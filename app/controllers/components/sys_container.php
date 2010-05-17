@@ -212,7 +212,7 @@ class sysContainerComponent
 	*/
 	function getCourseName($courseId=null, $userRole='', $courseObj=null)
   {
-    $this->Course =& new Course;
+    $this->Course = new Course;
     $course = null;
     if ($courseObj!=null)
     {
@@ -255,7 +255,7 @@ class sysContainerComponent
 	function getUserInfo($user_id, $opt='fullname')
 	{
 
-	  $this->User =& new User;
+	  $this->User = new User;
 	  $user = $this->User->findUserByid($user_id);
     if ($opt == 'fullname') {
        return $user['User']['first_name'].' '.$user['User']['last_name'];
@@ -265,7 +265,7 @@ class sysContainerComponent
   function checkEvaluationToolInUse($evalTool=null, $templateId=null)
   {
     //Get the target event
-    $this->Event =& new Event;
+    $this->Event = new Event;
     return $this->Event->checkEvaluationToolInUse($evalTool, $templateId);
   }
 }

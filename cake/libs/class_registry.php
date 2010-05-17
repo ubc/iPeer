@@ -52,7 +52,7 @@ class ClassRegistry{
 	function &getInstance() {
 		static $instance = array();
 		if (!$instance) {
-			$instance[0] = &new ClassRegistry;
+			$instance[0] = new ClassRegistry;
 		}
 		 return $instance[0];
 	}

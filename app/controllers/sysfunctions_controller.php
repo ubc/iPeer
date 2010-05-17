@@ -40,8 +40,8 @@ class SysFunctionsController extends AppController
 
 	function __construct()
 	{
-		$this->Sanitize = &new Sanitize;
-		$this->NeatString = &new NeatString;
+		$this->Sanitize = new Sanitize;
+		$this->NeatString = new NeatString;
 		$this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
 		if ($this->show == 'all') $this->show = 99999999;
 		$this->sortBy = empty($_GET['sort'])? 'id': $_GET['sort'];

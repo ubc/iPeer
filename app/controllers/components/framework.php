@@ -68,7 +68,7 @@ class frameworkComponent
 
   function getUser($userId) {
     
-    $this->User =& new User;
+    $this->User = new User;
     return ($this->User->find('id = '.$userId));
   }
 }

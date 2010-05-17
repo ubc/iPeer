@@ -15,7 +15,7 @@ class SearchHelperComponent
   function formatSearchEvaluation($conditions='', $order, $show, $page, $sortBy, $direction) {
     $matrixAry = array();
 
-    $this->Event =& new Event;
+    $this->Event = new Event;
 
     $courseIDs =  $this->sysContainer->getMyCourseIDs();
     $conditions .= !empty($conditions) ? ' AND course_id IN ('.$courseIDs.')':'course_id IN ('.$courseIDs.')';
@@ -43,11 +43,11 @@ class SearchHelperComponent
     if (empty($maxPercent)) $maxPercent = 1;
     if (empty($minPercent)) $minPercent = 0;
 
-    $this->GroupEvent =& new GroupEvent;
-    $this->Group =& new Group;
-    $this->EvaluationSubmission =& new EvaluationSubmission;
-    $this->GroupsMembers =& new GroupsMembers;
-    $this->Event =& new Event;
+    $this->GroupEvent = new GroupEvent;
+    $this->Group = new Group;
+    $this->EvaluationSubmission = new EvaluationSubmission;
+    $this->GroupsMembers = new GroupsMembers;
+    $this->Event = new Event;
 
     $this->Event->setId($eventId);
     $event = $this->Event->read();
@@ -125,7 +125,7 @@ class SearchHelperComponent
   {
     $matrixAry = array();
 
-    $this->User =& new User;
+    $this->User = new User;
 
     $conditions .= empty($conditions) ? 'role <> "S" AND role <> "A"':' AND role <> "S" AND role <> "A"';
 

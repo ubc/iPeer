@@ -13,7 +13,7 @@ class EventtoolHelperComponent
   function checkEvaluationToolInUse($evalTool=null, $templateId=null)
   {
     //Get the target event
-    $this->Event =& new Event;
+    $this->Event = new Event;
 
 
     return $this->Event->checkEvaluationToolInUse($evalTool, $templateId);

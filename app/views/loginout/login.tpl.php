@@ -47,7 +47,7 @@ if (isset($rdAuth->customIntegrateCWL) && !$rdAuth->customIntegrateCWL) { ?>
 document.write('        <br>');
 document.write('        <?php echo $html->image("layout/grey_arrow.gif",array("align"=>"middle",'alt'=>'grey_arrow'))?> <a href="/ipeer_v2/loginout/forgot" >Forgot Your Password?<\/a>');
 document.write('        <br><br>');
-document.write('        <?php echo $html->image("layout/grey_arrow.gif",array("align"=>"middle",'alt'=>'grey_arrow'))?> <a href="mailto:<?=$admin_email ?>" >Contact iPeer Administrator<\/a> ');
+document.write('        <?php echo $html->image("layout/grey_arrow.gif",array("align"=>"middle",'alt'=>'grey_arrow'))?> <a href="mailto:<?php echo $admin_email ?>" >Contact iPeer Administrator<\/a> ');
 document.write('        <\/td>');
 document.write('    <\/tr>');
 document.write('  <\/table>');

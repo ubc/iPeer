@@ -81,7 +81,7 @@
 	}
 
 	if (DEBUG) {
-		error_reporting(E_ALL);
+		error_reporting(E_ALL ^ E_DEPRECATED); // E_DEPRECATED was added to supress PHP5.3 decprecation warnings -Serge
 
 		if (function_exists('ini_set')) {
 			ini_set('display_errors', 1);

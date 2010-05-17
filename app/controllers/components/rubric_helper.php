@@ -2,7 +2,7 @@
 /* SVN FILE: $Id: rubric_helper.php,v 1.2 2006/07/18 21:38:54 davychiu Exp $ */
 /*
  * To use your Model’s inside of your components, you can create a new instance like this:
- *  $this->foo =& new Foo;
+ *  $this->foo = new Foo;
  *
  * @author
  * @version     0.10.5.1797
@@ -13,9 +13,9 @@ class RubricHelperComponent extends Object
 {
   function compileViewData($tmp=null)
 	{
-	  $this->RubricsLom =& new RubricsLom;
-	  $this->RubricsCriteria =& new RubricsCriteria;
-	  $this->RubricsCriteriaComment =& new RubricsCriteriaComment;
+	  $this->RubricsLom = new RubricsLom;
+	  $this->RubricsCriteria = new RubricsCriteria;
+	  $this->RubricsCriteriaComment = new RubricsCriteriaComment;
 
 		$rubric_id = $tmp['Rubric']['id'];
 

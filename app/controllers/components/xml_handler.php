@@ -4,9 +4,9 @@ class XmlHandlerComponent extends Object
 	var $components = array('rdAuth');
 
 	function makeTMXml4($questions=null,$surveyId=null,$numGroups=null,$params=null) {
-    $this->SurveyInput =& new SurveyInput;
-    $this->Response =& new Response;
-    $this->User =& new User;
+    $this->SurveyInput = new SurveyInput;
+    $this->Response = new Response;
+    $this->User = new User;
     $this->params = $params;
 
     $doc = domxml_new_doc('1.0');
@@ -96,9 +96,9 @@ class XmlHandlerComponent extends Object
 	}
 
 	function makeTMXml5($questions=null,$surveyId=null,$numGroups=null,$params=null) {
-    $this->SurveyInput =& new SurveyInput;
-    $this->Response =& new Response;
-    $this->User =& new User;
+    $this->SurveyInput = new SurveyInput;
+    $this->Response = new Response;
+    $this->User = new User;
     $this->params = $params;
 
     $doc = new DOMDocument('1.0');

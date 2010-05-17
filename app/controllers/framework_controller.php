@@ -38,7 +38,7 @@ class FrameworkController extends AppController
 
 	function __construct()
 	{
-		$this->Sanitize = &new Sanitize;
+		$this->Sanitize = new Sanitize;
  		$this->pageTitle = 'Framework';
 		parent::__construct();
 	}

@@ -242,7 +242,7 @@ class DboPostgres extends DboSource{
 
 			break;
 			default:
-				if (ini_get('magic_quotes_gpc') == 1) {
+				if (get_magic_quotes_gpc() == 1) {
 					$data = stripslashes($data);
 				}
 				$data = pg_escape_string($data);

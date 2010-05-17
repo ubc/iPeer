@@ -39,7 +39,7 @@ class HomeController extends AppController
 
 	function __construct()
 	{
-		$this->Sanitize = &new Sanitize;
+		$this->Sanitize = new Sanitize;
  		$this->pageTitle = 'Home';
 		parent::__construct();
 	}

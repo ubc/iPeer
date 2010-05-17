@@ -114,7 +114,7 @@ class Component extends Object {
 				} else {
 					$param = null;
 				}
-				$this->controller->{$component} =& new $componentCn($param);
+				$this->controller->{$component} = new $componentCn($param);
 				$loaded[$component] =& $this->controller->{$component};
 				if (isset($this->controller->{$component}->components) && is_array($this->controller->{$component}->components)) {
 					$loaded =& $this->_loadComponents($loaded, $this->controller->{$component}->components);

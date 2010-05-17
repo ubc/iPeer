@@ -457,7 +457,7 @@ class Model extends Object{
 		if (ClassRegistry::isKeySet($colKey)) {
 			$this->{$className} =& ClassRegistry::getObject($colKey);
 		} else {
-			$this->{$className} =& new $className();
+			$this->{$className} = new $className();
 		}
 
 		$this->alias[$assoc] = $this->{$className}->table;

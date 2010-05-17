@@ -5,9 +5,9 @@ class EvaluationSurveyHelperComponent extends Object
 
   function saveSurveyEvaluation($params=null)
   {
-    $this->Question =& new Question;
-    $this->SurveyInput =& new SurveyInput;
-    $this->EvaluationSubmission =& new EvaluationSubmission;
+    $this->Question = new Question;
+    $this->SurveyInput = new SurveyInput;
+    $this->EvaluationSubmission = new EvaluationSubmission;
 
     $userId = $params['data']['Evaluation']['surveyee_id'];
     $eventId = $params['form']['event_id'];
@@ -107,8 +107,8 @@ class EvaluationSurveyHelperComponent extends Object
 
 	function formatStudentViewOfSurveyEvaluationResult($event=null)
 	{
-	  $this->EvaluationSimple =& new EvaluationSimple;
-	  $this->GroupsMembers =& new GroupsMembers;
+	  $this->EvaluationSimple = new EvaluationSimple;
+	  $this->GroupsMembers = new GroupsMembers;
 	  $gradeReleaseStatus = 0;
 	  $aveScore = 0; $groupAve = 0;
 	  $studentResult = array();
@@ -158,11 +158,11 @@ class EvaluationSurveyHelperComponent extends Object
 
 	function formatSurveyEvaluationResult($event=null,$studentId=null)
 	{
-	  $this->Survey =& new Survey;
-	  $this->SurveyQuestion =& new SurveyQuestion;
-	  $this->Question =& new Question;
-	  $this->Response =& new Response;
-	  $this->SurveyInput =& new SurveyInput;
+	  $this->Survey = new Survey;
+	  $this->SurveyQuestion = new SurveyQuestion;
+	  $this->Question = new Question;
+	  $this->Response = new Response;
+	  $this->SurveyInput = new SurveyInput;
 
 	  $result = array();
 
@@ -198,12 +198,12 @@ class EvaluationSurveyHelperComponent extends Object
 	}
 
 	function formatSurveyGroupEvaluationResult($surveyId=null, $surveyGroupId=null) {
-	  $this->Survey =& new Survey;
-	  $this->SurveyQuestion =& new SurveyQuestion;
-	  $this->Question =& new Question;
-	  $this->Response =& new Response;
-	  $this->SurveyInput =& new SurveyInput;
-	  $this->User =& new User;
+	  $this->Survey = new Survey;
+	  $this->SurveyQuestion = new SurveyQuestion;
+	  $this->Question = new Question;
+	  $this->Response = new Response;
+	  $this->SurveyInput = new SurveyInput;
+	  $this->User = new User;
 
 	  $result = array();
 
@@ -270,12 +270,12 @@ class EvaluationSurveyHelperComponent extends Object
 
 	function formatSurveyEvaluationSummary($surveyId=null)
 	{
-	  $this->Survey =& new Survey;
-	  $this->SurveyQuestion =& new SurveyQuestion;
-	  $this->Question =& new Question;
-	  $this->Response =& new Response;
-	  $this->SurveyInput =& new SurveyInput;
-	  $this->User =& new User;
+	  $this->Survey = new Survey;
+	  $this->SurveyQuestion = new SurveyQuestion;
+	  $this->Question = new Question;
+	  $this->Response = new Response;
+	  $this->SurveyInput = new SurveyInput;
+	  $this->User = new User;
 
 	  $result = array();
     $survey_id = $surveyId;

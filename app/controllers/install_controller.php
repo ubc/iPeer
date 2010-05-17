@@ -37,7 +37,7 @@ class InstallController extends AppController
 	
 	function __construct()
 	{
-		$this->Sanitize = &new Sanitize;
+		$this->Sanitize = new Sanitize;
  		$this->pageTitle = 'Install Wizards';		
 		parent::__construct();
 	}

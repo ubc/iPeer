@@ -2,7 +2,7 @@
 /* SVN FILE: $Id: evaluation_simple_helper.php,v 1.2 2006/06/30 23:15:28 zoeshum Exp $ */
 /*
  * To use your Model’s inside of your components, you can create a new instance like this:
- *  $this->foo =& new Foo;
+ *  $this->foo = new Foo;
  *
  * @author
  * @version     0.10.5.1797
@@ -15,9 +15,9 @@ class EvaluationSimpleHelperComponent extends Object
 
   function saveSimpleEvaluation($params=null, $groupEvent=null, $evaluationSubmission=null)
   {
-    $this->EvaluationSimple =& new EvaluationSimple;
-    $this->EvaluationSubmission =& new EvaluationSubmission;
-    $this->GroupEvent =& new GroupEvent;
+    $this->EvaluationSimple = new EvaluationSimple;
+    $this->EvaluationSubmission = new EvaluationSubmission;
+    $this->GroupEvent = new GroupEvent;
 
     // assuming all are in the same order and same size
 		$evaluatees = $params['form']['memberIDs'];
@@ -83,8 +83,8 @@ class EvaluationSimpleHelperComponent extends Object
 
 	function formatStudentViewOfSimpleEvaluationResult($event=null)
 	{
-	  $this->EvaluationSimple =& new EvaluationSimple;
-	  $this->GroupsMembers =& new GroupsMembers;
+	  $this->EvaluationSimple = new EvaluationSimple;
+	  $this->GroupsMembers = new GroupsMembers;
 	  $gradeReleaseStatus = 0;
 	  $aveScore = 0; $groupAve = 0;
 	  $studentResult = array();
@@ -133,8 +133,8 @@ class EvaluationSimpleHelperComponent extends Object
 	}
 
   function changeEvaluationGradeRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus) {
-    $this->EvaluationSimple =& new EvaluationSimple;
-    $this->GroupEvent =& new GroupEvent;
+    $this->EvaluationSimple = new EvaluationSimple;
+    $this->GroupEvent = new GroupEvent;
     
 		$courseId = $this->rdAuth->courseId;
 
@@ -161,8 +161,8 @@ class EvaluationSimpleHelperComponent extends Object
   
   function changeEvaluationCommentRelease ($eventId, $groupId, $groupEventId, $evaluatorIds, $params) {
     
-    $this->GroupEvent =& new GroupEvent;
-    $this->EvaluationSimple =& new EvaluationSimple;
+    $this->GroupEvent = new GroupEvent;
+    $this->EvaluationSimple = new EvaluationSimple;
     
 		$this->GroupEvent->setId($groupEventId);
 		$groupEvent = $this->GroupEvent->read();
@@ -230,9 +230,9 @@ class EvaluationSimpleHelperComponent extends Object
   
 	function formatSimpleEvaluationResult($event=null)
 	{
-	  $this->GroupsMembers =& new GroupsMembers;
-	  $this->EvaluationSimple =& new EvaluationSimple;
-	  $this->EvaluationSubmission =& new EvaluationSubmission;
+	  $this->GroupsMembers = new GroupsMembers;
+	  $this->EvaluationSimple = new EvaluationSimple;
+	  $this->EvaluationSubmission = new EvaluationSubmission;
 	  $result = array();
 	  
      //Get Members for this evaluation

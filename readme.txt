@@ -1,6 +1,10 @@
-iPeer 2.0.7
+iPeer 2.0.8.3
 
-a quick readme as documentation is not yet compiled.
+Changelog from 2.0.8
+
+1) Bug fix: #1725231 , #1725229 (see bugs list in SF for details)
+2) Modify default login page to remove unnecessary JavaScript codes
+
 
 upgrade from 1.6:
 
@@ -24,11 +28,16 @@ MYSQL 4+
 --     in install4, make sure you set the absolute path to your path!
 3.  once the install is complete, delete controllers/install_controller.php and /ipeer_export directory.
 
+please note:
+
+1. The database config file /app/config/database.php must be writable during installation. 
+2. After installation, please make database.php read only. It is VERY important.
+3. To change file permission, you may either use a FTP client or do it directly through command line (if you have
+shell access to your server. In unix, you may use chmod command to do it)
+
 please report any bugs you find on sourceforge. we can't fix it if we don't know about it.
 
-questions? please post them on sourceforge.
-
-
+any suggestion or question? please let us know
 
 troubleshooting:
 

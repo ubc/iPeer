@@ -656,7 +656,7 @@ class View extends Object{
 				$replace = strtolower(substr($helper, 0, 1));
 				$camelBackedHelper = preg_replace('/\\w/', $replace, $helper, 1);
 
-				${$camelBackedHelper}			=& new $helperCn;
+				${$camelBackedHelper}			= new $helperCn;
 				${$camelBackedHelper}->view		=& $this;
 				${$camelBackedHelper}->base		= $this->base;
 				${$camelBackedHelper}->webroot	= $this->webroot;

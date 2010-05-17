@@ -113,7 +113,7 @@ class InstallHelperComponent
 	
 	function updateSystemParameters($data) 
   {
-  	$this->SysParameter =& new SysParameter;
+  	$this->SysParameter = new SysParameter;
   	$superAdmin = null;
   	
 		if (!empty($data)) {
@@ -142,19 +142,19 @@ class InstallHelperComponent
   
   function _importDataPhp4($xml_file, $to_import)
   {
-  	$this->User =& new User;
-    $this->Course =& new Course;
-    $this->Rubric =& new Rubric;
-    $this->RubricsLom =& new RubricsLom;
-    $this->RubricsCriteria =& new RubricsCriteria;
-    $this->RubricsCriteriaComment =& new RubricsCriteriaComment;
-    $this->SimpleEvaluation =& new SimpleEvaluation;
-    $this->Event =& new Event;
-    $this->UserCourse =& new UserCourse;
-    $this->UserEnrol =& new UserEnrol;
-    $this->Survey =& new Survey;
-    $this->SurveyQuestion =& new SurveyQuestion;
-    $this->Question =& new Question;
+  	$this->User = new User;
+    $this->Course = new Course;
+    $this->Rubric = new Rubric;
+    $this->RubricsLom = new RubricsLom;
+    $this->RubricsCriteria = new RubricsCriteria;
+    $this->RubricsCriteriaComment = new RubricsCriteriaComment;
+    $this->SimpleEvaluation = new SimpleEvaluation;
+    $this->Event = new Event;
+    $this->UserCourse = new UserCourse;
+    $this->UserEnrol = new UserEnrol;
+    $this->Survey = new Survey;
+    $this->SurveyQuestion = new SurveyQuestion;
+    $this->Question = new Question;
 
     // get the xml file
 
@@ -555,19 +555,19 @@ class InstallHelperComponent
   
   function _importDataPhp5($xml_file, $to_import)
   {
-  	$this->User =& new User;
-    $this->Course =& new Course;
-    $this->Rubric =& new Rubric;
-    $this->RubricsLom =& new RubricsLom;
-    $this->RubricsCriteria =& new RubricsCriteria;
-    $this->RubricsCriteriaComment =& new RubricsCriteriaComment;
-    $this->SimpleEvaluation =& new SimpleEvaluation;
-    $this->Event =& new Event;
-    $this->UserCourse =& new UserCourse;
-    $this->UserEnrol =& new UserEnrol;
-    $this->Survey =& new Survey;
-    $this->SurveyQuestion =& new SurveyQuestion;
-    $this->Question =& new Question;
+  	$this->User = new User;
+    $this->Course = new Course;
+    $this->Rubric = new Rubric;
+    $this->RubricsLom = new RubricsLom;
+    $this->RubricsCriteria = new RubricsCriteria;
+    $this->RubricsCriteriaComment = new RubricsCriteriaComment;
+    $this->SimpleEvaluation = new SimpleEvaluation;
+    $this->Event = new Event;
+    $this->UserCourse = new UserCourse;
+    $this->UserEnrol = new UserEnrol;
+    $this->Survey = new Survey;
+    $this->SurveyQuestion = new SurveyQuestion;
+    $this->Question = new Question;
         
     $dom = new DomDocument();
     $dom->load($xml_file);

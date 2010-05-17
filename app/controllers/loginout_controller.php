@@ -41,9 +41,9 @@ class LoginoutController extends AppController
 
 	function __construct()
 	{
-		$this->Sanitize = &new Sanitize;
+		$this->Sanitize = new Sanitize;
  		$this->pageTitle = 'Login';
-    $this->NeatString = &new NeatString;
+    $this->NeatString = new NeatString;
 		parent::__construct();
 	}
 

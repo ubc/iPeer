@@ -6,10 +6,10 @@ class ExportHelperComponent extends Object
   var $globEventId;
 
 	function createCSV($params) {
-	  $this->Course =& new Course;
-	  $this->UserCourse =& new UserCourse;
-	  $this->Event =& new Event;
-	  $this->GroupEvent =& new GroupEvent;
+	  $this->Course = new Course;
+	  $this->UserCourse = new UserCourse;
+	  $this->Event = new Event;
+	  $this->GroupEvent = new GroupEvent;
 
     $courseId = $this->rdAuth->courseId;
     $csvContent = '';
@@ -82,17 +82,17 @@ class ExportHelperComponent extends Object
 	//
 	function createBody ($groupEvents,$params,$eventTemplateId,$eventTypeId) {
     global $globEventId;
-	  $this->Group =& new Group;
-	  $this->GroupsMembers =& new GroupsMembers;
-	  $this->User =& new User;
-	  $this->SimpleEvaluation =& new SimpleEvaluation;
-	  $this->Rubric =& new Rubric;
-	  $this->Mixeval =& new Mixeval;
-	  $this->RubricsCriteria =& new RubricsCriteria;
-	  $this->MixEvalsQuestionDesc =& new MixevalsQuestionDesc;
-	  $this->EvaluationSimple =& new EvaluationSimple;
-	  $this->EvaluationRubric =& new EvaluationRubric;
-	  $this->EvaluationMixeval =& new EvaluationMixeval;   
+	  $this->Group = new Group;
+	  $this->GroupsMembers = new GroupsMembers;
+	  $this->User = new User;
+	  $this->SimpleEvaluation = new SimpleEvaluation;
+	  $this->Rubric = new Rubric;
+	  $this->Mixeval = new Mixeval;
+	  $this->RubricsCriteria = new RubricsCriteria;
+	  $this->MixEvalsQuestionDesc = new MixevalsQuestionDesc;
+	  $this->EvaluationSimple = new EvaluationSimple;
+	  $this->EvaluationRubric = new EvaluationRubric;
+	  $this->EvaluationMixeval = new EvaluationMixeval;   
 
     $globEventId = $groupEvents[0]['GroupEvent']['event_id'];
 

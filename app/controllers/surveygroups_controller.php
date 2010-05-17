@@ -41,7 +41,7 @@ class SurveyGroupsController extends AppController
 
     function __construct()
     {
-        $this->Sanitize = &new Sanitize;
+        $this->Sanitize = new Sanitize;
         $this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
         if ($this->show == 'all') $this->show = 99999999;
         $this->sortBy = empty($_GET['sort'])? 'created': $this->Sanitize->paranoid($_GET['sort']);
@@ -375,7 +375,7 @@ class SurveyGroupsController extends AppController
         
         $unix_path = '../uploads/'.$time.'.xml';
         $windows_path = '..\\uploads\\'.$time.'.xml';
-    $this->File =& new File($unix_path);
+    $this->File = new File($unix_path);
     $this->File->write($doc);
     //execute TeamMaker
         if(!file_exists('..\\controllers\\components\\TeamMaker')) //not windows

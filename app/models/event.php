@@ -192,8 +192,8 @@ class Event extends AppModel
     $event = $this->read($id);
 
     // delete evaluation_mixevals and evaluation_mixeval_details
-    $evaluation_mixeval =& new EvaluationMixeval();
-    $evaluation_mixeval_detail =& new EvaluationMixevalDetail();
+    $evaluation_mixeval = new EvaluationMixeval();
+    $evaluation_mixeval_detail = new EvaluationMixevalDetail();
 
     $ems = $evaluation_mixeval->findAllByEventId($this->id);
     foreach($ems as $em) {
@@ -205,11 +205,11 @@ class Event extends AppModel
     }
 
     // delete evaluation_rubrics and evaluation_rubrics_details
-    $evaluation_rubric =& new EvaluationRubric();
-    $evaluation_rubric_detail =& new EvaluationRubricDetail();
+    $evaluation_rubric = new EvaluationRubric();
+    $evaluation_rubric_detail = new EvaluationRubricDetail();
 
     // delete evaluation_simples
-    $evaluation_simple =& new EvaluationSimple();
+    $evaluation_simple = new EvaluationSimple();
 
     // delete evaluation_submissions
 

@@ -238,7 +238,7 @@ class DboMysqli extends DboSource {
 				$data = $this->boolean((bool)$data);
 			break;
 			default:
-				if (ini_get('magic_quotes_gpc') == 1) {
+				if (get_magic_quotes_gpc() == 1) {
 					$data = stripslashes($data);
 				}
 				$data = mysqli_real_escape_string($this->connection, $data);

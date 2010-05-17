@@ -2,7 +2,7 @@
 /* SVN FILE: $Id: evaluation_result.php,v 1.2 2006/06/30 23:15:28 zoeshum Exp $ */
 /*
  * To use your Model’s inside of your components, you can create a new instance like this:
- *  $this->foo =& new Foo;
+ *  $this->foo = new Foo;
  *
  * @author      
  * @version     0.10.5.1797
@@ -19,7 +19,7 @@ class EvaluationResultComponent extends Object
 		//
 		$matrix = array(); 
 
-//$this->User =& new User;
+//$this->User = new User;
 //print_r($this->User->findUserByStudentNo('36241032'));
 	      	
 	  foreach($evalResult AS $index => $value){

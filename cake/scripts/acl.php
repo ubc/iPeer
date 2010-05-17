@@ -213,7 +213,7 @@ class AclCLI {
 		$this->checkArgNumber(4, 'create');
 		$this->checkNodeType();
 		extract($this->__dataVars());
-		$node = &new $class;
+		$node = new $class;
 
 		$parent = intval($this->args[2]);
 
@@ -230,7 +230,7 @@ class AclCLI {
 		$this->checkArgNumber(2, 'delete');
 		$this->checkNodeType();
 		extract($this->__dataVars());
-		$node = &new $class;
+		$node = new $class;
 		//What about children
 		//$node->del($this->args[1])
 		//fwrite($this->stdout, "$class deleted.\n\n");
@@ -244,7 +244,7 @@ class AclCLI {
 		$this->checkArgNumber(3, 'setParent');
 		$this->checkNodeType();
 		extract($this->__dataVars());
-		$node = &new $class;
+		$node = new $class;
 
 		if (!$node->setParent($this->args[2], $this->args[1])){
 			fwrite($this->stdout, "Error in setting new parent. Please make sure the parent node exists, and is not a descendant of the node specified.\n");
@@ -265,7 +265,7 @@ class AclCLI {
 		if (!$suppliedNode) {
 			$this->displayError("Supplied Node '".$args[1]."' not found. No tree returned.");
 		}
-		$node = &new $class;
+		$node = new $class;
 		$nodes = $node->getPath(intval($this->args[1]));
 
 		for ($i = 0; $i < count($nodes); $i++) {
@@ -305,7 +305,7 @@ class AclCLI {
 		$this->checkArgNumber(1, 'view');
 		$this->checkNodeType();
 		extract($this->__dataVars());
-		$node = &new $class;
+		$node = new $class;
 		$nodes = $node->findAll(null, null, 'lft ASC');
 		$right = array();
 
@@ -482,7 +482,7 @@ class AclCLI {
 	function nodeExists($type, $id) {
 		//fwrite($this->stdout, "Check to see if $type with ID = $id exists...\n");
 		extract($this->__dataVars($type));
-		$node = &new $class;
+		$node = new $class;
 		$possibility = $node->find('id = ' . $id);
 
 		if (empty($possibility[$class]['id'])) {

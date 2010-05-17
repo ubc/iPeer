@@ -43,7 +43,7 @@ class Security extends Object{
 	function &getInstance() {
 		static $instance = array();
 	 	if (!$instance) {
-	 		$instance[0] = &new Security;
+	 		$instance[0] = new Security;
 	 	}
 	 	return $instance[0];
 	}
