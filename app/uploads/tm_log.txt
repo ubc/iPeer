@@ -1,0 +1,31 @@
+Loading XML file
+Processing to create 21 teams
+Found minority id == -1
+Loading students...
+done
+Initializing weight info...
+done
+Handling fixed teams...
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+Found a fixed team, processed and decremented numTeams
+done
+Trying 50 top-level creations

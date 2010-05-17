@@ -1,0 +1,62 @@
+<table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
+  <tr>
+    <td>
+    <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($data['SimpleEvaluation']['id'])?'add':'edit') ?>" onSubmit="return validate()">
+      <?php echo empty($data['SimpleEvaluation']['id']) ? null : $html->hidden('SimpleEvaluation/id'); ?>
+      <input type="hidden" name="required" id="required" value="point_per_member" />
+      <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+        <tr class=tableheader>
+          <td colspan="3"><center>View Simple Evaluation</center></td>
+        </tr>  
+        <tr class=tablecell2>
+	        <td width="254" id="newtitle_label">Evaluation Name:</td>
+	        <td width="405" align="left">
+        	<?php echo $data['SimpleEvaluation']['name']  ?>
+          </td>
+          <td width="243" id="newtitle_msg" class="error"/>
+        </tr>
+        <tr class=tablecell2>
+        	<td id="description_label">Description:</td>
+        	<td align="left"><?php echo $data['SimpleEvaluation']['description']  ?></td>
+        	<td id="description_msg" class="error"/>
+        </tr>
+        <tr class=tablecell2>
+        	<td id="point_per_member_label">Base Point Per Member:</td>
+        	<td align="left"><?php echo $data['SimpleEvaluation']['point_per_member']  ?>
+        	</td>
+        	<td id="point_per_member_msg" class="error"/>
+        </tr>
+        <tr class=tablecell2>
+          <td colspan="3" align="center">
+            <?php if (!empty($popUp) && $popUp) { ?>
+            <input type=button name="Close" value="Close" onClick="window.close()">            
+            <?php } else { ?>
+      	    <input type=button name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller']; ?>'">            
+            <?php }?>
+
+      	</td>
+      </table>
+      <table width="95%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">
+        <tr>
+          <td align=left><?php echo $html->image('layout/corner_bot_left.gif',array('align'=>'absmiddle'))?></td>
+          <td align=right><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'absmiddle'))?></td>
+        </tr>
+      </table>
+</form>
+</td>
+</tr>
+</table>
+  
+  <h1>
+<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+  <tr>
+	<td><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0'))?><a name="rpreview"/a> Simple Evaluation Preview </td>
+	<td><div align="right"><a href="#rpreview" onclick="showhide('rpreview'); toggle(this);"><?php echo empty($this->data) ? '[-]' : '[-]'; ?></a></div></td>
+  </tr>
+</table>
+</h1>
+
+<div id=rpreview style="display: block; background: #FFF;">
+<br>
+
+</div>

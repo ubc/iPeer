@@ -1,0 +1,108 @@
+<?php echo $javascript->link('calendar1')?>
+<table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
+  <tr>
+    <td>
+    <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Survey']['id'])?'add':'edit') ?>">
+      <h4><?php echo empty($params['data']['Survey']['id']) ? null : $html->hidden('Survey/id'); ?></h4>
+      <?php echo empty($params['data']['Survey']['id']) ? $html->hidden('Survey/creator_id', array('value'=>$rdAuth->id)) : $html->hidden('Survey/updater_id', array('value'=>$rdAuth->id)); ?>        
+	  <table width="95%"  border="0" align="center" cellpadding="4" cellspacing="2">
+        <tr class=tableheader>
+          <td colspan="3" align=center><?php echo empty($params['data']['Survey']['id'])?'Add':'Edit' ?> Survey </td>
+        </tr>
+        <tr class=tablecell2>
+          <td width="13%">Survey Title:<font color=red>*</font></td>
+          <td width="52%"><input type="hidden" name="assigned" id="assigned"/>
+            <input type="text" name="name" id="name" style="width:85%;" class=input value="<?php echo empty($params['data']['Survey']['name'])? '' : $params['data']['Survey']['name'] ?>" style="width:250px;">
+            <div id=surveyErr>
+              <?php 
+              $fieldValue = isset($this->params['form']['name'])? $this->params['form']['name'] : '';
+              $params = array('controller'=>'surveys', 'data'=>null, 'fieldvalue'=>$fieldValue);
+            	echo $this->renderElement('surveys/ajax_survey_validate', $params);
+              ?>
+            </div>
+            <?php echo $ajax->observeField('name', array('update'=>'surveyErr', 'url'=>"/surveys/checkDuplicateName", 'frequency'=>1, 'loading'=>"Toggle.display('search_spinner');", 'complete'=>"Toggle.display('search_spinner');stripe();")) ?> </td>
+          <td width="35%"> i.e. "CS100 Experience" </td>
+        </tr>
+        <tr class=tablecell2>
+          <td>Survey Template:</td>
+          <td>
+		  <select name="survey_template" id="survey_template" style="width:85%;">
+		  	<option value=>(No Template)</option>
+			<?php
+				for($i=0; $i<sizeof($templates); $i++)
+				{
+					echo "<option value='".$templates[$i]['Survey']['id']."'>".$templates[$i]['Survey']['name']."</option>";
+				}
+			?>
+		  </select>
+		  </td>
+          <td>Template used for survey. </td>
+        </tr>
+        <tr class=tablecell2>
+          <td>Assigned Course:<font color=red>*</font></td>
+          <td><?php 			
+              if (empty($rdAuth->courseId)) {
+                $params = array('controller'=>'courses', 'courseList'=>$courseList, 'courseId'=>null, 'defaultOpt'=>1);
+              } else {
+                $params = array('controller'=>'courses', 'courseList'=>$courseList, 'courseId'=>null);
+              }
+              echo $this->renderElement('courses/course_selection_box', $params);
+        ?></td>
+          <td>Which course may take this survey?</td>
+        </tr>
+        <tr class=tablecell2>
+          <td>Due Date:<font color=red>*</font></td>
+          <td><?php echo $html->input('Survey/due_date', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal1.popup();"><?php echo $html->image('icons/cal.gif',array('align'=>'absmiddle', 'border'=>'0'))?></a>  </td>
+          <td> eg. YYYY-MM-DD HH:MM:SS (24 HOUR) </td>
+        </tr>
+        <tr class=tablecell2>
+          <td valign="top">Release Date:<font color=red>*</font></td>
+          <td><table width="97%" border="0" cellspacing="2" cellpadding="4">
+            <tr>
+              <td>From:</td>
+              <td><?php echo $html->input('Survey/release_date_begin', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal2.popup();"><?php echo $html->image('icons/cal.gif',array('align'=>'absmiddle', 'border'=>'0'))?></a>  </td>
+            </tr>
+            <tr>
+              <td>To:</td>
+              <td><?php echo $html->input('Survey/release_date_end', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal3.popup();"><?php echo $html->image('icons/cal.gif',array('align'=>'absmiddle', 'border'=>'0'))?></a>  </td>
+            </tr>
+          </table>            </td>
+          <td valign="top"> eg. YYYY-MM-DD HH:MM:SS (24 HOUR) </td>
+        </tr>
+        <tr class=tablecell2>
+          <td colspan="3" align=center><?php echo $html->submit('Add Survey') ?>
+            <input type=button name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller']; ?>'"></td>
+          </tr>
+      </table>
+      <table width="95%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">
+        <tr>
+          <td align=left><?php echo $html->image('layout/corner_bot_left.gif',array('align'=>'absmiddle'))?></td>
+          <td align=right><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'absmiddle'))?></td>
+        </tr>
+      </table>
+    </form>
+	</td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+<!--
+
+// create calendar object(s) just after form tag closed
+// specify form element as the only parameter (document.forms['formname'].elements['inputname']);
+// note: you can have as many calendar objects as you need for your application
+
+var cal1 = new calendar1(document.forms[0].elements['data[Survey][due_date]']);
+cal1.year_scroll = false;
+cal1.time_comp = true;
+
+var cal2 = new calendar1(document.forms[0].elements['data[Survey][release_date_begin]']);
+cal2.year_scroll = false;
+cal2.time_comp = true;
+
+var cal3 = new calendar1(document.forms[0].elements['data[Survey][release_date_end]']);
+cal3.year_scroll = false;
+cal3.time_comp = true;
+
+//-->
+</script>

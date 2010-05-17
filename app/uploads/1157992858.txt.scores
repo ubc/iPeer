@@ -1,0 +1,16 @@
+<table border="1" cellpadding="2"><tr><td></td><td><span class="vertical">Are you in Thermo-Fluid option of MECH?</span></td>
+<td><span class="vertical">Are you in Mechatronics option?</span></td>
+<td><span class="vertical">How would you grade your English writing Skills?</span></td>
+<td><span class="vertical">What grade do you expect in this course?</span></td>
+<td><span class="vertical">What was your approximate grade average (percentage) last year?</span></td>
+<td><span class="vertical">Do you have access to a laptop you can bring to UBC?</span></td>
+<td><span class="vertical">Do you have any work experience relating to engineering or manufacturing beyond second year engineering?</span></td>
+<td><span class="vertical">Do you have access to a car after hours and on weekends?</span></td>
+<td><span class="vertical">What is your first choice of project?</span></td>
+<td><span class="vertical">What is your second choice project?</span></td>
+<td><span class="vertical">What is your third choice project?</span></td>
+<td><span class="vertical">Are you in COOP?</span></td>
+<td>Total</td></tr>
+<tr><td>Team / Weight</td><td bgcolor="">1</td>
+</tr>
+<tr><td>Team #1</td><td align="center">25%</td><td align="center">25%</td><td align="center">75%</td><td align="center">25%</td><td align="center">75%</td><td align="center">75%</td><td align="center">75%</td><td align="center">75%</td><td align="center">75%</td><td align="center">75%</td><td align="center">25%</td><td align="center">75%</td><td>-0.75</td></tr><tr><td>Team #2</td><td align="center">23%</td><td align="center">23%</td><td align="center">77%</td><td align="center">23%</td><td align="center">77%</td><td align="center">77%</td><td align="center">77%</td><td align="center">77%</td><td align="center">77%</td><td align="center">77%</td><td align="center">23%</td><td align="center">77%</td><td>-0.77</td></tr></table>

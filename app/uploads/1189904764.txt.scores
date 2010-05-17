@@ -1,0 +1,14 @@
+<table border="1" cellpadding="2"><tr><td></td><td><span class="vertical">What was your academic performance/average in 1st year?</span></td>
+<td><span class="vertical">Have you taken 1st year at UBC?</span></td>
+<td><span class="vertical">Have you taken grade 12 in BC?</span></td>
+<td><span class="vertical">Do you have a previous certifcation/diploma or degree?</span></td>
+<td><span class="vertical">Do you have any previous lab experienc?</span></td>
+<td><span class="vertical">Do you have experience with lab report writing experience?</span></td>
+<td><span class="vertical">What is your first language?</span></td>
+<td><span class="vertical">What is your second language?</span></td>
+<td><span class="vertical">What is your gender?</span></td>
+<td><span class="vertical">Do you have a laptop that you can bring to the lab?</span></td>
+<td>Total</td></tr>
+<tr><td>Team / Weight</td><td bgcolor="">-5</td>
+</tr>
+<tr><td>Team #1</td><td align="center">12%</td><td align="center">12%</td><td align="center">12%</td><td align="center">12%</td><td align="center">12%</td><td align="center">12%</td><td align="center">12%</td><td align="center">12%</td><td align="center">12%</td><td align="center">12%</td><td>-43.90</td></tr><tr><td>Team #2</td><td align="center">10%</td><td align="center">10%</td><td align="center">10%</td><td align="center">10%</td><td align="center">10%</td><td align="center">10%</td><td align="center">10%</td><td align="center">10%</td><td align="center">10%</td><td align="center">10%</td><td>-45.12</td></tr></table>

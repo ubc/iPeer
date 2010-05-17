@@ -1,0 +1,265 @@
+<?php
+/* SVN FILE: $Id: sys_container.php,v 1.8 2006/06/27 21:44:55 zoeshum Exp $ */
+/*
+ * rdAuth Component for ipeerSession
+ *
+ * @author      gwoo <gwoo@rd11.com>
+ * @version     0.10.5.1797
+ * @license		OPPL
+ *
+ */
+class sysContainerComponent
+{
+	var $components = array('Session');
+	
+	/**
+	* List of accessible functions using function code as index key
+	*
+	* @var array
+	* @access private
+	*/
+	var $acesFunctionList = array();
+
+	/**
+	* List of accessible functions using action as index key
+	*
+	* @var array
+	* @access private
+	*/
+	var $actionList = array();
+
+	/**
+	* List of system parameters
+	*
+	* @var array
+	* @access private
+	*/
+	var $paramList = array();
+		
+	/**
+	* List of my courses
+	*
+	* @var array
+	* @access private
+	*/
+	var $myCourseList = array();
+  
+  var $myCourseIDs = '';
+ // var $course
+	/**
+	* Function to set the accessible functions
+	*
+	* @param string $data used for login method
+	* @return errors
+	*/
+	function setAcesFunctionList($funcList='')
+  {
+
+    $result = array();
+    foreach($funcList as $row): $sysFunction = $row['SysFunction'];
+       $result[$sysFunction['function_code']] = $sysFunction;
+    endforeach;
+
+    $this->acesFunctionList = $result;
+    $this->Session->write('ipeerSession.acesFunctionList', $this->acesFunctionList);
+  }
+
+	/**
+	* Function to get the accessible functions
+	* Method to get: $tmp= $result['USR'];
+  *                echo $tmp['function_name'];
+	* @param string $data used for login method
+	* @return errors
+	*/
+	function getAcesFunctionList()
+  {
+
+    $this->acesFunctionList=$this->Session->read('ipeerSession.acesFunctionList');
+    return $this->acesFunctionList;
+  }
+  
+	/**
+	* Function to set the accessible functions by action
+	*
+	* @param string $data used for login method
+	* @return errors
+	*/
+	function setActionList($actionList='')
+  {
+    $result = array();
+    foreach($actionList as $row): $sysFunction = $row['SysFunction'];
+       $result[$sysFunction['controller_name']] = $sysFunction;
+    endforeach;
+
+    $this->actionList = $result;
+    $this->Session->write('ipeerSession.actionList', $this->actionList);
+  }
+
+	/**
+	* Function to get the accessible functions
+	* Method to get: $tmp= $result['USR'];
+  *                echo $tmp['function_name'];
+	* @param string $data used for login method
+	* @return errors
+	*/
+	function getActionList()
+  {
+    $this->actionList=$this->Session->read('ipeerSession.actionList');
+    return $this->actionList;
+  }
+  
+  function getFieldByFunctionCode($funcCode='', $field)
+  {
+    if (!empty($this->acesFunctionList)){
+      $function= $this->acesFunctionList[$funcCode];
+      return $function[$field];
+    } 
+  }
+
+  function getFieldByAction($action='', $field)
+  {
+    if (!empty($this->actionList)){
+      $function= $this->actionList[$action];
+      return $function[$field];
+    } 
+  }
+
+	/**
+	* Function to set the system parameters
+	*
+	* @param string $data used for login method
+	* @return errors
+	*/
+	function setParamList($paramList='')
+  {
+    $result = array();
+    foreach($paramList as $row): $sysParameter = $row['SysParameter'];
+       $result[$sysParameter['parameter_code']] = $sysParameter;
+    endforeach;
+
+    $this->paramList = $result;
+    $this->Session->write('ipeerSession.paramList', $this->paramList);
+  }
+
+	/**
+	* Function to get the system parameters
+	* Method to get: $tmp= $result['system.debug_mode'];
+  *                echo $tmp['parameter_value'];
+	* @param string $data used for login method
+	* @return errors
+	*/
+	function getParamByParamCode($paraCode='')
+  {
+    $paramList = $this->Session->read('ipeerSession.paramList');
+		$sysParameter = $paramList[$paraCode];
+    return $sysParameter;
+  }
+  
+ 	/**
+	* Function to set the my courses functions
+	*
+	* @param string 
+	* @return errors
+	*/
+	function setMyCourseList($courseList='')
+  {
+    $result = array();
+
+    if ($courseList!=null)
+    {
+      $pos = 1;
+      foreach($courseList as $row): $course = $row['courses'];
+         $result[$course['id']] = $course;
+         
+         $this->myCourseIDs .= $course['id'];
+         if ($pos < count($courseList)) {
+           $this->myCourseIDs .= ', ';
+           $pos++;
+         }
+      endforeach;
+
+      $this->myCourseList = $result;
+      $this->Session->write('ipeerSession.myCourseList', $this->myCourseList);
+      $this->Session->write('ipeerSession.myCourseIDs', $this->myCourseIDs);
+    }
+  }
+
+	/**
+	* Function to get the accessible functions
+	* Method to get: $tmp= $result['USR'];
+  *                echo $tmp['function_name'];
+	* @param string $data used for login method
+	* @return errors
+	*/
+	function getMyCourseList()
+  {
+    $this->myCourseList=$this->Session->read('ipeerSession.myCourseList');
+    return $this->myCourseList;
+  }
+	
+	function getMyCourseIDs()
+  {
+    $this->myCourseIDs=$this->Session->read('ipeerSession.myCourseIDs');
+    return $this->myCourseIDs;
+  }
+  	
+	/**
+	* Function to get the accessible functions
+	* Method to get: $tmp= $result['USR'];
+  *                echo $tmp['function_name'];
+	* @param string $data used for login method
+	* @return errors
+	*/
+	function getCourseName($courseId=null, $userRole='', $courseObj=null)
+  {
+    $course = null;
+    if ($courseObj!=null)
+    {
+      $course = $courseObj;
+    } else {
+      $this->myCourseList = $this->getMyCourseList();
+      $course= $this->myCourseList[$courseId];
+    }
+    //TODO: Change /ipeer2 using Session Name in SysParameter  
+    if (!empty($course['homepage'])) {
+      $courseLink = '&nbsp;<a href="'.$course['homepage'].'" onclick="wopen(this.href, \'popup\', 650, 500); return false;"><img src="/ipeer2/img/icons/home.gif" border="0" align="absmiddle" /></a>&nbsp;';
+    } else {
+      $courseLink = '&nbsp;<img src="'.dirname($_SERVER['PHP_SELF']).'/img/icons/home.gif" border="0" align="absmiddle" />&nbsp;';
+    } 
+    if ($userRole != 'S') {
+      $courseLink .=  '<a href="../../courses/home/'.$courseId.'" ><u>'.$course['course'].'</u></a>';
+    }
+    else {
+      $courseLink .=  $course['course'];
+    }
+    
+    return $courseLink;
+  }	
+  
+  function setCourseId($courseId=null)
+	{
+	  $this->Session->write('ipeerSession.courseId', $courseId);
+	}
+	
+	function getCourseId()
+	{
+	  return $this->Session->read('ipeerSession.courseId');
+	}
+	
+	function getUserInfo($user_id, $opt='fullname')
+	{
+
+	  $this->User =& new User;
+	  $user = $this->User->findUserByid($user_id);
+    if ($opt == 'fullname') {
+       return $user['User']['first_name'].' '.$user['User']['last_name'];
+    }	  
+	}
+
+  function checkEvaluationToolInUse($evalTool=null, $templateId=null)
+  {
+    //Get the target event
+    $this->Event =& new Event;
+    return $this->Event->checkEvaluationToolInUse($evalTool, $templateId);
+  } 
+}

@@ -1,0 +1,8 @@
+<table border="1" cellpadding="2"><tr><td></td><td><span class="vertical">What is your gender?</span></td>
+<td><span class="vertical">Please indicte your age range?</span></td>
+<td><span class="vertical">How many languages do you speak?</span></td>
+<td><span class="vertical">What is your preferred learning style?</span></td>
+<td>Total</td></tr>
+<tr><td>Team / Weight</td><td bgcolor="">5</td>
+</tr>
+<tr><td>Team #1</td><td align="center">2%</td><td align="center">98%</td><td align="center">98%</td><td align="center">98%</td><td>10.82</td></tr><tr><td>Team #2</td><td align="center">2%</td><td align="center">98%</td><td align="center">98%</td><td align="center">98%</td><td>10.81</td></tr></table>
