@@ -67,19 +67,20 @@ echo 'onload="document.getElementById(\'username\').focus()"';
 			<?php if (!empty( $rdAuth->id)) :?>
 				<td width="350" align="right"><?php echo $html->image('layout/icon_edit.gif',array('alt'=>'icon_edit'))?>
 				<a
-					href="<?php echo $this->webroot.$this->themeWeb;?>users/editProfile"
+					href="&lt;?php echo $this-&gt;webroot.$this-&gt;themeWeb;?&gt;users/editProfile"
 					class="miniLinks">Edit Profile (<?php echo $rdAuth->fullname ?>)</a></td>
 				<td width="57" align="right"><?php echo $html->image('layout/icon_arrow.gif',array('alt'=>'icon_arrow'))?>
 				<a
-					href="<?php echo $this->webroot.$this->themeWeb;?>loginout/logout"
+					href="&lt;?php echo $this-&gt;webroot.$this-&gt;themeWeb;?&gt;loginout/logout"
 					class="miniLinks">Logout</a></td>
 					<?php else:?>
-				<td width="157" ></td>
+				<td width="157"></td>
 				<td width="57" align="right"><?php echo $html->image('layout/icon_arrow.gif',array('alt'=>'icon_arrow'))?>
-				<a href="<?php echo $this->webroot.$this->themeWeb;?>loginout/login"
+				<a
+					href="&lt;?php echo $this-&gt;webroot.$this-&gt;themeWeb;?&gt;loginout/login"
 					class="miniLinks">Login</a></td>
 					<?php endif;?>
-			
+
 			</tr>
 		</table>
 		</td>
@@ -103,44 +104,44 @@ echo 'onload="document.getElementById(\'username\').focus()"';
 					$homeSysFunc = $access['HOME'];    ?>
 					<li
 					<?php if ($this->params['controller'] == 'home') echo 'id="current"'; ?>><a
-						href="<?php echo $this->webroot.$this->themeWeb.$homeSysFunc['url_link'];?>"><span><?php echo $html->image('layout/icon_home.gif',array('border'=>'0','alt'=>'icon_home'))?>
+						href="&lt;?php echo $this-&gt;webroot.$this-&gt;themeWeb.$homeSysFunc['url_link'];?&gt;"><span><?php echo $html->image('layout/icon_home.gif',array('border'=>'0','alt'=>'icon_home'))?>
 						<?php echo $homeSysFunc['function_name']?> </span></a></li>
 						<?php }?>
 						<?php if (!empty($access['COURSE'])) {
 							$courseSysFunc = $access['COURSE'];    ?>
 					<li
 					<?php if ($this->params['controller'] == 'courses' || $this->params['controller'] == 'events' || $this->params['controller'] == 'groups' || $this->params['controller'] == 'evaluations' || $this->params['controller'] == 'surveygroups') echo 'id="current"'; ?>><a
-						href="<?php echo $this->webroot.$this->themeWeb.$courseSysFunc['url_link'];?>"><span><?php echo $courseSysFunc['function_name']?></span></a></li>
+						href="&lt;?php echo $this-&gt;webroot.$this-&gt;themeWeb.$courseSysFunc['url_link'];?&gt;"><span><?php echo $courseSysFunc['function_name']?></span></a></li>
 						<?php }?>
 						<?php if (!empty($access['USR']) && ($rdAuth->role == 'A' || $rdAuth->role == 'I')) {
 							$userSysFunc = $access['USR'];    ?>
 					<li
 					<?php if ($this->params['controller'] == 'users') echo 'id="current"'; ?>><a
-						href="<?php echo $this->webroot.$this->themeWeb.$userSysFunc['url_link'];?>"><span><?php echo $userSysFunc['function_name']?></span></a></li>
+						href="&lt;?php echo $this-&gt;webroot.$this-&gt;themeWeb.$userSysFunc['url_link'];?&gt;"><span><?php echo $userSysFunc['function_name']?></span></a></li>
 						<?php } else if (!empty($access['USR']) && ($rdAuth->role == 'S')){?>
 					<li
 					<?php if ($this->params['controller'] == 'users') echo 'id="current"'; ?>><a
-						href="<?php echo $this->webroot.$this->themeWeb;?>users/editProfile"><span>Edit
+						href="&lt;?php echo $this-&gt;webroot.$this-&gt;themeWeb;?&gt;users/editProfile"><span>Edit
 					Profile</span></a></li>
 					<?php } ?>
 					<?php if (!empty($access['EVAL_TOOL'])) {
 						$evaltoolSysFunc = $access['EVAL_TOOL'];    ?>
 					<li
 					<?php if ($this->params['controller'] == 'evaltools'  || $this->params['controller'] == 'simpleevaluations' || $this->params['controller'] == 'rubrics' || $this->params['controller'] == 'surveys' || $this->params['controller'] == 'mixevals') echo 'id="current"'; ?>><a
-						href="<?php echo $this->webroot.$this->themeWeb.$evaltoolSysFunc['url_link'];?>"><span><?php echo $evaltoolSysFunc['function_name']?></span></a></li>
+						href="&lt;?php echo $this-&gt;webroot.$this-&gt;themeWeb.$evaltoolSysFunc['url_link'];?&gt;"><span><?php echo $evaltoolSysFunc['function_name']?></span></a></li>
 						<?php }?>
 						<?php if (!empty($access['ADV_SEARCH'])) {
 							$searchSysFunc = $access['ADV_SEARCH'];    ?>
 					<li
 					<?php if ($this->params['controller'] == 'searchs') echo 'id="current"'; ?>><a
-						href="<?php echo $this->webroot.$this->themeWeb.$searchSysFunc['url_link'];?>"><span><?php echo $searchSysFunc['function_name']?></span></a></li>
+						href="&lt;?php echo $this-&gt;webroot.$this-&gt;themeWeb.$searchSysFunc['url_link'];?&gt;"><span><?php echo $searchSysFunc['function_name']?></span></a></li>
 						<?php }?>
 
 						<?php if (!empty($access['SYS_PARA'])) {
 							$rubricSysFunc = $access['SYS_PARA'];    ?>
 					<li
 					<?php if ($this->params['controller'] == 'sysparameters') echo 'id="current"'; ?>><a
-						href="<?php echo $this->webroot.$this->themeWeb.$rubricSysFunc['url_link'];?>"><span><?php echo $rubricSysFunc['function_name']?></span></a></li>
+						href="&lt;?php echo $this-&gt;webroot.$this-&gt;themeWeb.$rubricSysFunc['url_link'];?&gt;"><span><?php echo $rubricSysFunc['function_name']?></span></a></li>
 						<?php }?>
 				</ul>
 				</div>
@@ -187,7 +188,9 @@ Created by UBC and Rosce-Hulman</span></h1>
 </div>
 </div>
 </div>
-<script>
+
+<!-- Prepare the SVN revision number and table -->
+<script language="JavaScript" type="text/javascript">
 	  var doShowSnvRevision = false;
 	  // Toggles the details display of the snv revision.
       function toggleShowSnvRevision() {
@@ -201,14 +204,31 @@ Created by UBC and Rosce-Hulman</span></h1>
 		}
       }
 </script>
-<div style="margin-left: 50px">
-	SVN <?php passthru("svn info ../.. | grep -i revision");?>
-	<a href="javascript:toggleShowSnvRevision();">details</a>
-	<div style="display: none" id="svn-data" >
-		<pre>
-			<?php passthru("svn info ../..");?>
-		</pre>
-	</div>
+<?php
+exec ("svn info ../..", $lines, $retval);
+$revision = "revision (unknown)";
+//Ouput each line as a table
+$svnTable = "<table style='background-color:#FFF5EE'>";
+foreach ($lines as $line) {
+	// Convert each output line of "svn info" to an html table.
+	if (!empty($line)) {
+		if (stripos($line,"revision") === FALSE) {
+			$line = str_replace (": ","</td><td>", $line);
+			$svnTable .= "<tr><td>";
+			$svnTable .= $line;
+			$svnTable .= "</td></tr>";
+		} else {
+			// If this line is about a revision, save it for display later on.
+			$revision = $line;
+		}
+	}
+}
+$svnTable .= "</table>";
+?>
+<!-- Now, render the SVN revision number and table -->
+<div style="margin-left: 50px">SVN <?php echo $revision;?> <a
+	href="javascript:toggleShowSnvRevision();">details</a>
+<div style="display: none" id="svn-data"><?php echo $svnTable?></div>
 </div>
 </body>
 </html>
