@@ -74,7 +74,7 @@ echo 'onload="document.getElementById(\'username\').focus()"';
 					href="<?php echo $this->webroot.$this->themeWeb;?>loginout/logout"
 					class="miniLinks">Logout</a></td>
 					<?php else:?>
-				<td width="157" />
+				<td width="157" ></td>
 				<td width="57" align="right"><?php echo $html->image('layout/icon_arrow.gif',array('alt'=>'icon_arrow'))?>
 				<a href="<?php echo $this->webroot.$this->themeWeb;?>loginout/login"
 					class="miniLinks">Login</a></td>
