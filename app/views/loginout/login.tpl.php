@@ -26,7 +26,7 @@ document.write('                  <td><?php echo $html->password("User/password"
 document.write('                <\/tr>');
 document.write('                <tr>');
 document.write('                  <td height="31">&nbsp;<\/td>');
-document.write('                  <td> <?php echo $html->submit("Submit") ?>         ');
+document.write('                  <td> <?php echo $html->submit("Submit now") ?>         ');
 document.write('                <\/tr>');
 document.write('            <\/table><\/td>');
 document.write('          <\/tr>');
