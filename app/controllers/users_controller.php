@@ -226,7 +226,6 @@ class UsersController extends AppController
 
 	function edit($id=null)
 	{
-		echo "<h1>Hello World!</h1>";
 		//Clear $id to only the alphanumeric value
 		$id = $this->Sanitize->paranoid($id);
 

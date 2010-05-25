@@ -37,15 +37,6 @@ class User extends AppModel
 	var $USER_TYPE_TA = 'T';
 	var $USER_TYPE_STUDENT = 'S';
 
-	// Privilige levels for the above user types
-	// Order is: Higher numbers -> more priviliges.
-	var $PRIVILEGE_LEVEL_ADMIN = 500;
-	var $PRIVILIGE_LEVEL_INSTRUCTOR = 400;
-	var $PRIVILIGE_LEVEL_TA = 300;
-	var $PRIVILIGE_LEVEL_STUDENT = 200;
-	var $PRIVILIGE_LELEL_NONE = 0;
-
-
 	var $hasMany = array(
 		'UserCourse' =>
 	array('className'   => 'UserCourse',
@@ -67,21 +58,6 @@ class User extends AppModel
                   'finderSql'   => '')
 	);
 	
-	// Tranlate a user's type to a privilege level
-	function getPrivilege($type = '') {
-		switch ($type) {
-			case $USER_TYPE_STUDENT:
-				return $PRIVILIGE_LEVEL_STUDENT;
-			case $USER_TYPE_TA:
-				return $PRIVILIGE_LEVEL_TA;
-			case $USER_TYPE_INSTRUCTOR:
-				return $PRIVILIGE_LEVEL_INSTRUCTOR;
-			case $USER_TYPE_ADMIN:
-				return $PRIVILEGE_LEVEL_ADMIN;
-			default:  // No privilige levels by default
-				return $PRIVILIGE_LELEL_NONE;
-		}
-	}
 
 	//Overwriting Function - will be called before save operation
 	function beforeSave(){
