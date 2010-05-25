@@ -210,11 +210,11 @@ class UsersController extends AppController
 					$this->pageTitle = $this->sysContainer->getCourseName($this->rdAuth->courseId).' > Instructors';
 				}
 				$renderPage = 'addInstructor';
-		  break;
+		  		break;
 			}
 
 			case $this->User->USER_TYPE_STUDENT:
-				$renderPage = 'addStudent';
+				$renderPagqe = 'addStudent';
 		  break;
 
 			case $this->User->USER_TYPE_TA:
@@ -226,6 +226,7 @@ class UsersController extends AppController
 
 	function edit($id=null)
 	{
+		echo "<h1>Hello World!</h1>";
 		//Clear $id to only the alphanumeric value
 		$id = $this->Sanitize->paranoid($id);
 
@@ -302,7 +303,7 @@ class UsersController extends AppController
 				$this->set('viewPage', 'true');
 				$this->set('message', 'Your Profile Updated Successfully.');
 				//Setup Custom parameter
-				$this->rdAuth->set($user['User']);
+				$this->rdAuth->setFromData($user['User']);
 				//$this->render('editProfile');
 			}
 			else

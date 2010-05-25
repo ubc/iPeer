@@ -28,110 +28,133 @@
 
 class User extends AppModel
 {
-  //The model name
-  var $name = 'User';
+	//The model name
+	var $name = 'User';
 
-  /* User Type - Admin, Instructor, TA, Student */
-  var $USER_TYPE_ADMIN = 'A';
-  var $USER_TYPE_INSTRUCTOR = 'I';
-  var $USER_TYPE_TA = 'T';
-  var $USER_TYPE_STUDENT = 'S';
+	/* User Type - Admin, Instructor, TA, Student */
+	var $USER_TYPE_ADMIN = 'A';
+	var $USER_TYPE_INSTRUCTOR = 'I';
+	var $USER_TYPE_TA = 'T';
+	var $USER_TYPE_STUDENT = 'S';
 
-  var $hasMany = array(
-                 'UserCourse' =>
-                     array('className'   => 'UserCourse',
-                           'conditions'  => 'UserCourse.record_status = "A"',
-                           'order'       => 'UserCourse.course_id ASC',
-                           'limit'       => '99999',
-                           'foreignKey'  => 'user_id',
-                           'dependent'   => true,
-                           'exclusive'   => false,
-                           'finderSql'   => ''
-                     ),
-                 'UserEnrol' =>
-                     array('className'   => 'UserEnrol',
-                           'conditions'  => 'UserEnrol.record_status = "A"',
-                           'order'       => 'UserEnrol.course_id ASC',
-                           'limit'       => '99999',
-                           'foreignKey'  => 'user_id',
-                           'dependent'   => true,
-                           'exclusive'   => false,
-                           'finderSql'   => ''
-                     )
-              );
+	// Privilige levels for the above user types
+	// Order is: Higher numbers -> more priviliges.
+	var $PRIVILEGE_LEVEL_ADMIN = 500;
+	var $PRIVILIGE_LEVEL_INSTRUCTOR = 400;
+	var $PRIVILIGE_LEVEL_TA = 300;
+	var $PRIVILIGE_LEVEL_STUDENT = 200;
+	var $PRIVILIGE_LELEL_NONE = 0;
+
+
+	var $hasMany = array(
+		'UserCourse' =>
+	array('className'   => 'UserCourse',
+                  'conditions'  => 'UserCourse.record_status = "A"',
+                  'order'       => 'UserCourse.course_id ASC',
+                  'limit'       => '99999',
+                  'foreignKey'  => 'user_id',
+                  'dependent'   => true,
+                  'exclusive'   => false,
+                   'finderSql'   => ''),
+       	'UserEnrol' =>
+	array('className'   => 'UserEnrol',
+                  'conditions'  => 'UserEnrol.record_status = "A"',
+                  'order'       => 'UserEnrol.course_id ASC',
+                  'limit'       => '99999',
+                  'foreignKey'  => 'user_id',
+                  'dependent'   => true,
+                  'exclusive'   => false,
+                  'finderSql'   => '')
+	);
+	
+	// Tranlate a user's type to a privilege level
+	function getPrivilege($type = '') {
+		switch ($type) {
+			case $USER_TYPE_STUDENT:
+				return $PRIVILIGE_LEVEL_STUDENT;
+			case $USER_TYPE_TA:
+				return $PRIVILIGE_LEVEL_TA;
+			case $USER_TYPE_INSTRUCTOR:
+				return $PRIVILIGE_LEVEL_INSTRUCTOR;
+			case $USER_TYPE_ADMIN:
+				return $PRIVILEGE_LEVEL_ADMIN;
+			default:  // No privilige levels by default
+				return $PRIVILIGE_LELEL_NONE;
+		}
+	}
 
 	//Overwriting Function - will be called before save operation
 	function beforeSave(){
-	  $allowSave = true;
-	  if (empty($this->data[$this->name]['id'])) {
-      //check the duplicate username
-      $allowSave = $this->__checkDuplicateUsername();
-    }
-    return $allowSave;
+		$allowSave = true;
+		if (empty($this->data[$this->name]['id'])) {
+			//check the duplicate username
+			$allowSave = $this->__checkDuplicateUsername();
+		}
+		return $allowSave;
 	}
 
-  //Validation check on duplication of username
+	//Validation check on duplication of username
 	function __checkDuplicateUsername() {
-	  $duplicate = false;
-    $field = 'username';
-    $value = $this->data[$this->name]['username'];
-    if ($result = $this->find($field . ' = "' . $value.'"', $field.', id')){
-		  if ($this->data[$this->name]['id'] == $result[$this->name]['id']) {
-		    $duplicate = false;
-		  } else {
-  		  $duplicate = true;
-  		}
-     }
+		$duplicate = false;
+		$field = 'username';
+		$value = $this->data[$this->name]['username'];
+		if ($result = $this->find($field . ' = "' . $value.'"', $field.', id')){
+			if ($this->data[$this->name]['id'] == $result[$this->name]['id']) {
+				$duplicate = false;
+			} else {
+				$duplicate = true;
+			}
+		}
 
-    if ($duplicate == true) {
+		if ($duplicate == true) {
 
-      $this->errorMessage='Duplicate Username found. Please change the username of this user.';
+			$this->errorMessage='Duplicate Username found. Please change the username of this user.';
 
-      if ($this->data[$this->name]['role'] == 'S') {
-        $this->errorMessage.='<br>If you want to enrol this student to one or more courses, use the enrol function on User Listing page.';
-      }
-      return false;
-    }
-    else {
-      return true;
-    }
+			if ($this->data[$this->name]['role'] == 'S') {
+				$this->errorMessage.='<br>If you want to enrol this student to one or more courses, use the enrol function on User Listing page.';
+			}
+			return false;
+		}
+		else {
+			return true;
+		}
 	}
 
-  function findUser ($username='', $password='') {
- 		return $this->find("username = '".$username."' AND password = '".$password."'");
-  }
+	function findUser ($username='', $password='') {
+		return $this->find("username = '".$username."' AND password = '".$password."'");
+	}
 
-  function findUserByStudentNo ($studentNo='') {
- 		return $this->find("student_no = '".$studentNo."' ");
-  }
+	function findUserByStudentNo ($studentNo='') {
+		return $this->find("student_no = '".$studentNo."' ");
+	}
 
-  function findUserByid ($id='') {
- 		return $this->find("id = '".$id."' ");
-  }
+	function findUserByid ($id='') {
+		return $this->find("id = '".$id."' ");
+	}
 
-  function getUserIdByStudentNo($studentNo=null) {
-    $tmp = $this->find('student_no='.$studentNo);
-    return $tmp['User']['id'];
-  }
+	function getUserIdByStudentNo($studentNo=null) {
+		$tmp = $this->find('student_no='.$studentNo);
+		return $tmp['User']['id'];
+	}
 
 
-  function getEnrolledStudents($courseId=null,$fields=null,$conditions=null) {
-    $condition = 'UserEnrol.course_id='.$courseId;
-    if ($conditions != null) {
-      $condition = $condition.' AND ('.$conditions.')';
-    }
-    $fields = 'User.id, User.role, User.username, User.first_name, User.last_name, User.student_no, User.title, User.email';
-    $joinTable = array(' RIGHT JOIN user_enrols as UserEnrol ON User.id=UserEnrol.user_id');
-    return $this->findAll($condition, $fields, 'User.last_name ASC', null, null, null, $joinTable );
-  }
-  
-  function getUserByEmail($email='') {
-  	return $this->find( "email='" . $email );
-  }
-  
-  function findUserByEmailAndStudentNo($email='', $studentNo='') {
-  	return $this->find("email='" .$email . "' AND student_no='" . $studentNo . "'");
-  }
+	function getEnrolledStudents($courseId=null,$fields=null,$conditions=null) {
+		$condition = 'UserEnrol.course_id='.$courseId;
+		if ($conditions != null) {
+			$condition = $condition.' AND ('.$conditions.')';
+		}
+		$fields = 'User.id, User.role, User.username, User.first_name, User.last_name, User.student_no, User.title, User.email';
+		$joinTable = array(' RIGHT JOIN user_enrols as UserEnrol ON User.id=UserEnrol.user_id');
+		return $this->findAll($condition, $fields, 'User.last_name ASC', null, null, null, $joinTable );
+	}
+
+	function getUserByEmail($email='') {
+		return $this->find( "email='" . $email );
+	}
+
+	function findUserByEmailAndStudentNo($email='', $studentNo='') {
+		return $this->find("email='" .$email . "' AND student_no='" . $studentNo . "'");
+	}
 }
 
 ?>
