@@ -44,8 +44,7 @@ class HomeController extends AppController
 		parent::__construct();
 	}
 
-	function index($msg='') {
-
+	function index($msg='') {		
 		//Disable the autorender, base the role to render the custom home
 		$this->autoRender = false;
 

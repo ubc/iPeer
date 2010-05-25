@@ -67,25 +67,25 @@ class LoginoutController extends AppController
 		if (empty($this->params['data']))
 		{
 			//Check for CWL login auth
-			$cwlErr = $this->rdAuth->Session->read('CWLErr');
+			$cwlErr = $this->Session->read('CWLErr');
 			if ($cwlErr == 'STUDENT_INVALID_LOGIN'){
 				$this->set('errmsg', 'Access Denied. <br>Student must login by using UBC CWL Authentication.<br>If you are experiencing any issues regarding iPeer, please contact the iPeer administrator at <a href="mailto:ipeer@apsc.ubc.ca">ipeer@apsc.ubc.ca</a>.');
-				$this->rdAuth->Session->del('CWLErr');
+				$this->Session->del('CWLErr');
 			} else if ($cwlErr!=''){
 				$this->set('errmsg', 'Access Denied. <br>You have successfully logged in using your CWL account but you do not have access to the iPeer application.<br>If you are experiencing any issues regarding iPeer, please contact the iPeer administrator at <a href="mailto:ipeer@apsc.ubc.ca">ipeer@apsc.ubc.ca</a>.');
-				$this->rdAuth->Session->del('CWLErr');
+				$this->Session->del('CWLErr');
 			}
 
-			$lastURL = $this->rdAuth->Session->read('URL');
-			$accessErr = $this->rdAuth->Session->read('AccessErr');
-			$message = $this->rdAuth->Session->read('Message');
+			$lastURL = $this->Session->read('URL');
+			$accessErr = $this->Session->read('AccessErr');
+			$message = $this->Session->read('Message');
 			//$a=print_r($this->rdAuth->Session,true); echo "<pre>$a</pre>"; exit;
 			if (empty($lastURL)){
 
 				if ($accessErr=='INVALID_LOGIN'){
 					$this->set('errmsg', 'Access Denied. <br>Invalid Username/Password Combination.');
-					$this->rdAuth->Session->del('URL');
-					$this->rdAuth->Session->del('AccessErr');
+					$this->Session->del('URL');
+					$this->Session->del('AccessErr');
 				}
 
 
@@ -101,8 +101,8 @@ class LoginoutController extends AppController
 				if ($accessErr=='INVALID_USER'){
 					$this->set('errmsg', 'Access Denied. <br>UBC CWL Authentication is only valid for students. <br>If you are experiencing any issues regarding the iPeer, please contact your administrator for details.');
 				}
-				$this->rdAuth->Session->del('URL');
-				$this->rdAuth->Session->del('AccessErr');
+				$this->Session->del('URL');
+				$this->Session->del('AccessErr');
 			}
 
 			$this->render($redirect);
@@ -130,20 +130,20 @@ class LoginoutController extends AppController
 		if (empty($this->params['data']))
 		{
 			$redirect = 'login';
-			$lastURL = $this->rdAuth->Session->read('URL');
-			$accessErr = $this->rdAuth->Session->read('AccessErr');
-			$message = $this->rdAuth->Session->read('Message');
+			$lastURL = $this->Session->read('URL');
+			$accessErr = $this->Session->read('AccessErr');
+			$message = $this->Session->read('Message');
 
 			if (empty($lastURL)){
 				//$this->set('errmsg', 'Session Expired.  Please log in again.');
 			} else {
 				if ($accessErr=='NO_LOGIN'){
 					$this->set('errmsg', 'Please Login to see '.$lastURL);
-					$this->rdAuth->Session->del('URL');
+					$this->Session->del('URL');
 				}
 				if ($accessErr=='NO_PERMISSION'){
 					$this->set('errmsg', 'Permission Denied to see: '.$lastURL);
-					$this->rdAuth->Session->del('URL');
+					$this->Session->del('URL');
 				}
 			}
 
@@ -361,7 +361,7 @@ class LoginoutController extends AppController
 		if (isset($sysParameter['parameter_value']) && $sysParameter['parameter_value'] != 'ipeer') {
 
 			//Setup Custom parameter
-			$this->rdAuth->Session->write('ipeerSession.customIntegrateCWL', 1);
+			$this->Session->write('ipeerSession.customIntegrateCWL', 1);
 
 			//There is a custom setup for login
 			$paraLogin = $this->sysContainer->getParamByParamCode('custom.login_page_pathname');
