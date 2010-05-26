@@ -1,1 +1,0 @@
-a:4:{i:0;a:3:{s:4:"name";s:2:"id";s:4:"type";s:7:"integer";s:4:"null";s:2:"NO";}i:1;a:3:{s:4:"name";s:6:"prompt";s:4:"type";s:6:"string";s:4:"null";s:2:"NO";}i:2;a:3:{s:4:"name";s:4:"type";s:4:"type";s:21:"enum('M','C','S','L')";s:4:"null";s:3:"YES";}i:3;a:3:{s:4:"name";s:6:"master";s:4:"type";s:16:"enum('yes','no')";s:4:"null";s:2:"NO";}}
