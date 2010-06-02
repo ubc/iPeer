@@ -5,7 +5,7 @@ class DATABASE_CONFIG {
 	
 var $default  = array('driver'   => 'mysql',
                      'connect'  => 'mysql_pconnect',
-                     'host'     => 'localhost',
+                     'host'     => 'burrito.olt.ubc.ca',
                      'login'    => 'ipeer',
                      'password' => '99bobotw',
                      'database' => 'ipeer',
@@ -16,7 +16,7 @@ var $default  = array('driver'   => 'mysql',
 // The development server
 var $burrito = array('driver'   => 'mysql',
                      'connect'  => 'mysql_pconnect',
-                     'host'     => '137.82.12.110',
+                     'host'     => 'burrito.olt.ubc.ca',
                      'login'    => 'ipeer',
                      'password' => '99bobotw',
                      'database' => 'ipeer',

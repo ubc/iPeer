@@ -107,6 +107,12 @@ function checkEmailAddress()
                     $rubricSysFunc = $access['SYS_PARA'];    ?>
                     <li <?php if ($this->params['controller'] == 'sysparameters') echo 'id="current"'; ?> ><a href="<?php echo $this->webroot.$this->themeWeb.$rubricSysFunc['url_link'];?>"><span><?php echo $rubricSysFunc['function_name']?></span></a></li>
             <?php }?>
+            
+  		    <?php if (!empty($access['SYS_FUNC'])) {
+                    $rubricSysFunc = $access['SYS_FUNC'];    ?>
+                    <li <?php if ($this->params['controller'] == 'sysparameters') echo 'id="current"'; ?> ><a href="<?php echo $this->webroot.$this->themeWeb.$rubricSysFunc['url_link'];?>"><span><?php echo $rubricSysFunc['function_name']?></span></a></li>
+            <?php }?>            
+            
           </ul>
         </div></td>
       </tr>
