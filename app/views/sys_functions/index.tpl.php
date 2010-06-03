@@ -6,7 +6,7 @@
 <table width="95%"  border="0" cellspacing="2" cellpadding="4">
   <tr>
     <td align="right" width="55%">
-        <?php echo $html->image('icons/add.gif', array('alt'=>'Add Sys Function', 'align'=>'middle')); ?>&nbsp;<?php echo $html->linkTo('Add Sys Function', '/sysfunctions/add'); ?>&nbsp;
+        <?php echo $html->image('icons/add.gif', array('alt'=>'Add Sys Function', 'align'=>'middle')); ?>&nbsp;<?php echo $html->linkTo('Add Sys Function', '/sysfunctions/edit'); ?>&nbsp;
     </td>
   </tr>
   <tr>
@@ -34,6 +34,7 @@ echo $ajax->observeForm('searchForm', array('update'=>'function_table', 'url'=>"
     <?php
     $params = array('controller'=>'sysfunctions', 'data'=>$data, 'paging'=>!empty($paging)? $paging: null);
     echo $this->renderElement('sys_functions/ajax_sysfunctions_list', $params);
+
     ?>
 </div>
 </td></tr></table>

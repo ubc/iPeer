@@ -37,6 +37,7 @@ class SysFunctionsController extends AppController
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $NeatString;
 	var $Sanitize;
+    var $uses = array('SysFunction','Personalize');
 
 	function __construct()
 	{
@@ -54,8 +55,18 @@ class SysFunctionsController extends AppController
 
 	function index($message='')
 	{
-  	$data = $this->SysFunction->findAll($conditions=null, $fields=null, $this->order, $this->show, $this->page);
 
+    $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+    $this->userPersonalize->setPersonalizeList($personalizeData);
+    if ($personalizeData && $this->userPersonalize->inPersonalizeList('SysParam.ListMenu.Limit.Show')) {
+       $this->show = $this->userPersonalize->getPersonalizeValue('SysParam.ListMenu.Limit.Show');
+       $this->set('userPersonalize', $this->userPersonalize);
+    } else {
+      $this->show = '10';
+      $this->update($attributeCode = 'SysParam.ListMenu.Limit.Show',$attributeValue = $this->show);
+    }
+  	$data = $this->SysFunction->findAll($conditions=null, $fields=null, $this->order, $this->show, $this->page);
+//
   	$paging['style'] = 'ajax';
   	$paging['link'] = '/sysfunctions/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
 
@@ -75,28 +86,8 @@ class SysFunctionsController extends AppController
 
 	function view($id)
 	{
-		$this->set('data', $this->SysFunction->read());
-	}
-
-	function add()
-	{
-		if (empty($this->params['data']))
-		{
-			$this->render();
-		}
-		else
-		{
-			if ($this->SysFunction->save($this->params['data']))
-			{
-				$message = 'The record is saved successfully';
-				$this->redirect('sysfunctions/index/'.$message);
-			}
-			else
-			{
-				$this->set('data', $this->params['data']);
-				$this->render('edit');
-			}
-		}
+        $data = $this->SysFunction->read();
+		$this->set('data', $data);
 	}
 
 	function edit($id=null)

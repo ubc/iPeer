@@ -6,12 +6,13 @@
 <tr>
 <td>
 <b><?php echo empty($params['data']['SysFunction']['id'])?'Add':'Edit' ?> Sys Functions</b>
-<form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['SysFunction']['id'])?'add':'edit') ?>" onSubmit="return validate()">
 <?php echo empty($params['data']['SysFunction']['id']) ? null : $html->hidden('SysFunction/id'); ?>
-<input type="hidden" name="required" id="required" value="id function_code function_name" />
+
 
 <p>
 <table width="100%" cellspacing="0" cellpadding="4">
+<form name="frm" id="frm" method="POST" action="<?php echo $html->url('edit') ?>" onSubmit="return validate()">
+<input type="hidden" name="required" id="required" value="id function_code function_name" />
 <tr>
 	<td width="130" id="id_label">id*:</td>
 	<td width="337" align="right"><?php echo $html->input('SysFunction/id', array('id'=>'id', 'size'=>'50', 'class'=>'validate required NUMERIC_FORMAT id_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
@@ -55,27 +56,15 @@
   </td>
   <td width="663" id="permission_type_msg" class="error"/>
 </tr>
-
-<tr>
-  <td colspan="3" align="left">
-  <br />
-  * &nbsp;&nbsp;<strong>id</strong> of sys_functions table are manually assigned and grouped by module as follow:<br/>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;100 &nbsp; 	SYS_FUNC<br/>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;200 &nbsp; 	HOME<br/>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;300 &nbsp; 	USR<br/>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;400 &nbsp; 	COURSE<br/>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;500 &nbsp; 	GROUP<br/>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;600 &nbsp; 	RUBRIC<br/>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;700 &nbsp; 	SIMPLE_EVAL<br/>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;800 &nbsp; 	EVENT<br/>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;900 &nbsp; 	FRAMEWORK<br/>
-  </td>
-</tr>
+<tr><td>
+<?php echo $html->submit('Save') ?> <?php echo $html->linkTo('Back', '/sysfunctions'); ?>
+</td></tr>
+</form>
 </table>
 <p>
-	<?php echo $html->submit('Save') ?><?php echo $html->linkTo('Back', '/sysfunctions'); ?>
+
 </p>
-</form>
+
 </td>
 </tr>
 </table>

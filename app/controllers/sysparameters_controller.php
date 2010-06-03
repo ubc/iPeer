@@ -64,7 +64,6 @@ class SysParametersController extends AppController
   	  $this->show = '10';
       $this->update($attributeCode = 'SysParam.ListMenu.Limit.Show',$attributeValue = $this->show);
   	}
-
   	$data = $this->SysParameter->findAll($conditions=null, $fields=null, $this->order, $this->show, $this->page);
 
   	$paging['style'] = 'ajax';

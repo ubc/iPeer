@@ -5,7 +5,7 @@
 <?php endif;?>
 	<table width="95%"  border="0" cellspacing="2" cellpadding="4">
       <tr>
-        <td><div align="right"><?php echo $pagination->show('Show ')?></div></td>
+        <td><div align="right"><?php echo $pagination->show('Show ',null,'function_table')?></div></td>
       </tr>
     </table>
 	<table width="95%" border="0" cellspacing="2" cellpadding="4" bgcolor="#FFFFFF">
