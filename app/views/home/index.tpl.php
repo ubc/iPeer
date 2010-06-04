@@ -1,13 +1,13 @@
 <?php
         //$b=print_r($rdAuth,true);
-        //echo "<pre>$b</pre>"; 
+        //echo "<pre>$b</pre>";
 ?>
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>
       <table class="title" width="100%"  border="0" cellspacing="0" cellpadding="0">
         <tr>
-          <td>My Course<?= count($activeCourseDetail) > 1 ? 's':''; ?></td>
+          <td>My Course<?php echo count($activeCourseDetail) > 1 ? 's': ''; ?></td>
           <td><div align="right"><!--a href="#evaldue" onClick="showhide('evaldue'); toggle(this);">[-]</a--></div></td>
         </tr>
       </table>
@@ -36,7 +36,7 @@
 			    <tr class="tablecell2">
 			      <td width="15"></td>
       			<td>
-      			    <b>Instructor<?= count($courseInstructors) > 2 ? 's':''; ?>: </b>&nbsp;
+      			    <b>Instructor<?php echo  count($courseInstructors) > 2 ? 's':''; ?>: </b>&nbsp;
               <?php $params = array('controller'=>'home', 'courseInstructors'=>$courseInstructors);
               echo $this->renderElement('courses/course_instructors', $params);?>
 

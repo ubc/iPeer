@@ -615,7 +615,7 @@ class UsersController extends AppController
 	function sendEmail($to='', $from='', $subject='', $body='' ) {
 		if ($this->rdAuth->role == 'S') {
 			$this->redirect('home/index');
-			exit();
+            exit();
 		}
 		// check if the user is an admin - reject otherwise
 		$result = false;
