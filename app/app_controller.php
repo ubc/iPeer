@@ -71,7 +71,6 @@ class AppController extends Controller  {
 			$this->set('rdAuth',$this->rdAuth);
 
 		} else {
-
 			//Check whether the user is current login yet
 			if (!isset($this->rdAuth->role)){
 				$this->Session->write('URL', $URL);
@@ -82,6 +81,27 @@ class AppController extends Controller  {
 			}
 
 			//check permission
+			$functions = $this->sysContainer->getActionList();
+        
+			$url = $this->params['url']['url'];
+            // Cut a trailing shash in url if it exists
+            if ($url[strlen($url) - 1] == "/") {
+                $url = substr($url, 0, (-1) );
+            }
+			
+			$allowedExplicitly = false;
+			$allowedByEntry = "";
+            // First, check that this URL has been explicitly specified in Sys functions table.
+            foreach ($functions as $func) {
+                if ($func['url_link'] === $url) {
+                    $allowedExplicitly = true;
+                    $allowedByEntry = $url;
+                    break;
+                }
+            }
+
+            if ($allowedExplicitly) echo "<b style='color:green'>Allowed Explicitly by $allowedByEntry</b>";
+
 			if (!$this->rdAuth->check($this->params['controller'], $this->sysContainer->getActionList()))
 			{
 				$this->Session->write('URL', $URL);
@@ -90,7 +110,6 @@ class AppController extends Controller  {
 				$this->redirect($redirect);
 				exit;
 			}
-
 
 			//render the authorized controller
 			$this->set('rdAuth',$this->rdAuth);

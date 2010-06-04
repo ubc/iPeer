@@ -88,10 +88,10 @@ function checkEmailAddress()
                     $courseSysFunc = $access['COURSE'];    ?>
                     <li <?php if ($this->params['controller'] == 'courses' || $this->params['controller'] == 'events' || $this->params['controller'] == 'groups' || $this->params['controller'] == 'evaluations' || $this->params['controller'] == 'surveygroups') echo 'id="current"'; ?> ><a href="<?php echo $this->webroot.$this->themeWeb.$courseSysFunc['url_link'];?>"><span><?php echo $courseSysFunc['function_name']?></span></a></li>
             <?php }?>
-            <?php if (!empty($access['USR']) && ($rdAuth->role == 'A' || $rdAuth->role == 'I')) {
-                    $userSysFunc = $access['USR'];    ?>
+            <?php if (!empty($access['USERS']) && ($rdAuth->role == 'A' || $rdAuth->role == 'I')) {
+                    $userSysFunc = $access['USERS'];    ?>
                     <li <?php if ($this->params['controller'] == 'users') echo 'id="current"'; ?> ><a href="<?php echo $this->webroot.$this->themeWeb.$userSysFunc['url_link'];?>"><span><?php echo $userSysFunc['function_name']?></span></a></li>
-            <?php } else if (!empty($access['USR']) && ($rdAuth->role == 'S')){?>
+            <?php } else if (!empty($access['USERS']) && ($rdAuth->role == 'S')){?>
                     <li <?php if ($this->params['controller'] == 'users') echo 'id="current"'; ?> ><a href="<?php echo $this->webroot.$this->themeWeb;?>users/editProfile"><span>Edit Profile</span></a></li>
             <?php } ?>
     		    <?php if (!empty($access['EVAL_TOOL'])) {

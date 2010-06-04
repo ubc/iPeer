@@ -138,20 +138,11 @@ class rdAuthComponent
 	function check($action, $actions)
 	{
 		 
-		if (is_array($actions) && array_key_exists($action, $actions))
-		{
-			if($this->role)
-			{
-				$function = $actions[$action];
-				//echo $function['function_name'];
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+		if (is_array($actions) && array_key_exists($action, $actions)) {
+			return $this->role;
+		} else {
+            return false;
 		}
-		return	false;
 	}
 
 	function setCourseId($courseId=null)

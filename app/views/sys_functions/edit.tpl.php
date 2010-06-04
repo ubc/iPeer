@@ -125,9 +125,8 @@
   function updateContFuncParam() {
     var c = hCont.value; var f = hFunc.value; var p = hParam.value;
     var params = p.replace(/,/g, " ").replace(/^\s*|\s*$/g,'');
-    dCode.value = (c + "_" + f).toUpperCase();
-    dFunc.value = c.charAt(0).toUpperCase() + c.substr(1) + " " +
-                  f.charAt(0).toUpperCase() + f.substr(1);
+    dCode.value = (c + (f ? ("_" + f) : "" )).toUpperCase();
+    dFunc.value = c.charAt(0).toUpperCase() + c.substr(1) + (f ? (" " + f.charAt(0).toUpperCase() + f.substr(1)) : "");
     dCont.value = c;
     if (p) { // Add parameters if needed
       dFunc.value += " " + "(" + params.replace(/ /g, ", ") + ")"; // Format extra params to look function-style.

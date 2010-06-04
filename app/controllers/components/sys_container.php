@@ -56,9 +56,21 @@ class sysContainerComponent
 	{
 
 		$result = array();
-		foreach($funcList as $row): $sysFunction = $row['SysFunction'];
-		$result[$sysFunction['function_code']] = $sysFunction;
-		endforeach;
+		foreach($funcList as $row) {
+            $sysFunction = $row['SysFunction'];
+
+            // Do no accept certain functions, in case the database has bad entries.
+            if ($sysFunction['id'] == 0) continue;      // No low ID's
+            if (empty($sysFunction['id'])) continue;    // No empty URL's.
+            if ($sysFunction['id'] == "/") continue;    // No empty URL's.
+
+            // Cut a trailing shash in url if it exists
+            if ($sysFunction['url_link'][strlen($sysFunction['url_link']) - 1] == "/") {
+                $sysFunction['url_link'] = substr($sysFunction['url_link'], 0, (-1) );
+            }
+
+            $result[$sysFunction['function_code']] = $sysFunction;
+		}
 
 		$this->accessFunctionList = $result;
 		$this->Session->write('ipeerSession.accessFunctionList', $this->accessFunctionList);
@@ -87,9 +99,21 @@ class sysContainerComponent
 	function setActionList($actionList='')
 	{
 		$result = array();
-		foreach($actionList as $row): $sysFunction = $row['SysFunction'];
-		$result[$sysFunction['controller_name']] = $sysFunction;
-		endforeach;
+		foreach($actionList as $row) {
+            $sysFunction = $row['SysFunction'];
+
+            // Do no accept certain functions, in case the database has bad entries.
+            if ($sysFunction['id'] == 0) continue;      // No low ID's
+            if (empty($sysFunction['id'])) continue;    // No empty URL's.
+            if ($sysFunction['id'] == "/") continue;    // No empty URL's.
+
+            // Cut a trailing shash in url if it exists
+            if ($sysFunction['url_link'][strlen($sysFunction['url_link']) - 1] == "/") {
+                $sysFunction['url_link'] = substr($sysFunction['url_link'], 0, (-1) );
+            }
+
+            $result[$sysFunction['controller_name']] = $sysFunction;
+		}
 
 		$this->actionList = $result;
 		$this->Session->write('ipeerSession.actionList', $this->actionList);
