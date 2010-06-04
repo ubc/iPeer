@@ -30,7 +30,7 @@ echo $ajax->observeForm('searchForm', array('update'=>'parameter_table', 'url'=>
 <div id='parameter_table'>
     <?php
     $params = array('controller'=>'sysparameters', 'data'=>$data, 'paging'=>!empty($paging)? $paging: null);
-    var_dump($this->renderElement('sys_parameters/ajax_sysparameters_list', $params));
+    echo $this->renderElement('sys_parameters/ajax_sysparameters_list', $params);
     ?>
 </div>
 </td></tr></table>
