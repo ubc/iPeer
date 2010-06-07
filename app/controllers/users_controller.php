@@ -425,7 +425,7 @@ class UsersController extends AppController
 
 
 		$this->layout = 'ajax';
-		if ($this->show ==4 'null') { //check for initial page load, if true, load record limit from db
+		if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
 			$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
 			if ($personalizeData) {
 				$this->userPersonalize->setPersonalizeList($personalizeData);
