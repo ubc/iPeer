@@ -232,7 +232,6 @@ class UsersController extends AppController
 		}
 	}
 
-
 	//private helper function
 	function __getRenderPage ($userType='') {
 		if ($this->rdAuth->role == 'S') {
@@ -259,7 +258,7 @@ class UsersController extends AppController
 			}
 
 			case $this->User->USER_TYPE_STUDENT:
-				$renderPagqe = 'addStudent';
+				$renderPage = 'addStudent';
 		  break;
 
 			case $this->User->USER_TYPE_TA:
