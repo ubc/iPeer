@@ -162,7 +162,6 @@ class UsersController extends AppController
         // Make sure the present user is not a student
         if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
             $this->privilegeError();
-
         }
 
         // Check that user type is valid
@@ -288,11 +287,10 @@ class UsersController extends AppController
         // Make sure the present user is not a student
         if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
             $this->privilegeError();
-
         }
 
+        // Ensure that the id is valid
         if (is_numeric($id)) {
-
 
             // We should be of equal or higher privileges to be able to create this user
             if ($this->getPrivilegeLevel() >= $this->getPrivilegeLevel($id)) {
@@ -340,9 +338,8 @@ class UsersController extends AppController
 
 	function editProfile()
 	{
+        // No security checks here, since we're editing the logged-in user
 		$id = $this->rdAuth->id;
-		//Clear $id to only the alphanumeric value
-		$id = $this->Sanitize->paranoid($id);
 
 		if (empty($this->params['data']))
 		{
@@ -350,11 +347,8 @@ class UsersController extends AppController
 			$this->params['data'] = $this->User->read();
 			$this->set('viewPage', 'false');
 			$this->render();
-		}
-		else
-		{
-			if (!empty($this->params['data']['User']['password']))
-			{
+		} else {
+			if (!empty($this->params['data']['User']['password'])) {
 				//Update password
 				$password = $this->params['data']['User']['password'];//custom method in the User model
 				$this->params['data']['User']['password'] =  md5($password);
@@ -374,9 +368,7 @@ class UsersController extends AppController
 				//Setup Custom parameter
 				$this->rdAuth->setFromData($user['User']);
 				//$this->render('editProfile');
-			}
-			else
-			{
+			} else {
 				$this->Output->br2nl($this->params['data']);
 				$this->set('data', $this->params['data']);
 				$this->set('viewPage', 'false');
@@ -387,36 +379,53 @@ class UsersController extends AppController
 
 	function delete($id = null)
 	{
-		if ($this->rdAuth->role == 'S') {
-			$this->redirect('home/index');
-			exit();
-		}
-		isset($this->params['form']['display_user_type'])? $displayUserType = $this->params['form']['display_user_type'] : $displayUserType = 'S';
-		$this->set('displayUserType', $displayUserType);
-		if (isset($this->params['form']['id']))
-		{
-			$id = intval(substr($this->params['form']['id'], 5));
-		}   //end if
-		if ($this->User->del($id)) {
-			$this->set('message', 'Record deletion successful.');
-			$this->index();
-			$this->render('index');
-		}
-		else {
-			$this->set('message', 'Record deletion failed.');
-			$this->index();
-			$this->render('index');
-		}
+        // Make sure the present user is not a student
+        if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
+            $this->privilegeError();
+        }
+
+        // Ensure that the id is valid
+        if (is_numeric($id)) {
+
+            // We should be of equal or higher privileges to be able to create this user
+            if ($this->getPrivilegeLevel() >= $this->getPrivilegeLevel($id)) {
+
+                $displayUserType = isset($this->params['form']['display_user_type']) ?
+                    $this->params['form']['display_user_type'] : 'S';
+
+                $this->set('displayUserType', $displayUserType);
+                if (isset($this->params['form']['id']))
+                {
+                    $id = intval(substr($this->params['form']['id'], 5));
+                }
+
+                if ($this->User->del($id)) {
+                    $this->set('message', 'Record deletion successful.');
+                    $this->index();
+                    $this->render('index');
+                } else {
+                    $this->set('message', 'Record deletion failed.');
+                    $this->index();
+                    $this->render('index');
+                }
+            } else {
+                $this->privilegeError();
+            }
+        } else {
+            $this->privilegeError();
+        }
 	}
 
 	function search()
 	{
-		if ($this->rdAuth->role == 'S') {
-			$this->redirect('home/index');
-			exit();
-		}
+        // Make sure the present user is not a student
+        if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
+            $this->privilegeError();
+        }
+
+
 		$this->layout = 'ajax';
-		if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
+		if ($this->show ==4 'null') { //check for initial page load, if true, load record limit from db
 			$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
 			if ($personalizeData) {
 				$this->userPersonalize->setPersonalizeList($personalizeData);
@@ -465,10 +474,11 @@ class UsersController extends AppController
 
 	function resetPassword($userId='', $render=true)
 	{
-		if ($this->rdAuth->role == 'S') {
-			$this->redirect('home/index');
-			exit();
-		}
+        // Make sure the present user is not a student
+        if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
+            $this->privilegeError();
+        }
+
 		//General password
 		$password = $this->NeatString->randomPassword(6);//custom method in the User model
 		$this->params['data']['User']['password'] =  md5($password);
@@ -531,10 +541,11 @@ class UsersController extends AppController
 	}
 
 	function import() {
-		if ($this->rdAuth->role == 'S') {
-			$this->redirect('home/index');
-			exit();
-		}
+        // Make sure the present user is not a student
+        if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
+            $this->privilegeError();
+        }
+
 		$this->autoRender = false;
 		$this->rdAuth->courseId = $this->params['form']['course_id'];
 		$filename = $this->params['form']['file']['name'];
@@ -575,10 +586,11 @@ class UsersController extends AppController
 
 	function addUserByImport($data=null, $lines=null)
 	{
-		if ($this->rdAuth->role == 'S') {
-			$this->redirect('home/index');
-			exit();
-		}
+        // Make sure the present user is not a student
+        if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
+            $this->privilegeError();
+        }
+
 		$result = array();
 		$createdPos = $failedPos = 0;
 
@@ -683,10 +695,12 @@ class UsersController extends AppController
 	}
 
 	function sendEmail($to='', $from='', $subject='', $body='' ) {
-		if ($this->rdAuth->role == 'S') {
-			$this->redirect('home/index');
-            exit();
-		}
+        // Make sure the present user is not a student
+        if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
+            $this->privilegeError();
+        }
+
+
 		// check if the user is an admin - reject otherwise
 		$result = false;
 		$role = $this->rdAuth->role;
@@ -709,10 +723,11 @@ class UsersController extends AppController
 
 	function removeFromCourse($course_id='', $user_id='') {
 
-		if ($this->rdAuth->role == 'S') {
-			$this->redirect('home/index');
-			exit();
-		}
+        // Make sure the present user is not a student
+        if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
+            $this->privilegeError();
+        }
+
 		$this->autoRender = false;
 		if($course_id != '' && $user_id != '') {
 			$return = $this->UserEnrol->removeStudentFromCourse($user_id, $course_id);
@@ -726,10 +741,11 @@ class UsersController extends AppController
 
 	function adddelcourse($user_id='')
 	{
-		if ($this->rdAuth->role == 'S') {
-			$this->redirect('home/index');
-			exit();
-		}
+        // Make sure the present user is not a student
+        if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
+            $this->privilegeError();
+        }
+
 		$this->set('user_id', $user_id);
 		$this->layout = 'ajax';
 	}
