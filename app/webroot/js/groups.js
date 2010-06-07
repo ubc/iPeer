@@ -59,8 +59,6 @@ function move(fbox, tbox) {
 
 function processSubmit(gbox)
 {
-	alert("processSubmit read");
-	
 	var assigned = "";
 	var i; 
 	
@@ -74,5 +72,4 @@ function processSubmit(gbox)
 	}
 	
 	document.forms[0].assigned.value = assigned;		
-	alert("Assigned is: " + assigned);
 }
