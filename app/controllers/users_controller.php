@@ -80,7 +80,7 @@ class UsersController extends AppController
         return $this->getPrivilegeLevel('s');
     }
 
-    function priviligeError() {
+    function privilegeError() {
         $this->redirect('home/index');
         exit;
     }
@@ -89,7 +89,7 @@ class UsersController extends AppController
 
         // Make sure this is not a student
         if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
-           priviligeError();
+           $this->privilegeError();
         }
 
 		if (!empty($this->rdAuth->courseId))
@@ -138,106 +138,121 @@ class UsersController extends AppController
 	}
 
 	function view($id) {
-        // Make sure this is not a student
+        // Make sure the present user is not a student
         if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
-           priviligeError();
+           $this->privilegeError();
         }
 
         if (is_numeric($id)) {
             // Make sure that the privileges of the asking user is at least as high
-            //  as the priviliges of the user being viewed
-
+            //  as the privileges of the user being viewed.
             if ($this->getPrivilegeLevel() >= $this->getPrivilegeLevel($id)) {
                 $this->set('data', $this->User->read());
             } else {
-                $this->priviligeError();
+                $this->privilegeError();
             }
+        } else {
+            // Bad ID.
+            $this->privilegeError();
         }
 	}
 
 	function add($userType='') {
 
-		if ($this->rdAuth->role == 'S') {
-			$this->redirect('home/index');
-			exit();
-		}
-		$this->autoRender = false;
-		if (!empty($this->rdAuth->courseId))
-		{
-			$this->pageTitle = $this->sysContainer->getCourseName($this->rdAuth->courseId).' > Students';
-		}
+        // Make sure the present user is not a student
+        if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
+            $this->privilegeError();
 
-		//List Add Page
-		if (empty($this->params['data'])) {
+        }
 
-			//check and set user type
-			if (empty($this->params['data']['User']['role'])) {
-				$this->params['data']['User']['role'] = $userType;
-			}
+        // Check that user type is valid
+        $userTypeLow = strtolower ($userType);
+        if ($userTypeLow != 's' && $userTypeLow != 'i' && $userTypeLow != 'a') {
+            // Bad user type
+            $this->privilegeError();
+        }
 
-			$courseList = $this->sysContainer->getMyCourseList();
-			$this->set('courseList', $courseList);
+        // We should be of equal or higher privileges to be able to create this user
+        if ($this->getPrivilegeLevel() >= $this->getPrivilegeLevel($userType)) {
 
-			//Get render page according to the user type
-			$renderPage = $this->__getRenderPage($userType);
-			$this->render($renderPage);
-		}
-		else {
-			//General password
-			$password = $this->NeatString->randomPassword(6);//custom method in the User model
-			$this->params['data']['User']['password'] =  md5($password);
-			if (empty($this->params['data']['User']['username'])) $this->params['data']['User']['username'] = $this->params['form']['newuser'];
+            if (!empty($this->rdAuth->courseId))
+            {
+                $this->pageTitle = $this->sysContainer->getCourseName($this->rdAuth->courseId).' > Students';
+            }
 
-			if ($this->params['data']['User']['role'] == 'S')
-			{
-				$this->params['data']['User']['student_no'] = $this->params['data']['User']['username'];
-			}
+            // No auto render - we'll do that explicitly in this method.
+            $this->autoRender = false;
 
-			$this->Output->filter($this->params['data']);//always filter
+            //List Add Page
+            if (empty($this->params['data'])) {
 
-			//Save Data
-			if ($this->User->save($this->params['data'])) {
+                //check and set user type
+                if (empty($this->params['data']['User']['role'])) {
+                    $this->params['data']['User']['role'] = $userType;
+                }
 
-				//Save enrol record
-				if (isset($this->params['form']['course_id']) && $this->params['form']['course_id'] > 0)
-				{
-					$userEnrol['UserEnrol']['course_id'] = $this->params['form']['course_id'];
-					$userEnrol['UserEnrol']['user_id'] = $this->User->id;
+                $courseList = $this->sysContainer->getMyCourseList();
+                $this->set('courseList', $courseList);
 
-					$this->UserEnrol->save($userEnrol);
-				}
+                //Get render page according to the user type
+                $renderPage = $this->__getRenderPage($userType);
+                $this->render($renderPage);
+            } else {
+                //General password
+                $password = $this->NeatString->randomPassword(6);//custom method in the User model
+                $this->params['data']['User']['password'] =  md5($password);
+                if (empty($this->params['data']['User']['username'])) $this->params['data']['User']['username'] = $this->params['form']['newuser'];
 
-				$this->set('tmpPassword',$password);
-				$this->set('data', $this->User->read());
-				$this->set('userRole', $this->params['data']['User']['role']);
-				$this->set('courseId', $this->rdAuth->courseId);
+                if ($this->params['data']['User']['role'] == 'S')
+                {
+                    $this->params['data']['User']['student_no'] = $this->params['data']['User']['username'];
+                }
 
-				//Render to view page to display saved data
-				$this->render('userSummary');
-			}
-			//Found error
-			else {
-				$this->set('data', $this->params['data']);
+                $this->Output->filter($this->params['data']);//always filter
 
-				//Validate the error why the User->save() method returned false
-				$this->validateErrors($this->User);
-				$this->set('errmsg', $this->User->errorMessage);
-				$this->set('courseId', $this->rdAuth->courseId);
+                //Save Data
+                if ($this->User->save($this->params['data'])) {
 
-				//Get render page according to the user type
-				$renderPage = $this->__getRenderPage($this->params['data']['User']['role']);
-				$this->render($renderPage);
+                    //Save enrol record
+                    if (isset($this->params['form']['course_id']) && $this->params['form']['course_id'] > 0)
+                    {
+                        $userEnrol['UserEnrol']['course_id'] = $this->params['form']['course_id'];
+                        $userEnrol['UserEnrol']['user_id'] = $this->User->id;
 
-			}//end if
-		}
+                        $this->UserEnrol->save($userEnrol);
+                    }
+
+                    $this->set('tmpPassword',$password);
+                    $this->set('data', $this->User->read());
+                    $this->set('userRole', $this->params['data']['User']['role']);
+                    $this->set('courseId', $this->rdAuth->courseId);
+
+                    //Render to view page to display saved data
+                    $this->render('userSummary');
+                }
+                //Found error
+                else {
+                    $this->set('data', $this->params['data']);
+
+                    //Validate the error why the User->save() method returned false
+                    $this->validateErrors($this->User);
+                    $this->set('errmsg', $this->User->errorMessage);
+                    $this->set('courseId', $this->rdAuth->courseId);
+
+                    //Get render page according to the user type
+                    $renderPage = $this->__getRenderPage($this->params['data']['User']['role']);
+                    $this->render($renderPage);
+
+                }//end if
+            }
+        } else {
+            $this->privilegeError();
+        }
 	}
 
 	//private helper function
 	function __getRenderPage ($userType='') {
-		if ($this->rdAuth->role == 'S') {
-			$this->redirect('home/index');
-			exit();
-		}
+
 		$renderPage = '';
 
 		//render user add page based on user type
@@ -270,46 +285,57 @@ class UsersController extends AppController
 
 	function edit($id=null)
 	{
-		//Clear $id to only the alphanumeric value
-		$id = $this->Sanitize->paranoid($id);
+        // Make sure the present user is not a student
+        if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
+            $this->privilegeError();
 
-		$enrolled_courses = $this->Course->findRegisteredCoursesList($id);
-		$course_count = $this->Course->findNonRegisteredCoursesCount($id);
-		$all_courses = $this->Course->findNonRegisteredCoursesList($id);
+        }
 
-		$this->set('all_courses', $all_courses);
-		$this->set('enrolled_courses', $enrolled_courses);
-		$this->set('course_count', $course_count[0][0]['total']);
-		$this->set('user_id', $id);
+        if (is_numeric($id)) {
 
-		if (empty($this->params['data']))
-		{
-			$this->User->setId($id);
-			$this->params['data'] = $this->User->read();
-			$this->render();
-		}
-		else
-		{
-			$this->Output->filter($this->params['data']);//always filter
 
-			if ( $this->User->save($this->params['data']))
-			{
+            // We should be of equal or higher privileges to be able to create this user
+            if ($this->getPrivilegeLevel() >= $this->getPrivilegeLevel($id)) {
 
-				$this->UserEnrol->insertCourses($this->User->id, $this->params['form']);
+                $enrolled_courses = $this->Course->findRegisteredCoursesList($id);
+                $course_count = $this->Course->findNonRegisteredCoursesCount($id);
+                $all_courses = $this->Course->findNonRegisteredCoursesList($id);
 
-				//Render to view page to display saved data
-				//TODO: Display list of users after import
-				$this->set('data', $this->User->read());
-				$this->set('userRole', $this->params['data']['User']['role']);
-				$this->render('userSummary');
-			}
-			else
-			{
-				$this->Output->br2nl($this->params['data']);
-				$this->set('data', $this->params['data']);
-				$this->render();
-			}
-		}
+                $this->set('all_courses', $all_courses);
+                $this->set('enrolled_courses', $enrolled_courses);
+                $this->set('course_count', $course_count[0][0]['total']);
+                $this->set('user_id', $id);
+
+                if (empty($this->params['data'])) {
+                    $this->User->setId($id);
+                    $this->params['data'] = $this->User->read();
+                    $this->render();
+                } else {
+                    $this->Output->filter($this->params['data']);//always filter
+
+                    if ( $this->User->save($this->params['data'])) {
+
+                        $this->UserEnrol->insertCourses($this->User->id, $this->params['form']);
+
+                        //Render to view page to display saved data
+                        //TODO: Display list of users after import
+                        $this->set('data', $this->User->read());
+                        $this->set('userRole', $this->params['data']['User']['role']);
+                        $this->render('userSummary');
+                    } else {
+                        $this->Output->br2nl($this->params['data']);
+                        $this->set('data', $this->params['data']);
+                        $this->render();
+                    }
+                }
+            } else {
+                //User is under-privileged
+                $this->privilegeError();
+            }
+        } else {
+            // Bad ID format
+            $this->privilegeError();
+        }
 	}
 
 	function editProfile()
