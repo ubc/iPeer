@@ -56,3 +56,20 @@ function move(fbox, tbox) {
 	
 	document.forms[0].assigned.value = assigned;	
 } 
+
+function processSubmit(gbox)
+{
+	var assigned = "";
+	var i; 
+	
+	for (i = 0; i < gbox.options.length; i++) { 
+		assigned += gbox.options[i].value;
+		
+		if(i < gbox.options.length - 1)
+		{
+			assigned += ":";
+		}
+	}
+	
+	document.forms[0].assigned.value = assigned;		
+}

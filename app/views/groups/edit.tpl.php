@@ -50,7 +50,7 @@
 	  </select></td>
   </tr>
   <tr class="tablecell2">
-    <td colspan="4" align="center"><?php echo $html->submit('Update Group') ?></td>
+    <td colspan="4" align="center"><?php echo $html->submit('Update Group', array('onClick'=>"processSubmit(document.getElementById('group_members'))")) ?></td>
     </tr>
 </table>
       <table width="95%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">
