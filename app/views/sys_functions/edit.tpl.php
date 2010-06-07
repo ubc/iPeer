@@ -67,7 +67,7 @@
   <!-- Render the input helper-->
   <table style="background-color: #FFFFD0">
     <tr><td colspan="2"><b>Entry Helper:</b></td><tr>
-    <tr><td colspan="2" style="color:gray"> (overwrites enries to the left)</td><tr>
+    <tr><td colspan="2" style="color:gray"> (overwrites entries to the left)</td><tr>
     <tr><td align="right">ID:</td><td>          <input type="text" id="helperID"    onkeyup="updateID();"></td></tr>
     <tr><td align="right">Controller:</td><td>  <input type="text" id="helperCont"  onkeyup="updateContFuncParam();"></td></tr>
     <tr><td align="right">Function:</td><td>    <input type="text" id="helperFunc"  onkeyup="updateContFuncParam();"></td></tr>

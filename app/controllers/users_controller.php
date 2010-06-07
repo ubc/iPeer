@@ -53,11 +53,46 @@ class UsersController extends AppController
 		parent::__construct();
 	}
 
+    // =-=-=-==-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
+    // User privilege level functions
+
+    // Get the privilege level for a user ID or a user type.
+    function getPrivilegeLevel($user=null) {
+        // For no parameters passed, get the privilege level of this user.
+        if (empty($user)) {
+            return getPrivilegeLevel($this->rdAuth->role);
+        } else if (is_numeric($user)) {
+        // If $user is a numberic user ID, look it up in the database.
+            $data = $this->User->findById($user);
+            return $data ? $this->getPrivilegeLevel($data['User']['role']) : 0;
+        } else {
+            // Or if this is a string, look up the user type, and return privilege
+            switch (strtolower($user)) {
+                case "s" : return 200;
+                case "i" : return 600;
+                case "a" : return 1200;
+                default : return 0;
+            }
+        }
+    }
+
+    function studentPrivilegeLevel() {
+        return getPrivilegeLevel('s');
+    }
+
+    function priviligeError() {
+        $this->redirect('home/index');
+        exit;
+    }
+
 	function index() {
-		if ($this->rdAuth->role == 'S') {
-			$this->redirect('home/index');
-			exit();
-		}
+     //   if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
+     //       priviligeError();
+     //   }
+
+
+       // $this->priviligeError();
+
 		if (!empty($this->rdAuth->courseId))
 		{
 			$this->pageTitle = $this->sysContainer->getCourseName($this->rdAuth->courseId).' > Students';
@@ -112,6 +147,7 @@ class UsersController extends AppController
 	}
 
 	function add($userType='') {
+
 		if ($this->rdAuth->role == 'S') {
 			$this->redirect('home/index');
 			exit();
