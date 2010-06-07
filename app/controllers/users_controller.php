@@ -164,8 +164,9 @@ class UsersController extends AppController
             $this->privilegeError();
         }
 
-        // Check that user type is valid
-        $userTypeLow = strtolower ($userType);
+        // Check that user type is valid : get from parameter, or the submited form.
+        $userTypeLow = !empty($this->params['data']) ? $this->params['data']['User']['role'] : $userType;
+        $userTypeLow = strtolower($userTypeLow);
         if ($userTypeLow != 's' && $userTypeLow != 'i' && $userTypeLow != 'a') {
             // Bad user type
             $this->privilegeError();
@@ -380,7 +381,7 @@ class UsersController extends AppController
 	function delete($id = null)
 	{
         // Make sure the present user is not a student
-        if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
+        if ($this->getPrivilegeLevel() < $this->studentPrivilegeLevel()) {
             $this->privilegeError();
         }
 
@@ -623,8 +624,7 @@ class UsersController extends AppController
 					$this->UserEnrol->id = null;
 				}
 
-			}
-			else{
+			} else{
 				if (isset($this->params['form']['course_id']))
 				{
 					$curUser = $this->User->find('username="'.$data['User']['username'].'"');
