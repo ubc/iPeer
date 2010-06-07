@@ -52,18 +52,25 @@ class AppController extends Controller  {
 	function checkAccess()
 	{
 		$this->rdAuth->loadFromSession();
-		
+
+        // Used when error messasges are displayed, just let cake display them.
+        // No controller -> no security risk.
+        if (empty($this->params)) {
+            return true;
+        }
+
 		//set access function list
 		$this->__setAccess();
 		$this->__setActions();
 		$this->__setCourses();
-		
+
 		// Enable for debug output
 		//$a=print_r($this->rdAuth,true);echo "<pre>$a</pre>";
 
 		//Save the current URL in session
 		$pass = (!empty($this->params['pass'])) ? join('/',$this->params['pass']) : null;
-		$URL = $this->params['controller'].'/'.$this->params['action'].'/'.$pass;
+
+        $URL = $this->params['controller'].'/'.$this->params['action'].'/'.$pass;
 		//$a=print_r($this->rdAuth,true);echo "<pre>$a</pre>";
 		//check if user not logined
 		if ($this->params['controller']=='' || $this->params['controller']=="loginout" || $this->params['controller']=="install")
@@ -82,13 +89,13 @@ class AppController extends Controller  {
 
 			//check permission
 			$functions = $this->sysContainer->getActionList();
-        
+
 			$url = $this->params['url']['url'];
             // Cut a trailing shash in url if it exists
             if ($url[strlen($url) - 1] == "/") {
                 $url = substr($url, 0, (-1) );
             }
-			
+
 			$allowedExplicitly = false;
 			$allowedByEntry = "";
             // First, check that this URL has been explicitly specified in Sys functions table.
@@ -117,8 +124,6 @@ class AppController extends Controller  {
 			$this->set('Output', $this->Output);
 
 			$this->Session->del('URL');
-
-
 		}
 		return true;
 	}

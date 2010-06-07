@@ -43,14 +43,18 @@ function checkEmailAddress()
 -->
 </script>
 </head>
-<body <?php if ($this->params['controller'] != 'loginout') {
-          if (!empty($rdAuth->role) && $rdAuth->role == 'S') {
-            if (empty($rdAuth->email))
-              echo 'onload="checkEmailAddress()"';
-            }
-          } elseif (substr($_SERVER['REQUEST_URI'],-14) == "loginByDefault")
-            echo 'onload="document.getElementById(\'username\').focus()"';
-          ?>>
+<body <?php
+    if (!empty($this->params)) {
+        if ($this->params['controller'] != 'loginout') {
+            if (!empty($rdAuth->role) && $rdAuth->role == 'S') {
+                if (empty($rdAuth->email))
+                echo 'onload="checkEmailAddress()"';
+                }
+        } elseif (substr($_SERVER['REQUEST_URI'],-14) == "loginByDefault") {
+                echo 'onload="document.getElementById(\'username\').focus()"';
+        }
+    }
+          ?> >
 <table class="tableback" width="94%" border="0" align="center" cellpadding="0" cellspacing="0">
 
   <tr>
@@ -107,12 +111,12 @@ function checkEmailAddress()
                     $rubricSysFunc = $access['SYS_PARA'];    ?>
                     <li <?php if ($this->params['controller'] == 'sysparameters') echo 'id="current"'; ?> ><a href="<?php echo $this->webroot.$this->themeWeb.$rubricSysFunc['url_link'];?>"><span><?php echo $rubricSysFunc['function_name']?></span></a></li>
             <?php }?>
-            
+
   		    <?php if (!empty($access['SYS_FUNC'])) {
                     $rubricSysFunc = $access['SYS_FUNC'];    ?>
                     <li <?php if ($this->params['controller'] == 'sysparameters') echo 'id="current"'; ?> ><a href="<?php echo $this->webroot.$this->themeWeb.$rubricSysFunc['url_link'];?>"><span><?php echo $rubricSysFunc['function_name']?></span></a></li>
-            <?php }?>            
-            
+            <?php }?>
+
           </ul>
         </div></td>
       </tr>
@@ -134,7 +138,18 @@ function checkEmailAddress()
         <td><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?>
           <?php echo $title_for_layout;?> </td>
         <td>
-      <div align="right"><?php if ($this->controller->rdAuth->role != 'S' && $this->params['controller'] != 'loginout') echo '<a href="'.$this->webroot.$this->themeWeb.'framework/tutIndex" onclick="wopen(this.href, \'popup\', 800, 600); return false;">'.$html->image('layout/button_ipeer_tutorial.gif',array('border'=>'0','alt'=>'button_ipeer_tutorial')).'</a>' ?></div></td>
+      <div align="right">
+        <?php
+        if (!empty($this->params)) {
+            if ($this->controller->rdAuth->role != 'S' && $this->params['controller'] != 'loginout') {
+                echo '<a href="' . $this->webroot . $this->themeWeb .
+                'framework/tutIndex" onclick="wopen(this.href, \'popup\', 800, 600); return false;">' .
+                $html->image('layout/button_ipeer_tutorial.gif',
+                array('border'=>'0','alt'=>'button_ipeer_tutorial')) . '</a>';
+            }
+        }
+        ?>
+        </div></td>
       </tr>
       </table>
         <?php if (!empty($errmsg)): ?>
@@ -161,7 +176,7 @@ function checkEmailAddress()
 	  // Toggles the details display of the snv revision.
       function toggleShowSnvRevision() {
 		var division = document.getElementById("svn-data");
-		if (!division) { 
+		if (!division) {
 			alert ("svn-data div was not found");
 			return;
 		} else {

@@ -60,7 +60,7 @@ class UsersController extends AppController
     function getPrivilegeLevel($user=null) {
         // For no parameters passed, get the privilege level of this user.
         if (empty($user)) {
-            return getPrivilegeLevel($this->rdAuth->role);
+            return $this->getPrivilegeLevel($this->rdAuth->role);
         } else if (is_numeric($user)) {
         // If $user is a numberic user ID, look it up in the database.
             $data = $this->User->findById($user);
@@ -77,7 +77,7 @@ class UsersController extends AppController
     }
 
     function studentPrivilegeLevel() {
-        return getPrivilegeLevel('s');
+        return $this->getPrivilegeLevel('s');
     }
 
     function priviligeError() {
@@ -86,12 +86,11 @@ class UsersController extends AppController
     }
 
 	function index() {
-     //   if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
-     //       priviligeError();
-     //   }
 
-
-       // $this->priviligeError();
+        // Make sure this is not a student
+        if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
+           priviligeError();
+        }
 
 		if (!empty($this->rdAuth->courseId))
 		{
