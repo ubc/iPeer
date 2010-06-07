@@ -57,7 +57,7 @@
     <td colspan="3"><div align="center"><span class="error">
 	 <input type="button" name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller']; ?>'">
 	 <?php echo $html->submit('Save') ?><br>
-          <span class="required">Note:</span> Student No. is used as login username and password. </span></div></td>
+          <span class="required">Note:</span> The password will be generated automatically on the next page. </span></div></td>
   </tr>
 </table>
 <table width="95%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">

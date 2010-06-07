@@ -199,8 +199,7 @@ class UsersController extends AppController
                 $this->render($renderPage);
             } else {
                 //General password
-                $password = $this->NeatString->randomPassword(6);//custom method in the User model
-                $this->params['data']['User']['password'] =  md5($password);
+                $this->params['data']['User']['password'] = $this->NeatString->randomPassword(6);
                 if (empty($this->params['data']['User']['username'])) $this->params['data']['User']['username'] = $this->params['form']['newuser'];
 
                 if ($this->params['data']['User']['role'] == 'S')
@@ -222,7 +221,7 @@ class UsersController extends AppController
                         $this->UserEnrol->save($userEnrol);
                     }
 
-                    $this->set('tmpPassword',$password);
+                    $this->set('tmpPassword', $this->params['data']['User']['password']);
                     $this->set('data', $this->User->read());
                     $this->set('userRole', $this->params['data']['User']['role']);
                     $this->set('courseId', $this->rdAuth->courseId);
@@ -349,11 +348,7 @@ class UsersController extends AppController
 			$this->set('viewPage', 'false');
 			$this->render();
 		} else {
-			if (!empty($this->params['data']['User']['password'])) {
-				//Update password
-				$password = $this->params['data']['User']['password'];//custom method in the User model
-				$this->params['data']['User']['password'] =  md5($password);
-			} else {
+			if (empty($this->params['data']['User']['password'])) {
 				unset($this->params['data']['User']['password']);
 			}
 			$this->Output->filter($this->params['data']);//always filter
@@ -481,8 +476,7 @@ class UsersController extends AppController
         }
 
 		//General password
-		$password = $this->NeatString->randomPassword(6);//custom method in the User model
-		$this->params['data']['User']['password'] =  md5($password);
+		$this->params['data']['User']['password'] =  $this->NeatString->randomPassword(6);
 		$this->params['data']['User']['id'] =  $userId;
 		//Save Data
 		if ($this->User->save($this->params['data'])) {
@@ -500,7 +494,7 @@ class UsersController extends AppController
 			$to = $user['User']['email'];
 			$fullname = $user['User']['first_name'] . " " . $user['User']['last_name'];
 			$email_msg = ereg_replace("<user>", $fullname, $email_msg);
-			$email_msg = ereg_replace("<newpassword>", $password, $email_msg);
+			$email_msg = ereg_replace("<newpassword>", $this->params['data']['User']['password'], $email_msg);
 
 			// send email to user
 			$success = $this->sendEmail( $to, $from, $subject, $email_msg );
@@ -519,7 +513,7 @@ class UsersController extends AppController
 
 			//Render to view page to display saved data
 			//TODO: Allow to enter email and forward the password reset message to the user
-			$this->set('tmpPassword',$password);
+			$this->set('tmpPassword',$this->params['data']['User']['password']);
 			$this->set('userRole', $user['User']['role']);
 			$this->set('data', $user);
 			$this->render('userSummary');

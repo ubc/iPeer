@@ -62,6 +62,10 @@ class User extends AppModel
 	//Overwriting Function - will be called before save operation
 	function beforeSave(){
 		$allowSave = true;
+
+    // generate password
+    $this->data[$this->name]['password'] = md5($this->data[$this->name]['password']);
+
 		if (empty($this->data[$this->name]['id'])) {
 			//check the duplicate username
 			$allowSave = $this->__checkDuplicateUsername();
