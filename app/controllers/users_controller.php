@@ -138,11 +138,21 @@ class UsersController extends AppController
 	}
 
 	function view($id) {
-		if ($this->rdAuth->role == 'S') {
-			$this->redirect('home/index');
-			exit();
-		}
-		$this->set('data', $this->User->read());
+        // Make sure this is not a student
+        if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
+           priviligeError();
+        }
+
+        if (is_numeric($id)) {
+            // Make sure that the privileges of the asking user is at least as high
+            //  as the priviliges of the user being viewed
+
+            if ($this->getPrivilegeLevel() >= $this->getPrivilegeLevel($id)) {
+                $this->set('data', $this->User->read());
+            } else {
+                $this->priviligeError();
+            }
+        }
 	}
 
 	function add($userType='') {

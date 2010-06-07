@@ -8,7 +8,17 @@
       </tr>
       <tr class="tablecell2">
         <td width="12%" id="username_label">Username:</td>
-        <td width="88%" align="left" colspan="3"><?php echo $data['User']['username']; ?></td>
+        <td width="38%" ><?php echo $data['User']['username']; ?></td>
+        <td width="12%" id="username_label"> Role:
+        <td width="38%" > <?php
+            $role = $data['User']['role'];
+            switch ($role) {
+                case "S" : echo "Student"; break;
+                case "I" : echo "Instructor"; break;
+                case "A" : echo "Admin"; break;
+                default  : echo "Unknown User Role $role";
+            }
+            ?></td>
       </tr>
       <tr class="tablecell2">
         <td id="last_name_label">Last Name:</td>
