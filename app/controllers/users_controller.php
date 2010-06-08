@@ -164,6 +164,11 @@ class UsersController extends AppController
             $this->privilegeError();
         }
 
+        //check and set user type
+        if (!empty($this->params['data'])) {
+             $userType = $this->params['data']['User']['role'];
+        }
+
         // Check that user type is valid : get from parameter, or the submited form.
         $userTypeLow = !empty($this->params['data']) ? $this->params['data']['User']['role'] : $userType;
         $userTypeLow = strtolower($userTypeLow);

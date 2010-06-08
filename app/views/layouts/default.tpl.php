@@ -224,6 +224,8 @@ function checkEmailAddress()
         <a href="javascript:toggleDivision('access-data');">(details)</a></td>
     <td>Actions: <?php echo empty($access) ? 0 : count($access); ?>
         <a href="javascript:toggleDivision('actions-data');">(details)</a></td>
+    <td>Params: <?php echo empty($params) ? 0 : count($params); ?>
+        <a href="javascript:toggleDivision('params-data');">(details)</a></td>
     </tr></table>
 
     <!-- The actual debugging data -->
@@ -241,6 +243,9 @@ function checkEmailAddress()
     <div style="display: none; background-color:#E9FFFF; width: 90%;" id="access-data">
         <h1>$access variable</h1>
         <?php if(!empty($access)) var_dump($access); else echo "(Empty)"?></div>
+    <div style="display: none; background-color:#E9FFFF; width: 90%;" id="params-data">
+        <h1>$params variable</h1>
+        <?php if(!empty($params)) var_dump($params); else echo "(Empty)"?></div>
 
 
 <?php } // end if(!constant('DEBUG') == 0) { ?>
