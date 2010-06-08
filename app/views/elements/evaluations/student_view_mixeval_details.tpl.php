@@ -8,7 +8,7 @@ $pos = 1;
 <br/><br/>
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr class="tableheader" align="center">
-    <td width="100" valign="top" colspan="<?=($mixeval['Mixeval']["lickert_question_max"]+1)?>">Section One:</td>
+    <td width="100" valign="top" colspan="<?php echo ($mixeval['Mixeval']["lickert_question_max"]+1)?>">Section One:</td>
   </tr>
 	<tr class="tableheader" align="center">
     <td width="100" valign="top">Evaluatee</td>
@@ -85,7 +85,7 @@ else if ($gradeReleased || $commentReleased) {
 <br/><br/>
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr class="tableheader" align="center">
-    <td width="100" valign="top" colspan="<?=($mixeval['Mixeval']["prefill_question_max"]+1)?>">Section Two:</td>
+    <td width="100" valign="top" colspan="<?php echo ($mixeval['Mixeval']["prefill_question_max"]+1)?>">Section Two:</td>
   </tr>
 	<tr class="tableheader" align="center">
     <td width="100" valign="top">Evaluatee</td>

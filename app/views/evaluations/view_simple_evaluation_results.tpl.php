@@ -116,10 +116,10 @@ else { // if no members are present
 <tr class="tablecell2" align="center">
 	<td colspan="<?php echo count($groupMembers) +1; ?>">
 <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
-  <input type="hidden" name="event_id" value="<?=$event['Event']['id']?>" />
-  <input type="hidden" name="group_id" value="<?=$event['group_id']?>" />
-  <input type="hidden" name="course_id" value="<?=$rdAuth->courseId?>" />
-  <input type="hidden" name="group_event_id" value="<?=$event['group_event_id']?>" /><?php
+  <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
+  <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
+  <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>" />
+  <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" /><?php
 	if ($event['group_event_marked'] == "reviewed") {
 		echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_not_reviewed\" value=\"Mark Peer Evaluations as Not Reviewed\" />";
 	}
@@ -152,8 +152,8 @@ else { // if no members are present
 <div id="accordion">
 	<?php $i = 0;
 	foreach($groupMembers as $row): $user = $row['User']; ?>
-		<div id="panel<?=$user['id']?>">
-			<div id="panel<?=$user['id']?>Header" class="panelheader">
+		<div id="panel<?php echo $user['id']?>">
+			<div id="panel<?php echo $user['id']?>Header" class="panelheader">
 				<?php echo 'Evaluator: '.$user['last_name'].' '.$user['first_name']?>
 			</div>
 			<div style="height: 200px;" id="panel1Content" class="panelContent">
@@ -199,10 +199,10 @@ else { // if no members are present
 	</tr>
 <tr class="tablecell2" align="center">
 	<td colspan="4">
-  <input type="hidden" name="event_id" value="<?=$event['Event']['id']?>" />
-  <input type="hidden" name="group_id" value="<?=$event['group_id']?>" />
-  <input type="hidden" name="course_id" value="<?=$rdAuth->courseId?>" />
-  <input type="hidden" name="group_event_id" value="<?=$event['group_event_id']?>" />
+  <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
+  <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
+  <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>" />
+  <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" />
 	&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="submit" value="Save Changes" />
 	&nbsp;&nbsp;&nbsp;<input type="submit" name="submit" value="Release All" />
 	&nbsp;&nbsp;&nbsp;<input type="submit" name="submit" value="Unrelease All" />

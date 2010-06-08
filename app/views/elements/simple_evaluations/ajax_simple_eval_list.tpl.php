@@ -36,7 +36,7 @@
   	        <?php echo $html->image('icons/editdisabled.gif',array('border'=>'0','alt'=>'Edit'))?>
   	      <?php endif; ?>
   	      <?php if ($rdAuth->id == $simpleeval['creator_id'] or ($rdAuth->role=='A')): ?>
-  	      <a href="<?php echo $this->webroot.$this->themeWeb.'simpleevaluations/delete/'.$simpleeval['id']?>" onclick="return confirm('All associating events and evaluation data will be deleted as well.\n Are you sure you want to delete this evaluation &ldquo;<?=$simpleeval['name']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
+  	      <a href="<?php echo $this->webroot.$this->themeWeb.'simpleevaluations/delete/'.$simpleeval['id']?>" onclick="return confirm('All associating events and evaluation data will be deleted as well.\n Are you sure you want to delete this evaluation &ldquo;<?php echo $simpleeval['name']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
   	      <?php else: ?>
   	        <?php echo $html->image('icons/deletedisabled.gif',array('border'=>'0','alt'=>'Delete'))?>
   	      <?php endif; ?>

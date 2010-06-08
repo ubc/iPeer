@@ -27,7 +27,7 @@
       			  echo '<td width="50">'.(isset($scores[$i]['percent'])? $scores[$i]['percent']:'-').'</td>';
       			  for ($j=0; $j < count($team);$j++) {
       			?>
-      			<td width="70"><a href="<?=$this->webroot.$this->themeWeb.'evaluations/viewEvaluationResults/'.$event_id.';'.$team['member_'.$j]['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?=$team['member_'.$j]['student_no']?></a></td>
+      			<td width="70"><a href="<?php echo $this->webroot.$this->themeWeb.'evaluations/viewEvaluationResults/'.$event_id.';'.$team['member_'.$j]['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $team['member_'.$j]['student_no']?></a></td>
       			<?php
       			  }
       			  echo '</tr>';

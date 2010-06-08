@@ -4,7 +4,7 @@
     <?php echo $javascript->link('course')?>
 <script type="text/javascript" language="javascript">
 <!--
-  var total_instructor_count = <?=$instructor_count?>;
+  var total_instructor_count = <?php echo $instructor_count?>;
 //-->
 </script>
     <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Course']['id'])?'add':'edit') ?>">

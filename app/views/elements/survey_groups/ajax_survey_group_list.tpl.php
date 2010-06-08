@@ -20,10 +20,10 @@
       <tr class="tablecell">
         <td align="center"> <a href="<?php echo $this->webroot.$this->themeWeb.'/surveys/questionssummary/'.$survey['survey_id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
           <?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
-          <a href="<?php echo $this->webroot.$this->themeWeb.'surveygroups/editgroupset/'.$survey['id']?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a> <a href="<?php echo $this->webroot.$this->themeWeb.'surveygroups/deletesurveygroupset/'.$survey['id']?>" onclick="return confirm('Are you sure you want to delete survey group set &ldquo;<?=$survey['set_description']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
+          <a href="<?php echo $this->webroot.$this->themeWeb.'surveygroups/editgroupset/'.$survey['id']?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a> <a href="<?php echo $this->webroot.$this->themeWeb.'surveygroups/deletesurveygroupset/'.$survey['id']?>" onclick="return confirm('Are you sure you want to delete survey group set &ldquo;<?php echo $survey['set_description']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
           <?php endif;?></td>
         <td><?php echo $html->link($survey['set_description'], '/surveys/questionssummary/'.$survey['survey_id']) ?></td>
-        <td align="center"><?=$survey['num_groups']?></td>
+        <td align="center"><?php echo $survey['num_groups']?></td>
         <td align="center">
 		<?php
 		if($survey['released'])

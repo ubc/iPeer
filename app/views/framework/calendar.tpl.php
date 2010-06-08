@@ -100,9 +100,9 @@ function set_datetime(n_datetime, b_close) {
 <tr><td>
 <script language="javascript" type="text/javascript">
 document.write(
-'<td>'+(obj_caller&&obj_caller.year_scroll?'<a href="javascript:set_datetime('+dt_prev_year.valueOf()+')"><?= $html->image('calendar/prev_year.gif',array('align'=>'middle', 'border'=>'0', 'width'=>'16', 'height'=>'16', 'alt'=>'previous year'))?><\/a>&nbsp;':'')+'<a href="javascript:set_datetime('+dt_prev_month.valueOf()+')"><?= $html->image('calendar/prev.gif',array('align'=>'middle', 'border'=>'0', 'width'=>'16', 'height'=>'16', 'alt'=>'previous month'))?><\/a><\/td>'+
+'<td>'+(obj_caller&&obj_caller.year_scroll?'<a href="javascript:set_datetime('+dt_prev_year.valueOf()+')"><?php echo $html->image('calendar/prev_year.gif',array('align'=>'middle', 'border'=>'0', 'width'=>'16', 'height'=>'16', 'alt'=>'previous year'))?><\/a>&nbsp;':'')+'<a href="javascript:set_datetime('+dt_prev_month.valueOf()+')"><?php echo $html->image('calendar/prev.gif',array('align'=>'middle', 'border'=>'0', 'width'=>'16', 'height'=>'16', 'alt'=>'previous month'))?><\/a><\/td>'+
 '<td align="center" width="100%"><b><font color="white">'+ARR_MONTHS[dt_current.getMonth()]+' '+dt_current.getFullYear() + '<\/font><\/b><\/td>'+
-'<td><a href="javascript:set_datetime('+dt_next_month.valueOf()+')"><?= $html->image('calendar/next.gif',array('align'=>'middle', 'border'=>'0', 'width'=>'16', 'height'=>'16', 'alt'=>'next month'))?><\/a>'+(obj_caller && obj_caller.year_scroll?'&nbsp;<a href="javascript:set_datetime('+dt_next_year.valueOf()+')"><?= $html->image('calendar/next_year.gif',array('align'=>'middle', 'border'=>'0', 'width'=>'16', 'height'=>'16', 'alt'=>'next year'))?><\/a>':'')+'<\/td>'
+'<td><a href="javascript:set_datetime('+dt_next_month.valueOf()+')"><?php echo $html->image('calendar/next.gif',array('align'=>'middle', 'border'=>'0', 'width'=>'16', 'height'=>'16', 'alt'=>'next month'))?><\/a>'+(obj_caller && obj_caller.year_scroll?'&nbsp;<a href="javascript:set_datetime('+dt_next_year.valueOf()+')"><?php echo $html->image('calendar/next_year.gif',array('align'=>'middle', 'border'=>'0', 'width'=>'16', 'height'=>'16', 'alt'=>'next year'))?><\/a>':'')+'<\/td>'
 );
 </script>
 </td></tr>

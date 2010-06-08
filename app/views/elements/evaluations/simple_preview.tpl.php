@@ -56,8 +56,8 @@
 </script>
 	<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
     <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeSimpleEvaluation') ?>">
-      <input type="hidden" name="course_id" value="<?=$rdAuth->courseId?>"/>
-      <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?=$rdAuth->id?>"/>
+      <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>"/>
+      <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $rdAuth->id?>"/>
 
 
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
@@ -108,21 +108,21 @@
 	foreach($groupMembers as $row): $user = $row['User']; ?>
 	<tr class="tablecell">
 		<td><?php echo $user['last_name'].' '.$user['first_name']?>
-	  <input type="hidden" name="memberIDs[]" value="<?=$user['id']?>"/></td>
+	  <input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/></td>
 	  <td width="130"><table><tr align="center">
 	    <td width="5">Min.</td>
 	    <td width="120">
-        <div id="track<?=$user['id']?>" style="width:100px;background-color:#aaa;height:10px;">
-          <div id="handle<?=$user['id']?>" style="width:10px;height:15px;background-color:#fa7e04;cursor:move;"> </div>
+        <div id="track<?php echo $user['id']?>" style="width:100px;background-color:#aaa;height:10px;">
+          <div id="handle<?php echo $user['id']?>" style="width:10px;height:15px;background-color:#fa7e04;cursor:move;"> </div>
         </div>
-        <div id="score<?=$user['id']?>" style="padding-top: 5px;"></div>&nbsp;&nbsp;
+        <div id="score<?php echo $user['id']?>" style="padding-top: 5px;"></div>&nbsp;&nbsp;
       </td>
       <td width="5">Max.</td>
       </tr></table>
 		</td>
-		<td align="center"><input type="text" name="points[]" id="point<?=$user['id']?>" value="<?php echo empty($params['data']['Evaluation']['point'.$user['id']])? '' : $params['data']['Evaluation']['point'.$user['id']] ?>" size="5" onkeyup="updateCount('total', 'remaining');">
+		<td align="center"><input type="text" name="points[]" id="point<?php echo $user['id']?>" value="<?php echo empty($params['data']['Evaluation']['point'.$user['id']])? '' : $params['data']['Evaluation']['point'.$user['id']] ?>" size="5" onkeyup="updateCount('total', 'remaining');">
     </td>
-		<td><input type="text" name="comments[]" id="comment<?=$user['id']?>" value="<?php echo empty($params['data']['Evaluation']['comment_'.$user['id']])? '' : $params['data']['Evaluation']['comment_'.$user['id']] ?>" style="width:96%">
+		<td><input type="text" name="comments[]" id="comment<?php echo $user['id']?>" value="<?php echo empty($params['data']['Evaluation']['comment_'.$user['id']])? '' : $params['data']['Evaluation']['comment_'.$user['id']] ?>" style="width:96%">
       <script type="text/javascript" language="javascript">
       new Control.Slider(<?php echo "'handle".$user['id']."'"?>,<?php echo "'track".$user['id']."'"?>,{minimum: 0, maximum:10, increment:10,
           onSlide:function(v){$(<?php echo "'score".$user['id']."'"?>).innerHTML=v },

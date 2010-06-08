@@ -37,7 +37,7 @@
 	        <?php echo $html->image('icons/editdisabled.gif',array('border'=>'0','alt'=>'Edit'))?>
 	      <?php endif; ?>
 	      <?php if ($rdAuth->id == $mixeval['creator_id'] or ($rdAuth->role=='A')): ?>
-          <a href="<?php echo $this->webroot.$this->themeWeb.'mixevals/delete/'.$mixeval['id']?>" onclick="return confirm('All associating events and evaluation data will be deleted as well.\n Are you sure you want to delete mixeval &ldquo;<?=$mixeval['name'] ?>&rdquo;? ')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
+          <a href="<?php echo $this->webroot.$this->themeWeb.'mixevals/delete/'.$mixeval['id']?>" onclick="return confirm('All associating events and evaluation data will be deleted as well.\n Are you sure you want to delete mixeval &ldquo;<?php echo $mixeval['name'] ?>&rdquo;? ')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
 	      <?php else: ?>
 	        <?php echo $html->image('icons/deletedisabled.gif',array('border'=>'0','alt'=>'Delete'))?>
 	      <?php endif; ?>

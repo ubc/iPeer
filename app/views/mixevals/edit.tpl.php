@@ -113,7 +113,7 @@ echo $javascript->link('calculate_marks');?>
 
     <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
     	<tr class="tableheader" align="center">
-			<td valign="top" colspan="<?=$scale_default?>" width="90%"  align='left'>Section One: &nbsp;Lickert Scales</td>
+			<td valign="top" colspan="<?php echo $scale_default?>" width="90%"  align='left'>Section One: &nbsp;Lickert Scales</td>
 		<?php
 		$descriptor_des = array('1'=>'Lowest','2'=>'','3'=>'Middle','4'=>'','5'=>'Highest');
 
@@ -211,9 +211,9 @@ echo $javascript->link('calculate_marks');?>
 		  $this->controller->Output->br2nl($mixevalQuestion);
   ?>
 			<tr class="tablecell" align="center">
-  			<td class="tableheader2" valign="top" colspan="<?=$scale_default?>">
+  			<td class="tableheader2" valign="top" colspan="<?php echo $scale_default?>">
   			  <table border="0" width="95%" cellpadding="2">
-  			    <tr><td width="15%">Question <?=$pos?>:</td>
+  			    <tr><td width="15%">Question <?php echo $pos?>:</td>
   			        <td width="85%" align="left"> Question Prompt:
   			          <?php echo	$html->input('Mixeval/title'.$pos, array('style'=>'width:100%;', 'value'=>isset($mixevalQuestion['title'])? $mixevalQuestion['title'] : '')) ?> <br>
   			          <?php echo $html->hidden('Mixeval/question_type'.$pos, array('value'=>'T'));?>
@@ -228,8 +228,8 @@ echo $javascript->link('calculate_marks');?>
                      $checkRequired = '';
                      $checkNo = 'checked';
                    }?>
-          		    <input type="radio" name="data[Mixeval][text_require<?=$pos?>]" value="1" <?php echo $checkRequired?> > Yes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          		    <input type="radio" name="data[Mixeval][text_require<?=$pos?>]" value="0" <?php echo $checkNo ?> > No<br>
+          		    <input type="radio" name="data[Mixeval][text_require<?php echo $pos?>]" value="1" <?php echo $checkRequired?> > Yes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          		    <input type="radio" name="data[Mixeval][text_require<?php echo $pos?>]" value="0" <?php echo $checkNo ?> > No<br>
                 </td>
   				  </tr>
   			  </table>
@@ -258,8 +258,8 @@ echo $javascript->link('calculate_marks');?>
                    $responseLickert = '';
                    $responseText = 'checked';
                    }?>
-          		    <input type="radio" name="data[Mixeval][response_type<?=$pos?>]" value="S" <?=$responseLickert?>  > Single line of text input box<br>
-          		    <input type="radio" name="data[Mixeval][response_type<?=$pos?>]" value="L" <?=$responseText?> > Multiple lines of text input box<br>
+          		    <input type="radio" name="data[Mixeval][response_type<?php echo $pos?>]" value="S" <?php echo $responseLickert?>  > Single line of text input box<br>
+          		    <input type="radio" name="data[Mixeval][response_type<?php echo $pos?>]" value="L" <?php echo $responseText?> > Multiple lines of text input box<br>
                 </td></tr>
 			 </table></td>
 			</tr>

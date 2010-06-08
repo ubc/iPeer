@@ -31,7 +31,7 @@
 		    <a href="<?php echo $this->webroot.$this->themeWeb.'sysparameters/view/'.$sysparameter['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
 	    <?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
 	      <a href="<?php echo $this->webroot.$this->themeWeb.'sysparameters/edit/'.$sysparameter['id']?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
-	      <a href="<?php echo $this->webroot.$this->themeWeb.'sysparameters/delete/'.$sysparameter['id']?>" onclick="return confirm('Are you sure you want to delete parameter &ldquo;<?=$sysparameter['parameter_code']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
+	      <a href="<?php echo $this->webroot.$this->themeWeb.'sysparameters/delete/'.$sysparameter['id']?>" onclick="return confirm('Are you sure you want to delete parameter &ldquo;<?php echo $sysparameter['parameter_code']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
 	    <?php endif;?>
 	    </td>
 		  <td>

@@ -1,5 +1,5 @@
 <form name="frm" id="frm" method="POST" action="">
-<input type="hidden" id="search_type" name="search_type" value="<?=$display?>"/>
+<input type="hidden" id="search_type" name="search_type" value="<?php echo $display?>"/>
 <table width="95%"  border="0" cellspacing="2" cellpadding="4">
     <tr>
       <td><div align="left" id="criteria_panel">
@@ -19,13 +19,13 @@
           <tr class="tablecell2">
             <td width="100" id="instructorname_label">Name:</td>
             <td width="200">
-              <input type="text" name="instructorname" id="instructorname" class="validate null DATE_FORMAT instructorname_msg Invalid_Date_Format." value="<?=$sticky['instructor_name'] ?>" size="50"/>
+              <input type="text" name="instructorname" id="instructorname" class="validate null DATE_FORMAT instructorname_msg Invalid_Date_Format." value="<?php echo $sticky['instructor_name'] ?>" size="50"/>
             </td>
             <td width="100" id="instructorname_msg" class="error" >&nbsp;</td>
           </tr>
           <tr class="tablecell2">
             <td id="email_label">Email:</td>
-            <td><input type="text" name="email" id="email" class="validate null DATE_FORMAT email_msg Invalid_Date_Format." value="<?=$sticky['email']?>" size="50"></td>
+            <td><input type="text" name="email" id="email" class="validate null DATE_FORMAT email_msg Invalid_Date_Format." value="<?php echo $sticky['email']?>" size="50"></td>
             <td id="email_msg" class="error">&nbsp;</td>
           </tr>
           <tr class="tablecell2">

@@ -13,7 +13,7 @@
     else {?>
   		<select name="data[Event][template_id]" id="template_id" style="width:200px;" >
   			<?php foreach($eventTemplates as $row): $template = $row[$model];?>
-  		  <option value="<?= trim($template['id']) ?>"<?php
+  		  <option value="<?php echo trim($template['id']) ?>"<?php
   				  if (isset($templateID) && $template['id'] == $templateID) {
   				       echo ' selected';
   				  }
@@ -24,15 +24,15 @@
       <script type="text/javascript" language="javascript">
         function getSimpleIndex(obj) {
           index = document.getElementById("template_id").selectedIndex;
-          obj.href = "<?=$this->webroot.$this->themeWeb;?>simpleevaluations/view/"+(++index)+"/pop_up";
+          obj.href = "<?php echo $this->webroot.$this->themeWeb;?>simpleevaluations/view/"+(++index)+"/pop_up";
         }
         function getRubricIndex(obj) {
           index = document.getElementById("template_id").selectedIndex;
-          obj.href = "<?=$this->webroot.$this->themeWeb;?>rubrics/view/"+(++index)+"/pop_up";
+          obj.href = "<?php echo $this->webroot.$this->themeWeb;?>rubrics/view/"+(++index)+"/pop_up";
         }
         function getMixIndex(obj) {
           index = document.getElementById("template_id").selectedIndex;
-          obj.href = "<?=$this->webroot.$this->themeWeb;?>mixevals/view/"+(++index)+"/pop_up";
+          obj.href = "<?php echo $this->webroot.$this->themeWeb;?>mixevals/view/"+(++index)+"/pop_up";
         }
       </script>
     <?php

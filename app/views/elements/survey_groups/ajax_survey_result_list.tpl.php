@@ -24,7 +24,7 @@ if (isset($pagination->params['pass']['0'])) {
 	<table width="65%" border="0" cellspacing="2" cellpadding="4" bgcolor="#FFFFFF">
 	  <tr style="background-color:#CCCCDD;">
 	    <td colspan="3" align="center">
-	    <table cellspacing="0" cellpadding="0" width="100%"><tr><td align="left"><?= $data[0]['Survey']['name']; ?></td>
+	    <table cellspacing="0" cellpadding="0" width="100%"><tr><td align="left"><?php echo $data[0]['Survey']['name']; ?></td>
 	    <td align="right"><a href="<?php echo $this->webroot.$this->themeWeb.'evaluations/viewSurveySummary/'.$data[0]['Survey']['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;">View Summary</a></td></tr></table></td>
 	  </tr>
 	  <tr class="tableheader">

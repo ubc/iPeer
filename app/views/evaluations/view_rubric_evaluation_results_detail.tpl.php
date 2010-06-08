@@ -17,9 +17,9 @@
   <tr>
     <td colspan="3"><?php echo $html->image('icons/instructions.gif',array('alt'=>'instructions'));?>
       <b> Summary:</b>(
-      <a href="<?=$this->webroot.$this->themeWeb?>evaluations/viewEvaluationResults/<?=$event['Event']['id']?>;<?=$event['group_id']?>;Basic">Basic</a>
+      <a href="<?php echo $this->webroot.$this->themeWeb?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>;<?php echo $event['group_id']?>;Basic">Basic</a>
        |
-      <a href="<?=$this->webroot.$this->themeWeb?>evaluations/viewEvaluationResults/<?=$event['Event']['id']?>;<?=$event['group_id']?>;Detail" >Detail</a>
+      <a href="<?php echo $this->webroot.$this->themeWeb?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>;<?php echo $event['group_id']?>;Detail" >Detail</a>
         )
     </td>
   </tr>
@@ -125,10 +125,10 @@ $groupAve = 0;
 	</tr>
   <tr class="tablecell2" align="center"><td colspan="<?php echo $rubric['Rubric']["criteria"] +2; ?>">
       <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
-			  <input type="hidden" name="event_id" value="<?=$event['Event']['id']?>" />
-			  <input type="hidden" name="group_id" value="<?=$event['group_id']?>" />
-			  <input type="hidden" name="course_id" value="<?=$rdAuth->courseId?>" />
-			  <input type="hidden" name="group_event_id" value="<?=$event['group_event_id']?>" />
+			  <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
+			  <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
+			  <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>" />
+			  <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" />
 			  <input type="hidden" name="display_format" value="Detail" />
 
       	<?php
@@ -148,8 +148,8 @@ $groupAve = 0;
 <div id="accordion">
 	<?php $i = 0;
 	foreach($groupMembers as $row): $user = $row['User']; ?>
-		<div id="panel<?=$user['id']?>">
-		  <div id="panel<?=$user['id']?>Header" class="panelheader">
+		<div id="panel<?php echo $user['id']?>">
+		  <div id="panel<?php echo $user['id']?>Header" class="panelheader">
 		  	<?php echo 'Evaluatee: '.$user['last_name'].' '.$user['first_name']?>
 		  </div>
 		  <div style="height: 200px;" id="panel1Content" class="panelContent">

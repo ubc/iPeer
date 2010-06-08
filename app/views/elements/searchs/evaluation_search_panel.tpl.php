@@ -1,5 +1,5 @@
 <form name="frm" id="frm" method="POST" action="">
-<input type="hidden" id="search_type" name="search_type" value="<?=$display?>"/>
+<input type="hidden" id="search_type" name="search_type" value="<?php echo $display?>"/>
 <table width="95%"  border="0" cellspacing="2" cellpadding="4">
     <tr>
       <td width="80%"><div align="left" id="criteria_panel">

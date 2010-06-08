@@ -6,7 +6,7 @@
 	  <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Event']['id'])?'add':'edit') ?>">
       <?php echo empty($params['data']['Event']['id']) ? null : $html->hidden('Event/id'); ?>
       <?php echo empty($params['data']['Event']['id']) ? $html->hidden('Event/creator_id', array('value'=>$rdAuth->id)) : $html->hidden('Event/updater_id', array('value'=>$rdAuth->id)); ?>
-      <input type="hidden" name="assigned" id="assigned" value="<?=$groupIDs?>"/>
+      <input type="hidden" name="assigned" id="assigned" value="<?php echo $groupIDs?>"/>
       <?php $event = $params['data'];?>
 
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
@@ -52,20 +52,20 @@
       <tr>
           <td width="50%" align="left" valign="top" >
 						<select name="data[Event][event_template_type_id]"
-							onChange="new Ajax.Updater('template_table','<?=$this->webroot.$this->themeWeb?>events/eventTemplatesList/'+this.options[this.selectedIndex].value,
+							onChange="new Ajax.Updater('template_table','<?php echo $this->webroot.$this->themeWeb?>events/eventTemplatesList/'+this.options[this.selectedIndex].value,
 																				 {onLoading:function(request){Element.show('loading');},
 																					onComplete:function(request){Element.hide('loading');},
 																					asynchronous:true, evalScripts:true});  return false;">
 						<?php
 
 						foreach($eventTypes as $row): $eventTemplateType = $row['EventTemplateType']; ?>
-							<option value="<?=$eventTemplateType['id']?>"
+							<option value="<?php echo $eventTemplateType['id']?>"
 							  <?php
 							  if (!empty($event['Event']['event_template_type_id']) && $event['Event']['event_template_type_id'] == $eventTemplateType['id']) {
 							       echo 'SELECTED';
 							  }
 							  ?>
-							  ><?=$eventTemplateType['type_name']?></option>
+							  ><?php echo $eventTemplateType['type_name']?></option>
 						<?php endforeach; ?>
 						</select>
 						<br>

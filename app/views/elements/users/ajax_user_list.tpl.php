@@ -36,8 +36,8 @@
 		    <a href="<?php echo $this->webroot.$this->themeWeb.'users/view/'.$user['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
 	    <?php if($rdAuth->role == 'A' || $user['role'] != 'I' && ($rdAuth->role == 'A' || $rdAuth->role == 'I')):?>
 	      <a href="<?php echo $this->webroot.$this->themeWeb.'users/edit/'.$user['id']?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
-	      <a href="<?php echo $this->webroot.$this->themeWeb.'users/delete/'.$user['id']?>" onclick="return confirm('Are you sure you want to delete user &ldquo;<?=$user['username']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
-	      <a href="<?php echo $this->webroot.$this->themeWeb.'users/resetPassword/'.$user['id']?>" onclick="return confirm('Are you sure you want to reset password for user &ldquo;<?=$user['username']?>&rdquo;?')"><?php echo $html->image('icons/key_email.gif',array('border'=>'0','alt'=>'Reset password'))?></a>
+	      <a href="<?php echo $this->webroot.$this->themeWeb.'users/delete/'.$user['id']?>" onclick="return confirm('Are you sure you want to delete user &ldquo;<?php echo $user['username']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
+	      <a href="<?php echo $this->webroot.$this->themeWeb.'users/resetPassword/'.$user['id']?>" onclick="return confirm('Are you sure you want to reset password for user &ldquo;<?php echo $user['username']?>&rdquo;?')"><?php echo $html->image('icons/key_email.gif',array('border'=>'0','alt'=>'Reset password'))?></a>
 	    <?php endif;?>
 	    </td>
 		  <td>

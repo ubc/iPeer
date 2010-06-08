@@ -30,7 +30,7 @@
 	  }
 	  echo '</table>';
 	  if (!empty($maillToAll)) {?>
-	   <a href="mailto:<?=$maillToAll?>"><?php echo $html->image('icons/email.gif',array('border'=>'0','alt'=>'Emaill To All'))?></a>
+	   <a href="mailto:<?php echo $maillToAll?>"><?php echo $html->image('icons/email.gif',array('border'=>'0','alt'=>'Emaill To All'))?></a>
           Email To All Instructors
 	  <?php }
 	  ?>

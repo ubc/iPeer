@@ -4,7 +4,7 @@
   <?php echo $javascript->link('groups')?>
 	  <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Event']['id'])?'add':'edit') ?>">
       <?php echo empty($params['data']['Event']['id']) ? null : $html->hidden('Event/id'); ?>
-      <input type="hidden" name="assigned" id="assigned" value="<?=$groupIDs?>"/>
+      <input type="hidden" name="assigned" id="assigned" value="<?php echo $groupIDs?>"/>
       <?php $event = $params['data'];?>
 
 <?php

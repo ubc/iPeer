@@ -2,10 +2,10 @@
 <tr>
 <td align="center">
 <form id="searchForm" action="">
-<input type="hidden" name="id" value="<?=$id?>"/>
+<input type="hidden" name="id" value="<?php echo $id?>"/>
 <table width="95%" border="0" cellspacing="0" cellpadding="2">
   <tr>
-    <td align="left" colspan="5"><?php echo $html->image('/icons/caution.gif', array('alt'=>'Due Date'));?>&nbsp;<b>Event Due:</b>&nbsp; <?=$this->controller->Output->formatDate($data['Event']['due_date']) ?></td>
+    <td align="left" colspan="5"><?php echo $html->image('/icons/caution.gif', array('alt'=>'Due Date'));?>&nbsp;<b>Event Due:</b>&nbsp; <?php echo $this->controller->Output->formatDate($data['Event']['due_date']) ?></td>
   </tr>
   <tr>
     <td colspan="2" align="left">

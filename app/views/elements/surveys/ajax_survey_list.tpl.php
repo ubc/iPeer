@@ -37,7 +37,7 @@
       	        <?php echo $html->image('icons/editdisabled.gif',array('border'=>'0','alt'=>'Edit'))?>
       	      <?php endif; ?>
       	      <?php if ($rdAuth->id == $survey['creator_id'] or ($rdAuth->role=='A')): ?>
-        	      <a href="<?php echo $this->webroot.$this->themeWeb.'surveys/delete/'.$survey['id']?>" onclick="return confirm('All associating events and evaluation data will be deleted as well.\n Are you sure you want to delete survey &ldquo;<?=$survey['name']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
+        	      <a href="<?php echo $this->webroot.$this->themeWeb.'surveys/delete/'.$survey['id']?>" onclick="return confirm('All associating events and evaluation data will be deleted as well.\n Are you sure you want to delete survey &ldquo;<?php echo $survey['name']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
       	      <?php else: ?>
       	        <?php echo $html->image('icons/deletedisabled.gif',array('border'=>'0','alt'=>'Delete'))?>
       	      <?php endif; ?>

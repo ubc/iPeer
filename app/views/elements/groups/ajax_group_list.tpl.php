@@ -25,7 +25,7 @@
 		<a href="<?php echo $this->webroot.$this->themeWeb.'groups/view/'.$group['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
 	    <?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
 		<a href="<?php echo $this->webroot.$this->themeWeb.'groups/edit/'.$group['id']?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
-	    <a href="<?php echo $this->webroot.$this->themeWeb.'groups/delete/'.$group['id']?>" onclick="return confirm('Are you sure you want to delete group &ldquo;<?=$group['group_name']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
+	    <a href="<?php echo $this->webroot.$this->themeWeb.'groups/delete/'.$group['id']?>" onclick="return confirm('Are you sure you want to delete group &ldquo;<?php echo $group['group_name']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
 	    <?php endif;?>
 		</div></td>
         <td align="center"><?php echo $group['group_num'] ?></td>

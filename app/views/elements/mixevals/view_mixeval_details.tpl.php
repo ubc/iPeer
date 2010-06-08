@@ -104,9 +104,9 @@
 
   ?>
       <tr class="tablecell" align="center">
-        <td class="tableheader2" valign="top" colspan="<?=$scale_default?>">
+        <td class="tableheader2" valign="top" colspan="<?php echo $scale_default?>">
           <table border="0" width="95%" cellpadding="2">
-            <tr><td width="5%"><?=$pos?>:</td>
+            <tr><td width="5%"><?php echo $pos?>:</td>
                 <td width="95%" align="left"> Question Prompt:
                   <?php echo  $mixevalQuestion['title'];
                    if ($evaluate) {
@@ -151,9 +151,9 @@
                      $Output->br2nl($text);
                      //echo $text;
                       ?>
-                     <textarea name="response_text_<?=$userId?>_<?=$mixevalQuestion['question_num']?>" cols="80" rows="15"><?=$text?></textarea>
+                     <textarea name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['question_num']?>" cols="80" rows="15"><?php echo $text?></textarea>
                    <?php } else { ?> 
-                     <input type="text" name="response_text_<?=$userId?>_<?=$mixevalQuestion['question_num']?>" size="80" value="<?= $evaluation['EvaluationDetail'][$pos-1]['EvaluationMixevalDetail']['question_comment']?>"/>
+                     <input type="text" name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['question_num']?>" size="80" value="<?php echo $evaluation['EvaluationDetail'][$pos-1]['EvaluationMixevalDetail']['question_comment']?>"/>
                    <?php }?>
 
                 </td></tr>

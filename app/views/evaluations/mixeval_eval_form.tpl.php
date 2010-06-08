@@ -8,13 +8,13 @@
 <?php echo $javascript->link('ricoaccordion')?>
 	<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
     <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeMixevalEvaluation'); echo '/'.$event['Event']['id'].';'.$event['group_id']; ?>">
-      <input type="hidden" name="event_id" value="<?=$event['Event']['id']?>"/>
-      <input type="hidden" name="group_id" value="<?=$event['group_id']?>"/>
-      <input type="hidden" name="group_event_id" value="<?=$event['group_event_id']?>"/>
-      <input type="hidden" name="course_id" value="<?=$rdAuth->courseId?>"/>
-      <input type="hidden" name="mixeval_id" value="<?=$data['Mixeval']['id']?>"/>
-      <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?=$rdAuth->id?>"/>
-      <input type="hidden" name="evaluateeCount" value="<?=$evaluateeCount?>"/>
+      <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
+      <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>"/>
+      <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>"/>
+      <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>"/>
+      <input type="hidden" name="mixeval_id" value="<?php echo $data['Mixeval']['id']?>"/>
+      <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $rdAuth->id?>"/>
+      <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
     <td colspan="4" align="center">Evaluation Event Detail</td>
@@ -57,9 +57,9 @@
 <div id="accordion">
 	<?php $i = 0;
 	foreach($groupMembers as $row): $user = $row['User']; ?>
-	<input type="hidden" name="memberIDs[]" value="<?=$user['id']?>"/>
-		<div id="panel<?=$user['id']?>">
-		  <div id="panel<?=$user['id']?>Header" class="panelheader">
+	<input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/>
+		<div id="panel<?php echo $user['id']?>">
+		  <div id="panel<?php echo $user['id']?>Header" class="panelheader">
 		  	<?php
 		  	echo $user['last_name'].' '.$user['first_name'];
 		  	if (isset($user['Evaluation'])) {
@@ -103,13 +103,13 @@
 <table width="95%" align="center" bgcolor="#E5E5E5">
   <tr class="tablecell2">
     <td colspan="4" align="center"><form name="submitForm" id="submitForm" method="POST" action="<?php echo $html->url('completeEvaluationMixeval') ?>">
-  <input type="hidden" name="event_id" value="<?=$event['Event']['id']?>"/>
-  <input type="hidden" name="group_id" value="<?=$event['group_id']?>"/>
-  <input type="hidden" name="group_event_id" value="<?=$event['group_event_id']?>"/>
-  <input type="hidden" name="course_id" value="<?=$rdAuth->courseId?>"/>
-  <input type="hidden" name="mixeval_id" value="<?=$data['Mixeval']['id']?>"/>
-  <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?=$rdAuth->id?>"/>
-  <input type="hidden" name="evaluateeCount" value="<?=$evaluateeCount?>"/><?php echo $html->submit('Submit to Complete the Evaluation') ?></form></td>
+  <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
+  <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>"/>
+  <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>"/>
+  <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>"/>
+  <input type="hidden" name="mixeval_id" value="<?php echo $data['Mixeval']['id']?>"/>
+  <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $rdAuth->id?>"/>
+  <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/><?php echo $html->submit('Submit to Complete the Evaluation') ?></form></td>
     </tr>
 </table>
 	<script type="text/javascript"> new Rico.Accordion( 'accordion',

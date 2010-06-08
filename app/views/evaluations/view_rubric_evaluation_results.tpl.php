@@ -17,9 +17,9 @@ echo $this->renderElement('evaluations/view_event_info', $params);
   <tr>
     <td colspan="3"><?php echo $html->image('icons/instructions.gif',array('alt'=>'instructions'));?>
       <b> Summary:</b>(
-      <a href="<?=$this->webroot.$this->themeWeb?>evaluations/viewEvaluationResults/<?=$event['Event']['id']?>;<?=$event['group_id']?>;Basic">Basic</a>
+      <a href="<?php echo $this->webroot.$this->themeWeb?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>;<?php echo $event['group_id']?>;Basic">Basic</a>
        |
-      <a href="<?=$this->webroot.$this->themeWeb?>evaluations/viewEvaluationResults/<?=$event['Event']['id']?>;<?=$event['group_id']?>;Detail" >Detail</a>
+      <a href="<?php echo $this->webroot.$this->themeWeb?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>;<?php echo $event['group_id']?>;Detail" >Detail</a>
         )
     </td>
   </tr>
@@ -82,10 +82,10 @@ echo $this->renderElement('evaluations/view_event_info', $params);
 	<?php if ($allMembersCompleted) {?>
   <tr class="tablecell2" align="center">
       <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
-			  <input type="hidden" name="event_id" value="<?=$event['Event']['id']?>" />
-			  <input type="hidden" name="group_id" value="<?=$event['group_id']?>" />
-			  <input type="hidden" name="course_id" value="<?=$rdAuth->courseId?>" />
-			  <input type="hidden" name="group_event_id" value="<?=$event['group_event_id']?>" />
+			  <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
+			  <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
+			  <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>" />
+			  <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" />
 			  <input type="hidden" name="display_format" value="Basic" />
 
       	<td colspan="<?php echo count($groupMembers) +1; ?>"><?php

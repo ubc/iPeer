@@ -2,7 +2,7 @@
 <tr>
 <td><script type="text/javascript" language="javascript">
 <!--
-  var total_course_count = <?=$course_count?>;
+  var total_course_count = <?php echo $course_count?>;
 //-->
 </script>
 <?php echo $javascript->link('user')?>

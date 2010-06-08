@@ -64,7 +64,7 @@
         			            <a href="<?php
         			            if ($event['event_template_type_id'] == 3)
                             echo $this->webroot.$this->themeWeb.'surveygroups/viewresult/'.$event['id'];
-        			            else echo $this->webroot.$this->themeWeb.'evaluations/view/'.$event['id']?>"><?=$event['title']?></a>
+        			            else echo $this->webroot.$this->themeWeb.'evaluations/view/'.$event['id']?>"><?php echo $event['title']?></a>
         			            <?php //$event['title'];
         			            if ($event['to_review_count']>0) {
           			            echo "<font color='red'> - ".$event['to_review_count']." new evaluation(s)</font>";

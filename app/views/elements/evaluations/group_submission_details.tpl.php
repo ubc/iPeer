@@ -5,9 +5,9 @@
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
         <tr class="tableheader">
           <td colspan="4" align="center">Group Details
-        <input type="hidden" name="event_id" value="<?=$eventId?>" />
-        <input type="hidden" name="group_id" value="<?=$group['Group']['id']?>" />
-        <input type="hidden" name="group_event_id" value="<?=$groupEventId?>" /></td>
+        <input type="hidden" name="event_id" value="<?php echo $eventId?>" />
+        <input type="hidden" name="group_id" value="<?php echo $group['Group']['id']?>" />
+        <input type="hidden" name="group_event_id" value="<?php echo $groupEventId?>" /></td>
           </tr>
         <tr class="tablecell2">
           <td width="15%">Group Number:</td>

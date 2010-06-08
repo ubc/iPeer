@@ -1,7 +1,7 @@
 <!-- elements::ajax_survey_makegroups end -->
 <div id="ajax_update">
 <form name="frm" id="frm" method="POST" action="<?php echo $html->url('maketmgroups') ?>">
-<input name="survey_id" id="survey_id" type="hidden" value="<?=$survey_id?>">
+<input name="survey_id" id="survey_id" type="hidden" value="<?php echo $survey_id?>">
   <table width="65%" border="0" align="center" cellpadding="4" cellspacing="2">
     <tr class="tableheader">
       <td align="center">Team Making - Step One</td>
@@ -49,23 +49,23 @@
           for ($i=1; $i <= count($questions); $i++):
           if ($questions[$i]['Question']['type'] == 'M' || $questions[$i]['Question']['type'] == 'C'): ?>
     <tr class="tablecell2">
-    	<td width="40%" colspan="2"><b>Question<?=$question_count;?>: <?=$questions[$i]['Question']['prompt'];?></b><br />
+    	<td width="40%" colspan="2"><b>Question<?php echo $question_count;?>: <?php echo $questions[$i]['Question']['prompt'];?></b><br />
       <table>
         <tr>
           <td align="center">
-          <?= $html->image('/survey/correlate.gif',array('alt'=>'correlate')); ?>
-          <td bgcolor="#00ff00"><input type="radio" name="weight_<?= $questions[$i]['Question']['id'];?>" value="-5"></td>
-          <td bgcolor="#30ff30"><input type="radio" name="weight_<?= $questions[$i]['Question']['id'];?>" value="-4"></td>
-          <td bgcolor="#60ff60"><input type="radio" name="weight_<?= $questions[$i]['Question']['id'];?>" value="-3"></td>
-          <td bgcolor="#90ff90"><input type="radio" name="weight_<?= $questions[$i]['Question']['id'];?>" value="-2"></td>
-          <td bgcolor="#c0ffc0"><input type="radio" name="weight_<?= $questions[$i]['Question']['id'];?>" value="-1"></td>
-          <td bgcolor="#ffffff"><input type="radio" name="weight_<?= $questions[$i]['Question']['id'];?>" value="0" checked></td>
-          <td bgcolor="#ffcfcf"><input type="radio" name="weight_<?= $questions[$i]['Question']['id'];?>" value="1"></td>
-          <td bgcolor="#ff9f9f"><input type="radio" name="weight_<?= $questions[$i]['Question']['id'];?>" value="2"></td>
-          <td bgcolor="#ff6f6f"><input type="radio" name="weight_<?= $questions[$i]['Question']['id'];?>" value="3"></td>
-          <td bgcolor="#ff3f3f"><input type="radio" name="weight_<?= $questions[$i]['Question']['id'];?>" value="4"></td>
-          <td bgcolor="#ff0f0f"><input type="radio" name="weight_<?= $questions[$i]['Question']['id'];?>" value="5"></td>
-          <td align="center"><?= $html->image('/survey/differentiate.gif',array('alt'=>'differentiate')); ?></td>
+          <?php echo $html->image('/survey/correlate.gif',array('alt'=>'correlate')); ?>
+          <td bgcolor="#00ff00"><input type="radio" name="weight_<?php echo $questions[$i]['Question']['id'];?>" value="-5"></td>
+          <td bgcolor="#30ff30"><input type="radio" name="weight_<?php echo $questions[$i]['Question']['id'];?>" value="-4"></td>
+          <td bgcolor="#60ff60"><input type="radio" name="weight_<?php echo $questions[$i]['Question']['id'];?>" value="-3"></td>
+          <td bgcolor="#90ff90"><input type="radio" name="weight_<?php echo $questions[$i]['Question']['id'];?>" value="-2"></td>
+          <td bgcolor="#c0ffc0"><input type="radio" name="weight_<?php echo $questions[$i]['Question']['id'];?>" value="-1"></td>
+          <td bgcolor="#ffffff"><input type="radio" name="weight_<?php echo $questions[$i]['Question']['id'];?>" value="0" checked></td>
+          <td bgcolor="#ffcfcf"><input type="radio" name="weight_<?php echo $questions[$i]['Question']['id'];?>" value="1"></td>
+          <td bgcolor="#ff9f9f"><input type="radio" name="weight_<?php echo $questions[$i]['Question']['id'];?>" value="2"></td>
+          <td bgcolor="#ff6f6f"><input type="radio" name="weight_<?php echo $questions[$i]['Question']['id'];?>" value="3"></td>
+          <td bgcolor="#ff3f3f"><input type="radio" name="weight_<?php echo $questions[$i]['Question']['id'];?>" value="4"></td>
+          <td bgcolor="#ff0f0f"><input type="radio" name="weight_<?php echo $questions[$i]['Question']['id'];?>" value="5"></td>
+          <td align="center"><?php echo $html->image('/survey/differentiate.gif',array('alt'=>'differentiate')); ?></td>
         </tr>
         <tr><td>Gather<br />Similar</td><td colspan="11" align="center">Ignore</td>
           <td align="center">Gather<br />Dissimilar</td></tr>

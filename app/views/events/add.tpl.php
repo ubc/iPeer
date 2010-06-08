@@ -43,20 +43,20 @@
       <tr>
           <td height="50" width="50%" align="left" valign="top" >
 						<select name="data[Event][event_template_type_id]"
-							onChange="new Ajax.Updater('template_table','<?=$this->webroot.$this->themeWeb?>events/eventTemplatesList/'+this.options[this.selectedIndex].value,
+							onChange="new Ajax.Updater('template_table','<?php echo $this->webroot.$this->themeWeb?>events/eventTemplatesList/'+this.options[this.selectedIndex].value,
 																				 {onLoading:function(request){Element.show('loading');},
 																					onComplete:function(request){Element.hide('loading');},
 																					asynchronous:true, evalScripts:true});  return false;">
 						<?php
 //print_r($this->webroot.$this->themeWeb);
 						foreach($eventTypes as $row): $eventTemplateType = $row['EventTemplateType']; ?>
-							<option value="<?=$eventTemplateType['id']?>"
+							<option value="<?php echo $eventTemplateType['id']?>"
 							  <?php
 							  if (!empty($params['data']['Event']['event_template_type_id']) && $params['data']['Event']['event_template_type_id'] == $eventTemplateType['id']) {
 							       echo 'SELECTED';
 							  }
 							  ?>
-							  ><?=$eventTemplateType['type_name']?></option>
+							  ><?php echo $eventTemplateType['type_name']?></option>
 						<?php endforeach; ?>
 						</select>
 						<br>

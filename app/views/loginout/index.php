@@ -76,14 +76,14 @@ echo 'get ticket';
 echo 'empty';      	
         ?>
           <p>
-            <a href="<?= $CWLLoginURL ?>?serviceName=<?= $applicationID ?>&amp;serviceURL=<?= $redirectURL ?>">Login</a>
+            <a href="<?php echo $CWLLoginURL ?>?serviceName=<?php echo $applicationID ?>&amp;serviceURL=<?php echo $redirectURL ?>">Login</a>
           </p>
         <?php
       }
       else
       {
 echo 'success';       	
-        ?><p>Success!  Received session ticket "<?= $ticket ?>" from the CWL LoginServlet.</p><?php
+        ?><p>Success!  Received session ticket "<?php echo $ticket ?>" from the CWL LoginServlet.</p><?php
 
         // now get some info about the session
           
