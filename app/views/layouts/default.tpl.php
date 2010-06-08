@@ -170,46 +170,79 @@ function checkEmailAddress()
   </div>
 </div>
 
-<!-- Prepare the SVN revision number and table -->
-<script language="JavaScript" type="text/javascript">
-	  var doShowSnvRevision = false;
-	  // Toggles the details display of the snv revision.
-      function toggleShowSnvRevision() {
-		var division = document.getElementById("svn-data");
-		if (!division) {
-			alert ("svn-data div was not found");
-			return;
-		} else {
-			doShowSnvRevision = !doShowSnvRevision;
-			division.style.display = doShowSnvRevision ? "block" : "none";
-		}
-      }
-</script>
-<?php
-exec ("svn info ../..", $lines, $retval);
-$revision = "revision (unknown)";
-//Ouput each line as a table
-$svnTable = "<table style='background-color:#FFF5EE'>";
-foreach ($lines as $line) {
-	// Convert each output line of "svn info" to an html table.
-	if (!empty($line)) {
-		if (stripos($line,"revision") === FALSE) {
-			$line = str_replace (": ","</td><td>", $line);
-			$svnTable .= "<tr><td>";
-			$svnTable .= $line;
-			$svnTable .= "</td></tr>";
-		} else {
-			// If this line is about a revision, save it for display later on.
-			$revision = $line;
-		}
-	}
-}
-$svnTable .= "</table>";
-?>
-<!-- Now, render the SVN revision number and table -->
-<div style="margin-left: 50px">SVN <?php echo $revision;?> <a
-	href="javascript:toggleShowSnvRevision();">details</a>
-<div style="display: none" id="svn-data"><?php echo $svnTable?></div>
-</div>
+<!-- Debuggin output -->
+<?php if(!constant('DEBUG') == 0) { ?>
+
+    <!-- Prepare the SVN revision number and table -->
+    <script language="JavaScript" type="text/javascript">
+        // Toggles the details display of the snv revision.
+        function toggleDivision(divID) {
+            var division = $(divID);
+            if (!division) {
+                alert ("svn-data div was not found");
+                return;
+            } else {
+                if (division.style.display == "block") {
+                    division.style.display = "none";
+                } else {
+                    division.style.display = "block";
+                }
+            }
+        }
+    </script>
+    <?php
+    exec ("svn info ../..", $lines, $retval);
+    $revision = "revision (unknown)";
+    //Ouput each line as a table
+    $svnTable = "<table style='background-color:#FFF5EE'>";
+    foreach ($lines as $line) {
+        // Convert each output line of "svn info" to an html table.
+        if (!empty($line)) {
+            if (stripos($line,"revision") === FALSE) {
+                $line = str_replace (": ","</td><td>", $line);
+                $svnTable .= "<tr><td>";
+                $svnTable .= $line;
+                $svnTable .= "</td></tr>";
+            } else {
+                // If this line is about a revision, save it for display later on.
+                $revision = $line;
+            }
+        }
+    }
+    $svnTable .= "</table>";
+    ?>
+    <div style="margin-left: 50px">
+    <!-- Render a few other debuging elements -->
+    <table width="95%"><tr>
+    <td>SVN <?php echo $revision;?>
+        <a href="javascript:toggleDivision('svn-data');">(details)</a></td>
+    <td>User ID: <?php echo $rdAuth->id ?>
+        <a href="javascript:toggleDivision('rdAuth-data');">(details)</a></td>
+    <td>Courses: <?php echo empty($coursesList) ? 0 : count($coursesList); ?>
+        <a href="javascript:toggleDivision('coursesList-data');">(details)</a></td>
+    <td>Access: <?php echo empty($action) ? 0 : count($action); ?>
+        <a href="javascript:toggleDivision('access-data');">(details)</a></td>
+    <td>Actions: <?php echo empty($access) ? 0 : count($access); ?>
+        <a href="javascript:toggleDivision('actions-data');">(details)</a></td>
+    </tr></table>
+
+    <!-- The actual debugging data -->
+    <div style="display: none" id="svn-data">
+        <?php echo $svnTable?></div>
+    <div style="display: none; background-color:#FFFFE9; width: 90%;" id="rdAuth-data">
+        <h1>$rdAuth variable</h1>
+        <?php if(!empty($rdAuth)) var_dump($rdAuth); else echo "(Empty)"?></div>
+    <div style="display: none; background-color:#E9FFFF; width: 90%;" id="coursesList-data">
+        <h1>$coursesList variable</h1>
+        <?php if(!empty($coursesList)) var_dump($coursesList); else echo "(Empty)"?></div>
+    <div style="display: none; background-color:#FFE9FF; width: 90%;" id="actions-data">
+        <h1>$actions variable</h1>
+        <?php if(!empty($action)) var_dump($action); else echo "(Empty)"?></div>
+    <div style="display: none; background-color:#E9FFFF; width: 90%;" id="access-data">
+        <h1>$access variable</h1>
+        <?php if(!empty($access)) var_dump($access); else echo "(Empty)"?></div>
+
+
+<?php } // end if(!constant('DEBUG') == 0) { ?>
 </body>
 </html>

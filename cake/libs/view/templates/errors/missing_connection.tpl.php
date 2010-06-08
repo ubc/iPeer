@@ -34,6 +34,6 @@
 </p>
 
 <p>
-<span class="notice"><strong>Notice:</strong> this error is being rendered by the <code>app/views/errors/missing_database.tpl.php</code>
+<span class="notice"><strong>Notice:</strong> this error is being rendered by the <code>app/views/errors/missing_connection.tpl.php</code>
 view file, a user-customizable error page for handling errors within CakePHP.</span>
 </p>
