@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: home_controller.php,v 1.14 2006/09/08 00:22:00 davychiu Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.14 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/09/08 00:22:00 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License

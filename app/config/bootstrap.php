@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: bootstrap.php,v 1.1 2006/06/20 18:44:07 zoeshum Exp $ */
+/* SVN FILE: $Id$ */
 /**
  * Short description for file.
  *
@@ -21,7 +21,7 @@
  * @package			cake
  * @subpackage		cake.app.config
  * @since			CakePHP v 0.10.8.2117
- * @version			$Revision: 1.1 $
+ * @version			$Revision$
  * @modifiedby		$LastChangedBy: phpnut $
  * @lastmodified	$Date: 2006/06/20 18:44:07 $
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License

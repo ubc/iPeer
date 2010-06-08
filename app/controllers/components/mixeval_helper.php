@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: mixeval_helper.php,v 1.2 2006/07/03 20:39:19 zoeshum Exp $ */
+/* SVN FILE: $Id$ */
 /*
  * To use your Model’s inside of your components, you can create a new instance like this:
  *  $this->foo = new Foo;

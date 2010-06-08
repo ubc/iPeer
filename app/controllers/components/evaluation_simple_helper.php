@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: evaluation_simple_helper.php,v 1.2 2006/06/30 23:15:28 zoeshum Exp $ */
+/* SVN FILE: $Id$ */
 /*
  * To use your Model’s inside of your components, you can create a new instance like this:
  *  $this->foo = new Foo;

@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: mixeval.php,v 1.2 2006/08/28 18:31:49 rrsantos Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.2 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/08/28 18:31:49 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License

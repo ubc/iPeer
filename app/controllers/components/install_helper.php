@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: install_helper.php,v 1.8 2006/08/25 22:29:26 rrsantos Exp $ */
+/* SVN FILE: $Id$ */
 /*
  * InstallHelper Component 
  *

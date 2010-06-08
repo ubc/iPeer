@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: global_constant.php,v 1.3 2006/06/20 18:44:15 zoeshum Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.3 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/06/20 18:44:15 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License

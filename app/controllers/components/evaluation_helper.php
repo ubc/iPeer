@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: evaluation_helper.php,v 1.2 2006/06/27 21:44:13 zoeshum Exp $ */
+/* SVN FILE: $Id$ */
 /*
  *
  *

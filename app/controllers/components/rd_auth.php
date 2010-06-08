@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: rd_auth.php,v 1.7 2006/06/27 21:44:41 zoeshum Exp $ */
+/* SVN FILE: $Id$ */
 /*
  * rdAuth Component for ipeerSession
  *

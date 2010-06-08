@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: survey_helper.php,v 1.4 2006/08/01 21:59:40 davychiu Exp $ */
+/* SVN FILE: $Id$ */
 /*
  *
  *

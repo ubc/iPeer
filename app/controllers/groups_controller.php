@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: groups_controller.php,v 1.10 2006/10/11 17:27:15 davychiu Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.10 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/10/11 17:27:15 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License

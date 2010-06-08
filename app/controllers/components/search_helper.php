@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: search_helper.php,v 1.4 2006/07/06 23:13:16 davychiu Exp $ */
+/* SVN FILE: $Id$ */
 /*
  *
  *

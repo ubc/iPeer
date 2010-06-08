@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: event.php,v 1.7 2006/08/31 21:03:09 davychiu Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.7 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/08/31 21:03:09 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License

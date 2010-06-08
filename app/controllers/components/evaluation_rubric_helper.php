@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: evaluation_rubric_helper.php,v 1.5 2006/09/27 17:25:53 kamilon Exp $ */
+/* SVN FILE: $Id$ */
 /*
  * To use your Model’s inside of your components, you can create a new instance like this:
  *  $this->foo = new Foo;

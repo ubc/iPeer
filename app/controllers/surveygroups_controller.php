@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: surveygroups_controller.php,v 1.15 2006/11/01 20:20:34 davychiu Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.15 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/11/01 20:20:34 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License

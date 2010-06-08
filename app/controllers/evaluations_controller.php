@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: evaluations_controller.php,v 1.23 2006/11/14 16:10:40 kamilon Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.23 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/11/14 16:10:40 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License

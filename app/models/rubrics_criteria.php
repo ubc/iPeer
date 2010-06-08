@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: rubrics_criteria.php,v 1.4 2006/10/05 16:47:45 kamilon Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.4 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/10/05 16:47:45 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License

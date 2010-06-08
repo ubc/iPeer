@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: sys_container.php,v 1.14 2006/08/16 21:38:21 davychiu Exp $ */
+/* SVN FILE: $Id$ */
 /*
  * rdAuth Component for ipeerSession
  *

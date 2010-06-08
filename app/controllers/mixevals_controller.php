@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: mixevals_controller.php,v 1.16 2006/09/12 20:58:00 kamilon Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.16 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/09/12 20:58:00 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
