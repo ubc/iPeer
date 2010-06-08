@@ -294,6 +294,11 @@ class UsersController extends AppController
             $this->privilegeError();
         }
 
+        // If a form was submitted, user that id instead
+        if (!empty($this->params['data'])) {
+            $id = $this->params['data']['User']['id'];
+        }
+
         // Ensure that the id is valid
         if (is_numeric($id)) {
 
@@ -316,14 +321,20 @@ class UsersController extends AppController
                 } else {
                     $this->Output->filter($this->params['data']);//always filter
 
-                    if ( $this->User->save($this->params['data'])) {
+                    // Prevent User role changes (also stops privilege escalation)
+                    if (!empty($this->params['data']['User']['role'])) {
+                        unset ($this->params['data']['User']['role']);
+                    }
+
+                    if ($this->User->save($this->params['data'])) {
 
                         $this->UserEnrol->insertCourses($this->User->id, $this->params['form']);
 
                         //Render to view page to display saved data
                         //TODO: Display list of users after import
-                        $this->set('data', $this->User->read());
-                        $this->set('userRole', $this->params['data']['User']['role']);
+                        $data = $this->User->read();
+                        $this->set('data', $data);
+                        $this->set('userRole', $data['User']['role']);
                         $this->render('userSummary');
                     } else {
                         $this->Output->br2nl($this->params['data']);
@@ -346,6 +357,7 @@ class UsersController extends AppController
         // No security checks here, since we're editing the logged-in user
 		$id = $this->rdAuth->id;
 
+
 		if (empty($this->params['data']))
 		{
 			$this->User->setId($id);
@@ -358,17 +370,21 @@ class UsersController extends AppController
 			}
 			$this->Output->filter($this->params['data']);//always filter
 
+            // Prevent User role changes (also stops privilege escalation)
+            if (!empty($this->params['data']['User']['role'])) {
+                unset ($this->params['data']['User']['role']);
+            }
+
 			if ( $this->User->save($this->params['data']))
 			{
 				//Render to view page to display saved data
 				//TODO: Display list of users after import
 				$user = $this->User->read();
-				$this->set('data', $user);
+				$this->params['data'] = $user;
 				$this->set('viewPage', 'true');
 				$this->set('message', 'Your Profile Updated Successfully.');
 				//Setup Custom parameter
 				$this->rdAuth->setFromData($user['User']);
-				//$this->render('editProfile');
 			} else {
 				$this->Output->br2nl($this->params['data']);
 				$this->set('data', $this->params['data']);

@@ -57,14 +57,16 @@ class User extends AppModel
                   'exclusive'   => false,
                   'finderSql'   => '')
 	);
-	
+
 
 	//Overwriting Function - will be called before save operation
 	function beforeSave(){
 		$allowSave = true;
 
-    // generate password
-    $this->data[$this->name]['password'] = md5($this->data[$this->name]['password']);
+        // generate a password hash if it was set
+        if (!empty($this->data[$this->name]['password'])) {
+            $this->data[$this->name]['password'] = md5($this->data[$this->name]['password']);
+        }
 
 		if (empty($this->data[$this->name]['id'])) {
 			//check the duplicate username
