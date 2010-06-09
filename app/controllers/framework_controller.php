@@ -51,6 +51,20 @@ class FrameworkController extends AppController
 	}
 
 	function userInfoDisplay($id='') {
+        // Make sure the present user is not a student
+        if ($this->rdAuth->getPrivilegeLevel() <= $this->rdAuth->studentPrivilegeLevel()) {
+           $this->rdAuth->privilegeError();
+        }
+
+        if (!is_numeric($id)) {
+            $this->rdAuth->privilegeError();
+        }
+            // Make sure that the privileges of the asking user is at least as high
+            //  as the privileges of the user being viewed.
+        if ($this->rdAuth->getPrivilegeLevel() < $this->rdAuth->getPrivilegeLevel($id)) {
+            $this->rdAuth->privilegeError();
+        }
+
 		$this->autoRender = false;
         $this->layout = 'pop_up';
         $this->set('userId', $id);

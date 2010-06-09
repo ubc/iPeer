@@ -8,9 +8,19 @@
  * @license		OPPL
  *
  */
-class rdAuthComponent
+class rdAuthComponent extends AppController // This component is in fact a
+                                            //controller since is accessed the USERS model
 {
+
+    var $modelClass;  // For contructClasses to Work with no warnin
+
+    function __construct() {
+        $this->constructClasses();
+    }
+
 	var $components = array('Session');
+    var $uses = array('User');
+    var $name = "rdAuthComponent";
 
 	/**
 	 * id of the logged in user
@@ -43,7 +53,7 @@ class rdAuthComponent
 	 * @access private
 	 */
 	var $email = null;
-		
+
 	/**
 	 * role assigned to the logged in user
 	 *
@@ -64,6 +74,40 @@ class rdAuthComponent
 
 	var $customIntegrateCWL = 0;
 
+    // =-=-=-==-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
+    // User privilege level functions
+
+    // Get the privilege level for a user ID or a user type.
+    function getPrivilegeLevel($user=null) {
+        // For no parameters passed, get the privilege level of this user.
+        if (empty($user)) {
+            return $this->getPrivilegeLevel($this->role);
+        } else if (is_numeric($user)) {
+        // If $user is a numberic user ID, look it up in the database.
+            $data = $this->User->findById($user);
+            return $data ? $this->getPrivilegeLevel($data['User']['role']) : 0;
+        } else {
+            // Or if this is a string, look up the user type, and return privilege
+            switch (strtolower($user)) {
+                case "s" : return 200;
+                case "i" : return 600;
+                case "a" : return 1200;
+                default : return 0;
+            }
+        }
+    }
+
+    function studentPrivilegeLevel() {
+        return $this->getPrivilegeLevel('s');
+    }
+
+    function privilegeError() {
+        $this->redirect('home/index');
+        exit;
+    }
+
+
+
 	/**
 	 * Loads the rdAuth data from the Session.
 	 */
@@ -80,7 +124,7 @@ class rdAuthComponent
 			return $this->Session->error();
 		}
 	}
-	
+
 	/**
 	 * Updates the user session from the user data passed, and loads it into this rdAuth object.
 	 * @param unknown_type userData
@@ -137,7 +181,7 @@ class rdAuthComponent
 	 */
 	function check($action, $actions)
 	{
-		 
+
 		if (is_array($actions) && array_key_exists($action, $actions)) {
 			return $this->role;
 		} else {
