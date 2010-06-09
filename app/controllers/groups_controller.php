@@ -229,6 +229,7 @@ class GroupsController extends AppController
   function checkDuplicateName()
   {
       $this->layout = 'ajax';
+      $this->set('course_id', $this->rdAuth->courseId);
       $this->render('checkDuplicateName');
   }
 
