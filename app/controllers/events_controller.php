@@ -36,7 +36,7 @@ class EventsController extends AppController
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $NeatString;
 	var $Sanitize;
-	var $uses = array('Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Group', 'GroupEvent','Personalize');
+	var $uses = array('Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Group', 'GroupEvent', 'Personalize', 'GroupsMembers');
 
 	function __construct()
 	{
@@ -604,17 +604,57 @@ class EventsController extends AppController
 	  //Clear $id to only the alphanumeric value
 		$id = $this->Sanitize->paranoid($eventId);
 
+    $this->set('event_id', $id);
     $this->set('assignedGroups', $this->getAssignedGroups($eventId));
+	}
 
+  function editGroup($groupId, $eventId)
+  {
+    $this->layout = 'pop_up';
+    $courseId = $this->rdAuth->courseId;
 
+	  //Clear $id to only the alphanumeric value
+		$id = $this->Sanitize->paranoid($groupId);
+ 		$event_id = $this->Sanitize->paranoid($eventId);
+ 		$this->set('event_id', $event_id);
+    $this->set('group_id', $id);
+
+		// gets all students not listed in the group for unfiltered box
+		$this->set('user_data', $this->Group->groupDifference($id,$courseId));
+
+		// gets all students in the group
+		$this->set('group_data', $this->Group->groupStudents($id));
+
+		if (empty($this->params['data']))
+		{
+			$this->Group->setId($id);
+			$this->params['data'] = $this->Group->read();
+		}
+		else
+		{
+			$this->params = $this->Group->prepData($this->params);
+
+			if ( $this->Group->save($this->params['data']))
+			{
+				$this->GroupsMembers->updateMembers($this->Group->id, $this->params['data']['Group']);
+
+				$this->flash('Group Updated', '/events/viewGroups/'.$event_id, 2);
+			}
+			else
+			{
+				$this->set('data', $this->params['data']);
+				$this->render();
+			}
+		}
 	}
 
 	function getAssignedGroups($eventId=null)
 	{
  		$assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($eventId);
+    $assignedGroups = array();
+
 		if (!empty($assignedGroupIDs))
 		{
-		  $assignedGroups = array();
 
 			// retrieve string of group ids
   		for ($i = 0; $i < count($assignedGroupIDs); $i++) {
@@ -623,14 +663,13 @@ class EventsController extends AppController
   			$assignedGroups[$i] = $group;
   			$assignedGroups[$i]['Group']['Students']=$students;
   		}
+    }
 
-		  return $assignedGroups;
-  	}else {
-      return array();
-  	}
+    return $assignedGroups;
 	}
 
-	function update($attributeCode='',$attributeValue='') {
+	function update($attributeCode='',$attributeValue='') 
+  {
 		if ($attributeCode != '' && $attributeValue != '') //check for empty params
   		$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
 	}

@@ -13,7 +13,7 @@
   	  <tr>
           <td>
        	    <?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
-        		<a href="<?php echo $this->webroot.$this->themeWeb.'groups/edit/'.$group['id']?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
+        		<a href="<?php echo $this->webroot.$this->themeWeb.'events/editGroup/'.$group['id'].'/'.$event_id?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
       	    <?php endif;?>
             <?php echo $group['group_num'] ?></td>
           <td><?php echo $group['group_name'] ?></td>
