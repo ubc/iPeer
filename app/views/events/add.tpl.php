@@ -22,6 +22,8 @@
           $params = array('controller'=>'events', 'data'=>null, 'fieldvalue'=>$fieldValue);
           echo $this->renderElement('events/ajax_title_validate', $params);
           ?>
+           <?php echo $html->tagErrorMsg('Event/title', 'Title is required.')?>
+           <?php echo $html->tagErrorMsg('Event/title_unique', 'Duplicate Title found. Please change the title of this event.')?>
       </div>
   	</td>
   	<td id="newtitle_msg" class="error" />
@@ -93,6 +95,7 @@
     <td>Due Date:&nbsp;<font color="red">*</font></td>
     <td><?php echo $html->input('Event/due_date', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;
 		    <a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+       <?php echo $html->tagErrorMsg('Event/due_date', 'required.')?>
 		</td>
     <td>eg. YYYY-MM-DD HH:MM:SS (24 HOUR)</td>
   </tr>
@@ -103,12 +106,14 @@
 				<td width="10%">FROM:</td>
 				<td width="90%">
       		<?php echo $html->input('Event/release_date_begin', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal2.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+          <?php echo $html->tagErrorMsg('Event/release_date_begin', 'required.')?>
       	</td>
       </tr>
       <tr>
       	<td width="10%">TO:</td>
       	<td width="90%">
       		<?php echo $html->input('Event/release_date_end', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal3.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+          <?php echo $html->tagErrorMsg('Event/release_date_end', 'required.')?>
       	</td>
   	  </tr></table>
   	</td>

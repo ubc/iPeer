@@ -43,6 +43,13 @@ class Event extends AppModel
 
   );
 
+
+  var $validate = array(
+      'title' => VALID_NOT_EMPTY,
+      'due_date' => VALID_NOT_EMPTY,
+      'release_date_begin' => VALID_NOT_EMPTY,
+      'release_date_end' => VALID_NOT_EMPTY
+  );
  /* var $hasMany = array(
                       'GroupEvent' =>
                         array(
@@ -98,10 +105,10 @@ class Event extends AppModel
 	}
 
   //Validation check on duplication of title
-	function __checkDuplicateTitle() {
+	function __checkDuplicateTitle($title = null) {
 	  $duplicate = false;
     $field = 'title';
-    $value = $this->data[$this->name]['title'];
+    $value = null === $title ? $this->data[$this->name]['title'] : $title;
     if ($result = $this->find($field . ' = "' . $value.'"', $field)){
       $duplicate = true;
      }

@@ -209,6 +209,12 @@ class EventsController extends AppController
 			$this->params['data']['Event']['course_id'] = $courseId;
 			$this->params = $this->Event->prepData($this->params);
 			//print_r($this->params['data']);
+      
+      // uniqueness check for title
+      if(!$this->Event->__checkDuplicateTitle($this->params['data']['Event']['title']))
+      {
+        $this->Event->invalidate('title_unique');
+      }
 
       //Save Data
 			if ($this->Event->save($this->params['data'])) {
@@ -231,15 +237,12 @@ class EventsController extends AppController
         $default = 'Default Simple Evaluation';
         $model = 'SimpleEvaluation';
         $eventTemplates = $this->SimpleEvaluation->findAll();
-        $eventTemplates=$this->eventTemplatesList(2);
         $this->set('eventTemplates', $eventTemplates);
         $this->set('default',$default);
         $this->set('model', $model);
 
-        //Validate the error why the Event->save() method returned false
-        $this->validateErrors($this->Event);
-        $this->set('errmsg', $this->Event->errorMessage);
-
+        $this->set('errmsg', 'Please correct errors below.');
+        $this->render();
       }//end if
 		}
   }
