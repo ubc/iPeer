@@ -1,4 +1,4 @@
-<form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Rubric']['id'])||($copy)?'add':'edit') ?>">
+<form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Rubric']['id']) || (!empty($copy) && $copy) ? 'add':'edit') ?>">
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
 <tr><td>
 	<?php
