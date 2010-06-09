@@ -143,18 +143,17 @@ class UsersController extends AppController
            $this->privilegeError();
         }
 
-        if (is_numeric($id)) {
-            // Make sure that the privileges of the asking user is at least as high
-            //  as the privileges of the user being viewed.
-            if ($this->getPrivilegeLevel() >= $this->getPrivilegeLevel($id)) {
-                $this->set('data', $this->User->read());
-            } else {
-                $this->privilegeError();
-            }
-        } else {
-            // Bad ID.
+        if (!is_numeric($id)) {
             $this->privilegeError();
         }
+            // Make sure that the privileges of the asking user is at least as high
+            //  as the privileges of the user being viewed.
+        if ($this->getPrivilegeLevel() < $this->getPrivilegeLevel($id)) {
+            $this->privilegeError();
+        }
+
+        $this->set("userId", $id);
+        // All okay, proceed to render.
 	}
 
 	function add($userType='') {

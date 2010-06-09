@@ -45,22 +45,21 @@ class FrameworkController extends AppController
 
 	function calendarDisplay($datetime = '', $id='') {
 		$this->autoRender = false;
-    $this->layout = false;
-    $redirect = "calendar";
-
-  	$this->render($redirect);
+        $this->layout = false;
+        $redirect = "calendar";
+        $this->render($redirect);
 	}
 
 	function userInfoDisplay($id='') {
 		$this->autoRender = false;
-    $this->layout = 'pop_up';
-    $this->set('userId', $id);
-  	$this->render("userinfo");
+        $this->layout = 'pop_up';
+        $this->set('userId', $id);
+        $this->render("userinfo");
 	}
 
 	function tutIndex($tut=null) {
-	  $this->layout = 'tutorial_pop_up';
-    $this->set('tut',$tut);
+        $this->layout = 'tutorial_pop_up';
+        $this->set('tut',$tut);
 	}
 }
 

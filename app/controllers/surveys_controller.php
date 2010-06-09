@@ -24,6 +24,7 @@
  * @package
  * @subpackage
  * @since
+
  */
 
 class SurveysController extends AppController
@@ -261,7 +262,7 @@ class SurveysController extends AppController
 		{
 			$this->Survey->setId($id);
 			$this->params['data'] = $this->Survey->read();
-		  $this->set('course_id',$this->params['data']['Survey']['course_id']);
+		    $this->set('course_id',$this->params['data']['Survey']['course_id']);
 			$this->render();
 		}
 		else
@@ -281,6 +282,7 @@ class SurveysController extends AppController
     		$eventArray['Event']['release_date_end'] = $this->params['data']['Survey']['release_date_end'];
     		$this->Event->save($eventArray);
 
+                $this->set('course_id', $this->params['data']['Survey']['course_id']);
 				$this->set('message', 'The survey was updated successfully.');
 				$this->index();
 			}
