@@ -148,13 +148,9 @@ class UsersController extends AppController
         // We should be of equal or higher privileges to be able to create this user
         if ($this->rdAuth->getPrivilegeLevel() >= $this->rdAuth->getPrivilegeLevel($userType)) {
 
-            if (!empty($this->rdAuth->courseId))
-            {
+            if (!empty($this->rdAuth->courseId))  {
                 $this->pageTitle = $this->sysContainer->getCourseName($this->rdAuth->courseId).' > Students';
             }
-
-            // No auto render - we'll do that explicitly in this method.
-            $this->autoRender = false;
 
             //List Add Page
             if (empty($this->params['data'])) {
@@ -167,9 +163,6 @@ class UsersController extends AppController
                 $courseList = $this->sysContainer->getMyCourseList();
                 $this->set('courseList', $courseList);
 
-                //Get render page according to the user type
-                $renderPage = $this->__getRenderPage($userType);
-                $this->render($renderPage);
             } else {
                 //General password
                 $this->params['data']['User']['password'] = $this->NeatString->randomPassword(6);
@@ -211,48 +204,11 @@ class UsersController extends AppController
                     $this->set('errmsg', $this->User->errorMessage);
                     $this->set('courseId', $this->rdAuth->courseId);
 
-                    //Get render page according to the user type
-                    $renderPage = $this->__getRenderPage($this->params['data']['User']['role']);
-                    $this->render($renderPage);
-
                 }//end if
             }
         } else {
             $this->rdAuth->privilegeError();
         }
-	}
-
-	//private helper function
-	function __getRenderPage ($userType='') {
-
-		$renderPage = '';
-
-		//render user add page based on user type
-		switch ($userType) {
-			case $this->User->USER_TYPE_ADMIN:
-				if (!empty($this->rdAuth->courseId)) {
-					$this->pageTitle = $this->sysContainer->getCourseName($this->rdAuth->courseId).' > Admins';
-				}
-				$renderPage = 'addAdmin';
-				break;
-
-			case $this->User->USER_TYPE_INSTRUCTOR: {
-				if (!empty($this->rdAuth->courseId)) {
-					$this->pageTitle = $this->sysContainer->getCourseName($this->rdAuth->courseId).' > Instructors';
-				}
-				$renderPage = 'addInstructor';
-		  		break;
-			}
-
-			case $this->User->USER_TYPE_STUDENT:
-				$renderPage = 'addStudent';
-		  break;
-
-			case $this->User->USER_TYPE_TA:
-		  //Implement Later
-		  break;
-		}
-		return $renderPage;
 	}
 
 	function edit($id=null)

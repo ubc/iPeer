@@ -24,7 +24,7 @@
       <?php echo $data['last_name']; ?>
     </td>
     <td>
-      <?php echo empty($tmpPassword)?'':$tmpPassword; ?>
+      <tt><strong style="color:red;letter-spacing:3px"><?php echo empty($tmpPassword)?'':$tmpPassword; ?></strong></tt>
     </td>
   </tr>
 	<?php else: ?>
@@ -41,7 +41,7 @@
 				<?php echo $user['first_name'] ?>
 			</td>
 			<td>
-				<?php echo $user['tmp_password']; ?>
+				<tt><strong style="color:red;letter-spacing:3px"><?php echo $user['tmp_password']; ?></strong></tt>
 			</td>
 				<?php if ( isset($data[0]['User']['error_message'])){
 							echo '<td><font color="#FF0000">'.$user['error_message'].'</font></td>';
