@@ -539,7 +539,7 @@ class EventsController extends AppController
         //parse the parameters
         $searchField=$this->params['form']['select'];
         $searchValue=$this->params['form']['livesearch2'];
-        $conditions = ' AND '.$searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
+        $conditions .= ' AND '.$searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
       }
       $this->update($attributeCode = 'Event.ListMenu.Limit.Show',$attributeValue = $this->show);
       $this->set('conditions',$conditions);
