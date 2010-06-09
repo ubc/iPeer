@@ -79,14 +79,8 @@ class User extends AppModel
 	function __checkDuplicateUsername() {
 		$duplicate = false;
 		$field = 'username';
-		$value = $this->data[$this->name]['username'];
-		if ($result = $this->find($field . ' = "' . $value.'"', $field.', id')){
-			if ($this->data[$this->name]['id'] == $result[$this->name]['id']) {
-				$duplicate = false;
-			} else {
-				$duplicate = true;
-			}
-		}
+        $results = $this->findByUsername($this->data[$this->name]['username']);
+        $duplicate = $results ? true : false; // Convert to boolean
 
 		if ($duplicate == true) {
 

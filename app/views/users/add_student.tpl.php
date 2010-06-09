@@ -18,9 +18,9 @@
     <td id="course_label">Course:</td>
     <td width="440"><?php
               if (empty($rdAuth->courseId)) {
-                $params = array('controller'=>'courses', 'courseList'=>$courseList, 'courseId'=>$rdAuth->courseId, 'defaultOpt'=>1);
+                $params = array('controller'=>'courses', 'courseList'=>$coursesList, 'courseId'=>$rdAuth->courseId, 'defaultOpt'=>1);
               } else {
-                $params = array('controller'=>'courses', 'courseList'=>$courseList, 'courseId'=>$rdAuth->courseId);
+                $params = array('controller'=>'courses', 'courseList'=>$coursesList, 'courseId'=>$rdAuth->courseId);
               }
               echo $this->renderElement('courses/course_selection_box', $params);
         ?></td>
