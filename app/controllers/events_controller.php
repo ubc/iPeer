@@ -248,6 +248,8 @@ class EventsController extends AppController
   function edit ($id=null)
   {
     $courseId = $this->rdAuth->courseId;
+		$unassignedGroups = array();
+    $assignedGroups = array();
 
 	  //Clear $id to only the alphanumeric value
 		$id = $this->Sanitize->paranoid($id);
@@ -287,7 +289,8 @@ class EventsController extends AppController
 
     	}else {
    			$unassignedGroups = $this->Group->findAll('course_id = '.$courseId);
-  			$this->set('unassignedGroups', $unassignedGroups);
+  			$this->set('assignedGroups', $assignedGroups);
+        $this->set('unassignedGroups', $unassignedGroups);
 
     	}
 		  $this->set('groupIDs', $groupIDs);
