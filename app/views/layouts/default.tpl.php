@@ -216,7 +216,7 @@ function checkEmailAddress()
     <table width="95%"><tr>
     <td>SVN <?php echo $revision;?>
         <a href="javascript:toggleDivision('svn-data');">(details)</a></td>
-    <td>User ID: <?php echo $rdAuth->id ?>
+    <td>User ID: <?php echo empty($rdAuth) ? "none" : $rdAuth->id ?>
         <a href="javascript:toggleDivision('rdAuth-data');">(details)</a></td>
     <td>Courses: <?php echo empty($coursesList) ? 0 : count($coursesList); ?>
         <a href="javascript:toggleDivision('coursesList-data');">(details)</a></td>
