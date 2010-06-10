@@ -1,5 +1,11 @@
 <?php
 $data = $this->controller->Group->findAll($conditions, $fields, $this->controller->order, $this->controller->show, $this->controller->page, null, $joinTable);
+for ($i=0; $i < count($data); $i++) {
+	$data[$i]['Group']['member_count'] = $data[$i][$i]['mc'];
+}
+
+if(!isset($data[0]['Group']['id']))
+	$data = null;
 
 $paging['style'] = 'ajax';
 $paging['link'] = '/groups/search/?show='.$this->controller->show.'&sort='.$this->controller->sortBy.'&direction='.$this->controller->direction.'&page=';
