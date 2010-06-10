@@ -82,40 +82,61 @@ function checkEmailAddress()
         <td width="971" height="38" valign="bottom">
         <div id="header">
           <ul>
+            <?php
 
-            <!-- Parameters of $access based on the table SYS_FUNCTION -->
-            <?php if (!empty($access['HOME'])) {
-                    $homeSysFunc = $access['HOME'];    ?>
-                    <li <?php if ($this->params['controller'] == 'home') echo 'id="current"'; ?> ><a href="<?php echo $this->webroot.$this->themeWeb.$homeSysFunc['url_link'];?>"><span><?php echo $html->image('layout/icon_home.gif',array('border'=>'0','alt'=>'icon_home'))?> <?php echo $homeSysFunc['function_name']?> </span></a></li>
-            <?php }?>
-            <?php if (!empty($access['COURSE'])) {
-                    $courseSysFunc = $access['COURSE'];    ?>
-                    <li <?php if ($this->params['controller'] == 'courses' || $this->params['controller'] == 'events' || $this->params['controller'] == 'groups' || $this->params['controller'] == 'evaluations' || $this->params['controller'] == 'surveygroups') echo 'id="current"'; ?> ><a href="<?php echo $this->webroot.$this->themeWeb.$courseSysFunc['url_link'];?>"><span><?php echo $courseSysFunc['function_name']?></span></a></li>
-            <?php }?>
-            <?php if (!empty($access['USERS']) && ($rdAuth->role == 'A' || $rdAuth->role == 'I')) {
-                    $userSysFunc = $access['USERS'];    ?>
-                    <li <?php if ($this->params['controller'] == 'users') echo 'id="current"'; ?> ><a href="<?php echo $this->webroot.$this->themeWeb.$userSysFunc['url_link'];?>"><span><?php echo $userSysFunc['function_name']?></span></a></li>
-            <?php } else if (!empty($access['USERS']) && ($rdAuth->role == 'S')){?>
-                    <li <?php if ($this->params['controller'] == 'users') echo 'id="current"'; ?> ><a href="<?php echo $this->webroot.$this->themeWeb;?>users/editProfile"><span>Edit Profile</span></a></li>
-            <?php } ?>
-    		    <?php if (!empty($access['EVAL_TOOL'])) {
-                    $evaltoolSysFunc = $access['EVAL_TOOL'];    ?>
-                    <li <?php if ($this->params['controller'] == 'evaltools'  || $this->params['controller'] == 'simpleevaluations' || $this->params['controller'] == 'rubrics' || $this->params['controller'] == 'surveys' || $this->params['controller'] == 'mixevals') echo 'id="current"'; ?> ><a href="<?php echo $this->webroot.$this->themeWeb.$evaltoolSysFunc['url_link'];?>"><span><?php echo $evaltoolSysFunc['function_name']?></span></a></li>
-            <?php }?>
-    		    <?php if (!empty($access['ADV_SEARCH'])) {
-                    $searchSysFunc = $access['ADV_SEARCH'];    ?>
-                    <li <?php if ($this->params['controller'] == 'searchs') echo 'id="current"'; ?> ><a href="<?php echo $this->webroot.$this->themeWeb.$searchSysFunc['url_link'];?>"><span><?php echo $searchSysFunc['function_name']?></span></a></li>
-            <?php }?>
+            /**
+             * Creates a user interface tab:
+             *      $object and $access should always be set at $this and $access respectively.
+             *      $accessVar is the key inside the sys_function function list.
+             *      $activeControllers is an aeeay containg all the controllers for which this tab will be
+             *        highlighted as active.
+             *      $prefix and $postfix will be shown if passesed. Can be text or HTML.
+             */
+            function generateTab ($object, $access, $accessVar, $activeControllers, $prefix='', $postfix='') {
+                if (!empty($access[$accessVar])) {
+                    // Get the variables
+                    $sysFunc = $access[$accessVar];
+                    $name = $sysFunc['function_name'];
+                    $url = $object->webroot . $object->themeWeb . $sysFunc['url_link'];
+                    // Generate the HTML
+                    $current = in_array($object->params['controller'], $activeControllers) ? "id='current'" : "";
+                    echo "<li $current><a href='$url'><span>$prefix $name $postfix</span></a></li>";
+                }
+            }
+            ?>
 
-    		    <?php if (!empty($access['SYS_PARA'])) {
-                    $rubricSysFunc = $access['SYS_PARA'];    ?>
-                    <li <?php if ($this->params['controller'] == 'sysparameters') echo 'id="current"'; ?> ><a href="<?php echo $this->webroot.$this->themeWeb.$rubricSysFunc['url_link'];?>"><span><?php echo $rubricSysFunc['function_name']?></span></a></li>
-            <?php }?>
+            <!-- Build the actual Tabs -->
+            <?php
+                if (!empty($access)) {
+                    // Home Tab
+                    generateTab($this, $access, 'HOME', array('home'),
+                                $html->image('layout/icon_home.gif',array('border'=>'0','alt'=>'icon_home')));
 
-  		    <?php if (!empty($access['SYS_FUNC'])) {
-                    $rubricSysFunc = $access['SYS_FUNC'];    ?>
-                    <li <?php if ($this->params['controller'] == 'sysparameters') echo 'id="current"'; ?> ><a href="<?php echo $this->webroot.$this->themeWeb.$rubricSysFunc['url_link'];?>"><span><?php echo $rubricSysFunc['function_name']?></span></a></li>
-            <?php }?>
+                    // Course Tab
+                    generateTab($this, $access, 'COURSE', array('courses', 'events', 'groups', 'evaluations', 'surveygroups'));
+
+                   // Users Tab
+                    $isStudent = ($rdAuth->role == 'S');
+                    if (!$isStudent) {
+                        generateTab($this, $access, 'USERS' , array('users'));
+                    } else {
+                        generateTab($this, $access, 'USR_PROFILE' , array('users'));
+                    }
+
+                    //Evaluation Tools Tab
+                    generateTab($this, $access, 'EVAL_TOOL',
+                                array('evaltools', 'simpleevaluations', 'rubrics', 'surveys', 'mixevals'));
+
+                    // Advanced Search Tab
+                    generateTab($this, $access, 'ADV_SEARCH', array('searchs'));
+
+                    // System Parameters Tab
+                    generateTab($this, $access, 'SYS_PARA',  array('sysparameters'));
+
+                    // System Functions Tab
+                    generateTab($this, $access, 'SYS_FUNC', array('sysfunctions'));
+                }
+            ?>
 
           </ul>
         </div></td>
@@ -170,7 +191,7 @@ function checkEmailAddress()
   </div>
 </div>
 
-<!-- Debuggin output -->
+<!-- Debugging output -->
 <?php if(!constant('DEBUG') == 0) { ?>
 
     <!-- Prepare the SVN revision number and table -->
@@ -188,7 +209,7 @@ function checkEmailAddress()
                     division.style.display = "block";
                 }
             }
-        }
+        }acceptable
     </script>
     <?php
     exec ("svn info ../..", $lines, $retval);
