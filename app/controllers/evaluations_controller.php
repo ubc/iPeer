@@ -35,7 +35,7 @@ class EvaluationsController extends AppController
     var $order;
     var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
     var $Sanitize;
-    var $uses = array('EvaluationRubric', 'EvaluationRubricDetail', 'EvaluationSubmission', 'Event', 'EvaluationSimple', 'SimpleEvaluation', 'Rubric', 'Group', 'GroupEvent', 'GroupsMembers','RubricsLom','RubricsCriteria', 'RubricsCriteriaComment', 'Personalize', 'User','SurveyQuestion','Question','Response','Survey','SurveyInput','Course','MixevalsQuestion','EvaluationMixeval','EvaluationMixevalDetail'); 
+    var $uses = array('EvaluationRubric', 'EvaluationRubricDetail', 'EvaluationSubmission', 'Event', 'EvaluationSimple', 'SimpleEvaluation', 'Rubric', 'Group', 'GroupEvent', 'GroupsMembers','RubricsLom','RubricsCriteria', 'RubricsCriteriaComment', 'Personalize', 'User','SurveyQuestion','Question','Response','Survey','SurveyInput','Course','MixevalsQuestion','EvaluationMixeval','EvaluationMixevalDetail');
     var $components = array('rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework',
                             'EvaluationResult', 'EvaluationHelper', 'EvaluationRubricHelper', 'EvaluationSimpleHelper',
                             'RubricHelper','EvaluationSurveyHelper', 'MixevalHelper', 'EvaluationMixevalHelper','ExportHelper');
@@ -732,7 +732,7 @@ exit;
             $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
             $this->set('evalResult', $formattedResult['evalResult']);
 
-          if ($displayFormat == 'Detail') { 
+          if ($displayFormat == 'Detail') {
             $this->render('view_mixeval_evaluation_results_detail');
 
           } else {
@@ -1015,7 +1015,7 @@ exit;
       } else {
          if ($releaseStatus && ($numOfCompletedCount == $numMembers)) {
             $completeStatus = 'All';
-        } else {          
+        } else {
             $completeStatus = 'None';
         }
       }
@@ -1152,13 +1152,15 @@ exit;
     $groupEventId = $this->params['form']['group_event_id'];
     $groupId = $this->params['form']['group_id'];
     $eventId = $this->params['form']['event_id'];
-    $releaseMemberIds = $this->params['form']['release_member'];
-    foreach ($releaseMemberIds as $userId) {
-       $evalSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $userId);
-       $evalSubmission['EvaluationSubmission']['submitted'] = 0;
-       $this->EvaluationSubmission->id = $evalSubmission['EvaluationSubmission']['id'];
-       //$this->EvaluationSubmission->save($evalSubmission);
-       $this->EvaluationSubmission->del();
+    if (!empty($this->params['form']['release_member'])) {  // were any students selected?
+        $releaseMemberIds = $this->params['form']['release_member'];
+        foreach ($releaseMemberIds as $userId) {
+            $evalSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $userId);
+            $evalSubmission['EvaluationSubmission']['submitted'] = 0;
+            $this->EvaluationSubmission->id = $evalSubmission['EvaluationSubmission']['id'];
+            //$this->EvaluationSubmission->save($evalSubmission);
+            $this->EvaluationSubmission->del();
+        }
     }
     $this->redirect('/evaluations/viewGroupSubmissionDetails/'.$eventId.';'.$groupId);
   }
@@ -1184,12 +1186,12 @@ exit;
         $this->autoLayout=false;
         $courseId=$this->rdAuth->courseId;
         $questions= $this->RubricsCriteria->findAll("rubric_id=$rubicEvalId",array("id","criteria"));
-        $numberOfCriteria=$this->RubricsCriteria->findCount("`rubric_id` = $rubicEvalId");  
+        $numberOfCriteria=$this->RubricsCriteria->findCount("`rubric_id` = $rubicEvalId");
 
         $groups=    $this->GroupEvent->findAll("event_id=$eventId AND group_id !=0","group_id","group_id ASC",null,null,false);
 
         foreach ($questions as $key=>$array){
-           $questionsArray[$array['RubricsCriteria']['id']]=$array['RubricsCriteria']['criteria'];  
+           $questionsArray[$array['RubricsCriteria']['id']]=$array['RubricsCriteria']['criteria'];
         }
 
         foreach ($groups as $key=>$array)
@@ -1197,7 +1199,7 @@ exit;
 
         foreach ($groupsArray as $key=>$value)
             $groupMembersArrayComplete[]=$this->GroupsMembers->findAll("group_id=$value");
-      
+
         for ($i=0;$i<count($groupMembersArrayComplete);$i++)
             foreach ($groupMembersArrayComplete[$i] as $key=>$array)
             $groupMembersArraySimple[$groupsArray[$i]][]=$array['GroupsMembers']['user_id'];
@@ -1205,26 +1207,26 @@ exit;
         foreach ($groupMembersArraySimple as $key=>$array)
             foreach ($array as $index=>$value)
                 $groupMembersArrayWithName[$key][$value]=$this->User->field("first_name","id=$value").' '.$this->User->field('last_name',"id=$value");
-    
+
         foreach ($groupMembersArrayWithName as $key=>$array)
             foreach ($array as $index=>$value)
                 $studetnsWithName[$index]=$value;
-        
-        ksort($studetnsWithName);               
 
-        $groupEvents=$this->GroupEvent->findAll("event_id=$eventId ","id","id ASC",null,null,false);          
+        ksort($studetnsWithName);
 
-$this->pre ($groupEvents);      
-   
+        $groupEvents=$this->GroupEvent->findAll("event_id=$eventId ","id","id ASC",null,null,false);
+
+$this->pre ($groupEvents);
+
         $groupEventsArray=array();
-        
+
         foreach ($groupEvents as $key=>$array)
             $groupEventsArray[]=$array['GroupEvent']['id'];
 
-//$this->pre ($groupEventsArray); 
+//$this->pre ($groupEventsArray);
 
 //        $evalutorToEvaluateesByGroup=array();
-        
+
         foreach ($groupEventsArray as $key=>$value) {
             $sql = "SELECT id,evaluator,evaluatee FROM `evaluation_rubrics` WHERE `grp_event_id` = $value ORDER BY `evaluator` ASC, `evaluatee` ASC";
             $result=$this->EvaluationRubric->query($sql);
@@ -1232,66 +1234,66 @@ $this->pre ($groupEvents);
             foreach ($result as $resultKey=>$resultArray){
                 if (!isset($evalutorToEvaluatees[$resultArray['evaluation_rubrics']['evaluator']]))
                     $evalutorToEvaluatees[$resultArray['evaluation_rubrics']['evaluator']]=array();
-            
+
             foreach ($resultArray as $rubricEvalKey=>$rubricEvalValue) {
-                    for($i=1;$i<=$numberOfCriteria;$i++){ 
+                    for($i=1;$i<=$numberOfCriteria;$i++){
                        $evalutorToEvaluatees[$rubricEvalValue['evaluator']]['evaluatee'][$rubricEvalValue['evaluatee']]['grade'][$i]=$this->EvaluationRubricDetail->field('grade',array('evaluation_rubric_id'=>$rubricEvalValue['id'],'criteria_number'=>$i));
-                       
-                       $evalutorToEvaluatees[$rubricEvalValue['evaluator']]['evaluatee'][$rubricEvalValue['evaluatee']]['criteria_comment'][$i]=$this->EvaluationRubricDetail->field('criteria_comment',array('evaluation_rubric_id'=>$rubricEvalValue['id'],'criteria_number'=>$i)); 
-                    }              
-                }       
+
+                       $evalutorToEvaluatees[$rubricEvalValue['evaluator']]['evaluatee'][$rubricEvalValue['evaluatee']]['criteria_comment'][$i]=$this->EvaluationRubricDetail->field('criteria_comment',array('evaluation_rubric_id'=>$rubricEvalValue['id'],'criteria_number'=>$i));
+                    }
+                }
             }
             $evalutorToEvaluateesByGroup[]=$evalutorToEvaluatees;
 
         }
-        
-        
-        
+
+
+
         $evalutorToEvaluateesArray=array();
         foreach ($evalutorToEvaluateesByGroup as $groupIndex => $groupData)
             foreach ($groupData as $evaluatorId => $evaluateeList)
                 foreach ($evaluateeList as $evaluateeId => $evalDetails)
                     foreach ($evalDetails as $key => $value)
                         $evalutorToEvaluateesArray[$evaluatorId][$key]=$value;
-        
+
 $this->pre(array_keys($evalutorToEvaluateesByGroup)); die;
         $options=array('Grade'=>'grade','Criteria Comment'=>'criteria_comment');
         foreach ($options as $optionsIndex => $mode) {
-            echo "<h1>$optionsIndex</h1>"; 
+            echo "<h1>$optionsIndex</h1>";
             for ($questionIndex=1;$questionIndex<=$numberOfCriteria;$questionIndex++){
                 foreach ($evalutorToEvaluateesByGroup as $groupIndex => $groupData) {
                     $evaluators=array_keys($groupData);
                     if (empty($evaluators)) continue;
-                    echo "<h2>Question $questionIndex Group ".($groupIndex+1)."($optionsIndex)</h2>";  
+                    echo "<h2>Question $questionIndex Group ".($groupIndex+1)."($optionsIndex)</h2>";
                     echo "<table border=1>";
                     $numberOfGroupMembers=count($groupMembersArrayComplete[$groupIndex]);
                     //row
                 for ($rowIndex=0;$rowIndex<count($evaluators)+1;$rowIndex++) {
                 echo "<tr>";
                 //column
-                    for ($columnIndex=0;$columnIndex<count($evaluators)+1;$columnIndex++) { 
+                    for ($columnIndex=0;$columnIndex<count($evaluators)+1;$columnIndex++) {
                         if ($rowIndex==0 && $columnIndex==0) echo "<td>&nbsp</td>";
                         elseif ($rowIndex==0 && $columnIndex >0 ) echo "<td>".$studetnsWithName[$evaluators[$columnIndex-1]]."</td>";
-                        elseif ($rowIndex>0 && $columnIndex == 0 ) echo "<td>".$studetnsWithName[$evaluators[$rowIndex-1]]."</td>"; 
+                        elseif ($rowIndex>0 && $columnIndex == 0 ) echo "<td>".$studetnsWithName[$evaluators[$rowIndex-1]]."</td>";
                         elseif ($rowIndex==$columnIndex && $rowIndex !=0) echo "<td> / </td>";
                     else {
                         if (isset($evalutorToEvaluateesArray[$evaluators[$rowIndex-1]][$evaluators[$columnIndex-1]][$mode][$questionIndex]))
                             echo "<td>".$evalutorToEvaluateesArray[$evaluators[$rowIndex-1]][$evaluators[$columnIndex-1]][$mode][$questionIndex]."&nbsp</td>";
-                        else 
+                        else
                             echo "<td>N/A</td>";
-                    } 
+                    }
                 }
                 echo "</tr>";
             }
             echo "</table";
-            
+
         }
-        }
-            
         }
 
-        
-        
+        }
+
+
+
     }
 
 function export_test($eventId=null,$groupID=null)
@@ -1304,74 +1306,74 @@ function export_test($eventId=null,$groupID=null)
         //step 2: get Group Info
         $group_number=$this->Group->field('group_num',"id=$groupID"); //field 1
         $group_name=$this->Group->field('group_name',"id=$groupID");//field 2
-        
+
         //step 3: Get Group members
-        
+
         //step 3.1 Get Group Membrer user_id
         $user_id=$this->extractModel("GroupsMembers",$this->GroupsMembers->findAll("group_id=$groupID","user_id","user_id asc",null,null,false),"user_id");
-        //step 3.2 Get Group Membrer user_data 
+        //step 3.2 Get Group Membrer user_data
         $user_data=array();
         foreach ($user_id as $key=>$value)
         {
             $user_data["$value"]=$this->User->find("id=$value",array("first_name","last_name","student_no","email"),"id asc",false);
         }   //field 3,4,5,6
-        
+
         //pre ($user_data);
-        
+
         //step 4   (if Rubric)
-        
+
         //step 4.1 Get evaluation_rubic id(s)
 
          $evaluation_rubric_id=$this->extractModel("EvaluationRubric",$this->EvaluationRubric->findAll("event_id=$eventId","id","id asc",null,null,false),"id");
          //pre($evaluation_rubric_id);
-         
+
         //step 4.2 Get evaluation_rubic general data
         $evaluation_rubric_general_data=array();
         foreach ($evaluation_rubric_id as $key=>$value)
         {
             $evaluation_rubric_general_data["$value"]=$this->EvaluationRubric->find("id=$value",array("evaluator","evaluatee","general_comment","score"),"id asc",false);  //field 7,8
-        }        
-        
+        }
+
         //pre($evaluation_rubric_general_data);
-        
+
         //step 4.2.1 get evaluatee->evaluator array
         $evaluateesToEvaluators=array();
         foreach ($evaluation_rubric_general_data as $key=>$value)
             $evaluateesToEvaluators[$user_data[$value['EvaluationRubric']['evaluatee']]['User']['student_no']][]=$key;
         // pre ($evaluateesToEvaluators);
-        
+
         //step 4.3 Get rubric evaluation specific data
         $evaluation_rubric_specific_data=array();
         foreach ($evaluation_rubric_id as $key=>$value)
         {
             $evaluation_rubric_specific_data["$value"]=$this->EvaluationRubricDetail->findAll("evaluation_rubric_id=$value",array("criteria_number","criteria_comment",),"evaluation_rubric_id asc",null,false);     //field 9
-        }        
-        //pre($evaluation_rubric_specific_data);   
-                
+        }
+        //pre($evaluation_rubric_specific_data);
+
         //step 5 Get Rubic title
         $rubtic_id=$this->Event->field('template_id',"id=$eventId");
         $rubtic_title=$this->Rubric->field("name","id=$rubtic_id");
-        //step 6 Get Rubic criteria 
+        //step 6 Get Rubic criteria
         $rubric_criteria=$this->RubricsCriteria->generateList("rubric_id=$rubtic_id","rubric_id asc",null,"{n}.RubricsCriteria.criteria_num","{n}.RubricsCriteria.criteria");
-        //pre($rubric_criteria);  
-        
+        //pre($rubric_criteria);
+
         //output
          $fh=fopen("/var/www/ipeer.apsc.ubc.ca/htdocs/prod/app/tmp/test/output.csv","w");
          fputcsv($fh,array("Event Name",$event_title));
          fputcsv($fh,array("Event Type","Rubric"));
-         fputcsv($fh,array("Criteria number","Criteria"));    
+         fputcsv($fh,array("Criteria number","Criteria"));
          foreach ($rubric_criteria as $key=>$value)
          fputcsv($fh,array($key,$value));
-         
+
         $header=array("Group Number","Group Name","First Name","Last Name","Student Number","Email","General Comments","Score","Specific Comments");
-        
+
         fputcsv($fh,$header);
         foreach ($user_data as $key=>$value)
         {
-            $line=array();  
+            $line=array();
             array_push($line,$group_name);
-            array_push($line,$group_number); 
-            $score_total=0; 
+            array_push($line,$group_number);
+            $score_total=0;
             //bad coding style
             foreach ($value['User'] as $key_2=>$value_2)
             array_push($line,$value_2);
@@ -1382,36 +1384,36 @@ function export_test($eventId=null,$groupID=null)
                 //1) get evaluatee id;
                 $evaluatee_id=$array['EvaluationRubric']['evaluatee'];
                 //2) get student number from user_data
-                $student_number=$user_data[$evaluatee_id]['User']['student_no'];                //3) if current student is the evaluatee 
+                $student_number=$user_data[$evaluatee_id]['User']['student_no'];                //3) if current student is the evaluatee
                 if ($value['User']['student_no']==$student_number)
                 {
-                    $general_comments=$general_comments.''.$array['EvaluationRubric']['general_comment'].';';                 
+                    $general_comments=$general_comments.''.$array['EvaluationRubric']['general_comment'].';';
                     //add up score
                     $score_total=$score_total+$array['EvaluationRubric']['score'];
                 }
             }
-            
+
             array_push($line,$general_comments);
             array_push($line,$score_total);
-            $specific_commens=''; 
+            $specific_commens='';
             foreach ($evaluateesToEvaluators[$value['User']['student_no']] as $index=>$value)
             {
-                
+
                 //bad coding style
                 foreach ($evaluation_rubric_specific_data[$value] as $index_2=>$array_2)
                       $specific_commens=$specific_commens.''.$array_2['EvaluationRubricDetail']['criteria_comment'].';';
         }
         array_push($line,$specific_commens);
-        fputcsv($fh,$line);  
-        unset($line); 
-        } 
+        fputcsv($fh,$line);
+        unset($line);
+        }
         fclose($fh);
     header("Location: ../tmp/test/output.csv");
 
-           
-                
+
+
     }
-    
+
     public function pre($para) {
         $this->autoRender=false;
         $this->autoLayout=false;
