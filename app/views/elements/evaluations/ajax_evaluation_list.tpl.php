@@ -17,7 +17,7 @@
 	    <?php if (isset($display) && $display == 'search') { ?>
 	    <th>Course</th>
 	    <?php } ?>
-	    <th>Email <br>All Groups</th>
+<!--	    <th>Email <br>All Groups</th>-->
 	    <th><?php echo $pagination->sortLink('Evaluation Event Title',array('title','desc'))?></th>
 	    <th>Event Type</th>
 	    <th><?php echo $pagination->sortLink('Due Date',array('due_date','desc'))?></th>
@@ -44,9 +44,9 @@
   		    <?php echo $sysContainer->getCourseName($evaluation['course_id']); ?>
   	    </td>
   	    <?php } ?>
-  		  <td>
+<!--  		  <td>
   		    <a href="<?php echo $this->webroot.$this->themeWeb.'evaluations/view/'.$evaluation['id']?>"><?php echo $html->image('icons/email.gif',array('border'=>'0','alt'=>'View'))?></a>
-  	    </td>
+  	    </td>-->
   		  <td>
   	      <?php echo $evaluation['title'] ?>
   	    </td>

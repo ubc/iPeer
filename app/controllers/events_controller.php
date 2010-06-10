@@ -102,6 +102,7 @@ class EventsController extends AppController
 
 	  //Clear $id to only the alphanumeric value
 		$id = $this->Sanitize->paranoid($id);
+    $this->set('event_id', $id);
 
 		$this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Events';
 		$this->Event->setId($id);
