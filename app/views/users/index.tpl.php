@@ -52,17 +52,19 @@
 				&nbsp;<b>For Course:&nbsp;</b>
 				<select name="course_id" id="course_id" >
    				<?php
-				//echo '<option value="" SELECTED >-- All --</option>';
-				echo '<option value="-1" SELECTED >-- Unassigned Students --</option>';
-				foreach($courseList as $index => $value) {
-				  if ($value['record_status'] == 'A') {
-						echo '<option value="'.$value['id'].'"';
-						if ($rdAuth->courseId == $index){
-							echo 'SELECTED';
-						}
-						echo '>'.$value['course'].'</option>';
-					}
-				}
+                    //echo '<option value="" SELECTED >-- All --</option>';
+                    echo '<option value="-1" SELECTED >-- Unassigned Students --</option>';
+                    if (!empty($courseList)) {
+                        foreach($courseList as $index => $value) {
+                        if ($value['record_status'] == 'A') {
+                                echo '<option value="'.$value['id'].'"';
+                                if ($rdAuth->courseId == $index){
+                                    echo 'SELECTED';
+                                }
+                                echo '>'.$value['course'].'</option>';
+                            }
+                        }
+                    }
 				?>
 			  </select>
 			</div>

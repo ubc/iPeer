@@ -209,7 +209,7 @@ function checkEmailAddress()
                     division.style.display = "block";
                 }
             }
-        }acceptable
+        }
     </script>
     <?php
     exec ("svn info ../..", $lines, $retval);
