@@ -29,7 +29,7 @@
 	    <?php endif;?>
 		</div></td>
         <td align="center"><?php echo $group['group_num'] ?></td>
-        <td><?php echo $group['group_name'].' ('.$group['member_count'].')' ;	    
+        <td><?php echo $group['group_name'].' ('.count($row['GroupsMember']).')' ;	    
 	    ?></td>
         <td align="center"><?php
         $params = array('controller'=>'groups', 'userId'=>$group['creator_id']);

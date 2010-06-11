@@ -29,12 +29,13 @@ class Group extends AppModel
 {
   var $name = 'Group';
 
-  var $hasMany = array(
-                        'GroupEvent' => array(
-                          'className' => 'GroupEvent',
-                          'dependent' => true
-                        )
-                 );
+  var $hasMany = array('GroupEvent' => array('className' => 'GroupEvent',
+                                             'dependent' => true
+                                            ),
+                       'GroupsMember' => array('className' => 'GroupsMembers',
+                                               'dependent' => true
+                                              )
+                      );
 
 	function beforeSave(){ //serverside validation
 		$allowSave = true;

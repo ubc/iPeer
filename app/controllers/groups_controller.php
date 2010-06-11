@@ -56,8 +56,8 @@ class GroupsController extends AppController
 
 		$queryAttributes = $this->getQueryAttribute($courseId);
 		$fields = $queryAttributes['fields'];
-		$condition = $queryAttributes['condition']. ' GROUP BY Group.id';
-		$joinTable = $queryAttributes['joinTable'];
+		$condition = $queryAttributes['condition'];
+    $joinTable = $queryAttributes['joinTable'];
 
 		$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
     $this->userPersonalize->setPersonalizeList($personalizeData);
@@ -69,17 +69,12 @@ class GroupsController extends AppController
       $this->update($attributeCode = 'Group.ListMenu.Limit.Show',$attributeValue = $this->show);
   	}
 
-		$data = $this->Group->findAll($condition, $fields, $this->order, $this->show, $this->page, null, $joinTable);
+		$data = $this->Group->findAllByCourseId($courseId, null, $this->order, $this->show, $this->page);//, null, null);//$joinTable);
 		
-		for ($i=0; $i < count($data); $i++) 
-		{
-		  $data[$i]['Group']['member_count'] = $data[$i][0]['mc'];
-		}
-
 		$paging['style'] = 'ajax';
 		$paging['link'] = '/groups/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
 
-		$paging['count'] = $this->Group->findCount($condition, 0, $joinTable);
+		$paging['count'] = $this->Group->findCount($condition, 0);//, $joinTable);
 		$paging['show'] = array('10','25','50','all');
 		$paging['page'] = $this->page;
 		$paging['limit'] = $this->show;
@@ -206,21 +201,20 @@ class GroupsController extends AppController
 		$condition = $queryAttributes['condition'];
 		$joinTable = $queryAttributes['joinTable'];
     
-    if ('' != $this->params['form']['livesearch2'] && !empty($this->params['form']['select']))
+    if (isset($this->params['form']['livesearch2']) && '' != $this->params['form']['livesearch2'] && !empty($this->params['form']['select']))
     {
       $pagination->loadingId = 'loading';
       //parse the parameters
       $searchField='Group.'.$this->params['form']['select'];
       $searchValue=$this->params['form']['livesearch2'];
       
-     if (!empty($condition))
- 	 {
-		$condition .= " AND ";
-	 }
+      if (!empty($condition))
+      {
+        $condition .= " AND ";
+      }
       $condition .= $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
     }
-    
-    $condition = $condition . " GROUP BY Group.id";
+
     $this->update($attributeCode = 'Group.ListMenu.Limit.Show',$attributeValue = $this->show);
     $this->set('conditions',$condition);
     $this->set('fields',$fields);
@@ -237,8 +231,8 @@ class GroupsController extends AppController
   function getQueryAttribute($courseId = null)
   {	
     $attributes = array('fields'=>'', 'condition'=>'', 'joinTable'=>array());
-    $attributes['fields'] = 'DISTINCT Group.id, Group.group_num, Group.group_name, Group.course_id, Group.created, Group.creator_id, Group.modified, Group.updater_id, count(GroupsMembers.group_id) AS mc';
-	$joinTable = array('INNER JOIN groups_members AS GroupsMembers ON Group.id = GroupsMembers.group_id');
+    $attributes['fields'] = 'Group.id, Group.group_num, Group.group_name, Group.course_id, Group.created, Group.creator_id, Group.modified, Group.updater_id';
+    $joinTable = array();//array('INNER JOIN groups_members AS GroupsMembers ON Group.id = GroupsMembers.group_id');
 	 
     if (!empty($courseId)) {
       $attributes['condition'] .= ' Group.course_id = '.$courseId;
