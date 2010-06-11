@@ -122,10 +122,11 @@ class AppController extends Controller  {
 
 
             // Debug output: Display how this page was allowed.
-            if ($allowedExplicitly)
-                echo "<b style='color:green'>Allowed Explicitly by <u>$allowedByEntry</u> entry in SysFunctions. </b>";
-            if ($allowedByControllerEntry)
-                echo "<b style='color:darkblue'>Allowed Implicitly by a controller <u>$allowedByEntry</u> entry in SysFunctions. </b>";
+            if ($allowedExplicitly){
+                $this->set("allowedBy", "<span style='color:green'>Allowed Explicitly by <u>$allowedByEntry</u> entry in SysFunctions. </span>");
+            } else if ($allowedByControllerEntry) {
+                $this->set("allowedBy", "<span style='color:darkblue'>Allowed Implicitly by a controller <u>$allowedByEntry</u> entry in SysFunctions. </span>");
+            }
 
             // Rdirect the user away if they have no permission to render this page.
 			if (!$allowedExplicitly && !$allowedByControllerEntry) {

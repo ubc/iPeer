@@ -193,23 +193,16 @@ function checkEmailAddress()
 
 <!-- Debugging output -->
 <?php if(!constant('DEBUG') == 0) { ?>
-
     <!-- Prepare the SVN revision number and table -->
     <script language="JavaScript" type="text/javascript">
         // Toggles the details display of the snv revision.
         function toggleDivision(divID) {
             var division = $(divID);
-            if (!division) {
-                alert ("svn-data div was not found");
-                return;
-            } else {
-                if (division.style.display == "block") {
-                    division.style.display = "none";
-                } else {
-                    division.style.display = "block";
-                }
-            }
+            division ?
+                (division.style.display = (division.style.display == "block") ? "none" : "block") :
+                (alert ("division was not found"));
         }
+
     </script>
     <?php
     exec ("svn info ../..", $lines, $retval);
@@ -233,7 +226,8 @@ function checkEmailAddress()
     $svnTable .= "</table>";
     ?>
     <div style="margin-left: 50px">
-    <!-- Render a few other debuging elements -->
+
+    <!-- Render a few debuging elements -->
     <table width="95%"><tr>
     <td>SVN <?php echo $revision;?>
         <a href="javascript:toggleDivision('svn-data');">(details)</a></td>
@@ -247,6 +241,7 @@ function checkEmailAddress()
         <a href="javascript:toggleDivision('actions-data');">(details)</a></td>
     <td>Params: <?php echo empty($params) ? 0 : count($params); ?>
         <a href="javascript:toggleDivision('params-data');">(details)</a></td>
+    <td> <a style="color:blue" href="javascript:void" onmouseover="toggleDivision('allowedBy-data');">Allowed By&hellip;</a></td>
     </tr></table>
 
     <!-- The actual debugging data -->
@@ -267,8 +262,10 @@ function checkEmailAddress()
     <div style="display: none; background-color:#E9FFFF; width: 90%;" id="params-data">
         <h1>$params variable</h1>
         <?php if(!empty($params)) var_dump($params); else echo "(Empty)"?></div>
+    <div style="display: none; width: 95%; text-align: right;" id="allowedBy-data">
+        <?php echo !empty($allowedBy)? $allowedBy : "No AllowedBy data was set"; ?></div>
 
 
-<?php } // end if(!constant('DEBUG') == 0) { ?>
+<?php } // end if(!constant('DEBUG') == 0) ?>
 </body>
 </html>
