@@ -29,16 +29,16 @@
 
 class SurveysController extends AppController
 {
-    var $uses =  array('Course', 'Survey', 'User', 'Question', 'SurveyQuestion', 'Response','Personalize','Event','EvaluationSubmission','UserEnrol','SurveyInput','SurveyGroupMember','SurveyGroupSet','SurveyGroup');
-	var $name = 'Surveys';
-	var $show;
-	var $sortBy;
-	var $direction;
-	var $page;
-	var $order;
-	var $Sanitize;
-	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
-	var $components = array('rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework','SurveyHelper');
+  var $uses =  array('Course', 'Survey', 'User', 'Question', 'SurveyQuestion', 'Response','Personalize','Event','EvaluationSubmission','UserEnrol','SurveyInput','SurveyGroupMember','SurveyGroupSet','SurveyGroup');
+  var $name = 'Surveys';
+  var $show;
+  var $sortBy;
+  var $direction;
+  var $page;
+  var $order;
+  var $Sanitize;
+  var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
+  var $components = array('rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework','SurveyHelper');
 
 
 	function __construct()
@@ -427,7 +427,9 @@ class SurveysController extends AppController
 
 	function checkDuplicateName()
 	{
+    $course_id = $this->rdAuth->courseId;
 		$this->layout = 'ajax';
+    $this->set('course_id', $course_id);
 		$this->render('checkDuplicateName');
 	}
 
