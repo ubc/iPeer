@@ -185,38 +185,38 @@ class GroupsController extends AppController
   }
 
 	function search()
-  	{
-  		$this->layout = 'ajax';
+  {
+    $this->layout = 'ajax';
 
     if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-    	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-    	if ($personalizeData) {
-    	   $this->userPersonalize->setPersonalizeList($personalizeData);
-         $this->show = $this->userPersonalize->getPersonalizeValue('Group.ListMenu.Limit.Show');
-         $this->set('userPersonalize', $this->userPersonalize);
-    	}
+      $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+      if ($personalizeData) {
+        $this->userPersonalize->setPersonalizeList($personalizeData);
+        $this->show = $this->userPersonalize->getPersonalizeValue('Group.ListMenu.Limit.Show');
+        $this->set('userPersonalize', $this->userPersonalize);
+      }
     }
 
     $condition = "";
-	    $courseId = isset($this->params['form']['course_id'])? $this->params['form']['course_id']: $this->rdAuth->courseId;;
-		$this->set('courseId', $courseId);
+    $courseId = isset($this->params['form']['course_id'])? $this->params['form']['course_id']: $this->rdAuth->courseId;;
+    $this->set('courseId', $courseId);
 
-		$queryAttributes = $this->getQueryAttribute($courseId);
-		$fields = $queryAttributes['fields'];
+    $queryAttributes = $this->getQueryAttribute($courseId);
+    $fields = $queryAttributes['fields'];
 		$condition = $queryAttributes['condition'];
 		$joinTable = $queryAttributes['joinTable'];
-	
-    if (!empty($this->params['form']['livesearch2']) && !empty($this->params['form']['select']))
+    
+    if ('' != $this->params['form']['livesearch2'] && !empty($this->params['form']['select']))
     {
       $pagination->loadingId = 'loading';
       //parse the parameters
       $searchField=$this->params['form']['select'];
       $searchValue=$this->params['form']['livesearch2'];
-      
-     if (!empty($condition))
-    {
-		$condition .= " AND ";
-	}
+
+      if (!empty($condition))
+      {
+        $condition .= " AND ";
+      }
       $condition .= $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
     }
     $this->update($attributeCode = 'Group.ListMenu.Limit.Show',$attributeValue = $this->show);
