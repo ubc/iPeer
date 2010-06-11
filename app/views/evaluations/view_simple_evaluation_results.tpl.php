@@ -50,7 +50,8 @@
     		       echo '<td> - </td>' . "\n\t\t";
         		}else {
       		    if (isset($scoreRecords[$member_row['User']['id']][$member_col['User']['id']])) {
-        		    echo '<td>'.number_format($scoreRecords[$member_row['User']['id']][$member_col['User']['id']], 2).'</td>' . "\n\t\t";
+                $score = $scoreRecords[$member_row['User']['id']][$member_col['User']['id']];
+        		    echo '<td>'.(is_numeric($score) ? number_format($score, 2) : $score).'</td>' . "\n\t\t";
         		  } else {
         		     echo '<td>0.00</td>' . "\n\t\t";
         		  }
@@ -112,7 +113,7 @@ else { // if no members are present
 <tr class="tablecell2">
 	<td colspan="4"><em>No group members</em></td>
 </tr>
-<? }?>
+<?php }?>
 <tr class="tablecell2" align="center">
 	<td colspan="<?php echo count($groupMembers) +1; ?>">
 <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">

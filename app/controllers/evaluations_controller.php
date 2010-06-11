@@ -665,13 +665,13 @@ exit;
       $this->autoRender = false;
       $this->layout = 'pop_up';
       $tok = strtok($param, ';');
-    $eventId = $tok;
-    $groupId = strtok(';');
-    $displayFormat = strtok(';');
+      $eventId = $tok;
+      $groupId = strtok(';');
+      $displayFormat = strtok(';');
 
-    $courseId = $this->rdAuth->courseId;
-    $event = $this->EvaluationHelper->formatEventObj($eventId, $groupId);
-        $this->set('event', $event);
+      $courseId = $this->rdAuth->courseId;
+      $event = $this->EvaluationHelper->formatEventObj($eventId, $groupId);
+      $this->set('event', $event);
       $this->pageTitle = !empty($event['Event']) ? $this->sysContainer->getCourseName($courseId).' > '.$event['Event']['title']. ' > Results ':'';
 
 
@@ -683,13 +683,13 @@ exit;
           $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
           $this->set('evalResult', $formattedResult['evalResult']);
           $this->set('groupMembers', $formattedResult['groupMembers']);
-            $this->set('allMembersCompleted', $formattedResult['allMembersCompleted']);
-            $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
-            $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
+          $this->set('allMembersCompleted', $formattedResult['allMembersCompleted']);
+          $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
+          $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
           $this->render('view_simple_evaluation_results');
           break;
 
-        case 2: //View Rubric Evaluation
+      case 2: //View Rubric Evaluation
             $formattedResult = $this->EvaluationRubricHelper->formatRubricEvaluationResult($event, $displayFormat);
             $this->set('rubric', $formattedResult['rubric']);
             if (isset($formattedResult['groupMembers'])) $this->set('groupMembers', $formattedResult['groupMembers']);

@@ -27,16 +27,16 @@ function attachFormHandlers()
 var gContinue = true;
 function attach(objInput)
 {
-  sVal = objInput.value; //get value inside of input field
+  var sVal = objInput.value; //get value inside of input field
   var sFeedBack; //feedback is the feedback message sent back to the user
   gContinue = true;
 
-  sRules = objInput.className.split(' '); // get all the rules from the input box classname
-  sValidate = sRules[0];                  // validate means we will validate the field
-  sRequired = sRules[1];                  // required means field is required
-  sTypeCheck = sRules[2];                 // typecheck are additional validation rules (ie. email, phone, date)
-  sFeedbackLoc = sRules[3];               // feedbackLoc is the td id where feedback is sent to.
-  sErrorMsg =  sRules[4];                 // error message if it is invalid
+  var sRules = objInput.className.split(' '); // get all the rules from the input box classname
+  var sValidate = sRules[0];                  // validate means we will validate the field
+  var sRequired = sRules[1];                  // required means field is required
+  var sTypeCheck = sRules[2];                 // typecheck are additional validation rules (ie. email, phone, date)
+  var sFeedbackLoc = sRules[3];               // feedbackLoc is the td id where feedback is sent to.
+  var sErrorMsg =  sRules[4];                 // error message if it is invalid
 
   sFeedback = validateRequired (sRequired, sVal, sTypeCheck); //validateRequired() checks if it is required and then sends back feedback
 
@@ -47,9 +47,10 @@ function attach(objInput)
     sFeedback = validateObject(sRequired, sTypeCheck, sVal, sErrorMsg);
   }
   // after validation is complete return the feedback
-  if (sFeedback != null && sFeedback != '') {
-    document.getElementById(sFeedbackLoc).innerHTML = sFeedback;
+  if (sFeedback == null || sFeedback == undefined) {
+    sFeedback = "";
   }
+  document.getElementById(sFeedbackLoc).innerHTML = sFeedback;
 
 }
 

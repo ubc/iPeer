@@ -49,9 +49,7 @@
 <tr><td align="center">
   <table width="95%"  border="0" cellspacing="2" cellpadding="4">
   <tr>
-    <td width="45%"><table width="403" border="0" cellspacing="0" cellpadding="4">
-      <tr>
-			  <td colspan="3">
+    <td>
 			    <?php echo $html->linkTo('Back to Evaluation Event Listing', '/evaluations/index/'); ?>
           <?php
               if (!empty($rdAuth->courseId)) {
@@ -59,10 +57,7 @@
                 echo $html->linkTo('Back to Course Home', '/courses/home/'.$rdAuth->courseId);
               }
         ?>
-        </td>
-      </tr></table>
     </td>
-    <td width="55%">&nbsp; </td>
   </tr>
 </table>
 </td></tr>
