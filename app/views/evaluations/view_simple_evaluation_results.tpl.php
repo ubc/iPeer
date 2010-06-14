@@ -72,7 +72,7 @@
             }
             else {
               echo '<td>'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score']) . "\n\t\t";
-            }            
+            }
           }
           else {
             if ($memberEvaluatedCount > count($inCompletedMembers)) {
@@ -165,31 +165,28 @@ else { // if no members are present
 	<td colspan="2">Released</td>
 </tr>
 	<?php
-		$i = 0;
-	  foreach($evalResult[$user['id']] AS $row ){
-		  if ($groupMembers[$i]['User']['id']==$user['id'])
-		    $i++;
-		  $evaluatee = $groupMembers[$i++]['User'];
-		  $evalMark = isset($row['EvaluationSimple'])? $row['EvaluationSimple']: null;
-			echo '<tr class="tablecell2">';
-		  if (isset($evalMark)) {
-					echo '<td width="30%">'.$evaluatee['last_name'].' '.$evaluatee['first_name'].'</td>' . "\n";
-					echo '<td width="60%">';
-					echo (isset($evalMark['eval_comment']))? $evalMark['eval_comment'] : 'No Comments';
-					echo '</td>' ;
-					if ($evalMark['release_status'] == 1) { // made explicit comparison with 1
-						echo '<td colspan="2" width="10%">' . '<input type="checkbox" name="release' .  $evalMark['evaluator']  . '[]" value="' . $evalMark['evaluatee'] . '" checked />';
-					}
-					else {
-						echo '<td colspan="2" width="10%">' . '<input type="checkbox" name="release' .  $evalMark['evaluator']  . '[]" value="' . $evalMark['evaluatee'] . '" />';
-					}
-					echo '<input type="hidden" name="evaluator_ids[]" value="' .  $evalMark['evaluator']  . '" /></td>';
-       } else {
-					echo 'ss';
-					echo '<td colspan="4">n/a</td>';
-			 }
-			echo '</tr>';
-      }
+$i = 0;
+foreach($evalResult[$user['id']] AS $row ) {
+    $evaluatee = $groupMembers[$i++]['User'];
+    $evalMark = isset($row['EvaluationSimple'])? $row['EvaluationSimple']: null;
+    echo '<tr class="tablecell2">';
+    if (isset($evalMark)) {
+        echo '<td width="30%">'.$evaluatee['last_name'].' '.$evaluatee['first_name'].'</td>' . "\n";
+        echo '<td width="60%">';
+        echo (isset($evalMark['eval_comment']))? $evalMark['eval_comment'] : 'No Comments';
+        echo '</td>' ;
+        if ($evalMark['release_status'] == 1) { // made explicit comparison with 1
+            echo '<td colspan="2" width="10%">' . '<input type="checkbox" name="release' .  $evalMark['evaluator']  . '[]" value="' . $evalMark['evaluatee'] . '" checked />';
+        } else {
+            echo '<td colspan="2" width="10%">' . '<input type="checkbox" name="release' .  $evalMark['evaluator']  . '[]" value="' . $evalMark['evaluatee'] . '" />';
+        }
+        echo '<input type="hidden" name="evaluator_ids[]" value="' .  $evalMark['evaluator']  . '" /></td>';
+    } else {
+        echo 'ss';
+        echo '<td colspan="4">n/a</td>';
+    }
+    echo '</tr>';
+}
 			 ?>
 			</table>
 			</div>
