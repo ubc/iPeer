@@ -59,7 +59,7 @@ $groupAve = 0;
     ?>
     <td> Total:( <?php echo number_format($rubric['Rubric']['total_marks'], 2)?>)</td>
   </tr>
-    <?
+    <?php
     $aveScoreSum = 0;
     //This section will display the evaluatees' name
     //as display the average scores their peers gave them

@@ -42,7 +42,7 @@ echo $this->renderElement('evaluations/view_event_info', $params);
 		<td valign="middle">Student Name:</td>
     <td> Total:( /<?php echo number_format($rubric['Rubric']['total_marks'], 2)?>)</td>
   </tr>
-<?
+<?php
     $aveScoreSum = 0;
     //This section will display the evaluatees' name
     //as display the average scores their peers gave them
