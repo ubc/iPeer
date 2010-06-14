@@ -26,8 +26,8 @@
 	    <th><?php echo $pagination->sortLink('First Name',array('first_name','desc'))?></th>
 	    <th><?php echo $pagination->sortLink('Last Name',array('last_name','desc'))?></th>
 	    <th><?php echo $pagination->sortLink('Email',array('email','desc'))?></th>
-<!--	    <th><?php echo $pagination->sortLink('Created By',array('created','desc'))?></th> -->
-<!--	    <th><?php echo $pagination->sortLink('Last Updated By',array('modified','desc'))?></th> -->
+<!--	    <th><?php //echo $pagination->sortLink('Created By',array('created','desc'))?></th> -->
+<!--	    <th><?php //echo $pagination->sortLink('Last Updated By',array('modified','desc'))?></th> -->
 	  </tr>
   	<?php $i = '0';?>
 	  <?php foreach($data as $row): $user = $row['User']; ?>

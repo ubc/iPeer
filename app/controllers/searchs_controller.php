@@ -53,6 +53,7 @@ class SearchsController extends AppController
       $courseList = $this->sysContainer->getMyCourseList();
       $this->set('courseList', $courseList);
 
+
       $searchMartix = $this->SearchHelper->formatSearchEvaluation('', $this->order, $this->show, $this->page, $this->sortBy, $this->direction);
       $this->set('data', $searchMartix['data']);
       $this->set('paging', $searchMartix['paging']);
@@ -61,6 +62,21 @@ class SearchsController extends AppController
     }
     $this->render('index');
 	}
+
+  function searchEvaluation(){
+    $this->params['form']['search_type'] = 'evaluation';
+    $this->display();
+  }
+
+  function searchResult(){
+    $this->params['form']['search_type'] = 'eval_result';
+    $this->display();
+  }
+
+  function searchInstructor(){
+    $this->params['form']['search_type'] = 'instructor';
+    $this->display();
+  }
 
 	function display() {
 	 // if (!isset($this->params['form']['select']))

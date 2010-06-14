@@ -24,7 +24,7 @@ class SearchHelperComponent
     $data = $this->Event->findAll($conditions, '*, (NOW() >= release_date_begin AND NOW() <= release_date_end) AS is_released', $order, $show, $page);
 
     $paging['style'] = 'ajax';
-    $paging['link'] = '/searchs/searchEvents/?show='.$show.'&sort='.$sortBy.'&direction='.$direction.'&page=';
+    $paging['link'] = '/searchs/searchEvaluation/?show='.$show.'&sort='.$sortBy.'&direction='.$direction.'&page=';
 
     $paging['count'] = $this->Event->findCount($conditions);
     $paging['show'] = array('10','25','50','all');
@@ -107,7 +107,7 @@ class SearchHelperComponent
   	}
 
     $paging['style'] = 'ajax';
-    $paging['link'] = '/searchs/searchEvents/?show='.$show.'&sort='.$sortBy.'&direction='.$direction.'&page=';
+    $paging['link'] = '/searchs/searchResult/?show='.$show.'&sort='.$sortBy.'&direction='.$direction.'&page=';
 
     $paging['count'] = count($assignedGroupIDs);
     $paging['show'] = array('10','25','50','all');
@@ -133,7 +133,7 @@ class SearchHelperComponent
     $data = $this->User->findAll($conditions, null, $order, $show, $page);
 
     $paging['style'] = 'ajax';
-    $paging['link'] = '/searchs/searchEvents/?show='.$show.'&sort='.$sortBy.'&direction='.$direction.'&page=';
+    $paging['link'] = '/searchs/searchInstructor/?show='.$show.'&sort='.$sortBy.'&direction='.$direction.'&page=';
 
     $paging['count'] = $this->User->findCount($conditions);
     $paging['show'] = array('10','25','50','all');
