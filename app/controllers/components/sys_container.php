@@ -221,6 +221,7 @@ class sysContainerComponent
 	function getMyCourseList()
 	{
 		$this->myCourseList=$this->Session->read('ipeerSession.myCourseList');
+    if($this->myCourseList == null) $this->myCourseList = array();
 		return $this->myCourseList;
 	}
 
