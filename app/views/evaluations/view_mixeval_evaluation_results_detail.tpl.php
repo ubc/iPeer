@@ -61,7 +61,7 @@ $groupAve = 0;
     ?>
     <td> Total:( /<?php echo number_format($mixeval['Mixeval']['total_marks'], 2)?>)</td>
   </tr>
-    <?
+    <?php
     $aveScoreSum = 0;
     //This section will display the evaluatees' name
     //as display the average scores their peers gave them
@@ -200,7 +200,7 @@ $groupAve = 0;
          //Retrieve the individual mixeval detail
         // if ($allMembersCompleted && isset($evalResult[$user['id']])) {
          if (isset($evalResult[$user['id']])) {
-           $memberResult = $evalResult[$user['id']]; 
+           $memberResult = $evalResult[$user['id']];
            foreach ($memberResult AS $row): $memberMixeval = $row['EvaluationMixeval'];
              $evalutor = $membersAry[$memberMixeval['evaluator']];
              echo "<tr class=\"tablecell2\">";
