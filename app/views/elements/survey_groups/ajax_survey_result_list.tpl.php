@@ -21,6 +21,7 @@ if (isset($pagination->params['pass']['0'])) {
         </div></td>
       </tr>
     </table>
+    <?php if(isset($data[0])):?>
 	<table width="65%" border="0" cellspacing="2" cellpadding="4" bgcolor="#FFFFFF">
 	  <tr style="background-color:#CCCCDD;">
 	    <td colspan="3" align="center">
@@ -92,5 +93,8 @@ if (isset($pagination->params['pass']['0'])) {
 <?php endif;?>
     </td></tr>
   </table>
+  <?php else:?>
+    No survey available.
+  <?php endif;?>
 </div>
 <!-- elements::ajax_survey_result_list end -->
