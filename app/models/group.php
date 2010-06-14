@@ -117,6 +117,21 @@ class Group extends AppModel
 	  $tmp = $this->find('course_id='.$courseId,'max(group_num)');
 	  return $tmp[0]['max(group_num)'];
 	}
+
+  function getFilteredStudents($group_id, $filter){
+    $course_id = $this->field('course_id',sprintf("id = '%d'", $group_id));
+    if($filter)
+    {
+      return $this->findBySql("SELECT DISTINCT users.id, users.role, users.username, users.first_name, users.last_name, users.student_no, users.title
+                              FROM users
+                              JOIN user_enrols on users.id=user_enrols.user_id
+                              WHERE user_enrols.course_id=".$course_id." AND users.role = 'S' AND users.id NOT IN 
+                              (SELECT user_id FROM `groups` LEFT JOIN groups_members as gs ON groups.id = gs.group_id WHERE groups.course_id = ".$course_id.") 
+                              ORDER BY users.last_name ASC");
+    }else{
+      return $this->groupDifference($group_id,$course_id);
+    }
+  }
 }
 
 ?>

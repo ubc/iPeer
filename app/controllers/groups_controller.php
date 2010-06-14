@@ -135,6 +135,7 @@ class GroupsController extends AppController
 
 		// gets all students in the group
 		$this->set('group_data', $this->Group->groupStudents($id));
+    $this->set('group_id', $id);
 
 		if (empty($this->params['data']))
 		{
@@ -315,6 +316,16 @@ $user = $this->User->find('username = '.$data['Group']['username']);
 			$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
 		}
 	}
+
+  function getFilteredStudent()
+  {
+      $this->layout = 'ajax';
+      $this->set('course_id', $this->rdAuth->courseId);
+      $group_id = $this->params['form']['group_id'];
+      $filter = 'filter' == $this->params['form']['filter'];
+      $this->set('students', $this->Group->getFilteredStudents($group_id, $filter));
+      $this->render('filteredStudents');
+  }
 }
 
 ?>

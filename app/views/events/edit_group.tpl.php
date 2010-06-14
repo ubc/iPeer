@@ -1,7 +1,7 @@
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td><?php echo $javascript->link('groups')?>
-    <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Group']['id'])?'add':'edit') ?>">
+    <form name="frm" id="frm" method="POST" action="<?php echo $html->url('editGroup/'.$group_id.'/'.$event_id) ?>">
      <?php echo empty($params['data']['Group']['id']) ? null : $html->hidden('Group/id'); ?>
      <?php echo empty($params['data']['Group']['id']) ? $html->hidden('Group/creator_id', array('value'=>$rdAuth->id)) : $html->hidden('Group/updater_id', array('value'=>$rdAuth->id)); ?>
 	  <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
@@ -39,11 +39,9 @@
     <td width="124" align="center">
       <input type="button" style="width:150px;" onClick="move(document.getElementById('filtered'),document.getElementById('group_members'))" value="Add Student(s) >>" />
       <br><br><br>
-
-      <input name="filter" type="checkbox" id="filter" value="filter"><label for="filter">- Show Unassigned Students Only</label><br><br><br>
-      <?php echo $ajax->observeField('filter', array('with' => '{filter:$F(filter),group_id:$F(GroupId)}', 'update'=>'filtered', 'url'=>"/groups/getFilteredStudent", 'frequency'=>1,'loading'=>"Element.show('loading');",'complete'=>"Element.hide('loading');stripe();")) ?>
-
-    <input type="button" style="width:150px;" onClick="move(document.getElementById('group_members'),document.getElementById('filtered'))" value="<< Remove Student(s)" /></td>
+      <input name="filter" type="checkbox" id="filter" value="filter">
+- Show Unassigned Students Only <br><br><br>
+      <input type="button" style="width:150px;" onClick="move(document.getElementById('group_members'),document.getElementById('filtered'))" value="<< Remove Student(s)" /></td>
     <td width="251" align="center">Group List<br><br>
       <select name="group_members" multiple id="group_members" style="width:90%; height:200px;">
 	  	<?php if (isset($group_data)) foreach($group_data as $row): $user = $row['users'];?>
