@@ -167,6 +167,11 @@ else { // if no members are present
 	<?php
 $i = 0;
 foreach($evalResult[$user['id']] AS $row ) {
+    // We need to skip self-evaluation results properl:
+    if (($groupMembers[$i]['User']['id']==$user['id']) && (!$event['Event']['self_eval'])) {
+        $i++;
+    }
+
     $evaluatee = $groupMembers[$i++]['User'];
     $evalMark = isset($row['EvaluationSimple'])? $row['EvaluationSimple']: null;
     echo '<tr class="tablecell2">';
