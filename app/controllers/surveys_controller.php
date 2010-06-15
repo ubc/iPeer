@@ -119,7 +119,9 @@ class SurveysController extends AppController
 				}
 			}
 		}
-    $this->set('data',$this->Survey->read($survey_id));
+
+		$survey = $this->Survey->findById($survey_id);
+        $this->set('data',$survey);
 		$this->set('questions', $result);
 		$this->render('questionssummary');
 	}

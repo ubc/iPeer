@@ -12,9 +12,9 @@
           <tr class="tablecell2">
             <td>
 			<?php
-      global $data;
 			if( !empty($questions)):
 			$count =0;
+
 			foreach ($questions as $row): $question = $row['Question'];
 			 $count++;
 				echo '<br><table align="center" width="95%" border="0" cellspacing="0" cellpadding="5">
