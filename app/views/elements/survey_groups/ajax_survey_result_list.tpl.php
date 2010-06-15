@@ -3,17 +3,19 @@
 <?php $pagination->loadingId = 'loading';?>
 <?php if($pagination->set($paging)):?>
 <?php endif;?>
-<?php 
-if (isset($pagination->params['pass']['0'])) {
-  $count=0;
-  foreach ($data as $piece) {
-    if ($pagination->params['pass']['0'] == $data[$count]['eventId']) {
-      $data[0] = $data[$count];
-      continue;
+<?php
+    if (isset($pagination->params['pass']['0'])) {
+    $count=0;
+    if (isset($data[$count]['eventId'])) {
+        foreach ($data as $piece) {
+            if ($pagination->params['pass']['0'] == $data[$count]['eventId']) {
+            $data[0] = $data[$count];
+            continue;
+            }
+            $count++;
+            }
+        }
     }
-    $count++;
-    }
-}
 ?>
 	<table width="95%"  border="0" cellspacing="2" cellpadding="4">
       <tr>
