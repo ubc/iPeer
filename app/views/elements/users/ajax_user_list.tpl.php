@@ -45,7 +45,7 @@
 	    </td>
 		  <td>
 	      <?php if ($user['role']=='A') {
-	              echo 'Administartor';
+	              echo 'Administrator';
 	            } else if ($user['role']=='I') {
 	              echo 'Instructor';
 	            } else if ($user['role']=='S') {
