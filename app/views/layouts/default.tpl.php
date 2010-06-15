@@ -241,8 +241,12 @@ function checkEmailAddress()
         <a href="javascript:toggleDivision('actions-data');">(details)</a></td>
     <td>Params: <?php echo empty($params) ? 0 : count($params); ?>
         <a href="javascript:toggleDivision('params-data');">(details)</a></td>
-    <td> <a style="color:blue" href="javascript:void" onmouseover="toggleDivision('allowedBy-data');">Allowed By&hellip;</a></td>
-    </tr></table>
+    <td>SQL Log
+        <a href="javascript:toggleDivision('SQL-data');">(details)</a></td>
+    <td> <a style="color:blue" href="javascript:toggleDivision('allowedBy-data')">Allowed By&hellip;</a></td>
+    </tr>
+
+</table>
 
     <!-- The actual debugging data -->
     <div style="display: none" id="svn-data">
@@ -265,6 +269,11 @@ function checkEmailAddress()
     <div style="display: none; width: 95%; text-align: right;" id="allowedBy-data">
         <?php echo !empty($allowedBy)? $allowedBy : "No AllowedBy data was set"; ?></div>
 
+    <div style="display: none; width: 95%; background-color: #FFE9FF;" id="SQL-data">
+        <?php
+            $dataSource = ConnectionManager::getDataSource('default');
+            echo !empty($dataSource) ? $dataSource->showLog() : "No SQL data";
+        ?></div>
 
 <?php } // end if(!constant('DEBUG') == 0) ?>
 </body>
