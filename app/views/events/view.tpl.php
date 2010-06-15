@@ -121,7 +121,7 @@ if ($event['Event']['id']==292) {
   <tr>
     <td width="45%"><table width="403" border="0" cellspacing="0" cellpadding="4">
       <tr>
-        <td colspan="2"><?php echo $html->linkTo('Edit this Event', '/events/edit/'.$event['Event']['id'].';'.$rdAuth->courseId); ?> | <?php echo $html->linkTo('Back to Event Listing', '/events/index/'.$rdAuth->courseId); ?></td>
+        <td colspan="2"><?php echo $html->linkTo('Edit this Event', '/events/edit/'.$event['Event']['id']); ?> | <?php echo $html->linkTo('Back to Event Listing', '/events/index/'.$rdAuth->courseId); ?></td>
       </tr></table>
     </td>
     <td align="right" width="55%"></td>
