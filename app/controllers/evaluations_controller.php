@@ -380,66 +380,64 @@ exit;
     return $status;
   }
 
-  function makeSurveyEvaluation ($param = null) {
-      $this->autoRender = false;
-//print_r($this->params);
-      $tok = strtok($param, ';');
-    $eventId = $tok;
+    function makeSurveyEvaluation ($param = null) {
+        $this->autoRender = false;
+        //print_r($this->params);
+        $tok = strtok($param, ';');
+        $eventId = $tok;
 
         if (empty($this->params['data'])) {
-      //Get the target event
-          $eventId = $this->Sanitize->paranoid($eventId);
-        $this->Event->setId($eventId);
-          $event = $this->Event->read();
+            //Get the target event
+            $eventId = $this->Sanitize->paranoid($eventId);
+            $this->Event->setId($eventId);
+            $event = $this->Event->read();
 
-          //Setup the courseId to session
-        $this->rdAuth->setCourseId($event['Event']['course_id']);
-        $courseId = $event['Event']['course_id'];
-          $this->pageTitle = $this->sysContainer->getCourseName($courseId, 'S').' > Survey';
+            //Setup the courseId to session
+            $this->rdAuth->setCourseId($event['Event']['course_id']);
+            $courseId = $event['Event']['course_id'];
+            $this->pageTitle = $this->sysContainer->getCourseName($courseId, 'S').' > Survey';
 
-          $survey_id = $this->Survey->getSurveyIdByCourseIdTitle($courseId, $event['Event']['title']);
-        $this->set('survey_id', $survey_id);
+            $survey_id = $this->Survey->getSurveyIdByCourseIdTitle($courseId, $event['Event']['title']);
+            $this->set('survey_id', $survey_id);
 
-          // Get all required data from each table for every question
-          $tmp = $this->SurveyQuestion->getQuestionsID($survey_id);
-          $tmp = $this->Question->fillQuestion($tmp);
-          $tmp = $this->Response->fillResponse($tmp);
-          $result = null;
+            // Get all required data from each table for every question
+            $tmp = $this->SurveyQuestion->getQuestionsID($survey_id);
+            $tmp = $this->Question->fillQuestion($tmp);
+            $tmp = $this->Response->fillResponse($tmp);
+            $result = null;
 
-          // Sort the resultant array by question number
-          $count = 1;
-          for( $i=0; $i<=$tmp['count']; $i++ ){
-              for( $j=0; $j<$tmp['count']; $j++ ){
-                  if( $i == $tmp[$j]['Question']['number'] ){
-                      $result[$count]['Question'] = $tmp[$j]['Question'];
-                      $count++;
-                  }
-              }
-          }
-
-          $this->set('questions', $result);
-      $this->set('event', $event);
-          $this->render('survey_eval_form');
-        } else {
-          $courseId = $this->params['form']['course_id'];
-
-          if (!$this->validSurveyEvalComplete($this->params))
-      {
-        $this->redirect('/evaluations/makeSurveyEvaluation/'.$eventId);
-      }
-
-          if ($this->EvaluationSurveyHelper->saveSurveyEvaluation($this->params)) {
-              $this->redirect('/home/index/Your survey is submitted successfully.');
+            // Sort the resultant array by question number
+            $count = 1;
+            for( $i=0; $i<=$tmp['count']; $i++ ){
+                for( $j=0; $j<$tmp['count']; $j++ ){
+                    if( $i == $tmp[$j]['Question']['number'] ){
+                        $result[$count]['Question'] = $tmp[$j]['Question'];
+                        $count++;
+                    }
+                }
             }
-      //Found error
-      else {
-        //Validate the error why the Event->save() method returned false
-        $this->validateErrors($this->Event);
-        $this->set('errmsg', 'Save Evaluation failure.');
-        $this->redirect('/evaluations/makeSurveyEvaluation/'.$eventId);
-      }//end if
+
+            $this->set('questions', $result);
+            $this->set('event', $event);
+            $this->render('survey_eval_form');
+        } else {
+            $courseId = $this->params['form']['course_id'];
+
+            if (!$this->validSurveyEvalComplete($this->params))  {
+                $this->set('errmsg', 'validSurveyEvalCompleten failure.');
+                //$this->redirect('/evaluations/makeSurveyEvaluation/'.$eventId);
+            }
+
+            if ($this->EvaluationSurveyHelper->saveSurveyEvaluation($this->params)) {
+                $this->redirect('/home/index/Your survey is submitted successfully.');
+            } else {
+                echo "<h1>Hello!</h1>";
+                //Validate the error why the Event->save() method returned false
+                // $this->validateErrors($this->Event);
+                //this->redirect('/evaluations/makeSurveyEvaluation/'.$eventId);
+            }//end if
         }
-  }
+    }
 
   function validSurveyEvalComplete($param = null) {
     return true;
