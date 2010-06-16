@@ -1,7 +1,7 @@
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td><?php echo $javascript->link('groups')?>
-    <form name="frm" id="frm" method="POST" action="<?php echo $html->url('editGroup/'.$group_id.'/'.$event_id) ?>">
+    <form name="frm" id="frm" method="POST" action="<?php echo $html->url('editGroup/'.$group_id.'/'.$event_id . '/'. $popup) ?>">
      <?php echo empty($params['data']['Group']['id']) ? null : $html->hidden('Group/id'); ?>
      <?php echo empty($params['data']['Group']['id']) ? $html->hidden('Group/creator_id', array('value'=>$rdAuth->id)) : $html->hidden('Group/updater_id', array('value'=>$rdAuth->id)); ?>
 	  <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">

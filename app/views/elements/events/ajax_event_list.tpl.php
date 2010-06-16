@@ -43,7 +43,7 @@
   	    </td>
   	    <td>
   	    <a title="View Groups" href="<?php echo $this->webroot.$this->themeWeb;?>events/viewGroups/<?php echo $event['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;">&nbsp;View Groups</a> &nbsp;
-
+		
   	    </td>
   	  </tr>
   	  <?php $i++;?>

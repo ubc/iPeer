@@ -612,17 +612,20 @@ class EventsController extends AppController
     $this->set('assignedGroups', $this->getAssignedGroups($eventId));
 	}
 
-  function editGroup($groupId, $eventId)
+  function editGroup($groupId, $eventId, $popup)
   {
-    $this->layout = 'pop_up';
-    $courseId = $this->rdAuth->courseId;
+		if(isset($popup) && $popup == 'y')
+			$this->layout = 'pop_up';
+  	
+	    $courseId = $this->rdAuth->courseId;
 
 	  //Clear $id to only the alphanumeric value
 		$id = $this->Sanitize->paranoid($groupId);
  		$event_id = $this->Sanitize->paranoid($eventId);
  		$this->set('event_id', $event_id);
-    $this->set('group_id', $id);
-
+    	$this->set('group_id', $id);
+   		$this->set('popup', $popup);
+    	
 		// gets all students not listed in the group for unfiltered box
 		$this->set('user_data', $this->Group->groupDifference($id,$courseId));
 
@@ -641,8 +644,11 @@ class EventsController extends AppController
 			if ( $this->Group->save($this->params['data']))
 			{
 				$this->GroupsMembers->updateMembers($this->Group->id, $this->params['data']['Group']);
-
-				$this->flash('Group Updated', '/events/viewGroups/'.$event_id, 2);
+				
+				if(isset($popup) && $popup == 'y')
+					$this->flash('Group Updated', '/events/viewGroups/'.$event_id, 1);
+				else
+					$this->flash('Group Updated', '/events/view/'.$event_id, 1);		
 			}
 			else
 			{
@@ -678,5 +684,4 @@ class EventsController extends AppController
   		$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
 	}
 }
-
 ?>
