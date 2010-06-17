@@ -137,6 +137,8 @@ class UsersController extends AppController
             $this->rdAuth->privilegeError();
         }
 
+        $this->set('user_type', $userType);
+
         // We should be of equal or higher privileges to be able to create this user
         if ($this->rdAuth->getPrivilegeLevel() >= $this->rdAuth->getPrivilegeLevel($userType)) {
 

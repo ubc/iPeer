@@ -59,7 +59,7 @@
             <td width="437">
                 <input type="text" name="newuser" id="newuser" class="validate required USERNAME_FORMAT newuser_msg Invalid_Username_Format." size="50">
                 <?php echo $isStudent ? "" : "<u>Remember:</u> Usernames must be at least 6 characters long and contain only:<li>letters, digits, _ (underscore) or @ (at symbol) or . (period) </li"; ?>
-                <?php echo $ajax->observeField('newuser', array('update'=>'usernameErr', 'url'=>"checkDuplicateName", 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');stripe();")); ?>
+                <?php echo $ajax->observeField('newuser', array('update'=>'usernameErr', 'url'=>"checkDuplicateName/".$user_type, 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');stripe();")); ?>
             <div id='usernameErr' class="error">
                 <?php echo $this->renderElement('users/ajax_username_validate', array('controller'=>'users', 'data'=>null)); ?>
             </div></td>
