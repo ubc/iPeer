@@ -122,24 +122,13 @@
   </tr>
   <tr class="tablecell2">
     <td>Groups Assignment:&nbsp;</td>
-    <td><table><tr align="center">
-					<td width="260" align="center">Group List<br>
-						<br>
-					<select name="filtered" id="filtered" style="width:200px; height:200px;" multiple>
-							<?php foreach($unassignedGroups as $row): $group = $row['Group'];?>
-					<option value="<?php echo $group['id'] ?>"><?php echo 'Group '.$group['group_num'].' - '.$group['group_name'] ?></option>
-						<?php endforeach; ?>
-						</select>
-					</td>
-					<td width="80" align="center">
-						<input type="button" style="width:80px;" onClick="move(document.getElementById('filtered'),document.getElementById('group_members'))" value="Assign >>" />
-						<br><br>
-						<input type="button" style="width:80px;" onClick="move(document.getElementById('group_members'),document.getElementById('filtered'))" value="<< Remove " /></td>
-					<td width="260" align="center">Assigned Groups<br><br>
-						<select name="group_members" multiple id="group_members" style="width:200px; height:200px;">
-					</select></td>
-				</tr></table>
-		</td>
+    <td>
+    <?php echo $this->renderElement("groups/group_list_chooser",
+            array('all' => $unassignedGroups,
+            'allName' =>  'Avaliable Groups', 'selectedName' => 'Participating Groups',
+            'itemName' => 'Group', 'listStrings' => array("Group #", "group_num"," - ","group_name")));
+        ?>
+    </td>
     <td>&nbsp;</td>
   </tr>
   <tr class="tablecell2">

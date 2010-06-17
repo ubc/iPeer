@@ -210,7 +210,7 @@ class EventsController extends AppController
 			$this->params['data']['Event']['course_id'] = $courseId;
 			$this->params = $this->Event->prepData($this->params);
 			//print_r($this->params['data']);
-      
+
       // uniqueness check for title
       if(!$this->Event->__checkDuplicateTitle($this->params['data']['Event']['title']))
       {
@@ -397,10 +397,10 @@ class EventsController extends AppController
 			$this->Output->br2nl($this->params['data']);
 
 			//$assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($id);
-			// No need to use getGroupIDsByEventId method, can call Cake's findAllBy... directly 
+			// No need to use getGroupIDsByEventId method, can call Cake's findAllBy... directly
                         //$assignedGroupIDs =    $this->GroupEvent->findAllByEvent_id($id);
                      $assignedGroupIDs =    $this->GroupEvent->findAll("event_id=$id",null,null,null,1,FALSE);
-			//$assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($id);  
+			//$assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($id);
 //$a=print_r($assignedGroupIDs,true);
 //print "<pre>($a)</pre>";
 
@@ -616,7 +616,7 @@ class EventsController extends AppController
   {
 		if(isset($popup) && $popup == 'y')
 			$this->layout = 'pop_up';
-  	
+
 	    $courseId = $this->rdAuth->courseId;
 
 	  //Clear $id to only the alphanumeric value
@@ -625,7 +625,7 @@ class EventsController extends AppController
  		$this->set('event_id', $event_id);
     	$this->set('group_id', $id);
    		$this->set('popup', $popup);
-    	
+
 		// gets all students not listed in the group for unfiltered box
 		$this->set('user_data', $this->Group->groupDifference($id,$courseId));
 
@@ -644,11 +644,11 @@ class EventsController extends AppController
 			if ( $this->Group->save($this->params['data']))
 			{
 				$this->GroupsMembers->updateMembers($this->Group->id, $this->params['data']['Group']);
-				
+
 				if(isset($popup) && $popup == 'y')
 					$this->flash('Group Updated', '/events/viewGroups/'.$event_id, 1);
 				else
-					$this->flash('Group Updated', '/events/view/'.$event_id, 1);		
+					$this->flash('Group Updated', '/events/view/'.$event_id, 1);
 			}
 			else
 			{
@@ -678,7 +678,7 @@ class EventsController extends AppController
     return $assignedGroups;
 	}
 
-	function update($attributeCode='',$attributeValue='') 
+	function update($attributeCode='',$attributeValue='')
   {
 		if ($attributeCode != '' && $attributeValue != '') //check for empty params
   		$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);

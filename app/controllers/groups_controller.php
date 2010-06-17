@@ -50,7 +50,7 @@ class GroupsController extends AppController
 		parent::__construct();
 	}
 
-  function index($msg='') {	
+  function index($msg='') {
     $courseId = $this->rdAuth->courseId;
    	$this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Groups';
 
@@ -70,7 +70,7 @@ class GroupsController extends AppController
   	}
 
 		$data = $this->Group->findAllByCourseId($courseId, null, $this->order, $this->show, $this->page);//, null, null);//$joinTable);
-		
+
 		$paging['style'] = 'ajax';
 		$paging['link'] = '/groups/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
 
@@ -201,14 +201,14 @@ class GroupsController extends AppController
 		$fields = $queryAttributes['fields'];
 		$condition = $queryAttributes['condition'];
 		$joinTable = $queryAttributes['joinTable'];
-    
+
     if (isset($this->params['form']['livesearch2']) && '' != $this->params['form']['livesearch2'] && !empty($this->params['form']['select']))
     {
       $pagination->loadingId = 'loading';
       //parse the parameters
       $searchField='Group.'.$this->params['form']['select'];
       $searchValue=$this->params['form']['livesearch2'];
-      
+
       if (!empty($condition))
       {
         $condition .= " AND ";
@@ -230,11 +230,11 @@ class GroupsController extends AppController
   }
 
   function getQueryAttribute($courseId = null)
-  {	
+  {
     $attributes = array('fields'=>'', 'condition'=>'', 'joinTable'=>array());
     $attributes['fields'] = 'Group.id, Group.group_num, Group.group_name, Group.course_id, Group.created, Group.creator_id, Group.modified, Group.updater_id';
     $joinTable = array();//array('INNER JOIN groups_members AS GroupsMembers ON Group.id = GroupsMembers.group_id');
-	 
+
     if (!empty($courseId)) {
       $attributes['condition'] .= ' Group.course_id = '.$courseId;
   	}
@@ -317,15 +317,23 @@ $user = $this->User->find('username = '.$data['Group']['username']);
 		}
 	}
 
-  function getFilteredStudent()
-  {
-      $this->layout = 'ajax';
-      $this->set('course_id', $this->rdAuth->courseId);
-      $group_id = $this->params['form']['group_id'];
-      $filter = 'filter' == $this->params['form']['filter'];
-      $this->set('students', $this->Group->getFilteredStudents($group_id, $filter));
-      $this->render('filteredStudents');
-  }
+    function getFilteredStudent()
+    {
+        $this->layout = 'ajax';
+        $this->set('course_id', $this->rdAuth->courseId);
+        $group_id = $this->params['form']['group_id'];
+        $filter = 'filter' == $this->params['form']['filter'];
+        $this->set('students', $this->Group->getFilteredStudents($group_id, $filter));
+        $this->render('filteredStudents');
+    }
+
+    function sendGroupEmail ($courseId) {
+        if (is_numeric($courseId)) {
+
+        } else {
+
+        }
+    }
 }
 
 ?>
