@@ -6,10 +6,10 @@
 	<table width="95%"  border="0" cellspacing="2" cellpadding="4">
       <tr>
         <td align="left">
-          <?php if (!empty($data)) { //TODO: fill href with mailto list ?>
+<!--          <?php if (!empty($data)): //TODO: fill href with mailto list ?>
 		      <a href="#"><?php echo $html->image('icons/email.gif',array('border'=>'0','alt'=>'View'))?></a>
           Email To All Listed Users
-        <?php }?>
+        <?php endif;?>-->
         </td>
         <td align="right">
           <?php echo $pagination->show('Show ',null,'user_table')?>
