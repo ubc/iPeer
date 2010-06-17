@@ -101,8 +101,26 @@ class rdAuthComponent extends AppController // This component is in fact a
         return $this->getPrivilegeLevel('s');
     }
 
-    function privilegeError() {
-        $this->redirect('home/index');
+    function noStudentsAllowed() {
+        // Make sure the present user is not a student
+        if ($this->getPrivilegeLevel() <= $this->studentPrivilegeLevel()) {
+            $this->privilegeError("rdAuth->noStudentsAllowed() caught a student user.");
+        }
+    }
+
+    /**
+     * Display a simple message the access was denied, with the option to go back.
+     */
+    function privilegeError($message = "") {
+        echo "<html><head><title>iPeer: Access Denied</title></head><body>";
+        echo "<center><div style='width:50%; padding: 20px;border: 1px solid #000; background-color:#FFFFE0'>";
+        echo "<h1>iPeer</h1>";
+        echo "<h2>Access Denied</h2>";
+        echo "<h4>( to: <tt><script language='javascript' type='text/javascript'>document.write (document.location.href);</script> )</tt></h4>";
+        echo "<h5>" . (!empty($message) ? "reason: $message" : "") . "</h5>";
+        echo "<input type='button' value='Click here to go back' onClick='history.back()'>";
+        echo "</div>";
+        echo "</center></body></html>";
         exit;
     }
 

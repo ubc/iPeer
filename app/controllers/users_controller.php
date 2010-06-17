@@ -55,11 +55,8 @@ class UsersController extends AppController
 
 
 	function index() {
-
-        // Make sure this is not a student
-        if ($this->rdAuth->getPrivilegeLevel() <= $this->rdAuth->studentPrivilegeLevel()) {
-           $this->rdAuth->privilegeError();
-        }
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
 
 		if (!empty($this->rdAuth->courseId))
 		{
@@ -108,9 +105,7 @@ class UsersController extends AppController
 
 	function view($id) {
         // Make sure the present user is not a student
-        if ($this->rdAuth->getPrivilegeLevel() <= $this->rdAuth->studentPrivilegeLevel()) {
-           $this->rdAuth->privilegeError();
-        }
+        $this->rdAuth->noStudentsAllowed();
 
         if (!is_numeric($id)) {
             $this->rdAuth->privilegeError();
@@ -126,11 +121,8 @@ class UsersController extends AppController
 	}
 
 	function add($userType='') {
-
         // Make sure the present user is not a student
-        if ($this->rdAuth->getPrivilegeLevel() <= $this->rdAuth->studentPrivilegeLevel()) {
-            $this->rdAuth->privilegeError();
-        }
+        $this->rdAuth->noStudentsAllowed();
 
         //check and set user type
         if (!empty($this->params['data'])) {
@@ -214,9 +206,7 @@ class UsersController extends AppController
 	function edit($id=null)
 	{
         // Make sure the present user is not a student
-        if ($this->rdAuth->getPrivilegeLevel() <= $this->rdAuth->studentPrivilegeLevel()) {
-            $this->rdAuth->privilegeError();
-        }
+        $this->rdAuth->noStudentsAllowed();
 
         // If a form was submitted, user that id instead
         if (!empty($this->params['data'])) {
@@ -321,10 +311,7 @@ class UsersController extends AppController
 	function delete($id = null)
 	{
         // Make sure the present user is not a student
-        if ($this->rdAuth->getPrivilegeLevel() < $this->rdAuth->studentPrivilegeLevel()) {
-            $this->rdAuth->privilegeError();
-        }
-
+        $this->rdAuth->noStudentsAllowed();
         // Ensure that the id is valid
         if (is_numeric($id)) {
 
@@ -360,10 +347,7 @@ class UsersController extends AppController
 	function search()
 	{
         // Make sure the present user is not a student
-        if ($this->rdAuth->getPrivilegeLevel() <= $this->rdAuth->studentPrivilegeLevel()) {
-            $this->rdAuth->privilegeError();
-        }
-
+        $this->rdAuth->noStudentsAllowed();
 
 		$this->layout = 'ajax';
 		if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
@@ -416,9 +400,7 @@ class UsersController extends AppController
 	function resetPassword($userId='', $render=true)
 	{
         // Make sure the present user is not a student
-        if ($this->rdAuth->getPrivilegeLevel() <= $this->rdAuth->studentPrivilegeLevel()) {
-            $this->rdAuth->privilegeError();
-        }
+        $this->rdAuth->noStudentsAllowed();
 
 		//General password
 		$this->params['data']['User']['password'] =  $this->NeatString->randomPassword(6);
@@ -482,9 +464,7 @@ class UsersController extends AppController
 
 	function import() {
         // Make sure the present user is not a student
-        if ($this->rdAuth->getPrivilegeLevel() <= $this->rdAuth->studentPrivilegeLevel()) {
-            $this->rdAuth->privilegeError();
-        }
+        $this->rdAuth->noStudentsAllowed();
 
 		$this->autoRender = false;
 		$this->rdAuth->courseId = $this->params['form']['course_id'];
@@ -527,9 +507,7 @@ class UsersController extends AppController
 	function addUserByImport($data=null, $lines=null)
 	{
         // Make sure the present user is not a student
-        if ($this->rdAuth->getPrivilegeLevel() <= $this->rdAuth->studentPrivilegeLevel()) {
-            $this->rdAuth->privilegeError();
-        }
+        $this->rdAuth->noStudentsAllowed();
 
 		$result = array();
 		$createdPos = $failedPos = 0;
@@ -635,9 +613,7 @@ class UsersController extends AppController
 
 	function sendEmail($to='', $from='', $subject='', $body='' ) {
         // Make sure the present user is not a student
-        if ($this->rdAuth->getPrivilegeLevel() <= $this->rdAuth->studentPrivilegeLevel()) {
-            $this->rdAuth->privilegeError();
-        }
+        $this->rdAuth->noStudentsAllowed();
 
 
 		// check if the user is an admin - reject otherwise
@@ -681,9 +657,7 @@ class UsersController extends AppController
 	function adddelcourse($user_id='')
 	{
         // Make sure the present user is not a student
-        if ($this->rdAuth->getPrivilegeLevel() <= $this->rdAuth->studentPrivilegeLevel()) {
-            $this->rdAuth->privilegeError();
-        }
+        $this->rdAuth->noStudentsAllowed();
 
 		$this->set('user_id', $user_id);
 		$this->layout = 'ajax';

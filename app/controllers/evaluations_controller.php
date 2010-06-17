@@ -54,210 +54,195 @@ class EvaluationsController extends AppController
     }
 
 
-  /**
-   * Enter description here...
-   *
-   * @return
-   */
-  function index ()
-  {
-      if ($this->rdAuth->role == 'S') {
-        $this->redirect('home/index');
-        exit();
-      }
-    $courseId = $this->rdAuth->courseId;
+    function index ()
+    {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+
+        $courseId = $this->rdAuth->courseId;
         $this->pageTitle = $this->sysContainer->getCourseName($courseId).' > List Evaluation Results';
 
         $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-    $this->userPersonalize->setPersonalizeList($personalizeData);
-      if ($personalizeData && $this->userPersonalize->inPersonalizeList('Eval.ListMenu.Limit.Show') && $this->userPersonalize->getPersonalizeValue('Eval.ListMenu.Limit.Show') != 'null') {
-       $this->show = $this->userPersonalize->getPersonalizeValue('Eval.ListMenu.Limit.Show');
-       $this->set('userPersonalize', $this->userPersonalize);
-      } else {
-        $this->show = '10';
-      $this->update($attributeCode = 'Eval.ListMenu.Limit.Show',$attributeValue = $this->show);
-      }
-
-    $conditions = 'course_id = '.$courseId.' AND event_template_type_id <> 3';
-      $data = $this->Event->findAll($conditions, '*, (NOW() >= release_date_begin AND NOW() <= release_date_end) AS is_released',$this->order, $this->show, $this->page);
-
-      $paging['style'] = 'ajax';
-      $paging['link'] = '/evaluations/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
-
-      $paging['count'] = count($data);
-      $paging['show'] = array('10','25','50','all');
-      $paging['page'] = $this->page;
-      $paging['limit'] = $this->show;
-      $paging['direction'] = $this->direction;
-
-      $this->set('paging',$paging);
-      $this->set('data',$data);
-      $this->set('courseId', $courseId);
-  }
-
-  function search()
-  {
-      if ($this->rdAuth->role == 'S') {
-        $this->redirect('home/index');
-        exit();
-      }
-    $this->layout = 'ajax';
-    if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-        $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-        if ($personalizeData) {
-           $this->userPersonalize->setPersonalizeList($personalizeData);
-         $this->show = $this->userPersonalize->getPersonalizeValue('Eval.ListMenu.Limit.Show');
-         $this->set('userPersonalize', $this->userPersonalize);
+        $this->userPersonalize->setPersonalizeList($personalizeData);
+        if ($personalizeData && $this->userPersonalize->inPersonalizeList('Eval.ListMenu.Limit.Show') && $this->userPersonalize->getPersonalizeValue('Eval.ListMenu.Limit.Show') != 'null') {
+            $this->show = $this->userPersonalize->getPersonalizeValue('Eval.ListMenu.Limit.Show');
+            $this->set('userPersonalize', $this->userPersonalize);
+        } else {
+            $this->show = '10';
+            $this->update($attributeCode = 'Eval.ListMenu.Limit.Show',$attributeValue = $this->show);
         }
-        $this->show = '10';
+
+        $conditions = 'course_id = '.$courseId.' AND event_template_type_id <> 3';
+        $data = $this->Event->findAll($conditions, '*, (NOW() >= release_date_begin AND NOW() <= release_date_end) AS is_released',$this->order, $this->show, $this->page);
+
+        $paging['style'] = 'ajax';
+        $paging['link'] = '/evaluations/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
+
+        $paging['count'] = count($data);
+        $paging['show'] = array('10','25','50','all');
+        $paging['page'] = $this->page;
+        $paging['limit'] = $this->show;
+        $paging['direction'] = $this->direction;
+
+        $this->set('paging',$paging);
+        $this->set('data',$data);
+        $this->set('courseId', $courseId);
     }
 
-    $courseId = $this->rdAuth->courseId;
-    $conditions = 'course_id = '.$courseId;
-
-    if (!empty($this->params['form']['livesearch2']) && !empty($this->params['form']['select']))
+    function search()
     {
-      $pagination->loadingId = 'loading';
-      //parse the parameters
-      $searchField=$this->params['form']['select'];
-      $searchValue=$this->params['form']['livesearch2'];
-      $conditions = ' AND '.$searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
-    }
-    $this->update($attributeCode = 'Eval.ListMenu.Limit.Show',$attributeValue = $this->show);
-    $this->set('conditions',$conditions);
-  }
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
 
-  /**
-   * Enter description here...
-   *
-   * @return
-   */
-  function view ($id,$filter=null,$maxPercent=1) {
-      if ($this->rdAuth->role == 'S') {
-        $this->redirect('home/index');
-        exit();
-      }
-      //Clear $id to only the alphanumeric value
+        $this->layout = 'ajax';
+        if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
+            $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+            if ($personalizeData) {
+                $this->userPersonalize->setPersonalizeList($personalizeData);
+                $this->show = $this->userPersonalize->getPersonalizeValue('Eval.ListMenu.Limit.Show');
+                $this->set('userPersonalize', $this->userPersonalize);
+            }
+            $this->show = '10';
+        }
+
+        $courseId = $this->rdAuth->courseId;
+        $conditions = 'course_id = '.$courseId;
+
+        if (!empty($this->params['form']['livesearch2']) && !empty($this->params['form']['select'])) {
+            $pagination->loadingId = 'loading';
+            //parse the parameters
+            $searchField=$this->params['form']['select'];
+            $searchValue=$this->params['form']['livesearch2'];
+            $conditions = ' AND '.$searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
+        }
+        $this->update($attributeCode = 'Eval.ListMenu.Limit.Show',$attributeValue = $this->show);
+        $this->set('conditions',$conditions);
+    }
+
+    function view ($id,$filter=null,$maxPercent=1) {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+
+        //Clear $id to only the alphanumeric value
         $id = $this->Sanitize->paranoid($id);
         $this->Event->setId($id);
         $event = $this->Event->read();
         $eventId = $event['Event']['id'];
 
-    $courseId = $this->rdAuth->courseId;
-    if (!isset($courseId)) {
-       $courseId = $event['Event']['course_id'];
-      //Setup the courseId to session
-        $this->rdAuth->setCourseId($courseId);
-    }
-    //get personalize threshold
+        $courseId = $this->rdAuth->courseId;
+        if (!isset($courseId)) {
+            $courseId = $event['Event']['course_id'];
+            //Setup the courseId to session
+            $this->rdAuth->setCourseId($courseId);
+        }
+        //get personalize threshold
         $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-    $this->userPersonalize->setPersonalizeList($personalizeData);
-      if (!($personalizeData && $this->userPersonalize->inPersonalizeList('Eval.Threshold.Limit'))) {
-         $threshold = 100;
-       $this->update($attributeCode = 'Eval.Threshold.Limit',$attributeValue = $threshold);
-      } else {
-       $threshold = $this->userPersonalize->getPersonalizeValue('Eval.Threshold.Limit');
-       $this->set('maxPercent', $threshold);
-      }
+        $this->userPersonalize->setPersonalizeList($personalizeData);
+        if (!($personalizeData && $this->userPersonalize->inPersonalizeList('Eval.Threshold.Limit'))) {
+            $threshold = 100;
+            $this->update($attributeCode = 'Eval.Threshold.Limit',$attributeValue = $threshold);
+        } else {
+            $threshold = $this->userPersonalize->getPersonalizeValue('Eval.Threshold.Limit');
+            $this->set('maxPercent', $threshold);
+        }
         $this->pageTitle = $this->sysContainer->getCourseName($event['Event']['course_id']).' > '.$event['Event']['title'];
-    $evlResult = array();
-    $evlResult = $event;
-    $assignedGroupIDs = '';
-      switch ($filter) {
-        case 1: // not reviewed
-          $assignedGroupIDs = $this->GroupEvent->getNotReviewed($eventId);
-          break;
-        case 2: // late
-          $assignedGroupIDs = $this->GroupEvent->getLate($eventId);
-          break;
-        case 3: //low mark
-          $eventTypeId = $event['Event']['event_template_type_id'];
-          $assignedGroupIDs = $this->GroupEvent->getLowMark($eventId, $eventTypeId, $maxPercent);
-          break;
-        default: //no filter
-            $assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($eventId);
-          break;
-      }
+        $evlResult = array();
+        $evlResult = $event;
+        $assignedGroupIDs = '';
+        switch ($filter) {
+            case 1: // not reviewed
+                $assignedGroupIDs = $this->GroupEvent->getNotReviewed($eventId);
+                break;
+            case 2: // late
+                $assignedGroupIDs = $this->GroupEvent->getLate($eventId);
+                break;
+            case 3: //low mark
+                $eventTypeId = $event['Event']['event_template_type_id'];
+                $assignedGroupIDs = $this->GroupEvent->getLowMark($eventId, $eventTypeId, $maxPercent);
+                break;
+            default: //no filter
+                $assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($eventId);
+                break;
+        }
         if (!empty($assignedGroupIDs)) {
-          $assignedGroups = array();
+            $assignedGroups = array();
 
             // retrieve string of group ids
-          for ($i = 0; $i < count($assignedGroupIDs); $i++) {
-        $group = $this->Group->find('id = '.$assignedGroupIDs[$i]['GroupEvent']['group_id']);
-              //$students = $this->Group->groupStudents($assignedGroupIDs[$i]['GroupEvent']['group_id']);
-              $assignedGroups[$i] = $group;
-              //$assignedGroups[$i]['Group']['Students']=$students;
+            for ($i = 0; $i < count($assignedGroupIDs); $i++) {
+                $group = $this->Group->find('id = '.$assignedGroupIDs[$i]['GroupEvent']['group_id']);
+                //$students = $this->Group->groupStudents($assignedGroupIDs[$i]['GroupEvent']['group_id']);
+                $assignedGroups[$i] = $group;
+                //$assignedGroups[$i]['Group']['Students']=$students;
 
-              //Get Members whom completed evaluation
-            $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($group['Group']['id'], $assignedGroupIDs[$i]['GroupEvent']['id']);
-        //Check to see if all members are completed this evaluation
+                //Get Members whom completed evaluation
+                $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($group['Group']['id'], $assignedGroupIDs[$i]['GroupEvent']['id']);
+                //Check to see if all members are completed this evaluation
 
-           $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
-              //$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->findCount('group_id='.$group['Group']['id']) : $this->GroupsMembers->findCount('group_id='.$group['Group']['id']) - 1;
-              $numMembers=$this->GroupsMembers->findCount('group_id='.$group['Group']['id']);
-        ($numOfCompletedCount == $numMembers) ? $completeStatus = 1:$completeStatus = 0;
+                $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
+                //$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->findCount('group_id='.$group['Group']['id']) : $this->GroupsMembers->findCount('group_id='.$group['Group']['id']) - 1;
+                $numMembers=$this->GroupsMembers->findCount('group_id='.$group['Group']['id']);
+                ($numOfCompletedCount == $numMembers) ? $completeStatus = 1:$completeStatus = 0;
 
-        //Get release status
-        $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($event['Event']['id'], $group['Group']['id']);
-        $released = $this->EvaluationHelper->getGroupReleaseStatus($groupEvent);
+                //Get release status
+                $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($event['Event']['id'], $group['Group']['id']);
+                $released = $this->EvaluationHelper->getGroupReleaseStatus($groupEvent);
 
-        $assignedGroups[$i]['Group']['complete_status'] = $completeStatus;
-        $assignedGroups[$i]['Group']['num_completed'] = $numOfCompletedCount;
-        $assignedGroups[$i]['Group']['num_members'] = $numMembers;
-        $assignedGroups[$i]['Group']['marked'] = $assignedGroupIDs[$i]['GroupEvent']['marked'];
-        $assignedGroups[$i]['Group']['grade_release_status'] = $released['grade_release_status'];
-        $assignedGroups[$i]['Group']['comment_release_status'] = $released['comment_release_status'];
-          }
+                $assignedGroups[$i]['Group']['complete_status'] = $completeStatus;
+                $assignedGroups[$i]['Group']['num_completed'] = $numOfCompletedCount;
+                $assignedGroups[$i]['Group']['num_members'] = $numMembers;
+                $assignedGroups[$i]['Group']['marked'] = $assignedGroupIDs[$i]['GroupEvent']['marked'];
+                $assignedGroups[$i]['Group']['grade_release_status'] = $released['grade_release_status'];
+                $assignedGroups[$i]['Group']['comment_release_status'] = $released['comment_release_status'];
+            }
 
-          $evlResult['Evaluation']['assignedGroups'] = $assignedGroups;
-      }else {
-      $evlResult['Evaluation']['assignedGroups'] = array();
-      }
-      $paging['style'] = 'ajax';
-      $paging['link'] = '/evaluations/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
+            $evlResult['Evaluation']['assignedGroups'] = $assignedGroups;
+        } else {
+            $evlResult['Evaluation']['assignedGroups'] = array();
+        }
+        $paging['style'] = 'ajax';
+        $paging['link'] = '/evaluations/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
 
-      $paging['count'] = isset($assignedGroups) ? count($assignedGroups):0;
-      $paging['show'] = array('10','25','50','all');
-      $paging['page'] = $this->page;
-      $paging['limit'] = $this->show;
-      $paging['direction'] = $this->direction;
+        $paging['count'] = isset($assignedGroups) ? count($assignedGroups):0;
+        $paging['show'] = array('10','25','50','all');
+        $paging['page'] = $this->page;
+        $paging['limit'] = $this->show;
+        $paging['direction'] = $this->direction;
 
-      $this->set('id',$id);
-      $this->set('paging',$paging);
-    $this->set('data', $evlResult);
+        $this->set('id',$id);
+        $this->set('paging',$paging);
+        $this->set('data', $evlResult);
     }
 
     function viewsearch() {
-      if ($this->rdAuth->role == 'S') {
-        $this->redirect('home/index');
-        exit();
-      }
-      $this->layout = false;
-      $id = $this->params['form']['id'];
-    //if filter selected:
-    if ($this->params['form']['filter_select'] != -1) {
-      switch ($this->params['form']['filter_select']) {
-      //if not reviewed
-        case 'listUnreview':
-          $this->view($id,1);
-          break;
-      //if late
-        case 'late':
-          $this->view($id,2);
-          break;
-      //if low mark
-        case 'low':
-          $maxPercent = $this->params['form']['threshold'];
-          $this->update($attributeCode = 'Eval.Threshold.Limit',$attributeValue = $maxPercent);
-          $maxPercent /= 100.0;
-          $this->view($id,3,$maxPercent);
-          break;
-        default:
-          $this->view($id);
-          break;
-      }
-    } else
-      $this->view($id);
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+
+        $this->layout = false;
+        $id = $this->params['form']['id'];
+        //if filter selected:
+        if ($this->params['form']['filter_select'] != -1) {
+            switch ($this->params['form']['filter_select']) {
+                //if not reviewed
+                case 'listUnreview':
+                    $this->view($id,1);
+                    break;
+                    //if late
+                case 'late':
+                    $this->view($id,2);
+                    break;
+                //if low mark
+                case 'low':
+                    $maxPercent = $this->params['form']['threshold'];
+                    $this->update($attributeCode = 'Eval.Threshold.Limit',$attributeValue = $maxPercent);
+                    $maxPercent /= 100.0;
+                    $this->view($id,3,$maxPercent);
+                    break;
+                default:
+                    $this->view($id);
+                    break;
+            }
+        } else
+        $this->view($id);
     }
 
     function update($attributeCode='',$attributeValue='') {
@@ -268,109 +253,97 @@ class EvaluationsController extends AppController
 
 
     function export() {
-      if ($this->rdAuth->role == 'S') {
-        $this->redirect('home/index');
-        exit();
-      }
-/*
-echo $this->params['pass'][0];
-$a=print_r( $this->params,true);
-echo "<pre>$a</pre>";
-exit;
-*/
-    $courseId = $this->rdAuth->courseId;
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        $courseId = $this->rdAuth->courseId;
         $this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Export Evaluation Results';
-      //do stuff
-      if (isset($this->params['form'])) {
-        $this->autoRender = false;
-        $fileContent = $this->ExportHelper->createCSV($this->params);
-      $fileName = empty($this->params['form']['file_name']) ? $this->params['form']['file_name']:date('m.d.y');
+        //do stuff
+        if (isset($this->params['form'])) {
+            $this->autoRender = false;
+            $fileContent = $this->ExportHelper->createCSV($this->params);
+            $fileName = empty($this->params['form']['file_name']) ? $this->params['form']['file_name']:date('m.d.y');
 
-        header('Content-Type: application/csv');
-          header('Content-Disposition: attachment; filename=' . $fileName . '.csv');
-          echo $fileContent;
-      } else {
-        $this->set('file_name',date('m.d.y'));
-      }
+            header('Content-Type: application/csv');
+            header('Content-Disposition: attachment; filename=' . $fileName . '.csv');
+            echo $fileContent;
+        } else {
+            $this->set('file_name',date('m.d.y'));
+        }
     }
 
-    function makeSimpleEvaluation ($param = null)
-    {
-      $this->autoRender = false;
+    function makeSimpleEvaluation ($param = null) {
+        $this->autoRender = false;
 
-      $tok = strtok($param, ';');
-    $eventId = $tok;
-    $groupId = strtok(';');
+        $tok = strtok($param, ';');
+        $eventId = $tok;
+        $groupId = strtok(';');
 
         if (empty($this->params['data'])) {
-      //Get the target event
-          $eventId = $this->Sanitize->paranoid($eventId);
-      $event = $this->EvaluationHelper->formatEventObj($eventId, $groupId);
-          $this->set('event', $event);
+            //Get the target event
+            $eventId = $this->Sanitize->paranoid($eventId);
+            $event = $this->EvaluationHelper->formatEventObj($eventId, $groupId);
+            $this->set('event', $event);
 
-          //Setup the courseId to session
-        $this->rdAuth->setCourseId($event['Event']['course_id']);
-        $courseId = $event['Event']['course_id'];
-          $this->pageTitle = $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers';
+            //Setup the courseId to session
+            $this->rdAuth->setCourseId($event['Event']['course_id']);
+            $courseId = $event['Event']['course_id'];
+            $this->pageTitle = $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers';
 
-      //Get Members for this evaluation
-      $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'],
-                                                                 $this->rdAuth->id);
-          $this->set('groupMembers', $groupMembers);
+            //Get Members for this evaluation
+            $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'],
+                                                        $this->rdAuth->id);
+            $this->set('groupMembers', $groupMembers);
 
-          // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
-          $numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->findCount('group_id='.$event['group_id']) :
-                                                     $this->GroupsMembers->findCount('group_id='.$event['group_id']) - 1;
-          $simpleEvaluation = $this->SimpleEvaluation->find('id='.$event['Event']['template_id']);
-          $remaining = $simpleEvaluation['SimpleEvaluation']['point_per_member'] * $numMembers;
-//          if($in['points']) $out['points']=$in['points']; //saves previous points
-          $points_to_ratio = $numMembers==0 ? 0 : 1 / ($simpleEvaluation['SimpleEvaluation']['point_per_member'] * $numMembers);
-//          if($in['comments']) $out['comments']=$in['comments'];
+            // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
+            $numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->findCount('group_id='.$event['group_id']) :
+                                            $this->GroupsMembers->findCount('group_id='.$event['group_id']) - 1;
+            $simpleEvaluation = $this->SimpleEvaluation->find('id='.$event['Event']['template_id']);
+            $remaining = $simpleEvaluation['SimpleEvaluation']['point_per_member'] * $numMembers;
+            //          if($in['points']) $out['points']=$in['points']; //saves previous points
+            $points_to_ratio = $numMembers==0 ? 0 : 1 / ($simpleEvaluation['SimpleEvaluation']['point_per_member'] * $numMembers);
+            //          if($in['comments']) $out['comments']=$in['comments'];
 
-          $this->set('remaining', $remaining);
-          $this->set('evaluateeCount', $numMembers);
-          $this->set('courseId', $courseId);
-          $this->render('simple_eval_form');
-      }
-        else {
-      $eventId = $this->params['form']['event_id'];
-      $groupId = $this->params['form']['group_id'];
-      $courseId = $this->params['form']['course_id'];
-      $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
+            $this->set('remaining', $remaining);
+            $this->set('evaluateeCount', $numMembers);
+            $this->set('courseId', $courseId);
+            $this->render('simple_eval_form');
+        } else {
+            $eventId = $this->params['form']['event_id'];
+            $groupId = $this->params['form']['group_id'];
+            $courseId = $this->params['form']['course_id'];
+            $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
 
-      //Get the target event
-        $this->Event->setId($eventId);
-          $event = $this->Event->read();
+            //Get the target event
+            $this->Event->setId($eventId);
+            $event = $this->Event->read();
 
-          //Get simple evaluation tool
-          $this->SimpleEvaluation->setId($event['Event']['template_id']);
-          $seval = $this->SimpleEvaluation->read();
+            //Get simple evaluation tool
+            $this->SimpleEvaluation->setId($event['Event']['template_id']);
+            $seval = $this->SimpleEvaluation->read();
 
-      //Get the target group event
-          $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
+            //Get the target group event
+            $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
 
-      //Get the target event submission
-          $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'],
-                                                                                                      $evaluator);
-      $this->EvaluationSubmission->setId($evaluationSubmission['EvaluationSubmission']['id']);
+            //Get the target event submission
+            $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'],
+                                                                                            $evaluator);
+            $this->EvaluationSubmission->setId($evaluationSubmission['EvaluationSubmission']['id']);
 
-      if (!$this->validSimpleEvalComplete($this->params))
-      {
-        $this->redirect('/evaluations/makeSimpleEvaluation');
-      }
-
-          if ($this->EvaluationSimpleHelper->saveSimpleEvaluation($this->params, $groupEvent, $evaluationSubmission)) {
-              $this->redirect('/home/index/Your Evaluation is submitted successfully.');
+            if (!$this->validSimpleEvalComplete($this->params)) {
+                $this->redirect('/evaluations/makeSimpleEvaluation');
             }
-      //Found error
-      else {
-        //Validate the error why the Event->save() method returned false
-        $this->validateErrors($this->Event);
-        $this->set('errmsg', 'Save Evaluation failure.');
-        $this->redirect('/evaluations/makeSimpleEvaluation');
-      }//end if
-      }
-  }
+
+            if ($this->EvaluationSimpleHelper->saveSimpleEvaluation($this->params, $groupEvent, $evaluationSubmission)) {
+                $this->redirect('/home/index/Your Evaluation is submitted successfully.');
+            } else {
+                //Found error
+                //Validate the error why the Event->save() method returned false
+                $this->validateErrors($this->Event);
+                $this->set('errmsg', 'Save Evaluation failure.');
+                $this->redirect('/evaluations/makeSimpleEvaluation');
+            }//end if
+        }
+    }
 
 
   function validSimpleEvalComplete ($params=null)
@@ -439,92 +412,87 @@ exit;
         }
     }
 
-  function validSurveyEvalComplete($param = null) {
-    return true;
-  }
+    function validSurveyEvalComplete($param = null) {
+        return true;
+    }
 
-    function makeRubricEvaluation ($param = '')
-    {
-      $this->autoRender = false;
+    function makeRubricEvaluation ($param = '')  {
+        $this->autoRender = false;
 
         if (empty($this->params['data'])) {
-        $tok = strtok($param, ';');
-      $eventId = $tok;
-      $groupId = strtok(';');
-      //$msg = strtok(';');
-      $event = $this->EvaluationHelper->formatEventObj($eventId, $groupId);
-          $this->set('event', $event);
+            $tok = strtok($param, ';');
+            $eventId = $tok;
+            $groupId = strtok(';');
+            //$msg = strtok(';');
+            $event = $this->EvaluationHelper->formatEventObj($eventId, $groupId);
+            $this->set('event', $event);
 
-          //Setup the courseId to session
-        $this->rdAuth->setCourseId($event['Event']['course_id']);
-        $courseId = $event['Event']['course_id'];
-          $this->pageTitle = $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers';
+            //Setup the courseId to session
+            $this->rdAuth->setCourseId($event['Event']['course_id']);
+            $courseId = $event['Event']['course_id'];
+            $this->pageTitle = $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers';
 
-      $rubricDetail = $this->EvaluationRubricHelper->loadRubricEvaluationDetail($event);
-      $this->set('rubric', $rubricDetail['rubric']);
-      $this->set('groupMembers', $rubricDetail['groupMembers']);
-      $this->set('evaluateeCount', $rubricDetail['evaluateeCount']);
+            $rubricDetail = $this->EvaluationRubricHelper->loadRubricEvaluationDetail($event);
+            $this->set('rubric', $rubricDetail['rubric']);
+            $this->set('groupMembers', $rubricDetail['groupMembers']);
+            $this->set('evaluateeCount', $rubricDetail['evaluateeCount']);
 
-           $this->render('rubric_eval_form');
-      }
-        else {
-      $eventId = $this->params['form']['event_id'];
-      $groupId = $this->params['form']['group_id'];
-      $groupEventId = $this->params['form']['group_event_id'];
-      $courseId = $this->params['form']['course_id'];
-      $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
-      if (!$this->validRubricEvalComplete($this->params['form']))
-      {
-        $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
-      }
-          if ($this->EvaluationRubricHelper->saveRubricEvaluation($this->params)) {
-              $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
+            $this->render('rubric_eval_form');
+        }  else {
+            $eventId = $this->params['form']['event_id'];
+            $groupId = $this->params['form']['group_id'];
+            $groupEventId = $this->params['form']['group_event_id'];
+            $courseId = $this->params['form']['course_id'];
+            $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
+            if (!$this->validRubricEvalComplete($this->params['form'])) {
+                $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
             }
-      //Found error
-      else {
-        //Validate the error why the Event->save() method returned false
-        $this->validateErrors($this->Event);
-        $this->set('errmsg', 'Save Evaluation failure.');
-        $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
-      }//end if
-      }
-  }
+            if ($this->EvaluationRubricHelper->saveRubricEvaluation($this->params)) {
+                $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
+            }
+            //Found error
+            else {
+                //Validate the error why the Event->save() method returned false
+                $this->validateErrors($this->Event);
+                $this->set('errmsg', 'Save Evaluation failure.');
+                $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
+            }//end if
+        }
+    }
 
-  function validRubricEvalComplete ($form=null)
-  {
+    function validRubricEvalComplete ($form=null)
+    {
     $status = true;
     return $status;
-  }
+    }
 
-  function completeEvaluationRubric ()
-  {
-    $status = true;
+    function completeEvaluationRubric () {
+        $status = true;
 
-    $eventId = $this->params['form']['event_id'];
-    $groupId = $this->params['form']['group_id'];
-    $courseId = $this->params['form']['course_id'];
-    $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
-    $evaluateeCount = $this->params['form']['evaluateeCount'];
+        $eventId = $this->params['form']['event_id'];
+        $groupId = $this->params['form']['group_id'];
+        $courseId = $this->params['form']['course_id'];
+        $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
+        $evaluateeCount = $this->params['form']['evaluateeCount'];
 
-    $groupEventId = $this->params['form']['group_event_id'];
-    //Get the target group event
-      $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
-    $this->GroupEvent->id = $groupEvent['GroupEvent']['id'];
+        $groupEventId = $this->params['form']['group_event_id'];
+        //Get the target group event
+        $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
+        $this->GroupEvent->id = $groupEvent['GroupEvent']['id'];
 
         // if no submission exists, create one
-    //Get the target event submission
+        //Get the target event submission
         $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
-    $this->EvaluationSubmission->setId($evaluationSubmission['EvaluationSubmission']['id']);
+        $this->EvaluationSubmission->setId($evaluationSubmission['EvaluationSubmission']['id']);
 
-    $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
-    $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
-    $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
+        $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
+        $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
+        $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
         // save evaluation submission
-    $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
-    $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
-        if (!$this->EvaluationSubmission->save($evaluationSubmission))
-        {
-          $status = false;
+        $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
+        $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
+        if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
+            $status = false;
         }
 
         //checks if all members in the group have submitted
@@ -532,104 +500,97 @@ exit;
         //means that this group is ready to review
         $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupId, $groupEventId);
         $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
-    //Check to see if all members are completed this evaluation
+        //Check to see if all members are completed this evaluation
         if($numOfCompletedCount == $evaluateeCount ){
-          $groupEvent['GroupEvent']['marked'] = 'to review';
-          if (!$this->GroupEvent->save($groupEvent))
-          {
-            $status = false;
-          }
+            $groupEvent['GroupEvent']['marked'] = 'to review';
+            if (!$this->GroupEvent->save($groupEvent)) {
+                $status = false;
+            }
         }
 
-        if ($status)
-        {
-          $this->redirect('/home/index/Your Evaluation is submitted successfully.');
+        if ($status) {
+            $this->redirect('/home/index/Your Evaluation is submitted successfully.');
         } else {
-          $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
+            $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
         }
-  }
+    }
 
-    function makeMixevalEvaluation ($param = '')
-    {
-      $this->autoRender = false;
+    function makeMixevalEvaluation ($param = '')  {
+        $this->autoRender = false;
 
         if (empty($this->params['data'])) {
-        $tok = strtok($param, ';');
-      $eventId = $tok;
-      $groupId = strtok(';');
-      //$msg = strtok(';');
-      $event = $this->EvaluationHelper->formatEventObj($eventId, $groupId);
-          $this->set('event', $event);
+            $tok = strtok($param, ';');
+            $eventId = $tok;
+            $groupId = strtok(';');
+            //$msg = strtok(';');
+            $event = $this->EvaluationHelper->formatEventObj($eventId, $groupId);
+            $this->set('event', $event);
 
-          //Setup the courseId to session
-        $this->rdAuth->setCourseId($event['Event']['course_id']);
-        $courseId = $event['Event']['course_id'];
-          $this->pageTitle = $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers';
-      $mixEvalDetail = $this->EvaluationMixevalHelper->loadMixEvaluationDetail($event);
-      $this->set('data', $mixEvalDetail['mixeval']);
-      $this->set('groupMembers', $mixEvalDetail['groupMembers']);
-      $this->set('evaluateeCount', $mixEvalDetail['evaluateeCount']);
+            //Setup the courseId to session
+            $this->rdAuth->setCourseId($event['Event']['course_id']);
+            $courseId = $event['Event']['course_id'];
+            $this->pageTitle = $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers';
+            $mixEvalDetail = $this->EvaluationMixevalHelper->loadMixEvaluationDetail($event);
+            $this->set('data', $mixEvalDetail['mixeval']);
+            $this->set('groupMembers', $mixEvalDetail['groupMembers']);
+            $this->set('evaluateeCount', $mixEvalDetail['evaluateeCount']);
 
-           $this->render('mixeval_eval_form');
-      }
-        else {
-
-      $eventId = $this->params['form']['event_id'];
-      $groupId = $this->params['form']['group_id'];
-      $groupEventId = $this->params['form']['group_event_id'];
-      $courseId = $this->params['form']['course_id'];
-      $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
-      if (!$this->validMixevalEvalComplete($this->params['form'])) {
-        $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
-      }
-          if ($this->EvaluationMixevalHelper->saveMixevalEvaluation($this->params)) {
-              $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
+            $this->render('mixeval_eval_form');
+        } else {
+            $eventId = $this->params['form']['event_id'];
+            $groupId = $this->params['form']['group_id'];
+            $groupEventId = $this->params['form']['group_event_id'];
+            $courseId = $this->params['form']['course_id'];
+            $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
+            if (!$this->validMixevalEvalComplete($this->params['form'])) {
+                $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
             }
-      //Found error
-      else {
-        //Validate the error why the Event->save() method returned false
-        $this->validateErrors($this->Event);
-        $this->set('errmsg', 'Save Evaluation failure.');
-        $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
-      }//end if
-      }
-  }
+                if ($this->EvaluationMixevalHelper->saveMixevalEvaluation($this->params)) {
+                $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
+            }
+            //Found error
+            else {
+                //Validate the error why the Event->save() method returned false
+                $this->validateErrors($this->Event);
+                $this->set('errmsg', 'Save Evaluation failure.');
+                $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
+            }//end if
+        }
+    }
 
-  function validMixevalEvalComplete ($form=null)
-  {
-    $status = true;
-    return $status;
-  }
+    function validMixevalEvalComplete ($form=null)
+    {
+        $status = true;
+        return $status;
+    }
 
-  function completeEvaluationMixeval ()
-  {
-    $status = true;
+    function completeEvaluationMixeval ()  {
+        $status = true;
 
-    $eventId = $this->params['form']['event_id'];
-    $groupId = $this->params['form']['group_id'];
-    $courseId = $this->params['form']['course_id'];
-    $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
-    $evaluateeCount = $this->params['form']['evaluateeCount'];
+        $eventId = $this->params['form']['event_id'];
+        $groupId = $this->params['form']['group_id'];
+        $courseId = $this->params['form']['course_id'];
+        $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
+        $evaluateeCount = $this->params['form']['evaluateeCount'];
 
-    $groupEventId = $this->params['form']['group_event_id'];
-    //Get the target group event
-      $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
-    $this->GroupEvent->id = $groupEvent['GroupEvent']['id'];
+        $groupEventId = $this->params['form']['group_event_id'];
+        //Get the target group event
+        $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
+        $this->GroupEvent->id = $groupEvent['GroupEvent']['id'];
 
         // if no submission exists, create one
-    //Get the target event submission
+        //Get the target event submission
         $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
-    $this->EvaluationSubmission->setId($evaluationSubmission['EvaluationSubmission']['id']);
+        $this->EvaluationSubmission->setId($evaluationSubmission['EvaluationSubmission']['id']);
 
-    $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
-    $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
-    $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
+        $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
+        $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
+        $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
         // save evaluation submission
-    $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
-    $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
-        if (!$this->EvaluationSubmission->save($evaluationSubmission))
-        {
-          $status = false;
+        $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
+        $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
+        if (!$this->EvaluationSubmission->save($evaluationSubmission))  {
+            $status = false;
         }
 
         //checks if all members in the group have submitted
@@ -637,29 +598,26 @@ exit;
         //means that this group is ready to review
         $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupId, $groupEventId);
         $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
-    //Check to see if all members are completed this evaluation
-        if($numOfCompletedCount == $evaluateeCount ){
-          $groupEvent['GroupEvent']['marked'] = 'to review';
-          if (!$this->GroupEvent->save($groupEvent))
-          {
-            $status = false;
-          }
+        //Check to see if all members are completed this evaluation
+        if($numOfCompletedCount == $evaluateeCount ) {
+            $groupEvent['GroupEvent']['marked'] = 'to review';
+            if (!$this->GroupEvent->save($groupEvent)) {
+                $status = false;
+            }
         }
 
-        if ($status)
-        {
-          $this->redirect('/home/index/Your Evaluation is submitted successfully.');
+        if ($status) {
+            $this->redirect('/home/index/Your Evaluation is submitted successfully.');
         } else {
-          $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
+            $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
         }
-  }
+    }
 
     function viewEvaluationResults($param=null)
     {
-      if ($this->rdAuth->role == 'S') {
-        $this->redirect('home/index');
-        exit();
-      }
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+
       $this->autoRender = false;
       $this->layout = 'pop_up';
       $tok = strtok($param, ';');
@@ -742,16 +700,16 @@ exit;
     }
 
     function viewSurveyGroupEvaluationResults($params=null) {
-    $this->layout = 'pop_up';
-    $this->autoRender = false;
+        $this->layout = 'pop_up';
+        $this->autoRender = false;
 
-    $surveyId = strtok($params,';');
-    $surveyGroupId = strtok(';');
+        $surveyId = strtok($params,';');
+        $surveyGroupId = strtok(';');
 
-    $formattedResult = $this->EvaluationSurveyHelper->formatSurveyGroupEvaluationResult($surveyId,$surveyGroupId);
+        $formattedResult = $this->EvaluationSurveyHelper->formatSurveyGroupEvaluationResult($surveyId,$surveyGroupId);
 
-    $this->set('questions', $formattedResult);
-    $this->render('view_survey_summary');
+        $this->set('questions', $formattedResult);
+        $this->render('view_survey_summary');
     }
 
     function studentViewEvaluationResult($param=null)
@@ -828,10 +786,9 @@ exit;
 
     function markEventReviewed ()
     {
-      if ($this->rdAuth->role == 'S') {
-        $this->redirect('home/index');
-        exit();
-      }
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+
       $this->autoRender = false;
     $eventId = $this->params['form']['event_id'];
     $groupId =  $this->params['form']['group_id'];
@@ -876,10 +833,9 @@ exit;
 
     function markGradeRelease($param)
     {
-      if ($this->rdAuth->role == 'S') {
-        $this->redirect('home/index');
-        exit();
-      }
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+
       $tok = strtok($param, ';');
     $eventId = $tok;
     $groupId =  strtok(';');
@@ -915,10 +871,9 @@ exit;
 
     function markCommentRelease($param = null)
     {
-      if ($this->rdAuth->role == 'S') {
-        $this->redirect('home/index');
-        exit();
-      }
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+
 
       $this->autoRender = false;
       if ($param !=null) {
@@ -966,10 +921,9 @@ exit;
 
     function changeAllCommentRelease ($param=null)
     {
-      if ($this->rdAuth->role == 'S') {
-        $this->redirect('home/index');
-        exit();
-      }
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+
          $tok = strtok($param, ';');
     $eventId = $tok;
     $releaseStatus = strtok(';');
@@ -1030,10 +984,9 @@ exit;
 
   function changeAllGradeRelease ($param=null)
     {
-      if ($this->rdAuth->role == 'S') {
-        $this->redirect('home/index');
-        exit();
-      }
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+
       $this->autoRender = false;
          $tok = strtok($param, ';');
     $eventId = $tok;
@@ -1092,10 +1045,9 @@ exit;
 
     function viewGroupSubmissionDetails ($param=null)
     {
-      if ($this->rdAuth->role == 'S') {
-        $this->redirect('home/index');
-        exit();
-      }
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+
          $tok = strtok($param, ';');
     $eventId = $tok;
     $groupId = strtok(';');
@@ -1141,10 +1093,9 @@ exit;
 
   function reReleaseEvaluation ()
   {
-      if ($this->rdAuth->role == 'S') {
-        $this->redirect('home/index');
-        exit();
-      }
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+
     $this->autoRender = false;
 
     $groupEventId = $this->params['form']['group_event_id'];
@@ -1164,10 +1115,9 @@ exit;
   }
 
   function viewSurveySummary($surveyId=null) {
-      if ($this->rdAuth->role == 'S') {
-        $this->redirect('home/index');
-        exit();
-      }
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+
     $this->layout = 'pop_up';
 
     $formattedResult = $this->EvaluationSurveyHelper->formatSurveyEvaluationSummary($surveyId);
