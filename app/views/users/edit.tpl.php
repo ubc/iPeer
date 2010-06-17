@@ -103,7 +103,7 @@
 <?php  }  ?>
 
     <tr class="tablecell2">
-      <td align="center" colspan="3" id="password_label">	   <input type="button" name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller']; ?>'">
+      <td align="center" colspan="3" id="password_label">	   <input type="button" value="Back" onClick="javascript:window.history.back()">
 
       <?php echo $html->submit('Save') ?>
 
