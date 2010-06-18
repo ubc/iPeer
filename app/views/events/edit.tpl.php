@@ -16,7 +16,8 @@
     <tr class="tablecell2">
     	<td width="150" id="course_label">Course:</td>
     	<td width="405">
-			<?php 			$params = array('controller'=>'courses', 'courseList'=>$coursesList, 'courseId'=>$rdAuth->courseId);
+			<?php
+                  $params = array('controller'=>'courses', 'courseList'=>$coursesList, 'courseId'=>$rdAuth->courseId);
                   echo $this->renderElement('courses/course_selection_box', $params);
             ?>
 			</td>
