@@ -99,10 +99,6 @@ class EvaluationSurveyHelperComponent extends Object
                 }
             }
         }
-        //var_dump ($evaluationSubmission);
-        //var_dump ($this->EvaluationSubmission->validates());
-        $dataSource = ConnectionManager::getDataSource('default');
-        echo !empty($dataSource) ? $dataSource->showLog() : "No SQL data";
         if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
             echo "this->EvaluationSubmission->save() returned false";
             return false;
