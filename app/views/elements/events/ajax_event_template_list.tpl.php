@@ -39,13 +39,13 @@
     }
     //echo '<br><br>';
     if ($model == 'SimpleEvaluation') { ?>
-      <a title="Simple Evaluation Preview" href="<?php echo $this->webroot.$this->themeWeb;?>simpleevaluations/view/1/pop_up" onclick="getSimpleIndex(this); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview</a>
+      <a title="Simple Evaluation Preview" target="_blank" href="<?php echo $this->webroot.$this->themeWeb;?>simpleevaluations/view/1/pop_up" onclick="getSimpleIndex(this); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview</a>
     <?php } 
     else if ($model == 'Rubric') { ?>
-      <a title="Rubric Preview" href="<?php echo $this->webroot.$this->themeWeb;?>rubrics/view/1/pop_up" onclick="getRubricIndex(this); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview</a>
+      <a title="Rubric Preview" target="_blank" href="<?php echo $this->webroot.$this->themeWeb;?>rubrics/view/1/pop_up" onclick="getRubricIndex(this); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview</a>
     <?php } 
     else if ($model == 'Mixeval') { ?>
-      <a title="Mix Evaluation Preview" href="<?php echo $this->webroot.$this->themeWeb;?>mixevals/view/1/pop_up" onclick="getMixIndex(this); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview</a>
+      <a title="Mix Evaluation Preview" target="_blank" href="<?php echo $this->webroot.$this->themeWeb;?>mixevals/view/1/pop_up" onclick="getMixIndex(this); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview</a>
     <?php } ?>
 <?php  }
   else {
