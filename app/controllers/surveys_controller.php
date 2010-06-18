@@ -56,16 +56,18 @@ class SurveysController extends AppController
 
 	function index()
 	{
-  	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-    $this->userPersonalize->setPersonalizeList($personalizeData);
-  	if ($personalizeData && $this->userPersonalize->inPersonalizeList('Survey.ListMenu.Limit.Show')) {
-       $this->show = $this->userPersonalize->getPersonalizeValue('Survey.ListMenu.Limit.Show');
-       $this->set('userPersonalize', $this->userPersonalize);
-  	} else {
-  	  $this->show = '10';
-      $this->update($attributeCode = 'Survey.ListMenu.Limit.Show',$attributeValue = $this->show);
-  	}
-  	$conditions = 'Survey.creator_id='.$this->rdAuth->id;
+        $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+        $this->userPersonalize->setPersonalizeList($personalizeData);
+        if ($personalizeData && $this->userPersonalize->inPersonalizeList('Survey.ListMenu.Limit.Show')) {
+            $this->show = $this->userPersonalize->getPersonalizeValue('Survey.ListMenu.Limit.Show');
+            $this->set('userPersonalize', $this->userPersonalize);
+        } else {
+            $this->show = '10';
+            $this->update($attributeCode = 'Survey.ListMenu.Limit.Show',$attributeValue = $this->show);
+        }
+        $conditions = array('Survey.creator_id' =>  $this->rdAuth->id,
+                            'Survey.course_id' => $this->rdAuth->courseId);
+
 		$data = $this->Survey->findAll($conditions, '', $this->order, $this->show, $this->page,null,null);//array('JOIN courses AS Course ON Survey.course_id = Course.id'));
 
 		$paging['style'] = 'ajax';
@@ -400,10 +402,9 @@ class SurveysController extends AppController
       	}
       }
 
-      $conditions = '';
-      if (!empty($this->params['form']['show_my_tool'])){
-        $conditions .= 'Survey.creator_id = '.$this->rdAuth->id;
-      }
+        $conditions = array('Survey.creator_id' =>  $this->rdAuth->id,
+                            'Survey.course_id' => $this->rdAuth->courseId);
+
 
       if (!empty($this->params['form']['livesearch2']) && !empty($this->params['form']['select']))
       {
