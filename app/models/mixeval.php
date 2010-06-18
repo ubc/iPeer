@@ -35,18 +35,19 @@ class Mixeval extends AppModel
 			//check empty name
 			$this->errorMessage='Mixed evaluation name is required.';
 			$allowSave = false;
-			//check the duplicate mixeval					
-		} else 
+			//check the duplicate mixeval
+		} else
 			$allowSave = $this->__checkDuplicateMixeval();
 		return $allowSave;
-	}	
-	
+	}
+
 	function __checkDuplicateMixeval() {
 		$duplicate = false;
 		$field = 'name';
 		$value = $this->data[$this->name]['name'];
 		if ($result = $this->find($field . ' = "' . $value.'"', $field.', id')){
-		  if ($this->data[$this->name]['id'] == $result[$this->name]['id']) {
+		  if (isset($this->data[$this->name]['id']) &&
+            ($this->data[$this->name]['id'] == $result[$this->name]['id'])) {
 		    $duplicate = false;
 		  } else {
   		  $duplicate = true;
@@ -63,7 +64,7 @@ class Mixeval extends AppModel
 	}
 	//sets the current userid and merges the form values into the data array
 	function prepData($tmp=null, $userid){
-		
+
 //		$tmp = array_merge($tmp['data']['Mixeval'], $tmp['form']);
     $ttlQuestionNo = $tmp['data']['Mixeval']['total_question'];
     $questions = array();
@@ -78,7 +79,7 @@ class Mixeval extends AppModel
       $question['scale_level'] = $tmp['data']['Mixeval']['scale_max'];
       isset($tmp['data']['Mixeval']['response_type'.$i])? $question['response_type'] = $tmp['data']['Mixeval']['response_type'.$i] : $question['response_type'] = null;
       $questions[$i]['MixevalsQuestion'] = $question;
-      
+
       //Format lickert descriptors
       if ($question['question_type'] == 'S') {
         for ($j = 1; $j <= $question['scale_level']; $j++) {
@@ -87,11 +88,11 @@ class Mixeval extends AppModel
          $desc['descriptor'] = $tmp['data']['Mixeval']['criteria_comment_'.$question['question_num'].'_'.$j];
          $questions[$i]['MixevalsQuestion']['descriptor'][$j] = $desc;
         }
-         
+
       }
-      
+
     }
-		
+
 		return $questions;
 	}
 }

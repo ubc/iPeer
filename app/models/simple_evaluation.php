@@ -32,41 +32,41 @@ class SimpleEvaluation extends AppModel
       'name' => VALID_NOT_EMPTY,
       'point_per_member' => VALID_NUMBER
   );
-  
+
   var $hasMany = array(
                        'EvaluationSimple' => array(
                         'className' => 'EvaluationSimple',
                         'dependent' => true
                        )
   );
-	//Overwriting Function - will be called before save operation 
-	function beforeSave(){              
+	//Overwriting Function - will be called before save operation
+	function beforeSave(){
 	  $allowSave = true;
 	  if (empty($this->data[$this->name]['id'])) {
       //check the duplicate username
       $allowSave = $this->__checkDuplicateTitle();
     }
     return $allowSave;
-	}    
-  
-  //Validation check on duplication of username	
+	}
+
+  //Validation check on duplication of username
 	function __checkDuplicateTitle() {
 	  $duplicate = false;
     $field = 'name';
-    $value = $this->data[$this->name]['name'];  
+    $value = $this->data[$this->name]['name'];
     if ($result = $this->find($field . ' = "' . $value.'"', $field)){
       $duplicate = true;
      }
-           
+
     if ($duplicate == true) {
       $this->errorMessage='Duplicate name found.  Please change the name of this Simple Evaluation';
       return false;
-    } 
+    }
     else {
       return true;
-    }	  
+    }
 	}
-	
+
 
 }
 

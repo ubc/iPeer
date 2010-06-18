@@ -53,18 +53,19 @@ class Rubric extends AppModel
 			//check empty name
 			$this->errorMessage='Rubric name is required.';
 			$allowSave = false;
-			//check the duplicate rubric					
-		} else 
+			//check the duplicate rubric
+		} else
 			$allowSave = $this->__checkDuplicateRubric();
 		return $allowSave;
-	}	
-	
+	}
+
 	function __checkDuplicateRubric() {
 		$duplicate = false;
 		$field = 'name';
 		$value = $this->data[$this->name]['name'];
 		if ($result = $this->find($field . ' = "' . $value.'"', $field.', id')){
-		  if ($this->data[$this->name]['id'] == $result[$this->name]['id']) {
+		  if (isset($this->data[$this->name]['id']) &&
+            ($this->data[$this->name]['id'] == $result[$this->name]['id'])) {
 		    $duplicate = false;
 		  } else {
   		  $duplicate = true;
@@ -84,10 +85,10 @@ class Rubric extends AppModel
 		$tmp['data']['Rubric']['user_id'] = $userid;
 		$tmp = array_merge($tmp['data']['Rubric'], $tmp['form']);
 		unset($tmp['data']);
-		
+
 		if(empty($tmp['zero_mark']))
 			$tmp['zero_mark'] = "off";
-		
+
 		return $tmp;
 	}
 }
