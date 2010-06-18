@@ -188,6 +188,12 @@ class XmlHandlerComponent extends Object
 	}
 
 	function readTMXml($questionCount=null,$scoreFilePathAndName=null) {
+
+        // Make sure the specified file exists
+        if (!file_exists($scoreFilePathAndName) || filesize($scoreFilePathAndName) <= 0) {
+            return false;
+        }
+
     $lineSkip = $questionCount+3;
     $i=0;
     $score = array();
