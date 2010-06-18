@@ -86,3 +86,7 @@ echo $ajax->observeForm('searchForm', array('update'=>'user_table', 'url'=>"/use
 </div>
 </td></tr>
 </table>
+
+<script language="JavaScript" type="text/javascript">
+  OnChange(document.getElementById('display_user_type'));
+</script>
