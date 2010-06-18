@@ -1,6 +1,7 @@
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr>
-    <td colspan="4"><?php echo $html->image('/icons/export_excel.gif', array('alt'=>'Export'));?>&nbsp;Export Evaluations&nbsp;</td>
+    <td colspan="2"><?php echo $html->image('/icons/export_excel.gif', array('alt'=>'Export'));?>&nbsp;Export Evaluations&nbsp;</td>
+    <td colspan="2" align="right"><a href="" onClick="window.close();">[X] Close Window</a></td>
     </tr>
   <tr class="tableheader">
     <td colspan="4" align="center">Evaluation Event Detail</td>
