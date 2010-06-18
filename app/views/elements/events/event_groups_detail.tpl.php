@@ -13,8 +13,12 @@
   	  <tr>
           <td>
        	    <?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
+        	<?php if(isset($popup)):?>
         		<a href="<?php echo $this->webroot.$this->themeWeb.'events/editGroup/'.$group['id'].'/'.$event_id. '/'. $popup?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
-      	    <?php endif;?>
+      	    <?php else:?>
+       	    <a href="<?php echo $this->webroot.$this->themeWeb.'events/editGroup/'.$group['id'].'/'.$event_id. '/n'?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
+       	    <?php endif;?>
+       	    <?php endif;?>
             <?php echo $group['group_num'] ?></td>
           <td><?php echo $group['group_name'] ?></td>
           <td>

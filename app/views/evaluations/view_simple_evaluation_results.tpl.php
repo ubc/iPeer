@@ -6,6 +6,8 @@
 <?php echo $javascript->link('ricoanimation')?>
 <?php echo $javascript->link('ricopanelcontainer')?>
 <?php echo $javascript->link('ricoaccordion')?>
+
+<?php echo "<br>Evaluation id is: " . $html->hidden('Evaluation/id')?>
 	<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
     <!-- Render Event Info table -->
 	  <?php

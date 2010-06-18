@@ -886,14 +886,19 @@ class EvaluationsController extends AppController
       $this->Event->setId($eventId);
       $event = $this->Event->read();
 
+      
       switch ($event['Event']['event_template_type_id']) {
         case "1":
-
-        $groupId =  $this->params['form']['group_id'];
-        $groupEventId = $this->params['form']['group_event_id'];
-            $evaluatorIds = $this->params['form']['evaluator_ids'];
-          $this->EvaluationSimpleHelper->changeEvaluationCommentRelease ($eventId, $groupId, $groupEventId, $evaluatorIds, $this->params);
-        $this->redirect('evaluations/viewEvaluationResults/'.$eventId.';'.$groupId);
+		$groupId =  $this->params['form']['group_id'];
+	    
+	    if(isset($this->params['form']['evaluator_ids']))
+        {
+	        $groupEventId = $this->params['form']['group_event_id'];
+	        $evaluatorIds = $this->params['form']['evaluator_ids'];
+	        $this->EvaluationSimpleHelper->changeEvaluationCommentRelease ($eventId, $groupId, $groupEventId, $evaluatorIds, $this->params);
+        }
+        
+	    $this->redirect('evaluations/viewEvaluationResults/'.$eventId.';'.$groupId);
           break;
 
         case "2":
