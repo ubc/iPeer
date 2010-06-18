@@ -68,7 +68,7 @@
   </tr>
   <tr class="tablecell2">
   		<td colspan="3" align="center">
-		<input type="button" name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller']; ?>'">
+        <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
 		<?php
 		    if(empty($preview)) {
 		      echo $html->submit('Next', array('Name'=>'preview'));
