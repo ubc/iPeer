@@ -258,10 +258,10 @@ class EvaluationsController extends AppController
         $courseId = $this->rdAuth->courseId;
         $this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Export Evaluation Results';
         //do stuff
-        if (isset($this->params['form'])) {
+        if (isset($this->params['form']) && !empty($this->params['form'])) {
             $this->autoRender = false;
             $fileContent = $this->ExportHelper->createCSV($this->params);
-            $fileName = empty($this->params['form']['file_name']) ? $this->params['form']['file_name']:date('m.d.y');
+            $fileName = isset($this->params['form']['file_name']) && empty($this->params['form']['file_name']) ? $this->params['form']['file_name']:date('m.d.y');
 
             header('Content-Type: application/csv');
             header('Content-Disposition: attachment; filename=' . $fileName . '.csv');
