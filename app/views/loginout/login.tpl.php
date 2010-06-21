@@ -17,7 +17,7 @@ document.write('          <\/tr>');
 document.write('          <tr>');
 document.write('            <td height="115" background="../img/layout/small_table_back.gif"><table width="199" border="0" cellpadding="6" cellspacing="0">');
 document.write('                <tr>');
-document.write('                  <td width="62">My Username:<\/td>');
+document.write('                  <td width="62">Username:<\/td>');
 document.write('                  <td width="140"><?php echo $html->input("User/username",array("style"=>"width:150px;","id"=>"username")); ?><\/td>');
 document.write('                <\/tr>');
 document.write('                <tr>');
