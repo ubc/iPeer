@@ -161,22 +161,22 @@ class SearchHelperComponent
     } else
       $sticky['course_id'] = '';
     if ($dueDateBegin != '') {
-      $condition .= !empty($condition) ? ' AND NOW() > '.$dueDateBegin:'NOW() > '.$dueDateBegin;
+      $condition .= !empty($condition) ? ' AND due_date > "'.$dueDateBegin.'"' : 'due_date > "'.$dueDateBegin.'"';
       $sticky['due_date_begin'] = $dueDateBegin;
     } else
       $sticky['due_date_begin'] = '';
     if ($dueDateEnd != '') {
-      $condition .= !empty($condition) ? ' AND NOW() < '.$dueDateEnd:'NOW() < '.$dueDateEnd;
+      $condition .= !empty($condition) ? ' AND due_date < "'.$dueDateEnd.'"' : 'due_date < "'.$dueDateEnd.'"';
       $sticky['due_date_end'] = $dueDateEnd;
     } else
       $sticky['due_date_end'] = '';
     if ($releaseDateBegin != '') {
-      $condition .= !empty($condition) ? ' AND NOW() > '.$releaseDateBegin:'NOW() > '.$releaseDateBegin;
+      $condition .= !empty($condition) ? ' AND release_date_end > "'.$releaseDateBegin.'"' :' release_date_end > "'.$releaseDateBegin.'"';
       $sticky['release_date_begin'] = $releaseDateBegin;
     } else
       $sticky['release_date_begin'] = '';
     if ($releaseDateEnd != '') {
-      $condition .= !empty($condition) ? ' AND NOW() < '.$releaseDateEnd:'NOW() < '.$releaseDateEnd;
+      $condition .= !empty($condition) ? ' AND release_date_begin < "'.$releaseDateEnd.'"' : 'release_date_begin < "'.$releaseDateEnd.'"';
       $sticky['release_date_end'] = $releaseDateEnd;
     } else
       $sticky['release_date_end'] = '';
