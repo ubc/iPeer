@@ -1,3 +1,4 @@
+<?php echo $javascript->link('calendar_us')?>
 <form name="frm" id="frm" method="POST" action="">
 <input type="hidden" id="search_type" name="search_type" value="<?php echo $display?>"/>
 <table width="95%"  border="0" cellspacing="2" cellpadding="4">
@@ -21,7 +22,19 @@
             	  <table width="100%"><tr align="left">
           				<td width="10%" align="left">FROM:</td>
           				<td width="40%" align="left">
-                		<?php echo $html->input('Search/due_date_begin', array('size'=>'50','class'=>'input', 'style'=>'width:75%;','value'=>(isset($sticky['due_date_begin']))? $sticky['due_date_begin']:'')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:calDueDateB.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('border'=>'0','alt'=>'cal','align'=>'left'))?></a>
+<script type="text/javascript">
+<!--
+var calDueDateB = new tcal ({
+		'formname': 'frm',
+		'controlname': 'data[Search][due_date_begin]'
+	});
+	
+	// individual template parameters can be modified via the calendar variable
+	calDueDateB.a_tpl.yearscroll = false;
+	calDueDateB.a_tpl.weekstart = 1;
+//-->
+</script>
+                		<?php echo $html->input('Search/due_date_begin', array('size'=>'50','class'=>'input', 'style'=>'width:75%;','value'=>(isset($sticky['due_date_begin']))? $sticky['due_date_begin']:'')) ?>
                 	</td>
 
                 	<td width="10%" align="left">&nbsp;&nbsp;TO:</td>
@@ -52,7 +65,7 @@
           </tr>
           <tr class="tablecell2">
             <td colspan="3"><div align="center"><?php echo $ajax->submit('Search',array('url'=>'/searchs/display','update'=>'search_table')) ?>
-        	  <input type="reset" name="Reset" value="Reset" onClick="">
+        	  <input type="reset" name="Reset" value="Reset">
             </div></td>
           </tr>
         </table>
@@ -74,14 +87,13 @@ $params = array('controller'=>'searchs', 'data'=>$data, 'paging'=>$paging, 'disp
 echo $this->renderElement('evaluations/ajax_evaluation_list', $params);
 ?>
 </div>
-<?php echo $javascript->link('calendar1')?>
 <script type="text/javascript">
 <!--
 
 // create calendar object(s) just after form tag closed
 // specify form element as the only parameter (document.forms['formname'].elements['inputname']);
 // note: you can have as many calendar objects as you need for your application
-var calDueDateB = new calendar1(document.forms['frm'].elements['data[Search][due_date_begin]']);
+/*var calDueDateB = new calendar1(document.forms['frm'].elements['data[Search][due_date_begin]']);
 calDueDateB.year_scroll = false;
 calDueDateB.time_comp = false;
 
@@ -96,7 +108,19 @@ releaseDateB.time_comp = false;
 
 var releaseDateE = new calendar1(document.forms['frm'].elements['data[Search][release_date_end]']);
 releaseDateE.year_scroll = false;
-releaseDateE.time_comp = false;
+releaseDateE.time_comp = false;*/
+
+
+
+/*var calDueDateB = new tcal ({
+		'formname': 'frm',
+		'controlname': 'data[Search][due_date_begin]'
+	});
+	
+	// individual template parameters can be modified via the calendar variable
+	calDueDateB.a_tpl.yearscroll = false;
+	calDueDateB.a_tpl.weekstart = 1;
+*/
 
 //-->
 </script>
