@@ -54,7 +54,7 @@
           </tr>
           <tr class="tablecell2">
             <td colspan="3"><div align="center"><?php echo $ajax->submit('Search',array('url'=>'/searchs/display','update'=>'search_table')) ?>
-        	  <input type="reset" name="Reset" value="Reset">
+        	  <input type="button" name="Reset" value="Reset" onClick="window.location.href=window.location.href;">
             </div></td>
           </tr>
         </table>
