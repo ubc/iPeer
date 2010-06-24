@@ -152,7 +152,7 @@
                      //echo $text;
                       ?>
                      <textarea name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['question_num']?>" cols="80" rows="15"><?php echo $text?></textarea>
-                   <?php } else { ?> 
+                   <?php } else { ?>
                      <input type="text" name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['question_num']?>" size="80" value="<?php echo $evaluation['EvaluationDetail'][$pos-1]['EvaluationMixevalDetail']['question_comment']?>"/>
                    <?php }?>
 
@@ -177,7 +177,7 @@
     <td colspan="3" align="center">
 <?php echo $html->hidden('Mixeval/total_question', array('value'=>$pos));?>
 <?php if (!$evaluate) :?>
-    <input type="button" name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller']; ?>'">
+    <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
 <?php endif; ?>
   </td>
   </tr>

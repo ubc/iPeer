@@ -53,18 +53,20 @@
       <td>
         <?php if (isset($enrolled_courses)):?>
          <table  width="100%" border="0" cellspacing="2" cellpadding="2">
-         <?php foreach($enrolled_courses as $ec):?>
-          	<tr>
-              <td width="15">
-                <?php if(User::canRemoveCourse($user, $ec['Course']['id'])):?>
-                <a href="<?php echo $this->webroot . $this->themeWeb . $this->params['controller'] . '/removeFromCourse/'.$ec['Course']['id']. '/' .$params['data']['User']['id']?>"><?php echo $html->image('icons/x_small.gif',array('border'=>'0','alt'=>'Delete'), 'Are you sure you want to remove \"' . $ec['Course']['title'] . '\"?')?></a>
-                <?php endif;?>
-              </td>
-              <td><a href="../../courses/view/<?php echo $ec['Course']['id']?>"><?php echo $ec['Course']['course']?></a></td>
-            </tr>
-          <?php endforeach;?>
-          </table>
-        <?php endif;?>
+         <?php
+          foreach($enrolled_courses as $ec) {
+          	echo '<tr>';
+            echo '<td width="15"><a href="' . $this->webroot . $this->themeWeb .
+              $this->params['controller'] . '/removeFromCourse/'.$ec['Course']['id']. '/' .$params['data']['User']['id']. '">' .
+              $html->image('icons/x_small.gif',array('border'=>'0','alt'=>'Delete'), 'Are you sure you want to remove \"' . $ec['Course']['title'] . '\"?').'</a>';
+            echo '</td><td>';
+            echo '<a href="../../courses/view/'.$ec['Course']['id'].'">';
+            echo $ec['Course']['course'] . '</a></td>';
+            echo '</tr>';
+          }
+          echo '</table>';
+        }
+        ?>
         <input type="hidden" name="user_id" id="user_id" value="<?php echo $user_id;?>">
         <div id="adddelcourses">
         <?php
@@ -99,7 +101,8 @@
 <?php  }  ?>
 
     <tr class="tablecell2">
-      <td align="center" colspan="3" id="password_label">	   <input type="button" value="Back" onClick="javascript:window.history.back()">
+      <td align="center" colspan="3" id="password_label">
+      <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
 
       <?php echo $html->submit('Save') ?>
 

@@ -82,7 +82,7 @@
   </tr>
   <tr class="tablecell2">
     <td colspan="3" align="center"><?php echo $html->submit('Add Course') ?>
-   <input type="button" name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller']; ?>'">
+   <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
   </td>
     </tr>
 </table>

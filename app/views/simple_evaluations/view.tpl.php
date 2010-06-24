@@ -22,7 +22,7 @@
         </tr>
         <tr class="tablecell2">
         	<td id="point_per_member_label">Base Point Per Member:</td>
-        	<td align="left"><?php echo $data['SimpleEvaluation']['point_per_member']  
+        	<td align="left"><?php echo $data['SimpleEvaluation']['point_per_member']
         	?>
         	</td>
         	<td id="point_per_member_msg" class="error"/>
@@ -32,7 +32,7 @@
             <?php if (!empty($popUp) && $popUp) { ?>
             <input type="button" name="Close" value="Close" onClick="window.close()">
             <?php } else { ?>
-      	    <input type="button" name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller']; ?>'">
+      	    <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
             <?php }?>
 
       	</td>
@@ -64,4 +64,4 @@
 //$params = array('controller'=>'simpleevaluations','data'=>$this->controller->EvaluationHelper->formatEventObj($data), 'evaluate'=>0);
 echo $this->renderElement('evaluations/simple_preview');
 ?>
-</div> 
+</div>

@@ -269,7 +269,7 @@ echo $javascript->link('calculate_marks');?>
   <tr>
   		<td colspan="3" align="center">
 <?php echo $html->hidden('Mixeval/total_question', array('value'=>$pos));?>
-		<input type="button" name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller']; ?>'">
+		<input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
   		  <?php if (empty($params['data']['Mixeval']['id'])) {
   		      echo $html->submit('Add Mixed Evaluation');
   		    } else {
