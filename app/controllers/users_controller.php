@@ -229,6 +229,7 @@ class UsersController extends AppController
                 $this->set('enrolled_courses', $enrolled_courses);
                 $this->set('course_count', $course_count[0][0]['total']);
                 $this->set('user_id', $id);
+                $this->set('user', $this->rdAuth->User->findUserById($this->rdAuth->id));
 
                 if (empty($this->params['data'])) {
                     $this->User->setId($id);
@@ -266,6 +267,7 @@ class UsersController extends AppController
             // Bad ID format
             $this->rdAuth->privilegeError();
         }
+        
 	}
 
 	function editProfile()
@@ -640,18 +642,23 @@ class UsersController extends AppController
 
 	function removeFromCourse($course_id='', $user_id='') {
 
-        // Make sure the present user is not a student
-        if ($this->rdAuth->getPrivilegeLevel() <= $this->rdAuth->studentPrivilegeLevel()) {
-            $this->rdAuth->privilegeError();
-        }
+    // Make sure the present user is not a student
+    if ($this->rdAuth->getPrivilegeLevel() <= $this->rdAuth->studentPrivilegeLevel()) {
+      $this->rdAuth->privilegeError();
+    }
 
-		$this->autoRender = false;
-		if($course_id != '' && $user_id != '') {
-			$return = $this->UserEnrol->removeStudentFromCourse($user_id, $course_id);
-		}
-		else {
+    if($course_id != '' && $user_id != '') {
+      $this->Session->setFlash('Invalid course id or user id!');
+    }
 
-		}
+    $this->autoRender = false;
+
+    if(User::canRemoveCourse($this->rdAuth->User->findUserById($this->rdAuth->id), $course_id))
+    {
+      $return = $this->UserEnrol->removeStudentFromCourse($user_id, $course_id);
+    }else{
+      $this->Session->setFlash('You do not have permssion to remove this course.');
+    }
 
 		$this->redirect('users/edit/'.$user_id);
 	}

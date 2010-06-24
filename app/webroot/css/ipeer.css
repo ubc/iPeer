@@ -461,3 +461,14 @@ a.miniLinks:active {
   float:left;
   display:none;
 }
+
+#flashMessage {
+  text-align: center;
+	margin:0;
+	padding:2px 5px;
+	background:#F4F4F4;
+	font:bold 1em/1 Arial, Helvetica, sans-serif;
+	color: #0A2C64;
+	border-top: 1px solid #CFCFCF;
+	border-bottom: 1px solid #CFCFCF;
+}

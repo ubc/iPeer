@@ -51,23 +51,20 @@
     <tr class="tablecell2">
       <td width="130" id="courses_label">Courses</td>
       <td>
-        <?php if (isset($enrolled_courses)) {
-         ?>
+        <?php if (isset($enrolled_courses)):?>
          <table  width="100%" border="0" cellspacing="2" cellpadding="2">
-         <?php
-          foreach($enrolled_courses as $ec) {
-          	echo '<tr>';
-            echo '<td width="15"><a href="' . $this->webroot . $this->themeWeb .
-              $this->params['controller'] . '/removeFromCourse/'.$ec['Course']['id']. '/' .$params['data']['User']['id']. '">' .
-              $html->image('icons/x_small.gif',array('border'=>'0','alt'=>'Delete'), 'Are you sure you want to remove \"' . $ec['Course']['title'] . '\"?').'</a>';
-            echo '</td><td>';
-            echo '<a href="../../Course/view/'.$ec['Course']['id'].'">';
-            echo $ec['Course']['course'] . '</a></td>';
-            echo '</tr>';
-          }
-          echo '</table>';
-        }
-        ?>
+         <?php foreach($enrolled_courses as $ec):?>
+          	<tr>
+              <td width="15">
+                <?php if(User::canRemoveCourse($user, $ec['Course']['id'])):?>
+                <a href="<?php echo $this->webroot . $this->themeWeb . $this->params['controller'] . '/removeFromCourse/'.$ec['Course']['id']. '/' .$params['data']['User']['id']?>"><?php echo $html->image('icons/x_small.gif',array('border'=>'0','alt'=>'Delete'), 'Are you sure you want to remove \"' . $ec['Course']['title'] . '\"?')?></a>
+                <?php endif;?>
+              </td>
+              <td><a href="../../courses/view/<?php echo $ec['Course']['id']?>"><?php echo $ec['Course']['course']?></a></td>
+            </tr>
+          <?php endforeach;?>
+          </table>
+        <?php endif;?>
         <input type="hidden" name="user_id" id="user_id" value="<?php echo $user_id;?>">
         <div id="adddelcourses">
         <?php

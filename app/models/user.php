@@ -131,6 +131,30 @@ class User extends AppModel
 	function findUserByEmailAndStudentNo($email='', $studentNo='') {
 		return $this->find("email='" .$email . "' AND student_no='" . $studentNo . "'");
 	}
+
+  /**
+   * canRemoveCourse check if user has permission to remove the course from a 
+   * student
+   * 
+   * @param mixed $user the user array returned by findUserByxxxx
+   * @param mixed $course_id target course id
+   * @access public
+   * @return boolean whether or not user can remove the course from the student
+   */
+  static function canRemoveCourse($user, $course_id)
+  {
+    if(!isset($user['User']) || !is_array($user['User'])) return false;
+    if('A' == $user['User']['role']) return true;
+    if('S' == $user['User']['role']) return false;
+    if(!isset($user['UserCourse']) || !is_array($user['UserCourse'])) return false;
+
+    foreach($user['UserCourse'] as $c)
+    {
+      if($c['course_id'] == $course_id) return true;
+    }
+
+    return false;
+  }
 }
 
 ?>

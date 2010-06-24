@@ -180,6 +180,7 @@ function checkEmailAddress()
         <?php if (!empty($message)): ?>
         <div align="center" class="title2"><?php echo $message; ?></div>
         <?php endif; ?>
+        <?php if($this->controller->Session->check('Message.flash')): $this->controller->Session->flash(); endif;?>
         <div align="left" id="loading"><?php echo $html->image('spinner.gif',array('alt'=>'spinner'))?></div>
         <?php echo $content_for_layout;?>
 			<p>&nbsp;</p>
