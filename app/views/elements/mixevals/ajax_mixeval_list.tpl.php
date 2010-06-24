@@ -26,6 +26,7 @@
   </tr>
     <?php $i = '0';?>
     <?php
+    if (!$data) $data = array(); // in case data is empty (false by cake php standarts)
     foreach ($data as $row): $mixeval = $row['Mixeval']; ?>
     <tr class="tablecell">
       <td align="center">
