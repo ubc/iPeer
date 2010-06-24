@@ -47,7 +47,7 @@
       <td><?php echo $html->input('User/email', array('id'=>'email', 'size'=>'50', 'class'=>'validate none EMAIL_FORMAT email_msg Invalid_Email_Format.')) ?> </td>
       <td width="663" id="email_msg" class="error"></td>
     </tr>
-    <?php if (($rdAuth->role == 'I') || ($rdAuth->role == 'A')):?>
+    <?php if (($params['data']['User']['role'] == 'S') && (($rdAuth->role == 'I') || ($rdAuth->role == 'A'))):?>
     <tr class="tablecell2">
       <td width="130" id="courses_label">Courses</td>
       <td>
@@ -67,7 +67,6 @@
           }
           echo '</table>';
         }
-
         ?>
         <input type="hidden" name="user_id" id="user_id" value="<?php echo $user_id;?>">
         <div id="adddelcourses">
@@ -79,11 +78,11 @@
       </td>
       <td>
 
-  <input type="hidden" name="add" id="add" value="0">
-  <a href=# onClick="addToCourse();"><?php echo $html->image('icons/add.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Add Another Course</a>
-  <br><br>
-  <a href=# onClick="removeFromCourse();"><?php echo $html->image('icons/delete.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Remove From Another Course</a>
-  <?php echo $ajax->observeField('add', array('update'=>'adddelcourses', 'url'=>"/users/adddelcourse/$user_id", 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');")) ?>
+        <input type="hidden" name="add" id="add" value="0">
+        <a href=# onClick="addToCourse();"><?php echo $html->image('icons/add.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Add Another Course</a>
+        <br><br>
+        <a href=# onClick="removeFromCourse();"><?php echo $html->image('icons/delete.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Remove From Another Course</a>
+        <?php echo $ajax->observeField('add', array('update'=>'adddelcourses', 'url'=>"/users/adddelcourse/$user_id", 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');")) ?>
 
       </td>
     </tr>
