@@ -89,7 +89,7 @@ class CoursesController extends AppController
 
 	function home($id)
 	{
-	
+
 	  $course = $this->Course->findById($id);
 		$this->set('data', $course);
 //	  $this->set('courseInstructors', $course['UserCourse']);
@@ -99,7 +99,7 @@ class CoursesController extends AppController
 	  //$groups = $this->Group->getCourseGroupCount($id);
 	  //$this->set('groupCount', $groups[0]['total']);
 
-         $number_of_groups=count($this->Group->findAllByCourse_id($id)); 
+         $number_of_groups=count($this->Group->findAllByCourse_id($id));
           $this->set('groupCount', $number_of_groups);
 	  $events = $this->Event->getCourseEventCount($id);
     $this->set('eventCount', $events[0]['total']);
@@ -129,6 +129,9 @@ class CoursesController extends AppController
 		}
 		else
 		{
+            if (!stristr($this->params['data']['Course']['homepage'], "http://")) {
+                $this->params['data']['Course']['homepage'] = "http://" . $this->params['data']['Course']['homepage'];
+            }
 			$this->params = $this->Course->prepData($this->params);
 			if ($this->Course->save($this->params['data']))
 			{
@@ -168,6 +171,9 @@ class CoursesController extends AppController
 		}
 		else
 		{
+            if (!stristr($this->params['data']['Course']['homepage'], "http://")) {
+                $this->params['data']['Course']['homepage'] = "http://" . $this->params['data']['Course']['homepage'];
+            }
 			$this->params = $this->Course->prepData($this->params);
 			if ( $this->Course->save($this->params['data']))
 			{
