@@ -87,12 +87,42 @@
 	  <tr>
 	    <td>
 	<?php endforeach; ?>
-  <?php
-    if ($i ==0 ) {
-  		print "<tr class=\"tablecell\"><td colspan=\"4\" align=\"center\"><b>No courses at this time<br/>If you are a new instructor, now would be a good time to read the <a href=\"../../install/manualdoc\">manual</a>.<br />Another option would be to check out the wizard link the top right hand corner.</b></td></tr>";
-  	}
-  ?>
-		</table>
+  <?php if ($i ==0 ) {  ?>
+    <tr class="tablecell"><td colspan="4">
+        <b>No courses at this time</b>
+    </td></tr>
+  <?php	} // if ($i ==0 )?>
+    <tr><td>
+    <?php
+     $showShortHelpNow = ($i == 0);
+    ?>
+    </td></tr>
+  </table>
+    <div id="short_help" style="display:none">
+         <h5>To use iPeer you have to add a course.</h5>
+        <ul>
+            <li>Please <u>add a course</u> from the yellow "Courses" tab above</li>
+            <li>Then <U>register students</u> into that course from that courses summary display. This display will avaliable (once the course is created) by clicking on the courses name from most menus .</li>
+            <li>Put your students into <u>groups</u> manually, (or, if you have the students complete a survey, iPeer can do it for you, using TeamMaker).
+            <li>To create evaluations, check out the orange wizard link the top right hand corner "iPeer Tutorial Wirard".
+                It has detailed movies on how to create evaluations.</li>
+    </div>
+    <script>
+        function showShortHelp() {
+            var shortHelpDiv = $("short_help");
+            shortHelpDiv.style.display = "block";
+        }
+
+    </script>
+
+    <?php
+        if ($showShortHelpNow) {
+            echo "<script>javascript:showShortHelp();</script>";
+        }
+    ?>
+
+    <div style="text-align:right"><a href="javascript:showShortHelp();">( Show short help )</a></div>
+
 		<br>
       </div>
 	  </td>
