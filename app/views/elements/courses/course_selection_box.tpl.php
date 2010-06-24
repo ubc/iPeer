@@ -7,7 +7,7 @@
     if (empty($disabled)) $disabled='';
 
     //For Edit or Add pages; shows the selection box
-    echo '<select name="course_id" '.$disabled.'>';
+    echo '<select name="course_id" id="course_id" '.$disabled.'>';
 
     if (isset($defaultOpt) && $defaultOpt == '1') {
         echo '<option value="-1" SELECTED >No Course Selected</option>';

@@ -13,7 +13,6 @@
 <!--link rel="shortcut icon" href="favicon.ico" type="image/x-icon"-->
 <?php echo $html->charsetTag('UTF-8')?>
 <?php echo $html->css('ipeer')?>
-<?php echo $html->css('calendar')?>
 <?php echo $html->css('datepicker')?>
 <?php //echo $javascript->link('calculate_marks')?>
 <?php echo $javascript->link('ipeer')?>
