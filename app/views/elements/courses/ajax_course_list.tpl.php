@@ -35,9 +35,15 @@
     	  </td>
         <td align="left">
     	  <?php
-    		echo !empty($course['homepage']) ? "<a href=".$course['homepage'].">":'';
+            if (!empty($course['homepage'])) {
+                $homepage = $course['homepage'];
+                if (strpos(strtolower($homepage), "http://") === false) {
+                    $homepage = "http://" . $homepage;
+                }
+            }
+    		echo !empty($homepage) ? "<a href='$homepage'>" : "";
     		echo $html->image('icons/home.gif',array('border'=>'0', 'align'=>'middle','alt'=>'home'));
-    		echo !empty($course['homepage']) ? "</a>":'';
+    		echo !empty($homepage) ? "</a>":'';
     		?>
     	  <?php echo $html->link($course['course'], '/courses/home/'.$course['id']) ?>
     	  </td>
