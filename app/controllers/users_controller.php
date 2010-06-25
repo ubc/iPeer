@@ -267,7 +267,7 @@ class UsersController extends AppController
             // Bad ID format
             $this->rdAuth->privilegeError();
         }
-        
+
 	}
 
 	function editProfile()
@@ -286,6 +286,7 @@ class UsersController extends AppController
 			if (empty($this->params['data']['User']['password'])) {
 				unset($this->params['data']['User']['password']);
 			}
+
 			$this->Output->filter($this->params['data']);//always filter
 
             // Prevent User role changes (also stops privilege escalation)
@@ -299,8 +300,18 @@ class UsersController extends AppController
 				//TODO: Display list of users after import
 				$user = $this->User->read();
 				$this->params['data'] = $user;
-				$this->set('viewPage', 'true');
-				$this->set('message', 'Your Profile Updated Successfully.');
+				$this->set('viewPage', 'false');
+
+                if (!empty($user['User']['email'])) {
+                    $message =  "Your Profile Has Been Updated Successfully." . "<br > <br />";
+                    $message .= "<a href='..' style='font-size:140%'>Go to your iPeer Home page.</a><br /><br />";
+                } else {
+                    $message = "We saved your data, but you still need to enter an email address!";
+                }
+
+				$this->set('message', $message);
+
+
 				//Setup Custom parameter
 				$this->rdAuth->setFromData($user['User']);
 			} else {

@@ -27,18 +27,18 @@
 <!-- End of Validation Include Files -->
 <script language="JavaScript" type="text/javascript">
 <!--
+
 function checkEmailAddress()
 {
   var redirectURL = "<?php echo $this->webroot.$this->themeWeb;?> " + "users/editProfile";
   if (document.forms[0].elements['data[User][email]'].value == '') {
-    if (confirm('You have not yet enter your email address yet.  Do you want to input it now?') != null) {
+    alert("You don't have an email address on file.\nPlease enter your email address now.");
+    <?php if ($this->params['controller'] == 'users') { ?>
+    document.forms[0].elements['data[User][email]'].focus();
+    <?php }else {?>
+    window.location=redirectURL;
+    <?php } ?>
 
-      <?php if ($this->params['controller'] == 'users') { ?>
-        document.forms[0].elements['data[User][email]'].focus();
-      <?php }else {?>
-        window.location=redirectURL;
-      <?php } ?>
-    }
   }
 }
 -->
