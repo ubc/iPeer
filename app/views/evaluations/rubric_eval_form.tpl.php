@@ -64,9 +64,9 @@
 		  	<?php
 		  	echo $user['last_name'].' '.$user['first_name'];
 		  	if (isset($user['Evaluation'])) {
-		  	  echo '<font color="#66FF33"> ( Completed )</font>';
+		  	  echo '<font color="#66FF33"> ( Saved )</font>';
 		  	} else {
-		  	  echo '<blink><font color="#FF6666"> - Incomplete</font></blink>  (click to expand)';
+		  	  echo '<blink><font color="#FF6666"> - </font></blink>  (click to expand)';
 		  	}
 		  	?>
 		  </div>
@@ -80,11 +80,7 @@
       <table align="center" >
         <tr class="tablecell2">
           <td align="center"><?php
-            if (isset($user['Evaluation'])) {
-              echo $html->submit('Edit This Section', array('name'=>$user['id']));
-            } else {
-              echo $html->submit('Save This Section', array('name'=>$user['id']));
-            }
+            echo $html->submit('Save This Section', array('name'=>$user['id']));
             ?></td>
         </tr>
       </table>
@@ -109,7 +105,7 @@
   <input type="hidden" name="rubric_id" value="<?php echo $rubric['Rubric']['id']?>"/>
   <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $rdAuth->id?>"/>
   <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
-  <?php 
+  <?php
   $count = 0;
   foreach($groupMembers as $row) {
     $user = $row['User'];
@@ -117,14 +113,42 @@
       $count++;
     }
   }
-  if ($count == $evaluateeCount) {
+
+    $mustCompleteUsers = ($count != $evaluateeCount);
+
+    $commentsNeeded = false;
+    // Check if any comment fields were left empty.
+    if ($event['Event']['com_req']) {
+        foreach($groupMembers as $row) {
+            $user = $row['User'];
+            $evaluation = $user['Evaluation']['EvaluationRubric'];
+            $evaluationDetails = $user['Evaluation']['EvaluationRubricDetail'];
+            foreach ($evaluationDetails as $detail)
+                if (empty($detail['criteria_comment'])) {
+                    $commentsNeeded = true;
+                }
+            if (empty($evaluation['general_comment'])) {
+                $commentsNeeded = true;
+            }
+        }
+    } else {
+        $commentsNeeded = false;
+    }
+
+  if (!$mustCompleteUsers && !$commentsNeeded) {
     echo $html->submit('Submit to Complete the Evaluation');
   }
   else {
-    echo $html->submit('Submit to Complete the Evaluation', array('disabled'=>'true'));
+    echo $html->submit('Submit to Complete the Evaluation', array('disabled'=>'true')); echo "<br />";
+    echo $mustCompleteUsers ? "<div style='color: red'>Please complete the evaluation for all group members.</div>" : "";
+    echo $commentsNeeded ? "<div style='color: red'>Please Enter and Save comments for all the group members before submitting.</div>" : "";
   }
+
+
+
+
   ?>
-  
+
     </form></td>
     </tr>
 </table>
