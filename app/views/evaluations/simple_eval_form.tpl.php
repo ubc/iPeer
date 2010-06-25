@@ -178,7 +178,7 @@ if ($event['Event']['id']==292) {
 		<td width="15%">Mark</td>
 		<td width="35%">Comment  <?php echo $event['Event']['com_req']? '<font color=red>*</font>' : '(Optional)' ;?></td>
 	</tr>
-    <?php $i = 0;
+                   <?php $i = 0;
     foreach($groupMembers as $row): $user = $row['User']; ?>
     <tr class="tablecell">
         <td><?php echo $user['last_name'].' '.$user['first_name']?>
@@ -193,10 +193,10 @@ if ($event['Event']['id']==292) {
       </td>
       <td width="5">Max.</td>
       </tr></table>
-        </td>
-        <td><input type="text" name="points[]" id="point<?php echo $user['id']?>" value="<?php echo empty($params['data']['Evaluation']['point'.$user['id']])? '' : $params['data']['Evaluation']['point'.$user['id']] ?>" size="5" onkeyup="updateCount('total', 'remaining');">
+                </td>
+                 <td><input type="text" name="points[]" id="point<?php echo $user['id']?>" value="<?php echo empty($params['data']['Evaluation']['point'.$user['id']])? '' : $params['data']['Evaluation']['point'.$user['id']] ?>" size="5" onchange="updateCount(<?php echo $remaining?>,<?php echo $event['Event']['com_req']?>);">
     </td>
-        <td><input type="text" name="comments[]" id="comment<?php echo $user['id']?>" value="<?php echo empty($params['data']['Evaluation']['comment_'.$user['id']])? '' : $params['data']['Evaluation']['comment_'.$user['id']] ?>" style="width:96%">
+                 <td><input type="text" name="comments[]" id="comment<?php echo $user['id']?>" value="<?php echo empty($params['data']['Evaluation']['comment_'.$user['id']])? '' : $params['data']['Evaluation']['comment_'.$user['id']] ?>" size="50" onchange="updateCount(<?php echo $remaining?>,<?php echo $event['Event']['com_req']?>);">
       <script type="text/javascript" language="javascript">
 
             function onSlide(v){
