@@ -1,5 +1,5 @@
 
-<?php   
+<?php
   $groupMembers[0]['User']['id'] = 1;
   $groupMembers[0]['User']['last_name'] = 'User1';
   $groupMembers[0]['User']['first_name'] = 'Test';
@@ -102,31 +102,48 @@
 		<td width="15%">Mark</td>
 		<td width="35%">Comment  <?php echo  1? '<font color=red>*</font>' : '(Optional)' ;?></td>
 	</tr>
-	
-	
-	<?php $i = 0;
-	foreach($groupMembers as $row): $user = $row['User']; ?>
-	<tr class="tablecell">
-		<td><?php echo $user['last_name'].' '.$user['first_name']?>
-	  <input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/></td>
-	  <td width="130"><table><tr align="center">
-	    <td width="5">Min.</td>
-	    <td width="120">
-        <div id="track<?php echo $user['id']?>" style="width:100px;background-color:#aaa;height:10px;">
+
+
+    <?php $i = 0;
+    foreach($groupMembers as $row): $user = $row['User']; ?>
+    <tr class="tablecell">
+        <td><?php echo $user['last_name'].' '.$user['first_name']?>
+      <input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/></td>
+      <td width="110"><table><tr>
+        <td width="5">Min.</td>
+        <td width="110">
+        <div id="track<?php echo $user['id']?>" style="width:120px;background-color:#aaa;height:10px;">
           <div id="handle<?php echo $user['id']?>" style="width:10px;height:15px;background-color:#fa7e04;cursor:move;"> </div>
         </div>
-        <div id="score<?php echo $user['id']?>" style="padding-top: 5px;"></div>&nbsp;&nbsp;
+        <div style="height:10px;padding-top:10px;" align="center" id="score<?php echo $user['id']?>"></div>&nbsp;&nbsp;
       </td>
       <td width="5">Max.</td>
       </tr></table>
-		</td>
-		<td align="center"><input type="text" name="points[]" id="point<?php echo $user['id']?>" value="<?php echo empty($params['data']['Evaluation']['point'.$user['id']])? '' : $params['data']['Evaluation']['point'.$user['id']] ?>" size="5" onkeyup="updateCount('total', 'remaining');">
+        </td>
+        <td><input type="text" name="points[]" id="point<?php echo $user['id']?>" value="<?php echo empty($params['data']['Evaluation']['point'.$user['id']])? '' : $params['data']['Evaluation']['point'.$user['id']] ?>" size="5" onkeyup="updateCount('total', 'remaining');">
     </td>
-		<td><input type="text" name="comments[]" id="comment<?php echo $user['id']?>" value="<?php echo empty($params['data']['Evaluation']['comment_'.$user['id']])? '' : $params['data']['Evaluation']['comment_'.$user['id']] ?>" style="width:96%">
+        <td><input type="text" name="comments[]" id="comment<?php echo $user['id']?>" value="<?php echo empty($params['data']['Evaluation']['comment_'.$user['id']])? '' : $params['data']['Evaluation']['comment_'.$user['id']] ?>" style="width:96%">
       <script type="text/javascript" language="javascript">
-      new Control.Slider(<?php echo "'handle".$user['id']."'"?>,<?php echo "'track".$user['id']."'"?>,{minimum: 0, maximum:10, increment:10,
-          onSlide:function(v){$(<?php echo "'score".$user['id']."'"?>).innerHTML=v },
-          onChange:function(v){$(<?php echo "'score".$user['id']."'"?>).innerHTML=v }});
+
+            function onSlide(v){
+                $(<?php echo "'score".$user['id']."'"?>).innerHTML=(v+1);
+            }
+
+            var defaultValue = 5;
+
+            new Control.Slider(
+                <?php echo "'handle".$user['id']."'"?>,
+                <?php echo "'track".$user['id']."'"?>,
+                {values:        [0,1,2,3,4,5,6,7,8,9],
+                 range:         $R(0,9),
+                 increment:     10,
+                 sliderValue:   defaultValue,
+                 onSlide:       onSlide,
+                 onChange:      onSlide
+                }
+            );
+
+            onSlide(defaultValue-1);
     </script></td>
 	</tr>
 	<?php $i++;?>

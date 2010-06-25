@@ -4,9 +4,9 @@
 <script type="text/javascript" language="javascript">
 
   function updateCount(allPoints,commentsRequired) {
-    <?php 
+    <?php
       $ids = array();
-      foreach($groupMembers as $row) { 
+      foreach($groupMembers as $row) {
         $user = $row['User'];
         array_push($ids, $user['id']);
       }
@@ -14,7 +14,7 @@
         echo "floatPoints = document.getElementById('point".$id."');";
         echo "intPoints = Math.round(parseFloat(floatPoints.value));";
         echo "floatPoints.value = intPoints;";
-      }      
+      }
       echo "var totalPoints = 0;\n";
       echo "var emptyComments = 0;\n";
       foreach ($ids as $id) {
@@ -33,28 +33,28 @@
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments != 0) {";
       echo "    $('statusMsg').innerHTML = 'All points are allocated.<br />There are still <font color=red>' + emptyComments + '</font> comments to be filled.';";
-      echo "    submitButton.disabled = true;";      
+      echo "    submitButton.disabled = true;";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments == 0) {";
       echo "    $('statusMsg').innerHTML = 'All points are allocated.<br />All comments are filled.';";
-      echo "    submitButton.disabled = false;";      
+      echo "    submitButton.disabled = false;";
       echo "  }";
       echo "}";
- 
+
       echo "else if (totalPoints > parseFloat(allPoints)) {";
       echo "  diff = totalPoints - parseFloat(allPoints);";
       echo "  if (commentsRequired == 0) {";
       echo "    $('statusMsg').innerHTML = 'Too many points, need to unallocate <font color=red>' + diff + '</font> points.';";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments != 0) {";
-      echo "    $('statusMsg').innerHTML = 'Too many points, need to unallocate <font color=red>' + diff + '</font> points.<br />There are still <font color=red>' + emptyComments + '</font> comments to be filled.';";      
+      echo "    $('statusMsg').innerHTML = 'Too many points, need to unallocate <font color=red>' + diff + '</font> points.<br />There are still <font color=red>' + emptyComments + '</font> comments to be filled.';";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments == 0) {";
-      echo "    $('statusMsg').innerHTML = 'Too many points, need to unallocate <font color=red>' + diff + '</font> points.<br />All comments are filled.';";      
-      echo "  }";      
+      echo "    $('statusMsg').innerHTML = 'Too many points, need to unallocate <font color=red>' + diff + '</font> points.<br />All comments are filled.';";
+      echo "  }";
       echo "  submitButton.disabled = true;";
       echo "}";
- 
+
       echo "else if (totalPoints < parseFloat(allPoints)) {";
       echo "  diff = parseFloat(allPoints) - totalPoints;";
       echo "  if (commentsRequired == 0) {";
@@ -178,29 +178,46 @@ if ($event['Event']['id']==292) {
 		<td width="15%">Mark</td>
 		<td width="35%">Comment  <?php echo $event['Event']['com_req']? '<font color=red>*</font>' : '(Optional)' ;?></td>
 	</tr>
-	<?php $i = 0;
-	foreach($groupMembers as $row): $user = $row['User']; ?>
-	<tr class="tablecell">
-		<td><?php echo $user['last_name'].' '.$user['first_name']?>
-	  <input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/></td>
-	  <td width="130"><table><tr align="center">
-	    <td width="5">Min.</td>
-	    <td width="120">
-        <div id="track<?php echo $user['id']?>" style="width:100px;background-color:#aaa;height:10px;">
+    <?php $i = 0;
+    foreach($groupMembers as $row): $user = $row['User']; ?>
+    <tr class="tablecell">
+        <td><?php echo $user['last_name'].' '.$user['first_name']?>
+      <input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/></td>
+      <td width="110"><table><tr>
+        <td width="5">Min.</td>
+        <td width="110">
+        <div id="track<?php echo $user['id']?>" style="width:120px;background-color:#aaa;height:10px;">
           <div id="handle<?php echo $user['id']?>" style="width:10px;height:15px;background-color:#fa7e04;cursor:move;"> </div>
         </div>
-        <div id="score<?php echo $user['id']?>" style="padding-top: 5px;"></div>&nbsp;&nbsp;
+        <div style="height:10px;padding-top:10px;" align="center" id="score<?php echo $user['id']?>"></div>&nbsp;&nbsp;
       </td>
       <td width="5">Max.</td>
       </tr></table>
-		</td>
-		<td align="center"><input type="text" name="points[]" id="point<?php echo $user['id']?>" value="<?php echo empty($params['data']['Evaluation']['point'.$user['id']])? '' : $params['data']['Evaluation']['point'.$user['id']] ?>" size="5" onchange="updateCount(<?php echo $remaining?>,<?php echo $event['Event']['com_req']?>);">
+        </td>
+        <td><input type="text" name="points[]" id="point<?php echo $user['id']?>" value="<?php echo empty($params['data']['Evaluation']['point'.$user['id']])? '' : $params['data']['Evaluation']['point'.$user['id']] ?>" size="5" onkeyup="updateCount('total', 'remaining');">
     </td>
-		<td><input type="text" name="comments[]" id="comment<?php echo $user['id']?>" value="<?php echo empty($params['data']['Evaluation']['comment_'.$user['id']])? '' : $params['data']['Evaluation']['comment_'.$user['id']] ?>" size="50" onchange="updateCount(<?php echo $remaining?>,<?php echo $event['Event']['com_req']?>);">
+        <td><input type="text" name="comments[]" id="comment<?php echo $user['id']?>" value="<?php echo empty($params['data']['Evaluation']['comment_'.$user['id']])? '' : $params['data']['Evaluation']['comment_'.$user['id']] ?>" style="width:96%">
       <script type="text/javascript" language="javascript">
-      new Control.Slider(<?php echo "'handle".$user['id']."'"?>,<?php echo "'track".$user['id']."'"?>,{minimum: 0, maximum:10, increment:10,
-          onSlide:function(v){$(<?php echo "'score".$user['id']."'"?>).innerHTML=v },
-          onChange:function(v){$(<?php echo "'score".$user['id']."'"?>).innerHTML=v }});
+
+            function onSlide(v){
+                $(<?php echo "'score".$user['id']."'"?>).innerHTML=(v+1);
+            }
+
+            var defaultValue = 5;
+
+            new Control.Slider(
+                <?php echo "'handle".$user['id']."'"?>,
+                <?php echo "'track".$user['id']."'"?>,
+                {values:        [0,1,2,3,4,5,6,7,8,9],
+                 range:         $R(0,9),
+                 increment:     10,
+                 sliderValue:   defaultValue,
+                 onSlide:       onSlide,
+                 onChange:      onSlide
+                }
+            );
+
+            onSlide(defaultValue-1);
     </script></td>
 	</tr>
 	<?php $i++;?>
