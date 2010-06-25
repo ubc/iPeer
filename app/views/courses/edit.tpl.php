@@ -72,7 +72,7 @@
     <td>Status:</td>
     <td>
 		<input type="radio" name="data[Course][record_status]" value="A" <?php if( $course['record_status'] == "A" ) echo "checked";?>> - Active&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <input type="radio" name="record_status" id="record_status" value="I" <?php if( $course['record_status'] == "I" ) echo "checked";?>> - Inactive<br>
+    <input type="radio" name="data[Course][record_status]" value="I" <?php if( $course['record_status'] == "I" ) echo "checked";?>> - Inactive<br>
 	</td>
     <td>&nbsp;</td>
   </tr>

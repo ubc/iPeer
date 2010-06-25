@@ -175,14 +175,10 @@ class CoursesController extends AppController
                 $this->params['data']['Course']['homepage'] = "http://" . $this->params['data']['Course']['homepage'];
             }
 			$this->params = $this->Course->prepData($this->params);
-			if ( $this->Course->save($this->params['data']))
-			{
-				$this->UserCourse->insertInstructors($this->Course->id, $this->params['data']['Course']);
-
+			if ( $this->Course->save($this->params['data'])) {
+                var_dump($this->params['data']);
 				$this->redirect('courses/index/The course was updated successfully.');
-			}
-			else
-			{
+			} else	{
 				$this->set('data', $this->params['data']);
 				$this->set('errmsg', $this->Course->errorMessage);
 			}
