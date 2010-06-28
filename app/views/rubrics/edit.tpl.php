@@ -73,7 +73,7 @@
 		<?php echo $html->submit('Preview', array('Name'=>'preview')) ?>
 		<?php
 		$actionname = empty($params['data']['Rubric']['id'])?'Add Rubric':'Edit Rubric';
-		echo $html->submit($actionname) ?>
+		echo $html->submit($actionname, array('id' => 'submit-rubric')) ?>
 		</td>
     </tr>
 </table>
@@ -90,7 +90,7 @@
 <table class="title" width="100%"  border="0" cellspacing="0" cellpadding="0">
   <tr>
 	<td><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> Rubric Preview </td>
-	<td><div align="right"><a href="#rpreview" onclick="showhide('rpreview'); toggle(this);"><?php echo empty($this->data) ? '[+]' : '[-]'; ?></a></div></td>
+	<td><div align="right"><a href="#rpreview" onclick="$('rpreview').toggle(); toggle1(this);"><?php echo empty($this->data) ? '[-]' : '[-]'; ?></a></div></td>
   </tr>
 </table>
 <div id="rpreview" <?php echo empty($this->data) ? 'style="display: none; background: #FFF;">' : 'style="display: block; background: #FFF;"'; ?>>
@@ -101,3 +101,12 @@
 ?>
 </div>
 </form>
+
+<script type="text/javascript">
+$('LOM').observe('change', function(event){
+  $('submit-rubric').disable();
+})
+$('criteria').observe('change', function(event){
+  $('submit-rubric').disable();
+})
+</script>

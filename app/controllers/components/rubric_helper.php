@@ -11,7 +11,7 @@
  */
 class RubricHelperComponent extends Object
 {
-  function compileViewData($tmp=null)
+  function compileViewData($tmp)
 	{
 	  $this->RubricsLom = new RubricsLom;
 	  $this->RubricsCriteria = new RubricsCriteria;
@@ -25,10 +25,17 @@ class RubricHelperComponent extends Object
 		$data = $this->RubricsCriteria->getCriteria($rubric_id);
 		$tmp2 = array_merge($tmp1,$data);
 
+    // add some empty ones if needed
+    $criteria_count = count($data)/2;
+    for(;$criteria_count < $tmp['Rubric']['criteria'];$criteria_count++)
+    {
+      $tmp2['criteria'.($criteria_count+1)] = '';
+      $tmp2['criteria_weight_'.($criteria_count+1)] = 1;
+    }
+
 		$data = $this->RubricsCriteriaComment->getCriteriaComment($rubric_id, $tmp['Rubric']['criteria'], $tmp['Rubric']['lom_max']);
 		$tmp3 = array_merge($tmp2,$data);
 
-		//print_r($tmp3);
 		return $tmp3;
 	}
 

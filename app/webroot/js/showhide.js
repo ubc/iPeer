@@ -15,15 +15,14 @@ function showhide(layer_ref) {
 	if (document.layers) { //IS NETSCAPE 4 or below
 		document.layers[layer_ref].display = state;
 	}*/
-	if (document.getElementById) {
+	/*if (document.getElementById) {
 		hza = document.getElementById(layer_ref);
 		hza.style.display = state;
-	}
+	}*/
 }
 
-function toggle(link)
+function toggle1(link)
 {
-
 	var lText = link.innerHTML;
 	//var showHideFlag = document.getElementById(link).innerHTML;
 	if (lText == '[+]') { link.innerHTML = '[-]'; }

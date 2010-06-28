@@ -34,7 +34,7 @@
   <tr class="tablecell2">
     <td width="209" id="rubric_name_label">Rubric Name:<font color="red">*</font></td>
     <td width="301"><?php echo $html->input('Rubric/name', array('size'=>'30','class'=>'validate required TEXT_FORMAT rubric_name_msg Invalid_Text._At_Least_One_Word_Is_Required.','value'=>$rubric_name, 'id'=>'rubric_name')) ?></td>
-    <td width="353" id="rubric_name_msg" class="error" />
+    <td width="353" id="rubric_name_msg" class="error">&nbsp;</td>
   </tr>
   <tr class="tablecell2">
     <td>Level of Mastery:</td>

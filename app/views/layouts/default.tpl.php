@@ -16,6 +16,7 @@
 <?php echo $html->css('datepicker')?>
 <?php //echo $javascript->link('calculate_marks')?>
 <?php echo $javascript->link('ipeer')?>
+<?php echo $javascript->link('showhide')?>
 <!-- AJAX Include Files -->
 <?php echo $javascript->link('prototype')?>
 <?php echo $javascript->link('scriptaculous')?>

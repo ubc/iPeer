@@ -120,7 +120,8 @@ class RubricsController extends AppController
     				$this->RubricsCriteria->insertCriteria($this->Rubric->id, $this->params['data']['Rubric']);
     				$this->RubricsCriteriaComment->insertCriteriaComm($this->Rubric->id, $this->params['data']['Rubric']);
 
-    				$this->redirect('/rubrics/index/The rubric was added successfully.');
+            $this->Session->setFlash('The rubric was added successfully.');
+    				$this->redirect('/rubrics/index');
     			}
     			//updating a current rubric
     			else{

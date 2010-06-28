@@ -58,7 +58,7 @@
 <table width="100%"  border="0" cellspacing="0" cellpadding="0" class="title">
   <tr>
 	<td><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'ipeer_logo'))?> Rubric Preview </td>
-	<td><div align="right"><a href="#rpreview" onclick="showhide('rpreview'); toggle(this);"><?php echo empty($this->data) ? '[-]' : '[-]'; ?></a></div></td>
+	<td><div align="right"><a href="#rpreview" onclick="$('rpreview').toggle(); toggle1(this);"><?php echo empty($this->data) ? '[-]' : '[-]'; ?></a></div></td>
   </tr>
 </table>
 
