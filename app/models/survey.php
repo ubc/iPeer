@@ -27,7 +27,19 @@
  */
 class Survey extends AppModel
 {
-    var $name = 'Survey';
+  var $name = 'Survey';
+
+  var $belongsTo = array('Course' =>
+                         array('className'  =>  'Course',
+                               'conditions' =>  '',
+                               'order'      =>  '',
+                               'foreignKey' =>  'course_id'),
+                         'Creator' =>
+                         array('className'  =>  'User',
+                               'conditions' =>  '',
+                               'order'      =>  '',
+                               'foreignKey' =>  'creator_id')
+                        );
 
   function getSurveyIdByCourseIdTitle($courseId=null,$title=null) {
     $tmp = $this->find('course_id='.$courseId.' AND name=\''.$title.'\'','id');

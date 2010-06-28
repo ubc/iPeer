@@ -7,9 +7,9 @@
       <td width="10" height="32"><?php echo $html->image('magnify.png', array('alt'=>'Magnify Icon'));?></td>
       <td width="35"> <b>Search:</b> </td>
       <td width="35"><select name="select" id="select2">
-          <option value="title" >Survey</option>
-          <option value="course_id" >Course</option>
-		  <option value="user_id" >Creator</option>
+          <option value="Survey.title">Survey</option>
+          <option value="Course.course">Course</option>
+          <option value="Creator.name">Creator</option>
       </select></td>
       <td width="35"><input type="text" name="livesearch2" id="livesearch" size="30"></td>
       <td width="80%" align="right"> Show Only My Team Making Tool(s)? <input type="checkbox" name="show_my_tool" checked />	</td>

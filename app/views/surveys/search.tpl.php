@@ -1,6 +1,6 @@
 <?php
 
-$data = $this->controller->Survey->findAll($conditions,'' , $this->controller->order, $this->controller->show, $this->controller->page,null,null);//array('JOIN courses AS Course ON Survey.course_id = Course.id'));'Survey.*,Course.course'
+$data = $this->controller->Survey->findAll($conditions,'' , $this->controller->order, $this->controller->show, $this->controller->page,null,null);
 
 $paging['style'] = 'ajax';
 $paging['link'] = '/surveys/search/?show='.$this->controller->show.'&sort='.$this->controller->sortBy.'&direction='.$this->controller->direction.'&page=';

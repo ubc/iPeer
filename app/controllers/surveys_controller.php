@@ -46,7 +46,7 @@ class SurveysController extends AppController
 		$this->Sanitize = new Sanitize;
 		$this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
 		if ($this->show == 'all') $this->show = 99999999;
-		$this->sortBy = empty($_GET['sort'])? 'created': $this->Sanitize->paranoid($_GET['sort']);
+		$this->sortBy = empty($_GET['sort'])? 'Survey.created': $this->Sanitize->paranoid($_GET['sort']);
 		$this->direction = empty($_GET['direction'])? 'desc': $this->Sanitize->paranoid($_GET['direction']);
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
@@ -390,34 +390,40 @@ class SurveysController extends AppController
 		}
 	}
 
-	function search()
-  	{
-      $this->layout = 'ajax';
-      if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-      	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-      	if ($personalizeData) {
-      	   $this->userPersonalize->setPersonalizeList($personalizeData);
-           $this->show = $this->userPersonalize->getPersonalizeValue('Survey.ListMenu.Limit.Show');
-           $this->set('userPersonalize', $this->userPersonalize);
-      	}
+  function search()
+  {
+    $this->layout = 'ajax';
+    if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
+      $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+      if ($personalizeData) {
+        $this->userPersonalize->setPersonalizeList($personalizeData);
+        $this->show = $this->userPersonalize->getPersonalizeValue('Survey.ListMenu.Limit.Show');
+        $this->set('userPersonalize', $this->userPersonalize);
       }
+    }
 
-        $conditions = array('Survey.creator_id' =>  $this->rdAuth->id,
-                            'Survey.course_id' => $this->rdAuth->courseId);
+    $conditions = array('Survey.creator_id' =>  $this->rdAuth->id,
+                        'Survey.course_id' => $this->rdAuth->courseId);
 
 
-      if (!empty($this->params['form']['livesearch2']) && !empty($this->params['form']['select']))
+    if (!empty($this->params['form']['livesearch2']) && !empty($this->params['form']['select']))
+    {
+      $pagination->loadingId = 'loading';
+      //parse the parameters
+      $searchField=$this->params['form']['select'];
+      $searchValue=$this->params['form']['livesearch2'];
+      (empty($conditions))? $conditions = '' : $conditions .= ' AND ';
+      if('Creator.name' == $searchField)
       {
-        $pagination->loadingId = 'loading';
-        //parse the parameters
-        $searchField=$this->params['form']['select'];
-        $searchValue=$this->params['form']['livesearch2'];
-        (empty($conditions))? $conditions = '' : $conditions .= ' AND ';
+        $conditions = "(Creator.first_name LIKE '%".mysql_real_escape_string($searchValue)."%' 
+          OR Creator.last_name LIKE '%".mysql_real_escape_string($searchValue)."%')";
+      }else{
         $conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
       }
-      $this->update($attributeCode = 'Survey.ListMenu.Limit.Show',$attributeValue = $this->show);
-      $this->set('conditions',$conditions);
-  	}
+    }
+    $this->update($attributeCode = 'Survey.ListMenu.Limit.Show',$attributeValue = $this->show);
+    $this->set('conditions',$conditions);
+  }
 
     // called to add/remove response field from add/edit question pages
 	function adddelquestion($question_id=null)
