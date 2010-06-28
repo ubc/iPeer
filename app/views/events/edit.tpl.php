@@ -154,7 +154,8 @@
     <td>&nbsp;</td>
   </tr>
   <tr class="tablecell2">
-    <td colspan="3" align="center"><?php echo $html->submit('Edit Event') ?></td>
+    <?php echo $javascript->link('events')?>
+    <td colspan="3" align="center"><?php echo $html->submit('Edit Event', array('onclick' => "return validateEventDates();")); ?></td>
     </tr>
 </table>
 

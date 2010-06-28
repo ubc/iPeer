@@ -132,7 +132,8 @@
     <td>&nbsp;</td>
   </tr>
   <tr class="tablecell2">
-    <td colspan="3" align="center"><?php echo $html->submit('Add Event') ?></td>
+  <?php echo $javascript->link('events')?>
+    <td colspan="3" align="center"><?php echo $html->submit('Add Event', array('onclick' => "return validateEventDates();")); ?></td>
     </tr>
 </table>
 
