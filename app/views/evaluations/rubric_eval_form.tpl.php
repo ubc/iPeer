@@ -121,15 +121,26 @@
     if ($event['Event']['com_req']) {
         foreach($groupMembers as $row) {
             $user = $row['User'];
-            $evaluation = $user['Evaluation']['EvaluationRubric'];
-            $evaluationDetails = $user['Evaluation']['EvaluationRubricDetail'];
-            foreach ($evaluationDetails as $detail)
-                if (empty($detail['criteria_comment'])) {
-                    $commentsNeeded = true;
+
+            if (empty($user['Evaluation'])) {
+                $commentsNeeded = true;      // Not evaluated? Then we need comments for sure
+            } else {
+                $evaluation = $user['Evaluation']['EvaluationRubric'];
+                $evaluationDetails = $user['Evaluation']['EvaluationRubricDetail'];
+                foreach ($evaluationDetails as $detail)
+                    if (empty($detail['criteria_comment'])) {
+                        $commentsNeeded = true;      // A criteria comment is missing
+                        break;
+                    }
+                if (empty($evaluation['general_comment'])) {
+                    $commentsNeeded = true;   // General comment missing
                 }
-            if (empty($evaluation['general_comment'])) {
-                $commentsNeeded = true;
             }
+
+            if ($commentsNeeded) {
+                break; // avoid too much looping. If we need comments, that's it, we need comments!
+            }
+
         }
     } else {
         $commentsNeeded = false;
@@ -140,8 +151,8 @@
   }
   else {
     echo $html->submit('Submit to Complete the Evaluation', array('disabled'=>'true')); echo "<br />";
-    echo $mustCompleteUsers ? "<div style='color: red'>Please complete the evaluation for all group members.</div>" : "";
-    echo $commentsNeeded ? "<div style='color: red'>Please Enter and Save comments for all the group members before submitting.</div>" : "";
+    echo $mustCompleteUsers ? "<div style='color: red'>Please complete the questions for all group members, pressing 'Save This Section' button for each one.</div>" : "";
+    echo $commentsNeeded ? "<div style='color: red'>Please Enter all the comments for all the group members before submitting.</div>" : "";
   }
 
 
