@@ -117,4 +117,54 @@
         </tr>
         </table>
     </form>
+ <?php if ($isStudent) { ?>
+    <br /> <br />
+    <table class="title" width="100%"  border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> Import Students From Text (.txt) or CSV File (.csv)</td>
+          <td><div align="right"><a href="#import" onclick="showhide('import'); toggle(this);">[click here to start]</a> </div></td>
+        </tr>
+    </table>
+  <div id="import" style="display: none; background: #FFF;">
+  <br>
+  <?php echo $javascript->link('showhide')?>
+  <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td>
+          <table width="95%"  border="0" cellspacing="2" cellpadding="8" align="center">
+    <tr class="tableheader">
+      <td width="50%">Instructions</td>
+      <td width="50%">Import</td>
+    </tr>
+    <tr class="tablecell2">
+      <td>
+                          <?php
+                          if (isset($rdAuth->customIntegrateCWL) && $rdAuth->customIntegrateCWL) {
+                                  echo $this->renderElement('users/user_import_info_cwl');
+                          } else {
+                          echo $this->renderElement('users/user_import_info');
+                  }?>
+           </td>
+     <td valign="top"><br>
+
+ <form name="importfrm" id="importfrm" method="POST" action="<?php echo $html->url('import') ?>" enctype="multipart/form-data" >
+ <input type="hidden" name="required" value="file" />
+ <input type="file" name="file" value="Browse" /><br>
+ <?php echo  $html->hidden('User/role'); ?>
+
+                         <?php
+                         if (empty($rdAuth->courseId)) {
+                           $params = array('controller'=>'users', 'courseList'=>$courseList, 'defaultOpt'=>1);
+                         } else {
+                           $params = array('controller'=>'users', 'courseList'=>$courseList);
+                         }
+       echo $this->renderElement('courses/course_selection_box', $params);
+       ?>
+       <br>
+ <?php echo $html->submit('Import Student List') ?>
+ </form>
+ <br></td>
+   </tr>
+ </table>
+ <?php } ?>
 </td></tr></table>
