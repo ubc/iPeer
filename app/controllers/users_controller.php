@@ -487,7 +487,7 @@ class UsersController extends AppController
 		$tmpFile = $this->params['form']['file']['tmp_name'];
 
 		//$uploadDir = $this->sysContainer->getParamByParamCode('system.upload_dir');
-		$uploadDir="/var/www/ipeer.apsc.ubc.ca/htdocs/prod/app/uploads/";
+		$uploadDir="../tmp/";
 		$uploadFile = $uploadDir.$filename;
 		//check for blank value
 		if (trim($filename) == "") {
@@ -533,14 +533,14 @@ class UsersController extends AppController
 			$line = split(',', $lines[$i]);
 
 			$data['User']['id'] = null;
-			$data['User']['username'] = trim($line[0]);
-			$data['User']['tmp_password'] = trim($line[1]);
-			$data['User']['password'] = md5(trim($line[1]));
-			$data['User']['student_no'] = trim($line[2]);
-			$data['User']['email'] = trim($line[3]);
-			$data['User']['first_name'] = trim($line[4]);
-			$data['User']['last_name'] = trim($line[5]);
-			$data['User']['creator_id'] = $this->rdAuth->id;
+			$data['User']['username']     = isset($line[0]) ? trim($line[0]) : "";
+			$data['User']['tmp_password'] = isset($line[1]) ? trim($line[1]) : "";
+			$data['User']['password']     = isset($line[1]) ? md5(trim($line[1])) : "";
+			$data['User']['student_no']   = isset($line[2]) ? trim($line[2]) : "";
+			$data['User']['email']        = isset($line[3]) ? trim($line[3]) : "";
+			$data['User']['first_name']   = isset($line[4]) ? trim($line[4]) : "";
+			$data['User']['last_name']    = isset($line[5]) ? trim($line[5]) : "";
+			$data['User']['creator_id']   = $this->rdAuth->id;
 			if ($this->User->save($data))
 			{
 				//New user, save it as usual
