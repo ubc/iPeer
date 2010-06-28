@@ -45,7 +45,9 @@
 		echo '<table width="100%" border="0" cellspacing="2" cellpadding="2">';
 		for( $i=0; $i < count($instructor_data); $i++ ){
 			echo '<tr>';
-			echo '<td width="15"><a href='.$this->webroot.$this->themeWeb.$this->params['controller'].'/deleteInstructor/'.$instructor_data[$i]['User']['id'].'/'.$course['id'].'>'.$html->image('icons/x_small.gif',array('border'=>'0','alt'=>'Delete'), 'Are you sure to delete instructor \"'.$instructor_data[$i]['User']['last_name'].', '.$instructor_data[$i]['User']['first_name'] .'\"?').'</a></td><td>';
+			if ( count($instructor_data) > 1 ) {
+                echo '<td width="15"><a href='.$this->webroot.$this->themeWeb.$this->params['controller'].'/deleteInstructor/'.$instructor_data[$i]['User']['id'].'/'.$course['id'].'>'.$html->image('icons/x_small.gif',array('border'=>'0','alt'=>'Delete'), 'Are you sure to delete instructor \"'.$instructor_data[$i]['User']['last_name'].', '.$instructor_data[$i]['User']['first_name'] .'\"?').'</a></td><td>';
+            }
 			echo '<a href=../../users/view/'.$instructor_data[$i]['User']['id'].'>';
 			echo $instructor_data[$i]['User']['last_name'].', '.$instructor_data[$i]['User']['first_name'].'<br>';
 			echo '</a>';

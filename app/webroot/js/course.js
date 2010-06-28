@@ -13,9 +13,9 @@
   }
 
   function removeInstructor() {
-    if ((parseInt(document.frm.add.value)-1) < 0 ) {
+    if ((parseInt(document.frm.add.value)-1) < 1 ) {
         document.frm.add.value = 0;
-        alert("No more instructors to remove.");
+        alert("   A course should have at least one instructor.");
     } else {
         document.frm.add.value = parseInt(document.frm.add.value)-1;
     }
