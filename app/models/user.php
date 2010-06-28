@@ -38,7 +38,7 @@ class User extends AppModel
 	var $USER_TYPE_STUDENT = 'S';
 
 	var $hasMany = array(
-		'UserCourse' =>
+/*		'UserCourse' =>
 	array('className'   => 'UserCourse',
                   'conditions'  => 'UserCourse.record_status = "A"',
                   'order'       => 'UserCourse.course_id ASC',
@@ -46,7 +46,7 @@ class User extends AppModel
                   'foreignKey'  => 'user_id',
                   'dependent'   => true,
                   'exclusive'   => false,
-                   'finderSql'   => ''),
+                   'finderSql'   => ''),*/
        	'UserEnrol' =>
 	array('className'   => 'UserEnrol',
                   'conditions'  => 'UserEnrol.record_status = "A"',
@@ -57,6 +57,20 @@ class User extends AppModel
                   'exclusive'   => false,
                   'finderSql'   => '')
 	);
+
+  var $hasAndBelongsToMany = array('Course' =>
+                                   array('className'    =>  'Course',
+                                         'joinTable'    =>  'user_courses',
+                                         'foreignKey'   =>  'user_id',
+                                         'associationForeignKey'    =>  'course_id',
+                                         'conditions'   =>  '',
+                                         'order'        =>  '',
+                                         'limit'        => '',
+                                         'unique'       => true,
+                                         'finderQuery'  => '',
+                                         'deleteQuery'  => '', 
+                                         )
+                                  );
 
 
 	//Overwriting Function - will be called before save operation

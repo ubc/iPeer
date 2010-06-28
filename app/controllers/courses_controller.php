@@ -93,9 +93,8 @@ class CoursesController extends AppController
 	  $course = $this->Course->findById($id);
 		$this->set('data', $course);
 //	  $this->set('courseInstructors', $course['UserCourse']);
-	  $students = $this->UserEnrol->getEnrolledStudentCount($id);
-         $this->set('studentCount', $students[0]['total']);
-         //print_r($this);
+	  $students = $this->Course->getEnrolledStudentCount($id);
+    $this->set('studentCount', $students);
 	  //$groups = $this->Group->getCourseGroupCount($id);
 	  //$this->set('groupCount', $groups[0]['total']);
 

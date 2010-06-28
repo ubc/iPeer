@@ -12,7 +12,9 @@ class UserEnrol extends AppModel
 
 
   function getEnrolledStudentCount($courseId=null) {
-    return $this->find('course_id='.$courseId, 'COUNT(DISTINCT user_id) as total');
+    $conditions = array('course_id' => $courseId,
+                        );
+    return $this->find($conditions, 'COUNT(DISTINCT user_id) as total');
   }
 
   function removeStudentFromCourse($user_id=null, $course_id=null) {

@@ -61,6 +61,32 @@ class Course extends AppModel
                      )
               );
 
+  var $hasAndBelongsToMany = array('User' =>
+                                   array('className'    =>  'User',
+                                         'joinTable'    =>  'user_courses',
+                                         'foreignKey'   =>  'course_id',
+                                         'associationForeignKey'    =>  'user_id',
+                                         'conditions'   =>  '',
+                                         'order'        =>  '',
+                                         'limit'        => '',
+                                         'unique'       => true,
+                                         'finderQuery'  => '',
+                                         'deleteQuery'  => '', 
+                                         ),
+                                   'Enrol' =>
+                                   array('className'    =>  'User',
+                                         'joinTable'    =>  'user_enrols',
+                                         'foreignKey'   =>  'course_id',
+                                         'associationForeignKey'    =>  'user_id',
+                                         'conditions'   =>  'Enrol.role = "S"',
+                                         'order'        =>  '',
+                                         'limit'        => '',
+                                         'unique'       => true,
+                                         'finderQuery'  => '',
+                                         'deleteQuery'  => '', 
+                                         )
+                                  );
+
 	function findInstructors(){
 		return $this->findBySql("SELECT * FROM users WHERE role='I'");
 	}
@@ -226,6 +252,12 @@ class Course extends AppModel
         $this->Event->deleteAll($event['Event']['id']);
       //
     }
+  }
+
+  function getEnrolledStudentCount($course_id) {
+    $course = $this->findById($course_id);
+    if(null == $course) return;
+    return count($course['Enrol']);
   }
 }
 ?>
