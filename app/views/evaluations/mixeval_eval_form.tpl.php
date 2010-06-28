@@ -63,9 +63,9 @@
 		  	<?php
 		  	echo $user['last_name'].' '.$user['first_name'];
 		  	if (isset($user['Evaluation'])) {
-		  	  echo '<font color="#66FF33"> ( Completed )</font>';
+		  	  echo '<font color="#66FF33"> ( Entered )</font>';
 		  	} else {
-		  	  echo '<font color="#FF6666"> - Incompleted </font>';
+		  	  echo '<font color="#FF6666"> - Incomplete </font>';
 		  	}
 		  	?>
 		  </div>
@@ -109,8 +109,63 @@
   <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>"/>
   <input type="hidden" name="mixeval_id" value="<?php echo $data['Mixeval']['id']?>"/>
   <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $rdAuth->id?>"/>
-  <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/><?php echo $html->submit('Submit to Complete the Evaluation') ?></form></td>
-    </tr>
+<center>
+<?php
+  $count = 0;
+  foreach($groupMembers as $row) {
+    $user = $row['User'];
+    if (isset($user['Evaluation'])) {
+      $count++;
+    }
+  }
+
+    $mustCompleteUsers = ($count != $evaluateeCount);
+
+    $commentsNeeded = false;
+    // Check if any comment fields were left empty.
+    if ($event['Event']['com_req']) {
+        foreach($groupMembers as $row) {
+            $user = $row['User'];
+            if (empty($user['Evaluation'])) {
+                $commentsNeeded = true;      // Not evaluated? Then we need comments for sure
+                //echo "Missing eval for user $user[id]<br />";
+            } else {
+                if (isset($params['data']['questions'])) {
+                    $evaluationDetails = $user['Evaluation']['EvaluationMixevalDetail'];
+                    foreach ($evaluationDetails as $detail) {
+                        if ($params['data']['questions'][$detail['question_number']]['question_type'] != 'S' &&
+                            empty($detail['question_comment'])) {
+                            $commentsNeeded = true;      // A criteria comment is missing
+                            //echo "Missing detail $detail[id] $detail[question_comment] for user $user[id]<br />";
+                            break;
+                        } else {
+                            //echo "OK detail $detail[id] $detail[question_comment] for user $user[id]<br />";
+                        }
+                    }
+                }
+            }
+
+            if ($commentsNeeded) {
+                break; // avoid too much looping. If we need comments, that's it, we need comments!
+            }
+
+        }
+    } else {
+        $commentsNeeded = false;
+    }
+
+  if (!$mustCompleteUsers && !$commentsNeeded) {
+    echo $html->submit('Submit to Complete the Evaluation');
+  }
+  else {
+    echo $html->submit('Submit to Complete the Evaluation', array('disabled'=>'true')); echo "<br />";
+    echo $mustCompleteUsers ? "<div style='color: red'>Please complete the questions for all group members, pressing 'Save This Section' button for each one.</div>" : "";
+    echo $commentsNeeded ? "<div style='color: red'>Please Enter all the comments for all the group members before submitting.</div>" : "";
+  }
+
+?>
+</center>
+</tr>
 </table>
 	<script type="text/javascript"> new Rico.Accordion( 'accordion',
 								{panelHeight:800,

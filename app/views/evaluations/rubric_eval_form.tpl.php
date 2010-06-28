@@ -118,20 +118,21 @@
 
     $commentsNeeded = false;
     // Check if any comment fields were left empty.
-    if ($event['Event']['com_req']) {
+    if ($event['Event']['com_req'] && isset($data['questions'])) {
         foreach($groupMembers as $row) {
             $user = $row['User'];
 
             if (empty($user['Evaluation'])) {
                 $commentsNeeded = true;      // Not evaluated? Then we need comments for sure
             } else {
-                $evaluation = $user['Evaluation']['EvaluationRubric'];
-                $evaluationDetails = $user['Evaluation']['EvaluationRubricDetail'];
-                foreach ($evaluationDetails as $detail)
-                    if (empty($detail['criteria_comment'])) {
-                        $commentsNeeded = true;      // A criteria comment is missing
-                        break;
-                    }
+                    $evaluation = $user['Evaluation']['EvaluationRubric'];
+                    $evaluationDetails = $user['Evaluation']['EvaluationRubricDetail'];
+                    foreach ($evaluationDetails as $detail)
+                        if ($data['questions'][$detail['question_number']]['question_type'] !='S' &&   // if the questing in not a selection one.
+                            empty($detail['criteria_comment'])) {
+                            $commentsNeeded = true;      // A criteria comment is missing
+                            break;
+                        }
                 if (empty($evaluation['general_comment'])) {
                     $commentsNeeded = true;   // General comment missing
                 }
