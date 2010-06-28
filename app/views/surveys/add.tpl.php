@@ -68,6 +68,7 @@
         <tr class="tablecell2">
           <td colspan="3" align="center">
         <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
+        <?php echo $html->submit('Add Survey') ?></td>
           </tr>
       </table>
       <table width="95%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">
