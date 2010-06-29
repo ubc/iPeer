@@ -74,7 +74,17 @@
 
       <?php
 
-      $params = array('controller'=>'mixevals','data'=>$this->controller->MixevalHelper->compileViewData($data), 'scale_default'=>$data['Mixeval']['scale_max'], 'question_default'=>$data['Mixeval']['lickert_question_max'], 'prefill_question_max'=>$data['Mixeval']['prefill_question_max'], 'zero_mark'=>$data['Mixeval']['zero_mark'], 'total_mark'=>$data['Mixeval']['total_marks'], 'evaluate'=>1, 'user'=>$user);
+      $params = array(  'controller'            => 'mixevals',
+                        'data'                  => $this->controller->MixevalHelper->compileViewData($data),
+                        'scale_default'         => $data['Mixeval']['scale_max'],
+                        'question_default'      => $data['Mixeval']['lickert_question_max'],
+                        'prefill_question_max'  => $data['Mixeval']['prefill_question_max'],
+                        'zero_mark'             => $data['Mixeval']['zero_mark'],
+                        'total_mark'            => $data['Mixeval']['total_marks'],
+                        'evaluate'              => 1,
+                        'user'                  => $user);
+
+
       echo $this->renderElement('mixevals/view_mixeval_details', $params);
       ?>
       <table align="center" >

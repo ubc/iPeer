@@ -57,7 +57,8 @@
         echo '<td width="'.round(50/$scale_default).'%" valign="bottom"><table border="0" width="100%" cellpadding="2"><tr align="center"><td width="100">';
         echo $descriptor_des[$j].'&nbsp;';
         echo "</td></tr>";
-					echo '<tr><td align="center" width="100"><input name="'.$userId.'criteria_points_'.$i.'" type="radio" value="'.$mark_value.'" onclick="document.evalForm.selected_lom_'.$userId.'_'.$i.'" ';
+					echo '<tr><td align="center" width="100">';
+					echo '<input name="'.$userId.'criteria_points_'.$i.'" type="radio" value="'.$mark_value.'" onclick="document.evalForm.selected_lom_'.$userId.'_'.$i.".value=".$j.'" ';
 					if (isset($evaluation)) {
 					  if (isset($evaluation['EvaluationDetail'][$i-1]['EvaluationMixevalDetail']['selected_lom']) && $evaluation['EvaluationDetail'][$i-1]['EvaluationMixevalDetail']['selected_lom'] == $j) echo " checked ";
 					} else {

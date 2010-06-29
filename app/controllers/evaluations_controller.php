@@ -334,7 +334,7 @@ class EvaluationsController extends AppController
             }
 
             if ($this->EvaluationSimpleHelper->saveSimpleEvaluation($this->params, $groupEvent, $evaluationSubmission)) {
-                $this->redirect('/home/index/Your Evaluation is submitted successfully.');
+                $this->redirect('/home/index/Your Evaluation was submitted successfully.');
             } else {
                 //Found error
                 //Validate the error why the Event->save() method returned false
@@ -402,7 +402,7 @@ class EvaluationsController extends AppController
             }
 
             if ($this->EvaluationSurveyHelper->saveSurveyEvaluation($this->params)) {
-                $this->redirect('/home/index/Your survey is submitted successfully.');
+                $this->redirect('/home/index/Your survey was submitted successfully.');
             } else {
                 echo "<h1>Hello!</h1>";
                 //Validate the error why the Event->save() method returned false
@@ -509,7 +509,7 @@ class EvaluationsController extends AppController
         }
 
         if ($status) {
-            $this->redirect('/home/index/Your Evaluation is submitted successfully.');
+            $this->redirect('/home/index/Your Evaluation was submitted successfully.');
         } else {
             $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
         }
@@ -545,7 +545,8 @@ class EvaluationsController extends AppController
             if (!$this->validMixevalEvalComplete($this->params['form'])) {
                 $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
             }
-                if ($this->EvaluationMixevalHelper->saveMixevalEvaluation($this->params)) {
+
+            if ($this->EvaluationMixevalHelper->saveMixevalEvaluation($this->params)) {
                 $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
             }
             //Found error
@@ -607,7 +608,7 @@ class EvaluationsController extends AppController
         }
 
         if ($status) {
-            $this->redirect('/home/index/Your Evaluation is submitted successfully.');
+            $this->redirect('/home/index/Your Evaluation was submitted successfully.');
         } else {
             $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
         }
@@ -886,18 +887,18 @@ class EvaluationsController extends AppController
       $this->Event->setId($eventId);
       $event = $this->Event->read();
 
-      
+
       switch ($event['Event']['event_template_type_id']) {
         case "1":
 		$groupId =  $this->params['form']['group_id'];
-	    
+
 	    if(isset($this->params['form']['evaluator_ids']))
         {
 	        $groupEventId = $this->params['form']['group_event_id'];
 	        $evaluatorIds = $this->params['form']['evaluator_ids'];
 	        $this->EvaluationSimpleHelper->changeEvaluationCommentRelease ($eventId, $groupId, $groupEventId, $evaluatorIds, $this->params);
         }
-        
+
 	    $this->redirect('evaluations/viewEvaluationResults/'.$eventId.';'.$groupId);
           break;
 

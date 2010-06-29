@@ -81,6 +81,7 @@
         <tr class="tablecell2">
           <td align="center"><?php
             echo $html->submit('Save This Section', array('name'=>$user['id']));
+            echo "<br />Make sure you save this section before moving on to the other ones! <br /><br />";
             ?></td>
         </tr>
       </table>
