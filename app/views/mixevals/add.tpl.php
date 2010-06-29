@@ -78,7 +78,6 @@
         <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
 		<?php
 		if(!empty($data)){
-		  echo $html->submit('Reset', array('Name'=>'next')); echo '&nbsp;';
 		  echo $html->submit('Add Mix Evaluation');
 		} else {
 		  echo $html->submit('Next', array('Name'=>'next'));

@@ -80,7 +80,6 @@
         <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
 		<?php
 		if(!empty($data)){
-		  echo $html->submit('Reset', array('Name'=>'preview')); echo '&nbsp;';
     	if (empty($params['data']['Mixeval']['id'])) {
 	      echo $html->submit('Add Mixed Evaluation');
 	    } else {
@@ -135,7 +134,7 @@ echo $javascript->link('calculate_marks');?>
 		  //Get and set Mixeval Question
 		  isset($questions[$pos])? $mixevalQuestion = $questions[$pos] : $mixevalQuestion = null;
 		  if ($mixevalQuestion !=null) {
-		    $questionDescriptors = $mixevalQuestion['descriptors'];
+		    $questionDescriptors = isset($mixevalQuestion['descriptors']) ?  isset($mixevalQuestion['descriptors']) : "";
    		  //$this->controller->Output->br2nl($mixevalQuestion);
 		    $descriptor_des = array();
 
