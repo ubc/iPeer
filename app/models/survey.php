@@ -46,6 +46,15 @@ class Survey extends AppModel
     return $tmp['Survey']['id'];
   }
 
+
+  function beforeSave() {
+
+    // Remove any single quotes in the name, so that custom SQL queries are not confused.
+    $this->data[$this->name]['name'] =
+        str_replace("'", "", $this->data[$this->name]['name']);
+    return true;
+  }
+
   function getSurveyResult($courseId=null) {
     $condition = 'Survey.course_id='.$courseId;
     $fields = 'Survey.id,Survey.name,User.id,User.first_name,User.last_name,User.student_no,EvaluationSubmission.id,EvaluationSubmission.submitted,EvaluationSubmission.date_submitted';

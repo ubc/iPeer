@@ -96,6 +96,11 @@ class Event extends AppModel
 
 	//Overwriting Function - will be called before save operation
 	function beforeSave(){
+
+      // Remove any signle quotes in the name, so that custom SQL queries are not confused.
+      $this->data[$this->name]['title'] =
+        str_replace("'", "", $this->data[$this->name]['title']);
+
 	  $allowSave = true;
 	  if (empty($this->data[$this->name]['id'])) {
       //check the duplicate title

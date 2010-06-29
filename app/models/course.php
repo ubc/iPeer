@@ -71,7 +71,7 @@ class Course extends AppModel
                                          'limit'        => '',
                                          'unique'       => true,
                                          'finderQuery'  => '',
-                                         'deleteQuery'  => '', 
+                                         'deleteQuery'  => '',
                                          ),
                                    'Enrol' =>
                                    array('className'    =>  'User',
@@ -83,7 +83,7 @@ class Course extends AppModel
                                          'limit'        => '',
                                          'unique'       => true,
                                          'finderQuery'  => '',
-                                         'deleteQuery'  => '', 
+                                         'deleteQuery'  => '',
                                          )
                                   );
 
@@ -131,6 +131,10 @@ class Course extends AppModel
 
 	//Overwriting Function - will be called before save operation
 	function beforeSave(){
+      // Remove any single quotes in the name, so that custom SQL queries are not confused.
+      $this->data[$this->name]['title'] =
+        str_replace("'", "", $this->data[$this->name]['title']);
+
 	  $allowSave = true;
 	  if (empty($this->data[$this->name]['course'])) { //temp ! to escape ajax bug
 		  $this->errorMessage='Course name is required.'; //check empty name

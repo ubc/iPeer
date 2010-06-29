@@ -41,12 +41,17 @@ class SimpleEvaluation extends AppModel
   );
 	//Overwriting Function - will be called before save operation
 	function beforeSave(){
-	  $allowSave = true;
-	  if (empty($this->data[$this->name]['id'])) {
-      //check the duplicate username
-      $allowSave = $this->__checkDuplicateTitle();
-    }
-    return $allowSave;
+        // Remove any signle quotes in the name, so that custom SQL queries are not confused.
+        $this->data[$this->name]['name'] =
+            str_replace("'", "", $this->data[$this->name]['name']);
+
+
+        $allowSave = true;
+        if (empty($this->data[$this->name]['id'])) {
+            //check the duplicate username
+            $allowSave = $this->__checkDuplicateTitle();
+        }
+        return $allowSave;
 	}
 
   //Validation check on duplication of username

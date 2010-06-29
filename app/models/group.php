@@ -38,6 +38,11 @@ class Group extends AppModel
                       );
 
 	function beforeSave(){ //serverside validation
+
+        // Remove any single quotes in the name, so that custom SQL queries are not confused.
+        $this->data[$this->name]['group_name'] =
+            str_replace("'", "", $this->data[$this->name]['group_name']);
+
 		$allowSave = true;
 		if (empty($this->data[$this->name]['group_num'])) {
 			//$this->errorMessage = 'Group number is required.'; //ajax bug
@@ -125,8 +130,8 @@ class Group extends AppModel
       return $this->findBySql("SELECT DISTINCT users.id, users.role, users.username, users.first_name, users.last_name, users.student_no, users.title
                               FROM users
                               JOIN user_enrols on users.id=user_enrols.user_id
-                              WHERE user_enrols.course_id=".$course_id." AND users.role = 'S' AND users.id NOT IN 
-                              (SELECT user_id FROM `groups` LEFT JOIN groups_members as gs ON groups.id = gs.group_id WHERE groups.course_id = ".$course_id.") 
+                              WHERE user_enrols.course_id=".$course_id." AND users.role = 'S' AND users.id NOT IN
+                              (SELECT user_id FROM `groups` LEFT JOIN groups_members as gs ON groups.id = gs.group_id WHERE groups.course_id = ".$course_id.")
                               ORDER BY users.last_name ASC");
     }else{
       return $this->groupDifference($group_id,$course_id);

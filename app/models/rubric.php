@@ -48,6 +48,11 @@ class Rubric extends AppModel
   );
 
 	function beforeSave(){
+
+        // Remove any signle quotes in the name, so that custom SQL queries are not confused.
+        $this->data[$this->name]['name'] =
+            str_replace("'", "", $this->data[$this->name]['name']);
+
 		$allowSave = true;
 		if (empty($this->data[$this->name]['name'])) {
 			//check empty name
