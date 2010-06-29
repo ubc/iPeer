@@ -288,7 +288,7 @@ class SurveysController extends AppController
 
                 $this->set('course_id', $this->params['data']['Survey']['course_id']);
 				$this->set('message', 'The survey was updated successfully.');
-				$this->index();
+				$this->index(); $this->render("index"); // Render the Survey List
 			}
 			else
 			{
@@ -415,7 +415,7 @@ class SurveysController extends AppController
       (empty($conditions))? $conditions = '' : $conditions .= ' AND ';
       if('Creator.name' == $searchField)
       {
-        $conditions = "(Creator.first_name LIKE '%".mysql_real_escape_string($searchValue)."%' 
+        $conditions = "(Creator.first_name LIKE '%".mysql_real_escape_string($searchValue)."%'
           OR Creator.last_name LIKE '%".mysql_real_escape_string($searchValue)."%')";
       }else{
         $conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
@@ -451,7 +451,7 @@ class SurveysController extends AppController
 		$this->params['data'] = $this->Survey->read();
 		$this->params['data']['Survey']['released'] = 1;
 
-		//add survey to events
+		//add survey to eventsx();
 		  //set up Event params
 		$eventArray['Event']['title'] = $this->params['data']['Survey']['name'];
 		$eventArray['Event']['course_id'] = $this->params['data']['Survey']['course_id'];
