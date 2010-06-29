@@ -38,7 +38,7 @@
   </tr>
   <tr class="tablecell2">
     <td>Level of Mastery:</td>
-    <td><?php echo $html->selectTag('Rubric/lom_max', array('1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8',
+    <td><?php echo $html->selectTag('Rubric/lom_max', array('2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8',
 									'9'=>'9','10'=>'10'), $lom_default, array('style'=>'width:50px;','id'=>'LOM'),'',false) ?></td>
     <td>aka LOM, Evaluation Range (Max 10) </td>
   </tr>

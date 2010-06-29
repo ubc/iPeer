@@ -52,7 +52,7 @@
 									'18'=>'18','19'=>'19','20'=>'20','21'=>'21','22'=>'22','23'=>'23','24'=>'24','25'=>'25'), $question_default,
 									array('style'=>'width:50px;','id'=>'lickert_question_max'),'',false) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		Level of Scale:&nbsp;&nbsp;
-		<?php echo $html->selectTag('Mixeval/scale_max', array('1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8',
+		<?php echo $html->selectTag('Mixeval/scale_max', array('2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8',
 									'9'=>'9','10'=>'10'), $scale_default, array('style'=>'width:50px;','id'=>'LOM'),'',false) ?>
 		</td>
     <td><!--Number of Lickert Question Aspects (Max 25)--> </td>

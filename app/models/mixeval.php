@@ -90,7 +90,11 @@ class Mixeval extends AppModel
         for ($j = 1; $j <= $question['scale_level']; $j++) {
          $desc['question_num'] = $question['question_num'];
          $desc['scale_level'] = $j;
-         $desc['descriptor'] = $tmp['data']['Mixeval']['criteria_comment_'.$question['question_num'].'_'.$j];
+
+        // Make sure empty strings cause no php errors.
+         $descriptor = isset($tmp['data']['Mixeval']['criteria_comment_'.$question['question_num'].'_'.$j]) ?
+                             $tmp['data']['Mixeval']['criteria_comment_'.$question['question_num'].'_'.$j] : "";
+         $desc['descriptor'] = $descriptor;
          $questions[$i]['MixevalsQuestion']['descriptor'][$j] = $desc;
         }
 
