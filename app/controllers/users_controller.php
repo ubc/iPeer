@@ -245,7 +245,7 @@ class UsersController extends AppController
 
                     if ($this->User->save($this->params['data'])) {
 
-                        $this->UserEnrol->insertCourses($this->User->id, $this->params['form']);
+                        $this->UserEnrol->insertCourses($this->User->id, $this->params['form']['course_ids']);
 
                         //Render to view page to display saved data
                         //TODO: Display list of users after import
@@ -658,33 +658,34 @@ class UsersController extends AppController
       $this->rdAuth->privilegeError();
     }
 
-    if($course_id != '' && $user_id != '') {
+    if($course_id == '' || $user_id == '') {
       $this->Session->setFlash('Invalid course id or user id!');
-    }
-
-    $this->autoRender = false;
-
-    if(User::canRemoveCourse($this->rdAuth->User->findUserById($this->rdAuth->id), $course_id))
-    {
-      $return = $this->UserEnrol->removeStudentFromCourse($user_id, $course_id);
     }else{
-      $this->Session->setFlash('You do not have permssion to remove this course.');
+
+      $this->autoRender = false;
+
+      if(User::canRemoveCourse($this->rdAuth->User->findUserById($this->rdAuth->id), $course_id))
+      {
+        $return = $this->UserEnrol->removeStudentFromCourse($user_id, $course_id);
+      }else{
+        $this->Session->setFlash('You do not have permssion to remove this course.');
+      }
     }
 
 		$this->redirect('users/edit/'.$user_id);
 	}
 
-	function adddelcourse($user_id='')
+	function adddelcourse($user_id)
 	{
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
+    // Make sure the present user is not a student
+    $this->rdAuth->noStudentsAllowed();
 
 		$this->set('user_id', $user_id);
 		$this->layout = 'ajax';
 	}
 
-	function nonRegisteredCourses($userId=null) {
-		return $this->Course->findNonRegisteredCoursesList($userId);
+	function nonRegisteredCourses($user_id) {
+		return $this->Course->findNonRegisteredCoursesList($user_id);
 	}
 
 }

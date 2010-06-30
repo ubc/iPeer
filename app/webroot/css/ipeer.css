@@ -472,3 +472,8 @@ a.miniLinks:active {
 	border-top: 1px solid #CFCFCF;
 	border-bottom: 1px solid #CFCFCF;
 }
+
+#adddelcourses select.course-selector{
+  width: 250px;
+  margin: 2px;
+}

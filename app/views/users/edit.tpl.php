@@ -3,6 +3,7 @@
 <td><script type="text/javascript" language="javascript">
 <!--
   var total_course_count = <?php echo $course_count?>;
+  var course_count = 1;
 //-->
 </script>
 <?php echo $javascript->link('user')?>
@@ -66,20 +67,29 @@
                 </table>
             <?php endif;?>
         <input type="hidden" name="user_id" id="user_id" value="<?php echo $user_id;?>">
-        <div id="adddelcourses">
-        <?php
-        $params2 = array('controller'=>'users', 'all_courses'=>$all_courses, 'count'=>0, 'user_id' => $user_id);
-        echo $this->renderElement('users/ajax_user_courses', $params2);
-        ?>
-        </div>
+        <div id="adddelcourses"></div>
       </td>
       <td>
 
         <input type="hidden" name="add" id="add" value="0">
-        <a href=# onClick="addToCourse();"><?php echo $html->image('icons/add.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Add Another Course</a>
+        <!--<a href=# onClick="addToCourse();"><?php echo $html->image('icons/add.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Add Another Course</a>-->
+        <?php echo $ajax->link($html->image('icons/add.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')).'- Add Another Course', 
+                               '/users/adddelcourse/'.$user_id, 
+                               array('update'=>'adddelcourses', 
+                                     'with'=> '{add:course_count}',
+                                     'loading'=>"Element.show('loading');", 
+                                     'complete'=>"Element.hide('loading');course_count++;",
+                                     'position'=>'bottom'),
+                               null,
+                               false) ?>
+
         <br><br>
         <a href=# onClick="removeFromCourse();"><?php echo $html->image('icons/delete.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Remove From Another Course</a>
-        <?php echo $ajax->observeField('add', array('update'=>'adddelcourses', 'url'=>"/users/adddelcourse/$user_id", 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');")) ?>
+        <?php echo $ajax->observeField('add', array('update'=>'adddelcourses', 
+                                                    'url'=>"/users/adddelcourse", 
+                                                    'frequency'=>1, 
+                                                    'loading'=>"Element.show('loading');", 
+                                                    'complete'=>"Element.hide('loading');")) ?>
 
       </td>
     </tr>

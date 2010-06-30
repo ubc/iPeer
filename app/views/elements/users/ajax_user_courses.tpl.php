@@ -1,11 +1,5 @@
-<?php
-for ( $i=0; $i<$count; $i++) {
-  echo '<select name="course_id'.($i+1).'" style="width:250px;margin: 2px;">';
-  foreach($all_courses as $row) {   	
-    $course = $row['Course']; 
-    echo '<option value='.$course['id'].'>'.$course['course']." - ".$course['title']."</option>";
-  }
-  echo "</select><br>";
-}
-echo '<input type="hidden" name="data[Course][count]"  value="'.$count.'" />';
-?>
+<select name="course_ids[<?php echo $count?>]" class="course-selector">
+  <?php foreach($all_courses as $row):?>
+    <option value='<?php echo $row['Course']['id']?>'><?php echo $row['Course']['course']." - ".$row['Course']['title']?></option>
+  <?php endforeach;?>
+</select>
