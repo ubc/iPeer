@@ -134,7 +134,7 @@ echo $javascript->link('calculate_marks');?>
 		  //Get and set Mixeval Question
 		  isset($questions[$pos])? $mixevalQuestion = $questions[$pos] : $mixevalQuestion = null;
 		  if ($mixevalQuestion !=null) {
-		    $questionDescriptors = isset($mixevalQuestion['descriptors']) ?  isset($mixevalQuestion['descriptors']) : "";
+		    $questionDescriptors = isset($mixevalQuestion['descriptors']) ?  $mixevalQuestion['descriptors'] : "";
    		  //$this->controller->Output->br2nl($mixevalQuestion);
 		    $descriptor_des = array();
 
