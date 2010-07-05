@@ -20,32 +20,26 @@
   				  ?>><?php echo $template['name'] ?></option>
   			<?php endforeach; ?>
   		</select>
-      
+
       <script type="text/javascript" language="javascript">
-        function getSimpleIndex(obj) {
-          index = document.getElementById("template_id").selectedIndex;
-          obj.href = "<?php echo $this->webroot.$this->themeWeb;?>simpleevaluations/view/"+(++index)+"/pop_up";
+
+        function getIndex(obj, type) {
+          index = document.getElementById("template_id").value;
+          obj.href = "<?php echo $this->webroot.$this->themeWeb;?>" + type + "/view/"+(index)+"/pop_up";
         }
-        function getRubricIndex(obj) {
-          index = document.getElementById("template_id").selectedIndex;
-          obj.href = "<?php echo $this->webroot.$this->themeWeb;?>rubrics/view/"+(++index)+"/pop_up";
-        }
-        function getMixIndex(obj) {
-          index = document.getElementById("template_id").selectedIndex;
-          obj.href = "<?php echo $this->webroot.$this->themeWeb;?>mixevals/view/"+(++index)+"/pop_up";
-        }
+
       </script>
     <?php
     }
     //echo '<br><br>';
     if ($model == 'SimpleEvaluation') { ?>
-      <a title="Simple Evaluation Preview" target="_blank" href="<?php echo $this->webroot.$this->themeWeb;?>simpleevaluations/view/1/pop_up" onclick="getSimpleIndex(this); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview</a>
-    <?php } 
+      <a title="Simple Evaluation Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'simpleevaluations'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview This Simple Evaluation</a>
+    <?php }
     else if ($model == 'Rubric') { ?>
-      <a title="Rubric Preview" target="_blank" href="<?php echo $this->webroot.$this->themeWeb;?>rubrics/view/1/pop_up" onclick="getRubricIndex(this); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview</a>
-    <?php } 
+      <a title="Rubric Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'rubrics'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview This Rubric</a>
+    <?php }
     else if ($model == 'Mixeval') { ?>
-      <a title="Mix Evaluation Preview" target="_blank" href="<?php echo $this->webroot.$this->themeWeb;?>mixevals/view/1/pop_up" onclick="getMixIndex(this); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview</a>
+      <a title="Mix Evaluation Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'mixevals'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview this Mixed Evaluaiton</a>
     <?php } ?>
 <?php  }
   else {
@@ -61,5 +55,5 @@
     <?php } else  if ($model == 'Mixeval'){ ?>
     <a title="Preview Rubric" href="<?php echo $this->webroot.$this->themeWeb;?>mixevals/view/1/pop_up" onclick="wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview</a>
     <?php } ?>
-<?php  }?>  
+<?php  }?>
 <!-- elements::ajax_event_template_lists end -->
