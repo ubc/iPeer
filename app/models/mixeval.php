@@ -104,6 +104,15 @@ class Mixeval extends AppModel
 
 		return $questions;
 	}
+
+    /**
+     * Returns the evaluations made by this user, and any other public ones.
+     */
+    function getBelongingOrPublic($userID) {
+        return is_numeric($userID) ?
+            $this->query("SELECT * FROM mixevals as Mixeval where availability='public' or creator_id=" . $userID)
+            : false;
+    }
 }
 
 ?>

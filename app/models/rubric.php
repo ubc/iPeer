@@ -96,6 +96,15 @@ class Rubric extends AppModel
 
 		return $tmp;
 	}
+
+	    /**
+     * Returns the evaluations made by this user, and any other public ones.
+     */
+    function getBelongingOrPublic($userID) {
+        return is_numeric($userID) ?
+            $this->query("SELECT * FROM rubrics as Rubric where availability='public' or creator_id=" . $userID)
+            : false;
+    }
 }
 
 ?>

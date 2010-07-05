@@ -73,6 +73,14 @@ class SimpleEvaluation extends AppModel
 	}
 
 
+    /**
+     * Returns the evaluations made by this user, and any other public ones.
+     */
+    function getBelongingOrPublic($userID) {
+        return is_numeric($userID) ?
+            $this->query("SELECT * FROM simple_evaluations as SimpleEvaluation where creator_id=" . $userID)
+            : false;
+    }
 }
 
 ?>

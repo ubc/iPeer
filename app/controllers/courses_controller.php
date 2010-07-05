@@ -175,7 +175,6 @@ class CoursesController extends AppController
             }
 			$this->params = $this->Course->prepData($this->params);
 			if ( $this->Course->save($this->params['data'])) {
-                var_dump($this->params['data']);
 				$this->redirect('courses/index/The course was updated successfully.');
 			} else	{
 				$this->set('data', $this->params['data']);

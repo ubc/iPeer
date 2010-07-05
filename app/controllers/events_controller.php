@@ -151,19 +151,19 @@ class EventsController extends AppController
       {
         $default = 'Default Simple Evaluation';
         $model = 'SimpleEvaluation';
-        $eventTemplates = $this->SimpleEvaluation->findAll();
+        $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->rdAuth->id);
       }
       else if ($templateId == 2)
       {
         $default = 'Default Rubric';
         $model = 'Rubric';
-	      $eventTemplates = $this->Rubric->findAll();
+	      $eventTemplates = $this->Rubric->getBelongingOrPublic($this->rdAuth->id);
       }
       else if ($templateId == 4)
       {
         $default = 'Default Mixed Evaluation';
         $model = 'MixedEvaluation';
-	      //$eventTemplates = $this->Rubric->findAll($conditions=null);
+        $eventTemplates = $this->Rubric->getBelongingOrPublic($this->rdAuth->id);
       }
 
     }
@@ -178,12 +178,44 @@ class EventsController extends AppController
 		$this->render();
   }
 
-  /**
-   * Enter description here...
-   *
-   * @return
-   */
-  function add ()
+  function eventTemplatesList($templateId = 1)
+  {
+      $this->layout = 'ajax';
+      //$conditions = null;
+      $eventTemplates = array();
+      $default = null;
+      $model = '';
+      if (!empty($templateId))
+      {
+        $eventTemplateType = $this->EventTemplateType->find('id = '.$templateId);
+
+        if ($templateId == 1 )
+        {
+          $default = 'Default Simple Evaluation';
+          $model = 'SimpleEvaluation';
+          $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->rdAuth->id);
+        }
+        else if ($templateId == 2)
+        {
+          $default = 'Default Rubric';
+          $model = 'Rubric';
+          $eventTemplates = $this->Rubric->getBelongingOrPublic($this->rdAuth->id);
+        }
+        else if ($templateId == 4)
+        {
+          $default = 'Default Mixed Evaluation';
+          $model = 'Mixeval';
+          $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->rdAuth->id);
+        }
+
+      }
+      $this->set('eventTemplates', $eventTemplates);
+      $this->set('default',$default);
+      $this->set('model', $model);
+  }
+
+
+function add ()
   {
     $courseId = $this->rdAuth->courseId;
 		$this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Events';
@@ -200,7 +232,7 @@ class EventsController extends AppController
 		  //Set default template
       $default = '-- Select a Evaluation Tool -- ';
       $model = 'SimpleEvaluation';
-      $eventTemplates = $this->SimpleEvaluation->findAll();
+      $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->rdAuth->id);
       $this->set('eventTemplates', $eventTemplates);
       $this->set('default',$default);
       $this->set('model', $model);
@@ -314,19 +346,19 @@ class EventsController extends AppController
         {
           $default = 'Default Simple Evaluation';
           $model = 'SimpleEvaluation';
-          $eventTemplates = $this->SimpleEvaluation->findAll();
+          $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->rdAuth->id);
         }
         else if ($templateId == 2)
         {
           $default = 'Default Rubric';
           $model = 'Rubric';
-		      $eventTemplates = $this->Rubric->findAll();
+		      $eventTemplates = $this->Rubric->getBelongingOrPublic($this->rdAuth->id);
         }
         else if ($templateId == 4)
         {
           $default = 'Default Mixed Evaluation';
           $model = 'Mixeval';
-		      $eventTemplates = $this->Mixeval->findAll();
+		      $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->rdAuth->id);
         }
 
       }
@@ -448,19 +480,19 @@ class EventsController extends AppController
         {
           $default = 'Default Simple Evaluation';
           $model = 'SimpleEvaluation';
-          $eventTemplates = $this->SimpleEvaluation->findAll();
+          $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->rdAuth->id);
         }
         else if ($templateId == 2)
         {
           $default = 'Default Rubric';
           $model = 'Rubric';
-		      $eventTemplates = $this->Rubric->findAll();
+		      $eventTemplates = $this->Rubric->getBelongingOrPublic($this->rdAuth->id);
         }
         else if ($templateId == 4)
         {
           $default = 'Default Mixed Evaluation';
           $model = 'Mixeval';
-		      $eventTemplates = $this->Mixeval->findAll();
+		      $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->rdAuth->id);
         }
 
       }
@@ -558,43 +590,7 @@ class EventsController extends AppController
       $this->render('checkDuplicateTitle');
   }
 
-  function eventTemplatesList($templateId = 1)
-  {
-      $this->layout = 'ajax';
-      //$conditions = null;
-      $conditions=array('availability'=>'public');
-      $modelName = '';
-      $eventTemplates = array();
-      $default = null;
-      $model = '';
-      if (!empty($templateId))
-      {
-        $eventTemplateType = $this->EventTemplateType->find('id = '.$templateId);
 
-        if ($templateId == 1 )
-        {
-          $default = 'Default Simple Evaluation';
-          $model = 'SimpleEvaluation';
-          $eventTemplates = $this->SimpleEvaluation->findAll();
-        }
-        else if ($templateId == 2)
-        {
-          $default = 'Default Rubric';
-          $model = 'Rubric';
-		      $eventTemplates = $this->Rubric->findAll($conditions);
-        }
-        else if ($templateId == 4)
-        {
-          $default = 'Default Mixed Evaluation';
-          $model = 'Mixeval';
-		      $eventTemplates = $this->Mixeval->findAll($conditions);
-        }
-
-      }
-      $this->set('eventTemplates', $eventTemplates);
-      $this->set('default',$default);
-      $this->set('model', $model);
-  }
 
     /**
    * Enter description here...
