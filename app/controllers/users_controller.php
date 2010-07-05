@@ -28,82 +28,82 @@
 uses('neat_string');
 class UsersController extends AppController
 {
-	var $name = 'Users';
-	var $show;
-	var $sortBy;
-	var $direction;
-	var $page;
-	var $order;
-	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
-	var $NeatString;
-	var $Sanitize;
-	var $uses = array('User', 'UserEnrol','Personalize', 'Course','SysParameter');
+    var $name = 'Users';
+    var $show;
+    var $sortBy;
+    var $direction;
+    var $page;
+    var $order;
+    var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
+    var $NeatString;
+    var $Sanitize;
+    var $uses = array('User', 'UserEnrol','Personalize', 'Course','SysParameter');
+    
+    function __construct()
+    {
+        $this->Sanitize = new Sanitize;
+        $this->NeatString = new NeatString;
+        $this->show = empty($_GET['show'])? 'null':$this->Sanitize->paranoid($_GET['show']);
+        if ($this->show == 'all') $this->show = 99999999;
+        $this->sortBy = empty($_GET['sort'])? 'id': $_GET['sort'];
+        $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
+        $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
+        $this->order = $this->sortBy.' '.strtoupper($this->direction);
+        $this->pageTitle = 'Users';
+        parent::__construct();
+    }
 
-	function __construct()
-	{
-		$this->Sanitize = new Sanitize;
-		$this->NeatString = new NeatString;
-		$this->show = empty($_GET['show'])? 'null':$this->Sanitize->paranoid($_GET['show']);
-		if ($this->show == 'all') $this->show = 99999999;
-		$this->sortBy = empty($_GET['sort'])? 'id': $_GET['sort'];
-		$this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
-		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
-		$this->order = $this->sortBy.' '.strtoupper($this->direction);
-		$this->pageTitle = 'Users';
-		parent::__construct();
-	}
 
-
-	function index() {
+    function index() {
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
 
-		if (!empty($this->rdAuth->courseId))
-		{
-			$this->pageTitle = $this->sysContainer->getCourseName($this->rdAuth->courseId).' > Students';
-			$courseId = $this->rdAuth->courseId;
-		} else {
-			$courseId = -1;
-		}
-		//Setup User Type Display Option
-		isset($this->params['form']['display_user_type'])? $displayUserType = $this->params['form']['display_user_type'] : $displayUserType = 'S';
+        if (!empty($this->rdAuth->courseId))
+        {
+            $this->pageTitle = $this->sysContainer->getCourseName($this->rdAuth->courseId).' > Students';
+            $courseId = $this->rdAuth->courseId;
+        } else {
+            $courseId = -1;
+        }
+        //Setup User Type Display Option
+        isset($this->params['form']['display_user_type'])? $displayUserType = $this->params['form']['display_user_type'] : $displayUserType = 'S';
 
 
-		$this->set('displayUserType', $displayUserType);
+        $this->set('displayUserType', $displayUserType);
 
-		$courseList = $this->sysContainer->getMyCourseList();
-		$this->set('courseList', $courseList);
+        $courseList = $this->sysContainer->getMyCourseList();
+        $this->set('courseList', $courseList);
 
-		$queryAttributes = $this->getQueryAttribute($displayUserType, $courseId);
-		$fields = $queryAttributes['fields'];
-		$condition = $queryAttributes['condition'];
-		$joinTable = $queryAttributes['joinTable'];
+        $queryAttributes = $this->getQueryAttribute($displayUserType, $courseId);
+        $fields = $queryAttributes['fields'];
+        $condition = $queryAttributes['condition'];
+        $joinTable = $queryAttributes['joinTable'];
 
-		$paging['style'] = 'ajax';
-		$paging['link'] = '/users/search/?show='.$this->show.'&display_user_type='.$displayUserType.'&course_id='.$courseId.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
+        $paging['style'] = 'ajax';
+        $paging['link'] = '/users/search/?show='.$this->show.'&display_user_type='.$displayUserType.'&course_id='.$courseId.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
 
-		$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-		$this->userPersonalize->setPersonalizeList($personalizeData);
-		if ($personalizeData && $this->userPersonalize->inPersonalizeList('User.ListMenu.Limit.Show')) {
-			$this->show = $this->userPersonalize->getPersonalizeValue('User.ListMenu.Limit.Show');
-			$this->set('userPersonalize', $this->userPersonalize);
-		} else {
-			$this->show = '10';
-			$this->update($attributeCode = 'User.ListMenu.Limit.Show',$attributeValue = $this->show);
-		}
+        $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+        $this->userPersonalize->setPersonalizeList($personalizeData);
+        if ($personalizeData && $this->userPersonalize->inPersonalizeList('User.ListMenu.Limit.Show')) {
+            $this->show = $this->userPersonalize->getPersonalizeValue('User.ListMenu.Limit.Show');
+            $this->set('userPersonalize', $this->userPersonalize);
+        } else {
+            $this->show = '10';
+            $this->update($attributeCode = 'User.ListMenu.Limit.Show',$attributeValue = $this->show);
+        }
 
-		$data = $this->User->findAll($condition, $fields, $this->order, $this->show, $this->page, null, $joinTable);
-		$paging['count'] = $this->User->findCount($condition, 0, $joinTable);
-		$paging['show'] = array('10','25','50','all');
-		$paging['page'] = $this->page;
-		$paging['limit'] = $this->show;
-		$paging['direction'] = $this->direction;
+        $data = $this->User->findAll($condition, $fields, $this->order, $this->show, $this->page, null, $joinTable);
+        $paging['count'] = $this->User->findCount($condition, 0, $joinTable);
+        $paging['show'] = array('10','25','50','all');
+        $paging['page'] = $this->page;
+        $paging['limit'] = $this->show;
+        $paging['direction'] = $this->direction;
 
-		$this->set('paging',$paging);
-		$this->set('data',$data);
-	}
+        $this->set('paging',$paging);
+        $this->set('data',$data);
+    }
 
-	function view($id) {
+    function view($id) {
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
 
@@ -118,9 +118,9 @@ class UsersController extends AppController
 
         $this->set("userId", $id);
         // All okay, proceed to render.
-	}
+    }
 
-	function add($userType='') {
+    function add($userType='') {
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
 
@@ -140,7 +140,7 @@ class UsersController extends AppController
         $this->set('user_type', $userType);
 
         // We should be of equal or higher privileges to be able to create this user
-        if ($this->rdAuth->getPrivilegeLevel() >= $this->rdAuth->getPrivilegeLevel($userType)) {
+        if ($this->rdAuth->getPrivilegeLevel() >= $this->rdAuth->getPrivilegeLevel($userType    )) {
 
             if (!empty($this->rdAuth->courseId))  {
                 $this->pageTitle = $this->sysContainer->getCourseName($this->rdAuth->courseId).' > Students';
@@ -157,56 +157,101 @@ class UsersController extends AppController
                 $courseList = $this->sysContainer->getMyCourseList();
                 $this->set('courseList', $courseList);
 
-            } else {
-                //General password
-                $this->params['data']['User']['password'] = $this->NeatString->randomPassword(6);
-                if (empty($this->params['data']['User']['username'])) $this->params['data']['User']['username'] = $this->params['form']['newuser'];
-
-                if ($this->params['data']['User']['role'] == 'S')
+            } 
+            else 
+            {
+                $sFound = $this->User->findUserByStudentNo($this->params['data']['User']['username']);
+                $duplicate = $sFound ? true : false; // Convert to boolean
+      
+                if(!$duplicate)
                 {
-                    $this->params['data']['User']['student_no'] = $this->params['data']['User']['username'];
+                       //Generate password
+                       if(!$duplicate)
+                        $this->params['data']['User']['password'] = $this->NeatString->randomPassword(6);
+                    
+                    if (empty($this->params['data']['User']['username'])) 
+                        $this->params['data']['User']['username'] = $this->params['form']['newuser'];
+    
+                    if ($this->params['data']['User']['role'] == 'S')
+                    {
+                        $this->params['data']['User']['student_no'] = $this->params['data']['User']['username'];
+                    }
+    
+                    $this->Output->filter($this->params['data']);//always filter
+                    
+                     //Save Data
+                    if ($this->User->save($this->params['data'])) {
+
+                        //Save enrol record
+                        if (isset($this->params['form']['course_id']) && $this->params['form']['course_id'] > 0)
+                        {
+                            $userEnrol['UserEnrol']['course_id'] = $this->params['form']['course_id'];
+                            $userEnrol['UserEnrol']['user_id'] = $this->User->id;
+    
+                            $this->UserEnrol->save($userEnrol);
+                        }
+    
+                        $this->set('tmpPassword', $this->params['data']['User']['password']);
+                        $this->set('data', $this->User->read());
+                        $this->set('userRole', $this->params['data']['User']['role']);
+                        $this->set('courseId', $this->rdAuth->courseId);
+    
+                        //Render to view page to display saved data
+                        $this->render('userSummary');
+                    }
+                    //Found error
+                    else {
+                        $this->set('data', $this->params['data']);
+    
+                        //Validate the error why the User->save() method returned false
+                        $this->validateErrors($this->User);
+                        $this->set('errmsg', $this->User->errorMessage);
+                        $this->set('courseId', $this->rdAuth->courseId);
+    
+                    }//end if
                 }
-
-                $this->Output->filter($this->params['data']);//always filter
-
-                //Save Data
-                if ($this->User->save($this->params['data'])) {
-
+                else
+                {
+                    $sFound['User']['first_name'] = $this->data['User']['first_name'];
+                    $sFound['User']['last_name'] = $this->data['User']['last_name'];
+                    $sFound['User']['email'] = $this->data['User']['email'];
+                    
                     //Save enrol record
                     if (isset($this->params['form']['course_id']) && $this->params['form']['course_id'] > 0)
                     {
                         $userEnrol['UserEnrol']['course_id'] = $this->params['form']['course_id'];
-                        $userEnrol['UserEnrol']['user_id'] = $this->User->id;
-
-                        $this->UserEnrol->save($userEnrol);
+                        $userEnrol['UserEnrol']['user_id'] = $sFound['User']['id'];
+                        
+                        if($this->UserEnrol->save($userEnrol) && $this->User->save($sFound['User']))
+                        {
+                            $this->set('tmpPassword', '<Hidden>');
+                            $this->set('data', $sFound);
+                            $this->set('userRole', $sFound['User']['role']);
+                            $this->set('courseId', $this->rdAuth->courseId);
+            
+                            //Render to view page to display saved data
+                            $this->render('userSummary');
+                        }
+                        else
+                        {
+                            $this->set('data', $this->params['data']);
+        
+                            //Validate the error why the User->save() method returned false
+                            $this->validateErrors($this->UserEnrol);
+                            $this->set('errmsg', 'Data not saved.  The student is already enrolled in the course.  Please use the edit function to edit the student\'s details.');
+                            $this->set('courseId', $this->rdAuth->courseId);
+                        }
                     }
-
-                    $this->set('tmpPassword', $this->params['data']['User']['password']);
-                    $this->set('data', $this->User->read());
-                    $this->set('userRole', $this->params['data']['User']['role']);
-                    $this->set('courseId', $this->rdAuth->courseId);
-
-                    //Render to view page to display saved data
-                    $this->render('userSummary');
                 }
-                //Found error
-                else {
-                    $this->set('data', $this->params['data']);
-
-                    //Validate the error why the User->save() method returned false
-                    $this->validateErrors($this->User);
-                    $this->set('errmsg', $this->User->errorMessage);
-                    $this->set('courseId', $this->rdAuth->courseId);
-
-                }//end if
+                
             }
         } else {
             $this->rdAuth->privilegeError();
         }
-	}
+    }
 
-	function edit($id=null)
-	{
+    function edit($id=null)
+    {
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
 
@@ -268,39 +313,39 @@ class UsersController extends AppController
             $this->rdAuth->privilegeError();
         }
 
-	}
+    }
 
-	function editProfile()
-	{
+    function editProfile()
+    {
         // No security checks here, since we're editing the logged-in user
-		$id = $this->rdAuth->id;
+        $id = $this->rdAuth->id;
 
 
-		if (empty($this->params['data']))
-		{
-			$this->User->setId($id);
-			$this->params['data'] = $this->User->read();
-			$this->set('viewPage', 'false');
-			$this->render();
-		} else {
-			if (empty($this->params['data']['User']['password'])) {
-				unset($this->params['data']['User']['password']);
-			}
+        if (empty($this->params['data']))
+        {
+            $this->User->setId($id);
+            $this->params['data'] = $this->User->read();
+            $this->set('viewPage', 'false');
+            $this->render();
+        } else {
+            if (empty($this->params['data']['User']['password'])) {
+                unset($this->params['data']['User']['password']);
+            }
 
-			$this->Output->filter($this->params['data']);//always filter
+            $this->Output->filter($this->params['data']);//always filter
 
             // Prevent User role changes (also stops privilege escalation)
             if (!empty($this->params['data']['User']['role'])) {
                 unset ($this->params['data']['User']['role']);
             }
 
-			if ( $this->User->save($this->params['data']))
-			{
-				//Render to view page to display saved data
-				//TODO: Display list of users after import
-				$user = $this->User->read();
-				$this->params['data'] = $user;
-				$this->set('viewPage', 'false');
+            if ( $this->User->save($this->params['data']))
+            {
+                //Render to view page to display saved data
+                //TODO: Display list of users after import
+                $user = $this->User->read();
+                $this->params['data'] = $user;
+                $this->set('viewPage', 'false');
 
                 if (!empty($user['User']['email'])) {
                     $message =  "Your Profile Has Been Updated Successfully." . "<br > <br />";
@@ -309,22 +354,22 @@ class UsersController extends AppController
                     $message = "We saved your data, but you still need to enter an email address!";
                 }
 
-				$this->set('message', $message);
+                $this->set('message', $message);
 
 
-				//Setup Custom parameter
-				$this->rdAuth->setFromData($user['User']);
-			} else {
-				$this->Output->br2nl($this->params['data']);
-				$this->set('data', $this->params['data']);
-				$this->set('viewPage', 'false');
-				$this->render();
-			}
-		}
-	}
+                //Setup Custom parameter
+                $this->rdAuth->setFromData($user['User']);
+            } else {
+                $this->Output->br2nl($this->params['data']);
+                $this->set('data', $this->params['data']);
+                $this->set('viewPage', 'false');
+                $this->render();
+            }
+        }
+    }
 
-	function delete($id = null)
-	{
+    function delete($id = null)
+    {
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
         // Ensure that the id is valid
@@ -357,301 +402,314 @@ class UsersController extends AppController
         } else {
             $this->rdAuth->privilegeError();
         }
-	}
+    }
 
-	function search()
-	{
+    function search()
+    {
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
 
-		$this->layout = 'ajax';
-		if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-			$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-			if ($personalizeData) {
-				$this->userPersonalize->setPersonalizeList($personalizeData);
-				$this->show = $this->userPersonalize->getPersonalizeValue('User.ListMenu.Limit.Show');
-				$this->set('userPersonalize', $this->userPersonalize);
-			}
-		}
-		$condition = "";
-		isset($this->params['form']['display_user_type'])? $displayUserType = $this->params['form']['display_user_type'] : $displayUserType = $_GET['display_user_type'];
+        $this->layout = 'ajax';
+        if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
+            $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+            if ($personalizeData) {
+                $this->userPersonalize->setPersonalizeList($personalizeData);
+                $this->show = $this->userPersonalize->getPersonalizeValue('User.ListMenu.Limit.Show');
+                $this->set('userPersonalize', $this->userPersonalize);
+            }
+        }
+        $condition = "";
+        isset($this->params['form']['display_user_type'])? $displayUserType = $this->params['form']['display_user_type'] : $displayUserType = $_GET['display_user_type'];
 
-		//$courseId = $this->rdAuth->courseId;
-		isset( $this->params['form']['course_id'] )? $courseId = $this->params['form']['course_id'] : $courseId = $_GET['course_id'];
-		$queryAttributes = $this->getQueryAttribute($displayUserType, $courseId);
-		$fields = $queryAttributes['fields'];
-		$condition = $queryAttributes['condition'];
-		$joinTable = $queryAttributes['joinTable'];
-		if (!empty($this->params['form']['livesearch']) && !empty($this->params['form']['select']))
-		{
-			$pagination->loadingId = 'loading';
-			//parse the parameters
-			$searchField=$this->params['form']['select'];
-			$searchValue=trim($this->params['form']['livesearch']);
-			if (!empty($displayUserType) )
-			{
-				$condition .= " AND ";
-			}
-			$condition .= $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
-		}
+        //$courseId = $this->rdAuth->courseId;
+        isset( $this->params['form']['course_id'] )? $courseId = $this->params['form']['course_id'] : $courseId = $_GET['course_id'];
+        $queryAttributes = $this->getQueryAttribute($displayUserType, $courseId);
+        $fields = $queryAttributes['fields'];
+        $condition = $queryAttributes['condition'];
+        $joinTable = $queryAttributes['joinTable'];
+        if (!empty($this->params['form']['livesearch']) && !empty($this->params['form']['select']))
+        {
+            $pagination->loadingId = 'loading';
+            //parse the parameters
+            $searchField=$this->params['form']['select'];
+            $searchValue=trim($this->params['form']['livesearch']);
+            if (!empty($displayUserType) )
+            {
+                $condition .= " AND ";
+            }
+            $condition .= $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
+        }
 
-		$this->update($attributeCode = 'User.ListMenu.Limit.Show',$attributeValue = $this->show);
-		$this->set('conditions',$condition);
-		$this->set('fields',$fields);
-		$this->set('joinTable',$joinTable);
-		$this->set('displayUserType',$displayUserType);
-		$this->set('courseId',$courseId);
+        $this->update($attributeCode = 'User.ListMenu.Limit.Show',$attributeValue = $this->show);
+        $this->set('conditions',$condition);
+        $this->set('fields',$fields);
+        $this->set('joinTable',$joinTable);
+        $this->set('displayUserType',$displayUserType);
+        $this->set('courseId',$courseId);
 
-	}
+    }
 
-	function checkDuplicateName($role='')
-	{
-		$this->layout = 'ajax';
-		$this->set('role', $role);
-		$this->render('checkDuplicateName');
+    function checkDuplicateName($role='')
+    {
+    	$isUserEnrol = false;
+	   	$sFound = $this->User->findUserByStudentNo($this->params['form']['newuser']);
 
-	}
+    	if(!empty($sFound))
+    	{
+	    	 foreach($sFound['UserEnrol'] as $uEnrol)
+	    	 {
+	    	 	if($uEnrol['course_id'] == $this->rdAuth->courseId)
+	    	 		$isUserEnrol = true;
+	    	 }
+    	}
 
-	function resetPassword($userId='', $render=true)
-	{
+    	$this->layout = 'ajax';
+        $this->set('role', $role);
+        $this->set('isEnrolled', $isUserEnrol);
+        $this->render('checkDuplicateName');
+
+    }
+
+    function resetPassword($userId='', $render=true)
+    {
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
 
-		//General password
-		$this->params['data']['User']['password'] =  $this->NeatString->randomPassword(6);
-		$this->params['data']['User']['id'] =  $userId;
-		//Save Data
-		if ($this->User->save($this->params['data'])) {
-			$message = "Password successfully reset. ";
-			$this->User->setId($userId);
-			$user = $this->User->read();
+        //General password
+        $this->params['data']['User']['password'] =  $this->NeatString->randomPassword(6);
+        $this->params['data']['User']['id'] =  $userId;
+        //Save Data
+        if ($this->User->save($this->params['data'])) {
+            $message = "Password successfully reset. ";
+            $this->User->setId($userId);
+            $user = $this->User->read();
 
-			// set email parameters
-			$email_msg_param = $this->sysContainer->getParamByParamCode('system.password_reset_mail');
-			$email_msg = $email_msg_param['parameter_value'];
-			$from_param = $this->sysContainer->getParamByParamCode('system.admin_email');
-			$from = $from_param['parameter_value'];
-			$subject_param = $this->sysContainer->getParamByParamCode('system.password_reset_emailsubject');
-			$subject = $subject_param['parameter_value'];
-			$to = $user['User']['email'];
-			$fullname = $user['User']['first_name'] . " " . $user['User']['last_name'];
-			$email_msg = ereg_replace("<user>", $fullname, $email_msg);
-			$email_msg = ereg_replace("<newpassword>", $this->params['data']['User']['password'], $email_msg);
+            // set email parameters
+            $email_msg_param = $this->sysContainer->getParamByParamCode('system.password_reset_mail');
+            $email_msg = $email_msg_param['parameter_value'];
+            $from_param = $this->sysContainer->getParamByParamCode('system.admin_email');
+            $from = $from_param['parameter_value'];
+            $subject_param = $this->sysContainer->getParamByParamCode('system.password_reset_emailsubject');
+            $subject = $subject_param['parameter_value'];
+            $to = $user['User']['email'];
+            $fullname = $user['User']['first_name'] . " " . $user['User']['last_name'];
+            $email_msg = ereg_replace("<user>", $fullname, $email_msg);
+            $email_msg = ereg_replace("<newpassword>", $this->params['data']['User']['password'], $email_msg);
 
-			// send email to user
-			$success = $this->sendEmail( $to, $from, $subject, $email_msg );
+            // send email to user
+            $success = $this->sendEmail( $to, $from, $subject, $email_msg );
 
-			if ( $success ) {
-				$message .= "Email has been sent. ";
-				$this->set('message', $message);
-			}
-			else {
-				if(!isset($to) || strlen($to) < 1) {
-					$message .= 'No destination email address. ';
-				}
-				$message .= "Email didn't get sent.";
-				$this->set('message', $message);
-			}
+            if ( $success ) {
+                $message .= "Email has been sent. ";
+                $this->set('message', $message);
+            }
+            else {
+                if(!isset($to) || strlen($to) < 1) {
+                    $message .= 'No destination email address. ';
+                }
+                $message .= "Email didn't get sent.";
+                $this->set('message', $message);
+            }
 
-			//Render to view page to display saved data
-			//TODO: Allow to enter email and forward the password reset message to the user
-			$this->set('tmpPassword',$this->params['data']['User']['password']);
-			$this->set('userRole', $user['User']['role']);
-			$this->set('data', $user);
-			$this->render('userSummary');
+            //Render to view page to display saved data
+            //TODO: Allow to enter email and forward the password reset message to the user
+            $this->set('tmpPassword',$this->params['data']['User']['password']);
+            $this->set('userRole', $user['User']['role']);
+            $this->set('data', $user);
+            $this->render('userSummary');
 
-		}
-		//Found error
-		else {
-			$this->set('data', $this->params['data']);
+        }
+        //Found error
+        else {
+            $this->set('data', $this->params['data']);
 
-			//Validate the error why the User->save() method returned false
-			$this->validateErrors($this->User);
-			$this->set('errmsg', $this->User->errorMessage);
+            //Validate the error why the User->save() method returned false
+            $this->validateErrors($this->User);
+            $this->set('errmsg', $this->User->errorMessage);
 
-			//Get render page according to the user type
-			$renderPage = $this->__getRenderPage($this->params['data']['User']['role']);
-			$this->render($renderPage);
+            //Get render page according to the user type
+            $renderPage = $this->__getRenderPage($this->params['data']['User']['role']);
+            $this->render($renderPage);
 
-		}//end if
+        }//end if
 
-	}
+    }
 
-	function import() {
+    function import() {
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
 
-		$this->autoRender = false;
-		$this->rdAuth->courseId = $this->params['form']['course_id'];
-		$filename = $this->params['form']['file']['name'];
-		$tmpFile = $this->params['form']['file']['tmp_name'];
+        $this->autoRender = false;
+        $this->rdAuth->courseId = $this->params['form']['course_id'];
+        $filename = $this->params['form']['file']['name'];
+        $tmpFile = $this->params['form']['file']['tmp_name'];
 
-		//$uploadDir = $this->sysContainer->getParamByParamCode('system.upload_dir');
-		$uploadDir="../tmp/";
-		$uploadFile = $uploadDir.$filename;
-		//check for blank value
-		if (trim($filename) == "") {
-			$courseList = $this->sysContainer->getMyCourseList();
-			$this->set('courseList', $courseList);
-			$this->set('errmsg','File required.');
-			$this->render('add_student');
-			return false;
-		}
+        //$uploadDir = $this->sysContainer->getParamByParamCode('system.upload_dir');
+        $uploadDir="../tmp/";
+        $uploadFile = $uploadDir.$filename;
+        //check for blank value
+        if (trim($filename) == "") {
+            $courseList = $this->sysContainer->getMyCourseList();
+            $this->set('courseList', $courseList);
+            $this->set('errmsg','File required.');
+            $this->render('add_student');
+            return false;
+        }
 
-		//Return true if valid, else error msg
-		$validUploads = $this->framework->validateUploadFile($tmpFile, $filename, $uploadFile);
-		if ($validUploads) {
-			// Get file into an array.
-			$lines = file($uploadFile);
-			// Delete the uploaded file
-			unlink($uploadFile);
+        //Return true if valid, else error msg
+        $validUploads = $this->framework->validateUploadFile($tmpFile, $filename, $uploadFile);
+        if ($validUploads) {
+            // Get file into an array.
+            $lines = file($uploadFile);
+            // Delete the uploaded file
+            unlink($uploadFile);
 
-			//Mess create students
-			$resultAry = $this->addUserByImport($this->params['data'], $lines);
-			$this->set('data', $resultAry);
-			$this->set('userRole', $this->params['data']['User']['role']);
+            //Mess create students
+            $resultAry = $this->addUserByImport($this->params['data'], $lines);
+            $this->set('data', $resultAry);
+            $this->set('userRole', $this->params['data']['User']['role']);
 
-			$this->render('userSummary');
-		}
-		else {
-			$this->set('errmsg', $$validUploads);
-			$this->render('add_student');
-		}
-	}
+            $this->render('userSummary');
+        }
+        else {
+            $this->set('errmsg', $$validUploads);
+            $this->render('add_student');
+        }
+    }
 
-	function addUserByImport($data=null, $lines=null)
-	{
+    function addUserByImport($data=null, $lines=null)
+    {
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
 
-		$result = array();
-		$createdPos = $failedPos = 0;
+        $result = array();
+        $createdPos = $failedPos = 0;
 
-		// Loop through our array
-		for ($i = 0; $i < count($lines); $i++) {
-			// Split fields up on line by '
-			$line = split(',', $lines[$i]);
+        // Loop through our array
+        for ($i = 0; $i < count($lines); $i++) {
+            // Split fields up on line by '
+            $line = split(',', $lines[$i]);
 
-			$data['User']['id'] = null;
-			$data['User']['username']     = isset($line[0]) ? trim($line[0]) : "";
-			$data['User']['tmp_password'] = isset($line[1]) ? trim($line[1]) : "";
-			$data['User']['password']     = isset($line[1]) ? md5(trim($line[1])) : "";
-			$data['User']['student_no']   = isset($line[2]) ? trim($line[2]) : "";
-			$data['User']['email']        = isset($line[3]) ? trim($line[3]) : "";
-			$data['User']['first_name']   = isset($line[4]) ? trim($line[4]) : "";
-			$data['User']['last_name']    = isset($line[5]) ? trim($line[5]) : "";
-			$data['User']['creator_id']   = $this->rdAuth->id;
-			if ($this->User->save($data))
-			{
-				//New user, save it as usual
-				$result['created_students'][$createdPos++] = $data;
+            $data['User']['id'] = null;
+            $data['User']['username']     = isset($line[0]) ? trim($line[0]) : "";
+            $data['User']['tmp_password'] = isset($line[1]) ? trim($line[1]) : "";
+            $data['User']['password']     = isset($line[1]) ? md5(trim($line[1])) : "";
+            $data['User']['student_no']   = isset($line[2]) ? trim($line[2]) : "";
+            $data['User']['email']        = isset($line[3]) ? trim($line[3]) : "";
+            $data['User']['first_name']   = isset($line[4]) ? trim($line[4]) : "";
+            $data['User']['last_name']    = isset($line[5]) ? trim($line[5]) : "";
+            $data['User']['creator_id']   = $this->rdAuth->id;
+            if ($this->User->save($data))
+            {
+                //New user, save it as usual
+                $result['created_students'][$createdPos++] = $data;
 
-				//Save enrol record
-				if (isset($this->params['form']['course_id']) && $this->params['form']['course_id'] > 0)
-				{
-					$userEnrol['UserEnrol']['course_id'] = $this->params['form']['course_id'];
-					$userEnrol['UserEnrol']['user_id'] = $this->User->id;
-					$userEnrol['UserEnrol']['creator_id'] = $this->rdAuth->id;
-					$this->UserEnrol->save($userEnrol);
-					$this->UserEnrol->id = null;
-				}
+                //Save enrol record
+                if (isset($this->params['form']['course_id']) && $this->params['form']['course_id'] > 0)
+                {
+                    $userEnrol['UserEnrol']['course_id'] = $this->params['form']['course_id'];
+                    $userEnrol['UserEnrol']['user_id'] = $this->User->id;
+                    $userEnrol['UserEnrol']['creator_id'] = $this->rdAuth->id;
+                    $this->UserEnrol->save($userEnrol);
+                    $this->UserEnrol->id = null;
+                }
 
-			} else{
-				if (isset($this->params['form']['course_id']))
-				{
-					$curUser = $this->User->find('username="'.$data['User']['username'].'"');
-					//Existing user, get this user with the course id
-					$enrolled = $this->UserEnrol->getEnrolledStudents($this->params['form']['course_id'], null, 'User.username="'.$data['User']['username'].'"');
-					//Current user does not registered to this course yet
-					if (empty($enrolled)) {
-						$userEnrol['UserEnrol']['course_id'] = $this->params['form']['course_id'];
-						$userEnrol['UserEnrol']['user_id'] = $curUser['User']['id'];
-						$userEnrol['UserEnrol']['creator_id'] = $this->rdAuth->id;
-						$this->UserEnrol->save($userEnrol);
-						$this->UserEnrol->id = null;
-						$result['created_students'][$createdPos++] = $data;
-
-
-					} else {
-						//Current user already registered
-						$result['failed_students'][$failedPos] = $data;
-						$result['failed_students'][$failedPos++]['User']['error_message'] = 'This user has been already added to this course.';
-					}
-
-				} else {
-					//Current user already registered
-					$result['failed_students'][$failedPos] = $data;
-					$result['failed_students'][$failedPos++]['User']['error_message'] = 'This user has been already added to the database.';
-				}
-
-			}
-		}
-		return $result;
-	}
+            } else{
+                if (isset($this->params['form']['course_id']))
+                {
+                    $curUser = $this->User->find('username="'.$data['User']['username'].'"');
+                    //Existing user, get this user with the course id
+                    $enrolled = $this->UserEnrol->getEnrolledStudents($this->params['form']['course_id'], null, 'User.username="'.$data['User']['username'].'"');
+                    //Current user does not registered to this course yet
+                    if (empty($enrolled)) {
+                        $userEnrol['UserEnrol']['course_id'] = $this->params['form']['course_id'];
+                        $userEnrol['UserEnrol']['user_id'] = $curUser['User']['id'];
+                        $userEnrol['UserEnrol']['creator_id'] = $this->rdAuth->id;
+                        $this->UserEnrol->save($userEnrol);
+                        $this->UserEnrol->id = null;
+                        $result['created_students'][$createdPos++] = $data;
 
 
-	function getQueryAttribute($displayUserType = null, $courseId = null)
-	{
-		$attributes = array('fields'=>'', 'condition'=>'', 'joinTable'=>array());
-		$attributes['fields'] = 'User.id, User.username, User.role, User.first_name, User.last_name, User.email, User.created, User.creator_id, User.modified, User.updater_id';
-		$joinTable = array();
+                    } else {
+                        //Current user already registered
+                        $result['failed_students'][$failedPos] = $data;
+                        $result['failed_students'][$failedPos++]['User']['error_message'] = 'This user has been already added to this course.';
+                    }
 
-		//if (isset($this->rdAuth->courseId)) {
-		if (!empty($displayUserType))
-		{
-			$attributes['condition'] .= 'User.role = "'.$displayUserType.'"';
-		}
-		if ($displayUserType == 'S') {
-			if ($courseId == -1)
-			{//Get unassigned student
-				$joinTable = array(' LEFT JOIN user_enrols as UserEnrol ON User.id=UserEnrol.user_id');
-				$attributes['condition']  .= ' AND UserEnrol.user_id IS NULL';
-			}
-			else {
-				$attributes['condition']  .= ' AND User.id = UserEnrol.user_id';
-				//if ($courseId != -1) {
-				$attributes['condition'] .= ' AND UserEnrol.course_id = '.$courseId;
-				//}
-				$joinTable = array(', user_enrols as UserEnrol');
-			}
-		}
-		//}
-		$attributes['joinTable']=$joinTable;
+                } else {
+                    //Current user already registered
+                    $result['failed_students'][$failedPos] = $data;
+                    $result['failed_students'][$failedPos++]['User']['error_message'] = 'This user has been already added to the database.';
+                }
 
-		return $attributes;
-	}
+            }
+        }
+        return $result;
+    }
 
-	function update($attributeCode='',$attributeValue='') {
-		if ($attributeCode != '' && $attributeValue != '') //check for empty params
-		$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
-	}
 
-	function sendEmail($to='', $from='', $subject='', $body='' ) {
+    function getQueryAttribute($displayUserType = null, $courseId = null)
+    {
+        $attributes = array('fields'=>'', 'condition'=>'', 'joinTable'=>array());
+        $attributes['fields'] = 'User.id, User.username, User.role, User.first_name, User.last_name, User.email, User.created, User.creator_id, User.modified, User.updater_id';
+        $joinTable = array();
+
+        //if (isset($this->rdAuth->courseId)) {
+        if (!empty($displayUserType))
+        {
+            $attributes['condition'] .= 'User.role = "'.$displayUserType.'"';
+        }
+        if ($displayUserType == 'S') {
+            if ($courseId == -1)
+            {//Get unassigned student
+                $joinTable = array(' LEFT JOIN user_enrols as UserEnrol ON User.id=UserEnrol.user_id');
+                $attributes['condition']  .= ' AND UserEnrol.user_id IS NULL';
+            }
+            else {
+                $attributes['condition']  .= ' AND User.id = UserEnrol.user_id';
+                //if ($courseId != -1) {
+                $attributes['condition'] .= ' AND UserEnrol.course_id = '.$courseId;
+                //}
+                $joinTable = array(', user_enrols as UserEnrol');
+            }
+        }
+        //}
+        $attributes['joinTable']=$joinTable;
+
+        return $attributes;
+    }
+
+    function update($attributeCode='',$attributeValue='') {
+        if ($attributeCode != '' && $attributeValue != '') //check for empty params
+        $this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
+    }
+
+    function sendEmail($to='', $from='', $subject='', $body='' ) {
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
 
 
-		// check if the user is an admin - reject otherwise
-		$result = false;
-		$role = $this->rdAuth->role;
+        // check if the user is an admin - reject otherwise
+        $result = false;
+        $role = $this->rdAuth->role;
 
-		// TODO: Validation...
-		if ( ($role == $this->User->USER_TYPE_ADMIN) || ($role == $this->User->USER_TYPE_INSTRUCTOR) ) {
-			$headers = "Content-Transfer-Encoding: quoted-printable\n" .
-  	             "From: $from\n" .
-  	             "Return-Path: $from\n" .
-  	             "CC:\n" .
-  	             "BCC:\n";
+        // TODO: Validation...
+        if ( ($role == $this->User->USER_TYPE_ADMIN) || ($role == $this->User->USER_TYPE_INSTRUCTOR) ) {
+            $headers = "Content-Transfer-Encoding: quoted-printable\n" .
+                   "From: $from\n" .
+                   "Return-Path: $from\n" .
+                   "CC:\n" .
+                   "BCC:\n";
 
-			$result = @mail($to, $subject, $body, $headers);
-			return $result;
-		}
-		else {
-			return $result;
-		}
-	}
+            $result = @mail($to, $subject, $body, $headers);
+            return $result;
+        }
+        else {
+            return $result;
+        }
+    }
 
-	function removeFromCourse($course_id='', $user_id='') {
+    function removeFromCourse($course_id='', $user_id='') {
 
     // Make sure the present user is not a student
     if ($this->rdAuth->getPrivilegeLevel() <= $this->rdAuth->studentPrivilegeLevel()) {
@@ -672,22 +730,22 @@ class UsersController extends AppController
       }
     }
 
-		$this->redirect('users/edit/'.$user_id);
-	}
+        $this->redirect('users/edit/'.$user_id);
+    }
 
-	function adddelcourse($user_id)
-	{
+    function adddelcourse($user_id)
+    {
     // Make sure the present user is not a student
     $this->rdAuth->noStudentsAllowed();
 
-		$this->set('user_id', $user_id);
-		$this->layout = 'ajax';
-	}
+        $this->set('user_id', $user_id);
+        
+        $this->layout = 'ajax';
+    }
 
-	function nonRegisteredCourses($user_id) {
-		return $this->Course->findNonRegisteredCoursesList($user_id);
-	}
+    function nonRegisteredCourses($user_id) {
+        return $this->Course->findNonRegisteredCoursesList($user_id);
+    }
 
 }
-
 ?>
