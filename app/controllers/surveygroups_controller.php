@@ -228,18 +228,20 @@ class SurveyGroupsController extends AppController
     $userData = array_splice($tmpUserData, $page, $this->show);
 
     //append user survey array if submitted for hyperlink
-    for ($i=0; $i < count($data); $i++) {
-      $data[$i]['User'] = array();
-      $title = $data[$i]['Survey']['name'];
-      if ($eventId = $this->Event->getSurveyEventIdByCourseIdDescription($courseId,$title)) {
-        $data[$i]['eventId'] = $eventId['Event']['id'];
-        foreach ($userData as $user) {
-          $evalSub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId['Event']['id'],$user['User']['id']);
-          if (isset($evalSub['EvaluationSubmission'])) {
-            array_push($data[$i]['User'],array('id'=>$user['User']['id'],'time'=>$evalSub['EvaluationSubmission']['date_submitted']));
-          }
+    if ($data) {
+        for ($i=0; $i < count($data); $i++) {
+        $data[$i]['User'] = array();
+        $title = $data[$i]['Survey']['name'];
+        if ($eventId = $this->Event->getSurveyEventIdByCourseIdDescription($courseId,$title)) {
+            $data[$i]['eventId'] = $eventId['Event']['id'];
+            foreach ($userData as $user) {
+            $evalSub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId['Event']['id'],$user['User']['id']);
+            if (isset($evalSub['EvaluationSubmission'])) {
+                array_push($data[$i]['User'],array('id'=>$user['User']['id'],'time'=>$evalSub['EvaluationSubmission']['date_submitted']));
+            }
+            }
         }
-      }
+        }
     }
 
     $data['User'] = $userData;
