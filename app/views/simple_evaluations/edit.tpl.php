@@ -36,7 +36,20 @@
         <tr class="tablecell2">
           <td colspan="3" align="center">
           <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
-          <?php echo $html->submit('Save') ?>
+          <script>
+                // Ensure that the entries are valid
+                function ensureEntriesValid() {
+                    var bppm = $("point_per_member");
+                    if (bppm.value > 0) {
+                        return true;
+                    } else {
+                        alert ("Base points per member *must be* at least 1 point.\nHowever, at least 10 is recommended.");
+                        bppm.value = 10; bppm.focus();bppm.select();
+                        return false;
+                    }
+                }
+          </script>
+          <?php echo $html->submit('Save', array('onclick' => 'return ensureEntriesValid();')); ?>
 
       	</td>
       </table>

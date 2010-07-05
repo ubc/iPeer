@@ -3,7 +3,7 @@
 
 /**
  * Enter description here ....
- * 
+ *
  * @filesource
  * @copyright    Copyright (c) 2006, .
  * @link
@@ -57,7 +57,7 @@ class SimpleevaluationsController extends AppController
 
 	function index($msg=null)
 	{
-	  
+
     $this->pageTitle = 'Evaluation Tools';
 
     $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
@@ -70,7 +70,7 @@ class SimpleevaluationsController extends AppController
       $this->update($attributeCode = 'SimpleEval.ListMenu.Limit.Show',$attributeValue = $this->show);
   	}
 
-  	
+
   	$conditions = 'creator_id = '.$this->rdAuth->id;
   	$data = $this->SimpleEvaluation->findAll($conditions, $fields=null, $this->order, $this->show, $this->page);
 
@@ -126,7 +126,6 @@ class SimpleevaluationsController extends AppController
 
         //Validate the error why the SimpleEvaluation->save() method returned false
         $this->validateErrors($this->SimpleEvaluation);
-        $this->set('errmsg', $this->SimpleEvaluation->errorMessage);
         $this->render();
       }//end if
 		}
@@ -145,7 +144,7 @@ class SimpleevaluationsController extends AppController
 		else
 		{
       if (empty($this->params['data']['SimpleEvaluation']['name'])) $this->params['data']['SimpleEvaluation']['name'] = $this->params['form']['newtitle'];
-		  
+
 			if ( $this->SimpleEvaluation->save($this->params['data']))
 			{
   			$this->redirect('/simpleevaluations/index/The record is updated successfully.');
@@ -167,9 +166,9 @@ class SimpleevaluationsController extends AppController
 		//converting nl2br back so it looks better
 		$this->Output->br2nl($this->params['data']);
     $this->render('add');
-    
+
 	}
-	
+
 	function delete($id)
 	{
     if (isset($this->params['form']['id']))
@@ -197,17 +196,17 @@ class SimpleevaluationsController extends AppController
       if (!empty($this->params['form']['show_my_tool']) && $this->params['form']['show_my_tool']){
         $conditions .= 'creator_id = '.$this->rdAuth->id;
       }
-      
+
       if (!empty($this->params['form']['livesearch']) && !empty($this->params['form']['select'])){
         $pagination->loadingId = 'loading';
         //parse the parameters
         $searchField=$this->params['form']['select'];
         $searchValue=$this->params['form']['livesearch'];
-        
+
         (empty($conditions))? $conditions = '' : $conditions .= ' AND ';
         $conditions .= $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
       }
-      
+
       $this->update($attributeCode = 'SimpleEval.ListMenu.Limit.Show',$attributeValue = $this->show);
       $this->set('conditions',$conditions);
   }
