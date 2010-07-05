@@ -170,16 +170,7 @@ class SurveyGroupsController extends AppController
     }
 
     $data['User'] = $userData;
-    //print_r($data);
-    $paging['style'] = 'ajax';
-    $paging['link'] = '/surveygroups/viewresult/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
-    $paging['count'] = $this->UserEnrol->findCount('course_id='.$courseId);
-    $paging['show'] = array('10','25','50','all');
-    $paging['page'] = $this->page;
-    $paging['limit'] = $this->show;
-    $paging['direction'] = $this->direction;
 
-    $this->set('paging',$paging);
     $this->set('data',$data);
   }
 
@@ -198,29 +189,27 @@ class SurveyGroupsController extends AppController
     $this->update($attributeCode = 'Survey.ResultList.Limit.Show',$attributeValue = $this->show);
 
     //search function
-    $conditions = null;
     if (!empty($this->params['form']['livesearch2']) && !empty($this->params['form']['select']))
     {
       $pagination->loadingId = 'loading';
       //parse the parameters
       $searchField=$this->params['form']['select'];
       $searchValue=$this->params['form']['livesearch2'];
-      //$conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
     }
 
     $courseId = $this->rdAuth->courseId;
 
-    if (!empty($this->params['form']['survey_select']))
-      $conditions = "id=".$this->params['form']['survey_select'];
-    else
-      $conditions = "course_id=".$courseId;
+    $data = false;
+    if (!empty($this->params['form']['survey_select'])) {
+        $data = array();
+        $data[0] = $this->Survey->findById($this->params['form']['survey_select']);
+    }
 
     if (isset($this->params['form']) && !empty($this->params['form']) && $this->params['form']['select'] == 'user' && !empty($this->params['form']['livesearch2']))
       $userCondition = "User.first_name LIKE '%".mysql_real_escape_string($searchValue)."%' OR User.last_name LIKE'%".mysql_real_escape_string($searchValue)."%'";
     else
       $userCondition = null;
     //get surveys for the course
-    $data = $this->Survey->findAll($conditions);
     //get users
     $page = (($this->page-1)*$this->show);
 
@@ -245,16 +234,7 @@ class SurveyGroupsController extends AppController
     }
 
     $data['User'] = $userData;
-    //print_r($data);
-    $paging['style'] = 'ajax';
-    $paging['link'] = '/surveygroups/viewresultsearch/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
-    $paging['count'] = count($tmpUserData);
-    $paging['show'] = array('10','25','50','all');
-    $paging['page'] = $this->page;
-    $paging['limit'] = $this->show;
-    $paging['direction'] = $this->direction;
 
-    $this->set('paging',$paging);
     $this->set('data',$data);
   }
 
