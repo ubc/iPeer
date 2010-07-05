@@ -28,6 +28,13 @@
 class SurveyGroupSet extends AppModel
 {
     var $name = 'SurveyGroupSet';
+    var $belongsTo = array('Survey' => 
+                           array('className'    => 'Survey',
+                                 'condition'    => '',
+                                 'order'        => '',
+                                 'foreignKey'   => 'survey_id'
+                                )
+                          );
 
     function getIdBySurveyIdSetDescription($surveyId=null,$setDescription=null) {
       $tmp = $this->find('survey_id='.$surveyId.' AND set_description=\''.$setDescription.'\'');

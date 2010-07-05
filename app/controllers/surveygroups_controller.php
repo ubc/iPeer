@@ -51,6 +51,7 @@ class SurveyGroupsController extends AppController
     $this->pageTitle = 'Survey Groups';
     parent::__construct();
   }
+
   function index() {
     $this->pageTitle = $this->sysContainer->getCourseName($this->rdAuth->courseId).' > Groupsets';
     $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
@@ -63,10 +64,11 @@ class SurveyGroupsController extends AppController
       $this->update($attributeCode = 'SurveyGroupSet.List.Limit.Show',$attributeValue = $this->show);
     }
     if (substr_count($this->order,'created') > 0) {
-      $this->order = 'id ASC';
+      $this->order = 'SurveyGroupSet.id ASC';
     }
 
-    $data = $this->SurveyGroupSet->findAll($conditions=null, $fields=null, $this->order, $this->show, $this->page);
+    $conditions = "Survey.course_id = ".$this->rdAuth->courseId;
+    $data = $this->SurveyGroupSet->findAll($conditions, $fields=null, $this->order, $this->show, $this->page);
 
     $paging['style'] = 'ajax';
     $paging['link'] = '/surveygroups/listgroupssearch/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';

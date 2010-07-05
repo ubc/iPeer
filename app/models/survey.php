@@ -41,6 +41,21 @@ class Survey extends AppModel
                                'foreignKey' =>  'creator_id')
                         );
 
+  var $hasMany = array('SurveyGroupSet' =>
+                       array('className'    =>  'SurveyGroupSet',
+                             'conditions'    => '',
+                             'order'         => '',                               
+                             'limit'         => '',                               
+                             'foreignKey'    => 'survey_id',                               
+                             'dependent'     => true,                               
+                             'exclusive'     => false,                               
+                             'finderQuery'   => '',                               
+                             'fields'        => '',                               
+                             'offset'        => '',                               
+                             'counterQuery'  => ''                         
+                             )                  
+                       ); 
+
   function getSurveyIdByCourseIdTitle($courseId=null,$title=null) {
     $tmp = $this->find('course_id='.$courseId.' AND name=\''.$title.'\'','id');
     return $tmp['Survey']['id'];
