@@ -101,6 +101,7 @@ class UsersController extends AppController
 
         $this->set('paging',$paging);
         $this->set('data',$data);
+        $this->set('course_id',$courseId);
     }
 
     function view($id) {
@@ -368,9 +369,9 @@ class UsersController extends AppController
         }
     }
 
-    function delete($id = null)
+    function delete($id = null, $type = null)
     {
-        // Make sure the present user is not a student
+    	// Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
         // Ensure that the id is valid
         if (is_numeric($id)) {
@@ -387,7 +388,14 @@ class UsersController extends AppController
                     $id = intval(substr($this->params['form']['id'], 5));
                 }
 
-                if ($this->User->del($id)) {
+                $delStatus = false;
+                
+                if($type == 'S')
+                	$delStatus = $this->UserEnrol->del($id);
+                else
+                	$delStatus = $this->User->del($id);
+                
+                if($delStatus) {
                     $this->set('message', 'Record deletion successful.');
                     $this->index();
                     $this->render('index');
@@ -444,9 +452,8 @@ class UsersController extends AppController
         $this->set('conditions',$condition);
         $this->set('fields',$fields);
         $this->set('joinTable',$joinTable);
-        $this->set('displayUserType',$displayUserType);
+        $this->set('displayUserType',$displayUserType);  
         $this->set('courseId',$courseId);
-
     }
 
     function checkDuplicateName($role='')
