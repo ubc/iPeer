@@ -40,20 +40,23 @@
     <?php }
     else if ($model == 'Mixeval') { ?>
       <a title="Mix Evaluation Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'mixevals'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview this Mixed Evaluaiton</a>
-    <?php } ?>
-<?php  }
-  else {
+    <?php
+    }
+ } else {
+    if ($model == 'SimpleEvaluation') {
+        $evalTypeString = "Simple";
+    } else if ($model == 'Rubric') {
+        $evalTypeString = "Rubric";
+    } else if ($model == 'Mixeval') {
+        $evalTypeString = "Mixed";
+    } else {
+        $evalTypeString = "(Unknown Evaluation Type : $model)";
+    }
 
-    echo $html->selectTag('Event/template_id', array('-1'=>$default), isset($templateID)?$templateID:$templateID=null, null, null, false);
+    echo "No $evalTypeString Evaluations available. You need to create a $evalTypeString Evaluation first! <br />";
+    echo "<ul><li>Just Click on <i>Add $evalTypeString Evaluation</i> above.</li></ul><br />";
 
-    //echo '<br><br>';
-    if ($model == 'SimpleEvaluation')
-    { ?>
-    <a title="Rubric Preview" href="<?php echo $this->webroot.$this->themeWeb;?>simpleevaluations/view/1/pop_up" onclick="wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview</a>
-    <?php } else  if ($model == 'Rubric'){ ?>
-    <a title="Preview Rubric" href="<?php echo $this->webroot.$this->themeWeb;?>rubrics/view/1/pop_up" onclick="wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview </a>
-    <?php } else  if ($model == 'Mixeval'){ ?>
-    <a title="Preview Rubric" href="<?php echo $this->webroot.$this->themeWeb;?>mixevals/view/1/pop_up" onclick="wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview</a>
-    <?php } ?>
-<?php  }?>
+}
+
+?>
 <!-- elements::ajax_event_template_lists end -->

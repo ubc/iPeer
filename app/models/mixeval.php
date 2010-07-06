@@ -110,7 +110,7 @@ class Mixeval extends AppModel
      */
     function getBelongingOrPublic($userID) {
         return is_numeric($userID) ?
-            $this->query("SELECT * FROM mixevals as Mixeval where availability='public' or creator_id=" . $userID)
+            $this->query("SELECT * FROM mixevals as Mixeval where availability='public' or Mixeval.creator_id=" . $userID)
             : false;
     }
 }

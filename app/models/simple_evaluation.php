@@ -78,7 +78,7 @@ class SimpleEvaluation extends AppModel
      */
     function getBelongingOrPublic($userID) {
         return is_numeric($userID) ?
-            $this->query("SELECT * FROM simple_evaluations as SimpleEvaluation where creator_id=" . $userID)
+            $this->query("SELECT * FROM simple_evaluations as SimpleEvaluation where SimpleEvaluation.creator_id=" . $userID)
             : false;
     }
 }

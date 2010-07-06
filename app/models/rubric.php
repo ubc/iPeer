@@ -102,7 +102,7 @@ class Rubric extends AppModel
      */
     function getBelongingOrPublic($userID) {
         return is_numeric($userID) ?
-            $this->query("SELECT * FROM rubrics as Rubric where availability='public' or creator_id=" . $userID)
+            $this->query("SELECT * FROM rubrics as Rubric where availability='public' or Rubric.creator_id=" . $userID)
             : false;
     }
 }
