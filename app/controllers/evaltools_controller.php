@@ -36,27 +36,27 @@ class EvaltoolsController extends AppController
 	var $page;
 	var $Sanitize;
 	var $functionCode = 'EVAL_TOOL';
-	
+
 	function __construct()
 	{
 		$this->Sanitize = new Sanitize;
- 		$this->pageTitle = 'Evaluation Tools';    
+ 		$this->pageTitle = 'Evaluation Tools';
 		parent::__construct();
 	}
-	
+
 	function index($evaltool='') {
 		//Disable the autorender, base the role to render the custom home
 		$this->autoRender = false;
-    
+
     $this->set('event', $this->Event);
 
     //General Evaluation Tools Rendering for Admin and Instructor
     switch ($evaltool) {
-  
+
       case "simpleevaluations" :
         $this->redirect('/simpleevaluations/index/');
         break;
-  
+
       case "rubrics" :
         $this->redirect('/rubrics/index/');
       break;
@@ -64,29 +64,29 @@ class EvaltoolsController extends AppController
       case "surveys" :
         $this->redirect('/surveys/index/');
       break;
-        
+
      default :
         $this->showAll();
      break;
-  
+
    }
 	}
 
   function showAll()
   {
-    $simpleEvalData = $this->SimpleEvaluation->findAll('creator_id = '.$this->rdAuth->id);
+    $simpleEvalData = $this->SimpleEvaluation->findAllByCreatorId($this->rdAuth->id);
     $this->set('simpleEvalData', $simpleEvalData);
 
-    $rubricData = $this->Rubric->findAll('creator_id = '.$this->rdAuth->id);
+    $rubricData = $this->Rubric->findAllByCreatorId($this->rdAuth->id);
     $this->set('rubricData', $rubricData);
-    
-    $mixevalData = $this->Mixeval->findAll('creator_id = '.$this->rdAuth->id);
+
+    $mixevalData = $this->Mixeval->findAllByCreatorId($this->rdAuth->id);
     $this->set('mixevalData', $mixevalData);
-    
-    $surveyData = $this->Survey->findAll('creator_id = '.$this->rdAuth->id);
+
+    $surveyData = $this->Survey->findAllByCreatorId($this->rdAuth->id);
     $this->set('surveyData', $surveyData);
-    
+
     $this->render('index');
-  }	
+  }
 }
 ?>

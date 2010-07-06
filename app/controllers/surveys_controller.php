@@ -65,8 +65,11 @@ class SurveysController extends AppController
             $this->show = '10';
             $this->update($attributeCode = 'Survey.ListMenu.Limit.Show',$attributeValue = $this->show);
         }
-        $conditions = array('Survey.creator_id' =>  $this->rdAuth->id,
-                            'Survey.course_id' => $this->rdAuth->courseId);
+
+        $conditions = array('Survey.creator_id' =>  $this->rdAuth->id);
+        if ($this->rdAuth->courseId > 1)  { // If the course is set, use that value as well.
+            $conditions['Survey.course_id'] = $this->rdAuth->courseId;
+        }
 
 		$data = $this->Survey->findAll($conditions, '', $this->order, $this->show, $this->page,null,null);//array('JOIN courses AS Course ON Survey.course_id = Course.id'));
 
