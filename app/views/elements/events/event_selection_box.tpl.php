@@ -16,7 +16,9 @@ else {
 
   foreach($eventList as $index => $value) {
     //print_r($value);
-    $sticky = $sticky_event_id == $value['Event']['id'] ? 'selected':'';
+
+    $sticky = (isset($sticky_event_id) && ($sticky_event_id == $value['Event']['id'])) ? 'selected':'';
+
     if ($eventId == null) {
       echo '<option value="'.$value['Event']['id'].'" '.$sticky.'>'.$value['Event']['title'].'</option>';
     } else {

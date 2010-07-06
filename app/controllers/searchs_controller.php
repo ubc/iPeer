@@ -118,8 +118,9 @@ class SearchsController extends AppController
 
         $searchMartix = $this->SearchHelper->formatSearchEvaluationResult($maxPercent,$minPercent,$eventId,$status, $this->order, $this->show, $this->page, $this->sortBy, $this->direction);
 
+        $eventList = $this->rdAuth->role == 'A' ? $this->Event->findAll() : $this->Event->findAllByCreatorId($this->rdAuth->id);
         $this->set('sticky', $sticky);
-        $this->set('eventList',$this->Event->findAll());
+        $this->set('eventList', $eventList);
         $this->set('data', $searchMartix['data']);
         $this->set('paging', $searchMartix['paging']);
         $this->set('display', 'eval_result');
@@ -155,8 +156,9 @@ class SearchsController extends AppController
     $this->layout = false;
     $courseId = $this->params['form']['course_id'];
     $condition = 'course_id='.$courseId;
-    if ($courseId == 'A')
+    if ($courseId == 'A') {
       $condition = '';
+  }
     $this->set('eventList',$this->Event->findAll($condition));
   }
 

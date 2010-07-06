@@ -23,6 +23,7 @@
             <div name="event_box" id="event_box">
               <?php
                 $params = array('controller'=>'events', 'data'=>$data, 'eventId'=>null, 'defaultOpt'=>'A', 'view'=>0, 'disabled'=>0,'sticky_event_id'=>$sticky['event_id']);
+
                 echo $this->renderElement('events/event_selection_box', $params);
               ?></div></td>
 
