@@ -1,3 +1,4 @@
+<body onunload="window.opener.document.getElementById('eval_dropdown').onchange()">
 <?php //isset($data)?print_r($data):true;
 	if (empty($layout)) $layout=''; ?>
 <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Mixeval']['id'])?'add':'edit').'/'.$layout ?>" onSubmit="return validate()">
@@ -117,3 +118,4 @@ echo $this->renderElement('mixevals/ajax_mixeval_details', $params); ?>
 
 </div>
 </form>
+</body>

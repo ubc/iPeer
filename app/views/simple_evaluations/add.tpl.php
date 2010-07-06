@@ -1,3 +1,4 @@
+<body onunload="window.opener.document.getElementById('eval_dropdown').onchange()">
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>
@@ -64,3 +65,4 @@
 </td>
 </tr>
 </table>
+</body>

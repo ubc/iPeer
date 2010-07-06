@@ -51,8 +51,8 @@
 			<a title="Add Mix Evaluation" href="<?php echo $this->webroot.$this->themeWeb;?>mixevals/add/pop_up" onclick="wopen(this.href, 'popup', 650, 500); return false;" >&nbsp;Add Mix Evaluation</a>
 			</td></tr>
       <tr>
-          <td width="50%" align="left" valign="top" >
-						<select name="data[Event][event_template_type_id]"
+      <td width="50%" align="left" valign="top" >
+						<select name="data[Event][event_template_type_id]" id="eval_dropdown"
 							onChange="new Ajax.Updater('template_table','<?php echo $this->webroot.$this->themeWeb?>events/eventTemplatesList/'+this.options[this.selectedIndex].value,
 																				 {onLoading:function(request){Element.show('loading');},
 																					onComplete:function(request){Element.hide('loading');},

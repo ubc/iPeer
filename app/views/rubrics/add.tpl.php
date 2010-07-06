@@ -1,3 +1,4 @@
+<body onunload="window.opener.document.getElementById('eval_dropdown').onchange()">
 <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Rubric']['id'])?'add':'edit') ?>" onSubmit="return validate()">
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
 <tr><td>
@@ -92,7 +93,7 @@
 	</td>
   </tr>
 </table>
-<?php if(!empty($preview) && $preview){ ?>
+<?php if(!empty($preview) && $preview): ?>
 <table class="title" width="100%"  border="0" cellspacing="0" cellpadding="0">
   <tr>
 	<td><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> Rubric Preview </td>
@@ -106,5 +107,6 @@ $params = array('controller'=>'rubrics','data'=>null, 'rubric_type'=>$rubric_typ
 echo $this->renderElement('rubrics/ajax_rubric_preview', $params);
 ?>
 </div>
-<?php } ?>
+<?php endif ?>
 </form>
+</body>
