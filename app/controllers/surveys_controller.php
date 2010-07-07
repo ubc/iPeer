@@ -405,8 +405,10 @@ class SurveysController extends AppController
       }
     }
 
-    $conditions = array('Survey.creator_id' =>  $this->rdAuth->id,
-                        'Survey.course_id' => $this->rdAuth->courseId);
+    $conditions = array('Survey.creator_id' =>  $this->rdAuth->id);
+    if ($this->rdAuth->courseId > 1)  { // If the course is set, use that value as well.
+        $conditions['Survey.course_id'] = $this->rdAuth->courseId;
+    }
 
 
     if (!empty($this->params['form']['livesearch2']) && !empty($this->params['form']['select']))

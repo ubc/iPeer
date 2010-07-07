@@ -7,7 +7,7 @@
       <td width="10" height="32"><?php echo $html->image('magnify.png', array('alt'=>'Magnify Icon'));?></td>
       <td width="35"> <b>Search:</b> </td>
       <td width="35"><select name="select" id="select2">
-          <option value="Survey.title">Survey</option>
+          <option value="Survey.name">Survey</option>
           <option value="Course.course">Course</option>
           <option value="Creator.name">Creator</option>
       </select></td>
