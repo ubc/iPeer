@@ -375,7 +375,7 @@ class SurveysController extends AppController
 		  }
 
 		  //delete associating event
-		  $events = $this->Event->findAll('event_template_id=3 AND template_id='.$id);
+		  $events = $this->Event->findAll('event_template_type_id=3 AND template_id='.$id);
 		  if(!empty($events)) {
 			  foreach ($events as $event) {
 			    $this->Event->del($event['Event']['id']);

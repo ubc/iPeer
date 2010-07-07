@@ -188,7 +188,8 @@ class Event extends AppModel
 		  }
 	}
 
-  function cascadeRemove($id=null)
+  //TODO: unfinished function
+  function cascadeRemove($id)
   {
   	/* tables related: events, group_events,
      * evaluation_submissions,
@@ -201,7 +202,7 @@ class Event extends AppModel
       $this->id = $id;
     }
 
-    $event = $this->read($id);
+    $event = $this->read(null, $id);
 
     // delete evaluation_mixevals and evaluation_mixeval_details
     $evaluation_mixeval = new EvaluationMixeval();
@@ -229,6 +230,24 @@ class Event extends AppModel
 
     // now, delete this event
     $this->delete();
+  }
+
+  /**
+   * removeEventsBySurveyId remove all events associated with a survey by survey ID
+   * 
+   * @param mixed $survey_id 
+   * @access public
+   * @return void
+   */
+  function removeEventsBySurveyId($survey_id)
+  {
+    $events = $this->findAll($this->name.'.event_template_type_id = 3 AND '.$this->name.'.template_id = '.$survey_id);
+    if(empty($events)) return true;
+    
+    foreach($events as $e){
+      $this->cascadeRemove($e[$this->name]['id']);
+    }
+    return true;
   }
 }
 

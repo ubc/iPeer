@@ -70,6 +70,11 @@ class Survey extends AppModel
     return true;
   }
 
+  function beforeDelete() {
+    $event = new Event();
+    return $event->removeEventsBySurveyId($this->id);
+  }
+
   function getSurveyResult($courseId=null) {
     $condition = 'Survey.course_id='.$courseId;
     $fields = 'Survey.id,Survey.name,User.id,User.first_name,User.last_name,User.student_no,EvaluationSubmission.id,EvaluationSubmission.submitted,EvaluationSubmission.date_submitted';
