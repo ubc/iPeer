@@ -1,6 +1,6 @@
 <?php
   $params = array('controller'  =>'users', 
-                  'all_courses' =>$this->controller->nonRegisteredCourses($user_id), 
+                  'all_courses' =>$courses, 
                   'count'       =>$this->params['form']['add']);
   echo $this->renderElement('users/ajax_user_courses', $params);
 ?>

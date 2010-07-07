@@ -267,9 +267,9 @@ class UsersController extends AppController
             // We should be of equal or higher privileges to be able to create this user
             if ($this->rdAuth->getPrivilegeLevel() >= $this->rdAuth->getPrivilegeLevel($id)) {
 
-                $enrolled_courses = $this->Course->findRegisteredCoursesList($id);
-                $course_count = $this->Course->findNonRegisteredCoursesCount($id);
-                $all_courses = $this->Course->findNonRegisteredCoursesList($id);
+                $enrolled_courses = $this->Course->findRegisteredCoursesList($id, $this->rdAuth->id, $this->rdAuth->role);
+                $course_count = $this->Course->findNonRegisteredCoursesCount($id, $this->rdAuth->id, $this->rdAuth->role);
+                $all_courses = $this->Course->findNonRegisteredCoursesList($id, $this->rdAuth->id, $this->rdAuth->role);
 
                 $this->set('all_courses', $all_courses);
                 $this->set('enrolled_courses', $enrolled_courses);
@@ -742,16 +742,16 @@ class UsersController extends AppController
 
     function adddelcourse($user_id)
     {
-    // Make sure the present user is not a student
-    $this->rdAuth->noStudentsAllowed();
+      // Make sure the present user is not a student
+      $this->rdAuth->noStudentsAllowed();
 
-        $this->set('user_id', $user_id);
-        
-        $this->layout = 'ajax';
+      $this->set('courses', $this->nonRegisteredCourses($user_id, $this->rdAuth->id, $this->rdAuth->role));
+
+      $this->layout = 'ajax';
     }
 
-    function nonRegisteredCourses($user_id) {
-        return $this->Course->findNonRegisteredCoursesList($user_id);
+    function nonRegisteredCourses($user_id, $requester = null, $requester_role = null) {
+        return $this->Course->findNonRegisteredCoursesList($user_id, $requester, $requester_role);
     }
 
 }

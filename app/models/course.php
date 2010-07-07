@@ -226,20 +226,46 @@ class Course extends AppModel
   }
 
   // Find all accessible courses id
-  function findRegisteredCoursesList($userId=null){
+  function generateRegisterCourseSQL($userId, $register = true, $count = false,  $requester = null, $requester_role = null)
+  {
+    $count = $count ? 'count(*) as total' : '*';
+    $register = $register ? 'IN' : 'NOT IN';
 
-    $course =  $this->findBySql('SELECT * FROM courses AS Course WHERE Course.id IN ( SELECT DISTINCT course_id FROM user_enrols WHERE user_id = '.$userId.' )');
-    return $course;
+    $sql = 'SELECT '.$count.' FROM courses As Course ';
+    $condition = 'Course.id '.$register.' (SELECT course_id FROM user_enrols WHERE user_id = ' . $userId . ')';
+
+    if(null == $requester_role && null == $requester)
+    {
+      return array();
+    }
+    elseif(null == $requester_role && null != $requester)
+    {
+      $user = new User();
+      $user->read(null, $requester);
+      $requester_role = $user['role'];
+    }
+
+    if('A' != $requester_role)
+    {
+      $sql .= ' LEFT JOIN user_courses as UserCourse ON Course.id = UserCourse.course_id ';
+      $condition .= ' AND UserCourse.user_id = '.$requester;
+    }
+
+    $sql .= ' WHERE '.$condition;
+
+    return $sql;
   }
 
-  function findNonRegisteredCoursesList($userId=null) {
-    $course = $this->findBySql('SELECT * FROM courses As Course WHERE Course.id NOT IN (SELECT DISTINCT course_id FROM user_enrols WHERE user_id = ' . $userId . ')');
-    return $course;
+  function findRegisteredCoursesList($user_id, $requester = null, $requester_role = null){
+    return $this->findBySql($this->generateRegisterCourseSQL($user_id, true, false, $requester, $requester_role));
   }
 
-  function findNonRegisteredCoursesCount($userId=null){
-  	$course = $this->findBySql('SELECT COUNT(*) AS total FROM courses As Course WHERE Course.id NOT IN (SELECT DISTINCT course_id FROM user_enrols WHERE user_id = ' . $userId . ')');
-    return $course;
+  function findNonRegisteredCoursesList($user_id, $requester = null, $requester_role = null) {
+    return $this->findBySql($this->generateRegisterCourseSQL($user_id, false, false, $requester, $requester_role));
+  }
+
+  function findNonRegisteredCoursesCount($user_id, $requester = null, $requester_role = null){
+    return $this->findBySql($this->generateRegisterCourseSQL($user_id, false, true, $requester, $requester_role));
   }
 
   function getCourseName($id=null) {
