@@ -74,7 +74,7 @@
 		    if(empty($preview)) {
 		      echo $html->submit('Next', array('Name'=>'preview'));
 		    } else {
-		      echo $html->submit('Reset', array('Name'=>'preview'));
+		      echo $html->submit('Update Rubric Format', array('Name'=>'preview'));
 		    } ?>
 		<?php if(!empty($preview) && $preview){
 		        echo $html->submit('Add Rubric', array('Name'=>'add1'));

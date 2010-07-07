@@ -10,9 +10,10 @@
 		$zero_mark = $data['zero_mark'];
 		$total_marks = 0;
 
+
 		//for loop to display the top header row with LOM comments
 		for($i=1; $i<=$LOM_num; $i++){
-			echo "<td>LOM General Comment $i<br>".$html->areaTag('Rubric/LOM_comment'.$i,'',2, array('style'=>'width:90%;','value'=>$data['lom_comment'.$i]))."</td>";
+			echo "<td>LOM General Comment $i<br>".$html->areaTag('Rubric/lom_comment'.$i,'',2, array('style'=>'width:90%;','value'=>$data['lom_comment'.$i]))."</td>";
 		}
 		echo "<td>Criteria Weight</td>";
 		echo "</tr>";

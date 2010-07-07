@@ -140,36 +140,30 @@ class RubricsController extends AppController
 			$this->Rubric->setId($id);
 			$this->params['data'] = $this->Rubric->read();
 			$this->render();
-		}
-		else
-		{
+		} else {
 			//check to see if user has clicked preview
-			if(!empty($this->params['form']['preview'])){
+			if(!empty($this->params['form']['preview'])) {
 				$this->set('data', $this->params['data']);
 				$this->render('edit');
-			}
-			else {
-			if ( $this->Rubric->save($this->params['data']))
-  			{
-  				//prepare the data from the form fields in array
-  				$this->params['data']['Rubric'] = $this->Rubric->prepData($this->params, $this->rdAuth->id);
+			} else {
+                if ( $this->Rubric->save($this->params['data']))  {
+                    //prepare the data from the form fields in array
+                    $this->params['data']['Rubric'] = $this->Rubric->prepData($this->params, $this->rdAuth->id);
 
-  				//insert all the rubric data into other associated tables
-  				$this->RubricsLom->updateLOM($this->params['data']['Rubric']);
-  				$this->RubricsCriteria->updateCriteria($this->params['data']['Rubric']);
-  				$this->RubricsCriteriaComment->updateCriteriaComm($this->params['data']['Rubric']);
-  				$this->Rubric->save($this->params['data']);
+                    //insert all the rubric data into other associated tables
+                    $this->RubricsLom->updateLOM($this->params['data']['Rubric']);
+                    $this->RubricsCriteria->updateCriteria($this->params['data']['Rubric']);
+                    $this->RubricsCriteriaComment->updateCriteriaComm($this->params['data']['Rubric']);
+                    $this->Rubric->save($this->params['data']);
 
-  				$this->redirect('/rubrics/index/The rubric was updated successfully.');
-  			}
-  			else
-  			{
-  				$this->set('data', $this->params['data']);
-  				$this->set('errmsg', $this->Rubric->errorMessage);
-  				$this->render('edit');
-  			}
-  		}
-  	}
+                    $this->redirect('/rubrics/index/The rubric was updated successfully.');
+                } else {
+                    $this->set('data', $this->params['data']);
+                    $this->set('errmsg', $this->Rubric->errorMessage);
+                    $this->render('edit');
+                }
+            }
+        }
 	}
 
 	function copy($id=null)

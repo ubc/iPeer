@@ -2,7 +2,7 @@
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
 <tr><td>
 	<?php
-	$this->data = $this->params['data'];
+	//$this->data = $this->params['data'];
 	if(!empty($this->data)){
 		$rubric_name = $this->data['Rubric']['name'];
 		$lom_default = $this->data['Rubric']['lom_max'];
