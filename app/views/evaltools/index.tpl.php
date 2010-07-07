@@ -184,7 +184,7 @@
 	  </tr>
 <?php if (!empty($access['SURVEY'])):?>
 	  <tr class="tableheader">
-	    <td colspan="7">Team Maker</td>
+	    <td colspan="7">Surveys (Team Maker)</td>
 	  </tr>
 	  <tr class="panelContent">
 	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
@@ -192,7 +192,7 @@
 	        <td colspan="6" align="right">
           <?php if (!empty($access['SURVEY_RECORD'])):?>
           <?php echo $html->image('icons/add.gif', array('alt'=>'Add Survey', 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->linkTo('Add Survey', '/surveys/add'); ?>
-          <?php endif;?>          
+          <?php endif;?>
           </td>
 	      </tr>
     	  <tr class="panelContent">
