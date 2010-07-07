@@ -358,24 +358,28 @@ class SurveysController extends AppController
 	{
 		if ($this->Survey->del($id)) {
 		  $groupSets = $this->SurveyGroupSet->findAll('survey_id='.$id);
-		  foreach ($groupSets as $groupSet) {
-    	  $groupSetId = $groupSet['SurveyGroupSet']['id'];
-        $time = $groupSet['SurveyGroupSet']['date'];
+		  
+		  foreach ($groupSets as $groupSet) 
+		  {
+    	  	$groupSetId = $groupSet['SurveyGroupSet']['id'];
+        	$time = $groupSet['SurveyGroupSet']['date'];
 
-        $this->SurveyHelper->deleteGroupSet($groupSetId);
+        	$this->SurveyHelper->deleteGroupSet($groupSetId);
 
-        //delete teammaker crums
-        if (!empty($time)) {
-          unlink('../uploads/'.$time.'.txt');
-          unlink('../uploads/'.$time.'.xml');
-          unlink('../uploads/'.$time.'.txt.scores');
-        }
+        	//delete teammaker crums
+        	if (!empty($time)) {
+	          unlink('../uploads/'.$time.'.txt');
+	          unlink('../uploads/'.$time.'.xml');
+	          unlink('../uploads/'.$time.'.txt.scores');
+	        }
 		  }
 
 		  //delete associating event
 		  $events = $this->Event->findAll('event_template_id=3 AND template_id='.$id);
-		  foreach ($events as $event) {
-		    $this->Event->del($event['Event']['id']);
+		  if(!empty($events)) {
+			  foreach ($events as $event) {
+			    $this->Event->del($event['Event']['id']);
+			  }
 		  }
 	    //delete possible submissions
 		  $inputs = $this->SurveyInput->findAll('survey_id='.$id);
