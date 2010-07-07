@@ -89,10 +89,7 @@ cal1.time_comp = true;
 var cal2 = new calendar1(document.forms[0].elements['data[Survey][release_date_begin]']);
 cal2.year_scroll = false;
 cal2.time_comp = true;
-      <?php echo $javascript->link('events'); // For vallidation of dates?>
-        <?php echo $html->submit('Add Survey', array('onclick' =>
-        "return validateEventDates('SurveyReleaseDateBegin','SurveyReleaseDateEnd','SurveyDueDate');")); ?></td>
-          </tr>
+
 var cal3 = new calendar1(document.forms[0].elements['data[Survey][release_date_end]']);
 cal3.year_scroll = false;
 cal3.time_comp = true;
