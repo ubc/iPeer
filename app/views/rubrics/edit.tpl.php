@@ -3,14 +3,14 @@
 <tr><td>
 	<?php
 	//$this->data = $this->params['data'];
-	if(!empty($this->data)){
-		$rubric_name = $this->data['Rubric']['name'];
-		$lom_default = $this->data['Rubric']['lom_max'];
-		$criteria_default = $this->data['Rubric']['criteria'];
-		$rubric_avail = $this->data['Rubric']['availability'];
-		$rubric_type = $this->data['Rubric']['template'];
-		if(!empty($this->data['Rubric']['zero_mark']))
-			$zero_mark = $this->data['Rubric']['zero_mark'];
+	if(!empty($data)){
+		$rubric_name = $data['Rubric']['name'];
+		$lom_default = $data['Rubric']['lom_max'];
+		$criteria_default = $data['Rubric']['criteria'];
+		$rubric_avail = $data['Rubric']['availability'];
+		$rubric_type = $data['Rubric']['template'];
+		if(!empty($data['Rubric']['zero_mark']))
+			$zero_mark = $data['Rubric']['zero_mark'];
 		else
 			$zero_mark='off';
 	}
@@ -70,7 +70,8 @@
   <tr class="tablecell2">
   		<td colspan="3" align="center">
         <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
-		<?php echo $html->submit('Preview', array('Name'=>'preview')) ?>
+		<?php echo $html->submit('Preview (Update Format)', array('Name'=>'preview')) ?>
+		&nbsp;&nbsp;&nbsp;
 		<?php
 		$actionname = empty($params['data']['Rubric']['id'])?'Add Rubric':'Edit Rubric';
 		echo $html->submit($actionname, array('id' => 'submit-rubric')) ?>
@@ -93,10 +94,10 @@
 	<td><div align="right"><a href="#rpreview" onclick="$('rpreview').toggle(); toggle1(this);"><?php echo empty($this->data) ? '[-]' : '[-]'; ?></a></div></td>
   </tr>
 </table>
-<div id="rpreview" <?php echo empty($this->data) ? 'style="display: none; background: #FFF;">' : 'style="display: block; background: #FFF;"'; ?>>
+<div id="rpreview" <?php echo empty($data) ? 'style="display: none; background: #FFF;">' : 'style="display: block; background: #FFF;"'; ?>>
 <br>
 <?php
-  $params = array('controller'=>'rubrics','data'=>$this->controller->RubricHelper->compileViewData($this->data));
+  $params = array('controller'=>'rubrics','data'=>$this->controller->RubricHelper->compileViewData($data));
   echo $this->renderElement('rubrics/ajax_rubric_edit', $params);
 ?>
 </div>

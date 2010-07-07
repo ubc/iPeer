@@ -9,12 +9,12 @@
 		$criteria_default = $this->data['Rubric']['criteria'];
 		$rubric_avail = $this->data['Rubric']['availability'];
 		$rubric_type = $this->data['Rubric']['template'];
-		if(!empty($this->data['Rubric']['zero_mark']))
+		if(!empty($this->data['Rubric']['zero_mark'])) {
 			$zero_mark = $this->data['Rubric']['zero_mark'];
-		else
+        } else {
 			$zero_mark='off';
-	}
-	else{
+        }
+	} else {
 		$rubric_name = '';
 		$lom_default = 5;
 		$criteria_default = 3;
@@ -70,12 +70,14 @@
   <tr class="tablecell2">
   		<td colspan="3" align="center">
         <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
+        &nbsp;&nbsp;&nbsp;
 		<?php
 		    if(empty($preview)) {
 		      echo $html->submit('Next', array('Name'=>'preview'));
 		    } else {
-		      echo $html->submit('Update Rubric Format', array('Name'=>'preview'));
+		      echo $html->submit('Preview (Update Format)', array('Name'=>'preview'));
 		    } ?>
+        &nbsp;&nbsp;&nbsp;
 		<?php if(!empty($preview) && $preview){
 		        echo $html->submit('Add Rubric', array('Name'=>'add1'));
 		      } ?>
@@ -100,10 +102,10 @@
 	<td><div align="right"><a href="#rpreview" onclick="showhide('rpreview'); toggle(this);"><?php echo empty($this->data) ? '[+]' : '[-]'; ?></a></div></td>
   </tr>
 </table>
-<div id="rpreview" <?php echo empty($this->data) ? 'style="display: none; background: #FFF;">' : 'style="display: block; background: #FFF;">'; ?>
+<div id="rpreview" <?php echo empty($data) ? 'style="display: none; background: #FFF;">' : 'style="display: block; background: #FFF;">'; ?>
 <br>
 <?php
-$params = array('controller'=>'rubrics','data'=>null, 'rubric_type'=>$rubric_type,'LOM_num'=>$lom_default, 'criteria_num'=>$criteria_default, 'rubric_avail'=>$rubric_avail, 'zero_mark'=>$zero_mark);
+$params = array('controller'=>'rubrics','data'=>!empty($data) ? $data : null , 'rubric_type'=>$rubric_type,'LOM_num'=>$lom_default, 'criteria_num'=>$criteria_default, 'rubric_avail'=>$rubric_avail, 'zero_mark'=>$zero_mark);
 echo $this->renderElement('rubrics/ajax_rubric_preview', $params);
 ?>
 </div>

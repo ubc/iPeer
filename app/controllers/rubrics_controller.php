@@ -88,58 +88,50 @@ class RubricsController extends AppController
 		$this->set('data', $this->Rubric->read());
 	}
 
-	function add($layout='')
-	{
-		if (empty($this->params['data']))
-		{
-		  if ($layout != '')
-		  {
-		    $this->layout = $layout;
-		  }
-			$this->render();
-		}
-		else
-		{
-			//check to see if user has clicked preview
-			if(!empty($this->params['form']['preview'])){
-				$this->set('data', $this->params['data']);
-				$this->set('preview', 1);
-				$this->render('add');
-			}
-			//adding a new rubric
-			else {
-	      $this->params['data']['Rubric']['total_marks'] = $this->params['form']['total_marks'];
+    function add($layout='')
+    {
+        if (empty($this->params['data'])) {
+            if ($layout != '') {
+                $this->layout = $layout;
+            }
+            $this->render();
+        } else {
+            //check to see if user has clicked preview
+            if(!empty($this->params['form']['preview'])){
+                $this->set('data', $this->params['data']);
+                $this->set('preview', 1);
+                $this->render('add');
+            } else {
+                $this->params['data']['Rubric']['total_marks'] = $this->params['form']['total_marks'];
 
-			  if ($this->Rubric->save($this->params['data']))
-    			{
-    				//prepare the data from the form fields in array
-    				$this->params['data']['Rubric'] = $this->Rubric->prepData($this->params, $this->rdAuth->id);
+                if ($this->Rubric->save($this->params['data'])) {
+                    //prepare the data from the form fields in array
+                    $this->params['data']['Rubric'] = $this->Rubric->prepData($this->params, $this->rdAuth->id);
 
-    				//insert all the rubric data into other associated tables
-    				$this->RubricsLom->insertLOM($this->Rubric->id, $this->params['data']['Rubric']);
-    				$this->RubricsCriteria->insertCriteria($this->Rubric->id, $this->params['data']['Rubric']);
-    				$this->RubricsCriteriaComment->insertCriteriaComm($this->Rubric->id, $this->params['data']['Rubric']);
+                    //insert all the rubric data into other associated tables
+                    $this->RubricsLom->insertLOM($this->Rubric->id, $this->params['data']['Rubric']);
+                    $this->RubricsCriteria->insertCriteria($this->Rubric->id, $this->params['data']['Rubric']);
+                    $this->RubricsCriteriaComment->insertCriteriaComm($this->Rubric->id, $this->params['data']['Rubric']);
 
-            $this->Session->setFlash('The rubric was added successfully.');
-    				$this->redirect('/rubrics/index');
-    			}
-    			//updating a current rubric
-    			else{
-    				$this->set('data', $this->params['data']);
-    				$this->set('errmsg', $this->Rubric->errorMessage);
-    				$this->render('add');
-    			}
-    		}
-    	}
-	}
+                    $this->Session->setFlash('The rubric was added successfully.');
+                    $this->redirect('/rubrics/index');
+                } else {
+                    $this->set('data', $this->params['data']);
+                    $this->set('errmsg', $this->Rubric->errorMessage);
+                    $this->render('add');
+                }
+            }
+        }
+    }
 
 	function edit($id=null)
 	{
 		if (empty($this->params['data']))
 		{
-			$this->Rubric->setId($id);
-			$this->params['data'] = $this->Rubric->read();
-			$this->render();
+            $data = $this->Rubric->findById($id);
+			$this->params['data'] = $data;
+            $this->set('data', $this->params['data']);
+            $this->render('edit');
 		} else {
 			//check to see if user has clicked preview
 			if(!empty($this->params['form']['preview'])) {

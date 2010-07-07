@@ -37,7 +37,7 @@ class RubricsLom extends AppModel
   // inserts/updates with LOM comments for each rubric
   function insertLOM( $id=null, $data ){
   	for( $i=1; $i<=$data['lom_max']; $i++ ){
-  		$tmp = array( 'rubric_id'=>$id, 'lom_num'=>$i, 'lom_comment'=>$data['LOM_comment'.$i]);
+  		$tmp = array( 'rubric_id'=>$id, 'lom_num'=>$i, 'lom_comment'=>$data['lom_comment'.$i]);
   		$this->save($tmp);
   		$this->id = null;
   	}
