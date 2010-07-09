@@ -9,6 +9,7 @@ $paging['show'] = array('10','25','50','all');
 $paging['page'] = $this->controller->page;
 $paging['limit'] = $this->controller->show;
 $paging['direction'] = $this->controller->direction;
+$paging['mine'] = $this->controller->mine_only;
 
 $params = array('controller'=>'simpleevaluations', 'data'=>$data, 'paging'=>$paging);
 echo $this->renderElement('simple_evaluations/ajax_simple_eval_list', $params);

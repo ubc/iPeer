@@ -3,15 +3,7 @@
 <?php $pagination->loadingId = 'loading';?>
 <?php if($pagination->set($paging)):?>
 <?php endif;?>
-<table width="95%" border="0" cellspacing="2" cellpadding="4">
-	  <tr>
-	    <td colspan="5">
-      <?php
-      echo $this->renderElement('evaltools/tools_menu', array());
-      ?>
-	    </td>
-	    <td align="right" colspan="2"><div align="right"><?php echo $pagination->show('Show ',null,'mixeval_table')?></div></td>
-	  </tr>
+<table width="95%" border="0" cellspacing="2" cellpadding="2">
 <tr class="tableheader">
 	<?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
 	<th width="15%">Actions</th>

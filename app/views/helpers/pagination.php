@@ -77,7 +77,7 @@ class PaginationHelper {
 				//$t = $text.$seperator;
 				$link = preg_replace('/show=(.*?)&/','',$this->link);
 				$link = ereg_replace('&','&amp;',$link);
-				$t = '<b>Show</b> <select onChange="showLimit(this.value,\''.$link.$this->_details['page'].'\',\''.$ajaxObj.'\');">';
+				$t = '<b>'.$text.'</b> <select onChange="showLimit(this.value,\''.$link.$this->_details['page'].'\',\''.$ajaxObj.'\');">';
 				foreach($this->show as $value)
 				{
 					if($value < ($this->_details['recordCount'] + $this->_details['limit']))

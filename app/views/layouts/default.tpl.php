@@ -183,9 +183,7 @@ function checkEmailAddress()
         <?php endif; ?>
         <?php if($this->controller->Session->check('Message.flash')): $this->controller->Session->flash(); endif;?>
         <div align="left" id="loading"><?php echo $html->image('spinner.gif',array('alt'=>'spinner'))?></div>
-        <?php echo $content_for_layout;?>
-			<p>&nbsp;</p>
-
+        <div id="content"><?php echo $content_for_layout;?></div>
       <h1 align="center"><span class="footer">Powered by iPeer and TeamMaker - Created by UBC and Rose-Hulman</span></h1>
       <div class="bb">
         <div>&nbsp;</div>

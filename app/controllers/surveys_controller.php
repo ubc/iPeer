@@ -50,6 +50,7 @@ class SurveysController extends AppController
 		$this->direction = empty($_GET['direction'])? 'desc': $this->Sanitize->paranoid($_GET['direction']);
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
+    $this->mine_only = (!empty($_REQUEST['show_my_tool']) && 'on' == $_REQUEST['show_my_tool']) ? true : false;
  		$this->pageTitle = 'Surveys';
 		parent::__construct();
 	}
@@ -409,7 +410,11 @@ class SurveysController extends AppController
       }
     }
 
-    $conditions = array('Survey.creator_id' =>  $this->rdAuth->id);
+    $conditions = '';
+    if ($this->mine_only){
+      $conditions = array('Survey.creator_id' =>  $this->rdAuth->id);
+    }
+
     if ($this->rdAuth->courseId > 1)  { // If the course is set, use that value as well.
         $conditions['Survey.course_id'] = $this->rdAuth->courseId;
     }

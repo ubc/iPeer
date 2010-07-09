@@ -9,6 +9,7 @@ $paging['show'] = array('10','25','50','all');
 $paging['page'] = $this->controller->page;
 $paging['limit'] = $this->controller->show;
 $paging['direction'] = $this->controller->direction;
+$paging['mine'] = $this->controller->mine_only;
 
 $params = array('controller'=>'rubrics', 'data'=>$data, 'paging'=>$paging);
 echo $this->renderElement('rubrics/ajax_rubric_list', $params);

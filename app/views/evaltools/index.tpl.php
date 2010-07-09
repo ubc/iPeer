@@ -1,3 +1,5 @@
+<?php echo $this->renderElement('evaltools/tools_menu', array());?>
+
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
 <tr>
 <td align="center">
@@ -16,15 +18,7 @@
   </tr>
 </table>
 </form-->
-	<table width="95%" border="0" cellspacing="2" cellpadding="4" bgcolor="#FFFFFF">
-	  <tr>
-	    <td colspan="5">
-      <?php
-      echo $this->renderElement('evaltools/tools_menu', array());
-      ?>
-	    </td>
-	    <td align="right" colspan="2">&nbsp;	</td>
-	  </tr>
+	<table width="95%" border="0" cellspacing="2" cellpadding="2" bgcolor="#FFFFFF">
 	  <tr class="tableheader">
 	    <td colspan="7">Simple Evaluations</td>
 	  </tr>

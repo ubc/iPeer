@@ -396,12 +396,14 @@ a.miniLinks:active {
 
 /* Main Navigation */
 #nav {
-	float: left;
-	margin: 1px 0 0px 0px;
-	text-align: center;
+	margin-left: auto;
+  margin-right: auto;
+  padding: 5px 0 5px 0;
+	text-align: left;
 	border: solid #fff;
 	border-width: 0px 0px 0px 0px;
-
+  width: 95%;
+  background-color: white;
 }
 #nav ul {
 	margin: 0px;
@@ -476,4 +478,11 @@ a.miniLinks:active {
 #adddelcourses select.course-selector{
   width: 250px;
   margin: 2px;
+}
+
+#content{
+  width: 100%;
+  height: auto;
+  background-color: white;
+  padding-bottom: 1em;
 }

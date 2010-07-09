@@ -4,14 +4,6 @@
 <?php if($pagination->set($paging)):?>
 <?php endif;?>
 	<table width="95%" border="0" cellspacing="2" cellpadding="4" bgcolor="#FFFFFF">
-	  <tr>
-	    <td colspan="4">
-      <?php
-      echo $this->renderElement('evaltools/tools_menu', array());
-      ?>
-	    </td>
-	    <td align="right" colspan="2"><div align="right"><?php echo $pagination->show('Show ',null,'simple_table')?></div></td>
-	  </tr>
 	  <tr class="tableheader">
 	    <?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
 	    <th width="13%">Actions</th>

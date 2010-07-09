@@ -28,7 +28,7 @@
 uses('neat_string');
 class SimpleevaluationsController extends AppController
 {
-    var $name = 'SimpleEvaluations';
+  var $name = 'SimpleEvaluations';
 
 	var $show;
 	var $sortBy;
@@ -52,6 +52,8 @@ class SimpleevaluationsController extends AppController
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
  		$this->pageTitle = 'Simple Evaluations';
+    $this->mine_only = (!empty($_REQUEST['show_my_tool']) && 'on' == $_REQUEST['show_my_tool']) ? true : false;
+
 		parent::__construct();
 	}
 
@@ -193,7 +195,7 @@ class SimpleevaluationsController extends AppController
       	}
       }
       $conditions = '';
-      if (!empty($this->params['form']['show_my_tool']) && $this->params['form']['show_my_tool']){
+      if ($this->mine_only){
         $conditions .= 'creator_id = '.$this->rdAuth->id;
       }
 
