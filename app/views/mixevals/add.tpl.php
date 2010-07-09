@@ -90,8 +90,6 @@
         &nbsp;&nbsp;
 		<?php
 		if(!empty($data)){
-          echo $html->submit('Preview', array('Name'=>'preview'));
-          echo "&nbsp;&nbsp;";
 		  echo $html->submit('Add Mixed Evaluation');
 		} else {
 		  echo $html->submit('Next', array('Name'=>'next'));

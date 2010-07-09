@@ -79,7 +79,6 @@
             if (empty($params['data']['Mixeval']['id'])) {
                 echo $html->submit('Add Mixed Evaluation');
             } else {
-                echo $html->submit('Next', array('Name'=>'preview'));
                 echo $html->submit('Edit (and Update Format)');
             }
 		} else {
