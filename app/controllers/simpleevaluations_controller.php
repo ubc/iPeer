@@ -45,7 +45,7 @@ class SimpleevaluationsController extends AppController
 	{
 		$this->Sanitize = new Sanitize;
 		$this->NeatString = new NeatString;
-		$this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
+		$this->show = empty($_REQUEST['show'])? 'null': $this->Sanitize->paranoid($_REQUEST['show']);
 		if ($this->show == 'all') $this->show = 99999999;
 		$this->sortBy = empty($_GET['sort'])? 'name': $_GET['sort'];
 		$this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
