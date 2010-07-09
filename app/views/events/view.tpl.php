@@ -17,7 +17,7 @@ if ($event['Event']['id']==292) {
 
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
-    <td colspan="3" align="center"><?php echo empty($event['Event']['id'])?'Add':'Edit' ?> Evaluation Event</td>
+    <td colspan="3" align="center">View Evaluation Event</td>
     </tr>
     <tr class="tablecell2">
     	<td width="150" id="course_label">Course:</td>
