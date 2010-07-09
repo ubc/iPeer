@@ -65,6 +65,7 @@ class EvaluationRubricHelperComponent extends Object
 		$evaluatees = $params['form']['memberIDs'];
 		$evaluator = $params['data']['Evaluation']['evaluator_id'];
     $groupEventId = $params['form']['group_event_id'];
+    $rubricId = $params['form']['rubric_id'];
 
     //Get the target event
     $eventId = $params['form']['event_id'];
@@ -93,6 +94,7 @@ class EvaluationRubricHelperComponent extends Object
 		    $evalRubric['EvaluationRubric']['evaluatee'] = $targetEvaluatee;
 		    $evalRubric['EvaluationRubric']['grp_event_id'] = $groupEventId;
 		    $evalRubric['EvaluationRubric']['event_id'] = $eventId;
+		    $evalRubric['EvaluationRubric']['rubric_id'] = $rubricId;
         $evalRubric['EvaluationRubric']['release_status'] = 0;
         $evalRubric['EvaluationRubric']['grade_release'] = 0;
         $this->EvaluationRubric->save($evalRubric);
@@ -105,6 +107,7 @@ class EvaluationRubricHelperComponent extends Object
 		 $score = $this->saveNGetEvalutionRubricDetail($evalRubric['EvaluationRubric']['id'], $rubric,
 		                                               $targetEvaluatee, $params['form']);
      $evalRubric['EvaluationRubric']['score'] = $score;
+     
      if (!$this->EvaluationRubric->save($evalRubric))
      {
        return false;

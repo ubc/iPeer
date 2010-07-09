@@ -9,15 +9,13 @@ class EvaluationRubric extends AppModel
                           'className' => 'EvaluationRubricDetail',
                           'conditions' => '',
                           'order' => '',
-                          'dependent' => true,
-                          'foreignKey' => 'evaluation_rubric_id'
+                          'dependent' => true
                       )
   								);
 
 	var $belongsTo = array(
 									 			'Rubric' => array(
 									 			  'className' => 'Rubric',
-									 			  'foreignKey' => 'id'
 									 			)
 									 );
 
