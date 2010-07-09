@@ -119,8 +119,8 @@ class GroupsController extends AppController
 			}
 			else
 			{
-				$this->set('data', $this->params['data']);
-				$this->render('edit');
+        $this->Session->setFlash('Please correct the error below.');
+				$this->render();
 			}
 		}
   }

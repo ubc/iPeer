@@ -36,6 +36,7 @@ class Group extends AppModel
                                                'dependent' => true
                                               )
                       );
+  var $validate = array('group_num' => VALID_NOT_EMPTY);
 
 	function beforeSave(){ //serverside validation
 

@@ -21,7 +21,8 @@
 	<?php $params = array('controller'=>'groups', 'data'=>null);
     	echo $this->renderElement('groups/ajax_group_validate', $params);
     ?>
-	</div>
+  <?php echo $html->tagErrorMsg('Group/group_num', 'Group number is required.')?>
+  </div>
 	<?php echo $ajax->observeField('group_num', array('update'=>'groupErr', 'url'=>"/groups/checkDuplicateName", 'frequency'=>1,'loading'=>"Element.show('loading');",'complete'=>"Element.hide('loading');stripe();")) ?>
 	</td></tr>
   <tr class="tablecell2">
