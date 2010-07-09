@@ -162,11 +162,12 @@ class EventsController extends AppController
       else if ($templateId == 4)
       {
         $default = 'Default Mixed Evaluation';
-        $model = 'MixedEvaluation';
-        $eventTemplates = $this->Rubric->getBelongingOrPublic($this->rdAuth->id);
+        $model = 'Mixeval';
+        $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->rdAuth->id);
       }
 
     }
+
     $this->set('eventTemplates', $eventTemplates);
     $this->set('default',$default);
     $this->set('model', $model);
@@ -209,6 +210,7 @@ class EventsController extends AppController
         }
 
       }
+
       $this->set('eventTemplates', $eventTemplates);
       $this->set('default',$default);
       $this->set('model', $model);
