@@ -58,7 +58,9 @@
             <tr>
                 <td width="15">
                     <?php if(User::canRemoveCourse($user, $ec['Course']['id'])):?>
-                        <a href="<?php echo $this->webroot . $this->themeWeb . $this->params['controller'] . '/removeFromCourse/'.$ec['Course']['id']. '/' .$params['data']['User']['id']?>"><?php echo $html->image('icons/x_small.gif',array('border'=>'0','alt'=>'Delete'), 'Are you sure you want to remove \"' . $ec['Course']['title'] . '\"?')?></a>
+                        <a href="<?php echo $this->webroot . $this->themeWeb . $this->params['controller'] . '/removeFromCourse/'.$ec['Course']['id']. '/' .$params['data']['User']['id']?>"
+                        onclick='return confirm("Are you sure you want to remove the student:\n    <?php echo $params['data']['User']['student_no'];?>\nfrom the course:\n    <?php echo $ec['Course']['title'];?> ?")'>
+                        <?php echo $html->image('icons/x_small.gif',array('border'=>'0','alt'=>'Delete'))?></a>
                     <?php endif;?>
                     </td>
                     <td><a href="../../courses/view/<?php echo $ec['Course']['id']?>"><?php echo $ec['Course']['course']?></a></td>
@@ -73,11 +75,11 @@
 
         <input type="hidden" name="add" id="add" value="0">
         <!--<a href=# onClick="addToCourse();"><?php echo $html->image('icons/add.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Add Another Course</a>-->
-        <?php echo $ajax->link($html->image('icons/add.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')).'- Add Another Course', 
-                               '/users/adddelcourse/'.$user_id, 
-                               array('update'=>'adddelcourses', 
+        <?php echo $ajax->link($html->image('icons/add.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')).'- Add Another Course',
+                               '/users/adddelcourse/'.$user_id,
+                               array('update'=>'adddelcourses',
                                      'with'=> '{add:course_count}',
-                                     'loading'=>"Element.show('loading');", 
+                                     'loading'=>"Element.show('loading');",
                                      'complete'=>"Element.hide('loading');course_count++;",
                                      'position'=>'bottom'),
                                null,
@@ -85,10 +87,10 @@
 
         <br><br>
         <a href=# onClick="removeFromCourse();"><?php echo $html->image('icons/delete.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Remove From Another Course</a>
-        <?php echo $ajax->observeField('add', array('update'=>'adddelcourses', 
-                                                    'url'=>"/users/adddelcourse", 
-                                                    'frequency'=>1, 
-                                                    'loading'=>"Element.show('loading');", 
+        <?php echo $ajax->observeField('add', array('update'=>'adddelcourses',
+                                                    'url'=>"/users/adddelcourse",
+                                                    'frequency'=>1,
+                                                    'loading'=>"Element.show('loading');",
                                                     'complete'=>"Element.hide('loading');")) ?>
 
       </td>
