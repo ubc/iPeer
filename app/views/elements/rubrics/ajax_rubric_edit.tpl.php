@@ -44,7 +44,6 @@
 
 				echo '<td>';
 				echo '<select name="data[Rubric][criteria_weight_'.$i.']" style="width:50px;" onchange="calculateMarks(\''.$LOM_num.'\',\''.$criteria_num.'\',\''.$zero_mark.'\')">';
-				echo '<option value="1" selected >1</option>';
 				echo '<option value="1"'; if( $data['criteria_weight_'.$i] == 1 ) echo ' selected '; echo '>1</option>';
 				echo '<option value="2"'; if( $data['criteria_weight_'.$i] == 2 ) echo ' selected '; echo '>2</option>';
 				echo '<option value="3"'; if( $data['criteria_weight_'.$i] == 3 ) echo ' selected '; echo '>3</option>';
