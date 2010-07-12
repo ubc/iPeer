@@ -111,8 +111,12 @@ $groupAve = 0;
      // if ( $allMembersCompleted ) {
       	//foreach ($scoreRecords['group_question_ave'] AS $groupAveIndex => $groupAveGrade) {
       	for ($j = 1; $j <= $mixeval['Mixeval']["lickert_question_max"]; $j++) {
-      	  $groupAveGrade = $scoreRecords['group_question_ave'][$j];
-        	echo '<td>' . number_format($groupAveGrade, 2). "</td>";
+            echo "<td>";
+            if(isset($scoreRecords['group_question_ave'][$j])){
+                $groupAveGrade = $scoreRecords['group_question_ave'][$j];
+                echo number_format($groupAveGrade, 2);
+            }
+            echo "</td>";
         }
       //} else {
      // 	for ($i = 1; $i <= $mixeval['Mixeval']["lickert_question_max"]; $i++) {
