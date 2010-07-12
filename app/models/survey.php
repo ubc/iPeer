@@ -44,17 +44,40 @@ class Survey extends AppModel
   var $hasMany = array('SurveyGroupSet' =>
                        array('className'    =>  'SurveyGroupSet',
                              'conditions'    => '',
-                             'order'         => '',                               
-                             'limit'         => '',                               
-                             'foreignKey'    => 'survey_id',                               
-                             'dependent'     => true,                               
-                             'exclusive'     => false,                               
-                             'finderQuery'   => '',                               
-                             'fields'        => '',                               
-                             'offset'        => '',                               
-                             'counterQuery'  => ''                         
-                             )                  
-                       ); 
+                             'order'         => '',
+                             'limit'         => '',
+                             'foreignKey'    => 'survey_id',
+                             'dependent'     => true,
+                             'exclusive'     => false,
+                             'finderQuery'   => '',
+                             'fields'        => '',
+                             'offset'        => '',
+                             'counterQuery'  => ''
+                             )
+                       );
+
+
+    function __checkDuplicateSurvey() {
+
+        // Set up query condition for dusplicates
+        $conditions = "";
+        $conditions.= "name='" . $this->data[$this->name]['name'] . "'";
+        if (!empty($this->data[$this->name]['id'])) {
+            $conditions.= "and not id='" . $this->data[$this->name]['id'] . "'";
+        }
+
+        var_dump($conditions);
+        $duplicate = $this->findCount($conditions) > 0;
+
+        var_dump($duplicate);
+
+        if ($duplicate) {
+          $this->errorMessage='Duplicate Survey found. Please change the Survey name and try again';
+          return false;
+        } else {
+          return true;
+        }
+    }
 
   function getSurveyIdByCourseIdTitle($courseId=null,$title=null) {
     $tmp = $this->find('course_id='.$courseId.' AND name=\''.$title.'\'','id');
@@ -67,7 +90,7 @@ class Survey extends AppModel
     // Remove any single quotes in the name, so that custom SQL queries are not confused.
     $this->data[$this->name]['name'] =
         str_replace("'", "", $this->data[$this->name]['name']);
-    return true;
+    return $this->__checkDuplicateSurvey();
   }
 
   function beforeDelete() {

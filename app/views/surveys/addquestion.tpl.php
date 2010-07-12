@@ -34,8 +34,8 @@
             <td>Master Question?</td>
             <td>
 			<select name="master" style="width:85%;">
-		  	<option value="yes" <?php if (isset($type)) echo ''; else echo 'selected'; ?>>Yes</option>
-			<option value="no" <?php if (isset($type)) echo 'selected'; else echo ''; ?>>No</option>
+		  	<option value="no" <?php if (isset($type)) echo ''; else echo 'selected'; ?>>No</option>
+			<option value="yes" <?php if (isset($type)) echo 'selected'; else echo ''; ?>>Yes</option>
 
 		  	</select>
 			</td>
