@@ -31,12 +31,12 @@
 	  </tr>
   	<?php $i = '0';?>
 	  <?php foreach($data as $row): $user = $row['User']; ?>
-	  <?php 
+	  <?php
 	  	$userEnrol = $row['UserEnrol'];
 	  	$userEnrolId = 0;
 	  	foreach($row['UserEnrol'] as $enrol)
 	  	{
-	  		if($enrol['course_id'] == $course_id)
+	  		if(isset($course_id) && $enrol['course_id'] == $course_id)
 	  			$userEnrolId = $enrol['id'];
 	  	}
 	  ?>
@@ -51,7 +51,7 @@
 	   	 <a href="<?php echo $this->webroot.$this->themeWeb.'users/delete/'.$user['id'].'/'. $user['role']?>" onclick="return confirm('Are you sure you want to delete user &ldquo;<?php echo $user['username']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
 	   	<?php endif;?>
 	      <a href="<?php echo $this->webroot.$this->themeWeb.'users/resetPassword/'.$user['id']?>" onclick="return confirm('Are you sure you want to reset password for user &ldquo;<?php echo $user['username']?>&rdquo;?')"><?php echo $html->image('icons/key_email.gif',array('border'=>'0','alt'=>'Reset password'))?></a>
-	   	
+
 	    <?php endif;?>
 	    </td>
 		  <td>
