@@ -189,15 +189,26 @@ class ExportHelperComponent extends Object
   	    	  $data[$i]['students'][$j]['score'] = !isset($score_tmp[0]['received_total_score'])?'':$score_tmp[0]['received_total_score'];
 
   	    	  $data[$i]['students'][$j]['comments'] = '';
-  	    	    
+  	    	  
   	    	  foreach ($userResults as $comment)
-  	    	  {
+  	    	  {		    	  	
   	    	  	foreach($comment['EvaluationMixevalDetail'] as $sComment => $value)
   	    	  	{
+  	    	  		if($sComment == 'evaluation_mixeval_id' && !is_array($value))
+  	    	  			{
+  	    	  				$userArray = $this->EvaluationMixeval->getMixEvalById($value);
+  	    	  				$evaluatorId = $userArray['EvaluationMixeval']['evaluator'];
+  	    	  				$evaluateeId = $userArray['EvaluationMixeval']['evaluatee'];
+  	    	  				$evaluatorArray = $this->User->findUserByid($evaluatorId);
+  	    	  				$evaluateeArray = $this->User->findUserByid($evaluateeId);
+							$evaluatorName = $evaluatorArray['User']['first_name'];
+							$evaluateeName = $evaluateeArray['User']['first_name'];	  				
+  	    	  			}
+  	    	  		
   	    	  		if(is_array($value))
-  	    	  		{
+  	    	  		{	  			
   	    	  			foreach($value as $comm => $commValue)
-  	    	  				$data[$i]['students'][$j]['comments'] .= isset($commValue)&&!empty($commValue) && $comm == 'question_comment' ? $commValue.'; ':'';
+  	    	  				$data[$i]['students'][$j]['comments'] .= isset($commValue)&&!empty($commValue) && $comm == 'question_comment' ? $evaluateeName. "->". $evaluatorName. ": ". $commValue.'; ':'';
   	    	  		}
   	    	  	}
   	    	  }    	  
