@@ -52,8 +52,8 @@
 				&nbsp;<b>For Course:&nbsp;</b>
 				<select name="course_id" id="course_id" >
    				<?php
-                    //echo '<option value="" SELECTED >-- All --</option>';
-                    echo '<option value="-1" SELECTED >-- Unassigned Students --</option>';
+                    echo '<option value="ALL" SELECTED >-- All --</option>';
+                    echo '<option value="-1">-- Unassigned Students --</option>';
                     if (!empty($courseList)) {
                         foreach($courseList as $index => $value) {
                         if ($value['record_status'] == 'A') {

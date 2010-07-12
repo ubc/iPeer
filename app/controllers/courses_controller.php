@@ -267,6 +267,8 @@ class CoursesController extends AppController
         $searchField=$this->params['form']['select'];
         $searchValue=trim($this->params['form']['livesearch']);
         $conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
+        var_dump($searchField);
+        var_dump($searchValue);
       }
       $this->update($attributeCode = 'Course.ListMenu.Limit.Show',$attributeValue = $this->show);
       $this->set('conditions',$conditions);
