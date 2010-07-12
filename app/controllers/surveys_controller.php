@@ -206,6 +206,7 @@ class SurveysController extends AppController
 			}
 			else
 			{
+                $this->set('errmsg', $this->Survey->errorMessage);
 				$this->set('data', $this->params['data']);
 				$this->render('edit');
 			}
@@ -266,36 +267,32 @@ class SurveysController extends AppController
 		$courseList = $this->sysContainer->getMyCourseList();
 		$this->set('courseList', $courseList);
 
-		if (empty($this->params['data']))
-		{
+		if (empty($this->params['data'])) {
 			$this->Survey->setId($id);
 			$this->params['data'] = $this->Survey->read();
 		    $this->set('course_id',$this->params['data']['Survey']['course_id']);
 			$this->render();
-		}
-		else
-		{
+		} else {
 			$this->params['data']['Survey']['name'] = $this->params['form']['name'];
 			$this->params['data']['Survey']['course_id'] = $this->params['form']['course_id'];
-		  $this->set('course_id',$this->params['form']['course_id']);
+            $this->set('course_id',$this->params['form']['course_id']);
 
 			if ( $this->Survey->save($this->params['data']))
 			{
 			  //alter dates for the event
-			  $eventArray = $this->Event->find('template_id='.$this->Survey->id.' AND event_template_type_id=3');
-    		$eventArray['Event']['title'] = $this->params['data']['Survey']['name'];
-    		$eventArray['Event']['course_id'] = $this->params['data']['Survey']['course_id'];
-    		$eventArray['Event']['due_date'] = $this->params['data']['Survey']['due_date'];
-    		$eventArray['Event']['release_date_begin'] = $this->params['data']['Survey']['release_date_begin'];
-    		$eventArray['Event']['release_date_end'] = $this->params['data']['Survey']['release_date_end'];
-    		$this->Event->save($eventArray);
+                $eventArray = $this->Event->find('template_id='.$this->Survey->id.' AND event_template_type_id=3');
+                $eventArray['Event']['title'] = $this->params['data']['Survey']['name'];
+                $eventArray['Event']['course_id'] = $this->params['data']['Survey']['course_id'];
+                $eventArray['Event']['due_date'] = $this->params['data']['Survey']['due_date'];
+                $eventArray['Event']['release_date_begin'] = $this->params['data']['Survey']['release_date_begin'];
+                $eventArray['Event']['release_date_end'] = $this->params['data']['Survey']['release_date_end'];
+                $this->Event->save($eventArray);
 
                 $this->set('course_id', $this->params['data']['Survey']['course_id']);
 				$this->set('message', 'The survey was updated successfully.');
-				$this->index(); $this->render("index"); // Render the Survey List
-			}
-			else
-			{
+				//$this->index(); $this->render("index"); // Render the Survey List
+			} else {
+                $this->set('errmsg', $this->Survey->errorMessage);
 				$this->set('data', $this->params['data']);
 				$this->render();
 			}
@@ -304,17 +301,16 @@ class SurveysController extends AppController
 
 	function copy($id=null)
 	{
-	  $this->render = false;
+        $this->render = false;
 		$this->Survey->setId($id);
 		$courseList = $this->sysContainer->getMyCourseList();
 		$this->set('courseList', $courseList);
 		$this->set('templates', $this->Survey->findAll($conditions=null, $fields="id, name"));
 		$this->params['data'] = $this->Survey->read();
 		unset($this->params['data']['Survey']['id']);
-	  //converting nl2br back so it looks better
+            //converting nl2br back so it looks better
 		$this->Output->br2nl($this->params['data']);
-    $this->render('add');
-
+        $this->render('add');
 	}
 
 	function editquestion( $question_id=null, $survey_id=null )
@@ -359,8 +355,8 @@ class SurveysController extends AppController
 	{
 		if ($this->Survey->del($id)) {
 		  $groupSets = $this->SurveyGroupSet->findAll('survey_id='.$id);
-		  
-		  foreach ($groupSets as $groupSet) 
+
+		  foreach ($groupSets as $groupSet)
 		  {
     	  	$groupSetId = $groupSet['SurveyGroupSet']['id'];
         	$time = $groupSet['SurveyGroupSet']['date'];

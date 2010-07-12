@@ -63,13 +63,11 @@ class Survey extends AppModel
         $conditions = "";
         $conditions.= "name='" . $this->data[$this->name]['name'] . "'";
         if (!empty($this->data[$this->name]['id'])) {
-            $conditions.= "and not id='" . $this->data[$this->name]['id'] . "'";
+            $conditions.= "and not Survey.id='" . $this->data[$this->name]['id'] . "'";
         }
 
-        var_dump($conditions);
-        $duplicate = $this->findCount($conditions) > 0;
-
-        var_dump($duplicate);
+        $count = $this->findCount($conditions);
+        $duplicate = $count > 0;
 
         if ($duplicate) {
           $this->errorMessage='Duplicate Survey found. Please change the Survey name and try again';
