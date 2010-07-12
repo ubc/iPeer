@@ -139,7 +139,7 @@ class ExportHelperComponent extends Object
   	    $data[$i]['students'][$j]['first_name'] = $student['User']['first_name'];
   	    $data[$i]['students'][$j]['last_name'] = $student['User']['last_name'];
   	    $data[$i]['students'][$j]['email'] = $student['User']['email'];
-
+  	    
   	    switch ($eventTypeId) {
   	    	case 1://simple
   	    	  $comments = $this->EvaluationSimple->getAllComments($groupEventId,$userId);
@@ -189,8 +189,18 @@ class ExportHelperComponent extends Object
   	    	  $data[$i]['students'][$j]['score'] = !isset($score_tmp[0]['received_total_score'])?'':$score_tmp[0]['received_total_score'];
 
   	    	  $data[$i]['students'][$j]['comments'] = '';
+  	    	    
   	    	  foreach ($userResults as $comment)
-  	    	    $data[$i]['students'][$j]['comments'] .= isset($comment['EvaluationMixevalDetail']['question_comment'])&&!empty($comment['EvaluationMixevalDetail']['question_comment']) ? $comment['EvaluationMixevalDetail']['question_comment'].'; ':'';
+  	    	  {
+  	    	  	foreach($comment['EvaluationMixevalDetail'] as $sComment => $value)
+  	    	  	{
+  	    	  		if(is_array($value))
+  	    	  		{
+  	    	  			foreach($value as $comm => $commValue)
+  	    	  				$data[$i]['students'][$j]['comments'] .= isset($commValue)&&!empty($commValue) && $comm == 'question_comment' ? $commValue.'; ':'';
+  	    	  		}
+  	    	  	}
+  	    	  }    	  
   	    	  break;
   	    	default:
   	    		break;
@@ -240,8 +250,9 @@ class ExportHelperComponent extends Object
     }
     $content .= !isset($params['form']['include_general_comments']) ? '':'Comments';
     if ($hasContent) $content .= "\n\n";
-
 	  foreach ($data as $group) {
+//	  	echo "<br>Dumping students group: ";
+//	  	var_dump($group['students']);
 	    foreach ($group['students'] as $student) {
 	      if (!empty($params['form']['include_group_status'])) {
           $submittedArr = $this->buildSubmittedArr();
@@ -250,7 +261,10 @@ class ExportHelperComponent extends Object
             $content .= 'X,';
           else
             $content .= 'OK,';
-        }
+        
+	    }
+        
+        
   	  	$content .= empty($params['form']['include_group_names']) ? '':$group['group_name'].",";$stuff=true;
   	  	$content .= empty($params['form']['include_student_first']) ? '':"\"".$student['first_name']."\",";
   	  	$content .= empty($params['form']['include_student_last']) ? '':"\"".$student['last_name']."\",";
