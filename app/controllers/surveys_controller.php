@@ -289,8 +289,7 @@ class SurveysController extends AppController
                 $this->Event->save($eventArray);
 
                 $this->set('course_id', $this->params['data']['Survey']['course_id']);
-				$this->set('message', 'The survey was updated successfully.');
-				//$this->index(); $this->render("index"); // Render the Survey List
+ 				$this->redirect('/surveys/index/The Survey was edited successfully.');
 			} else {
                 $this->set('errmsg', $this->Survey->errorMessage);
 				$this->set('data', $this->params['data']);
