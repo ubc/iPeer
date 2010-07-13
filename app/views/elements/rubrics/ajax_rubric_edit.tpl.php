@@ -29,7 +29,7 @@
 
 				//for loop to display the criteria comment cells for each LOM
 				for($j=1; $j<=$LOM_num; $j++){
-					if( $zero_mark == "on" ){
+					if($zero_mark){
 						$mark_value = round( ($data['criteria_weight_'.$i]/($LOM_num-1)*($j-1)) , 2);
 					}
 					else{

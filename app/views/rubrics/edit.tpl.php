@@ -9,7 +9,8 @@
 		$criteria_default = $data['Rubric']['criteria'];
 		$rubric_avail = $data['Rubric']['availability'];
 		$rubric_type = $data['Rubric']['template'];
-		if(!empty($data['Rubric']['zero_mark']))
+		
+		if(!empty($data['Rubric']['zero_mark']) && $data['Rubric']['zero_mark'] == 'on')
 			$zero_mark = $data['Rubric']['zero_mark'];
 		else
 			$zero_mark='off';
@@ -64,7 +65,7 @@
   <tr class="tablecell2">
     <td>Zero Mark:
   <input type="hidden" name="data[Rubric][template]" value="horizontal"/></td>
-    <td><?php echo $html->checkbox('Rubric/zero_mark', array('size'=>'50','class'=>'self_enroll', 'id'=>'zero_mark',  'checked'=>$zero_mark)) ?></td>
+    <td><?php echo $html->checkbox('Rubric/zero_mark', null, array('size'=>'50','class'=>'self_enroll', 'id'=>'zero_mark',  'checked'=> ($zero_mark == 'on') ? 'checked': 'unchecked' )) ?></td>
     <td>No Marks Given  for Level of Mastery of 1</td>
   </tr>
   <tr class="tablecell2">
