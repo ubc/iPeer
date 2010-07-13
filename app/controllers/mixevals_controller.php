@@ -89,7 +89,7 @@ class MixevalsController extends AppController
 		  }
 		  $this->Mixeval->id = $id;
 		$this->params['data'] = $this->Mixeval->read();
-		
+
     $this->Output->filter($this->params['data']);
 		$this->set('data', $this->params['data']);
 	}
@@ -187,9 +187,10 @@ class MixevalsController extends AppController
 
   function copy($id=null)
   {
-    $this->render = false;
+        $this->render = false;
 		$this->Mixeval->setId($id);
 		$data = $this->Mixeval->read();
+		$data['Mixeval']['name'] = ""; // Clear the name when evaluation copied
 		$this->set('data', $data);
 		$this->render('edit');
   }

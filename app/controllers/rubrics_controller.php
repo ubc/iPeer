@@ -161,13 +161,13 @@ class RubricsController extends AppController
 
 	function copy($id=null)
 	{
-	  $this->render = false;
+        $this->render = false;
 		$this->Rubric->setId($id);
 		$this->params['data'] = $this->Rubric->read();
-    //$this->params['data']['Rubric']['id'] = null;
-    $this->params['data']['Rubric']['name'] = null;
-    $this->set('preview', 1);
-    $this->set('copy', 1);
+        //$this->params['data']['Rubric']['id'] = null;
+        $this->params['data']['Rubric']['name'] = "";
+        $this->set('preview', 1);
+        $this->set('copy', 1);
 		$this->render('edit');
 	}
 

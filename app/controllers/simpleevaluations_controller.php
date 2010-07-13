@@ -158,14 +158,13 @@ class SimpleevaluationsController extends AppController
 
 	function copy($id=null)
 	{
-	  $this->render = false;
+        $this->render = false;
 		$this->params['data'] = $this->SimpleEvaluation->read();
-    $this->params['data']['SimpleEvaluation']['id'] = null;
-    $this->params['data']['SimpleEvaluation']['name'] = null;
+        $this->params['data']['SimpleEvaluation']['id'] = null;
+        $this->params['data']['SimpleEvaluation']['name'] = "";
 		//converting nl2br back so it looks better
 		$this->Output->br2nl($this->params['data']);
-    $this->render('add');
-
+        $this->render('add');
 	}
 
 	function delete($id)
