@@ -41,6 +41,13 @@ class SimpleEvaluation extends AppModel
   );
 	//Overwriting Function - will be called before save operation
 	function beforeSave(){
+
+	    // Ensure the name is not empty
+        if (empty($this->data[$this->name]['name'])) {
+            $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
+            return false;
+        }
+
         // Remove any signle quotes in the name, so that custom SQL queries are not confused.
         $this->data[$this->name]['name'] =
             str_replace("'", "", $this->data[$this->name]['name']);

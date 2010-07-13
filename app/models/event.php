@@ -96,6 +96,11 @@ class Event extends AppModel
 
 	//Overwriting Function - will be called before save operation
 	function beforeSave(){
+        // Ensure the name is not empty
+        if (empty($this->data[$this->name]['title'])) {
+            $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
+            return false;
+        }
 
       // Remove any signle quotes in the name, so that custom SQL queries are not confused.
       $this->data[$this->name]['title'] =
@@ -234,8 +239,8 @@ class Event extends AppModel
 
   /**
    * removeEventsBySurveyId remove all events associated with a survey by survey ID
-   * 
-   * @param mixed $survey_id 
+   *
+   * @param mixed $survey_id
    * @access public
    * @return void
    */
@@ -243,7 +248,7 @@ class Event extends AppModel
   {
     $events = $this->findAll($this->name.'.event_template_type_id = 3 AND '.$this->name.'.template_id = '.$survey_id);
     if(empty($events)) return true;
-    
+
     foreach($events as $e){
       $this->cascadeRemove($e[$this->name]['id']);
     }

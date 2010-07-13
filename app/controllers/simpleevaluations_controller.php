@@ -125,9 +125,6 @@ class SimpleevaluationsController extends AppController
       //Found error
       else {
         $this->set('data', $this->params['data']);
-
-        //Validate the error why the SimpleEvaluation->save() method returned false
-        $this->validateErrors($this->SimpleEvaluation);
         $this->render();
       }//end if
 		}

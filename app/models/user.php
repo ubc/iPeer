@@ -68,7 +68,7 @@ class User extends AppModel
                                          'limit'        => '',
                                          'unique'       => true,
                                          'finderQuery'  => '',
-                                         'deleteQuery'  => '', 
+                                         'deleteQuery'  => '',
                                          )
                                   );
 
@@ -76,6 +76,12 @@ class User extends AppModel
 	//Overwriting Function - will be called before save operation
 	function beforeSave(){
 		$allowSave = true;
+
+        // Ensure the name is not empty
+        if (empty($this->data[$this->name]['username'])) {
+            $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
+            return false;
+        }
 
         // generate a password hash if it was set
         if (!empty($this->data[$this->name]['password'])) {
@@ -147,9 +153,9 @@ class User extends AppModel
 	}
 
   /**
-   * canRemoveCourse check if user has permission to remove the course from a 
+   * canRemoveCourse check if user has permission to remove the course from a
    * student
-   * 
+   *
    * @param mixed $user the user array returned by findUserByxxxx
    * @param mixed $course_id target course id
    * @access public

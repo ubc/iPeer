@@ -308,6 +308,7 @@ class SurveysController extends AppController
 		$this->set('templates', $this->Survey->findAll($conditions=null, $fields="id, name"));
 		$this->params['data'] = $this->Survey->read();
 		unset($this->params['data']['Survey']['id']);
+		$this->params['data']['Survey']['name'] = "";
             //converting nl2br back so it looks better
 		$this->Output->br2nl($this->params['data']);
         $this->render('add');

@@ -84,6 +84,11 @@ class Survey extends AppModel
 
 
   function beforeSave() {
+    // Ensure the name is not empty
+    if (empty($this->data[$this->name]['name'])) {
+        $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
+        return false;
+    }
 
     // Remove any single quotes in the name, so that custom SQL queries are not confused.
     $this->data[$this->name]['name'] =

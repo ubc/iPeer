@@ -31,15 +31,15 @@ class SysFunction extends AppModel
 
   function getAllAccessibleFunction ($role='') {
    	return $this->findAll("permission_type LIKE '%".$role."%' ", array('id', 'function_code', 'function_name', 'parent_id', 'controller_name', 'url_link'));
-  }    
+  }
 
   function getTopAccessibleFunction ($role='') {
    	return $this->findAll("permission_type LIKE '%".$role."%' AND parent_id = 0 ", array('id', 'function_code', 'function_name', 'parent_id', 'controller_name', 'url_link'));
-  }  
-   
+  }
+
   function getCountAccessibleFunction ($role='') {
    	return $this->findCount("permission_type LIKE '%".$role."%' ");
-  }       
+  }
 }
 
 ?>
