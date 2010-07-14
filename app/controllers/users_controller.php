@@ -585,7 +585,7 @@ class UsersController extends AppController
             // Delete the uploaded file
             unlink($uploadFile);
 
-            //Mess create students
+            //Mass create students
             $resultAry = $this->addUserByImport($this->params['data'], $lines);
             $this->set('data', $resultAry);
             $this->set('userRole', $this->params['data']['User']['role']);

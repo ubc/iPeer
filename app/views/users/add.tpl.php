@@ -122,7 +122,7 @@
     <table class="title" width="100%"  border="0" cellspacing="0" cellpadding="0">
         <tr>
           <td><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> Import Students From Text (.txt) or CSV File (.csv)</td>
-          <td><div align="right"><a href="#import" onclick="showhide('import'); toggle(this);">[click here to start]</a> </div></td>
+          <td><div align="right"><a href="#import" onclick="$('import').style.display='block'; toggle(this);">[click here to start]</a> </div></td>
         </tr>
     </table>
   <div id="import" style="display: none; background: #FFF;">
@@ -146,23 +146,26 @@
                   }?>
            </td>
      <td valign="top"><br>
+ <center>
+    <form name="importfrm" id="importfrm" method="POST" action="<?php echo $html->url('import') ?>" enctype="multipart/form-data" >
+    <input type="hidden" name="required" value="file" />
+    <h3>1) Please select a CSV file to import:</h3>
+    <input type="file" name="file" value="Browse" /><br>
+    <?php echo  $html->hidden('User/role'); ?>
+    <?php
+    if (empty($rdAuth->courseId)) {
+        $params = array('controller'=>'users', 'courseList'=>$courseList, 'defaultOpt'=>1);
+    } else {
+        $params = array('controller'=>'users', 'courseList'=>$courseList);
+    } ?>
 
- <form name="importfrm" id="importfrm" method="POST" action="<?php echo $html->url('import') ?>" enctype="multipart/form-data" >
- <input type="hidden" name="required" value="file" />
- <input type="file" name="file" value="Browse" /><br>
- <?php echo  $html->hidden('User/role'); ?>
-
-                         <?php
-                         if (empty($rdAuth->courseId)) {
-                           $params = array('controller'=>'users', 'courseList'=>$courseList, 'defaultOpt'=>1);
-                         } else {
-                           $params = array('controller'=>'users', 'courseList'=>$courseList);
-                         }
-       echo $this->renderElement('courses/course_selection_box', $params);
-       ?>
-       <br>
- <?php echo $html->submit('Import Student List') ?>
+    <br /><h3>2) Select the course to import into:</h3>
+    <?php echo $this->renderElement('courses/course_selection_box', $params); ?>
+    <br>
+    <br /><h3>3) Click the button bellow to Import the students:</h3>
+    <?php echo $html->submit('Import Student List') ?>
  </form>
+ </center>
  <br></td>
    </tr>
  </table>
