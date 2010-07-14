@@ -33,7 +33,7 @@
         <li><?php echo $html->image("layout/grey_arrow.gif",array("align"=>"middle",'alt'=>'grey_arrow'))?> First Time Users: Use student number as username and password. </li>
         <li><?php echo $html->image("layout/grey_arrow.gif",array("align"=>"middle",'alt'=>'grey_arrow'))?> Self Enroll (Password Required)</li>
 <?php endif; ?>-->
-        <li><?php echo $html->image("layout/grey_arrow.gif",array("align"=>"middle",'alt'=>'grey_arrow'))?> <a href="/ipeer_v2/loginout/forgot" >Forgot Your Password?</a></li>
+        <li><?php echo $html->image("layout/grey_arrow.gif",array("align"=>"middle",'alt'=>'grey_arrow'))?> <a href="<?php echo $html->url('forgot')?>" >Forgot Your Password?</a></li>
         <li><?php echo $html->image("layout/grey_arrow.gif",array("align"=>"middle",'alt'=>'grey_arrow'))?> <a href="mailto:<?php echo $admin_email ?>" >Contact iPeer Administrator</a></li>
         </div>
   </div>
