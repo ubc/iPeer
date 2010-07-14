@@ -15,14 +15,14 @@
             <td>Assigned Course:&nbsp;</td>
             <td><?php
 				echo '<a href=../../courses/view/'.$data['Survey']['course_id'].'>'
-					  .$data['Survey']['course_name'].'</a>';
+					  .$data['Course']['course'].'</a>';
 				?></td>
           </tr>
           <tr class="tablecell2">
             <td>Creator:</td>
             <td><?php
 				echo '<a href=../../users/view/'.$data['Survey']['user_id'].'>'
-					  .$data['Survey']['user_name'].'</a>';
+					  .$data['Creator']['username'].'</a>';
 				?></td>
           </tr>
           <tr class="tablecell2">

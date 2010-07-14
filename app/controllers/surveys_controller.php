@@ -88,13 +88,7 @@ class SurveysController extends AppController
 	}
 
 	function view($id) {
-	  $data = $this->Survey->read();
-
-    $userName = $this->User->find('id='.$data['Survey']['user_id']);
-    $data['Survey']['user_name'] = $userName['User']['username'];
-    $courseName = $this->Course->find('id='.$data['Survey']['course_id']);
-    $data['Survey']['course_name'] = $courseName['Course']['title'];
-
+        $data = $this->Survey->read();
 		$this->set('data', $data);
 	}
 
