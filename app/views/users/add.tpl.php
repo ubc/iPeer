@@ -146,10 +146,10 @@
                   }?>
            </td>
      <td valign="top"><br>
- <center>
-    <form name="importfrm" id="importfrm" method="POST" action="<?php echo $html->url('import') ?>" enctype="multipart/form-data" >
+<form name="importfrm" id="importfrm" method="POST" action="<?php echo $html->url('import') ?>" enctype="multipart/form-data" >
     <input type="hidden" name="required" value="file" />
     <h3>1) Please select a CSV file to import:</h3>
+    &nbsp;&nbsp;&nbsp;&nbsp;
     <input type="file" name="file" value="Browse" /><br>
     <?php echo  $html->hidden('User/role'); ?>
     <?php
@@ -160,11 +160,13 @@
     } ?>
 
     <br /><h3>2) Select the course to import into:</h3>
+    &nbsp;&nbsp;&nbsp;&nbsp;
     <?php echo $this->renderElement('courses/course_selection_box', $params); ?>
     <br>
     <br /><h3>3) Click the button bellow to Import the students:</h3>
+    &nbsp;&nbsp;&nbsp;&nbsp;
     <?php echo $html->submit('Import Student List') ?>
- </form>
+</form>
  </center>
  <br></td>
    </tr>

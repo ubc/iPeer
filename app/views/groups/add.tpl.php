@@ -68,7 +68,7 @@
   <table class="title" width="100%"  border="0" cellspacing="0" cellpadding="0">
       <tr>
         <td><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> Import Groups From Text (.txt) or CSV File (.csv)</td>
-        <td><div align="right"><a href="#" onclick="showhide('import'); toggle(this);">[+]</a> </div></td>
+        <td><div align="right"><a href="#" onclick="$('import').style.display='block'; toggle(this);">[+]</a> </div></td>
       </tr>
   </table>
 <div id="import" style="display: none; background: #FFF;">
@@ -84,33 +84,39 @@
   <tr class="tablecell2">
     <td>
 
-StudentNumber is required<br>
-Group# (e.g. 5 for group 5) is required<br>
-Please follow the following formatting:<br>
-<br>
-[StudentNumber],[Group#],[GroupName]<br>
-[StudentNumber],[Group#],[GroupName]<br>
-<br>
-*[GroupName] is optional. Leave blank for no group name.<br>
-<br>
-eg:<br>
-<br>
-29978037,1,team 1<br>
-29978063,1,team 1<br>
+        <b>StudentNumber, Group# (e.g. 5 for group 5), and Group Name<br />
+        &nbsp;&nbsp;&nbsp;are all required.</b><br>
+        <br />
+        Please follow the following formatting:<br>
+        [StudentNumber], [Group#], [GroupName]<br>
+        [StudentNumber], [Group#], [GroupName]<br>
+        <br>
+        For example:<br>
+        <br>
+<pre style='background-color: white; border:1px solid black; padding:5px; margin:5px'>
+29978037, 1, Team A
+29978063, 1, Team A
+29978043, 2, Team B
+29978051, 2, Team B
+</pre>
 	</td>
     <td valign="top"><br>
 <form name="importfrm" id="importfrm" method="POST" action="<?php echo $html->url('import') ?>" enctype="multipart/form-data" >
-<input type="file" name="file" value="Browse" /><br>
-			<?php
-			if (empty($rdAuth->courseId)) {
-			  $params = array('controller'=>'users', 'courseList'=>$coursesList, 'defaultOpt'=>1);
-			} else {
-			  $params = array('controller'=>'users', 'courseList'=>$coursesList);
-			}
-      echo $this->renderElement('courses/course_selection_box', $params);
-      ?>
-<br>
-<?php echo $html->submit('Import Group List') ?>
+    <h3>1) Please select a CSV file to import:</h3>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <input type="file" name="file" value="Browse" /><br>
+    <?php
+    if (empty($rdAuth->courseId)) {
+        $params = array('controller'=>'users', 'courseList'=>$coursesList, 'defaultOpt'=>1);
+    } else {
+        $params = array('controller'=>'users', 'courseList'=>$coursesList);
+    }?>
+    <br /><h3>2) Select the course to import into:</h3>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <?php echo $this->renderElement('courses/course_selection_box', $params); ?>
+    <br /><br /><h3>3) Click the button bellow to Create the Groups:</h3>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <?php echo $html->submit('Import Group List') ?>
 </form>
 <br></td>
   </tr>
