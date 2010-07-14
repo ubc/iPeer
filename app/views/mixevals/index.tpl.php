@@ -9,10 +9,7 @@
       <td width="35"> <b>Search:</b> </td>
       <td width="35"><select name="select" id="select">
           <option value="name" >Name</option>
-          <option value="owner" >Owner</option>
-		      <option value="lom_max" >LOM</option>
-          <option value="criteria" >Criteria</option>
-		  <option value="total_mark" >Total Mark</option>
+		  <option value="total_marks" >Total Marks</option>
       </select></td>
       <td width="35"><input type="text" name="livesearch" id="livesearch" size="30">
       </td>
