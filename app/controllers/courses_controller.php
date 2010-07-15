@@ -89,33 +89,29 @@ class CoursesController extends AppController
 
 	function home($id)
 	{
+        $course = $this->Course->findById($id);
+        $this->set('data', $course);
+        $students = $this->Course->getEnrolledStudentCount($id);
+        $this->set('studentCount', $students);;
 
-	  $course = $this->Course->findById($id);
-		$this->set('data', $course);
-//	  $this->set('courseInstructors', $course['UserCourse']);
-	  $students = $this->Course->getEnrolledStudentCount($id);
-    $this->set('studentCount', $students);
-	  //$groups = $this->Group->getCourseGroupCount($id);
-	  //$this->set('groupCount', $groups[0]['total']);
+        $number_of_groups=count($this->Group->findAllByCourse_id($id));
+        $this->set('groupCount', $number_of_groups);
+        $events = $this->Event->getCourseEventCount($id);
+        $this->set('eventCount', $events[0]['total']);
 
-         $number_of_groups=count($this->Group->findAllByCourse_id($id));
-          $this->set('groupCount', $number_of_groups);
-	  $events = $this->Event->getCourseEventCount($id);
-    $this->set('eventCount', $events[0]['total']);
+        $this->pageTitle = $this->sysContainer->getCourseName($id);
 
-		$this->pageTitle = $this->sysContainer->getCourseName($id);
+        //Setup the Personalization list
+        if (empty($this->userPersonalize->personalizeList)) {
+            $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+            $this->userPersonalize->setPersonalizeList($personalizeData);
+        }
+        $this->set('userPersonalize', $this->userPersonalize);
 
-		//Setup the Personalization list
-		if (empty($this->userPersonalize->personalizeList)) {
-      $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-			$this->userPersonalize->setPersonalizeList($personalizeData);
-		}
-		$this->set('userPersonalize', $this->userPersonalize);
+        //Setup the courseId to session
+        $this->rdAuth->setCourseId($id);
 
-    //Setup the courseId to session
-  	$this->rdAuth->setCourseId($id);
-
-		$this->render('home');
+        $this->render('home');
 	}
 
 	function add() {
@@ -125,15 +121,12 @@ class CoursesController extends AppController
 		if (empty($this->params['data']))
 		{
 			$this->render('add');
-		}
-		else
-		{
+		} else {
             if (!stristr($this->params['data']['Course']['homepage'], "http://")) {
                 $this->params['data']['Course']['homepage'] = "http://" . $this->params['data']['Course']['homepage'];
             }
 			$this->params = $this->Course->prepData($this->params);
-			if ($this->Course->save($this->params['data']))
-			{
+			if ($this->Course->save($this->params['data'])) {
 				$this->UserCourse->insertAdmin($this->Course->id);
 				$this->UserCourse->insertInstructors($this->Course->id,$this->params['data']['Course']);
 				//refresh my accessible courses on session
@@ -141,9 +134,7 @@ class CoursesController extends AppController
 				$this->sysContainer->setMyCourseList($myCourses);
 
 				$this->redirect('courses/index/The course was added successfully.');
-			}
-			else
-			{
+			} else {
 				$this->set('data', $this->params['data']);
 				$this->set('errmsg', $this->Course->errorMessage);
 				$this->render('add');
@@ -167,9 +158,7 @@ class CoursesController extends AppController
 			$this->Course->setId($id);
 			$this->params['data'] = $this->Course->read();
 			$this->set('data', $this->Course->read());
-		}
-		else
-		{
+		} else {
             if (!stristr($this->params['data']['Course']['homepage'], "http://")) {
                 $this->params['data']['Course']['homepage'] = "http://" . $this->params['data']['Course']['homepage'];
             }
@@ -247,31 +236,31 @@ class CoursesController extends AppController
 
 	function search()
   	{
-      $this->layout = 'ajax';
+        $this->layout = 'ajax';
 
-      if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-      	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-      	if ($personalizeData) {
-      	   $this->userPersonalize->setPersonalizeList($personalizeData);
-           $this->show = $this->userPersonalize->getPersonalizeValue('Course.ListMenu.Limit.Show');
-           $this->set('userPersonalize', $this->userPersonalize);
-      	}
-      }
+        if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
+            $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+            if ($personalizeData) {
+            $this->userPersonalize->setPersonalizeList($personalizeData);
+            $this->show = $this->userPersonalize->getPersonalizeValue('Course.ListMenu.Limit.Show');
+            $this->set('userPersonalize', $this->userPersonalize);
+            }
+        }
 
-      $conditions = null;
+        $conditions = null;
 
-      if (!empty($this->params['form']['livesearch']) && !empty($this->params['form']['select']))
-      {
-        $pagination->loadingId = 'loading';
-        //parse the parameters
-        $searchField=$this->params['form']['select'];
-        $searchValue=trim($this->params['form']['livesearch']);
-        $conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
-        var_dump($searchField);
-        var_dump($searchValue);
-      }
-      $this->update($attributeCode = 'Course.ListMenu.Limit.Show',$attributeValue = $this->show);
-      $this->set('conditions',$conditions);
+        if (!empty($this->params['form']['livesearch']) &&
+            !empty($this->params['form']['select'])) {
+            $pagination->loadingId = 'loading';
+            //parse the parameters
+            $searchField=$this->params['form']['select'];
+            $searchValue=trim($this->params['form']['livesearch']);
+            $conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
+            var_dump($searchField);
+            var_dump($searchValue);
+        }
+        $this->update($attributeCode = 'Course.ListMenu.Limit.Show',$attributeValue = $this->show);
+        $this->set('conditions',$conditions);
   }
 
   function adddelrow()
@@ -294,7 +283,7 @@ class CoursesController extends AppController
   	return $this->Course->findInstructors();
   }
 
-  function uniqueInstructors($course_id){
+  function uniqueInstructors($course_id) {
   	return $this->Course->findUniqueInstructors($course_id);
   }
 
@@ -309,17 +298,16 @@ class CoursesController extends AppController
 		$this->layout = false;
 
 		if ($attributeCode != '') {
-  		$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode,$attributeValue);
-  		$this->set('attributeCode',$attributeCode);
+            $this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode,$attributeValue);
+            $this->set('attributeCode',$attributeCode);
 
-  		//Setup the Personalization list
-  		//if (empty($this->userPersonalize->personalizeList)) {
-        $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-        //print_r($personalizeData);
-  			$this->userPersonalize->setPersonalizeList($personalizeData);
-  		//}
-  		$this->set('userPersonalize', $this->userPersonalize);
-      if ($attributeValue == '') $this->render('update');
+            $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+            $this->userPersonalize->setPersonalizeList($personalizeData);
+
+            $this->set('userPersonalize', $this->userPersonalize);
+            if ($attributeValue == '') {
+                $this->render('update');
+            }
 		}
 	}
 }
