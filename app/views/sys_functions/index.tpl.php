@@ -1,3 +1,19 @@
+<?php
+    $paging['style'] = 'ajax';
+    $paging['link'] =  $this->webroot . '/sysfunctions/search/?show=' . $this->controller->show .
+                        '&liveSearch=' . $liveSearch .
+                        '$searchIndex=' . $searchIndex .
+                        '&sort=' . $this->controller->sortBy .
+                        '&direction=' . $this->controller->direction . '&page=';
+
+    $paging['count'] = $this->controller->SysFunction->findCount($conditions=null);
+    $paging['show'] = array('10','25','50','all');
+    $paging['page'] = $this->controller->page;
+    $paging['limit'] = $this->controller->show;
+    $paging['direction'] = $this->controller->direction;
+?>
+
+
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
 <tr>
 <td align="center">

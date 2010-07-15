@@ -68,7 +68,6 @@ class SysParametersController extends AppController
 
   	$paging['style'] = 'ajax';
   	$paging['link'] = '/sysparameters/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
-
   	$paging['count'] = $this->SysParameter->findCount($conditions=null);
   	$paging['show'] = array('10','25','50','all');
   	$paging['page'] = $this->page;
@@ -90,19 +89,13 @@ class SysParametersController extends AppController
 
 	function add()
 	{
-		if (empty($this->params['data']))
-		{
+		if (empty($this->params['data'])) {
 			$this->render();
-		}
-		else
-		{
-			if ($this->SysParameter->save($this->params['data']))
-			{
+		} else {
+			if ($this->SysParameter->save($this->params['data'])) {
 				$message = 'The record is saved successfully';
 				$this->redirect('sysparameters/index/'.$message);
-			}
-			else
-			{
+			} else {
 				$this->set('data', $this->params['data']);
 				$this->render('edit');
 			}
@@ -111,21 +104,15 @@ class SysParametersController extends AppController
 
 	function edit($id=null)
 	{
-		if (empty($this->params['data']))
-		{
+		if (empty($this->params['data'])) {
 			$this->SysParameter->setId($id);
 			$this->params['data'] = $this->SysParameter->read();
 			$this->render();
-		}
-		else
-		{
-			if ( $this->SysParameter->save($this->params['data']))
-			{
+		} else {
+			if ( $this->SysParameter->save($this->params['data'])) {
 				$message = 'The record is edited successfully';
 				$this->redirect('sysparameters/index/'.$message);
-			}
-			else
-			{
+			} else {
 				$this->set('data', $this->params['data']);
 				$this->render();
 			}
@@ -153,7 +140,7 @@ class SysParametersController extends AppController
     	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
     	if ($personalizeData) {
     	   $this->userPersonalize->setPersonalizeList($personalizeData);
-         $this->show = $this->userPersonalize->getPersonalizeValue('Survey.ListMenu.Limit.Show');
+         $this->show = $this->userPersonalize->getPersonalizeValue('SysParam.ListMenu.Limit.Show');
          $this->set('userPersonalize', $this->userPersonalize);
     	}
     }

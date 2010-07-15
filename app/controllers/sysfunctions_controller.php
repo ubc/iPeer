@@ -56,32 +56,34 @@ class SysFunctionsController extends AppController
 	function index($message='')
 	{
 
-    $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-    $this->userPersonalize->setPersonalizeList($personalizeData);
-    if ($personalizeData && $this->userPersonalize->inPersonalizeList('SysParam.ListMenu.Limit.Show')) {
-       $this->show = $this->userPersonalize->getPersonalizeValue('SysParam.ListMenu.Limit.Show');
-       $this->set('userPersonalize', $this->userPersonalize);
-    } else {
-      $this->show = '10';
-      $this->update($attributeCode = 'SysParam.ListMenu.Limit.Show',$attributeValue = $this->show);
-    }
-  	$data = $this->SysFunction->findAll($conditions=null, $fields=null, $this->order, $this->show, $this->page);
-//
-  	$paging['style'] = 'ajax';
-  	$paging['link'] = '/sysfunctions/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
+        $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+        $this->userPersonalize->setPersonalizeList($personalizeData);
+        if ($personalizeData && $this->userPersonalize->inPersonalizeList('SysParam.ListMenu.Limit.Show')) {
+            $this->show = $this->userPersonalize->getPersonalizeValue('SysParam.ListMenu.Limit.Show');
+            $this->set('userPersonalize', $this->userPersonalize);
+        } else {
+            $this->show = '10';
+            $this->update($attributeCode = 'SysParam.ListMenu.Limit.Show',$attributeValue = $this->show);
+        }
+        $data = $this->SysFunction->findAll($conditions=null, $fields=null, $this->order, $this->show, $this->page);
 
-  	$paging['count'] = $this->SysFunction->findCount($conditions=null);
-  	$paging['show'] = array('10','25','50','all');
-  	$paging['page'] = $this->page;
-  	$paging['limit'] = $this->show;
-  	$paging['direction'] = $this->direction;
+        $searchIndexURL = isset($_GET['searchIndex']) ? $_GET['searchIndex'] : '';
+        $liveSearchURL  = isset($_GET['livesearch'])  ? $_GET['livesearch']  : '';
 
-    if (isset($message)) {
-      $this->set('message', $message);
-    }
+        $searchIndex = isset($this->params['form']['searchIndex']) ?
+            $this->params['form']['searchIndex'] : $searchIndexURL;
+        $liveSearch =  isset($this->params['form']['livesearch']) ?
+                    $this->params['form']['livesearch'] : $liveSearchURL;
 
-  	$this->set('paging',$paging);
-  	$this->set('data',$data);
+
+
+        if (isset($message)) {
+            $this->set('message', $message);
+        }
+
+        $this->set('data',$data);
+        $this->set('searchIndex',$searchIndex);
+        $this->set('liveSearch',$liveSearch);
 	}
 
 	function view($id)
@@ -125,22 +127,49 @@ class SysFunctionsController extends AppController
     }
   }
 
-  function search()
-  {
-    $this->layout = 'ajax';
-    $pagination->loadingId = 'loading';
+    function search()
+    {
+        if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
+            $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+            if ($personalizeData) {
+                $this->userPersonalize->setPersonalizeList($personalizeData);
+                $this->show = $this->userPersonalize->getPersonalizeValue('SysFunc.ListMenu.Limit.Show');
+                $this->set('userPersonalize', $this->userPersonalize);
+            }
+        }
 
-    $conditions = null;
 
-    if (isset($this->params['form']['livesearch'])){
-      $searchField=$this->params['form']['searchIndex'];
-      $searchValue=$this->params['form']['livesearch'];
+        $this->layout = 'ajax';
+        $pagination->loadingId = 'loading';
 
-      $conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
+        $conditions = null;
 
+        $searchIndexURL = isset($_GET['searchIndex']) ? $_GET['searchIndex'] : '';
+        $liveSearchURL  = isset($_GET['livesearch'])  ? $_GET['livesearch']  : '';
+
+        $searchIndex = isset($this->params['form']['searchIndex']) ?
+            $this->params['form']['searchIndex'] : $searchIndexURL;
+        $liveSearch =  isset($this->params['form']['livesearch']) ?
+                    $this->params['form']['livesearch'] : $liveSearchURL;
+
+        if (!empty($searchIndex) && !empty($liveSearch)){
+            $searchField = $searchIndex;
+            $searchValue = $liveSearch;
+
+            $conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
+
+        }
+
+        $this->set('conditions',$conditions);
+        $this->set('searchIndex', $searchIndex);
+        $this->set('liveSearch', $liveSearch);
+        $this->update($attributeCode = 'SysFunc.ListMenu.Limit.Show',$attributeValue = $this->show);
     }
-    $this->set('conditions',$conditions);
-  }
+
+    function update($attributeCode='',$attributeValue='') {
+        if ($attributeCode != '' && $attributeValue != '') //check for empty params
+        $this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
+    }
 }
 
 ?>
