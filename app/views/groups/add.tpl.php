@@ -71,8 +71,8 @@
         <td><div align="right"><a href="#" onclick="$('import').style.display='block'; toggle(this);">[+]</a> </div></td>
       </tr>
   </table>
-<div id="import" style="display: none; background: #FFF;">
-<br>
+<div id="import" style="display: <?php echo isset($import_again) ? "block" : "none" ?>; background: #FFF;">
+  <br>
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>

@@ -100,26 +100,20 @@ class GroupsController extends AppController
     // gets all the students in db for the unfiltered students list
 		$this->set('user_data', $this->User->getEnrolledStudents($courseId));
 
-		if (empty($this->params['data']))
-		{
+		if (empty($this->params['data'])) {
 			$this->render('add');
-		}
-		else
-		{
-		  $this->params['data']['Group']['course_id']=$courseId;
+		} else {
+            $this->params['data']['Group']['course_id']=$courseId;
 			$this->params = $this->Group->prepData($this->params);
 
-			if ($this->Group->save($this->params['data']))
-			{
+			if ($this->Group->save($this->params['data'])) {
 				// add members into the groups_members table
 				$this->GroupsMembers->insertMembers($this->Group->id, $this->params['data']['Group']);
 
 				$this->redirect('/groups/index/The groups were added successfully.');
 
-			}
-			else
-			{
-        $this->Session->setFlash('Please correct the error below.');
+			} else {
+                $this->Session->setFlash('Please correct the error below.');
 				$this->render();
 			}
 		}
@@ -243,10 +237,10 @@ class GroupsController extends AppController
   	return $attributes;
   }
 
-  function import() {
-    $this->autoRender = false;
-    $courseId = $this->params['form']['course_id'];
-    $this->params['data']['Group']['course_id'] = $courseId;
+    function import() {
+        $this->autoRender = false;
+        $courseId = $this->params['form']['course_id'];
+        $this->params['data']['Group']['course_id'] = $courseId;
 		$filename = $this->params['form']['file']['name'];
 		$tmpFile = $this->params['form']['file']['tmp_name'];
 
@@ -258,11 +252,13 @@ class GroupsController extends AppController
 		//check for blank filename
 		if (trim($filename) == "") {
 			$this->set('errmsg','File required.');
-			$this->render('add');
+			$this->set('user_data', $this->User->getEnrolledStudents($courseId));
+			$this->set('import_again',"true");
+            $this->render('add');
 			return false;
 		}
 	  //Return true if valid, else error msg
-    $validUploads = $this->framework->validateUploadFile($tmpFile, $filename, $uploadFile);
+        $validUploads = $this->framework->validateUploadFile($tmpFile, $filename, $uploadFile);
 		if ($validUploads) {
 			// Get file into an array.
 			$lines = file($uploadFile);
@@ -271,15 +267,16 @@ class GroupsController extends AppController
 
 			//Mess create students
 			$resultAry = $this->addGroupByImport($this->params['data'], $lines);
-  		$this->set('data', $resultAry);
+            $this->set('data', $resultAry);
 
-  		$this->redirect('/groups/index/The groups were added successfully.');
-		}
-		else {
+            $this->redirect('/groups/index/The groups were added successfully.');
+		} else {
 		  $this->set('errmsg', $$validUploads);
+		  $this->set('user_data', $this->User->getEnrolledStudents($courseId));
+		  $this->set('import_again',"true");
 		  $this->render('add');
 		}
-	}
+    }
 
   function addGroupByImport($data=null, $lines=null)
 	{

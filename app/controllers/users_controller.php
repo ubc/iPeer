@@ -577,8 +577,10 @@ class UsersController extends AppController
         if (trim($filename) == "") {
             $courseList = $this->sysContainer->getMyCourseList();
             $this->set('courseList', $courseList);
-            $this->set('errmsg','File required.');
-            $this->render('add_student');
+            $this->set('errmsg','A File is required for the import!');
+            $this->set('user_type', 'S');
+            $this->set('import_again',"true");
+            $this->render('add');
             return false;
         }
 
@@ -599,7 +601,10 @@ class UsersController extends AppController
         }
         else {
             $this->set('errmsg', $$validUploads);
-            $this->render('add_student');
+            $this->set('user_type', 'S');
+            $this->set('import_again',"true");
+            $this->render('add');
+            return false;
         }
     }
 

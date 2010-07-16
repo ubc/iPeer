@@ -125,7 +125,7 @@
           <td><div align="right"><a href="#import" onclick="$('import').style.display='block'; toggle(this);">[click here to start]</a> </div></td>
         </tr>
     </table>
-  <div id="import" style="display: none; background: #FFF;">
+  <div id="import" style="display: <?php echo isset($import_again) ? "block" : "none" ?>; background: #FFF;">
   <br>
   <?php echo $javascript->link('showhide')?>
   <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
