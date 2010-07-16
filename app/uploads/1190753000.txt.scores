@@ -1,8 +1,0 @@
-<table border="1" cellpadding="2"><tr><td></td><td><span class="vertical">What is your GPA?</span></td>
-<td><span class="vertical">Have you ever worked on a construction site or related engineering project?</span></td>
-<td><span class="vertical">Do you have a laptop?</span></td>
-<td><span class="vertical">Number of languages you speack?</span></td>
-<td>Total</td></tr>
-<tr><td>Team / Weight</td><td bgcolor="">0</td>
-</tr>
-<tr><td>Team #1</td><td align="center">86%</td><td align="center">14%</td><td align="center">86%</td><td align="center">-</td><td>4.32</td></tr><tr><td>Team #2</td><td align="center">88%</td><td align="center">12%</td><td align="center">88%</td><td align="center">-</td><td>4.40</td></tr></table>

@@ -1,5 +1,0 @@
-<table border="1" cellpadding="2"><tr><td></td><td><span class="vertical">What was your grade in first year English?</span></td>
-<td>Total</td></tr>
-<tr><td>Team / Weight</td><td bgcolor="<?=color_for_weight(0)?>">0</td>
-</tr>
-<tr><td>Team #1</td><td align="center">-</td><td>0.00</td></tr><tr><td>Team #2</td><td align="center">-</td><td>0.00</td></tr></table>
