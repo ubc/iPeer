@@ -13,7 +13,11 @@
 <?php } else {?>
     <tr class="tablecell2">
       <td width="185" id="newuser_label">Username:*</td>
-      <td width="502"><?php echo $html->input('User/username', array('size'=>'50', 'disabled'=>'true')) ?></td>
+
+      <td width="502"><?php echo $html->hidden('User/username'); ?>
+        <?php echo "<input type='text' size='50' disabled='true' value='" . $params['data']['User']['username'] . "'>"; ?>
+
+        </td>
       <td></td>
     </tr>
 <?php } ?>

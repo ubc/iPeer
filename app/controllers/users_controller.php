@@ -368,6 +368,7 @@ class UsersController extends AppController
                 $this->Output->br2nl($this->params['data']);
                 $this->set('data', $this->params['data']);
                 $this->set('viewPage', 'false');
+                $this->set('message', $this->User->errorMessage);
                 $this->render();
             }
         }
