@@ -69,7 +69,7 @@ function checkEmailAddress()
         <td width="350" align="right"><?php echo $html->image('layout/icon_edit.gif',array('alt'=>'icon_edit'))?> <a href="<?php echo $this->webroot.$this->themeWeb;?>users/editProfile" class="miniLinks">Edit Profile (<?php echo $rdAuth->fullname ?>)</a></td>
         <td width="57" align="right"><?php echo $html->image('layout/icon_arrow.gif',array('alt'=>'icon_arrow'))?> <a href="<?php echo $this->webroot.$this->themeWeb;?>loginout/logout" class="miniLinks">Logout</a></td>
         <?php else:?>
-        <td width="157"/>
+        <td width="157">&nbsp;</td>
         <td width="57" align="right"><?php echo $html->image('layout/icon_arrow.gif',array('alt'=>'icon_arrow'))?> <a href="<?php echo $this->webroot.$this->themeWeb;?>loginout/login" class="miniLinks">Login</a></td>
         <?php endif;?>
 
@@ -164,12 +164,16 @@ function checkEmailAddress()
       <div align="right">
         <?php
         if (!empty($this->params)) {
-            if ($this->controller->rdAuth->role != 'S' && $this->params['controller'] != 'loginout') {
-                echo '<a href="' . $this->webroot . $this->themeWeb .
-                'framework/tutIndex" onclick="wopen(this.href, \'popup\', 800, 600); return false;">' .
-                $html->image('layout/button_ipeer_tutorial.gif',
-                array('border'=>'0','alt'=>'button_ipeer_tutorial')) . '</a>';
-            }
+          if ('install' != $this->params['controller'] && 
+              'upgrade' != $this->params['controller'] && 
+              'loginout' != $this->params['controller'] &&
+              $this->controller->rdAuth->role != 'S') {
+
+            echo '<a href="' . $this->webroot . $this->themeWeb .
+              'framework/tutIndex" onclick="wopen(this.href, \'popup\', 800, 600); return false;">' .
+              $html->image('layout/button_ipeer_tutorial.gif',
+                           array('border'=>'0','alt'=>'button_ipeer_tutorial')) . '</a>';
+          }
         }
         ?>
         </div></td>

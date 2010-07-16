@@ -1,5 +1,5 @@
 <div style="margin-left:120px">
-<h1>No iPeer database found. Make sure you define in it <u><tt>app/config/database.php</tt></u> in the following format:</h1>
+<h1>No iPeer database found. You may want to run <a href="/install">installation</a> first. Otherwise make sure you define in it <u><tt>app/config/database.php</tt></u> in the following format:</h1>
 
 <pre style="background-color:#FFFFDD;">
 &lt;?php

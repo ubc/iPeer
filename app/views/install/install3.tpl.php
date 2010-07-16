@@ -1,26 +1,9 @@
-<script type="text/javascript" language="javascript">
-<!--
-  function show(element)
-  {
-  	element.style.display="block";
-    /*new Effect.BlindDown(element);*/
-  }
-
-  function hide(element)
-  {
-  	element.style.display="none";
-    /*new Effect.BlindUp(element);*/
-  }
-
-// -->
-</script>
-
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" align="center">
 <tr>
 <td align="center">
   <br>
 <form name="frm" id="frm" method="POST" action="<?php echo $html->url('install3') ?>" onSubmit="return validate()" enctype="multipart/form-data">
-<input type="hidden" name="required" id="required" value="host_name db_user db_password db_name session_name" />
+<input type="hidden" name="required" id="required" value="host_name db_user db_name" />
 
 <table width="95%"  border="0" cellspacing="2" cellpadding="4">
   <tr>
@@ -44,11 +27,11 @@
                   <tr>
                   	<td width="130" id="data_opt_label">Data Setup:</td>
                   	<td width="500" align="left">
-                  	  <input type="radio" name="data_setup_option" value="A" CHECKED  onClick="hide($('import_data'))">Installation with sample data. (Recommended)<br>
-                      <input type="radio" name="data_setup_option" value="B" onClick="hide($('import_data'));">Basic Installation<br />
-                      <input type="radio" name="data_setup_option" value="C" onClick="show($('import_data'));">Import Data From iPeer 1.6<br />
+                  	  <input type="radio" name="data_setup_option" value="A" CHECKED  onClick="javascript:$('import_data').hide()">Installation with sample data. (Recommended)<br>
+                      <input type="radio" name="data_setup_option" value="B" onClick="javascript:$('import_data').hide();">Basic Installation<br />
+                      <input type="radio" name="data_setup_option" value="C" onClick="javascript:$('import_data').show();">Import Data From iPeer 1.6<br />
                   	</td>
-                  	<td width="363" id="data_opt_msg" class="error"/>
+                  	<td width="363" id="data_opt_msg" class="error">&nbsp;</td>
                   </tr>
                   </table>
               </td>
@@ -62,7 +45,7 @@
 
   <tr>
     <td colspan="3">
-    <div  id="import_data">
+    <div id="import_data" style="display: none;">
       <table width="100%" border="0" cellspacing="0" cellpadding="0">
         <tr>
           <td width="10%">&nbsp;</td>
@@ -81,7 +64,7 @@
                       <td width="337" align="left">
                         <input type="file" name="data_file" />
                       </td>
-                      <td width="663" id="data_file_msg" class="error" />
+                      <td width="663" id="data_file_msg" class="error">&nbsp;</td>
                     </tr>
                     <tr>
                       <td width="130" id="data_to_import_label">Data to Import</td>
@@ -96,7 +79,7 @@
                         <input type="checkbox" name="to_import[]" value="surveys" checked />Surveys<br />
                         <input type="checkbox" name="to_import[]" value="groups" checked />Groups<br />
                       </td>
-                      <td width="663" id="data_to_import_msg" class="error" />
+                      <td width="663" id="data_to_import_msg" class="error">&nbsp;</td>
                     </tr>
                   </table>
                 </td>
@@ -129,7 +112,7 @@
 										echo $html->selectTag('DBConfig/driver', $dbDriver, null, null, null, false);
 										 ?>
 										</td>
-                  	<td width="663" id="driver_msg" class="error"/>
+                  	<td width="663" id="driver_msg" class="error">&nbsp;</td>
                   </tr>
                   <tr>
                   	<td width="130" id="connect_label">DB Connection:</td>
@@ -139,27 +122,27 @@
 										echo $html->selectTag('DBConfig/connect', $dbConnection, null, null, null, false);
 										 ?>
 										</td>
-                  	<td width="663" id="connect_msg" class="error"/>
+                  	<td width="663" id="connect_msg" class="error">&nbsp;</td>
                   </tr>
                   <tr>
                   	<td width="130" id="host_name_label">Host Name:</td>
-                  	<td width="337" align="left"><?php echo $html->input('DBConfig/host_name', array('id'=>'host_name', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT host_name_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'value'=>'localhost'))?></td>
-                  	<td width="663" id="host_name_msg" class="error"/>
+                  	<td width="337" align="left"><?php echo $html->input('DBConfig/host', array('id'=>'host_name', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT host_name_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'value'=>'localhost'))?></td>
+                  	<td width="663" id="host_name_msg" class="error">&nbsp;</td>
                   </tr>
                   <tr>
                   	<td width="130" id="db_user_label">DB Username:</td>
-                  	<td width="337" align="left"><?php echo $html->input('DBConfig/db_user', array('id'=>'db_user', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT db_user_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
-                  	<td width="663" id="db_user_msg" class="error"/>
+                  	<td width="337" align="left"><?php echo $html->input('DBConfig/login', array('id'=>'db_user', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT db_user_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
+                  	<td width="663" id="db_user_msg" class="error">&nbsp;</td>
                   </tr>
                   <tr>
                   	<td width="130" id="db_password_label">DB Password:</td>
-                  	<td width="337" align="left"><?php echo $html->input('DBConfig/db_password', array('id'=>'db_password', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT db_password_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
-                  	<td width="663" id="db_password_msg" class="error"/>
+                  	<td width="337" align="left"><?php echo $html->password('DBConfig/password', array('id'=>'db_password', 'size'=>'50', 'class'=>'TEXT_FORMAT'))?></td>
+                  	<td width="663" id="db_password_msg" class="error">&nbsp;</td>
                   </tr>
                   <tr>
-                  	<td width="130" id="db_name_label">Database Name:</td>
-                  	<td width="337" align="left"><?php echo $html->input('DBConfig/db_name', array('id'=>'db_name', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT db_name_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
-                  	<td width="663" id="db_name_msg" class="error"/>
+                  	<td width="140" id="db_name_label">Database Name:</td>
+                  	<td width="337" align="left"><?php echo $html->input('DBConfig/database', array('id'=>'db_name', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT db_name_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
+                  	<td width="663" id="db_name_msg" class="error">&nbsp;</td>
                   </tr>
 
                   </table>
@@ -173,7 +156,7 @@
   </tr>
   <tr>
     <td colspan="3" align="right">
-    <?php echo $html->submit('Next >>', array('name'=>'next')) ?></br>
+    <?php echo $html->submit('Next >>', array('name'=>'next')) ?><br />
     </td>
   </tr>
   <tr>

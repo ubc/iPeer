@@ -2,37 +2,30 @@
 /* SVN FILE: $Id$ */
 
 /**
- * Enter description here ....
- *
  * @filesource
  * @copyright    Copyright (c) 2006, .
  * @link
  * @package
  * @subpackage
  * @since
- * @version      $Revision$
- * @modifiedby   $LastChangedBy$
- * @lastmodified $Date: 2006/08/11 17:22:15 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
 /**
  * Controller :: Installs
  *
- * Enter description here...
- *
  * @package
  * @subpackage
  * @since
  */
-class InstallController extends AppController
+class InstallController extends Controller
 {
-  //var $uses =  array('SysParameter');
-  var $uses = array();
 	var $Sanitize;
-	var $superAdmin = '';
-	var $components = array('rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework',
-	                        'installHelper');
+  var $uses         = array(); 
+	var $components   = array('Output', 
+                            'framework',
+                            'Session',
+                            'installHelper');
 
 	
 	function __construct()
@@ -42,22 +35,48 @@ class InstallController extends AppController
 		parent::__construct();
 	}
 		
+  function checkDatabaseFile()
+  {
+    return file_exists('../config/database.php');
+  }
+
 	function index()
 	{
+    $this->Session->write('progress', 'index');
 	  $this->autoRender = false;
-    $this->render('install');
+    if(file_exists('../config/database.php'))
+    {
+      $this->set('message_content', 'It looks like you already have a instance running. Please install a fresh copy or remove app/config/database.php.');
+      $this->render(null, null, 'views/pages/message.tpl.php');
+    }else{
+      $this->render('install');
+    }
 	}
 	
 	function install2()
 	{
+    if(!$this->Session->check('progress') || 'index' != $this->Session->read('progress'))
+    {
+      $this->set('message_content', 'You seems to miss some steps. Please start the installation from beginning.');
+      $this->render(null, null, 'views/pages/message.tpl.php');
+    }
+    $this->Session->write('progress', 'install2');
 	}
 
 	function install3()
 	{
-		if (empty($this->params['data'])) {
-      //render default
-  	}
-		else {
+    if(!$this->Session->check('progress') || ('install2' != $this->Session->read('progress') && 'install3' != $this->Session->read('progress')))
+    {
+      $this->render('wrongstep');
+    }
+    $this->Session->write('progress', 'install3');
+
+    $writable = is_writable("../config");
+  
+    if(!$writable) $this->set('errmsg', '"app/config" is not writable. Please check the permission on config directory, e.g., chmod 777 app/config. After installation, please change the permission back.');
+
+    if (!empty($this->params['data'])) 
+    {
       //setup parameter
       $dbConfig = $this->__createDBConfigFile();
 			
@@ -66,39 +85,57 @@ class InstallController extends AppController
 			$insertDataStructure = $this->installHelper->runInsertDataStructure($dbConfig, $this->params);
 			
       //Save Data
-			//if ($this->SysParameter->save($this->params['data'])) {
-      if ($dbConfig && $insertDataStructure) {
+      if ($dbConfig && $insertDataStructure) 
+      {
 				$this->params['data'] = array(); 
 				$this->set('data', $this->params['data']);
 				$this->redirect('install/install4');  
-			}	
-      //Found error
-      else {
+			}else{
+        //Found error
         $this->set('data', $this->params['data']);
         $this->set('errmsg', 'Create Database Configuration Failed');
         $this->render('install3');
-      
-      }//end if
+      }
 		}	  
 	}
 
 	function install4()
 	{
 	  $this->autoRender = false;
+
+    if(!$this->Session->check('progress') || ('install3' != $this->Session->read('progress') && 'install4' != $this->Session->read('progress')))
+    {
+      $this->render('wrongstep');
+    }
+    $this->Session->write('progress', 'install4');
+
 		if (empty($this->params['data'])) {
       //render default
       $this->render();
-  	}
-		else {
+  	}else{
       //update parameters
-      $this->superAdmin = $this->installHelper->updateSystemParameters($this->params['data']);
-      
-      if (!empty($this->superAdmin)) {
-				$this->set('superAdmin', $this->superAdmin);
+      $username = $this->installHelper->updateSystemParameters($this->params['data']);
+      if (!empty($username)) {
+				$this->set('superAdmin', $username);
+
+        //create super admin
+        $admin = array('User' => array('role'           => 'A',
+                                       'username'       => $username,
+                                       'password'       => $this->params['data']['Admin']['password'],
+                                       'first_name'     => 'Super',
+                                       'last_name'      => 'Admin',
+                                       'email'          => $this->params['data']['SysParameter']['system.admin_email'],
+                                       'record_status'  => 'A',
+                                       'creator_id'     => 0));
+        $user = new User();
+        $user->save($admin); 
+
+        // test if the config directory is still writable by http user
+        $this->set('config_writable', $writable = is_writable("../config"));
+
 				$this->render('install5');  
-			}	
-      //Found error
-      else {
+			}	else {
+        //Found error
         $this->set('data', $this->params['data']);
         $this->set('errmsg', 'Configuration of iPeer System Parameters Failed.');
         $this->render('install4');
@@ -124,61 +161,28 @@ class InstallController extends AppController
         $errMsg= "Error creating ../config/database.php; check your permissions<br />" ;
         $this->set('errmsg', $errMsg);
         return false;
-    }
-    if($confile){
+    }else{
      	if (!empty($this->params['data'])) {
 				//Setup the database config parameters
-				foreach($this->params['data']['DBConfig'] as $key => $value){
-					switch ($key) {
-						case 'driver':
-							 $dbDriver = $value;
-							 $dbConfig['db_driver'] = $dbDriver;
-							 break;
-						case 'connect':
-							 $dbConnect = $value;
-							 $dbConfig['db_connect'] = $dbConnect;
-							 break;
-						case 'host_name':
-							 $hostName = $value;
-							 $dbConfig['host_name'] = $hostName;
-							 break;
-						case 'db_user':
-							 $dbUser = $value;
-							 $dbConfig['db_user'] = $dbUser;
-							 break;
-						case 'db_password':
-							 $dbPassword = $value;
-							 $dbConfig['db_password'] = $dbPassword;
-							 break;
-						case 'db_name':
-							 $dbName = $value;
-							 $dbConfig['db_name'] = $dbName;
-							 break;
-					}					
-				}
+        $dbConfig = $this->params['data']['DBConfig'];
+
 				//Write Config file
-				fwrite($confile,"<?php" . $endl);
-				fwrite($confile,"class DATABASE_CONFIG {".$endl);
-    		fwrite($confile,"var \$default = array('driver'   => '".$dbDriver."',".$endl);
-        fwrite($confile,"                     'connect'  => '".$dbConnect."',".$endl);
-        fwrite($confile,"                     'host'     => '".$hostName."',".$endl);
-        fwrite($confile,"                     'login'    => '".$dbUser."',".$endl);
-        fwrite($confile,"                     'password' => '".$dbPassword."',".$endl);
-        fwrite($confile,"                     'database' => '".$dbName."',".$endl);
+				fwrite($confile, "<?php" . $endl);
+				fwrite($confile, "class DATABASE_CONFIG {".$endl);
+    		fwrite($confile, "var \$default = array(".$endl);
+        foreach($dbConfig as $k => $v)
+        {
+          fwrite($confile, "                     '".$k."'   => '".$v."',".$endl);
+        }
         fwrite($confile,"                     'prefix'   => '');  }".$endl);
-				fwrite($confile,"?>" . $endl);
-			} else {
-			  
+        fwrite($confile,"?>" . $endl);
+      } else {
 			  return false; 
 			}
 			
-     }  
-   	return $dbConfig;
+    }  
+    return $dbConfig;
   }
-
-
-	
-
 	
   function gpl()
   {
@@ -190,9 +194,6 @@ class InstallController extends AppController
   {
     $this->render('manualdoc');
   }
-  
-  
-  
 }
 
 ?>

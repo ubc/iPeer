@@ -31,22 +31,22 @@ function get_php_setting($val) {
                   <tr>
                     <td width="30%" rowspan="7" class="style6"><div align="justify">All items in this section must be green. Please take action to correct any item that is shown in red before installation. </div></td>
                     <td width="10%"></td>
-                    <td width="40%">PHP version &gt;= 4.3</td>
-                    <td width="20%"><?php echo phpversion() < '4.1' ? '<b><font color="red">No</font></b>' : '<b><font color="green">Yes</font></b>';?></td>
+                    <td width="40%">PHP version &gt;= 4.3.2</td>
+                    <td width="20%"><?php echo phpversion() < '4.3.2' ? '<b><font color="red">No</font></b>' : '<b><font color="green">Yes</font></b>';?></td>
                   </tr>
                   <tr>
                     <td><div align="center"></div></td>
                     <td>MySQL Support</td>
                     <td><?php echo function_exists( 'mysql_connect' ) ? '<b><font color="green">Available</font></b>' : '<b><font color="red">Unavailable</font></b>';?></td>
                   </tr>
-          			  <tr>
+<!--          			  <tr>
           			   <td>&nbsp;</td>
           			   <td>PEAR extensions</td>
           			   <td><b><?php
           			   @include_once("DB.php");
                	  echo class_exists('DB') ? '<font color="green">Available</font>' : '<font color="red">Not Installed</font>';
           			   ?></b></td>
-          			  </tr>
+          			  </tr>-->
                 </table>
               </td>
             </tr>

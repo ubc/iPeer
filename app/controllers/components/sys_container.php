@@ -172,13 +172,13 @@ class sysContainerComponent
 	 * @param string $data used for login method
 	 * @return errors
 	 */
-	function getParamByParamCode($paraCode='')
+	function getParamByParamCode($paraCode, $default = null)
 	{
 		// echo "<h1>" . $paraCode . "</h1>";
 		$paramList = $this->Session->read('ipeerSession.paramList');
 		
 		// echo "<pre>"; print_r($paramList);echo "</pre>"; 
-		$sysParameter = $paramList[$paraCode];
+		$sysParameter = isset($paramList[$paraCode]) ? $paramList[$paraCode] : $default;
 		return $sysParameter;
 	}
 

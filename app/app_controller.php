@@ -12,9 +12,18 @@ uses('sanitize');
 class AppController extends Controller  {
 	var $startpage = 'pages';
 	var $components = array('rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework');
-	var $beforeFilter =	 array('checkAccess');
+	var $beforeFilter =	 array('checkAccess', 'checkDatabaseVersion');
 	var $access = array ();
 	var $actionList = array ();
+
+  function checkDatabaseVersion()
+  {
+    $dbv = $this->sysContainer->getParamByParamCode('database.version', array('parameter_value' => 0));
+    if('A' == $this->rdAuth->role && DATABASE_VERSION > $dbv['parameter_value'])
+    {
+      $this->Session->setFlash('<span class="notice">Your database version is older than the current version. Please do the <a href="/upgrade">upgrade</a>.</span>');
+    }
+  }
 
 	function __setAccess()
 	{

@@ -146,4 +146,10 @@ set_time_limit(300);
  */
 	define('ACL_CLASSNAME', 'DB_ACL');
 	define('ACL_FILENAME', 'dbacl' . DS . 'db_acl');
+
+  /**
+   * iPeer database version
+   */
+  define('DATABASE_VERSION', 1);
+
 ?>

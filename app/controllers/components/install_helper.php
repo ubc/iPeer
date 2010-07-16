@@ -51,14 +51,14 @@ class InstallHelperComponent
 	  $fname = $dbConfig['filename'];
 	  
     //connect to the server
-    $mysql = mysql_connect($dbConfig['host_name'], $dbConfig['db_user'], $dbConfig['db_password']);
+    $mysql = mysql_connect($dbConfig['host'], $dbConfig['login'], $dbConfig['password']);
     if(!$mysql) {
       die('Could not connect: ' . mysql_error());
       return($error);
     } 
     else {
       //Open the database
-      $mysqldb = mysql_select_db($dbConfig['db_name']);
+      $mysqldb = mysql_select_db($dbConfig['database']);
       if (!$mysqldb) {
         //TODO create database
         //return($error);
@@ -70,6 +70,8 @@ class InstallHelperComponent
   			return false;
   		}
   	
+      mysql_query('BEGIN');
+
   		$cmd = "";
   		$done = false;
   	
@@ -93,8 +95,10 @@ class InstallHelperComponent
   				$result = mysql_query($cmd, $mysql);
           if (!$result)
           {
-          $error = "Cannot run query";
-          return $error;
+            $error = "Cannot run query";
+            mysql_query('ROLLBACK');
+            mysql_close($mysql);
+            return $error;
           }
   				//if ($this->execute($cmd)) {
   				//	return false;
