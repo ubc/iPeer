@@ -161,7 +161,7 @@ class User extends AppModel
    * @access public
    * @return boolean whether or not user can remove the course from the student
    */
-  static function canRemoveCourse($user, $course_id)
+  function canRemoveCourse($user, $course_id)
   {
     if(!isset($user['User']) || !is_array($user['User'])) return false;
     if('A' == $user['User']['role']) return true;
