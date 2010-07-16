@@ -52,32 +52,30 @@ class CoursesController extends AppController
 	}
 
 	function index($msg='') {
-
-
-  	$paging['style'] = 'ajax';
-  	$paging['link'] = '/courses/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
-
-  	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-    $this->userPersonalize->setPersonalizeList($personalizeData);
-  	if ($personalizeData && $this->userPersonalize->inPersonalizeList('Course.ListMenu.Limit.Show')) {
-       $this->show = $this->userPersonalize->getPersonalizeValue('Course.ListMenu.Limit.Show');
-       $this->set('userPersonalize', $this->userPersonalize);
-  	} else {
-  	  $this->show = '10';
-      $this->update($attributeCode = 'Course.ListMenu.Limit.Show',$attributeValue = $this->show);
-  	}
-
-    $coursesCount = $this->Course->findAccessibleCoursesCount($this->rdAuth->id, $this->rdAuth->role);
-  	$paging['count'] = isset($coursesCount[0][0]['total'])? $coursesCount[0][0]['total'] : 0;
-  	$paging['show'] = array('10','25','50','all');
-  	$paging['page'] = $this->page;
-  	$paging['limit'] = $this->show;
-  	$paging['direction'] = $this->direction;
-
-    $this->set('message', $msg);
-    $data = $this->Course->findAccessibleCoursesListByUserIdRole($this->rdAuth->id, $this->rdAuth->role);
-  	$this->set('paging',$paging);
-  	$this->set('data',$data);
+        $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+        $this->userPersonalize->setPersonalizeList($personalizeData);
+        if ($personalizeData && $this->userPersonalize->inPersonalizeList('Course.ListMenu.Limit.Show')) {
+            $this->show = $this->userPersonalize->getPersonalizeValue('Course.ListMenu.Limit.Show');
+            $this->set('userPersonalize', $this->userPersonalize);
+        } else {
+            $this->show = '10';
+            $this->update($attributeCode = 'Course.ListMenu.Limit.Show',$attributeValue = $this->show);
+             // Work around the first-time render bug. No layout is displayed otherwise, but after a
+             // refresh, everything is fine once more.
+             $this->redirect("courses/index");
+        }
+        $coursesCount = $this->Course->findAccessibleCoursesCount($this->rdAuth->id, $this->rdAuth->role);
+        $paging['style'] = 'ajax';
+        $paging['link'] = '/courses/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
+        $paging['count'] = isset($coursesCount[0][0]['total'])? $coursesCount[0][0]['total'] : 0;
+        $paging['show'] = array('10','25','50','all');
+        $paging['page'] = $this->page;
+        $paging['limit'] = $this->show;
+        $paging['direction'] = $this->direction;
+        $this->set('message', $msg);
+        $data = $this->Course->findAccessibleCoursesListByUserIdRole($this->rdAuth->id, $this->rdAuth->role);
+        $this->set('paging',$paging);
+        $this->set('data',$data);
 	}
 
 	function view($id)
