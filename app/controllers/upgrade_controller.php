@@ -26,7 +26,7 @@ class UpgradeController extends Controller
                             'framework',
                             'Session',
                             'rdAuth',
-                            'dbPatchHelper'
+                            'DbPatcher'
                             );
 	var $beforeFilter =	 array('preExecute');
 
