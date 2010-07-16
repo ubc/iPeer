@@ -196,7 +196,7 @@ function checkEmailAddress()
 </div>
 
 <!-- Debugging output -->
-<?php if(!constant('DEBUG') == 0 && 'install' != $this->params['controller']) { ?>
+<?php if(!constant('DEBUG') == 0 && isset($this->params['controller']) && 'install' != $this->params['controller']) { ?>
     <!-- Prepare the SVN revision number and table -->
     <script language="JavaScript" type="text/javascript">
         // Toggles the details display of the snv revision.
@@ -216,7 +216,7 @@ function checkEmailAddress()
     foreach ($lines as $line) {
         // Convert each output line of "svn info" to an html table.
         if (!empty($line)) {
-            if (stripos($line,"revision") === FALSE) {
+            if (strpos($line,"Revision") === FALSE) {
                 $line = str_replace (": ","</td><td>", $line);
                 $svnTable .= "<tr><td>";
                 $svnTable .= $line;
