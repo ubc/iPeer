@@ -25,7 +25,8 @@ class UpgradeController extends Controller
 	var $components   = array('Output', 
                             'framework',
                             'Session',
-                            'rdAuth'
+                            'rdAuth',
+                            'dbPatchHelper'
                             );
 	var $beforeFilter =	 array('preExecute');
 
@@ -45,53 +46,15 @@ class UpgradeController extends Controller
   function step2()
   {
     $this->checkPermission();
-    // apply the delta files
-    $mysql = $this->connectDb();
     $dbv = $this->sysContainer->getParamByParamCode('database.version', array('parameter_value' => 0));
 
-    for($i = $dbv['parameter_value']+1; $i <= DATABASE_VERSION; $i++)
+    // patch the database
+    if(true !== ($ret = $this->dbPatchHelper->patch($dbv['parameter_value'])))
     {
-      $file = '../config/sql/delta_'.$i.'.sql';
-      if(is_readable($file))
-      {
-        /*if(true !== ($ret = $this->applyDelta($file)))
-        {
-          $this->set('message_content', 'Failed to apply delta file: '.$file.'. Message = '.$ret);
-          $this->render(null, null, 'views/pages/message.tpl.php');
-          return;
-        }*/
-      }else{
-        mysql_query("ROLLBACK");
-        mysql_close($mysql);
-        $this->set('message_content', 'The file '.$file.' is missing. Please make sure you have a complete copy of iPeer.');
+        $this->set('message_content', $ret);
         $this->render(null, null, 'views/pages/message.tpl.php');
-        return;
-      }
     }
-    $this->disconnectDb($mysql);
-
-    // apply the other changes
-
-    // update database version
-    $sysParam = new SysParameter();
-    if($dbv = $sysParam->findByParameterCode('database.version1'))
-    {
-      $sysParam->id = $dbv['SysParameter']['id'];
-      $sysParam->saveField('parameter_code', DATABASE_VERSION);
-    }else{
-      $dbv = array('SysParameter' => array('parameter_code' => 'database.version',
-                                           'parameter_value'=> DATABASE_VERSION,
-                                           'parameter_type' => 'I',
-                                           'description'    => 'database version',
-                                           'record_status'  => 'A',
-                                           'creator_id'     => 0,
-                                           'created'        => 'NOW()',
-                                           'updater_id'     => 0,
-                                           'modified'       => 'NOW()'
-                                           ));
-      $sysParam->save($dbv);
-    }
-
+   
     // logout the user
 		$this->rdAuth->logout();
 		$this->Session->del('URL');
@@ -103,79 +66,7 @@ class UpgradeController extends Controller
     $this->render(null, null, 'views/pages/message.tpl.php');
   }
 
-  function connectDb()
-  {
-    $db = new DATABASE_CONFIG();
-    $dbConfig = $db->default;
-    $mysql = mysql_connect($dbConfig['host'], $dbConfig['login'], $dbConfig['password']);
-    if(!$mysql) {
-      $this->set('message_content', 'Could not connect to database!');
-      $this->render(null, null, 'views/pages/message.tpl.php');
-      exit;
-    } 
 
-    //Open the database
-    $mysqldb = mysql_select_db($dbConfig['database']);
-    if (!$mysqldb) {
-      $this->set('message_content', 'Could not find database '.$dbConfig['database'].'!');
-      $this->render(null, null, 'views/pages/message.tpl.php');
-      exit;
-    }	  
-  
-    mysql_query('BEGIN');
-
-    return $mysql;
-  }
-
-  function disconnectDb($mysql)
-  {
-    mysql_query("COMMIT");
-    mysql_close($mysql);
-  }
-
-  function applyDelta($file)
-  {
-    $fp = fopen( $file, "r" );
-    if ( false === $fp ) {
-      return "Could not open ".$fname;
-    }
-
-    $cmd = "";
-    $done = false;
-
-    while ( ! feof( $fp ) ) {
-      $line = trim( fgets( $fp, 1024 ) );
-      $sl = strlen( $line ) - 1;
-
-      if ( $sl < 0 ) { continue; }
-      if ( "-" == $line{0} && "-" == $line{1} ) { continue; }
-
-      if ( ";" == $line{$sl} ) {
-        $done = true;
-        $line = substr( $line, 0, $sl );
-      }
-
-      if ( "" != $cmd ) { $cmd .= " "; }
-      $cmd .= $line;
-
-      if ( $done ) {
-        echo $cmd . ";<br /><br /><br />";
-        $result = mysql_query($cmd);
-        if (!$result)
-        {
-          $error = "Cannot run query";
-          return $error;
-        }
-        //if ($this->execute($cmd)) {
-        //	return false;
-        //}
-        $cmd = "";
-        $done = false;
-      }
-    }
-    fclose( $fp );
-    return true;
-  }
 
   function checkPermission()
   {

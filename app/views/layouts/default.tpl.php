@@ -85,7 +85,6 @@ function checkEmailAddress()
         <div id="header">
           <ul>
             <?php
-
             /**
              * Creates a user interface tab:
              *      $object and $access should always be set at $this and $access respectively.
@@ -197,7 +196,7 @@ function checkEmailAddress()
 </div>
 
 <!-- Debugging output -->
-<?php if(!constant('DEBUG') == 0) { ?>
+<?php if(!constant('DEBUG') == 0 && 'install' != $this->params['controller']) { ?>
     <!-- Prepare the SVN revision number and table -->
     <script language="JavaScript" type="text/javascript">
         // Toggles the details display of the snv revision.

@@ -25,7 +25,8 @@ class InstallController extends Controller
 	var $components   = array('Output', 
                             'framework',
                             'Session',
-                            'installHelper');
+                            'installHelper',
+                            'DbPatcher');
 
 	
 	function __construct()
@@ -49,7 +50,7 @@ class InstallController extends Controller
       $this->set('message_content', 'It looks like you already have a instance running. Please install a fresh copy or remove app/config/database.php.');
       $this->render(null, null, 'views/pages/message.tpl.php');
     }else{
-      $this->render('install');
+      return $this->render('install');
     }
 	}
 	
@@ -84,18 +85,27 @@ class InstallController extends Controller
 			$dbConfig['data_setup_option'] = $this->params['form']['data_setup_option'];
 			$insertDataStructure = $this->installHelper->runInsertDataStructure($dbConfig, $this->params);
 			
-      //Save Data
-      if ($dbConfig && $insertDataStructure) 
+      //Found error
+      if (!($dbConfig && $insertDataStructure))
       {
-				$this->params['data'] = array(); 
-				$this->set('data', $this->params['data']);
-				$this->redirect('install/install4');  
-			}else{
-        //Found error
         $this->set('data', $this->params['data']);
         $this->set('errmsg', 'Create Database Configuration Failed');
         $this->render('install3');
       }
+
+      // apply the patches
+      $dbv = $this->sysContainer->getParamByParamCode('database.version', array('parameter_value' => 0));
+
+      // patch the database
+      if(true !== ($ret = $this->DbPatcher->patch($dbv['parameter_value'], $dbConfig)))
+      {
+        $this->set('message_content', $ret);
+        $this->render(null, null, 'views/pages/message.tpl.php');
+        exit;
+      }
+      
+      $this->set('data', array());
+      $this->redirect('install/install4');  
 		}	  
 	}
 

@@ -127,7 +127,6 @@ CREATE TABLE `evaluation_rubrics` (
   `created` datetime NOT NULL default '0000-00-00 00:00:00',
   `updater_id` int(11) default NULL,
   `modified` datetime default NULL,
-  `rubric_id` INTEGER DEFAULT 0 NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
@@ -167,7 +166,7 @@ DROP TABLE IF EXISTS `evaluation_submissions`;
 CREATE TABLE `evaluation_submissions` (
   `id` int(11) NOT NULL auto_increment,
   `event_id` bigint(20) NOT NULL default '0',
-  `grp_event_id` int(11) NOT NULL default NULL,
+  `grp_event_id` int(11) NOT NULL default '0',
   `submitter_id` int(11) NOT NULL default '0',
   `submitted` tinyint(1) NOT NULL default '0',
   `date_submitted` datetime default NULL,
@@ -731,8 +730,7 @@ INSERT INTO `sys_parameters` (`id`, `parameter_code`, `parameter_value`, `parame
 (15, 'system.admin_email', 'ipeer.support@ubc.ca', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 (16, 'system.password_reset_mail', 'Dear <user>,<br> Your password has been reset to <newpassword>. Please use this to log in from now on. <br><br>iPeer Administrator', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 (17, 'system.password_reset_emailsubject', 'iPeer Password Reset', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
-(18, 'display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', 0, NOW(), NULL, NOW()),
-(19, 'database.version', '1', 'I', 'database version', 'A', 0, NOW(), NULL , NOW());
+(18, 'display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', 0, NOW(), NULL, NOW());
 
 
 -- --------------------------------------------------------
