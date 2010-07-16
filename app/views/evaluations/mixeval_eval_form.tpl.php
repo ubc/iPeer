@@ -131,34 +131,36 @@
 
     $mustCompleteUsers = ($count != $evaluateeCount);
 
+
+
     $commentsNeeded = false;
     // Check if any comment fields were left empty.
     if ($event['Event']['com_req']) {
         foreach($groupMembers as $row) {
             $user = $row['User'];
+            //echo "<div style='text-align:left'>";
+            //var_dump($user);
+            //echo "</div>";
+
             if (empty($user['Evaluation'])) {
                 $commentsNeeded = true;      // Not evaluated? Then we need comments for sure
-                //echo "Missing eval for user $user[id]<br />";
+                //echo "(Please complete evaluation for student $user[first_name] $user[last_name])<br />";
             } else {
                 if (isset($params['data']['questions'])) {
-                    $evaluationDetails = $user['Evaluation']['EvaluationMixevalDetail'];
-                    foreach ($evaluationDetails as $detail) {
+                    $evaluationDetails = $user['Evaluation']['EvaluationDetail'];
+                    foreach ($evaluationDetails as $detailEval) {
+                        $detail = $detailEval['EvaluationMixevalDetail'];
                         if ($params['data']['questions'][$detail['question_number']]['question_type'] != 'S' &&
                             empty($detail['question_comment'])) {
                             $commentsNeeded = true;      // A criteria comment is missing
-                            //echo "Missing detail $detail[id] $detail[question_comment] for user $user[id]<br />";
+                            //echo "Missing detail $detail[id] for user $user[id]<br />";
                             break;
                         } else {
-                            //echo "OK detail $detail[id] $detail[question_comment] for user $user[id]<br />";
+                            //echo "OK detail $detail[id] ($detail[question_comment]) for user $user[id]<br />";
                         }
                     }
                 }
             }
-
-            if ($commentsNeeded) {
-                break; // avoid too much looping. If we need comments, that's it, we need comments!
-            }
-
         }
     } else {
         $commentsNeeded = false;
