@@ -1,20 +1,20 @@
 -- phpMyAdmin SQL Dump
 -- version 2.6.2
 -- http://www.phpmyadmin.net
--- 
+--
 -- Host: localhost
 -- Generation Time: Jun 27, 2006 at 10:51 AM
 -- Server version: 4.1.11
 -- PHP Version: 4.3.10-16
--- 
+--
 -- Database: `ipeer2`
--- 
+--
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `courses`
--- 
+--
 
 DROP TABLE IF EXISTS `courses`;
 CREATE TABLE `courses` (
@@ -36,9 +36,9 @@ CREATE TABLE `courses` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evaluation_mixeval_details`
--- 
+--
 
 DROP TABLE IF EXISTS `evaluation_mixeval_details`;
 CREATE TABLE `evaluation_mixeval_details` (
@@ -59,9 +59,9 @@ CREATE TABLE `evaluation_mixeval_details` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evaluation_mixevals`
--- 
+--
 
 DROP TABLE IF EXISTS `evaluation_mixevals`;
 CREATE TABLE `evaluation_mixevals` (
@@ -84,9 +84,9 @@ CREATE TABLE `evaluation_mixevals` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evaluation_rubric_details`
--- 
+--
 
 DROP TABLE IF EXISTS `evaluation_rubric_details`;
 CREATE TABLE `evaluation_rubric_details` (
@@ -107,9 +107,9 @@ CREATE TABLE `evaluation_rubric_details` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evaluation_rubrics`
--- 
+--
 
 DROP TABLE IF EXISTS `evaluation_rubrics`;
 CREATE TABLE `evaluation_rubrics` (
@@ -132,9 +132,9 @@ CREATE TABLE `evaluation_rubrics` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evaluation_simples`
--- 
+--
 
 DROP TABLE IF EXISTS `evaluation_simples`;
 CREATE TABLE `evaluation_simples` (
@@ -158,9 +158,9 @@ CREATE TABLE `evaluation_simples` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evaluation_submissions`
--- 
+--
 
 DROP TABLE IF EXISTS `evaluation_submissions`;
 CREATE TABLE `evaluation_submissions` (
@@ -181,9 +181,9 @@ CREATE TABLE `evaluation_submissions` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `event_template_types`
--- 
+--
 
 DROP TABLE IF EXISTS `event_template_types`;
 CREATE TABLE `event_template_types` (
@@ -202,9 +202,9 @@ CREATE TABLE `event_template_types` (
   UNIQUE KEY `table_name` (`table_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
--- 
+--
 -- Dumping data for table `event_template_types`
--- 
+--
 
 INSERT INTO `event_template_types` VALUES (1, 'SIMPLE', 'simple_evaluations', 'SimpleEvaluation', 1, 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
 INSERT INTO `event_template_types` VALUES (2, 'RUBRIC', 'rubrics', 'Rubric', 1, 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
@@ -213,9 +213,9 @@ INSERT INTO `event_template_types` VALUES (4, 'MIX EVALUATION', 'mixevals', 'Mix
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `events`
--- 
+--
 
 DROP TABLE IF EXISTS `events`;
 CREATE TABLE `events` (
@@ -240,9 +240,9 @@ CREATE TABLE `events` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `group_events`
--- 
+--
 
 DROP TABLE IF EXISTS `group_events`;
 CREATE TABLE `group_events` (
@@ -264,9 +264,9 @@ CREATE TABLE `group_events` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `groups`
--- 
+--
 
 DROP TABLE IF EXISTS `groups`;
 CREATE TABLE `groups` (
@@ -284,9 +284,9 @@ CREATE TABLE `groups` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `groups_members`
--- 
+--
 
 DROP TABLE IF EXISTS `groups_members`;
 CREATE TABLE `groups_members` (
@@ -298,9 +298,9 @@ CREATE TABLE `groups_members` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `mixevals`
--- 
+--
 
 DROP TABLE IF EXISTS `mixevals`;
 CREATE TABLE `mixevals` (
@@ -320,14 +320,14 @@ CREATE TABLE `mixevals` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
-INSERT INTO `mixevals` (`id`, `name`, `total_marks`, `total_question`, `lickert_question_max`, `scale_max`, `prefill_question_max`, `availability`, `creator_id`, `created`, `updater_id`, `modified`) VALUES 
+INSERT INTO `mixevals` (`id`, `name`, `total_marks`, `total_question`, `lickert_question_max`, `scale_max`, `prefill_question_max`, `availability`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
 (1, 'Default Mix Evalution', 3, 7, 3, 5, 3, 'public', 1, '2006-09-12 13:34:30', 1, '2006-09-12 13:47:57');
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `mixevals_question_descs`
--- 
+--
 
 DROP TABLE IF EXISTS `mixevals_question_descs`;
 CREATE TABLE `mixevals_question_descs` (
@@ -339,7 +339,7 @@ CREATE TABLE `mixevals_question_descs` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=11 ;
 
-INSERT INTO `mixevals_question_descs` (`id`, `mixeval_id`, `question_num`, `scale_level`, `descriptor`) VALUES 
+INSERT INTO `mixevals_question_descs` (`id`, `mixeval_id`, `question_num`, `scale_level`, `descriptor`) VALUES
 (46, 1, 1, 1, 'Lowest'),
 (47, 1, 1, 2, NULL),
 (48, 1, 1, 3, 'Middle'),
@@ -358,9 +358,9 @@ INSERT INTO `mixevals_question_descs` (`id`, `mixeval_id`, `question_num`, `scal
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `mixevals_questions`
--- 
+--
 
 DROP TABLE IF EXISTS `mixevals_questions`;
 CREATE TABLE `mixevals_questions` (
@@ -377,7 +377,7 @@ CREATE TABLE `mixevals_questions` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
-INSERT INTO `mixevals_questions` (`id`, `mixeval_id`, `question_num`, `title`, `instructions`, `question_type`, `required`, `multiplier`, `scale_level`, `response_type`) VALUES 
+INSERT INTO `mixevals_questions` (`id`, `mixeval_id`, `question_num`, `title`, `instructions`, `question_type`, `required`, `multiplier`, `scale_level`, `response_type`) VALUES
 (19, 1, 1, 'Participated in Team Meetings', NULL, 'S', 1, 1, 5, NULL),
 (20, 1, 2, 'Was Helpful and co-operative', NULL, 'S', 1, 1, 5, NULL),
 (21, 1, 3, 'Submitted work on time', NULL, 'S', 1, 1, 5, NULL),
@@ -387,9 +387,9 @@ INSERT INTO `mixevals_questions` (`id`, `mixeval_id`, `question_num`, `title`, `
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `personalizes`
--- 
+--
 
 DROP TABLE IF EXISTS `personalizes`;
 CREATE TABLE `personalizes` (
@@ -404,9 +404,9 @@ CREATE TABLE `personalizes` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `questions`
--- 
+--
 
 DROP TABLE IF EXISTS `questions`;
 CREATE TABLE `questions` (
@@ -419,9 +419,9 @@ CREATE TABLE `questions` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `responses`
--- 
+--
 
 DROP TABLE IF EXISTS `responses`;
 CREATE TABLE `responses` (
@@ -433,9 +433,9 @@ CREATE TABLE `responses` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `rubrics`
--- 
+--
 
 DROP TABLE IF EXISTS `rubrics`;
 CREATE TABLE `rubrics` (
@@ -456,9 +456,9 @@ CREATE TABLE `rubrics` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `rubrics_criteria_comments`
--- 
+--
 
 DROP TABLE IF EXISTS `rubrics_criteria_comments`;
 CREATE TABLE `rubrics_criteria_comments` (
@@ -472,9 +472,9 @@ CREATE TABLE `rubrics_criteria_comments` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `rubrics_criterias`
--- 
+--
 
 DROP TABLE IF EXISTS `rubrics_criterias`;
 CREATE TABLE `rubrics_criterias` (
@@ -488,9 +488,9 @@ CREATE TABLE `rubrics_criterias` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `rubrics_loms`
--- 
+--
 
 DROP TABLE IF EXISTS `rubrics_loms`;
 CREATE TABLE `rubrics_loms` (
@@ -503,9 +503,9 @@ CREATE TABLE `rubrics_loms` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `simple_evaluations`
--- 
+--
 
 DROP TABLE IF EXISTS `simple_evaluations`;
 CREATE TABLE `simple_evaluations` (
@@ -524,9 +524,9 @@ CREATE TABLE `simple_evaluations` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `survey_group_members`
--- 
+--
 
 DROP TABLE IF EXISTS `survey_group_members`;
 CREATE TABLE `survey_group_members` (
@@ -539,9 +539,9 @@ CREATE TABLE `survey_group_members` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `survey_group_sets`
--- 
+--
 
 DROP TABLE IF EXISTS `survey_group_sets`;
 CREATE TABLE `survey_group_sets` (
@@ -557,9 +557,9 @@ CREATE TABLE `survey_group_sets` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `survey_groups`
--- 
+--
 
 DROP TABLE IF EXISTS `survey_groups`;
 CREATE TABLE `survey_groups` (
@@ -571,9 +571,9 @@ CREATE TABLE `survey_groups` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `survey_inputs`
--- 
+--
 
 DROP TABLE IF EXISTS `survey_inputs`;
 CREATE TABLE `survey_inputs` (
@@ -589,9 +589,9 @@ CREATE TABLE `survey_inputs` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `survey_questions`
--- 
+--
 
 DROP TABLE IF EXISTS `survey_questions`;
 CREATE TABLE `survey_questions` (
@@ -606,9 +606,9 @@ CREATE TABLE `survey_questions` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `surveys`
--- 
+--
 
 DROP TABLE IF EXISTS `surveys`;
 CREATE TABLE `surveys` (
@@ -629,9 +629,9 @@ CREATE TABLE `surveys` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `sys_functions`
--- 
+--
 
 DROP TABLE IF EXISTS `sys_functions`;
 CREATE TABLE `sys_functions` (
@@ -650,17 +650,17 @@ CREATE TABLE `sys_functions` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- 
+--
 -- Dumping data for table `sys_functions`
--- 
+--
 
 INSERT INTO `sys_functions` VALUES (100, 'SYS_FUNC', 'System Functions', 0, 'sysfunctions', 'sysfunctions/index/', 'A', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
 INSERT INTO `sys_functions` VALUES (101, 'SYS_PARA', 'System Parameters', 0, 'sysparameters', 'sysparameters/index/', 'A', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
 INSERT INTO `sys_functions` VALUES (102, 'SYS_BAKER', 'System Codes Generator', 0, 'bakers', 'bakers/index/', 'A', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
 INSERT INTO `sys_functions` VALUES (200, 'HOME', 'Home', 0, 'home', 'home/index/', 'AI', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
 INSERT INTO `sys_functions` VALUES (201, 'HOME', 'Home', 0, 'home', 'home/index/', 'S', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
-INSERT INTO `sys_functions` VALUES (300, 'USR', 'Users', 0, 'users', 'users/index/', 'A', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
-INSERT INTO `sys_functions` VALUES (301, 'USR', 'Students', 0, 'users', 'users/index/', 'IS', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
+INSERT INTO `sys_functions` VALUES (300, 'USERS', 'Users', 0, 'users', 'users/index/', 'A', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
+INSERT INTO `sys_functions` VALUES (301, 'USERS', 'Students', 0, 'users', 'users/index/', 'IS', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
 INSERT INTO `sys_functions` VALUES (302, 'USR_PROFILE', 'Profile', 0, 'users', 'users/editProfile/', 'S', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
 INSERT INTO `sys_functions` VALUES (303, 'USR_RECORD', 'User Record', 1000, 'users', 'users/add/S', 'AI', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
 INSERT INTO `sys_functions` VALUES (304, 'USR_INST_MGT', 'Instruction Record Management', 1000, 'users', 'users/add/I', 'A', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
@@ -688,9 +688,9 @@ INSERT INTO `sys_functions` VALUES (1601, 'SURVEY_GROUP_RECORD', 'Survey Group R
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `sys_parameters`
--- 
+--
 
 DROP TABLE IF EXISTS `sys_parameters`;
 CREATE TABLE `sys_parameters` (
@@ -708,9 +708,9 @@ CREATE TABLE `sys_parameters` (
   UNIQUE KEY `parameter_code` (`parameter_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=20;
 
--- 
+--
 -- Dumping data for table `sys_parameters`
--- 
+--
 
 INSERT INTO `sys_parameters` (`id`, `parameter_code`, `parameter_value`, `parameter_type`, `description`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
 (1, 'system.soft_delete_enable', 'true', 'B', 'Whether soft deletion of records is enabled.', 'A', 0, NOW(), 0, NOW()),
@@ -735,9 +735,9 @@ INSERT INTO `sys_parameters` (`id`, `parameter_code`, `parameter_value`, `parame
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `user_courses`
--- 
+--
 
 DROP TABLE IF EXISTS `user_courses`;
 CREATE TABLE `user_courses` (
@@ -755,9 +755,9 @@ CREATE TABLE `user_courses` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `user_enrols`
--- 
+--
 
 DROP TABLE IF EXISTS `user_enrols`;
 CREATE TABLE `user_enrols` (
@@ -775,9 +775,9 @@ CREATE TABLE `user_enrols` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `users`
--- 
+--
 
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (

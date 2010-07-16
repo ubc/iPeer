@@ -1,20 +1,20 @@
 -- phpMyAdmin SQL Dump
 -- version 2.6.2
 -- http://www.phpmyadmin.net
--- 
+--
 -- Host: localhost
 -- Generation Time: Jun 27, 2006 at 10:51 AM
 -- Server version: 4.1.11
 -- PHP Version: 4.3.10-16
--- 
+--
 -- Database: `ipeer2`
--- 
+--
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `courses`
--- 
+--
 
 DROP TABLE IF EXISTS `courses`;
 CREATE TABLE `courses` (
@@ -34,18 +34,18 @@ CREATE TABLE `courses` (
   UNIQUE KEY `course` (`course`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
--- 
+--
 -- Dumping data for table `courses`
--- 
+--
 
 INSERT INTO `courses` VALUES (1, 'MECH 328', 'Mechanical Engineering Design Project', 'http://www.mech.ubc.ca', 'off', NULL, 'A', 1, '2006-06-20 14:14:45', NULL, '2006-06-20 14:14:45', 0);
 INSERT INTO `courses` VALUES (2, 'APSC 201', 'Technical Communication', 'http://www.apsc.ubc.ca', 'off', NULL, 'A', 1, '2006-06-20 14:15:38', 1, '2006-06-20 14:39:31', 0);
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evaluation_mixeval_details`
--- 
+--
 
 DROP TABLE IF EXISTS `evaluation_mixeval_details`;
 CREATE TABLE `evaluation_mixeval_details` (
@@ -64,16 +64,16 @@ CREATE TABLE `evaluation_mixeval_details` (
   UNIQUE KEY `evaluation_mixeval_id` (`evaluation_mixeval_id`,`question_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
--- 
+--
 -- Dumping data for table `evaluation_mixeval_details`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evaluation_mixevals`
--- 
+--
 
 DROP TABLE IF EXISTS `evaluation_mixevals`;
 CREATE TABLE `evaluation_mixevals` (
@@ -93,16 +93,16 @@ CREATE TABLE `evaluation_mixevals` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
--- 
+--
 -- Dumping data for table `evaluation_mixevals`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evaluation_rubric_details`
--- 
+--
 
 DROP TABLE IF EXISTS `evaluation_rubric_details`;
 CREATE TABLE `evaluation_rubric_details` (
@@ -121,16 +121,16 @@ CREATE TABLE `evaluation_rubric_details` (
   UNIQUE KEY `evaluation_rubric_id` (`evaluation_rubric_id`,`criteria_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
--- 
+--
 -- Dumping data for table `evaluation_rubric_details`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evaluation_rubrics`
--- 
+--
 
 DROP TABLE IF EXISTS `evaluation_rubrics`;
 CREATE TABLE `evaluation_rubrics` (
@@ -151,16 +151,16 @@ CREATE TABLE `evaluation_rubrics` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
--- 
+--
 -- Dumping data for table `evaluation_rubrics`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evaluation_simples`
--- 
+--
 
 DROP TABLE IF EXISTS `evaluation_simples`;
 CREATE TABLE `evaluation_simples` (
@@ -182,16 +182,16 @@ CREATE TABLE `evaluation_simples` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
--- 
+--
 -- Dumping data for table `evaluation_simples`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evaluation_submissions`
--- 
+--
 
 DROP TABLE IF EXISTS `evaluation_submissions`;
 CREATE TABLE `evaluation_submissions` (
@@ -210,16 +210,16 @@ CREATE TABLE `evaluation_submissions` (
   UNIQUE KEY `grp_event_id` (`grp_event_id`,`submitter_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
--- 
+--
 -- Dumping data for table `evaluation_submissions`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `event_template_types`
--- 
+--
 
 DROP TABLE IF EXISTS `event_template_types`;
 CREATE TABLE `event_template_types` (
@@ -238,9 +238,9 @@ CREATE TABLE `event_template_types` (
   UNIQUE KEY `table_name` (`table_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
--- 
+--
 -- Dumping data for table `event_template_types`
--- 
+--
 
 INSERT INTO `event_template_types` VALUES (1, 'SIMPLE', 'simple_evaluations', 'SimpleEvaluation', 1, 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
 INSERT INTO `event_template_types` VALUES (2, 'RUBRIC', 'rubrics', 'Rubric', 1, 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
@@ -249,9 +249,9 @@ INSERT INTO `event_template_types` VALUES (4, 'MIX EVALUATION', 'mixevals', 'Mix
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `events`
--- 
+--
 
 DROP TABLE IF EXISTS `events`;
 CREATE TABLE `events` (
@@ -274,9 +274,9 @@ CREATE TABLE `events` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
 
--- 
+--
 -- Dumping data for table `events`
--- 
+--
 
 INSERT INTO `events` VALUES (1, 'Term 1 Evaluation', 1, '', 1, 1, '0', 0, '2006-07-02 16:34:43', '2006-06-16 16:34:49', '2006-07-02 16:34:53', 'A', 0, '2006-06-20 16:27:33', NULL, '2006-06-21 08:51:20');
 INSERT INTO `events` VALUES (2, 'Term Report Evaluation', 1, '', 2, 1, '0', 0, '2006-06-08 08:59:29', '2006-06-06 08:59:35', '2006-07-02 08:59:41', 'A', 0, '2006-06-21 08:52:20', NULL, '2006-06-21 08:54:25');
@@ -284,9 +284,9 @@ INSERT INTO `events` VALUES (3, 'Project Evaluation', 1, '', 4, 1, '0', 0, '2006
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `group_events`
--- 
+--
 
 DROP TABLE IF EXISTS `group_events`;
 CREATE TABLE `group_events` (
@@ -306,9 +306,9 @@ CREATE TABLE `group_events` (
   UNIQUE KEY `group_id` (`event_id`,`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=9 ;
 
--- 
+--
 -- Dumping data for table `group_events`
--- 
+--
 
 INSERT INTO `group_events` VALUES (1, 1, 1, 'not reviewed', NULL, 'None', 'None', 'A', 0, '2006-06-20 16:27:33', NULL, '2006-06-20 16:27:33');
 INSERT INTO `group_events` VALUES (2, 2, 1, 'not reviewed', NULL, 'None', 'None', 'A', 0, '2006-06-21 08:50:22', NULL, '2006-06-21 08:50:22');
@@ -321,9 +321,9 @@ INSERT INTO `group_events` VALUES (8, 0, 3, 'not reviewed', NULL, 'None', 'None'
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `groups`
--- 
+--
 
 DROP TABLE IF EXISTS `groups`;
 CREATE TABLE `groups` (
@@ -339,18 +339,18 @@ CREATE TABLE `groups` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
--- 
+--
 -- Dumping data for table `groups`
--- 
+--
 
 INSERT INTO `groups` VALUES (1, 0, 'Reapers', 1, 'A', 0, '2006-06-20 16:23:40', NULL, '2006-06-20 16:23:40');
 INSERT INTO `groups` VALUES (2, 1, 'Lazy Engineers', 1, 'A', 0, '2006-06-21 08:47:04', NULL, '2006-06-21 08:49:53');
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `groups_members`
--- 
+--
 
 DROP TABLE IF EXISTS `groups_members`;
 CREATE TABLE `groups_members` (
@@ -360,9 +360,9 @@ CREATE TABLE `groups_members` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
 
--- 
+--
 -- Dumping data for table `groups_members`
--- 
+--
 
 INSERT INTO `groups_members` VALUES (1, 1, 5);
 INSERT INTO `groups_members` VALUES (2, 1, 7);
@@ -373,9 +373,9 @@ INSERT INTO `groups_members` VALUES (9, 2, 32);
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `mixevals`
--- 
+--
 
 DROP TABLE IF EXISTS `mixevals`;
 CREATE TABLE `mixevals` (
@@ -395,17 +395,17 @@ CREATE TABLE `mixevals` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
--- 
+--
 -- Dumping data for table `mixevals`
--- 
+--
 
 INSERT INTO `mixevals` VALUES (1, 'Project Evaluation', 1, 'on', 3, 1, 5, 1, 'public', 1, '2006-06-21 09:06:47', 1, '2006-06-21 09:08:49');
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `mixevals_question_descs`
--- 
+--
 
 DROP TABLE IF EXISTS `mixevals_question_descs`;
 CREATE TABLE `mixevals_question_descs` (
@@ -417,9 +417,9 @@ CREATE TABLE `mixevals_question_descs` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=11 ;
 
--- 
+--
 -- Dumping data for table `mixevals_question_descs`
--- 
+--
 
 INSERT INTO `mixevals_question_descs` VALUES (1, 1, 1, 1, 'Lowest');
 INSERT INTO `mixevals_question_descs` VALUES (2, 1, 1, 2, '');
@@ -434,9 +434,9 @@ INSERT INTO `mixevals_question_descs` VALUES (10, 1, 1, 5, 'Highest');
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `mixevals_questions`
--- 
+--
 
 DROP TABLE IF EXISTS `mixevals_questions`;
 CREATE TABLE `mixevals_questions` (
@@ -453,7 +453,7 @@ CREATE TABLE `mixevals_questions` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
-INSERT INTO `mixevals_questions` (`id`, `mixeval_id`, `question_num`, `title`, `instructions`, `question_type`, `required`, `multiplier`, `scale_level`, `response_type`) VALUES 
+INSERT INTO `mixevals_questions` (`id`, `mixeval_id`, `question_num`, `title`, `instructions`, `question_type`, `required`, `multiplier`, `scale_level`, `response_type`) VALUES
 (19, 1, 1, 'Participated in Team Meetings', NULL, 'S', 1, 1, 5, NULL),
 (20, 1, 2, 'Was Helpful and co-operative', NULL, 'S', 1, 1, 5, NULL),
 (21, 1, 3, 'Submitted work on time', NULL, 'S', 1, 1, 5, NULL),
@@ -463,9 +463,9 @@ INSERT INTO `mixevals_questions` (`id`, `mixeval_id`, `question_num`, `title`, `
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `personalizes`
--- 
+--
 
 DROP TABLE IF EXISTS `personalizes`;
 CREATE TABLE `personalizes` (
@@ -478,9 +478,9 @@ CREATE TABLE `personalizes` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=23 ;
 
--- 
+--
 -- Dumping data for table `personalizes`
--- 
+--
 
 INSERT INTO `personalizes` VALUES (1, 1, 'Course.SubMenu.EvalEvents.Show', 'true', NULL, '2006-04-03 09:08:36');
 INSERT INTO `personalizes` VALUES (2, 1, 'Course.SubMenu.SimpleEvals.Show', 'true', NULL, '2006-04-03 09:08:42');
@@ -501,9 +501,9 @@ INSERT INTO `personalizes` VALUES (22, 1, 'SysParam.ListMenu.Limit.Show', '10', 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `questions`
--- 
+--
 
 DROP TABLE IF EXISTS `questions`;
 CREATE TABLE `questions` (
@@ -514,18 +514,18 @@ CREATE TABLE `questions` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
--- 
+--
 -- Dumping data for table `questions`
--- 
+--
 
 INSERT INTO `questions` VALUES (1, 'What was your GPA last term?', 'M', 'no');
 INSERT INTO `questions` VALUES (2, 'Do you own a laptop?', 'M', 'no');
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `responses`
--- 
+--
 
 DROP TABLE IF EXISTS `responses`;
 CREATE TABLE `responses` (
@@ -535,9 +535,9 @@ CREATE TABLE `responses` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
 
--- 
+--
 -- Dumping data for table `responses`
--- 
+--
 
 INSERT INTO `responses` VALUES (1, 1, '4+');
 INSERT INTO `responses` VALUES (2, 1, '3-4');
@@ -548,9 +548,9 @@ INSERT INTO `responses` VALUES (6, 2, 'no');
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `rubrics`
--- 
+--
 
 DROP TABLE IF EXISTS `rubrics`;
 CREATE TABLE `rubrics` (
@@ -569,17 +569,17 @@ CREATE TABLE `rubrics` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
--- 
+--
 -- Dumping data for table `rubrics`
--- 
+--
 
 INSERT INTO `rubrics` VALUES (1, 'Term Report Evaluation', 15, 'off', 5, 3, 'public', 'horizontal', 1, '2006-06-20 15:21:50', NULL, '2006-06-20 15:21:50');
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `rubrics_criteria_comments`
--- 
+--
 
 DROP TABLE IF EXISTS `rubrics_criteria_comments`;
 CREATE TABLE `rubrics_criteria_comments` (
@@ -591,9 +591,9 @@ CREATE TABLE `rubrics_criteria_comments` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=16 ;
 
--- 
+--
 -- Dumping data for table `rubrics_criteria_comments`
--- 
+--
 
 INSERT INTO `rubrics_criteria_comments` VALUES (1, 1, 1, 1, NULL);
 INSERT INTO `rubrics_criteria_comments` VALUES (2, 1, 1, 2, NULL);
@@ -613,9 +613,9 @@ INSERT INTO `rubrics_criteria_comments` VALUES (15, 1, 3, 5, NULL);
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `rubrics_criterias`
--- 
+--
 
 DROP TABLE IF EXISTS `rubrics_criterias`;
 CREATE TABLE `rubrics_criterias` (
@@ -627,9 +627,9 @@ CREATE TABLE `rubrics_criterias` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
 
--- 
+--
 -- Dumping data for table `rubrics_criterias`
--- 
+--
 
 INSERT INTO `rubrics_criterias` VALUES (1, 1, 1, 'Participated in Team Meetings', 5);
 INSERT INTO `rubrics_criterias` VALUES (2, 1, 2, 'Was Helpful and Co-operative', 5);
@@ -637,9 +637,9 @@ INSERT INTO `rubrics_criterias` VALUES (3, 1, 3, 'Submitted Work on Time', 5);
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `rubrics_loms`
--- 
+--
 
 DROP TABLE IF EXISTS `rubrics_loms`;
 CREATE TABLE `rubrics_loms` (
@@ -650,9 +650,9 @@ CREATE TABLE `rubrics_loms` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
 
--- 
+--
 -- Dumping data for table `rubrics_loms`
--- 
+--
 
 INSERT INTO `rubrics_loms` VALUES (1, 1, 1, 'Poor');
 INSERT INTO `rubrics_loms` VALUES (2, 1, 2, 'Below Average');
@@ -662,9 +662,9 @@ INSERT INTO `rubrics_loms` VALUES (5, 1, 5, 'Excellent');
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `simple_evaluations`
--- 
+--
 
 DROP TABLE IF EXISTS `simple_evaluations`;
 CREATE TABLE `simple_evaluations` (
@@ -683,17 +683,17 @@ CREATE TABLE `simple_evaluations` (
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
--- 
+--
 -- Dumping data for table `simple_evaluations`
--- 
+--
 
 INSERT INTO `simple_evaluations` VALUES (1, 'Module 1 Project Evaluation', '', 100, 50, 200, 'A', 1, '2006-06-20 15:17:47', NULL, '2006-06-20 15:17:47');
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `survey_group_members`
--- 
+--
 
 DROP TABLE IF EXISTS `survey_group_members`;
 CREATE TABLE `survey_group_members` (
@@ -704,9 +704,9 @@ CREATE TABLE `survey_group_members` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=37 ;
 
--- 
+--
 -- Dumping data for table `survey_group_members`
--- 
+--
 
 INSERT INTO `survey_group_members` VALUES (25, 3, 5, 17);
 INSERT INTO `survey_group_members` VALUES (26, 3, 5, 21);
@@ -723,9 +723,9 @@ INSERT INTO `survey_group_members` VALUES (36, 3, 7, 33);
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `survey_group_sets`
--- 
+--
 
 DROP TABLE IF EXISTS `survey_group_sets`;
 CREATE TABLE `survey_group_sets` (
@@ -739,17 +739,17 @@ CREATE TABLE `survey_group_sets` (
   KEY `survey_id` (`survey_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
 
--- 
+--
 -- Dumping data for table `survey_group_sets`
--- 
+--
 
 INSERT INTO `survey_group_sets` VALUES (3, 1, 'test groupset', 3, 1150923956, 0);
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `survey_groups`
--- 
+--
 
 DROP TABLE IF EXISTS `survey_groups`;
 CREATE TABLE `survey_groups` (
@@ -759,9 +759,9 @@ CREATE TABLE `survey_groups` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
 
--- 
+--
 -- Dumping data for table `survey_groups`
--- 
+--
 
 INSERT INTO `survey_groups` VALUES (5, 3, 1);
 INSERT INTO `survey_groups` VALUES (6, 3, 2);
@@ -769,9 +769,9 @@ INSERT INTO `survey_groups` VALUES (7, 3, 3);
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `survey_inputs`
--- 
+--
 
 DROP TABLE IF EXISTS `survey_inputs`;
 CREATE TABLE `survey_inputs` (
@@ -785,16 +785,16 @@ CREATE TABLE `survey_inputs` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
--- 
+--
 -- Dumping data for table `survey_inputs`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `survey_questions`
--- 
+--
 
 DROP TABLE IF EXISTS `survey_questions`;
 CREATE TABLE `survey_questions` (
@@ -807,18 +807,18 @@ CREATE TABLE `survey_questions` (
   KEY `survey_id` (`survey_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
--- 
+--
 -- Dumping data for table `survey_questions`
--- 
+--
 
 INSERT INTO `survey_questions` VALUES (1, 1, 1, 1);
 INSERT INTO `survey_questions` VALUES (2, 1, 2, 2);
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `surveys`
--- 
+--
 
 DROP TABLE IF EXISTS `surveys`;
 CREATE TABLE `surveys` (
@@ -837,17 +837,17 @@ CREATE TABLE `surveys` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
--- 
+--
 -- Dumping data for table `surveys`
--- 
+--
 
 INSERT INTO `surveys` VALUES (1, 1, 1, 'Team Creation Survey', '2006-07-01 15:31:08', '2006-06-01 15:31:17', '2006-07-02 15:31:21', 0, 0, '2006-06-20 15:23:59', NULL, '2006-06-21 09:43:24');
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `sys_functions`
--- 
+--
 
 DROP TABLE IF EXISTS `sys_functions`;
 CREATE TABLE `sys_functions` (
@@ -866,17 +866,17 @@ CREATE TABLE `sys_functions` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- 
+--
 -- Dumping data for table `sys_functions`
--- 
+--
 
 INSERT INTO `sys_functions` VALUES (100, 'SYS_FUNC', 'System Functions', 0, 'sysfunctions', 'sysfunctions/index/', 'A', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
 INSERT INTO `sys_functions` VALUES (101, 'SYS_PARA', 'System Parameters', 0, 'sysparameters', 'sysparameters/index/', 'A', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
 INSERT INTO `sys_functions` VALUES (102, 'SYS_BAKER', 'System Codes Generator', 0, 'bakers', 'bakers/index/', 'A', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
 INSERT INTO `sys_functions` VALUES (200, 'HOME', 'Home', 0, 'home', 'home/index/', 'AI', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
 INSERT INTO `sys_functions` VALUES (201, 'HOME', 'Home', 0, 'home', 'home/index/', 'S', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
-INSERT INTO `sys_functions` VALUES (300, 'USR', 'Users', 0, 'users', 'users/index/', 'A', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
-INSERT INTO `sys_functions` VALUES (301, 'USR', 'Students', 0, 'users', 'users/index/', 'IS', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
+INSERT INTO `sys_functions` VALUES (300, 'USERS', 'Users', 0, 'users', 'users/index/', 'A', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
+INSERT INTO `sys_functions` VALUES (301, 'USERS', 'Students', 0, 'users', 'users/index/', 'IS', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
 INSERT INTO `sys_functions` VALUES (302, 'USR_PROFILE', 'Profile', 0, 'users', 'users/editProfile/', 'S', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
 INSERT INTO `sys_functions` VALUES (303, 'USR_RECORD', 'User Record', 1000, 'users', 'users/add/S', 'AI', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
 INSERT INTO `sys_functions` VALUES (304, 'USR_INST_MGT', 'Instruction Record Management', 1000, 'users', 'users/add/I', 'A', 'A', 0, '2000-01-01 00:00:00', 0, '2000-01-01 00:00:00');
@@ -904,9 +904,9 @@ INSERT INTO `sys_functions` VALUES (1601, 'SURVEY_GROUP_RECORD', 'Survey Group R
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `sys_parameters`
--- 
+--
 
 DROP TABLE IF EXISTS `sys_parameters`;
 CREATE TABLE `sys_parameters` (
@@ -924,9 +924,9 @@ CREATE TABLE `sys_parameters` (
   UNIQUE KEY `parameter_code` (`parameter_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=15 ;
 
--- 
+--
 -- Dumping data for table `sys_parameters`
--- 
+--
 
 INSERT INTO `sys_parameters` VALUES (1, 'system.soft_delete_enable', 'true', 'B', 'Whether soft deletion of records is enabled.', 'A', 0, '2006-03-01 00:00:00', 0, '2006-03-01 00:00:00');
 INSERT INTO `sys_parameters` VALUES (2, 'system.debug_mode', '0', 'I', 'Debug Mode of the system', 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
@@ -943,16 +943,16 @@ INSERT INTO `sys_parameters` VALUES (12, 'display.login_text', '<a href=''http:/
 INSERT INTO `sys_parameters` VALUES (13, 'custom.login_control', 'ipeer', 'S', 'The login control for iPeer: ipeer; CWL: UBC_CWL', 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
 INSERT INTO `sys_parameters` VALUES (14, 'custom.login_page_pathname', 'custom_ubc_cwl_login', 'S', 'The file pathname for the custom login page; CWL:custom_ubc_cwl_login', 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
 INSERT INTO `sys_parameters` VALUES (15, 'system.admin_email', 'ipeer@apsc.ubc.ca', 'S', NULL, 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
-INSERT INTO `sys_parameters` VALUES (16, 'system.password_reset_mail', 'Dear <user>,<br> Your password has been reset to <newpassword>. Please use this to log in from now on. <br><br>iPeer Administrator', 'S', NULL, 'A', 0, '0000-00-00 00:00:00', NULL, NULL); 
+INSERT INTO `sys_parameters` VALUES (16, 'system.password_reset_mail', 'Dear <user>,<br> Your password has been reset to <newpassword>. Please use this to log in from now on. <br><br>iPeer Administrator', 'S', NULL, 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
 INSERT INTO `sys_parameters` VALUES (17, 'system.password_reset_emailsubject', 'iPeer Password Reset', 'S', NULL, 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
 INSERT INTO `sys_parameters` ( `id` , `parameter_code` , `parameter_value` , `parameter_type` , `description` , `record_status` , `creator_id` , `created` , `updater_id` , `modified` )
-VALUES (18 , 'display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', '0', '0000-00-00 00:00:00', NULL , NULL); 
+VALUES (18 , 'display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', '0', '0000-00-00 00:00:00', NULL , NULL);
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `user_courses`
--- 
+--
 
 DROP TABLE IF EXISTS `user_courses`;
 CREATE TABLE `user_courses` (
@@ -968,9 +968,9 @@ CREATE TABLE `user_courses` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
 
--- 
+--
 -- Dumping data for table `user_courses`
--- 
+--
 
 INSERT INTO `user_courses` VALUES (1, 1, 1, 'A', 'A', 0, '2006-06-20 14:14:45', NULL, '2006-06-20 14:14:45');
 INSERT INTO `user_courses` VALUES (2, 2, 1, 'A', 'A', 0, '2006-06-20 14:14:45', NULL, '2006-06-20 14:14:45');
@@ -980,9 +980,9 @@ INSERT INTO `user_courses` VALUES (5, 4, 2, 'A', 'A', 0, '2006-06-20 14:39:31', 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `user_enrols`
--- 
+--
 
 DROP TABLE IF EXISTS `user_enrols`;
 CREATE TABLE `user_enrols` (
@@ -998,9 +998,9 @@ CREATE TABLE `user_enrols` (
   UNIQUE KEY `course_id` (`course_id`,`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=30 ;
 
--- 
+--
 -- Dumping data for table `user_enrols`
--- 
+--
 
 INSERT INTO `user_enrols` VALUES (1, 1, 5, 'A', 0, '2006-06-20 14:19:18', NULL, '2006-06-20 14:19:18');
 INSERT INTO `user_enrols` VALUES (2, 1, 6, 'A', 0, '2006-06-20 14:26:59', NULL, '2006-06-20 14:26:59');
@@ -1034,9 +1034,9 @@ INSERT INTO `user_enrols` VALUES (29, 1, 33, 'A', 0, '2006-06-21 08:44:09', NULL
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `users`
--- 
+--
 
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
@@ -1061,9 +1061,9 @@ CREATE TABLE `users` (
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=34 ;
 
--- 
+--
 -- Dumping data for table `users`
--- 
+--
 
 INSERT INTO `users` VALUES (1, 'A', 'root', 'eda2575e2d2d21385336d974ddd83eec', 'Super', 'Admin', NULL, 'Administrator', 'cis-dev1@apsc.ubc.ca', NULL, NULL, NULL, 'A', 0, '0000-00-00 00:00:00', NULL, '2006-05-24 16:02:59');
 INSERT INTO `users` VALUES (2, 'I', 'poscar', '22bf1cbd965e66775fd973a30dcc4431', 'Peter', 'Oscar', NULL, 'Instructor', '', NULL, NULL, NULL, 'A', 1, '2006-06-19 16:25:24', NULL, '2006-06-19 16:25:24');
