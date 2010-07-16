@@ -255,7 +255,7 @@ a.miniLinks:active {
 
 div.subTable .table-header{
   height: 2.2em;
-  background-image: url(/img/layout/header_back.gif);
+  background-image: url("../img/layout/header_back.gif");
   text-align: center;
   line-height: 2.2em;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
@@ -265,7 +265,7 @@ div.subTable .table-header{
 }
 
 div.subTable .table-content{
-  background-image: url(/img/layout/small_table_back.gif);
+  background-image: url("../img/layout/small_table_back.gif");
   height: 115px;
   padding-top: 20px;
 }
