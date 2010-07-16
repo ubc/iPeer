@@ -337,6 +337,7 @@ class UsersController extends AppController
 
             // Prevent User role changes (also stops privilege escalation)
             if (!empty($this->params['data']['User']['role'])) {
+                $saveRole = $this->params['data']['User']['role'];
                 unset ($this->params['data']['User']['role']);
             }
 
@@ -355,12 +356,15 @@ class UsersController extends AppController
                     $message = "We saved your data, but you still need to enter an email address!";
                 }
 
-                $this->set('message', $message);
+                $this->params['data']['User']['role'] = isset($saveRole) ? $saveRole : '';
 
+                $this->set('data', $this->params['data']);
+                $this->set('message', $message);
 
                 //Setup Custom parameter
                 $this->rdAuth->setFromData($user['User']);
             } else {
+                $this->params['data']['User']['role'] = isset($saveRole) ? $saveRole : '';
                 $this->Output->br2nl($this->params['data']);
                 $this->set('data', $this->params['data']);
                 $this->set('viewPage', 'false');
