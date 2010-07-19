@@ -30,7 +30,6 @@ function showLimit(value, link, ajaxObj) {
     }
 
     var newLink = upTree + link + '&show=' + value;
-    alert(newLink);
 
   new Ajax.Updater(ajaxObj,
                    newLink,
