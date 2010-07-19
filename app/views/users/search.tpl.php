@@ -7,7 +7,7 @@ $data = $this->controller->User->findAll($conditions, $fields, $this->controller
 
 
 $paging['style'] = 'ajax';
-$paging['link'] = '/users/search/?show='.$this->controller->show .
+$paging['link'] = '/users/search/?show=' . $this->controller->show .
                 '&livesearch=' . $liveSearch . '&select=' . $select .
                 '&display_user_type='.$displayUserType.'&course_id=' . $courseId .
                 '&sort='.$this->controller->sortBy.'&direction='.$this->controller->direction.'&page=';

@@ -52,11 +52,11 @@ class PaginationHelper {
 
 		}
 
-		if(!empty($paging) && $paging['count'] > $paging['show'][0])
-		{
+		if(!empty($paging) && $paging['count'] > $paging['show'][0]) {
 			return true;
-		}
-		return false;
+		} else {
+            return false;
+        }
 	}
 	/**
 	* Displays limits for the query
@@ -67,50 +67,32 @@ class PaginationHelper {
 	**/
 	function show($text=null, $seperator=null, $ajaxObj=null)
 	{
-		if (empty($this->_details)) { return false; }
-		if (!empty($this->_details['recordCount']))
-		{
+		if (empty($this->_details)) {
+            return false;
+        }
+		if (!empty($this->_details['recordCount'])) {
 			$t = '';
 			$selected = '';
-			if(is_array($this->show))
-			{
-				//$t = $text.$seperator;
+			if(is_array($this->show)) {
 				$link = preg_replace('/show=(.*?)&/','',$this->link);
 				$link = ereg_replace('&','&amp;',$link);
-				$t = '<b>'.$text.'</b> <select onChange="showLimit(this.value,\''.$link.$this->_details['page'].'\',\''.$ajaxObj.'\');">';
-				foreach($this->show as $value)
-				{
-					if($value < ($this->_details['recordCount'] + $this->_details['limit']))
-					{
-						//$link = preg_replace('/show=(.*?)&/','show='.$value.'&',$this->link);
-						//print_r($this->_details['limit']);
-						if ($value==$this->_details['limit']||$this->_details['limit']==99999999) $selected = "selected";
-						else $selected = "";
-						if($this->_details['limit'] == $value)
-						{
-							//$t .= '<em>'.$value.'</em>'.$seperator;
-							$t .= "<option value=\"$value\" $selected>$value</option>";
-						}
-						else
-						{
-							if($this->style == 'ajax')
-							{
-								$t .= "<option value=\"$value\" $selected>$value</option>";
-								//$t .= $this->Ajax->link($value, $link.$this->_details['page'], array("update" => $this->updateId, 'loading' => "Element.show('".$this->loadingId."');", 'complete' => "Element.hide('".$this->loadingId."');", "method"=>"get")).$seperator;
-							}
-							else
-							{
-								$t .= "<option value=\"$value\" $selected>$value</option>";
-								//$t .= $this->Html->link($value,$link.$this->_details['page']).$seperator;
-							}
-						}
+				$t .= '<b>' . $text. '</b>';
+				$t .= '<select onChange="showLimit(this.value,\'' . $link .
+                        $this->_details['page'] . '\',\'' . $ajaxObj . '\');">';
+				foreach($this->show as $value) {
+					if($value < ($this->_details['recordCount'] + $this->_details['limit'])) {
+                        $selected = ($value == $this->_details['limit'] || $this->_details['limit'] == 99999999)
+                                        ? "selected" : "";
+
+                        $t .= "<option value=\"$value\" $selected>$value</option>";
 					}
 				}
 				$t .= '</select>';
 			}
 			return $t;
-		}
-		return false;
+		} else {
+            return false;
+        }
 
 	}
 	/**
@@ -148,27 +130,18 @@ class PaginationHelper {
 		if (empty($this->_details) || $this->_details['pageCount'] == 1) { return false; }
 		$t = '';
 		$pc = 1;
-		  do
-		  {
-			 if($pc == $this->_details['page'])
-			 {
+		  do {
+			 if($pc == $this->_details['page'])  {
 				$t .= '<em>'.$pc.'</em>';
-			 }
-			 else
-			 {
-				if($this->style == 'ajax')
-				{
+			 } else {
+				if($this->style == 'ajax') {
 					$t .= $this->Ajax->link($pc, $this->link.$pc, array("update" => $this->updateId, 'loading' => "Element.show('".$this->loadingId."');", 'complete' => "Element.hide('".$this->loadingId."');", "method"=>"get"));
-				}
-				else
-				{
+				} else {
 					$t .= $this->Html->link($pc,$this->link.$pc);
 				}
 			 }
 			 $pc++;
-		  }
-		  while ($pc<=$this->_details['pageCount']);
-      //$t = ereg_replace('&','&amp;',$t);
+		  } while ($pc<=$this->_details['pageCount']);
 		return $t;
 	}
 	/**

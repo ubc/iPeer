@@ -54,7 +54,7 @@ class UsersController extends AppController
     }
 
 
-    function index() {
+    function index($message='') {
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
 
@@ -100,6 +100,7 @@ class UsersController extends AppController
         $paging['direction'] = $this->direction;
 
         $this->set('paging',$paging);
+        $this->set('message', $message);
         $this->set('data',$data);
         $this->set('course_id',$courseId);
     }
@@ -401,13 +402,10 @@ class UsersController extends AppController
                 	$delStatus = $this->User->del($id);
 
                 if($delStatus) {
-                    $this->set('message', 'Record deletion successful.');
-                    $this->index();
-                    $this->render('index');
+
+                    $this->redirect('users/index/Record deletion successful.');
                 } else {
-                    $this->set('message', 'Record deletion failed.');
-                    $this->index();
-                    $this->render('index');
+                    $this->redirect('users/index/Record deletion failed.');
                 }
             } else {
                 $this->rdAuth->privilegeError();
@@ -697,7 +695,7 @@ class UsersController extends AppController
                 $attributes['condition']  .= ' AND UserEnrol.user_id IS NULL';
             } else if (is_numeric($courseId)) {
                 $attributes['condition'] .= ' AND User.id = UserEnrol.user_id';
-                $attributes['condition'] .= ' AND UserEnrol.course_id = '.$courseId;
+                $attributes['condition'] .= ' AND UserEnrol.course_id = ' . $courseId;
                 $joinTable = array(', user_enrols as UserEnrol');
             }
         }

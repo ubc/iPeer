@@ -20,10 +20,30 @@ function wopen(url, name, w, h)
 }
 
 function showLimit(value, link, ajaxObj) {
-  new Ajax.Updater(ajaxObj,'../../'+link+'&show='+value,
-                                         {onLoading:function(request){Element.show('loading');},
-                                          onComplete:function(request){Element.hide('loading');},
-                                          asynchronous:true, evalScripts:true});
+
+    // a workaround for bug #191 in the users controller
+    var position = window.location.toString().search("users/");
+    if (position > 0) {
+        var upTree = window.location.toString().slice(0, position);
+    } else {
+        var upTree = "../..";
+    }
+
+    var newLink = upTree + link + '&show=' + value;
+    alert(newLink);
+
+  new Ajax.Updater(ajaxObj,
+                   newLink,
+              { onLoading : function(request) {
+                    Element.show('loading');
+                },
+                onComplete : function(request) {
+                    Element.hide('loading');
+                },
+                asynchronous:true,
+                evalScripts:true
+              }
+        );
   return false;
 }
 
