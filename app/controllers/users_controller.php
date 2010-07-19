@@ -223,7 +223,7 @@ class UsersController extends AppController
                     {
                         $userEnrol['UserEnrol']['course_id'] = $this->params['form']['course_id'];
                         $userEnrol['UserEnrol']['user_id'] = $sFound['User']['id'];
-
+                        
                         if($this->UserEnrol->save($userEnrol) && $this->User->save($sFound['User']))
                         {
                             $this->set('tmpPassword', '<Hidden>');
@@ -290,9 +290,14 @@ class UsersController extends AppController
                         unset ($this->params['data']['User']['role']);
                     }
 
-                    if ($this->User->save($this->params['data'])) {
-
-                        $this->UserEnrol->insertCourses($this->User->id, $this->params['form']['course_ids']);
+                    $sFound = $this->User->findUserByStudentNo($this->params['data']['User']['student_no']);
+                    $sFound['User']['first_name'] = $this->data['User']['first_name'];
+                    $sFound['User']['last_name'] = $this->data['User']['last_name'];
+                    $sFound['User']['email'] = $this->data['User']['email'];
+                    
+                    if ($this->User->save($sFound['User'])) {
+ 						if(!empty($this->params['form']['course_ids']))
+                        	$this->UserEnrol->insertCourses($this->User->id, $this->params['form']['course_ids']);
 
                         //Render to view page to display saved data
                         //TODO: Display list of users after import
@@ -301,7 +306,7 @@ class UsersController extends AppController
                         $this->set('userRole', $data['User']['role']);
                         $this->render('userSummary');
                     } else {
-                        $this->Output->br2nl($this->params['data']);
+                    	$this->Output->br2nl($this->params['data']);
                         $this->set('data', $this->params['data']);
                         $this->render();
                     }

@@ -32,7 +32,7 @@
 				echo "<td>";
 				echo !empty($user['tmp_password']) ?
                     "<strong style='color:red;letter-spacing:3px'>$user[tmp_password]</strong></tt>" :
-                    "<i>Not avalialble for existing users</i>";
+                    "<i>Not availalble for existing users</i>";
                 echo "</td>";
                 echo isset($user['error_message']) ?
                     "<td><font color='#FF0000'>$user[error_message]</font></td>"  :
