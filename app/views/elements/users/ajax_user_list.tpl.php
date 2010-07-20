@@ -45,10 +45,11 @@
 		    <a href="<?php echo $this->webroot.$this->themeWeb.'users/view/'.$user['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
 	    <?php if($rdAuth->role == 'A' || $user['role'] != 'I' && ($rdAuth->role == 'A' || $rdAuth->role == 'I')):?>
 	      <a href="<?php echo $this->webroot.$this->themeWeb.'users/edit/'.$user['id']?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
-	    <?php if($user['role'] == 'S'):?>
-	      <a href="<?php echo $this->webroot.$this->themeWeb.'users/delete/'.$userEnrolId.'/'. $user['role']?>" onclick="return confirm('Are you sure you want to delete user &ldquo;<?php echo $user['username']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
-	   	<?php else:?>
-	   	 <a href="<?php echo $this->webroot.$this->themeWeb.'users/delete/'.$user['id'].'/'. $user['role']?>" onclick="return confirm('Are you sure you want to delete user &ldquo;<?php echo $user['username']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
+	    <?php if($user['role'] == 'S' && $rdAuth->role == 'I' && $userEnrolId != 0):?>
+	      <a href="<?php echo $this->webroot.$this->themeWeb.'users/delete/'.$userEnrolId.'/'. $user['role']?>" onclick="return confirm('Are you sure you want to unregister student (ID: <?php echo $user['username']?>) from ' + document.getElementById('course_id').options[document.getElementById('course_id').selectedIndex].text + '?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
+	   	<?php elseif($user['role'] == 'S' && $rdAuth->role == 'I' && $userEnrolId == 0):?>
+	    <?php else:?>
+	   	 <a href="<?php echo $this->webroot.$this->themeWeb.'users/delete/'.$user['id'] ?>" onclick="return confirm('Are you sure you want to delete user &ldquo;<?php echo $user['username']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
 	   	<?php endif;?>
 	      <a href="<?php echo $this->webroot.$this->themeWeb.'users/resetPassword/'.$user['id']?>" onclick="return confirm('Are you sure you want to reset password for user &ldquo;<?php echo $user['username']?>&rdquo;?')"><?php echo $html->image('icons/key_email.gif',array('border'=>'0','alt'=>'Reset password'))?></a>
 

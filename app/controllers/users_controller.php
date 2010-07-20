@@ -401,7 +401,7 @@ class UsersController extends AppController
 
                 $delStatus = false;
 
-                if($type == 'S')
+                if(!is_null($type))
                 	$delStatus = $this->UserEnrol->del($id);
                 else
                 	$delStatus = $this->User->del($id);
@@ -447,7 +447,7 @@ class UsersController extends AppController
         $condition = $queryAttributes['condition'];
         $joinTable = $queryAttributes['joinTable'];
 
-
+        
         $urlLiveSearchParam = isset($_GET['livesearch']) ? $_GET['livesearch'] : "";
         $liveSearch = trim( !empty($this->params['form']['livesearch']) ?
                 $this->params['form']['livesearch'] : $urlLiveSearchParam);
@@ -693,6 +693,7 @@ class UsersController extends AppController
         {
             $attributes['condition'] .= 'User.role = "'.$displayUserType.'"';
         }
+     
         if ($displayUserType == 'S') {
             if ($courseId == -1)
             {//Get unassigned student
