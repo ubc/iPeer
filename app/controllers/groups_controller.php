@@ -245,7 +245,7 @@ class GroupsController extends AppController
 		$tmpFile = $this->params['form']['file']['tmp_name'];
 
 		//$uploadDir = $this->sysContainer->getParamByParamCode('system.upload_dir');
-		$uploadDir="/var/www/ipeer.apsc.ubc.ca/htdocs/prod/app/uploads/";
+		$uploadDir="../tmp/";
 		//$uploadFile = APP.$uploadDir['parameter_value'] . $filename;
 		$uploadFile=$uploadDir.$filename;
 

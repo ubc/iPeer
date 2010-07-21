@@ -1312,7 +1312,7 @@ function export_test($eventId=null,$groupID=null)
         //pre($rubric_criteria);
 
         //output
-         $fh=fopen("/var/www/ipeer.apsc.ubc.ca/htdocs/prod/app/tmp/test/output.csv","w");
+         $fh=fopen("../tmp/test/output.csv","w");
          fputcsv($fh,array("Event Name",$event_title));
          fputcsv($fh,array("Event Type","Rubric"));
          fputcsv($fh,array("Criteria number","Criteria"));
