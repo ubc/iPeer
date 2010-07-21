@@ -56,6 +56,7 @@ class UpgradeController extends Controller
     {
         $this->set('message_content', $ret);
         $this->render(null, null, 'views/pages/message.tpl.php');
+        return;
     }
 
     // logout the user

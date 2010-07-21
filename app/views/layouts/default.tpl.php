@@ -163,8 +163,8 @@ function checkEmailAddress()
       <div align="right">
         <?php
         if (!empty($this->params)) {
-          if ('install' != $this->params['controller'] && 
-              'upgrade' != $this->params['controller'] && 
+          if ('install' != $this->params['controller'] &&
+              'upgrade' != $this->params['controller'] &&
               'loginout' != $this->params['controller'] &&
               $this->controller->rdAuth->role != 'S') {
 
@@ -196,7 +196,11 @@ function checkEmailAddress()
 </div>
 
 <!-- Debugging output -->
-<?php if(!constant('DEBUG') == 0 && isset($this->params['controller']) && 'install' != $this->params['controller']) { ?>
+<?php if(!constant('DEBUG') == 0 &&
+        isset($this->params['controller']) &&
+        'install' != $this->params['controller'] &&
+        'upgrade' != $this->params['controller']) { ?>
+
     <!-- Prepare the SVN revision number and table -->
     <script language="JavaScript" type="text/javascript">
         // Toggles the details display of the snv revision.
