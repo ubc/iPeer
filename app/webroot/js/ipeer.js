@@ -13,10 +13,10 @@ function wopen(url, name, w, h)
     'location=no, menubar=no, ' +
     'status=no, toolbar=no, scrollbars=yes, resizable=yes');
   // Just in case width and height are ignored
-  win.resizeTo(w, h);
+//  win.resizeTo(w, h);
   // Just in case left and top are ignored
-  win.moveTo(wleft, wtop);
-  win.focus();
+//  win.moveTo(wleft, wtop);
+//  win.focus();
 }
 
 function showLimit(value, link, ajaxObj) {
