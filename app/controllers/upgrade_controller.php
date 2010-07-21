@@ -52,7 +52,7 @@ class UpgradeController extends Controller
     $dbv = $this->sysContainer->getParamByParamCode('database.version', array('parameter_value' => 0));
 
     // patch the database
-    if(true !== ($ret = $this->dbPatchHelper->patch($dbv['parameter_value'])))
+    if(true !== ($ret = $this->DbPatcher->patch($dbv['parameter_value'])))
     {
         $this->set('message_content', $ret);
         $this->render(null, null, 'views/pages/message.tpl.php');
@@ -65,7 +65,9 @@ class UpgradeController extends Controller
 		$this->Session->del('Message');
 		$this->Session->del('CWLErr');
 
-    $this->set('message_content', 'Your iPeer instance has been upgraded. Please login again.<br /><a href="/loginout/login">Login</a>');
+    $message  = "Your iPeer instance has been upgraded. Please login again.<br />";
+    $message .= "<a href='" . $this->webroot . "loginout/login'>Login</a>";
+    $this->set('message_content', $message);
     $this->render(null, null, 'views/pages/message.tpl.php');
   }
 
