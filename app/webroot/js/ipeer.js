@@ -67,3 +67,9 @@ function OnChange(dropdown)
 
 	return true;
 }
+
+
+function getIndex(obj, type, url) {
+  index = document.getElementById("template_id").value;
+  obj.href = url + type + "/view/" + index + "/pop_up";
+}

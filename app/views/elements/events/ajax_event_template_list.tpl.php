@@ -1,6 +1,7 @@
-<!-- elements::ajax_event_template_lists end -->
+<!-- elements::ajax_event_template_lists begin -->
 <?php
   //$templateID = null;
+  $url = $this->webroot.$this->themeWeb;
   $templates = array();
   if ($eventTemplates!=null) {
     if (isset($view) && $view) {
@@ -13,36 +14,22 @@
     else {?>
   		<select name="data[Event][template_id]" id="template_id" style="width:200px;" >
   			<?php foreach($eventTemplates as $row): $template = $row[$model];?>
-  		  <option value="<?php echo trim($template['id']) ?>"<?php
-  				  if (isset($templateID) && $template['id'] == $templateID) {
-  				       echo ' selected';
-  				  }
-  				  ?>><?php echo $template['name'] ?></option>
+  		    <option value="<?php echo trim($template['id']) ?>" <?php echo (isset($templateID) && $template['id'] == $templateID)?' selected':''?>>
+            <?php echo $template['name'] ?>
+          </option>
   			<?php endforeach; ?>
   		</select>
 
-      <script type="text/javascript" language="javascript">
-
-        function getIndex(obj, type) {
-          index = document.getElementById("template_id").value;
-          obj.href = "<?php echo $this->webroot.$this->themeWeb;?>" + type + "/view/"+(index)+"/pop_up";
-        }
-
-      </script>
+      <?php if ($model == 'SimpleEvaluation'):?>
+        <a title="Simple Evaluation Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'simpleevaluations', '<?php echo $url?>'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview This Simple Evaluation</a>
+      <?php elseif ($model == 'Rubric'):?>
+        <a title="Rubric Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'rubrics', '<?php echo $url?>'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview This Rubric</a>
+      <?php elseif ($model == 'Mixeval'):?>
+        <a title="Mix Evaluation Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'mixevals', '<?php echo $url?>'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview this Mixed Evaluaiton</a>
+      <?php endif;?> 
     <?php
     }
-    //echo '<br><br>';
-    if ($model == 'SimpleEvaluation') { ?>
-      <a title="Simple Evaluation Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'simpleevaluations'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview This Simple Evaluation</a>
-    <?php }
-    else if ($model == 'Rubric') { ?>
-      <a title="Rubric Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'rubrics'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview This Rubric</a>
-    <?php }
-    else if ($model == 'Mixeval') { ?>
-      <a title="Mix Evaluation Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'mixevals'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview this Mixed Evaluaiton</a>
-    <?php
-    }
- } else {
+  } else {
     if ($model == 'SimpleEvaluation') {
         $evalTypeString = "Simple";
     } else if ($model == 'Rubric') {
