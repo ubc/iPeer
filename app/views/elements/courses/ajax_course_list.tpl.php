@@ -40,6 +40,8 @@
                 if (strpos(strtolower($homepage), "http://") === false) {
                     $homepage = "http://" . $homepage;
                 }
+            } else {
+                $homepage = "";
             }
     		echo !empty($homepage) ? "<a href='$homepage'>" : "";
     		echo $html->image('icons/home.gif',array('border'=>'0', 'align'=>'middle','alt'=>'home'));
