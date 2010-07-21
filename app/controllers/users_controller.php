@@ -63,7 +63,7 @@ class UsersController extends AppController
             $this->pageTitle = $this->sysContainer->getCourseName($this->rdAuth->courseId).' > Students';
             $courseId = $this->rdAuth->courseId;
         } else {
-            $courseId = -1;
+            $courseId = 'ALL';
         }
         //Setup User Type Display Option
         isset($this->params['form']['display_user_type'])? $displayUserType = $this->params['form']['display_user_type'] : $displayUserType = 'S';
@@ -92,8 +92,17 @@ class UsersController extends AppController
             $this->update($attributeCode = 'User.ListMenu.Limit.Show',$attributeValue = $this->show);
         }
 
-        $data = $this->User->findAll($condition, $fields, $this->order, $this->show, $this->page, null, $joinTable);
-        $paging['count'] = $this->User->findCount($condition, 0, $joinTable);
+        $data = $this->User->findAll($condition, $fields, $this->order, $this->show, $this->page, -1, $joinTable);
+
+        // merge enrol count to User array
+        for($i = 0; $i < sizeof($data); $i++)
+        {
+          $data[$i]['User']['enrol_count'] = $data[$i][0]['enrol_count'];
+          unset($data[$i][0]['enrol_count']);
+        }
+
+        $queryAttributes = $this->getQueryAttribute($displayUserType, $courseId, true);
+        $paging['count'] = $this->User->findCount($queryAttributes['condition'], 0, $queryAttributes['joinTable']);
         $paging['show'] = array('10','25','50','all');
         $paging['page'] = $this->page;
         $paging['limit'] = $this->show;
@@ -469,13 +478,25 @@ class UsersController extends AppController
         }
 
         $this->update($attributeCode = 'User.ListMenu.Limit.Show',$attributeValue = $this->show);
-        $this->set('conditions', $condition);
-        $this->set('fields', $fields);
-        $this->set('joinTable', $joinTable);
-        $this->set('displayUserType', $displayUserType);
-        $this->set('courseId', $courseId);
-        $this->set('liveSearch', $liveSearch);
-        $this->set('select', $select);
+
+        $data = $this->User->findAll($condition, $fields, $this->order, $this->show, $this->page, -1, $joinTable);
+
+        $paging['style'] = 'ajax';
+        $paging['link'] = '/users/search/?show=' . $this->show .
+          '&livesearch=' . $liveSearch . '&select=' . $select .
+          '&display_user_type='.$displayUserType.'&course_id=' . $courseId .
+          '&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
+
+        $queryAttributes = $this->getQueryAttribute($displayUserType, $courseId, true);
+        $paging['count'] = $this->User->findCount($queryAttributes['condition'], 0, $queryAttributes['joinTable']);
+        $paging['show'] = array('10','25','50','all');
+        $paging['page'] = $this->page;
+        $paging['limit'] = $this->show;
+        $paging['direction'] = $this->direction;
+
+        $this->set('paging',$paging);
+        $this->set('data',$data);
+        $this->set('courseId',$courseId);
     }
 
     function checkDuplicateName($role='')
@@ -682,31 +703,52 @@ class UsersController extends AppController
     }
 
 
-    function getQueryAttribute($displayUserType = null, $courseId = null)
+    function getQueryAttribute($displayUserType = null, $courseId = null, $is_count = false)
     {
-        $attributes = array('fields'=>'', 'condition'=>'', 'joinTable'=>array());
-        $attributes['fields'] = 'User.id, User.username, User.role, User.first_name, User.last_name, User.email, User.created, User.creator_id, User.modified, User.updater_id';
+        $attributes = array('fields'    => 'User.id, User.username, User.role, User.first_name, User.last_name, User.email, User.created, User.creator_id, User.modified, User.updater_id', 
+                            'condition' => array(), 
+                            'joinTable' => array());
         $joinTable = array();
 
         //if (isset($this->rdAuth->courseId)) {
         if (!empty($displayUserType))
         {
-            $attributes['condition'] .= 'User.role = "'.$displayUserType.'"';
+            $attributes['condition'][] = 'User.role = "'.$displayUserType.'"';
         }
      
-        if ($displayUserType == 'S') {
-            if ($courseId == -1)
-            {//Get unassigned student
-                $joinTable = array(' LEFT JOIN user_enrols as UserEnrol ON User.id=UserEnrol.user_id');
-                $attributes['condition']  .= ' AND UserEnrol.user_id IS NULL';
-            } else if (is_numeric($courseId)) {
-                $attributes['condition'] .= ' AND User.id = UserEnrol.user_id';
-                $attributes['condition'] .= ' AND UserEnrol.course_id = ' . $courseId;
-                $joinTable = array(', user_enrols as UserEnrol');
+
+        if ('S' == $displayUserType) {
+          $attributes['fields'] .= ', COUNT(UserEnrol.id) as enrol_count';
+
+          if ($courseId == -1)
+          {   
+            //Get unassigned student
+            $attributes['condition'][] = 'UserEnrol.user_id IS NULL';
+            $joinTable = array(' LEFT JOIN user_enrols as UserEnrol ON User.id = UserEnrol.user_id');
+          } else if (is_numeric($courseId)) {
+            $attributes['condition'][] = 'UserEnrol.course_id = ' . $courseId;
+            if($is_count)
+            {
+              $attributes['condition'][] = 'User.id = UserEnrol.user_id';
+              $joinTable = array(', user_enrols as UserEnrol');
             }
+            else
+            {
+              $joinTable = array(' LEFT JOIN user_enrols as UserEnrol ON User.id = UserEnrol.user_id');
+            }
+          } else {
+            if(!$is_count)
+            {
+              $joinTable = array(' LEFT JOIN user_enrols as UserEnrol ON User.id = UserEnrol.user_id');
+            }
+          }
         }
         //}
-        $attributes['joinTable']=$joinTable;
+        
+        // hack for stupid CakePHP 1.1, no group by
+        $attributes['condition'] = implode(' AND ', $attributes['condition']) . ((!$is_count && 'S' == $displayUserType) ? ' GROUP BY User.id' : '');
+
+        $attributes['joinTable'] = $joinTable;
         return $attributes;
     }
 

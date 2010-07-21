@@ -32,22 +32,22 @@
   	<?php $i = '0';?>
 	  <?php foreach($data as $row): $user = $row['User']; ?>
 	  <?php
-	  	$userEnrol = $row['UserEnrol'];
+/*	  	$userEnrol = $row['UserEnrol'];
 	  	$userEnrolId = 0;
 	  	foreach($row['UserEnrol'] as $enrol)
 	  	{
 	  		if(isset($course_id) && $enrol['course_id'] == $course_id)
 	  			$userEnrolId = $enrol['id'];
-	  	}
+	  	}*/
 	  ?>
 	  <tr class="tablecell">
 	    <td align="center">
 		    <a href="<?php echo $this->webroot.$this->themeWeb.'users/view/'.$user['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
 	    <?php if($rdAuth->role == 'A' || $user['role'] != 'I' && ($rdAuth->role == 'A' || $rdAuth->role == 'I')):?>
 	      <a href="<?php echo $this->webroot.$this->themeWeb.'users/edit/'.$user['id']?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
-	    <?php if($user['role'] == 'S' && $rdAuth->role == 'I' && $userEnrolId != 0):?>
+	    <?php if($user['role'] == 'S' && $rdAuth->role == 'I' && 0 != $user['enrol_count']):?>
 	      <a href="<?php echo $this->webroot.$this->themeWeb.'users/delete/'.$userEnrolId.'/'. $user['role']?>" onclick="return confirm('Are you sure you want to unregister student (ID: <?php echo $user['username']?>) from ' + document.getElementById('course_id').options[document.getElementById('course_id').selectedIndex].text + '?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
-	   	<?php elseif($user['role'] == 'S' && $rdAuth->role == 'I' && $userEnrolId == 0):?>
+	   	<?php elseif($user['role'] == 'S' && $rdAuth->role == 'I' && 0 != $user['enrol_count']):?>
 	    <?php else:?>
 	   	 <a href="<?php echo $this->webroot.$this->themeWeb.'users/delete/'.$user['id'] ?>" onclick="return confirm('Are you sure you want to delete user &ldquo;<?php echo $user['username']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
 	   	<?php endif;?>
@@ -78,15 +78,15 @@
 	    </td>
 <!--      <td align="center">
         <?php
-        $params = array('controller'=>'users', 'userId'=>$user['creator_id']);
-        echo $this->renderElement('users/user_info', $params);
+        //$params = array('controller'=>'users', 'userId'=>$user['creator_id']);
+        //echo $this->renderElement('users/user_info', $params);
         ?><br/>
         <?php echo $this->controller->Output->formatDate(date('Y-m-d H:i:s', strtotime($user['created']))) ?>
       </td>
       <td align="center">
         <?php
-        $params = array('controller'=>'users', 'userId'=>$user['updater_id']);
-        echo $this->renderElement('users/user_info', $params);
+        //$params = array('controller'=>'users', 'userId'=>$user['updater_id']);
+        //echo $this->renderElement('users/user_info', $params);
         ?><br/>
         <?php
             if (!empty($user['modified'])) echo $this->controller->Output->formatDate(date('Y-m-d H:i:s', strtotime($user['modified'])));
