@@ -16,14 +16,15 @@ class AppController extends Controller  {
 	var $access = array ();
 	var $actionList = array ();
 
-  function checkDatabaseVersion()
-  {
-    $dbv = $this->sysContainer->getParamByParamCode('database.version', array('parameter_value' => 0));
-    if('A' == $this->rdAuth->role && DATABASE_VERSION > $dbv['parameter_value'])
+    function checkDatabaseVersion()
     {
-      $this->Session->setFlash('<span class="notice">Your database version is older than the current version. Please do the <a href="/upgrade">upgrade</a>.</span>');
+        $dbv = $this->sysContainer->getParamByParamCode('database.version', array('parameter_value' => 0));
+        if('A' == $this->rdAuth->role && DATABASE_VERSION > $dbv['parameter_value']) {
+            $flashMessage  = "<span class='notice'>Your database version is older than the current version. ";
+            $flashMessage .= "Please do the <a href=" . $this->webroot ."upgrade" .">upgrade</a>.</span>";
+            $this->Session->setFlash($flashMessage);
+        }
     }
-  }
 
 	function __setAccess()
 	{

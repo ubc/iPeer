@@ -21,8 +21,8 @@
 class UpgradeController extends Controller
 {
 	var $Sanitize;
-  var $uses         = array(); 
-	var $components   = array('Output', 
+  var $uses         = array();
+	var $components   = array('Output',
                             'framework',
                             'Session',
                             'rdAuth',
@@ -39,7 +39,10 @@ class UpgradeController extends Controller
   function index()
   {
     $this->checkPermission();
-    $this->set('message_content', 'You are about to upgrade your iPeer instance. Please make sure you have backed up your database and files before proceeding!<br /><a href="/upgrade/step2">Confirm</a>');
+    $message  = "You are about to upgrade your iPeer instance. ";
+    $message .= "Please make sure you have backed up your database and files before proceeding!<br />";
+    $message .= "<a href='" . $this->webroot . "upgrade/step2'>Confirm</a>";
+    $this->set('message_content', $message);
     $this->render(null, null, 'views/pages/message.tpl.php');
   }
 
@@ -54,7 +57,7 @@ class UpgradeController extends Controller
         $this->set('message_content', $ret);
         $this->render(null, null, 'views/pages/message.tpl.php');
     }
-   
+
     // logout the user
 		$this->rdAuth->logout();
 		$this->Session->del('URL');
