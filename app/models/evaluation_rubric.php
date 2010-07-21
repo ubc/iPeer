@@ -13,11 +13,11 @@ class EvaluationRubric extends AppModel
                       )
   								);
 
-	var $belongsTo = array(
+/*	var $belongsTo = array(
 									 			'Rubric' => array(
 									 			  'className' => 'Rubric',
 									 			)
-									 );
+									 );*/
 
 	function getEvalRubricByGrpEventIdEvaluatorEvaluatee($grpEventId=null, $evaluator=null, $evaluatee=null){
 		return $this->find('grp_event_id='.$grpEventId.' AND evaluator='.$evaluator.' AND evaluatee='.$evaluatee);

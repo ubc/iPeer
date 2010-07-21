@@ -41,10 +41,10 @@ class Rubric extends AppModel
                           'className' => 'RubricsLom',
                           'dependent' => true
                         ),
-                        'EvaluationRubric' => array(
+/*                        'EvaluationRubric' => array(
                           'className' => 'EvaluationRubric',
                           'dependent' => true
-                        )
+                        )*/
   );
 
 	function beforeSave(){

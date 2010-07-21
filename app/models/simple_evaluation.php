@@ -33,12 +33,12 @@ class SimpleEvaluation extends AppModel
       'point_per_member' => VALID_NUMBER
   );
 
-  var $hasMany = array(
+/*  var $hasMany = array(
                        'EvaluationSimple' => array(
                         'className' => 'EvaluationSimple',
                         'dependent' => true
                        )
-  );
+  );*/
 	//Overwriting Function - will be called before save operation
 	function beforeSave(){
 

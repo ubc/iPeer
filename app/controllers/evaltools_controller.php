@@ -83,7 +83,7 @@ class EvaltoolsController extends AppController
     $mixevalData = $this->Mixeval->findAll('creator_id = '.$this->rdAuth->id);
     $this->set('mixevalData', $mixevalData);
 
-    $surveyData = $this->Survey->findAll('creator_id = '.$this->rdAuth->id);
+    $surveyData = $this->Survey->findAll('Survey.creator_id = '.$this->rdAuth->id);
     $this->set('surveyData', $surveyData);
 
     $this->render('index');
