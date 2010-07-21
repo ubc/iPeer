@@ -129,7 +129,7 @@ class RubricsController extends AppController
 	{
 		if (empty($this->params['data']))
 		{
-            $data = $this->Rubric->findById($id);
+            $data = $this->Rubric->find('id = '.$id);
 			$this->params['data'] = $data;
             $this->set('data', $this->params['data']);
             $this->render('edit');

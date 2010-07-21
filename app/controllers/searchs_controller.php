@@ -118,7 +118,7 @@ class SearchsController extends AppController
 
         $searchMartix = $this->SearchHelper->formatSearchEvaluationResult($maxPercent,$minPercent,$eventId,$status, $this->order, $this->show, $this->page, $this->sortBy, $this->direction);
 
-        $eventList = $this->rdAuth->role == 'A' ? $this->Event->findAll() : $this->Event->findAllByCreatorId($this->rdAuth->id);
+        $eventList = $this->rdAuth->role == 'A' ? $this->Event->findAll() : $this->Event->findAll('creator_id = '.$this->rdAuth->id);
         $this->set('sticky', $sticky);
         $this->set('eventList', $eventList);
         $this->set('data', $searchMartix['data']);

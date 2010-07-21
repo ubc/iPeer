@@ -213,9 +213,9 @@ class Event extends AppModel
     $evaluation_mixeval = new EvaluationMixeval();
     $evaluation_mixeval_detail = new EvaluationMixevalDetail();
 
-    $ems = $evaluation_mixeval->findAllByEventId($this->id);
+    $ems = $evaluation_mixeval->findAll('eventi_id = '.$this->id);
     foreach($ems as $em) {
-    	$emds = $evaluation_mixeval_detail->findAllByEvaluationMixevalId($em->id);
+    	$emds = $evaluation_mixeval_detail->findAll('evaluation_mixeval_id = '.$em->id);
       foreach($emds as $emd) {
       	$emd->delete();
       }

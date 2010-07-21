@@ -278,7 +278,7 @@ class LoginoutController extends AppController
 					$studentNumber = empty($data['student_number'])? $data['guest_id']:$data['student_number'];
 
 					//Check is this CWL login student able to use iPeer
-					$this->params['data'] = $this->User->findByUsername(trim($studentNumber));
+					$this->params['data'] = $this->User->find("username = '".trim($studentNumber)."'");
 
 					if ($this->params['data']['User']['id'])
 					{

@@ -143,7 +143,7 @@ class SurveyGroupsController extends AppController
       $courseId = $this->rdAuth->courseId;
     else {
       $eventId = $params;
-      $event = $this->Event->findById($eventId);
+      $event = $this->Event->find("id = $eventId");
       $courseId = $event['Event']['course_id'];
       $this->rdAuth->setCourseId($courseId);
     }
@@ -204,7 +204,7 @@ class SurveyGroupsController extends AppController
     $data = false;
     if (!empty($this->params['form']['survey_select'])) {
         $data = array();
-        $data[0] = $this->Survey->findById($this->params['form']['survey_select']);
+        $data[0] = $this->Survey->find('id = '.$this->params['form']['survey_select']);
     }
 
     if (isset($this->params['form']) && !empty($this->params['form']) && $this->params['form']['select'] == 'user' && !empty($this->params['form']['livesearch2']))

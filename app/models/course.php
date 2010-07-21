@@ -283,7 +283,7 @@ class Course extends AppModel
     //delete self
     if ($this->del($id)) {
       //delete user course,user enrol handled by hasMany
-      $events = $this->Events->findAllByCourseId($id);
+      $events = $this->Events->findAll('course_id = '.$id);
       foreach ($events as $event)
         $this->Event->deleteAll($event['Event']['id']);
       //
@@ -291,7 +291,7 @@ class Course extends AppModel
   }
 
   function getEnrolledStudentCount($course_id) {
-    $course = $this->findById($course_id);
+    $course = $this->find('id = '.$course_id);
     if(null == $course) return;
     return count($course['Enrol']);
   }

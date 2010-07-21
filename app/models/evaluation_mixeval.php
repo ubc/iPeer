@@ -80,7 +80,7 @@ class EvaluationMixeval extends AppModel
 	
 	function getMixEvalById($id)
 	{
-		return $this->findById($id);
+		return $this->find('id = '.$id);
 	}
 }
 

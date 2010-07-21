@@ -55,8 +55,7 @@ class HomeController extends AppController
 			if ($role == $this->User->USER_TYPE_ADMIN || $role == $this->User->USER_TYPE_INSTRUCTOR)
 			{
 				//$courseList = $this->sysContainer->getMyCourseList();
-				$courseList = $this->User->findById($this->rdAuth->id);
-				//$courseList = $this->UserCourse->findByUser_id($this->rdAuth->id);
+				$courseList = $this->User->find("id = '".$this->rdAuth->id."'");
 				$activeCourseDetail = $this->formatCourseList($courseList['UserCourse'], 'active_course');
 
 				$inactiveCourseDetail=null;

@@ -301,7 +301,7 @@ function add ()
 			$this->params['data'] = $event;
 			$this->Output->br2nl($this->params['data']);
 
-                     $assignedGroupIDs = $this->GroupEvent->findAllByEvent_id($id);
+      $assignedGroupIDs = $this->GroupEvent->findAll('event_id = '.$id);
 //$a=print_r($assignedGroupIDs,true);
 //print "<pre>($a)</pre>";
 			$groupIDs = '';

@@ -116,7 +116,7 @@ class DbPatcherComponent extends Object
 
     // update database version
     $sysParam = new SysParameter();
-    if($dbv = $sysParam->findByParameterCode('database.version'))
+    if($dbv = $sysParam->find("parameter_code = 'database.version'"))
     {
       $sysParam->id = $dbv['SysParameter']['id'];
       $sysParam->saveField('parameter_code', DATABASE_VERSION);

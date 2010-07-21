@@ -74,16 +74,16 @@ class EvaltoolsController extends AppController
 
   function showAll()
   {
-    $simpleEvalData = $this->SimpleEvaluation->findAllByCreatorId($this->rdAuth->id);
+    $simpleEvalData = $this->SimpleEvaluation->findAll('creator_id = '.$this->rdAuth->id);
     $this->set('simpleEvalData', $simpleEvalData);
 
-    $rubricData = $this->Rubric->findAllByCreatorId($this->rdAuth->id);
+    $rubricData = $this->Rubric->findAll('creator_id = '.$this->rdAuth->id);
     $this->set('rubricData', $rubricData);
 
-    $mixevalData = $this->Mixeval->findAllByCreatorId($this->rdAuth->id);
+    $mixevalData = $this->Mixeval->findAll('creator_id = '.$this->rdAuth->id);
     $this->set('mixevalData', $mixevalData);
 
-    $surveyData = $this->Survey->findAllByCreatorId($this->rdAuth->id);
+    $surveyData = $this->Survey->findAll('creator_id = '.$this->rdAuth->id);
     $this->set('surveyData', $surveyData);
 
     $this->render('index');

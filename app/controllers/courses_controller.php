@@ -87,12 +87,12 @@ class CoursesController extends AppController
 
 	function home($id)
 	{
-        $course = $this->Course->findById($id);
+        $course = $this->Course->find("id = '$id'");
         $this->set('data', $course);
         $students = $this->Course->getEnrolledStudentCount($id);
         $this->set('studentCount', $students);;
 
-        $number_of_groups=count($this->Group->findAllByCourse_id($id));
+        $number_of_groups=count($this->Group->findAll('course_id = '.$id));
         $this->set('groupCount', $number_of_groups);
         $events = $this->Event->getCourseEventCount($id);
         $this->set('eventCount', $events[0]['total']);
@@ -175,7 +175,7 @@ class CoursesController extends AppController
 		if ($this->Course->del($id))
 		{
 		  //Delete all corresponding data start here
-		  $course = $this->Course->findById($id);
+		  $course = $this->Course->find("id = '$id'");
 
 		  //Instructors: Instructor record will remain in database, but the join table records will be deleted
 		  $instructors = $course['UserCourse'];

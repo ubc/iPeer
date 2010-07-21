@@ -69,7 +69,7 @@ class GroupsController extends AppController
       $this->update($attributeCode = 'Group.ListMenu.Limit.Show',$attributeValue = $this->show);
   	}
 
-		$data = $this->Group->findAllByCourseId($courseId, null, $this->order, $this->show, $this->page);//, null, null);//$joinTable);
+		$data = $this->Group->findAll('course_id = '.$courseId, null, $this->order, $this->show, $this->page);//, null, null);//$joinTable);
 
 		$paging['style'] = 'ajax';
 		$paging['link'] = '/groups/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
