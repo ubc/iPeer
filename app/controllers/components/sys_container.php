@@ -176,8 +176,8 @@ class sysContainerComponent
 	{
 		// echo "<h1>" . $paraCode . "</h1>";
 		$paramList = $this->Session->read('ipeerSession.paramList');
-		
-		// echo "<pre>"; print_r($paramList);echo "</pre>"; 
+
+		// echo "<pre>"; print_r($paramList);echo "</pre>";
 		$sysParameter = isset($paramList[$paraCode]) ? $paramList[$paraCode] : $default;
 		return $sysParameter;
 	}
@@ -256,7 +256,7 @@ class sysContainerComponent
 		}
 		//TODO: Change /ipeer2 using Session Name in SysParameter
 		if (!empty($course['homepage'])) {
-			$courseLink = '&nbsp;<a href="'.$course['homepage'].'" onclick="wopen(this.href, \'popup\', 650, 500); return false;"><img alt="home" src="'.dirname($_SERVER['PHP_SELF']).'/img/icons/home.gif" border="0" align="middle" /></a>&nbsp;';
+			$courseLink = '&nbsp;<a href="'.$course['homepage'].'"  target="_blank"><img alt="home" src="'.dirname($_SERVER['PHP_SELF']).'/img/icons/home.gif" border="0" align="middle" /></a>&nbsp;';
 		} else {
 			$courseLink = '&nbsp;<img alt="home" src="'. dirname($_SERVER['PHP_SELF']).'/img/icons/home.gif" border="0" align="middle" />&nbsp;';
 		}

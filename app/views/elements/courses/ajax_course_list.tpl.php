@@ -43,7 +43,7 @@
             } else {
                 $homepage = "";
             }
-    		echo !empty($homepage) ? "<a href='$homepage'>" : "";
+    		echo !empty($homepage) ? "<a href='$homepage' target='_blank'>" : "";
     		echo $html->image('icons/home.gif',array('border'=>'0', 'align'=>'middle','alt'=>'home'));
     		echo !empty($homepage) ? "</a>":'';
     		?>
