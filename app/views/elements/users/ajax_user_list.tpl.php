@@ -29,53 +29,27 @@
 <!--	    <th><?php //echo $pagination->sortLink('Created By',array('created','desc'))?></th> -->
 <!--	    <th><?php //echo $pagination->sortLink('Last Updated By',array('modified','desc'))?></th> -->
 	  </tr>
-  	<?php $i = '0';?>
 	  <?php foreach($data as $row): $user = $row['User']; ?>
-	  <?php
-/*	  	$userEnrol = $row['UserEnrol'];
-	  	$userEnrolId = 0;
-	  	foreach($row['UserEnrol'] as $enrol)
-	  	{
-	  		if(isset($course_id) && $enrol['course_id'] == $course_id)
-	  			$userEnrolId = $enrol['id'];
-	  	}*/
-	  ?>
 	  <tr class="tablecell">
 	    <td align="center">
 		    <a href="<?php echo $this->webroot.$this->themeWeb.'users/view/'.$user['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
+
 	    <?php if($rdAuth->role == 'A' || $user['role'] != 'I' && ($rdAuth->role == 'A' || $rdAuth->role == 'I')):?>
 	      <a href="<?php echo $this->webroot.$this->themeWeb.'users/edit/'.$user['id']?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
-	    <?php if($user['role'] == 'S' && $rdAuth->role == 'I' && 0 != $user['enrol_count']):?>
-	      <a href="<?php echo $this->webroot.$this->themeWeb.'users/delete/'.$userEnrolId.'/'. $user['role']?>" onclick="return confirm('Are you sure you want to unregister student (ID: <?php echo $user['username']?>) from ' + document.getElementById('course_id').options[document.getElementById('course_id').selectedIndex].text + '?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
-	   	<?php elseif($user['role'] == 'S' && $rdAuth->role == 'I' && 0 != $user['enrol_count']):?>
-	    <?php else:?>
-	   	 <a href="<?php echo $this->webroot.$this->themeWeb.'users/delete/'.$user['id'] ?>" onclick="return confirm('Are you sure you want to delete user &ldquo;<?php echo $user['username']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
-	   	<?php endif;?>
+
+   	    <?php if($rdAuth->role == 'A'):?>
+          <a href="<?php echo $this->webroot.$this->themeWeb.'users/delete/'.$user['id'] ?>" onclick="return confirm('Are you sure you want to delete user &ldquo;<?php echo $user['username']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
+  	   	<?php endif;?>
+
 	      <a href="<?php echo $this->webroot.$this->themeWeb.'users/resetPassword/'.$user['id']?>" onclick="return confirm('Are you sure you want to reset password for user &ldquo;<?php echo $user['username']?>&rdquo;?')"><?php echo $html->image('icons/key_email.gif',array('border'=>'0','alt'=>'Reset password'))?></a>
 
 	    <?php endif;?>
 	    </td>
-		  <td>
-	      <?php echo $user['username'] ?>
-	    </td>
-		  <td>
-	      <?php if ($user['role']=='A') {
-	              echo 'Administrator';
-	            } else if ($user['role']=='I') {
-	              echo 'Instructor';
-	            } else if ($user['role']=='S') {
-	              echo 'Student';
-	            }?>
-	    </td>
-	    <td>
-	      <?php echo $user['first_name'] ?>
-	    </td>
-	    <td>
-	      <?php echo $user['last_name'] ?>
-	    </td>
-	    <td>
-	      <a href="mailto:<?php echo $user['email']; ?>"><?php echo $user['email']; ?></a>
-	    </td>
+		  <td><?php echo $user['username'] ?></td>
+		  <td><?php echo User::getRoleText($user['role'])?></td>
+	    <td><?php echo $user['first_name'] ?></td>
+	    <td><?php echo $user['last_name'] ?></td>
+	    <td><a href="mailto:<?php echo $user['email']; ?>"><?php echo $user['email']; ?></a></td>
 <!--      <td align="center">
         <?php
         //$params = array('controller'=>'users', 'userId'=>$user['creator_id']);
@@ -94,9 +68,8 @@
       </td>
 -->
 	  </tr>
-	  <?php $i++;?>
 	  <?php endforeach; ?>
-    <?php if ($i == 0) :?>
+    <?php if (0 == count($data)) :?>
   	<tr class="tablecell" align="center">
   	    <td colspan="9">Record Not Found</td>
     </tr>

@@ -37,6 +37,7 @@ class User extends AppModel
 	var $USER_TYPE_TA = 'T';
 	var $USER_TYPE_STUDENT = 'S';
 
+
 	var $hasMany = array(
 		'UserCourse' =>
 	array('className'   => 'UserCourse',
@@ -174,6 +175,21 @@ class User extends AppModel
     }
 
     return false;
+  }
+
+  function getRoleText($role)
+  {
+    $ROLE_TEXT = array('A'  => 'Administrator',
+                       'I'  => 'Instructor',
+                       'T'  => 'TA',
+                       'S'  => 'Student');
+    if(isset($ROLE_TEXT[$role]))
+    {
+      $text = $ROLE_TEXT[$role];
+    }else{
+      $text = 'Unknown';
+    }
+    return $text;
   }
 }
 
