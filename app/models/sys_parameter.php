@@ -32,8 +32,12 @@ class SysParameter extends AppModel
 	function findParameter ($paramCode='') {
  		return $this->find("parameter_code = '".$paramCode."' ", array('id', 'parameter_code', 'parameter_value', 'parameter_type'));
   }
-	
 
+  function beforeSave()
+  {
+    $this->data[$this->name]['modified'] = date('Y-m-d H:i:s');
+    return true;
+  }
 }
 
 ?>

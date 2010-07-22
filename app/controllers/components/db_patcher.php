@@ -119,7 +119,7 @@ class DbPatcherComponent extends Object
     if($dbv = $sysParam->find("parameter_code = 'database.version'"))
     {
       $sysParam->id = $dbv['SysParameter']['id'];
-      $sysParam->saveField('parameter_code', DATABASE_VERSION);
+      $sysParam->saveField('parameter_value', DATABASE_VERSION);
     }else{
       $dbv = array('SysParameter' => array('parameter_code' => 'database.version',
                                            'parameter_value'=> DATABASE_VERSION,
@@ -127,9 +127,8 @@ class DbPatcherComponent extends Object
                                            'description'    => 'database version',
                                            'record_status'  => 'A',
                                            'creator_id'     => 0,
-                                           'created'        => 'NOW()',
-                                           'updater_id'     => 0,
-                                           'modified'       => 'NOW()'
+                                           'created'        => date('Y-m-d H:i:s'),
+                                           'updater_id'     => 0
                                            ));
       $sysParam->save($dbv);
     }
