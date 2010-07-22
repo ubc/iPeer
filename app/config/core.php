@@ -150,6 +150,6 @@ set_time_limit(300);
   /**
    * iPeer database version
    */
-  define('DATABASE_VERSION', 1);
+  define('DATABASE_VERSION', 2);
 
 ?>
