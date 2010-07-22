@@ -232,7 +232,7 @@ class UsersController extends AppController
                     {
                         $userEnrol['UserEnrol']['course_id'] = $this->params['form']['course_id'];
                         $userEnrol['UserEnrol']['user_id'] = $sFound['User']['id'];
-                        
+
                         if($this->UserEnrol->save($userEnrol) && $this->User->save($sFound['User']))
                         {
                             $this->set('tmpPassword', '<Hidden>');
@@ -294,26 +294,36 @@ class UsersController extends AppController
                 } else {
                     $this->Output->filter($this->params['data']);//always filter
 
-                    // Prevent User role changes (also stops privilege escalation)
-                    if (!empty($this->params['data']['User']['role'])) {
-                        unset ($this->params['data']['User']['role']);
+
+                    if ($this->params['data']['User']['role'] == 'S') {
+                        // For existing students
+                        $data2save = $this->User->findUserByStudentNo($this->params['data']['User']['student_no']);
+                        $data2save['User']['first_name'] = $this->data['User']['first_name'];
+                        $data2save['User']['last_name'] = $this->data['User']['last_name'];
+                        $data2save['User']['email'] = $this->data['User']['email'];
+                    } else {
+
+                        // For other users
+                        $data2save = $this->params['data'];
                     }
 
-                    $sFound = $this->User->findUserByStudentNo($this->params['data']['User']['student_no']);
-                    $sFound['User']['first_name'] = $this->data['User']['first_name'];
-                    $sFound['User']['last_name'] = $this->data['User']['last_name'];
-                    $sFound['User']['email'] = $this->data['User']['email'];
-                    
-                    if ($this->User->save($sFound['User'])) {
- 						if(!empty($this->params['form']['course_ids']))
+                    // Prevent User role changes (also stops privilege escalation)
+                    if (!empty($data2save['User']['role'])) {
+                        unset ($data2save['User']['role']);
+                    }
+
+                    if ($this->User->save($data2save['User'])) {
+ 						if(!empty($this->params['form']['course_ids'])) {
                         	$this->UserEnrol->insertCourses($this->User->id, $this->params['form']['course_ids']);
+                        }
 
                         //Render to view page to display saved data
                         //TODO: Display list of users after import
-                        $data = $this->User->read();
-                        $this->set('data', $data);
-                        $this->set('userRole', $data['User']['role']);
-                        $this->render('userSummary');
+                        // $data = $this->User->read();
+                        // $this->set('data', $data);
+                        // $this->set('userRole', $data['User']['role']);
+                        // $this->render('userSummary');
+                        $this->redirect("/users/index/The user was edited.");
                     } else {
                     	$this->Output->br2nl($this->params['data']);
                         $this->set('data', $this->params['data']);
@@ -456,7 +466,7 @@ class UsersController extends AppController
         $condition = $queryAttributes['condition'];
         $joinTable = $queryAttributes['joinTable'];
 
-        
+
         $urlLiveSearchParam = isset($_GET['livesearch']) ? $_GET['livesearch'] : "";
         $liveSearch = trim( !empty($this->params['form']['livesearch']) ?
                 $this->params['form']['livesearch'] : $urlLiveSearchParam);
@@ -705,8 +715,8 @@ class UsersController extends AppController
 
     function getQueryAttribute($displayUserType = null, $courseId = null, $is_count = false)
     {
-        $attributes = array('fields'    => 'User.id, User.username, User.role, User.first_name, User.last_name, User.email, User.created, User.creator_id, User.modified, User.updater_id', 
-                            'condition' => array(), 
+        $attributes = array('fields'    => 'User.id, User.username, User.role, User.first_name, User.last_name, User.email, User.created, User.creator_id, User.modified, User.updater_id',
+                            'condition' => array(),
                             'joinTable' => array());
         $joinTable = array();
 
@@ -715,13 +725,13 @@ class UsersController extends AppController
         {
             $attributes['condition'][] = 'User.role = "'.$displayUserType.'"';
         }
-     
+
 
         if ('S' == $displayUserType) {
           $attributes['fields'] .= ', COUNT(UserEnrol.id) as enrol_count';
 
           if ($courseId == -1)
-          {   
+          {
             //Get unassigned student
             $attributes['condition'][] = 'UserEnrol.user_id IS NULL';
             $joinTable = array(' LEFT JOIN user_enrols as UserEnrol ON User.id = UserEnrol.user_id');
@@ -744,7 +754,7 @@ class UsersController extends AppController
           }
         }
         //}
-        
+
         // hack for stupid CakePHP 1.1, no group by
         $attributes['condition'] = implode(' AND ', $attributes['condition']) . ((!$is_count && 'S' == $displayUserType) ? ' GROUP BY User.id' : '');
 
