@@ -60,6 +60,7 @@ class LoginoutController extends AppController
 		{
 			$redirect = 'home/index/';
 			$this->redirect($redirect);
+			exit;
 		}
 
 		$redirect = $this->__renderLoginPage();
@@ -106,6 +107,7 @@ class LoginoutController extends AppController
 			}
 
 			$this->render($redirect);
+			exit;
 		}
 
 	}
@@ -113,28 +115,29 @@ class LoginoutController extends AppController
 	function loginByDefault() {
 		$this->autoRender = false;
 
+
 		// Get iPeer Admin's email address
 		$admin_email = $this->sysContainer->getParamByParamCode('system.admin_email');
 		$admin_email = $admin_email['parameter_value'];
 		$this->set('admin_email', $admin_email);
 
 		//RENDER VIEW IF USER IS LOGGED IN
-		if($this->rdAuth->id && $this->rdAuth->role)
-		{
+		if($this->rdAuth->id && $this->rdAuth->role) {
 			$redirect = 'home/index/';
 			$this->redirect($redirect);
+			exit;
 		}
+
 
 		//$a=print_r($this->params,true); echo "<pre>$a</pre>"; exit;
 		//RENDER LOGIN FORM AND THEN HANDLE POST
-		if (empty($this->params['data']))
-		{
+		if (empty($this->params['data'])) {
 			$redirect = 'login';
 			$lastURL = $this->Session->read('URL');
 			$accessErr = $this->Session->read('AccessErr');
 			$message = $this->Session->read('Message');
 
-			if (empty($lastURL)){
+			if (empty($lastURL)) {
 				//$this->set('errmsg', 'Session Expired.  Please log in again.');
 			} else {
 				if ($accessErr=='NO_LOGIN'){
@@ -148,9 +151,7 @@ class LoginoutController extends AppController
 			}
 
 			$this->render($redirect);
-		}
-		else
-		{
+		} else {
 			$this->Output->filter($this->params['data']);//always filter
 			$this->Sanitize->cleanArray($this->params['data']);
 			$this->User->recursive = 0;
@@ -169,18 +170,20 @@ class LoginoutController extends AppController
 				is a hard coding for Political Science 101-051 upon the request of Rosalind Warner
 
 				*/
-				if ($this->params['data']['User']['role'] == "S" && !($this->params['data']['User']['id'] >=4553 && $this->params['data']['User']['id'] <=4583 )) {
+				if ($this->params['data']['User']['role'] == "S" ) {
 					$this->params['data']['User']['password'] = '';
 					$this->Session->write('CWLErr', 'STUDENT_INVALID_LOGIN');
 					$redirect = 'loginout/login';
 					$this->redirect($redirect);
+					exit;
 				}
 			}
 
-			if ($this->params['data']['User']['id'])
-			{
+			if ($this->params['data']['User']['id']) {
 				//sets up the session vars
 				$this->rdAuth->setFromData($this->params['data']['User']);
+
+                //var_dump($this->rdAuth);
 
 				//sets up the system container for accessible functions
 				$accessFunction = $this->SysFunction->getAllAccessibleFunction($this->params['data']['User']['role']);
@@ -196,16 +199,16 @@ class LoginoutController extends AppController
 				$this->params['data'] = array();
 				$redirect = '/home/index/';
 				$this->redirect($redirect);
-			}
-			else
-			{
-				print 333;
+				exit;
+
+			} else {
 				$this->params['data']['User']['password'] = '';
 				$this->Session->write('AccessErr', 'INVALID_LOGIN');
+
 				$redirect = '/loginout/login';
 				$this->redirect($redirect);
+				exit;
 			}
-
 		}
 	}
 
@@ -369,6 +372,8 @@ class LoginoutController extends AppController
 				$redirect = $paraLogin['parameter_value'];
 			}
 		} else {
+            //Setup Custom parameter
+            $this->Session->write('ipeerSession.customIntegrateCWL', 0);
 			$redirect = 'login';
 		}
 		return $redirect;
