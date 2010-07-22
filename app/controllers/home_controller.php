@@ -44,7 +44,7 @@ class HomeController extends AppController
 		parent::__construct();
 	}
 
-	function index($msg='') {		
+	function index($msg='') {
 		//Disable the autorender, base the role to render the custom home
 		$this->autoRender = false;
 
@@ -55,7 +55,7 @@ class HomeController extends AppController
 			if ($role == $this->User->USER_TYPE_ADMIN || $role == $this->User->USER_TYPE_INSTRUCTOR)
 			{
 				//$courseList = $this->sysContainer->getMyCourseList();
-				$courseList = $this->User->find("id = '".$this->rdAuth->id."'");
+				$courseList = $this->User->findById($this->rdAuth->id);
 				$activeCourseDetail = $this->formatCourseList($courseList['UserCourse'], 'active_course');
 
 				$inactiveCourseDetail=null;

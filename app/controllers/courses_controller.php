@@ -87,7 +87,7 @@ class CoursesController extends AppController
 
 	function home($id)
 	{
-        $course = $this->Course->find("id = '$id'");
+        $course = $this->Course->findById($id);
         $this->set('data', $course);
         $students = $this->Course->getEnrolledStudentCount($id);
         $this->set('studentCount', $students);;
@@ -175,7 +175,7 @@ class CoursesController extends AppController
 		if ($this->Course->del($id))
 		{
 		  //Delete all corresponding data start here
-		  $course = $this->Course->find("id = '$id'");
+		  $course = $this->Course->findById($id);
 
 		  //Instructors: Instructor record will remain in database, but the join table records will be deleted
 		  $instructors = $course['UserCourse'];

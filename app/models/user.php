@@ -125,7 +125,7 @@ class User extends AppModel
 	}
 
 	function findUserByid ($id='') {
-		return $this->find("id = '".$id."' ");
+		return $this->findById($id);
 	}
 
 	function getUserIdByStudentNo($studentNo=null) {

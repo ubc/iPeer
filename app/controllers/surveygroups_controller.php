@@ -143,7 +143,7 @@ class SurveyGroupsController extends AppController
       $courseId = $this->rdAuth->courseId;
     else {
       $eventId = $params;
-      $event = $this->Event->find("id = $eventId");
+      $event = $this->Event->findById($eventId);
       $courseId = $event['Event']['course_id'];
       $this->rdAuth->setCourseId($courseId);
     }

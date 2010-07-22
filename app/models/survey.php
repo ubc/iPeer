@@ -110,7 +110,7 @@ class Survey extends AppModel
   }
 
   function getSurveyTitleById($id=null) {
-    $tmp = $this->find('id='.$id);
+    $tmp = $this->findById($id);
     return $tmp['Survey']['name'];
   }
 }

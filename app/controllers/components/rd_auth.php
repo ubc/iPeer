@@ -84,7 +84,7 @@ class rdAuthComponent extends AppController // This component is in fact a
             return $this->getPrivilegeLevel($this->role);
         } else if (is_numeric($user)) {
         // If $user is a numberic user ID, look it up in the database.
-            $data = $this->User->find("id = '$user'");
+            $data = $this->User->findById($user);
             return $data ? $this->getPrivilegeLevel($data['User']['role']) : 0;
         } else {
             // Or if this is a string, look up the user type, and return privilege
