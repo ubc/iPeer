@@ -103,7 +103,7 @@ class UsersController extends AppController
 
         $queryAttributes = $this->getQueryAttribute($displayUserType, $courseId, true);
         $paging['count'] = $this->User->findCount($queryAttributes['condition'], 0, $queryAttributes['joinTable']);
-        $paging['show'] = array('10','25','50','all');
+        $paging['show'] = array('10','25','50'); //,'all');
         $paging['page'] = $this->page;
         $paging['limit'] = $this->show;
         $paging['direction'] = $this->direction;
@@ -489,7 +489,7 @@ class UsersController extends AppController
 
         $queryAttributes = $this->getQueryAttribute($displayUserType, $courseId, true);
         $paging['count'] = $this->User->findCount($queryAttributes['condition'], 0, $queryAttributes['joinTable']);
-        $paging['show'] = array('10','25','50','all');
+        $paging['show'] = array('10','25','50'); //'all');'
         $paging['page'] = $this->page;
         $paging['limit'] = $this->show;
         $paging['direction'] = $this->direction;
