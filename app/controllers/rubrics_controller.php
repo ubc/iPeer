@@ -47,12 +47,14 @@ class RubricsController extends AppController
 		$this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
+    $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
  		$this->pageTitle = 'Rubrics';
-    $this->mine_only = (!empty($_REQUEST['show_my_tool']) && 'on' == $_REQUEST['show_my_tool']) ? true : false;
     parent::__construct();
 	}
 
-	function index($msg='') {
+	function index($msg='') 
+  {
+    $this->mine_only = true;
 	  $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
     $this->userPersonalize->setPersonalizeList($personalizeData);
   	if ($personalizeData && $this->userPersonalize->inPersonalizeList('Rubric.ListMenu.Limit.Show')) {
@@ -62,17 +64,19 @@ class RubricsController extends AppController
   	  $this->show = '10';
       $this->update($attributeCode = 'Rubric.ListMenu.Limit.Show',$attributeValue = $this->show);
   	}
+
     $conditions = 'creator_id = '.$this->rdAuth->id;
 		$data = $this->Rubric->findAll($conditions, $fields=null, $this->order, $this->show, $this->page);
 
 		$paging['style'] = 'ajax';
-		$paging['link'] = '/rubrics/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
+		$paging['link'] = '/rubrics/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&show_my_tool='.$this->mine_only.'&page=';
 
 		$paging['count'] = $this->Rubric->findCount($conditions);
 		$paging['show'] = array('10','25','50','all');
 		$paging['page'] = $this->page;
 		$paging['limit'] = $this->show;
 		$paging['direction'] = $this->direction;
+    $paging['result_count'] = count($data);
 
 		$this->set('paging',$paging);
 		$this->set('data',$data);
@@ -185,41 +189,55 @@ class RubricsController extends AppController
 		}
 	}
 
-	function search()
-  	{
-      $this->layout = 'ajax';
+  function search()
+  {
+    $this->layout = 'ajax';
+    $pagination->loadingId = 'loading';
+
+    if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
+      $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+      if ($personalizeData) {
+        $this->userPersonalize->setPersonalizeList($personalizeData);
+        $this->show = $this->userPersonalize->getPersonalizeValue('Rubric.ListMenu.Limit.Show');
+        $this->set('userPersonalize', $this->userPersonalize);
+      }
+    }
+
+    $conditions = '';
+    if ($this->mine_only){
+      $conditions .= 'creator_id = '.$this->rdAuth->id;
+    } else if ('A' != $this->rdAuth->role){
+      $conditions .= ' (creator_id = '.$this->rdAuth->id. ' OR availability = "public" ) ';
+    }
+
+    if (!empty($this->params['form']['livesearch']) && !empty($this->params['form']['select'])){
       $pagination->loadingId = 'loading';
+      //parse the parameters
+      $searchField=$this->params['form']['select'];
+      $searchValue=$this->params['form']['livesearch'];
+      (empty($conditions))? $conditions = '' : $conditions .= ' AND ';
+      $conditions .= $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
+    }
+    $this->update($attributeCode = 'Rubric.ListMenu.Limit.Show',$attributeValue = $this->show);
 
-      if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-      	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-      	if ($personalizeData) {
-      	   $this->userPersonalize->setPersonalizeList($personalizeData);
-           $this->show = $this->userPersonalize->getPersonalizeValue('Rubric.ListMenu.Limit.Show');
-           $this->set('userPersonalize', $this->userPersonalize);
-      	}
-      }
+    $data = $this->Rubric->findAll($conditions, $fields=null, $this->order, $this->show, $this->page);
 
-      $conditions = '';
-      if ($this->mine_only){
-        $conditions .= 'creator_id = '.$this->rdAuth->id;
-      } else if ('A' != $this->rdAuth->role){
-        $conditions .= ' (creator_id = '.$this->rdAuth->id. ' OR availability = "public" ) ';
-      }
+    $paging['style'] = 'ajax';
+    $paging['link'] = '/rubrics/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&show_my_tool='.$this->mine_only.'&page=';
 
-      if (!empty($this->params['form']['livesearch']) && !empty($this->params['form']['select'])){
-        $pagination->loadingId = 'loading';
-        //parse the parameters
-        $searchField=$this->params['form']['select'];
-        $searchValue=$this->params['form']['livesearch'];
-        (empty($conditions))? $conditions = '' : $conditions .= ' AND ';
-        $conditions .= $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
-      }
-      $this->update($attributeCode = 'Rubric.ListMenu.Limit.Show',$attributeValue = $this->show);
-      $this->set('conditions',$conditions);
-      $this->set('event', $this->Event);
+    $paging['count'] = $this->Rubric->findCount($conditions);
+    $paging['show'] = array('10','25','50','all');
+    $paging['page'] = $this->page;
+    $paging['limit'] = $this->show;
+    $paging['direction'] = $this->direction;
+    $paging['mine'] = $this->mine_only;
+    $paging['result_count'] = count($data);
 
-	}
-	function previewRubric()
+    $this->set('paging', $paging);
+    $this->set('data', $data);
+  }
+
+  function previewRubric()
   {
     $this->layout = 'ajax';
 		$this->render('preview');

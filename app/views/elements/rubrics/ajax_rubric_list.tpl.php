@@ -15,7 +15,7 @@
 	<th width="5%"><?php echo $pagination->sortLink('Criteria',array('criteria','desc'))?></th>
 	<th width="5%"><?php echo $pagination->sortLink('Total Marks',array('total_marks','desc'))?></th>
 	<th width="27%"><?php echo $pagination->sortLink('Created By',array('created','desc'))?></th>
-	<!--th width="14%"><?php echo $pagination->sortLink('Last Updated By',array('modified','desc'))?></th-->
+	<!--th width="14%"><?php //echo $pagination->sortLink('Last Updated By',array('modified','desc'))?></th-->
   </tr>
 <?php $i = '0';?>
 <?php

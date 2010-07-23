@@ -85,6 +85,7 @@ class SimpleevaluationsController extends AppController
   	$paging['page'] = $this->page;
   	$paging['limit'] = $this->show;
   	$paging['direction'] = $this->direction;
+    $paging['result_count'] = count($data);
 
   	$this->set('paging',$paging);
   	$this->set('data',$data);
@@ -220,6 +221,7 @@ class SimpleevaluationsController extends AppController
       $paging['limit'] = $this->show;
       $paging['direction'] = $this->direction;
       $paging['mine'] = $this->mine_only;
+      $paging['result_count'] = count($data);
 
       $this->set('paging', $paging);
       $this->set('data', $data);
