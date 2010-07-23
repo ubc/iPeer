@@ -23,7 +23,7 @@ var strTemp = "";
     return"";
   }
   var iTemp = v_length -1;
-  
+
   while(iTemp > -1){
     if(VALUE.charAt(iTemp) == w_space){
   }
@@ -32,7 +32,7 @@ var strTemp = "";
     break;
   }
   iTemp = iTemp-1;
-  
+
   } //End While
 return strTemp;
 
@@ -45,9 +45,9 @@ var w_space = String.fromCharCode(32);
   }
   var v_length = VALUE.length;
   var strTemp = "";
-  
+
   var iTemp = 0;
-  
+
   while(iTemp < v_length){
     if(VALUE.charAt(iTemp) == w_space){
   }
@@ -71,7 +71,7 @@ gErrors = 0;
   //Check for Required Field in hidden input variable "required" is Empty or not
   if (document.getElementById('required') != null) {
 		requiresField = document.getElementById('required').value.split(' '); //get all required fields
-		for (i=0; i<requiresField.length; i++) {   
+		for (i=0; i<requiresField.length; i++) {
 			requiredF = requiresField[i];
 			requiredValue = document.getElementById(requiredF).value;
 			requiredLabel = document.getElementById(requiredF+'_label');
@@ -80,24 +80,22 @@ gErrors = 0;
 			  gErrors = gErrors + 1;
 			  //Set its label color
 			  requiredLabel.style.color = '#ff0000';//error messages are changed to red
-			}
-			else {
+			} else {
 			  //Check its valiate return error or not
 			  requiredMessage = document.getElementById(requiredF+'_msg');
-			  if (Trim(requiredMessage.innerHTML) != '' || Trim(requiredMessage.innerHTML) != '\n' )
-				{
-				requiredLabel.style.color = '#000000';//the color is changed to blank or stays black
-			  }
-			  else
-			  {
-
-				gErrors = gErrors + 1; //the error count increases by 1
-				requiredLabel.style.color = '#ff0000';//error messages are changed to red
-			  }
+              if (requiredMessage != null) { // Fix for bug #210 in IE
+                if (Trim(requiredMessage.innerHTML) != '' || Trim(requiredMessage.innerHTML) != '\n' )
+                    {
+                    requiredLabel.style.color = '#000000';//the color is changed to blank or stays black
+                } else {
+                    gErrors = gErrors + 1; //the error count increases by 1
+                    requiredLabel.style.color = '#ff0000';//error messages are changed to red
+                }
+              }
 			}
 	  }
   }
-  
+
   //Check for error message for all type of valiation error
 /*  tables = document.getElementsByTagName('td');
 	for (j=0; j<tables.length; j++)
@@ -124,7 +122,7 @@ gErrors = 0;
 		gErrors = 0;// reset errors to 0
 		return false;
 	}
-	else 
+	else
 	{
 		return true;
 	}

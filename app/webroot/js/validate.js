@@ -26,33 +26,36 @@ function attachFormHandlers()
 }
 
 var gContinue = true;
-function attach(objInput)
-{
-  var sVal = objInput.value; //get value inside of input field
-  var sFeedBack; //feedback is the feedback message sent back to the user
-  gContinue = true;
+function attach(objInput) {
+    var sVal = objInput.value; //get value inside of input field
+    var sFeedBack; //feedback is the feedback message sent back to the user
+    gContinue = true;
 
-  var sRules = objInput.className.split(' '); // get all the rules from the input box classname
-  var sValidate = sRules[0];                  // validate means we will validate the field
-  var sRequired = sRules[1];                  // required means field is required
-  var sTypeCheck = sRules[2];                 // typecheck are additional validation rules (ie. email, phone, date)
-  var sFeedbackLoc = sRules[3];               // feedbackLoc is the td id where feedback is sent to.
-  var sErrorMsg =  sRules[4];                 // error message if it is invalid
+    var sRules = objInput.className.split(' '); // get all the rules from the input box classname
+    var sValidate = sRules[0];                  // validate means we will validate the field
+    var sRequired = sRules[1];                  // required means field is required
+    var sTypeCheck = sRules[2];                 // typecheck are additional validation rules (ie. email, phone, date)
+    var sFeedbackLoc = sRules[3];               // feedbackLoc is the td id where feedback is sent to.
+    var sErrorMsg =  sRules[4];                 // error message if it is invalid
 
-  sFeedback = validateRequired (sRequired, sVal, sTypeCheck); //validateRequired() checks if it is required and then sends back feedback
+    sFeedback = validateRequired (sRequired, sVal, sTypeCheck); //validateRequired() checks if it is required and then sends back feedback
 
-  if (gContinue) //if it is required and blank gContinue is false and we don't validate anymore.  // this is done because if it is blank
-  //it will also fail other tests.  We don't want to spam the user with INVALID EMAIL!! if the field is still blank.
-  {
-    // check the different validation cases (ie: email, phone, etc.)
-    sFeedback = validateObject(sRequired, sTypeCheck, sVal, sErrorMsg);
-  }
-  // after validation is complete return the feedback
-  if (sFeedback == null || sFeedback == undefined) {
-    sFeedback = "";
-  }
-  document.getElementById(sFeedbackLoc).innerHTML = sFeedback;
+    if (gContinue) //if it is required and blank gContinue is false and we don't validate anymore.  // this is done because if it is blank
+    //it will also fail other tests.  We don't want to spam the user with INVALID EMAIL!! if the field is still blank.
+    {
+        // check the different validation cases (ie: email, phone, etc.)
+        sFeedback = validateObject(sRequired, sTypeCheck, sVal, sErrorMsg);
+    }
+    // after validation is complete return the feedback
+    if (sFeedback == null || sFeedback == undefined) {
+        sFeedback = "";
+    }
 
+    // Fixes bug #211
+    var sFeedbackLocElem = document.getElementById(sFeedbackLoc);
+    if (sFeedbackLocElem) {
+        sFeedbackLocElem.innerHTML = sFeedback;
+    }
 }
 
 function validateRequired(sRequired, sVal, sTypecheck)
