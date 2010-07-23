@@ -52,7 +52,7 @@ class SimpleevaluationsController extends AppController
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
  		$this->pageTitle = 'Simple Evaluations';
-    $this->mine_only = (!empty($_REQUEST['show_my_tool']) && 'on' == $_REQUEST['show_my_tool']) ? true : false;
+    $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
 
 		parent::__construct();
 	}
@@ -61,6 +61,7 @@ class SimpleevaluationsController extends AppController
 	{
 
     $this->pageTitle = 'Evaluation Tools';
+    $this->mine_only = true;
 
     $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
     $this->userPersonalize->setPersonalizeList($personalizeData);
@@ -77,7 +78,7 @@ class SimpleevaluationsController extends AppController
   	$data = $this->SimpleEvaluation->findAll($conditions, $fields=null, $this->order, $this->show, $this->page);
 
   	$paging['style'] = 'ajax';
-  	$paging['link'] = '/simpleevaluations/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
+  	$paging['link'] = '/simpleevaluations/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&show_my_tool='.$this->mine_only.'&page=';
 
   	$paging['count'] = $this->SimpleEvaluation->findCount($conditions);
   	$paging['show'] = array('10','25','50','all');
@@ -207,6 +208,21 @@ class SimpleevaluationsController extends AppController
 
       $this->update($attributeCode = 'SimpleEval.ListMenu.Limit.Show',$attributeValue = $this->show);
       $this->set('conditions',$conditions);
+
+      $data = $this->SimpleEvaluation->findAll($conditions, $fields=null, $this->order, $this->show, $this->page);
+
+      $paging['style'] = 'ajax';
+      $paging['link'] = '/simpleevaluations/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&show_my_tool='.$this->mine_only.'&page=';
+
+      $paging['count'] = $this->SimpleEvaluation->findCount($conditions);
+      $paging['show'] = array('10','25','50','all');
+      $paging['page'] = $this->page;
+      $paging['limit'] = $this->show;
+      $paging['direction'] = $this->direction;
+      $paging['mine'] = $this->mine_only;
+
+      $this->set('paging', $paging);
+      $this->set('data', $data);
   }
 
   function checkDuplicateTitle()

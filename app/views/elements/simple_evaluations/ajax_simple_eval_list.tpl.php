@@ -12,7 +12,7 @@
 	    <th><?php echo $pagination->sortLink('Description',array('description','desc'))?></th>
 	    <th width="20%"><?php echo $pagination->sortLink('Base Point/Member',array('point_per_member','desc'))?></th>
 	    <th width="23%"><?php echo $pagination->sortLink('Created',array('created','desc'))?></th>
-	    <!--th><?php echo $pagination->sortLink('Last Updated By',array('modified','desc'))?></th-->
+	    <!--th><?php //echo $pagination->sortLink('Last Updated By',array('modified','desc'))?></th-->
 	  </tr>
   	<?php $i = '0';?>
 	  <?php
