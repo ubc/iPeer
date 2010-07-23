@@ -116,7 +116,7 @@
 
     <tr class="tablecell2">
       <td align="center" colspan="3" id="password_label">
-      <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
+      <input type="button" name="Back" value="Back" onClick="window.location='<?php echo $this->webroot . "users/index" ?>'";>
 
       <?php echo $html->submit('Save') ?>
 
