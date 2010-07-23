@@ -22,7 +22,21 @@ function wopen(url, name, w, h)
 function showLimit(value, link, ajaxObj) {
 
     // a workaround for bug #191 in the users controller
+    // try searching for users/
     var position = window.location.toString().search("users/");
+
+    // Next, try searching for searchs/
+    if (position < 0) {
+        position = window.location.toString().search("searchs/");
+        if (position > 0) {
+            // Workaround fo #212 -
+            ajaxObj = "ajax_update"; // Since I don't want to replace these values in the calling
+                                     // Functions - i suspect they are correct in other lists, and
+                                    //   changing them would break those
+        }
+    }
+
+    // Replace if the above controllers were matched
     if (position > 0) {
         var upTree = window.location.toString().slice(0, position);
     } else {
