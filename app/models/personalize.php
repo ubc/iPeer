@@ -50,6 +50,12 @@ class Personalize extends AppModel
     }
     $this->save($data);
   }
+
+  function beforeSave()
+  {
+    $this->data[$this->name]['updated'] = date('Y-m-d H:i:s');
+    return true;
+  }
 }
 
 ?>

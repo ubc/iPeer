@@ -21,6 +21,7 @@ class PaginationHelper {
 	var $direction = 'desc';
 	var $updateId = 'ajax_update';
 	var $loadingId = 'loading';
+  var $result_count = null; // the count of the result returned. this may be different from recordCount, which is the whole count.
 
 	/**
 	 * Sets the default pagination options.
@@ -37,6 +38,7 @@ class PaginationHelper {
 			$this->show = isset($paging['show']) ? $paging['show'] : array();
 			$this->page = isset($paging['page']) ? $paging['page'] : '1';
 			$this->direction = isset($paging['direction']) ? $paging['direction'] : 'desc';
+      $this->result_count = isset($paging['result_count']) ? $paging['result_count'] : null;
 
 			$pageCount = ($paging['limit']!=0) ? ceil($paging['count'] / $paging['limit'] ):0;
 
@@ -114,7 +116,9 @@ class PaginationHelper {
 			}
 			else
 			{
-			*/	return $text.$this->_details['recordCount'];
+			*/	
+    $result_count_text = (null == $this->result_count) ? '' : $this->result_count.' of ';
+    return $text . $result_count_text . $this->_details['recordCount'];
 			//}
 	//	}
 		//return false;
@@ -156,30 +160,30 @@ class PaginationHelper {
 	**/
 	function googleNumbers($separator=null, $prefix=null, $pageSetLength=10, $prevLabel=null, $nextLabel=null)
 	{
-		if (empty($this->_pageDetails) || $this->_pageDetails['pageCount'] == 1) { return false; }
+		if (empty($this->_details) || $this->_details['pageCount'] == 1) { return false; }
 
 		$t = array();
 
-		$modulo = $this->_pageDetails['page'] % $pageSetLength;
+		$modulo = $this->_details['page'] % $pageSetLength;
 		if ($modulo)
 		{ // any number > 0
-			$prevSetLastPage = $this->_pageDetails['page'] - $modulo;
+			$prevSetLastPage = $this->_details['page'] - $modulo;
 		}
 		else
 		{ // 0, last page of set
-			$prevSetLastPage = $this->_pageDetails['page'] - $pageSetLength;
+			$prevSetLastPage = $this->_details['page'] - $pageSetLength;
 		}
 		//$nextSetFirstPage = $prevSetLastPage + $pageSetLength + 1;
 
-		if ($prevLabel) $t[] = $this->prevPage($prevLabel);
+		if ($prevLabel) $t[] = $this->prev($prevLabel);
 
 		// loops through each page number
 		$pageSet = $prevSetLastPage + $pageSetLength;
-		if ($pageSet > $this->_pageDetails['pageCount']) $pageSet = $this->_pageDetails['pageCount'];
+		if ($pageSet > $this->_details['pageCount']) $pageSet = $this->_details['pageCount'];
 
 		for ($pageIndex = $prevSetLastPage+1; $pageIndex <= $pageSet; $pageIndex++)
 		{
-			if ($pageIndex == $this->_pageDetails['page'])
+			if ($pageIndex == $this->_details['page'])
 			{
 				$t[] = '<em>'.$pageIndex.'</em>';
 			}
@@ -196,7 +200,7 @@ class PaginationHelper {
 			}
 		}
 
-		if ($nextLabel) $t[] = $this->nextPage($nextLabel);
+		if ($nextLabel) $t[] = $this->next($nextLabel);
 
 		$t = implode($separator, $t);
 

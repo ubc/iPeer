@@ -57,7 +57,7 @@
                 <?php echo $isStudent ? "Student Number" : "Username"; ?>
             </td>
             <td width="437">
-                <input type="text" name="newuser" id="newuser" class="validate required USERNAME_FORMAT newuser_msg Invalid_Username_Format." size="50">
+                <input type="text" name="newuser" id="newuser" class="validate required USERNAME_FORMAT newuser_msg Invalid_Username_Format." size="50"><br /><br />
                 <?php echo $isStudent ? "" : "<u>Remember:</u> Usernames must be at least 6 characters long and contain only:<li>letters, digits, _ (underscore) or @ (at symbol) or . (period) </li>"; ?>
                 <?php echo $ajax->observeField('newuser', array('update'=>'usernameErr', 'url'=>"checkDuplicateName/".$user_type, 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');stripe();")); ?>
             <div id='usernameErr' class="error">

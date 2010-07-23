@@ -86,12 +86,9 @@
 <table width="95%"  border="0" cellspacing="0" cellpadding="4">
   <tr>
     <td width="33%" align="left"><?php echo $pagination->result('Results: ')?></td>
-    <td width="33%"></td>
-    <td width="33%" align="right">
+    <td colspan="2" align="right">
 <?php if($pagination->set($paging)):?>
-		<?php echo $pagination->prev('Prev')?>
-		<?php echo $pagination->numbers()?>
-		<?php echo $pagination->next('Next')?>
+		<?php echo $pagination->googleNumbers(' ', null, 10, 'Prev', 'Next')?>
 <?php endif;?>
 	</td>
   </tr>

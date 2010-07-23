@@ -101,12 +101,13 @@ class UsersController extends AppController
           unset($data[$i][0]['enrol_count']);
         }
 
-        $queryAttributes = $this->getQueryAttribute($displayUserType, $courseId, true);
+        $queryAttributes = $this->getQueryAttribute($displayUserType, $courseId, null, true);
         $paging['count'] = $this->User->findCount($queryAttributes['condition'], 0, $queryAttributes['joinTable']);
         $paging['show'] = array('10','25','50'); //,'all');
         $paging['page'] = $this->page;
         $paging['limit'] = $this->show;
         $paging['direction'] = $this->direction;
+        $paging['result_count'] = count($data);
 
         $this->set('paging',$paging);
         $this->set('message', $message);
@@ -453,39 +454,19 @@ class UsersController extends AppController
                 $this->set('userPersonalize', $this->userPersonalize);
             }
         }
-        $condition = "";
+
+        $search_paramters = $this->getSearchParameters();
+        $condition = $this->getSearchCondition($search_paramters);
         $displayUserType = isset($this->params['form']['display_user_type']) ?
                             $this->params['form']['display_user_type'] : $displayUserType = $_GET['display_user_type'];
 
         //$courseId = $this->rdAuth->courseId;
-       $courseId  = isset($this->params['form']['course_id'] ) ?
-             $this->params['form']['course_id'] :
-             $_GET['course_id'];
-        $queryAttributes = $this->getQueryAttribute($displayUserType, $courseId);
+        $courseId  = isset($this->params['form']['course_id'] ) ? $this->params['form']['course_id'] : $_GET['course_id'];
+
+        $queryAttributes = $this->getQueryAttribute($displayUserType, $courseId, $condition);
         $fields = $queryAttributes['fields'];
         $condition = $queryAttributes['condition'];
         $joinTable = $queryAttributes['joinTable'];
-
-
-        $urlLiveSearchParam = isset($_GET['livesearch']) ? $_GET['livesearch'] : "";
-        $liveSearch = trim( !empty($this->params['form']['livesearch']) ?
-                $this->params['form']['livesearch'] : $urlLiveSearchParam);
-
-        $urlSelectParam = isset($_GET['select']) ? $_GET['select'] : "";
-        $select = !empty($this->params['form']['select']) ?
-                    $this->params['form']['select'] : $urlSelectParam;
-
-
-        if (!empty($liveSearch) && !empty($select))
-        {
-            $pagination->loadingId = 'loading';
-            //parse the parameters
-            if (!empty($displayUserType) )
-            {
-                $condition .= " AND ";
-            }
-            $condition .= $select." LIKE '%".mysql_real_escape_string($liveSearch)."%'";
-        }
 
         $this->update($attributeCode = 'User.ListMenu.Limit.Show',$attributeValue = $this->show);
 
@@ -493,25 +474,58 @@ class UsersController extends AppController
 
         $paging['style'] = 'ajax';
         $paging['link'] = '/users/search/?show=' . $this->show .
-          '&livesearch=' . $liveSearch . '&select=' . $select .
+          '&livesearch=' . $search_paramters['search'] . '&select=' . $search_paramters['select'] .
           '&display_user_type='.$displayUserType.'&course_id=' . $courseId .
           '&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
 
-        $queryAttributes = $this->getQueryAttribute($displayUserType, $courseId, true);
+        $condition = $this->getSearchCondition($search_paramters);
+        $queryAttributes = $this->getQueryAttribute($displayUserType, $courseId, $condition, true);
         $paging['count'] = $this->User->findCount($queryAttributes['condition'], 0, $queryAttributes['joinTable']);
-        $paging['show'] = array('10','25','50'); //'all');'
+        $paging['show'] = array('10','25','50'); //'all');
         $paging['page'] = $this->page;
         $paging['limit'] = $this->show;
         $paging['direction'] = $this->direction;
+        $paging['result_count'] = count($data);
 
         $this->set('paging',$paging);
         $this->set('data',$data);
         $this->set('courseId',$courseId);
     }
 
+    function getSearchParameters()
+    {
+      $urlLiveSearchParam = isset($_GET['livesearch']) ? $_GET['livesearch'] : "";
+      $liveSearch = trim( !empty($this->params['form']['livesearch']) ?
+                          $this->params['form']['livesearch'] : $urlLiveSearchParam);
+
+      $urlSelectParam = isset($_GET['select']) ? $_GET['select'] : "";
+      $select = !empty($this->params['form']['select']) ?
+        $this->params['form']['select'] : $urlSelectParam;
+
+      return array('select' => $select,
+                   'search' => $liveSearch);
+    }
+
+    function getSearchCondition($search_parameters = array())
+    {
+      $condition = array();
+
+      if(empty($search_paramters))
+      {
+        $search_paramters = $this->getSearchParameters();
+      }
+
+      if (!empty($search_parameters['search']) && !empty($search_paramters['select']))
+      {
+        $condition[] = $search_parameters['select'] . " LIKE '%".mysql_real_escape_string($search_paramters['search'])."%'";
+      }
+
+      return $condition;
+    }
+
     function checkDuplicateName($role='')
     {
-    	$isUserEnrol = false;
+      $isUserEnrol = false;
 	   	$sFound = $this->User->findUserByStudentNo($this->params['form']['newuser']);
 
     	if(!empty($sFound))
@@ -713,10 +727,10 @@ class UsersController extends AppController
     }
 
 
-    function getQueryAttribute($displayUserType = null, $courseId = null, $is_count = false)
+    function getQueryAttribute($displayUserType = null, $courseId = null, $conditions = array(), $is_count = false)
     {
         $attributes = array('fields'    => 'User.id, User.username, User.role, User.first_name, User.last_name, User.email, User.created, User.creator_id, User.modified, User.updater_id',
-                            'condition' => array(),
+                            'condition' => $conditions,
                             'joinTable' => array());
         $joinTable = array();
 
