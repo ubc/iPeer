@@ -17,7 +17,9 @@
       </tr>
     <tr class="tablecell2">
       <td width="130" id="username_label">Username:*</td>
-      <td width="337"><?php echo $html->input('User/username', array('size'=>'50', 'disabled'=>'true')) ?></td>
+      <td width="337"><?php echo $html->hidden('User/username'); ?>
+        <input type="text" value="<?php echo $params['data']['User']['username']?>" size=50 disabled=true /></td>
+
       <td width="663" id="username_msg" class="error"></td>
     </tr>
     <tr class="tablecell2">

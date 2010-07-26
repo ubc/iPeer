@@ -326,6 +326,7 @@ class UsersController extends AppController
                         $this->redirect("/users/index/The user was edited.");
                     } else {
                     	$this->Output->br2nl($this->params['data']);
+                    	$this->set('errmsg', $this->User->errorMessage);
                         $this->set('data', $this->params['data']);
                         $this->render();
                     }
