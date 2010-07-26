@@ -185,50 +185,48 @@ class Course extends AppModel
     if ($userRole == 'S') {
       $course =  $this->findBySql('SELECT * FROM courses WHERE id IN ( SELECT DISTINCT course_id FROM user_enrols WHERE user_id = '.$userId.') ORDER BY course');
       return $course;
-    }
-    else {
-      if ($userId == 1) {
+    } else  if ($userRole == 'A') {
         if ($condition !=null) {
           return $this->findBySql('SELECT * FROM courses WHERE '.$condition.' ORDER BY course');
         } else {
           return $this->findBySql('SELECT * FROM courses ORDER BY course');
         }
-      }
-      else {
+      } else {
         if ($condition !=null) {
-          $course =  $this->findBySql('SELECT * FROM courses WHERE record_status = "A" AND '.$condition.' AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' ) ORDER BY course');
+            $course =  $this->findBySql('SELECT * FROM courses WHERE record_status = "A" AND '.$condition.' AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' ) ORDER BY course');
         } else {
-          $course =  $this->findBySql('SELECT * FROM courses WHERE record_status = "A" AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' ) ORDER BY course');
+            $course =  $this->findBySql('SELECT * FROM courses WHERE record_status = "A" AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' ) ORDER BY course');
         }
+
         return $course;
-      }
     }
+
+    return false;
+
   }
 
   // Find the record count of all accessible courses
   function findAccessibleCoursesCount($userId=null, $userRole=null, $condition=null){
 
     if ($userRole == 'S') {
-      $course =  $this->findBySql('SELECT COUNT(DISTINCT course_id) as total FROM user_enrols WHERE user_id = '.$userId);
-      return $course;
-    }
-    else {
-      if ($userId == 1) {
+        $course =  $this->findBySql('SELECT COUNT(DISTINCT course_id) as total FROM user_enrols WHERE user_id = '.$userId);
+        return $course;
+    } else if ($userRole == 'A') {
         if ($condition !=null) {
           return $this->findBySql('SELECT COUNT(*) AS total FROM courses WHERE '.$condition);
         } else {
           return $this->findBySql('SELECT COUNT(*) AS total FROM courses');
         }
-      }
-      else {
+    } else {
         if ($condition !=null) {
           $course =  $this->findBySql('SELECT COUNT(*) as total FROM courses WHERE record_status = "A" AND '.$condition.' AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' )');
-        }else {
+        } else {
           $course =  $this->findBySql('SELECT COUNT(*) as total FROM courses WHERE record_status = "A" AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' )');
         }
         return $course;
-      }
     }
+
+    return false;
   }
 
   // Find all accessible courses id
