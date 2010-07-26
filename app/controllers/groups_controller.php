@@ -113,46 +113,45 @@ class GroupsController extends AppController
 				$this->redirect('/groups/index/The groups were added successfully.');
 
 			} else {
+                // Error occured
                 $this->Session->setFlash('Please correct the error below.');
 				$this->render();
 			}
 		}
   }
 
-  function edit ($id=null)
-  {
-    $courseId = $this->rdAuth->courseId;
-   	$this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Groups';
+    function edit ($id=null)
+    {
+        $courseId = $this->rdAuth->courseId;
+        $this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Groups';
 
-		// gets all students not listed in the group for unfiltered box
-		$this->set('user_data', $this->Group->groupDifference($id,$courseId));
+        if (!empty($this->params['data'])) {
+            $id = $this->params['data']['Group']['id'];
+            $data2save = $this->Group->prepData($this->params);
+            if ( $this->Group->save($data2save['data'])) {
+                $this->GroupsMembers->updateMembers($this->Group->id, $data2save['data']['Group']);
+                $this->redirect('/groups/index/The group was updated successfully.');
+            } else {
+                // Error occurs:
+                // todo: display error message
+                $this->redirect('/groups/index/Error saving that group.');
 
-		// gets all students in the group
-		$this->set('group_data', $this->Group->groupStudents($id));
-    $this->set('group_id', $id);
+            }
+        }
 
-		if (empty($this->params['data']))
-		{
-			$this->Group->setId($id);
-			$this->params['data'] = $this->Group->read();
-			$this->render('edit');
-		}
-		else
-		{
-			$this->params = $this->Group->prepData($this->params);
+        // gets all students not listed in the group for unfiltered box
+        $this->set('user_data', $this->Group->groupDifference($id,$courseId));
 
-			if ( $this->Group->save($this->params['data']))
-			{
-				$this->GroupsMembers->updateMembers($this->Group->id, $this->params['data']['Group']);
+        //gets all students in the group
+        $this->set('group_data', $this->Group->groupStudents($id));
+        $this->set('group_id', $id);
 
-				$this->redirect('/groups/index/The groups were updated successfully.');
-			}
-			else
-			{
-				$this->set('data', $this->params['data']);
-				$this->render();
-			}
-		}
+        $groupData = $this->Group->findById($id);
+        if(empty($groupData)) {
+            $this->redirect('/groups/index/Group Not Found.');
+        }
+
+        $this->params['data'] = $groupData;
   }
 
   function delete ($id)

@@ -49,14 +49,7 @@ class Group extends AppModel
         $this->data[$this->name]['group_name'] =
             str_replace("'", "", $this->data[$this->name]['group_name']);
 
-		$allowSave = true;
-		if (empty($this->data[$this->name]['group_num'])) {
-			//$this->errorMessage = 'Group number is required.'; //ajax bug
-			//$allowSave = false;
-		} else
-			//check the duplicate course
-			//$allowSave = $this->__checkDuplicateGroupNum();
-		return $allowSave;
+		return true;
 	}
 
   function getCourseGroupCount($courseId=null) {
