@@ -268,7 +268,7 @@ class GroupsController extends AppController
 			$resultAry = $this->addGroupByImport($this->params['data'], $lines);
             $this->set('data', $resultAry);
 
-            $this->redirect('/groups/index/The groups were added successfully.');
+            $this->redirect('/groups/index/The group was added successfully.');
 		} else {
 		  $this->set('errmsg', $$validUploads);
 		  $this->set('user_data', $this->User->getEnrolledStudents($courseId));
@@ -280,30 +280,30 @@ class GroupsController extends AppController
   function addGroupByImport($data=null, $lines=null)
 	{
 	  $groupNo = '';
-		for ($i = 1; $i < count($lines); $i++) {
+		for ($i = 0; $i < count($lines); $i++) {
 			// Split fields up on line by '
 			$line = split(',', $lines[$i]);
 
-  		$data['Group']['id'] = null;
-  		//$data['Group']['student_no'] = trim($line[0]);
-$data['Group']['username'] = trim($line[0]);
-  		$data['Group']['group_num'] = trim($line[1]);
-  		$data['Group']['group_name'] = trim($line[2]);
-      $data['Group']['creator_id'] = $this->rdAuth->id;
+            $data['Group']['id'] = null;
+            //$data['Group']['student_no'] = trim($line[0]);
+            $data['Group']['username'] = trim($line[0]);
+            $data['Group']['group_num'] = trim($line[1]);
+            $data['Group']['group_name'] = trim($line[2]);
+            $data['Group']['creator_id'] = $this->rdAuth->id;
 			if ($groupNo != $data['Group']['group_num']) {
-			  $this->Group->save($data);
+                $this->Group->save($data);
 			}
 
 			// add members into the groups_members table
 			$groupMember['GroupsMembers']['group_id'] = $this->Group->id;
 			//$user = $this->User->find('student_no = '.$data['Group']['student_num']);
-$user = $this->User->find('username = '.$data['Group']['username']);
+            $user = $this->User->find('username = '.$data['Group']['username']);
 			$groupMember['GroupsMembers']['user_id'] = $user['User']['id'];
 			$this->GroupsMembers->save($groupMember);
 			$this->GroupsMembers->id = null;
 
 			$groupNo = $data['Group']['group_num'];
-    }
+        }
 	}
 
 	function update($attributeCode='',$attributeValue='') {
