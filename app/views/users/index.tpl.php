@@ -4,6 +4,18 @@
 		<form id="searchForm" action="">
 		<table width="95%" border="0" cellspacing="0" cellpadding="2">
   		<tr>
+
+          <!--  <br />
+
+            <?php //echo $this->renderElement("list/ajaxList",
+                  //      array(  "controller" => "users",
+                  //              "columns" => array("username", "role"))); ?>
+
+           <br />
+
+            -->
+
+
 			<td width="10" height="32"><?php echo $html->image('magnify.png', array('alt'=>'Magnify Icon'));?></td>
 			<td width="35"> <b>Search:</b> </td>
 			<td width="35"><select name="select" >

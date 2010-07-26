@@ -549,11 +549,18 @@ class UsersController extends AppController
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
 
+        // Read the user
+        $userData = $this->User->findById($userId);
+        if (empty($userData)) {
+            $this->redirect("/users/index/User Not Found");
+        }
+
         //General password
-        $this->params['data']['User']['password'] =  $this->NeatString->randomPassword(6);
-        $this->params['data']['User']['id'] =  $userId;
+        $userData['User']['password'] =  $this->NeatString->randomPassword(6);
+        $userData['User']['id'] =  $userId;
+
         //Save Data
-        if ($this->User->save($this->params['data'])) {
+        if ($this->User->save($userData)) {
             $message = "Password successfully reset. ";
             $this->User->setId($userId);
             $user = $this->User->read();
@@ -568,7 +575,7 @@ class UsersController extends AppController
             $to = $user['User']['email'];
             $fullname = $user['User']['first_name'] . " " . $user['User']['last_name'];
             $email_msg = ereg_replace("<user>", $fullname, $email_msg);
-            $email_msg = ereg_replace("<newpassword>", $this->params['data']['User']['password'], $email_msg);
+            $email_msg = ereg_replace("<newpassword>", $userData['User']['password'], $email_msg);
 
             // send email to user
             $success = $this->sendEmail( $to, $from, $subject, $email_msg );
@@ -581,29 +588,25 @@ class UsersController extends AppController
                 if(!isset($to) || strlen($to) < 1) {
                     $message .= 'No destination email address. ';
                 }
-                $message .= "Email didn't get sent.";
+                $message .= "Email was <u>not</u> sent to the user.";
                 $this->set('message', $message);
             }
 
             //Render to view page to display saved data
             //TODO: Allow to enter email and forward the password reset message to the user
-            $this->set('tmpPassword',$this->params['data']['User']['password']);
-            $this->set('userRole', $user['User']['role']);
+            $this->set('tmpPassword',$userData['User']['password']);
+            $this->set('userRole', $userData['User']['role']);
             $this->set('data', $user);
             $this->render('userSummary');
 
-        }
-        //Found error
-        else {
+        } else {         //Found error
             $this->set('data', $this->params['data']);
 
             //Validate the error why the User->save() method returned false
             $this->validateErrors($this->User);
-            $this->set('errmsg', $this->User->errorMessage);
 
             //Get render page according to the user type
-            $renderPage = $this->__getRenderPage($this->params['data']['User']['role']);
-            $this->render($renderPage);
+            $this->redirect("/users/index/" . $this->User->errorMessage);
 
         }//end if
 
@@ -669,10 +672,17 @@ class UsersController extends AppController
             // Split fields up on line by '
             $line = split(',', $lines[$i]);
 
+            // Set up the password lines
+            if (isset($line[1])) {
+                $trimmedPassword = trim($line[1]);
+            } else {
+                $trimmedPassword = "";
+            }
+
             $data['User']['id'] = null;
             $data['User']['username']     = isset($line[0]) ? trim($line[0]) : "";
-            $data['User']['tmp_password'] = isset($line[1]) ? trim($line[1]) : "";
-            $data['User']['password']     = isset($line[1]) ? md5(trim($line[1])) : "";
+            $data['User']['tmp_password'] = $trimmedPassword;
+            $data['User']['password']     = $trimmedPassword; // Will be hashed by the Users controller
             $data['User']['student_no']   = isset($line[2]) ? trim($line[2]) : "";
             $data['User']['email']        = isset($line[3]) ? trim($line[3]) : "";
             $data['User']['first_name']   = isset($line[4]) ? trim($line[4]) : "";

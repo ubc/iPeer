@@ -13,6 +13,7 @@ class AppController extends Controller  {
 	var $startpage = 'pages';
 	var $components = array('rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework');
 	var $beforeFilter =	 array('checkAccess', 'checkDatabaseVersion');
+	var $helpers = array('Html', 'Javascript');
 	var $access = array ();
 	var $actionList = array ();
 
