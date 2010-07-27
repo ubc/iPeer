@@ -25,7 +25,6 @@
  * @subpackage
  * @since
  */
-require_once('XML/RPC.php');
 uses('sanitize', 'neat_string');
 class LoginoutController extends AppController
 {
@@ -213,29 +212,8 @@ class LoginoutController extends AppController
 	}
 
 	function loginByCWL() {
+    require_once('XML/RPC.php');
 		$this->autoRender = false;
-		/**
-		 * the URL of the CWL login page
-		 */
-		$CWLLoginURL = 'https://www.auth.cwl.ubc.ca/auth/login';
-
-		// CWL XML-RPC interface URLs: https://www.auth.verf.cwl.ubc.ca/auth/rpc (for verification)
-		//                             https://www.auth.cwl.ubc.ca/auth/rpc
-		$CWLRPCURL = "https://www.auth.cwl.ubc.ca";
-		$CWLRPCPath = "/auth/rpc";
-
-		/**
-		 * the name of the function being called through XML-RPC. this is
-		 * prepended with 'session.' later
-		 */
-		//$CWLFunctionName = 'getLoginName';
-		$CWLFunctionName = 'getIdentities';
-
-		/**
-		 * the application's ID/name and password as given by the CWL team
-		 */
-		$applicationID = 'cis_ipeer_psa';
-		$applicationPassword = 'p33k4b00';
 
 		$ticket = $_GET['ticket'];
 		if ($ticket != null) {
@@ -246,10 +224,10 @@ class LoginoutController extends AppController
 			$params = array( new XML_RPC_Value($ticket, 'string') );
 
 			// note that the function name is prepended with the string 'session.'
-			$msg = new XML_RPC_Message("session.$CWLFunctionName", $params);
+			$msg = new XML_RPC_Message("session.".$CWL['FunctionName'], $params);
 
-			$cli = new XML_RPC_Client($CWLRPCPath, $CWLRPCURL);
-			$cli->setCredentials($applicationID, $applicationPassword);
+			$cli = new XML_RPC_Client($CWL['RPCPath'], $CWL['RPCURL']);
+			$cli->setCredentials($CWL['applicationID'], $CWL['applicationPassword']);
 			//print_r ($cli);
 			//$cli->setDebug(1);
 
@@ -362,6 +340,8 @@ class LoginoutController extends AppController
 		$sysParameter = $this->sysContainer->getParamByParamCode('custom.login_control');
 		//Check whether we are using the general ipeer login page
 		if (isset($sysParameter['parameter_value']) && $sysParameter['parameter_value'] != 'ipeer') {
+      global $CWL;
+      $this->set('CWL', $CWL);
 
 			//Setup Custom parameter
 			$this->Session->write('ipeerSession.customIntegrateCWL', 1);

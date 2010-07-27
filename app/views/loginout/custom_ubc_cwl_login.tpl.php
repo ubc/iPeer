@@ -1,4 +1,3 @@
-
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
 <tr>
@@ -14,10 +13,8 @@
             <td height="93" background="../img/layout/small_table_back.gif"><table width="199" border="0" cellpadding="6" cellspacing="0">
                 <tr>
                   <td width="62">For Students:</td>
-                 <td width="140"><A HREF="https://www.auth.cwl.ubc.ca/auth/login?serviceName=cis_ipeer_psa&serviceURL=https://ipeer.apsc.ubc.ca/prod/loginout/loginByCWL">
-
-		<IMG SRC="https://www.auth.cwl.ubc.ca/CWL_login_button.gif " WIDTH="76" HEIGHT="25" ALT="CWL Login" BORDER="0">
-									</A>
+                 <td width="140">
+                    <A HREF="<?php echo $CWL['LoginURL'].'?serviceName='.$CWL['applicationID'].'&serviceURL=https://'.$_SERVER['SERVER_NAME'].$html->url('/loginout/loginByCWL', true)?>"><IMG SRC="https://www.auth.cwl.ubc.ca/CWL_login_button.gif " WIDTH="76" HEIGHT="25" ALT="CWL Login" BORDER="0"></A>
 									</td>
                 </tr>
                 <tr>
