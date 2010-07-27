@@ -4,14 +4,6 @@
 <?php if($pagination->set($paging)):?>
 <?php endif;?>
 <table width="95%" border="0" cellspacing="2" cellpadding="4">
-	  <tr>
-	    <td colspan="7">
-      <?php
-      echo $this->renderElement('evaltools/tools_menu', array());
-      ?>
-	    </td>
-	    <td align="right" colspan="2">	<?php echo $pagination->show('Show ',null,'rubric_table')?></td>
-	  </tr>
 <tr class="tableheader">
 	<?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
 	<th width="15%">Actions</th>
@@ -23,7 +15,7 @@
 	<th width="5%"><?php echo $pagination->sortLink('Criteria',array('criteria','desc'))?></th>
 	<th width="5%"><?php echo $pagination->sortLink('Total Marks',array('total_marks','desc'))?></th>
 	<th width="27%"><?php echo $pagination->sortLink('Created By',array('created','desc'))?></th>
-	<!--th width="14%"><?php echo $pagination->sortLink('Last Updated By',array('modified','desc'))?></th-->
+	<!--th width="14%"><?php //echo $pagination->sortLink('Last Updated By',array('modified','desc'))?></th-->
   </tr>
 <?php $i = '0';?>
 <?php
@@ -38,7 +30,7 @@ foreach ($data as $row): $rubric = $row['Rubric']; ?>
       <?php echo $html->image('icons/editdisabled.gif',array('border'=>'0','alt'=>'Edit'))?>
     <?php endif;?>
     <?php if ($rdAuth->id == $rubric['creator_id'] or $rdAuth->role=='A'): ?>
-      <a href="<?php echo $this->webroot.$this->themeWeb.'rubrics/delete/'.$rubric['id']?>" onclick="return confirm('All associating events and evaluation data will be deleted as well.\n Are you sure you want to delete rubric &ldquo;<?=$rubric['name']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
+      <a href="<?php echo $this->webroot.$this->themeWeb.'rubrics/delete/'.$rubric['id']?>" onclick="return confirm('All associating events and evaluation data will be deleted as well.\n Are you sure you want to delete rubric &ldquo;<?php echo $rubric['name']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
     <?php else: ?>
        <?php echo $html->image('icons/deletedisabled.gif',array('border'=>'0','alt'=>'Delete'))?>
     <?php endif;?>

@@ -1,16 +1,16 @@
 <?php
-/* SVN FILE: $Id: simpleevaluations_controller.php,v 1.3 2006/09/13 18:19:23 kamilon Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
- * 
+ *
  * @filesource
  * @copyright    Copyright (c) 2006, .
  * @link
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.3 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/09/13 18:19:23 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -28,7 +28,7 @@
 uses('neat_string');
 class SimpleevaluationsController extends AppController
 {
-    var $name = 'SimpleEvaluations';
+  var $name = 'SimpleEvaluations';
 
 	var $show;
 	var $sortBy;
@@ -43,22 +43,25 @@ class SimpleevaluationsController extends AppController
 
 	function __construct()
 	{
-		$this->Sanitize = &new Sanitize;
-		$this->NeatString = &new NeatString;
-		$this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
+		$this->Sanitize = new Sanitize;
+		$this->NeatString = new NeatString;
+		$this->show = empty($_REQUEST['show'])? 'null': $this->Sanitize->paranoid($_REQUEST['show']);
 		if ($this->show == 'all') $this->show = 99999999;
 		$this->sortBy = empty($_GET['sort'])? 'name': $_GET['sort'];
 		$this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
  		$this->pageTitle = 'Simple Evaluations';
+    $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
+
 		parent::__construct();
 	}
 
 	function index($msg=null)
 	{
-	  
+
     $this->pageTitle = 'Evaluation Tools';
+    $this->mine_only = true;
 
     $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
     $this->userPersonalize->setPersonalizeList($personalizeData);
@@ -70,18 +73,19 @@ class SimpleevaluationsController extends AppController
       $this->update($attributeCode = 'SimpleEval.ListMenu.Limit.Show',$attributeValue = $this->show);
   	}
 
-  	
+
   	$conditions = 'creator_id = '.$this->rdAuth->id;
   	$data = $this->SimpleEvaluation->findAll($conditions, $fields=null, $this->order, $this->show, $this->page);
 
   	$paging['style'] = 'ajax';
-  	$paging['link'] = '/simpleevaluations/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
+  	$paging['link'] = '/simpleevaluations/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&show_my_tool='.$this->mine_only.'&page=';
 
   	$paging['count'] = $this->SimpleEvaluation->findCount($conditions);
   	$paging['show'] = array('10','25','50','all');
   	$paging['page'] = $this->page;
   	$paging['limit'] = $this->show;
   	$paging['direction'] = $this->direction;
+    $paging['result_count'] = count($data);
 
   	$this->set('paging',$paging);
   	$this->set('data',$data);
@@ -123,10 +127,6 @@ class SimpleevaluationsController extends AppController
       //Found error
       else {
         $this->set('data', $this->params['data']);
-
-        //Validate the error why the SimpleEvaluation->save() method returned false
-        $this->validateErrors($this->SimpleEvaluation);
-        $this->set('errmsg', $this->SimpleEvaluation->errorMessage);
         $this->render();
       }//end if
 		}
@@ -145,7 +145,7 @@ class SimpleevaluationsController extends AppController
 		else
 		{
       if (empty($this->params['data']['SimpleEvaluation']['name'])) $this->params['data']['SimpleEvaluation']['name'] = $this->params['form']['newtitle'];
-		  
+
 			if ( $this->SimpleEvaluation->save($this->params['data']))
 			{
   			$this->redirect('/simpleevaluations/index/The record is updated successfully.');
@@ -160,16 +160,15 @@ class SimpleevaluationsController extends AppController
 
 	function copy($id=null)
 	{
-	  $this->render = false;
+        $this->render = false;
 		$this->params['data'] = $this->SimpleEvaluation->read();
-    $this->params['data']['SimpleEvaluation']['id'] = null;
-    $this->params['data']['SimpleEvaluation']['name'] = null;
+        $this->params['data']['SimpleEvaluation']['id'] = null;
+        $this->params['data']['SimpleEvaluation']['name'] = "";
 		//converting nl2br back so it looks better
 		$this->Output->br2nl($this->params['data']);
-    $this->render('add');
-    
+        $this->render('add');
 	}
-	
+
 	function delete($id)
 	{
     if (isset($this->params['form']['id']))
@@ -194,22 +193,38 @@ class SimpleevaluationsController extends AppController
       	}
       }
       $conditions = '';
-      if (!empty($this->params['form']['show_my_tool']) && $this->params['form']['show_my_tool']){
+      if ($this->mine_only){
         $conditions .= 'creator_id = '.$this->rdAuth->id;
       }
-      
+
       if (!empty($this->params['form']['livesearch']) && !empty($this->params['form']['select'])){
         $pagination->loadingId = 'loading';
         //parse the parameters
         $searchField=$this->params['form']['select'];
         $searchValue=$this->params['form']['livesearch'];
-        
+
         (empty($conditions))? $conditions = '' : $conditions .= ' AND ';
         $conditions .= $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
       }
-      
+
       $this->update($attributeCode = 'SimpleEval.ListMenu.Limit.Show',$attributeValue = $this->show);
       $this->set('conditions',$conditions);
+
+      $data = $this->SimpleEvaluation->findAll($conditions, $fields=null, $this->order, $this->show, $this->page);
+
+      $paging['style'] = 'ajax';
+      $paging['link'] = '/simpleevaluations/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&show_my_tool='.$this->mine_only.'&page=';
+
+      $paging['count'] = $this->SimpleEvaluation->findCount($conditions);
+      $paging['show'] = array('10','25','50','all');
+      $paging['page'] = $this->page;
+      $paging['limit'] = $this->show;
+      $paging['direction'] = $this->direction;
+      $paging['mine'] = $this->mine_only;
+      $paging['result_count'] = count($data);
+
+      $this->set('paging', $paging);
+      $this->set('data', $data);
   }
 
   function checkDuplicateTitle()

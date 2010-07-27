@@ -9,17 +9,15 @@ class EvaluationRubric extends AppModel
                           'className' => 'EvaluationRubricDetail',
                           'conditions' => '',
                           'order' => '',
-                          'dependent' => true,
-                          'foreignKey' => 'evaluation_rubric_id'
+                          'dependent' => true
                       )
   								);
 
-	var $belongsTo = array(
+/*	var $belongsTo = array(
 									 			'Rubric' => array(
 									 			  'className' => 'Rubric',
-									 			  'foreignKey' => 'id'
 									 			)
-									 );
+									 );*/
 
 	function getEvalRubricByGrpEventIdEvaluatorEvaluatee($grpEventId=null, $evaluator=null, $evaluatee=null){
 		return $this->find('grp_event_id='.$grpEventId.' AND evaluator='.$evaluator.' AND evaluatee='.$evaluatee);

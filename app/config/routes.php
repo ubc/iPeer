@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: routes.php,v 1.4 2006/06/20 18:44:08 zoeshum Exp $ */
+/* SVN FILE: $Id$ */
 /**
  * Short description for file.
  *
@@ -23,7 +23,7 @@
  * @package			cake
  * @subpackage		cake.app.config
  * @since			CakePHP v 0.2.9
- * @version			$Revision: 1.4 $
+ * @version			$Revision$
  * @modifiedby		$LastChangedBy: phpnut $
  * @lastmodified	$Date: 2006/06/20 18:44:08 $
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License

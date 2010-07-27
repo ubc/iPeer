@@ -4,20 +4,13 @@
   <?php echo $javascript->link('groups')?>
 	  <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Event']['id'])?'add':'edit') ?>">
       <?php echo empty($params['data']['Event']['id']) ? null : $html->hidden('Event/id'); ?>
-      <input type="hidden" name="assigned" id="assigned" value="<?=$groupIDs?>"/>
+      <input type="hidden" name="assigned" id="assigned" value="<?php echo $groupIDs?>"/>
       <?php $event = $params['data'];?>
 
-<?php
-
-if ($event['Event']['id']==292) {
-	$event['Event']['description']=$this->controller->SimpleEvaluation->field('description','id=50');
-}
-
-?>
 
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
-    <td colspan="3" align="center"><?php echo empty($event['Event']['id'])?'Add':'Edit' ?> Evaluation Event</td>
+    <td colspan="3" align="center">View Evaluation Event</td>
     </tr>
     <tr class="tablecell2">
     	<td width="150" id="course_label">Course:</td>
@@ -110,7 +103,7 @@ if ($event['Event']['id']==292) {
     <td valign="top">Groups Assignment:&nbsp;</td>
     <td>
       <?php
-        $params = array('controller'=>'events', 'data'=>$assignedGroups);
+        $params = array('controller'=>'events', 'data'=>$assignedGroups, 'event_id' => $event_id, 'popup' => 'y');
         echo $this->renderElement('events/event_groups_detail', $params);
       ?>
 		</td>
@@ -121,7 +114,8 @@ if ($event['Event']['id']==292) {
   <tr>
     <td width="45%"><table width="403" border="0" cellspacing="0" cellpadding="4">
       <tr>
-        <td colspan="2"><?php echo $html->linkTo('Edit this Event', '/events/edit/'.$event['Event']['id'].';'.$rdAuth->courseId); ?> | <?php echo $html->linkTo('Back to Event Listing', '/events/index/'.$rdAuth->courseId); ?></td>
+        <td colspan="2"><?php
+        echo $html->linkTo('Edit this Event', '/events/edit/'.$event['Event']['id']); ?> | <?php echo $html->linkTo('Back to Event Listing', '/events/index/'.$rdAuth->courseId); ?></td>
       </tr></table>
     </td>
     <td align="right" width="55%"></td>

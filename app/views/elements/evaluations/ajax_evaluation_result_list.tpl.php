@@ -10,7 +10,7 @@
 	  <tr class="tableheader">
 	    <th>ID</th>
 	    <th>View</th>
-	    <th>Email<br>Group</th>
+<!--	    <th>Email<br>Group</th>-->
 	    <th>Group</th>
 	    <th>Completion Rate</th>
 	    <th>Status</th>
@@ -30,11 +30,11 @@
   	    <td align="center">
   		    <a href="<?php echo $this->webroot.$this->themeWeb.'evaluations/viewEvaluationResults/'.$data['Event']['id'].';'.$group['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
   	    </td>
-  		  <td>
+<!--  		  <td>
   		    <a href="<?php echo $this->webroot.$this->themeWeb.'evaluations/view/'.$group['id']?>"><?php echo $html->image('icons/email.gif',array('border'=>'0','alt'=>'View'))?></a>
-  	    </td>
+  	    </td>-->
   		  <td>
-  	      <a title="Group Submission Detail" href="<?php echo $this->webroot.$this->themeWeb;?>evaluations/viewGroupSubmissionDetails/<?=$data['Event']['id']?>;<?=$group['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo 'Group '.$group['group_num'].' - '.$group['group_name'] ?></a> &nbsp;
+  	      <a title="Group Submission Detail" href="<?php echo $this->webroot.$this->themeWeb;?>evaluations/viewGroupSubmissionDetails/<?php echo $data['Event']['id']?>;<?php echo $group['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo 'Group '.$group['group_num'].' - '.$group['group_name'] ?></a> &nbsp;
   	    </td>
         <td align="center"><?php echo '<b>'.$group['num_completed'].'</b> / <b>'.$group['num_members'].'</b> completed' ?></td>
   	    <td>

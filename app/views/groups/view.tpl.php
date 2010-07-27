@@ -7,9 +7,7 @@
     <td>
         <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
           <tr class="tableheader">
-            <td colspan="2" align="center">
-                View Group
-            </td>
+            <td colspan="2" align="center">View Group</td>
           </tr>
           <tr class="tablecell2">
             <td width="265">Group Number:&nbsp;</td>
@@ -26,24 +24,38 @@
           <tr class="tablecell2">
             <td valign="top">Members:</td>
             <td>
-				<?php
-				echo '<table width="100%" border="0" cellspacing="2" cellpadding="2">';
-				foreach($group_data as $row): $user = $row['users'];
-					echo '<tr>';
-					echo '<td width="15">'.$html->image('icons/email_icon.gif',array('border'=>'0','alt'=>'Email')).'</td><td>';
-					echo '<a href="../../users/view/'.$user['id'].'">'.$user['last_name'].', '.$user['first_name'].'</a><br>';
-					echo '</td></tr>';
-				endforeach;
-				echo '</table>';
-				?>
-			</td>
+				      <table width="100%" border="0" cellspacing="2" cellpadding="2">
+				      <?php foreach($group_data as $row): $user = $row['users']?>
+					      <tr>
+                  <td width="15"><?php echo $html->image('icons/email_icon.gif',array('border'=>'0','alt'=>'Email'))?></td>
+                  <td><a href="../../users/view/'<?php echo $user['id']?>"><?php echo $user['last_name'].', '.$user['first_name']?></a><br></td>
+                </tr>
+				      <?php endforeach;?>
+				      </table>
+			      </td>
           </tr>
-      </table>
+        </table>
+
         <table width="95%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">
           <tr>
             <td align="left"><?php echo $html->image('layout/corner_bot_left.gif',array('align'=>'middle','alt'=>'corner_bot_left'))?></td>
             <td align="right"><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'middle','alt'=>'corner_bot_right'))?></td>
           </tr>
-        </table>      </form></td>
+        </table> 
+
+        <table width="95%"  border="0" cellspacing="2" cellpadding="4">
+          <tr>
+            <td width="45%">
+              <table width="403" border="0" cellspacing="0" cellpadding="4">
+              <tr>
+                <td colspan="2"><?php echo $html->linkTo('Edit this Group', '/groups/edit/'.$data['Group']['id']); ?> | <?php echo $html->linkTo('Back to Group Listing', '/groups/index/'.$rdAuth->courseId); ?></td>
+              </tr>
+              </table>
+            </td>
+            <td align="right" width="55%"></td>
+          </tr>
+        </table>
+
+    </td>
   </tr>
 </table>

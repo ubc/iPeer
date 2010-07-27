@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: sysfunctions_controller.php,v 1.3 2006/08/22 17:31:26 davychiu Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.3 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/08/22 17:31:26 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -37,11 +37,12 @@ class SysFunctionsController extends AppController
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $NeatString;
 	var $Sanitize;
+    var $uses = array('SysFunction','Personalize');
 
 	function __construct()
 	{
-		$this->Sanitize = &new Sanitize;
-		$this->NeatString = &new NeatString;
+		$this->Sanitize = new Sanitize;
+		$this->NeatString = new NeatString;
 		$this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
 		if ($this->show == 'all') $this->show = 99999999;
 		$this->sortBy = empty($_GET['sort'])? 'id': $_GET['sort'];
@@ -54,49 +55,41 @@ class SysFunctionsController extends AppController
 
 	function index($message='')
 	{
-  	$data = $this->SysFunction->findAll($conditions=null, $fields=null, $this->order, $this->show, $this->page);
 
-  	$paging['style'] = 'ajax';
-  	$paging['link'] = '/sysfunctions/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
+        $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+        $this->userPersonalize->setPersonalizeList($personalizeData);
+        if ($personalizeData && $this->userPersonalize->inPersonalizeList('SysParam.ListMenu.Limit.Show')) {
+            $this->show = $this->userPersonalize->getPersonalizeValue('SysParam.ListMenu.Limit.Show');
+            $this->set('userPersonalize', $this->userPersonalize);
+        } else {
+            $this->show = '10';
+            $this->update($attributeCode = 'SysParam.ListMenu.Limit.Show',$attributeValue = $this->show);
+        }
+        $data = $this->SysFunction->findAll($conditions=null, $fields=null, $this->order, $this->show, $this->page);
 
-  	$paging['count'] = $this->SysFunction->findCount($conditions=null);
-  	$paging['show'] = array('10','25','50','all');
-  	$paging['page'] = $this->page;
-  	$paging['limit'] = $this->show;
-  	$paging['direction'] = $this->direction;
+        $searchIndexURL = isset($_GET['searchIndex']) ? $_GET['searchIndex'] : '';
+        $liveSearchURL  = isset($_GET['livesearch'])  ? $_GET['livesearch']  : '';
 
-    if (isset($message)) {
-      $this->set('message', $message);
-    }
+        $searchIndex = isset($this->params['form']['searchIndex']) ?
+            $this->params['form']['searchIndex'] : $searchIndexURL;
+        $liveSearch =  isset($this->params['form']['livesearch']) ?
+                    $this->params['form']['livesearch'] : $liveSearchURL;
 
-  	$this->set('paging',$paging);
-  	$this->set('data',$data);
+
+
+        if (isset($message)) {
+            $this->set('message', $message);
+        }
+
+        $this->set('data',$data);
+        $this->set('searchIndex',$searchIndex);
+        $this->set('liveSearch',$liveSearch);
 	}
 
 	function view($id)
 	{
-		$this->set('data', $this->SysFunction->read());
-	}
-
-	function add()
-	{
-		if (empty($this->params['data']))
-		{
-			$this->render();
-		}
-		else
-		{
-			if ($this->SysFunction->save($this->params['data']))
-			{
-				$message = 'The record is saved successfully';
-				$this->redirect('sysfunctions/index/'.$message);
-			}
-			else
-			{
-				$this->set('data', $this->params['data']);
-				$this->render('edit');
-			}
-		}
+        $data = $this->SysFunction->read();
+		$this->set('data', $data);
 	}
 
 	function edit($id=null)
@@ -134,22 +127,49 @@ class SysFunctionsController extends AppController
     }
   }
 
-  function search()
-  {
-    $this->layout = 'ajax';
-    $pagination->loadingId = 'loading';
+    function search()
+    {
+        if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
+            $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+            if ($personalizeData) {
+                $this->userPersonalize->setPersonalizeList($personalizeData);
+                $this->show = $this->userPersonalize->getPersonalizeValue('SysFunc.ListMenu.Limit.Show');
+                $this->set('userPersonalize', $this->userPersonalize);
+            }
+        }
 
-    $conditions = null;
 
-    if (isset($this->params['form']['livesearch'])){
-      $searchField=$this->params['form']['searchIndex'];
-      $searchValue=$this->params['form']['livesearch'];
+        $this->layout = 'ajax';
+        $pagination->loadingId = 'loading';
 
-      $conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
+        $conditions = null;
 
+        $searchIndexURL = isset($_GET['searchIndex']) ? $_GET['searchIndex'] : '';
+        $liveSearchURL  = isset($_GET['livesearch'])  ? $_GET['livesearch']  : '';
+
+        $searchIndex = isset($this->params['form']['searchIndex']) ?
+            $this->params['form']['searchIndex'] : $searchIndexURL;
+        $liveSearch =  isset($this->params['form']['livesearch']) ?
+                    $this->params['form']['livesearch'] : $liveSearchURL;
+
+        if (!empty($searchIndex) && !empty($liveSearch)){
+            $searchField = $searchIndex;
+            $searchValue = $liveSearch;
+
+            $conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
+
+        }
+
+        $this->set('conditions',$conditions);
+        $this->set('searchIndex', $searchIndex);
+        $this->set('liveSearch', $liveSearch);
+        $this->update($attributeCode = 'SysFunc.ListMenu.Limit.Show',$attributeValue = $this->show);
     }
-    $this->set('conditions',$conditions);
-  }
+
+    function update($attributeCode='',$attributeValue='') {
+        if ($attributeCode != '' && $attributeValue != '') //check for empty params
+        $this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
+    }
 }
 
 ?>

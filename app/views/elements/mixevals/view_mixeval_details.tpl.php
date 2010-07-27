@@ -34,7 +34,10 @@
       echo '<tr class="tablecell" align="center">';
       echo '<td class="tableheader2" valign="top" width="50%">';
 		  if (isset($evaluate)) {
-		     echo '<input type="hidden" name="selected_lom_'.$userId.'_'.$i.'" value="'.(isset($evaluation['EvaluationDetail'][$i-1]['EvaluationMixevalDetail']['selected_lom'])?$evaluation['EvaluationDetail'][$i-1]['EvaluationMixevalDetail']['selected_lom']:'').'">';
+		     echo '<input type="hidden" name="selected_lom_'.$userId.'_'.$i.'"';
+		     echo 'value="'.(isset($evaluation['EvaluationDetail'][$i-1]['EvaluationMixevalDetail']['selected_lom']) ?
+                    $evaluation['EvaluationDetail'][$i-1]['EvaluationMixevalDetail']['selected_lom'] :
+                    '1') . '">';
 		  } else {
         echo '<input type="hidden" name="selected_lom_'.$userId.'_'.$i.'" value="1" size="4" >';
       }
@@ -44,31 +47,39 @@
       echo $mixevalQuestion['title']."<br></td></tr></table>";
       echo $html->hidden('Mixeval/question_type'.$pos, array('value'=>'S'))."</td>";
 
-      //for loop to display the criteria comment cells for each LOM
-      for($j=1; $j<=$scale_default; $j++){
-        isset($mixevalQuestion['multiplier']) ? $multiplier = $mixevalQuestion['multiplier'] : $multiplier = 1;
+        //for loop to display the criteria comment cells for each LOM
+        for($j=1; $j<=$scale_default; $j++){
+            isset($mixevalQuestion['multiplier']) ? $multiplier = $mixevalQuestion['multiplier'] : $multiplier = 1;
 
-        if( $zero_mark == "on" ){
-          $mark_value = round( ($multiplier/($scale_default-1)*($j-1)) , 2);
+            if( $zero_mark == "on" ) {
+                $mark_value = round( ($multiplier/($scale_default-1)*($j-1)) , 2);
+            } else {
+                $mark_value = round( ($multiplier/$scale_default*$j) , 2);
+            }
+            echo '<td width="'.round(50/$scale_default).'%" valign="bottom">';
+            echo '<table border="0" width="100%" cellpadding="2"><tr align="center"><td width="100">';
+            echo $descriptor_des[$j].'&nbsp;';
+            echo "</td></tr>";
+            echo '<tr><td align="center" width="100">';
+            echo '<input name="'.$userId.'criteria_points_'.$i.'" type="radio" value="'.$mark_value.'"';
+            echo 'onclick="document.evalForm.selected_lom_'.$userId.'_'.$i.".value=".$j.'" ';
+
+            if (isset($evaluation)) {
+                if (isset($evaluation['EvaluationDetail'][$i-1]['EvaluationMixevalDetail']['selected_lom']) &&
+                    $evaluation['EvaluationDetail'][$i-1]['EvaluationMixevalDetail']['selected_lom'] == $j) {
+                        echo " checked ";
+                }
+            } else {
+                if ($j==1) {
+                    echo " checked ";
+                }
+            }
+            echo "/></td></tr>";
+            if (!$evaluate) {
+                echo '<tr><td align="center" width="20%">Mark: '.$mark_value.'</td></tr>';
+            }
+            echo "</table></td>";
         }
-        else{
-          $mark_value = round( ($multiplier/$scale_default*$j) , 2);
-        }
-        echo '<td width="'.round(50/$scale_default).'%" valign="bottom"><table border="0" width="100%" cellpadding="2"><tr align="center"><td width="100">';
-        echo $descriptor_des[$j].'&nbsp;';
-        echo "</td></tr>";
-					echo '<tr><td align="center" width="100"><input name="'.$userId.'criteria_points_'.$i.'" type="radio" value="'.$mark_value.'" onclick="document.evalForm.selected_lom_'.$userId.'_'.$i.'" ';
-					if (isset($evaluation)) {
-					  if (isset($evaluation['EvaluationDetail'][$i-1]['EvaluationMixevalDetail']['selected_lom']) && $evaluation['EvaluationDetail'][$i-1]['EvaluationMixevalDetail']['selected_lom'] == $j) echo " checked ";
-					} else {
-  					if ($j==1) echo " checked ";
-  				}
-					echo "/></td></tr>";
-        if (!$evaluate) {
-          echo '<tr><td align="center" width="20%">Mark: '.$mark_value.'</td></tr>';
-        }
-        echo "</table></td>";
-      }
 
       if (!$evaluate) {
         echo '<td>'.$multiplier.'</td>';
@@ -104,9 +115,9 @@
 
   ?>
       <tr class="tablecell" align="center">
-        <td class="tableheader2" valign="top" colspan="<?=$scale_default?>">
+        <td class="tableheader2" valign="top" colspan="<?php echo $scale_default?>">
           <table border="0" width="95%" cellpadding="2">
-            <tr><td width="5%"><?=$pos?>:</td>
+            <tr><td width="5%"><?php echo $pos?>:</td>
                 <td width="95%" align="left"> Question Prompt:
                   <?php echo  $mixevalQuestion['title'];
                    if ($evaluate) {
@@ -151,9 +162,9 @@
                      $Output->br2nl($text);
                      //echo $text;
                       ?>
-                     <textarea name="response_text_<?=$userId?>_<?=$mixevalQuestion['question_num']?>" cols="80" rows="15"><?=$text?></textarea>
-                   <?php } else { ?> 
-                     <input type="text" name="response_text_<?=$userId?>_<?=$mixevalQuestion['question_num']?>" size="80" value="<?= $evaluation['EvaluationDetail'][$pos-1]['EvaluationMixevalDetail']['question_comment']?>"/>
+                     <textarea name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['question_num']?>" cols="80" rows="15"><?php echo $text?></textarea>
+                   <?php } else { ?>
+                     <input type="text" name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['question_num']?>" size="80" value="<?php echo $evaluation['EvaluationDetail'][$pos-1]['EvaluationMixevalDetail']['question_comment']?>"/>
                    <?php }?>
 
                 </td></tr>
@@ -177,7 +188,7 @@
     <td colspan="3" align="center">
 <?php echo $html->hidden('Mixeval/total_question', array('value'=>$pos));?>
 <?php if (!$evaluate) :?>
-    <input type="button" name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller']; ?>'">
+    <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
 <?php endif; ?>
   </td>
   </tr>

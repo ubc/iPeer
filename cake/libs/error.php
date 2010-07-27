@@ -47,7 +47,7 @@ class ErrorHandler extends Object{
 	function __construct($method, $messages) {
 		parent::__construct();
 		static $__previousError = null;
-		$this->__dispatch =& new Dispatcher();
+		$this->__dispatch = new Dispatcher();
 
 		if ($__previousError != array($method, $messages)) {
 			$__previousError = array($method, $messages);
@@ -56,14 +56,14 @@ class ErrorHandler extends Object{
 				loadController(null);
 			}
 
-			$this->controller =& new AppController();
+			$this->controller = new AppController();
 			$this->__dispatch->start($this->controller);
 
 			if (method_exists($this->controller, 'apperror')) {
 				return $this->controller->appError($method, $messages);
 			}
 		} else {
-			$this->controller =& new Controller();
+			$this->controller = new Controller();
 		}
 		if (DEBUG > 0 || $method == 'error') {
 			call_user_func_array(array(&$this, $method), $messages);

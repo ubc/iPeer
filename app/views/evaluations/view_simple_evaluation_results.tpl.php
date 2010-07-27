@@ -6,6 +6,7 @@
 <?php echo $javascript->link('ricoanimation')?>
 <?php echo $javascript->link('ricopanelcontainer')?>
 <?php echo $javascript->link('ricoaccordion')?>
+
 	<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
     <!-- Render Event Info table -->
 	  <?php
@@ -50,7 +51,8 @@
     		       echo '<td> - </td>' . "\n\t\t";
         		}else {
       		    if (isset($scoreRecords[$member_row['User']['id']][$member_col['User']['id']])) {
-        		    echo '<td>'.number_format($scoreRecords[$member_row['User']['id']][$member_col['User']['id']], 2).'</td>' . "\n\t\t";
+                $score = $scoreRecords[$member_row['User']['id']][$member_col['User']['id']];
+        		    echo '<td>'.(is_numeric($score) ? number_format($score, 2) : $score).'</td>' . "\n\t\t";
         		  } else {
         		     echo '<td>0.00</td>' . "\n\t\t";
         		  }
@@ -71,7 +73,7 @@
             }
             else {
               echo '<td>'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score']) . "\n\t\t";
-            }            
+            }
           }
           else {
             if ($memberEvaluatedCount > count($inCompletedMembers)) {
@@ -112,14 +114,14 @@ else { // if no members are present
 <tr class="tablecell2">
 	<td colspan="4"><em>No group members</em></td>
 </tr>
-<? }?>
+<?php }?>
 <tr class="tablecell2" align="center">
 	<td colspan="<?php echo count($groupMembers) +1; ?>">
 <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
-  <input type="hidden" name="event_id" value="<?=$event['Event']['id']?>" />
-  <input type="hidden" name="group_id" value="<?=$event['group_id']?>" />
-  <input type="hidden" name="course_id" value="<?=$rdAuth->courseId?>" />
-  <input type="hidden" name="group_event_id" value="<?=$event['group_event_id']?>" /><?php
+  <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
+  <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
+  <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>" />
+  <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" /><?php
 	if ($event['group_event_marked'] == "reviewed") {
 		echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_not_reviewed\" value=\"Mark Peer Evaluations as Not Reviewed\" />";
 	}
@@ -152,8 +154,8 @@ else { // if no members are present
 <div id="accordion">
 	<?php $i = 0;
 	foreach($groupMembers as $row): $user = $row['User']; ?>
-		<div id="panel<?=$user['id']?>">
-			<div id="panel<?=$user['id']?>Header" class="panelheader">
+		<div id="panel<?php echo $user['id']?>">
+			<div id="panel<?php echo $user['id']?>Header" class="panelheader">
 				<?php echo 'Evaluator: '.$user['last_name'].' '.$user['first_name']?>
 			</div>
 			<div style="height: 200px;" id="panel1Content" class="panelContent">
@@ -164,31 +166,33 @@ else { // if no members are present
 	<td colspan="2">Released</td>
 </tr>
 	<?php
-		$i = 0;
-	  foreach($evalResult[$user['id']] AS $row ){
-		  if ($groupMembers[$i]['User']['id']==$user['id'])
-		    $i++;
-		  $evaluatee = $groupMembers[$i++]['User'];
-		  $evalMark = isset($row['EvaluationSimple'])? $row['EvaluationSimple']: null;
-			echo '<tr class="tablecell2">';
-		  if (isset($evalMark)) {
-					echo '<td width="30%">'.$evaluatee['last_name'].' '.$evaluatee['first_name'].'</td>' . "\n";
-					echo '<td width="60%">';
-					echo (isset($evalMark['eval_comment']))? $evalMark['eval_comment'] : 'No Comments';
-					echo '</td>' ;
-					if ($evalMark['release_status'] == 1) { // made explicit comparison with 1
-						echo '<td colspan="2" width="10%">' . '<input type="checkbox" name="release' .  $evalMark['evaluator']  . '[]" value="' . $evalMark['evaluatee'] . '" checked />';
-					}
-					else {
-						echo '<td colspan="2" width="10%">' . '<input type="checkbox" name="release' .  $evalMark['evaluator']  . '[]" value="' . $evalMark['evaluatee'] . '" />';
-					}
-					echo '<input type="hidden" name="evaluator_ids[]" value="' .  $evalMark['evaluator']  . '" /></td>';
-       } else {
-					echo 'ss';
-					echo '<td colspan="4">n/a</td>';
-			 }
-			echo '</tr>';
-      }
+$i = 0;
+foreach($evalResult[$user['id']] AS $row ) {
+    // We need to skip self-evaluation results properl:
+    if (($groupMembers[$i]['User']['id']==$user['id']) && (!$event['Event']['self_eval'])) {
+        $i++;
+    }
+
+    $evaluatee = $groupMembers[$i++]['User'];
+    $evalMark = isset($row['EvaluationSimple'])? $row['EvaluationSimple']: null;
+    echo '<tr class="tablecell2">';
+    if (isset($evalMark)) {
+        echo '<td width="30%">'.$evaluatee['last_name'].' '.$evaluatee['first_name'].'</td>' . "\n";
+        echo '<td width="60%">';
+        echo (isset($evalMark['eval_comment']))? $evalMark['eval_comment'] : 'No Comments';
+        echo '</td>' ;
+        if ($evalMark['release_status'] == 1) { // made explicit comparison with 1
+            echo '<td colspan="2" width="10%">' . '<input type="checkbox" name="release' .  $evalMark['evaluator']  . '[]" value="' . $evalMark['evaluatee'] . '" checked />';
+        } else {
+            echo '<td colspan="2" width="10%">' . '<input type="checkbox" name="release' .  $evalMark['evaluator']  . '[]" value="' . $evalMark['evaluatee'] . '" />';
+        }
+        echo '<input type="hidden" name="evaluator_ids[]" value="' .  $evalMark['evaluator']  . '" /></td>';
+    } else {
+        echo 'ss';
+        echo '<td colspan="4">n/a</td>';
+    }
+    echo '</tr>';
+}
 			 ?>
 			</table>
 			</div>
@@ -199,10 +203,10 @@ else { // if no members are present
 	</tr>
 <tr class="tablecell2" align="center">
 	<td colspan="4">
-  <input type="hidden" name="event_id" value="<?=$event['Event']['id']?>" />
-  <input type="hidden" name="group_id" value="<?=$event['group_id']?>" />
-  <input type="hidden" name="course_id" value="<?=$rdAuth->courseId?>" />
-  <input type="hidden" name="group_event_id" value="<?=$event['group_event_id']?>" />
+  <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
+  <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
+  <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>" />
+  <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" />
 	&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="submit" value="Save Changes" />
 	&nbsp;&nbsp;&nbsp;<input type="submit" name="submit" value="Release All" />
 	&nbsp;&nbsp;&nbsp;<input type="submit" name="submit" value="Unrelease All" />

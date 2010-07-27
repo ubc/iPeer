@@ -21,7 +21,7 @@ class SearchsController extends AppController
 
 	function __construct()
 	{
-		$this->Sanitize = &new Sanitize;
+		$this->Sanitize = new Sanitize;
 		$this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
 		if ($this->show == 'all') $this->show = 99999999;
 		$this->sortBy = empty($_GET['sort'])? 'id': $_GET['sort'];
@@ -53,6 +53,7 @@ class SearchsController extends AppController
       $courseList = $this->sysContainer->getMyCourseList();
       $this->set('courseList', $courseList);
 
+
       $searchMartix = $this->SearchHelper->formatSearchEvaluation('', $this->order, $this->show, $this->page, $this->sortBy, $this->direction);
       $this->set('data', $searchMartix['data']);
       $this->set('paging', $searchMartix['paging']);
@@ -61,6 +62,21 @@ class SearchsController extends AppController
     }
     $this->render('index');
 	}
+
+  function searchEvaluation(){
+    $this->params['form']['search_type'] = 'evaluation';
+    $this->display();
+  }
+
+  function searchResult(){
+    $this->params['form']['search_type'] = 'eval_result';
+    $this->display();
+  }
+
+  function searchInstructor(){
+    $this->params['form']['search_type'] = 'instructor';
+    $this->display();
+  }
 
 	function display() {
 	 // if (!isset($this->params['form']['select']))
@@ -102,8 +118,9 @@ class SearchsController extends AppController
 
         $searchMartix = $this->SearchHelper->formatSearchEvaluationResult($maxPercent,$minPercent,$eventId,$status, $this->order, $this->show, $this->page, $this->sortBy, $this->direction);
 
+        $eventList = $this->rdAuth->role == 'A' ? $this->Event->findAll() : $this->Event->findAll('creator_id = '.$this->rdAuth->id);
         $this->set('sticky', $sticky);
-        $this->set('eventList',$this->Event->findAll());
+        $this->set('eventList', $eventList);
         $this->set('data', $searchMartix['data']);
         $this->set('paging', $searchMartix['paging']);
         $this->set('display', 'eval_result');
@@ -139,8 +156,9 @@ class SearchsController extends AppController
     $this->layout = false;
     $courseId = $this->params['form']['course_id'];
     $condition = 'course_id='.$courseId;
-    if ($courseId == 'A')
+    if ($courseId == 'A') {
       $condition = '';
+  }
     $this->set('eventList',$this->Event->findAll($condition));
   }
 

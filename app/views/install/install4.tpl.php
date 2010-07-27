@@ -3,7 +3,6 @@
 <td align="center">
   <br>
 <form name="frm" id="frm" method="POST" action="<?php echo $html->url('install4') ?>" onSubmit="return validate()">
-<input type="hidden" name="required" id="required" value="host_name db_user db_password db_name session_name" />
 
 <table width="95%"  border="0" cellspacing="2" cellpadding="4">
   <tr>
@@ -24,11 +23,11 @@
         <td><table width="100%"  border="1" cellpadding="0" cellspacing="0" bgcolor="#E9ECEF">
             <tr>
               <td><table width="90%"  border="0" cellspacing="2" cellpadding="10">
-                  <tr>
+                  <!--<tr>
                   	<td width="130" id="session_name_label">Session Name:</td>
                   	<td width="337" align="left"><?php echo $html->input('SysParameter/session_name', array('id'=>'session_name', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT session_name_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'value'=>'ipeer'))?></td>
                   	<td width="663" id="session_name_msg" class="error"/>
-                  </tr>
+                  </tr>-->
                   <tr>
                   	<td width="130" id="debug_mode_label">Debug Mode:</td>
                   	<td width="337" align="left">
@@ -46,7 +45,7 @@
                   </tr-->
                   <tr>
                   	<td width="130" id="login_text_label">Custom Login Text:</td>
-                  	<td width="337" align="left"><?php echo $html->input('SysParameter/display.login_text', array('id'=>'login_text', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT login_text_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'value'=>'<a href=\'http://www.apsc.ubc.ca\' target=\'_blank\'>UBC - Faculty of Applied Science</a>'))?></td>
+                  	<td width="337" align="left"><?php echo $html->input('SysParameter/display.login_text', array('id'=>'login_text', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT login_text_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'value'=>'<a href=\'http://www.ubc.ca\' target=\'_blank\'>UBC</a>'))?></td>
                   	<td width="663" id="login_text_msg" class="error"/>
                   </tr>
                   <!--tr>
@@ -68,6 +67,11 @@
                   	<td width="130" id="super_admin_label">Super administrator username:</td>
                   	<td width="337" align="left"><?php echo $html->input('SysParameter/system.super_admin', array('id'=>'super_admin', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT super_admin_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'value'=>'root'))?></td>
                   	<td width="663" id="super_admin_msg" class="error"/>
+                  </tr>
+                  <tr>
+                  	<td width="130" id="super_admin_label">Super administrator password:</td>
+                  	<td width="337" align="left"><?php echo $html->password('Admin/password', array('id'=>'password', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT password_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'value'=>''))?></td>
+                  	<td width="663" id="password_msg" class="error"/>
                   </tr>
                   <tr>
                   	<td width="130" id="contact_info_label">Custom Contact Info:</td>

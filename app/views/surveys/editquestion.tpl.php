@@ -60,7 +60,7 @@
           <tr class="tablecell2">
             <td colspan="3">
 			  <div align="center"><?php echo $html->submit('Update Question') ?>
-			  <input type="button" name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller'].'/questionssummary/'.$survey_id; ?>'">
+			  <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
 			  <br>
               </div></td>
           </tr>

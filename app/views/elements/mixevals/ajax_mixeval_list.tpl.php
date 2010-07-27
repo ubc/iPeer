@@ -3,15 +3,7 @@
 <?php $pagination->loadingId = 'loading';?>
 <?php if($pagination->set($paging)):?>
 <?php endif;?>
-<table width="95%" border="0" cellspacing="2" cellpadding="4">
-	  <tr>
-	    <td colspan="5">
-      <?php
-      echo $this->renderElement('evaltools/tools_menu', array());
-      ?>
-	    </td>
-	    <td align="right" colspan="2"><div align="right"><?php echo $pagination->show('Show ',null,'mixeval_table')?></div></td>
-	  </tr>
+<table width="95%" border="0" cellspacing="2" cellpadding="2">
 <tr class="tableheader">
 	<?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
 	<th width="15%">Actions</th>
@@ -22,10 +14,11 @@
 	<th width="4%"><?php echo $pagination->sortLink('Public',array('availability','desc'))?></th>
 	<th width="4%"><?php echo $pagination->sortLink('Total Marks',array('total_marks','desc'))?></th>
 	<th width="25%"><?php echo $pagination->sortLink('Created',array('created','desc'))?></th>
-	<!--th width="14%"><?php echo $pagination->sortLink('Last Updated',array('modified','desc'))?></th-->
+	<!--th width="14%"><?php //echo $pagination->sortLink('Last Updated',array('modified','desc'))?></th-->
   </tr>
     <?php $i = '0';?>
     <?php
+    if (!$data) $data = array(); // in case data is empty (false by cake php standarts)
     foreach ($data as $row): $mixeval = $row['Mixeval']; ?>
     <tr class="tablecell">
       <td align="center">
@@ -37,7 +30,7 @@
 	        <?php echo $html->image('icons/editdisabled.gif',array('border'=>'0','alt'=>'Edit'))?>
 	      <?php endif; ?>
 	      <?php if ($rdAuth->id == $mixeval['creator_id'] or ($rdAuth->role=='A')): ?>
-          <a href="<?php echo $this->webroot.$this->themeWeb.'mixevals/delete/'.$mixeval['id']?>" onclick="return confirm('All associating events and evaluation data will be deleted as well.\n Are you sure you want to delete mixeval &ldquo;<?=$mixeval['name'] ?>&rdquo;? ')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
+          <a href="<?php echo $this->webroot.$this->themeWeb.'mixevals/delete/'.$mixeval['id']?>" onclick="return confirm('All associating events and evaluation data will be deleted as well.\n Are you sure you want to delete mixeval &ldquo;<?php echo $mixeval['name'] ?>&rdquo;? ')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
 	      <?php else: ?>
 	        <?php echo $html->image('icons/deletedisabled.gif',array('border'=>'0','alt'=>'Delete'))?>
 	      <?php endif; ?>

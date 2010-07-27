@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: search_helper.php,v 1.4 2006/07/06 23:13:16 davychiu Exp $ */
+/* SVN FILE: $Id$ */
 /*
  *
  *
@@ -15,7 +15,7 @@ class SearchHelperComponent
   function formatSearchEvaluation($conditions='', $order, $show, $page, $sortBy, $direction) {
     $matrixAry = array();
 
-    $this->Event =& new Event;
+    $this->Event = new Event;
 
     $courseIDs =  $this->sysContainer->getMyCourseIDs();
     $conditions .= !empty($conditions) ? ' AND course_id IN ('.$courseIDs.')':'course_id IN ('.$courseIDs.')';
@@ -24,7 +24,7 @@ class SearchHelperComponent
     $data = $this->Event->findAll($conditions, '*, (NOW() >= release_date_begin AND NOW() <= release_date_end) AS is_released', $order, $show, $page);
 
     $paging['style'] = 'ajax';
-    $paging['link'] = '/searchs/searchEvents/?show='.$show.'&sort='.$sortBy.'&direction='.$direction.'&page=';
+    $paging['link'] = '/searchs/searchEvaluation/?show='.$show.'&sort='.$sortBy.'&direction='.$direction.'&page=';
 
     $paging['count'] = $this->Event->findCount($conditions);
     $paging['show'] = array('10','25','50','all');
@@ -43,11 +43,11 @@ class SearchHelperComponent
     if (empty($maxPercent)) $maxPercent = 1;
     if (empty($minPercent)) $minPercent = 0;
 
-    $this->GroupEvent =& new GroupEvent;
-    $this->Group =& new Group;
-    $this->EvaluationSubmission =& new EvaluationSubmission;
-    $this->GroupsMembers =& new GroupsMembers;
-    $this->Event =& new Event;
+    $this->GroupEvent = new GroupEvent;
+    $this->Group = new Group;
+    $this->EvaluationSubmission = new EvaluationSubmission;
+    $this->GroupsMembers = new GroupsMembers;
+    $this->Event = new Event;
 
     $this->Event->setId($eventId);
     $event = $this->Event->read();
@@ -107,7 +107,7 @@ class SearchHelperComponent
   	}
 
     $paging['style'] = 'ajax';
-    $paging['link'] = '/searchs/searchEvents/?show='.$show.'&sort='.$sortBy.'&direction='.$direction.'&page=';
+    $paging['link'] = '/searchs/searchResult/?show='.$show.'&sort='.$sortBy.'&direction='.$direction.'&page=';
 
     $paging['count'] = count($assignedGroupIDs);
     $paging['show'] = array('10','25','50','all');
@@ -125,7 +125,7 @@ class SearchHelperComponent
   {
     $matrixAry = array();
 
-    $this->User =& new User;
+    $this->User = new User;
 
     $conditions .= empty($conditions) ? 'role <> "S" AND role <> "A"':' AND role <> "S" AND role <> "A"';
 
@@ -133,7 +133,7 @@ class SearchHelperComponent
     $data = $this->User->findAll($conditions, null, $order, $show, $page);
 
     $paging['style'] = 'ajax';
-    $paging['link'] = '/searchs/searchEvents/?show='.$show.'&sort='.$sortBy.'&direction='.$direction.'&page=';
+    $paging['link'] = '/searchs/searchInstructor/?show='.$show.'&sort='.$sortBy.'&direction='.$direction.'&page=';
 
     $paging['count'] = $this->User->findCount($conditions);
     $paging['show'] = array('10','25','50','all');
@@ -161,22 +161,22 @@ class SearchHelperComponent
     } else
       $sticky['course_id'] = '';
     if ($dueDateBegin != '') {
-      $condition .= !empty($condition) ? ' AND NOW() > '.$dueDateBegin:'NOW() > '.$dueDateBegin;
+      $condition .= !empty($condition) ? ' AND due_date > "'.$dueDateBegin.'"' : 'due_date > "'.$dueDateBegin.'"';
       $sticky['due_date_begin'] = $dueDateBegin;
     } else
       $sticky['due_date_begin'] = '';
     if ($dueDateEnd != '') {
-      $condition .= !empty($condition) ? ' AND NOW() < '.$dueDateEnd:'NOW() < '.$dueDateEnd;
+      $condition .= !empty($condition) ? ' AND due_date < "'.$dueDateEnd.'"' : 'due_date < "'.$dueDateEnd.'"';
       $sticky['due_date_end'] = $dueDateEnd;
     } else
       $sticky['due_date_end'] = '';
     if ($releaseDateBegin != '') {
-      $condition .= !empty($condition) ? ' AND NOW() > '.$releaseDateBegin:'NOW() > '.$releaseDateBegin;
+      $condition .= !empty($condition) ? ' AND release_date_end > "'.$releaseDateBegin.'"' :' release_date_end > "'.$releaseDateBegin.'"';
       $sticky['release_date_begin'] = $releaseDateBegin;
     } else
       $sticky['release_date_begin'] = '';
     if ($releaseDateEnd != '') {
-      $condition .= !empty($condition) ? ' AND NOW() < '.$releaseDateEnd:'NOW() < '.$releaseDateEnd;
+      $condition .= !empty($condition) ? ' AND release_date_begin < "'.$releaseDateEnd.'"' : 'release_date_begin < "'.$releaseDateEnd.'"';
       $sticky['release_date_end'] = $releaseDateEnd;
     } else
       $sticky['release_date_end'] = '';

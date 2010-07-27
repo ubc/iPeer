@@ -5,7 +5,7 @@
 <?php endif;?>
 	<table width="95%"  border="0" cellspacing="2" cellpadding="4">
       <tr>
-        <td><div align="right"><?php echo $pagination->show('Show ')?></div></td>
+        <td><div align="right"><?php echo $pagination->show('Show ',null,'function_table')?></div></td>
       </tr>
     </table>
 	<table width="95%" border="0" cellspacing="2" cellpadding="4" bgcolor="#FFFFFF">
@@ -34,7 +34,7 @@
 		    <a href="<?php echo $this->webroot.$this->themeWeb.'sysfunctions/view/'.$sysfunction['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
 	    <?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
 	      <a href="<?php echo $this->webroot.$this->themeWeb.'sysfunctions/edit/'.$sysfunction['id']?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
-	      <a href="<?php echo $this->webroot.$this->themeWeb.'sysfunctions/delete/'.$sysfunction['id']?>" onclick="return confirm('Are you sure you want to delete function &ldquo;<?=$sysfunction['function_code']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
+	      <a href="<?php echo $this->webroot.$this->themeWeb.'sysfunctions/delete/'.$sysfunction['id']?>" onclick="return confirm('Are you sure you want to delete function &ldquo;<?php echo $sysfunction['function_code']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
 	    <?php endif;?>
 	    </td>
 		  <td>

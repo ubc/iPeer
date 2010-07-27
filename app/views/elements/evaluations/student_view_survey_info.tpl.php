@@ -1,9 +1,9 @@
 <form name="frm" id="frm" method="POST" action="<?php echo $html->url('makeSurveyEvaluation') ?>">
-<input type="hidden" name="event_id" value="<?=$event['Event']['id']?>"/>
+<input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
 <input type="hidden" name="survey_id" id="survey_id" value="<?php if (!empty($survey_id)) echo $survey_id; ?>" />
-<input type="hidden" name="course_id" value="<?=$rdAuth->courseId?>"/>
-<input type="hidden" name="data[Evaluation][surveyee_id]" value="<?=$rdAuth->id?>"/>
-<input type="hidden" name="question_count" value="<?=count($questions)?>"/>
+<input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>"/>
+<input type="hidden" name="data[Evaluation][surveyee_id]" value="<?php echo $rdAuth->id?>"/>
+<input type="hidden" name="question_count" value="<?php echo count($questions)?>"/>
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>

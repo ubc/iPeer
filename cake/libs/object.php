@@ -83,7 +83,7 @@ class Object{
  */
 	function requestAction($url, $extra = array()) {
 		if (!empty($url)) {
-			$dispatcher =& new Dispatcher();
+			$dispatcher = new Dispatcher();
 			if(isset($this->plugin)){
 				$extra['plugin'] = $this->plugin;
 			}

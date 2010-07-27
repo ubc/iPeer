@@ -28,7 +28,7 @@
   		    <a href="<?php echo $this->webroot.$this->themeWeb.'events/view/'.$event['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
   	    <?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
   	      <a href="<?php echo $this->webroot.$this->themeWeb.'events/edit/'.$event['id']?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
-  	      <a href="<?php echo $this->webroot.$this->themeWeb.'events/delete/'.$event['id']?>" onclick="return confirm('Are you sure you want to delete event &ldquo;<?=$event['title']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
+  	      <a href="<?php echo $this->webroot.$this->themeWeb.'events/delete/'.$event['id']?>" onclick="return confirm('Are you sure you want to delete event &ldquo;<?php echo $event['title']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
   	    <?php endif;?>
   	    </td>
   		  <td>
@@ -42,8 +42,8 @@
   	      <?php echo $event['self_eval']==1? 'YES' : 'NO' ?>
   	    </td>
   	    <td>
-  	    <a title="View Groups" href="<?php echo $this->webroot.$this->themeWeb;?>events/viewGroups/<?=$event['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;">&nbsp;View Groups</a> &nbsp;
-
+  	    <a title="View Groups" href="<?php echo $this->webroot.$this->themeWeb;?>events/viewGroups/<?php echo $event['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;">&nbsp;View Groups</a> &nbsp;
+		
   	    </td>
   	  </tr>
   	  <?php $i++;?>

@@ -171,11 +171,11 @@ class Scaffold extends Object{
  * @access private
  */
 	 function __scaffoldForm($params = array(), $type) {
-		  $tpl.php='edit';
+		  $tpl='edit';
 		  $form ='Edit';
 
 		  if ($type === 'add') {
-				$tpl.php='new';
+				$tpl='new';
 				$form ='New';
 		  }
 
@@ -192,12 +192,12 @@ class Scaffold extends Object{
 
 				$this->controllerClass->set('type', $form);
 
-				if (file_exists(APP . 'views' . DS . $this->viewPath . DS . 'scaffold.' . $tpl.php . '.tpl.php')) {
+				if (file_exists(APP . 'views' . DS . $this->viewPath . DS . 'scaffold.' . $tpl . '.tpl.php')) {
 					 return $this->controllerClass->render($this->actionView, '',
-																			APP . 'views' . DS . $this->viewPath . DS . 'scaffold.' . $tpl.php . '.tpl.php');
-				} elseif(file_exists(APP . 'views' . DS . 'scaffold' . DS . 'scaffold.' . $tpl.php . '.tpl.php')) {
+																			APP . 'views' . DS . $this->viewPath . DS . 'scaffold.' . $tpl . '.tpl.php');
+				} elseif(file_exists(APP . 'views' . DS . 'scaffold' . DS . 'scaffold.' . $tpl . '.tpl.php')) {
 					 return $this->controllerClass->render($this->actionView, '',
-																			APP . 'views' . DS . 'scaffold' . DS . 'scaffold.' . $tpl.php . '.tpl.php');
+																			APP . 'views' . DS . 'scaffold' . DS . 'scaffold.' . $tpl . '.tpl.php');
 				} else {
 					 return $this->controllerClass->render($this->actionView, '', LIBS . 'view' . DS . 'templates'
 																			. DS . 'scaffolds' . DS . 'edit.tpl.php');
@@ -217,7 +217,7 @@ class Scaffold extends Object{
  * @access private
  */
 	 function __scaffoldSave($params = array(), $type) {
-		  $tpl.php    ='edit';
+		  $tpl    ='edit';
 		  $form     ='Edit';
 		  $success  ='updated';
 		  $formError='edit';
@@ -236,7 +236,7 @@ class Scaffold extends Object{
 
 				if ($type == 'create') {
 					 $this->controllerClass->{$this->modelKey}->create();
-					 $tpl.php  ='new';
+					 $tpl  ='new';
 					 $form   ='New';
 					 $success='saved';
 				}
@@ -270,13 +270,13 @@ class Scaffold extends Object{
 					 $this->controllerClass->set('type', $form);
 
 					 if (file_exists(
-							  APP . 'views' . DS . $this->viewPath . DS . 'scaffolds' . DS . 'scaffold.' . $tpl.php . '.tpl.php')) {
+							  APP . 'views' . DS . $this->viewPath . DS . 'scaffolds' . DS . 'scaffold.' . $tpl . '.tpl.php')) {
 						  return $this->controllerClass->render($this->actionView, '',
-																				 APP . 'views' . DS . $this->viewPath . DS . 'scaffolds' . DS . 'scaffold.' . $tpl.php . '.tpl.php');
-					 } elseif(file_exists(APP . 'views' . DS . 'scaffold' . DS . 'scaffold.' . $tpl.php . '.tpl.php'))
+																				 APP . 'views' . DS . $this->viewPath . DS . 'scaffolds' . DS . 'scaffold.' . $tpl . '.tpl.php');
+					 } elseif(file_exists(APP . 'views' . DS . 'scaffold' . DS . 'scaffold.' . $tpl . '.tpl.php'))
 						 {
 						  return $this->controllerClass->render($this->actionView, '',
-																				 APP . 'views' . DS . 'scaffold' . DS . 'scaffold.' . $tpl.php . '.tpl.php');
+																				 APP . 'views' . DS . 'scaffold' . DS . 'scaffold.' . $tpl . '.tpl.php');
 					 } else {
 						  return $this->controllerClass->render($this->actionView, '',
 																				 LIBS . 'view' . DS . 'templates' . DS . 'scaffolds' . DS . 'edit.tpl.php');

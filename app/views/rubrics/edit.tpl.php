@@ -1,16 +1,17 @@
-<form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Rubric']['id'])||($copy)?'add':'edit') ?>">
+<form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Rubric']['id']) || (!empty($copy) && $copy) ? 'add':'edit') ?>">
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
 <tr><td>
 	<?php
-	$this->data = $this->params['data'];
-	if(!empty($this->data)){
-		$rubric_name = $this->data['Rubric']['name'];
-		$lom_default = $this->data['Rubric']['lom_max'];
-		$criteria_default = $this->data['Rubric']['criteria'];
-		$rubric_avail = $this->data['Rubric']['availability'];
-		$rubric_type = $this->data['Rubric']['template'];
-		if(!empty($this->data['Rubric']['zero_mark']))
-			$zero_mark = $this->data['Rubric']['zero_mark'];
+	//$this->data = $this->params['data'];
+	if(!empty($data)){
+		$rubric_name = $data['Rubric']['name'];
+		$lom_default = $data['Rubric']['lom_max'];
+		$criteria_default = $data['Rubric']['criteria'];
+		$rubric_avail = $data['Rubric']['availability'];
+		$rubric_type = $data['Rubric']['template'];
+		
+		if(!empty($data['Rubric']['zero_mark']) && $data['Rubric']['zero_mark'] == 'on')
+			$zero_mark = $data['Rubric']['zero_mark'];
 		else
 			$zero_mark='off';
 	}
@@ -44,7 +45,7 @@
   </tr>
   <tr class="tablecell2">
     <td>Level of Mastery:</td>
-    <td><?php echo $html->selectTag('Rubric/lom_max', array('1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8',
+    <td><?php echo $html->selectTag('Rubric/lom_max', array('2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8',
 									'9'=>'9','10'=>'10'), $lom_default, array('style'=>'width:50px;','id'=>'LOM'),'',false) ?></td>
     <td>aka LOM, Evaluation Range (Max 10) </td>
   </tr>
@@ -64,16 +65,17 @@
   <tr class="tablecell2">
     <td>Zero Mark:
   <input type="hidden" name="data[Rubric][template]" value="horizontal"/></td>
-    <td><?php echo $html->checkbox('Rubric/zero_mark', array('size'=>'50','class'=>'self_enroll', 'id'=>'zero_mark',  'checked'=>$zero_mark)) ?></td>
+    <td><?php echo $html->checkbox('Rubric/zero_mark', null, array('size'=>'50','class'=>'self_enroll', 'id'=>'zero_mark',  'checked'=> ($zero_mark == 'on') ? 'checked': 'unchecked' )) ?></td>
     <td>No Marks Given  for Level of Mastery of 1</td>
   </tr>
   <tr class="tablecell2">
   		<td colspan="3" align="center">
-		<input type="button" name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller']; ?>'">
-		<?php echo $html->submit('Preview', array('Name'=>'preview')) ?>
+        <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
+		<?php echo $html->submit('Preview (Update Format)', array('Name'=>'preview')) ?>
+		&nbsp;&nbsp;&nbsp;
 		<?php
 		$actionname = empty($params['data']['Rubric']['id'])?'Add Rubric':'Edit Rubric';
-		echo $html->submit($actionname) ?>
+		echo $html->submit($actionname, array('id' => 'submit-rubric')) ?>
 		</td>
     </tr>
 </table>
@@ -90,14 +92,23 @@
 <table class="title" width="100%"  border="0" cellspacing="0" cellpadding="0">
   <tr>
 	<td><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> Rubric Preview </td>
-	<td><div align="right"><a href="#rpreview" onclick="showhide('rpreview'); toggle(this);"><?php echo empty($this->data) ? '[+]' : '[-]'; ?></a></div></td>
+	<td><div align="right"><a href="#rpreview" onclick="$('rpreview').toggle(); toggle1(this);"><?php echo empty($this->data) ? '[-]' : '[-]'; ?></a></div></td>
   </tr>
 </table>
-<div id="rpreview" <?php echo empty($this->data) ? 'style="display: none; background: #FFF;">' : 'style="display: block; background: #FFF;"'; ?>>
+<div id="rpreview" <?php echo empty($data) ? 'style="display: none; background: #FFF;">' : 'style="display: block; background: #FFF;"'; ?>>
 <br>
 <?php
-  $params = array('controller'=>'rubrics','data'=>$this->controller->RubricHelper->compileViewData($this->data));
+  $params = array('controller'=>'rubrics','data'=>$this->controller->RubricHelper->compileViewData($data));
   echo $this->renderElement('rubrics/ajax_rubric_edit', $params);
 ?>
 </div>
 </form>
+
+<script type="text/javascript">
+$('LOM').observe('change', function(event){
+  $('submit-rubric').disable();
+})
+$('criteria').observe('change', function(event){
+  $('submit-rubric').disable();
+})
+</script>

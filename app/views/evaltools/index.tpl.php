@@ -1,3 +1,5 @@
+<?php echo $this->renderElement('evaltools/tools_menu', array());?>
+
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
 <tr>
 <td align="center">
@@ -16,15 +18,7 @@
   </tr>
 </table>
 </form-->
-	<table width="95%" border="0" cellspacing="2" cellpadding="4" bgcolor="#FFFFFF">
-	  <tr>
-	    <td colspan="5">
-      <?php
-      echo $this->renderElement('evaltools/tools_menu', array());
-      ?>
-	    </td>
-	    <td align="right" colspan="2">&nbsp;	</td>
-	  </tr>
+	<table width="95%" border="0" cellspacing="2" cellpadding="2" bgcolor="#FFFFFF">
 	  <tr class="tableheader">
 	    <td colspan="7">Simple Evaluations</td>
 	  </tr>
@@ -182,17 +176,18 @@
     	  </table>
 	  </td>
 	  </tr>
-<?php if (!empty($access['SURVEY'])) {   ?>
+<?php if (!empty($access['SURVEY'])):?>
 	  <tr class="tableheader">
-	    <td colspan="7">Team Maker</td>
+	    <td colspan="7">Surveys (Team Maker)</td>
 	  </tr>
 	  <tr class="panelContent">
 	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
 	      <tr class="panelContent">
 	        <td colspan="6" align="right">
-        <?php if (!empty($access['SURVEY_RECORD'])) {   ?>
-        <?php echo $html->image('icons/add.gif', array('alt'=>'Add Survey', 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->linkTo('Add Survey', '/surveys/add'); ?>
-        <?php }?>          </td>
+          <?php if (!empty($access['SURVEY_RECORD'])):?>
+          <?php echo $html->image('icons/add.gif', array('alt'=>'Add Survey', 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->linkTo('Add Survey', '/surveys/add'); ?>
+          <?php endif;?>
+          </td>
 	      </tr>
     	  <tr class="panelContent">
     	    <th colspan="2" width="42%">Name</th>
@@ -201,7 +196,7 @@
     	    <th width="170">Due Date</th>
           <th>Released?</th>
     	  </tr>
-      	<?php $i = '0';?>
+        <?php if(!empty($surveyData)):?>
     	  <?php foreach($surveyData as $row): $survey = $row['Survey']; ?>
     	  <tr class="tablecell">
     	    <td width="1%" bgcolor="#FFB66F">&nbsp;</td>
@@ -225,9 +220,8 @@
       			echo $html->image('icons/red_x.gif',array('border'=>'0','alt'=>'red_x'));
       	 ?></td>
     	  </tr>
-    	  <?php $i++;?>
     	  <?php endforeach; ?>
-        <?php if ($i == 0) :?>
+        <?php else:?>
       	<tr class="tablecell" align="center">
       	    <td colspan="6">Record Not Found</td>
         </tr>
@@ -235,7 +229,7 @@
     	  </table>
 	  </td>
 	  </tr>
-<?php } ?>
+<?php endif; ?>
   </table>
 </td>
 </tr>

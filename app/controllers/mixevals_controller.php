@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: mixevals_controller.php,v 1.16 2006/09/12 20:58:00 kamilon Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.16 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/09/12 20:58:00 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -40,18 +40,21 @@ class MixevalsController extends AppController
 
 	function __construct()
 	{
-		$this->Sanitize = &new Sanitize;
-		$this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
+		$this->Sanitize = new Sanitize;
+		$this->show = empty($_REQUEST['show'])? 'null': $this->Sanitize->paranoid($_REQUEST['show']);
 		if ($this->show == 'all') $this->show = 99999999;
 		$this->sortBy = empty($_GET['sort'])? 'name': $_GET['sort'];
 		$this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
  		$this->pageTitle = 'Mixed Evaluations';
+    $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
 		parent::__construct();
 	}
 
 	function index($msg='') {
+    $this->mine_only = true;
+
 	  $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
     $this->userPersonalize->setPersonalizeList($personalizeData);
   	if ($personalizeData && $this->userPersonalize->inPersonalizeList('Mixeval.ListMenu.Limit.Show')) {
@@ -66,13 +69,14 @@ class MixevalsController extends AppController
 		$data = $this->Mixeval->findAll($conditions, $fields=null, $this->order, $this->show, $this->page);
 
 		$paging['style'] = 'ajax';
-		$paging['link'] = '/mixevals/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
+		$paging['link'] = '/mixevals/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&show_my_tool='.$this->mine_only.'&page=';
 
 		$paging['count'] = $this->Mixeval->findCount($conditions);
 		$paging['show'] = array('10','25','50','all');
 		$paging['page'] = $this->page;
 		$paging['limit'] = $this->show;
 		$paging['direction'] = $this->direction;
+    $paging['result_count'] = count($data);
 
 		$this->set('paging',$paging);
 		$this->set('data',$data);
@@ -88,7 +92,7 @@ class MixevalsController extends AppController
 		  }
 		  $this->Mixeval->id = $id;
 		$this->params['data'] = $this->Mixeval->read();
-		
+
     $this->Output->filter($this->params['data']);
 		$this->set('data', $this->params['data']);
 	}
@@ -186,9 +190,10 @@ class MixevalsController extends AppController
 
   function copy($id=null)
   {
-    $this->render = false;
+        $this->render = false;
 		$this->Mixeval->setId($id);
 		$data = $this->Mixeval->read();
+		$data['Mixeval']['name'] = ""; // Clear the name when evaluation copied
 		$this->set('data', $data);
 		$this->render('edit');
   }
@@ -203,47 +208,62 @@ class MixevalsController extends AppController
 		}
 	}
 
-	function search()
-  	{
-      $this->layout = 'ajax';
-      $pagination->loadingId = 'loading';
+  function search()
+  {
+    $this->layout = 'ajax';
+    $pagination->loadingId = 'loading';
 
-      if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-      	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-      	if ($personalizeData) {
-      	   $this->userPersonalize->setPersonalizeList($personalizeData);
-           $this->show = $this->userPersonalize->getPersonalizeValue('Mixeval.ListMenu.Limit.Show');
-           $this->set('userPersonalize', $this->userPersonalize);
-      	}
+    if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
+      $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+      if ($personalizeData) {
+        $this->userPersonalize->setPersonalizeList($personalizeData);
+        $this->show = $this->userPersonalize->getPersonalizeValue('Mixeval.ListMenu.Limit.Show');
+        $this->set('userPersonalize', $this->userPersonalize);
       }
-
-      $conditions = '';
-      if (!empty($this->params['form']['show_my_tool']) && $this->params['form']['show_my_tool']){
-        $conditions .= 'creator_id = '.$this->rdAuth->id;
-      } else if (empty($this->params['form']['show_my_tool'])){
-        $conditions .= ' (creator_id = '.$this->rdAuth->id. ' OR availability = "public" ) ';
-      }
-
-      if (!empty($this->params['form']['livesearch']) && !empty($this->params['form']['select'])){
-        $pagination->loadingId = 'loading';
-        //parse the parameters
-        $searchField=$this->params['form']['select'];
-        $searchValue=$this->params['form']['livesearch'];
-        (empty($conditions))? $conditions = '' : $conditions .= ' AND ';
-        $conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
-      }
-      $this->update($attributeCode = 'Mixeval.ListMenu.Limit.Show',$attributeValue = $this->show);
-      $this->set('conditions',$conditions);
-      $this->set('event', $this->Event);
-
-	}
-	function previewMixeval()
-    {
-		//print_r(array_values($this->params));
-
-        $this->layout = 'ajax';
-		$this->render('preview');
     }
+
+    $conditions = '';
+    if ($this->mine_only){
+      $conditions .= 'creator_id = '.$this->rdAuth->id;
+    } else if ('A' != $this->rdAuth->role){
+      $conditions .= ' (creator_id = '.$this->rdAuth->id. ' OR availability = "public" ) ';
+    }
+
+    if (!empty($this->params['form']['livesearch']) && !empty($this->params['form']['select'])){
+      $pagination->loadingId = 'loading';
+      //parse the parameters
+      $searchField=$this->params['form']['select'];
+      $searchValue=$this->params['form']['livesearch'];
+      (empty($conditions))? $conditions = '' : $conditions .= ' AND ';
+      $conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
+    }
+    $this->update($attributeCode = 'Mixeval.ListMenu.Limit.Show',$attributeValue = $this->show);
+
+    $data = $this->Mixeval->findAll($conditions, $fields=null, $this->order, $this->show, $this->page);
+
+    $paging['style'] = 'ajax';
+    $paging['link'] = '/mixevals/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&show_my_tool='.$this->mine_only.'&page=';
+
+    $paging['count'] = $this->Mixeval->findCount($conditions);
+    $paging['show'] = array('10','25','50','all');
+    $paging['page'] = $this->page;
+    $paging['limit'] = $this->show;
+    $paging['direction'] = $this->direction;
+    $paging['mine'] = $this->mine_only;
+    $paging['result_count'] = count($data);
+
+		$this->set('event', $this->Event);
+		$this->set('paging',$paging);
+		$this->set('data',$data);
+  }
+
+  function previewMixeval()
+  {
+    //print_r(array_values($this->params));
+
+    $this->layout = 'ajax';
+    $this->render('preview');
+  }
 
 	function renderRows($row=null, $criteria_weight=null )
 	{

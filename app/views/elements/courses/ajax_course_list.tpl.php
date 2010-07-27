@@ -29,15 +29,23 @@
     	  <a href="<?php echo $this->webroot.$this->themeWeb.'courses/view/'.$course['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
     	  <?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
     	  <a href="<?php echo $this->webroot.$this->themeWeb.'courses/edit/'.$course['id']?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
-    	  <a href="<?php echo $this->webroot.$this->themeWeb.'courses/delete/'.$course['id']?>" onclick="return confirm('Are you sure you want to delete course &ldquo;<?=$course['course']?>&rdquo;? \n All related data such as students and events will be deleted as well.')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
+    	  <a href="<?php echo $this->webroot.$this->themeWeb.'courses/delete/'.$course['id']?>" onclick="return confirm('Are you sure you want to delete course &ldquo;<?php echo $course['course']?>&rdquo;? \n All related data such as students and events will be deleted as well.')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
 
     	  <?php endif;?>
     	  </td>
         <td align="left">
     	  <?php
-    		echo !empty($course['homepage']) ? "<a href=".$course['homepage'].">":'';
+            if (!empty($course['homepage'])) {
+                $homepage = $course['homepage'];
+                if (strpos(strtolower($homepage), "http://") === false) {
+                    $homepage = "http://" . $homepage;
+                }
+            } else {
+                $homepage = "";
+            }
+    		echo !empty($homepage) ? "<a href='$homepage' target='_blank'>" : "";
     		echo $html->image('icons/home.gif',array('border'=>'0', 'align'=>'middle','alt'=>'home'));
-    		echo !empty($course['homepage']) ? "</a>":'';
+    		echo !empty($homepage) ? "</a>":'';
     		?>
     	  <?php echo $html->link($course['course'], '/courses/home/'.$course['id']) ?>
     	  </td>

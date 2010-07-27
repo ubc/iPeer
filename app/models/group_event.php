@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: group_event.php,v 1.10 2006/11/16 21:51:10 kamilon Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.10 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/11/16 21:51:10 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -28,19 +28,6 @@
 class GroupEvent extends AppModel
 {
   var $name = 'GroupEvent';
-
-  var $hasMany = array(
-                        'EvaluationSubmission' => array(
-                          'className' => 'EvaluationSubmission',
-                          'conditions' => 'EvaluationSubmission.record_status = "A"',
-                          'order' => 'EvaluationSubmission.id ASC',
-                          'limit' => '999',
-                          'foreignKey' => 'evaluation_submission_id',
-                          'dependent' => true,
-                          'exclusive' => false,
-                          'finderSql' => ''
-                        )
-                 );
 
   // inserts all members into the groups_events table
   function insertGroups($id=null, $data=null){
@@ -89,7 +76,7 @@ class GroupEvent extends AppModel
   	  if (empty($eventId) || is_null($eventId)) {
   	  	return;
   	  }
-	  $tmp = $this->findAll($conditions = 'event_id='.$eventId, 'id, group_id, event_id, marked, grade');
+	  $tmp = $this->findAll('group_id != 0 AND event_id='.$eventId, 'id, group_id, event_id, marked, grade');
 	  return $tmp;
   }
 
@@ -151,13 +138,18 @@ class GroupEvent extends AppModel
   }
 
   function getNotReviewed($eventId=null) {
-    return $this->findBySql('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked FROM group_events AS GroupEvent WHERE (GroupEvent.marked="not reviewed" OR GroupEvent.marked="to review") AND GroupEvent.event_id='.$eventId.' ORDER BY GroupEvent.group_id');
+    return $this->findBySql('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked 
+                            FROM group_events AS GroupEvent 
+                            WHERE (GroupEvent.marked="not reviewed" OR GroupEvent.marked="to review") AND GroupEvent.group_id != 0 AND GroupEvent.event_id='.$eventId.' 
+                            ORDER BY GroupEvent.group_id');
   }
 
   function getLate($eventId) {
-    return $this->findBySql('SELECT DISTINCT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked 
-                            FROM group_events as GroupEvent,
-                              (SELECT id
+    return $this->findBySql('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked 
+                            FROM group_events as GroupEvent 
+                            LEFT JOIN events as Event ON GroupEvent.event_id = Event.id
+                            LEFT JOIN evaluation_submissions as es  on GroupEvent.id=es.grp_event_id
+                            WHERE GroupEvent.id IN  (SELECT id
                               FROM
                                 (SELECT group_events.id, count( * ) as count1
                                 FROM group_events
@@ -170,8 +162,9 @@ class GroupEvent extends AppModel
                                 WHERE evaluation_submissions.event_id = '.$eventId.'
                                 GROUP BY evaluation_submissions.grp_event_id) AS tb2
                                 ON tb1.id=tb2.grp_event_id
-                              WHERE count1 > count2 OR count2 IS NULL) AS tb3
-                            WHERE tb3.id=GroupEvent.id');
+                              WHERE count1 > count2 OR count2 IS NULL) 
+                            AND GroupEvent.group_id != 0 AND (Event.due_date < now() OR date_submitted > due_date)' 
+                            );
   }
 }
 

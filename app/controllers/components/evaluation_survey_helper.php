@@ -3,112 +3,114 @@ class EvaluationSurveyHelperComponent extends Object
 {
 	var $components = array('rdAuth', 'EvaluationHelper');
 
-  function saveSurveyEvaluation($params=null)
-  {
-    $this->Question =& new Question;
-    $this->SurveyInput =& new SurveyInput;
-    $this->EvaluationSubmission =& new EvaluationSubmission;
+    function saveSurveyEvaluation($params=null)
+    {
+        $this->Question = new Question;
+        $this->SurveyInput = new SurveyInput;
+        $this->EvaluationSubmission = new EvaluationSubmission;
 
-    $userId = $params['data']['Evaluation']['surveyee_id'];
-    $eventId = $params['form']['event_id'];
-    $surveyId = $params['form']['survey_id'];
+        $userId = $params['data']['Evaluation']['surveyee_id'];
+        $eventId = $params['form']['event_id'];
+        $surveyId = $params['form']['survey_id'];
 
-    //get existing record if there is one
-    $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId,$userId);
+        //get existing record if there is one
+        $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId,$userId);
 
-    if (empty($evalSubmission)) {//if there is no existing record, fill in all fields
-      $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $userId;
-      $evaluationSubmission['EvaluationSubmission']['survey_id'] = $surveyId;
-      $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
-      $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
-      $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
-    } else {//if existing record, just update the time submitted
-      $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
-    }
-    $surveyInput=array();
-		$surveyInput['SurveyInput']['user_id'] = $params['data']['Evaluation']['surveyee_id'];
-
-		// if no submission exists, create one
-    $surveyInput['SurveyInput']['survey_id'] = $params['form']['survey_id'];
-    //$surveyInput['SurveyInput']['event_id'] = $params['form']['event_id'];
-		// save evaluation submission
-    //$surveyInput['SurveyInput']['date_submitted'] = date('Y-m-d H:i:s');
-
-    //parse for question id and their response id/text
-    //then save
-    for ($i=1; $i < $params['form']['question_count']+1; $i++) {
-      $questionId = $params['form']['question_id'.$i];
-
-      if (isset($params['form']['answer_'.$i])) {
-        if (is_array($params['form']['answer_'.$i])) {
-          if (!$this->SurveyInput->delAllSurveyInputBySurveyIdUserIdQuestionId($surveyId,$userId,$questionId)) {
-        	  die('delete failed');
-          }
-          //parse answers for 'any choice' type
-          for ($j=0; $j < count($params['form']['answer_'.$i]); $j++) {
-        		$surveyInput['SurveyInput']['user_id'] = $userId;
-            $surveyInput['SurveyInput']['survey_id'] = $surveyId;
-            $surveyInput['SurveyInput']['question_id'] = $questionId;
-
-            $answer = explode("_",$params['form']['answer_'.$i][$j]);
-            $surveyInput['SurveyInput']['response_id'] = $answer[1];
-        		if (!$this->SurveyInput->save($surveyInput)) {
-        		  return false;
-        		}
-        		$this->SurveyInput->id = null;
-          }
-        } else {
-            //get existing 'answer' record
-          $surveyInput = $this->SurveyInput->getSurveyInputBySurveyIdUserIdQuestionId($surveyId,$userId,$questionId);
-
-          //if none exists fill in fields
-          if (empty($surveyInput)) {
-        		$surveyInput['SurveyInput']['user_id'] = $userId;
-            $surveyInput['SurveyInput']['survey_id'] = $surveyId;
-          }
-          $surveyInput['SurveyInput']['question_id'] = $questionId;
-
-          //check for MC
-          $type = $this->Question->getTypeById($questionId);
-          if ($type == 'M') {
-            $answer = explode("_",$params['form']['answer_'.$i]);
-            $surveyInput['SurveyInput']['response_id'] = $answer[1];
-          } else
-        	  $surveyInput['SurveyInput']['response_text'] = $params['form']['answer_'.$i];
-      		if (!$this->SurveyInput->save($surveyInput)) {
-      		  return false;
-      		}
-      		$this->SurveyInput->id = null;
+        if (empty($evalSubmission)) {//if there is no existing record, fill in all fields
+            $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $userId;
+            $evaluationSubmission['EvaluationSubmission']['survey_id'] = $surveyId;
+            $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
+            $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
+            $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
+        } else { //if existing record, just update the time submitted
+            $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
         }
-      } else {
-        if (!$this->SurveyInput->delAllSurveyInputBySurveyIdUserIdQuestionId($surveyId,$userId,$questionId)) {
-        	die('delete failed');
-        } else {
-          if (!$this->SurveyInput->delAllSurveyInputBySurveyIdUserIdQuestionId($surveyId,$userId,$questionId)) {
-        	  die('delete failed');
-          }
-          //parse answers for 'any choice' type
-      		$surveyInput['SurveyInput']['user_id'] = $userId;
-          $surveyInput['SurveyInput']['survey_id'] = $surveyId;
-          $surveyInput['SurveyInput']['question_id'] = $questionId;
-      		if (!$this->SurveyInput->save($surveyInput)) {
-      		  return false;
-      		}
-      		$this->SurveyInput->id = null;
+        $surveyInput=array();
+        $surveyInput['SurveyInput']['user_id'] = $params['data']['Evaluation']['surveyee_id'];
+
+        // if no submission exists, create one
+        $surveyInput['SurveyInput']['survey_id'] = $params['form']['survey_id'];
+        //$surveyInput['SurveyInput']['event_id'] = $params['form']['event_id'];
+        // save evaluation submission
+        //$surveyInput['SurveyInput']['date_submitted'] = date('Y-m-d H:i:s');
+
+        //parse for question id and their response id/text
+        //then save
+        for ($i=1; $i < $params['form']['question_count']+1; $i++) {
+            $questionId = $params['form']['question_id'.$i];
+
+            if (isset($params['form']['answer_'.$i])) {
+                if (is_array($params['form']['answer_'.$i])) {
+                    if (!$this->SurveyInput->delAllSurveyInputBySurveyIdUserIdQuestionId($surveyId,$userId,$questionId)) {
+                        die('delete failed');
+                    }
+                    //parse answers for 'any choice' type
+                    for ($j=0; $j < count($params['form']['answer_'.$i]); $j++) {
+                        $surveyInput['SurveyInput']['user_id'] = $userId;
+                        $surveyInput['SurveyInput']['survey_id'] = $surveyId;
+                        $surveyInput['SurveyInput']['question_id'] = $questionId;
+
+                        $answer = explode("_",$params['form']['answer_'.$i][$j]);
+                        $surveyInput['SurveyInput']['response_id'] = $answer[1];
+                        if (!$this->SurveyInput->save($surveyInput)) {
+                            return false;
+                        }
+                        $this->SurveyInput->id = null;
+                    }
+                } else {
+                    //get existing 'answer' record
+                    $surveyInput = $this->SurveyInput->getSurveyInputBySurveyIdUserIdQuestionId($surveyId,$userId,$questionId);
+
+                    //if none exists fill in fields
+                    if (empty($surveyInput)) {
+                        $surveyInput['SurveyInput']['user_id'] = $userId;
+                        $surveyInput['SurveyInput']['survey_id'] = $surveyId;
+                    }
+                    $surveyInput['SurveyInput']['question_id'] = $questionId;
+
+                    //check for MC
+                    $type = $this->Question->getTypeById($questionId);
+                    if ($type == 'M') {
+                        $answer = explode("_",$params['form']['answer_'.$i]);
+                        $surveyInput['SurveyInput']['response_id'] = $answer[1];
+                    } else {
+                        $surveyInput['SurveyInput']['response_text'] = $params['form']['answer_'.$i];
+                    }
+                    if (!$this->SurveyInput->save($surveyInput)) {
+                        return false;
+                    }
+                    $this->SurveyInput->id = null;
+                }
+            } else {
+                if (!$this->SurveyInput->delAllSurveyInputBySurveyIdUserIdQuestionId($surveyId,$userId,$questionId)) {
+                die('delete failed');
+                } else {
+                    if (!$this->SurveyInput->delAllSurveyInputBySurveyIdUserIdQuestionId($surveyId,$userId,$questionId)) {
+                        die('delete failed');
+                    }
+                    //parse answers for 'any choice' type
+                    $surveyInput['SurveyInput']['user_id'] = $userId;
+                    $surveyInput['SurveyInput']['survey_id'] = $surveyId;
+                    $surveyInput['SurveyInput']['question_id'] = $questionId;
+                    if (!$this->SurveyInput->save($surveyInput)) {
+                        return false;
+                    }
+                    $this->SurveyInput->id = null;
+                }
+            }
         }
-      }
+        if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
+            echo "this->EvaluationSubmission->save() returned false";
+            return false;
+        }
+        $this->EvaluationSubmission->id = null;
+        return true;
     }
-    if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
-      return false;
-    }
-    $this->EvaluationSubmission->id = null;
-    return true;
-  }
 
 	function formatStudentViewOfSurveyEvaluationResult($event=null)
 	{
-	  $this->EvaluationSimple =& new EvaluationSimple;
-	  $this->GroupsMembers =& new GroupsMembers;
+	  $this->EvaluationSimple = new EvaluationSimple;
+	  $this->GroupsMembers = new GroupsMembers;
 	  $gradeReleaseStatus = 0;
 	  $aveScore = 0; $groupAve = 0;
 	  $studentResult = array();
@@ -158,11 +160,11 @@ class EvaluationSurveyHelperComponent extends Object
 
 	function formatSurveyEvaluationResult($event=null,$studentId=null)
 	{
-	  $this->Survey =& new Survey;
-	  $this->SurveyQuestion =& new SurveyQuestion;
-	  $this->Question =& new Question;
-	  $this->Response =& new Response;
-	  $this->SurveyInput =& new SurveyInput;
+	  $this->Survey = new Survey;
+	  $this->SurveyQuestion = new SurveyQuestion;
+	  $this->Question = new Question;
+	  $this->Response = new Response;
+	  $this->SurveyInput = new SurveyInput;
 
 	  $result = array();
 
@@ -198,12 +200,12 @@ class EvaluationSurveyHelperComponent extends Object
 	}
 
 	function formatSurveyGroupEvaluationResult($surveyId=null, $surveyGroupId=null) {
-	  $this->Survey =& new Survey;
-	  $this->SurveyQuestion =& new SurveyQuestion;
-	  $this->Question =& new Question;
-	  $this->Response =& new Response;
-	  $this->SurveyInput =& new SurveyInput;
-	  $this->User =& new User;
+	  $this->Survey = new Survey;
+	  $this->SurveyQuestion = new SurveyQuestion;
+	  $this->Question = new Question;
+	  $this->Response = new Response;
+	  $this->SurveyInput = new SurveyInput;
+	  $this->User = new User;
 
 	  $result = array();
 
@@ -270,12 +272,12 @@ class EvaluationSurveyHelperComponent extends Object
 
 	function formatSurveyEvaluationSummary($surveyId=null)
 	{
-	  $this->Survey =& new Survey;
-	  $this->SurveyQuestion =& new SurveyQuestion;
-	  $this->Question =& new Question;
-	  $this->Response =& new Response;
-	  $this->SurveyInput =& new SurveyInput;
-	  $this->User =& new User;
+	  $this->Survey = new Survey;
+	  $this->SurveyQuestion = new SurveyQuestion;
+	  $this->Question = new Question;
+	  $this->Response = new Response;
+	  $this->SurveyInput = new SurveyInput;
+	  $this->User = new User;
 
 	  $result = array();
     $survey_id = $surveyId;

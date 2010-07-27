@@ -25,16 +25,16 @@
 		  <tr class="tablecell">
 			<td>
 			  <?php if ($comingUpEvent['Event']['event_template_type_id'] == 1):?>
-			  <a href="<?=$this->webroot.$this->themeWeb?>evaluations/makeSimpleEvaluation/<?=$comingUpEvent['Event']['id']?>;<?=$comingUpEvent['Event']['group_id']?>"><?php echo $comingUpEvent['Event']['title'] ?>&nbsp;</a>
+			  <a href="<?php echo $this->webroot.$this->themeWeb?>evaluations/makeSimpleEvaluation/<?php echo $comingUpEvent['Event']['id']?>;<?php echo $comingUpEvent['Event']['group_id']?>"><?php echo $comingUpEvent['Event']['title'] ?>&nbsp;</a>
 			  <?php endif;?>
 			  <?php if ($comingUpEvent['Event']['event_template_type_id'] == 2):?>
-			  <a href="<?=$this->webroot.$this->themeWeb?>evaluations/makeRubricEvaluation/<?=$comingUpEvent['Event']['id']?>;<?=$comingUpEvent['Event']['group_id']?>"><?php echo $comingUpEvent['Event']['title'] ?>&nbsp;</a>
+			  <a href="<?php echo $this->webroot.$this->themeWeb?>evaluations/makeRubricEvaluation/<?php echo $comingUpEvent['Event']['id']?>;<?php echo $comingUpEvent['Event']['group_id']?>"><?php echo $comingUpEvent['Event']['title'] ?>&nbsp;</a>
 			  <?php endif;?>
 			  <?php if ($comingUpEvent['Event']['event_template_type_id'] == 3):?>
-			  <a href="<?=$this->webroot.$this->themeWeb?>evaluations/makeSurveyEvaluation/<?=$comingUpEvent['Event']['id']?>"><?php echo $comingUpEvent['Event']['title'] ?>&nbsp;</a>
+			  <a href="<?php echo $this->webroot.$this->themeWeb?>evaluations/makeSurveyEvaluation/<?php echo $comingUpEvent['Event']['id']?>"><?php echo $comingUpEvent['Event']['title'] ?>&nbsp;</a>
 			  <?php endif;?>
 			  <?php if ($comingUpEvent['Event']['event_template_type_id'] == 4):?>
-			  <a href="<?=$this->webroot.$this->themeWeb?>evaluations/makeMixevalEvaluation/<?=$comingUpEvent['Event']['id']?>;<?=$comingUpEvent['Event']['group_id']?>"><?php echo $comingUpEvent['Event']['title'] ?>&nbsp;</a>
+			  <a href="<?php echo $this->webroot.$this->themeWeb?>evaluations/makeMixevalEvaluation/<?php echo $comingUpEvent['Event']['id']?>;<?php echo $comingUpEvent['Event']['group_id']?>"><?php echo $comingUpEvent['Event']['title'] ?>&nbsp;</a>
 			  <?php endif;?>
 			</td>
 			<td><?php echo $comingUpEvent['Event']['course'] ?>&nbsp;</td>
@@ -86,16 +86,16 @@
 		  <tr class="tablecell">
 			<td>
 			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 1):?>
-			  <a href="<?=$this->webroot.$this->themeWeb?>evaluations/studentViewEvaluationResult/<?=$eventSubmitted['Event']['id']?>;<?=$eventSubmitted['Event']['group_id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
+			  <a href="<?php echo $this->webroot.$this->themeWeb?>evaluations/studentViewEvaluationResult/<?php echo $eventSubmitted['Event']['id']?>;<?php echo $eventSubmitted['Event']['group_id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
 			  <?php endif;?>
 			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 2):?>
-			  <a href="<?=$this->webroot.$this->themeWeb?>evaluations/studentViewEvaluationResult/<?=$eventSubmitted['Event']['id']?>;<?=$eventSubmitted['Event']['group_id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
+			  <a href="<?php echo $this->webroot.$this->themeWeb?>evaluations/studentViewEvaluationResult/<?php echo $eventSubmitted['Event']['id']?>;<?php echo $eventSubmitted['Event']['group_id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
 			  <?php endif;?>
 			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 3):?>
-			  <a href="<?=$this->webroot.$this->themeWeb?>evaluations/makeSurveyEvaluation/<?=$eventSubmitted['Event']['id']?>"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
+			  <a href="<?php echo $this->webroot.$this->themeWeb?>evaluations/makeSurveyEvaluation/<?php echo $eventSubmitted['Event']['id']?>"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
 			  <?php endif;?>
 			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 4):?>
-			  <a href="<?=$this->webroot.$this->themeWeb?>evaluations/studentViewEvaluationResult/<?=$eventSubmitted['Event']['id']?>;<?=$eventSubmitted['Event']['group_id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
+			  <a href="<?php echo $this->webroot.$this->themeWeb?>evaluations/studentViewEvaluationResult/<?php echo $eventSubmitted['Event']['id']?>;<?php echo $eventSubmitted['Event']['group_id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
 			  <?php endif;?>
 			</td>
 			<td><?php echo $eventSubmitted['Event']['course'] ?>&nbsp;</td>

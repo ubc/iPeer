@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: flash.tpl.php,v 1.3 2006/06/20 18:44:55 zoeshum Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  *
@@ -22,7 +22,7 @@
  * @package      cake
  * @subpackage   cake.cake.libs.view.templates.layouts
  * @since        CakePHP v 0.10.0.1076
- * @version      $Revision: 1.3 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy: phpnut $
  * @lastmodified $Date: 2006/06/20 18:44:55 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License

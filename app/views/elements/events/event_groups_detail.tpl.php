@@ -7,14 +7,14 @@
 	  </tr>
     <?php $i = '0';?>
 	  <?php
-	  //print_r($data);
+	 	  //print_r($data);
 	  foreach($data as $row): $group = $row['Group'];
 	  if (isset($group['id'])) {?>
   	  <tr>
           <td>
        	    <?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
-        		<a href="<?php echo $this->webroot.$this->themeWeb.'groups/edit/'.$group['id']?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
-      	    <?php endif;?>
+        		  <a <?php echo ('y' == $popup ? 'onclick="wopen(this.href, \'popup\', 700, 500); return false;"' : '')?> href="<?php echo $this->webroot.$this->themeWeb.'events/editGroup/'.$group['id'].'/'.$event_id. '/'. $popup?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
+       	    <?php endif;?>
             <?php echo $group['group_num'] ?></td>
           <td><?php echo $group['group_name'] ?></td>
           <td>
@@ -43,4 +43,13 @@
        <?php echo "No Groups"; ?>
     </td></tr>
 <?php endif; ?>
+
+<?php if(isset($popup) && $popup == 'y'): ?>
+    <tr><td colspan="3" align="center">
+		<input type="button" value="Close Window" onclick="window.close()">
+    </td></tr>
+<?php endif; ?>    
 </table>
+<div align = "center">
+
+</div>

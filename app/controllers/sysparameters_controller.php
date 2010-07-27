@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: sysparameters_controller.php,v 1.2 2006/08/22 17:31:26 davychiu Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.2 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/08/22 17:31:26 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -41,8 +41,8 @@ class SysParametersController extends AppController
 
 	function __construct()
 	{
-		$this->Sanitize = &new Sanitize;
-		$this->NeatString = &new NeatString;
+		$this->Sanitize = new Sanitize;
+		$this->NeatString = new NeatString;
 		$this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
 		if ($this->show == 'all') $this->show = 99999999;
 		$this->sortBy = empty($_GET['sort'])? 'id': $_GET['sort'];
@@ -64,12 +64,10 @@ class SysParametersController extends AppController
   	  $this->show = '10';
       $this->update($attributeCode = 'SysParam.ListMenu.Limit.Show',$attributeValue = $this->show);
   	}
-
   	$data = $this->SysParameter->findAll($conditions=null, $fields=null, $this->order, $this->show, $this->page);
 
   	$paging['style'] = 'ajax';
   	$paging['link'] = '/sysparameters/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
-
   	$paging['count'] = $this->SysParameter->findCount($conditions=null);
   	$paging['show'] = array('10','25','50','all');
   	$paging['page'] = $this->page;
@@ -91,19 +89,13 @@ class SysParametersController extends AppController
 
 	function add()
 	{
-		if (empty($this->params['data']))
-		{
+		if (empty($this->params['data'])) {
 			$this->render();
-		}
-		else
-		{
-			if ($this->SysParameter->save($this->params['data']))
-			{
+		} else {
+			if ($this->SysParameter->save($this->params['data'])) {
 				$message = 'The record is saved successfully';
 				$this->redirect('sysparameters/index/'.$message);
-			}
-			else
-			{
+			} else {
 				$this->set('data', $this->params['data']);
 				$this->render('edit');
 			}
@@ -112,21 +104,15 @@ class SysParametersController extends AppController
 
 	function edit($id=null)
 	{
-		if (empty($this->params['data']))
-		{
+		if (empty($this->params['data'])) {
 			$this->SysParameter->setId($id);
 			$this->params['data'] = $this->SysParameter->read();
 			$this->render();
-		}
-		else
-		{
-			if ( $this->SysParameter->save($this->params['data']))
-			{
+		} else {
+			if ( $this->SysParameter->save($this->params['data'])) {
 				$message = 'The record is edited successfully';
 				$this->redirect('sysparameters/index/'.$message);
-			}
-			else
-			{
+			} else {
 				$this->set('data', $this->params['data']);
 				$this->render();
 			}
@@ -154,7 +140,7 @@ class SysParametersController extends AppController
     	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
     	if ($personalizeData) {
     	   $this->userPersonalize->setPersonalizeList($personalizeData);
-         $this->show = $this->userPersonalize->getPersonalizeValue('Survey.ListMenu.Limit.Show');
+         $this->show = $this->userPersonalize->getPersonalizeValue('SysParam.ListMenu.Limit.Show');
          $this->set('userPersonalize', $this->userPersonalize);
     	}
     }

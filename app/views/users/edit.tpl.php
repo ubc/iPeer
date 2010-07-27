@@ -2,7 +2,8 @@
 <tr>
 <td><script type="text/javascript" language="javascript">
 <!--
-  var total_course_count = <?=$course_count?>;
+  var total_course_count = <?php echo $course_count?>;
+  var course_count = 1;
 //-->
 </script>
 <?php echo $javascript->link('user')?>
@@ -16,7 +17,9 @@
       </tr>
     <tr class="tablecell2">
       <td width="130" id="username_label">Username:*</td>
-      <td width="337"><?php echo $html->input('User/username', array('size'=>'50', 'disabled'=>'true')) ?></td>
+      <td width="337"><?php echo $html->hidden('User/username'); ?>
+        <input type="text" value="<?php echo $params['data']['User']['username']?>" size=50 disabled=true /></td>
+
       <td width="663" id="username_msg" class="error"></td>
     </tr>
     <tr class="tablecell2">
@@ -29,66 +32,77 @@
       <td><?php echo $html->input('User/first_name', array('id'=>'first_name', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT first_name_msg Invalid_Text._At_Least_One_Word_Is_Required.')) ?> </td>
       <td width="663" id="first_name_msg" class="error"></td>
     </tr class="tablecell2">
-    <?php if ($params['data']['User']['role'] == 'S')  :?>
-    <tr class="tablecell2">
-      <td width="130" id="student_no_label">Student No.:</td>
-      <td><?php echo $html->input('User/student_no', array('id'=>'student_no', 'size'=>'50', 'class'=>'validate none TEXT_FORMAT student_no_msg Invalid_Text._At_Least_One_Word_Is_Required.')) ?> </td>
-      <td width="663" id="student_no_msg" class="error"></td>
-    </tr>
-    <?php else: ?>
+    <?php if (isset($params['data']['User']['role']) && $params['data']['User']['role'] == 'S') { ?>
+        <?php if ($this->controller->rdAuth->role == 'A') { ?>
+            <tr class="tablecell2">
+            <td width="130" id="student_no_label">Student No.:</td>
+            <td><?php echo $html->input('User/student_no', array('id'=>'student_no', 'size'=>'50', 'class'=>'validate none TEXT_FORMAT student_no_msg Invalid_Text._At_Least_One_Word_Is_Required.')) ?> </td>
+            <td width="663" id="student_no_msg" class="error"></td>
+            </tr>
+        <?php } else { ?>
+            <?php echo $html->hidden('User/student_no'); ?> </td>
+        <?php } ?>
+    <?php } else { ?>
     <tr class="tablecell2">
       <td width="130" id="title_label">Title:</td>
       <td><?php echo $html->input('User/title', array('id'=>'title', 'size'=>'50', 'class'=>'validate none TEXT_FORMAT title_msg Invalid_Text._At_Least_One_Word_Is_Required.')) ?> </td>
       <td width="663" id="title_msg" class="error"></td>
     </tr>
-    <?php endif;?>
+    <?php } ?>
     <tr class="tablecell2">
       <td width="130" id="email_label">Email:</td>
       <td><?php echo $html->input('User/email', array('id'=>'email', 'size'=>'50', 'class'=>'validate none EMAIL_FORMAT email_msg Invalid_Email_Format.')) ?> </td>
       <td width="663" id="email_msg" class="error"></td>
     </tr>
-    <?php if (($rdAuth->role == 'I') || ($rdAuth->role == 'A')):?>
+    <?php if (isset($params['data']['User']['role']) &&($params['data']['User']['role'] == 'S') && (($rdAuth->role == 'I') || ($rdAuth->role == 'A'))):?>
     <tr class="tablecell2">
       <td width="130" id="courses_label">Courses</td>
       <td>
-        <?php if (isset($enrolled_courses)) {
-         ?>
+        <?php if (isset($enrolled_courses)):?>
          <table  width="100%" border="0" cellspacing="2" cellpadding="2">
-         <?php
-          foreach($enrolled_courses as $ec) {
-          	echo '<tr>';
-            echo '<td width="15"><a href="' . $this->webroot . $this->themeWeb .
-              $this->params['controller'] . '/removeFromCourse/'.$ec['Course']['id']. '/' .$params['data']['User']['id']. '">' .
-              $html->image('icons/x_small.gif',array('border'=>'0','alt'=>'Delete'), 'Are you sure you want to remove \"' . $ec['Course']['title'] . '\"?').'</a>';
-            echo '</td><td>';
-            echo '<a href="../../Course/view/'.$ec['Course']['id'].'">';
-            echo $ec['Course']['course'] . '</a></td>';
-            echo '</tr>';
-          }
-          echo '</table>';
-        }
-
-        ?>
+        <?php foreach($enrolled_courses as $ec):?>
+            <tr>
+                <td width="15">
+                    <?php if(User::canRemoveCourse($user, $ec['Course']['id'])):?>
+                        <a href="<?php echo $this->webroot . $this->themeWeb . $this->params['controller'] . '/removeFromCourse/'.$ec['Course']['id']. '/' .$params['data']['User']['id']?>"
+                        onclick='return confirm("Are you sure you want to remove the student:\n    <?php echo $params['data']['User']['student_no'];?>\nfrom the course:\n    <?php echo $ec['Course']['title'];?> ?")'>
+                        <?php echo $html->image('icons/x_small.gif',array('border'=>'0','alt'=>'Delete'))?></a>
+                    <?php endif;?>
+                    </td>
+                    <td><a href="../../courses/view/<?php echo $ec['Course']['id']?>"><?php echo $ec['Course']['course']?></a></td>
+                    </tr>
+                    <?php endforeach;?>
+                </table>
+            <?php endif;?>
         <input type="hidden" name="user_id" id="user_id" value="<?php echo $user_id;?>">
-        <div id="adddelcourses">
-        <?php
-        $params2 = array('controller'=>'users', 'all_courses'=>$all_courses, 'count'=>0, 'user_id' => $user_id);
-        echo $this->renderElement('users/ajax_user_courses', $params2);
-        ?>
-        </div>
+        <div id="adddelcourses"></div>
       </td>
       <td>
 
-  <input type="hidden" name="add" id="add" value="0">
-  <a href=# onClick="addToCourse();"><?php echo $html->image('icons/add.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Add Another Course</a>
-  <br><br>
-  <a href=# onClick="removeFromCourse();"><?php echo $html->image('icons/delete.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Remove From Another Course</a>
-  <?php echo $ajax->observeField('add', array('update'=>'adddelcourses', 'url'=>"/users/adddelcourse/$user_id", 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');")) ?>
+        <input type="hidden" name="add" id="add" value="0">
+        <!--<a href=# onClick="addToCourse();"><?php echo $html->image('icons/add.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Add Another Course</a>-->
+        <?php echo $ajax->link($html->image('icons/add.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')).'- Add Another Course',
+                               '/users/adddelcourse/'.$user_id,
+                               array('update'=>'adddelcourses',
+                                     'with'=> '{add:course_count}',
+                                     'loading'=>"Element.show('loading');",
+                                     'complete'=>"Element.hide('loading');course_count++;",
+                                     'position'=>'bottom'),
+                               null,
+                               false) ?>
+
+        <br><br>
+        <a href=# onClick="removeFromCourse();"><?php echo $html->image('icons/delete.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Remove From Another Course</a>
+        <?php echo $ajax->observeField('add', array('update'=>'adddelcourses',
+                                                    'url'=>"/users/adddelcourse",
+                                                    'frequency'=>1,
+                                                    'loading'=>"Element.show('loading');",
+                                                    'complete'=>"Element.hide('loading');")) ?>
 
       </td>
     </tr>
     <?php endif;?>
-<?php if (($params['data']['User']['role'] == 'S'))  {
+<?php if (isset($params['data']['User']['role']) &&($params['data']['User']['role'] == 'S'))  {
          if (!(isset($rdAuth->customIntegrateCWL) && $rdAuth->customIntegrateCWL)) :?>
           <tr class="tablecell2">
             <td id="password_label">Password:</td>
@@ -103,7 +117,8 @@
 <?php  }  ?>
 
     <tr class="tablecell2">
-      <td align="center" colspan="3" id="password_label">	   <input type="button" name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller']; ?>'">
+      <td align="center" colspan="3" id="password_label">
+      <input type="button" name="Back" value="Back" onClick="window.location='<?php echo $this->webroot . "users/index" ?>'";>
 
       <?php echo $html->submit('Save') ?>
 

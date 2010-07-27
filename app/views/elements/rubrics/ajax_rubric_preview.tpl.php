@@ -12,7 +12,17 @@
 
 		//for loop to display the top header row with LOM comments
 		for($i=1; $i<=$LOM_num; $i++){
-			echo '<td align="left">LOM General Comment '.$i.'<br>'.$html->areaTag('Rubric/LOM_comment'.$i,'',2, array('style'=>'width:90%;','value'=>(empty($LOM_des[$i])?'':$LOM_des[$i])))."</td>";
+			echo '<td align="left">LOM General Comment '.$i.'<br>'.
+			$html->areaTag('Rubric/lom_comment'.$i,'',2,
+                array('style'=>'width:90%;',
+                'value'=>(!empty($data['Rubric']['lom_comment'.$i]) ?
+                    $data['Rubric']['lom_comment'.$i] :
+                    (isset($LOM_des[$i]) ?
+                        $LOM_des[$i] :
+                        "")
+                    )
+                )
+            )."</td>";
 		}
 		echo "<td>Criteria Weight</td>";
 		echo "</tr>";
@@ -23,7 +33,11 @@
 			for($i=1; $i<=$criteria_num; $i++){
 				echo '<tr class="tablecell" align="center">';
 				echo '<td class="tableheader2" valign="top"><table border="0" width="95%" cellpadding="2"><tr><td align="left">Criteria '.$i.'</td></tr><tr><td>'
-					  .$html->areaTag('Rubric/criteria'.$i,15,2, array('value'=>(empty($crit[$i])?'':$crit[$i]),'style'=>'width:95%;'))."<br>"
+					  .$html->areaTag('Rubric/criteria'.$i,15,2,
+                            array('value'=>( isset($data['Rubric']['criteria'.$i]) ?
+                                                $data['Rubric']['criteria'.$i] :
+                                                (isset($crit[$i]) ? $crit[$i] : "")),
+                                                'style'=>'width:95%;'))."<br>"
 					  ."</td></tr></table></td>";
 
 				//for loop to display the criteria comment cells for each LOM
@@ -67,7 +81,7 @@
 			for($i=1; $i<=$criteria_num; $i++){
 				echo '<tr class="tablecell" align="center">';
 				echo '<td class="tableheader2" valign="top"><table border="0" width="95%" cellpadding="2"><tr><td>Criteria $i</td></tr><tr><td>'
-					  .$html->areaTag('Rubric/criteria'.$i,15,2, array('value'=>$crit[$i]))."<br>"
+					  .$html->areaTag('Rubric/criteria'.$i,15,2, array('value'=> !empty($data['Rubric']['criteria'.$i]) ? $data['Rubric']['criteria'.$i] : $crit[$i]))."<br>"
 					  ."</td></tr></table></td>";
 
 				echo '<td colspan="'.$LOM_num.'"><table border="0" width="95%" cellpadding="4"><tr><td colspan="3">Specific Comment</td></tr>';

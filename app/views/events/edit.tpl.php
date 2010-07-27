@@ -6,7 +6,7 @@
 	  <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Event']['id'])?'add':'edit') ?>">
       <?php echo empty($params['data']['Event']['id']) ? null : $html->hidden('Event/id'); ?>
       <?php echo empty($params['data']['Event']['id']) ? $html->hidden('Event/creator_id', array('value'=>$rdAuth->id)) : $html->hidden('Event/updater_id', array('value'=>$rdAuth->id)); ?>
-      <input type="hidden" name="assigned" id="assigned" value="<?=$groupIDs?>"/>
+      <input type="hidden" name="assigned" id="assigned" value="<?php echo $groupIDs?>"/>
       <?php $event = $params['data'];?>
 
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
@@ -16,7 +16,8 @@
     <tr class="tablecell2">
     	<td width="150" id="course_label">Course:</td>
     	<td width="405">
-			<?php 			$params = array('controller'=>'courses', 'courseList'=>$coursesList, 'courseId'=>$rdAuth->courseId);
+			<?php
+                  $params = array('controller'=>'courses', 'courseList'=>$coursesList, 'courseId'=>$rdAuth->courseId);
                   echo $this->renderElement('courses/course_selection_box', $params);
             ?>
 			</td>
@@ -50,22 +51,22 @@
 			<a title="Add Mix Evaluation" href="<?php echo $this->webroot.$this->themeWeb;?>mixevals/add/pop_up" onclick="wopen(this.href, 'popup', 650, 500); return false;" >&nbsp;Add Mix Evaluation</a>
 			</td></tr>
       <tr>
-          <td width="50%" align="left" valign="top" >
-						<select name="data[Event][event_template_type_id]"
-							onChange="new Ajax.Updater('template_table','<?=$this->webroot.$this->themeWeb?>events/eventTemplatesList/'+this.options[this.selectedIndex].value,
+      <td width="50%" align="left" valign="top" >
+						<select name="data[Event][event_template_type_id]" id="eval_dropdown"
+							onChange="new Ajax.Updater('template_table','<?php echo $this->webroot.$this->themeWeb?>events/eventTemplatesList/'+this.options[this.selectedIndex].value,
 																				 {onLoading:function(request){Element.show('loading');},
 																					onComplete:function(request){Element.hide('loading');},
 																					asynchronous:true, evalScripts:true});  return false;">
 						<?php
 
 						foreach($eventTypes as $row): $eventTemplateType = $row['EventTemplateType']; ?>
-							<option value="<?=$eventTemplateType['id']?>"
+							<option value="<?php echo $eventTemplateType['id']?>"
 							  <?php
 							  if (!empty($event['Event']['event_template_type_id']) && $event['Event']['event_template_type_id'] == $eventTemplateType['id']) {
 							       echo 'SELECTED';
 							  }
 							  ?>
-							  ><?=$eventTemplateType['type_name']?></option>
+							  ><?php echo $eventTemplateType['type_name']?></option>
 						<?php endforeach; ?>
 						</select>
 						<br>
@@ -85,14 +86,14 @@
   <tr class="tablecell2">
     <td>Allow Self-Evaluation?:</td>
     <td>
-    <?php 
+    <?php
       if ($event['Event']['self_eval'] == 1) {
 		    echo '<input type="radio" name="data[Event][self_eval]" value="1" CHECKED> - Enable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		    <input type="radio" name="data[Event][self_eval]" value="0"> - Disable<br>';
       }
       else {
         echo '<input type="radio" name="data[Event][self_eval]" value="1"> - Enable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <input type="radio" name="data[Event][self_eval]" value="0" CHECKED> - Disable<br>';        
+        <input type="radio" name="data[Event][self_eval]" value="0" CHECKED> - Disable<br>';
       }
     ?>
 	  </td>
@@ -108,7 +109,7 @@
       }
       else {
         echo '<input type="radio" name="data[Event][com_req]" value="1"> - Yes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <input type="radio" name="data[Event][com_req]" value="0" CHECKED> - No<br>';        
+        <input type="radio" name="data[Event][com_req]" value="0" CHECKED> - No<br>';
       }
     ?>
 	  </td>
@@ -142,33 +143,20 @@
   </tr>
   <tr class="tablecell2">
     <td>Groups Assignment:&nbsp;</td>
-    <td><table><tr align="center">
-					<td width="260" align="center">Group List<br>
-						<br>
-					<select name="filtered" id="filtered" style="width:200px; height:200px;" multiple>
-						<?php foreach($unassignedGroups as $row): $group = $row['Group'];?>
-					  <option value="<?php echo $group['id'] ?>"><?php echo 'Group '.$group['group_num'].' - '.$group['group_name'] ?></option>
-						<?php endforeach; ?>
-						</select>
-					</td>
-					<td width="80" align="center">
-						<input type="button" style="width:80px;" onClick="move(document.getElementById('filtered'),document.getElementById('group_members'))" value="Assign >>" />
-						<br><br>
-						<input type="button" style="width:80px;" onClick="move(document.getElementById('group_members'),document.getElementById('filtered'))" value="<< Remove " /></td>
-					<td width="260" align="center">Assigned Groups<br><br>
-						<select name="group_members" multiple id="group_members" style="width:200px; height:200px;">
-					  <?php foreach($assignedGroups as $row): $group = $row['Group'];?>
-					  <option value="<?php echo $group['id'] ?>"><?php echo 'Group '.$group['group_num'].' - '.$group['group_name'] ?></option>
-						<?php endforeach; ?>
+    <td>
+        <?php echo $this->renderElement("groups/group_list_chooser",
+            array('all' => $unassignedGroups, 'selected' => $assignedGroups,
+            'allName' =>  'Avaliable Groups', 'selectedName' => 'Participating Groups',
+            'itemName' => 'Group', 'listStrings' => array("Group #", "group_num"," - ","group_name")));
+        ?>
 
-					  </select>
-				  </td>
-				</tr></table>
-		</td>
+    </td>
     <td>&nbsp;</td>
   </tr>
   <tr class="tablecell2">
-    <td colspan="3" align="center"><?php echo $html->submit('Edit Event') ?></td>
+    <?php echo $javascript->link('events')?>
+    <td colspan="3" align="center"><?php echo $html->submit('Edit Event', array('onclick' =>
+        "return validateEventDates('EventReleaseDateBegin','EventReleaseDateEnd','EventDueDate');")); ?></td>
     </tr>
 </table>
 

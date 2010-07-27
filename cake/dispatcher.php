@@ -153,7 +153,7 @@ class Dispatcher extends Object {
 													'url' => $url,
 													'base' => $this->base)));
 		} else {
-			$controller =& new $ctrlClass($this);
+			$controller = new $ctrlClass($this);
 		}
 
 		$classMethods = get_class_methods($controller);
@@ -211,7 +211,7 @@ class Dispatcher extends Object {
 		if(!is_null($controller->webservices)) {
 			array_push($controller->components, $controller->webservices);
 			array_push($controller->helpers, $controller->webservices);
-			$component =& new Component($controller);
+			$component = new Component($controller);
 		}
 
 		$controller->constructClasses();
@@ -251,7 +251,8 @@ class Dispatcher extends Object {
 			uses(DS.'controller'.DS.'scaffold');
 			return new Scaffold($controller, $params);
 		} else {
-			$output = call_user_func_array(array(&$controller, $params['action']), empty($params['pass'])? null: $params['pass']);
+			//$output = call_user_func_array(array(&$controller, $params['action']), empty($params['pass'])? null: $params['pass']);
+			$output = call_user_func_array(array(&$controller, $params['action']), empty($params['pass'])? array(): $params['pass']);
 		}
 		if ($controller->autoRender) {
 			$output = $controller->render();
@@ -301,7 +302,7 @@ class Dispatcher extends Object {
 		include CONFIGS.'routes.php';
 		$params = $Route->parse ($from_url);
 
-		if (ini_get('magic_quotes_gpc') == 1) {
+		if (get_magic_quotes_gpc() == 1) {
 			if(!empty($_POST)) {
 				$params['form'] = stripslashes_deep($_POST);
 			}
@@ -314,7 +315,7 @@ class Dispatcher extends Object {
 		}
 
 		if (isset($_GET)) {
-			if (ini_get('magic_quotes_gpc') == 1) {
+			if (get_magic_quotes_gpc() == 1) {
 				$params['url'] = stripslashes_deep($_GET);
 			} else {
 				$params['url'] = $_GET;

@@ -262,7 +262,7 @@ class Controller extends Object{
 			}
 
 			if (($cached === false)) {
-				$model =& new $this->modelClass($id);
+				$model = new $this->modelClass($id);
 				$this->modelNames[] = $this->modelClass;
 				$this->{$this->modelClass} =& $model;
 
@@ -295,9 +295,10 @@ class Controller extends Object{
 					}
 
 					if (($cached === false)) {
-						$model =& new $modelClass($id);
+						$model = new $modelClass($id);
 						$this->modelNames[] = $modelClass;
-						$this->{$modelClass} =& $model;
+						
+						$this->{$modelClass} = $model;
 
 						if ($this->persistModel === true) {
 							$this->_persist($modelClass, true, $model);
@@ -467,7 +468,7 @@ class Controller extends Object{
 			loadView($this->view);
 		}
 		$this->beforeRender();
-		$this->_viewClass =& new $viewClass($this);
+		$this->_viewClass = new $viewClass($this);
 
 		if (!empty($this->modelNames)) {
 			foreach($this->modelNames as $model) {
@@ -732,7 +733,7 @@ class Controller extends Object{
 				$modelName = $relData['className'];
 				$manyAssociation = $relation;
 				$modelKeyM = Inflector::underscore($modelName);
-				$modelObject =& new $modelName();
+				$modelObject = new $modelName();
 
 				if ($doCreateOptions) {
 					$otherDisplayField = $modelObject->getDisplayField();

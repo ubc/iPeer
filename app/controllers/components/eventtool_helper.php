@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: evaluation_helper.php,v 1.1 2006/06/20 18:44:15 zoeshum Exp $ */
+/* SVN FILE: $Id$ */
 /*
  *
  *
@@ -13,7 +13,7 @@ class EventtoolHelperComponent extends Object
   function checkEvaluationToolInUse($evalTool=null, $templateId=null)
   {
     //Get the target event
-    $this->Event =& new Event;
+    $this->Event = new Event;
 
 
     return $this->Event->checkEvaluationToolInUse($evalTool, $templateId);

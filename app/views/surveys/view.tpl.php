@@ -15,14 +15,14 @@
             <td>Assigned Course:&nbsp;</td>
             <td><?php
 				echo '<a href=../../courses/view/'.$data['Survey']['course_id'].'>'
-					  .$data['Survey']['course_name'].'</a>';
+					  .$data['Course']['course'].'</a>';
 				?></td>
           </tr>
           <tr class="tablecell2">
             <td>Creator:</td>
             <td><?php
 				echo '<a href=../../users/view/'.$data['Survey']['user_id'].'>'
-					  .$data['Survey']['user_name'].'</a>';
+					  .$data['Creator']['username'].'</a>';
 				?></td>
           </tr>
           <tr class="tablecell2">
@@ -53,7 +53,9 @@
             <td><?php echo $data['Survey']['modified']; ?></td>
           </tr>
           <tr class="tablecell2">
-            <td colspan="2" align="center"><input type="button" name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller']; ?>'"></td>
+            <td colspan="2" align="center">
+            <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
+            </td>
           </tr>
       </table>
         <table width="95%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">

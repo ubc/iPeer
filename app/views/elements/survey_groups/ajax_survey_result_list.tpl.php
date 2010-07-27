@@ -3,17 +3,19 @@
 <?php $pagination->loadingId = 'loading';?>
 <?php if($pagination->set($paging)):?>
 <?php endif;?>
-<?php 
-if (isset($pagination->params['pass']['0'])) {
-  $count=0;
-  foreach ($data as $piece) {
-    if ($pagination->params['pass']['0'] == $data[$count]['eventId']) {
-      $data[0] = $data[$count];
-      continue;
+<?php
+    if (isset($pagination->params['pass']['0'])) {
+    $count=0;
+    if (isset($data[$count]['eventId'])) {
+        foreach ($data as $piece) {
+            if ($pagination->params['pass']['0'] == $data[$count]['eventId']) {
+            $data[0] = $data[$count];
+            continue;
+            }
+            $count++;
+            }
+        }
     }
-    $count++;
-    }
-}
 ?>
 	<table width="95%"  border="0" cellspacing="2" cellpadding="4">
       <tr>
@@ -21,10 +23,11 @@ if (isset($pagination->params['pass']['0'])) {
         </div></td>
       </tr>
     </table>
+    <?php if(isset($data[0])):?>
 	<table width="65%" border="0" cellspacing="2" cellpadding="4" bgcolor="#FFFFFF">
 	  <tr style="background-color:#CCCCDD;">
 	    <td colspan="3" align="center">
-	    <table cellspacing="0" cellpadding="0" width="100%"><tr><td align="left"><?= $data[0]['Survey']['name']; ?></td>
+	    <table cellspacing="0" cellpadding="0" width="100%"><tr><td align="left"><?php echo $data[0]['Survey']['name']; ?></td>
 	    <td align="right"><a href="<?php echo $this->webroot.$this->themeWeb.'evaluations/viewSurveySummary/'.$data[0]['Survey']['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;">View Summary</a></td></tr></table></td>
 	  </tr>
 	  <tr class="tableheader">
@@ -92,5 +95,8 @@ if (isset($pagination->params['pass']['0'])) {
 <?php endif;?>
     </td></tr>
   </table>
+  <?php else:?>
+    No survey available.
+  <?php endif;?>
 </div>
 <!-- elements::ajax_survey_result_list end -->

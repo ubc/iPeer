@@ -18,6 +18,7 @@ form {
 .bannerText {
 	color: #FFFFFF;
 	font-weight: bold;
+	text-shadow: black 0.0em 0.0em 0.5em
 }
 #header {
   float:left;
@@ -130,7 +131,7 @@ a.miniLinks:active {
 
 }
 
-.error{
+.error, .error_message{
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 12px;
 	color: red;
@@ -229,7 +230,9 @@ a.miniLinks:active {
 	font-size: 10px;
 	font-weight: bold;
 	color: #333;
-}.subTable {
+}
+
+.subTable {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 10px;
 	color: #333333;
@@ -245,7 +248,38 @@ a.miniLinks:active {
 	border-right-color: #e2e2e2;
 	border-bottom-color: #e2e2e2;
 	border-left-color: #e2e2e2;
+  width: 240px;
+  float: left;
+  margin: 20px 0 20px 0;
+  position: relative;
 }
+
+div.subTable .table-header{
+  height: 2.2em;
+  background-image: url("../img/layout/header_back.gif");
+  text-align: center;
+  line-height: 2.2em;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	font-weight: bold;
+	color: #FFF;
+}
+
+div.subTable .table-content{
+  background-image: url("../img/layout/small_table_back.gif");
+  height: 115px;
+  padding-top: 20px;
+}
+
+div.table-content li{
+	list-style: none;
+	line-height: 20px;
+}
+
+div.table-content li img{
+  vertical-align: middle;
+}
+
 .tableback {
 	background-image: url(banner_back.gif);
 }
@@ -396,12 +430,14 @@ a.miniLinks:active {
 
 /* Main Navigation */
 #nav {
-	float: left;
-	margin: 1px 0 0px 0px;
-	text-align: center;
+	margin-left: auto;
+  margin-right: auto;
+  padding: 5px 0 5px 0;
+	text-align: left;
 	border: solid #fff;
 	border-width: 0px 0px 0px 0px;
-
+  width: 95%;
+  background-color: white;
 }
 #nav ul {
 	margin: 0px;
@@ -450,14 +486,49 @@ a.miniLinks:active {
 }
 /* end Main Navigation */
 
-/* import data box */
-#import_data {
-  display: none;
-}
 #loading {
   padding-left: 2px;
   padding-top:2px;
   position:absolute;
   float:left;
   display:none;
+}
+
+#flashMessage {
+  text-align: center;
+	margin:0;
+	padding:2px 5px;
+	background:#F4F4F4;
+	font:bold 1em/1 Arial, Helvetica, sans-serif;
+	color: #0A2C64;
+	border-top: 1px solid #CFCFCF;
+	border-bottom: 1px solid #CFCFCF;
+}
+
+#adddelcourses select.course-selector{
+  width: 250px;
+  margin: 2px;
+}
+
+#content{
+  width: 100%;
+  height: auto;
+  background-color: white;
+  padding-bottom: 1em;
+}
+
+#login-form{
+  margin-left: auto;
+  margin-right: auto;
+  width: 500px;
+}
+
+.notice{
+  color: red;
+}
+
+.message{
+  padding: 20px 0 20px 0;
+  text-align: center;
+  line-height: 2em;
 }

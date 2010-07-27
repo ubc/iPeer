@@ -10,10 +10,14 @@
 	  </tr>
 <?php if (isset($rdAuth->customIntegrateCWL) && $rdAuth->customIntegrateCWL) { ?>
     <!-- For CWL customization, no need to display username -->
-<? } else {?>
+<?php } else {?>
     <tr class="tablecell2">
       <td width="185" id="newuser_label">Username:*</td>
-      <td width="502"><?php echo $html->input('User/username', array('size'=>'50', 'disabled'=>'true')) ?></td>
+
+      <td width="502"><?php echo $html->hidden('User/username'); ?>
+        <?php echo "<input type='text' size='50' disabled='true' value='" . $params['data']['User']['username'] . "'>"; ?>
+
+        </td>
       <td></td>
     </tr>
 <?php } ?>
@@ -32,7 +36,7 @@
       <td width="185" id="student_no_label">Student No.:</td>
 <?php if (isset($rdAuth->customIntegrateCWL) && $rdAuth->customIntegrateCWL) { ?>
       <td><?php echo $html->input('User/student_no', array('id'=>'student_no', 'size'=>'50', 'class'=>'validate none TEXT_FORMAT student_no_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'disabled'=>true)) ?> </td>
-<? } else {?>
+<?php } else {?>
       <td><?php echo $html->input('User/student_no', array('id'=>'student_no', 'size'=>'50', 'class'=>'validate none TEXT_FORMAT student_no_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'disabled'=>$viewPage)) ?> </td>
 <?php } ?>
 

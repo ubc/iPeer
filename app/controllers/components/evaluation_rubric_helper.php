@@ -1,8 +1,8 @@
 <?php
-/* SVN FILE: $Id: evaluation_rubric_helper.php,v 1.5 2006/09/27 17:25:53 kamilon Exp $ */
+/* SVN FILE: $Id$ */
 /*
  * To use your Model’s inside of your components, you can create a new instance like this:
- *  $this->foo =& new Foo;
+ *  $this->foo = new Foo;
  *
  * @author
  * @version     0.10.5.1797
@@ -15,10 +15,10 @@ class EvaluationRubricHelperComponent extends Object
 
   function loadRubricEvaluationDetail ($event)
   {
-    $this->EvaluationRubric =& new EvaluationRubric;
-    $this->GroupsMembers =& new GroupsMembers;
-    $this->EvaluationRubricDetail =& new EvaluationRubricDetail;
-    $this->Rubric =& new Rubric;
+    $this->EvaluationRubric = new EvaluationRubric;
+    $this->GroupsMembers = new GroupsMembers;
+    $this->EvaluationRubricDetail = new EvaluationRubricDetail;
+    $this->Rubric = new Rubric;
 
     $result = array();
  	  $evaluator = $this->rdAuth->id;
@@ -57,14 +57,15 @@ class EvaluationRubricHelperComponent extends Object
 
   function saveRubricEvaluation($params=null)
   {
-    $this->Event =& new Event;
-    $this->Rubric =& new Rubric;
-    $this->EvaluationRubric =& new EvaluationRubric;
+    $this->Event = new Event;
+    $this->Rubric = new Rubric;
+    $this->EvaluationRubric = new EvaluationRubric;
 
     // assuming all are in the same order and same size
 		$evaluatees = $params['form']['memberIDs'];
 		$evaluator = $params['data']['Evaluation']['evaluator_id'];
     $groupEventId = $params['form']['group_event_id'];
+    $rubricId = $params['form']['rubric_id'];
 
     //Get the target event
     $eventId = $params['form']['event_id'];
@@ -93,6 +94,7 @@ class EvaluationRubricHelperComponent extends Object
 		    $evalRubric['EvaluationRubric']['evaluatee'] = $targetEvaluatee;
 		    $evalRubric['EvaluationRubric']['grp_event_id'] = $groupEventId;
 		    $evalRubric['EvaluationRubric']['event_id'] = $eventId;
+		    $evalRubric['EvaluationRubric']['rubric_id'] = $rubricId;
         $evalRubric['EvaluationRubric']['release_status'] = 0;
         $evalRubric['EvaluationRubric']['grade_release'] = 0;
         $this->EvaluationRubric->save($evalRubric);
@@ -105,6 +107,7 @@ class EvaluationRubricHelperComponent extends Object
 		 $score = $this->saveNGetEvalutionRubricDetail($evalRubric['EvaluationRubric']['id'], $rubric,
 		                                               $targetEvaluatee, $params['form']);
      $evalRubric['EvaluationRubric']['score'] = $score;
+     
      if (!$this->EvaluationRubric->save($evalRubric))
      {
        return false;
@@ -114,7 +117,7 @@ class EvaluationRubricHelperComponent extends Object
 
   function saveNGetEvalutionRubricDetail ($evalRubricId, $rubric, $targetEvaluatee, $form)
   {
-    $this->EvaluationRubricDetail =& new EvaluationRubricDetail;
+    $this->EvaluationRubricDetail = new EvaluationRubricDetail;
     $isCheckBoxes = false;
     $totalGrade = 0;
     $pos = 0;
@@ -146,9 +149,9 @@ class EvaluationRubricHelperComponent extends Object
 
   function getRubricResultDetail ($event, $groupMembers) {
 	  $pos = 0;
-	  $this->EvaluationSubmission =& new EvaluationSubmission;
-	  $this->EvaluationRubric  =& new EvaluationRubric;
-    $this->EvaluationRubricDetail   =& new EvaluationRubricDetail;
+	  $this->EvaluationSubmission = new EvaluationSubmission;
+	  $this->EvaluationRubric  = new EvaluationRubric;
+    $this->EvaluationRubricDetail   = new EvaluationRubricDetail;
     $rubricResultDetail = array();
 		$memberScoreSummary = array();
 		$allMembersCompleted = true;
@@ -211,10 +214,10 @@ class EvaluationRubricHelperComponent extends Object
 
   function getStudentViewRubricResultDetailReview ($event, $userId) {
 	  $userPOS = 0;
-	  $this->EvaluationSubmission =& new EvaluationSubmission;
-	  $this->EvaluationRubric  =& new EvaluationRubric;
-    $this->EvaluationRubricDetail   =& new EvaluationRubricDetail;
-    $this->User =& new User;
+	  $this->EvaluationSubmission = new EvaluationSubmission;
+	  $this->EvaluationRubric  = new EvaluationRubric;
+    $this->EvaluationRubricDetail   = new EvaluationRubricDetail;
+    $this->User = new User;
 
     $rubricResultDetail = array();
 		$memberScoreSummary = array();
@@ -306,8 +309,8 @@ class EvaluationRubricHelperComponent extends Object
 
 
   function changeEvaluationGradeRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus) {
- 	  $this->EvaluationRubric  =& new EvaluationRubric;
- 	  $this->GroupEvent =& new GroupEvent;
+ 	  $this->EvaluationRubric  = new EvaluationRubric;
+ 	  $this->GroupEvent = new GroupEvent;
 
     //changing grade release for each EvaluationRubric
  		$evaluationRubric = $this->EvaluationRubric->getResultsByEvaluatee($groupEventId, $evaluateeId);
@@ -329,8 +332,8 @@ class EvaluationRubricHelperComponent extends Object
 	}
 
   function changeEvaluationCommentRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus) {
- 	  $this->EvaluationRubric  =& new EvaluationRubric;
- 	  $this->GroupEvent =& new GroupEvent;
+ 	  $this->EvaluationRubric  = new EvaluationRubric;
+ 	  $this->GroupEvent = new GroupEvent;
 
 		$this->GroupEvent->setId($groupEventId);
 		$groupEvent = $this->GroupEvent->read();
@@ -357,11 +360,11 @@ class EvaluationRubricHelperComponent extends Object
 
 	function formatRubricEvaluationResult($event=null, $displayFormat='', $studentView=0)
 	{
-	  $this->Rubric =& new Rubric;
-	  $this->User =& new User;
-	  $this->GroupsMembers =& new GroupsMembers;
-	  $this->RubricsCriteria =& new RubricsCriteria;
-	  $this->EvaluationRubric =& new EvaluationRubric;
+	  $this->Rubric = new Rubric;
+	  $this->User = new User;
+	  $this->GroupsMembers = new GroupsMembers;
+	  $this->RubricsCriteria = new RubricsCriteria;
+	  $this->EvaluationRubric = new EvaluationRubric;
 
 	  $evalResult = array();
 	  $groupMembers = array();

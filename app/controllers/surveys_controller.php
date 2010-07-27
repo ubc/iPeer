@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: surveys_controller.php,v 1.19 2006/09/12 14:16:32 davychiu Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.19 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/09/12 14:16:32 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -24,70 +24,74 @@
  * @package
  * @subpackage
  * @since
+
  */
 
 class SurveysController extends AppController
 {
-    var $uses =  array('Course', 'Survey', 'User', 'Question', 'SurveyQuestion', 'Response','Personalize','Event','EvaluationSubmission','UserEnrol','SurveyInput','SurveyGroupMember','SurveyGroupSet','SurveyGroup');
-	var $name = 'Surveys';
-	var $show;
-	var $sortBy;
-	var $direction;
-	var $page;
-	var $order;
-	var $Sanitize;
-	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
-	var $components = array('rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework','SurveyHelper');
+  var $uses =  array('Course', 'Survey', 'User', 'Question', 'SurveyQuestion', 'Response','Personalize','Event','EvaluationSubmission','UserEnrol','SurveyInput','SurveyGroupMember','SurveyGroupSet','SurveyGroup');
+  var $name = 'Surveys';
+  var $show;
+  var $sortBy;
+  var $direction;
+  var $page;
+  var $order;
+  var $Sanitize;
+  var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
+  var $components = array('rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework','SurveyHelper');
 
 
 	function __construct()
 	{
-		$this->Sanitize = &new Sanitize;
-		$this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
+		$this->Sanitize = new Sanitize;
+		$this->show = empty($_REQUEST['show'])? 'null': $this->Sanitize->paranoid($_REQUEST['show']);
 		if ($this->show == 'all') $this->show = 99999999;
-		$this->sortBy = empty($_GET['sort'])? 'created': $this->Sanitize->paranoid($_GET['sort']);
+		$this->sortBy = empty($_GET['sort'])? 'Survey.created': $_GET['sort'];
 		$this->direction = empty($_GET['direction'])? 'desc': $this->Sanitize->paranoid($_GET['direction']);
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
+    $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
  		$this->pageTitle = 'Surveys';
 		parent::__construct();
 	}
 
 	function index()
 	{
-  	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+    $this->mine_only = true;
+    $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
     $this->userPersonalize->setPersonalizeList($personalizeData);
-  	if ($personalizeData && $this->userPersonalize->inPersonalizeList('Survey.ListMenu.Limit.Show')) {
-       $this->show = $this->userPersonalize->getPersonalizeValue('Survey.ListMenu.Limit.Show');
-       $this->set('userPersonalize', $this->userPersonalize);
-  	} else {
-  	  $this->show = '10';
+    if ($personalizeData && $this->userPersonalize->inPersonalizeList('Survey.ListMenu.Limit.Show')) {
+      $this->show = $this->userPersonalize->getPersonalizeValue('Survey.ListMenu.Limit.Show');
+      $this->set('userPersonalize', $this->userPersonalize);
+    } else {
+      $this->show = '10';
       $this->update($attributeCode = 'Survey.ListMenu.Limit.Show',$attributeValue = $this->show);
-  	}
-  	$conditions = 'Survey.creator_id='.$this->rdAuth->id;
+    }
+
+    $conditions = array('Survey.creator_id' =>  $this->rdAuth->id);
+    if ($this->rdAuth->courseId > 1)  { // If the course is set, use that value as well.
+      $conditions['Survey.course_id'] = $this->rdAuth->courseId;
+    }
+
 		$data = $this->Survey->findAll($conditions, '', $this->order, $this->show, $this->page,null,null);//array('JOIN courses AS Course ON Survey.course_id = Course.id'));
 
 		$paging['style'] = 'ajax';
-		$paging['link'] = '/surveys/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
+		$paging['link'] = '/surveys/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&show_my_tool='.$this->mine_only.'&page=';
 
-		$paging['count'] = !empty($data) ? count($data):0;
+		$paging['count'] = $this->Survey->findCount($conditions);
 		$paging['show'] = array('10','25','50','all');
 		$paging['page'] = $this->page;
 		$paging['limit'] = $this->show;
 		$paging['direction'] = $this->direction;
+    $paging['mine'] = $this->mine_only;
+    $paging['result_count'] = count($data);
 
 		$this->set('paging',$paging);
 		$this->set('data',$data);
 	}
 
 	function view($id) {
-	  $data = $this->Survey->read();
-
-    $userName = $this->User->find('id='.$data['Survey']['user_id']);
-    $data['Survey']['user_name'] = $userName['User']['username'];
-    $courseName = $this->Course->find('id='.$data['Survey']['course_id']);
-    $data['Survey']['course_name'] = $courseName['Course']['title'];
-
+        $data = $this->Survey->read();
 		$this->set('data', $data);
 	}
 
@@ -118,7 +122,9 @@ class SurveysController extends AppController
 				}
 			}
 		}
-    $this->set('data',$this->Survey->read($survey_id));
+
+		$survey = $this->Survey->findById($survey_id);
+        $this->set('data',$survey);
 		$this->set('questions', $result);
 		$this->render('questionssummary');
 	}
@@ -197,6 +203,7 @@ class SurveysController extends AppController
 			}
 			else
 			{
+                $this->set('errmsg', $this->Survey->errorMessage);
 				$this->set('data', $this->params['data']);
 				$this->render('edit');
 			}
@@ -257,35 +264,31 @@ class SurveysController extends AppController
 		$courseList = $this->sysContainer->getMyCourseList();
 		$this->set('courseList', $courseList);
 
-		if (empty($this->params['data']))
-		{
+		if (empty($this->params['data'])) {
 			$this->Survey->setId($id);
 			$this->params['data'] = $this->Survey->read();
-		  $this->set('course_id',$this->params['data']['Survey']['course_id']);
+		    $this->set('course_id',$this->params['data']['Survey']['course_id']);
 			$this->render();
-		}
-		else
-		{
+		} else {
 			$this->params['data']['Survey']['name'] = $this->params['form']['name'];
 			$this->params['data']['Survey']['course_id'] = $this->params['form']['course_id'];
-		  $this->set('course_id',$this->params['form']['course_id']);
+            $this->set('course_id',$this->params['form']['course_id']);
 
 			if ( $this->Survey->save($this->params['data']))
 			{
 			  //alter dates for the event
-			  $eventArray = $this->Event->find('template_id='.$this->Survey->id.' AND event_template_type_id=3');
-    		$eventArray['Event']['title'] = $this->params['data']['Survey']['name'];
-    		$eventArray['Event']['course_id'] = $this->params['data']['Survey']['course_id'];
-    		$eventArray['Event']['due_date'] = $this->params['data']['Survey']['due_date'];
-    		$eventArray['Event']['release_date_begin'] = $this->params['data']['Survey']['release_date_begin'];
-    		$eventArray['Event']['release_date_end'] = $this->params['data']['Survey']['release_date_end'];
-    		$this->Event->save($eventArray);
+                $eventArray = $this->Event->find('template_id='.$this->Survey->id.' AND event_template_type_id=3');
+                $eventArray['Event']['title'] = $this->params['data']['Survey']['name'];
+                $eventArray['Event']['course_id'] = $this->params['data']['Survey']['course_id'];
+                $eventArray['Event']['due_date'] = $this->params['data']['Survey']['due_date'];
+                $eventArray['Event']['release_date_begin'] = $this->params['data']['Survey']['release_date_begin'];
+                $eventArray['Event']['release_date_end'] = $this->params['data']['Survey']['release_date_end'];
+                $this->Event->save($eventArray);
 
-				$this->set('message', 'The survey was updated successfully.');
-				$this->index();
-			}
-			else
-			{
+                $this->set('course_id', $this->params['data']['Survey']['course_id']);
+ 				$this->redirect('/surveys/index/The Survey was edited successfully.');
+			} else {
+                $this->set('errmsg', $this->Survey->errorMessage);
 				$this->set('data', $this->params['data']);
 				$this->render();
 			}
@@ -294,17 +297,17 @@ class SurveysController extends AppController
 
 	function copy($id=null)
 	{
-	  $this->render = false;
+        $this->render = false;
 		$this->Survey->setId($id);
 		$courseList = $this->sysContainer->getMyCourseList();
 		$this->set('courseList', $courseList);
 		$this->set('templates', $this->Survey->findAll($conditions=null, $fields="id, name"));
 		$this->params['data'] = $this->Survey->read();
 		unset($this->params['data']['Survey']['id']);
-	  //converting nl2br back so it looks better
+		$this->params['data']['Survey']['name'] = "";
+            //converting nl2br back so it looks better
 		$this->Output->br2nl($this->params['data']);
-    $this->render('add');
-
+        $this->render('add');
 	}
 
 	function editquestion( $question_id=null, $survey_id=null )
@@ -349,24 +352,28 @@ class SurveysController extends AppController
 	{
 		if ($this->Survey->del($id)) {
 		  $groupSets = $this->SurveyGroupSet->findAll('survey_id='.$id);
-		  foreach ($groupSets as $groupSet) {
-    	  $groupSetId = $groupSet['SurveyGroupSet']['id'];
-        $time = $groupSet['SurveyGroupSet']['date'];
 
-        $this->SurveyHelper->deleteGroupSet($groupSetId);
+		  foreach ($groupSets as $groupSet)
+		  {
+    	  	$groupSetId = $groupSet['SurveyGroupSet']['id'];
+        	$time = $groupSet['SurveyGroupSet']['date'];
 
-        //delete teammaker crums
-        if (!empty($time)) {
-          unlink('../uploads/'.$time.'.txt');
-          unlink('../uploads/'.$time.'.xml');
-          unlink('../uploads/'.$time.'.txt.scores');
-        }
+        	$this->SurveyHelper->deleteGroupSet($groupSetId);
+
+        	//delete teammaker crums
+        	if (!empty($time)) {
+	          unlink('../uploads/'.$time.'.txt');
+	          unlink('../uploads/'.$time.'.xml');
+	          unlink('../uploads/'.$time.'.txt.scores');
+	        }
 		  }
 
 		  //delete associating event
-		  $events = $this->Event->findAll('event_template_id=3 AND template_id='.$id);
-		  foreach ($events as $event) {
-		    $this->Event->del($event['Event']['id']);
+		  $events = $this->Event->findAll('event_template_type_id=3 AND template_id='.$id);
+		  if(!empty($events)) {
+			  foreach ($events as $event) {
+			    $this->Event->del($event['Event']['id']);
+			  }
 		  }
 	    //delete possible submissions
 		  $inputs = $this->SurveyInput->findAll('survey_id='.$id);
@@ -384,83 +391,112 @@ class SurveysController extends AppController
 		}
 	}
 
-	function search()
-  	{
-      $this->layout = 'ajax';
-      if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-      	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-      	if ($personalizeData) {
-      	   $this->userPersonalize->setPersonalizeList($personalizeData);
-           $this->show = $this->userPersonalize->getPersonalizeValue('Survey.ListMenu.Limit.Show');
-           $this->set('userPersonalize', $this->userPersonalize);
-      	}
+  function search()
+  {
+    $this->layout = 'ajax';
+    if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
+      $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+      if ($personalizeData) {
+        $this->userPersonalize->setPersonalizeList($personalizeData);
+        $this->show = $this->userPersonalize->getPersonalizeValue('Survey.ListMenu.Limit.Show');
+        $this->set('userPersonalize', $this->userPersonalize);
       }
-
-      $conditions = '';
-      if (!empty($this->params['form']['show_my_tool'])){
-        $conditions .= 'Survey.creator_id = '.$this->rdAuth->id;
-      }
-
-      if (!empty($this->params['form']['livesearch2']) && !empty($this->params['form']['select']))
-      {
-        $pagination->loadingId = 'loading';
-        //parse the parameters
-        $searchField=$this->params['form']['select'];
-        $searchValue=$this->params['form']['livesearch2'];
-        (empty($conditions))? $conditions = '' : $conditions .= ' AND ';
-        $conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
-      }
-      $this->update($attributeCode = 'Survey.ListMenu.Limit.Show',$attributeValue = $this->show);
-      $this->set('conditions',$conditions);
-  	}
-
-    // called to add/remove response field from add/edit question pages
-	function adddelquestion($question_id=null)
-    {
-      if(!empty($question_id))
-	 	 $this->set('responses', $this->Response->findAll($conditions='question_id='.$question_id));
-
-	  $this->layout = 'ajax';
     }
 
-	function checkDuplicateName()
-	{
-		$this->layout = 'ajax';
-		$this->render('checkDuplicateName');
-	}
+    $conditions = '';
+    if ($this->mine_only){
+      $conditions = array('Survey.creator_id' =>  $this->rdAuth->id);
+    }
 
-	// called to change survey status to release
-	function releaseSurvey($id=null)
-	{//deprecated, this function is not used
-	  $eventArray = array();
+    if ($this->rdAuth->courseId > 1)  { // If the course is set, use that value as well.
+      $conditions['Survey.course_id'] = $this->rdAuth->courseId;
+    }
 
-		$this->Survey->setId($id);
-		$this->params['data'] = $this->Survey->read();
-		$this->params['data']['Survey']['released'] = 1;
 
-		//add survey to events
-		  //set up Event params
-		$eventArray['Event']['title'] = $this->params['data']['Survey']['name'];
-		$eventArray['Event']['course_id'] = $this->params['data']['Survey']['course_id'];
-		$eventArray['Event']['event_template_type_id'] = 3;
-		$eventArray['Event']['template_id'] = $this->params['data']['Survey']['id'];
-		$eventArray['Event']['self_eval'] = 0;
-		$eventArray['Event']['com_req'] = 0;
-		$eventArray['Event']['due_date'] = $this->params['data']['Survey']['due_date'];
-		$eventArray['Event']['release_date_begin'] = $this->params['data']['Survey']['release_date_begin'];
-		$eventArray['Event']['release_date_end'] = $this->params['data']['Survey']['release_date_end'];
-		$eventArray['Event']['creator_id'] = $this->params['data']['Survey']['creator_id'];
-		$eventArray['Event']['created'] = $this->params['data']['Survey']['created'];
+    if (!empty($this->params['form']['livesearch2']) && !empty($this->params['form']['select']))
+    {
+      $pagination->loadingId = 'loading';
+      //parse the parameters
+      $searchField=$this->params['form']['select'];
+      $searchValue=$this->params['form']['livesearch2'];
+      (empty($conditions))? $conditions = '' : $conditions .= ' AND ';
+      if('Creator.name' == $searchField)
+      {
+        $conditions = "(Creator.first_name LIKE '%".mysql_real_escape_string($searchValue)."%'
+          OR Creator.last_name LIKE '%".mysql_real_escape_string($searchValue)."%')";
+      }else{
+        $conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
+      }
+    }
+    $this->update($attributeCode = 'Survey.ListMenu.Limit.Show',$attributeValue = $this->show);
+
+    $data = $this->Survey->findAll($conditions,'' , $this->order, $this->show, $this->page,null,null);
+
+    $paging['style'] = 'ajax';
+    $paging['link'] = '/surveys/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&show_my_tool='.$this->mine_only.'&page=';
+
+    $paging['count'] = $this->Survey->findCount($conditions);
+    $paging['show'] = array('10','25','50','all');
+    $paging['page'] = $this->page;
+    $paging['limit'] = $this->show;
+    $paging['direction'] = $this->direction;
+    $paging['mine'] = $this->mine_only;
+    $paging['count'] = $this->Survey->findCount($conditions);
+
+    $this->set('paging', $paging);
+    $this->set('data', $data);
+
+  }
+
+  // called to add/remove response field from add/edit question pages
+  function adddelquestion($question_id=null)
+  {
+    if(!empty($question_id))
+      $this->set('responses', $this->Response->findAll($conditions='question_id='.$question_id));
+
+    $this->layout = 'ajax';
+  }
+
+  function checkDuplicateName()
+  {
+    $course_id = $this->rdAuth->courseId;
+    $this->layout = 'ajax';
+    $this->set('course_id', $course_id);
+    $this->render('checkDuplicateName');
+  }
+
+  // called to change survey status to release
+  function releaseSurvey($id=null)
+  {//deprecated, this function is not used
+    $eventArray = array();
+
+    $this->Survey->setId($id);
+    $this->params['data'] = $this->Survey->read();
+    $this->params['data']['Survey']['released'] = 1;
+
+    //add survey to eventsx();
+    //set up Event params
+    $eventArray['Event']['title'] = $this->params['data']['Survey']['name'];
+    $eventArray['Event']['course_id'] = $this->params['data']['Survey']['course_id'];
+    $eventArray['Event']['event_template_type_id'] = 3;
+    $eventArray['Event']['template_id'] = $this->params['data']['Survey']['id'];
+    $eventArray['Event']['self_eval'] = 0;
+    $eventArray['Event']['com_req'] = 0;
+    $eventArray['Event']['due_date'] = $this->params['data']['Survey']['due_date'];
+    $eventArray['Event']['release_date_begin'] = $this->params['data']['Survey']['release_date_begin'];
+    $eventArray['Event']['release_date_end'] = $this->params['data']['Survey']['release_date_end'];
+    $eventArray['Event']['creator_id'] = $this->params['data']['Survey']['creator_id'];
+    $eventArray['Event']['created'] = $this->params['data']['Survey']['created'];
 
     //Save Data
-		if ($this->Event->save($eventArray)) {
+    if ($this->Event->save($eventArray)) {
       //Save Groups for the Event
-		  //$this->GroupEvent->insertGroups($this->Event->id, $this->params['data']['Event']);
+      //$this->GroupEvent->insertGroups($this->Event->id, $this->params['data']['Event']);
 
-			//$this->redirect('/events/index/The event is added successfully.');
-		}
+      //$this->redirect('/events/index/The event is added successfully.');
+    }
 
-		$this->Survey->save($this->params['data']);
+    $this->Survey->save($this->params['data']);
 
 
 		$this->set('data', $this->Survey->findAll(null, null, 'id'));

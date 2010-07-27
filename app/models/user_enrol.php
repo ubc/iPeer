@@ -12,34 +12,32 @@ class UserEnrol extends AppModel
 
 
   function getEnrolledStudentCount($courseId=null) {
-    return $this->find('course_id='.$courseId, 'COUNT(DISTINCT user_id) as total');
+    $conditions = array('course_id' => $courseId,
+                        );
+    return $this->find($conditions, 'COUNT(DISTINCT user_id) as total');
   }
-  
+
   function removeStudentFromCourse($user_id=null, $course_id=null) {
     $course_to_remove = $this->find(array('course_id=' . $course_id, 'user_id=' . $user_id));
     return $this->delete($course_to_remove['UserEnrol']['id']);
   }
-  
-  function insertCourses($user_id=null, $data=null) {
-    $courseIDs = '';
-    for( $i=1; $i<=$data['data']['Course']['count']; $i++ ){
-      $pos = 0;
-      if (!empty($data['course_id'.$i]) && $data['course_id'.$i] > 0) {
-          //$pos = strpos($instructorIDs, $data['course_id'.$i]);
-          $pos = strpos($courseIDs, $data['course_id'.$i]);
-          if (!(FALSE !== $pos)) {
-              $newCourse = array();
-              $newCourse['UserEnrol']['course_id'] = $data['course_id'.$i];
-              $newCourse['UserEnrol']['user_id'] = $user_id;
-              $newCourse['UserEnrol']['record_status'] = 'A';
-              $this->save($newCourse);
-              $this->id = null;
-              $courseIDs .= $data['course_id'.$i].';';
-          }
-        }
+
+  function insertCourses($user_id, $course_ids) {
+    if(!is_array($course_ids) || empty($course_ids) || $user_id <= 0) return;
+
+    $course_ids = array_unique($course_ids);
+
+    foreach($course_ids as $id)
+    {
+      $c = array();
+      $c['UserEnrol']['course_id']  = $id;
+      $c['UserEnrol']['user_id']    = $user_id;
+      $c['UserEnrol']['record_status'] = 'A';
+      $this->save($c);
+      $this->id = null;
     }
   }
-  
+
 }
 
 ?>

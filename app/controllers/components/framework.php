@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: framework.php,v 1.1 2006/06/20 18:44:15 zoeshum Exp $ */
+/* SVN FILE: $Id$ */
 /*
  * rdAuth Component for ipeerSession
  *
@@ -68,7 +68,7 @@ class frameworkComponent
 
   function getUser($userId) {
     
-    $this->User =& new User;
+    $this->User = new User;
     return ($this->User->find('id = '.$userId));
   }
 }

@@ -333,7 +333,7 @@ class DboAdodb extends DboSource{
 				return "''";
 		  }
 
-		  if (ini_get('magic_quotes_gpc') == 1) {
+		  if (get_magic_quotes_gpc() == 1) {
 				$data = stripslashes($data);
 		  }
 

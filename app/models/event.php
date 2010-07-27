@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: event.php,v 1.7 2006/08/31 21:03:09 davychiu Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.7 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/08/31 21:03:09 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -43,6 +43,13 @@ class Event extends AppModel
 
   );
 
+
+  var $validate = array(
+      'title' => VALID_NOT_EMPTY,
+      'due_date' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/',
+      'release_date_begin' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/',
+      'release_date_end' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/'
+  );
  /* var $hasMany = array(
                       'GroupEvent' =>
                         array(
@@ -89,6 +96,16 @@ class Event extends AppModel
 
 	//Overwriting Function - will be called before save operation
 	function beforeSave(){
+        // Ensure the name is not empty
+        if (empty($this->data[$this->name]['title'])) {
+            $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
+            return false;
+        }
+
+      // Remove any signle quotes in the name, so that custom SQL queries are not confused.
+      $this->data[$this->name]['title'] =
+        str_replace("'", "", $this->data[$this->name]['title']);
+
 	  $allowSave = true;
 	  if (empty($this->data[$this->name]['id'])) {
       //check the duplicate title
@@ -98,10 +115,10 @@ class Event extends AppModel
 	}
 
   //Validation check on duplication of title
-	function __checkDuplicateTitle() {
+	function __checkDuplicateTitle($title = null) {
 	  $duplicate = false;
     $field = 'title';
-    $value = $this->data[$this->name]['title'];
+    $value = null === $title ? $this->data[$this->name]['title'] : $title;
     if ($result = $this->find($field . ' = "' . $value.'"', $field)){
       $duplicate = true;
      }
@@ -176,7 +193,8 @@ class Event extends AppModel
 		  }
 	}
 
-  function cascadeRemove($id=null)
+  //TODO: unfinished function
+  function cascadeRemove($id)
   {
   	/* tables related: events, group_events,
      * evaluation_submissions,
@@ -189,15 +207,15 @@ class Event extends AppModel
       $this->id = $id;
     }
 
-    $event = $this->read($id);
+    $event = $this->read(null, $id);
 
     // delete evaluation_mixevals and evaluation_mixeval_details
-    $evaluation_mixeval =& new EvaluationMixeval();
-    $evaluation_mixeval_detail =& new EvaluationMixevalDetail();
+    $evaluation_mixeval = new EvaluationMixeval();
+    $evaluation_mixeval_detail = new EvaluationMixevalDetail();
 
-    $ems = $evaluation_mixeval->findAllByEventId($this->id);
+    $ems = $evaluation_mixeval->findAll('eventi_id = '.$this->id);
     foreach($ems as $em) {
-    	$emds = $evaluation_mixeval_detail->findAllByEvaluationMixevalId($em->id);
+    	$emds = $evaluation_mixeval_detail->findAll('evaluation_mixeval_id = '.$em->id);
       foreach($emds as $emd) {
       	$emd->delete();
       }
@@ -205,11 +223,11 @@ class Event extends AppModel
     }
 
     // delete evaluation_rubrics and evaluation_rubrics_details
-    $evaluation_rubric =& new EvaluationRubric();
-    $evaluation_rubric_detail =& new EvaluationRubricDetail();
+    $evaluation_rubric = new EvaluationRubric();
+    $evaluation_rubric_detail = new EvaluationRubricDetail();
 
     // delete evaluation_simples
-    $evaluation_simple =& new EvaluationSimple();
+    $evaluation_simple = new EvaluationSimple();
 
     // delete evaluation_submissions
 
@@ -217,6 +235,24 @@ class Event extends AppModel
 
     // now, delete this event
     $this->delete();
+  }
+
+  /**
+   * removeEventsBySurveyId remove all events associated with a survey by survey ID
+   *
+   * @param mixed $survey_id
+   * @access public
+   * @return void
+   */
+  function removeEventsBySurveyId($survey_id)
+  {
+    $events = $this->findAll($this->name.'.event_template_type_id = 3 AND '.$this->name.'.template_id = '.$survey_id);
+    if(empty($events)) return true;
+
+    foreach($events as $e){
+      $this->cascadeRemove($e[$this->name]['id']);
+    }
+    return true;
   }
 }
 

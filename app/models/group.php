@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: group.php,v 1.7 2006/10/12 15:42:21 davychiu Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.7 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/10/12 15:42:21 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -29,22 +29,27 @@ class Group extends AppModel
 {
   var $name = 'Group';
 
-  var $hasMany = array(
-                        'GroupEvent' => array(
-                          'className' => 'GroupEvent',
-                          'dependent' => true
-                        )
-                 );
+  var $hasMany = array('GroupEvent' => array('className' => 'GroupEvent',
+                                             'dependent' => true
+                                            ),
+                       'GroupsMember' => array('className' => 'GroupsMembers',
+                                               'dependent' => true
+                                              )
+                      );
+  var $validate = array('group_num' => VALID_NOT_EMPTY);
 
 	function beforeSave(){ //serverside validation
-		$allowSave = true;
-		if (empty($this->data[$this->name]['group_num'])) {
-			//$this->errorMessage = 'Group number is required.'; //ajax bug
-			//$allowSave = false;
-		} else
-			//check the duplicate course
-			//$allowSave = $this->__checkDuplicateGroupNum();
-		return $allowSave;
+        // Ensure the name is not empty
+        if (empty($this->data[$this->name]['group_name'])) {
+            $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
+            return false;
+        }
+
+        // Remove any single quotes in the name, so that custom SQL queries are not confused.
+        $this->data[$this->name]['group_name'] =
+            str_replace("'", "", $this->data[$this->name]['group_name']);
+
+		return true;
 	}
 
   function getCourseGroupCount($courseId=null) {
@@ -116,6 +121,21 @@ class Group extends AppModel
 	  $tmp = $this->find('course_id='.$courseId,'max(group_num)');
 	  return $tmp[0]['max(group_num)'];
 	}
+
+  function getFilteredStudents($group_id, $filter){
+    $course_id = $this->field('course_id',sprintf("id = '%d'", $group_id));
+    if($filter)
+    {
+      return $this->findBySql("SELECT DISTINCT users.id, users.role, users.username, users.first_name, users.last_name, users.student_no, users.title
+                              FROM users
+                              JOIN user_enrols on users.id=user_enrols.user_id
+                              WHERE user_enrols.course_id=".$course_id." AND users.role = 'S' AND users.id NOT IN
+                              (SELECT user_id FROM `groups` LEFT JOIN groups_members as gs ON groups.id = gs.group_id WHERE groups.course_id = ".$course_id.")
+                              ORDER BY users.last_name ASC");
+    }else{
+      return $this->groupDifference($group_id,$course_id);
+    }
+  }
 }
 
 ?>

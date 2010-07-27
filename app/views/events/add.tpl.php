@@ -1,3 +1,4 @@
+<body onunload="window.opener.document.getElementById('eval_dropdown').onchange()">
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>
@@ -22,6 +23,8 @@
           $params = array('controller'=>'events', 'data'=>null, 'fieldvalue'=>$fieldValue);
           echo $this->renderElement('events/ajax_title_validate', $params);
           ?>
+           <?php echo $html->tagErrorMsg('Event/title', 'Title is required.')?>
+           <?php echo $html->tagErrorMsg('Event/title_unique', 'Duplicate Title found. Please change the title of this event.')?>
       </div>
   	</td>
   	<td id="newtitle_msg" class="error" />
@@ -42,21 +45,21 @@
 			</td></tr>
       <tr>
           <td height="50" width="50%" align="left" valign="top" >
-						<select name="data[Event][event_template_type_id]"
-							onChange="new Ajax.Updater('template_table','<?=$this->webroot.$this->themeWeb?>events/eventTemplatesList/'+this.options[this.selectedIndex].value,
+						<select name="data[Event][event_template_type_id]" id="eval_dropdown"
+							onChange="new Ajax.Updater('template_table','<?php echo $this->webroot.$this->themeWeb?>events/eventTemplatesList/'+this.options[this.selectedIndex].value,
 																				 {onLoading:function(request){Element.show('loading');},
 																					onComplete:function(request){Element.hide('loading');},
 																					asynchronous:true, evalScripts:true});  return false;">
 						<?php
 //print_r($this->webroot.$this->themeWeb);
 						foreach($eventTypes as $row): $eventTemplateType = $row['EventTemplateType']; ?>
-							<option value="<?=$eventTemplateType['id']?>"
+							<option value="<?php echo $eventTemplateType['id']?>"
 							  <?php
 							  if (!empty($params['data']['Event']['event_template_type_id']) && $params['data']['Event']['event_template_type_id'] == $eventTemplateType['id']) {
 							       echo 'SELECTED';
 							  }
 							  ?>
-							  ><?=$eventTemplateType['type_name']?></option>
+							  ><?php echo $eventTemplateType['type_name']?></option>
 						<?php endforeach; ?>
 						</select>
 						<br>
@@ -93,6 +96,7 @@
     <td>Due Date:&nbsp;<font color="red">*</font></td>
     <td><?php echo $html->input('Event/due_date', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;
 		    <a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+       <?php echo $html->tagErrorMsg('Event/due_date', 'Please enter a valid date.')?>
 		</td>
     <td>eg. YYYY-MM-DD HH:MM:SS (24 HOUR)</td>
   </tr>
@@ -103,12 +107,14 @@
 				<td width="10%">FROM:</td>
 				<td width="90%">
       		<?php echo $html->input('Event/release_date_begin', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal2.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+          <?php echo $html->tagErrorMsg('Event/release_date_begin', 'Please enter a valid date.')?>
       	</td>
       </tr>
       <tr>
       	<td width="10%">TO:</td>
       	<td width="90%">
       		<?php echo $html->input('Event/release_date_end', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal3.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+          <?php echo $html->tagErrorMsg('Event/release_date_end', 'Please enter a valid date.')?>
       	</td>
   	  </tr></table>
   	</td>
@@ -117,28 +123,20 @@
   </tr>
   <tr class="tablecell2">
     <td>Groups Assignment:&nbsp;</td>
-    <td><table><tr align="center">
-					<td width="260" align="center">Group List<br>
-						<br>
-					<select name="filtered" id="filtered" style="width:200px; height:200px;" multiple>
-							<?php foreach($unassignedGroups as $row): $group = $row['Group'];?>
-					<option value="<?php echo $group['id'] ?>"><?php echo 'Group '.$group['group_num'].' - '.$group['group_name'] ?></option>
-						<?php endforeach; ?>
-						</select>
-					</td>
-					<td width="80" align="center">
-						<input type="button" style="width:80px;" onClick="move(document.getElementById('filtered'),document.getElementById('group_members'))" value="Assign >>" />
-						<br><br>
-						<input type="button" style="width:80px;" onClick="move(document.getElementById('group_members'),document.getElementById('filtered'))" value="<< Remove " /></td>
-					<td width="260" align="center">Assigned Groups<br><br>
-						<select name="group_members" multiple id="group_members" style="width:200px; height:200px;">
-					</select></td>
-				</tr></table>
-		</td>
+    <td>
+    <?php echo $this->renderElement("groups/group_list_chooser",
+            array('all' => $unassignedGroups,
+            'allName' =>  'Avaliable Groups', 'selectedName' => 'Participating Groups',
+            'itemName' => 'Group', 'listStrings' => array("Group #", "group_num"," - ","group_name")));
+        ?>
+    </td>
     <td>&nbsp;</td>
   </tr>
   <tr class="tablecell2">
-    <td colspan="3" align="center"><?php echo $html->submit('Add Event') ?></td>
+  <?php echo $javascript->link('events')?>
+    <td colspan="3" align="center"><?php echo $html->submit('Add Event', array('onclick' =>
+        "return validateEventDates('EventReleaseDateBegin','EventReleaseDateEnd','EventDueDate');"));
+        ?></td>
     </tr>
 </table>
 

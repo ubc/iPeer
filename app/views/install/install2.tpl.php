@@ -39,7 +39,7 @@ function defaultagree(el){
     <td>&nbsp;</td>
   </tr>
   <tr>
-    <td colspan="3" align="center"><a href="http://ipeer.apsc.ubc.ca">iPeer </a> is Free Software released under the GNU/GPL License. </td>
+    <td colspan="3" align="center"><a href="http://ipeer.olt.ubc.ca">iPeer </a> is Free Software released under the GNU/GPL License. </td>
   </tr>
   <!-- Property of System Requirements -->
   <tr>

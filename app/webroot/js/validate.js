@@ -2,7 +2,8 @@ window.onload = attachFormHandlers;
 var USERNAME_FORMAT = /^[a-zA-Z0-9@_\.-]{6,}$/;
 var PASSWORD_FORMAT = /^[a-zA-Z0-9]{6,}$/;
 var EMAIL_FORMAT = /^[\w-\.]+\@[\w\.-]+\.[a-z]{2,4}$/;
-var TEXT_FORMAT = /^[\w ]+$/; //at least one word
+//var TEXT_FORMAT = /^[\w ]+$/; //at least one word
+var TEXT_FORMAT = /^.+$/; //at least one word
 var DATE_FORMAT = /(((0[13578]|10|12)([-.\/])(0[1-9]|[12][0-9]|3[01])([-.\/])(\d{4}))|((0[469]|11)([-.\/])([0][1-9]|[12][0-9]|30)([-.\/])(\d{4}))|((2)([-.\/])(0[1-9]|1[0-9]|2[0-8])([-.\/])(\d{4}))|((2)(\.|-|\/)(29)([-.\/])([02468][048]00))|((2)([-.\/])(29)([-.\/])([13579][26]00))|((2)([-.\/])(29)([-.\/])([0-9][0-9][0][48]))|((2)([-.\/])(29)([-.\/])([0-9][0-9][2468][048]))|((2)([-.\/])(29)([-.\/])([0-9][0-9][13579][26])))/;
 var NUMERIC_FORMAT = /^(\d|-)?(\d|,)*\.?\d*$/;
 var PHONE_FORMAT = /^(\d{3}-\d{3}-\d{4})*$/;
@@ -25,32 +26,36 @@ function attachFormHandlers()
 }
 
 var gContinue = true;
-function attach(objInput)
-{
-  sVal = objInput.value; //get value inside of input field
-  var sFeedBack; //feedback is the feedback message sent back to the user
-  gContinue = true;
+function attach(objInput) {
+    var sVal = objInput.value; //get value inside of input field
+    var sFeedBack; //feedback is the feedback message sent back to the user
+    gContinue = true;
 
-  sRules = objInput.className.split(' '); // get all the rules from the input box classname
-  sValidate = sRules[0];                  // validate means we will validate the field
-  sRequired = sRules[1];                  // required means field is required
-  sTypeCheck = sRules[2];                 // typecheck are additional validation rules (ie. email, phone, date)
-  sFeedbackLoc = sRules[3];               // feedbackLoc is the td id where feedback is sent to.
-  sErrorMsg =  sRules[4];                 // error message if it is invalid
+    var sRules = objInput.className.split(' '); // get all the rules from the input box classname
+    var sValidate = sRules[0];                  // validate means we will validate the field
+    var sRequired = sRules[1];                  // required means field is required
+    var sTypeCheck = sRules[2];                 // typecheck are additional validation rules (ie. email, phone, date)
+    var sFeedbackLoc = sRules[3];               // feedbackLoc is the td id where feedback is sent to.
+    var sErrorMsg =  sRules[4];                 // error message if it is invalid
 
-  sFeedback = validateRequired (sRequired, sVal, sTypeCheck); //validateRequired() checks if it is required and then sends back feedback
+    sFeedback = validateRequired (sRequired, sVal, sTypeCheck); //validateRequired() checks if it is required and then sends back feedback
 
-  if (gContinue) //if it is required and blank gContinue is false and we don't validate anymore.  // this is done because if it is blank
-  //it will also fail other tests.  We don't want to spam the user with INVALID EMAIL!! if the field is still blank.
-  {
-    // check the different validation cases (ie: email, phone, etc.)
-    sFeedback = validateObject(sRequired, sTypeCheck, sVal, sErrorMsg);
-  }
-  // after validation is complete return the feedback
-  if (sFeedback != null && sFeedback != '') {
-    document.getElementById(sFeedbackLoc).innerHTML = sFeedback;
-  }
+    if (gContinue) //if it is required and blank gContinue is false and we don't validate anymore.  // this is done because if it is blank
+    //it will also fail other tests.  We don't want to spam the user with INVALID EMAIL!! if the field is still blank.
+    {
+        // check the different validation cases (ie: email, phone, etc.)
+        sFeedback = validateObject(sRequired, sTypeCheck, sVal, sErrorMsg);
+    }
+    // after validation is complete return the feedback
+    if (sFeedback == null || sFeedback == undefined) {
+        sFeedback = "";
+    }
 
+    // Fixes bug #211
+    var sFeedbackLocElem = document.getElementById(sFeedbackLoc);
+    if (sFeedbackLocElem) {
+        sFeedbackLocElem.innerHTML = sFeedback;
+    }
 }
 
 function validateRequired(sRequired, sVal, sTypecheck)

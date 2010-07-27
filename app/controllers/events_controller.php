@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: events_controller.php,v 1.8 2006/11/03 16:55:33 kamilon Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.8 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/11/03 16:55:33 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -36,11 +36,11 @@ class EventsController extends AppController
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $NeatString;
 	var $Sanitize;
-	var $uses = array('Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Group', 'GroupEvent','Personalize');
+	var $uses = array('Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Group', 'GroupEvent', 'Personalize', 'GroupsMembers');
 
 	function __construct()
 	{
-		$this->Sanitize = &new Sanitize;
+		$this->Sanitize = new Sanitize;
 		$this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
 		if ($this->show == 'all') $this->show = 99999999;
 		$this->sortBy = empty($_GET['sort'])? 'id': $_GET['sort'];
@@ -102,6 +102,7 @@ class EventsController extends AppController
 
 	  //Clear $id to only the alphanumeric value
 		$id = $this->Sanitize->paranoid($id);
+    $this->set('event_id', $id);
 
 		$this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Events';
 		$this->Event->setId($id);
@@ -150,22 +151,23 @@ class EventsController extends AppController
       {
         $default = 'Default Simple Evaluation';
         $model = 'SimpleEvaluation';
-        $eventTemplates = $this->SimpleEvaluation->findAll();
+        $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->rdAuth->id);
       }
       else if ($templateId == 2)
       {
         $default = 'Default Rubric';
         $model = 'Rubric';
-	      $eventTemplates = $this->Rubric->findAll();
+	      $eventTemplates = $this->Rubric->getBelongingOrPublic($this->rdAuth->id);
       }
       else if ($templateId == 4)
       {
         $default = 'Default Mixed Evaluation';
-        $model = 'MixedEvaluation';
-	      //$eventTemplates = $this->Rubric->findAll($conditions=null);
+        $model = 'Mixeval';
+        $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->rdAuth->id);
       }
 
     }
+
     $this->set('eventTemplates', $eventTemplates);
     $this->set('default',$default);
     $this->set('model', $model);
@@ -177,12 +179,45 @@ class EventsController extends AppController
 		$this->render();
   }
 
-  /**
-   * Enter description here...
-   *
-   * @return
-   */
-  function add ()
+  function eventTemplatesList($templateId = 1)
+  {
+      $this->layout = 'ajax';
+      //$conditions = null;
+      $eventTemplates = array();
+      $default = null;
+      $model = '';
+      if (!empty($templateId))
+      {
+        $eventTemplateType = $this->EventTemplateType->find('id = '.$templateId);
+
+        if ($templateId == 1 )
+        {
+          $default = 'Default Simple Evaluation';
+          $model = 'SimpleEvaluation';
+          $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->rdAuth->id);
+        }
+        else if ($templateId == 2)
+        {
+          $default = 'Default Rubric';
+          $model = 'Rubric';
+          $eventTemplates = $this->Rubric->getBelongingOrPublic($this->rdAuth->id);
+        }
+        else if ($templateId == 4)
+        {
+          $default = 'Default Mixed Evaluation';
+          $model = 'Mixeval';
+          $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->rdAuth->id);
+        }
+
+      }
+
+      $this->set('eventTemplates', $eventTemplates);
+      $this->set('default',$default);
+      $this->set('model', $model);
+  }
+
+
+function add ()
   {
     $courseId = $this->rdAuth->courseId;
 		$this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Events';
@@ -199,7 +234,7 @@ class EventsController extends AppController
 		  //Set default template
       $default = '-- Select a Evaluation Tool -- ';
       $model = 'SimpleEvaluation';
-      $eventTemplates = $this->SimpleEvaluation->findAll();
+      $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->rdAuth->id);
       $this->set('eventTemplates', $eventTemplates);
       $this->set('default',$default);
       $this->set('model', $model);
@@ -209,6 +244,12 @@ class EventsController extends AppController
 			$this->params['data']['Event']['course_id'] = $courseId;
 			$this->params = $this->Event->prepData($this->params);
 			//print_r($this->params['data']);
+
+      // uniqueness check for title
+      if(!$this->Event->__checkDuplicateTitle($this->params['data']['Event']['title']))
+      {
+        $this->Event->invalidate('title_unique');
+      }
 
       //Save Data
 			if ($this->Event->save($this->params['data'])) {
@@ -231,15 +272,12 @@ class EventsController extends AppController
         $default = 'Default Simple Evaluation';
         $model = 'SimpleEvaluation';
         $eventTemplates = $this->SimpleEvaluation->findAll();
-        $eventTemplates=$this->eventTemplatesList(2);
         $this->set('eventTemplates', $eventTemplates);
         $this->set('default',$default);
         $this->set('model', $model);
 
-        //Validate the error why the Event->save() method returned false
-        $this->validateErrors($this->Event);
-        $this->set('errmsg', $this->Event->errorMessage);
-
+        $this->set('errmsg', 'Please correct errors below.');
+        $this->render();
       }//end if
 		}
   }
@@ -248,6 +286,8 @@ class EventsController extends AppController
   function edit ($id=null)
   {
     $courseId = $this->rdAuth->courseId;
+		$unassignedGroups = array();
+    $assignedGroups = array();
 
 	  //Clear $id to only the alphanumeric value
 		$id = $this->Sanitize->paranoid($id);
@@ -261,7 +301,7 @@ class EventsController extends AppController
 			$this->params['data'] = $event;
 			$this->Output->br2nl($this->params['data']);
 
-                     $assignedGroupIDs = $this->GroupEvent->findAllByEvent_id($id);
+      $assignedGroupIDs = $this->GroupEvent->findAll('event_id = '.$id);
 //$a=print_r($assignedGroupIDs,true);
 //print "<pre>($a)</pre>";
 			$groupIDs = '';
@@ -287,7 +327,8 @@ class EventsController extends AppController
 
     	}else {
    			$unassignedGroups = $this->Group->findAll('course_id = '.$courseId);
-  			$this->set('unassignedGroups', $unassignedGroups);
+  			$this->set('assignedGroups', $assignedGroups);
+        $this->set('unassignedGroups', $unassignedGroups);
 
     	}
 		  $this->set('groupIDs', $groupIDs);
@@ -307,19 +348,19 @@ class EventsController extends AppController
         {
           $default = 'Default Simple Evaluation';
           $model = 'SimpleEvaluation';
-          $eventTemplates = $this->SimpleEvaluation->findAll();
+          $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->rdAuth->id);
         }
         else if ($templateId == 2)
         {
           $default = 'Default Rubric';
           $model = 'Rubric';
-		      $eventTemplates = $this->Rubric->findAll();
+		      $eventTemplates = $this->Rubric->getBelongingOrPublic($this->rdAuth->id);
         }
         else if ($templateId == 4)
         {
           $default = 'Default Mixed Evaluation';
           $model = 'Mixeval';
-		      $eventTemplates = $this->Mixeval->findAll();
+		      $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->rdAuth->id);
         }
 
       }
@@ -390,10 +431,10 @@ class EventsController extends AppController
 			$this->Output->br2nl($this->params['data']);
 
 			//$assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($id);
-			// No need to use getGroupIDsByEventId method, can call Cake's findAllBy... directly 
+			// No need to use getGroupIDsByEventId method, can call Cake's findAllBy... directly
                         //$assignedGroupIDs =    $this->GroupEvent->findAllByEvent_id($id);
                      $assignedGroupIDs =    $this->GroupEvent->findAll("event_id=$id",null,null,null,1,FALSE);
-			//$assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($id);  
+			//$assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($id);
 //$a=print_r($assignedGroupIDs,true);
 //print "<pre>($a)</pre>";
 
@@ -441,19 +482,19 @@ class EventsController extends AppController
         {
           $default = 'Default Simple Evaluation';
           $model = 'SimpleEvaluation';
-          $eventTemplates = $this->SimpleEvaluation->findAll();
+          $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->rdAuth->id);
         }
         else if ($templateId == 2)
         {
           $default = 'Default Rubric';
           $model = 'Rubric';
-		      $eventTemplates = $this->Rubric->findAll();
+		      $eventTemplates = $this->Rubric->getBelongingOrPublic($this->rdAuth->id);
         }
         else if ($templateId == 4)
         {
           $default = 'Default Mixed Evaluation';
           $model = 'Mixeval';
-		      $eventTemplates = $this->Mixeval->findAll();
+		      $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->rdAuth->id);
         }
 
       }
@@ -539,7 +580,7 @@ class EventsController extends AppController
         //parse the parameters
         $searchField=$this->params['form']['select'];
         $searchValue=$this->params['form']['livesearch2'];
-        $conditions = ' AND '.$searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
+        $conditions .= ' AND '.$searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
       }
       $this->update($attributeCode = 'Event.ListMenu.Limit.Show',$attributeValue = $this->show);
       $this->set('conditions',$conditions);
@@ -551,43 +592,7 @@ class EventsController extends AppController
       $this->render('checkDuplicateTitle');
   }
 
-  function eventTemplatesList($templateId = 1)
-  {
-      $this->layout = 'ajax';
-      //$conditions = null;
-      $conditions=array('availability'=>'public');
-      $modelName = '';
-      $eventTemplates = array();
-      $default = null;
-      $model = '';
-      if (!empty($templateId))
-      {
-        $eventTemplateType = $this->EventTemplateType->find('id = '.$templateId);
 
-        if ($templateId == 1 )
-        {
-          $default = 'Default Simple Evaluation';
-          $model = 'SimpleEvaluation';
-          $eventTemplates = $this->SimpleEvaluation->findAll();
-        }
-        else if ($templateId == 2)
-        {
-          $default = 'Default Rubric';
-          $model = 'Rubric';
-		      $eventTemplates = $this->Rubric->findAll($conditions);
-        }
-        else if ($templateId == 4)
-        {
-          $default = 'Default Mixed Evaluation';
-          $model = 'Mixeval';
-		      $eventTemplates = $this->Mixeval->findAll($conditions);
-        }
-
-      }
-      $this->set('eventTemplates', $eventTemplates);
-      $this->set('default',$default);
-      $this->set('model', $model);
-  }
 
     /**
    * Enter description here...
@@ -601,17 +606,63 @@ class EventsController extends AppController
 	  //Clear $id to only the alphanumeric value
 		$id = $this->Sanitize->paranoid($eventId);
 
+    $this->set('event_id', $id);
     $this->set('assignedGroups', $this->getAssignedGroups($eventId));
+	}
 
+  function editGroup($groupId, $eventId, $popup)
+  {
+		if(isset($popup) && $popup == 'y')
+			$this->layout = 'pop_up';
 
+	    $courseId = $this->rdAuth->courseId;
+
+	  //Clear $id to only the alphanumeric value
+		$id = $this->Sanitize->paranoid($groupId);
+ 		$event_id = $this->Sanitize->paranoid($eventId);
+ 		$this->set('event_id', $event_id);
+    	$this->set('group_id', $id);
+   		$this->set('popup', $popup);
+
+		// gets all students not listed in the group for unfiltered box
+		$this->set('user_data', $this->Group->groupDifference($id,$courseId));
+
+		// gets all students in the group
+		$this->set('group_data', $this->Group->groupStudents($id));
+
+		if (empty($this->params['data']))
+		{
+			$this->Group->setId($id);
+			$this->params['data'] = $this->Group->read();
+		}
+		else
+		{
+			$this->params = $this->Group->prepData($this->params);
+
+			if ( $this->Group->save($this->params['data']))
+			{
+				$this->GroupsMembers->updateMembers($this->Group->id, $this->params['data']['Group']);
+
+				if(isset($popup) && $popup == 'y')
+					$this->flash('Group Updated', '/events/viewGroups/'.$event_id, 1);
+				else
+					$this->flash('Group Updated', '/events/view/'.$event_id, 1);
+			}
+			else
+			{
+				$this->set('data', $this->params['data']);
+				$this->render();
+			}
+		}
 	}
 
 	function getAssignedGroups($eventId=null)
 	{
  		$assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($eventId);
+    $assignedGroups = array();
+
 		if (!empty($assignedGroupIDs))
 		{
-		  $assignedGroups = array();
 
 			// retrieve string of group ids
   		for ($i = 0; $i < count($assignedGroupIDs); $i++) {
@@ -620,17 +671,15 @@ class EventsController extends AppController
   			$assignedGroups[$i] = $group;
   			$assignedGroups[$i]['Group']['Students']=$students;
   		}
+    }
 
-		  return $assignedGroups;
-  	}else {
-      return array();
-  	}
+    return $assignedGroups;
 	}
 
-	function update($attributeCode='',$attributeValue='') {
+	function update($attributeCode='',$attributeValue='')
+  {
 		if ($attributeCode != '' && $attributeValue != '') //check for empty params
   		$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
 	}
 }
-
 ?>

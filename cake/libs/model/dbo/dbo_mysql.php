@@ -151,7 +151,8 @@ class DboMysql extends DboSource {
 			return $cache;
 		}
 
-		$result = mysql_list_tables($this->config['database'], $this->connection);
+		//$result = mysql_list_tables($this->config['database'], $this->connection);
+		$result = mysql_query('SHOW TABLES FROM '.$this->config['database']);
 		if (!$result) {
 			return array();
 		} else {
@@ -238,7 +239,7 @@ class DboMysql extends DboSource {
 				$data = $this->boolean((bool)$data);
 			break;
 			default:
-				if (ini_get('magic_quotes_gpc') == 1) {
+				if (get_magic_quotes_gpc() == 1) {
 					$data = stripslashes($data);
 				}
 				$data = mysql_real_escape_string($data, $this->connection);

@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: survey_helper.php,v 1.4 2006/08/01 21:59:40 davychiu Exp $ */
+/* SVN FILE: $Id$ */
 /*
  *
  *
@@ -11,9 +11,9 @@
 class SurveyHelperComponent extends Object {
 
   function deleteGroupSet($groupSetId=null) {
-    $this->SurveyGroup =& new SurveyGroup;
-    $this->SurveyGroupMember =& new SurveyGroupMember;
-    $this->SurveyGroupSet =& new SurveyGroupSet;
+    $this->SurveyGroup = new SurveyGroup;
+    $this->SurveyGroupMember = new SurveyGroupMember;
+    $this->SurveyGroupSet = new SurveyGroupSet;
     //delete members
     //get member id's
     $memberIds = $this->SurveyGroupMember->getIdsByGroupSetId($groupSetId);
@@ -37,7 +37,7 @@ class SurveyHelperComponent extends Object {
   }
 
   function moveQuestion($survey_id, $question_id, $move) {
-    $this->SurveyQuestion =& new SurveyQuestion;
+    $this->SurveyQuestion = new SurveyQuestion;
     // Move to TOP case
 	  // Note, this method will not work for the BOTTOM case
 	  switch ($move) {

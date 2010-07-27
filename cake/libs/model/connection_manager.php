@@ -80,7 +80,7 @@ class ConnectionManager extends Object{
 		static $instance = array();
 
 		if (!isset($instance[0]) || !$instance[0]) {
-			$instance[0] = &new ConnectionManager();
+			$instance[0] = new ConnectionManager();
 		}
 
 		return $instance[0];
@@ -103,7 +103,7 @@ class ConnectionManager extends Object{
 			$conn = $connections[$name];
 			$class = $conn['classname'];
 			$_this->loadDataSource($name);
-			$_this->_dataSources[$name] =& new $class($_this->config->{$name});
+			$_this->_dataSources[$name] = new $class($_this->config->{$name});
 			$_this->_dataSources[$name]->configKeyName = $name;
 		} else {
 			trigger_error("ConnectionManager::getDataSource - Non-existent data source {$name}", E_USER_ERROR);

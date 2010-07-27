@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: core.php,v 1.4 2006/06/20 18:44:07 zoeshum Exp $ */
+/* SVN FILE: $Id$ */
 /**
  * This is core configuration file.
  *
@@ -21,7 +21,7 @@
  * @package			cake
  * @subpackage		cake.app.config
  * @since			CakePHP v 0.2.9
- * @version			$Revision: 1.4 $
+ * @version			$Revision$
  * @modifiedby		$LastChangedBy: phpnut $
  * @lastmodified	$Date: 2006/06/20 18:44:07 $
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -146,4 +146,10 @@ set_time_limit(300);
  */
 	define('ACL_CLASSNAME', 'DB_ACL');
 	define('ACL_FILENAME', 'dbacl' . DS . 'db_acl');
+
+  /**
+   * iPeer database version
+   */
+  define('DATABASE_VERSION', 2);
+
 ?>

@@ -66,7 +66,7 @@ class Sanitize{
  * @return string
  */
 	function sql($string) {
-		if (!ini_get('magic_quotes_gpc')) {
+		if (!get_magic_quotes_gpc()) {
 			$string = addslashes($string);
 		}
 		return $string;

@@ -10,7 +10,7 @@ class EvaluationMixeval extends AppModel
                         'conditions' => '',
                         'order' => '',
                         'dependent' => true,
-                        'foreignKey' => 'evaluation_mixeval_id'
+                        'foreignKey' => 'id'
                        )
                 );
 
@@ -76,6 +76,11 @@ class EvaluationMixeval extends AppModel
 	function setAllEventGradeRelease($eventId=null, $releaseStatus=null) {
 		$sql = 'UPDATE evaluation_mixevals SET grade_release = '.$releaseStatus.' WHERE event_id = '.$eventId;
 	  return $this->query($sql);
+	}
+	
+	function getMixEvalById($id)
+	{
+		return $this->find('id = '.$id);
 	}
 }
 

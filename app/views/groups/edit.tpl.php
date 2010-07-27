@@ -26,31 +26,22 @@
         <input type="radio" name="record_status" value="I" <?php if( $params['data']['Group']['record_status'] == "I" ) echo "checked";?>> - Inactive<br>
 	</td>
     </tr>
+
   <tr class="tablecell2">
-    <td align="center">&nbsp;</td>
-    <td width="250" align="center">Filtered Students<br>
-      <br>
-	  <select name="filtered" id="filtered" style="width:90%; height:200px;" multiple>
-        <?php foreach($user_data as $row): $user = $row['users'];?>
-		<option value="<?php echo $user['id'] ?>"><?php echo $user['last_name'] ?>, <?php echo $user['first_name'] ?></option>
-    	<?php endforeach; ?>
-      </select>
-	  </td>
-    <td width="124" align="center">
-      <input type="button" style="width:150px;" onClick="move(document.getElementById('filtered'),document.getElementById('group_members'))" value="Add Student(s) >>" />
-      <br><br><br>
-      <input name="filter" type="checkbox" id="filter" value="filter">
-- Show Unassigned Students Only <br><br><br>
-      <input type="button" style="width:150px;" onClick="move(document.getElementById('group_members'),document.getElementById('filtered'))" value="<< Remove Student(s)" /></td>
-    <td width="251" align="center">Group List<br><br>
-      <select name="group_members" multiple id="group_members" style="width:90%; height:200px;">
-	  	<?php if (isset($group_data)) foreach($group_data as $row): $user = $row['users'];?>
-		<option value="<?php echo $user['id'] ?>"><?php echo $user['last_name'] ?>, <?php echo $user['first_name'] ?></option>
-    	<?php endforeach; ?>
-	  </select></td>
+  <td colspan="6">
+
+    <?php echo $this->renderElement("groups/group_list_chooser",
+                array('all' => $user_data, 'selected' => $group_data,
+                'allName' =>  "Filtered Students", 'selectedName' => 'Students in Group',
+                'itemName' => 'users', 'listStrings' => array("student_no"," - ","first_name", " ", "last_name"),
+                'listSize' => 20));
+    ?>
+  </td>
+
+
   </tr>
   <tr class="tablecell2">
-    <td colspan="4" align="center"><?php echo $html->submit('Update Group') ?></td>
+    <td colspan="4" align="center"><?php echo $html->submit('Update Group', array('onClick'=>"processSubmit(document.getElementById('selected_groups'))")) ?></td>
     </tr>
 </table>
       <table width="95%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">

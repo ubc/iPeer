@@ -1,10 +1,10 @@
 <!-- elements::ajax_username_validate end -->
 <?php 
 if (empty($fieldvalue)) $fieldvalue = '';
-if (!empty($data[0])){
+if (!empty($data[0]) && $isEnrolled){
   echo 'Username "'.$data.'" already exists.'; 
-
-  if (!empty($role) && $role == 'S') {
+  
+  if (!empty($role) && $role == 'S' && !$isEnrolled) {
     echo '<br>Use enrol function on User Listing page to enrol this student to one or more courses.';
   }  
 }

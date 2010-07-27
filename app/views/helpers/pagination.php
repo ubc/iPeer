@@ -21,6 +21,7 @@ class PaginationHelper {
 	var $direction = 'desc';
 	var $updateId = 'ajax_update';
 	var $loadingId = 'loading';
+  var $result_count = null; // the count of the result returned. this may be different from recordCount, which is the whole count.
 
 	/**
 	 * Sets the default pagination options.
@@ -37,6 +38,7 @@ class PaginationHelper {
 			$this->show = isset($paging['show']) ? $paging['show'] : array();
 			$this->page = isset($paging['page']) ? $paging['page'] : '1';
 			$this->direction = isset($paging['direction']) ? $paging['direction'] : 'desc';
+      $this->result_count = isset($paging['result_count']) ? $paging['result_count'] : null;
 
 			$pageCount = ($paging['limit']!=0) ? ceil($paging['count'] / $paging['limit'] ):0;
 
@@ -52,11 +54,11 @@ class PaginationHelper {
 
 		}
 
-		if(!empty($paging) && $paging['count'] > $paging['show'][0])
-		{
+		if(!empty($paging) && $paging['count'] > $paging['show'][0]) {
 			return true;
-		}
-		return false;
+		} else {
+            return false;
+        }
 	}
 	/**
 	* Displays limits for the query
@@ -67,50 +69,32 @@ class PaginationHelper {
 	**/
 	function show($text=null, $seperator=null, $ajaxObj=null)
 	{
-		if (empty($this->_details)) { return false; }
-		if (!empty($this->_details['recordCount']))
-		{
+		if (empty($this->_details)) {
+            return false;
+        }
+		if (!empty($this->_details['recordCount'])) {
 			$t = '';
 			$selected = '';
-			if(is_array($this->show))
-			{
-				//$t = $text.$seperator;
+			if(is_array($this->show)) {
 				$link = preg_replace('/show=(.*?)&/','',$this->link);
 				$link = ereg_replace('&','&amp;',$link);
-				$t = '<b>Show</b> <select onChange="showLimit(this.value,\''.$link.$this->_details['page'].'\',\''.$ajaxObj.'\');">';
-				foreach($this->show as $value)
-				{
-					if($value < ($this->_details['recordCount'] + $this->_details['limit']))
-					{
-						//$link = preg_replace('/show=(.*?)&/','show='.$value.'&',$this->link);
-						//print_r($this->_details['limit']);
-						if ($value==$this->_details['limit']||$this->_details['limit']==99999999) $selected = "selected";
-						else $selected = "";
-						if($this->_details['limit'] == $value)
-						{
-							//$t .= '<em>'.$value.'</em>'.$seperator;
-							$t .= "<option value=\"$value\" $selected>$value</option>";
-						}
-						else
-						{
-							if($this->style == 'ajax')
-							{
-								$t .= "<option value=\"$value\" $selected>$value</option>";
-								//$t .= $this->Ajax->link($value, $link.$this->_details['page'], array("update" => $this->updateId, 'loading' => "Element.show('".$this->loadingId."');", 'complete' => "Element.hide('".$this->loadingId."');", "method"=>"get")).$seperator;
-							}
-							else
-							{
-								$t .= "<option value=\"$value\" $selected>$value</option>";
-								//$t .= $this->Html->link($value,$link.$this->_details['page']).$seperator;
-							}
-						}
+				$t .= '<b>' . $text. '</b>';
+				$t .= '<select onChange="showLimit(this.value,\'' . $link .
+                        $this->_details['page'] . '\',\'' . $ajaxObj . '\');">';
+				foreach($this->show as $value) {
+					if($value < ($this->_details['recordCount'] + $this->_details['limit'])) {
+                        $selected = ($value == $this->_details['limit'] || $this->_details['limit'] == 99999999)
+                                        ? "selected" : "";
+
+                        $t .= "<option value=\"$value\" $selected>$value</option>";
 					}
 				}
 				$t .= '</select>';
 			}
 			return $t;
-		}
-		return false;
+		} else {
+            return false;
+        }
 
 	}
 	/**
@@ -132,7 +116,9 @@ class PaginationHelper {
 			}
 			else
 			{
-			*/	return $text.$this->_details['recordCount'];
+			*/	
+    $result_count_text = (null == $this->result_count) ? '' : $this->result_count.' of ';
+    return $text . $result_count_text . $this->_details['recordCount'];
 			//}
 	//	}
 		//return false;
@@ -148,27 +134,18 @@ class PaginationHelper {
 		if (empty($this->_details) || $this->_details['pageCount'] == 1) { return false; }
 		$t = '';
 		$pc = 1;
-		  do
-		  {
-			 if($pc == $this->_details['page'])
-			 {
+		  do {
+			 if($pc == $this->_details['page'])  {
 				$t .= '<em>'.$pc.'</em>';
-			 }
-			 else
-			 {
-				if($this->style == 'ajax')
-				{
+			 } else {
+				if($this->style == 'ajax') {
 					$t .= $this->Ajax->link($pc, $this->link.$pc, array("update" => $this->updateId, 'loading' => "Element.show('".$this->loadingId."');", 'complete' => "Element.hide('".$this->loadingId."');", "method"=>"get"));
-				}
-				else
-				{
+				} else {
 					$t .= $this->Html->link($pc,$this->link.$pc);
 				}
 			 }
 			 $pc++;
-		  }
-		  while ($pc<=$this->_details['pageCount']);
-      //$t = ereg_replace('&','&amp;',$t);
+		  } while ($pc<=$this->_details['pageCount']);
 		return $t;
 	}
 	/**
@@ -183,30 +160,30 @@ class PaginationHelper {
 	**/
 	function googleNumbers($separator=null, $prefix=null, $pageSetLength=10, $prevLabel=null, $nextLabel=null)
 	{
-		if (empty($this->_pageDetails) || $this->_pageDetails['pageCount'] == 1) { return false; }
+		if (empty($this->_details) || $this->_details['pageCount'] == 1) { return false; }
 
 		$t = array();
 
-		$modulo = $this->_pageDetails['page'] % $pageSetLength;
+		$modulo = $this->_details['page'] % $pageSetLength;
 		if ($modulo)
 		{ // any number > 0
-			$prevSetLastPage = $this->_pageDetails['page'] - $modulo;
+			$prevSetLastPage = $this->_details['page'] - $modulo;
 		}
 		else
 		{ // 0, last page of set
-			$prevSetLastPage = $this->_pageDetails['page'] - $pageSetLength;
+			$prevSetLastPage = $this->_details['page'] - $pageSetLength;
 		}
 		//$nextSetFirstPage = $prevSetLastPage + $pageSetLength + 1;
 
-		if ($prevLabel) $t[] = $this->prevPage($prevLabel);
+		if ($prevLabel) $t[] = $this->prev($prevLabel);
 
 		// loops through each page number
 		$pageSet = $prevSetLastPage + $pageSetLength;
-		if ($pageSet > $this->_pageDetails['pageCount']) $pageSet = $this->_pageDetails['pageCount'];
+		if ($pageSet > $this->_details['pageCount']) $pageSet = $this->_details['pageCount'];
 
 		for ($pageIndex = $prevSetLastPage+1; $pageIndex <= $pageSet; $pageIndex++)
 		{
-			if ($pageIndex == $this->_pageDetails['page'])
+			if ($pageIndex == $this->_details['page'])
 			{
 				$t[] = '<em>'.$pageIndex.'</em>';
 			}
@@ -223,7 +200,7 @@ class PaginationHelper {
 			}
 		}
 
-		if ($nextLabel) $t[] = $this->nextPage($nextLabel);
+		if ($nextLabel) $t[] = $this->next($nextLabel);
 
 		$t = implode($separator, $t);
 

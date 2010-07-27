@@ -6,10 +6,10 @@ class ExportHelperComponent extends Object
   var $globEventId;
 
 	function createCSV($params) {
-	  $this->Course =& new Course;
-	  $this->UserCourse =& new UserCourse;
-	  $this->Event =& new Event;
-	  $this->GroupEvent =& new GroupEvent;
+	  $this->Course = new Course;
+	  $this->UserCourse = new UserCourse;
+	  $this->Event = new Event;
+	  $this->GroupEvent = new GroupEvent;
 
     $courseId = $this->rdAuth->courseId;
     $csvContent = '';
@@ -82,17 +82,17 @@ class ExportHelperComponent extends Object
 	//
 	function createBody ($groupEvents,$params,$eventTemplateId,$eventTypeId) {
     global $globEventId;
-	  $this->Group =& new Group;
-	  $this->GroupsMembers =& new GroupsMembers;
-	  $this->User =& new User;
-	  $this->SimpleEvaluation =& new SimpleEvaluation;
-	  $this->Rubric =& new Rubric;
-	  $this->Mixeval =& new Mixeval;
-	  $this->RubricsCriteria =& new RubricsCriteria;
-	  $this->MixEvalsQuestionDesc =& new MixevalsQuestionDesc;
-	  $this->EvaluationSimple =& new EvaluationSimple;
-	  $this->EvaluationRubric =& new EvaluationRubric;
-	  $this->EvaluationMixeval =& new EvaluationMixeval;   
+	  $this->Group = new Group;
+	  $this->GroupsMembers = new GroupsMembers;
+	  $this->User = new User;
+	  $this->SimpleEvaluation = new SimpleEvaluation;
+	  $this->Rubric = new Rubric;
+	  $this->Mixeval = new Mixeval;
+	  $this->RubricsCriteria = new RubricsCriteria;
+	  $this->MixEvalsQuestionDesc = new MixevalsQuestionDesc;
+	  $this->EvaluationSimple = new EvaluationSimple;
+	  $this->EvaluationRubric = new EvaluationRubric;
+	  $this->EvaluationMixeval = new EvaluationMixeval;   
 
     $globEventId = $groupEvents[0]['GroupEvent']['event_id'];
 
@@ -139,7 +139,7 @@ class ExportHelperComponent extends Object
   	    $data[$i]['students'][$j]['first_name'] = $student['User']['first_name'];
   	    $data[$i]['students'][$j]['last_name'] = $student['User']['last_name'];
   	    $data[$i]['students'][$j]['email'] = $student['User']['email'];
-
+  	    
   	    switch ($eventTypeId) {
   	    	case 1://simple
   	    	  $comments = $this->EvaluationSimple->getAllComments($groupEventId,$userId);
@@ -189,8 +189,29 @@ class ExportHelperComponent extends Object
   	    	  $data[$i]['students'][$j]['score'] = !isset($score_tmp[0]['received_total_score'])?'':$score_tmp[0]['received_total_score'];
 
   	    	  $data[$i]['students'][$j]['comments'] = '';
+  	    	  
   	    	  foreach ($userResults as $comment)
-  	    	    $data[$i]['students'][$j]['comments'] .= isset($comment['EvaluationMixevalDetail']['question_comment'])&&!empty($comment['EvaluationMixevalDetail']['question_comment']) ? $comment['EvaluationMixevalDetail']['question_comment'].'; ':'';
+  	    	  {		    	  	
+  	    	  	foreach($comment['EvaluationMixevalDetail'] as $sComment => $value)
+  	    	  	{
+  	    	  		if($sComment == 'evaluation_mixeval_id' && !is_array($value))
+  	    	  			{
+  	    	  				$userArray = $this->EvaluationMixeval->getMixEvalById($value);
+  	    	  				$evaluatorId = $userArray['EvaluationMixeval']['evaluator'];
+  	    	  				$evaluateeId = $userArray['EvaluationMixeval']['evaluatee'];
+  	    	  				$evaluatorArray = $this->User->findUserByid($evaluatorId);
+  	    	  				$evaluateeArray = $this->User->findUserByid($evaluateeId);
+							$evaluatorName = $evaluatorArray['User']['first_name'];
+							$evaluateeName = $evaluateeArray['User']['first_name'];	  				
+  	    	  			}
+  	    	  		
+  	    	  		if(is_array($value))
+  	    	  		{	  			
+  	    	  			foreach($value as $comm => $commValue)
+  	    	  				$data[$i]['students'][$j]['comments'] .= isset($commValue)&&!empty($commValue) && $comm == 'question_comment' ? $evaluateeName. "->". $evaluatorName. ": ". $commValue.'; ':'';
+  	    	  		}
+  	    	  	}
+  	    	  }    	  
   	    	  break;
   	    	default:
   	    		break;
@@ -240,8 +261,9 @@ class ExportHelperComponent extends Object
     }
     $content .= !isset($params['form']['include_general_comments']) ? '':'Comments';
     if ($hasContent) $content .= "\n\n";
-
 	  foreach ($data as $group) {
+//	  	echo "<br>Dumping students group: ";
+//	  	var_dump($group['students']);
 	    foreach ($group['students'] as $student) {
 	      if (!empty($params['form']['include_group_status'])) {
           $submittedArr = $this->buildSubmittedArr();
@@ -250,7 +272,10 @@ class ExportHelperComponent extends Object
             $content .= 'X,';
           else
             $content .= 'OK,';
-        }
+        
+	    }
+        
+        
   	  	$content .= empty($params['form']['include_group_names']) ? '':$group['group_name'].",";$stuff=true;
   	  	$content .= empty($params['form']['include_student_first']) ? '':"\"".$student['first_name']."\",";
   	  	$content .= empty($params['form']['include_student_last']) ? '':"\"".$student['last_name']."\",";

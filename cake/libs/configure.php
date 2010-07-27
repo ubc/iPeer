@@ -79,7 +79,7 @@ class Configure extends Object {
 	function &getInstance() {
 		static $instance = array();
 		if (!$instance) {
-			$instance[0] =& new Configure;
+			$instance[0] = new Configure;
 			$instance[0]->__loadBootstrap();
 		}
 		return $instance[0];

@@ -17,9 +17,9 @@
   <tr>
     <td colspan="3"><?php echo $html->image('icons/instructions.gif',array('alt'=>'instructions'));?>
       <b> Summary:</b>(
-      <a href="<?=$this->webroot.$this->themeWeb?>evaluations/viewEvaluationResults/<?=$event['Event']['id']?>;<?=$event['group_id']?>;Basic">Basic</a>
+      <a href="<?php echo $this->webroot.$this->themeWeb?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>;<?php echo $event['group_id']?>;Basic">Basic</a>
        |
-      <a href="<?=$this->webroot.$this->themeWeb?>evaluations/viewEvaluationResults/<?=$event['Event']['id']?>;<?=$event['group_id']?>;Detail" >Detail</a>
+      <a href="<?php echo $this->webroot.$this->themeWeb?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>;<?php echo $event['group_id']?>;Detail" >Detail</a>
         )
     </td>
   </tr>
@@ -61,7 +61,7 @@ $groupAve = 0;
     ?>
     <td> Total:( /<?php echo number_format($mixeval['Mixeval']['total_marks'], 2)?>)</td>
   </tr>
-    <?
+    <?php
     $aveScoreSum = 0;
     //This section will display the evaluatees' name
     //as display the average scores their peers gave them
@@ -111,8 +111,12 @@ $groupAve = 0;
      // if ( $allMembersCompleted ) {
       	//foreach ($scoreRecords['group_question_ave'] AS $groupAveIndex => $groupAveGrade) {
       	for ($j = 1; $j <= $mixeval['Mixeval']["lickert_question_max"]; $j++) {
-      	  $groupAveGrade = $scoreRecords['group_question_ave'][$j];
-        	echo '<td>' . number_format($groupAveGrade, 2). "</td>";
+            echo "<td>";
+            if(isset($scoreRecords['group_question_ave'][$j])){
+                $groupAveGrade = $scoreRecords['group_question_ave'][$j];
+                echo number_format($groupAveGrade, 2);
+            }
+            echo "</td>";
         }
       //} else {
      // 	for ($i = 1; $i <= $mixeval['Mixeval']["lickert_question_max"]; $i++) {
@@ -132,10 +136,10 @@ $groupAve = 0;
 	</tr>
   <tr class="tablecell2" align="center"><td colspan="<?php echo count($groupMembers) +1; ?>">
       <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
-			  <input type="hidden" name="event_id" value="<?=$event['Event']['id']?>" />
-			  <input type="hidden" name="group_id" value="<?=$event['group_id']?>" />
-			  <input type="hidden" name="course_id" value="<?=$rdAuth->courseId?>" />
-			  <input type="hidden" name="group_event_id" value="<?=$event['group_event_id']?>" />
+			  <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
+			  <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
+			  <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>" />
+			  <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" />
 			  <input type="hidden" name="display_format" value="Detail" />
 
       	<?php
@@ -155,8 +159,8 @@ $groupAve = 0;
 <div id="accordion">
 	<?php $i = 0;
 	foreach($groupMembers as $row): $user = $row['User']; ?>
-		<div id="panel<?=$user['id']?>">
-		  <div id="panel<?=$user['id']?>Header" class="panelheader">
+		<div id="panel<?php echo $user['id']?>">
+		  <div id="panel<?php echo $user['id']?>Header" class="panelheader">
 		  	<?php echo 'Evaluatee: '.$user['last_name'].' '.$user['first_name']?>
 		  </div>
 		  <div style="height: 200px;" id="panel1Content" class="panelContent">
@@ -182,7 +186,7 @@ $groupAve = 0;
 			  <!-- Section One -->
         <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
           <tr>
-            <td colspan="<?= $mixeval['Mixeval']["lickert_question_max"] ?>"><b> Section One: </b></td>
+            <td colspan="<?php echo $mixeval['Mixeval']["lickert_question_max"] ?>"><b> Section One: </b></td>
           </tr>
         	<tr class="tableheader" align="center">
             <td width="100" valign="top">Evaluator</td>
@@ -200,7 +204,7 @@ $groupAve = 0;
          //Retrieve the individual mixeval detail
         // if ($allMembersCompleted && isset($evalResult[$user['id']])) {
          if (isset($evalResult[$user['id']])) {
-           $memberResult = $evalResult[$user['id']]; 
+           $memberResult = $evalResult[$user['id']];
            foreach ($memberResult AS $row): $memberMixeval = $row['EvaluationMixeval'];
              $evalutor = $membersAry[$memberMixeval['evaluator']];
              echo "<tr class=\"tablecell2\">";
@@ -250,7 +254,7 @@ $groupAve = 0;
         <!-- Section Two -->
         <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
           <tr>
-            <td colspan="<?= $mixeval['Mixeval']["total_question"] ?>"><b> Section Two: </b></td>
+            <td colspan="<?php echo $mixeval['Mixeval']["total_question"] ?>"><b> Section Two: </b></td>
           </tr>
         	<tr class="tableheader" align="center">
             <td width="100" valign="top">Evaluator</td>

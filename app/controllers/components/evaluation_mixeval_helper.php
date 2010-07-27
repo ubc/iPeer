@@ -1,8 +1,8 @@
 <?php
-/* SVN FILE: $Id: evaluation_mixeval_helper.php,v 1.6 2006/12/13 22:07:09 davychiu Exp $ */
+/* SVN FILE: $Id$ */
 /*
  * To use your Model’s inside of your components, you can create a new instance like this:
- *  $this->foo =& new Foo;
+ *  $this->foo = new Foo;
  *
  * @author
  * @version     0.10.5.1797
@@ -15,10 +15,10 @@ class EvaluationMixevalHelperComponent extends Object
 
   function loadMixEvaluationDetail ($event)
   {
-    $this->GroupsMembers =& new GroupsMembers;
-    $this->EvaluationMixeval =& new EvaluationMixeval;
-    $this->EvaluationMixevalDetail =& new EvaluationMixevalDetail;
-    $this->Mixeval =& new Mixeval;
+    $this->GroupsMembers = new GroupsMembers;
+    $this->EvaluationMixeval = new EvaluationMixeval;
+    $this->EvaluationMixevalDetail = new EvaluationMixevalDetail;
+    $this->Mixeval = new Mixeval;
 
     $result = array();
  	  $evaluator = $this->rdAuth->id;
@@ -56,9 +56,9 @@ class EvaluationMixevalHelperComponent extends Object
 
   function saveMixevalEvaluation($params=null)
   {
-    $this->Event =& new Event;
-    $this->Mixeval =& new Mixeval;
-    $this->EvaluationMixeval =& new EvaluationMixeval;
+    $this->Event = new Event;
+    $this->Mixeval = new Mixeval;
+    $this->EvaluationMixeval = new EvaluationMixeval;
 
     // assuming all are in the same order and same size
 		$evaluatees = $params['form']['memberIDs'];
@@ -112,7 +112,7 @@ class EvaluationMixevalHelperComponent extends Object
 
   function saveNGetEvalutionMixevalDetail ($evalMixevalId, $mixeval, $targetEvaluatee, $form)
   {
-    $this->EvaluationMixevalDetail =& new EvaluationMixevalDetail;
+    $this->EvaluationMixevalDetail = new EvaluationMixevalDetail;
     $isCheckBoxes = false;
     $totalGrade = 0;
     $pos = 0;
@@ -142,9 +142,9 @@ class EvaluationMixevalHelperComponent extends Object
 
   function getMixevalResultDetail ($event, $groupMembers) {
 	  $pos = 0;
-	  $this->EvaluationSubmission =& new EvaluationSubmission;
-	  $this->EvaluationMixeval  =& new EvaluationMixeval;
-    $this->EvaluationMixevalDetail   =& new EvaluationMixevalDetail;
+	  $this->EvaluationSubmission = new EvaluationSubmission;
+	  $this->EvaluationMixeval  = new EvaluationMixeval;
+    $this->EvaluationMixevalDetail   = new EvaluationMixevalDetail;
     $mixevalResultDetail = array();
 		$memberScoreSummary = array();
 		$allMembersCompleted = true;
@@ -203,10 +203,10 @@ class EvaluationMixevalHelperComponent extends Object
 
   function getStudentViewMixevalResultDetailReview ($event, $userId) {
 	  $userPOS = 0;
-	  $this->EvaluationSubmission =& new EvaluationSubmission;
-	  $this->EvaluationMixeval  =& new EvaluationMixeval;
-    $this->EvaluationMixevalDetail   =& new EvaluationMixevalDetail;
-    $this->User =& new User;
+	  $this->EvaluationSubmission = new EvaluationSubmission;
+	  $this->EvaluationMixeval  = new EvaluationMixeval;
+    $this->EvaluationMixevalDetail   = new EvaluationMixevalDetail;
+    $this->User = new User;
 
     $mixevalResultDetail = array();
 		$memberScoreSummary = array();
@@ -302,8 +302,8 @@ class EvaluationMixevalHelperComponent extends Object
 
 
   function changeEvaluationGradeRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus) {
- 	  $this->EvaluationMixeval  =& new EvaluationMixeval;
- 	  $this->GroupEvent =& new GroupEvent;
+ 	  $this->EvaluationMixeval  = new EvaluationMixeval;
+ 	  $this->GroupEvent = new GroupEvent;
 
     //changing grade release for each EvaluationMixeval
  		$evaluationMixeval = $this->EvaluationMixeval->getResultsByEvaluatee($groupEventId, $evaluateeId);
@@ -325,8 +325,8 @@ class EvaluationMixevalHelperComponent extends Object
 	}
 
   function changeEvaluationCommentRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus) {
- 	  $this->EvaluationMixeval  =& new EvaluationMixeval;
- 	  $this->GroupEvent =& new GroupEvent;
+ 	  $this->EvaluationMixeval  = new EvaluationMixeval;
+ 	  $this->GroupEvent = new GroupEvent;
 
 		$this->GroupEvent->setId($groupEventId);
 		$groupEvent = $this->GroupEvent->read();
@@ -353,11 +353,11 @@ class EvaluationMixevalHelperComponent extends Object
 
 	function formatMixevalEvaluationResult($event=null, $displayFormat='', $studentView=0)
 	{
-	  $this->Mixeval =& new Mixeval;
-	  $this->User =& new User;
-	  $this->GroupsMembers =& new GroupsMembers;
-	  $this->MixevalsQuestion =& new MixevalsQuestion;
-	  $this->EvaluationMixeval =& new EvaluationMixeval;
+	  $this->Mixeval = new Mixeval;
+	  $this->User = new User;
+	  $this->GroupsMembers = new GroupsMembers;
+	  $this->MixevalsQuestion = new MixevalsQuestion;
+	  $this->EvaluationMixeval = new EvaluationMixeval;
 
 	  $evalResult = array();
 	  $groupMembers = array();

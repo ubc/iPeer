@@ -1,6 +1,6 @@
 <form name="frm" id="frm" method="POST" action="<?php echo $html->url('changegroupset') ?>">
-<input name="survey_id" id="survey_id" type="hidden" value="<?=$survey_id?>">
-<input name="group_set_id" id="group_set_id" type="hidden" value="<?=$group_set_id?>">
+<input name="survey_id" id="survey_id" type="hidden" value="<?php echo $survey_id?>">
+<input name="group_set_id" id="group_set_id" type="hidden" value="<?php echo $group_set_id?>">
 <?php echo $html->image('layout/corner_bot_left.gif',array('style'=>'display:none;','alt'=>'corner_bot_left','onload'=>'Element.show(\'loading\')'))?>
 <table width="100%" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>

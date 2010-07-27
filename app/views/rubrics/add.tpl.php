@@ -1,3 +1,4 @@
+<body onunload="window.opener.document.getElementById('eval_dropdown').onchange()">
 <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Rubric']['id'])?'add':'edit') ?>" onSubmit="return validate()">
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
 <tr><td>
@@ -8,12 +9,12 @@
 		$criteria_default = $this->data['Rubric']['criteria'];
 		$rubric_avail = $this->data['Rubric']['availability'];
 		$rubric_type = $this->data['Rubric']['template'];
-		if(!empty($this->data['Rubric']['zero_mark']))
+		if(!empty($this->data['Rubric']['zero_mark'])) {
 			$zero_mark = $this->data['Rubric']['zero_mark'];
-		else
+        } else {
 			$zero_mark='off';
-	}
-	else{
+        }
+	} else {
 		$rubric_name = '';
 		$lom_default = 5;
 		$criteria_default = 3;
@@ -34,11 +35,11 @@
   <tr class="tablecell2">
     <td width="209" id="rubric_name_label">Rubric Name:<font color="red">*</font></td>
     <td width="301"><?php echo $html->input('Rubric/name', array('size'=>'30','class'=>'validate required TEXT_FORMAT rubric_name_msg Invalid_Text._At_Least_One_Word_Is_Required.','value'=>$rubric_name, 'id'=>'rubric_name')) ?></td>
-    <td width="353" id="rubric_name_msg" class="error" />
+    <td width="353" id="rubric_name_msg" class="error">&nbsp;</td>
   </tr>
   <tr class="tablecell2">
     <td>Level of Mastery:</td>
-    <td><?php echo $html->selectTag('Rubric/lom_max', array('1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8',
+    <td><?php echo $html->selectTag('Rubric/lom_max', array('2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8',
 									'9'=>'9','10'=>'10'), $lom_default, array('style'=>'width:50px;','id'=>'LOM'),'',false) ?></td>
     <td>aka LOM, Evaluation Range (Max 10) </td>
   </tr>
@@ -68,13 +69,15 @@
   </tr>
   <tr class="tablecell2">
   		<td colspan="3" align="center">
-		<input type="button" name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller']; ?>'">
+        <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
+        &nbsp;&nbsp;&nbsp;
 		<?php
 		    if(empty($preview)) {
 		      echo $html->submit('Next', array('Name'=>'preview'));
 		    } else {
-		      echo $html->submit('Reset', array('Name'=>'preview'));
+		      echo $html->submit('Preview (Update Format)', array('Name'=>'preview'));
 		    } ?>
+        &nbsp;&nbsp;&nbsp;
 		<?php if(!empty($preview) && $preview){
 		        echo $html->submit('Add Rubric', array('Name'=>'add1'));
 		      } ?>
@@ -92,19 +95,20 @@
 	</td>
   </tr>
 </table>
-<?php if(!empty($preview) && $preview){ ?>
+<?php if(!empty($preview) && $preview): ?>
 <table class="title" width="100%"  border="0" cellspacing="0" cellpadding="0">
   <tr>
 	<td><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> Rubric Preview </td>
 	<td><div align="right"><a href="#rpreview" onclick="showhide('rpreview'); toggle(this);"><?php echo empty($this->data) ? '[+]' : '[-]'; ?></a></div></td>
   </tr>
 </table>
-<div id="rpreview" <?php echo empty($this->data) ? 'style="display: none; background: #FFF;">' : 'style="display: block; background: #FFF;">'; ?>
+<div id="rpreview" <?php echo empty($data) ? 'style="display: none; background: #FFF;">' : 'style="display: block; background: #FFF;">'; ?>
 <br>
 <?php
-$params = array('controller'=>'rubrics','data'=>null, 'rubric_type'=>$rubric_type,'LOM_num'=>$lom_default, 'criteria_num'=>$criteria_default, 'rubric_avail'=>$rubric_avail, 'zero_mark'=>$zero_mark);
+$params = array('controller'=>'rubrics','data'=>!empty($data) ? $data : null , 'rubric_type'=>$rubric_type,'LOM_num'=>$lom_default, 'criteria_num'=>$criteria_default, 'rubric_avail'=>$rubric_avail, 'zero_mark'=>$zero_mark);
 echo $this->renderElement('rubrics/ajax_rubric_preview', $params);
 ?>
 </div>
-<?php } ?>
+<?php endif ?>
 </form>
+</body>

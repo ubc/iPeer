@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: survey_group_set.php,v 1.1 2006/06/20 18:44:19 zoeshum Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.1 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/06/20 18:44:19 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -28,6 +28,13 @@
 class SurveyGroupSet extends AppModel
 {
     var $name = 'SurveyGroupSet';
+    var $belongsTo = array('Survey' => 
+                           array('className'    => 'Survey',
+                                 'condition'    => '',
+                                 'order'        => '',
+                                 'foreignKey'   => 'survey_id'
+                                )
+                          );
 
     function getIdBySurveyIdSetDescription($surveyId=null,$setDescription=null) {
       $tmp = $this->find('survey_id='.$surveyId.' AND set_description=\''.$setDescription.'\'');

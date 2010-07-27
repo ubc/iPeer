@@ -8,13 +8,13 @@
 <?php echo $javascript->link('ricoaccordion')?>
 	<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
     <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeMixevalEvaluation'); echo '/'.$event['Event']['id'].';'.$event['group_id']; ?>">
-      <input type="hidden" name="event_id" value="<?=$event['Event']['id']?>"/>
-      <input type="hidden" name="group_id" value="<?=$event['group_id']?>"/>
-      <input type="hidden" name="group_event_id" value="<?=$event['group_event_id']?>"/>
-      <input type="hidden" name="course_id" value="<?=$rdAuth->courseId?>"/>
-      <input type="hidden" name="mixeval_id" value="<?=$data['Mixeval']['id']?>"/>
-      <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?=$rdAuth->id?>"/>
-      <input type="hidden" name="evaluateeCount" value="<?=$evaluateeCount?>"/>
+      <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
+      <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>"/>
+      <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>"/>
+      <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>"/>
+      <input type="hidden" name="mixeval_id" value="<?php echo $data['Mixeval']['id']?>"/>
+      <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $rdAuth->id?>"/>
+      <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
     <td colspan="4" align="center">Evaluation Event Detail</td>
@@ -57,15 +57,15 @@
 <div id="accordion">
 	<?php $i = 0;
 	foreach($groupMembers as $row): $user = $row['User']; ?>
-	<input type="hidden" name="memberIDs[]" value="<?=$user['id']?>"/>
-		<div id="panel<?=$user['id']?>">
-		  <div id="panel<?=$user['id']?>Header" class="panelheader">
+	<input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/>
+		<div id="panel<?php echo $user['id']?>">
+		  <div id="panel<?php echo $user['id']?>Header" class="panelheader">
 		  	<?php
 		  	echo $user['last_name'].' '.$user['first_name'];
 		  	if (isset($user['Evaluation'])) {
-		  	  echo '<font color="#66FF33"> ( Completed )</font>';
+		  	  echo '<font color="#66FF33"> ( Entered )</font>';
 		  	} else {
-		  	  echo '<font color="#FF6666"> - Incompleted </font>';
+		  	  echo '<font color="#FF6666"> - Incomplete </font>';
 		  	}
 		  	?>
 		  </div>
@@ -74,7 +74,17 @@
 
       <?php
 
-      $params = array('controller'=>'mixevals','data'=>$this->controller->MixevalHelper->compileViewData($data), 'scale_default'=>$data['Mixeval']['scale_max'], 'question_default'=>$data['Mixeval']['lickert_question_max'], 'prefill_question_max'=>$data['Mixeval']['prefill_question_max'], 'zero_mark'=>$data['Mixeval']['zero_mark'], 'total_mark'=>$data['Mixeval']['total_marks'], 'evaluate'=>1, 'user'=>$user);
+      $params = array(  'controller'            => 'mixevals',
+                        'data'                  => $this->controller->MixevalHelper->compileViewData($data),
+                        'scale_default'         => $data['Mixeval']['scale_max'],
+                        'question_default'      => $data['Mixeval']['lickert_question_max'],
+                        'prefill_question_max'  => $data['Mixeval']['prefill_question_max'],
+                        'zero_mark'             => $data['Mixeval']['zero_mark'],
+                        'total_mark'            => $data['Mixeval']['total_marks'],
+                        'evaluate'              => 1,
+                        'user'                  => $user);
+
+
       echo $this->renderElement('mixevals/view_mixeval_details', $params);
       ?>
       <table align="center" >
@@ -103,14 +113,71 @@
 <table width="95%" align="center" bgcolor="#E5E5E5">
   <tr class="tablecell2">
     <td colspan="4" align="center"><form name="submitForm" id="submitForm" method="POST" action="<?php echo $html->url('completeEvaluationMixeval') ?>">
-  <input type="hidden" name="event_id" value="<?=$event['Event']['id']?>"/>
-  <input type="hidden" name="group_id" value="<?=$event['group_id']?>"/>
-  <input type="hidden" name="group_event_id" value="<?=$event['group_event_id']?>"/>
-  <input type="hidden" name="course_id" value="<?=$rdAuth->courseId?>"/>
-  <input type="hidden" name="mixeval_id" value="<?=$data['Mixeval']['id']?>"/>
-  <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?=$rdAuth->id?>"/>
-  <input type="hidden" name="evaluateeCount" value="<?=$evaluateeCount?>"/><?php echo $html->submit('Submit to Complete the Evaluation') ?></form></td>
-    </tr>
+  <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
+  <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>"/>
+  <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>"/>
+  <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>"/>
+  <input type="hidden" name="mixeval_id" value="<?php echo $data['Mixeval']['id']?>"/>
+  <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $rdAuth->id?>"/>
+<center>
+<?php
+  $count = 0;
+  foreach($groupMembers as $row) {
+    $user = $row['User'];
+    if (isset($user['Evaluation'])) {
+      $count++;
+    }
+  }
+
+    $mustCompleteUsers = ($count != $evaluateeCount);
+
+
+
+    $commentsNeeded = false;
+    // Check if any comment fields were left empty.
+    if ($event['Event']['com_req']) {
+        foreach($groupMembers as $row) {
+            $user = $row['User'];
+            //echo "<div style='text-align:left'>";
+            //var_dump($user);
+            //echo "</div>";
+
+            if (empty($user['Evaluation'])) {
+                $commentsNeeded = true;      // Not evaluated? Then we need comments for sure
+                //echo "(Please complete evaluation for student $user[first_name] $user[last_name])<br />";
+            } else {
+                if (isset($params['data']['questions'])) {
+                    $evaluationDetails = $user['Evaluation']['EvaluationDetail'];
+                    foreach ($evaluationDetails as $detailEval) {
+                        $detail = $detailEval['EvaluationMixevalDetail'];
+                        if ($params['data']['questions'][$detail['question_number']]['question_type'] != 'S' &&
+                            empty($detail['question_comment'])) {
+                            $commentsNeeded = true;      // A criteria comment is missing
+                            //echo "Missing detail $detail[id] for user $user[id]<br />";
+                            break;
+                        } else {
+                            //echo "OK detail $detail[id] ($detail[question_comment]) for user $user[id]<br />";
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        $commentsNeeded = false;
+    }
+
+  if (!$mustCompleteUsers && !$commentsNeeded) {
+    echo $html->submit('Submit to Complete the Evaluation');
+  }
+  else {
+    echo $html->submit('Submit to Complete the Evaluation', array('disabled'=>'true')); echo "<br />";
+    echo $mustCompleteUsers ? "<div style='color: red'>Please complete the questions for all group members, pressing 'Save This Section' button for each one.</div>" : "";
+    echo $commentsNeeded ? "<div style='color: red'>Please Enter all the comments for all the group members before submitting.</div>" : "";
+  }
+
+?>
+</center>
+</tr>
 </table>
 	<script type="text/javascript"> new Rico.Accordion( 'accordion',
 								{panelHeight:800,

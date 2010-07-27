@@ -3,7 +3,7 @@
     <td>
 <script type="text/javascript" language="javascript">
 <!--
-  var total_instructor_count = <?=$instructor_count?>;
+  var total_instructor_count = <?php echo $instructor_count?>;
 //-->
 </script>
 <?php echo $javascript->link('course')?>
@@ -45,7 +45,9 @@
 		echo '<table width="100%" border="0" cellspacing="2" cellpadding="2">';
 		for( $i=0; $i < count($instructor_data); $i++ ){
 			echo '<tr>';
-			echo '<td width="15"><a href='.$this->webroot.$this->themeWeb.$this->params['controller'].'/deleteInstructor/'.$instructor_data[$i]['User']['id'].'/'.$course['id'].'>'.$html->image('icons/x_small.gif',array('border'=>'0','alt'=>'Delete'), 'Are you sure to delete instructor \"'.$instructor_data[$i]['User']['last_name'].', '.$instructor_data[$i]['User']['first_name'] .'\"?').'</a></td><td>';
+			if ( count($instructor_data) > 1 ) {
+                echo '<td width="15"><a href='.$this->webroot.$this->themeWeb.$this->params['controller'].'/deleteInstructor/'.$instructor_data[$i]['User']['id'].'/'.$course['id'].'>'.$html->image('icons/x_small.gif',array('border'=>'0','alt'=>'Delete'), 'Are you sure to delete instructor \"'.$instructor_data[$i]['User']['last_name'].', '.$instructor_data[$i]['User']['first_name'] .'\"?').'</a></td><td>';
+            }
 			echo '<a href=../../users/view/'.$instructor_data[$i]['User']['id'].'>';
 			echo $instructor_data[$i]['User']['last_name'].', '.$instructor_data[$i]['User']['first_name'].'<br>';
 			echo '</a>';
@@ -72,7 +74,7 @@
     <td>Status:</td>
     <td>
 		<input type="radio" name="data[Course][record_status]" value="A" <?php if( $course['record_status'] == "A" ) echo "checked";?>> - Active&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <input type="radio" name="record_status" id="record_status" value="I" <?php if( $course['record_status'] == "I" ) echo "checked";?>> - Inactive<br>
+    <input type="radio" name="data[Course][record_status]" value="I" <?php if( $course['record_status'] == "I" ) echo "checked";?>> - Inactive<br>
 	</td>
     <td>&nbsp;</td>
   </tr>
@@ -96,7 +98,8 @@
   </tr>
   <tr class="tablecell2">
     <td colspan="3" align="center"><?php echo $html->submit('Update Course') ?>
-	<input type="button" name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller']; ?>'"></td>
+	<input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
+	</td>
   </tr>
 </table>
 <table width="95%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">

@@ -21,7 +21,8 @@
 	<?php $params = array('controller'=>'groups', 'data'=>null);
     	echo $this->renderElement('groups/ajax_group_validate', $params);
     ?>
-	</div>
+  <?php echo $html->tagErrorMsg('Group/group_num', 'Group number is required.')?>
+  </div>
 	<?php echo $ajax->observeField('group_num', array('update'=>'groupErr', 'url'=>"/groups/checkDuplicateName", 'frequency'=>1,'loading'=>"Element.show('loading');",'complete'=>"Element.hide('loading');stripe();")) ?>
 	</td></tr>
   <tr class="tablecell2">
@@ -35,25 +36,20 @@
         <input type="radio" name="record_status" value="I" > - Inactive<br>
 	</td>
     </tr>
-  <tr class="tablecell2">
-    <td align="center">&nbsp;</td>
-    <td width="250" align="center">Filtered Students<br>
-      <br>
-	  <select name="filtered" id="filtered" style="width:90%; height:200px;" multiple>
-        <?php foreach($user_data as $row): $user = $row['User'];?>
-		<option value="<?php echo $user['id'] ?>"><?php echo $user['last_name'] ?>, <?php echo $user['first_name'] ?></option>
-    	<?php endforeach; ?>
-      </select>
-	  </td>
-    <td width="124" align="center">
-      <input type="button" style="width:150px;" onClick="move(document.getElementById('filtered'),document.getElementById('group_members'))" value="Add Student(s) >>" />
-      <br><br><br>
-      <input name="filter" type="checkbox" id="filter" value="filter">
-- Show Unassigned Students Only <br><br><br>
-      <input type="button" style="width:150px;" onClick="move(document.getElementById('group_members'),document.getElementById('filtered'))" value="<< Remove Student(s)" /></td>
-    <td width="251" align="center">Group List<br><br>
-      <select name="group_members" multiple id="group_members" style="width:90%; height:200px;">
-	  </select></td>
+
+
+    <tr class="tablecell2">
+  <td colspan="6">
+
+    <?php echo $this->renderElement("groups/group_list_chooser",
+                array('all' => $user_data,
+                'allName' =>  "Filtered Students", 'selectedName' => 'Students in Group',
+                'itemName' => 'User', 'listStrings' => array("student_no"," - ","first_name", " ", "last_name"),
+                'listSize' => 20));
+    ?>
+  </td>
+
+
   </tr>
   <tr class="tablecell2">
     <td colspan="4" align="center"><?php echo $html->submit('Add Group') ?></td>
@@ -72,11 +68,11 @@
   <table class="title" width="100%"  border="0" cellspacing="0" cellpadding="0">
       <tr>
         <td><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> Import Groups From Text (.txt) or CSV File (.csv)</td>
-        <td><div align="right"><a href="#" onclick="showhide('import'); toggle(this);">[+]</a> </div></td>
+        <td><div align="right"><a href="#" onclick="$('import').style.display='block'; toggle(this);">[+]</a> </div></td>
       </tr>
   </table>
-<div id="import" style="display: none; background: #FFF;">
-<br>
+<div id="import" style="display: <?php echo isset($import_again) ? "block" : "none" ?>; background: #FFF;">
+  <br>
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>
@@ -88,33 +84,39 @@
   <tr class="tablecell2">
     <td>
 
-StudentNumber is required<br>
-Group# (e.g. 5 for group 5) is required<br>
-Please follow the following formatting:<br>
-<br>
-[StudentNumber],[Group#],[GroupName]<br>
-[StudentNumber],[Group#],[GroupName]<br>
-<br>
-*[GroupName] is optional. Leave blank for no group name.<br>
-<br>
-eg:<br>
-<br>
-29978037,1,team 1<br>
-29978063,1,team 1<br>
+        <b>StudentNumber, Group# (e.g. 5 for group 5), and Group Name<br />
+        &nbsp;&nbsp;&nbsp;are all required.</b><br>
+        <br />
+        Please follow the following formatting:<br>
+        [StudentNumber], [Group#], [GroupName]<br>
+        [StudentNumber], [Group#], [GroupName]<br>
+        <br>
+        For example:<br>
+        <br>
+<pre style='background-color: white; border:1px solid black; padding:5px; margin:5px'>
+29978037, 1, Team A
+29978063, 1, Team A
+29978043, 2, Team B
+29978051, 2, Team B
+</pre>
 	</td>
     <td valign="top"><br>
 <form name="importfrm" id="importfrm" method="POST" action="<?php echo $html->url('import') ?>" enctype="multipart/form-data" >
-<input type="file" name="file" value="Browse" /><br>
-			<?php
-			if (empty($rdAuth->courseId)) {
-			  $params = array('controller'=>'users', 'courseList'=>$coursesList, 'defaultOpt'=>1);
-			} else {
-			  $params = array('controller'=>'users', 'courseList'=>$coursesList);
-			}
-      echo $this->renderElement('courses/course_selection_box', $params);
-      ?>
-<br>
-<?php echo $html->submit('Import Group List') ?>
+    <h3>1) Please select a CSV file to import:</h3>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <input type="file" name="file" value="Browse" /><br>
+    <?php
+    if (empty($rdAuth->courseId)) {
+        $params = array('controller'=>'users', 'courseList'=>$coursesList, 'defaultOpt'=>1);
+    } else {
+        $params = array('controller'=>'users', 'courseList'=>$coursesList);
+    }?>
+    <br /><h3>2) Select the course to import into:</h3>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <?php echo $this->renderElement('courses/course_selection_box', $params); ?>
+    <br /><br /><h3>3) Click the button bellow to Create the Groups:</h3>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <?php echo $html->submit('Import Group List') ?>
 </form>
 <br></td>
   </tr>

@@ -1,5 +1,5 @@
 <form name="frm" id="frm" method="POST" action="">
-<input type="hidden" id="search_type" name="search_type" value="<?=$display?>"/>
+<input type="hidden" id="search_type" name="search_type" value="<?php echo $display?>"/>
 <table width="95%"  border="0" cellspacing="2" cellpadding="4">
     <tr>
       <td><div align="left" id="criteria_panel">
@@ -19,10 +19,11 @@
           </tr>
          <tr class="tablecell2">
             <td id="event_label">Event:</td>
-            <td width="440"> <?php echo $ajax->observeField('course_id', array('update'=>'event_box', 'url'=>"/searchs/eventBoxSearch", 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');"));
-              ?><div name="event_box" id="event_box">
+            <td width="440"> <?php echo $ajax->observeField('course_id', array('update'=>'event_box', 'url'=>"/searchs/eventBoxSearch", 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');"));?>
+            <div name="event_box" id="event_box">
               <?php
                 $params = array('controller'=>'events', 'data'=>$data, 'eventId'=>null, 'defaultOpt'=>'A', 'view'=>0, 'disabled'=>0,'sticky_event_id'=>$sticky['event_id']);
+
                 echo $this->renderElement('events/event_selection_box', $params);
               ?></div></td>
 

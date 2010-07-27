@@ -1,17 +1,17 @@
 		<table width="100%" class="title2" border="0" cellpadding="4" cellspacing="0">
           <tr>
-            <td><?php echo $html->image('layout/grey_arrow.gif',array('align'=>'middle','alt'=>'grey_arrow'))?>&nbsp; <?=$submenuTitle?></td>
+            <td><?php echo $html->image('layout/grey_arrow.gif',array('align'=>'middle','alt'=>'grey_arrow'))?>&nbsp; <?php echo $submenuTitle?></td>
             <td>
             <div align="right">
-               <a href="<?=$this->webroot.$this->themeWeb?>courses/update/<?=$submenu?>"
-                onclick="new Ajax.Updater('<?=ereg_replace(' ','_',$submenuTitle)?>','<?=$this->webroot.$this->themeWeb?>courses/update/<?=$submenu?>',
+               <a href="<?php echo $this->webroot.$this->themeWeb?>courses/update/<?php echo $submenu?>"
+                onclick="new Ajax.Updater('<?php echo ereg_replace(' ','_',$submenuTitle)?>','<?php echo $this->webroot.$this->themeWeb?>courses/update/<?php echo $submenu?>',
                                          {onLoading:function(request){Element.show('loading');},
                                           onComplete:function(request){Element.hide('loading');},
                                           asynchronous:true, evalScripts:true}); return false;">show/hide</a>
             </div></td>
         </tr>
         </table>
-      <div id="<?=ereg_replace(' ','_',$submenuTitle)?>" style="background: #FFF;display:inline;"><?php
+      <div id="<?php echo ereg_replace(' ','_',$submenuTitle)?>" style="background: #FFF;display:inline;"><?php
       $params = array('controller'=>'courses', 'userPersonalize'=>$userPersonalize, 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'courseId'=>$rdAuth->courseId);
       echo $this->renderElement('courses/ajax_personalize_'.$submenu, $params);
       ?></div>

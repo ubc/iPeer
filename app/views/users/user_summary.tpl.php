@@ -21,13 +21,14 @@ $params = array('controller'=>'users', 'data'=>$data['failed_students']);
 echo $this->renderElement('users/user_summary_list', $params);
 ?>
 <?php endif; ?>
+<?php $msg = 'edit' == $this->controller->action ? 'User(s) modified successfully:' : 'User(s) created successfully:';?>
 <?php if (isset($data['created_students'])) : ?>
   <table width="95%"  border="0" cellspacing="2" cellpadding="4">
     <tr>
       <td width="45%"><table width="403" border="0" cellspacing="0" cellpadding="4">
         <tr>
           <td width="300">
-            <b>User(s) created successfully:</b>
+            <b><?php echo $msg?></b>
           </td>
           <td></td>
         </tr></table>
@@ -46,7 +47,7 @@ echo $this->renderElement('users/user_summary_list', $params);
       <td width="45%"><table width="403" border="0" cellspacing="0" cellpadding="4">
         <tr>
           <td width="300">
-            <b>User(s) created successfully:</b>
+            <b><?php echo $msg?></b>
           </td>
           <td></td>
         </tr></table>

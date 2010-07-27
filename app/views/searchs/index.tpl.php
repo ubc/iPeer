@@ -1,7 +1,7 @@
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td align="center">
-<form id="searchForm" action="">
+<form id="searchForm" action="/searchs/index">
 <table width="60%" align="center" border="0" cellspacing="0" cellpadding="2">
   <tr >
     <td width="10" height="32"></td>

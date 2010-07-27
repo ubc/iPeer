@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: loginout_controller.php,v 1.19 2006/08/22 17:31:26 davychiu Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.19 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/08/22 17:31:26 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -29,83 +29,85 @@ require_once('XML/RPC.php');
 uses('sanitize', 'neat_string');
 class LoginoutController extends AppController
 {
-/**
- * This controller does not use a model
- *
- * @var $uses
- */
-  var $uses =  array('User','SysFunction', 'SysParameter', 'Course');
+	/**
+	 * This controller does not use a model
+	 *
+	 * @var $uses
+	 */
+	var $uses =  array('User','SysFunction', 'SysParameter', 'Course');
 	var $Sanitize;
 	var $components = array('rdAuth','Output','sysContainer','userPersonalize');
-  var $NeatString;
+	var $NeatString;
 
 	function __construct()
 	{
-		$this->Sanitize = &new Sanitize;
- 		$this->pageTitle = 'Login';
-    $this->NeatString = &new NeatString;
+		$this->Sanitize = new Sanitize;
+		$this->pageTitle = 'Login';
+		$this->NeatString = new NeatString;
 		parent::__construct();
 	}
 
 	function login() {
 		$this->autoRender = false;
 
-    // Get iPeer Admin's email address
-    $admin_email = $this->sysContainer->getParamByParamCode('system.admin_email');
-    $admin_email = $admin_email['parameter_value'];
-    $this->set('admin_email', $admin_email);
+		// Get iPeer Admin's email address
+		$admin_email = $this->sysContainer->getParamByParamCode('system.admin_email');
+		$admin_email = $admin_email['parameter_value'];
+		$this->set('admin_email', $admin_email);
 
 		//RENDER VIEW IF USER IS LOGGED IN
 		if($this->rdAuth->id && $this->rdAuth->role)
 		{
-		  $redirect = 'home/index/';
+			$redirect = 'home/index/';
 			$this->redirect($redirect);
+			exit;
 		}
 
 		$redirect = $this->__renderLoginPage();
 		//RENDER LOGIN FORM AND THEN HANDLE POST
 		if (empty($this->params['data']))
 		{
-		  //Check for CWL login auth
-      $cwlErr = $this->rdAuth->Session->read('CWLErr');
-      if ($cwlErr == 'STUDENT_INVALID_LOGIN'){
-  		  $this->set('errmsg', 'Access Denied. <br>Student must login by using UBC CWL Authentication.<br>If you are experiencing any issues regarding iPeer, please contact the iPeer administrator at <a href="mailto:ipeer@apsc.ubc.ca">ipeer@apsc.ubc.ca</a>.');
-  		  $this->rdAuth->Session->del('CWLErr');
-  		} else if ($cwlErr!=''){
-  		  $this->set('errmsg', 'Access Denied. <br>You have successfully logged in using your CWL account but you do not have access to the iPeer application.<br>If you are experiencing any issues regarding iPeer, please contact the iPeer administrator at <a href="mailto:ipeer@apsc.ubc.ca">ipeer@apsc.ubc.ca</a>.');
-  		  $this->rdAuth->Session->del('CWLErr');
-  		}
+			//Check for CWL login auth
+			$cwlErr = $this->Session->read('CWLErr');
+			if ($cwlErr == 'STUDENT_INVALID_LOGIN'){
+				$this->set('errmsg', 'Access Denied. <br>Student must login by using UBC CWL Authentication.<br>If you are experiencing any issues regarding iPeer, please contact the iPeer administrator at <a href="mailto:ipeer@apsc.ubc.ca">ipeer@apsc.ubc.ca</a>.');
+				$this->Session->del('CWLErr');
+			} else if ($cwlErr!=''){
+				$this->set('errmsg', 'Access Denied. <br>You have successfully logged in using your CWL account but you do not have access to the iPeer application.<br>If you are experiencing any issues regarding iPeer, please contact the iPeer administrator at <a href="mailto:ipeer@apsc.ubc.ca">ipeer@apsc.ubc.ca</a>.');
+				$this->Session->del('CWLErr');
+			}
 
-  		  $lastURL = $this->rdAuth->Session->read('URL');
-  		  $accessErr = $this->rdAuth->Session->read('AccessErr');
-  		  $message = $this->rdAuth->Session->read('Message');
-//$a=print_r($this->rdAuth->Session,true); echo "<pre>$a</pre>"; exit;
-  		  if (empty($lastURL)){
+			$lastURL = $this->Session->read('URL');
+			$accessErr = $this->Session->read('AccessErr');
+			$message = $this->Session->read('Message');
+			//$a=print_r($this->rdAuth->Session,true); echo "<pre>$a</pre>"; exit;
+			if (empty($lastURL)){
 
-    		  if ($accessErr=='INVALID_LOGIN'){
-      		  $this->set('errmsg', 'Access Denied. <br>Invalid Username/Password Combination.');
-      		  $this->rdAuth->Session->del('URL');
-      		  $this->rdAuth->Session->del('AccessErr');
-      		}
-
-
-  		  } else {
+				if ($accessErr=='INVALID_LOGIN'){
+					$this->set('errmsg', 'Access Denied. <br>Invalid Username/Password Combination.');
+					$this->Session->del('URL');
+					$this->Session->del('AccessErr');
+				}
 
 
-    		  if ($accessErr=='NO_LOGIN'){
-      		  $this->set('errmsg', 'please log in to see: '.$lastURL);
-      		}
-    		  if ($accessErr=='NO_PERMISSION'){
-      		  $this->set('errmsg', 'Permission Denied to see: '.$lastURL);
-      		}
-    		  if ($accessErr=='INVALID_USER'){
-      		  $this->set('errmsg', 'Access Denied. <br>UBC CWL Authentication is only valid for students. <br>If you are experiencing any issues regarding the iPeer, please contact your administrator for details.');
-      		}
-    		  $this->rdAuth->Session->del('URL');
-    		  $this->rdAuth->Session->del('AccessErr');
-      	}
+			} else {
 
-  		$this->render($redirect);
+
+				if ($accessErr=='NO_LOGIN'){
+					$this->set('errmsg', 'please log in to see: '.$lastURL);
+				}
+				if ($accessErr=='NO_PERMISSION'){
+					$this->set('errmsg', 'Permission Denied to see: '.$lastURL);
+				}
+				if ($accessErr=='INVALID_USER'){
+					$this->set('errmsg', 'Access Denied. <br>UBC CWL Authentication is only valid for students. <br>If you are experiencing any issues regarding the iPeer, please contact your administrator for details.');
+				}
+				$this->Session->del('URL');
+				$this->Session->del('AccessErr');
+			}
+
+			$this->render($redirect);
+			exit;
 		}
 
 	}
@@ -113,99 +115,100 @@ class LoginoutController extends AppController
 	function loginByDefault() {
 		$this->autoRender = false;
 
-    // Get iPeer Admin's email address
-    $admin_email = $this->sysContainer->getParamByParamCode('system.admin_email');
-    $admin_email = $admin_email['parameter_value'];
-    $this->set('admin_email', $admin_email);
+
+		// Get iPeer Admin's email address
+		$admin_email = $this->sysContainer->getParamByParamCode('system.admin_email');
+		$admin_email = $admin_email['parameter_value'];
+		$this->set('admin_email', $admin_email);
 
 		//RENDER VIEW IF USER IS LOGGED IN
-		if($this->rdAuth->id && $this->rdAuth->role)
-		{
-		  $redirect = 'home/index/';
+		if($this->rdAuth->id && $this->rdAuth->role) {
+			$redirect = 'home/index/';
 			$this->redirect($redirect);
+			exit;
 		}
 
-//$a=print_r($this->params,true); echo "<pre>$a</pre>"; exit;
+
+		//$a=print_r($this->params,true); echo "<pre>$a</pre>"; exit;
 		//RENDER LOGIN FORM AND THEN HANDLE POST
-		if (empty($this->params['data']))
-		{		
-		  $redirect = 'login';
-		  $lastURL = $this->rdAuth->Session->read('URL');
-		  $accessErr = $this->rdAuth->Session->read('AccessErr');
-		  $message = $this->rdAuth->Session->read('Message');
+		if (empty($this->params['data'])) {
+			$redirect = 'login';
+			$lastURL = $this->Session->read('URL');
+			$accessErr = $this->Session->read('AccessErr');
+			$message = $this->Session->read('Message');
 
-		  if (empty($lastURL)){
-		    //$this->set('errmsg', 'Session Expired.  Please log in again.');
-		  } else {
-  		  if ($accessErr=='NO_LOGIN'){
-    		  $this->set('errmsg', 'Please Login to see '.$lastURL);
-    		  $this->rdAuth->Session->del('URL');
-    		}
-  		  if ($accessErr=='NO_PERMISSION'){
-    		  $this->set('errmsg', 'Permission Denied to see: '.$lastURL);
-    		  $this->rdAuth->Session->del('URL');
-    		}
-    	}
+			if (empty($lastURL)) {
+				//$this->set('errmsg', 'Session Expired.  Please log in again.');
+			} else {
+				if ($accessErr=='NO_LOGIN'){
+					$this->set('errmsg', 'Please Login to see '.$lastURL);
+					$this->Session->del('URL');
+				}
+				if ($accessErr=='NO_PERMISSION'){
+					$this->set('errmsg', 'Permission Denied to see: '.$lastURL);
+					$this->Session->del('URL');
+				}
+			}
 
-  		$this->render($redirect);
-		}
-		else
-		{
+			$this->render($redirect);
+		} else {
 			$this->Output->filter($this->params['data']);//always filter
 			$this->Sanitize->cleanArray($this->params['data']);
 			$this->User->recursive = 0;
 			$this->params['data']['User']['username'] = $this->Sanitize->paranoid($this->params['data']['User']['username'],array('.','_','-'));
 			$this->params['data']['User']['password'] = md5(trim($this->params['data']['User']['password']));
 			$this->params['data'] = $this->User->findUser($this->params['data']['User']['username'], $this->params['data']['User']['password']);
-      //Check for CWL integration: Student cannot login generally
-      if (isset($this->rdAuth->customIntegrateCWL) && $this->rdAuth->customIntegrateCWL) {
+			//Check for CWL integration: Student cannot login generally
+			if (isset($this->rdAuth->customIntegrateCWL) && $this->rdAuth->customIntegrateCWL) {
 
-/*
+				/*
 
-Code below:
+				Code below:
 
- && !($this->params['data']['User']['id'] >=4553 && $this->params['data']['User']['id'] <=4583 ) 
+				&& !($this->params['data']['User']['id'] >=4553 && $this->params['data']['User']['id'] <=4583 )
 
-is a hard coding for Political Science 101-051 upon the request of Rosalind Warner
+				is a hard coding for Political Science 101-051 upon the request of Rosalind Warner
 
-*/
-        if ($this->params['data']['User']['role'] == "S" && !($this->params['data']['User']['id'] >=4553 && $this->params['data']['User']['id'] <=4583 )) {
-  				$this->params['data']['User']['password'] = '';
-  				$this->Session->write('CWLErr', 'STUDENT_INVALID_LOGIN');
-          $redirect = 'loginout/login';
-  				$this->redirect($redirect);
-        }
-      }
+				*/
+				if ($this->params['data']['User']['role'] == "S" ) {
+					$this->params['data']['User']['password'] = '';
+					$this->Session->write('CWLErr', 'STUDENT_INVALID_LOGIN');
+					$redirect = 'loginout/login';
+					$this->redirect($redirect);
+					exit;
+				}
+			}
 
-			if ($this->params['data']['User']['id'])
-			{
+			if ($this->params['data']['User']['id']) {
 				//sets up the session vars
-				$this->rdAuth->set($this->params['data']['User']);
+				$this->rdAuth->setFromData($this->params['data']['User']);
 
-        //sets up the system container for accessible functions
-        $accessFunction = $this->SysFunction->getAllAccessibleFunction($this->params['data']['User']['role']);
-        $accessController = $this->SysFunction->getTopAccessibleFunction($this->params['data']['User']['role']);
-        $this->sysContainer->setAccessFunctionList($accessFunction);
-        $this->sysContainer->setActionList($accessController);
+                //var_dump($this->rdAuth);
+
+				//sets up the system container for accessible functions
+				$accessFunction = $this->SysFunction->getAllAccessibleFunction($this->params['data']['User']['role']);
+				$accessController = $this->SysFunction->getTopAccessibleFunction($this->params['data']['User']['role']);
+				$this->sysContainer->setAccessFunctionList($accessFunction);
+				$this->sysContainer->setActionList($accessController);
 
 				//setup my accessible courses
 				$myCourses = $this->Course->findAccessibleCoursesList($this->params['data']['User']);
 				$this->sysContainer->setMyCourseList($myCourses);
 
-        //clear up the data parameters
+				//clear up the data parameters
 				$this->params['data'] = array();
-        $redirect = '/home/index/';
+				$redirect = '/home/index/';
 				$this->redirect($redirect);
-			}
-			else
-			{
-print 333;
+				exit;
+
+			} else {
 				$this->params['data']['User']['password'] = '';
 				$this->Session->write('AccessErr', 'INVALID_LOGIN');
-        $redirect = '/loginout/login';
-				$this->redirect($redirect);
-			}
 
+				$redirect = '/loginout/login';
+				$this->redirect($redirect);
+				exit;
+			}
 		}
 	}
 
@@ -275,37 +278,37 @@ print 333;
 				//print_r($data);
 				//echo "</pre>";
 				if (!empty($data['student_number'])||!empty($data['guest_id'])) {
-				  $studentNumber = empty($data['student_number'])? $data['guest_id']:$data['student_number'];
+					$studentNumber = empty($data['student_number'])? $data['guest_id']:$data['student_number'];
 
-  				//Check is this CWL login student able to use iPeer
-  				$this->params['data'] = $this->User->findByUsername(trim($studentNumber));
+					//Check is this CWL login student able to use iPeer
+					$this->params['data'] = $this->User->find("username = '".trim($studentNumber)."'");
 
-  				if ($this->params['data']['User']['id'])
-  				{
-  					//sets up the session vars
-  					$this->rdAuth->set($this->params['data']['User']);
+					if ($this->params['data']['User']['id'])
+					{
+						//sets up the session vars
+						$this->rdAuth->setFromData($this->params['data']['User']);
 
-  					//sets up the system container for accessible functions
-  					$accessFunction = $this->SysFunction->getAllAccessibleFunction($this->params['data']['User']['role']);
-  					$accessController = $this->SysFunction->getTopAccessibleFunction($this->params['data']['User']['role']);
-  					$this->sysContainer->setAccessFunctionList($accessFunction);
-  					$this->sysContainer->setActionList($accessController);
+						//sets up the system container for accessible functions
+						$accessFunction = $this->SysFunction->getAllAccessibleFunction($this->params['data']['User']['role']);
+						$accessController = $this->SysFunction->getTopAccessibleFunction($this->params['data']['User']['role']);
+						$this->sysContainer->setAccessFunctionList($accessFunction);
+						$this->sysContainer->setActionList($accessController);
 
-    				//setup my accessible courses
-    				$myCourses = $this->Course->findAccessibleCoursesList($this->params['data']['User']);
-    				$this->sysContainer->setMyCourseList($myCourses);
+						//setup my accessible courses
+						$myCourses = $this->Course->findAccessibleCoursesList($this->params['data']['User']);
+						$this->sysContainer->setMyCourseList($myCourses);
 
-  					//clear up the data parameters
-  					$this->params['data'] = array();
-  					$redirect = '/home/index/';
-  					$this->redirect($redirect);
-  				}
-  				else
-  				{
-  					$this->Session->write('CWLErr', 'NO_PERMISSION');
-  					$redirect = 'loginout/login';
-  					$this->redirect($redirect);
-  				}
+						//clear up the data parameters
+						$this->params['data'] = array();
+						$redirect = '/home/index/';
+						$this->redirect($redirect);
+					}
+					else
+					{
+						$this->Session->write('CWLErr', 'NO_PERMISSION');
+						$redirect = 'loginout/login';
+						$this->redirect($redirect);
+					}
 				} else {
 					$this->Session->write('CWLErr', 'INVALID_USER');
 					$redirect = 'loginout/login';
@@ -325,15 +328,28 @@ print 333;
 	}
 
 	/**
-	* Function to logout the user.
-	*
-	*/
+	 * Cleans up any Session variable that need to be cleaned on logout
+	 */
+	function clearSession() {
+		$this->Session->del('URL');
+		$this->Session->del('AccessErr');
+		$this->Session->del('Message');
+		$this->Session->del('CWLErr');
+	}
+
+	/**
+	 * Function to logout the user.
+	 *
+	 */
 	function logout()
 	{
-	  $this->autoRender = false;
+		$this->autoRender = false;
 		$this->rdAuth->logout();
+		$this->clearSession();
+
 		$redirect = 'loginout/login';
 		$this->redirect($redirect);
+
 	}
 
 	function __renderLoginPage()
@@ -347,8 +363,8 @@ print 333;
 		//Check whether we are using the general ipeer login page
 		if (isset($sysParameter['parameter_value']) && $sysParameter['parameter_value'] != 'ipeer') {
 
-		  //Setup Custom parameter
-		  $this->rdAuth->Session->write('ipeerSession.customIntegrateCWL', 1);
+			//Setup Custom parameter
+			$this->Session->write('ipeerSession.customIntegrateCWL', 1);
 
 			//There is a custom setup for login
 			$paraLogin = $this->sysContainer->getParamByParamCode('custom.login_page_pathname');
@@ -356,7 +372,9 @@ print 333;
 				$redirect = $paraLogin['parameter_value'];
 			}
 		} else {
-      $redirect = 'login';
+            //Setup Custom parameter
+            $this->Session->write('ipeerSession.customIntegrateCWL', 0);
+			$redirect = 'login';
 		}
 		return $redirect;
 
@@ -366,101 +384,101 @@ print 333;
 	{
 		$this->autoRender = false;
 
-    $email = isset($this->params['form']['email']) ? trim($this->params['form']['email']):null;
-    $studentNo = isset($this->params['form']['student_no']) ? trim($this->params['form']['student_no']):null;
-    $user_id = '';
-    $errmsg = '';
+		$email = isset($this->params['form']['email']) ? trim($this->params['form']['email']):null;
+		$studentNo = isset($this->params['form']['student_no']) ? trim($this->params['form']['student_no']):null;
+		$user_id = '';
+		$errmsg = '';
 
-    $this->set('student_no', $studentNo);
-    $this->set('email', $email);
+		$this->set('student_no', $studentNo);
+		$this->set('email', $email);
 
 
 		if(isset($email) && isset($studentNo))
 		{
 
 			if($email == '') {
-        $errmsg .= 'Email address is required for password reset. ';
-      }
-      if($studentNo == '') {
-        $errmsg .= 'Student number is required for password reset. ';
-      }
-      if ($errmsg != '') {
-        $this->set('errmsg', $errmsg);
-        $this->render('forgot');
-        return;
-      }
+				$errmsg .= 'Email address is required for password reset. ';
+			}
+			if($studentNo == '') {
+				$errmsg .= 'Student number is required for password reset. ';
+			}
+			if ($errmsg != '') {
+				$this->set('errmsg', $errmsg);
+				$this->render('forgot');
+				return;
+			}
 
-      $user = $this->User->findUserByEmailAndStudentNo($email, $studentNo);
+			$user = $this->User->findUserByEmailAndStudentNo($email, $studentNo);
 
-      // TODO: sanitize data
+			// TODO: sanitize data
 			// TODO: check if valid email
 
-      // check if there is a user with that email
-      if( empty($user)) {
-      	$errmsg .= 'There is no one with that email address in the system. ';
-      }
-      else {
-        // generate random password
-        $new_password = $this->NeatString->randomPassword(6);
-        $user['User']['password'] =  md5($new_password);
+			// check if there is a user with that email
+			if( empty($user)) {
+				$errmsg .= 'There is no one with that email address in the system. ';
+			}
+			else {
+				// generate random password
+				$new_password = $this->NeatString->randomPassword(6);
+				$user['User']['password'] =  md5($new_password);
 
-        if ($errmsg != '') {
-          $this->set('errmsg', $errmsg);
-          $this->render('forgot');
-          return;
-        }
-        // save new md5 sum to database
-        if ($this->User->save($user)) {
-          // set email parameters
-          $email_msg_param = $this->sysContainer->getParamByParamCode('system.password_reset_email');
-          $email_msg = $email_msg_param['parameter_value'];
-          $from_param = $this->sysContainer->getParamByParamCode('system.admin_email');
-          $from = $from_param['parameter_value'];
-          $subject_param = $this->sysContainer->getParamByParamCode('system.password_reset_emailsubject');
-          $subject = $subject_param['parameter_value'];
-          $to = $user['User']['email'];
-          $fullname = $user['User']['first_name'] . " " . $user['User']['last_name'];
-          $email_msg = ereg_replace("<user>", $fullname, $email_msg);
-          $email_msg = ereg_replace("<newpassword>", $new_password, $email_msg);
-          $email_msg = ereg_replace("<br>", "\n", $email_msg);
+				if ($errmsg != '') {
+					$this->set('errmsg', $errmsg);
+					$this->render('forgot');
+					return;
+				}
+				// save new md5 sum to database
+				if ($this->User->save($user)) {
+					// set email parameters
+					$email_msg_param = $this->sysContainer->getParamByParamCode('system.password_reset_email');
+					$email_msg = $email_msg_param['parameter_value'];
+					$from_param = $this->sysContainer->getParamByParamCode('system.admin_email');
+					$from = $from_param['parameter_value'];
+					$subject_param = $this->sysContainer->getParamByParamCode('system.password_reset_emailsubject');
+					$subject = $subject_param['parameter_value'];
+					$to = $user['User']['email'];
+					$fullname = $user['User']['first_name'] . " " . $user['User']['last_name'];
+					$email_msg = ereg_replace("<user>", $fullname, $email_msg);
+					$email_msg = ereg_replace("<newpassword>", $new_password, $email_msg);
+					$email_msg = ereg_replace("<br>", "\n", $email_msg);
 
-          // send email to user
-          $success = $this->_sendEmail( $to, $from, $subject, $email_msg );
+					// send email to user
+					$success = $this->_sendEmail( $to, $from, $subject, $email_msg );
 
-          if($success) {
-          	$this->set('message', 'Password reset request sent.');
-            $this->set('student_no', $studentNo);
-            $this->set('email', $email);
-            $this->render('login');
-            return;
-          }
-          else {
-          	$errmsg .= 'There was a problem in sending email. Please contact your iPeer administrator. ';
-          }
-        }
-        else {
-      	  $errmsg .= 'There was a problem resetting your password. Please contact your iPeer administrator. ';
-        }
-      }
+					if($success) {
+						$this->set('message', 'Password reset request sent.');
+						$this->set('student_no', $studentNo);
+						$this->set('email', $email);
+						$this->render('login');
+						return;
+					}
+					else {
+						$errmsg .= 'There was a problem in sending email. Please contact your iPeer administrator. ';
+					}
+				}
+				else {
+					$errmsg .= 'There was a problem resetting your password. Please contact your iPeer administrator. ';
+				}
+			}
 		}
 
-    $this->set('errmsg', $errmsg);
+		$this->set('errmsg', $errmsg);
 		$this->render('forgot');
 	}
 
-  function _sendEmail($to='', $from='', $subject='', $body='' ) {
-    $result = false;
-    $role = $this->rdAuth->role;
+	function _sendEmail($to='', $from='', $subject='', $body='' ) {
+		$result = false;
+		$role = $this->rdAuth->role;
 
-    $headers = "Content-Transfer-Encoding: quoted-printable\n" .
+		$headers = "Content-Transfer-Encoding: quoted-printable\n" .
                "From: $from\n" .
                "Return-Path: $from\n" .
                "CC:\n" .
                "BCC:\n";
 
-    $result = mail($to, $subject, $body, $headers);
-    return $result;
-  }
+		$result = mail($to, $subject, $body, $headers);
+		return $result;
+	}
 }
 
 ?>

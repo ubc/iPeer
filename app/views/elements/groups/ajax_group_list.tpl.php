@@ -19,17 +19,18 @@
 	    <th width="18%"><?php echo $pagination->sortLink('Last Updated',array('modified','desc'))?></th>
 	  </tr>
       <?php $i = '0';?>
-	  <?php foreach($data as $row): $group = $row['Group']; ?>
+	  <?php if(isset($data)){foreach($data as $row): $group = $row['Group']; ?>
 	  <tr class="tablecell">
         <td><div align="center">
 		<a href="<?php echo $this->webroot.$this->themeWeb.'groups/view/'.$group['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
 	    <?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
 		<a href="<?php echo $this->webroot.$this->themeWeb.'groups/edit/'.$group['id']?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
-	    <a href="<?php echo $this->webroot.$this->themeWeb.'groups/delete/'.$group['id']?>" onclick="return confirm('Are you sure you want to delete group &ldquo;<?=$group['group_name']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
+	    <a href="<?php echo $this->webroot.$this->themeWeb.'groups/delete/'.$group['id']?>" onclick="return confirm('Are you sure you want to delete group &ldquo;<?php echo $group['group_name']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
 	    <?php endif;?>
 		</div></td>
         <td align="center"><?php echo $group['group_num'] ?></td>
-        <td><?php echo $group['group_name'].' ('.$group['member_count'].')' ?></td>
+        <td><?php echo $group['group_name'].' ('.count($row['GroupsMember']).')' ;	    
+	    ?></td>
         <td align="center"><?php
         $params = array('controller'=>'groups', 'userId'=>$group['creator_id']);
         echo $this->renderElement('users/user_info', $params);
@@ -44,7 +45,7 @@
         ?></td>
       </tr>
 	  <?php $i++;?>
-    <?php endforeach; ?>
+    <?php endforeach; } ?>
     </table>
     <table width="95%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">
       <tr>

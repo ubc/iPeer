@@ -88,7 +88,7 @@
               echo $this->renderElement('courses/ajax_course_submenu', $params);
             if (!empty($access['SURVEY'])) {
               $submenu = 'Course.SubMenu.TeamMaker.Show';
-              $submenuTitle = 'Team Maker';
+              $submenuTitle = 'Surveys (Team Maker)';
               $params = array('controller'=>'courses', 'userPersonalize'=>$userPersonalize, 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'courseId'=>$rdAuth->courseId);
               echo $this->renderElement('courses/ajax_course_submenu', $params);
             }  ?>

@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: groups_controller.php,v 1.10 2006/10/11 17:27:15 davychiu Exp $ */
+/* SVN FILE: $Id$ */
 
 /**
  * Enter description here ....
@@ -10,7 +10,7 @@
  * @package
  * @subpackage
  * @since
- * @version      $Revision: 1.10 $
+ * @version      $Revision$
  * @modifiedby   $LastChangedBy$
  * @lastmodified $Date: 2006/10/11 17:27:15 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -39,7 +39,7 @@ class GroupsController extends AppController
 
 	function __construct()
 	{
-		$this->Sanitize = &new Sanitize;
+		$this->Sanitize = new Sanitize;
 		$this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
 		if ($this->show == 'all') $this->show = 99999999;
 		$this->sortBy = empty($_GET['sort'])? 'created': $_GET['sort'];
@@ -51,14 +51,13 @@ class GroupsController extends AppController
 	}
 
   function index($msg='') {
-
     $courseId = $this->rdAuth->courseId;
    	$this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Groups';
 
 		$queryAttributes = $this->getQueryAttribute($courseId);
 		$fields = $queryAttributes['fields'];
 		$condition = $queryAttributes['condition'];
-		$joinTable = $queryAttributes['joinTable'];
+    $joinTable = $queryAttributes['joinTable'];
 
 		$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
     $this->userPersonalize->setPersonalizeList($personalizeData);
@@ -70,17 +69,12 @@ class GroupsController extends AppController
       $this->update($attributeCode = 'Group.ListMenu.Limit.Show',$attributeValue = $this->show);
   	}
 
-		$data = $this->Group->findAll($condition, $fields, $this->order, $this->show, $this->page, null, $joinTable);
-
-		for ($i=0; $i < count($data); $i++) {
-		  $members = $this->GroupsMembers->getMembers($data[$i]['Group']['id']);
-		  $data[$i]['Group']['member_count'] = $members['member_count'];
-		}
+		$data = $this->Group->findAll('course_id = '.$courseId, null, $this->order, $this->show, $this->page);//, null, null);//$joinTable);
 
 		$paging['style'] = 'ajax';
 		$paging['link'] = '/groups/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
 
-		$paging['count'] = $this->Group->findCount($condition, 0, $joinTable);
+		$paging['count'] = $this->Group->findCount($condition, 0);//, $joinTable);
 		$paging['show'] = array('10','25','50','all');
 		$paging['page'] = $this->page;
 		$paging['limit'] = $this->show;
@@ -106,64 +100,58 @@ class GroupsController extends AppController
     // gets all the students in db for the unfiltered students list
 		$this->set('user_data', $this->User->getEnrolledStudents($courseId));
 
-		if (empty($this->params['data']))
-		{
+		if (empty($this->params['data'])) {
 			$this->render('add');
-		}
-		else
-		{
-		  $this->params['data']['Group']['course_id']=$courseId;
+		} else {
+            $this->params['data']['Group']['course_id']=$courseId;
 			$this->params = $this->Group->prepData($this->params);
 
-			if ($this->Group->save($this->params['data']))
-			{
+			if ($this->Group->save($this->params['data'])) {
 				// add members into the groups_members table
 				$this->GroupsMembers->insertMembers($this->Group->id, $this->params['data']['Group']);
 
 				$this->redirect('/groups/index/The groups were added successfully.');
 
-			}
-			else
-			{
-				$this->set('data', $this->params['data']);
-				$this->render('edit');
+			} else {
+                // Error occured
+                $this->Session->setFlash('Please correct the error below.');
+				$this->render();
 			}
 		}
   }
 
-  function edit ($id=null)
-  {
-    $courseId = $this->rdAuth->courseId;
-   	$this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Groups';
+    function edit ($id=null)
+    {
+        $courseId = $this->rdAuth->courseId;
+        $this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Groups';
 
-		// gets all students not listed in the group for unfiltered box
-		$this->set('user_data', $this->Group->groupDifference($id,$courseId));
+        if (!empty($this->params['data'])) {
+            $id = $this->params['data']['Group']['id'];
+            $data2save = $this->Group->prepData($this->params);
+            if ( $this->Group->save($data2save['data'])) {
+                $this->GroupsMembers->updateMembers($this->Group->id, $data2save['data']['Group']);
+                $this->redirect('/groups/index/The group was updated successfully.');
+            } else {
+                // Error occurs:
+                // todo: display error message
+                $this->redirect('/groups/index/Error saving that group.');
 
-		// gets all students in the group
-		$this->set('group_data', $this->Group->groupStudents($id));
+            }
+        }
 
-		if (empty($this->params['data']))
-		{
-			$this->Group->setId($id);
-			$this->params['data'] = $this->Group->read();
-			$this->render('edit');
-		}
-		else
-		{
-			$this->params = $this->Group->prepData($this->params);
+        // gets all students not listed in the group for unfiltered box
+        $this->set('user_data', $this->Group->groupDifference($id,$courseId));
 
-			if ( $this->Group->save($this->params['data']))
-			{
-				$this->GroupsMembers->updateMembers($this->Group->id, $this->params['data']['Group']);
+        //gets all students in the group
+        $this->set('group_data', $this->Group->groupStudents($id));
+        $this->set('group_id', $id);
 
-				$this->redirect('/groups/index/The groups were updated successfully.');
-			}
-			else
-			{
-				$this->set('data', $this->params['data']);
-				$this->render();
-			}
-		}
+        $groupData = $this->Group->findById($id);
+        if(empty($groupData)) {
+            $this->redirect('/groups/index/Group Not Found.');
+        }
+
+        $this->params['data'] = $groupData;
   }
 
   function delete ($id)
@@ -187,7 +175,7 @@ class GroupsController extends AppController
 
 	function search()
   	{
-    $this->layout = 'ajax';
+  		$this->layout = 'ajax';
 
     if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
     	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
@@ -199,7 +187,7 @@ class GroupsController extends AppController
     }
 
     $condition = "";
-	  $courseId = isset($this->params['form']['course_id'])? $this->params['form']['course_id']: '';
+	    $courseId = isset($this->params['form']['course_id'])? $this->params['form']['course_id']: $this->rdAuth->courseId;;
 		$this->set('courseId', $courseId);
 
 		$queryAttributes = $this->getQueryAttribute($courseId);
@@ -207,19 +195,20 @@ class GroupsController extends AppController
 		$condition = $queryAttributes['condition'];
 		$joinTable = $queryAttributes['joinTable'];
 
-    if (!empty($this->params['form']['livesearch2']) && !empty($this->params['form']['select']))
+    if (isset($this->params['form']['livesearch2']) && '' != $this->params['form']['livesearch2'] && !empty($this->params['form']['select']))
     {
       $pagination->loadingId = 'loading';
       //parse the parameters
-      $searchField=$this->params['form']['select'];
+      $searchField='Group.'.$this->params['form']['select'];
       $searchValue=$this->params['form']['livesearch2'];
 
-		if (!empty($condition))
-    {
-			$condition .= " AND ";
-		}
+      if (!empty($condition))
+      {
+        $condition .= " AND ";
+      }
       $condition .= $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
     }
+
     $this->update($attributeCode = 'Group.ListMenu.Limit.Show',$attributeValue = $this->show);
     $this->set('conditions',$condition);
     $this->set('fields',$fields);
@@ -229,6 +218,7 @@ class GroupsController extends AppController
   function checkDuplicateName()
   {
       $this->layout = 'ajax';
+      $this->set('course_id', $this->rdAuth->courseId);
       $this->render('checkDuplicateName');
   }
 
@@ -236,7 +226,7 @@ class GroupsController extends AppController
   {
     $attributes = array('fields'=>'', 'condition'=>'', 'joinTable'=>array());
     $attributes['fields'] = 'Group.id, Group.group_num, Group.group_name, Group.course_id, Group.created, Group.creator_id, Group.modified, Group.updater_id';
-		$joinTable = array();
+    $joinTable = array();//array('INNER JOIN groups_members AS GroupsMembers ON Group.id = GroupsMembers.group_id');
 
     if (!empty($courseId)) {
       $attributes['condition'] .= ' Group.course_id = '.$courseId;
@@ -246,26 +236,28 @@ class GroupsController extends AppController
   	return $attributes;
   }
 
-  function import() {
-    $this->autoRender = false;
-    $courseId = $this->params['form']['course_id'];
-    $this->params['data']['Group']['course_id'] = $courseId;
+    function import() {
+        $this->autoRender = false;
+        $courseId = $this->params['form']['course_id'];
+        $this->params['data']['Group']['course_id'] = $courseId;
 		$filename = $this->params['form']['file']['name'];
 		$tmpFile = $this->params['form']['file']['tmp_name'];
 
 		//$uploadDir = $this->sysContainer->getParamByParamCode('system.upload_dir');
-		$uploadDir="/var/www/ipeer.apsc.ubc.ca/htdocs/prod/app/uploads/";
+		$uploadDir="../tmp/";
 		//$uploadFile = APP.$uploadDir['parameter_value'] . $filename;
 		$uploadFile=$uploadDir.$filename;
 
 		//check for blank filename
 		if (trim($filename) == "") {
 			$this->set('errmsg','File required.');
-			$this->render('add');
+			$this->set('user_data', $this->User->getEnrolledStudents($courseId));
+			$this->set('import_again',"true");
+            $this->render('add');
 			return false;
 		}
 	  //Return true if valid, else error msg
-    $validUploads = $this->framework->validateUploadFile($tmpFile, $filename, $uploadFile);
+        $validUploads = $this->framework->validateUploadFile($tmpFile, $filename, $uploadFile);
 		if ($validUploads) {
 			// Get file into an array.
 			$lines = file($uploadFile);
@@ -274,49 +266,70 @@ class GroupsController extends AppController
 
 			//Mess create students
 			$resultAry = $this->addGroupByImport($this->params['data'], $lines);
-  		$this->set('data', $resultAry);
+            $this->set('data', $resultAry);
 
-  		$this->redirect('/groups/index/The groups were added successfully.');
-		}
-		else {
+            $this->redirect('/groups/index/The group was added successfully.');
+		} else {
 		  $this->set('errmsg', $$validUploads);
+		  $this->set('user_data', $this->User->getEnrolledStudents($courseId));
+		  $this->set('import_again',"true");
 		  $this->render('add');
 		}
-	}
+    }
 
   function addGroupByImport($data=null, $lines=null)
 	{
 	  $groupNo = '';
-		for ($i = 1; $i < count($lines); $i++) {
+		for ($i = 0; $i < count($lines); $i++) {
 			// Split fields up on line by '
 			$line = split(',', $lines[$i]);
 
-  		$data['Group']['id'] = null;
-  		//$data['Group']['student_no'] = trim($line[0]);
-$data['Group']['username'] = trim($line[0]);
-  		$data['Group']['group_num'] = trim($line[1]);
-  		$data['Group']['group_name'] = trim($line[2]);
-      $data['Group']['creator_id'] = $this->rdAuth->id;
+            $data['Group']['id'] = null;
+            //$data['Group']['student_no'] = trim($line[0]);
+            $data['Group']['username'] = trim($line[0]);
+            $data['Group']['group_num'] = trim($line[1]);
+            $data['Group']['group_name'] = trim($line[2]);
+            $data['Group']['creator_id'] = $this->rdAuth->id;
 			if ($groupNo != $data['Group']['group_num']) {
-			  $this->Group->save($data);
+                $this->Group->save($data);
 			}
 
 			// add members into the groups_members table
 			$groupMember['GroupsMembers']['group_id'] = $this->Group->id;
 			//$user = $this->User->find('student_no = '.$data['Group']['student_num']);
-$user = $this->User->find('username = '.$data['Group']['username']);
+            $user = $this->User->find('username = '.$data['Group']['username']);
 			$groupMember['GroupsMembers']['user_id'] = $user['User']['id'];
 			$this->GroupsMembers->save($groupMember);
 			$this->GroupsMembers->id = null;
 
 			$groupNo = $data['Group']['group_num'];
-    }
+        }
 	}
 
 	function update($attributeCode='',$attributeValue='') {
 		if ($attributeCode != '' && $attributeValue != '') //check for empty params
-  		$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
+		{
+			$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
+		}
 	}
+
+    function getFilteredStudent()
+    {
+        $this->layout = 'ajax';
+        $this->set('course_id', $this->rdAuth->courseId);
+        $group_id = $this->params['form']['group_id'];
+        $filter = 'filter' == $this->params['form']['filter'];
+        $this->set('students', $this->Group->getFilteredStudents($group_id, $filter));
+        $this->render('filteredStudents');
+    }
+
+    function sendGroupEmail ($courseId) {
+        if (is_numeric($courseId)) {
+
+        } else {
+
+        }
+    }
 }
 
 ?>

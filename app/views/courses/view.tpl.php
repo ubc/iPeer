@@ -30,7 +30,7 @@
 	  }
 	  echo '</table>';
 	  if (!empty($maillToAll)) {?>
-	   <a href="mailto:<?=$maillToAll?>"><?php echo $html->image('icons/email.gif',array('border'=>'0','alt'=>'Emaill To All'))?></a>
+	   <a href="mailto:<?php echo $maillToAll?>"><?php echo $html->image('icons/email.gif',array('border'=>'0','alt'=>'Emaill To All'))?></a>
           Email To All Instructors
 	  <?php }
 	  ?>
@@ -74,7 +74,9 @@
       <td align="left"><small><?php echo $data['Course']['modified']; ?></small></td>
     </tr>
     <tr class="tablecell">
-      <td colspan="4" align="center"><input type="button" name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller']; ?>'"></td>
+      <td colspan="4" align="center">
+      <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
+      </td>
       </tr>
   </table>
   <table width="95%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">

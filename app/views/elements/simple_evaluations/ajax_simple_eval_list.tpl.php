@@ -4,14 +4,6 @@
 <?php if($pagination->set($paging)):?>
 <?php endif;?>
 	<table width="95%" border="0" cellspacing="2" cellpadding="4" bgcolor="#FFFFFF">
-	  <tr>
-	    <td colspan="4">
-      <?php
-      echo $this->renderElement('evaltools/tools_menu', array());
-      ?>
-	    </td>
-	    <td align="right" colspan="2"><div align="right"><?php echo $pagination->show('Show ',null,'simple_table')?></div></td>
-	  </tr>
 	  <tr class="tableheader">
 	    <?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
 	    <th width="13%">Actions</th>
@@ -20,7 +12,7 @@
 	    <th><?php echo $pagination->sortLink('Description',array('description','desc'))?></th>
 	    <th width="20%"><?php echo $pagination->sortLink('Base Point/Member',array('point_per_member','desc'))?></th>
 	    <th width="23%"><?php echo $pagination->sortLink('Created',array('created','desc'))?></th>
-	    <!--th><?php echo $pagination->sortLink('Last Updated By',array('modified','desc'))?></th-->
+	    <!--th><?php //echo $pagination->sortLink('Last Updated By',array('modified','desc'))?></th-->
 	  </tr>
   	<?php $i = '0';?>
 	  <?php
@@ -36,7 +28,7 @@
   	        <?php echo $html->image('icons/editdisabled.gif',array('border'=>'0','alt'=>'Edit'))?>
   	      <?php endif; ?>
   	      <?php if ($rdAuth->id == $simpleeval['creator_id'] or ($rdAuth->role=='A')): ?>
-  	      <a href="<?php echo $this->webroot.$this->themeWeb.'simpleevaluations/delete/'.$simpleeval['id']?>" onclick="return confirm('All associating events and evaluation data will be deleted as well.\n Are you sure you want to delete this evaluation &ldquo;<?=$simpleeval['name']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
+  	      <a href="<?php echo $this->webroot.$this->themeWeb.'simpleevaluations/delete/'.$simpleeval['id']?>" onclick="return confirm('All associating events and evaluation data will be deleted as well.\n Are you sure you want to delete this evaluation &ldquo;<?php echo $simpleeval['name']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
   	      <?php else: ?>
   	        <?php echo $html->image('icons/deletedisabled.gif',array('border'=>'0','alt'=>'Delete'))?>
   	      <?php endif; ?>

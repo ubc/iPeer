@@ -4,6 +4,18 @@
 		<form id="searchForm" action="">
 		<table width="95%" border="0" cellspacing="0" cellpadding="2">
   		<tr>
+
+          <!--  <br />
+
+            <?php //echo $this->renderElement("list/ajaxList",
+                  //      array(  "controller" => "users",
+                  //              "columns" => array("username", "role"))); ?>
+
+           <br />
+
+            -->
+
+
 			<td width="10" height="32"><?php echo $html->image('magnify.png', array('alt'=>'Magnify Icon'));?></td>
 			<td width="35"> <b>Search:</b> </td>
 			<td width="35"><select name="select" >
@@ -52,17 +64,19 @@
 				&nbsp;<b>For Course:&nbsp;</b>
 				<select name="course_id" id="course_id" >
    				<?php
-				//echo '<option value="" SELECTED >-- All --</option>';
-				echo '<option value="-1" SELECTED >-- Unassigned Students --</option>';
-				foreach($courseList as $index => $value) {
-				  if ($value['record_status'] == 'A') {
-						echo '<option value="'.$value['id'].'"';
-						if ($rdAuth->courseId == $index){
-							echo 'SELECTED';
-						}
-						echo '>'.$value['course'].'</option>';
-					}
-				}
+                    echo '<option value="ALL" SELECTED >-- All --</option>';
+                    echo '<option value="-1">-- Unassigned Students --</option>';
+                    if (!empty($courseList)) {
+                        foreach($courseList as $index => $value) {
+                        if ($value['record_status'] == 'A') {
+                                echo '<option value="'.$value['id'].'"';
+                                if ($rdAuth->courseId == $index){
+                                    echo 'SELECTED';
+                                }
+                                echo '>'.$value['course'].'</option>';
+                            }
+                        }
+                    }
 				?>
 			  </select>
 			</div>
@@ -84,3 +98,7 @@ echo $ajax->observeForm('searchForm', array('update'=>'user_table', 'url'=>"/use
 </div>
 </td></tr>
 </table>
+
+<script language="JavaScript" type="text/javascript">
+  OnChange(document.getElementById('display_user_type'));
+</script>

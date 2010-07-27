@@ -6,7 +6,7 @@
 		$prefill_question_max = $data['Mixeval']['prefill_question_max'];
 		$question_default = $data['Mixeval']['lickert_question_max'];
 		$mixeval_avail = $data['Mixeval']['availability'];
-		$total_mark = $data['Mixeval']['total_marks'];
+		$total_mark = isset($data['Mixeval']['total_marks']) ? $data['Mixeval']['total_marks'] : "";
 		if(!empty($data['Mixeval']['zero_mark']))
 			$zero_mark = $data['Mixeval']['zero_mark'];
 		else
@@ -42,19 +42,21 @@
   </tr>
 
   <tr class="tablecell2">
-    <td>Number of Lickert Question:</td>
-    <td><?php echo $html->selectTag('Mixeval/lickert_question_max', array('1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8',
-									'9'=>'9','10'=>'10','11'=>'11','12'=>'12','13'=>'13','14'=>'14','15'=>'15','16'=>'16','17'=>'17',
-									'18'=>'18','19'=>'19','20'=>'20','21'=>'21','22'=>'22','23'=>'23','24'=>'24','25'=>'25'), $question_default,
-									array('style'=>'width:50px;','id'=>'lickert_question_max'),'',false) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <td>Number of Lickert Questions:</td>
+    <td>
+
+        <?php echo "<b>&nbsp;&nbsp;$question_default&nbsp;&nbsp;</b>";?>
+        <!-- disable editing the number of questions for now -->
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		Level of Scale:&nbsp;&nbsp;
-		<?php echo $html->selectTag('Mixeval/scale_max', array('1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8',
-									'9'=>'9','10'=>'10'), $scale_default, array('style'=>'width:50px;','id'=>'LOM'),'',false) ?>
+		<?php echo $html->selectTag('Mixeval/scale_max', array('2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8',
+									'9'=>'9','10'=>'10'), $scale_default, array('style'=>'width:50px;','id'=>'LOM',
+                                    ),'',false) ?>
 		</td>
     <td>Number of Lickert Question Aspects (Max 25) </td>
   </tr>
   <tr class="tablecell2">
-    <td>Number of Pre-fill Text Question:</td>
+    <td>Number of Pre-fill Text Questions:</td>
     <td><?php echo $html->selectTag('Mixeval/prefill_question_max', array('1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8',
 									'9'=>'9','10'=>'10'), $prefill_question_max, array('style'=>'width:50px;','id'=>'LOM'),'',false) ?></td>
     <td>Number of Pre-fill Text Question Aspects (Max 10) </td>
@@ -71,18 +73,18 @@
   </tr>
   <tr class="tablecell2">
   		<td colspan="3" align="center">
-		<input type="button" name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller']; ?>'">
+        <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
 		<?php
 		if(!empty($data)){
-		  echo $html->submit('Reset', array('Name'=>'preview')); echo '&nbsp;';
-    	if (empty($params['data']['Mixeval']['id'])) {
-	      echo $html->submit('Add Mixed Evaluation');
-	    } else {
-	      echo $html->submit('Edit Mixed Evaluation');
-	    }
+            if (empty($params['data']['Mixeval']['id'])) {
+                echo $html->submit('Add Mixed Evaluation');
+            } else {
+                echo $html->submit('Edit (and Update Format)');
+            }
 		} else {
-		  echo $html->submit('Next', array('Name'=>'preview'));
-		} ?>
+            echo $html->submit('Next', array('Name'=>'preview'));
+		}
+		?>
 		</td>
     </tr>
 </table>
@@ -113,7 +115,7 @@ echo $javascript->link('calculate_marks');?>
 
     <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
     	<tr class="tableheader" align="center">
-			<td valign="top" colspan="<?=$scale_default?>" width="90%"  align='left'>Section One: &nbsp;Lickert Scales</td>
+			<td valign="top" colspan="<?php echo $scale_default?>" width="90%"  align='left'>Section One: &nbsp;Lickert Scales</td>
 		<?php
 		$descriptor_des = array('1'=>'Lowest','2'=>'','3'=>'Middle','4'=>'','5'=>'Highest');
 
@@ -129,7 +131,7 @@ echo $javascript->link('calculate_marks');?>
 		  //Get and set Mixeval Question
 		  isset($questions[$pos])? $mixevalQuestion = $questions[$pos] : $mixevalQuestion = null;
 		  if ($mixevalQuestion !=null) {
-		    $questionDescriptors = $mixevalQuestion['descriptors'];
+		    $questionDescriptors = isset($mixevalQuestion['descriptors']) ?  $mixevalQuestion['descriptors'] : "";
    		  //$this->controller->Output->br2nl($mixevalQuestion);
 		    $descriptor_des = array();
 
@@ -211,9 +213,9 @@ echo $javascript->link('calculate_marks');?>
 		  $this->controller->Output->br2nl($mixevalQuestion);
   ?>
 			<tr class="tablecell" align="center">
-  			<td class="tableheader2" valign="top" colspan="<?=$scale_default?>">
+  			<td class="tableheader2" valign="top" colspan="<?php echo $scale_default?>">
   			  <table border="0" width="95%" cellpadding="2">
-  			    <tr><td width="15%">Question <?=$pos?>:</td>
+  			    <tr><td width="15%">Question <?php echo $pos?>:</td>
   			        <td width="85%" align="left"> Question Prompt:
   			          <?php echo	$html->input('Mixeval/title'.$pos, array('style'=>'width:100%;', 'value'=>isset($mixevalQuestion['title'])? $mixevalQuestion['title'] : '')) ?> <br>
   			          <?php echo $html->hidden('Mixeval/question_type'.$pos, array('value'=>'T'));?>
@@ -228,8 +230,8 @@ echo $javascript->link('calculate_marks');?>
                      $checkRequired = '';
                      $checkNo = 'checked';
                    }?>
-          		    <input type="radio" name="data[Mixeval][text_require<?=$pos?>]" value="1" <?php echo $checkRequired?> > Yes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          		    <input type="radio" name="data[Mixeval][text_require<?=$pos?>]" value="0" <?php echo $checkNo ?> > No<br>
+          		    <input type="radio" name="data[Mixeval][text_require<?php echo $pos?>]" value="1" <?php echo $checkRequired?> > Yes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          		    <input type="radio" name="data[Mixeval][text_require<?php echo $pos?>]" value="0" <?php echo $checkNo ?> > No<br>
                 </td>
   				  </tr>
   			  </table>
@@ -258,8 +260,8 @@ echo $javascript->link('calculate_marks');?>
                    $responseLickert = '';
                    $responseText = 'checked';
                    }?>
-          		    <input type="radio" name="data[Mixeval][response_type<?=$pos?>]" value="S" <?=$responseLickert?>  > Single line of text input box<br>
-          		    <input type="radio" name="data[Mixeval][response_type<?=$pos?>]" value="L" <?=$responseText?> > Multiple lines of text input box<br>
+          		    <input type="radio" name="data[Mixeval][response_type<?php echo $pos?>]" value="S" <?php echo $responseLickert?>  > Single line of text input box<br>
+          		    <input type="radio" name="data[Mixeval][response_type<?php echo $pos?>]" value="L" <?php echo $responseText?> > Multiple lines of text input box<br>
                 </td></tr>
 			 </table></td>
 			</tr>
@@ -269,7 +271,7 @@ echo $javascript->link('calculate_marks');?>
   <tr>
   		<td colspan="3" align="center">
 <?php echo $html->hidden('Mixeval/total_question', array('value'=>$pos));?>
-		<input type="button" name="Back" value="Back" onClick="parent.location='<?php echo $this->webroot.$this->themeWeb.$this->params['controller']; ?>'">
+		<input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
   		  <?php if (empty($params['data']['Mixeval']['id'])) {
   		      echo $html->submit('Add Mixed Evaluation');
   		    } else {

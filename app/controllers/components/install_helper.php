@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: install_helper.php,v 1.8 2006/08/25 22:29:26 rrsantos Exp $ */
+/* SVN FILE: $Id$ */
 /*
  * InstallHelper Component 
  *
@@ -51,14 +51,14 @@ class InstallHelperComponent
 	  $fname = $dbConfig['filename'];
 	  
     //connect to the server
-    $mysql = mysql_connect($dbConfig['host_name'], $dbConfig['db_user'], $dbConfig['db_password']);
+    $mysql = mysql_connect($dbConfig['host'], $dbConfig['login'], $dbConfig['password']);
     if(!$mysql) {
       die('Could not connect: ' . mysql_error());
       return($error);
     } 
     else {
       //Open the database
-      $mysqldb = mysql_select_db($dbConfig['db_name']);
+      $mysqldb = mysql_select_db($dbConfig['database']);
       if (!$mysqldb) {
         //TODO create database
         //return($error);
@@ -70,6 +70,8 @@ class InstallHelperComponent
   			return false;
   		}
   	
+      mysql_query('BEGIN');
+
   		$cmd = "";
   		$done = false;
   	
@@ -93,8 +95,10 @@ class InstallHelperComponent
   				$result = mysql_query($cmd, $mysql);
           if (!$result)
           {
-          $error = "Cannot run query";
-          return $error;
+            $error = "Cannot run query";
+            mysql_query('ROLLBACK');
+            mysql_close($mysql);
+            return $error;
           }
   				//if ($this->execute($cmd)) {
   				//	return false;
@@ -113,7 +117,7 @@ class InstallHelperComponent
 	
 	function updateSystemParameters($data) 
   {
-  	$this->SysParameter =& new SysParameter;
+  	$this->SysParameter = new SysParameter;
   	$superAdmin = null;
   	
 		if (!empty($data)) {
@@ -142,19 +146,19 @@ class InstallHelperComponent
   
   function _importDataPhp4($xml_file, $to_import)
   {
-  	$this->User =& new User;
-    $this->Course =& new Course;
-    $this->Rubric =& new Rubric;
-    $this->RubricsLom =& new RubricsLom;
-    $this->RubricsCriteria =& new RubricsCriteria;
-    $this->RubricsCriteriaComment =& new RubricsCriteriaComment;
-    $this->SimpleEvaluation =& new SimpleEvaluation;
-    $this->Event =& new Event;
-    $this->UserCourse =& new UserCourse;
-    $this->UserEnrol =& new UserEnrol;
-    $this->Survey =& new Survey;
-    $this->SurveyQuestion =& new SurveyQuestion;
-    $this->Question =& new Question;
+  	$this->User = new User;
+    $this->Course = new Course;
+    $this->Rubric = new Rubric;
+    $this->RubricsLom = new RubricsLom;
+    $this->RubricsCriteria = new RubricsCriteria;
+    $this->RubricsCriteriaComment = new RubricsCriteriaComment;
+    $this->SimpleEvaluation = new SimpleEvaluation;
+    $this->Event = new Event;
+    $this->UserCourse = new UserCourse;
+    $this->UserEnrol = new UserEnrol;
+    $this->Survey = new Survey;
+    $this->SurveyQuestion = new SurveyQuestion;
+    $this->Question = new Question;
 
     // get the xml file
 
@@ -555,19 +559,19 @@ class InstallHelperComponent
   
   function _importDataPhp5($xml_file, $to_import)
   {
-  	$this->User =& new User;
-    $this->Course =& new Course;
-    $this->Rubric =& new Rubric;
-    $this->RubricsLom =& new RubricsLom;
-    $this->RubricsCriteria =& new RubricsCriteria;
-    $this->RubricsCriteriaComment =& new RubricsCriteriaComment;
-    $this->SimpleEvaluation =& new SimpleEvaluation;
-    $this->Event =& new Event;
-    $this->UserCourse =& new UserCourse;
-    $this->UserEnrol =& new UserEnrol;
-    $this->Survey =& new Survey;
-    $this->SurveyQuestion =& new SurveyQuestion;
-    $this->Question =& new Question;
+  	$this->User = new User;
+    $this->Course = new Course;
+    $this->Rubric = new Rubric;
+    $this->RubricsLom = new RubricsLom;
+    $this->RubricsCriteria = new RubricsCriteria;
+    $this->RubricsCriteriaComment = new RubricsCriteriaComment;
+    $this->SimpleEvaluation = new SimpleEvaluation;
+    $this->Event = new Event;
+    $this->UserCourse = new UserCourse;
+    $this->UserEnrol = new UserEnrol;
+    $this->Survey = new Survey;
+    $this->SurveyQuestion = new SurveyQuestion;
+    $this->Question = new Question;
         
     $dom = new DomDocument();
     $dom->load($xml_file);
