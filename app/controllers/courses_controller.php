@@ -162,6 +162,7 @@ class CoursesController extends AppController
             }
 			$this->params = $this->Course->prepData($this->params);
 			if ( $this->Course->save($this->params['data'])) {
+        $this->UserCourse->insertInstructors($this->Course->id,$this->params['data']['Course']);
 				$this->redirect('courses/index/The course was updated successfully.');
 			} else	{
 				$this->set('data', $this->params['data']);
