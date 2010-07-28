@@ -152,4 +152,24 @@ set_time_limit(300);
    */
   define('DATABASE_VERSION', 2);
 
+
+  $CWL['LoginURL'] = 'https://www.auth.cwl.ubc.ca/auth/login';
+
+  // CWL XML-RPC interface URLs: https://www.auth.verf.cwl.ubc.ca/auth/rpc (for verification)
+  //                             https://www.auth.cwl.ubc.ca/auth/rpc
+  $CWL['RPCURL'] = "https://www.auth.cwl.ubc.ca";
+  $CWL['RPCPath'] = "/auth/rpc";
+
+  /**
+   * the name of the function being called through XML-RPC. this is
+   * prepended with 'session.' later
+   */
+  //$CWLFunctionName = 'getLoginName';
+  $CWL['FunctionName'] = 'getIdentities';
+
+  /**
+   * the application's ID/name and password as given by the CWL team
+   */
+  $CWL['applicationID'] = '';
+  $CWL['applicationPassword'] = '';
 ?>
