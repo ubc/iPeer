@@ -306,13 +306,12 @@ class LoginoutController extends AppController
 	}
 
 	/**
-	 * Cleans up any Session variable that need to be cleaned on logout
+	 * Clean out the entire session
 	 */
 	function clearSession() {
-		$this->Session->del('URL');
-		$this->Session->del('AccessErr');
-		$this->Session->del('Message');
-		$this->Session->del('CWLErr');
+        foreach ($this->Session->read() as $key => $value) {
+            $this->Session->del($key);
+        }
 	}
 
 	/**
@@ -324,7 +323,6 @@ class LoginoutController extends AppController
 		$this->autoRender = false;
 		$this->rdAuth->logout();
 		$this->clearSession();
-
 		$redirect = 'loginout/login';
 		$this->redirect($redirect);
 
