@@ -213,13 +213,19 @@ class Event extends AppModel
     $evaluation_mixeval = new EvaluationMixeval();
     $evaluation_mixeval_detail = new EvaluationMixevalDetail();
 
-    $ems = $evaluation_mixeval->findAll('eventi_id = '.$this->id);
-    foreach($ems as $em) {
+    $ems = $evaluation_mixeval->findAll('event_id = '.$this->id);
+    if(!empty($ems))
+    {
+    	foreach($ems as $em) {
     	$emds = $evaluation_mixeval_detail->findAll('evaluation_mixeval_id = '.$em->id);
-      foreach($emds as $emd) {
-      	$emd->delete();
-      }
+
+    	if(!empty($emds))
+    	{
+	    	foreach($emds as $emd) 
+	      		$emd->delete();
+		}
     	$em->delete();
+    	}
     }
 
     // delete evaluation_rubrics and evaluation_rubrics_details
