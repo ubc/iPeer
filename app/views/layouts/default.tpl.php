@@ -29,6 +29,11 @@
 <script language="JavaScript" type="text/javascript">
 <!--
 
+// The presents of an onbeforeunload (Even an empty one) prevents
+// caching for sure, see
+// http://www.hunlock.com/blogs/Mastering_The_Back_Button_With_Javascript
+window.onbeforeunload = function () {};
+
 function checkEmailAddress()
 {
   var redirectURL = "<?php echo $this->webroot.$this->themeWeb;?> " + "users/editProfile";

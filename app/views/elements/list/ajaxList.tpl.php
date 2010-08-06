@@ -37,10 +37,9 @@
 
         // Start Up the element
         $variables = json_encode($paramsForList);
-        $stateJSON = json_encode($state);
 
         echo $javascript->link("ajaxList");
-        echo $javascript->codeBlock("var ajaxList = new AjaxList($variables,'$divisionName',$stateJSON)");
+        echo $javascript->codeBlock("var ajaxList = new AjaxList($variables,'$divisionName')");
 
     }
 

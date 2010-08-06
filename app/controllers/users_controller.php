@@ -38,6 +38,7 @@ class UsersController extends AppController
     var $NeatString;
     var $Sanitize;
     var $uses = array('User', 'UserEnrol','Personalize', 'Course','SysParameter');
+    var $components = array('Session','AjaxList');
 
     function __construct()
     {
@@ -53,10 +54,38 @@ class UsersController extends AppController
         parent::__construct();
     }
 
+    // =-=-=-=-=-== New list routines =-=-=-=-=-===-=-
+    function setUpAjaxList () {
+        // Set up the ajax list component
+        $fields  = "User.id, User.username, User.role ,User.first_name, User.last_name, User.email, ";
+        $fields .= "User.created, User.creator_id, User.modified, User.updater_id";
+        $this->AjaxList->setUp($this->User, $fields, "User.id", "User.username");
+    }
+
+
+    function newIndex($message='') {
+        $this->setUpAjaxList();
+        $this->set('listData', $this->AjaxList->getListByState());
+    }
+
+    function ajaxList($pageForRedirect=null) {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set up the list
+        $this->setUpAjaxList();
+        // Process the request for data
+        $this->AjaxList->asyncGet();
+    }
+
+    // =-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-
+
 
     function index($message='') {
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
+
+        // For the new Ajax table
+        $this->newIndex();
 
         if (!empty($this->rdAuth->courseId))
         {
@@ -168,9 +197,7 @@ class UsersController extends AppController
                 $courseList = $this->sysContainer->getMyCourseList();
                 $this->set('courseList', $courseList);
 
-            }
-            else
-            {
+            }  else  {
                 $sFound = $this->User->findUserByStudentNo($this->params['data']['User']['username']);
                 $duplicate = $sFound ? true : false; // Convert to boolean
 

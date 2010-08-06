@@ -1,5 +1,4 @@
 
-
 // Configuration Variables
 var AjaxListActionMenuOffsetX = 100;
 var AjaxListActionMenuOffsetY = -120;
@@ -33,7 +32,7 @@ AjaxListLibrary.prototype.createDelegate = function (object, method) {
     }
 }
 
-AjaxListLibrary.prototype.createDelegateWith1Param = function (object, method, param1) {
+AjaxListLibrary.prototype.createDelegateWithParams = function (object, method, param1, param2) {
     return function() {
         // Copy the parameter to the newArguments array....
         //  since the arguments array has no push() function
@@ -48,10 +47,40 @@ AjaxListLibrary.prototype.createDelegateWith1Param = function (object, method, p
         }
 
         // Push the new argument into the newArguments array
-        newArguments.push(param1);
+       if (param1 !== undefined) {
+            newArguments.push(param1);
+       }
+
+       if (param2 !== undefined) {
+           newArguments.push(param2);
+       }
         // And call the intended function with the old + new parameters
         return method.apply(object, newArguments);
     }
+}
+
+// Gets a cookie - from JavaScript, the Definitive Guide, 5th ed, Chap 19.2
+AjaxListLibrary.prototype.getCookie = function(name) {
+    // Read the cookie property. This returns all cookies for this document.
+    var allcookies = document.cookie;
+    // Look for the start of the cookie named "version"
+    var pos = allcookies.indexOf(name + "=");
+    // If we find a cookie by that name, extract and use its value
+    if (pos != -1) {
+        var start = pos + name.length + 1;              // Start of cookie value
+        var end = allcookies.indexOf(";", start);       // End of cookie value
+        if (end == -1) end = allcookies.length;
+        var value = allcookies.substring(start, end);   // Extract the value
+        return value
+    } else {
+        return null;
+    }
+}
+
+
+// Sets a cookie
+AjaxListLibrary.prototype.setCookie = function(name, value) {
+    document.cookie = name + "=" + encodeURIComponent(value) + "; max-age=" + (60*60*24);
 }
 
 
@@ -61,15 +90,17 @@ var ajaxListLibrary = new AjaxListLibrary();
 /**
  * Ajax List java script element to render interactible lists in iPeer
  */
-function AjaxList (parameterArray, whereToDisplay, state) {
+function AjaxList (parameterArray, whereToDisplay) {
     // Initialize given vairables
     this.controller = parameterArray.controller;
     this.columns = parameterArray.columns;
     this.data = parameterArray.data.entries;
     this.count = parameterArray.data.count;
+    this.timeStamp = parameterArray.data.timeStamp;
+    this.state = parameterArray.data.state;
     this.actions = parameterArray.actions;
     this.webroot = parameterArray.webroot;
-    this.state = state;
+
 
     // Where to display this object?
     var whereToDisplayElement = $(whereToDisplay);
@@ -83,48 +114,58 @@ function AjaxList (parameterArray, whereToDisplay, state) {
     this.table.width = "100%";
     this.table.cellPadding = "4";
     this.header = new Element ("div");
+    this.footer = new Element("div");
 
     this.display.appendChild(this.header);
     this.display.appendChild(this.table);
+    this.display.appendChild(this.footer);
     whereToDisplayElement.appendChild(this.display);
 
+    this.ajaxObject = null;
     this.headerPageList = null;
+    this.footerPageList = null;
     this.headerPageSizes = null;
     this.actionDisplay = null;
     this.searchBar = null;
-    this.renderHeader();
 
 
-    if (this.data != null && this.state != null) {
+
+    // There should always be data supplied by php in the HTML
+    //  file sent by the server. Decide to either use this data, or
+    //  ask the server to refresh it.
+    var isStaleData = false;
+    var lastTime = ajaxListLibrary.getCookie(this.getUpdateCookieName());
+    if (lastTime && this.data !=null) {
+        // If the cookie's timeStamp is older, this means that
+        //  this page was AJAX-updated since, and we need to refresh it.
+        isStaleData = (lastTime > this.timeStamp);
+    }
+
+
+    if (!isStaleData && this.data != null && this.state != null) {
+        this.renderHeader();
         this.renderTable();
-        this.renderFooter();
+        this.renderFooter(this.footer);
     } else {
         this.updateFromServer();
     }
+
+
+
+
 }
 
 
-
-// Clears out the headers for the list
-AjaxList.prototype.clearHeader = function() {
-    while(this.header.firstChild) this.header.removeChild(this.header.firstChild);
+// Gets the update cookie name for this controller list
+AjaxList.prototype.getUpdateCookieName = function() {
+    return "ajaxListLastUpdateTime" + "_" + this.controller;
 }
-
-//Clears out the list contents
-AjaxList.prototype.clearTable = function() {
-    // so long as obj has children, remove them
-    while(this.table.firstChild) this.table.removeChild(this.table.firstChild);
-}
-
-//Clears out the list contents
-AjaxList.prototype.clearFooter = function() {
-    // so long as obj has children, remove them
-    while(this.footer.firstChild) this.footer.removeChild(this.footer.firstChild);
-}
-
 
 // Renders the Search Tab, etc.
 AjaxList.prototype.renderHeader = function() {
+    while(this.header.firstChild) this.header.removeChild(this.header.firstChild);
+
+
     var table = new Element("table");
     table.width = "100%";
     var tbody = new Element("tbody");
@@ -163,6 +204,12 @@ AjaxList.prototype.renderSearchBar = function (divIn) {
 
     div.appendChild(document.createTextNode(" "));
 
+    // Put in a state variable for selection maps
+    if (this.state.mapFilterSelections === undefined) {
+        this.state.mapFilterSelections = {}; // New Object
+    }
+
+    // First, render the selection maps
     var atLeastOneMapAdded = false;
     for (i = 0; i < this.columns.length; i++) {
         // Put all maps into the selections
@@ -172,13 +219,34 @@ AjaxList.prototype.renderSearchBar = function (divIn) {
         if (type == "map") {
             div.appendChild(document.createTextNode(atLeastOneMapAdded ? ", and " : "Show "));
 
+            // Does the state variable exist for this entry? if not, put it in
+            if (this.state.mapFilterSelections[column[ID_COL]] === undefined) {
+                this.state.mapFilterSelections[column[ID_COL]] = "";
+            }
+
             var select = new Element("select");
+            var thisObject = this;
+            var thisColumn = column[ID_COL];
+            select.onchange = function () {
+                // We need to create a callback for this: direct call
+                //   to changeMapFilter doesn't detect the value change!
+                var delegate = ajaxListLibrary.createDelegateWithParams(thisObject,
+                    thisObject.changeMapFilter,thisColumn, this.value);
+                window.setTimeout(delegate, 0);
+            }
+
             var option = new Element("option", {"value" : ""}).update("-- All --");
             select.appendChild(option);
-            // Now list each of the options
+            // Now list each of the optionsecords
             for (var entry in column[MAP_COL]) {
+                // Create the new option
                 option = new Element("option",
                     {"value" : entry}).update(column[MAP_COL][entry]);
+
+                if (this.state.mapFilterSelections[column[ID_COL]] == entry) {
+                    option.selected = "selected";
+                }
+
                 select.appendChild(option);
                 div.appendChild(select);
             }
@@ -191,7 +259,14 @@ AjaxList.prototype.renderSearchBar = function (divIn) {
     div.appendChild(document.createTextNode(atLeastOneMapAdded ? " and Search where: " : "Search where: "));
 
     var select = new Element("select");
-
+    var thisObject = this;
+    select.onchange = function () {
+        // We need to create a callback for this: direct call
+        //   to selectSearchColumn doesn't detect the value change!
+        var delegate = ajaxListLibrary.createDelegateWithParams(thisObject,
+            thisObject.selectSearchColumn,this.value);
+        window.setTimeout(delegate, 0);
+    }
     // Generate a drop-down entry for each column
     for (i = 0; i < this.columns.length; i++) {
         // Put all maps into the selections
@@ -202,16 +277,13 @@ AjaxList.prototype.renderSearchBar = function (divIn) {
             option.selected = "selected";
         }
 
-        option.onclick = ajaxListLibrary.createDelegateWith1Param
-            (this, this.selectSearchColumn, column[ID_COL]);
-
         select.appendChild(option);
     }
     div.appendChild(select);
 
     div.appendChild(document.createTextNode(" contains: "));
 
-    var input = new Element("input", {"type" : "text", "size" : 20});
+    var input = new Element("input", {"type" : "text", "size" : 20, "value" : this.state.searchValue});
     input.id = "searchInputField";
     var thisObject = this;
     input.onkeyup = function() {  thisObject.changeSearchValue(this.value); }
@@ -219,7 +291,7 @@ AjaxList.prototype.renderSearchBar = function (divIn) {
 
     div.appendChild(document.createTextNode("   "));
     var submit = new Element("input", {"type" : "submit", "value" : "Search"});
-    submit.onclick = ajaxListLibrary.createDelegate(this, this.updateFromServer);
+    submit.onclick = ajaxListLibrary.createDelegate(this, this.doSearch);
 
     var clear = new Element("input", {"type" : "submit", "value" : "Clear"});
     clear.onclick = ajaxListLibrary.createDelegate(this, this.clearSearchValue);
@@ -252,13 +324,14 @@ AjaxList.prototype.renderPageSizes = function (div) {
                 div.appendChild(document.createTextNode(thisPageSize + "  "));
             }
         } else {
-            input.onclick = ajaxListLibrary.createDelegateWith1Param
+            input.onclick = ajaxListLibrary.createDelegateWithParams
                 (this, this.changePageSize, thisPageSize);
             div.appendChild(input);
             div.appendChild(document.createTextNode(thisPageSize + "  "));
         }
     }
 }
+
 
 AjaxList.prototype.renderPageList = function(div) {
     // so long as obj has children, remove them
@@ -280,7 +353,7 @@ AjaxList.prototype.renderPageList = function(div) {
             // Selected Pages
             var span = new Element("span");
             span.style.cursor = "pointer";
-            span.onclick = ajaxListLibrary.createDelegateWith1Param(this, this.changePage, i);
+            span.onclick = ajaxListLibrary.createDelegateWithParams(this, this.changePage, i);
         }
         span.appendChild(document.createTextNode(i));
         pages.appendChild(span);
@@ -288,10 +361,46 @@ AjaxList.prototype.renderPageList = function(div) {
     div.appendChild(pages);
 }
 
+AjaxList.prototype.renderAllPageLists = function() {
+    this.renderPageList(this.headerPageList);
+    this.renderPageList(this.footerPageList);
+}
+
 
 // Renders the Page Selection Tab, etc.
-AjaxList.prototype.renderFooter = function() {
+AjaxList.prototype.renderFooter = function(div) {
+    // so long as obj has children, remove them
+    while(div.firstChild) div.removeChild(div.firstChild);
 
+    var table = new Element("table", {"width" : "100%"});
+    var tbody = new Element("tbody");
+    var tr = new Element("tr");
+
+    // Display the number of results
+    var td = new Element("td", {"style" : "font-weight: bold;"});
+    td.appendChild(document.createTextNode(
+        this.count < 1 ?
+        "No results" :
+        ("Total Results: " + this.count)
+    ));
+    tr.appendChild(td);
+
+    // Display the time of the search
+    var td = new Element("td", {"style" : "text-align: center; " });
+    var date = new Date();
+    td.appendChild(document.createTextNode(date.toString()));
+    tr.appendChild(td);
+
+
+    // Display Number of search results in first f
+    var td = new Element("td");
+    this.footerPageList = td;
+    this.renderPageList (this.footerPageList);
+    tr.appendChild(td);
+
+    tbody.appendChild(tr);
+    table.appendChild(tbody);
+    div.appendChild(table);
 }
 
 // Renders the table headers, with column names
@@ -305,7 +414,7 @@ AjaxList.prototype.renderTableHeaders = function (tbody) {
         th.noWrap = true;
 
         // Set up the sorting onclick handler
-        th.onclick = ajaxListLibrary.createDelegateWith1Param(
+        th.onclick = ajaxListLibrary.createDelegateWithParams(
             this, this.setSortingColumn, this.columns[i][0]);
 
         // User either Model.column convension, if a real column name if it was specified
@@ -333,7 +442,7 @@ AjaxList.prototype.renderTableBody = function(tbody) {
 
     // Render each entry
     for (j = 0; j < this.data.length; j++) {
-        var tr = new Element("tr",{ "class"  :"tablecell", "style" : "cursor:pointer;"});
+        var tr = new Element("tr",{ "class"  :"tablecell", "style" : "cursor: pointer;"});
         var entry = this.data[j];
         for (i = 0; i < this.columns.length; i++) {
             var td = new Element("td");
@@ -356,14 +465,24 @@ AjaxList.prototype.renderTableBody = function(tbody) {
             tr.appendChild(td);
         }
 
-        tr.onclick = ajaxListLibrary.createDelegateWith1Param(this, this.rowClicked, entry);
+        tr.onclick = ajaxListLibrary.createDelegateWithParams(this, this.rowClicked, entry);
 
         tbody.appendChild(tr);
+    }
+
+    // Display no results if there are none
+    if (this.data.length < 1) {
+        var div = new Element("div", {"style" : "text-align: center;   font-weight: bold;"});
+        div.appendChild(document.createTextNode("No results"));
+        tbody.appendChild(div);
     }
 }
 
 // Renders the whole table at once
 AjaxList.prototype.renderTable = function() {
+    // Clear Table
+    while(this.table.firstChild) this.table.removeChild(this.table.firstChild);
+
     var tbody = new Element("tbody");
 
     this.renderTableHeaders(tbody);
@@ -407,7 +526,7 @@ AjaxList.prototype.setSortingColumn = function(event, column) {
     this.updateFromServer();
 
     // Render the new page list
-    this.renderPageList(this.headerPageList);
+    this.renderAllPageLists();
 }
 
 AjaxList.prototype.changePageSize = function(event, pageSize) {
@@ -431,7 +550,7 @@ AjaxList.prototype.changePageSize = function(event, pageSize) {
 
     // Re-render the page size display.
     this.renderPageSizes(this.headerPageSizes);
-    this.renderPageList(this.headerPageList);
+    this.renderAllPageLists();
 }
 
 AjaxList.prototype.changePage = function(event, pageNumber) {
@@ -442,7 +561,7 @@ AjaxList.prototype.changePage = function(event, pageNumber) {
     this.updateFromServer();
 
     // Render the new page list
-    this.renderPageList(this.headerPageList);
+    this.renderAllPageLists();
 }
 
 // Change the search column selections
@@ -455,64 +574,94 @@ AjaxList.prototype.changeSearchValue = function (newValue) {
     this.state.searchValue = newValue;
 }
 
-AjaxList.prototype.clearSearchValue = function(newValue) {
-    this.state.searchValue = newValue;
+AjaxList.prototype.clearSearchValue = function() {
+    this.state.searchValue = "";
     $("searchInputField"). value = "";
-
-    // Prevent the click from refreshing the page.
-    return false;
+    // Remove any maps that were selected
+    this.state.mapFilterSelections = {}; // New Object
+    // And refresh the page!
+    return this.doSearch();
 }
 
-// Fetches an update from server
-AjaxList.prototype.updateFromServer = function() {
+// When the search button is clicked
+AjaxList.prototype.doSearch = function() {
+    // Set the page number
+    this.state.pageShown = 1;
 
-    // IE 6 doesn't handle rendering the whole page well.
-    var fullPage = isIE6;
-
-    var parameters = {"json" : JSON.stringify(this.state), "fullPage" : false};
-    var url = this.webroot + this.controller + "/" + controllerAjaxListFunctionName;
-
-    if (!fullPage) {
-        new Ajax.Request(url,
-            {
-                "method" : "post",
-                "parameters" : parameters,
-                "onComplete" : ajaxListLibrary.createDelegate(this, this.ajaxCallComplete)
-            }
-        );
-    } else {
-        // Create a form and submit it to the server
-        var hiddenDiv = new Element("div",
-                {"style":"display:none;"});
-        var form = new Element("form",
-                {"action" : url, "method" : "post"});
-        var jsonInput = new Element("input",
-                {"type" : "text", "name" : "json", "value" : parameters.json});
-        var fullPageInput = new Element ("input",
-                {"type" : "text", "name" : "fullPage", "value" : "true"});
-        var submitButton = new Element("input",
-                {"type" : "submit", "name" : "submit", "value" : "submit"});
-        form.appendChild(jsonInput);
-        form.appendChild(fullPageInput);
-        form.appendChild(submitButton);
-        hiddenDiv.appendChild(form);
-        document.body.appendChild(hiddenDiv);
-        submitButton.click();
-    }
+    // Do the update from server
+    this.updateFromServer();
 
     // Return false to indicate "do not proceed" for button clicks
     return false;
 }
 
+// When the uses changes the selection of a map filter
+AjaxList.prototype.changeMapFilter = function (event, column, newValue) {
+    // Set the new selection up
+    this.state.mapFilterSelections[column] = newValue;
+    // And refresh the page (pageShown set to 1, updateFromServer is called)
+    this.doSearch();
+}
+
+// Fetches an update from server
+AjaxList.prototype.updateFromServer = function() {
+    // If there's no call already outgoing.
+    if (!this.ajaxObject) {
+        // IE 6 doesn't handle rendering the whole page well.
+        var fullPage = isIE6;
+
+        var parameters = {"json" : JSON.stringify(this.state), "fullPage" : false};
+        var url = this.webroot + this.controller + "/" + controllerAjaxListFunctionName;
+
+        if (!fullPage) {
+            this.ajaxObject = new Ajax.Request(url,
+                {
+                    "method" : "post",
+                    "parameters" : parameters,
+                    "onComplete" : ajaxListLibrary.createDelegate(this, this.ajaxCallComplete)
+                }
+            );
+        } else {
+            // Create a form and submit it to the server
+            var hiddenDiv = new Element("div",
+                    {"style":"display:none;"});
+            var form = new Element("form",
+                    {"action" : url, "method" : "post"});
+            var jsonInput = new Element("input",
+                    {"type" : "text", "name" : "json", "value" : parameters.json});
+            var fullPageInput = new Element ("input",
+                    {"type" : "text", "name" : "fullPage", "value" : "true"});
+            var submitButton = new Element("input",
+                    {"type" : "submit", "name" : "submit", "value" : "submit"});
+            form.appendChild(jsonInput);
+            form.appendChild(fullPageInput);
+            form.appendChild(submitButton);
+            hiddenDiv.appendChild(form);
+            document.body.appendChild(hiddenDiv);
+            submitButton.click();
+        }
+    }
+}
+
 AjaxList.prototype.ajaxCallComplete = function (response) {
+
+    // free the ajax object
+    this.ajaxObject = null;
+
     if (response.status != 200 || !response.responseJSON) {
         alert("Can not update list: network down or bad server response.");
     } else {
-        //  Set the new data up
+        // Update the update time
+        ajaxListLibrary.setCookie(this.getUpdateCookieName(), response.responseJSON.timeStamp);
+        // Update Data
         this.data = response.responseJSON.entries;
         this.count = response.responseJSON.count;
-        this.clearTable();
+        this.state = response.responseJSON.state;
+        this.timeStamp =response.responseJSON.timeStamp;
+        ajaxListLibrary.setCookie(this.getUpdateCookieName(), this.timeStamp);
+        this.renderHeader();
         this.renderTable();
+        this.renderFooter(this.footer);
     }
 }
 
@@ -594,7 +743,7 @@ AjaxListActionMenu.prototype.render = function() {
         var action = this.actions[i];
 
         var button = new Element("input",{"type":"submit","value":action[0]});
-        button.onclick = ajaxListLibrary.createDelegateWith1Param(this, this.performAction, action);
+        button.onclick = ajaxListLibrary.createDelegateWithParams(this, this.performAction, action);
         this.display.appendChild(button);
     }
 

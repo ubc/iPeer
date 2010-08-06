@@ -120,7 +120,7 @@ class CoursesController extends AppController
 		{
 			$this->render('add');
 		} else {
-            if (!stristr($this->params['data']['Course']['homepage'], "http://")) {
+            if (!stristr($this->params['data']['Course']['homepage'], "http://") || !stristr($this->params['data']['Course']['homepage'], "https://") ) {
                 $this->params['data']['Course']['homepage'] = "http://" . $this->params['data']['Course']['homepage'];
             }
 			$this->params = $this->Course->prepData($this->params);
