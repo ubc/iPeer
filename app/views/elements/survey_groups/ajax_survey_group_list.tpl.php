@@ -16,7 +16,7 @@
         <th width="8%"><?php echo $pagination->sortLink('Released?',array('released','desc'))?></th>
         <th width="10%">Release Now</th>
       </tr>
-      <?php if(isset($row) && $row != null):?>
+      <?php if(isset($data) && $data != null):?>
       <?php foreach ($data as $row): $survey = $row['SurveyGroupSet']; ?>
       <tr class="tablecell">
         <td align="center"> <a href="<?php echo $this->webroot.$this->themeWeb.'/surveys/questionssummary/'.$survey['survey_id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
