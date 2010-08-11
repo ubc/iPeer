@@ -193,22 +193,8 @@ AjaxList.prototype.renderHeader = function() {
 }
 
 
-// Renders the search bar
-AjaxList.prototype.renderSearchBar = function (divIn) {
-    // so long as obj has children, remove them
-    while(divIn.firstChild) divIn.removeChild(divIn.firstChild);
-
-    // make everything bold
-    var div = new Element("b");
-    divIn.appendChild(div);
-
-    div.appendChild(document.createTextNode(" "));
-
-    // Put in a state variable for selection maps
-    if (this.state.mapFilterSelections === undefined) {
-        this.state.mapFilterSelections = {}; // New Object
-    }
-
+// Renders the Select elements for any "map" type columns
+AjaxList.prototype.renderSelectionMaps = function (div) {
     // First, render the selection maps
     var atLeastOneMapAdded = false;
     for (i = 0; i < this.columns.length; i++) {
@@ -231,8 +217,8 @@ AjaxList.prototype.renderSearchBar = function (divIn) {
                 // We need to create a callback for this: direct call
                 //   to changeMapFilter doesn't detect the value change!
                 var delegate = ajaxListLibrary.createDelegateWithParams(thisObject,
-                    thisObject.changeMapFilter,thisColumn, this.value);
-                window.setTimeout(delegate, 0);
+                                                                        thisObject.changeMapFilter,thisColumn, this.value);
+                                                                        window.setTimeout(delegate, 0);
             }
 
             var option = new Element("option", {"value" : ""}).update("-- All --");
@@ -241,31 +227,33 @@ AjaxList.prototype.renderSearchBar = function (divIn) {
             for (var entry in column[MAP_COL]) {
                 // Create the new option
                 option = new Element("option",
-                    {"value" : entry}).update(column[MAP_COL][entry]);
+                                     {"value" : entry}).update(column[MAP_COL][entry]);
 
-                if (this.state.mapFilterSelections[column[ID_COL]] == entry) {
-                    option.selected = "selected";
-                }
+                                     if (this.state.mapFilterSelections[column[ID_COL]] == entry) {
+                                         option.selected = "selected";
+                                     }
 
-                select.appendChild(option);
-                div.appendChild(select);
+                                     select.appendChild(option);
+                                     div.appendChild(select);
             }
             div.appendChild(document.createTextNode(" " + column[DESC_COL] + "s"));
             atLeastOneMapAdded = true;
         }
     }
+    return atLeastOneMapAdded;
+}
 
-    // Fill the select with options
-    div.appendChild(document.createTextNode(atLeastOneMapAdded ? " and Search where: " : "Search where: "));
+// Renders the search control itself
 
+AjaxList.prototype.renderSearchControl = function (div) {
     var select = new Element("select");
     var thisObject = this;
     select.onchange = function () {
         // We need to create a callback for this: direct call
         //   to selectSearchColumn doesn't detect the value change!
         var delegate = ajaxListLibrary.createDelegateWithParams(thisObject,
-            thisObject.selectSearchColumn,this.value);
-        window.setTimeout(delegate, 0);
+                                                                thisObject.selectSearchColumn,this.value);
+                                                                window.setTimeout(delegate, 0);
     }
     // Generate a drop-down entry for each column
     for (i = 0; i < this.columns.length; i++) {
@@ -299,6 +287,32 @@ AjaxList.prototype.renderSearchBar = function (divIn) {
     div.appendChild(submit);
     div.appendChild(document.createTextNode(" . . . . "));
     div.appendChild(clear);
+}
+
+
+// Renders the search bar
+AjaxList.prototype.renderSearchBar = function (divIn) {
+    // so long as obj has children, remove them
+    while(divIn.firstChild) divIn.removeChild(divIn.firstChild);
+
+    // make everything bold
+    var div = new Element("b");
+    divIn.appendChild(div);
+
+    div.appendChild(document.createTextNode(" "));
+
+    // Put in a state variable for selection maps
+    if (this.state.mapFilterSelections === undefined) {
+        this.state.mapFilterSelections = {}; // New Object
+    }
+
+    var atLeastOneMapAdded = this.renderSelectionMaps(div);
+
+    // Fill the select with options
+    div.appendChild(document.createTextNode(atLeastOneMapAdded ? " and Search where: " : "Search where: "));
+
+    this.renderSearchControl(div);
+
 }
 
 // Renders the page size control
@@ -577,8 +591,6 @@ AjaxList.prototype.changeSearchValue = function (newValue) {
 AjaxList.prototype.clearSearchValue = function() {
     this.state.searchValue = "";
     $("searchInputField"). value = "";
-    // Remove any maps that were selected
-    this.state.mapFilterSelections = {}; // New Object
     // And refresh the page!
     return this.doSearch();
 }

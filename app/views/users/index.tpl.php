@@ -14,22 +14,30 @@
             echo "<div>";
   */
             // Define Columns
-            $columns = array(
-                            //    Model   columns       (Display Title) (Type Description)
-                            array("User.id",         "ID",           "number"),
-                            array("User.username",   "Username",     "string"),
-                            array("User.role",       "Role",         "map",
-                                array(  "A"=>"Admin",
-                                        "I"=>"Instructor",
-                                        "S"=>"Student")),
-                            array("User.first_name", "First Name",   "string"),
-                            array("User.last_name",  "Last Name",    "string"),
-                            array("User.email",      "Email",        "string"),
-                            array("User.created",    "Creation Date","date"),
-                            array("User.creator_id", "Creator ID",   "number"),
-                            array("User.modified",   "Last Change",  "date"),
-                            array("User.updater_id", "Changed by",   "number")
-                            );
+            $columns =
+                array(
+                    //    Model   columns       (Display Title) (Type Description)
+                    array("User.id",         "ID",           "number"),
+                    array("User.username",   "Username",     "string"),
+                    array("User.role",       "Role",         "map",
+                        array(  "A"=>"Admin",
+                                "I"=>"Instructor",
+                                "S"=>"Student")),
+                    array("User.first_name", "First Name",   "string"),
+                    array("User.last_name",  "Last Name",    "string"),
+                    array("User.email",      "Email",        "string")  //,
+                    //array("User.created",    "Creation Date","date"),
+                    //array("User.creator_id", "Creator ID",   "number"),
+                    //array("User.modified",   "Last Change",  "date"),
+                    //array("User.updater_id", "Changed by",   "number")
+                     );
+
+            $extraFilter =
+                array(
+                    array("id" => "courses",
+                          "title" => "Courses",
+                        "list"  => $courseList)
+                    );
 
 
             // Define Actions
@@ -52,7 +60,7 @@
                             "actions"   => $actions,
                             "data"      => $listData);
 
-           // echo $this->renderElement("list/ajaxList", array ("paramsForList" =>$paramsForList)); ?>
+            //echo $this->renderElement("list/ajaxList", array ("paramsForList" =>$paramsForList)); ?>
 
 <br />
 
