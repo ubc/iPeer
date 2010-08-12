@@ -64,8 +64,65 @@ class UsersController extends AppController
 
 
     function newIndex($message='') {
+        // Set up the basic static ajax list variables
         $this->setUpAjaxList();
-        $this->set('listData', $this->AjaxList->getListByState());
+        // Get the list data
+        $listData = $this->AjaxList->getListByState();
+        // Get the course data
+        $userCourseList = $this->sysContainer->getMyCourseList();
+        $courseList = array();
+        foreach ($userCourseList as $id => $course) {
+            $courseList[$id] = $course['course'];
+        }
+
+        // The columns to show
+        $columns = array(
+            //    Model   columns       (Display Title) (Type Description)
+            array("User.id",         "ID",           "number"),
+            array("User.username",   "Username",     "string"),
+            array("User.role",       "Role",         "map",
+                array(  "A" => "Admin",
+                        "I" => "Instructor",
+                        "S" => "Student")),
+            array("User.first_name", "First Name",   "string"),
+            array("User.last_name",  "Last Name",    "string"),
+            array("User.email",      "Email",        "string")
+                );
+
+        // The course to list for is the extra filter in this case
+        $extraFilter =
+            array(
+                array(  "id" => "courses",
+                        "description" => "for Course",
+                        "default" => $this->rdAuth->courseId,
+                        "list"  => $courseList)
+                );
+
+        // Define Actions
+        $deleteUserWarning = "Delete this user. Irreversible. Are you sure?";
+        $resetPassWarning = "Resets user Password. Are you sure?";
+        $actions = array(
+            //   parameters to cakePHP controller:,
+            //   display name, (warning shown), fixed parameters or Column ids
+            array("View User",  "", "view", "User.id"),
+            array("Edit User",  "", "edit", "User.id"),
+            array("Delete User",  $deleteUserWarning,  "delete",      "User.id"),
+            array("Reset Password", $resetPassWarning, "resetPassword","User.id")
+        );
+
+        // Collect the parameters
+        $paramsForList = array(
+                        "webroot"   => $this->webroot,
+                        "controller" => "users",
+                        "columns"   => $columns,
+                        "actions"   => $actions,
+                        "extra"     => $extraFilter,
+                        "data"      => $listData);
+
+
+        // Set the display list
+        $this->set('paramsForList', $paramsForList);
+
     }
 
     function ajaxList($pageForRedirect=null) {
@@ -96,7 +153,6 @@ class UsersController extends AppController
         }
         //Setup User Type Display Option
         isset($this->params['form']['display_user_type'])? $displayUserType = $this->params['form']['display_user_type'] : $displayUserType = 'S';
-
 
         $this->set('displayUserType', $displayUserType);
 
@@ -247,9 +303,7 @@ class UsersController extends AppController
                         $this->set('courseId', $this->rdAuth->courseId);
 
                     }//end if
-                }
-                else
-                {
+                } else {
                     $sFound['User']['first_name'] = $this->data['User']['first_name'];
                     $sFound['User']['last_name'] = $this->data['User']['last_name'];
                     $sFound['User']['email'] = $this->data['User']['email'];

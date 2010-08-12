@@ -92,14 +92,15 @@ var ajaxListLibrary = new AjaxListLibrary();
  */
 function AjaxList (parameterArray, whereToDisplay) {
     // Initialize given vairables
-    this.controller = parameterArray.controller;
-    this.columns = parameterArray.columns;
-    this.data = parameterArray.data.entries;
-    this.count = parameterArray.data.count;
-    this.timeStamp = parameterArray.data.timeStamp;
-    this.state = parameterArray.data.state;
-    this.actions = parameterArray.actions;
-    this.webroot = parameterArray.webroot;
+    this.controller     = parameterArray.controller;
+    this.columns        = parameterArray.columns;
+    this.data           = parameterArray.data.entries;
+    this.count          = parameterArray.data.count;
+    this.timeStamp      = parameterArray.data.timeStamp;
+    this.state          = parameterArray.data.state;
+    this.actions        = parameterArray.actions;
+    this.extraFilters   = parameterArray.extra;
+    this.webroot        = parameterArray.webroot;
 
 
     // Where to display this object?
@@ -129,7 +130,6 @@ function AjaxList (parameterArray, whereToDisplay) {
     this.searchBar = null;
 
 
-
     // There should always be data supplied by php in the HTML
     //  file sent by the server. Decide to either use this data, or
     //  ask the server to refresh it.
@@ -138,23 +138,17 @@ function AjaxList (parameterArray, whereToDisplay) {
     if (lastTime && this.data !=null) {
         // If the cookie's timeStamp is older, this means that
         //  this page was AJAX-updated since, and we need to refresh it.
-        isStaleData = (lastTime > this.timeStamp);
+        isStaleData = (lastTime >= this.timeStamp);
     }
-
 
     if (!isStaleData && this.data != null && this.state != null) {
         this.renderHeader();
         this.renderTable();
         this.renderFooter(this.footer);
     } else {
-        this.updateFromServer();
+        this.updateFromServer(false);
     }
-
-
-
-
 }
-
 
 // Gets the update cookie name for this controller list
 AjaxList.prototype.getUpdateCookieName = function() {
@@ -164,7 +158,6 @@ AjaxList.prototype.getUpdateCookieName = function() {
 // Renders the Search Tab, etc.
 AjaxList.prototype.renderHeader = function() {
     while(this.header.firstChild) this.header.removeChild(this.header.firstChild);
-
 
     var table = new Element("table");
     table.width = "100%";
@@ -229,12 +222,12 @@ AjaxList.prototype.renderSelectionMaps = function (div) {
                 option = new Element("option",
                                      {"value" : entry}).update(column[MAP_COL][entry]);
 
-                                     if (this.state.mapFilterSelections[column[ID_COL]] == entry) {
-                                         option.selected = "selected";
-                                     }
+                if (this.state.mapFilterSelections[column[ID_COL]] == entry) {
+                    option.selected = "selected";
+                }
 
-                                     select.appendChild(option);
-                                     div.appendChild(select);
+                select.appendChild(option);
+                div.appendChild(select);
             }
             div.appendChild(document.createTextNode(" " + column[DESC_COL] + "s"));
             atLeastOneMapAdded = true;
@@ -243,8 +236,68 @@ AjaxList.prototype.renderSelectionMaps = function (div) {
     return atLeastOneMapAdded;
 }
 
-// Renders the search control itself
+// Render the extra filter control
+AjaxList.prototype.renderExtraFilters = function (div) {
+    // First, render the selection maps
+    var atLeastOneAdded = false;
 
+    // If there are no extra paramaters, just return false;
+    if (!this.extraFilters) {
+        return atLeastOneAdded; // (false)
+    }
+
+    // For each filter, render a selection
+    for (i = 0; i < this.extraFilters.length; i++) {
+        // Create a local reference
+        var filter = this.extraFilters[i];
+
+        // Does the state variable exist for this entry? if not, create it
+        if (this.state.extraFilterSelections[filter.id] === undefined) {
+            this.state.extraFilterSelections[filter.id] = "";
+        }
+
+        var text = atLeastOneAdded ? ", and" : "";
+        text += " " + filter.description + " ";
+        div.appendChild(document.createTextNode(text));
+
+        var select = new Element("select");
+        var thisObject = this;
+        select.onchange = function () {
+            // We need to create a callback for this: direct call
+            //   to changeExtraFilter doesn't detect the value change!
+            var delegate = ajaxListLibrary.createDelegateWithParams(thisObject,
+                            thisObject.changeExtraFilter, filter.id, this.value);
+            window.setTimeout(delegate, 0);
+        }
+
+        var option = new Element("option", {"value" : ""}).update("-- All --");
+        select.appendChild(option);
+        // Now list each of the optionsecords
+        for (var entry in filter.list) {
+            // Discart any objects that do not come from this one.
+            if (!filter.list.hasOwnProperty(entry)) {
+                continue;
+            }
+
+            var description = filter.list[entry];
+            // Create the new option
+            option = new Element("option", {"value" : entry}).update(description);
+
+            if (this.state.extraFilterSelections[filter.id] == entry) {
+                option.selected = "selected";
+            }
+
+            select.appendChild(option);
+            div.appendChild(select);
+        }
+
+        atLeastOneAdded = true;
+    }
+    return atLeastOneAdded;
+}
+
+
+// Renders the search control itself
 AjaxList.prototype.renderSearchControl = function (div) {
     var select = new Element("select");
     var thisObject = this;
@@ -299,19 +352,31 @@ AjaxList.prototype.renderSearchBar = function (divIn) {
     var div = new Element("b");
     divIn.appendChild(div);
 
-    div.appendChild(document.createTextNode(" "));
+    var divTop = new Element("div", {"style":"margin:6px"});
+    var divBottom = new Element("div", {"style":"margin:6px"});
+
 
     // Put in a state variable for selection maps
     if (this.state.mapFilterSelections === undefined) {
         this.state.mapFilterSelections = {}; // New Object
     }
 
-    var atLeastOneMapAdded = this.renderSelectionMaps(div);
+    // Put in a state variable for selection maps
+    if (this.state.extraFilterSelections === undefined) {
+        this.state.extraFilterSelections = {}; // New Object
+    }
 
-    // Fill the select with options
-    div.appendChild(document.createTextNode(atLeastOneMapAdded ? " and Search where: " : "Search where: "));
+    var atLeastOneMapAdded = this.renderSelectionMaps(divTop);
 
-    this.renderSearchControl(div);
+    this.renderExtraFilters(divTop);
+
+    // Now, render the search control
+    divBottom.appendChild(document.createTextNode(atLeastOneMapAdded ? " and Search where: " : "Search where: "));
+    this.renderSearchControl(divBottom);
+
+    // Add the divisions to the
+    div.appendChild(divTop);
+    div.appendChild(divBottom);
 
 }
 
@@ -615,14 +680,28 @@ AjaxList.prototype.changeMapFilter = function (event, column, newValue) {
     this.doSearch();
 }
 
+// When the user changes an extra filter
+AjaxList.prototype.changeExtraFilter = function (event, filter, newValue) {
+    // Set the new selection up
+    this.state.extraFilterSelections[filter] = newValue;
+    // And refresh the page (pageShown set to 1, updateFromServer is called)
+    this.doSearch();
+}
+
 // Fetches an update from server
-AjaxList.prototype.updateFromServer = function() {
+AjaxList.prototype.updateFromServer = function(getState) {
+    // Send the state or no?
+    var state = this.state;
+    if (getState != null && getState === false) {
+        // Disregard state
+        var state = null;
+    }
+
     // If there's no call already outgoing.
     if (!this.ajaxObject) {
         // IE 6 doesn't handle rendering the whole page well.
         var fullPage = isIE6;
-
-        var parameters = {"json" : JSON.stringify(this.state), "fullPage" : false};
+        var parameters = {"json" : JSON.stringify(state), "fullPage" : fullPage};
         var url = this.webroot + this.controller + "/" + controllerAjaxListFunctionName;
 
         if (!fullPage) {

@@ -24,8 +24,11 @@ class AjaxListComponent extends Object {
 
     // Constructs the state for this ajaxList
     function getState() {
+        // Read the state out of the session
         $state = $this->Session->read($this->sessionVariableName);
+        // Got it okay?
         if (!$state) {
+            // No state is session? Well, set it up then!
             $state->sortBy = $this->sortBy;
             $state->sortAsc = true;
             $state->pageSize = 15;
@@ -34,7 +37,7 @@ class AjaxListComponent extends Object {
             $state->searchBy = $this->searchBy;
             $this->Session->write($this->sessionVariableName, $state);
         }
-
+        // Return the session or constructed state
         return $state;
     }
 
@@ -115,14 +118,23 @@ class AjaxListComponent extends Object {
 
         // Grab the next state the browser sent over, and save it
         $state = json_decode($_POST['json']);
-        $this->Session->write($this->sessionVariableName, $state);
 
+        // If not state was sent: fetch it from session.
+        if ($state == null) {
+            $state = $this->getState();
+        } else {
+            // Or if state was send, save it to session
+            $this->Session->write($this->sessionVariableName, $state);
+        }
+
+        // Get the user data for the state.
         $listData = $this->getListByState();
 
+        // Return a different page, depending if we were asked for full page
+        //   or just the data.
         if ($_POST['fullPage'] == "true") {
             // Render the index page for a full page  (for ie 6)
             $this->redirect($this->controllerName . "/" . $pageForRedirect);
-
         } else {
             // Send the reponse in JSON only ( for non-ie 6)
             // Don't cache these, please, from : http://php.net/manual/en/function.header.php
@@ -134,21 +146,19 @@ class AjaxListComponent extends Object {
         }
     }
 
-
-
     function setUp ($model, $fields, $sortBy, $searchBy,
                     $listName = null,
                     $recursive = 0,
                     $customModelFindFunction = null,
                     $customModelCountFunction = null)
     {
+        // Set up the basics
         $this->model = $model;
         $this->fields = $fields;
         $this->sortBy = $sortBy;
         $this->searchBy = $searchBy;
         $this->customModelFindFunction = $customModelFindFunction;
         $this->customModelCountFunction = $customModelCountFunction;
-
 
         // If this list has a name, name it!
         if (!empty($listName))  {
