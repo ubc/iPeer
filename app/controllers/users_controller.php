@@ -49,7 +49,7 @@ class UsersController extends AppController
         $this->sortBy = empty($_GET['sort'])? 'id': $_GET['sort'];
         $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
         $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
-        $this->order = $this->sortBy.' '.strtoupper($this->direction);
+        $this->order = $this->sortBy . ' ' . strtoupper($this->direction);
         $this->pageTitle = 'Users';
         parent::__construct();
     }
@@ -57,17 +57,7 @@ class UsersController extends AppController
     // =-=-=-=-=-== New list routines =-=-=-=-=-===-=-
     function setUpAjaxList () {
         // Set up the ajax list component
-        $fields  = "User.id, User.username, User.role ,User.first_name, User.last_name, User.email, ";
-        $fields .= "User.created, User.creator_id, User.modified, User.updater_id";
-        $this->AjaxList->setUp($this->User, $fields, "User.id", "User.username");
-    }
 
-
-    function newIndex($message='') {
-        // Set up the basic static ajax list variables
-        $this->setUpAjaxList();
-        // Get the list data
-        $listData = $this->AjaxList->getListByState();
         // Get the course data
         $userCourseList = $this->sysContainer->getMyCourseList();
         $courseList = array();
@@ -75,28 +65,39 @@ class UsersController extends AppController
             $courseList[$id] = $course['course'];
         }
 
+
         // The columns to show
         $columns = array(
             //    Model   columns       (Display Title) (Type Description)
             array("User.id",         "ID",           "number"),
             array("User.username",   "Username",     "string"),
             array("User.role",       "Role",         "map",
-                array(  "A" => "Admin",
-                        "I" => "Instructor",
-                        "S" => "Student")),
+                array(  "A" => "Admin",  "I" => "Instructor", "S" => "Student")),
             array("User.first_name", "First Name",   "string"),
             array("User.last_name",  "Last Name",    "string"),
-            array("User.email",      "Email",        "string")
-                );
+            array("User.email",      "Email",        "string")//,
+            //array("UserEnrol.course_id", "Course ID", "number")
+        );
 
         // The course to list for is the extra filter in this case
-        $extraFilter =
+        $extraFilters =
             array(
-                array(  "id" => "courses",
-                        "description" => "for Course",
+                array(  // Define the GUI aspecs
+                        "id"            => "course_id",
+                        "description"   => "for Course:",
+                        // What are the choises and the default values?
+                        "list"  => $courseList,
                         "default" => $this->rdAuth->courseId,
-                        "list"  => $courseList)
-                );
+                        // What table to we join to get these
+                        "joinTable"     => "user_enrols",
+                        "joinModel"     => "UserEnrol",
+                        "foreignKey"    => "user_id",
+
+                        // Any show/hide features based on maps
+                        "dependsMap"    => "User.role",    // Look to this column
+                        "dependsValues" => array("", "S")  // Display only when this column is one of these values
+                )
+            );
 
         // Define Actions
         $deleteUserWarning = "Delete this user. Irreversible. Are you sure?";
@@ -110,18 +111,12 @@ class UsersController extends AppController
             array("Reset Password", $resetPassWarning, "resetPassword","User.id")
         );
 
-        // Collect the parameters
-        $paramsForList = array(
-                        "webroot"   => $this->webroot,
-                        "controller" => "users",
-                        "columns"   => $columns,
-                        "actions"   => $actions,
-                        "extra"     => $extraFilter,
-                        "data"      => $listData);
+        $this->AjaxList->setUp($this->User, $columns, $actions, $extraFilters, "User.id", "User.username");
+    }
 
 
-        // Set the display list
-        $this->set('paramsForList', $paramsForList);
+    function newIndex($message='') {
+
 
     }
 
@@ -141,62 +136,17 @@ class UsersController extends AppController
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
 
+        // Set the top message
+        $this->set('message', $message);
+
         // For the new Ajax table
         $this->newIndex();
 
-        if (!empty($this->rdAuth->courseId))
-        {
-            $this->pageTitle = $this->sysContainer->getCourseName($this->rdAuth->courseId).' > Students';
-            $courseId = $this->rdAuth->courseId;
-        } else {
-            $courseId = 'ALL';
-        }
-        //Setup User Type Display Option
-        isset($this->params['form']['display_user_type'])? $displayUserType = $this->params['form']['display_user_type'] : $displayUserType = 'S';
+        // Set up the basic static ajax list variables
+        $this->setUpAjaxList();
 
-        $this->set('displayUserType', $displayUserType);
-
-        $courseList = $this->sysContainer->getMyCourseList();
-        $this->set('courseList', $courseList);
-
-        $queryAttributes = $this->getQueryAttribute($displayUserType, $courseId);
-        $fields = $queryAttributes['fields'];
-        $condition = $queryAttributes['condition'];
-        $joinTable = $queryAttributes['joinTable'];
-
-        $paging['style'] = 'ajax';
-        $paging['link'] = '/users/search/?show='.$this->show.'&display_user_type='.$displayUserType.'&course_id='.$courseId.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
-
-        $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-        $this->userPersonalize->setPersonalizeList($personalizeData);
-        if ($personalizeData && $this->userPersonalize->inPersonalizeList('User.ListMenu.Limit.Show')) {
-            $this->show = $this->userPersonalize->getPersonalizeValue('User.ListMenu.Limit.Show');
-            $this->set('userPersonalize', $this->userPersonalize);
-        } else {
-            $this->show = '10';
-            $this->update($attributeCode = 'User.ListMenu.Limit.Show',$attributeValue = $this->show);
-        }
-
-        $data = $this->User->findAll($condition, $fields, $this->order, $this->show, $this->page, -1, $joinTable);
-
-        // merge enrol count to User array
-        for($i = 0; $i < sizeof($data); $i++)
-        {
-          $data[$i]['User']['enrol_count'] = $data[$i][0]['enrol_count'];
-          unset($data[$i][0]['enrol_count']);
-        }
-
-        $queryAttributes = $this->getQueryAttribute($displayUserType, $courseId, true);
-        $paging['count'] = $this->User->findCount($queryAttributes['condition'], 0, $queryAttributes['joinTable']);
-        $paging['show'] = array('10','25','50'); //,'all');
-        $paging['page'] = $this->page;
-        $paging['limit'] = $this->show;
-        $paging['direction'] = $this->direction;
-
-        $this->set('paging',$paging);
-        $this->set('message', $message);
-        $this->set('data',$data);
-        $this->set('course_id',$courseId);
+        // Set the display list
+        $this->set('paramsForList', $this->AjaxList->getParamsForList());
     }
 
     function view($id) {
@@ -519,76 +469,6 @@ class UsersController extends AppController
         } else {
             $this->rdAuth->privilegeError();
         }
-    }
-
-    function search()
-    {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
-
-        $this->layout = 'ajax';
-        if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-            $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-            if ($personalizeData) {
-                $this->userPersonalize->setPersonalizeList($personalizeData);
-                $this->show = $this->userPersonalize->getPersonalizeValue('User.ListMenu.Limit.Show');
-                $this->set('userPersonalize', $this->userPersonalize);
-            }
-        }
-        $condition = "";
-        $displayUserType = isset($this->params['form']['display_user_type']) ?
-                            $this->params['form']['display_user_type'] : $displayUserType = $_GET['display_user_type'];
-
-        //$courseId = $this->rdAuth->courseId;
-       $courseId  = isset($this->params['form']['course_id'] ) ?
-             $this->params['form']['course_id'] :
-             $_GET['course_id'];
-        $queryAttributes = $this->getQueryAttribute($displayUserType, $courseId);
-        $fields = $queryAttributes['fields'];
-        $condition = $queryAttributes['condition'];
-        $joinTable = $queryAttributes['joinTable'];
-
-
-        $urlLiveSearchParam = isset($_GET['livesearch']) ? $_GET['livesearch'] : "";
-        $liveSearch = trim( !empty($this->params['form']['livesearch']) ?
-                $this->params['form']['livesearch'] : $urlLiveSearchParam);
-
-        $urlSelectParam = isset($_GET['select']) ? $_GET['select'] : "";
-        $select = !empty($this->params['form']['select']) ?
-                    $this->params['form']['select'] : $urlSelectParam;
-
-
-        if (!empty($liveSearch) && !empty($select))
-        {
-            $pagination->loadingId = 'loading';
-            //parse the parameters
-            if (!empty($displayUserType) )
-            {
-                $condition .= " AND ";
-            }
-            $condition .= $select." LIKE '%".mysql_real_escape_string($liveSearch)."%'";
-        }
-
-        $this->update($attributeCode = 'User.ListMenu.Limit.Show',$attributeValue = $this->show);
-
-        $data = $this->User->findAll($condition, $fields, $this->order, $this->show, $this->page, -1, $joinTable);
-
-        $paging['style'] = 'ajax';
-        $paging['link'] = '/users/search/?show=' . $this->show .
-          '&livesearch=' . $liveSearch . '&select=' . $select .
-          '&display_user_type='.$displayUserType.'&course_id=' . $courseId .
-          '&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
-
-        $queryAttributes = $this->getQueryAttribute($displayUserType, $courseId, true);
-        $paging['count'] = $this->User->findCount($queryAttributes['condition'], 0, $queryAttributes['joinTable']);
-        $paging['show'] = array('10','25','50'); //'all');'
-        $paging['page'] = $this->page;
-        $paging['limit'] = $this->show;
-        $paging['direction'] = $this->direction;
-
-        $this->set('paging',$paging);
-        $this->set('data',$data);
-        $this->set('courseId',$courseId);
     }
 
     function checkDuplicateName($role='')

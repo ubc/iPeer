@@ -134,8 +134,7 @@ class User extends AppModel
 		return $tmp['User']['id'];
 	}
 
-
-	function getEnrolledStudents($courseId=null,$fields=null,$conditions=null) {
+	function getEnrolledStudents($courseId=null, $fields=null, $conditions=null) {
 		$condition = 'UserEnrol.course_id='.$courseId;
 		if ($conditions != null) {
 			$condition = $condition.' AND ('.$conditions.')';

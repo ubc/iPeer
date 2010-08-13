@@ -22,6 +22,7 @@ var DESC_COL = 1;   // Description of the columns
 var TYPE_COL = 2;   // Type of the column
 var MAP_COL = 3;    // Map of column values
 
+
 // Small Helper function library class
 function AjaxListLibrary () {
 }
@@ -84,6 +85,18 @@ AjaxListLibrary.prototype.setCookie = function(name, value) {
 }
 
 
+// Determing if an object exists in an array
+// From: http://stackoverflow.com/questions/237104/javascript-array-containsobj
+AjaxListLibrary.prototype.contains = function (a, obj){
+    for(var i = 0; i < a.length; i++) {
+        if(a[i] === obj){
+            return true;
+        }
+    }
+    return false;
+}
+
+
 // Instantiate the library.
 var ajaxListLibrary = new AjaxListLibrary();
 
@@ -99,7 +112,7 @@ function AjaxList (parameterArray, whereToDisplay) {
     this.timeStamp      = parameterArray.data.timeStamp;
     this.state          = parameterArray.data.state;
     this.actions        = parameterArray.actions;
-    this.extraFilters   = parameterArray.extra;
+    this.joinFilters    = parameterArray.joinFilters;
     this.webroot        = parameterArray.webroot;
 
 
@@ -220,7 +233,7 @@ AjaxList.prototype.renderSelectionMaps = function (div) {
             for (var entry in column[MAP_COL]) {
                 // Create the new option
                 option = new Element("option",
-                                     {"value" : entry}).update(column[MAP_COL][entry]);
+                                     {"value" : entry}).update(column[MAP_COL][entry] + "s");
 
                 if (this.state.mapFilterSelections[column[ID_COL]] == entry) {
                     option.selected = "selected";
@@ -242,18 +255,35 @@ AjaxList.prototype.renderExtraFilters = function (div) {
     var atLeastOneAdded = false;
 
     // If there are no extra paramaters, just return false;
-    if (!this.extraFilters) {
+    if (!this.joinFilters) {
         return atLeastOneAdded; // (false)
     }
 
-    // For each filter, render a selection
-    for (i = 0; i < this.extraFilters.length; i++) {
+// For each filter, render a selecngineering Design Graphics - 8th Edition by J. H. Earletion
+    for (i = 0; i < this.joinFilters.length; i++) {
+
         // Create a local reference
-        var filter = this.extraFilters[i];
+        var filter = this.joinFilters[i];
 
         // Does the state variable exist for this entry? if not, create it
-        if (this.state.extraFilterSelections[filter.id] === undefined) {
-            this.state.extraFilterSelections[filter.id] = "";
+        if (this.state.joinFilterSelections[filter.id] === undefined) {
+            this.state.joinFilterSelections[filter.id] = "";
+        }
+
+        // Is this filter meant to be shown now? Do a quick check to make sure.
+        if (filter.dependsMap !== undefined && filter.dependsValues !== undefined) {
+            // Check this state of the map this filter depends on
+            if (this.state.mapFilterSelections[filter.dependsMap] !== undefined) {
+                // Check if this is one of the
+                if (!ajaxListLibrary.contains(filter.dependsValues,
+                        this.state.mapFilterSelections[filter.dependsMap])) {
+                    // Sorry! don't render this join condition unless the above are met.
+                    continue;
+                }
+            } else {
+                // Sorry! don't render this join condition unless the above are met.
+                continue;
+            }
         }
 
         var text = atLeastOneAdded ? ", and" : "";
@@ -266,7 +296,7 @@ AjaxList.prototype.renderExtraFilters = function (div) {
             // We need to create a callback for this: direct call
             //   to changeExtraFilter doesn't detect the value change!
             var delegate = ajaxListLibrary.createDelegateWithParams(thisObject,
-                            thisObject.changeExtraFilter, filter.id, this.value);
+                            thisObject.changeJoinFilter, filter.id, this.value);
             window.setTimeout(delegate, 0);
         }
 
@@ -283,7 +313,7 @@ AjaxList.prototype.renderExtraFilters = function (div) {
             // Create the new option
             option = new Element("option", {"value" : entry}).update(description);
 
-            if (this.state.extraFilterSelections[filter.id] == entry) {
+            if (this.state.joinFilterSelections[filter.id] == entry) {
                 option.selected = "selected";
             }
 
@@ -352,7 +382,7 @@ AjaxList.prototype.renderSearchBar = function (divIn) {
     var div = new Element("b");
     divIn.appendChild(div);
 
-    var divTop = new Element("div", {"style":"margin:6px"});
+    var divTop = new Element("div", {"style":"margin: 0 6px 6px 6px"});
     var divBottom = new Element("div", {"style":"margin:6px"});
 
 
@@ -362,8 +392,8 @@ AjaxList.prototype.renderSearchBar = function (divIn) {
     }
 
     // Put in a state variable for selection maps
-    if (this.state.extraFilterSelections === undefined) {
-        this.state.extraFilterSelections = {}; // New Object
+    if (this.state.joinFilterSelections === undefined) {
+        this.state.joinFilterSelections = {}; // New Object
     }
 
     var atLeastOneMapAdded = this.renderSelectionMaps(divTop);
@@ -411,7 +441,7 @@ AjaxList.prototype.renderPageSizes = function (div) {
     }
 }
 
-
+// Renders the page listing
 AjaxList.prototype.renderPageList = function(div) {
     // so long as obj has children, remove them
     while(div.firstChild) div.removeChild(div.firstChild);
@@ -422,12 +452,15 @@ AjaxList.prototype.renderPageList = function(div) {
     div.appendChild(new Element("b").update("Go to Page: "));
     var pages = new Element("span");
     pages.style.color = "chocolate";
-    var totalPages = Math.floor(this.count / this.state.pageSize) + 1;
+    var totalPages = Math.ceil(this.count / this.state.pageSize);
+    totalPages = (totalPages < 1) ? 1 : totalPages;
+
+
     for (i = 1; i <= totalPages; i++) {
         pages.appendChild(document.createTextNode(" "));
         if (this.state.pageShown == i) {
             // Create a link for the non-selecte Pages
-            var span = new Element("b",{"style":"font-size:110%;"})
+            var span = new Element("b",{"style":"font-size:105%;"})
         } else {
             // Selected Pages
             var span = new Element("span");
@@ -455,24 +488,23 @@ AjaxList.prototype.renderFooter = function(div) {
     var tbody = new Element("tbody");
     var tr = new Element("tr");
 
-    // Display the number of results
-    var td = new Element("td", {"style" : "font-weight: bold;"});
-    td.appendChild(document.createTextNode(
-        this.count < 1 ?
-        "No results" :
-        ("Total Results: " + this.count)
-    ));
-    tr.appendChild(td);
-
     // Display the time of the search
-    var td = new Element("td", {"style" : "text-align: center; " });
+    var td = new Element("td", {"style" : "text-align: left; width: 33%" });
     var date = new Date();
     td.appendChild(document.createTextNode(date.toString()));
     tr.appendChild(td);
 
+    // Display the number of results
+    var td = new Element("td", {"style" : "text-align: center;  width: 33%; font-weight: bold; font-size: 110%"});
+    td.appendChild(document.createTextNode(
+    this.count < 1 ?
+    "No results" :
+    ("Total Results: " + this.count)
+    ));
+    tr.appendChild(td);
 
     // Display Number of search results in first f
-    var td = new Element("td");
+    var td = new Element("td", "td", {"style" : "text-align: right; width: 33%" });
     this.footerPageList = td;
     this.renderPageList (this.footerPageList);
     tr.appendChild(td);
@@ -548,13 +580,6 @@ AjaxList.prototype.renderTableBody = function(tbody) {
 
         tbody.appendChild(tr);
     }
-
-    // Display no results if there are none
-    if (this.data.length < 1) {
-        var div = new Element("div", {"style" : "text-align: center;   font-weight: bold;"});
-        div.appendChild(document.createTextNode("No results"));
-        tbody.appendChild(div);
-    }
 }
 
 // Renders the whole table at once
@@ -589,6 +614,7 @@ AjaxList.prototype.rowClicked = function (event, entry) {
                                                 this.columns, entry, this.actions);
 }
 
+// Sets up the list to sort by this column
 AjaxList.prototype.setSortingColumn = function(event, column) {
     if (this.state.sortBy == column) {
         // If this column was already selected, toggle direction
@@ -681,9 +707,9 @@ AjaxList.prototype.changeMapFilter = function (event, column, newValue) {
 }
 
 // When the user changes an extra filter
-AjaxList.prototype.changeExtraFilter = function (event, filter, newValue) {
+AjaxList.prototype.changeJoinFilter = function (event, filter, newValue) {
     // Set the new selection up
-    this.state.extraFilterSelections[filter] = newValue;
+    this.state.joinFilterSelections[filter] = newValue;
     // And refresh the page (pageShown set to 1, updateFromServer is called)
     this.doSearch();
 }
