@@ -15,10 +15,10 @@
 <?php echo $html->css('ipeer')?>
 <?php echo $html->css('datepicker')?>
 <?php //echo $javascript->link('calculate_marks')?>
+<?php echo $javascript->link('prototype')?>
 <?php echo $javascript->link('ipeer')?>
 <?php echo $javascript->link('showhide')?>
 <!-- AJAX Include Files -->
-<?php echo $javascript->link('prototype')?>
 <?php echo $javascript->link('scriptaculous')?>
 <?php echo $javascript->link('zebra_tables')?>
 <!-- End of AJAX Include Files -->
