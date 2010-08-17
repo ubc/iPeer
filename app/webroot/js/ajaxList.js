@@ -11,6 +11,9 @@ var AjaxListActionOffsetY = -120;
 //  contains the first record on the present page,
 var AvailablePageSizes = [15, 30, 90, 360];
 
+// How many page numbers to show before we.
+var maxPageNumbersToShow = 12;
+
 //Contants
 var blackUpTriangleHTMLCode = "&#9650;";
 var blackDownTriableHTMLCode = "&#9660;";
@@ -438,6 +441,7 @@ AjaxList.prototype.renderSearchBar = function (divIn) {
 
 }
 
+
 // Renders the page size control
 AjaxList.prototype.renderPageSizes = function (div) {
     // so long as obj has children, remove them
@@ -469,6 +473,23 @@ AjaxList.prototype.renderPageSizes = function (div) {
     }
 }
 
+// Render a single page entry radio button
+
+AjaxList.prototype.renderSinglePageRadioButton = function (i, pages) {
+    pages.appendChild(document.createTextNode(" "));
+    if (this.state.pageShown == i) {
+        // Create a link for the non-selecte Pages
+        var span = new Element("b",{"style":"font-size:105%;"})
+    } else {
+        // Selected Pages
+        var span = new Element("span");
+        span.style.cursor = "pointer";
+        span.onclick = ajaxListLibrary.createDelegateWithParams(this, this.changePage, i);
+    }
+    span.appendChild(document.createTextNode(i));
+    pages.appendChild(span);
+}
+
 // Renders the page listing
 AjaxList.prototype.renderPageList = function(div) {
     // so long as obj has children, remove them
@@ -490,20 +511,38 @@ AjaxList.prototype.renderPageList = function(div) {
     var pages = new Element("span");
     pages.style.color = "chocolate";
 
-    for (i = 1; i <= totalPages; i++) {
-        pages.appendChild(document.createTextNode(" "));
-        if (this.state.pageShown == i) {
-            // Create a link for the non-selecte Pages
-            var span = new Element("b",{"style":"font-size:105%;"})
-        } else {
-            // Selected Pages
-            var span = new Element("span");
-            span.style.cursor = "pointer";
-            span.onclick = ajaxListLibrary.createDelegateWithParams(this, this.changePage, i);
+    if (totalPages <= maxPageNumbersToShow) {
+        for (i = 1; i <= totalPages; i++) {
+            this.renderSinglePageRadioButton(i, pages);
         }
-        span.appendChild(document.createTextNode(i));
-        pages.appendChild(span);
+    } else {
+        // Always render the first Page Number
+        this.renderSinglePageRadioButton(1, pages);
+
+        var plusMinusOffset = (maxPageNumbersToShow - 2) / 2;
+
+        // Do we need to elipsis?
+        if (this.state.pageShown - plusMinusOffset > 2) {
+            pages.appendChild(document.createTextNode(" ... "));
+        }
+
+        // Display the pages around this page
+        for (i = (this.state.pageShown - plusMinusOffset);
+             i <= (this.state.pageShown + plusMinusOffset);
+            i++) {
+            if (i > 1 && (i < totalPages)) {
+                this.renderSinglePageRadioButton(i, pages);
+            }
+        }
+
+       if (this.state.pageShown + plusMinusOffset < (totalPages - 1)) {
+            pages.appendChild(document.createTextNode(" ... "));
+        }
+
+        // Always render the last Page Number
+        this.renderSinglePageRadioButton(totalPages, pages);
     }
+    // Add the pages to the GUI
     div.appendChild(pages);
 }
 
