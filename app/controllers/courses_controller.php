@@ -105,8 +105,8 @@ class CoursesController extends AppController
 
         $recursive = 0;
 
-        $this->AjaxList->setUp($this->Course, $columns, $actions, $joinTables, $extraFilters,
-                "Course.id", "Course.title", $recursive);
+        $this->AjaxList->setUp($this->Course, $columns, $actions,
+            "Course.id", "Course.title", $joinTables, $extraFilters, $recursive);
     }
 
 
@@ -183,7 +183,7 @@ class CoursesController extends AppController
 				$myCourses = $this->Course->findAccessibleCoursesListByUserIdRole($this->rdAuth->id, $this->rdAuth->role);
 				$this->sysContainer->setMyCourseList($myCourses);
 
-				$this->redirect('courses/index/The course was added successfully.');
+				$this->redirect('/courses/index/The course was added successfully.');
 			} else {
 				$this->set('data', $this->params['data']);
 				$this->set('errmsg', $this->Course->errorMessage);

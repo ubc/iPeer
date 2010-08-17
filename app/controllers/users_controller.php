@@ -109,12 +109,12 @@ class UsersController extends AppController
             //   display name, (warning shown), fixed parameters or Column ids
             array("View User",  "", "", "view", "User.id"),
             array("Edit User",  "", "", "edit", "User.id"),
-            array("Delete User",  $deleteUserWarning,  "", "delete",      "User.id"),
+            array("Delete User",  $deleteUserWarning,  "", "delete",       "User.id"),
             array("Reset Password", $resetPassWarning, "", "resetPassword","User.id")
         );
 
-        $this->AjaxList->setUp($this->User, $columns, $actions, $joinTables, $extraFilters,
-            "User.id", "User.username");
+        $this->AjaxList->setUp($this->User, $columns, $actions, "User.id", "User.username",
+            $joinTables, $extraFilters);
     }
 
     function ajaxList($pageForRedirect=null) {
@@ -141,6 +141,29 @@ class UsersController extends AppController
 
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
+    }
+
+    // Show a class list
+    function goToClassList($course) {
+        if (is_numeric($course)) {
+            $courses = $this->sysContainer->getMyCourseList();
+            if (!empty($courses[$course])) {
+                // We need to change the session state to point to this
+                // course:
+                // Initialize a basic non-funcional AjaxList
+                $this->AjaxList->quickSetUp();
+                // Clear the state first, we don't want any previous searches/selections.
+                $this->AjaxList->clearState();
+                // Set and update session state Variable
+                $joinFilterSelections->course_id = $course;
+                $this->AjaxList->setStateVariable("joinFilterSelections", $joinFilterSelections);
+                // but since that join filter depends on user role, we should set that too.
+                $mapFilterSelections->{"User.role"} = "S";
+                $this->AjaxList->setStateVariable("mapFilterSelections", $mapFilterSelections);
+            }
+        }
+        // Redirect to user list after state modifications (or in case of error)
+        $this->redirect("/users/index");
     }
 
     function view($id) {

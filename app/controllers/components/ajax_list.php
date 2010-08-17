@@ -52,6 +52,17 @@ class AjaxListComponent extends Object {
         return $state;
     }
 
+    // Do a quick state check to fix any error inside
+    function checkState($state) {
+        if (empty($state->sortBy)) {
+            $state->sortBy = $this->sortBy;
+        }
+        if (empty($state->searchBy)) {
+            $state->searchBy = $this->searchBy;
+        }
+        return $state;
+    }
+
     // Get data function for the ajaxList
     // Example call:
     //  $this->AjaxList->getListByState($state, $this->User, "User.id, User.username");
@@ -61,13 +72,12 @@ class AjaxListComponent extends Object {
     function getListByState()
     {
         // Get the session state, or create a new session state
-        $state = $this->getState();
+        $state = $this->checkState($this->getState());
 
         // Set up sorting and pagination
         $order = $state->sortBy . " " .  ($state->sortAsc ? "ASC" : "DESC");
         $limit = $state->pageSize;
         $page = $state->pageShown;
-
 
         // Ensure that search objects are strings
         if (!is_string($state->sortBy)) {
@@ -93,7 +103,6 @@ class AjaxListComponent extends Object {
         // Add in any join filter conditions
         if (!empty($state->joinFilterSelections)) {
             foreach ($state->joinFilterSelections as $filter => $value) {
-
                  // Find the joinFilter object relating to this one
                  $joinFilter = null;
                  foreach ($this->joinFilters as $index => $thisJoinFilter) {
@@ -122,7 +131,6 @@ class AjaxListComponent extends Object {
                  }
 
                  if (!empty($filter) && !empty($value)) {
-                    //var_dump($filter . " - " . $value);
                     $conditions .= mysql_real_escape_string($filter) . "='" .
                                    mysql_real_escape_string($value) . "' and ";
                 }
@@ -272,8 +280,28 @@ class AjaxListComponent extends Object {
         }
     }
 
-    function setUp ($model, $columns, $actions, $joinFilters, $extraFilters,
+    // Set a state variable manually
+    function setStateVariable($variableName, $value) {
+        $state = $this->getState();
+        $state->$variableName = $value;
+        $this->Session->write($this->sessionVariableName, $state);
+    }
+
+    // Clears the state completelly.
+    function clearState() {
+        $this->Session->write($this->sessionVariableName, null);
+    }
+
+    // Create a non-operational version of the stucture
+    function quickSetUp() {
+        $this->setUp (null, null, null, null, null);
+    }
+
+    // Sets up the basic info about the list
+    function setUp ($model, $columns, $actions,
                     $sortBy, $searchBy,
+                    $joinFilters = null,
+                    $extraFilters = null,
                     $recursive = 0,
                     $listName = null,
                     $customModelFindFunction = null,
