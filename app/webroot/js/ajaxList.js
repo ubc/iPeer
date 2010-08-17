@@ -1,7 +1,7 @@
 
 // Configuration Variables
-var AjaxListActionMenuOffsetX = 100;
-var AjaxListActionMenuOffsetY = -120;
+var AjaxListActionOffsetX = 100;
+var AjaxListActionOffsetY = -120;
 
 // It's best to keep the following as multiples of the lowest page count,
 //  so that when the page-size-change Occurs, the
@@ -16,12 +16,20 @@ var blackUpTriangleHTMLCode = "&#9650;";
 var blackDownTriableHTMLCode = "&#9660;";
 
 var controllerAjaxListFunctionName = "ajaxList";
+var iconURL = "img/icons/" ;
 
 var ID_COL = 0;     // ID of the column
 var DESC_COL = 1;   // Description of the columns
-var TYPE_COL = 2;   // Type of the column
-var MAP_COL = 3;    // Map of column values
+var WIDTH_COL = 2;
+var TYPE_COL = 3;   // Type of the column
+var MAP_COL = 4;    // Map of column values
+var ACTION_COL = 4; // Action for an action try column
+var ICON_COL = 4;  // Icon for a link-type column
 
+var ACTION_NAME = 0;
+var ACTION_WARNING = 1;
+var ACTION_CONTROLLER = 2;
+var ACTION_URL_PARTS_START = 3;
 
 // Small Helper function library class
 function AjaxListLibrary () {
@@ -112,7 +120,7 @@ function AjaxList (parameterArray, whereToDisplay) {
     this.timeStamp      = parameterArray.data.timeStamp;
     this.state          = parameterArray.data.state;
     this.actions        = parameterArray.actions;
-    this.joinFilters    = parameterArray.joinFilters;
+    this.joinTables    = parameterArray.joinFilters;
     this.webroot        = parameterArray.webroot;
 
 
@@ -231,9 +239,10 @@ AjaxList.prototype.renderSelectionMaps = function (div) {
             select.appendChild(option);
             // Now list each of the optionsecords
             for (var entry in column[MAP_COL]) {
+                var text = column[MAP_COL][entry];
                 // Create the new option
                 option = new Element("option",
-                                     {"value" : entry}).update(column[MAP_COL][entry] + "s");
+                                     {"value" : entry}).update(column[MAP_COL][entry]);
 
                 if (this.state.mapFilterSelections[column[ID_COL]] == entry) {
                     option.selected = "selected";
@@ -242,7 +251,11 @@ AjaxList.prototype.renderSelectionMaps = function (div) {
                 select.appendChild(option);
                 div.appendChild(select);
             }
-            div.appendChild(document.createTextNode(" " + column[DESC_COL] + "s"));
+            // Get the proper plural
+            var text = column[DESC_COL];
+            text += (text.length > 1 && text[text.length - 1] == 's') ? "es" : "s";
+
+            div.appendChild(document.createTextNode(" " + text));
             atLeastOneMapAdded = true;
         }
     }
@@ -250,20 +263,26 @@ AjaxList.prototype.renderSelectionMaps = function (div) {
 }
 
 // Render the extra filter control
-AjaxList.prototype.renderExtraFilters = function (div) {
+AjaxList.prototype.renderJoinFilters = function (div) {
     // First, render the selection maps
     var atLeastOneAdded = false;
 
     // If there are no extra paramaters, just return false;
-    if (!this.joinFilters) {
+    if (!this.joinTables) {
         return atLeastOneAdded; // (false)
     }
 
 // For each filter, render a selecngineering Design Graphics - 8th Edition by J. H. Earletion
-    for (i = 0; i < this.joinFilters.length; i++) {
+    for (i = 0; i < this.joinTables.length; i++) {
 
         // Create a local reference
-        var filter = this.joinFilters[i];
+        var filter = this.joinTables[i];
+
+        // If this a filter, or just a join table?
+        if (filter.id === undefined) {
+            // Don't process non-filters.
+            continue;
+        }
 
         // Does the state variable exist for this entry? if not, create it
         if (this.state.joinFilterSelections[filter.id] === undefined) {
@@ -340,8 +359,17 @@ AjaxList.prototype.renderSearchControl = function (div) {
     }
     // Generate a drop-down entry for each column
     for (i = 0; i < this.columns.length; i++) {
+
         // Put all maps into the selections
         var column = this.columns[i];
+
+        // Should we show this column
+        if (column[TYPE_COL] !== undefined && column[TYPE_COL] == "hidden") {
+            // do not render hidden columns.
+            continue;
+        }
+
+        // Prep the selection drop down entry
         var columnDesc = (column[DESC_COL] !== undefined) ? column[DESC_COL] : column[ID_COL];
         var option = new Element("option", {"value" : column[ID_COL]}).update(columnDesc);
         if (this.state.searchBy == column[ID_COL]) {
@@ -398,7 +426,7 @@ AjaxList.prototype.renderSearchBar = function (divIn) {
 
     var atLeastOneMapAdded = this.renderSelectionMaps(divTop);
 
-    this.renderExtraFilters(divTop);
+    this.renderJoinFilters(divTop);
 
     // Now, render the search control
     divBottom.appendChild(document.createTextNode(atLeastOneMapAdded ? " and Search where: " : "Search where: "));
@@ -446,15 +474,21 @@ AjaxList.prototype.renderPageList = function(div) {
     // so long as obj has children, remove them
     while(div.firstChild) div.removeChild(div.firstChild);
 
+    var totalPages = Math.ceil(this.count / this.state.pageSize);
+    totalPages = (totalPages < 1) ? 1 : totalPages;
+
+    // Check if there are any pages at all:
+    if (totalPages < 2) {
+        // Only 1 page? on need to render this, then.
+        return;
+    }
+
     div.style.textAlign = "right";
     div.style.paddingTop = "4px";
 
     div.appendChild(new Element("b").update("Go to Page: "));
     var pages = new Element("span");
     pages.style.color = "chocolate";
-    var totalPages = Math.ceil(this.count / this.state.pageSize);
-    totalPages = (totalPages < 1) ? 1 : totalPages;
-
 
     for (i = 1; i <= totalPages; i++) {
         pages.appendChild(document.createTextNode(" "));
@@ -521,22 +555,35 @@ AjaxList.prototype.renderTableHeaders = function (tbody) {
                                         "style":"cursor:pointer; text-align:center"});
 
     for (i = 0; i < this.columns.length; i++) {
+        var column = this.columns[i];
+
+        // Should we show this column
+        if (column[TYPE_COL] !== undefined && column[TYPE_COL] == "hidden") {
+            // do not render hidden columns.
+            continue;
+        }
+
         var th = new Element("th");
+        // Set the width of this column
+        if (column[WIDTH_COL] !== undefined) {
+            th.style.width = column[WIDTH_COL];
+        }
+
         th.noWrap = true;
 
         // Set up the sorting onclick handler
         th.onclick = ajaxListLibrary.createDelegateWithParams(
-            this, this.setSortingColumn, this.columns[i][0]);
+            this, this.setSortingColumn, column[ID_COL]);
 
         // User either Model.column convension, if a real column name if it was specified
-        if (this.columns[i][1] !== undefined) {
-            var columnTitle = this.columns[i][1];
-         } else {
-            var columnTitle = this.columns[i][0];
+        if (this.columns[i][DESC_COL] !== undefined) {
+            var columnTitle = column[DESC_COL];
+        } else {
+            var columnTitle = column[i][ID_COL];
         }
 
         // If sorting by this column
-        if (this.columns[i][0] == this.state.sortBy) {
+        if (column[ID_COL] == this.state.sortBy) {
             columnTitle += this.state.sortAsc ? " \u25B2" : " \u25BC";
         }
 
@@ -556,27 +603,69 @@ AjaxList.prototype.renderTableBody = function(tbody) {
         var tr = new Element("tr",{ "class"  :"tablecell", "style" : "cursor: pointer;"});
         var entry = this.data[j];
         for (i = 0; i < this.columns.length; i++) {
-            var td = new Element("td");
-            td.noWrap = true;
-            // Get the actual entry name
             var column = this.columns[i];
-            var split = column[0].split(".", 2);
-            var contents = entry[split[0]][split[1]];
 
-            // Is this a map-type column? Should be translate it?
-            if (column[TYPE_COL] !== undefined && column[TYPE_COL] == "map") {
-                if (column[MAP_COL][contents] !== undefined) {
-                    contents = column[MAP_COL][contents];
-                } else {
-                    contents = "(unknown) " + contents;
-                }
+            // Should we show this column
+            if (column[TYPE_COL] !== undefined && column[TYPE_COL] == "hidden") {
+                // do not render hidden columns.
+                continue;
             }
 
-            td.appendChild(document.createTextNode(contents));
+            var td = new Element("td");
+            td.noWrap = true;
+
+            // Get the actual entry name
+            var split = column[ID_COL].split(".", 2);
+            var contents = entry[split[0]][split[1]];
+
+            // Handle any special column types
+            if (column[TYPE_COL] !== undefined) {
+
+                // Is this a map-type column? Should be translate it?
+                if (column[TYPE_COL] == "map") {
+                    if (column[MAP_COL][contents] !== undefined) {
+                        contents = column[MAP_COL][contents];
+                    } else {
+                        contents = "(unknown) " + contents;
+                    }
+                    // Normal Text create and add
+                    td.appendChild(document.createTextNode(contents));
+                } else if (column[TYPE_COL] == "action") {
+                    // If this is an "action" type entry, we need to create a link for it
+                    var link = new Element("a").update(contents);
+                    link.href="";
+                    link.onclick = ajaxListLibrary.createDelegateWithParams(this,
+                        this.doAction, entry, column[ACTION_COL]);
+                    td.appendChild(link);
+                } else if (column[TYPE_COL] == "link") {
+                    // Create an icon with a link in it
+                    if (contents && (contents.length > 10)) { // 10 is min url length
+                        // Create a link fist
+                        var link = new Element("a");
+                        td.style.textAlign = "center";
+                        link.href = contents;
+                        // Check to see if there was an icon defined.
+                        //  if there was, display it. if not, display
+                        var linkInsides = (column[ICON_COL] !== undefined) ?
+                            new Element("img", {"src":(this.webroot + iconURL + column[ICON_COL]),
+                                "style":"border:0px;"}) :
+                            document.createTextNode(contents); // if no icon defined
+                        link.appendChild(linkInsides);
+                        td.appendChild(link);
+                    }
+                } else {
+                    // Normal Text create and add
+                    td.appendChild(document.createTextNode(contents));
+                }
+            } else {
+                // Normal Text create and add
+                td.appendChild(document.createTextNode(contents));
+            }
+
+            var clickDelegate = ajaxListLibrary.createDelegateWithParams(this, this.rowClicked, entry);
+            td.onclick = clickDelegate;
             tr.appendChild(td);
         }
-
-        tr.onclick = ajaxListLibrary.createDelegateWithParams(this, this.rowClicked, entry);
 
         tbody.appendChild(tr);
     }
@@ -595,8 +684,35 @@ AjaxList.prototype.renderTable = function() {
     this.table.appendChild(tbody);
 }
 
+// When user clicks a link-type table cell entry
+AjaxList.prototype.doAction = function (event, entryRow, actionDesc) {
+
+    // Stop this event's propogation, so that the link is triggered,
+    //  and not the row.
+    if (Prototype.Browser.IE) {
+        window.event.cancelBubble = true;   // IE only
+    } else {
+        event.stopPropagation();         // W3C compatibles
+    }
+
+
+    // Find the function description if the actions array
+    for (var i = 0; i < this.actions.length; i++) {
+        var action = this.actions[i];
+        if (action[ACTION_NAME] == actionDesc) {
+            // Action found, execute it!
+            var actionDisplay = new AjaxListAction( 0, 0,
+                                                     this.webroot, this.controller,
+                                                     this.columns, entryRow, this.actions);
+            actionDisplay.performAction(event, action);
+            return false; // Do not take the link!
+        }
+    }
+    return false; // Do not take the link!
+}
+
 // Handles a user's click on a displayed row
-AjaxList.prototype.rowClicked = function (event, entry) {
+AjaxList.prototype.rowClicked = function (event, entryRow) {
     if (this.actionDisplay != null) {
         this.actionDisplay.close();
     }
@@ -608,10 +724,11 @@ AjaxList.prototype.rowClicked = function (event, entry) {
     x += (document.documentElement.scrollLeft || document.body.scrollLeft);
     y += (document.documentElement.scrollTop  || document.body.scrollTop);
 
-    this.actionDisplay = new AjaxListActionMenu( x + AjaxListActionMenuOffsetX,
-                                                 y + AjaxListActionMenuOffsetY,
-                                                this.webroot + this.controller,
-                                                this.columns, entry, this.actions);
+    this.actionDisplay = new AjaxListAction( x + AjaxListActionOffsetX,
+                                                 y + AjaxListActionOffsetY,
+                                                this.webroot,  this.controller,
+                                                this.columns, entryRow, this.actions);
+    this.actionDisplay.render();
 }
 
 // Sets up the list to sort by this column
@@ -784,18 +901,18 @@ AjaxList.prototype.ajaxCallComplete = function (response) {
 
 
 /********** Action Display for Ajax List **********/
-function AjaxListActionMenu(x, y, root, columns, entry, actions) {
+function AjaxListAction(x, y, root, controller, columns, entry, actions) {
     this.x = x;
     this.y = y;
     this.root = root;
+    this.controller = controller;
     this.columns  = columns;
     this.entry = entry;
     this.actions = actions;
     this.display = null;
-    this.render();
 }
 
-AjaxListActionMenu.prototype.close = function() {
+AjaxListAction.prototype.close = function() {
     if (this.display) {
         document.body.removeChild(this.display);
         this.display = null;
@@ -803,7 +920,7 @@ AjaxListActionMenu.prototype.close = function() {
 }
 
 
-AjaxListActionMenu.prototype.render = function() {
+AjaxListAction.prototype.render = function() {
     this.display = new Element("div");
     this.display.style.backgroundColor = "white";
     this.display.style.position = "absolute";
@@ -823,10 +940,10 @@ AjaxListActionMenu.prototype.render = function() {
 
         var td = new Element("td");
 
-        if (this.columns[i][1] !== undefined) {
-            var columnTitle = this.columns[i][1];
+        if (this.columns[i][DESC_COL] !== undefined) {
+            var columnTitle = this.columns[i][DESC_COL];
         } else {
-            var columnTitle = this.columns[i][0];
+            var columnTitle = this.columns[i][ID_COL];
         }
 
         td.appendChild(document.createTextNode(columnTitle + ": "));
@@ -835,21 +952,29 @@ AjaxListActionMenu.prototype.render = function() {
         td = new Element("td");
         // Get the actual entry name
         var column = this.columns[i];
-        var split = column[0].split(".", 2);
+        var split = column[ID_COL].split(".", 2);
         var contents = this.entry[split[0]][split[1]];
 
-        // Is this a map-type column? Should be translate it?
-        if (column[TYPE_COL] !== undefined && column[TYPE_COL] == "map") {
-            if (column[MAP_COL][contents] !== undefined) {
-                contents = column[MAP_COL][contents];
-            } else {
-                contents = "(unknown) " + contents;
+        if (column[TYPE_COL] !== undefined) {
+            // Is this a map-type column? Should be translate it?
+            if (column[TYPE_COL] == "map") {
+                if (column[MAP_COL][contents] !== undefined) {
+                    contents = column[MAP_COL][contents];
+                } else {
+                    contents = "(unknown) " + contents;
+                }
+            } else if (column[TYPE_COL] == "hidden") {
+                // skip hidden columns
+                continue;
             }
         }
+
+
         td.appendChild(document.createTextNode(contents));
         tr.appendChild(td);
 
         tbody.appendChild(tr);
+
     }
 
     table.appendChild(tbody);
@@ -859,9 +984,14 @@ AjaxListActionMenu.prototype.render = function() {
     for (i = 0; i < this.actions.length; i++) {
         var action = this.actions[i];
 
-        var button = new Element("input",{"type":"submit","value":action[0]});
+        var button = new Element("input",{"type":"submit","value":action[ACTION_NAME]});
         button.onclick = ajaxListLibrary.createDelegateWithParams(this, this.performAction, action);
         this.display.appendChild(button);
+
+        // Insert a break event 3 buttons
+        if ( (i > 0) && ((i-1) % 3 == 0)) {
+            this.display.appendChild(new Element("br"));
+        }
     }
 
     var closeButton = new Element("input",{"type":"submit","value":"Close"});
@@ -872,18 +1002,20 @@ AjaxListActionMenu.prototype.render = function() {
 }
 
 
-AjaxListActionMenu.prototype.performAction = function(event, action) {
-    if (action[1] != "") {
-        if (!confirm(action[1])) {
+AjaxListAction.prototype.performAction = function(event, action) {
+    if (action[ACTION_WARNING] != "") {
+        if (!confirm(action[ACTION_WARNING])) {
             this.close();
             return;
         }
     }
 
-    // Figure out the proper URL
-    var url = "";
-    for (j = 2; j < action.length; j++) {
+    // Figure out the proper URL, starting with the controller
+    var url = action[ACTION_CONTROLLER] ? action[ACTION_CONTROLLER] : this.controller;
+
+    for (j = ACTION_URL_PARTS_START; j < action.length; j++) {
         urlPart = action[j];
+
         var split = urlPart.split(".", 2);
         if ((split.length == 2) && (this.entry[split[0]][split[1]])) {
             // If this is an actual value, set it.

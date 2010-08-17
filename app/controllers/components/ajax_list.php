@@ -14,6 +14,7 @@ class AjaxListComponent extends Object {
     var $columns = null;
     var $actions = null;
     var $joinFilters = null;
+    var $extraFilters = null;
 
     var $fields = null;
 
@@ -56,8 +57,6 @@ class AjaxListComponent extends Object {
     //  $this->AjaxList->getListByState($state, $this->User, "User.id, User.username");
     // Remember:
     //  if you use custom functions, they must be take parameters just like:
-    //  findAll   ($conditions, $fields, $order, $limit, $page, $recursive, $state, $joinTable, $groupBy);
-    //  findCount ($conditions, $state);
 
     function getListByState()
     {
@@ -91,11 +90,9 @@ class AjaxListComponent extends Object {
             }
         }
 
-        // Add in any join conditions
-
+        // Add in any join filter conditions
         if (!empty($state->joinFilterSelections)) {
             foreach ($state->joinFilterSelections as $filter => $value) {
-
 
                  // Find the joinFilter object relating to this one
                  $joinFilter = null;
@@ -132,6 +129,13 @@ class AjaxListComponent extends Object {
             }
         }
 
+        // Add in any extra Filters
+        if (!empty($this->extraFilters)) {
+            foreach ($this->extraFilters as $column => $value) {
+                $conditions .= "$column=$value and ";
+            }
+        }
+
         // Add in the search conditions
         if (!empty($state->searchBy) && !empty($state->searchValue)) {
             $conditions .= mysql_real_escape_string($state->searchBy) .
@@ -157,8 +161,15 @@ class AjaxListComponent extends Object {
         if (!empty($this->joinFilters)) {
             for ($i = 0; $i < sizeof($this->joinFilters); $i++) {
                 $joinFilter = $this->joinFilters[$i];
-                $joinTable .= " LEFT JOIN " . $joinFilter['joinTable'] . " as " . $joinFilter['joinModel'];
-                $joinTable .= " on " . $this->model->name . ".id" . "=" . $joinFilter['joinModel'] . "." . $joinFilter['foreignKey'];
+                if (!empty($joinFilter)) {
+                    // Set up the default values
+                    $localKey   = !empty($joinFilter['localKey'])   ? $joinFilter['localKey']   : "id";
+                    $foreignKey = !empty($joinFilter['foreignKey']) ? $joinFilter['foreignKey'] : "id";
+                    $localModel = !empty($joinFilter['localModel']) ? $joinFilter['localModel'] : $this->model->name;
+
+                    $joinTable .= " LEFT JOIN `$joinFilter[joinTable]` as `$joinFilter[joinModel]`";
+                    $joinTable .= " on $localModel.`$localKey`=`$joinFilter[joinModel]`.`$foreignKey`";
+                }
             }
         }
 
@@ -261,9 +272,10 @@ class AjaxListComponent extends Object {
         }
     }
 
-    function setUp ($model, $columns, $actions, $joinFilters, $sortBy, $searchBy,
-                    $listName = null,
+    function setUp ($model, $columns, $actions, $joinFilters, $extraFilters,
+                    $sortBy, $searchBy,
                     $recursive = 0,
+                    $listName = null,
                     $customModelFindFunction = null,
                     $customModelCountFunction = null)
     {
@@ -272,8 +284,10 @@ class AjaxListComponent extends Object {
         $this->columns = $columns;
         $this->actions = $actions;
         $this->joinFilters = $joinFilters;
+        $this->extraFilters = $extraFilters;
         $this->sortBy = $sortBy;
         $this->searchBy = $searchBy;
+        $this->recursive = $recursive;
 
         // Setup up the custom variables
         $this->customModelFindFunction = $customModelFindFunction;
@@ -284,7 +298,6 @@ class AjaxListComponent extends Object {
         for ($i = 0; $i < sizeof($this->columns); $i++) {
             array_push($this->fields, $columns[$i][0]);
         }
-
 
         // If this list has a name, name it!
         if (!empty($listName))  {

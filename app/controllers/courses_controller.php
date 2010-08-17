@@ -37,6 +37,7 @@ class CoursesController extends AppController
 	var $order;
 	var $Sanitize;
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
+	var $components = array("AjaxList");
 
 	function __construct()
 	{
@@ -51,32 +52,83 @@ class CoursesController extends AppController
 		parent::__construct();
 	}
 
-	function index($msg='') {
-        $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-        $this->userPersonalize->setPersonalizeList($personalizeData);
-        if ($personalizeData && $this->userPersonalize->inPersonalizeList('Course.ListMenu.Limit.Show')) {
-            $this->show = $this->userPersonalize->getPersonalizeValue('Course.ListMenu.Limit.Show');
-            $this->set('userPersonalize', $this->userPersonalize);
-        } else {
-            $this->show = '10';
-            $this->update($attributeCode = 'Course.ListMenu.Limit.Show',$attributeValue = $this->show);
-             // Work around the first-time render bug. No layout is displayed otherwise, but after a
-             // refresh, everything is fine once more.
-             $this->redirect("courses/index");
-        }
-        $coursesCount = $this->Course->findAccessibleCoursesCount($this->rdAuth->id, $this->rdAuth->role);
-        $paging['style'] = 'ajax';
-        $paging['link'] = '/courses/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
-        $paging['count'] = isset($coursesCount[0][0]['total'])? $coursesCount[0][0]['total'] : 0;
-        $paging['show'] = array('10','25','50','all');
-        $paging['page'] = $this->page;
-        $paging['limit'] = $this->show;
-        $paging['direction'] = $this->direction;
-        $this->set('message', $msg);
-        $data = $this->Course->findAccessibleCoursesListByUserIdRole($this->rdAuth->id, $this->rdAuth->role);
-        $this->set('paging',$paging);
-        $this->set('data',$data);
-	}
+    function setUpAjaxList() {
+        // Set up Columns
+        $columns = array(
+            array("Course.id",            "ID",          "4em",  "number"),
+            array("Course.homepage",      "Web",         "4em",  "link",   "home.gif"),
+            array("Course.course",        "Course",      "5em",  "action", "Course Home"),
+            array("Course.title",         "Title",       "auto", "action", "Course Home"),
+            array("Creator.id",           "",            "",     "hidden"),
+            array("Instructor.username",  "Instructor *","10em", "action", "View Instructor"),
+            array("Course.record_status", "Status",      "5em",  "map",
+                array("A" => "Active", "I" => "Inactive")),
+            array("Creator.username",     "Created by",  "10em", "action", "View Creator"),
+            array("Instructor.id",        "",            "",     "hidden"));
+
+        // Join with
+        $jointTableCreator =
+            array("localKey"   => "creator_id",
+                  "joinTable"  => "users",
+                  "joinModel"  => "Creator");
+        // Join with user courses for instructor ID's
+        $joinTableInstructorsIDs =
+            array("joinTable" => "user_courses",
+                  "joinModel" => "UserCourse",
+                  "foreignKey" => "course_id");
+        // Join with users to translate instructor ID's into usernames
+        $joinTableInsturctorUserName =
+            array("localModel" => "UserCourse",
+                  "localKey" => "user_id",
+                  "joinTable" => "users",
+                  "joinModel" => "Instructor");
+
+        // put all the joins together
+        $joinTables = array($jointTableCreator,
+                            $joinTableInstructorsIDs,
+                            $joinTableInsturctorUserName);
+
+        // For instructors: only list their own courses
+        $extraFilters = $this->rdAuth->role != 'A' ?
+            array("Instructor.id" => $this->rdAuth->id) :
+            null;
+
+        // Set up actions
+        $warning = "Are you sure you want to delete this course permanently?";
+        $actions = array(
+            array("Course Home", "", "", "home", "Course.id"),
+            array("View Record", "", "", "view", "Course.id"),
+            array("Edit Record", "", "", "edit", "Course.id"),
+            array("Delete Course", $warning, "", "home", "Course.id"),
+            array("View Creator", "",    "users", "view", "Creator.id"),
+            array("View Instructor", "", "users", "view", "Instructor.id"));
+
+        $recursive = 0;
+
+        $this->AjaxList->setUp($this->Course, $columns, $actions, $joinTables, $extraFilters,
+                "Course.id", "Course.title", $recursive);
+    }
+
+
+    function index($message='') {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set the top message
+        $this->set('message', $message);
+        // Set up the basic static ajax list variables
+        $this->setUpAjaxList();
+        // Set the display list
+        $this->set('paramsForList', $this->AjaxList->getParamsForList());
+    }
+
+    function ajaxList() {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set up the list
+        $this->setUpAjaxList();
+        // Process the request for data
+        $this->AjaxList->asyncGet();
+    }
 
 	function view($id)
 	{
@@ -232,33 +284,6 @@ class CoursesController extends AppController
 
 		//$this->redirect('/courses/edit/'.$course_id);
 	}
-
-	function search()
-  	{
-        $this->layout = 'ajax';
-
-        if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-            $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-            if ($personalizeData) {
-            $this->userPersonalize->setPersonalizeList($personalizeData);
-            $this->show = $this->userPersonalize->getPersonalizeValue('Course.ListMenu.Limit.Show');
-            $this->set('userPersonalize', $this->userPersonalize);
-            }
-        }
-
-        $conditions = null;
-
-        if (!empty($this->params['form']['livesearch']) &&
-            !empty($this->params['form']['select'])) {
-            $pagination->loadingId = 'loading';
-            //parse the parameters
-            $searchField=$this->params['form']['select'];
-            $searchValue=trim($this->params['form']['livesearch']);
-            $conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
-        }
-        $this->update($attributeCode = 'Course.ListMenu.Limit.Show',$attributeValue = $this->show);
-        $this->set('conditions',$conditions);
-  }
 
   function adddelrow()
   {

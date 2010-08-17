@@ -69,35 +69,37 @@ class UsersController extends AppController
         // The columns to show
         $columns = array(
             //    Model   columns       (Display Title) (Type Description)
-            array("User.id",         "ID",           "number"),
-            array("User.username",   "Username",     "string"),
-            array("User.role",       "Role",         "map",
+            array("User.id",         "ID",           "4em",    "number"),
+            array("User.username",   "Username",     "10em",    "string"),
+            array("User.role",       "Role",         "6em",    "map",
                 array(  "A" => "Admin",  "I" => "Instructor", "S" => "Student")),
-            array("User.first_name", "First Name",   "string"),
-            array("User.last_name",  "Last Name",    "string"),
-            array("User.email",      "Email",        "string")//,
+            array("User.first_name", "First Name",   "13em",    "string"),
+            array("User.last_name",  "Last Name",    "13em",    "string"),
+            array("User.email",      "Email",        "auto",    "string")//,
             //array("UserEnrol.course_id", "Course ID", "number")
         );
 
         // The course to list for is the extra filter in this case
-        $extraFilters =
+        $joinTables =
             array(
                 array(  // Define the GUI aspecs
-                        "id"            => "course_id",
-                        "description"   => "for Course:",
-                        // What are the choises and the default values?
-                        "list"  => $courseList,
-                        "default" => $this->rdAuth->courseId,
-                        // What table to we join to get these
-                        "joinTable"     => "user_enrols",
-                        "joinModel"     => "UserEnrol",
-                        "foreignKey"    => "user_id",
+                    "id"            => "course_id",
+                    "description"   => "for Course:",
+                    // What are the choises and the default values?
+                    "list"  => $courseList,
+                    "default" => $this->rdAuth->courseId,
+                    // What table to we join to get these
+                    "joinTable"     => "user_enrols",
+                    "joinModel"     => "UserEnrol",
+                    "foreignKey"    => "user_id",
 
-                        // Any show/hide features based on maps
-                        "dependsMap"    => "User.role",    // Look to this column
-                        "dependsValues" => array("", "S")  // Display only when this column is one of these values
+                    // Any show/hide features based on maps
+                    "dependsMap"    => "User.role",    // Look to this column
+                    "dependsValues" => array("", "S")  // Display only when this column is one of these values
                 )
             );
+
+        $extraFilters = array();
 
         // Define Actions
         $deleteUserWarning = "Delete this user. Irreversible. Are you sure?";
@@ -105,19 +107,14 @@ class UsersController extends AppController
         $actions = array(
             //   parameters to cakePHP controller:,
             //   display name, (warning shown), fixed parameters or Column ids
-            array("View User",  "", "view", "User.id"),
-            array("Edit User",  "", "edit", "User.id"),
-            array("Delete User",  $deleteUserWarning,  "delete",      "User.id"),
-            array("Reset Password", $resetPassWarning, "resetPassword","User.id")
+            array("View User",  "", "", "view", "User.id"),
+            array("Edit User",  "", "", "edit", "User.id"),
+            array("Delete User",  $deleteUserWarning,  "", "delete",      "User.id"),
+            array("Reset Password", $resetPassWarning, "", "resetPassword","User.id")
         );
 
-        $this->AjaxList->setUp($this->User, $columns, $actions, $extraFilters, "User.id", "User.username");
-    }
-
-
-    function newIndex($message='') {
-
-
+        $this->AjaxList->setUp($this->User, $columns, $actions, $joinTables, $extraFilters,
+            "User.id", "User.username");
     }
 
     function ajaxList($pageForRedirect=null) {
@@ -138,9 +135,6 @@ class UsersController extends AppController
 
         // Set the top message
         $this->set('message', $message);
-
-        // For the new Ajax table
-        $this->newIndex();
 
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
