@@ -68,7 +68,8 @@
 
         <!-- PassWord -->
         <tr class="tablecell2"><td  colspan="3">
-        <strong>Note:</strong> A password will be automatically generated, and shown on the next page, after you click "Save".
+        A password will be automatically generated, and shown on the next page, after you click "Save".<br />
+        <strong>Note:</strong> If using CWL logons, students should use CWL username/password for iPeer, instead of the generated one.
         </td></tr>
 
         <!-- Last Name -->
@@ -172,4 +173,5 @@
    </tr>
  </table>
  <?php } ?>
+    </td></tr></table>
 </td></tr></table>

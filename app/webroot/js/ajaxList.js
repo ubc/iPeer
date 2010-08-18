@@ -11,7 +11,8 @@ var AjaxListActionOffsetY = -120;
 //  contains the first record on the present page,
 var AvailablePageSizes = [15, 30, 90, 360];
 
-// How many page numbers to show before we.
+// How many page numbers to show before we collapse the page list a bit.
+// must be 4 or greater, no upper limit.
 var maxPageNumbersToShow = 12;
 
 //Contants
@@ -519,7 +520,7 @@ AjaxList.prototype.renderPageList = function(div) {
         // Always render the first Page Number
         this.renderSinglePageRadioButton(1, pages);
 
-        var plusMinusOffset = (maxPageNumbersToShow - 2) / 2;
+        var plusMinusOffset = Math.floor((maxPageNumbersToShow - 2) / 2);
 
         // Do we need to elipsis?
         if (this.state.pageShown - plusMinusOffset > 2) {
