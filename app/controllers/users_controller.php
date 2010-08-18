@@ -61,8 +61,12 @@ class UsersController extends AppController
         // Get the course data
         $userCourseList = $this->sysContainer->getMyCourseList();
         $courseList = array();
+
+        // Add in the unassigned course entry:
+        $courseList{"!!!null"} = "-- Unassigned --";
+
         foreach ($userCourseList as $id => $course) {
-            $courseList[$id] = $course['course'];
+            $courseList{$id} = $course['course'];
         }
 
 
@@ -95,7 +99,7 @@ class UsersController extends AppController
 
                     // Any show/hide features based on maps
                     "dependsMap"    => "User.role",    // Look to this column
-                    "dependsValues" => array("", "S")  // Display only when this column is one of these values
+                    "dependsValues" => array("S")  // Display only when this column is one of these values
                 )
             );
 

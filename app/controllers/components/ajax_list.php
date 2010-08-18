@@ -60,7 +60,21 @@ class AjaxListComponent extends Object {
         if (empty($state->searchBy)) {
             $state->searchBy = $this->searchBy;
         }
+
+        // Ensure that search objects are strings
+        if (!is_string($state->sortBy)) {
+            $state->sortBy = "";
+        }
+        if (!is_string($state->searchValue)) {
+            $state->searchValue = "";
+        }
+
         return $state;
+    }
+
+
+    function isSpecialValue($value) {
+        return strlen($value)>3  &&  $value[0]=='!'  &&  $value[1]=='!'  &&  $value[2]=='!';
     }
 
     // Get data function for the ajaxList
@@ -79,16 +93,11 @@ class AjaxListComponent extends Object {
         $limit = $state->pageSize;
         $page = $state->pageShown;
 
-        // Ensure that search objects are strings
-        if (!is_string($state->sortBy)) {
-            $state->sortBy = "";
-        }
-        if (!is_string($state->searchValue)) {
-            $state->searchValue = "";
-        }
-
-        // Start with no conditions
+        // Start with no tables, and noconditions
+        $tables = "";
         $conditions = "";
+
+        // Add the main table
 
         // Add in the map filter conditions
         if (!empty($state->mapFilterSelections)) {
@@ -131,8 +140,15 @@ class AjaxListComponent extends Object {
                  }
 
                  if (!empty($filter) && !empty($value)) {
-                    $conditions .= mysql_real_escape_string($filter) . "='" .
-                                   mysql_real_escape_string($value) . "' and ";
+                    // Keywords starting with !!! are a special case
+                    if (!$this->isSpecialValue($value)) {
+                        $conditions .= mysql_real_escape_string($filter) . "='" .
+                                    mysql_real_escape_string($value) . "' and ";
+                    } else {
+                        // note: no quotes around special value
+                        $conditions .= mysql_real_escape_string($filter) . " is " .
+                                    mysql_real_escape_string(substr($value, 3)) . " and ";
+                    }
                 }
             }
         }
@@ -211,19 +227,16 @@ class AjaxListComponent extends Object {
     }
 
 
-    // Find all can't handle joint talbes that and GROUP By well,
+    // Find all can't handle joint tables that and GROUP By well,
     //  so this custom function is its replacement
     function betterCount ($conditions, $groupBy, $recursive, $joinTable) {
 
-        /*
-        select count(*) from (select count(*) FROM `users` AS `User`
-        LEFT JOIN user_enrols as UserEnrol on User.id=UserEnrol.user_id WHERE 1=1
-        GROUP by `User`.`id` ORDER BY `User`.`id`) as a
-        */
+        // Cache object variables
+        $modelName = $this->model->name;
+        $tableName = $this->model->table;
 
         // Initial Statement
-        $sql  = "SELECT count(*) as count FROM ( SELECT count(*) FROM " . $this->model->table . " as ";
-        $sql .= $this->model->name . " ";
+        $sql  = "SELECT count($modelName.id) as count FROM $tableName as $modelName ";
 
         // Add table joins
         for ($i = 0; $i < sizeof($joinTable); $i++) {
@@ -233,15 +246,10 @@ class AjaxListComponent extends Object {
         // add on conditions
         $sql .= "WHERE " . $conditions;
 
-        // add on the group statement
-        $sql .= $groupBy;
-
-        // And finish up the statement
-
-        $sql .= " ) as aTableForCount";
-
+        // Query the count
         list($data) = $this->model->findBySql($sql);
 
+        // Return the data count
         return isset($data[0]['count']) ? $data[0]['count'] : 0;
     }
 

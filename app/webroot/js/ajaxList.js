@@ -13,7 +13,7 @@ var AvailablePageSizes = [15, 30, 90, 360];
 
 // How many page numbers to show before we collapse the page list a bit.
 // must be 4 or greater, no upper limit.
-var maxPageNumbersToShow = 12;
+var maxPageNumbersToShow = 8;
 
 //Contants
 var blackUpTriangleHTMLCode = "&#9650;";
