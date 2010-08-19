@@ -38,6 +38,7 @@ class SysParametersController extends AppController
 	var $NeatString;
 	var $Sanitize;
 	var $uses = array('SysParameter','Personalize');
+	var $components = array('AjaxList');
 
 	function __construct()
 	{
@@ -53,34 +54,48 @@ class SysParametersController extends AppController
 		parent::__construct();
 	}
 
-	function index($message='')
-	{
-  	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-    $this->userPersonalize->setPersonalizeList($personalizeData);
-  	if ($personalizeData && $this->userPersonalize->inPersonalizeList('SysParam.ListMenu.Limit.Show')) {
-       $this->show = $this->userPersonalize->getPersonalizeValue('SysParam.ListMenu.Limit.Show');
-       $this->set('userPersonalize', $this->userPersonalize);
-  	} else {
-  	  $this->show = '10';
-      $this->update($attributeCode = 'SysParam.ListMenu.Limit.Show',$attributeValue = $this->show);
-  	}
-  	$data = $this->SysParameter->findAll($conditions=null, $fields=null, $this->order, $this->show, $this->page);
+	function setUpAjaxList() {
+        $columns = array(
+            array("SysParameter.id",             "ID",      "", "number"),
+            array("SysParameter.parameter_code", "Code",    "", "string"),
+            array("SysParameter.parameter_value","Value",   "", "string"),
+            array("SysParameter.parameter_type", "Type",    "", "map",
+                array("I" => "Interger", "B" => "Boolean", "S" => "String")),
+            array("SysParameter.record_status",  "Status",   "", "map",
+                array("A" => "Active", "I" => "Inactive")),
+            array("SysParameter.created",        "Created", "", "date"),
+            array("SysParameter.modified",       "Updated", "", "date"));
 
-  	$paging['style'] = 'ajax';
-  	$paging['link'] = '/sysparameters/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
-  	$paging['count'] = $this->SysParameter->findCount($conditions=null);
-  	$paging['show'] = array('10','25','50','all');
-  	$paging['page'] = $this->page;
-  	$paging['limit'] = $this->show;
-  	$paging['direction'] = $this->direction;
+        $warning = "Are you sure you with to delete this System Parameter?";
+        $actions = array(
+            array("View", "", "", "view", "SysParameter.id"),
+            array("Edit", "", "", "edit", "SysParameter.id"),
+            array("Delete", $warning, "", "delete", "SysParameter.id"));
 
-    if (isset($message)) {
-      $this->set('message', $message);
+        $this->AjaxList->setUp($this->SysParameter, $columns, $actions,
+            "SysParameter.id", "SysParameter.title");
+	}
+
+
+    function index($message='') {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set the top message
+        $this->set('message', $message);
+        // Set up the basic static ajax list variables
+        $this->setUpAjaxList();
+        // Set the display list
+        $this->set('paramsForList', $this->AjaxList->getParamsForList());
     }
 
-  	$this->set('paging',$paging);
-  	$this->set('data',$data);
-	}
+    function ajaxList() {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set up the list
+        $this->setUpAjaxList();
+        // Process the request for data
+        $this->AjaxList->asyncGet();
+    }
 
 	function view($id)
 	{
@@ -131,34 +146,6 @@ class SysParametersController extends AppController
     }
   }
 
-  function search()
-  {
-    $this->layout = 'ajax';
-    $pagination->loadingId = 'loading';
-
-    if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-    	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-    	if ($personalizeData) {
-    	   $this->userPersonalize->setPersonalizeList($personalizeData);
-         $this->show = $this->userPersonalize->getPersonalizeValue('SysParam.ListMenu.Limit.Show');
-         $this->set('userPersonalize', $this->userPersonalize);
-    	}
-    }
-
-    $conditions = null;
-    if (isset($this->params['form']['livesearch'])){
-      $searchField=$this->params['form']['searchIndex'];
-      $searchValue=$this->params['form']['livesearch'];
-
-      $conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
-    }
-    $this->update($attributeCode = 'SysParam.ListMenu.Limit.Show',$attributeValue = $this->show);
-    $this->set('conditions',$conditions);
-  }
-	function update($attributeCode='',$attributeValue='') {
-		if ($attributeCode != '' && $attributeValue != '') //check for empty params
-  		$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
-	}
 }
 
 ?>

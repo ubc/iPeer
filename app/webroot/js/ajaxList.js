@@ -210,6 +210,17 @@ AjaxList.prototype.renderHeader = function() {
     this.header.appendChild(table);
 }
 
+// Create a handler for the map Selectors
+AjaxList.prototype.createDelegateForSelectionMap = function (thisObject, thisColumn)
+{
+    return function () {
+        // We need to create a callback for this: direct call
+        //   to changeMapFilter doesn't detect the value change!
+        var delegate = ajaxListLibrary.createDelegateWithParams(thisObject,
+                                                                thisObject.changeMapFilter, thisColumn, this.value);
+        window.setTimeout(delegate, 0);
+    }
+}
 
 // Renders the Select elements for any "map" type columns
 AjaxList.prototype.renderSelectionMaps = function (div) {
@@ -231,13 +242,8 @@ AjaxList.prototype.renderSelectionMaps = function (div) {
             var select = new Element("select");
             var thisObject = this;
             var thisColumn = column[ID_COL];
-            select.onchange = function () {
-                // We need to create a callback for this: direct call
-                //   to changeMapFilter doesn't detect the value change!
-                var delegate = ajaxListLibrary.createDelegateWithParams(thisObject,
-                                                                        thisObject.changeMapFilter,thisColumn, this.value);
-                                                                        window.setTimeout(delegate, 0);
-            }
+            select.onchange = this.createDelegateForSelectionMap(
+                thisObject, thisColumn);
 
             var option = new Element("option", {"value" : ""}).update("-- All --");
             select.appendChild(option);
@@ -417,7 +423,6 @@ AjaxList.prototype.renderSearchBar = function (divIn) {
     var divTop = new Element("div", {"style":"margin: 0 6px 6px 6px"});
     var divBottom = new Element("div", {"style":"margin:6px"});
 
-
     // Put in a state variable for selection maps
     if (this.state.mapFilterSelections === undefined) {
         this.state.mapFilterSelections = {}; // New Object
@@ -571,10 +576,9 @@ AjaxList.prototype.renderFooter = function(div) {
     // Display the number of results
     var td = new Element("td", {"style" : "text-align: center;  width: 33%; font-weight: bold; font-size: 110%"});
     td.appendChild(document.createTextNode(
-    this.count < 1 ?
-    "No results" :
-    ("Total Results: " + this.count)
-    ));
+        this.count < 1 ?
+        "No results" :
+        ("Total Results: " + this.count)));
     tr.appendChild(td);
 
     // Display Number of search results in first f
@@ -652,7 +656,10 @@ AjaxList.prototype.renderTableBody = function(tbody) {
             }
 
             var td = new Element("td");
-            td.noWrap = true;
+
+            // A division is required to use overflow
+            var div = new Element("div");
+            div.style.overflow="hidden";
 
             // Get the actual entry name
             var split = column[ID_COL].split(".", 2);
@@ -669,20 +676,20 @@ AjaxList.prototype.renderTableBody = function(tbody) {
                         contents = "(unknown) " + contents;
                     }
                     // Normal Text create and add
-                    td.appendChild(document.createTextNode(contents));
+                    div.appendChild(document.createTextNode(contents));
                 } else if (column[TYPE_COL] == "action") {
                     // If this is an "action" type entry, we need to create a link for it
                     var link = new Element("a").update(contents);
                     link.href="";
                     link.onclick = ajaxListLibrary.createDelegateWithParams(this,
                         this.doAction, entry, column[ACTION_COL]);
-                    td.appendChild(link);
+                        div.appendChild(link);
                 } else if (column[TYPE_COL] == "link") {
                     // Create an icon with a link in it
                     if (contents && (contents.length > 10)) { // 10 is min url length
                         // Create a link fist
                         var link = new Element("a");
-                        td.style.textAlign = "center";
+                        div.style.textAlign = "center";
                         link.href = contents;
                         // Check to see if there was an icon defined.
                         //  if there was, display it. if not, display
@@ -691,16 +698,19 @@ AjaxList.prototype.renderTableBody = function(tbody) {
                                 "style":"border:0px;"}) :
                             document.createTextNode(contents); // if no icon defined
                         link.appendChild(linkInsides);
-                        td.appendChild(link);
+                        div.appendChild(link);
                     }
                 } else {
                     // Normal Text create and add
-                    td.appendChild(document.createTextNode(contents));
+                    div.appendChild(document.createTextNode(contents));
                 }
             } else {
                 // Normal Text create and add
-                td.appendChild(document.createTextNode(contents));
+                div.appendChild(document.createTextNode(contents));
             }
+
+            // Append the contents division onto the element
+            td.appendChild(div);
 
             var clickDelegate = ajaxListLibrary.createDelegateWithParams(this, this.rowClicked, entry);
             td.onclick = clickDelegate;
