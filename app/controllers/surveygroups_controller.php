@@ -392,7 +392,7 @@ class SurveyGroupsController extends AppController
       }
     }
     $xmlFile = file_get_contents('../tmp/'.$time.'.txt.scores');
-    $xmlFile = ereg_replace('(<\?=).*(\?>)','',$xmlFile);
+    $xmlFile = @ereg_replace('(<\?=).*(\?>)','',$xmlFile);
     file_put_contents('../tmp/'.$time.'.txt.scores',$xmlFile);
     //$scores = file_get_contents('../tmp/'.$time.'.txt.scores');
 
@@ -540,7 +540,7 @@ class SurveyGroupsController extends AppController
     $time = $time['SurveyGroupSet']['date'];
     $scoreFilePathAndName = '../tmp/'.$time.'.txt.scores';
     $xmlFile = file_get_contents('../tmp/'.$time.'.txt.scores');
-    $xmlFile = ereg_replace('(<\?=).*(\?>)','',$xmlFile);
+    $xmlFile = @ereg_replace('(<\?=).*(\?>)','',$xmlFile);
     file_put_contents('../tmp/'.$time.'.txt.scores',$xmlFile);
 
     //get group
@@ -692,8 +692,8 @@ class SurveyGroupsController extends AppController
     }
     //group code end
     $out = file_get_contents($xmlFilePathAndName);
-    $out = ereg_replace("</team_input>",'',$out);
-    $out = ereg_replace("(<fixed>).+(</fixed>)",'',$out);
+    $out = @ereg_replace("</team_input>",'',$out);
+    $out = @ereg_replace("(<fixed>).+(</fixed>)",'',$out);
     //print_r($data);
     for ($i=0; $i < count($data); $i++) {
       $team = $data[$i]['members'];

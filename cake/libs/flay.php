@@ -108,9 +108,9 @@ class Flay extends Object{
 						}
 					}
 					// bold
-					$line = ereg_replace("\*([^\*]*)\*", "<strong>\\1</strong>", $line);
+					$line = @ereg_replace("\*([^\*]*)\*", "<strong>\\1</strong>", $line);
 					// italic
-					$line = ereg_replace("_([^_]*)_", "<em>\\1</em>", $line);
+					$line = @ereg_replace("_([^_]*)_", "<em>\\1</em>", $line);
 				}
 				// entities
 				$line = str_replace(' - ', ' &ndash; ', $line);

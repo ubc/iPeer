@@ -220,12 +220,12 @@ class PaginationHelper {
 		{
 			if($this->style == 'ajax')
 			{
-				//return ereg_replace('&','&amp;',$this->Ajax->link($text, $this->link.$this->_details['previousPage'], array("update" => $this->updateId,  'loading' => "Element.show('".$this->loadingId."');", 'complete' => "Element.hide('".$this->loadingId."');", "method"=>"get")));
+				//return @ereg_replace('&','&amp;',$this->Ajax->link($text, $this->link.$this->_details['previousPage'], array("update" => $this->updateId,  'loading' => "Element.show('".$this->loadingId."');", 'complete' => "Element.hide('".$this->loadingId."');", "method"=>"get")));
 				return $this->Ajax->link($text, $this->link.$this->_details['previousPage'], array("update" => $this->updateId,  'loading' => "Element.show('".$this->loadingId."');", 'complete' => "Element.hide('".$this->loadingId."');", "method"=>"get"));
 			}
 			else
 			{
-				return ereg_replace('&','&amp;',$this->Html->link($text,$this->link.$this->_details['previousPage']));
+				return @ereg_replace('&','&amp;',$this->Html->link($text,$this->link.$this->_details['previousPage']));
 			}
 		}
 		return false;
@@ -244,12 +244,12 @@ class PaginationHelper {
 		{
 			if($this->style == 'ajax')
 			{
-				//return ereg_replace('&','&amp;',$this->Ajax->link($text, $this->link.$this->_details['next'], array("update" => $this->updateId, 'loading' => "Element.show('".$this->loadingId."');", 'complete' => "Element.hide('".$this->loadingId."');", "method"=>"get")));
+				//return @ereg_replace('&','&amp;',$this->Ajax->link($text, $this->link.$this->_details['next'], array("update" => $this->updateId, 'loading' => "Element.show('".$this->loadingId."');", 'complete' => "Element.hide('".$this->loadingId."');", "method"=>"get")));
 				return $this->Ajax->link($text, $this->link.$this->_details['next'], array("update" => $this->updateId, 'loading' => "Element.show('".$this->loadingId."');", 'complete' => "Element.hide('".$this->loadingId."');", "method"=>"get"));
 			}
 			else
 			{
-				return ereg_replace('&','&amp;',$this->Html->link($text,$this->link.$this->_details['next']));
+				return @ereg_replace('&','&amp;',$this->Html->link($text,$this->link.$this->_details['next']));
 			}
 		}
 		return false;
@@ -282,13 +282,13 @@ class PaginationHelper {
 
 		if($this->style == 'ajax')
 		{
-			//$newlink = ereg_replace('&','&amp;',$newlink);
-			//$newlink = ereg_replace('&',';',$newlink);
+			//$newlink = @ereg_replace('&','&amp;',$newlink);
+			//$newlink = @ereg_replace('&',';',$newlink);
 			return $this->Ajax->link($name, $newlink, array("update" => $this->updateId, 'loading' => "Element.show('".$this->loadingId."');", 'complete' => "Element.hide('".$this->loadingId."');", "method"=>"get"));
 		}
 		else
 		{
-			//$newlink = ereg_replace('&','&amp;',$newlink);
+			//$newlink = @ereg_replace('&','&amp;',$newlink);
 			return $this->Html->link($name, $newlink);
 		}
 	}

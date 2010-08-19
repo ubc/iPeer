@@ -551,8 +551,8 @@ class UsersController extends AppController
             $subject = $subject_param['parameter_value'];
             $to = $user['User']['email'];
             $fullname = $user['User']['first_name'] . " " . $user['User']['last_name'];
-            $email_msg = ereg_replace("<user>", $fullname, $email_msg);
-            $email_msg = ereg_replace("<newpassword>", $userData['User']['password'], $email_msg);
+            $email_msg = @ereg_replace("<user>", $fullname, $email_msg);
+            $email_msg = @ereg_replace("<newpassword>", $userData['User']['password'], $email_msg);
 
             // send email to user
             $success = $this->sendEmail( $to, $from, $subject, $email_msg );
