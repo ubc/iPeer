@@ -231,26 +231,34 @@ class AjaxListComponent extends Object {
     //  so this custom function is its replacement
     function betterCount ($conditions, $groupBy, $recursive, $joinTable) {
 
-        // Cache object variables
-        $modelName = $this->model->name;
-        $tableName = $this->model->table;
+         /*
+         select count(*) from (select count(*) FROM `users` AS `User`
+         LEFT JOIN user_enrols as UserEnrol on User.id=UserEnrol.user_id WHERE 1=1
+         GROUP by `User`.`id` ORDER BY `User`.`id`) as a
+         */
 
-        // Initial Statement
-        $sql  = "SELECT count($modelName.id) as count FROM $tableName as $modelName ";
+         // Initial Statement
+         $sql  = "SELECT count(*) as count FROM ( SELECT count(*) FROM " . $this->model->table . " as ";
+         $sql .= $this->model->name . " ";
 
-        // Add table joins
-        for ($i = 0; $i < sizeof($joinTable); $i++) {
-            $sql .= $joinTable[$i] . " ";
-        }
+         // Add table joins
+         for ($i = 0; $i < sizeof($joinTable); $i++) {
+             $sql .= $joinTable[$i] . " ";
+         }
 
-        // add on conditions
-        $sql .= "WHERE " . $conditions;
+         // add on conditions
+         $sql .= "WHERE " . $conditions;
 
-        // Query the count
-        list($data) = $this->model->findBySql($sql);
+         // add on the group statement
+         $sql .= $groupBy;
 
-        // Return the data count
-        return isset($data[0]['count']) ? $data[0]['count'] : 0;
+         // And finish up the statement
+
+         $sql .= " ) as aTableForCount";
+
+         list($data) = $this->model->findBySql($sql);
+
+         return isset($data[0]['count']) ? $data[0]['count'] : 0;
     }
 
 
