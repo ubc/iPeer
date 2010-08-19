@@ -106,7 +106,7 @@ class CoursesController extends AppController
         $recursive = 0;
 
         $this->AjaxList->setUp($this->Course, $columns, $actions,
-            "Course.id", "Course.title", $joinTables, $extraFilters, $recursive);
+            "Course.id", "Course.course", $joinTables, $extraFilters, $recursive);
     }
 
 

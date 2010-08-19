@@ -38,6 +38,7 @@ class SysFunctionsController extends AppController
 	var $NeatString;
 	var $Sanitize;
     var $uses = array('SysFunction','Personalize');
+    var $components = array('AjaxList');
 
 	function __construct()
 	{
@@ -53,38 +54,52 @@ class SysFunctionsController extends AppController
 		parent::__construct();
 	}
 
-	function index($message='')
-	{
 
-        $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-        $this->userPersonalize->setPersonalizeList($personalizeData);
-        if ($personalizeData && $this->userPersonalize->inPersonalizeList('SysParam.ListMenu.Limit.Show')) {
-            $this->show = $this->userPersonalize->getPersonalizeValue('SysParam.ListMenu.Limit.Show');
-            $this->set('userPersonalize', $this->userPersonalize);
-        } else {
-            $this->show = '10';
-            $this->update($attributeCode = 'SysParam.ListMenu.Limit.Show',$attributeValue = $this->show);
-        }
-        $data = $this->SysFunction->findAll($conditions=null, $fields=null, $this->order, $this->show, $this->page);
+    function setUpAjaxList() {
+        $columns = array(
+            array("SysFunction.id",              "ID",         "3em", "number"),
+            array("SysFunction.function_code",   "Code",       "15em","string"),
+            array("SysFunction.function_name",   "Name",       "auto","string"),
+            array("SysFunction.controller_name", "Controller", "6em", "string"),
+            array("SysFunction.url_link",        "URL Link",   "5em", "string"),
+            array("SysFunction.permission_type", "Permissions","5em", "string"),
+            array("SysFunction.record_status",  "Status",   "5em", "map",
+                array("A" => "Active", "I" => "Inactive")),
+            array("SysFunction.created",        "Created", "7em", "date"),
+            array("SysFunction.modified",       "Updated", "7em", "date"));
 
-        $searchIndexURL = isset($_GET['searchIndex']) ? $_GET['searchIndex'] : '';
-        $liveSearchURL  = isset($_GET['livesearch'])  ? $_GET['livesearch']  : '';
+        $warning = "Are you sure you wish to delete this System Function?";
+        $actions = array(
+            array("View", "", "", "view", "SysFunction.id"),
+            array("Edit", "", "", "edit", "SysFunction.id"),
+            array("Delete", $warning, "", "delete", "SysFunction.id"));
 
-        $searchIndex = isset($this->params['form']['searchIndex']) ?
-            $this->params['form']['searchIndex'] : $searchIndexURL;
-        $liveSearch =  isset($this->params['form']['livesearch']) ?
-                    $this->params['form']['livesearch'] : $liveSearchURL;
+        $this->AjaxList->setUp($this->SysFunction, $columns, $actions,
+            "SysFunction.id", "SysFunction.function_code");
+    }
 
 
-
-        if (isset($message)) {
-            $this->set('message', $message);
-        }
-
-        $this->set('data',$data);
-        $this->set('searchIndex',$searchIndex);
-        $this->set('liveSearch',$liveSearch);
+	function index($message='') {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set the top message
+        $this->set('message', $message);
+        // Set up the basic static ajax list variables
+        $this->setUpAjaxList();
+        // Set the display list
+        $this->set('paramsForList', $this->AjaxList->getParamsForList());
 	}
+
+
+    function ajaxList() {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set up the list
+        $this->setUpAjaxList();
+        // Process the request for data
+        $this->AjaxList->asyncGet();
+    }
+
 
 	function view($id)
 	{
@@ -126,45 +141,6 @@ class SysFunctionsController extends AppController
 				$this->redirect('sysfunctions/index/'.$message);
     }
   }
-
-    function search()
-    {
-        if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-            $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-            if ($personalizeData) {
-                $this->userPersonalize->setPersonalizeList($personalizeData);
-                $this->show = $this->userPersonalize->getPersonalizeValue('SysFunc.ListMenu.Limit.Show');
-                $this->set('userPersonalize', $this->userPersonalize);
-            }
-        }
-
-
-        $this->layout = 'ajax';
-        $pagination->loadingId = 'loading';
-
-        $conditions = null;
-
-        $searchIndexURL = isset($_GET['searchIndex']) ? $_GET['searchIndex'] : '';
-        $liveSearchURL  = isset($_GET['livesearch'])  ? $_GET['livesearch']  : '';
-
-        $searchIndex = isset($this->params['form']['searchIndex']) ?
-            $this->params['form']['searchIndex'] : $searchIndexURL;
-        $liveSearch =  isset($this->params['form']['livesearch']) ?
-                    $this->params['form']['livesearch'] : $liveSearchURL;
-
-        if (!empty($searchIndex) && !empty($liveSearch)){
-            $searchField = $searchIndex;
-            $searchValue = $liveSearch;
-
-            $conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
-
-        }
-
-        $this->set('conditions',$conditions);
-        $this->set('searchIndex', $searchIndex);
-        $this->set('liveSearch', $liveSearch);
-        $this->update($attributeCode = 'SysFunc.ListMenu.Limit.Show',$attributeValue = $this->show);
-    }
 
     function update($attributeCode='',$attributeValue='') {
         if ($attributeCode != '' && $attributeValue != '') //check for empty params

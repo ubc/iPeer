@@ -56,24 +56,24 @@ class SysParametersController extends AppController
 
 	function setUpAjaxList() {
         $columns = array(
-            array("SysParameter.id",             "ID",      "", "number"),
-            array("SysParameter.parameter_code", "Code",    "", "string"),
-            array("SysParameter.parameter_value","Value",   "", "string"),
-            array("SysParameter.parameter_type", "Type",    "", "map",
+            array("SysParameter.id",             "ID",      "3em", "number"),
+            array("SysParameter.parameter_code", "Code",    "15em", "string"),
+            array("SysParameter.parameter_value","Value",   "auto","string"),
+            array("SysParameter.parameter_type", "Type",    "6em",   "map",
                 array("I" => "Interger", "B" => "Boolean", "S" => "String")),
-            array("SysParameter.record_status",  "Status",   "", "map",
+            array("SysParameter.record_status",  "Status",   "5em", "map",
                 array("A" => "Active", "I" => "Inactive")),
-            array("SysParameter.created",        "Created", "", "date"),
-            array("SysParameter.modified",       "Updated", "", "date"));
+            array("SysParameter.created",        "Created", "7em", "date"),
+            array("SysParameter.modified",       "Updated", "7em", "date"));
 
-        $warning = "Are you sure you with to delete this System Parameter?";
+        $warning = "Are you sure you wish to delete this System Parameter?";
         $actions = array(
             array("View", "", "", "view", "SysParameter.id"),
             array("Edit", "", "", "edit", "SysParameter.id"),
             array("Delete", $warning, "", "delete", "SysParameter.id"));
 
         $this->AjaxList->setUp($this->SysParameter, $columns, $actions,
-            "SysParameter.id", "SysParameter.title");
+            "SysParameter.id", "SysParameter.parameter_code");
 	}
 
 
