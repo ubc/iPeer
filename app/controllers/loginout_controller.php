@@ -213,6 +213,7 @@ class LoginoutController extends AppController
 
 	function loginByCWL() {
     require_once('XML/RPC.php');
+    global $CWL;
 		$this->autoRender = false;
 
 		$ticket = $_GET['ticket'];
