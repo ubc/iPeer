@@ -70,9 +70,9 @@ class SysFunctionsController extends AppController
 
         $warning = "Are you sure you wish to delete this System Function?";
         $actions = array(
-            array("View", "", "", "view", "SysFunction.id"),
-            array("Edit", "", "", "edit", "SysFunction.id"),
-            array("Delete", $warning, "", "delete", "SysFunction.id"));
+            array("View", "", "", "", "view", "SysFunction.id"),
+            array("Edit", "", "", "", "edit", "SysFunction.id"),
+            array("Delete", $warning, "", "", "delete", "SysFunction.id"));
 
         $this->AjaxList->setUp($this->SysFunction, $columns, $actions,
             "SysFunction.id", "SysFunction.function_code");

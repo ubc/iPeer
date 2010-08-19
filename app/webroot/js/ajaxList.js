@@ -9,7 +9,7 @@ var AjaxListActionOffsetY = -120;
 //  required: the JS pagination code will figure out
 //  the right page to jump to: the one that for sure
 //  contains the first record on the present page,
-var AvailablePageSizes = [15, 30, 90, 360];
+var AvailablePageSizes = [15, 30, 90, 270];
 
 // How many page numbers to show before we collapse the page list a bit.
 // must be 4 or greater, no upper limit.
@@ -32,8 +32,9 @@ var ICON_COL = 4;  // Icon for a link-type column
 
 var ACTION_NAME = 0;
 var ACTION_WARNING = 1;
-var ACTION_CONTROLLER = 2;
-var ACTION_URL_PARTS_START = 3;
+var ACTION_RESTRICTIONS = 2;
+var ACTION_CONTROLLER = 3;
+var ACTION_URL_PARTS_START = 4;
 
 // Small Helper function library class
 function AjaxListLibrary () {
@@ -969,6 +970,49 @@ AjaxListAction.prototype.close = function() {
     }
 }
 
+// Checks and renders a single action button.
+AjaxListAction.prototype.renderAction = function (action) {
+    // Determine if the user is allowed to renderAction, based on maps
+    if (action[ACTION_RESTRICTIONS]) {
+        var restrictions = action[ACTION_RESTRICTIONS];
+        for (var map in restrictions) {
+            // Ensure this is an actual property
+            if (!restrictions.hasOwnProperty(map)) {
+                continue;
+            }
+
+            // Grab the cell of interest's value
+            var split = map.split(".", 2);
+            cell = this.entry[split[0]][split[1]];
+
+            var values = restrictions[map];
+
+            // If this value was specified, follow those direct instructrions
+            if (values[cell] !== undefined) {
+                if (!values[cell]) {
+                    // Do not render this one
+                    return;
+                }
+            } else {
+                // Otherwise look for the default value entry, and follow that.
+                if (values["!default"] !== undefined) {
+                    if (!values["!default"]) {
+                        // Default says do not render
+                        return;
+                    }
+                } else {
+                    // Default was undefined, so do not render
+                    return;
+                }
+            }
+        }
+    }
+
+    var button = new Element("input", {"type" : "submit","value" : action[ACTION_NAME]});
+    button.onclick = ajaxListLibrary.createDelegateWithParams(this, this.performAction, action);
+    this.display.appendChild(button);
+}
+
 
 AjaxListAction.prototype.render = function() {
     this.display = new Element("div");
@@ -1033,15 +1077,7 @@ AjaxListAction.prototype.render = function() {
     // Create buttons for actions
     for (i = 0; i < this.actions.length; i++) {
         var action = this.actions[i];
-
-        var button = new Element("input",{"type":"submit","value":action[ACTION_NAME]});
-        button.onclick = ajaxListLibrary.createDelegateWithParams(this, this.performAction, action);
-        this.display.appendChild(button);
-
-        // Insert a break event 3 buttons
-        if ( (i > 0) && ((i-1) % 3 == 0)) {
-            this.display.appendChild(new Element("br"));
-        }
+        this.renderAction(action);
     }
 
     var closeButton = new Element("input",{"type":"submit","value":"Close"});

@@ -96,12 +96,12 @@ class CoursesController extends AppController
         // Set up actions
         $warning = "Are you sure you want to delete this course permanently?";
         $actions = array(
-            array("Course Home", "", "", "home", "Course.id"),
-            array("View Record", "", "", "view", "Course.id"),
-            array("Edit Record", "", "", "edit", "Course.id"),
-            array("Delete Course", $warning, "", "home", "Course.id"),
-            array("View Creator", "",    "users", "view", "Creator.id"),
-            array("View Instructor", "", "users", "view", "Instructor.id"));
+            array("Course Home", "", "", "", "home", "Course.id"),
+            array("View Record", "", "", "", "view", "Course.id"),
+            array("Edit Record", "", "", "", "edit", "Course.id"),
+            array("Delete Course", $warning, "", "", "home", "Course.id"),
+            array("View Creator", "",    "", "users", "view", "Creator.id"),
+            array("View Instructor", "", "", "users", "view", "Instructor.id"));
 
         $recursive = 0;
 

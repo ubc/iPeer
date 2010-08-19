@@ -74,7 +74,7 @@ class UsersController extends AppController
         $columns = array(
             //    Model   columns       (Display Title) (Type Description)
             array("User.id",         "ID",           "4em",    "number"),
-            array("User.username",   "Username",     "10em",    "string"),
+            array("User.username",   "Username",     "10em",   "action", "View User"),
             array("User.role",       "Role",         "6em",    "map",
                 array(  "A" => "Admin",  "I" => "Instructor", "S" => "Student")),
             array("User.first_name", "First Name",   "13em",    "string"),
@@ -108,13 +108,21 @@ class UsersController extends AppController
         // Define Actions
         $deleteUserWarning = "Delete this user. Irreversible. Are you sure?";
         $resetPassWarning = "Resets user Password. Are you sure?";
+
+        $actionRestrictions = array(
+            "User.role" => array (
+                "S" => true,
+                "!default" => false
+        ));
+
+
         $actions = array(
             //   parameters to cakePHP controller:,
             //   display name, (warning shown), fixed parameters or Column ids
-            array("View User",  "", "", "view", "User.id"),
-            array("Edit User",  "", "", "edit", "User.id"),
-            array("Delete User",  $deleteUserWarning,  "", "delete",       "User.id"),
-            array("Reset Password", $resetPassWarning, "", "resetPassword","User.id")
+            array("View User",  "", "", "", "view", "User.id"),
+            array("Edit User",  "", $actionRestrictions, "", "edit", "User.id"),
+            array("Delete User",  $deleteUserWarning,   $actionRestrictions, "", "delete",       "User.id"),
+            array("Reset Password", $resetPassWarning,  $actionRestrictions, "", "resetPassword","User.id")
         );
 
         $this->AjaxList->setUp($this->User, $columns, $actions, "User.id", "User.username",

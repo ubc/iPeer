@@ -67,10 +67,11 @@ class SysParametersController extends AppController
             array("SysParameter.modified",       "Updated", "7em", "date"));
 
         $warning = "Are you sure you wish to delete this System Parameter?";
+
         $actions = array(
-            array("View", "", "", "view", "SysParameter.id"),
-            array("Edit", "", "", "edit", "SysParameter.id"),
-            array("Delete", $warning, "", "delete", "SysParameter.id"));
+            array("View", "", "", "", "view", "SysParameter.id"),
+            array("Edit", "", "", "", "edit", "SysParameter.id"),
+            array("Delete", $warning, "", "", "delete", "SysParameter.id"));
 
         $this->AjaxList->setUp($this->SysParameter, $columns, $actions,
             "SysParameter.id", "SysParameter.parameter_code");
