@@ -193,7 +193,7 @@ class AjaxHelper extends Helper {
 
 		$htmlOptions['onclick'] .= ' return false;';
 		$return = $this->Html->link($title, $href, $htmlOptions, null, $escapeTitle);
-		$return = ereg_replace('&','&amp;',$return);
+		$return = @ereg_replace('&','&amp;',$return);
 		$script = $this->Javascript->event("'{$htmlOptions['id']}'", "click", $this->remoteFunction($options));
 
 		if (is_string($script)) {

@@ -77,7 +77,7 @@ class PaginationHelper {
 			$selected = '';
 			if(is_array($this->show)) {
 				$link = preg_replace('/show=(.*?)&/','',$this->link);
-				$link = ereg_replace('&','&amp;',$link);
+				$link = @ereg_replace('&','&amp;',$link);
 				$t .= '<b>' . $text. '</b>';
 				$t .= '<select onChange="showLimit(this.value,\'' . $link .
                         $this->_details['page'] . '\',\'' . $ajaxObj . '\');">';
@@ -116,7 +116,7 @@ class PaginationHelper {
 			}
 			else
 			{
-			*/	
+			*/
     $result_count_text = (null == $this->result_count) ? '' : $this->result_count.' of ';
     return $text . $result_count_text . $this->_details['recordCount'];
 			//}
