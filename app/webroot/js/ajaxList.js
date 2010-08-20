@@ -1,7 +1,13 @@
 
 // Configuration Variables
-var AjaxListActionOffsetX = 100;
-var AjaxListActionOffsetY = -120;
+var AjaxListActionOffsetX = -5;
+var AjaxListActionOffsetY = -5;
+var AjaxListActionMenuTextEnabledColor = "Black";
+var AjaxListActionMenuTextDisabledColor = "LightGrey";
+var AjaxListActionMenuColor = "LightYellow";
+var AjaxListActionMenuSelected = "LightBlue";
+
+var iconURL = "img/icons/";
 
 // It's best to keep the following as multiples of the lowest page count,
 //  so that when the page-size-change Occurs, the
@@ -20,7 +26,6 @@ var blackUpTriangleHTMLCode = "&#9650;";
 var blackDownTriableHTMLCode = "&#9660;";
 
 var controllerAjaxListFunctionName = "ajaxList";
-var iconURL = "img/icons/" ;
 
 var ID_COL = 0;     // ID of the column
 var DESC_COL = 1;   // Description of the columns
@@ -248,9 +253,13 @@ AjaxList.prototype.renderSelectionMaps = function (div) {
 
             var option = new Element("option", {"value" : ""}).update("-- All --");
             select.appendChild(option);
-            // Now list each of the optionsecords
+            // Now list each of the options records
             for (var entry in column[MAP_COL]) {
                 var text = column[MAP_COL][entry];
+
+                if (!column[MAP_COL].hasOwnProperty(entry)) {
+                    continue;
+                }
                 // Create the new option
                 option = new Element("option",
                                      {"value" : entry}).update(column[MAP_COL][entry]);
@@ -596,8 +605,7 @@ AjaxList.prototype.renderFooter = function(div) {
 // Renders the table headers, with column names
 AjaxList.prototype.renderTableHeaders = function (tbody) {
     // Create Headers
-    var headerRow = new Element("tr", { "class":"tableheader",
-                                        "style":"cursor:pointer; text-align:center"});
+    var headerRow = new Element("tr", { "class":"tableheader","style":"text-align:center"});
 
     for (i = 0; i < this.columns.length; i++) {
         var column = this.columns[i];
@@ -616,9 +624,14 @@ AjaxList.prototype.renderTableHeaders = function (tbody) {
 
         th.noWrap = true;
 
-        // Set up the sorting onclick handler
-        th.onclick = ajaxListLibrary.createDelegateWithParams(
-            this, this.setSortingColumn, column[ID_COL]);
+        // Set up the sorting onclick handler, if this isn't a special "!"-flagged column
+        if (column[ID_COL] && column[ID_COL][0] != '!') {
+            th.onclick = ajaxListLibrary.createDelegateWithParams(
+                this, this.setSortingColumn, column[ID_COL]);
+            th.style.cursor = "pointer";
+        } else {
+            th.style.cursor = "arrow";
+        }
 
         // User either Model.column convension, if a real column name if it was specified
         if (this.columns[i][DESC_COL] !== undefined) {
@@ -715,6 +728,7 @@ AjaxList.prototype.renderTableBody = function(tbody) {
 
             var clickDelegate = ajaxListLibrary.createDelegateWithParams(this, this.rowClicked, entry);
             td.onclick = clickDelegate;
+            td.oncontextmenu = clickDelegate;
             tr.appendChild(td);
         }
 
@@ -764,8 +778,10 @@ AjaxList.prototype.doAction = function (event, entryRow, actionDesc) {
 
 // Handles a user's click on a displayed row
 AjaxList.prototype.rowClicked = function (event, entryRow) {
-    if (this.actionDisplay != null) {
+    if (this.actionDisplay != null && !this.actionDisplay.isClosed()) {
         this.actionDisplay.close();
+        this.actionDisplay = null;
+        return false;
     }
 
     // IE workaround
@@ -780,6 +796,9 @@ AjaxList.prototype.rowClicked = function (event, entryRow) {
                                                 this.webroot,  this.controller,
                                                 this.columns, entryRow, this.actions);
     this.actionDisplay.render();
+
+    // This is for the on context menu
+    return false;
 }
 
 // Sets up the list to sort by this column
@@ -961,6 +980,7 @@ function AjaxListAction(x, y, root, controller, columns, entry, actions) {
     this.entry = entry;
     this.actions = actions;
     this.display = null;
+    this.closed = false;
 }
 
 AjaxListAction.prototype.close = function() {
@@ -968,11 +988,24 @@ AjaxListAction.prototype.close = function() {
         document.body.removeChild(this.display);
         this.display = null;
     }
+
+    // Clear any onclicks
+    document.body.onclick = null;
+    document.body.oncontextmenu = null;
+
+    this.closed = true;
+    return false;
+}
+
+AjaxListAction.prototype.isClosed = function() {
+    return this.closed;
 }
 
 // Checks and renders a single action button.
 AjaxListAction.prototype.renderAction = function (action) {
     // Determine if the user is allowed to renderAction, based on maps
+    var active = true;
+
     if (action[ACTION_RESTRICTIONS]) {
         var restrictions = action[ACTION_RESTRICTIONS];
         for (var map in restrictions) {
@@ -990,101 +1023,61 @@ AjaxListAction.prototype.renderAction = function (action) {
             // If this value was specified, follow those direct instructrions
             if (values[cell] !== undefined) {
                 if (!values[cell]) {
-                    // Do not render this one
-                    return;
+                    active = false;
                 }
             } else {
                 // Otherwise look for the default value entry, and follow that.
                 if (values["!default"] !== undefined) {
                     if (!values["!default"]) {
-                        // Default says do not render
-                        return;
+                        active = false;;
                     }
                 } else {
-                    // Default was undefined, so do not render
-                    return;
+                    active = false;
                 }
             }
         }
     }
 
-    var button = new Element("input", {"type" : "submit","value" : action[ACTION_NAME]});
-    button.onclick = ajaxListLibrary.createDelegateWithParams(this, this.performAction, action);
-    this.display.appendChild(button);
+    var menuItem = new Element("div", {"style": "cursor: default; padding:4px;font-weight: bold;",
+        "onMouseover":"this.style.backgroundColor=AjaxListActionMenuSelected;",
+        "onMouseout" :"this.style.backgroundColor=AjaxListActionMenuColor;"})
+        .update(action[ACTION_NAME]);
+    if (active) {
+        menuItem.style.color = AjaxListActionMenuTextEnabledColor;
+        menuItem.onclick = ajaxListLibrary.createDelegateWithParams(this, this.performAction, action);
+    } else {
+        menuItem.style.color = AjaxListActionMenuTextDisabledColor;
+        menuItem.onclick = "return false;";
+    }
+    this.display.appendChild(menuItem);
 }
 
 
 AjaxListAction.prototype.render = function() {
     this.display = new Element("div");
-    this.display.style.backgroundColor = "white";
+    this.display.style.backgroundColor = AjaxListActionMenuColor;
     this.display.style.position = "absolute";
     this.display.style.left = this.x + "px";
     this.display.style.top = this.y + "px";
     this.display.style.order = "solid 1px";
-    this.display.style.margin = "3px";
-    this.display.style.padding = "3px";
+    this.display.style.margin = "0px";
+    this.display.style.padding = "5px";
     this.display.style.border = "solid 1px";
 
-    var table = new Element("table");
-    var tbody = new Element("tbody");
-
-    // Create the summary table in the pop-up
-    for (i = 0; i < this.columns.length; i++) {
-        var tr = new Element("tr");
-
-        var td = new Element("td");
-
-        if (this.columns[i][DESC_COL] !== undefined) {
-            var columnTitle = this.columns[i][DESC_COL];
-        } else {
-            var columnTitle = this.columns[i][ID_COL];
-        }
-
-        td.appendChild(document.createTextNode(columnTitle + ": "));
-        tr.appendChild(td);
-
-        td = new Element("td");
-        // Get the actual entry name
-        var column = this.columns[i];
-        var split = column[ID_COL].split(".", 2);
-        var contents = this.entry[split[0]][split[1]];
-
-        if (column[TYPE_COL] !== undefined) {
-            // Is this a map-type column? Should be translate it?
-            if (column[TYPE_COL] == "map") {
-                if (column[MAP_COL][contents] !== undefined) {
-                    contents = column[MAP_COL][contents];
-                } else {
-                    contents = "(unknown) " + contents;
-                }
-            } else if (column[TYPE_COL] == "hidden") {
-                // skip hidden columns
-                continue;
-            }
-        }
-
-
-        td.appendChild(document.createTextNode(contents));
-        tr.appendChild(td);
-
-        tbody.appendChild(tr);
-
-    }
-
-    table.appendChild(tbody);
-    this.display.appendChild(table);
-
-    // Create buttons for actions
+    // Create MenU Items for actions
     for (i = 0; i < this.actions.length; i++) {
         var action = this.actions[i];
         this.renderAction(action);
     }
 
-    var closeButton = new Element("input",{"type":"submit","value":"Close"});
-    closeButton.onclick = ajaxListLibrary.createDelegate(this, this.close);
-    this.display.appendChild(closeButton);
-
     document.body.appendChild(this.display);
+    var delegate = ajaxListLibrary.createDelegate(this, this.assignCloseDelegate);
+    window.setTimeout(delegate,10);
+}
+
+AjaxListAction.prototype.assignCloseDelegate = function() {
+    document.body.onclick = ajaxListLibrary.createDelegate(this, this.close);
+    document.body.oncontextmenu = ajaxListLibrary.createDelegate(this, this.close);
 }
 
 
