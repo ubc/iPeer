@@ -37,6 +37,7 @@ class EventsController extends AppController
 	var $NeatString;
 	var $Sanitize;
 	var $uses = array('Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Group', 'GroupEvent', 'Personalize', 'GroupsMembers');
+    var $components = array("AjaxList", "SysContainer");
 
 	function __construct()
 	{
@@ -49,7 +50,124 @@ class EventsController extends AppController
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
  		$this->pageTitle = 'Events';
 		parent::__construct();
-	}
+    }
+
+    // Post Process Data : add released column
+    function postProcessData($data) {
+        // Check the release dates, and match them up with present date
+        foreach ($data as $i => $entry) {
+            $releaseDate = strtotime($entry["Event"]["release_date_begin"]);
+            $endDate = strtotime($entry["Event"]["release_date_end"]);
+            $timeNow = strtotime($entry[0]["now()"]);
+
+            if (!$releaseDate) $releaseDate = 0;
+            if (!$endDate) $endDate = 0;
+
+            $isReleased = "";
+            if ($timeNow < $releaseDate) {
+                $isReleased = "Not Yep Open";
+            } else if ($timeNow > $endDate) {
+                $isReleased = "Already Closed";
+            } else {
+                $isReleased = "Open Now";
+            }
+
+            $entry['!Custom']['isReleased'] = $isReleased;
+
+            // Write the entry back
+            $data[$i] = $entry;
+        }
+
+        // Return the modified data
+        return $data;
+    }
+
+    function setUpAjaxList() {
+
+        // Grab the course list
+        $userCourseList = $this->SysContainer->getMyCourseList();
+        $courseList = array();
+        foreach ($userCourseList as $id => $course) {
+            $courseList[$id] = $course['course'];
+        }
+
+        // Set up Columns
+        $columns = array(
+            array("Event.id",             "ID",          "4em",  "number"),
+            array("Course.id",            "",            "",     "hidden"),
+            array("Course.course",        "Course",      "15em", "action", "View Course"),
+            array("Event.Title",          "Title",       "auto", "action", "View Event"),
+            array("Event.due_date",       "Due Date",    "12em", "date"),
+            array("!Custom.isReleased",    "Release Window", "12em", "string"),
+            array("Event.self_eval",       "Self Eval",   "6em", "map",
+                array("0" => "Disabled", "1" => "Enabled")),
+            array("Event.com_req",        "Comment",      "6em", "map",
+                array("0" => "Optional", "1" => "Required")),
+
+            // Release window
+            array("Event.release_date_begin", "", "",    "hidden"),
+            array("Event.release_date_end",   "", "",    "hidden"),
+            array("now()",           "",          "",    "hidden"));
+
+        // put all the joins together
+        $joinTables =  array( array (
+                // GUI aspects
+                "id" => "course_id",
+                "description" => "for Course:",
+                // The choise and default values
+                "list" => $courseList,
+                "default" => $this->rdAuth->courseId,
+                // What tables do we join?
+                "joinTable" => "courses",
+                "joinModel" => "Course",
+                "localKey" => "course_id"
+        ));
+
+        // For instructors: only list their own course events
+        $extraFilters = null;
+        if ($this->rdAuth->role != 'A') {
+            $extraFilters = "";
+            foreach ($courseList as $id => $course) {
+                $extraFilters .= "course_id=$id or ";
+            }
+            $extraFilters .= "1=0"; // just terminates the query
+        }
+        // Set up actions
+        $warning = "Are you sure you want to delete this event permanently?";
+        $actions = array(
+            array("View", "", "", "", "!view", "Event.id"),
+            array("Edit", "", "", "", "edit", "Event.id"),
+            array("Delete", $warning, "", "", "home", "Event.id"),
+            array("View Course", "", "", "courses", "view", "Course.id"),
+            array("View Groups", "", "", "", "!viewGroups", "Event.id"));
+
+        $recursive = 0;
+
+        $this->AjaxList->setUp($this->Event, $columns, $actions,
+            "Event.id", "Event.title", $joinTables, $extraFilters, $recursive, "postProcessData");
+    }
+
+    function newIndex($message='') {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set the top message
+        $this->set('message', $message);
+        // Set up the basic static ajax list variables
+        $this->setUpAjaxList();
+        // Set the display list
+        $this->set('paramsForList', $this->AjaxList->getParamsForList());
+    }
+
+    function ajaxList() {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set up the list
+        $this->setUpAjaxList();
+        // Process the request for data
+        $this->AjaxList->asyncGet();
+    }
+
+
 
   /**
    * Enter description here...
@@ -58,6 +176,7 @@ class EventsController extends AppController
    */
   function index ($msg=null)
   {
+    $this->newIndex();
     $courseId = $this->rdAuth->courseId;
 		$this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Events';
 

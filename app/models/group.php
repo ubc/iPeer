@@ -69,7 +69,12 @@ class Group extends AppModel
 
 		for( $i=0; $i<$count; $i++ ){
 			$tmp2 = $this->findBySql("SELECT users.id, users.role, users.username, users.first_name, users.last_name, users.student_no, users.title FROM users WHERE id=".$tmp[$i]['groups_members']['user_id']." ORDER BY users.last_name ASC");
-			$result[$i] = $tmp2[0];
+			if(!empty($tmp2[0])) {
+                $result[$i] = $tmp2[0];
+            } else {
+                $result[$i] = null;
+            }
+
 		}
 
 		//print_r($result);

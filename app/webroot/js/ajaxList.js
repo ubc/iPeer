@@ -7,6 +7,8 @@ var AjaxListActionMenuTextDisabledColor = "LightGrey";
 var AjaxListActionMenuColor = "LightYellow";
 var AjaxListActionMenuSelected = "LightBlue";
 
+var AjaxListActionNewWindowFeatures = "width=640, height=480";
+
 var iconURL = "img/icons/";
 
 // It's best to keep the following as multiples of the lowest page count,
@@ -383,8 +385,8 @@ AjaxList.prototype.renderSearchControl = function (div) {
         // Put all maps into the selections
         var column = this.columns[i];
 
-        // Should we show this column
-        if (column[TYPE_COL] !== undefined && column[TYPE_COL] == "hidden") {
+        // Should we show this search column
+        if ((column[ID_COL] && column[ID_COL][0]=='!') || column[TYPE_COL] !== undefined && column[TYPE_COL] == "hidden" || column[TYPE_COL] == "map") {
             // do not render hidden columns.
             continue;
         }
@@ -1039,8 +1041,8 @@ AjaxListAction.prototype.renderAction = function (action) {
     }
 
     var menuItem = new Element("div", {"style": "cursor: default; padding:4px;font-weight: bold;",
-        "onMouseover":"this.style.backgroundColor=AjaxListActionMenuSelected;",
-        "onMouseout" :"this.style.backgroundColor=AjaxListActionMenuColor;"})
+        "onMouseover": active ? "this.style.backgroundColor=AjaxListActionMenuSelected;" : "",
+        "onMouseout" : active ? "this.style.backgroundColor=AjaxListActionMenuColor;" : ""})
         .update(action[ACTION_NAME]);
     if (active) {
         menuItem.style.color = AjaxListActionMenuTextEnabledColor;
@@ -1089,11 +1091,20 @@ AjaxListAction.prototype.performAction = function(event, action) {
         }
     }
 
+    var newWindow = false;
+
     // Figure out the proper URL, starting with the controller
     var url = action[ACTION_CONTROLLER] ? action[ACTION_CONTROLLER] : this.controller;
 
+    // Combine the URL components
     for (j = ACTION_URL_PARTS_START; j < action.length; j++) {
         urlPart = action[j];
+
+        // a "!" in front of url action means open a new window
+        if (!newWindow && urlPart.length > 0 && urlPart[0] == '!') {
+            urlPart = urlPart.substr(1);
+            newWindow = true;
+        }
 
         var split = urlPart.split(".", 2);
         if ((split.length == 2) && (this.entry[split[0]][split[1]])) {
@@ -1108,5 +1119,11 @@ AjaxListAction.prototype.performAction = function(event, action) {
     }
 
     this.close();
-    window.location = this.root + url;
+    if (newWindow) {
+        var link = new Element("a");
+        window.open(this.root + url,"_blank", "width=640, height=480");
+    } else {
+        window.location = this.root + url;
+    }
+
 }

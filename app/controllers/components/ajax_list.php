@@ -21,6 +21,7 @@ class AjaxListComponent extends Object {
     var $customModelFindFunction = null;
     var $customModelCountFunction = null;
     var $recursive = 0;
+    var $postProcessFunction = null;
 
     // Initialize other componenets
     var $components = array('Session');
@@ -153,10 +154,14 @@ class AjaxListComponent extends Object {
             }
         }
 
-        // Add in any extra Filters
+        // Add in any extra Filters - by array or by string.
         if (!empty($this->extraFilters)) {
-            foreach ($this->extraFilters as $column => $value) {
-                $conditions .= "$column=$value and ";
+            if (is_array($this->extraFilters)) {
+                foreach ($this->extraFilters as $column => $value) {
+                    $conditions .= "$column=$value and ";
+                }
+            } else if (is_string($this->extraFilters)) {
+                $conditions .= "( " .  $this->extraFilters . " ) and ";
             }
         }
 
@@ -206,6 +211,11 @@ class AjaxListComponent extends Object {
         //  for it. However, in findCound, the group by must be absent.
         $data = $this->model->$customModelFindFunction($conditions . $groupBy,
                          $this->fields, $order, $limit, $page, $this->recursive, array($joinTable));
+
+        if (!empty($this->postProcessFunction)) {
+            $function = $this->postProcessFunction;
+            $data = $this->controller->$function($data);
+        }
 
         // Counts a a bit more difficult with grouped, joint tables.
         if (isset($customModelCountFunction)) {
@@ -319,6 +329,7 @@ class AjaxListComponent extends Object {
                     $joinFilters = null,
                     $extraFilters = null,
                     $recursive = 0,
+                    $postProcess = null,
                     $listName = null,
                     $customModelFindFunction = null,
                     $customModelCountFunction = null)
@@ -332,6 +343,7 @@ class AjaxListComponent extends Object {
         $this->sortBy = $sortBy;
         $this->searchBy = $searchBy;
         $this->recursive = $recursive;
+        $this->postProcessFunction = $postProcess;
 
         // Setup up the custom variables
         $this->customModelFindFunction = $customModelFindFunction;
@@ -340,7 +352,11 @@ class AjaxListComponent extends Object {
         // Generate the fields
         $this->fields = array();
         for ($i = 0; $i < sizeof($this->columns); $i++) {
-            array_push($this->fields, $columns[$i][0]);
+            $columnName = $this->columns[$i][0];
+            // Leave out emptry and "!"-flagged colums out of queries
+            if (!empty($columnName) && $columnName[0] != "!") {
+                array_push($this->fields, $columnName);
+            }
         }
 
         // If this list has a name, name it!
@@ -361,7 +377,6 @@ class AjaxListComponent extends Object {
             "joinFilters" => $this->joinFilters,
             "data"        => $this->getListByState());
     }
-
 }
 
 
