@@ -66,7 +66,7 @@
       </tr>
 
         <tr>
-          <td valign="top">
+          <td valign="top"><br />
             <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">
               <tr>
                 <td><?php echo $html->image('layout/corner_top_left.gif',array('align'=>'middle','alt'=>'left'))?></td>
@@ -75,23 +75,37 @@
             </table>
 		        <table width="100%"  border="0" cellspacing="0" cellpadding="2">
               <tr>
-                <td>
+                <td style="padding-bottom:0px">
              <?php
-              $submenu = 'Course.SubMenu.Student.Show';
-              $submenuTitle = 'Students';
-              $params = array('controller'=>'courses', 'userPersonalize'=>$userPersonalize, 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'courseId'=>$rdAuth->courseId);
-              echo $this->renderElement('courses/ajax_course_submenu', $params);
+                $submenu = 'Course.SubMenu.Student.Show';
+                $submenuTitle = 'Students';
+                $params = array('controller'=>'courses', 'userPersonalize'=>$userPersonalize,
+                    'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'courseId'=>$rdAuth->courseId);
+                echo $this->renderElement('courses/ajax_course_submenu', $params);
+            ?>
+            </td></tr>
+            <tr><td>
+            <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">
+              <tr>
+                <td><?php echo $html->image('layout/corner_bot_left.gif',array('align'=>'middle','alt'=>'left'))?></td>
+                <td align="right"><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'middle','alt'=>'right'))?></td>
+              </tr>
+            </table>
+            <br /><br /><br /></td></tr>
+             <tr><td >
+             <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5"><tr>
+                <td><?php echo $html->image('layout/corner_top_left.gif',array('align'=>'middle','alt'=>'left'))?></td>
+                <td align="right"><?php echo $html->image('layout/corner_top_right.gif',array('align'=>'middle','alt'=>'right'))?></td></tr>
+             </table>
 
+             </td></tr>
+             <tr><td>
+
+            <?php
               $submenu = 'Course.SubMenu.Group.Show';
               $submenuTitle = 'Groups';
               $params = array('controller'=>'courses', 'userPersonalize'=>$userPersonalize, 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'courseId'=>$rdAuth->courseId);
-              echo $this->renderElement('courses/ajax_course_submenu', $params);
-            if (!empty($access['SURVEY'])) {
-              $submenu = 'Course.SubMenu.TeamMaker.Show';
-              $submenuTitle = 'Surveys (Team Maker)';
-              $params = array('controller'=>'courses', 'userPersonalize'=>$userPersonalize, 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'courseId'=>$rdAuth->courseId);
-              echo $this->renderElement('courses/ajax_course_submenu', $params);
-            }  ?>
+              echo $this->renderElement('courses/ajax_course_submenu', $params);?>
                  </td>
                </tr>
             </table>
@@ -149,11 +163,34 @@
             $submenuTitle = 'Evaluation Events';
             $params = array('controller'=>'courses', 'userPersonalize'=>$userPersonalize, 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'courseId'=>$rdAuth->courseId);
             echo $this->renderElement('courses/ajax_course_submenu', $params);
+        ?>
 
-            $submenu = 'Course.SubMenu.EvalResults.Show';
-            $submenuTitle = 'Evaluation Results';
-            $params = array('controller'=>'courses', 'userPersonalize'=>$userPersonalize, 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'courseId'=>$rdAuth->courseId);
-            echo $this->renderElement('courses/ajax_course_submenu', $params); ?>
+            </td></tr>
+            <tr><td>
+            <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">
+              <tr>
+                <td><?php echo $html->image('layout/corner_bot_left.gif',array('align'=>'middle','alt'=>'left'))?></td>
+                <td align="right"><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'middle','alt'=>'right'))?></td>
+              </tr>
+            </table>
+            <br /></td></tr>
+             <tr><td >
+             <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5"><tr>
+                <td><?php echo $html->image('layout/corner_top_left.gif',array('align'=>'middle','alt'=>'left'))?></td>
+                <td align="right"><?php echo $html->image('layout/corner_top_right.gif',array('align'=>'middle','alt'=>'right'))?></td></tr>
+             </table>
+
+             </td></tr>
+             <tr><td>
+        <?php
+            if (!empty($access['SURVEY'])) {
+              $submenu = 'Course.SubMenu.TeamMaker.Show';
+              $submenuTitle = 'Surveys (Team Maker)';
+              $params = array('controller'=>'courses', 'userPersonalize'=>$userPersonalize, 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'courseId'=>$rdAuth->courseId);
+              echo $this->renderElement('courses/ajax_course_submenu', $params);
+            }
+            ?>
+
       		    </td>
             </tr>
           </table>

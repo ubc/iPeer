@@ -8,6 +8,8 @@
   <tr>
     <td bgcolor="#FFB66F">&nbsp;</td>
     <td class="tablecell"><A HREF="<?php echo $this->webroot.$this->themeWeb;?>evaluations/export/"><?php echo $html->image('layout/yellow_arrow.gif',array('align'=>'middle', 'border'=>'0', 'alt'=>'yellow_arrow'))?> &nbsp;Export Evaluation Results
-      </a></td>  </tr>
+    </a></td>
+
+    </tr>
 </table>
 <?php endif; ?>

@@ -158,7 +158,7 @@ class EventsController extends AppController
             "Event.id", "Event.title", $joinTables, $extraFilters, $recursive, "postProcessData");
     }
 
-    function newIndex($message='') {
+    function index($message='') {
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
         // Set the top message
@@ -180,46 +180,27 @@ class EventsController extends AppController
 
 
 
-  /**
-   * Enter description here...
-   *
-   * @return
-   */
-  function index ($msg=null)
-  {
-    $this->newIndex();
-    $courseId = $this->rdAuth->courseId;
-		$this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Events';
+    // Show a class list
+    function goToClassList($course) {
+        if (is_numeric($course)) {
+            $courses = $this->sysContainer->getMyCourseList();
+            if (!empty($courses[$course])) {
+                // We need to change the session state to point to this
+                // course:
+                // Initialize a basic non-funcional AjaxList
+                $this->AjaxList->quickSetUp();
+                // Clear the state first, we don't want any previous searches/selections.
+                $this->AjaxList->clearState();
+                // Set and update session state Variable
+                $joinFilterSelections->course_id = $course;
+                $this->AjaxList->setStateVariable("joinFilterSelections", $joinFilterSelections);
+            }
+        }
+        // Redirect to user list after state modifications (or in case of error)
+        $this->redirect("/events/index");
+    }
 
-  	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-    $this->userPersonalize->setPersonalizeList($personalizeData);
-  	if ($personalizeData && $this->userPersonalize->inPersonalizeList('Event.ListMenu.Limit.Show')) {
-       $this->show = $this->userPersonalize->getPersonalizeValue('Event.ListMenu.Limit.Show');
-       $this->set('userPersonalize', $this->userPersonalize);
-  	} else {
-  	  $this->show = '10';
-      $this->update($attributeCode = 'Event.ListMenu.Limit.Show',$attributeValue = $this->show);
-  	}
 
-    $conditions = 'course_id = '.$courseId;
-  	$data = $this->Event->findAll($conditions, '*, (NOW() >= release_date_begin AND NOW() <= release_date_end) AS is_released', $this->order, $this->show, $this->page);
-
-  	$paging['style'] = 'ajax';
-  	$paging['link'] = '/events/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
-
-  	$paging['count'] = $this->Event->findCount($conditions);
-  	$paging['show'] = array('10','25','50','all');
-  	$paging['page'] = $this->page;
-  	$paging['limit'] = $this->show;
-  	$paging['direction'] = $this->direction;
-
-  	$this->set('paging',$paging);
-  	$this->set('data',$data);
-  	$this->set('courseId', $courseId);
-  	if (isset($msg)) {
-  	 $this->set('message', $msg);
-  	}
-  }
 
   /**
    * Enter description here...

@@ -240,7 +240,7 @@ AjaxList.prototype.renderSelectionMaps = function (div) {
         var type = (column[TYPE_COL] !== undefined) ? column[TYPE_COL] : "string";
         // Is this a map? add it in!
         if (type == "map") {
-            div.appendChild(document.createTextNode(atLeastOneMapAdded ? ", and " : "Show "));
+            div.appendChild(document.createTextNode(atLeastOneMapAdded ? ", and " : "with "));
 
             // Does the state variable exist for this entry? if not, put it in
             if (this.state.mapFilterSelections[column[ID_COL]] === undefined) {
@@ -1121,7 +1121,7 @@ AjaxListAction.prototype.performAction = function(event, action) {
     this.close();
     if (newWindow) {
         var link = new Element("a");
-        window.open(this.root + url,"_blank", "width=640, height=480");
+        window.open(this.root + url,"_blank", "width=770,height=700,scrollbars=yes");
     } else {
         window.location = this.root + url;
     }
