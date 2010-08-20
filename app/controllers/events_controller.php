@@ -55,6 +55,8 @@ class EventsController extends AppController
     // Post Process Data : add released column
     function postProcessData($data) {
         // Check the release dates, and match them up with present date
+        if (empty($data)) $data;
+        // loop through each data point, and display it.
         foreach ($data as $i => $entry) {
             $releaseDate = strtotime($entry["Event"]["release_date_begin"]);
             $endDate = strtotime($entry["Event"]["release_date_end"]);
@@ -95,10 +97,12 @@ class EventsController extends AppController
         $columns = array(
             array("Event.id",             "ID",          "4em",  "number"),
             array("Course.id",            "",            "",     "hidden"),
-            array("Course.course",        "Course",      "15em", "action", "View Course"),
+            array("Course.course",        "Course",      "12em", "action", "View Course"),
             array("Event.Title",          "Title",       "auto", "action", "View Event"),
+            array("Event.event_template_type_id", "Type", "", "map",
+                array("1" => "Simple", "2" => "Rubric", "4" => "Mixed")),
             array("Event.due_date",       "Due Date",    "12em", "date"),
-            array("!Custom.isReleased",    "Release Window", "12em", "string"),
+            array("!Custom.isReleased",    "Release Window", "10em", "string"),
             array("Event.self_eval",       "Self Eval",   "6em", "map",
                 array("0" => "Disabled", "1" => "Enabled")),
             array("Event.com_req",        "Comment",      "6em", "map",
@@ -124,22 +128,29 @@ class EventsController extends AppController
         ));
 
         // For instructors: only list their own course events
-        $extraFilters = null;
+        $extraFilters = "";
         if ($this->rdAuth->role != 'A') {
-            $extraFilters = "";
+            $extraFilters = " ( ";
             foreach ($courseList as $id => $course) {
                 $extraFilters .= "course_id=$id or ";
             }
-            $extraFilters .= "1=0"; // just terminates the query
+            $extraFilters .= "1=0 ) "; // just terminates the or condition chain with "false"
         }
+
+        // Leave the survey types out, always
+        $extraFilters .= !empty($extraFilters) ? "and " : "";
+        $extraFilters .= "Event.event_template_type_id<>3";
+
+
         // Set up actions
         $warning = "Are you sure you want to delete this event permanently?";
         $actions = array(
-            array("View", "", "", "", "!view", "Event.id"),
-            array("Edit", "", "", "", "edit", "Event.id"),
-            array("Delete", $warning, "", "", "home", "Event.id"),
+            array("View Results", "", "", "evaluations", "view", "Event.id"),
+            array("View Event", "", "", "", "!view", "Event.id"),
+            array("Edit Event", "", "", "", "edit", "Event.id"),
             array("View Course", "", "", "courses", "view", "Course.id"),
-            array("View Groups", "", "", "", "!viewGroups", "Event.id"));
+            array("View Groups", "", "", "", "!viewGroups", "Event.id"),
+            array("Delete Event", $warning, "", "", "home", "Event.id"));
 
         $recursive = 0;
 
