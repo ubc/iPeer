@@ -117,6 +117,17 @@ AjaxListLibrary.prototype.contains = function (a, obj){
     return false;
 }
 
+// Set an objects opacity in a cross-browser sort of way.
+AjaxListLibrary.prototype.setOpacity = function (obj, value) {
+    if (Prototype.Browser.IE) {
+        // IE has a very interesting way of setting alpha
+        obj.style.filter = "alpha(opacity=" + (value*100) + ")";
+        obj.zoom = 1; // Required by ie for filters to work
+    } else {
+        // Other browsers has a more sane approach...
+        obj.style.opacity = value;
+    }
+}
 
 // Instantiate the library.
 var ajaxListLibrary = new AjaxListLibrary();
@@ -241,7 +252,7 @@ AjaxList.prototype.renderSelectionMaps = function (div) {
         var type = (column[TYPE_COL] !== undefined) ? column[TYPE_COL] : "string";
         // Is this a map? add it in!
         if (type == "map") {
-            div.appendChild(document.createTextNode(atLeastOneMapAdded ? ", and " : "with "));
+            div.appendChild(document.createTextNode(atLeastOneMapAdded ? ", and " : "Show "));
 
             // Does the state variable exist for this entry? if not, put it in
             if (this.state.mapFilterSelections[column[ID_COL]] === undefined) {
@@ -276,7 +287,7 @@ AjaxList.prototype.renderSelectionMaps = function (div) {
             }
             // Get the proper plural
             var text = column[DESC_COL];
-            text += (text.length > 1 && text[text.length - 1] == 's') ? "es" : "s";
+            text += (text.length > 1 && text.charAt(text.length - 1) == 's') ? "es" : "s";
 
             div.appendChild(document.createTextNode(" " + text));
             atLeastOneMapAdded = true;
@@ -920,6 +931,8 @@ AjaxList.prototype.updateFromServer = function(getState) {
         var parameters = {"json" : JSON.stringify(state), "fullPage" : fullPage};
         var url = this.webroot + this.controller + "/" + controllerAjaxListFunctionName;
 
+        ajaxListLibrary.setOpacity(this.table, 0.6);
+
         if (!fullPage) {
             this.ajaxObject = new Ajax.Request(url,
                 {
@@ -969,6 +982,7 @@ AjaxList.prototype.ajaxCallComplete = function (response) {
         this.renderHeader();
         this.renderTable();
         this.renderFooter(this.footer);
+        ajaxListLibrary.setOpacity(this.table, 1.0);
     }
 }
 
