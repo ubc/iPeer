@@ -11,6 +11,11 @@ var AjaxListActionMenuSelected = "LightBlue";
 var AjaxListActionNewWindowFeatures = "width=640, height=480";
 
 var iconURL = "img/icons/";
+var busyIconURL = "img/big-rotation.gif";
+
+var BusyImageYOffset = 380;
+var BusyImageXOffset = 70;
+
 
 // It's best to keep the following as multiples of the lowest page count,
 //  so that when the page-size-change Occurs, the
@@ -173,6 +178,7 @@ function AjaxList (parameterArray, whereToDisplay) {
     this.headerPageSizes = null;
     this.actionDisplay = null;
     this.searchBar = null;
+    this.busyImage = null;
 
 
     // There should always be data supplied by php in the HTML
@@ -199,6 +205,32 @@ function AjaxList (parameterArray, whereToDisplay) {
 AjaxList.prototype.getUpdateCookieName = function() {
     return "ajaxListLastUpdateTime" + "_" + this.controller;
 }
+
+// Renders the busy spinner in the middle of the talbe
+AjaxList.prototype.renderBusyImage = function() {
+    // Shut off image if already rendering
+    if (this.busyImage) {
+        this.stopBusyImage();
+    }
+    // Create a new image in the middle of the table.
+    this.busyImage = new Element("img");
+    this.busyImage.src = this.webroot + busyIconURL;
+    this.busyImage.style.position = "fixed";
+    this.busyImage.style.top = BusyImageYOffset + "px";
+    this.busyImage.style.left = (this.table.offsetWidth / 2) + BusyImageXOffset + "px" ;
+
+    // Add the image to the body of the page
+    document.body.appendChild(this.busyImage);
+}
+
+// Stops the busy image from rendering anymore
+AjaxList.prototype.stopBusyImage = function () {
+    if (this.busyImage) {
+        document.body.removeChild(this.busyImage);
+        this.busyImage = null;
+    }
+}
+
 
 // Renders the Search Tab, etc.
 AjaxList.prototype.renderHeader = function() {
@@ -931,7 +963,8 @@ AjaxList.prototype.updateFromServer = function(getState) {
         var parameters = {"json" : JSON.stringify(state), "fullPage" : fullPage};
         var url = this.webroot + this.controller + "/" + controllerAjaxListFunctionName;
 
-        ajaxListLibrary.setOpacity(this.table, 0.6);
+        ajaxListLibrary.setOpacity(this.table, 0.4);
+        this.renderBusyImage();
 
         if (!fullPage) {
             this.ajaxObject = new Ajax.Request(url,
@@ -982,8 +1015,11 @@ AjaxList.prototype.ajaxCallComplete = function (response) {
         this.renderHeader();
         this.renderTable();
         this.renderFooter(this.footer);
-        ajaxListLibrary.setOpacity(this.table, 1.0);
     }
+
+    //  Change the gui Components
+    this.stopBusyImage();
+    ajaxListLibrary.setOpacity(this.table, 1.0);
 }
 
 
