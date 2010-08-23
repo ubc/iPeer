@@ -4,6 +4,7 @@ var AjaxListActionOffsetX = -5;
 var AjaxListActionOffsetY = -5;
 var AjaxListActionMenuTextEnabledColor = "Black";
 var AjaxListActionMenuTextDisabledColor = "LightGrey";
+var AjaxListActionMenuTextSelectedColor = "Blue";
 var AjaxListActionMenuColor = "LightYellow";
 var AjaxListActionMenuSelected = "LightBlue";
 
@@ -386,7 +387,7 @@ AjaxList.prototype.renderSearchControl = function (div) {
         var column = this.columns[i];
 
         // Should we show this search column
-        if ((column[ID_COL] && column[ID_COL][0]=='!') || column[TYPE_COL] !== undefined && column[TYPE_COL] == "hidden" || column[TYPE_COL] == "map") {
+        if ((column[ID_COL] && column[ID_COL].charAt(0) =='!') || column[TYPE_COL] !== undefined && column[TYPE_COL] == "hidden" || column[TYPE_COL] == "map") {
             // do not render hidden columns.
             continue;
         }
@@ -627,7 +628,7 @@ AjaxList.prototype.renderTableHeaders = function (tbody) {
         th.noWrap = true;
 
         // Set up the sorting onclick handler, if this isn't a special "!"-flagged column
-        if (column[ID_COL] && column[ID_COL][0] != '!') {
+        if (column[ID_COL] && column[ID_COL].charAt(0) != '!') {
             th.onclick = ajaxListLibrary.createDelegateWithParams(
                 this, this.setSortingColumn, column[ID_COL]);
             th.style.cursor = "pointer";
@@ -1040,13 +1041,14 @@ AjaxListAction.prototype.renderAction = function (action) {
         }
     }
 
-    var menuItem = new Element("div", {"style": "cursor: default; padding:4px;font-weight: bold;",
-        "onMouseover": active ? "this.style.backgroundColor=AjaxListActionMenuSelected;" : "",
-        "onMouseout" : active ? "this.style.backgroundColor=AjaxListActionMenuColor;" : ""})
+    var menuItem = new Element("div", {"style": "cursor: default; padding:4px;font-weight: bold;"})
         .update(action[ACTION_NAME]);
     if (active) {
         menuItem.style.color = AjaxListActionMenuTextEnabledColor;
+        menuItem.onmouseover =  function() { this.style.backgroundColor=AjaxListActionMenuSelected;};
+        menuItem.onmouseout =   function() { this.style.backgroundColor=AjaxListActionMenuColor;};
         menuItem.onclick = ajaxListLibrary.createDelegateWithParams(this, this.performAction, action);
+
     } else {
         menuItem.style.color = AjaxListActionMenuTextDisabledColor;
         menuItem.onclick = "return false;";
@@ -1101,7 +1103,7 @@ AjaxListAction.prototype.performAction = function(event, action) {
         urlPart = action[j];
 
         // a "!" in front of url action means open a new window
-        if (!newWindow && urlPart.length > 0 && urlPart[0] == '!') {
+        if (!newWindow && urlPart.length > 0 && urlPart.charAt(0) == '!') {
             urlPart = urlPart.substr(1);
             newWindow = true;
         }
@@ -1125,5 +1127,4 @@ AjaxListAction.prototype.performAction = function(event, action) {
     } else {
         window.location = this.root + url;
     }
-
 }

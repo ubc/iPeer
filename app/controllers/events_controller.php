@@ -55,7 +55,7 @@ class EventsController extends AppController
     // Post Process Data : add released column
     function postProcessData($data) {
         // Check the release dates, and match them up with present date
-        if (empty($data)) $data;
+        if (empty($data)) return $data;
         // loop through each data point, and display it.
         foreach ($data as $i => $entry) {
             $releaseDate = strtotime($entry["Event"]["release_date_begin"]);
@@ -74,7 +74,12 @@ class EventsController extends AppController
                 $isReleased = "Open Now";
             }
 
+
+            // Set the is released string
             $entry['!Custom']['isReleased'] = $isReleased;
+
+            // Set the view results column
+            $entry['!Custom']['results'] = "Results";
 
             // Write the entry back
             $data[$i] = $entry;
@@ -99,6 +104,7 @@ class EventsController extends AppController
             array("Course.id",            "",            "",     "hidden"),
             array("Course.course",        "Course",      "12em", "action", "View Course"),
             array("Event.Title",          "Title",       "auto", "action", "View Event"),
+            array("!Custom.results",       "View",            "4em", "action", "View Results"),
             array("Event.event_template_type_id", "Type", "", "map",
                 array("1" => "Simple", "2" => "Rubric", "4" => "Mixed")),
             array("Event.due_date",       "Due Date",    "12em", "date"),
