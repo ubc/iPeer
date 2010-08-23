@@ -39,6 +39,8 @@ class SimpleevaluationsController extends AppController
 	var $NeatString;
 	var $Sanitize;
 	var $uses = array('SimpleEvaluation', 'Personalize');
+	var $components = array('AjaxList');
+
 //	var $components = array('EvaluationSimpleHelper');
 
 	function __construct()
@@ -57,42 +59,69 @@ class SimpleevaluationsController extends AppController
 		parent::__construct();
 	}
 
-	function index($msg=null)
-	{
 
-    $this->pageTitle = 'Evaluation Tools';
-    $this->mine_only = true;
+    function setUpAjaxList() {
+        // Set up Columns
+        $columns = array(
+            array("SimpleEvaluation.id",   "ID",          "4em",        "number"),
+            array("SimpleEvaluation.name", "Name",        "12em",       "action",   "View Evaluation"),
+            array("SimpleEvaluation.description", "Description", "auto",  "action", "View Evaluation"),
+            array("SimpleEvaluation.point_per_member", "Points/Member", "10em", "number"),
+            array("Creator.id",           "",            "",     "hidden"),
+            array("Creator.username",     "Creator",  "10em", "action", "View Creator"),
+            array("SimpleEvaluation.created", "Creation Date", "12em", "date"));
 
-    $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-    $this->userPersonalize->setPersonalizeList($personalizeData);
-  	if ($personalizeData && $this->userPersonalize->inPersonalizeList('SimpleEval.ListMenu.Limit.Show')) {
-       $this->show = $this->userPersonalize->getPersonalizeValue('SimpleEval.ListMenu.Limit.Show');
-       $this->set('userPersonalize', $this->userPersonalize);
-  	} else {
-  	  $this->show = '10';
-      $this->update($attributeCode = 'SimpleEval.ListMenu.Limit.Show',$attributeValue = $this->show);
-  	}
+        $userList = array($this->rdAuth->id => "My Evaluations");
+
+        // Join with Users
+        $jointTableCreator =
+            array("id"         => "Creator.id",
+                  "localKey"   => "creator_id",
+                  "description" => "Evaluations to show:",
+                  "default" => $this->rdAuth->id,
+                  "list" => $userList,
+                  "joinTable"  => "users",
+                  "joinModel"  => "Creator");
+        // put all the joins together
+        $joinTables = array($jointTableCreator);
+
+        // For instructors: only list their own courses
+        $extraFilters = "";
+
+        // Set up actions
+        $warning = "Are you sure you want to delete this evaluation permanently?";
+        $actions = array(
+            array("View Evaluation", "", "", "", "view", "SimpleEvaluation.id"),
+            array("Edit Evaluation", "", "", "", "edit", "SimpleEvaluation.id"),
+            array("Copy Evaluation", "", "", "", "copy", "SimpleEvaluation.id"),
+            array("Delete Evaluation", $warning, "", "", "delete", "SimpleEvaluation.id"),
+            array("View Creator", "",    "", "users", "view", "Creator.id"));
+        $recursive = 0;
+
+        $this->AjaxList->setUp($this->SimpleEvaluation, $columns, $actions,
+            "SimpleEvaluation.id", "SimpleEvaluation.name", $joinTables, $extraFilters, $recursive);
+    }
 
 
-  	$conditions = 'creator_id = '.$this->rdAuth->id;
-  	$data = $this->SimpleEvaluation->findAll($conditions, $fields=null, $this->order, $this->show, $this->page);
+    function index($message='') {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set the top message
+        $this->set('message', $message);
+        // Set up the basic static ajax list variables
+        $this->setUpAjaxList();
+        // Set the display list
+        $this->set('paramsForList', $this->AjaxList->getParamsForList());
+    }
 
-  	$paging['style'] = 'ajax';
-  	$paging['link'] = '/simpleevaluations/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&show_my_tool='.$this->mine_only.'&page=';
-
-  	$paging['count'] = $this->SimpleEvaluation->findCount($conditions);
-  	$paging['show'] = array('10','25','50','all');
-  	$paging['page'] = $this->page;
-  	$paging['limit'] = $this->show;
-  	$paging['direction'] = $this->direction;
-    $paging['result_count'] = count($data);
-
-  	$this->set('paging',$paging);
-  	$this->set('data',$data);
-  	if (isset($msg)) {
-  	 $this->set('message', $msg);
-  	}
-	}
+    function ajaxList() {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set up the list
+        $this->setUpAjaxList();
+        // Process the request for data
+        $this->AjaxList->asyncGet();
+    }
 
 	function view($id='', $layout='')
 	{
@@ -169,63 +198,14 @@ class SimpleevaluationsController extends AppController
         $this->render('add');
 	}
 
-	function delete($id)
-	{
-    if (isset($this->params['form']['id']))
-    {
-      $id = intval(substr($this->params['form']['id'], 5));
-    }   //end if
-    if ($this->SimpleEvaluation->del($id)) {
-
+	function delete($id) {
+        if (isset($this->params['form']['id'])) {
+            $id = intval(substr($this->params['form']['id'], 5));
+        }   //end if
+        if ($this->SimpleEvaluation->del($id)) {
 			$this->redirect('/simpleevaluations/index/The record is deleted successfully.');
-    }
+        }
 	}
-
-  function search()
-  {
-      $this->layout = 'ajax';
-      if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-      	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-      	if ($personalizeData) {
-      	   $this->userPersonalize->setPersonalizeList($personalizeData);
-           $this->show = $this->userPersonalize->getPersonalizeValue('SimpleEval.ListMenu.Limit.Show');
-           $this->set('userPersonalize', $this->userPersonalize);
-      	}
-      }
-      $conditions = '';
-      if ($this->mine_only){
-        $conditions .= 'creator_id = '.$this->rdAuth->id;
-      }
-
-      if (!empty($this->params['form']['livesearch']) && !empty($this->params['form']['select'])){
-        $pagination->loadingId = 'loading';
-        //parse the parameters
-        $searchField=$this->params['form']['select'];
-        $searchValue=$this->params['form']['livesearch'];
-
-        (empty($conditions))? $conditions = '' : $conditions .= ' AND ';
-        $conditions .= $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
-      }
-
-      $this->update($attributeCode = 'SimpleEval.ListMenu.Limit.Show',$attributeValue = $this->show);
-      $this->set('conditions',$conditions);
-
-      $data = $this->SimpleEvaluation->findAll($conditions, $fields=null, $this->order, $this->show, $this->page);
-
-      $paging['style'] = 'ajax';
-      $paging['link'] = '/simpleevaluations/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&show_my_tool='.$this->mine_only.'&page=';
-
-      $paging['count'] = $this->SimpleEvaluation->findCount($conditions);
-      $paging['show'] = array('10','25','50','all');
-      $paging['page'] = $this->page;
-      $paging['limit'] = $this->show;
-      $paging['direction'] = $this->direction;
-      $paging['mine'] = $this->mine_only;
-      $paging['result_count'] = count($data);
-
-      $this->set('paging', $paging);
-      $this->set('data', $data);
-  }
 
   function checkDuplicateTitle()
   {

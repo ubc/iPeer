@@ -185,11 +185,6 @@ class UsersController extends AppController
         if (!is_numeric($id)) {
             $this->rdAuth->privilegeError();
         }
-            // Make sure that the privileges of the asking user is at least as high
-            //  as the privileges of the user being viewed.
-        if ($this->rdAuth->getPrivilegeLevel() < $this->rdAuth->getPrivilegeLevel($id)) {
-            $this->rdAuth->privilegeError();
-        }
 
         $this->set("userId", $id);
         // All okay, proceed to render.

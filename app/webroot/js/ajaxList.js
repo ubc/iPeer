@@ -1115,25 +1115,29 @@ AjaxListAction.prototype.renderAction = function (action) {
 
 
 AjaxListAction.prototype.render = function() {
-    this.display = new Element("div");
-    this.display.style.backgroundColor = AjaxListActionMenuColor;
-    this.display.style.position = "absolute";
-    this.display.style.left = this.x + "px";
-    this.display.style.top = this.y + "px";
-    this.display.style.order = "solid 1px";
-    this.display.style.margin = "0px";
-    this.display.style.padding = "5px";
-    this.display.style.border = "solid 1px";
+    if (this.actions.length>0) {
+        this.display = new Element("div");
+        this.display.style.backgroundColor = AjaxListActionMenuColor;
+        this.display.style.position = "absolute";
+        this.display.style.left = this.x + "px";
+        this.display.style.top = this.y + "px";
+        this.display.style.order = "solid 1px";
+        this.display.style.margin = "0px";
+        this.display.style.padding = "5px";
+        this.display.style.border = "solid 1px";
 
-    // Create MenU Items for actions
-    for (i = 0; i < this.actions.length; i++) {
-        var action = this.actions[i];
-        this.renderAction(action);
+        // Create MenU Items for actions
+        for (i = 0; i < this.actions.length; i++) {
+            var action = this.actions[i];
+            this.renderAction(action);
+        }
+
+        document.body.appendChild(this.display);
+
+
+        var delegate = ajaxListLibrary.createDelegate(this, this.assignCloseDelegate);
+        window.setTimeout(delegate,10);
     }
-
-    document.body.appendChild(this.display);
-    var delegate = ajaxListLibrary.createDelegate(this, this.assignCloseDelegate);
-    window.setTimeout(delegate,10);
 }
 
 AjaxListAction.prototype.assignCloseDelegate = function() {
