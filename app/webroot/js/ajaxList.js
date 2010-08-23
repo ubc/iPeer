@@ -215,8 +215,15 @@ AjaxList.prototype.renderBusyImage = function() {
     // Create a new image in the middle of the table.
     this.busyImage = new Element("img");
     this.busyImage.src = this.webroot + busyIconURL;
-    this.busyImage.style.position = "fixed";
-    this.busyImage.style.top = BusyImageYOffset + "px";
+    if (!isIE6) {
+        this.busyImage.style.position = "fixed";
+        this.busyImage.style.top = BusyImageYOffset + "px"
+    } else {
+        this.busyImage.style.position = "absolute";
+        this.busyImage.style.bottom = 0;
+        this.busyImage.style.top = BusyImageYOffset +
+            (document.documentElement.scrollTop  || document.body.scrollTop) + "px"
+    };
     this.busyImage.style.left = (this.table.offsetWidth / 2) + BusyImageXOffset + "px" ;
 
     // Add the image to the body of the page
@@ -963,7 +970,7 @@ AjaxList.prototype.updateFromServer = function(getState) {
         var parameters = {"json" : JSON.stringify(state), "fullPage" : fullPage};
         var url = this.webroot + this.controller + "/" + controllerAjaxListFunctionName;
 
-        ajaxListLibrary.setOpacity(this.table, 0.4);
+        ajaxListLibrary.setOpacity(this.table, 0.75);
         this.renderBusyImage();
 
         if (!fullPage) {
