@@ -49,6 +49,11 @@ var ACTION_RESTRICTIONS = 2;
 var ACTION_CONTROLLER = 3;
 var ACTION_URL_PARTS_START = 4;
 
+var ListUsage =  "Note: Right-click on any list entry to bring up the action menu. ";
+    ListUsage += "Left-clicking on an entry's orange link takes you to another iPeer page, ";
+    ListUsage += "and clicking an entry anywhere else brings up the menu as well ";
+    ListUsage += "(usefull for Macs and iPads).";
+
 // Small Helper function library class
 function AjaxListLibrary () {
 }
@@ -196,6 +201,7 @@ function AjaxList (parameterArray, whereToDisplay) {
         this.renderHeader();
         this.renderTable();
         this.renderFooter(this.footer);
+        this.renderUsage(this.display);
     } else {
         this.updateFromServer(false);
     }
@@ -268,6 +274,14 @@ AjaxList.prototype.renderHeader = function() {
     table.appendChild(tbody);
     this.header.appendChild(table);
 }
+
+AjaxList.prototype.renderUsage = function (div) {
+    var textBox = new Element("div", {"style":
+    "text-align:left;color:dimgray"}).update(ListUsage);
+    div.appendChild(new Element("br"));
+    div.appendChild(textBox);
+}
+
 
 // Create a handler for the map Selectors
 AjaxList.prototype.createDelegateForSelectionMap = function (thisObject, thisColumn)
@@ -455,7 +469,8 @@ AjaxList.prototype.renderSearchControl = function (div) {
 
     div.appendChild(document.createTextNode(" contains: "));
 
-    var input = new Element("input", {"type" : "text", "size" : 20, "value" : this.state.searchValue});
+    var input = new Element("input", {"type" : "text", "size" : 15, "value" : this.state.searchValue,
+        "style":"text-align:center"});
     input.id = "searchInputField";
     var thisObject = this;
     input.onkeyup = function() {  thisObject.changeSearchValue(this.value); }

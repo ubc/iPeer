@@ -36,7 +36,7 @@ class RubricsController extends AppController
 	var $order;
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $Sanitize;
-  var $components = array('rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework', 'RubricHelper');
+    var $components = array('AjaxList','rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework', 'RubricHelper');
 
 	function __construct()
 	{
@@ -52,37 +52,104 @@ class RubricsController extends AppController
     parent::__construct();
 	}
 
-	function index($msg='') 
-  {
-    $this->mine_only = true;
-	  $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-    $this->userPersonalize->setPersonalizeList($personalizeData);
-  	if ($personalizeData && $this->userPersonalize->inPersonalizeList('Rubric.ListMenu.Limit.Show')) {
-       $this->show = $this->userPersonalize->getPersonalizeValue('Rubric.ListMenu.Limit.Show');
-       $this->set('userPersonalize', $this->userPersonalize);
-  	} else {
-  	  $this->show = '10';
-      $this->update($attributeCode = 'Rubric.ListMenu.Limit.Show',$attributeValue = $this->show);
-  	}
 
-    $conditions = 'creator_id = '.$this->rdAuth->id;
-		$data = $this->Rubric->findAll($conditions, $fields=null, $this->order, $this->show, $this->page);
+    function postProcess($data) {
 
-		$paging['style'] = 'ajax';
-		$paging['link'] = '/rubrics/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&show_my_tool='.$this->mine_only.'&page=';
+        // Creates the custom in use column
+        if ($data) {
+            foreach ($data as $key => $entry) {
+                // is it in use?
+                $inUse = $this->Event->checkEvaluationToolInUse('2',$entry['Rubric']['id']) ;
 
-		$paging['count'] = $this->Rubric->findCount($conditions);
-		$paging['show'] = array('10','25','50','all');
-		$paging['page'] = $this->page;
-		$paging['limit'] = $this->show;
-		$paging['direction'] = $this->direction;
-    $paging['result_count'] = count($data);
+                // Put in the custom column
+                $data[$key]['!Custom']['inUse'] = $inUse ? "Yes" : "No";
+            }
+        }
+        // Return the processed data back
+        return $data;
+    }
 
-		$this->set('paging',$paging);
-		$this->set('data',$data);
-		$this->set('message',$msg);
-		$this->set('event', $this->Event);
-	}
+
+    function setUpAjaxList() {
+        // Set up Columns
+        $columns = array(
+            array("Rubric.id",   "ID",          "4em",        "number"),
+            array("Rubric.name", "Name",        "auto",       "action",   "View Evaluation"),
+            array("!Custom.inUse", "In Use", "4em",           "number"),
+            array("Rubric.availability", "Availability", "6em",  "string"),
+            array("Rubric.lom_max", "LOM", "4em",           "number"),
+            array("Rubric.criteria", "Criteria", "4em",     "number"),
+            array("Rubric.total_marks", "Total", "4em",     "number"),
+            array("Creator.id",           "",            "",     "hidden"),
+            array("Creator.username",     "Creator",  "8em", "action", "View Creator"),
+            array("Rubric.created", "Creation Date", "12em", "date"));
+
+        // Just list all and my evaluations for selections
+        $userList = array($this->rdAuth->id => "My Evaluations");
+
+        // Join with Users
+        $jointTableCreator =
+            array("id"         => "Creator.id",
+                  "localKey"   => "creator_id",
+                  "description" => "Evaluations to show:",
+                  "default" => $this->rdAuth->id,
+                  "list" => $userList,
+                  "joinTable"  => "users",
+                  "joinModel"  => "Creator");
+        // put all the joins together
+        $joinTables = array($jointTableCreator);
+
+        // List only my own or
+        $myID = $this->rdAuth->id;
+        $extraFilters = "(Creator.id=$myID or Rubric.availability='public')";
+
+        // Instructors can only edit their own evaluations
+        $restrictions = "";
+        if ($this->rdAuth->role != 'A') {
+            $restrictions = array(
+                "Creator.id" => array(
+                    $myID => true,
+                    "!default" => false));
+        }
+
+        // Set up actions
+        $warning = "Are you sure you want to delete this evaluation permanently?";
+        $actions = array(
+            array("View Evaluation", "", "", "", "view", "Rubric.id"),
+            array("Edit Evaluation", "", $restrictions, "", "edit", "Rubric.id"),
+            array("Copy Evaluation", "", "", "", "copy", "Rubric.id"),
+            array("Delete Evaluation", $warning, $restrictions, "", "delete", "Rubric.id"),
+            array("View Creator", "",    "", "users", "view", "Creator.id"));
+
+        // No recursion in results
+        $recursive = 0;
+
+        // Set up the list itself
+        $this->AjaxList->setUp($this->Rubric, $columns, $actions,
+            "Rubric.id", "Rubric.name", $joinTables, $extraFilters, $recursive, "postProcess");
+    }
+
+
+    function index($message='') {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set the top message
+        $this->set('message', $message);
+        // Set up the basic static ajax list variables
+        $this->setUpAjaxList();
+        // Set the display list
+        $this->set('paramsForList', $this->AjaxList->getParamsForList());
+    }
+
+    function ajaxList() {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set up the list
+        $this->setUpAjaxList();
+        // Process the request for data
+        $this->AjaxList->asyncGet();
+    }
+
 
 	function view($id='', $layout='')
 	{
@@ -177,7 +244,10 @@ class RubricsController extends AppController
 
 	function delete($id)
 	{
-		if ($this->Rubric->del($id))
+		if ($this->Rubric->del($id))        // No recursion in results
+        $recursive = 0;
+
+        // Set up the list itself
 		{
 			$this->RubricsLom->deleteLOM($id);
 			$this->RubricsCriteria->deleteCriterias($id);
@@ -188,54 +258,6 @@ class RubricsController extends AppController
 			$this->render('index');
 		}
 	}
-
-  function search()
-  {
-    $this->layout = 'ajax';
-    $pagination->loadingId = 'loading';
-
-    if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-      $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-      if ($personalizeData) {
-        $this->userPersonalize->setPersonalizeList($personalizeData);
-        $this->show = $this->userPersonalize->getPersonalizeValue('Rubric.ListMenu.Limit.Show');
-        $this->set('userPersonalize', $this->userPersonalize);
-      }
-    }
-
-    $conditions = '';
-    if ($this->mine_only){
-      $conditions .= 'creator_id = '.$this->rdAuth->id;
-    } else if ('A' != $this->rdAuth->role){
-      $conditions .= ' (creator_id = '.$this->rdAuth->id. ' OR availability = "public" ) ';
-    }
-
-    if (!empty($this->params['form']['livesearch']) && !empty($this->params['form']['select'])){
-      $pagination->loadingId = 'loading';
-      //parse the parameters
-      $searchField=$this->params['form']['select'];
-      $searchValue=$this->params['form']['livesearch'];
-      (empty($conditions))? $conditions = '' : $conditions .= ' AND ';
-      $conditions .= $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
-    }
-    $this->update($attributeCode = 'Rubric.ListMenu.Limit.Show',$attributeValue = $this->show);
-
-    $data = $this->Rubric->findAll($conditions, $fields=null, $this->order, $this->show, $this->page);
-
-    $paging['style'] = 'ajax';
-    $paging['link'] = '/rubrics/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&show_my_tool='.$this->mine_only.'&page=';
-
-    $paging['count'] = $this->Rubric->findCount($conditions);
-    $paging['show'] = array('10','25','50','all');
-    $paging['page'] = $this->page;
-    $paging['limit'] = $this->show;
-    $paging['direction'] = $this->direction;
-    $paging['mine'] = $this->mine_only;
-    $paging['result_count'] = count($data);
-
-    $this->set('paging', $paging);
-    $this->set('data', $data);
-  }
 
   function previewRubric()
   {

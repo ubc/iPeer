@@ -161,37 +161,32 @@ class Event extends AppModel
 		return $data;
 	}
 
-  function getCourseEvent($courseId=null)
-  {
-     return $this->findAll('course_id ='.$courseId);
-  }
+    function getCourseEvent($courseId=null)
+    {
+        return $this->findAll('course_id ='.$courseId);
+    }
 
-  function getCourseEvalEvent($courseId=null) {
-    return $this->findAll('course_id='.$courseId.' AND event_template_type_id!=3');
-  }
+    function getCourseEvalEvent($courseId=null) {
+        return $this->findAll('course_id='.$courseId.' AND event_template_type_id!=3');
+    }
 
-  function getCourseEventCount($courseId=null) {
-    return $this->find('course_id='.$courseId, 'COUNT(DISTINCT id) as total');
-  }
+    function getCourseEventCount($courseId=null) {
+        return $this->find('course_id='.$courseId, 'COUNT(DISTINCT id) as total');
+    }
 
-  function getSurveyEventIdByCourseIdDescription($courseId=null,$title=null) {
-    return $this->find('course_id='.$courseId.' AND title=\''.$title.'\' AND event_template_type_id=3','id');
-  }
+    function getSurveyEventIdByCourseIdDescription($courseId=null,$title=null) {
+        return $this->find('course_id='.$courseId.' AND title=\''.$title.'\' AND event_template_type_id=3','id');
+    }
 
-  function getActiveSurveyEvents($courseId=null) {
-    return $this->findAll('course_id='.$courseId.' AND event_template_type_id=3');
-  }
+    function getActiveSurveyEvents($courseId=null) {
+        return $this->findAll('course_id='.$courseId.' AND event_template_type_id=3');
+    }
 
-	function checkEvaluationToolInUse($evalTool=null, $templateId=null)
-	{
-		 $event = $this->find('event_template_type_id = '.$evalTool.' AND template_id = '.$templateId);
-		 if (empty($event)) {
-		    return false;
-		  }else {
-
-		  return true;
-		  }
-	}
+    function checkEvaluationToolInUse($evalTool=null, $templateId=null)
+    {
+        $event = $this->find('event_template_type_id = '.$evalTool.' AND template_id = '.$templateId);
+        return !empty($event);
+    }
 
   //TODO: unfinished function
   function cascadeRemove($id)
@@ -221,7 +216,7 @@ class Event extends AppModel
 
     	if(!empty($emds))
     	{
-	    	foreach($emds as $emd) 
+	    	foreach($emds as $emd)
 	      		$emd->delete();
 		}
     	$em->delete();

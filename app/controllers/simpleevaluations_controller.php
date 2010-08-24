@@ -38,7 +38,7 @@ class SimpleevaluationsController extends AppController
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $NeatString;
 	var $Sanitize;
-	var $uses = array('SimpleEvaluation', 'Personalize');
+	var $uses = array('SimpleEvaluation', 'Event', 'Personalize');
 	var $components = array('AjaxList');
 
 //	var $components = array('EvaluationSimpleHelper');
@@ -59,47 +59,76 @@ class SimpleevaluationsController extends AppController
 		parent::__construct();
 	}
 
+    function postProcess($data) {
+
+        // Creates the custom in use column
+        if ($data) {
+            foreach ($data as $key => $entry) {
+                // is it in use?
+                $inUse = $this->Event->checkEvaluationToolInUse('1', $entry['SimpleEvaluation']['id']) ;
+
+                // Put in the custom column
+                $data[$key]['!Custom']['inUse'] = $inUse ? "Yes" : "No";
+            }
+        }
+        // Return the processed data back
+        return $data;
+    }
 
     function setUpAjaxList() {
+        $myID = $this->rdAuth->id;
+
         // Set up Columns
         $columns = array(
             array("SimpleEvaluation.id",   "ID",          "4em",        "number"),
             array("SimpleEvaluation.name", "Name",        "12em",       "action",   "View Evaluation"),
             array("SimpleEvaluation.description", "Description", "auto",  "action", "View Evaluation"),
+            array("!Custom.inUse", "In Use", "4em",           "number"),
             array("SimpleEvaluation.point_per_member", "Points/Member", "10em", "number"),
             array("Creator.id",           "",            "",     "hidden"),
             array("Creator.username",     "Creator",  "10em", "action", "View Creator"),
             array("SimpleEvaluation.created", "Creation Date", "12em", "date"));
 
-        $userList = array($this->rdAuth->id => "My Evaluations");
+        $userList = array($myID => "My Evaluations");
 
         // Join with Users
         $jointTableCreator =
             array("id"         => "Creator.id",
                   "localKey"   => "creator_id",
                   "description" => "Evaluations to show:",
-                  "default" => $this->rdAuth->id,
+                  "default" => $myID,
                   "list" => $userList,
                   "joinTable"  => "users",
                   "joinModel"  => "Creator");
         // put all the joins together
         $joinTables = array($jointTableCreator);
 
-        // For instructors: only list their own courses
         $extraFilters = "";
+
+        // Instructors can only edit their own evaluations
+        $restrictions = "";
+        if ($this->rdAuth->role != 'A') {
+            $restrictions = array(
+                "Creator.id" => array(
+                    $myID => true,
+                    "!default" => false));
+        }
 
         // Set up actions
         $warning = "Are you sure you want to delete this evaluation permanently?";
         $actions = array(
             array("View Evaluation", "", "", "", "view", "SimpleEvaluation.id"),
-            array("Edit Evaluation", "", "", "", "edit", "SimpleEvaluation.id"),
+            array("Edit Evaluation", "", $restrictions, "", "edit", "SimpleEvaluation.id"),
             array("Copy Evaluation", "", "", "", "copy", "SimpleEvaluation.id"),
-            array("Delete Evaluation", $warning, "", "", "delete", "SimpleEvaluation.id"),
+            array("Delete Evaluation", $warning, $restrictions, "", "delete", "SimpleEvaluation.id"),
             array("View Creator", "",    "", "users", "view", "Creator.id"));
+
+        // No recursion in results
         $recursive = 0;
 
+        // Set up the list itself
         $this->AjaxList->setUp($this->SimpleEvaluation, $columns, $actions,
-            "SimpleEvaluation.id", "SimpleEvaluation.name", $joinTables, $extraFilters, $recursive);
+            "SimpleEvaluation.id", "SimpleEvaluation.name", $joinTables, $extraFilters, $recursive, "postProcess");
     }
 
 
