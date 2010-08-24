@@ -59,7 +59,7 @@ class RubricsController extends AppController
         if ($data) {
             foreach ($data as $key => $entry) {
                 // is it in use?
-                $inUse = $this->Event->checkEvaluationToolInUse('2',$entry['Rubric']['id']) ;
+                $inUse = $this->Event->checkEvaluationToolInUse('4',$entry['Rubric']['id']) ;
 
                 // Put in the custom column
                 $data[$key]['!Custom']['inUse'] = $inUse ? "Yes" : "No";
@@ -73,16 +73,17 @@ class RubricsController extends AppController
     function setUpAjaxList() {
         // Set up Columns
         $columns = array(
-            array("Rubric.id",   "ID",          "4em",        "number"),
-            array("Rubric.name", "Name",        "auto",       "action",   "View Evaluation"),
-            array("!Custom.inUse", "In Use", "4em",           "number"),
-            array("Rubric.availability", "Availability", "6em",  "string"),
-            array("Rubric.lom_max", "LOM", "4em",           "number"),
-            array("Rubric.criteria", "Criteria", "4em",     "number"),
-            array("Rubric.total_marks", "Total", "4em",     "number"),
-            array("Creator.id",           "",            "",     "hidden"),
-            array("Creator.username",     "Creator",  "8em", "action", "View Creator"),
-            array("Rubric.created", "Creation Date", "12em", "date"));
+            array("Rubric.id",          "ID",          "4em",   "number"),
+            array("Rubric.name",        "Name",        "auto",  "action",
+                "View Evaluation"),
+            array("!Custom.inUse",      "In Use",      "4em",   "number"),
+            array("Rubric.availability","Availability","6em",   "string"),
+            array("Rubric.criteria",    "Criteria",    "4em",   "number"),
+            array("Rubric.total_marks", "Total",       "4em",   "number"),
+            array("Creator.id",         "",            "",      "hidden"),
+            array("Creator.username",   "Creator",     "8em",   "action",
+                "View Creator"),
+            array("Rubric.created",     "Creation Date","12em", "date"));
 
         // Just list all and my evaluations for selections
         $userList = array($this->rdAuth->id => "My Evaluations");

@@ -36,53 +36,124 @@ class MixevalsController extends AppController
 	var $order;
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $Sanitize;
-	var $components = array('rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework', 'MixevalHelper');
+	var $components = array('AjaxList','rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework', 'MixevalHelper');
 
-	function __construct()
-	{
-		$this->Sanitize = new Sanitize;
-		$this->show = empty($_REQUEST['show'])? 'null': $this->Sanitize->paranoid($_REQUEST['show']);
-		if ($this->show == 'all') $this->show = 99999999;
-		$this->sortBy = empty($_GET['sort'])? 'name': $_GET['sort'];
-		$this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
-		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
-		$this->order = $this->sortBy.' '.strtoupper($this->direction);
- 		$this->pageTitle = 'Mixed Evaluations';
-    $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
-		parent::__construct();
-	}
 
-	function index($msg='') {
-    $this->mine_only = true;
+    function __construct()
+    {
+        $this->Sanitize = new Sanitize;
+        $this->show = empty($_REQUEST['show'])? 'null': $this->Sanitize->paranoid($_REQUEST['show']);
+        if ($this->show == 'all') $this->show = 99999999;
+        $this->sortBy = empty($_GET['sort'])? 'name': $_GET['sort'];
+        $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
+        $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
+        $this->order = $this->sortBy.' '.strtoupper($this->direction);
+        $this->pageTitle = 'Mixed Evaluations';
+        $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
+        parent::__construct();
+    }
 
-	  $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-    $this->userPersonalize->setPersonalizeList($personalizeData);
-  	if ($personalizeData && $this->userPersonalize->inPersonalizeList('Mixeval.ListMenu.Limit.Show')) {
-       $this->show = $this->userPersonalize->getPersonalizeValue('Mixeval.ListMenu.Limit.Show');
-       $this->set('userPersonalize', $this->userPersonalize);
-  	} else {
-  	  $this->show = '10';
-      $this->update($attributeCode = 'Mixeval.ListMenu.Limit.Show',$attributeValue = $this->show);
-  	}
 
-    $conditions = 'creator_id = '.$this->rdAuth->id;
-		$data = $this->Mixeval->findAll($conditions, $fields=null, $this->order, $this->show, $this->page);
+    function postProcess($data) {
 
-		$paging['style'] = 'ajax';
-		$paging['link'] = '/mixevals/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&show_my_tool='.$this->mine_only.'&page=';
+        // Creates the custom in use column
+        if ($data) {
+            foreach ($data as $key => $entry) {
+                // is it in use?
+                $inUse = $this->Event->checkEvaluationToolInUse('4',$entry['Mixeval']['id']) ;
 
-		$paging['count'] = $this->Mixeval->findCount($conditions);
-		$paging['show'] = array('10','25','50','all');
-		$paging['page'] = $this->page;
-		$paging['limit'] = $this->show;
-		$paging['direction'] = $this->direction;
-    $paging['result_count'] = count($data);
+                // Put in the custom column
+                $data[$key]['!Custom']['inUse'] = $inUse ? "Yes" : "No";
+            }
+        }
+        // Return the processed data back
+        return $data;
+    }
 
-		$this->set('paging',$paging);
-		$this->set('data',$data);
-		$this->set('message',$msg);
-		$this->set('event', $this->Event);
-	}
+
+    function setUpAjaxList() {
+        // Set up Columns
+        $columns = array(
+            array("Mixeval.id",             "ID",          "4em",  "number"),
+            array("Mixeval.name",          "Name",         "auto", "action",
+                "View Evaluation"),
+            array("!Custom.inUse",         "In Use",       "4em",  "number"),
+            array("Mixeval.availability",  "Availability", "6em",  "string"),
+            array("Mixeval.scale_max",     "LOM",          "3em",  "number"),
+            array("Mixeval.lickert_question_max", "Lickert","4em", "number"),
+            array("Mixeval.prefill_question_max", "Pre-fill","4em","number"),
+            array("Mixeval.total_marks",  "Total Marks",    "4em", "number"),
+            array("Creator.id",           "",               "",    "hidden"),
+            array("Creator.username",     "Creator",        "8em", "action",
+                "View Creator"),
+            array("Mixeval.created",      "Creation Date",  "12em", "date"));
+
+        // Just list all and my evaluations for selections
+        $userList = array($this->rdAuth->id => "My Evaluations");
+
+        // Join with Users
+        $jointTableCreator =
+            array("id"         => "Creator.id",
+                  "localKey"   => "creator_id",
+                  "description" => "Evaluations to show:",
+                  "default" => $this->rdAuth->id,
+                  "list" => $userList,
+                  "joinTable"  => "users",
+                  "joinModel"  => "Creator");
+        // put all the joins together
+        $joinTables = array($jointTableCreator);
+
+        // List only my own or
+        $myID = $this->rdAuth->id;
+        $extraFilters = "(Creator.id=$myID or Mixeval.availability='public')";
+
+        // Instructors can only edit their own evaluations
+        $restrictions = "";
+        if ($this->rdAuth->role != 'A') {
+            $restrictions = array(
+                "Creator.id" => array(
+                    $myID => true,
+                    "!default" => false));
+        }
+
+        // Set up actions
+        $warning = "Are you sure you want to delete this evaluation permanently?";
+        $actions = array(
+            array("View Evaluation", "", "", "", "view", "Mixeval.id"),
+            array("Edit Evaluation", "", $restrictions, "", "edit", "Mixeval.id"),
+            array("Copy Evaluation", "", "", "", "copy", "Mixeval.id"),
+            array("Delete Evaluation", $warning, $restrictions, "", "delete", "Mixeval.id"),
+            array("View Creator", "",    "", "users", "view", "Creator.id"));
+
+        // No recursion in results
+        $recursive = 0;
+
+        // Set up the list itself
+        $this->AjaxList->setUp($this->Mixeval, $columns, $actions,
+            "Mixeval.id", "Mixeval.name", $joinTables, $extraFilters, $recursive, "postProcess");
+    }
+
+
+    function index($message='') {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set the top message
+        $this->set('message', $message);
+        // Set up the basic static ajax list variables
+        $this->setUpAjaxList();
+        // Set the display list
+        $this->set('paramsForList', $this->AjaxList->getParamsForList());
+    }
+
+    function ajaxList() {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set up the list
+        $this->setUpAjaxList();
+        // Process the request for data
+        $this->AjaxList->asyncGet();
+    }
+
 
 	function view($id='', $layout='')
 	{
@@ -207,55 +278,6 @@ class MixevalsController extends AppController
 			$this->redirect('/mixevals/index/The mixed evaluation was deleted successfully.');
 		}
 	}
-
-  function search()
-  {
-    $this->layout = 'ajax';
-    $pagination->loadingId = 'loading';
-
-    if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-      $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-      if ($personalizeData) {
-        $this->userPersonalize->setPersonalizeList($personalizeData);
-        $this->show = $this->userPersonalize->getPersonalizeValue('Mixeval.ListMenu.Limit.Show');
-        $this->set('userPersonalize', $this->userPersonalize);
-      }
-    }
-
-    $conditions = '';
-    if ($this->mine_only){
-      $conditions .= 'creator_id = '.$this->rdAuth->id;
-    } else if ('A' != $this->rdAuth->role){
-      $conditions .= ' (creator_id = '.$this->rdAuth->id. ' OR availability = "public" ) ';
-    }
-
-    if (!empty($this->params['form']['livesearch']) && !empty($this->params['form']['select'])){
-      $pagination->loadingId = 'loading';
-      //parse the parameters
-      $searchField=$this->params['form']['select'];
-      $searchValue=$this->params['form']['livesearch'];
-      (empty($conditions))? $conditions = '' : $conditions .= ' AND ';
-      $conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
-    }
-    $this->update($attributeCode = 'Mixeval.ListMenu.Limit.Show',$attributeValue = $this->show);
-
-    $data = $this->Mixeval->findAll($conditions, $fields=null, $this->order, $this->show, $this->page);
-
-    $paging['style'] = 'ajax';
-    $paging['link'] = '/mixevals/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&show_my_tool='.$this->mine_only.'&page=';
-
-    $paging['count'] = $this->Mixeval->findCount($conditions);
-    $paging['show'] = array('10','25','50','all');
-    $paging['page'] = $this->page;
-    $paging['limit'] = $this->show;
-    $paging['direction'] = $this->direction;
-    $paging['mine'] = $this->mine_only;
-    $paging['result_count'] = count($data);
-
-		$this->set('event', $this->Event);
-		$this->set('paging',$paging);
-		$this->set('data',$data);
-  }
 
   function previewMixeval()
   {

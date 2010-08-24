@@ -109,11 +109,14 @@ class UsersController extends AppController
         $deleteUserWarning = "Delete this user. Irreversible. Are you sure?";
         $resetPassWarning = "Resets user Password. Are you sure?";
 
-        $actionRestrictions = array(
-            "User.role" => array (
-                "S" => true,
-                "!default" => false
-        ));
+        if ($this->rdAuth->role != 'A') {
+            $actionRestrictions = array(
+                "User.role" => array (
+                    "S" => true,
+                    "!default" => false));
+        } else {
+            $actionRestrictions = "";
+        }
 
 
         $actions = array(
@@ -121,7 +124,7 @@ class UsersController extends AppController
             //   display name, (warning shown), fixed parameters or Column ids
             array("View User",  "", "", "", "view", "User.id"),
             array("Edit User",  "", $actionRestrictions, "", "edit", "User.id"),
-            array("Delete User",  $deleteUserWarning,   $actionRestrictions, "", "delete",       "User.id"),
+            array("Delete User",    $deleteUserWarning,   $actionRestrictions, "", "delete",       "User.id"),
             array("Reset Password", $resetPassWarning,  $actionRestrictions, "", "resetPassword","User.id")
         );
 
