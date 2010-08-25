@@ -172,7 +172,7 @@ class SurveysController extends AppController
     }
 
 
-    function nindex($message='') {
+    function index($message='') {
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
         // Set the top message
@@ -192,42 +192,6 @@ class SurveysController extends AppController
         $this->AjaxList->asyncGet();
     }
 
-
-	function index()
-	{
-    $this->nindex();
-    $this->mine_only = true;
-    $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-    $this->userPersonalize->setPersonalizeList($personalizeData);
-    if ($personalizeData && $this->userPersonalize->inPersonalizeList('Survey.ListMenu.Limit.Show')) {
-      $this->show = $this->userPersonalize->getPersonalizeValue('Survey.ListMenu.Limit.Show');
-      $this->set('userPersonalize', $this->userPersonalize);
-    } else {
-      $this->show = '10';
-      $this->update($attributeCode = 'Survey.ListMenu.Limit.Show',$attributeValue = $this->show);
-    }
-
-    $conditions = array('Survey.creator_id' =>  $this->rdAuth->id);
-    if ($this->rdAuth->courseId > 1)  { // If the course is set, use that value as well.
-      $conditions['Survey.course_id'] = $this->rdAuth->courseId;
-    }
-
-		$data = $this->Survey->findAll($conditions, '', $this->order, $this->show, $this->page,null,null);//array('JOIN courses AS Course ON Survey.course_id = Course.id'));
-
-		$paging['style'] = 'ajax';
-		$paging['link'] = '/surveys/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&show_my_tool='.$this->mine_only.'&page=';
-
-		$paging['count'] = $this->Survey->findCount($conditions);
-		$paging['show'] = array('10','25','50','all');
-		$paging['page'] = $this->page;
-		$paging['limit'] = $this->show;
-		$paging['direction'] = $this->direction;
-    $paging['mine'] = $this->mine_only;
-    $paging['result_count'] = count($data);
-
-		$this->set('paging',$paging);
-		$this->set('data',$data);
-	}
 
 	function view($id) {
         $data = $this->Survey->read();
@@ -524,68 +488,11 @@ class SurveysController extends AppController
 			$this->index();
 			$this->render('index');
 		} else {
-		  $this->set('message', 'Survey delete failed.');
-		  $this->index();
+		    $this->set('message', 'Survey delete failed.');
+            $this->index();
 			$this->render('index');
 		}
 	}
-
-  function search()
-  {
-    $this->layout = 'ajax';
-    if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-      $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-      if ($personalizeData) {
-        $this->userPersonalize->setPersonalizeList($personalizeData);
-        $this->show = $this->userPersonalize->getPersonalizeValue('Survey.ListMenu.Limit.Show');
-        $this->set('userPersonalize', $this->userPersonalize);
-      }
-    }
-
-    $conditions = '';
-    if ($this->mine_only){
-      $conditions = array('Survey.creator_id' =>  $this->rdAuth->id);
-    }
-
-    if ($this->rdAuth->courseId > 1)  { // If the course is set, use that value as well.
-      $conditions['Survey.course_id'] = $this->rdAuth->courseId;
-    }
-
-
-    if (!empty($this->params['form']['livesearch2']) && !empty($this->params['form']['select']))
-    {
-      $pagination->loadingId = 'loading';
-      //parse the parameters
-      $searchField=$this->params['form']['select'];
-      $searchValue=$this->params['form']['livesearch2'];
-      (empty($conditions))? $conditions = '' : $conditions .= ' AND ';
-      if('Creator.name' == $searchField)
-      {
-        $conditions = "(Creator.first_name LIKE '%".mysql_real_escape_string($searchValue)."%'
-          OR Creator.last_name LIKE '%".mysql_real_escape_string($searchValue)."%')";
-      }else{
-        $conditions = $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
-      }
-    }
-    $this->update($attributeCode = 'Survey.ListMenu.Limit.Show',$attributeValue = $this->show);
-
-    $data = $this->Survey->findAll($conditions,'' , $this->order, $this->show, $this->page,null,null);
-
-    $paging['style'] = 'ajax';
-    $paging['link'] = '/surveys/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&show_my_tool='.$this->mine_only.'&page=';
-
-    $paging['count'] = $this->Survey->findCount($conditions);
-    $paging['show'] = array('10','25','50','all');
-    $paging['page'] = $this->page;
-    $paging['limit'] = $this->show;
-    $paging['direction'] = $this->direction;
-    $paging['mine'] = $this->mine_only;
-    $paging['count'] = $this->Survey->findCount($conditions);
-
-    $this->set('paging', $paging);
-    $this->set('data', $data);
-
-  }
 
   // called to add/remove response field from add/edit question pages
   function adddelquestion($question_id=null)
