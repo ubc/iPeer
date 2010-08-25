@@ -349,6 +349,18 @@ AjaxList.prototype.renderSelectionMaps = function (div) {
     return atLeastOneMapAdded;
 }
 
+// Create a handler for the map Selectors
+AjaxList.prototype.createDelegateForJoinFilter = function (thisObject, thisColumn)
+{
+    return function () {
+        // We need to create a callback for this: direct call
+        //   to changeMapFilter doesn't detect the value change!
+        var delegate = ajaxListLibrary.createDelegateWithParams(thisObject,
+                                                                thisObject.changeJoinFilter, thisColumn, this.value);
+        window.setTimeout(delegate, 0);
+    }
+}
+
 // Render the extra filter control
 AjaxList.prototype.renderJoinFilters = function (div) {
     // First, render the selection maps
@@ -398,14 +410,16 @@ AjaxList.prototype.renderJoinFilters = function (div) {
 
         var select = new Element("select");
         var thisObject = this;
-        select.onchange = function () {
+        select.onchange = this.createDelegateForJoinFilter(thisObject, filter.id);
+
+        /*function () {
             // We need to create a callback for this: direct call
             //   to changeExtraFilter doesn't detect the value change!
             var delegate = ajaxListLibrary.createDelegateWithParams(thisObject,
                             thisObject.changeJoinFilter, filter.id, this.value);
             window.setTimeout(delegate, 0);
         }
-
+      */
         var option = new Element("option", {"value" : ""}).update("-- All --");
         select.appendChild(option);
         // Now list each of the optionsecords
@@ -782,6 +796,9 @@ AjaxList.prototype.renderTableBody = function(tbody) {
                         link.appendChild(linkInsides);
                         div.appendChild(link);
                     }
+                } else if (column[TYPE_COL] == "date") {
+                    div.style.textAlign = "center";
+                    div.appendChild(document.createTextNode(contents));
                 } else {
                     // Normal Text create and add
                     div.appendChild(document.createTextNode(contents));

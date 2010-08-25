@@ -129,10 +129,17 @@ class OutputComponent extends Object{
 	}
 
 	function formatDate($timestamp=null) {
-	  $this->SysParameter = new SysParameter;
-	  $data = $this->SysParameter->findParameter('display.date_format');
-	  $dateFormat = $data['SysParameter']['parameter_value'];
-	  return date($dateFormat,strtotime($timestamp));
+        $this->SysParameter = new SysParameter;
+        $data = $this->SysParameter->findParameter('display.date_format');
+        $dateFormat = $data['SysParameter']['parameter_value'];
+
+        if (is_string($timestamp)) {
+            return date($dateFormat,strtotime($timestamp));
+        } else if(is_numeric($timestamp)){
+            return date($dateFormat, $timestamp);
+        } else {
+            return "";
+        }
 	}
 }
 

@@ -38,7 +38,7 @@ class SurveysController extends AppController
   var $order;
   var $Sanitize;
   var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
-  var $components = array('rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework','SurveyHelper');
+  var $components = array('AjaxList','rdAuth','Output','sysContainer', 'globalConstant','userPersonalize', 'framework','SurveyHelper');
 
 
 	function __construct()
@@ -55,8 +55,147 @@ class SurveysController extends AppController
 		parent::__construct();
 	}
 
+
+    function postProcess($data) {
+
+        // Creates the custom in use column
+        if ($data) {
+            foreach ($data as $key => $entry) {
+                // is it in use?
+                $inUse = $this->Event->checkEvaluationToolInUse('3',$entry['Survey']['id']) ;
+
+                // Put in the custom inUse column
+                $data[$key]['!Custom']['inUse'] = $inUse ? "Yes" : "No";
+
+                // Decide whether the course is release or not ->
+                // (from the events controller postProcess function)
+                $releaseDate = strtotime($entry["Survey"]["release_date_begin"]);
+                $endDate = strtotime($entry["Survey"]["release_date_end"]);
+                $timeNow = strtotime($entry[0]["now()"]);
+
+                if (!$releaseDate) $releaseDate = 0;
+                if (!$endDate) $endDate = 0;
+
+                $isReleased = "";
+                if ($timeNow < $releaseDate) {
+                    $isReleased = "Not Yep Open";
+                } else if ($timeNow > $endDate) {
+                    $isReleased = "Already Closed";
+                } else {
+                    $isReleased = "Open Now";
+                }
+
+                // Put in the custom isReleased string
+                $data[$key]['!Custom']['isReleased'] = $isReleased;
+            }
+        }
+        // Return the processed data back
+        return $data;
+    }
+
+    function setUpAjaxList() {
+        $myID = $this->rdAuth->id;
+
+       // Get the course data
+        $userCourseList = $this->sysContainer->getMyCourseList();
+        $courseList = array();
+        foreach ($userCourseList as $id => $course) {
+            $courseList{$id} = $course['course'];
+        }
+
+        // Set up Columns
+        $columns = array(
+            array("Survey.id",          "ID",          "4em",   "number"),
+            array("Course.course",      "Course",      "15em",  "action",
+              "View Course"),
+            array("Survey.name",        "Name",        "auto",  "action",
+                "View Evaluation"),
+            array("!Custom.inUse",      "In Use",      "4em",   "number"),
+            array("Survey.due_date",     "Due Date",   "10em", "date"),
+            // The release window columns
+            array("now()",   "", "", "hidden"),
+            array("Survey.release_date_begin", "", "", "hidden"),
+            array("Survey.release_date_end",   "", "", "hidden"),
+            array("!Custom.isReleased", "Released ?",   "  4em",   "string"),
+            array("Creator.id",   "", "", "hidden"),
+            array("Creator.username",  "Created By",    "8em", "action",
+              "View Creator"),
+            array("Survey.created",     "Creation Date","10em", "date"));
+
+        // Just list all and my evaluations for selections
+        $userList = array($myID => "My Evaluations");
+
+        // Join in the course name
+        $joinTableCourse =
+             array("id"        => "Course.id",
+                   "localKey"  => "course_id",
+                   "description" => "Course:",
+                   "default"   => $this->rdAuth->courseId,
+                   "list" => $courseList,
+                   "joinTable" => "courses",
+                   "joinModel" => "Course");
+
+        $joinTableCreator =
+              array("joinTable"=>"users",
+                    "localKey" => "creator_id",
+                    "joinModel" => "Creator");
+
+        // Add the join table into the array
+        $joinTables = array($joinTableCourse, $joinTableCreator);
+
+        // For instructors: only list their own course events (surveys
+        $extraFilters = "";
+        if ($this->rdAuth->role != 'A') {
+            $extraFilters = " ( ";
+            foreach ($courseList as $id => $course) {
+                $extraFilters .= "course_id=$id or ";
+            }
+            $extraFilters .= "1=0 ) "; // just terminates the or condition chain with "false"
+        }
+
+        // Set up actions
+        $warning = "Are you sure you want to delete this evaluation permanently?";
+        $actions = array(
+            array("View Evaluation", "", "", "", "view", "Survey.id"),
+            array("Edit Evaluation", "", "", "", "edit", "Survey.id"),
+            array("Copy Evaluation", "", "", "", "copy", "Survey.id"),
+            array("Delete Evaluation", $warning, "", "", "delete", "Survey.id"),
+            array("View Course", "",    "", "course", "view", "Course.id"),
+            array("View Creator", "",    "", "users", "view", "Creator.id"));
+
+        // No recursion in results (at all!)
+        $recursive = -1;
+
+        // Set up the list itself
+        $this->AjaxList->setUp($this->Survey, $columns, $actions,
+            "Survey.id", "Survey.name", $joinTables, $extraFilters, $recursive, "postProcess");
+    }
+
+
+    function nindex($message='') {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set the top message
+        $this->set('message', $message);
+        // Set up the basic static ajax list variables
+        $this->setUpAjaxList();
+        // Set the display list
+        $this->set('paramsForList', $this->AjaxList->getParamsForList());
+    }
+
+    function ajaxList() {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set up the list
+        $this->setUpAjaxList();
+        // Process the request for data
+        $this->AjaxList->asyncGet();
+    }
+
+
 	function index()
 	{
+    $this->nindex();
     $this->mine_only = true;
     $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
     $this->userPersonalize->setPersonalizeList($personalizeData);

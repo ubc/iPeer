@@ -78,12 +78,13 @@ class RubricsController extends AppController
                 "View Evaluation"),
             array("!Custom.inUse",      "In Use",      "4em",   "number"),
             array("Rubric.availability","Availability","6em",   "string"),
+            array("Rubric.lom_max",     "LOM",         "4em",   "number"),
             array("Rubric.criteria",    "Criteria",    "4em",   "number"),
             array("Rubric.total_marks", "Total",       "4em",   "number"),
             array("Creator.id",         "",            "",      "hidden"),
             array("Creator.username",   "Creator",     "8em",   "action",
                 "View Creator"),
-            array("Rubric.created",     "Creation Date","12em", "date"));
+            array("Rubric.created",     "Creation Date","10em", "date"));
 
         // Just list all and my evaluations for selections
         $userList = array($this->rdAuth->id => "My Evaluations");

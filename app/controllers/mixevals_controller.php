@@ -86,7 +86,7 @@ class MixevalsController extends AppController
             array("Creator.id",           "",               "",    "hidden"),
             array("Creator.username",     "Creator",        "8em", "action",
                 "View Creator"),
-            array("Mixeval.created",      "Creation Date",  "12em", "date"));
+            array("Mixeval.created",      "Creation Date",  "10em", "date"));
 
         // Just list all and my evaluations for selections
         $userList = array($this->rdAuth->id => "My Evaluations");

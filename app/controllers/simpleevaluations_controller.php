@@ -87,7 +87,7 @@ class SimpleevaluationsController extends AppController
             array("SimpleEvaluation.point_per_member", "Points/Member", "10em", "number"),
             array("Creator.id",           "",            "",     "hidden"),
             array("Creator.username",     "Creator",  "10em", "action", "View Creator"),
-            array("SimpleEvaluation.created", "Creation Date", "12em", "date"));
+            array("SimpleEvaluation.created", "Creation Date", "10em", "date"));
 
         $userList = array($myID => "My Evaluations");
 

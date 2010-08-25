@@ -65,8 +65,8 @@ class SysFunctionsController extends AppController
             array("SysFunction.permission_type", "Permissions","5em", "string"),
             array("SysFunction.record_status",  "Status",   "5em", "map",
                 array("A" => "Active", "I" => "Inactive")),
-            array("SysFunction.created",        "Created", "7em", "date"),
-            array("SysFunction.modified",       "Updated", "7em", "date"));
+            array("SysFunction.created",        "Created", "10em", "date"),
+            array("SysFunction.modified",       "Updated", "10em", "date"));
 
         $warning = "Are you sure you wish to delete this System Function?";
         $actions = array(

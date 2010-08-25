@@ -63,8 +63,8 @@ class SysParametersController extends AppController
                 array("I" => "Interger", "B" => "Boolean", "S" => "String")),
             array("SysParameter.record_status",  "Status",   "5em", "map",
                 array("A" => "Active", "I" => "Inactive")),
-            array("SysParameter.created",        "Created", "7em", "date"),
-            array("SysParameter.modified",       "Updated", "7em", "date"));
+            array("SysParameter.created",        "Created", "10em", "date"),
+            array("SysParameter.modified",       "Updated", "10em", "date"));
 
         $warning = "Are you sure you wish to delete this System Parameter?";
 

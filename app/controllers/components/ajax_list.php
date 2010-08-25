@@ -1,5 +1,31 @@
 <?php
 
+// We use json encode and json decode here...
+// Make sure they're defined :-)
+
+// This code will substitute in json_encode and json_decode implemented in PHP.
+// the problem with these functions is that they're slower than PHP 5.2's c implementationss
+if ( !function_exists('json_decode') ){
+    function json_decode($content, $assoc=false){
+        require_once 'vendors/JSON.php';
+        if ( $assoc ){
+            $json = new Services_JSON(SERVICES_JSON_LOOSE_TYPE);
+        } else {
+            $json = new Services_JSON;
+        }
+        return $json->decode($content);
+    }
+}
+
+if ( !function_exists('json_encode') ){
+    function json_encode($content){
+        require_once 'vendors/JSON.php';
+        $json = new Services_JSON;
+        return $json->encode($content);
+    }
+}
+
+
 class AjaxListComponent extends Object {
 
     // Will hold a reference to the controller
@@ -24,7 +50,7 @@ class AjaxListComponent extends Object {
     var $postProcessFunction = null;
 
     // Initialize other componenets
-    var $components = array('Session');
+    var $components = array('Session', 'Output');
 
     // On start up , just remember the contoller, so we can get it's name later
     function startup($controller) {
@@ -74,6 +100,30 @@ class AjaxListComponent extends Object {
     }
 
 
+    function formatDates($data) {
+        // Process data if it's there
+        if (!empty($data) && is_array($data)) {
+            // For each column defined
+            foreach ($this->columns as $column) {
+                // Is this column maked as a date?
+                if ($column[3] == "date") {
+                    $split = explode(".", $column[0], 2);
+                    $model = $split[0];
+                    $col = $split[1];
+                    foreach ($data as $key => $entry) {
+                        $date = strtotime($entry[$model][$col]);
+                        $date = $this->controller->Output->formatDate($date);
+                        $data[$key][$model][$col] = $date;
+                    }
+                }
+            }
+
+        }
+        return $data;
+    }
+
+
+    // Special values start with a '!'
     function isSpecialValue($value) {
         return strlen($value)>3  &&  $value[0]=='!'  &&  $value[1]=='!'  &&  $value[2]=='!';
     }
@@ -211,6 +261,9 @@ class AjaxListComponent extends Object {
         //  for it. However, in findCound, the group by must be absent.
         $data = $this->model->$customModelFindFunction($conditions . $groupBy,
                          $this->fields, $order, $limit, $page, $this->recursive, array($joinTable));
+
+        // Format the dates
+        $data = $this->formatDates($data);
 
         if (!empty($this->postProcessFunction)) {
             $function = $this->postProcessFunction;
