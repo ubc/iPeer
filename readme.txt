@@ -1,5 +1,20 @@
 iPeer 2.1
 
+Changelog from 2.1
+
+1) Over 180 bugs are fixed
+2) Major browsers are supported
+3) PHP 5.3 is supported
+4) Improved security and permission checking
+5) Improved installation script and new upgrade script
+6) Now exports comments in the CSV file
+7) Import Students/Groups from CSV file now functional
+8) Instructors can only add students to the courses the instructor teaches
+9) Instructors can no longer remove students from courses the instructor does not teach
+10) Instructors can no longer remove students from the database
+11) An instructor can no longer remove himself/herself from the course
+12) Group email links are removed temporarily
+
 Changelog from 2.0.8
 
 1) Bug fix: #1725231 , #1725229 (see bugs list in SF for details)
