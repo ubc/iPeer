@@ -1,4 +1,4 @@
-iPeer 2.0.8.3
+iPeer 2.1
 
 Changelog from 2.0.8
 
