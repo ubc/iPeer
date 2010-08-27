@@ -31,10 +31,10 @@ upgrade from 1.6:
 iPeer 2 install:
 
 requirements:
-PEAR with XML_RPC module
 mod_rewrite for apache
 PHP 4.3.10+ with GD extension
 MYSQL 4+
+PEAR with XML_RPC module (optional, only needed when using CWL)
 
 1.  run http://yourserverpath/youripeerpath/install   (trailing slash may be required)
 1b. create a database in MySql
