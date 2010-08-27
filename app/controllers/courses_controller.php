@@ -258,9 +258,11 @@ class CoursesController extends AppController
 		  if (!empty($events)) {
 
 		  }
-		  // Finished all deletion of course related data
-
-			$this->redirect('/courses/index/The course was deleted successfully.');
+            //refresh my accessible courses on session
+            $myCourses = $this->Course->findAccessibleCoursesListByUserIdRole($this->rdAuth->id, $this->rdAuth->role);
+            $this->sysContainer->setMyCourseList($myCourses);
+            // Finished all deletion of course related data
+            $this->redirect('/courses/index/The course was deleted successfully.');
 		} else {
 		  $this->set('errmsg', $this->Course->errorMessage);
 		  $this->redirect('/courses/index');

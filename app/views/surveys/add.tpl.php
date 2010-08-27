@@ -5,10 +5,11 @@
       <?php echo empty($params['data']['Survey']['id']) ? $html->hidden('Survey/creator_id', array('value'=>$rdAuth->id)) : $html->hidden('Survey/updater_id', array('value'=>$rdAuth->id)); ?>
 	  <table width="95%"  border="0" align="center" cellpadding="4" cellspacing="2">
         <?php if (!$createSurveyPossible) : ?>
-        <tr><td style="text-align=center; color: red">
+        <tr><td style="text-align: center; color: red;">
             You must create a course before you create a survey!<br />
             Please do so from the link bellow:<br />
-            <?php echo "" ?>
+            <?php   $webroot = $this->controller->webroot;
+                    echo "<a href='" . $webroot . "'courses/add'>Add a course to iPeer.</a>";?>
 
         <?php else: ?>
             <tr class="tableheader">
@@ -85,31 +86,31 @@
               <td align="left"><?php echo $html->image('layout/corner_bot_left.gif',array('align'=>'middle','alt'=>'corner_bot_left'))?></td>
               <td align="right"><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'middle','alt'=>'corner_bot_right'))?></td>
             </tr>
+            <?php echo $javascript->link('calendar1')?>
+            <script type="text/javascript">
+            <!--
+            // create calendar object(s) just after form tag closed
+            // specify form element as the only parameter (document.forms['formname'].elements['inputname']);
+            // note: you can have as many calendar objects as you need for your application
+            var cal1 = new calendar1(document.forms[0].elements['data[Survey][due_date]']);
+            cal1.year_scroll = false;
+            cal1.time_comp = true;
+
+            var cal2 = new calendar1(document.forms[0].elements['data[Survey][release_date_begin]']);
+            cal2.year_scroll = false;
+            cal2.time_comp = true;
+
+            var cal3 = new calendar1(document.forms[0].elements['data[Survey][release_date_end]']);
+            cal3.year_scroll = false;
+            cal3.time_comp = true;
+
+            //-->
+            </script>
         <?php endif; ?>
       </table>
     </form>
 	</td>
   </tr>
 </table>
-<?php echo $javascript->link('calendar1')?>
-<script type="text/javascript">
-<!--
 
-// create calendar object(s) just after form tag closed
-// specify form element as the only parameter (document.forms['formname'].elements['inputname']);
-// note: you can have as many calendar objects as you need for your application
 
-var cal1 = new calendar1(document.forms[0].elements['data[Survey][due_date]']);
-cal1.year_scroll = false;
-cal1.time_comp = true;
-
-var cal2 = new calendar1(document.forms[0].elements['data[Survey][release_date_begin]']);
-cal2.year_scroll = false;
-cal2.time_comp = true;
-
-var cal3 = new calendar1(document.forms[0].elements['data[Survey][release_date_end]']);
-cal3.year_scroll = false;
-cal3.time_comp = true;
-
-//-->
-</script>
