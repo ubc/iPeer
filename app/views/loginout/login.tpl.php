@@ -11,6 +11,9 @@
                 <tr>
                   <td width="62">Username:</td>
                   <td width="140"><?php echo $html->input("User/username",array("style"=>"width:150px;","id"=>"username")); ?></td>
+                    <script>
+                        $("username").focus();
+                    </script>
                 </tr>
                 <tr>
                   <td>Password:</td>
@@ -37,7 +40,7 @@
         <li><?php echo $html->image("layout/grey_arrow.gif",array("align"=>"middle",'alt'=>'grey_arrow'))?> <a href="mailto:<?php echo $admin_email ?>" >Contact iPeer Administrator</a></li>
         </div>
   </div>
-</form> 
+</form>
 
 
 </td>

@@ -258,6 +258,10 @@ class SurveysController extends AppController
 	{
 		$courseList = $this->sysContainer->getMyCourseList();
 		$this->set('courseList', $courseList);
+
+		// We need at least one course to be defined before Survey creation.
+        $this->set ('createSurveyPossible', sizeof($courseList) > 0 );
+
 		$this->set('templates', $this->Survey->findAll($conditions=null, $fields="id, name"));
 
 		if (empty($this->params['data']))

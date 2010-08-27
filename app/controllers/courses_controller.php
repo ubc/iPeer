@@ -99,7 +99,7 @@ class CoursesController extends AppController
             array("Course Home", "", "", "", "home", "Course.id"),
             array("View Record", "", "", "", "view", "Course.id"),
             array("Edit Record", "", "", "", "edit", "Course.id"),
-            array("Delete Course", $warning, "", "", "home", "Course.id"),
+            array("Delete Course", $warning, "", "", "delete", "Course.id"),
             array("View Creator", "",    "", "users", "view", "Creator.id"),
             array("View Instructor", "", "", "users", "view", "Instructor.id"));
 
