@@ -499,9 +499,6 @@ class SurveyGroupsController extends AppController
                 $surveyGroupId = $surveyGroup['SurveyGroup']['id'];
                 $conditions = "group_set_id='$groupSetId' AND group_id='$surveyGroupId'";
                 $surveyGroupMembers = $this->SurveyGroupMember->findAll($conditions);
-                var_dump($conditions);
-                var_dump($surveyGroupMembers);
-
                 //add group members
                 foreach ($surveyGroupMembers as $surveyGroupMember) {
                     $groupMember = array();
@@ -509,7 +506,6 @@ class SurveyGroupsController extends AppController
                     $groupMember['GroupsMembers']['user_id'] = $surveyGroupMember['SurveyGroupMember']['user_id'];
                     $this->GroupsMembers->save($groupMember);
                     $this->GroupsMembers->id = null;
-                    var_dump("saving", $groupMember);
                 }
             } else {
                 //complain about error...
@@ -523,7 +519,7 @@ class SurveyGroupsController extends AppController
         //change status of survey set to released
         $this->SurveyGroupSet->setId($groupSetId);
         $surveyGroupSet = array();
-        $surveyGroupSet['SurveyGroupSet']['released'] = 0;
+        $surveyGroupSet['SurveyGroupSet']['released'] = 1;
         if (!$this->SurveyGroupSet->save($surveyGroupSet)) {
             $this->set('message','Group set release failed.');
             $this->index();
