@@ -25,12 +25,15 @@
             <td valign="top">Members:</td>
             <td>
 				      <table width="100%" border="0" cellspacing="2" cellpadding="2">
-				      <?php foreach($group_data as $row): $user = $row['users']?>
+				      <?php if (!empty($groupData)) :
+                            foreach($group_data as $row): $user = $row['users']?>
 					      <tr>
                   <td width="15"><?php echo $html->image('icons/email_icon.gif',array('border'=>'0','alt'=>'Email'))?></td>
                   <td><a href="../../users/view/'<?php echo $user['id']?>"><?php echo $user['last_name'].', '.$user['first_name']?></a><br></td>
                 </tr>
-				      <?php endforeach;?>
+				      <?php endforeach;
+                            else: echo "No members in this group.";
+                            endif;?>
 				      </table>
 			      </td>
           </tr>
@@ -41,7 +44,7 @@
             <td align="left"><?php echo $html->image('layout/corner_bot_left.gif',array('align'=>'middle','alt'=>'corner_bot_left'))?></td>
             <td align="right"><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'middle','alt'=>'corner_bot_right'))?></td>
           </tr>
-        </table> 
+        </table>
 
         <table width="95%"  border="0" cellspacing="2" cellpadding="4">
           <tr>

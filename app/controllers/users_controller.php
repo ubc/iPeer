@@ -92,7 +92,7 @@ class UsersController extends AppController
                     // What are the choises and the default values?
                     "list"  => $courseList,
                     "default" => $this->rdAuth->courseId,
-                    // What table to we join to get these
+                    // What table do we join to get these
                     "joinTable"     => "user_enrols",
                     "joinModel"     => "UserEnrol",
                     "foreignKey"    => "user_id",

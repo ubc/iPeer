@@ -8,7 +8,7 @@
   </tr>
   <tr>
     <td bgcolor="#FFB66F">&nbsp;</td>
-    <td class="tablecell"><A HREF="<?php echo $this->webroot.$this->themeWeb;?>groups/index/"><?php echo $html->image('layout/yellow_arrow.gif',array('align'=>'middle', 'border'=>'0', 'alt'=>'yellow_arrow'))?> &nbsp;List Groups
+    <td class="tablecell"><A HREF="<?php echo $this->webroot.$this->themeWeb;?>groups/goToClassList/<?php echo $this->controller->rdAuth->courseId; ?>"><?php echo $html->image('layout/yellow_arrow.gif',array('align'=>'middle', 'border'=>'0', 'alt'=>'yellow_arrow'))?> &nbsp;List Groups
       </a></td>
   </tr>
   <tr>

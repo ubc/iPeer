@@ -247,7 +247,7 @@ class AjaxListComponent extends Object {
                     $localModel = !empty($joinFilter['localModel']) ? $joinFilter['localModel'] : $this->model->name;
 
                     $joinTable .= " LEFT JOIN `$joinFilter[joinTable]` as `$joinFilter[joinModel]`";
-                    $joinTable .= " on $localModel.`$localKey`=`$joinFilter[joinModel]`.`$foreignKey`";
+                    $joinTable .= " on `$localModel`.`$localKey`=`$joinFilter[joinModel]`.`$foreignKey`";
                 }
             }
         }
@@ -262,14 +262,6 @@ class AjaxListComponent extends Object {
         $data = $this->model->$customModelFindFunction($conditions . $groupBy,
                          $this->fields, $order, $limit, $page, $this->recursive, array($joinTable));
 
-        // Format the dates
-        $data = $this->formatDates($data);
-
-        if (!empty($this->postProcessFunction)) {
-            $function = $this->postProcessFunction;
-            $data = $this->controller->$function($data);
-        }
-
         // Counts a a bit more difficult with grouped, joint tables.
         if (isset($customModelCountFunction)) {
             $count = $this->model->$customModelCountFunction
@@ -280,7 +272,16 @@ class AjaxListComponent extends Object {
 
         }
 
-        // Package up the list, and return it to called
+        // Format the dates as given in the iPeer database
+        $data = $this->formatDates($data);
+
+        // Post-process Data, if asked
+        if (!empty($this->postProcessFunction)) {
+            $function = $this->postProcessFunction;
+            $data = $this->controller->$function($data);
+        }
+
+        // Package up the list, and return it to caller
         $result = array ("entries" =>   $data,
                          "count"   =>   $count,
                          "state" =>     $state,
@@ -294,34 +295,30 @@ class AjaxListComponent extends Object {
     //  so this custom function is its replacement
     function betterCount ($conditions, $groupBy, $recursive, $joinTable) {
 
-         /*
-         select count(*) from (select count(*) FROM `users` AS `User`
-         LEFT JOIN user_enrols as UserEnrol on User.id=UserEnrol.user_id WHERE 1=1
-         GROUP by `User`.`id` ORDER BY `User`.`id`) as a
-         */
+        $table = $this->model->table;
+        $name = $this->model->name;
 
          // Initial Statement
-         $sql  = "SELECT count(*) as count FROM ( SELECT count(*) FROM " . $this->model->table . " as ";
-         $sql .= $this->model->name . " ";
+        $sql  = "SELECT count(*) as count FROM ( SELECT count(*) FROM `$table` as `$name` ";
 
-         // Add table joins
-         for ($i = 0; $i < sizeof($joinTable); $i++) {
-             $sql .= $joinTable[$i] . " ";
-         }
+        // Add table joins
+        for ($i = 0; $i < sizeof($joinTable); $i++) {
+            $sql .= $joinTable[$i] . " ";
+        }
 
-         // add on conditions
-         $sql .= "WHERE " . $conditions;
+        // add on conditions
+        $sql .= "WHERE " . $conditions;
 
-         // add on the group statement
-         $sql .= $groupBy;
+        // add on the group statement
+        $sql .= $groupBy;
 
-         // And finish up the statement
+        // And finish up the statement
 
-         $sql .= " ) as aTableForCount";
+        $sql .= " ) as aTableForCount";
 
-         list($data) = $this->model->findBySql($sql);
+        list($data) = $this->model->findBySql($sql);
 
-         return isset($data[0]['count']) ? $data[0]['count'] : 0;
+        return isset($data[0]['count']) ? $data[0]['count'] : 0;
     }
 
 

@@ -36,6 +36,7 @@ class GroupsController extends AppController
 	var $order;
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $Sanitize;
+    var $components = array('AjaxList');
 
 	function __construct()
 	{
@@ -50,40 +51,132 @@ class GroupsController extends AppController
 		parent::__construct();
 	}
 
-  function index($msg='') {
-    $courseId = $this->rdAuth->courseId;
-   	$this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Groups';
+   function postProcess($data) {
+        // Creates the custom in use column
+        if ($data) {
+            foreach ($data as $key => $entry) {
+                $data[$key]['Group']['group_name'] .= " (" .
+                    $this->GroupsMembers->countMembers($entry['Group']['id']) . ")";
+            }
+        }
+        // Return the processed data back
+        return $data;
+    }
 
-		$queryAttributes = $this->getQueryAttribute($courseId);
-		$fields = $queryAttributes['fields'];
-		$condition = $queryAttributes['condition'];
-    $joinTable = $queryAttributes['joinTable'];
+       // =-=-=-=-=-== New list routines =-=-=-=-=-===-=-
+    function setUpAjaxList () {
+        // Set up the ajax list component
 
-		$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-    $this->userPersonalize->setPersonalizeList($personalizeData);
-  	if ($personalizeData && $this->userPersonalize->inPersonalizeList('Group.ListMenu.Limit.Show')) {
-       $this->show = $this->userPersonalize->getPersonalizeValue('Group.ListMenu.Limit.Show');
-       $this->set('userPersonalize', $this->userPersonalize);
-  	} else {
-  	  $this->show = '10';
-      $this->update($attributeCode = 'Group.ListMenu.Limit.Show',$attributeValue = $this->show);
-  	}
+        // Get the course data
+        $userCourseList = $this->sysContainer->getMyCourseList();
+        $courseList = array();
 
-		$data = $this->Group->findAll('course_id = '.$courseId, null, $this->order, $this->show, $this->page);//, null, null);//$joinTable);
+        foreach ($userCourseList as $id => $course) {
+            $courseList{$id} = $course['course'];
+        }
 
-		$paging['style'] = 'ajax';
-		$paging['link'] = '/groups/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
+        // The columns to show
+        $columns = array(
+            array("Group.id",        "ID",       "4em",  "number"),
+            array("Course.id",       "",         "",     "hidden"),
+            array("Course.course",   "Course",   "12em", "action", "Course Home"),
+            array("Group.group_num", "Group #",  "6em",  "number"),
+            array("Group.group_name","Group Name (members)",     "auto", "action", "View Group"),
+            array("Creator.id",      "",         "",     "hidden"),
+            array("Creator.username","Creator",  "10em", "action", "View Creator"),
+            array("Course.created",  "Date",     "10em", "date"),
+        );
 
-		$paging['count'] = $this->Group->findCount($condition, 0);//, $joinTable);
-		$paging['show'] = array('10','25','50','all');
-		$paging['page'] = $this->page;
-		$paging['limit'] = $this->show;
-		$paging['direction'] = $this->direction;
+        // The course to list for is the extra filter in this case
+        $joinTables =
+            array(
+                array(  // Define the GUI aspecs
+                    "id"            => "Group.course_id",
+                    "description"   => "for Course:",
+                    // What are the choises and the default values?
+                    "list"  => $courseList,
+                    "default" => $this->rdAuth->courseId,
+                    // What table do we join to get these
+                    "joinTable"     => "courses",
+                    "joinModel"     => "Course",
+                    "localKey"      => "course_id"
+                ),
+                array(  "joinTable" => "users",
+                        "joinModel" => "Creator",
+                        "localKey" => "creator_id")
+            );
 
-		$this->set('paging',$paging);
-		$this->set('data',$data);
-		$this->set('message', $msg);
-	}
+        // For instructors: only list their own course events
+        $extraFilters = "";
+        if ($this->rdAuth->role != 'A') {
+            $extraFilters = " ( ";
+            foreach ($courseList as $id => $course) {
+                $extraFilters .= "course_id=$id or ";
+            }
+            $extraFilters .= "1=0 ) "; // just terminates the or condition chain with "false"
+        }
+
+        // Define Actions
+        $deleteUserWarning = "Delete this group?\n";
+        $deleteUserWarning.= "(The students themselves will be unaffected).\n";
+        $deleteUserWarning.= "Proceed?";
+
+        $recursive = (-1);
+
+        $actions = array(
+            //   parameters to cakePHP controller:,
+            //   display name, (warning shown), fixed parameters or Column ids
+            array("View Group",  "", "", "",  "view", "Group.id"),
+            array("Edit Group",  "", "", "",  "edit", "Group.id"),
+            array("Course Home",  "", "", "courses", "home", "Course.id"),
+            array("View Course",  "", "", "courses", "view", "Course.id"),
+            array("View Creator",  "", "", "users","view", "Creator.id"),
+            array("Delete Group",    $deleteUserWarning, "", "", "delete",       "Group.id")
+        );
+
+        $this->AjaxList->setUp($this->Group, $columns, $actions, "Group.id", "Group.name",
+            $joinTables, $extraFilters, $recursive, "postProcess");
+    }
+
+    function index($message='') {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set the top message
+        $this->set('message', $message);
+        // Set up the basic static ajax list variables
+        $this->setUpAjaxList();
+        // Set the display list
+        $this->set('paramsForList', $this->AjaxList->getParamsForList());
+    }
+
+    function ajaxList() {
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        // Set up the list
+        $this->setUpAjaxList();
+        // Process the request for data
+        $this->AjaxList->asyncGet();
+    }
+
+    // Show a class list of groups
+    function goToClassList($course) {
+        if (is_numeric($course)) {
+            $courses = $this->sysContainer->getMyCourseList();
+            if (!empty($courses[$course])) {
+                // We need to change the session state to point to this
+                // course:
+                // Initialize a basic non-funcional AjaxList
+                $this->AjaxList->quickSetUp();
+                // Clear the state first, we don't want any previous searches/selections.
+                $this->AjaxList->clearState();
+                // Set and update session state Variable
+                $joinFilterSelections->{"Group.course_id"} = $course;
+                $this->AjaxList->setStateVariable("joinFilterSelections", $joinFilterSelections);
+            }
+        }
+        // Redirect to list after state modifications (or in case of error)
+        $this->redirect("/groups/index");
+    }
 
   function view ($id)
   {
@@ -171,48 +264,6 @@ class GroupsController extends AppController
 		  $this->set('data', $this->Group->findAll(null, null, 'id'));
 			$this->redirect('/groups/index/Group delete failed.');
 		}
-  }
-
-	function search()
-  	{
-  		$this->layout = 'ajax';
-
-    if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-    	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-    	if ($personalizeData) {
-    	   $this->userPersonalize->setPersonalizeList($personalizeData);
-         $this->show = $this->userPersonalize->getPersonalizeValue('Group.ListMenu.Limit.Show');
-         $this->set('userPersonalize', $this->userPersonalize);
-    	}
-    }
-
-    $condition = "";
-	    $courseId = isset($this->params['form']['course_id'])? $this->params['form']['course_id']: $this->rdAuth->courseId;;
-		$this->set('courseId', $courseId);
-
-		$queryAttributes = $this->getQueryAttribute($courseId);
-		$fields = $queryAttributes['fields'];
-		$condition = $queryAttributes['condition'];
-		$joinTable = $queryAttributes['joinTable'];
-
-    if (isset($this->params['form']['livesearch2']) && '' != $this->params['form']['livesearch2'] && !empty($this->params['form']['select']))
-    {
-      $pagination->loadingId = 'loading';
-      //parse the parameters
-      $searchField='Group.'.$this->params['form']['select'];
-      $searchValue=$this->params['form']['livesearch2'];
-
-      if (!empty($condition))
-      {
-        $condition .= " AND ";
-      }
-      $condition .= $searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
-    }
-
-    $this->update($attributeCode = 'Group.ListMenu.Limit.Show',$attributeValue = $this->show);
-    $this->set('conditions',$condition);
-    $this->set('fields',$fields);
-    $this->set('joinTable',$joinTable);
   }
 
   function checkDuplicateName()
