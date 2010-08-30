@@ -8,6 +8,9 @@ var AjaxListActionMenuTextSelectedColor = "Blue";
 var AjaxListActionMenuColor = "LightYellow";
 var AjaxListActionMenuSelected = "LightBlue";
 
+// How long to wait after a user has finished typing to start a search
+var searchAfterTypeDelay = 1100; //ms
+
 var AjaxListActionNewWindowFeatures = "width=640, height=480";
 
 var iconURL = "img/icons/";
@@ -184,7 +187,7 @@ function AjaxList (parameterArray, whereToDisplay) {
     this.actionDisplay = null;
     this.searchBar = null;
     this.busyImage = null;
-
+    this.searchAfterTypeDelayTimer = null;
 
     // There should always be data supplied by php in the HTML
     //  file sent by the server. Decide to either use this data, or
@@ -455,8 +458,8 @@ AjaxList.prototype.renderSearchControl = function (div) {
         // We need to create a callback for this: direct call
         //   to selectSearchColumn doesn't detect the value change!
         var delegate = ajaxListLibrary.createDelegateWithParams(thisObject,
-                                                                thisObject.selectSearchColumn,this.value);
-                                                                window.setTimeout(delegate, 0);
+            thisObject.selectSearchColumn,this.value);
+        window.setTimeout(delegate, 0);
     }
     // Generate a drop-down entry for each column
     for (i = 0; i < this.columns.length; i++) {
@@ -465,7 +468,9 @@ AjaxList.prototype.renderSearchControl = function (div) {
         var column = this.columns[i];
 
         // Should we show this search column
-        if ((column[ID_COL] && column[ID_COL].charAt(0) =='!') || column[TYPE_COL] !== undefined && column[TYPE_COL] == "hidden" || column[TYPE_COL] == "map") {
+        if ((column[ID_COL] && column[ID_COL].charAt(0) =='!') ||
+                column[TYPE_COL] !== undefined && column[TYPE_COL] == "hidden" ||
+                column[TYPE_COL] == "map" || column[TYPE_COL] == "date") {
             // do not render hidden columns.
             continue;
         }
@@ -485,10 +490,19 @@ AjaxList.prototype.renderSearchControl = function (div) {
 
     var input = new Element("input", {"type" : "text", "size" : 15, "value" : this.state.searchValue,
         "style":"text-align:center"});
+
+    // Set the input's color based on what on the resutls
+    if (input.value) {
+        // If there are files listed, make it yellow, but for no files, make it red.
+        input.style.backgroundColor = (this.count > 0) ? "#FFFFA8" : "#FFB0B0";
+    }
+
     input.id = "searchInputField";
     var thisObject = this;
     input.onkeyup = function() {  thisObject.changeSearchValue(this.value); }
     div.appendChild(input);
+    // Focus input after a moment, if it contains anything.
+    window.setTimeout("var s = $('searchInputField'); if (s.value) { s.focus(); }", 10);
 
     div.appendChild(document.createTextNode("   "));
     var submit = new Element("input", {"type" : "submit", "value" : "Search"});
@@ -944,11 +958,31 @@ AjaxList.prototype.changePage = function(event, pageNumber) {
 // Change the search column selections
 AjaxList.prototype.selectSearchColumn = function(event, columnName) {
     this.state.searchBy = columnName;
+    this.startSearchAfterTypeDelayTimer();
+}
+
+
+// Stop the Search After Typing Timer, if it's been started
+AjaxList.prototype.clearSearchAfterTypeDelayTimer = function () {
+    if (this.searchAfterTypeDelayTimer) {
+        window.clearTimeout(this.searchAfterTypeDelayTimer);
+    }
+    this.searchAfterTypeDelayTimer = null;
+}
+
+// Starts the Search After Typing Timer, restarting it if it's been previously started
+AjaxList.prototype.startSearchAfterTypeDelayTimer = function () {
+    this.clearSearchAfterTypeDelayTimer();
+    this.searchAfterTypeDelayTimer = window.setTimeout(
+        ajaxListLibrary.createDelegate(this, this.doSearch), searchAfterTypeDelay);
 }
 
 // Start a new search if the browser is not IE (use the search button here)
 AjaxList.prototype.changeSearchValue = function (newValue) {
+    // Was there a search timer already created?
+    this.clearSearchAfterTypeDelayTimer();
     this.state.searchValue = newValue;
+    this.startSearchAfterTypeDelayTimer();
 }
 
 AjaxList.prototype.clearSearchValue = function() {
@@ -960,6 +994,9 @@ AjaxList.prototype.clearSearchValue = function() {
 
 // When the search button is clicked
 AjaxList.prototype.doSearch = function() {
+    // Clear the search after typing timer
+    this.clearSearchAfterTypeDelayTimer();
+
     // Set the page number
     this.state.pageShown = 1;
 
