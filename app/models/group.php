@@ -123,8 +123,12 @@ class Group extends AppModel
 	}
 
 	function getLastGroupNumByCourseId($courseId=null) {
-	  $tmp = $this->find('course_id='.$courseId,'max(group_num)');
-	  return $tmp[0]['max(group_num)'];
+        $tmp = $this->find('course_id='.$courseId, 'max(group_num)');
+        $maxGroupNum = $tmp[0]['max(group_num)'];
+        if (empty($maxGroupNum)) {
+            $maxGroupNum = 1;
+        }
+        return $maxGroupNum;
 	}
 
   function getFilteredStudents($group_id, $filter){
