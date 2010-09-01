@@ -10,6 +10,7 @@
 	  </tr>
 <?php if (isset($rdAuth->customIntegrateCWL) && $rdAuth->customIntegrateCWL) { ?>
     <!-- For CWL customization, no need to display username -->
+      <?php echo $html->hidden('User/username'); ?>
 <?php } else {?>
     <tr class="tablecell2">
       <td width="185" id="newuser_label">Username:*</td>
