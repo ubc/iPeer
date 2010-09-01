@@ -786,7 +786,7 @@ AjaxList.prototype.renderTableBody = function(tbody) {
                         contents = "(unknown) " + contents;
                     }
                     // Normal Text create and add
-                    div.appendChild(document.createTextNode(contents));
+                    div.update(contents);
                 } else if (column[TYPE_COL] == "action") {
                     // If this is an "action" type entry, we need to create a link for it
                     var link = new Element("a").update(contents);
@@ -812,10 +812,10 @@ AjaxList.prototype.renderTableBody = function(tbody) {
                     }
                 } else if (column[TYPE_COL] == "date") {
                     div.style.textAlign = "center";
-                    div.appendChild(document.createTextNode(contents));
+                    div.update(contents);
                 } else {
                     // Normal Text create and add
-                    div.appendChild(document.createTextNode(contents));
+                    div.update(contents);
                 }
             } else {
                 // Normal Text create and add
@@ -866,8 +866,8 @@ AjaxList.prototype.doAction = function (event, entryRow, actionDesc) {
         if (action[ACTION_NAME] == actionDesc) {
             // Action found, execute it!
             var actionDisplay = new AjaxListAction( 0, 0,
-                                                     this.webroot, this.controller,
-                                                     this.columns, entryRow, this.actions);
+                                                    this.webroot, this.controller,
+                                                    this.columns, entryRow, this.actions);
             actionDisplay.performAction(event, action);
             return false; // Do not take the link!
         }
@@ -1078,7 +1078,10 @@ AjaxList.prototype.ajaxCallComplete = function (response) {
     this.ajaxObject = null;
 
     if (response.status != 200 || !response.responseJSON) {
-        alert("Can not update list: network down or bad server response.");
+        var message = "Can not update list: network down or invalid server response.\n";
+        message += "This can be be your iPeer session timing out.\n";
+        message += "Try logging out, and logging back into iPeer.";
+        alert("message");
     } else {
         // Update the update time
         ajaxListLibrary.setCookie(this.getUpdateCookieName(), response.responseJSON.timeStamp);

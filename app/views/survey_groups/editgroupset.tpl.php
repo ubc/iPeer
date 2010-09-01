@@ -44,7 +44,7 @@
 
         			    //student id column
         			    if (!empty($data[$i]['members'][$j]['response']))
-           			    echo '<td width="80"><a href="'.$this->webroot.$this->themeWeb.'evaluations/viewEvaluationResults/'.$event_id.';'.$user_id.'" onclick="wopen(this.href, \'popup\', 650, 500); return false;">'.$student_id.'</a></td>';
+           			    echo '<td width="80"><a href="'.$this->webroot.$this->themeWeb.'evaluations/viewEvaluationResults/'.$event_id.'/'.$user_id.'" onclick="wopen(this.href, \'popup\', 650, 500); return false;">'.$student_id.'</a></td>';
            			  else
            			    echo '<td width="80">'.$student_id.'</td>';
            			  //student name column

@@ -35,13 +35,13 @@
               if ($member['submitted']) {
                 echo $this->controller->Output->formatDate(date("Y-m-d H:i:s", strtotime($member['date_submitted'])));
               }else {
-                echo "---";
+                echo "(not submitted)";
               } ?></td>
             <td align="center"><?php
               if (isset($member['time_diff'])) {
                 echo $member['time_diff']. ' day(s)';
               }else {
-                echo "---";
+                echo $member['submitted'] ?  "(on time)" : "---";
               } ?></td>
             <td align="center"><?php
               if ($member['submitted']) {

@@ -126,7 +126,8 @@ class GroupEvent extends AppModel
     $eventType = array(1=>'simple_evaluations',2=>'rubrics',4=>'mixevals');
     switch ($eventTypeId) {
       case 1: //simple eval
-        return $this->findBySql('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked FROM group_events AS GroupEvent WHERE GroupEvent.event_id='.$eventId.' AND GroupEvent.id IN (SELECT DISTINCT grp_event_id FROM '.$eventTypeEval[$eventTypeId].' WHERE event_id='.$eventId.' GROUP BY grp_event_id, evaluatee HAVING (SUM(score)/COUNT(evaluatee)) < '.$maxPercent.'*(SELECT point_per_member FROM '.$eventType[$eventTypeId].' WHERE id IN (SELECT template_id AS id FROM events WHERE id=GroupEvent.event_id)) AND (SUM(score)/COUNT(evaluatee)) > '.$minPercent.'*COUNT(evaluatee)*(SELECT point_per_member FROM '.$eventType[$eventTypeId].' WHERE id IN (SELECT template_id AS id FROM events WHERE id=GroupEvent.event_id))) ORDER BY GroupEvent.group_id');
+        return $this->findBySql('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked FROM group_events AS GroupEvent WHERE GroupEvent.event_id='.$eventId.' AND GroupEvent.id IN (SELECT DISTINCT grp_event_id FROM '.
+            $eventTypeEval[$eventTypeId].' WHERE event_id='.$eventId.' GROUP BY grp_event_id, evaluatee HAVING (SUM(score)/COUNT(evaluatee)) < '.$maxPercent.'*(SELECT point_per_member FROM '.$eventType[$eventTypeId].' WHERE id IN (SELECT template_id AS id FROM events WHERE id=GroupEvent.event_id)) AND (SUM(score)/COUNT(evaluatee)) > '.$minPercent.'*COUNT(evaluatee)*(SELECT point_per_member FROM '.$eventType[$eventTypeId].' WHERE id IN (SELECT template_id AS id FROM events WHERE id=GroupEvent.event_id))) ORDER BY GroupEvent.group_id');
         break;
       case 2||4:
         //echo $eventId.' '.$eventTypeId.' '.$maxPercent;
@@ -138,15 +139,30 @@ class GroupEvent extends AppModel
   }
 
   function getNotReviewed($eventId=null) {
-    return $this->findBySql('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked 
-                            FROM group_events AS GroupEvent 
-                            WHERE (GroupEvent.marked="not reviewed" OR GroupEvent.marked="to review") AND GroupEvent.group_id != 0 AND GroupEvent.event_id='.$eventId.' 
+    return $this->findBySql('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked
+                            FROM group_events AS GroupEvent
+                            WHERE (GroupEvent.marked="not reviewed" OR GroupEvent.marked="to review") AND GroupEvent.group_id != 0 AND GroupEvent.event_id='.$eventId.'
                             ORDER BY GroupEvent.group_id');
   }
 
+
+    function getLateGroupMembers($groupEventId) {
+        $conditions ="`EvaluationSubmission`.date_submitted > `Event`.due_date " .
+            "AND `GroupEvent`.`id`=$groupEventId";
+
+        $joins = array(
+            "LEFT JOIN `events` AS `Event` ON `GroupEvent`.`event_id`=`Event`.`id`",
+            "LEFT JOIN `evaluation_submissions` AS `EvaluationSubmission` ON ".
+                "`GroupEvent`.`id`=`EvaluationSubmission`.`grp_event_id`",
+        );
+
+        $count = $this->findCount($conditions, (-1), $joins);
+        return $count;
+    }
+
   function getLate($eventId) {
-    return $this->findBySql('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked 
-                            FROM group_events as GroupEvent 
+    return $this->findBySql('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked
+                            FROM group_events as GroupEvent
                             LEFT JOIN events as Event ON GroupEvent.event_id = Event.id
                             LEFT JOIN evaluation_submissions as es  on GroupEvent.id=es.grp_event_id
                             WHERE GroupEvent.id IN  (SELECT id
@@ -162,8 +178,8 @@ class GroupEvent extends AppModel
                                 WHERE evaluation_submissions.event_id = '.$eventId.'
                                 GROUP BY evaluation_submissions.grp_event_id) AS tb2
                                 ON tb1.id=tb2.grp_event_id
-                              WHERE count1 > count2 OR count2 IS NULL) 
-                            AND GroupEvent.group_id != 0 AND (Event.due_date < now() OR date_submitted > due_date)' 
+                              WHERE count1 > count2 OR count2 IS NULL)
+                            AND GroupEvent.group_id != 0 AND (Event.due_date < now() OR date_submitted > due_date)'
                             );
   }
 }

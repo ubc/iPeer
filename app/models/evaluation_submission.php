@@ -2,7 +2,7 @@
 class EvaluationSubmission extends AppModel
 {
   var $name = 'EvaluationSubmission';
-  
+
   var $belongsTo = array(
                    'Event' =>
                      array(
@@ -22,30 +22,27 @@ class EvaluationSubmission extends AppModel
   // check if an entire group has completed all the evaluations
 	// for a particular assignment
 	function numInGroupCompleted($groupId=null, $groupEventId=null) {
-    $condition = 'EvaluationSubmission.submitted = 1 AND GroupMember.group_id='.$groupId.' AND EvaluationSubmission.grp_event_id='.$groupEventId;
-    $fields = 'GroupMember.user_id, EvaluationSubmission.submitter_id, EvaluationSubmission.submitted';
-    $joinTable = array(' LEFT JOIN groups_members as GroupMember ON GroupMember.user_id=EvaluationSubmission.submitter_id');
+        $condition = 'EvaluationSubmission.submitted = 1 AND GroupMember.group_id='.$groupId.' AND EvaluationSubmission.grp_event_id='.$groupEventId;
+        $fields = 'GroupMember.user_id, EvaluationSubmission.submitter_id, EvaluationSubmission.submitted';
+        $joinTable = array(' LEFT JOIN groups_members as GroupMember ON GroupMember.user_id=EvaluationSubmission.submitter_id');
 
-    return $this->findAll($condition, $fields, null, null, null, null, $joinTable );
-
+        return $this->findAll($condition, $fields, null, null, null, null, $joinTable );
 	}
 
 	function numCountInGroupCompleted($groupId=null, $groupEventId=null) {
-    $condition = 'EvaluationSubmission.submitted = 1 AND GroupMember.group_id='.$groupId.' AND EvaluationSubmission.grp_event_id='.$groupEventId;
-    $fields = 'Count(EvaluationSubmission.submitter_id) AS count';
-    $joinTable = array(' LEFT JOIN groups_members as GroupMember ON GroupMember.user_id=EvaluationSubmission.submitter_id');
-
-    return $this->findAll($condition, $fields, null, null, null, null, $joinTable );
-
+        $condition = 'EvaluationSubmission.submitted = 1 AND GroupMember.group_id='.$groupId.' AND EvaluationSubmission.grp_event_id='.$groupEventId;
+        $fields = 'Count(EvaluationSubmission.submitter_id) AS count';
+        $joinTable = array(' LEFT JOIN groups_members as GroupMember ON GroupMember.user_id=EvaluationSubmission.submitter_id');
+        return $this->findAll($condition, $fields, null, null, null, null, $joinTable );
 	}
 
 	function numCountInEventCompleted($eventId=null) {
-    $condition = 'EvaluationSubmission.submitted = 1 AND EvaluationSubmission.event_id='.$eventId;
-    $fields = 'Count(EvaluationSubmission.submitter_id) AS count';
-    $joinTable = array(' LEFT JOIN groups_members as GroupMember ON GroupMember.user_id=EvaluationSubmission.submitter_id');
+        $condition = 'EvaluationSubmission.submitted = 1 AND EvaluationSubmission.event_id='.$eventId;
+        $fields = 'Count(EvaluationSubmission.submitter_id) AS count';
+        $joinTable = array(' LEFT JOIN groups_members as GroupMember ON GroupMember.user_id=EvaluationSubmission.submitter_id');
 
-   // return $this->findAll($condition, $fields, null, null, null, null, $joinTable );
-return $this->findAll($condition, $fields, null, null, null, null );
+       // return $this->findAll($condition, $fields, null, null, null, null, $joinTable );
+       return $this-> findAll($condition, $fields, null, null, null, null );
 
 	}
 

@@ -17,9 +17,9 @@ echo $this->renderElement('evaluations/view_event_info', $params);
   <tr>
     <td colspan="3"><?php echo $html->image('icons/instructions.gif',array('alt'=>'instructions'));?>
       <b> Summary:</b>(
-      <a href="<?php echo $this->webroot.$this->themeWeb?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>;<?php echo $event['group_id']?>;Basic">Basic</a>
+      <a href="<?php echo $this->webroot.$this->themeWeb?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Basic">Basic</a>
        |
-      <a href="<?php echo $this->webroot.$this->themeWeb?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>;<?php echo $event['group_id']?>;Detail" >Detail</a>
+      <a href="<?php echo $this->webroot.$this->themeWeb?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Detail" >Detail</a>
         )
     </td>
   </tr>

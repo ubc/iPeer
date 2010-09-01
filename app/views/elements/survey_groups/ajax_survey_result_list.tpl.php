@@ -46,7 +46,7 @@
 	      } else {
           for ($k=0; $k < count($data[0]['User']); $k++) {
 		            if (in_array($student['id'],$data[0]['User'][$k])) { ?>
-		    <a href="<?php echo $this->webroot.$this->themeWeb.'evaluations/viewEvaluationResults/'.$data[0]['eventId'].";".$student['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php  echo $student['last_name'].", ".$student['first_name']?></a>
+		    <a href="<?php echo $this->webroot.$this->themeWeb.'evaluations/viewEvaluationResults/'.$data[0]['eventId']."/".$student['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php  echo $student['last_name'].", ".$student['first_name']?></a>
 		    <?php
 		              break;
 		            } elseif ($k >= count($data[0]['User'])-1)
