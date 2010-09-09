@@ -157,7 +157,7 @@ class EvaluationsController extends AppController
             //   display name, (warning shown), fixed parameters or Column ids
             array("View Results",    "", "", "", "!viewEvaluationResults", "Event.id", "Group.id"),
             array("View Submission", "", "", "", "!viewGroupSubmissionDetails", "Event.id", "Group.id"),
-            array("View Group",      "", "", "", "view", "Group.id"),
+            array("View Group",      "", "", "groups", "!view", "Group.id"),
             array("View Event",      "", "", "events", "view", "Event.id"),
             array("View Course",     "", "", "courses", "view", "Course.id")
         );
@@ -168,6 +168,7 @@ class EvaluationsController extends AppController
             "Group.group_num", "Group.group_name",
             $joinTables, $extraFilters, $recursive, "postProcess");
     }
+
 
     function ajaxList() {
         // Make sure the present user is not a student

@@ -139,11 +139,11 @@
     </tr>
     <tr class="tablecell2">
       <td>
-                          <?php
-                          if (isset($rdAuth->customIntegrateCWL) && $rdAuth->customIntegrateCWL) {
-                                  echo $this->renderElement('users/user_import_info_cwl');
-                          } else {
-                          echo $this->renderElement('users/user_import_info');
+          <?php
+          if (isset($rdAuth->customIntegrateCWL) && $rdAuth->customIntegrateCWL) {
+                  echo $this->renderElement('users/user_import_info_cwl');
+          } else {
+          echo $this->renderElement('users/user_import_info');
                   }?>
            </td>
      <td valign="top"><br>
