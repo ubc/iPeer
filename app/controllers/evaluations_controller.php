@@ -134,7 +134,6 @@ class EvaluationsController extends AppController
             array("Course.course",     "Course",       "7em",    "action", "View Course"),
         );
 
-        // The course to list for is the extra filter in this case
         $joinTables = array(
             array( "joinTable" => "groups",
                    "joinModel" => "Group",

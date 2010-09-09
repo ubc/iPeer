@@ -117,7 +117,6 @@ class AjaxListComponent extends Object {
                     }
                 }
             }
-
         }
         return $data;
     }
