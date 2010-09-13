@@ -64,12 +64,15 @@
         			            <a href="<?php
         			            if ($event['event_template_type_id'] == 3)
                             echo $this->webroot.$this->themeWeb.'surveygroups/viewresult/'.$event['id'];
-        			            else echo $this->webroot.$this->themeWeb.'evaluations/view/'.$event['id']?>"><?php echo $event['title']?></a>
+        			            else echo $this->webroot.$this->themeWeb.'evaluations/view/'.$event['id']?>"><?php echo $event['title']?><br />
         			            <?php //$event['title'];
         			            if ($event['to_review_count']>0) {
-          			            echo "<font color='red'> - ".$event['to_review_count']." new evaluation(s)</font>";
-          			          }
-        			            echo "</td>";
+                                    $plural = ($event['to_review_count'] > 1) ? "s" : "";
+                                    echo "<font color='darkred' style='padding-left:2em'>$event[to_review_count] new group ";
+                                    echo "evaluation$plural to review.</font>";
+          			            }
+
+        			            echo "</a></td>";
                                               //Quick fix of a bug
                                               $temp=$event['completed_count'];
         			            echo "<td>".$temp." of ".$event['student_sum']." Students</td>";
