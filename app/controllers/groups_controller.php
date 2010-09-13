@@ -333,7 +333,7 @@ class GroupsController extends AppController
 	  $groupNo = '';
 		for ($i = 0; $i < count($lines); $i++) {
 			// Split fields up on line by '
-			$line = split(',', $lines[$i]);
+			$line = @split(',', $lines[$i]);
 
             $data['Group']['id'] = null;
             //$data['Group']['student_no'] = trim($line[0]);

@@ -645,7 +645,7 @@ class UsersController extends AppController
         // Loop through our array
         for ($i = 0; $i < count($lines); $i++) {
             // Split fields up on line by '
-            $line = split(',', $lines[$i]);
+            $line = @split(',', $lines[$i]);
 
             // Set up the password lines
             if (isset($line[1])) {

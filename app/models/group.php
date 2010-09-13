@@ -94,7 +94,7 @@ class Group extends AppModel
 	  // Loop through import file
 		for ($i = 1; $i < count($lines); $i++) {
 			// Split fields up on line by '
-			$line = split(',', $lines[$i]);
+			$line = @split(',', $lines[$i]);
 
 			$data['member'.$i] = trim($line[0]);
 		}
