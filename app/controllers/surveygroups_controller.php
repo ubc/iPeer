@@ -201,10 +201,12 @@ class SurveyGroupsController extends AppController
 
     $courseId = $this->rdAuth->courseId;
 
+
+
     $data = false;
     if (!empty($this->params['form']['survey_select'])) {
         $data = array();
-        $data[0] = $this->Survey->find('id = '.$this->params['form']['survey_select']);
+        $data[0] = $this->Survey->find('`Survey`.`id` = '.$this->params['form']['survey_select']);
     }
 
     if (isset($this->params['form']) && !empty($this->params['form']) && $this->params['form']['select'] == 'user' && !empty($this->params['form']['livesearch2']))
@@ -235,9 +237,14 @@ class SurveyGroupsController extends AppController
         }
     }
 
+
+
     $data['User'] = $userData;
 
     $this->set('data',$data);
+
+
+
   }
 
   function makegroups($params=null) {
