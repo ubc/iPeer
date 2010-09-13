@@ -118,7 +118,6 @@ class UsersController extends AppController
             $actionRestrictions = "";
         }
 
-
         $actions = array(
             //   parameters to cakePHP controller:,
             //   display name, (warning shown), fixed parameters or Column ids

@@ -59,7 +59,7 @@ class RubricsController extends AppController
         if ($data) {
             foreach ($data as $key => $entry) {
                 // is it in use?
-                $inUse = $this->Event->checkEvaluationToolInUse('4',$entry['Rubric']['id']) ;
+                $inUse = $this->Event->checkEvaluationToolInUse('2',$entry['Rubric']['id']) ;
 
                 // Put in the custom column
                 $data[$key]['!Custom']['inUse'] = $inUse ? "Yes" : "No";
@@ -246,6 +246,20 @@ class RubricsController extends AppController
 
 	function delete($id)
 	{
+        // Deny Deleting evaluations in use:
+        $inUse = $this->Event->checkEvaluationToolInUse('2',$id);
+
+        if ($inUse) {
+            $this->index();
+            $message = "<span style='color:red'>";
+            $message.= "This evaluation is now in use, and can NOT be deleted.<br />";
+            $message.= "Please remove all the events assosiated with this evaluation first.";
+            $message.= "</span>";
+            $this->set('message', $message);
+            $this->render('index');
+            exit;
+        }
+
 		if ($this->Rubric->del($id))        // No recursion in results
         $recursive = 0;
 

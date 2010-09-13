@@ -228,6 +228,20 @@ class SimpleevaluationsController extends AppController
 	}
 
 	function delete($id) {
+        // Deny Deleting evaluations in use:
+        $inUse = $this->Event->checkEvaluationToolInUse('1',$id);
+
+        if ($inUse) {
+            $this->index();
+            $message = "<span style='color:red'>";
+            $message.= "This evaluation is now in use, and can NOT be deleted.<br />";
+            $message.= "Please remove all the events assosiated with this evaluation first.";
+            $message.= "</span>";
+            $this->set('message', $message);
+            $this->render('index');
+            exit;
+        }
+
         if (isset($this->params['form']['id'])) {
             $id = intval(substr($this->params['form']['id'], 5));
         }   //end if
