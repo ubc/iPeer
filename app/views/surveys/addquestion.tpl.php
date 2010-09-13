@@ -52,7 +52,7 @@
             <td>&nbsp;</td>
           </tr>
           <tr class="tablecell2">
-            <td valign="top">Possbile Question Answers: <font color="red">*</font></td>
+            <td valign="top">Possible Question Answers: <font color="red">*</font></td>
             <td>
 			<div id="adddelanswers">
 			<?php

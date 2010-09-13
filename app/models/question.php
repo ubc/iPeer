@@ -34,7 +34,7 @@ class Question extends AppModel
   {
   	$data['data']['Question']['master'] = $data['form']['master'];
 	$data['data']['Question']['type'] = $data['form']['type'];
-	$data['data']['Question']['count'] = $data['form']['add'];
+	$data['data']['Question']['count'] = $data['form']['data']['Question']['count'];
 
 	return $data;
   }

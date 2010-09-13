@@ -37,7 +37,7 @@
             <td>&nbsp;</td>
           </tr>
           <tr class="tablecell2">
-            <td valign="top">Possbile Question Answers: <font color="red">*</font></td>
+            <td valign="top">Possible Question Answers: <font color="red">*</font></td>
             <td>
 			<div id="adddelanswers">
 			<?php
@@ -51,7 +51,7 @@
 			</td>
             <td valign="top">'Multiple Choice' and 'Choose Any Of...' Questions Only<br>
               <br>
-              Do not include an option for "I choose not to answer this question." Iit will be inserted automatically.               <br>
+              Do not include an option for "I choose not to answer this question." It will be inserted automatically.               <br>
               <br>
 			<a href=# onclick="document.frm.add.value = parseInt(document.frm.add.value)+1;"><?php echo $html->image('icons/add.gif', array('alt'=>'Add Answer', 'align'=>'middle', 'border'=>'0')); ?> - Add Answer</a>
 			<br>
