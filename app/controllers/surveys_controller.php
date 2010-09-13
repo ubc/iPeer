@@ -106,6 +106,7 @@ class SurveysController extends AppController
         // Set up Columns
         $columns = array(
             array("Survey.id",          "ID",          "4em",   "number"),
+            array("Course.id",          "",             "",   "hidden"),
             array("Course.course",      "Course",      "15em",  "action",
               "View Course"),
             array("Survey.name",        "Name",        "auto",  "action",
@@ -160,7 +161,7 @@ class SurveysController extends AppController
             array("Edit Evaluation", "", "", "", "edit", "Survey.id"),
             array("Copy Evaluation", "", "", "", "copy", "Survey.id"),
             array("Delete Evaluation", $warning, "", "", "delete", "Survey.id"),
-            array("View Course", "",    "", "course", "view", "Course.id"),
+            array("View Course", "",    "", "courses", "home", "Course.id"),
             array("View Creator", "",    "", "users", "view", "Creator.id"));
 
         // No recursion in results (at all!)
