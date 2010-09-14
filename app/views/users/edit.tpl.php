@@ -81,6 +81,7 @@
 
         <input type="hidden" name="add" id="add" value="0">
         <!--<a href=# onClick="addToCourse();"><?php echo $html->image('icons/add.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Add Another Course</a>-->
+        <?php if($course_count > 0):?>
         <?php echo $ajax->link($html->image('icons/add.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')).'- Add Another Course',
                                '/users/adddelcourse/'.$user_id,
                                array('update'=>'adddelcourses',
@@ -92,6 +93,7 @@
                                false) ?>
 
         <br><br>
+        <?php endif;?>
         <a href=# onClick="removeFromCourse();"><?php echo $html->image('icons/delete.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Remove From Another Course</a>
         <?php echo $ajax->observeField('add', array('update'=>'adddelcourses',
                                                     'url'=>"/users/adddelcourse",
