@@ -106,14 +106,11 @@
     &nbsp;&nbsp;&nbsp;&nbsp;
     <input type="file" name="file" value="Browse" /><br>
     <?php
-    if (empty($rdAuth->courseId)) {
-        $params = array('controller'=>'users', 'courseList'=>$coursesList, 'defaultOpt'=>1);
-    } else {
-        $params = array('controller'=>'users', 'courseList'=>$coursesList);
-    }?>
+        $params = array('controller'=>'users', 'courseList'=>$coursesList, "courseId" => $rdAuth->courseId);
+    ?>
     <br /><h3>2) Select the course to import into:</h3>
     &nbsp;&nbsp;&nbsp;&nbsp;
-    <?php echo $this->renderElement('courses/course_selection_box', $params); ?>
+        <?php echo $this->renderElement('courses/course_selection_box', $params); ?>
     <br /><br /><h3>3) Click the button bellow to Create the Groups:</h3>
     &nbsp;&nbsp;&nbsp;&nbsp;
     <?php echo $html->submit('Import Group List') ?>

@@ -143,8 +143,8 @@
           if (isset($rdAuth->customIntegrateCWL) && $rdAuth->customIntegrateCWL) {
                   echo $this->renderElement('users/user_import_info_cwl');
           } else {
-          echo $this->renderElement('users/user_import_info');
-                  }?>
+              echo $this->renderElement('users/user_import_info');
+          }?>
            </td>
      <td valign="top"><br>
 <form name="importfrm" id="importfrm" method="POST" action="<?php echo $html->url('import') ?>" enctype="multipart/form-data" >
@@ -154,11 +154,8 @@
     <input type="file" name="file" value="Browse" /><br>
     <?php echo  $html->hidden('User/role'); ?>
     <?php
-    if (empty($rdAuth->courseId)) {
-        $params = array('controller'=>'users', 'courseList'=>$courseList, 'defaultOpt'=>1);
-    } else {
-        $params = array('controller'=>'users', 'courseList'=>$courseList);
-    } ?>
+        $params = array('controller'=>'users', 'courseList'=>$courseList, "courseId" => $rdAuth->courseId);
+    ?>
 
     <br /><h3>2) Select the course to import into:</h3>
     &nbsp;&nbsp;&nbsp;&nbsp;
