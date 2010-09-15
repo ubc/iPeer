@@ -98,7 +98,7 @@ class CoursesController extends AppController
         $actions = array(
             array("Course Home", "", "", "", "home", "Course.id"),
             array("View Record", "", "", "", "view", "Course.id"),
-            array("Edit Record", "", "", "", "edit", "Course.id"),
+            array("Edit Course", "", "", "", "edit", "Course.id"),
             array("Delete Course", $warning, "", "", "delete", "Course.id"),
             array("View Creator", "",    "", "users", "view", "Creator.id"),
             array("View Instructor", "", "", "users", "view", "Instructor.id"));
@@ -172,9 +172,7 @@ class CoursesController extends AppController
 		{
 			$this->render('add');
 		} else {
-            if (!stristr($this->params['data']['Course']['homepage'], "http://") || !stristr($this->params['data']['Course']['homepage'], "https://") ) {
-                $this->params['data']['Course']['homepage'] = "http://" . $this->params['data']['Course']['homepage'];
-            }
+
 			$this->params = $this->Course->prepData($this->params);
 			if ($this->Course->save($this->params['data'])) {
 				$this->UserCourse->insertAdmin($this->Course->id);

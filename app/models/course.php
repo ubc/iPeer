@@ -134,22 +134,29 @@ class Course extends AppModel
 	function beforeSave(){
         // Ensure the name is not empty
         if (empty($this->data[$this->name]['title'])) {
-            $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
+            $this->errorMessage = "Please enter a title for this " . $this->name . ".";
             return false;
         }
 
-      // Remove any single quotes in the name, so that custom SQL queries are not confused.
-      $this->data[$this->name]['title'] =
-        str_replace("'", "", $this->data[$this->name]['title']);
+        // Add an http or https to address
+        if (!empty($this->data[$this->name]['homepage']) && (
+            !stristr($this->data[$this->name]['homepage'], "http://") ||
+            !stristr($this->data[$this->name]['homepage'], "https://") )) {
+            $this->data[$this->name]['homepage'] = "http://" . $this->data[$this->name]['Course']['homepage'];
+        }
 
-	  $allowSave = true;
-	  if (empty($this->data[$this->name]['course'])) { //temp ! to escape ajax bug
-		  $this->errorMessage='Course name is required.'; //check empty name
-			$allowSave = false;
-    } else {
-		  $allowSave = $this->__checkDuplicateCourse();//check the duplicate course
-		}
-	   return $allowSave;
+        // Remove any single quotes in the name, so that custom SQL queries are not confused.
+        $this->data[$this->name]['title'] =
+              str_replace("'", "", $this->data[$this->name]['title']);
+
+          $allowSave = true;
+        if (empty($this->data[$this->name]['course'])) { //temp ! to escape ajax bug
+            $this->errorMessage='Course name is required.'; //check empty name
+            $allowSave = false;
+        } else {
+            $allowSave = $this->__checkDuplicateCourse();//check the duplicate course
+        }
+        return $allowSave;
 	}
 
   //Validation check on duplication of course
