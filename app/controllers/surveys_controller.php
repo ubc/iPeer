@@ -106,13 +106,13 @@ class SurveysController extends AppController
         // Set up Columns
         $columns = array(
             array("Survey.id",          "ID",          "4em",   "number"),
-            array("Course.id",          "",             "",   "hidden"),
+            array("Course.id",          "",             "",     "hidden"),
             array("Course.course",      "Course",      "15em",  "action",
               "View Course"),
             array("Survey.name",        "Name",        "auto",  "action",
-                "View Evaluation"),
+                "View Survey"),
             array("!Custom.inUse",      "In Use",      "4em",   "number"),
-            array("Survey.due_date",     "Due Date",   "10em", "date"),
+            array("Survey.due_date",     "Due Date",   "10em",  "date"),
             // The release window columns
             array("now()",   "", "", "hidden"),
             array("Survey.release_date_begin", "", "", "hidden"),
@@ -157,10 +157,10 @@ class SurveysController extends AppController
         // Set up actions
         $warning = "Are you sure you want to delete this evaluation permanently?";
         $actions = array(
-            array("View Evaluation", "", "", "", "view", "Survey.id"),
-            array("Edit Evaluation", "", "", "", "edit", "Survey.id"),
-            array("Copy Evaluation", "", "", "", "copy", "Survey.id"),
-            array("Delete Evaluation", $warning, "", "", "delete", "Survey.id"),
+            array("View Survey", "", "", "", "view", "Survey.id"),
+            array("Edit Survey", "", "", "", "edit", "Survey.id"),
+            array("Copy Survey", "", "", "", "copy", "Survey.id"),
+            array("Delete Survey", $warning, "", "", "delete", "Survey.id"),
             array("View Course", "",    "", "courses", "home", "Course.id"),
             array("View Creator", "",    "", "users", "view", "Creator.id"));
 

@@ -505,14 +505,13 @@ AjaxList.prototype.renderSearchControl = function (div) {
     window.setTimeout("var s = $('searchInputField'); if (s.value) { s.focus(); }", 10);
 
     div.appendChild(document.createTextNode("   "));
-    var submit = new Element("input", {"type" : "submit", "value" : "Search"});
+    var submit = new Element("input", {"type" : "submit", "value" : "Search", "style":"margin:0em 2em 0em 1em"});
     submit.onclick = ajaxListLibrary.createDelegate(this, this.doSearch);
 
     var clear = new Element("input", {"type" : "submit", "value" : "Clear"});
     clear.onclick = ajaxListLibrary.createDelegate(this, this.clearSearchValue);
 
     div.appendChild(submit);
-    div.appendChild(document.createTextNode(" . . . . "));
     div.appendChild(clear);
 }
 

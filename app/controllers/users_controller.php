@@ -73,13 +73,13 @@ class UsersController extends AppController
         // The columns to show
         $columns = array(
             //    Model   columns       (Display Title) (Type Description)
-            array("User.id",         "ID",           "4em",    "number"),
-            array("User.username",   "Username",     "10em",   "action", "View User"),
-            array("User.role",       "Role",         "6em",    "map",
+            array("User.role",       "Role",         "6em",   "map",
                 array(  "A" => "Admin",  "I" => "Instructor", "S" => "Student")),
-            array("User.first_name", "First Name",   "13em",    "string"),
-            array("User.last_name",  "Last Name",    "13em",    "string"),
-            array("User.email",      "Email",        "auto",    "string")//,
+            array("User.id",         "",             "",      "hidden"),
+            array("User.username",   "Username",     "10em",  "action", "View User"),
+            array("User.first_name", "First Name",   "13em",  "string"),
+            array("User.last_name",  "Last Name",    "13em",  "string"),
+            array("User.email",      "Email",        "auto",  "string")//,
             //array("UserEnrol.course_id", "Course ID", "number")
         );
 

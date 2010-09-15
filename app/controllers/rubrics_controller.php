@@ -75,7 +75,7 @@ class RubricsController extends AppController
         $columns = array(
             array("Rubric.id",          "ID",          "4em",   "number"),
             array("Rubric.name",        "Name",        "auto",  "action",
-                "View Evaluation"),
+                "View Rubric"),
             array("!Custom.inUse",      "In Use",      "4em",   "number"),
             array("Rubric.availability","Availability","6em",   "string"),
             array("Rubric.lom_max",     "LOM",         "4em",   "number"),
@@ -115,12 +115,12 @@ class RubricsController extends AppController
         }
 
         // Set up actions
-        $warning = "Are you sure you want to delete this evaluation permanently?";
+        $warning = "Are you sure you want to delete this Rubric permanently?";
         $actions = array(
-            array("View Evaluation", "", "", "", "view", "Rubric.id"),
-            array("Edit Evaluation", "", $restrictions, "", "edit", "Rubric.id"),
-            array("Copy Evaluation", "", "", "", "copy", "Rubric.id"),
-            array("Delete Evaluation", $warning, $restrictions, "", "delete", "Rubric.id"),
+            array("View Rubric", "", "", "", "view", "Rubric.id"),
+            array("Edit Rubric", "", $restrictions, "", "edit", "Rubric.id"),
+            array("Copy Rubric", "", "", "", "copy", "Rubric.id"),
+            array("Delete Rubric", $warning, $restrictions, "", "delete", "Rubric.id"),
             array("View Creator", "",    "", "users", "view", "Creator.id"));
 
         // No recursion in results
