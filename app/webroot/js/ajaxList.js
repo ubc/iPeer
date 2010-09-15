@@ -1081,7 +1081,7 @@ AjaxList.prototype.ajaxCallComplete = function (response) {
         var message = "Can not update list: network down or invalid server response.\n";
         message += "This can be be your iPeer session timing out.\n";
         message += "Try logging out, and logging back into iPeer.";
-        alert("message");
+        alert(message);
     } else {
         // Update the update time
         ajaxListLibrary.setCookie(this.getUpdateCookieName(), response.responseJSON.timeStamp);
