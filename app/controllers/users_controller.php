@@ -643,8 +643,14 @@ class UsersController extends AppController
 
         // Loop through our array
         for ($i = 0; $i < count($lines); $i++) {
-            // Split fields up on line by '
-            $line = @split(',', $lines[$i]);
+
+
+            // Get rid of '"', it just  confuses iPeer in CSV Files
+            $filteredLine = $lines[$i];
+            $filteredLine = str_replace('"','', $filteredLine);
+
+            // Split fields up on line by ','
+            $line = @split(',', $filteredLine);
 
             // Set up the password lines
             if (isset($line[1])) {
