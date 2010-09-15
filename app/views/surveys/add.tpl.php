@@ -47,11 +47,7 @@
             <tr class="tablecell2">
               <td>Assigned Course:<font color="red">*</font></td>
               <td><?php
-                  if (empty($rdAuth->courseId)) {
-                    $params = array('controller'=>'surveys', 'courseList'=>$courseList, 'courseId'=>null, 'defaultOpt'=>1);
-                  } else {
-                    $params = array('controller'=>'surveys', 'courseList'=>$courseList, 'courseId'=>null);
-                  }
+                  $params = array('controller'=>'surveys', 'courseList'=>$courseList, "courseId" => $this->controller->rdAuth->courseId);
                   echo $this->renderElement('courses/course_selection_box', $params);
             ?></td>
               <td>Which course may take this survey?</td>
