@@ -80,10 +80,10 @@ class SimpleevaluationsController extends AppController
 
         // Set up Columns
         $columns = array(
-            array("SimpleEvaluation.id",   "ID",          "4em",        "number"),
-            array("SimpleEvaluation.name", "Name",        "12em",       "action",   "View Evaluation"),
-            array("SimpleEvaluation.description", "Description", "auto",  "action", "View Evaluation"),
-            array("!Custom.inUse", "In Use", "4em",           "number"),
+            array("SimpleEvaluation.id",   "",       "",        "hidden"),
+            array("SimpleEvaluation.name", "Name",   "12em",    "action",   "View Evaluation"),
+            array("SimpleEvaluation.description", "Description","auto",  "action", "View Evaluation"),
+            array("!Custom.inUse", "In Use",          "4em",    "number"),
             array("SimpleEvaluation.point_per_member", "Points/Member", "10em", "number"),
             array("Creator.id",           "",            "",     "hidden"),
             array("Creator.username",     "Creator",  "10em", "action", "View Creator"),
@@ -128,7 +128,7 @@ class SimpleevaluationsController extends AppController
 
         // Set up the list itself
         $this->AjaxList->setUp($this->SimpleEvaluation, $columns, $actions,
-            "SimpleEvaluation.id", "SimpleEvaluation.name", $joinTables, $extraFilters, $recursive, "postProcess");
+            "SimpleEvaluation.name", "SimpleEvaluation.name", $joinTables, $extraFilters, $recursive, "postProcess");
     }
 
 

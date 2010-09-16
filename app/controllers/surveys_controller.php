@@ -170,7 +170,7 @@ class SurveysController extends AppController
 
         // Set up the list itself
         $this->AjaxList->setUp($this->Survey, $columns, $actions,
-            "Survey.id", "Survey.name", $joinTables, $extraFilters, $recursive, "postProcess");
+            "Course.course", "Survey.name", $joinTables, $extraFilters, $recursive, "postProcess");
     }
 
 

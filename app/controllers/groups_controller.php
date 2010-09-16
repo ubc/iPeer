@@ -55,8 +55,10 @@ class GroupsController extends AppController
         // Creates the custom in use column
         if ($data) {
             foreach ($data as $key => $entry) {
-                $data[$key]['Group']['group_name'] .= " (" .
-                    $this->GroupsMembers->countMembers($entry['Group']['id']) . ")";
+                $memberCount = $this->GroupsMembers->countMembers($entry['Group']['id']);
+                $plural = ($memberCount > 1) ? "s" : "";
+                $data[$key]['Group']['group_name'] .= " <span style='color:#404080'>".
+                    "($memberCount member$plural)</span>";
             }
         }
         // Return the processed data back
@@ -77,11 +79,12 @@ class GroupsController extends AppController
 
         // The columns to show
         $columns = array(
-            array("Group.id",        "ID",       "4em",  "number"),
+            array("Group.id",        "",         "",     "hidden"),
             array("Course.id",       "",         "",     "hidden"),
             array("Course.course",   "Course",   "12em", "action", "Course Home"),
             array("Group.group_num", "Group #",  "6em",  "number"),
-            array("Group.group_name","Group Name (members)",     "auto", "action", "View Group"),
+            array("Group.group_name","Group Name","auto", "action",
+                    "View Group"),
             array("Creator.id",      "",         "",     "hidden"),
             array("Creator.username","Creator",  "10em", "action", "View Creator"),
             array("Course.created",  "Date",     "10em", "date"),
@@ -134,7 +137,7 @@ class GroupsController extends AppController
             array("Delete Group",    $deleteUserWarning, "", "", "delete",       "Group.id")
         );
 
-        $this->AjaxList->setUp($this->Group, $columns, $actions, "Group.id", "Group.name",
+        $this->AjaxList->setUp($this->Group, $columns, $actions, "Group.group_num", "Group.group_name",
             $joinTables, $extraFilters, $recursive, "postProcess");
     }
 

@@ -100,11 +100,11 @@ class EventsController extends AppController
 
         // Set up Columns
         $columns = array(
-            array("Event.id",             "ID",          "4em",  "number"),
+            array("Event.id",             "",            "",     "hidden"),
             array("Course.id",            "",            "",     "hidden"),
-            array("Course.course",        "Course",      "12em", "action", "View Course"),
+            array("Course.course",        "Course",      "13em", "action", "View Course"),
             array("Event.Title",          "Title",       "auto", "action", "View Event"),
-            array("!Custom.results",       "View",            "4em", "action", "View Results"),
+            array("!Custom.results",       "View",       "4em", "action", "View Results"),
             array("Event.event_template_type_id", "Type", "", "map",
                 array("1" => "Simple", "2" => "Rubric", "4" => "Mixed")),
             array("Event.due_date",       "Due Date",    "10em", "date"),
@@ -161,7 +161,8 @@ class EventsController extends AppController
         $recursive = 0;
 
         $this->AjaxList->setUp($this->Event, $columns, $actions,
-            "Event.id", "Event.title", $joinTables, $extraFilters, $recursive, "postProcessData");
+            "Course.course", "Course.course", $joinTables, $extraFilters,
+            $recursive, "postProcessData");
     }
 
     function index($message='') {

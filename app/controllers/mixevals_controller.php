@@ -74,7 +74,7 @@ class MixevalsController extends AppController
     function setUpAjaxList() {
         // Set up Columns
         $columns = array(
-            array("Mixeval.id",             "ID",          "4em",  "number"),
+            array("Mixeval.id",            "",              "",  "hidden"),
             array("Mixeval.name",          "Name",         "auto", "action",
                 "View Evaluation"),
             array("!Custom.inUse",         "In Use",       "4em",  "number"),
@@ -130,7 +130,7 @@ class MixevalsController extends AppController
 
         // Set up the list itself
         $this->AjaxList->setUp($this->Mixeval, $columns, $actions,
-            "Mixeval.id", "Mixeval.name", $joinTables, $extraFilters, $recursive, "postProcess");
+            "Mixeval.name", "Mixeval.name", $joinTables, $extraFilters, $recursive, "postProcess");
     }
 
 

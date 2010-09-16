@@ -55,7 +55,7 @@ class CoursesController extends AppController
     function setUpAjaxList() {
         // Set up Columns
         $columns = array(
-            array("Course.id",            "ID",          "4em",  "number"),
+            array("Course.id",            "",            "",      "hidden"),
             array("Course.homepage",      "Web",         "4em",  "link",   "home.gif"),
             array("Course.course",        "Course",      "15em",  "action", "Course Home"),
             array("Course.title",         "Title",       "auto", "action", "Course Home"),
@@ -106,7 +106,7 @@ class CoursesController extends AppController
         $recursive = 0;
 
         $this->AjaxList->setUp($this->Course, $columns, $actions,
-            "Course.id", "Course.course", $joinTables, $extraFilters, $recursive);
+            "Course.course", "Course.course", $joinTables, $extraFilters, $recursive);
     }
 
 

@@ -110,12 +110,12 @@ class EvaluationsController extends AppController
         // The columns to show
         $columns = array(
             //    Model   columns       (Display Title) (Type Description)
-            array("GroupEvent.id",     "ID",         "4em", "number"),
-            array("Group.id",   "",                  "",    "hidden"),
-            array("Group.group_num",   "Group #",    "7em",  "action", "View Group"),
-            array("Group.group_name",  "Group Name", "auto", "action", "View Results"),
-            array("!Custom.completion","Completed",  "7em",  "string"),
-            array("!Custom.lates",      "Late?",     "7em",  "action", "View Submission"),
+            array("GroupEvent.id",     "",           "",    "hidden"),
+            array("Group.id",          "",           "",    "hidden"),
+            array("Group.group_num",   "Group #",    "7em", "action", "View Group"),
+            array("Group.group_name",  "Group Name", "auto","action", "View Results"),
+            array("!Custom.completion","Completed",  "7em", "string"),
+            array("!Custom.lates",     "Late?",      "7em", "action", "View Submission"),
 
             // Release and mark status
             array("GroupEvent.marked", "Status",      "9em",  "map",

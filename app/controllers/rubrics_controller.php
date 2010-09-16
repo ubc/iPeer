@@ -73,7 +73,7 @@ class RubricsController extends AppController
     function setUpAjaxList() {
         // Set up Columns
         $columns = array(
-            array("Rubric.id",          "ID",          "4em",   "number"),
+            array("Rubric.id",          "",            "",      "hidden"),
             array("Rubric.name",        "Name",        "auto",  "action",
                 "View Rubric"),
             array("!Custom.inUse",      "In Use",      "4em",   "number"),
@@ -128,7 +128,7 @@ class RubricsController extends AppController
 
         // Set up the list itself
         $this->AjaxList->setUp($this->Rubric, $columns, $actions,
-            "Rubric.id", "Rubric.name", $joinTables, $extraFilters, $recursive, "postProcess");
+            "Rubric.name", "Rubric.name", $joinTables, $extraFilters, $recursive, "postProcess");
     }
 
 
