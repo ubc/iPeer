@@ -157,8 +157,9 @@ class SurveysController extends AppController
         // Set up actions
         $warning = "Are you sure you want to delete this evaluation permanently?";
         $actions = array(
-            array("View Survey", "", "", "", "view", "Survey.id"),
-            array("Edit Survey", "", "", "", "edit", "Survey.id"),
+            array("View Event", "", "", "", "view", "Survey.id"),
+            array("Edit Event", "", "", "", "edit", "Survey.id"),
+            array("Edit Questions", "", "", "", "questionssummary", "Survey.id"),
             array("Copy Survey", "", "", "", "copy", "Survey.id"),
             array("Delete Survey", $warning, "", "", "delete", "Survey.id"),
             array("View Course", "",    "", "courses", "home", "Course.id"),

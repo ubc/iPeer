@@ -55,19 +55,25 @@
             <td valign="top">Possible Question Answers: <font color="red">*</font></td>
             <td>
 			<div id="adddelanswers">
+
+            <script> defaultAnswerCount=<?php echo empty($count) ? 4 : $count;?>;</script>
 			<?php
 			if(empty($count)) $count=4;
-			$params = array('controller'=>'surveys', 'count'=>$count);
-			echo $this->renderElement('surveys/ajax_survey_answers', $params);
+                $params = array('controller'=>'surveys', 'count'=>$count);
+                echo $this->renderElement('surveys/ajax_survey_answers', $params);
 			?>
 			</div>
 			<input type="hidden" name="add" id="add" value="4">
-			<?php echo $ajax->observeField('add', array('update'=>'adddelanswers', 'url'=>"/surveys/adddelquestion", 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');stripe();")) ?>
+			<?php echo $ajax->observeField('add',
+                        array('update'=>'adddelanswers',
+                        'with' => "Form.serialize( $('frm') )",
+                        'url'=>"/surveys/adddelquestion", 'frequency'=>1,
+                        'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');stripe();")) ?>
 
 			</td>
             <td valign="top">'Multiple Choice' and 'Choose Any Of...' Questions Only<br>
               <br>
-              Do not include an option for "I choose not to answer this question." Iit will be inserted automatically.               <br>
+              Do not include an option for "I choose not to answer this question." It will be inserted automatically.               <br>
               <br>
 			<a href=# onclick="document.frm.add.value = parseInt(document.frm.add.value)+1;"><?php echo $html->image('icons/add.gif', array('alt'=>'Add Answer', 'align'=>'middle', 'border'=>'0')); ?> - Add Answer</a>
 			<br>
