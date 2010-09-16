@@ -27,8 +27,8 @@
                 $user = $row['User'];
                 echo "<tr class='tablecell'>";
                 echo "<td>$user[username]</td>";
-                echo "<td>$user[last_name]</td>";
                 echo "<td>$user[first_name]</td>";
+                echo "<td>$user[last_name]</td>";
 				echo "<td>";
 				echo !empty($user['tmp_password']) ?
                     "<strong style='color:red;letter-spacing:3px'>$user[tmp_password]</strong></tt>" :
