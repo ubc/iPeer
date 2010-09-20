@@ -506,7 +506,16 @@ class DboSource extends DataSource {
 		$query = $this->generateAssociationQuery($model, $null, null, null, null, $queryData, false, $null);
 		$resultSet = $this->fetchAll($query, $model->cacheQueries, $model->name);
 		$filtered = $this->__filterResults($resultSet, $model);
-//echo $query;
+
+        // Echo SQL Errors immidiately after they occur
+        if (DEBUG && !is_array($resultSet)) {
+            echo "<div style='border:1px solid black; margin: 6px; padding:6px; background:white'>";
+            echo "<div style='color:red'>Error in SQL:</div>";
+            echo "<div style='margin-left:1em;color:brown'>" . $this->error . "</div>";
+            echo "<div style='margin-left:2em;color:darkblue'>$query</div>";
+            echo "</div>";
+        }
+
 		if ($model->recursive > 0) {
 			foreach($model->__associations as $type) {
 				foreach($model->{$type} as $assoc => $assocData) {
@@ -606,13 +615,13 @@ class DboSource extends DataSource {
 		if ($query) {
 
 			if (!isset($resultSet) || !is_array($resultSet)) {
-				if (DEBUG) {
+				/*if (DEBUG) {
 					e('<div style = "font: Verdana bold 12px; color: #FF0000">SQL Error in model ' . $model->name . ': ');
 					if (isset($this->error) && $this->error != null) {
 						e($this->error);
 					}
 					e('</div>');
-				}
+				}*/
 				return null;
 			}
 
