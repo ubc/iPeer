@@ -331,16 +331,37 @@ class UsersController extends AppController
         // Ensure that the id is valid
         if (is_numeric($id)) {
 
-            // We should be of equal or higher privileges to be able to create this user
+            // We should be of equal or higher privileges to be able to edit this user
             if ($this->rdAuth->getPrivilegeLevel() >= $this->rdAuth->getPrivilegeLevel($id)) {
 
                 $enrolled_courses = $this->Course->findRegisteredCoursesList($id, $this->rdAuth->id, $this->rdAuth->role);
-                $course_count = $this->Course->findNonRegisteredCoursesCount($id, $this->rdAuth->id, $this->rdAuth->role);
-                $all_courses = $this->Course->findNonRegisteredCoursesList($id, $this->rdAuth->id, $this->rdAuth->role);
-
-                $this->set('all_courses', $all_courses);
                 $this->set('enrolled_courses', $enrolled_courses);
+                $course_count = $this->Course->findNonRegisteredCoursesCount($id, $this->rdAuth->id, $this->rdAuth->role);
                 $this->set('course_count', $course_count[0][0]['total']);
+                $all_courses = $this->Course->findNonRegisteredCoursesList($id, $this->rdAuth->id, $this->rdAuth->role);
+                $this->set('all_courses', $all_courses);
+
+
+                // Get accessible courses
+                $courseList = $this->sysContainer->getMyCourseList();
+
+                // List the entrolled courses
+                $simpleEnrolledList = array();
+                foreach ($enrolled_courses as $key => $value) {
+                    if (!empty($courseList[$value['Course']['id']])) {
+                        array_push($simpleEnrolledList, $value['Course']['id']);
+                    }
+                }
+
+                $this->set("simpleEnrolledList", $simpleEnrolledList);
+
+                // List the avaliable courses
+                $simpleCoursesList = array();
+                foreach ($courseList as $key => $value) {
+                    $simpleCoursesList[$key] = $value['course'];
+                }
+                $this->set("simpleCoursesList", $simpleCoursesList);
+
                 $this->set('user_id', $id);
                 $this->set('user', $this->rdAuth->User->findUserById($this->rdAuth->id));
 
@@ -373,6 +394,30 @@ class UsersController extends AppController
  						if(!empty($this->params['form']['course_ids'])) {
                         	$this->UserEnrol->insertCourses($this->User->id, $this->params['form']['course_ids']);
                         }
+
+                        // Build up a list of checkboxed courses
+                        $checkedCourseList = array();
+                        foreach ($this->params['form'] as $key => $value) {
+                            if (strstr($key, "checkBoxList_")) {
+                                $aCourse = substr($key, 13);
+                                array_push($checkedCourseList, $aCourse);
+                            }
+                        }
+
+                        // Put students into newly selected courses
+                        foreach ($checkedCourseList as $key => $value) {
+                            if(!isset($simpleEnrolledList[$value])) {
+                                $this->UserEnrol->insertCourses($data2save['User']['id'],array($value));
+                            }
+                        }
+
+                        // Take them out of the de-selected courses
+                        foreach ($simpleEnrolledList as $key => $value) {
+                            if (!isset($checkedCourseList[$value])) {
+                                $this->UserEnrol->removeStudentFromCourse($data2save['User']['id'], $value);
+                            }
+                        }
+
 
                         //Render to view page to display saved data
                         //TODO: Display list of users after import
@@ -683,7 +728,7 @@ class UsersController extends AppController
                     $this->UserEnrol->id = null;
                 }
 
-            } else{
+            } else {
                 if (isset($this->params['form']['course_id']))
                 {
                     $curUser = $this->User->find('username="'.$data['User']['username'].'"');
@@ -796,39 +841,7 @@ class UsersController extends AppController
         }
     }
 
-    function removeFromCourse($course_id='', $user_id='') {
 
-    // Make sure the present user is not a student
-    if ($this->rdAuth->getPrivilegeLevel() <= $this->rdAuth->studentPrivilegeLevel()) {
-      $this->rdAuth->privilegeError();
-    }
-
-    if($course_id == '' || $user_id == '') {
-      $this->Session->setFlash('Invalid course id or user id!');
-    }else{
-
-      $this->autoRender = false;
-
-      if(User::canRemoveCourse($this->rdAuth->User->findUserById($this->rdAuth->id), $course_id))
-      {
-        $return = $this->UserEnrol->removeStudentFromCourse($user_id, $course_id);
-      }else{
-        $this->Session->setFlash('You do not have permssion to remove this course.');
-      }
-    }
-
-        $this->redirect('users/edit/'.$user_id);
-    }
-
-    function adddelcourse($user_id)
-    {
-      // Make sure the present user is not a student
-      $this->rdAuth->noStudentsAllowed();
-
-      $this->set('courses', $this->nonRegisteredCourses($user_id, $this->rdAuth->id, $this->rdAuth->role));
-
-      $this->layout = 'ajax';
-    }
 
     function nonRegisteredCourses($user_id, $requester = null, $requester_role = null) {
         return $this->Course->findNonRegisteredCoursesList($user_id, $requester, $requester_role);

@@ -56,51 +56,19 @@
     </tr>
     <?php if (isset($params['data']['User']['role']) &&($params['data']['User']['role'] == 'S') && (($rdAuth->role == 'I') || ($rdAuth->role == 'A'))):?>
     <tr class="tablecell2">
-      <td width="130" id="courses_label">Courses</td>
-      <td>
-        <?php if (isset($enrolled_courses)):?>
-         <table  width="100%" border="0" cellspacing="2" cellpadding="2">
-        <?php foreach($enrolled_courses as $ec):?>
-            <tr>
-                <td width="15">
-                    <?php if(User::canRemoveCourse($user, $ec['Course']['id'])):?>
-                        <a href="<?php echo $this->webroot . $this->themeWeb . $this->params['controller'] . '/removeFromCourse/'.$ec['Course']['id']. '/' .$params['data']['User']['id']?>"
-                        onclick='return confirm("Are you sure you want to remove the student:\n    <?php echo $params['data']['User']['student_no'];?>\nfrom the course:\n    <?php echo $ec['Course']['title'];?> ?")'>
-                        <?php echo $html->image('icons/x_small.gif',array('border'=>'0','alt'=>'Delete'))?></a>
-                    <?php endif;?>
-                    </td>
-                    <td><a href="../../courses/view/<?php echo $ec['Course']['id']?>"><?php echo $ec['Course']['course']?></a></td>
-                    </tr>
-                    <?php endforeach;?>
-                </table>
-            <?php endif;?>
+      <td width="130" id="courses_label">This student's<br />Courses:</td>
+      <td colspan=2>
+        <?php
+        // Render the course list, with check box selections
+        echo $this->renderElement("list/checkBoxList", array(
+            "eachName" => "Course",
+            "setName" => "Courses",
+            "verbIn" => "add",
+            "verbOut" => "remove",
+            "list" => $simpleCoursesList,
+            "selection" => $simpleEnrolledList)); ?>
         <input type="hidden" name="user_id" id="user_id" value="<?php echo $user_id;?>">
         <div id="adddelcourses"></div>
-      </td>
-      <td>
-
-        <input type="hidden" name="add" id="add" value="0">
-        <!--<a href=# onClick="addToCourse();"><?php echo $html->image('icons/add.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Add Another Course</a>-->
-        <?php if($course_count > 0):?>
-        <?php echo $ajax->link($html->image('icons/add.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')).'- Add Another Course',
-                               '/users/adddelcourse/'.$user_id,
-                               array('update'=>'adddelcourses',
-                                     'with'=> '{add:course_count}',
-                                     'loading'=>"Element.show('loading');",
-                                     'complete'=>"Element.hide('loading');course_count++;",
-                                     'position'=>'bottom'),
-                               null,
-                               false) ?>
-
-        <br><br>
-        <?php endif;?>
-        <a href=# onClick="removeFromCourse();"><?php echo $html->image('icons/delete.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Remove From Another Course</a>
-        <?php echo $ajax->observeField('add', array('update'=>'adddelcourses',
-                                                    'url'=>"/users/adddelcourse",
-                                                    'frequency'=>1,
-                                                    'loading'=>"Element.show('loading');",
-                                                    'complete'=>"Element.hide('loading');")) ?>
-
       </td>
     </tr>
     <?php endif;?>
