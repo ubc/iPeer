@@ -244,6 +244,7 @@ class EvaluationMixevalHelperComponent extends Object
 
       if ($evalMarkArray!=null) {
         $grade_release = 1;
+         		$detailPOS = 0;
 
   	    foreach($evalMarkArray AS $row ){
   	      $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
@@ -259,15 +260,14 @@ class EvaluationMixevalHelperComponent extends Object
 							$matrix[$index]['grade_released'] =$grade_release;
 							$matrix[$index]['comment_released'] =$comment_release;
 						}
-         		$detailPOS = 0;
 
         	  //Format the mixeval question
         	  foreach ($evalMark['details'] AS $detail) {
         	    $mixevalResult = $detail['EvaluationMixevalDetail'];
 	            if (!isset($mixevalQuestion[$mixevalResult['question_number']])) $mixevalQuestion[$mixevalResult['question_number']] = 0;
         	      $mixevalQuestion[$mixevalResult['question_number']] += $mixevalResult['grade'];
-        	      $detailPOS ++ ;
         	  }
+            $detailPOS ++ ;
       	  } else{
       	    //$matrix[$index][$evalMark['evaluatee']] = 'n/a';
       	  }

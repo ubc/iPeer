@@ -29,7 +29,7 @@
     <td colspan="3">
 	      <font color="red">These student(s) have yet to submit their evaluations: <br>
 	         <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
-	          &nbsp;-&nbsp; <?php echo $user['last_name'].' '.$user['first_name']?> <br>
+	          &nbsp;-&nbsp; <?php echo $user['first_name'].' '.$user['last_name']?> <br>
 	      <?php endforeach; ?>
       </font>
     </td>
@@ -161,7 +161,7 @@ $groupAve = 0;
 	foreach($groupMembers as $row): $user = $row['User']; ?>
 		<div id="panel<?php echo $user['id']?>">
 		  <div id="panel<?php echo $user['id']?>Header" class="panelheader">
-		  	<?php echo 'Evaluatee: '.$user['last_name'].' '.$user['first_name']?>
+		  	<?php echo 'Evaluatee: '.$user['first_name'].' '.$user['last_name']?>
 		  </div>
 		  <div style="height: 200px;" id="panel1Content" class="panelContent">
 			 <br><b>Total: <?php
@@ -208,7 +208,7 @@ $groupAve = 0;
            foreach ($memberResult AS $row): $memberMixeval = $row['EvaluationMixeval'];
              $evalutor = $membersAry[$memberMixeval['evaluator']];
              echo "<tr class=\"tablecell2\">";
-             echo "<td width='15%'>".$evalutor['User']['last_name'].' '.$evalutor['User']['first_name']."</td>";
+             echo "<td width='15%'>".$evalutor['User']['first_name'].' '.$evalutor['User']['last_name']."</td>";
 
              $resultDetails = $memberMixeval['details'];
              //foreach ($resultDetails AS $detail) : $rubDet = $detail['EvaluationMixevalDetail'];
@@ -277,7 +277,7 @@ $groupAve = 0;
            foreach ($memberResult AS $row): $memberMixeval = $row['EvaluationMixeval'];
              $evalutor = $membersAry[$memberMixeval['evaluator']];
              echo "<tr class=\"tablecell2\">";
-             echo "<td width='15%'>".$evalutor['User']['last_name'].' '.$evalutor['User']['first_name']."</td>";
+             echo "<td width='15%'>".$evalutor['User']['first_name'].' '.$evalutor['User']['last_name']."</td>";
 
              $resultDetails = $memberMixeval['details'];
              //foreach ($resultDetails AS $detail) : $rubDet = $detail['EvaluationMixevalDetail'];

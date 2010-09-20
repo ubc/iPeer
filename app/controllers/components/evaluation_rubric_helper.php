@@ -255,6 +255,7 @@ class EvaluationRubricHelperComponent extends Object
 
       if ($evalMarkArray!=null) {
         $grade_release = 1;
+         		$detailPOS = 0;
 
   	    foreach($evalMarkArray AS $row ){
   	      $evalMark = isset($row['EvaluationRubric'])? $row['EvaluationRubric']: null;
@@ -266,15 +267,14 @@ class EvaluationRubricHelperComponent extends Object
 							$matrix[$index]['grade_released'] =$grade_release;
 							$matrix[$index]['comment_released'] =$comment_release;
 						}
-         		$detailPOS = 0;
 
         	  //Format the rubric criteria
         	  foreach ($evalMark['details'] AS $detail) {
         	    $rubricResult = $detail['EvaluationRubricDetail'];
 	            if (!isset($rubricCriteria[$rubricResult['criteria_number']])) $rubricCriteria[$rubricResult['criteria_number']] = 0;
         	      $rubricCriteria[$rubricResult['criteria_number']] += $rubricResult['grade'];
-        	      $detailPOS ++ ;
         	  }
+            $detailPOS ++ ;
       	  } else{
       	    //$matrix[$index][$evalMark['evaluatee']] = 'n/a';
       	  }
