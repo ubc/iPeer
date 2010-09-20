@@ -607,11 +607,14 @@ class DboSource extends DataSource {
 
 			if (!isset($resultSet) || !is_array($resultSet)) {
 				if (DEBUG) {
-					e('<div style = "font: Verdana bold 12px; color: #FF0000">SQL Error in model ' . $model->name . ': ');
+					e('<div style="margin:6px;padding:6px;background:white;border:1px solid black;">');
+                    e('<div style = "font: Verdana bold 12px; color: red"><u>SQL Error in model ');
+                    e($model->name . '</u></div>');
 					if (isset($this->error) && $this->error != null) {
-						e($this->error);
+						e('<div style="margin-left:1em;color:brown">' . $this->error . " in query:</div>");
 					}
-					e('</div>');
+					e("<div style='margin-left:2em;color:darkblue'>$query</div>");
+                    e("</div>");
 				}
 				return null;
 			}
