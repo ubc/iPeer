@@ -30,7 +30,6 @@ class UserEnrol extends AppModel
 
     foreach($course_ids as $id)
     {
-     var_dump("abcde", $user_id, $id);
       $c = array();
       $c['UserEnrol']['course_id']  = $id;
       $c['UserEnrol']['user_id']    = $user_id;
