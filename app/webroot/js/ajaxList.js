@@ -1175,7 +1175,10 @@ AjaxListAction.prototype.renderAction = function (action) {
         menuItem.style.color = AjaxListActionMenuTextEnabledColor;
         menuItem.onmouseover =  function() { this.style.backgroundColor=AjaxListActionMenuSelected;};
         menuItem.onmouseout =   function() { this.style.backgroundColor=AjaxListActionMenuColor;};
-        menuItem.onclick = ajaxListLibrary.createDelegateWithParams(this, this.performAction, action);
+        var actionDelegate = ajaxListLibrary.createDelegateWithParams(this, this.performAction, action);
+        // Captures right and left button mouse ups on most platforms.
+        // Tested : IE6, Firefox, Chrome.
+        menuItem.onmouseup = actionDelegate;
 
     } else {
         menuItem.style.color = AjaxListActionMenuTextDisabledColor;
@@ -1196,6 +1199,10 @@ AjaxListAction.prototype.render = function() {
         this.display.style.margin = "0px";
         this.display.style.padding = "5px";
         this.display.style.border = "solid 1px";
+
+        // Disable text selection for various browsers - this is a pop-up menu!
+        this.display.style.KhtmlUserSelect="none"; // WebKit based
+        this.display.style.MozUserSelect="none";
 
         // Create MenU Items for actions
         for (i = 0; i < this.actions.length; i++) {
