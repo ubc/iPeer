@@ -282,23 +282,23 @@ class ExportHelperComponent extends Object
                         $content .= 'OK,';
                     }
                 }
+
+
+                $content .= empty($params['form']['include_group_names']) ? '':$group['group_name'].",";$stuff=true;
+                $content .= empty($params['form']['include_student_first']) ? '':"\"".$student['first_name']."\",";
+                $content .= empty($params['form']['include_student_last']) ? '':"\"".$student['last_name']."\",";
+                $content .= empty($params['form']['include_student_id']) ? '':$student['student_id'].",";
+                $content .= empty($params['form']['include_student_email']) ? '':"\"".$student['email']."\",";
+                $content .= empty($params['form']['include_criteria_marks']) ? '':$student['score'].",";
+                $content .= (empty($params['form']['include_criteria_legend'])||!isset($student['sub_score']))? '':$student['sub_score'];
+                $content .= empty($params['form']['include_general_comments']) ? '': "\"".$student['comments']."\",";
+                if ($hasContent) {
+                    $content .= "\n";
+                }
             }
-
-
-            $content .= empty($params['form']['include_group_names']) ? '':$group['group_name'].",";$stuff=true;
-            $content .= empty($params['form']['include_student_first']) ? '':"\"".$student['first_name']."\",";
-            $content .= empty($params['form']['include_student_last']) ? '':"\"".$student['last_name']."\",";
-            $content .= empty($params['form']['include_student_id']) ? '':$student['student_id'].",";
-            $content .= empty($params['form']['include_student_email']) ? '':"\"".$student['email']."\",";
-            $content .= empty($params['form']['include_criteria_marks']) ? '':$student['score'].",";
-            $content .= (empty($params['form']['include_criteria_legend'])||!isset($student['sub_score']))? '':$student['sub_score'];
-            $content .= empty($params['form']['include_general_comments']) ? '': "\"".$student['comments']."\",";
             if ($hasContent) {
                 $content .= "\n";
             }
-        }
-        if ($hasContent) {
-            $content .= "\n";
         }
         return $content;
     }
