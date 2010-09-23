@@ -150,7 +150,7 @@ set_time_limit(300);
   /**
    * iPeer database version
    */
-  define('DATABASE_VERSION', 2);
+  define('DATABASE_VERSION', 3);
 
 
   $CWL['LoginURL'] = 'https://www.auth.cwl.ubc.ca/auth/login';
