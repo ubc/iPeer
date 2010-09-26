@@ -110,7 +110,7 @@ class EvaluationsController extends AppController
         // The columns to show
         $columns = array(
             //    Model   columns       (Display Title) (Type Description)
-            array("GroupEvent.id",     "",           "",    "hidden"),
+            array("GroupEvent.id",     "",           "",    "number"),
             array("Group.id",          "",           "",    "hidden"),
             array("Group.group_num",   "Group #",    "7em", "action", "View Group"),
             array("Group.group_name",  "Group Name", "auto","action", "View Results"),
@@ -280,6 +280,12 @@ class EvaluationsController extends AppController
           $this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
     }
 
+
+    function test($groupEventId, $userId) {
+        $subScore = $this->EvaluationRubric->getCriteriaResults($groupEventId, $userId);
+        var_dump($subScore);
+        exit;
+    }
 
 
     function export() {

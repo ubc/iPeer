@@ -35,16 +35,28 @@ class EvaluationRubric extends AppModel
 
 	// gets rubric evaluation result for a specific assignment and evaluator
 	function getResultsDetailByEvaluatee($grpEventId=null, $evaluatee=null) {
-	  $condition = 'EvaluationRubric.grp_event_id='.$grpEventId.' AND EvaluationRubric.evaluatee='.$evaluatee;
-    $fields = 'EvaluationRubricDetail.*';
-    $joinTable = array(' LEFT JOIN evaluation_rubric_details AS EvaluationRubricDetail ON EvaluationRubric.id=EvaluationRubricDetail.evaluation_rubric_id');
+        $condition = 'EvaluationRubric.grp_event_id='.$grpEventId.' AND EvaluationRubric.evaluatee='.$evaluatee;
+        $fields = 'EvaluationRubricDetail.*';
+        $joinTable = array(' LEFT JOIN evaluation_rubric_details AS EvaluationRubricDetail ON EvaluationRubric.id=EvaluationRubricDetail.evaluation_rubric_id');
 
-    return $this->findAll($condition, $fields, 'EvaluationRubric.id ASC, EvaluationRubricDetail.criteria_number ASC', null, null, null, $joinTable );
-
+        return $this->findAll($condition, $fields, 'EvaluationRubric.id ASC, EvaluationRubricDetail.criteria_number ASC', null, null, null, $joinTable );
 	}
 
 	function getCriteriaResults($grpEventId=null,$evaluatee=null) {
-	  return $this->findBySql('SELECT SUM(EvaluationRubricDetail.grade) AS score FROM evaluation_rubrics JOIN evaluation_rubric_details AS EvaluationRubricDetail ON EvaluationRubricDetail.evaluation_rubric_id = evaluation_rubrics.id WHERE evaluation_rubrics.grp_event_id='.$grpEventId.' AND evaluation_rubrics.evaluatee='.$evaluatee.' GROUP BY EvaluationRubricDetail.criteria_number');
+        $data = $this->findBySql('SELECT SUM(EvaluationRubricDetail.grade) AS sumScore, ' .
+                'EvaluationRubricDetail.criteria_number as criteria FROM evaluation_rubrics ' .
+                'JOIN evaluation_rubric_details AS EvaluationRubricDetail ' .
+                'ON EvaluationRubricDetail.evaluation_rubric_id = evaluation_rubrics.id ' .
+                'WHERE evaluation_rubrics.grp_event_id=' . $grpEventId .
+                ' AND evaluation_rubrics.evaluatee=' . $evaluatee .
+                ' GROUP BY EvaluationRubricDetail.criteria_number');
+
+        $results = array();
+        for ($i = 0; $i < sizeof($data); $i++) {
+            $results[$data[$i]['EvaluationRubricDetail']['criteria']] = $data[$i][0]['sumScore'];
+        }
+
+        return $results;
 	}
 
 	// gets rubric evaluation result for a specific assignment and evaluator

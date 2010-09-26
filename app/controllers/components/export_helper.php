@@ -57,14 +57,14 @@ class ExportHelperComponent extends Object
 
 	function createHeader($params) {
         if (!empty($params['course_name']) || !empty($params['export_date']) || !empty($params['instructors'])) {
-            $header = '************************************************************************'."\n";
+            $header = '***************'."\n";
             $header .= !empty($params['course_name']) ? $params['course_name']."\n":'';
             $header .= !empty($params['export_date']) ? $params['export_date']."\n":'';
             foreach ($params['instructors'] as $instructor) {
                 $instructor = $instructor['User'];
                 $header .= $instructor['first_name'].' '.$instructor['last_name']."\n";
             }   //
-            $header .= '************************************************************************'."\n";
+            $header .= '**************'."\n";
             return  $header;
         } else {
             return '';
@@ -172,11 +172,8 @@ class ExportHelperComponent extends Object
                                 array_push($legends, $legend['RubricsCriteria']['criteria']);
                             }
                         }
-                        $data[$i]['students'][$j]['sub_score'] = '';
-                        $subScore = $this->EvaluationRubric->getCriteriaResults($groupEventId,$userId);
-                        foreach ($subScore as $score) {
-                            $data[$i]['students'][$j]['sub_score'] .= $score[0]['score'].',';
-                        }
+                        $data[$i]['students'][$j]['sub_score'] = $this->EvaluationRubric->getCriteriaResults($groupEventId, $userId);
+
                         $score_tmp = $this->EvaluationRubric->getReceivedTotalScore($groupEventId,$userId);
                         $data[$i]['students'][$j]['score'] = !isset($score_tmp[0]['received_total_score']) ? '':$score_tmp[0]['received_total_score'];
                         //get comments
@@ -226,10 +223,10 @@ class ExportHelperComponent extends Object
             //calculate final mark
             $i++;
         }
-        return $this->formatBody($data,$params,$legends);
+        return $this->formatBody($data, $params, $legends);
     }
 
-    function formatBody($data,$params,$legends=null) {
+    function formatBody($data, $params, $legends=null) {
         $content = '';
         //sloppy code... sorry...
         $fields = array('group_status','group_names','student_first','student_last','student_id','student_id','criteria_marks','general_comments');
@@ -244,7 +241,7 @@ class ExportHelperComponent extends Object
         if (isset($legends)&&!empty($params['form']['include_criteria_legend'])) {
             $k=1;
             foreach ($legends as $item) {
-                $content .= $k++.",".$item."\n";
+                $content .= "Creteria " . $k++.",".$item."\n";
             }
             $content .= "\n";
         }
@@ -256,21 +253,23 @@ class ExportHelperComponent extends Object
         $content .= empty($params['form']['include_student_last']) ? '':'Last Name,';
         $content .= empty($params['form']['include_student_id']) ? '':'Student Number,';
         $content .= empty($params['form']['include_student_email']) ? '':'Email,';
-        $content .= empty($params['form']['include_criteria_marks']) ? '':'Final Mark,';
-        //$content .= empty($params['form']['include_']) ? '':'/Total,';
 
-        //question count... print 1..2..3..
-        $question_count = !empty($legends)&&!empty($params['form']['include_criteria_legend']) ? count($legends):0;
-        for ($i=1; $i <= $question_count; $i++) {
-            $content .= $i.',';
+        $content .= 'Final Mark,';
+
+        if (!empty($params['form']['include_criteria_marks'])) {
+            $k = 1;
+            foreach ($legends as $key=>$value) {
+                $content .= "Criteria $k, ";
+                $k++;
+            }
         }
+
         $content .= !isset($params['form']['include_general_comments']) ? '':'Comments';
         if ($hasContent) {
             $content .= "\n\n";
         }
         foreach ($data as $group) {
-        //	  	echo "<br>Dumping students group: ";
-        //	  	var_dump($group['students']);
+
             foreach ($group['students'] as $student) {
                 if (!empty($params['form']['include_group_status'])) {
                     $submittedArr = $this->buildSubmittedArr();
@@ -282,14 +281,21 @@ class ExportHelperComponent extends Object
                     }
                 }
 
+                $content .= empty($params['form']['include_group_names']) ? '':$group['group_name'].",";
+                $content .= empty($params['form']['include_student_first']) ? '':"\"".$student['first_name']."\", ";
+                $content .= empty($params['form']['include_student_last']) ? '':"\"".$student['last_name']."\", ";
+                $content .= empty($params['form']['include_student_id']) ? '':$student['student_id'].", ";
+                $content .= empty($params['form']['include_student_email']) ? '':"\"".$student['email']."\", ";
+                $content .= empty($params['form']['include_criteria_marks']) ? '':$student['score'].", ";
 
-                $content .= empty($params['form']['include_group_names']) ? '':$group['group_name'].",";$stuff=true;
-                $content .= empty($params['form']['include_student_first']) ? '':"\"".$student['first_name']."\",";
-                $content .= empty($params['form']['include_student_last']) ? '':"\"".$student['last_name']."\",";
-                $content .= empty($params['form']['include_student_id']) ? '':$student['student_id'].",";
-                $content .= empty($params['form']['include_student_email']) ? '':"\"".$student['email']."\",";
-                $content .= empty($params['form']['include_criteria_marks']) ? '':$student['score'].",";
-                $content .= (empty($params['form']['include_criteria_legend'])||!isset($student['sub_score']))? '':$student['sub_score'];
+                if (!empty($legends) &&
+                    !empty($params['form']['include_criteria_marks'])) {
+                    foreach ($student['sub_score'] as $key => $value) {
+                        $content .= $value . ", ";
+                    }
+
+                }
+
                 $content .= empty($params['form']['include_general_comments']) ? '': "\"".$student['comments']."\",";
                 if ($hasContent) {
                     $content .= "\n";
