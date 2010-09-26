@@ -183,10 +183,16 @@ class EvaluationsController extends AppController
 
     function view($eventId='') {
 
+
         // Record the event id into the session
         if (!empty($eventId) && is_numeric($eventId)) {
             $this->Session->write("evaluationsControllerEventIdSession", $eventId);
-            $this->set("data", $this->Event->find("`Event`.`id`=$eventId"));
+            $data = $this->Event->find("`Event`.`id`=$eventId");
+            $this->set("data", $data);
+            // Set the course ID to the evaluation's course id
+            // This required, as export functions assume the course id is set
+            // During the view, and will break if it's not.
+            $this->rdAuth->setCourseId($data['Event']['course_id']);
         } else {
             $this->Session->delete("evaluationsControllerEventIdSession");
         }
@@ -277,6 +283,7 @@ class EvaluationsController extends AppController
 
 
     function export() {
+
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
         $courseId = $this->rdAuth->courseId;

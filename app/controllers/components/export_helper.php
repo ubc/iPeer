@@ -10,13 +10,12 @@ class ExportHelperComponent extends Object
         $this->UserCourse = new UserCourse;
         $this->Event = new Event;
         $this->GroupEvent = new GroupEvent;
-
-        $courseId = $this->rdAuth->courseId;
         $csvContent = '';
 
         //*******header
         $header = array();
         //get coursename
+        $courseId = $this->rdAuth->courseId;
         $course = $this->Course->find('id='.$courseId,'course');
         $header['course_name'] = empty($params['form']['include_course']) ? '':$course['Course']['course'];
         //get date of export
