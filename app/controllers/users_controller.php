@@ -656,26 +656,25 @@ class UsersController extends AppController
 
         //Return true if valid, else error msg
         $validUploads = $this->framework->validateUploadFile($tmpFile, $filename, $uploadFile);
-        if ($validUploads) {
-            // Get file into an array.
-            $lines = file($uploadFile);
-            // Delete the uploaded file
-            unlink($uploadFile);
-
-            //Mass create students
-            $resultAry = $this->addUserByImport($this->params['data'], $lines);
-            $this->set('data', $resultAry);
-            $this->set('userRole', $this->params['data']['User']['role']);
-
-            $this->render('userSummary');
+        if ($validUploads !== true) {
+          $this->set('errmsg', $validUploads);
+          $this->set('user_type', 'S');
+          $this->set('import_again',"true");
+          $this->render('add');
+          return false;
         }
-        else {
-            $this->set('errmsg', $$validUploads);
-            $this->set('user_type', 'S');
-            $this->set('import_again',"true");
-            $this->render('add');
-            return false;
-        }
+
+        // Get file into an array.
+        $lines = file($uploadFile);
+        // Delete the uploaded file
+        unlink($uploadFile);
+
+        //Mass create students
+        $resultAry = $this->addUserByImport($this->params['data'], $lines);
+        $this->set('data', $resultAry);
+        $this->set('userRole', $this->params['data']['User']['role']);
+
+        $this->render('userSummary');
     }
 
     function addUserByImport($data=null, $lines=null)
@@ -688,7 +687,6 @@ class UsersController extends AppController
 
         // Loop through our array
         for ($i = 0; $i < count($lines); $i++) {
-
 
             // Get rid of '"', it just  confuses iPeer in CSV Files
             $filteredLine = $lines[$i];

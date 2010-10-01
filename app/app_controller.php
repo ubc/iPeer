@@ -7,6 +7,8 @@
  * @license		OPPL
  *
  */
+ini_set('auto_detect_line_endings', true);
+
 uses('sanitize');
 
 class AppController extends Controller  {

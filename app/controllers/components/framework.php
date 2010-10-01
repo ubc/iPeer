@@ -24,11 +24,11 @@ class frameworkComponent
   	$fileExtension = strtolower($fileParts['extension']); 
   	if ($fileExtension == 'txt' || $fileExtension == 'csv')  {
   		if (!move_uploaded_file($tmpFile, $uploadFile)) {
-  			$errMsg = "Error reading file";
+  			$result = "Error reading file";
   		}
   	}
   	else {
-  		$errMsg = "iPeer does not support the file type '." . $fileExtension .
+  		$result = "iPeer does not support the file type '." . $fileExtension .
   					 "'. Please use only text files (.txt) or comma seperated values files (.csv).";
   	}
   	return $result;
