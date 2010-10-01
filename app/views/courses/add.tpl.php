@@ -41,7 +41,7 @@
     <td>
   <div id="adddelinstructors">
   <?php
-    $params = array('controller'=>'courses', 'instructor'=>$instructor, 'count'=>1);
+    $params = array('controller'=>'courses', 'instructor'=>$instructor, 'count'=>1, 'empty' => true);
     echo $this->renderElement('courses/ajax_course_instructors', $params);
     ?>
   </div>
@@ -51,7 +51,7 @@
   <a href=# onclick="addInstructor();"><?php echo $html->image('icons/add.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Add Additional Instructor</a>
   <br><br>
   <a href=# onclick="removeInstructor();"><?php echo $html->image('icons/delete.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Remove Additional Instructor</a>
-  <?php echo $ajax->observeField('add', array('update'=>'adddelinstructors', 'url'=>"/courses/adddelinstructor", 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');")) ?>
+  <?php echo $ajax->observeField('add', array('update'=>'adddelinstructors', 'url'=>"/courses/adddelinstructor", 'with'=>"{empty:1, add:$('add').value}", 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');")) ?>
 
   </td>
   </tr>

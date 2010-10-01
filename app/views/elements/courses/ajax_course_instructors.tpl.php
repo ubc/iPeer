@@ -1,11 +1,16 @@
-<?php
+<?php for ( $i=0; $i<$count; $i++):?>
+  <?php $is_empty_set = false; ?>
+	<select name="instructor_id<?php echo $i+1?>" style="width:250px;margin: 2px;">
+	
+  <?php foreach($instructor as $row):?>
+    <?php  $user = $row['users']?>
+    <?php if(isset($empty) && $empty && !$is_empty_set):?>
+      <option value=''></option>
+      <?php $is_empty_set = true;?>
+    <?php endif;?>
+    <option value='<?php echo $user['id']?>'><?php echo $user['last_name'].', '.$user['first_name']?></option>
+	<?php endforeach;?>
+  </select><br>
 
-for ( $i=0; $i<$count; $i++){
-	echo '<select name="instructor_id'.($i+1).'" style="width:250px;margin: 2px;">';
-	foreach($instructor as $row): $user = $row['users'];
-    echo '<option value='.$user['id'].'>'.$user['last_name'].", ".$user['first_name']."</option>";
-	endforeach;
-	echo "</select><br>";
-}
-echo '<input type="hidden" name="data[Course][count]"  value="'.$count.'" />';
-?>
+<input type="hidden" name="data[Course][count]"  value="<?php echo $count?>" />
+<?php endfor;?>

@@ -261,7 +261,7 @@ echo $javascript->link('calculate_marks');?>
                    $responseText = 'checked';
                    }?>
           		    <input type="radio" name="data[Mixeval][response_type<?php echo $pos?>]" value="S" <?php echo $responseLickert?>  > Single line of text input box<br>
-          		    <input type="radio" name="data[Mixeval][response_type<?php echo $pos?>]" value="L" <?php echo $responseText?> > Multiple lines of text input box<br>
+          		    <input type="radio" name="data[Mixeval][response_type<?php echo $pos?>]" value="L" <?php echo $responseText?> > Multiple lines of text input box (Maximum 65535 characters)<br>
                 </td></tr>
 			 </table></td>
 			</tr>

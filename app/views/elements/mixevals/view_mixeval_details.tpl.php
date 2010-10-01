@@ -163,6 +163,7 @@
                      //echo $text;
                       ?>
                      <textarea name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['question_num']?>" cols="80" rows="15"><?php echo $text?></textarea>
+                     <br />Maximum 65535 characters.
                    <?php } else { ?>
                      <input type="text" name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['question_num']?>" size="80" value="<?php echo $evaluation['EvaluationDetail'][$pos-1]['EvaluationMixevalDetail']['question_comment']?>"/>
                    <?php }?>

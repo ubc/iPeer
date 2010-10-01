@@ -69,10 +69,10 @@ class LoginoutController extends AppController
 			//Check for CWL login auth
 			$cwlErr = $this->Session->read('CWLErr');
 			if ($cwlErr == 'STUDENT_INVALID_LOGIN'){
-				$this->set('errmsg', 'Access Denied. <br>Student must login by using UBC CWL Authentication.<br>If you are experiencing any issues regarding iPeer, please contact the iPeer administrator at <a href="mailto:ipeer@apsc.ubc.ca">ipeer@apsc.ubc.ca</a>.');
+				$this->set('errmsg', 'Access Denied. <br>Student must login by using UBC CWL Authentication.<br>If you are experiencing any issues regarding iPeer, please contact the iPeer administrator at <a href="mailto:ipeer.support@ubc.ca">ipeer.support@ubc.ca</a>.');
 				$this->Session->del('CWLErr');
 			} else if ($cwlErr!=''){
-				$this->set('errmsg', 'Access Denied. <br>You have successfully logged in using your CWL account but you do not have access to the iPeer application.<br>If you are experiencing any issues regarding iPeer, please contact the iPeer administrator at <a href="mailto:ipeer@apsc.ubc.ca">ipeer@apsc.ubc.ca</a>.');
+				$this->set('errmsg', 'Access Denied. <br>You have successfully logged in using your CWL account but you do not have access to the iPeer application.<br>If you are experiencing any issues regarding iPeer, please contact the iPeer administrator at <a href="mailto:ipeer.support@ubc.ca">ipeer.support@ubc.ca</a>.');
 				$this->Session->del('CWLErr');
 			}
 
