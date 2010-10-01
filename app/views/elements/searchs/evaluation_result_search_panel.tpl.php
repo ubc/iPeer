@@ -36,12 +36,21 @@
                 <option value="A">--- None ---</option>
             		<option value="listNotReviewed" <?php if ($sticky['status']=="listNotReviewed") echo 'selected'?>>List Not Reviewed Evaluations</option>
             		<option value="late" <?php if($sticky['status']=="late") echo 'selected'?>>List Late Evaluations </option>
-            		<option value="low" <?php if($sticky['status']=="low") echo 'selected'?>>List Low Mark Evaluations</option>
+            		<option value="low" <?php if($sticky['status']=="low") echo 'selected'?>>List Ranged Mark Evaluations (set mark range below)</option>
              	</select>
+              <script>
+                $('status').observe('change', function(event) {
+                  if('low' == $('status').value) {
+                    $('mark-range').show(); 
+                  } else {
+                    $('mark-range').hide();
+                  }
+                });
+              </script>
             </td>
             <td width="100" id="status_msg" class="error" >&nbsp;</td>
           </tr>
-          <tr class="tablecell2">
+          <tr class="tablecell2" id='mark-range' <?php echo 'low' != $sticky['status'] ? 'style="display:none;"' : ''?>>
             <td id="resultmark_label">Result Mark(%):</td>
             <td><table width="100%"><tr align="left">
           				<td width="10%">FROM:</td>
