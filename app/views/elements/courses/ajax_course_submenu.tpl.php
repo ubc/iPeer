@@ -1,6 +1,6 @@
 		<table width="100%" class="title2" border="0" cellpadding="4" cellspacing="0">
           <tr>
-            <td><?php echo $html->image('layout/grey_arrow.gif',array('align'=>'middle','alt'=>'grey_arrow'))?>&nbsp; <?php echo $submenuTitle?></td>
+            <td><?php echo $html->image('layout/grey_arrow.gif',array('valign'=>'middle','alt'=>'grey_arrow'))?>&nbsp; <?php echo $submenuTitle?></td>
             <td>
             <div align="right">
                <a href="<?php echo $this->webroot.$this->themeWeb?>courses/update/<?php echo $submenu?>"

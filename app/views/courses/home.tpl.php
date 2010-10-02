@@ -66,7 +66,7 @@
       </tr>
 
         <tr>
-          <td valign="top"><br />
+          <td valign="top" width="50%">
             <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">
               <tr>
                 <td><?php echo $html->image('layout/corner_top_left.gif',array('align'=>'middle','alt'=>'left'))?></td>
@@ -91,7 +91,7 @@
                 <td align="right"><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'middle','alt'=>'right'))?></td>
               </tr>
             </table>
-            <br /><br /><br /></td></tr>
+            <br /></td></tr>
              <tr><td >
              <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5"><tr>
                 <td><?php echo $html->image('layout/corner_top_left.gif',array('align'=>'middle','alt'=>'left'))?></td>
