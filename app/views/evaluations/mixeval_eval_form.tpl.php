@@ -119,6 +119,7 @@
   <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>"/>
   <input type="hidden" name="mixeval_id" value="<?php echo $data['Mixeval']['id']?>"/>
   <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $rdAuth->id?>"/>
+  <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
 <center>
 <?php
   $count = 0;
