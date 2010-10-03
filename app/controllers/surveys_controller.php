@@ -98,9 +98,9 @@ class SurveysController extends AppController
 
        // Get the course data
         $userCourseList = $this->sysContainer->getMyCourseList();
-        $courseList = array();
+        $coursesList = array();
         foreach ($userCourseList as $id => $course) {
-            $courseList{$id} = $course['course'];
+            $coursesList{$id} = $course['course'];
         }
 
         // Set up Columns
@@ -132,7 +132,7 @@ class SurveysController extends AppController
                    "localKey"  => "course_id",
                    "description" => "Course:",
                    "default"   => $this->rdAuth->courseId,
-                   "list" => $courseList,
+                   "list" => $coursesList,
                    "joinTable" => "courses",
                    "joinModel" => "Course");
 
@@ -148,7 +148,7 @@ class SurveysController extends AppController
         $extraFilters = "";
         if ($this->rdAuth->role != 'A') {
             $extraFilters = " ( ";
-            foreach ($courseList as $id => $course) {
+            foreach ($coursesList as $id => $course) {
                 $extraFilters .= "course_id=$id or ";
             }
             $extraFilters .= "1=0 ) "; // just terminates the or condition chain with "false"
@@ -258,11 +258,11 @@ class SurveysController extends AppController
 
 	function add()
 	{
-		$courseList = $this->sysContainer->getMyCourseList();
-		$this->set('courseList', $courseList);
+		$coursesList = $this->sysContainer->getMyCourseList();
+		$this->set('coursesList', $coursesList);
 
 		// We need at least one course to be defined before Survey creation.
-        $this->set ('createSurveyPossible', sizeof($courseList) > 0 );
+        $this->set ('createSurveyPossible', sizeof($coursesList) > 0 );
 
 		$this->set('templates', $this->Survey->findAll($conditions=null, $fields="id, name"));
 
@@ -370,8 +370,8 @@ class SurveysController extends AppController
 
 	function edit($id=null)
 	{
-		$courseList = $this->sysContainer->getMyCourseList();
-		$this->set('courseList', $courseList);
+		$coursesList = $this->sysContainer->getMyCourseList();
+		$this->set('coursesList', $coursesList);
 
 		if (empty($this->params['data'])) {
 			$this->Survey->setId($id);
@@ -408,8 +408,8 @@ class SurveysController extends AppController
 	{
         $this->render = false;
 		$this->Survey->setId($id);
-		$courseList = $this->sysContainer->getMyCourseList();
-		$this->set('courseList', $courseList);
+		$coursesList = $this->sysContainer->getMyCourseList();
+		$this->set('coursesList', $coursesList);
 		$this->set('templates', $this->Survey->findAll($conditions=null, $fields="id, name"));
 		$this->params['data'] = $this->Survey->read();
 		unset($this->params['data']['Survey']['id']);

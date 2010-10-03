@@ -71,10 +71,10 @@ class GroupsController extends AppController
 
         // Get the course data
         $userCourseList = $this->sysContainer->getMyCourseList();
-        $courseList = array();
+        $coursesList = array();
 
         foreach ($userCourseList as $id => $course) {
-            $courseList{$id} = $course['course'];
+            $coursesList{$id} = $course['course'];
         }
 
         // The columns to show
@@ -97,7 +97,7 @@ class GroupsController extends AppController
                     "id"            => "Group.course_id",
                     "description"   => "for Course:",
                     // What are the choises and the default values?
-                    "list"  => $courseList,
+                    "list"  => $coursesList,
                     "default" => $this->rdAuth->courseId,
                     // What table do we join to get these
                     "joinTable"     => "courses",
@@ -113,7 +113,7 @@ class GroupsController extends AppController
         $extraFilters = "";
         if ($this->rdAuth->role != 'A') {
             $extraFilters = " ( ";
-            foreach ($courseList as $id => $course) {
+            foreach ($coursesList as $id => $course) {
                 $extraFilters .= "course_id=$id or ";
             }
             $extraFilters .= "1=0 ) "; // just terminates the or condition chain with "false"

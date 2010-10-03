@@ -12,7 +12,7 @@
          <tr class="tablecell2">
             <td width="186" id="course_label">Course:</td>
             <td width="437"><?php
-                $params = array('controller'=>'searchs', 'courseList'=>$courseList, 'courseId'=>null, 'defaultOpt'=>'A','sticky_course_id'=>(isset($sticky['course_id'])? $sticky['course_id']:null));
+                $params = array('controller'=>'searchs', 'coursesList'=>$coursesList, 'courseId'=>null, 'defaultOpt'=>'A','sticky_course_id'=>(isset($sticky['course_id'])? $sticky['course_id']:null));
                 echo $this->renderElement('courses/course_selection_box', $params);
                 ?></td>
             <td width="201" id="course_msg" class="error">&nbsp;</td>

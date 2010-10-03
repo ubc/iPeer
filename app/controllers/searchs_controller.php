@@ -50,8 +50,8 @@ class SearchsController extends AppController
     //General Home Rendering for Admin and Instructor
     if ($role == $this->User->USER_TYPE_ADMIN || $role == $this->User->USER_TYPE_INSTRUCTOR)
     {
-      $courseList = $this->sysContainer->getMyCourseList();
-      $this->set('courseList', $courseList);
+      $coursesList = $this->sysContainer->getMyCourseList();
+      $this->set('coursesList', $coursesList);
 
 
       $searchMartix = $this->SearchHelper->formatSearchEvaluation('', $this->order, $this->show, $this->page, $this->sortBy, $this->direction);
@@ -90,8 +90,8 @@ class SearchsController extends AppController
          $this->set('userPersonalize', $this->userPersonalize);
     	}
     }
-    $courseList = $this->sysContainer->getMyCourseList();
-    $this->set('courseList', $courseList);
+    $coursesList = $this->sysContainer->getMyCourseList();
+    $this->set('coursesList', $coursesList);
 //print_r($this->params['form']);
     $search_select = isset($this->params['form']['select']) ? $this->params['form']['select']:$this->params['form']['search_type'];
     switch ($search_select) {

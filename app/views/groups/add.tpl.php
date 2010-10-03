@@ -106,7 +106,7 @@
     &nbsp;&nbsp;&nbsp;&nbsp;
     <input type="file" name="file" value="Browse" /><br>
     <?php
-        $params = array('controller'=>'users', 'courseList'=>$coursesList, "courseId" => $rdAuth->courseId);
+        $params = array('controller'=>'users', 'coursesList'=>$coursesList, "courseId" => $rdAuth->courseId);
     ?>
     <br /><h3>2) Select the course to import into:</h3>
     &nbsp;&nbsp;&nbsp;&nbsp;

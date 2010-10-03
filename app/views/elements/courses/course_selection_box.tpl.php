@@ -2,7 +2,7 @@
 
     if (isset($view) && $view) {
     //For view page; display the name only
-    echo $courseList[$courseId]['course'];
+    echo $coursesList[$courseId]['course'];
     } else {
     if (empty($disabled)) $disabled='';
 
@@ -15,7 +15,7 @@
         echo '<option value="A" SELECTED > --- All Courses --- </option>';
     }
 
-        foreach ($courseList as $course) {
+        foreach ($coursesList as $course) {
             // Mark this course as selected if it's the presend course
             $isSelected = (isset($courseId) && ($courseId == $course['id'])) ? "selected" : "";
             echo "<option value='$course[id]' $isSelected >$course[course]</option>";

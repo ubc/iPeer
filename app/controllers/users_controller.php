@@ -60,13 +60,13 @@ class UsersController extends AppController
 
         // Get the course data
         $userCourseList = $this->sysContainer->getMyCourseList();
-        $courseList = array();
+        $coursesList = array();
 
         // Add in the unassigned course entry:
-        $courseList{"!!!null"} = "-- Unassigned --";
+        $coursesList{"!!!null"} = "-- Unassigned --";
 
         foreach ($userCourseList as $id => $course) {
-            $courseList{$id} = $course['course'];
+            $coursesList{$id} = $course['course'];
         }
 
 
@@ -90,7 +90,7 @@ class UsersController extends AppController
                     "id"            => "course_id",
                     "description"   => "for Course:",
                     // What are the choises and the default values?
-                    "list"  => $courseList,
+                    "list"  => $coursesList,
                     "default" => $this->rdAuth->courseId,
                     // What table do we join to get these
                     "joinTable"     => "user_enrols",
@@ -226,8 +226,8 @@ class UsersController extends AppController
                     $this->params['data']['User']['role'] = $userType;
                 }
 
-                $courseList = $this->sysContainer->getMyCourseList();
-                $this->set('courseList', $courseList);
+                $coursesList = $this->sysContainer->getMyCourseList();
+                $this->set('coursesList', $coursesList);
 
             }  else  {
                 $sFound = $this->User->findUserByStudentNo($this->params['data']['User']['username']);
@@ -343,12 +343,12 @@ class UsersController extends AppController
 
 
                 // Get accessible courses
-                $courseList = $this->sysContainer->getMyCourseList();
+                $coursesList = $this->sysContainer->getMyCourseList();
 
                 // List the entrolled courses
                 $simpleEnrolledList = array();
                 foreach ($enrolled_courses as $key => $value) {
-                    if (!empty($courseList[$value['Course']['id']])) {
+                    if (!empty($coursesList[$value['Course']['id']])) {
                         array_push($simpleEnrolledList, $value['Course']['id']);
                     }
                 }
@@ -357,7 +357,7 @@ class UsersController extends AppController
 
                 // List the avaliable courses
                 $simpleCoursesList = array();
-                foreach ($courseList as $key => $value) {
+                foreach ($coursesList as $key => $value) {
                     $simpleCoursesList[$key] = $value['course'];
                 }
                 $this->set("simpleCoursesList", $simpleCoursesList);
@@ -645,8 +645,8 @@ class UsersController extends AppController
         $uploadFile = $uploadDir.$filename;
         //check for blank value
         if (trim($filename) == "") {
-            $courseList = $this->sysContainer->getMyCourseList();
-            $this->set('courseList', $courseList);
+            $coursesList = $this->sysContainer->getMyCourseList();
+            $this->set('coursesList', $coursesList);
             $this->set('errmsg','A File is required for the import!');
             $this->set('user_type', 'S');
             $this->set('import_again',"true");

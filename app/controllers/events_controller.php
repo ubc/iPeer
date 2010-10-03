@@ -93,9 +93,9 @@ class EventsController extends AppController
 
         // Grab the course list
         $userCourseList = $this->SysContainer->getMyCourseList();
-        $courseList = array();
+        $coursesList = array();
         foreach ($userCourseList as $id => $course) {
-            $courseList[$id] = $course['course'];
+            $coursesList[$id] = $course['course'];
         }
 
         // Set up Columns
@@ -125,7 +125,7 @@ class EventsController extends AppController
                 "id" => "course_id",
                 "description" => "for Course:",
                 // The choise and default values
-                "list" => $courseList,
+                "list" => $coursesList,
                 "default" => $this->rdAuth->courseId,
                 // What tables do we join?
                 "joinTable" => "courses",
@@ -137,7 +137,7 @@ class EventsController extends AppController
         $extraFilters = "";
         if ($this->rdAuth->role != 'A') {
             $extraFilters = " ( ";
-            foreach ($courseList as $id => $course) {
+            foreach ($coursesList as $id => $course) {
                 $extraFilters .= "course_id=$id or ";
             }
             $extraFilters .= "1=0 ) "; // just terminates the or condition chain with "false"

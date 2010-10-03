@@ -30,7 +30,7 @@
                     }
 
                     $params = array('controller'=>'courses',
-                                    'courseList'=>$coursesList,
+                                    'coursesList'=>$coursesList,
                                     'courseId'=>$rdAuth->courseId);
 
                     if (empty($rdAuth->courseId)) {
@@ -154,7 +154,7 @@
     <input type="file" name="file" value="Browse" /><br>
     <?php echo  $html->hidden('User/role'); ?>
     <?php
-        $params = array('controller'=>'users', 'courseList'=>$courseList, "courseId" => $rdAuth->courseId);
+        $params = array('controller'=>'users', 'coursesList'=>$coursesList, "courseId" => $rdAuth->courseId);
     ?>
 
     <br /><h3>2) Select the course to import into:</h3>

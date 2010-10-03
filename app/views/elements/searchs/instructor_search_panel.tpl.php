@@ -11,7 +11,7 @@
          <tr class="tablecell2">
             <td width="186" id="course_label">Course:</td>
             <td width="437"><?php
-                $params = array('controller'=>'courses', 'courseList'=>$courseList, 'courseId'=>null, 'defaultOpt'=>'A','sticky_course_id'=>$sticky['course_id']);
+                $params = array('controller'=>'courses', 'coursesList'=>$coursesList, 'courseId'=>null, 'defaultOpt'=>'A','sticky_course_id'=>$sticky['course_id']);
                 echo $this->renderElement('courses/course_selection_box', $params);
                 ?></td>
             <td width="201" id="course_msg" class="error">&nbsp;</td>

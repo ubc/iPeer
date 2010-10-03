@@ -26,9 +26,9 @@
           <td>Assigned Course:<font color="red">*</font></td>
           <td><?php
               if (!isset($course_id)&&empty($course_id)) {
-                $params = array('controller'=>'surveys', 'courseList'=>$courseList, 'courseId'=>null, 'defaultOpt'=>1);
+                $params = array('controller'=>'surveys', 'coursesList'=>$coursesList, 'courseId'=>null, 'defaultOpt'=>1);
               } else {
-                $params = array('controller'=>'surveys', 'courseList'=>$courseList, 'courseId'=>$course_id);
+                $params = array('controller'=>'surveys', 'coursesList'=>$coursesList, 'courseId'=>$course_id);
               }
               echo $this->renderElement('courses/course_selection_box', $params);
         ?></td>

@@ -54,9 +54,9 @@ class HomeController extends AppController
 			//General Home Rendering for Admin and Instructor
 			if ($role == $this->User->USER_TYPE_ADMIN || $role == $this->User->USER_TYPE_INSTRUCTOR)
 			{
-				//$courseList = $this->sysContainer->getMyCourseList();
-				$courseList = $this->User->findById($this->rdAuth->id);
-				$activeCourseDetail = $this->formatCourseList($courseList['UserCourse'], 'active_course');
+				//$coursesList = $this->sysContainer->getMyCourseList();
+				$coursesList = $this->User->findById($this->rdAuth->id);
+				$activeCourseDetail = $this->formatCourseList($coursesList['UserCourse'], 'active_course');
 
 				$inactiveCourseDetail=null;
 				if ($this->rdAuth->role == $this->User->USER_TYPE_ADMIN)
@@ -204,14 +204,14 @@ class HomeController extends AppController
 		return $result;
 	}
 
-	function formatCourseList($courseList=null, $courseType='')
+	function formatCourseList($coursesList=null, $courseType='')
 	{
 		$pos = 0;
 		$result = array();
 
-		if ($courseList!=null) {
+		if ($coursesList!=null) {
 
-			foreach ($courseList as $course) {
+			foreach ($coursesList as $course) {
 				$result[$pos][$courseType]['Course'] = $course;
 				if (isset($course['Course'])){
 					$courseId = $course['Course']['id'];

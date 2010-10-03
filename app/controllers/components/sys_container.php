@@ -188,18 +188,18 @@ class sysContainerComponent
 	 * @param string
 	 * @return errors
 	 */
-	function setMyCourseList($courseList='')
+	function setMyCourseList($coursesList='')
 	{
 		$result = array();
 
-		if ($courseList!=null)
+		if ($coursesList!=null)
 		{
 			$pos = 1;
-			foreach($courseList as $row): $course = $row['courses'];
+			foreach($coursesList as $row): $course = $row['courses'];
 			$result[$course['id']] = $course;
 
 			$this->myCourseIDs .= $course['id'];
-			if ($pos < count($courseList)) {
+			if ($pos < count($coursesList)) {
 				$this->myCourseIDs .= ', ';
 				$pos++;
 			}
