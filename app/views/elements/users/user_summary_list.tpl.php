@@ -22,22 +22,18 @@
         }
 	?>
 		<!-- Summary for import record creation -->
-		<?php
-            foreach($data as $row) {
-                $user = $row['User'];
-                echo "<tr class='tablecell'>";
-                echo "<td>$user[username]</td>";
-                echo "<td>$user[first_name]</td>";
-                echo "<td>$user[last_name]</td>";
-				echo "<td>";
-				echo !empty($user['tmp_password']) ?
-                    "<strong style='color:red;letter-spacing:3px'>$user[tmp_password]</strong></tt>" :
-                    "<i>Not availalble for existing users</i>";
-                echo "</td>";
-                echo isset($user['error_message']) ?
-                    "<td><font color='#FF0000'>$user[error_message]</font></td>"  :
-                    "";
-                }
-                echo "</tr>";
-        ?>
+		<?php foreach($data as $row): ?>
+            <?php $user = $row['User'];?>
+            <tr class='tablecell'>
+            <td><?php echo $user['username']?></td>
+            <td><?php echo $user['first_name']?></td>
+            <td><?php echo $user['last_name']?></td>
+            <td><?php echo !empty($user['tmp_password']) ? 
+              "<strong style='color:red;letter-spacing:3px'>".$user['tmp_password']."</strong></tt>" : 
+              "<i>Not availalble for existing users</i>";?></td>
+            <?php if(isset($user['error_message'])):?>
+                    <td><font color='#FF0000'><?php echo $user['error_message']?></font></td>
+            <?php endif;?>
+            </tr>
+     <?php endforeach;?> 
 </table>

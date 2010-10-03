@@ -54,7 +54,7 @@
         <!-- User Name / Student No. -->
         <tr class="tablecell2">
             <td width="186" id="newuser_label">
-                <?php echo $isStudent ? "Student Number" : "Username"; ?>
+                <?php echo $isStudent ? "Student Number*:" : "Username:"; ?>
             </td>
             <td width="437">
                 <input type="text" name="newuser" id="newuser" class="validate required USERNAME_FORMAT newuser_msg Invalid_Username_Format." size="50"><br /><br />
@@ -72,18 +72,18 @@
         <strong>Note:</strong> If using CWL logons, students should use CWL username/password for iPeer, instead of the generated one.
         </td></tr>
 
-        <!-- Last Name -->
-        <tr class="tablecell2">
-            <td id="last_name_label">Last Name:</td>
-            <td><?php echo $html->input('User/last_name', array('id'=>'last_name', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT last_name_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
-            <td id="last_name_msg" class="error">&nbsp;</td>
-        </tr>
-
         <!-- First Name -->
         <tr class="tablecell2">
             <td>First Name:</td>
-            <td><?php echo $html->input('User/first_name', array('id'=>'first_name', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT first_name_msg Invalid_Text._At_Least_One_Word_Is_Required.')) ?></td>
+            <td><?php echo $html->input('User/first_name', array('id'=>'first_name', 'size'=>'50', 'class'=>'validate TEXT_FORMAT first_name_msg Invalid_Text._At_Least_One_Word_Is_Required.')) ?></td>
             <td id="first_name_msg" class="error">&nbsp;</td>
+        </tr>
+
+        <!-- Last Name -->
+        <tr class="tablecell2">
+            <td id="last_name_label">Last Name*:</td>
+            <td><?php echo $html->input('User/last_name', array('id'=>'last_name', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT last_name_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
+            <td id="last_name_msg" class="error">&nbsp;</td>
         </tr>
 
         <!-- Title  -->
