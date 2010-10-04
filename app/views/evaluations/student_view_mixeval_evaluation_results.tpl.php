@@ -26,13 +26,15 @@ $numerical_index = 1;  //use numbers instead of words; get users to refer to the
 $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
 $membersAry = array();  //used to format result
 $groupAve = 0;
-if (isset($scoreRecords[$rdAuth->id])) {
-  $gradeReleased = $scoreRecords[$rdAuth->id]['grade_released'];
-  $commentReleased = $scoreRecords[$rdAuth->id]['comment_released'];
-} else {
-  $gradeReleased = array();
-  $commentReleased = array();
-}
+
+//unset($scoreRecords[$rdAuth->id]);
+
+$gradeReleased = !empty($scoreRecords[$rdAuth->id]['grade_released']) ?
+        $scoreRecords[$rdAuth->id]['grade_released'] :
+        "No Grades Released";
+$commentReleased = !empty($scoreRecords[$rdAuth->id]['comment_released']) ?
+        $scoreRecords[$rdAuth->id]['comment_released'] :
+        "No Comments Released";
 
 ?>
 			 <!--br>Total: <?php /*$memberAve = number_format($membersAry[$user['id']]['received_ave_score'], 2);

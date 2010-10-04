@@ -140,66 +140,94 @@ class EvaluationMixevalHelperComponent extends Object
     return $totalGrade;
   }
 
-  function getMixevalResultDetail ($event, $groupMembers) {
-	  $pos = 0;
-	  $this->EvaluationSubmission = new EvaluationSubmission;
-	  $this->EvaluationMixeval  = new EvaluationMixeval;
-    $this->EvaluationMixevalDetail   = new EvaluationMixevalDetail;
-    $mixevalResultDetail = array();
-		$memberScoreSummary = array();
-		$allMembersCompleted = true;
-		$inCompletedMembers = array();
-    $evalResult = array();
+    function getMixevalResultDetail ($event, $groupMembers) {
+        $pos = 0;
+        $this->EvaluationSubmission = new EvaluationSubmission;
+        $this->EvaluationMixeval  = new EvaluationMixeval;
+        $this->EvaluationMixevalDetail   = new EvaluationMixevalDetail;
+        $mixevalResultDetail = array();
+        $memberScoreSummary = array();
+        $allMembersCompleted = true;
+        $inCompletedMembers = array();
+        $evalResult = array();
 
-	  if ($event['group_event_id'] && $groupMembers) {
-			foreach ($groupMembers as $user)   {
-	      $userPOS = 0;
-	      if (isset($user['id'])) {
-	        $userId = $user['id'];
-	      } elseif (isset($user['User'])) {
-	        $userId = $user['User']['id'];
-  	      //$userId = isset($user['User'])? $user['User']['id'] : $user['id'];
-  			  //Check if this memeber submitted evaluation
-  			  $evalSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($event['group_event_id'],
-  			                                                                                        $userId);
-  			  
-  			 // if (isset($evalSubmission['EvaluationSubmission'])) {
-  			    $mixevalResult = $this->EvaluationMixeval->getResultsByEvaluatee($event['group_event_id'], $userId);
-  				  $evalResult[$userId] = $mixevalResult;
+        if ($event['group_event_id'] && $groupMembers) {
+            foreach ($groupMembers as $user)   {
+                $userPOS = 0;
+                if (isset($user['id'])) {
 
-    		    //Get total mark each member received
-    				$receivedTotalScore = $this->EvaluationMixeval->getReceivedTotalScore($event['group_event_id'],
-    				                                                                     $userId);
-            $ttlEvaluatorCount = $this->EvaluationMixeval->getReceivedTotalEvaluatorCount($event['group_event_id'],
-                                                                                         $userId);
-            if ($ttlEvaluatorCount[0]['ttl_count'] >0 ) {
-      				$memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0]['received_total_score'];
-      			  $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0]['received_total_score'] /
-      			                                                                   $ttlEvaluatorCount[0]['ttl_count'];
-      			}
-      	    foreach($mixevalResult AS $row ){
-      	      $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
-              if ($evalMark!=null) {
-      			    $rubriDetail = $this->EvaluationMixevalDetail->getAllByEvalMixevalId($evalMark['id']);
-      			    $evalResult[$userId][$userPOS++]['EvaluationMixeval']['details'] = $rubriDetail;
-      			  }
-      			}
-  			  if (!isset($evalSubmission['EvaluationSubmission'])) {
-  			     $allMembersCompleted = false;
-  			     $inCompletedMembers[$pos++]=$user;
-  			  }
-  			}
-			}
-		}
+                    $userId = $user['id'];
 
-  	$mixevalResultDetail['scoreRecords'] =  $this->formatMixevalEvaluationResultsMatrix($event, $groupMembers, $evalResult);
-  	$mixevalResultDetail['allMembersCompleted'] = $allMembersCompleted;
-  	$mixevalResultDetail['inCompletedMembers'] = $inCompletedMembers;
-  	$mixevalResultDetail['memberScoreSummary'] = $memberScoreSummary;
-  	$mixevalResultDetail['evalResult'] = $evalResult;
+                    $evalSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($event['group_event_id'],
+                                    $userId);
 
-  	return $mixevalResultDetail;
-   }
+                    // if (isset($evalSubmission['EvaluationSubmission'])) {
+                    $mixevalResult = $this->EvaluationMixeval->getResultsByEvaluatee($event['group_event_id'], $userId);
+                    $evalResult[$userId] = $mixevalResult;
+
+                    //Get total mark each member received
+                    $receivedTotalScore = $this->EvaluationMixeval->getReceivedTotalScore($event['group_event_id'],
+                         $userId);
+                    $ttlEvaluatorCount = $this->EvaluationMixeval->getReceivedTotalEvaluatorCount($event['group_event_id'],$userId);
+                    if ($ttlEvaluatorCount[0]['ttl_count'] >0 ) {
+                        $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0]['received_total_score'];
+                        $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0]['received_total_score'] / $ttlEvaluatorCount[0]['ttl_count'];
+                    }
+                    foreach($mixevalResult AS $row ) {
+                        $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
+                        if ($evalMark!=null) {
+                            $rubriDetail = $this->EvaluationMixevalDetail->getAllByEvalMixevalId($evalMark['id']);
+                            $evalResult[$userId][$userPOS++]['EvaluationMixeval']['details'] = $rubriDetail;
+                        }
+                    }
+                    if (!isset($evalSubmission['EvaluationSubmission'])) {
+                        $allMembersCompleted = false;
+                        $inCompletedMembers[$pos++]=$user;
+                    }
+                } elseif (isset($user['User'])) {
+                    $userId = $user['User']['id'];
+                    //$userId = isset($user['User'])? $user['User']['id'] : $user['id'];
+                    //Check if this memeber submitted evaluation
+                    $evalSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($event['group_event_id'],
+                                    $userId);
+
+                    // if (isset($evalSubmission['EvaluationSubmission'])) {
+                    $mixevalResult = $this->EvaluationMixeval->getResultsByEvaluatee($event['group_event_id'], $userId);
+                    $evalResult[$userId] = $mixevalResult;
+
+                    //Get total mark each member received
+                    $receivedTotalScore = $this->EvaluationMixeval->getReceivedTotalScore($event['group_event_id'],
+                         $userId);
+                    $ttlEvaluatorCount = $this->EvaluationMixeval->getReceivedTotalEvaluatorCount($event['group_event_id'],
+                         $userId);
+                    if ($ttlEvaluatorCount[0]['ttl_count'] > 0 ) {
+                        $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0]['received_total_score'];
+                        $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0]['received_total_score'] /
+                        $ttlEvaluatorCount[0]['ttl_count'];
+                    }
+                    foreach($mixevalResult AS $row ) {
+                        $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
+                        if ($evalMark!=null) {
+                            $rubriDetail = $this->EvaluationMixevalDetail->getAllByEvalMixevalId($evalMark['id']);
+                            $evalResult[$userId][$userPOS++]['EvaluationMixeval']['details'] = $rubriDetail;
+                        }
+                    }
+                    if (!isset($evalSubmission['EvaluationSubmission'])) {
+                        $allMembersCompleted = false;
+                        $inCompletedMembers[$pos++]=$user;
+                    }
+                }
+            }
+        }
+
+        $mixevalResultDetail['scoreRecords'] =  $this->formatMixevalEvaluationResultsMatrix($event, $groupMembers, $evalResult);
+        $mixevalResultDetail['allMembersCompleted'] = $allMembersCompleted;
+        $mixevalResultDetail['inCompletedMembers'] = $inCompletedMembers;
+        $mixevalResultDetail['memberScoreSummary'] = $memberScoreSummary;
+        $mixevalResultDetail['evalResult'] = $evalResult;
+
+        return $mixevalResultDetail;
+    }
 
   function getStudentViewMixevalResultDetailReview ($event, $userId) {
 	  $userPOS = 0;
@@ -229,75 +257,80 @@ class EvaluationMixevalHelperComponent extends Object
   	return $evalResult;
    }
 
- 	function formatMixevalEvaluationResultsMatrix($event, $groupMembers, $evalResult) {
-		//
-		// results matrix format:
-		// Matrix[evaluatee_id][evaluator_id] = score
-		//
-		$matrix = array();
-		$groupQuestionAve = array();
+    function formatMixevalEvaluationResultsMatrix($event, $groupMembers, $evalResult) {
+        //
+        // results matrix format:
+        // Matrix[evaluatee_id][evaluator_id] = score
+        //
+        $matrix = array();
+        $groupQuestionAve = array();
 
-	  foreach($evalResult AS $index => $value){
-	    $evalMarkArray = $value;
-	    $evalTotal = 0;
-      $mixevalQuestion = array();
+        foreach($evalResult AS $index => $value) {
+            $evalMarkArray = $value;
+            $evalTotal = 0;
+            $mixevalQuestion = array();
 
-      if ($evalMarkArray!=null) {
-        $grade_release = 1;
-         		$detailPOS = 0;
+            if ($evalMarkArray != null) {
+                $grade_release = 1;
+                $detailPOS = 0;
 
-  	    foreach($evalMarkArray AS $row ){
-  	      $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
-          if ($evalMark!=null) {
-//print_r($evalMark);
-    				$grade_release = $evalMark['grade_release'];
-    				$comment_release = $evalMark['comment_release'];
-    				//$ave_score= $receivedTotalScore / count($evalMarkArray);
-        	  //$matrix[$index][$evalMark['evaluator']] = $evalMark['score'];
-        	  //$matrix[$index]['received_ave_score'] =$ave_score;
-						if ($index == $evalMark['evaluatee'] ) {
+                foreach($evalMarkArray AS $row ){
+                    $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
+                    if ($evalMark!=null) {
+                    //print_r($evalMark);
+                        $grade_release = $evalMark['grade_release'];
+                        $comment_release = $evalMark['comment_release'];
+                        //$ave_score= $receivedTotalScore / count($evalMarkArray);
+                        //$matrix[$index][$evalMark['evaluator']] = $evalMark['score'];
+                        //$matrix[$index]['received_ave_score'] =$ave_score;
+                        if ($index == $evalMark['evaluatee'] ) {
+                            $matrix[$index]['grade_released'] =$grade_release;
+                            $matrix[$index]['comment_released'] =$comment_release;
+                        }
 
-							$matrix[$index]['grade_released'] =$grade_release;
-							$matrix[$index]['comment_released'] =$comment_release;
-						}
-
-        	  //Format the mixeval question
-        	  foreach ($evalMark['details'] AS $detail) {
-        	    $mixevalResult = $detail['EvaluationMixevalDetail'];
-	            if (!isset($mixevalQuestion[$mixevalResult['question_number']])) $mixevalQuestion[$mixevalResult['question_number']] = 0;
-        	      $mixevalQuestion[$mixevalResult['question_number']] += $mixevalResult['grade'];
-        	  }
-            $detailPOS ++ ;
-      	  } else{
-      	    //$matrix[$index][$evalMark['evaluatee']] = 'n/a';
-      	  }
+                        //Format the mixeval question
+                        foreach ($evalMark['details'] AS $detail) {
+                            $mixevalResult = $detail['EvaluationMixevalDetail'];
+                            if (!isset($mixevalQuestion[$mixevalResult['question_number']])) $mixevalQuestion[$mixevalResult['question_number']] = 0;
+                            $mixevalQuestion[$mixevalResult['question_number']] += $mixevalResult['grade'];
+                        }
+                        $detailPOS ++ ;
+                    } else{
+                        //$matrix[$index][$evalMark['evaluatee']] = 'n/a';
+                    }
 
 
-    	  }
-    	}	else {
-				foreach ($groupMembers as $user) {
-					$matrix[$index][$user['User']['id']] = 'n/a';
-				}
-			}
-      //Get Ave Question Grade
-      foreach ($mixevalQuestion AS $criIndex => $criGrade) {
-        if (!isset($groupQuestionAve[$criIndex])) $groupQuestionAve[$criIndex] = 0;
-        $ave = $criGrade / $detailPOS;
-        $mixevalQuestion[$criIndex] = $ave;
-        $groupQuestionAve[$criIndex]+= $ave;
-      }
-      $matrix[$index]['mixeval_question_ave'] = $mixevalQuestion;
-	  }
+                }
+            }	else {
+                foreach ($groupMembers as $user) {
+                    if (!empty($user)) {
+                        // The array's format varries. Sometime a sub-array [0] is present
+                        $id = !empty($user['id']) ? $user['id'] : $user[0]['id'];
+                        $matrix[$index][$id] = 'n/a';
+                    }
+                }
+            }
+            //Get Ave Question Grade
+            foreach ($mixevalQuestion AS $criIndex => $criGrade) {
+                if (!isset($groupQuestionAve[$criIndex])) {
+                    $groupQuestionAve[$criIndex] = 0;
+                }
+                $ave = $criGrade / $detailPOS;
+                $mixevalQuestion[$criIndex] = $ave;
+                $groupQuestionAve[$criIndex]+= $ave;
+            }
+            $matrix[$index]['mixeval_question_ave'] = $mixevalQuestion;
+        }
 
-    //Get Group Ave Question Grade
-    foreach ($groupQuestionAve AS $groupIndex => $groupGrade) {
-      $ave = $groupGrade / count($evalResult);
-      $groupQuestionAve[$groupIndex] = $ave;
+        //Get Group Ave Question Grade
+        foreach ($groupQuestionAve AS $groupIndex => $groupGrade) {
+            $ave = $groupGrade / count($evalResult);
+            $groupQuestionAve[$groupIndex] = $ave;
+        }
+        $matrix['group_question_ave'] = $groupQuestionAve;
+
+        return $matrix;
     }
-    $matrix['group_question_ave'] = $groupQuestionAve;
-
-		return $matrix;
-	}
 
 
 

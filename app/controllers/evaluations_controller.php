@@ -110,7 +110,7 @@ class EvaluationsController extends AppController
         // The columns to show
         $columns = array(
             //    Model   columns       (Display Title) (Type Description)
-            array("GroupEvent.id",     "",           "",    "number"),
+            array("GroupEvent.id",     "",           "",    "hidden"),
             array("Group.id",          "",           "",    "hidden"),
             array("Group.group_num",   "Group #",    "7em", "action", "View Group"),
             array("Group.group_name",  "Group Name", "auto","action", "View Results"),
@@ -158,7 +158,7 @@ class EvaluationsController extends AppController
             array("View Results",    "", "", "", "!viewEvaluationResults", "Event.id", "Group.id"),
             array("View Submission", "", "", "", "!viewGroupSubmissionDetails", "Event.id", "Group.id"),
             array("View Group",      "", "", "groups", "!view", "Group.id"),
-            array("View Event",      "", "", "events", "view", "Event.id"),
+            array("View Event",      "", "", "events", "!view", "Event.id"),
             array("View Course",     "", "", "courses", "view", "Course.id")
         );
 
@@ -726,6 +726,9 @@ class EvaluationsController extends AppController
             $this->set('scoreRecords', $formattedResult['scoreRecords']);
             $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
             $this->set('evalResult', $formattedResult['evalResult']);
+            $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
+
+
 
           if ($displayFormat == 'Detail') {
             $this->render('view_mixeval_evaluation_results_detail');

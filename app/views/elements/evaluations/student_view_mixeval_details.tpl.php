@@ -1,9 +1,11 @@
 <?php
-$gradeReleased = isset($scoreRecords[$rdAuth->id])? $scoreRecords[$rdAuth->id]['grade_released']: 1;
-$commentReleased = isset($scoreRecords[$rdAuth->id])? $scoreRecords[$rdAuth->id]['comment_released']: 1;
-$color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
+    $gradeReleased = isset($scoreRecords[$rdAuth->id]['grade_released']) ?
+        $scoreRecords[$rdAuth->id]['grade_released'] : 1;
+    $commentReleased = isset($scoreRecords[$rdAuth->id]['comment_released']) ?
+        $scoreRecords[$rdAuth->id]['comment_released'] : 1;
+    $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
 
-$pos = 1;
+    $pos = 1;
 ?>
 <br/><br/>
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
@@ -39,7 +41,12 @@ else if ($gradeReleased || $commentReleased) {
 
    foreach ($memberResult AS $row): $memberMixeval = $row['EvaluationMixeval'];
 
-     $member = $membersAry[$memberMixeval['evaluatee']];
+     if ($scoreRecords == null) { // renders self evaluation
+        $member = $membersAry[$memberMixeval['evaluatee']];
+     } else { // renders evaluations from peers
+        $member = $membersAry[$memberMixeval['evaluator']];
+     }
+
      echo "<tr class=\"tablecell2\">";
      if (isset($scoreRecords)) {
        echo "<td width='15%'>".$rdAuth->fullname."</td>";
@@ -73,7 +80,6 @@ else if ($gradeReleased || $commentReleased) {
         }
 
         echo "</td>";
-     //endforeach;
      }
      echo "</tr>";
 
@@ -114,7 +120,12 @@ if (!$gradeReleased && !$commentReleased) {
    }
    foreach ($memberResult AS $row): $memberMixeval = $row['EvaluationMixeval'];
 
-     $member = $membersAry[$memberMixeval['evaluatee']];
+     if ($scoreRecords == null)  {
+        $member = $membersAry[$memberMixeval['evaluatee']];
+     } else {
+        $member = $membersAry[$memberMixeval['evaluator']];
+     }
+
      echo "<tr class=\"tablecell2\">";
      if (isset($scoreRecords)) {
        echo "<td width='15%'>".$rdAuth->fullname."</td>";
