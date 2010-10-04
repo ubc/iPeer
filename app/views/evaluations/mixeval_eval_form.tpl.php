@@ -58,16 +58,38 @@
 	<?php $i = 0;
 	foreach($groupMembers as $row): $user = $row['User']; ?>
 	<input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/>
+  <?php
+    $view_data = $this->controller->MixevalHelper->compileViewData($data);
+  ?>
 		<div id="panel<?php echo $user['id']?>">
 		  <div id="panel<?php echo $user['id']?>Header" class="panelheader">
-		  	<?php
-		  	echo $user['last_name'].' '.$user['first_name'];
-		  	if (isset($user['Evaluation'])) {
-		  	  echo '<font color="#66FF33"> ( Entered )</font>';
-		  	} else {
-		  	  echo '<font color="#FF6666"> - Incomplete </font>';
-		  	}
-		  	?>
+		  	<?php echo $user['last_name'].' '.$user['first_name'];?>
+		  	<?php if (isset($user['Evaluation'])):?>
+        <?php                
+          // check if the evaluation comment is empty
+          $commentsNeeded = false;
+          $evaluationDetails = $user['Evaluation']['EvaluationDetail'];
+          foreach ($evaluationDetails as $detailEval) {
+            $detail = $detailEval['EvaluationMixevalDetail'];
+            if ($view_data['questions'][$detail['question_number']]['question_type'] != 'S' &&
+                empty($detail['question_comment'])) {
+              $commentsNeeded = true;      // A criteria comment is missing
+              //echo "Missing detail $detail[id] for user $user[id]<br />";
+              break;
+            } else {
+              //echo "OK detail $detail[id] ($detail[question_comment]) for user $user[id]<br />";
+            }
+          }
+          $partial = '';
+          if($commentsNeeded) {
+            $partial = '<font color="red">Partially </font>';
+          }
+        ?>
+
+		  	  <font color="#66FF33"> ( <?php echo $partial?>Entered )</font>
+		  	<?php else:?>
+		  	  <font color="#FF6666"> - Incomplete </font>
+		  	<?php endif;?>
 		  </div>
 		  <div style="height: 200px;" id="panel1Content" class="panelContent">
 			 <br><br>
@@ -75,7 +97,7 @@
       <?php
 
       $params = array(  'controller'            => 'mixevals',
-                        'data'                  => $this->controller->MixevalHelper->compileViewData($data),
+                        'data'                  => $view_data,
                         'scale_default'         => $data['Mixeval']['scale_max'],
                         'question_default'      => $data['Mixeval']['lickert_question_max'],
                         'prefill_question_max'  => $data['Mixeval']['prefill_question_max'],
@@ -139,9 +161,6 @@
     if ($event['Event']['com_req']) {
         foreach($groupMembers as $row) {
             $user = $row['User'];
-            //echo "<div style='text-align:left'>";
-            //var_dump($user);
-            //echo "</div>";
 
             if (empty($user['Evaluation'])) {
                 $commentsNeeded = true;      // Not evaluated? Then we need comments for sure
@@ -163,8 +182,6 @@
                 }
             }
         }
-    } else {
-        $commentsNeeded = false;
     }
 
   if (!$mustCompleteUsers && !$commentsNeeded) {
