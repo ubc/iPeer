@@ -170,18 +170,14 @@ class MixevalsController extends AppController
 
 	function add($layout='')
 	{
-		if ($layout != ''){
+		if ($layout != '') {
 	    $this->layout = $layout;
 	    $this->set('layout', $layout);
 		}
 
-		if (empty($this->params['data']))
-		{
+		if (empty($this->params['data'])) {
 		  $this->render();
-		}
-		else
-		{
-//print_r($this->params['data']);
+		} else {
       $this->Mixeval->setId(null);
       //print_r($this->params['data']['total_marks']);
       //$this->params['data']['Mixeval']['total_marks'] = isset($this->params['data']['Mixeval']['total_marks'])?$this->params['data']['total_marks']:'';
@@ -191,11 +187,10 @@ class MixevalsController extends AppController
 			  //$this->set('total_mark',1);
 				$this->set('data', $this->params['data']);
 				$this->render('add');
-			}
-			//adding a new rubric
-			else{
+			} else {
+        //adding a new rubric
 			  $data = $this->params['data'];
-			  $data['Mixeval']['total_question'] = $data['Mixeval']['total_question'] -1 ;
+//			  $data['Mixeval']['total_question'] = $data['Mixeval']['total_question'] -1 ;
 			  if ($this->Mixeval->save($data))
 			  {
   				//prepare the data from the form fields in array
@@ -206,15 +201,14 @@ class MixevalsController extends AppController
   				$this->MixevalsQuestionDesc->insertQuestionDescriptor($this->Mixeval->id, $mixEvaluation);
 
   				$this->redirect('/mixevals/index/The mixed evaluation was added successfully.');
-  			}
-  			//updating a current rubric
-  			else{
+  			} else{
+          //updating a current rubric
             $this->set('data', $this->params['data']);
             $this->set('errmsg', $this->Mixeval->errorMessage);
             $this->render('add');
-  			  }
-  		  }
-  		}
+        }
+      }
+    }
 	}
 
 	function edit($id=null)
@@ -261,7 +255,7 @@ class MixevalsController extends AppController
 
   function copy($id=null)
   {
-        $this->render = false;
+    $this->render = false;
 		$this->Mixeval->setId($id);
 		$data = $this->Mixeval->read();
 		$data['Mixeval']['name'] = ""; // Clear the name when evaluation copied

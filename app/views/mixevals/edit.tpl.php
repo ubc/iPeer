@@ -38,12 +38,13 @@
   <tr class="tablecell2">
     <td width="209" id="mixeval_name_label">Mixed Evaluation Name:<font color="red">*</font></td>
     <td width="301"><?php echo $html->input('Mixeval/name', array('size'=>'30','class'=>'validate required TEXT_FORMAT mixeval_name_msg Invalid_Text._At_Least_One_Word_Is_Required.','value'=>$mixeval_name, 'id'=>'mixeval_name')) ?></td>
-    <td width="353" id="mixeval_name_msg" class="error" />
+    <td width="353" id="mixeval_name_msg" class="error">&nbsp;</td>
   </tr>
 
   <tr class="tablecell2">
     <td>Number of Lickert Questions:</td>
     <td>
+    <input type="hidden" id="lickert_question_max" value="<?php echo $question_default?>" name="data[Mixeval][lickert_question_max]">
 
         <?php echo "<b>&nbsp;&nbsp;$question_default&nbsp;&nbsp;</b>";?>
         <!-- disable editing the number of questions for now -->
@@ -195,7 +196,7 @@ echo $javascript->link('calculate_marks');?>
 		}
 		echo '<tr class="tableheader2">';
 		echo '<td colspan="'.($scale_default).'" align="right">Total Marks: </td>';
-		echo '<td align="center"> <input type="text" name="total_marks" id="total_marks" class="input" value="'.$total_mark.'" size="5" readonly></td>';
+		echo '<td align="center"> <input type="text" name="data[Mixeval][total_marks]" id="total_marks" class="input" value="'.$total_mark.'" size="5" readonly></td>';
 		echo "</tr>";
 		?>
   <tr>
