@@ -83,22 +83,26 @@
   </tr>
   <tr class="tablecell2">
     <td>
+      NOTE:
+      <ul>
+        <li>Please make sure the username column matches the username column in student import file.</li>
+        <li>Please make sure to remove the header in CSV file.</li>
+        <li>All columns are requried.</li>
+      </ul>
 
-        <b>StudentNumber, Group# (e.g. 5 for group 5), and Group Name<br />
-        &nbsp;&nbsp;&nbsp;are all required.</b><br>
-        <br />
-        Please follow the following formatting:<br>
-        [StudentNumber], [Group#], [GroupName]<br>
-        [StudentNumber], [Group#], [GroupName]<br>
-        <br>
-        For example:<br>
-        <br>
-<pre style='background-color: white; border:1px solid black; padding:5px; margin:5px'>
+      <br />
+      Format:
+      <pre style='background-color: white; border:1px solid black; padding:5px; margin:5px'>
+Username, Group# (e.g. 5 for group 5), and Group Name
+      </pre>
+
+      Example:
+      <pre style='background-color: white; border:1px solid black; padding:5px; margin:5px'>
 29978037, 1, Team A
 29978063, 1, Team A
 29978043, 2, Team B
 29978051, 2, Team B
-</pre>
+      </pre>
 	</td>
     <td valign="top"><br>
 <form name="importfrm" id="importfrm" method="POST" action="<?php echo $html->url('import') ?>" enctype="multipart/form-data" >

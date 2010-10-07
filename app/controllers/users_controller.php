@@ -25,6 +25,14 @@
  * @subpackage
  * @since
  */
+
+define('IMPORT_USERNAME', 0);
+define('IMPORT_FIRSTNAME', 1);
+define('IMPORT_LASTNAME', 2);
+define('IMPORT_STUDENT_NO', 3);
+define('IMPORT_EMAIL', 4);
+define('IMPORT_PASSWORD', 5);
+
 uses('neat_string');
 class UsersController extends AppController
 {
@@ -677,7 +685,7 @@ class UsersController extends AppController
         $this->render('userSummary');
     }
 
-    function addUserByImport($data=null, $lines=null)
+    function addUserByImport($data, $lines)
     {
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
@@ -696,21 +704,22 @@ class UsersController extends AppController
             $line = @split(',', $filteredLine);
 
             // Set up the password lines
-            if (isset($line[1])) {
-                $trimmedPassword = trim($line[1]);
+            if (isset($line[IMPORT_PASSWORD])) {
+                $trimmedPassword = trim($line[IMPORT_PASSWORD]);
             } else {
-                $trimmedPassword = "";
+                $trimmedPassword = $this->NeatString->randomPassword(6);
             }
 
             $data['User']['id'] = null;
-            $data['User']['username']     = isset($line[0]) ? trim($line[0]) : "";
+            $data['User']['username']     = isset($line[IMPORT_USERNAME]) ? trim($line[IMPORT_USERNAME]) : "";
+            $data['User']['first_name']   = isset($line[IMPORT_FIRSTNAME]) ? trim($line[IMPORT_FIRSTNAME]) : "";
+            $data['User']['last_name']    = isset($line[IMPORT_LASTNAME]) ? trim($line[IMPORT_LASTNAME]) : "";
+            $data['User']['student_no']   = isset($line[IMPORT_STUDENT_NO]) ? trim($line[IMPORT_STUDENT_NO]) : "";
+            $data['User']['email']        = isset($line[IMPORT_EMAIL]) ? trim($line[IMPORT_EMAIL]) : "";
             $data['User']['tmp_password'] = $trimmedPassword;
             $data['User']['password']     = $trimmedPassword; // Will be hashed by the Users controller
-            $data['User']['student_no']   = isset($line[2]) ? trim($line[2]) : "";
-            $data['User']['email']        = isset($line[3]) ? trim($line[3]) : "";
-            $data['User']['first_name']   = isset($line[4]) ? trim($line[4]) : "";
-            $data['User']['last_name']    = isset($line[5]) ? trim($line[5]) : "";
             $data['User']['creator_id']   = $this->rdAuth->id;
+
             if ($this->User->save($data))
             {
                 //New user, save it as usual
@@ -740,8 +749,6 @@ class UsersController extends AppController
                         $this->UserEnrol->save($userEnrol);
                         $this->UserEnrol->id = null;
                         $result['created_students'][$createdPos++] = $data;
-
-
                     } else {
                         //Current user already registered
                         $result['failed_students'][$failedPos] = $data;
