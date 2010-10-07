@@ -107,7 +107,7 @@ class EvaluationRubricHelperComponent extends Object
 		 $score = $this->saveNGetEvalutionRubricDetail($evalRubric['EvaluationRubric']['id'], $rubric,
 		                                               $targetEvaluatee, $params['form']);
      $evalRubric['EvaluationRubric']['score'] = $score;
-     
+
      if (!$this->EvaluationRubric->save($evalRubric))
      {
        return false;
@@ -147,164 +147,201 @@ class EvaluationRubricHelperComponent extends Object
     return $totalGrade;
   }
 
-  function getRubricResultDetail ($event, $groupMembers) {
-	  $pos = 0;
-	  $this->EvaluationSubmission = new EvaluationSubmission;
-	  $this->EvaluationRubric  = new EvaluationRubric;
-    $this->EvaluationRubricDetail   = new EvaluationRubricDetail;
-    $rubricResultDetail = array();
-		$memberScoreSummary = array();
-		$allMembersCompleted = true;
-		$inCompletedMembers = array();
-    $evalResult = array();
+    function getRubricResultDetail ($event, $groupMembers) {
+        $pos = 0;
+        $this->EvaluationSubmission = new EvaluationSubmission;
+        $this->EvaluationRubric  = new EvaluationRubric;
+        $this->EvaluationRubricDetail   = new EvaluationRubricDetail;
+        $rubricResultDetail = array();
+        $memberScoreSummary = array();
+        $allMembersCompleted = true;
+        $inCompletedMembers = array();
+        $evalResult = array();
 
-	  if ($event['group_event_id'] && $groupMembers) {
-//print_r($groupMembers);
-			foreach ($groupMembers as $user)   {
-	      $userPOS = 0;
-	      if (isset($user['id'])) {
-	        $userId = $user['id'];
-	      } elseif (isset($user['User'])) {
-	        $userId = $user['User']['id'];
-	      //}
-	      //$userId = isset($user['User'])? $user['User']['id'] : $user['id'];
-			  //Check if this memeber submitted evaluation
-			  $evalSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($event['group_event_id'], $userId);
-			  if (isset($evalSubmission['EvaluationSubmission'])) {
+        if ($event['group_event_id'] && $groupMembers) {;
+        foreach ($groupMembers as $user)   {
+            $userPOS = 0;
+                if (isset($user['id'])) {
 
-			  } else {
-			     $allMembersCompleted = false;
-			     $inCompletedMembers[$pos++]=$user;
-			  }
-			    $rubricResult = $this->EvaluationRubric->getResultsByEvaluatee($event['group_event_id'], $userId);
-				  $evalResult[$userId] = $rubricResult;
+                    $userId = $user['id'];
 
-  		    //Get total mark each member received
-  				$receivedTotalScore = $this->EvaluationRubric->getReceivedTotalScore($event['group_event_id'],
-  				                                                                     $userId);
+                    $evalSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($event['group_event_id'],
+                                    $userId);
 
-          $ttlEvaluatorCount = $this->EvaluationRubric->getReceivedTotalEvaluatorCount($event['group_event_id'],
-                                                                                       $userId);
-  				$memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0]['received_total_score'];
-  				if ($ttlEvaluatorCount[0]['ttl_count'] == 0) {
-  				  $memberScoreSummary[$userId]['received_ave_score'] = 0;
-  				} else {
-  			    $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0]['received_total_score'] /
-  			                                                                   $ttlEvaluatorCount[0]['ttl_count'];
-  			                                                                  }
-    	    foreach($rubricResult AS $row ){
-    	      $evalMark = isset($row['EvaluationRubric'])? $row['EvaluationRubric']: null;
-            if ($evalMark!=null) {
-    			    $rubriDetail = $this->EvaluationRubricDetail->getAllByEvalRubricId($evalMark['id']);
-    			    $evalResult[$userId][$userPOS++]['EvaluationRubric']['details'] = $rubriDetail;
-    			  }
-    			}
+                    // if (isset($evalSubmission['EvaluationSubmission'])) {
+                    $rubricResult = $this->EvaluationRubric->getResultsByEvaluatee($event['group_event_id'], $userId);
+                    $evalResult[$userId] = $rubricResult;
 
-    		}
-			}
-		}
-  	$rubricResultDetail['scoreRecords'] =  $this->formatRubricEvaluationResultsMatrix($event, $groupMembers, $evalResult);
-  	$rubricResultDetail['allMembersCompleted'] = $allMembersCompleted;
-  	$rubricResultDetail['inCompletedMembers'] = $inCompletedMembers;
-  	$rubricResultDetail['memberScoreSummary'] = $memberScoreSummary;
-  	$rubricResultDetail['evalResult'] = $evalResult;
+                    //Get total mark each member received
+                    $receivedTotalScore = $this->EvaluationRubric->getReceivedTotalScore($event['group_event_id'],
+                         $userId);
+                    $ttlEvaluatorCount = $this->EvaluationRubric->getReceivedTotalEvaluatorCount(
+                        $event['group_event_id'],$userId);
+                    if ($ttlEvaluatorCount[0]['ttl_count'] >0 ) {
+                        $memberScoreSummary[$userId]['received_total_score'] =
+                            $receivedTotalScore[0]['received_total_score'];
+                        $memberScoreSummary[$userId]['received_ave_score'] =
+                            $receivedTotalScore[0]['received_total_score'] / $ttlEvaluatorCount[0]['ttl_count'];
+                    }
 
-  	return $rubricResultDetail;
-   }
+                    foreach($rubricResult AS $row ){
+                        $evalMark = isset($row['EvaluationRubric'])? $row['EvaluationRubric']: null;
+                        if ($evalMark!=null) {
+                            $rubricDetail = $this->EvaluationRubricDetail->getAllByEvalRubricId($evalMark['id']);
+                            $evalResult[$userId][$userPOS++]['EvaluationRubric']['details'] = $rubricDetail;
+                        }
+                    }
+                    if (!isset($evalSubmission['EvaluationSubmission'])) {
+                        $allMembersCompleted = false;
+                        $inCompletedMembers[$pos++]=$user;
+                    }
+            } elseif (isset($user['User'])) {
+                $userId = $user['User']['id'];
+                //}
+                //$userId = isset($user['User'])? $user['User']['id'] : $user['id'];
+                //Check if this memeber submitted evaluation
+                $evalSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($event['group_event_id'], $userId);
+                if (isset($evalSubmission['EvaluationSubmission'])) {
 
-  function getStudentViewRubricResultDetailReview ($event, $userId) {
-	  $userPOS = 0;
-	  $this->EvaluationSubmission = new EvaluationSubmission;
-	  $this->EvaluationRubric  = new EvaluationRubric;
-    $this->EvaluationRubricDetail   = new EvaluationRubricDetail;
-    $this->User = new User;
+                } else {
+                    $allMembersCompleted = false;
+                    $inCompletedMembers[$pos++]=$user;
+                }
+                $rubricResult = $this->EvaluationRubric->getResultsByEvaluatee($event['group_event_id'], $userId);
+                $evalResult[$userId] = $rubricResult;
 
-    $rubricResultDetail = array();
-		$memberScoreSummary = array();
-		$allMembersCompleted = true;
-		$inCompletedMembers = array();
-    $this->User->setId($userId);
-    $user = $this->User->read();
-	  if ($event['group_event_id'] && $userId) {
-			    $rubricResult = $this->EvaluationRubric->getResultsByEvaluator($event['group_event_id'], $userId);
-				  $evalResult[$userId] = $rubricResult;
+                //Get total mark each member received
+                $receivedTotalScore = $this->EvaluationRubric->getReceivedTotalScore($event['group_event_id'],
+                                                                     $userId);
 
-    	    foreach($rubricResult AS $row ){
-    	      $evalMark = isset($row['EvaluationRubric'])? $row['EvaluationRubric']: null;
-            if ($evalMark!=null) {
-    			    $rubriDetail = $this->EvaluationRubricDetail->getAllByEvalRubricId($evalMark['id']);
-    			    $evalResult[$userId][$userPOS++]['EvaluationRubric']['details'] = $rubriDetail;
-    			  }
-    			}
-		}
-  	return $evalResult;
-   }
+                $ttlEvaluatorCount = $this->EvaluationRubric->getReceivedTotalEvaluatorCount($event['group_event_id'],
+                                                                       $userId);
+                $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0]['received_total_score'];
+                if ($ttlEvaluatorCount[0]['ttl_count'] == 0) {
+                    $memberScoreSummary[$userId]['received_ave_score'] = 0;
+                } else {
+                    $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0]['received_total_score'] /
+                        $ttlEvaluatorCount[0]['ttl_count'];
+                }
+                foreach($rubricResult AS $row ){
+                    $evalMark = isset($row['EvaluationRubric'])? $row['EvaluationRubric']: null;
+                    if ($evalMark!=null) {
+                        $rubricDetail = $this->EvaluationRubricDetail->getAllByEvalRubricId($evalMark['id']);
+                        $evalResult[$userId][$userPOS++]['EvaluationRubric']['details'] = $rubricDetail;
+                    }
+                }
 
- 	function formatRubricEvaluationResultsMatrix($event, $groupMembers, $evalResult) {
-		//
-		// results matrix format:
-		// Matrix[evaluatee_id][evaluator_id] = score
-		//
-		$matrix = array();
-		$groupCriteriaAve = array();
+            }
+        }
+        }
+        $rubricResultDetail['scoreRecords'] =  $this->formatRubricEvaluationResultsMatrix($event, $groupMembers, $evalResult);
+        $rubricResultDetail['allMembersCompleted'] = $allMembersCompleted;
+        $rubricResultDetail['inCompletedMembers'] = $inCompletedMembers;
+        $rubricResultDetail['memberScoreSummary'] = $memberScoreSummary;
+        $rubricResultDetail['evalResult'] = $evalResult;
 
-	  foreach($evalResult AS $index => $value){
-	    $evalMarkArray = $value;
-	    $evalTotal = 0;
-      $rubricCriteria = array();
+        var_dump($rubricResultDetail['scoreRecords']);
 
-      if ($evalMarkArray!=null) {
-        $grade_release = 1;
-         		$detailPOS = 0;
-
-  	    foreach($evalMarkArray AS $row ){
-  	      $evalMark = isset($row['EvaluationRubric'])? $row['EvaluationRubric']: null;
-          if ($evalMark!=null) {
-    				$grade_release = $evalMark['grade_release'];
-    				$comment_release = $evalMark['comment_release'];
-						if ($index == $evalMark['evaluatee'] ) {
-
-							$matrix[$index]['grade_released'] =$grade_release;
-							$matrix[$index]['comment_released'] =$comment_release;
-						}
-
-        	  //Format the rubric criteria
-        	  foreach ($evalMark['details'] AS $detail) {
-        	    $rubricResult = $detail['EvaluationRubricDetail'];
-	            if (!isset($rubricCriteria[$rubricResult['criteria_number']])) $rubricCriteria[$rubricResult['criteria_number']] = 0;
-        	      $rubricCriteria[$rubricResult['criteria_number']] += $rubricResult['grade'];
-        	  }
-            $detailPOS ++ ;
-      	  } else{
-      	    //$matrix[$index][$evalMark['evaluatee']] = 'n/a';
-      	  }
-
-
-    	  }
-    	}	else {
-				foreach ($groupMembers as $user) {
-					$matrix[$index][$user['User']['id']] = 'n/a';
-				}
-			}
-      //Get Ave Criteria Grade
-      foreach ($rubricCriteria AS $criIndex => $criGrade) {
-        if (!isset($groupCriteriaAve[$criIndex])) $groupCriteriaAve[$criIndex] = 0;
-        $ave = $criGrade / $detailPOS;
-        $rubricCriteria[$criIndex] = $ave;
-        $groupCriteriaAve[$criIndex]+= $ave;
-      }
-      $matrix[$index]['rubric_criteria_ave'] = $rubricCriteria;
-	  }
-
-    //Get Group Ave Criteria Grade
-    foreach ($groupCriteriaAve AS $groupIndex => $groupGrade) {
-      $ave = $groupGrade / count($evalResult);
-      $groupCriteriaAve[$groupIndex] = $ave;
+        return $rubricResultDetail;
     }
-    $matrix['group_criteria_ave'] = $groupCriteriaAve;
 
-		return $matrix;
-	}
+    function getStudentViewRubricResultDetailReview ($event, $userId) {
+        $userPOS = 0;
+        $this->EvaluationSubmission = new EvaluationSubmission;
+        $this->EvaluationRubric  = new EvaluationRubric;
+        $this->EvaluationRubricDetail   = new EvaluationRubricDetail;
+        $this->User = new User;
+
+        $rubricResultDetail = array();
+        $memberScoreSummary = array();
+        $allMembersCompleted = true;
+        $inCompletedMembers = array();
+        $this->User->setId($userId);
+        $user = $this->User->read();
+        if ($event['group_event_id'] && $userId) {
+            $rubricResult = $this->EvaluationRubric->getResultsByEvaluator($event['group_event_id'], $userId);
+            $evalResult[$userId] = $rubricResult;
+
+            foreach($rubricResult AS $row ){
+                $evalMark = isset($row['EvaluationRubric'])? $row['EvaluationRubric']: null;
+                if ($evalMark!=null) {
+                    $rubriDetail = $this->EvaluationRubricDetail->getAllByEvalRubricId($evalMark['id']);
+                    $evalResult[$userId][$userPOS++]['EvaluationRubric']['details'] = $rubriDetail;
+                }
+            }
+        }
+        return $evalResult;
+    }
+
+    function formatRubricEvaluationResultsMatrix($event, $groupMembers, $evalResult) {
+        //
+        // results matrix format:
+        // Matrix[evaluatee_id][evaluator_id] = score
+        //
+        $matrix = array();
+        $groupCriteriaAve = array();
+
+        foreach($evalResult AS $index => $value) {
+            $evalMarkArray = $value;
+            $evalTotal = 0;
+            $rubricCriteria = array();
+
+            if ($evalMarkArray!=null) {
+                $grade_release = 1;
+                $detailPOS = 0;
+
+                foreach($evalMarkArray AS $row ){
+                    $evalMark = isset($row['EvaluationRubric'])? $row['EvaluationRubric']: null;
+                    if ($evalMark!=null) {
+                    $grade_release = $evalMark['grade_release'];
+                        $comment_release = $evalMark['comment_release'];
+                        if ($index == $evalMark['evaluatee'] ) {
+                            $matrix[$index]['grade_released'] = $grade_release;
+                            $matrix[$index]['comment_released'] = $comment_release;
+                        }
+
+                        //Format the rubric criteria\
+                        //var_dump($evalMark);
+                        foreach ($evalMark['details'] AS $detail) {
+                            $rubricResult = $detail['EvaluationRubricDetail'];
+                            if (!isset($rubricCriteria[$rubricResult['criteria_number']])) {
+                                $rubricCriteria[$rubricResult['criteria_number']] = 0;
+                            }
+                            $rubricCriteria[$rubricResult['criteria_number']] += $rubricResult['grade'];
+                        }
+                        $detailPOS ++ ;
+                    } else{
+                        //$matrix[$index][$evalMark['evaluatee']] = 'n/a';
+                    }
+
+
+                }
+            } else {
+                foreach ($groupMembers as $user) {
+                    $matrix[$index][$user['User']['id']] = 'n/a';
+                }
+            }
+            //Get Ave Criteria Grade
+            foreach ($rubricCriteria AS $criIndex => $criGrade) {
+                if (!isset($groupCriteriaAve[$criIndex])) {
+                    $groupCriteriaAve[$criIndex] = 0;
+                }
+                $ave = $criGrade / $detailPOS;
+                $rubricCriteria[$criIndex] = $ave;
+                $groupCriteriaAve[$criIndex]+= $ave;
+            }
+            $matrix[$index]['rubric_criteria_ave'] = $rubricCriteria;
+        }
+
+        //Get Group Ave Criteria Grade
+        foreach ($groupCriteriaAve AS $groupIndex => $groupGrade) {
+            $ave = $groupGrade / count($evalResult);
+            $groupCriteriaAve[$groupIndex] = $ave;
+        }
+        $matrix['group_criteria_ave'] = $groupCriteriaAve;
+
+        return $matrix;
+    }
 
 
 
