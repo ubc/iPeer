@@ -240,8 +240,6 @@ class EvaluationRubricHelperComponent extends Object
         $rubricResultDetail['memberScoreSummary'] = $memberScoreSummary;
         $rubricResultDetail['evalResult'] = $evalResult;
 
-        var_dump($rubricResultDetail['scoreRecords']);
-
         return $rubricResultDetail;
     }
 
@@ -301,7 +299,6 @@ class EvaluationRubricHelperComponent extends Object
                         }
 
                         //Format the rubric criteria\
-                        //var_dump($evalMark);
                         foreach ($evalMark['details'] AS $detail) {
                             $rubricResult = $detail['EvaluationRubricDetail'];
                             if (!isset($rubricCriteria[$rubricResult['criteria_number']])) {

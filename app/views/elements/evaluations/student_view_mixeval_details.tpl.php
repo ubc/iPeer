@@ -13,7 +13,7 @@
     <td width="100" valign="top" colspan="<?php echo ($mixeval['Mixeval']["lickert_question_max"]+1)?>">Section One:</td>
   </tr>
 	<tr class="tableheader" align="center">
-    <td width="100" valign="top">Evaluatee</td>
+    <td width="100" valign="top">Person Being Evaluated</td>
     <?php
       for ($i=1; $i<=$mixeval['Mixeval']["lickert_question_max"]; $i++) {
         if (isset($mixevalQuestion[$i])) {
@@ -94,7 +94,7 @@ else if ($gradeReleased || $commentReleased) {
     <td width="100" valign="top" colspan="<?php echo ($mixeval['Mixeval']["prefill_question_max"]+1)?>">Section Two:</td>
   </tr>
 	<tr class="tableheader" align="center">
-    <td width="100" valign="top">Evaluatee</td>
+    <td width="100" valign="top">Person Being Evaluated</td>
     <?php
       for ($i=$pos; $i<=$mixeval['Mixeval']["total_question"]; $i++) {
         if (isset($mixevalQuestion[$i])) {

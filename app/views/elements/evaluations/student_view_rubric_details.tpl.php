@@ -6,7 +6,7 @@ $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","
 ?>
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr class="tableheader" align="center">
-    <td width="100" valign="top">Evaluatee</td>
+    <td width="100" valign="top">Person Being Evaluated</td>
     <?php
       for ($i=1; $i<=$rubric['Rubric']["criteria"]; $i++) {
     		echo "<td><strong><font color=" . $color[ $i % sizeof($color) ] . ">" . ($i) . ". "  . "</font></strong>";
@@ -27,14 +27,15 @@ if (!$gradeReleased && !$commentReleased) {
    if (isset($scoreRecords)) {
      shuffle($memberResult);
    }
-   foreach ($memberResult AS $row): $memberRubric = $row['EvaluationRubric'];
+   foreach ($memberResult AS $row):
 
-     $member = $membersAry[$memberRubric['evaluatee']];
+     $memberRubric = $row['EvaluationRubric'];
      echo "<tr class=\"tablecell2\">";
      if (isset($scoreRecords)) {
        echo "<td width='15%'>".$rdAuth->fullname."</td>";
      } else {
-       echo "<td width='15%'>".$member['User']['last_name'].' '.$member['User']['first_name']."</td>";
+        $member = $membersAry[$memberRubric['evaluatee']];
+        echo "<td width='15%'>".$member['User']['last_name'].' '.$member['User']['first_name']."</td>";
      }
 
      $resultDetails = $memberRubric['details'];

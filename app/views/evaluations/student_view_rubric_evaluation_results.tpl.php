@@ -27,11 +27,11 @@ $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","
 $membersAry = array();  //used to format result
 $groupAve = 0;
 if (isset($scoreRecords[$rdAuth->id])) {
-  $gradeReleased = $scoreRecords[$rdAuth->id]['grade_released'];
-  $commentReleased = $scoreRecords[$rdAuth->id]['comment_released'];
+    $gradeReleased = $scoreRecords[$rdAuth->id]['grade_released'];
+    $commentReleased = $scoreRecords[$rdAuth->id]['comment_released'];
 } else {
-  $gradeReleased = 0;
-  $commentReleased = 0;
+    $gradeReleased = 0;
+    $commentReleased = 0;
 }
 ?>
 			 <!--br>Total: <?php /*$memberAve = number_format($membersAry[$user['id']]['received_ave_score'], 2);
