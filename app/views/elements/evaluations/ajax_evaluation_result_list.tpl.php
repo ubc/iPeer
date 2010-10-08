@@ -8,7 +8,6 @@
     </table>
 	<table width="95%" border="0" cellspacing="2" cellpadding="4" bgcolor="#FFFFFF">
 	  <tr class="tableheader">
-	    <th>ID</th>
 	    <th>View</th>
 <!--	    <th>Email<br>Group</th>-->
 	    <th>Group</th>
@@ -24,9 +23,6 @@
 	  foreach($data['Evaluation']['assignedGroups'] as $row): $group = $row['Group'];
 	    if (isset($group['id'])) {?>
   	  <tr class="tablecell">
-  	    <td align="center">
-  		  <?php echo $group['id'] ?>
-  	    </td>
   	    <td align="center">
   		    <a href="<?php echo $this->webroot.$this->themeWeb.'evaluations/viewEvaluationResults/'.$data['Event']['id'].'/'.$group['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
   	    </td>
