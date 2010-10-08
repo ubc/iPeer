@@ -60,8 +60,7 @@ var ListUsage =  "<u style='font-size:115%'>How to use Lists in iPeer:</u><br />
     ListUsage += "background of an item will open the <b>pop-up menu.</b><br />";
     ListUsage += "<p style='margin-left=6em'>The <b>pop-up menu</b> displays all available actions for this item, ";
     ListUsage += "like 'View', 'Edit', 'Copy', 'Delete', etc...</p>";
-    ListUsage += "<i>Right-Clicking</i> anywhere on a list will open <b style='color:#909090'>pop-up menu</b> ";
-    ListUsage += "as well.<br />";
+    ListUsage += "<i>Right-Clicking</i> anywhere on a list will also open the <b style='color:#909090'>pop-up menu</b>.";
 
 // Small Helper function library class
 function AjaxListLibrary () {

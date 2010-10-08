@@ -70,26 +70,23 @@ class EvaluationsController extends AppController
 
                 $groupID = $entry['Group']['id'];
                 $groupEventID = $entry['GroupEvent']['id'];
-                $completedEvaluations = $this->EvaluationSubmission->
-                    findCount("`grp_event_id`=$groupEventID");
-                $totalMembers = $this->GroupsMembers->
-                    findCount("`group_id`=$groupID");
+                $completedEvaluations =
+                    $this->EvaluationSubmission->findCount("`grp_event_id`=$groupEventID");
+                $totalMembers =
+                    $this->GroupsMembers->findCount("`group_id`=$groupID");
 
                 $custom['completion'] = "<center><img border=0 src='" . $this->webroot . "img/icons/" .
                     // Display Check or X for completion
                     (($completedEvaluations == $totalMembers) ? "green_check.gif" : "red_x.gif")
                     . "'>&nbsp;&nbsp;&nbsp;<b>$completedEvaluations</b> / <b>$totalMembers </b></center>";
 
-                $custom['submission'] = "Submission";
-                $custom['submission'] = "Results";
+                $custom['results'] = 'Results';
 
                 // Include missing submissions into the lates
                 $lates = $this->GroupEvent->getLateGroupMembers($groupEventID) +
                     ($totalMembers - $completedEvaluations);
 
                 $custom['lates'] = ($lates > 0) ? " <b>$lates</b> Late" : "No Lates";
-
-                $custom['responses'] = "Responses";
 
                 $data[$key]['!Custom'] = $custom;
 
@@ -114,7 +111,8 @@ class EvaluationsController extends AppController
             array("Group.id",          "",           "",    "hidden"),
             array("Group.group_num",   "Group #",    "7em", "action", "View Group"),
             array("Group.group_name",  "Group Name", "auto","action", "View Results"),
-            array("!Custom.completion","Completed",  "7em", "string"),
+            array("!Custom.completion","Completed",  "6em", "string"),
+            array("!Custom.results",    "View",      "4em", "action", "View Results"),
             array("!Custom.lates",     "Late?",      "7em", "action", "View Submission"),
 
             // Release and mark status
@@ -129,9 +127,6 @@ class EvaluationsController extends AppController
             // Extra info about course and Event
             array("Event.id", "", "","hidden"),
             array("Event.title",       "Event",        "10em",    "action", "View Event"),
-
-            array("Course.id", "", "","hidden"),
-            array("Course.course",     "Course",       "7em",    "action", "View Course"),
         );
 
         $joinTables = array(
@@ -141,9 +136,6 @@ class EvaluationsController extends AppController
             array( "joinTable" => "events",
                    "joinModel" => "Event",
                    "localKey" => "event_id"),
-            array("joinTable" => "courses",
-                  "joinModel" => "Course",
-                  "localkey" => "course_id")
           );
 
         $extraFilters ="`Group`.`id` is not null and `Event`.`id` is not null ";
@@ -159,7 +151,7 @@ class EvaluationsController extends AppController
             array("View Submission", "", "", "", "!viewGroupSubmissionDetails", "Event.id", "Group.id"),
             array("View Group",      "", "", "groups", "!view", "Group.id"),
             array("View Event",      "", "", "events", "!view", "Event.id"),
-            array("View Course",     "", "", "courses", "view", "Course.id")
+            array("Edit Event",      "", "", "events", "edit", "Event.id"),
         );
 
         $recursive = (-1);
