@@ -52,10 +52,16 @@ var ACTION_RESTRICTIONS = 2;
 var ACTION_CONTROLLER = 3;
 var ACTION_URL_PARTS_START = 4;
 
-var ListUsage =  "Note: Right-click on any list entry to bring up the action menu. ";
-    ListUsage += "Left-clicking on an entry's orange link takes you to another iPeer page, ";
-    ListUsage += "and clicking an entry anywhere else brings up the menu as well ";
-    ListUsage += "(usefull for Macs and iPads).";
+var ListUsage =  "<u style='font-size:115%'>How to use Lists in iPeer:</u><br />";
+    ListUsage += "<i>Left-Clicking</i> on an <span style='background:#EEEEEE;color:darkorange'>orange</span> ";
+    ListUsage += "link will take you to that item's display. ";
+    ListUsage += "<i>Left-Clicking</i> the gray ";
+    ListUsage += "(<span style='background:#DDDDDD'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>) ";
+    ListUsage += "background of an item will open the <b>pop-up menu.</b><br />";
+    ListUsage += "<p style='margin-left=6em'>The <b>pop-up menu</b> displays all available actions for this item, ";
+    ListUsage += "like 'View', 'Edit', 'Copy', 'Delete', etc...</p>";
+    ListUsage += "<i>Right-Clicking</i> anywhere on a list will open <b style='color:#909090'>pop-up menu</b> ";
+    ListUsage += "as well.<br />";
 
 // Small Helper function library class
 function AjaxListLibrary () {
