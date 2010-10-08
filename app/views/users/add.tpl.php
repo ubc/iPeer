@@ -118,7 +118,7 @@
         </tr>
         </table>
     </form>
- <?php if ($isStudent) { ?>
+ <?php if ($isStudent):?>
     <br /> <br />
     <table class="title" width="100%"  border="0" cellspacing="0" cellpadding="0">
         <tr>
@@ -147,17 +147,15 @@
           }?>
            </td>
      <td valign="top"><br>
-<form name="importfrm" id="importfrm" method="POST" action="<?php echo $html->url('import') ?>" enctype="multipart/form-data" >
-    <input type="hidden" name="required" value="file" />
-    <h3>1) Please select a CSV file to import:</h3>
+<form name="importfrm" id="importfrm" method="POST" action="<?php echo $html->url('import') ?>" enctype="multipart/form-data" onSubmit="return import_validate();">
+    <input type="hidden" name="required" value="course_id"/>
+    <h3 id="file_label">1) Please select a CSV file to import:</h3>
     &nbsp;&nbsp;&nbsp;&nbsp;
-    <input type="file" name="file" value="Browse" /><br>
-    <?php echo  $html->hidden('User/role'); ?>
-    <?php
-        $params = array('controller'=>'users', 'coursesList'=>$coursesList, "courseId" => $rdAuth->courseId);
-    ?>
+    <input type="file" name="file" value="Browse" class="required"/><br>
+    <?php echo $html->hidden('User/role'); ?>
+    <?php $params = array('controller'=>'users', 'coursesList'=>$coursesList, "courseId" => $rdAuth->courseId, 'defaultOpt' => 1, 'id_prefix' => 'import');?>
 
-    <br /><h3>2) Select the course to import into:</h3>
+    <br /><h3 id="course_id_label">2) Select the course to import into:</h3>
     &nbsp;&nbsp;&nbsp;&nbsp;
     <?php echo $this->renderElement('courses/course_selection_box', $params); ?>
     <br>
@@ -165,10 +163,9 @@
     &nbsp;&nbsp;&nbsp;&nbsp;
     <?php echo $html->submit('Import Student List') ?>
 </form>
- </center>
  <br></td>
    </tr>
  </table>
- <?php } ?>
+ <?php endif;?>
     </td></tr></table>
 </td></tr></table>
