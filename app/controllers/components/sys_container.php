@@ -250,13 +250,13 @@ class sysContainerComponent
 			if (isset($this->myCourseList[$courseId]))
 			$course= $this->myCourseList[$courseId];
 			else {
-				$courseLink = '&nbsp;<img alt="home" src="'. dirname($_SERVER['PHP_SELF']).'/img/icons/home.gif" border="0" align="middle" />&nbsp;'.$this->Course->getCourseName($courseId);
+				$courseLink = '&nbsp;<img alt="home" src="'. dirname($_SERVER['PHP_SELF']).'/img/icons/home.gif" border="0" valign="middle" />&nbsp;'.$this->Course->getCourseName($courseId);
 				return $courseLink;
 			}
 		}
 		//TODO: Change /ipeer2 using Session Name in SysParameter
 		if (!empty($course['homepage'])) {
-			$courseLink = '&nbsp;<a href="'.$course['homepage'].'"  target="_blank"><img alt="home" src="'.dirname($_SERVER['PHP_SELF']).'/img/icons/home.gif" border="0" align="middle" /></a>&nbsp;';
+			$courseLink = '&nbsp;<a href="'.$course['homepage'].'"  target="_blank"><img alt="home" src="'.dirname($_SERVER['PHP_SELF']).'/img/icons/home.gif" border="0" valign="middle" /></a>&nbsp;';
 		} else {
 			$courseLink = '&nbsp;<img alt="home" src="'. dirname($_SERVER['PHP_SELF']).'/img/icons/home.gif" border="0" align="middle" />&nbsp;';
 		}

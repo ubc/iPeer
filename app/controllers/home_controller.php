@@ -87,39 +87,39 @@ class HomeController extends AppController
 	function preparePeerEvals()
 	{
 		$curUserId = $this->rdAuth->id;
-		$eventAry = array();
-		$pos = 0;
-		//Get enrolled courses
-		$enrolledCourseIds = $this->UserEnrol->getEnrolledCourses($curUserId);
-		foreach($enrolledCourseIds as $row): $userEnrol = $row['UserEnrol'];
-		$courseId = $userEnrol['course_id'];
-		//$courseDetail = $this->Course->find('id='.$courseId);
+    $eventAry = array();
+    $pos = 0;
+    //Get enrolled courses
+    $enrolledCourseIds = $this->UserEnrol->getEnrolledCourses($curUserId);
+    foreach($enrolledCourseIds as $row) {
+      $userEnrol = $row['UserEnrol'];
+      $courseId = $userEnrol['course_id'];
+      //$courseDetail = $this->Course->find('id='.$courseId);
 
-		//Get Events for this course that are due
-		$events = $this->Event->findAll('release_date_begin < NOW() AND NOW() <= release_date_end AND course_id='.$courseId);
-		foreach($events as $row):
-		$event = $row['Event'];
-		switch ($event['event_template_type_id']) {
-			case 3:
-				//Survey
-				$survey = $this->getSurveyEvaluation($courseId,$event,$curUserId);
-				if ($survey!=null) {
-					$eventAry[$pos] = $survey;
-					$pos++;
-				}
-				break;
-			default:
-				//Simple, Rubric and Mixed Evaluation
-				$evaluation = $this->getEvaluation($curUserId, $event);
-				if ($evaluation!=null) {
-					$eventAry[$pos] = $evaluation;
-					$pos++;
-				}
-				break;
-
-		}
-		endforeach;
-		endforeach;
+      //Get Events for this course that are due
+      $events = $this->Event->findAll('release_date_begin < NOW() AND NOW() <= release_date_end AND course_id='.$courseId);
+      foreach($events as $row) {
+        $event = $row['Event'];
+        switch ($event['event_template_type_id']) {
+          case 3:
+            //Survey
+            $survey = $this->getSurveyEvaluation($courseId,$event,$curUserId);
+            if ($survey!=null) {
+              $eventAry[$pos] = $survey;
+              $pos++;
+            }
+            break;
+          default:
+            //Simple, Rubric and Mixed Evaluation
+            $evaluation = $this->getEvaluation($curUserId, $event);
+            if ($evaluation!=null) {
+              $eventAry[$pos] = $evaluation;
+              $pos++;
+            }
+            break;
+        }
+      }
+    }
 
 		return $eventAry;
 	}

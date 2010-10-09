@@ -1,4 +1,3 @@
-
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>
@@ -17,9 +16,7 @@
 			<td width="20%">Due In/Late By (red) </td>
 		  </tr>
   	<?php $i = '0';?>
-
 	  <?php
-	  //print_r($data);
 	  foreach($data as $row): isset($row['comingEvent'])? $comingUpEvent = $row['comingEvent']: $comingUpEvent = null;
 	    if (isset($comingUpEvent['Event']['id'])) {?>
 		  <tr class="tablecell">
@@ -78,9 +75,8 @@
 			<td width="20%">Due Date</td>
 			<td width="20%">Date Submitted</td>
 		  </tr>
-  	<?php $i = '0';?>
+  	<?php $i = 0;?>
 	  <?php
-	  //print_r($data);
 	  foreach($data as $row): isset($row['eventSubmitted'])? $eventSubmitted = $row['eventSubmitted']: $eventSubmitted =null;
 	    if (isset($eventSubmitted['Event']['id'])) {?>
 		  <tr class="tablecell">
@@ -104,9 +100,9 @@
 		  </tr>
 	  <?php $i++;} ?>
 	  <?php endforeach; ?>
-	  <?php if ($i == 0):
-	          print "<tr class=\"tablecell\"><td colspan=\"4\" align=\"center\"><b>No peer evaluations submitted.</b></td></tr>";
-	        endif; ?>
+	  <?php if ($i == 0):?>
+	          <tr class=\"tablecell\"><td colspan=\"4\" align=\"center\"><b>No peer evaluations submitted.</b></td></tr>
+	  <?php endif;?>
 		</table>
 		<table width="95%"  border="0" cellpadding="0" align="center" cellspacing="0" bgcolor="#E5E5E5">
 		  <tr>

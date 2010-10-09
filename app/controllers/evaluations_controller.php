@@ -865,15 +865,15 @@ class EvaluationsController extends AppController
 
     function markGradeRelease($param)
     {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
+      // Make sure the present user is not a student
+      $this->rdAuth->noStudentsAllowed();
 
       $tok = strtok($param, ';');
-    $eventId = $tok;
-    $groupId =  strtok(';');
-    $evaluateeId =  strtok(';');
-    $groupEventId = strtok(';');
-        $releaseStatus = strtok(';');
+      $eventId = $tok;
+      $groupId =  strtok(';');
+      $evaluateeId =  strtok(';');
+      $groupEventId = strtok(';');
+      $releaseStatus = strtok(';');
 
       $this->autoRender = false;
 
@@ -883,20 +883,20 @@ class EvaluationsController extends AppController
       switch ($event['Event']['event_template_type_id']) {
         case "1":
           $this->EvaluationSimpleHelper->changeEvaluationGradeRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus);
-          $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId);
-          break;
+        $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId);
+        break;
 
         case "2":
           $this->EvaluationRubricHelper->changeEvaluationGradeRelease($eventId, $groupId, $groupEventId,
                                                                       $evaluateeId, $releaseStatus);
-            $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
-          break;
+        $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
+        break;
 
         case "4":
           $this->EvaluationMixevalHelper->changeEvaluationGradeRelease($eventId, $groupId, $groupEventId,
-                                                                      $evaluateeId, $releaseStatus);
-            $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
-          break;
+                                                                       $evaluateeId, $releaseStatus);
+        $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
+        break;
       }
 
     }
@@ -958,126 +958,122 @@ class EvaluationsController extends AppController
 
     function changeAllCommentRelease ($param=null)
     {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
+      // Make sure the present user is not a student
+      $this->rdAuth->noStudentsAllowed();
 
-         $tok = strtok($param, ';');
-    $eventId = $tok;
-    $releaseStatus = strtok(';');
+      $tok = strtok($param, ';');
+      $eventId = $tok;
+      $releaseStatus = strtok(';');
       $this->Event->setId($eventId);
-        $event = $this->Event->read();
+      $event = $this->Event->read();
 
-        switch ($event['Event']['event_template_type_id']) {
-          case 1://simple
-            $this->EvaluationSimple->setAllEventCommentRelease($eventId, $releaseStatus);
-            break;
-          case 2://rubric
-            $this->EvaluationRubric->setAllEventCommentRelease($eventId, $releaseStatus);
-            break;
-          case 4://mix
-            $this->EvaluationMixeval->setAllEventCommentRelease($eventId, $releaseStatus);
-            break;
-          default:
-            break;
-        }
-
-
-    //Update all groupEvent's comment release Status based on submission
-      $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId);
-        for ($i=0; $i<count($groupEventList); $i++){
-          $groupEvent = $groupEventList[$i];
-          $this->GroupEvent->setId($groupEvent['GroupEvent']['id']);
-
-            //Get Members whom completed evaluation
-          $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent['GroupEvent']['group_id'],
-                                                                                     $groupEvent['GroupEvent']['id']);
-
-      //Check to see if all members are completed this evaluation
-            $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
-
-          $numMembers=$event['Event']['self_eval'] ?
-                            $this->GroupsMembers->findCount('group_id='.$groupEvent['GroupEvent']['group_id']) - 1:
-                            $this->GroupsMembers->findCount('group_id='.$groupEvent['GroupEvent']['group_id']);
-
-      if (($numOfCompletedCount != 0) && ($numOfCompletedCount < $numMembers)) {
-         $completeStatus = 'Some';
-      } else {
-         if ($releaseStatus && ($numOfCompletedCount == $numMembers)) {
-            $completeStatus = 'All';
-        } else {
-            $completeStatus = 'None';
-        }
+      switch ($event['Event']['event_template_type_id']) {
+        case 1://simple
+          $this->EvaluationSimple->setAllEventCommentRelease($eventId, $releaseStatus);
+          break;
+        case 2://rubric
+          $this->EvaluationRubric->setAllEventCommentRelease($eventId, $releaseStatus);
+          break;
+        case 4://mix
+          $this->EvaluationMixeval->setAllEventCommentRelease($eventId, $releaseStatus);
+          break;
+        default:
+          break;
       }
-      if ($releaseStatus == 0)
-        $groupEvent['GroupEvent']['comment_release_status'] = 'None';
-      else
-        $groupEvent['GroupEvent']['comment_release_status'] = $completeStatus;
-      $this->GroupEvent->save($groupEvent);
+
+
+      //Update all groupEvent's comment release Status based on submission
+      $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId);
+      foreach ($groupEventList as $groupEvent) {
+        $this->GroupEvent->setId($groupEvent['GroupEvent']['id']);
+
+        //Get Members whom completed evaluation
+        $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent['GroupEvent']['group_id'],
+                                                                                   $groupEvent['GroupEvent']['id']);
+
+        //Check to see if all members are completed this evaluation
+        $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
+
+        $numMembers = ('0' == $event['Event']['self_eval']) ?
+          $this->GroupsMembers->findCount('group_id='.$groupEvent['GroupEvent']['group_id']) - 1:
+          $this->GroupsMembers->findCount('group_id='.$groupEvent['GroupEvent']['group_id']);
+
+        if (($numOfCompletedCount != 0) && ($numOfCompletedCount < $numMembers)) {
+          $completeStatus = 'Some';
+        } elseif ($releaseStatus && ($numOfCompletedCount == $numMembers)) {
+          $completeStatus = 'All';
+        } else {
+          $completeStatus = 'None';
+        }
+
+        if ($releaseStatus == 0) {
+          $groupEvent['GroupEvent']['comment_release_status'] = 'None';
+        } else {
+          $groupEvent['GroupEvent']['comment_release_status'] = $completeStatus;
+        }
+        $this->GroupEvent->save($groupEvent);
+      }
+
+      $this->redirect('/evaluations/view/'.$eventId);
     }
 
-
-    $this->redirect('/evaluations/view/'.$eventId);
-    }
-
-  function changeAllGradeRelease ($param=null)
+    function changeAllGradeRelease ($param=null)
     {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
+      // Make sure the present user is not a student
+      $this->rdAuth->noStudentsAllowed();
 
       $this->autoRender = false;
-         $tok = strtok($param, ';');
-    $eventId = $tok;
-    $releaseStatus = strtok(';');
+      $tok = strtok($param, ';');
+      $eventId = $tok;
+      $releaseStatus = strtok(';');
       $this->Event->setId($eventId);
-        $event = $this->Event->read();
+      $event = $this->Event->read();
 
-        switch ($event['Event']['event_template_type_id']) {
-          case 1://simple
-            $this->EvaluationSimple->setAllEventGradeRelease($eventId, $releaseStatus);
-            break;
-          case 2://rubric
-            $this->EvaluationRubric->setAllEventGradeRelease($eventId, $releaseStatus);
-            break;
-          case 4://mix
-            $this->EvaluationMixeval->setAllEventGradeRelease($eventId, $releaseStatus);
-            break;
-          default:
-            break;
-        }
-
-
-    //Update all groupEvent's grade release Status based on submission
-      $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId);
-        for ($i=0; $i<count($groupEventList); $i++){
-          $groupEvent = $groupEventList[$i];
-          $this->GroupEvent->setId($groupEvent['GroupEvent']['id']);
-
-            //Get Members whom completed evaluation
-          $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent['GroupEvent']['group_id'],
-                                                                                     $groupEvent['GroupEvent']['id']);
-      //Check to see if all members are completed this evaluation
-      $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
-          $numMembers=$event['Event']['self_eval'] ?
-                             $this->GroupsMembers->findCount('group_id='.$groupEvent['GroupEvent']['group_id']) - 1:
-                             $this->GroupsMembers->findCount('group_id='.$groupEvent['GroupEvent']['group_id']);
-
-      if (($numOfCompletedCount != 0) && ($numOfCompletedCount < $numMembers)) {
-         $completeStatus = 'Some';
-      } else {
-         if ($releaseStatus && ($numOfCompletedCount == $numMembers)) {
-            $completeStatus = 'All';
-        } else {
-            $completeStatus = 'None';
-        }
+      switch ($event['Event']['event_template_type_id']) {
+        case 1://simple
+          $this->EvaluationSimple->setAllEventGradeRelease($eventId, $releaseStatus);
+          break;
+        case 2://rubric
+          $this->EvaluationRubric->setAllEventGradeRelease($eventId, $releaseStatus);
+          break;
+        case 4://mix
+          $this->EvaluationMixeval->setAllEventGradeRelease($eventId, $releaseStatus);
+          break;
+        default:
+          break;
       }
-      if ($releaseStatus == 0)
-        $groupEvent['GroupEvent']['grade_release_status'] = 'None';
-      else
-        $groupEvent['GroupEvent']['grade_release_status'] = $completeStatus;
-      $this->GroupEvent->save($groupEvent);
-    }
 
-    $this->redirect('/evaluations/view/'.$eventId);
+
+      //Update all groupEvent's grade release Status based on submission
+      $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId);
+      foreach($groupEventList as $groupEvent) {
+        $this->GroupEvent->setId($groupEvent['GroupEvent']['id']);
+
+        //Get Members whom completed evaluation
+        $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent['GroupEvent']['group_id'],
+                                                                                   $groupEvent['GroupEvent']['id']);
+        //Check to see if all members are completed this evaluation
+        $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
+        $numMembers = ('0' == $event['Event']['self_eval']) ?
+          $this->GroupsMembers->findCount('group_id='.$groupEvent['GroupEvent']['group_id']) - 1:
+          $this->GroupsMembers->findCount('group_id='.$groupEvent['GroupEvent']['group_id']);
+
+        if (($numOfCompletedCount != 0) && ($numOfCompletedCount < $numMembers)) {
+          $completeStatus = 'Some';
+        } elseif ($releaseStatus && ($numOfCompletedCount == $numMembers)) {
+          $completeStatus = 'All';
+        } else {
+          $completeStatus = 'None';
+        }
+
+        if ($releaseStatus == 0)
+          $groupEvent['GroupEvent']['grade_release_status'] = 'None';
+        else
+          $groupEvent['GroupEvent']['grade_release_status'] = $completeStatus;
+        $this->GroupEvent->save($groupEvent);
+      }
+
+      $this->redirect('/evaluations/view/'.$eventId);
     }
 
     function viewGroupSubmissionDetails ($eventId, $groupId)

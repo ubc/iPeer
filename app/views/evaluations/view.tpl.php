@@ -19,16 +19,16 @@
             <?php echo $html->image('/icons/export_excel.gif', array('alt'=>'Export'));?>
             &nbsp;Export Evaluations&nbsp;</td>
         <td>
-            <a href="<?php echo "$root/evaluations/changeAllCommentRelease/$eventId;1"?>">Release All Comments</a>
+            <a href="<?php echo $root."evaluations/changeAllCommentRelease/$eventId;1"?>">Release All Comments</a>
         </td>
         <td>
-            <a href="<?php echo "$root/evaluations/changeAllCommentRelease/$eventId;0"?>">Unrelease All Comments</a>
+            <a href="<?php echo $root."evaluations/changeAllCommentRelease/$eventId;0"?>">Unrelease All Comments</a>
         </td>
         <td>
-            <a href="<?php echo "$root/evaluations/changeAllGradeRelease/$eventId;1"?>">Release All Grades</a>
+            <a href="<?php echo $root."evaluations/changeAllGradeRelease/$eventId;1"?>">Release All Grades</a>
         </td>
         <td>
-            <a href="<?php echo "$root/evaluations/changeAllGradeRelease/$eventId;0"?>">Unrelease All Grades</a>
+            <a href="<?php echo $root."evaluations/changeAllGradeRelease/$eventId;0"?>">Unrelease All Grades</a>
         </td>
         </tr><tr><td>&nbsp;</td><tr>
     <?php endif; ?>
