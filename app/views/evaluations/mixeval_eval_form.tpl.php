@@ -171,7 +171,7 @@
                     foreach ($evaluationDetails as $detailEval) {
                         $detail = $detailEval['EvaluationMixevalDetail'];
                         if ($params['data']['questions'][$detail['question_number']]['question_type'] != 'S' &&
-                            empty($detail['question_comment'])) {
+                            '' === $detail['question_comment']) {
                             $commentsNeeded = true;      // A criteria comment is missing
                             //echo "Missing detail $detail[id] for user $user[id]<br />";
                             break;
