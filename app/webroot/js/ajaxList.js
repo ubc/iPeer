@@ -1,4 +1,3 @@
-
 // Configuration Variables
 var AjaxListActionOffsetX = -5;
 var AjaxListActionOffsetY = -5;
@@ -7,6 +6,8 @@ var AjaxListActionMenuTextDisabledColor = "LightGrey";
 var AjaxListActionMenuTextSelectedColor = "Blue";
 var AjaxListActionMenuColor = "LightYellow";
 var AjaxListActionMenuSelected = "LightBlue";
+
+var AjaxListTableRowSelectedBackgroundColor = "#F0F040";
 
 // How long to wait after a user has finished typing to start a search
 var searchAfterTypeDelay = 1100; //ms
@@ -829,7 +830,7 @@ AjaxList.prototype.renderTableBody = function(tbody) {
             // Append the contents division onto the element
             td.appendChild(div);
 
-            var clickDelegate = ajaxListLibrary.createDelegateWithParams(this, this.rowClicked, entry);
+            var clickDelegate = ajaxListLibrary.createDelegateWithParams(this, this.rowClicked, entry, tr);
             td.onclick = clickDelegate;
             td.oncontextmenu = clickDelegate;
             tr.appendChild(td);
@@ -880,14 +881,15 @@ AjaxList.prototype.doAction = function (event, entryRow, actionDesc) {
 }
 
 // Handles a user's click on a displayed row
-AjaxList.prototype.rowClicked = function (event, entryRow) {
+AjaxList.prototype.rowClicked = function (event, entryRow, tr) {
+
     if (this.actionDisplay != null && !this.actionDisplay.isClosed()) {
         this.actionDisplay.close();
         this.actionDisplay = null;
         return false;
     }
 
-    // IE workaround
+    // IE workaround - how do we get XY of click?
     var x = ((window.event) ? (window.event.clientX) : event.clientX);
     var y = ((window.event) ? (window.event.clientY) : event.clientY);
 
@@ -897,7 +899,7 @@ AjaxList.prototype.rowClicked = function (event, entryRow) {
     this.actionDisplay = new AjaxListAction( x + AjaxListActionOffsetX,
                                                  y + AjaxListActionOffsetY,
                                                 this.webroot,  this.controller,
-                                                this.columns, entryRow, this.actions);
+                                                this.columns, entryRow, this.actions, tr);
     this.actionDisplay.render();
 
     // This is for the on context menu
@@ -1107,7 +1109,7 @@ AjaxList.prototype.ajaxCallComplete = function (response) {
 
 
 /********** Action Display for Ajax List **********/
-function AjaxListAction(x, y, root, controller, columns, entry, actions) {
+function AjaxListAction(x, y, root, controller, columns, entry, actions, tableRow) {
     this.x = x;
     this.y = y;
     this.root = root;
@@ -1115,6 +1117,7 @@ function AjaxListAction(x, y, root, controller, columns, entry, actions) {
     this.columns  = columns;
     this.entry = entry;
     this.actions = actions;
+    this.tableRow = tableRow;
     this.display = null;
     this.closed = false;
 }
@@ -1130,6 +1133,9 @@ AjaxListAction.prototype.close = function() {
     document.body.oncontextmenu = null;
 
     this.closed = true;
+
+    this.tableRow.style.backgroundColor = "";
+
     return false;
 }
 
@@ -1141,6 +1147,9 @@ AjaxListAction.prototype.isClosed = function() {
 AjaxListAction.prototype.renderAction = function (action) {
     // Determine if the user is allowed to renderAction, based on maps
     var active = true;
+
+    // Highlist this row another color
+    this.tableRow.style.backgroundColor = AjaxListTableRowSelectedBackgroundColor;
 
     if (action[ACTION_RESTRICTIONS]) {
         var restrictions = action[ACTION_RESTRICTIONS];
