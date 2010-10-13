@@ -1134,7 +1134,9 @@ AjaxListAction.prototype.close = function() {
 
     this.closed = true;
 
-    this.tableRow.style.backgroundColor = "";
+    if (this.tableRow !== undefined) {
+        this.tableRow.style.backgroundColor = "";
+    }
 
     return false;
 }
@@ -1149,7 +1151,9 @@ AjaxListAction.prototype.renderAction = function (action) {
     var active = true;
 
     // Highlist this row another color
-    this.tableRow.style.backgroundColor = AjaxListTableRowSelectedBackgroundColor;
+    if (this.tableRow !== undefined) {
+        this.tableRow.style.backgroundColor = AjaxListTableRowSelectedBackgroundColor;
+    }
 
     if (action[ACTION_RESTRICTIONS]) {
         var restrictions = action[ACTION_RESTRICTIONS];
@@ -1274,6 +1278,7 @@ AjaxListAction.prototype.performAction = function(event, action) {
     }
 
     this.close();
+
     if (newWindow) {
         var link = new Element("a");
         window.open(this.root + url,"_blank", "width=770,height=700,scrollbars=yes");
