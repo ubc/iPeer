@@ -7,7 +7,7 @@ var AjaxListActionMenuTextSelectedColor = "Blue";
 var AjaxListActionMenuColor = "LightYellow";
 var AjaxListActionMenuSelected = "LightBlue";
 
-var AjaxListTableRowSelectedBackgroundColor = "#F0F040";
+var AjaxListTableRowSelectedBackgroundColor = "#F8F850";
 
 // How long to wait after a user has finished typing to start a search
 var searchAfterTypeDelay = 1100; //ms
@@ -54,7 +54,7 @@ var ACTION_CONTROLLER = 3;
 var ACTION_URL_PARTS_START = 4;
 
 var ListUsage =  "<u style='font-size:115%'>How to use Lists in iPeer:</u><br />";
-    ListUsage += "<i>Left-Clicking</i> on an <span style='background:#EEEEEE;color:darkorange'><b>orange</b></span> ";
+    ListUsage += "<i>Left-Clicking</i> on an <span style='background:#EEEEEE;color:#D85000'>brown</span> ";
     ListUsage += "link will take you to that item's display. ";
     ListUsage += "<i>Left-Clicking</i> the gray ";
     ListUsage += "(<span style='background:#DDDDDD'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>) ";
@@ -794,7 +794,7 @@ AjaxList.prototype.renderTableBody = function(tbody) {
                     div.update(contents);
                 } else if (column[TYPE_COL] == "action") {
                     // If this is an "action" type entry, we need to create a link for it
-                    var link = new Element("a", {"style":"text-shadow: white 1px 1px"}).update(contents);
+                    var link = new Element("a", {"style":"color:#D84800;text-shadow: white 0px 0px 1px"}).update(contents);
                     link.href="";
                     link.onclick = ajaxListLibrary.createDelegateWithParams(this,
                         this.doAction, entry, column[ACTION_COL]);
