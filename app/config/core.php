@@ -43,7 +43,8 @@
  * - 0: production
  * - 1: development
  * - 2: full debug with sql
- * - 3: full debug with sql and dump of the current object
+ * - 3: full debug withALTER TABLE `personalizes` ADD INDEX ( `user_id` , `attribute_code` ) ;
+ sql and dump of the current object
  *
  * In production, the "flash messages" redirect after a time interval.
  * With the other debug levels you get to click the "flash message" to continue.
@@ -150,7 +151,7 @@ set_time_limit(300);
   /**
    * iPeer database version
    */
-  define('DATABASE_VERSION', 3);
+  define('DATABASE_VERSION', 4);
 
 
   $CWL['LoginURL'] = 'https://www.auth.cwl.ubc.ca/auth/login';
