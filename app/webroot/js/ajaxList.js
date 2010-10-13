@@ -54,7 +54,7 @@ var ACTION_CONTROLLER = 3;
 var ACTION_URL_PARTS_START = 4;
 
 var ListUsage =  "<u style='font-size:115%'>How to use Lists in iPeer:</u><br />";
-    ListUsage += "<i>Left-Clicking</i> on an <span style='background:#EEEEEE;color:darkorange'>orange</span> ";
+    ListUsage += "<i>Left-Clicking</i> on an <span style='background:#EEEEEE;color:darkorange'><b>orange</b></span> ";
     ListUsage += "link will take you to that item's display. ";
     ListUsage += "<i>Left-Clicking</i> the gray ";
     ListUsage += "(<span style='background:#DDDDDD'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>) ";
@@ -794,7 +794,7 @@ AjaxList.prototype.renderTableBody = function(tbody) {
                     div.update(contents);
                 } else if (column[TYPE_COL] == "action") {
                     // If this is an "action" type entry, we need to create a link for it
-                    var link = new Element("a").update(contents);
+                    var link = new Element("a", {"style":"text-shadow: white 1px 1px"}).update(contents);
                     link.href="";
                     link.onclick = ajaxListLibrary.createDelegateWithParams(this,
                         this.doAction, entry, column[ACTION_COL]);

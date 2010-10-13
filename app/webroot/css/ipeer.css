@@ -92,15 +92,16 @@ html>body #header {
 
 a:link, a:visited {
   font-family: Verdana, Arial, Helvetica, sans-serif;
-	color: #DA5E04;
+  color: #FA7E04;
 	text-decoration: none;
+    font-weight: bold;
   }
 a:hover {
   color: #333;
   text-decoration: none;
   }
 a:active {
-  color: #FA7E04;
+    color: #FA7E04;
   text-decoration: none;
   }
 
@@ -288,7 +289,7 @@ div.table-content li img{
 	font-size: 11px;
 	font-weight: bold;
 	color: #FFFFFF;
-	background-color: #24588C;
+	background-color: #4478AC;
 }
 
 .tablesubheader {
@@ -355,7 +356,7 @@ div.table-content li img{
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 11px;
 	color: #000000;
-	background-color: #E5E5E5;
+	background-color: #EAEAEA;
 }
 .tablecell a:link,.tablecell a:visited {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
@@ -372,7 +373,7 @@ div.table-content li img{
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 11px;
 	color: #000000;
-	background-color: #E5E5E5;
+    background-color: #EAEAEA;
 }
 #detailside {
 	margin-left : 280px;
