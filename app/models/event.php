@@ -255,6 +255,18 @@ class Event extends AppModel
     }
     return true;
   }
+
+    function checkIfNowLate($eventID) {
+        if (is_numeric($eventID)) {
+            $conditions = "`Event`.`due_date` < now() AND `id`=$eventID";
+            $count = $this->findCount($conditions);
+            return ($count>0);
+        } else {
+            return false;
+        }
+
+    }
+
 }
 
 ?>

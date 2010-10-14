@@ -126,49 +126,49 @@ class GroupEvent extends AppModel
     $eventType = array(1=>'simple_evaluations',2=>'rubrics',4=>'mixevals');
     switch ($eventTypeId) {
       case 1: //simple eval
-        return $this->findBySql('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked 
-                                FROM group_events AS GroupEvent 
-                                WHERE GroupEvent.event_id='.$eventId.' 
-                                AND GroupEvent.id IN (SELECT DISTINCT grp_event_id 
-                                                      FROM '.$eventTypeEval[$eventTypeId].' 
-                                                      WHERE event_id='.$eventId.' 
-                                                      GROUP BY grp_event_id, evaluatee 
-                                                      HAVING (SUM(score)/COUNT(evaluatee)) < '.$maxPercent.'*(SELECT point_per_member 
-                                                                                                              FROM '.$eventType[$eventTypeId].' 
-                                                                                                              WHERE id IN (SELECT template_id AS id 
+        return $this->findBySql('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked
+                                FROM group_events AS GroupEvent
+                                WHERE GroupEvent.event_id='.$eventId.'
+                                AND GroupEvent.id IN (SELECT DISTINCT grp_event_id
+                                                      FROM '.$eventTypeEval[$eventTypeId].'
+                                                      WHERE event_id='.$eventId.'
+                                                      GROUP BY grp_event_id, evaluatee
+                                                      HAVING (SUM(score)/COUNT(evaluatee)) < '.$maxPercent.'*(SELECT point_per_member
+                                                                                                              FROM '.$eventType[$eventTypeId].'
+                                                                                                              WHERE id IN (SELECT template_id AS id
                                                                                                                            FROM events WHERE id=GroupEvent.event_id)
-                                                                                                              ) 
-                                                      AND (SUM(score)/COUNT(evaluatee)) > '.$minPercent.'*COUNT(evaluatee)*(SELECT point_per_member 
-                                                                                                                            FROM '.$eventType[$eventTypeId].' 
-                                                                                                                            WHERE id IN (SELECT template_id AS id 
-                                                                                                                                         FROM events 
+                                                                                                              )
+                                                      AND (SUM(score)/COUNT(evaluatee)) > '.$minPercent.'*COUNT(evaluatee)*(SELECT point_per_member
+                                                                                                                            FROM '.$eventType[$eventTypeId].'
+                                                                                                                            WHERE id IN (SELECT template_id AS id
+                                                                                                                                         FROM events
                                                                                                                                          WHERE id=GroupEvent.event_id)
                                                                                                                             )
-                                                      ) 
+                                                      )
                                 ORDER BY GroupEvent.group_id');
         break;
       case 2||4:
         //echo $eventId.' '.$eventTypeId.' '.$maxPercent;
-        return $this->findBySql('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked 
-                                FROM group_events AS GroupEvent 
-                                WHERE GroupEvent.event_id='.$eventId.' AND GroupEvent.id 
-                                IN (SELECT DISTINCT grp_event_id 
-                                    FROM '.$eventTypeEval[$eventTypeId].' 
-                                    WHERE event_id='.$eventId.' 
-                                    GROUP BY grp_event_id, evaluatee 
-                                    HAVING (SUM(score)/COUNT(evaluatee)) < '.$maxPercent.'*(SELECT total_marks 
-                                                                                            FROM '.$eventType[$eventTypeId].' 
-                                                                                            WHERE id IN (SELECT template_id AS id 
-                                                                                                         FROM events 
+        return $this->findBySql('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked
+                                FROM group_events AS GroupEvent
+                                WHERE GroupEvent.event_id='.$eventId.' AND GroupEvent.id
+                                IN (SELECT DISTINCT grp_event_id
+                                    FROM '.$eventTypeEval[$eventTypeId].'
+                                    WHERE event_id='.$eventId.'
+                                    GROUP BY grp_event_id, evaluatee
+                                    HAVING (SUM(score)/COUNT(evaluatee)) < '.$maxPercent.'*(SELECT total_marks
+                                                                                            FROM '.$eventType[$eventTypeId].'
+                                                                                            WHERE id IN (SELECT template_id AS id
+                                                                                                         FROM events
                                                                                                          WHERE id = GroupEvent.event_id)
-                                                                                            ) 
-                                    AND    (SUM(score)/COUNT(evaluatee)) > '.$minPercent.'*(SELECT total_marks 
-                                                                                            FROM '.$eventType[$eventTypeId].' 
-                                                                                            WHERE id IN (SELECT template_id AS id 
-                                                                                                         FROM events 
+                                                                                            )
+                                    AND    (SUM(score)/COUNT(evaluatee)) > '.$minPercent.'*(SELECT total_marks
+                                                                                            FROM '.$eventType[$eventTypeId].'
+                                                                                            WHERE id IN (SELECT template_id AS id
+                                                                                                         FROM events
                                                                                                          WHERE id=GroupEvent.event_id)
                                                                                            )
-                                   ) 
+                                   )
                                 ORDER BY GroupEvent.group_id');
         break;
       default:

@@ -65,11 +65,13 @@ class EvaluationsController extends AppController
 
         // Creates the custom in use column
         if ($data) {
+
             foreach ($data as $key => $entry) {
                 $custom = array();
 
                 $groupID = $entry['Group']['id'];
                 $groupEventID = $entry['GroupEvent']['id'];
+                $eventID = $entry['Event']['id'];
                 $completedEvaluations =
                     $this->EvaluationSubmission->findCount("`grp_event_id`=$groupEventID");
                 $totalMembers =
@@ -86,7 +88,14 @@ class EvaluationsController extends AppController
                 $lates = $this->GroupEvent->getLateGroupMembers($groupEventID) +
                     ($totalMembers - $completedEvaluations);
 
-                $custom['lates'] = ($lates > 0) ? " <b>$lates</b> Late" : "No Lates";
+                // Is it time for this event to be late yet?
+                $eventIsNowLate = $this->Event->checkIfNowLate($eventID);
+
+                if ($eventIsNowLate) {
+                    $custom['lates'] = ($lates > 0) ? " <b>$lates</b> Late" : "No Lates";
+                } else {
+                    $custom['lates'] = "Not Yet";
+                }
 
                 $data[$key]['!Custom'] = $custom;
 
