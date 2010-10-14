@@ -1,6 +1,29 @@
-iPeer 2.1
+iPeer 2.2
 
 Changelog from 2.1
+1) Students are now able to view released evaluation results (grades and comments)
+     These results are anonymous, and randomly ordered.
+     Fixed for Rubrics and Mixed Evaluations.
+2) Import from CSV changes for Students/Groups:
+     Email and password are optional. Password will be randomly generated if it is omitted from the import file.
+     Column orders are changed. Please see the sample file on import page.
+     Mac/Windows Excel CSV format is supported.
+     Default course is set to blank when importing student.
+3) Export Changes
+     Corrected Export Evaluation result calculations.
+     Evaluation result export with details.
+4) Copy mixed evaluation function is now working.
+5) Small GUI Changes:
+     Changed phrasing and language to make things more clear.
+     More clear notice if student did not finish all questions on student portal.
+6) General bug fixes, including some code clean-up.
+7) New Listing component
+     Replaces most lists in iPeer with a unified component
+     (with notable exception of Advanced Search).
+     Easy to use for end-users, and to implement and augment by developers.
+
+
+Changelog from 2.0
 
 1) Over 180 bugs are fixed
 2) Major browsers are supported
