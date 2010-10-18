@@ -156,7 +156,7 @@ class EventsController extends AppController
             array("Edit Event", "", "", "", "edit", "Event.id"),
             array("View Course", "", "", "courses", "view", "Course.id"),
             array("View Groups", "", "", "", "!viewGroups", "Event.id"),
-            array("Delete Event", $warning, "", "", "home", "Event.id"));
+            array("Delete Event", $warning, "", "", "delete", "Event.id"));
 
         $recursive = 0;
 
