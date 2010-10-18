@@ -67,7 +67,7 @@ class EventsController extends AppController
 
             $isReleased = "";
             if ($timeNow < $releaseDate) {
-                $isReleased = "Not Yep Open";
+                $isReleased = "Not Yet Open";
             } else if ($timeNow > $endDate) {
                 $isReleased = "Already Closed";
             } else {
