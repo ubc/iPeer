@@ -87,7 +87,7 @@
       <ul>
         <li>Please make sure the username column matches the username column in student import file.</li>
         <li>Please make sure to remove the header in CSV file.</li>
-        <li>All columns are requried.</li>
+        <li>All columns are required.</li>
       </ul>
 
       <br />
