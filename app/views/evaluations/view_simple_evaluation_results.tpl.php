@@ -91,12 +91,9 @@
 	<tr class="tablesummary2">
 	    <td>Grade Released</td>
       <?php
-
-       $n=0;
        for ($m=0;$m < count($groupMembers); $m++) {
-
-	if (isset($gradeReleaseStatus[$n]['EvaluationSimple']['evaluatee']) && $groupMembers[$m]['User']['id']==$gradeReleaseStatus[$n]['EvaluationSimple']['evaluatee']) {
-          $gradeRelease = $gradeReleaseStatus[$n++]['EvaluationSimple'];
+         if(array_key_exists($groupMembers[$m]['User']['id'], $gradeReleaseStatus)){
+           $gradeRelease = $gradeReleaseStatus[$groupMembers[$m]['User']['id']];
            echo '<td>';
            if (isset($gradeRelease['grade_release']) && $gradeRelease['grade_release']) {?>
             <input type="button" name="Unrelease" value="Unrelease" onclick="location.href='<?php echo $this->webroot.$this->themeWeb.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$groupMembers[$m]['User']['id'].';'.$event['group_event_id'].';0'; ?>'">

@@ -70,9 +70,15 @@ class EvaluationSimple extends AppModel
 	  return $this->findCount('grp_event_id='.$groupEventId.' AND release_status != '.$releaseStatus);
 	}
 
-	function getTeamReleaseStatus($groupEventId=null){
-	  return $this->findAll('grp_event_id='.$groupEventId.' GROUP BY evaluatee', 'evaluatee, release_status, grade_release', 'evaluatee');
-	}
+  function getTeamReleaseStatus($groupEventId=null){
+    $ret = array();
+    $status = $this->findAll('grp_event_id='.$groupEventId.' GROUP BY evaluatee', 'evaluatee, release_status, grade_release', 'evaluatee');
+
+    foreach($status as $s) {
+      $ret[$s['EvaluationSimple']['evaluatee']] = $s['EvaluationSimple'];
+    }
+    return $ret;  
+  }
 
 }
 
