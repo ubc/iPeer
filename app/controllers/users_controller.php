@@ -353,7 +353,7 @@ class UsersController extends AppController
                 // Get accessible courses
                 $coursesList = $this->sysContainer->getMyCourseList();
 
-                // List the entrolled courses
+                // List the enrolled courses
                 $simpleEnrolledList = array();
                 foreach ($enrolled_courses as $key => $value) {
                     if (!empty($coursesList[$value['Course']['id']])) {
@@ -398,15 +398,15 @@ class UsersController extends AppController
                         unset ($data2save['User']['role']);
                     }
 
+                    // Save the user to the database
                     if ($this->User->save($data2save['User'])) {
- 						if(!empty($this->params['form']['course_ids'])) {
-                        	$this->UserEnrol->insertCourses($this->User->id, $this->params['form']['course_ids']);
-                        }
+
+                        // Now handle the course data.
 
                         // Build up a list of checkboxed courses
                         $checkedCourseList = array();
                         foreach ($this->params['form'] as $key => $value) {
-                            if (strstr($key, "checkBoxList_")) {
+                            if (stristr($key, "checkBoxList_")) {
                                 $aCourse = substr($key, 13);
                                 array_push($checkedCourseList, $aCourse);
                             }
@@ -414,26 +414,20 @@ class UsersController extends AppController
 
                         // Put students into newly selected courses
                         foreach ($checkedCourseList as $key => $value) {
-                            if(!isset($simpleEnrolledList[$value])) {
+                            if(!in_array($value, $simpleEnrolledList)) {
                                 $this->UserEnrol->insertCourses($data2save['User']['id'],array($value));
                             }
                         }
 
                         // Take them out of the de-selected courses
                         foreach ($simpleEnrolledList as $key => $value) {
-                            if (!isset($checkedCourseList[$value])) {
+                            if (!in_array($value, $checkedCourseList)) {
                                 $this->UserEnrol->removeStudentFromCourse($data2save['User']['id'], $value);
                             }
                         }
 
-
-                        //Render to view page to display saved data
-                        //TODO: Display list of users after import
-                        // $data = $this->User->read();
-                        // $this->set('data', $data);
-                        // $this->set('userRole', $data['User']['role']);
-                        // $this->render('userSummary');
-                        $this->redirect("/users/index/The user was edited.");
+                       $this->redirect("/users/index/The user was edited.");
+                        exit;
                     } else {
                     	$this->Output->br2nl($this->params['data']);
                     	$this->set('errmsg', $this->User->errorMessage);
