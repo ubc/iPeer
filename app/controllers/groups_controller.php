@@ -290,85 +290,86 @@ class GroupsController extends AppController
   	return $attributes;
   }
 
-  function import() {
-    $this->autoRender = false;
-    $courseId = $this->params['form']['course_id'];
-    $this->params['data']['Group']['course_id'] = $courseId;
-    $filename = $this->params['form']['file']['name'];
-		$tmpFile = $this->params['form']['file']['tmp_name'];
+    function import() {
+        $this->autoRender = false;
+        $courseId = $this->params['form']['course_id'];
+        $this->params['data']['Group']['course_id'] = $courseId;
+        $filename = $this->params['form']['file']['name'];
+        $tmpFile = $this->params['form']['file']['tmp_name'];
 
-		//$uploadDir = $this->sysContainer->getParamByParamCode('system.upload_dir');
-		$uploadDir = "../tmp/";
-		//$uploadFile = APP.$uploadDir['parameter_value'] . $filename;
-		$uploadFile = $uploadDir.$filename;
+        //$uploadDir = $this->sysContainer->getParamByParamCode('system.upload_dir');
+        $uploadDir = "../tmp/";
+        //$uploadFile = APP.$uploadDir['parameter_value'] . $filename;
+        $uploadFile = $uploadDir.$filename;
 
-		//check for blank filename
-		if (trim($filename) == "") {
-			$this->set('errmsg','File required.');
-			$this->set('user_data', $this->User->getEnrolledStudents($courseId));
-			$this->set('import_again',"true");
-      $this->render('add');
-			return false;
-		}
-	  //Return true if valid, else error msg
-    $validUploads = $this->framework->validateUploadFile($tmpFile, $filename, $uploadFile);
-		if ($validUploads) {
-			// Get file into an array.
-			$lines = file($uploadFile);
-			// Delete the uploaded file
-			unlink($uploadFile);
-
-			//Mess create students
-			$resultAry = $this->addGroupByImport($this->params['data'], $lines);
-      $this->set('data', $resultAry);
-
-      $this->redirect('/groups/index/The group was added successfully.');
-		} else {
-		  $this->set('errmsg', $$validUploads);
-		  $this->set('user_data', $this->User->getEnrolledStudents($courseId));
-		  $this->set('import_again',"true");
-		  $this->render('add');
-		}
-  }
-
-  function addGroupByImport($data=null, $lines=null)
-	{
-	  $groupNo = '';
-    for ($i = 0; $i < count($lines); $i++) {
-      // Get rid of '"', it just  confuses iPeer in CSV Files
-      $filteredLine = $lines[$i];
-      $filteredLine = str_replace('"','', $filteredLine);
-
-      // Split fields up on line by ','
-      $line = @split(',', $filteredLine);
-      $data['Group']['id'] = null;
-      //$data['Group']['student_no'] = trim($line[0]);
-      $data['Group']['username'] = trim($line[0]);
-      $data['Group']['group_num'] = trim($line[1]);
-      $data['Group']['group_name'] = trim($line[2]);
-      $data['Group']['creator_id'] = $this->rdAuth->id;
-      if ($groupNo != $data['Group']['group_num']) {
-        $this->Group->save($data);
-      }
-
-			// add members into the groups_members table
-			$groupMember['GroupsMembers']['group_id'] = $this->Group->id;
-			//$user = $this->User->find('student_no = '.$data['Group']['student_num']);
-      $user = $this->User->find('username = '.$data['Group']['username']);
-			$groupMember['GroupsMembers']['user_id'] = $user['User']['id'];
-			$this->GroupsMembers->save($groupMember);
-			$this->GroupsMembers->id = null;
-
-			$groupNo = $data['Group']['group_num'];
+        //check for blank filename
+        if (trim($filename) == "") {
+            $this->set('errmsg','File required.');
+            $this->set('user_data', $this->User->getEnrolledStudents($courseId));
+            $this->set('import_again',"true");
+            $this->render('add');
+            return false;
         }
-	}
+        //Return true if valid, else error msg
+        $validUploads = $this->framework->validateUploadFile($tmpFile, $filename, $uploadFile);
+        if ($validUploads) {
+            // Get file into an array.
+            $lines = file($uploadFile);
+            // Delete the uploaded file
+            unlink($uploadFile);
 
-	function update($attributeCode='',$attributeValue='') {
-		if ($attributeCode != '' && $attributeValue != '') //check for empty params
-		{
-			$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
-		}
-	}
+            //Mess create students
+            $resultAry = $this->addGroupByImport($this->params['data'], $lines);
+            $this->set('data', $resultAry);
+
+            $this->redirect('/groups/index/The group was added successfully.');
+        } else {
+            $this->set('errmsg', $$validUploads);
+            $this->set('user_data', $this->User->getEnrolledStudents($courseId));
+            $this->set('import_again',"true");
+            $this->render('add');
+        }
+    }
+
+    function addGroupByImport($data=null, $lines=null)
+    {
+        $groupNo = '';
+        for ($i = 0; $i < count($lines); $i++) {
+            // Get rid of '"', it just  confuses iPeer in CSV Files
+            $filteredLine = $lines[$i];
+            $filteredLine = str_replace('"','', $filteredLine);
+
+            // Split fields up on line by ','
+            $line = @split(',', $filteredLine);
+            $data['Group']['id'] = null;
+            //$data['Group']['student_no'] = trim($line[0]);
+            $data['Group']['username'] = trim($line[0]);
+            $data['Group']['group_num'] = trim($line[1]);
+            $data['Group']['group_name'] = trim($line[2]);
+            $data['Group']['creator_id'] = $this->rdAuth->id;
+            if ($groupNo != $data['Group']['group_num']) {
+                $this->Group->save($data);
+            }
+
+            // add members into the groups_members table
+            $groupMember['GroupsMembers']['group_id'] = $this->Group->id;
+            //$user = $this->User->find('student_no = '.$data['Group']['student_num']);
+            $user = $this->User->find('username = '.$data['Group']['username']);
+            $groupMember['GroupsMembers']['user_id'] = $user['User']['id'];
+            $this->GroupsMembers->save($groupMember);
+            $this->GroupsMembers->id = null;
+
+            $groupNo = $data['Group']['group_num'];
+        }
+    }
+
+    function update($attributeCode='',$attributeValue='') {
+        if ($attributeCode != '' && $attributeValue != '') //check for empty params
+        {
+            $this->params['data'] =
+                $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
+        }
+    }
 
     function getFilteredStudent()
     {

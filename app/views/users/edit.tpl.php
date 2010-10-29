@@ -17,9 +17,7 @@
       </tr>
     <tr class="tablecell2">
       <td width="130" id="username_label">Username:*</td>
-      <td width="337"><?php echo $html->hidden('User/username'); ?>
-        <input type="text" value="<?php echo $params['data']['User']['username']?>" size=50 disabled=true /></td>
-
+      <td width="337"><?php echo $html->input('User/username', array('size'=>'50')); ?>
       <td width="663" id="username_msg" class="error"></td>
     </tr>
     <tr class="tablecell2">
@@ -33,15 +31,11 @@
       <td width="663" id="first_name_msg" class="error"></td>
     </tr class="tablecell2">
     <?php if (isset($params['data']['User']['role']) && $params['data']['User']['role'] == 'S') { ?>
-        <?php if ($this->controller->rdAuth->role == 'A') { ?>
-            <tr class="tablecell2">
-            <td width="130" id="student_no_label">Student No.:</td>
-            <td><?php echo $html->input('User/student_no', array('id'=>'student_no', 'size'=>'50', 'class'=>'validate none TEXT_FORMAT student_no_msg Invalid_Text._At_Least_One_Word_Is_Required.')) ?> </td>
-            <td width="663" id="student_no_msg" class="error"></td>
-            </tr>
-        <?php } else { ?>
-            <?php echo $html->hidden('User/student_no'); ?> </td>
-        <?php } ?>
+        <tr class="tablecell2">
+        <td width="130" id="student_no_label">Student No.:</td>
+        <td><?php echo $html->input('User/student_no', array('id'=>'student_no', 'size'=>'50', 'class'=>'validate none TEXT_FORMAT student_no_msg Invalid_Text._At_Least_One_Word_Is_Required.')) ?> </td>
+        <td width="663" id="student_no_msg" class="error"></td>
+        </tr>
     <?php } else { ?>
     <tr class="tablecell2">
       <td width="130" id="title_label">Title:</td>

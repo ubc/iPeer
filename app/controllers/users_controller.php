@@ -87,6 +87,7 @@ class UsersController extends AppController
             array("User.username",   "Username",     "10em",  "action", "View User"),
             array("User.first_name", "First Name",   "13em",  "string"),
             array("User.last_name",  "Last Name",    "13em",  "string"),
+            array("User.student_no", "Student #",         "6em",  "string"),
             array("User.email",      "Email",        "auto",  "string")//,
             //array("UserEnrol.course_id", "Course ID", "number")
         );
@@ -380,18 +381,8 @@ class UsersController extends AppController
                 } else {
                     $this->Output->filter($this->params['data']);//always filter
 
-
-                    if ($this->params['data']['User']['role'] == 'S') {
-                        // For existing students
-                        $data2save = $this->User->findUserByStudentNo($this->params['data']['User']['student_no']);
-                        $data2save['User']['first_name'] = $this->data['User']['first_name'];
-                        $data2save['User']['last_name'] = $this->data['User']['last_name'];
-                        $data2save['User']['email'] = $this->data['User']['email'];
-                    } else {
-
-                        // For other users
-                        $data2save = $this->params['data'];
-                    }
+                    // For other users
+                    $data2save = $this->params['data'];
 
                     // Prevent User role changes (also stops privilege escalation)
                     if (!empty($data2save['User']['role'])) {
