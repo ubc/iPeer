@@ -43,7 +43,7 @@ var ID_COL = 0;     // ID of the column
 var DESC_COL = 1;   // Description of the columns
 var WIDTH_COL = 2;
 var TYPE_COL = 3;   // Type of the column
-var MAP_COL = 4;    // Map of column values
+var MAP_COL = 4;    // AvailablePageSizesMap of column values
 var ACTION_COL = 4; // Action for an action try column
 var ICON_COL = 4;  // Icon for a link-type column
 

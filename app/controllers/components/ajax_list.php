@@ -323,7 +323,7 @@ class AjaxListComponent extends Object {
 
     // Returns the search results to JSON, or redirects to the list again, that will be rendered with the
     //  new state
-    function asyncGet($pageForRedirect = "index") {
+    function asyncGet($pageForRedirect = "index", $parameters = "") {
 
         // Grab the next state the browser sent over, and save it
         $state = json_decode($_POST['json']);
@@ -343,7 +343,9 @@ class AjaxListComponent extends Object {
         //   or just the data.
         if ($_POST['fullPage'] == "true") {
             // Render the index page for a full page  (for ie 6)
-            $this->controller->redirect($this->controllerName . "/" . $pageForRedirect);
+            $redirect = $this->controllerName . "/" . $pageForRedirect .
+                (!empty($parameters) ? ("/" . $parameters) : "");
+            $this->controller->redirect($redirect);
         } else {
             // Send the reponse in JSON only ( for non-ie 6)
             // Don't cache these, please, from : http://php.net/manual/en/function.header.php

@@ -109,10 +109,7 @@ class EvaluationsController extends AppController
         return $data;
     }
 
-    function setUpAjaxList () {
-
-        $eventId = $this->Session->read("evaluationsControllerEventIdSession");
-
+    function setUpAjaxList ($eventId) {
         // The columns to show
         $columns = array(
             //    Model   columns       (Display Title) (Type Description)
@@ -175,15 +172,18 @@ class EvaluationsController extends AppController
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
         // Set up the list
-        $this->setUpAjaxList();
-        // Process the request for data
-        $this->AjaxList->asyncGet();
+        $eventId = $this->Session->read("evaluationsControllerEventIdSession");
+        //var_dump($eventID);
+        $this->setUpAjaxList($eventId);
+        // Process the request for data*/
+        $this->AjaxList->asyncGet("view");
     }
 
 
 
     function view($eventId='') {
-
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
 
         // Record the event id into the session
         if (!empty($eventId) && is_numeric($eventId)) {
@@ -195,14 +195,12 @@ class EvaluationsController extends AppController
             // During the view, and will break if it's not.
             $this->rdAuth->setCourseId($data['Event']['course_id']);
         } else {
-            $this->Session->delete("evaluationsControllerEventIdSession");
+            // Use last event ID if none was passed with a parameter
+            $eventId = $this->Session->read("evaluationsControllerEventIdSession");
         }
 
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
-
         // Set up the basic static ajax list variables
-        $this->setUpAjaxList();
+        $this->setUpAjaxList($eventId);
 
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
@@ -210,70 +208,13 @@ class EvaluationsController extends AppController
 
     // =-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-
 
-
     function index ($message="")
     {
         // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
+                $this->rdAuth->noStudentsAllowed();
 
-        $courseId = $this->rdAuth->courseId;
-        $this->pageTitle = $this->sysContainer->getCourseName($courseId).' > List Evaluation Results';
-
-        $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-        $this->userPersonalize->setPersonalizeList($personalizeData);
-        if ($personalizeData && $this->userPersonalize->inPersonalizeList('Eval.ListMenu.Limit.Show') && $this->userPersonalize->getPersonalizeValue('Eval.ListMenu.Limit.Show') != 'null') {
-            $this->show = $this->userPersonalize->getPersonalizeValue('Eval.ListMenu.Limit.Show');
-            $this->set('userPersonalize', $this->userPersonalize);
-        } else {
-            $this->show = '10';
-            $this->update($attributeCode = 'Eval.ListMenu.Limit.Show',$attributeValue = $this->show);
-        }
-
-        $conditions = 'course_id = '.$courseId.' AND event_template_type_id <> 3';
-        $data = $this->Event->findAll($conditions, '*, (NOW() >= release_date_begin AND NOW() <= release_date_end) AS is_released',$this->order, $this->show, $this->page);
-
-        $paging['style'] = 'ajax';
-        $paging['link'] = '/evaluations/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
-
-        $paging['count'] = count($data);
-        $paging['show'] = array('10','25','50','all');
-        $paging['page'] = $this->page;
-        $paging['limit'] = $this->show;
-        $paging['direction'] = $this->direction;
-
-        $this->set('paging',$paging);
-        $this->set('data',$data);
-        $this->set('courseId', $courseId);
-    }
-
-    function search()
-    {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
-
-        $this->layout = 'ajax';
-        if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-            $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-            if ($personalizeData) {
-                $this->userPersonalize->setPersonalizeList($personalizeData);
-                $this->show = $this->userPersonalize->getPersonalizeValue('Eval.ListMenu.Limit.Show');
-                $this->set('userPersonalize', $this->userPersonalize);
-            }
-            $this->show = '10';
-        }
-
-        $courseId = $this->rdAuth->courseId;
-        $conditions = 'course_id = '.$courseId;
-
-        if (!empty($this->params['form']['livesearch2']) && !empty($this->params['form']['select'])) {
-            $pagination->loadingId = 'loading';
-            //parse the parameters
-            $searchField=$this->params['form']['select'];
-            $searchValue=$this->params['form']['livesearch2'];
-            $conditions = ' AND '.$searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
-        }
-        $this->update($attributeCode = 'Eval.ListMenu.Limit.Show',$attributeValue = $this->show);
-        $this->set('conditions',$conditions);
+                // Evaluation index was merged with events ajaxList
+                $this->redirect($this->webroot + "events/index");
     }
 
     function update($attributeCode='',$attributeValue='') {
@@ -498,10 +439,9 @@ class EvaluationsController extends AppController
         }
     }
 
-    function validRubricEvalComplete ($form=null)
-    {
-    $status = true;
-    return $status;
+    function validRubricEvalComplete ($form=null) {
+        $status = true;
+        return $status;
     }
 
     function completeEvaluationRubric () {
