@@ -4,6 +4,12 @@ class GroupsMembers extends AppModel
 {
   var $name = 'GroupsMembers';
 
+    function isMemberOf($userId, $groupId) {
+        $result = $this->findCount("where user_id=$userId AND group_id=$groupId");
+        return $result > 0;
+    }
+
+
   // inserts all members into the groups_members table
   function insertMembers($id=null, $data=null){
   	for( $i=1; $i<=$data['member_count']; $i++ ){

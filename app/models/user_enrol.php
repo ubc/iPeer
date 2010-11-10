@@ -2,6 +2,7 @@
 class UserEnrol extends AppModel
 {
   var $name = 'UserEnrol';
+  var $belongsTo = array("User", "Course");
 
   function getEnrolledCourses($userId=null)
   {
@@ -9,6 +10,14 @@ class UserEnrol extends AppModel
 
     return $result;
   }
+
+    function isEnrolledInById($userId, $courseId) {
+        return $this->findCount("user_id=$user_id AND course_id=$courseId") > 0;
+    }
+
+    function isEnrolledInByUsername($userName, $courseId) {
+        return $this->findCount("User.username='$userName' AND course_id=$courseId") > 0;
+    }
 
 
   function getEnrolledStudentCount($courseId=null) {

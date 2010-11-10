@@ -122,6 +122,17 @@ class Group extends AppModel
 		return $data;
 	}
 
+
+    function findGroup($courseId, $groupNumber, $groupName) {
+        $data = $this->find
+            ("course_id=$courseId AND group_num=$groupNumber and group_name='$groupName'");
+        if (is_array($data)) {
+            return $data['Group']['id'];
+        } else {
+            return false;
+        }
+    }
+
 	function getLastGroupNumByCourseId($courseId=null) {
         $tmp = $this->find('course_id='.$courseId, 'max(group_num)');
         $maxGroupNum = $tmp[0]['max(group_num)'];
@@ -141,7 +152,7 @@ class Group extends AppModel
                               WHERE user_enrols.course_id=".$course_id." AND users.role = 'S' AND users.id NOT IN
                               (SELECT user_id FROM `groups` LEFT JOIN groups_members as gs ON groups.id = gs.group_id WHERE groups.course_id = ".$course_id.")
                               ORDER BY users.last_name ASC");
-    }else{
+    } else {
       return $this->groupDifference($group_id,$course_id);
     }
   }
