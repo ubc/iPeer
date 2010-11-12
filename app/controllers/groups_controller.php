@@ -257,6 +257,8 @@ class GroupsController extends AppController
             $this->redirect('/groups/index/Group Not Found.');
         }
 
+        //var_dump($this->Group->countUserSubmissionsInAGroup(3504, 1310));
+
         $this->params['data'] = $groupData;
   }
 

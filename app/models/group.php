@@ -156,6 +156,16 @@ class Group extends AppModel
       return $this->groupDifference($group_id,$course_id);
     }
   }
+
+    function countUserSubmissionsInAGroup($user_id, $group_id) {
+        $data = $this->findBySql("
+            SELECT count(*) AS count FROM users AS User
+            JOIN evaluation_submissions AS EvaluationSubmission ON User.id=submitter_id
+            JOIN group_events AS GroupEvent ON GroupEvent.id=EvaluationSubmission.grp_event_id
+            WHERE User.id=$user_id AND group_id=$group_id");
+
+        return $data[0][0]['count'];
+    }
 }
 
 ?>
