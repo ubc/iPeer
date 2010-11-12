@@ -3,23 +3,37 @@
     <td align="center">
 <table width="95%" border="0" cellspacing="0" cellpadding="2">
     <tr><td>
-    <center><?php echo $html->linkTo("Return to group list.", "index"); ?></center>
-    <center><h3>Group Import Results</h3></center>
-    <center><h4>Group Creation</h4></center>
+    <center style="font-size:150%">The group CVS file was processed.</center><br />
+    <center>Click OK to return
+    to the list of groups, or look bellow for the results of the import.
+    <br /> <br />
+    <input type="button" name="Okay" value="OK" onClick="window.location='<?php echo $this->webroot . "users/index" ?>'";>
+    </center>
+    <br /> <br />
+    <div style="border:1px solid;">
+    <center><span style="font-size:150%">Group Import Results</span></center>
+    <br />
+    <center><u style="font-size:130%">Group Creation</u></center>
+    <br />
     <center>
-    <?php ?>
-
     <?php // Group List ?>
-    <table>
-    <tr><td>Groups Created:</td><?php ?><td></tr>
+    <span style="background:#CCFFCC">Groups Created: <?php echo $results['groups_added']; ?></span>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <span style="background:#FFFFCC">Groups Skipped: <?php echo $results['groups_skipped']; ?></span>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <span style="background:#FFDDDD"> Errors in Groups: <?php echo $results['groups_error']; ?></span>
 
+    <table>
     <tr><td>&nbsp;</td></tr>
     <?php if (empty($results['groups'])) : ?>
         <tr><td style='background:#FFCC99'>No groups Listed</td></tr>
     <?php else: ?>
         <?php foreach ($results['groups'] as $group) : ?>
             <?php $bgColor = $group['present'] ? ( $group['created'] ? '#CCFFCC' : '#FFFFCC') : '$FFCCC'; ?>
-            <tr><td>
+            <?php $imageUrl = $this->webroot . "img/icons/" . ($group['present'] ? "green_check.gif" : "red_x.gif" )?>
+            <tr>
+            <td><img src="<?php echo $imageUrl?>"/></td>
+            <td>
                 <b><?php echo $group['name']; ?></b>
             <td>:</td>
             </td><td style="background:<?php echo $bgColor; ?>">
@@ -30,16 +44,27 @@
     <?php endif; ?>
     </table>
     </center>
-    <center><h4>User->Group Assignment</h4></center>
+    <br />
+    <center><u style="font-size:130%">User->Group Assignment</u></center>
+    <br />
     <center>
     <?php // User List ?>
+    <span style="background:#CCFFCC">Users Added To Groups: <?php echo $results['users_added']; ?></span>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <span style="background:#FFFFCC">Entries Skipped: <?php echo $results['users_skipped']; ?></span>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <span style="background:#FFDDDD"> Errors in Entries: <?php echo $results['users_error']; ?></span>
+    <br /><br />
     <table>
     <?php if (empty($results['users'])) : ?>
         <tr><td style='background:#FFCC99'>No Students Listed</td></tr>
     <?php else: ?>
         <?php foreach ($results['users'] as $user) : ?>
             <?php $bgColor = $user['valid'] ? ( $user['added'] ? '#CCFFCC' : '#FFFFCC') : '#FFDDDD'; ?>
-            <tr style="background:<?php echo $bgColor; ?>">
+            <?php $imageUrl = $this->webroot . "img/icons/" . ($user['valid'] ? "green_check.gif" : "red_x.gif" )?>
+            <tr style="background:<?php echo $bgColor; ?>;solid 2px">
+            <td rowspan=4 style="background:white"><img src="<?php echo $imageUrl?>"/>
+            &nbsp;&nbsp;&nbsp;</td>
             <td>User : </td>
             <?php if (!empty($user['data'])) : ?>
                 <?php $data = $user['data']['User'];?>
@@ -67,9 +92,9 @@
     <?php endif; ?>
     </table>
     </center>
-    </td></tr>
-    <tr><td>
+    </div>
     </td></tr>
 </table>
 </table>
+
 
