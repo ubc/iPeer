@@ -34,14 +34,14 @@
                 array('all' => $user_data, 'selected' => $group_data,
                 'allName' =>  "Filtered Students", 'selectedName' => 'Students in Group',
                 'itemName' => 'users', 'listStrings' => array("student_no"," - ","first_name", " ", "last_name"),
-                'listSize' => 20));
+                'listSize' => 20,
+                'groupHasSubmittedEvaluation' => $groupHasSubmittedEvaluation));
     ?>
   </td>
-
-
   </tr>
   <tr class="tablecell2">
-    <td colspan="4" align="center"><?php echo $html->submit('Update Group', array('onClick'=>"processSubmit(document.getElementById('selected_groups'))")) ?></td>
+    <td colspan="4" align="center"><?php echo $html->submit('Update Group', array('onClick'=>"processSubmit(document.getElementById('selected_groups'))")) ?>
+    <input type="button" name="Cancel Changes" value="Cancel Changes" onClick="javascript:(history.length > 1) ? history.back() : window.close();"></td>
     </tr>
 </table>
       <table width="95%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">

@@ -231,6 +231,11 @@ class GroupsController extends AppController
         $courseId = $this->rdAuth->courseId;
         $this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Groups';
 
+        $groupData = $this->Group->findById($id);
+        if(empty($groupData)) {
+            $this->redirect('/groups/index/Group Not Found.');
+        }
+
         if (!empty($this->params['data'])) {
             $id = $this->params['data']['Group']['id'];
             $data2save = $this->Group->prepData($this->params);
@@ -249,15 +254,26 @@ class GroupsController extends AppController
         $this->set('user_data', $this->Group->groupDifference($id,$courseId));
 
         //gets all students in the group
-        $this->set('group_data', $this->Group->groupStudents($id));
+        $students = $this->Group->groupStudents($id);
+
+        // groupHasSubmittedEvaluation checks if anyone in the group submited an evaluation
+        $groupHasSubmittedEvaluation = false;
+        foreach ($students as $user) {
+            $groupHasSubmittedEvaluation =
+                $this->Group->countUserSubmissionsInAGroup($user['users']['id'], $id) > 0;
+            if($groupHasSubmittedEvaluation) {
+                break;
+            }
+        }
+
+        $this->set('group_data', $students);
         $this->set('group_id', $id);
+        $this->set('groupHasSubmittedEvaluation', $groupHasSubmittedEvaluation);
 
         $groupData = $this->Group->findById($id);
         if(empty($groupData)) {
             $this->redirect('/groups/index/Group Not Found.');
         }
-
-        //var_dump($this->Group->countUserSubmissionsInAGroup(3504, 1310));
 
         $this->params['data'] = $groupData;
   }
