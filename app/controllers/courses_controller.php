@@ -166,6 +166,7 @@ class CoursesController extends AppController
 	}
 
 	function add() {
+        $this->set('user_id', $this->rdAuth->id);
 		$this->set('instructor', $this->Course->findInstructors());
 		$this->set('instructor_count', count($this->Course->findInstructors()));
 

@@ -11,6 +11,7 @@
     <input type="hidden" name="required" id="required" value="course" />
     <?php echo empty($params['data']['Course']['id']) ? null : $html->hidden('Course/id'); ?>
     <?php echo empty($params['data']['Course']['id']) ? $html->hidden('Course/creator_id', array('value'=>$rdAuth->id)) : $html->hidden('Course/updater_id', array('value'=>$rdAuth->id)); ?>
+
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
     <td colspan="3" align="center"><?php echo empty($params['data']['Course']['id'])?'Add':'Edit' ?> Course</td>
@@ -37,22 +38,19 @@
     <td> eg. Intro to APSCI </td>
   </tr>
   <tr class="tablecell2">
-    <td valign="top">Instructor(s):</td>
+    <td valign="top">Instructor<br/>(More instructors can be added later,<br /> via Course->Edit)</td>
     <td>
   <div id="adddelinstructors">
   <?php
-    $params = array('controller'=>'courses', 'instructor'=>$instructor, 'count'=>1, 'empty' => true);
+    $params = array('controller'=>'courses',
+                    'instructor'=>$instructor,
+                    'count'=>1, 'empty' => true, 'user_id' => $user_id );
     echo $this->renderElement('courses/ajax_course_instructors', $params);
     ?>
   </div>
     </td>
     <td valign="top">
   <input type="hidden" name="add" id="add" value="1">
-  <a href=# onclick="addInstructor();"><?php echo $html->image('icons/add.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Add Additional Instructor</a>
-  <br><br>
-  <a href=# onclick="removeInstructor();"><?php echo $html->image('icons/delete.gif', array('alt'=>'Add Additional Instructor', 'align'=>'middle', 'border'=>'0')); ?> - Remove Additional Instructor</a>
-  <?php echo $ajax->observeField('add', array('update'=>'adddelinstructors', 'url'=>"/courses/adddelinstructor", 'with'=>"{empty:1, add:$('add').value}", 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');")) ?>
-
   </td>
   </tr>
   <tr class="tablecell2">
