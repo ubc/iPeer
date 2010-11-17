@@ -405,18 +405,27 @@ class GroupsController extends AppController
                 $entry['group_num'] = trim($split[IMPORT_GROUP_NUMBER]);
                 $entry['group_name'] = trim($split[IMPORT_GROUP_NAME]);
 
-                $userData = $this->User->findByUsername($entry['username']);
-                if (!is_array($userData)) {
-                    $entry['status'] = "User $entry[username] is unknown. Please add this user first.";
+                // Check the entries for empty spots
+                if (empty($entry['username'])) {
+                    $entry['status'] = "Username column is empty.";
+                } else if (empty($entry['group_num'])) {
+                    $entry['status'] = "Group Number column is empty.";
+                } else if (empty($entry['group_name'])) {
+                    $entry['status'] = "Group Name column is empty.";
                 } else {
-                    $entry['id'] = $userData['User']['id'];
-                    if (!$this->UserEnrol->isEnrolledInByUsername($entry['username'], $courseId)) {
-                        $entry['status'] = "User $entry[username] is not enrolled in your selected course. ";
-                        $entry['status'] .= "Please entroll them first.";
+                    $userData = $this->User->findByUsername($entry['username']);
+                    if (!is_array($userData)) {
+                        $entry['status'] = "User $entry[username] is unknown. Please add this user first.";
                     } else {
-                        // So, the user exists, and is enrolled in the course - they pass validation
-                        $entry['status'] = "Validated Entry";
-                        $entry['valid'] = true;
+                        $entry['id'] = $userData['User']['id'];
+                        if (!$this->UserEnrol->isEnrolledInByUsername($entry['username'], $courseId)) {
+                            $entry['status'] = "User $entry[username] is not enrolled in your selected course. ";
+                            $entry['status'] .= "Please entroll them first.";
+                        } else {
+                            // So, the user exists, and is enrolled in the course - they pass validation
+                            $entry['status'] = "Validated Entry";
+                            $entry['valid'] = true;
+                        }
                     }
                 }
             }

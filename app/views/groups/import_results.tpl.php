@@ -76,7 +76,7 @@
                     <?php echo ("$data[first_name]"); ?>
                 </td>
             <?php else: ?>
-                <td colspan=10><b>Error: User not found. </b> See the 'Results:' line for details</td>
+                <td colspan=10><b>Error.</b> See the 'Results:' line for details</td>
             <?php endif; ?>
             </tr>
             <tr><td style="background:<?php echo $bgColor; ?>">Entry :</td>
