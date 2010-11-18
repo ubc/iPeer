@@ -39,10 +39,10 @@
                 $groupHasSubmittedEvaluation : "false" ?>;
 
             // Prevents group changes after submission
-            function checkedAssign(a, b) {
+            function checkedAssign(a, b, event) {
                 // Make sure something is selected in the sourse list
                 if (a.selectedIndex >= 0) {
-                    if (groupHasSubmittedEvaluation) {
+                    if (groupHasSubmittedEvaluation  && !(event && event.shiftKey)) {
                         var msg = "Are you sure you wish to add the person(s) to this group?\n";
                         msg += "Since this group has submitted evaluations, you will not be able\n";
                         msg += "to remove them afterwards! \n\nSo please be sure before hitting 'OK', and\n";
@@ -57,13 +57,13 @@
             }
 
             // Prevents group changes after submission
-            function checkedRemove(a, b) {
+            function checkedRemove(a, b, event) {
                 if (a.selectedIndex >= 0) {
-                    if (groupHasSubmittedEvaluation) {
+                    if (groupHasSubmittedEvaluation && !(event && event.shiftKey)) {
                         var msg = "Sorry, since this group has submitted evaluations,\n";
                         msg += "it can not have members removed. Members can only be added.\n\n";
-                        msg += "However, if you did not save your changes, yet \n";
-                        msg += "'you can still press Cancel Changes' to undo.";
+                        msg += "However, if you did not save your changes yet, \n";
+                        msg += "you can still press 'Cancel Changes' to undo.";
                         alert(msg);
                     } else {
                         itemMove(a,b);
@@ -72,9 +72,9 @@
             }
 
         </script>
-        <input type="button" style="width:100px;" onClick="checkedAssign($('all_groups'), $('selected_groups'))" value="Assign >>" />
+        <input type="button" style="width:100px;" onClick="checkedAssign($('all_groups'), $('selected_groups'), event)" value="Assign >>" />
         <br><br>
-        <input type="button" style="width:100px;" onClick="checkedRemove($('selected_groups'), $('all_groups'))" value="<< Remove " /></td>
+        <input type="button" style="width:100px;" onClick="checkedRemove($('selected_groups'), $('all_groups'), event)" value="<< Remove " /></td>
         <td align="center">
 
         <h3><?php echo empty($selectedName) ? "Selected Groups" : $selectedName ?></h3>
