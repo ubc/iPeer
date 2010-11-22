@@ -112,23 +112,29 @@ class Course extends AppModel
 		return $this->findBySql("SELECT * FROM courses As Course WHERE record_status = 'I'");
 	}
 
-	function prepData($data=null){
-	  if (empty($data['data']['Course']['record_status'])) {
-  		$data['data']['Course']['record_status'] = $data['form']['record_status'];
-  	}
+    function prepData($data=null){
+        if (empty($data['data']['Course']['record_status'])) {
+            $data['data']['Course']['record_status'] = $data['form']['record_status'];
+        }
 
+        if( !empty($data['form']['self_enroll'])) {
+            $data['data']['Course']['self_enroll'] = "on";
+        } else {
+            $data['data']['Course']['self_enroll'] = "off";
+        }
 
-		if( !empty($data['form']['self_enroll']))
-			$data['data']['Course']['self_enroll'] = "on";
-		else
-			$data['data']['Course']['self_enroll'] = "off";
+        if (!isset($data['data']['Course']['count'])) {
+            $data['data']['Course']['count'] = 1;
+        }
 
-		for( $i=1; $i<=$data['data']['Course']['count']; $i++ ){
-			$data['data']['Course']['instructor_id'.$i] = isset($data['form']['instructor_id'.$i])? $data['form']['instructor_id'.$i] : '';
-		}
+        for( $i=1; $i <= $data['data']['Course']['count']; $i++ ) {
+            $data['data']['Course']['instructor_id'.$i] =
+                isset($data['form']['instructor_id'.$i]) ? $data['form']['instructor_id'.$i] : '';
 
-		return $data;
-	}
+        }
+
+        return $data;
+    }
 
 	//Overwriting Function - will be called before save operation
 	function beforeSave(){

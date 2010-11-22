@@ -62,8 +62,9 @@
     		  echo '</tr>';
     	  }   ?>
   <tr class="tablesummary">
-    	<td>Average Received</td>
+    	<td>Average Received <?php var_dump(count($scoreRecords), $scoreRecords);?></td>
       <?php
+
       $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;
        foreach ($groupMembers as $member_col) {
         if (isset($memberScoreSummary[$member_col['User']['id']])) {
