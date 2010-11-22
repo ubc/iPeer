@@ -7,7 +7,7 @@
     <center>Click OK to return
     to the list of groups, or look bellow for the results of the import.
     <br /> <br />
-    <input type="button" name="Okay" value="OK" onClick="window.location='<?php echo $this->webroot . "groups/index/". $rdAuth->courseId ?>'";>
+    <input type="button" name="Okay" value="OK" onClick="window.location='<?php echo $this->webroot . "groups/goToClassList/". $rdAuth->courseId ?>'";>
     </center>
     <br /> <br />
     <div style="border:1px solid;">
