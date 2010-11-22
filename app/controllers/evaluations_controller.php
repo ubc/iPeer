@@ -265,7 +265,7 @@ class EvaluationsController extends AppController
 
             //Setup the courseId to session
             $this->rdAuth->setCourseId($event['Event']['course_id']);
-            $courseId = $event['Event']['course_i$completedEvaluationsd'];
+            $courseId = $event['Event']['course_id'];
             $this->pageTitle = $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers';
 
             //Get Members for this evaluation
