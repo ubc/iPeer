@@ -87,7 +87,7 @@ class UsersController extends AppController
             array("User.username",   "Username",     "10em",  "action", "View User"),
             array("User.first_name", "First Name",   "13em",  "string"),
             array("User.last_name",  "Last Name",    "13em",  "string"),
-            array("User.student_no", "Student #",         "6em",  "string"),
+            array("User.student_no", "Student #",     "6em",  "string"),
             array("User.email",      "Email",        "auto",  "string")//,
             //array("UserEnrol.course_id", "Course ID", "number")
         );

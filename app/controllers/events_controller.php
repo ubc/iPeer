@@ -161,7 +161,7 @@ class EventsController extends AppController
         $recursive = 0;
 
         $this->AjaxList->setUp($this->Event, $columns, $actions,
-            "Course.course", "Course.course", $joinTables, $extraFilters,
+            "Course.course", "Event.Title", $joinTables, $extraFilters,
             $recursive, "postProcessData");
     }
 
