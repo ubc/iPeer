@@ -1,7 +1,6 @@
 <span class="required">NOTE</span>: <br />
 <ul>
-  <li><strong>Username</strong> <u>must</u> the same at the <strong>Student Number</strong>.</li>
-  <li>All fields mandatory, except email and password.</li> 
+  <li>All fields mandatory, except email and password.</li>
   <li>If email column is missing, students will be requested to fill in when they log in the first time.</li>
   <li>If password column is missing, system will generate random password for each student.</li>
   <li>If an external authentication module is enabled (e.g. CWL or Shiboleth), password column can be ignored. Students will use external authentication module to login.</li>

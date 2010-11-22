@@ -62,7 +62,7 @@
     		  echo '</tr>';
     	  }   ?>
   <tr class="tablesummary">
-    	<td>Average Received <?php var_dump(count($scoreRecords), $scoreRecords);?></td>
+    	<td>Average Received <?php// var_dump(count($scoreRecords), $scoreRecords);?></td>
       <?php
 
       $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;
