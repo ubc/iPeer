@@ -375,7 +375,7 @@ function add ()
         //Save Groups for the Event
 			  $this->GroupEvent->insertGroups($this->Event->id, $this->params['data']['Event']);
 
-				$this->redirect('/events/index/The event is added successfully.');
+                $this->goToClassList($this->rdAuth->courseId);
 			}
       //Found error
       else {
