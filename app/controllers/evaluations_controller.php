@@ -943,9 +943,7 @@ class EvaluationsController extends AppController
         //Check to see if all members are completed this evaluation
         $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
 
-        $numMembers = ('0' == $event['Event']['self_eval']) ?
-          $this->GroupsMembers->findCount('group_id='.$groupEvent['GroupEvent']['group_id']) - 1:
-          $this->GroupsMembers->findCount('group_id='.$groupEvent['GroupEvent']['group_id']);
+        $numMembers = $this->GroupsMembers->findCount('group_id='.$groupEvent['GroupEvent']['group_id']);
 
         if (($numOfCompletedCount != 0) && ($numOfCompletedCount < $numMembers)) {
           $completeStatus = 'Some';
@@ -1003,9 +1001,7 @@ class EvaluationsController extends AppController
                                                                                    $groupEvent['GroupEvent']['id']);
         //Check to see if all members are completed this evaluation
         $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
-        $numMembers = ('0' == $event['Event']['self_eval']) ?
-          $this->GroupsMembers->findCount('group_id='.$groupEvent['GroupEvent']['group_id']) - 1:
-          $this->GroupsMembers->findCount('group_id='.$groupEvent['GroupEvent']['group_id']);
+        $numMembers = $this->GroupsMembers->findCount('group_id='.$groupEvent['GroupEvent']['group_id']);
 
         if (($numOfCompletedCount != 0) && ($numOfCompletedCount < $numMembers)) {
           $completeStatus = 'Some';
