@@ -230,7 +230,8 @@ class MixevalsController extends AppController
 				$this->render('edit');
 			}
 			else {
-			  $this->params['data']['Mixeval']['total_marks'] = $this->params['form']['total_marks'];
+                // Removed to fix bug #307
+			  //$this->params['data']['Mixeval']['total_marks'] = $this->params['form']['total_marks'];
   			if ( $this->Mixeval->save($this->params['data']))
   			{
   				//prepare the data from the form fields in array

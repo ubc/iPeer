@@ -1,26 +1,28 @@
 <?php
 
-	if(!empty($data)){
-		$mixeval_name = $data['Mixeval']['name'];
-		$scale_default = $data['Mixeval']['scale_max'];
-		$prefill_question_max = $data['Mixeval']['prefill_question_max'];
-		$question_default = $data['Mixeval']['lickert_question_max'];
-		$mixeval_avail = $data['Mixeval']['availability'];
-		$total_mark = isset($data['Mixeval']['total_marks']) ? $data['Mixeval']['total_marks'] : "";
-		if(!empty($data['Mixeval']['zero_mark']))
-			$zero_mark = $data['Mixeval']['zero_mark'];
-		else
-			$zero_mark='off';
-	}
-	else{
-		$mixeval_name = '';
-		$scale_default = 5;
-		$question_default = 3;
-		$prefill_question_max = 3;
-		$mixeval_avail = 'public';
-		$total_mark = 5;
-		$zero_mark = 'off';
-	}
+    if(!empty($data)){
+        $mixeval_name = $data['Mixeval']['name'];
+        $scale_default = $data['Mixeval']['scale_max'];
+        $prefill_question_max = $data['Mixeval']['prefill_question_max'];
+        $question_default = $data['Mixeval']['lickert_question_max'];
+        $mixeval_avail = $data['Mixeval']['availability'];
+        $total_mark = isset($data['Mixeval']['total_marks']) ? $data['Mixeval']['total_marks'] : "";
+        var_dump($total_mark);
+        if(!empty($data['Mixeval']['zero_mark'])) {
+            $zero_mark = $data['Mixeval']['zero_mark'];
+        } else {
+            $zero_mark='off';
+        }
+    }
+    else{
+        $mixeval_name = '';
+        $scale_default = 5;
+        $question_default = 3;
+        $prefill_question_max = 3;
+        $mixeval_avail = 'public';
+        $total_mark = 5;
+        $zero_mark = 'off';
+    }
 	?>
     <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Mixeval']['id'])?'add':'edit') ?>" onSubmit="return validate()">
     <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
