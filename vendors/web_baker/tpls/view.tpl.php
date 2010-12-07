@@ -1,1 +1,0 @@
-<p>Edit "<b>%VIEW_FILE_PATH%</b>" to change this message.</p>

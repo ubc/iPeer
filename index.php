@@ -1,31 +1,25 @@
 <?php
-/* SVN FILE: $Id: index.php,v 1.3 2006/06/20 18:44:06 zoeshum Exp $ */
 /**
  * Requests collector.
  *
  *  This file collects requests if:
  *	- no mod_rewrite is avilable or .htaccess files are not supported
- *	-/public is not set as a web root.
+ *  - requires App.baseUrl to be uncommented in app/config/core.php
+ *	- app/webroot is not set as a document root.
  *
  * PHP versions 4 and 5
  *
- * CakePHP : Rapid Development Framework <http://www.cakephp.org/>
- * Copyright (c)	2006, Cake Software Foundation, Inc.
- *								1785 E. Sahara Avenue, Suite 490-204
- *								Las Vegas, Nevada 89104
+ * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
+ * Copyright 2005-2010, Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @filesource
- * @copyright		Copyright (c) 2006, Cake Software Foundation, Inc.
- * @link				http://www.cakefoundation.org/projects/info/cakephp CakePHP Project
- * @package			cake
- * @since			CakePHP v 0.2.9
- * @version			$Revision: 1.3 $
- * @modifiedby		$LastChangedBy: phpnut $
- * @lastmodified	$Date: 2006/06/20 18:44:06 $
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @copyright     Copyright 2005-2010, Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * @link          http://cakephp.org CakePHP(tm) Project
+ * @package       cake
+ * @since         CakePHP(tm) v 0.2.9
+ * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 /**
  *  Get Cake's root directory
@@ -36,42 +30,26 @@
 	define('WEBROOT_DIR', 'webroot');
 	define('WWW_ROOT', ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS);
 /**
- * This only needs to be changed if the cake installed libs are located
- * outside of the distributed directory structure.
+ * This only needs to be changed if the "cake" directory is located
+ * outside of the distributed structure.
+ * Full path to the directory containing "cake". Do not add trailing directory separator
  */
 	if (!defined('CAKE_CORE_INCLUDE_PATH')) {
-		//define ('CAKE_CORE_INCLUDE_PATH', FULL PATH TO DIRECTORY WHERE CAKE CORE IS INSTALLED DO NOT ADD A TRAILING DIRECTORY SEPARATOR';
 		define('CAKE_CORE_INCLUDE_PATH', ROOT);
 	}
+
+/**
+ * Set the include path or define app and core path
+ */
 	if (function_exists('ini_set')) {
-		ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . CAKE_CORE_INCLUDE_PATH . PATH_SEPARATOR . ROOT . DS . APP_DIR . DS);
+		ini_set('include_path',
+			ini_get('include_path') . PATH_SEPARATOR . CAKE_CORE_INCLUDE_PATH
+			. PATH_SEPARATOR . ROOT . DS . APP_DIR . DS
+		);
 		define('APP_PATH', null);
 		define('CORE_PATH', null);
 	} else {
 		define('APP_PATH', ROOT . DS . APP_DIR . DS);
 		define('CORE_PATH', CAKE_CORE_INCLUDE_PATH . DS);
 	}
-	require CORE_PATH . 'cake' . DS . 'basics.php';
-	require APP_PATH . 'config' . DS . 'core.php';
-	require CORE_PATH . 'cake' . DS . 'config' . DS . 'paths.php';
-	$bootstrap=true;
-	$uri      =setUri();
-/**
- * As mod_rewrite (or .htaccess files) is not working, we need to take care
- * of what would normally be rewritten, i.e. the static files in app/webroot/
- */
-	if ($uri === '/' || $uri === '/index.php') {
-		$_GET['url'] = '/';
-		require APP_DIR . DS . WEBROOT_DIR . DS . 'index.php';
-	} else {
-		$elements=explode('/index.php', $uri);
-
-		if (!empty($elements[1])) {
-			$path = $elements[1];
-		} else {
-			$path = '/';
-		}
-		$_GET['url']=$path;
-		require APP_DIR . DS . WEBROOT_DIR . DS . 'index.php';
-	}
-?>
+	require APP_DIR . DS . WEBROOT_DIR . DS . 'index.php';
