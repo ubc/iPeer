@@ -10,26 +10,43 @@
 ini_set('auto_detect_line_endings', true);
 
 uses('sanitize');
+App::import('Lib', 'toolkit');
 
 class AppController extends Controller  {
-	var $startpage = 'pages';
-	var $components = array('rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework');
-	var $beforeFilter =	 array('checkAccess', 'checkDatabaseVersion');
-	var $helpers = array('Html', 'Javascript');
-	var $access = array ();
-	var $actionList = array ();
+  var $startpage = 'pages';
+  var $components = array('Session', 'Output', 'sysContainer', 'globalConstant', 'userPersonalize', 'framework', 'Auth', 'Acl', 'AccessControl');
+  var $helpers = array('Session', 'Html', 'Js');
+  var $access = array ();
+  var $actionList = array ();
 
-    function checkDatabaseVersion()
-    {
-        $dbv = $this->sysContainer->getParamByParamCode('database.version', array('parameter_value' => 0));
-        if('A' == $this->rdAuth->role && DATABASE_VERSION > $dbv['parameter_value']) {
-            $flashMessage  = "<span class='notice'>Your database version is older than the current version. ";
-            $flashMessage .= "Please do the <a href=" . $this->webroot ."upgrade" .">upgrade</a>.</span>";
-            $this->Session->setFlash($flashMessage);
-        }
+  function beforeFilter() {
+    $this->Auth->authenticate = ClassRegistry::init('User');
+    ClassRegistry::addObject('AuthComponent', $this->Auth);
+    if($this->Auth->isAuthorized()) {
+  //    $this->AccessControl->check('controllers/'.ucwords($this->params['controller']).'/'.$this->params['action']);
+
+      $this->checkAccess();
+//      $this->checkDatabaseVersion();
+
+      // pass user variable to view
+      $user_array = $this->Auth->user();
+      $this->set('user', $user_array['User']);
     }
 
-	function __setAccess()
+    parent::beforeFilter();
+  }
+
+  function checkDatabaseVersion()
+  {
+    $dbv = $this->sysContainer->getParamByParamCode('database.version', array('parameter_value' => 0));
+    if('A' == $this->Auth->user('role') && Configure::read('DATABASE_VERSION') > $dbv['parameter_value']) {
+      $flashMessage  = "<span class='notice'>Your database version is older than the current version. ";
+      $flashMessage .= "Please do the <a href=" . $this->webroot ."upgrade" .">upgrade</a>.</span>";
+      $this->Session->setFlash($flashMessage);
+    }
+  }
+
+  function __setAccess()
 	{
 		$access = $this->sysContainer->getAccessFunctionList();
 		if (!empty($access)){
@@ -56,15 +73,24 @@ class AppController extends Controller  {
 
 	function extractModel($model,$array,$field)
 	{
-		$return=array();
+		$return = array();
 		foreach ($array as $row)
-		array_push($return,$row[$model][$field]);
+      array_push($return,$row[$model][$field]);
 		return $return;
 	}
 
 	function checkAccess()
 	{
-		$this->rdAuth->loadFromSession();
+		//$this->rdAuth->loadFromSession();
+		/*if($this->Session->check('ipeerSession') && $this->Session->valid('ipeerSession')) {
+			$this->Auth->id = $this->Session->read('ipeerSession.id');
+			$this->username = $this->Session->read('ipeerSession.username');
+			$this->fullname = $this->Session->read('ipeerSession.fullname');
+			$this->role = $this->Session->read('ipeerSession.role');
+			$this->email = $this->Session->read('ipeerSession.email');
+			$this->customIntegrateCWL = $this->Session->read('ipeerSession.customIntegrateCWL');
+			$this->courseId = $this->Session->read('ipeerSession.courseId');
+		}*/
 
     // Used when error messasges are displayed, just let cake display them.
     // No controller -> no security risk.
@@ -90,13 +116,14 @@ class AppController extends Controller  {
 		{
 			$this->set('rdAuth',$this->rdAuth);
 
-		} else {
+		}/* else {
       //Check whether the user is current login yet
-      if (!isset($this->rdAuth->role)){
+      $role = $this->Auth->user('role');
+      if (!isset($role)){
         $this->Session->write('URL', $URL);
         $this->Session->write('AccessErr', 'NO_LOGIN');
-        $redirect = 'loginout/login';
-        $this->redirect($redirect);
+        $this->redirect(array('controller' => 'Users',
+                              'action'     => 'login'));
         exit;
       }
 
@@ -152,8 +179,8 @@ class AppController extends Controller  {
       $this->set('sysContainer', $this->sysContainer);
       $this->set('Output', $this->Output);
 
-      $this->Session->del('URL');
-    }
+      $this->Session->delete('URL');
+    }*/
     return true;
   }
 }

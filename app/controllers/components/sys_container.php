@@ -8,6 +8,8 @@
  * @license		OPPL
  *
  */
+App::import('Model', 'SysParameter');
+
 class sysContainerComponent
 {
 	var $components = array('Session');
@@ -45,7 +47,13 @@ class sysContainerComponent
 	var $myCourseList = array();
 
 	var $myCourseIDs = '';
-	// var $course
+  var $SysParameter = null;
+
+  function initialize(&$controller, $settings=array()) {
+    $this->controller = $controller;
+    $this->SysParameter = new SysParameter;
+  }
+
 	/**
 	 * Function to set the accessible functions
 	 *
@@ -174,10 +182,12 @@ class sysContainerComponent
 	 */
 	function getParamByParamCode($paraCode, $default = null)
 	{
-		// echo "<h1>" . $paraCode . "</h1>";
 		$paramList = $this->Session->read('ipeerSession.paramList');
+    if($paramList === null) {
+      $paramList = $this->SysParameter->find('all', array('fields' => array('id', 'parameter_code', 'parameter_value', 'parameter_type')));
+      $this->setParamList($paramList);
+    }
 
-		// echo "<pre>"; print_r($paramList);echo "</pre>";
 		$sysParameter = isset($paramList[$paraCode]) ? $paramList[$paraCode] : $default;
 		return $sysParameter;
 	}
@@ -220,7 +230,7 @@ class sysContainerComponent
 	 */
 	function getMyCourseList()
 	{
-		$this->myCourseList=$this->Session->read('ipeerSession.myCourseList');
+		$this->myCourseList = $this->Session->read('ipeerSession.myCourseList');
     if($this->myCourseList == null) $this->myCourseList = array();
 		return $this->myCourseList;
 	}
@@ -248,7 +258,7 @@ class sysContainerComponent
 		} else {
 			$this->myCourseList = $this->getMyCourseList();
 			if (isset($this->myCourseList[$courseId]))
-			$course= $this->myCourseList[$courseId];
+        $course= $this->myCourseList[$courseId];
 			else {
 				$courseLink = '&nbsp;<img alt="home" src="'. dirname($_SERVER['PHP_SELF']).'/img/icons/home.gif" border="0" valign="middle" />&nbsp;'.$this->Course->getCourseName($courseId);
 				return $courseLink;
@@ -290,10 +300,11 @@ class sysContainerComponent
 		}
 	}
 
-	function checkEvaluationToolInUse($evalTool=null, $templateId=null)
+  // deprecated function, use event_count attribute instead
+	/*function checkEvaluationToolInUse($evalTool=null, $templateId=null)
 	{
 		//Get the target event
 		$this->Event = new Event;
 		return $this->Event->checkEvaluationToolInUse($evalTool, $templateId);
-	}
+	}*/
 }

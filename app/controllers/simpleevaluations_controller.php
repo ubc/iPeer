@@ -25,7 +25,8 @@
  * @subpackage
  * @since
  */
-uses('neat_string');
+App::import('Lib', 'neat_string');
+
 class SimpleevaluationsController extends AppController
 {
   var $name = 'SimpleEvaluations';
@@ -43,8 +44,7 @@ class SimpleevaluationsController extends AppController
 
 //	var $components = array('EvaluationSimpleHelper');
 
-	function __construct()
-	{
+	function __construct() {
 		$this->Sanitize = new Sanitize;
 		$this->NeatString = new NeatString;
 		$this->show = empty($_REQUEST['show'])? 'null': $this->Sanitize->paranoid($_REQUEST['show']);
@@ -53,7 +53,7 @@ class SimpleevaluationsController extends AppController
 		$this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
- 		$this->pageTitle = 'Simple Evaluations';
+ 		$this->set('title_for_layout', 'Simple Evaluations');
     $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
 
 		parent::__construct();
@@ -65,7 +65,7 @@ class SimpleevaluationsController extends AppController
         if ($data) {
             foreach ($data as $key => $entry) {
                 // is it in use?
-                $inUse = $this->Event->checkEvaluationToolInUse('1', $entry['SimpleEvaluation']['id']) ;
+                $inUse = (0 != $entry['SimpleEvaluation']['event_count']);
 
                 // Put in the custom column
                 $data[$key]['!Custom']['inUse'] = $inUse ? "Yes" : "No";
@@ -76,11 +76,12 @@ class SimpleevaluationsController extends AppController
     }
 
     function setUpAjaxList() {
-        $myID = $this->rdAuth->id;
+        $myID = $this->Auth->user('id');
 
         // Set up Columns
         $columns = array(
             array("SimpleEvaluation.id",   "",       "",        "hidden"),
+            array("SimpleEvaluation.event_count",   "",       "",        "hidden"),
             array("SimpleEvaluation.name", "Name",   "12em",    "action",   "View Evaluation"),
             array("SimpleEvaluation.description", "Description","auto",  "action", "View Evaluation"),
             array("!Custom.inUse", "In Use",          "4em",    "number"),
@@ -107,7 +108,7 @@ class SimpleevaluationsController extends AppController
 
         // Instructors can only edit their own evaluations
         $restrictions = "";
-        if ($this->rdAuth->role != 'A') {
+        if ($this->Auth->user('role') != 'A') {
             $restrictions = array(
                 "Creator.id" => array(
                     $myID => true,
@@ -132,35 +133,26 @@ class SimpleevaluationsController extends AppController
     }
 
 
-    function index($message='') {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
-        // Set the top message
-        $this->set('message', $message);
-        // Set up the basic static ajax list variables
-        $this->setUpAjaxList();
-        // Set the display list
-        $this->set('paramsForList', $this->AjaxList->getParamsForList());
+    function index() {
+      // Set up the basic static ajax list variables
+      $this->setUpAjaxList();
+      // Set the display list
+      $this->set('paramsForList', $this->AjaxList->getParamsForList());
     }
 
     function ajaxList() {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
         // Set up the list
         $this->setUpAjaxList();
         // Process the request for data
         $this->AjaxList->asyncGet();
     }
 
-	function view($id='', $layout='')
-	{
-  	if ($layout != '')
-	  {
+	function view($id, $layout='') {
+  	if ($layout != '') {
 	    $this->layout = $layout;
 	    if ($layout == 'pop_up') $this->set('popUp', 1);
 	  }
-	  $this->SimpleEvaluation->setId($id);
-	  $data = $this->SimpleEvaluation->read();
+	  $data = $this->SimpleEvaluation->read(null, $id);
 		$this->set('data', $data);
 	}
 
@@ -190,30 +182,25 @@ class SimpleevaluationsController extends AppController
 		}
 	}
 
-	function edit($id=null)
-	{
-		if (empty($this->params['data']))
-		{
-			$this->SimpleEvaluation->setId($id);
-			$this->params['data'] = $this->SimpleEvaluation->read();
+	function edit($id) {
+    if(!is_numeric($id)) {
+      $this->Session->setFlash('Invalid ID.');
+      $this->redirect('index');
+    }
+
+    $this->data['SimpleEvaluation']['id'] = $id;
+
+		if (!empty($this->data) && $this->SimpleEvaluation->save($this->data)) {
+      $this->Session->setFlash('The simple evaluation was updated successfully.');
+      $this->redirect('index');
+    } else {
+			$this->data = $this->SimpleEvaluation->find('first', array('conditions' => array('id' => $id),
+                                                                 'contain' => false));
+
 			$this->Output->filter($this->params['data']);//always filter
 			//converting nl2br back so it looks better
 			$this->Output->br2nl($this->params['data']);
-		}
-		else
-		{
-      if (empty($this->params['data']['SimpleEvaluation']['name'])) $this->params['data']['SimpleEvaluation']['name'] = $this->params['form']['newtitle'];
-
-			if ( $this->SimpleEvaluation->save($this->params['data']))
-			{
-  			$this->redirect('/simpleevaluations/index/The record is updated successfully.');
-			}
-			else
-			{
-				$this->set('data', $this->params['data']);
-				$this->render();
-			}
-		}
+		} 
 	}
 
 	function copy($id=null)

@@ -25,7 +25,6 @@ if ( !function_exists('json_encode') ){
     }
 }
 
-
 class AjaxListComponent extends Object {
 
     // Will hold a reference to the controller
@@ -48,6 +47,8 @@ class AjaxListComponent extends Object {
     var $customModelCountFunction = null;
     var $recursive = 0;
     var $postProcessFunction = null;
+
+    var $conditions = array();
 
     // Initialize other componenets
     var $components = array('Session', 'Output');
@@ -101,24 +102,24 @@ class AjaxListComponent extends Object {
 
 
     function formatDates($data) {
-        // Process data if it's there
-        if (!empty($data) && is_array($data)) {
-            // For each column defined
-            foreach ($this->columns as $column) {
-                // Is this column maked as a date?
-                if ($column[3] == "date") {
-                    $split = explode(".", $column[0], 2);
-                    $model = $split[0];
-                    $col = $split[1];
-                    foreach ($data as $key => $entry) {
-                        $date = strtotime($entry[$model][$col]);
-                        $date = $this->controller->Output->formatDate($date);
-                        $data[$key][$model][$col] = $date;
-                    }
-                }
+      // Process data if it's there
+      if (!empty($data) && is_array($data)) {
+        // For each column defined
+        foreach ($this->columns as $column) {
+          // Is this column maked as a date?
+          if ($column[3] == "date") {
+            $split = explode(".", $column[0], 2);
+            $model = $split[0];
+            $col = $split[1];
+            foreach ($data as $key => $entry) {
+              $date = strtotime($entry[$model][$col]);
+              $date = Toolkit::formatDate($date);
+              $data[$key][$model][$col] = $date;
             }
+          }
         }
-        return $data;
+      }
+      return $data;
     }
 
 
@@ -145,7 +146,7 @@ class AjaxListComponent extends Object {
 
         // Start with no tables, and noconditions
         $tables = "";
-        $conditions = "";
+        $conditions = $this->conditions;
 
         // Add the main table
 
@@ -153,8 +154,7 @@ class AjaxListComponent extends Object {
         if (!empty($state->mapFilterSelections)) {
             foreach ($state->mapFilterSelections as $column => $value) {
                 if (!empty($column) && !empty($value)) {
-                    $conditions .=  mysql_real_escape_string($column) . "='" .
-                                    mysql_real_escape_string($value) . "' and ";
+                    $conditions[mysql_real_escape_string($column)] =  mysql_real_escape_string($value);
                 }
             }
         }
@@ -192,12 +192,10 @@ class AjaxListComponent extends Object {
                  if (!empty($filter) && !empty($value)) {
                     // Keywords starting with !!! are a special case
                     if (!$this->isSpecialValue($value)) {
-                        $conditions .= mysql_real_escape_string($filter) . "='" .
-                                    mysql_real_escape_string($value) . "' and ";
+                        $conditions[mysql_real_escape_string($filter)] = mysql_real_escape_string($value);
                     } else {
                         // note: no quotes around special value
-                        $conditions .= mysql_real_escape_string($filter) . " is " .
-                                    mysql_real_escape_string(substr($value, 3)) . " and ";
+                        $conditions[mysql_real_escape_string($filter)] = mysql_real_escape_string(substr($value, 3));
                     }
                 }
             }
@@ -206,25 +204,22 @@ class AjaxListComponent extends Object {
         // Add in any extra Filters - by array or by string.
         if (!empty($this->extraFilters)) {
             if (is_array($this->extraFilters)) {
-                foreach ($this->extraFilters as $column => $value) {
-                    $conditions .= "$column=$value and ";
-                }
+                /*foreach ($this->extraFilters as $column => $value) {
+                    $conditions[$column] = $value;
+                }*/
+              $conditions = array_merge($conditions, $this->extraFilters);
             } else if (is_string($this->extraFilters)) {
-                $conditions .= "( " .  $this->extraFilters . " ) and ";
+                $conditions[] = $this->extraFilters;
             }
         }
 
         // Add in the search conditions
         if (!empty($state->searchBy) && !empty($state->searchValue)) {
-            $conditions .= mysql_real_escape_string($state->searchBy) .
-                " like '%" .  mysql_real_escape_string($state->searchValue) . "%'";
-        } else {
-            // Because the last statement appended an "and" we need to specify a dummy condition
-            $conditions .= " 1=1 ";
-        }
+            $conditions[mysql_real_escape_string($state->searchBy) . " LIKE"] = '%' .  mysql_real_escape_string($state->searchValue) . '%';
+        } 
 
         // The default functions for searhing
-        $customModelFindFunction = "findAll";
+        $customModelFindFunction = "find";
 
         // Put in the custom functions is they were suppplied
         if (!empty($this->customModelFindFunction)) {
@@ -253,22 +248,29 @@ class AjaxListComponent extends Object {
 
         // Get the group By // we always group by this models's id, to make
         // sure there is only 1 result per entry even when using inner join.
-        $groupBy = " GROUP by " . $this->model->name . ".id";
+        $groupBy = array($this->model->name . ".id");
 
         // Do the database quiries to return the data
         // Group by needs to be "hacked" onto the conditions, since Cake php 1.1 has no direct support
         //  for it. However, in findCound, the group by must be absent.
-        $data = $this->model->$customModelFindFunction($conditions . $groupBy,
-                         $this->fields, $order, $limit, $page, $this->recursive, array($joinTable));
+        $data = $this->model->$customModelFindFunction('all', array('conditions' => $conditions,
+                                                                    'group'      => $groupBy,
+                                                                    'fields'     => $this->fields, 
+                                                                    'order'      => $order, 
+                                                                    'limit'      => $limit, 
+                                                                    'page'       => $page, 
+                                                                    'recursive'  => $this->recursive,
+                                                                    'joins'      => array($joinTable)));
 
         // Counts a a bit more difficult with grouped, joint tables.
         if (isset($customModelCountFunction)) {
             $count = $this->model->$customModelCountFunction
                 ($conditions, $groupBy, $this->recursive, array($joinTable));
         } else {
-            $count = $this->betterCount
-                ($conditions, $groupBy, $this->recursive, array($joinTable));
-
+            //$count = $this->betterCount
+            //    ($conditions, $groupBy, $this->recursive, array($joinTable));
+          $count = $this->model->$customModelFindFunction('count', array('conditions' => $conditions,
+                                                                         'joins'      => array($joinTable)));
         }
 
         // Format the dates as given in the iPeer database
@@ -315,7 +317,7 @@ class AjaxListComponent extends Object {
 
         $sql .= " ) as aTableForCount";
 
-        list($data) = $this->model->findBySql($sql);
+        list($data) = $this->model->query($sql);
 
         return isset($data[0]['count']) ? $data[0]['count'] : 0;
     }
@@ -381,7 +383,8 @@ class AjaxListComponent extends Object {
                     $postProcess = null,
                     $listName = null,
                     $customModelFindFunction = null,
-                    $customModelCountFunction = null)
+                    $customModelCountFunction = null,
+                    $conditions = array())
     {
         // Set up the basics
         $this->model = $model;
@@ -397,6 +400,8 @@ class AjaxListComponent extends Object {
         // Setup up the custom variables
         $this->customModelFindFunction = $customModelFindFunction;
         $this->customModelCountFunction = $customModelCountFunction;
+
+        $this->conditions = $conditions;
 
         // Generate the fields
         $this->fields = array();

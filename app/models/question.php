@@ -28,30 +28,55 @@
 class Question extends AppModel
 {
   var $name = 'Question';
+  var $displayField = 'prompt';
+
+  var $hasMany = array('Response' =>
+                       array('className' => 'Response',
+                             'foreignKey' => 'question_id',
+                             'dependent' => true)
+                      );
+
+  var $hasAndBelongsToMany = array('Survey' =>
+                                   array('className'    =>  'Survey',
+                                         'joinTable'    =>  'survey_questions',
+                                         'foreignKey'   =>  'question_id',
+                                         'associationForeignKey'    =>  'survey_id',
+                                         'conditions'   =>  '',
+                                         'order'        =>  '',
+                                         'limit'        => '',
+                                         'unique'       => true,
+                                         'finderQuery'  => '',
+                                         'deleteQuery'  => '',
+                                         'dependent'    => false,
+                                        ),
+                       );
+
+  var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable');
 
   // prepares the data by moving varibles in the form to the data question sub array
   function prepData($data)
   {
-  	$data['data']['Question']['master'] = $data['form']['master'];
-	$data['data']['Question']['type'] = $data['form']['type'];
-	$data['data']['Question']['count'] = $data['form']['data']['Question']['count'];
+    $data['data']['Question']['master'] = $data['form']['master'];
+    $data['data']['Question']['type'] = $data['form']['type'];
+    $data['data']['Question']['count'] = $data['form']['data']['Question']['count'];
 
-	return $data;
+    return $data;
   }
 
   // sets the data variable up with proper formating in the array for display
   function fillQuestion($data)
   {
-	for( $i=0; $i<$data['count']; $i++ ){
-		$data[$i]['Question'] = $this->findAll($conditions='id='.$data[$i]['SurveyQuestion']['question_id'], $fields="prompt, type");
-		$data[$i]['Question'] = $data[$i]['Question'][0]['Question'];
-		$data[$i]['Question']['number'] = $data[$i]['SurveyQuestion']['number'];
-		$data[$i]['Question']['id'] = $data[$i]['SurveyQuestion']['question_id'];
-		$data[$i]['Question']['sq_id'] = $data[$i]['SurveyQuestion']['id'];
-		unset($data[$i]['SurveyQuestion']);
-	}
+    for( $i=0; $i<$data['count']; $i++ ){
+      $data[$i]['Question'] = $this->find('all',array('conditions' => array('id' => $data[$i]['SurveyQuestion']['question_id']),
+                                                      'fields' => array('prompt', 'type')));
+      $data[$i]['Question'] = $data[$i]['Question'][0]['Question'];
+      $data[$i]['Question']['number'] = $data[$i]['SurveyQuestion']['number'];
+      $data[$i]['Question']['id'] = $data[$i]['SurveyQuestion']['question_id'];
+      $data[$i]['Question']['sq_id'] = $data[$i]['SurveyQuestion']['id'];
+      unset($data[$i]['SurveyQuestion']);
+    }
 
-	return $data;
+    return $data;
   }
 
   // delete old question references in each table

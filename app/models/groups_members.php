@@ -44,21 +44,22 @@ class GroupsMembers extends AppModel
  }
 
   // returns the user_id of all members in a specific group
-  function getMembers($id=null){
-  	  $tmp = $this->findAll($conditions = 'group_id='.$id, $fields = 'user_id');
-	  $tmp['member_count'] = count($tmp); //$this->findCount($conditions = 'group_id='.$id);
+  function getMembers($id){
+    $tmp = $this->find('all',array('conditions' => array('group_id' => $id),
+                                   'fields' => array('id')));
+    $tmp['member_count'] = count($tmp); 
 
 	  return $tmp;
   }
 
 
-    function countMembers($groupID) {
-        if (!is_numeric($groupID)) {
-            return -1;
-        } else {
-            return $this->findCount("`group_id`=$groupID");
-        }
+  function countMembers($groupID) {
+    if (!is_numeric($groupID)) {
+      return -1;
+    } else {
+      return $this->find('count', array('conditions' => array('group_id' => $groupID)));
     }
+  }
 
   function getEventGroupMembers ($groupId, $selfEval, $userId)
   {
@@ -72,7 +73,7 @@ class GroupsMembers extends AppModel
     $fields = 'User.id, User.role, User.username, User.first_name, User.last_name, User.student_no, User.title, User.email';
     $joinTable = array(' RIGHT JOIN users as User ON User.id=GroupsMembers.user_id');
 
-    return $this->findAll($condition, $fields, 'User.last_name ASC', null, null, null, $joinTable );
+    return $this->find('all',$condition, $fields, 'User.last_name ASC', null, null, null, $joinTable );
 
   }
 }

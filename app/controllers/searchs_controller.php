@@ -28,7 +28,7 @@ class SearchsController extends AppController
 		$this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
- 		$this->pageTitle = 'Advanced Search';
+ 		$this->set('title_for_layout', 'Advanced Search');
 		parent::__construct();
 	}
 
@@ -36,7 +36,7 @@ class SearchsController extends AppController
 
     $role = $this->rdAuth->role;
 
-  	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+  	$personalizeData = $this->Personalize->find('all','user_id = '.$this->rdAuth->id);
     $this->userPersonalize->setPersonalizeList($personalizeData);
   	if ($personalizeData && $this->userPersonalize->inPersonalizeList('Search.ListMenu.Limit.Show')) {
        $this->show = $this->userPersonalize->getPersonalizeValue('Search.ListMenu.Limit.Show');
@@ -83,7 +83,7 @@ class SearchsController extends AppController
       $this->layout = false;
 
     if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-    	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+    	$personalizeData = $this->Personalize->find('all','user_id = '.$this->rdAuth->id);
     	if ($personalizeData) {
     	   $this->userPersonalize->setPersonalizeList($personalizeData);
          $this->show = $this->userPersonalize->getPersonalizeValue('Search.ListMenu.Limit.Show');
@@ -118,7 +118,7 @@ class SearchsController extends AppController
 
         $searchMartix = $this->SearchHelper->formatSearchEvaluationResult($maxPercent,$minPercent,$eventId,$status, $this->order, $this->show, $this->page, $this->sortBy, $this->direction);
 
-        $eventList = $this->rdAuth->role == 'A' ? $this->Event->findAll('event_template_type_id != 3') : $this->Event->findAll('creator_id = '.$this->rdAuth->id . ' AND event_template_type_id !=3');
+        $eventList = $this->rdAuth->role == 'A' ? $this->Event->find('all','event_template_type_id != 3') : $this->Event->find('all','creator_id = '.$this->rdAuth->id . ' AND event_template_type_id !=3');
         $this->set('sticky', $sticky);
         $this->set('eventList', $eventList);
         $this->set('data', $searchMartix['data']);
@@ -159,7 +159,7 @@ class SearchsController extends AppController
     if ($courseId == 'A') {
       $condition = '';
   }
-    $this->set('eventList',$this->Event->findAll($condition));
+    $this->set('eventList',$this->Event->find('all',$condition));
   }
 
 }?>

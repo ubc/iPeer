@@ -25,7 +25,8 @@
  * @subpackage
  * @since
  */
-uses('sanitize', 'neat_string');
+uses('sanitize');
+App::import('Lib', 'neat_string');
 class LoginoutController extends AppController
 {
 	/**
@@ -41,7 +42,7 @@ class LoginoutController extends AppController
 	function __construct()
 	{
 		$this->Sanitize = new Sanitize;
-		$this->pageTitle = 'Login';
+		$this->set('title_for_layout', 'Login');
 		$this->NeatString = new NeatString;
 		parent::__construct();
 	}
@@ -70,10 +71,10 @@ class LoginoutController extends AppController
 			$cwlErr = $this->Session->read('CWLErr');
 			if ($cwlErr == 'STUDENT_INVALID_LOGIN'){
 				$this->set('errmsg', 'Access Denied. <br>Student must login by using UBC CWL Authentication.<br>If you are experiencing any issues regarding iPeer, please contact the iPeer administrator at <a href="mailto:ipeer.support@ubc.ca">ipeer.support@ubc.ca</a>.');
-				$this->Session->del('CWLErr');
+				$this->Session->delete('CWLErr');
 			} else if ($cwlErr!=''){
 				$this->set('errmsg', 'Access Denied. <br>You have successfully logged in using your CWL account but you do not have access to the iPeer application.<br>If you are experiencing any issues regarding iPeer, please contact the iPeer administrator at <a href="mailto:ipeer.support@ubc.ca">ipeer.support@ubc.ca</a>.');
-				$this->Session->del('CWLErr');
+				$this->Session->delete('CWLErr');
 			}
 
 			$lastURL = $this->Session->read('URL');
@@ -81,17 +82,12 @@ class LoginoutController extends AppController
 			$message = $this->Session->read('Message');
 			//$a=print_r($this->rdAuth->Session,true); echo "<pre>$a</pre>"; exit;
 			if (empty($lastURL)){
-
 				if ($accessErr=='INVALID_LOGIN'){
 					$this->set('errmsg', 'Access Denied. <br>Invalid Username/Password Combination.');
-					$this->Session->del('URL');
-					$this->Session->del('AccessErr');
+					$this->Session->delete('URL');
+					$this->Session->delete('AccessErr');
 				}
-
-
 			} else {
-
-
 				if ($accessErr=='NO_LOGIN'){
 					$this->set('errmsg', 'please log in to see: '.$lastURL);
 				}
@@ -101,12 +97,11 @@ class LoginoutController extends AppController
 				if ($accessErr=='INVALID_USER'){
 					$this->set('errmsg', 'Access Denied. <br>UBC CWL Authentication is only valid for students. <br>If you are experiencing any issues regarding the iPeer, please contact your administrator for details.');
 				}
-				$this->Session->del('URL');
-				$this->Session->del('AccessErr');
+				$this->Session->delete('URL');
+				$this->Session->delete('AccessErr');
 			}
 
 			$this->render($redirect);
-			exit;
 		}
 
 	}
@@ -141,18 +136,18 @@ class LoginoutController extends AppController
 			} else {
 				if ($accessErr=='NO_LOGIN'){
 					$this->set('errmsg', 'Please Login to see '.$lastURL);
-					$this->Session->del('URL');
+					$this->Session->delete('URL');
 				}
 				if ($accessErr=='NO_PERMISSION'){
 					$this->set('errmsg', 'Permission Denied to see: '.$lastURL);
-					$this->Session->del('URL');
+					$this->Session->delete('URL');
 				}
 			}
 
 			$this->render($redirect);
 		} else {
 			$this->Output->filter($this->params['data']);//always filter
-			$this->Sanitize->cleanArray($this->params['data']);
+			$this->Sanitize->clean($this->params['data']);
 			$this->User->recursive = 0;
 			$this->params['data']['User']['username'] = $this->Sanitize->paranoid($this->params['data']['User']['username'],array('.','_','-'));
 			$this->params['data']['User']['password'] = md5(trim($this->params['data']['User']['password']));
@@ -311,7 +306,7 @@ class LoginoutController extends AppController
 	 */
 	function clearSession() {
         foreach ($this->Session->read() as $key => $value) {
-            $this->Session->del($key);
+            $this->Session->delete($key);
         }
 	}
 
@@ -326,14 +321,13 @@ class LoginoutController extends AppController
 		$this->clearSession();
 		$redirect = 'loginout/login';
 		$this->redirect($redirect);
-
 	}
 
 	function __renderLoginPage()
 	{
 		$redirect = 'login';
 		//sets up the system parameters to system contrainer
-		$allParameters = $this->SysParameter->findAll(null, array('id', 'parameter_code', 'parameter_value', 'parameter_type'));
+		$allParameters = $this->SysParameter->find('all', array('id', 'parameter_code', 'parameter_value', 'parameter_type'));
 		$this->sysContainer->setParamList($allParameters);
 
 		$sysParameter = $this->sysContainer->getParamByParamCode('custom.login_control');
@@ -351,8 +345,8 @@ class LoginoutController extends AppController
 				$redirect = $paraLogin['parameter_value'];
 			}
 		} else {
-            //Setup Custom parameter
-            $this->Session->write('ipeerSession.customIntegrateCWL', 0);
+      //Setup Custom parameter
+      $this->Session->write('ipeerSession.customIntegrateCWL', 0);
 			$redirect = 'login';
 		}
 		return $redirect;

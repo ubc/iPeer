@@ -25,12 +25,12 @@ class EvaluationRubric extends AppModel
 
 	// gets rubric evaluation result for a specific assignment and evaluator
 	function getResultsByEvaluatee($grpEventId=null, $evaluatee=null) {
-    return $this->findAll('grp_event_id='.$grpEventId.' AND evaluatee='.$evaluatee, null, 'evaluator ASC');
+    return $this->find('all','grp_event_id='.$grpEventId.' AND evaluatee='.$evaluatee, null, 'evaluator ASC');
 	}
 
 	// gets rubric evaluation result for a specific assignment and evaluator
 	function getResultsByEvaluator($grpEventId=null, $evaluator=null) {
-    return $this->findAll('grp_event_id='.$grpEventId.' AND evaluator='.$evaluator, null, 'evaluatee ASC');
+    return $this->find('all','grp_event_id='.$grpEventId.' AND evaluator='.$evaluator, null, 'evaluatee ASC');
 	}
 
 	// gets rubric evaluation result for a specific assignment and evaluator
@@ -39,11 +39,11 @@ class EvaluationRubric extends AppModel
         $fields = 'EvaluationRubricDetail.*';
         $joinTable = array(' LEFT JOIN evaluation_rubric_details AS EvaluationRubricDetail ON EvaluationRubric.id=EvaluationRubricDetail.evaluation_rubric_id');
 
-        return $this->findAll($condition, $fields, 'EvaluationRubric.id ASC, EvaluationRubricDetail.criteria_number ASC', null, null, null, $joinTable );
+        return $this->find('all',$condition, $fields, 'EvaluationRubric.id ASC, EvaluationRubricDetail.criteria_number ASC', null, null, null, $joinTable );
 	}
 
 	function getCriteriaResults($grpEventId=null,$evaluatee=null) {
-        $data = $this->findBySql('SELECT ' .
+        $data = $this->query('SELECT ' .
                 'SUM(EvaluationRubricDetail.grade) AS sumScore, ' .
                 'COUNT(EvaluationRubricDetail.grade) As count, ' .
                 'EvaluationRubricDetail.criteria_number as criteria FROM evaluation_rubrics ' .
@@ -69,7 +69,7 @@ class EvaluationRubric extends AppModel
         $fields = 'EvaluationRubricDetail.*';
         $joinTable = array(' LEFT JOIN evaluation_rubric_details AS EvaluationRubricDetail ON EvaluationRubric.id=EvaluationRubricDetail.evaluation_rubric_id');
 
-        return $this->findAll($condition, $fields, 'EvaluationRubric.id ASC, EvaluationRubricDetail.criteria_number ASC', null, null, null, $joinTable );
+        return $this->find('all',$condition, $fields, 'EvaluationRubric.id ASC, EvaluationRubricDetail.criteria_number ASC', null, null, null, $joinTable );
 	}
 
 	// get total mark each member recieved
@@ -78,7 +78,7 @@ class EvaluationRubric extends AppModel
 	}
 
 	function getAllComments($grpEventId=null, $evaluatee=null) {
-        return $this->findAll('grp_event_id='.$grpEventId.' AND evaluatee='.$evaluatee,'general_comment');
+        return $this->find('all','grp_event_id='.$grpEventId.' AND evaluatee='.$evaluatee,'general_comment');
 	}
 
 	// get total evaluator each member recieved
@@ -87,15 +87,15 @@ class EvaluationRubric extends AppModel
 	}
 
 	function getOppositeGradeReleaseStatus($groupEventId=null, $releaseStatus){
-        return $this->findCount('grp_event_id='.$groupEventId.' AND grade_release != '.$releaseStatus);
+        return $this->find(count,'grp_event_id='.$groupEventId.' AND grade_release != '.$releaseStatus);
 	}
 
 	function getOppositeCommentReleaseStatus($groupEventId=null, $releaseStatus){
-        return $this->findCount('grp_event_id='.$groupEventId.' AND comment_release != '.$releaseStatus);
+        return $this->find(count,'grp_event_id='.$groupEventId.' AND comment_release != '.$releaseStatus);
 	}
 
 	function getTeamReleaseStatus($groupEventId=null){
-        return $this->findAll('grp_event_id='.$groupEventId.' GROUP BY evaluatee', 'evaluatee, comment_release, grade_release', 'evaluatee');
+        return $this->find('all','grp_event_id='.$groupEventId.' GROUP BY evaluatee', 'evaluatee, comment_release, grade_release', 'evaluatee');
 	}
 
 	function setAllEventCommentRelease($eventId=null, $releaseStatus=null) {

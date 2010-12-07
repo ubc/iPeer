@@ -34,11 +34,6 @@ class Survey extends AppModel
                                'conditions' =>  '',
                                'order'      =>  '',
                                'foreignKey' =>  'course_id'),
-                         'Creator' =>
-                         array('className'  =>  'User',
-                               'conditions' =>  '',
-                               'order'      =>  '',
-                               'foreignKey' =>  'creator_id')
                         );
 
   var $hasMany = array('SurveyGroupSet' =>
@@ -53,29 +48,63 @@ class Survey extends AppModel
                              'fields'        => '',
                              'offset'        => '',
                              'counterQuery'  => ''
-                             )
+                             ),
+                       'Event' =>
+                       array('className'    => 'Event',
+                             'conditions'   => 'Event.event_template_type_id = 3',
+                             'order'         => '',
+                             'limit'         => '',
+                             'foreignKey'    => 'template_id',
+                             'dependent'     => true,
+                             'exclusive'     => false,
+                             'finderQuery'   => '',
+                             'fields'        => '',
+                             'offset'        => '',
+                             'counterQuery'  => ''),
+                      );
+
+  var $hasAndBelongsToMany = array('Question' =>
+                                   array('className'    =>  'Question',
+                                         'joinTable'    =>  'survey_questions',
+                                         'foreignKey'   =>  'survey_id',
+                                         'associationForeignKey'    =>  'question_id',
+                                         'conditions'   =>  '',
+                                         'order'        =>  '',
+                                         'limit'        => '',
+                                         'unique'       => true,
+                                         'finderQuery'  => '',
+                                         'deleteQuery'  => '',
+                                         'dependent'    => false,
+                                        ),
                        );
 
+  var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Copyable');
 
-    function __checkDuplicateSurvey() {
+  var $contain = array('Question');
 
-        // Set up query condition for dusplicates
-        $conditions = "";
-        $conditions.= "name='" . $this->data[$this->name]['name'] . "'";
-        if (!empty($this->data[$this->name]['id'])) {
-            $conditions.= "and not Survey.id='" . $this->data[$this->name]['id'] . "'";
-        }
+  function __construct($id = false, $table = null, $ds = null) {
+    parent::__construct($id, $table, $ds);
+    $this->virtualFields['event_count'] = sprintf('SELECT count(*) as count FROM events as event WHERE event.event_template_type_id = 3 AND event.template_id = %s.id', $this->alias);
+  }
 
-        $count = $this->findCount($conditions);
-        $duplicate = $count > 0;
-
-        if ($duplicate) {
-          $this->errorMessage='Duplicate Survey found. Please change the Survey name and try again';
-          return false;
-        } else {
-          return true;
-        }
+  function __checkDuplicateSurvey() {
+    // Set up query condition for dusplicates
+    $conditions = array();
+    $conditions['name'] = $this->data[$this->alias]['name'];
+    if (!empty($this->data[$this->alias]['id'])) {
+      $conditions[$this->alias.'.id <>']= $this->data[$this->name]['id'];
     }
+
+    $count = $this->find('count', array('conditions' =>$conditions));
+    $duplicate = $count > 0;
+
+    if ($duplicate) {
+      $this->errorMessage='Duplicate Survey found. Please change the Survey name and try again';
+      return false;
+    } else {
+      return true;
+    }
+  }
 
   function getSurveyIdByCourseIdTitle($courseId=null,$title=null) {
     $tmp = $this->find('course_id='.$courseId.' AND name=\''.$title.'\'','id');
@@ -85,33 +114,58 @@ class Survey extends AppModel
 
   function beforeSave() {
     // Ensure the name is not empty
-    if (empty($this->data[$this->name]['name'])) {
-        $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
+    if (empty($this->data[$this->alias]['name'])) {
+        $this->errorMessage = "Please enter a new name for this " . $this->alias. ".";
         return false;
     }
 
     // Remove any single quotes in the name, so that custom SQL queries are not confused.
     $this->data[$this->name]['name'] =
         str_replace("'", "", $this->data[$this->name]['name']);
-    return $this->__checkDuplicateSurvey();
+
+    if(!$this->__checkDuplicateSurvey()) {
+      return false;
+    }
+
+    return parent::beforeSave();;
   }
 
-  function beforeDelete() {
+/*  function beforeDelete() {
     $event = new Event();
     return $event->removeEventsBySurveyId($this->id);
-  }
+  }*/
 
   function getSurveyResult($courseId=null) {
     $condition = 'Survey.course_id='.$courseId;
     $fields = 'Survey.id,Survey.name,User.id,User.first_name,User.last_name,User.student_no,EvaluationSubmission.id,EvaluationSubmission.submitted,EvaluationSubmission.date_submitted';
-    $joinTable = array(' LEFT JOIN (users as Users CROSS JOIN evaluation_submissions as EvaluationSubmission) ON (User.id=EvaluatonSubmission.submitter_id');
+    $joinTable = array(' LEFT JOIN (users as Users CROSS JOIN evaluation_submissions as EvaluationSubmission) ON (User.id=EvaluationSubmission.submitter_id');
 
-    return $this->findAll($condition, $fields, null, null, null, null, $joinTable );
+    return $this->find('all',$condition, $fields, null, null, null, null, $joinTable );
   }
 
   function getSurveyTitleById($id=null) {
     $tmp = $this->findById($id);
     return $tmp['Survey']['name'];
+  }
+
+  function getSurveyWithSubmissionById($survey_id, $conditions = array()) {
+    $evaluation_submission = Classregistry::init('EvaluationSubmission');
+
+    $survey = $this->find('first',array('conditions' => array('Survey.id' => $survey_id),
+                                                'contain' => array('Course' => array('Enrol' => array('conditions' => $conditions)),
+                                                                   'Event')));
+    if(empty($survey)) return false;
+
+    $user_ids = Set::extract('/Course/Enrol/id', $survey);
+    $submissions = $evaluation_submission->find('list', array('conditions' => array('event_id' => $survey['Event'][0]['id'],
+                                                                                   'submitter_id' => $user_ids),
+                                                              'fields' => array('submitter_id', 'date_submitted')));
+
+    foreach($survey['Course']['Enrol'] as $key => $student) {
+      $survey['Course']['Enrol'][$key]['date_submitted'] = isset($submissions[$student['id']]) ? $submissions[$student['id']] : '';
+    }
+
+    return $survey;
   }
 }
 

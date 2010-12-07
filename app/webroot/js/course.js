@@ -20,3 +20,15 @@
     }
     return false;
   }
+
+Element.addMethods("SELECT", (function() {
+    function getSelectedOptionHTML(element) {
+        if (!(element = $(element))) return;
+        var index = element.selectedIndex;
+        return index >= 0 ? element.options[index].innerHTML : undefined;
+    }
+
+    return {
+        getSelectedOptionHTML: getSelectedOptionHTML
+    };
+})());

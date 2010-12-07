@@ -14,9 +14,9 @@ class rdAuthComponent extends AppController // This component is in fact a
 
     var $modelClass;  // For contructClasses to Work with no warnin
 
-    function __construct() {
+/*    function __construct() {
         $this->constructClasses();
-    }
+    }*/
 
 	var $components = array('Session');
     var $uses = array('User');
@@ -111,7 +111,7 @@ class rdAuthComponent extends AppController // This component is in fact a
     /**
      * Display a simple message the access was denied, with the option to go back.
      */
-    function privilegeError($message = "") {
+/*    function privilegeError($message = "") {
         echo "<html><head><title>iPeer: Access Denied</title></head><body>";
         echo "<center><div style='width:50%; padding: 20px;border: 1px solid #000; background-color:#FFFFE0'>";
         echo "<h1>iPeer</h1>";
@@ -122,7 +122,7 @@ class rdAuthComponent extends AppController // This component is in fact a
         echo "</div>";
         echo "</center></body></html>";
         exit;
-    }
+    }*/
 
 
 
@@ -160,13 +160,13 @@ class rdAuthComponent extends AppController // This component is in fact a
 	 * Clear the Session of rdAuth user data
 	 */
 	function clearUserDataFromSession() {
-		$this->Session->del('ipeerSession.id');
-		$this->Session->del('ipeerSession.username');
-		$this->Session->del('ipeerSession.fullname');
-		$this->Session->del('ipeerSession.role');
-		$this->Session->del('ipeerSession.email');
-		$this->Session->del('ipeerSession.courseId');
-		$this->Session->del('ipeerSession');
+		$this->Session->delete('ipeerSession.id');
+		$this->Session->delete('ipeerSession.username');
+		$this->Session->delete('ipeerSession.fullname');
+		$this->Session->delete('ipeerSession.role');
+		$this->Session->delete('ipeerSession.email');
+		$this->Session->delete('ipeerSession.courseId');
+		$this->Session->delete('ipeerSession');
 	}
 
 	/**
@@ -209,7 +209,7 @@ class rdAuthComponent extends AppController // This component is in fact a
 
 	function setCourseId($courseId=null)
 	{
-		$this->Session->del('ipeerSession.courseId');
+		$this->Session->delete('ipeerSession.courseId');
 		$this->Session->write('ipeerSession.courseId', $courseId);
 		$this->courseId = $this->Session->read('ipeerSession.courseId');
 	}

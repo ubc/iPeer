@@ -29,46 +29,120 @@ class Group extends AppModel
 {
   var $name = 'Group';
 
-  var $hasMany = array('GroupEvent' => array('className' => 'GroupEvent',
-                                             'dependent' => true
-                                            ),
-                       'GroupsMember' => array('className' => 'GroupsMembers',
-                                               'dependent' => true
-                                              )
-                      );
-  var $validate = array('group_num' => VALID_NOT_EMPTY);
+  var $schema = array('id' => array('type' => 'integer',
+                                     'null' => false,
+                                     'default' => null,
+                                     'length' => 11,
+                                     'key' => 'primary'),
+                       'group_num' => array('type' => 'integer',
+                                     'null' => false,
+                                     'default' => 0,
+                                     'length' => 4),
+                       'group_name' => array('type' => 'string',
+                                     'null' => true,
+                                     'default' => null,
+                                     'length' => 80,
+                                     'collate' => 'latin1_swedish_ci',
+                                     'charset' => 'latin1'),
+                       'course_id' => array('type' => 'integer',
+                                     'null' => true,
+                                     'default' => null,
+                                     'length' => 11),
+                       'record_status' => array('type' => 'enum("A", "I")',
+                                     'null' => false,
+                                     'default' => 'A',
+                                     'length' => 1,
+                                     'collate' => 'latin1_swedish_ci',
+                                     'charset' => 'latin1'),
+                       'creator_id' => array('type' => 'integer',
+                                     'null' => false,
+                                     'default' => 0,
+                                     'length' => 11),
+                       'updater_id' => array('type' => 'integer',
+                                     'null' => true,
+                                     'default' => null,
+                                     'length' => 11),
+                       'created' => array('type' => 'datetime',
+                                     'null' => false,
+                                     'default' => '0000-00-00 00:00:00',
+                                     'length' => null),
+                       'modified' => array('type' => 'datetime',
+                                     'null' => true,
+                                     'default' => null,
+                                     'length' => null),
+                       );
 
-	function beforeSave(){ //serverside validation
-        // Ensure the name is not empty
-        if (empty($this->data[$this->name]['group_name'])) {
-            $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
-            return false;
-        }
+  var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable');
 
-        // Remove any single quotes in the name, so that custom SQL queries are not confused.
-        $this->data[$this->name]['group_name'] =
-            str_replace("'", "", $this->data[$this->name]['group_name']);
+  var $belongsTo = array('Course' => array('className' => 'Course',
+                                           'foreignKey' => 'course_id'));
 
-		return true;
-	}
+  var $hasAndBelongsToMany = array('Member' =>
+                                   array('className'    =>  'User',
+                                         'joinTable'    =>  'groups_members',
+                                         'foreignKey'   =>  'group_id',
+                                         'associationForeignKey'    =>  'user_id',
+                                         'conditions'   =>  '',
+                                         'order'        =>  '',
+                                         'limit'        => '',
+                                         'unique'       => true,
+                                         'finderQuery'  => '',
+                                         'deleteQuery'  => '',
+                                         'dependent'    => false,
+                                         ),
+                                   'Evnet' =>
+                                   array('className'    =>  'Event',
+                                         'joinTable'    =>  'group_events',
+                                         'foreignKey'   =>  'group_id',
+                                         'associationForeignKey'    =>  'event_id',
+                                         'conditions'   =>  '',
+                                         'order'        =>  '',
+                                         'limit'        => '',
+                                         'unique'       => true,
+                                         'finderQuery'  => '',
+                                         'deleteQuery'  => '',
+                                         'dependent'    => false,
+                                        ),);
+  var $validate = array('group_num' => 'notEmpty');
+
+  function __construct($id = false, $table = null, $ds = null) {
+    parent::__construct($id, $table, $ds);
+
+    $this->virtualFields['member_count'] = sprintf('SELECT count(*) as count FROM groups_members as gm WHERE gm.group_id = %s.id', $this->alias);
+  }
+
+  function schema($field = false) {
+    $this->_schema = $this->schema;
+    return $this->schema;
+  }
+
+  function beforeSave(){ //serverside validation
+    // Ensure the name is not empty
+    if (empty($this->data[$this->name]['group_name'])) {
+      $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
+      return false;
+    }
+
+    // Remove any single quotes in the name, so that custom SQL queries are not confused.
+    $this->data[$this->name]['group_name'] =
+      str_replace("'", "", $this->data[$this->name]['group_name']);
+
+    return parent::beforeSave();
+  }
 
   function getCourseGroupCount($courseId=null) {
     return $this->find('course_id='.$courseId, 'COUNT(DISTINCT id) as total');
   }
 
-	// gets all students in database
-	function findStudents(){
-		return $this->findBySql("SELECT users.id, users.role, users.username, users.first_name, users.last_name, users.student_no, users.title FROM users WHERE role='S'");
-	}
-
 	// gets all students in a specific group
-	function groupStudents($id=null){
-		$tmp = $this->findBySql("SELECT * FROM groups_members WHERE group_id=".$id);
+  // replaced with getMembers($group_id)
+	/*function groupStudents($id=null){
+		$tmp = $this->query("SELECT * FROM groups_members WHERE group_id=".$id);
 		$count = sizeof( $tmp );
 		$result = null;
 
 		for( $i=0; $i<$count; $i++ ){
-			$tmp2 = $this->findBySql("SELECT users.id, users.role, users.username, users.first_name, users.last_name, users.student_no, users.title FROM users WHERE id=".$tmp[$i]['groups_members']['user_id']." ORDER BY users.last_name ASC");
+			$tmp2 = $this->query("SELECT users.id, users.role, users.username, users.first_name, users.last_name, users.student_no, users.title FROM users WHERE id=".$tmp[$i]['groups_members']['user_id']." ORDER BY users.last_name ASC");
 			if(!empty($tmp2[0])) {
                 $result[$i] = $tmp2[0];
             } else {
@@ -79,15 +153,15 @@ class Group extends AppModel
 
 		//print_r($result);
 		return $result;
-	}
+	}*/
 
 	// finds all students not in a particular course
-	function groupDifference($id=null,$courseId=null){
-		return $this->findBySql("SELECT DISTINCT users.id, users.role, users.username, users.first_name, users.last_name, users.student_no, users.title
+	/*function groupDifference($id=null,$courseId=null){
+		return $this->query("SELECT DISTINCT users.id, users.role, users.username, users.first_name, users.last_name, users.student_no, users.title
 								 FROM users
 								 JOIN user_enrols on users.id=user_enrols.user_id
 								 WHERE user_enrols.course_id=".$courseId." AND users.role = 'S' AND users.id NOT IN (SELECT user_id as id from groups_members where group_id=".$id.") ORDER BY users.last_name ASC");
-	}
+	}*/
 
 	function prepDataImport($lines=null)
 	{
@@ -105,7 +179,7 @@ class Group extends AppModel
 	}
 
 	// parses the group members id from the hidden field assigned
-	function prepData($data=null){
+	/*function prepData($data=null){
 		$tmp = $data['form']['assigned'];
 		$member_count=0;
 
@@ -120,22 +194,24 @@ class Group extends AppModel
 		$data['data']['Group']['record_status'] = $data['form']['record_status'];
 
 		return $data;
-	}
+	}*/
 
-	function getLastGroupNumByCourseId($courseId=null) {
-        $tmp = $this->find('course_id='.$courseId, 'max(group_num)');
-        $maxGroupNum = $tmp[0]['max(group_num)'];
-        if (empty($maxGroupNum)) {
-            $maxGroupNum = 1;
-        }
-        return $maxGroupNum;
-	}
+  function getLastGroupNumByCourseId($course_id) {
+    $tmp = $this->find('first', array('conditions' => array('course_id' => $course_id), 
+                                      'fields' => array('max(group_num)'),
+                                      'contain' => false));
+    $maxGroupNum = $tmp[0]['max(group_num)'];
+    if (empty($maxGroupNum)) {
+      $maxGroupNum = 1;
+    }
+    return $maxGroupNum;
+  }
 
   function getFilteredStudents($group_id, $filter){
     $course_id = $this->field('course_id',sprintf("id = '%d'", $group_id));
     if($filter)
     {
-      return $this->findBySql("SELECT DISTINCT users.id, users.role, users.username, users.first_name, users.last_name, users.student_no, users.title
+      return $this->query("SELECT DISTINCT users.id, users.role, users.username, users.first_name, users.last_name, users.student_no, users.title
                               FROM users
                               JOIN user_enrols on users.id=user_enrols.user_id
                               WHERE user_enrols.course_id=".$course_id." AND users.role = 'S' AND users.id NOT IN
@@ -144,6 +220,14 @@ class Group extends AppModel
     }else{
       return $this->groupDifference($group_id,$course_id);
     }
+  }
+
+  function getStudentsNotInGroup($group_id, $type = 'all') {
+    return $this->Member->getStudentsNotInGroup($group_id, $type);
+  }
+
+  function getMembersByGroupId($group_id, $type = 'all') {
+    return $this->Member->getMembersByGroupId($group_id, $type);
   }
 }
 

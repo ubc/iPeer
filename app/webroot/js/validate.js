@@ -1,5 +1,6 @@
 window.onload = attachFormHandlers;
-var USERNAME_FORMAT = /^[a-zA-Z0-9@_\.-]{6,}$/;
+//var USERNAME_FORMAT = /^[a-zA-Z0-9@_\.-]{6,}$/;
+var STUDENTNO_FORMAT = /^[a-zA-Z0-9@_\.-]{6,}$/;
 var PASSWORD_FORMAT = /^[a-zA-Z0-9]{6,}$/;
 var EMAIL_FORMAT = /^[\w-\.]+\@[\w\.-]+\.[a-z]{2,4}$/;
 //var TEXT_FORMAT = /^[\w ]+$/; //at least one word

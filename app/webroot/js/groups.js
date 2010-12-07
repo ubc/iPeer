@@ -45,31 +45,23 @@ function itemMove(fbox, tbox) {
 
 	var assigned = "";
 
-    for (i = 0; i < document.forms[0].selected_groups.length - 1; i++){
-        if (document.forms[0].selected_groups.options[i] != -1){
-            assigned = assigned + document.forms[0].selected_groups.options[i].value + ":";
-		}
-	}
-	if (document.forms[0].selected_groups.length > 0) {
-        assigned = assigned + document.forms[0].selected_groups.options[i].value;
+  for (i = 0; i < tbox.length - 1; i++){
+    if (tbox.options[i] != -1){
+      assigned = assigned + tbox.options[i].value + ":";
+    }
 	}
 
-	document.forms[0].assigned.value = assigned;
+	if (tbox.length > 0) {
+        assigned = assigned + tbox.options[i].value;
+	}
+
+	//document.forms[0].assigned.value = assigned;
 }
 
 function processSubmit(gbox)
 {
-	var assigned = "";
 	var i;
-
 	for (i = 0; i < gbox.options.length; i++) {
-		assigned += gbox.options[i].value;
-
-		if(i < gbox.options.length - 1)
-		{
-			assigned += ":";
-		}
+    gbox.options[i].selected = true;
 	}
-
-	document.forms[0].assigned.value = assigned;
 }

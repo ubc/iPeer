@@ -1,7 +1,7 @@
 <?php
 class EvaluationSurveyHelperComponent extends Object
 {
-	var $components = array('rdAuth', 'EvaluationHelper');
+	var $components = array('Auth', 'Session', 'EvaluationHelper');
 
     function saveSurveyEvaluation($params=null)
     {
@@ -115,7 +115,7 @@ class EvaluationSurveyHelperComponent extends Object
 	  $aveScore = 0; $groupAve = 0;
 	  $studentResult = array();
 
-	  $results = $this->EvaluationSimple->getResultsByEvaluatee($event['group_event_id'], $this->rdAuth->id);
+	  $results = $this->EvaluationSimple->getResultsByEvaluatee($event['group_event_id'], $this->Auth->user('id'));
 		if ($results !=null) {
        //Get Grade Release: grade_release will be the same for all evaluatee records
        $gradeReleaseStatus = $results[0]['EvaluationSimple']['grade_release'];
@@ -124,11 +124,11 @@ class EvaluationSurveyHelperComponent extends Object
 
           //Get total mark each member received
   				$receivedTotalScore = $this->EvaluationSimple->getReceivedTotalScore($event['group_event_id'],
-  				                                                                         $this->rdAuth->id);
+  				                                                                         $this->Auth->user('id'));
   				$totalScore = $receivedTotalScore[0]['received_total_score'];
 
-  				$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->findCount('group_id='.$event['group_id']) :
-  				                                           $this->GroupsMembers->findCount('group_id='.$event['group_id']) - 1;
+  				$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find(count,'group_id='.$event['group_id']) :
+  				                                           $this->GroupsMembers->find(count,'group_id='.$event['group_id']) - 1;
           $aveScore = $totalScore / $numMembers;
           $studentResult['numMembers'] = $numMembers;
           $studentResult['receivedNum'] = count($receivedTotalScore);
@@ -145,7 +145,7 @@ class EvaluationSurveyHelperComponent extends Object
        $commentReleaseStatus = $results[0]['EvaluationSimple']['release_status'];
        if ($commentReleaseStatus) {
          //Comment is released; retrieve all comments
-          $comments = $this->EvaluationSimple->getAllComments($event['group_event_id'], $this->rdAuth->id);
+          $comments = $this->EvaluationSimple->getAllComments($event['group_event_id'], $this->Auth->user('id'));
           if (shuffle($comments)) {
             $studentResult['comments'] = $comments;
           }
@@ -168,7 +168,7 @@ class EvaluationSurveyHelperComponent extends Object
 
 	  $result = array();
 
-		$survey_id = $this->Survey->getSurveyIdByCourseIdTitle($this->rdAuth->courseId, $event['Event']['title']);
+		$survey_id = $this->Survey->getSurveyIdByCourseIdTitle($this->Session->read('ipeerSession.courseId'), $event['Event']['title']);
   	//$this->set('survey_id', $survey_id);
   	$result['survey_id'] = $survey_id;
 
@@ -309,13 +309,15 @@ class EvaluationSurveyHelperComponent extends Object
 		    $totalResponsePerQuestion = 0;
   		  for ($j=0; $j < count($questions[$i]['Question']['Responses']); $j++) {
   		    $responseId = $questions[$i]['Question']['Responses']['response_'.$j]['id'];
-  		    $answerCount = $this->SurveyInput->findCount('survey_id='.$surveyId.' AND question_id='.$questionId.' AND response_id='.$responseId);
+  		    $answerCount = $this->SurveyInput->find('count', array('conditions' => array('survey_id' => $surveyId,
+                                                                                       'question_id' => $questionId,
+                                                                                       'response_id' => $responseId)));
   		    $questions[$i]['Question']['Responses']['response_'.$j]['count'] = $answerCount;
   		    $totalResponsePerQuestion += $answerCount;
   		  }
   		  $questions[$i]['Question']['total_response'] = $totalResponsePerQuestion;
 		  } else {
-		    $responses = $this->SurveyInput->findAll('survey_id='.$surveyId.' AND question_id='.$questionId,'user_id,response_text');
+		    $responses = $this->SurveyInput->find('all', 'survey_id='.$surveyId.' AND question_id='.$questionId,'user_id,response_text');
 		    $questions[$i]['Question']['Responses'] = array();
 
 		    //sort results by last name

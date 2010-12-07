@@ -76,7 +76,7 @@ class GroupEvent extends AppModel
   	  if (empty($eventId) || is_null($eventId)) {
   	  	return;
   	  }
-	  $tmp = $this->findAll('group_id != 0 AND event_id='.$eventId, 'id, group_id, event_id, marked, grade');
+	  $tmp = $this->find('all','group_id != 0 AND event_id='.$eventId, 'id, group_id, event_id, marked, grade');
 	  return $tmp;
   }
 
@@ -85,7 +85,7 @@ class GroupEvent extends AppModel
   	  if (empty($eventId) || is_null($eventId)) {
   	  	return;
   	  }
-	  $tmp = $this->findAll($conditions = 'event_id='.$eventId);
+	  $tmp = $this->find('all',$conditions = 'event_id='.$eventId);
 	  return $tmp;
   }
 
@@ -103,7 +103,7 @@ class GroupEvent extends AppModel
     $fields = 'GroupMember.user_id, GroupEvent.group_id, GroupEvent.id, GroupEvent.event_id';
     $joinTable = array(' RIGHT JOIN groups_members as GroupMember ON GroupMember.group_id=GroupEvent.group_id');
 
-    return $this->findAll($condition, $fields, null, null, null, null, $joinTable );
+    return $this->find('all',$condition, $fields, null, null, null, null, $joinTable );
   }
 
   function getMemberCountByEventId($eventId=null)
@@ -112,12 +112,12 @@ class GroupEvent extends AppModel
     $fields = 'Count(GroupMember.user_id) AS count';
     $joinTable = array(' RIGHT JOIN groups_members as GroupMember ON GroupMember.group_id=GroupEvent.group_id');
 
-    return $this->findAll($condition, $fields, null, null, null, null, $joinTable );
+    return $this->find('all',$condition, $fields, null, null, null, null, $joinTable );
   }
 
   // returns list of group id within the selected Event
   function getToReviewGroupEventByEventId($eventId=null){
-	  $tmp = $this->findCount($conditions = 'event_id='.$eventId.' AND marked="to review"');
+	  $tmp = $this->find(count,$conditions = 'event_id='.$eventId.' AND marked="to review"');
 	  return $tmp;
   }
 
@@ -126,7 +126,7 @@ class GroupEvent extends AppModel
     $eventType = array(1=>'simple_evaluations',2=>'rubrics',4=>'mixevals');
     switch ($eventTypeId) {
       case 1: //simple eval
-        return $this->findBySql('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked
+        return $this->query('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked
                                 FROM group_events AS GroupEvent
                                 WHERE GroupEvent.event_id='.$eventId.'
                                 AND GroupEvent.id IN (SELECT DISTINCT grp_event_id
@@ -149,7 +149,7 @@ class GroupEvent extends AppModel
         break;
       case 2||4:
         //echo $eventId.' '.$eventTypeId.' '.$maxPercent;
-        return $this->findBySql('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked
+        return $this->query('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked
                                 FROM group_events AS GroupEvent
                                 WHERE GroupEvent.event_id='.$eventId.' AND GroupEvent.id
                                 IN (SELECT DISTINCT grp_event_id
@@ -177,7 +177,7 @@ class GroupEvent extends AppModel
   }
 
   function getNotReviewed($eventId=null) {
-    return $this->findBySql('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked
+    return $this->query('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked
                             FROM group_events AS GroupEvent
                             WHERE (GroupEvent.marked="not reviewed" OR GroupEvent.marked="to review") AND GroupEvent.group_id != 0 AND GroupEvent.event_id='.$eventId.'
                             ORDER BY GroupEvent.group_id');
@@ -194,12 +194,12 @@ class GroupEvent extends AppModel
                 "`GroupEvent`.`id`=`EvaluationSubmission`.`grp_event_id`",
         );
 
-        $count = $this->findCount($conditions, (-1), $joins);
+        $count = $this->find(count,$conditions, (-1), $joins);
         return $count;
     }
 
   function getLate($eventId) {
-    return $this->findBySql('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked
+    return $this->query('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked
                             FROM group_events as GroupEvent
                             LEFT JOIN events as Event ON GroupEvent.event_id = Event.id
                             LEFT JOIN evaluation_submissions as es  on GroupEvent.id=es.grp_event_id

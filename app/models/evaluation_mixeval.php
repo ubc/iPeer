@@ -20,12 +20,12 @@ class EvaluationMixeval extends AppModel
 
     // gets Mixeval evaluation result for a specific assignment and evaluator
     function getResultsByEvaluatee($grpEventId=null, $evaluatee=null) {
-        return $this->findAll('grp_event_id='.$grpEventId.' AND evaluatee='.$evaluatee, null, 'evaluator ASC');
+        return $this->find('all','grp_event_id='.$grpEventId.' AND evaluatee='.$evaluatee, null, 'evaluator ASC');
     }
 
     // gets Mixeval evaluation result for a specific assignment and evaluator
     function getResultsByEvaluator($grpEventId=null, $evaluator=null) {
-        return $this->findAll('grp_event_id='.$grpEventId.' AND evaluator='.$evaluator, null, 'evaluatee ASC');
+        return $this->find('all','grp_event_id='.$grpEventId.' AND evaluator='.$evaluator, null, 'evaluatee ASC');
     }
 
     // gets Mixeval evaluation result for a specific assignment and evaluator
@@ -36,7 +36,7 @@ class EvaluationMixeval extends AppModel
         $joinTable = array(' LEFT JOIN evaluation_mixeval_details AS EvaluationMixevalDetail ' .
             'ON EvaluationMixeval.id=EvaluationMixevalDetail.evaluation_mixeval_id');
 
-        return $this->findAll($condition, $fields, 'EvaluationMixeval.id ASC', null, null, null, $joinTable );
+        return $this->find('all',$condition, $fields, 'EvaluationMixeval.id ASC', null, null, null, $joinTable );
     }
 
     // gets Mixeval evaluation result for a specific assignment and evaluator
@@ -45,7 +45,7 @@ class EvaluationMixeval extends AppModel
         $fields = 'EvaluationMixevalDetail.*';
         $joinTable = array(' LEFT JOIN evaluation_mixeval_details AS EvaluationMixevalDetail ON EvaluationMixeval.id=EvaluationMixevalDetail.evaluation_mixeval_id');
 
-        return $this->findAll($condition, $fields, 'EvaluationMixeval.id ASC', null, null, null, $joinTable );
+        return $this->find('all',$condition, $fields, 'EvaluationMixeval.id ASC', null, null, null, $joinTable );
     }
 
     // get total mark each member recieved
@@ -61,15 +61,15 @@ class EvaluationMixeval extends AppModel
     }
 
     function getOppositeGradeReleaseStatus($groupEventId=null, $releaseStatus){
-        return $this->findCount('grp_event_id='.$groupEventId.' AND grade_release != '.$releaseStatus);
+        return $this->find(count,'grp_event_id='.$groupEventId.' AND grade_release != '.$releaseStatus);
     }
 
     function getOppositeCommentReleaseStatus($groupEventId=null, $releaseStatus){
-        return $this->findCount('grp_event_id='.$groupEventId.' AND comment_release != '.$releaseStatus);
+        return $this->find(count,'grp_event_id='.$groupEventId.' AND comment_release != '.$releaseStatus);
     }
 
     function getTeamReleaseStatus($groupEventId=null){
-        return $this->findAll('grp_event_id='.$groupEventId.' GROUP BY evaluatee', 'evaluatee, grade_release', 'evaluatee');
+        return $this->find('all','grp_event_id='.$groupEventId.' GROUP BY evaluatee', 'evaluatee, grade_release', 'evaluatee');
     }
 
     function setAllEventCommentRelease($eventId=null, $releaseStatus=null) {

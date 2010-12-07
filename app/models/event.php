@@ -25,6 +25,9 @@
  * @subpackage
  * @since
  */
+App::import('Model', 'EvaluationMixeval');
+App::import('Model', 'EvaluationMixevalDetail');
+
 class Event extends AppModel
 {
   var $name = 'Event';
@@ -39,13 +42,13 @@ class Event extends AppModel
      * evaluation_mixevals, evaluation_mixeval_details
      */
 
-  var $hasOne = array(
-
-  );
+  var $belongsTo = array('EventTemplateType');
 
 
   var $validate = array(
-      'title' => VALID_NOT_EMPTY,
+      'title' => array('rule' => 'notEmpty',
+                       'message' => 'Title is required.',
+                       'allowEmpty' => false),
       'due_date' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/',
       'release_date_begin' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/',
       'release_date_end' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/'
@@ -93,6 +96,10 @@ class Event extends AppModel
                         )
   );*/
 
+  function __construct($id = false, $table = null, $ds = null) {
+    parent::__construct($id, $table, $ds);
+    $this->virtualFields['response_count'] = sprintf('SELECT count(*) as count FROM evaluation_submissions as sub WHERE sub.event_id = %s.id', $this->alias);
+  }
 
 	//Overwriting Function - will be called before save operation
 	function beforeSave(){
@@ -163,15 +170,15 @@ class Event extends AppModel
 
     function getCourseEvent($courseId=null)
     {
-        return $this->findAll('course_id ='.$courseId);
+        return $this->find('all','course_id ='.$courseId);
     }
 
     function getCourseEvalEvent($courseId=null) {
-        return $this->findAll('course_id='.$courseId.' AND event_template_type_id!=3');
+        return $this->find('all','course_id='.$courseId.' AND event_template_type_id!=3');
     }
 
     function getCourseEventCount($courseId=null) {
-        return $this->find('course_id='.$courseId, 'COUNT(DISTINCT id) as total');
+        return $this->find('course_id='.$courseId, 'COUNT(*) as total');
     }
 
     function getSurveyEventIdByCourseIdDescription($courseId=null,$title=null) {
@@ -179,14 +186,15 @@ class Event extends AppModel
     }
 
     function getActiveSurveyEvents($courseId=null) {
-        return $this->findAll('course_id='.$courseId.' AND event_template_type_id=3');
+        return $this->find('all','course_id='.$courseId.' AND event_template_type_id=3');
     }
 
-    function checkEvaluationToolInUse($evalTool=null, $templateId=null)
+  // deprecated function, use event_count attribute instead
+    /*function checkEvaluationToolInUse($evalTool=null, $templateId=null)
     {
         $event = $this->find('event_template_type_id = '.$evalTool.' AND template_id = '.$templateId);
         return !empty($event);
-    }
+    }*/
 
   //TODO: unfinished function
   function cascadeRemove($id)
@@ -208,11 +216,11 @@ class Event extends AppModel
     $evaluation_mixeval = new EvaluationMixeval();
     $evaluation_mixeval_detail = new EvaluationMixevalDetail();
 
-    $ems = $evaluation_mixeval->findAll('event_id = '.$this->id);
+    $ems = $evaluation_mixeval->find('all','event_id = '.$this->id);
     if(!empty($ems))
     {
     	foreach($ems as $em) {
-    	$emds = $evaluation_mixeval_detail->findAll('evaluation_mixeval_id = '.$em->id);
+    	$emds = $evaluation_mixeval_detail->find('all','evaluation_mixeval_id = '.$em->id);
 
     	if(!empty($emds))
     	{
@@ -247,7 +255,7 @@ class Event extends AppModel
    */
   function removeEventsBySurveyId($survey_id)
   {
-    $events = $this->findAll($this->name.'.event_template_type_id = 3 AND '.$this->name.'.template_id = '.$survey_id);
+    $events = $this->find('all',$this->name.'.event_template_type_id = 3 AND '.$this->name.'.template_id = '.$survey_id);
     if(empty($events)) return true;
 
     foreach($events as $e){
@@ -259,7 +267,7 @@ class Event extends AppModel
     function checkIfNowLate($eventID) {
         if (is_numeric($eventID)) {
             $conditions = "`Event`.`due_date` < now() AND `id`=$eventID";
-            $count = $this->findCount($conditions);
+            $count = $this->find(count,$conditions);
             return ($count>0);
         } else {
             return false;

@@ -101,8 +101,8 @@ class EvaluationSimpleHelperComponent extends Object
   				                                                                         $this->rdAuth->id);
   				$totalScore = $receivedTotalScore[0]['received_total_score'];
 
-  				$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->findCount('group_id='.$event['group_id']) :
-  				                                           $this->GroupsMembers->findCount('group_id='.$event['group_id']) - 1;
+  				$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find(count,'group_id='.$event['group_id']) :
+  				                                           $this->GroupsMembers->find(count,'group_id='.$event['group_id']) - 1;
           $aveScore = $totalScore / $numMembers;
           $studentResult['numMembers'] = $numMembers;
           $studentResult['receivedNum'] = count($receivedTotalScore);

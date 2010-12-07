@@ -46,8 +46,8 @@ class EvaluationMixevalHelperComponent extends Object
     $result['mixeval'] = $this->Mixeval->read();
 
  		// enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
- 		$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->findCount('group_id='.$event['group_id']) :
- 		                                           $this->GroupsMembers->findCount('group_id='.$event['group_id']) - 1;
+ 		$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find(count,'group_id='.$event['group_id']) :
+ 		                                           $this->GroupsMembers->find(count,'group_id='.$event['group_id']) - 1;
 		//$this->set('evaluateeCount', $numMembers);
 		$result['evaluateeCount'] = $numMembers;
 

@@ -45,7 +45,7 @@ class ExportHelperComponent extends Object
       $eventId = $event['Event']['id'];
       $eventTemplateId = $event['Event']['template_id'];
       $eventTypeId = $event['Event']['event_template_type_id'];
-      $groupEvents = $this->GroupEvent->findAll('event_id='.$eventId);
+      $groupEvents = $this->GroupEvent->find('all', 'event_id='.$eventId);
 
       //too much garbage... outsourced to createBody
       if (!empty($groupEvents)) {
@@ -165,7 +165,7 @@ class ExportHelperComponent extends Object
           case 2://rubric
             //get the legend
             if (empty($legend)) {
-              $legend_tmp = $this->RubricsCriteria->findAll('rubric_id='.$eventTemplateId, 'criteria');
+              $legend_tmp = $this->RubricsCriteria->find('all','rubric_id='.$eventTemplateId, 'criteria');
               foreach ($legend_tmp as $legend) {
                 array_push($legends, $legend['RubricsCriteria']['criteria']);
               }

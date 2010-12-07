@@ -25,7 +25,7 @@
  * @subpackage
  * @since
  */
-uses('neat_string');
+App::import('Lib', 'neat_string');
 class SysFunctionsController extends AppController
 {
   var $name = 'SysFunctions';
@@ -50,7 +50,7 @@ class SysFunctionsController extends AppController
 		$this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
- 		$this->pageTitle = 'Sys Functions';
+ 		$this->set('title_for_layout', 'Sys Functions');
 		parent::__construct();
 	}
 

@@ -29,39 +29,13 @@ class SurveyQuestion extends AppModel
 {
   var $name = 'SurveyQuestion';
 
-  // used to copy questions to a new survey when a template is used
-  function copyQuestions($survey_id, $id)
-  {
-  	$tmp = $this->findAll($conditions='survey_id='.$survey_id);
-
-	for( $i=0; $i<sizeof($tmp); $i++ ){
-		$data['survey_id'] = $id;
-		$data['question_id'] = $tmp[$i]['SurveyQuestion']['question_id'];
-		$data['number'] = $tmp[$i]['SurveyQuestion']['number'];
-
-		$this->save($data);
-		$this->id=null;
-	}
-  }
-
-  // saves rows into table survey_questions for a survey and its
-  // corresponding questions
-  function linkQuestions($survey_id, $question_id)
-  {
-  	$data['survey_id'] = $survey_id;
-	$data['question_id'] = $question_id;
-	$data['number'] = ($this->findCount($conditions='survey_id ='.$survey_id)) +1;
-
-	$this->save($data);
-  }
-
   // returns all the question IDs of a specific survey
-  function getQuestionsID($survey_id)
-  {
-	$data = $this->findAll($conditions='survey_id='.$survey_id, $fields="number, question_id, id");
-	$data['count'] = $this->findCount($conditions='survey_id='.$survey_id);
+  function getQuestionsID($survey_id) {
+    $data = $this->find('all', array('conditions'=> array('survey_id' => $survey_id),
+                                     'fields' => array('number', 'question_id', 'id')));
+    $data['count'] = count($data);
 
-	return $data;
+    return $data;
   }
 
 }

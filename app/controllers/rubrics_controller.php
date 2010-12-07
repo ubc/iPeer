@@ -36,7 +36,7 @@ class RubricsController extends AppController
 	var $order;
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $Sanitize;
-    var $components = array('AjaxList','rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework', 'RubricHelper');
+  var $components = array('AjaxList','rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework', 'RubricHelper');
 
 	function __construct()
 	{
@@ -48,7 +48,7 @@ class RubricsController extends AppController
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
     $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
- 		$this->pageTitle = 'Rubrics';
+ 		$this->set('title_for_layout', 'Rubrics');
     parent::__construct();
 	}
 
@@ -268,7 +268,7 @@ class RubricsController extends AppController
 			$this->RubricsLom->deleteLOM($id);
 			$this->RubricsCriteria->deleteCriterias($id);
 			$this->RubricsCriteriaComment->deleteCriteriaComments($id);
-			//$this->set('data', $this->Rubric->findAll(null, null, 'id'));
+			//$this->set('data', $this->Rubric->find('all',null, null, 'id'));
 			$this->index();
 			$this->set('message', 'The rubric was deleted successfully.');
 			$this->render('index');

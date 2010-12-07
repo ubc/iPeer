@@ -39,7 +39,7 @@ class FrameworkController extends AppController
 	function __construct()
 	{
 		$this->Sanitize = new Sanitize;
- 		$this->pageTitle = 'Framework';
+ 		$this->set('title_for_layout', 'Framework');
 		parent::__construct();
 	}
 
@@ -50,26 +50,25 @@ class FrameworkController extends AppController
         $this->render($redirect);
 	}
 
-	function userInfoDisplay($id='') {
-        // Make sure the present user is not a student
-        if ($this->rdAuth->getPrivilegeLevel() <= $this->rdAuth->studentPrivilegeLevel()) {
-           $this->rdAuth->privilegeError();
-        }
+	function userInfoDisplay($id) {
+    $this->AccessControl->check('functions/user', 'read');
 
-        if (!is_numeric($id)) {
-            $this->rdAuth->privilegeError();
-        }
-            // Make sure that the privileges of the asking user is at least as high
-            //  as the privileges of the user being viewed.
-        if ($this->rdAuth->getPrivilegeLevel() < $this->rdAuth->getPrivilegeLevel($id)) {
-            $this->rdAuth->privilegeError();
-        }
+    if (!is_numeric($id) || !($this->data = $this->User->findUserByid($id))) {
+      $this->Session->setFlash('Invalid user ID.');
+      $this->redirect('index');
+    }
 
-		$this->autoRender = false;
-        $this->layout = 'pop_up';
-        $this->set('userId', $id);
-        $this->render("userinfo");
-	}
+    $roles = $this->User->getRoles($id);
+    if(!$this->AccessControl->hasPermissionDoActionOnUserWithRoles('ViewUser', $roles)) {
+      $this->Session->setFlash('You do not have permission to view this user.');
+      $this->redirect('index');
+    }
+
+    $this->autoRender = false;
+    $this->layout = 'pop_up';
+    $this->set('data', $this->data);
+    $this->render("userinfo");
+  }
 
 	function tutIndex($tut=null) {
         $this->layout = 'tutorial_pop_up';

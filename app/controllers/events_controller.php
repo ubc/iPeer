@@ -48,7 +48,7 @@ class EventsController extends AppController
 		$this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
- 		$this->pageTitle = 'Events';
+ 		$this->set('title_for_layout', 'Events');
 		parent::__construct();
     }
 
@@ -222,7 +222,7 @@ class EventsController extends AppController
 		$id = $this->Sanitize->paranoid($id);
     $this->set('event_id', $id);
 
-		$this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Events';
+		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
 		$this->Event->setId($id);
 
 
@@ -292,7 +292,7 @@ class EventsController extends AppController
 
 
     //Get all display event types
-    $eventTypes = $this->EventTemplateType->findAll(' display_for_selection = 1 ');
+    $eventTypes = $this->EventTemplateType->find('all',' display_for_selection = 1 ');
 	  $this->set('eventTypes', $eventTypes);
 		$this->render();
   }
@@ -338,15 +338,15 @@ class EventsController extends AppController
 function add ()
   {
     $courseId = $this->rdAuth->courseId;
-		$this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Events';
+		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
 	  //List Add Page
 		if (empty($this->params['data'])) {
 
-			$unassignedGroups = $this->Group->findAll('course_id = '.$courseId);
+			$unassignedGroups = $this->Group->find('all','course_id = '.$courseId);
 			$this->set('unassignedGroups', $unassignedGroups);
 
  	    //Get all display event types
- 	    $eventTypes = $this->EventTemplateType->findAll(' EventTemplateType.display_for_selection = 1 ');
+ 	    $eventTypes = $this->EventTemplateType->find('all',' EventTemplateType.display_for_selection = 1 ');
 		  $this->set('eventTypes', $eventTypes);
 
 		  //Set default template
@@ -382,14 +382,14 @@ function add ()
         $this->set('data', $this->params['data']);
         $this->set('courseId', $courseId);
 
-				$unassignedGroups = $this->Group->findAll('course_id = '.$courseId);
+				$unassignedGroups = $this->Group->find('all','course_id = '.$courseId);
 				$this->set('unassignedGroups', $unassignedGroups);
-				$eventTypes = $this->EventTemplateType->findAll(' display_for_selection = 1 ');
+				$eventTypes = $this->EventTemplateType->find('all',' display_for_selection = 1 ');
 		    $this->set('eventTypes', $eventTypes);
   		  //Set default template
         $default = 'Default Simple Evaluation';
         $model = 'SimpleEvaluation';
-        $eventTemplates = $this->SimpleEvaluation->findAll();
+        $eventTemplates = $this->SimpleEvaluation->find('all');
         $this->set('eventTemplates', $eventTemplates);
         $this->set('default',$default);
         $this->set('model', $model);
@@ -410,7 +410,7 @@ function add ()
 	  //Clear $id to only the alphanumeric value
 		$id = $this->Sanitize->paranoid($id);
 
-		$this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Events';
+		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
 
 		if (empty($this->params['data']))
 		{
@@ -419,7 +419,7 @@ function add ()
 			$this->params['data'] = $event;
 			$this->Output->br2nl($this->params['data']);
 
-      $assignedGroupIDs = $this->GroupEvent->findAll('event_id = '.$id);
+      $assignedGroupIDs = $this->GroupEvent->find('all','event_id = '.$id);
 //$a=print_r($assignedGroupIDs,true);
 //print "<pre>($a)</pre>";
 			$groupIDs = '';
@@ -436,15 +436,15 @@ function add ()
     			  $groupIDSQL .= ",";
     			}
     		}
-			  $assignedGroups = $this->Group->findAll('id IN ('.$groupIDSQL.')');
+			  $assignedGroups = $this->Group->find('all','id IN ('.$groupIDSQL.')');
 
 			  $this->set('assignedGroups', $assignedGroups);
 
-  			$unassignedGroups = $this->Group->findAll('course_id='.$courseId.' AND id NOT IN ('.$groupIDSQL.')');
+  			$unassignedGroups = $this->Group->find('all','course_id='.$courseId.' AND id NOT IN ('.$groupIDSQL.')');
   			$this->set('unassignedGroups', $unassignedGroups);
 
     	}else {
-   			$unassignedGroups = $this->Group->findAll('course_id = '.$courseId);
+   			$unassignedGroups = $this->Group->find('all','course_id = '.$courseId);
   			$this->set('assignedGroups', $assignedGroups);
         $this->set('unassignedGroups', $unassignedGroups);
 
@@ -488,7 +488,7 @@ function add ()
 
 
  	    //Get all display event types
- 	    $eventTypes = $this->EventTemplateType->findAll(' display_for_selection = 1 ');
+ 	    $eventTypes = $this->EventTemplateType->find('all',' display_for_selection = 1 ');
 		  $this->set('eventTypes', $eventTypes);
 
 			$this->render();
@@ -513,9 +513,9 @@ function add ()
 			  $this->Output->br2nl($this->params['data']);
         $this->set('data', $this->params['data']);
 
-				$unassignedGroups = $this->Group->findAll('course_id = '.$courseId);
+				$unassignedGroups = $this->Group->find('all','course_id = '.$courseId);
 				$this->set('unassignedGroups', $unassignedGroups);
-				$eventTypes = $this->EventTemplateType->findAll(' display_for_selection = 1 ');
+				$eventTypes = $this->EventTemplateType->find('all',' display_for_selection = 1 ');
 		    $this->set('eventTypes', $eventTypes);
 
         //Validate the error why the Event->save() method returned false
@@ -539,7 +539,7 @@ function add ()
 		$id = $this->Sanitize->paranoid($id);
 
 
-		$this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Events';
+		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
 		if (empty($this->params['data']))
 		{
 
@@ -551,7 +551,7 @@ function add ()
 			//$assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($id);
 			// No need to use getGroupIDsByEventId method, can call Cake's findAllBy... directly
                         //$assignedGroupIDs =    $this->GroupEvent->findAllByEvent_id($id);
-                     $assignedGroupIDs =    $this->GroupEvent->findAll("event_id=$id",null,null,null,1,FALSE);
+                     $assignedGroupIDs =    $this->GroupEvent->find('all',"event_id=$id",null,null,null,1,FALSE);
 			//$assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($id);
 //$a=print_r($assignedGroupIDs,true);
 //print "<pre>($a)</pre>";
@@ -571,15 +571,15 @@ function add ()
     			  $groupIDSQL .= ",";
     			}
     		}
-			  $assignedGroups = $this->Group->findAll('id IN ('.$groupIDSQL.')');
+			  $assignedGroups = $this->Group->find('all','id IN ('.$groupIDSQL.')');
 
 			  $this->set('assignedGroups', $assignedGroups);
 
-  			$unassignedGroups = $this->Group->findAll('course_id='.$courseId.' AND id NOT IN ('.$groupIDSQL.')');
+  			$unassignedGroups = $this->Group->find('all','course_id='.$courseId.' AND id NOT IN ('.$groupIDSQL.')');
   			$this->set('unassignedGroups', $unassignedGroups);
 
     	}else {
-   			$unassignedGroups = $this->Group->findAll('course_id = '.$courseId);
+   			$unassignedGroups = $this->Group->find('all','course_id = '.$courseId);
   			$this->set('unassignedGroups', $unassignedGroups);
 
     	}
@@ -624,7 +624,7 @@ function add ()
 
 
  	    //Get all display event types
- 	    $eventTypes = $this->EventTemplateType->findAll(' display_for_selection = 1 ');
+ 	    $eventTypes = $this->EventTemplateType->find('all',' display_for_selection = 1 ');
 		  $this->set('eventTypes', $eventTypes);
 
 			$this->render();
@@ -649,9 +649,9 @@ function add ()
 			  $this->Output->br2nl($this->params['data']);
         $this->set('data', $this->params['data']);
 
-				$unassignedGroups = $this->Group->findAll('course_id = '.$courseId);
+				$unassignedGroups = $this->Group->find('all','course_id = '.$courseId);
 				$this->set('unassignedGroups', $unassignedGroups);
-				$eventTypes = $this->EventTemplateType->findAll(' display_for_selection = 1 ');
+				$eventTypes = $this->EventTemplateType->find('all',' display_for_selection = 1 ');
 		    $this->set('eventTypes', $eventTypes);
 
         //Validate the error why the Event->save() method returned false
@@ -684,7 +684,7 @@ function add ()
       $conditions = 'course_id = '.$courseId;
 
       if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-      	$personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
+      	$personalizeData = $this->Personalize->find('all','user_id = '.$this->rdAuth->id);
       	if ($personalizeData) {
       	   $this->userPersonalize->setPersonalizeList($personalizeData);
            $this->show = $this->userPersonalize->getPersonalizeValue('Event.ListMenu.Limit.Show');

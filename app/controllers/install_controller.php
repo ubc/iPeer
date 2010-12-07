@@ -32,7 +32,7 @@ class InstallController extends Controller
 	function __construct()
 	{
 		$this->Sanitize = new Sanitize;
- 		$this->pageTitle = 'Install Wizards';		
+ 		$this->set('title_for_layout', 'Install Wizards');
 		parent::__construct();
 	}
 		

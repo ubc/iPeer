@@ -32,30 +32,26 @@ class EvaltoolsController extends AppController
  *
  * @var $uses
  */
-  var $uses =  array('Event', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Survey');
+  var $uses =  array('SimpleEvaluation', 'Rubric', 'Mixeval', 'Survey');
 	var $page;
 	var $Sanitize;
 	var $functionCode = 'EVAL_TOOL';
 
-	function __construct()
-	{
+	function __construct() {
 		$this->Sanitize = new Sanitize;
- 		$this->pageTitle = 'Evaluation Tools';
+ 		$this->set('title_for_layout', 'Evaluation Tools');
 		parent::__construct();
 	}
 
-	function index($evaltool='') {
-		//Disable the autorender, base the role to render the custom home
-		$this->autoRender = false;
-
-    $this->set('event', $this->Event);
+	function index($evaltool = null) {
+    //Disable the autorender, base the role to render the custom home
+    $this->autoRender = false;
 
     //General Evaluation Tools Rendering for Admin and Instructor
     switch ($evaltool) {
-
       case "simpleevaluations" :
         $this->redirect('/simpleevaluations/index/');
-        break;
+      break;
 
       case "rubrics" :
         $this->redirect('/rubrics/index/');
@@ -65,28 +61,26 @@ class EvaltoolsController extends AppController
         $this->redirect('/surveys/index/');
       break;
 
-     default :
+      default:
         $this->showAll();
-     break;
+        $this->render('index');
+      break;
+    }
+  }
 
-   }
-	}
-
-  function showAll()
-  {
-    $simpleEvalData = $this->SimpleEvaluation->findAll('creator_id = '.$this->rdAuth->id);
+  function showAll() {
+    $simpleEvalData = $this->SimpleEvaluation->find('all', array('conditions' => array('creator_id' => $this->Auth->user('id'))));
     $this->set('simpleEvalData', $simpleEvalData);
 
-    $rubricData = $this->Rubric->findAll('creator_id = '.$this->rdAuth->id);
+    $rubricData = $this->Rubric->find('all', array('conditions' => array('creator_id' => $this->Auth->user('id'))));
     $this->set('rubricData', $rubricData);
 
-    $mixevalData = $this->Mixeval->findAll('creator_id = '.$this->rdAuth->id);
+    $mixevalData = $this->Mixeval->find('all', array('conditions' => array('creator_id' => $this->Auth->user('id'))));
     $this->set('mixevalData', $mixevalData);
 
-    $surveyData = $this->Survey->findAll('Survey.creator_id = '.$this->rdAuth->id);
+    $surveyData = $this->Survey->find('all', array('conditions' => array('Survey.creator_id' => $this->Auth->user('id')),
+                                                   'contain' => array('Course')));
     $this->set('surveyData', $surveyData);
-
-    $this->render('index');
   }
 }
 ?>

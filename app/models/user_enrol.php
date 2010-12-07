@@ -5,7 +5,7 @@ class UserEnrol extends AppModel
 
   function getEnrolledCourses($userId=null)
   {
-    $result = $this->findAll('user_id='.$userId, 'DISTINCT course_id');
+    $result = $this->find('all','user_id='.$userId, 'DISTINCT course_id');
 
     return $result;
   }

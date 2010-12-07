@@ -36,7 +36,7 @@ class GroupsController extends AppController
 	var $order;
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $Sanitize;
-    var $components = array('AjaxList');
+  var $components = array('AjaxList');
 
 	function __construct()
 	{
@@ -47,23 +47,22 @@ class GroupsController extends AppController
 		$this->direction = empty($_GET['direction'])? 'desc': $this->Sanitize->paranoid($_GET['direction']);
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
- 		$this->pageTitle = 'Groups';
+ 		$this->set('title_for_layout', 'Groups');
 		parent::__construct();
 	}
 
-   function postProcess($data) {
-        // Creates the custom in use column
-        if ($data) {
-            foreach ($data as $key => $entry) {
-                $memberCount = $this->GroupsMembers->countMembers($entry['Group']['id']);
-                $plural = ($memberCount > 1) ? "s" : "";
-                $data[$key]['Group']['group_name'] .= " <span style='color:#404080'>".
-                    "($memberCount member$plural)</span>";
-            }
-        }
-        // Return the processed data back
-        return $data;
+  function postProcess($data) {
+    // Creates the custom in use column
+    if ($data) {
+      foreach ($data as $key => $entry) {
+        $plural = ($entry['Group']['member_count']> 1) ? "s" : "";
+        $data[$key]['Group']['group_name'] .= " <span style='color:#404080'>".
+          '('.$entry['Group']['member_count'].' member'.$plural.')</span>';
+      }
     }
+    // Return the processed data back
+    return $data;
+  }
 
        // =-=-=-=-=-== New list routines =-=-=-=-=-===-=-
     function setUpAjaxList () {
@@ -80,38 +79,37 @@ class GroupsController extends AppController
         // The columns to show
         $columns = array(
             array("Group.id",        "",         "",     "hidden"),
-            array("Course.id",       "",         "",     "hidden"),
-            array("Course.course",   "Course",   "12em", "action", "Course Home"),
+            array("Group.member_count",       "",         "",     "hidden"),
+            array("Course.course",   "Course",   "15em", "action", "Course Home"),
             array("Group.group_num", "Group #",  "6em",  "number"),
             array("Group.group_name","Group Name","auto", "action",
                     "View Group"),
-            array("Creator.id",      "",         "",     "hidden"),
-            array("Creator.username","Creator",  "10em", "action", "View Creator"),
-            array("Course.created",  "Date",     "10em", "date"),
+            array("Group.creator_id",      "",         "",     "hidden"),
+            array("Group.creator","Creator",  "10em", "action", "View Creator"),
+            array("Group.created",  "Date",     "10em", "date"),
         );
 
+        $conditions = array('Group.course_id' => $this->Session->read('ipeerSession.courseId'));
+
         // The course to list for is the extra filter in this case
-        $joinTables =
+        $joinTables = array();/*
             array(
                 array(  // Define the GUI aspecs
                     "id"            => "Group.course_id",
                     "description"   => "for Course:",
                     // What are the choises and the default values?
                     "list"  => $coursesList,
-                    "default" => $this->rdAuth->courseId,
+                    "default" => $this->Session->read('iPeerSession.courseId'),
                     // What table do we join to get these
-                    "joinTable"     => "courses",
-                    "joinModel"     => "Course",
-                    "localKey"      => "course_id"
                 ),
                 array(  "joinTable" => "users",
                         "joinModel" => "Creator",
                         "localKey" => "creator_id")
-            );
+            );*/
 
         // For instructors: only list their own course events
         $extraFilters = "";
-        if ($this->rdAuth->role != 'A') {
+        if ($this->Auth->user('role') != 'A') {
             $extraFilters = " ( ";
             foreach ($coursesList as $id => $course) {
                 $extraFilters .= "course_id=$id or ";
@@ -120,41 +118,36 @@ class GroupsController extends AppController
         }
 
         // Define Actions
-        $deleteUserWarning = "Delete this group?\n";
-        $deleteUserWarning.= "(The students themselves will be unaffected).\n";
-        $deleteUserWarning.= "Proceed?";
+        $deleteUserWarning = "Delete this group?\n".
+                             "(The students themselves will be unaffected).\n".
+                             "Proceed?";
 
-        $recursive = (-1);
+        $recursive = 0;
 
         $actions = array(
             //   parameters to cakePHP controller:,
             //   display name, (warning shown), fixed parameters or Column ids
             array("View Group",  "", "", "",  "view", "Group.id"),
             array("Edit Group",  "", "", "",  "edit", "Group.id"),
-            array("Course Home",  "", "", "courses", "home", "Course.id"),
-            array("View Course",  "", "", "courses", "view", "Course.id"),
-            array("View Creator",  "", "", "users","view", "Creator.id"),
+            array("Course Home",  "", "", "courses", "home", "Group.course_id"),
+            array("View Course",  "", "", "courses", "view", "Group.course_id"),
+            array("View Creator",  "", "", "users","view", "Group.creator_id"),
             array("Delete Group",    $deleteUserWarning, "", "", "delete",       "Group.id")
         );
 
         $this->AjaxList->setUp($this->Group, $columns, $actions, "Group.group_num", "Group.group_name",
-            $joinTables, $extraFilters, $recursive, "postProcess");
+            $joinTables, $extraFilters, $recursive, "postProcess", null, null, null, $conditions);
     }
 
-    function index($message='') {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
-        // Set the top message
-        $this->set('message', $message);
-        // Set up the basic static ajax list variables
-        $this->setUpAjaxList();
-        // Set the display list
-        $this->set('paramsForList', $this->AjaxList->getParamsForList());
+    function index($course_id) {
+      $this->set('course_id', $course_id);
+      // Set up the basic static ajax list variables
+      $this->setUpAjaxList();
+      // Set the display list
+      $this->set('paramsForList', $this->AjaxList->getParamsForList());
     }
 
     function ajaxList() {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
         // Set up the list
         $this->setUpAjaxList();
         // Process the request for data
@@ -178,95 +171,77 @@ class GroupsController extends AppController
             }
         }
         // Redirect to list after state modifications (or in case of error)
-        $this->redirect("/groups/index");
+        $this->redirect("/groups/index/".$course);
     }
 
-  function view ($id)
-  {
-		$this->set('group_data', $this->Group->groupStudents($id));
-		$this->set('data', $this->Group->read());
+  function view ($id) {
+    $this->data = $this->Group->read(null, $id);
+		$this->set('data', $this->data);
+    $this->set('course_id', $this->data['Group']['course_id']);
+    $this->set('readonly', true);
+    $this->set('members', $this->Group->getMembersByGroupId($id, 'list'));
+    $this->render('edit');
   }
 
-  function add ()
-  {
-    $courseId = $this->rdAuth->courseId;
-   	$this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Groups';
-
-
-    // gets all the students in db for the unfiltered students list
-		$this->set('user_data', $this->User->getEnrolledStudents($courseId));
-
-		if (empty($this->params['data'])) {
-			$this->render('add');
-		} else {
-            $this->params['data']['Group']['course_id']=$courseId;
-			$this->params = $this->Group->prepData($this->params);
-
-			if ($this->Group->save($this->params['data'])) {
+  function add ($course_id) {
+		if (!empty($this->data)) {
+			//$this->params = $this->Group->prepData($this->params);
+			if ($this->Group->save($this->data)) {
 				// add members into the groups_members table
-				$this->GroupsMembers->insertMembers($this->Group->id, $this->params['data']['Group']);
-
-				$this->redirect('/groups/index/The groups were added successfully.');
-
+				//$this->GroupsMembers->insertMembers($this->Group->id, $this->params['data']['Group']);
+        $this->Session->setFlash('The groups were added successfully.');
+				$this->redirect('index/'.$course_id);
 			} else {
-                // Error occured
-                $this->Session->setFlash('Please correct the error below.');
-				$this->render();
+        // Error occured
+        $this->Session->setFlash('Please correct the error below.');
 			}
 		}
+
+   	$this->set('title_for_layout', $this->sysContainer->getCourseName($course_id).' > Groups');
+    $this->data['Group']['course_id'] = $course_id;
+    // gets all the students in db for the unfiltered students list
+		$this->set('user_data', $this->User->getEnrolledStudentsForList($course_id));
+    $this->set('group_data', array());
+    $this->set('course_id', $course_id);
+    $this->render('edit');
   }
 
-    function edit ($id=null)
-    {
-        $courseId = $this->rdAuth->courseId;
-        $this->pageTitle = $this->sysContainer->getCourseName($courseId).' > Groups';
+  function edit ($group_id) {
+    if (!empty($this->data)) {
+      $this->data['Group']['id'] = $group_id;
+      if ( $this->Group->save($this->data)) {
+        //$this->GroupsMembers->updateMembers($this->Group->id, $data2save['data']['Group']);
+        $this->Session->setFlash('The group was updated successfully.');
+      } else {
+        // Error occurs:
+        $this->Session->setFlash('Error saving that group.');
+      }
+      $this->redirect('index/'.$this->data['Group']['course_id']);
+    }
 
-        if (!empty($this->params['data'])) {
-            $id = $this->params['data']['Group']['id'];
-            $data2save = $this->Group->prepData($this->params);
-            if ( $this->Group->save($data2save['data'])) {
-                $this->GroupsMembers->updateMembers($this->Group->id, $data2save['data']['Group']);
-                $this->redirect('/groups/index/The group was updated successfully.');
-            } else {
-                // Error occurs:
-                // todo: display error message
-                $this->redirect('/groups/index/Error saving that group.');
+    if(!($this->data = $this->Group->find('first', array('conditions' => array('Group.id' => $group_id))))) {
+      $this->Session->setFlash('Group Not Found.');
+      $this->redirect('index/'.$this->Session->read('ipeerSession.courseId'));
+    };
 
-            }
-        }
+    $this->set('title_for_layout', $this->sysContainer->getCourseName($this->data['Group']['course_id']).' > Groups');
 
-        // gets all students not listed in the group for unfiltered box
-        $this->set('user_data', $this->Group->groupDifference($id,$courseId));
+    // gets all students not listed in the group for unfiltered box
+    $this->set('user_data', $this->Group->getStudentsNotInGroup($group_id, 'list'));
 
-        //gets all students in the group
-        $this->set('group_data', $this->Group->groupStudents($id));
-        $this->set('group_id', $id);
-
-        $groupData = $this->Group->findById($id);
-        if(empty($groupData)) {
-            $this->redirect('/groups/index/Group Not Found.');
-        }
-
-        $this->params['data'] = $groupData;
+    //gets all students in the group
+    $this->set('members', $this->Group->getMembersByGroupId($group_id, 'list'));
+    $this->set('group_id', $group_id);
+    $this->set('course_id', $this->data['Group']['course_id']);
   }
 
-  function delete ($id)
-  {
-    if ($this->Group->del($id)) {
-      $groupEvents = $this->GroupEvent->findAll('group_id='.$id);
-      $groupMembers = $this->GroupsMembers->findAll('group_id='.$id);
-      foreach ($groupEvents as $groupEvent) {
-        $this->GroupEvent->del($groupEvent['GroupEvent']['id']);
-      }
-      foreach ($groupMembers as $groupMember) {
-        $this->GroupsMembers->del($groupMember['GroupsMembers']['id']);
-      }
-			$this->set('data', $this->Group->findAll(null, null, 'id'));
-			$this->redirect('/groups/index/The group was deleted successfully.');
+  function delete ($id) {
+    if ($this->Group->delete($id)) {
+			$this->Session->setFlash('The group was deleted successfully.');
 		} else {
-		  $this->set('data', $this->Group->findAll(null, null, 'id'));
-			$this->redirect('/groups/index/Group delete failed.');
+      $this->Session->setFlash('Group delete failed.');
 		}
+    $this->redirect('index/'.$this->Session->read('ipeerSession.courseId'));
   }
 
   function checkDuplicateName()
@@ -370,7 +345,7 @@ class GroupsController extends AppController
 		}
 	}
 
-    function getFilteredStudent()
+/*    function getFilteredStudent()
     {
         $this->layout = 'ajax';
         $this->set('course_id', $this->rdAuth->courseId);
@@ -378,15 +353,15 @@ class GroupsController extends AppController
         $filter = 'filter' == $this->params['form']['filter'];
         $this->set('students', $this->Group->getFilteredStudents($group_id, $filter));
         $this->render('filteredStudents');
+    }*/
+
+  function sendGroupEmail ($courseId) {
+    if (is_numeric($courseId)) {
+
+    } else {
+
     }
-
-    function sendGroupEmail ($courseId) {
-        if (is_numeric($courseId)) {
-
-        } else {
-
-        }
-    }
+  }
 }
 
 ?>

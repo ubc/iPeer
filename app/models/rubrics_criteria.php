@@ -62,7 +62,7 @@ class RubricsCriteria extends AppModel
   // rubrics_loms table
   function getCriteria( $id=null){
     
-  	$data = $this->findAll($conditions = 'rubric_id='.$id, $fields = 'criteria, multiplier');
+  	$data = $this->find('all',$conditions = 'rubric_id='.$id, $fields = 'criteria, multiplier');
 
   	for( $i=0; $i<count($data); $i++ ){
   		if( !empty( $data[$i]['RubricsCriteria']['criteria'] ) )

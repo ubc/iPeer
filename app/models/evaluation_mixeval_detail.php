@@ -24,7 +24,7 @@ class EvaluationMixevalDetail extends AppModel
 	  if ($question != null) {
 	    $sql .= ' AND question_number='.$question;
 	  }
-		return $this->findAll($sql);
+		return $this->find('all',$sql);
 	}	
 }
 

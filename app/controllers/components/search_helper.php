@@ -10,9 +10,9 @@
  */
 class SearchHelperComponent
 {
-  var $components = array('rdAuth','sysContainer', 'EvaluationHelper');
+  var $components = array('sysContainer', 'EvaluationHelper');
 
-  function formatSearchEvaluation($conditions='', $order, $show, $page, $sortBy, $direction) {
+  function formatSearchEvaluation($conditions, $order, $show, $page, $sortBy, $direction) {
     $matrixAry = array();
 
     $this->Event = new Event;
@@ -21,12 +21,17 @@ class SearchHelperComponent
     $conditions .= !empty($conditions) ? ' AND course_id IN ('.$courseIDs.')':'course_id IN ('.$courseIDs.')';
 
     //$matrixAry['conditions'] = $conditions;
-    $data = $this->Event->findAll($conditions, '*, (NOW() >= release_date_begin AND NOW() <= release_date_end) AS is_released', $order, $show, $page);
+    $data = $this->Event->find('all', array('conditions' => $conditions, 
+                                            'fields' => array('*', '(NOW() >= release_cate_begin AND NOW() <= release_date_end) AS is_released'), 
+                                            'order' => $order, 
+                                            'limit' => $show, 
+                                            'page' => $page
+                                            ));
 
     $paging['style'] = 'ajax';
     $paging['link'] = '/searchs/searchEvaluation/?show='.$show.'&sort='.$sortBy.'&direction='.$direction.'&page=';
 
-    $paging['count'] = $this->Event->findCount($conditions);
+    $paging['count'] = $this->Event->find('count',$conditions);
     $paging['show'] = array('10','25','50','all');
     $paging['page'] = $page;
     $paging['limit'] = $show;
@@ -72,7 +77,7 @@ class SearchHelperComponent
 
 			// retrieve string of group ids
   		for ($i = 0; $i < count($assignedGroupIDs); $i++) {
-  			$group = $this->Group->find('id = '.$assignedGroupIDs[$i]['GroupEvent']['group_id']);
+  			$group = $this->Group->find('all', array('conditions' => array('id' => $assignedGroupIDs[$i]['GroupEvent']['group_id'])));
   			//$students = $this->Group->groupStudents($assignedGroupIDs[$i]['GroupEvent']['group_id']);
   			$assignedGroups[$i] = $group;
   			//$assignedGroups[$i]['Group']['Students']=$students;
@@ -83,8 +88,8 @@ class SearchHelperComponent
         //Check to see if all members are completed this evaluation
 
        	$numOfCompletedCount = $memberCompletedNo[0][0]['count'];
-	  		//$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->findCount('group_id='.$group['Group']['id']) : $this->GroupsMembers->findCount('group_id='.$group['Group']['id']) - 1;
-	  		$numMembers=$this->GroupsMembers->findCount('group_id='.$group['Group']['id']);
+	  		//$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find('count','group_id='.$group['Group']['id']) : $this->GroupsMembers->find('count','group_id='.$group['Group']['id']) - 1;
+	  		$numMembers=$this->GroupsMembers->find('count','group_id='.$group['Group']['id']);
         ($numOfCompletedCount == $numMembers) ? $completeStatus = 1:$completeStatus = 0;
 
 
@@ -130,12 +135,12 @@ class SearchHelperComponent
     $conditions .= empty($conditions) ? 'role <> "S" AND role <> "A"':' AND role <> "S" AND role <> "A"';
 
     //$matrixAry['conditions'] = $conditions;
-    $data = $this->User->findAll($conditions, null, $order, $show, $page);
+    $data = $this->User->find('all', $conditions, null, $order, $show, $page);
 
     $paging['style'] = 'ajax';
     $paging['link'] = '/searchs/searchInstructor/?show='.$show.'&sort='.$sortBy.'&direction='.$direction.'&page=';
 
-    $paging['count'] = $this->User->findCount($conditions);
+    $paging['count'] = $this->User->find('count',$conditions);
     $paging['show'] = array('10','25','50','all');
     $paging['page'] = $page;
     $paging['limit'] = $show;

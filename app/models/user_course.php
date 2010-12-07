@@ -28,7 +28,7 @@ class UserCourse extends AppModel
 
   // returns all the instructor names and ids for display on the view page
   function getInstructors($id=null){
-  	$result = $this->findBySql('SELECT User.id, User.first_name, User.last_name, User.email FROM user_courses JOIN users as User ON User.id=user_courses.user_id AND User.id <> 1 WHERE course_id='.$id);
+  	$result = $this->query('SELECT User.id, User.first_name, User.last_name, User.email FROM user_courses JOIN users as User ON User.id=user_courses.user_id AND User.id <> 1 WHERE course_id='.$id);
 
   	return $result;
   }

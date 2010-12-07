@@ -61,10 +61,10 @@ class UpgradeController extends Controller
 
     // logout the user
 		$this->rdAuth->logout();
-		$this->Session->del('URL');
-		$this->Session->del('AccessErr');
-		$this->Session->del('Message');
-		$this->Session->del('CWLErr');
+		$this->Session->delete('URL');
+		$this->Session->delete('AccessErr');
+		$this->Session->delete('Message');
+		$this->Session->delete('CWLErr');
 
     $message  = "Your iPeer instance has been upgraded. Please login again.<br />";
     $message .= "<a href='" . $this->webroot . "loginout/login'>Login</a>";

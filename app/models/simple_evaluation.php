@@ -25,13 +25,18 @@
  * @subpackage
  * @since
  */
-class SimpleEvaluation extends AppModel
+App::import('Model', 'EvaluationBase');
+
+class SimpleEvaluation extends EvaluationBase
 {
+  const TEMPLATE_TYPE_ID = 1;
   var $name = 'SimpleEvaluation';
-  var $validate = array(
-      'name' => VALID_NOT_EMPTY,
-      'point_per_member' => VALID_NUMBER
-  );
+  /*var $validate = array(
+      'name' => array('rule' => 'notEmpty',
+                      'required' => true,
+                      'allowEmpty' => false),
+      'point_per_member' => 'numeric',
+  );*/
 
 /*  var $hasMany = array(
                        'EvaluationSimple' => array(
@@ -39,6 +44,19 @@ class SimpleEvaluation extends AppModel
                         'dependent' => true
                        )
   );*/
+  var $hasMany = array(
+                  'Event' =>
+                     array('className'   => 'Event',
+                           'conditions'  => array('Event.event_template_type_id' => self::TEMPLATE_TYPE_ID),
+                           'order'       => '',
+                           'foreignKey'  => 'template_id',
+                           'dependent'   => true,
+                           'exclusive'   => false,
+                           'finderSql'   => ''
+                          ),
+                     );
+
+
 	//Overwriting Function - will be called before save operation
 	function beforeSave(){
 
@@ -80,14 +98,14 @@ class SimpleEvaluation extends AppModel
 	}
 
 
-    /**
-     * Returns the evaluations made by this user, and any other public ones.
-     */
-    function getBelongingOrPublic($userID) {
-        return is_numeric($userID) ?
-            $this->query("SELECT * FROM simple_evaluations as SimpleEvaluation where SimpleEvaluation.creator_id=" . $userID)
-            : false;
-    }
+  /**
+   * Returns the evaluations made by this user, and any other public ones.
+   */
+  function getBelongingOrPublic($userID) {
+    return is_numeric($userID) ?
+      $this->query("SELECT * FROM simple_evaluations as SimpleEvaluation where SimpleEvaluation.creator_id=" . $userID)
+      : false;
+  }
 }
 
 ?>

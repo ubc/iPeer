@@ -27,7 +27,24 @@
  */
 class Mixeval extends AppModel
 {
-    var $name = 'Mixeval';
+  var $name = 'Mixeval';
+
+  var $hasMany = array(
+                  'Event' =>
+                     array('className'   => 'Event',
+                           'conditions'  => 'Event.event_template_type_id = 4',
+                           'order'       => '',
+                           'foreignKey'  => 'template_id',
+                           'dependent'   => true,
+                           'exclusive'   => false,
+                           'finderSql'   => ''
+                          ),
+                     );
+
+  function __construct($id = false, $table = null, $ds = null) {
+    parent::__construct($id, $table, $ds);
+    $this->virtualFields['event_count'] = sprintf('SELECT count(*) as count FROM events as event WHERE event.event_template_type_id = 4 AND event.template_id = %s.id', $this->alias);
+  }
 
 	function beforeSave(){
         // Ensure the name is not empty

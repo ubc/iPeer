@@ -54,7 +54,7 @@ class MixevalsQuestion extends AppModel
   // function to return the question description and weight from the
   // mixevals_loms table
   function getQuestion( $id=null){
-  	$data = $this->findAll('mixeval_id='.$id, null, 'question_num ASC');
+  	$data = $this->find('all','mixeval_id='.$id, null, 'question_num ASC');
   	return $data;
   }  
 }

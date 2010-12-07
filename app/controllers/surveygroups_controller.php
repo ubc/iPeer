@@ -36,8 +36,8 @@ class SurveyGroupsController extends AppController
   var $page;
   var $order;
   var $Sanitize;
-  var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
-  var $components = array('rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework','EvaluationSurveyHelper','XmlHandler','SurveyHelper');
+  var $helpers = array('Html','Ajax','Javascript','Pagination');
+  var $components = array('rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework','EvaluationSurveyHelper','XmlHandler','SurveyHelper', 'AjaxList');
 
   function __construct()
   {
@@ -48,378 +48,181 @@ class SurveyGroupsController extends AppController
     $this->direction = empty($_GET['direction'])? 'desc': $this->Sanitize->paranoid($_GET['direction']);
     $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
     $this->order = $this->sortBy.' '.strtoupper($this->direction);
-    $this->pageTitle = 'Survey Groups';
+    $this->set('title_for_layout', 'Survey Groups');
     parent::__construct();
   }
 
-  function index() {
-    $this->pageTitle = $this->sysContainer->getCourseName($this->rdAuth->courseId).' > Groupsets';
-    $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-    $this->userPersonalize->setPersonalizeList($personalizeData);
-    if ($personalizeData && $this->userPersonalize->inPersonalizeList('SurveyGroupSet.List.Limit.Show')) {
-      $this->show = $this->userPersonalize->getPersonalizeValue('SurveyGroupSet.List.Limit.Show');
-      $this->set('userPersonalize', $this->userPersonalize);
-    } else {
-      $this->show = '10';
-      $this->update($attributeCode = 'SurveyGroupSet.List.Limit.Show',$attributeValue = $this->show);
-    }
-    if (substr_count($this->order,'created') > 0) {
-      $this->order = 'SurveyGroupSet.id ASC';
+  function postProcess($data) {
+    if (empty($data)) {
+      return $data;
     }
 
-    $conditions = "Survey.course_id = ".$this->rdAuth->courseId;
-    $data = $this->SurveyGroupSet->findAll($conditions, $fields=null, $this->order, $this->show, $this->page);
-
-    $paging['style'] = 'ajax';
-    $paging['link'] = '/surveygroups/listgroupssearch/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
-
-    $paging['count'] = $this->SurveyGroupSet->findCount($conditions=null);
-    $paging['show'] = array('10','25','50','all');
-    $paging['page'] = $this->page;
-    $paging['limit'] = $this->show;
-    $paging['direction'] = $this->direction;
-
-    $this->set('paging',$paging);
-    $this->set('data',$data);
+    foreach ($data as $key => $entry) {
+      $data[$key]['SurveyGroupSet']['released'] = $entry['SurveyGroupSet']['released'] == 0 ? 'No' : 'Yes';
+    }
+    return $data;
   }
 
-  function listgroupssearch() {
-    $this->layout = false;
-    if (substr_count($this->order,'created') > 0) {
-      $this->order = 'id ASC';
-    }
-    if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-      $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-      $this->show = '10';
-      if ($personalizeData) {
-        $this->userPersonalize->setPersonalizeList($personalizeData);
-        $this->show = $this->userPersonalize->getPersonalizeValue('SurveyGroupSet.List.Limit.Show');
-        $this->set('userPersonalize', $this->userPersonalize);
-      }
-    }
-    $this->update($attributeCode = 'SurveyGroupSet.List.Limit.Show',$attributeValue = $this->show);
+  function setUpAjaxList() {
+    $course_id = $this->Session->read('ipeerSession.courseId');
 
-    //search function
-    $conditions = null;
-    if (!empty($this->params['form']['livesearch2']) && !empty($this->params['form']['select']))
-    {
-      $pagination->loadingId = 'loading';
-      //parse the parameters
-      $searchField=$this->params['form']['select'];
-      $searchValue=$this->params['form']['livesearch2'];
-      if ($searchField == 'set_description')
-        $conditions = "set_description='".$searchValue."'";
-      else
-        $conditions = "num_groups=".$searchValue;
-    }
+    // Set up Columns
+    $columns = array(
+        array("SurveyGroupSet.id",            "",            "",      "hidden"),
+        array("Survey.name",      "Survey",         "auto",  "string",   ""),
+        array("SurveyGroupSet.group_count",        "Number of Groups",      "13em",  "number", ""),
+        array("SurveyGroupSet.released",         "Released?",       "9em", "string", ""),
+        );
 
-    $data = $this->SurveyGroupSet->findAll($conditions, $fields=null, $this->order, $this->show, $this->page);
+    $extraFilters = array("Survey.course_id" => $course_id);
 
-    $paging['style'] = 'ajax';
-    $paging['link'] = '/surveygroups/listgroupssearch/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
+    // Set up actions
+    $warning = "Are you sure you want to delete this group set permanently?";
+    $actions = array(
+        array("Release", "", "", "", "release", "SurveyGroupSet.id"),
+        array("View/Edit Group Set", "", "", "", "edit", "SurveyGroupSet.id"),
+        array("Delete Group Set", $warning, "", "", "delete", "SurveyGroupSet.id"),
+        );
 
-    $paging['count'] = $this->SurveyGroupSet->findCount($conditions);
-    $paging['show'] = array('10','25','50','all');
-    $paging['page'] = $this->page;
-    $paging['limit'] = $this->show;
-    $paging['direction'] = $this->direction;
+    $recursive = 0;
 
-    $this->set('paging',$paging);
-    $this->set('data',$data);
+    $this->AjaxList->setUp($this->SurveyGroupSet, $columns, $actions,
+        "SurveyGroupSet.id", "SurveyGroupSet.id", array(), $extraFilters, $recursive, 'postProcess');
+  }
+
+  function index() {
+    $this->set('course_id', $this->Session->read('ipeerSession.courseId'));
+    // Set up the basic static ajax list variables
+    $this->setUpAjaxList();
+    // Set the display list
+    $this->set('paramsForList', $this->AjaxList->getParamsForList());
+  }
+
+  function ajaxList() {
+    // Set up the list
+    $this->setUpAjaxList();
+    // Process the request for data
+    $this->AjaxList->asyncGet();
   }
 
   function viewresult($params=null) {
-    $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-    $this->userPersonalize->setPersonalizeList($personalizeData);
-    if ($personalizeData && $this->userPersonalize->inPersonalizeList('Survey.ResultList.Limit.Show')) {
-      $this->show = $this->userPersonalize->getPersonalizeValue('Survey.ResultList.Limit.Show');
-      $this->set('userPersonalize', $this->userPersonalize);
-    } else {
-      $this->show = '10';
-      $this->update($attributeCode = 'Survey.ResultList.Limit.Show',$attributeValue = $this->show);
-    }
-
     if (is_null($params))
-      $courseId = $this->rdAuth->courseId;
-    else {
+      $courseId = $this->Session->read('ipeerSession.courseId');
+    else { //TODO
       $eventId = $params;
       $event = $this->Event->findById($eventId);
       $courseId = $event['Event']['course_id'];
       $this->rdAuth->setCourseId($courseId);
     }
 
-    $this->pageTitle = $this->sysContainer->getCourseName($courseId).' > View Survey Result';
+    $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > View Survey Result');
     //get surveys for the course
-    $data = $this->Survey->findAll($conditions='course_id='.$courseId);
-    //get users
-    $page = (($this->page-1)*$this->show);
-    $userData = $this->User->getEnrolledStudents($courseId, $fields=null);
-    $userData = array_splice($userData, $page, $this->show);
+    $survey_list = $this->Survey->find('list', array('conditions' => array('course_id' => $courseId)));
+    $ids = array_keys($survey_list);
+    $survey = $this->Survey->getSurveyWithSubmissionById($ids[0]);
 
-    //append user survey array if submitted for hyperlink
-    for ($i=0; $i < count($data); $i++) {
-      $data[$i]['User'] = array();
-      $title = $data[$i]['Survey']['name'];
-      if ($eventId = $this->Event->getSurveyEventIdByCourseIdDescription($courseId,$title)) {
-        $data[$i]['eventId'] = $eventId['Event']['id'];
-        foreach ($userData as $user) {
-          $evalSub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId['Event']['id'],$user['User']['id']);
-          if (isset($evalSub['EvaluationSubmission'])) {
-            array_push($data[$i]['User'],array('id'=>$user['User']['id'],'time'=>$evalSub['EvaluationSubmission']['date_submitted']));
-          }
-        }
-      }
-    }
-
-    $data['User'] = $userData;
-
-    $this->set('data',$data);
+    $this->set('survey_list', $survey_list);
+    $this->set('data',$survey);
   }
 
   function viewresultsearch() {
     $this->layout = false;
-    //show limit personal setting
-    if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-      $personalizeData = $this->Personalize->findAll('user_id = '.$this->rdAuth->id);
-      $this->show = '10';
-      if ($personalizeData) {
-        $this->userPersonalize->setPersonalizeList($personalizeData);
-        $this->show = $this->userPersonalize->getPersonalizeValue('Survey.ResultList.Limit.Show');
-        $this->set('userPersonalize', $this->userPersonalize);
-      }
-    }
-    $this->update($attributeCode = 'Survey.ResultList.Limit.Show',$attributeValue = $this->show);
+    $conditions = array();
 
     //search function
-    if (!empty($this->params['form']['livesearch2']) && !empty($this->params['form']['select']))
+    if (!empty($this->data['livesearch2']) && !empty($this->data['select']))
     {
       $pagination->loadingId = 'loading';
       //parse the parameters
-      $searchField=$this->params['form']['select'];
-      $searchValue=$this->params['form']['livesearch2'];
+      $searchField=$this->data['select'];
+      $searchValue=$this->data['livesearch2'];
+      $conditions = array('OR' => array('Enrol.first_name LIKE' => '%'.$searchValue.'%',
+                                        'Enrol.last_name LIKE' => '%'.$searchValue.'%'));
     }
 
-    $courseId = $this->rdAuth->courseId;
-
-
-
-    $data = false;
-    if (!empty($this->params['form']['survey_select'])) {
-        $data = array();
-        $data[0] = $this->Survey->find('`Survey`.`id` = '.$this->params['form']['survey_select']);
-    }
-
-    if (isset($this->params['form']) && !empty($this->params['form']) && $this->params['form']['select'] == 'user' && !empty($this->params['form']['livesearch2']))
-      $userCondition = "User.first_name LIKE '%".mysql_real_escape_string($searchValue)."%' OR User.last_name LIKE'%".mysql_real_escape_string($searchValue)."%'";
-    else
-      $userCondition = null;
-    //get surveys for the course
-    //get users
-    $page = (($this->page-1)*$this->show);
-
-    $tmpUserData = $this->User->getEnrolledStudents($courseId, $fields=null, $userCondition);
-    $userData = array_splice($tmpUserData, $page, $this->show);
-
-    //append user survey array if submitted for hyperlink
-    if ($data) {
-        for ($i=0; $i < count($data); $i++) {
-        $data[$i]['User'] = array();
-        $title = $data[$i]['Survey']['name'];
-        if ($eventId = $this->Event->getSurveyEventIdByCourseIdDescription($courseId,$title)) {
-            $data[$i]['eventId'] = $eventId['Event']['id'];
-            foreach ($userData as $user) {
-            $evalSub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId['Event']['id'],$user['User']['id']);
-            if (isset($evalSub['EvaluationSubmission'])) {
-                array_push($data[$i]['User'],array('id'=>$user['User']['id'],'time'=>$evalSub['EvaluationSubmission']['date_submitted']));
-            }
-            }
-        }
-        }
-    }
-
-
-
-    $data['User'] = $userData;
-
-    $this->set('data',$data);
-
-
-
+    $survey = $this->Survey->getSurveyWithSubmissionById($this->data['survey_select'], $conditions);
+    $this->set('data',$survey);
   }
 
-  function makegroups($params=null) {
-    $this->pageTitle = $this->sysContainer->getCourseName($this->rdAuth->courseId).' > Create Group Set';
-    $courseId = $this->rdAuth->courseId;
-    $courseName = $this->Course->find('id='.$courseId,'course');
-    $courseName = $courseName['Course']['course'];
-    //get surveys for the course
-    $data = $this->Survey->findAll($conditions='course_id='.$courseId);
-
-    $survey = $this->Survey->find('course_id='.$courseId);
-    $survey_id = $survey['Survey']['id'];
-    $surveyTitle = $survey['Survey']['name'];
-    $surveyEventId = $this->Event->getSurveyEventIdByCourseIdDescription($courseId,$surveyTitle);
-    $surveyEventId = $surveyEventId['Event']['id'];
-    //display number of students and number responded
-    $studentCount = count($this->User->getEnrolledStudents($courseId, 'id'));
-    $studentResponseCount = count($this->EvaluationSubmission->findAll('event_id='.$surveyEventId,'id'));
-
-    // Get all required data from each table for every question
-    $tmp = $this->SurveyQuestion->getQuestionsID($survey_id);
-    $tmp = $this->Question->fillQuestion($tmp);
-    $result = null;
-
-    // Sort the resultant array by question number
-    $count = 1;
-    for( $i=0; $i<=$tmp['count']; $i++ ){
-      for( $j=0; $j<$tmp['count']; $j++ ){
-        if( $i == $tmp[$j]['Question']['number'] ){
-          $result[$count]['Question'] = $tmp[$j]['Question'];
-          $count++;
-        }
-      }
-    }
-    $this->set('course_name',$courseName);
-    $this->set('survey_id', $survey_id);
-    $this->set('questions', $result);
-    $this->set('student_count',$studentCount);
-    $this->set('student_response_count',$studentResponseCount);
-
-    $this->set('data',$data);
+  function makegroups($course_id) {
+    $course = $this->Course->find('first', array('conditions' => array('id' => $course_id),
+                                                 'contain' => array()));
+    $courseName = $course['Course']['course'];
+    $this->set('title_for_layout', $courseName.' > Create Group Set');
+    $this->set('surveys', $this->Survey->find('list', array('conditions' => array('course_id' => $course_id))));
   }
 
-  function makegroupssearch($params=null) {
+  function makegroupssearch() {
     $this->layout = false;
-    $courseId = $this->rdAuth->courseId;
-    if (!empty($this->params['form']['survey_select'])) {
-      $surveyId = $this->params['form']['survey_select'];
-      $survey = $this->Survey->find('id='.$surveyId);
-      $survey_id = $survey['Survey']['id'];
-      $surveyTitle = $survey['Survey']['name'];
-      $surveyEventId = $this->Event->getSurveyEventIdByCourseIdDescription($courseId,$surveyTitle);
-    } else {
-      $survey = $this->Survey->find('course_id='.$courseId);
-      $survey_id = $survey['Survey']['id'];
-      $surveyTitle = $survey['Survey']['name'];
-      $surveyEventId = $this->Event->getSurveyEventIdByCourseIdDescription($courseId,$surveyTitle);
+
+    if(empty($this->data['survey_select'])) {
+      $this->autoRender = false;
+       return '';
     }
-    $surveyEventId = $surveyEventId['Event']['id'];
-    //display number of students and number responded
-    $studentCount = count($this->User->getEnrolledStudents($courseId, 'id'));
-    $studentResponseCount = count($this->EvaluationSubmission->findAll('event_id='.$surveyEventId,'id'));
 
-    // Get all required data from each table for every question
-    $tmp = $this->SurveyQuestion->getQuestionsID($survey_id);
-    $tmp = $this->Question->fillQuestion($tmp);
-    $result = null;
+    $survey = $this->Survey->read(null, $this->data['survey_select']);
+    $this->set('group_list', $this->__makeGroupList($survey['Course']['student_count']));
 
-    // Sort the resultant array by question number
-    $count = 1;
-    for( $i=0; $i<=$tmp['count']; $i++ ){
-      for( $j=0; $j<$tmp['count']; $j++ ){
-        if( $i == $tmp[$j]['Question']['number'] ){
-          $result[$count]['Question'] = $tmp[$j]['Question'];
-          $count++;
-        }
+    $this->set('data', $survey);
+  }
+
+  function maketmgroups($params=null,$time=null,$make=true) {
+      /*$time = 1290644146;
+      $make = false;*/
+    $numGroups = $this->data['group_config'];
+    $survey_id = $this->data['survey_id'];
+    $survey = $this->Survey->find('first', array('conditions' => array('Survey.id' => $survey_id),
+                                                 'recursive' => 2));
+
+    //make xml for TeamMaker
+    $doc = $this->XmlHandler->makeTeamMakerXML($survey, $numGroups, $this->params['form']['weight']);
+
+    //saves the 'in' file
+    $time = (isset($time) ? $time: (String)time());
+
+    $file_path = TMP.$time;
+    $this->File = new File($file_path.'.xml');
+    $this->File->write($doc);
+    //execute TeamMaker
+    $cmdline .= $this->__getTeamMaker().' '.$file_path.'.xml '.$file_path.'.txt';// > ../tmp/tm_log.txt";
+
+    set_time_limit(1200);
+    if ($make) exec($cmdline);
+
+    //parse results and display
+    $teams_tmp = file($file_path.'.txt');
+    $teams = array();
+
+    //format the team recordset
+    for ($i=0; $i < count($teams_tmp); $i++) {
+      $team = $teams_tmp[$i];
+      $members = explode(' ',$team);
+      for ($j=0; $j < count($members); $j++) {
+        $member = $members[$j];
+        $member_id = $this->User->getUserIdByStudentNo($member);
+        $teams[$i]['member_'.$j]['student_no'] = $member;
+        $teams[$i]['member_'.$j]['id'] = $member_id;
       }
     }
 
+    $this->__cleanXmlFile($file_path.'.txt.scores');
+
+    $scores = $this->XmlHandler->readTMXml(count($survey['Question']), $file_path.'.txt.scores');
+    $this->set('scores',$scores);
+    $this->set('teams',$teams);
+
+    $this->set('filename',$time);
     $this->set('survey_id', $survey_id);
-    $this->set('questions', $result);
-    $this->set('student_count',$studentCount);
-    $this->set('student_response_count',$studentResponseCount);
-    //$this->set('data',true);
+    $this->set('event_id',$survey['Event'][0]['id']);
   }
 
-    function maketmgroups($params=null,$time=null,$make=true) {
-        $numGroups = $this->params['form']['group_config'];
-        $surveyId = $this->params['form']['survey_id'];
-        $courseId = $this->rdAuth->courseId;
-        $surveyName = $this->Survey->getSurveyTitleById($surveyId);
-        $eventId = $this->Event->getSurveyEventIdByCourseIdDescription($courseId,$surveyName);
-        $eventId = $eventId['Event']['id'];
-
-        // Get all required data from each table for every question
-        $tmp = $this->SurveyQuestion->getQuestionsID($surveyId);
-        $tmp = $this->Question->fillQuestion($tmp);
-        $questions = null;
-
-        // Sort the resultant array by question number
-        $count = 1;
-        for( $i = 0; $i <= $tmp['count']; $i++ ) {
-            for( $j = 0; $j < $tmp['count']; $j++ ) {
-                if($i == $tmp[$j]['Question']['number']) {
-                    $questions[$count]['Question'] = $tmp[$j]['Question'];
-                      $count++;
-                }
-            }
-        }
-
-        $doc = '';
-        //make xml for TeamMaker
-        if (phpversion() < 5) {
-            $doc = $this->XmlHandler->makeTMXml4($questions,$surveyId,$numGroups,$this->params);
-        } else {
-            $doc = $this->XmlHandler->makeTMXml5($questions,$surveyId,$numGroups,$this->params);
-        }
-
-        //saves the 'in' file
-        $time = (isset($time) ? $time: (String)time());
-
-        $unix_path = '../tmp/'.$time.'.xml';
-        $windows_path = '..\\tmp\\'.$time.'.xml';
-        $this->File = new File($unix_path);
-        $this->File->write($doc);
-        //execute TeamMaker
-        if(!file_exists('..\\controllers\\components\\TeamMaker'))  { //not windows
-            //$cmdline = "./TeamMaker $out_filename $in_filename > output.txt";
-            $cmdline = "../controllers/components/TeamMaker ".$unix_path." ../tmp/".$time.".txt";// > ../tmp/tm_log.txt";
-            //$cmdline =  "/var/www/ipeer.apsc.ubc.ca/htdocs/prod/app/controllers/components/TeamMaker ".$unix_path."/var/www/ipeer.apsc.ubc.ca/htdocs/prod/app/tmp/".$time.".txt";
-        } else {//windows
-        //$cmdline = "TeamMaker 1133823949_in.xml $in_filename > output.txt";
-            $cmdline = "..\\controllers\components\\TeamMaker ".$windows_path." ..\\tmp\\".$time.".txt > ..\\tmp\\tm_log.txt";
-        }
-
-        set_time_limit(1200);
-        if ($make) exec($cmdline);
-
-        //parse results and display
-        $teams_tmp = file('../tmp/'.$time.'.txt');
-        $teams = array();
-
-        //format the team recordset
-        for ($i=0; $i < count($teams_tmp); $i++) {
-            $team = $teams_tmp[$i];
-            $members = explode(' ',$team);
-            for ($j=0; $j < count($members); $j++) {
-                $member = $members[$j];
-                $member_id = $this->User->getUserIdByStudentNo($member);
-                $teams[$i]['member_'.$j]['student_no'] = $member;
-                $teams[$i]['member_'.$j]['id'] = $member_id;
-            }
-        }
-        $xmlFile = file_get_contents('../tmp/'.$time.'.txt.scores');
-        $xmlFile = @ereg_replace('(<\?=).*(\?>)','',$xmlFile);
-        file_put_contents('../tmp/'.$time.'.txt.scores',$xmlFile);
-        //$scores = file_get_contents('../tmp/'.$time.'.txt.scores');
-
-        $scores = $this->XmlHandler->readTMXml(count($questions),'../tmp/'.$time.'.txt.scores');
-        //print_r($scores);
-        $this->set('scores',$scores);
-        $this->set('teams',$teams);
-
-        $this->set('filename',$time);
-        $this->set('survey_id', $surveyId);
-        $this->set('event_id',$eventId);
-    }
-
-  function savegroups($params=null) {
+  function savegroups() {
     $this->autoRender = false;
-    $time = $this->params['form']['filename'];
-    $setDescription = $this->params['form']['team_set_name'];
-    $surveyId = $this->params['form']['survey_id'];
+    $time = $this->data['filename'];
+    $setDescription = $this->data['team_set_name'];
+    $surveyId = $this->data['survey_id'];
     //get teams
-    $teams_tmp = file('../tmp/'.$time.'.txt');
+    $teams_tmp = file(TMP.$time.'.txt');
 
     //save group sets
     $numGroups = count($teams_tmp);
@@ -428,175 +231,78 @@ class SurveyGroupsController extends AppController
     $surveyGroupSet['SurveyGroupSet']['set_description'] = $setDescription;
     $surveyGroupSet['SurveyGroupSet']['num_groups'] = $numGroups;
     $surveyGroupSet['SurveyGroupSet']['date'] = $time;
-    $this->SurveyGroupSet->save($surveyGroupSet);
 
-    $surveyGroupSetId = $this->SurveyGroupSet->getIdBySurveyIdSetDescription($surveyId,$setDescription);
-
-    for ($i=0; $i < count($teams_tmp); $i++) {
+    for ($i = 0; $i < count($teams_tmp); $i++) {
         //save groups
         $team = $teams_tmp[$i];
 
         $group = array();
-        $group['SurveyGroup']['group_set_id'] = $surveyGroupSetId;
-        $group['SurveyGroup']['group_number'] = $i+1;
-        $this->SurveyGroup->save($group);
-        $groupId = $this->SurveyGroup->getIdByGroupSetIdGroupNumber($surveyGroupSetId,$i+1);
-        $this->SurveyGroup->id = null;
+        $group['group_number'] = $i+1;
 
-        $members = explode(' ',$team);
-        for ($j=0; $j < count($members); $j++) {
+        $members = explode(' ',trim($team));
+        $group_members = array();
+        foreach ($members as $member) {
             //save group members
-            $member = $members[$j];
             $member_id = $this->User->getUserIdByStudentNo($member);
             $surveyGroupMember = array();
-            $surveyGroupMember['SurveyGroupMember']['group_set_id'] = $surveyGroupSetId;
-            $surveyGroupMember['SurveyGroupMember']['group_id'] = $groupId;
-            $surveyGroupMember['SurveyGroupMember']['user_id'] = $member_id;
-            $this->SurveyGroupMember->save($surveyGroupMember);
-            $this->SurveyGroupMember->id = null;
+            $surveyGroupMember['user_id'] = $member_id;
+            $group_members[] = $surveyGroupMember;
         }
+        $surveyGroupSet['SurveyGroup'][]['SurveyGroup'] = $group;
+        $surveyGroupSet['SurveyGroup'][$i]['SurveyGroupMember'] = $group_members;
     }
 
-    //set data for redirect
-    $this->index();
-
-    $this->set('message','The group set was added successfully.');
-    $this->render('index');
+    // use overwritten save method to save all
+    if($this->SurveyGroupSet->save($surveyGroupSet)) {
+      $this->Session->setFlash('The group set was added successfully.');
+    } else {
+      $this->Session->setFlash('The group set saving failed..');
+    }
+    $this->redirect('index');
   }
 
-    function releasesurveygroupset($groupSetId=null) {
-        $courseId = $this->rdAuth->courseId;
-        $userId = $this->rdAuth->id;
-
-        // Check for a valid parameter
-        if (!is_numeric($groupSetId)) {
-            $this->set('message','Group Set must be a numeric id');
-            $this->index();
-            $this->render('index');
-            exit;
-        }
-
-        //get survey groups
-        $surveyGroups = $this->SurveyGroup->findAll('group_set_id='.$groupSetId);
-
-
-        // Check for a valid survey group set
-        if (empty($surveyGroups)) {
-            $this->set('message','No Survey group found/');
-            $this->index();
-            $this->render('index');
-            exit;
-        }
-
-
-        //get last group number if exists; add groups
-        $maxGroupNum = $this->Group->getLastGroupNumByCourseId($courseId);
-
-
-        foreach ($surveyGroups as $surveyGroup) {
-            $group = array();
-            $this->Group->id = null;
-            $groupNum = $surveyGroup['SurveyGroup']['group_number'];
-            $group['Group']['group_num'] = $groupNum+$maxGroupNum;
-            $group['Group']['group_name'] = 'Team #'.$surveyGroup['SurveyGroup']['group_number'];
-            $group['Group']['course_id'] = $courseId;
-            $group['Group']['creator_id'] = $userId;
-            if ($this->Group->save($group)) {
-                $groupId = $this->Group->id;
-                $surveyGroupId = $surveyGroup['SurveyGroup']['id'];
-                $conditions = "group_set_id='$groupSetId' AND group_id='$surveyGroupId'";
-                $surveyGroupMembers = $this->SurveyGroupMember->findAll($conditions);
-                //add group members
-                foreach ($surveyGroupMembers as $surveyGroupMember) {
-                    $groupMember = array();
-                    $groupMember['GroupsMembers']['group_id'] = $groupId;
-                    $groupMember['GroupsMembers']['user_id'] = $surveyGroupMember['SurveyGroupMember']['user_id'];
-                    $this->GroupsMembers->save($groupMember);
-                    $this->GroupsMembers->id = null;
-                }
-            } else {
-                //complain about error...
-                $this->set('message','Group set release failed.');
-                $this->index();
-                $this->render('index');
-                die;
-            }
-        }
-
-        //change status of survey set to released
-        $this->SurveyGroupSet->setId($groupSetId);
-        $surveyGroupSet = array();
-        $surveyGroupSet['SurveyGroupSet']['released'] = 1;
-        if (!$this->SurveyGroupSet->save($surveyGroupSet)) {
-            $this->set('message','Group set release failed.');
-            $this->index();
-            $this->render('index');
-        }
-
-        $this->set('message','The group set was released successfully.');
-        $this->index();
-        $this->render('index');
+  function release($group_set_id) {
+    // Check for a valid parameter
+    if (!is_numeric($group_set_id)) {
+      $this->Session->setFlash('Group Set must be a numeric id');
+      $this->redirect('index');
     }
 
+    if($this->SurveyGroupSet->release($group_set_id)) {
+      $this->Session->setFlash('The group set was released successfully.');
+    } else {
+      $this->Session->setFlash('Releasing group set failed.');
+    }
+    $this->redirect('index');
+  }
 
-  function deletesurveygroupset($params=null) {
+
+  function delete($group_set_id) {
     $this->autoRender = false;
-    $groupSetId = $params;
-    $time = $this->SurveyGroupSet->find('id='.$groupSetId,'date');
-    $time = $time['SurveyGroupSet']['date'];
 
-    $this->SurveyHelper->deleteGroupSet($groupSetId);
-
-    //delete teammaker crums
-    unlink('../tmp/'.$time.'.txt');
-    unlink('../tmp/'.$time.'.xml');
-    unlink('../tmp/'.$time.'.txt.scores');
-
-    $this->index();
-
-    $this->set('message','The group set was deleted successfully.');
-    $this->render('index');
+    if($this->SurveyGroupSet->delete($group_set_id)) {
+      $this->Session->setFlash('The group set was deleted successfully.');
+    } else {
+      $this->Session->setFlash('Failed to delete group set.');
+    }
+    $this->redirect('index');
   }
 
-  function editgroupset($params=null,$data=null) {
-    $this->pageTitle = $this->sysContainer->getCourseName($this->rdAuth->courseId).' > Edit Groupset';
+  function edit($group_set_id, $question_id = null) {
+    $this->set('title_for_layout', $this->sysContainer->getCourseName($this->Session->read('ipeerSession.courseId')).' > Edit Groupset');
     //get group set
-    $groupSetId = strtok($params,';');
-    $questionId = strtok(';');
-    $courseId = $this->rdAuth->courseId;
-    $surveyId = $this->SurveyGroupSet->getSurveyIdById($groupSetId);
-    $surveyName = $this->Survey->getSurveyTitleById($surveyId);
-    $eventId = $this->Event->getSurveyEventIdByCourseIdDescription($courseId,$surveyName);
-    $eventId = $eventId['Event']['id'];
-    $time = $this->SurveyGroupSet->find('id='.$groupSetId,'date');
-    $time = $time['SurveyGroupSet']['date'];
-    $scoreFilePathAndName = '../tmp/'.$time.'.txt.scores';
-    $xmlFile = file_get_contents('../tmp/'.$time.'.txt.scores');
-    $xmlFile = @ereg_replace('(<\?=).*(\?>)','',$xmlFile);
-    file_put_contents('../tmp/'.$time.'.txt.scores',$xmlFile);
+    $group_set = $this->SurveyGroupSet->find('first', array('conditions' => array('SurveyGroupSet.id' => $group_set_id),
+                                                            'recursive' => 2));
+    $time = $group_set['SurveyGroupSet']['date'];
+    $scoreFilePathAndName = TMP.$time.'.txt.scores';
+    $this->__cleanXmlFile($scoreFilePathAndName);
 
-    //get group
-    $surveyGroups = $this->SurveyGroup->findAll('group_set_id='.$groupSetId);
-    $data = array();
-    //   print_r($surveyGroups);
-    for ($i=0; $i < count($surveyGroups); $i++) {
-      $surveyGroup = $surveyGroups[$i];
-      //get member
-      $groupId = $surveyGroup['SurveyGroup']['id'];
-      $data[$i]['id'] = $groupId;
-
-      $surveyGroupMembers = $this->SurveyGroupMember->findAll('group_set_id='.$groupSetId.' AND group_id='.$groupId);
-      $data[$i]['members'] = array();
-      for ($j=0; $j < count($surveyGroupMembers); $j++) {
-        $surveyGroupMember = $surveyGroupMembers[$j];
-        $memberId = $surveyGroupMember['SurveyGroupMember']['user_id'];
-        //add to data
-        $user = $this->User->findUserById($memberId);
-        $studentId = $user['User']['student_no'];
-        $name = $user['User']['last_name'].', '.$user['User']['first_name'];
+    $inputs = array();
+    foreach ($group_set['SurveyGroup'] as $i => $survey_group) {
+      foreach ($survey_group['Member'] as $j => $surveyGroupMember) {
         //if question selected, add responses to data
-        if ($questionId != '') {
-          $surveyInput = $this->SurveyInput->getAllSurveyInputBySurveyIdUserIdQuestionId($surveyId,$memberId,$questionId);
+        if ($question_id != null) {
+          $surveyInput = $this->SurveyInput->getAllSurveyInputBySurveyIdUserIdQuestionId($group_set['Survey']['id'],$surveyGroupMember['id'],$question_id);
 
           for ($k=0; $k < count($surveyInput); $k++) {
             $inputData = $surveyInput[$k]['SurveyInput'];
@@ -605,167 +311,125 @@ class SurveyGroupsController extends AppController
             $inputResponseText = $inputData['response_text'];
             $inputQuestionType = $this->Question->getTypeById($inputQuestionId);
 
-            $data[$i]['members'][$j]['response']['type'] = $inputQuestionType;
-            if (!isset($data[$i]['members'][$j]['response']['id']) || !is_array($data[$i]['members'][$j]['response']['id']))
-              $data[$i]['members'][$j]['response']['id'] = array();
-            array_push($data[$i]['members'][$j]['response']['id'], $inputResponseId);
-            $data[$i]['members'][$j]['response']['response_text'] = $inputResponseText;
+            $inputs[$surveyGroupMember['id']]['type'] = $inputQuestionType;
+            if (!isset($inputs[$surveyGroupMember['id']]['id']) || !is_array($inputs[$surveyGroupMember['id']]['id']))
+              $inputs[$surveyGroupMember['id']]['id'] = array();
+            array_push($inputs[$surveyGroupMember['id']]['id'], $inputResponseId);
+            $inputs[$surveyGroupMember['id']]['response_text'] = $inputResponseText;
           }
         } else {
           //links student to survey result if submitted
-          $surveyInput = $this->SurveyInput->getAllSurveyInputBySurveyIdUserId($surveyId,$memberId);
+          $surveyInput = $this->SurveyInput->getAllSurveyInputBySurveyIdUserId($group_set['Survey']['id'],$surveyGroupMember['id']);
           if (!empty($surveyInput))
-            $data[$i]['members'][$j]['response'] = 'yes';
+            $inputs[$surveyGroupMember['id']] = 'yes';
         }
-        $data[$i]['members'][$j]['id'] = $memberId;
-        $data[$i]['members'][$j]['name'] = $name;
-        $data[$i]['members'][$j]['student_id'] = $studentId;
       }
     }
-    // Get all required data from each table for every question
-    $tmp = $this->SurveyQuestion->getQuestionsID($surveyId);
-    $tmp = $this->Question->fillQuestion($tmp);
-    $result = null;
 
-    // Sort the resultant array by question number
-    $count = 1;
-    for( $i=0; $i<=$tmp['count']; $i++ ){
-      for( $j=0; $j<$tmp['count']; $j++ ){
-        if( $i == $tmp[$j]['Question']['number'] ){
-          $result[$count]['Question'] = $tmp[$j]['Question'];
-          $count++;
-        }
-      }
-    }
-    if ($questionId != '') {
-      $responses = $this->Response->getResponseByQuestionId($questionId);
+    if ($question_id != '') {
+      $responses = $this->Response->getResponseByQuestionId($question_id);
       $this->set('responses',$responses);
     }
 
-    $score = $this->XmlHandler->readTMXml(count($result),$scoreFilePathAndName);
-    //print_r($score);
-    //print_r($data);
+    $questions = array();
+    foreach($group_set['Survey']['Question'] as $q) {
+      $questions[$q['id']] = $q['prompt'];
+    }
+
+    $score = $this->XmlHandler->readTMXml(count($group_set['Survey']['Question']),$scoreFilePathAndName);
+
     //set data
     $this->set('score',$score);
-    $this->set('question_id',$questionId);
-    $this->set('questions', $result);
-    $this->set('survey_id', $surveyId);
-    $this->set('data',$data);
-    $this->set('event_id',$eventId);
-    $this->set('group_set_id',$groupSetId);
-    //render
+    $this->set('selected_question',$question_id);
+    $this->set('survey_id', $group_set['Survey']['id']);
+    $this->set('questions', $questions);
+    $this->set('inputs', $inputs);
+    $this->set('data',$group_set);
+    $this->set('event_id',$group_set['Survey']['Event'][0]['id']);
+    $this->set('group_set_id',$group_set_id);
   }
 
-  function changegroupset($params=null) {
+  function changegroupset() {
     $this->autoRender = false;
-    //get data
-    $formData = $this->params['form'];
-    $surveyId = $formData['survey_id'];
-    $groupSetId = $formData['group_set_id'];
-    $time = $this->SurveyGroupSet->find('id='.$groupSetId,'date');
-    $time = $time['SurveyGroupSet']['date'];
-    $xmlFilePathAndName = '../tmp/'.$time.'.xml';
-    $groupChangeData = array();
-    $i=0;
-    foreach ($formData['move'] as $value) {
-      if ($value != '-1') {
-        $data = explode('_',$value);
-        $groupChangeData[$i]['user_id'] = $data[0];
-        $groupId = $this->SurveyGroup->find('group_set_id='.$groupSetId.' AND group_number='.$data[1],'id');
-        $newGroupId = $this->SurveyGroup->find('group_set_id='.$groupSetId.' AND group_number='.$data[2],'id');
-        $groupId = $groupId['SurveyGroup']['id'];
-        $newGroupId = $newGroupId['SurveyGroup']['id'];
-        $groupChangeData[$i]['group_id'] = $groupId;
-        $groupChangeData[$i]['new_group_id'] = $newGroupId;
-        $i++;
+
+    foreach ($this->data['move'] as $value) {
+      if (empty($value)) continue;
+      $data = explode('_',$value);
+      if (!$this->SurveyGroupMember->updateAll(array('group_id' => $data[2]),
+                                               array('user_id' => $data[0],
+                                                     'group_id' => $data[1]))) {
+        $this->Session->setFlash('Group set change failed.');
+        $this->redirect('index');
       }
     }
-    //find group member id and change group id
-    foreach ($groupChangeData as $groupMember) {
-      $groupMemberData = $this->SurveyGroupMember->find('user_id='.$groupMember['user_id'].' AND group_id='.$groupMember['group_id']);
-      $groupMemberData['SurveyGroupMember']['group_id'] = $groupMember['new_group_id'];
-      if (!$this->SurveyGroupMember->save($groupMemberData)) {
-        $this->set('message','Group set change failed.');
-        $this->index();
-        $this->render('index');
-        die;
-      }
-      $this->SurveyGroupMember->id = null;
-    }
 
-    //get team data
-    $data = array();
-    //group code begin
-    $courseId = $this->rdAuth->courseId;
-    $surveyId = $this->SurveyGroupSet->getSurveyIdById($groupSetId);
-
-    //get group
-    $surveyGroups = $this->SurveyGroup->findAll('group_set_id='.$groupSetId);
-    $data = array();
-    for ($i=0; $i < count($surveyGroups); $i++) {
-      $surveyGroup = $surveyGroups[$i];
-      //get member
-      $groupId = $surveyGroup['SurveyGroup']['id'];
-      $data[$i]['id'] = $groupId;
-
-      $surveyGroupMembers = $this->SurveyGroupMember->findAll('group_set_id='.$groupSetId.' AND group_id='.$groupId);
-      $data[$i]['members'] = array();
-      for ($j=0; $j < count($surveyGroupMembers); $j++) {
-        $surveyGroupMember = $surveyGroupMembers[$j];
-        $memberId = $surveyGroupMember['SurveyGroupMember']['user_id'];
-        //add to data
-        $user = $this->User->findUserById($memberId);
-        $studentId = $user['User']['student_no'];
-        $name = $user['User']['last_name'].', '.$user['User']['first_name'];
-        $data[$i]['members'][$j]['id'] = $memberId;
-        $data[$i]['members'][$j]['name'] = $name;
-        $data[$i]['members'][$j]['student_id'] = $studentId;
-      }
-    }
     //group code end
+    /*$time = $group_set['SurveyGroupSet']['date'];
     $out = file_get_contents($xmlFilePathAndName);
     $out = @ereg_replace("</team_input>",'',$out);
     $out = @ereg_replace("(<fixed>).+(</fixed>)",'',$out);
-    //print_r($data);
-    for ($i=0; $i < count($data); $i++) {
-      $team = $data[$i]['members'];
-      $out .= "<fixed>";
-      for ($j=0; $j < count($team); $j++) {
-        //  print_r($data);die;
-        $student_no = $team[$j]['student_id'];
-        $out .= '<member name="'.$student_no.'"/>';
-        $out .= "\n";
+    $out .= "<fixed>";
+    foreach ($this->data['move'] as $move) {
+      if(empty($move)) continue;
+      $move = explode('_', $move);
+      as $i => $surveyGroup) {
+      foreach ($surveyGroup['Member'] as $j => $member) {
+        $out .= '<member name="'.$member['student_no'].'"/>'."\n";
       }
-      $out .= "</fixed>\n";
     }
+      $out .= "</fixed>\n";
     $out .= "</team_input>";
     file_put_contents($xmlFilePathAndName,$out);
 
-    //saves the 'in' file
-    $unix_path = '../tmp/'.$time.'.xml';
-    $windows_path = '..\\tmp\\'.$time.'.xml';
-    //execute TeamMaker
-    if(file_exists('../controllers/components/TeamMaker')) //unix
-    {
-      //$cmdline = "./TeamMaker $out_filename $in_filename > output.txt";
-      $cmdline = "../controllers/components/TeamMaker ".$unix_path." ../tmp/".$time.".txt > ../tmp/tm_log.txt";
+    //execute TeamMaker saves the 'in' file
+    if(file_exists(COMPONENTS.'TeamMaker')) {
+      $team_maker = 'TeamMaker';
+    } else {//windows
+      $team_maker = 'TeamMaker.exe';
     }
-    else //windows
-      //$cmdline = "TeamMaker 1133823949_in.xml $in_filename > output.txt";
-      $cmdline = "..\\controllers\\components\\TeamMaker.exe ".$windows_path." ..\\tmp\\".$time.".txt > ..\\tmp\\tm_log.txt";
-
+    $cmdline .= COMPONENTS.$team_maker.' '.$xmlFilePathAndName.' '.TMP.$time.'.txt > '.TMP.'tm_log.txt';
 
     set_time_limit(1200);
-    exec($cmdline);
+    exec($cmdline);*/
 
-    $this->index();
-    $this->set('message','Group set changed successfully.');
-    $this->render('index');
+    $this->Session->setFlash('Group set changed successfully.');
+    $this->redirect('index');
   }
 
-  function update($attributeCode='',$attributeValue='') {
-    if ($attributeCode != '' && $attributeValue != '') //check for empty params
-      $this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
+  function __makeGroupList($num_students){
+    $group_list = array();
+    for($i = 2; $i <= $num_students / 2; $i++) {
+
+      $teams = array_pad(array(),$i,0);
+      $maxie=0;
+      for($j = 0; $j < $num_students; $j++)  $maxie=max(++$teams[$j % $i],$maxie);
+
+      $counts = array_pad(array(),$maxie+1,0);
+      for($j = 0; $j < $i; $j++) $counts[$teams[$j]]++;
+
+      $output = array();
+      foreach($counts as $size => $number) if($number!=0){
+        array_push($output, "$number teams of $size");
+      }
+
+      rsort($output);
+      $group_list[$i] = join(', ' , $output);
+    }
+    return $group_list;
+  }
+
+  function __cleanXmlFile($file_path_name) {
+    $xmlFile = file_get_contents($file_path_name);
+    $xmlFile = @ereg_replace('(<\?=).*(\?>)','',$xmlFile);
+    file_put_contents($file_path_name,$xmlFile);
+  }
+
+  function __getTeamMaker() {
+    $cmdline = COMPONENTS.'TeamMaker';
+    if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')  {
+      $cmdline .= '.exe';
+    }
+    return $cmdline;
   }
 }
 ?>

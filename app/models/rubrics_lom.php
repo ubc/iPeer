@@ -61,7 +61,7 @@ class RubricsLom extends AppModel
   // function to return the LOM general statements from the
   // rubrics_loms table
   function getLOM( $id=null, $lom_num=null ){
-  	$data = $this->findAll($conditions = 'rubric_id='.$id, $fields = 'lom_comment');
+  	$data = $this->find('all',$conditions = 'rubric_id='.$id, $fields = 'lom_comment');
 
   	for( $i=0; $i<$lom_num; $i++ ){
   		if( !empty( $data[$i]['RubricsLom']['lom_comment'] ) )

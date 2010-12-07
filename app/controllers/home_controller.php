@@ -27,45 +27,341 @@
  */
 class HomeController extends AppController
 {
-	/**
-	 * This controller does not use a model
-	 *
-	 * @var $uses
-	 */
-	var $uses =  array('User', 'UserEnrol', 'UserCourse', 'Event', 'GroupEvent', 'Group', 'EvaluationSubmission', 'Course');
-	var $page;
-	var $Sanitize;
-	var $functionCode = 'HOME';
+  /**
+   * This controller does not use a model
+   *
+   * @var $uses
+   */
+  var $uses =  array('User', 'UserEnrol', 'UserCourse', 'Event', 'GroupEvent', 'Group', 'EvaluationSubmission', 'Course', 'Role');
+  var $page;
+  var $Sanitize;
+  var $functionCode = 'HOME';
+  var $componets = array('Acl');
 
-	function __construct()
-	{
-		$this->Sanitize = new Sanitize;
-		$this->pageTitle = 'Home';
-		parent::__construct();
-	}
+  function __construct()
+  {
+    $this->Sanitize = new Sanitize;
+    $this->set('title_for_layout', 'Home');
+    parent::__construct();
+  }
 
-	function index($msg='') {
+  /* temp code */
+  function beforeFilter() {
+    parent::beforeFilter(); 
+//    $this->Auth->allow('*');
+  }
+
+  function createAro() {
+    $this->Role->set('name', 'superadmin');
+    $this->Role->save(); 
+
+    $this->Role->set('id', '');
+    $this->Role->set('name', 'admin');
+    $this->Role->save(); 
+
+    $this->Role->set('id', '');
+    $this->Role->set('name', 'instructor');
+    $this->Role->save(); 
+
+    $this->Role->set('id', '');
+    $this->Role->set('name', 'student');
+    $this->Role->save(); 
+  }
+
+  function createPermissions() {
+    $role = $this->Role;
+    $role->id = 1;  // superadmin
+    $this->Acl->allow($role, 'controllers');
+    $this->Acl->allow($role, 'functions');
+
+    $role->id = 2;  // admin
+    $this->Acl->deny($role, 'controllers');
+    $this->Acl->allow($role, 'controllers/Home');
+    $this->Acl->allow($role, 'controllers/Courses');
+    $this->Acl->allow($role, 'controllers/Users');
+    $this->Acl->deny($role, 'functions');
+    $this->Acl->allow($role, 'functions/user');
+    $this->Acl->deny($role, 'functions/user/admin');
+    $this->Acl->deny($role, 'functions/user/superadmin');
+
+    $role->id = 3; // instructor
+    $this->Acl->deny($role, 'controllers');
+    $this->Acl->allow($role, 'controllers/Home');
+    $this->Acl->allow($role, 'controllers/Courses');
+    $this->Acl->allow($role, 'controllers/Users');
+    $this->Acl->deny($role, 'functions');
+    $this->Acl->allow($role, 'functions/user');
+    $this->Acl->deny($role, 'functions/user/admin');
+    $this->Acl->deny($role, 'functions/user/superadmin');
+    $this->Acl->deny($role, 'functions/user/instructor');
+
+    $role->id = 4; // student 
+    $this->Acl->deny($role, 'controllers');
+    $this->Acl->allow($role, 'controllers/Home');
+    $this->Acl->allow($role, 'controllers/Courses');
+    $this->Acl->deny($role, 'controllers/Users');
+    $this->Acl->deny($role, 'functions');
+  }
+
+  function createAcos() {
+    $this->__buildAcoControllers();
+    $this->__buildAcoFunctions();
+  }
+
+  function __buildAcoFunctions() {
+    $roles = $this->Role->find('all');
+
+    $this->Acl->Aco->create(array('parent_id' => null, 'alias' => 'functions'));
+    $root = $this->Acl->Aco->save();
+    $root['Aco']['id'] = $this->Acl->Aco->id;
+
+    // functions/user
+    $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'user'));
+    $aco_user = $this->Acl->Aco->save();
+    $aco_user['Aco']['id'] = $this->Acl->Aco->id;
+
+    foreach($roles as $r) {
+      $this->Acl->Aco->create(array('parent_id' => $aco_user['Aco']['id'], 'model' => null, 'alias' => $r['Role']['name']));
+      $this->Acl->Aco->save();
+    }
+
+    $this->Acl->Aco->create(array('parent_id' => $aco_user['Aco']['id'], 'model' => null, 'alias' => 'import'));
+    $this->Acl->Aco->save();
+
+    $this->Acl->Aco->create(array('parent_id' => $aco_user['Aco']['id'], 'model' => null, 'alias' => 'password_reset'));
+    $pwd_reset = $this->Acl->Aco->save();
+    $pwd_reset['Aco']['id'] = $this->Acl->Aco->id;
+
+    foreach($roles as $r) {
+      $this->Acl->Aco->create(array('parent_id' => $pwd_reset['Aco']['id'], 'model' => null, 'alias' => $r['Role']['name']));
+      $this->Acl->Aco->save();
+    }
+
+    // functions/role
+    $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'role'));
+    $role = $this->Acl->Aco->save();
+    $role['Aco']['id'] = $this->Acl->Aco->id;
+
+    foreach($roles as $r) {
+      $this->Acl->Aco->create(array('parent_id' => $role['Aco']['id'], 'model' => null, 'alias' => $r['Role']['name']));
+      $this->Acl->Aco->save();
+    }
+  } 
+
+  function __buildAcoControllers() {
+    if (!Configure::read('debug')) {
+      return $this->_stop();
+    }
+    $log = array();
+
+    $aco =& $this->Acl->Aco;
+    $root = $aco->node('controllers');
+    if (!$root) {
+      $aco->create(array('parent_id' => null, 'model' => null, 'alias' => 'controllers'));
+      $root = $aco->save();
+      $root['Aco']['id'] = $aco->id; 
+      $log[] = 'Created Aco node for controllers';
+    } else {
+      $root = $root[0];
+    }   
+
+    App::import('Core', 'File');
+    $Controllers = Configure::listObjects('controller');
+    $appIndex = array_search('App', $Controllers);
+    if ($appIndex !== false ) {
+      unset($Controllers[$appIndex]);
+    }
+    $baseMethods = get_class_methods('Controller');
+    $baseMethods[] = 'buildAcl';
+
+    $Plugins = $this->_getPluginControllerNames();
+    $Controllers = array_merge($Controllers, $Plugins);
+
+    // look at each controller in app/controllers
+    foreach ($Controllers as $ctrlName) {
+      $methods = $this->_getClassMethods($this->_getPluginControllerPath($ctrlName));
+
+      // Do all Plugins First
+      if ($this->_isPlugin($ctrlName)){
+        $pluginNode = $aco->node('controllers/'.$this->_getPluginName($ctrlName));
+        if (!$pluginNode) {
+          $aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => $this->_getPluginName($ctrlName)));
+          $pluginNode = $aco->save();
+          $pluginNode['Aco']['id'] = $aco->id;
+          $log[] = 'Created Aco node for ' . $this->_getPluginName($ctrlName) . ' Plugin';
+        }
+      }
+      // find / make controller node
+      $controllerNode = $aco->node('controllers/'.$ctrlName);
+      if (!$controllerNode) {
+        if ($this->_isPlugin($ctrlName)){
+          $pluginNode = $aco->node('controllers/' . $this->_getPluginName($ctrlName));
+          $aco->create(array('parent_id' => $pluginNode['0']['Aco']['id'], 'model' => null, 'alias' => $this->_getPluginControllerName($ctrlName)));
+          $controllerNode = $aco->save();
+          $controllerNode['Aco']['id'] = $aco->id;
+          $log[] = 'Created Aco node for ' . $this->_getPluginControllerName($ctrlName) . ' ' . $this->_getPluginName($ctrlName) . ' Plugin Controller';
+        } else {
+          $aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => $ctrlName));
+          $controllerNode = $aco->save();
+          $controllerNode['Aco']['id'] = $aco->id;
+          $log[] = 'Created Aco node for ' . $ctrlName;
+        }
+      } else {
+        $controllerNode = $controllerNode[0];
+      }
+
+      //clean the methods. to remove those in Controller and private actions.
+      foreach ($methods as $k => $method) {
+        if (strpos($method, '_', 0) === 0) {
+          unset($methods[$k]);
+          continue;
+        }
+        if (in_array($method, $baseMethods)) {
+          unset($methods[$k]);
+          continue;
+        }
+        $methodNode = $aco->node('controllers/'.$ctrlName.'/'.$method);
+        if (!$methodNode) {
+          $aco->create(array('parent_id' => $controllerNode['Aco']['id'], 'model' => null, 'alias' => $method));
+          $methodNode = $aco->save();
+          $log[] = 'Created Aco node for '. $method;
+        }
+      }
+    }
+    if(count($log)>0) {
+      debug($log);
+    }
+  }
+
+  function _getClassMethods($ctrlName = null) {
+    App::import('Controller', $ctrlName);
+    if (strlen(strstr($ctrlName, '.')) > 0) {
+      // plugin's controller
+      $num = strpos($ctrlName, '.');
+      $ctrlName = substr($ctrlName, $num+1);
+    }
+    $ctrlclass = $ctrlName . 'Controller';
+    $methods = get_class_methods($ctrlclass);
+
+    // Add scaffold defaults if scaffolds are being used
+    $properties = get_class_vars($ctrlclass);
+    if (array_key_exists('scaffold',$properties)) {
+      if($properties['scaffold'] == 'admin') {
+        $methods = array_merge($methods, array('admin_add', 'admin_edit', 'admin_index', 'admin_view', 'admin_delete'));
+      } else {
+        $methods = array_merge($methods, array('add', 'edit', 'index', 'view', 'delete'));
+      }
+    }
+    return $methods;
+  }
+
+  function _isPlugin($ctrlName = null) {
+    $arr = String::tokenize($ctrlName, '/');
+    if (count($arr) > 1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function _getPluginControllerPath($ctrlName = null) {
+    $arr = String::tokenize($ctrlName, '/');
+    if (count($arr) == 2) {
+      return $arr[0] . '.' . $arr[1];
+    } else {
+      return $arr[0];
+    }
+  }
+
+  function _getPluginName($ctrlName = null) {
+    $arr = String::tokenize($ctrlName, '/');
+    if (count($arr) == 2) {
+      return $arr[0];
+    } else {
+      return false;
+    }
+  }
+
+  function _getPluginControllerName($ctrlName = null) {
+    $arr = String::tokenize($ctrlName, '/');
+    if (count($arr) == 2) {
+      return $arr[1];
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Get the names of the plugin controllers ...
+   * 
+   * This function will get an array of the plugin controller names, and
+   * also makes sure the controllers are available for us to get the 
+   * method names by doing an App::import for each plugin controller.
+   *
+   * @return array of plugin names.
+   *
+   */
+  function _getPluginControllerNames() {
+    App::import('Core', 'File', 'Folder');
+    $paths = Configure::getInstance();
+    $folder =& new Folder();
+    $folder->cd(APP . 'plugins');
+
+    // Get the list of plugins
+    $Plugins = $folder->read();
+    $Plugins = $Plugins[0];
+    $arr = array();
+
+    // Loop through the plugins
+    foreach($Plugins as $pluginName) {
+      // Change directory to the plugin
+      $didCD = $folder->cd(APP . 'plugins'. DS . $pluginName . DS . 'controllers');
+      // Get a list of the files that have a file name that ends
+      // with controller.php
+      $files = $folder->findRecursive('.*_controller\.php');
+
+      // Loop through the controllers we found in the plugins directory
+      foreach($files as $fileName) {
+        // Get the base file name
+        $file = basename($fileName);
+
+        // Get the controller name
+        $file = Inflector::camelize(substr($file, 0, strlen($file)-strlen('_controller.php')));
+        if (!preg_match('/^'. Inflector::humanize($pluginName). 'App/', $file)) {
+          if (!App::import('Controller', $pluginName.'.'.$file)) {
+            debug('Error importing '.$file.' for plugin '.$pluginName);
+          } else {
+            /// Now prepend the Plugin name ...
+            // This is required to allow us to fetch the method names.
+            $arr[] = Inflector::humanize($pluginName) . "/" . $file;
+          }
+        }
+      }
+    }
+    return $arr;
+  }
+
+	function index() {
 		//Disable the autorender, base the role to render the custom home
 		$this->autoRender = false;
 
-		$role = $this->rdAuth->role;
-		$this->set('message', $msg);
+		$role = $this->Auth->user('role');
 		if (isset ($role)) {
 			//General Home Rendering for Admin and Instructor
 			if ($role == $this->User->USER_TYPE_ADMIN || $role == $this->User->USER_TYPE_INSTRUCTOR)
 			{
-				//$coursesList = $this->sysContainer->getMyCourseList();
-				$coursesList = $this->User->findById($this->rdAuth->id);
-				$activeCourseDetail = $this->formatCourseList($coursesList['UserCourse'], 'active_course');
+        $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
+        //var_dump($course_list[0]['Instructor']);
 
-				$inactiveCourseDetail=null;
-				if ($this->rdAuth->role == $this->User->USER_TYPE_ADMIN)
+				/*$inactiveCourseDetail = array();
+				if ($this->Auth->user('role') == $this->User->USER_TYPE_ADMIN)
 				{
 					$inactiveCourseList = $this->Course->getInactiveCourses();
 					$inactiveCourseDetail = $this->formatCourseList($inactiveCourseList, 'inactive_course');
 				}
 				$this->set('activeCourseDetail', $activeCourseDetail);
-				$this->set('inactiveCourseDetail', $inactiveCourseDetail);
+				$this->set('inactiveCourseDetail', $inactiveCourseDetail);*/
+        $this->set('course_list', $this->formatCourseList($course_list));
 				$this->render('index');
 
 			}//Student Home Rendering
@@ -74,19 +370,19 @@ class HomeController extends AppController
 				$this->set('data', $this->preparePeerEvals());
 
 				//Check if the student has a email in his/her profile
-				if (!empty($this->rdAuth->email)) {
+        $email = $this->Auth->user('email');
+				if (!empty($email)) {
 					$this->render('studentIndex');
 				}else{
 					$this->redirect('/users/editProfile');
 				}
 			}
 		}
-
 	}
 
 	function preparePeerEvals()
 	{
-		$curUserId = $this->rdAuth->id;
+		$curUserId = $this->Auth->user('id');
     $eventAry = array();
     $pos = 0;
     //Get enrolled courses
@@ -97,7 +393,7 @@ class HomeController extends AppController
       //$courseDetail = $this->Course->find('id='.$courseId);
 
       //Get Events for this course that are due
-      $events = $this->Event->findAll('release_date_begin < NOW() AND NOW() <= release_date_end AND course_id='.$courseId);
+      $events = $this->Event->find('all','release_date_begin < NOW() AND NOW() <= release_date_end AND course_id='.$courseId);
       foreach($events as $row) {
         $event = $row['Event'];
         switch ($event['event_template_type_id']) {
@@ -204,42 +500,29 @@ class HomeController extends AppController
 		return $result;
 	}
 
-	function formatCourseList($coursesList=null, $courseType='')
+	function formatCourseList($course_list)
 	{
-		$pos = 0;
-		$result = array();
+    $result = array();
 
-		if ($coursesList!=null) {
+    foreach ($course_list as $row) {
+      //$row['Course']['course'] = $this->sysContainer->getCourseName($row['Course']['id'], 'A');
+      for ($i = 0; $i < count($row['Event']); $i++) {
+        $event_id = $row['Event'][$i]['id'];
+        $row['Event'][$i]['to_review_count'] = $this->GroupEvent->getToReviewGroupEventByEventId($event_id);
+        $completeCount = $this->EvaluationSubmission->numCountInEventCompleted($event_id);
+        $row['Event'][$i]['completed_count'] = $completeCount[0][0]['count'];
+        $totalSum = $this->GroupEvent->getMemberCountByEventId($event_id);
+        if ($row['Event'][$i]['event_template_type_id'] == 3) {
+          $count = $this->UserEnrol->getEnrolledStudentCount($row['Course']['id']);
+          //print_r($count);
+          $row['Event'][$i]['student_sum'] = $count[0]['total'];
+        } else {
+          $row['Event'][$i]['student_sum'] = $totalSum[0][0]['count'];
+        }
+      }
 
-			foreach ($coursesList as $course) {
-				$result[$pos][$courseType]['Course'] = $course;
-				if (isset($course['Course'])){
-					$courseId = $course['Course']['id'];
-				} else {
-					$courseId =$course['course_id'];
-				}
-				$result[$pos][$courseType]['Course']['course'] = $this->sysContainer->getCourseName($courseId, 'A');
-				$result[$pos][$courseType]['Course']['instructors'] = $this->UserCourse->getInstructors($courseId);
-
-				$eventList = $this->Event->getCourseEvent($courseId);
-
-				$result[$pos][$courseType]['Course']['events'] = $eventList;
-				for ($i = 0; $i < count($eventList); $i++) {
-					$result[$pos][$courseType]['Course']['events'][$i]['Event']['to_review_count'] = $this->GroupEvent->getToReviewGroupEventByEventId($eventList[$i]['Event']['id']);
-					$completeCount = $this->EvaluationSubmission->numCountInEventCompleted($eventList[$i]['Event']['id']);
-					$result[$pos][$courseType]['Course']['events'][$i]['Event']['completed_count'] = $completeCount[0][0]['count'];
-					$totalSum = $this->GroupEvent->getMemberCountByEventId($eventList[$i]['Event']['id']);
-					if ($result[$pos][$courseType]['Course']['events'][$i]['Event']['event_template_type_id'] == 3) {
-						$count = $this->UserEnrol->getEnrolledStudentCount($courseId);
-						//print_r($count);
-						$result[$pos][$courseType]['Course']['events'][$i]['Event']['student_sum'] = $count[0]['total'];
-					}
-					else
-					$result[$pos][$courseType]['Course']['events'][$i]['Event']['student_sum'] = $totalSum[0][0]['count'];
-				}
-				$pos++;
-			}
-		}
+      $result[$row['Course']['record_status']][] = $row;
+    }
 		return $result;
 	}
 }

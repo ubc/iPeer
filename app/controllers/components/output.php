@@ -70,24 +70,18 @@ class OutputComponent extends Object{
 		return $dateTime;
 	}
 
-	function br2nl(&$data)
-	{
-		if(is_array($data))
-		{
-			$filtered = array();
-			foreach($data as $key=>$value)
-			{
-				$data[$key] = preg_replace( '!<br.*>!iU', "\n", $value );
-			}
-		}
-		else
-		{
-			$data = preg_replace( '!<br.*>!iU', "\n", $data );
-		}
+	function br2nl(&$data) {
+      if(is_array($data)) {
+        foreach($data as $key=>$value) {
+          $data[$key] = $this->br2nl($value);
+        }
+      } else {
+        $data = preg_replace( '!<br.*>!iU', "\n", $data );
+      }
+      return $data;
 	}
 
-	function filter(&$data)
-	{
+	function filter(&$data) {
 		$search = array (
 				 '@<script[^>]*?>.*?</script>@si', // Strip out javascript
 				 '@<object[^>]*?>.*?</object>@si', // Strip out objects
@@ -108,19 +102,14 @@ class OutputComponent extends Object{
                  '@&#(\d+);@e');                    // evaluate as php
 
 		$replace = array ('','','','','','','<br/>','"','&','<','>',' ',chr(161),chr(162),chr(163),chr(169),'chr(\1)');
-		if(is_array($data))
-		{
-			$filtered = array();
-			foreach($data as $key=>$value)
-			{
-				$data[$key] = preg_replace($search, $replace, $value);
-			}
-		}
-		else
-		{
+        if(is_array($data)) {
+      foreach($data as $key=>$value) {
+        $data[$key] = $this->filter($value);
+      }
+    } else {
 			$data = preg_replace($search, $replace, $data);
 		}
-
+    return $data;
 	}
 
 	function refresh($url='/',$time='1')
@@ -128,6 +117,7 @@ class OutputComponent extends Object{
 		echo '<meta http-equiv="refresh" content="'.$time.'; url="'.$url.'">';
 	}
 
+  /* deprecated and moved to DateTimeHelper
 	function formatDate($timestamp=null) {
         $this->SysParameter = new SysParameter;
         $data = $this->SysParameter->findParameter('display.date_format');
@@ -140,7 +130,7 @@ class OutputComponent extends Object{
         } else {
             return "";
         }
-	}
+	}*/
 }
 
 ?>

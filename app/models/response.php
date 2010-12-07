@@ -25,9 +25,9 @@
  * @subpackage
  * @since
  */
-class Response extends AppModel
-{
-    var $name = 'Response';
+class Response extends AppModel {
+  var $name = 'Response';
+  var $belongsTo = array('Question');
 
 	// saves all the responses in the database
 	function linkResponses($question_id, $data)
@@ -47,8 +47,9 @@ class Response extends AppModel
 	function fillResponse($data)
 	{
 		for( $i=0; $i<$data['count']; $i++ ){
-			$tmp = $this->findAll($conditions='question_id='.$data[$i]['Question']['id'], $fields="response,id");
-			$count = $this->findCount($conditions='question_id='.$data[$i]['Question']['id']);
+			$tmp = $this->find('all', array('conditions' => array('question_id' => $data[$i]['Question']['id']),
+                                      'fields' => array('response','id')));
+			$count = count($tmp);
 
 			for( $j=0; $j<$count; $j++ ){
 				if( !empty($tmp))
@@ -59,8 +60,9 @@ class Response extends AppModel
 		return $data;
 	}
 
-	function getResponseByQuestionId($questionId=null) {
-		$tmp = $this->findAll($conditions='question_id='.$questionId, $fields="response,id");
+	function getResponseByQuestionId($questionId) {
+    $tmp = $this->find('all', array('conditions' => array('question_id' => $questionId),
+                                    'fields' => array('response','id')));
     $data = array();
 		for( $j=0; $j< count($tmp); $j++ ) {
 				$data['Responses']['response_'.$j]['response'] = $tmp[$j]['Response']['response'];
@@ -69,14 +71,15 @@ class Response extends AppModel
 	  return $data;
 	}
 
-	function countResponses($questionID)
+	function countResponses($questionId)
 	{
-		return $this->findCount($conditions='question_id='.$questionID);
+		return $this->find('count', array('conditions' => array('question_id' => $questionId)));
 	}
 
 	function prepData($data, $questionID)
 	{
-		$tmp = $this->findAll($conditions='question_id='.$questionID, $fields="response");
+		$tmp = $this->find('all', array('conditions' => array('question_id' => $questionId), 
+                                    'fields' => 'response'));
 
 		for( $i=0; $i<$data['Question']['count']; $i++ ){
 			$data['Question']['response_'.($i+1)] = $tmp[$i]['Response']['response'];
@@ -85,7 +88,8 @@ class Response extends AppModel
 	}
 
 	function getResponseById($id=null) {
-	  $tmp = $this->find('id='.$id,'response');
+	  $tmp = $this->find('first', array('conditions' => array('id' => $id),
+                                      'fields' => array('response')));
 	  return $tmp['Response']['response'];
 	}
 }

@@ -48,7 +48,7 @@ class MixevalsController extends AppController
         $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
         $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
         $this->order = $this->sortBy.' '.strtoupper($this->direction);
-        $this->pageTitle = 'Mixed Evaluations';
+        $this->set('title_for_layout', 'Mixed Evaluations');
         $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
         parent::__construct();
     }
@@ -303,7 +303,7 @@ class MixevalsController extends AppController
 
 	function printUserName($user_id)
 	{
-		$tmp = $this->Mixeval->findBySql("SELECT username FROM users WHERE id=$user_id");
+		$tmp = $this->Mixeval->query("SELECT username FROM users WHERE id=$user_id");
 		echo $tmp[0]['users']['username'];
 	}
 

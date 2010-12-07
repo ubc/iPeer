@@ -24,7 +24,7 @@ class EvaluationRubricDetail extends AppModel
 	  if ($criteria != null) {
 	    $sql .= ' AND criteria_number='.$criteria;
 	  }
-		return $this->findAll($sql);
+		return $this->find('all',$sql);
 	}	
 }
 

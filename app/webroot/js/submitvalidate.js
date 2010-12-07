@@ -71,27 +71,29 @@ gErrors = 0;
   //Check for Required Field in hidden input variable "required" is Empty or not
   if (document.getElementById('required') != null) {
 		requiresField = document.getElementById('required').value.split(' '); //get all required fields
+
 		for (i=0; i<requiresField.length; i++) {
 			requiredF = requiresField[i];
 			requiredValue = document.getElementById(requiredF).value;
-			requiredLabel = document.getElementById(requiredF+'_label');
+			//requiredLabel = document.getElementById(requiredF+'_label');
+      requiredLabel = $$('label[for='+requiredF+']');
 			if (requiredValue=='') {
 			  //Required field left in blank
 			  gErrors = gErrors + 1;
 			  //Set its label color
-			  requiredLabel.style.color = '#ff0000';//error messages are changed to red
+        requiredLabel[0].setStyle({color:'#ff0000'});
 			} else {
 			  //Check its valiate return error or not
 			  requiredMessage = document.getElementById(requiredF+'_msg');
-              if (requiredMessage != null) { // Fix for bug #210 in IE
-                if (Trim(requiredMessage.innerHTML) != '' || Trim(requiredMessage.innerHTML) != '\n' )
-                    {
-                    requiredLabel.style.color = '#000000';//the color is changed to blank or stays black
-                } else {
-                    gErrors = gErrors + 1; //the error count increases by 1
-                    requiredLabel.style.color = '#ff0000';//error messages are changed to red
-                }
-              }
+        if (requiredMessage != null) { // Fix for bug #210 in IE
+          if (Trim(requiredMessage.innerHTML) != '' || Trim(requiredMessage.innerHTML) != '\n' )
+          {
+            requiredLabel[0].setStyle({color:'#000000'});//the color is changed to blank or stays black
+          } else {
+            gErrors = gErrors + 1; //the error count increases by 1
+            requiredLabel[0].setStyle({color:'#ff0000'});//error messages are changed to red
+          }
+        }
 			}
 	  }
   }
@@ -115,16 +117,12 @@ gErrors = 0;
   			}
   		}
 	}*/
-
 	if (gErrors > 0){
 		//if there are any errors give a message
 		alert ("Please make sure all fields are properly inputed.\n\nError/Required field(s) are marked in red!");
 		gErrors = 0;// reset errors to 0
 		return false;
 	}
-	else
-	{
-		return true;
-	}
 
+  return true;
 }

@@ -8,9 +8,11 @@
  * @license		OPPL
  *
  */
+App::import('Model', 'SurveyQuestion');
+
 class SurveyHelperComponent extends Object {
 
-  function deleteGroupSet($groupSetId=null) {
+  /*function deleteGroupSet($groupSetId=null) {
     $this->SurveyGroup = new SurveyGroup;
     $this->SurveyGroupMember = new SurveyGroupMember;
     $this->SurveyGroupSet = new SurveyGroupSet;
@@ -34,72 +36,90 @@ class SurveyHelperComponent extends Object {
     //delete group set
     $this->SurveyGroupSet->setId($groupSetId);
     $this->SurveyGroupSet->del();
-  }
+  }*/
 
-  function moveQuestion($survey_id, $question_id, $move) {
+  function moveQuestion($survey_id, $question_id, $position) {
     $this->SurveyQuestion = new SurveyQuestion;
     // Move to TOP case
 	  // Note, this method will not work for the BOTTOM case
-	  switch ($move) {
+	  switch ($position) {
 	    case "TOP":
     		// Call upon itself until function returns false (TOP of List)
     		//while($this->moveQuestion($survey_id, $question_id, "UP"));
     		// Call itself until function is bottom of list
 
-    		$data = $this->SurveyQuestion->find($conditions='question_id='.$question_id.' AND survey_id='.$survey_id);
+    		$data = $this->SurveyQuestion->find('first', array('conditions' => array('question_id' => $question_id,
+                                                                                 'survey_id' => $survey_id)));
     		$data['SurveyQuestion']['number'] = '0';
-        $this->SurveyQuestin->id=$data['SurveyQuestion']['id'];
+        $this->SurveyQuestin->id = $data['SurveyQuestion']['id'];
     		$this->SurveyQuestion->save($data);
 
-    		// get all questions order by the number
-    		$data = $this->SurveyQuestion->findAll($conditions='survey_id='.$survey_id.' ORDER BY number');
-    		$count = sizeof($data);
-    		// reset numbering for each question and resave
-    		for( $i=0; $i<$count; $i++ ){
-    			$data[$i]['SurveyQuestion']['number'] = ($i+1);
-    			$this->SurveyQuestion->save($data[$i]);
-    		}
+        $this->reorderQuestions($survey_id);
     		break;
     	// Move UP case
 	    case "UP":
     		// Get current question and the question before it
-    		$data = $this->SurveyQuestion->find($conditions='question_id='.$question_id.' AND survey_id='.$survey_id);
-    		$data2 = $this->SurveyQuestion->find($conditions='number='.($data['SurveyQuestion']['number'] - 1).' AND survey_id='.$survey_id);
+    		$data = $this->SurveyQuestion->find('first', array('conditions' => array('question_id' => $question_id,
+                                                                                 'survey_id' => $survey_id)));
 
     		// Check to make sure question isn't the very first question
-    		if ($data['SurveyQuestion']['number'] != 1) {
+    		if ($data['SurveyQuestion']['number'] == 1) {
+          return false;
+        }
+        
+    		$data2 = $this->SurveyQuestion->find('first', array('conditions' => array('number ' => ($data['SurveyQuestion']['number']-1),
+                                                                                  'survey_id' => $survey_id,
+                                                                                  )));
 
-    			// Sway numbers of the question and the previous question
-    			--$data['SurveyQuestion']['number'];
-    			++$data2['SurveyQuestion']['number'];
+        // Sway numbers of the question and the previous question
+        $save = array();
+        if(empty($data2)) {
+          $questions = $this->reorderQuestions($survey_id);
+          foreach($questions as $k => $q) {
+            if($q['SurveyQuestion']['question_id'] == $question_id) {
+              if(0 == $k) return false; // first one
+              $save[] = $questions[$k-1];
+              $save[] = $questions[$k];
+            }
+          }
+        } else {
+          $save[] = $data2;
+          $save[] = $data;
+        }
 
-    			$this->SurveyQuestion->save($data);
-    			$this->SurveyQuestion->save($data2);
+        $save[0]['SurveyQuestion']['number']++;
+        $save[1]['SurveyQuestion']['number']--;
+        $this->SurveyQuestion->saveAll($save, array('fieldList' => array('number')));
 
-    			return true;
-    		} else
-    			return false;
     	  break;
     	// Move DOWN case
       case "DOWN":
     		// Get current question and the question after it
-    		$data = $this->SurveyQuestion->find($conditions='question_id='.$question_id.' AND survey_id='.$survey_id);
-    		$data2 = $this->SurveyQuestion->find($conditions='number='.($data['SurveyQuestion']['number'] + 1).' AND survey_id='.$survey_id);
+    		$data = $this->SurveyQuestion->find('first', array('conditions' => array('question_id' => $question_id,
+                                                                                 'survey_id' => $survey_id)));
+    		$data2 = $this->SurveyQuestion->find('first', array('conditions' => array('number' => ($data['SurveyQuestion']['number'] + 1),
+                                                                                  'survey_id' => $survey_id)));
 
-    		// Check to make sure question to move down isn't last question
-    		if( !empty($data2) ){
+        $save = array();
+    		if( $data['SurveyQuestion']['number'] == 9999 || empty($data2) ){
+          $questions = $this->reorderQuestions($survey_id);
+          foreach($questions as $k => $q) {
+            if($q['SurveyQuestion']['number'] == $question_id) {
+              if($k == count($questions) - 1) return false; // last one
+              $save[] = $questions[$k];
+              $save[] = $questions[$k+1];
+            }
+          }
+        } else {
+          $save[] = $data;
+          $save[] = $data2;
+        }
 
-    			// Sway numbers of the question and the next question
-    			++$data['SurveyQuestion']['number'];
-    			--$data2['SurveyQuestion']['number'];
+        // Sway numbers of the question and the next question
+        $save[0]['SurveyQuestion']['number']++;
+        $save[1]['SurveyQuestion']['number']--;
 
-    			$this->SurveyQuestion->save($data);
-    			$this->SurveyQuestion->save($data2);
-
-    			return true;
-    		}
-    		else
-    			return false;
+        $this->SurveyQuestion->saveAll($save);
     	  break;
     	// Move to BOTTOM case
       case "BOTTOM":
@@ -107,22 +127,41 @@ class SurveyHelperComponent extends Object {
     		//while( $this->moveQuestion($survey_id, $question_id, "DOWN"));
 
     		// get question to move to bottom and change number to huge number and resave
-    		$data = $this->SurveyQuestion->find($conditions='question_id='.$question_id.' AND survey_id='.$survey_id);
-    		$data['SurveyQuestion']['number'] = '99999';
+    		$data = $this->SurveyQuestion->find('first', array('conditions' => array('question_id' => $question_id,
+                                                                                 'survey_id' => $survey_id)));
+    		$data['SurveyQuestion']['number'] = '10000';
     		$this->SurveyQuestion->save($data);
-
-    		// get all questions order by the number
-    		$data = $this->SurveyQuestion->findAll($conditions='survey_id='.$survey_id.' ORDER BY number');
-    		$count = sizeof($data);
-
-    		// reset numbering for each question and resave
-    		for( $i=0; $i<$count; $i++ ){
-    			$data[$i]['SurveyQuestion']['number'] = ($i+1);
-    			$this->SurveyQuestion->save($data[$i]);
-    		}
+        $this->reorderQuestions($survey_id);
     	  break;
       default:
         break;
   	}
+    return true;
   }
+
+  /*function reorderQuestions($survey_id) {
+    // get all questions order by the number
+    $data = $this->SurveyQuestion->find('all', array('conditions' => array('survey_id' => $survey_id),
+                                                     'order' => 'number'));
+    $count = sizeof($data);
+    // reset numbering for each question and resave
+    for( $i=1; $i<=$count; $i++ ){
+      $data[$i-1]['SurveyQuestion']['number'] = $i;
+    }
+    $this->SurveyQuestion->saveAll($data, array('fieldList' => array('number')));
+    return $data;
+  }
+
+  // used to copy questions to a new survey when a template is used
+  function copyQuestions($survey_id, $id) {
+    $this->SurveyQuestion = new SurveyQuestion;
+  	$questions = $this->SurveyQuestion->find('all', array('conditions' => array('survey_id' => $survey_id)));
+
+    foreach($questions as $k => $q) {
+      unset($q['SurveyQuestion']['id']);
+      $q['SurveyQuestion']['survey_id'] = $id;
+      $questions[$k] = $q;
+    }
+    $this->SurveyQuestion->saveAll($questions);
+  }*/
 }

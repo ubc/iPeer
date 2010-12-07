@@ -73,7 +73,7 @@ class RubricsCriteriaComment extends AppModel
   function getCriteriaComment( $id=null, $criteria=null, $lom=null ){	
   	for( $i=0; $i<$criteria; $i++ ){
   		for( $j=0; $j<$lom; $j++ ){
-  			$data = $this->findAll($conditions = 'rubric_id='.$id." AND ".'criteria_num='.($i+1)." AND ".'lom_num='.($j+1), $fields = 'criteria_comment');
+  			$data = $this->find('all',$conditions = 'rubric_id='.$id." AND ".'criteria_num='.($i+1)." AND ".'lom_num='.($j+1), $fields = 'criteria_comment');
   			if( !empty($data) )
   				$tmp['criteria_comment_'.($i+1).'_'.($j+1)] = $data[0]['RubricsCriteriaComment']['criteria_comment'];
   			else
