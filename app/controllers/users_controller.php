@@ -239,7 +239,7 @@ class UsersController extends AppController
                 $this->set('coursesList', $coursesList);
 
             }  else  {
-                $sFound = $this->User->findUserByStudentNo($this->params['data']['User']['username']);
+                $sFound = $this->User->find('username="'.$this->params['data']['User']['username'].'"');
                 $duplicate = $sFound ? true : false; // Convert to boolean
 
                 if(!$duplicate)
