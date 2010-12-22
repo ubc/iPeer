@@ -353,31 +353,30 @@ class UsersController extends AppController
 
 
   function getSimpleEntrollmentLists($id) {
-  $result = array();
+    $result = array();
 
-  if ($id) {
-    $enrolled_courses = $this->Course->findRegisteredCoursesList(
-      $id, $this->Auth->user('id'), $this->Auth->user('role'));
-    $course_count = $this->Course->findNonRegisteredCoursesCount(
-      $id, $this->Auth->user('id'), $this->Auth->user('role'));
-    $course_count = $course_count[0][0]['total'];
-    $all_courses = $this->Course->findNonRegisteredCoursesList(
-      $id, $this->Auth->user('id'), $this->Auth->user('role'));
-  } else {
-    // New Student = display a courses list.
-    $enrolled_courses = array();
-    $course_count = 0;
-    $all_courses = array();
-  }
+    if ($id) {
+      // This needs a custom query:
+      //   The getSimpleEntrollmentLists() can be called twice in one page rendering.
+      //    There's a problem with Cake PHP caching resutls (I could not turn this off)
+      $enrolled_courses = $this->UserEnrol->query(
+        "SELECT `course_id` from `user_enrols` WHERE user_id=$id",
+         /* No cache!! (undoc.) */ false );
+    } else {
+      // New Student = display a courses list.
+      $enrolled_courses = array();
+      $course_couha = 0;
+      $all_courses = array();
+    }
 
     // Get accessible courses
     $coursesList = $this->sysContainer->getMyCourseList();
 
     // List the entrolled courses
     $simpleEnrolledList = array();
-    foreach ($enrolled_courses as $key => $value) {
-      if (!empty($coursesList[$value['Course']['id']])) {
-        array_push($simpleEnrolledList, $value['Course']['id']);
+    foreach ($enrolled_courses as $value) {
+      if (!empty($coursesList[$value['user_enrols']['course_id']])) {
+        array_push($simpleEnrolledList, $value['user_enrols']['course_id']);
       }
     }
 
@@ -412,20 +411,22 @@ class UsersController extends AppController
 
     $data = $this->getSimpleEntrollmentLists($userId);
     $simpleEnrolledList = $data['simpleEnrolledList'];
-
     // Put students into newly selected courses
     foreach ($checkedCourseList as $key => $value) {
-      if(!in_array($value, $simpleEnrolledList)) {
-        var_dump("insert $value");
-        //$this->UserEnrol->insertCourses($userId,array($value));
+      if(!in_array($value, $simpleEnrolledList) && is_numeric($userId) && is_numeric($value)) {
+        // Direct Delete SQL  - Serge - custom methods in UserEnrol Model did not function.
+        $this->UserEnrol->query("DELETE FROM user_enrols WHERE course_id=$value AND user_id=$userId");
+        // Save a new entry
+        $this->UserEnrol->id = null;
+        $this->UserEnrol->save(array("user_id" => $userId, "course_id" => $value));
       }
     }
 
     // Take them out of the de-selected courses
     foreach ($simpleEnrolledList as $key => $value) {
-      if (!in_array($value, $checkedCourseList)) {
-        var_dump("remove $value");
-       //$this->UserEnrol->removeStudentFromCourse($userId, $value);
+      if (!in_array($value, $checkedCourseList) && is_numeric($userId) && is_numeric($value)) {
+        // Direct Delete SQL  - Serge - custom methods in UserEnrol Model did not function.
+        $this->UserEnrol->query("DELETE FROM user_enrols WHERE course_id=$value AND user_id=$userId");
       }
     }
   }
@@ -465,7 +466,7 @@ class UsersController extends AppController
       $this->render('userSummary');
     }
 
-  $this->setUpCourseEnrollmentLists(null);
+    $this->setUpCourseEnrollmentLists(null);
     $this->set('roles', $this->AccessControl->getEditableRoles());
     $this->set('isEdit', false);
     $this->set('readonly', false);
@@ -479,7 +480,6 @@ class UsersController extends AppController
     }
 
     $this->AccessControl->check('functions/user/' . $this->User->getRoleById($id), 'update');
-
     if(empty($this->data)) {
       $this->User->id = $id;
       $this->data = $this->User->read();
@@ -494,12 +494,10 @@ class UsersController extends AppController
     }
 
     $this->setUpCourseEnrollmentLists($id);
-
     $this->set('data', $this->data);
     $this->set('roles', $this->AccessControl->getEditableRoles());
     $this->set('readonly', false);
     $this->set('isEdit', true);
-    $this->set('is_student', $this->User->hasStudentNo($this->data['Role']));
     $this->render('add');
   }
 

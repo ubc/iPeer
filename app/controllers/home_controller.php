@@ -341,48 +341,48 @@ class HomeController extends AppController
     return $arr;
   }
 
-	function index() {
-		//Disable the autorender, base the role to render the custom home
-		$this->autoRender = false;
+  function index() {
+    //Disable the autorender, base the role to render the custom home
+    $this->autoRender = false;
 
-		$role = $this->Auth->user('role');
-		if (isset ($role)) {
-			//General Home Rendering for Admin and Instructor
-			if ($role == $this->User->USER_TYPE_ADMIN || $role == $this->User->USER_TYPE_INSTRUCTOR)
-			{
+    $role = $this->Auth->user('role');
+    if (isset ($role)) {
+      //General Home Rendering for Admin and Instructor
+      if ($role == $this->User->USER_TYPE_ADMIN || $role == $this->User->USER_TYPE_INSTRUCTOR)
+      {
         $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
         //var_dump($course_list[0]['Instructor']);
 
-				/*$inactiveCourseDetail = array();
-				if ($this->Auth->user('role') == $this->User->USER_TYPE_ADMIN)
-				{
-					$inactiveCourseList = $this->Course->getInactiveCourses();
-					$inactiveCourseDetail = $this->formatCourseList($inactiveCourseList, 'inactive_course');
-				}
-				$this->set('activeCourseDetail', $activeCourseDetail);
-				$this->set('inactiveCourseDetail', $inactiveCourseDetail);*/
+        /*$inactiveCourseDetail = array();
+        if ($this->Auth->user('role') == $this->User->USER_TYPE_ADMIN)
+        {
+          $inactiveCourseList = $this->Course->getInactiveCourses();
+          $inactiveCourseDetail = $this->formatCourseList($inactiveCourseList, 'inactive_course');
+        }
+        $this->set('activeCourseDetail', $activeCourseDetail);
+        $this->set('inactiveCourseDetail', $inactiveCourseDetail);*/
         $this->set('course_list', $this->formatCourseList($course_list));
-				$this->render('index');
+        $this->render('index');
 
-			}//Student Home Rendering
-			else if ($role == $this->User->USER_TYPE_STUDENT) {
+      }//Student Home Rendering
+      else if ($role == $this->User->USER_TYPE_STUDENT) {
 
-				$this->set('data', $this->preparePeerEvals());
+        $this->set('data', $this->preparePeerEvals());
 
-				//Check if the student has a email in his/her profile
+        //Check if the student has a email in his/her profile
         $email = $this->Auth->user('email');
-				if (!empty($email)) {
-					$this->render('studentIndex');
-				}else{
-					$this->redirect('/users/editProfile');
-				}
-			}
-		}
-	}
+        if (!empty($email)) {
+          $this->render('studentIndex');
+        }else{
+          $this->redirect('/users/editProfile');
+        }
+      }
+    }
+  }
 
-	function preparePeerEvals()
-	{
-		$curUserId = $this->Auth->user('id');
+  function preparePeerEvals()
+  {
+    $curUserId = $this->Auth->user('id');
     $eventAry = array();
     $pos = 0;
     //Get enrolled courses
@@ -417,91 +417,91 @@ class HomeController extends AppController
       }
     }
 
-		return $eventAry;
-	}
+    return $eventAry;
+  }
 
-	function getEvaluation($userId, $event=null)
-	{
-		$result = null;
-		$groupsEvents = $this->GroupEvent->getGroupEventByUserId($userId, $event['id']);
+  function getEvaluation($userId, $event=null)
+  {
+    $result = null;
+    $groupsEvents = $this->GroupEvent->getGroupEventByUserId($userId, $event['id']);
 
-		foreach($groupsEvents as $row):
-		$groupMember = $row['GroupMember'];
-		$groupEvent = $row['GroupEvent'];
-		//get corresponding group
-		$group = $this->Group->find('id='.$groupEvent['group_id']);
-		// get corresponding evaluation submission that is not submitted
-		$isSubmitted = false;
-		$eventSubmit = $this->EvaluationSubmission->find('grp_event_id='.$groupEvent['id'].' AND submitter_id='.$userId);
-		if ($eventSubmit['EvaluationSubmission']['submitted']) {
-			$isSubmitted = true;
-		}
+    foreach($groupsEvents as $row):
+    $groupMember = $row['GroupMember'];
+    $groupEvent = $row['GroupEvent'];
+    //get corresponding group
+    $group = $this->Group->find('id='.$groupEvent['group_id']);
+    // get corresponding evaluation submission that is not submitted
+    $isSubmitted = false;
+    $eventSubmit = $this->EvaluationSubmission->find('grp_event_id='.$groupEvent['id'].' AND submitter_id='.$userId);
+    if ($eventSubmit['EvaluationSubmission']['submitted']) {
+      $isSubmitted = true;
+    }
 
-		// get due date of event in days or number of days late
-		$diff = $this->framework->getTimeDifference($event['due_date'], $this->framework->getTime());
-		$isLate = ($diff < 0);
-		$dueIn = abs(floor($diff));
+    // get due date of event in days or number of days late
+    $diff = $this->framework->getTimeDifference($event['due_date'], $this->framework->getTime());
+    $isLate = ($diff < 0);
+    $dueIn = abs(floor($diff));
 
-		// if eval submission is not submitted or doesn't exist, output
-		if (!$isSubmitted) {
-			$result['comingEvent']['Event'] = $event;
-			$result['comingEvent']['Event']['is_late'] = $isLate;
-			$result['comingEvent']['Event']['days_to_due'] = $dueIn;
-			$result['comingEvent']['Event']['group_id'] = $groupEvent['group_id'];
-			$result['comingEvent']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
-		}
-		else {
-			$result['eventSubmitted']['Event'] = $event;
-			$result['eventSubmitted']['Event']['is_late'] = $isLate;
-			$result['eventSubmitted']['Event']['date_submitted'] = $eventSubmit['EvaluationSubmission']['date_submitted'];
-			$result['eventSubmitted']['Event']['group_id'] = $groupEvent['group_id'];
-			$result['eventSubmitted']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
-		}
+    // if eval submission is not submitted or doesn't exist, output
+    if (!$isSubmitted) {
+      $result['comingEvent']['Event'] = $event;
+      $result['comingEvent']['Event']['is_late'] = $isLate;
+      $result['comingEvent']['Event']['days_to_due'] = $dueIn;
+      $result['comingEvent']['Event']['group_id'] = $groupEvent['group_id'];
+      $result['comingEvent']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
+    }
+    else {
+      $result['eventSubmitted']['Event'] = $event;
+      $result['eventSubmitted']['Event']['is_late'] = $isLate;
+      $result['eventSubmitted']['Event']['date_submitted'] = $eventSubmit['EvaluationSubmission']['date_submitted'];
+      $result['eventSubmitted']['Event']['group_id'] = $groupEvent['group_id'];
+      $result['eventSubmitted']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
+    }
 
-		endforeach;
-		return $result;
+    endforeach;
+    return $result;
 
-	}
+  }
 
-	function getSurveyEvaluation($courseId, $event = null, $userId=null) {
-		$result = null;
-		$surveyEvents = $this->Event->getActiveSurveyEvents($courseId);
+  function getSurveyEvaluation($courseId, $event = null, $userId=null) {
+    $result = null;
+    $surveyEvents = $this->Event->getActiveSurveyEvents($courseId);
 
-		foreach($surveyEvents as $row) {
-			// get corresponding evaluation submission that is not submitted
-			$isSubmitted = false;
-			$eventSubmit = $this->EvaluationSubmission->find('event_id='.$event['id'].' AND submitter_id='.$userId);
+    foreach($surveyEvents as $row) {
+      // get corresponding evaluation submission that is not submitted
+      $isSubmitted = false;
+      $eventSubmit = $this->EvaluationSubmission->find('event_id='.$event['id'].' AND submitter_id='.$userId);
 
-			if ($eventSubmit['EvaluationSubmission']['submitted']) {
-				$isSubmitted = true;
-			}
+      if ($eventSubmit['EvaluationSubmission']['submitted']) {
+        $isSubmitted = true;
+      }
 
-			// get due date of event in days or number of days late
-			$diff = $this->framework->getTimeDifference($event['due_date'], $this->framework->getTime());
-			$isLate = ($diff < 0);
-			$dueIn = abs(floor($diff));
+      // get due date of event in days or number of days late
+      $diff = $this->framework->getTimeDifference($event['due_date'], $this->framework->getTime());
+      $isLate = ($diff < 0);
+      $dueIn = abs(floor($diff));
 
-			// if eval submission is not submitted or doesn't exist, output
-			if (!$isSubmitted) {
-				$result['comingEvent']['Event'] = $event;
-				$result['comingEvent']['Event']['is_late'] = $isLate;
-				$result['comingEvent']['Event']['days_to_due'] = $dueIn;
-				//   $result['comingEvent']['Event']['group_id'] = $groupEvent['group_id'];
-				$result['comingEvent']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
-			}
-			else {
-				$result['eventSubmitted']['Event'] = $event;
-				$result['comingEvent']['Event']['is_late'] = $isLate;
-				$result['eventSubmitted']['Event']['date_submitted'] = $eventSubmit['EvaluationSubmission']['date_submitted'];
-				//   $result['eventSubmitted']['Event']['group_id'] = $groupEvent['group_id'];
-				$result['eventSubmitted']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
-			}
-		}
-		return $result;
-	}
+      // if eval submission is not submitted or doesn't exist, output
+      if (!$isSubmitted) {
+        $result['comingEvent']['Event'] = $event;
+        $result['comingEvent']['Event']['is_late'] = $isLate;
+        $result['comingEvent']['Event']['days_to_due'] = $dueIn;
+        //   $result['comingEvent']['Event']['group_id'] = $groupEvent['group_id'];
+        $result['comingEvent']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
+      }
+      else {
+        $result['eventSubmitted']['Event'] = $event;
+        $result['comingEvent']['Event']['is_late'] = $isLate;
+        $result['eventSubmitted']['Event']['date_submitted'] = $eventSubmit['EvaluationSubmission']['date_submitted'];
+        //   $result['eventSubmitted']['Event']['group_id'] = $groupEvent['group_id'];
+        $result['eventSubmitted']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
+      }
+    }
+    return $result;
+  }
 
-	function formatCourseList($course_list)
-	{
+  function formatCourseList($course_list)
+  {
     $result = array();
 
     foreach ($course_list as $row) {
@@ -523,8 +523,8 @@ class HomeController extends AppController
 
       $result[$row['Course']['record_status']][] = $row;
     }
-		return $result;
-	}
+    return $result;
+  }
 }
 
 ?>

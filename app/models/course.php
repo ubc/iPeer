@@ -97,41 +97,41 @@ class Course extends AppModel
     $this->virtualFields['student_count'] = sprintf('SELECT count(*) as count FROM user_enrols as enrol WHERE enrol.course_id = %s.id', $this->alias);
   }
 
-	function getAllInstructors($type, $params = array()){
-		return ClassRegistry::init('User')->getInstructors($type, $params);
-	}
+  function getAllInstructors($type, $params = array()){
+    return ClassRegistry::init('User')->getInstructors($type, $params);
+  }
 
-	function deleteInstructor($course_id, $user_id){
+  function deleteInstructor($course_id, $user_id){
     return $this->habtmDelete('Instructor', $course_id, $user_id);
-	}
+  }
 
-	function addInstructor($course_id, $user_id){
+  function addInstructor($course_id, $user_id){
     return $this->habtmAdd('Instructor', $course_id, $user_id);
-	}
+  }
 
-	function getInactiveCourses(){
-		return $this->find('all', array('conditions' => array('record_status' => 'I')));
-	}
+  function getInactiveCourses(){
+    return $this->find('all', array('conditions' => array('record_status' => 'I')));
+  }
 
-	function prepData($data=null){
-	  if (empty($data['data']['Course']['record_status'])) {
-  		$data['data']['Course']['record_status'] = $data['form']['record_status'];
-  	}
+  function prepData($data=null){
+    if (empty($data['data']['Course']['record_status'])) {
+      $data['data']['Course']['record_status'] = $data['form']['record_status'];
+    }
 
 
-		if( !empty($data['form']['self_enroll']))
-			$data['data']['Course']['self_enroll'] = "on";
-		else
-			$data['data']['Course']['self_enroll'] = "off";
+    if( !empty($data['form']['self_enroll']))
+      $data['data']['Course']['self_enroll'] = "on";
+    else
+      $data['data']['Course']['self_enroll'] = "off";
 
-		for( $i=1; $i<=$data['data']['Course']['count']; $i++ ){
-			$data['data']['Course']['instructor_id'.$i] = isset($data['form']['instructor_id'.$i])? $data['form']['instructor_id'.$i] : '';
-		}
+    for( $i=1; $i<=$data['data']['Course']['count']; $i++ ){
+      $data['data']['Course']['instructor_id'.$i] = isset($data['form']['instructor_id'.$i])? $data['form']['instructor_id'.$i] : '';
+    }
 
-		return $data;
-	}
+    return $data;
+  }
 
-	//Overwriting Function - will be called before save operation
+  //Overwriting Function - will be called before save operation
   function beforeSave(){
     // Ensure the name is not empty
     if (empty($this->data[$this->name]['title'])) {
@@ -140,7 +140,7 @@ class Course extends AppModel
     }
 
     // Add an http or https to address
-    if (!empty($this->data[$this->name]['homepage']) && 
+    if (!empty($this->data[$this->name]['homepage']) &&
         stripos($this->data[$this->name]['homepage'], "http") !== 0) {
       $this->data[$this->name]['homepage'] = "http://" . $this->data[$this->name]['homepage'];
     }
@@ -157,29 +157,29 @@ class Course extends AppModel
     }
 
     return $allowSave && parent::beforeSave();
-	}
+  }
 
   //Validation check on duplication of course
-	function __checkDuplicateCourse() {
-		$duplicate = false;
-		$field = 'course';
-		$value = $this->data[$this->name]['course'];
-		if ($result = $this->find('first', array('conditions' => array($field => $value)))){
-		  if ($this->data[$this->name]['id'] == $result[$this->name]['id']) {
-		    $duplicate = false;
-		  } else {
-  		  $duplicate = true;
-  		}
-		 }
+  function __checkDuplicateCourse() {
+    $duplicate = false;
+    $field = 'course';
+    $value = $this->data[$this->name]['course'];
+    if ($result = $this->find('first', array('conditions' => array($field => $value)))){
+      if ($this->data[$this->name]['id'] == $result[$this->name]['id']) {
+        $duplicate = false;
+      } else {
+        $duplicate = true;
+      }
+     }
 
-		if ($duplicate == true) {
-		  $this->errorMessage='Duplicate Course found. Please change the course name.';
-		  return false;
-		}
-		else {
-		  return true;
-		}
-	}
+    if ($duplicate == true) {
+      $this->errorMessage='Duplicate Course found. Please change the course name.';
+      return false;
+    }
+    else {
+      return true;
+    }
+  }
   // Find all accessible courses id
   function findAccessibleCoursesList($user=null){
     $userId=$user['id'];

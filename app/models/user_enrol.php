@@ -23,9 +23,8 @@ class UserEnrol extends AppModel
   }
 
   function insertCourses ($user_id, $course_ids) {
-	  
-    if(!is_array($course_ids) || empty($course_ids) || $user_id <= 0) return;
 
+    if(!is_array($course_ids) || empty($course_ids) || $user_id <= 0) return;
 
     $course_ids = array_unique($course_ids);
 
@@ -38,7 +37,7 @@ class UserEnrol extends AppModel
       $this->save($c);
       $this->id = null;
     }
-   
+
   }
 
 }
