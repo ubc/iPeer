@@ -1,9 +1,10 @@
-
+<?php ?>
 
 <?php
     // Check that all required parameters are present
     if (empty($eachName) || empty($setName) || empty($verbIn) || empty($verbOut)||
-        !isset($list) || !is_array($list) || !isset($selection) || !is_array($selection)) {
+        !isset($list) || !is_array($list) || !isset($selection) || !is_array($selection) || 
+        !isset($readOnly)) {
         echo "Error: Please set all parameters for checkBoxList.<br/>";
     } else {
         if (empty($list)) {
@@ -19,17 +20,18 @@
             $renderedCount = 0;
 
             // Create a checkBox for each entry
+            echo "<div style='max-height:220px;overflow:auto'>";
             echo "<table><tr>";
             foreach ($list as $key => $value) {
                 echo "<td>";
 
                 // Is this item selected?
-                $checked = in_array($key, $selection) ? "checked" : "";
-
+                $checked = in_array($key, $selection) ? "checked=true" : "";
+				$disabled = $readOnly ? "disabled=true" : "";
                 // Cheate the chech for each entry
-                echo "<input type='checkbox' name=checkBoxList_$key value='$value' $checked>";
+                echo "<input type='checkbox' name=checkBoxList_$key value='$value' $checked $disabled>";
                 if (!empty($checked)) {
-                    echo "<b>$value</b>";
+                    echo "<b><u>$value</u></b>";
                 } else {
                     echo "$value";
                 }
@@ -45,11 +47,11 @@
                 } else {
                     echo "</tr><tr>";
                 }
-
             }
-            echo "</tr></table><br/>";
+            echo "</tr></table>";
+            echo "</div><br/>";
             echo "Use the checkmarks to $verbIn / $verbOut $setName.<br/>";
-            echo "($setName in <b>bold</b> are the ones selected initially.)<br/>";
+            echo "($setName in <b><u>bold</u></b> are the ones selected initially.)<br/>";
         }
     }
 ?>

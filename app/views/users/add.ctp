@@ -1,9 +1,9 @@
 <?php $readonly = isset($readonly) ? $readonly : false;?>
-<?php $username_msg = $readonly ? '' : '<br /><u>Remember:</u> Usernames must be at least 6 characters long and contain only:<li>letters, digits, _ (underscore) or @ (at symbol) or . (period) </li>';?> 
+<?php $username_msg = $readonly ? '' : '<br /><u>Remember:</u> Usernames must be at least 6 characters long and contain only:<li>letters, digits, _ (underscore) or @ (at symbol) or . (period) </li>';?>
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>
-    <?php echo $this->Form->create('User', 
+    <?php echo $this->Form->create('User',
                                    array('id' => 'frm',
                                          'url' => array('action' => $this->action),
                                          'inputDefaults' => array('div' => false,
@@ -23,12 +23,12 @@
           <td width="255" id="username_msg" class="error" ><div id='usernameErr' class="error"></div></td>
         </tr>
 
-        <?php if(!$readonly):?>
+        <?php if(!$readonly && !$isEdit):?>
         <!-- Password -->
-        <tr class="tablecell2"><td  colspan="3">
-        A password will be automatically generated, and shown on the next page, after you click "Save".<br />
-        <strong>Note:</strong> If using CWL logons, students should use CWL username/password for iPeer, instead of the generated one.
-        </td></tr>
+          <tr class="tablecell2"><td  colspan="3">
+          A password will be automatically generated, and shown on the next page, after you click "Save".<br />
+          <strong>Note:</strong> If using CWL logons, students should use CWL username/password for iPeer, instead of the generated one.
+          </td></tr>
         <?php endif;?>
 
         <!-- First Name -->
@@ -48,7 +48,7 @@
 
         <!-- Email  -->
         <tr class="tablecell2">
-            <?php echo $this->Form->input('email', array('size'=>'50', 'class'=>'validate none EMAIL_FORMAT email_msg Invalid_Email_Format.', 
+            <?php echo $this->Form->input('email', array('size'=>'50', 'class'=>'validate none EMAIL_FORMAT email_msg Invalid_Email_Format.',
                                                          'after' => '',
                                                          'readonly' => $readonly)) ?>
             <td id="email_msg" class="error">&nbsp;</td>
@@ -96,6 +96,23 @@
           <td id="student_no_msg" class="error">&nbsp;</td>
         </tr>
 
+        <tr class="tablecell2">
+        <td width="130" id="courses_label">This student's<br />Courses:</td>
+        <td colspan=2>
+          <?php
+          // Render the course list, with check box selections
+          echo $this->element("list/checkBoxList", array(
+              "eachName" => "Course",
+              "setName" => "Courses",
+              "verbIn" => "add",
+              "verbOut" => "remove",
+              "list" => $simpleCoursesList,
+              "readOnly" => $readonly,
+              "selection" => $simpleEnrolledList)); ?>
+          <div id="adddelcourses"></div>
+        </td>
+      </tr>
+
         <?php if($readonly):?>
         <tr class="tablecell2">
           <?php echo $this->Form->input('creator', array('size'=>'50', 'class'=>'validate none',
@@ -116,7 +133,7 @@
           <td></td>
         </tr>
         <tr class="tablecell2">
-          <?php echo $this->Form->input('modified', array('type' => 'text', 
+          <?php echo $this->Form->input('modified', array('type' => 'text',
                                                          'size'=>'50', 'class'=>'validate none',
                                                          'readonly' => $readonly)) ?>
           <td></td>
@@ -127,7 +144,7 @@
         <tr class="tablecell2">
             <td colspan="3" align="center">
             <input type="button" value="Back" onClick="javascript:window.history.back();">
-            <?php echo $this->Form->submit('Save', array('div' => false));?>
+            <?php if (!$readonly) echo $this->Form->submit('Save', array('div' => false));?>
             </td>
         </tr>
         </table>

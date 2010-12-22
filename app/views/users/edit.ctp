@@ -1,3 +1,4 @@
+<?php ?>
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
 <tr>
 <td><script type="text/javascript" language="javascript">
@@ -77,13 +78,13 @@
           <tr class="tablecell2">
             <td id="password_label">Password:</td>
             <td colspan="2"><?php echo $html->link('Reset Password', '/users/resetPassword/'.$params['data']['User']['id'], '', 'Are you sure to reset the password of the current user?') ?> </td>
-        	</tr>
+          </tr>
 <?php    endif; ?>
 <?php  } else { ?>
           <tr class="tablecell2">
             <td id="password_label">Password:</td>
             <td colspan="2"><?php echo $html->link('Reset Password', '/users/resetPassword/'.$params['data']['User']['id'], '', 'Are you sure to reset the password of the current user?') ?> </td>
-        	</tr>
+          </tr>
 <?php  }  ?>
 
     <tr class="tablecell2">
@@ -92,7 +93,7 @@
 
       <?php echo $html->submit('Save') ?>
 
-	  </td>
+    </td>
       </tr>
   </table>
   <table width="95%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">

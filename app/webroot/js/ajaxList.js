@@ -1,6 +1,6 @@
 // Configuration Variables
-var AjaxListActionOffsetX = -5;
-var AjaxListActionOffsetY = -5;
+var AjaxListActionOffsetX = -2;
+var AjaxListActionOffsetY = -2;
 var AjaxListActionMenuTextEnabledColor = "Black";
 var AjaxListActionMenuTextDisabledColor = "LightGrey";
 var AjaxListActionMenuTextSelectedColor = "Blue";

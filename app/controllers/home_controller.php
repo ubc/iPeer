@@ -47,25 +47,25 @@ class HomeController extends AppController
 
   /* temp code */
   function beforeFilter() {
-    parent::beforeFilter(); 
-//    $this->Auth->allow('*');
+    parent::beforeFilter();
+    $this->Auth->allow('*');
   }
 
   function createAro() {
     $this->Role->set('name', 'superadmin');
-    $this->Role->save(); 
+    $this->Role->save();
 
     $this->Role->set('id', '');
     $this->Role->set('name', 'admin');
-    $this->Role->save(); 
+    $this->Role->save();
 
     $this->Role->set('id', '');
     $this->Role->set('name', 'instructor');
-    $this->Role->save(); 
+    $this->Role->save();
 
     $this->Role->set('id', '');
     $this->Role->set('name', 'student');
-    $this->Role->save(); 
+    $this->Role->save();
   }
 
   function createPermissions() {
@@ -95,7 +95,7 @@ class HomeController extends AppController
     $this->Acl->deny($role, 'functions/user/superadmin');
     $this->Acl->deny($role, 'functions/user/instructor');
 
-    $role->id = 4; // student 
+    $role->id = 4; // student
     $this->Acl->deny($role, 'controllers');
     $this->Acl->allow($role, 'controllers/Home');
     $this->Acl->allow($role, 'controllers/Courses');
@@ -146,7 +146,7 @@ class HomeController extends AppController
       $this->Acl->Aco->create(array('parent_id' => $role['Aco']['id'], 'model' => null, 'alias' => $r['Role']['name']));
       $this->Acl->Aco->save();
     }
-  } 
+  }
 
   function __buildAcoControllers() {
     if (!Configure::read('debug')) {
@@ -159,11 +159,11 @@ class HomeController extends AppController
     if (!$root) {
       $aco->create(array('parent_id' => null, 'model' => null, 'alias' => 'controllers'));
       $root = $aco->save();
-      $root['Aco']['id'] = $aco->id; 
+      $root['Aco']['id'] = $aco->id;
       $log[] = 'Created Aco node for controllers';
     } else {
       $root = $root[0];
-    }   
+    }
 
     App::import('Core', 'File');
     $Controllers = Configure::listObjects('controller');
@@ -293,9 +293,9 @@ class HomeController extends AppController
 
   /**
    * Get the names of the plugin controllers ...
-   * 
+   *
    * This function will get an array of the plugin controller names, and
-   * also makes sure the controllers are available for us to get the 
+   * also makes sure the controllers are available for us to get the
    * method names by doing an App::import for each plugin controller.
    *
    * @return array of plugin names.

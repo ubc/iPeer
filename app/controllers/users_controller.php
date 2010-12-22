@@ -220,26 +220,6 @@ class UsersController extends AppController
     $this->redirect("index");
   }
 
-  function view($id) {
-    $this->AccessControl->check('functions/user', 'read');
-
-    if (!is_numeric($id) || !($this->data = $this->User->findUserByid($id))) {
-      $this->Session->setFlash('Invalid user ID.');
-      $this->redirect('index');
-    }
-
-
-    $roles = $this->User->getRoles($id);
-    if(!$this->AccessControl->hasPermissionDoActionOnUserWithRoles('ViewUser', $roles)) {
-      $this->Session->setFlash('You do not have permission to view this user.');
-      $this->redirect('index');
-    }
-
-    $this->set('roles', $this->User->getRoles($id));
-    $this->set('readonly', true);
-    $this->render('add');
-  }
-
     /*function add($userType = null) {
       if(empty($userType)) {
         $userType = $this->data['User']['role'];
@@ -370,6 +350,102 @@ class UsersController extends AppController
       }
     }
   }
+  
+  
+  function getSimpleEntrollmentLists($id) {
+	$result = array();
+	
+	if ($id) { 
+		$enrolled_courses = $this->Course->findRegisteredCoursesList(
+			$id, $this->Auth->user('id'), $this->Auth->user('role'));
+		$course_count = $this->Course->findNonRegisteredCoursesCount(
+			$id, $this->Auth->user('id'), $this->Auth->user('role'));
+		$course_count = $course_count[0][0]['total'];
+		$all_courses = $this->Course->findNonRegisteredCoursesList(
+			$id, $this->Auth->user('id'), $this->Auth->user('role'));
+	} else {
+		// New Student = display a courses list.
+		$enrolled_courses = array();
+		$course_count = 0;
+		$all_courses = array();
+	}
+
+    // Get accessible courses
+    $coursesList = $this->sysContainer->getMyCourseList();
+
+    // List the entrolled courses
+    $simpleEnrolledList = array();
+    foreach ($enrolled_courses as $key => $value) {
+      if (!empty($coursesList[$value['Course']['id']])) {
+        array_push($simpleEnrolledList, $value['Course']['id']);
+      }
+    }
+
+    // List the avaliable courses
+    $simpleCoursesList = array();
+    foreach ($coursesList as $key => $value) {
+      $simpleCoursesList[$key] = $value['course'];
+    }
+    
+    // Pack up the data for the return
+    $result['simpleEnrolledList'] = $simpleEnrolledList;
+    $result['simpleCoursesList'] = $simpleCoursesList;
+    
+    return $result;
+  }
+  
+  function setUpCourseEnrollmentLists($id, $thisCourse = null) {
+	$data = $this->getSimpleEntrollmentLists($id);
+    $this->set("simpleEnrolledList", $data['simpleEnrolledList']);
+    $this->set("simpleCoursesList",  $data['simpleCoursesList']);
+  }
+  
+  function processEnrollmentListsPostBack($params, $userId) {
+		// Build up a list of checkboxed courses
+	  $checkedCourseList = array();
+	  foreach ($params['form'] as $key => $value) {
+		if (strstr($key, "checkBoxList_")) {
+		  $aCourse = substr($key, 13);
+		  array_push($checkedCourseList, $aCourse);
+		}
+	  }
+
+	  // Put students into newly selected courses
+	  foreach ($checkedCourseList as $key => $value) {
+		if(!isset($simpleEnrolledList[$value])) {
+			var_dump("insert $value");
+		  //$this->UserEnrol->insertCourses($userId, array($value));
+		}
+	  }
+
+	  // Take them out of the de-selected courses
+	  foreach ($simpleEnrolledList as $key => $value) {
+		if (!isset($checkedCourseList[$value])) {
+		  $this->UserEnrol->removeStudentFromCourse($userId, $value);
+		}
+	  }
+  }
+
+  function view($id) {
+    $this->AccessControl->check('functions/user', 'read');
+
+    if (!is_numeric($id) || !($this->data = $this->User->findUserByid($id))) {
+      $this->Session->setFlash('Invalid user ID.');
+      $this->redirect('index');
+    }
+
+    $roles = $this->User->getRoles($id);
+
+    if(!$this->AccessControl->hasPermissionDoActionOnUserWithRoles('ViewUser', $roles)) {
+      $this->Session->setFlash('You do not have permission to view this user.');
+      $this->redirect('index');
+    }
+
+    $this->setUpCourseEnrollmentLists($id);
+    $this->set('roles', $this->User->getRoles($id));
+    $this->set('readonly', true);
+    $this->render('add');
+  }
 
   function add() {
     $this->AccessControl->check('functions/user', 'create');
@@ -385,8 +461,12 @@ class UsersController extends AppController
       $this->render('userSummary');
     }
 
+	$this->setUpCourseEnrollmentLists(null);
     $this->set('roles', $this->AccessControl->getEditableRoles());
+    $this->set('isEdit', false);
+    $this->set('readonly', false);
   }
+
 
   function edit($id) {
     // Ensure that the id is valid
@@ -394,7 +474,7 @@ class UsersController extends AppController
       $this->cakeError('error404');
     }
 
-    $this->AccessControl->check('functions/user/'.$this->User->getRoleById($id), 'update');
+    $this->AccessControl->check('functions/user/' . $this->User->getRoleById($id), 'update');
 
     if(empty($this->data)) {
       $this->User->id = $id;
@@ -402,11 +482,19 @@ class UsersController extends AppController
     } else {
       $this->data['User']['id'] = $id;
       if($this->__processForm()) {
+        // Process the course changes list
+        $this->processEnrollmentListsPostBack($this->params, $id);
+        // Set message for user.
         $this->Session->setFlash('Changes are saved.');
       }
     }
+
+    $this->setUpCourseEnrollmentLists($id);
+
     $this->set('data', $this->data);
     $this->set('roles', $this->AccessControl->getEditableRoles());
+    $this->set('readonly', false);
+    $this->set('isEdit', true);
     $this->render('add');
   }
 
@@ -536,7 +624,7 @@ class UsersController extends AppController
           $this->__setSessionData($this->data['User']);
           if (!empty($this->data['User']['email'])) {
             $this->Session->setFlash("Your Profile Has Been Updated Successfully.<br /><br />
-                                     <a href='/' style='font-size:140%'>Go to your iPeer Home page.</a><br /><br />");
+                                     <a href='" . $this->webroot/home . "' style='font-size:140%'>Go to your iPeer Home page.</a><br /><br />");
           } else {
             $this->Session->setFlash("We saved your data, but you still need to enter an email address!");
           }
@@ -558,7 +646,7 @@ class UsersController extends AppController
       if (!is_numeric($id)) {
         $this->cakeError('error404');
       }
-      
+
       // check if current user has permission to delete this user
       // in case of the being deleted user has higher level role
       $roles = $this->User->getRoles($id);
@@ -601,18 +689,18 @@ class UsersController extends AppController
       if(!$this->RequestHandler->isAjax()) {
         $this->cakeError('error404');
       }
-    	$this->layout = 'ajax';
+        $this->layout = 'ajax';
       $this->autoRender = false;
 
-    	$isUserEnrol = false;
-	   	$sFound = $this->User->getByUsername($this->data['User']['username']);
+        $isUserEnrol = false;
+        $sFound = $this->User->getByUsername($this->data['User']['username']);
 
-    	/*if(!empty($sFound)) {
-	    	 foreach($sFound['UserEnrol'] as $uEnrol) {
-	    	 	if($uEnrol['course_id'] == $this->Session->read('ipeerSession.courseId'))
-	    	 		$isUserEnrol = true;
-	    	 }
-    	}
+        /*if(!empty($sFound)) {
+             foreach($sFound['UserEnrol'] as $uEnrol) {
+                if($uEnrol['course_id'] == $this->Session->read('ipeerSession.courseId'))
+                    $isUserEnrol = true;
+             }
+        }
 
       $this->set('role', $role);
       $this->set('username', $this->params['form']['newuser']);
@@ -624,7 +712,7 @@ class UsersController extends AppController
     function resetPassword($user_id, $render=true)
     {
       $this->AccessControl->check('functions/user/password_reset');
- 
+
       // Read the user
       $user_data = $this->User->findUserByid($user_id, array('contain' => false));
 
@@ -871,34 +959,34 @@ class UsersController extends AppController
     }
 
 
-	/**
-	 * Loads the rdAuth data from the Session.
-	 */
-	function __loadFromSession() {
-		if($this->Session->check('ipeerSession') && $this->Session->valid('ipeerSession')) {
-			$this->id = $this->Session->read('ipeerSession.id');
-			$this->username = $this->Session->read('ipeerSession.username');
-			$this->fullname = $this->Session->read('ipeerSession.fullname');
-			$this->role = $this->Session->read('ipeerSession.role');
-			$this->email = $this->Session->read('ipeerSession.email');
-			$this->customIntegrateCWL = $this->Session->read('ipeerSession.customIntegrateCWL');
-			$this->courseId = $this->Session->read('ipeerSession.courseId');
-		} else {
-			return $this->Session->error();
-		}
-	}
+    /**
+     * Loads the rdAuth data from the Session.
+     */
+    function __loadFromSession() {
+        if($this->Session->check('ipeerSession') && $this->Session->valid('ipeerSession')) {
+            $this->id = $this->Session->read('ipeerSession.id');
+            $this->username = $this->Session->read('ipeerSession.username');
+            $this->fullname = $this->Session->read('ipeerSession.fullname');
+            $this->role = $this->Session->read('ipeerSession.role');
+            $this->email = $this->Session->read('ipeerSession.email');
+            $this->customIntegrateCWL = $this->Session->read('ipeerSession.customIntegrateCWL');
+            $this->courseId = $this->Session->read('ipeerSession.courseId');
+        } else {
+            return $this->Session->error();
+        }
+    }
 
-	/**
-	 * Updates the user session from the user data passed, and loads it into this rdAuth object.
-	 * @param unknown_type userData
-	 */
-	function __setSessionData($userData) {
-		$this->Session->write('ipeerSession.id', $userData['id']);
-		$this->Session->write('ipeerSession.username', $userData['username']);
-		$this->Session->write('ipeerSession.fullname', $userData['last_name'].' '.$userData['first_name']);
-		//$this->Session->write('ipeerSession.role', $userData['Role']);
-		$this->Session->write('ipeerSession.email', $userData['email']);
-		//return $this->__loadFromSession();
-	}
+    /**
+     * Updates the user session from the user data passed, and loads it into this rdAuth object.
+     * @param unknown_type userData
+     */
+    function __setSessionData($userData) {
+        $this->Session->write('ipeerSession.id', $userData['id']);
+        $this->Session->write('ipeerSession.username', $userData['username']);
+        $this->Session->write('ipeerSession.fullname', $userData['last_name'].' '.$userData['first_name']);
+        //$this->Session->write('ipeerSession.role', $userData['Role']);
+        $this->Session->write('ipeerSession.email', $userData['email']);
+        //return $this->__loadFromSession();
+    }
 }
 ?>

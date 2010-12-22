@@ -22,7 +22,8 @@ class UserEnrol extends AppModel
     return $this->delete($course_to_remove['UserEnrol']['id']);
   }
 
-  function insertCourses($user_id, $course_ids) {
+  function insertCourses ($user_id, $course_ids) {
+	  
     if(!is_array($course_ids) || empty($course_ids) || $user_id <= 0) return;
 
 
@@ -37,6 +38,7 @@ class UserEnrol extends AppModel
       $this->save($c);
       $this->id = null;
     }
+   
   }
 
 }
