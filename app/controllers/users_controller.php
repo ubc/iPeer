@@ -350,25 +350,25 @@ class UsersController extends AppController
       }
     }
   }
-  
-  
+
+
   function getSimpleEntrollmentLists($id) {
-	$result = array();
-	
-	if ($id) { 
-		$enrolled_courses = $this->Course->findRegisteredCoursesList(
-			$id, $this->Auth->user('id'), $this->Auth->user('role'));
-		$course_count = $this->Course->findNonRegisteredCoursesCount(
-			$id, $this->Auth->user('id'), $this->Auth->user('role'));
-		$course_count = $course_count[0][0]['total'];
-		$all_courses = $this->Course->findNonRegisteredCoursesList(
-			$id, $this->Auth->user('id'), $this->Auth->user('role'));
-	} else {
-		// New Student = display a courses list.
-		$enrolled_courses = array();
-		$course_count = 0;
-		$all_courses = array();
-	}
+  $result = array();
+
+  if ($id) {
+    $enrolled_courses = $this->Course->findRegisteredCoursesList(
+      $id, $this->Auth->user('id'), $this->Auth->user('role'));
+    $course_count = $this->Course->findNonRegisteredCoursesCount(
+      $id, $this->Auth->user('id'), $this->Auth->user('role'));
+    $course_count = $course_count[0][0]['total'];
+    $all_courses = $this->Course->findNonRegisteredCoursesList(
+      $id, $this->Auth->user('id'), $this->Auth->user('role'));
+  } else {
+    // New Student = display a courses list.
+    $enrolled_courses = array();
+    $course_count = 0;
+    $all_courses = array();
+  }
 
     // Get accessible courses
     $coursesList = $this->sysContainer->getMyCourseList();
@@ -386,44 +386,48 @@ class UsersController extends AppController
     foreach ($coursesList as $key => $value) {
       $simpleCoursesList[$key] = $value['course'];
     }
-    
+
     // Pack up the data for the return
     $result['simpleEnrolledList'] = $simpleEnrolledList;
     $result['simpleCoursesList'] = $simpleCoursesList;
-    
+
     return $result;
   }
-  
+
   function setUpCourseEnrollmentLists($id, $thisCourse = null) {
-	$data = $this->getSimpleEntrollmentLists($id);
+    $data = $this->getSimpleEntrollmentLists($id);
     $this->set("simpleEnrolledList", $data['simpleEnrolledList']);
     $this->set("simpleCoursesList",  $data['simpleCoursesList']);
   }
-  
+
   function processEnrollmentListsPostBack($params, $userId) {
-		// Build up a list of checkboxed courses
-	  $checkedCourseList = array();
-	  foreach ($params['form'] as $key => $value) {
-		if (strstr($key, "checkBoxList_")) {
-		  $aCourse = substr($key, 13);
-		  array_push($checkedCourseList, $aCourse);
-		}
-	  }
+    // Build up a list of checkboxed courses
+    $checkedCourseList = array();
+    foreach ($params['form'] as $key => $value) {
+      if (strstr($key, "checkBoxList_")) {
+        $aCourse = substr($key, 13);
+        array_push($checkedCourseList, $aCourse);
+      }
+    }
 
-	  // Put students into newly selected courses
-	  foreach ($checkedCourseList as $key => $value) {
-		if(!isset($simpleEnrolledList[$value])) {
-			var_dump("insert $value");
-		  //$this->UserEnrol->insertCourses($userId, array($value));
-		}
-	  }
+    $data = $this->getSimpleEntrollmentLists($userId);
+    $simpleEnrolledList = $data['simpleEnrolledList'];
 
-	  // Take them out of the de-selected courses
-	  foreach ($simpleEnrolledList as $key => $value) {
-		if (!isset($checkedCourseList[$value])) {
-		  $this->UserEnrol->removeStudentFromCourse($userId, $value);
-		}
-	  }
+    // Put students into newly selected courses
+    foreach ($checkedCourseList as $key => $value) {
+      if(!in_array($value, $simpleEnrolledList)) {
+        var_dump("insert $value");
+        //$this->UserEnrol->insertCourses($userId,array($value));
+      }
+    }
+
+    // Take them out of the de-selected courses
+    foreach ($simpleEnrolledList as $key => $value) {
+      if (!in_array($value, $checkedCourseList)) {
+        var_dump("remove $value");
+       //$this->UserEnrol->removeStudentFromCourse($userId, $value);
+      }
+    }
   }
 
   function view($id) {
@@ -461,7 +465,7 @@ class UsersController extends AppController
       $this->render('userSummary');
     }
 
-	$this->setUpCourseEnrollmentLists(null);
+  $this->setUpCourseEnrollmentLists(null);
     $this->set('roles', $this->AccessControl->getEditableRoles());
     $this->set('isEdit', false);
     $this->set('readonly', false);
@@ -495,6 +499,7 @@ class UsersController extends AppController
     $this->set('roles', $this->AccessControl->getEditableRoles());
     $this->set('readonly', false);
     $this->set('isEdit', true);
+    $this->set('is_student', $this->User->hasStudentNo($this->data['Role']));
     $this->render('add');
   }
 
@@ -623,8 +628,8 @@ class UsersController extends AppController
         if($this->__processForm()) {
           $this->__setSessionData($this->data['User']);
           if (!empty($this->data['User']['email'])) {
-            $this->Session->setFlash("Your Profile Has Been Updated Successfully.<br /><br />
-                                     <a href='" . $this->webroot/home . "' style='font-size:140%'>Go to your iPeer Home page.</a><br /><br />");
+            $this->Session->setFlash("Your Profile Has Been Updated Successfully.<br /><br /> " .
+            "<a href='../../home/' style='font-size:140%'>Go to your iPeer Home page.</a><br /><br />");
           } else {
             $this->Session->setFlash("We saved your data, but you still need to enter an email address!");
           }

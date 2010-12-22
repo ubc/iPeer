@@ -133,7 +133,7 @@ class User extends AppModel
     $this->virtualFields['student_no_with_full_name'] = sprintf('CONCAT(%s.student_no, " - ", %s.first_name, " ", %s.last_name)', $this->alias, $this->alias, $this->alias);
   }
 
-	//Overwriting Function - will be called before save operation
+  //Overwriting Function - will be called before save operation
   function beforeSave() {
     $allowSave = true;
 
@@ -182,55 +182,55 @@ class User extends AppModel
     return true;
   }
 
-	function findUser ($username, $password) {
-		return $this->find('first', array('conditions' => array('username' => $username,
+  function findUser ($username, $password) {
+    return $this->find('first', array('conditions' => array('username' => $username,
                                                             'password' => $password)));
   }
 
-	function findUserByStudentNo ($studentNo) {
-		return $this->find('first', array('conditions' => array('student_no' => $studentNo,
+  function findUserByStudentNo ($studentNo) {
+    return $this->find('first', array('conditions' => array('student_no' => $studentNo,
                                                             )));
-	}
+  }
 
-	function findUserByid ($id, $params = array()) {
-		return $this->find('first', array_merge(array('conditions' => array($this->name.'.id' => $id,
+  function findUserByid ($id, $params = array()) {
+    return $this->find('first', array_merge(array('conditions' => array($this->name.'.id' => $id,
                                                             )),
                                             $params));
-	}
+  }
 
-	function getByUsername($username) {
-		return $this->find('first', array('conditions' => array('username' => $username,
+  function getByUsername($username) {
+    return $this->find('first', array('conditions' => array('username' => $username,
                                                             )));
-	}
+  }
 
-	function getUserIdByStudentNo($studentNo) {
-		$tmp = $this->findUserByStudentNo($studentNo);
-		return $tmp['User']['id'];
-	}
+  function getUserIdByStudentNo($studentNo) {
+    $tmp = $this->findUserByStudentNo($studentNo);
+    return $tmp['User']['id'];
+  }
 
-	function getEnrolledStudents($course_id, $fields = array(), $conditions=null) {
+  function getEnrolledStudents($course_id, $fields = array(), $conditions=null) {
     return $this->find('all', array('conditions' => array('Enrolment.id' => $course_id),
                                     'fields' => 'User.*',
                                     'order' => 'User.student_no'));
-	}
+  }
 
 
-	function getEnrolledStudentsForList($course_id) {
+  function getEnrolledStudentsForList($course_id) {
     $students = $this->getEnrolledStudents($course_id);
     $list = array();
     foreach($students as $s) {
       $list[$s['User']['id']] = $s['User']['student_no_with_full_name'];
     }
     return $list;
-	}
+  }
 
-	function getUserByEmail($email='') {
-		return $this->find( "email='" . $email );
-	}
+  function getUserByEmail($email='') {
+    return $this->find( "email='" . $email );
+  }
 
-	function findUserByEmailAndStudentNo($email='', $studentNo='') {
-		return $this->find("email='" .$email . "' AND student_no='" . $studentNo . "'");
-	}
+  function findUserByEmailAndStudentNo($email='', $studentNo='') {
+    return $this->find("email='" .$email . "' AND student_no='" . $studentNo . "'");
+  }
 
   /**
    * canRemoveCourse check if user has permission to remove the course from a
@@ -276,14 +276,14 @@ class User extends AppModel
       $data['User']['password'] = md5($data['User']['password']);
       return $data;
     }
-    return $data;    
+    return $data;
   }
 
   function getRoleById($id) {
     $user = $this->find('first', array('conditions' => array($this->name.'.id' => $id)));
     return $user['Role'][0]['name'];
   }
-  
+
   function getRoles($id) {
     $user = $this->read(null, $id);
     return $this->getRolesByRole($user['Role']);
@@ -317,7 +317,7 @@ class User extends AppModel
     $hasStudentNo = false;
     foreach($roles as $key => $role) {
       if(is_array($role)) {
-        if('student' == $role['name']) {
+        if(isset($role['name']) && ('student' == $role['name'])) {
           $hasStudentNo = true;
         }
       } else {
