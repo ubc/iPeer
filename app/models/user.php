@@ -141,22 +141,12 @@ class User extends AppModel
       $this->data[$this->name]['password'] = NeatString::randomPassword(6);
     }
 
-    // generate a password hash if it was set
-    if (!empty($this->data[$this->name]['password'])) {
-      $this->unhashed_password = $this->data[$this->name]['password'];
-      $this->data[$this->name]['password'] = md5($this->data[$this->name]['password']);
-    }
-
     // clear password to avoid updating to a empty one
     if(empty($this->data[$this->name]['password'])) {
       unset($this->data[$this->name]['password']);
     }
 
     return $allowSave && parent::beforeSave();
-  }
-
-  function afterSave(){
-    $this->data[$this->name]['password'] = $this->unhashed_password;
   }
 
   function find($conditions = null, $fields = array(), $order = null, $recursive = null) {
