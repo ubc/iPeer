@@ -13,6 +13,8 @@
                 $emptyMessage :
                 "No $setName avaliable.";
         } else {
+            // Create a small hidden field to ID this list's presence
+            echo "<input type='hidden' id='$setName' name='$setName' value='present'></input>";
 
             // determing a good way to render the list
             $doubleColumn = sizeof($list) >= 6;
@@ -27,9 +29,9 @@
 
                 // Is this item selected?
                 $checked = in_array($key, $selection) ? "checked=true" : "";
-				$disabled = $readOnly ? "disabled=true" : "";
+                $disabled = $readOnly ? "disabled=true" : "";
                 // Cheate the chech for each entry
-                echo "<input type='checkbox' name=checkBoxList_$key value='$value' $checked $disabled>";
+                echo "<input type='checkbox' name='checkBoxList_$key' value='$value' $checked $disabled>";
                 if (!empty($checked)) {
                     echo "<b><u>$value</u></b>";
                 } else {
@@ -49,9 +51,14 @@
                 }
             }
             echo "</tr></table>";
-            echo "</div><br/>";
-            echo "Use the checkmarks to $verbIn / $verbOut $setName.<br/>";
-            echo "($setName in <b><u>bold</u></b> are the ones selected initially.)<br/>";
+            echo "</div><br/><center>";
+            if (!$readOnly) {
+              echo "Use the checkmarks to $verbIn / $verbOut $setName.<br/>";
+              echo "($setName in <b><u>bold</u></b> are the ones selected initially.)<br/>";
+            } else {
+              echo "(The selected $setName are check-marked and in <b><u>bold</u></b>)</br />";
+            }
+            echo "</center>";
         }
     }
 ?>

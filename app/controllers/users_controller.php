@@ -351,6 +351,29 @@ class UsersController extends AppController
     }
   }
 
+  // This function is needed since the $this->data looks different between
+  //  initial page render, and postback page render. Needs a better implementation.
+  function determineIfStudentFromThisData($data) {
+    // On initial page render, the Role is a complete structure
+    if (!empty($data['Role'])) {
+      foreach ($data['Role'] as $role) {
+        if (!empty($role['name']) && $role['name']=='student') {
+          return true;
+        }
+      }
+    }
+    
+    // But on a post back, it's a little funny...  Yeah, go figure :-)
+    if (!empty($data['Role']['Role']) && is_array($data['Role']['Role'])) {  
+      foreach ($data['Role']['Role'] as $value) {
+        if ($value == 4) { // 4 means student
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
 
   function getSimpleEntrollmentLists($id) {
     $result = array();
@@ -400,6 +423,11 @@ class UsersController extends AppController
   }
 
   function processEnrollmentListsPostBack($params, $userId) {
+    // Check if the course list was submitted at all.
+    if (empty($params['form']['Courses'])) {
+      // No Courses list? Then don't do anything. 
+      return;
+    }
     // Build up a list of checkboxed courses
     $checkedCourseList = array();
     foreach ($params['form'] as $key => $value) {
@@ -445,10 +473,16 @@ class UsersController extends AppController
       $this->Session->setFlash('You do not have permission to view this user.');
       $this->redirect('index');
     }
-
+    
+    $isStudent = $this->determineIfStudentFromThisData($this->data);  
+    if ($isStudent) {
+      $this->setUpCourseEnrollmentLists($id);
+    }
+    
     $this->setUpCourseEnrollmentLists($id);
     $this->set('roles', $this->User->getRoles($id));
     $this->set('readonly', true);
+    $this->set('isStudent', $isStudent);
     $this->render('add');
   }
 
@@ -463,15 +497,23 @@ class UsersController extends AppController
     $this->set('course_id', $course_id);
 
     if($this->__processForm()) {
+      // Process the course changes list
+      $this->processEnrollmentListsPostBack($this->params, $this->User->id);
+
       $this->render('userSummary');
     }
 
+    $thisUser = $this->Auth->user();
+    $thisUserRoles = $this->User->getRoles($thisUser['User']['id']);
+    $addingStudent = in_array("instructor", $thisUserRoles); // If this is an instructor, they can only add students.
     $this->setUpCourseEnrollmentLists(null);
+    $courseID = $this->set('courseId', $this->Session->read('ipeerSession.courseId'));
+
     $this->set('roles', $this->AccessControl->getEditableRoles());
     $this->set('isEdit', false);
+    $this->set('isStudent', $addingStudent);
     $this->set('readonly', false);
   }
-
 
   function edit($id) {
     // Ensure that the id is valid
@@ -492,10 +534,15 @@ class UsersController extends AppController
         $this->Session->setFlash('Changes are saved.');
       }
     }
-
-    $this->setUpCourseEnrollmentLists($id);
+    var_dump($this->data);
+    $isStudent = $this->determineIfStudentFromThisData($this->data);  
+    if ($isStudent) {
+      $this->setUpCourseEnrollmentLists($id);
+    }
+    
     $this->set('data', $this->data);
     $this->set('roles', $this->AccessControl->getEditableRoles());
+    $this->set('isStudent', $isStudent);
     $this->set('readonly', false);
     $this->set('isEdit', true);
     $this->render('add');

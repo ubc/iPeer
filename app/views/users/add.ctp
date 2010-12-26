@@ -96,22 +96,21 @@
           <td id="student_no_msg" class="error">&nbsp;</td>
         </tr>
 
-        <tr class="tablecell2">
-        <td width="130" id="courses_label">This student's<br />Courses:</td>
-        <td colspan=2>
-          <?php
-          // Render the course list, with check box selections
-          echo $this->element("list/checkBoxList", array(
-              "eachName" => "Course",
-              "setName" => "Courses",
-              "verbIn" => "add",
-              "verbOut" => "remove",
-              "list" => $simpleCoursesList,
-              "readOnly" => $readonly,
-              "selection" => $simpleEnrolledList)); ?>
-          <div id="adddelcourses"></div>
-        </td>
-      </tr>
+        <!-- student courses-->
+        <?php if ($isStudent) : ?>
+          <tr class="tablecell2"> <td width="130" id="courses_label">This student's<br />Courses:</td>
+          <td colspan=2><?php
+            // Render the course list, with check box selections
+            echo $this->element("list/checkBoxList", array(
+                "eachName" => "Course",
+                "setName" => "Courses",
+                "verbIn" => "add",
+                "verbOut" => "remove",
+                "list" => $simpleCoursesList,
+                "readOnly" => $readonly,
+                "selection" => $simpleEnrolledList)); ?>
+          </td></tr>
+        <?php endif; ?>
 
         <?php if($readonly):?>
         <tr class="tablecell2">
@@ -143,7 +142,7 @@
         <!-- Back / Save -->
         <tr class="tablecell2">
             <td colspan="3" align="center">
-            <input type="button" value="Back" onClick="javascript:window.history.back();">
+            <input type="button" value="Back" onClick="javascript:window.location='../index'";>
             <?php if (!$readonly) echo $this->Form->submit('Save', array('div' => false));?>
             </td>
         </tr>
