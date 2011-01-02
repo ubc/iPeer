@@ -534,7 +534,6 @@ class UsersController extends AppController
         $this->Session->setFlash('Changes are saved.');
       }
     }
-    var_dump($this->data);
     $isStudent = $this->determineIfStudentFromThisData($this->data);  
     if ($isStudent) {
       $this->setUpCourseEnrollmentLists($id);

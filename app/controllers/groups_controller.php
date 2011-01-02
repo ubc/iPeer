@@ -38,18 +38,21 @@ class GroupsController extends AppController
 	var $Sanitize;
   var $components = array('AjaxList');
 
-	function __construct()
-	{
-		$this->Sanitize = new Sanitize;
-		$this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
-		if ($this->show == 'all') $this->show = 99999999;
-		$this->sortBy = empty($_GET['sort'])? 'created': $_GET['sort'];
-		$this->direction = empty($_GET['direction'])? 'desc': $this->Sanitize->paranoid($_GET['direction']);
-		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
-		$this->order = $this->sortBy.' '.strtoupper($this->direction);
- 		$this->set('title_for_layout', 'Groups');
-		parent::__construct();
-	}
+
+    function __construct()
+    {
+        $this->Sanitize = new Sanitize;
+        $this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
+        if ($this->show == 'all') {
+            $this->show = 99999999;
+        }
+        $this->sortBy = empty($_GET['sort'])? 'created': $_GET['sort'];
+        $this->direction = empty($_GET['direction'])? 'desc': $this->Sanitize->paranoid($_GET['direction']);
+        $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
+        $this->order = $this->sortBy.' '.strtoupper($this->direction);
+        $this->pageTitle = 'Groups';
+        parent::__construct();
+    }
 
   function postProcess($data) {
     // Creates the custom in use column
@@ -287,56 +290,253 @@ class GroupsController extends AppController
 		}
 	  //Return true if valid, else error msg
     $validUploads = $this->framework->validateUploadFile($tmpFile, $filename, $uploadFile);
-		if ($validUploads) {
-			// Get file into an array.
-			$lines = file($uploadFile);
-			// Delete the uploaded file
-			unlink($uploadFile);
+    if ($validUploads) {
+        // Get file into an array.
+        $lines = file($uploadFile, FILE_SKIP_EMPTY_LINES);
+        // Delete the uploaded file
+        unlink($uploadFile);
 
-			//Mess create students
-			$resultAry = $this->addGroupByImport($this->params['data'], $lines);
-      $this->set('data', $resultAry);
-
-      $this->redirect('/groups/index/The group was added successfully.');
-		} else {
-		  $this->set('errmsg', $$validUploads);
-		  $this->set('user_data', $this->User->getEnrolledStudents($courseId));
-		  $this->set('import_again',"true");
-		  $this->render('add');
-		}
+        //Mass create groups
+        $this->addGroupByImport($this->params['data'], $lines, $courseId);
+    } else {
+        $this->set('errmsg', $$validUploads);
+        $this->set('user_data', $this->User->getEnrolledStudents($courseId));
+        $this->set('import_again',"true");
+        $this->render('add');
+    }
   }
 
-  function addGroupByImport($data=null, $lines=null)
-	{
-	  $groupNo = '';
-    for ($i = 0; $i < count($lines); $i++) {
-      // Get rid of '"', it just  confuses iPeer in CSV Files
-      $filteredLine = $lines[$i];
-      $filteredLine = str_replace('"','', $filteredLine);
+  // Takes an array of imported file lines, and creates groups from them
+  function addGroupByImport($data, $lines, $courseId) {
 
-      // Split fields up on line by ','
-      $line = @split(',', $filteredLine);
-      $data['Group']['id'] = null;
-      //$data['Group']['student_no'] = trim($line[0]);
-      $data['Group']['username'] = trim($line[0]);
-      $data['Group']['group_num'] = trim($line[1]);
-      $data['Group']['group_name'] = trim($line[2]);
-      $data['Group']['creator_id'] = $this->rdAuth->id;
-      if ($groupNo != $data['Group']['group_num']) {
-        $this->Group->save($data);
+      // Check for parameters
+      if (empty($lines) || empty($courseId)) {
+          return array();
       }
 
-			// add members into the groups_members table
-			$groupMember['GroupsMembers']['group_id'] = $this->Group->id;
-			//$user = $this->User->find('student_no = '.$data['Group']['student_num']);
-      $user = $this->User->find('username = '.$data['Group']['username']);
-			$groupMember['GroupsMembers']['user_id'] = $user['User']['id'];
-			$this->GroupsMembers->save($groupMember);
-			$this->GroupsMembers->id = null;
+      // pre-process the lines in the file first
+      for ($i = 0; $i < count($lines); $i++) {
+          // Trim this line's white space
+          $lines[$i] = trim($lines[$i]);
+          // Clear all quotes - we rely on separators instead
+          $lines[$i] = str_replace('"', '', $lines[$i]);
+          // Replace tabs with commas - in case of different CSV formatting
+          $lines[$i] = str_replace("\t", "", $lines[$i]);
+          // Put a space between the commas, and their following column
+          $lines[$i] = str_replace(",", ", ", $lines[$i]);
+      }
 
-			$groupNo = $data['Group']['group_num'];
-        }
-	}
+      // Remove duplicate lines
+      $lines = array_unique($lines);
+
+
+      // Process the array into groups
+      $users = array();
+      for ($i = 0; $i < count($lines); $i++) {
+          $entry = array();
+          $entry['line'] =  $lines[$i];
+          // To start, mark all entries as invalid and
+          $entry['status'] = "Unchecked Entry";
+          $entry['valid'] = false;
+          $entry['added'] = false;
+          // Split the line up by command
+          $split = @split (',', $entry['line']);
+          // If the count is not 3, there's probably a formatting error,
+          //  so ignore this entry.
+          if (count($split) < 3 ) {
+              $entry['status'] = "Too few columns in this line (" . count($split). ")," .
+                  " expected 3.";
+          } else if (count($split) > 3 ) {
+              $entry['status'] = "Too many columns in this line (" . count($split). ")," .
+                  " expected 3.";
+          } else {
+              // assign the parts into their appropriate places
+              $entry['username'] = trim($split[IMPORT_USERNAME]);
+              $entry['group_num'] = trim($split[IMPORT_GROUP_NUMBER]);
+              $entry['group_name'] = trim($split[IMPORT_GROUP_NAME]);
+
+              // Check the entries for empty spots
+              if (empty($entry['username'])) {
+                  $entry['status'] = "Username column is empty.";
+              } else if (empty($entry['group_num'])) {
+                  $entry['status'] = "Group Number column is empty.";
+              } else if (empty($entry['group_name'])) {
+                  $entry['status'] = "Group Name column is empty.";
+              } else {
+                  $userData = $this->User->findByUsername($entry['username']);
+                  if (!is_array($userData)) {
+                      $entry['status'] = "User $entry[username] is unknown. Please add this user first.";
+                  } else {
+                      $entry['id'] = $userData['User']['id'];
+                      if (!$this->UserEnrol->isEnrolledInByUsername($entry['username'], $courseId)) {
+                          $entry['status'] = "User $entry[username] is not enrolled in your selected course. ";
+                          $entry['status'] .= "Please entroll them first.";
+                      } else {
+                          // So, the user exists, and is enrolled in the course - they pass validation
+                          $entry['status'] = "Validated Entry";
+                          $entry['valid'] = true;
+                      }
+                  }
+              }
+          }
+          // Add this checked entry into the list
+          array_push($users, $entry);
+      }
+
+      // Now, generate a list of groups to create
+      $groups = array();
+      foreach ($users as $key => $entry) {
+          if ($entry['valid']) {
+              // Check to see if this group is already in the group array.
+              $newGroup = true;
+              foreach ($groups as $group) {
+                  if ($group['name'] == $entry['group_name'] &&
+                      $group['number'] == $entry['group_num']) {
+                      $newGroup = false;
+                      break;
+                  }
+              }
+              // If we have a new group, record it.
+              if ($newGroup) {
+                  $group = array();
+                  $group['number'] = $entry['group_num'];
+                  $group['name'] = $entry['group_name'];
+                  $group['id'] = false;
+                  $group['created'] = false;
+                  $group['present'] = false;
+                  $group['reason'] = "Unchecked groups";
+                  array_push($groups, $group);
+              }
+          } else {
+              continue;
+          }
+      }
+
+      // Check the groups' existance, and create them if they're missing.
+      // Here I assume that the above code will not add a group without users.
+      foreach ($groups as $key=>$group) {
+          $groupId = $this->Group->findGroup($courseId, $group['number'], $group['name']);
+          if (is_numeric($groupId)) {
+              $groups[$key]['present'] = true;
+              $groups[$key]['id'] = $groupId;
+              $groups[$key]['reason'] = "The group already exists. Students will be added to it.";
+          } else {
+              // DOESN'T WORK FOR SOME REASON...
+              // Create the group's database array for storage
+              $groupData = array();
+              $groupData['Group'] = array();
+              $groupData['Group']['id'] = null;
+              $groupData['Group']['group_num'] = $group['number'];
+              $groupData['Group']['group_name'] = $group['name'];
+              $groupData['Group']['creator_id'] = $this->rdAuth->id;
+              $groupData['Group']['course_id'] = $courseId;
+
+              // Save the group to the database
+              if ($this->Group->save($groupData)) {
+                  $groups[$key]['present'] = true;
+                  $groups[$key]['created'] = true;
+                  $groups[$key]['id'] = $this->Group->id;
+                  $groups[$key]['reason'] = "This is a new group; it was created sucessfully.";
+              } else {
+                  $groups[$key]['reason'] = "The group could not be created in the database!";
+              }
+          }
+      }
+
+      // Then, add the users to the created groups
+      foreach ($users as $key => $user) {
+          // For all valid users
+          if ($user['valid']) {
+              // Find the group we'd like to add this person to
+              $groupId = false;
+              foreach ($groups as $group) {
+                  if ($group['number'] == $user['group_num'] &&
+                      $group['name'] == $user['group_name']) {
+                      $groupId = $group['id'];
+                  }
+              }
+              if (is_numeric($groupId)) {
+                  $alreadyAdded = $this->GroupsMembers->isMemberOf($user['id'], $groupId);
+                  if ($alreadyAdded) {
+                      // User Already in group
+                      $users[$key]['status'] = "User $user[username] is already in group ";
+                      $users[$key]['status'].= "$user[group_num] - $user[group_name]";
+                  } else {
+                      $groupMemberData = array();
+                      $groupMemberData['id']= null;
+                      $groupMemberData['user_id'] = $user['id'];
+                      $groupMemberData['group_id'] = $groupId;
+                      if ($this->GroupsMembers->save($groupMemberData)) {
+                          $users[$key]['status'] = "User added sucessfully to group ";
+                          $users[$key]['status'].= "$user[group_num] - $user[group_name]";
+                          $users[$key]['added'] = true;
+                      } else {
+                          $users[$key]['status'] = "User $user[username] could not be added to group ";
+                          $users[$key]['status'].= "$user[group_num] - $user[group_name]";
+                          $users[$key]['status'].= "- the entry could not be created in the database.";
+                      }
+                  }
+              } else {
+                  // A group should have either existed, or was just created.
+                  $users[$key]['status'] = "Can't find the group for user $user[username]. ";
+                  $users[$key]['status'] = "This should never occur!";
+              }
+
+          }
+      }
+
+      // Set up the data for the view
+      $results = array();
+      $results['users_added'] = 0;
+      $results['users_skipped'] = 0;
+      $results['users_error'] = 0;
+
+      $results['groups_added'] = 0;
+      $results['groups_skipped'] = 0;
+      $results['groups_error'] = 0;
+
+      // Add up statistics of import
+      foreach ($users as $key => $user) {
+
+          // Look up extra user info:
+          if (!empty($user['id'])) {
+               $users[$key]['data'] = $this->User->findById($user['id']);
+          } else {
+              $users[$key]['data'] = false;
+          }
+
+          // Add the user to statistics
+          if ($user['valid']) {
+              if ($user['added']) {
+                  $results['users_added']++;
+              } else {
+                  $results['users_skipped']++;
+              }
+          } else {
+              $results['users_error']++;
+          }
+
+      }
+
+      foreach ($groups as $key => $group) {
+          if ($group['present']) {
+              if ($group['created']) {
+                  $results['groups_added']++;
+              } else {
+                  $results['groups_skipped']++;
+              }
+          } else {
+              $results['groups_error']++;
+          }
+      }
+
+      $results['groups'] = $groups;
+      $results['users'] = $users;
+
+      $this->set("results", $results);
+      $this->render('import_results');
+      exit;
+  }
 
 	function update($attributeCode='',$attributeValue='') {
 		if ($attributeCode != '' && $attributeValue != '') //check for empty params

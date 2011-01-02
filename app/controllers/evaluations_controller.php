@@ -109,10 +109,7 @@ class EvaluationsController extends AppController
         return $data;
     }
 
-    function setUpAjaxList () {
-
-        $eventId = $this->Session->read("evaluationsControllerEventIdSession");
-
+    function setUpAjaxList ($eventId) {
         // The columns to show
         $columns = array(
             //    Model   columns       (Display Title) (Type Description)
@@ -175,16 +172,17 @@ class EvaluationsController extends AppController
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
         // Set up the list
-        $this->setUpAjaxList();
+        $eventId = $this->Session->read("evaluationsControllerEventIdSession");
+        $this->setUpAjaxList($eventId);
         // Process the request for data
-        $this->AjaxList->asyncGet();
+        $this->AjaxList->asyncGet("view");
     }
 
 
-
     function view($eventId='') {
-
-
+        // Make sure the present user is not a student
+        $this->rdAuth->noStudentsAllowed();
+        
         // Record the event id into the session
         if (!empty($eventId) && is_numeric($eventId)) {
             $this->Session->write("evaluationsControllerEventIdSession", $eventId);
@@ -195,14 +193,12 @@ class EvaluationsController extends AppController
             // During the view, and will break if it's not.
             $this->rdAuth->setCourseId($data['Event']['course_id']);
         } else {
-            $this->Session->delete("evaluationsControllerEventIdSession");
+            // Use last event ID if none was passed with a parameter
+            $eventId = $this->Session->read("evaluationsControllerEventIdSession");
         }
 
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
-
         // Set up the basic static ajax list variables
-        $this->setUpAjaxList();
+        $this->setUpAjaxList($eventId);
 
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
