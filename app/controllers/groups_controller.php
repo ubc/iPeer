@@ -269,41 +269,42 @@ class GroupsController extends AppController
   }
 
   function import() {
-    $this->autoRender = false;
-    $courseId = $this->params['form']['course_id'];
-    $this->params['data']['Group']['course_id'] = $courseId;
-    $filename = $this->params['form']['file']['name'];
-		$tmpFile = $this->params['form']['file']['tmp_name'];
+    // Just render :-)
+    if (!empty($this->params['form'])) {
+      $this->autoRender = false;
+      $courseId = $this->params['form']['course_id'];
+      $this->params['data']['Group']['course_id'] = $courseId;
+      $filename = $this->params['form']['file']['name'];
+      $tmpFile = $this->params['form']['file']['tmp_name'];
 
-		//$uploadDir = $this->sysContainer->getParamByParamCode('system.upload_dir');
-		$uploadDir = "../tmp/";
-		//$uploadFile = APP.$uploadDir['parameter_value'] . $filename;
-		$uploadFile = $uploadDir.$filename;
+      //$uploadDir = $this->sysContainer->getParamByParamCode('system.upload_dir');
+      $uploadDir = "../tmp/";
+      //$uploadFile = APP.$uploadDir['parameter_value'] . $filename;
+      $uploadFile = $uploadDir.$filename;
 
-		//check for blank filename
-		if (trim($filename) == "") {
-			$this->set('errmsg','File required.');
-			$this->set('user_data', $this->User->getEnrolledStudents($courseId));
-			$this->set('import_again',"true");
-      $this->render('add');
-			return false;
-		}
-	  //Return true if valid, else error msg
-    $validUploads = $this->framework->validateUploadFile($tmpFile, $filename, $uploadFile);
-    if ($validUploads) {
-        // Get file into an array.
-        $lines = file($uploadFile, FILE_SKIP_EMPTY_LINES);
-        // Delete the uploaded file
-        unlink($uploadFile);
-
-        //Mass create groups
-        $this->addGroupByImport($this->params['data'], $lines, $courseId);
-    } else {
-        $this->set('errmsg', $$validUploads);
+      //check for blank filename
+      if (trim($filename) == "") {
+        $this->set('errmsg','File required.');
         $this->set('user_data', $this->User->getEnrolledStudents($courseId));
-        $this->set('import_again',"true");
-        $this->render('add');
+      }
+      //Return true if valid, else error msg
+      $validUploads = $this->framework->validateUploadFile($tmpFile, $filename, $uploadFile);
+      if ($validUploads) {
+          // Get file into an array.
+          $lines = file($uploadFile, FILE_SKIP_EMPTY_LINES);
+          // Delete the uploaded file
+          unlink($uploadFile);
+          //Mass create groups
+          $this->addGroupByImport($this->params['data'], $lines, $courseId);
+          // We should never get to this line :-)
+      } else {
+          $this->set('errmsg', $$validUploads);
+          $this->set('user_data', $this->User->getEnrolledStudents($courseId));
+      }
     }
+    
+    $courseId = $this->Session->read('ipeerSession.courseId');
+    $this->set("courseId", $courseId);
   }
 
   // Takes an array of imported file lines, and creates groups from them
