@@ -10,7 +10,6 @@ class UserEnrol extends AppModel
     return $result;
   }
 
-
   function getEnrolledStudentCount($courseId=null) {
     $conditions = array('course_id' => $courseId,
                         );
@@ -20,6 +19,14 @@ class UserEnrol extends AppModel
   function removeStudentFromCourse($user_id=null, $course_id=null) {
     $course_to_remove = $this->find(array('course_id=' . $course_id, 'user_id=' . $user_id));
     return $this->delete($course_to_remove['UserEnrol']['id']);
+  }
+  
+  // Returns true if the username is enrolled in the course, and false if not.
+  function isEnrolledInByUsername($username, $courseId) {
+    $result = $this->query("select User.id from users join user_enrols" .
+                            "on users.id=user_enrols.user_id " . 
+                            "where username=$username and course_id=$courseId");
+    return count($results) > 0;
   }
 
   function insertCourses ($user_id, $course_ids) {

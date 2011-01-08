@@ -19,15 +19,18 @@ class frameworkComponent
    */
   function validateUploadFile($tmpFile, $filename, $uploadFile) {
     $result = true;
-  	$fileParts = pathinfo('dir/' . $filename);  
-	//echo "tem file is ".$tmpFile.' file name is  '.$fileName.' upload file is '.$uploadFile.'<br>';
+  	$fileParts = pathinfo('dir/' . $filename);
+    if (empty($fileParts['extension'])) {
+      $result = "No filename extension. Must be csv.";
+      return $result;
+    }
+    //echo "tem file is ".$tmpFile.' file name is  '.$fileName.' upload file is '.$uploadFile.'<br>';
   	$fileExtension = strtolower($fileParts['extension']); 
   	if ($fileExtension == 'txt' || $fileExtension == 'csv')  {
   		if (!move_uploaded_file($tmpFile, $uploadFile)) {
   			$result = "Error reading file";
   		}
-  	}
-  	else {
+  	} else {
   		$result = "iPeer does not support the file type '." . $fileExtension .
   					 "'. Please use only text files (.txt) or comma seperated values files (.csv).";
   	}

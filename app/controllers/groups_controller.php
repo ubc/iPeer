@@ -25,10 +25,15 @@
  * @subpackage
  * @since
  */
+ 
+define('IMPORT_USERNAME', 0);
+define('IMPORT_GROUP_NUMBER', 1);
+define('IMPORT_GROUP_NAME', 2);
+ 
 class GroupsController extends AppController
 {
   var $name = 'Groups';
-	var $uses =  array('Group','GroupsMembers', 'User','Personalize','GroupEvent');
+	var $uses =  array('Group','GroupsMembers', 'User','UserEnrol','Personalize','GroupEvent');
   var $show;
 	var $sortBy;
 	var $direction;
@@ -271,7 +276,6 @@ class GroupsController extends AppController
   function import() {
     // Just render :-)
     if (!empty($this->params['form'])) {
-      $this->autoRender = false;
       $courseId = $this->params['form']['course_id'];
       $this->params['data']['Group']['course_id'] = $courseId;
       $filename = $this->params['form']['file']['name'];
@@ -289,7 +293,7 @@ class GroupsController extends AppController
       }
       //Return true if valid, else error msg
       $validUploads = $this->framework->validateUploadFile($tmpFile, $filename, $uploadFile);
-      if ($validUploads) {
+      if ($validUploads === true) {
           // Get file into an array.
           $lines = file($uploadFile, FILE_SKIP_EMPTY_LINES);
           // Delete the uploaded file
@@ -298,11 +302,10 @@ class GroupsController extends AppController
           $this->addGroupByImport($this->params['data'], $lines, $courseId);
           // We should never get to this line :-)
       } else {
-          $this->set('errmsg', $$validUploads);
-          $this->set('user_data', $this->User->getEnrolledStudents($courseId));
+          $this->set('errmsg', $validUploads);
       }
     }
-    
+   
     $courseId = $this->Session->read('ipeerSession.courseId');
     $this->set("courseId", $courseId);
   }
