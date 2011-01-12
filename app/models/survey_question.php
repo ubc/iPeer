@@ -58,8 +58,8 @@ class SurveyQuestion extends AppModel
   // returns all the question IDs of a specific survey
   function getQuestionsID($survey_id)
   {
-	$data = $this->findAll($conditions='survey_id='.$survey_id, $fields="number, question_id, id");
-	$data['count'] = $this->findCount($conditions='survey_id='.$survey_id);
+	$data = $this->findAll($conditions='survey_id='.$survey_id, $fields="number, question_id, id", 'number ASC');
+	$data['count'] = count($data);
 
 	return $data;
   }

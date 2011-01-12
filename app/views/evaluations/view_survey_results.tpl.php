@@ -25,7 +25,9 @@
 					if( !empty($question['Responses'])){
 						foreach ($question['Responses'] as $index => $value):
   						$checked = '';
-  					  if (isset($answers[$i-1]) && $answers[$i-1]['SurveyInput']['response_id'] == $value['id']) $checked = 'checked';
+              if($answer['SurveyInput']['question_id'] == $question['id'] && $answer['SurveyInput']['response_id'] == $value['id']) {
+                $checked = 'checked';
+              }
 							echo "<input type=\"radio\" name=\"answer_".$question['number']."\" value=\"".$value['response']."_".$value['id']."\" ".$checked." disabled> ".$value['response']."<br>";
 						endforeach;
 					}
@@ -40,7 +42,9 @@
 					if( !empty($question['Responses'])){
 						foreach ($question['Responses'] as $index => $value):
   						$checked = '';
-  					  if (isset($answers[$i-1]) && $answers[$i-1]['SurveyInput']['response_id'] == $value['id']) $checked = 'checked';
+              if($answer['SurveyInput']['question_id'] == $question['id'] && $answer['SurveyInput']['response_id'] == $value['id']) {
+                $checked = 'checked';
+              }
 							echo "<input type=\"checkbox\" name=\"answer_".$question['number']."[]\" value=\"".$value['response']."_".$value['id']."\" ".$checked." disabled> ".$value['response']."<br>";
 						endforeach;
 					}

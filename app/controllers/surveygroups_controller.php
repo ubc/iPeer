@@ -154,7 +154,7 @@ class SurveyGroupsController extends AppController
     //get users
     $page = (($this->page-1)*$this->show);
     $userData = $this->User->getEnrolledStudents($courseId, $fields=null);
-    $userData = array_splice($userData, $page, $this->show);
+    //$userData = array_splice($userData, $page, $this->show);
 
     //append user survey array if submitted for hyperlink
     for ($i=0; $i < count($data); $i++) {
