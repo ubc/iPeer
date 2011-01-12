@@ -236,15 +236,9 @@ class SurveyGroupsController extends AppController
         }
         }
     }
-
-
-
     $data['User'] = $userData;
 
     $this->set('data',$data);
-
-
-
   }
 
   function makegroups($params=null) {
@@ -366,25 +360,26 @@ class SurveyGroupsController extends AppController
         //saves the 'in' file
         $time = (isset($time) ? $time: (String)time());
 
-        $unix_path = '../tmp/'.$time.'.xml';
-        $windows_path = '..\\tmp\\'.$time.'.xml';
-        $this->File = new File($unix_path);
+        $file_path = TMP.$time;
+        $this->File = new File($file_path.'.xml');
         $this->File->write($doc);
         //execute TeamMaker
-        if(!file_exists('..\\controllers\\components\\TeamMaker'))  { //not windows
+
+        $cmdline = $this->__getTeamMaker().' '.$file_path.'.xml '.$file_path.'.txt';// > ../tmp/tm_log.txt";
+        /*if(!file_exists('..\\controllers\\components\\TeamMaker'))  { //not windows
             //$cmdline = "./TeamMaker $out_filename $in_filename > output.txt";
             $cmdline = "../controllers/components/TeamMaker ".$unix_path." ../tmp/".$time.".txt";// > ../tmp/tm_log.txt";
             //$cmdline =  "/var/www/ipeer.apsc.ubc.ca/htdocs/prod/app/controllers/components/TeamMaker ".$unix_path."/var/www/ipeer.apsc.ubc.ca/htdocs/prod/app/tmp/".$time.".txt";
         } else {//windows
         //$cmdline = "TeamMaker 1133823949_in.xml $in_filename > output.txt";
             $cmdline = "..\\controllers\components\\TeamMaker ".$windows_path." ..\\tmp\\".$time.".txt > ..\\tmp\\tm_log.txt";
-        }
+        }*/
 
         set_time_limit(1200);
         if ($make) exec($cmdline);
 
         //parse results and display
-        $teams_tmp = file('../tmp/'.$time.'.txt');
+        $teams_tmp = file($file_path.'.txt');
         $teams = array();
 
         //format the team recordset
@@ -398,12 +393,12 @@ class SurveyGroupsController extends AppController
                 $teams[$i]['member_'.$j]['id'] = $member_id;
             }
         }
-        $xmlFile = file_get_contents('../tmp/'.$time.'.txt.scores');
+        $xmlFile = file_get_contents(TMP.$time.'.txt.scores');
         $xmlFile = @ereg_replace('(<\?=).*(\?>)','',$xmlFile);
-        file_put_contents('../tmp/'.$time.'.txt.scores',$xmlFile);
+        file_put_contents(TMP.$time.'.txt.scores',$xmlFile);
         //$scores = file_get_contents('../tmp/'.$time.'.txt.scores');
 
-        $scores = $this->XmlHandler->readTMXml(count($questions),'../tmp/'.$time.'.txt.scores');
+        $scores = $this->XmlHandler->readTMXml(count($questions),TMP.$time.'.txt.scores');
         //print_r($scores);
         $this->set('scores',$scores);
         $this->set('teams',$teams);
@@ -413,13 +408,23 @@ class SurveyGroupsController extends AppController
         $this->set('event_id',$eventId);
     }
 
+    function __getTeamMaker() {
+      $cmdline = COMPONENTS.'TeamMaker';
+      if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')  {
+        $cmdline .= '.exe';
+      } elseif(strtoupper(PHP_OS) == 'DARWIN') {
+        $cmdline .= '.osx';
+      }
+      return $cmdline;
+    }
+
   function savegroups($params=null) {
     $this->autoRender = false;
     $time = $this->params['form']['filename'];
     $setDescription = $this->params['form']['team_set_name'];
     $surveyId = $this->params['form']['survey_id'];
     //get teams
-    $teams_tmp = file('../tmp/'.$time.'.txt');
+    $teams_tmp = file(TMP.$time.'.txt');
 
     //save group sets
     $numGroups = count($teams_tmp);
@@ -542,15 +547,15 @@ class SurveyGroupsController extends AppController
   function deletesurveygroupset($params=null) {
     $this->autoRender = false;
     $groupSetId = $params;
-    $time = $this->SurveyGroupSet->find('id='.$groupSetId,'date');
+    $time = $this->SurveyGroupSet->find('SurveyGroupSet.id='.$groupSetId,'date');
     $time = $time['SurveyGroupSet']['date'];
 
     $this->SurveyHelper->deleteGroupSet($groupSetId);
 
     //delete teammaker crums
-    unlink('../tmp/'.$time.'.txt');
-    unlink('../tmp/'.$time.'.xml');
-    unlink('../tmp/'.$time.'.txt.scores');
+    unlink(TMP.$time.'.txt');
+    unlink(TMP.$time.'.xml');
+    unlink(TMP.$time.'.txt.scores');
 
     $this->index();
 
@@ -568,12 +573,12 @@ class SurveyGroupsController extends AppController
     $surveyName = $this->Survey->getSurveyTitleById($surveyId);
     $eventId = $this->Event->getSurveyEventIdByCourseIdDescription($courseId,$surveyName);
     $eventId = $eventId['Event']['id'];
-    $time = $this->SurveyGroupSet->find('id='.$groupSetId,'date');
+    $time = $this->SurveyGroupSet->find('SurveyGroupSet.id='.$groupSetId,'date');
     $time = $time['SurveyGroupSet']['date'];
-    $scoreFilePathAndName = '../tmp/'.$time.'.txt.scores';
-    $xmlFile = file_get_contents('../tmp/'.$time.'.txt.scores');
+    $scoreFilePathAndName = TMP.$time.'.txt.scores';
+    $xmlFile = file_get_contents(TMP.$time.'.txt.scores');
     $xmlFile = @ereg_replace('(<\?=).*(\?>)','',$xmlFile);
-    file_put_contents('../tmp/'.$time.'.txt.scores',$xmlFile);
+    file_put_contents(TMP.$time.'.txt.scores',$xmlFile);
 
     //get group
     $surveyGroups = $this->SurveyGroup->findAll('group_set_id='.$groupSetId);
@@ -662,9 +667,9 @@ class SurveyGroupsController extends AppController
     $formData = $this->params['form'];
     $surveyId = $formData['survey_id'];
     $groupSetId = $formData['group_set_id'];
-    $time = $this->SurveyGroupSet->find('id='.$groupSetId,'date');
+    $time = $this->SurveyGroupSet->find('SurveyGroupSet.id='.$groupSetId,'date');
     $time = $time['SurveyGroupSet']['date'];
-    $xmlFilePathAndName = '../tmp/'.$time.'.xml';
+    $xmlFilePathAndName = TMP.$time.'.xml';
     $groupChangeData = array();
     $i=0;
     foreach ($formData['move'] as $value) {
@@ -742,18 +747,9 @@ class SurveyGroupsController extends AppController
     file_put_contents($xmlFilePathAndName,$out);
 
     //saves the 'in' file
-    $unix_path = '../tmp/'.$time.'.xml';
-    $windows_path = '..\\tmp\\'.$time.'.xml';
+    $file_path = TMP.$time;
     //execute TeamMaker
-    if(file_exists('../controllers/components/TeamMaker')) //unix
-    {
-      //$cmdline = "./TeamMaker $out_filename $in_filename > output.txt";
-      $cmdline = "../controllers/components/TeamMaker ".$unix_path." ../tmp/".$time.".txt > ../tmp/tm_log.txt";
-    }
-    else //windows
-      //$cmdline = "TeamMaker 1133823949_in.xml $in_filename > output.txt";
-      $cmdline = "..\\controllers\\components\\TeamMaker.exe ".$windows_path." ..\\tmp\\".$time.".txt > ..\\tmp\\tm_log.txt";
-
+    $cmdline = $this->__getTeamMaker().' '.$file_path.'.xml '.$file_path.'.txt';// > ../tmp/tm_log.txt";
 
     set_time_limit(1200);
     exec($cmdline);

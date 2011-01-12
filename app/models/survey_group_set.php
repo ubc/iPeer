@@ -42,7 +42,7 @@ class SurveyGroupSet extends AppModel
     }
 
     function getSurveyIdById($id=null) {
-      $tmp = $this->find('id='.$id);
+      $tmp = $this->find('SurveyGroupSet.id='.$id);
       return $tmp['SurveyGroupSet']['survey_id'];
     }
 }
