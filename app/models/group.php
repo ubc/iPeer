@@ -137,7 +137,7 @@ class Group extends AppModel
         $tmp = $this->find('course_id='.$courseId, 'max(group_num)');
         $maxGroupNum = $tmp[0]['max(group_num)'];
         if (empty($maxGroupNum)) {
-            $maxGroupNum = 1;
+            $maxGroupNum = 0;
         }
         return $maxGroupNum;
 	}
