@@ -274,11 +274,16 @@ class CakeSchema extends Object {
 								}
 								if (is_object($Object->$class)) {
 									$withTable = $db->fullTableName($Object->$class, false);
+									if ($prefix && strpos($withTable, $prefix) !== 0) {
+										continue;
+									}
 									if (in_array($withTable, $currentTables)) {
 										$key = array_search($withTable, $currentTables);
-										$tables[$withTable] = $this->__columns($Object->$class);
-										$tables[$withTable]['indexes'] = $db->index($Object->$class);
-										$tables[$withTable]['tableParameters'] = $db->readTableParameters($withTable);
+										$noPrefixWith = str_replace($prefix, '', $withTable);
+	
+										$tables[$noPrefixWith] = $this->__columns($Object->$class);
+										$tables[$noPrefixWith]['indexes'] = $db->index($Object->$class);
+										$tables[$noPrefixWith]['tableParameters'] = $db->readTableParameters($withTable);
 										unset($currentTables[$key]);
 									}
 								}
@@ -379,7 +384,7 @@ class CakeSchema extends Object {
 
 		$File =& new File($path . DS . $file, true);
 		$header = '$Id';
-		$content = "<?php \n/* SVN FILE: {$header}$ */\n/* {$name} schema generated on: " . date('Y-m-d H:m:s') . " : ". time() . "*/\n{$out}?>";
+		$content = "<?php \n/* {$name} schema generated on: " . date('Y-m-d H:i:s') . " : ". time() . "*/\n{$out}?>";
 		$content = $File->prepare($content);
 		if ($File->write($content)) {
 			return $content;

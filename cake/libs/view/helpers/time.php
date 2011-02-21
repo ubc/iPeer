@@ -79,6 +79,15 @@ class TimeHelper extends AppHelper {
 				return sprintf("%02d", date('Y', $this->__time) / 100);
 			case 'D':
 				return '%m/%d/%y';
+			case 'e':
+				if (DS === '/') {
+					return '%e';
+				}
+				$day = date('j', $this->__time);
+				if ($day < 10) {
+					$day = ' ' . $day;
+				}
+				return $day;
 			case 'eS' :
 				return date('jS', $this->__time);
 			case 'b':
@@ -226,9 +235,9 @@ class TimeHelper extends AppHelper {
 
 		$y = $this->isThisYear($date) ? '' : ' %Y';
 
-		if ($this->isToday($date)) {
+		if ($this->isToday($dateString, $userOffset)) {
 			$ret = sprintf(__('Today, %s',true), strftime("%H:%M", $date));
-		} elseif ($this->wasYesterday($date)) {
+		} elseif ($this->wasYesterday($dateString, $userOffset)) {
 			$ret = sprintf(__('Yesterday, %s',true), strftime("%H:%M", $date));
 		} else {
 			$format = $this->convertSpecifiers("%b %eS{$y}, %H:%M", $date);

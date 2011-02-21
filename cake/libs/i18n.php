@@ -148,11 +148,11 @@ class I18n extends Object {
 
 		$_this->domain = $domain . '_' . $_this->l10n->lang;
 
-		if (empty($_this->__domains[$domain][$_this->__lang])) {
+		if (!isset($_this->__domains[$domain][$_this->__lang])) {
 			$_this->__domains[$domain][$_this->__lang] = Cache::read($_this->domain, '_cake_core_');
 		}
 
-		if (empty($_this->__domains[$domain][$_this->__lang][$_this->category])) {
+		if (!isset($_this->__domains[$domain][$_this->__lang][$_this->category])) {
 			$_this->__bindTextDomain($domain);
 			Cache::write($_this->domain, $_this->__domains[$domain][$_this->__lang], '_cake_core_');
 		}
@@ -321,8 +321,10 @@ class I18n extends Object {
 			$this->__domains[$domain][$this->__lang][$this->category] = array();
 			return $domain;
 		}
-
-		if ($head = $this->__domains[$domain][$this->__lang][$this->category][""]) {
+		
+		if (isset($this->__domains[$domain][$this->__lang][$this->category][""])) {
+			$head = $this->__domains[$domain][$this->__lang][$this->category][""];
+			
 			foreach (explode("\n", $head) as $line) {
 				$header = strtok($line,":");
 				$line = trim(strtok("\n"));

@@ -1149,9 +1149,13 @@ class ControllerTest extends CakeTestCase {
 					? array_merge($appVars['uses'], $testVars['uses'])
 					: $testVars['uses'];
 
-		$this->assertEqual(count(array_diff($TestController->helpers, $helpers)), 0);
+		$this->assertEqual(count(array_diff_assoc(Set::normalize($TestController->helpers), Set::normalize($helpers))), 0);
 		$this->assertEqual(count(array_diff($TestController->uses, $uses)), 0);
 		$this->assertEqual(count(array_diff_assoc(Set::normalize($TestController->components), Set::normalize($components))), 0);
+
+		$expected = array('ControllerComment', 'ControllerAlias', 'ControllerPost');
+		$this->assertEqual($expected, $TestController->uses, '$uses was merged incorrectly, AppController models should be last.');
+		
 
 		$TestController =& new AnotherTestController();
 		$TestController->constructClasses();

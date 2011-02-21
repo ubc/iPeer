@@ -488,6 +488,24 @@ class ViewTest extends CakeTestCase {
 	}
 
 /**
+ * test that additional element viewVars don't get overwritten with helpers.
+ *
+ * @return void
+ */
+	function testElementParamsDontOverwriteHelpers() {
+		$Controller = new ViewPostsController();
+		$Controller->helpers = array('Form');
+
+		$View = new View($Controller);
+		$result = $View->element('type_check', array('form' => 'string'), true);
+		$this->assertEqual('string', $result);
+
+		$View->set('form', 'string');
+		$result = $View->element('type_check', array(), true);
+		$this->assertEqual('string', $result);
+	}
+
+/**
  * testElementCacheHelperNoCache method
  *
  * @access public
@@ -553,6 +571,21 @@ class ViewTest extends CakeTestCase {
 		$this->assertTrue($cached);
 		$this->assertEqual($result, $expected);
 
+	}
+
+/**
+ * test that ctp is used as a fallback file extension for elements
+ *
+ * @return void
+ */
+	function testElementCtpFallback() {
+		$View = new TestView($this->PostsController);
+		$View->ext = '.missing';
+		$element = 'test_element';
+		$expected = 'this is the test element';
+		$result = $View->element($element);
+
+		$this->assertEqual($expected, $result);
 	}
 
 /**

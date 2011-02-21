@@ -82,7 +82,7 @@ class Dispatcher extends Object {
 	}
 
 /**
- * Dispatches and invokes given URL, handing over control to the involved controllers, and then renders the 
+ * Dispatches and invokes given URL, handing over control to the involved controllers, and then renders the
  * results (if autoRender is set).
  *
  * If no controller of given name can be found, invoke() shows error messages in
@@ -264,9 +264,9 @@ class Dispatcher extends Object {
 		$namedExpressions = Router::getNamedExpressions();
 		extract($namedExpressions);
 		include CONFIGS . 'routes.php';
-		$params = array_merge(Router::parse($fromUrl), $params);
+		$params = array_merge(array('controller' => '', 'action' => ''), Router::parse($fromUrl), $params);
 
-		if (strlen($params['action']) === 0) {
+		if (empty($params['action'])) {
 			$params['action'] = 'index';
 		}
 		if (isset($params['form']['data'])) {
@@ -357,9 +357,12 @@ class Dispatcher extends Object {
 		if ($base === DS || $base === '.') {
 			$base = '';
 		}
-		$this->webroot = $base .'/';
+		$this->webroot = $base . '/';
 
-		if (!empty($base)) {
+		$docRoot = realpath(env('DOCUMENT_ROOT'));
+		$docRootContainsWebroot = strpos($docRoot, $dir . '/' . $webroot);
+
+		if (!empty($base) || !$docRootContainsWebroot) {
 			if (strpos($this->webroot, $dir) === false) {
 				$this->webroot .= $dir . '/' ;
 			}
@@ -483,8 +486,8 @@ class Dispatcher extends Object {
 			if ($tmpUri === '/' || $tmpUri == $baseDir || $tmpUri == $base) {
 				$url = $_GET['url'] = '/';
 			} else {
-				if ($base && strpos($uri, $base) !== false) {
-					$elements = explode($base, $uri);
+				if ($base && strpos($uri, $base) === 0) {
+					$elements = explode($base, $uri, 2);
 				} elseif (preg_match('/^[\/\?\/|\/\?|\?\/]/', $uri)) {
 					$elements = array(1 => preg_replace('/^[\/\?\/|\/\?|\?\/]/', '', $uri));
 				} else {
@@ -560,7 +563,7 @@ class Dispatcher extends Object {
 		}
 		$filters = Configure::read('Asset.filter');
 		$isCss = (
-			strpos($url, 'ccss/') === 0 || 
+			strpos($url, 'ccss/') === 0 ||
 			preg_match('#^(theme/([^/]+)/ccss/)|(([^/]+)(?<!css)/ccss)/#i', $url)
 		);
 		$isJs = (
