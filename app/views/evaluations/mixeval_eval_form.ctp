@@ -185,7 +185,7 @@
     }
 
   if (!$mustCompleteUsers && !$commentsNeeded) {
-    echo $html->submit('Submit to Complete the Evaluation');
+     echo $html->submit('Submit to Complete the Evaluation', array('onClick' => "javascript:return confirm('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?')"));
   }
   else {
     echo $html->submit('Submit to Complete the Evaluation', array('disabled'=>'true')); echo "<br />";

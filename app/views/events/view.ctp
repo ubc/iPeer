@@ -2,11 +2,8 @@
   <tr>
     <td>
   <?php echo $html->script('groups')?>
-	  <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Event']['id'])?'add':'edit') ?>">
-      <?php echo empty($params['data']['Event']['id']) ? null : $html->hidden('Event/id'); ?>
-      <input type="hidden" name="assigned" id="assigned" value="<?php echo $groupIDs?>"/>
-      <?php $event = $params['data'];?>
-
+	  <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($event['Event']['id'])?'add':'edit') ?>">
+      <?php echo empty($event['Event']['id']) ? null : $this->Form->hidden('id'); ?>
 
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
@@ -15,10 +12,10 @@
     <tr class="tablecell2">
     	<td width="150" id="course_label">Course:</td>
     	<td width="405">
-			<?php
-                  $params = array('controller'=>'courses', 'coursesList'=>$coursesList, 'courseId'=>$rdAuth->courseId, 'view'=>1);
-                  echo $this->element('courses/course_selection_box', $params);
-            ?>
+      <?php
+        $params = array('controller'=>'courses', 'coursesList'=>$coursesList, 'courseId'=>$course_id, 'view'=>1);
+        echo $this->element('courses/course_selection_box', $params);
+      ?>
 			</td>
     	<td width="243" id="course_msg" class="error"/>
     </tr>
@@ -77,7 +74,7 @@
   </tr>
   <tr class="tablecell2">
     <td>Due Date:&nbsp;</td>
-    <td><?php echo $this->controller->Output->formatDate(date("Y-m-d H:i:s", strtotime($event['Event']['due_date']))) ?>
+    <td><?php echo Toolkit::formatDate($event['Event']['due_date']) ?>
 		</td>
     <td></td>
   </tr>
@@ -87,13 +84,13 @@
   	  <table width="100%"><tr align="left">
 				<td width="10%">FROM:</td>
 				<td width="90%">
-				  <?php echo $this->controller->Output->formatDate(date("Y-m-d H:i:s", strtotime($event['Event']['release_date_begin']))) ?>
+				  <?php echo Toolkit::formatDate($event['Event']['release_date_begin']) ?>
       	</td>
       </tr>
       <tr>
       	<td width="10%">TO:</td>
       	<td width="90%">
-				  <?php echo $this->controller->Output->formatDate(date("Y-m-d H:i:s", strtotime($event['Event']['release_date_end']))) ?>
+				  <?php echo Toolkit::formatDate($event['Event']['release_date_end']) ?>
       	</td>
   	  </tr></table>
   	</td>
@@ -104,7 +101,7 @@
     <td valign="top">Groups Assignment:&nbsp;</td>
     <td>
       <?php
-        $params = array('controller'=>'events', 'data'=>$assignedGroups, 'event_id' => $event_id, 'popup' => 'y');
+        $params = array('controller'=>'events', 'data'=>$event['Group'], 'event_id' => $event_id, 'popup' => 'y');
         echo $this->element('events/event_groups_detail', $params);
       ?>
 		</td>
@@ -116,7 +113,7 @@
     <td width="45%"><table width="403" border="0" cellspacing="0" cellpadding="4">
       <tr>
         <td colspan="2"><?php
-        echo $html->link('Edit this Event', '/events/edit/'.$event['Event']['id']); ?> | <?php echo $html->link('Back to Event Listing', '/events/index/'.$rdAuth->courseId); ?></td>
+        echo $html->link('Edit this Event', '/events/edit/'.$event['Event']['id']); ?> | <?php echo $html->link('Back to Event Listing', '/events/index/'.$course_id); ?></td>
       </tr></table>
     </td>
     <td align="right" width="55%"></td>

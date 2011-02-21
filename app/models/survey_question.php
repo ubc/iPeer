@@ -32,7 +32,8 @@ class SurveyQuestion extends AppModel
   // returns all the question IDs of a specific survey
   function getQuestionsID($survey_id) {
     $data = $this->find('all', array('conditions'=> array('survey_id' => $survey_id),
-                                     'fields' => array('number', 'question_id', 'id')));
+                                     'fields' => array('number', 'question_id', 'id'),
+                                     'order' => 'number'));
     $data['count'] = count($data);
 
     return $data;

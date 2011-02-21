@@ -68,11 +68,11 @@ if (!$imported) {
 	define('ARTICLE_MODEL_CREATED', true);
 	App::import('Core', 'Model');
 
-	class Article extends Model {
+	/*class Article extends Model {
 		var $name = 'Article';
 		var $hasMany = array('Comment');
 		var $hasAndBelongsToMany = array('Tag');
-	}
+	}*/
 
 }
 

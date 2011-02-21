@@ -35,6 +35,17 @@ class Event extends AppModel
   var $SIMPLE_EVAL_HEIGHT = array('2'=>'200', '3'=>'250');
   var $RUBRIC_EVAL_HEIGHT = array('2'=>'200', '3'=>'250');
 
+  var $validate = array(
+      'title' => array('rule' => 'notEmpty',
+                       'message' => 'Title is required.',
+                       'allowEmpty' => false),
+      'due_date' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/',
+      'release_date_begin' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/',
+      'release_date_end' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/'
+  );
+
+  var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable');
+
   /* tables related: events, group_events,
      * evaluation_submissions,
      * evaluation_rubrics, evaluation_rubrics_details,
@@ -44,15 +55,21 @@ class Event extends AppModel
 
   var $belongsTo = array('EventTemplateType');
 
+  var $hasAndBelongsToMany = array('Group' =>
+                                   array('className'    =>  'Group',
+                                         'joinTable'    =>  'group_events',
+                                         'foreignKey'   =>  'event_id',
+                                         'associationForeignKey'    =>  'group_id',
+                                         'conditions'   =>  '',
+                                         'order'        =>  '',
+                                         'limit'        => '',
+                                         'unique'       => true,
+                                         'finderQuery'  => '',
+                                         'deleteQuery'  => '',
+                                         'dependent'    => false,
+                                        ),
+                                  );
 
-  var $validate = array(
-      'title' => array('rule' => 'notEmpty',
-                       'message' => 'Title is required.',
-                       'allowEmpty' => false),
-      'due_date' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/',
-      'release_date_begin' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/',
-      'release_date_end' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/'
-  );
  /* var $hasMany = array(
                       'GroupEvent' =>
                         array(
@@ -273,6 +290,34 @@ class Event extends AppModel
             return false;
         }
 
+    }
+
+    /**
+     * getUnassignedGroups get unassigned groups for an event from the course
+     * 
+     * @param mixed $event event array
+     * @param mixed $assigned_group_ids already assigned group ids
+     * @access public
+     * @return array unassigned groups
+     */
+    function getUnassignedGroups($event, $assigned_group_ids = null) {
+      $group = Classregistry::init('Group');
+
+      if(!is_array($event) || !isset($event['Event']['id'])) return array();
+
+      if(!isset($event['Event']['course_id'])) {
+        $event = $this->find('first', array('conditions' => array('Event.id' => $event['Event']['id']),
+                                            'contain' => array()));
+      }
+
+      if(null == $assigned_group_ids && !isset($event['Group'])) {
+        $assigned_group_ids = array_keys($group->find('list', array('conditions' => array('Event.id' => $event['Event']['id']))));
+      } elseif(isset($event['Group'])){
+        $assigned_group_ids = Set::extract('/Group/id', $event);
+      }
+
+      return $group->find('all', array('conditions' => array('course_id' => $event['Event']['course_id'], 
+                                                             'NOT' => array('Group.id' => $assigned_group_ids))));
     }
 
 }

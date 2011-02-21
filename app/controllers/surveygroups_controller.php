@@ -184,7 +184,7 @@ class SurveyGroupsController extends AppController
     $this->File = new File($file_path.'.xml');
     $this->File->write($doc);
     //execute TeamMaker
-    $cmdline .= $this->__getTeamMaker().' '.$file_path.'.xml '.$file_path.'.txt';// > ../tmp/tm_log.txt";
+    $cmdline = $this->__getTeamMaker().' '.$file_path.'.xml '.$file_path.'.txt';// > ../tmp/tm_log.txt";
 
     set_time_limit(1200);
     if ($make) exec($cmdline);
@@ -428,6 +428,8 @@ class SurveyGroupsController extends AppController
     $cmdline = COMPONENTS.'TeamMaker';
     if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')  {
       $cmdline .= '.exe';
+    } elseif(strtoupper(PHP_OS) == 'DARWIN') {
+      $cmdlin .= '.osx';
     }
     return $cmdline;
   }

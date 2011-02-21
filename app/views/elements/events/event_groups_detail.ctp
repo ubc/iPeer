@@ -5,39 +5,33 @@
 	    <th align="left" width="25%">Group Name</th>
 	    <th align="left" width="50%">Members</th>
 	  </tr>
-    <?php $i = '0';?>
-	  <?php
-	 	  //print_r($data);
-	  foreach($data as $row): $group = $row['Group'];
-	  if (isset($group['id'])) {?>
+	  <?php foreach($data as $group): ?>
+	  <?php if (isset($group['id'])): ?>
   	  <tr>
           <td>
-       	    <?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
-        		  <a <?php echo ('y' == $popup ? 'onclick="wopen(this.href, \'popup\', 700, 500); return false;"' : '')?> href="<?php echo $this->webroot.$this->theme.'events/editGroup/'.$group['id'].'/'.$event_id. '/'. $popup?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
+       	    <?php if($user['role'] == 'A' || $user['role'] == 'I'):?>
+        		  <?php echo $this->Html->link($html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit', 'valign' => 'middle')), 
+                                           '/events/editGroup/'.$group['id'].'/'.$event_id. '/'. $popup,
+                                           array('onclick' => ('y' == $popup ? '"wopen(this.href, \'popup\', 700, 500); return false;"' : ''),
+                                                 'escape' => false));?>
        	    <?php endif;?>
             <?php echo $group['group_num'] ?></td>
           <td><?php echo $group['group_name'] ?></td>
           <td>
-          	  <?php if (isset($group['Students'])): ?>
+          	  <?php if (isset($group['Member'])): ?>
           	  <table>
-          	  <?php foreach($group['Students'] as $row): $student = $row['users']; ?>
+          	  <?php foreach($group['Member'] as $member): ?>
           	  <tr>
-                  <td><?php
-                  $params = array('controller'=>'courses', 'userId'=>$student['id']);
-                  echo $this->element('users/user_info', $params);
-                  ?></td>
-                </tr>
-          	  <?php $i++;?>
+                  <td><?php echo $this->element('users/user_info', array('data'=>$member));?></td>
+              </tr>
               <?php endforeach; ?>
               </table>
               <?php endif;?>
 
           </td>
         </tr>
-  	  <?php $i++;?>
-    <?php }
-    endforeach; ?>
-
+    <?php endif; ?>
+    <?php endforeach; ?>
 <?php else: ?>
     <tr><th cols="3" align="left" width="25%">
        <?php echo "No Groups"; ?>

@@ -1,30 +1,34 @@
+<?php echo $html->script('calendar1')?>
+<?php echo $html->script('groups')?>
+<?php $readonly = isset($readonly) ? $readonly : false;?>
+
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>
-  <?php echo $html->script('calendar1')?>
-<?php echo $html->script('groups')?>
-	  <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Event']['id'])?'add':'edit') ?>">
-      <?php echo empty($params['data']['Event']['id']) ? null : $html->hidden('Event/id'); ?>
-      <?php echo empty($params['data']['Event']['id']) ? $html->hidden('Event/creator_id', array('value'=>$rdAuth->id)) : $html->hidden('Event/updater_id', array('value'=>$rdAuth->id)); ?>
-      <input type="hidden" name="assigned" id="assigned" value="<?php echo $groupIDs?>"/>
-      <?php $event = $params['data'];?>
+    <?php echo $this->Form->create('Event', 
+                                   array('id' => 'frm',
+                                         'url' => array('action' => $this->action.'/'.$course_id),
+                                         'inputDefaults' => array('div' => false,
+                                                                  'before' => '<td width="200px">',
+                                                                  'after' => '</td>',
+                                                                  'between' => '</td><td>')))?>
 
-      <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
-  <tr class="tableheader">
-    <td colspan="3" align="center"><?php echo empty($event['Event']['id'])?'Add':'Edit' ?> Evaluation Event</td>
+    <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+    <tr class="tableheader">
+      <td colspan="3" align="center"><?php echo ucfirst($this->action)?> Evaluation Event</td>
     </tr>
+
     <tr class="tablecell2">
     	<td width="150" id="course_label">Course:</td>
     	<td width="405">
-			<?php
-                  $params = array('controller'=>'courses', 'coursesList'=>$coursesList, 'courseId'=>$rdAuth->courseId);
-                  echo $this->element('courses/course_selection_box', $params);
-            ?>
+      <?php echo $this->element('courses/course_selection_box', array('coursesList'=>$coursesList, 'courseId' => $course_id, 'view' => true));?>
 			</td>
     	<td width="243" id="course_msg" class="error"/>
     </tr>
     <tr class="tablecell2">
-    	<td id="newtitle_label">Event Title:&nbsp;<font color="red">*</font></td>
+    <?php echo $this->Form->input('title', array('size'=>'50', 'class'=>'input',
+                                                 'readonly' => $readonly)) ?>
+<!--    	<td id="newtitle_label">Event Title:&nbsp;<font color="red">*</font></td>
     	<td>
     	  <input type="text" name="newtitle" id="newtitle" style="width:85%;" class="validate required TEXT_FORMAT newtitle_msg Invalid_Event_Title_Format." value="<?php echo empty($event['Event']['title'])? '' : $event['Event']['title'] ?>" >
         <?php echo $ajax->observeField('newtitle', array('update'=>'eventErr', 'url'=>"/events/checkDuplicateTitle", 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');stripe();")) ?>
@@ -34,41 +38,36 @@
             ?>
         </div>
     	</td>
-    	<td id="newtitle_msg" class="error" />
+    	<td id="newtitle_msg" class="error" />-->
     </tr>
-  <tr class="tablecell2">
-    <td>Description:&nbsp;</td>
-    <td><?php echo $html->textarea('Event/description', array('cols'=>'35', 'style'=>'width:85%;')) ?>  </td>
-    <td>&nbsp;</td>
-  </tr>
-  <tr class="tablecell2">
+
+    <tr class="tablecell2">
+    <?php echo $this->Form->input('description', array('class'=>'input', 'cols'=>'35', 'style'=>'width:85%;',
+                                                 'readonly' => $readonly)) ?>
+    <td></td>
+    </tr>
+
+    <tr class="tablecell2">
     <td>Evaluation Format:&nbsp;<font color="red">*</font></td>
     <td>
       <table border="0" align="left" cellpadding="4" cellspacing="2">
 			<tr><td>
-			<a title="Add Simple Evaluation" href="<?php echo $this->webroot.$this->theme;?>simpleevaluations/add/pop_up" onclick="wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Add Simple Evaluation </a>&nbsp;|
-			<a title="Add Rubric" href="<?php echo $this->webroot.$this->theme;?>rubrics/add/pop_up" onclick="wopen(this.href, 'popup', 650, 500); return false;" >&nbsp;Add Rubric</a>  &nbsp;|
-			<a title="Add Mix Evaluation" href="<?php echo $this->webroot.$this->theme;?>mixevals/add/pop_up" onclick="wopen(this.href, 'popup', 650, 500); return false;" >&nbsp;Add Mix Evaluation</a>
-			</td></tr>
-      <tr>
-      <td width="50%" align="left" valign="top" >
-						<select name="data[Event][event_template_type_id]" id="eval_dropdown"
-							onChange="new Ajax.Updater('template_table','<?php echo $this->webroot.$this->theme?>events/eventTemplatesList/'+this.options[this.selectedIndex].value,
-																				 {onLoading:function(request){Element.show('loading');},
-																					onComplete:function(request){Element.hide('loading');},
-																					asynchronous:true, evalScripts:true});  return false;">
-						<?php
+			<?php echo $this->Html->link('Add Simple Evaluation', '/simpleevaluations/add/pop_up', array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"))?>&nbsp;|
+			<?php echo $this->Html->link('Add Rubric', '/rubrics/add/pop_up', array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"))?>&nbsp;|
+			<?php echo $this->Html->link('Add Mix Evaluation', '/mixevals/add/pop_up', array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"))?>
+      </td></tr>
 
-						foreach($eventTypes as $row): $eventTemplateType = $row['EventTemplateType']; ?>
-							<option value="<?php echo $eventTemplateType['id']?>"
-							  <?php
-							  if (!empty($event['Event']['event_template_type_id']) && $event['Event']['event_template_type_id'] == $eventTemplateType['id']) {
-							       echo 'SELECTED';
-							  }
-							  ?>
-							  ><?php echo $eventTemplateType['type_name']?></option>
-						<?php endforeach; ?>
-						</select>
+      <tr>
+      <td align="left">
+      <?php echo $this->Form->input('EventTemplateType', array('disabled' => $readonly, 
+                                                                    'label' => false,
+                                                                    'before' => '',
+                                                                    'between' => '',
+                                                                    'after' => '',
+                                             'onChange' => "new Ajax.Updater('template_table','".$this->Html->url('/events/eventTemplatesList/')."+this.options[this.selectedIndex].value,
+																				                    {onLoading:function(request){Element.show('loading');},
+                  																					onComplete:function(request){Element.hide('loading');},
+									                  												asynchronous:true, evalScripts:true});  return false;"))?></td>
 						<br>
 						<br>
 						<div id='template_table'>
@@ -83,6 +82,7 @@
     </td>
     <td>&nbsp;</td>
   </tr>
+
   <tr class="tablecell2">
     <td>Allow Self-Evaluation?:</td>
     <td>

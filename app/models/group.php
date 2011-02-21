@@ -202,7 +202,7 @@ class Group extends AppModel
                                       'contain' => false));
     $maxGroupNum = $tmp[0]['max(group_num)'];
     if (empty($maxGroupNum)) {
-      $maxGroupNum = 1;
+      $maxGroupNum = 0;
     }
     return $maxGroupNum;
   }

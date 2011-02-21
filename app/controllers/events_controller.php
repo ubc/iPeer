@@ -37,69 +37,69 @@ class EventsController extends AppController
 	var $NeatString;
 	var $Sanitize;
 	var $uses = array('Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Group', 'GroupEvent', 'Personalize', 'GroupsMembers');
-    var $components = array("AjaxList", "SysContainer");
+  var $components = array("AjaxList", "SysContainer");
 
-	function __construct()
-	{
-		$this->Sanitize = new Sanitize;
-		$this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
-		if ($this->show == 'all') $this->show = 99999999;
-		$this->sortBy = empty($_GET['sort'])? 'id': $_GET['sort'];
-		$this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
-		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
-		$this->order = $this->sortBy.' '.strtoupper($this->direction);
- 		$this->set('title_for_layout', 'Events');
-		parent::__construct();
+  function __construct()
+  {
+    $this->Sanitize = new Sanitize;
+    $this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
+    if ($this->show == 'all') $this->show = 99999999;
+    $this->sortBy = empty($_GET['sort'])? 'id': $_GET['sort'];
+    $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
+    $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
+    $this->order = $this->sortBy.' '.strtoupper($this->direction);
+    $this->set('title_for_layout', 'Events');
+    parent::__construct();
+  }
+
+  // Post Process Data : add released column
+  function postProcessData($data) {
+    // Check the release dates, and match them up with present date
+    if (empty($data)) return $data;
+    // loop through each data point, and display it.
+    foreach ($data as $i => $entry) {
+      $releaseDate = strtotime($entry["Event"]["release_date_begin"]);
+      $endDate = strtotime($entry["Event"]["release_date_end"]);
+      $timeNow = strtotime($entry[0]["now()"]);
+
+      if (!$releaseDate) $releaseDate = 0;
+      if (!$endDate) $endDate = 0;
+
+      $isReleased = "";
+      if ($timeNow < $releaseDate) {
+        $isReleased = "Not Yet Open";
+      } else if ($timeNow > $endDate) {
+        $isReleased = "Already Closed";
+      } else {
+        $isReleased = "Open Now";
+      }
+
+
+      // Set the is released string
+      $entry['!Custom']['isReleased'] = $isReleased;
+
+      // Set the view results column
+      $entry['!Custom']['results'] = "Results";
+
+      // Write the entry back
+      $data[$i] = $entry;
     }
 
-    // Post Process Data : add released column
-    function postProcessData($data) {
-        // Check the release dates, and match them up with present date
-        if (empty($data)) return $data;
-        // loop through each data point, and display it.
-        foreach ($data as $i => $entry) {
-            $releaseDate = strtotime($entry["Event"]["release_date_begin"]);
-            $endDate = strtotime($entry["Event"]["release_date_end"]);
-            $timeNow = strtotime($entry[0]["now()"]);
+    // Return the modified data
+    return $data;
+  }
 
-            if (!$releaseDate) $releaseDate = 0;
-            if (!$endDate) $endDate = 0;
+  function setUpAjaxList() {
 
-            $isReleased = "";
-            if ($timeNow < $releaseDate) {
-                $isReleased = "Not Yet Open";
-            } else if ($timeNow > $endDate) {
-                $isReleased = "Already Closed";
-            } else {
-                $isReleased = "Open Now";
-            }
-
-
-            // Set the is released string
-            $entry['!Custom']['isReleased'] = $isReleased;
-
-            // Set the view results column
-            $entry['!Custom']['results'] = "Results";
-
-            // Write the entry back
-            $data[$i] = $entry;
-        }
-
-        // Return the modified data
-        return $data;
+    // Grab the course list
+    $userCourseList = $this->SysContainer->getMyCourseList();
+    $coursesList = array();
+    foreach ($userCourseList as $id => $course) {
+      $coursesList[$id] = $course['course'];
     }
 
-    function setUpAjaxList() {
-
-        // Grab the course list
-        $userCourseList = $this->SysContainer->getMyCourseList();
-        $coursesList = array();
-        foreach ($userCourseList as $id => $course) {
-            $coursesList[$id] = $course['course'];
-        }
-
-        // Set up Columns
-        $columns = array(
+    // Set up Columns
+    $columns = array(
             array("Event.id",             "",            "",     "hidden"),
             array("Course.id",            "",            "",     "hidden"),
             array("Course.course",        "Course",      "13em", "action", "View Course"),
@@ -119,148 +119,114 @@ class EventsController extends AppController
             array("Event.release_date_end",   "", "",    "hidden"),
             array("now()",           "",          "",    "hidden"));
 
-        // put all the joins together
-        $joinTables =  array( array (
+    // put all the joins together
+    $joinTables =  array( array (
                 // GUI aspects
                 "id" => "course_id",
                 "description" => "for Course:",
                 // The choise and default values
                 "list" => $coursesList,
-                "default" => $this->rdAuth->courseId,
+                "default" => $this->Session->read('ipeerSession.courseId'),
                 // What tables do we join?
                 "joinTable" => "courses",
                 "joinModel" => "Course",
                 "localKey" => "course_id"
         ));
 
-        // For instructors: only list their own course events
-        $extraFilters = "";
-        if ($this->rdAuth->role != 'A') {
-            $extraFilters = " ( ";
-            foreach ($coursesList as $id => $course) {
-                $extraFilters .= "course_id=$id or ";
-            }
-            $extraFilters .= "1=0 ) "; // just terminates the or condition chain with "false"
-        }
-
-        // Leave the survey types out, always
-        $extraFilters .= !empty($extraFilters) ? "and " : "";
-        $extraFilters .= "Event.event_template_type_id<>3";
-
-
-        // Set up actions
-        $warning = "Are you sure you want to delete this event permanently?";
-        $actions = array(
-            array("View Results", "", "", "evaluations", "view", "Event.id"),
-            array("View Event", "", "", "", "!view", "Event.id"),
-            array("Edit Event", "", "", "", "edit", "Event.id"),
-            array("View Course", "", "", "courses", "view", "Course.id"),
-            array("View Groups", "", "", "", "!viewGroups", "Event.id"),
-            array("Delete Event", $warning, "", "", "delete", "Event.id"));
-
-        $recursive = 0;
-
-        $this->AjaxList->setUp($this->Event, $columns, $actions,
-            "Course.course", "Course.course", $joinTables, $extraFilters,
-            $recursive, "postProcessData");
+    // For instructors: only list their own course events
+    $extraFilters = "";
+    if ($this->Auth->user('role') != 'A') {
+      $extraFilters = " ( ";
+      foreach ($coursesList as $id => $course) {
+        $extraFilters .= "course_id=$id or ";
+      }
+      $extraFilters .= "1=0 ) "; // just terminates the or condition chain with "false"
     }
 
-    function index($message='') {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
-        // Set the top message
-        $this->set('message', $message);
-        // Set up the basic static ajax list variables
-        $this->setUpAjaxList();
-        // Set the display list
-        $this->set('paramsForList', $this->AjaxList->getParamsForList());
+    // Leave the survey types out, always
+    $extraFilters .= !empty($extraFilters) ? "and " : "";
+    $extraFilters .= "Event.event_template_type_id<>3";
+
+
+    // Set up actions
+    $warning = "Are you sure you want to delete this event permanently?";
+    $actions = array(
+                     array("View Results", "", "", "evaluations", "view", "Event.id"),
+                     array("View Event", "", "", "", "!view", "Event.id"),
+                     array("Edit Event", "", "", "", "edit", "Event.id"),
+                     array("View Course", "", "", "courses", "view", "Course.id"),
+                     array("View Groups", "", "", "", "!viewGroups", "Event.id"),
+                     array("Delete Event", $warning, "", "", "delete", "Event.id"));
+
+    $recursive = 0;
+
+    $this->AjaxList->setUp($this->Event, $columns, $actions,
+                           "Course.course", "Course.course", $joinTables, $extraFilters,
+                           $recursive, "postProcessData");
+  }
+
+  function index() {
+    // Make sure the present user is not a student
+    //$this->rdAuth->noStudentsAllowed();
+    // Set up the basic static ajax list variables
+    $this->setUpAjaxList();
+    // Set the display list
+    $this->set('paramsForList', $this->AjaxList->getParamsForList());
+  }
+
+  function ajaxList() {
+    // Make sure the present user is not a student
+    //$this->rdAuth->noStudentsAllowed();
+    // Set up the list
+    $this->setUpAjaxList();
+    // Process the request for data
+    $this->AjaxList->asyncGet();
+  }
+
+  // Show a class list
+  function goToClassList($course) {
+    if (is_numeric($course)) {
+      $courses = $this->sysContainer->getMyCourseList();
+      if (!empty($courses[$course])) {
+        // We need to change the session state to point to this
+        // course:
+        // Initialize a basic non-funcional AjaxList
+        $this->AjaxList->quickSetUp();
+        // Clear the state first, we don't want any previous searches/selections.
+        $this->AjaxList->clearState();
+        // Set and update session state Variable
+        $joinFilterSelections->course_id = $course;
+        $this->AjaxList->setStateVariable("joinFilterSelections", $joinFilterSelections);
+      }
     }
-
-    function ajaxList() {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
-        // Set up the list
-        $this->setUpAjaxList();
-        // Process the request for data
-        $this->AjaxList->asyncGet();
-    }
-
-
-
-    // Show a class list
-    function goToClassList($course) {
-        if (is_numeric($course)) {
-            $courses = $this->sysContainer->getMyCourseList();
-            if (!empty($courses[$course])) {
-                // We need to change the session state to point to this
-                // course:
-                // Initialize a basic non-funcional AjaxList
-                $this->AjaxList->quickSetUp();
-                // Clear the state first, we don't want any previous searches/selections.
-                $this->AjaxList->clearState();
-                // Set and update session state Variable
-                $joinFilterSelections->course_id = $course;
-                $this->AjaxList->setStateVariable("joinFilterSelections", $joinFilterSelections);
-            }
-        }
-        // Redirect to user list after state modifications (or in case of error)
-        $this->redirect("/events/index");
-    }
-
-
+    // Redirect to user list after state modifications (or in case of error)
+    $this->redirect("/events/index");
+  }
 
   /**
-   * Enter description here...
-   *
-   * @return
+   * view 
+   * 
+   * @param mixed $id 
+   * @access public
+   * @return void
    */
-  function view ($id)
-  {
-    $courseId = $this->rdAuth->courseId;
+  function view ($id) {
+    $courseId = $this->Session->read('ipeerSession.courseId');
 
 	  //Clear $id to only the alphanumeric value
 		$id = $this->Sanitize->paranoid($id);
     $this->set('event_id', $id);
 
 		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
-		$this->Event->setId($id);
 
-
-		$this->params['data'] = $this->Event->read();
-		//print_r($this->params['data']);
-		//$this->Output->filter($this->params['data']);
-
-		$assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($id);
-		$groupIDs = '';
-		$groupIDSQL = '';
-		if (!empty($assignedGroupIDs))
-		{
-		  $assignedGroups = array();
-
-			// retrieve string of group ids
-  		for ($i = 0; $i < count($assignedGroupIDs); $i++) {
-  			$groupIDs .= $assignedGroupIDs[$i]['GroupEvent']['group_id']. ":";
-  			if ($i != count($assignedGroupIDs) -1 ) {
-  			  $groupIDs .= ":";
-  			}
-  			$group = $this->Group->find('id = '.$assignedGroupIDs[$i]['GroupEvent']['group_id']);
-  			$students = $this->Group->groupStudents($assignedGroupIDs[$i]['GroupEvent']['group_id']);
-  			$assignedGroups[$i] = $group;
-  			$assignedGroups[$i]['Group']['Students']=$students;
-  		}
-
-		  $this->set('assignedGroups', $assignedGroups);
-  	}else {
-      $this->set('assignedGroups', array());
-  	}
-	  $this->set('groupIDs', $groupIDs);
-
+		$event = $this->Event->find('first', array('conditions' => array('Event.id' => $id),
+                                               'contain' => array('Group.Member')));
 
     //Format Evaluation Selection Boxes
     $default = null;
     $model = '';
     $eventTemplates = array();
-    $templateId = $this->params['data']['Event']['event_template_type_id'];
+    $templateId = $event['Event']['event_template_type_id'];
     if (!empty($templateId))
     {
       $eventTemplateType = $this->EventTemplateType->find('id = '.$templateId);
@@ -269,23 +235,25 @@ class EventsController extends AppController
       {
         $default = 'Default Simple Evaluation';
         $model = 'SimpleEvaluation';
-        $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->rdAuth->id);
+        $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'));
       }
       else if ($templateId == 2)
       {
         $default = 'Default Rubric';
         $model = 'Rubric';
-	      $eventTemplates = $this->Rubric->getBelongingOrPublic($this->rdAuth->id);
+	      $eventTemplates = $this->Rubric->getBelongingOrPublic($this->Auth->user('id'));
       }
       else if ($templateId == 4)
       {
         $default = 'Default Mixed Evaluation';
         $model = 'Mixeval';
-        $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->rdAuth->id);
+        $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'));
       }
 
     }
 
+    $this->set('event', $event);
+    $this->set('course_id', $courseId);
     $this->set('eventTemplates', $eventTemplates);
     $this->set('default',$default);
     $this->set('model', $model);
@@ -335,9 +303,9 @@ class EventsController extends AppController
   }
 
 
-function add ()
+  function add()
   {
-    $courseId = $this->rdAuth->courseId;
+    $courseId = $this->Session->read('ipeerSession.courseId');
 		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
 	  //List Add Page
 		if (empty($this->params['data'])) {
@@ -352,7 +320,7 @@ function add ()
 		  //Set default template
       $default = '-- Select a Evaluation Tool -- ';
       $model = 'SimpleEvaluation';
-      $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->rdAuth->id);
+      $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'));
       $this->set('eventTemplates', $eventTemplates);
       $this->set('default',$default);
       $this->set('model', $model);
@@ -401,23 +369,39 @@ function add ()
   }
 
 
-  function edit ($id=null)
-  {
-    $courseId = $this->rdAuth->courseId;
-		$unassignedGroups = array();
-    $assignedGroups = array();
+  function edit($id) {
+    if(!is_numeric($id)) {
+      $this->Session->setFlash('Invalid survey ID.');
+      $this->redirect('index');
+    }
+    $data = $this->Event->find('first', array('conditions' => array('id' => $id),
+                                               'contain' => array('Group')));
 
-	  //Clear $id to only the alphanumeric value
-		$id = $this->Sanitize->paranoid($id);
-
+    $courseId = $data['Event']['course_id'];
 		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
 
+		if (!empty($this->data)) {
+			if($result = $this->Event->save($data)) {
+        $this->Session->setFlash('The event was edited successfully.');
+        $this->redirect('index');
+			} else {
+        $this->Session->setFlash($this->Survey->errorMessage);
+			}
+		} else {
+      $this->data = $data;
+    }
+
+    $this->set('eventTemplateTypes', $this->EventTemplateType->find('list', array('conditions' => array('NOT' => array('id' => 3)))));
+    $this->set('unassignedGroups', $this->Event->getUnassignedGroups($data));
+    $this->set('courses', $this->Course->find('list', array('recursive' => -1)));
+    $this->set('course_id', $courseId);
+
+    /*
 		if (empty($this->params['data']))
 		{
-			$this->Event->setId($id);
-			$event = $this->Event->read();
-			$this->params['data'] = $event;
-			$this->Output->br2nl($this->params['data']);
+			$event = $this->Event->read(null, $id);
+			$this->data = $event;
+			$this->Output->br2nl($this->data);
 
       $assignedGroupIDs = $this->GroupEvent->find('all','event_id = '.$id);
 //$a=print_r($assignedGroupIDs,true);
@@ -457,7 +441,7 @@ function add ()
       $model = '';
       $eventTemplates = array();
 
-      $templateId = $this->params['data']['Event']['event_template_type_id'];
+      $templateId = $this->data['Event']['event_template_type_id'];
       if (!empty($templateId))
       {
         $eventTemplateType = $this->EventTemplateType->find('id = '.$templateId);
@@ -491,10 +475,7 @@ function add ()
  	    $eventTypes = $this->EventTemplateType->find('all',' display_for_selection = 1 ');
 		  $this->set('eventTypes', $eventTypes);
 
-			$this->render();
-		}
-		else
-		{
+		} else {
 			//Format Data
 			$this->params['data']['Event']['course_id'] = $courseId;
 			$this->params = $this->Event->prepData($this->params);
@@ -522,7 +503,7 @@ function add ()
         $this->validateErrors($this->Event);
         $this->set('errmsg', $this->Event->errorMessage);
 			}
-		}
+		}*/
   }
 
   /**
@@ -774,7 +755,7 @@ function add ()
 		}
 	}
 
-	function getAssignedGroups($eventId=null)
+	/*function getAssignedGroups($eventId=null)
 	{
  		$assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($eventId);
     $assignedGroups = array();
@@ -792,7 +773,7 @@ function add ()
     }
 
     return $assignedGroups;
-	}
+	}*/
 
 	function update($attributeCode='',$attributeValue='')
   {
