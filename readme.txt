@@ -1,4 +1,17 @@
-iPeer 2.2
+iPeer 2.2.2
+
+Changelog from 2.2.1
+1) Fixed a bug that missing group 1 when release groups from teammaker(survey)
+2) Fixed a bug that ajax list is not working when magic_quote_gpc is set to ON
+
+Changelog from 2.2
+1) Fixed a bug pagination on evaluation result list failed on IE
+2) Fixed a bug that removing an evaluation event failed
+3) Fixed a bug when editing student will lose the course info
+4) Fixed a bug when changing student number will result an error
+5) Fixed a bug that unordered group import file will create duplicated groups
+6) Fixed a bug when editing Mixed evaluation resets the total_marks database entry to NULL
+7) Changed the instructor column on course page from username to instructor name
 
 Changelog from 2.1
 1) Students are now able to view released evaluation results (grades and comments)
