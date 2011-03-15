@@ -292,6 +292,8 @@ class UsersController extends AppController
                     $sFound['User']['first_name'] = $this->data['User']['first_name'];
                     $sFound['User']['last_name'] = $this->data['User']['last_name'];
                     $sFound['User']['email'] = $this->data['User']['email'];
+                    // remove password to avoid updating it to some random password
+                    unset($sFound['User']['password']);
 
                     //Save enrol record
                     if (isset($this->params['form']['course_id']) && $this->params['form']['course_id'] > 0)
