@@ -39,11 +39,11 @@
 					  $area_atrb = array('style'=>'width:100%;', 'value'=>$data['criteria_comment_'.$i.'_'.$j]);
 					else
 					  $area_atrb = array('style'=>'width:100%;');
-					echo '<td><table border="0" width="95%" cellpadding="2"><tr><td>Specific Comment</td></tr><tr><td>'.$html->areaTag('Rubric/criteria_comment_'.$i.'_'.$j,'',2, $area_atrb)."</td></tr><tr><td>Mark: ".'<input type="text" name="data[Rubric][criteria_mark_'.$i."_".$j.']" class="input" size="3" readonly value="'.$mark_value.'">'."</td></tr></table></td>";
+					echo '<td><table border="0" width="95%" cellpadding="2"><tr><td>Specific Comment</td></tr><tr><td>'.$html->areaTag('Rubric/criteria_comment_'.$i.'_'.$j,'',2, $area_atrb)."</td></tr><tr><td>Mark: ".'<input type="text" name="data[Rubric][criteria_mark_'.$i."_".$j.']" id="criteria_mark_'.$i."_".$j.'" class="input" size="3" readonly value="'.$mark_value.'">'."</td></tr></table></td>";
 				}
 
 				echo '<td>';
-				echo '<select name="data[Rubric][criteria_weight_'.$i.']" style="width:50px;" onchange="calculateMarks(\''.$LOM_num.'\',\''.$criteria_num.'\',\''.$zero_mark.'\')">';
+				echo '<select name="data[Rubric][criteria_weight_'.$i.']" id="criteria_weight_'.$i.'" style="width:50px;" onchange="calculateMarks(\''.$LOM_num.'\',\''.$criteria_num.'\',\''.$zero_mark.'\')">';
 				echo '<option value="1"'; if( $data['criteria_weight_'.$i] == 1 ) echo ' selected '; echo '>1</option>';
 				echo '<option value="2"'; if( $data['criteria_weight_'.$i] == 2 ) echo ' selected '; echo '>2</option>';
 				echo '<option value="3"'; if( $data['criteria_weight_'.$i] == 3 ) echo ' selected '; echo '>3</option>';

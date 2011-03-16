@@ -7,7 +7,7 @@ function calculateMarks(lom_num, criteria, zero_mark) {
 		var c_weight = parseInt(eval("document.getElementById('" + field2 + "').value"));
 		totalMark = parseInt(totalMark) + c_weight;
 	}
-	document.getElementById('total_marks').value = totalMark;
+	document.getElementById('total').value = totalMark;
 
 	// calculate each mark field
 	for(var i = 1; i <= criteria; i++) {
@@ -16,10 +16,10 @@ function calculateMarks(lom_num, criteria, zero_mark) {
 			var field2 = "criteria_weight_"+i;
 			var c_weight = parseInt(eval("document.getElementById('" + field2 + "').value"));
 
-			if(zero_mark=="off")
-				var mark = (c_weight/lom_num)*j;
-			else
+			if(zero_mark=="on")
 				var mark = (c_weight/(lom_num-1))*(j-1);
+			else
+				var mark = (c_weight/lom_num)*j;
 
 			mark = Math.round(mark * 100) / 100;
 

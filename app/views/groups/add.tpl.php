@@ -26,7 +26,7 @@
 	<?php echo $ajax->observeField('group_num', array('update'=>'groupErr', 'url'=>"/groups/checkDuplicateName", 'frequency'=>1,'loading'=>"Element.show('loading');",'complete'=>"Element.hide('loading');stripe();")) ?>
 	</td></tr>
   <tr class="tablecell2">
-    <td>Group Name:&nbsp;</td>
+    <td>Group Name:<font color="red">*</font></td>
     <td colspan="3"><?php echo $html->input('Group/group_name', array('size'=>'50','class'=>'input')) ?>  </td>
     </tr>
   <tr class="tablecell2">
