@@ -59,8 +59,8 @@ class CoursesController extends AppController
         array("Course.course",        "Course",      "15em",  "action", "Course Home"),
         array("Course.title",         "Title",       "auto", "action", "Course Home"),
         array("Creator.id",           "",            "",     "hidden"),
-        array("Instructor.first_name",  "Instructor *","10em", "action", "View Instructor"),
-        array("Instructor.last_name",  "Instructor *","10em", "action", "View Instructor"),
+#        array("Instructor.full_name",  "Instructor *","10em", "action", "View Instructor"),
+#        array("Instructor.last_name",  "Instructor *","10em", "action", "View Instructor"),
         array("Course.record_status", "Status",      "5em",  "map",
             array("A" => "Active", "I" => "Inactive")),
         array("Course.creator",     "Created by",  "10em", "action", "View Creator"),
@@ -226,7 +226,7 @@ class CoursesController extends AppController
 
 		  }
             //refresh my accessible courses on session
-            $myCourses = $this->Course->findAccessibleCoursesListByUserIdRole($this->rdAuth->id, $this->rdAuth->role);
+            $myCourses = $this->Course->findAccessibleCoursesListByUserIdRole($this->Auth->user('id'), $this->Auth->user('role'));
             $this->sysContainer->setMyCourseList($myCourses);
             // Finished all deletion of course related data
             $this->redirect('/courses/index/The course was deleted successfully.');

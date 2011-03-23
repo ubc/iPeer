@@ -25,21 +25,23 @@
  * @subpackage
  * @since
  */
-class Rubric extends AppModel
+App::import('Model', 'EvaluationBase');
+
+class Rubric extends EvaluationBase
 {
+  const TEMPLATE_TYPE_ID = 2;
   var $name = 'Rubric';
+  var $actsAs = array('Containable');
   var $hasMany = array(
                         'RubricsCriteria' => array(
                           'className' => 'RubricsCriteria',
-                          'dependent' => true
-                        ),
-                        'RubricsCriteriaComment' => array(
-                          'className' => 'RubricsCriteriaComment',
-                          'dependent' => true
+                          'dependent' => true,
+                          'order'     => array('criteria_num' => 'ASC', 'id' => 'ASC'),
                         ),
                         'RubricsLom' => array(
                           'className' => 'RubricsLom',
-                          'dependent' => true
+                          'dependent' => true,
+                          'order'     => array('lom_num' => 'ASC', 'id' => 'ASC'),
                         ),
 /*                        'EvaluationRubric' => array(
                           'className' => 'EvaluationRubric',
@@ -47,7 +49,7 @@ class Rubric extends AppModel
                         )*/
                         'Event' =>
                         array('className'   => 'Event',
-                              'conditions'  => 'Event.event_template_type_id = 2',
+                              'conditions'  => array('Event.event_template_type_id' => self::TEMPLATE_TYPE_ID),
                               'order'       => '',
                               'foreignKey'  => 'template_id',
                               'dependent'   => true,
@@ -58,55 +60,10 @@ class Rubric extends AppModel
 
   function __construct($id = false, $table = null, $ds = null) {
     parent::__construct($id, $table, $ds);
-    $this->virtualFields['event_count'] = sprintf('SELECT count(*) as count FROM events as event WHERE event.event_template_type_id = 2 AND event.template_id = %s.id', $this->alias);
+    $this->virtualFields['total_marks'] = sprintf('SELECT sum(multiplier) as sum FROM rubrics_criterias as rc WHERE rc.rubric_id = %s.id', $this->alias);
   }
-
-	function beforeSave(){
-
-        // Ensure the name is not empty
-        if (empty($this->data[$this->name]['name'])) {
-            $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
-            return false;
-        }
-
-        // Remove any signle quotes in the name, so that custom SQL queries are not confused.
-        $this->data[$this->name]['name'] =
-            str_replace("'", "", $this->data[$this->name]['name']);
-
-		$allowSave = true;
-		if (empty($this->data[$this->name]['name'])) {
-			//check empty name
-			$this->errorMessage='Rubric name is required.';
-			$allowSave = false;
-			//check the duplicate rubric
-		} else
-			$allowSave = $this->__checkDuplicateRubric();
-		return $allowSave;
-	}
-
-	function __checkDuplicateRubric() {
-		$duplicate = false;
-		$field = 'name';
-		$value = $this->data[$this->name]['name'];
-		if ($result = $this->find($field . ' = "' . $value.'"', $field.', id')){
-		  if (isset($this->data[$this->name]['id']) &&
-            ($this->data[$this->name]['id'] == $result[$this->name]['id'])) {
-		    $duplicate = false;
-		  } else {
-  		  $duplicate = true;
-  		}
-		 }
-
-		if ($duplicate) {
-		  $this->errorMessage='Duplicate Rubic found. Please change the rubic name.';
-		  return false;
-		}
-		else {
-		  return true;
-		}
-	}
 	//sets the current userid and merges the form values into the data array
-	function prepData($tmp=null, $userid=0){
+/*	function prepData($tmp=null, $userid=0){
 		$tmp['data']['Rubric']['user_id'] = $userid;
 		$tmp = array_merge($tmp['data']['Rubric'], $tmp['form']);
 		unset($tmp['data']);
@@ -115,16 +72,165 @@ class Rubric extends AppModel
 			$tmp['zero_mark'] = "off";
 
 		return $tmp;
-	}
+	}*/
 
-	    /**
-     * Returns the evaluations made by this user, and any other public ones.
-     */
-    function getBelongingOrPublic($userID) {
-        return is_numeric($userID) ?
-            $this->query("SELECT * FROM rubrics as Rubric where availability='public' or Rubric.creator_id=" . $userID)
-            : false;
+  /**
+   * saveAllWithCriteriaComment save all data passed in including criteria 
+   * comment. This function also remove the associations that exists in database 
+   * but not passed through parameter. 
+   * 
+   * @param mixed $data data to be saved 
+   * @access public
+   * @return void
+   */
+  function saveAllWithCriteriaComment($data) {
+    // check if the we should remove some of the association records
+    if(isset($data['Rubric']['id']) && !empty($data['Rubric']['id'])) {
+      $rubric = $this->find('first', array('conditions' => array('id' => $data['Rubric']['id']),
+                                           'contain' => array('RubricsCriteria.RubricsCriteriaComment',
+                                                              'RubricsLom')));
+
+
+      // check level of mastery and criteria if they should be removed
+      $result = array('RubricsLom' => array(),
+                      'RubricsCriteria' => array());
+      foreach(array_keys($result) as $model) {
+        foreach($rubric[$model] as $in_db) {
+          $found = false;
+          foreach($data[$model] as $d) {
+            if(isset($d['id']) && !empty($d['id']) && $in_db['id'] == $d['id']) {
+              $found = true;
+            }
+          }
+
+          if(!$found) {
+            $result[$model][] = $in_db['id'];
+          }
+        }
+
+        if(!empty($result[$model])) {
+          // this should also remove related comments
+          $this->{$model}->deleteAll(array($model.'.id' => $result[$model]), true);
+        }
+      }
+
+      // clean up LOM for criteria comments
+      /*if(!empty($result['RubricsLom']['nums'])) {
+        $ids = array();
+        foreach($rubric['RubricsCriteria'] as $c) {
+          foreach($c['RubricsCriteriaComment'] as $comment) {
+            if(in_array($comment['lom_num'], $result['RubricsLom']['nums'])) {
+              $ids[] = $comment['id'];
+            }
+          }
+        }
+        $this->RubricsCriteriaComment->deleteAll(array('id' => $ids), true);
+      }*/
     }
+
+    // saving the data. Because saveAll only saves direct associations. So we 
+    // have to save criteria and criteria comment separately.
+    
+    // remove criteria array. We only save rubric and RubricsLom first.  
+    $criterias = $data['RubricsCriteria'];
+    unset($data['RubricsCriteria']);
+
+    if(!$this->saveAll($data)) {
+      $this->errorMessage = __('Failed to save Rubric with Level of Mastery!', true);
+      return false;
+    }
+
+    // get LOM Ids
+    $loms = $this->RubricsLom->find('all', array('conditions' => array('rubric_id' => $this->id),
+                                                 'fields' => array('id'),
+                                                 'contain' => false));
+
+    // now save the criteria with comments one by one
+    foreach($criterias as $c) {
+      // link the rubric with criteria
+      $c['rubric_id'] = $this->id;
+
+      // link LOM id to comments, criteria id is linked by saveAll
+      for($i = 0; $i < count($c['RubricsCriteriaComment']); $i++) {
+        $c['RubricsCriteriaComment'][$i]['rubrics_loms_id'] = $loms[$i]['RubricsLom']['id'];
+      }
+
+      // prepare the data format for saveAll
+      $criteria_data['RubricsCriteriaComment'] = $c['RubricsCriteriaComment'];
+      unset($c['RubricsCriteriaComment']);
+      $criteria_data['RubricsCriteria'] = $c;
+
+      // save
+      if(!$this->RubricsCriteria->saveAll($criteria_data)) {
+        $this->errorMessage = __('Failed to save rubric criterias!', true);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function afterFind(array $results, $primary) {
+    $return = array();
+    foreach($results as $r) {
+      if(isset($r['RubricsCriteria']) && isset($r['RubricsLom']) &&
+         isset($r['RubricsCriteria'][0]['RubricsCriteriaComment'])) {
+        // order  comments
+        for($i = 0; $i < count($r['RubricsCriteria']); $i++) {
+          $comments = array();
+          foreach($r['RubricsLom'] as $lom) {
+            foreach($r['RubricsCriteria'][$i]['RubricsCriteriaComment'] as $c) {
+              if($c['rubrics_loms_id'] == $lom['id']) {
+                $comments[] = $c;
+              }
+            }
+          }
+          $r['RubricsCriteria'][$i]['RubricsCriteriaComment'] = $comments;
+        }
+      }
+      $return[] = $r;
+    }
+    return $return;
+  }
+
+  /**
+   * copy generate a copy of rubric with specific ID. The generated copy is 
+   * clean up with out any ID in it. 
+   * 
+   * @param mixed $id source rubric ID
+   * @access public
+   * @return array copy of rubric
+   */
+  function copy($id) {
+    $data = $this->find('first', array('conditions' => array('id' => $id),
+                                       'contain' => array('RubricsCriteria.RubricsCriteriaComment',
+                                                          'RubricsLom')));
+
+    if(null != $data) {
+      // set a new name
+      $data['Rubric']['name'] = __('Copy of ', true).$data['Rubric']['name'];
+
+      // remove rubric id and other stuff
+      unset($data['Rubric']['id'],
+            $data['Rubric']['creator_id'],
+            $data['Rubric']['created'],
+            $data['Rubric']['updater_id'],
+            $data['Rubric']['modified']);
+
+      // remove lom ids
+      for($i = 0; $i < count($data['RubricsLom']); $i++) {
+        unset($data['RubricsLom'][$i]['id']);
+      }
+
+      // remove criteria and criteria comment ids
+      for($i = 0; $i < count($data['RubricsCriteria']); $i++) {
+        unset($data['RubricsCriteria'][$i]['id']);
+        for($j = 0; $j < count($data['RubricsCriteria'][$i]['RubricsCriteriaComment']); $j++) {
+          unset($data['RubricsCriteria'][$i]['RubricsCriteriaComment'][$j]['id']);
+        }
+      }
+    }
+    return $data;
+  }
 }
 
 ?>

@@ -432,7 +432,7 @@ class GroupsController extends AppController
               $groupData['Group']['id'] = null;
               $groupData['Group']['group_num'] = $group['number'];
               $groupData['Group']['group_name'] = $group['name'];
-              $groupData['Group']['creator_id'] = $this->rdAuth->id;
+              $groupData['Group']['creator_id'] = $this->Auth->user('id');
               $groupData['Group']['course_id'] = $courseId;
 
               // Save the group to the database
@@ -545,7 +545,7 @@ class GroupsController extends AppController
 	function update($attributeCode='',$attributeValue='') {
 		if ($attributeCode != '' && $attributeValue != '') //check for empty params
 		{
-			$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
+			$this->params['data'] = $this->Personalize->updateAttribute($this->Auth->user('id'), $attributeCode, $attributeValue);
 		}
 	}
 

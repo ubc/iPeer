@@ -343,12 +343,12 @@ class UsersController extends AppController
 
       //Save Data
       if ($this->data = $this->User->save($this->data)) {
-        $data['User']['id'] = $this->User->id;
+        $this->data['User']['id'] = $this->User->id;
         return true;
-      } else {
-        return false;
       }
     }
+
+    return false;
   }
 
   // This function is needed since the $this->data looks different between

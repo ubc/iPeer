@@ -45,67 +45,16 @@ class SimpleEvaluation extends EvaluationBase
                        )
   );*/
   var $hasMany = array(
-                  'Event' =>
-                     array('className'   => 'Event',
-                           'conditions'  => array('Event.event_template_type_id' => self::TEMPLATE_TYPE_ID),
-                           'order'       => '',
-                           'foreignKey'  => 'template_id',
-                           'dependent'   => true,
-                           'exclusive'   => false,
-                           'finderSql'   => ''
-                          ),
-                     );
-
-
-	//Overwriting Function - will be called before save operation
-	function beforeSave(){
-
-	    // Ensure the name is not empty
-        if (empty($this->data[$this->name]['name'])) {
-            $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
-            return false;
-        }
-
-        // Remove any signle quotes in the name, so that custom SQL queries are not confused.
-        $this->data[$this->name]['name'] =
-            str_replace("'", "", $this->data[$this->name]['name']);
-
-
-        $allowSave = true;
-        if (empty($this->data[$this->name]['id'])) {
-            //check the duplicate username
-            $allowSave = $this->__checkDuplicateTitle();
-        }
-        return $allowSave;
-	}
-
-  //Validation check on duplication of username
-	function __checkDuplicateTitle() {
-	  $duplicate = false;
-    $field = 'name';
-    $value = $this->data[$this->name]['name'];
-    if ($result = $this->find($field . ' = "' . $value.'"', $field)){
-      $duplicate = true;
-     }
-
-    if ($duplicate == true) {
-      $this->errorMessage='Duplicate name found.  Please change the name of this Simple Evaluation';
-      return false;
-    }
-    else {
-      return true;
-    }
-	}
-
-
-  /**
-   * Returns the evaluations made by this user, and any other public ones.
-   */
-  function getBelongingOrPublic($userID) {
-    return is_numeric($userID) ?
-      $this->query("SELECT * FROM simple_evaluations as SimpleEvaluation where SimpleEvaluation.creator_id=" . $userID)
-      : false;
-  }
+    'Event' =>
+      array('className'   => 'Event',
+            'conditions'  => array('Event.event_template_type_id' => self::TEMPLATE_TYPE_ID),
+            'order'       => '',
+            'foreignKey'  => 'template_id',
+            'dependent'   => true,
+            'exclusive'   => false,
+            'finderSql'   => ''
+           ),
+      );
 }
 
 ?>

@@ -37,8 +37,8 @@ class SysFunctionsController extends AppController
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $NeatString;
 	var $Sanitize;
-    var $uses = array('SysFunction','Personalize');
-    var $components = array('AjaxList');
+  var $uses = array('SysFunction','Personalize');
+  var $components = array('AjaxList');
 
 	function __construct()
 	{

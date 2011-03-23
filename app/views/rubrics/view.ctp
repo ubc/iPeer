@@ -23,15 +23,17 @@
     </tr>
     <tr class="tablecell2">
       <td id="creator_label"><small>Creator:</small></td>
-      <td align="left"><?php
-      $params = array('controller'=>'rubrics', 'userId'=>$data['Rubric']['creator_id']);
-      echo $this->element('users/user_info', $params);
-      ?></td>
+      <td align="left">
+      <?php echo $this->element('users/user_info', 
+                                array('data' => array('id' => $data['Rubric']['creator_id'],
+                                                      'full_name' => $data['Rubric']['creator'])));?>
+      </td>
       <td id="updater_label"><small>Updater:</small></td>
-      <td align="left"><?php
-      $params = array('controller'=>'rubrics', 'userId'=>$data['Rubric']['updater_id']);
-      echo $this->element('users/user_info', $params);
-      ?></td>
+      <td align="left">
+      <?php echo $this->element('users/user_info', 
+                                array('data' => array('id' => $data['Rubric']['updater_id'],
+                                                      'full_name' => $data['Rubric']['updater'])));?>
+      </td>
     </tr>
     <tr class="tablecell2">
       <td id="created_label"><small>Create Date:</small></td>
@@ -64,8 +66,5 @@
 
 <div id="rpreview" style="display: block; background: #FFF;">
 <br>
-<?php
-$params = array('controller'=>'rubrics','data'=>$this->controller->RubricHelper->compileViewData($data), 'evaluate'=>0);
-echo $this->element('rubrics/ajax_rubric_view', $params);
-?>
+<?php echo $this->element('rubrics/ajax_rubric_view', array('data'=>$data, 'evaluate'=>0));?>
 </div>

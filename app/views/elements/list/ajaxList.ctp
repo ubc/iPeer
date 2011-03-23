@@ -18,7 +18,7 @@
     $divisionName = "ajaxListDiv";
 
     // The main div containing the controll
-    echo "<div id='$divisionName' style='text-align: left; margin: 0 1em 1em 1em'>";
+    echo "<div id='$divisionName'>";
 
     //Check all the parameters
     if (!function_exists('json_encode') || !function_exists('json_decode')) {

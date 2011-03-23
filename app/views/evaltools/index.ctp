@@ -1,8 +1,7 @@
+<div class="content-container">
+
 <?php echo $this->element('evaltools/tools_menu', array());?>
 
-<table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
-<tr>
-<td align="center">
 <!--form id="searchForm" action="">
 <table width="95%" border="0" cellspacing="0" cellpadding="2">
   <tr>
@@ -18,7 +17,7 @@
   </tr>
 </table>
 </form-->
-	<table width="95%" border="0" cellspacing="2" cellpadding="2" bgcolor="#FFFFFF">
+	<table class="list-table">
 	  <tr class="tableheader">
 	    <td colspan="7">Simple Evaluations</td>
 	  </tr>
@@ -35,19 +34,19 @@
     	    <th>Base Point Per Member</th>
     	  </tr>
       	<?php $i = '0';?>
-    	  <?php foreach($simpleEvalData as $row): $simpleeval = $row['SimpleEvaluation']; ?>
+    	  <?php foreach($simpleEvalData as $row): $eval = $row['SimpleEvaluation']; ?>
     	  <tr class="tablecell">
     	    <td width="1%" bgcolor="#FFB66F">&nbsp;</td>
     		  <td align="left">
-    	      <a href="<?php echo $this->webroot.$this->theme.'simpleevaluations/view/'.$simpleeval['id']?>"><?php echo $simpleeval['name']?></a>
+    	      <a href="<?php echo $this->webroot.$this->theme.'simpleevaluations/view/'.$eval['id']?>"><?php echo $eval['name']?></a>
     	    </td>
     		  <td align="center">
-        	<?php echo $mixeval['event_count'] > 0 ?
+        	<?php echo $eval['event_count'] > 0 ?
                      $html->image('icons/green_check.gif',array('border'=>'0','alt'=>'green_check')) :
                      $html->image('icons/red_x.gif',array('border'=>'0','alt'=>'red_x'));?>
           </td>
     	    <td align="center">
-    	      <?php echo $simpleeval['point_per_member'] ?>
+    	      <?php echo $eval['point_per_member'] ?>
     	    </td>
     	  </tr>
     	  <?php $i++;?>
@@ -85,7 +84,7 @@
     	    <td width="1%" bgcolor="#FFB66F">&nbsp;</td>
     		  <td align="left"><?php echo $html->link($rubric['name'], '/rubrics/view/'.$rubric['id']) ?></td>
           <td align="center">
-        	<?php echo $mixeval['event_count'] > 0 ?
+        	<?php echo $rubric['event_count'] > 0 ?
                      $html->image('icons/green_check.gif',array('border'=>'0','alt'=>'green_check')) :
                      $html->image('icons/red_x.gif',array('border'=>'0','alt'=>'red_x'));?>
           </td>
@@ -225,6 +224,5 @@
 	  </tr>
 <?php endif; ?>
   </table>
-</td>
-</tr>
-</table>
+
+</div>

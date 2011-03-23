@@ -2,24 +2,24 @@ function calculateMarks(lom_num, criteria, zero_mark) {
 	// calculate total marks
 	var totalMark = 0;
 
-	for(var j = 1; j <= criteria; j++) {
-		var field2 = "criteria_weight_"+j;
+	for(var j = 0; j < criteria; j++) {
+		var field2 = "RubricsCriteria"+j+"Multiplier";
 		var c_weight = parseInt(eval("document.getElementById('" + field2 + "').value"));
 		totalMark = parseInt(totalMark) + c_weight;
 	}
-	document.getElementById('total_marks').value = totalMark;
+	document.getElementById('total').value = totalMark;
 
 	// calculate each mark field
-	for(var i = 1; i <= criteria; i++) {
-		for(var j = 1; j <= lom_num; j++) {
-			var field = "criteria_mark_" +i +"_" +j;
-			var field2 = "criteria_weight_"+i;
+	for(var i = 0; i < criteria; i++) {
+		for(var j = 0; j < lom_num; j++) {
+			var field = "RubricCriteriaMark"+i+""+j;
+      var field2 = "RubricsCriteria"+i+"Multiplier";
 			var c_weight = parseInt(eval("document.getElementById('" + field2 + "').value"));
 
-			if(zero_mark=="off")
-				var mark = (c_weight/lom_num)*j;
+			if(zero_mark=="1")
+				var mark = (c_weight/(lom_num-1))*j;
 			else
-				var mark = (c_weight/(lom_num-1))*(j-1);
+				var mark = (c_weight/lom_num)*(j+1);
 
 			mark = Math.round(mark * 100) / 100;
 

@@ -1,6 +1,8 @@
 <?php 
 
 class AppModel extends Model {
+  var $errorMessage = 'Failed to save.';
+
   function __construct($id = false, $table = null, $ds = null) {
     parent::__construct($id, $table, $ds);
 

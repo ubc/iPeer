@@ -164,7 +164,7 @@ class LoginoutController extends AppController
 				is a hard coding for Political Science 101-051 upon the request of Rosalind Warner
 
 				*/
-				if ($this->params['data']['User']['role'] == "S" ) {
+				if ($this->params['data']['User']['role'] == "S" && $this->params['data']['User']['username'] != '00000000') {
 					$this->params['data']['User']['password'] = '';
 					$this->Session->write('CWLErr', 'STUDENT_INVALID_LOGIN');
 					$redirect = 'loginout/login';

@@ -1,87 +1,83 @@
 <!-- elements::ajax_rubric_view start -->
-    <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
-    	<tr class="tableheader" align="center">
-		<td width=100 valign="top">Rubric View </td>
-		<?php
-		$LOM_num = $data['lom_max'];
-		$criteria_num = $data['criteria'];
-		$rubric_type = $data['template'];
-		$zero_mark = $data['zero_mark'];
-		isset($user)? $userId = $user['id'] : $userId = '';
-		isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = null;
+<?php
+$LOM_num = $data['Rubric']['lom_max'];
+$criteria_num = $data['Rubric']['criteria'];
+$rubric_type = $data['Rubric']['template'];
+$zero_mark = $data['Rubric']['zero_mark'];
+isset($user)? $userId = $user['id'] : $userId = '';
+isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = null;
+?>
 
-		// horizontal template type
-		if( $rubric_type == "horizontal" ){
-			//for loop to display the top header row with LOM comments
-			for($i=1; $i<=$LOM_num; $i++){
-				echo "<td>Level of Mastery $i:<br>".$data['lom_comment'.$i]."</td>";
-			}
-			//Comment for Evaluation Form
-			if ($evaluate)
-			{
-			 echo "<td align='left'>Comments</td>";
-			}
-			echo "</tr>";
+<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+  <tr class="tableheader" align="center">
+		<td width=100 valign="top">Rubric View</td>
+		<!-- // horizontal template type -->
+		<?php if( $rubric_type == "horizontal" ):?>
+      <?php foreach($data['RubricsLom'] as $lom): ?>
+        <td>Level of Mastery <?php echo $lom['lom_num']?>:<br><?php echo $lom['lom_comment']?>
+      <?php endforeach ?>
+			<!-- //Comment for Evaluation Form -->
+			<?php if ($evaluate):?>
+        <td align='left'>Comments</td>
+			<?php endif ?>
+  </tr>
 
-			//for loop to display the criteria rows
-			for($i=1; $i<=$criteria_num; $i++){
-				echo '<tr class="tablecell" align="center"><td class="tableheader2" valign="top">';
-			  if (isset($evaluation)) {
-			     echo '<input type="hidden" name="selected_lom_'.$userId.'_'.$i.'" value="'.$evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['selected_lom'].'">';
-			  } else {
-          echo '<input type="hidden" name="selected_lom_'.$userId.'_'.$i.'" value="1" size="4" >';
-        }
+  <?php foreach($data['RubricsCriteria'] as $criteria): $i = $criteria['criteria_num']; ?>
+	<tr class="tablecell" align="center">
+    <td class="tableheader2" valign="top">
+		<?php if (isset($evaluation)) :?>
+		  <input type="hidden" name="selected_lom_<?php echo $userId.'_'.$i?>" value="<?php echo $evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['selected_lom']?>">
+		<?php else: ?>
+      <input type="hidden" name="selected_lom_<?php echo $userId.'_'.$i?>" value="1" size="4" >
+    <?php endif ?>
 
-				echo '<table border="0" width="95%" cellpadding="2"><tr><td>'.$i.': '.$data['criteria'.$i].'</td></tr><tr><td><i>'
-					 .$data['criteria_weight_'.$i]." mark(s)</i></td></tr></table></td>";
-				//for loop to display the criteria comment cells for each LOM
-				for($j=1; $j<=$LOM_num; $j++){
-					if( $zero_mark == "on" ){
-						$mark_value = round( ($data['criteria_weight_'.$i]/($LOM_num-1)*($j-1)) , 2);
-					}
-					else{
-						$mark_value = round( ($data['criteria_weight_'.$i]/$LOM_num*$j) , 2);            
-					}
-					echo "<td>".(!empty($data['criteria_comment_'.$i.'_'.$j]) ? "<font color=#000066><b>".$data['criteria_comment_'.$i.'_'.$j]."</b></font>":'')."<br><input name='".$userId."criteria_points_$i' type='radio' value='$mark_value' onClick=\"document.evalForm.selected_lom_".$userId."_".$i.".value=".$j.";\"";
-					if (isset($evaluation)) {
-					  if ($evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['selected_lom'] == $j) echo " checked ";
-					} else {
-  					if ($j==1) echo " checked ";
-  				}
-					echo "/>";
-					if (!$evaluate) {
+			<table border="0" width="95%" cellpadding="2">
+        <tr><td><?php echo $i.': '.$criteria['criteria']?></td></tr>
+        <tr><td><i><?php echo $criteria['multiplier']?> mark(s)</i></td></tr>
+      </table>
+    </td>
 
+    <?php foreach($data['RubricsLom'] as $lom): ?>
+    <?php $mark_value = round( ($criteria['multiplier']/(count($data['RubricsLom']) - ('on' == $zero_mark ? 1 : 0))*($lom['lom_num'] - ('on' == $zero_mark ? 1 : 0))) , 2);?>
+		<td>
+      <div class="rubric-comment"><?php echo (!empty($criteria['RubricsCriteriaComment'][$lom['lom_num']-1]['criteria_comment']) ? $criteria['RubricsCriteriaComment'][$lom['lom_num']-1]['criteria_comment'] : '')?></div>
+  		<?php 
+      $check = '';
+      if (isset($evaluation)) {
+        if ($evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['selected_lom'] == $lom['lom_num']) $check = "checked";
+      } else {
+        if ($lom['lom_num'] == 1) $check = "checked";
+      }?>
+      <div>
+      <input name="<?php echo $userId.'criteria_points_'.$i?>" type="radio" value="<?php echo $mark_value?>" 
+             onClick="document.evalForm.selected_lom_<?php echo $userId."_".$i?>.value=<?php echo $lom['lom_num']?>;" <?php echo $check?>/></div>
 
-					    echo "<br><br><font color=#FF6600>Points: ".$mark_value."</font>";
-						}
-					echo	"</td>";
-				}
-				//Comment for Evaluation Form
-				if ($evaluate)
-				{
-				 echo "<td align='left'><textarea cols='20' rows='2' name='".$userId."comments[]'>";
-				 	if (isset($evaluation)) {
-					  echo $evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['criteria_comment'];
-					}
-				 echo "</textarea>";
-				 echo "</td>";
-				}
-			}
-				echo "</tr>";
-		}
-echo "<tr>";
-		if (!$evaluate) {
-  		echo '<td colspan="'.($LOM_num+1).'" align="right">Total Marks: '.$data['total_marks'].'</td>';
-		}
-		else{
-  	    echo '<td colspan='.($LOM_num+2).' align="center" class="tableheader2">General Comments <br><textarea cols="80" rows="2" name="'.$userId.'gen_comment" >';
-		    if (isset($evaluation)) {
-  	  		echo $evaluation['EvaluationRubric']['general_comment'];
-  	  	}
-  	  	echo "</textarea></td>";
-  	}
-  	echo "</tr>";
+      <?php if (!$evaluate): ?>
+        <div class="rubric-mark">Mark: <?php echo $mark_value?></div>
+      <?php endif; ?>
+    </td>
+    <?php endforeach ?>
 
-		?>
-  </table>
+    <?php if ($evaluate): ?>
+    <td align="left">
+      <textarea cols="20" rows="2" name="<?php echo $userId?>comments[]">
+      <?php echo (isset($evaluation) ? $evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['criteria_comment'] : '')?>
+      </textarea>
+    </td>
+		<?php endif;?>	
+  <?php endforeach;?>	
+			
+	</tr>
+  <?php endif; ?>
+  <tr>
+	<?php if (!$evaluate): ?>
+ 		<td colspan="<?php echo $LOM_num+1?>" align="right">Total Marks: <?php echo $data['Rubric']['total_marks']?></td>
+	<?php else: ?>
+    <td colspan="<?php echo $LOM_num+2?>" align="center" class="tableheader2">General Comments<br>
+    <textarea cols="80" rows="2" name="<?php echo $userId?>gen_comment" >
+      <?php echo (isset($evaluation) ? $evaluation['EvaluationRubric']['general_comment'] : '')?>
+  	</textarea></td>
+  <?php endif;?>	
+  </tr>
+</table>
 <!-- elements::ajax_rubric_preview end -->

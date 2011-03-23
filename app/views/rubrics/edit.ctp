@@ -1,108 +1,146 @@
-<form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Rubric']['id']) || (!empty($copy) && $copy) ? 'add':'edit') ?>">
-<table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
-<tr><td>
-	<?php
-	//$this->data = $this->params['data'];
-	if(!empty($data)){
-		$rubric_name = $data['Rubric']['name'];
-		$lom_default = $data['Rubric']['lom_max'];
-		$criteria_default = $data['Rubric']['criteria'];
-		$rubric_avail = $data['Rubric']['availability'];
-		$rubric_type = $data['Rubric']['template'];
-		
-		if(!empty($data['Rubric']['zero_mark']) && $data['Rubric']['zero_mark'] == 'on')
-			$zero_mark = $data['Rubric']['zero_mark'];
-		else
-			$zero_mark='off';
-	}
-	else{
-		$rubric_name = '';
-		$lom_default = 5;
-		$criteria_default = 3;
-		$rubric_avail = 'public';
-		$rubric_type = 'horizontal';
-		$zero_mark = 'off';
-	}
-	if (!empty($copy) && $copy) {
-	  $params['data']['Rubric']['id'] = null;
-	}
-	?>
+<?php
+$readonly = isset($readonly) ? $readonly : false;
+$evaluate = isset($evaluate) ? $evaluate : false;
+$url = $this->action == 'copy' ? 'add' : $this->action;
+?>
 
-    <?php echo empty($params['data']['Rubric']['id']) ? null : $html->hidden('Rubric/id'); ?>
-    <?php echo empty($params['data']['Rubric']['id']) ? null : $html->hidden('Rubric/id'); ?>
-    <?php echo empty($params['data']['Rubric']['id']) ? $html->hidden('Rubric/creator_id', array('value'=>$rdAuth->id)) : $html->hidden('Rubric/updater_id', array('value'=>$rdAuth->id)); ?>
-    <br/>
-	  <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
-  <tr class="tableheader">
-    <td colspan="3" align="center">
-      <?php echo empty($params['data']['Rubric']['id'])?'Add':'Edit' ?> Rubric
-    </td>
+<?php echo $this->Form->create('Rubric',
+                               array('id' => 'frm',
+                                     'url' => array('action' => $url),
+                                     'inputDefaults' => array('div' => false,
+                                                              'before' => '<td width="200px">',
+                                                              'after' => '</td>',
+                                                              'between' => '</td><td>')))?>
+<?php echo $this->Form->input('id', array('type' => 'hidden'))?>
+<?php echo $this->Form->input('template', array('type' => 'hidden', 'value' => 'horizontal'))?>
+
+<div class="content-container">
+  <table class="form-table">
+    <tr class="tableheader">
+      <td colspan="3" align="center"><?php echo __($action)?></td>
     </tr>
-  <tr class="tablecell2">
-    <td width="209">Rubric Name:<font color="red">*</font></td>
-    <td width="301"><?php echo $html->input('Rubric/name', array('size'=>'30','class'=>'input','value'=>$rubric_name)) ?></td>
-    <td width="353">&nbsp;</td>
-  </tr>
-  <tr class="tablecell2">
-    <td>Level of Mastery:</td>
-    <td><?php echo $html->selectTag('Rubric/lom_max', array('2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8',
-									'9'=>'9','10'=>'10'), $lom_default, array('style'=>'width:50px;','id'=>'LOM'),'',false) ?></td>
-    <td>aka LOM, Evaluation Range (Max 10) </td>
-  </tr>
-  <tr class="tablecell2">
-    <td>Number of Criteria:</td>
-    <td><?php echo $html->selectTag('Rubric/criteria', array('1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8',
-									'9'=>'9','10'=>'10','11'=>'11','12'=>'12','13'=>'13','14'=>'14','15'=>'15','16'=>'16','17'=>'17',
-									'18'=>'18','19'=>'19','20'=>'20','21'=>'21','22'=>'22','23'=>'23','24'=>'24','25'=>'25'), $criteria_default,
-									array('style'=>'width:50px;','id'=>'criteria'),'',false) ?></td>
-    <td>Number of Evaluation Aspects (Max 25) </td>
-  </tr>
-  <tr class="tablecell2">
-    <td>Rubric Availability:<font color="red">*</font></td>
-    <td><?php echo $html->selectTag('Rubric/availability', array('public'=>'public','private'=>'private'), $rubric_avail, array('style'=>'width:100px;'),'',false) ?></td>
-    <td>Public Allows Rubric Sharing Amongst Instructors </td>
-  </tr>
-  <tr class="tablecell2">
-    <td>Zero Mark:
-  <input type="hidden" name="data[Rubric][template]" value="horizontal"/></td>
-    <td><?php echo $html->checkbox('Rubric/zero_mark', null, array('size'=>'50','class'=>'self_enroll', 'id'=>'zero_mark',  'checked'=> ($zero_mark == 'on') ? 'checked': 'unchecked' )) ?></td>
-    <td>No Marks Given  for Level of Mastery of 1</td>
-  </tr>
-  <tr class="tablecell2">
-  		<td colspan="3" align="center">
-        <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
-		<?php echo $html->submit('Preview (Update Format)', array('Name'=>'preview')) ?>
-		&nbsp;&nbsp;&nbsp;
-		<?php
-		$actionname = empty($params['data']['Rubric']['id'])?'Add Rubric':'Edit Rubric';
-		echo $html->submit($actionname, array('id' => 'submit-rubric')) ?>
-		</td>
+
+    <tr class="tablecell2">
+      <?php echo $this->Form->input('name', array('id' => 'name', 'size'=>'30', 
+                                                  'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.',
+                                                  'readonly' => $readonly));?>
+      <td>&nbsp;</td>
     </tr>
-</table>
-<table width="95%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">
+
+    <tr class="tablecell2">
+      <?php echo $this->Form->input('lom_max', array('id' => 'LOM', 'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.',
+                                                     'options' => array_combine(range(2,10), range(2,10)),
+                                                     'default' => 5,
+                                                     'label' => 'Level of Mastery:',
+                                                     'style'=>'width:50px;',
+                                                     'disabled' => $readonly));?>
+      <td>aka LOM, Evaluation Range (Max 10)</td>
+    </tr>
+
+    <tr class="tablecell2">
+      <?php echo $this->Form->input('criteria', array('id' => 'criteria', 'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.',
+                                                      'options' => array_combine(range(1,25), range(1,25)),
+                                                      'default' => 3,
+                                                      'label' => 'Number of Criteria:',
+                                                      'style'=>'width:50px;',
+                                                      'disabled' => $readonly));?>
+      <td>Number of Evaluation Aspects (Max 25)</td>
+    </tr>
+
+    <tr class="tablecell2">
+      <?php echo $this->Form->input('availability', array('id' => 'availability', 'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.',
+                                                          'options' => array('public'=>'Public','private'=>'Private'),
+                                                          'label' => 'Rubric Availability:',
+                                                          'style'=>'width:100px;',
+                                                          'disabled' => $readonly));?>
+      <td>Public Allows Rubric Sharing Amongst Instructors</td>
+    </tr>
+
+    <tr class="tablecell2">
+      <td>Zero Mark</td>
+      <td>
+      <?php echo $this->Form->checkbox('zero_mark', array('id' => 'zero_mark', 'class'=>'self_enroll',
+                                                       'size' => 50,
+                                                       'disabled' => $readonly));?>
+      </td>
+      <td>No Marks Given  for Level of Mastery of 1</td>
+    </tr>
+
+    <?php if('add' != $this->action && 'copy' != $this->action):?>
+    <tr class="tablecell2">
+      <td id="creator_label">Creator:</td>
+      <td align="left" colspan="2">
+      <?php echo $this->element('users/user_info', 
+                                array('data' => array('id' => $data['Rubric']['creator_id'],
+                                                      'full_name' => $data['Rubric']['creator'])));?>
+      </td>
+    </tr>
+
+    <tr class="tablecell2">
+      <td id="created_label">Create Date:</td>
+      <td align="left" colspan="2"><?php if (!empty($data['Rubric']['created'])) echo ''.$data['Rubric']['created'].''; ?></td>
+    </tr>
+
+    <tr class="tablecell2">
+      <td id="updater_label">Updater:</td>
+      <td align="left" colspan="2">
+      <?php echo $this->element('users/user_info', 
+                                array('data' => array('id' => $data['Rubric']['updater_id'],
+                                                      'full_name' => $data['Rubric']['updater'])));?>
+      </td>
+    </tr>
+
+    <tr class="tablecell2">
+      <td id="updated_label">Update Date:</td>
+      <td align="left" colspan="2"><?php if (!empty($data['Rubric']['modified'])) echo ''.$data['Rubric']['modified'].''; ?></td>
+    </tr>
+    <?php endif; ?>
+
+    <tr class="tablecell2">
+    	<td colspan="3" align="center">
+        <input type="button" name="Back" value="<?php echo __('Back')?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
+        <?php switch($action) {
+          case 'Add Rubric':
+            echo $this->Form->submit(__('Next', true), array('Name'=>'preview', 'div' => false)); 
+            break;
+          case 'View Rubric':
+            echo $this->Form->button(__('Edit Rubric', true), array('type' => 'button', 
+                                                                    'onClick' => 'javascript:location.href=\''.$this->Html->url('edit/'.$data['Rubric']['id'], true).'\';'));
+            break;
+          default:
+            echo $this->Form->submit(__('Preview (Update Format)', true), array('Name'=>'preview', 'div' => false));
+            echo $this->Form->submit(__('Save', true), array('id' => 'submit-rubric', 'Name' => 'submit', 'div' => false));
+          }?>
+      </td>
+    </tr>
+  </table>
+
+<table class="list-bottom">
   <tr>
     <td align="left"><?php echo $html->image('layout/corner_bot_left.gif',array('align'=>'middle','alt'=>'corner_bot_left'))?></td>
     <td align="right"><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'middle','alt'=>'corner_bot_right'))?></td>
   </tr>
 </table>
-<br>
-	</td>
-  </tr>
-</table>
-<table class="title" width="100%"  border="0" cellspacing="0" cellpadding="0">
-  <tr>
-	<td><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> Rubric Preview </td>
-	<td><div align="right"><a href="#rpreview" onclick="$('rpreview').toggle(); toggle1(this);"><?php echo empty($this->data) ? '[-]' : '[-]'; ?></a></div></td>
-  </tr>
-</table>
-<div id="rpreview" <?php echo empty($data) ? 'style="display: none; background: #FFF;">' : 'style="display: block; background: #FFF;"'; ?>>
-<br>
-<?php
-  $params = array('controller'=>'rubrics','data'=>$this->controller->RubricHelper->compileViewData($data));
-  echo $this->element('rubrics/ajax_rubric_edit', $params);
-?>
+  
 </div>
-</form>
+
+<?php if(!empty($data)):?>
+<div class='title'>
+  <span class="text"><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> Rubric Preview</span>
+	<span class="controls"><a href="#rpreview" onclick="$('rpreview').toggle(); toggle1(this);"><?php echo empty($this->data) ? '[-]' : '[-]'; ?></a></span>
+</div>
+
+
+<div class="content-container">
+
+<div id="rpreview" <?php echo empty($data) ? 'style="display: none; background: #FFF;">' : 'style="display: block; background: #FFF;"'; ?>>
+<?php echo $this->element('rubrics/ajax_rubric_'.($this->action == 'view' ? 'view' : 'edit'), array('data' => $data, 'readonly' => $readonly, 'evaluate' => $evaluate)); ?>
+</div>
+
+</div>
+<?php endif;?>
+
+<?php echo $this->Form->end()?>
 
 <script type="text/javascript">
 $('LOM').observe('change', function(event){

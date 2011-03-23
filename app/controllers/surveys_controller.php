@@ -60,7 +60,8 @@ class SurveysController extends AppController
     if ($data) {
       foreach ($data as $key => $entry) {
         // is it in use?
-        $inUse = $this->Event->checkEvaluationToolInUse('3',$entry['Survey']['id']) ;
+//        $inUse = $this->Event->checkEvaluationToolInUse('3',$entry['Survey']['id']) ;
+        $inUse = $this->Survey->getEventCount($entry['Survey']['id']);
 
         // Put in the custom inUse column
         $data[$key]['!Custom']['inUse'] = $inUse ? "Yes" : "No";

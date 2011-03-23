@@ -28,10 +28,12 @@
 class RubricsCriteriaComment extends AppModel
 {
   var $name = 'RubricsCriteriaComment';
+  var $actsAs = array('Containable');
   
-  var $belongsTo = array( 'Rubric' => array(
-                     'className' => 'Rubric'                     
-                   ));
+  var $belongsTo = array( 'RubricsCriteria' => array(
+                     'className' => 'RubricsCriteria',
+                     'foreignKey' => 'criteria_id'
+                     ));
   
   // called by rubrics controller during add/edit of rubric
   // inserts/updates with criteria comments for each rubric
@@ -70,7 +72,7 @@ class RubricsCriteriaComment extends AppModel
   }
   
   // function to return the criteria x lom comments
-  function getCriteriaComment( $id=null, $criteria=null, $lom=null ){	
+  /*function getCriteriaComment( $id=null, $criteria=null, $lom=null ){	
   	for( $i=0; $i<$criteria; $i++ ){
   		for( $j=0; $j<$lom; $j++ ){
   			$data = $this->find('all',$conditions = 'rubric_id='.$id." AND ".'criteria_num='.($i+1)." AND ".'lom_num='.($j+1), $fields = 'criteria_comment');
@@ -81,7 +83,7 @@ class RubricsCriteriaComment extends AppModel
   		}
   	}
   	return $tmp;
-  }
+  }*/
 }
 
 ?>

@@ -131,7 +131,7 @@ a.miniLinks:active {
 
 }
 
-.error, .error_message, .error-message{
+.error, .error_message {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 12px;
 	color: red;
@@ -166,14 +166,30 @@ a.miniLinks:active {
 	height:17px;
 	background:url(box.gif) 0 100% no-repeat;
 }
+.content-wrap {
+  background-color: #FFFFFF;
+  position: relative;
+}
 .title {
-	margin:0;
+	margin: 0;
 	padding:5px 10px;
 	background:#E2E2E2;
 	font:bold 1.2em/1 Arial, Helvetica, sans-serif;
 	border-top: 1px solid #CFCFCF;
 	border-bottom: 1px solid #CFCFCF;
+  position: relative;
 }
+
+.title .text {
+  text-align: left;
+}
+
+.title .controls {
+  text-align: right;
+  position: absolute;
+  right: 10px;
+}
+
 .title2 {
 	margin:0;
 	padding:2px 5px;
@@ -430,13 +446,11 @@ div.table-content li img{
 
 /* Main Navigation */
 #nav {
-	margin-left: auto;
-  margin-right: auto;
   padding: 5px 0 5px 0;
 	text-align: left;
 	border: solid #fff;
 	border-width: 0px 0px 0px 0px;
-  width: 95%;
+  width: 100%;
   background-color: white;
 }
 #nav ul {
@@ -494,15 +508,19 @@ div.table-content li img{
   display:none;
 }
 
-#flashMessage {
+.message {
   text-align: center;
 	margin:0;
 	padding:2px 5px;
 	background:#F4F4F4;
 	font:bold 1em/1 Arial, Helvetica, sans-serif;
-	color: #0A2C64;
+	color: red;
 	border-top: 1px solid #CFCFCF;
 	border-bottom: 1px solid #CFCFCF;
+}
+
+.error-message {
+  background: yellow;
 }
 
 #adddelcourses select.course-selector{
@@ -527,12 +545,6 @@ div.table-content li img{
   color: red;
 }
 
-.message{
-  padding: 20px 0 20px 0;
-  text-align: center;
-  line-height: 2em;
-}
-
 #login-form-div div.table-content div {
   width: 240px;
   padding-left: 5px;
@@ -555,4 +567,76 @@ div.table-content li img{
 input[readonly='readonly'] {
   border: 0px;
   background: transparent;
+}
+
+textarea[readonly='readonly'] {
+  border: 0px;
+  background: transparent;
+}
+
+.rubric-comment {
+  color: #000066;
+  font-weight: bold;
+}
+
+.rubric-mark {
+  color: #FF6600;
+}
+
+table.list-bottom {
+  width: 100%;
+  border-width: 0;
+  background-color: #E5E5E5;
+  border-collapse: collapse;
+  padding: 0;
+  margin: 0 0 2em 0;
+}
+
+table.list-bottom td {
+  border-width: 0;
+  padding: 0;
+}
+
+table.form-table {
+  width: 100%;
+  border-width: 0;
+  border-collapse: separate;
+  border-spacing: 2px;
+  margin: 2em 0 0 0;
+}
+
+table.form-table td {
+  border-width: 0;
+  padding: 4px;
+}
+
+table.list-table {
+  width: 100%;
+  border-width: 0;
+  border-collapse: separate;
+  border-spacing: 2px;
+  margin: 2em 0 0 0;
+}
+
+table.list-table td {
+  border-width: 0;
+  padding: 2px;
+}
+
+table.content-table {
+  width: 95%;
+  border-width: 0;
+  border-collapse: separate;
+  border-spacing: 2px;
+  margin: 0 auto 0 auto;
+}
+
+.list-add {
+  text-align: right;
+}
+
+.content-container {
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
 }

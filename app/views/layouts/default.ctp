@@ -156,16 +156,13 @@ function checkEmailAddress()
 <div id="wrap">
   <div class="box">
     <div class="bi">
-      <div class="bt">
-      <div>&nbsp;</div>
-      </div>
+      <div class="bt"><div>&nbsp;</div></div>
 
-      <table class="title" width="100%"  border="0" cellspacing="0" cellpadding="0">
-      <tr>
-        <td><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?>
-          <?php echo $title_for_layout;?> </td>
-        <td>
-      <div align="right">
+      <div class="content-wrap">
+      <div class='title'>
+        <span class='text'><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?>
+          <?php echo $title_for_layout;?> </span>
+        <span class="controls">
         <?php if (!empty($this->params) && 
                   'install' != $this->params['controller'] &&
                   'upgrade' != $this->params['controller'] &&
@@ -174,10 +171,10 @@ function checkEmailAddress()
 
             <a href="<?php echo $this->webroot . $this->theme?>framework/tutIndex" onclick="wopen(this.href, \'popup\', 800, 600); return false;">
               <?php echo $html->image('layout/button_ipeer_tutorial.gif', array('border'=>'0','alt'=>'button_ipeer_tutorial'))?></a>
-       <?php endif; ?> 
-        </div></td>
-      </tr>
-      </table>
+         <?php endif; ?> 
+         </span>
+      </div>
+
         <?php if (!empty($errmsg)): ?>
         <div align="center" class="title2"><font color="red"><?php echo $errmsg; ?></font></div>
         <?php endif; ?>
@@ -189,9 +186,9 @@ function checkEmailAddress()
         <div align="left" id="loading"><?php echo $html->image('spinner.gif',array('alt'=>'spinner'))?></div>
         <div id="content"><?php echo $content_for_layout;?></div>
       <h1 align="center"><span class="footer">Powered by iPeer and TeamMaker - Created by UBC and Rose-Hulman</span></h1>
-      <div class="bb">
-        <div>&nbsp;</div>
       </div>
+
+      <div class="bb"><div>&nbsp;</div></div>
     </div>
   </div>
 </div>

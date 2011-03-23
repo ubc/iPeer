@@ -25,9 +25,12 @@
  * @subpackage
  * @since
  */
-class Survey extends AppModel
+App::import('Model', 'EvaluationBase');
+
+class Survey extends EvaluationBase
 {
   var $name = 'Survey';
+  const TEMPLATE_TYPE_ID = 3;
 
   var $belongsTo = array('Course' =>
                          array('className'  =>  'Course',
@@ -82,12 +85,7 @@ class Survey extends AppModel
 
   var $contain = array('Question');
 
-  function __construct($id = false, $table = null, $ds = null) {
-    parent::__construct($id, $table, $ds);
-    $this->virtualFields['event_count'] = sprintf('SELECT count(*) as count FROM events as event WHERE event.event_template_type_id = 3 AND event.template_id = %s.id', $this->alias);
-  }
-
-  function __checkDuplicateSurvey() {
+  /*function __checkDuplicateSurvey() {
     // Set up query condition for dusplicates
     $conditions = array();
     $conditions['name'] = $this->data[$this->alias]['name'];
@@ -104,31 +102,13 @@ class Survey extends AppModel
     } else {
       return true;
     }
-  }
+  }*/
 
   function getSurveyIdByCourseIdTitle($courseId=null,$title=null) {
     $tmp = $this->find('course_id='.$courseId.' AND name=\''.$title.'\'','id');
     return $tmp['Survey']['id'];
   }
 
-
-  function beforeSave() {
-    // Ensure the name is not empty
-    if (empty($this->data[$this->alias]['name'])) {
-        $this->errorMessage = "Please enter a new name for this " . $this->alias. ".";
-        return false;
-    }
-
-    // Remove any single quotes in the name, so that custom SQL queries are not confused.
-    $this->data[$this->name]['name'] =
-        str_replace("'", "", $this->data[$this->name]['name']);
-
-    if(!$this->__checkDuplicateSurvey()) {
-      return false;
-    }
-
-    return parent::beforeSave();;
-  }
 
 /*  function beforeDelete() {
     $event = new Event();

@@ -33,44 +33,16 @@ class RubricsLom extends AppModel
                      'className' => 'Rubric'
                    ));
 
-  // called by rubrics controller during add/edit of rubric
-  // inserts/updates with LOM comments for each rubric
-  function insertLOM( $id=null, $data ){
-  	for( $i=1; $i<=$data['lom_max']; $i++ ){
-  		$tmp = array( 'rubric_id'=>$id, 'lom_num'=>$i, 'lom_comment'=>$data['lom_comment'.$i]);
-  		$this->save($tmp);
-  		$this->id = null;
-  	}
-  }
+  var $hasMany = array( 'RubricsCriteriaComment' => array(
+                    'className' => 'RubricsCriteriaComment',
+                    'foreignKey' => 'rubrics_loms_id',
+                    'dependent' => true,
+                    'exclusive' => true,
+                    ));
 
-  // called by rubrics controller during an edit of an
-  // existing rubric lom(s)
-  function updateLOM( $data ){
-  	$this->query('DELETE FROM rubrics_loms WHERE rubric_id='.$data['id']);
+  var $actsAs = array('Containable');
 
-	  for( $i=1; $i<=$data['lom_max']; $i++ ){
-		  $this->query('INSERT INTO rubrics_loms (rubric_id, lom_num, lom_comment) VALUES ("'.$data['id'].'","'.$i.'","'.$data['lom_comment'.$i].'")');
-	  }
-  }
-
-  // called by the delete function in the controller
-  function deleteLOM( $id ){
-  	$this->query('DELETE FROM rubrics_loms WHERE rubric_id='.$id);
-  }
-
-  // function to return the LOM general statements from the
-  // rubrics_loms table
-  function getLOM( $id=null, $lom_num=null ){
-  	$data = $this->find('all',$conditions = 'rubric_id='.$id, $fields = 'lom_comment');
-
-  	for( $i=0; $i<$lom_num; $i++ ){
-  		if( !empty( $data[$i]['RubricsLom']['lom_comment'] ) )
-  			$tmp['lom_comment'.($i+1)] = $data[$i]['RubricsLom']['lom_comment'];
-  		else
-  			$tmp['lom_comment'.($i+1)] = null;
-  	}
-  	return $tmp;
-  }
+  var $order = array('RubricsLom.lom_num' => 'ASC', 'RubricsLom.id' => 'ASC');
 }
 
 ?>

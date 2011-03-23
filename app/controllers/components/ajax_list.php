@@ -327,8 +327,11 @@ class AjaxListComponent extends Object {
     //  new state
     function asyncGet($pageForRedirect = "index", $parameters = "") {
 
-        // Grab the next state the browser sent over, and save it
-        $state = json_decode($_POST['json']);
+      // remove the escape backslashs if magic quotes is OK. Otherwise, 
+      // json_decode will not work properly 
+      $json = get_magic_quotes_gpc() ? stripslashes($_POST['json']) : $_POST['json'];
+      // Grab the next state the browser sent over, and save it
+      $state = json_decode($_POST['json']);
 
         // If not state was sent: fetch it from session.
         if ($state == null) {

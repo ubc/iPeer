@@ -28,12 +28,20 @@
 class RubricsCriteria extends AppModel
 {
   var $name = 'RubricsCriteria';
+  var $actsAs = array('Containable');
   
   var $belongsTo = array( 'Rubric' => array(
                      'className' => 'Rubric'                     
                    ));
 
-  // called by rubrics controller during add/edit of rubric
+  var $hasMany = array( 'RubricsCriteriaComment' => array(
+                    'className' => 'RubricsCriteriaComment',
+                    'foreignKey' => 'criteria_id',
+                    'dependent' => true,
+                    'exclusive' => true,
+                    ));
+
+/*  // called by rubrics controller during add/edit of rubric
   // inserts/updates with criteria comments for each rubric
   function insertCriteria($id=null, $data){
   	for( $i=1; $i<=$data['criteria']; $i++ ){
@@ -55,7 +63,8 @@ class RubricsCriteria extends AppModel
 
   // called by the delete function in the controller
   function deleteCriterias( $id ){
-  	$this->query('DELETE FROM rubrics_criterias WHERE rubric_id='.$id);
+    $this->deleteAll(array('rubric_id' => $id));
+  	//$this->query('DELETE FROM rubrics_criterias WHERE rubric_id='.$id);
   }
 
   // function to return the criteria description and weight from the
@@ -77,7 +86,7 @@ class RubricsCriteria extends AppModel
   	}
 
   	return $tmp;
-  }
+  }*/
 
 }
 
