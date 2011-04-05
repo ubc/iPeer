@@ -8,7 +8,7 @@ isset($user)? $userId = $user['id'] : $userId = '';
 isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = null;
 ?>
 
-<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+<table class="form-table">
   <tr class="tableheader" align="center">
 		<td width=100 valign="top">Rubric View</td>
 		<!-- // horizontal template type -->

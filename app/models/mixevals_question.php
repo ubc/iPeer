@@ -28,6 +28,16 @@
 class MixevalsQuestion extends AppModel
 {
   var $name = 'MixevalsQuestion';
+  var $hasMany = array(
+                  'Description' =>
+                     array('className'   => 'MixevalsQuestionDesc',
+                           'order'       => '',
+                           'foreignKey'  => 'question_id',
+                           'dependent'   => true,
+                           'exclusive'   => true,
+                           'finderSql'   => ''
+                          ),
+                     );
 
   // called by mixevals controller during add of mixeval
   // inserts with question comments for each mixeval

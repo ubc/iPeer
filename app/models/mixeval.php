@@ -25,72 +25,48 @@
  * @subpackage
  * @since
  */
-class Mixeval extends AppModel
+class Mixeval extends EvaluationBase
 {
+  const TEMPLATE_TYPE_ID = 4;
   var $name = 'Mixeval';
 
   var $hasMany = array(
                   'Event' =>
                      array('className'   => 'Event',
-                           'conditions'  => 'Event.event_template_type_id = 4',
+                           'conditions'  => array('Event.event_template_type_id' => self::TEMPLATE_TYPE_ID),
                            'order'       => '',
                            'foreignKey'  => 'template_id',
                            'dependent'   => true,
                            'exclusive'   => false,
                            'finderSql'   => ''
                           ),
+                  'Question' =>
+                    array('className' => 'MixevalsQuestion',
+                          'foreignKey' => 'mixeval_id',
+                          'dependent' => true,
+                          'exclusive' => true,
+                          'order'     => array('question_num' => 'ASC', 'id' => 'ASC'),
+                         ),
                      );
-
   function __construct($id = false, $table = null, $ds = null) {
     parent::__construct($id, $table, $ds);
-    $this->virtualFields['event_count'] = sprintf('SELECT count(*) as count FROM events as event WHERE event.event_template_type_id = 4 AND event.template_id = %s.id', $this->alias);
+    $this->virtualFields['total_question'] = sprintf('SELECT count(*) as total_question FROM mixevals_questions as q WHERE q.mixeval_id = %s.id', $this->alias);
+    $this->virtualFields['total_marks'] = sprintf('SELECT sum(multiplier) as sum FROM mixevals_questions as q WHERE q.mixeval_id = %s.id', $this->alias);
   }
 
-	function beforeSave(){
-        // Ensure the name is not empty
-        if (empty($this->data[$this->name]['name'])) {
-            $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
-            return false;
-        }
+  /**
+   * saveAllWithDescription save the mixed evaluation with all questions 
+   * including the descriptions in lickert questions
+   * 
+   * @param array $data the array of data to be saved
+   * @access public
+   * @return boolean
+   */
+  function saveAllWithDescription($data) {
+  }
 
-        // Remove any signle quotes in the name, so that custom SQL queries are not confused.
-        $this->data[$this->name]['name'] =
-            str_replace("'", "", $this->data[$this->name]['name']);
-
-		$allowSave = true;
-		if (empty($this->data[$this->name]['name'])) {
-			//check empty name
-			$this->errorMessage='Mixed evaluation name is required.';
-			$allowSave = false;
-			//check the duplicate mixeval
-		} else
-			$allowSave = $this->__checkDuplicateMixeval();
-		return $allowSave;
-	}
-
-	function __checkDuplicateMixeval() {
-		$duplicate = false;
-		$field = 'name';
-		$value = $this->data[$this->name]['name'];
-		if ($result = $this->find($field . ' = "' . $value.'"', $field.', id')){
-		  if (isset($this->data[$this->name]['id']) &&
-            ($this->data[$this->name]['id'] == $result[$this->name]['id'])) {
-		    $duplicate = false;
-		  } else {
-  		  $duplicate = true;
-  		}
-		 }
-
-		if ($duplicate) {
-		  $this->errorMessage='Duplicate Mixed evaluation found. Please change the rubic name.';
-		  return false;
-		}
-		else {
-		  return true;
-		}
-	}
 	//sets the current userid and merges the form values into the data array
-	function prepData($tmp=null, $userid){
+	/*function prepData($tmp=null, $userid){
 
 //		$tmp = array_merge($tmp['data']['Mixeval'], $tmp['form']);
     $ttlQuestionNo = $tmp['data']['Mixeval']['total_question'];
@@ -125,16 +101,5 @@ class Mixeval extends AppModel
     }
 
 		return $questions;
-	}
-
-    /**
-     * Returns the evaluations made by this user, and any other public ones.
-     */
-    function getBelongingOrPublic($userID) {
-        return is_numeric($userID) ?
-            $this->query("SELECT * FROM mixevals as Mixeval where availability='public' or Mixeval.creator_id=" . $userID)
-            : false;
-    }
+	}*/
 }
-
-?>

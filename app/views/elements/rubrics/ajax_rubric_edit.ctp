@@ -17,7 +17,7 @@ $default_options = array('type' => 'text',
                         );
 ?>
 
-<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+<table class="form-table">
 <tr class="tableheader" align="center">
   <td valign="top">Rubric Preview</td>
 
@@ -53,6 +53,7 @@ $default_options = array('type' => 'text',
     <?php echo $this->Form->input('RubricsCriteria.'.$i.'.RubricsCriteriaComment.'.$j.'.id', array('type' => 'hidden'))?>
     <div>Mark: <?php echo $this->Form->text('criteria_mark_'.$i.'_'.$j, array('size' =>3,
                                                                               'readonly' => true,
+                                                                              'id' => 'RubricsCriteriaMark'.$i.$j,
                                                                              ))?></div>
   </td>
 	<?php endfor;?>
@@ -61,7 +62,7 @@ $default_options = array('type' => 'text',
   <?php echo $this->Form->input('RubricsCriteria.'.$i.'.multiplier', 
                                 array('options' => array_combine(range(1,15), range(1,15)),
                                       'style' => 'width:50px;',
-                                      'onChange' => 'calculateMarks('.$LOM_num.','.$criteria_num.','.$zero_mark.');',
+                                      'onChange' => 'calculateMarks('.$LOM_num.','.$criteria_num.','.$zero_mark.', "RubricsCriteria");',
                                       'label' => false,
                                       'before' => '',
                                       'after' => '',
@@ -79,6 +80,6 @@ $default_options = array('type' => 'text',
 </table>
 
 <script type="text/javascript">
-  calculateMarks("<?php echo $LOM_num?>", "<?php echo $criteria_num?>", "<?php echo $zero_mark?>");  
+  calculateMarks("<?php echo $LOM_num?>", "<?php echo $criteria_num?>", "<?php echo $zero_mark?>", "RubricsCriteria");  
 </script>
 <!-- elements::ajax_rubric_preview end -->

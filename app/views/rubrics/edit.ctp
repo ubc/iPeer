@@ -48,10 +48,16 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
     </tr>
 
     <tr class="tablecell2">
-      <?php echo $this->Form->input('availability', array('id' => 'availability', 'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.',
+      <td>Availability:</td>
+      <?php echo $this->Form->input('availability', array('id' => 'availability',
+                                                          'type' => 'radio',
+                                                          'legend' => false,
                                                           'options' => array('public'=>'Public','private'=>'Private'),
-                                                          'label' => 'Rubric Availability:',
-                                                          'style'=>'width:100px;',
+                                                          'label' => false,
+                                                          'before' => '<td>',
+                                                          'after' => '</td>',
+                                                          'between' => '',
+                                                          'separator' => '&nbsp;',
                                                           'disabled' => $readonly));?>
       <td>Public Allows Rubric Sharing Amongst Instructors</td>
     </tr>
@@ -63,37 +69,13 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
                                                        'size' => 50,
                                                        'disabled' => $readonly));?>
       </td>
-      <td>No Marks Given  for Level of Mastery of 1</td>
+      <td>No Marks Given for Level of Mastery of 1</td>
     </tr>
 
-    <?php if('add' != $this->action && 'copy' != $this->action):?>
-    <tr class="tablecell2">
-      <td id="creator_label">Creator:</td>
-      <td align="left" colspan="2">
-      <?php echo $this->element('users/user_info', 
-                                array('data' => array('id' => $data['Rubric']['creator_id'],
-                                                      'full_name' => $data['Rubric']['creator'])));?>
-      </td>
-    </tr>
-
-    <tr class="tablecell2">
-      <td id="created_label">Create Date:</td>
-      <td align="left" colspan="2"><?php if (!empty($data['Rubric']['created'])) echo ''.$data['Rubric']['created'].''; ?></td>
-    </tr>
-
-    <tr class="tablecell2">
-      <td id="updater_label">Updater:</td>
-      <td align="left" colspan="2">
-      <?php echo $this->element('users/user_info', 
-                                array('data' => array('id' => $data['Rubric']['updater_id'],
-                                                      'full_name' => $data['Rubric']['updater'])));?>
-      </td>
-    </tr>
-
-    <tr class="tablecell2">
-      <td id="updated_label">Update Date:</td>
-      <td align="left" colspan="2"><?php if (!empty($data['Rubric']['modified'])) echo ''.$data['Rubric']['modified'].''; ?></td>
-    </tr>
+    <?php if('view' == $this->action):?>
+      <?php echo $this->element('creator_block', 
+                                array('data' => $data['Rubric'],
+                                     ));?>
     <?php endif; ?>
 
     <tr class="tablecell2">

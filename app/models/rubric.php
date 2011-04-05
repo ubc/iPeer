@@ -79,7 +79,7 @@ class Rubric extends EvaluationBase
    * comment. This function also remove the associations that exists in database 
    * but not passed through parameter. 
    * 
-   * @param mixed $data data to be saved 
+   * @param array $data data to be saved 
    * @access public
    * @return void
    */
@@ -136,7 +136,7 @@ class Rubric extends EvaluationBase
     unset($data['RubricsCriteria']);
 
     if(!$this->saveAll($data)) {
-      $this->errorMessage = __('Failed to save Rubric with Level of Mastery!', true);
+      //$this->errorMessage = __('Failed to save Rubric with Level of Mastery!', true);
       return false;
     }
 
@@ -162,7 +162,7 @@ class Rubric extends EvaluationBase
 
       // save
       if(!$this->RubricsCriteria->saveAll($criteria_data)) {
-        $this->errorMessage = __('Failed to save rubric criterias!', true);
+        //$this->errorMessage = __('Failed to save rubric criterias!', true);
         return false;
       }
     }

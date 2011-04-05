@@ -202,10 +202,10 @@ class RubricsController extends AppController
 		} else {
 			//check to see if user has clicked preview
 			if(!empty($this->params['form']['preview'])) {
-				$this->set('data', $this->params['data']);
+				$this->set('data', $this->data);
 			} else {
         if($this->__processForm()) {
-          $this->Session->setFlash(__('The rubric was updated successfully'));
+          $this->Session->setFlash(__('The rubric evaluation was updated successfully'));
           $this->redirect('index');
         }
       }
