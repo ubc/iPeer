@@ -824,7 +824,7 @@ class UsersController extends AppController
                    "Return-Path: $from\n" .
                    "CC:\n" .
                    "BCC:\n";
-
+            $body = preg_replace('/\<br(\s*)?\/?\>/i',chr(13).chr(10),$body);
             $result = @mail($to, $subject, $body, $headers);
             return $result;
         }
