@@ -90,7 +90,7 @@
                   </tr>
                   <tr>
                     <td width="130">Password Reset Email Message</td>
-                    <td width="337" align="left"><?php echo $html->textarea('SysParameter/system.password_reset_email', array('id'=>'password_reset_email',  'class'=>'validate required TEXT_FORMAT super_admin_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'value'=>htmlentities('Dear <username>, <br> Your iPeer password has been reset to \'<newpassword>\'. <br><br> iPeer Administrator'), 'cols'=>'40', 'rows'=>'10'))?></td>
+                    <td width="337" align="left"><?php echo $html->textarea('SysParameter/system.password_reset_mail', array('id'=>'password_reset_mail',  'class'=>'validate required TEXT_FORMAT super_admin_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'value'=>htmlentities('Dear <username>, <br> Your iPeer password has been reset to \'<newpassword>\'. <br><br> iPeer Administrator'), 'cols'=>'40', 'rows'=>'10'))?></td>
                     <td width="663" class="error"/>
                   </tr>
                   </table>

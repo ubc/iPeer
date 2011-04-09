@@ -409,7 +409,7 @@ class LoginoutController extends AppController
 				// save new md5 sum to database
 				if ($this->User->save($user)) {
 					// set email parameters
-					$email_msg_param = $this->sysContainer->getParamByParamCode('system.password_reset_email');
+					$email_msg_param = $this->sysContainer->getParamByParamCode('system.password_reset_mail');
 					$email_msg = $email_msg_param['parameter_value'];
 					$from_param = $this->sysContainer->getParamByParamCode('system.admin_email');
 					$from = $from_param['parameter_value'];
@@ -428,7 +428,7 @@ class LoginoutController extends AppController
 						$this->set('message', 'Password reset request sent.');
 						$this->set('student_no', $studentNo);
 						$this->set('email', $email);
-						$this->render('login');
+						$this->redirect('login');
 						return;
 					}
 					else {

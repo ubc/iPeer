@@ -4,6 +4,7 @@ Changelog from 2.2.1
 1) Fixed a bug that missing group 1 when release groups from teammaker(survey)
 2) Fixed a bug that ajax list is not working when magic_quote_gpc is set to ON
 3) Fixed a bug that password is updated when student is added to another course
+4) Fixed a bug that users receive empty email when resetting password by themselves
 
 Changelog from 2.2
 1) Fixed a bug pagination on evaluation result list failed on IE
