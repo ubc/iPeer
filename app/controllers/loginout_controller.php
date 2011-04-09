@@ -428,7 +428,7 @@ class LoginoutController extends AppController
 						$this->set('message', 'Password reset request sent.');
 						$this->set('student_no', $studentNo);
 						$this->set('email', $email);
-						$this->redirect('login');
+						$this->redirect('loginout/login');
 						return;
 					}
 					else {
