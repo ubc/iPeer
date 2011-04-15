@@ -187,13 +187,13 @@ class ExportHelperComponent extends Object
           case 4://mixeval
 
             $score_tmp = $this->EvaluationMixeval->getReceivedTotalScore($groupEventId,$userId);
-#Text data for specific questions is inside the userResults variable
+            #Text data for specific questions is inside the userResults variable
             $userResults = $this->EvaluationMixeval->getResultsDetailByEvaluatee($groupEventId,$userId);
             $data[$i]['students'][$j]['score'] = !isset($score_tmp[0]['received_total_score'])?'':$score_tmp[0]['received_total_score'];
             $data[$i]['students'][$j]['comments'] = '';
 
-#Here we add some generic information to the mixedEvalNumeric variable. First we add the name of the person being evaluated in this particular mixed eval(evaluatee)
-#then we sample index 0 of the userResults array to just get the number of numeric questions. Then we can make column headers for each question (1,2,3...)
+            #Here we add some generic information to the mixedEvalNumeric variable. First we add the name of the person being evaluated in this particular mixed eval(evaluatee)
+            #then we sample index 0 of the userResults array to just get the number of numeric questions. Then we can make column headers for each question (1,2,3...)
             global $mixedEvalNumeric;
             $nameArray = $this->User->findUserByid($userId);
             $name=$nameArray['User']['first_name'] . ' ' . $nameArray['User']['last_name'];
@@ -201,8 +201,8 @@ class ExportHelperComponent extends Object
             $tempEvaluatee = '';
             $counter = 0;
 
-#go through userResults just to get the number of numeric questions.
-#YES we could combine this with the other loop but I'm running out of time and this is so much easier.
+            #go through userResults just to get the number of numeric questions.
+            #YES we could combine this with the other loop but I'm running out of time and this is so much easier.
             foreach($userResults as $comment){
               if(!isset($comment['EvaluationMiexevalDetail']['question_comment'])){
                 if(is_null($comment['EvaluationMixevalDetail']['question_comment'])){

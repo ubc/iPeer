@@ -265,7 +265,7 @@ class EvaluationMixevalHelperComponent extends Object
         $matrix = array();
         $groupQuestionAve = array();
 
-        foreach($evalResult AS $index => $value) {
+        foreach($evalResult as $index => $value) {
             $evalMarkArray = $value;
             $evalTotal = 0;
             $mixevalQuestion = array();
@@ -274,7 +274,7 @@ class EvaluationMixevalHelperComponent extends Object
                 $grade_release = 1;
                 $detailPOS = 0;
 
-                foreach($evalMarkArray AS $row ){
+                foreach($evalMarkArray as $row ){
                     $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
                     if ($evalMark!=null) {
                     //print_r($evalMark);
@@ -324,7 +324,7 @@ class EvaluationMixevalHelperComponent extends Object
                 }
             }
             //Get Ave Question Grade
-            foreach ($mixevalQuestion AS $criIndex => $criGrade) {
+            foreach ($mixevalQuestion as $criIndex => $criGrade) {
                 if (!isset($groupQuestionAve[$criIndex])) {
                     $groupQuestionAve[$criIndex] = 0;
                 }
@@ -336,7 +336,7 @@ class EvaluationMixevalHelperComponent extends Object
         }
 
         //Get Group Ave Question Grade
-        foreach ($groupQuestionAve AS $groupIndex => $groupGrade) {
+        foreach ($groupQuestionAve as $groupIndex => $groupGrade) {
             $ave = $groupGrade / count($evalResult);
             $groupQuestionAve[$groupIndex] = $ave;
         }
