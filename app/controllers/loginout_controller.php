@@ -399,7 +399,7 @@ class LoginoutController extends AppController
 			else {
 				// generate random password
 				$new_password = $this->NeatString->randomPassword(6);
-				$user['User']['password'] =  md5($new_password);
+				$user['User']['password'] =  $new_password;
 
 				if ($errmsg != '') {
 					$this->set('errmsg', $errmsg);

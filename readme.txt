@@ -1,4 +1,7 @@
-iPeer 2.2.2
+iPeer 2.2.2.1
+
+Changelog from 2.2.2
+1) Fixed password reset double hash bug
 
 Changelog from 2.2.1
 1) Fixed a bug that missing group 1 when release groups from teammaker(survey)
