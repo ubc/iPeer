@@ -50,6 +50,8 @@ class Mixeval extends EvaluationBase
                      );
   function __construct($id = false, $table = null, $ds = null) {
     parent::__construct($id, $table, $ds);
+    $this->virtualFields['lickert_question_max'] = sprintf('SELECT count(*) as lickert_question_max FROM mixevals_questions as q WHERE q.mixeval_id = %s.id AND q.question_type LIKE "S"', $this->alias);
+    $this->virtualFields['prefill_question_max'] = sprintf('SELECT count(*) as prefill_question_max FROM mixevals_questions as q WHERE q.mixeval_id = %s.id AND q.question_type LIKE "T"', $this->alias);
     $this->virtualFields['total_question'] = sprintf('SELECT count(*) as total_question FROM mixevals_questions as q WHERE q.mixeval_id = %s.id', $this->alias);
     $this->virtualFields['total_marks'] = sprintf('SELECT sum(multiplier) as sum FROM mixevals_questions as q WHERE q.mixeval_id = %s.id', $this->alias);
   }

@@ -190,8 +190,13 @@ class MixevalsController extends AppController
 	}
 
   function deleteQuestion($question_id) {
-    $this->layout = false;
+    $this->autoRender = false;
     $this->MixevalsQuestion->deleteAll(array('id' => $question_id), true);
+  }
+
+  function deleteDescriptor($descriptor_id) {
+    $this->autoRender = false;
+    $this->MixevalsQuestionDesc->delete(array('id' => $descriptor_id));
   }
 
 	function edit($id) {

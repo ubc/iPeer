@@ -52,17 +52,6 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 
 
     <tr class="tablecell2">
-      <?php echo $this->Form->input('scale_max', array('id' => 'scale-max', 'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.',
-                                                       'options' => array_combine(range(2,10), range(2,10)),
-                                                       'default' => 3,
-                                                       'label' => 'Level of Scale:',
-                                                       'style'=>'width:50px;',
-                                                       'disabled' => $readonly));?>
-      <td>&nbsp;</td>
-    </tr>
-
-
-    <tr class="tablecell2">
       <td>Availability:</td>
       <?php echo $this->Form->input('availability', array('id' => 'availability',
                                                           'type' => 'radio',

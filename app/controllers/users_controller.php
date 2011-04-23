@@ -1000,6 +1000,7 @@ class UsersController extends AppController
       $this->Email->from = $from;
       $this->Email->to = $to;
       $this->Email->subject = $subject;
+      $body = preg_replace('/\<br(\s*)?\/?\>/i',chr(13).chr(10),$body);
       return $this->Email->send($body);
     }
 

@@ -645,6 +645,7 @@ table.content-table {
   height: 160px;
   margin: 0.8em 0 0.8em 0;
   overflow: auto;
+  position: relative;
 }
 
 .question-tab {
@@ -689,7 +690,60 @@ table.content-table {
   cursor: pointer;
 }
 
-textarea.question-title, textarea.question-descriptor {
-  width: 97%;
+textarea.question-title-textarea, textarea.question-descriptor {
+  width: 100%;
   height: 4em; 
+}
+
+.question-title {
+  width: 97%;
+}
+
+.question-instruction-textarea {
+  width: 97%;
+}
+
+.descriptor-title {
+  margin: 5px 0 3px 0;
+}
+
+.descriptors {
+  overflow: auto;
+  height: auto;
+  white-space: nowrap;
+}
+
+.descriptor {
+  width: 150px;
+  display: inline-block;
+  white-space: normal;
+  margin: 0 10px 0 0;
+}
+
+.scale-weight {
+  float: right;
+  width: 90px;
+  text-align: right;
+  margin-right: 15px;
+}
+
+.remove-descriptor-button {
+  float: right;
+}
+
+.text-button {
+  cursor: pointer;
+}
+
+#summary {
+  text-align: right;
+  background-color: #EAEAEA;
+}
+
+#summary #total {
+  width: 30px;
+}
+
+#controls {
+  text-align: right;
 }

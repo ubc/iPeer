@@ -52,7 +52,7 @@ class EvaluationMixeval extends AppModel
     function getReceivedTotalScore($grpEventId=null, $evaluatee=null) {
         return $this->find('grp_event_id=' . $grpEventId .
              ' AND evaluatee=' . $evaluatee,
-             'SUM(score) AS received_total_score');
+             'AVG(score) AS received_total_score');
     }
 
     // get total evaluator each member recieved
