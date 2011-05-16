@@ -95,7 +95,6 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
                                            'onClick' => 'javascript:location.href=\''.$this->Html->url('edit/'.$data['Mixeval']['id'], true).'\';'));
             break;
           default:
-            echo $this->Form->submit(__('Preview (Update Format)', true), array('Name'=>'preview', 'div' => false));
             echo $this->Form->submit(__('Save', true), array('id' => 'submit', 'Name' => 'submit', 'div' => false));
           }?>
       </td>
@@ -127,10 +126,3 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 <?php endif;?>
 
 <?php echo $this->Form->end()?>
-
-
-<script type="text/javascript">
-$('scale-max').observe('change', function(event){
-  $('submit').disable();
-})
-</script>

@@ -8,6 +8,8 @@
  * @license		OPPL
  *
  */
+App::import('Model', 'GroupEvent');
+
 class SearchHelperComponent
 {
   var $components = array('sysContainer', 'EvaluationHelper');

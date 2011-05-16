@@ -205,6 +205,7 @@ class MixevalsController extends AppController
                                                         'contain' => array('Question.Description',
                                                                           )));
 		} else {
+      var_dump($this->data);exit;
 			//check to see if user has clicked preview
 			if(empty($this->params['form']['preview'])) {
         if($this->__processForm()) {

@@ -136,6 +136,7 @@ class ClassRegistry {
 					$_this->map($alias, $class);
 					return $model;
 				}
+
 				if (class_exists($class) || App::import($type, $pluginPath . $class)) {
 					${$class} =& new $class($settings);
 				} elseif ($type === 'Model') {
