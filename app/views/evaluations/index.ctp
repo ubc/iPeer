@@ -15,6 +15,7 @@
 </table>
 </form>
 <?php
+//var_dump('eval ind');
 echo $ajax->observeForm('searchForm', array('update'=>'eval_table', 'url'=>"/evaluations/search", 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');"))
 ?>
 <a name="list"></a>
