@@ -128,7 +128,7 @@
 		}
 		echo '<tr class="tableheader2">';
 		echo '<td colspan="'.($LOM_num+1).'" align="right">Total Marks: </td>';
-		echo '<td><input type="text" name="total_marks" id="total_marks" class="input" value='.$criteria_num.' size="5" readonly></td>';
+		echo '<td><input type="text" name="total_marks" id="total" class="input" value='.$criteria_num.' size="5" readonly></td>';
 		echo "</tr>";
 		?>
   </table>

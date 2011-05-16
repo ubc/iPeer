@@ -441,7 +441,6 @@ class EvaluationMixevalHelperComponent extends Object
 
     //Get Detail information on Mixeval score
 		if ($displayFormat == 'Detail') {
-//echo 'ss';
 		  $mixevalQuestion = $this->MixevalsQuestion->getQuestion($mixeval['Mixeval']['id']);
 		  foreach ($mixevalQuestion AS $row) {
         $question = $row['MixevalsQuestion'];

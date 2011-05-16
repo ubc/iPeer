@@ -83,7 +83,7 @@
 		}
 		echo '<tr class="tableheader2">';
 		echo '<td colspan="'.($scale_default).'" align="right">Total Marks: </td>';
-		echo '<td align="center"> <input type="text" name="data[Mixeval][total_marks]" id="total_marks" class="input" value="'.$total_mark.'" size="5" readonly></td>';
+		echo '<td align="center"> <input type="text" name="data[Mixeval][total_marks]" id="total" class="input" value="'.$total_mark.'" size="5" readonly></td>';
 		echo "</tr>";
 		?>
   <tr>
