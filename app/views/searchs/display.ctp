@@ -1,6 +1,7 @@
 <?php
 switch ($display)
 {
+
   case 'evaluation':
   $params = array('controller'=>'searchs', 'data'=>$data, 'paging'=>$paging, 'sticky'=>$sticky);
   echo $this->element('searchs/evaluation_search_panel', $params);
@@ -17,6 +18,7 @@ switch ($display)
     break;
 
   default:
+ // 	var_dump('three');
   $params = array('controller'=>'searchs', 'data'=>$data, 'paging'=>$paging);
   echo $this->element('searchs/evaluation_search_panel', $params);
 
