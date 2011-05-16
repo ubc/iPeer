@@ -209,6 +209,9 @@ class EvaluationsController extends AppController
 
     function index ($message="")
     {
+    	
+    $currentUser = $this->User->getCurrentLoggedInUser();
+	$this->set('currentUser', $currentUser);
         // Make sure the present user is not a student
         $this->rdAuth->noStudentsAllowed();
 
