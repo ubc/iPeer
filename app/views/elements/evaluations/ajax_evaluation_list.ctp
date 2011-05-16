@@ -1,5 +1,6 @@
 <!-- elements::ajax_evaluation_list start -->
 <div id="ajax_update">
+
 <?php $pagination->loadingId = 'loading';?>
 <?php if($pagination->set($paging)):?>
 <?php endif;?>
@@ -11,7 +12,8 @@
 	<table width="95%" border="0" cellspacing="2" cellpadding="4" bgcolor="#FFFFFF">
 	  <tr class="tableheader">
 	    <th><?php echo $pagination->sortLink('ID',array('id','desc'))?></th>
-	    <?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
+	   <?php ?> 
+<?php if($currentUser['role'] == 'A' || $currentUser['role'] == 'I'):?>
 	        <th>View</th>
 	    <?php endif;?>
 	    <?php if (isset($display) && $display == 'search') { ?>
@@ -36,14 +38,17 @@
   		  <?php echo $evaluation['id'] ?>
   	    </td>
   	    <td align="center">
-  	    <?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
+  	    <?php if($currentUser['role'] == 'A' || $currentUser['role'] == 'I'):?>
   		    <a href="<?php echo $this->webroot.$this->theme.'evaluations/view/'.$evaluation['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
   	    <?php endif;?>
   	    </td>
   	    <?php
   	    if (isset($display) && $display == 'search') { ?>
   		  <td>
-  		    <?php echo $sysContainer->getCourseName($evaluation['course_id']); ?>
+  		    <?php 
+  	
+  		//    echo $sysContainer->getCourseName($evaluation['course_id']); 
+  		  echo $names[$i]; ?>
   	    </td>
   	    <?php } ?>
 <!--  		  <td>
