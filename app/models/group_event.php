@@ -76,7 +76,7 @@ class GroupEvent extends AppModel
   	  if (empty($eventId) || is_null($eventId)) {
   	  	return;
   	  }
-	  $tmp = $this->find('all','group_id != 0 AND event_id='.$eventId, 'id, group_id, event_id, marked, grade');
+	  $tmp = $this->find('all', array('conditions' => 'group_id != 0 AND event_id='.$eventId, 'id, group_id, evvent_id, marked, grade'));
 	  return $tmp;
   }
 
@@ -156,13 +156,13 @@ class GroupEvent extends AppModel
                                     FROM '.$eventTypeEval[$eventTypeId].'
                                     WHERE event_id='.$eventId.'
                                     GROUP BY grp_event_id, evaluatee
-                                    HAVING (SUM(score)/COUNT(evaluatee)) < '.$maxPercent.'*(SELECT total_marks
+                                    HAVING (SUM(score)/COUNT(evaluatee)) < '.$maxPercent.'*(SELECT (SELECT sum(multiplier) as sum FROM rubrics_criterias as rc WHERE rc.rubric_id = id ) 
                                                                                             FROM '.$eventType[$eventTypeId].'
                                                                                             WHERE id IN (SELECT template_id AS id
                                                                                                          FROM events
                                                                                                          WHERE id = GroupEvent.event_id)
                                                                                             )
-                                    AND    (SUM(score)/COUNT(evaluatee)) > '.$minPercent.'*(SELECT total_marks
+                                    AND    (SUM(score)/COUNT(evaluatee)) > '.$minPercent.'*(SELECT (SELECT sum(multiplier) as sum FROM rubrics_criterias as rc WHERE rc.rubric_id = id )
                                                                                             FROM '.$eventType[$eventTypeId].'
                                                                                             WHERE id IN (SELECT template_id AS id
                                                                                                          FROM events
