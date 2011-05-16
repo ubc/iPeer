@@ -33,7 +33,14 @@ class EvaluationSubmission extends AppModel
         $condition = 'EvaluationSubmission.submitted = 1 AND GroupMember.group_id='.$groupId.' AND EvaluationSubmission.grp_event_id='.$groupEventId;
         $fields = 'Count(EvaluationSubmission.submitter_id) AS count';
         $joinTable = array(' LEFT JOIN groups_members as GroupMember ON GroupMember.user_id=EvaluationSubmission.submitter_id');
-        return $this->find('all',$condition, $fields, null, null, null, null, $joinTable );
+       // return $this->find('all',$condition, $fields, null, null, null, null, $joinTable );
+        
+        
+        return    $this->find('all', array('conditions' => $condition, 
+                                            'fields' => $fields, 
+                                            'order' =>null, 
+                                            'joins' => $joinTable 
+                                            ));
 	}
 
 	function numCountInEventCompleted($eventId=null) {
