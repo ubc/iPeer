@@ -63,7 +63,7 @@ class HabtamableBehavior extends ModelBehavior {
      return false;
    }
 
-   $searchableConditions = implode('.', Set::flatten(array_keys($query['conditions'])));
+$searchableConditions = implode('.', Set::flatten(array_keys(array($query['conditions']))));
   
    return strpos($searchableConditions, $model_name) !== false; 
  }
