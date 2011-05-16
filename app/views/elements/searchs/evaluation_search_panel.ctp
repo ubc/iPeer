@@ -1,4 +1,6 @@
-<?php echo $html->script('datepicker')?>
+<?php echo $html->script('datepicker');
+//var_dump($this->params);
+?>
 <form name="frm" id="frm" method="POST">
 <input type="hidden" id="search_type" name="search_type" value="<?php echo $display?>"/>
 <table width="95%"  border="0" cellspacing="2" cellpadding="4">
@@ -22,12 +24,12 @@
             	  <table width="100%"><tr align="left">
           				<td width="10%" align="left">FROM:</td>
           				<td width="40%" align="left">
-                    <?php echo $form->input('Search/due_date_begin', array('size'=>'50','class'=>'input', 'style'=>'width:75%;','value'=>(isset($sticky['due_date_begin']))? $sticky['due_date_begin']:'')) ?>
+                    <?php echo $form->input('Search.due_date_begin', array('size'=>'50','class'=>'input',  'label'=> false, 'style'=>'width:75%;','value'=>(isset($sticky['due_date_begin']))? $sticky['due_date_begin']:'')) ?>
                 	</td>
 
                 	<td width="10%" align="left">&nbsp;&nbsp;TO:</td>
                 	<td width="40%" align="left">
-                		<?php echo $form->input('Search/due_date_end', array('size'=>'50','class'=>'input', 'style'=>'width:75%;','value'=>(isset($sticky['due_date_end']))? $sticky['due_date_end']:'')) ?>
+                		<?php echo $form->input('Search.due_date_end', array('size'=>'50','class'=>'input', 'label'=> false, 'style'=>'width:75%;','value'=>(isset($sticky['due_date_end']))? $sticky['due_date_end']:'')) ?>
                 	</td>
             	  </tr>
             	  </table>
@@ -40,11 +42,11 @@
             	  <table width="100%"><tr align="left">
           				<td width="10%" align="left">FROM:</td>
           				<td width="40%" align="left">
-                		<?php echo $form->input('Search/release_date_begin', array('size'=>'50','class'=>'input', 'style'=>'width:75%;','value'=>(isset($sticky['release_date_begin']))? $sticky['release_date_begin']:'')) ?>
+                		<?php echo $form->input('Search.release_date_begin', array('size'=>'50', 'label'=> false, 'class'=>'input', 'style'=>'width:75%;','value'=>(isset($sticky['release_date_begin']))? $sticky['release_date_begin']:'')) ?>
                 	</td>
                 	<td width="10%" align="left">&nbsp;&nbsp;TO:</td>
                 	<td width="40%" align="left">
-                		<?php echo $form->input('Search/release_date_end', array('size'=>'50','class'=>'input', 'style'=>'width:75%;','value'=>(isset($sticky['release_date_end']))? $sticky['release_date_end']:'')) ?>
+                		<?php echo $form->input('Search.release_date_end', array('size'=>'50',  'label'=> false, 'class'=>'input', 'style'=>'width:75%;','value'=>(isset($sticky['release_date_end']))? $sticky['release_date_end']:'')) ?>
                 	</td>
             	  </tr>
             	  </table>
@@ -72,7 +74,9 @@
 
 <div id="search_result">
 <?php
-$params = array('controller'=>'searchs', 'data'=>$data, 'paging'=>$paging, 'display'=>'search');
+
+$params = array('controller'=>'searchs', 'data'=>$data, 'paging'=>$paging, 'display'=>'search', array('currentUser'=>$currentUser), array('names'=>$names));
+//echo $this->element('evaluations/ajax_evaluation_list', array('currentUser'=>$currentUser));
 echo $this->element('evaluations/ajax_evaluation_list', $params);
 ?>
 </div>

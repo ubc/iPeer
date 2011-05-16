@@ -55,11 +55,11 @@
             <td><table width="100%"><tr align="left">
           				<td width="10%">FROM:</td>
           				<td width="40%">
-                		<?php echo $html->input('Search/mark_from', array('size'=>'50','class'=>'input', 'style'=>'width:75%;','value'=>$sticky['mark_from'])) ?>&nbsp;&nbsp;&nbsp;
+                		<?php echo $form->input('Search/mark_from', array('size'=>'50','class'=>'input', 'style'=>'width:75%;','value'=>$sticky['mark_from'])) ?>&nbsp;&nbsp;&nbsp;
                 	</td>
                 	<td width="10%">&nbsp;&nbsp;TO:</td>
                 	<td width="40%">
-                		<?php echo $html->input('Search/mark_to', array('size'=>'50','class'=>'input', 'style'=>'width:75%;','value'=>$sticky['mark_to'])) ?>&nbsp;&nbsp;&nbsp;
+                		<?php echo $form->input('Search/mark_to', array('size'=>'50','class'=>'input', 'style'=>'width:75%;','value'=>$sticky['mark_to'])) ?>&nbsp;&nbsp;&nbsp;
                 	</td>
             	  </tr>
             	  </table>
