@@ -55,7 +55,7 @@
             <td id="releasedate_msg" class="error">&nbsp;</td>
           </tr>
           <tr class="tablecell2">
-            <td colspan="3"><div align="center"><?php echo $ajax->submit('Search',array('url'=>'/searchs/display','update'=>'search_table')) ?>
+            <td colspan="3"><div align="center"><?php echo $form->submit('Search',array('url'=>'/searchs/searchEvaluation')) ?>
         	  <input type="button" name="Reset" value="Reset" onClick="window.location.href=window.location.href;">
             </div></td>
           </tr>
@@ -75,7 +75,7 @@
 <div id="search_result">
 <?php
 
-$params = array('controller'=>'searchs', 'data'=>$data, 'paging'=>$paging, 'display'=>'search', array('currentUser'=>$currentUser), array('names'=>$names));
+$params = array('controller'=>'searchs', 'data'=>$data, 'display'=>'search', array('currentUser'=>$currentUser), array('names'=>$names));
 //echo $this->element('evaluations/ajax_evaluation_list', array('currentUser'=>$currentUser));
 echo $this->element('evaluations/ajax_evaluation_list', $params);
 ?>

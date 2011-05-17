@@ -76,7 +76,7 @@ class GroupEvent extends AppModel
   	  if (empty($eventId) || is_null($eventId)) {
   	  	return;
   	  }
-	  $tmp = $this->find('all', array('conditions' => 'group_id != 0 AND event_id='.$eventId, 'id, group_id, evvent_id, marked, grade'));
+	  $tmp = $this->find('all', array('conditions' => array('group_id !=' => 0, 'event_id' => $eventId), 'field' => array('id', 'group_id', 'event_id', 'marked', 'grade')));
 	  return $tmp;
   }
 

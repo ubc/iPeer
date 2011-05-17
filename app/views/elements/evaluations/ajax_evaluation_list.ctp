@@ -1,17 +1,29 @@
 <!-- elements::ajax_evaluation_list start -->
 <div id="ajax_update">
 
-<?php $pagination->loadingId = 'loading';?>
-<?php if($pagination->set($paging)):?>
-<?php endif;?>
+<?php //$pagination->loadingId = 'loading';?>
+<?php //if($pagination->set($paging)):?>
+<?php //endif;?>
 	<table width="95%"  border="0" cellspacing="2" cellpadding="4">
       <tr>
-        <td><div align="right" id="page-numbers"><?php echo $pagination->show('Show ',null,'eval_table')?></div></td>
+        <td><div align="right" id="page-numbers">
+        <?php
+            //echo "<br/>Display".$paginator->link(' 10  ', array('limit' => 10));
+            //echo $paginator->link('25  ', array('limit' => 25));
+            //echo $paginator->link('50  ', array('limit' => 50));
+            //echo $paginator->link('all', array('limit' => $this->Paginator->params['paging']['Event']['count']))." results per page";
+        ?>
+                <b>Page Size: </b>
+                <input type="radio" id="15" onclick="window.location= window.location+'/limit:15';" /><label for="15">15</label>
+                <input type="radio" id="30" onclick="window.location= window.location+'/limit:30';" /><label for="30">30</label>
+                <input type="radio" id="90" onclick="window.location= window.location+'/limit:90';" /><label for="90">90</label>
+                <input type="radio" id="270" onclick="window.location= window.location+'/limit:270';" /><label for="270">270</label>
+        </div></td>
       </tr>
     </table>
 	<table width="95%" border="0" cellspacing="2" cellpadding="4" bgcolor="#FFFFFF">
 	  <tr class="tableheader">
-	    <th><?php echo $pagination->sortLink('ID',array('id','desc'))?></th>
+	    <th><?php echo $this->Paginator->sort('ID','Event.id')?></th>
 	   <?php ?> 
 <?php if($currentUser['role'] == 'A' || $currentUser['role'] == 'I'):?>
 	        <th>View</th>
@@ -20,11 +32,11 @@
 	    <th>Course</th>
 	    <?php } ?>
 <!--	    <th>Email <br>All Groups</th>-->
-	    <th><?php echo $pagination->sortLink('Evaluation Event Title',array('title','desc'))?></th>
+	    <th><?php echo $this->Paginator->sort('Evaluation Event Title','title')?></th>
 	    <th>Event Type</th>
-	    <th><?php echo $pagination->sortLink('Due Date',array('due_date','desc'))?></th>
+	    <th><?php echo $this->Paginator->sort('Due Date','due_date')?></th>
 	    <th>Released?</th>
-	    <th><?php echo $pagination->sortLink('Self Evaluation',array('self_eval','desc'))?></th>
+	    <th><?php echo $this->Paginator->sort('Self Evaluation','self_eval')?></th>
 	  </tr>
   	<?php $i = 0;?>
 	  <?php
@@ -84,14 +96,20 @@
 
 <table width="95%"  border="0" cellspacing="0" cellpadding="4">
   <tr>
-    <td width="33%" align="left"><?php echo $pagination->result('Results: ')?></td>
+    <td width="33%" align="left"><?php //Display page infomation
+	echo '<br/>'.$this->Paginator->counter(array(
+		'format' => 'Page %page% of %pages%, showing %current% records out of %count% total<br/>'
+	));?></td>
     <td width="33%"></td>
     <td width="33%" align="right">
-<?php if($pagination->set($paging)):?>
-		<?php echo $pagination->prev('Prev')?>
-		<?php echo $pagination->numbers()?>
-		<?php echo $pagination->next('Next')?>
-<?php endif;?>
+<?php	
+	//Prev page link
+        echo $this->Paginator->prev('Prev ',null,' ',array('class' => 'disabled'));
+	//Shows the page numbers
+	echo $this->Paginator->numbers();
+	//Next page link
+        echo $this->Paginator->next(' Next',null,' ',array('class' => 'disabled'));
+?>
 	</td>
   </tr>
 </table>

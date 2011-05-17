@@ -8,7 +8,7 @@ class SearchsController extends AppController
  *
  * @var $uses
  */
-  var $uses =  array('User', 'UserCourse', 'Event', 'GroupEvent', 'Group', 'EvaluationSubmission', 'Course','Personalize', 'GroupsMembers');
+        var $uses =  array('GroupEvent', 'User', 'UserCourse', 'Event', 'Group', 'EvaluationSubmission', 'Course','Personalize', 'GroupsMembers');
 	var $show;
 	var $sortBy;
 	var $direction;
@@ -17,7 +17,7 @@ class SearchsController extends AppController
 	var $Sanitize;
 	var $functionCode = 'ADV_SEARCH';
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
-	var $components = array('rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework', 'SearchHelper','sysContainer');
+	var $components = array('rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework', 'Search','sysContainer', 'EvaluationHelper');
 
 	
 	
@@ -36,160 +36,79 @@ class SearchsController extends AppController
 		parent::__construct();
 	}
 
+        function  beforeFilter() {
+            parent::beforeFilter();
+            $currentUser = $this->User->getCurrentLoggedInUser();
+            $this->set('currentUser', $currentUser);
+            $coursesList = $this->sysContainer->getMyCourseList();
+            $this->set('coursesList', $coursesList);
+
+            $role = $this->Auth->user('role');
+            $personalizeData = $this->Personalize->find('all',array('conditions' =>'user_id = '.$this->Auth->user('id')));
+            $this->userPersonalize->setPersonalizeList($personalizeData);
+            if ($personalizeData && $this->userPersonalize->inPersonalizeList('Search.ListMenu.Limit.Show')) {
+                $this->show = $this->userPersonalize->getPersonalizeValue('Search.ListMenu.Limit.Show');
+                $this->set('userPersonalize', $this->userPersonalize);
+            } else {
+              $this->show = '10';
+              $this->update($attributeCode = 'Search.ListMenu.Limit.Show',$attributeValue = $this->show);
+            }
+        }
 	function index($msg='') {
-	$currentUser = $this->User->getCurrentLoggedInUser();
-	$this->set('currentUser', $currentUser);
-		
-    $role = $this->Auth->user('role');  
-  	$personalizeData = $this->Personalize->find('all',array('conditions' =>'user_id = '.$this->Auth->user('id')));
-    $this->userPersonalize->setPersonalizeList($personalizeData);
-  	if ($personalizeData && $this->userPersonalize->inPersonalizeList('Search.ListMenu.Limit.Show')) {
-       $this->show = $this->userPersonalize->getPersonalizeValue('Search.ListMenu.Limit.Show');
-       $this->set('userPersonalize', $this->userPersonalize);
-  	} else {
-  	  $this->show = '10';
-      $this->update($attributeCode = 'Search.ListMenu.Limit.Show',$attributeValue = $this->show);
-  	}
-    $this->set('message', $msg);
-    //General Home Rendering for Admin and Instructor
-    if ($role == $this->User->USER_TYPE_ADMIN || $role == $this->User->USER_TYPE_INSTRUCTOR)
-    {
-    $courses = 	
-      $coursesList = $this->sysContainer->getMyCourseList();
-      $this->set('coursesList', $coursesList);
-	 
-	 
-
-      $searchMartix = $this->SearchHelper->formatSearchEvaluation('', $this->order, $this->show, $this->page, $this->sortBy, $this->direction);
-      
-      $courses = $searchMartix['data'];
-  
-      $i=0;
-      foreach($courses as $row): 
-        $evaluation = $row['Event'];
-        $name[$i] = $this->sysContainer->getCourseName($evaluation['course_id']);
-        $i++;
-        endforeach;
-        $this->set('names', $name);
-      $this->set('data', $searchMartix['data']);
-      $this->set('paging', $searchMartix['paging']);
-      $this->set('display', 'evaluation');
-	 
-    }
-    $this->render('index');
+            $this->set('message', $msg);
+            $this->redirect('/searchs/searchEvaluation');
 	}
 
-  function searchEvaluation(){
-  	$this->params['form']['search_type'] = 'evaluation';
-    $this->display();
-  }
+          function searchEvaluation(){
+                $nibble = $this->Search->setEvaluationCondition($this->params);
+                $sticky = $nibble['sticky'];
+                $condition = $nibble['condition'];
+                $searchMartix = $this->formatSearchEvaluation($condition, $this->sortBy, $this->show);
 
-  function searchResult(){
-    $this->params['form']['search_type'] = 'eval_result';
-    $this->display();
-  }
+                $courses = $searchMartix;
 
-  function searchInstructor(){
-    $this->params['form']['search_type'] = 'instructor';
-    $this->display();
-  }
+                $i=0;
+                foreach($courses as $row):
+                  $evaluation = $row['Event'];
+                  $name[$i] = $this->sysContainer->getCourseName($evaluation['course_id']);
+                  $i++;
+                endforeach;
+                $this->set('names', $name);
+                $this->set('data', $searchMartix);
+                $this->set('display', 'evaluation');
+          }
 
-	function display() {
+          function searchResult(){
 
-	 // if (!isset($this->params['form']['select']))
-      $this->layout = false;
-	$currentUser = $this->User->getCurrentLoggedInUser();
-	$this->set('currentUser', $currentUser);
-    if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-    	$personalizeData = $this->Personalize->find('all', array('conditions'=> 'user_id = '.$this->Auth->user('id')));
-    	if ($personalizeData) {
-    	   $this->userPersonalize->setPersonalizeList($personalizeData);
-         $this->show = $this->userPersonalize->getPersonalizeValue('Search.ListMenu.Limit.Show');
-         $this->set('userPersonalize', $this->userPersonalize);
-    	}
-    }
-    $coursesList = $this->sysContainer->getMyCourseList();
-    $this->set('coursesList', $coursesList);
-    
-     $courses = 	
-      $coursesList = $this->sysContainer->getMyCourseList();
-      $this->set('coursesList', $coursesList);
-	 
-	 
+                $nibble = $this->Search->setEvalResultCondition($this->params);
+                $sticky = $nibble['sticky'];
+                $eventId = $nibble['event_id'];
+                $status = $nibble['status'];
+                $maxPercent = $nibble['maxPercent'];
+                $minPercent = $nibble['minPercent'];
 
-      $searchMartix = $this->SearchHelper->formatSearchEvaluation('', $this->order, $this->show, $this->page, $this->sortBy, $this->direction);
-      
-      $courses = $searchMartix['data'];
-  
-      $i=0;
-      foreach($courses as $row) {
-        $evaluation = $row['Event'];
-        $name[$i] = $this->sysContainer->getCourseName($evaluation['course_id']);
-        $i++;
-      }
-        $this->set('names', $name);
-    
-  
-//print_r($this->params['form']);
-    $search_select = isset($this->params['form']['select']) ? $this->params['form']['select']:$this->params['form']['search_type'];
-    switch ($search_select) {
-      case 'evaluation':
-        $nibble = $this->SearchHelper->setEvaluationCondition($this->params);
-        $sticky = $nibble['sticky'];
-        $condition = $nibble['condition'];
-        $searchMartix = $this->SearchHelper->formatSearchEvaluation($condition, $this->order, $this->show, $this->page, $this->sortBy, $this->direction);
+                $searchMartix = $this->formatSearchEvaluationResult($maxPercent,$minPercent,$eventId,$status, $this->order, $this->sortBy, $this->show);
 
-        $this->set('sticky',$sticky);
-        $this->set('data', $searchMartix['data']);
-        $this->set('paging', $searchMartix['paging']);
-        $this->set('display', 'evaluation');
-        break;
+                $eventList = $this->Auth->user('role') == 'A' ? $this->Event->find('all', array('conditions' => 'event_template_type_id != 3')) : $this->Event->find('all', array('conditions' => 'creator_id = '.$this->Auth->user('id') . ' AND event_template_type_id !=3'));
+                $this->set('sticky', $sticky);
+                $this->set('eventList', $eventList);
+                $this->set('data', $searchMartix['data']);
+                $this->set('paging', $searchMartix['paging']);
+                $this->set('display', 'eval_result');
 
-      case 'eval_result':
-        $nibble = $this->SearchHelper->setEvalResultCondition($this->params);
-        $sticky = $nibble['sticky'];
-        $eventId = $nibble['event_id'];
-        $status = $nibble['status'];
-        $maxPercent = $nibble['maxPercent'];
-        $minPercent = $nibble['minPercent'];
+          }
 
-        $searchMartix = $this->SearchHelper->formatSearchEvaluationResult($maxPercent,$minPercent,$eventId,$status, $this->order, $this->show, $this->page, $this->sortBy, $this->direction);
+          function searchInstructor(){
+                $nibble = $this->Search->setInstructorCondition($this->params);
+                $condition = $nibble['condition'];
+                $sticky = $nibble['sticky'];
 
-        $eventList = $this->Auth->user('role') == 'A' ? $this->Event->find('all', array('conditions' => 'event_template_type_id != 3')) : $this->Event->find('all', array('conditions' => 'creator_id = '.$this->Auth->user('id') . ' AND event_template_type_id !=3'));
-        $this->set('sticky', $sticky);
-        $this->set('eventList', $eventList);
-        $this->set('data', $searchMartix['data']);
-        $this->set('paging', $searchMartix['paging']);
-        $this->set('display', 'eval_result');
-        break;
+                $searchMartix = $this->formatSearchInstructor($condition, $this->sortBy, $this->show);
 
-      case 'instructor':
-      	$nibble = $this->SearchHelper->setInstructorCondition($this->params);
-     //	var_dump($nibble);
-        $condition = $nibble['condition'];
-        $sticky = $nibble['sticky'];
-
-        $searchMartix = $this->SearchHelper->formatSearchInstructor($condition, $this->order, $this->show, $this->page, $this->sortBy, $this->direction);
-        $this->set('sticky', $sticky);
-        $this->set('data', $searchMartix['data']);
-        $this->set('paging', $searchMartix['paging']);
-        $this->set('display', 'instructor');
-     //   var_dump($searchMartix);
-        break;
-
-      default:
-        $searchMartix = $this->SearchHelper->formatSearchEvaluation('', $this->order, $this->show, $this->page, $this->sortBy, $this->direction);
-        $this->set('data', $searchMartix['data']);
-        $this->set('paging', $searchMartix['paging']);
-        $this->set('display', 'evaluation');
-        break;
-    }
-	}
-
-	function update($attributeCode='',$attributeValue='') {
-		if ($attributeCode != '' && $attributeValue != '') //check for empty params
-  		$this->params['data'] = $this->Personalize->updateAttribute($this->Auth->user('id'), $attributeCode, $attributeValue);
-	}
+                $this->set('sticky', $sticky);
+                $this->set('data', $searchMartix);
+                $this->set('display', 'instructor');
+          }
 
   function eventBoxSearch() {
     $this->layout = false;
@@ -200,5 +119,132 @@ class SearchsController extends AppController
   }
     $this->set('eventList',$this->Event->find('all', array ('conditions' => $condition)));
   }
+
+   /*
+   * function formatSearchEvaluation($conditions, $sortBy, $limit)
+   *
+   * This func returns paginated evaluation search result
+   *
+   * @param unknown_type $conditions the conditions
+   * @param unknown_type $sortBy the sortBy
+   * @param unknown_type $limit the limit per page
+   */
+  function formatSearchEvaluation($conditions, $sortBy, $limit) {
+
+    $courseIDs =  $this->sysContainer->getMyCourseIDs();
+    $conditions .= !empty($conditions) ? ' AND course_id IN ('.$courseIDs.')':'course_id IN ('.$courseIDs.')';
+
+    $this->paginate = array(
+                    'conditions' => $conditions,
+                    'fields' => array('*', '(NOW() >= release_date_begin AND NOW() <= release_date_end) AS is_released'),
+                    'order' => 'Event.'.$sortBy,
+                    'limit' => $limit
+    );
+
+    return $this->paginate('Event');
+  }
+
+   /*
+   * function formatSearchInstructor($conditions, $sortBy, $limit)
+   *
+   * This func returns paginated instructor search result
+   *
+   * @param unknown_type $conditions the conditions
+   * @param unknown_type $sortBy the sortBy
+   * @param unknown_type $limit the limit per page
+   */
+  function formatSearchInstructor($conditions='', $sortBy, $limit)
+  {
+    $conditions .= empty($conditions) ? 'role = "I"':' AND role ="I" ';
+
+    $this->paginate = array(
+                    'conditions' => $conditions,
+                    'order' => 'User.'.$sortBy,
+                    'limit' => $limit
+    );
+
+    return $this->paginate('User');
+  }
+
+  /*
+   * function formatSearchEvaluationResult($maxPercent=1,$minPercent=0,$eventId=null,$status=null, $sortBy, $limit)
+   *
+   * This func returns paginated evaluation result search result
+   *
+   * @param unknown_type $maxPercent
+   * @param unknown_type $minPercent
+   * @param unknown_type $eventId
+   * @param unknown_type $status
+   * @param unknown_type $sortBy the sortBy
+   * @param unknown_type $limit the limit per page
+   */
+  function formatSearchEvaluationResult($maxPercent=1,$minPercent=0,$eventId=null,$status=null, $sortBy, $limit) {
+    $matrixAry = array();
+    $this->Event->id = $eventId;
+    $event = $this->Event->read();
+    $evlResult = $event;
+    switch ($status) {
+      case "listNotReviewed":
+        $assignedGroupIDs = $this->GroupEvent->getNotReviewed($eventId);
+        break;
+      case "late":
+        $assignedGroupIDs = $this->GroupEvent->getLate($eventId);
+        break;
+      case "low":
+	      $eventTypeId = $event['Event']['event_template_type_id'];
+	      $assignedGroupIDs = $this->GroupEvent->getLowMark($eventId, $eventTypeId, $maxPercent, $minPercent);
+        break;
+      default:
+          $assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($eventId);
+        break;
+    }
+		if (!empty($assignedGroupIDs)) {
+		  $assignedGroups = array();
+
+			// retrieve string of group ids
+  		for ($i = 0; $i < count($assignedGroupIDs); $i++) {
+  			$groupid = $assignedGroupIDs[$i]['GroupEvent']['group_id'];
+  			$group = $this->Group->find('first', array('conditions' => array('Group.id' => $groupid)));
+  			$assignedGroups[$i] = $group;
+  			//Get Members whom completed evaluation
+    		$memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($group['Group']['id'],
+    		                                                                           $groupid);
+        //Check to see if all members are completed this evaluation
+
+       	$numOfCompletedCount = $memberCompletedNo[0][0]['count'];
+	  		$numMembers=$this->GroupsMembers->find('count', array('conditions' => 'group_id='.$group['Group']['id']));
+        ($numOfCompletedCount == $numMembers) ? $completeStatus = 1:$completeStatus = 0;
+
+
+        //Get release status
+        $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($event['Event']['id'], $group['Group']['id']);
+        $released = $this->EvaluationHelper->getGroupReleaseStatus($groupEvent);
+
+        $assignedGroups[$i]['Group']['complete_status'] = $completeStatus;
+        $assignedGroups[$i]['Group']['num_completed'] = $numOfCompletedCount;
+        $assignedGroups[$i]['Group']['num_members'] = $numMembers;
+        $assignedGroups[$i]['Group']['marked'] = $assignedGroupIDs[$i]['GroupEvent']['marked'];
+        $assignedGroups[$i]['Group']['grade_release_status'] = $released['grade_release_status'];
+        $assignedGroups[$i]['Group']['comment_release_status'] = $released['comment_release_status'];
+
+  		}
+
+		  $evlResult['Evaluation']['assignedGroups'] = $assignedGroups;
+  	}else {
+      $evlResult['Evaluation']['assignedGroups'] = array();
+  	}
+
+    $paging['style'] = 'ajax';
+
+    $paging['count'] = count($assignedGroupIDs);
+    $paging['show'] = array('10','25','50','all');
+    $paging['limit'] = $limit;
+
+    $matrixAry['data'] = $evlResult;
+    $matrixAry['paging'] = $paging;
+
+    return $matrixAry;
+  }
+
 
 }?>

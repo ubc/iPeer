@@ -14,7 +14,7 @@
 
 <?php
 $params = array('controller'=>'searchs', 'data'=>$data, 'currentUser'=>$currentUser);
-echo $this->element('searchs/instructor_search_panel', $params);
+echo $this->element('searchs/evaluation_result_search_panel', $params);
 ?>
 </div>
 	</td>

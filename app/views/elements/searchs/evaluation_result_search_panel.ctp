@@ -67,7 +67,7 @@
             <td id="resultmark_msg" class="error">&nbsp;</td>
           </tr>
           <tr class="tablecell2">
-            <td colspan="3"><div align="center"><?php echo $ajax->submit('Search',array('url'=>'/searchs/display','update'=>'search_table')) ?>
+            <td colspan="3"><div align="center"><?php echo $form->submit('Search',array('url'=>'/searchs/SearchResult')) ?>
         	  <input type="reset" name="Reset" value="Reset" onClick="">
             </div></td>
           </tr>

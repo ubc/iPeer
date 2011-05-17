@@ -54,6 +54,7 @@ class EventsController extends AppController
 
   // Post Process Data : add released column
   function postProcessData($data) {
+  	
     // Check the release dates, and match them up with present date
     if (empty($data)) return $data;
     // loop through each data point, and display it.

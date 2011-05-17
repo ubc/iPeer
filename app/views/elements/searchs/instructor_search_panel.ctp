@@ -29,7 +29,7 @@
             <td id="email_msg" class="error">&nbsp;</td>
           </tr>
           <tr class="tablecell2">
-            <td colspan="3"><div align="center"><?php echo $ajax->submit('Search',array('url'=>'/searchs/display','update'=>'search_table')) ?>
+            <td colspan="3"><div align="center"><?php echo $form->submit('Search',array('url'=>'/searchs/searchInstructor')) ?>
         	  <input type="reset" name="Reset" value="Reset">
             </div></td>
           </tr>
@@ -46,6 +46,6 @@
   </table>
 </form>
 <?php
-$params = array('controller'=>'searchs', 'data'=>$data, 'paging'=>$paging, 'display'=>'search');
+$params = array('controller'=>'searchs', 'data'=>$data, 'display'=>'search');
 echo $this->element('users/ajax_user_list', $params);
 ?>
