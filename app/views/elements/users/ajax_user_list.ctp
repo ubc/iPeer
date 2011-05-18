@@ -1,4 +1,5 @@
 <!-- elements::ajax_user_list end -->
+<?php echo $javascript->link('search.js');?>
 <div id="ajax_update">
 	<table width="95%"  border="0" cellspacing="2" cellpadding="4">
       <tr>
@@ -10,10 +11,9 @@
         </td>
         <td align="right">
           <b>Page Size: </b>
-                <input type="radio" id="15" onclick="window.location= window.location+'/limit:15';" /><label for="15">15</label>
-                <input type="radio" id="30" onclick="window.location= window.location+'/limit:30';" /><label for="30">30</label>
-                <input type="radio" id="90" onclick="window.location= window.location+'/limit:90';" /><label for="90">90</label>
-                <input type="radio" id="270" onclick="window.location= window.location+'/limit:270';" /><label for="270">270</label>
+            <?php
+                echo $form->input('radio', $this->Paginator->pageSize($this->params["paging"]["User"]["options"]["limit"]));
+            ?>
         </td>
       </tr>
     </table>
@@ -33,19 +33,37 @@
 	  
 	  <?php foreach($data as $row): $user = $row['User']; ?>
 	  <tr class="tablecell">
-	    <td align="center">  
-		    <a href="<?php echo '/users/view/'.$user['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
-
-	    <?php if($currentUser['role'] == 'A' || $currentUser['role'] != 'I' && ($currentUser['role'] == 'A' || $currentUser['role'] == 'I')):?>
-	      <a href="<?php echo '/users/edit/'.$user['id']?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
-
-   	    <?php if($currentUser['role'] == 'A'):?>
-          <a href="<?php echo '/users/delete/'.$user['id'] ?>" onclick="return confirm('Are you sure you want to delete user &ldquo;<?php echo $user['username']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
-  	   	<?php endif;?>
-
-	      <a href="<?php echo '/users/resetPassword/'.$user['id']?>" onclick="return confirm('Are you sure you want to reset password for user &ldquo;<?php echo $user['username']?>&rdquo;?')"><?php echo $html->image('icons/key_email.gif',array('border'=>'0','alt'=>'Reset password'))?></a>
-
-	    <?php endif;?>
+	    <td align="center">
+            <?php
+                  echo $html->link(
+                            $html->image("icons/view.gif", array("border"=>"0","alt"=>"View")),
+                            "/users/view/".$user['id'],
+                            array('escape'=>false)
+                  );
+            ?>
+	    <?php if($currentUser['role'] == 'A' || $currentUser['role'] != 'I' && ($currentUser['role'] == 'A' || $currentUser['role'] == 'I')):
+                   echo $html->link(
+                                    $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit')),
+                                    "/users/edit/".$user['id'],
+                                    array('escape'=>false)
+                   );
+            ?>
+   	    <?php if($currentUser['role'] == 'A'):
+                  echo $html->link(
+                                    $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete')),
+                                    "/users/delete/".$user['id'],
+                                    array('onClick' => "return confirm('Are you sure you want to delete user &ldquo;".$user["username"]."&rdquo;?')",'escape'=>false)
+                  );
+                  endif;
+            ?>
+            <?php
+                  echo $html->link(
+                                    $html->image('icons/key_email.gif',array('border'=>'0','alt'=>'Reset password')),
+                                    "/users/resetPassword/".$user['id'],
+                                    array('onClick' => "return confirm('Are you sure you want to reset password for user &ldquo;".$user["username"]."&rdquo;?')",'escape'=>false)
+                  );
+                  endif;
+            ?>
 	    </td>
 		  <td><?php echo $user['username'] ?></td>
 		  <td><?php echo User::getRoleText($user['role'])?></td>

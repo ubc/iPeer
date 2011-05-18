@@ -296,10 +296,6 @@ class Course extends AppModel
     }
   }
 
-  function getEnrolledStudentCount($course_id) {
-    return $this->Instructor->find('count', array('conditions' => array('Enrolment.id' => $course_id)));
-  }
-
   function getCourseByCourse($course, $params) {
     return $this->find('all', array_merge(array('conditions' => array('course' => $course)), $params));
   }

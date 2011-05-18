@@ -810,4 +810,24 @@ class PaginatorHelper extends AppHelper {
 		}
 		return $out;
 	}
+
+        /*
+         * function pageSize($default)
+         *
+         * return array of options for radio input of page limit size per page
+         *
+         * @param $default default selected value
+         *
+         * by Tae
+         */
+        function pageSize($default){
+            return array(
+                            "type"      => "radio",
+                            "options"   => array("15" => "15", "30" => "30", "90" => "90", "270" => "270"),
+                            "onclick" => "window.location= getUrl(document.activeElement.value);",
+                            "default" => $default,
+                            "label" => "radio",
+                            "div" => false
+                        );
+        }
 }

@@ -1,23 +1,14 @@
 <!-- elements::ajax_evaluation_list start -->
+<?php echo $javascript->link('search.js');?>
 <div id="ajax_update">
 
-<?php //$pagination->loadingId = 'loading';?>
-<?php //if($pagination->set($paging)):?>
-<?php //endif;?>
 	<table width="95%"  border="0" cellspacing="2" cellpadding="4">
       <tr>
         <td><div align="right" id="page-numbers">
-        <?php
-            //echo "<br/>Display".$paginator->link(' 10  ', array('limit' => 10));
-            //echo $paginator->link('25  ', array('limit' => 25));
-            //echo $paginator->link('50  ', array('limit' => 50));
-            //echo $paginator->link('all', array('limit' => $this->Paginator->params['paging']['Event']['count']))." results per page";
-        ?>
-                <b>Page Size: </b>
-                <input type="radio" id="15" onclick="window.location= window.location+'/limit:15';" /><label for="15">15</label>
-                <input type="radio" id="30" onclick="window.location= window.location+'/limit:30';" /><label for="30">30</label>
-                <input type="radio" id="90" onclick="window.location= window.location+'/limit:90';" /><label for="90">90</label>
-                <input type="radio" id="270" onclick="window.location= window.location+'/limit:270';" /><label for="270">270</label>
+            <b>Page Size: </b>
+            <?php                
+                echo $form->input('radio', $this->Paginator->pageSize($this->params["paging"]["Event"]["options"]["limit"]));
+            ?>
         </div></td>
       </tr>
     </table>

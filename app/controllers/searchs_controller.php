@@ -50,7 +50,7 @@ class SearchsController extends AppController
                 $this->show = $this->userPersonalize->getPersonalizeValue('Search.ListMenu.Limit.Show');
                 $this->set('userPersonalize', $this->userPersonalize);
             } else {
-              $this->show = '10';
+              $this->show = '15';
               $this->update($attributeCode = 'Search.ListMenu.Limit.Show',$attributeValue = $this->show);
             }
         }

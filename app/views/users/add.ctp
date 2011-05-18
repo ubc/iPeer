@@ -142,7 +142,7 @@
         <!-- Back / Save -->
         <tr class="tablecell2">
             <td colspan="3" align="center">
-            <input type="button" value="Back" onClick="javascript:window.location='../index'";>
+            <input type="button" value="Back" onClick="javascript:window.location='../users/index'";>
             <?php if (!$readonly) echo $this->Form->submit('Save', array('div' => false));?>
             </td>
         </tr>

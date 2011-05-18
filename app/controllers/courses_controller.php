@@ -131,8 +131,8 @@ class CoursesController extends AppController
     $course = $this->Course->find('first', array('conditions' => array('id' => $id), 'recursive' => 2));
     $this->set('data', $course);
     $this->set('course_id', $id);
-
-    $students = $this->Course->getEnrolledStudentCount($id);
+    
+    $students = $course['Course']['student_count'];
     $this->set('studentCount', $students);;
 
     $this->set('groupCount', count($course['Group']));
