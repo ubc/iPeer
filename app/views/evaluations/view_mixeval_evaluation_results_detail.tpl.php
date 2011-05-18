@@ -88,7 +88,6 @@ $groupAve = 0;
 
       	//totals section
       	echo '<td width="30%">';
-      //	if ($allMembersCompleted) {
         if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
       		echo number_format($memberScoreSummary[$member['User']['id']]['received_ave_score'], 2);
       		$receviedAvePercent = $memberScoreSummary[$member['User']['id']]['received_ave_score'] / $mixeval['Mixeval']['total_marks'] * 100;
@@ -134,7 +133,7 @@ $groupAve = 0;
       echo "</b></td>";
     }		?>
 	</tr>
-  <tr class="tablecell2" align="center"><td colspan="<?php echo count($groupMembers) +1; ?>">
+  <tr class="tablecell2" align="center"><td colspan="<?php echo $mixeval['Mixeval']["lickert_question_max"] +2; ?>">
       <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
 			  <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
 			  <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />

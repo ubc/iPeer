@@ -90,3 +90,8 @@ $params = array('controller'=>'mixevals','data'=>$this->controller->MixevalHelpe
 echo $this->renderElement('mixevals/view_mixeval_details', $params);
 ?>
 </div>
+
+
+<script>
+calculateMarks('<?php echo $scale_default?>','<?php echo $question_default?>','<?php echo $zero_mark?>');
+</script>

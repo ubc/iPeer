@@ -171,7 +171,8 @@ class EvaluationMixevalHelperComponent extends Object
                     $ttlEvaluatorCount = $this->EvaluationMixeval->getReceivedTotalEvaluatorCount($event['group_event_id'],$userId);
                     if ($ttlEvaluatorCount[0]['ttl_count'] >0 ) {
                         $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0]['received_total_score'];
-                        $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0]['received_total_score'] / $ttlEvaluatorCount[0]['ttl_count'];
+                        //temp fix: should divied by number of questions
+                        $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0]['received_total_score'];// / $ttlEvaluatorCount[0]['ttl_count'];
                     }
                     foreach($mixevalResult AS $row ) {
                         $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
@@ -202,8 +203,8 @@ class EvaluationMixevalHelperComponent extends Object
                          $userId);
                     if ($ttlEvaluatorCount[0]['ttl_count'] > 0 ) {
                         $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0]['received_total_score'];
-                        $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0]['received_total_score'] /
-                        $ttlEvaluatorCount[0]['ttl_count'];
+                        //temp fix: should divied by number of questions
+                        $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0]['received_total_score'];// / $ttlEvaluatorCount[0]['ttl_count'];
                     }
                     foreach($mixevalResult AS $row ) {
                         $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
