@@ -26,10 +26,10 @@
             <td>
               <table width="100%" border="0" cellspacing="2" cellpadding="2">
               <?php if (!empty($group_data)) :
-                    foreach($group_data as $row): $user = $row['users']?>
+                    foreach($group_data as $row): $user = $row['User']?>
                   <tr>
                   <td width="15"><?php echo $html->image('icons/email_icon.gif',array('border'=>'0','alt'=>'Email'))?></td>
-                  <td><a href="../../users/view/<?php echo $user['id']?>"><?php echo $user['last_name'].', '.$user['first_name']?></a><br></td>
+                  <td><a href="../../users/view/<?php echo $user['id']?>"><?php echo $user['full_name']?></a><br></td>
                  </tr>
 				      <?php endforeach;
                             else: echo "No members in this group.";
@@ -51,7 +51,7 @@
             <td width="45%">
               <table width="403" border="0" cellspacing="0" cellpadding="4">
               <tr>
-                <td colspan="2"><?php echo $html->link('Edit this Group', '/groups/edit/'.$data['Group']['id']); ?> | <?php echo $html->link('Back to Group Listing', '/groups/index/'.$rdAuth->courseId); ?></td>
+                <td colspan="2"><?php echo $html->link('Edit this Group', '/groups/edit/'.$data['Group']['id']); ?> | <?php echo $html->link('Back to Group Listing', '/groups/index/'.$course_id); ?></td>
               </tr>
               </table>
             </td>

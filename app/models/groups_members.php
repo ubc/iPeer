@@ -45,12 +45,12 @@ class GroupsMembers extends AppModel
 
   // returns the user_id of all members in a specific group
   function getMembers($id){
-    $tmp = $this->find('all',array('conditions' => array('group_id' => $id),
-                                   'fields' => array('id')));
-    $tmp['member_count'] = count($tmp); 
-
-	  return $tmp;
+    $tmp = $this->find('list',array('conditions' => array('group_id' => $id),
+                                   'fields' => array('user_id')));
+    //$tmp['member_count'] = count($tmp);
+    return $tmp;
   }
+
 
 
   function countMembers($groupID) {

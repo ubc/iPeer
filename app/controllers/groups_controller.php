@@ -187,8 +187,13 @@ class GroupsController extends AppController
 		$this->set('data', $this->data);
     $this->set('course_id', $this->data['Group']['course_id']);
     $this->set('readonly', true);
-    $this->set('members', $this->Group->getMembersByGroupId($id, 'list'));
-    $this->render('edit');
+    $this->set('members', $this->GroupsMembers->getMembers($id));
+    $members = $this->GroupsMembers->getMembers($id);
+    $this->User->recursive =0;
+    $group_data = $this->User->find('all', array('conditions' => array('id'=>$members),
+                                            'fields' => array('id','full_name')
+        ));
+    $this->set('group_data', $group_data);
   }
 
   function add ($course_id) {
