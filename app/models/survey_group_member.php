@@ -30,7 +30,11 @@ class SurveyGroupMember extends AppModel
     var $name = 'SurveyGroupMember';
 
     function getIdsByGroupSetId($groupSetId=null) {
-      return $this->find('all','group_set_id='.$groupSetId,'id');
+      //return $this->find('all','group_set_id='.$groupSetId,'id');
+        return $this->find('all', array(
+            'conditions' => array('group_set_id' => $groupSetId),
+            'fields' => array('SurveyGroupMember.id')
+        ));
     }
 }
 

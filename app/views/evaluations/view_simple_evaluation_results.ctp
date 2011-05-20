@@ -144,7 +144,7 @@ else { // if no members are present
     <td width="10" height="32" align="center">Comment Sections</td>
   </tr>
 	<tr>
-	<td width="100%" height="32"><?php echo $html->image('/icons/instructions.gif',array('alt'=>'instructions'));?>
+	<td width="100%" height="32"><?php echo $html->image('icons/instructions.gif',array('alt'=>'instructions'));?>
 		<b> Instructions:</b><br>
 		1. Click evaluator's name to view his/her evaluation on group members.<br>
 		2. Check the "Released" checkbox and click "Save Changes" to release individual comments , or

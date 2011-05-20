@@ -79,7 +79,7 @@ class Response extends AppModel {
 	function prepData($data, $questionID)
 	{
 		$tmp = $this->find('all', array('conditions' => array('question_id' => $questionId), 
-                                    'fields' => 'response'));
+                                    'fields' => array('response')));
 
 		for( $i=0; $i<$data['Question']['count']; $i++ ){
 			$data['Question']['response_'.($i+1)] = $tmp[$i]['Response']['response'];

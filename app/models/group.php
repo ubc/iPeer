@@ -131,7 +131,10 @@ class Group extends AppModel
   }
 
   function getCourseGroupCount($courseId=null) {
-    return $this->find('course_id='.$courseId, 'COUNT(DISTINCT id) as total');
+    //return $this->find('course_id='.$courseId, 'COUNT(DISTINCT id) as total');
+      return $this->find('count', array(
+          'conditions' => array('course_id' => $courseId)
+      ));
   }
 
 	// gets all students in a specific group

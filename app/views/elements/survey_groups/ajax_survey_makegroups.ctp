@@ -36,7 +36,7 @@
       <table>
         <tr>
           <td align="center">
-          <?php echo $html->image('/img/survey/correlate.gif',array('alt'=>'correlate')); ?>
+          <?php echo $html->image('survey/correlate.gif',array('alt'=>'correlate')); ?>
           <td bgcolor="#00ff00"><input type="radio" name="weight[<?php echo $q['id'];?>]" value="-5"></td>
           <td bgcolor="#30ff30"><input type="radio" name="weight[<?php echo $q['id'];?>]" value="-4"></td>
           <td bgcolor="#60ff60"><input type="radio" name="weight[<?php echo $q['id'];?>]" value="-3"></td>
@@ -48,7 +48,7 @@
           <td bgcolor="#ff6f6f"><input type="radio" name="weight[<?php echo $q['id'];?>]" value="3"></td>
           <td bgcolor="#ff3f3f"><input type="radio" name="weight[<?php echo $q['id'];?>]" value="4"></td>
           <td bgcolor="#ff0f0f"><input type="radio" name="weight[<?php echo $q['id'];?>]" value="5"></td>
-          <td align="center"><?php echo $html->image('/img/survey/differentiate.gif',array('alt'=>'differentiate')); ?></td>
+          <td align="center"><?php echo $html->image('survey/differentiate.gif',array('alt'=>'differentiate')); ?></td>
         </tr>
         <tr><td>Gather<br />Similar</td><td colspan="11" align="center">Ignore</td>
           <td align="center">Gather<br />Dissimilar</td></tr>

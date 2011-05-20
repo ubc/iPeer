@@ -31,7 +31,10 @@ class Personalize extends AppModel
 
   function updateAttribute($userId='', $attributeCode='', $attributeValue = null)
   {
-    $data = $this->find("user_id = ".$userId." AND attribute_code = '".$attributeCode."' ");
+    //$data = $this->find("user_id = ".$userId." AND attribute_code = '".$attributeCode."' ");
+    $data = $this->find('first', array(
+        'conditions' => array('user_id' => $userId, 'attribute_code' => $attributeCode)
+    ));
     $tmpValue = '';
     if (isset($data) && $attributeValue == null) {
       $tmpValue = $data['Personalize']['attribute_value'];

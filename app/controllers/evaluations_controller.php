@@ -35,9 +35,8 @@ class EvaluationsController extends AppController
     var $order;
     var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
     var $Sanitize;
-    var $uses = array('EvaluationRubric', 'EvaluationRubricDetail', 'EvaluationSubmission',
-                      'Event', 'EvaluationSimple', 'SimpleEvaluation', 'Rubric', 'Group',
-                      'GroupEvent', 'GroupsMembers','RubricsLom','RubricsCriteria',
+    var $uses = array('GroupEvent', 'EvaluationRubric', 'EvaluationRubricDetail', 'EvaluationSubmission',
+                      'Event', 'EvaluationSimple', 'SimpleEvaluation', 'Rubric', 'Group', 'GroupsMembers','RubricsLom','RubricsCriteria',
                       'RubricsCriteriaComment', 'Personalize', 'User','SurveyQuestion',
                       'Question','Response','Survey','SurveyInput','Course','MixevalsQuestion',
                       'EvaluationMixeval','EvaluationMixevalDetail');
@@ -73,9 +72,9 @@ class EvaluationsController extends AppController
                 $groupEventID = $entry['GroupEvent']['id'];
                 $eventID = $entry['Event']['id'];
                 $completedEvaluations =
-                    $this->EvaluationSubmission->find(count,"`grp_event_id`=$groupEventID");
+                    $this->EvaluationSubmission->find('count',array('conditions' => array('grp_event_id'=>$groupEventID)));
                 $totalMembers =
-                    $this->GroupsMembers->find(count,"`group_id`=$groupID");
+                    $this->GroupsMembers->find('count',array('conditions' => array('group_id'=>$groupID)));
 
                 $custom['completion'] = "<center><img border=0 src='" . $this->webroot . "img/icons/" .
                     // Display Check or X for completion

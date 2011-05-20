@@ -12,19 +12,31 @@ class EvaluationMixevalDetail extends AppModel
 									 );
   
 	function getByEvalMixevalIdCritera($MixevalId=null, $question=null){
-	  $sql = 'evaluation_mixeval_id='.$MixevalId;
-	  if ($question != null) {
-	    $sql .= ' AND question_number='.$question;
-	  }
-		return $this->find($sql);
+//	  $sql = 'evaluation_mixeval_id='.$MixevalId;
+//	  if ($question != null) {
+//	    $sql .= ' AND question_number='.$question;
+//	  }
+//		return $this->find($sql);
+            $conditions = array('evaluation_mixeval_id' => $MixevalId);
+            if ($question != null)
+                $conditions = array('question_number' => $question);
+            return $this->find('first', array(
+                'conditions' => $condtions
+            ));
 	}
 	
 	function getAllByEvalMixevalId($MixevalId=null, $question=null){
-	  $sql = 'evaluation_mixeval_id='.$MixevalId;
-	  if ($question != null) {
-	    $sql .= ' AND question_number='.$question;
-	  }
-		return $this->find('all',$sql);
+//	  $sql = 'evaluation_mixeval_id='.$MixevalId;
+//	  if ($question != null) {
+//	    $sql .= ' AND question_number='.$question;
+//	  }
+//		return $this->find('all',$sql);
+          $conditions = array('evaluation_mixeval_id' => $MixevalId);
+            if ($question != null)
+                $conditions = array('question_number' => $question);
+            return $this->find('all', array(
+                'conditions' => $condtions
+            ));
 	}	
 }
 

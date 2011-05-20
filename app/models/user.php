@@ -217,11 +217,17 @@ class User extends AppModel
   }
 
   function getUserByEmail($email='') {
-    return $this->find( "email='" . $email );
+    //return $this->find( "email='" . $email );
+      return $this->find('first', array(
+          'conditions' => array('email' => $email)
+      ));
   }
 
   function findUserByEmailAndStudentNo($email='', $studentNo='') {
-    return $this->find("email='" .$email . "' AND student_no='" . $studentNo . "'");
+    //return $this->find("email='" .$email . "' AND student_no='" . $studentNo . "'");
+      return $this->find('first', array(
+          'conditions' => array('email' => $email, 'student_no'=> $studentNo)
+      ));
   }
 
   /**

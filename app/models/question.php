@@ -88,7 +88,10 @@ class Question extends AppModel
   }
 
   function getTypeById($id=null) {
-    $type = $this->find('id='.$id,'type');
+    $type = $this->find('first', array(
+        'conditions' => array('Question.id' => $id),
+        'fields' => array('type')
+    ));
     return $type['Question']['type'];
   }
 }

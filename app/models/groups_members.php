@@ -37,7 +37,10 @@ class GroupsMembers extends AppModel
 		$this->id = null;
 	}
 	foreach ($deleteUsers as $userId) {
-		$tmp = $this->find($conditions = array('group_id'=>$id,'user_id'=>$userId), $fields = 'id');
+		$tmp = $this->find('first',array(
+                    'conditions' => array('group_id'=>$id,'user_id'=>$userId),
+                    'fields' => array('GroupMember.id')
+                    ));
 		$this->del($tmp['GroupsMembers']['id']);
 		$this->id = null;
 	}
@@ -65,15 +68,28 @@ class GroupsMembers extends AppModel
   {
      if ($selfEval)
      {//Include self on evaluation
-        $condition = 'GroupsMembers.group_id='.$groupId;
+        $condition = array('GroupsMembers.group_id' => $groupId);
      }
      else {
-        $condition = 'GroupsMembers.group_id='.$groupId.' AND User.id<>'.$userId;
+        $condition = array('GroupsMembers.group_id' => $groupId, 'User.id<>' => $userId);
      }
-    $fields = 'User.id, User.role, User.username, User.first_name, User.last_name, User.student_no, User.title, User.email';
-    $joinTable = array(' RIGHT JOIN users as User ON User.id=GroupsMembers.user_id');
-
-    return $this->find('all',$condition, $fields, 'User.last_name ASC', null, null, null, $joinTable );
+//    $fields = 'User.id, User.role, User.username, User.first_name, User.last_name, User.student_no, User.title, User.email';
+//    $joinTable = array(' RIGHT JOIN users as User ON User.id=GroupsMembers.user_id');
+//
+//    return $this->find('all',$condition, $fields, 'User.last_name ASC', null, null, null, $joinTable );
+    return $this->find('all', array(
+                    'conditions' => $condition,
+                    'fields' => array('User.id', 'User.role', 'User.username', 'User.first_name', 'User.last_name', 'User.student_no', 'User.title', 'User.email'),
+                    'joins' => array(
+                        array(
+                            'table' => 'users',
+                            'alias' => 'User',
+                            'type' => 'RIGHT',
+                            'conditions' => array('User.id' => 'GroupMember.user_id')
+                        )
+                    ),
+                    'order' => 'User.last_name ASC'
+                ));
 
   }
 }

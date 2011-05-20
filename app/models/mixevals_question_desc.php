@@ -60,9 +60,12 @@ class MixevalsQuestionDesc extends AppModel
 
   // function to return the question's descriptor
   function getQuestionDescriptor($mixevalId, $questionNum){
-		$data = $this->find('all','mixeval_id='.$mixevalId.' AND question_num='.$questionNum, null, 'scale_level ASC');
+		//$data = $this->find('all','mixeval_id='.$mixevalId.' AND question_num='.$questionNum, null, 'scale_level ASC');
 
-  	return $data;
+  	return $this->find('array', array(
+            'conditions' => array('mixeval_id' => $mixevalId, 'question_num' => $questionNum),
+            'order' => 'scale_level ASC'
+        ));
   }
 }
 ?>

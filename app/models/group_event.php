@@ -65,7 +65,11 @@ class GroupEvent extends AppModel
 		$this->id = null;
 	}
 	foreach ($deleteGroups as $groupId) {
-		$tmp = $this->find($conditions = array('event_id'=>$id,'group_id'=>$groupId), $fields = 'id');
+		//$tmp = $this->find($conditions = array('event_id'=>$id,'group_id'=>$groupId), $fields = 'id');
+                $tmp = $this->find('first',array(
+                    'conditions' => array('event_id'=>$id,'group_id'=>$groupId),
+                    'fields' => array('GroupEvent.id')
+                ));
 		$this->del($tmp['GroupEvent']['id']);
 		$this->id = null;
 	}
@@ -85,7 +89,9 @@ class GroupEvent extends AppModel
   	  if (empty($eventId) || is_null($eventId)) {
   	  	return;
   	  }
-	  $tmp = $this->find('all',$conditions = 'event_id='.$eventId);
+	  $tmp = $this->find('all',array(
+              'conditions' => array('event_id' => $eventId)
+          ));
 	  return $tmp;
   }
 
@@ -93,26 +99,52 @@ class GroupEvent extends AppModel
   function getGroupEventByEventIdGroupId($eventId=null, $groupId=null){
     if (empty($groupId)||is_null($groupId))
       return;
-	  $tmp = $this->find($conditions = 'event_id='.$eventId.' AND group_id='.$groupId);
+          $tmp = $this->find('first',array(
+              'conditions' => array('event_id' => $eventId, 'group_id' => $groupId)
+          ));
 	  return $tmp;
   }
 
   function getGroupEventByUserId($userId=null, $eventId=null)
   {
-    $condition = 'GroupMember.user_id='.$userId.' AND GroupEvent.event_id='.$eventId;
-    $fields = 'GroupMember.user_id, GroupEvent.group_id, GroupEvent.id, GroupEvent.event_id';
-    $joinTable = array(' RIGHT JOIN groups_members as GroupMember ON GroupMember.group_id=GroupEvent.group_id');
-
-    return $this->find('all',$condition, $fields, null, null, null, null, $joinTable );
+//    $condition = 'GroupMember.user_id='.$userId.' AND GroupEvent.event_id='.$eventId;
+//    $fields = 'GroupMember.user_id, GroupEvent.group_id, GroupEvent.id, GroupEvent.event_id';
+//    $joinTable = array(' RIGHT JOIN groups_members as GroupMember ON GroupMember.group_id=GroupEvent.group_id');
+//
+//    return $this->find('all',$condition, $fields, null, null, null, null, $joinTable );
+    return $this->find('all', array(
+                    'conditions' => array('GroupMember.user_id' => $userId, 'GroupEvent.event_id'=>$eventId),
+                    'fields' => array('GroupMember.user_id', 'GroupEvent.group_id, GroupEvent.id', 'GroupEvent.event_id'),
+                    'joins' => array(
+                        array(
+                            'table' => 'groups_members',
+                            'alias' => 'GroupMember',
+                            'type' => 'RIGHT',
+                            'conditions' => array('GroupMember.group_id' => 'GroupEvent.group_id')
+                        )
+                    )
+                ));
   }
 
   function getMemberCountByEventId($eventId=null)
   {
-    $condition = 'GroupEvent.event_id='.$eventId;
-    $fields = 'Count(GroupMember.user_id) AS count';
-    $joinTable = array(' RIGHT JOIN groups_members as GroupMember ON GroupMember.group_id=GroupEvent.group_id');
+//    $condition = 'GroupEvent.event_id='.$eventId;
+//    $fields = 'Count(GroupMember.user_id) AS count';
+//    $joinTable = array(' RIGHT JOIN groups_members as GroupMember ON GroupMember.group_id=GroupEvent.group_id');
+//
+//    return $this->find('all',$condition, $fields, null, null, null, null, $joinTable );
 
-    return $this->find('all',$condition, $fields, null, null, null, null, $joinTable );
+    return $this->find('count', array(
+                    'conditions' => array('GroupEvent.event_id'=>$eventId),
+                    'joins' => array(
+                        array(
+                            'table' => 'groups_members',
+                            'alias' => 'GroupMember',
+                            'type' => 'RIGHT',
+                            'conditions' => array('GroupMember.group_id' => 'GroupEvent.group_id')
+                        )
+                    )
+                ));
   }
 
   // returns list of group id within the selected Event
@@ -184,17 +216,35 @@ class GroupEvent extends AppModel
 
 
     function getLateGroupMembers($groupEventId) {
-        $conditions ="`EvaluationSubmission`.date_submitted > `Event`.due_date " .
-            "AND `GroupEvent`.`id`=$groupEventId";
+//        $conditions ="`EvaluationSubmission`.date_submitted > `Event`.due_date " .
+//            "AND `GroupEvent`.`id`=$groupEventId";
+//
+//        $joins = array(
+//            "LEFT JOIN `events` AS `Event` ON `GroupEvent`.`event_id`=`Event`.`id`",
+//            "LEFT JOIN `evaluation_submissions` AS `EvaluationSubmission` ON ".
+//                "`GroupEvent`.`id`=`EvaluationSubmission`.`grp_event_id`",
+//        );
+//
+//        $count = $this->find(count,$conditions, (-1), $joins);
+//        return $count;
 
-        $joins = array(
-            "LEFT JOIN `events` AS `Event` ON `GroupEvent`.`event_id`=`Event`.`id`",
-            "LEFT JOIN `evaluation_submissions` AS `EvaluationSubmission` ON ".
-                "`GroupEvent`.`id`=`EvaluationSubmission`.`grp_event_id`",
-        );
-
-        $count = $this->find(count,$conditions, (-1), $joins);
-        return $count;
+        return $this->find('count', array(
+                    'conditions' => array('GroupEvent.id' => $groupEventId, 'EvaluationSubmission.date_submitted >'=>'Event.due_date'),
+                    'joins' => array(
+                        array(
+                            'table' => 'events',
+                            'alias' => 'Event',
+                            'type' => 'LEFT',
+                            'conditions' => array('GroupEvent.event_id' => 'Event.id')
+                        ),
+                        array(
+                            'table' => 'evaluation_submissions',
+                            'alias' => 'EvaluationSubmission',
+                            'type' => 'LEFT',
+                            'conditions' => array('GroupEvent.id' => 'EvaluationSubmission.grp_event_id')
+                        )
+                    )
+                ));
     }
 
   function getLate($eventId) {

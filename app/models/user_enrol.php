@@ -5,9 +5,12 @@ class UserEnrol extends AppModel
 
   function getEnrolledCourses($userId=null)
   {
-    $result = $this->find('all','user_id='.$userId, 'DISTINCT course_id');
+    //$result = $this->find('all','user_id='.$userId, 'DISTINCT course_id');
 
-    return $result;
+    return $this->find('all', array(
+        'conditions' => array('user_id' => $userId),
+        'fields' => array('DISTINCT course_id')
+    ));
   }
 
   function getEnrolledStudentCount($courseId=null) {
@@ -17,7 +20,10 @@ class UserEnrol extends AppModel
   }
 
   function removeStudentFromCourse($user_id=null, $course_id=null) {
-    $course_to_remove = $this->find(array('course_id=' . $course_id, 'user_id=' . $user_id));
+    //$course_to_remove = $this->find(array('course_id=' . $course_id, 'user_id=' . $user_id));
+    $course_to_remove = $this->find('first', array(
+            'conditions' => array('course_id' => $course_id, 'user_id' => $user_id)
+        ));
     return $this->delete($course_to_remove['UserEnrol']['id']);
   }
   

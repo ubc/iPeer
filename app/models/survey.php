@@ -105,7 +105,11 @@ class Survey extends EvaluationBase
   }*/
 
   function getSurveyIdByCourseIdTitle($courseId=null,$title=null) {
-    $tmp = $this->find('course_id='.$courseId.' AND name=\''.$title.'\'','id');
+    //$tmp = $this->find('course_id='.$courseId.' AND name=\''.$title.'\'','id');
+    $tmp = $this->find('first', array(
+        'conditions' => array('course_id' => $courseId, 'name' => $title),
+        'fields' => array('id')
+    ));
     return $tmp['Survey']['id'];
   }
 
@@ -121,6 +125,18 @@ class Survey extends EvaluationBase
     $joinTable = array(' LEFT JOIN (users as Users CROSS JOIN evaluation_submissions as EvaluationSubmission) ON (User.id=EvaluationSubmission.submitter_id');
 
     return $this->find('all',$condition, $fields, null, null, null, null, $joinTable );
+//    return $this->find('all', array(
+//        'conditions' => array('Survey.course_id' => $courseId),
+//        'fields' => array('Survey.id','Survey.name','User.id','User.first_name','User.last_name','User.student_no','EvaluationSubmission.id','EvaluationSubmission.submitted','EvaluationSubmission.date_submitted'),
+//        'joins' => array(
+//            array(
+//                'table' => '',
+//                'alias' => 'User',
+//                'type' => 'LEFT',
+//                'conditions' => array('User.id' => 'EvaluationSubmission.submitter_id')
+//            )
+//        )
+//    ));
   }
 
   function getSurveyTitleById($id=null) {

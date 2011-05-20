@@ -187,23 +187,40 @@ class Event extends AppModel
 
     function getCourseEvent($courseId=null)
     {
-        return $this->find('all','course_id ='.$courseId);
+        //return $this->find('all','course_id ='.$courseId);
+        return $this->find('all', array(
+            'conditions' => array('course_id' => $courseId)
+        ));
+
     }
 
     function getCourseEvalEvent($courseId=null) {
-        return $this->find('all','course_id='.$courseId.' AND event_template_type_id!=3');
+        //return $this->find('all','course_id='.$courseId.' AND event_template_type_id!=3');
+        return $this->find('all', array(
+            'conditions' => array('course_id' => $courseId, 'event_template_type_id !=' => '3')
+        ));
     }
 
     function getCourseEventCount($courseId=null) {
-        return $this->find('course_id='.$courseId, 'COUNT(*) as total');
+        //return $this->find('course_id='.$courseId, 'COUNT(*) as total');
+        return $this->find('count', array(
+            'conditions' => array('course_id' => $courseId)
+        ));
     }
 
     function getSurveyEventIdByCourseIdDescription($courseId=null,$title=null) {
-        return $this->find('course_id='.$courseId.' AND title=\''.$title.'\' AND event_template_type_id=3','id');
+        //return $this->find('course_id='.$courseId.' AND title=\''.$title.'\' AND event_template_type_id=3','id');
+        return $this->find('first', array(
+            'conditions' => array('course_id' => $courseId, 'title' => $title, 'event_template_type_id' => '3'),
+            'fields' => array('Event.id')
+        ));
     }
 
     function getActiveSurveyEvents($courseId=null) {
-        return $this->find('all','course_id='.$courseId.' AND event_template_type_id=3');
+        //return $this->find('all','course_id='.$courseId.' AND event_template_type_id=3');
+        return $this->find('all', array(
+            'conditions' => array('course_id' => $courseId, 'event_template_type_id' => '3')
+        ));
     }
 
   // deprecated function, use event_count attribute instead
@@ -233,11 +250,17 @@ class Event extends AppModel
     $evaluation_mixeval = new EvaluationMixeval();
     $evaluation_mixeval_detail = new EvaluationMixevalDetail();
 
-    $ems = $evaluation_mixeval->find('all','event_id = '.$this->id);
+    //$ems = $evaluation_mixeval->find('all','event_id = '.$this->id);
+    $ems = $evaluation_mixeval->find('all',array(
+        'conditions' => array('event_id' => $this->id)
+    ));
     if(!empty($ems))
     {
     	foreach($ems as $em) {
-    	$emds = $evaluation_mixeval_detail->find('all','evaluation_mixeval_id = '.$em->id);
+    	//$emds = $evaluation_mixeval_detail->find('all','evaluation_mixeval_id = '.$em->id);
+        $emds = $evaluation_mixeval_detail->find('all',array(
+            'conditions' => array('evaluation_mixeval_id' => $em->id)
+        ));
 
     	if(!empty($emds))
     	{
@@ -272,7 +295,10 @@ class Event extends AppModel
    */
   function removeEventsBySurveyId($survey_id)
   {
-    $events = $this->find('all',$this->name.'.event_template_type_id = 3 AND '.$this->name.'.template_id = '.$survey_id);
+    //$events = $this->find('all',$this->name.'.event_template_type_id = 3 AND '.$this->name.'.template_id = '.$survey_id);
+    $events = $this->find('all', array(
+            'conditions' => array($this->name.'.event_template_type_id' => '3' , $this->name.'.template_id' => $survey_id)
+            ));
     if(empty($events)) return true;
 
     foreach($events as $e){
@@ -284,7 +310,9 @@ class Event extends AppModel
     function checkIfNowLate($eventID) {
         if (is_numeric($eventID)) {
             $conditions = "`Event`.`due_date` < now() AND `id`=$eventID";
-            $count = $this->find(count,$conditions);
+            $count = $this->find('count',array(
+                    'conditions' => array(`Event.due_date <` => 'now()' , `Event.id` => $eventID)
+            ));
             return ($count>0);
         } else {
             return false;
