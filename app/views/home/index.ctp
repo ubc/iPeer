@@ -15,8 +15,8 @@
 			  <td colspan="2">
 			    <?php //echo $row['Course']['course'] ;
                                 echo $html->link(
-                                    $html->image("icons/view.gif", array("border"=>"0","alt"=>$row['Course']['course'])).$row['Course']['course'],
-                                    "/courses/view/".$row['Course']['id'],
+                                    $html->image("icons/home.gif", array("border"=>"0","alt"=>$row['Course']['course'])).$row['Course']['course'],
+                                    "/courses/home/".$row['Course']['id'],
                                     array('escape'=>false)
                                 );
                             ?>&nbsp;

@@ -35,7 +35,7 @@
 			  <?php endif;?>
 			</td>
 			<td><?php echo $comingUpEvent['Event']['course'] ?>&nbsp;</td>
-			<td><?php echo $this->controller->Output->formatDate(date("Y-m-d H:i:s", strtotime($comingUpEvent['Event']['due_date']))) ?>&nbsp;</td>
+			<td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($comingUpEvent['Event']['due_date']))) ?>&nbsp;</td>
 			<td><?php
 			  if ($comingUpEvent['Event']['is_late']) {
 			     echo "<font color=\"red\"><b>" . $comingUpEvent['Event']["days_to_due"] . "</b> day(s) !</font>";
@@ -95,8 +95,8 @@
 			  <?php endif;?>
 			</td>
 			<td><?php echo $eventSubmitted['Event']['course'] ?>&nbsp;</td>
-			<td><?php echo $this->controller->Output->formatDate(date("Y-m-d H:i:s", strtotime($eventSubmitted['Event']['due_date']))) ?>&nbsp;</td>
-			<td><?php echo $this->controller->Output->formatDate(date("Y-m-d H:i:s", strtotime($eventSubmitted['Event']['date_submitted']))) ?>&nbsp;</td>
+			<td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($eventSubmitted['Event']['due_date']))) ?>&nbsp;</td>
+			<td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($eventSubmitted['Event']['date_submitted']))) ?>&nbsp;</td>
 		  </tr>
 	  <?php $i++;} ?>
 	  <?php endforeach; ?>

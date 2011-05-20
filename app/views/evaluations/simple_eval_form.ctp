@@ -149,7 +149,7 @@ if ($event['Event']['id']==292) {
     <td>Event Name:</td>
     <td><?php echo $event['Event']['title'] ?></td>
     <td>Due Date:</td>
-    <td><?php echo $this->controller->Output->formatDate(date("Y-m-d H:i:s", strtotime($event['Event']['due_date']))) ?></td>
+    <td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($event['Event']['due_date']))) ?></td>
   </tr>
   <tr class="tablecell2">
     <td>Description:&nbsp;</td>

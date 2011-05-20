@@ -34,7 +34,7 @@
   		  <td>
   	      <?php echo $event['title'] ?>
   	    </td>
-        <td align="center"><?php echo $this->controller->Output->formatDate(date("Y-m-d H:i:s", strtotime($event['due_date']))) ?> </td>
+        <td align="center"><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($event['due_date']))) ?> </td>
   	    <td>
   	      <?php echo $data[$i][0]['is_released']==1? 'YES' : 'NO' ?>
   	    </td>

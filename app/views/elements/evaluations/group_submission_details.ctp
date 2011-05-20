@@ -33,7 +33,7 @@
             <td><?php echo $member['first_name'].' '.$member['last_name'] ?></td>
             <td align="center"><?php
               if ($member['submitted']) {
-                echo $this->controller->Output->formatDate(date("Y-m-d H:i:s", strtotime($member['date_submitted'])));
+                echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($member['date_submitted'])));
               }else {
                 echo "(not submitted)";
               } ?></td>

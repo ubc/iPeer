@@ -181,7 +181,7 @@ class EvaluationsController extends AppController
 
     function view($eventId='') {
         // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
+        //$this->rdAuth->noStudentsAllowed();
         
         // Record the event id into the session
         if (!empty($eventId) && is_numeric($eventId)) {
