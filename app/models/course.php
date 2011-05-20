@@ -300,9 +300,14 @@ class Course extends AppModel
     return $this->find('all', array_merge(array('conditions' => array('course' => $course)), $params));
   }
 
+//  function getCourseByInstructor($instructor_id) {
+//    return $this->find('all', array('conditions' => array('Instructor.id' => $instructor_id),
+//                                    'fields' => array('Course.*')));
+//  }
+
   function getCourseByInstructor($instructor_id) {
-    return $this->find('all', array('conditions' => array('Instructor.id' => $instructor_id),
-                                    'fields' => array('Course.*')));
+    //$this->recursive = 0;
+    return $this->find('all', array('conditions' => array('Course.instructor_id' => $instructor_id)));
   }
 }
 ?>

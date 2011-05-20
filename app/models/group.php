@@ -90,7 +90,7 @@ class Group extends AppModel
                                          'deleteQuery'  => '',
                                          'dependent'    => false,
                                          ),
-                                   'Evnet' =>
+                                   'Event' =>
                                    array('className'    =>  'Event',
                                          'joinTable'    =>  'group_events',
                                          'foreignKey'   =>  'group_id',

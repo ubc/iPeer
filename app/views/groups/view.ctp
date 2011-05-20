@@ -28,7 +28,7 @@
               <?php if (!empty($group_data)) :
                     foreach($group_data as $row): $user = $row['User']?>
                   <tr>
-                  <td width="15"><?php echo $html->image('icons/email_icon.gif',array('border'=>'0','alt'=>'Email'))?></td>
+                  <td width="15"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'Email'))?></td>
                   <td><a href="../../users/view/<?php echo $user['id']?>"><?php echo $user['full_name']?></a><br></td>
                  </tr>
 				      <?php endforeach;

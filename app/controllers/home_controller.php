@@ -32,7 +32,7 @@ class HomeController extends AppController
    *
    * @var $uses
    */
-  var $uses =  array('User', 'UserEnrol', 'UserCourse', 'Event', 'GroupEvent', 'Group', 'EvaluationSubmission', 'Course', 'Role');
+  var $uses =  array('GroupEvent', 'UserEnrol', 'User', 'UserCourse', 'Event', 'Group', 'EvaluationSubmission', 'Course', 'Role');
   var $page;
   var $Sanitize;
   var $functionCode = 'HOME';
@@ -347,23 +347,23 @@ class HomeController extends AppController
 
     $role = $this->Auth->user('role');
     if (isset ($role)) {
-      //General Home Rendering for Admin and Instructor
-      if ($role == $this->User->USER_TYPE_ADMIN || $role == $this->User->USER_TYPE_INSTRUCTOR)
+      //General Home Rendering for Admin
+      if ($role == $this->User->USER_TYPE_ADMIN)
       {
-        $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
+        
         //var_dump($course_list[0]['Instructor']);
 
-        /*$inactiveCourseDetail = array();
-        if ($this->Auth->user('role') == $this->User->USER_TYPE_ADMIN)
-        {
-          $inactiveCourseList = $this->Course->getInactiveCourses();
-          $inactiveCourseDetail = $this->formatCourseList($inactiveCourseList, 'inactive_course');
-        }
-        $this->set('activeCourseDetail', $activeCourseDetail);
-        $this->set('inactiveCourseDetail', $inactiveCourseDetail);*/
-        $this->set('course_list', $this->formatCourseList($course_list));
-        $this->render('index');
+            $inactiveCourseDetail = array();
+            $inactiveCourseList = $this->Course->getInactiveCourses();
+            $inactiveCourseDetail = $this->formatCourseList($inactiveCourseList, 'inactive_course');
 
+            $this->set('course_list', $inactiveCourseDetail);
+            $this->render('index');
+      }////General Home Rendering for Instructor
+      else if($role == $this->User->USER_TYPE_INSTRUCTOR){
+            $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
+            $this->set('course_list', $this->formatCourseList($course_list));
+            $this->render('index');
       }//Student Home Rendering
       else if ($role == $this->User->USER_TYPE_STUDENT) {
 
@@ -508,16 +508,24 @@ class HomeController extends AppController
       //$row['Course']['course'] = $this->sysContainer->getCourseName($row['Course']['id'], 'A');
       for ($i = 0; $i < count($row['Event']); $i++) {
         $event_id = $row['Event'][$i]['id'];
+        //var_dump($this->GroupEvent);
         $row['Event'][$i]['to_review_count'] = $this->GroupEvent->getToReviewGroupEventByEventId($event_id);
-        $completeCount = $this->EvaluationSubmission->numCountInEventCompleted($event_id);
-        $row['Event'][$i]['completed_count'] = $completeCount[0][0]['count'];
+        //$completeCount = $this->EvaluationSubmission->numCountInEventCompleted($event_id);
+        //$row['Event'][$i]['completed_count'] = $completeCount[0][0]['count'];
+        $row['Event'][$i]['completed_count'] = $this->EvaluationSubmission->numCountInEventCompleted($event_id);
+        $this->User->recursive = 0;
+        $row['Instructor'] = $this->User->find('first', array(
+                            'conditions' => array('User.id'=>$row['Course']['instructor_id']),
+                            'fields' => array('User.*') ));
         $totalSum = $this->GroupEvent->getMemberCountByEventId($event_id);
         if ($row['Event'][$i]['event_template_type_id'] == 3) {
-          $count = $this->UserEnrol->getEnrolledStudentCount($row['Course']['id']);
-          //print_r($count);
-          $row['Event'][$i]['student_sum'] = $count[0]['total'];
+              $count = $this->UserEnrol->getEnrolledStudentCount($row['Course']['id']);
+              //print_r($count);
+              //$row['Event'][$i]['student_sum'] = $count[0]['total'];
+              $row['Event'][$i]['student_sum'] = $count;
         } else {
-          $row['Event'][$i]['student_sum'] = $totalSum[0][0]['count'];
+              //$row['Event'][$i]['student_sum'] = $totalSum[0][0]['count'];
+              $row['Event'][$i]['student_sum'] = $count;
         }
       }
 

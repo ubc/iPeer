@@ -44,12 +44,15 @@ class EvaluationSubmission extends AppModel
 	}
 
 	function numCountInEventCompleted($eventId=null) {
-        $condition = 'EvaluationSubmission.submitted = 1 AND EvaluationSubmission.event_id='.$eventId;
-        $fields = 'Count(EvaluationSubmission.submitter_id) AS count';
-        $joinTable = array(' LEFT JOIN groups_members as GroupMember ON GroupMember.user_id=EvaluationSubmission.submitter_id');
-
-       // return $this->find('all',$condition, $fields, null, null, null, null, $joinTable );
-       return $this-> find('all',$condition, $fields, null, null, null, null );
+//        $condition = 'EvaluationSubmission.submitted = 1 AND EvaluationSubmission.event_id='.$eventId;
+//        $fields = 'Count(EvaluationSubmission.submitter_id) AS count';
+//        $joinTable = array(' LEFT JOIN groups_members as GroupMember ON GroupMember.user_id=EvaluationSubmission.submitter_id');
+//
+//       // return $this->find('all',$condition, $fields, null, null, null, null, $joinTable );
+//       return $this-> find('all',$condition, $fields, null, null, null, null );
+            return $this->find('count', array(
+                'conditions' => array('EvaluationSubmission.submitted' => 1, 'EvaluationSubmission.event_id' => $eventId)
+            ));
 
 	}
 

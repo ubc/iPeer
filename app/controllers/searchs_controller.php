@@ -54,6 +54,12 @@ class SearchsController extends AppController
               $this->update($attributeCode = 'Search.ListMenu.Limit.Show',$attributeValue = $this->show);
             }
         }
+
+        function update($attributeCode='',$attributeValue='') {
+                if ($attributeCode != '' && $attributeValue != '') //check for empty params
+                    $this->params['data'] = $this->Personalize->updateAttribute($currentUser->id, $attributeCode, $attributeValue);
+        }
+
 	function index($msg='') {
             $this->set('message', $msg);
             $this->redirect('/searchs/searchEvaluation');

@@ -117,8 +117,7 @@ class GroupEvent extends AppModel
 
   // returns list of group id within the selected Event
   function getToReviewGroupEventByEventId($eventId=null){
-	  $tmp = $this->find(count,$conditions = 'event_id='.$eventId.' AND marked="to review"');
-	  return $tmp;
+	  return $this->find('count', array('conditions'=>array('event_id'=>$eventId, 'marked' => "to review")));
   }
 
   function getLowMark($eventId=null, $eventTypeId=null, $maxPercent=1, $minPercent=0) {

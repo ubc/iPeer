@@ -13,7 +13,13 @@
 
 		  <tr class="tableheader">
 			  <td colspan="2">
-			    <?php echo $row['Course']['course'] ?>&nbsp;
+			    <?php //echo $row['Course']['course'] ;
+                                echo $html->link(
+                                    $html->image("icons/view.gif", array("border"=>"0","alt"=>$row['Course']['course'])).$row['Course']['course'],
+                                    "/courses/view/".$row['Course']['id'],
+                                    array('escape'=>false)
+                                );
+                            ?>&nbsp;
 			  </td>
 		  </tr>
 
@@ -53,7 +59,7 @@
           			     <?php endif;?>       
         			        </a></td>
         			        <td><?php echo $event['completed_count'] . ' of ' . $event['student_sum'] . ' Students</td>';?>
-        			        <td><?php echo $this->DateTime->format($event['due_date'])?></td>
+        			        <td><?php echo Toolkit::formatDate($event['due_date'])?></td>
         			      <?php endforeach;?>
         			    <?php endif;?>
                  </tr>
@@ -79,10 +85,10 @@
             <li>Please <u>add a course</u> from the yellow "Courses" tab above</li>
             <li>Then <U>register students</u> into that course from that courses summary display. This display will avaliable (once the course is created) by clicking on the courses name from most menus .</li>
             <li>Put your students into <u>groups</u> manually, (or, if you have the students complete a survey, iPeer can do it for you, using TeamMaker).
-            <li>To create evaluations, check out the orange wizard link the top right hand corner "iPeer Tutorial Wirard".
+            <li>To create evaluations, check out the orange wizard link the top right hand corner "iPeer Tutorial Wizard".
                 It has detailed movies on how to create evaluations.</li>
     </div>
-    <div style="text-align:right"><a href="#" onClick="javascript:$('short_help').toggle();return false;">( Show short help )</a></div>
+    <div style="text-align:right"><a href="#" onClick="javascript:$('short_help').toggle();return false;">( Show/Hide short help )</a></div>
 
 		<br>
       </div>
