@@ -29,18 +29,31 @@ class MixevalsQuestionDesc extends AppModel
 {
   var $name = 'MixevalsQuestionDesc';
 
+  var $belongsTo = array(
+'MixevalsQuestion' => array(
+		'className' => 'MixevalsQuestion',
+		'foreignKey' => 'id'
+	)
+); 
+  
   // called by mixevals controller during add/edit of mixeval
   // inserts/updates with question comments for each mixeval
-  function insertQuestionDescriptor($id, $data){
-
+  function insertQuestionDescriptor($id, $data, $question_ids){
     foreach ($data as $row) {
-      if (isset($row['MixevalsQuestion']['descriptor'])) {
-        $descriptors =  $row['MixevalsQuestion']['descriptor'];
+      if (isset($row['Description'])) {
+        $descriptors =  $row['Description'];
+        foreach($question_ids as $question_id){
+          	if ($question_id['MixevalsQuestion']['question_num'] == $row['question_num']){
+          		$q_id = $question_id['MixevalsQuestion']['id']; 
+          	}
+          } 
+        
         foreach ($descriptors as $index => $value) {
-          $desc['MixevalsQuestionDesc'] = $value;
-          $desc['MixevalsQuestionDesc']['mixeval_id'] = $id;
-    			$this->save($desc);
-    			$this->id = null;
+          	$desc = $value;
+          	$desc['mixeval_id'] = $id;     
+          	$desc['question_id'] = $q_id;
+          	$this->save($desc);
+    	  	$this->id = null;
         }
       }
   	}
@@ -55,16 +68,24 @@ class MixevalsQuestionDesc extends AppModel
 
   // called by the delete function in the controller
   function deleteQuestionDescriptors( $id ){
-  	$this->query('DELETE FROM mixevals_question_descs WHERE mixeval_id='.$id);
+  	
+  	
+      
+  	$this->query('DELETE 
+  				  FROM mixevals_question_descs 
+  				  WHERE question_id IN 
+  				  	(SELECT id 
+  				  	FROM mixevals_questions 
+  				  	WHERE id='.$id.')');
   }
 
   // function to return the question's descriptor
   function getQuestionDescriptor($mixevalId, $questionNum){
-		//$data = $this->find('all','mixeval_id='.$mixevalId.' AND question_num='.$questionNum, null, 'scale_level ASC');
-
-  	return $this->find('array', array(
+/*		$data = $this->find('all','mixeval_id='.$mixevalId.' AND question_num='.$questionNum, null, 'scale_level ASC');
+		return $data;*/
+ 	return $this->find('all', array(
             'conditions' => array('mixeval_id' => $mixevalId, 'question_num' => $questionNum),
-            'order' => 'scale_level ASC'
+            'order' => 'MixevalsQuestionDesc.id ASC'
         ));
   }
 }

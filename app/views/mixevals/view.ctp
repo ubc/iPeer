@@ -1,6 +1,9 @@
+<?php $readonly = isset($readonly) ? $readonly : false;
+$evaluate = isset($evaluate) ? $evaluate : false;?>
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
 <tr><td>
 	<?php
+	
 	if(!empty($data) && is_array($data)){
 		$mixeval_name = $data['Mixeval']['name'];
 		$scale_default = $data['Mixeval']['scale_max'];
@@ -27,7 +30,7 @@
 	  <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
     <td colspan="3" align="center">
-	    <?php echo $html->hidden('Mixeval/user_id', array('value'=>$rdAuth->id)); ?>
+	    <?php echo $form->hidden('Mixeval/user_id', array('value'=>$Auth->user('id'))); ?>
       View Mix Evaluation
     </td>
     </tr>
@@ -40,8 +43,7 @@
   <tr class="tablecell2">
     <td>Number of Lickert Question:</td>
     <td><?php echo $data['Mixeval']['lickert_question_max']?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		Level of Scale:&nbsp;&nbsp;
-		<?php echo $data['Mixeval']['scale_max']?>
+	
 		</td>
     <td>Number of Lickert Question Aspects (Max 25) </td>
   </tr>
@@ -78,15 +80,21 @@
 </table>
 
 <table class="title" width="100%"  border="0" cellspacing="0" cellpadding="0">
-  <tr>
-	<td><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> Mix Evaluation Preview </td>
-	<td><div align="right"><a href="#rpreview" onclick="showhide('rpreview'); toggle(this);"><?php echo empty($data) ? '[+]' : '[-]'; ?></a></div></td>
-  </tr>
+<div class='title'>
+  <span class="text"><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> Mixed Evaluation Preview</span>
+	<span class="controls"><a href="#rpreview" onclick="$('rpreview').toggle(); toggle1(this);"><?php echo empty($data) ? '[+]' : '[-]'; ?></a></span>
+</div>
 </table>
+
+<div id="rpreview" <?php echo empty($data) ? 'style="display: none; background: #FFF;">' : 'style="display: block; background: #FFF;"'; ?>>
+<?php echo $this->element('mixevals/ajax_mixeval_view', array('data' => $data, 'readonly' => $readonly, 'evaluate' => $evaluate)); ?>
+</div>
+
+<?php /*?>
 <div id="rpreview" <?php echo empty($data) ? 'style="display: none; background: #FFF;">' : 'style="display: block; background: #FFF;">'; ?>
 <br />
 <?php
-$params = array('controller'=>'mixevals','data'=>$this->controller->MixevalHelper->compileViewData($data), 'scale_default'=>$scale_default, 'question_default'=>$question_default, 'mixeval_avail'=>$mixeval_avail, 'prefill_question_max'=>$prefill_question_max, 'zero_mark'=>$zero_mark, 'total_mark'=>$total_mark, 'evaluate'=>0);
+$params = array('controller'=>'mixevals','data'=>$prepare, 'scale_default'=>$scale_default, 'question_default'=>$question_default, 'mixeval_avail'=>$mixeval_avail, 'prefill_question_max'=>$prefill_question_max, 'zero_mark'=>$zero_mark, 'total_mark'=>$total_mark, 'evaluate'=>0);
 echo $this->element('mixevals/view_mixeval_details', $params);
 ?>
-</div>
+</div><?php */ ?>

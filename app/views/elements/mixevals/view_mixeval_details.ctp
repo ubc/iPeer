@@ -46,10 +46,10 @@
       echo '<tr><td width="5%">'.$pos.':</td><td width="30%">';
       echo $mixevalQuestion['title']."<br></td></tr></table>";
       echo $html->hidden('Mixeval/question_type'.$pos, array('value'=>'S'))."</td>";
-
         //for loop to display the criteria comment cells for each LOM
+        isset($mixevalQuestion['multiplier']) ? $multiplier = $mixevalQuestion['multiplier'] : $multiplier = 1;
         for($j=1; $j<=$scale_default; $j++){
-            isset($mixevalQuestion['multiplier']) ? $multiplier = $mixevalQuestion['multiplier'] : $multiplier = 1;
+        	//isset($mixevalQuestion['multiplier']) ? $multiplier = $mixevalQuestion['multiplier'] : $multiplier = 1;
 
             if( $zero_mark == "on" ) {
                 $mark_value = round( ($multiplier/($scale_default-1)*($j-1)) , 2);

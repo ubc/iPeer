@@ -24,7 +24,12 @@ class EvaluationBase extends AppModel {
     if (empty($this->data[$this->name]['id']) && !$this->__checkDuplicateName()) {
       return false;
     }
-
+    
+       //check if questions are entered
+    if(empty($this->data['Question'])&&($this->name =='Mixeval')){
+       $this->errorMessage = "Please add at least one question for this " . $this->name . ".";
+       return false;
+     }
     return parent::beforeSave();
   }
 

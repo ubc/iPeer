@@ -58,6 +58,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
                                                           'legend' => false,
                                                           'options' => array('public'=>'Public','private'=>'Private'),
                                                           'label' => false,
+      													  'default' => 'public',	     			
                                                           'before' => '<td>',
                                                           'after' => '</td>',
                                                           'between' => '',
@@ -87,15 +88,15 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
         <input type="button" name="Back" value="<?php echo __('Back')?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
         <?php switch($action) {
           case 'Add Mixed Evaluation':
-            echo $this->Form->submit(__('Next', true), array('Name'=>'preview', 'div' => false)); 
-            break;
+          	echo$this->Form->submit(__('Save', true), array('id' => 'submit', 'Name' => 'submit', 'div' => false));
+             break;
           case 'View Mixed Evaluation':
             echo $this->Form->button(__('Edit Mixed Evaluation', true), 
                                      array('type' => 'button', 
                                            'onClick' => 'javascript:location.href=\''.$this->Html->url('edit/'.$data['Mixeval']['id'], true).'\';'));
             break;
           default:
-            echo $this->Form->submit(__('Save', true), array('id' => 'submit', 'Name' => 'submit', 'div' => false));
+           echo $this->Form->submit(__('Save', true), array('id' => 'submit', 'Name' => 'submit', 'div' => false));
           }?>
       </td>
     </tr>
@@ -126,3 +127,12 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 <?php endif;?>
 
 <?php echo $this->Form->end()?>
+<?php /*
+
+<script type="text/javascript">
+$('scale-max').observe('change', function(event){
+  $('submit').disable();
+})
+</script>
+
+*/?>

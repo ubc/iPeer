@@ -43,11 +43,12 @@ class MixevalsQuestion extends AppModel
   // inserts with question comments for each mixeval
   function insertQuestion($id, $data){
     foreach ($data as $index => $value) {
-  		$value['MixevalsQuestion']['mixeval_id'] = $id;
-  		$this->save($value);
+   		$value['mixeval_id'] = $id;
+   		$this->save($value);
   		$this->id = null;
   	}
-  }
+	
+   }
   
    // called by mixevals controller during an edit of an
    // existing mixeval question(s)
