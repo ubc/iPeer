@@ -71,7 +71,7 @@ class GroupsMembers extends AppModel
         $condition = array('GroupsMembers.group_id' => $groupId);
      }
      else {
-        $condition = array('GroupsMembers.group_id' => $groupId, 'User.id<>' => $userId);
+        $condition = array('GroupsMembers.group_id' => $groupId, 'User.id <>' => $userId);
      }
 //    $fields = 'User.id, User.role, User.username, User.first_name, User.last_name, User.student_no, User.title, User.email';
 //    $joinTable = array(' RIGHT JOIN users as User ON User.id=GroupsMembers.user_id');
@@ -85,7 +85,7 @@ class GroupsMembers extends AppModel
                             'table' => 'users',
                             'alias' => 'User',
                             'type' => 'RIGHT',
-                            'conditions' => array('User.id' => 'GroupMember.user_id')
+                            'conditions' => array('User.id' => 'GroupsMember.user_id')
                         )
                     ),
                     'order' => 'User.last_name ASC'

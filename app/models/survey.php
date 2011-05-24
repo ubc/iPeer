@@ -114,30 +114,35 @@ class Survey extends EvaluationBase
   }
 
 
-/*  function beforeDelete() {
-    $event = new Event();
-    return $event->removeEventsBySurveyId($this->id);
-  }*/
-
-  function getSurveyResult($courseId=null) {
-    $condition = 'Survey.course_id='.$courseId;
-    $fields = 'Survey.id,Survey.name,User.id,User.first_name,User.last_name,User.student_no,EvaluationSubmission.id,EvaluationSubmission.submitted,EvaluationSubmission.date_submitted';
-    $joinTable = array(' LEFT JOIN (users as Users CROSS JOIN evaluation_submissions as EvaluationSubmission) ON (User.id=EvaluationSubmission.submitter_id');
-
-    return $this->find('all',$condition, $fields, null, null, null, null, $joinTable );
+///*  function beforeDelete() {
+//    $event = new Event();
+//    return $event->removeEventsBySurveyId($this->id);
+//  }*/
+//
+//  function getSurveyResult($courseId=null) {
+//    $condition = 'Survey.course_id='.$courseId;
+//    $fields = 'Survey.id,Survey.name,User.id,User.first_name,User.last_name,User.student_no,EvaluationSubmission.id,EvaluationSubmission.submitted,EvaluationSubmission.date_submitted';
+//    $joinTable = array(' LEFT JOIN (users as Users CROSS JOIN evaluation_submissions as EvaluationSubmission) ON (User.id=EvaluationSubmission.submitter_id');
+//
+//    return $this->find('all',$condition, $fields, null, null, null, null, $joinTable );
 //    return $this->find('all', array(
 //        'conditions' => array('Survey.course_id' => $courseId),
 //        'fields' => array('Survey.id','Survey.name','User.id','User.first_name','User.last_name','User.student_no','EvaluationSubmission.id','EvaluationSubmission.submitted','EvaluationSubmission.date_submitted'),
 //        'joins' => array(
 //            array(
-//                'table' => '',
-//                'alias' => 'User',
+//                'table' => 'evaluation_submissions',
+//                'alias' => 'EvaluationSubmission',
+//                'type' => 'CROSS'
+//            ),
+//            array(
+//                'table' => 'EvaluationSubmission',
+//                'alias' => 'CrossJoined',
 //                'type' => 'LEFT',
 //                'conditions' => array('User.id' => 'EvaluationSubmission.submitter_id')
 //            )
 //        )
 //    ));
-  }
+//  }
 
   function getSurveyTitleById($id=null) {
     $tmp = $this->findById($id);

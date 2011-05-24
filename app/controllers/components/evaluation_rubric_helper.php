@@ -1,7 +1,7 @@
 <?php
 /* SVN FILE: $Id$ */
 /*
- * To use your Model’s inside of your components, you can create a new instance like this:
+ * To use your Modelï¿½s inside of your components, you can create a new instance like this:
  *  $this->foo = new Foo;
  *
  * @author
@@ -42,7 +42,7 @@ class EvaluationRubricHelperComponent extends Object
 		$result['groupMembers'] = $groupMembers;
 
     //Get the target rubric
-	  $this->Rubric->setId($event['Event']['template_id']);
+	  $this->Rubric->id = $event['Event']['template_id'];
     //$this->set('rubric', $this->Rubric->read());
     $result['rubric'] = $this->Rubric->read();
 
@@ -69,11 +69,11 @@ class EvaluationRubricHelperComponent extends Object
 
     //Get the target event
     $eventId = $params['form']['event_id'];
-	  $this->Event->setId($eventId);
+	  $this->Event->id = $eventId;
 		$event = $this->Event->read();
 
 		//Get simple evaluation tool
-		$this->Rubric->setId($event['Event']['template_id']);
+		$this->Rubric->id = $event['Event']['template_id'];
 		$rubric = $this->Rubric->read();
 
 		// Save evaluation data
@@ -254,7 +254,7 @@ class EvaluationRubricHelperComponent extends Object
         $memberScoreSummary = array();
         $allMembersCompleted = true;
         $inCompletedMembers = array();
-        $this->User->setId($userId);
+        $this->User->id = $userId;
         $user = $this->User->read();
         if ($event['group_event_id'] && $userId) {
             $rubricResult = $this->EvaluationRubric->getResultsByEvaluator($event['group_event_id'], $userId);
@@ -351,14 +351,14 @@ class EvaluationRubricHelperComponent extends Object
  		foreach ($evaluationRubric as $row) {
  			$evalRubric = $row['EvaluationRubric'];
  			if( isset($evalRubric) ) {
-				$this->EvaluationRubric->setId($evalRubric['id']);
+				$this->EvaluationRubric->id = $evalRubric['id'];
  				$evalRubric['grade_release'] = $releaseStatus;
  				$this->EvaluationRubric->save($evalRubric);
  			}
  		}
 
 		//changing grade release status for the GroupEvent
-		$this->GroupEvent->setId($groupEventId);
+		$this->GroupEvent->id = $groupEventId;
 		$oppositGradeReleaseCount = $this->EvaluationRubric->getOppositeGradeReleaseStatus($groupEventId, $releaseStatus);
 	  $groupEvent = $this->EvaluationHelper->formatGradeReleaseStatus($this->GroupEvent->read(), $releaseStatus,
 	                                                                  $oppositGradeReleaseCount);
@@ -369,7 +369,7 @@ class EvaluationRubricHelperComponent extends Object
  	  $this->EvaluationRubric  = new EvaluationRubric;
  	  $this->GroupEvent = new GroupEvent;
 
-		$this->GroupEvent->setId($groupEventId);
+		$this->GroupEvent->id = $groupEventId;
 		$groupEvent = $this->GroupEvent->read();
 
     //changing comment release for each EvaluationRubric
@@ -377,14 +377,14 @@ class EvaluationRubricHelperComponent extends Object
  		foreach ($evaluationRubric as $row) {
  			$evalRubric = $row['EvaluationRubric'];
  			if( isset($evalRubric) ) {
-				$this->EvaluationRubric->setId($evalRubric['id']);
+				$this->EvaluationRubric->id = $evalRubric['id'];
  				$evalRubric['comment_release'] = $releaseStatus;
  				$this->EvaluationRubric->save($evalRubric);
  			}
  		}
 
 		//changing comment release status for the GroupEvent
-		$this->GroupEvent->setId($groupEventId);
+		$this->GroupEvent->id = $groupEventId;
 		$oppositGradeReleaseCount = $this->EvaluationRubric->getOppositeCommentReleaseStatus($groupEventId, $releaseStatus);
 	  $groupEvent = $this->EvaluationHelper->formatCommentReleaseStatus($this->GroupEvent->read(), $releaseStatus,
 	                                                                  $oppositGradeReleaseCount);
@@ -404,14 +404,14 @@ class EvaluationRubricHelperComponent extends Object
 	  $groupMembers = array();
 	  $result = array();
 
-	  $this->Rubric->setId($event['Event']['template_id']);
+	  $this->Rubric->id = $event['Event']['template_id'];
 	  $rubric = $this->Rubric->read();
 	  $result['rubric'] = $rubric;
 
 
      //Get Members for this evaluation
      if ($studentView) {
-       $this->User->setId($this->rdAuth->id);
+       $this->User->id = $this->rdAuth->id;
        $user = $this->User->read();
        $rubricResultDetail = $this->getRubricResultDetail($event, $user);
        $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'],

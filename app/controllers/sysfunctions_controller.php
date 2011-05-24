@@ -111,7 +111,7 @@ class SysFunctionsController extends AppController
 	{
 		if (empty($this->params['data']))
 		{
-			$this->SysFunction->setId($id);
+			$this->SysFunction->id = $id;
 			$this->params['data'] = $this->SysFunction->read();
 			$this->render();
 		}

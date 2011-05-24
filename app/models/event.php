@@ -309,9 +309,8 @@ class Event extends AppModel
 
     function checkIfNowLate($eventID) {
         if (is_numeric($eventID)) {
-            $conditions = "`Event`.`due_date` < now() AND `id`=$eventID";
             $count = $this->find('count',array(
-                    'conditions' => array(`Event.due_date <` => 'now()' , `Event.id` => $eventID)
+                    'conditions' => array('Event.due_date <' => 'now()' , 'Event.id' => $eventID)
             ));
             return ($count>0);
         } else {

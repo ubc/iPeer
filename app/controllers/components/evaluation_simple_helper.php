@@ -1,7 +1,7 @@
 <?php
 /* SVN FILE: $Id$ */
 /*
- * To use your Model’s inside of your components, you can create a new instance like this:
+ * To use your Modelï¿½s inside of your components, you can create a new instance like this:
  *  $this->foo = new Foo;
  *
  * @author
@@ -143,14 +143,14 @@ class EvaluationSimpleHelperComponent extends Object
  		foreach ($evaluationMarkSimples as $row) {
  			$evalMarkSimple = $row['EvaluationSimple'];
  			if( isset($evalMarkSimple) ) {
-				$this->EvaluationSimple->setId($evalMarkSimple['id']);
+				$this->EvaluationSimple->id = $evalMarkSimple['id'];
  				$evalMarkSimple['grade_release'] = $releaseStatus;
  				$this->EvaluationSimple->save($evalMarkSimple);
  			}
  		}
 
 		//changing grade release status for the GroupEvent
-		$this->GroupEvent->setId($groupEventId);
+		$this->GroupEvent->id = $groupEventId;
 		$oppositGradeReleaseCount = $this->EvaluationSimple->getOppositeGradeReleaseStatus($groupEventId, $releaseStatus);
 	  $groupEvent = $this->EvaluationHelper->formatGradeReleaseStatus($this->GroupEvent->read(), $releaseStatus,
 	                                                                  $oppositGradeReleaseCount);
@@ -164,7 +164,7 @@ class EvaluationSimpleHelperComponent extends Object
     $this->GroupEvent = new GroupEvent;
     $this->EvaluationSimple = new EvaluationSimple;
     
-		$this->GroupEvent->setId($groupEventId);
+		$this->GroupEvent->id = $groupEventId;
 		$groupEvent = $this->GroupEvent->read();
 		$courseId = $this->rdAuth->courseId;
 

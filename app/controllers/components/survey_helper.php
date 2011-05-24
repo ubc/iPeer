@@ -21,7 +21,7 @@ class SurveyHelperComponent extends Object {
     $memberIds = $this->SurveyGroupMember->getIdsByGroupSetId($groupSetId);
     foreach ($memberIds as $memberId) {
       $id = $memberId['SurveyGroupMember']['id'];
-      $this->SurveyGroupMember->setId($id);
+      $this->SurveyGroupMember->id = $id;
       $this->SurveyGroupMember->del();
       $this->SurveyGroupMember->id = null;
     }
@@ -29,12 +29,12 @@ class SurveyHelperComponent extends Object {
     $groupIds = $this->SurveyGroup->getIdsByGroupSetId($groupSetId);
     foreach ($groupIds as $groupId) {
       $id = $groupId['SurveyGroup']['id'];
-      $this->SurveyGroup->setId($id);
+      $this->SurveyGroup->id = $id;
       $this->SurveyGroup->del();
       $this->SurveyGroup->id = null;
     }
     //delete group set
-    $this->SurveyGroupSet->setId($groupSetId);
+    $this->SurveyGroupSet->id = $groupSetId;
     $this->SurveyGroupSet->del();
   }*/
 

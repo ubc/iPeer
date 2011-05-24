@@ -1,7 +1,7 @@
 <?php
 /* SVN FILE: $Id$ */
 /*
- * To use your Model’s inside of your components, you can create a new instance like this:
+ * To use your Modelï¿½s inside of your components, you can create a new instance like this:
  *  $this->foo = new Foo;
  *
  * @author
@@ -41,7 +41,7 @@ class EvaluationMixevalHelperComponent extends Object
 
     //Get the target mixeval
 
-	  $this->Mixeval->setId($event['Event']['template_id']);
+	  $this->Mixeval->id = $event['Event']['template_id'];
     //$this->set('mixeval', $this->Mixeval->read());
     $result['mixeval'] = $this->Mixeval->read();
 
@@ -67,11 +67,11 @@ class EvaluationMixevalHelperComponent extends Object
 
     //Get the target event
     $eventId = $params['form']['event_id'];
-	  $this->Event->setId($eventId);
+	  $this->Event->id = $eventId;
 		$event = $this->Event->read();
 
 		//Get simple evaluation tool
-		$this->Mixeval->setId($event['Event']['template_id']);
+		$this->Mixeval->id = $event['Event']['template_id'];
 		$mixeval = $this->Mixeval->read();
 
 		// Save evaluation data
@@ -240,7 +240,7 @@ class EvaluationMixevalHelperComponent extends Object
 		$memberScoreSummary = array();
 		$allMembersCompleted = true;
 		$inCompletedMembers = array();
-    $this->User->setId($userId);
+    $this->User->id = $userId;
     $user = $this->User->read();
 	  if ($event['group_event_id'] && $userId) {
 			    $mixevalResult = $this->EvaluationMixeval->getResultsByEvaluator($event['group_event_id'], $userId);
@@ -343,14 +343,14 @@ class EvaluationMixevalHelperComponent extends Object
  		foreach ($evaluationMixeval as $row) {
  			$evalMixeval = $row['EvaluationMixeval'];
  			if( isset($evalMixeval) ) {
-				$this->EvaluationMixeval->setId($evalMixeval['id']);
+				$this->EvaluationMixeval->id = $evalMixeval['id'];
  				$evalMixeval['grade_release'] = $releaseStatus;
  				$this->EvaluationMixeval->save($evalMixeval);
  			}
  		}
 
 		//changing grade release status for the GroupEvent
-		$this->GroupEvent->setId($groupEventId);
+		$this->GroupEvent->id = $groupEventId;
 		$oppositGradeReleaseCount = $this->EvaluationMixeval->getOppositeGradeReleaseStatus($groupEventId, $releaseStatus);
 	  $groupEvent = $this->EvaluationHelper->formatGradeReleaseStatus($this->GroupEvent->read(), $releaseStatus,
 	                                                                  $oppositGradeReleaseCount);
@@ -361,7 +361,7 @@ class EvaluationMixevalHelperComponent extends Object
  	  $this->EvaluationMixeval  = new EvaluationMixeval;
  	  $this->GroupEvent = new GroupEvent;
 
-		$this->GroupEvent->setId($groupEventId);
+		$this->GroupEvent->id = $groupEventId;
 		$groupEvent = $this->GroupEvent->read();
 
     //changing comment release for each EvaluationMixeval
@@ -369,14 +369,14 @@ class EvaluationMixevalHelperComponent extends Object
  		foreach ($evaluationMixeval as $row) {
  			$evalMixeval = $row['EvaluationMixeval'];
  			if( isset($evalMixeval) ) {
-				$this->EvaluationMixeval->setId($evalMixeval['id']);
+				$this->EvaluationMixeval->id = $evalMixeval['id'];
  				$evalMixeval['comment_release'] = $releaseStatus;
  				$this->EvaluationMixeval->save($evalMixeval);
  			}
  		}
 
 		//changing comment release status for the GroupEvent
-		$this->GroupEvent->setId($groupEventId);
+		$this->GroupEvent->id = $groupEventId;
 		$oppositGradeReleaseCount = $this->EvaluationMixeval->getOppositeCommentReleaseStatus($groupEventId, $releaseStatus);
 	  $groupEvent = $this->EvaluationHelper->formatCommentReleaseStatus($this->GroupEvent->read(), $releaseStatus,
 	                                                                  $oppositGradeReleaseCount);
@@ -396,14 +396,14 @@ class EvaluationMixevalHelperComponent extends Object
 	  $groupMembers = array();
 	  $result = array();
 
-	  $this->Mixeval->setId($event['Event']['template_id']);
+	  $this->Mixeval->id = $event['Event']['template_id'];
 	  $mixeval = $this->Mixeval->read();
 	  $result['mixeval'] = $mixeval;
 
 
      //Get Members for this evaluation
      if ($studentView) {
-       $this->User->setId($this->rdAuth->id);
+       $this->User->id = $this->rdAuth->id;
        $user = $this->User->read();
        $mixevalResultDetail = $this->getMixevalResultDetail($event, $user);
        $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'],

@@ -122,7 +122,7 @@ class SysParametersController extends AppController
 	function edit($id=null)
 	{
 		if (empty($this->params['data'])) {
-			$this->SysParameter->setId($id);
+			$this->SysParameter->id = $id;
 			$this->params['data'] = $this->SysParameter->read();
 			$this->render();
 		} else {

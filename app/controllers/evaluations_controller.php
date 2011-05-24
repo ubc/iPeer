@@ -350,11 +350,11 @@ class EvaluationsController extends AppController
             $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
 
             //Get the target event
-            $this->Event->setId($eventId);
+            $this->Event->id = $eventId;
             $event = $this->Event->read();
 
             //Get simple evaluation tool
-            $this->SimpleEvaluation->setId($event['Event']['template_id']);
+            $this->SimpleEvaluation->id = $event['Event']['template_id'];
             $seval = $this->SimpleEvaluation->read();
 
             //Get the target group event
@@ -363,7 +363,7 @@ class EvaluationsController extends AppController
             //Get the target event submission
             $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'],
                                                                                             $evaluator);
-            $this->EvaluationSubmission->setId($evaluationSubmission['EvaluationSubmission']['id']);
+            $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
 
             if (!$this->validSimpleEvalComplete($this->params)) {
                 $this->redirect('/evaluations/makeSimpleEvaluation');
@@ -398,7 +398,7 @@ class EvaluationsController extends AppController
         if (empty($this->params['data'])) {
             //Get the target event
             $eventId = $this->Sanitize->paranoid($eventId);
-            $this->Event->setId($eventId);
+            $this->Event->id = $eventId;
             $event = $this->Event->read();
 
             //Setup the courseId to session
@@ -519,7 +519,7 @@ class EvaluationsController extends AppController
         // if no submission exists, create one
         //Get the target event submission
         $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
-        $this->EvaluationSubmission->setId($evaluationSubmission['EvaluationSubmission']['id']);
+        $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
 
         $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
         $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
@@ -618,7 +618,7 @@ class EvaluationsController extends AppController
         // if no submission exists, create one
         //Get the target event submission
         $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
-        $this->EvaluationSubmission->setId($evaluationSubmission['EvaluationSubmission']['id']);
+        $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
 
         $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
         $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
@@ -836,10 +836,10 @@ class EvaluationsController extends AppController
     $courseId = $this->rdAuth->courseId;
 
     //Get the target event
-      $this->Event->setId($eventId);
+      $this->Event->id = $eventId;
         $event = $this->Event->read();
 
-        $this->GroupEvent->setId($groupEventId);
+        $this->GroupEvent->id = $groupEventId;
         $groupEvent = $this->GroupEvent->read();
             // if marking peer evaluations as reviewed/not reviewed
         if ($reviewStatus == "mark_reviewed") {
@@ -884,7 +884,7 @@ class EvaluationsController extends AppController
 
       $this->autoRender = false;
 
-      $this->Event->setId($eventId);
+      $this->Event->id = $eventId;
       $event = $this->Event->read();
 
       switch ($event['Event']['event_template_type_id']) {
@@ -922,7 +922,7 @@ class EvaluationsController extends AppController
         $eventId = $this->params['form']['event_id'];
       }
 
-      $this->Event->setId($eventId);
+      $this->Event->id = $eventId;
       $event = $this->Event->read();
 
 
@@ -971,7 +971,7 @@ class EvaluationsController extends AppController
       $tok = strtok($param, ';');
       $eventId = $tok;
       $releaseStatus = strtok(';');
-      $this->Event->setId($eventId);
+      $this->Event->id = $eventId;
       $event = $this->Event->read();
 
       switch ($event['Event']['event_template_type_id']) {
@@ -992,7 +992,7 @@ class EvaluationsController extends AppController
       //Update all groupEvent's comment release Status based on submission
       $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId);
       foreach ($groupEventList as $groupEvent) {
-        $this->GroupEvent->setId($groupEvent['GroupEvent']['id']);
+        $this->GroupEvent->id = $groupEvent['GroupEvent']['id'];
 
         //Get Members whom completed evaluation
         $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent['GroupEvent']['group_id'],
@@ -1031,7 +1031,7 @@ class EvaluationsController extends AppController
       $tok = strtok($param, ';');
       $eventId = $tok;
       $releaseStatus = strtok(';');
-      $this->Event->setId($eventId);
+      $this->Event->id = $eventId;
       $event = $this->Event->read();
 
       switch ($event['Event']['event_template_type_id']) {
@@ -1052,7 +1052,7 @@ class EvaluationsController extends AppController
       //Update all groupEvent's grade release Status based on submission
       $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId);
       foreach($groupEventList as $groupEvent) {
-        $this->GroupEvent->setId($groupEvent['GroupEvent']['id']);
+        $this->GroupEvent->id = $groupEvent['GroupEvent']['id'];
 
         //Get Members whom completed evaluation
         $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent['GroupEvent']['group_id'],
@@ -1088,9 +1088,9 @@ class EvaluationsController extends AppController
 
         $this->set('title_for_layout', 'Submission Details');
 
-        $this->Event->setId($eventId);
+        $this->Event->id = $eventId;
         $event = $this->Event->read();
-        $this->Group->setId($groupId);
+        $this->Group->id = $groupId;
         $group = $this->Group->read();
         $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
         $students = $this->Group->groupStudents($groupId);

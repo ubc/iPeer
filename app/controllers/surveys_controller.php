@@ -342,7 +342,7 @@ class SurveysController extends AppController
   {//deprecated, this function is not used
     $eventArray = array();
 
-    $this->Survey->setId($id);
+    $this->Survey->id = $id;
     $this->params['data'] = $this->Survey->read();
     $this->params['data']['Survey']['released'] = 1;
 

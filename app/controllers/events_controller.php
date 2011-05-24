@@ -525,7 +525,7 @@ class EventsController extends AppController
 		if (empty($this->params['data']))
 		{
 
-			$this->Event->setId($id);
+			$this->Event->id = $id;
 			$event = $this->Event->read();
 			$this->params['data'] = $event;
 			$this->Output->br2nl($this->params['data']);
@@ -732,7 +732,7 @@ class EventsController extends AppController
 
 		if (empty($this->params['data']))
 		{
-			$this->Group->setId($id);
+			$this->Group->id = $id;
 			$this->params['data'] = $this->Group->read();
 		}
 		else

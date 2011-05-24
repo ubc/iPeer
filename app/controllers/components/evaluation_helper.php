@@ -14,13 +14,13 @@ class EvaluationHelperComponent
   {
     //Get the target event
     $this->Event = new Event;
-	  $this->Event->setId($eventId);
+	  $this->Event->id = $eventId;
 		$event = $this->Event->read();
 
 		//Get the group name
 		if ($groupId != null) {
   		$this->Group = new Group;
-  	  $this->Group->setId($groupId);
+  	  $this->Group->id = $groupId;
   		$group = $this->Group->read();
   		$event['group_name'] = 'Group '.$group['Group']['group_num'].' - '.$group['Group']['group_name'];
   		$event['group_id'] = $group['Group']['id'];
@@ -104,7 +104,7 @@ class EvaluationHelperComponent
  	function getEventType ($eventTemplateTypeId, $field='type_name')
  	{
  	  $this->EventTemplateType = new EventTemplateType;
- 	  $this->EventTemplateType->setId($eventTemplateTypeId);
+ 	  $this->EventTemplateType->id = $eventTemplateTypeId;
  	  $eventTemplate = $this->EventTemplateType->read();
  	  
  	  return $eventTemplate['EventTemplateType'][$field];
