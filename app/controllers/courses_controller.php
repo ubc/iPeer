@@ -58,35 +58,13 @@ class CoursesController extends AppController
         array("Course.homepage",      "Web",         "4em",  "link",   "home.gif"),
         array("Course.course",        "Course",      "15em",  "action", "Course Home"),
         array("Course.title",         "Title",       "auto", "action", "Course Home"),
-        array("Creator.id",           "",            "",     "hidden"),
-#        array("Instructor.full_name",  "Instructor *","10em", "action", "View Instructor"),
-#        array("Instructor.last_name",  "Instructor *","10em", "action", "View Instructor"),
-        array("Course.record_status", "Status",      "5em",  "map",
-            array("A" => "Active", "I" => "Inactive")),
+        array("Course.creator_id",           "",            "",     "hidden"),
+        array("Course.record_status", "Status",      "5em",  "map",     array("A" => "Active", "I" => "Inactive")),
         array("Course.creator",     "Created by",  "10em", "action", "View Creator"),
         array("Instructor.id",        "",            "",     "hidden"));
 
-    // Join with
-    $jointTableCreator =
-        array("localKey"   => "creator_id",
-              "joinTable"  => "users",
-              "joinModel"  => "Creator");
-    // Join with user courses for instructor ID's
-    $joinTableInstructorsIDs =
-        array("joinTable" => "user_courses",
-              "joinModel" => "UserCourse",
-              "foreignKey" => "course_id");
-    // Join with users to translate instructor ID's into usernames
-    $joinTableInsturctorUserName =
-        array("localModel" => "UserCourse",
-              "localKey" => "user_id",
-              "joinTable" => "users",
-              "joinModel" => "Instructor");
-
     // put all the joins together
-    $joinTables = array($jointTableCreator,
-                        $joinTableInstructorsIDs,
-                        $joinTableInsturctorUserName);
+    $joinTables = array();
 
     // For instructors: only list their own courses
     $extraFilters = $this->Auth->user('role') != 'A' ?
@@ -100,7 +78,7 @@ class CoursesController extends AppController
         array("View Record", "", "", "", "view", "Course.id"),
         array("Edit Course", "", "", "", "edit", "Course.id"),
         array("Delete Course", $warning, "", "", "delete", "Course.id"),
-        array("View Creator", "",    "", "users", "view", "Creator.id"),
+        array("View Creator", "",    "", "users", "view", "Course.creator_id"),
         array("View Instructor", "", "", "users", "view", "Instructor.id"));
 
     $recursive = 0;
