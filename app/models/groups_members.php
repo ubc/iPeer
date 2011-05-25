@@ -85,7 +85,7 @@ class GroupsMembers extends AppModel
                             'table' => 'users',
                             'alias' => 'User',
                             'type' => 'RIGHT',
-                            'conditions' => array('User.id' => 'GroupsMember.user_id')
+                            'conditions' => array('User.id = GroupsMember.user_id')
                         )
                     ),
                     'order' => 'User.last_name ASC'

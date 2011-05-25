@@ -120,7 +120,7 @@ class GroupEvent extends AppModel
                             'table' => 'groups_members',
                             'alias' => 'GroupMember',
                             'type' => 'RIGHT',
-                            'conditions' => array('GroupMember.group_id' => 'GroupEvent.group_id')
+                            'conditions' => array('GroupMember.group_id = GroupEvent.group_id')
                         )
                     )
                 ));
@@ -142,7 +142,7 @@ class GroupEvent extends AppModel
                             'table' => 'groups_members',
                             'alias' => 'GroupMember',
                             'type' => 'RIGHT',
-                            'conditions' => array('GroupMember.group_id' => 'GroupEvent.group_id')
+                            'conditions' => array('GroupMember.group_id = GroupEvent.group_id')
                         )
                     )
                 ));
@@ -237,13 +237,13 @@ class GroupEvent extends AppModel
                             'table' => 'events',
                             'alias' => 'Event',
                             'type' => 'LEFT',
-                            'conditions' => array('GroupEvent.event_id' => 'Event.id')
+                            'conditions' => array('GroupEvent.event_id = Event.id')
                         ),
                         array(
                             'table' => 'evaluation_submissions',
                             'alias' => 'EvaluationSubmission',
                             'type' => 'LEFT',
-                            'conditions' => array('GroupEvent.id' => 'EvaluationSubmission.grp_event_id')
+                            'conditions' => array('GroupEvent.id = EvaluationSubmission.grp_event_id')
                         )
                     )
                 ));

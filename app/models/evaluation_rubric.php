@@ -61,7 +61,7 @@ class EvaluationRubric extends AppModel
                         'table' => 'evaluation_rubric_details',
                         'alias' => 'EvaluationRubricDetail',
                         'type' => 'LEFT',
-                        'conditions' => array('EvaluationRubric.id' => 'EvaluationRubricDetail.evaluation_rubric_id')
+                        'conditions' => array('EvaluationRubric.id = EvaluationRubricDetail.evaluation_rubric_id')
                     )
                 ),
                 'order' => 'EvaluationRubricDetail.criteria_number ASC'
@@ -105,7 +105,7 @@ class EvaluationRubric extends AppModel
                         'table' => 'evaluation_rubric_details',
                         'alias' => 'EvaluationRubricDetail',
                         'type' => 'LEFT',
-                        'conditions' => array('EvaluationRubric.id' => 'EvaluationRubricDetail.evaluation_rubric_id')
+                        'conditions' => array('EvaluationRubric.id = EvaluationRubricDetail.evaluation_rubric_id')
                     )
                 ),
                 'order' => 'EvaluationRubricDetail.criteria_number ASC'

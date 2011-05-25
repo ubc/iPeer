@@ -42,7 +42,7 @@ class EvaluationSubmission extends AppModel
                         'table' => 'groups_members',
                         'alias' => 'GroupMember',
                         'type' => 'LEFT',
-                        'conditions' => array('GroupMember.user_id' => 'EvaluationSubmission.submitter_id')
+                        'conditions' => array('GroupMember.user_id = EvaluationSubmission.submitter_id')
                     )
                 )
             ));
@@ -62,7 +62,7 @@ class EvaluationSubmission extends AppModel
                         'table' => 'groups_members',
                         'alias' => 'GroupMember',
                         'type' => 'LEFT',
-                        'conditions' => array('GroupMember.user_id' => 'EvaluationSubmission.submitter_id')
+                        'conditions' => array('GroupMember.user_id = EvaluationSubmission.submitter_id')
                     )
                 )
             ));

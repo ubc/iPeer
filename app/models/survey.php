@@ -138,7 +138,7 @@ class Survey extends EvaluationBase
 //                'table' => 'EvaluationSubmission',
 //                'alias' => 'CrossJoined',
 //                'type' => 'LEFT',
-//                'conditions' => array('User.id' => 'EvaluationSubmission.submitter_id')
+//                'conditions' => array('User.id = EvaluationSubmission.submitter_id')
 //            )
 //        )
 //    ));

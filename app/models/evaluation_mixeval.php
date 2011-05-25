@@ -57,7 +57,7 @@ class EvaluationMixeval extends AppModel
                     'tabel' => 'evaluation_mixeval_details',
                     'alias' => 'EvaluationMixevalDetail',
                     'type' => 'LEFT',
-                    'conditions' => array('EvaluationMixeval.id' => 'EvaluationMixevalDetail.evaluation_mixeval_id')
+                    'conditions' => array('EvaluationMixeval.id = EvaluationMixevalDetail.evaluation_mixeval_id')
                 )
             )
         ));
@@ -79,7 +79,7 @@ class EvaluationMixeval extends AppModel
                     'tabel' => 'evaluation_mixeval_details',
                     'alias' => 'EvaluationMixevalDetail',
                     'type' => 'LEFT',
-                    'conditions' => array('EvaluationMixeval.id' => 'EvaluationMixevalDetail.evaluation_mixeval_id')
+                    'conditions' => array('EvaluationMixeval.id = EvaluationMixevalDetail.evaluation_mixeval_id')
                 )
             )
         ));
