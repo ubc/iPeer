@@ -36,7 +36,7 @@ class EventsController extends AppController
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $NeatString;
 	var $Sanitize;
-	var $uses = array('Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Group', 'GroupEvent', 'Personalize', 'GroupsMembers');
+	var $uses = array('GroupEvent', 'Group', 'Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers');
   var $components = array("AjaxList", "SysContainer");
 
   function __construct()
@@ -725,10 +725,10 @@ class EventsController extends AppController
    		$this->set('popup', $popup);
 
 		// gets all students not listed in the group for unfiltered box
-		$this->set('user_data', $this->Group->groupDifference($id,$courseId));
+		//$this->set('user_data', $this->Group->groupDifference($id,$courseId));
 
 		// gets all students in the group
-		$this->set('group_data', $this->Group->groupStudents($id));
+		$this->set('group_data', $this->Group->getMembersByGroupId($id));
 
 		if (empty($this->params['data']))
 		{
@@ -756,25 +756,25 @@ class EventsController extends AppController
 		}
 	}
 
-	/*function getAssignedGroups($eventId=null)
+	function getAssignedGroups($eventId=null)
 	{
  		$assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($eventId);
-    $assignedGroups = array();
+                $assignedGroups = array();
 
-		if (!empty($assignedGroupIDs))
-		{
+                            if (!empty($assignedGroupIDs))
+                            {
 
-			// retrieve string of group ids
-  		for ($i = 0; $i < count($assignedGroupIDs); $i++) {
-  			$group = $this->Group->find('id = '.$assignedGroupIDs[$i]['GroupEvent']['group_id']);
-  			$students = $this->Group->groupStudents($assignedGroupIDs[$i]['GroupEvent']['group_id']);
-  			$assignedGroups[$i] = $group;
-  			$assignedGroups[$i]['Group']['Students']=$students;
-  		}
-    }
+                                    // retrieve string of group ids
+                            for ($i = 0; $i < count($assignedGroupIDs); $i++) {
+                                    $group = $this->Group->find('first',array('conditions' => array('Group.id' => $assignedGroupIDs[$i]['GroupEvent']['group_id'])));
+                                    //$students = $this->GroupsMembers->getMembersByGroupId($assignedGroupIDs[$i]['GroupEvent']['group_id']);
+                                    $assignedGroups[$i] = $group['Group'];
+                                    $assignedGroups[$i]['Member']=$group['Member'];
+                            }
+                }
 
-    return $assignedGroups;
-	}*/
+                return $assignedGroups;
+	}
 
 	function update($attributeCode='',$attributeValue='')
   {

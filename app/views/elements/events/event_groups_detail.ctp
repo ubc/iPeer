@@ -5,7 +5,7 @@
 	    <th align="left" width="25%">Group Name</th>
 	    <th align="left" width="50%">Members</th>
 	  </tr>
-	  <?php foreach($data as $group): ?>
+	  <?php foreach($data as $group):?>
 	  <?php if (isset($group['id'])): ?>
   	  <tr>
           <td>
@@ -16,7 +16,7 @@
                                                  'escape' => false));?>
        	    <?php endif;?>
             <?php echo $group['group_num'] ?></td>
-          <td><?php echo $group['group_name'] ?></td>
+          <td><?php echo $group['group_name']; ?></td>
           <td>
           	  <?php if (isset($group['Member'])): ?>
           	  <table>
