@@ -11,7 +11,7 @@
                                                                 'before' => '<td width="200px">',
                                                                 'after' => '</td>',
                                                                 'between' => '</td><td>')))?>
-  <?php echo $this->Form->input('course_id', array('type' => 'hidden'));?>
+  <?php echo $this->Form->hidden('Group.id', array('value' => $group_id));?>
   <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
     <td colspan="4" align="center"><?php echo ucfirst($this->action)?> Group</td>
@@ -89,7 +89,4 @@
 	</td>
 </tr>
 </table>
-<?php
-    echo $this->Form->hidden('Group.id', array('value' => $group_id));
-    echo $this->Form->end();
-?>
+<?php echo $this->Form->end();?>

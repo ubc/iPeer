@@ -55,8 +55,7 @@ class Event extends AppModel
 
   var $belongsTo = array('EventTemplateType');
 
-  // I don't see this relationship, need to be refactored
-/*  var $hasAndBelongsToMany = array('Group' =>
+  var $hasAndBelongsToMany = array('Group' =>
                                    array('className'    =>  'Group',
                                          'joinTable'    =>  'group_events',
                                          'foreignKey'   =>  'event_id',
@@ -69,7 +68,7 @@ class Event extends AppModel
                                          'deleteQuery'  => '',
                                          'dependent'    => false,
                                         ),
-                                  );*/
+                                  );
 
   var $hasMany = array(
                       'GroupEvent' =>

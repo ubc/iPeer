@@ -95,6 +95,8 @@ class GroupsController extends AppController
             array("Group.creator_id",      "",         "",     "hidden"),
             array("Group.creator","Creator",  "10em", "action", "View Creator"),
             array("Group.created",  "Date",     "10em", "date"),
+            array("Group.course_id",        "",         "",     "hidden"),
+            array("Course.id",        "",         "",     "hidden"),
         );
 
         $conditions = array('Group.course_id' => $this->Session->read('ipeerSession.courseId'));
@@ -224,7 +226,7 @@ class GroupsController extends AppController
       //$this->data['Group']['id'] = $group_id;
       if ( $this->Group->save($this->data)) {
         //$this->GroupsMembers->updateMembers($this->Group->id, $data2save['data']['Group']);
-        $this->Session->setFlash('The group was updated successfully.'.$this->data['Group']['id']);
+        $this->Session->setFlash('The group was updated successfully.');
       } else {
         // Error occurs:
         $this->Session->setFlash('Error saving that group.');
