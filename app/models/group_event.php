@@ -126,7 +126,8 @@ class GroupEvent extends AppModel
                 ));
   }
 
-  function getMemberCountByEventId($eventId=null)
+  // Deprecated: not being used anymore
+  /*function getMemberCountByEventId($eventId=null)
   {
 //    $condition = 'GroupEvent.event_id='.$eventId;
 //    $fields = 'Count(GroupMember.user_id) AS count';
@@ -145,12 +146,13 @@ class GroupEvent extends AppModel
                         )
                     )
                 ));
-  }
+  }*/
 
+  // Deprecated: replaced by virtual field in event model
   // returns list of group id within the selected Event
-  function getToReviewGroupEventByEventId($eventId=null){
+  /*function getToReviewGroupEventByEventId($eventId=null){
 	  return $this->find('count', array('conditions'=>array('event_id'=>$eventId, 'marked' => "to review")));
-  }
+  }*/
 
   function getLowMark($eventId=null, $eventTypeId=null, $maxPercent=1, $minPercent=0) {
     $eventTypeEval = array(1=>'evaluation_simples',2=>'evaluation_rubrics',4=>'evaluation_mixevals');

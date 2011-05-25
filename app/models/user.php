@@ -362,6 +362,7 @@ class User extends AppModel
       $params['conditions']['NOT'] = array($this->alias.'.id' => $ids);
     }
 
+    $params['contain'] = array('Role');
     $params['conditions']['Role.name'] = 'instructor';
 
     $ret = array();

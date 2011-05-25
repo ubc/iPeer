@@ -355,7 +355,7 @@ class HomeController extends AppController
 
             $inactiveCourseDetail = array();
             $inactiveCourseList = $this->Course->getInactiveCourses();
-            $inactiveCourseDetail = $this->formatCourseList($inactiveCourseList, 'inactive_course');
+            $inactiveCourseDetail = $this->formatCourseList($inactiveCourseList);
 
             $this->set('course_list', $inactiveCourseDetail);
             $this->render('index');
@@ -505,30 +505,14 @@ class HomeController extends AppController
     $result = array();
 
     foreach ($course_list as $row) {
-      //$row['Course']['course'] = $this->sysContainer->getCourseName($row['Course']['id'], 'A');
       for ($i = 0; $i < count($row['Event']); $i++) {
+        //var_dump($row['Event']);
         $event_id = $row['Event'][$i]['id'];
-        //var_dump($this->GroupEvent);
-        $row['Event'][$i]['to_review_count'] = $this->GroupEvent->getToReviewGroupEventByEventId($event_id);
-        //$completeCount = $this->EvaluationSubmission->numCountInEventCompleted($event_id);
-        //$row['Event'][$i]['completed_count'] = $completeCount[0][0]['count'];
         $row['Event'][$i]['completed_count'] = $this->EvaluationSubmission->numCountInEventCompleted($event_id);
-        $this->User->recursive = 0;
-        $row['Instructor'] = $this->User->find('first', array(
-                            'conditions' => array('User.id'=>$row['Course']['instructor_id']),
-                            'fields' => array('User.*') ));
-        $totalSum = $this->GroupEvent->getMemberCountByEventId($event_id);
         if ($row['Event'][$i]['event_template_type_id'] == 3) {
-              $count = $this->UserEnrol->getEnrolledStudentCount($row['Course']['id']);
-              //print_r($count);
-              //$row['Event'][$i]['student_sum'] = $count[0]['total'];
-              $row['Event'][$i]['student_sum'] = $count;
-        } else {
-              //$row['Event'][$i]['student_sum'] = $totalSum[0][0]['count'];
-              $row['Event'][$i]['student_sum'] = $count;
+              $row['Event'][$i]['student_count'] = $row['Course']['student_count'];
         }
       }
-
       $result[$row['Course']['record_status']][] = $row;
     }
     return $result;

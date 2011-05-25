@@ -25,6 +25,9 @@
  * @subpackage
  * @since
  */
+
+App::import('Model', 'EvaluationBase');
+
 class Mixeval extends EvaluationBase
 {
   const TEMPLATE_TYPE_ID = 4;

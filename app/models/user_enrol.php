@@ -13,11 +13,12 @@ class UserEnrol extends AppModel
     ));
   }
 
-  function getEnrolledStudentCount($courseId=null) {
+  // Deprecated: replaced by virtual field student_count in course model
+  /*function getEnrolledStudentCount($courseId=null) {
     $conditions = array('course_id' => $courseId,
                         );
     return $this->find('count', array('conditions' => $conditions));
-  }
+  }*/
 
   function removeStudentFromCourse($user_id=null, $course_id=null) {
     //$course_to_remove = $this->find(array('course_id=' . $course_id, 'user_id=' . $user_id));

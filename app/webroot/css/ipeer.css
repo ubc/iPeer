@@ -747,3 +747,39 @@ textarea.question-title-textarea, textarea.question-descriptor {
 #controls {
   text-align: right;
 }
+
+/* Home styles */
+.course {
+  margin-top: 15px;
+}
+
+.course-header {
+  color: white;
+  background-color: #4478AC;
+  padding: 3px 5px;
+  font-size: 0.9em;
+  font-weight: bold;
+  text-decoration: underline;
+  vertical-align: top;
+}
+
+.course-header A {
+  color: white;
+  vertical-align: top;
+}
+
+.course-header IMG {
+  margin-right: 5px;
+}
+
+.course .instructor {
+  padding: 5px 0 5px 20px;
+  background-color: #EAEAEA;
+  border-top: 2px solid white;
+  border-bottom: 2px solid white;
+}
+
+.course .event {
+  padding: 5px 0 5px 20px;
+  background-color: #EAEAEA;
+}
