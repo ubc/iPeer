@@ -68,7 +68,8 @@ class EvaluationSubmission extends AppModel
             ));
 	}
 
-	function numCountInEventCompleted($eventId=null) {
+  // Deprecated: replaced by virtual field in event model
+	/*function numCountInEventCompleted($eventId=null) {
 //        $condition = 'EvaluationSubmission.submitted = 1 AND EvaluationSubmission.event_id='.$eventId;
 //        $fields = 'Count(EvaluationSubmission.submitter_id) AS count';
 //        $joinTable = array(' LEFT JOIN groups_members as GroupMember ON GroupMember.user_id=EvaluationSubmission.submitter_id');
@@ -79,7 +80,7 @@ class EvaluationSubmission extends AppModel
                 'conditions' => array('EvaluationSubmission.submitted' => 1, 'EvaluationSubmission.event_id' => $eventId)
             ));
 
-	}
+	}*/
 
 }
 

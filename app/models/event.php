@@ -80,7 +80,7 @@ class Event extends AppModel
                           'dependent' => true,
                           'foreignKey' => 'event_id'
                         ),
- /*                     'EvaluationSubmission' =>
+                      'EvaluationSubmission' =>
                         array(
                           'className' => 'EvaluationSubmission',
                           'conditions' => '',
@@ -88,7 +88,7 @@ class Event extends AppModel
                           'dependent' => true,
                           'foreignKey' => 'event_id'
                         ),
-                      'EvaluationRubric' =>
+ /*                     'EvaluationRubric' =>
                         array(
                           'className' => 'EvaluationRubric',
                           'conditions' => '',
@@ -119,6 +119,7 @@ class Event extends AppModel
     $this->virtualFields['response_count'] = sprintf('SELECT count(*) as count FROM evaluation_submissions as sub WHERE sub.event_id = %s.id', $this->alias);
     $this->virtualFields['to_review_count'] = sprintf('SELECT count(*) as count FROM group_events as ge WHERE ge.event_id = %s.id AND marked LIKE "to review"', $this->alias);
     $this->virtualFields['student_count'] = sprintf('SELECT count(*) as count FROM group_events as vge RIGHT JOIN groups_members as vgm ON vge.group_id = vgm.group_id WHERE vge.event_id = %s.id', $this->alias);
+    $this->virtualFields['completed_count'] = sprintf('SELECT count(*) as count FROM evaluation_submissions as ves WHERE ves.submitted = 1 AND ves.event_id = %s.id', $this->alias);
   }
 
 	//Overwriting Function - will be called before save operation

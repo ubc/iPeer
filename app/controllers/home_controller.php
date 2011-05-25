@@ -508,7 +508,6 @@ class HomeController extends AppController
       for ($i = 0; $i < count($row['Event']); $i++) {
         //var_dump($row['Event']);
         $event_id = $row['Event'][$i]['id'];
-        $row['Event'][$i]['completed_count'] = $this->EvaluationSubmission->numCountInEventCompleted($event_id);
         if ($row['Event'][$i]['event_template_type_id'] == 3) {
               $row['Event'][$i]['student_count'] = $row['Course']['student_count'];
         }
