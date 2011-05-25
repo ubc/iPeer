@@ -208,12 +208,14 @@ class User extends AppModel
 
 
   function getEnrolledStudentsForList($course_id) {
-    $students = $this->getEnrolledStudents($course_id);
-    $list = array();
-    foreach($students as $s) {
-      $list[$s['User']['id']] = $s['User']['student_no_with_full_name'];
-    }
-    return $list;
+    $this->displayField = 'student_no_with_full_name';
+    return $this->find('list', array('conditions' => array('UserEnrol.course_id' => $course_id, 'User.role' => 'S'),
+                                    'joins' => array(array('table' => 'user_enrols',
+                                                           'alias' => 'UserEnrol',
+                                                           'type'  => 'LEFT',
+                                                           'conditions' => array('User.id = UserEnrol.user_id'))
+                                                    ),
+                                    'order' => 'User.student_no'));
   }
 
   function getUserByEmail($email='') {
@@ -393,7 +395,7 @@ class User extends AppModel
     $subQuery = ' `'.$this->alias.'`.`id` NOT IN (' . $subQuery . ') ';
     $subQueryExpression = $dbo->expression($subQuery);
     $this->displayField = 'student_no_with_full_name';
-    return $this->find($type, array('conditions' => array('GM.id' => $group_id,
+    return $this->find($type, array('conditions' => array('GM.id' => $group_id, $this->alias.'.role' => 'S',
                                                           $subQueryExpression),
                                     'joins' => array(array('table' => 'user_enrols',
                                                            'alias' => 'UserEnrol',
@@ -409,17 +411,45 @@ class User extends AppModel
   }
 
   function getMembersByGroupId($group_id, $type = 'all') {
-    $ret = array();
+//    $ret = array();
+//    $this->displayField = 'student_no_with_full_name';
+//    if('list' != $type) {
+//      $ret = $this->find($type, array('conditions' => array('Group.id' => $group_id)));
+//    } else {
+//      $data = $this->find('all', array('conditions' => array('Group.id' => $group_id)));
+//      foreach($data as $d) {
+//        $ret[$d[$this->alias]['id']] = $d[$this->alias][$this->displayField];
+//      }
+//    }
+//    return $ret;
+    $groups_member = Classregistry::init('GroupsMember');
+    $dbo = $groups_member->getDataSource();
+    $subQuery = $dbo->buildStatement(array('fields' => array('GroupsMember.user_id'),
+                                           'table' => $dbo->fullTableName($groups_member),
+                                           'alias' => 'GroupsMember',
+                                           'limit' => null,
+                                           'offset' => null,
+                                           'joins' => array(),
+                                           'conditions' => array('group_id' => $group_id),
+                                           'order' => null,
+                                           'group' => null),
+                                     $groups_member);
+    $subQuery = ' `'.$this->alias.'`.`id` IN (' . $subQuery . ') ';
+    $subQueryExpression = $dbo->expression($subQuery);
     $this->displayField = 'student_no_with_full_name';
-    if('list' != $type) {
-      $ret = $this->find($type, array('conditions' => array('Group.id' => $group_id)));
-    } else {
-      $data = $this->find('all', array('conditions' => array('Group.id' => $group_id)));
-      foreach($data as $d) {
-        $ret[$d[$this->alias]['id']] = $d[$this->alias][$this->displayField];
-      }
-    }
-    return $ret;
+    return $this->find($type, array('conditions' => array('GM.id' => $group_id, $this->alias.'.role' => 'S',
+                                                          $subQueryExpression),
+                                    'joins' => array(array('table' => 'user_enrols',
+                                                           'alias' => 'UserEnrol',
+                                                           'type'  => 'LEFT',
+                                                           'conditions' => array($this->alias.'.id = UserEnrol.user_id')),
+                                                     array('table' => 'groups',
+                                                           'alias' => 'GM',
+                                                           'type'  => 'LEFT',
+                                                           'conditions' => array('UserEnrol.course_id = GM.course_id'))
+                                                    ),
+                                    'order' => array($this->alias.'.student_no'),
+                                    'recursive' => 1));
   }
   
 function getCurrentLoggedInUser(){

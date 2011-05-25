@@ -213,7 +213,7 @@ class GroupsController extends AppController
    	$this->set('title_for_layout', $this->sysContainer->getCourseName($course_id).' > Groups');
     $this->data['Group']['course_id'] = $course_id;
     // gets all the students in db for the unfiltered students list
-		$this->set('user_data', $this->User->getEnrolledStudentsForList($course_id));
+    $this->set('user_data', $this->User->getEnrolledStudentsForList($course_id)); var_dump($this->User->getEnrolledStudentsForList($course_id));
     $this->set('group_data', array());
     $this->set('course_id', $course_id);
     $this->render('edit');
@@ -221,10 +221,10 @@ class GroupsController extends AppController
 
   function edit ($group_id) {
     if (!empty($this->data)) {
-      $this->data['Group']['id'] = $group_id;
+      //$this->data['Group']['id'] = $group_id;
       if ( $this->Group->save($this->data)) {
         //$this->GroupsMembers->updateMembers($this->Group->id, $data2save['data']['Group']);
-        $this->Session->setFlash('The group was updated successfully.');
+        $this->Session->setFlash('The group was updated successfully.'.$this->data['Group']['id']);
       } else {
         // Error occurs:
         $this->Session->setFlash('Error saving that group.');
@@ -232,7 +232,9 @@ class GroupsController extends AppController
       $this->redirect('index/'.$this->data['Group']['course_id']);
     }
 
-    if(!($this->data = $this->Group->find('first', array('conditions' => array('Group.id' => $group_id))))) {
+    $group = $this->Group->find('first', array('conditions' => array('Group.id' => $group_id)));
+    
+    if(!($this->data = $group)) {
       $this->Session->setFlash('Group Not Found.');
       $this->redirect('index/'.$this->Session->read('ipeerSession.courseId'));
     };
@@ -241,7 +243,6 @@ class GroupsController extends AppController
 
     // gets all students not listed in the group for unfiltered box
     $this->set('user_data', $this->Group->getStudentsNotInGroup($group_id, 'list'));
-
     //gets all students in the group
     $this->set('members', $this->Group->getMembersByGroupId($group_id, 'list'));
     $this->set('group_id', $group_id);

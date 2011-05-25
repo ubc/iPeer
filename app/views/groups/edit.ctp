@@ -89,4 +89,7 @@
 	</td>
 </tr>
 </table>
-<?php echo $this->Form->end()?>
+<?php
+    echo $this->Form->hidden('Group.id', array('value' => $group_id));
+    echo $this->Form->end();
+?>
