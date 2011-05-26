@@ -32,8 +32,8 @@ class HomeController extends AppController
    *
    * @var $uses
    */
+  var $uses =  array( 'UserEnrol', 'Group', 'GroupEvent', 'User', 'UserCourse', 'Event', 'EvaluationSubmission', 'Course', 'Role','UserEnrol');
 
-  var $uses =  array('GroupEvent', 'UserEnrol', 'User', 'UserCourse', 'Event', 'Group', 'EvaluationSubmission', 'Course', 'Role');
   var $page;
   var $Sanitize;
   var $functionCode = 'HOME';
@@ -430,8 +430,9 @@ class HomeController extends AppController
     $eventAry = array();
     $pos = 0;
     //Get enrolled courses
-	$enrolledCourseIds = $this->User->getEnrolledCourses($curUserId);
-    foreach($enrolledCourseIds as $courseId) {
+	$enrolledCourseIds = $this->UserEnrol->getEnrolledCourses($curUserId);
+    foreach($enrolledCourseIds as $enrolledCourse) {
+    	$courseId = $enrolledCourse['UserEnrol']['course_id'];
       //$courseDetail = $this->Course->find('id='.$courseId);
       //Get Events for this course that are due
       //$events = $this->Event->find('all',array('conditions' => array('release_date_begin < NOW() AND NOW() <= release_date_end AND course_id='.$courseId)));

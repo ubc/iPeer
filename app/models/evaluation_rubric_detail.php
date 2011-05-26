@@ -11,32 +11,37 @@ class EvaluationRubricDetail extends AppModel
 									 				)
 									 );
   
-	function getByEvalRubricIdCritera($rubricId=null, $criteria=null){
+	function getByEvalRubricIdCritera($rubricId=null, $criteriaNum=null){
 //	  $sql = 'evaluation_rubric_id='.$rubricId;
-//	  if ($criteria != null) {
-//	    $sql .= ' AND criteria_number='.$criteria;
+//	  if ($criteriaNum != null) {
+//	    $sql .= ' AND criteria_number='.$criteriaNum;
 //	  }
 //		return $this->find($sql);
-            $conditions = array('evaluation_rubric_id' => $rubricId);
-            if ($question != null)
-                $conditions = array('criteria_number' => $criteria);
+            /*$conditions = array('evaluation_rubric_id' => $rubricId);
+            if ($criteriaNum != null)
+                $conditions = array('criteria_number' => $criteriaNum);
             return $this->find('first', array(
                 'conditions' => $condtions
-            ));
+            ));*/
+		if($criteriaNum != null)
+			return $this->find('first', array('conditions'=>array('evaluation_rubric_id'=>$rubricId , 'criteria_number'=>$criteriaNum)));
+		else $this->find('first', array('conditions'=>array('evaluation_rubric_id'=>$rubricId)));	
 	}
 	
-	function getAllByEvalRubricId($rubricId=null, $criteria=null){
+	function getAllByEvalRubricId($rubricId=null, $criteriaNum=null){
 //	  $sql = 'evaluation_rubric_id='.$rubricId;
 //	  if ($criteria != null) {
 //	    $sql .= ' AND criteria_number='.$criteria;
 //	  }
 //		return $this->find('all',$sql);
-            $conditions = array('evaluation_rubric_id' => $rubricId);
-            if ($question != null)
-                $conditions = array('criteria_number' => $criteria);
+            /*$conditions = array('evaluation_rubric_id' => $rubricId);
+            if ($criteriaNum != null)
+                $conditions = array('criteria_number' => $criteriaNum);
             return $this->find('all', array(
-                'conditions' => $condtions
-            ));
+                'conditions' => $condtions*/
+			if($criteriaNum != null)
+				return $this->find('all', array('conditions'=>array('evaluation_rubric_id'=>$rubricId, 'criteria_number'=>$criteriaNum)));
+			else return $this->find('all', array('conditions'=>array('evaluation_rubric_id'=> $rubricId)));
 	}	
 }
 

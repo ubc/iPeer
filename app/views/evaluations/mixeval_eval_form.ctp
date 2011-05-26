@@ -7,24 +7,24 @@
 <?php echo $html->script('ricopanelcontainer')?>
 <?php echo $html->script('ricoaccordion')?>
 	<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
-    <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeMixevalEvaluation'); echo '/'.$event['Event']['id'].';'.$event['group_id']; ?>">
-      <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
-      <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>"/>
-      <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>"/>
-      <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id'] ?>"/>
-      <input type="hidden" name="mixeval_id" value="<?php echo $data['Mixeval']['id']?>"/>
-      <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $this->Auth->User('id);  ?>"/>
-      <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
+    <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeMixevalEvaluation'); echo '/'.$event['Event']['id'].';'.$event['group_id']; ?>
+      <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>
+      <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>
+      <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>
+      <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id'] ?>
+      <input type="hidden" name="mixeval_id" value="<?php echo $data['Mixeval']['id']?>
+      <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $evaluator_id ;?>
+      <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
     <td colspan="4" align="center">Evaluation Event Detail</td>
     </tr>
   <tr class="tablecell2">
     <td width="10%">Evaluator:</td>
-    <td width="25%"><?php echo $rdAuth->fullname ?>
+    <td width="25%"><?php echo $full_name ?>;
     </td>
     <td width="10%">Evaluating:</td>
-    <td width="25%"><?php echo $event['group_name']; ?></td>
+	<td width="25%"><?php echo $event['group_name']; ?></td>
   </tr>
   <tr class="tablecell2">
     <td>Event Name:</td>
@@ -56,10 +56,10 @@
 		<td>
 <div id="accordion">
 	<?php $i = 0;
-	foreach($groupMembers as $row): $user = $row['User']; ?>
+	foreach($groupMembers as $row): $user = $row['U']; ?>
 	<input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/>
   <?php
-    $view_data = $this->controller->MixevalHelper->compileViewData($data);
+    //$view_data = $this->controller->MixevalHelper->compileViewData($data);
   ?>
 		<div id="panel<?php echo $user['id']?>">
 		  <div id="panel<?php echo $user['id']?>Header" class="panelheader">
@@ -113,9 +113,9 @@
         <tr class="tablecell2">
           <td align="center"><?php
             if (isset($user['Evaluation'])) {
-              echo $html->submit('Edit This Section (Click this button to save now or you may lose your input)', array('name'=>$user['id']));
+              echo $form->submit('Edit This Section (Click this button to save now or you may lose your input)', array('name'=>$user['id']));
             } else {
-              echo $html->submit('Save This Section (Click this button to save now or you may lose your input)', array('name'=>$user['id']));
+              echo $form->submit('Save This Section (Click this button to save now or you may lose your input)', array('name'=>$user['id']));
             }
 
             ?></td>
@@ -138,15 +138,15 @@
   <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
   <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>"/>
   <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>"/>
-  <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>"/>
+  <input type="hidden" name="course_id" value="<?php echo $courseId ?>"/>
   <input type="hidden" name="mixeval_id" value="<?php echo $data['Mixeval']['id']?>"/>
-  <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $rdAuth->id?>"/>
+  <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $evaluator_id?>"/>
   <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
 <center>
 <?php
   $count = 0;
   foreach($groupMembers as $row) {
-    $user = $row['User'];
+    $user = $row['U'];
     if (isset($user['Evaluation'])) {
       $count++;
     }
@@ -188,7 +188,7 @@
      echo $html->submit('Submit to Complete the Evaluation', array('onClick' => "javascript:return confirm('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?')"));
   }
   else {
-    echo $html->submit('Submit to Complete the Evaluation', array('disabled'=>'true')); echo "<br />";
+    echo $form->submit('Submit to Complete the Evaluation', array('disabled'=>'true')); echo "<br />";
     echo $mustCompleteUsers ? "<div style='color: red'>Please complete the questions for all group members, pressing 'Save This Section' button for each one.</div>" : "";
     echo $commentsNeeded ? "<div style='color: red'>Please Enter all the comments for all the group members before submitting.</div>" : "";
   }

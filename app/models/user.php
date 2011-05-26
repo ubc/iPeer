@@ -205,18 +205,6 @@ class User extends AppModel
                                     'order' => 'User.student_no'));
   }
   
-  function getEnrolledCourses($userId=''){
-  	$sql = "SELECT course_id
-  			FROM user_enrols
-  			WHERE user_id = $userId";
-  	$courseId = $this->query($sql);
-  	$courseIdArray = array();
-  	foreach($courseId as $id){
-  		array_push($courseIdArray,$id['user_enrols']['course_id']);
-  	}
-  	return $courseIdArray;  	
-  }
-  
   function printHelp($temp){
   	$this->log($temp);
   }

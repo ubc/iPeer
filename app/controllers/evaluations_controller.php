@@ -596,11 +596,15 @@ class EvaluationsController extends AppController
             $event = $this->EvaluationHelper->formatEventObj($eventId, $groupId);
             $this->set('event', $event);
 
+            $this->set('evaluator_id',$this->Auth->user('id'));
+            $this->set('full_name', $this->Auth->user('first_name').' '.$this->Auth->user('last_name'));
             //Setup the courseId to session
             $this->rdAuth->setCourseId($event['Event']['course_id']);
             $courseId = $event['Event']['course_id'];
+            $this->set('courseId', $courseId);
             $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers');
             $mixEvalDetail = $this->EvaluationMixevalHelper->loadMixEvaluationDetail($event);
+            $this->set('view_data', $this->MixevalHelper->compileViewData($mixEvalDetail['mixeval']));
             $this->set('data', $mixEvalDetail['mixeval']);
             $this->set('groupMembers', $mixEvalDetail['groupMembers']);
             $this->set('evaluateeCount', $mixEvalDetail['evaluateeCount']);

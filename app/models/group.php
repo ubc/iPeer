@@ -249,7 +249,7 @@ class Group extends AppModel
 }
 
   function getGroupByGroupId($groupId){
-  	return $this->find('all', array('conditions' => array('id'=>$groupId)));
+  	return $this->find('all',array('conditions'=>array('Group.id'=>$groupId)));
   } 
 }
 

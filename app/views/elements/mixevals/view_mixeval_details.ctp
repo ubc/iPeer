@@ -22,13 +22,15 @@
       //Get and set Mixeval Question
       isset($questions[$pos])? $mixevalQuestion = $questions[$pos] : $mixevalQuestion = null;
       if ($mixevalQuestion !=null) {
-        $questionDescriptors = $mixevalQuestion['descriptors'];
+        $questionDescriptors = $mixevalQuestion['instructions'];
         $descriptor_des = array();
-
+		
         foreach ($questionDescriptors as $row) {
           $desc = $row['MixevalsQuestionDesc'];
           $descriptor_des[$desc['scale_level']] = $desc['descriptor'];
         }
+        
+        
       }
 
       echo '<tr class="tablecell" align="center">';
@@ -45,7 +47,7 @@
       echo '<table align="left" border="0" width="70%" cellpadding="2">';
       echo '<tr><td width="5%">'.$pos.':</td><td width="30%">';
       echo $mixevalQuestion['title']."<br></td></tr></table>";
-      echo $html->hidden('Mixeval/question_type'.$pos, array('value'=>'S'))."</td>";
+      echo $form->hidden('Mixeval/question_type'.$pos, array('value'=>'S'))."</td>";
         //for loop to display the criteria comment cells for each LOM
         isset($mixevalQuestion['multiplier']) ? $multiplier = $mixevalQuestion['multiplier'] : $multiplier = 1;
         for($j=1; $j<=$scale_default; $j++){
@@ -125,7 +127,7 @@
                         echo '<font color="red"> * </font>';
                       }
                    } ?> <br>
-                  <?php echo $html->hidden('Mixeval/question_type'.$pos, array('value'=>'T')); ?>
+                  <?php echo $form->hidden('Mixeval/question_type'.$pos, array('value'=>'T')); ?>
                 </td>
               </tr>
               <?php if (!$evaluate) { ?>
@@ -187,7 +189,7 @@
     ?>
   <tr>
     <td colspan="3" align="center">
-<?php echo $html->hidden('Mixeval/total_question', array('value'=>$pos));?>
+<?php echo $form->hidden('Mixeval/total_question', array('value'=>$pos));?>
 <?php if (!$evaluate) :?>
     <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
 <?php endif; ?>

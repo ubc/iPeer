@@ -33,7 +33,7 @@ class EvaluationRubricHelperComponent extends Object
        $evaluation = $this->EvaluationRubric->getEvalRubricByGrpEventIdEvaluatorEvaluatee($event['group_event_id'],$evaluator, $targetEvaluatee);
        if (!empty($evaluation)) {
          $groupMembers[$i]['User']['Evaluation'] = $evaluation;	
-         $groupMembers[$i]['User']['Evaluation']['EvaluationDetail'] = $this->EvaluationRubricDetail->getAllByEvalRubricId($evaluation['evaluation_rubrics']['id']);
+         $groupMembers[$i]['User']['Evaluation']['EvaluationDetail'] = $this->EvaluationRubricDetail->getAllByEvalRubricId($evaluation['EvaluationRubric']['id']);
         }
     }
 		//$this->set('groupMembers', $groupMembers);
