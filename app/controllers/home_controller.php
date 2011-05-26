@@ -394,11 +394,15 @@ class HomeController extends AppController
       {
         
         
-            $inactiveCourseDetail = array();
-            $inactiveCourseList = $this->Course->getInactiveCourses();
-            $inactiveCourseDetail = $this->formatCourseList($inactiveCourseList);
+//            $inactiveCourseDetail = array();
+//            $inactiveCourseList = $this->Course->getInactiveCourses();
+//            $inactiveCourseDetail = $this->formatCourseList($inactiveCourseList);
+//
+//            $this->set('course_list', $inactiveCourseDetail);
+//            $this->render('index');
 
-            $this->set('course_list', $inactiveCourseDetail);
+            $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
+            $this->set('course_list', $this->formatCourseList($course_list));
             $this->render('index');
       }////General Home Rendering for Instructor
       else if($role == $this->User->USER_TYPE_INSTRUCTOR){

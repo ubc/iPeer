@@ -74,6 +74,7 @@ class SearchsController extends AppController
                 $courses = $searchMartix;
 
                 $i=0;
+                $name = array();
                 foreach($courses as $row):
                   $evaluation = $row['Event'];
                   $name[$i] = $this->sysContainer->getCourseName($evaluation['course_id']);
@@ -95,7 +96,7 @@ class SearchsController extends AppController
 
                 $searchMartix = $this->formatSearchEvaluationResult($maxPercent,$minPercent,$eventId,$status, $this->order, $this->sortBy, $this->show);
 
-                $eventList = $this->Auth->user('role') == 'A' ? $this->Event->find('all', array('conditions' => 'event_template_type_id != 3')) : $this->Event->find('all', array('conditions' => 'creator_id = '.$this->Auth->user('id') . ' AND event_template_type_id !=3'));
+                $eventList = $this->Auth->user('role') == 'A' ? $this->Event->find('all', array('conditions' => array('event_template_type_id !=' => '3'))) : $this->Event->find('all', array('conditions' => array('creator_id' => $this->Auth->user('id') , 'event_template_type_id !=' => '3')));
                 $this->set('sticky', $sticky);
                 $this->set('eventList', $eventList);
                 $this->set('data', $searchMartix['data']);
@@ -119,9 +120,9 @@ class SearchsController extends AppController
   function eventBoxSearch() {
     $this->layout = false;
     $courseId = $this->params['form']['course_id'];
-    $condition = 'course_id='.$courseId;
+    $condition['course_id'] = $courseId;
     if ($courseId == 'A') {
-      $condition = '';
+      $condition = array();
   }
     $this->set('eventList',$this->Event->find('all', array ('conditions' => $condition)));
   }
@@ -138,7 +139,9 @@ class SearchsController extends AppController
   function formatSearchEvaluation($conditions, $sortBy, $limit) {
 
     $courseIDs =  $this->sysContainer->getMyCourseIDs();
-    $conditions .= !empty($conditions) ? ' AND course_id IN ('.$courseIDs.')':'course_id IN ('.$courseIDs.')';
+    //$conditions .= !empty($conditions) ? ' AND course_id IN ('.$courseIDs.')':'course_id IN ('.$courseIDs.')';
+    if(!isset($conditions['course_id']))
+        $conditions['course_id'] = $courseIDs;
 
     $this->paginate = array(
                     'conditions' => $conditions,
@@ -161,7 +164,9 @@ class SearchsController extends AppController
    */
   function formatSearchInstructor($conditions='', $sortBy, $limit)
   {
-    $conditions .= empty($conditions) ? 'role = "I"':' AND role ="I" ';
+    //$conditions .= empty($conditions) ? 'role = "I"':' AND role ="I" ';
+    if(!isset($conditions['role']))
+        $conditions['role'] = 'I';
 
     $this->paginate = array(
                     'conditions' => $conditions,

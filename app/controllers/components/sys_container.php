@@ -238,7 +238,7 @@ class sysContainerComponent
 	function getMyCourseIDs()
 	{
 		$this->myCourseIDs=$this->Session->read('ipeerSession.myCourseIDs');
-		return $this->myCourseIDs;
+		return explode(',', $this->myCourseIDs);
 	}
 
 	/**

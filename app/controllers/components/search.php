@@ -8,8 +8,12 @@
  * @license		OPPL
  *
  */
+
+App::import('Model', 'UserCourse');
+
 class SearchComponent extends Object
-{
+{   
+
   function setEvaluationCondition($params=null) {
  
     $courseId = isset($params['form']['course_id']) ? $params['form']['course_id']:'';
@@ -17,30 +21,34 @@ class SearchComponent extends Object
     $dueDateEnd = isset($params['data']['Search']['due_date_end']) ? $params['data']['Search']['due_date_end']:'';
     $releaseDateBegin = isset($params['data']['Search']['release_date_begin']) ? $params['data']['Search']['release_date_begin']:'';
     $releaseDateEnd = isset($params['data']['Search']['release_date_end']) ? $params['data']['Search']['release_date_end']:'';
-    $condition = '';
+    $condition = array();
     $sticky = array();
     if (!empty($courseId) && $courseId != 'A') {
-      $condition .= 'course_id='.$courseId;
+      $condition['course_id'] = $courseId;
       $sticky['course_id'] = $courseId;
     } else
       $sticky['course_id'] = '';
     if ($dueDateBegin != '') {
-      $condition .= !empty($condition) ? ' AND due_date > "'.$dueDateBegin.'"' : 'due_date > "'.$dueDateBegin.'"';
+      //$condition .= !empty($condition) ? ' AND due_date > "'.$dueDateBegin.'"' : 'due_date > "'.$dueDateBegin.'"';
+      $condition['due_date > '] = $dueDateBegin;
       $sticky['due_date_begin'] = $dueDateBegin;
     } else
       $sticky['due_date_begin'] = '';
     if ($dueDateEnd != '') {
-      $condition .= !empty($condition) ? ' AND due_date < "'.$dueDateEnd.'"' : 'due_date < "'.$dueDateEnd.'"';
+      //$condition .= !empty($condition) ? ' AND due_date < "'.$dueDateEnd.'"' : 'due_date < "'.$dueDateEnd.'"';
+      $condition['due_date < '] = $dueDateEnd;
       $sticky['due_date_end'] = $dueDateEnd;
     } else
       $sticky['due_date_end'] = '';
     if ($releaseDateBegin != '') {
-      $condition .= !empty($condition) ? ' AND release_date_end > "'.$releaseDateBegin.'"' :' release_date_end > "'.$releaseDateBegin.'"';
+      //$condition .= !empty($condition) ? ' AND release_date_end > "'.$releaseDateBegin.'"' :' release_date_end > "'.$releaseDateBegin.'"';
+      $condition['release_date_end > '] = $releaseDateBegin;
       $sticky['release_date_begin'] = $releaseDateBegin;
     } else
       $sticky['release_date_begin'] = '';
     if ($releaseDateEnd != '') {
-      $condition .= !empty($condition) ? ' AND release_date_begin < "'.$releaseDateEnd.'"' : 'release_date_begin < "'.$releaseDateEnd.'"';
+      //$condition .= !empty($condition) ? ' AND release_date_begin < "'.$releaseDateEnd.'"' : 'release_date_begin < "'.$releaseDateEnd.'"';
+      $condition['release_date_begin < '] = $releaseDateEnd;
       $sticky['release_date_end'] = $releaseDateEnd;
     } else
       $sticky['release_date_end'] = '';
@@ -52,24 +60,28 @@ class SearchComponent extends Object
   }
 
   function setInstructorCondition($params=null) {
+    $this->UserCourse = new UserCourse;
     $sticky = array();
   
     $courseId = isset($params['form']['course_id']) ? $params['form']['course_id']:'';
     $instructorName = isset($params['form']['instructorname']) ? $params['form']['instructorname']:'';
     $email = isset($params['form']['email']) ? $params['form']['email']:'';
-    $condition = '';
+    $condition = array();
     if (!empty($courseId) && $courseId != 'A') {
-      $condition .= 'id IN(SELECT user_id AS id FROM user_courses WHERE course_id='.$courseId.')';
+      //$condition .= 'id IN(SELECT user_id AS id FROM user_courses WHERE course_id='.$courseId.')';
+      $condition['User.id'] = $this->UserCourse->getInstructorsId($courseId);
       $sticky['course_id'] = $courseId;
     } else
       $sticky['course_id'] = '';
     if (!empty($instructorName)) {
-      $condition .= !empty($condition) ? ' AND (first_name LIKE "%'.$instructorName.'%" OR last_name LIKE "%'.$instructorName.'%")':' (first_name LIKE "%'.$instructorName.'%" OR last_name LIKE "%'.$instructorName.'%")';
+      //$condition .= !empty($condition) ? ' AND (first_name LIKE "%'.$instructorName.'%" OR last_name LIKE "%'.$instructorName.'%")':' (first_name LIKE "%'.$instructorName.'%" OR last_name LIKE "%'.$instructorName.'%")';
+      $condition['User.full_name LIKE '] = '%'.$instructorName.'%';
       $sticky['instructor_name'] = $instructorName;
     } else
       $sticky['instructor_name'] = '';
     if (!empty($email)) {
-      $condition .= !empty($condition) ? ' AND email LIKE "%'.$email.'%"':' email LIKE "%'.$email.'%"';
+      //$condition .= !empty($condition) ? ' AND email LIKE "%'.$email.'%"':' email LIKE "%'.$email.'%"';
+      $condition['email LIKE '] = '%'.$email.'%';
       $sticky['email'] = $email;
     } else
       $sticky['email'] = '';

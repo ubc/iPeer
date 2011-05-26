@@ -67,9 +67,10 @@ class CoursesController extends AppController
     $joinTables = array();
 
     // For instructors: only list their own courses
-    $extraFilters = $this->Auth->user('role') != 'A' ?
-        array("Instructor.id" => $this->Auth->user('id')) :
-        null;
+    $extraFilters = $this->Auth->user('role') == 'A' ?
+            array("Instructor.id" => $this->User->find('list',array('fields'=>array('User.id')))) :
+            array("Instructor.id" => $this->Auth->user('id'));
+        
 
     // Set up actions
     $warning = "Are you sure you want to delete this course permanently?";

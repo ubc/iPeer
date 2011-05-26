@@ -2,7 +2,11 @@
 
 <div class="content-container">
 
-  <?php foreach($course_list as $row):?>
+  <?php 
+        if(isset($course_list['A']))
+            $course_list = $course_list['A'];
+        foreach($course_list as $row):
+  ?>
       <div class="course">
 	  	  <div class="course-header">
           <?php echo $html->link($html->image("icons/home.gif", array("border"=>"0","alt"=>$row['Course']['course'])).$row['Course']['course'], 

@@ -33,6 +33,15 @@ class UserCourse extends AppModel
   	return $result;
   }
 
+  // returns all the instructor list
+  function getInstructorsId($course_id = null){
+      return $this->find('list', array(
+          'conditions' => array('course_id' => $course_id),
+          'fields' => array('user_id')
+      ));
+
+  }
+
   // function called for every newly added course to place root account as admin
   function insertAdmin($id=null){
     $tmp = array( 'user_id'=>1, 'course_id'=>$id, 'access_right'=>'A', 'record_status'=>'A' );
