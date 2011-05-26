@@ -179,7 +179,7 @@ if ($event['Event']['id']==292) {
 		<td width="35%">Comment  <?php echo $event['Event']['com_req']? '<font color=red>*</font>' : '(Optional)' ;?></td>
 	</tr>
                    <?php $i = 0;
-    foreach($groupMembers as $row): $user = $row['U'];
+    foreach($groupMembers as $row): $user = $row['User'];
     ?>
     <tr class="tablecell">
         <td><?php echo $user['last_name'].' '.$user['first_name']?>

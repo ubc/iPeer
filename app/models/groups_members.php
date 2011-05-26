@@ -66,35 +66,34 @@ class GroupsMembers extends AppModel
 
   function getEventGroupMembers ($groupId, $selfEval, $userId)
   {
-  	$sql = "SELECT U . *
-			FROM users U, groups_members G
-			WHERE U.id = G.user_id";
-  	//var_dump($this->query($sql));
-  	return $this->query($sql);
-  	/*
-     if ($selfEval)
-     {//Include self on evaluation
-<<<<<<< .mine
-        $condition = array( 'conditions' => array('GroupsMembers.group_id'=>$groupId));
-=======
-        $condition = array('GroupsMembers.group_id' => $groupId);
->>>>>>> .r489
-     }
-     else {
-<<<<<<< .mine
-        $condition = array('conditions' => array('GroupsMembers.group_id'=>$groupId, 'User.id'=>$userId));
-=======
-        $condition = array('GroupsMembers.group_id' => $groupId, 'User.id <>' => $userId);
->>>>>>> .r489
-     }
-<<<<<<< .mine
-    $fields = array('fields'=>array('User.id, User.role, User.username, User.first_name, User.last_name, User.student_no, User.title, User.email'));
-    $joinTable = array(' RIGHT JOIN users as User ON User.id=GroupsMembers.user_id');
-
-    //return $this->find('all',$condition, $fields, 'User.last_name ASC', null, null, null, $joinTable );
-    //var_dump($this->find('all',$condition, $fields));
-    return $this->find('all',$condition, $fields);
-    */
+        if($selfEval){
+            return $this->find('all', array(
+                'conditions' => array('GroupsMembers.group_id' => $groupId),
+                'fields' => array('User.*'),
+                'joins' => array(
+                        array(
+                            'table' => 'users',
+                            'alias' => 'User',
+                            'type' => 'LEFT',
+                            'conditions' => array('User.id = GroupsMembers.user_id')
+                        )
+                    ),
+            ));
+        }
+        else{
+            return $this->find('all', array(
+                'conditions' => array('GroupsMembers.group_id' => $groupId, 'GroupsMembers.user_id !=' => $userId),
+                'fields' => array('User.*'),
+                'joins' => array(
+                        array(
+                            'table' => 'users',
+                            'alias' => 'User',
+                            'type' => 'LEFT',
+                            'conditions' => array('User.id = GroupsMembers.user_id')
+                        )
+                    ),
+            ));
+        }
   }
   
   function getGroupsByUserId($userId){
@@ -124,7 +123,7 @@ class GroupsMembers extends AppModel
                             'table' => 'users',
                             'alias' => 'User',
                             'type' => 'RIGHT',
-                            'conditions' => array('User.id = GroupsMember.user_id')
+                            'conditions' => array('User.id = GroupsMembers.user_id')
                         )
                     ),
                     'order' => 'User.last_name ASC'
