@@ -319,6 +319,7 @@ class EventsController extends AppController
 	  //List Add Page
 		if (empty($this->params['data'])) {
 
+
 			$unassignedGroups = $this->Group->find('list', array( 'conditions'=> array('course_id'=>$courseId)));
 			$this->set('unassignedGroups', $unassignedGroups);
 
@@ -378,6 +379,9 @@ class EventsController extends AppController
 
 
   function edit($id) {
+ 
+  	
+  	
     if(!is_numeric($id)) {
       $this->Session->setFlash('Invalid survey ID.');
       $this->redirect('index');
@@ -385,19 +389,75 @@ class EventsController extends AppController
     $data = $this->Event->find('first', array('conditions' => array('id' => $id),
                                                'contain' => array('Group')));
 
-    $courseId = $data['Event']['course_id'];
+    
+    
+    
+      $courseId = $this->Session->read('ipeerSession.courseId');
+
+	  //Clear $id to only the alphanumeric value
+		$id = $this->Sanitize->paranoid($id);
+    $this->set('event_id', $id);
+
 		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
 
+		$event = $this->Event->find('first', array('conditions' => array('Event.id' => $id),
+                                               'contain' => array('Group.Member')));
+
+    //Format Evaluation Selection Boxes
+    $default = null;
+    $model = '';
+    $eventTemplates = array();
+    $templateId = $event['Event']['event_template_type_id'];
+    if (!empty($templateId))
+    {
+      $eventTemplateType = $this->EventTemplateType->find('id = '.$templateId);
+
+      if ($templateId == 1 )
+      {
+        $default = 'Default Simple Evaluation';
+        $model = 'SimpleEvaluation';
+        $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'));
+      }
+      else if ($templateId == 2)
+      {
+        $default = 'Default Rubric';
+        $model = 'Rubric';
+	      $eventTemplates = $this->Rubric->getBelongingOrPublic($this->Auth->user('id'));
+      }
+      else if ($templateId == 4)
+      {
+        $default = 'Default Mixed Evaluation';
+        $model = 'Mixeval';
+        $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'));
+      }
+
+    }
+    $this->set('assignedGroups',$data);
+    $this->set('data', $data); 
+    $this->set('event', $event);
+    $this->set('course_id', $courseId);
+    $this->set('eventTemplates', $eventTemplates);
+    $this->set('default',$default);
+    $this->set('model', $model);
+    $this->set('id', $id);
+    $courseId = $data['Event']['course_id'];
+		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
+$forsave =array();
+
 		if (!empty($this->data)) {
-			if($result = $this->Event->save($data)) {
+	$this->data['Event']['id'] = $id;
+			if($result = $this->Event->save($this->data)) {
         $this->Session->setFlash('The event was edited successfully.');
         $this->redirect('index');
 			} else {
         $this->Session->setFlash($this->Survey->errorMessage);
+        $this->render('edit');
 			}
 		} else {
       $this->data = $data;
+      $this->render('edit');
     }
+
 
     $this->set('eventTemplateTypes', $this->EventTemplateType->find('list', array('conditions' => array('NOT' => array('id' => 3)))));
     $this->set('unassignedGroups', $this->Event->getUnassignedGroups($data));
