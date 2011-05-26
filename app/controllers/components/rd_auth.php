@@ -150,7 +150,7 @@ class rdAuthComponent extends AppController // This component is in fact a
 	function setFromData($userData) {
 		$this->Session->write('ipeerSession.id', $userData['id']);
 		$this->Session->write('ipeerSession.username', $userData['username']);
-		$this->Session->write('ipeerSession.fullname', $userData['last_name'].' '.$userData['first_name']);
+		$this->Session->write('ipeerSession.fullname', $userData['first_name'].' '.$userData['last_name']);
 		$this->Session->write('ipeerSession.role', $userData['role']);
 		$this->Session->write('ipeerSession.email', $userData['email']);
 		return $this->loadFromSession();
