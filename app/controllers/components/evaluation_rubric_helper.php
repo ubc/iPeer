@@ -29,7 +29,7 @@ class EvaluationRubricHelperComponent extends Object
     $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'],
                                                                $evaluator);                                                                                                                           
     for ($i = 0; $i<count($groupMembers); $i++) {
-       $targetEvaluatee = $groupMembers[$i]['U']['id'];
+       $targetEvaluatee = $groupMembers[$i]['User']['id'];
        $evaluation = $this->EvaluationRubric->getEvalRubricByGrpEventIdEvaluatorEvaluatee($event['group_event_id'],$evaluator, $targetEvaluatee);
        if (!empty($evaluation)) {
          $groupMembers[$i]['User']['Evaluation'] = $evaluation;	
@@ -47,8 +47,9 @@ class EvaluationRubricHelperComponent extends Object
     $result['rubric'] = $this->Rubric->read();
     
  		// enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
- 		$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find('count',array( 'conditions'=>array('group_id=>'.$event['group_id']))) :
- 		                                           $this->GroupsMembers->find('count', array( 'conditions'=> array('group_id=>'.$event['group_id']- 1)));	                                           
+ 		$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find('count',array( 'conditions'=>array('group_id' => $event['group_id']))) :
+ 		                                           $this->GroupsMembers->find('count', array( 'conditions'=> array('group_id' => $event['group_id']- 1)));
+ 		                                           
 		//$this->set('evaluateeCount', $numMembers);
 		$result['evaluateeCount'] = $numMembers;
 

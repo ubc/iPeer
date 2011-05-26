@@ -58,7 +58,7 @@ function getEnrolledCourses($userId=''){
 }
   
   function weeWa(){
-  	var_dump("ADSA");
+  	//var_dump("ADSA");
   }  
 }
 

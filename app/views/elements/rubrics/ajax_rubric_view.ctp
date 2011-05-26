@@ -7,7 +7,7 @@ $zero_mark = $data['Rubric']['zero_mark'];
 isset($user)? $userId = $user['id'] : $userId = '';
 isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = null;
 ?>
-<?php var_dump($user); ?>
+<?php //var_dump($user); ?>
 <table class="form-table">
   <tr class="tableheader" align="center">
 		<td width=100 valign="top">Rubric View</td>

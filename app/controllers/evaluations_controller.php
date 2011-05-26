@@ -282,7 +282,7 @@ class EvaluationsController extends AppController
 
     function test($groupEventId, $userId) {
         $subScore = $this->EvaluationMixeval->getResultsDetailByEvaluatee($groupEventId, $userId);
-        var_dump($subScore[0]);
+        //var_dump($subScore[0]);
         exit;
     }
 

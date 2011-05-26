@@ -720,7 +720,7 @@ $forsave =array();
     if (isset($this->params['form']['id']))
     {
       $id = intval(substr($this->params['form']['id'], 5));
-      var_dump($id);
+      //var_dump($id);
     }   //end if
     if ($this->Event->delete($id)) {
 			$this->redirect('/events/index/The event is deleted successfully.');

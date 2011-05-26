@@ -57,7 +57,7 @@
 		<td>
 <div id="accordion">
 	<?php $i = 0;
-	foreach($groupMembers as $row): $user = $row['U'];
+	foreach($groupMembers as $row): $user = $row['User'];
 	?>
 	<input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/>
 		<div id="panel<?php echo $user['id']?>">
@@ -110,7 +110,7 @@
   <?php
   $count = 0;
   foreach($groupMembers as $row) {
-    $user = $row['U'];
+    $user = $row['User'];
     if (isset($user['Evaluation'])) {
       $count++;
     }
