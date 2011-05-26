@@ -199,7 +199,7 @@ class GroupsController extends AppController
   }
 
   function add ($course_id) {
-  	$this->log($this->data);
+  	
 		if (!empty($this->data)) {
 			//$this->params = $this->Group->prepData($this->params);
 			if ($this->Group->save($this->data)) {
@@ -216,7 +216,7 @@ class GroupsController extends AppController
    	$this->set('title_for_layout', $this->sysContainer->getCourseName($course_id).' > Groups');
     $this->data['Group']['course_id'] = $course_id;
     // gets all the students in db for the unfiltered students list
-    $this->set('user_data', $this->User->getEnrolledStudentsForList($course_id)); var_dump($this->User->getEnrolledStudentsForList($course_id));
+    $this->set('user_data', $this->User->getEnrolledStudentsForList($course_id));
     $this->set('group_data', array());
     $this->set('course_id', $course_id);
     $this->render('edit');

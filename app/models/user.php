@@ -397,28 +397,11 @@ class User extends AppModel
     return $ret;
   }
 
-//Function rewritten by Tony Chiu (March 16/2011)
-  function getStudentsNotInGroup($group_id) {
+  function getStudentsNotInGroup($group_id, $type = 'all') {
   	
-  	$getCourseCountSQL = 'SELECT COUNT(*) as count
-  						  FROM groups_members 
-  						  WHERE group_id = '.$group_id.'';
-	$courseCountArray = $this->query($getCourseCountSQL);
-	$courseCount= $courseCountArray[0][0]['count'];
 
-	//check that the $group_id exists
-	if($courseCount > 0){
-  		$sql = 'SELECT * 
-  		 	    FROM users U 
-  		    	WHERE U.id NOT IN (SELECT G.user_id
-                	   			   FROM groups_members G
-                   				   WHERE G.group_id ='.$group_id.')';
-		$studentsNotInGroup = $this->query($sql);
-		return $studentsNotInGroup;        	           			   
-	}	
-	else return null; 
   
-  	/*
+  	
     $groups_member = Classregistry::init('GroupsMember');
     $dbo = $groups_member->getDataSource();
     $subQuery = $dbo->buildStatement(array('fields' => array('GroupsMember.user_id'),
@@ -447,7 +430,7 @@ class User extends AppModel
                                                     ),
                                     'order' => array($this->alias.'.student_no'),
                                     'recursive' => 1));
- 	*/                                 
+ 	                            
   }
 
   function getMembersByGroupId($group_id, $type = 'all') {
