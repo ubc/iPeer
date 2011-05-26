@@ -1,6 +1,7 @@
 <?php
 
 class EvaluationBase extends AppModel {
+  var $name = 'EvaluationBase';
   var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable');
 
   function __construct($id = false, $table = null, $ds = null) {
@@ -32,7 +33,7 @@ class EvaluationBase extends AppModel {
      }
     return parent::beforeSave();
   }
-
+  
   //Validation check on duplication of name
 	function __checkDuplicateName() {
     $result = $this->find('first', array('conditions' => array('name' => $this->data[$this->name]['name'])));

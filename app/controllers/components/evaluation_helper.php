@@ -8,6 +8,8 @@
  * @license		OPPL
  *
  */
+App::import('Model', 'Group');
+App::import('Model', 'GroupEvent');
 class EvaluationHelperComponent
 {
   function formatEventObj ($eventId, $groupId=null)
@@ -20,17 +22,17 @@ class EvaluationHelperComponent
 		//Get the group name
 		if ($groupId != null) {
   		$this->Group = new Group;
-  	  $this->Group->id = $groupId;
+  	    $this->Group->id = $groupId;
+
   		$group = $this->Group->read();
   		$event['group_name'] = 'Group '.$group['Group']['group_num'].' - '.$group['Group']['group_name'];
   		$event['group_id'] = $group['Group']['id'];
 
-      $this->GroupEvent = new GroupEvent;
+  	  $this->GroupEvent = new GroupEvent;
    		$groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
   		$event['group_event_id'] = $groupEvent['GroupEvent']['id'];
   		$event['group_event_marked'] = $groupEvent['GroupEvent']['marked'];
 		}
-
     return $event;
   }
 

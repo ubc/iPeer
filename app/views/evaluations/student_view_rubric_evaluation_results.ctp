@@ -9,14 +9,13 @@
 <?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
     <!-- Render Event Info table -->
 	  <?php
-
-	  if (isset($memberScoreSummary[$rdAuth->id])) {
-  	  $receviedAvePercent = $memberScoreSummary[$rdAuth->id]['received_ave_score'] / $rubric['Rubric']['total_marks'] * 100;
-  	  $releaseStatus = $scoreRecords[$rdAuth->id]['grade_released'];
+	  if (isset($memberScoreSummary[$currentUser['id']])) {
+  	  $receviedAvePercent = $memberScoreSummary[$currentUser['id']]['received_ave_score'] / $rubric['Rubric']['total_marks'] * 100;
+  	  $releaseStatus = $scoreRecords[$currentUser['id']]['grade_released'];
   	} else {
   	  $receviedAvePercent = 0;
   	}
-    $params = array('controller'=>'evaluations', 'event'=>$event, 'gradeReleaseStatus'=>isset($scoreRecords[$rdAuth->id]['grade_released'])?$scoreRecords[$rdAuth->id]['grade_released'] : array(), 'aveScore'=>number_format($receviedAvePercent).'%', 'groupAve'=>null);
+    $params = array('controller'=>'evaluations', 'event'=>$event, 'gradeReleaseStatus'=>isset($scoreRecords[$currentUser['id']]['grade_released'])?$scoreRecords[$currentUser['id']]['grade_released'] : array(), 'aveScore'=>number_format($receviedAvePercent).'%', 'groupAve'=>null);
     echo $this->element('evaluations/student_view_event_info', $params);
     ?>
 <div id='rubric_result'>
@@ -26,9 +25,9 @@ $numerical_index = 1;  //use numbers instead of words; get users to refer to the
 $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
 $membersAry = array();  //used to format result
 $groupAve = 0;
-if (isset($scoreRecords[$rdAuth->id])) {
-    $gradeReleased = $scoreRecords[$rdAuth->id]['grade_released'];
-    $commentReleased = $scoreRecords[$rdAuth->id]['comment_released'];
+if (isset($scoreRecords[$currentUser['id']])) {
+    $gradeReleased = $scoreRecords[$currentUser['id']]['grade_released'];
+    $commentReleased = $scoreRecords[$currentUser['id']]['comment_released'];
 } else {
     $gradeReleased = 0;
     $commentReleased = 0;
@@ -66,7 +65,7 @@ if (isset($scoreRecords[$rdAuth->id])) {
 		  </div>
 		  <div style="height: 200px;" id="panelResultsContent" class="panelContent">
   	  <?php
-    $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$evalResult, 'userId'=>$rdAuth->id, 'scoreRecords'=>$scoreRecords);
+    $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$evalResult, 'userId'=>$currentUser['id'], 'scoreRecords'=>$scoreRecords);
     echo $this->element('evaluations/student_view_rubric_details', $params);
     ?>
 
@@ -80,7 +79,7 @@ if (isset($scoreRecords[$rdAuth->id])) {
 		  <div style="height: 200px;" id="panelReviewsContent" class="panelContent">
 
   	  <?php
-    $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$reviewEvaluations, 'userId'=>$rdAuth->id, 'scoreRecords'=>null);
+    $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$reviewEvaluations, 'userId'=>$currentUser['id'], 'scoreRecords'=>null);
     echo $this->element('evaluations/student_view_rubric_details', $params);
     ?>
 		  </div>

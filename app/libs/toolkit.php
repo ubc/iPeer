@@ -10,7 +10,7 @@ class Toolkit {
     }
     return $instance[0];
   }
-
+  
   static function getUser() {
     $_this =& Toolkit::getInstance();
     return $_this->user();
@@ -28,6 +28,10 @@ class Toolkit {
     return Set::extract($user, 'User.user_group_id');
   }*/
 
+   static function weeWa(){
+   	$this->log("Does nothing");
+   }
+  
   static function formatDate($timestamp) {
     $sys_parameter = new SysParameter;
     $data = $sys_parameter->findParameter('display.date_format');

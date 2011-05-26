@@ -114,6 +114,17 @@ function checkEmailAddress()
             <!-- Build the actual Tabs -->
             <?php
                 if (!empty($access)) {
+                
+                if($user['role']== 'S'){
+					//Home Tab
+                	generateTab($this, $access, 'HOME', array('home'),
+                                $html->image('layout/icon_home.gif',array('border'=>'0','alt'=>'icon_home')));
+            		
+            		//Edit profile tab
+            		generateTab($this, $access, 'USR_PROFILE' , array('users'));
+                }
+                else
+                {
                     // Home Tab
                     generateTab($this, $access, 'HOME', array('home'),
                                 $html->image('layout/icon_home.gif',array('border'=>'0','alt'=>'icon_home')));
@@ -141,6 +152,7 @@ function checkEmailAddress()
 
                     // System Functions Tab
                     generateTab($this, $access, 'SYS_FUNC', array('sysfunctions'));
+                }
                 }
             ?>
 

@@ -1,8 +1,8 @@
 <?php
-    $gradeReleased = isset($scoreRecords[$rdAuth->id]['grade_released']) ?
-        $scoreRecords[$rdAuth->id]['grade_released'] : 1;
-    $commentReleased = isset($scoreRecords[$rdAuth->id]['comment_released']) ?
-        $scoreRecords[$rdAuth->id]['comment_released'] : 1;
+    $gradeReleased = isset($scoreRecords[$currentUser['id']]['grade_released']) ?
+        $scoreRecords[$currentUser['id']]['grade_released'] : 1;
+    $commentReleased = isset($scoreRecords[$currentUser['id']]['comment_released']) ?
+        $scoreRecords[$currentUser['id']]['comment_released'] : 1;
     $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
 
     $pos = 1;

@@ -199,6 +199,7 @@ class GroupsController extends AppController
   }
 
   function add ($course_id) {
+  	$this->log($this->data);
 		if (!empty($this->data)) {
 			//$this->params = $this->Group->prepData($this->params);
 			if ($this->Group->save($this->data)) {
@@ -320,7 +321,6 @@ class GroupsController extends AppController
 
   // Takes an array of imported file lines, and creates groups from them
   function addGroupByImport($data, $lines, $courseId) {
-
       // Check for parameters
       if (empty($lines) || empty($courseId)) {
           return array();

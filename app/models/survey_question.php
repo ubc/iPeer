@@ -28,15 +28,24 @@
 class SurveyQuestion extends AppModel
 {
   var $name = 'SurveyQuestion';
-
+  
   // returns all the question IDs of a specific survey
-  function getQuestionsID($survey_id) {
-    $data = $this->find('all', array('conditions'=> array('survey_id' => $survey_id),
+  function getQuestionsID($surveyId=null) {
+    
+  	$data = $this->find('all', array('conditions'=> array('survey_id' => $surveyId),
                                      'fields' => array('number', 'question_id', 'id'),
                                      'order' => 'number'));
     $data['count'] = count($data);
-
     return $data;
+  	
+  	/*
+  	$surveyId=5;
+  	$sql = "SELECT question_id
+  			FROM survey_questions
+  			WHERE survey_id = $surveyId" ;  	
+    $val = $this->query($sql);
+    var_dump($val);
+    */
   }
 
 }

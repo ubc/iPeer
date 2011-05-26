@@ -130,8 +130,8 @@ if ($event['Event']['id']==292) {
     <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeSimpleEvaluation') ?>">
       <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
       <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>"/>
-      <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>"/>
-      <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $rdAuth->id?>"/>
+      <input type="hidden" name="course_id" value="<?php echo $courseId?>"/>
+      <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $userId ?>"/>
       <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
 
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
@@ -140,7 +140,7 @@ if ($event['Event']['id']==292) {
     </tr>
   <tr class="tablecell2">
     <td width="10%">Evaluator:</td>
-    <td width="25%"><?php echo $rdAuth->fullname ?>
+    <td width="25%"><?php echo $fullName ?>
     </td>
     <td width="10%">Evaluating:</td>
     <td width="25%"><?php echo $event['group_name'] ?></td>
@@ -179,7 +179,8 @@ if ($event['Event']['id']==292) {
 		<td width="35%">Comment  <?php echo $event['Event']['com_req']? '<font color=red>*</font>' : '(Optional)' ;?></td>
 	</tr>
                    <?php $i = 0;
-    foreach($groupMembers as $row): $user = $row['User']; ?>
+    foreach($groupMembers as $row): $user = $row['U'];
+    ?>
     <tr class="tablecell">
         <td><?php echo $user['last_name'].' '.$user['first_name']?>
       <input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/></td>
@@ -241,7 +242,7 @@ if ($event['Event']['id']==292) {
   <tr class="tablecell2">
     <td colspan="4" align="center"><?php
       if (!isset($preview)) {
-        echo $html->submit('Submit Evaluation', array('id' => 'submit0', 'disabled' => 'true', 'onClick' => "javascript:return confirm('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?')"));
+        echo $form->submit('Submit Evaluation', array('id' => 'submit0', 'disabled' => 'true', 'onClick' => "javascript:return confirm('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?')"));
       }
       ?></td>
     </tr>
@@ -256,3 +257,4 @@ if ($event['Event']['id']==292) {
 	</td>
   </tr>
 </table>
+

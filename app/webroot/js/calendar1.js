@@ -30,7 +30,7 @@ function calendar1(obj_target) {
 	this.prs_time = cal_prs_time1;
 	this.prs_tsmp = cal_prs_tsmp1;
 	this.popup    = cal_popup1;
-
+	
 	// validate input parameters
 	if (!obj_target)
 		return cal_error("Error calling the calendar: no target control specified");

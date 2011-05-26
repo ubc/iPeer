@@ -132,7 +132,7 @@ class User extends AppModel
     $this->virtualFields['full_name'] = sprintf('CONCAT(%s.first_name, " ", %s.last_name)', $this->alias, $this->alias);
     $this->virtualFields['student_no_with_full_name'] = sprintf('CONCAT(%s.student_no, " - ", %s.first_name, " ", %s.last_name)', $this->alias, $this->alias, $this->alias);
   }
-
+  
   //Overwriting Function - will be called before save operation
   function beforeSave() {
     $allowSave = true;
@@ -145,7 +145,6 @@ class User extends AppModel
     if(empty($this->data[$this->name]['password'])) {
       unset($this->data[$this->name]['password']);
     }
-
     return $allowSave && parent::beforeSave();
   }
 
@@ -205,7 +204,22 @@ class User extends AppModel
                                     'fields' => 'User.*',
                                     'order' => 'User.student_no'));
   }
-
+  
+  function getEnrolledCourses($userId=''){
+  	$sql = "SELECT course_id
+  			FROM user_enrols
+  			WHERE user_id = $userId";
+  	$courseId = $this->query($sql);
+  	$courseIdArray = array();
+  	foreach($courseId as $id){
+  		array_push($courseIdArray,$id['user_enrols']['course_id']);
+  	}
+  	return $courseIdArray;  	
+  }
+  
+  function printHelp($temp){
+  	$this->log($temp);
+  }
 
   function getEnrolledStudentsForList($course_id) {
     $this->displayField = 'student_no_with_full_name';
@@ -216,13 +230,16 @@ class User extends AppModel
                                                            'conditions' => array('User.id = UserEnrol.user_id'))
                                                     ),
                                     'order' => 'User.student_no'));
+
   }
+
 
   function getUserByEmail($email='') {
     //return $this->find( "email='" . $email );
       return $this->find('first', array(
           'conditions' => array('email' => $email)
       ));
+
   }
 
   function findUserByEmailAndStudentNo($email='', $studentNo='') {
@@ -243,19 +260,19 @@ class User extends AppModel
    */
   function canRemoveCourse($user, $course_id)
   {
+
     if(!isset($user['User']) || !is_array($user['User'])) return false;
     if('A' == $user['User']['role']) return true;
     if('S' == $user['User']['role']) return false;
     if(!isset($user['UserCourse']) || !is_array($user['UserCourse'])) return false;
-
+    
     foreach($user['UserCourse'] as $c)
     {
       if($c['course_id'] == $course_id) return true;
     }
-
     return false;
   }
-
+  
   function getRoleText($role)
   {
     $ROLE_TEXT = array('A'  => 'Administrator',
@@ -280,7 +297,7 @@ class User extends AppModel
   }
 
   function getRoleById($id) {
-    $user = $this->find('first', array('conditions' => array($this->name.'.id' => $id)));
+    $user = $this->find('first', array('conditions' => array('id'=>$id)));
     return $user['Role'][0]['name'];
   }
 
@@ -344,7 +361,7 @@ class User extends AppModel
   function registerEnrolment($id, $course_id) {
     $this->habtmAdd('Enrolment', $id, $course_id);
   }
-
+   
   function getInstructors($type, $params) {
     $defaults = array('order' => $this->alias.'.first_name');
     $params = array_merge($defaults, $params);
@@ -380,7 +397,28 @@ class User extends AppModel
     return $ret;
   }
 
-  function getStudentsNotInGroup($group_id, $type = 'all') {
+//Function rewritten by Tony Chiu (March 16/2011)
+  function getStudentsNotInGroup($group_id) {
+  	
+  	$getCourseCountSQL = 'SELECT COUNT(*) as count
+  						  FROM groups_members 
+  						  WHERE group_id = '.$group_id.'';
+	$courseCountArray = $this->query($getCourseCountSQL);
+	$courseCount= $courseCountArray[0][0]['count'];
+
+	//check that the $group_id exists
+	if($courseCount > 0){
+  		$sql = 'SELECT * 
+  		 	    FROM users U 
+  		    	WHERE U.id NOT IN (SELECT G.user_id
+                	   			   FROM groups_members G
+                   				   WHERE G.group_id ='.$group_id.')';
+		$studentsNotInGroup = $this->query($sql);
+		return $studentsNotInGroup;        	           			   
+	}	
+	else return null; 
+  
+  	/*
     $groups_member = Classregistry::init('GroupsMember');
     $dbo = $groups_member->getDataSource();
     $subQuery = $dbo->buildStatement(array('fields' => array('GroupsMember.user_id'),
@@ -409,6 +447,7 @@ class User extends AppModel
                                                     ),
                                     'order' => array($this->alias.'.student_no'),
                                     'recursive' => 1));
+ 	*/                                 
   }
 
   function getMembersByGroupId($group_id, $type = 'all') {
@@ -462,7 +501,5 @@ function getCurrentLoggedInUser(){
   
   	
   }
-  
 }
-
 ?>

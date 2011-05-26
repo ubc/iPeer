@@ -2,10 +2,10 @@
   <tr>
     <td>
       <form name="frm" id="frm" method="POST" action="<?php echo $html->url('makeSurveyEvaluation') ?>">
-      <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
-      <input type="hidden" name="survey_id" id="survey_id" value="<?php if (!empty($survey_id)) echo $survey_id; ?>" />
-      <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>"/>
-      <input type="hidden" name="data[Evaluation][surveyee_id]" value="<?php echo $rdAuth->id?>"/>
+      <input type="hidden" name="event_id" value="<?php echo $event[0]['events']['id']?>"/>
+      <input type="hidden" name="survey_id" id="survey_id" value="<?php if (!empty($survey_id)) echo $survey_id; ?>" />      
+      <input type="hidden" name="course_id" value="<?php echo $courseId ?>"/>
+      <input type="hidden" name="data[Evaluation][surveyee_id]" value="<?php echo $id ?>"/>
       <input type="hidden" name="question_count" value="<?php echo count($questions)?>"/>
         <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
           <tr class="tableheader">
@@ -20,7 +20,7 @@
 						<tr class=\"tablecell\">
 						<td width=\"50\"><b><font size=\"2\">Q: ".$question['number']."</font></b><br>";
 				echo "</td></tr>";
-
+				
 				// Multiple Choice Question
 				if( $question['type'] == 'M'){
 					echo "<tr class=\"tablecell2\"><td colspan=\"8\">".$question['prompt']."</td></tr>";
@@ -29,10 +29,9 @@
 
 					if( !empty($question['Responses'])){
 						foreach ($question['Responses'] as $index => $value):
-							echo "<input type=\"radio\" name=\"answer_".$question['number']."\" value=\"".$value['response']."_".$value['id']."\" > ".$value['response']."<br>";
+							echo "<input type=\"radio\" name=\"answer_".$question['id']."\" value=\"".$value['response']."_".$value['id']."\" > ".$value['response']."<br>";
 						endforeach;
 					}
-
 					echo "</td></tr>";
 				}
 				// Choose Any... Question
@@ -46,7 +45,6 @@
 							echo "<input type=\"checkbox\" name=\"answer_".$question['number']."[]\" value=\"".$value['response']."_".$value['id']."\" > ".$value['response']."<br>";
 						endforeach;
 					}
-
 					echo "</td></tr>";
 				}
 				// Short Answer Question
@@ -69,7 +67,7 @@
 			</td>
           </tr>
           <tr class="tablecell2">
-            <td><div align="center"><?php echo $html->submit('Submit') ?>
+            <td><div align="center"><?php echo $form->submit('Submit') ?>
 			</div></td>
           </tr>
       </table>

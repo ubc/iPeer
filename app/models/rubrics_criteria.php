@@ -41,6 +41,14 @@ class RubricsCriteria extends AppModel
                     'exclusive' => true,
                     ));
 
+
+                    
+	function getCriteria($id){
+		$sql = "SELECT criteria
+				FROM rubrics_criterias
+				WHERE rubric_id=$id";
+		return $this->query($sql);
+	}
 /*  // called by rubrics controller during add/edit of rubric
   // inserts/updates with criteria comments for each rubric
   function insertCriteria($id=null, $data){

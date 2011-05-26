@@ -10,7 +10,6 @@
 <!-- =-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-= -->
 
 <?php
-
     function showProgrammerError ($message) {
         echo "<span style='color:red'>ajaxList: $message</span><br />";
     }

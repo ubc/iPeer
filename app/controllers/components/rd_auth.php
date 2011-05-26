@@ -20,7 +20,7 @@ class rdAuthComponent extends AppController // This component is in fact a
 
 	var $components = array('Session');
     var $uses = array('User');
-    var $name = "rdAuthComponent";
+    var $name = 'rdAuthComponent';
 
 	/**
 	 * id of the logged in user
@@ -73,7 +73,7 @@ class rdAuthComponent extends AppController // This component is in fact a
 	var $courseId = null;
 
 	var $customIntegrateCWL = 0;
-
+	
     // =-=-=-==-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
     // User privilege level functions
 
@@ -96,7 +96,7 @@ class rdAuthComponent extends AppController // This component is in fact a
             }
         }
     }
-
+    
     function studentPrivilegeLevel() {
         return $this->getPrivilegeLevel('s');
     }
@@ -213,6 +213,9 @@ class rdAuthComponent extends AppController // This component is in fact a
 		$this->Session->write('ipeerSession.courseId', $courseId);
 		$this->courseId = $this->Session->read('ipeerSession.courseId');
 	}
-
+	
+	function setUserId($userId){
+		$this->id=$userId;
+	}
 
 }

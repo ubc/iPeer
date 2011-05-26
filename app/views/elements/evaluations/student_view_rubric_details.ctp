@@ -1,6 +1,6 @@
 <?php
-$gradeReleased = isset($scoreRecords[$rdAuth->id])? $scoreRecords[$rdAuth->id]['grade_released']: 1;
-$commentReleased = isset($scoreRecords[$rdAuth->id])? $scoreRecords[$rdAuth->id]['comment_released']: 1;
+$gradeReleased = isset($currentUser['id'])? $scoreRecords[$currentUser['id']]['grade_released']: 1;
+$commentReleased = isset($scoreRecords[$currentUser['id']])? $scoreRecords[$currentUser['id']]['comment_released']: 1;
 $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
 
 ?>
@@ -10,7 +10,7 @@ $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","
     <?php
       for ($i=1; $i<=$rubric['Rubric']["criteria"]; $i++) {
     		echo "<td><strong><font color=" . $color[ $i % sizeof($color) ] . ">" . ($i) . ". "  . "</font></strong>";
-    		echo $rubricCriteria['criteria'.$i];
+    		echo $rubricCriteria[0]['rubrics_criterias']['criteria'];
     		echo "</td>";
     	}
     ?>
@@ -28,14 +28,13 @@ if (!$gradeReleased && !$commentReleased) {
      shuffle($memberResult);
    }
    foreach ($memberResult AS $row):
-
      $memberRubric = $row['EvaluationRubric'];
      echo "<tr class=\"tablecell2\">";
      if (isset($scoreRecords)) {
-       echo "<td width='15%'>".$rdAuth->fullname."</td>";
+       echo "<td width='15%'>".$currentUser['first_name'].' '.$currentUser['last_name']."</td>";
      } else {
         $member = $membersAry[$memberRubric['evaluatee']];
-        echo "<td width='15%'>".$member['User']['last_name'].' '.$member['User']['first_name']."</td>";
+        echo "<td width='15%'>".$member['U']['first_name'].' '.$member['U']['last_name']."</td>";
      }
 
      $resultDetails = $memberRubric['details'];

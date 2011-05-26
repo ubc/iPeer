@@ -36,7 +36,7 @@ class EventsController extends AppController
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $NeatString;
 	var $Sanitize;
-	var $uses = array('GroupEvent', 'Group', 'Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers');
+	var $uses = array('GroupEvent', 'User', 'Group', 'Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers');
   var $components = array("AjaxList", "SysContainer");
 
   function __construct()
@@ -166,7 +166,10 @@ class EventsController extends AppController
                            $recursive, "postProcessData");
   }
 
-  function index() {
+  function index($message = '') {
+  	
+  	$this->set('message', $message);
+  	
     // Make sure the present user is not a student
     //$this->rdAuth->noStudentsAllowed();
     // Set up the basic static ajax list variables
@@ -268,6 +271,7 @@ class EventsController extends AppController
 
   function eventTemplatesList($templateId = 1)
   {
+  	  $currentUser = $this->User->getCurrentLoggedInUser();
       $this->layout = 'ajax';
       //$conditions = null;
       $eventTemplates = array();
@@ -281,23 +285,23 @@ class EventsController extends AppController
         {
           $default = 'Default Simple Evaluation';
           $model = 'SimpleEvaluation';
-          $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->rdAuth->id);
+          $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($currentUser['id']);
         }
         else if ($templateId == 2)
         {
           $default = 'Default Rubric';
           $model = 'Rubric';
-          $eventTemplates = $this->Rubric->getBelongingOrPublic($this->rdAuth->id);
+          $eventTemplates = $this->Rubric->getBelongingOrPublic($currentUser['id']);
         }
         else if ($templateId == 4)
         {
           $default = 'Default Mixed Evaluation';
           $model = 'Mixeval';
-          $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->rdAuth->id);
+          $eventTemplates = $this->Mixeval->getBelongingOrPublic($currentUser['id']);
         }
 
-      }
-
+      }    
+      
       $this->set('eventTemplates', $eventTemplates);
       $this->set('default',$default);
       $this->set('model', $model);
@@ -306,16 +310,20 @@ class EventsController extends AppController
 
   function add()
   {
+  	//Set up user info
+  	$currentUser = $this->User->getCurrentLoggedInUser();
+  	$this->set('currentUser', $currentUser);
+  	
     $courseId = $this->Session->read('ipeerSession.courseId');
 		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
 	  //List Add Page
 		if (empty($this->params['data'])) {
 
-			$unassignedGroups = $this->Group->find('all','course_id = '.$courseId);
+			$unassignedGroups = $this->Group->find('list', array( 'conditions'=> array('course_id'=>$courseId)));
 			$this->set('unassignedGroups', $unassignedGroups);
 
  	    //Get all display event types
- 	    $eventTypes = $this->EventTemplateType->find('all',' EventTemplateType.display_for_selection = 1 ');
+ 	    $eventTypes = $this->EventTemplateType->find('all', array('conditions'=> array('display_for_selection'=>1)));
 		  $this->set('eventTypes', $eventTypes);
 
 		  //Set default template
@@ -343,8 +351,7 @@ class EventsController extends AppController
 
         //Save Groups for the Event
 			  $this->GroupEvent->insertGroups($this->Event->id, $this->params['data']['Event']);
-
-				$this->redirect('/events/index/The event is added successfully.');
+			  $this->redirect('/events/index/The event is added successfully.');
 			}
       //Found error
       else {
@@ -653,8 +660,9 @@ class EventsController extends AppController
     if (isset($this->params['form']['id']))
     {
       $id = intval(substr($this->params['form']['id'], 5));
+      var_dump($id);
     }   //end if
-    if ($this->Event->del($id)) {
+    if ($this->Event->delete($id)) {
 			$this->redirect('/events/index/The event is deleted successfully.');
     }
   }
@@ -780,6 +788,7 @@ class EventsController extends AppController
   {
 		if ($attributeCode != '' && $attributeValue != '') //check for empty params
   		$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
-	}
+  }
+  
 }
 ?>

@@ -117,7 +117,7 @@ class OutputComponent extends Object{
 		echo '<meta http-equiv="refresh" content="'.$time.'; url="'.$url.'">';
 	}
 
-  /* deprecated and moved to DateTimeHelper
+  /* deprecated and moved to app/libs/toolkit.php; function name unchanged
 	function formatDate($timestamp=null) {
         $this->SysParameter = new SysParameter;
         $data = $this->SysParameter->findParameter('display.date_format');
@@ -131,6 +131,25 @@ class OutputComponent extends Object{
             return "";
         }
 	}*/
+	
+	function weeWa(){
+		$this->log("Does nothing");
+	}	
+	
+  function formatDate($timestamp) {
+    $sys_parameter = new SysParameter;
+    $data = $sys_parameter->findParameter('display.date_format');
+    $dateFormat = $data['SysParameter']['parameter_value'];
+
+    if (is_string($timestamp)) {
+      return date($dateFormat,strtotime($timestamp));
+    } else if(is_numeric($timestamp)){
+      return date($dateFormat, $timestamp);
+    } else {
+      return "";
+    }
+  }
+	
 }
 
 ?>

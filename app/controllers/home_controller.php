@@ -32,12 +32,51 @@ class HomeController extends AppController
    *
    * @var $uses
    */
+
   var $uses =  array('GroupEvent', 'UserEnrol', 'User', 'UserCourse', 'Event', 'Group', 'EvaluationSubmission', 'Course', 'Role');
   var $page;
   var $Sanitize;
   var $functionCode = 'HOME';
-  var $componets = array('Acl');
-
+  var $components = array( 'rdAuth', 'Acl', 'Output');
+  
+  
+  //Temporary formatDate function
+  function formatDate($timestamp) {
+    $sys_parameter = new SysParameter;
+    $data = $sys_parameter->findParameter('display.date_format');
+    $dateFormat = $data['SysParameter']['parameter_value'];
+    
+	return date($dateFormat, $timestamp);
+/*
+    if (is_string($timestamp)) {
+      return date($dateFormat,strtotime($timestamp));
+    } else if(is_numeric($timestamp)){
+      return date($dateFormat, $timestamp);
+    } else {
+      return "";
+    }
+*/
+  }
+ 
+/*
+  function formatDate($events) {
+  	$timestamp = date("Y-m2-d H:i:s", strtotime($comingUpEvent['Event']['due_date']));
+    $sys_parameter = new SysParameter;
+    $data = $sys_parameter->findParameter('display.date_format');
+    $dateFormat = $data['SysParameter']['parameter_value'];
+    
+    $this->log($events);
+    
+    if (is_string($timestamp)) {
+      return date($dateFormat,strtotime($timestamp));
+    } else if(is_numeric($timestamp)){
+    	$this->log(date($dateFormat, $timestamp));
+      return date($dateFormat, $timestamp);
+    } else {
+      return "";
+    }
+  }*/
+  
   function __construct()
   {
     $this->Sanitize = new Sanitize;
@@ -343,16 +382,18 @@ class HomeController extends AppController
 
   function index() {
     //Disable the autorender, base the role to render the custom home
-    $this->autoRender = false;
-
+    $this->autoRender = false;   
     $role = $this->Auth->user('role');
+    $userId = $this->Auth->user('id');
+    //Set up user id
+    //$this->rdAuth->setUserId($userId);
+    
     if (isset ($role)) {
       //General Home Rendering for Admin
       if ($role == $this->User->USER_TYPE_ADMIN)
       {
         
-        //var_dump($course_list[0]['Instructor']);
-
+        
             $inactiveCourseDetail = array();
             $inactiveCourseList = $this->Course->getInactiveCourses();
             $inactiveCourseDetail = $this->formatCourseList($inactiveCourseList);
@@ -366,7 +407,6 @@ class HomeController extends AppController
             $this->render('index');
       }//Student Home Rendering
       else if ($role == $this->User->USER_TYPE_STUDENT) {
-
         $this->set('data', $this->preparePeerEvals());
 
         //Check if the student has a email in his/her profile
@@ -386,14 +426,12 @@ class HomeController extends AppController
     $eventAry = array();
     $pos = 0;
     //Get enrolled courses
-    $enrolledCourseIds = $this->UserEnrol->getEnrolledCourses($curUserId);
-    foreach($enrolledCourseIds as $row) {
-      $userEnrol = $row['UserEnrol'];
-      $courseId = $userEnrol['course_id'];
+	$enrolledCourseIds = $this->User->getEnrolledCourses($curUserId);
+    foreach($enrolledCourseIds as $courseId) {
       //$courseDetail = $this->Course->find('id='.$courseId);
-
       //Get Events for this course that are due
-      $events = $this->Event->find('all','release_date_begin < NOW() AND NOW() <= release_date_end AND course_id='.$courseId);
+      //$events = $this->Event->find('all',array('conditions' => array('release_date_begin < NOW() AND NOW() <= release_date_end AND course_id='.$courseId)));
+      $events = $this->Event->find('all',array('conditions' => array('release_date_begin < ' => 'NOW()' , 'NOW() <= ' => 'release_date_end' , 'course_id' => $courseId)));
       foreach($events as $row) {
         $event = $row['Event'];
         switch ($event['event_template_type_id']) {
@@ -416,7 +454,6 @@ class HomeController extends AppController
         }
       }
     }
-
     return $eventAry;
   }
 
@@ -424,24 +461,21 @@ class HomeController extends AppController
   {
     $result = null;
     $groupsEvents = $this->GroupEvent->getGroupEventByUserId($userId, $event['id']);
-
     foreach($groupsEvents as $row):
-    $groupMember = $row['GroupMember'];
     $groupEvent = $row['GroupEvent'];
     //get corresponding group
-    $group = $this->Group->find('id='.$groupEvent['group_id']);
+    $group = $this->Group->getGroupByGroupId($groupEvent['group_id']);
     // get corresponding evaluation submission that is not submitted
     $isSubmitted = false;
-    $eventSubmit = $this->EvaluationSubmission->find('grp_event_id='.$groupEvent['id'].' AND submitter_id='.$userId);
+    $eventSubmit = $this->EvaluationSubmission->find( 'first', array( 'conditions'=>array( 'grp_event_id'=>$groupEvent['id'], 'submitter_id'=>$userId)));
     if ($eventSubmit['EvaluationSubmission']['submitted']) {
       $isSubmitted = true;
     }
-
     // get due date of event in days or number of days late
     $diff = $this->framework->getTimeDifference($event['due_date'], $this->framework->getTime());
     $isLate = ($diff < 0);
     $dueIn = abs(floor($diff));
-
+    
     // if eval submission is not submitted or doesn't exist, output
     if (!$isSubmitted) {
       $result['comingEvent']['Event'] = $event;
@@ -457,10 +491,8 @@ class HomeController extends AppController
       $result['eventSubmitted']['Event']['group_id'] = $groupEvent['group_id'];
       $result['eventSubmitted']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
     }
-
     endforeach;
     return $result;
-
   }
 
   function getSurveyEvaluation($courseId, $event = null, $userId=null) {

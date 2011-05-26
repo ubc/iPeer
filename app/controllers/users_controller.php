@@ -37,6 +37,7 @@ App::import('Lib', 'neat_string');
 
 class UsersController extends AppController
 {
+		
   var $name = 'Users';
   var $show;
   var $sortBy;
@@ -48,7 +49,7 @@ class UsersController extends AppController
   var $Sanitize;
   var $uses = array('User', 'UserEnrol', 'Personalize', 'Course', 'SysParameter', 'SysFunction');
   var $components = array('Session', 'AjaxList', 'RequestHandler', 'Email');
-
+  
   function __construct()
   {
     $this->Sanitize = new Sanitize;
@@ -67,7 +68,7 @@ class UsersController extends AppController
     $this->Auth->autoRedirect = false;
     parent::beforeFilter();
   }
-
+  
   function login() {
     // Get iPeer Admin's email address
     $admin_email = $this->sysContainer->getParamByParamCode('system.admin_email');
@@ -195,6 +196,11 @@ class UsersController extends AppController
 
     $this->set('can_add_user', $this->AccessControl->hasPermission('functions/user', 'create'));
     $this->set('can_import_user', $this->AccessControl->hasPermission('functions/user/import'));
+    
+    $fields = array('Enrolment');
+    
+    $tempVar=$this->User->getEnrolledStudents(1,$fields);
+    $this->log($tempVar);
   }
 
   // Show a class list
@@ -473,7 +479,7 @@ class UsersController extends AppController
       $this->Session->setFlash('You do not have permission to view this user.');
       $this->redirect('index');
     }
-    
+      
     $isStudent = $this->determineIfStudentFromThisData($this->data);  
     if ($isStudent) {
       $this->setUpCourseEnrollmentLists($id);
@@ -487,7 +493,7 @@ class UsersController extends AppController
   }
 
   function add() {
-    $this->AccessControl->check('functions/user', 'create');
+   // $this->AccessControl->check('functions/user', 'create');
 
     $course_id = $this->Session->read('ipeerSession.courseId');
     if (!empty($course_id))  {

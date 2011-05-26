@@ -121,6 +121,10 @@ class Event extends AppModel
     $this->virtualFields['completed_count'] = sprintf('SELECT count(*) as count FROM evaluation_submissions as ves WHERE ves.submitted = 1 AND ves.event_id = %s.id', $this->alias);
   }
 
+  function printing(){
+  	$this->log("PRINTED!!");
+  }
+  
 	//Overwriting Function - will be called before save operation
 	function beforeSave(){
         // Ensure the name is not empty
@@ -140,13 +144,12 @@ class Event extends AppModel
     }
     return $allowSave;
 	}
-
   //Validation check on duplication of title
 	function __checkDuplicateTitle($title = null) {
 	  $duplicate = false;
     $field = 'title';
     $value = null === $title ? $this->data[$this->name]['title'] : $title;
-    if ($result = $this->find($field . ' = "' . $value.'"', $field)){
+    if ($result =  $this->find('all' , array('conditions'=>array('title'=>$value) , 'fields'=>'title' ))){
       $duplicate = true;
      }
 
@@ -348,8 +351,14 @@ class Event extends AppModel
 
       return $group->find('all', array('conditions' => array('course_id' => $event['Event']['course_id'], 
                                                              'NOT' => array('Group.id' => $assigned_group_ids))));
-    }
+    }   
 
+    function getEventById($id){
+    	$sql = "SELECT *
+    			FROM events
+    			WHERE id=$id";
+    	return $this->query($sql);
+    }
 }
 
 ?>

@@ -85,14 +85,15 @@ class Rubric extends EvaluationBase
    */
   function saveAllWithCriteriaComment($data) {
     // check if the we should remove some of the association records
+	
+
     if(isset($data['Rubric']['id']) && !empty($data['Rubric']['id'])) {
       $rubric = $this->find('first', array('conditions' => array('id' => $data['Rubric']['id']),
                                            'contain' => array('RubricsCriteria.RubricsCriteriaComment',
                                                               'RubricsLom')));
 
-
       // check level of mastery and criteria if they should be removed
-      $result = array('RubricsLom' => array(),
+      $result = array('RubricsLom' => array(), 
                       'RubricsCriteria' => array());
       foreach(array_keys($result) as $model) {
         foreach($rubric[$model] as $in_db) {
@@ -132,19 +133,19 @@ class Rubric extends EvaluationBase
     // have to save criteria and criteria comment separately.
     
     // remove criteria array. We only save rubric and RubricsLom first.  
+    
     $criterias = $data['RubricsCriteria'];
     unset($data['RubricsCriteria']);
-
     if(!$this->saveAll($data)) {
       //$this->errorMessage = __('Failed to save Rubric with Level of Mastery!', true);
       return false;
     }
-
+	
     // get LOM Ids
     $loms = $this->RubricsLom->find('all', array('conditions' => array('rubric_id' => $this->id),
                                                  'fields' => array('id'),
                                                  'contain' => false));
-
+	
     // now save the criteria with comments one by one
     foreach($criterias as $c) {
       // link the rubric with criteria
@@ -160,17 +161,19 @@ class Rubric extends EvaluationBase
       unset($c['RubricsCriteriaComment']);
       $criteria_data['RubricsCriteria'] = $c;
 
-      // save
+      // save 
       if(!$this->RubricsCriteria->saveAll($criteria_data)) {
         //$this->errorMessage = __('Failed to save rubric criterias!', true);
         return false;
       }
     }
+    
     return true;
   }
 
   function afterFind(array $results, $primary) {
-    $return = array();
+  	$return = array();
+  	
     foreach($results as $r) {
       if(isset($r['RubricsCriteria']) && isset($r['RubricsLom']) &&
          isset($r['RubricsCriteria'][0]['RubricsCriteriaComment'])) {
@@ -184,6 +187,7 @@ class Rubric extends EvaluationBase
               }
             }
           }
+          
           $r['RubricsCriteria'][$i]['RubricsCriteriaComment'] = $comments;
         }
       }
@@ -204,11 +208,12 @@ class Rubric extends EvaluationBase
     $data = $this->find('first', array('conditions' => array('id' => $id),
                                        'contain' => array('RubricsCriteria.RubricsCriteriaComment',
                                                           'RubricsLom')));
-
+    
     if(null != $data) {
       // set a new name
       $data['Rubric']['name'] = __('Copy of ', true).$data['Rubric']['name'];
 
+      		
       // remove rubric id and other stuff
       unset($data['Rubric']['id'],
             $data['Rubric']['creator_id'],
@@ -231,6 +236,11 @@ class Rubric extends EvaluationBase
     }
     return $data;
   }
-}
-
+  
+  function getRubricById($id=null){
+  	return $this->find('all',array('conditions'=>array('id'=>$id)));
+  }
+  	
+  }
+  
 ?>

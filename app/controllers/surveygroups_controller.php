@@ -114,7 +114,7 @@ class SurveyGroupsController extends AppController
       $courseId = $event['Event']['course_id'];
       $this->rdAuth->setCourseId($courseId);
     }
-
+    
     $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > View Survey Result');
     //get surveys for the course
     $survey_list = $this->Survey->find('list', array('conditions' => array('course_id' => $courseId)));
@@ -128,7 +128,7 @@ class SurveyGroupsController extends AppController
   function viewresultsearch() {
     $this->layout = false;
     $conditions = array();
-
+    
     //search function
     if (!empty($this->data['livesearch2']) && !empty($this->data['select']))
     {
@@ -139,7 +139,7 @@ class SurveyGroupsController extends AppController
       $conditions = array('OR' => array('Enrol.first_name LIKE' => '%'.$searchValue.'%',
                                         'Enrol.last_name LIKE' => '%'.$searchValue.'%'));
     }
-
+	
     $survey = $this->Survey->getSurveyWithSubmissionById($this->data['survey_select'], $conditions);
     $this->set('data',$survey);
   }

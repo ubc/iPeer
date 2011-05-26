@@ -38,6 +38,7 @@ class RubricsCriteriaComment extends AppModel
   // called by rubrics controller during add/edit of rubric
   // inserts/updates with criteria comments for each rubric
   function insertCriteriaComm($id=null, $data){
+  	
   	for( $i=1; $i<=$data['criteria']; $i++ ){
   		for( $j=1; $j<=$data['lom_max']; $j++ ){
   			if( !empty($data['criteria_comment_'.$i.'_'.$j]) )
@@ -54,8 +55,7 @@ class RubricsCriteriaComment extends AppModel
   // called by rubrics controller during an edit of an
   // existing rubric criteria comment(s)
   function updateCriteriaComm($data){
-  	$this->query('DELETE FROM rubrics_criteria_comments WHERE rubric_id='.$data['id']);
-  	
+  	$this->query('DELETE FROM rubrics_criteria_comments WHERE rubric_id='.$data['id']);  	
   	for( $i=1; $i<=$data['criteria']; $i++ ){
   		for( $j=1; $j<=$data['lom_max']; $j++ ){
   			if( !empty($data['criteria_comment_'.$i.'_'.$j]) )
@@ -72,10 +72,11 @@ class RubricsCriteriaComment extends AppModel
   }
   
   // function to return the criteria x lom comments
-  /*function getCriteriaComment( $id=null, $criteria=null, $lom=null ){	
+  function getCriteriaComment( $id=null, $criteria=null, $lom=null ){	
   	for( $i=0; $i<$criteria; $i++ ){
   		for( $j=0; $j<$lom; $j++ ){
   			$data = $this->find('all',$conditions = 'rubric_id='.$id." AND ".'criteria_num='.($i+1)." AND ".'lom_num='.($j+1), $fields = 'criteria_comment');
+  			//$data = $this->find('all', array( 'conditions' => array('rubric_id' => $id ,'criteria_num'=> ($i+1) , 'lom_num'=>($j+1) $fields => 'criteria_comment'), array('fields'=>'criteria_comment')));
   			if( !empty($data) )
   				$tmp['criteria_comment_'.($i+1).'_'.($j+1)] = $data[0]['RubricsCriteriaComment']['criteria_comment'];
   			else
@@ -83,7 +84,7 @@ class RubricsCriteriaComment extends AppModel
   		}
   	}
   	return $tmp;
-  }*/
+  }
 }
 
 ?>

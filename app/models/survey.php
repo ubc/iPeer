@@ -104,6 +104,7 @@ class Survey extends EvaluationBase
     }
   }*/
 
+
   function getSurveyIdByCourseIdTitle($courseId=null,$title=null) {
     //$tmp = $this->find('course_id='.$courseId.' AND name=\''.$title.'\'','id');
     $tmp = $this->find('first', array(
@@ -144,12 +145,13 @@ class Survey extends EvaluationBase
 //    ));
 //  }
 
+
   function getSurveyTitleById($id=null) {
     $tmp = $this->findById($id);
     return $tmp['Survey']['name'];
   }
 
-  function getSurveyWithSubmissionById($survey_id, $conditions = array()) {
+  function getSurveyWithSubmissionById($survey_id, $conditions = array()){
     $evaluation_submission = Classregistry::init('EvaluationSubmission');
 
     $survey = $this->find('first',array('conditions' => array('Survey.id' => $survey_id),
@@ -157,17 +159,28 @@ class Survey extends EvaluationBase
                                                                    'Event')));
     if(empty($survey)) return false;
 
-    $user_ids = Set::extract('/Course/Enrol/id', $survey);
+    $user_ids = Set::extract('/Course/Enrol/id', $survey); 
     $submissions = $evaluation_submission->find('list', array('conditions' => array('event_id' => $survey['Event'][0]['id'],
                                                                                    'submitter_id' => $user_ids),
                                                               'fields' => array('submitter_id', 'date_submitted')));
-
     foreach($survey['Course']['Enrol'] as $key => $student) {
       $survey['Course']['Enrol'][$key]['date_submitted'] = isset($submissions[$student['id']]) ? $submissions[$student['id']] : '';
     }
-
     return $survey;
   }
+  
+  
+#### Helper functions for unit testing ####
+
+  	function printHelp($temp){
+  		$this->log($temp);
+  	}
+  
+	function deleteAllTuples($table){	
+		$sql = "DELETE FROM $table";
+		$this->query($sql);
+	}
+
 }
 
 ?>

@@ -12,43 +12,43 @@
 class EvaluationRubricHelperComponent extends Object
 {
 	var $components = array('EvaluationHelper', 'rdAuth');
-
+	
   function loadRubricEvaluationDetail ($event)
   {
     $this->EvaluationRubric = new EvaluationRubric;
     $this->GroupsMembers = new GroupsMembers;
     $this->EvaluationRubricDetail = new EvaluationRubricDetail;
     $this->Rubric = new Rubric;
-
-    $result = array();
- 	  $evaluator = $this->rdAuth->id;
-
+    $this->User=  new User;
+    
+    $Session = new SessionComponent();
+    $user = $Session->read('Auth.User');//User or Admin or
+ 	$evaluator = $user['id'];
+ 	$result = array();
     //Get Members for this evaluation
     $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'],
-                                                               $this->rdAuth->id);
+                                                               $evaluator);                                                                                                                           
     for ($i = 0; $i<count($groupMembers); $i++) {
-       $targetEvaluatee = $groupMembers[$i]['User']['id'];
-       $evaluation = $this->EvaluationRubric->getEvalRubricByGrpEventIdEvaluatorEvaluatee($event['group_event_id'],
-                                                                                          $evaluator, $targetEvaluatee);
-
+       $targetEvaluatee = $groupMembers[$i]['U']['id'];
+       $evaluation = $this->EvaluationRubric->getEvalRubricByGrpEventIdEvaluatorEvaluatee($event['group_event_id'],$evaluator, $targetEvaluatee);
        if (!empty($evaluation)) {
-         $groupMembers[$i]['User']['Evaluation'] = $evaluation;
-
-         $groupMembers[$i]['User']['Evaluation']['EvaluationDetail'] = $this->EvaluationRubricDetail->getAllByEvalRubricId
-                                                                              ($evaluation['EvaluationRubric']['id']);
+         $groupMembers[$i]['User']['Evaluation'] = $evaluation;	
+         $groupMembers[$i]['User']['Evaluation']['EvaluationDetail'] = $this->EvaluationRubricDetail->getAllByEvalRubricId($evaluation['evaluation_rubrics']['id']);
         }
     }
 		//$this->set('groupMembers', $groupMembers);
 		$result['groupMembers'] = $groupMembers;
 
     //Get the target rubric
+
 	  $this->Rubric->id = $event['Event']['template_id'];
+
     //$this->set('rubric', $this->Rubric->read());
     $result['rubric'] = $this->Rubric->read();
-
+    
  		// enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
- 		$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find(count,'group_id='.$event['group_id']) :
- 		                                           $this->GroupsMembers->find(count,'group_id='.$event['group_id']) - 1;
+ 		$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find('count',array( 'conditions'=>array('group_id=>'.$event['group_id']))) :
+ 		                                           $this->GroupsMembers->find('count', array( 'conditions'=> array('group_id=>'.$event['group_id']- 1)));	                                           
 		//$this->set('evaluateeCount', $numMembers);
 		$result['evaluateeCount'] = $numMembers;
 
@@ -62,18 +62,22 @@ class EvaluationRubricHelperComponent extends Object
     $this->EvaluationRubric = new EvaluationRubric;
 
     // assuming all are in the same order and same size
-		$evaluatees = $params['form']['memberIDs'];
-		$evaluator = $params['data']['Evaluation']['evaluator_id'];
+	$evaluatees = $params['form']['memberIDs'];
+	$evaluator = $params['data']['Evaluation']['evaluator_id'];
     $groupEventId = $params['form']['group_event_id'];
     $rubricId = $params['form']['rubric_id'];
 
     //Get the target event
     $eventId = $params['form']['event_id'];
-	  $this->Event->id = $eventId;
-		$event = $this->Event->read();
 
+	  $this->Event->id = $eventId;
+
+		$event = $this->Event->read();
+		
 		//Get simple evaluation tool
+
 		$this->Rubric->id = $event['Event']['template_id'];
+
 		$rubric = $this->Rubric->read();
 
 		// Save evaluation data
@@ -85,9 +89,7 @@ class EvaluationRubricHelperComponent extends Object
 		    $targetEvaluatee = $evaluatees[$i];
 		  }
 	  }
-
-		$evalRubric = $this->EvaluationRubric->getEvalRubricByGrpEventIdEvaluatorEvaluatee($groupEventId, $evaluator,
-		                                                                                   $targetEvaluatee);
+		$evalRubric = $this->EvaluationRubric->getEvalRubricByGrpEventIdEvaluatorEvaluatee($groupEventId, $evaluator,$targetEvaluatee);                                                                                                                                                                      
 		if (empty($evalRubric)) {
 		    //Save the master Evalution Rubric record if empty
 		    $evalRubric['EvaluationRubric']['evaluator'] = $evaluator;
@@ -107,7 +109,7 @@ class EvaluationRubricHelperComponent extends Object
 		 $score = $this->saveNGetEvalutionRubricDetail($evalRubric['EvaluationRubric']['id'], $rubric,
 		                                               $targetEvaluatee, $params['form']);
      $evalRubric['EvaluationRubric']['score'] = $score;
-
+     
      if (!$this->EvaluationRubric->save($evalRubric))
      {
        return false;
@@ -254,7 +256,9 @@ class EvaluationRubricHelperComponent extends Object
         $memberScoreSummary = array();
         $allMembersCompleted = true;
         $inCompletedMembers = array();
+
         $this->User->id = $userId;
+
         $user = $this->User->read();
         if ($event['group_event_id'] && $userId) {
             $rubricResult = $this->EvaluationRubric->getResultsByEvaluator($event['group_event_id'], $userId);
@@ -404,31 +408,33 @@ class EvaluationRubricHelperComponent extends Object
 	  $groupMembers = array();
 	  $result = array();
 
+
 	  $this->Rubric->id = $event['Event']['template_id'];
+
 	  $rubric = $this->Rubric->read();
 	  $result['rubric'] = $rubric;
 
 
      //Get Members for this evaluation
      if ($studentView) {
+
        $this->User->id = $this->rdAuth->id;
+
        $user = $this->User->read();
        $rubricResultDetail = $this->getRubricResultDetail($event, $user);
-       $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'],
-                                                                  $this->rdAuth->id);
+       $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'],$currentUser['id']);
+
        $membersAry = array();
        foreach ($groupMembers as $member) {
-        $membersAry[$member['User']['id']] = $member;
+        $membersAry[$member['U']['id']] = $member;
        }
        $result['groupMembers'] = $membersAry;
 
-       $reviewEvaluations = $this->getStudentViewRubricResultDetailReview($event,
-                                                                          $this->rdAuth->id);
+       $reviewEvaluations = $this->getStudentViewRubricResultDetailReview($event,$currentUser['id']);
 		   $result['reviewEvaluations'] = $reviewEvaluations;
 
      } else {
-       $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'],
-                                                                  $this->rdAuth->id);
+       $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'],$currentUser['id']);
        $rubricResultDetail = $this->getRubricResultDetail($event, $groupMembers);
        $result['groupMembers'] = $groupMembers;
      }
@@ -447,7 +453,7 @@ class EvaluationRubricHelperComponent extends Object
 		$result['memberScoreSummary'] = $rubricResultDetail['memberScoreSummary'];
 		$result['evalResult'] = $rubricResultDetail['evalResult'];
     $result['gradeReleaseStatus'] = $gradeReleaseStatus;
-
+    
     return $result;
 	}
 }

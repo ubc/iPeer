@@ -49,7 +49,6 @@ class LoginoutController extends AppController
 
 	function login() {
 		$this->autoRender = false;
-
 		// Get iPeer Admin's email address
 		$admin_email = $this->sysContainer->getParamByParamCode('system.admin_email');
 		$admin_email = $admin_email['parameter_value'];

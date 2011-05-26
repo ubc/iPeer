@@ -130,6 +130,10 @@ class Group extends AppModel
     return parent::beforeSave();
   }
 
+  function printing(){
+  	$this->log("PRINTED!!");
+  }
+  
   function getCourseGroupCount($courseId=null) {
     //return $this->find('course_id='.$courseId, 'COUNT(DISTINCT id) as total');
       return $this->find('count', array(
@@ -243,6 +247,10 @@ class Group extends AppModel
 
     return $data[0][0]['count'];
 }
+
+  function getGroupByGroupId($groupId){
+  	return $this->find('all', array('conditions' => array('id'=>$groupId)));
+  } 
 }
 
 ?>

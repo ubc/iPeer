@@ -14,18 +14,20 @@
 			<td width="20%">Course</td>
 			<td width="20%">Due Date </td>
 			<td width="20%">Due In/Late By (red) </td>
-		  </tr>
+		  </tr>	  
   	<?php $i = '0';?>
 	  <?php
 	  foreach($data as $row): isset($row['comingEvent'])? $comingUpEvent = $row['comingEvent']: $comingUpEvent = null;
-	    if (isset($comingUpEvent['Event']['id'])) {?>
+	  $releaseEndDate = strtotime( $row['comingEvent']['Event']['release_date_end']);	    
+	  $currentDate = strtotime('NOW');
+	    if (isset($comingUpEvent['Event']['id']) && $currentDate<=$releaseEndDate) {?>
 		  <tr class="tablecell">
 			<td>
 			  <?php if ($comingUpEvent['Event']['event_template_type_id'] == 1):?>
 			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/makeSimpleEvaluation/<?php echo $comingUpEvent['Event']['id']?>;<?php echo $comingUpEvent['Event']['group_id']?>"><?php echo $comingUpEvent['Event']['title'] ?>&nbsp;</a>
 			  <?php endif;?>
 			  <?php if ($comingUpEvent['Event']['event_template_type_id'] == 2):?>
-			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/makeRubricEvaluation/<?php echo $comingUpEvent['Event']['id']?>;<?php echo $comingUpEvent['Event']['group_id']?>"><?php echo $comingUpEvent['Event']['title'] ?>&nbsp;</a>
+  			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/makeRubricEvaluation/<?php echo $comingUpEvent['Event']['id']?>;<?php echo $comingUpEvent['Event']['group_id']?>"><?php echo $comingUpEvent['Event']['title'] ?>&nbsp;</a>
 			  <?php endif;?>
 			  <?php if ($comingUpEvent['Event']['event_template_type_id'] == 3):?>
 			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/makeSurveyEvaluation/<?php echo $comingUpEvent['Event']['id']?>"><?php echo $comingUpEvent['Event']['title'] ?>&nbsp;</a>
@@ -35,7 +37,10 @@
 			  <?php endif;?>
 			</td>
 			<td><?php echo $comingUpEvent['Event']['course'] ?>&nbsp;</td>
-			<td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($comingUpEvent['Event']['due_date']))) ?>&nbsp;</td>
+			<td><?php 
+				$dueDate=$row['comingEvent']['Event']['due_date'];
+				$timeStamp = strtotime($dueDate);
+				echo $this->requestAction('home/formatDate/'.$timeStamp); ?>&nbsp;</td>
 			<td><?php
 			  if ($comingUpEvent['Event']['is_late']) {
 			     echo "<font color=\"red\"><b>" . $comingUpEvent['Event']["days_to_due"] . "</b> day(s) !</font>";
@@ -95,8 +100,15 @@
 			  <?php endif;?>
 			</td>
 			<td><?php echo $eventSubmitted['Event']['course'] ?>&nbsp;</td>
-			<td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($eventSubmitted['Event']['due_date']))) ?>&nbsp;</td>
-			<td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($eventSubmitted['Event']['date_submitted']))) ?>&nbsp;</td>
+			<td><?php 
+				$due_date = $eventSubmitted['Event']['due_date'];
+				//var_dump($eventSubmitted['Event']['due_date']);
+				$timeStamp = strtotime($due_date);
+				echo $this->requestAction('home/formatDate/'.$timeStamp); ?>&nbsp;</td>
+			<td><?php 
+				$submit_date = $eventSubmitted['Event']['date_submitted'];
+				$timeStamp = strtotime($submit_date);
+				echo $this->requestAction('home/formatDate/'.$timeStamp); ?>&nbsp;</td>
 		  </tr>
 	  <?php $i++;} ?>
 	  <?php endforeach; ?>

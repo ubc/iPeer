@@ -46,9 +46,10 @@ class EvaluationSubmission extends AppModel
                     )
                 )
             ));
-	}
-
+	}	
+		
 	function numCountInGroupCompleted($groupId=null, $groupEventId=null) {
+
 //        $condition = 'EvaluationSubmission.submitted = 1 AND GroupMember.group_id='.$groupId.' AND EvaluationSubmission.grp_event_id='.$groupEventId;
 //        $fields = 'Count(EvaluationSubmission.submitter_id) AS count';
 //        $joinTable = array(' LEFT JOIN groups_members as GroupMember ON GroupMember.user_id=EvaluationSubmission.submitter_id');

@@ -2,7 +2,7 @@
 
 <div class="content-container">
 
-  <?php foreach($course_list['A'] as $row):?>
+  <?php foreach($course_list as $row):?>
       <div class="course">
 	  	  <div class="course-header">
           <?php echo $html->link($html->image("icons/home.gif", array("border"=>"0","alt"=>$row['Course']['course'])).$row['Course']['course'], 
@@ -51,7 +51,7 @@
         </div>
 	      <?php endforeach; ?>
 
-        <?php if (0 == count($course_list['A'])):?>
+        <?php if (0 == count($course_list)):?>
           <div class="course"><b>No courses at this time</b></div>
         <?php	endif;?>
    </div> 
@@ -72,9 +72,8 @@
         <?php endforeach; ?>
       </div>
     <?php endif;?>
-
   <div class="content-container">
-  <div id="short_help" <?php echo ($course_list['A'] == 0) ? '':'style="display:none"'?>>
+  <div id="short_help" <?php echo ($course_list == 0) ? '':'style="display:none"'?>
   <h5>To use iPeer you have to add a course.</h5>
         <ul>
             <li>Please <u>add a course</u> from the yellow "Courses" tab above</li>

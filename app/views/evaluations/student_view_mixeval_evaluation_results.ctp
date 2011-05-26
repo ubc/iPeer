@@ -9,7 +9,7 @@
 	<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
     <!-- Render Event Info table -->
 	  <?php
-	  if (isset($memberScoreSummary[$rdAuth->id])) {
+	  if (isset($memberScoreSummary[$currentUser['id']])) {
 	    $receviedAvePercent = $memberScoreSummary[$rdAuth->id]['received_ave_score'] / $mixeval['Mixeval']['total_marks'] * 100;
 	    $releaseStatus = $scoreRecords[$rdAuth->id]['grade_released'];
 	  } else {
@@ -29,11 +29,11 @@ $groupAve = 0;
 
 //unset($scoreRecords[$rdAuth->id]);
 
-$gradeReleased = !empty($scoreRecords[$rdAuth->id]['grade_released']) ?
-        $scoreRecords[$rdAuth->id]['grade_released'] :
+$gradeReleased = !empty($scoreRecords[$currentUser['id']]['grade_released']) ?
+        $scoreRecords[$currentUser['id']]['grade_released'] :
         "No Grades Released";
-$commentReleased = !empty($scoreRecords[$rdAuth->id]['comment_released']) ?
-        $scoreRecords[$rdAuth->id]['comment_released'] :
+$commentReleased = !empty($scoreRecords[$currentUser['id']]['comment_released']) ?
+        $scoreRecords[$currentUser['id']]['comment_released'] :
         "No Comments Released";
 
 ?>
@@ -69,7 +69,7 @@ $commentReleased = !empty($scoreRecords[$rdAuth->id]['comment_released']) ?
 		  </div>
 		  <div style="height: 200px;" id="panelResultsContent" class="panelContent">
   	  <?php
-    $params = array('controller'=>'evaluations', 'mixeval'=>$mixeval, 'mixevalQuestion'=>$mixevalQuestion, 'membersAry'=>$groupMembers, 'evalResult'=>$evalResult, 'userId'=>$rdAuth->id, 'scoreRecords'=>$scoreRecords);
+    $params = array('controller'=>'evaluations', 'mixeval'=>$mixeval, 'mixevalQuestion'=>$mixevalQuestion, 'membersAry'=>$groupMembers, 'evalResult'=>$evalResult, 'userId'=>$currentUser['id'], 'scoreRecords'=>$scoreRecords);
     echo $this->element('evaluations/student_view_mixeval_details', $params);
     ?>
 
@@ -83,7 +83,7 @@ $commentReleased = !empty($scoreRecords[$rdAuth->id]['comment_released']) ?
 		  <div style="height: 200px;" id="panelReviewsContent" class="panelContent">
 
   	  <?php
-    $params = array('controller'=>'evaluations', 'mixeval'=>$mixeval, 'mixevalQuestion'=>$mixevalQuestion, 'membersAry'=>$groupMembers, 'evalResult'=>$reviewEvaluations, 'userId'=>$rdAuth->id, 'scoreRecords'=>null);
+    $params = array('controller'=>'evaluations', 'mixeval'=>$mixeval, 'mixevalQuestion'=>$mixevalQuestion, 'membersAry'=>$groupMembers, 'evalResult'=>$reviewEvaluations, 'userId'=>$currentUser['id'], 'scoreRecords'=>null);
     echo $this->element('evaluations/student_view_mixeval_details', $params);
     ?>
 		  </div>

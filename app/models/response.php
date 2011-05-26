@@ -49,8 +49,7 @@ class Response extends AppModel {
 		for( $i=0; $i<$data['count']; $i++ ){
 			$tmp = $this->find('all', array('conditions' => array('question_id' => $data[$i]['Question']['id']),
                                       'fields' => array('response','id')));
-			$count = count($tmp);
-
+			$count = count($tmp);			
 			for( $j=0; $j<$count; $j++ ){
 				if( !empty($tmp))
 					$data[$i]['Question']['Responses']['response_'.$j]['response'] = $tmp[$j]['Response']['response'];
@@ -91,6 +90,11 @@ class Response extends AppModel {
 	  $tmp = $this->find('first', array('conditions' => array('id' => $id),
                                       'fields' => array('response')));
 	  return $tmp['Response']['response'];
+	}
+	
+	function getResponseId($questionId=null, $response=null){
+		$findResult = $this->find('first', array('conditions'=>array('question_id'=>$questionId, 'response'=>$response)));
+		return $findResult['Response']['id'];
 	}
 }
 

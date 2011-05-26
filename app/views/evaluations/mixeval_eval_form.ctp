@@ -11,9 +11,9 @@
       <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
       <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>"/>
       <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>"/>
-      <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>"/>
+      <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id'] ?>"/>
       <input type="hidden" name="mixeval_id" value="<?php echo $data['Mixeval']['id']?>"/>
-      <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $rdAuth->id?>"/>
+      <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $this->Auth->User('id);  ?>"/>
       <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
@@ -24,7 +24,7 @@
     <td width="25%"><?php echo $rdAuth->fullname ?>
     </td>
     <td width="10%">Evaluating:</td>
-    <td width="25%"><?php echo $event['group_name'] ?></td>
+    <td width="25%"><?php echo $event['group_name']; ?></td>
   </tr>
   <tr class="tablecell2">
     <td>Event Name:</td>

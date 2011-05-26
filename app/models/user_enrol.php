@@ -2,16 +2,16 @@
 class UserEnrol extends AppModel
 {
   var $name = 'UserEnrol';
-
-  function getEnrolledCourses($userId=null)
+    
+  //Moved function to User
+ /* function getEnrolledCourses($userId=null)
   {
     //$result = $this->find('all','user_id='.$userId, 'DISTINCT course_id');
-
     return $this->find('all', array(
         'conditions' => array('user_id' => $userId),
         'fields' => array('DISTINCT course_id')
     ));
-  }
+  }*/
 
   // Deprecated: replaced by virtual field student_count in course model
   /*function getEnrolledStudentCount($courseId=null) {
@@ -53,7 +53,6 @@ class UserEnrol extends AppModel
     }
 
   }
-
 }
 
 ?>

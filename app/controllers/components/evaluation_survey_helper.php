@@ -4,19 +4,18 @@ class EvaluationSurveyHelperComponent extends Object
 	var $components = array('Auth', 'Session', 'EvaluationHelper');
 
     function saveSurveyEvaluation($params=null)
-    {
+    { 
+    	$this->Response = new Response;
         $this->Question = new Question;
-        $this->SurveyInput = new SurveyInput;
         $this->EvaluationSubmission = new EvaluationSubmission;
 
         $userId = $params['data']['Evaluation']['surveyee_id'];
         $eventId = $params['form']['event_id'];
         $surveyId = $params['form']['survey_id'];
-
+        
         //get existing record if there is one
         $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId,$userId);
-
-        if (empty($evalSubmission)) {//if there is no existing record, fill in all fields
+        if (empty($evaluationSubmission)) {//if there is no existing record, fill in all fields
             $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $userId;
             $evaluationSubmission['EvaluationSubmission']['survey_id'] = $surveyId;
             $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
@@ -26,10 +25,38 @@ class EvaluationSurveyHelperComponent extends Object
             $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
         }
         $surveyInput=array();
-        $surveyInput['SurveyInput']['user_id'] = $params['data']['Evaluation']['surveyee_id'];
-
+        $surveyInput['SurveyInput']['user_id'] = $userId;
+        $surveyInput['SurveyInput']['survey_id'] = $surveyId;
+        $successfullySaved = true;
+        for($i=0; $i<$params['form']['question_count']; $i++){
+			$this->SurveyInput = new SurveyInput;
+        	//Set survey and user id
+        	$surveyInput[$i]['SurveyInput']['user_id'] = $userId;
+        	$surveyInput[$i]['SurveyInput']['survey_id'] = $surveyId;
+        	//Set question Id
+        	$questionId = $params['form']['question_id']-(1-$i);
+        	$surveyInput[$i]['SurveyInput']['question_id'] = $questionId;
+        	//Set answers
+        	$answer = $params['form']['answer_'.$questionId];
+        	$modAnswer =  $this->filterString($answer);
+			$surveyInput[$i]['SurveyInput']['response_text']=$modAnswer;
+			//Set reponse_id
+			$response = $params['form']['answer_'.$questionId];
+			$modResponse = $this->filterString($response);
+			$responseId = $this->Response->getResponseId($questionId,$modResponse);			
+			$surveyInput[$i]['SurveyInput']['response_id']=$responseId;
+			//Save data
+			if(!$this->SurveyInput->save($surveyInput[$i]['SurveyInput']))$successfullySaved=false;	
+        }
+        
+        //Indicate that evaluation has been submitted
+        if($successfullySaved)
+        {	
+			$this->EvaluationSubmission->save($evaluationSubmission);
+			return true;
+        }else return false;
+        /*
         // if no submission exists, create one
-        $surveyInput['SurveyInput']['survey_id'] = $params['form']['survey_id'];
         //$surveyInput['SurveyInput']['event_id'] = $params['form']['event_id'];
         // save evaluation submission
         //$surveyInput['SurveyInput']['date_submitted'] = date('Y-m-d H:i:s');
@@ -38,7 +65,6 @@ class EvaluationSurveyHelperComponent extends Object
         //then save
         for ($i=1; $i < $params['form']['question_count']+1; $i++) {
             $questionId = $params['form']['question_id'.$i];
-
             if (isset($params['form']['answer_'.$i])) {
                 if (is_array($params['form']['answer_'.$i])) {
                     if (!$this->SurveyInput->delAllSurveyInputBySurveyIdUserIdQuestionId($surveyId,$userId,$questionId)) {
@@ -105,6 +131,7 @@ class EvaluationSurveyHelperComponent extends Object
         }
         $this->EvaluationSubmission->id = null;
         return true;
+       */ 
     }
 
 	function formatStudentViewOfSurveyEvaluationResult($event=null)
@@ -341,6 +368,14 @@ class EvaluationSurveyHelperComponent extends Object
 		}
 
     return $questions;
+	}
+	
+//Helper function
+	
+	//Filters a input string by removing unwanted chars of {"_", "0", "1", "2", "3",...}
+	function filterString($string=null){
+		$unwantedChar = array("_","0","1","2","3","4","5","6","7","8","9");
+		return str_replace($unwantedChar, "", $string);
 	}
 
 }?>

@@ -40,7 +40,7 @@ class EvaluationsController extends AppController
                       'RubricsCriteriaComment', 'Personalize', 'User','SurveyQuestion',
                       'Question','Response','Survey','SurveyInput','Course','MixevalsQuestion',
                       'EvaluationMixeval','EvaluationMixevalDetail');
-    var $components = array('AjaxList', 'rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize','framework',
+    var $components = array( 'Auth','AjaxList', 'rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize','framework',
                             'EvaluationResult', 'EvaluationHelper', 'EvaluationRubricHelper', 'EvaluationSimpleHelper',
                             'RubricHelper','EvaluationSurveyHelper', 'MixevalHelper', 'EvaluationMixevalHelper','ExportHelper');
 
@@ -309,11 +309,15 @@ class EvaluationsController extends AppController
 
     function makeSimpleEvaluation ($param = null) {
         $this->autoRender = false;
-
-        $tok = strtok($param, ';');
+		$tok = strtok($param, ';');
         $eventId = $tok;
-        $groupId = strtok(';');
-
+        $group_Events = $this->GroupEvent->getGroupEventByEventId($eventId);
+        $groupId;
+        $userId=$this->Auth->user('id');
+        foreach($group_Events as $events){
+            	 if($this->GroupsMembers->checkMembershipInGroup($events['group_events']['group_id'],$userId));
+            	 	$groupId=$events['group_events']['group_id'];
+        }
         if (empty($this->params['data'])) {
             //Get the target event
             $eventId = $this->Sanitize->paranoid($eventId);
@@ -321,18 +325,25 @@ class EvaluationsController extends AppController
             $this->set('event', $event);
 
             //Setup the courseId to session
-            $this->rdAuth->setCourseId($event['Event']['course_id']);
-            $courseId = $event['Event']['course_i$completedEvaluationsd'];
+            //$this->rdAuth->setCourseId($event['Event']['course_id']);
+            $this->set('courseId', $event['Event']['course_id']);
+            $courseId = $event['Event']['course_id'];
             $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers');
 
-            //Get Members for this evaluation
-            $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'],
-                                                        $this->rdAuth->id);
+            //Set userId, first_name, last_name
+            $this->set('userId', $userId);
+            $this->set('fullName', $this->Auth->user('first_name').' '.$this->Auth->user('last_name'));
+            
+            
+            //Get Members for this evaluation	
+            $groupMembers = $this->GroupsMembers->getEventGroupMembers($groupId, $event['Event']['self_eval']	,
+                                                        $userId);
+			//var_dump($groupMembers);
             $this->set('groupMembers', $groupMembers);
 
             // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
             $numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find(count,'group_id='.$event['group_id']) :
-                                            $this->GroupsMembers->find(count,'group_id='.$event['group_id']) - 1;
+                                            $this->GroupsMembers->find('count','group_id='.$event['group_id']) - 1;
             $simpleEvaluation = $this->SimpleEvaluation->find('id='.$event['Event']['template_id']);
             $remaining = $simpleEvaluation['SimpleEvaluation']['point_per_member'] * $numMembers;
             //          if($in['points']) $out['points']=$in['points']; //saves previous points
@@ -364,7 +375,6 @@ class EvaluationsController extends AppController
             $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'],
                                                                                             $evaluator);
             $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
-
             if (!$this->validSimpleEvalComplete($this->params)) {
                 $this->redirect('/evaluations/makeSimpleEvaluation');
             }
@@ -389,12 +399,18 @@ class EvaluationsController extends AppController
     return $status;
   }
 
-    function makeSurveyEvaluation ($param = null) {
+  function makeSurveyEvaluation ($param = null) {
+  	
+  		//var_dump($this->params);
+  	
         $this->autoRender = false;
         //print_r($this->params);
         $tok = strtok($param, ';');
         $eventId = $tok;
-
+        $this->set('courseId', $eventId);
+      	$thisUser = $this->Auth->user();
+      	$userId = $thisUser['User']['id'];
+      	$this->set('id',$userId);
         if (empty($this->params['data'])) {
             //Get the target event
             $eventId = $this->Sanitize->paranoid($eventId);
@@ -404,17 +420,18 @@ class EvaluationsController extends AppController
             //Setup the courseId to session
             $this->rdAuth->setCourseId($event['Event']['course_id']);
             $courseId = $event['Event']['course_id'];
+           	$survey_id = $event['Event']['template_id'];
+           	
             $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').' > Survey');
-
-            $survey_id = $this->Survey->getSurveyIdByCourseIdTitle($courseId, $event['Event']['title']);
+            //$survey_id = $this->Survey->getSurveyIdByCourseIdTitle($courseId, $courseName);
             $this->set('survey_id', $survey_id);
 
             // Get all required data from each table for every question
-            $tmp = $this->SurveyQuestion->getQuestionsID($survey_id);
+            $tmp = $this->surveyQuestion->getQuestionsID($survey_id);
             $tmp = $this->Question->fillQuestion($tmp);
             $tmp = $this->Response->fillResponse($tmp);
             $result = null;
-
+                        
             // Sort the resultant array by question number
             $count = 1;
             for( $i=0; $i<=$tmp['count']; $i++ ){
@@ -425,18 +442,19 @@ class EvaluationsController extends AppController
                     }
                 }
             }
-
+			
             $this->set('questions', $result);
             $this->set('event', $event);
             $this->render('survey_eval_form');
+            
         } else {
             $courseId = $this->params['form']['course_id'];
-
+			//var_dump($this->params);	
             if (!$this->validSurveyEvalComplete($this->params))  {
                 $this->set('errmsg', 'validSurveyEvalCompleten failure.');
                 //$this->redirect('/evaluations/makeSurveyEvaluation/'.$eventId);
             }
-
+            //var_dump($this->params);
             if ($this->EvaluationSurveyHelper->saveSurveyEvaluation($this->params)) {
                 $this->redirect('/home/index/Your survey was submitted successfully.');
             } else {
@@ -454,21 +472,37 @@ class EvaluationsController extends AppController
 
     function makeRubricEvaluation ($param = '')  {
         $this->autoRender = false;
-
         if (empty($this->params['data'])) {
             $tok = strtok($param, ';');
             $eventId = $tok;
             $groupId = strtok(';');
             //$msg = strtok(';');
             $event = $this->EvaluationHelper->formatEventObj($eventId, $groupId);
+            $rubricId = $event['Event']['template_id'];
+            $data = $this->Rubric->getRubricById($rubricId);
+            $this->set('data', $data[0]);
             $this->set('event', $event);
-
             //Setup the courseId to session
-            $this->rdAuth->setCourseId($event['Event']['course_id']);
             $courseId = $event['Event']['course_id'];
+            $this->set('courseId',$courseId);
+            $this->rdAuth->setCourseId($courseId);
+            //Setup the evaluator_id
+            $evaluatorId = $this->Auth->user('id');
+         	$this->set('evaluatorId', $evaluatorId);
+         	//Setup the fullName of the evaluator
+			$firstName=$this->Auth->user('first_name');
+			$lastName =$this->Auth->user('last_name');
+			$this->set('firstName', $firstName);
+			$this->set('lastName', $lastName);
+         	//Setup the viewData
+         	$rubricId = $event['Event']['template_id'];
+			$rubric = $this->Rubric->getRubricById($rubricId);
+			$rubricEvalViewData = $this->RubricHelper->compileViewData($rubric);
+			$this->set('viewData',$rubricEvalViewData);
+            
             $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers');
-
-            $rubricDetail = $this->EvaluationRubricHelper->loadRubricEvaluationDetail($event);
+			
+            $rubricDetail = $this->EvaluationRubricHelper->loadRubricEvaluationDetail($event, $groupId);
             $this->set('rubric', $rubricDetail['rubric']);
             $this->set('groupMembers', $rubricDetail['groupMembers']);
             $this->set('evaluateeCount', $rubricDetail['evaluateeCount']);
@@ -477,7 +511,8 @@ class EvaluationsController extends AppController
         }  else {
             $eventId = $this->params['form']['event_id'];
             $groupId = $this->params['form']['group_id'];
-            $groupEventId = $this->params['form']['group_event_id'];
+            //$groupEventId = $this->params['form']['group_event_id'];
+            $groupEventId = $this->GroupEvent->getGroupEventByEventIdAndGroupId($eventId,$groupId);
             $courseId = $this->params['form']['course_id'];
             $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
             if (!$this->validRubricEvalComplete($this->params['form'])) {
@@ -520,7 +555,6 @@ class EvaluationsController extends AppController
         //Get the target event submission
         $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
         $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
-
         $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
         $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
         $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
@@ -761,6 +795,10 @@ class EvaluationsController extends AppController
         $eventId = $tok;
         $groupId = strtok(';');
 
+        //Setup CurrentUser Info
+        $currentUser = $this->User->getCurrentLoggedInUser();
+        $this->set('currentUser', $currentUser);
+        
         //Get the target event
         $event = $this->EvaluationHelper->formatEventObj($eventId, $groupId);
         $this->set('event', $event);
@@ -768,8 +806,7 @@ class EvaluationsController extends AppController
         //Setup the courseId to session
         $this->rdAuth->setCourseId($event['Event']['course_id']);
         $courseId = $this->rdAuth->courseId;
-        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId,
-                                    $this->rdAuth->role).' > '.$event['Event']['title']. ' > View My Results ');
+        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId,$this->rdAuth->role).' > '.$event['Event']['title']. ' > View My Results ');
 
         //Get Group Event
         $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($event['Event']['id'], $event['group_id']);

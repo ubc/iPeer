@@ -1,12 +1,12 @@
 <body onunload="window.opener.document.getElementById('eval_dropdown').onchange()">
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
-    <td>
+    <td>    
 <?php echo $html->script('calendar1')?>
 <?php echo $html->script('groups')?>
 	  <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Event']['id'])?'add':'edit') ?>">
       <?php echo empty($params['data']['Event']['id']) ? null : $html->hidden('Event/id'); ?>
-      <?php echo empty($params['data']['Event']['id']) ? $html->hidden('Event/creator_id', array('value'=>$rdAuth->id)) : $html->hidden('Event/updater_id', array('value'=>$rdAuth->id)); ?>
+      <?php echo empty($params['data']['Event']['id']) ? $form->hidden('Event/creator_id', array('value'=>$currentUser['id'])) : $form->hidden('Event/updater_id', array('value'=>$currentUser['id'])); ?>
       <input type="hidden" name="assigned" id="assigned" />
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
@@ -23,15 +23,15 @@
           $params = array('controller'=>'events', 'data'=>null, 'fieldvalue'=>$fieldValue);
           echo $this->element('events/ajax_title_validate', $params);
           ?>
-           <?php echo $html->tagErrorMsg('Event/title', 'Title is required.')?>
-           <?php echo $html->tagErrorMsg('Event/title_unique', 'Duplicate Title found. Please change the title of this event.')?>
+           <?php echo $form->error('Event/title', 'Title is required.')?>
+           <?php echo $form->error('Event/title_unique', 'Duplicate Title found. Please change the title of this event.')?>
       </div>
   	</td>
   	<td id="newtitle_msg" class="error" />
   </tr>
   <tr class="tablecell2">
     <td>Description:&nbsp;</td>
-    <td><?php echo $html->textarea('Event/description', array('cols'=>'35', 'style'=>'width:85%;')) ?>  </td>
+    <td><?php echo $form->textarea('Event/description', array('cols'=>'35', 'style'=>'width:85%;')) ?>  </td>
     <td>&nbsp;</td>
   </tr>
   <tr class="tablecell2">
@@ -94,9 +94,9 @@
   </tr>
   <tr class="tablecell2">
     <td>Due Date:&nbsp;<font color="red">*</font></td>
-    <td><?php echo $html->input('Event/due_date', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;
+    <td><?php echo $form->input('Event.due_date', array('type'=>'text', 'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;
 		    <a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
-       <?php echo $html->tagErrorMsg('Event/due_date', 'Please enter a valid date.')?>
+       <?php echo $form->error('Event.due_date', 'Please enter a valid date.')?>
 		</td>
     <td>eg. YYYY-MM-DD HH:MM:SS (24 HOUR)</td>
   </tr>
@@ -106,15 +106,15 @@
   	  <table width="100%"><tr align="left">
 				<td width="10%">FROM:</td>
 				<td width="90%">
-      		<?php echo $html->input('Event/release_date_begin', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal2.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
-          <?php echo $html->tagErrorMsg('Event/release_date_begin', 'Please enter a valid date.')?>
+      		<?php echo $form->input('Event.release_date_begin', array('type'=>'text',  'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal2.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+          <?php echo $form->error('Event.release_date_begin', 'Please enter a valid date.')?>
       	</td>
       </tr>
       <tr>
       	<td width="10%">TO:</td>
       	<td width="90%">
-      		<?php echo $html->input('Event/release_date_end', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal3.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
-          <?php echo $html->tagErrorMsg('Event/release_date_end', 'Please enter a valid date.')?>
+      		<?php echo $form->input('Event.release_date_end', array( 'type'=>'text', 'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal3.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+          <?php echo $form->error('Event.release_date_end', 'Please enter a valid date.')?>
       	</td>
   	  </tr></table>
   	</td>
@@ -134,7 +134,7 @@
   </tr>
   <tr class="tablecell2">
   <?php echo $html->script('events')?>
-    <td colspan="3" align="center"><?php echo $html->submit('Add Event', array('onclick' =>
+    <td colspan="3" align="center"><?php echo $form->submit('Add Event', array('onclick' =>
         "return validateEventDates('EventReleaseDateBegin','EventReleaseDateEnd','EventDueDate');"));
         ?></td>
     </tr>
@@ -145,12 +145,10 @@
   </tr>
 </table>
 <script type="text/javascript">
-<!--
 
 // create calendar object(s) just after form tag closed
 // specify form element as the only parameter (document.forms['formname'].elements['inputname']);
 // note: you can have as many calendar objects as you need for your application
-
 var cal1 = new calendar1(document.forms[0].elements['data[Event][due_date]']);
 cal1.year_scroll = false;
 cal1.time_comp = true;
@@ -163,5 +161,4 @@ var cal3 = new calendar1(document.forms[0].elements['data[Event][release_date_en
 cal3.year_scroll = false;
 cal3.time_comp = true;
 
-//-->
 </script>

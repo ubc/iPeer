@@ -47,12 +47,11 @@ class RubricsController extends AppController
 		$this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
-    $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
+    	$this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
  		$this->set('title_for_layout', 'Rubrics');
     parent::__construct();
 	}
-
-
+	
   function postProcess($data) {
     // Creates the custom in use column
     if ($data) {
@@ -68,6 +67,12 @@ class RubricsController extends AppController
     return $data;
   }
 
+  function getRubricById($id){
+  	$sql="SELECT *
+  		  FROM rubrics
+  		  WHERE id=$id";
+  	return $this->query($sql);
+  }
 
   function setUpAjaxList() {
     // Set up Columns
@@ -149,7 +154,7 @@ class RubricsController extends AppController
     $this->set('action', 'View Rubric');
     $this->render('edit');
   }
-
+  
   function add($layout='') {
     if ($layout != '') {
       $this->layout = $layout;
@@ -168,7 +173,6 @@ class RubricsController extends AppController
     } else {
       $this->set('action', 'Add Rubric');
     }
-
     $this->render('edit');
 /*
           $this->params['data']['Rubric']['total_marks'] = $this->params['form']['total_marks'];
@@ -217,8 +221,9 @@ class RubricsController extends AppController
   function __processForm() {
     if (!empty($this->data)) {
       $this->Output->filter($this->data);//always filter
-
       //Save Data
+      
+      $this->log($this->data);
       if ($this->Rubric->saveAllWithCriteriaComment($this->data)) {
         $this->data['Rubric']['id'] = $this->Rubric->id;
         return true;
@@ -252,6 +257,15 @@ class RubricsController extends AppController
       }
     }
     $this->redirect('index');
+	}
+	
+	function test(){
+		$this->log("Test Success");
+	}
+	
+	function setForm_RubricName($name){
+		$this->data['Rubric']['name'] = $name;
+		$this->log($this->data['Rubric']['name']);
 	}
 
 /*  function previewRubric()

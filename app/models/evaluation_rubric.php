@@ -20,10 +20,12 @@ class EvaluationRubric extends AppModel
 									 );*/
 
 	function getEvalRubricByGrpEventIdEvaluatorEvaluatee($grpEventId=null, $evaluator=null, $evaluatee=null){
+
             //return $this->find('grp_event_id='.$grpEventId.' AND evaluator='.$evaluator.' AND evaluatee='.$evaluatee);
             return $this->find('first', array(
                 'conditions' => array('grp_event_id' => $grpEventId, 'evaluator' => $evaluator, 'evaluatee' => $evaluatee)
             ));
+
 	}
 
 	// gets rubric evaluation result for a specific assignment and evaluator

@@ -9,6 +9,7 @@
  * @license		OPPL
  *
  */
+App::import('Model','Mixeval');
 class EvaluationMixevalHelperComponent extends Object
 {
 	var $components = array('EvaluationHelper', 'rdAuth');
@@ -27,7 +28,7 @@ class EvaluationMixevalHelperComponent extends Object
     $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'],
                                                                $this->rdAuth->id);
     for ($i = 0; $i<count($groupMembers); $i++) {
-       $targetEvaluatee = $groupMembers[$i]['User']['id'];
+       $targetEvaluatee = $groupMembers[$i]['U']['id'];
        $evaluation = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee($event['group_event_id'],
                                                                                           $evaluator, $targetEvaluatee);
        if (!empty($evaluation)) {
@@ -40,14 +41,13 @@ class EvaluationMixevalHelperComponent extends Object
 		$result['groupMembers'] = $groupMembers;
 
     //Get the target mixeval
-
 	  $this->Mixeval->id = $event['Event']['template_id'];
     //$this->set('mixeval', $this->Mixeval->read());
     $result['mixeval'] = $this->Mixeval->read();
 
  		// enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
- 		$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find(count,'group_id='.$event['group_id']) :
- 		                                           $this->GroupsMembers->find(count,'group_id='.$event['group_id']) - 1;
+ 		$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find('count','group_id='.$event['group_id']) :
+ 		                                           $this->GroupsMembers->find('count','group_id='.$event['group_id']) - 1;
 		//$this->set('evaluateeCount', $numMembers);
 		$result['evaluateeCount'] = $numMembers;
 
@@ -235,7 +235,8 @@ class EvaluationMixevalHelperComponent extends Object
 	  $this->EvaluationMixeval  = new EvaluationMixeval;
     $this->EvaluationMixevalDetail   = new EvaluationMixevalDetail;
     $this->User = new User;
-
+	$currentUser=$this->User->getCurrentLoggedInUser();
+    
     $mixevalResultDetail = array();
 		$memberScoreSummary = array();
 		$allMembersCompleted = true;
@@ -386,6 +387,7 @@ class EvaluationMixevalHelperComponent extends Object
 
 	function formatMixevalEvaluationResult($event=null, $displayFormat='', $studentView=0)
 	{
+	  $this->Course= & ClassRegistry::init('Mixeval');	
 	  $this->Mixeval = new Mixeval;
 	  $this->User = new User;
 	  $this->GroupsMembers = new GroupsMembers;
@@ -396,21 +398,26 @@ class EvaluationMixevalHelperComponent extends Object
 	  $groupMembers = array();
 	  $result = array();
 
+
 	  $this->Mixeval->id = $event['Event']['template_id'];
+
 	  $mixeval = $this->Mixeval->read();
 	  $result['mixeval'] = $mixeval;
 
-
+	  $currentUser = $this->User->getCurrentLoggedInUser();
+	  
      //Get Members for this evaluation
      if ($studentView) {
+
        $this->User->id = $this->rdAuth->id;
+
        $user = $this->User->read();
        $mixevalResultDetail = $this->getMixevalResultDetail($event, $user);
-       $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'],
-                                                                  $this->rdAuth->id);
+       $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event[0]['events']['self_eval'],
+                                                                 $currentUser['id']);
        $membersAry = array();
        foreach ($groupMembers as $member) {
-        $membersAry[$member['User']['id']] = $member;
+        $membersAry[$member['U']['id']] = $member;
        }
        $result['groupMembers'] = $membersAry;
 

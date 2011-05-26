@@ -1,7 +1,6 @@
 <!-- elements::ajax_title_validate end -->
 <?php 
 if (empty($fieldvalue)) $fieldvalue = '';
-
 if (!empty($data[0])){
   echo 'Title "'.$data.'" already exists.'; 
 }

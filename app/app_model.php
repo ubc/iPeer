@@ -28,7 +28,7 @@ class AppModel extends Model {
       $this->data[$this->alias]['creator_id'] = Toolkit::getUserId();
     }
     if ( $this->hasField('updater_id') && empty($this->data[$this->alias]['updater_id']) ) {
-      $this->data[$this->alias]['updater_id'] = Toolkit::getUserId();
+     // $this->data[$this->alias]['updater_id'] = Toolkit::getUserId();
     }
     return parent::beforeSave($options);
   }

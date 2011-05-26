@@ -28,13 +28,13 @@
 class GroupEvent extends AppModel
 {
   var $name = 'GroupEvent';
-
+  
   // inserts all members into the groups_events table
   function insertGroups($id=null, $data=null){
   	for( $i=1; $i<=$data['group_count']; $i++ ){
   	  if (!empty($id) && !empty($data['group'.$i]))
   	  {
-    	  $tmp = array( 'event_id'=>$id, 'group_id'=>$data['group'.$i], 'marked'=>'not reviewed' );
+    	  $tmp = array( 'group_id'=>$data['group'.$i],'event_id'=>$id, 'marked'=>'not reviewed' );
     	  $this->save($tmp);
     	  //reset the id field
     	  $this->id = null;
@@ -104,7 +104,7 @@ class GroupEvent extends AppModel
           ));
 	  return $tmp;
   }
-
+  
   function getGroupEventByUserId($userId=null, $eventId=null)
   {
 //    $condition = 'GroupMember.user_id='.$userId.' AND GroupEvent.event_id='.$eventId;
@@ -113,8 +113,8 @@ class GroupEvent extends AppModel
 //
 //    return $this->find('all',$condition, $fields, null, null, null, null, $joinTable );
     return $this->find('all', array(
-                    'conditions' => array('GroupMember.user_id' => $userId, 'GroupEvent.event_id'=>$eventId),
-                    'fields' => array('GroupMember.user_id', 'GroupEvent.group_id, GroupEvent.id', 'GroupEvent.event_id'),
+                    'conditions' => array('GroupEvent.event_id'=>$eventId, 'GroupMember.user_id'=>$userId),
+                    'fields' => array('GroupEvent.id', 'GroupEvent.group_id', 'GroupEvent.event_id'),
                     'joins' => array(
                         array(
                             'table' => 'groups_members',
@@ -124,6 +124,13 @@ class GroupEvent extends AppModel
                         )
                     )
                 ));
+	/*$sql = "SELECT *
+			FROM group_events AS ge
+			RIGHT JOIN groups_members AS gm ON ge.group_id = gm.group_id
+			WHERE ge.event_id =11
+			AND gm.user_id =2";
+	$returning = $this->query($sql);*/
+
   }
 
   // Deprecated: not being used anymore
@@ -270,6 +277,21 @@ class GroupEvent extends AppModel
                               WHERE count1 > count2 OR count2 IS NULL)
                             AND GroupEvent.group_id != 0 AND (Event.due_date < now() OR date_submitted > due_date)'
                             );
+  }
+  
+  function getGroupEventByEventId($eventId){
+  	$sql = "SELECT group_id
+  			FROM group_events
+  			WHERE event_id=$eventId";
+  	return $this->query($sql);
+  }
+  
+  function getGroupEventByEventIdAndGroupId($eventId, $groupId){
+  	$sql = "SELECT id
+  			FROM group_events
+  			WHERE event_id=$eventId AND group_id=$groupId";
+  	$returning = $this->query($sql);
+  	return $returning[0]['group_events']['id'];
   }
 }
 

@@ -43,6 +43,14 @@ class RubricsLom extends AppModel
   var $actsAs = array('Containable');
 
   var $order = array('RubricsLom.lom_num' => 'ASC', 'RubricsLom.id' => 'ASC');
+  
+  function getLoms($rubricId=null, $lomId=null){
+  	$sql = "SELECT *
+  			FROM rubrics_loms
+  			WHERE id = $lomId AND rubric_id=$rubricId";
+  	return $this->query($sql);
+  }
+  
 }
 
 ?>

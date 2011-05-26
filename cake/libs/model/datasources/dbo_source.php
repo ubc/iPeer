@@ -681,7 +681,7 @@ class DboSource extends DataSource {
 		if (Configure::read() > 0) {
 			$out = null;
 			if ($error) {
-				trigger_error('<span style="color:Red;text-align:left"><b>' . __('SQL Error:', true) . "</b> {$this->error}</span>", E_USER_WARNING);
+				//trigger_error('<span style="color:Red;text-align:left"><b>' . __('SQL Error:', true) . "</b> {$this->error}</span>", E_USER_WARNING);
 			} else {
 				$out = ('<small>[' . sprintf(__('Aff:%s Num:%s Took:%sms', true), $this->affected, $this->numRows, $this->took) . ']</small>');
 			}

@@ -30,6 +30,7 @@ class Course extends AppModel
 {
   var $name = 'Course';
 
+ 
   var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable');
 
   var $hasMany = array(
@@ -92,6 +93,7 @@ class Course extends AppModel
 
   var $STATUS = array('I' => 'Inactive', 'A' => 'Active');
 
+
   function __construct($id = false, $table = null, $ds = null) {
     parent::__construct($id, $table, $ds);
     $this->virtualFields['student_count'] = sprintf('SELECT count(*) as count FROM user_enrols as enrol WHERE enrol.course_id = %s.id', $this->alias);
@@ -100,14 +102,14 @@ class Course extends AppModel
   function getAllInstructors($type, $params = array()){
     return ClassRegistry::init('User')->getInstructors($type, $params);
   }
-
+ 
   function deleteInstructor($course_id, $user_id){
     return $this->habtmDelete('Instructor', $course_id, $user_id);
   }
 
   function addInstructor($course_id, $user_id){
     return $this->habtmAdd('Instructor', $course_id, $user_id);
-  }
+  } 
 
   function getInactiveCourses(){
     return $this->find('all', array('conditions' => array('record_status' => 'I')));
@@ -187,9 +189,13 @@ class Course extends AppModel
     return $this->findAccessibleCoursesListByUserIdRole($userId, $userRole);
   }
 
-  // Find all accessible courses id
-  function findAccessibleCoursesListByUserIdRole($userId=null, $userRole=null, $condition=null){
+  
 
+#### Function modified by Tony (March 11/2011)
+  // Find all accessible courses id
+  function findAccessibleCoursesListByUserIdRole($userId=null, $userRole='', $condition=null){
+
+/*
     if ($userRole == 'S') {
       $course =  $this->query('SELECT * FROM courses WHERE id IN ( SELECT DISTINCT course_id FROM user_enrols WHERE user_id = '.$userId.') ORDER BY course');
       return $course;
@@ -205,17 +211,43 @@ class Course extends AppModel
         } else {
             $course =  $this->query('SELECT * FROM courses WHERE record_status = "A" AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' ) ORDER BY course');
         }
-
-        return $course;
+		return $course;
     }
 
     return false;
+*/
+  	
+  	switch($userRole){
+  		case 'S':
+  			$course =  $this->query('SELECT * FROM courses WHERE id IN ( SELECT DISTINCT course_id FROM user_enrols WHERE user_id = '.$userId.') ORDER BY course');
+      		return $course;
+      		break;
+      		
+  		case 'A':
+  			if ($condition !=null){
+          		return $this->query('SELECT * FROM courses WHERE '.$condition.' ORDER BY course');
+          		break;
+        }
+        	else{
+          		return $this->query('SELECT * FROM courses ORDER BY course');
+          		break;
+        }
 
+  		default:
+  			if($condition !=null){
+            	$course =  $this->query('SELECT * FROM courses WHERE record_status = "A" AND '.$condition.' AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' ) ORDER BY course');
+        	}else{
+           		$course =  $this->query('SELECT * FROM courses WHERE record_status = "A" AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' ) ORDER BY course');
+        	}
+				return $course;
+    
+  	}
   }
 
   // Find the record count of all accessible courses
   function findAccessibleCoursesCount($userId=null, $userRole=null, $condition=null){
-
+  	
+/*
     if ($userRole == 'S') {
         $course =  $this->query('SELECT COUNT(DISTINCT course_id) as total FROM user_enrols WHERE user_id = '.$userId);
         return $course;
@@ -233,18 +265,78 @@ class Course extends AppModel
         }
         return $course;
     }
+*/
 
-    return false;
+    switch($userRole){
+    	case 'S':
+    		$course =  $this->query('SELECT COUNT(DISTINCT course_id) as total FROM user_enrols WHERE user_id = '.$userId);
+        	return $course;
+        	break;
+        	
+    	case 'A':
+    		//Check that admin is exists
+    		$sql = 'SELECT COUNT( * ) as count
+					FROM users U
+					WHERE U.id = '.$userId.'';
+    	$adminCount = $this->query($sql);
+    	if($adminCount[0][0]['count']>=1){	
+    		if ($condition !=null) return $this->query('SELECT COUNT(*) AS total FROM courses WHERE '.$condition);
+    		else return $this->query('SELECT COUNT(*) AS total FROM courses');
+    		break;
+    	}
+    	else return null;
+    	break;
+    	
+    	default:
+    		if ($condition !=null) return $this->query('SELECT COUNT(*) as total FROM courses WHERE record_status = "A" AND '.$condition.' AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' )');
+    		else return $this->query('SELECT COUNT(*) as total FROM courses WHERE record_status = "A" AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' )');
+			break;    		
+    }
+    
   }
 
-  // Find all accessible courses id
-  function generateRegisterCourseSQL($userId, $register = true, $count = false,  $requester = null, $requester_role = null)
-  {
-    $count = $count ? 'count(*) as total' : '*';
-    $register = $register ? 'IN' : 'NOT IN';
+//Verifies that a user matches with his/her userRole.
+  function verifyUserRole($userName=null, $userRole=null){
+  
+  	$this->User =& ClassRegistry::init('User');
+  	$user = $this->User->getByUsername($userName);
+  	$role = $user['User']['role'];
 
-    $sql = 'SELECT '.$count.' FROM courses As Course ';
-    $condition = 'Course.id '.$register.' (SELECT course_id FROM user_enrols WHERE user_id = ' . $userId . ')';
+  	if($role == $userRole)return 1;
+  	return 0;
+  }
+  
+#### Function was modified by Tony (March 14/2011)
+  // Generates SQL for querrying courses, only Instructors and admin can access this function.
+  function generateRegisterCourseSQL($userId, $enrolled = true, $getCount = false,  $requester = null, $requester_role = null)
+  {
+  	//verify that all necessary inputs are not null && requester's role indeed matches with $requester_role
+  	$isUserRoleMatch = $this->verifyUserRole($requester, $requester_role);
+	if($userId==null || $requester==null || $requester_role==null || $isUserRoleMatch==0) return array(); 	
+  	
+  	$enrolled = $enrolled ? 'IN' : 'NOT IN';
+  	$getCount = $getCount ? 'count(*) as total' : '*';
+  	
+  	//requester_role is 'Admin' or 'Instructor'
+  	if($requester_role=='A' || $requester_role=='I'){
+  		$sql = 'SELECT '.$getCount.' 
+  				FROM courses C 
+  				WHERE C.id '.$enrolled.' ( SELECT U.course_id 
+  								FROM user_courses U 
+  								WHERE U.user_id ='.$userId.')';
+  		
+  		return $sql;
+  		}
+  	//requester_role is 'Student' or invalid
+  	else return array();
+  	
+  							
+  	/*
+    $getCount = $getCount ? 'count(*) as total' : '*';
+    $enrolled = $enrolled ? 'IN' : 'NOT IN';
+
+    $sql = 'SELECT '.$getCount.' FROM courses As Course ';
+    $condition = 'Course.id '.$enrolled.' (SELECT course_id FROM user_enrols WHERE user_id = ' . $userId . ')';
 
     if(null == $requester_role && null == $requester)
     {
@@ -266,11 +358,12 @@ class Course extends AppModel
     $sql .= ' WHERE '.$condition;
 
     return $sql;
+    */
   }
 
   function findRegisteredCoursesList($user_id, $requester = null, $requester_role = null){
-    return $this->query($this->generateRegisterCourseSQL($user_id, true, false, $requester, $requester_role));
-  }
+	return $this->query($this->generateRegisterCourseSQL($user_id, true, false, $requester, $requester_role));
+  } 
 
   function findNonRegisteredCoursesList($user_id, $requester = null, $requester_role = null) {
     return $this->query($this->generateRegisterCourseSQL($user_id, false, false, $requester, $requester_role));
@@ -279,9 +372,9 @@ class Course extends AppModel
   function findNonRegisteredCoursesCount($user_id, $requester = null, $requester_role = null){
     return $this->query($this->generateRegisterCourseSQL($user_id, false, true, $requester, $requester_role));
   }
-
-  function getCourseName($id=null) {
-    $tmp = $this->read(null, 6);
+  
+  function getCourseName($id) {
+    $tmp = $this->read(null, $id);
     return $tmp['Course']['course'];
   }
 
@@ -292,10 +385,13 @@ class Course extends AppModel
       $events = $this->Events->find('all', array('conditions' => array('course_id' => $id)));
       foreach ($events as $event)
         $this->Event->deleteAll($event['Event']['id']);
-      //
     }
   }
 
+  function getEnrolledStudentCount($course_id) {
+    return $this->Instructor->find('count', array('conditions' => array('Enrolment.id' => $course_id)));
+  }
+  
   function getCourseByCourse($course, $params) {
     return $this->find('all', array_merge(array('conditions' => array('course' => $course)), $params));
   }
@@ -304,5 +400,52 @@ class Course extends AppModel
     return $this->find('all', array('conditions' => array('Instructor.id' => $instructor_id),
                                     'fields' => array('Course.*')));
   }
+
+##########################################################################################################     
+##################   HELPER FUNCTION USED FOR UNIT TESTING PURPOSES   ####################################
+##########################################################################################################        
+	
+  	function createUserHelper( $id ='' , $username='' , $role='' ){
+	
+		$query = "INSERT INTO users VALUES ('$id','$role' ,'$username' , 'password', NULL , NULL , NULL , NULL , NULL , NULL , NULL , NULL , 'A', '0', '0000-00-00 00:00:00', NULL , NULL )";		
+		$this->query($query);
+	}
+	
+	function enrollUserHelper( $id=null, $user_id=null, $course_id=null, $role=''){
+		
+		if($role=='S'){
+		$query = "INSERT INTO user_enrols VALUES ('$id', '$course_id', '$user_id','A', '0', '0000-00-00 00:00:00', NULL , NULL)";
+		$this->query($query);
+		}
+		
+		if($role=='I'){
+		$query = "INSERT INTO user_courses VALUES('$id' , '$user_id', '$course_id', 'O', 'A', '0', '0000-00-00 00:00:00', NULL , NULL)";
+		$this->query($query);
+		}
+	}
+	
+	function createCoursesHelper($id=null, $course=null, $title=null){
+		
+		$sql = "INSERT INTO courses VALUES ( '$id', '$course', '$title', NULL , 'off', NULL , 'A', '0', '0000-00-00 00:00:00', NULL , NULL , '0' ) "; 
+		$this->query($sql);		
+		
+	}
+	
+	function createInactiveCoursesHelper($id=null, $course=null, $title=null){
+		
+		$sql = "INSERT INTO courses VALUES ( '$id', '$course', '$title', NULL , 'off', NULL , 'I', '0', '0000-00-00 00:00:00', NULL , NULL , '0' ) "; 
+		$this->query($sql);		
+		
+	}
+	
+### Helper functions for testing purposes ###	
+	function deleteAllTuples($table){	
+		$sql = "DELETE FROM $table";
+		$this->query($sql);
+	}
+  
+  	function printHelp($temp){
+  	$this->log($temp);
+  	}
 }
 ?>
