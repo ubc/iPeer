@@ -349,8 +349,9 @@ class Event extends AppModel
         $assigned_group_ids = Set::extract('/Group/id', $event);
       }
 
-      return $group->find('all', array('conditions' => array('course_id' => $event['Event']['course_id'], 
-                                                             'NOT' => array('Group.id' => $assigned_group_ids))));
+      return $group->find('list', array('conditions' => array('course_id' => $event['Event']['course_id'],  
+                                                             'NOT' => array('Group.id' => $assigned_group_ids)),
+      									'fields'=> array('Group.group_name')));
     }   
 
     function getEventById($id){

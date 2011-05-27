@@ -7,12 +7,13 @@
     <td>
     <?php echo $this->Form->create('Event', 
                                    array('id' => 'frm',
-                                         'url' => array('action' => $this->action.'/'.$course_id),
+                                         'url' => array('action' => $this->action.'/'.$event_id),
                                          'inputDefaults' => array('div' => false,
                                                                   'before' => '<td width="200px">',
                                                                   'after' => '</td>',
                                                                   'between' => '</td><td>')))?>
-
+<?php 
+echo $this->Form->input('id', array('type' => 'hidden'))?>
     <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
     <tr class="tableheader">
       <td colspan="3" align="center"><?php echo ucfirst($this->action)?> Evaluation Event</td>
@@ -21,15 +22,22 @@
     <tr class="tablecell2">
     	<td width="150" id="course_label">Course:</td>
     	<td width="405">
-      <?php echo $this->element('courses/course_selection_box', array('coursesList'=>$coursesList, 'courseId' => $course_id, 'view' => true));?>
+    	
+      <?php 
+       echo $this->element('courses/course_selection_box', array('coursesList'=>$coursesList, 'courseId' => $course_id, 'view' => false));?>
+		
 			</td>
     	<td width="243" id="course_msg" class="error"/>
     </tr>
     <tr class="tablecell2">
     <?php echo $this->Form->input('title', array('size'=>'50', 'class'=>'input',
                                                  'readonly' => $readonly)) ?>
+                                                 
+                                                 <td></td>
+     <?php /*?>                                            
 <!--    	<td id="newtitle_label">Event Title:&nbsp;<font color="red">*</font></td>
     	<td>
+    	
     	  <input type="text" name="newtitle" id="newtitle" style="width:85%;" class="validate required TEXT_FORMAT newtitle_msg Invalid_Event_Title_Format." value="<?php echo empty($event['Event']['title'])? '' : $event['Event']['title'] ?>" >
         <?php echo $ajax->observeField('newtitle', array('update'=>'eventErr', 'url'=>"/events/checkDuplicateTitle", 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');stripe();")) ?>
         <div id='eventErr' class="error">
@@ -39,6 +47,7 @@
         </div>
     	</td>
     	<td id="newtitle_msg" class="error" />-->
+    	  <?php */?> 
     </tr>
 
     <tr class="tablecell2">
@@ -116,10 +125,22 @@
     <td>&nbsp;</td>
   </tr>
   <tr class="tablecell2">
-    <td>Due Date:&nbsp;<font color="red">*</font></td>
-    <td><?php echo $html->input('Event/due_date', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;
+   
+    <?php
+
+    echo $form->input('Event.due_date', array('size'=>'50','class'=>'input', 'style'=>'width:75%;', 'type'=>'text', 'label'=>'Due Date:<font color="red">*</font>', 'value'=>$this->data['Event']['due_date'], 'after'=>'')) ?>&nbsp;&nbsp;
+    
+    
+                        <?php // echo $form->input('Search.due_date_begin', array('size'=>'50','class'=>'input',  'label'=> false, 'style'=>'width:75%;','value'=>(isset($sticky['due_date_begin']))? $sticky['due_date_begin']:'')) 
+                        ?>
+    
+    
 		    <a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
-		</td>
+	
+   
+   
+   
+   	
     <td>eg. YYYY-MM-DD HH:MM:SS (24 HOUR)</td>
   </tr>
   <tr class="tablecell2">
@@ -128,13 +149,13 @@
   	  <table width="100%"><tr align="left">
 				<td width="10%">FROM:</td>
 				<td width="90%">
-      		<?php echo $html->input('Event/release_date_begin', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal2.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+      		<?php echo $form->input('Event.release_date_begin', array('size'=>'50','class'=>'input', 'format'=>array('input'), 'type'=>'text','style'=>'width:75%;', 'value'=>$this->data['Event']['release_date_begin'])) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal2.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
       	</td>
       </tr>
       <tr>
       	<td width="10%">TO:</td>
       	<td width="90%">
-      		<?php echo $html->input('Event/release_date_end', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal3.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+      		<?php echo $form->input('Event.release_date_end', array('size'=>'50','class'=>'input', 'format'=>array('input'),  'type'=>'text','style'=>'width:75%;', 'value'=>$this->data['Event']['release_date_end'])) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal3.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
       	</td>
   	  </tr></table>
   	</td>
@@ -144,10 +165,13 @@
   <tr class="tablecell2">
     <td>Groups Assignment:&nbsp;</td>
     <td>
-        <?php echo $this->element("groups/group_list_chooser",
-            array('all' => $unassignedGroups, 'selected' => $assignedGroups,
-            'allName' =>  'Avaliable Groups', 'selectedName' => 'Participating Groups',
-            'itemName' => 'Group', 'listStrings' => array("Group #", "group_num"," - ","group_name")));
+    
+        <?php
+ 	 
+        echo $this->element("groups/group_list_chooser",
+            array('all' => $unassignedGroups, 
+            'allName' =>  'Avaliable Groups', 'selectedName' => 'Participating Groups'
+          ));
         ?>
 
     </td>
@@ -155,8 +179,8 @@
   </tr>
   <tr class="tablecell2">
     <?php echo $html->script('events')?>
-    <td colspan="3" align="center"><?php echo $html->submit('Edit Event', array('onclick' =>
-        "return validateEventDates('EventReleaseDateBegin','EventReleaseDateEnd','EventDueDate');")); ?></td>
+    <td colspan="3" align="center"><?php echo $form->submit('Edit Event', array('onclick' =>
+        "processSubmit(document.getElementById('selected_groups')); return validateEventDates('EventReleaseDateBegin','EventReleaseDateEnd','EventDueDate'); ")); ?></td>
     </tr>
 </table>
 
@@ -182,6 +206,4 @@ cal2.time_comp = true;
 var cal3 = new calendar1(document.forms[0].elements['data[Event][release_date_end]']);
 cal3.year_scroll = false;
 cal3.time_comp = true;
-
-//-->
 </script>

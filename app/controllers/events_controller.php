@@ -432,7 +432,7 @@ class EventsController extends AppController
       }
 
     }
-    $this->set('assignedGroups',$data);
+    $this->set('assignedGroups', $data);
     $this->set('data', $data); 
     $this->set('event', $event);
     $this->set('course_id', $courseId);
@@ -455,9 +455,7 @@ $forsave =array();
 			}
 		} else {
       $this->data = $data;
-      $this->render('edit');
-    }
-
+        }
 
     $this->set('eventTemplateTypes', $this->EventTemplateType->find('list', array('conditions' => array('NOT' => array('id' => 3)))));
     $this->set('unassignedGroups', $this->Event->getUnassignedGroups($data));
