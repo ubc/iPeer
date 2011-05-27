@@ -202,6 +202,7 @@ class GroupsController extends AppController
   	
 		if (!empty($this->data)) {
 			//$this->params = $this->Group->prepData($this->params);
+			var_dump($this->data);
 			if ($this->Group->save($this->data)) {
 				// add members into the groups_members table
 				//$this->GroupsMembers->insertMembers($this->Group->id, $this->params['data']['Group']);

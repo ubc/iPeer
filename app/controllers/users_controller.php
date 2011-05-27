@@ -47,7 +47,7 @@ class UsersController extends AppController
   var $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Pagination');
   var $NeatString;
   var $Sanitize;
-  var $uses = array('User', 'UserEnrol', 'Personalize', 'Course', 'SysParameter', 'SysFunction');
+  var $uses = array('User', 'UserEnrol', 'Personalize', 'Course', 'SysParameter', 'SysFunction','Role');
   var $components = array('Session', 'AjaxList', 'RequestHandler', 'Email');
   
   function __construct()
@@ -346,7 +346,13 @@ class UsersController extends AppController
   function __processForm() {
     if (!empty($this->data)) {
       $this->Output->filter($this->data);//always filter
-
+		//var_dump($this->data);
+		$roleNum = $this->data['Role']['Role'];
+		var_dump($roleNum);
+		$role = $this->Role->getRoleByRoleNumber($roleNum[0]);
+		var_dump($role);
+		$this->data['User']['role'] = $role;
+		var_dump($this->data);
       //Save Data
       if ($this->data = $this->User->save($this->data)) {
         $this->data['User']['id'] = $this->User->id;
@@ -505,7 +511,6 @@ class UsersController extends AppController
     if($this->__processForm()) {
       // Process the course changes list
       $this->processEnrollmentListsPostBack($this->params, $this->User->id);
-
       $this->render('userSummary');
     }
 

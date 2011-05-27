@@ -50,12 +50,13 @@
         <tr class="tablecell2">
             <?php echo $this->Form->input('email', array('size'=>'50', 'class'=>'validate none EMAIL_FORMAT email_msg Invalid_Email_Format.',
                                                          'after' => '',
-                                                         'readonly' => $readonly)) ?>
+                                                         'readonly' => $readonly)) ?>                                          
             <td id="email_msg" class="error">&nbsp;</td>
         </tr>
 
         <tr class="tablecell2">
-          <?php echo $this->Form->input('Role.Role', array('disabled' => $readonly));?>
+          <?php echo $this->Form->input('Role.Role', array('disabled' => $readonly ));?>
+          <?php //echo $this->Form->select('record_status', array('A' => 'Active', 'I' => 'Inactive'), null, array('empty' => false))?>
            <td id="role_msg" class="error">&nbsp;</td>
         </tr>
 

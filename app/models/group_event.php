@@ -28,13 +28,12 @@
 class GroupEvent extends AppModel
 {
   var $name = 'GroupEvent';
-  
   // inserts all members into the groups_events table
   function insertGroups($id=null, $data=null){
-  	for( $i=1; $i<=$data['group_count']; $i++ ){
-  	  if (!empty($id) && !empty($data['group'.$i]))
+  	for( $i=0; $i<count($data); $i++ ){
+  	  if (!empty($id) && !empty($data['Member']))
   	  {
-    	  $tmp = array( 'group_id'=>$data['group'.$i],'event_id'=>$id, 'marked'=>'not reviewed' );
+    	  $tmp = array( 'group_id'=>$data['Member'][$i],'event_id'=>$id, 'marked'=>'not reviewed' );
     	  $this->save($tmp);
     	  //reset the id field
     	  $this->id = null;

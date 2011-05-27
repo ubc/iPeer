@@ -28,7 +28,7 @@ class EvaluationMixevalHelperComponent extends Object
     $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'],
                                                                $this->rdAuth->id);
     for ($i = 0; $i<count($groupMembers); $i++) {
-       $targetEvaluatee = $groupMembers[$i]['U']['id'];
+       $targetEvaluatee = $groupMembers[$i]['User']['id'];
        $evaluation = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee($event['group_event_id'],
                                                                                           $evaluator, $targetEvaluatee);
        if (!empty($evaluation)) {

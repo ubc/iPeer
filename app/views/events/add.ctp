@@ -94,7 +94,7 @@
   </tr>
   <tr class="tablecell2">
     <td>Due Date:&nbsp;<font color="red">*</font></td>
-    <td><?php echo $form->input('Event.due_date', array('type'=>'text', 'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;
+    <td><?php echo $form->input('Event.due_date', array('div'=>false, 'label'=> 'Due Date :', 'type'=>'text', 'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;
 		    <a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
        <?php echo $form->error('Event.due_date', 'Please enter a valid date.')?>
 		</td>
@@ -104,16 +104,14 @@
     <td>Release Date:&nbsp;<font color="red">*</font></td>
   	<td id="release_date_begin">
   	  <table width="100%"><tr align="left">
-				<td width="10%">FROM:</td>
 				<td width="90%">
-      		<?php echo $form->input('Event.release_date_begin', array('type'=>'text',  'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal2.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+      		<?php echo $form->input('Event.release_date_begin', array('div'=>false, 'label'=>'Release Date Begin :' ,'type'=>'text',  'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal2.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
           <?php echo $form->error('Event.release_date_begin', 'Please enter a valid date.')?>
       	</td>
       </tr>
       <tr>
-      	<td width="10%">TO:</td>
       	<td width="90%">
-      		<?php echo $form->input('Event.release_date_end', array( 'type'=>'text', 'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal3.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+      		<?php echo $form->input('Event.release_date_end', array('div'=>false, 'label'=> 'Release Date End :', 'type'=>'text', 'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal3.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
           <?php echo $form->error('Event.release_date_end', 'Please enter a valid date.')?>
       	</td>
   	  </tr></table>
@@ -134,9 +132,13 @@
   </tr>
   <tr class="tablecell2">
   <?php echo $html->script('events')?>
-    <td colspan="3" align="center"><?php echo $form->submit('Add Event', array('onclick' =>
-        "return validateEventDates('EventReleaseDateBegin','EventReleaseDateEnd','EventDueDate');"));
-        ?></td>
+
+<!--<td colspan="3" align="center"><?php echo $this->Form->submit(ucfirst($this->action).' Group', array('div' => false,
+                                                                                                         'onClick' => "processSubmit(document.getElementById('selected_groups'))")) ?>
+
+
+    --><td colspan="3" align="center"><?php echo $this->Form->submit(ucfirst($this->action).'Group', array('div' => false,
+                                                                                                         'onClick' => "processSubmit(document.getElementById('selected_groups'))")) ?></td>
     </tr>
 </table>
 

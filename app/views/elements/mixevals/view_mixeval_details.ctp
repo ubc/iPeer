@@ -22,9 +22,8 @@
       //Get and set Mixeval Question
       isset($questions[$pos])? $mixevalQuestion = $questions[$pos] : $mixevalQuestion = null;
       if ($mixevalQuestion !=null) {
-        $questionDescriptors = $mixevalQuestion['instructions'];
+        $questionDescriptors = $mixevalQuestion['descriptor'];
         $descriptor_des = array();
-		
         foreach ($questionDescriptors as $row) {
           $desc = $row['MixevalsQuestionDesc'];
           $descriptor_des[$desc['scale_level']] = $desc['descriptor'];
@@ -161,7 +160,7 @@
                    if (isset($mixevalQuestion['response_type']) && $mixevalQuestion['response_type']=='L') {?>
                      <?php
                      $text = isset($evaluation['EvaluationDetail'][$pos-1]['EvaluationMixevalDetail']['question_comment'])? $evaluation['EvaluationDetail'][$pos-1]['EvaluationMixevalDetail']['question_comment']:'';
-                     $Output->br2nl($text);
+					 $Output->br2nl($text);
                      //echo $text;
                       ?>
                      <textarea name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['question_num']?>" cols="80" rows="15"><?php echo $text?></textarea>

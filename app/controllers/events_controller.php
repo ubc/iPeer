@@ -320,13 +320,12 @@ class EventsController extends AppController
 		if (empty($this->params['data'])) {
 
 
-			$unassignedGroups = $this->Group->find('list', array( 'conditions'=> array('course_id'=>$courseId)));
+			$unassignedGroups = $this->Group->find('list', array('conditions'=> array('course_id'=>$courseId), 'fields'=>array('group_name')));
 			$this->set('unassignedGroups', $unassignedGroups);
 
  	    //Get all display event types
  	    $eventTypes = $this->EventTemplateType->find('all', array('conditions'=> array('display_for_selection'=>1)));
 		  $this->set('eventTypes', $eventTypes);
-
 		  //Set default template
       $default = '-- Select a Evaluation Tool -- ';
       $model = 'SimpleEvaluation';
@@ -351,14 +350,13 @@ class EventsController extends AppController
 			if ($this->Event->save($this->params['data'])) {
 
         //Save Groups for the Event
-			  $this->GroupEvent->insertGroups($this->Event->id, $this->params['data']['Event']);
+			  $this->GroupEvent->insertGroups($this->Event->id, $this->params['data']['Member']);
 			  $this->redirect('/events/index/The event is added successfully.');
 			}
       //Found error
       else {
         $this->set('data', $this->params['data']);
         $this->set('courseId', $courseId);
-
 				$unassignedGroups = $this->Group->find('all','course_id = '.$courseId);
 				$this->set('unassignedGroups', $unassignedGroups);
 				$eventTypes = $this->EventTemplateType->find('all',' display_for_selection = 1 ');

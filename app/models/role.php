@@ -30,4 +30,12 @@ class Role extends AppModel
   function parentNode() {
     return null;
   }
+  
+  function getRoleByRoleNumber($roleNum=''){
+  	if($roleNum==1)return 'SA';
+  	if($roleNum==2)return 'A';
+  	if($roleNum==3)return 'I';
+  	if($roleNum==4)return 'S';
+  	else return null; 
+  }
 }
