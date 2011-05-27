@@ -4,7 +4,7 @@
       <td valign="top" width="75%" align='left'>Section One: &nbsp;Lickert Scales</td>
     <?php
     $descriptor_des = array('1'=>'Lowest','2'=>'','3'=>'Middle','4'=>'','5'=>'Highest');
-
+    
     isset($data['questions'])? $questions = $data['questions'] : $questions = null;
     isset($user)? $userId = $user['id'] : $userId = '';
  		isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = null;

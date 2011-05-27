@@ -30,8 +30,8 @@ class GroupEvent extends AppModel
   var $name = 'GroupEvent';
   // inserts all members into the groups_events table
   function insertGroups($id=null, $data=null){
-  	for( $i=0; $i<count($data); $i++ ){
-  	  if (!empty($id) && !empty($data['Member']))
+  	for( $i=0; $i<count($data['Member']); $i++ ){
+  	  if (!empty($id) && !empty($data['Member'][$i]))
   	  {
     	  $tmp = array( 'group_id'=>$data['Member'][$i],'event_id'=>$id, 'marked'=>'not reviewed' );
     	  $this->save($tmp);

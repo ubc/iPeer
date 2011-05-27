@@ -133,12 +133,8 @@
   <tr class="tablecell2">
   <?php echo $html->script('events')?>
 
-<!--<td colspan="3" align="center"><?php echo $this->Form->submit(ucfirst($this->action).' Group', array('div' => false,
-                                                                                                         'onClick' => "processSubmit(document.getElementById('selected_groups'))")) ?>
-
-
-    --><td colspan="3" align="center"><?php echo $this->Form->submit(ucfirst($this->action).'Group', array('div' => false,
-                                                                                                         'onClick' => "processSubmit(document.getElementById('selected_groups'))")) ?></td>
+<td colspan="3" align="center"><?php echo $this->Form->submit(ucfirst($this->action).' Event', array('div' => false,
+  											'onClick' => "processSubmit(document.getElementById('selected_groups'))")) ?></td>
     </tr>
 </table>
 
