@@ -1,122 +1,141 @@
 <?php
 
-
 class SearchsController extends AppController
 {
-/**
- * This controller does not use a model
- *
- * @var $uses
- */
-        var $uses =  array('GroupEvent', 'User', 'UserCourse', 'Event', 'Group', 'EvaluationSubmission', 'Course','Personalize', 'GroupsMembers');
-	var $show;
-	var $sortBy;
-	var $direction;
-	var $page;
-	var $order;
-	var $Sanitize;
-	var $functionCode = 'ADV_SEARCH';
-	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
-	var $components = array('rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework', 'Search','sysContainer', 'EvaluationHelper');
-
+  /**
+   * This controller does not use a model
+   *
+   * @var $uses
+   */
+  var $uses =  array('GroupEvent', 'User', 'UserCourse', 'Event', 'Group',
+      'EvaluationSubmission', 'Course','Personalize', 'GroupsMembers');
+  var $show;
+  var $sortBy;
+  var $direction;
+  var $page;
+  var $order;
+  var $Sanitize;
+  var $functionCode = 'ADV_SEARCH';
+  var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
+  var $components = array('Output','sysContainer', 'globalConstant', 'Search',
+      'userPersonalize', 'framework', 'sysContainer', 'EvaluationHelper');
+  
 	
-	
-	
-	function __construct()
-	{
-		$this->Sanitize = new Sanitize;
-		$this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
-		if ($this->show == 'all') $this->show = 99999999;
-		$this->sortBy = empty($_GET['sort'])? 'id': $_GET['sort'];
-		$this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
-		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
-		$this->order = $this->sortBy.' '.strtoupper($this->direction);
- 		$this->set('title_for_layout', 'Advanced Search');
- 		
-		parent::__construct();
-	}
+  function __construct() {
+    $this->Sanitize = new Sanitize;
+    $this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
+    if ($this->show == 'all') $this->show = 99999999;
+    $this->sortBy = empty($_GET['sort'])? 'id': $_GET['sort'];
+    $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
+    $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
+    $this->order = $this->sortBy.' '.strtoupper($this->direction);
+    $this->set('title_for_layout', 'Advanced Search');
 
-        function  beforeFilter() {
-            parent::beforeFilter();
-            $currentUser = $this->User->getCurrentLoggedInUser();
-            $this->set('currentUser', $currentUser);
-            $coursesList = $this->sysContainer->getMyCourseList();
-            $this->set('coursesList', $coursesList);
+    parent::__construct();
+  }
 
-            $role = $this->Auth->user('role');
-            $personalizeData = $this->Personalize->find('all',array('conditions' =>'user_id = '.$this->Auth->user('id')));
-            $this->userPersonalize->setPersonalizeList($personalizeData);
-            if ($personalizeData && $this->userPersonalize->inPersonalizeList('Search.ListMenu.Limit.Show')) {
-                $this->show = $this->userPersonalize->getPersonalizeValue('Search.ListMenu.Limit.Show');
-                $this->set('userPersonalize', $this->userPersonalize);
-            } else {
-              $this->show = '15';
-              $this->update($attributeCode = 'Search.ListMenu.Limit.Show',$attributeValue = $this->show);
-            }
-        }
+  function  beforeFilter() {
+    parent::beforeFilter();
+    $currentUser = $this->User->getCurrentLoggedInUser();
+    $this->set('currentUser', $currentUser);
+    $coursesList = $this->sysContainer->getMyCourseList();
+    $this->set('coursesList', $coursesList);
 
-        function update($attributeCode='',$attributeValue='') {
-                if ($attributeCode != '' && $attributeValue != '') //check for empty params
-                    $this->params['data'] = $this->Personalize->updateAttribute($currentUser->id, $attributeCode, $attributeValue);
-        }
+    $role = $this->Auth->user('role');
+    $personalizeData = $this->Personalize->find('all',array('conditions' =>'user_id = '.$this->Auth->user('id')));
+    $this->userPersonalize->setPersonalizeList($personalizeData);
+    if ($personalizeData && $this->userPersonalize->inPersonalizeList('Search.ListMenu.Limit.Show')) {
+        $this->show = $this->userPersonalize->getPersonalizeValue('Search.ListMenu.Limit.Show');
+        $this->set('userPersonalize', $this->userPersonalize);
+    } else {
+      $this->show = '15';
+      $this->update($attributeCode = 'Search.ListMenu.Limit.Show',$attributeValue = $this->show);
+    }
+  }
 
-	function index($msg='') {
-            $this->set('message', $msg);
-            $this->redirect('/searchs/searchEvaluation');
-	}
+  function update($attributeCode='',$attributeValue='') {
+    if ($attributeCode != '' && $attributeValue != '') //check for empty params
+        $this->params['data'] = $this->Personalize->updateAttribute($currentUser->id, $attributeCode, $attributeValue);
+  }
 
-          function searchEvaluation(){
-                $nibble = $this->Search->setEvaluationCondition($this->params);
-                $sticky = $nibble['sticky'];
-                $condition = $nibble['condition'];
-                $searchMartix = $this->formatSearchEvaluation($condition, $this->sortBy, $this->show);
+  /**
+   * Index Page: Redirects to searchEvaluation page initially
+   *
+   * @param $msg A Message
+   */
+  function index($msg='') {
+    $this->set('message', $msg);
+    $this->redirect('/searchs/searchEvaluation');
+  }
 
-                $courses = $searchMartix;
+  /**
+   * Advanced Search Evaluation
+   */
+  function searchEvaluation(){
+    $nibble = $this->Search->setEvaluationCondition($this->params);
+    $sticky = $nibble['sticky'];
+    $condition = $nibble['condition'];
+    $searchMartix = $this->formatSearchEvaluation($condition, $this->sortBy, $this->show);
 
-                $i=0;
-                $name = array();
-                foreach($courses as $row):
-                  $evaluation = $row['Event'];
-                  $name[$i] = $this->sysContainer->getCourseName($evaluation['course_id']);
-                  $i++;
-                endforeach;
-                $this->set('names', $name);
-                $this->set('data', $searchMartix);
-                $this->set('display', 'evaluation');
-          }
+    $courses = $searchMartix;
 
-          function searchResult(){
+    $i=0;
+    $name = array();
+    foreach($courses as $row):
+      $evaluation = $row['Event'];
+      $name[$i] = $this->sysContainer->getCourseName($evaluation['course_id']);
+      $i++;
+    endforeach;
+    $this->set('names', $name);
+    $this->set('data', $searchMartix);
+    $this->set('display', 'evaluation');
+  }
 
-                $nibble = $this->Search->setEvalResultCondition($this->params);
-                $sticky = $nibble['sticky'];
-                $eventId = $nibble['event_id'];
-                $status = $nibble['status'];
-                $maxPercent = $nibble['maxPercent'];
-                $minPercent = $nibble['minPercent'];
+  /**
+   * Advanced Search Evaluation Result
+   */
+  function searchResult(){
 
-                $searchMartix = $this->formatSearchEvaluationResult($maxPercent,$minPercent,$eventId,$status, $this->order, $this->sortBy, $this->show);
+    $nibble = $this->Search->setEvalResultCondition($this->params);
+    $sticky = $nibble['sticky'];
+    $eventId = $nibble['event_id'];
+    $status = $nibble['status'];
+    $maxPercent = $nibble['maxPercent'];
+    $minPercent = $nibble['minPercent'];
 
-                $eventList = $this->Auth->user('role') == 'A' ? $this->Event->find('all', array('conditions' => array('event_template_type_id !=' => '3'))) : $this->Event->find('all', array('conditions' => array('creator_id' => $this->Auth->user('id') , 'event_template_type_id !=' => '3')));
-                $this->set('sticky', $sticky);
-                $this->set('eventList', $eventList);
-                $this->set('data', $searchMartix['data']);
-                $this->set('paging', $searchMartix['paging']);
-                $this->set('display', 'eval_result');
+    $searchMartix = $this->formatSearchEvaluationResult($maxPercent,$minPercent,$eventId,$status, $this->order, $this->sortBy, $this->show);
 
-          }
+    $eventList = $this->Auth->user('role') == 'A' ? 
+      $this->Event->find('all', array(
+          'conditions' => array('event_template_type_id !=' => '3'))) :
+      $this->Event->find('all', array(
+          'conditions' => array('creator_id' => $this->Auth->user('id') , 'event_template_type_id !=' => '3')));
+    $this->set('sticky', $sticky);
+    $this->set('eventList', $eventList);
+    $this->set('data', $searchMartix['data']);
+    $this->set('paging', $searchMartix['paging']);
+    $this->set('display', 'eval_result');
 
-          function searchInstructor(){
-                $nibble = $this->Search->setInstructorCondition($this->params);
-                $condition = $nibble['condition'];
-                $sticky = $nibble['sticky'];
+  }
 
-                $searchMartix = $this->formatSearchInstructor($condition, $this->sortBy, $this->show);
+  /**
+   * Advanced Search Instructor
+   */
+  function searchInstructor(){
+    $nibble = $this->Search->setInstructorCondition($this->params);
+    $condition = $nibble['condition'];
+    $sticky = $nibble['sticky'];
 
-                $this->set('sticky', $sticky);
-                $this->set('data', $searchMartix);
-                $this->set('display', 'instructor');
-          }
+    $searchMartix = $this->formatSearchInstructor($condition, $this->sortBy, $this->show);
 
+    $this->set('sticky', $sticky);
+    $this->set('data', $searchMartix);
+    $this->set('display', 'instructor');
+  }
+
+  /**
+   * Search box for searchResult
+   */
   function eventBoxSearch() {
     $this->layout = false;
     $courseId = $this->params['form']['course_id'];
@@ -127,9 +146,7 @@ class SearchsController extends AppController
     $this->set('eventList',$this->Event->find('all', array ('conditions' => $condition)));
   }
 
-   /*
-   * function formatSearchEvaluation($conditions, $sortBy, $limit)
-   *
+   /**
    * This func returns paginated evaluation search result
    *
    * @param unknown_type $conditions the conditions
@@ -144,18 +161,16 @@ class SearchsController extends AppController
         $conditions['course_id'] = $courseIDs;
 
     $this->paginate = array(
-                    'conditions' => $conditions,
-                    'fields' => array('*', '(NOW() >= release_date_begin AND NOW() <= release_date_end) AS is_released'),
-                    'order' => 'Event.'.$sortBy,
-                    'limit' => $limit
+      'conditions' => $conditions,
+      'fields' => array('*', '(NOW() >= release_date_begin AND NOW() <= release_date_end) AS is_released'),
+      'order' => 'Event.'.$sortBy,
+      'limit' => $limit
     );
 
     return $this->paginate('Event');
   }
 
-   /*
-   * function formatSearchInstructor($conditions, $sortBy, $limit)
-   *
+   /**
    * This func returns paginated instructor search result
    *
    * @param unknown_type $conditions the conditions
@@ -177,9 +192,7 @@ class SearchsController extends AppController
     return $this->paginate('User');
   }
 
-  /*
-   * function formatSearchEvaluationResult($maxPercent=1,$minPercent=0,$eventId=null,$status=null, $sortBy, $limit)
-   *
+  /**
    * This func returns paginated evaluation result search result
    *
    * @param unknown_type $maxPercent
@@ -209,21 +222,21 @@ class SearchsController extends AppController
           $assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($eventId);
         break;
     }
-		if (!empty($assignedGroupIDs)) {
-		  $assignedGroups = array();
+    if (!empty($assignedGroupIDs)) {
+      $assignedGroups = array();
 
-			// retrieve string of group ids
-  		for ($i = 0; $i < count($assignedGroupIDs); $i++) {
-  			$groupid = $assignedGroupIDs[$i]['GroupEvent']['group_id'];
-  			$group = $this->Group->find('first', array('conditions' => array('Group.id' => $groupid)));
-  			$assignedGroups[$i] = $group;
-  			//Get Members whom completed evaluation
-    		$memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($group['Group']['id'],
-    		                                                                           $groupid);
+            // retrieve string of group ids
+      for ($i = 0; $i < count($assignedGroupIDs); $i++) {
+        $groupid = $assignedGroupIDs[$i]['GroupEvent']['group_id'];
+        $group = $this->Group->find('first', array('conditions' => array('Group.id' => $groupid)));
+        $assignedGroups[$i] = $group;
+        //Get Members whom completed evaluation
+        $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($group['Group']['id'],
+                                                                               $groupid);
         //Check to see if all members are completed this evaluation
 
-       	$numOfCompletedCount = $memberCompletedNo[0][0]['count'];
-	  		$numMembers=$this->GroupsMembers->find('count', array('conditions' => 'group_id='.$group['Group']['id']));
+        $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
+                        $numMembers=$this->GroupsMembers->find('count', array('conditions' => 'group_id='.$group['Group']['id']));
         ($numOfCompletedCount == $numMembers) ? $completeStatus = 1:$completeStatus = 0;
 
 
@@ -238,12 +251,12 @@ class SearchsController extends AppController
         $assignedGroups[$i]['Group']['grade_release_status'] = $released['grade_release_status'];
         $assignedGroups[$i]['Group']['comment_release_status'] = $released['comment_release_status'];
 
-  		}
+      }
 
-		  $evlResult['Evaluation']['assignedGroups'] = $assignedGroups;
-  	}else {
+      $evlResult['Evaluation']['assignedGroups'] = $assignedGroups;
+    }else {
       $evlResult['Evaluation']['assignedGroups'] = array();
-  	}
+    }
 
     $paging['style'] = 'ajax';
 
