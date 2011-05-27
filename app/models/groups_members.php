@@ -81,12 +81,11 @@ class GroupsMembers extends AppModel
   function getEventGroupMembers ($groupId, $selfEval, $userId)
   {
     $conditions['GroupsMembers.group_id'] = $groupId;
-    if($selfEval)
+    if(!$selfEval)
       $conditions['GroupsMembers.user_id !='] = $userId;
 
     return $this->find('all', array(
-      'conditions' => array('GroupsMembers.group_id' => $groupId,
-                            'GroupsMembers.user_id !=' => $userId),
+      'conditions' => $conditions,
       'fields' => array('User.*'),
       'joins' => array(
           array(

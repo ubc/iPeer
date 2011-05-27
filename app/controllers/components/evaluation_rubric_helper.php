@@ -427,7 +427,7 @@ class EvaluationRubricHelperComponent extends Object
 
        $membersAry = array();
        foreach ($groupMembers as $member) {
-        $membersAry[$member['U']['id']] = $member;
+        $membersAry[$member['User']['id']] = $member;
        }
        $result['groupMembers'] = $membersAry;
 
