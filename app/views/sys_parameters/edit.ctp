@@ -12,31 +12,31 @@
 <table width="100%" cellspacing="0" cellpadding="4">
 <tr>
 	<td width="130" id="id_label">id*:</td>
-	<td width="337" align="left"><?php echo $html->input('SysParameter/id', array('id'=>'id', 'size'=>'50', 'class'=>'validate required NUMERIC_FORMAT id_msg Invalid_Numeric_Value.'))?></td>
+	<td width="337" align="left"><?php echo $form->input('SysParameter/id', array('id'=>'id', 'size'=>'50', 'class'=>'validate required NUMERIC_FORMAT id_msg Invalid_Numeric_Value.'))?></td>
 	<td width="663" id="id_msg" class="error"/>
 </tr>
 <tr>
 	<td width="130" id="parameter_code_label">Parameter Code:</td>
-	<td width="337" align="left"><?php echo $html->input('SysParameter/parameter_code', array('id'=>'function_name', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT parameter_code_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
+	<td width="337" align="left"><?php echo $form->input('SysParameter/parameter_code', array('id'=>'function_name', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT parameter_code_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
 	<td width="663" id="parameter_code_msg" class="error"/>
 </tr>
 <tr>
 	<td width="130" id="parameter_value_label">Parameter Value:</td>
-	<td width="337" align="left"><?php echo $html->input('SysParameter/parameter_value', array('id'=>'parameter_value', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT parameter_value_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
+	<td width="337" align="left"><?php echo $form->input('SysParameter/parameter_value', array('id'=>'parameter_value', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT parameter_value_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
 	<td width="663" id="parameter_value_msg" class="error"/>
 </tr>
 <tr>
 	<td width="130" id="parameter_type_label">Paramenter Type:</td>
 	<td align="left"><?php
 	  $types = array('S'=>'String','I'=>'Integer', 'B'=>'Boolean');
-		echo $html->selectTag('SysParameter/parameter_type', $types, $html->tagValue('SysParameter/parameter_type'), null, null, false);
+		echo $form->select('SysParameter.parameter_type', $types, $html->tag('SysParameter.parameter_type'));
 	   ?>
 	</td>
 	<td width="663" id="parameter_type_msg" class="error"/>
 </tr>
 <tr>
 	<td width="130" id="description_label">Description:</td>
-	<td align="left"><?php echo $html->input('SysParameter/description', array('id'=>'description', 'size'=>'50', 'class'=>'validate none TEXT_FORMAT description_msg Invalid_Text._At_Least_One_Word_Is_Required.')) ?>
+	<td align="left"><?php echo $form->input('SysParameter/description', array('id'=>'description', 'size'=>'50', 'class'=>'validate none TEXT_FORMAT description_msg Invalid_Text._At_Least_One_Word_Is_Required.')) ?>
 	</td>
 	<td width="663" id="description_msg" class="error"/>
 </tr>
@@ -50,7 +50,7 @@
 </tr>
 </table>
 <p>
-	<?php echo $html->submit('Save') ?><?php echo $html->link('Back', '/sysparameters'); ?>
+	<?php echo $form->submit('Save') ?><?php echo $html->link('Back', '/sysparameters'); ?>
 </p>
 </form>
 </td>
