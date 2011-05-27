@@ -81,7 +81,7 @@ class SysFunctionsController extends AppController
 
 	function index($message='') {
         // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
+     //   $this->rdAuth->noStudentsAllowed();
         // Set the top message
         $this->set('message', $message);
         // Set up the basic static ajax list variables
