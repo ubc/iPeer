@@ -22,13 +22,15 @@
     </td>
     <td align="center">
       <h3><?php echo isset($selectedName) ? $selectedName : ''?></h3>
-      <?php echo $this->Form->input('Member.Member', array('style' => $listStyle,
-                                                           'div' => false,
-                                                           'label' => false,
-                                                           'before' => '',
-                                                           'after' => '',
-                                                           'separator' => '',
-                                                           'between' => '',
-                                                           'id' => 'selected_groups' ))?>
+      <?php echo $this->Form->input('Member.Member',
+              array('style' => $listStyle,
+                     'div' => false,
+                     'label' => false,
+                     'before' => '',
+                     'after' => '',
+                     'separator' => '',
+                     'between' => '',
+                     'id' => 'selected_groups' ));
+      ?>
     </td>
 </tr></table>

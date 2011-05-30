@@ -14,7 +14,7 @@ App::import('Lib', 'toolkit');
 
 class AppController extends Controller  {
   var $startpage = 'pages';
-  var $components = array('Session', 'Output', 'sysContainer', 'globalConstant', 'userPersonalize', 'framework', 'Auth', 'Acl', 'AccessControl');
+  var $components = array('Session', 'Output', 'sysContainer', 'globalConstant', 'userPersonalize', 'framework', 'Auth', 'Acl', 'AccessControl', 'Email');
   var $helpers = array('Session', 'Html', 'Js');
   var $access = array ();
   var $actionList = array ();
@@ -182,6 +182,21 @@ class AppController extends Controller  {
       $this->Session->delete('URL');
     }*/
     return true;
+  }
+
+  function _sendEmail($templateName,$emailSubject,$from,$to,$cc,$bcc) {
+		$this->Email->reset();
+
+                $this->Email->delivery = 'debug';
+		$this->Email->to = $to;
+		$this->Email->cc = $cc;
+		$this->Email->bcc = $bcc;
+		$this->Email->subject = $emailSubject;
+		$this->Email->from = $from;
+		$this->Email->template = $templateName;
+		$this->Email->sendAs = 'both';
+
+		return $this->Email->send();
   }
 }
 ?>

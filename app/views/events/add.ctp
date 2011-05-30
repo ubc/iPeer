@@ -5,8 +5,8 @@
 <?php echo $html->script('calendar1')?>
 <?php echo $html->script('groups')?>
 	  <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Event']['id'])?'add':'edit') ?>">
-      <?php echo empty($params['data']['Event']['id']) ? null : $html->hidden('Event/id'); ?>
-      <?php echo empty($params['data']['Event']['id']) ? $form->hidden('Event/creator_id', array('value'=>$currentUser['id'])) : $form->hidden('Event/updater_id', array('value'=>$currentUser['id'])); ?>
+      <?php echo empty($params['data']['Event']['id']) ? null : $html->hidden('Event.id'); ?>
+      <?php echo empty($params['data']['Event']['id']) ? $form->hidden('Event.creator_id', array('value'=>$currentUser['id'])) : $form->hidden('Event.updater_id', array('value'=>$currentUser['id'])); ?>
       <input type="hidden" name="assigned" id="assigned" />
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
@@ -23,15 +23,15 @@
           $params = array('controller'=>'events', 'data'=>null, 'fieldvalue'=>$fieldValue);
           echo $this->element('events/ajax_title_validate', $params);
           ?>
-           <?php echo $form->error('Event/title', 'Title is required.')?>
-           <?php echo $form->error('Event/title_unique', 'Duplicate Title found. Please change the title of this event.')?>
+           <?php echo $form->error('Event.title', 'Title is required.')?>
+           <?php echo $form->error('Event.title_unique', 'Duplicate Title found. Please change the title of this event.')?>
       </div>
   	</td>
   	<td id="newtitle_msg" class="error" />
   </tr>
   <tr class="tablecell2">
     <td>Description:&nbsp;</td>
-    <td><?php echo $form->textarea('Event/description', array('cols'=>'35', 'style'=>'width:85%;')) ?>  </td>
+    <td><?php echo $form->textarea('Event.description', array('cols'=>'35', 'style'=>'width:85%;')) ?>  </td>
     <td>&nbsp;</td>
   </tr>
   <tr class="tablecell2">

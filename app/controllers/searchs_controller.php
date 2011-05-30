@@ -109,7 +109,7 @@ class SearchsController extends AppController
       $this->Event->find('all', array(
           'conditions' => array('event_template_type_id !=' => '3'))) :
       $this->Event->find('all', array(
-          'conditions' => array('creator_id' => $this->Auth->user('id') , 'event_template_type_id !=' => '3')));
+          'conditions' => array('Event.creator_id' => $this->Auth->user('id') , 'event_template_type_id !=' => '3')));
     $this->set('sticky', $sticky);
     $this->set('eventList', $eventList);
     $this->set('data', $searchMartix['data']);
