@@ -1,14 +1,41 @@
 <?php
 App::import('Model', 'Course');
+App::import('Component', 'Auth');
+
+class FakeController extends Controller {
+  var $name = 'FakeController';
+  var $components = array('Auth');
+  var $uses = null;
+  var $params = array('action' => 'test');
+}
+
 class CourseTestCase extends CakeTestCase {
 	
+  function setUp() {
+    $admin = array('User' => array('username' => 'root',
+                                   'password' => 'ipeer'));
+    $this->controller =& new FakeController();
+    $this->controller->constructClasses();
+    $this->controller->startupProcess();
+    $this->controller->Component->startup($this->controller);
+    $this->controller->Auth->startup($this->controller);
+    ClassRegistry::addObject('view', new View($this->Controller));
+    ClassRegistry::addObject('auth_component', $this->controller->Auth);
+
+    $this->controller->Auth->login($admin);
+
+		$this->Course =& ClassRegistry::init('Course');
+  }
+
+  function tearDown() {
+    $this->controller->Component->shutdown($this->controller);
+    $this->controller->shutdownProcess();
+  }
 	
 	function TestGetCourseByInstructor(){
 	
-		$this->Course= & ClassRegistry::init('Course');
 		$empty=null;
 		$this->flushDatabase();
-		
 		
 		/*
 		 * Test instructor teaching only ONE coures
@@ -86,7 +113,6 @@ class CourseTestCase extends CakeTestCase {
 	
 	function TestGetEnrolledStudentCount(){
 		
-		$this->Course= & ClassRegistry::init('Course');
 		$empty=null;
 		
 		/*
@@ -121,7 +147,7 @@ class CourseTestCase extends CakeTestCase {
 		$enrollmentCount = $this->Course->getEnrolledStudentCount(1);
 		$this->assertEqual($enrollmentCount, 3);
 		## Delete test data
-		$this->Course->flushDatabase();
+		$this->flushDatabase();
 		
 		
 		/*
@@ -136,7 +162,6 @@ class CourseTestCase extends CakeTestCase {
 	
 	function TestGetCourseName(){
 	
-		$this->Course= & ClassRegistry::init('Course');
 		$empty=null;
 		$this->flushDatabase();
 		
@@ -160,8 +185,6 @@ class CourseTestCase extends CakeTestCase {
 	
 	function TestAddInstructor(){
 		
-		
-		$this->Course= & ClassRegistry::init('Course');
 		$empty=null;
 				
 		/*
@@ -245,7 +268,6 @@ class CourseTestCase extends CakeTestCase {
 
 		function TestDeleteInstructor(){
 		
-		$this->Course= & ClassRegistry::init('Course');
 		$empty=null;
 		$this->flushDatabase();
 
@@ -333,7 +355,6 @@ class CourseTestCase extends CakeTestCase {
 	
 	function TestGetInactiveCourses(){
 		
-		$this->Course= & ClassRegistry::init('Course');
 		$empty=null;
 		
 		##set up test data
@@ -353,7 +374,6 @@ class CourseTestCase extends CakeTestCase {
 	function TestFindAccessibleCoursesListByUserIdRole(){
 		
 		
-		$this->Course= & ClassRegistry::init('Course');
 		$empty = null;
 		$this->flushDatabase();
 	
@@ -440,7 +460,6 @@ class CourseTestCase extends CakeTestCase {
 		
 	function TestFindAccessibleCoursesCount(){
 		
-		$this->Course= & ClassRegistry::init('Course');
 		$empty= null;
 		
 		##Set up test courses
@@ -508,7 +527,6 @@ class CourseTestCase extends CakeTestCase {
 	
 	function TestFindRegisteredCoursesList(){
 		
-		$this->Course= & ClassRegistry::init('Course');
 		$empty=null;
 		
 		##Set up test courses
@@ -591,7 +609,6 @@ class CourseTestCase extends CakeTestCase {
 		
 	function TestFindNonRegisteredCoursesList(){
 
-		$this->Course= & ClassRegistry::init('Course');
 		$empty = null;
 		$this->flushDatabase();
 
@@ -675,7 +692,6 @@ class CourseTestCase extends CakeTestCase {
 		
 	function TestFindNonRegisteredCoursesCount(){
 		
-		$this->Course= & ClassRegistry::init('Course');
 		$empty = null;
 		
 		//Set up test course data
@@ -756,7 +772,6 @@ class CourseTestCase extends CakeTestCase {
 		
 	function TestDeleteAll(){
 		
-		$this->Course= & ClassRegistry::init('Course');
 		$empty = null;
 		
 		//Set up test course data
@@ -785,7 +800,6 @@ class CourseTestCase extends CakeTestCase {
 	
 	function TestGetAllInstructors(){
 		
-		$this->Course= & ClassRegistry::init('Course');
 		$empty = null;
 		
 		

@@ -7,6 +7,9 @@ class Toolkit {
     static $instance = array();
     if (!$instance) {
       $instance[0] =& ClassRegistry::getObject('auth_component');
+      if (false == $instance[0]) {
+        throw new Exception('Could not get auth component!');
+      }
     }
     return $instance[0];
   }

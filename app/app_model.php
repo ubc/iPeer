@@ -1,4 +1,5 @@
 <?php 
+App::import('Lib', 'Toolkit');
 
 class AppModel extends Model {
   var $errorMessage = 'Failed to save.';
