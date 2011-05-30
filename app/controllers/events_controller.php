@@ -264,7 +264,8 @@ class EventsController extends AppController
 
 
     //Get all display event types
-    $eventTypes = $this->EventTemplateType->find('all',' display_for_selection = 1 ');
+    //$eventTypes = $this->EventTemplateType->find('all', array('conditions'=>array('display_for_selection'=>1)));
+    $eventTypes = $this->EventTemplateType->find('all', array('conditions'=>array('display_for_selection'=>1)));
 	  $this->set('eventTypes', $eventTypes);
 		$this->render();
   }
@@ -359,7 +360,7 @@ class EventsController extends AppController
         $this->set('courseId', $courseId);
 				$unassignedGroups = $this->Group->find('all','course_id = '.$courseId);
 				$this->set('unassignedGroups', $unassignedGroups);
-				$eventTypes = $this->EventTemplateType->find('all',' display_for_selection = 1 ');
+				$eventTypes = $this->EventTemplateType->find('all', array('conditions'=> array('display_for_selection'=>1)));
 		    $this->set('eventTypes', $eventTypes);
   		  //Set default template
         $default = 'Default Simple Evaluation';
@@ -377,8 +378,6 @@ class EventsController extends AppController
 
 
   function edit($id) {
- 
-  	
   	
     if(!is_numeric($id)) {
       $this->Session->setFlash('Invalid survey ID.');
@@ -394,7 +393,7 @@ class EventsController extends AppController
 
 	  //Clear $id to only the alphanumeric value
 		$id = $this->Sanitize->paranoid($id);
-    $this->set('event_id', $id);
+        $this->set('event_id', $id);
 
 		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
 
@@ -406,6 +405,7 @@ class EventsController extends AppController
     $model = '';
     $eventTemplates = array();
     $templateId = $event['Event']['event_template_type_id'];
+    $eventTypes = $this->EventTemplateType->find('all', array('conditions'=>array('display_for_selection'=>1)));
     if (!empty($templateId))
     {
       $eventTemplateType = $this->EventTemplateType->find('id = '.$templateId);
@@ -430,6 +430,7 @@ class EventsController extends AppController
       }
 
     }
+ 	$this->set('eventTypes', $eventTypes);
     $this->set('assignedGroups', $data);
     $this->set('data', $data); 
     $this->set('event', $event);
@@ -536,7 +537,7 @@ $forsave =array();
 
 
  	    //Get all display event types
- 	    $eventTypes = $this->EventTemplateType->find('all',' display_for_selection = 1 ');
+ 	    $eventTypes = $this->EventTemplateType->find('all', array('conditions'=>array('display_for_selection'=>1)));
 		  $this->set('eventTypes', $eventTypes);
 
 		} else {
@@ -560,7 +561,7 @@ $forsave =array();
 
 				$unassignedGroups = $this->Group->find('all','course_id = '.$courseId);
 				$this->set('unassignedGroups', $unassignedGroups);
-				$eventTypes = $this->EventTemplateType->find('all',' display_for_selection = 1 ');
+				$eventTypes = $this->EventTemplateType->find('all', array('conditions'=>array('display_for_selection'=>1)));
 		    $this->set('eventTypes', $eventTypes);
 
         //Validate the error why the Event->save() method returned false
@@ -669,7 +670,7 @@ $forsave =array();
 
 
  	    //Get all display event types
- 	    $eventTypes = $this->EventTemplateType->find('all',' display_for_selection = 1 ');
+ 	    $eventTypes = $this->EventTemplateType->find('all', array('conditions'=>array('display_for_selection'=>1)));
 		  $this->set('eventTypes', $eventTypes);
 
 			$this->render();
@@ -696,7 +697,7 @@ $forsave =array();
 
 				$unassignedGroups = $this->Group->find('all','course_id = '.$courseId);
 				$this->set('unassignedGroups', $unassignedGroups);
-				$eventTypes = $this->EventTemplateType->find('all',' display_for_selection = 1 ');
+				$eventTypes = $this->EventTemplateType->find('all', array('conditions'=>array('display_for_selection'=>1)));
 		    $this->set('eventTypes', $eventTypes);
 
         //Validate the error why the Event->save() method returned false

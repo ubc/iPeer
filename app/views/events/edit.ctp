@@ -66,23 +66,31 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
 			<?php echo $this->Html->link('Add Mix Evaluation', '/mixevals/add/pop_up', array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"))?>
       </td></tr>
 
-      <tr>
-      <td align="left">
-      <?php echo $this->Form->input('EventTemplateType', array('disabled' => $readonly, 
-                                                                    'label' => false,
-                                                                    'before' => '',
-                                                                    'between' => '',
-                                                                    'after' => '',
-                                             'onChange' => "new Ajax.Updater('template_table','".$this->Html->url('/events/eventTemplatesList/')."+this.options[this.selectedIndex].value,
-																				                    {onLoading:function(request){Element.show('loading');},
-                  																					onComplete:function(request){Element.hide('loading');},
-									                  												asynchronous:true, evalScripts:true});  return false;"))?></td>
+     <tr>
+          <td height="50" width="50%" align="left" valign="top" >
+						<select name="data[Event][event_template_type_id]" id="eval_dropdown"
+							onChange="new Ajax.Updater('template_table','<?php echo $this->webroot.$this->theme?>events/eventTemplatesList/'+this.options[this.selectedIndex].value,
+																				 {onLoading:function(request){Element.show('loading');},
+																					onComplete:function(request){Element.hide('loading');},
+																					asynchronous:true, evalScripts:true});  return false;">
+						<?php
+//print_r($this->webroot.$this->theme);
+						foreach($eventTypes as $row): $eventTemplateType = $row['EventTemplateType']; ?>
+							<option value="<?php echo $eventTemplateType['id']?>"
+							  <?php
+							  if (!empty($params['data']['Event']['event_template_type_id']) && $params['data']['Event']['event_template_type_id'] == $eventTemplateType['id']) {
+							       echo 'SELECTED';
+							  }
+							  ?>
+							  ><?php echo $eventTemplateType['type_name']?></option>
+						<?php endforeach; ?>
+						</select>
 						<br>
 						<br>
 						<div id='template_table'>
 								<?php
-								$params = array('controller'=>'events', 'eventTemplates'=>$eventTemplates, 'default'=>$default, 'model'=>$model, 'templateID'=>$event['Event']['template_id']);
-								echo $this->element('events/ajax_event_template_list', $params);
+                  $params = array('controller'=>'events', 'eventTemplates'=>$eventTemplates, 'default'=>$default, 'view'=>0);
+                  echo $this->element('events/ajax_event_template_list', $params);
 								?>
 						</div>
         </td>

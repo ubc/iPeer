@@ -105,13 +105,13 @@
   	<td id="release_date_begin">
   	  <table width="100%"><tr align="left">
 				<td width="90%">
-      		<?php echo $form->input('Event.release_date_begin', array('div'=>false, 'label'=>'Release Date Begin :' ,'type'=>'text',  'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal2.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+      		<?php echo $form->input('Event.release_date_begin', array('div'=>false, 'label'=>'From :' ,'type'=>'text',  'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal2.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
           <?php echo $form->error('Event.release_date_begin', 'Please enter a valid date.')?>
       	</td>
       </tr>
       <tr>
       	<td width="90%">
-      		<?php echo $form->input('Event.release_date_end', array('div'=>false, 'label'=> 'Release Date End :', 'type'=>'text', 'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal3.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+      		<?php echo $form->input('Event.release_date_end', array('div'=>false, 'label'=> 'To :', 'type'=>'text', 'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal3.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
           <?php echo $form->error('Event.release_date_end', 'Please enter a valid date.')?>
       	</td>
   	  </tr></table>

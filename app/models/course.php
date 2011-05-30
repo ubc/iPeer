@@ -449,4 +449,3 @@ class Course extends AppModel
   	}
 }
 ?>
-
