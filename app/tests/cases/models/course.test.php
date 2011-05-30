@@ -12,6 +12,7 @@ class FakeController extends Controller {
 class CourseTestCase extends CakeTestCase {
 	
   function setUp() {
+		$this->Course =& ClassRegistry::init('Course');
     $admin = array('User' => array('username' => 'root',
                                    'password' => 'ipeer'));
     $this->controller =& new FakeController();
@@ -24,7 +25,6 @@ class CourseTestCase extends CakeTestCase {
 
     $this->controller->Auth->login($admin);
 
-		$this->Course =& ClassRegistry::init('Course');
   }
 
   function tearDown() {
