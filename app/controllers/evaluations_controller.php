@@ -1134,44 +1134,44 @@ function makeSurveyEvaluation ($param = null) {
 
   function viewGroupSubmissionDetails ($eventId, $groupId)
   {
-      // Make sure the present user is not a student
-      $this->rdAuth->noStudentsAllowed();
+    // Make sure the present user is not a student
+    //$this->rdAuth->noStudentsAllowed();
 
-      $this->layout = 'pop_up';
+    $this->layout = 'pop_up';
 
-      $this->set('title_for_layout', 'Submission Details');
+    $this->set('title_for_layout', 'Submission Details');
 
-      $this->Event->id = $eventId;
-      $event = $this->Event->read();
-      $this->Group->id = $groupId;
-      $group = $this->Group->read();
-      $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
-      $students = $this->Group->groupStudents($groupId);
+    $this->Event->id = $eventId;
+    $event = $this->Event->read();
+    $this->Group->id = $groupId;
+    $group = $this->Group->read();
+    $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
+    $students = $this->Group->getMembersByGroupId($groupId, 'all');
 
-      $pos = 0;
-      foreach ($students as $row) {
-          $user = $row['users'];
-          $evalSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'],
-          $user['id']);
+    $pos = 0;
+    foreach ($students as $row) {
+      $user = $row['Member'];
+      $evalSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'],
+      $user['id']);
 
-          if (isset($evalSubmission)) {
-              $students[$pos]['users']['submitted'] = $evalSubmission['EvaluationSubmission']['submitted'];
-              $students[$pos]['users']['date_submitted'] = $evalSubmission['EvaluationSubmission']['date_submitted'];
-              $students[$pos]['users']['due_date'] = $event['Event']['due_date'];
-              if ($evalSubmission['EvaluationSubmission']['submitted']) {
-                  $lateBy = $this->framework->getTimeDifference($evalSubmission['EvaluationSubmission']['date_submitted'],
-                  $event['Event']['due_date'], 'days');
-                  if ($lateBy > 0) {
-                      $students[$pos]['users']['time_diff'] = ceil($lateBy);
-                  }
-              }
+      if (isset($evalSubmission)) {
+        $students[$pos]['users']['submitted'] = $evalSubmission['EvaluationSubmission']['submitted'];
+        $students[$pos]['users']['date_submitted'] = $evalSubmission['EvaluationSubmission']['date_submitted'];
+        $students[$pos]['users']['due_date'] = $event['Event']['due_date'];
+        if ($evalSubmission['EvaluationSubmission']['submitted']) {
+          $lateBy = $this->framework->getTimeDifference($evalSubmission['EvaluationSubmission']['date_submitted'],
+          $event['Event']['due_date'], 'days');
+          if ($lateBy > 0) {
+            $students[$pos]['users']['time_diff'] = ceil($lateBy);
           }
-          $pos++;
+        }
       }
-      $this->set('members', $students);
-      $this->set('group', $group);
-      $this->set('eventId', $eventId);
-      $this->set('groupEventId', $groupEvent['GroupEvent']['id']);
+      $pos++;
+    }
+    $this->set('members', $students);
+    $this->set('group', $group);
+    $this->set('eventId', $eventId);
+    $this->set('groupEventId', $groupEvent['GroupEvent']['id']);
   }
 
 function reReleaseEvaluation ()

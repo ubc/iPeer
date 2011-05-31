@@ -170,13 +170,13 @@ class User extends AppModel
     return $allowSave && parent::beforeSave();
   }
 
- function find($conditions = null, $fields = array(), $order = null, $recursive = null) {
+ function find($conditions = array(), $fields = array(), $order = null, $recursive = null) {
     if(!isset($fields)) {
     } elseif ($fields === false) {
       $fields = array('Creator', 'Updater');
     } else {
 
-    	$fields = array_merge((array)$fields, array('Creator', 'Updater'));
+      $fields = array_merge((array)$fields, array('Creator', 'Updater'));
     }
     
     return parent::find($conditions, $fields, $order, $recursive);

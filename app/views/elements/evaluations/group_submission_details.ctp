@@ -28,23 +28,23 @@
   	    <th width="15%">RE-release Evaluation?</th>
 	    </tr>
       <?php $i = '0';  $enable = false;?>
-	    <?php foreach($data as $row): $member = $row['users']; ?>
+	    <?php foreach($data as $row): $member = $row['Member']; ?>
     	  <tr class="tablecell">
             <td><?php echo $member['first_name'].' '.$member['last_name'] ?></td>
             <td align="center"><?php
-              if ($member['submitted']) {
-                echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($member['date_submitted'])));
+              if ($row['users']['submitted']) {
+                echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($row['users']['date_submitted'])));
               }else {
                 echo "(not submitted)";
               } ?></td>
             <td align="center"><?php
-              if (isset($member['time_diff'])) {
-                echo $member['time_diff']. ' day(s)';
+              if (isset($row['users']['time_diff'])) {
+                echo $row['users']['time_diff']. ' day(s)';
               }else {
-                echo $member['submitted'] ?  "(on time)" : "---";
+                echo $row['users']['submitted'] ?  "(on time)" : "---";
               } ?></td>
             <td align="center"><?php
-              if ($member['submitted']) {
+              if ($row['users']['submitted']) {
         				echo "<input type=\"checkbox\" name=\"release_member[]\" value=\"" . $member['id'] . "\" />";
         				$enable = true;
         			}
@@ -58,9 +58,9 @@
         <tr class="tablecell">
           <td colspan="4" align="center"><?php
             if ($enable) {
-             echo $html->submit('Re-release Selected Evaluation');
+             echo $form->submit('Re-release Selected Evaluation');
             } else {
-             echo $html->submit('Re-release Selected Evaluation', array('disabled'=>1));
+             echo $form->submit('Re-release Selected Evaluation', array('disabled'=>1));
             } ?></td>
         </tr>
     </table>
