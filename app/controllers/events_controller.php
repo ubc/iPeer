@@ -311,30 +311,31 @@ class EventsController extends AppController
 
   function add()
   {
-  	//Set up user info
-  	$currentUser = $this->User->getCurrentLoggedInUser();
-  	$this->set('currentUser', $currentUser);
+    //Set up user info
+    $currentUser = $this->User->getCurrentLoggedInUser();
+    $this->set('currentUser', $currentUser);
   	
     $courseId = $this->Session->read('ipeerSession.courseId');
-		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
-	  //List Add Page
-		if (empty($this->params['data'])) {
+    $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
+    //List Add Page
+    if (empty($this->params['data'])) {
 
+      $unassignedGroups = $this->Group->find('list', array('conditions'=> array('course_id'=>$courseId), 'fields'=>array('group_name')));
+      $this->set('unassignedGroups', $unassignedGroups);
 
-			$unassignedGroups = $this->Group->find('list', array('conditions'=> array('course_id'=>$courseId), 'fields'=>array('group_name')));
-			$this->set('unassignedGroups', $unassignedGroups);
-
- 	    //Get all display event types
- 	    $eventTypes = $this->EventTemplateType->find('all', array('conditions'=> array('display_for_selection'=>1)));
-		  $this->set('eventTypes', $eventTypes);
-		  //Set default template
+      //Get all display event types
+      $this->set('eventTypes', $this->EventTemplateType->find('list', array(
+          'conditions'=> array('display_for_selection'=>1),
+          'fields' => array('type_name')
+      )));
+      //Set default template
       $default = '-- Select a Evaluation Tool -- ';
       $model = 'SimpleEvaluation';
       $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'));
       $this->set('eventTemplates', $eventTemplates);
       $this->set('default',$default);
       $this->set('model', $model);
-  	}
+    }
 		else {
 			//Format Data
 			$this->params['data']['Event']['course_id'] = $courseId;
@@ -348,12 +349,11 @@ class EventsController extends AppController
       }
 
       //Save Data
-			if ($this->Event->save($this->params['data'])) {
-
+      if ($this->Event->save($this->params['data'])) {
         //Save Groups for the Event
-			  $this->GroupEvent->insertGroups($this->Event->id, $this->params['data']['Member']);
-			  $this->redirect('/events/index/The event is added successfully.');
-			}
+        $this->GroupEvent->insertGroups($this->Event->id, $this->params['data']['Member']);
+        $this->redirect('/events/index/The event is added successfully.');
+      }
       //Found error
       else {
         $this->set('data', $this->params['data']);
@@ -361,12 +361,20 @@ class EventsController extends AppController
         $this->set('unassignedGroups', $this->Group->find('list', array(
             'conditions'=> array('course_id'=>$courseId),
             'fields'=>array('group_name'))));
-        $this->set('eventTypes', $this->EventTemplateType->find('all', array(
-            'conditions'=> array('display_for_selection'=>1))));
+        $this->set('eventTypes', $this->EventTemplateType->find('list', array(
+          'conditions'=> array('display_for_selection'=>1),
+          'fields' => array('type_name')
+        )));
         //Set default template
         $default = 'Default Simple Evaluation';
-        $model = 'SimpleEvaluation';
-        $eventTemplates = $this->SimpleEvaluation->find('all');
+        //Check the event template type
+        if($this->params['data']['Event']['event_template_type_id'] == 2)
+          $model = 'Rubric';
+        else if($this->params['data']['Event']['event_template_type_id'] == 4)
+          $model = 'Mixeval';
+        else
+          $model = 'SimpleEvaluation';
+        $eventTemplates = $this->$model->getBelongingOrPublic($this->Auth->user('id'));
         $this->set('eventTemplates', $eventTemplates);
         $this->set('default',$default);
         $this->set('model', $model);

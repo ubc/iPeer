@@ -61,7 +61,7 @@ class EvaluationBase extends AppModel {
     if($this->name != 'SimpleEvaluation') {
       $conditions = array('OR' => array_merge(array('availability' => 'public'), $conditions));
     }
-    return $this->find('all', array('conditions' => $conditions));
+    return $this->find('list', array('conditions' => $conditions, 'fields' => array('name')));
   }
 
   function getEventCount($evaluation_id) {

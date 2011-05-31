@@ -12,13 +12,24 @@
 			endforeach;
     }
     else {?>
-  		<select name="data[Event][template_id]" id="template_id" style="width:200px;" >
+<!--  		<select name="data[Event][template_id]" id="template_id" style="width:200px;" >
   			<?php foreach($eventTemplates as $row): $template = $row[$model];?>
   		    <option value="<?php echo trim($template['id']) ?>" <?php echo (isset($templateID) && $template['id'] == $templateID)?' selected':''?>>
             <?php echo $template['name'] ?>
           </option>
   			<?php endforeach; ?>
-  		</select>
+  		</select>-->
+                <?php 
+                  echo $this->Form->input('Event.event_template_id', array(
+                  'type' => 'select',
+                  'id' => 'template_id',
+                  'style' => 'width:200px;',
+                  'label' => false,
+                  'options' => $eventTemplates,
+                  'escape'=>false
+
+              ));
+                ?>
 
       <?php if ($model == 'SimpleEvaluation'):?>
         <a title="Simple Evaluation Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'simpleevaluations', '<?php echo $url?>'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview This Simple Evaluation</a>
@@ -42,7 +53,7 @@
 
     echo "No $evalTypeString Evaluations available. You need to create a $evalTypeString Evaluation first! <br />";
     echo "<ul><li>Just Click on <i>Add $evalTypeString Evaluation</i> above.</li></ul><br />";
-
+    echo $form->hidden('ModelType', array('value' => $model));
 }
 
 ?>
