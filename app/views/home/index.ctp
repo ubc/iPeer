@@ -36,7 +36,7 @@
               <?php foreach($row['Event'] as $event):?>
               <tr><td>
  			          <?php echo $this->Html->link($event['title'],
-                                             ($event['event_template_type_id'] == 3) ? 'surveygroups/viewresult/'.$event['id'] : 'evaluations/view/'.$event['id']);?>
+                                             ($event['event_template_type_id'] == 3) ? '/surveygroups/viewresult/'.$event['id'] : '/evaluations/view/'.$event['id']);?>
                 <br />
         		  	<?php if ($event['to_review_count']>0): ?>
                   <font color='darkred' style='padding-left:2em'>

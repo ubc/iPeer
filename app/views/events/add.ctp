@@ -14,9 +14,19 @@
   </tr>
   <tr class="tablecell2">
   	<td id="newtitle_label">Event Title:&nbsp;<font color="red">*</font></td>
-  	<td>
-  	  <input type="text" name="newtitle" id="newtitle" style="width:85%;" class="validate required TEXT_FORMAT newtitle_msg Invalid_Event_Title_Format." value="<?php echo empty($params['data']['Event']['title'])? '' : $params['data']['Event']['title'] ?>" size="50">
-      <?php echo $ajax->observeField('newtitle', array('update'=>'eventErr', 'url'=>"/events/checkDuplicateTitle", 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');stripe();")) ?>
+  	<td>  	  
+      <?php
+        echo $form->input('Event.title',array(
+            'type' => 'text',
+            'name' => "newtitle",
+            'id' => 'newtitle',
+            'style' => 'width:85%',
+            'class' => "validate required TEXT_FORMAT newtitle_msg Invalid_Event_Title_Format.",
+            'size' => '50',
+            'label' => false
+        ));
+        echo $ajax->observeField('newtitle', array('update'=>'eventErr', 'url'=>"/events/checkDuplicateTitle", 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');stripe();"));
+      ?>
       <div id='eventErr' class="error">
           <?php
           $fieldValue = isset($this->params['form']['newtitle'])? $this->params['form']['newtitle'] : '';

@@ -37,7 +37,7 @@ class EventsController extends AppController
 	var $NeatString;
 	var $Sanitize;
 	var $uses = array('GroupEvent', 'User', 'Group', 'Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers');
-  var $components = array("AjaxList", "SysContainer");
+  var $components = array("AjaxList", "SysContainer", "Session");
 
   function __construct()
   {
@@ -358,11 +358,12 @@ class EventsController extends AppController
       else {
         $this->set('data', $this->params['data']);
         $this->set('courseId', $courseId);
-				$unassignedGroups = $this->Group->find('all','course_id = '.$courseId);
-				$this->set('unassignedGroups', $unassignedGroups);
-				$eventTypes = $this->EventTemplateType->find('all', array('conditions'=> array('display_for_selection'=>1)));
-		    $this->set('eventTypes', $eventTypes);
-  		  //Set default template
+        $this->set('unassignedGroups', $this->Group->find('list', array(
+            'conditions'=> array('course_id'=>$courseId),
+            'fields'=>array('group_name'))));
+        $this->set('eventTypes', $this->EventTemplateType->find('all', array(
+            'conditions'=> array('display_for_selection'=>1))));
+        //Set default template
         $default = 'Default Simple Evaluation';
         $model = 'SimpleEvaluation';
         $eventTemplates = $this->SimpleEvaluation->find('all');

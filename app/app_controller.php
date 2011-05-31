@@ -187,7 +187,7 @@ class AppController extends Controller  {
   function _sendEmail($templateName,$emailSubject,$from,$to,$cc,$bcc) {
 		$this->Email->reset();
 
-                $this->Email->delivery = 'debug';
+                //$this->Email->delivery = 'debug';
 		$this->Email->to = $to;
 		$this->Email->cc = $cc;
 		$this->Email->bcc = $bcc;
