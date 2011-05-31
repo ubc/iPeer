@@ -6,7 +6,7 @@
 <td>
 <h4>View SysFunction</h4>
 <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['SysFunction']['id'])?'add':'edit') ?>">
-<?php echo empty($params['data']['SysFunction']['id']) ? null : $html->hidden('SysFunction/id'); ?>
+<?php echo empty($data['SysFunction']['id']) ? null : $form->hidden('SysFunction.id'); ?>
 <p>
 <table width="40%" cellspacing="0" cellpadding="4">
 <tr>

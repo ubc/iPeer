@@ -51,6 +51,32 @@ class SysFunction extends AppModel
           'conditions' => array('permission_type LIKE' => '%'.$role.'%')
       ));
   }
+  
+  function beforeSave()
+  {
+  	    $this->data[$this->name]['modified'] = date('Y-m-d H:i:s');
+  	    
+      // Ensure the name is not empty
+    if (empty($this->data['SysFunction']['id']) || 
+    	empty($this->data['SysFunction']['function_code']) || 
+    	empty($this->data['SysFunction']['function_name']) || 
+    	empty($this->data['SysFunction']['parent_id']) || 
+    	empty($this->data['SysFunction']['controller_name']) || 
+    	empty($this->data['SysFunction']['url_link']) || 
+    	empty($this->data['SysFunction']['permission_type'])) {
+    		      
+    		$this->errorMessage = "All fields are required";
+      		return false;
+    }
+     
+               if (!is_numeric($this->data['SysFunction']['id'])) {
+    	
+    	   $this->errorMessage = "Id must be a number";
+      return false;}
+    
+        return parent::beforeSave();
+  }
+  
 }
 
 ?>

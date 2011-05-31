@@ -39,8 +39,35 @@ class SysParameter extends AppModel
 
   function beforeSave()
   {
-    $this->data[$this->name]['modified'] = date('Y-m-d H:i:s');
-    return true;
+  	    $this->data[$this->name]['modified'] = date('Y-m-d H:i:s');
+      // Ensure the name is not empty
+    if (empty($this->data['SysParameter']['id'])) {
+    	
+    	
+    	   $this->errorMessage = "Id is required";
+      return false;
+    } 
+    
+         if (!is_numeric($this->data['SysParameter']['id'])) {
+    	
+    	   $this->errorMessage = "Id must be a number";
+      return false;
+    }
+    
+    
+        if (empty($this->data['SysParameter']['parameter_code'])) {
+    	
+    	   $this->errorMessage = "Parameter code is required";
+      return false;
+    } 
+     if (empty($this->data['SysParameter']['parameter_type'])) {
+      $this->errorMessage = "Parameter type is required";
+      return false;
+    }
+  
+    
+
+      return true;
   }
 }
 

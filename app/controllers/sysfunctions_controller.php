@@ -102,29 +102,33 @@ class SysFunctionsController extends AppController
 
 
 	function view($id)
-	{
+	{	$this->SysFunction->id = $id;
         $data = $this->SysFunction->read();
 		$this->set('data', $data);
 	}
 
 	function edit($id=null)
 	{
-		if (empty($this->params['data']))
+		
+		if (empty($this->data))
 		{
 			$this->SysFunction->id = $id;
-			$this->params['data'] = $this->SysFunction->read();
+			$this->data = $this->SysFunction->read();
+			$this->set('data', $this->data);
 			$this->render();
 		}
 		else
 		{
-			if ( $this->SysFunction->save($this->params['data']))
+			if ( $this->SysFunction->save($this->data))
 			{
-				$message = 'The record is edited successfully';
-				$this->redirect('sysfunctions/index/'.$message);
-			}
+				
+				$this->Session->setFlash(__('The record is edited successfully.', true));
+				$this->redirect('index');
+				}
 			else
 			{
-				$this->set('data', $this->params['data']);
+				$this->Session->setFlash($this->SysFunction->errorMessage, true);
+				$this->set('data', $this->data);
 				$this->render();
 			}
 		}
@@ -132,13 +136,9 @@ class SysFunctionsController extends AppController
 
   function delete($id = null)
   {
-    if (isset($this->params['form']['id']))
-    {
-      $id = intval(substr($this->params['form']['id'], 5));
-    }   //end if
-    if ($this->SysFunction->del($id)) {
-				$message = 'The record is deleted successfully';
-				$this->redirect('sysfunctions/index/'.$message);
+    if ($this->SysFunction->delete($id)) {
+				$this->Session->setFlash(__('The record is deleted successfully.', true));
+				$this->redirect('index');
     }
   }
 

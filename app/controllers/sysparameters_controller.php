@@ -101,19 +101,20 @@ class SysParametersController extends AppController
 
 	function view($id)
 	{
-		$this->set('data', $this->SysParameter->read());
+			$this->SysParameter->id = $id;
+			$this->set('data', $this->SysParameter->read());
 	}
 
 	function add()
 	{
-		if (empty($this->params['data'])) {
+		if (empty($this->data)) {
 			$this->render();
 		} else {
 			if ($this->SysParameter->save($this->params['data'])) {
 				$message = 'The record is saved successfully';
 				$this->redirect('sysparameters/index/'.$message);
 			} else {
-				$this->set('data', $this->params['data']);
+				$this->set('data', $this->data);
 				$this->render('edit');
 			}
 		}
@@ -121,16 +122,18 @@ class SysParametersController extends AppController
 
 	function edit($id=null)
 	{
-		if (empty($this->params['data'])) {
+		if (empty($this->data)) {
 			$this->SysParameter->id = $id;
-			$this->params['data'] = $this->SysParameter->read();
+			$this->data = $this->SysParameter->read();
+			$this->set('data', $this->data);
 			$this->render();
 		} else {
-			if ( $this->SysParameter->save($this->params['data'])) {
-				$message = 'The record is edited successfully';
-				$this->redirect('sysparameters/index/'.$message);
+			if ( $this->SysParameter->save($this->data)) {
+				$this->Session->setFlash(__('The record is edited successfully.', true));
+				$this->redirect('index');
 			} else {
-				$this->set('data', $this->params['data']);
+					$this->Session->setFlash($this->SysParameter->errorMessage, true);
+				$this->set('data', $this->data);
 				$this->render();
 			}
 		}
@@ -138,13 +141,9 @@ class SysParametersController extends AppController
 
   function delete($id = null)
   {
-    if (isset($this->params['form']['id']))
-    {
-      $id = intval(substr($this->params['form']['id'], 5));
-    }   //end if
-    if ($this->SysParameter->del($id)) {
-				$message = 'The record is deleted successfully';
-				$this->redirect('sysparameters/index/'.$message);
+   if ($this->SysParameter->delete($id)) {
+				$this->Session->setFlash(__('The record is deleted successfully.', true));
+				$this->redirect('index');
     }
   }
 
