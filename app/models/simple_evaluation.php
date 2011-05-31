@@ -31,6 +31,8 @@ class SimpleEvaluation extends EvaluationBase
 {
   const TEMPLATE_TYPE_ID = 1;
   var $name = 'SimpleEvaluation';
+  // use default table
+  var $useTable = null;
   /*var $validate = array(
       'name' => array('rule' => 'notEmpty',
                       'required' => true,

@@ -10,12 +10,22 @@ class FakeController extends Controller {
 }
 
 class CourseTestCase extends CakeTestCase {
-	
-  function setUp() {
-		$this->Course =& ClassRegistry::init('Course');
+  var $name = 'Course';
+  var $fixtures = array('app.course', 'app.role', 'app.user', 'app.group', 
+                        'app.roles_user', 'app.event', 'app.event_template_type',
+                        'app.group_event', 'app.evaluation_submission',
+                        'app.survey_group_set', 'app.survey_group',
+                        'app.survey_group_member', 'app.question', 
+                        'app.response', 'app.survey_question', 'app.user_course',
+                        'app.user_enrol', 'app.groups_member',
+                       );
+  var $Course = null;
+
+  function startCase() {
+		$this->Course = ClassRegistry::init('Course');
     $admin = array('User' => array('username' => 'root',
                                    'password' => 'ipeer'));
-    $this->controller =& new FakeController();
+    $this->controller = new FakeController();
     $this->controller->constructClasses();
     $this->controller->startupProcess();
     $this->controller->Component->startup($this->controller);
@@ -27,91 +37,66 @@ class CourseTestCase extends CakeTestCase {
 
   }
 
-  function tearDown() {
+  function endCase() {
     $this->controller->Component->shutdown($this->controller);
     $this->controller->shutdownProcess();
   }
+
+  function startTest($method) {
+    // extra setup stuff here
+  }
 	
-	function TestGetCourseByInstructor(){
-	
-		$empty=null;
+  function endTest($method) {
 		$this->flushDatabase();
-		
+  }
+
+  function testCourseInstance() {
+    $this->assertTrue(is_a($this->Course, 'Course'));
+  }
+	
+	function testGetCourseByInstructor(){
+    $empty = null;
+
 		/*
-		 * Test instructor teaching only ONE coures
 		 * user_id==1 : "GSlade"
 		 * course_id==1 : "Math303"
 		 */
-		##Set up test data
-		$this->Course->createUserHelper('1', 'GSlade', 'I');
-		$this->Course->createCoursesHelper(1, 'Math303', 'Stochastic Process');
-		$this->Course->enrollUserHelper(1,1,1,'I');
-		##Run tests
 		$course = $this->Course->getCourseByInstructor(1);
-		$expectedCourse='Math303';
-		$this->assertEqual($course[0]['Course']['course'], $expectedCourse); 
-		##delete data
-		$this->flushDatabase();
-		
-		
-		/*
-		 * Test ONE instructor teaching MULTIPLE COURSES
-		 * user_id==1 : "GSlade"
-		 * course_id==1 : "Math320" && course_id==2: "Math220"
-		 */
-		##Set up test data
-		$this->Course->createUserHelper(1, 'GSlade', 'I');
-		$this->Course->createCoursesHelper(1, 'Math320', 'Analysis I');
-		$this->Course->createCoursesHelper(2, 'Math321', 'Analysis II');
-		$this->Course->enrollUserHelper(1,1,1,'I');
-		$this->Course->enrollUserHelper(2,1,2,'I');
-		##Run tests
-		$multipleTaught = $this->Course->getCourseByInstructor(1);
-		$courseArray=array();
-		foreach($multipleTaught as $courses){
-			array_push($courseArray,$courses['Course']['course']);
-		}	
-		$expectedCourseArray=array('Math320','Math321');
-		$this->assertEqual($expectedCourseArray, $courseArray);
-		##delte data
-		$this->flushDatabase();
-		
+		$expected = array(
+      array('Course' => array('id' => 1, 'course' => 'Math303', 'title' => 'Stochastic Process')),
+      array('Course' => array('id' => 2, 'course' => 'Math321', 'title' => 'Analysis II')),
+    );
+
+		$this->assertEqual($course[0]['Course']['course'], $expected[0]['Course']['course']); 
+		$this->assertEqual($course[0]['Course']['title'], $expected[0]['Course']['title']); 
+		$this->assertEqual($course[1]['Course']['course'], $expected[1]['Course']['course']); 
+		$this->assertEqual($course[1]['Course']['title'], $expected[1]['Course']['title']); 
 		
 		/*
 		 * Test valid instructor with unassigned course
 		 * user_id == 2 : "Peterson"
 		 */
-		##set up test data
-		$this->Course->createUserHelper(2, 'Peterson', 'I');
-		##Run tests
-		$unassignedInstructor=$this->Course->getCourseByInstructor(30);
+		$unassignedInstructor = $this->Course->getCourseByInstructor(2);
 		$this->assertEqual($unassignedInstructor, $empty);
-		##delete data
-		$this->flushDatabase();
-		
 		
 		/*
 		 * Testing invald instructor user_id
 		 * user_id == 312321 (invalid)
 		 */
-		##Run Tests
-		$instructor=$this->Course->getCourseByInstructor(312321);
+		$instructor = $this->Course->getCourseByInstructor(312321);
 		$this->assertEqual($instructor, $empty);
 		
 		
 		/*
 		 * Testing null inputs
 		 */
-		$instructor=$this->Course->getCourseByInstructor(null);
+		$instructor = $this->Course->getCourseByInstructor(null);
 		$this->assertEqual($instructor, $empty);
-		
-		##Flush database
-		$this->flushDatabase();
 	}
 	
 	
 	
-	function TestGetEnrolledStudentCount(){
+	function testGetEnrolledStudentCount(){
 		
 		$empty=null;
 		
@@ -160,7 +145,7 @@ class CourseTestCase extends CakeTestCase {
 	}	
 	
 	
-	function TestGetCourseName(){
+	function testGetCourseName(){
 	
 		$empty=null;
 		$this->flushDatabase();
@@ -183,7 +168,7 @@ class CourseTestCase extends CakeTestCase {
 	}
 	
 	
-	function TestAddInstructor(){
+	function testAddInstructor(){
 		
 		$empty=null;
 				
@@ -266,7 +251,7 @@ class CourseTestCase extends CakeTestCase {
 		$courseTaughtByStudent3 = $this->Course->getCourseByInstructor(3);
 	}
 
-		function TestDeleteInstructor(){
+		function testDeleteInstructor(){
 		
 		$empty=null;
 		$this->flushDatabase();
@@ -353,7 +338,7 @@ class CourseTestCase extends CakeTestCase {
 	}	
 	
 	
-	function TestGetInactiveCourses(){
+	function testGetInactiveCourses(){
 		
 		$empty=null;
 		
@@ -371,7 +356,7 @@ class CourseTestCase extends CakeTestCase {
 	}
 
 	
-	function TestFindAccessibleCoursesListByUserIdRole(){
+	function testFindAccessibleCoursesListByUserIdRole(){
 		
 		
 		$empty = null;
@@ -458,7 +443,7 @@ class CourseTestCase extends CakeTestCase {
 		$this->flushDatabase();
 	}
 		
-	function TestFindAccessibleCoursesCount(){
+	function testFindAccessibleCoursesCount(){
 		
 		$empty= null;
 		
@@ -525,7 +510,7 @@ class CourseTestCase extends CakeTestCase {
 	
 	
 	
-	function TestFindRegisteredCoursesList(){
+	function testFindRegisteredCoursesList(){
 		
 		$empty=null;
 		
@@ -607,7 +592,7 @@ class CourseTestCase extends CakeTestCase {
 	}
 		
 		
-	function TestFindNonRegisteredCoursesList(){
+	function testFindNonRegisteredCoursesList(){
 
 		$empty = null;
 		$this->flushDatabase();
@@ -690,7 +675,7 @@ class CourseTestCase extends CakeTestCase {
 	}
 	
 		
-	function TestFindNonRegisteredCoursesCount(){
+	function testFindNonRegisteredCoursesCount(){
 		
 		$empty = null;
 		
@@ -770,7 +755,7 @@ class CourseTestCase extends CakeTestCase {
 		$this->assertEqual($nullInputs, $empty);		
 	}
 		
-	function TestDeleteAll(){
+	function testDeleteAll(){
 		
 		$empty = null;
 		
@@ -798,7 +783,7 @@ class CourseTestCase extends CakeTestCase {
 		
 	}
 	
-	function TestGetAllInstructors(){
+	function testGetAllInstructors(){
 		
 		$empty = null;
 		

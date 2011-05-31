@@ -21,7 +21,7 @@
 class InstallController extends Controller
 {
 	var $Sanitize;
-  var $uses         = array(); 
+  var $uses         = null; 
 	var $components   = array('Output', 
                             'framework',
                             'Session',

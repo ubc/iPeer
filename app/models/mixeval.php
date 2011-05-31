@@ -32,6 +32,8 @@ class Mixeval extends EvaluationBase
 {
   const TEMPLATE_TYPE_ID = 4;
   var $name = 'Mixeval';
+  // use default table
+  var $useTable = null;
 
   var $hasMany = array(
                   'Event' =>
