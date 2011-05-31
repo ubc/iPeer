@@ -30,6 +30,7 @@ App::import('Model', 'EvaluationBase');
 class Survey extends EvaluationBase
 {
   var $name = 'Survey';
+  var $useTable = null;
   const TEMPLATE_TYPE_ID = 3;
 
   var $belongsTo = array('Course' =>
@@ -184,3 +185,4 @@ class Survey extends EvaluationBase
 }
 
 ?>
+
