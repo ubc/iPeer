@@ -395,9 +395,6 @@ class EventsController extends AppController
     $data = $this->Event->find('first', array('conditions' => array('id' => $id),
                                                'contain' => array('Group')));
 
-    
-    
-    
       $courseId = $this->Session->read('ipeerSession.courseId');
 
 	  //Clear $id to only the alphanumeric value
@@ -439,8 +436,17 @@ class EventsController extends AppController
       }
 
     }
+  	// Sets up the already assigned groups
+    $assignedGroupIds = $this->GroupEvent->getGroupListByEventId($id);
+    $assignedGroups=array();
+    foreach($assignedGroupIds as $groups) {
+    	$groupId = $groups['GroupEvent']['group_id'];
+    	$groupName = $this->Group->getGroupByGroupId($groupId, array('group_name'));
+    	$assignedGroups[$groupId] = $groupName[0]['Group']['group_name'];
+    }
+    
  	$this->set('eventTypes', $eventTypes);
-    $this->set('assignedGroups', $data);
+    $this->set('assignedGroups', $assignedGroups);
     $this->set('data', $data); 
     $this->set('event', $event);
     $this->set('course_id', $courseId);
@@ -455,6 +461,9 @@ $forsave =array();
 		if (!empty($this->data)) {
 	$this->data['Event']['id'] = $id;
 			if($result = $this->Event->save($this->data)) {
+				 //Save Groups for the Event
+		//$this->GroupEvent->insertGroups($this->Event->id, $this->data['Member']);
+		$this->GroupEvent->updateGroups($this->Event->id, $this->data['Member']);
         $this->Session->setFlash('The event was edited successfully.');
         $this->redirect('index');
 			} else {
@@ -464,7 +473,7 @@ $forsave =array();
 		} else {
       $this->data = $data;
         }
-
+        
     $this->set('eventTemplateTypes', $this->EventTemplateType->find('list', array('conditions' => array('NOT' => array('id' => 3)))));
     $this->set('unassignedGroups', $this->Event->getUnassignedGroups($data));
     $this->set('courses', $this->Course->find('list', array('recursive' => -1)));
@@ -855,6 +864,5 @@ $forsave =array();
 		if ($attributeCode != '' && $attributeValue != '') //check for empty params
   		$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
   }
-  
 }
 ?>

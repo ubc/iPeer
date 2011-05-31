@@ -95,7 +95,6 @@
 			 <br><br>
 
       <?php
-
       $params = array(  'controller'            => 'mixevals',
                         'data'                  => $view_data,
                         'scale_default'         => $data['Mixeval']['scale_max'],

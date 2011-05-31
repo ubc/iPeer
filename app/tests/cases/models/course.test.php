@@ -34,7 +34,6 @@ class CourseTestCase extends CakeTestCase {
     ClassRegistry::addObject('auth_component', $this->controller->Auth);
 
     $this->controller->Auth->login($admin);
-
   }
 
   function endCase() {
@@ -42,6 +41,7 @@ class CourseTestCase extends CakeTestCase {
     $this->controller->shutdownProcess();
   }
 
+  //Run before EVERY test.
   function startTest($method) {
     // extra setup stuff here
   }
@@ -53,7 +53,7 @@ class CourseTestCase extends CakeTestCase {
   function testCourseInstance() {
     $this->assertTrue(is_a($this->Course, 'Course'));
   }
-	
+	//modified
 	function testGetCourseByInstructor(){
     $empty = null;
 

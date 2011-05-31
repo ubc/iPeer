@@ -32,9 +32,9 @@ class MixevalsQuestionDesc extends AppModel
   var $belongsTo = array(
 'MixevalsQuestion' => array(
 		'className' => 'MixevalsQuestion',
-		'foreignKey' => 'id'
+		'foreignKey' => 'question_id'
 	)
-); 
+);
   
   // called by mixevals controller during add/edit of mixeval
   // inserts/updates with question comments for each mixeval
@@ -50,7 +50,7 @@ class MixevalsQuestionDesc extends AppModel
         
         foreach ($descriptors as $index => $value) {
           	$desc = $value;
-          	$desc['mixeval_id'] = $id;     
+          	//$desc['mixeval_id'] = $id;     
           	$desc['question_id'] = $q_id;
           	$this->save($desc);
     	  	$this->id = null;

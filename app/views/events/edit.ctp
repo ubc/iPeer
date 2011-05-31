@@ -175,9 +175,8 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
     <td>
     
         <?php
- 	 
         echo $this->element("groups/group_list_chooser",
-            array('all' => $unassignedGroups, 
+            array('all' => $unassignedGroups,   'assigned'  =>$assignedGroups,
             'allName' =>  'Avaliable Groups', 'selectedName' => 'Participating Groups'
           ));
         ?>

@@ -23,7 +23,8 @@
     <td align="center">
       <h3><?php echo isset($selectedName) ? $selectedName : ''?></h3>
       <?php echo $this->Form->input('Member.Member',
-              array('style' => $listStyle,
+              array( 'options'=> $assigned,
+              		 'style' => $listStyle,
                      'div' => false,
                      'label' => false,
                      'before' => '',

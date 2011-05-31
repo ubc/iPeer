@@ -49,14 +49,13 @@ class GroupEvent extends AppModel
 	$newGroups = array();
 	$insertGroups = array();
 	$deleteGroups = array();
-
-	for ($i = 1; $i <= $data['group_count']; $i++) array_push($newGroups, $data['group'.$i]);
+//	for ($i = 1; $i <= $data['group_count']; $i++) array_push($newGroups, $data['group'.$i]);
+	for ($i = 0; $i < count($data['Member']); $i++)if(!empty($data['Member']))array_push($newGroups, $data['Member'][$i]);
 	for ($i = 0; $i < count($tmp); $i++) array_push($oldGroups, $tmp[$i]['GroupEvent']['group_id']);
 
 //compare
 	$insertGroups = array_diff($newGroups, $oldGroups);
 	$deleteGroups = array_diff($oldGroups, $newGroups);
-
 //insert/delete
 	foreach ($insertGroups as $groupId) {
 		$tmp = array('event_id'=>$id, 'group_id'=>$groupId, 'marked'=>'not reviewed');
@@ -69,19 +68,27 @@ class GroupEvent extends AppModel
                     'conditions' => array('event_id'=>$id,'group_id'=>$groupId),
                     'fields' => array('GroupEvent.id')
                 ));
-		$this->del($tmp['GroupEvent']['id']);
+		$this->delete($tmp['GroupEvent']['id']);
 		$this->id = null;
 	}
   }
 
-  // returns list of group id within the selected Event
+// returns list of group id within the selected Event
   function getGroupIDsByEventId($eventId=null){
-  	  if (empty($eventId) || is_null($eventId)) {
+    if(empty($eventId) || is_null($eventId)) {
   	  	return;
   	  }
-	  $tmp = $this->find('all', array('conditions' => array('group_id !=' => 0, 'event_id' => $eventId), 'field' => array('id', 'group_id', 'event_id', 'marked', 'grade')));
-	  return $tmp;
+  	return $this->find('all', array('conditions'=>array('event_id'=>$eventId), 'fields'=>array('group_id')));
   }
+  
+//  // returns list of group id within the selected Event
+//  function getGroupIDsByEventId($eventId=null){
+//  	  if (empty($eventId) || is_null($eventId)) {
+//  	  	return;
+//  	  }
+//	  $tmp = $this->find('all', array('conditions' => array('group_id !=' => 0, 'event_id' => $eventId), 'field' => array('id', 'group_id', 'event_id', 'marked', 'grade')));
+//	  return $tmp;
+//  }
 
   // returns list of group id within the selected Event
   function getGroupListByEventId($eventId=null){
@@ -89,7 +96,7 @@ class GroupEvent extends AppModel
   	  	return;
   	  }
 	  $tmp = $this->find('all',array(
-              'conditions' => array('event_id' => $eventId)
+              'conditions' => array('event_id' => $eventId), 'fields'=>array('group_id')
           ));
 	  return $tmp;
   }
@@ -293,5 +300,4 @@ class GroupEvent extends AppModel
   	return $returning[0]['group_events']['id'];
   }
 }
-
 ?>

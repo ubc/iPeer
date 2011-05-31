@@ -554,6 +554,4 @@ class HomeController extends AppController
     return $result;
   }
 }
-
 ?>
-

@@ -352,7 +352,7 @@ class Event extends AppModel
       return $group->find('list', array('conditions' => array('course_id' => $event['Event']['course_id'],  
                                                              'NOT' => array('Group.id' => $assigned_group_ids)),
       									'fields'=> array('Group.group_name')));
-    }   
+    }
 
     function getEventById($id){
     	$sql = "SELECT *

@@ -4,11 +4,11 @@
       <td valign="top" width="75%" align='left'>Section One: &nbsp;Lickert Scales</td>
     <?php
     $descriptor_des = array('1'=>'Lowest','2'=>'','3'=>'Middle','4'=>'','5'=>'Highest');
-    
     isset($data['questions'])? $questions = $data['questions'] : $questions = null;
     isset($user)? $userId = $user['id'] : $userId = '';
  		isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = null;
 
+ 		
     echo "<td width=\"50%\" colspan=\"".$scale_default."\">Scale</td>";
 
     //for loop to display the top header row with LOM comments
@@ -18,11 +18,11 @@
     echo "</tr>";
     $pos = 1;
     //for loop to display the criteria rows
-    for($i=1; $i<=$question_default; $i++){
+    for($i=0; $i<count($questions); $i++){
       //Get and set Mixeval Question
-      isset($questions[$pos])? $mixevalQuestion = $questions[$pos] : $mixevalQuestion = null;
+      isset($questions[$i])? $mixevalQuestion = $questions[$i] : $mixevalQuestion = null;
       if ($mixevalQuestion !=null) {
-        $questionDescriptors = $mixevalQuestion['descriptor'];
+        $questionDescriptors = $mixevalQuestion['descriptors'];
         $descriptor_des = array();
         foreach ($questionDescriptors as $row) {
           $desc = $row['MixevalsQuestionDesc'];

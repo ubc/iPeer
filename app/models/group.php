@@ -248,9 +248,8 @@ class Group extends AppModel
     return $data[0][0]['count'];
 }
 
-  function getGroupByGroupId($groupId){
-  	return $this->find('all',array('conditions'=>array('Group.id'=>$groupId)));
-  } 
+  function getGroupByGroupId($groupId, $fields=null){
+  	return $this->find('all',array('conditions'=>array('Group.id'=>$groupId), 'fields' => $fields));
+  }
 }
-
 ?>

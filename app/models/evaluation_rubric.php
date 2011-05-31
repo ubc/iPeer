@@ -174,6 +174,4 @@ class EvaluationRubric extends AppModel
         return $this->query($sql);
 	}
 }
-
 ?>
-
