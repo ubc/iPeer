@@ -311,10 +311,13 @@ class EventsController extends AppController
 
   function add()
   {
+    $eventTypes = $this->EventTemplateType->find('list', array(
+          'conditions'=> array('EventTemplateType.display_for_selection'=>1)
+    ));
     //Set up user info
     $currentUser = $this->User->getCurrentLoggedInUser();
     $this->set('currentUser', $currentUser);
-  	
+    
     $courseId = $this->Session->read('ipeerSession.courseId');
     $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
     //List Add Page
@@ -324,10 +327,7 @@ class EventsController extends AppController
       $this->set('unassignedGroups', $unassignedGroups);
 
       //Get all display event types
-      $this->set('eventTypes', $this->EventTemplateType->find('list', array(
-          'conditions'=> array('display_for_selection'=>1),
-          'fields' => array('type_name')
-      )));
+      $this->set('eventTypes', $eventTypes);
       //Set default template
       $default = '-- Select a Evaluation Tool -- ';
       $model = 'SimpleEvaluation';
@@ -361,19 +361,16 @@ class EventsController extends AppController
         $this->set('unassignedGroups', $this->Group->find('list', array(
             'conditions'=> array('course_id'=>$courseId),
             'fields'=>array('group_name'))));
-        $this->set('eventTypes', $this->EventTemplateType->find('list', array(
-          'conditions'=> array('display_for_selection'=>1),
-          'fields' => array('type_name')
-        )));
+        $this->set('eventTypes', $eventTypes);
         //Set default template
         $default = 'Default Simple Evaluation';
         //Check the event template type
-        if($this->params['data']['Event']['event_template_type_id'] == 2)
-          $model = 'Rubric';
-        else if($this->params['data']['Event']['event_template_type_id'] == 4)
-          $model = 'Mixeval';
-        else
-          $model = 'SimpleEvaluation';
+        $model = $this->EventTemplateType->find('first', array(
+            'conditions' => array('EventTemplateType.id' => $this->params['data']['Event']['event_template_type_id']),
+            'fields' => array('model_name')
+        ));
+        $model = $model['EventTemplateType']['model_name'];
+        
         $eventTemplates = $this->$model->getBelongingOrPublic($this->Auth->user('id'));
         $this->set('eventTemplates', $eventTemplates);
         $this->set('default',$default);
@@ -411,7 +408,9 @@ class EventsController extends AppController
     $model = '';
     $eventTemplates = array();
     $templateId = $event['Event']['event_template_type_id'];
-    $eventTypes = $this->EventTemplateType->find('all', array('conditions'=>array('display_for_selection'=>1)));
+    $eventTypes = $this->EventTemplateType->find('list', array(
+          'conditions'=> array('EventTemplateType.display_for_selection'=>1)
+    ));
     if (!empty($templateId))
     {
       $eventTemplateType = $this->EventTemplateType->find('id = '.$templateId);
@@ -444,12 +443,12 @@ class EventsController extends AppController
     	$groupName = $this->Group->getGroupByGroupId($groupId, array('group_name'));
     	$assignedGroups[$groupId] = $groupName[0]['Group']['group_name'];
     }
-    
- 	$this->set('eventTypes', $eventTypes);
+    $this->set('eventTypes', $eventTypes);
     $this->set('assignedGroups', $assignedGroups);
     $this->set('data', $data); 
     $this->set('event', $event);
     $this->set('course_id', $courseId);
+    $this->set('courses', $this->Course->getCourseList());
     $this->set('eventTemplates', $eventTemplates);
     $this->set('default',$default);
     $this->set('model', $model);

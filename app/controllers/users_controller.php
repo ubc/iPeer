@@ -200,7 +200,7 @@ class UsersController extends AppController
     $fields = array('Enrolment');
     
     $tempVar=$this->User->getEnrolledStudents(1,$fields);
-    $this->log($tempVar);
+    //$this->log($tempVar);
   }
 
   // Show a class list

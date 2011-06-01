@@ -20,14 +20,20 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
     </tr>
 
     <tr class="tablecell2">
-    	<td width="150" id="course_label">Course:</td>
-    	<td width="405">
-    	
-      <?php 
-       echo $this->element('courses/course_selection_box', array('coursesList'=>$coursesList, 'courseId' => $course_id, 'view' => false));?>
-		
-			</td>
-    	<td width="243" id="course_msg" class="error"/>
+      <td width="150" id="course_label">Course:</td>
+      <td width="405">
+
+      <?php
+        //echo $this->element('courses/course_selection_box', array('coursesList'=>$coursesList, 'courseId' => $course_id, 'view' => false));
+        echo $this->Form->input('course_id', array(
+            'options' => $courses,
+            'default' => $event['Event']['course_id'],
+            'format' => array('input')
+        )); 
+      ?>
+
+      </td>
+      <td width="243" id="course_msg" class="error"/>
     </tr>
     <tr class="tablecell2">
     <?php echo $this->Form->input('title', array('size'=>'50', 'class'=>'input',
@@ -68,31 +74,30 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
 
      <tr>
           <td height="50" width="50%" align="left" valign="top" >
-						<select name="data[Event][event_template_type_id]" id="eval_dropdown"
-							onChange="new Ajax.Updater('template_table','<?php echo $this->webroot.$this->theme?>events/eventTemplatesList/'+this.options[this.selectedIndex].value,
-																				 {onLoading:function(request){Element.show('loading');},
-																					onComplete:function(request){Element.hide('loading');},
-																					asynchronous:true, evalScripts:true});  return false;">
-						<?php
-//print_r($this->webroot.$this->theme);
-						foreach($eventTypes as $row): $eventTemplateType = $row['EventTemplateType']; ?>
-							<option value="<?php echo $eventTemplateType['id']?>"
-							  <?php
-							  if (!empty($params['data']['Event']['event_template_type_id']) && $params['data']['Event']['event_template_type_id'] == $eventTemplateType['id']) {
-							       echo 'SELECTED';
-							  }
-							  ?>
-							  ><?php echo $eventTemplateType['type_name']?></option>
-						<?php endforeach; ?>
-						</select>
-						<br>
-						<br>
-						<div id='template_table'>
-								<?php
-                  $params = array('controller'=>'events', 'eventTemplates'=>$eventTemplates, 'default'=>$default, 'view'=>0);
-                  echo $this->element('events/ajax_event_template_list', $params);
-								?>
-						</div>
+            <?php
+              echo $this->Form->input('Event.event_template_type_id', array(
+                  'type' => 'select',
+                  'id' => 'eval_dropdown',
+                  'label' => false,
+                  'options' => $eventTypes,
+                  'onChange' => "new Ajax.Updater('template_table','".
+                    $this->webroot.$this->theme."events/eventTemplatesList/'+this.options[this.selectedIndex].value,
+                     {onLoading:function(request){Element.show('loading');},
+                      onComplete:function(request){Element.hide('loading');},
+                      asynchronous:true, evalScripts:true});  return false;",
+                  'escape' => false,
+                  'format' => array('input')
+
+              ));
+            ?>
+            <br>
+            <br>
+            <div id='template_table'>
+            <?php
+              $params = array('controller'=>'events', 'eventTemplates'=>$eventTemplates, 'default'=>$default, 'view'=>0);
+              echo $this->element('events/ajax_event_template_list', $params);
+            ?>
+            </div>
         </td>
        </tr>
      </table>
@@ -104,32 +109,30 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
     <td>Allow Self-Evaluation?:</td>
     <td>
     <?php
-      if ($event['Event']['self_eval'] == 1) {
-		    echo '<input type="radio" name="data[Event][self_eval]" value="1" CHECKED> - Enable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		    <input type="radio" name="data[Event][self_eval]" value="0"> - Disable<br>';
-      }
-      else {
-        echo '<input type="radio" name="data[Event][self_eval]" value="1"> - Enable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <input type="radio" name="data[Event][self_eval]" value="0" CHECKED> - Disable<br>';
-      }
+      echo $form->input('Event.self_eval', array(
+           'type' => 'radio',
+           'options' => array('1' => ' - Enable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '0' => ' - Disable'),
+           'default' => $event['Event']['self_eval'],
+           'legend' => false,
+           'format' => array('input')
+      ));
     ?>
-	  </td>
+    </td>
     <td>&nbsp;</td>
   </tr>
   <tr class="tablecell2">
     <td>Require Student Comments?: </td>
     <td>
     <?php
-      if ($event['Event']['com_req'] == 1) {
-		    echo '<input type="radio" name="data[Event][com_req]" value="1" CHECKED> - Yes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		    <input type="radio" name="data[Event][com_req]" value="0"> - No<br>';
-      }
-      else {
-        echo '<input type="radio" name="data[Event][com_req]" value="1"> - Yes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <input type="radio" name="data[Event][com_req]" value="0" CHECKED> - No<br>';
-      }
+      echo $form->input('Event.com_req', array(
+         'type' => 'radio',
+         'options' => array('1' => ' - Yes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '0' => ' - No'),
+         'default' => $event['Event']['com_req'],
+         'legend' => false,
+         'format' => array('input')
+      ));
     ?>
-	  </td>
+    </td>
     <td>&nbsp;</td>
   </tr>
   <tr class="tablecell2">

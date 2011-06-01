@@ -223,7 +223,7 @@ class RubricsController extends AppController
       $this->Output->filter($this->data);//always filter
       //Save Data
       
-      $this->log($this->data);
+      //$this->log($this->data);
       if ($this->Rubric->saveAllWithCriteriaComment($this->data)) {
         $this->data['Rubric']['id'] = $this->Rubric->id;
         return true;

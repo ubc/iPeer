@@ -33,17 +33,17 @@ class EvaltoolsController extends AppController
  * @var $uses
  */
   var $uses =  array('SimpleEvaluation', 'Rubric', 'Mixeval', 'Survey');
-	var $page;
-	var $Sanitize;
-	var $functionCode = 'EVAL_TOOL';
+  var $page;
+  var $Sanitize;
+  var $functionCode = 'EVAL_TOOL';
 
-	function __construct() {
-		$this->Sanitize = new Sanitize;
- 		$this->set('title_for_layout', 'Evaluation Tools');
-		parent::__construct();
-	}
+  function __construct() {
+    $this->Sanitize = new Sanitize;
+    $this->set('title_for_layout', 'Evaluation Tools');
+    parent::__construct();
+  }
 
-	function index($evaltool = null) {
+  function index($evaltool = null) {
     //Disable the autorender, base the role to render the custom home
     $this->autoRender = false;
 

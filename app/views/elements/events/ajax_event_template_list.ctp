@@ -26,8 +26,8 @@
                   'style' => 'width:200px;',
                   'label' => false,
                   'options' => $eventTemplates,
-                  'escape'=>false
-
+                  'escape'=>false,
+                  'format' => array('input')
               ));
                 ?>
 

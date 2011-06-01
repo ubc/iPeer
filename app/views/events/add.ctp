@@ -54,25 +54,7 @@
 			<a title="Add Mix Evaluation" href="<?php echo $this->webroot.$this->theme;?>mixevals/add/pop_up" onclick="wopen(this.href, 'popup', 650, 500); return false;" >&nbsp;Add Mix Evaluation</a>
 			</td></tr>
       <tr>
-          <td height="50" width="50%" align="left" valign="top" >
-<!--           <select name="data[Event][event_template_type_id]" id="eval_dropdown"
-                onChange="new Ajax.Updater('template_table','<?php echo $this->webroot.$this->theme?>events/eventTemplatesList/'+this.options[this.selectedIndex].value,
-                                                                                                                         {onLoading:function(request){Element.show('loading');},
-                                                                                                                                onComplete:function(request){Element.hide('loading');},
-                                                                                                                                asynchronous:true, evalScripts:true});  return false;">
-            <?php
-            //print_r($this->webroot.$this->theme);
-            foreach($eventTypes as $row): $eventTemplateType = $row['EventTemplateType']; ?>
-                <option value="<?php echo $eventTemplateType['id']?>"
-                  <?php
-                  if (!empty($params['data']['Event']['event_template_type_id']) && $params['data']['Event']['event_template_type_id'] == $eventTemplateType['id']) {
-                       echo 'SELECTED';
-                  }
-                  ?>
-                  ><?php echo $eventTemplateType['type_name']?></option>
-            <?php endforeach; ?>
-            </select>-->
-            
+          <td height="50" width="50%" align="left" valign="top" >            
             <?php
               echo $this->Form->input('Event.event_template_type_id', array(
                   'type' => 'select',

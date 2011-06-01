@@ -22,8 +22,8 @@
     </td>
     <td align="center">
       <h3><?php echo isset($selectedName) ? $selectedName : ''?></h3>
-      <?php echo $this->Form->input('Member.Member',
-              array( 'options'=> $assigned,
+      <?php
+        $options = array(
               		 'style' => $listStyle,
                      'div' => false,
                      'label' => false,
@@ -31,7 +31,11 @@
                      'after' => '',
                      'separator' => '',
                      'between' => '',
-                     'id' => 'selected_groups' ));
+                     'id' => 'selected_groups' );
+        if(isset($assigned))
+          $options['options'] = $assigned;
+
+        echo $this->Form->input('Member.Member', $options);
       ?>
     </td>
 </tr></table>

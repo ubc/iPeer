@@ -437,6 +437,13 @@ class Course extends AppModel
 		$this->query($sql);		
 		
 	}
+
+        function getCourseList(){
+          $this->displayField = 'course';
+          return $this->find('list', array(
+              'conditions' => array()
+          ));
+        }
 	
 ### Helper functions for testing purposes ###	
 	function deleteAllTuples($table){	
