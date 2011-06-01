@@ -693,7 +693,7 @@ AjaxList.prototype.renderFooter = function(div) {
     tr.appendChild(td);
 
     // Display Number of search results in first f
-    var td = new Element("td", "td", {"style" : "text-align: right; width: 33%" });
+    var td = new Element("td", {"style" : "text-align: right; width: 33%" });
     this.footerPageList = td;
     this.renderPageList (this.footerPageList);
     tr.appendChild(td);
@@ -1082,7 +1082,6 @@ AjaxList.prototype.ajaxCallComplete = function (response) {
 
     // free the ajax object
     this.ajaxObject = null;
-
     if (response.status != 200 || !response.responseJSON) {
         var message = "Can not update list: network down or invalid server response.\n";
         message += "This can be be your iPeer session timing out.\n";

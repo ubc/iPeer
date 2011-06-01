@@ -92,7 +92,7 @@ class SysParametersController extends AppController
 
     function ajaxList() {
         // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
+       // $this->rdAuth->noStudentsAllowed();
         // Set up the list
         $this->setUpAjaxList();
         // Process the request for data
