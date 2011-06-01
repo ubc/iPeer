@@ -89,7 +89,6 @@
               ));
             ?>
             <br>
-            <br>
             <div id='template_table'>
             <?php
               $params = array('controller'=>'events', 'eventTemplates'=>$eventTemplates, 'default'=>$default, 'view'=>0);
@@ -143,7 +142,7 @@
   	<td id="release_date_begin">
   	  <table width="100%"><tr align="left">
 				<td width="90%">
-      		<?php echo $form->input('Event.release_date_begin', array('div'=>false, 'label'=>'From :' ,'type'=>'text',  'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal2.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+      	  <?php echo $form->input('Event.release_date_begin', array('div'=>false, 'label'=>'From :' ,'type'=>'text',  'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal2.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
           <?php echo $form->error('Event.release_date_begin', 'Please enter a valid date.')?>
       	</td>
       </tr>
@@ -161,7 +160,7 @@
     <td>Groups Assignment:&nbsp;</td>
     <td>
     <?php echo $this->element("groups/group_list_chooser",
-            array('all' => $unassignedGroups,
+            array('all' => $unassignedGroups, 'assigned'=>'',
             'allName' =>  'Avaliable Groups', 'selectedName' => 'Participating Groups',
             'itemName' => 'Group', 'listStrings' => array("Group #", "group_num"," - ","group_name")));
         ?>

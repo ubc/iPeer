@@ -2,7 +2,7 @@
       $action = ($this->action == 'copy' ? 'add' : $this->action);
 ?>
 <!--<?php //echo $html->script('events'); // For vallidation of dates?>-->
-
+<?php echo $html->script('calendar1')?>
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
 <tr>
   <td>
@@ -48,45 +48,49 @@
           <td>&nbsp;</td>
         </tr>
         <tr class="tablecell2">
-        <?php echo $this->Form->input('due_date', array('label' => 'Due Date:<font color="red">*</font>',
-                                                        'dateFormat' => 'YMD',
-                                                        'timeFormat' => '24',
-                                                        'selected' => null,
-                                                        'empty' => false,
-                                                        'minYear' => date('Y'),
-                                                        'maxYear' => date('Y')+3));?>
+        <td><?php echo 'Due Date:<font color="red">*</font>'?></td>
+        <td><?php echo $form->input('Survey.due_date', array('div'=>false, 
+        														'label'=>'From :',
+        														'type'=>'text',
+        	  													'size'=>'50',
+        														'format'=>array('input'),
+        	  													'class'=>'input',
+        	 													'style'=>'width:55%;')) ?>&nbsp;&nbsp;&nbsp;
+				<a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');">
+				<?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a></td>
           <!--<td><?php //echo $html->input('Survey/due_date', array('size'=>'25','class'=>'input')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a></td>-->
           <td> eg. YYYY-MM-DD HH:MM (24 HOUR) </td>
         </tr>
+		
         <tr class="tablecell2">
-          <td valign="top">Release Date:<font color="red">*</font></td>
-          <td><table width="100%" border="0" cellspacing="2" cellpadding="4">
-            <tr>
-              <?php echo $this->Form->input('release_date_begin', array('label' => 'From:',
-                                                              'dateFormat' => 'YMD',
-                                                              'timeFormat' => '24',
-                                                              'selected' => null,
-                                                              'empty' => false,
-                                                              'minYear' => date('Y'),
-                                                              'maxYear' => date('Y')+3,
-                                                              'before' => '<td>'));?>
-
-              <!--<?php //echo $html->input('Survey/release_date_begin', array('size'=>'25','class'=>'input')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal2.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a></td>-->
-            </tr>
-            <tr>
-              <?php echo $this->Form->input('release_date_end', array('label' => 'To:',
-                                                              'dateFormat' => 'YMD',
-                                                              'timeFormat' => '24',
-                                                              'selected' => null,
-                                                              'empty' => false,
-                                                              'minYear' => date('Y'),
-                                                              'maxYear' => date('Y')+3,
-                                                              'before' => '<td>'));?>
-              <!--<td nowrap><?php echo $html->input('Survey/release_date_end', array('size'=>'25','class'=>'input')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal3.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a></td>-->
-            </tr>
-          </table>            </td>
-          <td valign="top"> eg. YYYY-MM-DD HH:MM (24 HOUR) </td>
+        <td><?php echo 'Release Date:<font color="red">*</font>' ?>
+        <td><?php echo 'From :'?>
+        	<?php echo $form->input('Survey.release_date_begin', array('div'=>false, 
+        														'label'=>'From :',
+        														'type'=>'text',
+        	  													'size'=>'50',
+        														'format'=>array('input'),
+        	  													'class'=>'input',
+        	 													'style'=>'width:48.5%;')) ?>&nbsp;&nbsp;&nbsp;
+				<a href="javascript:cal2.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');">
+				<?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+		    
+		<br><?php echo 'To :'?>
+	   		<?php echo $form->input('Survey.release_date_end', array('div'=>false, 
+                                                        	'label'=> 'Due Date :',
+        													'format'=> array('input'), 
+                                                        	'type'=>'text', 
+                                                        	'size'=>'50',
+                                                        	'class'=>'input', 
+                                                        	'style'=>'width:51.5%;')) ?>&nbsp;&nbsp;
+		    <a href="javascript:cal3.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');">
+		    <?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+                                                               	
+		</td>              
+          <!--<td><?php //echo $html->input('Survey/due_date', array('size'=>'25','class'=>'input')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a></td>-->
+          <td> eg. YYYY-MM-DD HH:MM (24 HOUR) </td>
         </tr>
+	
         <tr class="tablecell2">
           <td colspan="3" align="center">
         <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
@@ -108,13 +112,12 @@
 
 <?php //echo $html->script('calendar1')?>
 <script type="text/javascript">
-<!--
 
 // create calendar object(s) just after form tag closed
 // specify form element as the only parameter (document.forms['formname'].elements['inputname']);
 // note: you can have as many calendar objects as you need for your application
 
-/*var cal1 = new calendar1(document.forms[0].elements['data[Survey][due_date]']);
+var cal1 = new calendar1(document.forms[0].elements['data[Survey][due_date]']);
 cal1.year_scroll = false;
 cal1.time_comp = true;
 
@@ -125,6 +128,4 @@ cal2.time_comp = true;
 var cal3 = new calendar1(document.forms[0].elements['data[Survey][release_date_end]']);
 cal3.year_scroll = false;
 cal3.time_comp = true;
-*/
-//-->
 </script>

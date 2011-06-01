@@ -183,6 +183,4 @@ class Survey extends EvaluationBase
 	}
 
 }
-
 ?>
-
