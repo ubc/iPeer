@@ -261,7 +261,7 @@ class EvaluationSimpleHelperComponent extends Object
 		    //Get total mark each member received
 				$receivedTotalScore = $this->EvaluationSimple->getReceivedTotalScore($event['group_event_id'],
 				                                                                         $user['User']['id']);
-				$memberScoreSummary[$user['User']['id']]['received_total_score'] = $receivedTotalScore[0]['received_total_score'];
+				$memberScoreSummary[$user['User']['id']]['received_total_score'] = $receivedTotalScore[0][0]['received_total_score'];
 
 			}
 		}

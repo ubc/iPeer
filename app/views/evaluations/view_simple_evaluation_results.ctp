@@ -122,7 +122,7 @@ else { // if no members are present
 <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
   <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
   <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
-  <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>" />
+  <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id']?>" />
   <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" /><?php
 	if ($event['group_event_marked'] == "reviewed") {
 		echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_not_reviewed\" value=\"Mark Peer Evaluations as Not Reviewed\" />";
@@ -207,7 +207,7 @@ foreach($evalResult[$user['id']] AS $row ) {
 	<td colspan="4">
   <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
   <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
-  <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>" />
+  <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id']?>" />
   <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" />
 	&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="submit" value="Save Changes" />
 	&nbsp;&nbsp;&nbsp;<input type="submit" name="submit" value="Release All" />

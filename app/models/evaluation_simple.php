@@ -102,7 +102,13 @@ class EvaluationSimple extends AppModel
 
   function getTeamReleaseStatus($groupEventId=null){
     $ret = array();
-    $status = $this->findAll('grp_event_id='.$groupEventId.' GROUP BY evaluatee', 'evaluatee, release_status, grade_release', 'evaluatee');
+    //$status = $this->findAll('grp_event_id='.$groupEventId.' GROUP BY evaluatee', 'evaluatee, release_status, grade_release', 'evaluatee');
+    $status = $this->find('all', array(
+        'conditions' => array('grp_event_id' => $groupEventId),
+        'fields' => array('evaluatee', 'release_status', 'grade_release'),
+        'order' => 'evaluatee',
+        'group' => 'evaluatee'
+    ));
 
     foreach($status as $s) {
       $ret[$s['EvaluationSimple']['evaluatee']] = $s['EvaluationSimple'];

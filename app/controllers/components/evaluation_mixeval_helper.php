@@ -306,7 +306,7 @@ class EvaluationMixevalHelperComponent extends Object
                 foreach ($groupMembers as $user) {
                     if (!empty($user)) {
                         // The array's format varries. Sometime a sub-array [0] is present
-                        $id = !empty($user['id']) ? $user['id'] : $user[0]['id'];
+                        $id = !empty($user['id']) ? $user['id'] : $user['User']['id'];
                         $matrix[$index][$id] = 'n/a';
                     }
                 }
