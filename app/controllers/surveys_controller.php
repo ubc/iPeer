@@ -234,7 +234,7 @@ class SurveysController extends AppController
 
 		$this->set('templates', $this->Survey->find('list', array('fields' => array('id', 'name'))));
 
-    $this->set('courses', $this->Survey->Course->find('list', array('recursive' => -1)));
+    $this->set('courses', $this->Survey->Course->find('list', array('fields' => array('Course.course'),'recursive' => -1)));
     $this->render('edit');
 	}
 

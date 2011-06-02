@@ -109,16 +109,17 @@ class SurveyGroupsController extends AppController
     if (is_null($params))
       $courseId = $this->Session->read('ipeerSession.courseId');
     else { //TODO
-      $eventId = $params;
-      $event = $this->Event->findById($eventId);
-      $courseId = $event['Event']['course_id'];
-      $this->rdAuth->setCourseId($courseId);
+//      $eventId = $params;
+//      $event = $this->Event->findById($eventId);
+//      $courseId = $event['Event']['course_id'];
+//      $this->rdAuth->setCourseId($courseId);
+       $courseId = $params;
     }
     
     $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > View Survey Result');
     //get surveys for the course
     $survey_list = $this->Survey->find('list', array('conditions' => array('course_id' => $courseId)));
-    $ids = array_keys($survey_list);
+    $ids = array_keys($survey_list); 
     $survey = $this->Survey->getSurveyWithSubmissionById($ids[0]);
 
     $this->set('survey_list', $survey_list);

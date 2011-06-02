@@ -196,7 +196,7 @@
     	    <td width="1%" bgcolor="#FFB66F">&nbsp;</td>
     		  <td align="left"><?php echo $html->link($survey['name'], '/surveys/questionssummary/'.$survey['id']) ?></td>
           <td align="center">
-        	<?php echo $mixeval['event_count'] > 0 ?
+        	<?php echo $survey['event_count'] > 0 ?
                      $html->image('icons/green_check.gif',array('border'=>'0','alt'=>'green_check')) :
                      $html->image('icons/red_x.gif',array('border'=>'0','alt'=>'red_x'));?>
           </td>
