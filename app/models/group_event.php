@@ -78,7 +78,7 @@ class GroupEvent extends AppModel
     if(empty($eventId) || is_null($eventId)) {
   	  	return;
   	  }
-  	return $this->find('all', array('conditions'=>array('event_id'=>$eventId), 'fields'=>array('group_id')));
+  	return $this->find('all', array('conditions'=>array('event_id'=>$eventId)));
   }
   
 //  // returns list of group id within the selected Event
@@ -223,10 +223,16 @@ class GroupEvent extends AppModel
   }
 
   function getNotReviewed($eventId=null) {
-    return $this->query('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked
-                            FROM group_events AS GroupEvent
-                            WHERE (GroupEvent.marked="not reviewed" OR GroupEvent.marked="to review") AND GroupEvent.group_id != 0 AND GroupEvent.event_id='.$eventId.'
-                            ORDER BY GroupEvent.group_id');
+//    return $this->query('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked
+//      FROM group_events AS GroupEvent
+//      WHERE (GroupEvent.marked="not reviewed" OR GroupEvent.marked="to review")
+//      AND GroupEvent.group_id != 0 AND GroupEvent.event_id='.$eventId.'
+//      ORDER BY GroupEvent.group_id');
+    return $this->find('all', array(
+        'conditions' => array('GroupEvent.group_id !=' => '0', 'GroupEvent.event_id' => $eventId,
+            "OR" => array('GroupEvent.marked' => "not reviewed", 'GroupEvent.marked' => "to review")),
+        'order' => 'GroupEvent.group_id'
+    ));
   }
 
 

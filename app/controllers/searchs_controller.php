@@ -209,7 +209,7 @@ class SearchsController extends AppController
     $evlResult = $event;
     switch ($status) {
       case "listNotReviewed":
-        $assignedGroupIDs = $this->GroupEvent->getNotReviewed($eventId);
+        $assignedGroupIDs = $this->GroupEvent->getNotReviewed($eventId); 
         break;
       case "late":
         $assignedGroupIDs = $this->GroupEvent->getLate($eventId);
@@ -228,15 +228,15 @@ class SearchsController extends AppController
             // retrieve string of group ids
       for ($i = 0; $i < count($assignedGroupIDs); $i++) {
         $groupid = $assignedGroupIDs[$i]['GroupEvent']['group_id'];
+        $groupEventId = $assignedGroupIDs[$i]['GroupEvent']['id'];
         $group = $this->Group->find('first', array('conditions' => array('Group.id' => $groupid)));
         $assignedGroups[$i] = $group;
         //Get Members whom completed evaluation
-        $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($group['Group']['id'],
-                                                                               $groupid);
+        $numOfCompletedCount = $this->EvaluationSubmission->numCountInGroupCompleted($group['Group']['id'],
+                                                                               $groupEventId);
         //Check to see if all members are completed this evaluation
 
-        $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
-                        $numMembers=$this->GroupsMembers->find('count', array('conditions' => 'group_id='.$group['Group']['id']));
+        $numMembers=$this->GroupsMembers->find('count', array('conditions' => 'group_id='.$group['Group']['id']));
         ($numOfCompletedCount == $numMembers) ? $completeStatus = 1:$completeStatus = 0;
 
 

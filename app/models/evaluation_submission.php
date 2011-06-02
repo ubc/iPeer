@@ -55,7 +55,6 @@ class EvaluationSubmission extends AppModel
 //        $joinTable = array(' LEFT JOIN groups_members as GroupMember ON GroupMember.user_id=EvaluationSubmission.submitter_id');
 //        return $this->find('all',$condition, $fields, null, null, null, null, $joinTable );
         
-        
             return $this->find('count', array(
                 'conditions' => array('EvaluationSubmission.submitted' => 1, 'GroupMember.group_id' => $groupId, 'EvaluationSubmission.grp_event_id' => $groupEventId),
                 'joins' => array(

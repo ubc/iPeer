@@ -436,7 +436,7 @@ class HomeController extends AppController
       //$courseDetail = $this->Course->find('id='.$courseId);
       //Get Events for this course that are due
       //$events = $this->Event->find('all',array('conditions' => array('release_date_begin < NOW() AND NOW() <= release_date_end AND course_id='.$courseId)));
-      $events = $this->Event->find('all',array('conditions' => array('release_date_begin < ' => 'NOW()' , 'NOW() <= ' => 'release_date_end' , 'course_id' => $courseId)));
+      $events = $this->Event->find('all',array('conditions' => array('release_date_begin < NOW()', 'NOW() <= release_date_end', 'course_id' => $courseId)));
       foreach($events as $row) {
         $event = $row['Event'];
         switch ($event['event_template_type_id']) {
