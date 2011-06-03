@@ -139,7 +139,7 @@ class SurveyHelperComponent extends Object {
     return true;
   }
 
-  /*function reorderQuestions($survey_id) {
+  function reorderQuestions($survey_id) {
     // get all questions order by the number
     $data = $this->SurveyQuestion->find('all', array('conditions' => array('survey_id' => $survey_id),
                                                      'order' => 'number'));
@@ -163,5 +163,5 @@ class SurveyHelperComponent extends Object {
       $questions[$k] = $q;
     }
     $this->SurveyQuestion->saveAll($questions);
-  }*/
+  }
 }

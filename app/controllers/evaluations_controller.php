@@ -35,11 +35,11 @@ class EvaluationsController extends AppController
   var $order;
   var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
   var $Sanitize;
-  var $uses = array('GroupEvent', 'EvaluationRubric', 'EvaluationRubricDetail', 
+  var $uses = array('SurveyQuestion', 'GroupEvent', 'EvaluationRubric', 'EvaluationRubricDetail', 
                     'EvaluationSubmission', 'Event', 'EvaluationSimple',
                     'SimpleEvaluation', 'Rubric', 'Group', 'User',
                     'GroupsMembers','RubricsLom','RubricsCriteria',
-                    'RubricsCriteriaComment', 'Personalize','SurveyQuestion',
+                    'RubricsCriteriaComment', 'Personalize',
                     'Question','Response','Survey','SurveyInput','Course','MixevalsQuestion',
                     'EvaluationMixeval','EvaluationMixevalDetail');
   var $components = array( 'Auth','AjaxList', 'rdAuth','Output','sysContainer',
@@ -434,11 +434,11 @@ function makeSurveyEvaluation ($param = null) {
           $this->set('survey_id', $survey_id);
 
           // Get all required data from each table for every question
-          $tmp = $this->surveyQuestion->getQuestionsID($survey_id);
+          $tmp = $this->SurveyQuestion->getQuestionsID($survey_id);
           $tmp = $this->Question->fillQuestion($tmp);
           $tmp = $this->Response->fillResponse($tmp);
           $result = null;
-
+          
           // Sort the resultant array by question number
           $count = 1;
           for( $i=0; $i<=$tmp['count']; $i++ ){
@@ -449,7 +449,6 @@ function makeSurveyEvaluation ($param = null) {
                   }
               }
           }
-
           $this->set('questions', $result);
           $this->set('event', $event);
           $this->render('survey_eval_form');

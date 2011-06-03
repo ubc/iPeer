@@ -28,13 +28,13 @@ class EvaluationSurveyHelperComponent extends Object
         $surveyInput['SurveyInput']['user_id'] = $userId;
         $surveyInput['SurveyInput']['survey_id'] = $surveyId;
         $successfullySaved = true;
-        for($i=0; $i<$params['form']['question_count']; $i++){
+        for($i=1; $i<=$params['form']['question_count']; $i++){
 			$this->SurveyInput = new SurveyInput;
         	//Set survey and user id
         	$surveyInput[$i]['SurveyInput']['user_id'] = $userId;
         	$surveyInput[$i]['SurveyInput']['survey_id'] = $surveyId;
         	//Set question Id
-        	$questionId = $params['form']['question_id']-(1-$i);
+        	$questionId = $params['form']['question_id'.$i];
         	$surveyInput[$i]['SurveyInput']['question_id'] = $questionId;
         	//Set answers
         	$answer = $params['form']['answer_'.$questionId];

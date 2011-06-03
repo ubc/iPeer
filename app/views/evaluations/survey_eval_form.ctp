@@ -2,7 +2,7 @@
   <tr>
     <td>
       <form name="frm" id="frm" method="POST" action="<?php echo $html->url('makeSurveyEvaluation') ?>">
-      <input type="hidden" name="event_id" value="<?php echo $event[0]['events']['id']?>"/>
+      <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
       <input type="hidden" name="survey_id" id="survey_id" value="<?php if (!empty($survey_id)) echo $survey_id; ?>" />      
       <input type="hidden" name="course_id" value="<?php echo $courseId ?>"/>
       <input type="hidden" name="data[Evaluation][surveyee_id]" value="<?php echo $id ?>"/>
@@ -14,7 +14,7 @@
           <tr class="tablecell2">
             <td>
 			<?php
-			if( !empty($questions)):
+			if(!empty($questions)):
 			foreach ($questions as $row): $question = $row['Question'];
 				echo "<br><table align=\"center\" width=\"95%\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\">
 						<tr class=\"tablecell\">
@@ -26,7 +26,6 @@
 					echo "<tr class=\"tablecell2\"><td colspan=\"8\">".$question['prompt']."</td></tr>";
 					echo "<tr class=\"tablecell2\"><td colspan=\"8\">";
 					echo "<input type=\"hidden\" name=\"question_id".$question['number']."\" value=\"".$question['id']."\"/>";
-
 					if( !empty($question['Responses'])){
 						foreach ($question['Responses'] as $index => $value):
 							echo "<input type=\"radio\" name=\"answer_".$question['id']."\" value=\"".$value['response']."_".$value['id']."\" > ".$value['response']."<br>";

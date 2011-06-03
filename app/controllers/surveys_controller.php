@@ -38,7 +38,7 @@ class SurveysController extends AppController
   var $order;
   var $Sanitize;
   var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
-  var $components = array('AjaxList','rdAuth','Output','sysContainer', 'globalConstant','userPersonalize', 'framework','SurveyHelper');
+  var $components = array('SurveyHelper', 'AjaxList','rdAuth','Output','sysContainer', 'globalConstant','userPersonalize', 'framework');
 
 
 	function __construct() {
@@ -243,10 +243,9 @@ class SurveysController extends AppController
       $this->Session->setFlash('Invalid survey ID.');
       $this->redirect('index');
     }
-
     $data = $this->Survey->find('first', array('conditions' => array('id' => $id),
                                                'contain' => array('Event')));
-		if (!empty($this->data)) {
+	if (!empty($this->data)) {
       //alter dates for the event 
       //TODO: separte date from survey
       $data['Survey'] = $this->data['Survey'];
@@ -256,7 +255,7 @@ class SurveysController extends AppController
       $data['Event'][0]['release_date_begin'] = $this->data['Survey']['release_date_begin'];
       $data['Event'][0]['release_date_end'] = $this->data['Survey']['release_date_end'];
 
-			if($result = $this->Survey->save($data)) {
+	if($result = $this->Survey->save($data)) {
         $this->Session->setFlash('The Survey was edited successfully.');
         $this->redirect('index');
 			} else {
@@ -426,7 +425,7 @@ class SurveysController extends AppController
 		if(!empty($this->params['form']['loadq'])) {
 			// load values from selected question into temp array
 			$this->data = $this->Question->find('first', array('conditions' => array('id' => $this->data['Question']['template_id'])));
-      $this->set('responses', $this->data['Response']);
+      		$this->set('responses', $this->data['Response']);
 		} elseif (!empty($this->params['data']['Question'])) {
 			if ($this->Question->saveAll($this->data)) {
 
