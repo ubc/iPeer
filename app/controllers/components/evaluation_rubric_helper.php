@@ -48,11 +48,10 @@ class EvaluationRubricHelperComponent extends Object
     
  		// enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
  		$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find('count',array( 'conditions'=>array('group_id' => $event['group_id']))) :
- 		                                           $this->GroupsMembers->find('count', array( 'conditions'=> array('group_id' => $event['group_id']- 1)));
+ 		                                           ($this->GroupsMembers->find('count', array( 'conditions'=> array('group_id' => $event['group_id'])))-1); 		                                           
  		                                           
 		//$this->set('evaluateeCount', $numMembers);
 		$result['evaluateeCount'] = $numMembers;
-
 		return $result;
   }
 

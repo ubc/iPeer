@@ -489,7 +489,6 @@ function makeSurveyEvaluation ($param = null) {
           //$msg = strtok(';');
           $event = $this->EvaluationHelper->formatEventObj($eventId, $groupId);
           $rubricId = $event['Event']['template_id'];
-          var_dump($rubricId);
           $data = $this->Rubric->getRubricById($rubricId);
           $this->set('data', $data[0]);
           $this->set('event', $event);

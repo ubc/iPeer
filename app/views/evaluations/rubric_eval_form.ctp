@@ -115,14 +115,14 @@
       $count++;
     }
   }
-
+	var_dump($count);
+    var_dump($evaluateeCount);
     $mustCompleteUsers = ($count != $evaluateeCount);
     $commentsNeeded = false;
     // Check if any comment fields were left empty.
     if ($event['Event']['com_req'] && isset($data['questions'])) {
         foreach($groupMembers as $row) {
             $user = $row['User'];
-
             if (empty($user['Evaluation'])) {
                 $commentsNeeded = true;      // Not evaluated? Then we need comments for sure
             } else {
@@ -147,6 +147,8 @@
     } else {
         $commentsNeeded = false;
     }
+    
+    
   if (!$mustCompleteUsers && !$commentsNeeded) {
     echo $form->submit('Submit to Complete the Evaluation', array('onClick' => "javascript:return confirm('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?')"));
   }
