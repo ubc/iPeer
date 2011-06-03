@@ -207,7 +207,7 @@
           ?></td>
           <td align="center">
       		<?php
-      		if($survey['released'])
+                if(date('Y-m-d H:i:s',time()) > $survey['release_date_begin'])
       			echo $html->image('icons/green_check.gif',array('border'=>'0','alt'=>'green_check'));
       		else
       			echo $html->image('icons/red_x.gif',array('border'=>'0','alt'=>'red_x'));

@@ -35,7 +35,8 @@ class EvaluationsController extends AppController
   var $order;
   var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
   var $Sanitize;
-  var $uses = array('SurveyQuestion', 'GroupEvent', 'EvaluationRubric', 'EvaluationRubricDetail', 
+
+  var $uses = array('GroupEvent', 'SurveyQuestion','EvaluationRubric', 'EvaluationRubricDetail',
                     'EvaluationSubmission', 'Event', 'EvaluationSimple',
                     'SimpleEvaluation', 'Rubric', 'Group', 'User',
                     'GroupsMembers','RubricsLom','RubricsCriteria',
