@@ -21,7 +21,7 @@ class EvaluationMixevalDetail extends AppModel
             if ($question != null)
                 $conditions = array('question_number' => $question);
             return $this->find('first', array(
-                'conditions' => $condtions
+                'conditions' => $conditions
             ));
 	}
 	
@@ -35,7 +35,7 @@ class EvaluationMixevalDetail extends AppModel
             if ($question != null)
                 $conditions = array('question_number' => $question);
             return $this->find('all', array(
-                'conditions' => $condtions
+                'conditions' => $conditions
             ));
 	}	
 }

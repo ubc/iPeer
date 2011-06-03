@@ -12,7 +12,7 @@
 App::import('Model','Mixeval');
 class EvaluationMixevalHelperComponent extends Object
 {
-	var $components = array('EvaluationHelper', 'rdAuth');
+	var $components = array('EvaluationHelper', 'Auth');
 
   function loadMixEvaluationDetail ($event)
   {
@@ -22,15 +22,15 @@ class EvaluationMixevalHelperComponent extends Object
     $this->Mixeval = new Mixeval;
 
     $result = array();
- 	  $evaluator = $this->rdAuth->id;
+ 	  $evaluator = $this->Auth->user('id');
 
     //Get Members for this evaluation
     $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'],
-                                                               $this->rdAuth->id);
-    for ($i = 0; $i<count($groupMembers); $i++) {
+                                                             $this->Auth->user('id'));
+       for ($i = 0; $i<count($groupMembers); $i++) {
        $targetEvaluatee = $groupMembers[$i]['User']['id'];
        $evaluation = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee($event['group_event_id'],
-                                                                                          $evaluator, $targetEvaluatee);
+                                                                                            $evaluator, $targetEvaluatee);                                                                                                                                         
        if (!empty($evaluation)) {
          $groupMembers[$i]['User']['Evaluation'] = $evaluation;
          $groupMembers[$i]['User']['Evaluation']['EvaluationDetail'] = $this->EvaluationMixevalDetail->getAllByEvalMixevalId
@@ -86,6 +86,7 @@ class EvaluationMixevalHelperComponent extends Object
 
 		$evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee($groupEventId, $evaluator,
 		                                                                                   $targetEvaluatee);
+		                                                                                   
 		if (empty($evalMixeval)) {
 		    //Save the master Evalution Mixeval record if empty
 		    $evalMixeval['EvaluationMixeval']['evaluator'] = $evaluator;
@@ -100,13 +101,13 @@ class EvaluationMixevalHelperComponent extends Object
 
 		 }
 		 $score = $this->saveNGetEvalutionMixevalDetail($evalMixeval['EvaluationMixeval']['id'], $mixeval,
-		                                               $targetEvaluatee, $params['form']);
+		                                               $targetEvaluatee, $params);
+		                                            
      $evalMixeval['EvaluationMixeval']['score'] = $score;
      if (!$this->EvaluationMixeval->save($evalMixeval))
      {
        return false;
      }
-
     return true;
   }
 
@@ -116,7 +117,7 @@ class EvaluationMixevalHelperComponent extends Object
     $isCheckBoxes = false;
     $totalGrade = 0;
     $pos = 0;
-    for($i=1; $i < $form['data']['Mixeval']['total_question']; $i++) {
+    for($i=1; $i < $mixeval['Mixeval']['total_question']; $i++) {
 
   		$evalMixevalDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera($evalMixevalId, $i);
       if (isset($evalMixevalDetail)) {
@@ -124,15 +125,17 @@ class EvaluationMixevalHelperComponent extends Object
       }
       $evalMixevalDetail['EvaluationMixevalDetail']['evaluation_mixeval_id'] = $evalMixevalId;
       $evalMixevalDetail['EvaluationMixevalDetail']['question_number'] = $i;
+
+
       if ($form['data']['Mixeval']['question_type'.$i] == 'S') {
-    		// get total possible grade for the question number ($i)
-    		$selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$i];
-    		$grade = $form[$targetEvaluatee.'criteria_points_'.$i];
+      			// get total possible grade for the question number ($i)
+      		$selectedLom = $form['form']['selected_lom_'.$targetEvaluatee.'_'.($i-1)];
+    		$grade = $form['form'][$targetEvaluatee.'criteria_points_'.($i-1)];
         $evalMixevalDetail['EvaluationMixevalDetail']['selected_lom'] = $selectedLom;
         $evalMixevalDetail['EvaluationMixevalDetail']['grade'] = $grade;
     		$totalGrade += $grade;
       } else if ($form['data']['Mixeval']['question_type'.$i] == 'T') {
-        $evalMixevalDetail['EvaluationMixevalDetail']['question_comment'] = $form["response_text_".$targetEvaluatee."_".$i];
+        $evalMixevalDetail['EvaluationMixevalDetail']['question_comment'] = $form['form']["response_text_".$targetEvaluatee."_".$i];
       }
       $this->EvaluationMixevalDetail->save($evalMixevalDetail);
       $this->EvaluationMixevalDetail->id=null;

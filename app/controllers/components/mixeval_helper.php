@@ -20,7 +20,6 @@ class MixevalHelperComponent extends Object
   
 		$mixeval_id = $mixeval['Mixeval']['id'];
 		$mixEvalDetail = $this->MixevalsQuestion->getQuestion($mixeval_id);
-
 		$tmp = array();
 	  
 	  if (!empty($mixEvalDetail)) {
@@ -36,8 +35,22 @@ class MixevalHelperComponent extends Object
     	}
     }
     $mixEvalDetail = array_merge($mixeval,$tmp);
+
 		return $mixEvalDetail;
 	}  
+	
+  function compileViewDataShort($mixeval=null)
+	{
+	  $this->MixevalsQuestion = new MixevalsQuestion;
+	  $this->MixevalsQuestionDesc = new MixevalsQuestionDesc;
+  
+		$mixeval_id = $mixeval['Mixeval']['id'];
+		$mixEvalDetail = $this->MixevalsQuestion->getQuestion($mixeval_id);
+		if(!empty($mixeval['Question'])) {
+			$mixeval['Question'] = $mixEvalDetail;
+		}
+		return $mixeval;
+	}
 	
 }
 ?>

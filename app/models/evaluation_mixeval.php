@@ -16,9 +16,10 @@ class EvaluationMixeval extends AppModel
 
     function getEvalMixevalByGrpEventIdEvaluatorEvaluatee($grpEventId=null, $evaluator=null, $evaluatee=null){
         //return $this->find('grp_event_id='.$grpEventId.' AND evaluator='.$evaluator.' AND evaluatee='.$evaluatee);
-        return $this->find('first', array(
+    	$eval = $this->find('first', array(
             'conditions' => array('grp_event_id' =>$grpEventId, 'evaluator' => $evaluator, 'evaluatee' => $evaluatee)
         ));
+        return $eval; 
     }
 
     // gets Mixeval evaluation result for a specific assignment and evaluator

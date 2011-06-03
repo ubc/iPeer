@@ -294,7 +294,6 @@ class EvaluationsController extends AppController
 
   function test($groupEventId, $userId) {
       $subScore = $this->EvaluationMixeval->getResultsDetailByEvaluatee($groupEventId, $userId);
-      //var_dump($subScore[0]);
       exit;
   }
 
@@ -411,8 +410,6 @@ function validSimpleEvalComplete ($params=null)
 
 function makeSurveyEvaluation ($param = null) {
 
-              //var_dump($this->params);
-
       $this->autoRender = false;
       //print_r($this->params);
       $tok = strtok($param, ';');
@@ -459,12 +456,10 @@ function makeSurveyEvaluation ($param = null) {
 
       } else {
           $courseId = $this->params['form']['course_id'];
-                      //var_dump($this->params);
           if (!$this->validSurveyEvalComplete($this->params))  {
               $this->set('errmsg', 'validSurveyEvalCompleten failure.');
               //$this->redirect('/evaluations/makeSurveyEvaluation/'.$eventId);
           }
-          //var_dump($this->params);
           if ($this->EvaluationSurveyHelper->saveSurveyEvaluation($this->params)) {
               $this->redirect('/home/index/Your survey was submitted successfully.');
           } else {
@@ -614,7 +609,7 @@ function makeSurveyEvaluation ($param = null) {
           $this->set('courseId', $courseId);
           $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers');
           $mixEvalDetail = $this->EvaluationMixevalHelper->loadMixEvaluationDetail($event);
-          $this->set('view_data', $this->MixevalHelper->compileViewData($mixEvalDetail['mixeval']));
+          $this->set('view_data', $this->MixevalHelper->compileViewDataShort($mixEvalDetail['mixeval']));
           $this->set('data', $mixEvalDetail['mixeval']);
           $this->set('groupMembers', $mixEvalDetail['groupMembers']);
           $this->set('evaluateeCount', $mixEvalDetail['evaluateeCount']);
@@ -627,10 +622,11 @@ function makeSurveyEvaluation ($param = null) {
           $courseId = $this->params['form']['course_id'];
           $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
           if (!$this->validMixevalEvalComplete($this->params['form'])) {
+       
               $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
           }
 
-          if ($this->EvaluationMixevalHelper->saveMixevalEvaluation($this->params)) {
+          if ($this->EvaluationMixevalHelper->saveMixevalEvaluation($this->params)) {        		
               $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
           }
           //Found error
@@ -753,7 +749,7 @@ function makeSurveyEvaluation ($param = null) {
     case 3: // View Survey
       $studentId = $groupId;
       $formattedResult = $this->EvaluationSurveyHelper->formatSurveyEvaluationResult($event,$studentId);
-
+      
       $this->set('survey_id', $formattedResult['survey_id']);
       $this->set('answers', $formattedResult['answers']);
       $this->set('questions', $formattedResult['questions']);
