@@ -321,7 +321,7 @@ class EvaluationsController extends AppController
 
   function makeSimpleEvaluation ($param = null) {
       $this->autoRender = false;
-              $tok = strtok($param, ';');
+      $tok = strtok($param, ';');
       $eventId = $tok;
       $group_Events = $this->GroupEvent->getGroupEventByEventId($eventId);
       $groupId;
@@ -350,12 +350,11 @@ class EvaluationsController extends AppController
           //Get Members for this evaluation
           $groupMembers = $this->GroupsMembers->getEventGroupMembers($groupId, $event['Event']['self_eval']	,
                                                       $userId);
-                      //var_dump($groupMembers);
           $this->set('groupMembers', $groupMembers);
 
           // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
-          $numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find(count,'group_id='.$event['group_id']) :
-                                          $this->GroupsMembers->find('count','group_id='.$event['group_id']) - 1;
+          $numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find('count', array('conditions'=>array('group_id'=>$event['group_id']))) :
+                                          $this->GroupsMembers->find('count',array('conditions'=>array('group_id'=>$event['group_id']))) - 1;                                          
           $simpleEvaluation = $this->SimpleEvaluation->find('id='.$event['Event']['template_id']);
           $remaining = $simpleEvaluation['SimpleEvaluation']['point_per_member'] * $numMembers;
           //          if($in['points']) $out['points']=$in['points']; //saves previous points
@@ -385,12 +384,11 @@ class EvaluationsController extends AppController
 
           //Get the target event submission
           $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'],
-                                                                                          $evaluator);
+                                                                                         $evaluator);                                                                                      
           $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
-          if (!$this->validSimpleEvalComplete($this->params)) {
-              $this->redirect('/evaluations/makeSimpleEvaluation');
-          }
-
+          /*if (!$this->validSimpleEvalComplete($this->params)) {
+              $this->redirect('/evaluations/makeSimpleEvaluation/'.$this->params['form']['event_id']);
+          }*/
           if ($this->EvaluationSimpleHelper->saveSimpleEvaluation($this->params, $groupEvent, $evaluationSubmission)) {
               $this->redirect('/home/index/Your Evaluation was submitted successfully.');
           } else {
@@ -407,7 +405,7 @@ class EvaluationsController extends AppController
 function validSimpleEvalComplete ($params=null)
 {
   $status = false;
-
+  
   return $status;
 }
 
@@ -491,6 +489,7 @@ function makeSurveyEvaluation ($param = null) {
           //$msg = strtok(';');
           $event = $this->EvaluationHelper->formatEventObj($eventId, $groupId);
           $rubricId = $event['Event']['template_id'];
+          var_dump($rubricId);
           $data = $this->Rubric->getRubricById($rubricId);
           $this->set('data', $data[0]);
           $this->set('event', $event);
