@@ -17,7 +17,6 @@
     //for loop to display the criteria rows
     
     for($i=0; $i<count($questions); $i++){
-    	
        //Get and set Mixeval Question
     isset($questions[$i])? $mixevalQuestion = $questions[$i]['MixevalsQuestion'] : $mixevalQuestion = null;
     if ($mixevalQuestion !=null && $mixevalQuestion["question_type"]=="S") {
@@ -65,10 +64,9 @@
         echo '<tr><td align="center">';
         echo '<input name="'.$userId.'criteria_points_'.$i.'" type="radio" value="'.$mark_value.'"';
         echo 'onclick="document.evalForm.selected_lom_'.$userId.'_'.$i.".value=".$j.'" ';
-		
         if (isset($evaluation)) {
-          if (isset($evaluation['EvaluationDetail'][$i-1]['EvaluationMixevalDetail']['selected_lom']) &&
-                    $evaluation['EvaluationDetail'][$i-1]['EvaluationMixevalDetail']['selected_lom'] == $j) {
+          if (isset($evaluation['EvaluationDetail'][$i]['EvaluationMixevalDetail']['selected_lom']) &&
+                    $evaluation['EvaluationDetail'][$i]['EvaluationMixevalDetail']['selected_lom'] == $j) {
                         echo " checked ";
           }
         } else {

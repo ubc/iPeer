@@ -622,7 +622,6 @@ function makeSurveyEvaluation ($param = null) {
           $courseId = $this->params['form']['course_id'];
           $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
           if (!$this->validMixevalEvalComplete($this->params['form'])) {
-       
               $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
           }
 

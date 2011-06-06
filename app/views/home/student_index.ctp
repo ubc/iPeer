@@ -18,11 +18,10 @@
   	<?php $i = '0';?>
 	  <?php
 	  foreach($data as $row): isset($row['comingEvent'])? $comingUpEvent = $row['comingEvent']: $comingUpEvent = null;
-
 	 if(!empty($row['comingEvent']['Event']['release_date_end'])) { 
 	 	$releaseEndDate = strtotime( $row['comingEvent']['Event']['release_date_end']);}	    
 	  $currentDate = strtotime('NOW');
-	    if (isset($comingUpEvent['Event']['id']) && $currentDate<=$releaseEndDate) {?>
+	    if (isset($comingUpEvent['Event']['id']) && $currentDate<=$releaseEndDate && !isset($row['eventSubmitted'])) {?>
 		  <tr class="tablecell">
 			<td>
 			  <?php if ($comingUpEvent['Event']['event_template_type_id'] == 1):?>
