@@ -44,10 +44,8 @@ class EvaluationsController extends AppController
                     'Question','Response','Survey','SurveyInput','Course','MixevalsQuestion',
                     'EvaluationMixeval','EvaluationMixevalDetail');
   var $components = array( 'Auth','AjaxList', 'rdAuth','Output','sysContainer',
-                          'globalConstant', 'userPersonalize','framework',
-                          'EvaluationResult', 'Evaluation', 'EvaluationRubricHelper', 
-                          'EvaluationSimpleHelper', 'RubricHelper','EvaluationSurveyHelper',
-                          'MixevalHelper', 'EvaluationMixevalHelper','ExportHelper');
+                          'globalConstant', 'userPersonalize','framework', 'Evaluation',
+                          'RubricHelper', 'MixevalHelper','ExportHelper');
 
   function __construct()
   {
@@ -458,7 +456,7 @@ function makeSurveyEvaluation ($param = null) {
               $this->set('errmsg', 'validSurveyEvalCompleten failure.');
               //$this->redirect('/evaluations/makeSurveyEvaluation/'.$eventId);
           }
-          if ($this->EvaluationSurveyHelper->saveSurveyEvaluation($this->params)) {
+          if ($this->Evaluation->saveSurveyEvaluation($this->params)) {
               $this->redirect('/home/index/Your survey was submitted successfully.');
           } else {
               echo "<h1>Hello!</h1>";
@@ -745,7 +743,7 @@ function makeSurveyEvaluation ($param = null) {
 
     case 3: // View Survey
       $studentId = $groupId;
-      $formattedResult = $this->EvaluationSurveyHelper->formatSurveyEvaluationResult($event,$studentId);
+      $formattedResult = $this->Evaluation->formatSurveyEvaluationResult($event,$studentId);
       
       $this->set('survey_id', $formattedResult['survey_id']);
       $this->set('answers', $formattedResult['answers']);
@@ -756,7 +754,7 @@ function makeSurveyEvaluation ($param = null) {
       break;
 
     case 4:  //View Mix Evaluation
-          $formattedResult = $this->EvaluationMixevalHelper->formatMixevalEvaluationResult($event, $displayFormat);
+          $formattedResult = $this->Evaluation->formatMixevalEvaluationResult($event, $displayFormat);
           $this->set('mixeval', $formattedResult['mixeval']);
           if (isset($formattedResult['groupMembers'])) $this->set('groupMembers', $formattedResult['groupMembers']);
           if (isset($formattedResult['reviewEvaluations'])) $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);
@@ -788,7 +786,7 @@ function makeSurveyEvaluation ($param = null) {
       $surveyId = strtok($params,';');
       $surveyGroupId = strtok(';');
 
-      $formattedResult = $this->EvaluationSurveyHelper->formatSurveyGroupEvaluationResult($surveyId,$surveyGroupId);
+      $formattedResult = $this->Evaluation->formatSurveyGroupEvaluationResult($surveyId,$surveyGroupId);
 
       $this->set('questions', $formattedResult);
       $this->render('view_survey_summary');
@@ -842,7 +840,7 @@ function makeSurveyEvaluation ($param = null) {
               break;
 
           case 3: //View Survey Result
-              $formattedResult = $this->EvaluationSurveyHelper->formatSurveyEvaluationResult($event);
+              $formattedResult = $this->Evaluation->formatSurveyEvaluationResult($event);
               $this->set('survey_id', $result['survey_id']);
               $this->set('answers', $result['answers']);
               $this->set('questions', $result['questions']);
@@ -851,7 +849,7 @@ function makeSurveyEvaluation ($param = null) {
               break;
 
           case 4: //View Mix Evaluation Result
-              $formattedResult = $this->EvaluationMixevalHelper->formatMixevalEvaluationResult($event, 'Detail', 1);
+              $formattedResult = $this->Evaluation->formatMixevalEvaluationResult($event, 'Detail', 1);
               $this->set('mixeval', $formattedResult['mixeval']);
               if (isset($formattedResult['groupMembers'])) $this->set('groupMembers', $formattedResult['groupMembers']);
               if (isset($formattedResult['reviewEvaluations'])) $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);
@@ -1191,7 +1189,7 @@ function reReleaseEvaluation ()
 function viewSurveySummary($surveyId=null) {
   $this->layout = 'pop_up';
 
-  $formattedResult = $this->EvaluationSurveyHelper->formatSurveyEvaluationSummary($surveyId);
+  $formattedResult = $this->Evaluation->formatSurveyEvaluationSummary($surveyId);
 
  // $this->set('survey_id', $formattedResult['survey_id']);
   //$this->set('answers', $formattedResult['answers']);
