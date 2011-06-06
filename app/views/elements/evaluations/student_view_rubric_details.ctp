@@ -1,5 +1,5 @@
 <?php
-$gradeReleased = isset($currentUser['id'])? $scoreRecords[$currentUser['id']]['grade_released']: 1;
+$gradeReleased = isset($currentUser['id'])? $scoreRecords['group_criteria_ave']: 1;
 $commentReleased = isset($scoreRecords[$currentUser['id']])? $scoreRecords[$currentUser['id']]['comment_released']: 1;
 $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
 
@@ -34,7 +34,7 @@ if (!$gradeReleased && !$commentReleased) {
        echo "<td width='15%'>".$currentUser['first_name'].' '.$currentUser['last_name']."</td>";
      } else {
         $member = $membersAry[$memberRubric['evaluatee']];
-        echo "<td width='15%'>".$member['U']['first_name'].' '.$member['U']['last_name']."</td>";
+        echo "<td width='15%'>".$member['User']['first_name'].' '.$member['User']['last_name']."</td>";
      }
 
      $resultDetails = $memberRubric['details'];

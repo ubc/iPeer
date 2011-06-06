@@ -439,7 +439,6 @@ function makeSurveyEvaluation ($param = null) {
           $tmp = $this->Question->fillQuestion($tmp);
           $tmp = $this->Response->fillResponse($tmp);
           $result = null;
-          
           // Sort the resultant array by question number
           $count = 1;
           for( $i=0; $i<=$tmp['count']; $i++ ){
@@ -804,7 +803,7 @@ function makeSurveyEvaluation ($param = null) {
       $eventId = $tok;
       $groupId = strtok(';');
 
-      //Setup CurrentUser Info
+      //Setup current user Info
       $currentUser = $this->User->getCurrentLoggedInUser();
       $this->set('currentUser', $currentUser);
 
@@ -819,7 +818,7 @@ function makeSurveyEvaluation ($param = null) {
 
       //Get Group Event
       $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($event['Event']['id'], $event['group_id']);
-
+      
       switch ($event['Event']['event_template_type_id'])
       {
           case 1: //View Simple Evaluation Result
@@ -829,7 +828,7 @@ function makeSurveyEvaluation ($param = null) {
               break;
 
           case 2: //View Rubric Evaluation Result
-              $formattedResult = $this->EvaluationRubricHelper->formatRubricEvaluationResult($event, 'Detail', 1);
+              $formattedResult = $this->EvaluationRubricHelper->formatRubricEvaluationResult($event, 'Detail', 1, $currentUser);
               $this->set('rubric', $formattedResult['rubric']);
               if (isset($formattedResult['groupMembers'])) $this->set('groupMembers', $formattedResult['groupMembers']);
               if (isset($formattedResult['reviewEvaluations'])) $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);

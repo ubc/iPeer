@@ -41,7 +41,7 @@ class EvaluationRubric extends AppModel
 	function getResultsByEvaluator($grpEventId=null, $evaluator=null) {
             //return $this->find('all','grp_event_id='.$grpEventId.' AND evaluator='.$evaluator, null, 'evaluatee ASC');
             return $this->find('all', array(
-                'conditions' => array('grp_event)id' => $grpEventId, 'evaluator' => $evaluator),
+                'conditions' => array('grp_event_id' => $grpEventId, 'evaluator' => $evaluator),
                 'order' => 'evaluatee ASC'
             ));
 	}

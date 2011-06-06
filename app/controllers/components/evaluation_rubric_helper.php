@@ -396,7 +396,7 @@ class EvaluationRubricHelperComponent extends Object
   	$this->GroupEvent->save($groupEvent);
   }
 
-	function formatRubricEvaluationResult($event=null, $displayFormat='', $studentView=0)
+	function formatRubricEvaluationResult($event=null, $displayFormat='', $studentView=0, $currentUser)
 	{
 	  $this->Rubric = new Rubric;
 	  $this->User = new User;
@@ -419,11 +419,11 @@ class EvaluationRubricHelperComponent extends Object
      if ($studentView) {
 
        $this->User->id = $this->rdAuth->id;
-
+       
        $user = $this->User->read();
        $rubricResultDetail = $this->getRubricResultDetail($event, $user);
        $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'],$currentUser['id']);
-
+       
        $membersAry = array();
        foreach ($groupMembers as $member) {
         $membersAry[$member['User']['id']] = $member;
