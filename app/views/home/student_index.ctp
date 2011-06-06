@@ -18,7 +18,9 @@
   	<?php $i = '0';?>
 	  <?php
 	  foreach($data as $row): isset($row['comingEvent'])? $comingUpEvent = $row['comingEvent']: $comingUpEvent = null;
-	  $releaseEndDate = strtotime( $row['comingEvent']['Event']['release_date_end']);	    
+
+	 if(!empty($row['comingEvent']['Event']['release_date_end'])) { 
+	 	$releaseEndDate = strtotime( $row['comingEvent']['Event']['release_date_end']);}	    
 	  $currentDate = strtotime('NOW');
 	    if (isset($comingUpEvent['Event']['id']) && $currentDate<=$releaseEndDate) {?>
 		  <tr class="tablecell">
