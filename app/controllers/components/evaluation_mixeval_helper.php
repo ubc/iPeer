@@ -306,8 +306,10 @@ class EvaluationMixevalHelperComponent extends Object
 
                 }
             }	else {
-                foreach ($groupMembers as $user) {
+         //  	var_dump($groupMembers);
+                foreach ($groupMembers['Group'] as $user) {
                     if (!empty($user)) {
+                    	
                         // The array's format varries. Sometime a sub-array [0] is present
                         $id = !empty($user['id']) ? $user['id'] : $user['User']['id'];
                         $matrix[$index][$id] = 'n/a';
@@ -412,20 +414,22 @@ class EvaluationMixevalHelperComponent extends Object
      //Get Members for this evaluation
      if ($studentView) {
 
-       $this->User->id = $this->rdAuth->id;
+       $this->User->id = $this->Auth->user('id');
 
        $user = $this->User->read();
+
        $mixevalResultDetail = $this->getMixevalResultDetail($event, $user);
-       $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event[0]['events']['self_eval'],
+       $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'],
                                                                  $currentUser['id']);
        $membersAry = array();
+    //   var_dump($groupMembers);
        foreach ($groupMembers as $member) {
-        $membersAry[$member['U']['id']] = $member;
+        $membersAry[$member['User']['id']] = $member;
        }
        $result['groupMembers'] = $membersAry;
 
        $reviewEvaluations = $this->getStudentViewMixevalResultDetailReview($event,
-                                                                          $this->rdAuth->id);
+                                                                          $this->Auth->user('id'));
 		   $result['reviewEvaluations'] = $reviewEvaluations;
 
      } else {
