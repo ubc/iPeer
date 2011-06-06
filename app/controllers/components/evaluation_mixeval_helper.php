@@ -30,7 +30,7 @@ class EvaluationMixevalHelperComponent extends Object
        for ($i = 0; $i<count($groupMembers); $i++) {
        $targetEvaluatee = $groupMembers[$i]['User']['id'];
        $evaluation = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee($event['group_event_id'],
-                                                                                            $evaluator, $targetEvaluatee);                                                                                                                                         
+                                                                                            $evaluator, $targetEvaluatee);                                                                                                                
        if (!empty($evaluation)) {
          $groupMembers[$i]['User']['Evaluation'] = $evaluation;
          $groupMembers[$i]['User']['Evaluation']['EvaluationDetail'] = $this->EvaluationMixevalDetail->getAllByEvalMixevalId
@@ -46,8 +46,8 @@ class EvaluationMixevalHelperComponent extends Object
     $result['mixeval'] = $this->Mixeval->read();
 
  		// enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
- 		$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find('count','group_id='.$event['group_id']) :
- 		                                           $this->GroupsMembers->find('count','group_id='.$event['group_id']) - 1;
+ 		$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find('count', array('conditions'=>(array ('group_id' => $event['group_id'])))) :
+ 		                                           $this->GroupsMembers->find('count',array('conditions'=>(array ('group_id' => $event['group_id'])))) - 1;
 		//$this->set('evaluateeCount', $numMembers);
 		$result['evaluateeCount'] = $numMembers;
 
@@ -117,7 +117,7 @@ class EvaluationMixevalHelperComponent extends Object
     $isCheckBoxes = false;
     $totalGrade = 0;
     $pos = 0;
-    for($i=1; $i < $mixeval['Mixeval']['total_question']; $i++) {
+    for($i=0; $i < $mixeval['Mixeval']['total_question']; $i++) {
 
   		$evalMixevalDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera($evalMixevalId, $i);
       if (isset($evalMixevalDetail)) {
@@ -129,8 +129,8 @@ class EvaluationMixevalHelperComponent extends Object
 
       if ($form['data']['Mixeval']['question_type'.$i] == 'S') {
       			// get total possible grade for the question number ($i)
-      		$selectedLom = $form['form']['selected_lom_'.$targetEvaluatee.'_'.($i-1)];
-    		$grade = $form['form'][$targetEvaluatee.'criteria_points_'.($i-1)];
+      		$selectedLom = $form['form']['selected_lom_'.$targetEvaluatee.'_'.$i];
+    		$grade = $form['form'][$targetEvaluatee.'criteria_points_'.$i];
         $evalMixevalDetail['EvaluationMixevalDetail']['selected_lom'] = $selectedLom;
         $evalMixevalDetail['EvaluationMixevalDetail']['grade'] = $grade;
     		$totalGrade += $grade;

@@ -28,8 +28,17 @@ class EvaluationBase extends AppModel {
     if (empty($this->data[$this->name]['id']) && !$this->__checkDuplicateName()) {
       return false;
     }
-    
        //check if questions are entered
+    //   var_dump($this->data['Question']);
+    if(!empty($this->data['Question'])&&$this->name =='Mixeval') {
+     foreach ($this->data['Question'] as $row) {
+    	 if ($row['question_type']== 'S' &&(empty($row['Description'] ) || (count($row['Description'])) < 2)) {
+    	 	$this->errorMessage = "Please add at least two descriptors for each of the Lickert questions.";
+    	 	 return false;
+    	 }
+     }
+    }
+    
     if(empty($this->data['Question'])&&($this->name =='Mixeval')){
        $this->errorMessage = "Please add at least one question for this " . $this->name . ".";
        return false;

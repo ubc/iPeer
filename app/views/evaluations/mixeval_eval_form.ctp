@@ -7,7 +7,8 @@
 <?php echo $html->script('ricopanelcontainer')?>
 <?php echo $html->script('ricoaccordion')?>
 
-	<?php echo empty($data['Evaluation']['id']) ? null : $html->hidden('Evaluation.id'); ?>
+	<?php 
+	echo empty($data['Evaluation']['id']) ? null : $html->hidden('Evaluation.id'); ?>
     <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeMixevalEvaluation'); echo '/'.$event['Event']['id'].';'.$event['group_id']; ?>">
       <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
       <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>"/>
@@ -152,7 +153,6 @@
       $count++;
     }
   }
-
     $mustCompleteUsers = ($count != $evaluateeCount);
 
 
@@ -184,9 +184,8 @@
             }
         }
     }
-
   if (!$mustCompleteUsers && !$commentsNeeded) {
-     echo $html->submit('Submit to Complete the Evaluation', array('onClick' => "javascript:return confirm('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?')"));
+     echo $form->submit('Submit to Complete the Evaluation', array('onClick' => "javascript:return confirm('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?')"));
   }
   else {
     echo $form->submit('Submit to Complete the Evaluation', array('disabled'=>'true')); echo "<br />";

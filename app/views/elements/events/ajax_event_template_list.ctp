@@ -20,7 +20,7 @@
   			<?php endforeach; ?>
   		</select>-->
                 <?php 
-                  echo $this->Form->input('Event.event_template_id', array(
+                  echo $this->Form->input('Event.template_id', array(
                   'type' => 'select',
                   'id' => 'template_id',
                   'style' => 'width:200px;',

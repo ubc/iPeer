@@ -15,7 +15,6 @@
     echo "</tr>";
     $pos = 1;
     //for loop to display the criteria rows
-    
     for($i=0; $i<count($questions); $i++){
        //Get and set Mixeval Question
     isset($questions[$i])? $mixevalQuestion = $questions[$i]['MixevalsQuestion'] : $mixevalQuestion = null;
@@ -43,7 +42,7 @@
   
       echo $pos. ': &nbsp &nbsp '. $mixevalQuestion['title']; 
       echo '</td></tr>';
-      echo $form->hidden('Mixeval.question_type'.$pos, array('value'=>'S'));      
+      echo $form->hidden('Mixeval.question_type'.($pos-1), array('value'=>'S'));      
       
         //for loop to display the criteria comment cells for each LOM
       isset($mixevalQuestion['multiplier']) ? $multiplier = $mixevalQuestion['multiplier'] : $multiplier = 1;
@@ -136,7 +135,7 @@
                         echo '<font color="red"> * </font>';
                       }
                    } ?> <br>
-                  <?php echo $form->hidden('Mixeval.question_type'.$pos, array('value'=>'T')); ?>
+                  <?php echo $form->hidden('Mixeval.question_type'.($pos-1), array('value'=>'T')); ?>
                 </td>
               </tr>
               <?php if (!$evaluate) { ?>
@@ -164,11 +163,12 @@
             <?php if ($evaluate) :?>
             <tr><td colspan="2" align='left' >
                   <?php
-                   if (isset($mixevalQuestion['response_type']) && $mixevalQuestion['response_type']=='L') {?>
+                    if (isset($mixevalQuestion['response_type']) && $mixevalQuestion['response_type']=='L') {?>
                      <?php
+              
                      $text = isset($evaluation['EvaluationDetail'][$pos-1]['EvaluationMixevalDetail']['question_comment'])? $evaluation['EvaluationDetail'][$pos-1]['EvaluationMixevalDetail']['question_comment']:'';
 					// $Output->br2nl($text);
-                     echo $text;
+                   
                       ?>
                      <textarea name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['question_num']?>" cols="80" rows="10"><?php echo $text?></textarea>
                      <br />Maximum 65535 characters.
@@ -197,7 +197,7 @@
     ?>
   <tr>
     <td colspan="3" align="center">
-<?php echo $form->hidden('Mixeval.total_question', array('value'=>$pos));?>
+<?php echo $form->hidden('Mixeval.total_question', array('value'=>($pos-1)));?>
 <?php if (!$evaluate) :?>
     <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
 <?php endif; ?>

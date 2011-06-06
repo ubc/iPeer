@@ -17,12 +17,14 @@ class EvaluationMixevalDetail extends AppModel
 //	    $sql .= ' AND question_number='.$question;
 //	  }
 //		return $this->find($sql);
+
             $conditions = array('evaluation_mixeval_id' => $MixevalId);
             if ($question != null)
-                $conditions = array('question_number' => $question);
+                $conditions['question_number'] = $question;
             return $this->find('first', array(
                 'conditions' => $conditions
             ));
+            
 	}
 	
 	function getAllByEvalMixevalId($MixevalId=null, $question=null){
@@ -33,9 +35,9 @@ class EvaluationMixevalDetail extends AppModel
 //		return $this->find('all',$sql);
           $conditions = array('evaluation_mixeval_id' => $MixevalId);
             if ($question != null)
-                $conditions = array('question_number' => $question);
+                 $conditions['question_number'] = $question;
             return $this->find('all', array(
-                'conditions' => $conditions
+                'conditions' => $conditions, 'order'=>'question_number'
             ));
 	}	
 }
