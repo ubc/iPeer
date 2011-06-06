@@ -532,19 +532,19 @@ $forsave =array();
         {
           $default = 'Default Simple Evaluation';
           $model = 'SimpleEvaluation';
-          $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->rdAuth->id);
+          $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'));
         }
         else if ($templateId == 2)
         {
           $default = 'Default Rubric';
           $model = 'Rubric';
-		      $eventTemplates = $this->Rubric->getBelongingOrPublic($this->rdAuth->id);
+		      $eventTemplates = $this->Rubric->getBelongingOrPublic($this->Auth->user('id'));
         }
         else if ($templateId == 4)
         {
           $default = 'Default Mixed Evaluation';
           $model = 'Mixeval';
-		      $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->rdAuth->id);
+		      $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'));
         }
 
       }
@@ -663,19 +663,19 @@ $forsave =array();
         {
           $default = 'Default Simple Evaluation';
           $model = 'SimpleEvaluation';
-          $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->rdAuth->id);
+          $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'));
         }
         else if ($templateId == 2)
         {
           $default = 'Default Rubric';
           $model = 'Rubric';
-		      $eventTemplates = $this->Rubric->getBelongingOrPublic($this->rdAuth->id);
+		      $eventTemplates = $this->Rubric->getBelongingOrPublic($this->Auth->user('id'));
         }
         else if ($templateId == 4)
         {
           $default = 'Default Mixed Evaluation';
           $model = 'Mixeval';
-		      $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->rdAuth->id);
+		      $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'));
         }
 
       }
@@ -748,7 +748,7 @@ $forsave =array();
       $conditions = 'course_id = '.$courseId;
 
       if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-      	$personalizeData = $this->Personalize->find('all','user_id = '.$this->rdAuth->id);
+      	$personalizeData = $this->Personalize->find('all','user_id = '.$this->Auth->user('id'));
       	if ($personalizeData) {
       	   $this->userPersonalize->setPersonalizeList($personalizeData);
            $this->show = $this->userPersonalize->getPersonalizeValue('Event.ListMenu.Limit.Show');
@@ -861,7 +861,7 @@ $forsave =array();
 	function update($attributeCode='',$attributeValue='')
   {
 		if ($attributeCode != '' && $attributeValue != '') //check for empty params
-  		$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
+  		$this->params['data'] = $this->Personalize->updateAttribute($this->Auth->user('id'), $attributeCode, $attributeValue);
   }
 }
 ?>

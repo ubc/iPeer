@@ -466,7 +466,7 @@ class SurveysController extends AppController
 
 	function update($attributeCode='',$attributeValue='') {
 		if ($attributeCode != '' && $attributeValue != '') //check for empty params
-  		$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
+  		$this->params['data'] = $this->Personalize->updateAttribute($this->Auth->user('id'), $attributeCode, $attributeValue);
 	}
 }
 

@@ -117,12 +117,10 @@ class GroupsMembers extends AppModel
    * @return <type> Boolean value whether the user is in the group or not
    */
   function checkMembershipInGroup($groupId, $userId){
-    $sql = "SELECT id
-            FROM groups_members
-            WHERE group_id=$groupId AND user_id=$userId";
-    $id = $this->query($sql);
-    if($id==null)return false;
-    else return true;
+    return $this->find('count', array(
+        'conditions' => array('GroupsMembers.group_id' => $groupId,
+            'GroupsMembers.user_id' => $userId)
+    ));
   }
 }
 

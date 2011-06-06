@@ -55,7 +55,7 @@ class LoginoutController extends AppController
 		$this->set('admin_email', $admin_email);
 
 		//RENDER VIEW IF USER IS LOGGED IN
-		if($this->rdAuth->id && $this->rdAuth->role)
+		if($this->Auth->user('id') && $this->Auth->user('role'))
 		{
 			$redirect = 'home/index/';
 			$this->redirect($redirect);
@@ -115,7 +115,7 @@ class LoginoutController extends AppController
 		$this->set('admin_email', $admin_email);
 
 		//RENDER VIEW IF USER IS LOGGED IN
-		if($this->rdAuth->id && $this->rdAuth->role) {
+		if($this->Auth->user('id') && $this->Auth->user('role')) {
 			$redirect = 'home/index/';
 			$this->redirect($redirect);
 			exit;

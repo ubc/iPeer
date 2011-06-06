@@ -229,7 +229,7 @@ class EvaluationsController extends AppController
     $courseId = $this->rdAuth->courseId;
     $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > List Evaluation Results');
 
-    $personalizeData = $this->Personalize->find('all', 'user_id = '.$this->rdAuth->id);
+    $personalizeData = $this->Personalize->find('all', 'user_id = '.$this->Auth->user('id'));
     $this->userPersonalize->setPersonalizeList($personalizeData);
     if ($personalizeData && $this->userPersonalize->inPersonalizeList('Eval.ListMenu.Limit.Show')
             && $this->userPersonalize->getPersonalizeValue('Eval.ListMenu.Limit.Show') != 'null') {
@@ -264,7 +264,7 @@ class EvaluationsController extends AppController
 
       $this->layout = 'ajax';
       if ($this->show == 'null') { //check for initial page load, if true, load record limit from db
-          $personalizeData = $this->Personalize->find('all', 'user_id = '.$this->rdAuth->id);
+          $personalizeData = $this->Personalize->find('all', 'user_id = '.$this->Auth->user('id'));
           if ($personalizeData) {
               $this->userPersonalize->setPersonalizeList($personalizeData);
               $this->show = $this->userPersonalize->getPersonalizeValue('Eval.ListMenu.Limit.Show');
@@ -289,7 +289,7 @@ class EvaluationsController extends AppController
 
   function update($attributeCode='',$attributeValue='') {
       if ($attributeCode != '' && $attributeValue != '') //check for empty params
-        $this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
+        $this->params['data'] = $this->Personalize->updateAttribute($this->Auth->user('id'), $attributeCode, $attributeValue);
   }
 
 
@@ -323,12 +323,12 @@ class EvaluationsController extends AppController
       $this->autoRender = false;
       $tok = strtok($param, ';');
       $eventId = $tok;
-      $group_Events = $this->GroupEvent->getGroupEventByEventId($eventId);
+      $group_events = $this->GroupEvent->getGroupEventByEventId($eventId);
       $groupId;
-      $userId=$this->Auth->user('id');
-      foreach($group_Events as $events){
-               if($this->GroupsMembers->checkMembershipInGroup($events['group_events']['group_id'],$userId));
-                      $groupId=$events['group_events']['group_id'];
+      $userId=$this->Auth->user('id'); 
+      foreach($group_events as $events){
+         if($this->GroupsMembers->checkMembershipInGroup($events['group_events']['group_id'],$userId) !== 0)
+            $groupId=$events['group_events']['group_id'];
       }
       if (empty($this->params['data'])) {
           //Get the target event
@@ -348,8 +348,7 @@ class EvaluationsController extends AppController
 
 
           //Get Members for this evaluation
-          $groupMembers = $this->GroupsMembers->getEventGroupMembers($groupId, $event['Event']['self_eval']	,
-                                                      $userId);
+          $groupMembers = $this->GroupsMembers->getEventGroupMembers($groupId, $event['Event']['self_eval'],$userId);
           $this->set('groupMembers', $groupMembers);
 
           // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
@@ -389,7 +388,7 @@ class EvaluationsController extends AppController
           /*if (!$this->validSimpleEvalComplete($this->params)) {
               $this->redirect('/evaluations/makeSimpleEvaluation/'.$this->params['form']['event_id']);
           }*/
-          if ($this->EvaluationSimpleHelper->saveSimpleEvaluation($this->params, $groupEvent, $evaluationSubmission)) {
+          if ($this->Evaluation->saveSimpleEvaluation($this->params, $groupEvent, $evaluationSubmission)) {
               $this->redirect('/home/index/Your Evaluation was submitted successfully.');
           } else {
               //Found error
@@ -506,7 +505,7 @@ function makeSurveyEvaluation ($param = null) {
 
           $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers');
 
-          $rubricDetail = $this->EvaluationRubricHelper->loadRubricEvaluationDetail($event, $groupId);
+          $rubricDetail = $this->Evaluation->loadRubricEvaluationDetail($event, $groupId);
           $this->set('rubric', $rubricDetail['rubric']);
           $this->set('groupMembers', $rubricDetail['groupMembers']);
           $this->set('evaluateeCount', $rubricDetail['evaluateeCount']);
@@ -522,7 +521,7 @@ function makeSurveyEvaluation ($param = null) {
           if (!$this->validRubricEvalComplete($this->params['form'])) {
               $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
           }
-          if ($this->EvaluationRubricHelper->saveRubricEvaluation($this->params)) {
+          if ($this->Evaluation->saveRubricEvaluation($this->params)) {
               $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
           }
           //Found error
@@ -607,7 +606,7 @@ function makeSurveyEvaluation ($param = null) {
           $courseId = $event['Event']['course_id'];
           $this->set('courseId', $courseId);
           $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers');
-          $mixEvalDetail = $this->EvaluationMixevalHelper->loadMixEvaluationDetail($event);
+          $mixEvalDetail = $this->Evaluation->loadMixEvaluationDetail($event);
           $this->set('view_data', $this->MixevalHelper->compileViewDataShort($mixEvalDetail['mixeval']));
           $this->set('data', $mixEvalDetail['mixeval']);
           $this->set('groupMembers', $mixEvalDetail['groupMembers']);
@@ -624,7 +623,7 @@ function makeSurveyEvaluation ($param = null) {
               $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
           }
 
-          if ($this->EvaluationMixevalHelper->saveMixevalEvaluation($this->params)) {        		
+          if ($this->Evaluation->saveMixevalEvaluation($this->params)) {        		
               $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
           }
           //Found error
@@ -714,7 +713,7 @@ function makeSurveyEvaluation ($param = null) {
     switch ($event['Event']['event_template_type_id'])
     {
     case 1:  //View Simple Evaluation Result
-        $formattedResult = $this->EvaluationSimpleHelper->formatSimpleEvaluationResult($event);
+        $formattedResult = $this->Evaluation->formatSimpleEvaluationResult($event);
         $this->set('scoreRecords', $formattedResult['scoreRecords']);
         $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
         $this->set('evalResult', $formattedResult['evalResult']);
@@ -726,7 +725,7 @@ function makeSurveyEvaluation ($param = null) {
         break;
 
     case 2: //View Rubric Evaluation
-          $formattedResult = $this->EvaluationRubricHelper->formatRubricEvaluationResult($event, $displayFormat);
+          $formattedResult = $this->Evaluation->formatRubricEvaluationResult($event, $displayFormat);
           $this->set('rubric', $formattedResult['rubric']);
           if (isset($formattedResult['groupMembers'])) $this->set('groupMembers', $formattedResult['groupMembers']);
           if (isset($formattedResult['reviewEvaluations'])) $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);
@@ -822,13 +821,13 @@ function makeSurveyEvaluation ($param = null) {
       switch ($event['Event']['event_template_type_id'])
       {
           case 1: //View Simple Evaluation Result
-              $studentResult = $this->EvaluationSimpleHelper->formatStudentViewOfSimpleEvaluationResult($event);
+              $studentResult = $this->Evaluation->formatStudentViewOfSimpleEvaluationResult($event);
               $this->set('studentResult', $studentResult);
               $this->render('student_view_simple_evaluation_results');
               break;
 
           case 2: //View Rubric Evaluation Result
-              $formattedResult = $this->EvaluationRubricHelper->formatRubricEvaluationResult($event, 'Detail', 1, $currentUser);
+              $formattedResult = $this->Evaluation->formatRubricEvaluationResult($event, 'Detail', 1, $currentUser);
               $this->set('rubric', $formattedResult['rubric']);
               if (isset($formattedResult['groupMembers'])) $this->set('groupMembers', $formattedResult['groupMembers']);
               if (isset($formattedResult['reviewEvaluations'])) $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);
@@ -934,18 +933,18 @@ function makeSurveyEvaluation ($param = null) {
 
     switch ($event['Event']['event_template_type_id']) {
       case "1":
-        $this->EvaluationSimpleHelper->changeEvaluationGradeRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus);
+        $this->Evaluation->changeSimpleEvaluationGradeRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus);
       $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId);
       break;
 
       case "2":
-        $this->EvaluationRubricHelper->changeEvaluationGradeRelease($eventId, $groupId, $groupEventId,
+        $this->Evaluation->changeRubricEvaluationGradeRelease($eventId, $groupId, $groupEventId,
                                                                     $evaluateeId, $releaseStatus);
       $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
       break;
 
       case "4":
-        $this->EvaluationMixevalHelper->changeEvaluationGradeRelease($eventId, $groupId, $groupEventId,
+        $this->Evaluation->changeMixevalEvaluationGradeRelease($eventId, $groupId, $groupEventId,
                                                                      $evaluateeId, $releaseStatus);
       $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
       break;
@@ -979,7 +978,7 @@ function makeSurveyEvaluation ($param = null) {
       {
               $groupEventId = $this->params['form']['group_event_id'];
               $evaluatorIds = $this->params['form']['evaluator_ids'];
-              $this->EvaluationSimpleHelper->changeEvaluationCommentRelease ($eventId, $groupId, $groupEventId, $evaluatorIds, $this->params);
+              $this->Evaluation->changeSimpleEvaluationCommentRelease ($eventId, $groupId, $groupEventId, $evaluatorIds, $this->params);
       }
 
           $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId);
@@ -990,7 +989,7 @@ function makeSurveyEvaluation ($param = null) {
       $evaluateeId =  strtok(';');
       $groupEventId = strtok(';');
           $releaseStatus = strtok(';');
-        $this->EvaluationRubricHelper->changeEvaluationCommentRelease($eventId, $groupId,
+        $this->Evaluation->changeRubricEvaluationCommentRelease($eventId, $groupId,
                                                                   $groupEventId, $evaluateeId, $releaseStatus);
           $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
         break;
@@ -1000,7 +999,7 @@ function makeSurveyEvaluation ($param = null) {
       $evaluateeId =  strtok(';');
       $groupEventId = strtok(';');
           $releaseStatus = strtok(';');
-        $this->EvaluationMixevalHelper->changeEvaluationCommentRelease($eventId, $groupId,
+        $this->Evaluation->changeMixevalEvaluationCommentRelease($eventId, $groupId,
                                                                   $groupEventId, $evaluateeId, $releaseStatus);
           $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
         break;

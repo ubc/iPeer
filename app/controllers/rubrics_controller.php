@@ -179,7 +179,7 @@ class RubricsController extends AppController
 
           if ($this->Rubric->save($this->params['data'])) {
             //prepare the data from the form fields in array
-            $this->params['data']['Rubric'] = $this->Rubric->prepData($this->params, $this->rdAuth->id);
+            $this->params['data']['Rubric'] = $this->Rubric->prepData($this->params, $this->Auth->user('id'));
 
             //insert all the rubric data into other associated tables
             $this->RubricsLom->insertLOM($this->Rubric->id, $this->params['data']['Rubric']);
@@ -283,7 +283,7 @@ class RubricsController extends AppController
 
 	function update($attributeCode='',$attributeValue='') {
 		if ($attributeCode != '' && $attributeValue != '') //check for empty params
-  		$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
+  		$this->params['data'] = $this->Personalize->updateAttribute($this->Auth->user('id'), $attributeCode, $attributeValue);
 	}*/
 }
 
