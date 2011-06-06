@@ -360,6 +360,44 @@ class Event extends AppModel
     			WHERE id=$id";
     	return $this->query($sql);
     }
+
+    function formatEventObj ($eventId, $groupId=null)
+    {
+//      //Get the target event
+//      $this->Event = new Event;
+//      $this->Event->id = $eventId;
+//      $event = $this->Event->read();
+//
+//      //Get the group name
+//      if ($groupId != null) {
+//        $this->Group = new Group;
+//        $this->Group->id = $groupId;
+//
+//        $group = $this->Group->read();
+//        $event['group_name'] = 'Group '.$group['Group']['group_num'].' - '.$group['Group']['group_name'];
+//        $event['group_id'] = $group['Group']['id'];
+//
+//        $this->GroupEvent = new GroupEvent;
+//        $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
+//        $event['group_event_id'] = $groupEvent['GroupEvent']['id'];
+//        $event['group_event_marked'] = $groupEvent['GroupEvent']['marked'];
+//      }
+      $this->recursive = 0;
+      $conditions['Event.id'] = $eventId;
+      if($groupId != null)
+        $conditions['Group.id'] = $groupId;
+      
+      $event = $this->find('first', array('conditions' => $conditions));
+
+      //This part can be removed after correcting array indexing on controller and view files
+      if($groupId != null){
+        $event['group_name'] = 'Group '.$event['Group']['group_num']." - ".$event['Group']['group_name'];
+        $event['group_id'] = $event['Group']['id'];
+        $event['group_event_id'] = $event['GroupEvent']['id'];
+        $event['group_event_marked'] = $event['GroupEvent']['marked'];
+      }
+      return $event;
+    }
 }
 
 ?>

@@ -18,7 +18,7 @@ class SearchsController extends AppController
   var $functionCode = 'ADV_SEARCH';
   var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
   var $components = array('Output','sysContainer', 'globalConstant', 'Search',
-      'userPersonalize', 'framework', 'sysContainer', 'EvaluationHelper');
+      'userPersonalize', 'framework', 'sysContainer', 'Evaluation');
   
 	
   function __construct() {
@@ -242,7 +242,7 @@ class SearchsController extends AppController
 
         //Get release status
         $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($event['Event']['id'], $group['Group']['id']);
-        $released = $this->EvaluationHelper->getGroupReleaseStatus($groupEvent);
+        $released = $this->Evaluation->getGroupReleaseStatus($groupEvent);
 
         $assignedGroups[$i]['Group']['complete_status'] = $completeStatus;
         $assignedGroups[$i]['Group']['num_completed'] = $numOfCompletedCount;

@@ -45,7 +45,7 @@ class EvaluationsController extends AppController
                     'EvaluationMixeval','EvaluationMixevalDetail');
   var $components = array( 'Auth','AjaxList', 'rdAuth','Output','sysContainer',
                           'globalConstant', 'userPersonalize','framework',
-                          'EvaluationResult', 'EvaluationHelper', 'EvaluationRubricHelper', 
+                          'EvaluationResult', 'Evaluation', 'EvaluationRubricHelper', 
                           'EvaluationSimpleHelper', 'RubricHelper','EvaluationSurveyHelper',
                           'MixevalHelper', 'EvaluationMixevalHelper','ExportHelper');
 
@@ -333,7 +333,7 @@ class EvaluationsController extends AppController
       if (empty($this->params['data'])) {
           //Get the target event
           $eventId = $this->Sanitize->paranoid($eventId);
-          $event = $this->EvaluationHelper->formatEventObj($eventId, $groupId);
+          $event = $this->Event->formatEventObj($eventId, $groupId);
           $this->set('event', $event);
 
           //Setup the courseId to session
@@ -482,7 +482,7 @@ function makeSurveyEvaluation ($param = null) {
           $eventId = $tok;
           $groupId = strtok(';');
           //$msg = strtok(';');
-          $event = $this->EvaluationHelper->formatEventObj($eventId, $groupId);
+          $event = $this->Event->formatEventObj($eventId, $groupId);
           $rubricId = $event['Event']['template_id'];
           $data = $this->Rubric->getRubricById($rubricId);
           $this->set('data', $data[0]);
@@ -598,7 +598,7 @@ function makeSurveyEvaluation ($param = null) {
           $eventId = $tok;
           $groupId = strtok(';');
           //$msg = strtok(';');
-          $event = $this->EvaluationHelper->formatEventObj($eventId, $groupId);
+          $event = $this->Event->formatEventObj($eventId, $groupId);
           $this->set('event', $event);
 
           $this->set('evaluator_id',$this->Auth->user('id'));
@@ -707,7 +707,7 @@ function makeSurveyEvaluation ($param = null) {
     $this->layout = 'pop_up';
 
     $courseId = $this->rdAuth->courseId;
-    $event = $this->EvaluationHelper->formatEventObj($eventId, $groupId);
+    $event = $this->Event->formatEventObj($eventId, $groupId);
     $this->set('event', $event);
     $this->set('title_for_layout', !empty($event['Event']) ? $this->sysContainer->getCourseName($courseId).' > '.$event['Event']['title']. ' > Results ':'');
 
@@ -809,7 +809,7 @@ function makeSurveyEvaluation ($param = null) {
       $this->set('currentUser', $currentUser);
 
       //Get the target event
-      $event = $this->EvaluationHelper->formatEventObj($eventId, $groupId);
+      $event = $this->Event->formatEventObj($eventId, $groupId);
       $this->set('event', $event);
 
       //Setup the courseId to session

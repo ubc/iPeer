@@ -11,7 +11,7 @@
  */
 class EvaluationSimpleHelperComponent extends Object
 {
-	var $components = array('rdAuth', 'EvaluationHelper', 'EvaluationResult');
+	var $components = array('rdAuth', 'Evaluation', 'EvaluationResult');
 
   function saveSimpleEvaluation($params=null, $groupEvent=null, $evaluationSubmission=null)
   {
@@ -152,7 +152,7 @@ class EvaluationSimpleHelperComponent extends Object
 		//changing grade release status for the GroupEvent
 		$this->GroupEvent->id = $groupEventId;
 		$oppositGradeReleaseCount = $this->EvaluationSimple->getOppositeGradeReleaseStatus($groupEventId, $releaseStatus);
-	  $groupEvent = $this->EvaluationHelper->formatGradeReleaseStatus($this->GroupEvent->read(), $releaseStatus,
+	  $groupEvent = $this->Evaluation->formatGradeReleaseStatus($this->GroupEvent->read(), $releaseStatus,
 	                                                                  $oppositGradeReleaseCount);
 	  $this->GroupEvent->save($groupEvent);
 
@@ -196,11 +196,11 @@ class EvaluationSimpleHelperComponent extends Object
   		//check grade release status for the GroupEvent
   		$oppositCommentReleaseCount = $this->EvaluationSimple->getOppositeCommentReleaseStatus($groupEventId, 1);
   		if ($oppositCommentReleaseCount == 0) {
-  		  $groupEvent = $this->EvaluationHelper->formatCommentReleaseStatus($groupEvent, 1, $oppositCommentReleaseCount);
+  		  $groupEvent = $this->Evaluation->formatCommentReleaseStatus($groupEvent, 1, $oppositCommentReleaseCount);
   		} else {
   		  $oppositCommentReleaseCount = $this->EvaluationSimple->getOppositeCommentReleaseStatus($groupEventId, 0);
   		  if ($oppositCommentReleaseCount == 0) {
-    		  $groupEvent = $this->EvaluationHelper->formatCommentReleaseStatus($groupEvent, 0, $oppositCommentReleaseCount);
+    		  $groupEvent = $this->Evaluation->formatCommentReleaseStatus($groupEvent, 0, $oppositCommentReleaseCount);
     		} else {
     		  $groupEvent['GroupEvent']['comment_release_status'] = "Some";
     		}
@@ -212,7 +212,7 @@ class EvaluationSimpleHelperComponent extends Object
 
   		//changing grade release status for the GroupEvent
   		$oppositCommentReleaseCount = $this->EvaluationSimple->getOppositeCommentReleaseStatus($groupEventId, 1);
-  	  $groupEvent = $this->EvaluationHelper->formatCommentReleaseStatus($groupEvent, 1, $oppositCommentReleaseCount);
+  	  $groupEvent = $this->Evaluation->formatCommentReleaseStatus($groupEvent, 1, $oppositCommentReleaseCount);
 
 
     } else if($params['form']['submit']=='Unrelease All') {
@@ -221,7 +221,7 @@ class EvaluationSimpleHelperComponent extends Object
 
   		//changing grade release status for the GroupEvent
   		$oppositCommentReleaseCount = $this->EvaluationSimple->getOppositeCommentReleaseStatus($groupEventId, 0);
-  	  $groupEvent = $this->EvaluationHelper->formatCommentReleaseStatus($groupEvent, 0, $oppositCommentReleaseCount);
+  	  $groupEvent = $this->Evaluation->formatCommentReleaseStatus($groupEvent, 0, $oppositCommentReleaseCount);
 
     }
   	$this->GroupEvent->save($groupEvent);

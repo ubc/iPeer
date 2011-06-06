@@ -2,7 +2,7 @@
 App::import('Model', 'SurveyQuestion');
 class EvaluationSurveyHelperComponent extends Object
 {
-	var $components = array('Auth', 'Session', 'EvaluationHelper');        
+	var $components = array('Auth', 'Session', 'Evaluation');        
 
     function saveSurveyEvaluation($params=null)
     { 

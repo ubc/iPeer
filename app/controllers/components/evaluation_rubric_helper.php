@@ -11,7 +11,7 @@
  */
 class EvaluationRubricHelperComponent extends Object
 {
-	var $components = array('EvaluationHelper', 'rdAuth');
+	var $components = array('Evaluation', 'rdAuth');
 	
   function loadRubricEvaluationDetail ($event)
   {
@@ -364,7 +364,7 @@ class EvaluationRubricHelperComponent extends Object
 		//changing grade release status for the GroupEvent
 		$this->GroupEvent->id = $groupEventId;
 		$oppositGradeReleaseCount = $this->EvaluationRubric->getOppositeGradeReleaseStatus($groupEventId, $releaseStatus);
-	  $groupEvent = $this->EvaluationHelper->formatGradeReleaseStatus($this->GroupEvent->read(), $releaseStatus,
+	  $groupEvent = $this->Evaluation->formatGradeReleaseStatus($this->GroupEvent->read(), $releaseStatus,
 	                                                                  $oppositGradeReleaseCount);
 	  $this->GroupEvent->save($groupEvent);
 	}
@@ -390,7 +390,7 @@ class EvaluationRubricHelperComponent extends Object
 		//changing comment release status for the GroupEvent
 		$this->GroupEvent->id = $groupEventId;
 		$oppositGradeReleaseCount = $this->EvaluationRubric->getOppositeCommentReleaseStatus($groupEventId, $releaseStatus);
-	  $groupEvent = $this->EvaluationHelper->formatCommentReleaseStatus($this->GroupEvent->read(), $releaseStatus,
+	  $groupEvent = $this->Evaluation->formatCommentReleaseStatus($this->GroupEvent->read(), $releaseStatus,
 	                                                                  $oppositGradeReleaseCount);
 
   	$this->GroupEvent->save($groupEvent);
