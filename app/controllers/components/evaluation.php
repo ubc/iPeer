@@ -8,6 +8,7 @@
  * @license		OPPL
  *
  */
+App::import('Model', 'Mixeval');
 class EvaluationComponent extends Object
 {
   var $uses =  array('Session');

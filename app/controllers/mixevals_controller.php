@@ -36,7 +36,7 @@ class MixevalsController extends AppController
 	var $order;
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $Sanitize;
-	var $components = array('AjaxList','rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework', 'MixevalHelper');
+	var $components = array('AjaxList','rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework');
 
 
 	function __construct() {
@@ -158,7 +158,7 @@ class MixevalsController extends AppController
 		$this->params['data'] = $this->Mixeval->read();
 
 		$this->Output->filter($this->params['data']);
-		$prepare_data = $this->MixevalHelper->compileViewData($this->params['data']);
+		$prepare_data = $this->Mixeval->compileViewData($this->params['data']);
 		$this->set('prepare', $prepare_data);
 	}
 

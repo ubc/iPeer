@@ -129,7 +129,7 @@ class SurveyQuestion extends AppModel
         $save['0']['SurveyQuestion']['number']++;
         $save['1']['SurveyQuestion']['number']--;
 
-        $this->saveAll($save); $this->log($save);
+        $this->saveAll($save); 
       break;
       // Move to BOTTOM case
       case "BOTTOM":
@@ -140,7 +140,7 @@ class SurveyQuestion extends AppModel
         $data = $this->find('first', array(
           'conditions' => array('question_id' => $question_id,'survey_id' => $survey_id)));
         $data['SurveyQuestion']['number'] = '10000';
-        $this->save($data); var_dump($data);
+        $this->save($data);
         $this->reorderQuestions($survey_id);
       break;
       default:

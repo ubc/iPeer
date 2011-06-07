@@ -115,8 +115,6 @@
       $count++;
     }
   }
-	var_dump($count);
-    var_dump($evaluateeCount);
     $mustCompleteUsers = ($count != $evaluateeCount);
     $commentsNeeded = false;
     // Check if any comment fields were left empty.

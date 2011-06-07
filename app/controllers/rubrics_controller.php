@@ -36,7 +36,7 @@ class RubricsController extends AppController
 	var $order;
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $Sanitize;
-  var $components = array('AjaxList','rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework', 'RubricHelper');
+  var $components = array('AjaxList','rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework');
 
 	function __construct()
 	{
@@ -265,7 +265,7 @@ class RubricsController extends AppController
 	
 	function setForm_RubricName($name){
 		$this->data['Rubric']['name'] = $name;
-		$this->log($this->data['Rubric']['name']);
+		//$this->log($this->data['Rubric']['name']);
 	}
 
 /*  function previewRubric()

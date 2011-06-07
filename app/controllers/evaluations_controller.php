@@ -42,10 +42,10 @@ class EvaluationsController extends AppController
                     'GroupsMembers','RubricsLom','RubricsCriteria',
                     'RubricsCriteriaComment', 'Personalize',
                     'Question','Response','Survey','SurveyInput','Course','MixevalsQuestion',
-                    'EvaluationMixeval','EvaluationMixevalDetail');
+                    'EvaluationMixeval','EvaluationMixevalDetail', 'Mixeval');
   var $components = array( 'Auth','AjaxList', 'rdAuth','Output','sysContainer',
-                          'globalConstant', 'userPersonalize','framework', 'Evaluation',
-                          'RubricHelper', 'MixevalHelper','ExportHelper');
+                          'globalConstant', 'userPersonalize','framework', 
+                          'Evaluation', 'ExportHelper');
 
   function __construct()
   {
@@ -489,18 +489,17 @@ function makeSurveyEvaluation ($param = null) {
           $this->rdAuth->setCourseId($courseId);
           //Setup the evaluator_id
           $evaluatorId = $this->Auth->user('id');
-              $this->set('evaluatorId', $evaluatorId);
-              //Setup the fullName of the evaluator
-                      $firstName=$this->Auth->user('first_name');
-                      $lastName =$this->Auth->user('last_name');
-                      $this->set('firstName', $firstName);
-                      $this->set('lastName', $lastName);
-              //Setup the viewData
-              $rubricId = $event['Event']['template_id'];
-                      $rubric = $this->Rubric->getRubricById($rubricId);
-                      $rubricEvalViewData = $this->RubricHelper->compileViewData($rubric);
-                      $this->set('viewData',$rubricEvalViewData);
-
+          $this->set('evaluatorId', $evaluatorId);
+          //Setup the fullName of the evaluator
+          $firstName=$this->Auth->user('first_name');
+          $lastName =$this->Auth->user('last_name');
+          $this->set('firstName', $firstName);
+          $this->set('lastName', $lastName);
+          //Setup the viewData
+          $rubricId = $event['Event']['template_id'];
+          $rubric = $this->Rubric->getRubricById($rubricId);
+          $rubricEvalViewData = $this->Rubric->compileViewData($rubric); 
+          $this->set('viewData',$rubricEvalViewData);
           $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers');
 
           $rubricDetail = $this->Evaluation->loadRubricEvaluationDetail($event, $groupId);
@@ -605,7 +604,7 @@ function makeSurveyEvaluation ($param = null) {
           $this->set('courseId', $courseId);
           $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers');
           $mixEvalDetail = $this->Evaluation->loadMixEvaluationDetail($event);
-          $this->set('view_data', $this->MixevalHelper->compileViewDataShort($mixEvalDetail['mixeval']));
+          $this->set('view_data', $this->Mixeval->compileViewDataShort($mixEvalDetail['mixeval'], $this)); $this->Output->weeWa();
           $this->set('data', $mixEvalDetail['mixeval']);
           $this->set('groupMembers', $mixEvalDetail['groupMembers']);
           $this->set('evaluateeCount', $mixEvalDetail['evaluateeCount']);

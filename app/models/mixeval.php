@@ -109,4 +109,76 @@ class Mixeval extends EvaluationBase
 
 		return $questions;
 	}*/
+
+  function compileViewData($mixeval=null) {
+    $this->MixevalsQuestion = new MixevalsQuestion;
+    $this->MixevalsQuestionDesc = new MixevalsQuestionDesc;
+
+    $mixeval_id = $mixeval['Mixeval']['id'];
+    $mixEvalDetail = $this->MixevalsQuestion->getQuestion($mixeval_id);
+    $tmp = array();
+
+    if (!empty($mixEvalDetail)) {
+      foreach ($mixEvalDetail as $row) {
+        $evalQuestion = $row['MixevalsQuestion'];
+        $this->filter($evalQuestion);
+        $tmp['questions'][$evalQuestion['question_num']] = $evalQuestion;
+        if ($evalQuestion['question_type'] == 'S') {
+          //Retrieve the lickert descriptor
+          $descriptors = $this->MixevalsQuestionDesc->getQuestionDescriptor($mixeval_id, $evalQuestion['question_num']);
+          $tmp['questions'][$evalQuestion['question_num']]['descriptors'] = $descriptors;
+        }
+      }
+    }
+    $mixEvalDetail = array_merge($mixeval,$tmp);
+
+    return $mixEvalDetail;
+  }
+
+  function compileViewDataShort($mixeval=null) {
+    $this->MixevalsQuestion = new MixevalsQuestion;
+    $this->MixevalsQuestionDesc = new MixevalsQuestionDesc;
+
+    $mixeval_id = $mixeval['Mixeval']['id'];
+    $mixEvalDetail = $this->MixevalsQuestion->getQuestion($mixeval_id);
+    if(!empty($mixeval['Question'])) {
+            $mixeval['Question'] = $mixEvalDetail;
+    }
+    
+    return $mixeval;
+  }
+
+  //Filter function from Output Component
+  function filter(&$data) {
+    $search = array (
+    '@<script[^>]*?>.*?</script>@si', // Strip out javascript
+    '@<object[^>]*?>.*?</object>@si', // Strip out objects
+    '@<iframe[^>]*?>.*?</iframe>@si', // Strip out iframes
+    '@<applet[^>]*?>.*?</applet>@si', // Strip out applets
+    '@<meta[^>]*?>.*?</meta>@si', // Strip out meta
+    '@<form[^>]*?>.*?</form>@si', // Strip out forms
+    '@([\n])@',                // convert to <br/>
+    '@&(quot|#34);@i',                // Replace HTML entities
+    '@&(amp|#38);@i',
+    '@&(lt|#60);@i',
+    '@&(gt|#62);@i',
+    '@&(nbsp|#160);@i',
+    '@&(iexcl|#161);@i',
+    '@&(cent|#162);@i',
+    '@&(pound|#163);@i',
+    '@&(copy|#169);@i',
+    '@&#(\d+);@e');                    // evaluate as php
+
+    $replace = array ('','','','','','','<br/>','"','&','<','>',' ',chr(161),chr(162),chr(163),chr(169),'chr(\1)');
+    if(is_array($data)) {
+      foreach($data as $key=>$value) {
+        $data[$key] = $this->filter($value);
+      }
+    } else {
+      $data = preg_replace($search, $replace, $data);
+    }
+    return $data;
+  }
+
+  
 }
