@@ -83,8 +83,9 @@ echo $this->element('evaluations/view_event_info', $params);
   <tr class="tablecell2" align="center">
       <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
 			  <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
+		
 			  <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
-			  <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>" />
+			  <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id']?>" />
 			  <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" />
 			  <input type="hidden" name="display_format" value="Basic" />
 

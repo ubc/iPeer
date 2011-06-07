@@ -38,6 +38,8 @@ class EvaluationComponent extends Object
 //    return $event;
 //  }
 
+	var $components = array('Auth');
+	
   function formatGradeReleaseStatus($groupEvent, $releaseStatus, $oppositGradeReleaseCount) {
     $gradeReleaseStatus = $groupEvent['GroupEvent']['grade_release_status'];
 
