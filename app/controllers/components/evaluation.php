@@ -10,6 +10,8 @@
  */
 class EvaluationComponent extends Object
 {
+  var $uses =  array('Session');
+
   //General functions
 // Moved to Event Model
 //  function formatEventObj ($eventId, $groupId=null)
@@ -1121,7 +1123,7 @@ class EvaluationComponent extends Object
           }
         }
       }	else {
-        foreach ($groupMembers as $user) {
+        foreach ($groupMembers['Group'] as $user) {
           if (!empty($user)) {
             // The array's format varries. Sometime a sub-array [0] is present
             $id = !empty($user['id']) ? $user['id'] : $user['User']['id'];

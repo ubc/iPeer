@@ -29,7 +29,7 @@
 
 class SurveysController extends AppController
 {
-  var $uses =  array('Course', 'Survey', 'User', 'Question', 'SurveyQuestion', 'Response','Personalize','Event','EvaluationSubmission','UserEnrol','SurveyInput','SurveyGroupMember','SurveyGroupSet','SurveyGroup');
+  var $uses =  array('SurveyQuestion', 'Course', 'Survey', 'User', 'Question', 'Response','Personalize','Event','EvaluationSubmission','UserEnrol','SurveyInput','SurveyGroupMember','SurveyGroupSet','SurveyGroup');
   var $name = 'Surveys';
   var $show;
   var $sortBy;
@@ -38,21 +38,21 @@ class SurveysController extends AppController
   var $order;
   var $Sanitize;
   var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
-  var $components = array('SurveyHelper', 'AjaxList','rdAuth','Output','sysContainer', 'globalConstant','userPersonalize', 'framework');
+  var $components = array('AjaxList','rdAuth','Output','sysContainer', 'globalConstant','userPersonalize', 'framework');
 
 
-	function __construct() {
-		$this->Sanitize = new Sanitize;
-		$this->show = empty($_REQUEST['show'])? 'null': $this->Sanitize->paranoid($_REQUEST['show']);
-		if ($this->show == 'all') $this->show = 99999999;
-		$this->sortBy = empty($_GET['sort'])? 'Survey.created': $_GET['sort'];
-		$this->direction = empty($_GET['direction'])? 'desc': $this->Sanitize->paranoid($_GET['direction']);
-		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
-		$this->order = $this->sortBy.' '.strtoupper($this->direction);
+  function __construct() {
+    $this->Sanitize = new Sanitize;
+    $this->show = empty($_REQUEST['show'])? 'null': $this->Sanitize->paranoid($_REQUEST['show']);
+    if ($this->show == 'all') $this->show = 99999999;
+    $this->sortBy = empty($_GET['sort'])? 'Survey.created': $_GET['sort'];
+    $this->direction = empty($_GET['direction'])? 'desc': $this->Sanitize->paranoid($_GET['direction']);
+    $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
+    $this->order = $this->sortBy.' '.strtoupper($this->direction);
     $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
- 		$this->set('title_for_layout', 'Surveys');
-		parent::__construct();
-	}
+    $this->set('title_for_layout', 'Surveys');
+    parent::__construct();
+  }
 
 
   function __postProcess($data) {
@@ -102,72 +102,72 @@ class SurveysController extends AppController
       $coursesList{$id} = $course['course'];
     }
 
-        // Set up Columns
-        $columns = array(
-            array("Survey.id",          "ID",          "4em",   "hidden"),
-            array("Course.id",          "",             "",     "hidden"),
-            array("Course.course",      "Course",      "15em",  "action", "View Course"),
-            array("Survey.name",        "Name",        "auto",  "action", "View Survey"),
-            array("!Custom.inUse",      "In Use",      "4em",   "number"),
-            array("Survey.due_date",     "Due Date",   "10em",  "date"),
-            // The release window columns
-            array("now()",   "", "", "hidden"),
-            array("Survey.release_date_begin", "", "", "hidden"),
-            array("Survey.release_date_end",   "", "", "hidden"),
-            array("!Custom.isReleased", "Released ?",   "  4em",   "string"),
-            array("Survey.creator_id",   "", "", "hidden"),
-            array("Survey.creator",  "Created By",    "8em", "action", "View Creator"),
-            array("Survey.created",     "Creation Date","10em", "date"));
+    // Set up Columns
+    $columns = array(
+        array("Survey.id",          "ID",          "4em",   "hidden"),
+        array("Course.id",          "",             "",     "hidden"),
+        array("Course.course",      "Course",      "15em",  "action", "View Course"),
+        array("Survey.name",        "Name",        "auto",  "action", "View Survey"),
+        array("!Custom.inUse",      "In Use",      "4em",   "number"),
+        array("Survey.due_date",     "Due Date",   "10em",  "date"),
+        // The release window columns
+        array("now()",   "", "", "hidden"),
+        array("Survey.release_date_begin", "", "", "hidden"),
+        array("Survey.release_date_end",   "", "", "hidden"),
+        array("!Custom.isReleased", "Released ?",   "  4em",   "string"),
+        array("Survey.creator_id",   "", "", "hidden"),
+        array("Survey.creator",  "Created By",    "8em", "action", "View Creator"),
+        array("Survey.created",     "Creation Date","10em", "date"));
 
-        // Just list all and my evaluations for selections
-        $userList = array($myID => "My Evaluations");
+    // Just list all and my evaluations for selections
+    $userList = array($myID => "My Evaluations");
 
-        // Join in the course name
-        $joinTableCourse =
-             array("id"        => "Course.id",
-                   "localKey"  => "course_id",
-                   "description" => "Course:",
-                   "default"   => $this->Session->read('ipeerSession.courseId'),
-                   "list" => $coursesList,
-                   "joinTable" => "courses",
-                   "joinModel" => "Course");
+    // Join in the course name
+    $joinTableCourse =
+         array("id"        => "Course.id",
+               "localKey"  => "course_id",
+               "description" => "Course:",
+               "default"   => $this->Session->read('ipeerSession.courseId'),
+               "list" => $coursesList,
+               "joinTable" => "courses",
+               "joinModel" => "Course");
 
-        $joinTableCreator =
-              array("joinTable"=>"users",
-                    "localKey" => "creator_id",
-                    "joinModel" => "Creator");
+    $joinTableCreator =
+          array("joinTable"=>"users",
+                "localKey" => "creator_id",
+                "joinModel" => "Creator");
 
-        // Add the join table into the array
-        $joinTables = array();
+    // Add the join table into the array
+    $joinTables = array();
 
-        // For instructors: only list their own course events (surveys
-        $extraFilters = $conditions;
-        if ($this->Auth->user('role') != 'A') {
-            $extraFilters = " ( ";
-            foreach ($coursesList as $id => $course) {
-                $extraFilters .= "course_id=$id or ";
-            }
-            $extraFilters .= "1=0 ) "; // just terminates the or condition chain with "false"
+    // For instructors: only list their own course events (surveys
+    $extraFilters = $conditions;
+    if ($this->Auth->user('role') != 'A') {
+        $extraFilters = " ( ";
+        foreach ($coursesList as $id => $course) {
+            $extraFilters .= "course_id=$id or ";
         }
-
-        // Set up actions
-        $warning = "Are you sure you want to delete this evaluation permanently?";
-        $actions = array(
-            array("View Event", "", "", "", "view", "Survey.id"),
-            array("Edit Event", "", "", "", "edit", "Survey.id"),
-            array("Edit Questions", "", "", "", "questionsSummary", "Survey.id"),
-            array("Copy Survey", "", "", "", "copy", "Survey.id"),
-            array("Delete Survey", $warning, "", "", "delete", "Survey.id"),
-            array("View Course", "",    "", "courses", "home", "Course.id"),
-            array("View Creator", "",    "", "users", "view", "Survey.creator_id"));
-
-        // No recursion in results (at all!)
-        $recursive = 1;
-
-        // Set up the list itself
-        $this->AjaxList->setUp($this->Survey, $columns, $actions,
-            "Course.course", "Survey.name", $joinTables, $extraFilters, $recursive, "__postProcess");
+        $extraFilters .= "1=0 ) "; // just terminates the or condition chain with "false"
     }
+
+    // Set up actions
+    $warning = "Are you sure you want to delete this evaluation permanently?";
+    $actions = array(
+        array("View Event", "", "", "", "view", "Survey.id"),
+        array("Edit Event", "", "", "", "edit", "Survey.id"),
+        array("Edit Questions", "", "", "", "questionsSummary", "Survey.id"),
+        array("Copy Survey", "", "", "", "copy", "Survey.id"),
+        array("Delete Survey", $warning, "", "", "delete", "Survey.id"),
+        array("View Course", "",    "", "courses", "home", "Course.id"),
+        array("View Creator", "",    "", "users", "view", "Survey.creator_id"));
+
+    // No recursion in results (at all!)
+    $recursive = 1;
+
+    // Set up the list itself
+    $this->AjaxList->setUp($this->Survey, $columns, $actions,
+        "Course.course", "Survey.name", $joinTables, $extraFilters, $recursive, "__postProcess");
+  }
 
 
   function index($course_id = null) {
@@ -190,62 +190,61 @@ class SurveysController extends AppController
   }
 
 
-	function view($id) {
+  function view($id) {
     $data = $this->Survey->read(null, $id);
-		$this->set('data', $data);
-	}
+    $this->set('data', $data);
+  }
 
-	function add() {
-		if (!empty($this->data)) {
-			if ($result = $this->Survey->save($this->data)) {
+  function add() {
+    if (!empty($this->data)) {
+      if ($result = $this->Survey->save($this->data)) {
         $this->data = $result;
         $this->data['Survey']['id'] = $this->Survey->id;
 
         // check to see if a template has been selected
         if( !empty($this->data['Survey']['template_id'] )) {
-          $this->SurveyHelper->copyQuestions($this->data['Survey']['template_id'], $this->Survey->id);
+          $this->SurveyQuestion->copyQuestions($this->data['Survey']['template_id'], $this->Survey->id);
         }
 
-				//$this->questionsSummary($this->Survey->id);
+        //$this->questionsSummary($this->Survey->id);
 
-    		//$this->params['data']['Survey']['released'] = 1;
-    	  $eventArray = array();
+        //$this->params['data']['Survey']['released'] = 1;
+        $eventArray = array();
 
-    		//add survey to events
-    		$eventArray['Event']['title'] = $this->data['Survey']['name'];
-    		$eventArray['Event']['course_id'] = $this->data['Survey']['course_id'];
-    		$eventArray['Event']['event_template_type_id'] = 3;
-    		$eventArray['Event']['template_id'] = $this->data['Survey']['id'];
-    		$eventArray['Event']['self_eval'] = 0;
-    		$eventArray['Event']['com_req'] = 0;
-    		$eventArray['Event']['due_date'] = $this->data['Survey']['due_date'];
-    		$eventArray['Event']['release_date_begin'] = $this->data['Survey']['release_date_begin'];
-    		$eventArray['Event']['release_date_end'] = $this->data['Survey']['release_date_end'];
+        //add survey to events
+        $eventArray['Event']['title'] = $this->data['Survey']['name'];
+        $eventArray['Event']['course_id'] = $this->data['Survey']['course_id'];
+        $eventArray['Event']['event_template_type_id'] = 3;
+        $eventArray['Event']['template_id'] = $this->data['Survey']['id'];
+        $eventArray['Event']['self_eval'] = 0;
+        $eventArray['Event']['com_req'] = 0;
+        $eventArray['Event']['due_date'] = $this->data['Survey']['due_date'];
+        $eventArray['Event']['release_date_begin'] = $this->data['Survey']['release_date_begin'];
+        $eventArray['Event']['release_date_end'] = $this->data['Survey']['release_date_end'];
 
         //Save Data
-    		$this->Event->save($eventArray);
+        $this->Event->save($eventArray);
         $this->Session->setFlash('Survey is saved!');
         $this->redirect('edit/'.$this->Survey->id);
-			} else {
+      } else {
         //$this->set('errmsg', $this->Survey->errorMessage);
         $this->Session->setFlash('Error on saving survey.');
-			}
-		}
+      }
+    }
 
-		$this->set('templates', $this->Survey->find('list', array('fields' => array('id', 'name'))));
-
+    $this->set('templates', $this->Survey->find('list', array('fields' => array('id', 'name'))));
     $this->set('courses', $this->Survey->Course->find('list', array('fields' => array('Course.course'),'recursive' => -1)));
     $this->render('edit');
-	}
+  }
 
-	function edit($id) {
+  function edit($id) {
     if(!is_numeric($id)) {
       $this->Session->setFlash('Invalid survey ID.');
       $this->redirect('index');
     }
     $data = $this->Survey->find('first', array('conditions' => array('id' => $id),
                                                'contain' => array('Event')));
-	if (!empty($this->data)) {
+    if (!empty($this->data)) {
       //alter dates for the event 
       //TODO: separte date from survey
       $data['Survey'] = $this->data['Survey'];
@@ -255,69 +254,69 @@ class SurveysController extends AppController
       $data['Event'][0]['release_date_begin'] = $this->data['Survey']['release_date_begin'];
       $data['Event'][0]['release_date_end'] = $this->data['Survey']['release_date_end'];
 
-	if($result = $this->Survey->save($data)) {
+      if($result = $this->Survey->save($data)) {
         $this->Session->setFlash('The Survey was edited successfully.');
         $this->redirect('index');
-			} else {
+      } else {
         $this->Session->setFlash($this->Survey->errorMessage);
-			}
-		} else {
+      }
+    } else {
       $this->data = $data;
     }
 
     $this->set('courses', $this->Survey->Course->find('list', array('recursive' => -1)));
-	}
+  }
 
-	function copy($id) {
-		$this->data = $this->Survey->read(null, $id);
-		unset($this->data['Survey']['id']);
-		$this->data['Survey']['name'] = 'Copy of '.$this->data['Survey']['name'];
+  function copy($id) {
+    $this->data = $this->Survey->read(null, $id);
+    unset($this->data['Survey']['id']);
+    $this->data['Survey']['name'] = 'Copy of '.$this->data['Survey']['name'];
     //converting nl2br back so it looks better
-		$this->Output->br2nl($this->data);
+    $this->Output->br2nl($this->data);
 
-		$this->set('template_id', $id);
-    $this->set('courses', $this->Survey->Course->find('list', array('recursive' => -1)));
+    $this->set('template_id', $id);
+    $this->set('courses', $this->Survey->Course->getCourseList());
     $this->render('edit');
-	}
+  }
 
-	function delete($id) {
-		if ($this->Survey->delete($id)) {
-		  /*$groupSets = $this->SurveyGroupSet->find('all','survey_id='.$id);
+  function delete($id) {
+    if ($this->Survey->delete($id)) {
+      /*$groupSets = $this->SurveyGroupSet->find('all','survey_id='.$id);
 
-		  foreach ($groupSets as $groupSet)
-		  {
-    	  	$groupSetId = $groupSet['SurveyGroupSet']['id'];
-        	$time = $groupSet['SurveyGroupSet']['date'];
+      foreach ($groupSets as $groupSet)
+      {
+    $groupSetId = $groupSet['SurveyGroupSet']['id'];
+    $time = $groupSet['SurveyGroupSet']['date'];
 
-        	$this->SurveyHelper->deleteGroupSet($groupSetId);
+    $this->SurveyQuestion->deleteGroupSet($groupSetId);
 
-        	//delete teammaker crums
-        	if (!empty($time)) {
-	          unlink('../uploads/'.$time.'.txt');
-	          unlink('../uploads/'.$time.'.xml');
-	          unlink('../uploads/'.$time.'.txt.scores');
-	        }
-		  }
+    //delete teammaker crums
+    if (!empty($time)) {
+      unlink('../uploads/'.$time.'.txt');
+      unlink('../uploads/'.$time.'.xml');
+      unlink('../uploads/'.$time.'.txt.scores');
+    }
+      }
 
-		  //delete associating event
-		  $events = $this->Event->find('all','event_template_type_id=3 AND template_id='.$id);
-		  if(!empty($events)) {
-			  foreach ($events as $event) {
-			    $this->Event->del($event['Event']['id']);
-			  }
-		  }
-	    //delete possible submissions
-		  $inputs = $this->SurveyInput->find('all','survey_id='.$id);
-		  foreach ($inputs as $input) {
-		    $this->SurveyInputs->del($input['SurveyInput']['id']);
-		  }*/
+      //delete associating event
+      $events = $this->Event->find('all','event_template_type_id=3 AND template_id='.$id);
+      if(!empty($events)) {
+              foreach ($events as $event) {
+                $this->Event->del($event['Event']['id']);
+              }
+      }
+      //delete possible submissions
+      $inputs = $this->SurveyInput->find('all','survey_id='.$id);
+      foreach ($inputs as $input) {
+        $this->SurveyInputs->del($input['SurveyInput']['id']);
+      }*/
 
-			$this->Session->setFlash('The survey was deleted successfully.');
-		} else {
+      $this->Session->setFlash('The survey was deleted successfully.');
+    } else {
       $this->Session->setFlash('Survey delete failed.');
-		}
+    }
     $this->redirect('index');
-	}
+  }
 
   // called to add/remove response field from add/edit question pages
   /*function adddelquestion($question_id=null)
@@ -379,81 +378,79 @@ class SurveysController extends AppController
   /************ Question Functions ***********/
 
 	// Gets all the questions associated with selected survey and displays them
-	function questionsSummary($survey_id)
-	{
-		// Get all required data from each table for every question
-    $questions = $this->Question->find('all', array('conditions' => array('Survey.id' => $survey_id),
-                                                 //'contain' => array('Question', 'Response'),
-                                                 'order' => 'SurveyQuestion.number',
-                                                 'recursive' => 1));
-		$this->set('survey_id', $survey_id);
-		$this->set('questions', $questions);
-    $this->set('is_editable', true);//TODO: check permission $this->controller->rdAuth->id == $data['Survey']['creator_id'] || $this->controller->rdAuth->id == 1 
-		$this->render('questionssummary');
-	}
+  function questionsSummary($survey_id) {
+          // Get all required data from each table for every question
+    $questions = $this->Question->find('all', array(
+      'conditions' => array('Survey.id' => $survey_id),
+      //'contain' => array('Question', 'Response'),
+      'order' => 'SurveyQuestion.number',
+      'recursive' => 1));
+    $this->set('survey_id', $survey_id);
+    $this->set('questions', $questions);
+    $this->set('is_editable', true);//TODO: check permission $this->controller->rdAuth->id == $data['Survey']['creator_id'] || $this->controller->rdAuth->id == 1
+    $this->render('questionssummary');
+  }
 
   function moveQuestion($survey_id, $question_id, $position) {
-		// Move request for a question
-		if( $survey_id != null && $position != null && $question_id != null){
-			//$this->SurveyQuestion->moveQuestion($survey_id, $question_id, $move);
-			$this->SurveyHelper->moveQuestion($survey_id, $question_id, $position);
-		}
+    // Move request for a question
+    if( $survey_id != null && $position != null && $question_id != null){
+      //$this->SurveyQuestion->moveQuestion($survey_id, $question_id, $move);
+      $this->SurveyQuestion->moveQuestion($survey_id, $question_id, $position);
+    }
     $this->redirect('questionsSummary/'.$survey_id);
   }
 
-	// Used when remove is clicked on questionssummary page
-	function removeQuestion($survey_id, $question_id) {
-		$this->autoRender = false;
+  // Used when remove is clicked on questionssummary page
+  function removeQuestion($survey_id, $question_id) {
+    $this->autoRender = false;
 
-		// move question to bottom of survey list so deletion can be done
-		// without affecting the number order
-    $this->SurveyHelper->moveQuestion($survey_id, $question_id, 'BOTTOM');
+    // move question to bottom of survey list so deletion can be done
+    // without affecting the number order
+    $this->SurveyQuestion->moveQuestion($survey_id, $question_id, 'BOTTOM');
 
-		// remove the question from the survey association as well as all other
-		// references to the question in the responses and questions tables
-		$this->Survey->habtmDelete('Question', $survey_id, $question_id);
-		//$this->Question->editCleanUp($question_id);
+    // remove the question from the survey association as well as all other
+    // references to the question in the responses and questions tables
+    $this->Survey->habtmDelete('Question', $survey_id, $question_id);
+    //$this->Question->editCleanUp($question_id);
 
-		$this->Session->setFlash('The question was removed successfully.');
+    $this->Session->setFlash('The question was removed successfully.');
 
-		$this->redirect('questionsSummary/'.$survey_id);
-	}
+    $this->redirect('questionsSummary/'.$survey_id);
+  }
 
-	function addQuestion($survey_id)
-	{
-		//check to see if user has clicked load question
-		if(!empty($this->params['form']['loadq'])) {
-			// load values from selected question into temp array
-			$this->data = $this->Question->find('first', array('conditions' => array('id' => $this->data['Question']['template_id'])));
-      		$this->set('responses', $this->data['Response']);
-		} elseif (!empty($this->params['data']['Question'])) {
-			if ($this->Question->saveAll($this->data)) {
-
-				$this->Session->setFlash('The question was added successfully.');
+  function addQuestion($survey_id) {
+    //check to see if user has clicked load question
+    if(!empty($this->params['form']['loadq'])) {
+      // load values from selected question into temp array
+      $this->data = $this->Question->find('first', array('conditions' => array('id' => $this->data['Question']['template_id'])));
+      $this->set('responses', $this->data['Response']);
+    } elseif (!empty($this->params['data']['Question'])) {
+      if ($this->Question->saveAll($this->data)) {
+        $this->Session->setFlash('The question was added successfully.');
         $this->redirect('questionsSummary/'.$survey_id);
-				//$this->questionsSummary($this->params['form']['survey_id'], null, null);
-			} else {
+        //$this->questionsSummary($this->params['form']['survey_id'], null, null);
+      } else {
         $this->set('responses', $this->data['Response']);
-				$this->render('editQuestion');
-			}
-		} else {
+                            $this->render('editQuestion');
+      }
+    } else {
       $this->set('responses', array());
     }
 
-		$this->autorender = false;
-		$this->set('templates', $this->Question->find('list', array('conditions' => array('master' => 'yes'))));
+    $this->autorender = false;
+    $this->set('templates', $this->Question->find('list', array('conditions' => array('master' => 'yes'))));
     $this->set('survey_id',$survey_id);
-	}
+  }
 
-	function editQuestion( $question_id, $survey_id ) {
-		if(!empty($this->data)){
-			if ($this->Question->saveAll($this->data)) {
-				$this->Session->setFlash('The question was updated successfully.');
-				$this->redirect('questionsSummary/'.$survey_id);
-			}	else{
+  function editQuestion( $question_id, $survey_id ) {
+    if(!empty($this->data)){
+      if ($this->Question->saveAll($this->data)) {
+              $this->Session->setFlash('The question was updated successfully.');
+              $this->redirect('questionsSummary/'.$survey_id);
+      }	else{
         $this->Session->setFlash('Error in saving question.');
-			}
-		} else {
+      }
+    } else {
       $this->data = $this->Question->find('first', array('conditions' => array('id' => $question_id)));
     }
 
@@ -462,12 +459,12 @@ class SurveysController extends AppController
     $this->set('responses', $this->data['Response']);
 
     $this->render('addQuestion');
-	}
+  }
 
-	function update($attributeCode='',$attributeValue='') {
-		if ($attributeCode != '' && $attributeValue != '') //check for empty params
-  		$this->params['data'] = $this->Personalize->updateAttribute($this->Auth->user('id'), $attributeCode, $attributeValue);
-	}
+  function update($attributeCode='',$attributeValue='') {
+    if ($attributeCode != '' && $attributeValue != '') //check for empty params
+    $this->params['data'] = $this->Personalize->updateAttribute($this->Auth->user('id'), $attributeCode, $attributeValue);
+  }
 }
 
 ?>
