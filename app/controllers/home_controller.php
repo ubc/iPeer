@@ -37,7 +37,7 @@ class HomeController extends AppController
   var $page;
   var $Sanitize;
   var $functionCode = 'HOME';
-  var $components = array( 'rdAuth', 'Acl', 'Output');
+  var $components = array( 'Auth', 'Acl', 'Output');
   
   
   //Temporary formatDate function
@@ -385,9 +385,7 @@ class HomeController extends AppController
     $this->autoRender = false;   
     $role = $this->Auth->user('role');
     $userId = $this->Auth->user('id');
-    //Set up user id
-    //$this->rdAuth->setUserId($userId);
-    
+
     if (isset ($role)) {
       //General Home Rendering for Admin
       if ($role == $this->User->USER_TYPE_ADMIN)

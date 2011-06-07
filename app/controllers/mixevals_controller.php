@@ -36,7 +36,7 @@ class MixevalsController extends AppController
 	var $order;
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $Sanitize;
-	var $components = array('AjaxList','rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework');
+	var $components = array('AjaxList','Auth','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework');
 
 
 	function __construct() {

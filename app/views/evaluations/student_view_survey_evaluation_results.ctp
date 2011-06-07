@@ -6,7 +6,7 @@
       <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
       <input type="hidden" name="survey_id" id="survey_id" value="<?php if (!empty($survey_id)) echo $survey_id; ?>" />
       <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>"/>
-      <input type="hidden" name="data[Evaluation][surveyee_id]" value="<?php echo $rdAuth->id?>"/>
+      <input type="hidden" name="data[Evaluation][surveyee_id]" value="<?php echo $this->Auth->user('id')?>"/>
       <input type="hidden" name="question_count" value="<?php echo count($questions)?>"/>
         <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
           <tr class="tableheader">

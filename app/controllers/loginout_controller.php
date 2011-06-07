@@ -440,7 +440,7 @@ class LoginoutController extends AppController
 
 	function _sendEmail($to='', $from='', $subject='', $body='' ) {
 		$result = false;
-		$role = $this->rdAuth->role;
+		$role = $this->Auth->user('role');
 
 		$headers = "Content-Transfer-Encoding: quoted-printable\n" .
                "From: $from\n" .

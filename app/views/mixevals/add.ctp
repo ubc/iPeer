@@ -31,12 +31,12 @@
 	?>
 	<input type="hidden" name="required" id="required" value="mixeval_name" />
       <?php echo empty($params['data']['Mixeval']['id']) ? null : $html->hidden('Mixeval/id'); ?>
-      <?php echo empty($params['data']['Mixeval']['id']) ? $html->hidden('Mixeval/creator_id', array('value'=>$rdAuth->id)) : $html->hidden('Mixeval/updater_id', array('value'=>$rdAuth->id)); ?>
+      <?php echo empty($params['data']['Mixeval']['id']) ? $html->hidden('Mixeval/creator_id', array('value'=>$this->Auth->user('id'))) : $html->hidden('Mixeval/updater_id', array('value'=>$this->Auth->user('id'))); ?>
 
 	  <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
     <td colspan="3" align="center">
-	    <?php echo $html->hidden('Mixeval/user_id', array('value'=>$rdAuth->id)); ?>
+	    <?php echo $html->hidden('Mixeval/user_id', array('value'=>$this->Auth->user('id'))); ?>
       <?php echo empty($params['data']['Mixeval']['id'])?'Add':'Edit' ?> Mix Evaluation
     </td>
     </tr>

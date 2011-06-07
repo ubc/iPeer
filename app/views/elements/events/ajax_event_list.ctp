@@ -10,7 +10,7 @@
     </table>
 	<table width="95%" border="0" cellspacing="2" cellpadding="4" bgcolor="#FFFFFF">
 	  <tr class="tableheader">
-	    <?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
+	    <?php if($this->Auth->user('role') == 'A' || $this->Auth->user('role') == 'I'):?>
 	    <th>Actions</th>
 	    <?php endif;?>
 	    <th><?php echo $pagination->sortLink('Title',array('title','desc'))?></th>
@@ -26,7 +26,7 @@
   	  <tr class="tablecell">
   	    <td align="center">
   		    <a href="<?php echo $this->webroot.$this->theme.'events/view/'.$event['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
-  	    <?php if($rdAuth->role == 'A' || $rdAuth->role == 'I'):?>
+  	    <?php if($this->Auth->user('role') == 'A' || $this->Auth->user('role') == 'I'):?>
   	      <a href="<?php echo $this->webroot.$this->theme.'events/edit/'.$event['id']?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
   	      <a href="<?php echo $this->webroot.$this->theme.'events/delete/'.$event['id']?>" onclick="return confirm('Are you sure you want to delete event &ldquo;<?php echo $event['title']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete'))?></a>
   	    <?php endif;?>

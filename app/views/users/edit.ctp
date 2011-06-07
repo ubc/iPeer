@@ -11,7 +11,7 @@
 <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['User']['id'])?'add':'edit') ?>" onSubmit="return validate()">
   <?php echo empty($params['data']['User']['id']) ? null : $html->hidden('User/id'); ?> <?php echo empty($params['data']['User']['role']) ? null: $html->hidden('User/role'); ?>
   <input type="hidden" name="required" id="required" value="last_name first_name" />
-  <?php echo empty($params['data']['User']['id']) ? $html->hidden('User/creator_id', array('value'=>$rdAuth->id)) : $html->hidden('User/updater_id', array('value'=>$rdAuth->id)); ?>
+  <?php echo empty($params['data']['User']['id']) ? $html->hidden('User/creator_id', array('value'=>$this->Auth->user('id'))) : $html->hidden('User/updater_id', array('value'=>$this->Auth->user('id'))); ?>
   <table width="95%" align="center" cellpadding="4" cellspacing="2">
     <tr class="tableheader">
       <td align="center" colspan="3"><?php echo empty($params['data']['User']['id'])?'Add':'Edit' ?> User </td>
@@ -34,7 +34,7 @@
       <td width="663" id="first_name_msg" class="error"></td>
     </tr class="tablecell2">
     <?php if (isset($params['data']['User']['role']) && $params['data']['User']['role'] == 'S') { ?>
-        <?php if ($this->controller->rdAuth->role == 'A') { ?>
+        <?php if ($this->Auth->user('role') == 'A') { ?>
             <tr class="tablecell2">
             <td width="130" id="student_no_label">Student No.:</td>
             <td><?php echo $html->input('User/student_no', array('id'=>'student_no', 'size'=>'50', 'class'=>'validate none TEXT_FORMAT student_no_msg Invalid_Text._At_Least_One_Word_Is_Required.')) ?> </td>
@@ -55,7 +55,7 @@
       <td><?php echo $html->input('User/email', array('id'=>'email', 'size'=>'50', 'class'=>'validate none EMAIL_FORMAT email_msg Invalid_Email_Format.')) ?> </td>
       <td width="663" id="email_msg" class="error"></td>
     </tr>
-    <?php if (isset($params['data']['User']['role']) &&($params['data']['User']['role'] == 'S') && (($rdAuth->role == 'I') || ($rdAuth->role == 'A'))):?>
+    <?php if (isset($params['data']['User']['role']) &&($params['data']['User']['role'] == 'S') && (($this->Auth->user('role') == 'I') || ($this->Auth->user('role') == 'A'))):?>
     <tr class="tablecell2">
       <td width="130" id="courses_label">This student's<br />Courses:</td>
       <td colspan=2>

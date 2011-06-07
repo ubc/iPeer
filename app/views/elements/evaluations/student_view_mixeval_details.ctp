@@ -49,7 +49,7 @@ else if ($gradeReleased || $commentReleased) {
 
      echo "<tr class=\"tablecell2\">";
      if (isset($scoreRecords)) {
-       echo "<td width='15%'>".$rdAuth->fullname."</td>";
+       echo "<td width='15%'>".$this->Auth->user('full_name')."</td>";
      } else {
        echo "<td width='15%'>".$member['User']['last_name'].' '.$member['User']['first_name']."</td>";
      }
@@ -128,7 +128,7 @@ if (!$gradeReleased && !$commentReleased) {
 
      echo "<tr class=\"tablecell2\">";
      if (isset($scoreRecords)) {
-       echo "<td width='15%'>".$rdAuth->fullname."</td>";
+       echo "<td width='15%'>".$this->Auth->user('full_name')."</td>";
      } else {
        echo "<td width='15%'>".$member['User']['last_name'].' '.$member['User']['first_name']."</td>";
      }

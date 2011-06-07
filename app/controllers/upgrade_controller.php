@@ -76,7 +76,7 @@ class UpgradeController extends Controller
 
   function checkPermission()
   {
-    if('A' != $this->rdAuth->role)
+    if('A' != $this->Auth->user('role'))
     {
       $this->set('message_content', 'Sorry, you do not have access to this page. Only administrator can perform a upgrade. If you are an administrator, please login and then go to this page to perform the upgrade.');
       $this->render(null, null, 'views/pages/message.tpl.php');

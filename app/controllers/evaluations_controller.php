@@ -45,7 +45,7 @@ class EvaluationsController extends AppController
                     'EvaluationMixeval','EvaluationMixevalDetail', 'Mixeval');
   var $components = array( 'Auth','AjaxList', 'rdAuth','Output','sysContainer',
                           'globalConstant', 'userPersonalize','framework', 
-                          'Evaluation', 'ExportHelper');
+                          'Evaluation', 'Export');
 
   function __construct()
   {
@@ -306,7 +306,7 @@ class EvaluationsController extends AppController
       //do stuff
       if (isset($this->params['form']) && !empty($this->params['form'])) {
           $this->autoRender = false;
-          $fileContent = $this->ExportHelper->createCSV($this->params);
+          $fileContent = $this->Export->createCSV($this->params);
           $fileName = isset($this->params['form']['file_name']) && empty($this->params['form']['file_name']) ? $this->params['form']['file_name']:date('m.d.y');
 
           header('Content-Type: application/csv');
@@ -810,7 +810,7 @@ function makeSurveyEvaluation ($param = null) {
       //Setup the courseId to session
       $this->rdAuth->setCourseId($event['Event']['course_id']);
       $courseId = $this->rdAuth->courseId;
-      $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId,$this->rdAuth->role).' > '.$event['Event']['title']. ' > View My Results ');
+      $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId,$this->Auth->user('role')).' > '.$event['Event']['title']. ' > View My Results ');
 
       //Get Group Event
       $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($event['Event']['id'], $event['group_id']);

@@ -3,7 +3,7 @@
     <td><?php echo $html->script('groups')?>
     <form name="frm" id="frm" method="POST" action="<?php echo $html->url('editGroup/'.$group_id.'/'.$event_id . '/'. $popup) ?>">
      <?php echo empty($params['data']['Group']['id']) ? null : $html->hidden('Group/id'); ?>
-     <?php echo empty($params['data']['Group']['id']) ? $html->hidden('Group/creator_id', array('value'=>$rdAuth->id)) : $html->hidden('Group/updater_id', array('value'=>$rdAuth->id)); ?>
+     <?php echo empty($params['data']['Group']['id']) ? $html->hidden('Group/creator_id', array('value'=>$this->Auth->user('id'))) : $html->hidden('Group/updater_id', array('value'=>$this->Auth->user('id'))); ?>
 	  <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
     <td colspan="4" align="center">

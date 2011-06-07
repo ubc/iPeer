@@ -1,5 +1,5 @@
 <?php
-class ExportHelperComponent extends Object
+class ExportComponent extends Object
 {
   var $components = array('rdAuth');
   var $globUsersArr = array();

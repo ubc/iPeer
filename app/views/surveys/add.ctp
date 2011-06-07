@@ -2,7 +2,7 @@
   <tr>
     <td>
     <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($params['data']['Survey']['id'])?'add':'edit') ?>">
-      <?php echo empty($params['data']['Survey']['id']) ? $html->hidden('Survey/creator_id', array('value'=>$rdAuth->id)) : $html->hidden('Survey/updater_id', array('value'=>$rdAuth->id)); ?>
+      <?php echo empty($params['data']['Survey']['id']) ? $html->hidden('Survey/creator_id', array('value'=>$this->Auth->user('id'))) : $html->hidden('Survey/updater_id', array('value'=>$this->Auth->user('id'))); ?>
 	  <table width="95%"  border="0" align="center" cellpadding="4" cellspacing="2">
         <?php if (!$createSurveyPossible) : ?>
         <tr><td style="text-align: center; color: red;">
