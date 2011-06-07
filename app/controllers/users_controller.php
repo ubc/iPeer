@@ -346,11 +346,12 @@ class UsersController extends AppController
   function __processForm() {
     if (!empty($this->data)) {
       $this->Output->filter($this->data);//always filter
-		//var_dump($this->data);
+	if(!empty($roleNum)) {
 		$roleNum = $this->data['Role']['Role'];
+	
 		$role = $this->Role->getRoleByRoleNumber($roleNum[0]);
-		$this->data['User']['role'] = $role;
-      //Save Data
+		$this->data['User']['role'] = $role;}
+	    //Save Data
       if ($this->data = $this->User->save($this->data)) {
         $this->data['User']['id'] = $this->User->id;
         return true;
@@ -670,10 +671,9 @@ class UsersController extends AppController
 
     function editProfile()
     {
-      // No security checks here, since we're editing the logged-in user
+       // No security checks here, since we're editing the logged-in user
       $id = $this->Auth->user('id');
       $this->set('viewPage', false);
-
       if(!empty($this->data)) {
         $this->data['User']['id'] = $id;
 
@@ -688,7 +688,7 @@ class UsersController extends AppController
         }
       }
       $this->data = $this->User->read(null, $id);
-      $this->Output->br2nl($this->data);
+      $this->Output->br2nl($this->data);    
       $this->set('has_title', $this->User->hasTitle($this->data['Role']));
       $this->set('is_student', $this->User->hasStudentNo($this->data['Role']));
       $this->set('data', $this->data);

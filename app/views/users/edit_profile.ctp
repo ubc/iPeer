@@ -53,7 +53,8 @@
       <td id="student_no_msg" class="error">&nbsp;</td>
     </tr>
     <?php endif;?>
-
+ <?php echo $this->Form->hidden('role', array('value'=>$data['User']['role'])); ?>
+     
     <?php //if (!(isset($rdAuth->customIntegrateCWL) && $rdAuth->customIntegrateCWL)) :?>
             <tr class="tablecell2">
               <td colspan="3"><b> Change Password: </b></td>
