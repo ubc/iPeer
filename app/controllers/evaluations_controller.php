@@ -379,7 +379,7 @@ class EvaluationsController extends AppController
           $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
 
           //Get the target event submission
-          $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['group_id'],
+          $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'],
                                                                                          $evaluator);                                                                                      
           $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
           /*if (!$this->validSimpleEvalComplete($this->params)) {
@@ -894,8 +894,9 @@ function makeSurveyEvaluation ($param = null) {
           $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupId, $groupEventId);
           //Check to see if all members are completed this evaluation
           $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
-          $numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find('count', array('conditions' => array('group_id='.$groupId))) :
-                                                     $this->GroupsMembers->find('count',array('conditions' => array('group_id='.$groupId))) - 1;
+          $numMembers=$event['Event']['self_eval'] ?
+            $this->GroupsMembers->find('count', array('conditions' => array('group_id' => $groupId))) :
+            $this->GroupsMembers->find('count',array('conditions' => array('group_id' => $groupId))) - 1;
 
           ($numOfCompletedCount == $numMembers) ? $completeStatus = 1:$completeStatus = 0;
           if ($completeStatus)
@@ -1132,7 +1133,7 @@ function makeSurveyEvaluation ($param = null) {
     $pos = 0;
     foreach ($students as $row) {
       $user = $row['Member'];
-      $evalSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['group_id'],
+      $evalSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'],
       $user['id']);
 
       if (isset($evalSubmission)) {
