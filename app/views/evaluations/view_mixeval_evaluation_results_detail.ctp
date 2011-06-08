@@ -50,6 +50,7 @@ $groupAve = 0;
 		<td valign="middle">Student Name:</td>
     <?php
     //print_r($mixevalQuestion);
+   
     	for ($i = 1; $i <= $mixeval['Mixeval']["lickert_question_max"]; $i++) {
     		echo "<td>";
     		echo "<strong><font color=" . $color[ $numerical_index % sizeof($color) ] . ">" . $numerical_index . ". </font></strong>";
@@ -138,7 +139,7 @@ $groupAve = 0;
       <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
 			  <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
 			  <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
-			  <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>" />
+			  <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id']?>" />
 			  <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" />
 			  <input type="hidden" name="display_format" value="Detail" />
 
@@ -191,8 +192,8 @@ $groupAve = 0;
         	<tr class="tableheader" align="center">
             <td width="100" valign="top">Evaluator</td>
             <?php
-              for ($i=1; $i<=$mixeval['Mixeval']["lickert_question_max"]; $i++) {
-            		echo "<td><strong><font color=" . $color[ $i % sizeof($color) ] . ">" . ($i) . ". "  . "</font></strong>";
+              for ($i=0; $i<$mixeval['Mixeval']["lickert_question_max"]; $i++) {
+            		echo "<td><strong><font color=" . $color[ ($i+1) % sizeof($color) ] . ">" . ($i+1) . ". "  . "</font></strong>";
             		//echo $mixevalQuestion[$i-1]['MixevalsQuestion']['title'];
             		echo $mixevalQuestion[$i]['title'];
             		echo "</td>";
@@ -260,9 +261,9 @@ $groupAve = 0;
             <td width="100" valign="top">Evaluator</td>
             <?php
               for ($i=$numerical_index; $i<=$mixeval['Mixeval']["total_question"]; $i++) {
-                if (isset($mixevalQuestion[$i])) {
+                if (isset($mixevalQuestion[$i-1])) {
               		echo "<td><strong><font color=" . $color[ $i % sizeof($color) ] . ">" . ($i) . ". "  . "</font></strong>";
-              		echo $mixevalQuestion[$i]['title'];
+              		echo $mixevalQuestion[$i-1]['title'];
               		echo "</td>";
               	}
             	}

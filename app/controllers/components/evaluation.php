@@ -11,7 +11,7 @@
 App::import('Model', 'Mixeval');
 class EvaluationComponent extends Object
 {
-  var $uses =  array('Session');
+  var $uses =  array('Session', 'Mixeval');
 
   //General functions
 // Moved to Event Model
@@ -405,7 +405,6 @@ class EvaluationComponent extends Object
       }
     }
     $scoreRecords = $this->formatSimpleEvaluationResultsMatrix($event, $groupMembers,$evalResult);
-
     $gradeReleaseStatus = $this->EvaluationSimple->getTeamReleaseStatus($event['group_event_id']);
     $result['scoreRecords'] = $scoreRecords;
     $result['memberScoreSummary'] = $memberScoreSummary;
@@ -994,9 +993,9 @@ class EvaluationComponent extends Object
             $receivedTotalScore = $this->EvaluationMixeval->getReceivedTotalScore(
               $event['group_event_id'],$userId);
             $ttlEvaluatorCount = $this->EvaluationMixeval->getReceivedTotalEvaluatorCount($event['group_event_id'],$userId);
-            if ($ttlEvaluatorCount[0]['ttl_count'] >0 ) {
+            if ($ttlEvaluatorCount >0 ) {
               $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0]['received_total_score'];
-              $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0]['received_total_score'] / $ttlEvaluatorCount[0]['ttl_count'];
+              $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0]['received_total_score'] / $ttlEvaluatorCount;
             }
             foreach($mixevalResult AS $row ) {
               $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
@@ -1025,12 +1024,14 @@ class EvaluationComponent extends Object
               $event['group_event_id'],$userId);
             $ttlEvaluatorCount = $this->EvaluationMixeval->getReceivedTotalEvaluatorCount(
               $event['group_event_id'],$userId);
-            if ($ttlEvaluatorCount[0]['ttl_count'] > 0 ) {
-              $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0]['received_total_score'];
-              $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0]['received_total_score'] /
-              $ttlEvaluatorCount[0]['ttl_count'];
+            if ($ttlEvaluatorCount > 0 ) {
+              $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0][0]['received_total_score'];
+              $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0][0]['received_total_score'] /
+              $ttlEvaluatorCount;
+              
             }
-            foreach($mixevalResult AS $row ) {
+            // $memberScoreSummary =   $receivedTotalScore;
+           foreach($mixevalResult AS $row ) {
               $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
               if ($evalMark!=null) {
                 $rubriDetail = $this->EvaluationMixevalDetail->getAllByEvalMixevalId($evalMark['id']);
@@ -1486,7 +1487,6 @@ class EvaluationComponent extends Object
     $result['questions'] = $questions;
     //$this->set('event', $event);
     $result['event'] = $event;
-
     return $result;
   }
 
