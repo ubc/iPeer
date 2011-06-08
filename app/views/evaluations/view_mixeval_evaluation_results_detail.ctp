@@ -55,7 +55,7 @@ $groupAve = 0;
     		echo "<td>";
     		echo "<strong><font color=" . $color[ $numerical_index % sizeof($color) ] . ">" . $numerical_index . ". </font></strong>";
     		//echo "(" . "/" . $mixevalQuestion[$i-1]['MixevalsQuestion']['multiplier']. ")";
-    		echo "(" . "/" . $mixevalQuestion[$i]['multiplier']. ")";
+    		echo "(" . "/" . $mixevalQuestion[$i-1]['multiplier']. ")";
     		echo "</td>";
     		$numerical_index++;
     	}
@@ -78,7 +78,7 @@ $groupAve = 0;
         	//foreach ($scoreRecords[$member['User']['id']]['mixeval_question_ave'] AS $criteriaAveIndex => $criteriaAveGrade) {
         	for ($j = 1; $j <= $mixeval['Mixeval']["lickert_question_max"]; $j++) {
 
-        	  $criteriaAveGrade = $scoreRecords[$member['User']['id']]['mixeval_question_ave'][$j];
+        	  $criteriaAveGrade = $scoreRecords[$member['User']['id']]['mixeval_question_ave'][$j-1];
           	echo '<td>' . number_format($criteriaAveGrade, 2). "</td>";
           }
         } else {
@@ -113,8 +113,8 @@ $groupAve = 0;
       	//foreach ($scoreRecords['group_question_ave'] AS $groupAveIndex => $groupAveGrade) {
       	for ($j = 1; $j <= $mixeval['Mixeval']["lickert_question_max"]; $j++) {
             echo "<td>";
-            if(isset($scoreRecords['group_question_ave'][$j])){
-                $groupAveGrade = $scoreRecords['group_question_ave'][$j];
+            if(isset($scoreRecords['group_question_ave'][$j-1])){
+                $groupAveGrade = $scoreRecords['group_question_ave'][$j-1];
                 echo number_format($groupAveGrade, 2);
             }
             echo "</td>";
@@ -135,7 +135,7 @@ $groupAve = 0;
       echo "</b></td>";
     }		?>
 	</tr>
-  <tr class="tablecell2" align="center"><td colspan="<?php echo count($groupMembers) +1; ?>">
+  <tr class="tablecell2" align="center"><td colspan="<?php echo ($mixeval['Mixeval']["lickert_question_max"] +2); ?>">
       <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
 			  <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
 			  <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
@@ -219,8 +219,8 @@ $groupAve = 0;
                 //Points Detail
                 echo "<strong>Points: </strong>";
                 if (isset($rubDet)) {
-                		$lom = $rubDet["grade"];
-                	$empty = $mixeval["Mixeval"]["scale_max"];
+                	$lom = $rubDet["grade"];
+                	$empty = $mixevalQuestion[$i-1]['multiplier'];
                 	for ($v = 0; $v < $lom; $v++) {
                 		echo $html->image('evaluations/circle.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle'));
                 		$empty--;
@@ -237,7 +237,7 @@ $groupAve = 0;
                 echo "<strong>Grade: </strong>";
                 if (isset($rubDet)) {
                   //echo $rubDet["grade"] . " / " . $mixevalQuestion[$j-1]['MixevalsQuestion']['multiplier'] . "<br />";
-                  echo $rubDet["grade"] . " / " . $mixevalQuestion[$j]['multiplier'] . "<br />";
+                  echo $rubDet["grade"] . " / " . $mixevalQuestion[$j-1]['multiplier'] . "<br />";
                 } else {
                 	echo "n/a<br />";
                 }

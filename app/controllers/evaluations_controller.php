@@ -586,7 +586,6 @@ function makeSurveyEvaluation ($param = null) {
 
   function makeMixevalEvaluation ($param = '')  {
       $this->autoRender = false;
-
       if (empty($this->params['data'])) {
           $tok = strtok($param, ';');
           $eventId = $tok;
@@ -594,7 +593,6 @@ function makeSurveyEvaluation ($param = null) {
           //$msg = strtok(';');
           $event = $this->Event->formatEventObj($eventId, $groupId);
           $this->set('event', $event);
-
           $this->set('evaluator_id',$this->Auth->user('id'));
           $this->set('full_name', $this->Auth->user('first_name').' '.$this->Auth->user('last_name'));
           //Setup the courseId to session
@@ -618,7 +616,6 @@ function makeSurveyEvaluation ($param = null) {
           if (!$this->validMixevalEvalComplete($this->params['form'])) {
               $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
           }
-
           if ($this->Evaluation->saveMixevalEvaluation($this->params)) {        		
               $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
           }
@@ -897,10 +894,15 @@ function makeSurveyEvaluation ($param = null) {
           $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupId, $groupEventId);
           //Check to see if all members are completed this evaluation
           $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
+<<<<<<< .mine
+          $numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find('count', array('conditions' => array('group_id='.$groupId))) :
+                                                     $this->GroupsMembers->find('count',array('conditions' => array('group_id='.$groupId))) - 1;
+=======
           /*$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find(count,'group_id='.$groupId) :
                                                      $this->GroupsMembers->find(count,'group_id='.$groupId) - 1;*/
           $numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find('count',array('conditions'=>array('group_id'=>$groupId))) :
                                                      ($this->GroupsMembers->find('count',array('conditions'=>array('group_id'=>$groupId)))) - 1;
+>>>>>>> .r549
           ($numOfCompletedCount == $numMembers) ? $completeStatus = 1:$completeStatus = 0;
           if ($completeStatus)
           {
@@ -912,7 +914,7 @@ function makeSurveyEvaluation ($param = null) {
               $this->GroupEvent->save($groupEvent);
           }
       }
-      $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId);
+      $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId);
   }
 
   function markGradeRelease($param)
@@ -935,19 +937,19 @@ function makeSurveyEvaluation ($param = null) {
     switch ($event['Event']['event_template_type_id']) {
       case "1":
         $this->Evaluation->changeSimpleEvaluationGradeRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus);
-      $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId);
+      $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId);
       break;
 
       case "2":
         $this->Evaluation->changeRubricEvaluationGradeRelease($eventId, $groupId, $groupEventId,
                                                                     $evaluateeId, $releaseStatus);
-      $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
+      $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
       break;
 
       case "4":
         $this->Evaluation->changeMixevalEvaluationGradeRelease($eventId, $groupId, $groupEventId,
                                                                      $evaluateeId, $releaseStatus);
-      $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
+      $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
       break;
     }
 
@@ -982,7 +984,7 @@ function makeSurveyEvaluation ($param = null) {
               $this->Evaluation->changeSimpleEvaluationCommentRelease ($eventId, $groupId, $groupEventId, $evaluatorIds, $this->params);
       }
 
-          $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId);
+          $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId);
         break;
 
       case "2":
@@ -992,7 +994,7 @@ function makeSurveyEvaluation ($param = null) {
           $releaseStatus = strtok(';');
         $this->Evaluation->changeRubricEvaluationCommentRelease($eventId, $groupId,
                                                                   $groupEventId, $evaluateeId, $releaseStatus);
-          $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
+          $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
         break;
 
       case "4":
@@ -1002,7 +1004,7 @@ function makeSurveyEvaluation ($param = null) {
           $releaseStatus = strtok(';');
         $this->Evaluation->changeMixevalEvaluationCommentRelease($eventId, $groupId,
                                                                   $groupEventId, $evaluateeId, $releaseStatus);
-          $this->redirect('evaluations/viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
+          $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
         break;
     }
 
