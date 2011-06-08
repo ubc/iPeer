@@ -332,7 +332,7 @@ $groupAve = 0;
 
 </table>
 	<script type="text/javascript"> new Rico.Accordion( 'accordion',
-								{panelHeight:500,
+								{panelHeight:320,
 								 hoverClass: 'mdHover',
 								 selectedClass: 'mdSelected',
 								 clickedClass: 'mdClicked',
