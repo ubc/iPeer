@@ -379,7 +379,7 @@ class EvaluationsController extends AppController
           $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
 
           //Get the target event submission
-          $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'],
+          $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['group_id'],
                                                                                          $evaluator);                                                                                      
           $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
           /*if (!$this->validSimpleEvalComplete($this->params)) {
@@ -548,7 +548,7 @@ function makeSurveyEvaluation ($param = null) {
       $groupEventId = $this->params['form']['group_event_id'];
       //Get the target group event
       $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
-      $this->GroupEvent->id = $groupEvent['GroupEvent']['id'];
+      $this->GroupEvent->id = $groupEvent['GroupEvent']['group_id'];
 
       // if no submission exists, create one
       //Get the target event submission
@@ -647,7 +647,7 @@ function makeSurveyEvaluation ($param = null) {
       $groupEventId = $this->params['form']['group_event_id'];
       //Get the target group event
       $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
-      $this->GroupEvent->id = $groupEvent['GroupEvent']['id'];
+      $this->GroupEvent->id = $groupEvent['GroupEvent']['group_id'];
 
       // if no submission exists, create one
       //Get the target event submission
@@ -1033,17 +1033,14 @@ function makeSurveyEvaluation ($param = null) {
     //Update all groupEvent's comment release Status based on submission
     $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId);
     foreach ($groupEventList as $groupEvent) {
-      $this->GroupEvent->id = $groupEvent['GroupEvent']['id'];
-
-      //Get Members whom completed evaluation
-      $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent['GroupEvent']['group_id'],
+      $this->GroupEvent->id = $groupEvent['GroupEvent']['group_id'];
+      
+      //Get the total number of members who has completed this evaluation
+      $numOfCompletedCount = $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent['GroupEvent']['group_id'],
                                                                                  $groupEvent['GroupEvent']['id']);
-
-      //Check to see if all members are completed this evaluation
-      $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
-
-      $numMembers = $this->GroupsMembers->find(count,'group_id='.$groupEvent['GroupEvent']['group_id']);
-
+      //$numMembers = $this->GroupsMembers->find(count,'group_id='.$groupEvent['GroupEvent']['group_id']);
+      $numMembers = $this->GroupsMembers->find('count',array('conditions'=>array('group_id'=>$groupEvent['GroupEvent']['group_id'])));
+      
       if (($numOfCompletedCount != 0) && ($numOfCompletedCount < $numMembers)) {
         $completeStatus = 'Some';
       } elseif ($releaseStatus && ($numOfCompletedCount == $numMembers)) {
@@ -1059,7 +1056,6 @@ function makeSurveyEvaluation ($param = null) {
       }
       $this->GroupEvent->save($groupEvent);
     }
-
     $this->redirect('/evaluations/view/'.$eventId);
   }
 
@@ -1093,15 +1089,12 @@ function makeSurveyEvaluation ($param = null) {
     //Update all groupEvent's grade release Status based on submission
     $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId);
     foreach($groupEventList as $groupEvent) {
-      $this->GroupEvent->id = $groupEvent['GroupEvent']['id'];
+      $this->GroupEvent->id = $groupEvent['GroupEvent']['group_id'];
 
-      //Get Members whom completed evaluation
-      $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent['GroupEvent']['group_id'],
+      //Get Members count whom completed evaluation
+      $numOfCompletedCount = $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent['GroupEvent']['group_id'],
                                                                                  $groupEvent['GroupEvent']['id']);
-      //Check to see if all members are completed this evaluation
-      $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
-      $numMembers = $this->GroupsMembers->find(count,'group_id='.$groupEvent['GroupEvent']['group_id']);
-
+      $numMembers = $this->GroupsMembers->find('count', array('conditions'=>array('group_id'=>$groupEvent['GroupEvent']['group_id'])));
       if (($numOfCompletedCount != 0) && ($numOfCompletedCount < $numMembers)) {
         $completeStatus = 'Some';
       } elseif ($releaseStatus && ($numOfCompletedCount == $numMembers)) {
@@ -1139,7 +1132,7 @@ function makeSurveyEvaluation ($param = null) {
     $pos = 0;
     foreach ($students as $row) {
       $user = $row['Member'];
-      $evalSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'],
+      $evalSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['group_id'],
       $user['id']);
 
       if (isset($evalSubmission)) {
@@ -1159,7 +1152,7 @@ function makeSurveyEvaluation ($param = null) {
     $this->set('members', $students);
     $this->set('group', $group);
     $this->set('eventId', $eventId);
-    $this->set('groupEventId', $groupEvent['GroupEvent']['id']);
+    $this->set('groupEventId', $groupEvent['GroupEvent']['group_id']);
   }
 
 function reReleaseEvaluation ()

@@ -96,7 +96,7 @@ class GroupEvent extends AppModel
   	  	return;
   	  }
 	  $tmp = $this->find('all',array(
-              'conditions' => array('event_id' => $eventId), 'fields'=>array('group_id')
+              'conditions' => array('event_id' => $eventId), 'fields'=>array('id', 'group_id')
           ));
 	  return $tmp;
   }
