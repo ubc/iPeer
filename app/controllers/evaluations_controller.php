@@ -894,15 +894,9 @@ function makeSurveyEvaluation ($param = null) {
           $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupId, $groupEventId);
           //Check to see if all members are completed this evaluation
           $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
-<<<<<<< .mine
           $numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find('count', array('conditions' => array('group_id='.$groupId))) :
                                                      $this->GroupsMembers->find('count',array('conditions' => array('group_id='.$groupId))) - 1;
-=======
-          /*$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find(count,'group_id='.$groupId) :
-                                                     $this->GroupsMembers->find(count,'group_id='.$groupId) - 1;*/
-          $numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find('count',array('conditions'=>array('group_id'=>$groupId))) :
-                                                     ($this->GroupsMembers->find('count',array('conditions'=>array('group_id'=>$groupId)))) - 1;
->>>>>>> .r549
+
           ($numOfCompletedCount == $numMembers) ? $completeStatus = 1:$completeStatus = 0;
           if ($completeStatus)
           {
