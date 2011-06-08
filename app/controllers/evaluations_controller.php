@@ -62,7 +62,6 @@ class EvaluationsController extends AppController
 
 // =-=-=-=-=-== New list routines =-=-=-=-=-===-=-
 
-
   function postProcess($data) {
     // Creates the custom in use column
     if ($data) {
@@ -701,7 +700,8 @@ function makeSurveyEvaluation ($param = null) {
     $this->autoRender = false;
     $this->layout = 'pop_up';
 
-    $courseId = $this->rdAuth->courseId;
+    //$courseId = $this->rdAuth->courseId;
+    $courseId = $this->Event->getCourseByEventId($eventId);
     $event = $this->Event->formatEventObj($eventId, $groupId);
     $this->set('event', $event);
     $this->set('title_for_layout', !empty($event['Event']) ? $this->sysContainer->getCourseName($courseId).' > '.$event['Event']['title']. ' > Results ':'');
@@ -722,11 +722,13 @@ function makeSurveyEvaluation ($param = null) {
         break;
 
     case 2: //View Rubric Evaluation
+    	
           $formattedResult = $this->Evaluation->formatRubricEvaluationResult($event, $displayFormat);
           $this->set('rubric', $formattedResult['rubric']);
           if (isset($formattedResult['groupMembers'])) $this->set('groupMembers', $formattedResult['groupMembers']);
           if (isset($formattedResult['reviewEvaluations'])) $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);
-          if (isset($formattedResult['rubricCriteria'])) $this->set('rubricCriteria', $formattedResult['rubricCriteria']);
+          if (isset($formattedResult['rubric']['RubricsCriteria'])) $this->set('rubricCriteria', $formattedResult['rubric']['RubricsCriteria']);
+          $this->set('courseId', $courseId);
           $this->set('allMembersCompleted', $formattedResult['allMembersCompleted']);
           $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
           $this->set('scoreRecords', $formattedResult['scoreRecords']);
@@ -828,7 +830,7 @@ function makeSurveyEvaluation ($param = null) {
               $this->set('rubric', $formattedResult['rubric']);
               if (isset($formattedResult['groupMembers'])) $this->set('groupMembers', $formattedResult['groupMembers']);
               if (isset($formattedResult['reviewEvaluations'])) $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);
-              if (isset($formattedResult['rubricCriteria'])) $this->set('rubricCriteria', $formattedResult['rubricCriteria']);
+              if (isset($formattedResult['rubric']['RubricsCriteria'])) $this->set('rubricCriteria', $formattedResult['rubric']['RubricsCriteria']);
               $this->set('allMembersCompleted', $formattedResult['allMembersCompleted']);
               $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
               $this->set('scoreRecords', $formattedResult['scoreRecords']);
@@ -895,8 +897,10 @@ function makeSurveyEvaluation ($param = null) {
           $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupId, $groupEventId);
           //Check to see if all members are completed this evaluation
           $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
-          $numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find(count,'group_id='.$groupId) :
-                                                     $this->GroupsMembers->find(count,'group_id='.$groupId) - 1;
+          /*$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find(count,'group_id='.$groupId) :
+                                                     $this->GroupsMembers->find(count,'group_id='.$groupId) - 1;*/
+          $numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find('count',array('conditions'=>array('group_id'=>$groupId))) :
+                                                     ($this->GroupsMembers->find('count',array('conditions'=>array('group_id'=>$groupId)))) - 1;
           ($numOfCompletedCount == $numMembers) ? $completeStatus = 1:$completeStatus = 0;
           if ($completeStatus)
           {

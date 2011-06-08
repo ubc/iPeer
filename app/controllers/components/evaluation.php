@@ -250,7 +250,7 @@ class EvaluationComponent extends Object
         //Get total mark each member received
 	$receivedTotalScore = $this->EvaluationSimple->getReceivedTotalScore(
         $event['group_event_id'], $this->Auth->user('id'));
-  	$totalScore = $receivedTotalScore[0]['received_total_score'];
+  	$totalScore = $receivedTotalScore[0][0]['received_total_score'];
 	$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find(count,'group_id='.$event['group_id']) :
           $this->GroupsMembers->find(count,'group_id='.$event['group_id']) - 1;
         $aveScore = $totalScore / $numMembers;
@@ -578,9 +578,9 @@ class EvaluationComponent extends Object
           $ttlEvaluatorCount = $this->EvaluationRubric->getReceivedTotalEvaluatorCount($event['group_event_id'],$userId);
           if ($ttlEvaluatorCount[0]['ttl_count'] >0 ) {
             $memberScoreSummary[$userId]['received_total_score'] =
-            $receivedTotalScore[0]['received_total_score'];
+            $receivedTotalScore[0][0]['received_total_score'];
             $memberScoreSummary[$userId]['received_ave_score'] =
-            $receivedTotalScore[0]['received_total_score'] / $ttlEvaluatorCount[0]['ttl_count'];
+            $receivedTotalScore[0][0]['received_total_score'] / $ttlEvaluatorCount[0]['ttl_count'];
           }
 
           foreach($rubricResult AS $row ){
@@ -611,11 +611,11 @@ class EvaluationComponent extends Object
           //Get total mark each member received
           $receivedTotalScore = $this->EvaluationRubric->getReceivedTotalScore($event['group_event_id'],$userId);
           $ttlEvaluatorCount = $this->EvaluationRubric->getReceivedTotalEvaluatorCount($event['group_event_id'],$userId);
-          $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0]['received_total_score'];
+          $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0][0]['received_total_score'];
           if ($ttlEvaluatorCount[0]['ttl_count'] == 0) {
             $memberScoreSummary[$userId]['received_ave_score'] = 0;
           } else {
-            $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0]['received_total_score'] /
+            $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0][0]['received_total_score'] /
             $ttlEvaluatorCount[0]['ttl_count'];
           }
           foreach($rubricResult AS $row ){
@@ -783,7 +783,7 @@ class EvaluationComponent extends Object
     $this->GroupEvent->save($groupEvent);
   }
 
-  function formatRubricEvaluationResult($event=null, $displayFormat='', $studentView=0, $currentUser) {
+  function formatRubricEvaluationResult($event=null, $displayFormat='', $studentView=0, $currentUser=null) {
     $this->Rubric = new Rubric;
     $this->User = new User;
     $this->GroupsMembers = new GroupsMembers;
@@ -1028,7 +1028,6 @@ class EvaluationComponent extends Object
               $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0][0]['received_total_score'];
               $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0][0]['received_total_score'] /
               $ttlEvaluatorCount;
-              
             }
             // $memberScoreSummary =   $receivedTotalScore;
            foreach($mixevalResult AS $row ) {

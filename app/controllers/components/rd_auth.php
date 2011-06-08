@@ -18,7 +18,7 @@ class rdAuthComponent extends AppController // This component is in fact a
         $this->constructClasses();
     }*/
 
-	var $components = array('Session');
+	var $components = array('Session','Auth');
     var $uses = array('User');
     var $name = 'rdAuthComponent';
 
@@ -81,7 +81,8 @@ class rdAuthComponent extends AppController // This component is in fact a
     function getPrivilegeLevel($user=null) {
         // For no parameters passed, get the privilege level of this user.
         if (empty($user)) {
-            return $this->getPrivilegeLevel($this->role);
+            //return $this->getPrivilegeLevel($this->role);
+            return $this->getPrivilegeLevel($this->Auth->user('role'));
         } else if (is_numeric($user)) {
         // If $user is a numberic user ID, look it up in the database.
             $data = $this->User->findById($user);

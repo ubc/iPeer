@@ -214,6 +214,11 @@ class Event extends AppModel
         ));
     }
 
+    function getCourseByEventId($eventId) {
+    	$tmp = $this->find('all', array('conditions'=>array('Event.id' => $eventId), 'fields'=>array('course_id')));
+    	return $tmp[0]['Event']['course_id'];
+    }
+    
     function getSurveyEventIdByCourseIdDescription($courseId=null,$title=null) {
         //return $this->find('course_id='.$courseId.' AND title=\''.$title.'\' AND event_template_type_id=3','id');
         return $this->find('first', array(
@@ -312,7 +317,7 @@ class Event extends AppModel
     }
     return true;
   }
-
+ 
     function checkIfNowLate($eventID) {
         if (is_numeric($eventID)) {
             $count = $this->find('count', array(

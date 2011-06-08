@@ -55,8 +55,8 @@ echo $this->element('evaluations/view_event_info', $params);
       	echo '<td width="30%">';
       	//if ($allMembersCompleted) {
       	if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
-          $aveScoreSum += $memberScoreSummary[$member['User']['id']]['received_ave_score'];
-       		echo number_format($memberScoreSummary[$member['User']['id']]['received_ave_score'], 2);
+          $aveScoreSum += $memberScoreSummary[$member['User']['id']]['received_total_score'];
+       		echo number_format($memberScoreSummary[$member['User']['id']]['received_total_score'], 2);
       	} else {
       		echo '-';
       	}
@@ -84,7 +84,7 @@ echo $this->element('evaluations/view_event_info', $params);
       <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
 			  <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
 			  <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
-			  <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>" />
+			  <input type="hidden" name="course_id" value="<?php echo $courseId; ?>" />
 			  <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" />
 			  <input type="hidden" name="display_format" value="Basic" />
 

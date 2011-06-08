@@ -52,7 +52,7 @@ $groupAve = 0;
     	for ($i = 1; $i <= $rubric['Rubric']["criteria"]; $i++) {
     		echo "<td>";
     		echo '<strong><font color="' . $color[ $i % sizeof($color) ] . '">' . $numerical_index . ". </font></strong>";
-    		echo "(" . $rubricCriteria['criteria_weight_'.$i]. ")";
+    		echo "(" .$rubricCriteria[$i-1]['multiplier']. ")";
     		echo "</td>";
     		$numerical_index++;
     	}
@@ -68,10 +68,10 @@ $groupAve = 0;
       foreach ($groupMembers as $member) {
         $membersAry[$member['User']['id']] = $member;
       	echo '<tr class="tablecell2">';
-      	echo '<td width="30%">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td>' . "\n";
+      		echo '<td width="30%">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td>' . "\n";
         //if ($allMembersCompleted) {
         if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
-          $aveScoreSum += $memberScoreSummary[$member['User']['id']]['received_ave_score'];
+          $aveScoreSum += $memberScoreSummary[$member['User']['id']]['received_total_score'];
         	foreach ($scoreRecords[$member['User']['id']]['rubric_criteria_ave'] AS $criteriaAveIndex => $criteriaAveGrade) {
           	echo '<td>' . number_format($criteriaAveGrade, 2). "</td>";
           }
@@ -85,8 +85,8 @@ $groupAve = 0;
       	echo '<td width="30%">';
       	//if ($allMembersCompleted) {
       	if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
-      		echo number_format($memberScoreSummary[$member['User']['id']]['received_ave_score'], 2);
-      		$receviedAvePercent = $memberScoreSummary[$member['User']['id']]['received_ave_score'] / $rubric['Rubric']['total_marks'] * 100;
+      		echo number_format($memberScoreSummary[$member['User']['id']]['received_total_score'], 2);
+      		$receviedAvePercent = $memberScoreSummary[$member['User']['id']]['received_total_score'] / $rubric['Rubric']['total_marks'] * 100;
       		echo ' ('.number_format($receviedAvePercent) . '%)';
       		$membersAry[$member['User']['id']]['received_ave_score'] = $memberScoreSummary[$member['User']['id']]['received_ave_score'];
       		$membersAry[$member['User']['id']]['received_ave_score_%'] = $receviedAvePercent;
@@ -127,7 +127,7 @@ $groupAve = 0;
       <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
 			  <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
 			  <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
-			  <input type="hidden" name="course_id" value="<?php echo $rdAuth->courseId?>" />
+			  <input type="hidden" name="course_id" value="<?php echo $courseId; ?>" />
 			  <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" />
 			  <input type="hidden" name="display_format" value="Detail" />
 
@@ -154,19 +154,20 @@ $groupAve = 0;
 		  </div>
 		  <div style="height: 200px;" id="panel1Content" class="panelContent">
 			 <br><b>Total: <?php if (isset($membersAry[$user['id']]['received_ave_score'])) {
-			                    $memberAve = number_format($membersAry[$user['id']]['received_ave_score'], 2);
-			                    $memberAvePercent = number_format($membersAry[$user['id']]['received_ave_score_%']);
+			                    //$memberTotalScore = number_format($membersAry[$user['id']]['received_ave_score'], 2);
+			                    $memberTotalScore = $memberScoreSummary[$row['User']['id']]['received_total_score'];
+			                    $memberTotalScorePercent = number_format($membersAry[$user['id']]['received_ave_score_%']);
 			                  }else {
-			                    $memberAve = '-';
-			                    $memberAvePercent = '-';
+			                    $memberTotalScore = '-';
+			                    $memberTotalScorePercent = '-';
 			                  }
-			                  echo $memberAve;
-			                  echo '('.$memberAvePercent.'%)';
-			                  if ($memberAve == $groupAve) {
+			                  echo $memberTotalScore;
+			                  echo '('.$memberTotalScorePercent.'%)';
+			                  if ($memberTotalScore == $groupAve) {
 			                    echo "&nbsp;&nbsp;<< Same Mark as Group Average >>";
-			                  } else if ($memberAve < $groupAve) {
+			                  } else if ($memberTotalScore < $groupAve) {
 			                    echo "&nbsp;&nbsp;<font color='#cc0033'><< Below Group Average >></font>";
-			                  } else if ($memberAve > $groupAve) {
+			                  } else if ($memberTotalScore > $groupAve) {
 			                    echo "&nbsp;&nbsp;<font color='#000099'><< Above Group Average >></font>";
 			                  }
 			                ?> </b>
@@ -177,7 +178,7 @@ $groupAve = 0;
             <?php
               for ($i=1; $i<=$rubric['Rubric']["criteria"]; $i++) {
             		echo "<td><strong><font color=" . $color[ $i % sizeof($color) ] . ">" . ($i) . ". "  . "</font></strong>";
-            		echo $rubricCriteria['criteria'.$i];
+            		echo $rubricCriteria[$i-1]['criteria'];
             		echo "</td>";
             	}
             ?>
@@ -196,6 +197,7 @@ $groupAve = 0;
 
              $resultDetails = $memberRubric['details'];
              foreach ($resultDetails AS $detail) : $rubDet = $detail['EvaluationRubricDetail'];
+             	$i = 0;
                 echo '<td valign="middle">';
                 echo "<br />";
                 //Points Detail
@@ -214,11 +216,11 @@ $groupAve = 0;
                 } else {
                 	echo "n/a<br />";
                 }
-
                 //Grade Detail
                 echo "<strong>Grade: </strong>";
                 if (isset($rubDet)) {
-                  echo $rubDet["grade"] . " / " . $rubricCriteria['criteria_weight_'.$rubDet['criteria_number']] . "<br />";
+                  echo $rubDet["grade"] . " / " . $rubricCriteria[$i]['multiplier'] . "<br />";
+                  $i++;
                 } else {
                 	echo "n/a<br />";
                 }
@@ -229,7 +231,6 @@ $groupAve = 0;
                 } else {
                 	echo "n/a<br />";
                 }
-
                 echo "</td>";
              endforeach;
              //echo "<td>";
