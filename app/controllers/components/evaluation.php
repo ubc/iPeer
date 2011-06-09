@@ -1313,6 +1313,16 @@ class EvaluationComponent extends Object
       $modResponse = $this->filterString($response);
       $responseId = $this->Response->getResponseId($questionId,$modResponse);
       $surveyInput[$i]['SurveyInput']['response_id']=$responseId;
+      //Check SurveyInput existed
+      $this->SurveyInput->recursive = 0;
+      $surveyInputId = $this->SurveyInput->find('first',array(
+          'conditions' => array('SurveyInput.survey_id' => $surveyId,
+              'SurveyInput.user_id' => $userId,
+              'SurveyInput.question_id' => $questionId),
+          'fields' => array('SurveyInput.id')
+      ));
+      if($surveyInputId)
+        $surveyInput[$i]['SurveyInput']['id'] = $surveyInputId['SurveyInput']['id'];
       //Save data
       if(!$this->SurveyInput->save($surveyInput[$i]['SurveyInput']))$successfullySaved=false;
     }
