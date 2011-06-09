@@ -82,7 +82,7 @@ class EvaluationSimple extends AppModel
 	  //return $this->find('all','grp_event_id='.$grpEventId.' AND evaluatee='.$evaluatee, 'eval_comment');
             return $this->find('all', array(
                   'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
-                  'fields' => array('eval_commnet')
+                  'fields' => array('eval_comment')
               ));
 	}
 

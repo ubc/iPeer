@@ -205,6 +205,9 @@ class EvaluationsController extends AppController
     // Set up the basic static ajax list variables
     $this->setUpAjaxList($eventId);
 
+    //Set up the course Id
+    $this->set('courseId', $data[0]['Event']['course_id']);
+    
     // Set the display list
     $this->set('paramsForList', $this->AjaxList->getParamsForList());
   }
@@ -296,16 +299,15 @@ class EvaluationsController extends AppController
   }
 
 
-  function export() {
-
+  function export($courseId=null) {
       // Make sure the present user is not a student
       $this->rdAuth->noStudentsAllowed();
-      $courseId = $this->rdAuth->courseId;
       $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Export Evaluation Results');
+      $this->set('courseId',$courseId);
       //do stuff
       if (isset($this->params['form']) && !empty($this->params['form'])) {
           $this->autoRender = false;
-          $fileContent = $this->Export->createCSV($this->params);
+          $fileContent = $this->Export->createCSV($this->params, $courseId);
           $fileName = isset($this->params['form']['file_name']) && empty($this->params['form']['file_name']) ? $this->params['form']['file_name']:date('m.d.y');
 
           header('Content-Type: application/csv');

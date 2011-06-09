@@ -110,7 +110,7 @@ class Course extends AppModel
   function addInstructor($course_id, $user_id){
     return $this->habtmAdd('Instructor', $course_id, $user_id);
   } 
-
+  
   function getInactiveCourses(){
     return $this->find('all', array('conditions' => array('record_status' => 'I')));
   }

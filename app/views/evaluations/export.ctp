@@ -1,7 +1,7 @@
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>
-    <form name="frm" id="frm" method="POST" action="<?php echo $html->url('export') ?>">
+    <form name="frm" id="frm" method="POST" action="<?php echo $html->url('export/'.$courseId) ?>">
       <input type="hidden" name="assigned" id="assigned"/>
       <table width="85%" border="0" align="center" cellpadding="4" cellspacing="2">
         <tr class="tableheader">
@@ -61,7 +61,7 @@
           <td>Include Final Marks:</td><td><input type="checkbox" name="include_final_marks" checked /></td><td></td>
         </tr>
         <tr class="tablecell2">
-          <td colspan="3" align="center"><?php echo $html->submit('Export') ?></td>
+          <td colspan="3" align="center"><?php echo $this->Form->submit('Export') ?></td>
         </tr>
       </table>
     </form>

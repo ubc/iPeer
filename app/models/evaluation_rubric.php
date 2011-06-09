@@ -150,7 +150,7 @@ class EvaluationRubric extends AppModel
 	function getOppositeCommentReleaseStatus($groupEventId=null, $releaseStatus){
         //return $this->find(count,'grp_event_id='.$groupEventId.' AND comment_release != '.$releaseStatus);
             return $this->find('count', array(
-                'conditions' => array('grp_event_id' => $grpEventId, 'comment_release !=' => $releaseStatus)
+                'conditions' => array('grp_event_id' => $groupEventId, 'comment_release !=' => $releaseStatus)
             ));
 	}
 

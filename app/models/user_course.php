@@ -3,7 +3,6 @@ class UserCourse extends AppModel
 {
   var $name = 'UserCourse';
 
-
   // saves all the instructors associated with a course to the user_courses table
   function insertInstructors($course_id=null, $data=null){
     $instructorIDs = '';
@@ -29,10 +28,9 @@ class UserCourse extends AppModel
   // returns all the instructor names and ids for display on the view page
   function getInstructors($id=null){
   	$result = $this->query('SELECT User.id, User.first_name, User.last_name, User.email FROM user_courses JOIN users as User ON User.id=user_courses.user_id AND User.id <> 1 WHERE course_id='.$id);
-
   	return $result;
-  }
-
+  } 
+  
   // returns all the instructor list
   function getInstructorsId($course_id = null){
       return $this->find('list', array(

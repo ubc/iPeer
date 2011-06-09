@@ -1,26 +1,26 @@
 <?php
+App::import('Model', 'UserCourse');
 class ExportComponent extends Object
 {
   var $components = array('rdAuth');
   var $globUsersArr = array();
   var $globEventId;
   var $mixedEvalNumeric;
-
-
-  function createCSV($params) {
+   
+  function createCSV($params, $courseId=null) {
+  	
     $this->Course = new Course;
-    $this->UserCourse = new UserCourse;
     $this->Event = new Event;
     $this->GroupEvent = new GroupEvent;
-
-    $courseId = $this->rdAuth->courseId;
+    $this->UserCourse = new UserCourse;
+    
     $csvContent = '';
 
     //*******header
     $header = array();
     //get coursename
-    $course = $this->Course->find('id='.$courseId,'course');
-    $header['course_name'] = empty($params['form']['include_course']) ? '':$course['Course']['course'];
+    $course = $this->Course->find('all', array('conditions'=>array('id'=>$courseId)));
+    $header['course_name'] = empty($params['form']['include_course']) ? '':$course[0]['Course']['course'];
     //get date of export
     $header['export_date'] = empty($params['form']['include_date']) ? '':date('F t Y g:ia');
     //get instructor name
@@ -109,9 +109,9 @@ class ExportComponent extends Object
       //*******beef
       $groupId = $groupEvent['GroupEvent']['group_id'];
       $groupEventId = $groupEvent['GroupEvent']['id'];
-      $group = $this->Group->find('id='.$groupId);
+      $group = $this->Group->find('all', array('conditions' => array('Group.id' => $groupId)));
       //get group names
-      $data[$i]['group_name'] = $group['Group']['group_name'];
+      $data[$i]['group_name'] = $group[0]['Group']['group_name'];
       //get group stati
       $data[$i]['group_status'] = $groupEvent['GroupEvent']['marked'];
 
@@ -122,7 +122,7 @@ class ExportComponent extends Object
 
       global $globUsersArr;
       foreach($groupMembers as $groupMember) {
-        $userId = $groupMember['GroupsMembers']['user_id'];
+        $userId = $groupMember;
         $student = $this->User->findUserByid($userId);
         $globUsersArr[$student['User']['student_no']] = $userId;
       }
@@ -133,14 +133,14 @@ class ExportComponent extends Object
       }
       $count = 0;
       foreach($groupMembers as $groupMember) {
-        if(in_array($groupMember['GroupsMembers']['user_id'], $submittedArr)) {
+        if(in_array($groupMember, $submittedArr)) {
           $count++;
         }
       }
 
       foreach ($groupMembers as $groupMember) {
         //get student info: first_name, last_name, id, email
-        $userId = $groupMember['GroupsMembers']['user_id'];
+        $userId = $groupMember;
         $student = $this->User->findUserByid($userId);
         $data[$i]['students'][$j]['student_id'] = $student['User']['student_no'];
         $data[$i]['students'][$j]['first_name'] = $student['User']['first_name'];
@@ -220,23 +220,23 @@ class ExportComponent extends Object
             }
             $mixedEvalNumeric .= "\n";
 ##########
-            foreach ($userResults as $comment){
-              $results = $this->EvaluationMixeval->find('id='.$comment['EvaluationMixevalDetail']['evaluation_mixeval_id']);
-
+            foreach ($userResults as $comment){            	
+              $results = $this->EvaluationMixeval->find('all', array('conditions' => array('EvaluationMixeval.id' => $comment['EvaluationMixevalDetail']['evaluation_mixeval_id'])));
+			if(!empty($results)) {              
 #Set some variables that hold the USER data for the evaluator and evaluatee, then set the names for convenience
-              $evaluatorArray = $this->User->find('id='.$results['EvaluationMixeval']['evaluator']);
-              $evaluatorName = $evaluatorArray['User']['first_name'] . ' ' . $evaluatorArray['User']['last_name'];
-              $evaluateeArray = $this->User->find('id='.$results['EvaluationMixeval']['evaluatee']);
-              $evaluateeName = $evaluateeArray['User']['first_name'] . ' ' . $evaluateeArray['User']['last_name'];
+              $evaluatorArray = $this->User->find('all', array('conditions' => array('User.id' => $results[0]['EvaluationMixeval']['evaluator'])));
+              $evaluatorName = $evaluatorArray[0]['User']['first_name'] . ' ' . $evaluatorArray[0]['User']['last_name'];
+              $evaluateeArray = $this->User->find('all', array('conditions' => array('User.id' => $results[0]['EvaluationMixeval']['evaluatee'])));
+              $evaluateeName = $evaluateeArray[0]['User']['first_name'] . ' ' . $evaluateeArray[0]['User']['last_name'];
 
 #The $userResults variable is a long list of entries for EVERY evaluatee. If the evaluator changes, it means we are on a new 'survey' created by a different person.
 #Then we want to add a new line to our numeric data variable.
-              if($evaluatorArray['User']['username'] != $tempEvaluatee){
+              if($evaluatorArray[0]['User']['username'] != $tempEvaluatee){
                 $mixedEvalNumeric .= "\n";
                 $mixedEvalNumeric .= $evaluatorName. ",";
               }
 #Set the temp variable
-              $tempEvaluatee = $evaluatorArray['User']['username'];
+              $tempEvaluatee = $evaluatorArray[0]['User']['username'];
 
 #Here we go through the text responses for the mixed evaluation answers. If there is text content, we append it to the contents of the comments parameter for the evaluatee.
               $data[$i]['students'][$j]['comments'] .= isset($comment['EvaluationMixevalDetail']['question_comment'])&&!empty($comment['EvaluationMixevalDetail']['question_comment']) ? $evaluatorName.' on ' .$evaluateeName. ' Q'.$comment['EvaluationMixevalDetail']['question_number'] .' : '.$comment['EvaluationMixevalDetail']['question_comment']."\n".'':'';
@@ -244,6 +244,7 @@ class ExportComponent extends Object
                 $mixedEvalNumeric .= trim($comment['EvaluationMixevalDetail']['grade']).",";
               }
             }
+          }  
             $mixedEvalNumeric .= "\n";
             break;
           default:

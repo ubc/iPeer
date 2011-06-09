@@ -175,10 +175,8 @@ class User extends AppModel
     } elseif ($fields === false) {
       $fields = array('Creator', 'Updater');
     } else {
-
       $fields = array_merge((array)$fields, array('Creator', 'Updater'));
     }
-    
     return parent::find($conditions, $fields, $order, $recursive);
   }
 

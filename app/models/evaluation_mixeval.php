@@ -55,7 +55,7 @@ class EvaluationMixeval extends AppModel
             'fields' => array('EvaluationMixevalDetail.*'),
             'joins' => array(
                 array(
-                    'tabel' => 'evaluation_mixeval_details',
+                    'table' => 'evaluation_mixeval_details',
                     'alias' => 'EvaluationMixevalDetail',
                     'type' => 'LEFT',
                     'conditions' => array('EvaluationMixeval.id = EvaluationMixevalDetail.evaluation_mixeval_id')
