@@ -96,7 +96,7 @@ class EvaluationSimple extends AppModel
 	function getOppositeCommentReleaseStatus($groupEventId=null, $releaseStatus){
 	  //return $this->find(count,'grp_event_id='.$groupEventId.' AND release_status != '.$releaseStatus);
             return $this->find('count', array(
-                  'conditions' => array('grp_event_id' => $grpEventId, 'release_status !='=>$releaseStatus)
+                  'conditions' => array('grp_event_id' => $groupEventId, 'release_status !='=>$releaseStatus)
               ));
 	}
 

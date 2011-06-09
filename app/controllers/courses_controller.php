@@ -171,7 +171,7 @@ class CoursesController extends AppController
 
 	function delete($id)
 	{
-		if ($this->Course->del($id))
+		if ($this->Course->delete($id))
 		{
 		  //Delete all corresponding data start here
 		  $course = $this->Course->findById($id);
