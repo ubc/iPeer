@@ -699,9 +699,12 @@ function makeSurveyEvaluation ($param = null) {
     $this->autoRender = false;
     $this->layout = 'pop_up';
 
+    $templateTypeId = $this->Event->getEventTemplateTypeId($eventId);
     //$courseId = $this->rdAuth->courseId;
     $courseId = $this->Event->getCourseByEventId($eventId);
-    $event = $this->Event->formatEventObj($eventId, $groupId);
+    $event = ($templateTypeId == '3' ? $this->Event->formatEventObj($eventId, null):
+      $this->Event->formatEventObj($eventId, $groupId));
+    
     $this->set('event', $event);
     $this->set('title_for_layout', !empty($event['Event']) ? $this->sysContainer->getCourseName($courseId).' > '.$event['Event']['title']. ' > Results ':'');
 
@@ -744,9 +747,14 @@ function makeSurveyEvaluation ($param = null) {
     case 3: // View Survey
       $studentId = $groupId;
       $formattedResult = $this->Evaluation->formatSurveyEvaluationResult($event,$studentId);
-      
+
+      $answers = array();
+      foreach($formattedResult['answers'] as $answer){
+        $answers[$answer['SurveyInput']['question_id']] = $answer;
+      }
+
       $this->set('survey_id', $formattedResult['survey_id']);
-      $this->set('answers', $formattedResult['answers']);
+      $this->set('answers', $answers);
       $this->set('questions', $formattedResult['questions']);
       $this->set('event', $formattedResult['event']);
 

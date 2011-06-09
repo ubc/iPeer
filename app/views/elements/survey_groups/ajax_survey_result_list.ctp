@@ -52,7 +52,7 @@
 	    </td>
 
 		  <td align="center">
-		    <?php echo empty($student['date_submitted']) ? 'Not submitted' : $this->DateTime->format($student['date_submitted'])?>
+		    <?php echo empty($student['date_submitted']) ? 'Not submitted' : Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($student['date_submitted'])))?>
 	    </td>
 	  </tr>
 	  <?php endforeach; ?>

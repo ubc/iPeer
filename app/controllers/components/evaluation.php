@@ -11,7 +11,8 @@
 App::import('Model', 'Mixeval');
 class EvaluationComponent extends Object
 {
-  var $uses =  array('Session', 'Mixeval');
+  var $uses =  array('Mixeval');
+  var $components = array('Session', 'Auth');
 
   //General functions
 // Moved to Event Model
@@ -37,9 +38,7 @@ class EvaluationComponent extends Object
 //      $event['group_event_marked'] = $groupEvent['GroupEvent']['marked'];
 //    }
 //    return $event;
-//  }
-
-	var $components = array('Auth');
+//  }	
 	
   function formatGradeReleaseStatus($groupEvent, $releaseStatus, $oppositGradeReleaseCount) {
     $gradeReleaseStatus = $groupEvent['GroupEvent']['grade_release_status'];
@@ -1606,7 +1605,12 @@ class EvaluationComponent extends Object
       }
       $questions[$i]['Question']['total_response'] = $totalResponsePerQuestion;
       } else {
-        $responses = $this->SurveyInput->find('all', 'survey_id='.$surveyId.' AND question_id='.$questionId,'user_id,response_text');
+        $responses = $this->SurveyInput->find('all', array(
+            'conditions' => array('SurveyInput.survey_id' => $surveyId,
+              'SurveyInput.question_id' => $questionId),
+            'fields' => array('response_text','user_id')
+            
+        ));
         $questions[$i]['Question']['Responses'] = array();
 
         //sort results by last name

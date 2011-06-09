@@ -11,7 +11,9 @@
             <td>
 			<?php
 			if( !empty($questions)):
-			for ($i=1; $i <= count($questions); $i++): $question = $questions[$i]['Question'];
+			for ($i=1; $i <= count($questions); $i++): 
+                          $question = $questions[$i]['Question'];
+                          $answer = $answers[$question['id']];
 				echo "<br><table align=\"center\" width=\"95%\" cellspacing=\"0\" cellpadding=\"5\">
 						<tr class=\"tablecell\">
 						<td width=\"50\"><b><font size=\"2\">Q: ".$question['number']."</font></b><br>";
@@ -54,12 +56,12 @@
 				// Short Answer Question
 				elseif( $question['type'] == 'S'){
 					echo "<tr class=\"tablecell2\"><td colspan=\"8\">".$question['prompt']."</td></tr>";
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\"><input type=\"text\" name=\"answer_".$question['number']."\" style='width:55%;' value=\"".$answers[$i-1]['SurveyInput']['response_text']."\" disabled></input></td></tr>";
+					echo "<tr class=\"tablecell2\"><td colspan=\"8\"><input type=\"text\" name=\"answer_".$question['number']."\" style='width:55%;' value=\"".$answer['SurveyInput']['response_text']."\" disabled></input></td></tr>";
 				}
 				// Long Answer Question
 				elseif( $question['type'] == 'L'){
 					echo "<tr class=\"tablecell2\"><td colspan=\"8\">".$question['prompt']."</td></tr>";
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\"><textarea name=\"answer_".$question['number']."\"  style='width:55%;' rows=\"3\" disabled>".$answers[$i-1]['SurveyInput']['response_text']."</textarea></td></tr>";
+					echo "<tr class=\"tablecell2\"><td colspan=\"8\"><textarea name=\"answer_".$question['number']."\"  style='width:55%;' rows=\"3\" disabled>".$answer['SurveyInput']['response_text']."</textarea></td></tr>";
 				}
 
 				echo "</tr></table>";

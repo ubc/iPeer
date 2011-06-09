@@ -366,6 +366,16 @@ class Event extends AppModel
     	return $this->query($sql);
     }
 
+    function getEventTemplateTypeId($id){
+        $this->recursive = 0;
+        $event = $this->find('first', array(
+            'conditions' => array('Event.id' => $id),
+            'fields' => array('Event.event_template_type_id')
+        ));
+
+        return $event['Event']['event_template_type_id'];
+    }
+
     function formatEventObj ($eventId, $groupId=null)
     {
 //      //Get the target event

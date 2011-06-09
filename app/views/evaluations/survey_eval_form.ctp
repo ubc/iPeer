@@ -41,7 +41,7 @@
 
 					if( !empty($question['Responses'])){
 						foreach ($question['Responses'] as $index => $value):
-							echo "<input type=\"checkbox\" name=\"answer_".$question['number']."[]\" value=\"".$value['response']."_".$value['id']."\" > ".$value['response']."<br>";
+							echo "<input type=\"checkbox\" name=\"answer_".$question['id']."[]\" value=\"".$value['response']."_".$value['id']."\" > ".$value['response']."<br>";
 						endforeach;
 					}
 					echo "</td></tr>";
@@ -49,13 +49,13 @@
 				// Short Answer Question
 				elseif( $question['type'] == 'S'){
 					echo "<tr class=\"tablecell2\"><td colspan=\"8\">".$question['prompt']."</td></tr>";
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\"><input type=\"text\" name=\"answer_".$question['number']."\" style='width:55%;'></td></tr>";
+					echo "<tr class=\"tablecell2\"><td colspan=\"8\"><input type=\"text\" name=\"answer_".$question['id']."\" style='width:55%;'></td></tr>";
 					echo "<input type=\"hidden\" name=\"question_id".$question['number']."\" value=\"".$question['id']."\"/>";
 				}
 				// Long Answer Question
 				elseif( $question['type'] == 'L'){
 					echo "<tr class=\"tablecell2\"><td colspan=\"8\">".$question['prompt']."</td></tr>";
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\"><textarea name=\"answer_".$question['number']."\"  style='width:55%;' rows=\"3\"></textarea></td></tr>";
+					echo "<tr class=\"tablecell2\"><td colspan=\"8\"><textarea name=\"answer_".$question['id']."\"  style='width:55%;' rows=\"3\"></textarea></td></tr>";
 					echo "<input type=\"hidden\" name=\"question_id".$question['number']."\" value=\"".$question['id']."\"/>";
 				}
 
