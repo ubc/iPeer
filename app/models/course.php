@@ -406,7 +406,6 @@ class Course extends AppModel
 ##########################################################################################################        
 	
   	function createUserHelper( $id ='' , $username='' , $role='' ){
-	
 		$query = "INSERT INTO users VALUES ('$id','$role' ,'$username' , 'password', NULL , NULL , NULL , NULL , NULL , NULL , NULL , NULL , 'A', '0', '0000-00-00 00:00:00', NULL , NULL )";		
 		$this->query($query);
 	}

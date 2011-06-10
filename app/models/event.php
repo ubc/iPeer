@@ -120,12 +120,8 @@ class Event extends AppModel
     $this->virtualFields['student_count'] = sprintf('SELECT count(*) as count FROM group_events as vge RIGHT JOIN groups_members as vgm ON vge.group_id = vgm.group_id WHERE vge.event_id = %s.id', $this->alias);
     $this->virtualFields['completed_count'] = sprintf('SELECT count(*) as count FROM evaluation_submissions as ves WHERE ves.submitted = 1 AND ves.event_id = %s.id', $this->alias);
   }
-
-  function printing(){
-  	$this->log("PRINTED!!");
-  }
   
-	//Overwriting Function - will be called before save operation
+	// Overwriting Function - will be called before save operation
 	function beforeSave(){
         // Ensure the name is not empty
         if (empty($this->data[$this->name]['title'])) {

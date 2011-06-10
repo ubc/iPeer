@@ -425,6 +425,8 @@ class SurveysController extends AppController
       $this->data = $this->Question->find('first', array('conditions' => array('id' => $this->data['Question']['template_id'])));
       $this->set('responses', $this->data['Response']);
     } elseif (!empty($this->params['data']['Question'])) {
+//$maxQuestionNum = $this->SurveyQuestion->getMaxSurveyQuestionNumber($this->data['Survey']['id']);
+//$this->data['number'] = $maxQuestionNum+1;
       if ($this->Question->saveAll($this->data)) {
         $this->Session->setFlash('The question was added successfully.');
         $this->redirect('questionsSummary/'.$survey_id);

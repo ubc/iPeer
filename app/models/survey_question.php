@@ -31,21 +31,11 @@ class SurveyQuestion extends AppModel
   
   // returns all the question IDs of a specific survey
   function getQuestionsID($surveyId=null) {
-    
   	$data = $this->find('all', array('conditions'=> array('survey_id' => $surveyId),
                                      'fields' => array('number', 'question_id', 'id'),
                                      'order' => 'number'));
     $data['count'] = count($data);
     return $data;
-  	
-  	/*
-  	$surveyId=5;
-  	$sql = "SELECT question_id
-  			FROM survey_questions
-  			WHERE survey_id = $surveyId" ;  	
-    $val = $this->query($sql);
-    var_dump($val);
-    */
   }
 
   function moveQuestion($survey_id, $question_id, $position) {
@@ -71,7 +61,7 @@ class SurveyQuestion extends AppModel
         $data = $this->find('first', array(
             'conditions' => array('question_id' => $question_id,
             'survey_id' => $survey_id)));
-
+        
         // Check to make sure question isn't the very first question
         if ($data['SurveyQuestion']['number'] == 1) {
           return false;
@@ -96,7 +86,6 @@ class SurveyQuestion extends AppModel
           $save[] = $data2;
           $save[] = $data;
         }
-
         $save['0']['SurveyQuestion']['number']++;
         $save['1']['SurveyQuestion']['number']--;
         $this->saveAll($save, array('fieldList' => array('number')));
@@ -111,8 +100,12 @@ class SurveyQuestion extends AppModel
           'conditions' => array('number' => ($data['SurveyQuestion']['number'] + 1), 'survey_id' => $survey_id)));
 
         $save = array();
-        if( $data['SurveyQuestion']['number'] == 9999 || empty($data2) ){
+        if($data['SurveyQuestion']['number'] == 9999 || empty($data2)) {
           $questions = $this->reorderQuestions($survey_id);
+          $lastQuestionNum = $this->getLastSurveyQuestionNum($survey_id);
+          if($lastQuestionNum == $data['SurveyQuestion']['number']) {
+          	return false;
+          }
           foreach($questions as $k => $q) {
             if($q['SurveyQuestion']['number'] == $question_id) {
               if($k == count($questions) - 1) return false; // last one
@@ -175,6 +168,11 @@ class SurveyQuestion extends AppModel
     $this->saveAll($data, array('fieldList' => array('number')));
     return $data;
   }
+  
+  function getLastSurveyQuestionNum($surveyId) {
+  	$tmp = $this->find('all', array('condition' => array('SurveyQuestion.id' => $surveyId), 'fields' => array('max(number)')));
+  	return $tmp[0][0]['max(number)'];
+  }
 
   /*function deleteGroupSet($groupSetId=null) {
     $this->SurveyGroup = new SurveyGroup;
@@ -203,5 +201,4 @@ class SurveyQuestion extends AppModel
   }*/
 
 }
-
 ?>

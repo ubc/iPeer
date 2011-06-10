@@ -646,5 +646,4 @@ class UserTTestCase extends CakeTestCase {
 		$this->deleteAllTuples('groups_members');
 	}
 }
-
 ?>

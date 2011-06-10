@@ -15,12 +15,13 @@
             <td>
 			<?php
 			if(!empty($questions)):
+			$i = 1;
 			foreach ($questions as $row): $question = $row['Question'];
 				echo "<br><table align=\"center\" width=\"95%\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\">
 						<tr class=\"tablecell\">
-						<td width=\"50\"><b><font size=\"2\">Q: ".$question['number']."</font></b><br>";
+						<td width=\"50\"><b><font size=\"2\">Q: ".$i."</font></b><br>";
 				echo "</td></tr>";
-				
+				$i ++;
 				// Multiple Choice Question
 				if( $question['type'] == 'M'){
 					echo "<tr class=\"tablecell2\"><td colspan=\"8\">".$question['prompt']."</td></tr>";

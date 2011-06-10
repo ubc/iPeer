@@ -547,7 +547,6 @@ class InstallHelperComponent
             $svy_q_data['SurveyQuestion']['survey_id'] = $this->_getValueByTagNamePhp4($svy_q, 'survey_id');
             $svy_q_data['SurveyQuestion']['number'] = $this->_getValueByTagNamePhp4($svy_q, 'number');
             $svy_q_data['SurveyQuestion']['question_id'] = $this->_getValueByTagNamePhp4($svy_q, 'question_id');
-            
             $this->SurveyQuestion->save($svy_q_data);
             $this->SurveyQuestion->id = null;
           }
@@ -957,7 +956,6 @@ class InstallHelperComponent
             $svy_q_data['SurveyQuestion']['survey_id'] = $this->_getValueByTagNamePhp5($svy_q, 'survey_id');
             $svy_q_data['SurveyQuestion']['number'] = $this->_getValueByTagNamePhp5($svy_q, 'number');
             $svy_q_data['SurveyQuestion']['question_id'] = $this->_getValueByTagNamePhp5($svy_q, 'question_id');
-            
             $this->SurveyQuestion->save($svy_q_data);
             $this->SurveyQuestion->id = null;
           }

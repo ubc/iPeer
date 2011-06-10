@@ -10,7 +10,7 @@ $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","
     <?php
       for ($i=1; $i<=$rubric['Rubric']["criteria"]; $i++) {
     		echo "<td><strong><font color=" . $color[ $i % sizeof($color) ] . ">" . ($i) . ". "  . "</font></strong>";
-    		echo $rubricCriteria[0]['rubrics_criterias']['criteria'];
+    		echo $rubricCriteria[0]['criteria'];
     		echo "</td>";
     	}
     ?>
