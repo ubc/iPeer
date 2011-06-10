@@ -829,7 +829,7 @@ class UsersController extends AppController
         $this->Session->write('ipeerSession.courseId', $this->params['form']['course_id']);
         $filename = $this->params['form']['file']['name'];
         $tmpFile = $this->params['form']['file']['tmp_name'];
-
+        
         //$uploadDir = $this->sysContainer->getParamByParamCode('system.upload_dir');
         $uploadDir="../tmp/";
         $uploadFile = $uploadDir.$filename;
@@ -840,7 +840,7 @@ class UsersController extends AppController
             $this->set('errmsg','A File is required for the import!');
             $this->set('user_type', 'S');
             $this->set('import_again',"true");
-            $this->render('add');
+            $this->render('import');
             return false;
         }
 
@@ -850,7 +850,7 @@ class UsersController extends AppController
           $this->set('errmsg', $validUploads);
           $this->set('user_type', 'S');
           $this->set('import_again',"true");
-          $this->render('add');
+          $this->render('import');
           return false;
         }
 
