@@ -1183,7 +1183,7 @@ function reReleaseEvaluation ()
           $evalSubmission['EvaluationSubmission']['submitted'] = 0;
           $this->EvaluationSubmission->id = $evalSubmission['EvaluationSubmission']['id'];
           //$this->EvaluationSubmission->save($evalSubmission);
-          $this->EvaluationSubmission->del();
+          $this->EvaluationSubmission->delete();
       }
   }
   $this->redirect('/evaluations/viewGroupSubmissionDetails/'.$eventId.'/'.$groupId);

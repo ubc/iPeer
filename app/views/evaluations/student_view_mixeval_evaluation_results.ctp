@@ -10,8 +10,8 @@
     <!-- Render Event Info table -->
 	  <?php
 	  if (isset($memberScoreSummary[$currentUser['id']])) {
-	    $receviedAvePercent = $memberScoreSummary[$rdAuth->id]['received_ave_score'] / $mixeval['Mixeval']['total_marks'] * 100;
-	    $releaseStatus = $scoreRecords[$this->Auth->user('id')]['grade_released'];
+	    $receviedAvePercent = $memberScoreSummary[$currentUser['id']]['received_ave_score'] / $mixeval['Mixeval']['total_marks'] * 100;
+	    $releaseStatus = $scoreRecords[$currentUser['id']]['grade_released'];
 	  } else {
   	  $receviedAvePercent = 0;
   	  $releaseStatus = array();

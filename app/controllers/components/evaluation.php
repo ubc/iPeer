@@ -942,6 +942,7 @@ class EvaluationComponent extends Object
     $isCheckBoxes = false;
     $totalGrade = 0;
     $pos = 0;
+
     for($i=0; $i < $mixeval['Mixeval']['total_question']; $i++) {
       $evalMixevalDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera($evalMixevalId, $i);
       if (isset($evalMixevalDetail)) {
@@ -949,7 +950,7 @@ class EvaluationComponent extends Object
       }
       $evalMixevalDetail['EvaluationMixevalDetail']['evaluation_mixeval_id'] = $evalMixevalId;
       $evalMixevalDetail['EvaluationMixevalDetail']['question_number'] = $i;
-
+ 	
       if ($form['data']['Mixeval']['question_type'.$i] == 'S') {
         // get total possible grade for the question number ($i)
       	$selectedLom = $form['form']['selected_lom_'.$targetEvaluatee.'_'.$i];
@@ -958,7 +959,7 @@ class EvaluationComponent extends Object
         $evalMixevalDetail['EvaluationMixevalDetail']['grade'] = $grade;
     	$totalGrade += $grade;
       } else if ($form['data']['Mixeval']['question_type'.$i] == 'T') {
-        $evalMixevalDetail['EvaluationMixevalDetail']['question_comment'] = $form['form']["response_text_".$targetEvaluatee."_".$i];
+             $evalMixevalDetail['EvaluationMixevalDetail']['question_comment'] = $form['form']["response_text_".$targetEvaluatee."_".$i];
       }
       $this->EvaluationMixevalDetail->save($evalMixevalDetail);
       $this->EvaluationMixevalDetail->id=null;
@@ -993,8 +994,8 @@ class EvaluationComponent extends Object
               $event['group_event_id'],$userId);
             $ttlEvaluatorCount = $this->EvaluationMixeval->getReceivedTotalEvaluatorCount($event['group_event_id'],$userId);
             if ($ttlEvaluatorCount >0 ) {
-              $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0]['received_total_score'];
-              $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0]['received_total_score'] / $ttlEvaluatorCount;
+              $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0][0]['received_total_score'];
+              $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0][0]['received_total_score'] / $ttlEvaluatorCount;
             }
             foreach($mixevalResult AS $row ) {
               $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
@@ -1125,7 +1126,7 @@ class EvaluationComponent extends Object
           }
         }
       }	else {
-        foreach ($groupMembers as $user) {
+        foreach ($groupMembers['Group'] as $user) {
           if (!empty($user)) {
             // The array's format varries. Sometime a sub-array [0] is present
             $id = !empty($user['id']) ? $user['id'] : $user['User']['id'];

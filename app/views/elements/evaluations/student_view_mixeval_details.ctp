@@ -16,9 +16,9 @@
     <td width="100" valign="top">Person Being Evaluated</td>
     <?php
       for ($i=1; $i<=$mixeval['Mixeval']["lickert_question_max"]; $i++) {
-        if (isset($mixevalQuestion[$i])) {
+        if (isset($mixevalQuestion[$i-1])) {
       		echo "<td><strong><font color=" . $color[ $i % sizeof($color) ] . ">" . ($i) . ". "  . "</font></strong>";
-      		echo $mixevalQuestion[$i]['title'];
+      		echo $mixevalQuestion[$i-1]['title'];
       		echo "</td>";
       		$pos++;
       	}
@@ -38,18 +38,18 @@ else if ($gradeReleased || $commentReleased) {
    if (isset($scoreRecords)) {
      shuffle($memberResult);
    }
-
    foreach ($memberResult AS $row): $memberMixeval = $row['EvaluationMixeval'];
 
      if ($scoreRecords == null) { // renders self evaluation
-        $member = $membersAry[$memberMixeval['evaluatee']];
+     	$member = $membersAry[$memberMixeval['evaluatee']];
+     	
      } else { // renders evaluations from peers
         $member = $membersAry[$memberMixeval['evaluator']];
      }
 
      echo "<tr class=\"tablecell2\">";
      if (isset($scoreRecords)) {
-       echo "<td width='15%'>".$this->Auth->user('full_name')."</td>";
+       echo "<td width='15%'>".$member['User']['last_name'].' '.$member['User']['first_name']."</td>";
      } else {
        echo "<td width='15%'>".$member['User']['last_name'].' '.$member['User']['first_name']."</td>";
      }
@@ -65,8 +65,8 @@ else if ($gradeReleased || $commentReleased) {
         echo "<strong>Points: </strong>";
         if ($gradeReleased && isset($mixevalDet)) {
           //if (
-        	$lom = $mixevalDet["selected_lom"];
-        	$empty = $mixeval["Mixeval"]["scale_max"];
+        	$lom = $mixeval["Question"][$i-1]["multiplier"]/ $mixevalDet["selected_lom"];
+        	$empty = $mixeval["Question"][$i-1]["multiplier"];
         	for ($v = 0; $v < $lom; $v++) {
         		echo $html->image('evaluations/circle.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle'));
         		$empty--;
@@ -97,9 +97,9 @@ else if ($gradeReleased || $commentReleased) {
     <td width="100" valign="top">Person Being Evaluated</td>
     <?php
       for ($i=$pos; $i<=$mixeval['Mixeval']["total_question"]; $i++) {
-        if (isset($mixevalQuestion[$i])) {
+        if (isset($mixevalQuestion[$i-1])) {
       		echo "<td><strong><font color=" . $color[ $i % sizeof($color) ] . ">" . ($i) . ". "  . "</font></strong>";
-      		echo $mixevalQuestion[$i]['title'];
+      		echo $mixevalQuestion[$i-1]['title'];
       		echo "</td>";
       	}
     	}
@@ -128,7 +128,7 @@ if (!$gradeReleased && !$commentReleased) {
 
      echo "<tr class=\"tablecell2\">";
      if (isset($scoreRecords)) {
-       echo "<td width='15%'>".$this->Auth->user('full_name')."</td>";
+       echo "<td width='15%'>".$member['User']['last_name'].' '.$member['User']['first_name']."</td>";
      } else {
        echo "<td width='15%'>".$member['User']['last_name'].' '.$member['User']['first_name']."</td>";
      }
