@@ -384,7 +384,7 @@ class SurveysController extends AppController
       'conditions' => array('Survey.id' => $survey_id),
       //'contain' => array('Question', 'Response'),
       'order' => 'SurveyQuestion.number',
-      'recursive' => 1));
+      'recursive' => 1));  
     $this->set('survey_id', $survey_id);
     $this->set('questions', $questions);
     $this->set('is_editable', true);//TODO: check permission $this->controller->rdAuth->id == $data['Survey']['creator_id'] || $this->controller->rdAuth->id == 1
@@ -429,6 +429,9 @@ class SurveysController extends AppController
 //$this->data['number'] = $maxQuestionNum+1;
       if ($this->Question->saveAll($this->data)) {
         $this->Session->setFlash('The question was added successfully.');
+        // Need to run reorderQuestions once in order to correctly set the question position numbers
+        $surveyQuestionId = $this->SurveyQuestion->find('first', array('conditions' => array('survey_id' => $survey_id), 'fields' => array('MIN(number) as minQuestionId')));
+        $this->SurveyQuestion->reorderQuestions($survey_id, $surveyQuestionId['0']['minQuestionId'], 'TOP');
         $this->redirect('questionsSummary/'.$survey_id);
         //$this->questionsSummary($this->params['form']['survey_id'], null, null);
       } else {
