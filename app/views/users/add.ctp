@@ -1,5 +1,5 @@
 <?php $readonly = isset($readonly) ? $readonly : false;?>
-<?php $username_msg = $readonly ? '' : '<br /><u>Remember:</u> Usernames must be at least 6 characters long and contain only:<li>letters, digits, _ (underscore) or @ (at symbol) or . (period) </li>';?>
+<?php $username_msg = $readonly ? '' : '<br /><u>Remember:</u> Usernames must be at least 6 characters long and contain only:<li>letters and numbers</li>';?>
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>
@@ -17,10 +17,10 @@
         <!-- User Name -->
         <tr class="tablecell2">
           <?php echo $this->Form->input('username', array('id' => 'username', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'after' => $username_msg,
-                                                          'error' => array('unique' => __('Duplicate Username found. Please change the username.', true)),
+                                                          //'error' => array('unique' => __('Duplicate Username found. Please change the username.', true)),
                                                           'readonly' => $readonly));?>
           <?php echo $readonly ? '' : $ajax->observeField('username', array('update'=>'usernameErr', 'url'=>'checkDuplicateName/', 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');stripe();")); ?>
-          <td width="255" id="username_msg" class="error" ><div id='usernameErr' class="error"></div></td>
+          <td width="255"><div id='username_msg' class="error"></div><div id='usernameErr' class="error"></div></td>
         </tr>
 
         <?php if(!$readonly && !$isEdit):?>

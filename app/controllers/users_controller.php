@@ -356,6 +356,15 @@ class UsersController extends AppController
         $this->data['User']['id'] = $this->User->id;
         return true;
       }
+      else{
+        $validationErrors = $this->User->invalidFields();
+        $errorMsg = '';
+        foreach($validationErrors as $error){
+          $errorMsg = $errorMsg."\n".$error;
+        }
+        $this->Session->setFlash('Failed to save.</br>'.$errorMsg);
+        
+      }
     }
 
     return false;
@@ -412,8 +421,8 @@ class UsersController extends AppController
     // List the entrolled courses
     $simpleEnrolledList = array();
     foreach ($enrolled_courses as $value) {
-      if (!empty($coursesList[$value['user_enrols']['course_id']])) {
-        array_push($simpleEnrolledList, $value['user_enrols']['course_id']);
+      if (!empty($coursesList[$value['UserEnrol']['course_id']])) {
+        array_push($simpleEnrolledList, $value['UserEnrol']['course_id']);
       }
     }
 
@@ -547,6 +556,10 @@ class UsersController extends AppController
         $this->processEnrollmentListsPostBack($this->params, $id);
         // Set message for user.
         $this->Session->setFlash('Changes are saved.');
+      }
+      else{
+        $this->User->id = $id;
+        $this->data = $this->User->read();
       }
     }
     $isStudent = $this->determineIfStudentFromThisData($this->data);  
@@ -769,7 +782,7 @@ class UsersController extends AppController
       $this->set('username', $this->params['form']['newuser']);
       $this->set('isEnrolled', $isUserEnrol);*/
       //$this->render('checkDuplicateName');
-      return ($sFound) ? 'Username "'.$this->params['form']['newuser'].'" already exists.' : '';
+      return ($sFound) ? 'Username "'.$this->data['User']['username'].'" already exists.' : '';
     }
 
     function resetPassword($user_id, $render=true)
