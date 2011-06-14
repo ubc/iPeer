@@ -7,7 +7,6 @@
         $question_default = $data['Mixeval']['lickert_question_max'];
         $mixeval_avail = $data['Mixeval']['availability'];
         $total_mark = isset($data['Mixeval']['total_marks']) ? $data['Mixeval']['total_marks'] : "";
-        var_dump($total_mark);
         if(!empty($data['Mixeval']['zero_mark'])) {
             $zero_mark = $data['Mixeval']['zero_mark'];
         } else {

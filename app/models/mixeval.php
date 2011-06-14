@@ -78,7 +78,7 @@ class Mixeval extends AppModel
 //		$tmp = array_merge($tmp['data']['Mixeval'], $tmp['form']);
     $ttlQuestionNo = $tmp['data']['Mixeval']['total_question'];
     $questions = array();
-    for ($i = 1; $i < $ttlQuestionNo; $i++) {
+    for ($i = 1; $i < $ttlQuestionNo+1; $i++) {
       //Format questions for mixed eval
       $question['question_num'] = $i;
       $question['title'] = $tmp['data']['Mixeval']['title'.$i];
