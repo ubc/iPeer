@@ -74,7 +74,6 @@ class Mixeval extends AppModel
 	}
 	//sets the current userid and merges the form values into the data array
 	function prepData($tmp=null, $userid){
-
 //		$tmp = array_merge($tmp['data']['Mixeval'], $tmp['form']);
     $ttlQuestionNo = $tmp['data']['Mixeval']['total_question'];
     $questions = array();
