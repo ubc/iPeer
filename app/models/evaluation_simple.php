@@ -43,23 +43,36 @@ class EvaluationSimple extends AppModel
   }
 
   function setAllGroupCommentRelease($grpEventId=null, $releaseStatus=null, $evaluator=null, $evaluateeIds=null) {
-    $sql = 'UPDATE evaluation_simples SET release_status = '.$releaseStatus.' WHERE grp_event_id = '.$grpEventId;
-    if ($evaluateeIds !=null) {
-      $sql .= ' AND evaluator = '.$evaluator.' AND evaluatee IN ('.$evaluateeIds.')';
+//    $sql = 'UPDATE evaluation_simples SET release_status = '.$releaseStatus.' WHERE grp_event_id = '.$grpEventId;
+//    if ($evaluateeIds !=null) {
+//      $sql .= ' AND evaluator = '.$evaluator.' AND evaluatee IN ('.$evaluateeIds.')';
+//    }
+//    return $this->query($sql);
+    $fields = array('EvaluationSimple.release_status' => $releaseStatus);
+    $conditions = array('EvaluationSimple.grp_event_id' => $grpEventId);
+    if ($evaluateeIds !=null){
+      $conditions['EvaluationSimple.evaluator'] = $evaluator;
+      $conditions['EvaluationSimple.evaluatee IN'] = $evaluateeIds;
     }
-    return $this->query($sql);
+    return $this->updateAll($fields, $conditions);
   }
 
   function setAllEventCommentRelease($eventId=null, $releaseStatus=null) {
-    $sql = 'UPDATE evaluation_simples SET release_status = '.$releaseStatus.' WHERE event_id = '.$eventId;
-    return $this->query($sql);
+//    $sql = 'UPDATE evaluation_simples SET release_status = '.$releaseStatus.' WHERE event_id = '.$eventId;
+//    return $this->query($sql);
+    $fields = array('EvaluationSimple.release_status' => $releaseStatus);
+    $conditions = array('EvaluationSimple.event_id' => $eventId);
+    return $this->updateAll($fields, $conditions);
   }
 
 
   function setAllEventGradeRelease($eventId=null, $releaseStatus=null) {
-		$sql = 'UPDATE evaluation_simples SET grade_release = '.$releaseStatus.' WHERE event_id = '.$eventId;
-	  return $this->query($sql);
-	}
+//		$sql = 'UPDATE evaluation_simples SET grade_release = '.$releaseStatus.' WHERE event_id = '.$eventId;
+//	  return $this->query($sql);
+    $fields = array('EvaluationSimple.grade_release' => $releaseStatus);
+    $conditions = array('EvaluationSimple.event_id' => $eventId);
+    return $this->updateAll($fields, $conditions);
+  }
 
 	function getGroupResultsByGroupEventId($grpEventId=null)
 	{

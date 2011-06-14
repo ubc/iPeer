@@ -283,8 +283,9 @@ class MixevalsController extends AppController
 
 			if ($this->Mixeval->delete($id))
 			{
-				$this->MixevalsQuestionDesc->deleteQuestionDescriptors($id);
-				$this->MixevalsQuestion->deleteQuestions($id);
+                          //Automatically deleted by dependent setting on Model
+//				$this->MixevalsQuestionDesc->deleteQuestionDescriptors($id);
+//				$this->MixevalsQuestion->deleteQuestions($id);
 					
 				$this->Session->setFlash(__('The Mixed Evaluation was removed successfully.', true));
 				$this->redirect('index');
@@ -310,11 +311,11 @@ class MixevalsController extends AppController
 		$this->render('row');
 	}
 
-	function printUserName($user_id)
-	{
-		$tmp = $this->Mixeval->query("SELECT username FROM users WHERE id=$user_id");
-		echo $tmp[0]['users']['username'];
-	}
+//	function printUserName($user_id)
+//	{
+//		$tmp = $this->Mixeval->query("SELECT username FROM users WHERE id=$user_id");
+//		echo $tmp[0]['users']['username'];
+//	}
 
 	function update($attributeCode='',$attributeValue='') {
 		if ($attributeCode != '' && $attributeValue != '') //check for empty params

@@ -59,7 +59,8 @@ class MixevalsQuestion extends AppModel
   
   // called by the delete function in the controller
   function deleteQuestions( $id ){
-  	$this->query('DELETE FROM mixevals_questions WHERE mixeval_id='.$id);
+//  	$this->query('DELETE FROM mixevals_questions WHERE mixeval_id='.$id);
+    $this->delete($id);
   }
   
   // function to return the question description and weight from the

@@ -214,20 +214,20 @@ class Group extends AppModel
     return $maxGroupNum;
   }
 
-  function getFilteredStudents($group_id, $filter){
-    $course_id = $this->field('course_id',sprintf("id = '%d'", $group_id));
-    if($filter)
-    {
-      return $this->query("SELECT DISTINCT users.id, users.role, users.username, users.first_name, users.last_name, users.student_no, users.title
-                              FROM users
-                              JOIN user_enrols on users.id=user_enrols.user_id
-                              WHERE user_enrols.course_id=".$course_id." AND users.role = 'S' AND users.id NOT IN
-                              (SELECT user_id FROM `groups` LEFT JOIN groups_members as gs ON groups.id = gs.group_id WHERE groups.course_id = ".$course_id.")
-                              ORDER BY users.last_name ASC");
-    }else{
-      return $this->groupDifference($group_id,$course_id);
-    }
-  }
+//  function getFilteredStudents($group_id, $filter){
+//    $course_id = $this->field('course_id',sprintf("id = '%d'", $group_id));
+//    if($filter)
+//    {
+//      return $this->query("SELECT DISTINCT users.id, users.role, users.username, users.first_name, users.last_name, users.student_no, users.title
+//                              FROM users
+//                              JOIN user_enrols on users.id=user_enrols.user_id
+//                              WHERE user_enrols.course_id=".$course_id." AND users.role = 'S' AND users.id NOT IN
+//                              (SELECT user_id FROM `groups` LEFT JOIN groups_members as gs ON groups.id = gs.group_id WHERE groups.course_id = ".$course_id.")
+//                              ORDER BY users.last_name ASC");
+//    }else{
+//      return $this->groupDifference($group_id,$course_id);
+//    }
+//  }
 
   function getStudentsNotInGroup($group_id, $type = 'all') {
     return $this->Member->getStudentsNotInGroup($group_id, $type);
@@ -238,15 +238,15 @@ class Group extends AppModel
   }
   
   
-  function countUserSubmissionsInAGroup($user_id, $group_id) {
-    $data = $this->query("
-        SELECT count(*) AS count FROM users AS User
-        JOIN evaluation_submissions AS EvaluationSubmission ON User.id=submitter_id
-        JOIN group_events AS GroupEvent ON GroupEvent.id=EvaluationSubmission.grp_event_id
-        WHERE User.id=$user_id AND group_id=$group_id");
-
-    return $data[0][0]['count'];
-}
+//  function countUserSubmissionsInAGroup($user_id, $group_id) {
+//    $data = $this->query("
+//        SELECT count(*) AS count FROM users AS User
+//        JOIN evaluation_submissions AS EvaluationSubmission ON User.id=submitter_id
+//        JOIN group_events AS GroupEvent ON GroupEvent.id=EvaluationSubmission.grp_event_id
+//        WHERE User.id=$user_id AND group_id=$group_id");
+//
+//    return $data[0][0]['count'];
+//}
 
   function getGroupByGroupId($groupId, $fields=null){
   	return $this->find('all',array('conditions'=>array('Group.id'=>$groupId), 'fields' => $fields));

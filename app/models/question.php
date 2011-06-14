@@ -80,13 +80,13 @@ class Question extends AppModel
     return $data;
   }
 
-  // delete old question references in each table
-  function editCleanUp($question_id)
-  {
-  		$this->query('DELETE FROM questions WHERE id='.$question_id);
-		$this->query('DELETE FROM responses WHERE question_id='.$question_id);
-		$this->query('DELETE FROM survey_questions WHERE question_id='.$question_id);
-  }
+//  // delete old question references in each table
+//  function editCleanUp($question_id)
+//  {
+//  		$this->query('DELETE FROM questions WHERE id='.$question_id);
+//		$this->query('DELETE FROM responses WHERE question_id='.$question_id);
+//		$this->query('DELETE FROM survey_questions WHERE question_id='.$question_id);
+//  }
 
   function getTypeById($id=null) {
     $type = $this->find('first', array(

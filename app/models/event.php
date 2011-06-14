@@ -356,10 +356,13 @@ class Event extends AppModel
     }
 
     function getEventById($id){
-    	$sql = "SELECT *
-    			FROM events
-    			WHERE id=$id";
-    	return $this->query($sql);
+//    	$sql = "SELECT *
+//    			FROM events
+//    			WHERE id=$id";
+//    	return $this->query($sql);
+      return $this->find('first', array(
+          'conditions' => array('Event.id' => $id)
+      ));
     }
 
     function getEventTemplateTypeId($id){

@@ -292,18 +292,25 @@ class GroupEvent extends AppModel
   }
   
   function getGroupEventByEventId($eventId){
-  	$sql = "SELECT group_id
-  			FROM group_events
-  			WHERE event_id=$eventId";
-  	return $this->query($sql);
+//  	$sql = "SELECT group_id
+//  			FROM group_events
+//  			WHERE event_id=$eventId";
+//  	return $this->query($sql);
+    return $this->find('all', array(
+        'conditions' => array('GroupEvent.event_id' => $eventId)
+    ));
   }
   
   function getGroupEventByEventIdAndGroupId($eventId, $groupId){
-  	$sql = "SELECT id
-  			FROM group_events
-  			WHERE event_id=$eventId AND group_id=$groupId";
-  	$returning = $this->query($sql);
-  	return $returning[0]['group_events']['id'];
+//  	$sql = "SELECT id
+//  			FROM group_events
+//  			WHERE event_id=$eventId AND group_id=$groupId";
+//  	$returning = $this->query($sql);
+    $returning = $this->find('first', array(
+        'conditions' => array('GroupEvent.event_id' => $eventId, 'GroupEvent.group_id' => $groupId),
+        'fields' => array('GroupEvent.id')
+    ));
+    return $returning['GroupEvent']['id'];
   }
 }
 ?>

@@ -205,7 +205,7 @@ class sysContainerComponent
 		if ($coursesList!=null)
 		{
 			$pos = 1;
-			foreach($coursesList as $row): $course = $row['courses'];
+			foreach($coursesList as $row): $course = $row['Course'];
 			$result[$course['id']] = $course;
 
 			$this->myCourseIDs .= $course['id'];

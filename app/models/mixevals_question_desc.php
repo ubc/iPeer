@@ -66,18 +66,18 @@ class MixevalsQuestionDesc extends AppModel
   	$this->insertQuestionDescriptor($id, $data);
   }
 
-  // called by the delete function in the controller
-  function deleteQuestionDescriptors( $id ){
-  	
-  	
-      
-  	$this->query('DELETE 
-  				  FROM mixevals_question_descs 
-  				  WHERE question_id IN 
-  				  	(SELECT id 
-  				  	FROM mixevals_questions 
-  				  	WHERE id='.$id.')');
-  }
+//  // called by the delete function in the controller
+//  function deleteQuestionDescriptors( $id ){
+//
+//
+//
+//  	$this->query('DELETE
+//  				  FROM mixevals_question_descs
+//  				  WHERE question_id IN
+//  				  	(SELECT id
+//  				  	FROM mixevals_questions
+//  				  	WHERE id='.$id.')');
+//  }
 
   // function to return the question's descriptor
   function getQuestionDescriptor($mixevalId, $questionNum){

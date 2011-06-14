@@ -240,7 +240,9 @@ class Rubric extends EvaluationBase
   }
   
   function getRubricById($id=null){
-  	return $this->find('all',array('conditions'=>array('id'=>$id)));
+  	return $this->find('first',array(
+          'conditions'=>array('Rubric.id'=>$id)
+        ));
   }
 
   function compileViewData($tmp) {

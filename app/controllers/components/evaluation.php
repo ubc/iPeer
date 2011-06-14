@@ -321,19 +321,16 @@ class EvaluationComponent extends Object
           //Check for released guys
           if (isset($params['form']['release'.$value])) {
             $evaluateeIds = $params['form']['release'.$value];
-            $idString = '';
+            $idString = array();
             $pos = 1;
             foreach($evaluateeIds as $index=>$id) {
-              $idString .= $id;
-              if ($pos < count($evaluateeIds)) {
-                $idString .= ',';
-              }
+              $idString[$pos] = $id;
               $pos ++;
             }
             $this->EvaluationSimple->setAllGroupCommentRelease($groupEventId, 1, $value, $idString);
           }
           $evaluator = $value;
-          $idString = '';
+          $idString = array();
         }
       }
       //check grade release status for the GroupEvent

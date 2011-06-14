@@ -193,105 +193,132 @@ class Course extends AppModel
 
 #### Function modified by Tony (March 11/2011)
   // Find all accessible courses id
-  function findAccessibleCoursesListByUserIdRole($userId=null, $userRole='', $condition=null){
+  function findAccessibleCoursesListByUserIdRole($userId=null, $userRole='', $condition=null){  	
+    switch($userRole){
+      case 'S':
+        //$course =  $this->query('SELECT * FROM courses WHERE id IN ( SELECT DISTINCT course_id FROM user_enrols WHERE user_id = '.$userId.') ORDER BY course');
+        $conditionsSubQuery['UserEnrol.user_id'] = $userId;
+        $dbo = $this->UserEnrol->getDataSource();
+        $subQuery = $dbo->buildStatement(
+        array(
+            'fields' => array('DISTINCT UserEnrol.course_id'),
+            'table' => $dbo->fullTableName($this->UserEnrol),
+            'alias' => 'UserEnrol',
+            'conditions' => $conditionsSubQuery,
+            'order' => null,
+            'limit' => null,
+            'group' => null
+          ),
+          $this->UserEnrol
+        );
+        $subQuery = 'Course.id IN (' . $subQuery . ') ';
+        $subQueryExpression = $dbo->expression($subQuery);
+        $conditions[] = $subQueryExpression;
+        $this->recursive = 0;
+        $course = $this->find('all', compact('conditions'));
+        return $course;
+      break;
 
-/*
-    if ($userRole == 'S') {
-      $course =  $this->query('SELECT * FROM courses WHERE id IN ( SELECT DISTINCT course_id FROM user_enrols WHERE user_id = '.$userId.') ORDER BY course');
-      return $course;
-    } else  if ($userRole == 'A') {
-        if ($condition !=null) {
-          return $this->query('SELECT * FROM courses WHERE '.$condition.' ORDER BY course');
-        } else {
-          return $this->query('SELECT * FROM courses ORDER BY course');
-        }
-      } else {
-        if ($condition !=null) {
-            $course =  $this->query('SELECT * FROM courses WHERE record_status = "A" AND '.$condition.' AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' ) ORDER BY course');
-        } else {
-            $course =  $this->query('SELECT * FROM courses WHERE record_status = "A" AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' ) ORDER BY course');
-        }
-		return $course;
+      case 'A':
+//        if ($condition !=null){
+//          return $this->query('SELECT * FROM courses WHERE '.$condition.' ORDER BY course');
+//          break;
+//        }
+//        else{
+//          return $this->query('SELECT * FROM courses ORDER BY course');
+//          break;
+//        }
+        return $this->find('all', array(
+            'conditions' => $condition,
+            'order' => 'Course.course'
+        ));
+        break;
+
+      default:
+//        if($condition !=null){
+//          $course =  $this->query('SELECT * FROM courses WHERE record_status = "A" AND '.$condition.' AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' ) ORDER BY course');
+//        }else{
+//          $course =  $this->query('SELECT * FROM courses WHERE record_status = "A" AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' ) ORDER BY course');
+//        }
+        $conditionsSubQuery['UserEnrol.user_id'] = $userId;
+        $dbo = $this->UserEnrol->getDataSource();
+        $subQuery = $dbo->buildStatement(
+        array(
+            'fields' => array('DISTINCT UserEnrol.course_id'),
+            'table' => $dbo->fullTableName($this->UserEnrol),
+            'alias' => 'UserEnrol',
+            'conditions' => $conditionsSubQuery,
+            'order' => null,
+            'limit' => null,
+            'group' => null
+          ),
+          $this->UserEnrol
+        );
+        $subQuery = 'Course.id IN (' . $subQuery . ') ';
+        $subQueryExpression = $dbo->expression($subQuery);
+        $conditions[] = $condition + $subQueryExpression;
+        $conditions['Course.record_status'] = 'A';
+        $this->recursive = 0;
+        $course = $this->find('all', compact('conditions'));
+        return $course;
     }
-
-    return false;
-*/
-  	
-  	switch($userRole){
-  		case 'S':
-  			$course =  $this->query('SELECT * FROM courses WHERE id IN ( SELECT DISTINCT course_id FROM user_enrols WHERE user_id = '.$userId.') ORDER BY course');
-      		return $course;
-      		break;
-      		
-  		case 'A':
-  			if ($condition !=null){
-          		return $this->query('SELECT * FROM courses WHERE '.$condition.' ORDER BY course');
-          		break;
-        }
-        	else{
-          		return $this->query('SELECT * FROM courses ORDER BY course');
-          		break;
-        }
-
-  		default:
-  			if($condition !=null){
-            	$course =  $this->query('SELECT * FROM courses WHERE record_status = "A" AND '.$condition.' AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' ) ORDER BY course');
-        	}else{
-           		$course =  $this->query('SELECT * FROM courses WHERE record_status = "A" AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' ) ORDER BY course');
-        	}
-				return $course;
-    
-  	}
   }
 
   // Find the record count of all accessible courses
   function findAccessibleCoursesCount($userId=null, $userRole=null, $condition=null){
-  	
-/*
-    if ($userRole == 'S') {
-        $course =  $this->query('SELECT COUNT(DISTINCT course_id) as total FROM user_enrols WHERE user_id = '.$userId);
-        return $course;
-    } else if ($userRole == 'A') {
-        if ($condition !=null) {
-          return $this->query('SELECT COUNT(*) AS total FROM courses WHERE '.$condition);
-        } else {
-          return $this->query('SELECT COUNT(*) AS total FROM courses');
-        }
-    } else {
-        if ($condition !=null) {
-          $course =  $this->query('SELECT COUNT(*) as total FROM courses WHERE record_status = "A" AND '.$condition.' AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' )');
-        } else {
-          $course =  $this->query('SELECT COUNT(*) as total FROM courses WHERE record_status = "A" AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' )');
-        }
-        return $course;
-    }
-*/
-
     switch($userRole){
-    	case 'S':
-    		$course =  $this->query('SELECT COUNT(DISTINCT course_id) as total FROM user_enrols WHERE user_id = '.$userId);
-        	return $course;
-        	break;
-        	
-    	case 'A':
-    		//Check that admin is exists
-    		$sql = 'SELECT COUNT( * ) as count
-					FROM users U
-					WHERE U.id = '.$userId.'';
-    	$adminCount = $this->query($sql);
-    	if($adminCount[0][0]['count']>=1){	
-    		if ($condition !=null) return $this->query('SELECT COUNT(*) AS total FROM courses WHERE '.$condition);
-    		else return $this->query('SELECT COUNT(*) AS total FROM courses');
-    		break;
-    	}
-    	else return null;
-    	break;
-    	
-    	default:
-    		if ($condition !=null) return $this->query('SELECT COUNT(*) as total FROM courses WHERE record_status = "A" AND '.$condition.' AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' )');
-    		else return $this->query('SELECT COUNT(*) as total FROM courses WHERE record_status = "A" AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' )');
-			break;    		
-    }
+      case 'S':
+        //$course =  $this->query('SELECT COUNT(DISTINCT course_id) as total FROM user_enrols WHERE user_id = '.$userId);
+        $course = $this->UserEnrol->find('count', array(
+          'conditions' => array('UserEnrol.user_id' => $userId),
+          'fields' => 'DISTINCT UserEnrol.course_id'
+        ));
+        return $course;
+        break;
+
+      case 'A':
+//        //Check that admin is exists
+//        $sql = 'SELECT COUNT( * ) as count
+//                                FROM users U
+//                                WHERE U.id = '.$userId.'';
+//        $adminCount = $this->query($sql);
+//        if($adminCount[0][0]['count']>=1){
+//          if ($condition !=null) return $this->query('SELECT COUNT(*) AS total FROM courses WHERE '.$condition);
+//          else return $this->query('SELECT COUNT(*) AS total FROM courses');
+//          break;
+//        }
+//        else return null;
+        return $this->find('count', array(
+          'conditions' => $condition
+        ));
+      break;
+
+      default:
+//        if ($condition !=null) return $this->query('SELECT COUNT(*) as total FROM courses WHERE record_status = "A" AND '.$condition.' AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' )');
+//        else return $this->query('SELECT COUNT(*) as total FROM courses WHERE record_status = "A" AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' )');
+        $conditionsSubQuery['UserEnrol.user_id'] = $userId;
+        $dbo = $this->UserEnrol->getDataSource();
+        $subQuery = $dbo->buildStatement(
+        array(
+            'fields' => array('DISTINCT UserEnrol.course_id'),
+            'table' => $dbo->fullTableName($this->UserEnrol),
+            'alias' => 'UserEnrol',
+            'conditions' => $conditionsSubQuery,
+            'order' => null,
+            'limit' => null,
+            'group' => null
+          ),
+          $this->UserEnrol
+        );
+        $subQuery = 'Course.id IN (' . $subQuery . ') ';
+        $subQueryExpression = $dbo->expression($subQuery);
+        $conditions[] = $condition + $subQueryExpression;
+        $conditions['Course.record_status'] = 'A';
+        $this->recursive = 0;
+        $course = $this->find('count', compact('conditions'));
+        return $course;
+      break;
+  }
     
   }
 
@@ -310,67 +337,63 @@ class Course extends AppModel
   // Generates SQL for querrying courses, only Instructors and admin can access this function.
   function generateRegisterCourseSQL($userId, $enrolled = true, $getCount = false,  $requester = null, $requester_role = null)
   {
-  	//verify that all necessary inputs are not null && requester's role indeed matches with $requester_role
-  	$isUserRoleMatch = $this->verifyUserRole($requester, $requester_role);
-	if($userId==null || $requester==null || $requester_role==null || $isUserRoleMatch==0) return array(); 	
-  	
-  	$enrolled = $enrolled ? 'IN' : 'NOT IN';
-  	$getCount = $getCount ? 'count(*) as total' : '*';
-  	
-  	//requester_role is 'Admin' or 'Instructor'
-  	if($requester_role=='A' || $requester_role=='I'){
-  		$sql = 'SELECT '.$getCount.' 
-  				FROM courses C 
-  				WHERE C.id '.$enrolled.' ( SELECT U.course_id 
-  								FROM user_courses U 
-  								WHERE U.user_id ='.$userId.')';
-  		
-  		return $sql;
-  		}
-  	//requester_role is 'Student' or invalid
-  	else return array();
-  	
-  							
-  	/*
-    $getCount = $getCount ? 'count(*) as total' : '*';
+    //verify that all necessary inputs are not null && requester's role indeed matches with $requester_role
+    $isUserRoleMatch = $this->verifyUserRole($requester, $requester_role);
+    if($userId==null || $requester==null || $requester_role==null || $isUserRoleMatch==0) return array();
+//
+//  	$enrolled = $enrolled ? 'IN' : 'NOT IN';
+//  	$getCount = $getCount ? 'count(*) as total' : '*';
+//
+//  	//requester_role is 'Admin' or 'Instructor'
+//  	if($requester_role=='A' || $requester_role=='I'){
+//  		$sql = 'SELECT '.$getCount.'
+//  				FROM courses C
+//  				WHERE C.id '.$enrolled.' ( SELECT U.course_id
+//  								FROM user_courses U
+//  								WHERE U.user_id ='.$userId.')';
+//
+//  		return $sql;
+//  		}
+//  	//requester_role is 'Student' or invalid
+//  	else return array();
+    $type = $getCount ? 'count': 'all';
     $enrolled = $enrolled ? 'IN' : 'NOT IN';
-
-    $sql = 'SELECT '.$getCount.' FROM courses As Course ';
-    $condition = 'Course.id '.$enrolled.' (SELECT course_id FROM user_enrols WHERE user_id = ' . $userId . ')';
-
-    if(null == $requester_role && null == $requester)
-    {
+    
+    $conditionsSubQuery['UserCourse.user_id'] = $userId;
+    $dbo = $this->UserEnrol->getDataSource();
+    $subQuery = $dbo->buildStatement(
+    array(
+        'fields' => array('UserCourse.course_id'),
+        'table' => $dbo->fullTableName($this->UserCourse),
+        'alias' => 'UserCourse',
+        'conditions' => $conditionsSubQuery,
+        'order' => null,
+        'limit' => null,
+        'group' => null
+      ),
+      $this->UserCourse
+    );
+    $subQuery = 'Course.id'. $enrolled .'(' . $subQuery . ') ';
+    $subQueryExpression = $dbo->expression($subQuery);
+    $conditions[] = $subQueryExpression;
+    $this->recursive = 0;
+    //requester_role is 'Admin' or 'Instructor'
+    if($requester_role=='A' || $requester_role=='I')
+      return $this->find($type, compact('conditions'));
+    else
       return array();
-    }
-    elseif(null == $requester_role && null != $requester)
-    {
-      $user = new User();
-      $user->read(null, $requester);
-      $requester_role = $user['role'];
-    }
-
-    if('A' != $requester_role)
-    {
-      $sql .= ' LEFT JOIN user_courses as UserCourse ON Course.id = UserCourse.course_id ';
-      $condition .= ' AND UserCourse.user_id = '.$requester;
-    }
-
-    $sql .= ' WHERE '.$condition;
-
-    return $sql;
-    */
   }
 
   function findRegisteredCoursesList($user_id, $requester = null, $requester_role = null){
-	return $this->query($this->generateRegisterCourseSQL($user_id, true, false, $requester, $requester_role));
+	return $this->generateRegisterCourse($user_id, true, false, $requester, $requester_role);
   } 
 
   function findNonRegisteredCoursesList($user_id, $requester = null, $requester_role = null) {
-    return $this->query($this->generateRegisterCourseSQL($user_id, false, false, $requester, $requester_role));
+    return $this->generateRegisterCourse($user_id, false, false, $requester, $requester_role);
   }
 
   function findNonRegisteredCoursesCount($user_id, $requester = null, $requester_role = null){
-    return $this->query($this->generateRegisterCourseSQL($user_id, false, true, $requester, $requester_role));
+    return $this->generateRegisterCourse($user_id, false, true, $requester, $requester_role);
   }
   
   function getCourseName($id) {

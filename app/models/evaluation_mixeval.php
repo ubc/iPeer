@@ -128,13 +128,19 @@ class EvaluationMixeval extends AppModel
     }
 
     function setAllEventCommentRelease($eventId=null, $releaseStatus=null) {
-        $sql = 'UPDATE evaluation_mixevals SET comment_release = '.$releaseStatus.' WHERE event_id = '.$eventId;
-        return $this->query($sql);
+//        $sql = 'UPDATE evaluation_mixevals SET comment_release = '.$releaseStatus.' WHERE event_id = '.$eventId;
+//        return $this->query($sql);
+      $fields = array('EvaluationMixeval.commnet_release' => $releaseStatus);
+      $conditions = array('EvaluationMixeval.event_id' => $eventId);
+      return $this->updateAll($fields, $conditions);
     }
 
     function setAllEventGradeRelease($eventId=null, $releaseStatus=null) {
-        $sql = 'UPDATE evaluation_mixevals SET grade_release = '.$releaseStatus.' WHERE event_id = '.$eventId;
-        return $this->query($sql);
+//        $sql = 'UPDATE evaluation_mixevals SET grade_release = '.$releaseStatus.' WHERE event_id = '.$eventId;
+//        return $this->query($sql);
+      $fields = array('EvaluationMixeval.grade_release' => $releaseStatus);
+      $conditions = array('EvaluationMixeval.event_id' => $eventId);
+      return $this->updateAll($fields, $conditions);
     }
 
     function getMixEvalById($id)

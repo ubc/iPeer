@@ -71,16 +71,33 @@ class EvaluationRubric extends AppModel
         }
 
 	function getCriteriaResults($grpEventId=null,$evaluatee=null) {
-        $data = $this->query('SELECT ' .
-                'SUM(EvaluationRubricDetail.grade) AS sumScore, ' .
-                'COUNT(EvaluationRubricDetail.grade) As count, ' .
-                'EvaluationRubricDetail.criteria_number as criteria FROM evaluation_rubrics ' .
-                'JOIN evaluation_rubric_details AS EvaluationRubricDetail ' .
-                'ON EvaluationRubricDetail.evaluation_rubric_id = evaluation_rubrics.id ' .
-                'WHERE evaluation_rubrics.grp_event_id=' . $grpEventId .
-                ' AND evaluation_rubrics.evaluatee=' . $evaluatee .
-                ' GROUP BY EvaluationRubricDetail.criteria_number');
+//        $data = $this->query('SELECT ' .
+//                'SUM(EvaluationRubricDetail.grade) AS sumScore, ' .
+//                'COUNT(EvaluationRubricDetail.grade) As count, ' .
+//                'EvaluationRubricDetail.criteria_number as criteria FROM evaluation_rubrics ' .
+//                'JOIN evaluation_rubric_details AS EvaluationRubricDetail ' .
+//                'ON EvaluationRubricDetail.evaluation_rubric_id = evaluation_rubrics.id ' .
+//                'WHERE evaluation_rubrics.grp_event_id=' . $grpEventId .
+//                ' AND evaluation_rubrics.evaluatee=' . $evaluatee .
+//                ' GROUP BY EvaluationRubricDetail.criteria_number');
 
+        $this->recursive = 0;
+        $data = $this->find('all', array(
+            'conditions' => array('EvaluationRubric.grp_event_id' => $grpEventId, 'EvaluationRubric.evaluatee' => $evaluatee),
+            'fields' => array('SUM(EvaluationRubricDetail.grade) AS sumScore',
+                'COUNT(EvaluationRubricDetail.grade) As count',
+                'EvaluationRubricDetail.criteria_number as criteria'),
+            'joins' => array(array(
+                'table' => 'evaluation_rubric_details',
+                'alias' => 'EvaluationRubricDetail',
+                'type' => 'inner',
+                'foreignKey' => false,
+                'conditions'=> array('EvaluationRubricDetail.evaluation_rubric_id = EvaluationRubric.id')
+              )),
+
+            'group' => 'EvaluationRubricDetail.criteria_number'
+        ));
+        
         $results = array();
         for ($i = 0; $i < sizeof($data); $i++) {
             //Calculate grade average
@@ -165,13 +182,19 @@ class EvaluationRubric extends AppModel
         }
 
 	function setAllEventCommentRelease($eventId=null, $releaseStatus=null) {
-        $sql = 'UPDATE evaluation_rubrics SET comment_release = '.$releaseStatus.' WHERE event_id = '.$eventId;
-        return $this->query($sql);
+//        $sql = 'UPDATE evaluation_rubrics SET comment_release = '.$releaseStatus.' WHERE event_id = '.$eventId;
+//        return $this->query($sql);
+          $fields = array('EvaluationRubric.commnet_release' => $releaseStatus);
+          $conditions = array('EvaluationRubric.event_id' => $eventId);
+          return $this->updateAll($fields, $conditions);
 	}
 
 	function setAllEventGradeRelease($eventId=null, $releaseStatus=null) {
-        $sql = 'UPDATE evaluation_rubrics SET grade_release = '.$releaseStatus.' WHERE event_id = '.$eventId;
-        return $this->query($sql);
+//        $sql = 'UPDATE evaluation_rubrics SET grade_release = '.$releaseStatus.' WHERE event_id = '.$eventId;
+//        return $this->query($sql);
+          $fields = array('EvaluationRubric.grade_release' => $releaseStatus);
+          $conditions = array('EvaluationRubric.event_id' => $eventId);
+          return $this->updateAll($fields, $conditions);
 	}
 }
 ?>

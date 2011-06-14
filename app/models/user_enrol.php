@@ -2,6 +2,8 @@
 class UserEnrol extends AppModel
 {
   var $name = 'UserEnrol';
+
+  var $belongsTo = array('User');
     
   //Moved function to User
  /* function getEnrolledCourses($userId=null)
@@ -30,10 +32,13 @@ class UserEnrol extends AppModel
   
   // Returns true if the username is enrolled in the course, and false if not.
   function isEnrolledInByUsername($username, $courseId) {
-    $result = $this->query("select User.id from users join user_enrols" .
-                            "on users.id=user_enrols.user_id " . 
-                            "where username=$username and course_id=$courseId");
-    return count($results) > 0;
+//    $result = $this->query("select User.id from users join user_enrols" .
+//                            "on users.id=user_enrols.user_id " .
+//                            "where username=$username and course_id=$courseId");
+//    return count($results) > 0;    
+    return $this->find('count', array(
+        'conditions' => array('UserEnrol.course_id' => $courseId, 'User.username' => $username)
+    ));
   }
 
   function insertCourses ($user_id, $course_ids) {

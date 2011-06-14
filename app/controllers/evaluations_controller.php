@@ -1253,22 +1253,27 @@ function viewSurveySummary($surveyId=null) {
 //        $evalutorToEvaluateesByGroup=array();
 
       foreach ($groupEventsArray as $key=>$value) {
-          $sql = "SELECT id,evaluator,evaluatee FROM `evaluation_rubrics` WHERE `grp_event_id` = $value ORDER BY `evaluator` ASC, `evaluatee` ASC";
-          $result=$this->EvaluationRubric->query($sql);
-          $evalutorToEvaluatees=array();
-          foreach ($result as $resultKey=>$resultArray){
-              if (!isset($evalutorToEvaluatees[$resultArray['evaluation_rubrics']['evaluator']]))
-                  $evalutorToEvaluatees[$resultArray['evaluation_rubrics']['evaluator']]=array();
+//          $sql = "SELECT id,evaluator,evaluatee FROM `evaluation_rubrics` WHERE `grp_event_id` = $value ORDER BY `evaluator` ASC, `evaluatee` ASC";
+//          $result=$this->EvaluationRubric->query($sql);
+        $result = $this->EvaluationRubric->find('all', array(
+            'conditions' => array('EvaluationRubric.grp_event_id' => $value),
+            'fields' => array('EvaluationRubric.id', 'EvaluationRubric.evaluator', 'EvaluationRubric.evaluatee'),
+            'order' => array('EvaluationRubric.evaluator' => 'ASC', 'EvaluationRubric.evaluatee' => 'ASC')
+        ));
+        $evalutorToEvaluatees=array();
+        foreach ($result as $resultKey=>$resultArray){
+            if (!isset($evalutorToEvaluatees[$resultArray['evaluation_rubrics']['evaluator']]))
+                $evalutorToEvaluatees[$resultArray['evaluation_rubrics']['evaluator']]=array();
 
-          foreach ($resultArray as $rubricEvalKey=>$rubricEvalValue) {
-                  for($i=1;$i<=$numberOfCriteria;$i++){
-                     $evalutorToEvaluatees[$rubricEvalValue['evaluator']]['evaluatee'][$rubricEvalValue['evaluatee']]['grade'][$i]=$this->EvaluationRubricDetail->field('grade',array('evaluation_rubric_id'=>$rubricEvalValue['id'],'criteria_number'=>$i));
+        foreach ($resultArray as $rubricEvalKey=>$rubricEvalValue) {
+                for($i=1;$i<=$numberOfCriteria;$i++){
+                   $evalutorToEvaluatees[$rubricEvalValue['evaluator']]['evaluatee'][$rubricEvalValue['evaluatee']]['grade'][$i]=$this->EvaluationRubricDetail->field('grade',array('evaluation_rubric_id'=>$rubricEvalValue['id'],'criteria_number'=>$i));
 
-                     $evalutorToEvaluatees[$rubricEvalValue['evaluator']]['evaluatee'][$rubricEvalValue['evaluatee']]['criteria_comment'][$i]=$this->EvaluationRubricDetail->field('criteria_comment',array('evaluation_rubric_id'=>$rubricEvalValue['id'],'criteria_number'=>$i));
-                  }
-              }
-          }
-          $evalutorToEvaluateesByGroup[]=$evalutorToEvaluatees;
+                   $evalutorToEvaluatees[$rubricEvalValue['evaluator']]['evaluatee'][$rubricEvalValue['evaluatee']]['criteria_comment'][$i]=$this->EvaluationRubricDetail->field('criteria_comment',array('evaluation_rubric_id'=>$rubricEvalValue['id'],'criteria_number'=>$i));
+                }
+            }
+        }
+        $evalutorToEvaluateesByGroup[]=$evalutorToEvaluatees;
 
       }
 

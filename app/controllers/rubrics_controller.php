@@ -67,13 +67,6 @@ class RubricsController extends AppController
     return $data;
   }
 
-  function getRubricById($id){
-  	$sql="SELECT *
-  		  FROM rubrics
-  		  WHERE id=$id";
-  	return $this->query($sql);
-  }
-
   function setUpAjaxList() {
     // Set up Columns
     $columns = array(

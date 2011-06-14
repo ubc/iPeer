@@ -392,9 +392,13 @@ class UsersController extends AppController
       // This needs a custom query:
       //   The getSimpleEntrollmentLists() can be called twice in one page rendering.
       //    There's a problem with Cake PHP caching resutls (I could not turn this off)
-      $enrolled_courses = $this->UserEnrol->query(
-        "SELECT `course_id` from `user_enrols` WHERE user_id=$id",
-         /* No cache!! (undoc.) */ false );
+//      $enrolled_courses = $this->UserEnrol->query(
+//        "SELECT `course_id` from `user_enrols` WHERE user_id=$id",
+//         /* No cache!! (undoc.) */ false );
+      $enrolled_courses = $this->UserEnrol->find('all', array(
+          'conditions' => array('UserEnrol.user_id' => $id),
+          'fields' => array('UserEnrol.course_id')
+      ));
     } else {
       // New Student = display a courses list.
       $enrolled_courses = array();
@@ -453,7 +457,8 @@ class UsersController extends AppController
     foreach ($checkedCourseList as $key => $value) {
       if(!in_array($value, $simpleEnrolledList) && is_numeric($userId) && is_numeric($value)) {
         // Direct Delete SQL  - Serge - custom methods in UserEnrol Model did not function.
-        $this->UserEnrol->query("DELETE FROM user_enrols WHERE course_id=$value AND user_id=$userId");
+        //$this->UserEnrol->query("DELETE FROM user_enrols WHERE course_id=$value AND user_id=$userId");
+        $this->UserEnrol->deleteAll(array('UserEnrol.course_id' => $value, 'UserEnrol.user_id' => $userId));
         // Save a new entry
         $this->UserEnrol->id = null;
         $this->UserEnrol->save(array("user_id" => $userId, "course_id" => $value));
@@ -464,7 +469,8 @@ class UsersController extends AppController
     foreach ($simpleEnrolledList as $key => $value) {
       if (!in_array($value, $checkedCourseList) && is_numeric($userId) && is_numeric($value)) {
         // Direct Delete SQL  - Serge - custom methods in UserEnrol Model did not function.
-        $this->UserEnrol->query("DELETE FROM user_enrols WHERE course_id=$value AND user_id=$userId");
+        //$this->UserEnrol->query("DELETE FROM user_enrols WHERE course_id=$value AND user_id=$userId");
+        $this->UserEnrol->deleteAll(array('UserEnrol.course_id' => $value, 'UserEnrol.user_id' => $userId));
       }
     }
   }
