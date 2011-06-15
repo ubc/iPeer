@@ -23,7 +23,7 @@
 
   <tr class="tablecell2">
     <?php echo $this->Form->input('group_num', array('size'=>'50', 'class'=>'input',
-                                                  'readonly' => $readonly)) ?>
+                                                  'readonly' => true, 'value' => $group_num)) ?>
   </tr>
 
   <tr class="tablecell2">

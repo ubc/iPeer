@@ -213,12 +213,13 @@ class GroupsController extends AppController
 			}
 		}
 
-   	$this->set('title_for_layout', $this->sysContainer->getCourseName($course_id).' > Groups');
+    $this->set('title_for_layout', $this->sysContainer->getCourseName($course_id).' > Groups');
     $this->data['Group']['course_id'] = $course_id;
     // gets all the students in db for the unfiltered students list
     $this->set('user_data', $this->User->getEnrolledStudentsForList($course_id));
     $this->set('group_data', array());
     $this->set('course_id', $course_id);
+    $this->set('group_num', $this->Group->getCourseGroupCount($course_id)+1);
     $this->render('edit');
   }
 
@@ -249,6 +250,7 @@ class GroupsController extends AppController
     //gets all students in the group
     $this->set('members', $this->Group->getMembersByGroupId($group_id, 'list'));
     $this->set('group_id', $group_id);
+    $this->set('group_num',$this->data['Group']['group_num']);
     $this->set('course_id', $this->data['Group']['course_id']);
   }
 
