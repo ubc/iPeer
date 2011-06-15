@@ -139,10 +139,11 @@ class SearchsController extends AppController
   function eventBoxSearch() {
     $this->layout = false;
     $courseId = $this->params['form']['course_id'];
-    $condition['course_id'] = $courseId;
+    $condition['course_id'] = $courseId;    
     if ($courseId == 'A') {
       $condition = array();
-  }
+    }
+    $condition['event_template_type_id !='] = '3';
     $this->set('eventList',$this->Event->find('all', array ('conditions' => $condition)));
   }
 
@@ -204,24 +205,38 @@ class SearchsController extends AppController
    */
   function formatSearchEvaluationResult($maxPercent=1,$minPercent=0,$eventId=null,$status=null, $sortBy, $limit) {
     $matrixAry = array();
-    $this->Event->id = $eventId;
-    $event = $this->Event->read();
-    $evlResult = $event;
-    switch ($status) {
-      case "listNotReviewed":
-        $assignedGroupIDs = $this->GroupEvent->getNotReviewed($eventId); 
-        break;
-      case "late":
-        $assignedGroupIDs = $this->GroupEvent->getLate($eventId);
-        break;
-      case "low":
-	      $eventTypeId = $event['Event']['event_template_type_id'];
-	      $assignedGroupIDs = $this->GroupEvent->getLowMark($eventId, $eventTypeId, $maxPercent, $minPercent);
-        break;
-      default:
-          $assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($eventId);
-        break;
+    
+    $assignedGroupIDs = array();
+    $course_id = isset($this->params['form']['course_id'])? $this->params['form']['course_id']: "0";
+
+    $conditions = $course_id == "A" ? ($eventId == "A"? array(): array('Event.id' => $eventId)) :
+      ($eventId == "A"? array('Event.course_id' => $course_id): array('Event.id' => $eventId));
+    $conditions['event_template_type_id !='] = '3';
+    
+    $this->Event->recursive = -1;
+    $events = $this->Event->find('all', array(
+        'conditions' => $conditions
+    ));
+
+    foreach($events as $event){
+      switch ($status) {
+        case "listNotReviewed":
+          $assignedGroupIDs = array_merge($assignedGroupIDs , $this->GroupEvent->getNotReviewed($event['Event']['id']));
+          break;
+        case "late":
+          $assignedGroupIDs = array_merge($assignedGroupIDs , $this->GroupEvent->getLate($event['Event']['id']));
+          break;
+        case "low":
+                $eventTypeId = $event['Event']['event_template_type_id'];
+                $assignedGroupIDs = array_merge($assignedGroupIDs , $this->GroupEvent->getLowMark($event['Event']['id'], $eventTypeId, $maxPercent, $minPercent));
+          break;
+        default:
+            //$assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($eventId);
+          $assignedGroupIDs = array_merge($assignedGroupIDs , $this->GroupEvent->getGroupIDsByEventId($event['Event']['id']));
+          break;
+      }
     }
+    
     if (!empty($assignedGroupIDs)) {
       $assignedGroups = array();
 
@@ -241,7 +256,7 @@ class SearchsController extends AppController
 
 
         //Get release status
-        $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($event['Event']['id'], $group['Group']['id']);
+        $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($assignedGroupIDs[$i]['GroupEvent']['event_id'], $group['Group']['id']);
         $released = $this->Evaluation->getGroupReleaseStatus($groupEvent);
 
         $assignedGroups[$i]['Group']['complete_status'] = $completeStatus;
@@ -250,6 +265,8 @@ class SearchsController extends AppController
         $assignedGroups[$i]['Group']['marked'] = $assignedGroupIDs[$i]['GroupEvent']['marked'];
         $assignedGroups[$i]['Group']['grade_release_status'] = $released['grade_release_status'];
         $assignedGroups[$i]['Group']['comment_release_status'] = $released['comment_release_status'];
+        $assignedGroups[$i]['Group']['event_title'] = $this->Event->getEventTitleById($assignedGroupIDs[$i]['GroupEvent']['event_id']);
+        $assignedGroups[$i]['Group']['event_id'] = $assignedGroupIDs[$i]['GroupEvent']['event_id'];
 
       }
 

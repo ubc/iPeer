@@ -10,9 +10,10 @@ else {
 
   if ($defaultOpt == '1') {
     echo '<option value="-1" SELECTED >No event Selected</option>';
-  }// else if ($defaultOpt == 'A') {
-  //  echo '<option value="A" SELECTED > --- All events --- </option>';
-  //}
+  } else if ($defaultOpt == 'A') {
+    echo '<option value="A" SELECTED > --- All events --- </option>';
+  }
+
 
   foreach($eventList as $index => $value) {
     //print_r($value);

@@ -412,6 +412,15 @@ class Event extends AppModel
       }
       return $event;
     }
+
+    function getEventTitleById($id){
+      $this->recursive = -1;
+      $event = $this->find('first', array(
+          'conditions' => array('Event.id' => $id),
+          'fields' => array('Event.title')
+      ));
+      return $event['Event']['title'];
+    }
 }
 
 ?>

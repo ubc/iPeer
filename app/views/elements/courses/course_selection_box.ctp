@@ -6,7 +6,7 @@
   <select name="course_id" id="<?php echo isset($id_prefix) ? $id_prefix.'_' : ''?>course_id" <?php echo empty($disabled)?'':$disabled;?>>
 
   <?php if (isset($defaultOpt) && $defaultOpt == '-1'): ?>
-    <option value="-1" SELECTED >No Course Selected</option>
+    <option value="-1" SELECTED > --- No Course Selected --- </option>
   <?php elseif (isset($defaultOpt) && $defaultOpt == 'A'): ?>
     <option value="A" SELECTED > --- All Courses --- </option>
   <?php endif;?>

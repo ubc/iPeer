@@ -230,7 +230,9 @@ class GroupEvent extends AppModel
 //      ORDER BY GroupEvent.group_id');
     return $this->find('all', array(
         'conditions' => array('GroupEvent.group_id !=' => '0', 'GroupEvent.event_id' => $eventId,
-            "OR" => array('GroupEvent.marked' => "not reviewed", 'GroupEvent.marked' => "to review")),
+            "OR" => array(
+                array('GroupEvent.marked' => "not reviewed"),
+                array('GroupEvent.marked' => "to review"))),
         'order' => 'GroupEvent.group_id'
     ));
   }
