@@ -8,6 +8,7 @@ class GroupFixture extends CakeTestFixture {
 		'group_num' => array('type' => 'integer', 'null' => false, 'default' => 0, 'length' => 4),
 		'group_name' => array('type' => 'string', 'null' => true, 'default' => NULL, 'length' => 80, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'course_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'record_status' => array('type' => 'string', 'length' => 1, 'null' => false, 'default' => 'A', 'collate' => 'latin1_swedish_ci'),
 		'creator_id' => array('type' => 'integer', 'null' => false, 'default' => 0),
 		'updater_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
 		'created' => array('type' => 'datetime', 'null' => false, 'default' => '0000-00-00 00:00:00'),

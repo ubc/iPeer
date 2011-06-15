@@ -7,6 +7,7 @@ class GroupEventFixture extends CakeTestFixture {
 		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
 		'group_id' => array('type' => 'integer', 'null' => false, 'default' => '0'),
 		'event_id' => array('type' => 'integer', 'null' => false, 'default' => '0', 'key' => 'index'),
+		'marked' => array('type' => 'string', 'null' => false, 'default' => 'not reviewed'),
 		'grade' => array('type' => 'float', 'null' => true, 'default' => NULL, 'length' => '12,2'),
 		'grade_release_status' => array('type' => 'string', 'null' => false, 'default' => 'None', 'length' => 20, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'comment_release_status' => array('type' => 'string', 'null' => false, 'default' => 'None', 'length' => 20, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
