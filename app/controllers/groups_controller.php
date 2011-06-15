@@ -198,25 +198,32 @@ class GroupsController extends AppController
     $this->set('group_data', $group_data);
   }
 
-  function add ($course_id) {
-  	
-		if (!empty($this->data)) {
-			//$this->params = $this->Group->prepData($this->params);
-			if ($this->Group->save($this->data)) {
-				// add members into the groups_members table
-				//$this->GroupsMembers->insertMembers($this->Group->id, $this->params['data']['Group']);
+  function add ($course_id) {  	
+    if (!empty($this->data)) {
+      //$this->params = $this->Group->prepData($this->params);
+      if ($this->Group->save($this->data)) {
+        // add members into the groups_members table
+        //$this->GroupsMembers->insertMembers($this->Group->id, $this->params['data']['Group']);
         $this->Session->setFlash('The groups were added successfully.');
-				$this->redirect('index/'.$course_id);
-			} else {
+        $this->redirect('index/'.$course_id);
+      } else {
         // Error occured
         $this->Session->setFlash('Please correct the error below.');
-			}
-		}
+      }
+    }
+    $user_data = $this->User->getEnrolledStudentsForList($course_id);
+
+    //Check if student is already assigned in a group
+    $groups = $this->Group->getGroupsByCouseId($course_id);;
+    $assigned_users = $this->GroupsMembers->getUserListInGroups($groups);
+    foreach($assigned_users as $assigned_user){
+      $user_data[$assigned_user] = $user_data[$assigned_user].'*';
+    }
 
     $this->set('title_for_layout', $this->sysContainer->getCourseName($course_id).' > Groups');
     $this->data['Group']['course_id'] = $course_id;
     // gets all the students in db for the unfiltered students list
-    $this->set('user_data', $this->User->getEnrolledStudentsForList($course_id));
+    $this->set('user_data', $user_data);
     $this->set('group_data', array());
     $this->set('course_id', $course_id);
     $this->set('group_num', $this->Group->getCourseGroupCount($course_id)+1);

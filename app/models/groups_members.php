@@ -122,6 +122,14 @@ class GroupsMembers extends AppModel
             'GroupsMembers.user_id' => $userId)
     ));
   }
+
+  function getUserListInGroups($group_ids){
+    $this->displayField = 'user_id';
+    return $this->find('list', array(
+        'conditions' => array('group_id' => $group_ids),
+        'group' => 'user_id'
+    ));
+  }
 }
 
 ?>

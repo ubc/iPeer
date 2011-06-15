@@ -39,7 +39,7 @@
 
   <tr class="tablecell2">
     <td>Members:</td>
-    <td>
+    <td>    
     <?php if($readonly):?>
       <?php if(!empty($members)):?>
     <table width="100%" border="0" cellspacing="2" cellpadding="2">
@@ -59,6 +59,7 @@
                       'allName' =>  "Filtered Students", 'selectedName' => 'Students in Group'));
     ?>
     <?php endif;?>
+        * : Student is already assigned in some group in this course
     </td>
   </tr>
 

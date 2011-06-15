@@ -251,5 +251,11 @@ class Group extends AppModel
   function getGroupByGroupId($groupId, $fields=null){
   	return $this->find('all',array('conditions'=>array('Group.id'=>$groupId), 'fields' => $fields));
   }
+
+  function getGroupsByCouseId($course_id){
+    return $this->find('list', array(
+        'conditions' => array('Group.course_id' => $course_id)
+    ));    
+  }
 }
 ?>
