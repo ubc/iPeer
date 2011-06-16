@@ -19,6 +19,12 @@
                 ?></td>
             <td width="201" id="course_msg" class="error">&nbsp;</td>
           </tr><tr class="tablecell2">
+            <td width="186" id="event_type_label">Event Type:</td>
+            <td width="437"><?php 
+                echo $form->input('Search.event_type', array('type' => 'select', 'options' => $eventTypes, 'empty' => '--- All Event Types ---','label' => false));
+                ?></td>
+            <td width="201" id="event_type_msg" class="error">&nbsp;</td>
+          </tr><tr class="tablecell2">
             <td width="100" id="duedate_label">Due Date:</td>
             <td id="duedate">
             	  <table width="100%"><tr align="left">

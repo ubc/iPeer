@@ -8,7 +8,7 @@ class SearchsController extends AppController
    * @var $uses
    */
   var $uses =  array('GroupEvent', 'User', 'UserCourse', 'Event', 'Group',
-      'EvaluationSubmission', 'Course','Personalize', 'GroupsMembers');
+      'EvaluationSubmission', 'Course','Personalize', 'GroupsMembers', 'EventTemplateType');
   var $show;
   var $sortBy;
   var $direction;
@@ -86,6 +86,7 @@ class SearchsController extends AppController
       $name[$i] = $this->sysContainer->getCourseName($evaluation['course_id']);
       $i++;
     endforeach;
+    $this->set('eventTypes',$this->EventTemplateType->getEventTemplateTypeList(false));
     $this->set('names', $name);
     $this->set('data', $searchMartix);
     $this->set('display', 'evaluation');

@@ -13,7 +13,7 @@
 <div id='search_table'>
 
 <?php
-$params = array('controller'=>'schs', 'data'=>$data, 'currentUser'=>$currentUser, array('names'=>$names));
+$params = array('controller'=>'schs', 'data'=>$data, 'currentUser'=>$currentUser, array('names'=>$names), 'eventTypes' => $eventTypes);
 echo $this->element('searchs/evaluation_search_panel', $params);
 //echo $this->element('searchs/evaluation_search_panel', array('currentUser'=>$currentUser));
 

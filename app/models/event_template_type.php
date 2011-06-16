@@ -30,11 +30,15 @@ class EventTemplateType extends AppModel
   var $name = 'EventTemplateType';
   var $displayField = 'type_name';
 
-  function getEventTemplateTypeList(){    
-    $this->find('list', array(
-          'conditions'=> array('EventTemplateType.display_for_selection'=>1)
+  function getEventTemplateTypeList($selection = true){
+
+    $selection? $conditions['EventTemplateType.display_for_selection'] = '1': $conditions = array();
+    return $this->find('list', array(
+        'conditions'=> $conditions,
+        'order' => 'EventTemplateType.id'
     ));
   }
+
   function getEventType ($eventTemplateTypeId, $field='type_name')
   {
     $eventTemplate = $this->find('first', array(

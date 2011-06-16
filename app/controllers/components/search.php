@@ -17,6 +17,7 @@ class SearchComponent extends Object
   function setEvaluationCondition($params=null) {
  
     $courseId = isset($params['form']['course_id']) ? $params['form']['course_id']:'';
+    $eventType = isset($params['data']['Search']['event_type']) ? $params['data']['Search']['event_type']:'';
     $dueDateBegin = isset($params['data']['Search']['due_date_begin']) ? $params['data']['Search']['due_date_begin']:'';
     $dueDateEnd = isset($params['data']['Search']['due_date_end']) ? $params['data']['Search']['due_date_end']:'';
     $releaseDateBegin = isset($params['data']['Search']['release_date_begin']) ? $params['data']['Search']['release_date_begin']:'';
@@ -28,6 +29,11 @@ class SearchComponent extends Object
       $sticky['course_id'] = $courseId;
     } else
       $sticky['course_id'] = '';
+    if (!empty($eventType)) {
+      $condition['EventTemplateType.id'] = $eventType;
+      $sticky['EventTemplateType.id'] = $eventType;
+    } else
+      $sticky['EventTemplateType.id'] = '';
     if ($dueDateBegin != '') {
       //$condition .= !empty($condition) ? ' AND due_date > "'.$dueDateBegin.'"' : 'due_date > "'.$dueDateBegin.'"';
       $condition['due_date > '] = $dueDateBegin;

@@ -116,7 +116,7 @@ class UsersController extends AppController
     $columns = array(
                      //    Model   columns       (Display Title) (Type Description)
                      array("User.role",       "Role",         "6em",   "map",
-                           array(  "A" => "Admin",  "I" => "Instructor", "S" => "Student")),
+                     array(  "A" => "Admin",  "I" => "Instructor", "S" => "Student")),
                      array("User.id",         "",             "",      "hidden"),
                      array("User.username",   "Username",     "10em",  "action", "View User"),
                      array("User.full_name",  "Full Name",    "15em",  "string"),
@@ -523,7 +523,7 @@ class UsersController extends AppController
 
     if($this->__processForm()) {
       // Process the course changes list
-      $this->processEnrollmentListsPostBack($this->params, $this->User->id);$this->log($this->params);
+      $this->processEnrollmentListsPostBack($this->params, $this->User->id);
       //Send email w/ params
       $this->set('user', $this->params['data']['User']);
       //$this->_sendEmail('addUser','User Created','tyou@exchange.ubc.ca',$this->params['data']['User']['email']);
