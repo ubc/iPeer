@@ -193,9 +193,11 @@ class Course extends AppModel
 
 #### Function modified by Tony (March 11/2011)
   // Find all accessible courses id
-  function findAccessibleCoursesListByUserIdRole($userId=null, $userRole='', $condition=null){  	
-    switch($userRole){
-      case 'S':
+  function findAccessibleCoursesListByUserIdRole($userId=null, $userRole='', $condition=null){
+
+  	
+  	switch($userRole){
+   case 'S':
         //$course =  $this->query('SELECT * FROM courses WHERE id IN ( SELECT DISTINCT course_id FROM user_enrols WHERE user_id = '.$userId.') ORDER BY course');
         $conditionsSubQuery['UserEnrol.user_id'] = $userId;
         $dbo = $this->UserEnrol->getDataSource();
@@ -218,16 +220,31 @@ class Course extends AppModel
         $course = $this->find('all', compact('conditions'));
         return $course;
       break;
-
-      case 'A':
-//        if ($condition !=null){
-//          return $this->query('SELECT * FROM courses WHERE '.$condition.' ORDER BY course');
-//          break;
-//        }
-//        else{
-//          return $this->query('SELECT * FROM courses ORDER BY course');
-//          break;
-//        }
+      
+    case 'I':
+        //$course =  $this->query('SELECT * FROM courses WHERE id IN ( SELECT DISTINCT course_id FROM user_enrols WHERE user_id = '.$userId.') ORDER BY course');
+        $conditionsSubQuery['UserCourse.user_id'] = $userId;
+        $dbo = $this->UserCourse->getDataSource();
+        $subQuery = $dbo->buildStatement(
+        array(
+            'fields' => array('DISTINCT UserCourse.course_id'),
+            'table' => $dbo->fullTableName($this->UserCourse),
+            'alias' => 'UserCourse',
+            'conditions' => $conditionsSubQuery,
+            'order' => null,
+            'limit' => null,
+            'group' => null
+          ),
+          $this->UserCourse
+        );
+        $subQuery = 'Course.id IN (' . $subQuery . ') ';
+        $subQueryExpression = $dbo->expression($subQuery);
+        $conditions[] = $subQueryExpression;
+        $this->recursive = 0;
+        $course = $this->find('all', compact('conditions'));
+        return $course;
+      break;
+  	      case 'A':
         return $this->find('all', array(
             'conditions' => $condition,
             'order' => 'Course.course'
@@ -235,11 +252,6 @@ class Course extends AppModel
         break;
 
       default:
-//        if($condition !=null){
-//          $course =  $this->query('SELECT * FROM courses WHERE record_status = "A" AND '.$condition.' AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' ) ORDER BY course');
-//        }else{
-//          $course =  $this->query('SELECT * FROM courses WHERE record_status = "A" AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' ) ORDER BY course');
-//        }
         $conditionsSubQuery['UserEnrol.user_id'] = $userId;
         $dbo = $this->UserEnrol->getDataSource();
         $subQuery = $dbo->buildStatement(
@@ -266,36 +278,31 @@ class Course extends AppModel
 
   // Find the record count of all accessible courses
   function findAccessibleCoursesCount($userId=null, $userRole=null, $condition=null){
+  	
     switch($userRole){
-      case 'S':
-        //$course =  $this->query('SELECT COUNT(DISTINCT course_id) as total FROM user_enrols WHERE user_id = '.$userId);
+    	case 'S':
         $course = $this->UserEnrol->find('count', array(
           'conditions' => array('UserEnrol.user_id' => $userId),
           'fields' => 'DISTINCT UserEnrol.course_id'
         ));
         return $course;
         break;
-
+        	
+    	case 'I':
+        $course = $this->UserCourse->find('count', array(
+          'conditions' => array('UserCourse.user_id' => $userId),
+          'fields' => 'DISTINCT UserCourse.course_id'
+        ));
+        return $course;
+        break;	
+        	
       case 'A':
-//        //Check that admin is exists
-//        $sql = 'SELECT COUNT( * ) as count
-//                                FROM users U
-//                                WHERE U.id = '.$userId.'';
-//        $adminCount = $this->query($sql);
-//        if($adminCount[0][0]['count']>=1){
-//          if ($condition !=null) return $this->query('SELECT COUNT(*) AS total FROM courses WHERE '.$condition);
-//          else return $this->query('SELECT COUNT(*) AS total FROM courses');
-//          break;
-//        }
-//        else return null;
         return $this->find('count', array(
           'conditions' => $condition
         ));
       break;
-
-      default:
-//        if ($condition !=null) return $this->query('SELECT COUNT(*) as total FROM courses WHERE record_status = "A" AND '.$condition.' AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' )');
-//        else return $this->query('SELECT COUNT(*) as total FROM courses WHERE record_status = "A" AND id IN ( SELECT DISTINCT course_id FROM user_courses WHERE user_id = '.$userId.' )');
+    	
+    	 default:
         $conditionsSubQuery['UserEnrol.user_id'] = $userId;
         $dbo = $this->UserEnrol->getDataSource();
         $subQuery = $dbo->buildStatement(
@@ -317,8 +324,8 @@ class Course extends AppModel
         $this->recursive = 0;
         $course = $this->find('count', compact('conditions'));
         return $course;
-      break;
-  }
+      break;		
+    }
     
   }
 
@@ -335,29 +342,13 @@ class Course extends AppModel
   
 #### Function was modified by Tony (March 14/2011)
   // Generates SQL for querrying courses, only Instructors and admin can access this function.
-  function generateRegisterCourseSQL($userId, $enrolled = true, $getCount = false,  $requester = null, $requester_role = null)
+  function generateRegisterCourse($userId, $enrolled = true, $getCount = false,  $requester = null, $requester_role = null)
   {
     //verify that all necessary inputs are not null && requester's role indeed matches with $requester_role
     $isUserRoleMatch = $this->verifyUserRole($requester, $requester_role);
     if($userId==null || $requester==null || $requester_role==null || $isUserRoleMatch==0) return array();
-//
-//  	$enrolled = $enrolled ? 'IN' : 'NOT IN';
-//  	$getCount = $getCount ? 'count(*) as total' : '*';
-//
-//  	//requester_role is 'Admin' or 'Instructor'
-//  	if($requester_role=='A' || $requester_role=='I'){
-//  		$sql = 'SELECT '.$getCount.'
-//  				FROM courses C
-//  				WHERE C.id '.$enrolled.' ( SELECT U.course_id
-//  								FROM user_courses U
-//  								WHERE U.user_id ='.$userId.')';
-//
-//  		return $sql;
-//  		}
-//  	//requester_role is 'Student' or invalid
-//  	else return array();
     $type = $getCount ? 'count': 'all';
-    $enrolled = $enrolled ? 'IN' : 'NOT IN';
+    $enrolled = $enrolled ? 'IN ' : 'NOT IN ';
     
     $conditionsSubQuery['UserCourse.user_id'] = $userId;
     $dbo = $this->UserEnrol->getDataSource();
@@ -373,7 +364,7 @@ class Course extends AppModel
       ),
       $this->UserCourse
     );
-    $subQuery = 'Course.id'. $enrolled .'(' . $subQuery . ') ';
+    $subQuery = 'Course.id '. $enrolled .'(' . $subQuery . ') ';
     $subQueryExpression = $dbo->expression($subQuery);
     $conditions[] = $subQueryExpression;
     $this->recursive = 0;
@@ -403,9 +394,9 @@ class Course extends AppModel
 
   function deleteAll($id=null) {
     //delete self
-    if ($this->del($id)) {
+    if ($this->delete($id)) {
       //delete user course,user enrol handled by hasMany
-      $events = $this->Events->find('all', array('conditions' => array('course_id' => $id)));
+      $events = $this->Event->find('all', array('conditions' => array('course_id' => $id)));
       foreach ($events as $event)
         $this->Event->deleteAll($event['Event']['id']);
     }
@@ -415,7 +406,7 @@ class Course extends AppModel
     return $this->Instructor->find('count', array('conditions' => array('Enrolment.id' => $course_id)));
   }
   
-  function getCourseByCourse($course, $params) {
+  function getCourseByCourse($course, $params =null) {
     return $this->find('all', array_merge(array('conditions' => array('course' => $course)), $params));
   }
 
@@ -429,6 +420,7 @@ class Course extends AppModel
 ##########################################################################################################        
 	
   	function createUserHelper( $id ='' , $username='' , $role='' ){
+	
 		$query = "INSERT INTO users VALUES ('$id','$role' ,'$username' , 'password', NULL , NULL , NULL , NULL , NULL , NULL , NULL , NULL , 'A', '0', '0000-00-00 00:00:00', NULL , NULL )";		
 		$this->query($query);
 	}
