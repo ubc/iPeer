@@ -209,8 +209,14 @@ class SearchsController extends AppController
     $assignedGroupIDs = array();
     $course_id = isset($this->params['form']['course_id'])? $this->params['form']['course_id']: "0";
 
-    $conditions = $course_id == "A" ? ($eventId == "A"? array(): array('Event.id' => $eventId)) :
+    $conditions = $course_id == "A" ?
+      ($eventId == "A"?
+        ($this->Auth->user('role') == 'A' ? 
+            array():
+            array('Event.creator_id' => $this->Auth->user('id'))):
+        array('Event.id' => $eventId)) :
       ($eventId == "A"? array('Event.course_id' => $course_id): array('Event.id' => $eventId));
+
     $conditions['event_template_type_id !='] = '3';
     
     $this->Event->recursive = -1;

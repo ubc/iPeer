@@ -523,7 +523,10 @@ class UsersController extends AppController
 
     if($this->__processForm()) {
       // Process the course changes list
-      $this->processEnrollmentListsPostBack($this->params, $this->User->id);
+      $this->processEnrollmentListsPostBack($this->params, $this->User->id);$this->log($this->params);
+      //Send email w/ params
+      $this->set('user', $this->params['data']['User']);
+      //$this->_sendEmail('addUser','User Created','tyou@exchange.ubc.ca',$this->params['data']['User']['email']);
       $this->render('userSummary');
     }
 

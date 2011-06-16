@@ -162,7 +162,9 @@ class User extends AppModel
     $allowSave = true;
 
     if(!isset($this->data[$this->name]['id']) && empty($this->data[$this->name]['password'])) {
-      $this->data[$this->name]['password'] = NeatString::randomPassword(6);
+      $tmp_pw = NeatString::randomPassword(6);
+      $this->data[$this->name]['password'] = md5($tmp_pw);
+      $this->data[$this->name]['tmp_password'] = $tmp_pw;
     }
 
     // clear password to avoid updating to a empty one
