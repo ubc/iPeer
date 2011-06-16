@@ -499,7 +499,8 @@ function makeSurveyEvaluation ($param = null) {
           //Setup the viewData
           $rubricId = $event['Event']['template_id'];
           $rubric = $this->Rubric->getRubricById($rubricId);
-          $rubricEvalViewData = $this->Rubric->compileViewData($rubric); 
+          $rubricEvalViewData = $this->Rubric->compileViewData($rubric);
+          var_dump($rubricEvalViewData); 
           $this->set('viewData',$rubricEvalViewData);
           $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers');
 

@@ -96,7 +96,7 @@
                                                             'readonly' => $readonly)) ?>
           <td id="student_no_msg" class="error">&nbsp;</td>
         </tr>
-
+        
         <!-- student courses-->
         <?php if ($isStudent) : ?>
           <tr class="tablecell2"> <td width="130" id="courses_label">This student's<br />Courses:</td>

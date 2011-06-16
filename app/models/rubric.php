@@ -87,14 +87,12 @@ class Rubric extends EvaluationBase
    */
   function saveAllWithCriteriaComment($data) {
     // check if the we should remove some of the association records
-	
-
     if(isset($data['Rubric']['id']) && !empty($data['Rubric']['id'])) {
       $rubric = $this->find('first', array('conditions' => array('id' => $data['Rubric']['id']),
                                            'contain' => array('RubricsCriteria.RubricsCriteriaComment',
                                                               'RubricsLom')));
-
       // check level of mastery and criteria if they should be removed
+      if(null != $rubric) {
       $result = array('RubricsLom' => array(), 
                       'RubricsCriteria' => array());
       foreach(array_keys($result) as $model) {
@@ -116,7 +114,7 @@ class Rubric extends EvaluationBase
           $this->{$model}->deleteAll(array($model.'.id' => $result[$model]), true);
         }
       }
-
+    }
       // clean up LOM for criteria comments
       /*if(!empty($result['RubricsLom']['nums'])) {
         $ids = array();
@@ -173,6 +171,13 @@ class Rubric extends EvaluationBase
     return true;
   }
 
+  /**
+   * Executes everytime after find is called on Rubircs, and rearranges the resulting criteria comments array
+   * such that the criteria comments from the rubrics grid is ordered from left to right, top to bottom.
+   * 
+   * @param array $results: The result of the find->Rubric operation
+   * @param boolean $primary Whether this model is being queried directly (vs. being queried as an association)
+   */
   function afterFind(array $results, $primary) {
   	$return = array();
   	
@@ -225,24 +230,33 @@ class Rubric extends EvaluationBase
 
       // remove lom ids
       for($i = 0; $i < count($data['RubricsLom']); $i++) {
+        unset($data['RubricsLom'][$i]['rubric_id']);
         unset($data['RubricsLom'][$i]['id']);
       }
-
+      
       // remove criteria and criteria comment ids
       for($i = 0; $i < count($data['RubricsCriteria']); $i++) {
+        unset($data['RubricsCriteria'][$i]['rubric_id']);
         unset($data['RubricsCriteria'][$i]['id']);
         for($j = 0; $j < count($data['RubricsCriteria'][$i]['RubricsCriteriaComment']); $j++) {
           unset($data['RubricsCriteria'][$i]['RubricsCriteriaComment'][$j]['id']);
+          unset($data['RubricsCriteria'][$i]['RubricsCriteriaComment'][$j]['criteria_id']);
+          unset($data['RubricsCriteria'][$i]['RubricsCriteriaComment'][$j]['rubrics_loms_id']);
         }
       }
     }
     return $data;
   }
   
+  /**
+   * @param Integer $id : Rubric id
+   * @return returns Rubric and all of its associated models
+   */
   function getRubricById($id=null){
-  	return $this->find('first',array(
-          'conditions'=>array('Rubric.id'=>$id)
-        ));
+
+  	return $this->find('first', array('conditions' => array('id' => $id),
+                                       'contain' => array('RubricsCriteria.RubricsCriteriaComment',
+                                                     'RubricsLom')));
   }
 
   function compileViewData($tmp) {
@@ -278,8 +292,6 @@ class Rubric extends EvaluationBase
         }
     }
     return $tmp3;
-  }
-  	
+  } 	
 }
-  
 ?>

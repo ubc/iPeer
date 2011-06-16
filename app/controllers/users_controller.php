@@ -881,16 +881,17 @@ class UsersController extends AppController
         //Mass create students
         $resultAry = $this->addUserByImport($this->params['data'], $lines);
         $this->set('data', $resultAry);
-        $this->set('userRole', $this->params['data']['User']['role']);
-
+        var_dump($this->params);
+        $this->set('userRole', $this->params['data']['User/role']);
         $this->render('userSummary');
     }
 
     function addUserByImport($data, $lines)
     {
         // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
-
+        //$this->rdAuth->noStudentsAllowed();
+		if('S' == $this->Auth->user('role'))
+		  return false;	  
         $result = array();
         $createdPos = $failedPos = 0;
 
