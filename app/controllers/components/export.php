@@ -171,12 +171,14 @@ class ExportComponent extends Object
               }
             }
             $data[$i]['students'][$j]['sub_score'] = '';
+            $data[$i]['students'][$j]['score'] = 0;
             $subScore = $this->EvaluationRubric->getCriteriaResults($groupEventId, $userId);
             foreach ($subScore as $score)
-              $data[$i]['students'][$j]['sub_score'] .= $score[0]['score'].',';
+            {
+              $data[$i]['students'][$j]['sub_score'] .= $score.',';
+              $data[$i]['students'][$j]['score'] += $score;
+            }
 
-            $score_tmp = $this->EvaluationRubric->getReceivedTotalScore($groupEventId, $userId);
-            $data[$i]['students'][$j]['score'] = !isset($score_tmp[0]['received_total_score']) ? '':$score_tmp[0]['received_total_score'];
             //get comments
             $data[$i]['students'][$j]['comments'] = '';
             $comments = $this->EvaluationRubric->getAllComments($groupEventId, $userId);
