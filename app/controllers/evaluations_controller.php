@@ -206,7 +206,7 @@ class EvaluationsController extends AppController
     $this->setUpAjaxList($eventId);
 
     //Set up the course Id
-    $this->set('courseId', $data[0]['Event']['course_id']);
+    $this->set('courseId', $data['0']['Event']['course_id']);
     
     // Set the display list
     $this->set('paramsForList', $this->AjaxList->getParamsForList());
@@ -326,8 +326,8 @@ class EvaluationsController extends AppController
       $groupId;
       $userId=$this->Auth->user('id'); 
       foreach($group_events as $events){
-         if($this->GroupsMembers->checkMembershipInGroup($events['group_events']['group_id'],$userId) !== 0)
-            $groupId=$events['group_events']['group_id'];
+         if($this->GroupsMembers->checkMembershipInGroup($events['GroupEvent']['group_id'],$userId) !== 0)
+            $groupId=$events['GroupEvent']['group_id'];
       }
       if (empty($this->params['data'])) {
           //Get the target event

@@ -25,7 +25,7 @@ $numerical_index = 1;  //use numbers instead of words; get users to refer to the
 $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
 $membersAry = array();  //used to format result
 $groupAve = 0;
-if (isset($scoreRecords[$currentUser['id']])) {
+if (isset($scoreRecords[$currentUser['id']])) { 
     $gradeReleased = $scoreRecords[$currentUser['id']]['grade_released'];
     $commentReleased = $scoreRecords[$currentUser['id']]['comment_released'];
 } else {

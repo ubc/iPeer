@@ -214,17 +214,16 @@ class EventsController extends AppController
    * @access public
    * @return void
    */
-  function view ($id) {
-    $courseId = $this->Session->read('ipeerSession.courseId');
+  function view ($id) { 
 
-	  //Clear $id to only the alphanumeric value
-		$id = $this->Sanitize->paranoid($id);
-    $this->set('event_id', $id);
+    //Clear $id to only the alphanumeric value
+    $id = $this->Sanitize->paranoid($id);
+    $this->set('event_id', $id);	
 
-		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
-
-		$event = $this->Event->find('first', array('conditions' => array('Event.id' => $id),
-                                               'contain' => array('Group.Member')));
+    $event = $this->Event->find('first', array('conditions' => array('Event.id' => $id),
+                                   'contain' => array('Group.Member')));
+    $courseId = $event['Event']['course_id'];
+    $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
 
     //Format Evaluation Selection Boxes
     $default = null;

@@ -249,23 +249,27 @@ class EvaluationComponent extends Object
         //Get total mark each member received
 	$receivedTotalScore = $this->EvaluationSimple->getReceivedTotalScore(
         $event['group_event_id'], $this->Auth->user('id'));
-  	$totalScore = $receivedTotalScore[0][0]['received_total_score'];
-	$numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find(count,'group_id='.$event['group_id']) :
-          $this->GroupsMembers->find(count,'group_id='.$event['group_id']) - 1;
-        $aveScore = $totalScore / $numMembers;
-        $studentResult['numMembers'] = $numMembers;
+  	$totalScore = $receivedTotalScore[0][0]['received_total_score'];	
+        $numMemberSubmissions = $this->EvaluationSimple->find('count',array(
+            'conditions' => array(
+                'EvaluationSimple.evaluatee' => $this->Auth->user('id'),
+                'EvaluationSimple.event_id' => $event['Event']['id'],
+                'EvaluationSimple.grp_event_id' => $event['group_event_id'])));
+
+        $aveScore = $totalScore / $numMemberSubmissions;
+        $studentResult['numMembers'] = $numMemberSubmissions;
         $studentResult['receivedNum'] = count($receivedTotalScore);
 
         $groupTotal = $this->EvaluationSimple->getGroupResultsByGroupEventId($event['group_event_id']);
         $groupTotalCount = $this->EvaluationSimple->getGroupResultsCountByGroupEventId($event['group_event_id']);
-        $groupAve = $groupTotal[0]['received_total_score'] / $groupTotalCount[0]['received_total_count'];
+        $groupAve = $groupTotal['0']['0']['received_total_score'] / $groupTotalCount;
        }
 
        $studentResult['aveScore'] = $aveScore;
        $studentResult['groupAve'] = $groupAve;
 
        //Get Comment Release: release_status will be the same for all evaluatee
-       $commentReleaseStatus = $results[0]['EvaluationSimple']['release_status'];
+       $commentReleaseStatus = $results['0']['EvaluationSimple']['release_status'];
        if ($commentReleaseStatus) {
          //Comment is released; retrieve all comments
          $comments = $this->EvaluationSimple->getAllComments($event['group_event_id'], $this->Auth->user('id'));
@@ -705,7 +709,7 @@ class EvaluationComponent extends Object
         }
       } else {
         foreach ($groupMembers as $user) {
-          $matrix[$index][$user['User']['id']] = 'n/a';
+          $matrix[$index][$user['id']] = 'n/a';
         }
       }
       //Get Ave Criteria Grade
@@ -726,7 +730,7 @@ class EvaluationComponent extends Object
       $groupCriteriaAve[$groupIndex] = $ave;
     }
     $matrix['group_criteria_ave'] = $groupCriteriaAve;
-
+    
     return $matrix;
   }
 
@@ -798,6 +802,7 @@ class EvaluationComponent extends Object
     //Get Members for this evaluation
     if ($studentView) {
       $this->User->id = $this->Auth->user('id');
+      $this->User->recursive = -1;
       $user = $this->User->read();
       $rubricResultDetail = $this->getRubricResultDetail($event, $user);
       $groupMembers = $this->GroupsMembers->getEventGroupMembers(
