@@ -1,34 +1,79 @@
-
 <?php
+App::import('Model', 'User');
+App::import('Component', 'Auth');
 
-class UserTTestCase extends CakeTestCase {
+class FakeController extends Controller {
+  var $name = 'FakeController';
+  var $components = array('Auth');
+  var $uses = null;
+  var $params = array('action' => 'test');
+}
 
+class UserTestCase extends CakeTestCase {
+  var $name = 'Course';
+  var $fixtures = array('app.course', 'app.role', 'app.user', 'app.group', 
+                        'app.roles_user', 'app.event', 'app.event_template_type',
+                        'app.group_event', 'app.evaluation_submission',
+                        'app.survey_group_set', 'app.survey_group',
+                        'app.survey_group_member', 'app.question', 
+                        'app.response', 'app.survey_question', 'app.user_course',
+                        'app.user_enrol', 'app.groups_member', 'app.survey'
+                       );
+  var $Course = null;
+
+  function startCase() {
+		$this->User = ClassRegistry::init('User');
+    $admin = array('User' => array('username' => 'root',
+                                   'password' => 'ipeer'));
+    $this->controller = new FakeController();
+    $this->controller->constructClasses();
+    $this->controller->startupProcess();
+    $this->controller->Component->startup($this->controller);
+    $this->controller->Auth->startup($this->controller);
+    ClassRegistry::addObject('view', new View($this->Controller));
+    ClassRegistry::addObject('auth_component', $this->controller->Auth);
+
+    $this->controller->Auth->login($admin);
+  }
+
+  function endCase() {
+    $this->controller->Component->shutdown($this->controller);
+    $this->controller->shutdownProcess();
+  }
+
+  //Run before EVERY test.
+  function startTest($method) {
+    // extra setup stuff here
+  }
+	
+  function endTest($method) {
+		$this->flushDatabase();
+  }
+
+  function testCourseInstance() {
+    $this->assertTrue(is_a($this->User, 'User'));
+  }
 	function testGetByUsername(){
 		
 		$this->User= & ClassRegistry::init('User');
 		$empty=null;
-		$this->flushDatabase();
 	
 		//Test on valid student input
-		##Set up test data
-		$this->createUserHelper(1,'KevinLuk','S','Password');
 		##Run tests
-		$studentName = $this->User->getByUsername('KevinLuk');
-		$this->assertEqual($studentName['User']['username'], "KevinLuk");
+		$studentName = $this->User->getByUsername('StudentY');
+		$this->assertEqual($studentName['User']['username'], "StudentY");
 		
 		//Test on valid instructor input
-		##Set up test data
-		$this->createUserHelper(2,'Peterson','I','Password');
 		##Run Tests
 		$instructorName = $this->User->getByUserName('Peterson');
 		$this->assertEqual($instructorName['User']['username'], "Peterson");
 		
 		//Test on valid admin input
 		##Set up test data
-		$this->createUserHelper(3,'tonychiu','A','Password');
+//		$this->createUserHelper(3,'tonychiu','A','Password');
 		##Run tests
-		$adminName = $this->User->getByUserName('tonychiu');
-		$this->assertEqual($adminName['User']['username'], "tonychiu");
+		$adminName = $this->User->getByUserName('Admin');
+		$this->assertEqual($adminName['User']['username'], "Admin");
 
 		//Testing invalid inputs; all tests should return NULL
 		##invalid username input
@@ -54,27 +99,24 @@ class UserTTestCase extends CakeTestCase {
 		//On valid student user_name and password
 		
 		##Students
-		$this->createUserHelper(1,'KevinLuk','S','Password1');
-		$validStudent = $this->User->findUser('KevinLuk', 'Password1');
-		$this->assertEqual($validStudent['User']['username'], "KevinLuk");
+		$validStudent = $this->User->findUser('StudentY', 'password1');
+		$this->assertEqual($validStudent['User']['username'], "StudentY");
 		
 		##Instructor
-		$this->createUserHelper(2,'Peterson','I','Password2');
-		$validInstructor = $this->User->findUser('Peterson', 'Password2');
-		$this->assertEqual($validInstructor['User']['username'], "Peterson");
+		$validInstructor = $this->User->findUser('INSTRUCTOR1', 'password2');
+		$this->assertEqual($validInstructor['User']['username'], "INSTRUCTOR1");
 		
 		##Admin
-		$this->createUserHelper(3,'tonychiu','A','Password3');
-		$validAdmin = $this->User->findUser('tonychiu', 'Password3');
-		$this->assertEqual($validAdmin['User']['username'],"tonychiu");
+		$validAdmin = $this->User->findUser('Admin', 'passwordA');
+		$this->assertEqual($validAdmin['User']['username'],"Admin");
 		
 		
 		//On invalid user_name
-		$invalidUserName = $this->User->findUser('invalidUser', 'Password1');
+		$invalidUserName = $this->User->findUser('invalidUser', 'password1');
 		$this->assertEqual($invalidUserName, $empty);
 		
 		//On invalid passWord
-		$invalidPassword = $this->User->findUser('KevinLuk', 'invalidPassword');
+		$invalidPassword = $this->User->findUser('StudentY', 'invalidPassword');
 		$this->assertEqual($invalidPassword, $empty);
 		
 		//ALL invalid paramters
@@ -85,29 +127,23 @@ class UserTTestCase extends CakeTestCase {
 		$nullInput = $this->User->findUser(null, 'password1');
 		$this->assertEqual($nullInput, $empty);
 		
-		$nullInput = $this->User->findUser( 'KevinLuk' , null);
+		$nullInput = $this->User->findUser( 'StudentY' , null);
 		$this->assertEqual($nullInput, $empty);
 		
 		$nullInput = $this->User->findUser(null, null);
 		$this->assertEqual($nullInput, $empty);
-		
-		//clear data tables
-		$this->flushDatabase();
-		
+	
 		
 		//On duplicate password
-		$this->createUserHelper(1,'KevinLuk','S','duplicate');
-		$this->createUserHelper(2,'Steven','S','duplicate');
-		$checkDuplicate1 = $this->User->findUser('KevinLuk', 'duplicate');
-		$checkDuplicate2 = $this->User->findUser('Steven', 'duplicate');
+		$checkDuplicate1 = $this->User->findUser('StudentY', 'password1');
+		$checkDuplicate2 = $this->User->findUser('StudentZ', 'password1');
 		##run tests
-		$this->assertEqual($checkDuplicate1['User']['username'], "KevinLuk");
-		$this->assertEqual($checkDuplicate2['User']['username'], "Steven");
-		
-		
+		$this->assertEqual($checkDuplicate1['User']['username'], "StudentY");
+		$this->assertEqual($checkDuplicate2['User']['username'], "StudentZ");
 		
 		$this->flushDatabase();
 	}
+	
 	
 	
 	function testFindUserByStudentNo(){
@@ -118,22 +154,18 @@ class UserTTestCase extends CakeTestCase {
 		//Test findUserByStudentNo() on valid users
 		
 		##Students
-		$this->createUserHelper(1,'KevinLuk','S','password',123);
 		$student = $this->User->findUserByStudentNo(123);
-		$this->assertEqual($student['User']['username'], "KevinLuk");
+		$this->assertEqual($student['User']['username'], "StudentY");
 		
 		##Instructors
-		$this->createUserHelper(2,'GSlade','I','password',321);
 		$instructors = $this->User->findUserByStudentNo(321);
-		$this->assertEqual($instructors['User']['username'], "GSlade");
+		$this->assertEqual($instructors['User']['username'], "INSTRUCTOR1");
       	
 		##Admin
-		$this->createUserHelper(3, 'tonychiu','A','password',111);
 		$admin = $this->User->findUserByStudentNo(111);
-		$this->assertEqual($admin['User']['username'], "tonychiu");
+		$this->assertEqual($admin['User']['username'], "Admin");
 		
 		##Test studentNo==0
-		$this->createUserHelper(4, 'Zero','S','password',0);
 		$zero  = $this->User->findUserByStudentNo(0);
 		$zero1 = $this->User->findUserByStudentNo(000000); 
 		$this->assertEqual($zero['User']['username'], $zero1['User']['username']);
@@ -156,32 +188,18 @@ class UserTTestCase extends CakeTestCase {
 
 		$this->User =& ClassRegistry::init('User');
 		$empty=null;	
-		
-		//Test on a valid course with some student enrollment
-		##Set up test data
-		$this->createCoursesHelper(1, 'Math320', 'AnalysisI');
-		$this->createUserHelper(1,'KevinLuk','S','password',1);
-		$this->createUserHelper(2,'Steven','S','password',2);
-		$this->createUserHelper(3,'Thomas','S','password',3);
-		$this->createUserHelper(4,'Ruth','S','password',4);
-		$this->enrollUserHelper(1,1,1,'S');
-		$this->enrollUserHelper(2,2,1,'S');
-		$this->enrollUserHelper(3,3,1,'S');
-		$this->enrollUserHelper(4,4,1,'S');
-		$this->createUserHelper(5,'Instructor','I','password',5);
-		$this->enrollUserHelper(5,5,1,'I');
+
 		##Run tests
 		$enrolledStudentList = $this->User->getEnrolledStudents(1);
 		$enrolledStudentArray=array();
 		foreach($enrolledStudentList as $student){
 			array_push($enrolledStudentArray, $student['User']['username']);
 		}		
-		$expect = array('KevinLuk','Steven','Thomas','Ruth');
-		$this->assertEqual($enrolledStudentArray, $expect);
+		$expect = array('GSlade','Peterson','StudentY','StudentZ');
+		$this->assertEqual(sort($enrolledStudentArray), sort($expect));
 		
 		//Test a course with no students enrolled
-		$this->createCoursesHelper(2, 'Math321', 'AnalysisII');
-		$enrolledStudentList = $this->User->getEnrolledStudents(2);
+		$enrolledStudentList = $this->User->getEnrolledStudents(3);
 		$this->assertEqual($enrolledStudentList, $empty);
 		
 		//Test an invalid corse, course_id==231321 (invalid)
@@ -195,24 +213,15 @@ class UserTTestCase extends CakeTestCase {
 	
 	function TestGetEnrolledStudentsForList()
 	{
+
+		/* TO DO */
 		
 		$this->User =& ClassRegistry::init('User');
 		$empty=null;
 		
 		//Test on a valid course with some student enrollment
 		##Set up test data
-		$this->createCoursesHelper(1, 'Math320', 'AnalysisI');
-		$this->createUserHelper(1,'KevinLuk','S','password',1);
-		$this->createUserHelper(2,'Steven','S','password',2);
-		$this->createUserHelper(3,'Thomas','S','password',3);
-		$this->createUserHelper(4,'Ruth','S','password',4);
-		$this->enrollUserHelper(1,1,1,'S');
-		$this->enrollUserHelper(2,2,1,'S');
-		$this->enrollUserHelper(3,3,1,'S');
-		$this->enrollUserHelper(4,4,1,'S');
-		$this->createUserHelper(5,'Instructor','I','password',5);
-		$this->enrollUserHelper(5,5,1,'I');
-		
+	
 		$temp = $this->User->getEnrolledStudentsForList(1);
 		$this->User->printHelp($temp);
 
@@ -223,25 +232,25 @@ class UserTTestCase extends CakeTestCase {
 		
 		$this->User =& ClassRegistry::init('User');
 		$empty=null;
-		$this->flushDatabase();
-		
+				
 		//Test on valid admin and valid course
 		##Set up test data
-		$this->createCoursesHelper(1, 'Math320', 'AnalysisI');
-		$this->createUserHelper(1,'tonychiu','A');
-		$admin = $this->User->getByUsername('tonychiu');
+		$admin = $this->User->getByUsername('Admin');
 		$canRemove = $this->User->canRemoveCourse($admin, 1);
 		$this->assertEqual($canRemove,true);
 		
 		//Test if instructor can remove a course
-		$this->createUserHelper(2,'GSlade','I');
 		$instructor = $this->User->getByUsername('GSlade');
 		$canRemove = $this->User->canRemoveCourse($instructor, 1);
+		$this->assertEqual($canRemove, true);
+		
+	//Test if instructor can remove a course
+		$instructor = $this->User->getByUsername('GSlade');
+		$canRemove = $this->User->canRemoveCourse($instructor, 2);
 		$this->assertEqual($canRemove, false);
 		
 		//Test if student can remove a course
-		$this->createUserHelper(3,'KevinLuk','S');
-		$student = $this->User->getByUsername('KevinLuk');
+		$student = $this->User->getByUsername('StudentY');
 		$canRemove = $this->User->canRemoveCourse($student, 1);
 		$this->assertEqual($canRemove, false);
 		
@@ -281,19 +290,19 @@ class UserTTestCase extends CakeTestCase {
 		
 		//Test function on valid users
 		##Set up test data
-		$this->createUserHelper(1,'KevinLuk','S','password',100);
-		$this->createUserHelper(2,'Steven','S','password',200);
-		$this->createUserHelper(3,'GSlade','I','password',300);
-		$this->createUserHelper(4,'tonychiu','A','password',400);
+//		$this->createUserHelper(1,'KevinLuk','S','password',100);
+//		$this->createUserHelper(2,'Steven','S','password',200);
+//		$this->createUserHelper(3,'GSlade','I','password',300);
+//		$this->createUserHelper(4,'tonychiu','A','password',400);
 		##Run tests
-		$student1ID = $this->User->getUserIdByStudentNo(100);
-		$student2ID = $this->User->getUserIdByStudentNo(200);
-		$instructorID =$this->User->getUserIdByStudentNo(300);
-		$adminID = $this->User->getUserIdByStudentNo(400);
-		$this->assertEqual($student1ID, 1);
-		$this->assertEqual($student2ID, 2);
-		$this->assertEqual($instructorID, 3);
-		$this->assertEqual($adminID, 4);
+		$student1ID = $this->User->getUserIdByStudentNo(123);
+		$student2ID = $this->User->getUserIdByStudentNo(100);
+		$instructorID =$this->User->getUserIdByStudentNo(321);
+		$adminID = $this->User->getUserIdByStudentNo(111);
+		$this->assertEqual($student1ID, 3);
+		$this->assertEqual($student2ID, 4);
+		$this->assertEqual($instructorID, 5);
+		$this->assertEqual($adminID, 8);
 		
 		//Test function on invalid users
 		$invalid = $this->User->getUserIdByStudentNo(23123123);
@@ -336,19 +345,19 @@ class UserTTestCase extends CakeTestCase {
 		
 		$this->User =& ClassRegistry::init('User');
 		$empty=null;
-		$this->flushDatabase();
+//		$this->flushDatabase();
 		
 		//Set up test data
-		$this->createUserHelper(1,'KevinLuk','SA','password',100);
-		$this->createUserHelper(3,'Steven','S','password',200);
-		$this->createUserHelper(13,'GSlade','I','password',300);
-		$this->createUserHelper(20,'tonychiu','A','password',400);
+//		$this->createUserHelper(1,'KevinLuk','SA','password',100);
+//		$this->createUserHelper(3,'Steven','S','password',200);
+//		$this->createUserHelper(13,'GSlade','I','password',300);
+//		$this->createUserHelper(20,'tonychiu','A','password',400);
 		
 		//user_id==1 : role(superadmin)
-		$superAdminRole=$this->User->getRoleById(1);
+		$superAdminRole=$this->User->getRoleById(8);
 		$this->assertEqual($superAdminRole, 'superadmin');
 		
-		//user_id==3 : role(student)
+/*		//user_id==3 : role(student)
 		$studentRole=$this->User->getRoleById(3);
 		$this->assertEqual($studentRole, 'student');
 		
@@ -366,7 +375,7 @@ class UserTTestCase extends CakeTestCase {
 		
 		//null input
 		$nullInput = $this->User->getRoleById(null);
-		$this->assertEqual($nullInput, $empty);
+		$this->assertEqual($nullInput, $empty);*/
 
 	}
 	
@@ -374,30 +383,12 @@ class UserTTestCase extends CakeTestCase {
 		
 		$this->User =& ClassRegistry::init('User');
 		$empty=null;
-		$this->flushDatabase();
 		
 		//Set up test data students
-		$this->createUserHelper(1,'KevinLuk','S','password',100);
-		$this->createUserHelper(2,'Steven','S','password',200);
-		$this->createUserHelper(3,'Rod','S','password',300);
-		$this->createUserHelper(4,'Tod','S','password',400);
-		$this->createGroupHelper(1, 1);
-		$this->createGroupHelper(2, 2);
-		//Add members to group 1
-		$this->addGroupMemberHelper(1,1,1);
-		$this->addGroupMemberHelper(2,1,2);
-		$this->addGroupMemberHelper(3,1,3);
-		$this->addGroupMemberHelper(4,1,4);
-		
-		//Test function on students assigned to multiple groups
-		$this->createUserHelper(5,'Alex','S','password',500);
-		$this->createGroupHelper(3, 3);
-		$this->createGroupHelper(4, 4);
-		$this->addGroupMemberHelper(5,3,5);
-		$this->addGroupMemberHelper(5,4,5);
-		$group3=$this->User->getMembersByGroupId(3);
-		$group4=$this->User->getMembersByGroupId(4);
-		$this->assertEqual($group3[0]['User']['username'], $group4[0]['User']['username']);
+
+		$group1=$this->User->getMembersByGroupId(1);
+		$group2=$this->User->getMembersByGroupId(2);
+		$this->assertEqual($group1[0]['User']['username'], $group2[0]['User']['username']);
 		
 		//Run tests on group with multiple members
 		$groupMembers = $this->User->getMembersByGroupId(1);
@@ -405,11 +396,11 @@ class UserTTestCase extends CakeTestCase {
 		foreach($groupMembers as $student){
 			array_push($groupMembersArray, $student['User']['username']);
 		}
-		$expect=array('KevinLuk', 'Steven','Rod', 'Tod');
+		$expect=array('StudentZ', 'StudentY');
 		$this->assertEqual($groupMembersArray, $expect);
 		
 		//Run test on group with NO members
-		$groupMembers = $this->User->getMembersByGroupId(2);
+		$groupMembers = $this->User->getMembersByGroupId(3);
 		$this->assertEqual($groupMembers, $empty);
 		
 		//Run test on invalid group; "group_id==213123" (invalid)
@@ -426,25 +417,16 @@ class UserTTestCase extends CakeTestCase {
 		
 		$this->User =& ClassRegistry::init('User');
 		$empty=null;
-		$this->flushDatabase();
+//		$this->flushDatabase();
 		
 		//Test function for valid users and course
-		##Create users and course data
-		$this->createUserHelper(1,'KevinLuk','S','password',100);
-		$this->createUserHelper(2,'Steven','S','password',200);
-		$this->createUserHelper(3,'Rod','S','password',300);
-		$this->createUserHelper(4,'Tod','S','password',400);
-		$this->createGroupHelper(1, 1);
-		##Add members to group one; only add students 1 and 2
-		$this->addGroupMemberHelper(1,1,1);
-		$this->addGroupMemberHelper(2,1,2);
 		##Run test
-		$studentNotInGroup = $this->User->getStudentsNotInGroup(1);
+		$studentNotInGroup = $this->User->getStudentsNotInGroup(3);
 		$studentsArray=array();
 		foreach($studentNotInGroup as $student){
-			array_push($studentsArray, $student['U']['username']);		
+			array_push($studentsArray, $student['User']['username']);		
 		}
-		$expect = array('Rod', 'Tod');
+		$expect = array('StudentZ', 'StudentY');
 		$this->User->printHelp($studentNotInGroup);
 		$this->assertEqual($studentsArray, $expect);		
 
@@ -465,28 +447,28 @@ class UserTTestCase extends CakeTestCase {
 		
 		$this->User =& ClassRegistry::init('User');
 		$empty=null;
-		$this->flushDatabase();
+	//	$this->flushDatabase();
 		
 		//Test function for valid user_id
 		##Set up test data
-		$this->createUserHelper(1,'KevinLuk','S','password',100);
-		$this->createUserHelper(2,'Steven','S','password',200);
-		$this->createUserHelper(3,'GSlade','I','password',300);
-		$this->createUserHelper(4,'tonychiu','A','password',400);
-		$this->createUserHelper(5,'superAdmin','SA','password',500);
+		//$this->createUserHelper(1,'KevinLuk','S','password',100);
+		//$this->createUserHelper(2,'Steven','S','password',200);
+	//	$this->createUserHelper(3,'GSlade','I','password',300);
+	//	$this->createUserHelper(4,'tonychiu','A','password',400);
+	//	$this->createUserHelper(5,'superAdmin','SA','password',500);
 		
 		##For students
-		$student=$this->User->findUserByid(1);
-		$this->assertEqual($student['User']['username'],"KevinLuk");
+		$student=$this->User->findUserByid(3);
+		$this->assertEqual($student['User']['username'],"StudentY");
 		##For instructors
-		$instructors = $this->User->findUserByid(3);
+		$instructors = $this->User->findUserByid(1);
 		$this->assertEqual($instructors['User']['username'],"GSlade");
 		##For admin
-		$admin = $this->User->findUserByid(4);
-		$this->assertEqual($admin['User']['username'],"tonychiu"); 
+		$admin = $this->User->findUserByid(8);
+		$this->assertEqual($admin['User']['username'],"Admin"); 
 		##For Super-admin
-		$superAdmin = $this->User->findUserByid(5);
-		$this->assertEqual($superAdmin['User']['username'],"superAdmin");
+		$superAdmin = $this->User->findUserByid(9);
+		$this->assertEqual($superAdmin['User']['username'],"SuperAdmin");
 		
 		//Test function for invalid user_id
 		##user_id==323123 (invalid)
@@ -514,21 +496,24 @@ class UserTTestCase extends CakeTestCase {
 	}
 	
 	function TestRegisterEnrolment(){
+		/* TO DO */
 		
+		/*
 		$this->User =& ClassRegistry::init('User');
 		$this->Course =& ClassRegistry::init('Course');
 		$empty=null;
-		$this->flushDatabase();
+//		$this->flushDatabase();
 
 		//Test for valid instructor and course
 		//Set up test data
-		$this->createUserHelper(1,'KevinLuk','S','Password');
-		$this->createUserHelper(2,'GSlade','I','Password');
-		$this->createCoursesHelper(1, 'Math320', 'AnalysisI');
+	//	$this->createUserHelper(1,'KevinLuk','S','Password');
+	//	$this->createUserHelper(2,'GSlade','I','Password');
+//		$this->createCoursesHelper(1, 'Math320', 'AnalysisI');
 		//Run tests
-		$this->User->registerEnrolment(1,1);
-		$students=$this->User->getEnrolledStudentsForList(1);
-		$this->assertEqual($students[0],'KevinLuk');
+		$this->User->registerEnrolment(3,3);
+		$students=$this->User->getEnrolledStudentsForList(3);
+		$this->assertEqual($students[0],'StudentY');
+		*/
 	}
 	
 	function TestDropEnrolment(){
@@ -536,12 +521,12 @@ class UserTTestCase extends CakeTestCase {
 		$this->User =& ClassRegistry::init('User');
 		$this->Course =& ClassRegistry::init('Course');
 		$empty=null;
-		$this->flushDatabase();
+//	$this->flushDatabase();
 		
 		//set up test data
-		$this->createUserHelper(1,'KevinLuk','S','Password');
-		$this->createUserHelper(2,'GSlade','I','Password');
-		$this->createCoursesHelper(1, 'Math320', 'AnalysisI');
+//	$this->createUserHelper(1,'KevinLuk','S','Password');
+//		$this->createUserHelper(2,'GSlade','I','Password');
+	//	$this->createCoursesHelper(1, 'Math320', 'AnalysisI');
 		//Run tests
 		$this->User->registerEnrolment(1,1);
 		$this->User->DropEnrolment(1,1);
@@ -646,4 +631,5 @@ class UserTTestCase extends CakeTestCase {
 		$this->deleteAllTuples('groups_members');
 	}
 }
+
 ?>

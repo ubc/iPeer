@@ -16,4 +16,10 @@ class GroupFixture extends CakeTestFixture {
 		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),
 		'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'InnoDB')
 	);
+	
+	  var $records = array(
+    array('id' => 1, 'group_num' => '1', 'group_name' => 'group1', 'course_id' =>1, 'record_status' => 'A'),
+    array('id' => 2, 'group_num' => '2', 'group_name' => 'group2', 'course_id' =>1, 'record_status' => 'A'),
+    array('id' => 3, 'group_num' => '3', 'group_name' => 'group3', 'course_id' =>1, 'record_status' => 'A'),
+     );
 }
