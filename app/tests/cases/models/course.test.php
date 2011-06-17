@@ -66,8 +66,7 @@ class CourseTestCase extends CakeTestCase {
   
   
   function testGetCourseByInstructor(){
-  	var_dump($this->Course->find('all'));
-    $empty = null;
+     $empty = null;
 
 		/*
 		 * user_id==1 : "GSlade"

@@ -159,7 +159,6 @@ class User extends AppModel
   
   //Overwriting Function - will be called before save operation
   function beforeSave() {
-    $allowSave = true;
 
     if(!isset($this->data[$this->name]['id']) && empty($this->data[$this->name]['password'])) {
       $tmp_pw = NeatString::randomPassword(6);
@@ -171,7 +170,7 @@ class User extends AppModel
     if(empty($this->data[$this->name]['password'])) {
       unset($this->data[$this->name]['password']);
     }
-    return $allowSave && parent::beforeSave();
+    return parent::beforeSave();
   }
 
  function find($conditions = array(), $fields = array(), $order = null, $recursive = null) {
@@ -287,7 +286,8 @@ class User extends AppModel
   
   function getRoleText($role)
   {
-    $ROLE_TEXT = array('A'  => 'Administrator',
+    if(!empty($role)){
+  	$ROLE_TEXT = array('A'  => 'Administrator',
                        'I'  => 'Instructor',
                        'T'  => 'TA',
                        'S'  => 'Student');
@@ -297,7 +297,8 @@ class User extends AppModel
     }else{
       $text = 'Unknown';
     }
-    return $text;
+    return $text;}
+    else return null;
   }
 
   function hashPasswords($data) {
@@ -310,7 +311,7 @@ class User extends AppModel
 
   function getRoleById($id) {
     $user = $this->find('first', array('conditions' => array('id'=>$id)));
-    return $user['Role'][0]['name'];
+    return (!empty($user['Role'][0]['name'])) ? $user['Role'][0]['name'] : null;
   }
 
   function getRoles($id) {
