@@ -80,13 +80,15 @@ class MixevalsQuestionDesc extends AppModel
 //  }
 
   // function to return the question's descriptor
-  function getQuestionDescriptor($mixevalId, $questionNum){
+  function getQuestionDescriptor($questionId){
 /*		$data = $this->find('all','mixeval_id='.$mixevalId.' AND question_num='.$questionNum, null, 'scale_level ASC');
 		return $data;*/
- 	return $this->find('all', array(
+ 	/*return $this->find('all', array(
             'conditions' => array('mixeval_id' => $mixevalId, 'question_num' => $questionNum),
             'order' => 'MixevalsQuestionDesc.id ASC'
-        ));
+        ));*/
+  	return $this->find('all', array('conditions' => array('question_id' => $questionId), 
+  								  	'order' => 'MixevalsQuestionDesc.id ASC'));
   }
 }
 ?>

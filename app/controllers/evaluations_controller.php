@@ -587,7 +587,7 @@ function makeSurveyEvaluation ($param = null) {
       }
   }
 
-  function makeMixevalEvaluation ($param = '')  {
+  function makeMixevalEvaluation ($param = '') {
       $this->autoRender = false;
       if (empty($this->params['data'])) {
           $tok = strtok($param, ';');
@@ -604,7 +604,7 @@ function makeSurveyEvaluation ($param = null) {
           $this->set('courseId', $courseId);
           $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers');
           $mixEvalDetail = $this->Evaluation->loadMixEvaluationDetail($event);
-          $this->set('view_data', $this->Mixeval->compileViewDataShort($mixEvalDetail['mixeval'], $this)); $this->Output->weeWa();
+          $this->set('view_data', $this->Mixeval->compileViewDataShort($mixEvalDetail['mixeval'], $this));
           $this->set('data', $mixEvalDetail['mixeval']);
           $this->set('groupMembers', $mixEvalDetail['groupMembers']);
           $this->set('evaluateeCount', $mixEvalDetail['evaluateeCount']);

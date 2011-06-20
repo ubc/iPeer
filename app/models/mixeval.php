@@ -111,6 +111,7 @@ class Mixeval extends EvaluationBase
 	}*/
 
   function compileViewData($mixeval=null) {
+  	
     $this->MixevalsQuestion = new MixevalsQuestion;
     $this->MixevalsQuestionDesc = new MixevalsQuestionDesc;
 
@@ -125,7 +126,7 @@ class Mixeval extends EvaluationBase
         $tmp['questions'][$evalQuestion['question_num']] = $evalQuestion;
         if ($evalQuestion['question_type'] == 'S') {
           //Retrieve the lickert descriptor
-          $descriptors = $this->MixevalsQuestionDesc->getQuestionDescriptor($mixeval_id, $evalQuestion['question_num']);
+          $descriptors = $this->MixevalsQuestionDesc->getQuestionDescriptor($row['MixevalsQuestion']['id']);
           $tmp['questions'][$evalQuestion['question_num']]['descriptors'] = $descriptors;
         }
       }
@@ -144,7 +145,6 @@ class Mixeval extends EvaluationBase
     if(!empty($mixeval['Question'])) {
             $mixeval['Question'] = $mixEvalDetail;
     }
-    
     return $mixeval;
   }
 

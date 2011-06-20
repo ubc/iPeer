@@ -2,8 +2,84 @@
 App::import('Model', 'Survey');
 App::import('Controller', 'Rubrics');
 
+class FakeController extends Controller {
+  var $name = 'FakeController';
+  var $components = array('Auth');
+  var $uses = null;
+  var $params = array('action' => 'test');
+}
+
 class SurveyTestCase extends CakeTestCase{
+  var $name = 'Survey';
+  var $fixtures = array('app.course', 'app.role', 'app.user', 'app.group', 
+                        'app.roles_user', 'app.event', 'app.event_template_type',
+                        'app.group_event', 'app.evaluation_submission',
+                        'app.survey_group_set', 'app.survey_group',
+                        'app.survey_group_member', 'app.question', 
+                        'app.response', 'app.survey_question', 'app.user_course',
+                        'app.user_enrol', 'app.groups_member', 'app.rubric', 'app.rubrics_lom', 
+  					 	'app.rubrics_criteria', 'app.rubrics_criteria_comment'
+                       );
+  var $Survey = null;
+  
+  function startCase() {
+	$this->Survey = ClassRegistry::init('Survey');
+    $admin = array('User' => array('username' => 'root',
+                                   'password' => 'ipeer'));
+    $this->controller = new FakeController();
+    $this->controller->constructClasses();
+    $this->controller->startupProcess();
+    $this->controller->Component->startup($this->controller);
+    $this->controller->Auth->startup($this->controller);
+    ClassRegistry::addObject('view', new View($this->Controller));
+    ClassRegistry::addObject('auth_component', $this->controller->Auth);
+
+    $this->controller->Auth->login($admin);
+  }
+  
+  function endCase() {
+    $this->controller->Component->shutdown($this->controller);
+    $this->controller->shutdownProcess();
+  }
+  
+  //Run before EVERY test.
+  function startTest($method) {
+  // extra setup stuff here
+  }
 	
+  function endTest($method) {
+  }
+
+  function testRubricInstance() {
+    $this->assertTrue(is_a($this->Survey, 'Survey'));
+  }
+  
+  function testGetSurveyIdByCourseIdTitle() {
+  	
+  	// Set up test data
+  	$SurveyId = $this->Survey->getSurveyIdByCourseIdTitle(1, 'Math303 Survey');
+  	$SurveyInFixture = $this->Survey->find('first', array('conditions' => array('name' => 'Math303 Survey')));
+  	
+  	// Assert on valid data
+  	$this->assertEqual($SurveyId['Survey'], $SurveyInFixture['Survey']['id']);
+  	
+  	// Test on faulty inputs
+  	$faultyInputs1 = $this->Survey->getSurveyIdByCourseIdTitle(1, 'Faulty');
+  	$faultyInputs2 = $this->Survey->getSurveyIdByCourseIdTitle(999, 'Math303 Survey');
+  	$faultyInputs3 = $this->Survey->getSurveyIdByCourseIdTitle(999, null);
+  	$faultyInputs4 = $this->Survey->getSurveyIdByCourseIdTitle(null, null);
+  	$this->assertNull($faultyInputs1);
+  	$this->assertNull($faultyInputs2);
+  	$this->assertNull($faultyInputs3);
+  	$this->assertNull($faultyInputs4);
+  }
+  
+  function testGetSurveyWithSubmissionById() {
+  	
+  	
+  }
+
+  /*
 	function TestGetSurveyTitleById(){
 		
 		$this->Survey= & ClassRegistry::init('Survey');
@@ -98,5 +174,7 @@ class SurveyTestCase extends CakeTestCase{
 		$this->Survey= & ClassRegistry::init('Survey');		
 		$this->Survey->deleteAllTuples('surveys');
 	}
+	*/
 }
+
 ?>

@@ -146,12 +146,6 @@ class Survey extends EvaluationBase
 //    ));
 //  }
 
-
-  function getSurveyTitleById($id=null) {
-    $tmp = $this->findById($id);
-    return $tmp['Survey']['name'];
-  }
-
   function getSurveyWithSubmissionById($survey_id, $conditions = array()){
     $evaluation_submission = Classregistry::init('EvaluationSubmission');
 
@@ -160,7 +154,7 @@ class Survey extends EvaluationBase
                                                                    'Event')));
     if(empty($survey)) return false;
 
-    $user_ids = Set::extract('/Course/Enrol/id', $survey); 
+    $user_ids = Set::extract('/Course/Enrol/id', $survey);
     $submissions = $evaluation_submission->find('list', array('conditions' => array('event_id' => $survey['Event'][0]['id'],
                                                                                    'submitter_id' => $user_ids),
                                                               'fields' => array('submitter_id', 'date_submitted')));
@@ -169,20 +163,5 @@ class Survey extends EvaluationBase
     }
     return $survey;
   }
-  
-  
-#### Helper functions for unit testing ####
-
-  	function printHelp($temp){
-  		$this->log($temp);
-  	}
-  
-	function deleteAllTuples($table){	
-		$sql = "DELETE FROM $table";
-		$this->query($sql);
-	}
-
 }
-
-
 ?>

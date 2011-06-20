@@ -64,7 +64,6 @@ class CourseTestCase extends CakeTestCase {
 		
 	}
   
-  
   function testGetCourseByInstructor(){
      $empty = null;
 
