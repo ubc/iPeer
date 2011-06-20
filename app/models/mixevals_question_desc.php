@@ -35,15 +35,19 @@ class MixevalsQuestionDesc extends AppModel
 		'foreignKey' => 'question_id'
 	)
 );
-  
-  // called by mixevals controller during add/edit of mixeval
-  // inserts/updates with question comments for each mixeval
-  function insertQuestionDescriptor($id, $data, $question_ids){
-    foreach ($data as $row) {
-      if (isset($row['Description'])) {
+
+/**
+ * Saves Mix evaluation question descriptions to database
+ * 
+ * @param type_Array $data : Mixeval_question data array
+ * @param type_Array $question_ids : Array of question_ids for Mixeval_questions
+ */
+  function insertQuestionDescriptor($data, $question_ids) {
+    foreach ($data as $row){
+      if(isset($row['Description'])){
         $descriptors =  $row['Description'];
         foreach($question_ids as $question_id){
-          	if ($question_id['MixevalsQuestion']['question_num'] == $row['question_num']){
+          	if($question_id['MixevalsQuestion']['question_num'] == $row['question_num']){
           		$q_id = $question_id['MixevalsQuestion']['id']; 
           	}
           } 
@@ -61,10 +65,11 @@ class MixevalsQuestionDesc extends AppModel
 
   // called by mixevals controller during an edit of an
   // existing mixeval question comment(s)
-  function updateQuestionDescriptor($id=null, $data){
-  	$this->deleteQuestionDescriptors( $id );
+  /* FUNCTION NOT BEING USED
+  function updateQuestionDescriptor($id=null, $data) {
+  	$this->delete($id);
   	$this->insertQuestionDescriptor($id, $data);
-  }
+  }*/
 
 //  // called by the delete function in the controller
 //  function deleteQuestionDescriptors( $id ){

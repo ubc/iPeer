@@ -1,24 +1,24 @@
-Array
+array
 (
     '0' => array
         (
             'id' => '',
-            'question_type' => S,
+            'question_type' => 'S',
             'question_num' => 0,
-            'title' => Licket, Q1
+            'title' => 'Q1 Lickert',
             'multiplier' => 15,
             'Description' => array
                 (
                     '0' => array
                         (
-                            'id' => 
-                            'descriptor' => Des1
+                            'id' => '', 
+                            'descriptor' => 'Des 1'
                         )
 
                     '1' => array
                         (
-                            'id' => 
-                            'descriptor' => Des2
+                            'id' => '',
+                            'descriptor' => 'Des 2'
                         )
 
                 )
@@ -27,12 +27,12 @@ Array
 
     '1' => array
         (
-            'id' => 
-            'question_type' => T,
+            'id' => '',
+            'question_type' => 'T',
             'question_num' => 1,
-            'title' => Comment Q2
-            'instructions' => Comment,
-            'response_type' => L
+            'title' => 'Q1 Comment',
+            'instructions' => Ins 1,
+            'response_type' => 'L'
         )
 
 )

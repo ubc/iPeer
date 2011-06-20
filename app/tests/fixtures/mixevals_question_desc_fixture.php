@@ -11,7 +11,7 @@ class MixevalsQuestionDescFixture extends CakeTestFixture {
   
   var $records = array(
   	  array('id' => 1, 'question_id' => 1, 'scale_level' => 0, 'descriptor' => 'HELLO'),
-  	  array('id' => 2, 'question_id' => 5, 'scale_level' => 0, 'descriptor' => 'HELLO 1'),
-  	  array('id' => 3, 'question_id' => 6, 'scale_level' => 0, 'descriptor' => 'HELLO 2')
+  	  array('id' => 3, 'question_id' => 1, 'scale_level' => 0, 'descriptor' => 'HELLO 1'),
+  	  array('id' => 4, 'question_id' => 2, 'scale_level' => 0, 'descriptor' => 'HELLO 2')
   );
 }

@@ -181,8 +181,8 @@ class MixevalsController extends AppController
 			if ($this->Mixeval->save($data)){
 				$this->MixevalsQuestion->insertQuestion($this->Mixeval->id, $this->data['Question']);
 				$id = $this->Mixeval->id;
-				$question_ids= $this->MixevalsQuestion->find('all', array('conditions' => array('mixeval_id'=> $id), 'fields'=>'id, question_num'));
-				$this->MixevalsQuestionDesc->insertQuestionDescriptor($this->Mixeval->id, $this->data['Question'], $question_ids);
+				$question_ids= $this->MixevalsQuestion->find('all', array('conditions' => array('mixeval_id'=> $id), 'fields' => array('MixevalsQuestion.id, question_num')));
+				$this->MixevalsQuestionDesc->insertQuestionDescriptor($this->data['Question'], $question_ids);
 				$this->Session->setFlash(__('The Mixed Evaluation was added successfully.', true));
 				$this->redirect('index');
 
@@ -221,7 +221,7 @@ class MixevalsController extends AppController
 				$this->MixevalsQuestion->insertQuestion($this->Mixeval->id, $this->data['Question']);
 				$id = $this->Mixeval->id;
 				$question_ids= $this->MixevalsQuestion->find('all', array('conditions' => array('mixeval_id'=> $id), 'fields'=>'id, question_num'));
-				$this->MixevalsQuestionDesc->insertQuestionDescriptor($this->Mixeval->id, $this->data['Question'], $question_ids);
+				$this->MixevalsQuestionDesc->insertQuestionDescriptor($this->data['Question'], $question_ids);
 				$this->Session->setFlash(__('The Mixed Evaluation was edited successfully.', true));
 				$this->redirect('index');
 
