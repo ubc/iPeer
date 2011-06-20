@@ -39,23 +39,30 @@ class MixevalsQuestion extends AppModel
                           ),
                      );
 
-  // called by mixevals controller during add of mixeval
-  // inserts with question comments for each mixeval
-  function insertQuestion($id, $data){
-    foreach ($data as $index => $value) {
+  /**
+   * Saves Mix evaluation questions to database
+   * 
+   * @param Type_int $id: id of mix corresponding mix evaluation
+   * @param Type_array $data: array of the mixevals questions to be inserted
+   */
+  function insertQuestion($id=null, $data=null) {
+    if(!is_null($id) && !is_null($data)){
+      foreach($data as $value){
    		$value['mixeval_id'] = $id;
    		$this->save($value);
   		$this->id = null;
-  	}
-	
-   }
-  
-   // called by mixevals controller during an edit of an
-   // existing mixeval question(s)
-  function updateQuestion($id, $data){
+      }
+    }
+	else return false;    
+  }
+   
+  /*FUNCTION NOT BEING USED
+    called by mixevals controller during an edit of an
+    existing mixeval question(s)*/
+  /*function updateQuestion($id, $data){
     $this->deleteQuestions($id);
     $this->insertQuestion($id, $data);
-  }
+  }*/
   
   // called by the delete function in the controller
   function deleteQuestions($id){
@@ -63,12 +70,15 @@ class MixevalsQuestion extends AppModel
     $this->delete($id);
   }
   
-  // function to return the question description and weight from the
-  // mixevals_loms table
-  function getQuestion($id=null){
+/**
+ * Get corresponding mix evaluation question corresponding to some mix evaluation
+ * 
+ * @param Tpye_int $mixEvalId : mix evaluation id
+ */
+  function getQuestion($mixEvalId=null){
 //  	$data = $this->find('all','mixeval_id='.$id, null, 'question_num ASC');
   	return $this->find('all', array(
-            'conditions' => array('mixeval_id' => $id),
+            'conditions' => array('mixeval_id' => $mixEvalId),
             'order' => 'question_num ASC'
         ));
   }  
