@@ -90,7 +90,7 @@ class CoursesController extends AppController
 
   function index() {
     // Set up the basic static ajax list variables
-	$this->setUpAjaxList();
+    $this->setUpAjaxList();
     // Set the display list
     $this->set('paramsForList', $this->AjaxList->getParamsForList());
   }
