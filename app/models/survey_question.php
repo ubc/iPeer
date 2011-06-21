@@ -16,20 +16,14 @@
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-/**
- * Question
- *
- * Enter description here...
- *
- * @package
- * @subpackage
- * @since
- */
 class SurveyQuestion extends AppModel
 {
   var $name = 'SurveyQuestion';
   
-  // returns all the question IDs of a specific survey
+  /**
+   * Returns all the question IDs of a specific survey and merges a array "count" in the result
+   * @param type_INT $surveyId : survey's id
+   */
   function getQuestionsID($surveyId=null) {
   	$data = $this->find('all', array('conditions'=> array('survey_id' => $surveyId),
                                      'fields' => array('number', 'question_id', 'id'),
@@ -38,6 +32,12 @@ class SurveyQuestion extends AppModel
     return $data;
   }
 
+  /**
+   * Reorders the survey's list of questions.
+   * @param type_INT $survey_id : survey's id.
+   * @param type_INT $question_id : id corresponding to the question that needs to be repositioned
+   * @param type_STRING('UP', 'DOWN', 'TOP', 'DOWN') $position : specifies how the question will be repositioned
+   */
   function moveQuestion($survey_id, $question_id, $position) {
     // Move to TOP case
     // Note, this method will not work for the BOTTOM case
@@ -142,10 +142,15 @@ class SurveyQuestion extends AppModel
     return true;
   }
 
-  // used to copy questions to a new survey when a template is used
+  /**
+   * Used to copy questions to a new survey when a template is used
+   * 
+   * @param type_INT $survey_id : copy from this survey
+   * @param type_INT $id : copy to this survey
+   */
   function copyQuestions($survey_id, $id) {
     $questions = $this->find('all', array('conditions' => array('SurveyQuestion.survey_id' => $survey_id)));
-
+    
     foreach($questions as $k => $q) {
       unset($q['SurveyQuestion']['id']);
       $q['SurveyQuestion']['survey_id'] = $id;
@@ -154,6 +159,12 @@ class SurveyQuestion extends AppModel
     $this->saveAll($questions);
   }
 
+  /**
+   * Assigned question number to each question in a survey based on its position in the list;
+   * called after the survey question list is reordered
+   * 
+   * @param type_INT $survey_id : survey's id
+   */
   function reorderQuestions($survey_id) {
     // get all questions order by the number
     $data = $this->find('all', array(
@@ -169,8 +180,13 @@ class SurveyQuestion extends AppModel
     return $data;
   }
   
+  /**
+   * Retrieves the last question in the survey question list 
+   * 
+   * @param type_INT $surveyId : survey's id
+   */
   function getLastSurveyQuestionNum($surveyId) {
-  	$tmp = $this->find('all', array('condition' => array('SurveyQuestion.id' => $surveyId), 'fields' => array('max(number)')));
+  	$tmp = $this->find('all', array('conditions' => array('survey_id' => $surveyId), 'fields' => array('max(number)')));
   	return $tmp[0][0]['max(number)'];
   }
 
