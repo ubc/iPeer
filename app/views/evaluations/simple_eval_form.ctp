@@ -204,7 +204,7 @@ if ($event['Event']['id']==292) {
                 $(<?php echo "'score".$user['id']."'"?>).innerHTML=(v+1);
             }
 
-            var defaultValue = 5;
+            var defaultValue = 4;
 
             new Control.Slider(
                 <?php echo "'handle".$user['id']."'"?>,
@@ -218,7 +218,7 @@ if ($event['Event']['id']==292) {
                 }
             );
 
-            onSlide(defaultValue-1);
+            onSlide(defaultValue);
     </script></td>
 	</tr>
 	<?php $i++;?>
