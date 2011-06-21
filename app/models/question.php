@@ -54,20 +54,25 @@ class Question extends AppModel
   var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable');
 
   // prepares the data by moving varibles in the form to the data question sub array
-  function prepData($data)
+  /*function prepData($data)
   {
     $data['data']['Question']['master'] = $data['form']['master'];
     $data['data']['Question']['type'] = $data['form']['type'];
     $data['data']['Question']['count'] = $data['form']['data']['Question']['count'];
 
     return $data;
-  }
+  }*/
 
-  // sets the data variable up with proper formating in the array for display
+  /**
+   * sets the data variable up with proper formating in the array for display
+   * @param array_$data : $data obtained as return value from 
+   * 					  SurveyQuestion::getQuestionsID($survey_id);
+   */
   function fillQuestion($data)
   {
     for( $i=0; $i<$data['count']; $i++ ){
-      $data[$i]['Question'] = $this->find('all',array('conditions' => array('id' => $data[$i]['SurveyQuestion']['question_id']),'fields' => array('prompt', 'type')));
+      $data[$i]['Question'] = $this->find('all',array('conditions' => array('id' => $data[$i]['SurveyQuestion']['question_id']),
+      									  			  'fields' => array('prompt', 'type')));
 	  //var_dump($data[$i]['Question'][0]['Question']);
       $data[$i]['Question'] = $data[$i]['Question'][0]['Question'];
       //var_dump($data[$i]['surveyQuestion']['number']);
@@ -76,7 +81,6 @@ class Question extends AppModel
       $data[$i]['Question']['sq_id'] = $data[$i]['SurveyQuestion']['id'];
 	  unset($data[$i]['SurveyQuestion']);
     }
-
     return $data;
   }
 
@@ -96,5 +100,4 @@ class Question extends AppModel
     return $type['Question']['type'];
   }
 }
-
 ?>

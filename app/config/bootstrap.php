@@ -50,5 +50,5 @@
  */
 
 if(file_exists(dirname(__FILE__).'/bootstrap.local.php')) { 
-  include('bootstrap.local.php'); 
+  include('bootstrap.local.php');
 }
