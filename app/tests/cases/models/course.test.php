@@ -65,7 +65,8 @@ class CourseTestCase extends CakeTestCase {
 	}
   
   function testGetCourseByInstructor(){
-     $empty = null;
+  
+    $empty = null;
 
 		/*
 		 * user_id==1 : "GSlade"

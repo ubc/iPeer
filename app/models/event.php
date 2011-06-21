@@ -346,7 +346,7 @@ class Event extends AppModel
 
       if(null == $assigned_group_ids && !isset($event['Group'])) {
         $assigned_group_ids = array_keys($group->find('list', array('conditions' => array('Event.id' => $event['Event']['id']))));
-      } elseif(isset($event['Group'])){
+      } elseif(null == $assigned_group_ids && isset($event['Group'])){
         $assigned_group_ids = Set::extract('/Group/id', $event);
       }
 

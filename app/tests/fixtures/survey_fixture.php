@@ -2,7 +2,18 @@
 class SurveyFixture extends CakeTestFixture {
   var $name = 'Survey';
   var $import = 'Survey';
+
   
+  var $records = array(
+    array('id' => 1, 'course_id' => 2, 'name' => 'Math321 Survey'),
+    array('id' => 2, 'course_id' => 3, 'name' => 'Math320 Survey'),
+    array('id' => 3, 'course_id' => 3, 'name' => 'Math320 Survey'),
+   
+    );
+}
+
+
+/*
   var $fields = array(
   	  'id' => array('type' => 'integer', 'key' => 'primary')
   	  'course_id' => array('type' => 'integer'),
@@ -23,4 +34,4 @@ class SurveyFixture extends CakeTestFixture {
     	  'release_date_begin' => '2011-06-16 12:28:07', 'release_date_end' => '2013-06-16 12:28:07', 'released' => 0,
     	  'creator_id' => 0, 'created' => '2011-06-16 12:28:07', 'updater_id' => null, 'modified' => null)
   );
-}
+}*/
