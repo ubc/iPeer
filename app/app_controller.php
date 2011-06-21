@@ -14,7 +14,7 @@ App::import('Lib', 'toolkit');
 
 class AppController extends Controller  {
   var $startpage = 'pages';
-  var $components = array('Session', 'Output', 'sysContainer', 'globalConstant', 'userPersonalize', 'framework', 'Auth', 'Acl', 'Email');
+  var $components = array('Session', 'Output', 'sysContainer', 'globalConstant', 'userPersonalize', 'framework', 'Auth', 'Acl', 'AccessControl', 'Email');
   var $helpers = array('Session', 'Html', 'Js');
   var $access = array ();
   var $actionList = array ();
