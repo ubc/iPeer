@@ -56,14 +56,15 @@ class SurveyGroup extends AppModel
 
   var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable');
 
-
-    function getIdByGroupSetIdGroupNumber($groupSetId=null,$groupNumber=null) {
+	//Function obsolete
+   /* function getIdByGroupSetIdGroupNumber($groupSetId=null,$groupNumber=null) {
       //$tmp = $this->find('group_set_id='.$groupSetId.' AND group_number='.$groupNumber);
         $tmp = $this->find('first', array(
             'conditions' => array('group_set_id' => $groupSetId, 'group_number' => $groupNumber)
         ));
       return $tmp['SurveyGroup']['id'];
-    }
+    }*/
+
     function getIdsByGroupSetId($groupSetId=null) {
       //return $this->find('all','group_set_id='.$groupSetId,'id');
         return $this->find('all', array(
