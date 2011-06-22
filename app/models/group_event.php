@@ -79,7 +79,7 @@ class GroupEvent extends AppModel
     if(empty($eventId) || is_null($eventId)) {
   	  	return;
   	  }
-  	return $this->find('all', array('conditions'=>array('event_id'=>$eventId)));
+  	return $this->find('all', array('conditions'=>array('event_id'=>$eventId), 'fields' => 'group_id'));
   }
   
 //  // returns list of group id within the selected Event

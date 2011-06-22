@@ -18,5 +18,13 @@ class EvaluationSubmissionFixture extends CakeTestFixture {
 		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1), 'grp_event_id' => array('column' => array('grp_event_id', 'submitter_id'), 'unique' => 1)),
 		'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'InnoDB')
 	);
+	
+  var $records = array(
+  array('id' => 1, 'event_id' => 1, 'grp_event_id' => 1, 'submitter_id' =>3, 'submitted' => 1, 'date_submitted' => '2010-06-25 00:00:00'),
+ // array('id' => 2, 'event_id' => 1, 'grp_event_id' => 1, 'submitter_id' =>4, 'submitted' => 1, 'date_submitted' => '2010-06-25 00:00:00' ),
+  array('id' => 3, 'event_id' => 2, 'grp_event_id' => 3, 'submitter_id' =>3, 'submitted' => 1, 'date_submitted' => '2010-06-25 00:00:00'),
+  array('id' => 4, 'event_id' => 2, 'grp_event_id' => 3, 'submitter_id' =>4, 'submitted' => 1, 'date_submitted' => '2010-06-25 00:00:00' ),
+  
+  );
 }
 

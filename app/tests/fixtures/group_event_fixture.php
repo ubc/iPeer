@@ -19,4 +19,13 @@ class GroupEventFixture extends CakeTestFixture {
 		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1), 'group_id' => array('column' => array('event_id', 'group_id'), 'unique' => 1)),
 		'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'InnoDB')
 	);
+	
+		  var $records = array(
+    array('id' => 1, 'group_id' => 1, 'event_id' => 1, 'record_status'=>'A', 'marked' => 'reviewed'),
+    array('id' => 2, 'group_id' => 2, 'event_id' => 1, 'record_status'=>'A', 'marked' => 'not reviewed'),
+    array('id' => 3, 'group_id' => 1, 'event_id' => 2, 'record_status'=>'A', 'marked' => 'reviewed'),
+    array('id' => 4, 'group_id' => 2, 'event_id' => 2, 'record_status'=>'I'),
+        
+    );
+	
 }
