@@ -72,7 +72,7 @@ class Group extends AppModel
                                      'length' => null),
                        );
 
-  var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable');
+  var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Traceable');
 
   var $belongsTo = array('Course' => array('className' => 'Course',
                                            'foreignKey' => 'course_id'));

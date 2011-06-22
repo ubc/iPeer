@@ -4,6 +4,7 @@ class UserCourse extends AppModel
   var $name = 'UserCourse';
 
   var $belongsTo = array('User');
+  var $actsAs = array('Traceable');
 
   // saves all the instructors associated with a course to the user_courses table
   function insertInstructors($course_id=null, $data=null){

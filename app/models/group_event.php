@@ -28,6 +28,7 @@
 class GroupEvent extends AppModel
 {
   var $name = 'GroupEvent';
+  var $actsAs = array('Traceable');
   // inserts all members into the groups_events table
   function insertGroups($id=null, $data=null){
   	for( $i=0; $i<count($data['Member']); $i++ ){

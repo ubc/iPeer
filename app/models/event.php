@@ -44,7 +44,7 @@ class Event extends AppModel
       'release_date_end' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/'
   );
 
-  var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable');
+  var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Traceable');
 
   /* tables related: events, group_events,
      * evaluation_submissions,

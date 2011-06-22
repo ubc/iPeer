@@ -2,6 +2,7 @@
 class UserEnrol extends AppModel
 {
   var $name = 'UserEnrol';
+  var $actsAs = array('Traceable');
 
   var $belongsTo = array('User');
     

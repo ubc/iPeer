@@ -28,6 +28,7 @@
 class SysFunction extends AppModel
 {
   var $name = 'SysFunction';
+  var $actsAs = array('Traceable');
 
   function getAllAccessibleFunction ($role='') {
    	//return $this->find('all',"permission_type LIKE '%".$role."%' ", array('id', 'function_code', 'function_name', 'parent_id', 'controller_name', 'url_link'));

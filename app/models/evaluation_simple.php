@@ -2,6 +2,7 @@
 class EvaluationSimple extends AppModel
 {
   var $name = 'EvaluationSimple';
+  var $actsAs = array('Traceable');
 
   /*var $belongsTo = array(
     'SimpleEvaluation' => array(

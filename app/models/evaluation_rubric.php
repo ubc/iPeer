@@ -2,6 +2,7 @@
 class EvaluationRubric extends AppModel
 {
   var $name = 'EvaluationRubric';
+  var $actsAs = array('Traceable');
 
   var $hasMany = array(
   									  'EvaluationRubricDetail' =>

@@ -33,7 +33,7 @@ class Rubric extends EvaluationBase
   var $name = 'Rubric';
   // use default table
   var $useTable = null;
-  var $actsAs = array('Containable');
+  var $actsAs = array('Containable', 'Traceable');
   var $hasMany = array(
                         'RubricsCriteria' => array(
                           'className' => 'RubricsCriteria',

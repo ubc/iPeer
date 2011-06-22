@@ -2,6 +2,7 @@
 class EvaluationSubmission extends AppModel
 {
   var $name = 'EvaluationSubmission';
+  var $actsAs = array('Traceable');
 
   var $belongsTo = array(
                    'Event' =>

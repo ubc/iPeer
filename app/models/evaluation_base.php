@@ -2,7 +2,7 @@
 
 class EvaluationBase extends AppModel {
   var $name = 'EvaluationBase';
-  var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable');
+  var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Traceable');
   var $useTable = false;
   // suppress the warning when using "cake schema generate"
   const TEMPLATE_TYPE_ID = 0;

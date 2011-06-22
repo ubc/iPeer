@@ -29,9 +29,8 @@
 class Course extends AppModel
 {
   var $name = 'Course';
-
  
-  var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable');
+  var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Traceable');
 
   var $hasMany = array(
                   'Group' =>

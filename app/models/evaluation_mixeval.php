@@ -2,6 +2,7 @@
 class EvaluationMixeval extends AppModel
 {
     var $name = 'EvaluationMixeval';
+    var $actsAs = array('Traceable');
 
     var $hasMany = array(
         'EvaluationMixevalDetail' =>

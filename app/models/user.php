@@ -62,7 +62,7 @@ class User extends AppModel
 		'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'InnoDB')
 	);
 
-  var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable');
+  var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Traceable');
 
   var $hasMany =array('Submission' => array('className' => 'EvaluationSubmission',
                                             'foreignKey' => 'submitter_id',

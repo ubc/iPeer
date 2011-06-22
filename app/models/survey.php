@@ -82,7 +82,7 @@ class Survey extends EvaluationBase
                                         ),
                        );
 
-  var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Copyable');
+  var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Copyable', 'Traceable');
 
   var $contain = array('Question');
 

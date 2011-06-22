@@ -28,6 +28,7 @@
 class SysParameter extends AppModel
 {
   var $name = 'SysParameter';
+  var $actsAs = array('Traceable');
   
 	function findParameter ($paramCode='') {
  		//return $this->find("parameter_code = '".$paramCode."' ", array('id', 'parameter_code', 'parameter_value', 'parameter_type'));
