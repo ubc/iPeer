@@ -53,16 +53,16 @@ class SurveyGroupSet extends AppModel
     $this->virtualFields['group_count'] = sprintf('SELECT count(*) as count FROM survey_groups as sg WHERE sg.group_set_id = %s.id', $this->alias);
   }
 
-  function getIdBySurveyIdSetDescription($surveyId=null,$setDescription=null) {
+  /*function date($surveyId=null,$setDescription=null) {
     $tmp = $this->find('first', array('conditions' => array('survey_id' => $surveyId,
                                                             'set_description' => $setDescription)));
     return $tmp['SurveyGroupSet']['id'];
-  }
+  }*/
 
-  function getSurveyIdById($id) {
+  /*function getSurveyIdById($id) {
     $tmp = $this->read(null, $id);
     return $tmp['SurveyGroupSet']['survey_id'];
-  }
+  }*/
 
   function save($data = null, $validate = true, $fieldList = array()) {
     if(empty($data)) return false;
@@ -71,30 +71,27 @@ class SurveyGroupSet extends AppModel
     $dataSource = $this->getDataSource();
     $dataSource->begin($this);
 
-    if($result = parent::save($data, $validate, $fieldList)) {
-      if(isset($data['SurveyGroup'])) {
+    if($result = parent::save($data, $validate, $fieldList)){
+      if(isset($data['SurveyGroup'])){
         $SurveyGroup = ClassRegistry::init('SurveyGroup');
-        foreach($data['SurveyGroup'] as $survey_group) {
+        foreach($data['SurveyGroup'] as $survey_group){
           $survey_group['SurveyGroup']['group_set_id'] = $this->id;
 
-          if(isset($survey_group['SurveyGroupMember'])) {
-            foreach($survey_group['SurveyGroupMember'] as $key => $m) {
+          if(isset($survey_group['SurveyGroupMember'])){
+            foreach($survey_group['SurveyGroupMember'] as $key => $m){
               $survey_group['SurveyGroupMember'][$key]['group_set_id'] = $this->id;
             }
           }
-
           $result = $SurveyGroup->saveAll($survey_group, array('validate' => $validate,
                                                                'atomic' => false));
         }
       }
     }
-
-    if($result) {
+    if($result){
       $dataSource->commit($this);
-    } else {
+    } else{
       $dataSource->rollback($this);
     }
-
     return $result;
   }
 
@@ -146,7 +143,7 @@ class SurveyGroupSet extends AppModel
 
     return $result;
   }
-
+  
   function beforeDelete($cascade) {
     $time = $this->field('date', array('id' => $this->id));
 
@@ -158,5 +155,4 @@ class SurveyGroupSet extends AppModel
     return true;
   }
 }
-
 ?>
