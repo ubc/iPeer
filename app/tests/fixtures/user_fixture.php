@@ -28,6 +28,8 @@ class UserFixture extends CakeTestFixture {
 	);
 
   var $records = array(
+  	array('id' => 10, 'username' => 'kevin', 'password' => 'kevin', 'role' => 'S', 'record_status' => 'A', 'creator_id' => 8, 'created' => 0),
+  	array('id' => 11, 'username' => 'zion', 'password' => 'zion', 'role' => 'S', 'record_status' => 'A', 'creator_id' => 8, 'created' => 0),
     array('id' => 1, 'username' => 'GSlade', 'role' => 'I'),
     array('id' => 2, 'username' => 'Peterson', 'role' => 'I'),
     array('id' => 3, 'username' => 'StudentY', 'role' => 'S', 'password'=>'password1', 'student_no'=>123),

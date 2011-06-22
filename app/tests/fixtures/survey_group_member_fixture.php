@@ -12,7 +12,7 @@ class SurveyGroupMemberFixture extends CakeTestFixture {
 	);*/
   var $import = 'SurveyGroupMember';
   var $records = array(
-  			array('id' => 1, 'group_set_id' => 1, 'group_id' => 1, 'user_id' => 1);
+  			array('id' => 1, 'group_set_id' => 1, 'group_id' => 1, 'user_id' => 1),
   			array('id' => 2, 'group_set_id' => 1, 'group_id' => 2, 'user_id' => 2)
   	);
 }

@@ -1,38 +1,33 @@
 array
 (
-    '0' => array
+    'SurveyGroupSet' => array
         (
-            'id' => '',
-            'question_type' => 'S',
-            'question_num' => 0,
-            'title' => 'Q1 Lickert',
-            'multiplier' => 15,
-            'Description' => array
+            'survey_id' => '1',
+            'set_description' => '303' GROUP,
+            'num_groups' => '1',
+            'date' => '1308770251'
+        )
+
+    'SurveyGroup' => array
+        (
+            '0' => array
                 (
-                    '0' => array
+                    'SurveyGroup' => array
                         (
-                            'id' => '', 
-                            'descriptor' => 'Des 1'
+                            'group_number' => '1'
                         )
 
-                    '1' => array
+                    'SurveyGroupMember' => array
                         (
-                            'id' => '',
-                            'descriptor' => 'Des 2'
+                            '0' => array
+                                (
+                                    'user_id' => ''
+                                )
+
                         )
 
                 )
 
-        )
-
-    '1' => array
-        (
-            'id' => '',
-            'question_type' => 'T',
-            'question_num' => 1,
-            'title' => 'Q1 Comment',
-            'instructions' => Ins 1,
-            'response_type' => 'L'
         )
 
 )

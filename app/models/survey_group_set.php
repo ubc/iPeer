@@ -64,19 +64,23 @@ class SurveyGroupSet extends AppModel
     return $tmp['SurveyGroupSet']['survey_id'];
   }*/
 
+  /**
+   * Saves data to surveyGroupSet model and all of its associates.
+   * @param tpye_ARRAY $data : array consisting of survey_group_set,
+   * 						   survey_groups, survey_group_members tables entries
+   * @param type_BOOLEAN $validate : 
+   * @param type_ARRAY $fieldList :
+   */
   function save($data = null, $validate = true, $fieldList = array()) {
     if(empty($data)) return false;
-
     // begin transaction
     $dataSource = $this->getDataSource();
     $dataSource->begin($this);
-
     if($result = parent::save($data, $validate, $fieldList)){
       if(isset($data['SurveyGroup'])){
         $SurveyGroup = ClassRegistry::init('SurveyGroup');
         foreach($data['SurveyGroup'] as $survey_group){
           $survey_group['SurveyGroup']['group_set_id'] = $this->id;
-
           if(isset($survey_group['SurveyGroupMember'])){
             foreach($survey_group['SurveyGroupMember'] as $key => $m){
               $survey_group['SurveyGroupMember'][$key]['group_set_id'] = $this->id;
@@ -95,11 +99,17 @@ class SurveyGroupSet extends AppModel
     return $result;
   }
 
+  /**
+   * Sets SurveyGroupSet.release == 1 and creates a entry in Group based on the 
+   * corresponding groupSet.  Note, SurveyGroupSet.release is set to 1 if and only if a
+   * correspond group entry is successfully added to the database.
+   * 
+   * @param type_INT $group_set_id : SurveyGroupSet.id
+   */
   function release($group_set_id) {
-    $group_set = $this->find('first', array('conditions' => array($this->alias.'.id' => $group_set_id),
+    $group_set = $this->find('first', array('conditions' => array('SurveyGroupSet.id' => $group_set_id),
                                             'contain' => array('Survey', 'SurveyGroup' => array('Member.id')),
                                            ));
-
     if($group_set['SurveyGroupSet']['released']) return false;
 
     $Group = ClassRegistry::init('Group');
@@ -129,7 +139,7 @@ class SurveyGroupSet extends AppModel
       $groups[] = $group;
     }
 
-    if(!($result = $Group->saveAll($groups))) {
+    if($result = $Group->saveAll($groups)) {
       //change status of survey set to released
       $this->id = $group_set['SurveyGroupSet']['id'];
       $result = $this->saveField('released', 1);
@@ -146,7 +156,6 @@ class SurveyGroupSet extends AppModel
   
   function beforeDelete($cascade) {
     $time = $this->field('date', array('id' => $this->id));
-
     //delete teammaker crums
     unlink(TMP.$time.'.txt');
     unlink(TMP.$time.'.xml');
