@@ -29,23 +29,23 @@ class Response extends AppModel {
   var $name = 'Response';
   var $belongsTo = array('Question');
 
+  // Function is Obsolete
 	// saves all the responses in the database
-	function linkResponses($question_id, $data)
-	{
-		for( $i = 1; $i <= $data['Question']['count']; $i++ ){
-			if( !empty($data['Question']['response_'.$i]) ){
+	/*function linkResponses($question_id, $data) {
+		var_dump($data);
+		for($i = 1; $i <= $data['Question']['count']; $i++){
+			if(!empty($data['Question']['response_'.$i])){
 				$tmpData['response'] = $data['Question']['response_'.$i];
 				$tmpData['question_id'] = $question_id;
-
 				$this->save($tmpData);
 				$this->id=null;
 			}
 		}
-	}
+	}*/
 
 	// prepares the data var with all the response info from the form for display
-	function fillResponse($data)
-	{
+	function fillResponse($data) {
+		var_dump($data);
 		for( $i=0; $i<$data['count']; $i++ ){
 			$tmp = $this->find('all', array('conditions' => array('question_id' => $data[$i]['Question']['id']),
                                       'fields' => array('response','id')));
@@ -70,16 +70,13 @@ class Response extends AppModel {
 	  return $data;
 	}
 
-	function countResponses($questionId)
-	{
+	function countResponses($questionId) {
 		return $this->find('count', array('conditions' => array('question_id' => $questionId)));
 	}
 
-	function prepData($data, $questionID)
-	{
+	function prepData($data, $questionID) {
 		$tmp = $this->find('all', array('conditions' => array('question_id' => $questionId), 
                                     'fields' => array('response')));
-
 		for( $i=0; $i<$data['Question']['count']; $i++ ){
 			$data['Question']['response_'.($i+1)] = $tmp[$i]['Response']['response'];
 		}
@@ -92,7 +89,7 @@ class Response extends AppModel {
 	  return $tmp['Response']['response'];
 	}
 	
-	function getResponseId($questionId=null, $response=null){
+	function getResponseId($questionId=null, $response=null) {
 		$findResult = $this->find('first', array('conditions'=>array('question_id'=>$questionId, 'response'=>$response)));
 		return $findResult['Response']['id'];
 	}

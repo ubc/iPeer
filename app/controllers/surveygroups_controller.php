@@ -120,7 +120,7 @@ class SurveyGroupsController extends AppController
     //get surveys for the course
     $survey_list = $this->Survey->find('list', array('conditions' => array('course_id' => $courseId)));
     $ids = array_keys($survey_list); 
-    $survey = $this->Survey->getSurveyWithSubmissionById($ids[0]);
+    $survey = $this->Survey->getSurveyWithSubmissionById($ids);
 
     $this->set('survey_list', $survey_list);
     $this->set('data',$survey);

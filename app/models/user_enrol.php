@@ -61,11 +61,7 @@ class UserEnrol extends AppModel
   
 function getEnrolledCourses($userId=''){
   	return $this->find('all',array('conditions'=>array('user_id'=>$userId), 'fields'=>array('course_id')));
-}
-  
-  function weeWa(){
-  	//var_dump("ADSA");
-  }  
+  }
 }
 
 ?>
