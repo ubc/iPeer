@@ -9,7 +9,7 @@ class FakeController extends Controller {
   var $params = array('action' => 'test');
 }
 
-class UserTestCase extends CakeTestCase {
+class UserEnrolTestCase extends CakeTestCase {
   var $name = 'UserEnrol';
   var $fixtures = array('app.course', 'app.role', 'app.user', 'app.group', 
                         'app.roles_user', 'app.event', 'app.event_template_type',
