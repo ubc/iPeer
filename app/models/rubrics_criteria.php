@@ -43,13 +43,13 @@ class RubricsCriteria extends AppModel
 
 
                     
-  function getCriteria($id){
+  function getCriteria($rubric_id){
 //          $sql = "SELECT criteria
 //                          FROM rubrics_criterias
 //                          WHERE rubric_id=$id";
 //          return $this->query($sql);
     return $this->find('all', array(
-        'conditions' => array('RubricsCriteria.rubric_id' => $id),
+        'conditions' => array('RubricsCriteria.rubric_id' => $rubric_id),
         'fields' => array('RubricsCriteria.criteria')
     ));
   }
