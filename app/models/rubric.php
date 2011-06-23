@@ -278,7 +278,7 @@ class Rubric extends EvaluationBase
         $tmp2['criteria_weight_'.($criteria_count+1)] = 1;
     }
 
-    $data = $this->RubricsCriteriaComment->getCriteriaComment($tmp[0]['Rubric']['id'], $tmp[0]['Rubric']['criteria'], $tmp[0]['Rubric']['lom_max']);
+    $data = $this->RubricsCriteriaComment->getCriteriaComment($tmp);
     $tmp3 = array_merge($tmp2,$data);
 
     /* Now, replace all the elements of this database array with the submitted array,
