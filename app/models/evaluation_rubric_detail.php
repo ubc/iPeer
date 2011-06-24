@@ -4,13 +4,11 @@ class EvaluationRubricDetail extends AppModel
   var $name = 'EvaluationRubricDetail';
   var $actsAs = array('Traceable');
   
-  var $belongsTo = array(
-									 			'EvaluationRubric' =>
-									 				array(
-									 					'className' => 'EvaluationRubric',
-									 					'foreignKey' => 'evaluation_rubric_id'
-									 				)
-									 );
+  var $belongsTo = array('EvaluationRubric' =>array(
+										'className' => 'EvaluationRubric',
+									 	'foreignKey' => 'evaluation_rubric_id'
+									 			   )
+						);
   
 	function getByEvalRubricIdCritera($rubricId=null, $criteriaNum=null){
 //	  $sql = 'evaluation_rubric_id='.$rubricId;

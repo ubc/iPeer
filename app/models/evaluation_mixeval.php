@@ -30,7 +30,6 @@ class EvaluationMixeval extends AppModel
             'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
             'order' => 'evaluator ASC'
         ));
-
     }
 
     // gets Mixeval evaluation result for a specific assignment and evaluator
@@ -78,7 +77,7 @@ class EvaluationMixeval extends AppModel
             'fields' => array('EvaluationMixevalDetail.*'),
             'joins' => array(
                 array(
-                    'tabel' => 'evaluation_mixeval_details',
+                    'table' => 'evaluation_mixeval_details',
                     'alias' => 'EvaluationMixevalDetail',
                     'type' => 'LEFT',
                     'conditions' => array('EvaluationMixeval.id = EvaluationMixevalDetail.evaluation_mixeval_id')

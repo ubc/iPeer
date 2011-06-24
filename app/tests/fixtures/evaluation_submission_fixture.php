@@ -2,7 +2,6 @@
 
 class EvaluationSubmissionFixture extends CakeTestFixture {
   var $name = 'EvaluationSubmission';
-
   var $fields = array(
 		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
 		'event_id' => array('type' => 'integer', 'null' => false, 'default' => '0', 'length' => 20),
