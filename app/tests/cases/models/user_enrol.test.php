@@ -23,7 +23,7 @@ class UserEnrolTestCase extends CakeTestCase {
 
   function startCase() {
 		$this->UserEnrol = ClassRegistry::init('UserEnrol');
-    $admin = array('UserEnrol' => array('username' => 'root',
+    $admin = array('User' => array('username' => 'root',
                                    'password' => 'ipeer'));
     $this->controller = new FakeController();
     $this->controller->constructClasses();
