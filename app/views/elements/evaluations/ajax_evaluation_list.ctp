@@ -42,7 +42,7 @@
   	    </td>
   	    <td align="center">
   	    <?php if($currentUser['role'] == 'A' || $currentUser['role'] == 'I'):?>
-  		    <a href="<?php echo $this->webroot.$this->theme.'evaluations/view/'.$evaluation['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
+  		    <a href="<?php echo $this->webroot.$this->theme.'evaluations/view/'.$evaluation['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View', 'title'=>'View '.$evaluation['title']))?></a>
   	    <?php endif;?>
   	    </td>
   	    <?php

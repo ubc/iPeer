@@ -25,7 +25,7 @@
 	    if (isset($group['id'])) {?>
   	  <tr class="tablecell">
   	    <td align="center">
-  		    <a href="<?php echo $this->webroot.$this->theme.'evaluations/viewEvaluationResults/'.$group['event_id'].'/'.$group['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
+  		    <a href="<?php echo $this->webroot.$this->theme.'evaluations/viewEvaluationResults/'.$group['event_id'].'/'.$group['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View','title'=>'View Evaluation Result'))?></a>
   	    </td>
 <!--  		  <td>
   		    <a href="<?php echo $this->webroot.$this->theme.'evaluations/view/'.$group['id']?>"><?php echo $html->image('icons/email.gif',array('border'=>'0','alt'=>'View'))?></a>

@@ -38,19 +38,19 @@
                   echo $html->link(
                             $html->image("icons/view.gif", array("border"=>"0","alt"=>"View")),
                             "/users/view/".$user['id'],
-                            array('escape'=>false)
+                            array('escape'=>false, 'title'=>'View '.$user['full_name'])
                   );
             ?>
 	    <?php if($currentUser['role'] == 'A' || $currentUser['role'] != 'I' && ($currentUser['role'] == 'A' || $currentUser['role'] == 'I')):
                    echo $html->link(
                                     $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit')),
                                     "/users/edit/".$user['id'],
-                                    array('escape'=>false)
+                                    array('escape'=>false, 'title'=>'Edit '.$user['full_name'])
                    );
             ?>
    	    <?php if($currentUser['role'] == 'A'):
                   echo $html->link(
-                                    $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete')),
+                                    $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete', 'title'=>'Delete '.$user['full_name'])),
                                     "/users/delete/".$user['id'],
                                     array('onClick' => "return confirm('Are you sure you want to delete user &ldquo;".$user["username"]."&rdquo;?')",'escape'=>false)
                   );
@@ -58,7 +58,7 @@
             ?>
             <?php
                   echo $html->link(
-                                    $html->image('icons/key_email.gif',array('border'=>'0','alt'=>'Reset password')),
+                                    $html->image('icons/key_email.gif',array('border'=>'0','alt'=>'Reset password', 'title'=>'Reset '.$user['full_name']."'s password")),
                                     "/users/resetPassword/".$user['id'],
                                     array('onClick' => "return confirm('Are you sure you want to reset password for user &ldquo;".$user["username"]."&rdquo;?')",'escape'=>false)
                   );

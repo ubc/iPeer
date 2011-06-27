@@ -239,7 +239,7 @@ class SearchsController extends AppController
           break;
         default:
             //$assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($eventId);
-          $assignedGroupIDs = array_merge($assignedGroupIDs , $this->GroupEvent->getGroupIDsByEventId($event['Event']['id']));
+          $assignedGroupIDs = array_merge($assignedGroupIDs , $this->GroupEvent->getGroupsByEventId($event['Event']['id']));
           break;
       }
     }

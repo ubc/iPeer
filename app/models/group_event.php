@@ -81,6 +81,14 @@ class GroupEvent extends AppModel
   	  }
   	return $this->find('all', array('conditions'=>array('event_id'=>$eventId), 'fields' => 'group_id'));
   }
+
+  // returns list of group id within the selected Event
+  function getGroupsByEventId($eventId=null){
+    if(empty($eventId) || is_null($eventId)) {
+  	  	return;
+  	  }
+  	return $this->find('all', array('conditions'=>array('event_id'=>$eventId)));
+  }
   
 //  // returns list of group id within the selected Event
 //  function getGroupIDsByEventId($eventId=null){
