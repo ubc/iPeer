@@ -2,7 +2,6 @@
 
 class EventTemplateTypeFixture extends CakeTestFixture {
   var $name = 'EventTemplateType';
-
   var $fields = array(
 		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
 		'type_name' => array('type' => 'string', 'null' => false, 'length' => 50, 'key' => 'unique', 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
@@ -13,8 +12,17 @@ class EventTemplateTypeFixture extends CakeTestFixture {
 		'creator_id' => array('type' => 'integer', 'null' => false, 'default' => '0'),
 		'created' => array('type' => 'datetime', 'null' => false, 'default' => '0000-00-00 00:00:00'),
 		'updater_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
-		'modified' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
-		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1), 'type_name' => array('column' => 'type_name', 'unique' => 1), 'table_name' => array('column' => 'table_name', 'unique' => 1)),
-		'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'InnoDB')
+		'modified' => array('type' => 'datetime', 'null' => true, 'default' => NULL)
 	);
+  var $records = array(
+  	array('id' => 1, 'type_name' => 'RUBRIC', 'table_name' => 'rubrics', 'model_name' => 'RUBRIC',
+  		  'display_for_selection' => 1, 'record_status' => 'A', 'creator_id' => 1,
+  		  'created' => 0, 'updater_id' => null, 'modified' => null),
+  	array('id' => 2, 'type_name' => 'SIMPLE', 'table_name' => 'simple_evaluations', 'model_name' => 'SimpleEvaluation',
+  		  'display_for_selection' => 0, 'record_status' => 'A', 'creator_id' => 1,
+  		  'created' => 0, 'updater_id' => null, 'modified' => null),
+  	array('id' => 3, 'type_name' => 'SIMPLE', 'table_name' => 'simple_evaluations', 'model_name' => 'SimpleEvaluation',
+  		  'display_for_selection' => 0, 'record_status' => 'A', 'creator_id' => 1,
+  		  'created' => 0, 'updater_id' => null, 'modified' => null)
+  	);
 }

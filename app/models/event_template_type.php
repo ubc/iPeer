@@ -31,23 +31,26 @@ class EventTemplateType extends AppModel
   var $displayField = 'type_name';
   var $actsAs = array('Traceable');
 
-  function getEventTemplateTypeList($selection = true){
-
-    $selection? $conditions['EventTemplateType.display_for_selection'] = '1': $conditions = array();
+  /**
+   * Return a list of the event templates
+   * @param type_BOOLEAN $onlyDisplayForSelection : TRUE returns entries only for display_for_selection==1
+   * 												FALSE returns ALL entries
+   */
+  function getEventTemplateTypeList($onlyDisplayForSelection = true) {
+    $onlyDisplayForSelection? $conditions['EventTemplateType.display_for_selection'] = '1': $conditions = array();
     return $this->find('list', array(
         'conditions'=> $conditions,
         'order' => 'EventTemplateType.id'
     ));
   }
 
-  function getEventType ($eventTemplateTypeId, $field='type_name')
-  {
+  // Function is obsolete.
+  /*function getEventType($eventTemplateTypeId, $field='type_name') {
     $eventTemplate = $this->find('first', array(
         'conditions' => array('EventTemplateType.id' => $eventTemplateTypeId)
     ));
     return $eventTemplate['EventTemplateType'][$field];
-
-  }
+  }*/
 }
 
 ?>
