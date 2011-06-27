@@ -16,4 +16,3 @@ class EvaluationMixevalFixture extends CakeTestFixture {
   		
   );
 }
-

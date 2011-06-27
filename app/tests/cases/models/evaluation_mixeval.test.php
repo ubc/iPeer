@@ -139,7 +139,47 @@ class EvaluationMixevalTestCase extends CakeTestCase {
   
   function testGetOppositeGradeReleaseStatus() {
   	// Set up test data
+  	$groupEvent2NotReleasedCount = $this->EvaluationMixeval->getOppositeGradeReleaseStatus(2, 1);
+  	$groupEvent2ReleasedCount = $this->EvaluationMixeval->getOppositeGradeReleaseStatus(2, 0);
+  	$groupEvent1NotReleasedCount = $this->EvaluationMixeval->getOppositeGradeReleaseStatus(1, 1);
+  	$groupEvent1ReleasedCount = $this->EvaluationMixeval->getOppositeGradeReleaseStatus(1, 0);
+  	// Test against fixture data
+  	$this->assertEqual($groupEvent2NotReleasedCount, 2);
+  	$this->assertEqual($groupEvent2ReleasedCount, 0);
+  	$this->assertEqual($groupEvent1NotReleasedCount, 1);
+  	$this->assertEqual($groupEvent1ReleasedCount, 0);
+  }
+
+  function testGetOppositeCommentReleaseStatus() {
+  	// Set up test data
+  	$groupEvent2NotReleasedCount = $this->EvaluationMixeval->getOppositeCommentReleaseStatus(2, 1);
+  	$groupEvent2ReleasedCount = $this->EvaluationMixeval->getOppositeCommentReleaseStatus(2, 0);
+  	$groupEvent1NotReleasedCount = $this->EvaluationMixeval->getOppositeCommentReleaseStatus(1, 1);
+  	$groupEvent1ReleasedCount = $this->EvaluationMixeval->getOppositeCommentReleaseStatus(1, 0);
+  	// Test against fixture data
+  	$this->assertEqual($groupEvent2NotReleasedCount, 2);
+  	$this->assertEqual($groupEvent2ReleasedCount, 0);
+  	$this->assertEqual($groupEvent1NotReleasedCount, 1);
+  	$this->assertEqual($groupEvent1ReleasedCount, 0);  
+  }
+  
+  function testSetAllEventGradeRelease() {
+  	// Set up test data
+  	$this->EvaluationMixeval->setAllEventGradeRelease(1, 1);
+  	// Assert EvaluationMixeval.event_id is updated
+  	$searched = $this->EvaluationMixeval->find('all', array('conditions' => array('event_id' => 1)));
+  	$this->assertTrue(!empty($searched));
+  	$this->assertEqual($searched[0]['EvaluationMixeval']['grade_release'], 1);
+  	$this->assertEqual($searched[1]['EvaluationMixeval']['grade_release'], 1);
+  	$this->assertEqual($searched[2]['EvaluationMixeval']['grade_release'], 1);
   	
+  	// Revert grade release back to 0, and test again
+  	$this->EvaluationMixeval->setAllEventGradeRelease(1, 0);
+  	$searched = $this->EvaluationMixeval->find('all', array('conditions' => array('event_id' => 1)));
+  	$this->assertTrue(!empty($searched));
+  	$this->assertEqual($searched[0]['EvaluationMixeval']['grade_release'], 0);
+  	$this->assertEqual($searched[1]['EvaluationMixeval']['grade_release'], 0);
+  	$this->assertEqual($searched[2]['EvaluationMixeval']['grade_release'], 0);
   }
 }
 ?>

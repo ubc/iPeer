@@ -860,7 +860,7 @@ class EvaluationComponent extends Object
       if (!empty($evaluation)) {
         $groupMembers[$i]['User']['Evaluation'] = $evaluation;
         $groupMembers[$i]['User']['Evaluation']['EvaluationDetail'] =
-          $this->EvaluationMixevalDetail->getAllByEvalMixevalId($evaluation['EvaluationMixeval']['id']);
+          $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera($evaluation['EvaluationMixeval']['id']);
       }
     }
     //$this->set('groupMembers', $groupMembers);
@@ -1002,7 +1002,7 @@ class EvaluationComponent extends Object
             foreach($mixevalResult AS $row ) {
               $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
               if ($evalMark!=null) {
-                $rubriDetail = $this->EvaluationMixevalDetail->getAllByEvalMixevalId($evalMark['id']);
+                $rubriDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera($evalMark['id']);
                 $evalResult[$userId][$userPOS++]['EvaluationMixeval']['details'] = $rubriDetail;
               }
             }
@@ -1035,7 +1035,7 @@ class EvaluationComponent extends Object
            foreach($mixevalResult AS $row ) {
               $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
               if ($evalMark!=null) {
-                $rubriDetail = $this->EvaluationMixevalDetail->getAllByEvalMixevalId($evalMark['id']);
+                $rubriDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera($evalMark['id']);
                 $evalResult[$userId][$userPOS++]['EvaluationMixeval']['details'] = $rubriDetail;
               }
             }
@@ -1077,7 +1077,7 @@ class EvaluationComponent extends Object
       foreach($mixevalResult AS $row ){
         $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
         if ($evalMark!=null) {
-          $rubriDetail = $this->EvaluationMixevalDetail->getAllByEvalMixevalId($evalMark['id']);
+          $rubriDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera($evalMark['id']);
           $evalResult[$userId][$userPOS++]['EvaluationMixeval']['details'] = $rubriDetail;
         }
       }
