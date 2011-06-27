@@ -137,6 +137,25 @@ class GroupEventTestCase extends CakeTestCase {
   	
   }
   
+  function testGetGroupsByEventId(){
+  	
+  	//Test valid event with groups
+  	$groups = $this->GroupEvent->getGroupsByEventId(1);
+    $this->assertEqual($groups[0]['GroupEvent']['id'], '1');  	
+    $this->assertEqual($groups[0]['GroupEvent']['group_id'], '1');
+    $this->assertEqual($groups[0]['GroupEvent']['event_id'], '1');
+    $this->assertEqual($groups[1]['GroupEvent']['id'], '2');    
+    $this->assertEqual($groups[1]['GroupEvent']['group_id'], '2');    
+    $this->assertEqual($groups[1]['GroupEvent']['event_id'], '1');    
+    //Test valid event with no groups
+  	$groups = $this->GroupEvent->getGroupsByEventId(3);
+    $this->assertEqual($groups, null); 
+    
+    //Test invalid event
+  	$groups = $this->GroupEvent->getGroupsByEventId(999);
+    $this->assertEqual($groups, null);  
+  }
+    
   /*
    * Deprecated
    *
