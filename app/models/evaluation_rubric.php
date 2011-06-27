@@ -185,7 +185,7 @@ class EvaluationRubric extends AppModel
 	function setAllEventCommentRelease($eventId=null, $releaseStatus=null) {
 //        $sql = 'UPDATE evaluation_rubrics SET comment_release = '.$releaseStatus.' WHERE event_id = '.$eventId;
 //        return $this->query($sql);
-          $fields = array('EvaluationRubric.commnet_release' => $releaseStatus);
+          $fields = array('EvaluationRubric.comment_release' => $releaseStatus);
           $conditions = array('EvaluationRubric.event_id' => $eventId);
           return $this->updateAll($fields, $conditions);
 	}

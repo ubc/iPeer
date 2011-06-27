@@ -1,6 +1,6 @@
 <?php
 App::import('Model', 'Survey');
-App::import('Controller', 'Rubrics');
+App::import('Component', 'Auth');
 
 class FakeController extends Controller {
   var $name = 'FakeController';
@@ -10,6 +10,7 @@ class FakeController extends Controller {
 }
 
 class SurveyTestCase extends CakeTestCase{
+
   var $name = 'Survey';
   var $fixtures = array('app.course', 'app.role', 'app.user', 'app.group', 
                         'app.roles_user', 'app.event', 'app.event_template_type',
@@ -84,12 +85,12 @@ class SurveyTestCase extends CakeTestCase{
 		
 		$this->Survey= & ClassRegistry::init('Survey');
 		$empty=null;
-		$this->flushDatabase();
+//		$this->flushDatabase();
 		
 		//Test function for two different valid surveys
 		##Set up test data
-		$this->createSurvey(1,2, 'Math321 Survey');
-		$this->createSurvey(2,1, 'Math320 Survey');
+//		$this->createSurvey(1,2, 'Math321 Survey');
+//		$this->createSurvey(2,1, 'Math320 Survey');
 		##Run tests
 		$SurveyTitle1 = $this->Survey->getSurveyTitleById(1);
 		$SurveyTitle2 = $this->Survey->getSurveyTitleById(2);
@@ -98,11 +99,11 @@ class SurveyTestCase extends CakeTestCase{
 		
 		//Test function on surveys with same name
 		##Set up test data
-		$this->createSurvey(3,1, 'Same name');
-		$this->createSurvey(4,1, 'Same name');
+//		$this->createSurvey(3,1, 'Same name');
+//		$this->createSurvey(4,1, 'Same name');
 		##Run tests
-		$sameTitle1 = $this->Survey->getSurveyTitleById(3);
-		$sameTitle2 = $this->Survey->getSurveyTitleById(4);
+		$sameTitle1 = $this->Survey->getSurveyTitleById(2);
+		$sameTitle2 = $this->Survey->getSurveyTitleById(3);
 		$this->assertEqual($sameTitle1, $sameTitle2);
 		
 		//Test function on invalid survey_id
@@ -126,8 +127,8 @@ class SurveyTestCase extends CakeTestCase{
 		
 		//Test function for two different valid surveys
 		##Set up test data
-		$this->createSurvey(1,2, 'Math321 Survey');
-		$this->createSurvey(2,1, 'Math320 Survey');
+	//	$this->createSurvey(1,2, 'Math321 Survey');
+//		$this->createSurvey(2,1, 'Math320 Survey');
 		##Run tests
 		$Survey1Id = $this->Survey->getSurveyIdByCourseIdTitle(2, 'Math321 Survey');
 		$Survey2Id = $this->Survey->getSurveyIdByCourseIdTitle(1, 'Math320 Survey');
