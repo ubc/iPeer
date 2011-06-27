@@ -193,7 +193,7 @@ class GroupsController extends AppController
     $members = $this->GroupsMembers->getMembers($id);
     $this->User->recursive =0;
     $group_data = $this->User->find('all', array('conditions' => array('id'=>$members),
-                                            'fields' => array('id','full_name')
+                                            'fields' => array('id', 'full_name', 'email')
         ));
     $this->set('group_data', $group_data);
   }

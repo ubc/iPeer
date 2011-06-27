@@ -41,9 +41,11 @@
       <?php endif;?>
       <tr class="tablecell2">
         <td id="email_label">Email:</td>
-        <td align="left" colspan="3"><?php echo $html->image('icons/email_icon.gif',array('border'=>'0','alt'=>'Email'));?>
-          <a href="mailto:<?php if(!empty($data['User']['email'])) echo $data['User']['email']; ?>"><?php echo $data['User']['email']; ?></a>
-           </td>
+        <td align="left" colspan="3">
+          <a href="mailto:<?php if(!empty($data['User']['email'])) echo $data['User']['email']; ?>">
+          <?php echo $html->image('icons/email_icon.gif',array('border'=>'0','alt'=>'Email'));?></a>
+          <?php echo $data['User']['email']; ?>
+        </td>
       </tr>
       <tr class="tablecell2">
         <td id="creator_label">Creator:</td>

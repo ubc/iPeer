@@ -45,7 +45,7 @@ class Response extends AppModel {
 
 	// prepares the data var with all the response info from the form for display
 	function fillResponse($data) {
-		var_dump($data);
+		//var_dump($data);
 		for( $i=0; $i<$data['count']; $i++ ){
 			$tmp = $this->find('all', array('conditions' => array('question_id' => $data[$i]['Question']['id']),
                                       'fields' => array('response','id')));

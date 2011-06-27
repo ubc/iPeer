@@ -1,4 +1,4 @@
-Configuration File 	/Applications/MAMP/conf/php5.3/php.ini Configuration File 	/Applications/MAMP/conf/php5.3/php.ini Configuration File 	/Applications/MAMP/conf/php5.3/php.ini <?php
+<?php
 /* SVN FILE: $Id$ */
 
 /**

@@ -1,6 +1,8 @@
 <?php
-//$a=print_r($group_data,true);
-//echo "<pre>$a</a>";
+  //$a=print_r($group_data,true);
+  //echo "<pre>$a</a>";
+  $emailAddress = '';
+  echo $html->script('groups');
 ?>
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
@@ -24,12 +26,18 @@
           <tr class="tablecell2">
             <td valign="top">Members:</td>
             <td>
-              <table width="100%" border="0" cellspacing="2" cellpadding="2">
-              <?php if (!empty($group_data)) :
-                    foreach($group_data as $row): $user = $row['User']?>
+              <table width="100%" border="0" cellspacing="2" cellpadding="2">                
+              <?php if (!empty($group_data)) :?>
+                <tr>
+                  <td colspan="3"><a href="javascript:listEmail();"><?php echo $html->image('icons/email.gif',array('border'=>'0','alt'=>'Email'))?> Get email addresses</a></td></tr>
+                  <?php foreach($group_data as $row): $user = $row['User'];
+                    //Get email list
+                    $emailAddress = $emailAddress.$user['email'].'; ';
+                  ?>
                   <tr>
-                  <td width="15"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'Email'))?></td>
-                  <td><a href="../../users/view/<?php echo $user['id']?>"><?php echo $user['full_name']?></a><br></td>
+                  <td width="15"><a href="mailto:<?php echo $user['email']?>"><?php echo $html->image('icons/email_icon.gif',array('border'=>'0','alt'=>'Email', 'title' => 'Email to '.$user['full_name']))?></a></td>
+                  <td width="15"><a href="../../users/view/<?php echo $user['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View', 'title' => 'View '.$user['full_name']))?></a></td>
+                  <td><?php echo $user['full_name']?><br></td>
                  </tr>
 				      <?php endforeach;
                             else: echo "No members in this group.";
@@ -51,7 +59,9 @@
             <td width="45%">
               <table width="403" border="0" cellspacing="0" cellpadding="4">
               <tr>
-                <td colspan="2"><?php echo $html->link('Edit this Group', '/groups/edit/'.$data['Group']['id']); ?> | <?php echo $html->link('Back to Group Listing', '/groups/index/'.$course_id); ?></td>
+                <td colspan="3"><?php echo $html->link('Edit this Group', '/groups/edit/'.$data['Group']['id']); ?> |
+                <?php echo $html->link('Back to Group Listing', '/groups/index/'.$course_id); ?> |
+                <?php echo $html->link('Send Email', '/emailer/write/user/'.$emailAddress, array("onclick"=>"wopen(this.href, 'popup', 650, 500); return false;"));?></td>
               </tr>
               </table>
             </td>
@@ -62,3 +72,4 @@
     </td>
   </tr>
 </table>
+<input type="hidden" id="emailAddress" value="<?php echo substr($emailAddress,0,-2); ?>"/>

@@ -884,7 +884,7 @@ class UsersController extends AppController
         //Mass create students
         $resultAry = $this->addUserByImport($this->params['data'], $lines);
         $this->set('data', $resultAry);
-        var_dump($this->params);
+        
         $this->set('userRole', $this->params['data']['User/role']);
         $this->render('userSummary');
     }
