@@ -45,15 +45,15 @@ class Response extends AppModel {
 
 	// prepares the data var with all the response info from the form for display
 	function fillResponse($data) {
-		//var_dump($data);
 		for( $i=0; $i<$data['count']; $i++ ){
 			$tmp = $this->find('all', array('conditions' => array('question_id' => $data[$i]['Question']['id']),
                                       'fields' => array('response','id')));
 			$count = count($tmp);			
 			for( $j=0; $j<$count; $j++ ){
-				if( !empty($tmp))
+				if(!empty($tmp)){
 					$data[$i]['Question']['Responses']['response_'.$j]['response'] = $tmp[$j]['Response']['response'];
 					$data[$i]['Question']['Responses']['response_'.$j]['id'] = $tmp[$j]['Response']['id'];
+				}
 			}
 		}
 		return $data;
@@ -63,9 +63,11 @@ class Response extends AppModel {
     $tmp = $this->find('all', array('conditions' => array('question_id' => $questionId),
                                     'fields' => array('response','id')));
     $data = array();
-		for( $j=0; $j< count($tmp); $j++ ) {
+		for($j=0; $j< count($tmp); $j++){
+			if(!empty($tmp)){
 				$data['Responses']['response_'.$j]['response'] = $tmp[$j]['Response']['response'];
 				$data['Responses']['response_'.$j]['id'] = $tmp[$j]['Response']['id'];
+			}
 	  }
 	  return $data;
 	}
@@ -74,25 +76,26 @@ class Response extends AppModel {
 		return $this->find('count', array('conditions' => array('question_id' => $questionId)));
 	}
 
-	function prepData($data, $questionID) {
+	// Function is obsolete
+	/*function prepData($data, $questionID) {
 		$tmp = $this->find('all', array('conditions' => array('question_id' => $questionId), 
                                     'fields' => array('response')));
 		for( $i=0; $i<$data['Question']['count']; $i++ ){
 			$data['Question']['response_'.($i+1)] = $tmp[$i]['Response']['response'];
 		}
 		return $data;
-	}
+	}*/
 
-	function getResponseById($id=null) {
+	// Function is obsolete
+	/*function getResponseById($id=null) {
 	  $tmp = $this->find('first', array('conditions' => array('id' => $id),
                                       'fields' => array('response')));
 	  return $tmp['Response']['response'];
-	}
+	}*/
 	
 	function getResponseId($questionId=null, $response=null) {
 		$findResult = $this->find('first', array('conditions'=>array('question_id'=>$questionId, 'response'=>$response)));
 		return $findResult['Response']['id'];
 	}
 }
-
 ?>
