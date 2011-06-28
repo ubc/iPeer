@@ -53,6 +53,47 @@ class GroupsMembersTestCase extends CakeTestCase {
   function testCourseInstance() {
     $this->assertTrue(is_a($this->GroupsMembers, 'GroupsMembers'));
   }	
+
+  function testInsertMembers(){
+
+    // set up test input
+    $data = array();
+    $data['member_count'] = 2;
+    $data['member1'] = 3;
+    $data['member2'] = 4;
+  
+    $this->GroupsMembers->insertMembers(5, $data);
+     	// Assert the data was saved in database
+  	$searched = $this->GroupsMembers->find('all', array('conditions' => array('group_id' => 5)));
+  	$this->assertEqual($searched[0]['GroupsMembers']['group_id'], 5);
+  	$this->assertEqual($searched[1]['GroupsMembers']['group_id'], 5);
+  	$this->assertEqual($searched[0]['GroupsMembers']['user_id'], 3);
+  	$this->assertEqual($searched[1]['GroupsMembers']['user_id'], 4);
+  	
+  	// Test for incorrect inputs
+  
+  	$incorrectResult = $this->GroupsMembers->insertMembers(5, null);
+  	$this->assertFalse($incorrectResult);
+
+  }
+  
+  function testUpdateMembers(){  
+
+    $data = array();    
+    $data['member_count'] = 1;
+    $data['member1'] = 2;
+    
+    $this->GroupsMembers->updateMembers(2, $data);
+    $searched = $this->GroupsMembers->find('all', array('conditions' => array('group_id' => 2)));
+  	$this->assertEqual($searched[0]['GroupsMembers']['group_id'], 2);
+  	$this->assertEqual($searched[0]['GroupsMembers']['user_id'], 2);
+  	$this->assertEqual(sizeof($searched), 1);
+
+  	$incorrectData = $this->GroupsMembers->insertMembers(2, null);
+  	$this->assertFalse($incorrectData);
+  	
+    
+  }
   
   function testGetMembers(){
     	

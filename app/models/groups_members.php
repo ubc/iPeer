@@ -14,18 +14,28 @@ class GroupsMembers extends AppModel
     }
   }
 
-  // updates all the group members
+  /**
+   * Updates group members
+   * @param $id group id
+   * @param $data members info
+   	*/
+
   function updateMembers($id=null, $data=null){
     //get old userid's
     $tmp = $this->getMembers($id);
+
     $oldUsers = array();
     $newUsers = array();
     $insertUsers = array();
     $deleteUsers = array();
 
     for ($i = 1; $i <= $data['member_count']; $i++) array_push($newUsers, $data['member'.$i]);
-    for ($i = 0; $i < $tmp['member_count']; $i++) array_push($oldUsers, $tmp[$i]['GroupsMembers']['user_id']);
+    foreach($tmp as $user_id) {
+      array_push($oldUsers, $user_id);
+    }
+  //  for ($i = 0; $i < $tmp['member_count']; $i++) array_push($oldUsers, $tmp[$i]['GroupsMembers']['user_id']);
 
+      
     //compare
     $insertUsers = array_diff($newUsers, $oldUsers);
     $deleteUsers = array_diff($oldUsers, $newUsers);
@@ -39,17 +49,18 @@ class GroupsMembers extends AppModel
     foreach ($deleteUsers as $userId) {
       $tmp = $this->find('first',array(
           'conditions' => array('group_id'=>$id,'user_id'=>$userId),
-          'fields' => array('GroupMember.id')
+          //'fields' => array('GroupMember.id')
           ));
-      $this->del($tmp['GroupsMembers']['id']);
+      $this->delete($tmp['GroupsMembers']['id']);
       $this->id = null;
     }
  }
 
   /**
    *
-   * @param <type> $id Group Id
-   * @return <type> All members within the group
+   * Get members in a group
+   * @param  $id Group Id
+   * @return $tmp All member ids within the group
    */
   function getMembers($id){
     $tmp = $this->find('list',array('conditions' => array('group_id' => $id),
@@ -60,7 +71,8 @@ class GroupsMembers extends AppModel
 
   /**
    *
-   * @param <type> $groupID Group Id
+   * Get member count in a group
+   * @param  $groupID Group Id
    * @return Number of members within the group
    */
   function countMembers($groupID) {
@@ -72,7 +84,7 @@ class GroupsMembers extends AppModel
   }
 
   /**
-   * 
+   * Get members in a group in event
    * @param <type> $groupId Group Id
    * @param <type> $selfEval Check whether Self Evaluation is allowed or not
    * @param <type> $userId User Id
@@ -96,11 +108,10 @@ class GroupsMembers extends AppModel
           )
         ),
     ));
-
   }
 
   /**
-   *
+   * Get groups by user id
    * @param <type> $userId User Id
    * @return <type> Groups that the user is in
    */
@@ -111,7 +122,7 @@ class GroupsMembers extends AppModel
   }
   
   /**
-   *
+   * Check if user is in a group
    * @param <type> $groupId Group Id
    * @param <type> $userId User Id
    * @return <type> Boolean value whether the user is in the group or not
@@ -123,6 +134,11 @@ class GroupsMembers extends AppModel
     ));
   }
 
+  /**
+   * Get list of users in groups
+   * @param $group_ids group id
+   * @return 1 if user is in the group, 0 otherwise
+   */
   function getUserListInGroups($group_ids){
     $this->displayField = 'user_id';
     return $this->find('list', array(

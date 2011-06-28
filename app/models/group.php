@@ -130,43 +130,30 @@ class Group extends AppModel
     return parent::beforeSave();
   }
 
+  /**
+   * Count groups in a course
+   * 
+   *  @param int $courseId course id
+   *  
+   *  @return int count of courses
+   * */
+  
   function getCourseGroupCount($courseId=null) {
-    //return $this->find('course_id='.$courseId, 'COUNT(DISTINCT id) as total');
       return $this->find('count', array(
           'conditions' => array('course_id' => $courseId)
       ));
   }
 
-	// gets all students in a specific group
-  // replaced with getMembers($group_id)
-	/*function groupStudents($id=null){
-		$tmp = $this->query("SELECT * FROM groups_members WHERE group_id=".$id);
-		$count = sizeof( $tmp );
-		$result = null;
-
-		for( $i=0; $i<$count; $i++ ){
-			$tmp2 = $this->query("SELECT users.id, users.role, users.username, users.first_name, users.last_name, users.student_no, users.title FROM users WHERE id=".$tmp[$i]['groups_members']['user_id']." ORDER BY users.last_name ASC");
-			if(!empty($tmp2[0])) {
-                $result[$i] = $tmp2[0];
-            } else {
-                $result[$i] = null;
-            }
-
-		}
-
-		//print_r($result);
-		return $result;
-	}*/
-
-	// finds all students not in a particular course
-	/*function groupDifference($id=null,$courseId=null){
-		return $this->query("SELECT DISTINCT users.id, users.role, users.username, users.first_name, users.last_name, users.student_no, users.title
-								 FROM users
-								 JOIN user_enrols on users.id=user_enrols.user_id
-								 WHERE user_enrols.course_id=".$courseId." AND users.role = 'S' AND users.id NOT IN (SELECT user_id as id from groups_members where group_id=".$id.") ORDER BY users.last_name ASC");
-	}*/
-
-	function prepDataImport($lines=null)
+	/**
+	 * 
+	 * Prepares group member data in an array
+	 *
+	 * @param  $lines members
+	 * 
+	 * @return $data data in an array
+	 */
+  
+  function prepDataImport($lines=null)
 	{
 	  // Loop through import file
 		for ($i = 1; $i < count($lines); $i++) {
@@ -176,28 +163,15 @@ class Group extends AppModel
 			$data['member'.$i] = trim($line[0]);
 		}
 		$data['member_count'] = count($lines) - 1;
-		//$data['data']['Group']['record_status'] = $data['form']['record_status'];
 
 		return $data;
 	}
-
-	// parses the group members id from the hidden field assigned
-	/*function prepData($data=null){
-		$tmp = $data['form']['assigned'];
-		$member_count=0;
-
-		$tok = strtok($tmp, ":");
-		while ($tok !== false) {
-		   $member_count++;
-		   $data['data']['Group']['member'.$member_count] = $tok;
-		   $tok = strtok(":");
-		}
-
-		$data['data']['Group']['member_count'] = $member_count;
-		$data['data']['Group']['record_status'] = $data['form']['record_status'];
-
-		return $data;
-	}*/
+	
+	/**
+	 * Gets last group number in a course 
+	 * @param $course_id course id
+	 * @return $maxGroupNumber  last group number
+	 */
 
   function getLastGroupNumByCourseId($course_id) {
     $tmp = $this->find('first', array('conditions' => array('course_id' => $course_id), 
@@ -210,44 +184,45 @@ class Group extends AppModel
     return $maxGroupNum;
   }
 
-//  function getFilteredStudents($group_id, $filter){
-//    $course_id = $this->field('course_id',sprintf("id = '%d'", $group_id));
-//    if($filter)
-//    {
-//      return $this->query("SELECT DISTINCT users.id, users.role, users.username, users.first_name, users.last_name, users.student_no, users.title
-//                              FROM users
-//                              JOIN user_enrols on users.id=user_enrols.user_id
-//                              WHERE user_enrols.course_id=".$course_id." AND users.role = 'S' AND users.id NOT IN
-//                              (SELECT user_id FROM `groups` LEFT JOIN groups_members as gs ON groups.id = gs.group_id WHERE groups.course_id = ".$course_id.")
-//                              ORDER BY users.last_name ASC");
-//    }else{
-//      return $this->groupDifference($group_id,$course_id);
-//    }
-//  }
-
+  /**
+   * Get students not in a group 
+   * @param $group_id group id
+   * @param $type type of user
+   * @return array students not in the group
+   */
   function getStudentsNotInGroup($group_id, $type = 'all') {
     return $this->Member->getStudentsNotInGroup($group_id, $type);
   }
 
+  /**
+   * Get members in a group by id 
+   * @param $group_id group id
+   * @param $type type of user
+   * @return Array of students in the group
+   */  
+  
   function getMembersByGroupId($group_id, $type = 'all') {
     return $this->Member->getMembersByGroupId($group_id, $type);
   }
-  
-  
-//  function countUserSubmissionsInAGroup($user_id, $group_id) {
-//    $data = $this->query("
-//        SELECT count(*) AS count FROM users AS User
-//        JOIN evaluation_submissions AS EvaluationSubmission ON User.id=submitter_id
-//        JOIN group_events AS GroupEvent ON GroupEvent.id=EvaluationSubmission.grp_event_id
-//        WHERE User.id=$user_id AND group_id=$group_id");
-//
-//    return $data[0][0]['count'];
-//}
 
+  /**
+   * 
+   * Get group by group Id
+   * @param $groupId group id
+   * @param $fields fields to return
+   * @return Group array
+   */
   function getGroupByGroupId($groupId, $fields=null){
   	return $this->find('all',array('conditions'=>array('Group.id'=>$groupId), 'fields' => $fields));
   }
 
+  /**
+   * 
+   * Get groups in a course
+   * @param $course_id course id
+   * @return groups in a course
+   */
+  
   function getGroupsByCouseId($course_id){
     return $this->find('list', array(
         'conditions' => array('Group.course_id' => $course_id)

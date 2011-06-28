@@ -37,20 +37,21 @@ class GroupTestCase extends CakeTestCase {
   }
 
   function endCase() {
+    
     $this->controller->Component->shutdown($this->controller);
     $this->controller->shutdownProcess();
   }
 
-  //Run before EVERY test.
+  // Run before EVERY test.
   function startTest($method) {
     // extra setup stuff here
   }
 	
   function endTest($method) {
-		$this->flushDatabase();
   }
 
-  function testCourseInstance() {
+  function testGroupInstance() {
+    
     $this->assertTrue(is_a($this->Group, 'Group'));
   }
 	
@@ -58,21 +59,21 @@ class GroupTestCase extends CakeTestCase {
   	
     $empty = null;  	    
   	
-    //Test valid course id      
+    // Test valid course id      
     $group= $this->Group->getCourseGroupCount(1);
   	$this->assertEqual($group, 4);
 
-  	//Test course with no groups
+  	// Test course with no groups
   	$group= $this->Group->getCourseGroupCount(3);
   	$this->assertEqual($group, 0);
   	
-  	//Test invalid course id
+  	// Test invalid course id
   	$group= $this->Group->getCourseGroupCount(999);
   	$this->assertEqual($group, $empty);
   	
   }	
 	
-  //Function is not used anywhere
+  // Function is not used anywhere
   function testPrepDataImport() {  	
   	
   }
@@ -81,15 +82,15 @@ class GroupTestCase extends CakeTestCase {
   
     $empty = null;  	
     
-    //Test valid course
+    // Test valid course
     $group = $this->Group->getLastGroupNumByCourseId(1);
   	$this->assertEqual($group, 4);
   	
-  	//Test course with no groups;
+  	// Test course with no groups;
   	$group = $this->Group->getLastGroupNumByCourseId(3);
   	$this->assertEqual($group, $empty);
 
-  	//Test course with no groups;
+  	// Test course with no groups;
   	$group = $this->Group->getLastGroupNumByCourseId(3);
   	$this->assertEqual($group, $empty);  	      
   }
@@ -98,37 +99,36 @@ class GroupTestCase extends CakeTestCase {
   
   	$empty = null;  	
   	
-  	//Test group with some students in it
+  	// Test group with some students in it
   	$students = $this->Group->getStudentsNotInGroup(4);
   	$this->assertEqual($this->toNameArray($students), array('StudentY'));
   	
-  	 //Test group with all students in it
+  	 // Test group with all students in it
   	$students = $this->Group->getStudentsNotInGroup(1);
   	$this->assertEqual($this->toNameArray($students), $empty);
   	
-    //Test group with no students in it
+    // Test group with no students in it
   	$students = $this->Group->getStudentsNotInGroup(3);
   	$this->assertEqual($this->toNameArray($students), array('StudentZ', 'StudentY'));
   	
-  	//Test invalid group
+  	// Test invalid group
   	$students = $this->Group->getStudentsNotInGroup(999);
   	$this->assertEqual($students, $empty);
   }
-
     
   function testGetMembersByGroupId() {
   	
   	$empty = null;  
   	
-  	//Test group with students in it
+  	// Test group with students in it
   	$students = $this->Group->getMembersByGroupId(1);
   	$this->assertEqual($this->toNameArray($students), array('StudentZ','StudentY'));  
 
-  	//Test group with no students in it
+  	// Test group with no students in it
   	$students = $this->Group->getMembersByGroupId(3);
   	$this->assertEqual($students, $empty);
   	
-	//Test invalid group
+	  // Test invalid group
   	$students = $this->Group->getMembersByGroupId(999);
   	$this->assertEqual($students, $empty);
   	  	
@@ -138,11 +138,11 @@ class GroupTestCase extends CakeTestCase {
   	
   	$empty = null;  
   	
-  	//Test valid group
+  	// Test valid group
   	$group = $this->Group->getGroupByGroupId(1);
   	$this->assertEqual($group[0]['Group']['group_name'], 'group1');
   	
-  	//Test invalid group
+  	// Test invalid group
   	$group = $this->Group->getGroupByGroupId(999);
   	$this->assertEqual($group, $empty);
   	
@@ -152,15 +152,15 @@ class GroupTestCase extends CakeTestCase {
   	
   	$empty=null;
   	
-  	//Test valid course with groups
+  	// Test valid course with groups
   	$groups = $this->Group->getGroupsByCouseId(1);
   	$this->assertEqual($groups, array(1=>1,2=>2,3=>3,4=>4));
   	
-  	//Test valid course with no groups
+  	// Test valid course with no groups
   	$groups = $this->Group->getGroupsByCouseId(2);
   	$this->assertEqual($groups, $empty);
 
-  	//Test invalid course
+  	// Test invalid course
   	$groups = $this->Group->getGroupsByCouseId(999);
   	$this->assertEqual($groups, $empty);  	
   	
@@ -169,24 +169,6 @@ class GroupTestCase extends CakeTestCase {
 #####################################################################################################################################################	
 ###############################################     HELPER FUNCTIONS     ############################################################################
 #####################################################################################################################################################
-
-function deleteAllTuples($table){
-
-		$this->Group= & ClassRegistry::init('Group');
-		$sql = "DELETE FROM $table";
-		$this->Group->query($sql);
-	}
-	
-	function flushDatabase(){
-			
-		$this->deleteAllTuples('courses');
-		$this->deleteAllTuples('users');
-		$this->deleteAllTuples('user_courses');
-		$this->deleteAllTuples('user_enrols');
-		$this->deleteAllTuples('roles_users');
-		$this->deleteAllTuples('groups');
-		$this->deleteAllTuples('groups_members');
-	}
 	
 	
 	function toNameArray($students){
