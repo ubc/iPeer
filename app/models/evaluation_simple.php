@@ -100,7 +100,7 @@ class EvaluationSimple extends AppModel
               ));
 	}
 
-	function getOppositeGradeReleaseStatus($groupEventId=null, $releaseStatus){
+	function getOppositeGradeReleaseStatus($grpEventId=null, $releaseStatus){
 	  //return $this->find(count,'grp_event_id='.$groupEventId.' AND grade_release != '.$releaseStatus);
           return $this->find('count', array(
                   'conditions' => array('grp_event_id' => $grpEventId, 'grade_release !='=>$releaseStatus)
