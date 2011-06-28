@@ -50,7 +50,7 @@ class EvaluationSubmissionTestCase extends CakeTestCase {
   function endTest($method) {
   }
 
-  function testCourseInstance() {
+  function testEvaluationSubmissionInstance() {
     $this->assertTrue(is_a($this->EvaluationSubmission, 'EvaluationSubmission'));
   }
 
