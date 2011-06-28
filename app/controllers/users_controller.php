@@ -47,7 +47,7 @@ class UsersController extends AppController
   var $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Pagination');
   var $NeatString;
   var $Sanitize;
-  var $uses = array('User', 'UserEnrol', 'Personalize', 'Course', 'SysParameter', 'SysFunction','Role');
+  var $uses = array('User', 'UserEnrol', 'Personalize', 'Course', 'SysParameter', 'SysFunction','Role', 'Group');
   var $components = array('Session', 'AjaxList', 'RequestHandler', 'Email');
   
   function __construct()
@@ -103,7 +103,7 @@ class UsersController extends AppController
     // Get the course data
     $userCourseList = $this->sysContainer->getMyCourseList();
     $coursesList = array();
-
+    $selected_course_id = $this->AjaxList->getState()->joinFilterSelections->course_id;
     // Add in the unassigned course entry:
     $coursesList{"!!!null"} = "-- Unassigned --";
 
@@ -111,6 +111,11 @@ class UsersController extends AppController
       $coursesList{$id} = $course['course'];
     }
 
+    $groupsList = array($this->Group->find('list', array(
+        'fields' => array('group_name'),
+        'conditions' => array('course_id' => $selected_course_id)
+    ))); 
+    $groupsList = $groupsList['0'];
 
     // The columns to show
     $columns = array(
@@ -120,7 +125,7 @@ class UsersController extends AppController
                      array("User.id",         "",             "",      "hidden"),
                      array("User.username",   "Username",     "10em",  "action", "View User"),
                      array("User.full_name",  "Full Name",    "15em",  "string"),
-                     array("User.email",      "Email",        "auto",  "string")//,
+                     array("User.email",      "Email",        "auto",  "action", "Send Email")//,
                      //array("UserEnrol.course_id", "Course ID", "number")
                     );
 
@@ -137,6 +142,22 @@ class UsersController extends AppController
                     "joinTable"     => "user_enrols",
                     "joinModel"     => "UserEnrol",
                     "foreignKey"    => "user_id",
+
+                    // Any show/hide features based on maps
+                    "dependsMap"    => "User.role",    // Look to this column
+                    "dependsValues" => array("S")  // Display only when this column is one of these values
+                 ),
+            array(  // Define the GUI aspecs
+                    "id"            => "group_id",
+                    "description"   => "for Group:",
+                    // What are the choises and the default values?
+                    "list"  => $groupsList,
+                    "default" => '',
+                    // What table do we join to get these
+                    "joinTable"     => "groups_members",
+                    "joinModel"     => "GroupsMember",
+                    "foreignKey"    => "user_id",
+                    "conditions" => array('course_id' => $selected_course_id),
 
                     // Any show/hide features based on maps
                     "dependsMap"    => "User.role",    // Look to this column
@@ -163,8 +184,9 @@ class UsersController extends AppController
                      //   parameters to cakePHP controller:,
                      //   display name, (warning shown), fixed parameters or Column ids
                      array("View User",  "", "", "", "view", "User.id"),
+                     array("Send Email",  "", "", "emailer", "write", "User.id"),
                      array("Edit User",  "", $actionRestrictions, "", "edit", "User.id"),
-                     array("Delete User",    $deleteUserWarning,   $actionRestrictions, "", "delete",       "User.id"),
+                     array("Delete User",    $deleteUserWarning,   $actionRestrictions, "", "delete","User.id"),
                      array("Reset Password", $resetPassWarning,  $actionRestrictions, "", "resetPassword","User.id")
                     );
 

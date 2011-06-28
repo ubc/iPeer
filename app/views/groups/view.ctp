@@ -61,7 +61,13 @@
               <tr>
                 <td colspan="3"><?php echo $html->link('Edit this Group', '/groups/edit/'.$data['Group']['id']); ?> |
                 <?php echo $html->link('Back to Group Listing', '/groups/index/'.$course_id); ?> |
-                <?php echo $html->link('Send Email', '/emailer/write/user/'.$emailAddress, array("onclick"=>"wopen(this.href, 'popup', 650, 500); return false;"));?></td>
+                <?php echo $html->link('Send Email',
+                        array(
+                            'controller' => 'emailer',
+                            'action' => 'write',                            
+                            'G'.$data['Group']['id']
+                        ),
+                        array("onclick"=>"wopen(this.href, 'popup', 650, 500); return false;"));?></td>
               </tr>
               </table>
             </td>

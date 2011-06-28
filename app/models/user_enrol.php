@@ -62,6 +62,13 @@ class UserEnrol extends AppModel
 function getEnrolledCourses($userId=''){
   	return $this->find('all',array('conditions'=>array('user_id'=>$userId), 'fields'=>array('course_id')));
   }
+
+  function getUserListByCourse($course_id){
+    $this->displayField = 'user_id';
+    return $this->find('list', array(
+        'conditions' => array('course_id' => $course_id)
+    ));
+  }
 }
 
 ?>

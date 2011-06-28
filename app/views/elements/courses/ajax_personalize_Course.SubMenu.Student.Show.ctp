@@ -15,5 +15,12 @@
                             array('align'=>'middle', 'border'=>'0', 'alt'=>'yellow_arrow'))?>
                             &nbsp;List Students </a></td>
   </tr>
+  <tr>
+    <td bgcolor="#FFB66F">&nbsp;</td>
+    <td class="tablecell"><A HREF="<?php echo $this->webroot.$this->theme;?>emailer/write/<?php echo 'C'.$course_id;?>">
+        <?php echo $html->image('layout/yellow_arrow.gif',
+                            array('align'=>'middle', 'border'=>'0', 'alt'=>'yellow_arrow'))?>
+                            &nbsp;Email to All Students </a></td>
+  </tr>
 </table>
 <?php endif; ?>

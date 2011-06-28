@@ -15,6 +15,14 @@
             <td><?php echo $form->input('Email.to', array('size' => '80%','label' => false,'value' => $to));?></td>
           </tr>
           <tr class="tablecell2">
+            <td>Cc:&nbsp;</td>
+            <td><?php echo $form->input('Email.cc', array('size' => '80%','label' => false));?></td>
+          </tr>
+          <tr class="tablecell2">
+            <td>Bcc:&nbsp;</td>
+            <td><?php echo $form->input('Email.bcc', array('size' => '80%','label' => false));?></td>
+          </tr>
+          <tr class="tablecell2">
             <td>Message:</td>
             <td><?php
                 echo $form->textarea('Email.message', array(
