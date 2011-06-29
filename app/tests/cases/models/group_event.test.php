@@ -16,8 +16,8 @@ class GroupEventTestCase extends CakeTestCase {
                         'app.group_event', 'app.evaluation_submission',
                         'app.survey_group_set', 'app.survey_group',
                         'app.survey_group_member', 'app.question', 
-                        'app.response', 'app.survey_question', 'app.user_course',
-                        'app.user_enrol', 'app.groups_member', 'app.survey'
+                        'app.response', 'app.survey_question', 'app.user_course', 'app.evaluation_rubric', 'app.rubrics_criteria',
+                        'app.user_enrol', 'app.groups_member', 'app.survey', 'app.rubric'
                        );
   var $GroupEvent = null;
 
@@ -47,13 +47,28 @@ class GroupEventTestCase extends CakeTestCase {
   }
 	
   function endTest($method) {
-		$this->flushDatabase();
+
   }
 
   function testCourseInstance() {
     $this->assertTrue(is_a($this->GroupEvent, 'GroupEvent'));
   }
 
+  function testUpdateGroups() {
+    
+    $data = array();
+    $data['Member'] = array(3);
+    
+    $this->GroupEvent->updateGroups(1, $data);
+    $searched = $this->GroupEvent->find('all', array('conditions' => array('event_id' => 1)));
+  	$this->assertEqual($searched[0]['GroupEvent']['group_id'], 3);
+  	$this->assertEqual($searched[0]['GroupEvent']['event_id'], 1);
+  	$this->assertEqual(sizeof($searched), 1);
+
+  	$incorrectData = $this->GroupEvent->updateGroups(1, null);
+  	$this->assertFalse($incorrectData);  	
+  }
+  
   function testGetGroupIDsByEventId() {
   	
   	//Test valid event with groups
@@ -116,24 +131,24 @@ class GroupEventTestCase extends CakeTestCase {
   function testGetGroupEventByUserId() {
   	
   	//Test valid user in group
-	$groups = $this->GroupEvent->getGroupEventByUserId(3, 1);
-	$groups = $this->toArray($groups);
-	$this->assertEqual($groups, array(1,2));
-	
-  	//Test valid user not in group
-	$groups = $this->GroupEvent->getGroupEventByUserId(1, 1);
-	$groups = $this->toArray($groups);
-	$this->assertEqual($groups, null);	
-	
-	//Test invalid user
-	$groups = $this->GroupEvent->getGroupEventByUserId(999, 1);
-	$groups = $this->toArray($groups);
-	$this->assertEqual($groups, null);	
-
-	//Test invalid event
-	$groups = $this->GroupEvent->getGroupEventByUserId(3, 999);
-	$groups = $this->toArray($groups);
-	$this->assertEqual($groups, null);  	
+  	$groups = $this->GroupEvent->getGroupEventByUserId(3, 1);
+  	$groups = $this->toArray($groups);
+  	$this->assertEqual($groups, array(1,2));
+  	
+    	//Test valid user not in group
+  	$groups = $this->GroupEvent->getGroupEventByUserId(1, 1);
+  	$groups = $this->toArray($groups);
+  	$this->assertEqual($groups, null);	
+  	
+  	//Test invalid user
+  	$groups = $this->GroupEvent->getGroupEventByUserId(999, 1);
+  	$groups = $this->toArray($groups);
+  	$this->assertEqual($groups, null);	
+  
+  	//Test invalid event
+  	$groups = $this->GroupEvent->getGroupEventByUserId(3, 999);
+  	$groups = $this->toArray($groups);
+  	$this->assertEqual($groups, null);  	
   	
   }
   
@@ -155,13 +170,10 @@ class GroupEventTestCase extends CakeTestCase {
   	$groups = $this->GroupEvent->getGroupsByEventId(999);
     $this->assertEqual($groups, null);  
   }
-    
-  /*
-   * Deprecated
-   *
-   */
-  
+
   function testGetLowMark() {
+
+    $event = $this->GroupEvent->getLowMark(1,2,100, 0);
     
   }
 
@@ -188,7 +200,13 @@ class GroupEventTestCase extends CakeTestCase {
 
   	$events = $this->GroupEvent->getLateGroupMembers(1);
     $this->assertEqual($events, 1);
-  	
+
+    $events = $this->GroupEvent->getLateGroupMembers(999);
+    $this->assertFalse($events);
+    
+    $events = $this->GroupEvent->getLateGroupMembers(null);
+    $this->assertFalse($events);
+    
   }
 
   function testGetLate() {
@@ -254,26 +272,6 @@ class GroupEventTestCase extends CakeTestCase {
 ###############################################     HELPER FUNCTIONS     ############################################################################
 #####################################################################################################################################################
 
-  function deleteAllTuples($table){
-
-		$this->GroupEvent= & ClassRegistry::init('GroupEvent');
-		$sql = "DELETE FROM $table";
-		$this->GroupEvent->query($sql);
-	}
-	
-	function flushDatabase(){
-			
-		$this->deleteAllTuples('courses');
-		$this->deleteAllTuples('users');
-		$this->deleteAllTuples('user_courses');
-		$this->deleteAllTuples('user_enrols');
-		$this->deleteAllTuples('roles_users');
-		$this->deleteAllTuples('groups');
-		$this->deleteAllTuples('groups_members');
-		$this->deleteAllTuples('group_events');
-		
-	}
-	
 	
 	function toArray($groups){
 		$nameArray = array();

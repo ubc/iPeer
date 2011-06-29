@@ -42,7 +42,13 @@ class GroupEvent extends AppModel
     }
   }
 
-  // updates all the group events
+  /**
+   * Updates all the group events
+   * @param $id Event id
+   * @param $data new goups for the event
+   * 
+   */
+
   function updateGroups($id=null, $data=null){
 //get old groupid's
 	$tmp = $this->getGroupIDsByEventId($id);
@@ -73,8 +79,12 @@ class GroupEvent extends AppModel
 		$this->id = null;
 	}
   }
+/**
+ * Returns list of group id within the selected Event
+ * @param $eventId event id
+ * @return array of group ids associated with the event
+ */
 
-// returns list of group id within the selected Event
   function getGroupIDsByEventId($eventId=null){
     if(empty($eventId) || is_null($eventId)) {
   	  	return;
@@ -82,24 +92,25 @@ class GroupEvent extends AppModel
   	return $this->find('all', array('conditions'=>array('event_id'=>$eventId), 'fields' => 'group_id'));
   }
 
-  // returns list of group id within the selected Event
+  
+  /**
+   * Returns list of group id within the selected Event
+   * @param $eventId event id
+   * @return array of grops associated with the event
+   */
+
   function getGroupsByEventId($eventId=null){
     if(empty($eventId) || is_null($eventId)) {
   	  	return;
   	  }
   	return $this->find('all', array('conditions'=>array('event_id'=>$eventId)));
   }
-  
-//  // returns list of group id within the selected Event
-//  function getGroupIDsByEventId($eventId=null){
-//  	  if (empty($eventId) || is_null($eventId)) {
-//  	  	return;
-//  	  }
-//	  $tmp = $this->find('all', array('conditions' => array('group_id !=' => 0, 'event_id' => $eventId), 'field' => array('id', 'group_id', 'event_id', 'marked', 'grade')));
-//	  return $tmp;
-//  }
+  /**
+   * Returns list of group id within the selected Event
+   * @param $eventId event id
+   * @return list of groups by event id
+   */
 
-  // returns list of group id within the selected Event
   function getGroupListByEventId($eventId=null){
   	  if (empty($eventId) || is_null($eventId)) {
   	  	return;
@@ -110,7 +121,13 @@ class GroupEvent extends AppModel
 	  return $tmp;
   }
 
-  // returns list of Group Event
+  /**
+   * returns list of Group Event
+   * @param $eventId event id
+   * @param $groupId group id
+   * @return GroupEvent 
+   */
+  
   function getGroupEventByEventIdGroupId($eventId=null, $groupId=null){
     if (empty($groupId)||is_null($groupId))
       return;
@@ -120,13 +137,15 @@ class GroupEvent extends AppModel
 	  return $tmp;
   }
   
+  /**
+   * Get GroupEvent by user id 
+   * @param unknown_type $userId
+   * @param unknown_type $eventId
+   * @return GroupEvents associated with the member
+   */
+  
   function getGroupEventByUserId($userId=null, $eventId=null)
   {
-//    $condition = 'GroupMember.user_id='.$userId.' AND GroupEvent.event_id='.$eventId;
-//    $fields = 'GroupMember.user_id, GroupEvent.group_id, GroupEvent.id, GroupEvent.event_id';
-//    $joinTable = array(' RIGHT JOIN groups_members as GroupMember ON GroupMember.group_id=GroupEvent.group_id');
-//
-//    return $this->find('all',$condition, $fields, null, null, null, null, $joinTable );
     return $this->find('all', array(
                     'conditions' => array('GroupEvent.event_id'=>$eventId, 'GroupMember.user_id'=>$userId),
                     'fields' => array('GroupEvent.id', 'GroupEvent.group_id', 'GroupEvent.event_id'),
@@ -139,43 +158,16 @@ class GroupEvent extends AppModel
                         )
                     )
                 ));
-	/*$sql = "SELECT *
-			FROM group_events AS ge
-			RIGHT JOIN groups_members AS gm ON ge.group_id = gm.group_id
-			WHERE ge.event_id =11
-			AND gm.user_id =2";
-	$returning = $this->query($sql);*/
-
   }
 
-  // Deprecated: not being used anymore
-  /*function getMemberCountByEventId($eventId=null)
-  {
-//    $condition = 'GroupEvent.event_id='.$eventId;
-//    $fields = 'Count(GroupMember.user_id) AS count';
-//    $joinTable = array(' RIGHT JOIN groups_members as GroupMember ON GroupMember.group_id=GroupEvent.group_id');
-//
-//    return $this->find('all',$condition, $fields, null, null, null, null, $joinTable );
-
-    return $this->find('count', array(
-                    'conditions' => array('GroupEvent.event_id'=>$eventId),
-                    'joins' => array(
-                        array(
-                            'table' => 'groups_members',
-                            'alias' => 'GroupMember',
-                            'type' => 'RIGHT',
-                            'conditions' => array('GroupMember.group_id = GroupEvent.group_id')
-                        )
-                    )
-                ));
-  }*/
-
-  // Deprecated: replaced by virtual field in event model
-  // returns list of group id within the selected Event
-  /*function getToReviewGroupEventByEventId($eventId=null){
-	  return $this->find('count', array('conditions'=>array('event_id'=>$eventId, 'marked' => "to review")));
-  }*/
-
+  /**
+   * 
+   * @param $eventId
+   * @param $eventTypeId
+   * @param $maxPercent
+   * @param $minPercent
+   */
+  
   function getLowMark($eventId=null, $eventTypeId=null, $maxPercent=1, $minPercent=0) {
     $eventTypeEval = array(1=>'evaluation_simples',2=>'evaluation_rubrics',4=>'evaluation_mixevals');
     $eventType = array(1=>'simple_evaluations',2=>'rubrics',4=>'mixevals');
@@ -231,12 +223,12 @@ class GroupEvent extends AppModel
     }
   }
 
+  /**
+   * Get all not reviewed GroupEvents
+   * @param $eventId event id
+   * @return not reviewed GroupEvents
+   */
   function getNotReviewed($eventId=null) {
-//    return $this->query('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked
-//      FROM group_events AS GroupEvent
-//      WHERE (GroupEvent.marked="not reviewed" OR GroupEvent.marked="to review")
-//      AND GroupEvent.group_id != 0 AND GroupEvent.event_id='.$eventId.'
-//      ORDER BY GroupEvent.group_id');
     return $this->find('all', array(
         'conditions' => array('GroupEvent.group_id !=' => '0', 'GroupEvent.event_id' => $eventId,
             "OR" => array(
@@ -246,22 +238,15 @@ class GroupEvent extends AppModel
     ));
   }
 
+  /**
+   * Get group members with late evaluations
+   * @param $groupEventId GroupEvent id
+   * @return late Group Members
+   */
 
     function getLateGroupMembers($groupEventId) {
-//        $conditions ="`EvaluationSubmission`.date_submitted > `Event`.due_date " .
-//            "AND `GroupEvent`.`id`=$groupEventId";
-//
-//        $joins = array(
-//            "LEFT JOIN `events` AS `Event` ON `GroupEvent`.`event_id`=`Event`.`id`",
-//            "LEFT JOIN `evaluation_submissions` AS `EvaluationSubmission` ON ".
-//                "`GroupEvent`.`id`=`EvaluationSubmission`.`grp_event_id`",
-//        );
-//
-//        $count = $this->find(count,$conditions, (-1), $joins);
-//        return $count;
-
         return $this->find('count', array(
-                    'conditions' => array('GroupEvent.id' => $groupEventId, 'EvaluationSubmission.date_submitted >'=>'Event.due_date'),
+                    'conditions' => array('GroupEvent.id' => $groupEventId, 'EvaluationSubmission.date_submitted > Event.due_date'),
                     'joins' => array(
                         array(
                             'table' => 'events',
@@ -279,6 +264,12 @@ class GroupEvent extends AppModel
                 ));
     }
 
+  /**
+   * Get all late GroupEvents for an event
+   * @param $eventId event id
+   * @return array of late group members
+   */  
+    
   function getLate($eventId) {
     return $this->query('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked
                             FROM group_events as GroupEvent
@@ -302,21 +293,28 @@ class GroupEvent extends AppModel
                             );
   }
   
+  /**
+   * 
+   * Get GroupEvents by event id
+   * @param $eventId event id
+   * @return groupEvents
+   */
+  
   function getGroupEventByEventId($eventId){
-//  	$sql = "SELECT group_id
-//  			FROM group_events
-//  			WHERE event_id=$eventId";
-//  	return $this->query($sql);
     return $this->find('all', array(
         'conditions' => array('GroupEvent.event_id' => $eventId)
     ));
   }
   
+  /**
+   * 
+   * Get GroupEvent by group id and event id
+   * @param $eventId event id
+   * @param  $groupId group id
+   * @return GroupEvent 
+   */
+  
   function getGroupEventByEventIdAndGroupId($eventId, $groupId){
-//  	$sql = "SELECT id
-//  			FROM group_events
-//  			WHERE event_id=$eventId AND group_id=$groupId";
-//  	$returning = $this->query($sql);
     $returning = $this->find('first', array(
         'conditions' => array('GroupEvent.event_id' => $eventId, 'GroupEvent.group_id' => $groupId),
         'fields' => array('GroupEvent.id')

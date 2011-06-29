@@ -89,7 +89,7 @@ class GroupsMembersTestCase extends CakeTestCase {
   	$this->assertEqual($searched[0]['GroupsMembers']['user_id'], 2);
   	$this->assertEqual(sizeof($searched), 1);
 
-  	$incorrectData = $this->GroupsMembers->insertMembers(2, null);
+  	$incorrectData = $this->GroupsMembers->updateMembers(2, null);
   	$this->assertFalse($incorrectData);
   	
     
