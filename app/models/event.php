@@ -187,21 +187,39 @@ class Event extends AppModel
 		return $data;
 	}
 
+	/**
+	 *
+	 * Get event by course id
+	 * @param $courseId course id
+	 * @return array with event info
+	 */
     function getCourseEvent($courseId=null)
     {
         //return $this->find('all','course_id ='.$courseId);
         return $this->find('all', array(
             'conditions' => array('course_id' => $courseId)
         ));
-
     }
 
+    /**
+     * 
+     * Get course evaluation events by course id
+     * @param $courseId course id
+     * @return course evaluation events
+     */
     function getCourseEvalEvent($courseId=null) {
         //return $this->find('all','course_id='.$courseId.' AND event_template_type_id!=3');
         return $this->find('all', array(
             'conditions' => array('course_id' => $courseId, 'event_template_type_id !=' => '3')
         ));
     }
+    
+    /**
+     * 
+     * Number of events for a course
+     * @param $courseId course id
+     * @return count of course events
+     */
 
     function getCourseEventCount($courseId=null) {
         //return $this->find('course_id='.$courseId, 'COUNT(*) as total');
@@ -210,10 +228,25 @@ class Event extends AppModel
         ));
     }
 
+    /**
+     * 
+     * Get course for an event
+     * @param $eventId event id
+     * @return course by event id
+     */
+    
     function getCourseByEventId($eventId) {
     	$tmp = $this->find('all', array('conditions'=>array('Event.id' => $eventId), 'fields'=>array('course_id')));
     	return $tmp[0]['Event']['course_id'];
     }
+    
+    /**
+     * 
+     * Get survey id by course id description
+     * @param $courseId course id
+     * @param $title title of the event
+     * @return survey id
+     */
     
     function getSurveyEventIdByCourseIdDescription($courseId=null,$title=null) {
         //return $this->find('course_id='.$courseId.' AND title=\''.$title.'\' AND event_template_type_id=3','id');
@@ -222,11 +255,18 @@ class Event extends AppModel
             'fields' => array('Event.id')
         ));
     }
+    
+    /**
+     * 
+     * Get active survey events by course id
+     * @param $courseId course id
+     * @return array of survey events
+     */
 
     function getActiveSurveyEvents($courseId=null) {
         //return $this->find('all','course_id='.$courseId.' AND event_template_type_id=3');
         return $this->find('all', array(
-            'conditions' => array('course_id' => $courseId, 'event_template_type_id' => '3')
+            'conditions' => array('course_id' => $courseId, 'event_template_type_id' => '3', 'Event.record_status !='=>'I')
         ));
     }
 
@@ -314,6 +354,13 @@ class Event extends AppModel
     return true;
   }
  
+  /**
+   * 
+   * Check if event is late
+   * @param $eventID event id
+   * @return true if late, false otherwise
+   */
+  
     function checkIfNowLate($eventID) {
         if (is_numeric($eventID)) {
             $count = $this->find('count', array(
@@ -332,7 +379,7 @@ class Event extends AppModel
      * @param mixed $event event array
      * @param mixed $assigned_group_ids already assigned group ids
      * @access public
-     * @return array unassigned groups
+     * @return array of unassigned groups
      */
     function getUnassignedGroups($event, $assigned_group_ids = null) {
       $group = Classregistry::init('Group');
@@ -355,6 +402,13 @@ class Event extends AppModel
       									'fields'=> array('Group.group_name')));
     }
 
+    /**
+     * 
+     * Get event by event id
+     * @param $id event id
+     * @return array with event info
+     */
+    
     function getEventById($id){
 //    	$sql = "SELECT *
 //    			FROM events
@@ -364,6 +418,13 @@ class Event extends AppModel
           'conditions' => array('Event.id' => $id)
       ));
     }
+    
+    /**
+     * 
+     * Get event template ty id by event id
+     * @param unknown_type $id event id
+     * @return event template type id
+     */
 
     function getEventTemplateTypeId($id){
         $this->recursive = 0;
@@ -375,6 +436,7 @@ class Event extends AppModel
         return $event['Event']['event_template_type_id'];
     }
 
+    
     function formatEventObj ($eventId, $groupId=null)
     {
 //      //Get the target event
@@ -413,6 +475,13 @@ class Event extends AppModel
       return $event;
     }
 
+    /**
+     * 
+     * Get event title by event id
+     * @param unknown_type $id event id
+     * @return event title
+     */
+    
     function getEventTitleById($id){
       $this->recursive = -1;
       $event = $this->find('first', array(

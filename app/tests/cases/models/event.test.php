@@ -166,6 +166,20 @@ class EventTestCase extends CakeTestCase {
 
    }
 
+  function testCheckIfNowLate() {
+
+    $late = $this->Event->checkIfNowLate(1);
+    $this->assertTrue($late);
+    $late = $this->Event->checkIfNowLate(2);
+    $this->assertFalse($late);    
+
+    $late = $this->Event->checkIfNowLate(999);
+    $this->assertFalse($late);  
+    $late = $this->Event->checkIfNowLate(null);
+    $this->assertFalse($late);  
+    
+  }
+   
    
   function testGetUnassignedGroups() {
   	  	
@@ -176,28 +190,27 @@ class EventTestCase extends CakeTestCase {
   	
   	$event= $this->Event->getCourseEvent(1);
   	$groups = $this->Event->getUnassignedGroups($event[0]);
-  	
+
   	$groups= $this->toGroupArray($groups);
-	$this->assertEqual($groups, array('group1', 'group2', 'group3'));	
+  	$this->assertEqual($groups, array('group3','group4'));	
 	
-	//Test valid event with a group assigned
+	  //Test valid event with a group assigned
   	
   	$event= $this->Event->getCourseEvent(1);
   	$groups = $this->Event->getUnassignedGroups($event[0], array(1));
   	
   	$groups= $this->toGroupArray($groups);
-	$this->assertEqual($groups, array('group2', 'group3'));		
-       	
-	//Test invalid event id
-	$event= $this->Event->getCourseEvent(999);
-	$this->assertEqual($event, $empty);		
+	  $this->assertEqual($groups, array('group2', 'group3', 'group4'));		
+  	//Test invalid event id
+  	$event= $this->Event->getCourseEvent(999);
+  	$this->assertEqual($event, $empty);		
 	
-    //Test invalid event id
+    //Test valid event id with invalid gorups
   	$event= $this->Event->getCourseEvent(1);
   	$groups = $this->Event->getUnassignedGroups($event[0], 999);
   	
   	$groups= $this->toGroupArray($groups);
-	$this->assertEqual($groups, array('group1', 'group2', 'group3'));	
+	  $this->assertEqual($groups, array('group1', 'group2', 'group3', 'group4'));	
   }
    
   function testGetEventById() {
