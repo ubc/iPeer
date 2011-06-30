@@ -7,8 +7,9 @@
 class EmailerController extends AppController
 {
   var $name = 'Emailer';
-  var $uses = array('GroupsMembers', 'UserEnrol', 'User', 'CustomEmail');
+  var $uses = array('GroupsMembers', 'UserEnrol', 'User', 'EmailTemplate');
   var $components = array('AjaxList', 'Session');
+  var $helpers = array('Ajax');
 
   function __construct(){
     $this->pageTitle = 'Email';
@@ -20,12 +21,12 @@ class EmailerController extends AppController
 
     // Set up Columns
     $columns = array(
-            array("CustomEmail.id",   "",       "",        "hidden"),
-            array("CustomEmail.name", "Name",   "12em",    "action",   "View Email Template"),
-            array("CustomEmail.description", "Description","auto",  "action", "View Email Template"),
-            array("CustomEmail.creator_id",           "",            "",     "hidden"),
-            array("CustomEmail.creator",     "Creator",  "10em", "action", "View Creator"),
-            array("CustomEmail.created", "Creation Date", "10em", "date"));
+            array("EmailTemplate.id",   "",       "",        "hidden"),
+            array("EmailTemplate.name", "Name",   "12em",    "action",   "View Email Template"),
+            array("EmailTemplate.description", "Description","auto",  "action", "View Email Template"),
+            array("EmailTemplate.creator_id",           "",            "",     "hidden"),
+            array("EmailTemplate.creator",     "Creator",  "10em", "action", "View Creator"),
+            array("EmailTemplate.created", "Creation Date", "10em", "date"));
 
     $userList = array($myID => "My Email Template");
 
@@ -43,29 +44,29 @@ class EmailerController extends AppController
 
     $extraFilters = "";
 
-    // Instructors can only edit their own evaluations
+    // Restriction for Instructor
     $restrictions = "";
     if ($this->Auth->user('role') != 'A') {
       $restrictions = array(
-                            "CustomEmail.creator_id" => array(
-                                                  $myID => true,
-                                                  "!default" => false));
+          "EmailTemplate.creator_id" => array($myID => true, "!default" => false)
+      );
+      $extraFilters = "(EmailTemplate.creator_id=$myID or EmailTemplate.availability='0')";
     }
 
     // Set up actions
     $warning = "Are you sure you want to delete this email template permanently?";
     $actions = array(
-                     array("View Email Template", "", "", "", "view", "CustomEmail.id"),
-                     array("Edit Email Template", "", $restrictions, "", "edit", "CustomEmail.id"),
-                     array("Delete Email Template", $warning, $restrictions, "", "delete", "CustomEmail.id"),
-                     array("View Creator", "",    "", "users", "view", "CustomEmail.creator_id"));
+                     array("View Email Template", "", "", "", "view", "EmailTemplate.id"),
+                     array("Edit Email Template", "", $restrictions, "", "edit", "EmailTemplate.id"),
+                     array("Delete Email Template", $warning, $restrictions, "", "delete", "EmailTemplate.id"),
+                     array("View Creator", "",    "", "users", "view", "EmailTemplate.creator_id"));
 
     // No recursion in results
     $recursive = 0;
 
     // Set up the list itself
-    $this->AjaxList->setUp($this->CustomEmail, $columns, $actions,
-                           "CustomEmail.name", "CustomEmail.name", $joinTables, $extraFilters, $recursive);
+    $this->AjaxList->setUp($this->EmailTemplate, $columns, $actions,
+                           "EmailTemplate.name", "EmailTemplate.name", $joinTables, $extraFilters, $recursive);
   }
 
   function index(){
@@ -83,6 +84,8 @@ class EmailerController extends AppController
         $emailAddress = implode('; ', $emailAddress);
       $this->set('to', $emailAddress);
       $this->set('from', $this->Auth->user('email'));
+      $this->set('templatesList', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id'),'list'));
+      $this->set('templates', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id')));
     }
     else{
       $this->set('data', $this->data);
@@ -102,7 +105,7 @@ class EmailerController extends AppController
     }
     else{
       //Save Data
-      if ($this->CustomEmail->save($this->params['data'])) {
+      if ($this->EmailTemplate->save($this->params['data'])) {
         $this->Session->setFlash('Successful');
         $this->redirect('/emailer/index');
       }
@@ -118,8 +121,8 @@ class EmailerController extends AppController
     $currentUser = $this->User->getCurrentLoggedInUser();
     $this->set('currentUser', $currentUser);
 
-    $data = $this->CustomEmail->find('first', array(
-        'conditions' => array('CustomEmail.id' => $id)
+    $data = $this->EmailTemplate->find('first', array(
+        'conditions' => array('EmailTemplate.id' => $id)
     ));
 
     if (empty($this->params['data'])) {
@@ -128,7 +131,7 @@ class EmailerController extends AppController
     }
     else{
       //Save Data
-      if ($this->CustomEmail->save($this->params['data'])) {$this->log($this->params['data']);
+      if ($this->EmailTemplate->save($this->params['data'])) {$this->log($this->params['data']);
         $this->Session->setFlash('Successful'); 
         $this->redirect('/emailer/index');
       }
@@ -139,7 +142,7 @@ class EmailerController extends AppController
   }
 
   function delete ($id) {
-    if ($this->CustomEmail->delete($id)) {
+    if ($this->EmailTemplate->delete($id)) {
       $this->Session->setFlash('The Email Template was deleted successfully.');
     } else {
       $this->Session->setFlash('Email Template delete failed.');
@@ -148,12 +151,23 @@ class EmailerController extends AppController
   }
 
   function view ($id){
-    $this->data = $this->CustomEmail->find('first', array(
-        'conditions' => array('CustomEmail.id' => $id)
+    $this->data = $this->EmailTemplate->find('first', array(
+        'conditions' => array('EmailTemplate.id' => $id)
     ));
 
     $this->set('readonly', true);
     $this->render('add');
+
+  }
+
+  function emailTemplate($templateId = null)
+  {
+      $this->layout = 'ajax';
+      $template = $this->EmailTemplate->find('first', array(
+          'conditions' => array('EmailTemplate.id' => $templateId)
+      ));
+      
+      $this->set('template', $template);
 
   }
 

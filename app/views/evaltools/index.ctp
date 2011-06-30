@@ -223,6 +223,40 @@
 	  </td>
 	  </tr>
 <?php endif; ?>
+<?php if (!empty($access['EMAIL_TEMPLATE'])):?>
+	  <tr class="tableheader">
+	    <td colspan="7">Email Template</td>
+	  </tr>
+	  <tr class="panelContent">
+	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
+	      <tr class="panelContent">
+	        <td colspan="6" align="right">
+          <?php echo $html->image('icons/add.gif', array('alt'=>'Add Survey', 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link('Add Email Template', '/emailer/add'); ?>
+          
+          </td>
+	      </tr>
+    	  <tr class="panelContent">
+            <th colspan="2" width="20">Name</th>
+    	    <th width="70%">Description</th>
+    	  </tr>
+        <?php if(!empty($emailTemplates)):?>
+    	  <?php foreach($emailTemplates as $row): $emailTemplate = $row['EmailTemplate'];?>
+    	  <tr class="tablecell">
+    	    <td width="1%" bgcolor="#FFB66F">&nbsp;</td>
+            <td align="left"><?php echo $html->link($emailTemplate['name'], '/emailer/view/'.$emailTemplate['id']) ?></td>
+          <td align="center"><?php echo $emailTemplate['description'];?></td>
+    	  </tr>
+    	  <?php endforeach; ?>
+        <?php else:?>
+      	<tr class="tablecell" align="center">
+      	    <td colspan="6">Record Not Found</td>
+        </tr>
+        <?php endif;?>
+    	  </table>
+	  </td>
+	  </tr>
+<?php endif; ?>
+
   </table>
 
 </div>

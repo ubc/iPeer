@@ -32,7 +32,7 @@ class EvaltoolsController extends AppController
  *
  * @var $uses
  */
-  var $uses =  array('SimpleEvaluation', 'Rubric', 'Mixeval', 'Survey');
+  var $uses =  array('SimpleEvaluation', 'Rubric', 'Mixeval', 'Survey', 'EmailTemplate');
   var $page;
   var $Sanitize;
   var $functionCode = 'EVAL_TOOL';
@@ -61,6 +61,10 @@ class EvaltoolsController extends AppController
         $this->redirect('/surveys/index/');
       break;
 
+      case "emailer" :
+        $this->redirect('/emailer/index/');
+      break;
+
       default:
         $this->showAll();
         $this->render('index');
@@ -81,6 +85,9 @@ class EvaltoolsController extends AppController
     $surveyData = $this->Survey->find('all', array('conditions' => array('Survey.creator_id' => $this->Auth->user('id')),
                                                    'contain' => array('Course')));
     $this->set('surveyData', $surveyData);
+
+    $emailTemplates = $this->EmailTemplate->getMyEmailTemplate($this->Auth->user('id'));
+    $this->set('emailTemplates', $emailTemplates);
   }
 }
 ?>

@@ -21,8 +21,8 @@
               $surveySysFunc = $access['SURVEY'];    ?>
               <li <?php if ($this->params['controller'] == 'surveys') echo 'class="current"'; ?> ><a href="<?php echo $this->webroot.$this->theme.$surveySysFunc['url_link'];?>"><span><?php echo $surveySysFunc['function_name']?></span></a>|</li>
       <?php }?>
-      <?php if (!empty($access['CUSTOM_EMAIL'])) { 
-              $emailerSysFunc = $access['CUSTOM_EMAIL'];    ?>
+      <?php if (!empty($access['EMAIL_TEMPLATE'])) {
+              $emailerSysFunc = $access['EMAIL_TEMPLATE'];    ?>
               <li <?php if ($this->params['controller'] == 'emailers') echo 'class="current"'; ?> ><a href="<?php echo $this->webroot.$this->theme.$emailerSysFunc['url_link'];?>"><span><?php echo $emailerSysFunc['function_name']?></span></a></li>
       <?php }?>
   </ul>
