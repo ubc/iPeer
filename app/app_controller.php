@@ -198,5 +198,34 @@ class AppController extends Controller  {
 
 		return $this->Email->send();
   }
+
+  function getEmailAddress($to){
+
+    $type = $to[0];
+    $id = substr($to,1);
+    switch($type){
+      case ' ':
+        return '';
+        break;
+      case 'C': //Email addresses for all in Course
+        return $this->User->find('list', array(
+            'fields' => array('email'),
+            'conditions' => array('User.id' => $this->UserEnrol->getUserListByCourse($id))
+        ));
+        break;
+      case 'G': //Email addresses for all in group
+        return $this->User->find('list', array(
+            'fields' => array('email'),
+            'conditions' => array('User.id' => $this->GroupsMembers->getMembers($id))
+        ));
+        break;
+      default: //Email address for a user
+        return $this->User->find('list', array(
+            'fields' => array('email'),
+            'conditions' => array('User.id' => $to)
+        ));
+
+    }
+  }
 }
 ?>

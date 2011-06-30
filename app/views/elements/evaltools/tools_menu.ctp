@@ -1,7 +1,7 @@
 <div id="nav">
    <ul>
       <!-- Sub menu for Evaluation Event Tools -->
-      <?php if (!empty($access['EVAL_TOOL'])) {
+      <?php if (!empty($access['EVAL_TOOL'])) { 
               $evalTools = $access['EVAL_TOOL'];    ?>
               <li <?php if ($this->params['controller'] == 'evaltools') echo 'class="current"'; ?> ><a href="<?php echo $this->webroot.$this->theme.$evalTools['url_link'];?>"><span>All My Tools</span></a> |</li>
       <?php }?>
@@ -19,7 +19,11 @@
       <?php }?>
       <?php if (!empty($access['SURVEY'])) {
               $surveySysFunc = $access['SURVEY'];    ?>
-              <li <?php if ($this->params['controller'] == 'surveys') echo 'class="current"'; ?> ><a href="<?php echo $this->webroot.$this->theme.$surveySysFunc['url_link'];?>"><span><?php echo $surveySysFunc['function_name']?></span></a></li>
+              <li <?php if ($this->params['controller'] == 'surveys') echo 'class="current"'; ?> ><a href="<?php echo $this->webroot.$this->theme.$surveySysFunc['url_link'];?>"><span><?php echo $surveySysFunc['function_name']?></span></a>|</li>
+      <?php }?>
+      <?php if (!empty($access['CUSTOM_EMAIL'])) { 
+              $emailerSysFunc = $access['CUSTOM_EMAIL'];    ?>
+              <li <?php if ($this->params['controller'] == 'emailers') echo 'class="current"'; ?> ><a href="<?php echo $this->webroot.$this->theme.$emailerSysFunc['url_link'];?>"><span><?php echo $emailerSysFunc['function_name']?></span></a></li>
       <?php }?>
   </ul>
 </div>

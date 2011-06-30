@@ -103,7 +103,6 @@ class UsersController extends AppController
     // Get the course data
     $userCourseList = $this->sysContainer->getMyCourseList();
     $coursesList = array();
-    $selected_course_id = $this->AjaxList->getState()->joinFilterSelections->course_id;
     // Add in the unassigned course entry:
     $coursesList{"!!!null"} = "-- Unassigned --";
 
@@ -111,11 +110,15 @@ class UsersController extends AppController
       $coursesList{$id} = $course['course'];
     }
 
-    $groupsList = array($this->Group->find('list', array(
-        'fields' => array('group_name'),
-        'conditions' => array('course_id' => $selected_course_id)
-    ))); 
-    $groupsList = $groupsList['0'];
+//    (isset($this->AjaxList->getState()->joinFilterSelections->course_id))?
+//      $selected_course_id = $this->AjaxList->getState()->joinFilterSelections->course_id:
+//      $selected_course_id = '0';
+//
+//    $groupsList = array($this->Group->find('list', array(
+//        'fields' => array('group_name'),
+//        'conditions' => array('course_id' => $selected_course_id)
+//    )));
+//    $groupsList = $groupsList['0'];
 
     // The columns to show
     $columns = array(
@@ -147,22 +150,22 @@ class UsersController extends AppController
                     "dependsMap"    => "User.role",    // Look to this column
                     "dependsValues" => array("S")  // Display only when this column is one of these values
                  ),
-            array(  // Define the GUI aspecs
-                    "id"            => "group_id",
-                    "description"   => "for Group:",
-                    // What are the choises and the default values?
-                    "list"  => $groupsList,
-                    "default" => '',
-                    // What table do we join to get these
-                    "joinTable"     => "groups_members",
-                    "joinModel"     => "GroupsMember",
-                    "foreignKey"    => "user_id",
-                    "conditions" => array('course_id' => $selected_course_id),
-
-                    // Any show/hide features based on maps
-                    "dependsMap"    => "User.role",    // Look to this column
-                    "dependsValues" => array("S")  // Display only when this column is one of these values
-                 )
+//            array(  // Define the GUI aspecs
+//                    "id"            => "group_id",
+//                    "description"   => "for Group:",
+//                    // What are the choises and the default values?
+//                    "list"  => $groupsList,
+//                    "default" => '',
+//                    // What table do we join to get these
+//                    "joinTable"     => "groups_members",
+//                    "joinModel"     => "GroupsMember",
+//                    "foreignKey"    => "user_id",
+//                    "conditions" => array('course_id' => $selected_course_id),
+//
+//                    // Any show/hide features based on maps
+//                    "dependsMap"    => "User.role",    // Look to this column
+//                    "dependsValues" => array("S")  // Display only when this column is one of these values
+//                 )
            );
 
     $extraFilters = array();

@@ -1,7 +1,6 @@
 <?php
   //$a=print_r($group_data,true);
   //echo "<pre>$a</a>";
-  $emailAddress = '';
   echo $html->script('groups');
 ?>
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
@@ -30,10 +29,7 @@
               <?php if (!empty($group_data)) :?>
                 <tr>
                   <td colspan="3"><a href="javascript:listEmail();"><?php echo $html->image('icons/email.gif',array('border'=>'0','alt'=>'Email'))?> Get email addresses</a></td></tr>
-                  <?php foreach($group_data as $row): $user = $row['User'];
-                    //Get email list
-                    $emailAddress = $emailAddress.$user['email'].'; ';
-                  ?>
+                  <?php foreach($group_data as $row): $user = $row['User'];?>
                   <tr>
                   <td width="15"><a href="mailto:<?php echo $user['email']?>"><?php echo $html->image('icons/email_icon.gif',array('border'=>'0','alt'=>'Email', 'title' => 'Email to '.$user['full_name']))?></a></td>
                   <td width="15"><a href="../../users/view/<?php echo $user['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View', 'title' => 'View '.$user['full_name']))?></a></td>
@@ -78,4 +74,4 @@
     </td>
   </tr>
 </table>
-<input type="hidden" id="emailAddress" value="<?php echo substr($emailAddress,0,-2); ?>"/>
+<input type="hidden" id="emailAddress" value="<?php echo implode("; ",$group_email_list); ?>"/>
