@@ -23,7 +23,7 @@
       <?php }?>
       <?php if (!empty($access['EMAIL_TEMPLATE'])) {
               $emailerSysFunc = $access['EMAIL_TEMPLATE'];    ?>
-              <li <?php if ($this->params['controller'] == 'emailers') echo 'class="current"'; ?> ><a href="<?php echo $this->webroot.$this->theme.$emailerSysFunc['url_link'];?>"><span><?php echo $emailerSysFunc['function_name']?></span></a></li>
+              <li <?php if ($this->params['controller'] == 'emailer') echo 'class="current"'; ?> ><a href="<?php echo $this->webroot.$this->theme.$emailerSysFunc['url_link'];?>"><span><?php echo $emailerSysFunc['function_name']?></span></a></li>
       <?php }?>
   </ul>
 </div>

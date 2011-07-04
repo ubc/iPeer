@@ -24,17 +24,25 @@
           </tr>
           <tr id="tablecell2" class="tablecell2">
             <td>Template:&nbsp;</td>
-            <td><?php echo $form->input('Email.template', array(
-              'type' => 'select',
-              'id' => 'template',
-              'options' => $templatesList,
-              'empty' => '-- No Template --',
-              'label' => false,
-              'onChange' => "new Ajax.Updater('email_content','".
-                  $this->webroot.$this->theme."emailer/emailTemplate/'+this.options[this.selectedIndex].value,
-                   {method: 'post', asynchronous: true, evalScripts:false});  return false;",
-                'escape'=>false
-            ));?>
+            <td>
+              <table>
+              <tr><td>
+              <?php echo $html->link('Add Email Template', 'add/', array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"));?>
+              </td></tr>
+              <tr><td>
+              <?php echo $form->input('Email.template', array(
+                'type' => 'select',
+                'id' => 'template',
+                'options' => $templatesList,
+                'empty' => '-- No Template --',
+                'label' => false,
+                'onChange' => "new Ajax.Updater('email_content','".
+                    $this->webroot.$this->theme."emailer/emailTemplate/'+this.options[this.selectedIndex].value,
+                     {method: 'post', asynchronous: true, evalScripts:false});  return false;",
+                  'escape'=>false
+              ));?>
+              </td></tr>
+              </table>
             </td>
           </tr>
           <tr class="tablecell2">

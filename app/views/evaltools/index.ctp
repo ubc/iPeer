@@ -225,7 +225,7 @@
 <?php endif; ?>
 <?php if (!empty($access['EMAIL_TEMPLATE'])):?>
 	  <tr class="tableheader">
-	    <td colspan="7">Email Template</td>
+	    <td colspan="7">Email Templates</td>
 	  </tr>
 	  <tr class="panelContent">
 	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
