@@ -25,7 +25,7 @@ class EmailerController extends AppController
     $this->NeatString = new NeatString;
     $this->show = empty($_GET['show'])? 'null':$this->Sanitize->paranoid($_GET['show']);
     if ($this->show == 'all') $this->show = 99999999;
-    $this->sortBy = empty($_GET['sort'])? 'EmailTemplate.name': $_GET['sort'];
+    $this->sortBy = empty($_GET['sort'])? 'EmailTemplate.description': $_GET['sort'];
     $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
     $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
     $this->order = $this->sortBy . ' ' . strtoupper($this->direction);
@@ -48,16 +48,16 @@ class EmailerController extends AppController
     $userList = array($myID => "My Email Template");
 
     // Join with Users
-    $jointTableCreator = array();
-//      array("id"         => "Creator.id",
-//            "localKey"   => "creator_id",
-//            "description" => "Email Template to show:",
-//            "default" => $myID,
-//            "list" => $userList,
-//            "joinTable"  => "users",
-//            "joinModel"  => "Creator");
-    // put all the joins together
-    $joinTables = array();
+    $jointTableCreator = 
+      array("id"         => "Creator.id",
+            "localKey"   => "creator_id",
+            "description" => "Email Template to show:",
+            "default" => $myID,
+            "list" => $userList,
+            "joinTable"  => "users",
+            "joinModel"  => "Creator");
+    //put all the joins together
+    $joinTables = array($jointTableCreator);
 
     $extraFilters = "";
 
@@ -80,7 +80,7 @@ class EmailerController extends AppController
 
     // Set up the list itself
     $this->AjaxList->setUp($this->EmailTemplate, $columns, $actions,
-                           "EmailTemplate.name", "EmailTemplate.name", $joinTables, $extraFilters);
+                           "EmailTemplate.id", "EmailTemplate.name", $joinTables, $extraFilters);
   }
 
   function ajaxList() {
@@ -88,20 +88,6 @@ class EmailerController extends AppController
     $this->setUpAjaxList();
     // Process the request for data
     $this->AjaxList->asyncGet();
-  }
-
-  function __processForm() {
-    if (!empty($this->data)) {
-      $this->Output->filter($this->data);//always filter
-
-      //Save Data
-      if ($this->EmailTemplate->save($this->data)) {
-        $this->data['EmailTemplate']['id'] = $this->EmailTemplate->id;
-        return true;
-      }
-    }
-
-    return false;
   }
 
   function index(){

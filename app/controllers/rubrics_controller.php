@@ -68,6 +68,8 @@ class RubricsController extends AppController
   }
 
   function setUpAjaxList() {
+    $myID = $this->Auth->user('id');
+    
     // Set up Columns
     $columns = array(
             array("Rubric.id",          "",            "",      "hidden"),
@@ -85,8 +87,17 @@ class RubricsController extends AppController
     // Just list all and my evaluations for selections
     $userList = array($this->Auth->user('id') => "My Evaluations");
 
+    // Join with Users
+    $jointTableCreator =
+      array("id"         => "Creator.id",
+            "localKey"   => "creator_id",
+            "description" => "Evaluations to show:",
+            "default" => $myID,
+            "list" => $userList,
+            "joinTable"  => "users",
+            "joinModel"  => "Creator");
     // put all the joins together
-    $joinTables = array();
+    $joinTables = array($jointTableCreator);
 
     // List only my own or
     $myID = $this->Auth->user('id');

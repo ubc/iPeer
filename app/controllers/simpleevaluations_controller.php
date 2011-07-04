@@ -102,7 +102,7 @@ class SimpleevaluationsController extends AppController
             "joinTable"  => "users",
             "joinModel"  => "Creator");
     // put all the joins together
-    $joinTables = array();
+    $joinTables = array($jointTableCreator);
 
     $extraFilters = "";
 

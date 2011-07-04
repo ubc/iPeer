@@ -69,55 +69,66 @@ class MixevalsController extends AppController
 
 
 	function setUpAjaxList() {
-		// Set up Columns
-		$columns = array(
-		array("Mixeval.id",            "",              "",  "hidden"),
-		array("Mixeval.name",          "Name",         "auto", "action", "View Evaluation"),
-		array("!Custom.inUse",         "In Use",       "4em",  "number"),
-		array("Mixeval.availability",  "Availability", "6em",  "string"),
-		array("Mixeval.scale_max",     "LOM",          "3em",  "number"),
-		array("Mixeval.total_question",  "Questions",    "4em", "number"),
-		array("Mixeval.total_marks",  "Total Marks",    "4em", "number"),
-		array("Mixeval.event_count",   "",       "",        "hidden"),
-		array("Mixeval.creator_id",           "",               "",    "hidden"),
-		array("Mixeval.creator",     "Creator",        "8em", "action", "View Creator"),
-		array("Mixeval.created",      "Creation Date",  "10em", "date"));
+          $myID = $this->Auth->user('id');
+          
+          // Set up Columns
+          $columns = array(
+          array("Mixeval.id",            "",              "",  "hidden"),
+          array("Mixeval.name",          "Name",         "auto", "action", "View Evaluation"),
+          array("!Custom.inUse",         "In Use",       "4em",  "number"),
+          array("Mixeval.availability",  "Availability", "6em",  "string"),
+          array("Mixeval.scale_max",     "LOM",          "3em",  "number"),
+          array("Mixeval.total_question",  "Questions",    "4em", "number"),
+          array("Mixeval.total_marks",  "Total Marks",    "4em", "number"),
+          array("Mixeval.event_count",   "",       "",        "hidden"),
+          array("Mixeval.creator_id",           "",               "",    "hidden"),
+          array("Mixeval.creator",     "Creator",        "8em", "action", "View Creator"),
+          array("Mixeval.created",      "Creation Date",  "10em", "date"));
 
-		// Just list all and my evaluations for selections
-		$userList = array($this->Auth->user('id') => "My Evaluations");
+          // Just list all and my evaluations for selections
+          $userList = array($this->Auth->user('id') => "My Evaluations");
 
-		// put all the joins together
-		$joinTables = array();
+          // Join with Users
+          $jointTableCreator =
+            array("id"         => "Creator.id",
+                  "localKey"   => "creator_id",
+                  "description" => "Evaluations to show:",
+                  "default" => $myID,
+                  "list" => $userList,
+                  "joinTable"  => "users",
+                  "joinModel"  => "Creator");
+          // put all the joins together
+          $joinTables = array($jointTableCreator);
 
-		// List only my own or
-		$myID = $this->Auth->user('id');
-		$extraFilters = "(Mixeval.creator_id=$myID or Mixeval.availability='public')";
+          // List only my own or
+          $myID = $this->Auth->user('id');
+          $extraFilters = "(Mixeval.creator_id=$myID or Mixeval.availability='public')";
 
-		// Instructors can only edit their own evaluations
-		$restrictions = "";
-		if ($this->Auth->user('role') != 'A') {
-			$restrictions = array(
-        "Mixeval.creator_id" => array(
-			$myID => true,
-          "!default" => false));
-		}
+          // Instructors can only edit their own evaluations
+          $restrictions = "";
+          if ($this->Auth->user('role') != 'A') {
+                  $restrictions = array(
+                  "Mixeval.creator_id" => array(
+                                  $myID => true,
+                    "!default" => false));
+          }
 
-		// Set up actions
-		$warning = "Are you sure you want to delete this evaluation permanently?";
-		$actions = array(
-		array("View Evaluation", "", "", "", "view", "Mixeval.id"),
-		array("Edit Evaluation", "", $restrictions, "", "edit", "Mixeval.id"),
-		array("Copy Evaluation", "", "", "", "copy", "Mixeval.id"),
-		array("Delete Evaluation", $warning, $restrictions, "", "delete", "Mixeval.id"),
-		array("View Creator", "",    "", "users", "view", "Creator.id"));
+          // Set up actions
+          $warning = "Are you sure you want to delete this evaluation permanently?";
+          $actions = array(
+          array("View Evaluation", "", "", "", "view", "Mixeval.id"),
+          array("Edit Evaluation", "", $restrictions, "", "edit", "Mixeval.id"),
+          array("Copy Evaluation", "", "", "", "copy", "Mixeval.id"),
+          array("Delete Evaluation", $warning, $restrictions, "", "delete", "Mixeval.id"),
+          array("View Creator", "",    "", "users", "view", "Creator.id"));
 
-		// No recursion in results
-		$recursive = 0;
+          // No recursion in results
+          $recursive = 0;
 
-		// Set up the list itself
-		$this->AjaxList->setUp($this->Mixeval, $columns, $actions,
-                           "Mixeval.name", "Mixeval.name", $joinTables, $extraFilters, $recursive, "postProcess");
-	}
+          // Set up the list itself
+          $this->AjaxList->setUp($this->Mixeval, $columns, $actions,
+                     "Mixeval.name", "Mixeval.name", $joinTables, $extraFilters, $recursive, "postProcess");
+  }
 
 	function index() {
 		// Set up the basic static ajax list variables
