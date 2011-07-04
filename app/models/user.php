@@ -201,9 +201,10 @@ class User extends AppModel
                                                             'password' => $password)));
   }
 
-  function findUserByStudentNo ($studentNo) {
+  function findUserByStudentNo ($studentNo = null) {
+    if(!empty($studentNo)){
     return $this->find('first', array('conditions' => array('student_no' => $studentNo,
-                                                            )));
+                                                            )));}
   }
 
   function findUserByid ($id, $params = array()) {
@@ -218,8 +219,9 @@ class User extends AppModel
   }
 
   function getUserIdByStudentNo($studentNo) {
+    if(!empty($studentNo)){
     $tmp = $this->findUserByStudentNo($studentNo);
-    return $tmp['User']['id'];
+    return $tmp['User']['id']; }
   }
 
   function getEnrolledStudents($course_id, $fields = array(), $conditions=null) {
@@ -275,11 +277,11 @@ class User extends AppModel
     if(!isset($user['User']) || !is_array($user['User'])) return false;
     if('A' == $user['User']['role']) return true;
     if('S' == $user['User']['role']) return false;
-    if(!isset($user['UserCourse']) || !is_array($user['UserCourse'])) return false;
+    if(!isset($user['Course']) || !is_array($user['Course'])) return false;
     
-    foreach($user['UserCourse'] as $c)
+    foreach($user['Course'] as $c)
     {
-      if($c['course_id'] == $course_id) return true;
+      if($c['id'] == $course_id) return true;
     }
     return false;
   }
@@ -413,7 +415,7 @@ class User extends AppModel
   function getStudentsNotInGroup($group_id, $type = 'all') {
   	
 
-  
+  if($group_id = null) {return false;}
   	
     $groups_member = Classregistry::init('GroupsMember');
     $dbo = $groups_member->getDataSource();
