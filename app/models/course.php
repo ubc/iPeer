@@ -98,18 +98,46 @@ class Course extends AppModel
     $this->virtualFields['student_count'] = sprintf('SELECT count(*) as count FROM user_enrols as enrol WHERE enrol.course_id = %s.id', $this->alias);
   }
 
+  /**
+   * 
+   * Get instructors
+   * @param unknown_type $type search type
+   * @param unknown_type $params search parameters
+   * @return List of instructors
+   */
+  
   function getAllInstructors($type, $params = array()){
     return ClassRegistry::init('User')->getInstructors($type, $params);
   }
  
+  /**
+   * 
+   * Delete instructor from a course
+   * @param unknown_type $course_id course id
+   * @param unknown_type $user_id user id
+   */
   function deleteInstructor($course_id, $user_id){
     return $this->habtmDelete('Instructor', $course_id, $user_id);
   }
 
+  /**
+   * 
+   * Add instructor to a course
+   * @param unknown_type $course_id course id
+   * @param unknown_type $user_id user id
+   */
   function addInstructor($course_id, $user_id){
-    return $this->habtmAdd('Instructor', $course_id, $user_id);
+    $user = ClassRegistry::init('User')->findUserByid($user_id);
+    if($user['User']['role'] != 'S') { 
+      return $this->habtmAdd('Instructor', $course_id, $user_id);
+    }
   } 
   
+  /**
+   * 
+   * Get inactive courses
+   * @return list of inactive courses
+   */
   function getInactiveCourses(){
     return $this->find('all', array('conditions' => array('record_status' => 'I')));
   }
@@ -118,7 +146,6 @@ class Course extends AppModel
     if (empty($data['data']['Course']['record_status'])) {
       $data['data']['Course']['record_status'] = $data['form']['record_status'];
     }
-
 
     if( !empty($data['form']['self_enroll']))
       $data['data']['Course']['self_enroll'] = "on";
@@ -181,17 +208,29 @@ class Course extends AppModel
       return true;
     }
   }
-  // Find all accessible courses id
+  
+  /**
+   * 
+   * Find all accessible courses id
+   * @param unknown_type $user user data
+   * @return list of accessible courses
+   */  
+
   function findAccessibleCoursesList($user=null){
     $userId=$user['id'];
     $userRole=$user['role'];
     return $this->findAccessibleCoursesListByUserIdRole($userId, $userRole);
   }
 
-  
+  /**
+   * 
+   * Find all accessible courses id
+   * @param unknown_type $userId user id
+   * @param unknown_type $userRole user role
+   * @param unknown_type $condition search conditions
+   * @return list of course ids
+   */
 
-#### Function modified by Tony (March 11/2011)
-  // Find all accessible courses id
   function findAccessibleCoursesListByUserIdRole($userId=null, $userRole='', $condition=null){
 
   	
@@ -275,7 +314,14 @@ class Course extends AppModel
     }
   }
 
-  // Find the record count of all accessible courses
+  /**
+   * 
+   * Find the record count of all accessible courses
+   * @param unknown_type $userId user id
+   * @param unknown_type $userRole user role
+   * @param unknown_type $condition search conditions
+   */
+
   function findAccessibleCoursesCount($userId=null, $userRole=null, $condition=null){
   	
     switch($userRole){
@@ -328,7 +374,13 @@ class Course extends AppModel
     
   }
 
-//Verifies that a user matches with his/her userRole.
+  /**
+   * Verifies that a user matches with his/her userRole.
+   * @param $userName username	
+   * @param $userRole user role
+   * @return true if the role is verified
+   */
+
   function verifyUserRole($userName=null, $userRole=null){
   
   	$this->User =& ClassRegistry::init('User');
@@ -339,8 +391,16 @@ class Course extends AppModel
   	return 0;
   }
   
-#### Function was modified by Tony (March 14/2011)
-  // Generates SQL for querrying courses, only Instructors and admin can access this function.
+
+/**
+ * 
+ * Generates SQL for querrying courses, only Instructors and admin can access this function.
+ * @param unknown_type $userId user id
+ * @param unknown_type $enrolled if enrolled
+ * @param unknown_type $getCount if count is needed
+ * @param unknown_type $requester requester id
+ * @param unknown_type $requester_role requester role
+ */
   function generateRegisterCourse($userId, $enrolled = true, $getCount = false,  $requester = null, $requester_role = null)
   {
     //verify that all necessary inputs are not null && requester's role indeed matches with $requester_role
@@ -374,26 +434,60 @@ class Course extends AppModel
       return array();
   }
 
+  /**
+   * 
+   * Courses registered for a user
+   * @param unknown_type $user_id user id
+   * @param unknown_type $requester requester id
+   * @param unknown_type $requester_role requester role
+   * @return list of courses
+   */
   function findRegisteredCoursesList($user_id, $requester = null, $requester_role = null){
 	return $this->generateRegisterCourse($user_id, true, false, $requester, $requester_role);
   } 
 
+  /**
+   * 
+   * List of courses not registered for a user
+   * @param unknown_type $user_id user id
+   * @param unknown_type $requester requester id
+   * @param unknown_type $requester_role requester role
+   * @return list of courses
+   */
   function findNonRegisteredCoursesList($user_id, $requester = null, $requester_role = null) {
     return $this->generateRegisterCourse($user_id, false, false, $requester, $requester_role);
   }
-
+   /**
+   * 
+   * Count of courses not registered for a user
+   * @param unknown_type $user_id user id
+   * @param unknown_type $requester requester id
+   * @param unknown_type $requester_role requester role
+   * @return list of courses
+   */
+  
   function findNonRegisteredCoursesCount($user_id, $requester = null, $requester_role = null){
     return $this->generateRegisterCourse($user_id, false, true, $requester, $requester_role);
   }
   
+  /**
+   * 
+   * Get cource name by id
+   * @param unknown_type $id course id
+   * @return course name
+   */
   function getCourseName($id) {
     $tmp = $this->read(null, $id);
     return $tmp['Course']['course'];
   }
 
+  /**
+   * Delete course and all related items
+   * @param $id course id
+   */
   function deleteAll($id=null) {
     //delete self
-    if ($this->delete($id)) {
+   if($this->delete($id)){
       //delete user course,user enrol handled by hasMany
       $events = $this->Event->find('all', array('conditions' => array('course_id' => $id)));
       foreach ($events as $event)
@@ -401,14 +495,34 @@ class Course extends AppModel
     }
   }
 
+  /**
+   * 
+   * Count students enrolled in a course
+   * @param unknown_type $course_id course id
+   * @return  count of enrolled students
+   */
   function getEnrolledStudentCount($course_id) {
     return $this->Instructor->find('count', array('conditions' => array('Enrolment.id' => $course_id)));
   }
   
+  /**
+   * 
+   * Get course data by course name
+   * @param unknown_type $course course name
+   * @param unknown_type $params search params
+   * @return course data
+   */
   function getCourseByCourse($course, $params =null) {
     return $this->find('all', array_merge(array('conditions' => array('course' => $course)), $params));
   }
 
+  /**
+   * 
+   * Get course data by instructor id
+   * @param unknown_type $course instructor id
+   * @param unknown_type $params search params
+   * @return course data
+   */
   function getCourseByInstructor($instructor_id) {
     return $this->find('all', array('conditions' => array('Instructor.id' => $instructor_id),
                                     'fields' => array('Course.*')));

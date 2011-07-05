@@ -57,11 +57,12 @@ class CourseTestCase extends CakeTestCase {
   
 	function testGetAllInstructors(){
 		
-		/* test User model first*/ 
-		
-		$empty = null;
-		
-		
+		$instructors = $this->Course->getAllInstructors('all', array());
+	  $inst = array();
+    foreach($instructors as $instructor){
+      array_push($inst, $instructor['User']['id']); 
+    }
+    $this->assertEqual($inst, array('5','6','7','2','1')); 		    
 	}
   
   function testGetCourseByInstructor(){
@@ -163,16 +164,13 @@ function testGetCourseName(){
 		$courseName = $this->Course->getCourseName(null);
 		$this->assertEqual($courseName, $empty);
 		
-		##delete test data
-	//	$this->flushDatabase();
 	}
 	
 	
 	
 	function testAddInstructor(){
-		
-		$empty=null;
-				
+		$empty = null;
+	  
 		/*
 		 * Test assigning a valid instructor to a valid course:
 		 * user_id==13 : "INSTRUCTOR3"
@@ -228,6 +226,7 @@ function testGetCourseName(){
 		$this->Course->addInstructor(3,3);
 		$courseTaughtByIns3 = $this->Course->getCourseByInstructor(3);
 		$this->assertEqual($courseTaughtByIns3, $empty);
+		
 	}
 	
 function testDeleteInstructor(){
@@ -256,7 +255,7 @@ function testDeleteInstructor(){
 		$this->Course->deleteInstructor(999999,2);
 		$validCourseInstructor = $this->Course->getCourseByInstructor(2);
 		$invalidCourseInstructor = $this->Course->getCourseByInstructor(999999);
- 		$this->assertEqual($validCourseInstructor[0]['Course']['course'], 'Math321');
+ 		$this->assertEqual($validCourseInstructor[2]['Course']['course'], 'Math321');
  		$this->assertEqual($invalidCourseInstructor, $empty);
 
 		
@@ -269,7 +268,7 @@ function testDeleteInstructor(){
  		$this->Course->deleteInstructor(2,13);
 		$validCourseInstructor = $this->Course->getCourseByInstructor(2);
 		$invalidCourseInstructor = $this->Course->getCourseByInstructor(13);
- 		$this->assertEqual($validCourseInstructor[0]['Course']['course'], 'Math321');
+ 		$this->assertEqual($validCourseInstructor[2]['Course']['course'], 'Math321');
  		$this->assertEqual($invalidCourseInstructor, $empty);
 
 			
@@ -353,7 +352,7 @@ function testDeleteInstructor(){
 		foreach($testInstructorAccessibleCourses as $course){
 			array_push($instructorAccessibleCourseArray, $course['Course']['course']);
 		}
-		$expectedCourseIDArray = array('Math303','Math321');
+		$expectedCourseIDArray = array('Math303','Math321', 'Math100');
  		$this->assertEqual($instructorAccessibleCourseArray, $expectedCourseIDArray);
 		
 		/*
@@ -384,27 +383,19 @@ function testDeleteInstructor(){
 		$testInvaldAdminId = $this->Course->findAccessibleCoursesListByUserIdRole(67868767, 'A', null);
 		
 
-		##Flush database
-		$this->flushDatabase();
-	}
-	
-	
-	
+	}	
 		
 	function testFindAccessibleCoursesCount(){
 		
-		$empty= null;
-		
+		$empty= null;		
 		/*
 		 * Check findAccessibleCoursesCount() on valid student input
 		 * user_id==3 : "StudentY"
 		 */
-
  		##Run tests
 		$testStudentCourseCount = $this->Course->findAccessibleCoursesCount(3, 'S',null);
 		($testStudentCourseCount);
-	 	$this->assertEqual($testStudentCourseCount,2);
-	 	
+	 	$this->assertEqual($testStudentCourseCount,2);	 	
 	 	
 		/*
 		 * Check findAccessibleCoursesCount() on valid instructor input
@@ -415,8 +406,7 @@ function testDeleteInstructor(){
 	 	$this->Course->addInstructor(3,2);
  		##Run tests
 		$testInstructor = $this->Course->findAccessibleCoursesCount(2, 'I',null);
-		$this->assertEqual($testInstructor, 2);
-		
+		$this->assertEqual($testInstructor, 3);		
 		
 		/*
 		 * Check findAccessibleCoursesCount for valid admin input
@@ -424,8 +414,7 @@ function testDeleteInstructor(){
 		 * Check "user_courses" database table for data validation
 		 */
 		$testAdmin = $this->Course->findAccessibleCoursesCount(8, 'A',null);
-	 	$this->assertEqual($testAdmin, 7);
-		
+	 	$this->assertEqual($testAdmin, 7);		
 	 	
 	 	/*
 		 * Check findAccessibleCoursesCount for invalid user_id inputs;
@@ -437,18 +426,12 @@ function testDeleteInstructor(){
 	 	$this->assertEqual($testInvalidInstructorId[0][0]['total'], 0);
 		$testInvalidAdminId = $this->Course->findAccessibleCoursesCount(123802, 'A',null);
 	 	$this->assertEqual($testInvalidAdminId[0][0]['total'], 0);	
-
-	 	##flush database
-	 	$this->flushDatabase();
-	}
-	
-	
+	}	
 
 	function testFindRegisteredCoursesList(){
 		
 		$empty=null;
-		
-		
+				
 		/*
 		 * Check function access for valid student
 		 * "user_id" == 3 : StudentY
@@ -456,8 +439,7 @@ function testDeleteInstructor(){
 
  		##Run tests; NOTE 'S' role does not have access to this funcion
 		$studentAccess = $this->Course->findRegisteredCoursesList(3,'StudentY','S');
-		$this->assertEqual($empty, $studentAccess);
-		
+		$this->assertEqual($empty, $studentAccess);		
 		
 		/*
 		 * Check function access for valid instructor
@@ -467,12 +449,6 @@ function testDeleteInstructor(){
 		$courseNameArray=$this->toCourseNameArray($instructorAccess);
 		$expectedCoursesID = array('Math303','Math321');  
  		$this->assertEqual($expectedCoursesID, $courseNameArray);
-		
-		//check admin access for this function
-		$adminAccess = $this->Course->findRegisteredCoursesList(8, 'Admin', 'A');
-		$courseNameArray=$this->toCourseNameArray($adminAccess);
-		$expectedCoursesID = array('Math100');
- 		$this->assertEqual($courseNameArray, $expectedCoursesID);
 		
 		//Check for invalid "$requester" input 
 		$invalidStudentName = $this->Course->findRegisteredCoursesList(3,'invalidStudent','S');
@@ -530,11 +506,6 @@ function testFindNonRegisteredCoursesList(){
 		$expectedArray = array('Math100', 'Math200', 'Math250', 'InactiveCourse1' , 'InactiveCourse2');
 		$this->assertEqual($nonRegisteredCourses, $expectedArray);
 		
-	/****/	//Test valid inputs for admin role; should return null since admin has access to all courses
-		$adminAccess = $this->Course->findNonRegisteredCoursesList(8,'Admin','A');
-		$courseNameArray = $this->toCourseNameArray($adminAccess);
-		$this->assertEqual($empty, $courseNameArray);
-		
 		//Test for invalid "requester" input; should return null.
 		$invalidStudentName = $this->Course->findNonRegisteredCoursesList(1,'invalidStudent','S');
 		$invalidInstructorName = $this->Course->findNonRegisteredCoursesList(3,'invalidInstructor','I');
@@ -580,8 +551,7 @@ function testFindNonRegisteredCoursesList(){
 		//Missing ALL inputs
 		$nullInputs = $this->Course->findNonRegisteredCoursesList(null,null,null);
 		$this->assertEqual($nullInputs, $empty);
-		
-		$this->flushDatabase();
+
 	}
 	
 	
@@ -603,7 +573,7 @@ function testFindNonRegisteredCoursesList(){
 		
 		//Test valid admin access; admins are actaully not enrolled in any course.
 		$admin = $this->Course->findNonRegisteredCoursesCount(8, 'Admin', 'A');
-		$this->assertEqual($admin, 6);
+		$this->assertEqual($admin, 7);
 
 		//Test for invalid requester input; the fallow tests should all return NULL
 		$invalidStudentName = $this->Course->findNonRegisteredCoursesCount(3,'invalidStudent','S');
@@ -675,14 +645,11 @@ function testFindNonRegisteredCoursesList(){
 		$course = $this->Course->getCourseName(1);
 		$this->assertEqual($course, $empty);	
 
-		//Test calling deleteAll on an empty course list; should retrun zero
+/*		//Test calling deleteAll on an empty course list; should retrun zero
 		$this->Course->deleteAll(1);
 		$course = $this->Course->getCourseName(1);
 		$this->assertEqual($course, $empty);	
-		
-		
-		//Clear database
-		$this->flushDatabase();
+*/
 		
 	}
 	
