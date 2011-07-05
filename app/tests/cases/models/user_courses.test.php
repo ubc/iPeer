@@ -50,7 +50,7 @@ class UserCourseTestCase extends CakeTestCase {
 		$this->flushDatabase();
   }
 
-  function testUserEnrolInstance() {
+  function testUserCourseInstance() {
     $this->assertTrue(is_a($this->UserCourse, 'UserCourse'));
   }
 

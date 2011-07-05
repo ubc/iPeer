@@ -6,7 +6,12 @@ class UserCourse extends AppModel
   var $belongsTo = array('User');
   var $actsAs = array('Traceable');
 
-  // saves all the instructors associated with a course to the user_courses table
+  /**
+   * 
+   * Saves all the instructors associated with a course to the user_courses table
+   * @param $course_id course id
+   * @param $data instructors' data
+   */
   function insertInstructors($course_id=null, $data=null){
     $instructorIDs = '';
   	for( $i=1; $i<=$data['count']; $i++ ){
@@ -28,7 +33,12 @@ class UserCourse extends AppModel
   	}
   }
 
-  // returns all the instructor names and ids for display on the view page
+  /**
+   * 
+   * returns all the instructor names and ids for display on the view page
+   * @param $id instructor id
+   * @return UserCourse data
+   */
   function getInstructors($id=null){
   	//$result = $this->query('SELECT User.id, User.first_name, User.last_name, User.email FROM user_courses JOIN users as User ON User.id=user_courses.user_id AND User.id <> 1 WHERE course_id='.$id);
   	//return $result;
@@ -38,7 +48,12 @@ class UserCourse extends AppModel
     ));
   } 
   
-  // returns all the instructor list
+  /**
+   * 
+   * Returns all the instructor id list 
+   * @param $course_id course id
+   * @return list of instuctors' ids
+   */
   function getInstructorsId($course_id = null){
       return $this->find('list', array(
           'conditions' => array('course_id' => $course_id),
@@ -47,7 +62,11 @@ class UserCourse extends AppModel
 
   }
 
-  // function called for every newly added course to place root account as admin
+  /**
+   * 
+   * function called for every newly added course to place root account as admin
+   * @param $id user id
+   */
   function insertAdmin($id=null){
     $tmp = array( 'user_id'=>1, 'course_id'=>$id, 'access_right'=>'A', 'record_status'=>'A' );
   	$this->save($tmp);
