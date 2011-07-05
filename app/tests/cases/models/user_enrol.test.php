@@ -123,16 +123,10 @@ class UserEnrolTestCase extends CakeTestCase {
   	$this->assertEqual($user, true);
 
   	 //Test insert invalid student into valid course
-  	$this->UserEnrol->insertCourses(999, array(1));
-  	$user = $this->UserEnrol->isEnrolledInByUsername('StudentY', 1);
+  	$this->UserEnrol->insertCourses(999, array(5));
+  	$user = $this->UserEnrol->isEnrolledInByUsername('StudentY', 5);
   	$this->assertEqual($user, false);
-  	
-  	//Test insert valid student into invalid course
-  	$this->UserEnrol->insertCourses(3, array(999));
-  	$user = $this->UserEnrol->isEnrolledInByUsername('StudentY', 999);
-  	$this->assertEqual($user, false);
-  	
-  	  	
+  	  	  	
   	//Test insert invalid student into invalid course
   	$this->UserEnrol->insertCourses(9999, array(999));
   	$user = $this->UserEnrol->isEnrolledInByUsername('StudentY', 1);

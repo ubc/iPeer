@@ -6,22 +6,12 @@ class UserEnrol extends AppModel
 
   var $belongsTo = array('User');
     
-  //Moved function to User
- /* function getEnrolledCourses($userId=null)
-  {
-    //$result = $this->find('all','user_id='.$userId, 'DISTINCT course_id');
-    return $this->find('all', array(
-        'conditions' => array('user_id' => $userId),
-        'fields' => array('DISTINCT course_id')
-    ));
-  }*/
-
-  // Deprecated: replaced by virtual field student_count in course model
-  /*function getEnrolledStudentCount($courseId=null) {
-    $conditions = array('course_id' => $courseId,
-                        );
-    return $this->find('count', array('conditions' => $conditions));
-  }*/
+/**
+ * 
+ * Remove student from course
+ * @param unknown_type $user_id user id
+ * @param unknown_type $course_id course id
+ */
 
   function removeStudentFromCourse($user_id=null, $course_id=null) {
     //$course_to_remove = $this->find(array('course_id=' . $course_id, 'user_id=' . $user_id));
@@ -31,17 +21,25 @@ class UserEnrol extends AppModel
     return $this->delete($course_to_remove['UserEnrol']['id']);
   }
   
-  // Returns true if the username is enrolled in the course, and false if not.
-  function isEnrolledInByUsername($username, $courseId) {
-//    $result = $this->query("select User.id from users join user_enrols" .
-//                            "on users.id=user_enrols.user_id " .
-//                            "where username=$username and course_id=$courseId");
-//    return count($results) > 0;    
+  /**
+   * 
+   * Returns true if the username is enrolled in the course, and false if not.	
+   * @param unknown_type $username username		
+   * @param unknown_type $courseId course id
+   * @return true if user is enrolled  in a course
+   */ 
+  function isEnrolledInByUsername($username, $courseId) { 
     return $this->find('count', array(
         'conditions' => array('UserEnrol.course_id' => $courseId, 'User.username' => $username)
     ));
   }
 
+  /**
+   * 
+   * Enroll user in courses
+   * @param unknown_type $user_id user id
+   * @param unknown_type $course_ids course id
+   */
   function insertCourses ($user_id, $course_ids) {
 
     if(!is_array($course_ids) || empty($course_ids) || $user_id <= 0) return;
@@ -59,10 +57,22 @@ class UserEnrol extends AppModel
     }
   }
   
+  /**
+   * 
+   * Get courses a user is enrolled in
+   * @param unknown_type $userId user id
+   * @return list of course ids
+   */
 function getEnrolledCourses($userId=''){
   	return $this->find('all',array('conditions'=>array('user_id'=>$userId), 'fields'=>array('course_id')));
   }
 
+  /**
+   * 
+   * Get list of users enrolled in a course
+   * @param unknown_type $course_id
+   * @return list of user ids
+   */
   function getUserListByCourse($course_id){
     $this->displayField = 'user_id';
     return $this->find('list', array(
