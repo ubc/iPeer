@@ -196,34 +196,75 @@ class User extends AppModel
     return true;
   }
 
+  /**
+   * 
+   * Find user by username and password
+   * @param $username user's username
+   * @param $password user's password
+   * @return array with user data
+   */
+  
   function findUser ($username, $password) {
     return $this->find('first', array('conditions' => array('username' => $username,
                                                             'password' => $password)));
   }
 
+  /**
+   * 
+   * Find user by student number
+   * @param $studentNo student number
+   * @return array with user data
+   */
   function findUserByStudentNo ($studentNo = null) {
     if(!empty($studentNo)){
     return $this->find('first', array('conditions' => array('student_no' => $studentNo,
                                                             )));}
   }
 
+  /**
+   * 
+   * Get user by user id
+   * @param $id user id
+   * @param $params search parameters
+   * @return array with user data
+   */
   function findUserByid ($id, $params = array()) {
     return $this->find('first', array_merge(array('conditions' => array($this->name.'.id' => $id,
                                                             )),
                                             $params));
   }
 
+  /**
+   * 
+   * Get user by username
+   * @param $username user's username
+   * @return array with user data
+   */
   function getByUsername($username) {
     return $this->find('first', array('conditions' => array('username' => $username,
                                                             )));
   }
 
+  /**
+   * 
+   * Get user id by student no
+   * @param $studentNo student number
+   * @return user id
+   */
   function getUserIdByStudentNo($studentNo) {
     if(!empty($studentNo)){
     $tmp = $this->findUserByStudentNo($studentNo);
     return $tmp['User']['id']; }
   }
 
+  /**
+   * 
+   * Get student enrolled in a course
+   * @param $course_id course id
+   * @param $fields fields to return
+   * @param $conditions conditions of search
+   * @return students enrolled in a course
+   */
   function getEnrolledStudents($course_id, $fields = array(), $conditions=null) {
     return $this->find('all', array('conditions' => array('Enrolment.id' => $course_id),
                                     'fields' => 'User.*',
@@ -234,6 +275,13 @@ class User extends AppModel
   	$this->log($temp);
   }
 
+  /**
+   * 
+   * Get list of student enrolled students
+   * @param $course_id course id
+   * @return list of enrolled students
+   */
+  
   function getEnrolledStudentsForList($course_id) {
     $this->displayField = 'student_no_with_full_name';
     return $this->find('list', array('conditions' => array('UserEnrol.course_id' => $course_id, 'User.role' => 'S'),
@@ -243,18 +291,29 @@ class User extends AppModel
                                                            'conditions' => array('User.id = UserEnrol.user_id'))
                                                     ),
                                     'order' => 'User.student_no'));
-
   }
-
+  
+  /**
+   * 
+   * Get user by email
+   * @param $email user's email
+   * @return array with user data
+   */
 
   function getUserByEmail($email='') {
     //return $this->find( "email='" . $email );
       return $this->find('first', array(
           'conditions' => array('email' => $email)
       ));
-
   }
 
+  /**
+   * 
+   * Get user by email and student number
+   * @param $email user's email
+   * @param $studentNo user's student number
+   * @return array with user data
+   */
   function findUserByEmailAndStudentNo($email='', $studentNo='') {
     //return $this->find("email='" .$email . "' AND student_no='" . $studentNo . "'");
       return $this->find('first', array(
@@ -276,6 +335,7 @@ class User extends AppModel
 
     if(!isset($user['User']) || !is_array($user['User'])) return false;
     if('A' == $user['User']['role']) return true;
+    if('SA' == $user['User']['role']) return true;
     if('S' == $user['User']['role']) return false;
     if(!isset($user['Course']) || !is_array($user['Course'])) return false;
     
@@ -285,6 +345,13 @@ class User extends AppModel
     }
     return false;
   }
+  
+  /**
+   * 
+   * Get full name of a role by letter abbreviation
+   * @param $role abbreviation
+   * @return full name of a role
+   */
   
   function getRoleText($role)
   {
@@ -302,7 +369,12 @@ class User extends AppModel
     return $text;}
     else return null;
   }
-
+  /**
+   * 
+   * Hash password
+   * @param $data array containing password
+   * @return hashed password
+   */
   function hashPasswords($data) {
     if (isset($data['User']['password'])) {
       $data['User']['password'] = md5($data['User']['password']);
@@ -311,24 +383,51 @@ class User extends AppModel
     return $data;
   }
 
+  /**
+   * 
+   * Get user's role by id
+   * @param $id user id
+   * @return role
+   */
   function getRoleById($id) {
+    
     $user = $this->find('first', array('conditions' => array('id'=>$id)));
     return (!empty($user['Role'][0]['name'])) ? $user['Role'][0]['name'] : null;
   }
+  
+  /**
+   * 
+   * Get user's roles
+   * @param $id user id
+   * @return array of user's roles
+   */
 
   function getRoles($id) {
     $user = $this->read(null, $id);
     return $this->getRolesByRole($user['Role']);
   }
 
+  /**
+   * 
+   * Get role names by role ids
+   * @param $roles array of role ids
+   * @return role names
+   */
   function getRolesByRole($roles) {
     $ret = array();
+    if(!empty($roles)){
     foreach($roles as $role) {
       $ret[$role['id']] = $role['name'];
-    }
+    }}
     return $ret;
   }
 
+  /**
+   * 
+   * Return true if roles is any other then student
+   * @param $roles roles
+   * @return true if role isnt a student
+   */
   function hasTitle($roles) {
     $hasTitle = false;
     foreach($roles as $key => $role) {
@@ -345,6 +444,12 @@ class User extends AppModel
     return $hasTitle;
   }
 
+  /**
+   * 
+   * Return true if role is a student
+   * @param $roles roles
+   * @return true if role is a student
+   */
   function hasStudentNo($roles) {
     $hasStudentNo = false;
     foreach($roles as $key => $role) {
@@ -360,23 +465,58 @@ class User extends AppModel
     }
     return $hasStudentNo;
   }
+  
+  /**
+   * 
+   * Remove user from a course
+   * @param $id
+   * @param $course_id
+   */
 
   function dropCourses($id, $course_id) {
     $this->habtmDelete('Course', $id, $course_id);
   }
 
+  /**
+   * 
+   * Add user to the course
+   * @param $id user id
+   * @param $course_id course id
+   * @return true if user is added
+   */
   function registerCourses($id, $course_id) {
     $this->habtmAdd('Course', $id, $course_id);
   }
 
+  /**
+   * 
+   * Remove enrolled user from course
+   * @param $id user id
+   * @param $course_id course id
+   * @return true if user is added
+   */
   function dropEnrolment($id, $course_id) {
     $this->habtmDelete('Enrolment', $id, $course_id);
   }
 
+  /**
+   * 
+   * Enroll user in a course
+   * @param $id user id
+   * @param $course_id course id
+   * @return true if user is enrolled
+   */
   function registerEnrolment($id, $course_id) {
     $this->habtmAdd('Enrolment', $id, $course_id);
   }
    
+  /**
+   * 
+   * Get list of instructors
+   * @param $type type of search: all, first, list
+   * @param $params search parameters
+   * @return list of instructors
+   */
   function getInstructors($type, $params) {
     $defaults = array('order' => $this->alias.'.first_name');
     $params = array_merge($defaults, $params);
@@ -412,6 +552,13 @@ class User extends AppModel
     return $ret;
   }
 
+  /**
+   * 
+   * Get students not in group	
+   * @param $group_id group id
+   * @param $type type of search
+   * @return search results
+   */
   function getStudentsNotInGroup($group_id, $type = 'all') {
   	
 
@@ -447,19 +594,16 @@ class User extends AppModel
                                     'recursive' => 1));
  	                            
   }
-
+  
+  /**
+   * 
+   * Get members in a group
+   * @param $group_id group id
+   * @param $type type of search
+   * @return search result
+   */
   function getMembersByGroupId($group_id, $type = 'all') {
-//    $ret = array();
-//    $this->displayField = 'student_no_with_full_name';
-//    if('list' != $type) {
-//      $ret = $this->find($type, array('conditions' => array('Group.id' => $group_id)));
-//    } else {
-//      $data = $this->find('all', array('conditions' => array('Group.id' => $group_id)));
-//      foreach($data as $d) {
-//        $ret[$d[$this->alias]['id']] = $d[$this->alias][$this->displayField];
-//      }
-//    }
-//    return $ret;
+
     $groups_member = Classregistry::init('GroupsMember');
     $dbo = $groups_member->getDataSource();
     $subQuery = $dbo->buildStatement(array('fields' => array('GroupsMember.user_id'),
@@ -490,7 +634,12 @@ class User extends AppModel
                                     'recursive' => 1));
   }
   
-function getCurrentLoggedInUser(){
+  /**
+   * 
+   * Get current logged in user
+   * @return $user logged in user
+   */
+  function getCurrentLoggedInUser(){
 
       App::import('Component', 'Session');
     $Session = new SessionComponent();

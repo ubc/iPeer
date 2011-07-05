@@ -11,4 +11,14 @@ class RoleFixture extends CakeTestFixture {
 		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),
 		'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'InnoDB')
 	);
+
+	  var $records = array(
+    array('id' => 1, 'name' => 'superadmin'),
+    array('id' => 2, 'name' => 'admin'),
+    array('id' => 3, 'name' => 'instructor'),
+    array('id' => 4, 'name' => 'student'),
+            
+  );
+	
 }
+

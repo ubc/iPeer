@@ -1,5 +1,6 @@
 <?php
 App::import('Model', 'User');
+App::import('Model', 'UserCourse');
 App::import('Component', 'Auth');
 
 class FakeController extends Controller {
@@ -23,6 +24,7 @@ class UserTestCase extends CakeTestCase {
 
   function startCase() {
 		$this->User = ClassRegistry::init('User');
+		$this->UserCourse = ClassRegistry::init('UserCourse');		
     $admin = array('User' => array('username' => 'root',
                                    'password' => 'ipeer'));
     $this->controller = new FakeController();
@@ -141,7 +143,6 @@ class UserTestCase extends CakeTestCase {
 		$this->assertEqual($checkDuplicate1['User']['username'], "StudentY");
 		$this->assertEqual($checkDuplicate2['User']['username'], "StudentZ");
 		
-		$this->flushDatabase();
 	}
 	
 	
@@ -202,12 +203,8 @@ class UserTestCase extends CakeTestCase {
 		//Test an invalid corse, course_id==231321 (invalid)
 		$invalidCourse = $this->User->getEnrolledStudents(231321);
 		$this->assertEqual($invalidCourse, $empty);
-		
-		
-		$this->flushDatabase();
 	}
-	
-	
+		
 	function TestGetEnrolledStudentsForList()
 	{
 
@@ -351,21 +348,21 @@ class UserTestCase extends CakeTestCase {
 		$studentRole=$this->User->getRoleById(3);
 		$this->assertEqual($studentRole, 'student');
 		
-/*		//user_id==13 : role(instructor)
-		$instructorRole=$this->User->getRoleById(13);
+		//user_id==13 : role(instructor)
+		$instructorRole=$this->User->getRoleById(1);
 		$this->assertEqual($instructorRole, 'instructor');
 		
 		//user_id==20 : role(admin)
-		$adminRole = $this->User->getRoleById(20);
+		$adminRole = $this->User->getRoleById(9);
 		$this->assertEqual($adminRole,'admin');
 		
 		//user_id==9 : role(unassigned)
-		$unassignedRole = $this->User->getRoleById(9);
+		$unassignedRole = $this->User->getRoleById(13);
 		$this->assertEqual($unassignedRole, $empty);
 		
 		//null input
 		$nullInput = $this->User->getRoleById(null);
-		$this->assertEqual($nullInput, $empty);*/
+		$this->assertEqual($nullInput, $empty);
 
 	}
 	
@@ -410,12 +407,13 @@ class UserTestCase extends CakeTestCase {
 		
 		//Test function for valid users and course
 		##Run test
-		$studentNotInGroup = $this->User->getStudentsNotInGroup(2);
+		$studentNotInGroup = $this->User->getStudentsNotInGroup(3);
 		$studentsArray=array();
 		foreach($studentNotInGroup as $student){
 			array_push($studentsArray, $student['User']['username']);		
 		}
-		$expect = array('StudentZ', 'StudentY');
+		
+		$expect = array('StudentZ', 'StudentY',);
 		$this->User->printHelp($studentNotInGroup);
 		$this->assertEqual($studentsArray, $expect);		
 
@@ -427,9 +425,7 @@ class UserTestCase extends CakeTestCase {
 		$studentNotInGroup = $this->User->getStudentsNotInGroup(null);
 		$this->assertEqual($studentNotInGroup, $empty);
 		
-		
-		//clear data
-		$this->flushDatabase();
+
 	}
 
 	function TestFindUserByid(){
@@ -462,18 +458,70 @@ class UserTestCase extends CakeTestCase {
 		
 	}
 	
-	//TODO
 	function testGetRoles() {
 	 	  
-	  $role = $this->User->getRoles(1);
+	  $roles = $this->User->getRoles(1);
+		$role = array();
+	  foreach($roles as $r){
+			array_push($role, $r);		
+		}
+    
+		$this->assertEqual($role, array('instructor'));		
 	  
+    $roles = $this->User->getRoles(3);   
+		$role = array();
+	  
+		foreach($roles as $r){
+			array_push($role, $r);		
+		}
+    
+    $this->assertEqual($role, array('student'));   
+         
+	  $role = $this->User->getRoles(999);
+    $this->assertFalse($role);
+    
+	  $role = $this->User->getRoles(null);
+    $this->assertFalse($role);    
+     
 	}
-	//TODO
+
 	function testHasTitle() {
-	 	  
+	  
+	  $roles = $this->User->getRoles(3);
+	  $roles = $this->User->hasTitle($roles);
+	 	$this->assertFalse($roles);
+
+	  $roles = $this->User->getRoles(1);
+	  $roles = $this->User->hasTitle($roles);
+	 	$this->assertTrue($roles);	 	
+	 	
+	  $roles = $this->User->getRoles(999);
+	  $roles = $this->User->hasTitle($roles);
+	 	$this->assertFalse($roles);		 	
+	 	
+	  $roles = $this->User->getRoles(null);
+	  $roles = $this->User->hasTitle($roles);
+	 	$this->assertFalse($roles);	
+	 	
 	}
-	//TODO
+
 	function testHasStudentNo() {
+	  
+	  $roles = $this->User->getRoles(3);
+	  $roles = $this->User->hasStudentNo($roles);
+	 	$this->assertTrue($roles);
+
+	  $roles = $this->User->getRoles(1);
+	  $roles = $this->User->hasStudentNo($roles);
+	 	$this->assertFalse($roles);	 	
+	 	
+	  $roles = $this->User->getRoles(999);
+	  $roles = $this->User->hasStudentNo($roles);
+	 	$this->assertFalse($roles);		 	
+	 	
+	  $roles = $this->User->getRoles(null);
+	  $roles = $this->User->hasStudentNo($roles);
+	 	$this->assertFalse($roles);		  
 	 	  
 	}
 			
@@ -489,15 +537,53 @@ class UserTestCase extends CakeTestCase {
 		$this->assertEqual($roles['1'], 'Instructor');
 		$this->assertEqual($roles['2'], 'Student');
 	}
-	
-	//TODO	
+
 	function testDropCourses() {	  
+	
+ 	 $search = $this->UserCourse->find('all', array ('conditions' => array('course_id' => 1), 'fields' => 'user_id'));
+	 $courses = array();
+	  
+	 foreach($search as $c){
+     array_push($courses, $c['UserCourse']['user_id']);		
+	 }
+	 $this->assertEqual($courses, array(1,2));
+	 	 
+	 $this->User->dropCourses(1,1);
+	 $search = $this->UserCourse->find('all', array ('conditions' => array('course_id' => 1), 'fields' => 'user_id'));
+	 
+	 $courses = array();
+	  
+	 foreach($search as $c){
+     array_push($courses, $c['UserCourse']['user_id']);		
+	 }
+	 $this->assertEqual($courses, array(2));
+
+	 $drop = $this->User->dropCourses(1,999);
+	 $this->assertFalse($drop);
+
+	 $drop = $this->User->dropCourses(999,1);
+	 $this->assertFalse($drop);	 
+	 
+	 $drop = $this->User->dropCourses(null,1);
+	 $this->assertFalse($drop);	
+
+	 $drop = $this->User->dropCourses(1,null);
+	 $this->assertFalse($drop);		 
 	}
 	
-	//TODO	
 	function testGetInstructors() {	  
+	
+	  $instructors = $this->User->GetInstructors('all', array());
+
+		$instructor = array();
+	  foreach($instructors as $c){
+      array_push($instructor, $c['User']['id']);		
+	  }
+	  $this->assertEqual($instructor, array(5,6,7,2,1));	  
 	}
 			
+	//is not used anywhere
+	
 	function TestRegisterEnrolment(){
 		/* TO DO */
 		
@@ -542,79 +628,6 @@ class UserTestCase extends CakeTestCase {
 ##########################################################################################################        
 	
 	
-	function createGroupHelper($id='', $group_num = ''){
-		
-		$this->User= & ClassRegistry::init('User');
-		
-		$sql = "INSERT INTO groups VALUES($id, $group_num, NULL, NULL, 'A', '0' ,'0000-00-00 00:00:00', NULL, NULL )";
-		$this->User->query($sql);
-	}
-	
-	function addGroupMemberHelper($id='',$group_id='', $user_id=''){
-		
-		$this->User= & ClassRegistry::init('User');
-		
-		$sql = "INSERT INTO groups_members VALUES($id, $group_id, $user_id)";
-		$this->User->query($sql);
-	}
-	
-  	function createUserHelper( $id ='' , $username='' , $role='', $password='' , $studentNo = '', $email=''){
-	
-  		$this->User= & ClassRegistry::init('User');
-  		
-		$query = "INSERT INTO users VALUES ('$id','$role' ,'$username' , '$password', NULL , NULL , '$studentNo' , NULL , '$email' , NULL , NULL , NULL , 'A', '0', '0000-00-00 00:00:00', NULL , NULL )";		
-		$this->User->query($query);
-		
-		$user_role;
-		switch($role){
-			
-			case 'SA': $user_role=1;
-					break;
-			case 'A': $user_role=2;
-					break;
-			case 'I': $user_role=3;
-					break;
-			case 'S': $user_role=4;
-					break; 
-			default: $user_role=0;
-		}
-		
-		$query = "INSERT INTO roles_users VALUES ('$id', $user_role, '$id', '0000-00-00 00:00:00','0000-00-00 00:00:00' )";
-		$this->User->query($query);
-	}	
-	
-	function enrollUserHelper( $id=null, $user_id=null, $course_id=null, $role=''){
-		
-		$this->User= & ClassRegistry::init('User');
-		
-		if($role=='S'){
-		$query = "INSERT INTO user_enrols VALUES ('$id', '$course_id', '$user_id','A', '0', '0000-00-00 00:00:00', NULL , NULL)";
-		$this->User->query($query);
-		}
-		
-		if($role=='I'){
-		$query = "INSERT INTO user_courses VALUES('$id' , '$user_id', '$course_id', 'O', 'A', '0', '0000-00-00 00:00:00', NULL , NULL)";
-		$this->User->query($query);
-		}
-	}
-	
-	function createCoursesHelper($id=null, $course=null, $title=null){
-		
-		$this->User= & ClassRegistry::init('User');
-		
-		$sql = "INSERT INTO courses VALUES ( '$id', '$course', '$title', NULL , 'off', NULL , 'A', '0', '0000-00-00 00:00:00', NULL , NULL , '0' ) "; 
-		$this->User->query($sql);		
-		
-	}
-	
-	function createInactiveCoursesHelper($id=null, $course=null, $title=null){
-		
-		$this->User= & ClassRegistry::init('User');
-		
-		$sql = "INSERT INTO courses VALUES ( '$id', '$course', '$title', NULL , 'off', NULL , 'I', '0', '0000-00-00 00:00:00', NULL , NULL , '0' ) "; 
-		$this->User->query($sql);		
-		
-	}
 	
 	function deleteAllTuples($table){
 
