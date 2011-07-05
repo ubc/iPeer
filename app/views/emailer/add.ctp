@@ -1,4 +1,7 @@
-<?php $readonly = isset($readonly) ? $readonly : false;?>
+<?php 
+  echo $html->script('emailer.js');
+  $readonly = isset($readonly) ? $readonly : false;
+?>
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>
@@ -19,11 +22,11 @@
     ?> Custom Email Template</td>
   </tr>
   <tr class="tablecell2">
-  	<td id="newemail_label">Custom Email Name:&nbsp;<font color="red">*</font></td>
+  	<td width="20%">Name:</td>
   	<td>
         <?php echo $form->input('EmailTemplate.name', array('size'=>'50','label'=>false,'readonly'=>$readonly));?>
         </td>
-        <td>&nbsp;</td>
+        <td width="20%">&nbsp;</td>
   </tr>
 
   <tr class="tablecell2">
@@ -50,9 +53,29 @@
     <td>&nbsp;</td>
   </tr>
 
+  <?php if(!$readonly): ?>
+  <tr class="tablecell2">
+    <td>Insert Merge Field:&nbsp;</td>
+    <td><?php echo $form->input('Email.merge', array(
+                'type' => 'select',
+                'id' => 'merge',
+                'name' => 'merge',
+                'options' => $mergeList,
+                'empty' => '-- Select Merge Field --',
+                'label' => false,
+                'onChange' => "insertAtCursor(document.frm.emailContent, this.value)"
+              ));?>  </td>
+    <td>&nbsp;</td>
+  </tr>
+  <?php endif; ?>
+  
   <tr class="tablecell2">
     <td>Content:&nbsp;</td>
-    <td><?php echo $form->textarea('EmailTemplate.content', array('rows' => '30', 'style'=>'width:70%;', 'readonly'=>$readonly)) ?>  </td>
+    <td><?php echo $form->textarea('EmailTemplate.content', array(
+        'id' => 'emailContent',
+        'rows' => '30',
+        'style'=>'width:70%;',
+        'readonly'=>$readonly)) ?>  </td>
     <td>&nbsp;</td>
   </tr>
 

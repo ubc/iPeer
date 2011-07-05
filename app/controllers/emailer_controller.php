@@ -9,7 +9,7 @@ App::import('Lib', 'neat_string');
 class EmailerController extends AppController
 {
   var $name = 'Emailer';
-  var $uses = array('GroupsMembers', 'UserEnrol', 'User', 'EmailTemplate', 'Personalize', 'SysParameter', 'SysFunction');
+  var $uses = array('GroupsMembers', 'UserEnrol', 'User', 'EmailTemplate', 'EmailMerge','Personalize', 'SysParameter', 'SysFunction');
   var $components = array('AjaxList', 'Session', 'RequestHandler', 'Email');
   var $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Pagination');
   var $show;
@@ -120,13 +120,13 @@ class EmailerController extends AppController
     //Set up user info
     $currentUser = $this->User->getCurrentLoggedInUser();
     $this->set('currentUser', $currentUser);
-    
+    $this->set('mergeList', $this->EmailMerge->getMergeList());
     if (empty($this->params['data'])) {
 
     }
     else{
       //Save Data
-      if ($this->EmailTemplate->save($this->params['data'])) {
+      if ($this->EmailTemplate->save($this->params['data'])) {$this->log($this->params['data']);
         $this->Session->setFlash('Successful');
         $this->redirect('/emailer/index');
       }
@@ -141,6 +141,7 @@ class EmailerController extends AppController
     //Set up user info
     $currentUser = $this->User->getCurrentLoggedInUser();
     $this->set('currentUser', $currentUser);
+    $this->set('mergeList', $this->EmailMerge->getMergeList());
 
     $data = $this->EmailTemplate->find('first', array(
         'conditions' => array('EmailTemplate.id' => $id)
