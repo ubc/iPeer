@@ -105,7 +105,6 @@ class EvaluationRubric extends AppModel
             $results[$data[$i]['EvaluationRubricDetail']['criteria']] =
                 $data[$i][0]['sumScore'] / $data[$i][0]['count'];
         }
-
         return $results;
 	}
 

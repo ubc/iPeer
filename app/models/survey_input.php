@@ -3,11 +3,12 @@ class SurveyInput extends AppModel
 {
   var $name = 'SurveyInput';
 
-  function getSurveyInputBySurveyIdUserIdQuestionId($surveyId, $userId, $questionId) {
+  // Function obsolete.
+  /*function($surveyId, $userId, $questionId) {
     return $this->find('first', array('conditions' => array('survey_id' => $surveyId,
                                                             'user_id' => $userId,
                                                             'question_id' => $questionId)));
-  }
+  }*/
 
   function getAllSurveyInputBySurveyIdUserId($surveyId, $userId) {
     return $this->find('all', array('conditions' => array('survey_id' => $surveyId,
@@ -46,5 +47,4 @@ class SurveyInput extends AppModel
 	  return $tmp;
 	}
 }
-
 ?>

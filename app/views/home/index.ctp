@@ -9,16 +9,18 @@
   ?>
       <div class="course">
 	  	  <div class="course-header">
-          <?php echo $html->link($html->image("icons/home.gif", array("border"=>"0","alt"=>$row['Course']['course'])).$row['Course']['course'], 
-                                 "/courses/home/".$row['Course']['id'],
+	  	  <?php //var_dump($row);?>
+          <?php echo $html->link($html->image("icons/home.gif", array("border"=>"0","alt"=>$row[0]['Course']['course'])).$row[0]['Course']['course'], 
+                                 "/courses/home/".$row[0]['Course']['id'],
                                  array('escape'=>false)
                                 );?>
 		    </div>
 
         <div class="instructor">
-            <b>Instructor<?php echo count($row['Instructor']) > 2 ? 's':''; ?>: </b>&nbsp;
+        <?php //var_dump($row);?>
+            <b>Instructor<?php echo count($row[0]['Instructor']) > 2 ? 's':''; ?>: </b>&nbsp;
             <?php echo $this->element('courses/course_instructors',
-                                      array('instructors' => $row['Instructor']));?>
+                                      array('instructors' => $row[0]['Instructor']));?>
 
         </div>
 
@@ -30,7 +32,7 @@
               <td width="243"><b>Due Date </b></td>
             </tr>
 
-            <?php if (count($row['Event']) == 0):?>
+            <?php if (count($row[0]['Event']) == 0):?>
             <tr><td colspan='3'>None</td></tr>
             <?php else:?>
               <?php foreach($row['Event'] as $event):?>

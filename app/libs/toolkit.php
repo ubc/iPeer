@@ -30,10 +30,6 @@ class Toolkit {
     $user = $_this->user();
     return Set::extract($user, 'User.user_group_id');
   }*/
-
-   static function weeWa(){
-   	$this->log("Does nothing");
-   }
   
   static function formatDate($timestamp) {
     $sys_parameter = new SysParameter;

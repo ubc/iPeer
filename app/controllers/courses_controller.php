@@ -112,7 +112,7 @@ class CoursesController extends AppController
     $this->set('course_id', $id);
     
     $students = $course['Course']['student_count'];
-    $this->set('studentCount', $students);;
+    $this->set('studentCount', $students);
 
     $this->set('groupCount', count($course['Group']));
     $this->set('eventCount', count($course['Event']));

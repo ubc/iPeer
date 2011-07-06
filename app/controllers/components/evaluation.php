@@ -39,19 +39,19 @@ class EvaluationComponent extends Object
 //    }
 //    return $event;
 //  }	
-	
+
   function formatGradeReleaseStatus($groupEvent, $releaseStatus, $oppositGradeReleaseCount) {
     $gradeReleaseStatus = $groupEvent['GroupEvent']['grade_release_status'];
 
     //User clicked to release individual grade
-    if ($releaseStatus) {
+    if ($releaseStatus){
 
       //Check and update the groupEvent release status
-      if ($gradeReleaseStatus == 'None') {
+      if($gradeReleaseStatus == 'None'){
           $groupEvent['GroupEvent']['grade_release_status'] = "Some";
-      } else if ($gradeReleaseStatus == 'Some') {
+      }else if ($gradeReleaseStatus == 'Some'){
           //Check whether all members are released
-          if ($oppositGradeReleaseCount == 0) {
+          if($oppositGradeReleaseCount == 0){
            $groupEvent['GroupEvent']['grade_release_status'] = "All";
           }
       }
@@ -59,7 +59,7 @@ class EvaluationComponent extends Object
     else {
 
       //Check and update the groupEvent release status
-      if ($gradeReleaseStatus == 'Some') {
+      if($gradeReleaseStatus == 'Some'){
           //Check whether all members' released are none
           if ($oppositGradeReleaseCount == 0) {
           $groupEvent['GroupEvent']['grade_release_status'] = "None";
@@ -72,9 +72,9 @@ class EvaluationComponent extends Object
   }
 
   function getGroupReleaseStatus($groupEvent) {
-    if (isset($groupEvent)) {
+    if(isset($groupEvent)){
       $release = array('grade_release_status'=>$groupEvent['GroupEvent']['grade_release_status'], 'comment_release_status'=>$groupEvent['GroupEvent']['comment_release_status']);
-    }else{
+    }else {
       $release = array('grade_release_status'=>'None', 'comment_release_status'=>'None');
     }
     return $release;
@@ -122,20 +122,18 @@ class EvaluationComponent extends Object
 
     //$this->User = new User;
     //print_r($this->User->findUserByStudentNo('36241032'));
-
     foreach($evalResult AS $index => $value){
       $evalMarkArray = $value;
       $evalTotal = 0;
-      if ($evalMarkArray!=null) {
+      if ($evalMarkArray!=null){
         $grade_release = 1;
         //Get total score of each memeber
         //$receivedTotalScoreAry = isset($evalMarkArray[-1]['received_total_score'])? $evalMarkArray[-1]['received_total_score']: 0;
         //foreach($receivedTotalScoreAry AS $totalScore ){
         //$receivedTotalScore = $totalScore['received_total_score'];
         //}
-      foreach($evalMarkArray AS $row ){
+      foreach($evalMarkArray AS $row){
         $evalMark = isset($row['EvaluationSimple'])? $row['EvaluationSimple']: null;
-
         if ($evalMark!=null) {
           $grade_release = $evalMark['grade_release'];
           //$ave_score= $receivedTotalScore / count($evalMarkArray);

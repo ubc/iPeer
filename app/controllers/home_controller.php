@@ -380,7 +380,6 @@ class HomeController extends AppController
   }
 
   function index() {
-    //Disable the autorender, base the role to render the custom home
   	
     $this->autoRender = false;   
     $role = $this->Auth->user('role');

@@ -8,7 +8,6 @@ class ExportComponent extends Object
   var $mixedEvalNumeric;
    
   function createCSV($params, $courseId=null) {
-  	
     $this->Course = new Course;
     $this->Event = new Event;
     $this->GroupEvent = new GroupEvent;
@@ -19,7 +18,7 @@ class ExportComponent extends Object
     //*******header
     $header = array();
     //get coursename
-    $course = $this->Course->find('all', array('conditions'=>array('id'=>$courseId)));
+    $course = $this->Course->find('all', array('conditions'=>array('Course.id'=>$courseId)));
     $header['course_name'] = empty($params['form']['include_course']) ? '':$course[0]['Course']['course'];
     //get date of export
     $header['export_date'] = empty($params['form']['include_date']) ? '':date('F t Y g:ia');

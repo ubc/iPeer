@@ -17,7 +17,7 @@ if ( !function_exists('json_decode') ){
     }
 }
 
-if ( !function_exists('json_encode') ){
+if (!function_exists('json_encode') ){
     function json_encode($content){
         require_once 'vendors/JSON.php';
         $json = new Services_JSON;
