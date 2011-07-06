@@ -3,7 +3,7 @@ App::import('Component', 'Evaluation');
 
 class FakeEvaluationController extends Controller {
   var $name = 'FakeEvaluationController';
-  var $components = array('Evaluation');
+  var $components = array('Evaluation', 'Auth');
   var $uses = null;
   var $params = array('action' => 'test');
 }
@@ -12,15 +12,31 @@ class EvaluationTestCase extends CakeTestCase {
   	var $fixtures = array('app.course', 'app.role', 'app.user', 'app.group', 
                         'app.roles_user', 'app.event', 'app.event_template_type',
                         'app.group_event', 'app.evaluation_submission',
-                        'app.survey_group_set', 'app.survey_group',
+                        'app.survey_group_set', 'app.survey_group', 'app.groups_member',
                         'app.survey_group_member', 'app.question', 
                         'app.response', 'app.survey_question', 'app.user_course', 
                         'app.user_enrol', 'app.groups_member', 'app.survey', 
-                        'app.evaluation_mixeval', 'app.evaluation_mixeval_detail'
+                        'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
+  						'app.evaluation_simple'
                         );
                     
   function startCase() {
 	$this->EvaluationComponentTest = new EvaluationComponent();
+	$this->EvaluationSimple = ClassRegistry::init('EvaluationSimple');
+	$this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
+	$this->Event = ClassRegistry::init('Event');
+	
+	$admin = array('User' => array('username' => 'root',
+                                   'password' => 'ipeer'));
+    $this->controller = new FakeEvaluationController();
+    $this->controller->constructClasses();
+    $this->controller->startupProcess();
+    $this->controller->Component->startup($this->controller);
+    $this->controller->Auth->startup($this->controller);
+    ClassRegistry::addObject('view', new View($this->Controller));
+    ClassRegistry::addObject('auth_component', $this->controller->Auth);
+
+    $this->controller->Auth->login($admin);
   }  
   
   function testFormatGradeReleaseStatus() { 
@@ -74,7 +90,7 @@ class EvaluationTestCase extends CakeTestCase {
    	$this->assertEqual($result, $expect);
    }
    
-   function testFormatSimpleEvaluationResultsMatrix() {
+   	function testFormatSimpleEvaluationResultsMatrix() {
      // Set up test data 
 	 $evalResult = array();
 	 $evalResult[0]['EvaluationSimple']['EvaluationSimple']['grade_release'] = 0;
@@ -105,8 +121,78 @@ class EvaluationTestCase extends CakeTestCase {
 	 unset($evalResultDuplicate1[0]['EvaluationSimple']);
 	 unset($evalResultDuplicate1[1]['EvaluationSimple']);
 	 $result = $this->EvaluationComponentTest->formatSimpleEvaluationResultsMatrix(null, $groupMembers, $evalResultDuplicate1);
-	 
-	 
-	 
+	 $expect = array(array('1' => 'n/a', '2' => 'n/a'),
+	 				 array('1' => 'n/a', '2' => 'n/a'));
+	 $this->assertEqual($result, $expect);
+   }
+   
+	function testFilterString() {
+   	  $testString = "HELLO THIS IS A TEST";
+   	  $result = $this->EvaluationComponentTest->filterString($testString);
+   	  $this->assertEqual($testString, $result);
+   	  
+   	  $testString2 = "HELLO232_32";
+   	  $result = $this->EvaluationComponentTest->filterString($testString2);
+   	  $expect = "HELLO";
+   	  $this->assertEqual($result, $expect);
+   }
+   
+   function testSaveSimpleEvaluation() {
+   	  // Assert data was not saved prior to running function
+   	  $search1 = $this->EvaluationSimple->find('first', array('conditions' => array('eval_comment' => 'Kevin Luk was smart')));
+   	  $search2 = $this->EvaluationSimple->find('first', array('conditions' => array('eval_comment' => 'Zion Au was also smart')));
+   	  $searchEvalSubmission = $this->EvaluationSubmission->find('all', array('conditions' => array('grp_event_id' => 999)));
+	  $this->assertFalse($search1);
+	  $this->assertFalse($search2);
+	  $this->assertFalse($searchEvalSubmission);
+   	  
+   	  // Set up test data
+   	  $input = $this->setUpSimpleEvaluationTestData();
+   	  $params = $input[0];
+   	  $groupEvent = $input[1];
+   	  $result1 = $this->EvaluationComponentTest->saveSimpleEvaluation($params, $groupEvent, null);
+   	  $search1 = $this->EvaluationSimple->find('first', array('conditions' => array('eval_comment' => 'Kevin Luk was smart')));
+   	  $search2 = $this->EvaluationSimple->find('first', array('conditions' => array('eval_comment' => 'Zion Au was also smart')));
+   	  $searchEvalSubmission = $this->EvaluationSubmission->find('all', array('conditions' => array('grp_event_id' => 999)));
+   	  
+   	  // Run tests
+   	  $this->assertTrue($search1);
+   	  $this->assertTrue($search2);
+   	  $this->assertTrue($searchEvalSubmission);
+   	  $this->assertEqual($search1['EvaluationSimple']['eval_comment'], 'Kevin Luk was smart');
+   	  $this->assertEqual($search1['EvaluationSimple']['score'], 25);
+   	  $this->assertEqual($search1['EvaluationSimple']['grp_event_id'], 999);
+   	  $this->assertEqual($search2['EvaluationSimple']['eval_comment'], 'Zion Au was also smart');
+   	  $this->assertEqual($search2['EvaluationSimple']['score'], 50);
+   	  $this->assertEqual($search2['EvaluationSimple']['grp_event_id'], 999);
+   	  $this->assertEqual($searchEvalSubmission[0]['EvaluationSubmission']['event_id'], 999);
+   	  $this->assertEqual($searchEvalSubmission[0]['EvaluationSubmission']['grp_event_id'], 999);
+   }
+   
+   function testFormatStudentViewOfSimpleEvaluationResult() {
+   	  $eventInput = $this->Event->find('first', array('conditions' => array('Event.id' => 1)));
+   	  $result = $this->EvaluationComponentTest->formatStudentViewOfSimpleEvaluationResult($eventInput);
+   	  var_dump($return);
+   }
+   
+   function setUpSimpleEvaluationTestData() {
+   	  $params = array();
+   	  $params['form']['memberIDs'][0] = 1;
+   	  $params['form']['memberIDs'][1] = 2;
+   	  $params['form']['points'][0] = 25;
+   	  $params['form']['points'][1] = 50;
+   	  $params['form']['comments'][0] = "Kevin Luk was smart";
+   	  $params['form']['comments'][1] = "Zion Au was also smart";
+   	  $params['data']['Evaluation']['evaluator_id'] = 1;
+   	  $params['data']['Evaluation']['evaluator_id'] = 2;
+   	  $params['form']['evaluateeCount'] = 2;
+   	  
+   	  $groupEvent = array();
+   	  $groupEvent['GroupEvent']['id'] = 999;
+   	  $groupEvent['GroupEvent']['event_id'] = 999;
+   	  $groupEvent['GroupEvent']['group_id'] = 999;
+   	  
+   	  $return = array($params, $groupEvent);
+   	  return $return;   	  
    }
 }  

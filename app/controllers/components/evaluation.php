@@ -167,9 +167,9 @@ class EvaluationComponent extends Object
   //Simple Evaluation functions
 
   function saveSimpleEvaluation($params=null, $groupEvent=null, $evaluationSubmission=null){
-    $this->EvaluationSimple = new EvaluationSimple;
-    $this->EvaluationSubmission = new EvaluationSubmission;
-    $this->GroupEvent = new GroupEvent;
+    $this->EvaluationSimple = ClassRegistry::init('EvaluationSimple');
+    $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
+    $this->GroupEvent = ClassRegistry::init('GroupEvent');
 
     // assuming all are in the same order and same size
     $evaluatees = $params['form']['memberIDs'];
@@ -219,7 +219,7 @@ class EvaluationComponent extends Object
     //the number of submission equals the number of members
     //means that this group is ready to review
     $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted(
-      $groupEvent['GroupEvent']['group_id'], $groupEvent['GroupEvent']['id']);
+    $groupEvent['GroupEvent']['group_id'], $groupEvent['GroupEvent']['id']);
     $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
     //Check to see if all members are completed this evaluation
     if($numOfCompletedCount == $evaluateeCount ){
@@ -232,13 +232,14 @@ class EvaluationComponent extends Object
   }
 
   function formatStudentViewOfSimpleEvaluationResult($event=null){
-    $this->EvaluationSimple = new EvaluationSimple;
-    $this->GroupsMembers = new GroupsMembers;
+    $this->EvaluationSimple = ClassRegistry::init('EvaluationSimple');
+    $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
     $gradeReleaseStatus = 0;
-    $aveScore = 0; $groupAve = 0;
+    $aveScore = 0; 
+    $groupAve = 0;
     $studentResult = array();
-
-    $results = $this->EvaluationSimple->getResultsByEvaluatee($event['group_event_id'], $this->Auth->user('id'));
+    
+  $results = $this->EvaluationSimple->getResultsByEvaluatee($event['group_event_id'], $this->Auth->user('id'));
     if ($results !=null) {
       //Get Grade Release: grade_release will be the same for all evaluatee records
       $gradeReleaseStatus = $results[0]['EvaluationSimple']['grade_release'];
@@ -301,7 +302,7 @@ class EvaluationComponent extends Object
     $this->GroupEvent->id = $groupEventId;
     $oppositGradeReleaseCount = $this->EvaluationSimple->getOppositeGradeReleaseStatus($groupEventId, $releaseStatus);
     $groupEvent = $this->formatGradeReleaseStatus(
-      $this->GroupEvent->read(), $releaseStatus, $oppositGradeReleaseCount);
+    $this->GroupEvent->read(), $releaseStatus, $oppositGradeReleaseCount);
     $this->GroupEvent->save($groupEvent);
   }
 
