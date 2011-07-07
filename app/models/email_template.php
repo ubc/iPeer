@@ -24,5 +24,13 @@ class EmailTemplate extends AppModel
     ));
   }
 
+  function getCreatorId($template_id){
+    $tmp = $this->find('first', array(
+        'conditions' => array('EmailTemplate.id' => $template_id),
+        'fields' => array('EmailTemplate.creator_id')
+    ));
+    return $tmp['EmailTemplate']['creator_id'];
+  }
+
 }
 ?>

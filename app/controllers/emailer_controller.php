@@ -138,51 +138,66 @@ class EmailerController extends AppController
   }
 
   function edit ($id){
-    //Set up user info
-    $currentUser = $this->User->getCurrentLoggedInUser();
-    $this->set('currentUser', $currentUser);
-    $this->set('mergeList', $this->EmailMerge->getMergeList());
+    $creator_id = $this->EmailTemplate->getCreatorId($id);
+    $user_id = $this->Auth->user('id');
+    if($creator_id == $user_id){
+      //Set up user info
+      $currentUser = $this->User->getCurrentLoggedInUser();
+      $this->set('currentUser', $currentUser);
+      $this->set('mergeList', $this->EmailMerge->getMergeList());
 
-    $data = $this->EmailTemplate->find('first', array(
-        'conditions' => array('EmailTemplate.id' => $id)
-    ));
+      $data = $this->EmailTemplate->find('first', array(
+          'conditions' => array('EmailTemplate.id' => $id)
+      ));
 
-    if (empty($this->params['data'])) {
-        $this->data = $data;
-        $this->render('add');
-    }
-    else{
-      //Save Data
-      if ($this->EmailTemplate->save($this->params['data'])) {$this->log($this->params['data']);
-        $this->Session->setFlash('Successful'); 
-        $this->redirect('/emailer/index');
+      if (empty($this->params['data'])) {
+          $this->data = $data;
+          $this->render('add');
       }
       else{
-        $this->Session->setFlash('Failed to save');
+        //Save Data
+        if ($this->EmailTemplate->save($this->params['data'])) {$this->log($this->params['data']);
+          $this->Session->setFlash('Successful');
+          $this->redirect('/emailer/index');
+        }
+        else{
+          $this->Session->setFlash('Failed to save');
+        }
       }
+    }
+    else{
+      $this->Session->setFlash('No Permission');
+      $this->redirect('/emailer/index');
     }
   }
 
   function delete ($id) {
-    if ($this->EmailTemplate->delete($id)) {
-      $this->Session->setFlash('The Email Template was deleted successfully.');
-    } else {
-      $this->Session->setFlash('Email Template delete failed.');
+    $creator_id = $this->EmailTemplate->getCreatorId($id);
+    $user_id = $this->Auth->user('id');
+    if($creator_id == $user_id){
+      if ($this->EmailTemplate->delete($id)) {
+        $this->Session->setFlash('The Email Template was deleted successfully.');
+      } else {
+        $this->Session->setFlash('Email Template delete failed.');
+      }
+      $this->redirect('index/');
     }
-    $this->redirect('index/');
+    else{
+      $this->Session->setFlash('No Permission');
+      $this->redirect('/emailer/index');
+    }
   }
 
   function view ($id){
     $this->data = $this->EmailTemplate->find('first', array(
         'conditions' => array('EmailTemplate.id' => $id)
     ));
-
     $this->set('readonly', true);
     $this->render('add');
 
   }
 
-  function emailTemplate($templateId = null) {
+  function displayTemplate($templateId = null) {
       $this->layout = 'ajax';
       $template = $this->EmailTemplate->find('first', array(
           'conditions' => array('EmailTemplate.id' => $templateId)

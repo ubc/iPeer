@@ -37,19 +37,20 @@
            'type' => 'radio',
            'options' => array('0' => ' - Private&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
                               '1' => ' - Public&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-                              '2' => ' - shared&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'),
+                              //'2' => ' - shared&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+                             ),
            'default' => '0',
            'legend' => false,
            'disabled'=>$readonly
         ));
       ?>
     </td>
-    <td>&nbsp;</td>
+    <td>Public Allows Template Sharing Amongst Instructors</td>
   </tr>
 
   <tr class="tablecell2">
     <td>Description:&nbsp;</td>
-    <td><?php echo $form->textarea('EmailTemplate.description', array('rows' => '5', 'style'=>'width:70%;', 'readonly'=>$readonly)) ?>  </td>
+    <td><?php echo $form->textarea('EmailTemplate.description', array('rows' => '5', 'style'=>'width:90%;', 'readonly'=>$readonly)) ?>  </td>
     <td>&nbsp;</td>
   </tr>
 
@@ -74,7 +75,7 @@
     <td><?php echo $form->textarea('EmailTemplate.content', array(
         'id' => 'emailContent',
         'rows' => '30',
-        'style'=>'width:70%;',
+        'style'=>'width:90%;',
         'readonly'=>$readonly)) ?>  </td>
     <td>&nbsp;</td>
   </tr>

@@ -28,10 +28,30 @@
               <table width="100%" border="0" cellspacing="2" cellpadding="2">                
               <?php if (!empty($group_data)) :?>
                 <tr>
-                  <td colspan="3"><a href="javascript:listEmail();"><?php echo $html->image('icons/email.gif',array('border'=>'0','alt'=>'Email'))?> Get email addresses</a></td></tr>
+                  <td colspan="3"><?php 
+                  echo $html->link(
+                        $html->image('icons/email.gif',array('border'=>'0','alt'=>'Email')).' Email To All Members',
+                        array(
+                            'controller' => 'emailer',
+                            'action' => 'write',
+                            'G'.$data['Group']['id']
+                        ),
+                        array('escape'=>false)
+                  );?>
+                  </td>
                   <?php foreach($group_data as $row): $user = $row['User'];?>
                   <tr>
-                  <td width="15"><a href="mailto:<?php echo $user['email']?>"><?php echo $html->image('icons/email_icon.gif',array('border'=>'0','alt'=>'Email', 'title' => 'Email to '.$user['full_name']))?></a></td>
+                  <td width="15"><?php 
+                    echo $html->link(
+                        $html->image('icons/email_icon.gif',array('border'=>'0','alt'=>'Email', 'title' => 'Email to '.$user['full_name'])),
+                        array(
+                            'controller' => 'emailer',
+                            'action' => 'write',
+                            $user['id']
+                        ),
+                        array('escape'=>false)
+                    );?>
+                  </td>
                   <td width="15"><a href="../../users/view/<?php echo $user['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View', 'title' => 'View '.$user['full_name']))?></a></td>
                   <td><?php echo $user['full_name']?><br></td>
                  </tr>
@@ -56,14 +76,8 @@
               <table width="403" border="0" cellspacing="0" cellpadding="4">
               <tr>
                 <td colspan="3"><?php echo $html->link('Edit this Group', '/groups/edit/'.$data['Group']['id']); ?> |
-                <?php echo $html->link('Back to Group Listing', '/groups/index/'.$course_id); ?> |
-                <?php echo $html->link('Send Email',
-                        array(
-                            'controller' => 'emailer',
-                            'action' => 'write',                            
-                            'G'.$data['Group']['id']
-                        ),
-                        array("onclick"=>"wopen(this.href, 'popup', 650, 500); return false;"));?></td>
+                <?php echo $html->link('Back to Group Listing', '/groups/index/'.$course_id); ?>
+                </td>
               </tr>
               </table>
             </td>

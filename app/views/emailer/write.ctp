@@ -37,7 +37,7 @@
                 'empty' => '-- No Template --',
                 'label' => false,
                 'onChange' => "new Ajax.Updater('email_content','".
-                    $this->webroot.$this->theme."emailer/emailTemplate/'+this.options[this.selectedIndex].value,
+                    $this->webroot.$this->theme."emailer/displayTemplate/'+this.options[this.selectedIndex].value,
                      {method: 'post', asynchronous: true, evalScripts:false});  return false;",
                   'escape'=>false
               ));?>
