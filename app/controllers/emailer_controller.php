@@ -11,7 +11,7 @@ class EmailerController extends AppController
   var $name = 'Emailer';
   var $uses = array('GroupsMembers', 'UserEnrol', 'User', 'EmailTemplate', 'EmailMerge','Personalize', 'SysParameter', 'SysFunction');
   var $components = array('AjaxList', 'Session', 'RequestHandler', 'Email');
-  var $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Pagination');
+  var $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Pagination', 'Js' => array('Prototype'));
   var $show;
   var $sortBy;
   var $direction;
@@ -98,17 +98,23 @@ class EmailerController extends AppController
   }
 
   function write($to = ' '){
-
     if(!isset($this->data)){
       $emailAddress = $this->getEmailAddress($to);
       if(is_array($emailAddress))
         $emailAddress = implode('; ', $emailAddress);
-      $this->set('to', $emailAddress);
+
+      $recipients = $this->getRecipient($to);
+      $this->set('recipients', $recipients);
+      $this->Session->write('email_recipients', $recipients);
+      $this->set('recipients_rest', $this->User->find('list', array(
+          'conditions'=>array('User.id NOT' => array_flip($this->getRecipient($to, 'list'))))));
+      $this->set('to', $emailAddress);      
       $this->set('from', $this->Auth->user('email'));
       $this->set('templatesList', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id'),'list'));
       $this->set('templates', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id')));
     }
     else{
+      $this->set('recipients',$this->Session->read('email_recipients'));
       $this->set('data', $this->data);
       $this->render('confirmation');      
     }    
@@ -204,6 +210,117 @@ class EmailerController extends AppController
       ));      
       $this->set('template', $template);
   }
+
+  function addRecipient() {
+    if((!isset($this->passedArgs['recipient_id'])) &&
+       (!isset($this->params['form']['recipient_id']))) {
+      $this->cakeError('error404');
+    }
+
+    $recipient_id = isset($this->passedArgs['recipient_id']) ? $this->passedArgs['recipient_id'] : $this->params['form']['recipient_id'];
+    $this->User->recursive = -1;
+    if(!($recipient = $this->User->find('first', array('conditions' => array('User.id' => $recipient_id))))) {
+        $this->cakeError('error404');
+    }
+
+    //$this->autoRender = false;
+    $this->layout = false;
+    $this->ajax = true;
+//    if($this->Course->addInstructor($instructor_id)) {
+      $tmp_recipients = $this->Session->read('email_recipients');
+      array_push($tmp_recipients, $recipient);
+      $this->Session->write('email_recipients', $tmp_recipients);
+      $this->set('recipient', $recipient['User']);
+      $this->render('/elements/emailer/edit_recipient');
+//    } else {
+//      return 'Unknown error';
+//    }
+
+  }
+
+  function deleteRecipient() {
+      if(!isset($this->passedArgs['recipient_id'])) {
+        $this->cakeError('error404');
+      }
+      $tmp_index = $this->searchByUserId($this->Session->read('email_recipients'),'id', $this->passedArgs['recipient_id']);
+      $tmp_recipients = $this->Session->read('email_recipients');
+      unset($tmp_recipients[$tmp_index]);
+      $this->Session->write('email_recipients', $tmp_recipients);
+      $this->autoRender = false;
+      $this->ajax = true;
+  }
+
+  function getEmailAddress($to){
+
+    $type = $to[0];
+    $id = substr($to,1);
+    switch($type){
+      case ' ':
+        return '';
+        break;
+      case 'C': //Email addresses for all in Course
+        return $this->User->find('list', array(
+            'fields' => array('email'),
+            'conditions' => array('User.id' => $this->UserEnrol->getUserListByCourse($id))
+        ));
+        break;
+      case 'G': //Email addresses for all in group
+        return $this->User->find('list', array(
+            'fields' => array('email'),
+            'conditions' => array('User.id' => $this->GroupsMembers->getMembers($id))
+        ));
+        break;
+      default: //Email address for a user
+        return $this->User->find('list', array(
+            'fields' => array('email'),
+            'conditions' => array('User.id' => $to)
+        ));
+
+    }
+  }
+
+  function getRecipient($to, $s_type = 'all'){
+    $this->User->recursive = -1;
+    $type = $to[0];
+    $id = substr($to,1);
+    switch($type){
+      case ' ':
+        return array();
+        break;
+      case 'C': //Email addresses for all in Course
+        return $this->User->find($s_type, array(
+            //'fields' => array('email'),
+            'conditions' => array('User.id' => $this->UserEnrol->getUserListByCourse($id))
+        ));
+        break;
+      case 'G': //Email addresses for all in group
+        return $this->User->find($s_type, array(
+            //'fields' => array('email'),
+            'conditions' => array('User.id' => $this->GroupsMembers->getMembers($id))
+        ));
+        break;
+      default: //Email address for a user
+        return $this->User->find($s_type, array(
+            //'fields' => array('email'),
+            'conditions' => array('User.id' => $to)
+        ));
+
+    }
+  }
+
+  function searchByUserId($array, $key, $value)
+  {
+      $i = 0;
+      if (is_array($array))
+      {
+          foreach ($array as $subarray){
+            if($subarray['User'][$key]==$value)
+              return $i;
+            $i++;
+          }
+      }
+  }
+
 
 }
 ?>

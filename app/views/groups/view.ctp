@@ -88,4 +88,3 @@
     </td>
   </tr>
 </table>
-<input type="hidden" id="emailAddress" value="<?php echo implode("; ",$group_email_list); ?>"/>

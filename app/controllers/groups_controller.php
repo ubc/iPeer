@@ -196,7 +196,6 @@ class GroupsController extends AppController
                                             'fields' => array('id', 'full_name', 'email')
         ));
     $this->set('group_data', $group_data);
-    $this->set('group_email_list', $this->getEmailAddress('G'.$id));
   }
 
   function add ($course_id) {  	
