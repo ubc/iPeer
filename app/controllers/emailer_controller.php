@@ -30,6 +30,8 @@ class EmailerController extends AppController
     $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
     $this->order = $this->sortBy . ' ' . strtoupper($this->direction);
     $this->pageTitle = 'Email';
+    $this->mergeStart = '{{{';
+    $this->mergeEnd = '}}}';
     parent::__construct();
   }
 
@@ -107,7 +109,7 @@ class EmailerController extends AppController
       $this->set('recipients', $recipients);
       $this->Session->write('email_recipients', $recipients);
       $this->set('recipients_rest', $this->User->find('list', array(
-          'conditions'=>array('User.id NOT' => array_flip($this->getRecipient($to, 'list'))))));
+          'conditions'=>array('NOT' => array('User.id' => array_flip($this->getRecipient($to, 'list')))))));
       $this->set('to', $emailAddress);      
       $this->set('from', $this->Auth->user('email'));
       $this->set('templatesList', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id'),'list'));
@@ -319,6 +321,34 @@ class EmailerController extends AppController
             $i++;
           }
       }
+  }
+
+  function doMerge($string, $start, $end, $user_id = null){
+    //Return array $matches that contains all tags
+    preg_match_all('/'.$start.'(.*?)'.$end.'/', $string, $matches, PREG_OFFSET_CAPTURE);
+    $patterns = array();
+    $replacements = array();
+    $merge_count = 0;
+    $patterns = $matches[0];
+    foreach($matches[0] as $key => $match){
+      //Patterns
+      $patterns[$key] = '/'.$match[0].'/';
+      
+      $table = $this->EmailMerge->find('first', array(
+          'conditions' => array('value' => $match[0]),
+          'fields' => array('table_name','field_name')
+      ));
+      $table_name = $table['EmailMerge']['table_name'];
+      $field_name = $table['EmailMerge']['field_name'];
+      $this->$table_name->recursive = -1;
+      $value = $this->$table_name->find('first',array(
+          'conditions' => array($table_name.'.id' => $user_id),
+          'fields' => $field_name
+      )); 
+
+      $replacements[$key] = $value[$table_name][$field_name];
+    }
+    return preg_replace($patterns, $replacements, $string);
   }
 
 

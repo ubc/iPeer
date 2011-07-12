@@ -1,7 +1,3 @@
-<?php 
-  echo $html->script('autocomplete');
-  echo $html->css('style');
-?>
 <form method="post" action="<?php echo $html->url('/emailer/write/'); ?>" name="emailer" id="emailer" class="emailer">
   <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
