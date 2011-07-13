@@ -1,15 +1,17 @@
+<?php echo $html->script('calendar1')?>
 <form method="post" action="<?php echo $html->url('/emailer/write/'); ?>" name="emailer" id="emailer" class="emailer">
   <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>
         <table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
           <tr class="tableheader">
-            <td colspan="2" align="center">Write Email</td>
+            <td colspan="3" align="center">Write Email</td>
           </tr>
-          <tr class="tablecell2">
+<!--          <tr class="tablecell2">
             <td>From:&nbsp;</td>
             <td><?php echo $form->input('Email.from', array('size' => '80%', 'label'=>false, 'value' => $from));?></td>
-          </tr>
+            <td>&nbsp;</td>
+          </tr>-->
 <!--          <tr class="tablecell2">
             <td>To:&nbsp;</td>
             <td><?php echo $form->input('Email.to', array('size' => '80%','label' => false,'value' => $to));?>
@@ -33,7 +35,8 @@
                                          'evalScripts' => true,
                                          'data' => '{recipient_id:$F("recipients")}'))?>
 
-          </td>
+            </td>
+            <td>&nbsp;</td>
           </tr>
 <!--          <tr class="tablecell2">
             <td>Cc:&nbsp;</td>
@@ -43,6 +46,30 @@
             <td>Bcc:&nbsp;</td>
             <td><?php echo $form->input('Email.bcc', array('size' => '80%','label' => false));?></td>
           </tr>-->
+          <tr class="tablecell2">
+            <td>Schedule?:</td>
+            <td>
+              <table><tr><td>
+              <?php
+                echo $form->input('Email.schedule', array(
+                   'type' => 'radio',
+                   'options' => array('0' => ' - No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+                                      '1' => ' - Yes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+                                     ),
+                   'default' => '0',
+                   'onClick' => "toggle_schedule(this)",
+                   'legend' => false
+                ));
+              ?>
+              </td></tr>
+              <tr id="scheduling"><td>
+                <?php echo $form->input('Email.date', array('div'=>false, 'label'=> 'Date :', 'type'=>'text', 'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;
+                <a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+                <?php echo $form->error('Event.due_date', 'Please enter a valid date.')?>
+              </td></tr></table>
+            </td>
+            <td>&nbsp;</td>
+          </tr>
           <tr id="tablecell2" class="tablecell2">
             <td>Template:&nbsp;</td>
             <td>
@@ -65,13 +92,16 @@
               </td></tr>
               </table>
             </td>
+            <td>&nbsp;</td>
           </tr>
           <tr class="tablecell2">
             <td>Subject:&nbsp;</td>
             <td><?php echo $form->input('Email.subject', array('size' => '80%', 'label'=>false));?></td>
+            <td>&nbsp;</td>
           </tr>
           <tr class="tablecell2">
             <td>Message:</td>
+            <td><table><tr>
             <td><?php
                 echo $form->textarea('Email.content', array(
                   'id' => 'email_content',
@@ -80,7 +110,9 @@
                   'rows' => '15',
                   'escape' => false
                 ));
-            ?></td>
+            ?></td></tr>
+            </table></td>
+            <td>&nbsp;</td>
           </tr>
         </table>
         <div><?php echo $form->submit('Send'); ?></div>
@@ -88,7 +120,21 @@
   </tr>
 </table>
 </form>
+<script>
 
+  var cal1 = new calendar1(document.forms[0].elements['data[Email][date]']);
+  cal1.year_scroll = false;
+  cal1.time_comp = true;
+
+  $('scheduling').style.visibility = 'hidden';
+
+  function toggle_schedule(el) {
+        if (el.value == '1')
+                $('scheduling').style.visibility = 'visible';
+        else
+                $('scheduling').style.visibility = 'hidden';
+  }
+</script>
 <!--<script type="text/javascript">
   new Autocomplete('query', { serviceUrl: '/ipeer/users/user_list'});
 </script>-->

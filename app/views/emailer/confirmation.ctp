@@ -3,12 +3,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
-echo "<b>Data:  </b>";
-var_dump($data);
-
-echo "</br></br><b>Recipients:  </b>";
-var_dump($recipients);
-
+echo "<br/><b>From:  </b>".$data['from'];
+echo "<br/><b>To:  </b>".$data['to'];
+echo "<br/><b>Subject:  </b>".$data['subject'];
+echo "<br/><b>Content:  </b>".$data['content'];
+echo "<br/><b>Schedule:  </b>".$data['schedule'].' on '.$data['date'];
 ?>
-<input type="button" name="Close" value="Close" onClick="window.close()">
+<br/><input type="button" name="Close" value="Close" onClick="window.close()">

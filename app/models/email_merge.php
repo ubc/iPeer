@@ -15,13 +15,12 @@ class EmailMerge extends AppModel
     ));
   }
 
-  function getFieldNameByValue($value){
-    $result = $this->find('first', array(
-        'conditions' => array('EmailMerge.value' => $value),
-        'fields' => array('EmailMerge.field_name')
-    ));
-
-    return $result['EmailMerge']['field_name'];
+  function getFieldNameByValue($value = ''){
+    $table = $this->find('first', array(
+          'conditions' => array('value' => $value),
+          'fields' => array('table_name','field_name')
+      ));
+    return $table['EmailMerge'];
   }
 
 }

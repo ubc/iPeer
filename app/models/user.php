@@ -394,6 +394,18 @@ class User extends AppModel
     $user = $this->find('first', array('conditions' => array('id'=>$id)));
     return (!empty($user['Role'][0]['name'])) ? $user['Role'][0]['name'] : null;
   }
+
+  /**
+   *
+   * Get user's email by id
+   * @param $id user id
+   * @return email
+   */
+  function getEmailById($id) {
+
+    $user = $this->find('first', array('conditions' => array('User.id'=>$id)));
+    return (!empty($user['User']['email'])) ? $user['User']['email'] : null;
+  }
   
   /**
    * 

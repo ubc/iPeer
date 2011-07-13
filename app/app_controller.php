@@ -184,19 +184,19 @@ class AppController extends Controller  {
     return true;
   }
 
-  function _sendEmail($templateName,$emailSubject,$from,$to,$cc = array(),$bcc= array()) {
+  function _sendEmail($content,$subject,$from,$to,$cc = array(),$bcc= array()) {
 		$this->Email->reset();
 
-                //$this->Email->delivery = 'debug';
+                $this->Email->delivery = 'debug';
 		$this->Email->to = $to;
 		$this->Email->cc = $cc;
 		$this->Email->bcc = $bcc;
-		$this->Email->subject = $emailSubject;
+		$this->Email->subject = $subject;
 		$this->Email->from = $from;
-		$this->Email->template = $templateName;
+		//$this->Email->template = $templateName;
 		$this->Email->sendAs = 'both';
-
-		return $this->Email->send();
+                
+		return $this->Email->send($content);                
   }
 }
 ?>

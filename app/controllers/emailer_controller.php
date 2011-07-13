@@ -9,7 +9,7 @@ App::import('Lib', 'neat_string');
 class EmailerController extends AppController
 {
   var $name = 'Emailer';
-  var $uses = array('GroupsMembers', 'UserEnrol', 'User', 'EmailTemplate', 'EmailMerge','Personalize', 'SysParameter', 'SysFunction');
+  var $uses = array('GroupsMembers', 'UserEnrol', 'User', 'EmailTemplate', 'EmailMerge', 'EmailSchedule', 'Personalize', 'SysParameter', 'SysFunction');
   var $components = array('AjaxList', 'Session', 'RequestHandler', 'Email');
   var $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Pagination', 'Js' => array('Prototype'));
   var $show;
@@ -116,12 +116,28 @@ class EmailerController extends AppController
       $this->set('templates', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id')));
     }
     else{
-      $this->set('recipients',$this->Session->read('email_recipients'));
-      $this->set('data', $this->data);
-      $this->render('confirmation');      
-    }    
+      $recipients = $this->Session->read('email_recipients');
+      $data = $this->data;
+      $data = $data['Email'];
 
-    //_sendEmail($template,$subject,$from,$to)
+      $data['from'] = $this->Auth->user('id');
+      $to = array();
+      foreach($recipients as $key => $r){
+        $to[$key] = $r['User']['id'];
+      }
+      $to = implode(';', $to);
+      $data['to'] = $to;
+
+      //Set current date if no schedule
+      if(!$data['schedule'])
+        $data['date'] = date("Y-m-d H:i:s", time());
+
+      $this->EmailSchedule->save($data);
+
+      //Display for testing
+      $this->set('data', $data);
+      $this->render('confirmation');      
+    }        
   }
 
   function add(){
@@ -134,7 +150,7 @@ class EmailerController extends AppController
     }
     else{
       //Save Data
-      if ($this->EmailTemplate->save($this->params['data'])) {$this->log($this->params['data']);
+      if ($this->EmailTemplate->save($this->params['data'])) {
         $this->Session->setFlash('Successful');
         $this->redirect('/emailer/index');
       }
@@ -164,7 +180,7 @@ class EmailerController extends AppController
       }
       else{
         //Save Data
-        if ($this->EmailTemplate->save($this->params['data'])) {$this->log($this->params['data']);
+        if ($this->EmailTemplate->save($this->params['data'])) {
           $this->Session->setFlash('Successful');
           $this->redirect('/emailer/index');
         }
@@ -228,28 +244,25 @@ class EmailerController extends AppController
     //$this->autoRender = false;
     $this->layout = false;
     $this->ajax = true;
-//    if($this->Course->addInstructor($instructor_id)) {
-      $tmp_recipients = $this->Session->read('email_recipients');
-      array_push($tmp_recipients, $recipient);
-      $this->Session->write('email_recipients', $tmp_recipients);
-      $this->set('recipient', $recipient['User']);
-      $this->render('/elements/emailer/edit_recipient');
-//    } else {
-//      return 'Unknown error';
-//    }
+    
+    $tmp_recipients = $this->Session->read('email_recipients');
+    array_push($tmp_recipients, $recipient);
+    $this->Session->write('email_recipients', $tmp_recipients);
+    $this->set('recipient', $recipient['User']);
+    $this->render('/elements/emailer/edit_recipient');
 
   }
 
   function deleteRecipient() {
-      if(!isset($this->passedArgs['recipient_id'])) {
-        $this->cakeError('error404');
-      }
-      $tmp_index = $this->searchByUserId($this->Session->read('email_recipients'),'id', $this->passedArgs['recipient_id']);
-      $tmp_recipients = $this->Session->read('email_recipients');
-      unset($tmp_recipients[$tmp_index]);
-      $this->Session->write('email_recipients', $tmp_recipients);
-      $this->autoRender = false;
-      $this->ajax = true;
+    if(!isset($this->passedArgs['recipient_id'])) {
+      $this->cakeError('error404');
+    }
+    $tmp_index = $this->searchByUserId($this->Session->read('email_recipients'),'id', $this->passedArgs['recipient_id']);
+    $tmp_recipients = $this->Session->read('email_recipients');
+    unset($tmp_recipients[$tmp_index]);
+    $this->Session->write('email_recipients', $tmp_recipients);
+    $this->autoRender = false;
+    $this->ajax = true;
   }
 
   function getEmailAddress($to){
@@ -330,16 +343,12 @@ class EmailerController extends AppController
     $replacements = array();
     $merge_count = 0;
     $patterns = $matches[0];
-    foreach($matches[0] as $key => $match){
-      //Patterns
+    foreach($matches[0] as $key => $match){      
       $patterns[$key] = '/'.$match[0].'/';
       
-      $table = $this->EmailMerge->find('first', array(
-          'conditions' => array('value' => $match[0]),
-          'fields' => array('table_name','field_name')
-      ));
-      $table_name = $table['EmailMerge']['table_name'];
-      $field_name = $table['EmailMerge']['field_name'];
+      $table = $this->EmailMerge->getFieldNameByValue($match[0]);
+      $table_name = $table['table_name'];
+      $field_name = $table['field_name'];
       $this->$table_name->recursive = -1;
       $value = $this->$table_name->find('first',array(
           'conditions' => array($table_name.'.id' => $user_id),
@@ -349,6 +358,32 @@ class EmailerController extends AppController
       $replacements[$key] = $value[$table_name][$field_name];
     }
     return preg_replace($patterns, $replacements, $string);
+  }
+
+  function send(){
+    $this->layout = 'ajax';
+    $emails = $this->EmailSchedule->getEmailsToSend();
+
+    foreach($emails as $e){
+      $e = $e['EmailSchedule'];
+
+      $from_id = $e['from'];
+      $from = $this->User->getEmailById($from_id);
+
+      $to_ids = explode(';', $e['to']);
+      foreach($to_ids as $to_id){        
+        $to = $this->User->getEmailById($to_id);
+        $subject = $e['subject'];
+        $content = $this->doMerge($e['content'], $this->mergeStart, $this->mergeEnd, $to_id);
+        if($this->_sendEmail($content,$subject,$from,$to)){
+          $tmp = array('id' => $e['id'],'sent' => '1');
+          $this->EmailSchedule->save($tmp);
+          
+          var_dump($this->Session->read('Message.email'));
+        }
+
+      }
+    }
   }
 
 
