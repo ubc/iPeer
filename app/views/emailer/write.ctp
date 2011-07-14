@@ -63,9 +63,18 @@
               ?>
               </td></tr>
               <tr id="scheduling"><td>
+                <table><tr><td>
                 <?php echo $form->input('Email.date', array('div'=>false, 'label'=> 'Date :', 'type'=>'text', 'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;
                 <a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
-                <?php echo $form->error('Event.due_date', 'Please enter a valid date.')?>
+                <?php echo $form->error('Email.date', 'Please enter a valid date.')?>
+                </td></tr>
+                <tr><td>
+                <?php
+                  echo $form->input('Email.times', array('div'=>false, 'label'=>'Multiple Emails: ', 'value' => '1', 'size' => '3')).' time(s) ';
+                  echo $form->input('Email.interval_num', array('div'=>false, 'label'=>' / Every'));
+                  echo $form->input('Email.interval_type', array('div'=>false, 'label'=>false, 'options'=> array('60' => 'minute(s)','3600' => 'hour(s)','86400' => 'day(s)')));
+                ?>
+                </td></tr></table>
               </td></tr></table>
             </td>
             <td>&nbsp;</td>
@@ -111,6 +120,10 @@
                   'escape' => false
                 ));
             ?></td></tr>
+            <tr><td>
+            <?php 
+              //echo $form->submit('Preview', array('name'=>'preview', 'onclick'=>"wopen(this.href, 'popup', 650, 500); return false;")); ?>
+            </td></tr>
             </table></td>
             <td>&nbsp;</td>
           </tr>

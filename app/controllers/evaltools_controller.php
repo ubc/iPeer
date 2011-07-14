@@ -61,8 +61,8 @@ class EvaltoolsController extends AppController
         $this->redirect('/surveys/index/');
       break;
 
-      case "emailer" :
-        $this->redirect('/emailer/index/');
+      case "emailtemplates" :
+        $this->redirect('/emailtemplates/index/');
       break;
 
       default:

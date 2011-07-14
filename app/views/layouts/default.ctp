@@ -142,7 +142,7 @@ function checkEmailAddress()
 
                     //Evaluation Tools Tab
                     generateTab($this, $access, 'EVAL_TOOL',
-                                array('evaltools', 'simpleevaluations', 'rubrics', 'surveys', 'mixevals', 'emailer'));
+                                array('evaltools', 'simpleevaluations', 'rubrics', 'surveys', 'mixevals', 'emailer', 'emailtemplates'));
 
                     // Advanced Search Tab
                     generateTab($this, $access, 'ADV_SEARCH', array('searchs'));

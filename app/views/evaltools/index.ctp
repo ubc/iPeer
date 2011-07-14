@@ -231,7 +231,7 @@
 	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
 	      <tr class="panelContent">
 	        <td colspan="6" align="right">
-          <?php echo $html->image('icons/add.gif', array('alt'=>'Add Survey', 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link('Add Email Template', '/emailer/add'); ?>
+          <?php echo $html->image('icons/add.gif', array('alt'=>'Add Survey', 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link('Add Email Template', '/emailtemplates/add'); ?>
           
           </td>
 	      </tr>
@@ -243,7 +243,7 @@
     	  <?php foreach($emailTemplates as $row): $emailTemplate = $row['EmailTemplate'];?>
     	  <tr class="tablecell">
     	    <td width="1%" bgcolor="#FFB66F">&nbsp;</td>
-            <td align="left"><?php echo $html->link($emailTemplate['name'], '/emailer/view/'.$emailTemplate['id']) ?></td>
+            <td align="left"><?php echo $html->link($emailTemplate['name'], '/emailtemplates/view/'.$emailTemplate['id']) ?></td>
           <td align="center"><?php echo $emailTemplate['description'];?></td>
     	  </tr>
     	  <?php endforeach; ?>

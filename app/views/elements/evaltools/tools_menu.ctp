@@ -21,9 +21,13 @@
               $surveySysFunc = $access['SURVEY'];    ?>
               <li <?php if ($this->params['controller'] == 'surveys') echo 'class="current"'; ?> ><a href="<?php echo $this->webroot.$this->theme.$surveySysFunc['url_link'];?>"><span><?php echo $surveySysFunc['function_name']?></span></a>|</li>
       <?php }?>
+      <?php if (!empty($access['EMAIL'])) {
+              $emailsSysFunc = $access['EMAIL'];    ?>
+              <li <?php if ($this->params['controller'] == 'emailer') echo 'class="current"'; ?> ><a href="<?php echo $this->webroot.$this->theme.$emailsSysFunc['url_link'];?>"><span><?php echo $emailsSysFunc['function_name']?></span></a>|</li>
+      <?php }?>
       <?php if (!empty($access['EMAIL_TEMPLATE'])) {
-              $emailerSysFunc = $access['EMAIL_TEMPLATE'];    ?>
-              <li <?php if ($this->params['controller'] == 'emailer') echo 'class="current"'; ?> ><a href="<?php echo $this->webroot.$this->theme.$emailerSysFunc['url_link'];?>"><span><?php echo $emailerSysFunc['function_name']?></span></a></li>
+              $emailtemplatesSysFunc = $access['EMAIL_TEMPLATE'];    ?>
+              <li <?php if ($this->params['controller'] == 'emailtemplates') echo 'class="current"'; ?> ><a href="<?php echo $this->webroot.$this->theme.$emailtemplatesSysFunc['url_link'];?>"><span><?php echo $emailtemplatesSysFunc['function_name']?></span></a></li>
       <?php }?>
   </ul>
 </div>

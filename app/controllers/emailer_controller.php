@@ -4,8 +4,6 @@
  * and open the template in the editor.
  */
 
-App::import('Lib', 'neat_string');
-
 class EmailerController extends AppController
 {
   var $name = 'Emailer';
@@ -17,16 +15,14 @@ class EmailerController extends AppController
   var $direction;
   var $page;
   var $order;
-  var $NeatString;
   var $Sanitize;
 
   function __construct(){
     $this->Sanitize = new Sanitize;
-    $this->NeatString = new NeatString;
     $this->show = empty($_GET['show'])? 'null':$this->Sanitize->paranoid($_GET['show']);
     if ($this->show == 'all') $this->show = 99999999;
-    $this->sortBy = empty($_GET['sort'])? 'EmailTemplate.description': $_GET['sort'];
-    $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
+    $this->sortBy = empty($_GET['sort'])? 'EmailSchedule.date': $_GET['sort'];
+    $this->direction = empty($_GET['direction'])? 'desc': $this->Sanitize->paranoid($_GET['direction']);
     $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
     $this->order = $this->sortBy . ' ' . strtoupper($this->direction);
     $this->pageTitle = 'Email';
@@ -40,20 +36,21 @@ class EmailerController extends AppController
 
     // Set up Columns
     $columns = array(
-            array("EmailTemplate.id",   "",       "",        "hidden"),
-            array("EmailTemplate.name", "Name",   "12em",    "action",   "View Email Template"),
-            array("EmailTemplate.description", "Description","auto",  "action", "View Email Template"),
-            array("EmailTemplate.creator_id",           "",            "",     "hidden"),
-            array("EmailTemplate.creator",     "Creator",  "10em", "action", "View Creator"),
-            array("EmailTemplate.created", "Creation Date", "10em", "date"));
+            array("EmailSchedule.id",   "",       "",        "hidden"),
+            array("EmailSchedule.subject", "Subject",   "auto",    "action",   "View Email"),
+            array("EmailSchedule.date", "Scheduled On","15em",  "date"),
+            array("EmailSchedule.sent",       "Sent",         "5em",   "map",
+                     array(  "0" => "Not Yet",  "1" => "Sent")),
+            array("EmailSchedule.creator_id",           "",            "",     "hidden"),
+            array("EmailSchedule.created", "Creation Date", "15em", "date"));
 
-    $userList = array($myID => "My Email Template");
-
+    $userList = array($myID => "My Email");
+    
     // Join with Users
-    $jointTableCreator = 
+    $jointTableCreator =
       array("id"         => "Creator.id",
             "localKey"   => "creator_id",
-            "description" => "Email Template to show:",
+            "description" => "Email to show:",
             "default" => $myID,
             "list" => $userList,
             "joinTable"  => "users",
@@ -67,22 +64,21 @@ class EmailerController extends AppController
     $restrictions = "";
     if ($this->Auth->user('role') != 'A') {
       $restrictions = array(
-          "EmailTemplate.creator_id" => array($myID => true, "!default" => false)
+          "EmailSchedule.creator_id" => array($myID => true, "!default" => false)
       );
-      $extraFilters = "(EmailTemplate.creator_id=$myID or EmailTemplate.availability='0')";
+      $extraFilters = "(EmailSchedule.creator_id=$myID)";
     }
 
     // Set up actions
-    $warning = "Are you sure you want to delete this email template permanently?";
+    $warning = "Are you sure you want to cancel this email permanently?";
     $actions = array(
-                     array("View Email Template", "", "", "", "view", "EmailTemplate.id"),
-                     array("Edit Email Template", "", $restrictions, "", "edit", "EmailTemplate.id"),
-                     array("Delete Email Template", $warning, $restrictions, "", "delete", "EmailTemplate.id"),
-                     array("View Creator", "",    "", "users", "view", "EmailTemplate.creator_id"));
+                     array("View Email", "", "", "", "view", "EmailSchedule.id"),
+                     array("Cancel Email", $warning, $restrictions, "", "cancel", "EmailSchedule.id"),
+                     array("View Creator", "",    "", "users", "view", "EmailSchedule.creator_id"));
 
     // Set up the list itself
-    $this->AjaxList->setUp($this->EmailTemplate, $columns, $actions,
-                           "EmailTemplate.id", "EmailTemplate.name", $joinTables, $extraFilters);
+    $this->AjaxList->setUp($this->EmailSchedule, $columns, $actions,
+                           "EmailSchedule.date", "EmailSchedule.id", $joinTables, $extraFilters);
   }
 
   function ajaxList() {
@@ -100,109 +96,70 @@ class EmailerController extends AppController
   }
 
   function write($to = ' '){
-    if(!isset($this->data)){
-      $emailAddress = $this->getEmailAddress($to);
-      if(is_array($emailAddress))
-        $emailAddress = implode('; ', $emailAddress);
-
-      $recipients = $this->getRecipient($to);
-      $this->set('recipients', $recipients);
-      $this->Session->write('email_recipients', $recipients);
-      $this->set('recipients_rest', $this->User->find('list', array(
-          'conditions'=>array('NOT' => array('User.id' => array_flip($this->getRecipient($to, 'list')))))));
-      $this->set('to', $emailAddress);      
-      $this->set('from', $this->Auth->user('email'));
-      $this->set('templatesList', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id'),'list'));
-      $this->set('templates', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id')));
+    if(isset($this->params['form']['preview'])){
+      var_dump($this->data);
+      $this->render('preview');
     }
     else{
-      $recipients = $this->Session->read('email_recipients');
-      $data = $this->data;
-      $data = $data['Email'];
+      if(!isset($this->data)){
+        $emailAddress = $this->getEmailAddress($to);
+        if(is_array($emailAddress))
+          $emailAddress = implode('; ', $emailAddress);
 
-      $data['from'] = $this->Auth->user('id');
-      $to = array();
-      foreach($recipients as $key => $r){
-        $to[$key] = $r['User']['id'];
-      }
-      $to = implode(';', $to);
-      $data['to'] = $to;
-
-      //Set current date if no schedule
-      if(!$data['schedule'])
-        $data['date'] = date("Y-m-d H:i:s", time());
-
-      $this->EmailSchedule->save($data);
-
-      //Display for testing
-      $this->set('data', $data);
-      $this->render('confirmation');      
-    }        
-  }
-
-  function add(){
-    //Set up user info
-    $currentUser = $this->User->getCurrentLoggedInUser();
-    $this->set('currentUser', $currentUser);
-    $this->set('mergeList', $this->EmailMerge->getMergeList());
-    if (empty($this->params['data'])) {
-
-    }
-    else{
-      //Save Data
-      if ($this->EmailTemplate->save($this->params['data'])) {
-        $this->Session->setFlash('Successful');
-        $this->redirect('/emailer/index');
+        $recipients = $this->getRecipient($to);
+        $this->set('recipients', $recipients);
+        $this->Session->write('email_recipients', $recipients);
+        $this->set('recipients_rest', $this->User->find('list', array(
+            'conditions'=>array('NOT' => array('User.id' => array_flip($this->getRecipient($to, 'list')))))));
+        $this->set('to', $emailAddress);
+        $this->set('from', $this->Auth->user('email'));
+        $this->set('templatesList', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id'),'list'));
+        $this->set('templates', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id')));
       }
       else{
-        $this->Session->setFlash('Failed to save');
-      }
-    }
+        $recipients = $this->Session->read('email_recipients');
+        $data = $this->data;
+        $data = $data['Email'];
 
-  }
+        $data['from'] = $this->Auth->user('id');
+        $to = array();
+        foreach($recipients as $key => $r){
+          $to[$key] = $r['User']['id'];
+        }
+        $to = implode(';', $to);
+        $data['to'] = $to;
+        $date = $data['date'];
 
-  function edit ($id){
-    $creator_id = $this->EmailTemplate->getCreatorId($id);
-    $user_id = $this->Auth->user('id');
-    if($creator_id == $user_id){
-      //Set up user info
-      $currentUser = $this->User->getCurrentLoggedInUser();
-      $this->set('currentUser', $currentUser);
-      $this->set('mergeList', $this->EmailMerge->getMergeList());
-
-      $data = $this->EmailTemplate->find('first', array(
-          'conditions' => array('EmailTemplate.id' => $id)
-      ));
-
-      if (empty($this->params['data'])) {
-          $this->data = $data;
-          $this->render('add');
-      }
-      else{
-        //Save Data
-        if ($this->EmailTemplate->save($this->params['data'])) {
-          $this->Session->setFlash('Successful');
-          $this->redirect('/emailer/index');
+        //Set current date if no schedule
+        if(!$data['schedule']){
+          $data['date'] = date("Y-m-d H:i:s", time());
         }
         else{
-          $this->Session->setFlash('Failed to save');
-        }
+          $tmp_data = array();
+          for($i=1; $i<=$data['times']; $i++){
+            $tmp_data[$i] = $data;
+            $tmp_data[$i]['date'] = date("Y-m-d H:i:s", strtotime($date) + ($i-1)*$data['interval_type']*$data['interval_num']);
+          }
+          $data = $tmp_data;
+        }        
+
+        $this->EmailSchedule->saveAll($data);        
+
+        //Display for testing
+        $this->set('data', $data);
+        $this->render('confirmation');
       }
     }
-    else{
-      $this->Session->setFlash('No Permission');
-      $this->redirect('/emailer/index');
-    }
   }
-
-  function delete ($id) {
-    $creator_id = $this->EmailTemplate->getCreatorId($id);
+  
+  function cancel ($id) {
+    $creator_id = $this->EmailSchedule->getCreatorId($id);
     $user_id = $this->Auth->user('id');
     if($creator_id == $user_id){
-      if ($this->EmailTemplate->delete($id)) {
-        $this->Session->setFlash('The Email Template was deleted successfully.');
+      if ($this->EmailSchedule->delete($id)) {
+        $this->Session->setFlash('The Email was canceled successfully.');
       } else {
-        $this->Session->setFlash('Email Template delete failed.');
+        $this->Session->setFlash('Email cancellation failed.');
       }
       $this->redirect('index/');
     }
@@ -213,12 +170,15 @@ class EmailerController extends AppController
   }
 
   function view ($id){
-    $this->data = $this->EmailTemplate->find('first', array(
-        'conditions' => array('EmailTemplate.id' => $id)
+    $email = $this->EmailSchedule->find('first', array(
+        'conditions' => array('EmailSchedule.id' => $id)
     ));
-    $this->set('readonly', true);
-    $this->render('add');
-
+    $email['EmailSchedule']['to'] = explode(';', $email['EmailSchedule']['to']);
+    $this->User->recursive = -1;
+    $email['User'] = $this->User->find('all', array(
+        'conditions' => array('User.id'=>$email['EmailSchedule']['to'])
+    ));
+    $this->set('data', $email);
   }
 
   function displayTemplate($templateId = null) {
@@ -379,7 +339,7 @@ class EmailerController extends AppController
           $tmp = array('id' => $e['id'],'sent' => '1');
           $this->EmailSchedule->save($tmp);
           
-          var_dump($this->Session->read('Message.email'));
+          var_dump ($this->Session->read('Message.email'));
         }
 
       }

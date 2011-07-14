@@ -1,5 +1,5 @@
 <?php 
-  echo $html->script('emailer.js');
+  echo $html->script('emailtemplates.js');
   $readonly = isset($readonly) ? $readonly : false;
 ?>
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
