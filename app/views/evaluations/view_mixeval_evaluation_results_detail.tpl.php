@@ -240,7 +240,7 @@ $groupAve = 0;
                 	echo "n/a<br />";
                 }
 
-                echo "<br /><br /></td>";
+                echo "</td>";
              }
              //echo "<td>";
              //echo "</td>";
