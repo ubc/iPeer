@@ -28,6 +28,13 @@
         </td>
         <td width="20%">&nbsp;</td>
   </tr>
+  <tr class="tablecell2">
+  	<td width="20%">Subject:</td>
+  	<td>
+        <?php echo $form->input('EmailTemplate.subject', array('size'=>'50','label'=>false,'readonly'=>$readonly));?>
+        </td>
+        <td width="20%">&nbsp;</td>
+  </tr>
 
   <tr class="tablecell2">
     <td>Availability:</td>

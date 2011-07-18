@@ -38,7 +38,8 @@ class EmailtemplatesController extends AppController
     $columns = array(
             array("EmailTemplate.id",   "",       "",        "hidden"),
             array("EmailTemplate.name", "Name",   "12em",    "action",   "View Email Template"),
-            array("EmailTemplate.description", "Description","auto",  "action", "View Email Template"),
+            array("EmailTemplate.subject", "Subject",   "12em",    "string"),
+            array("EmailTemplate.description", "Description","auto",  "string"),
             array("EmailTemplate.creator_id",           "",            "",     "hidden"),
             array("EmailTemplate.creator",     "Creator",  "10em", "action", "View Creator"),
             array("EmailTemplate.created", "Creation Date", "10em", "date"));
@@ -78,7 +79,7 @@ class EmailtemplatesController extends AppController
 
     // Set up the list itself
     $this->AjaxList->setUp($this->EmailTemplate, $columns, $actions,
-                           "EmailTemplate.id", "EmailTemplate.name", $joinTables, $extraFilters);
+                           "EmailTemplate.id", "EmailTemplate.subject", $joinTables, $extraFilters);
   }
 
   function ajaxList() {
@@ -174,6 +175,22 @@ class EmailtemplatesController extends AppController
     $this->set('readonly', true);
     $this->render('add');
 
+  }
+
+    function displayTemplateContent($templateId = null) {
+      $this->layout = 'ajax';
+      $template = $this->EmailTemplate->find('first', array(
+          'conditions' => array('EmailTemplate.id' => $templateId)
+      ));
+      $this->set('template', $template);
+  }
+
+    function displayTemplateSubject($templateId = null) {
+      $this->layout = 'ajax';
+      $template = $this->EmailTemplate->find('first', array(
+          'conditions' => array('EmailTemplate.id' => $templateId)
+      ));
+      $this->set('template', $template);
   }
 }
 ?>

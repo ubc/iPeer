@@ -236,15 +236,17 @@
           </td>
 	      </tr>
     	  <tr class="panelContent">
-            <th colspan="2" width="20">Name</th>
-    	    <th width="70%">Description</th>
+            <th colspan="2" width="10">Name</th>
+            <th width="20%">Subject</th>
+    	    <th width="60%">Description</th>
     	  </tr>
         <?php if(!empty($emailTemplates)):?>
     	  <?php foreach($emailTemplates as $row): $emailTemplate = $row['EmailTemplate'];?>
     	  <tr class="tablecell">
     	    <td width="1%" bgcolor="#FFB66F">&nbsp;</td>
             <td align="left"><?php echo $html->link($emailTemplate['name'], '/emailtemplates/view/'.$emailTemplate['id']) ?></td>
-          <td align="center"><?php echo $emailTemplate['description'];?></td>
+            <td align="left"><?php echo $emailTemplate['subject'];?></td>
+            <td align="center"><?php echo $emailTemplate['description'];?></td>
     	  </tr>
     	  <?php endforeach; ?>
         <?php else:?>

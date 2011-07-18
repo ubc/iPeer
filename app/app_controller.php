@@ -185,18 +185,31 @@ class AppController extends Controller  {
   }
 
   function _sendEmail($content,$subject,$from,$to,$cc = array(),$bcc= array()) {
-		$this->Email->reset();
+    $smtp['port'] = $this->sysContainer->getParamByParamCode('email.port');
+    $smtp['host'] = $this->sysContainer->getParamByParamCode('email.host');
+    $smtp['username'] = $this->sysContainer->getParamByParamCode('email.username');
+    $smtp['password'] = $this->sysContainer->getParamByParamCode('email.password');
+    
+    $this->Email->reset();
 
-                $this->Email->delivery = 'debug';
-		$this->Email->to = $to;
-		$this->Email->cc = $cc;
-		$this->Email->bcc = $bcc;
-		$this->Email->subject = $subject;
-		$this->Email->from = $from;
-		//$this->Email->template = $templateName;
-		$this->Email->sendAs = 'both';
-                
-		return $this->Email->send($content);                
+    $this->Email->smtpOptions = array(
+      'port'=>$smtp['port']['parameter_value'],
+      'timeout'=>'30',
+      'host' => $smtp['host']['parameter_value'],
+      'username'=>$smtp['username']['parameter_value'],
+      'password'=>$smtp['password']['parameter_value'],
+    );
+    
+    $this->Email->delivery = 'smtp';
+    $this->Email->to = $to;
+    $this->Email->cc = $cc;
+    $this->Email->bcc = $bcc;
+    $this->Email->subject = $subject;
+    $this->Email->from = $from;
+    //$this->Email->template = $templateName;
+    $this->Email->sendAs = 'both';
+    
+    return $this->Email->send($content);
   }
 }
 ?>

@@ -7,7 +7,8 @@
 class EmailerController extends AppController
 {
   var $name = 'Emailer';
-  var $uses = array('GroupsMembers', 'UserEnrol', 'User', 'EmailTemplate', 'EmailMerge', 'EmailSchedule', 'Personalize', 'SysParameter', 'SysFunction');
+  var $uses = array('GroupsMembers', 'UserEnrol', 'User', 'EmailTemplate', 'EmailMerge', 
+      'EmailSchedule', 'Personalize', 'SysParameter', 'SysFunction', 'Group', 'Course');
   var $components = array('AjaxList', 'Session', 'RequestHandler', 'Email');
   var $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Pagination', 'Js' => array('Prototype'));
   var $show;
@@ -70,7 +71,7 @@ class EmailerController extends AppController
     }
 
     // Set up actions
-    $warning = "Are you sure you want to cancel this email permanently?";
+    $warning = "Are you sure you want to cancel this email?";
     $actions = array(
                      array("View Email", "", "", "", "view", "EmailSchedule.id"),
                      array("Cancel Email", $warning, $restrictions, "", "cancel", "EmailSchedule.id"),
@@ -107,14 +108,14 @@ class EmailerController extends AppController
           $emailAddress = implode('; ', $emailAddress);
 
         $recipients = $this->getRecipient($to);
-        $this->set('recipients', $recipients);
-        $this->Session->write('email_recipients', $recipients);
+        $this->set('recipients', $recipients['Display']);
+        $this->Session->write('email_recipients', $recipients['Users']);
         $this->set('recipients_rest', $this->User->find('list', array(
             'conditions'=>array('NOT' => array('User.id' => array_flip($this->getRecipient($to, 'list')))))));
-        $this->set('to', $emailAddress);
         $this->set('from', $this->Auth->user('email'));
         $this->set('templatesList', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id'),'list'));
         $this->set('templates', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id')));
+        $this->set('mergeList', $this->EmailMerge->getMergeList());
       }
       else{
         $recipients = $this->Session->read('email_recipients');
@@ -146,8 +147,8 @@ class EmailerController extends AppController
         $this->EmailSchedule->saveAll($data);        
 
         //Display for testing
-        $this->set('data', $data);
-        $this->render('confirmation');
+        $this->Session->setFlash('The Email was saved successfully');
+        $this->redirect('index/');
       }
     }
   }
@@ -156,12 +157,18 @@ class EmailerController extends AppController
     $creator_id = $this->EmailSchedule->getCreatorId($id);
     $user_id = $this->Auth->user('id');
     if($creator_id == $user_id){
-      if ($this->EmailSchedule->delete($id)) {
-        $this->Session->setFlash('The Email was canceled successfully.');
-      } else {
-        $this->Session->setFlash('Email cancellation failed.');
+      if(!$this->EmailSchedule->getSent($id)){
+        if ($this->EmailSchedule->delete($id)) {
+          $this->Session->setFlash('The Email was canceled successfully.');
+        } else {
+          $this->Session->setFlash('Email cancellation failed.');
+        }
+        $this->redirect('index/');
       }
-      $this->redirect('index/');
+      else{
+        $this->Session->setFlash('Cannot cancel: Email is already sent.');
+        $this->redirect('index/');
+      }
     }
     else{
       $this->Session->setFlash('No Permission');
@@ -179,14 +186,6 @@ class EmailerController extends AppController
         'conditions' => array('User.id'=>$email['EmailSchedule']['to'])
     ));
     $this->set('data', $email);
-  }
-
-  function displayTemplate($templateId = null) {
-      $this->layout = 'ajax';
-      $template = $this->EmailTemplate->find('first', array(
-          'conditions' => array('EmailTemplate.id' => $templateId)
-      ));      
-      $this->set('template', $template);
   }
 
   function addRecipient() {
@@ -255,32 +254,58 @@ class EmailerController extends AppController
   }
 
   function getRecipient($to, $s_type = 'all'){
+    $result = array();
     $this->User->recursive = -1;
     $type = $to[0];
     $id = substr($to,1);
     switch($type){
       case ' ':
-        return array();
+        $display = array();
+        $users = array();
         break;
       case 'C': //Email addresses for all in Course
-        return $this->User->find($s_type, array(
+        $users = $this->User->find($s_type, array(
             //'fields' => array('email'),
             'conditions' => array('User.id' => $this->UserEnrol->getUserListByCourse($id))
         ));
+        $course = $this->Course->find('first', array(
+            'fields' => array('id','course'),
+            'conditions' => array('Course.id' => $id)
+        ));
+        $display['name'] = 'All students in course: '.$course['Course']['course'];
+        $display['link'] = '/users/goToClassList/'.$course['Course']['id'];
         break;
       case 'G': //Email addresses for all in group
-        return $this->User->find($s_type, array(
+        $users = $this->User->find($s_type, array(
             //'fields' => array('email'),
             'conditions' => array('User.id' => $this->GroupsMembers->getMembers($id))
         ));
+        $group = $this->Group->find('first', array(
+            'fields' => array('id','group_name'),
+            'conditions' => array('Group.id' => $id)
+        ));
+        $display['name'] = 'All students in  group: '.$group['Group']['group_name'];
+        $display['link'] = '/groups/view/'.$group['Group']['id'];
         break;
       default: //Email address for a user
-        return $this->User->find($s_type, array(
+        $users = $this->User->find($s_type, array(
             //'fields' => array('email'),
             'conditions' => array('User.id' => $to)
         ));
+        $user = $this->User->find('first', array(
+            //'fields' => array('email'),
+            'conditions' => array('User.id' => $to)
+        ));
+        $display['name'] = $user['User']['full_name'];
+        $display['link'] = '/users/view/'.$user['User']['id'];
 
     }
+    $result['Users'] = $users;
+    $result['Display'] = $display;
+    if($s_type == 'list')
+      return $users;
+    else
+      return $result;
   }
 
   function searchByUserId($array, $key, $value)
@@ -337,9 +362,10 @@ class EmailerController extends AppController
         $content = $this->doMerge($e['content'], $this->mergeStart, $this->mergeEnd, $to_id);
         if($this->_sendEmail($content,$subject,$from,$to)){
           $tmp = array('id' => $e['id'],'sent' => '1');
-          $this->EmailSchedule->save($tmp);
-          
-          var_dump ($this->Session->read('Message.email'));
+          $this->EmailSchedule->save($tmp);          
+        }
+        else{
+          echo "Failed";
         }
 
       }
