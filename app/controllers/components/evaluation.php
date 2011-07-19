@@ -708,7 +708,7 @@ class EvaluationComponent extends Object
         }
       } else {
         foreach ($groupMembers as $user) {
-          $matrix[$index][$user['id']] = 'n/a';
+          $matrix[$index][$user['User']['id']] = 'n/a';
         }
       }
       //Get Ave Criteria Grade

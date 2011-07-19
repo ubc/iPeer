@@ -60,8 +60,18 @@
               <td colspan="3"><b> Change Password: </b></td>
             </tr>
             <tr class="tablecell2">
-              <td width="185" id="password_label">Password:</td>
-              <td><?php echo $this->Form->password('password', array('id'=>'password', 'size'=>'50', 'class'=>'validate none PASSWORD_FORMAT password_msg Invalid_Password_Format.', 'value'=>'', 'disabled'=>$viewPage)) ?> </td>
+              <td width="185" id="password_label">Old Password:</td>
+              <td><?php echo $this->Form->password('old_password', array('id'=>'password', 'size'=>'50', 'class'=>'validate none PASSWORD_FORMAT password_msg Invalid_Password_Format.', 'value'=>'', 'disabled'=>$viewPage)) ?> </td>
+              <td width="187" id="password_msg" class="error"/>
+            </tr>
+            <tr class="tablecell2">
+              <td width="185" id="password_label">New Password:</td>
+              <td><?php echo $this->Form->password('tmp_password', array('id'=>'password', 'size'=>'50', 'class'=>'validate none PASSWORD_FORMAT password_msg Invalid_Password_Format.', 'value'=>'', 'disabled'=>$viewPage)) ?> </td>
+              <td width="187" id="password_msg" class="error"/>
+            </tr>
+            <tr class="tablecell2">
+              <td width="185" id="password_label">Confirm New Password:</td>
+              <td><?php echo $this->Form->password('confirm_password', array('id'=>'password', 'size'=>'50', 'class'=>'validate none PASSWORD_FORMAT password_msg Invalid_Password_Format.', 'value'=>'', 'disabled'=>$viewPage)) ?> </td>
               <td width="187" id="password_msg" class="error"/>
             </tr>
     <?php //endif;?>

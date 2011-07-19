@@ -551,7 +551,7 @@ class UsersController extends AppController
       $this->processEnrollmentListsPostBack($this->params, $this->User->id);
       //Send email w/ params
       $this->set('addedUser', $this->params['data']['User']);
-      //$this->_sendEmail('','User Created','tyou@exchange.ubc.ca',$this->params['data']['User']['email'], 'addUser');
+      //$this->_sendEmail('','User Created',$this->Auth->user('email'),$this->params['data']['User']['email'], 'addUser');
       $this->render('userSummary');      
     }
 
@@ -723,7 +723,26 @@ class UsersController extends AppController
       $this->set('viewPage', false);
       if(!empty($this->data)) {
         $this->data['User']['id'] = $id;
-
+        
+        if(!empty($this->data['User']['tmp_password'])){
+          if(md5($this->data['User']['old_password']==$this->Auth->user('password'))){
+            if($this->data['User']['tmp_password']==$this->data['User']['confirm_password']){
+              $this->data['User']['password'] = md5($this->data['User']['tmp_password']);
+            }
+            else{
+              $this->Session->setFlash("Confirm password is wrong");
+              $this->redirect('editProfile/'.$id);
+            }
+          }
+          else{
+            $this->Session->setFlash("Old password is wrong");
+            $this->redirect('editProfile/'.$id);
+          }
+        }
+        else{
+          unset($this->data['User']['tmp_password']);
+        }
+        
         if($this->__processForm()) {
           $this->__setSessionData($this->data['User']);
           if (!empty($this->data['User']['email'])) {
@@ -831,7 +850,9 @@ class UsersController extends AppController
       }
 
       //General password
-      $user_data['User']['password'] =  $this->NeatString->randomPassword(6);
+      $tmp_password = $this->NeatString->randomPassword(6);
+      $user_data['User']['tmp_password'] = $tmp_password;
+      $user_data['User']['password'] =  md5($tmp_password);
       $user_data['User']['id'] =  $user_id;
 
       //Save Data
@@ -839,19 +860,11 @@ class UsersController extends AppController
         $message = "Password successfully reset. ";
         $this->User->set('id', $user_id);
 
-        // set email parameters
-        $email_msg_param = $this->sysContainer->getParamByParamCode('system.password_reset_mail');
-        $email_msg = $email_msg_param['parameter_value'];
-        $from_param = $this->sysContainer->getParamByParamCode('system.admin_email');
-        $from = $from_param['parameter_value'];
-        $subject_param = $this->sysContainer->getParamByParamCode('system.password_reset_emailsubject');
-        $subject = $subject_param['parameter_value'];
-        $to = $user['User']['email'];
-        $email_msg = @ereg_replace("<user>", $user['User']['full_name'], $email_msg);
-        $email_msg = @ereg_replace("<newpassword>", $user['User']['password'], $email_msg);
-
+        $user_data['User']['password'] = $user_data['User']['tmp_password'];
         // send email to user
-        if($this->__sendEmail( $to, $from, $subject, $email_msg )) {
+        $this->set('user_data', $user_data);
+        if($this->_sendEmail('','Reset Password',$this->Auth->user('email'),$user_data['User']['email'], 'resetPassword')){
+        //if($this->_sendEmail( $to, $from, $subject, $email_msg )) {
           $message .= "Email has been sent. ";
         } else {
           if(!isset($to) || strlen($to) < 1) {
@@ -860,11 +873,7 @@ class UsersController extends AppController
           $message .= "Email was <u>not</u> sent to the user.";
         }
         $this->Session->setFlash($message);
-
-        //Render to view page to display saved data
-        //TODO: Allow to enter email and forward the password reset message to the user
-        $this->set('data', $user);
-        $this->render('userSummary');
+        $this->redirect('index');
       } else {
         //Get render page according to the user type
         $this->redirect('index');
@@ -1050,16 +1059,7 @@ class UsersController extends AppController
         if ($attributeCode != '' && $attributeValue != '') //check for empty params
         $this->data = $this->Personalize->updateAttribute($this->Auth->user('id'), $attributeCode, $attributeValue);
     }
-
-    function __sendEmail($to='', $from='', $subject='', $body='' ) {
-      //$this->Email->delivery = 'debug';
-      $this->Email->from = $from;
-      $this->Email->to = $to;
-      $this->Email->subject = $subject;
-      $body = preg_replace('/\<br(\s*)?\/?\>/i',chr(13).chr(10),$body);
-      return $this->Email->send($body);
-    }
-
+    
     function nonRegisteredCourses($user_id, $requester = null, $requester_role = null) {
         return $this->Course->findNonRegisteredCoursesList($user_id, $requester, $requester_role);
     }

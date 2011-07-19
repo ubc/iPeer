@@ -142,14 +142,16 @@ class User extends AppModel
   var $validate = array('username'  => array('character' => array('rule' => 'alphaNumeric',
                                                                   'required' => true,
                                                                   'message' => 'Alphabets and numbers only'),
-                                             'minLength' => array('rule' => array('minLength', 6),
+                                             'minLength' => array('rule' => array('minLength', 4),
                                                               'message' => 'Usernames must be at least 6 characters long'),
                                              'unique' => array('rule' => 'isUnique',
                                                                'message' => 'Duplicate Username found. Please change the username.')),
                         'email'     => array('rule' => 'email',
                                              'required' => false,
                                              'allowEmpty' => true,
-                                             'message' => 'Invalid email format'));
+                                             'message' => 'Invalid email format'),
+                        'tmp_password'     => array('minLength' => array('rule' => array('minLength', 6),
+                                             'message' => 'Password must be at least 6 characters long')));
 
   function __construct($id = false, $table = null, $ds = null) {
     parent::__construct($id, $table, $ds);
