@@ -39,7 +39,7 @@ class EvaluationsController extends AppController
                       'Event', 'EvaluationSimple', 'SimpleEvaluation', 'Rubric', 'Group',
                       'GroupEvent', 'GroupsMembers','RubricsLom','RubricsCriteria',
                       'RubricsCriteriaComment', 'Personalize', 'User','SurveyQuestion',
-                      'Question','Response','Survey','SurveyInput','Course','MixevalsQuestion',
+                      'Question','Response','Survey','SurveyInput','Course','MixevalsQuestion', 'MixevalsQuestionDesc',
                       'EvaluationMixeval','EvaluationMixevalDetail');
     var $components = array('AjaxList', 'rdAuth','Output','sysContainer', 'globalConstant', 'userPersonalize','framework',
                             'EvaluationResult', 'EvaluationHelper', 'EvaluationRubricHelper', 'EvaluationSimpleHelper',
@@ -672,6 +672,12 @@ class EvaluationsController extends AppController
 
 
           if ($displayFormat == 'Detail') {
+            //mixevals_questions_descs
+            $loms = $this->MixevalsQuestionDesc->find('list', array(
+                'fields' => array('descriptor')
+            ));
+            $this->set('loms', $loms);
+
             $this->render('view_mixeval_evaluation_results_detail');
 
           } else {
