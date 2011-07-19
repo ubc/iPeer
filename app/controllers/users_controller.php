@@ -551,7 +551,12 @@ class UsersController extends AppController
       $this->processEnrollmentListsPostBack($this->params, $this->User->id);
       //Send email w/ params
       $this->set('addedUser', $this->params['data']['User']);
-      //$this->_sendEmail('','User Created',$this->Auth->user('email'),$this->params['data']['User']['email'], 'addUser');
+      if($this->params['data']['User']['send_email_notification']){
+        if($this->_sendEmail('','User Created',$this->Auth->user('email'),$this->params['data']['User']['email'], 'addUser'))
+          $this->Session->setFlash('Sent a notification email to the user');
+        else
+          $this->Session->setFlash('Failed to Send Email');
+      }
       $this->render('userSummary');      
     }
 
@@ -860,7 +865,6 @@ class UsersController extends AppController
         $message = "Password successfully reset. ";
         $this->User->set('id', $user_id);
 
-        $user_data['User']['password'] = $user_data['User']['tmp_password'];
         // send email to user
         $this->set('user_data', $user_data);
         if($this->_sendEmail('','Reset Password',$this->Auth->user('email'),$user_data['User']['email'], 'resetPassword')){

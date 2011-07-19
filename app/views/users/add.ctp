@@ -28,7 +28,12 @@
           <tr class="tablecell2"><td  colspan="3">
           A password will be automatically generated, and shown on the next page, after you click "Save".<br />
           <strong>Note:</strong> If using CWL logons, students should use CWL username/password for iPeer, instead of the generated one.
-          </td></tr>
+          </td></tr>        
+        <!-- Email Notification -->
+        <tr class="tablecell2">
+            <td>Send Email Notification?</td>
+            <?php echo $this->Form->input('send_email_notification', array('type'=>'checkbox','label'=>false)) ?>            
+        </tr>
         <?php endif;?>
 
         <!-- First Name -->
