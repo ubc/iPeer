@@ -1,7 +1,7 @@
 <?php
 /* SVN FILE: $Id$ */
 /*
- * To use your Model’s inside of your components, you can create a new instance like this:
+ * To use your Modelï¿½s inside of your components, you can create a new instance like this:
  *  $this->foo = new Foo;
  *
  * @author
@@ -404,6 +404,7 @@ class EvaluationMixevalHelperComponent extends Object
 	  $this->User = new User;
 	  $this->GroupsMembers = new GroupsMembers;
 	  $this->MixevalsQuestion = new MixevalsQuestion;
+          $this->MixevalsQuestionDesc = new MixevalsQuestionDesc;
 	  $this->EvaluationMixeval = new EvaluationMixeval;
 
 	  $evalResult = array();
@@ -444,6 +445,7 @@ class EvaluationMixevalHelperComponent extends Object
 		if ($displayFormat == 'Detail') {
 		  $mixevalQuestion = $this->MixevalsQuestion->getQuestion($mixeval['Mixeval']['id']);
 		  foreach ($mixevalQuestion AS $row) {
+        $row['MixevalsQuestion']['Description'] = $this->MixevalsQuestionDesc->getQuestionDescriptor($row['MixevalsQuestion']['id']);
         $question = $row['MixevalsQuestion'];
         $result['mixevalQuestion'][$question['question_num']] = $question;
       }

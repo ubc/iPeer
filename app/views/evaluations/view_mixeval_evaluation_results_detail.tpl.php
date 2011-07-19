@@ -6,7 +6,7 @@
 <?php echo $javascript->link('ricoanimation')?>
 <?php echo $javascript->link('ricopanelcontainer')?>
 <?php echo $javascript->link('ricoaccordion')?>
-<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
+<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id');?>
     <!-- Render Event Info table -->
 	  <?php
     $params = array('controller'=>'evaluations', 'event'=>$event);
@@ -216,7 +216,7 @@ $groupAve = 0;
                 echo '<td valign="middle">';
                 //Point Description Detail
                 if (isset($rubDet)) {
-                  echo $loms[$rubDet["selected_lom"]]."<br />";
+                  echo $mixevalQuestion[$j-1]['Description'][$rubDet['selected_lom']-1]['descriptor']."<br />";
                 } else {
                 	echo "n/a<br />";
                 }
@@ -240,8 +240,8 @@ $groupAve = 0;
                 //Grade Detail
                 echo "<strong>Grade: </strong>";
                 if (isset($rubDet)) {
-                  //echo $rubDet["grade"] . " / " . $mixevalQuestion[$j-1]['MixevalsQuestion']['multiplier'] . "<br />";
-                  echo $rubDet["grade"] . " / " . $mixevalQuestion[$j]['multiplier'] . "<br />";
+                  echo $rubDet["grade"] . " / " . $mixevalQuestion[$j-1]['multiplier'] . "<br />";
+                  //echo $rubDet["grade"] . " / " . $mixevalQuestion[$j]['multiplier'] . "<br />";
                 } else {
                 	echo "n/a<br />";
                 }
