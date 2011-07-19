@@ -1,7 +1,7 @@
 <?php
 /* SVN FILE: $Id$ */
 /**
- * Short description for file.
+ * Routes configuration
  *
  * In this file, you set up routes to your controllers and their actions.
  * Routes are very important mechanism that allows you to freely connect
@@ -9,35 +9,31 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP :  Rapid Development Framework <http://www.cakephp.org/>
- * Copyright (c)	2006, Cake Software Foundation, Inc.
- *								1785 E. Sahara Avenue, Suite 490-204
- *								Las Vegas, Nevada 89104
+ * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
+ * Copyright 2005-2010, Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @filesource
- * @copyright		Copyright (c) 2006, Cake Software Foundation, Inc.
- * @link				http://www.cakefoundation.org/projects/info/cakephp CakePHP Project
- * @package			cake
- * @subpackage		cake.app.config
- * @since			CakePHP v 0.2.9
- * @version			$Revision$
- * @modifiedby		$LastChangedBy: phpnut $
- * @lastmodified	$Date: 2006/06/20 18:44:08 $
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @copyright     Copyright 2005-2010, Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * @link          http://cakephp.org CakePHP(tm) Project
+ * @package       cake
+ * @subpackage    cake.app.config
+ * @since         CakePHP(tm) v 0.2.9
+ * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 /**
  * Here, we are connecting '/' (base path) to controller called 'Pages',
  * its action called 'display', and we pass a param to select the view file
- * to use (in this case, /app/views/pages/home.tpl.php)...
+ * to use (in this case, /app/views/pages/home.ctp)...
  */
-  Router::connect('/', array('controller' => 'pages', 'action' => 'display', 'home'));
+#Router::connect('/', array('controller' => 'pages', 'action' => 'display', 'home'));
+	Router::connect('/', array('controller' => 'home', 'action' => 'index'));
 /**
  * ...and connect the rest of 'Pages' controller's urls.
  */
-  Router::connect('/pages/*', array('controller' => 'pages', 'action' => 'display'));
+	Router::connect('/pages/*', array('controller' => 'pages', 'action' => 'display'));
+
 /**
  * Then we connect url '/test' to our test controller. This is helpfull in
  * developement.
