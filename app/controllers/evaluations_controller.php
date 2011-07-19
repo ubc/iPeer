@@ -673,9 +673,7 @@ class EvaluationsController extends AppController
 
           if ($displayFormat == 'Detail') {
             //mixevals_questions_descs
-            $loms = $this->MixevalsQuestionDesc->find('list', array(
-                'fields' => array('descriptor')
-            ));
+            $loms = $this->MixevalsQuestionDesc->generateList(null,null,null,'{n}.MixevalsQuestionDesc.id','{n}.MixevalsQuestionDesc.descriptor');
             $this->set('loms', $loms);
 
             $this->render('view_mixeval_evaluation_results_detail');
