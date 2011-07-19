@@ -216,6 +216,12 @@ $groupAve = 0;
              for ($j = 1; $j <= $mixeval['Mixeval']["lickert_question_max"]; $j++) {
                $rubDet = $resultDetails[$j-1]['EvaluationMixevalDetail'];
                 echo '<td valign="middle">';
+                //Point Description Detail
+                if (isset($rubDet)) {
+                  echo $loms[$rubDet["selected_lom"]]."<br />";
+                } else {
+                	echo "n/a<br />";
+                }
                 //Points Detail
                 echo "<strong>Points: </strong>";
                 if (isset($rubDet)) {

@@ -184,7 +184,7 @@ class AppController extends Controller  {
     return true;
   }
 
-  function _sendEmail($content,$subject,$from,$to,$cc = array(),$bcc= array()) {
+  function _sendEmail($content,$subject,$from,$to, $templateName = 'default', $cc = array(),$bcc= array()) {
     $smtp['port'] = $this->sysContainer->getParamByParamCode('email.port');
     $smtp['host'] = $this->sysContainer->getParamByParamCode('email.host');
     $smtp['username'] = $this->sysContainer->getParamByParamCode('email.username');
@@ -206,7 +206,7 @@ class AppController extends Controller  {
     $this->Email->bcc = $bcc;
     $this->Email->subject = $subject;
     $this->Email->from = $from;
-    //$this->Email->template = $templateName;
+    $this->Email->template = $templateName;
     $this->Email->sendAs = 'both';
     
     return $this->Email->send($content);

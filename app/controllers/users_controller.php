@@ -551,8 +551,8 @@ class UsersController extends AppController
       $this->processEnrollmentListsPostBack($this->params, $this->User->id);
       //Send email w/ params
       $this->set('addedUser', $this->params['data']['User']);
-      //$this->_sendEmail('addUser','User Created','tyou@exchange.ubc.ca',$this->params['data']['User']['email']);
-      $this->render('userSummary');
+      //$this->_sendEmail('','User Created','tyou@exchange.ubc.ca',$this->params['data']['User']['email'], 'addUser');
+      $this->render('userSummary');      
     }
 
     $thisUser = $this->Auth->user();
