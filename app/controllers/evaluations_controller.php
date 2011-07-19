@@ -778,11 +778,6 @@ function makeSurveyEvaluation ($param = null) {
 
 
         if ($displayFormat == 'Detail') {
-          //mixevals_questions_descs
-          $loms = $this->MixevalsQuestionDesc->find('list', array(
-              'fields' => array('descriptor')
-          ));
-          $this->set('loms', $loms);
           $this->render('view_mixeval_evaluation_results_detail');
 
         } else {

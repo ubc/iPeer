@@ -218,7 +218,7 @@ $groupAve = 0;
                 echo '<td valign="middle">';
                 //Point Description Detail
                 if (isset($rubDet)) {
-                  echo $loms[$rubDet["selected_lom"]]."<br />";
+                  echo $mixevalQuestion[$j-1]['Description'][$rubDet['selected_lom']-1]['descriptor']."<br />";
                 } else {
                 	echo "n/a<br />";
                 }

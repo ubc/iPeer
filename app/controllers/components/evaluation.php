@@ -1257,6 +1257,7 @@ class EvaluationComponent extends Object
       //echo 'ss';
       $mixevalQuestion = $this->MixevalsQuestion->getQuestion($mixeval['Mixeval']['id']);
       foreach ($mixevalQuestion AS $row) {
+        $row['MixevalsQuestion']['Description'] = $row['Description'];
         $question = $row['MixevalsQuestion'];
         $result['mixevalQuestion'][$question['question_num']] = $question;
       }
