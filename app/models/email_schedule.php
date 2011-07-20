@@ -9,12 +9,21 @@ class EmailSchedule extends AppModel
 
   var $actsAs = array('Traceable');
 
+  /**
+   * Get emails to send
+   * @return Emails to send
+   */
   function getEmailsToSend(){
     return $this->find('all', array(
         'conditions' => array('now() >= EmailSchedule.date', 'EmailSchedule.sent' => '0')
     ));
   }
 
+  /**
+   * Get creator's id
+   * @param $id id
+   * @return Creator id
+   */
   function getCreatorId($id){
     $tmp = $this->find('first', array(
         'conditions' => array('EmailSchedule.id' => $id),
@@ -23,6 +32,11 @@ class EmailSchedule extends AppModel
     return $tmp['EmailSchedule']['creator_id'];
   }
 
+  /**
+   * Get whether email is sent or not
+   * @param $id id
+   * @return Sent field
+   */
   function getSent($id){
     $tmp = $this->find('first', array(
         'conditions' => array('EmailSchedule.id' => $id),

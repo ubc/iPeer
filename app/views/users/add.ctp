@@ -32,7 +32,8 @@
         <!-- Email Notification -->
         <tr class="tablecell2">
             <td>Send Email Notification?</td>
-            <?php echo $this->Form->input('send_email_notification', array('type'=>'checkbox','label'=>false)) ?>            
+            <td><?php echo $this->Form->input('send_email_notification', array('type'=>'checkbox','label'=>false,'format' => array('input'))) ?></td>
+            <td>If checked, send a notification email to user include username, password and instruction</td>
         </tr>
         <?php endif;?>
 

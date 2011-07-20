@@ -9,12 +9,21 @@ class EmailMerge extends AppModel
 
   var $actsAs = array();
 
+  /**
+   * Get merge fields
+   * @return List of merge fields
+   */
   function getMergeList(){
     return $this->find('list', array(
         'fields' => array('EmailMerge.value', 'EmailMerge.key')
     ));
   }
 
+  /**
+   * Get field name by value
+   * @param $value value
+   * @return field name
+   */
   function getFieldNameByValue($value = ''){
     $table = $this->find('first', array(
           'conditions' => array('value' => $value),

@@ -89,6 +89,9 @@ class EmailtemplatesController extends AppController
     $this->AjaxList->asyncGet();
   }
 
+  /**
+   * Index
+   */
   function index(){
     // Set up the basic static ajax list variables
     $this->setUpAjaxList();
@@ -96,6 +99,9 @@ class EmailtemplatesController extends AppController
     $this->set('paramsForList', $this->AjaxList->getParamsForList());
   }
 
+  /**
+   * Add an email template
+   */
   function add(){
     //Set up user info
     $currentUser = $this->User->getCurrentLoggedInUser();
@@ -117,6 +123,10 @@ class EmailtemplatesController extends AppController
 
   }
 
+  /**
+   * Edit an email template
+   * @param <type> $id template id
+   */
   function edit ($id){
     $creator_id = $this->EmailTemplate->getCreatorId($id);
     $user_id = $this->Auth->user('id');
@@ -151,6 +161,10 @@ class EmailtemplatesController extends AppController
     }
   }
 
+  /**
+   * Delete an email template
+   * @param <type> $id template id
+   */
   function delete ($id) {
     $creator_id = $this->EmailTemplate->getCreatorId($id);
     $user_id = $this->Auth->user('id');
@@ -158,7 +172,7 @@ class EmailtemplatesController extends AppController
       if ($this->EmailTemplate->delete($id)) {
         $this->Session->setFlash('The Email Template was deleted successfully.');
       } else {
-        $this->Session->setFlash('Email Template delete failed.');
+        $this->Session->setFlash('Failed to delete the Email Template.');
       }
       $this->redirect('index/');
     }
@@ -168,6 +182,10 @@ class EmailtemplatesController extends AppController
     }
   }
 
+  /**
+   * View an email template
+   * @param <type> $id template id
+   */
   function view ($id){
     $this->data = $this->EmailTemplate->find('first', array(
         'conditions' => array('EmailTemplate.id' => $id)
@@ -177,7 +195,11 @@ class EmailtemplatesController extends AppController
 
   }
 
-    function displayTemplateContent($templateId = null) {
+  /**
+   * display template content for updating field by selecting a template
+   * @param <type> $templateId template id
+   */
+  function displayTemplateContent($templateId = null) {
       $this->layout = 'ajax';
       $template = $this->EmailTemplate->find('first', array(
           'conditions' => array('EmailTemplate.id' => $templateId)
@@ -185,7 +207,11 @@ class EmailtemplatesController extends AppController
       $this->set('template', $template);
   }
 
-    function displayTemplateSubject($templateId = null) {
+  /**
+   * display template subjec for updating field by selecting a template
+   * @param $templateId template id
+   */
+  function displayTemplateSubject($templateId = null) {
       $this->layout = 'ajax';
       $template = $this->EmailTemplate->find('first', array(
           'conditions' => array('EmailTemplate.id' => $templateId)

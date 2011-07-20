@@ -89,6 +89,9 @@ class EmailerController extends AppController
     $this->AjaxList->asyncGet();
   }
 
+  /**
+   * Index
+   */
   function index(){
     // Set up the basic static ajax list variables
     $this->setUpAjaxList();
@@ -96,20 +99,28 @@ class EmailerController extends AppController
     $this->set('paramsForList', $this->AjaxList->getParamsForList());
   }
 
+  /**
+   * Write an email
+   * @param $to parameter for recipients
+   */
   function write($to = ' '){
+    //TODO: preview function
     if(isset($this->params['form']['preview'])){
       var_dump($this->data);
       $this->render('preview');
     }
     else{
       if(!isset($this->data)){
+        //Get recipients' email address
         $emailAddress = $this->getEmailAddress($to);
         if(is_array($emailAddress))
           $emailAddress = implode('; ', $emailAddress);
 
         $recipients = $this->getRecipient($to);
         $this->set('recipients', $recipients['Display']);
+        //Write current recipients into session
         $this->Session->write('email_recipients', $recipients['Users']);
+        //Users who are not in recipients of the email
         $this->set('recipients_rest', $this->User->find('list', array(
             'conditions'=>array('NOT' => array('User.id' => array_flip($this->getRecipient($to, 'list')))))));
         $this->set('from', $this->Auth->user('email'));
@@ -144,15 +155,19 @@ class EmailerController extends AppController
           $data = $tmp_data;
         }        
 
+        //Push an email into email_schedules table
         $this->EmailSchedule->saveAll($data);        
 
-        //Display for testing
         $this->Session->setFlash('The Email was saved successfully');
         $this->redirect('index/');
       }
     }
   }
-  
+
+  /**
+   * Cancel(Delete) an email from email_schedules table
+   * @param <type> $id email_schedule id
+   */
   function cancel ($id) {
     $creator_id = $this->EmailSchedule->getCreatorId($id);
     $user_id = $this->Auth->user('id');
@@ -165,17 +180,21 @@ class EmailerController extends AppController
         }
         $this->redirect('index/');
       }
-      else{
+      else{//If email is already sent
         $this->Session->setFlash('Cannot cancel: Email is already sent.');
         $this->redirect('index/');
       }
     }
-    else{
+    else{//If user is not creator of the email
       $this->Session->setFlash('No Permission');
       $this->redirect('/emailer/index');
     }
   }
 
+  /**
+   * View an email
+   * @param <type> $id email_schedule id
+   */
   function view ($id){
     $email = $this->EmailSchedule->find('first', array(
         'conditions' => array('EmailSchedule.id' => $id)
@@ -188,6 +207,9 @@ class EmailerController extends AppController
     $this->set('data', $email);
   }
 
+  /**
+   * Add a recipient
+   */
   function addRecipient() {
     if((!isset($this->passedArgs['recipient_id'])) &&
        (!isset($this->params['form']['recipient_id']))) {
@@ -206,17 +228,20 @@ class EmailerController extends AppController
     
     $tmp_recipients = $this->Session->read('email_recipients');
     array_push($tmp_recipients, $recipient);
+    //Store added recipient to session
     $this->Session->write('email_recipients', $tmp_recipients);
     $this->set('recipient', $recipient['User']);
     $this->render('/elements/emailer/edit_recipient');
 
   }
 
+  //Delete a recipient
   function deleteRecipient() {
     if(!isset($this->passedArgs['recipient_id'])) {
       $this->cakeError('error404');
     }
     $tmp_index = $this->searchByUserId($this->Session->read('email_recipients'),'id', $this->passedArgs['recipient_id']);
+    //Unset the recipient from the session
     $tmp_recipients = $this->Session->read('email_recipients');
     unset($tmp_recipients[$tmp_index]);
     $this->Session->write('email_recipients', $tmp_recipients);
@@ -224,6 +249,11 @@ class EmailerController extends AppController
     $this->ajax = true;
   }
 
+  /**
+   * Get email addresses
+   * @param $to recipients
+   * @return List of users' email address
+   */
   function getEmailAddress($to){
 
     $type = $to[0];
@@ -253,6 +283,12 @@ class EmailerController extends AppController
     }
   }
 
+  /**
+   * Get recipients
+   * @param <type> $to recipients
+   * @param <type> $s_type find type
+   * @return array of recipients and info
+   */
   function getRecipient($to, $s_type = 'all'){
     $result = array();
     $this->User->recursive = -1;
@@ -308,6 +344,13 @@ class EmailerController extends AppController
       return $result;
   }
 
+  /**
+   * Get index of user in array
+   * @param <type> $array array
+   * @param <type> $key key
+   * @param <type> $value value
+   * @return index of searched user
+   */
   function searchByUserId($array, $key, $value)
   {
       $i = 0;
@@ -321,6 +364,14 @@ class EmailerController extends AppController
       }
   }
 
+  /**
+   * Do merge
+   * @param $string string with merge fields
+   * @param $start start of merge field
+   * @param $end end of merge field
+   * @param $user_id user id
+   * @return merged string
+   */
   function doMerge($string, $start, $end, $user_id = null){
     //Return array $matches that contains all tags
     preg_match_all('/'.$start.'(.*?)'.$end.'/', $string, $matches, PREG_OFFSET_CAPTURE);
@@ -345,6 +396,9 @@ class EmailerController extends AppController
     return preg_replace($patterns, $replacements, $string);
   }
 
+  /**
+   * Send emails 
+   */
   function send(){
     $this->layout = 'ajax';
     $emails = $this->EmailSchedule->getEmailsToSend();
