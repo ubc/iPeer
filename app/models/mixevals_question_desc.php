@@ -64,5 +64,12 @@ class MixevalsQuestionDesc extends AppModel
 
   	return $data;
   }
+
+  // function to return the question's descriptor
+  function getQuestionDescriptorByMixevalId($mixevalId, $questionNum) {
+    $data = $this->findAll('mixeval_id='.$mixevalId.' AND question_num='.$questionNum, null, 'scale_level ASC');
+
+  	return $data;
+  }
 }
 ?>
