@@ -20,7 +20,7 @@ function get_php_setting($val) {
     <td colspan="3"><table width="100%"  border="0" cellspacing="0" cellpadding="0">
        <tr>
         <td width="10%">&nbsp;</td>
-        <td><strong>System Requirements: </strong></td>
+        <td><strong><?php __('System Requirements')?>: </strong></td>
         <td width="10%">&nbsp;</td>
       </tr>
       <tr>
@@ -29,22 +29,22 @@ function get_php_setting($val) {
             <tr>
               <td><table width="90%"  border="0" cellspacing="2" cellpadding="10">
                   <tr>
-                    <td width="30%" rowspan="7" class="style6"><div align="justify">All items in this section must be green. Please take action to correct any item that is shown in red before installation. </div></td>
+                    <td width="30%" rowspan="7" class="style6"><div align="justify"><?php __('All items in this section must be green. Please take action to correct any item that is shown in red before installation.')?> </div></td>
                     <td width="10%"></td>
-                    <td width="40%">PHP version &gt;= 4.3.2</td>
-                    <td width="20%"><?php echo phpversion() < '4.3.2' ? '<b><font color="red">No</font></b>' : '<b><font color="green">Yes</font></b>';?></td>
+                    <td width="40%"><?php __('PHP version')?> &gt;= 4.3.2</td>
+                    <td width="20%"><?php echo phpversion() < '4.3.2' ? '<b><font color="red">'.__('No', true).'</font></b>' : '<b><font color="green">'.__('Yes', true).'</font></b>';?></td>
                   </tr>
                   <tr>
                     <td><div align="center"></div></td>
-                    <td>MySQL Support</td>
-                    <td><?php echo function_exists( 'mysql_connect' ) ? '<b><font color="green">Available</font></b>' : '<b><font color="red">Unavailable</font></b>';?></td>
+                    <td><?php __('MySQL Support')?></td>
+                    <td><?php echo function_exists( 'mysql_connect' ) ? '<b><font color="green">'.__('Available', true).'</font></b>' : '<b><font color="red">'.__('Unavailable', true).'</font></b>';?></td>
                   </tr>
 <!--          			  <tr>
           			   <td>&nbsp;</td>
           			   <td>PEAR extensions</td>
           			   <td><b><?php
           			   @include_once("DB.php");
-               	  echo class_exists('DB') ? '<font color="green">Available</font>' : '<font color="red">Not Installed</font>';
+               	  echo class_exists('DB') ? '<font color="green">'.__('Available', true).'</font>' : '<font color="red">'.__('Not Installed', true).'</font>';
           			   ?></b></td>
           			  </tr>-->
                 </table>
@@ -61,7 +61,7 @@ function get_php_setting($val) {
     <td colspan="3"><table width="100%"  border="0" cellspacing="0" cellpadding="0">
        <tr>
         <td width="10%">&nbsp;</td>
-        <td><strong>Optional Requirements: </strong></td>
+        <td><strong><?php __('Optional Requirements')?>: </strong></td>
         <td width="10%">&nbsp;</td>
       </tr>
       <tr>
@@ -70,25 +70,25 @@ function get_php_setting($val) {
             <tr>
               <td><table width="90%"  border="0" cellspacing="2" cellpadding="10">
                   <tr>
-                    <td width="30%" rowspan="7" class="style6"><div align="justify">All items in this section are optional. </div></td>
+                    <td width="30%" rowspan="7" class="style6"><div align="justify"><?php __('All items in this section are optional.')?> </div></td>
                     <td width="10%"></td>
-                    <td width="40%">Sendmail or Sendmail Wrapper <br/>(Required if you want email functions.)</td>
+                    <td width="40%"><?php __('Sendmail or Sendmail Wrapper <br/>(Required if you want email functions.)')?></td>
                     <td width="20%"><b><?php
-            				   echo ini_get("sendmail_path") ? '<font color="green">Installed</font>' : '<font color="red">Not Installed</font>';
+            				   echo ini_get("sendmail_path") ? '<font color="green">'.__('Installed', true).'</font>' : '<font color="red">'.__('Not Installed', true).'</font>';
             			   ?></b></td>
                   </tr>
                   <tr>
                     <td><div align="center"></div></td>
-            			  <td>"at" permissions for email scheduling</td>
+            			  <td><?php __('"at" permissions for email scheduling')?></td>
             			  <td><?php
                         $output;
                         $return_var;
                         //echo | at `date +%H:%M` //this one might work.. but generates an empty job
                         exec("atq",$output,$return_var); //won't work on windows
                         if($return_var != 0)
-                        	echo '<b><font color="red">Denied. Remove Apache daemon ('. exec("whoami") . ") from \"/etc/at.deny\" or \"/var/at/at.deny\"</font></b>";
+                        	echo '<b><font color="red">'.__('Denied. Remove Apache daemon').' ('. exec("whoami") . ")".__('from', true)." \"/etc/at.deny\" or \"/var/at/at.deny\"</font></b>";
                         else
-                        	echo '<b><font color="green">Allowed</font></b>';
+                        	echo '<b><font color="green">'.__('Allowed', true).'</font></b>';
                         ?></td>
                   </tr>
                 </table>
@@ -105,7 +105,7 @@ function get_php_setting($val) {
     <td colspan="3"><table width="100%"  border="0" cellspacing="0" cellpadding="0">
        <tr>
         <td width="10%">&nbsp;</td>
-        <td><strong>Recommended Settings: </strong></td>
+        <td><strong><?php __('Recommended Settings')?>: </strong></td>
         <td width="10%">&nbsp;</td>
       </tr>
       <tr>
@@ -113,7 +113,7 @@ function get_php_setting($val) {
         <td><table width="100%"  border="1" cellpadding="0" cellspacing="0" bgcolor="#E9ECEF">
             <tr>
               <td><table width="95%"  border="0" cellspacing="2" cellpadding="10">
-                  <tr><td class="title"> Directive</td><td class="title"> Recommended</td><td class="title" >Actual</td></tr>
+                  <tr><td class="title"> <?php __('Directive')?></td><td class="title"><?php __(' Recommended')?></td><td class="title" ><?php __('Actual')?></td></tr>
                   <?php
                 		$php_recommended_settings = array(array ('Safe Mode','safe_mode','OFF'),
                 		array ('Display Errors','display_errors','ON'),
@@ -150,7 +150,7 @@ function get_php_setting($val) {
   <!-- Next -->
   <tr>
     <td colspan="3" align="right">
-      <?php echo $html->submit('Next >>', array('name'=>'next')) ?>
+      <?php echo $html->submit(__('Next >>', true), array('name'=>'next')) ?>
 
     </td>
   </tr>

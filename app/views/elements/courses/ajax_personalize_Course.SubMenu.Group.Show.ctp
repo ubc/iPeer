@@ -11,14 +11,14 @@
   </tr>
   <tr>
     <td bgcolor="#FFB66F">&nbsp;</td>
-    <td class="tablecell"><?php echo $this->Html->link($this->Html->image('layout/yellow_arrow.gif',array('valign'=>'middle', 'border'=>'0', 'alt'=>'yellow_arrow')).'&nbsp;List Groups', 
+    <td class="tablecell"><?php echo $this->Html->link($this->Html->image('layout/yellow_arrow.gif',array('valign'=>'middle', 'border'=>'0', 'alt'=>'yellow_arrow')).'&nbsp;'.__('List Groups',true), 
                                                        '/groups/goToClassList/'.$course_id, 
                                                        array('escape' => false))?>
       </a></td>
   </tr>
 <!--  <tr>
     <td bgcolor="#FFB66F">&nbsp;</td>
-    <td class="tablecell"><?php echo $html->image('layout/yellow_arrow.gif',array('align'=>'middle','alt'=>'yellow_arrow'))?> &nbsp;Send Group Email
+    <td class="tablecell"><?php echo $html->image('layout/yellow_arrow.gif',array('align'=>'middle','alt'=>'yellow_arrow'))?> &nbsp;<?php __('Send Group Email')?>
       </td>
   </tr>-->
 </table>

@@ -17,9 +17,9 @@ echo $this->element('evaluations/view_event_info', $params);
   <tr>
     <td colspan="3"><?php echo $html->image('icons/instructions.gif',array('alt'=>'instructions'));?>
       <b> Summary:</b>(
-      <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Basic">Basic</a>
+      <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Basic"><?php __('Basic')?></a>
        |
-      <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Detail" >Detail</a>
+      <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Detail" ><?php __('Detail')?></a>
         )
     </td>
   </tr>
@@ -27,7 +27,7 @@ echo $this->element('evaluations/view_event_info', $params);
   if (!$allMembersCompleted) {?>
   <tr>
     <td colspan="3">
-	      <font color="red">These student(s) have yet to submit their evaluations: <br>
+	      <font color="red"><?php __('These student(s) have yet to submit their evaluations:')?> <br>
 	         <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
 	          &nbsp;-&nbsp; <?php echo $user['last_name'].' '.$user['first_name']?> <br>
 	      <?php endforeach; ?>
@@ -39,8 +39,8 @@ echo $this->element('evaluations/view_event_info', $params);
 <div id='rubric_result'>
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr class="tableheader">
-		<td valign="middle">Student Name:</td>
-    <td> Total:( /<?php echo number_format($rubric['Rubric']['total_marks'], 2)?>)</td>
+		<td valign="middle"><?php __('Student Name:')?></td>
+    <td><?php __('Total:')?>( /<?php echo number_format($rubric['Rubric']['total_marks'], 2)?>)</td>
   </tr>
 <?php
     $aveScoreSum = 0;
@@ -68,7 +68,7 @@ echo $this->element('evaluations/view_event_info', $params);
       //averages
       echo '<tr class="tablesummary">';
       echo "<td><b>";
-      echo "Group Average: ";
+      echo __("Group Average: ", true);
       echo "</b></td>";
       echo "<td><b>";
       if ( $allMembersCompleted ) {
@@ -86,14 +86,14 @@ echo $this->element('evaluations/view_event_info', $params);
 			  <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
 			  <input type="hidden" name="course_id" value="<?php echo $courseId; ?>" />
 			  <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" />
-			  <input type="hidden" name="display_format" value="Basic" />
+			  <input type="hidden" name="display_format" value="<?php __('Basic')?>" />
 
       	<td colspan="<?php echo count($groupMembers) +1; ?>"><?php
 				if ($event['group_event_marked'] == "reviewed") {
-					echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_not_reviewed\" value=\"Mark Peer Evaluations as Not Reviewed\" />";
+					echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_not_reviewed\" value=\" ".__('Mark Peer Evaluations as Not Reviewed', true)."\" />";
 				}
 				else {
-					echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_reviewed\" value=\"Mark Peer Evaluations as Reviewed\" />";
+					echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_reviewed\" value=\" ".__('Mark Peer Evaluations as Reviewed', true)."\" />";
 				}
 			?></td>
 			</form>

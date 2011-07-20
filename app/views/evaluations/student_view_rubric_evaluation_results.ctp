@@ -53,13 +53,13 @@ if (isset($scoreRecords[$currentUser['id']])) {
     <!-- Panel of Evaluations Results -->
 		<div id="panelResults">
 		  <div id="panelResultsHeader" class="panelheader">
-		  	<?php echo 'Evaluation Results From Your Teammates. (Randomly Ordered)       ';
+		  	<?php echo __('Evaluation Results From Your Teammates. (Randomly Ordered)       ', true);
 		  	if ( !$gradeReleased && !$commentReleased) {
-          echo '<font color="red">Comments/Grades Not Released Yet.</font>';
+          echo '<font color="red">'.__('Comments/Grades Not Released Yet.', true).'</font>';
 		  	}	else if ( !$gradeReleased) {
-		  	  echo '<font color="red">Grades Not Released Yet.</font>';
+		  	  echo '<font color="red">'.__('Grades Not Released Yet.', true).'</font>';
         }	else if ( !$commentReleased) {
-		  	  echo '<font color="red">Comments Not Released Yet.</font>';
+		  	  echo '<font color="red">'.__('Comments Not Released Yet.', true).'</font>';
         }
 ?>
 		  </div>

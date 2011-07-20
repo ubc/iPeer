@@ -4,10 +4,10 @@
 <form id="searchForm" action="">
 <table width="95%" border="0" cellspacing="0" cellpadding="2">
   <tr>
-    <td width="10" height="32"><?php echo $html->image('magnify.png', array('alt'=>'Magnify Icon'));?></td>
-    <td width="35"> <b>Search:</b> </td>
+    <td width="10" height="32"><?php echo $html->image('magnify.png', array('alt'=>__('Magnify Icon', true)));?></td>
+    <td width="35"> <b><?php __('Search:')?></b> </td>
     <td width="35"><select name="select" id="select2">
-      <option value="title" >Title</option>
+      <option value="title" ><?php __('Title')?></option>
     </select></td>
     <td width="35"><input type="text" name="livesearch2" id="livesearch" size="30"></td>
     <td width="80%" align="right">&nbsp;</td>

@@ -1,4 +1,4 @@
-<div class="title">My Course<?php echo (isset($course_list['A']) && count($course_list['A']) > 1) ? 's': ''; ?></div>
+<div class="title"><?php __('My Course')?><?php echo (isset($course_list['A']) && count($course_list['A']) > 1) ? 's': ''; ?></div>
 
 <div class="content-container">
 
@@ -18,7 +18,7 @@
 
         <div class="instructor">
         <?php //var_dump($row);?>
-            <b>Instructor<?php echo count($row[0]['Instructor']) > 2 ? 's':''; ?>: </b>&nbsp;
+            <b><?php __('Instructor')?> <?php echo count($row[0]['Instructor']) > 2 ? 's':''; ?>: </b>&nbsp;
             <?php echo $this->element('courses/course_instructors',
                                       array('instructors' => $row[0]['Instructor']));?>
 
@@ -27,13 +27,13 @@
         <div class="event">
   		    <table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
             <tr class="tablecell2">
-              <td width="405"><b>Events: </b>&nbsp;</td>
-              <td width="254"><b>Completion Ratio</b></td>
-              <td width="243"><b>Due Date </b></td>
+              <td width="405"><b><?php __('Events')?>: </b>&nbsp;</td>
+              <td width="254"><b><?php __('Completion Ratio')?></b></td>
+              <td width="243"><b><?php __('Due Date')?> </b></td>
             </tr>
 
             <?php if (count($row[0]['Event']) == 0):?>
-            <tr><td colspan='3'>None</td></tr>
+            <tr><td colspan='3'><?php __('None')?></td></tr>
             <?php else:?>
               <?php foreach($row['Event'] as $event):?>
               <tr><td>
@@ -46,7 +46,7 @@
                   </font>
             		<?php endif;?>       
           		</td>
-          		<td><?php echo $event['completed_count'] . ' of ' . $event['student_count'] . ' Students</td>';?>
+          		<td><?php echo $event['completed_count'] . __(' of ', true) . $event['student_count'] . __(' Students</td>', true);?>
           		<td><?php echo Toolkit::formatDate($event['due_date'])?></td>
               </tr>
         	  	<?php endforeach;?>
@@ -58,12 +58,12 @@
 	      <?php endforeach; ?>
 
         <?php if (0 == count($course_list)):?>
-          <div class="course"><b>No courses at this time</b></div>
+          <div class="course"><b><?php __('No courses at this time')?></b></div>
         <?php	endif;?>
    </div> 
 
     <?php if (isset($course_list['I'])):?>
-      <div class="title">Inactive Course(s)</div>
+      <div class="title"><?php __('Inactive Course(s)')?></div>
 
       <div class="content-container">
     	  <?php foreach($course_list['I'] as $row):?>
@@ -79,16 +79,16 @@
       </div>
     <?php endif;?>
   <div class="content-container">
-  <div id="short_help" <?php echo ($course_list == 0) ? '':'style="display:none"'?>
-  <h5>To use iPeer you have to add a course.</h5>
+  <div id="short_help" <?php echo ($course_list == 0) ? '':'style="display:none"'?>>
+  <h5><?php __('To use iPeer you have to add a course.')?></h5>
         <ul>
-            <li>Please <u>add a course</u> from the yellow "Courses" tab above</li>
-            <li>Then <U>register students</u> into that course from that courses summary display. This display will avaliable (once the course is created) by clicking on the courses name from most menus .</li>
-            <li>Put your students into <u>groups</u> manually, (or, if you have the students complete a survey, iPeer can do it for you, using TeamMaker).
-            <li>To create evaluations, check out the orange wizard link the top right hand corner "iPeer Tutorial Wizard".
-                It has detailed movies on how to create evaluations.</li>
+            <li><?php __('Please <u>add a course</u> from the yellow "Courses" tab above')?></li>
+            <li><?php __('Then <U>register students</u> into that course from that courses summary display. This display will avaliable (once the course is created) by clicking on the courses name from most menus .')?></li>
+            <li><?php __('Put your students into <u>groups</u> manually, (or, if you have the students complete a survey, iPeer can do it for you, using TeamMaker).')?>
+            <li><?php __('To create evaluations, check out the orange wizard link the top right hand corner "iPeer Tutorial Wizard".')?>
+                <?php __('It has detailed movies on how to create evaluations.')?></li>
     </div>
-    <div style="text-align:right"><a href="#" onClick="javascript:$('short_help').toggle();return false;">( Show/Hide short help )</a></div>
+    <div style="text-align:right"><a href="#" onClick="javascript:$('short_help').toggle();return false;">( <?php __('Show/Hide short help')?> )</a></div>
     </div>
 
 </div>

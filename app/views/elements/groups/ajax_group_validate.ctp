@@ -3,7 +3,7 @@
 if (empty($fieldvalue)) $fieldvalue = '';
 
 if (!empty($data[0])){
-  echo '<font color="red">Group "'.$data.'" already exists.</font>';
+  echo '<font color="red">'.__('Group', true).' "'.$data.'" '.__('already exists', true).'</font>';
 }
 
 echo ' <input type="hidden" name="data[Group][group_num]"  value="'.$fieldvalue.'" />';

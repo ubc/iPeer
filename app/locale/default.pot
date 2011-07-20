@@ -1,0 +1,1976 @@
+# LANGUAGE translation of CakePHP Application
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2011-07-20 10:33-0700\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: /controllers/mixevals_controller.php:197
+msgid "The Mixed Evaluation was added successfully."
+msgstr ""
+
+#: /controllers/mixevals_controller.php:236
+msgid "The Mixed Evaluation was edited successfully."
+msgstr ""
+
+#: /controllers/mixevals_controller.php:301
+msgid "The Mixed Evaluation was removed successfully."
+msgstr ""
+
+#: /controllers/rubrics_controller.php:173
+msgid "The rubric was added successfully."
+msgstr ""
+
+#: /controllers/rubrics_controller.php:216
+msgid "The rubric evaluation was updated successfully"
+msgstr ""
+
+#: /controllers/rubrics_controller.php:260
+msgid "The rubric was deleted successfully."
+msgstr ""
+
+#: /controllers/sysfunctions_controller.php:125
+#: /controllers/sysparameters_controller.php:132
+msgid "The record is edited successfully."
+msgstr ""
+
+#: /controllers/sysfunctions_controller.php:140
+#: /controllers/sysparameters_controller.php:145
+msgid "The record is deleted successfully."
+msgstr ""
+
+#: /controllers/components/email.php:700
+msgid "_lineLength cannot be accessed please use lineLength"
+msgstr ""
+
+#: /models/rubric.php:221
+msgid "Copy of "
+msgstr ""
+
+#: /views/courses/edit.ctp:18;22
+#: /views/courses/view.ctp:9
+#: /views/elements/searchs/evaluation_result_search_panel.ctp:12
+#: /views/elements/searchs/evaluation_search_panel.ctp:15
+#: /views/elements/searchs/instructor_search_panel.ctp:12
+#: /views/evaltools/index.ctp:189
+msgid "Course"
+msgstr ""
+
+#: /views/courses/edit.ctp:23
+msgid "course"
+msgstr ""
+
+#: /views/courses/edit.ctp:34
+msgid "eg. APSC 201 001"
+msgstr ""
+
+#: /views/courses/edit.ctp:38
+#: /views/courses/view.ctp:13
+#: /views/elements/events/ajax_event_list.ctp:16
+#: /views/elements/events/ajax_title_validate.ctp:5
+#: /views/elements/framework/view_user_detail.ctp:38
+#: /views/evaluations/index.ctp:10
+msgid "Title"
+msgstr ""
+
+#: /views/courses/edit.ctp:41
+msgid "eg. Intro to APSCI"
+msgstr ""
+
+#: /views/courses/edit.ctp:46
+#: /views/courses/view.ctp:17
+msgid "Instructor(s)"
+msgstr ""
+
+#: /views/courses/edit.ctp:55
+msgid "Add Instructor"
+msgstr ""
+
+#: /views/courses/edit.ctp:55
+msgid " Add Instructor"
+msgstr ""
+
+#: /views/courses/edit.ctp:71
+#: /views/courses/view.ctp:35
+#: /views/elements/evaluations/ajax_evaluation_result_list.ctp:16
+#: /views/elements/searchs/evaluation_result_search_panel.ctp:33
+#: /views/events/edit_group.ctp:22
+msgid "Status"
+msgstr ""
+
+#: /views/courses/edit.ctp:73
+#: /views/courses/view.ctp:36
+#: /views/events/edit_group.ctp:25
+msgid "Active"
+msgstr ""
+
+#: /views/courses/edit.ctp:73
+#: /views/courses/view.ctp:36
+#: /views/events/edit_group.ctp:26
+msgid "Inactive"
+msgstr ""
+
+#: /views/courses/edit.ctp:79
+msgid "Enable Student Self Enrollment"
+msgstr ""
+
+#: /views/courses/edit.ctp:85
+msgid "Password for Self Enroll"
+msgstr ""
+
+#: /views/courses/edit.ctp:86
+msgid "Course/password"
+msgstr ""
+
+#: /views/courses/edit.ctp:92
+#: /views/courses/view.ctp:49
+msgid "Homepage"
+msgstr ""
+
+#: /views/courses/edit.ctp:94
+msgid "homepage"
+msgstr ""
+
+#: /views/courses/edit.ctp:96
+#: /views/events/add.ctp:120
+#: /views/events/edit.ctp:155
+msgid "eg."
+msgstr ""
+
+#: /views/courses/edit.ctp:100
+msgid " Course"
+msgstr ""
+
+#: /views/courses/edit.ctp:101
+#: /views/courses/view.ctp:67
+#: /views/elements/mixevals/ajax_mixeval_details.ctp:162
+#: /views/elements/mixevals/view_mixeval_details.ctp:202
+#: /views/mixevals/edit.ctp:88
+#: /views/rubrics/edit.ctp:83
+msgid "Back"
+msgstr ""
+
+#: /views/courses/home.ctp:18
+#: /views/elements/framework/view_user_detail.ctp:17
+msgid "Instructor"
+msgstr ""
+
+#: /views/courses/home.ctp:24
+msgid "Class Size"
+msgstr ""
+
+#: /views/courses/home.ctp:27
+msgid "No student is enrolled"
+msgstr ""
+
+#: /views/courses/home.ctp:29
+msgid " students"
+msgstr ""
+
+#: /views/courses/home.ctp:31
+msgid "Class Statistics"
+msgstr ""
+
+#: /views/courses/home.ctp:34
+msgid "No group has been made"
+msgstr ""
+
+#: /views/courses/home.ctp:36
+msgid " groups"
+msgstr ""
+
+#: /views/courses/home.ctp:40
+msgid "No Evaluation Event has been created"
+msgstr ""
+
+#: /views/courses/home.ctp:42
+msgid " Evaluation Events"
+msgstr ""
+
+#: /views/courses/home.ctp:47
+#: /views/courses/view.ctp:40
+msgid "Self Enrollment"
+msgstr ""
+
+#: /views/courses/home.ctp:48
+msgid "Not Enabled"
+msgstr ""
+
+#: /views/courses/home.ctp:48
+msgid "Enabled"
+msgstr ""
+
+#: /views/courses/home.ctp:49
+#: /views/courses/view.ctp:44
+msgid "Self Enrollment Password"
+msgstr ""
+
+#: /views/courses/home.ctp:50;54
+msgid "N/A"
+msgstr ""
+
+#: /views/courses/home.ctp:53
+msgid "Self Enrollment URL"
+msgstr ""
+
+#: /views/courses/home.ctp:80
+msgid "Students"
+msgstr ""
+
+#: /views/courses/home.ctp:105
+#: /views/elements/events/ajax_event_list.ctp:20
+msgid "Groups"
+msgstr ""
+
+#: /views/courses/home.ctp:131
+#: /views/evaltools/index.ctp:63
+msgid "Rubrics"
+msgstr ""
+
+#: /views/courses/home.ctp:136
+#: /views/evaltools/index.ctp:22
+msgid "Simple Evaluations"
+msgstr ""
+
+#: /views/courses/home.ctp:162
+#: /views/elements/searchs/search_menu.ctp:5
+msgid "Evaluation Events"
+msgstr ""
+
+#: /views/courses/home.ctp:187
+#: /views/evaltools/index.ctp:175
+msgid "Surveys (Team Maker)"
+msgstr ""
+
+#: /views/courses/index.ctp:8;9
+msgid "Add Course"
+msgstr ""
+
+#: /views/courses/index.ctp:16
+msgid "Note"
+msgstr ""
+
+#: /views/courses/index.ctp:16
+msgid "When searching by Instructor, the results will return any course they<br />\n              are leading. However, only one instructor is listed above by when not searching."
+msgstr ""
+
+#: /views/courses/view.ctp:25
+#: /views/elements/framework/view_user_detail.ctp:43
+#: /views/elements/searchs/instructor_search_panel.ctp:27
+#: /views/elements/users/ajax_user_list.ctp:29
+msgid "Email"
+msgstr ""
+
+#: /views/courses/view.ctp:30
+msgid "Emaill To All"
+msgstr ""
+
+#: /views/courses/view.ctp:30
+msgid "Email To All Instructors"
+msgstr ""
+
+#: /views/courses/view.ctp:54
+#: /views/elements/creator_block.ctp:2
+#: /views/elements/framework/view_user_detail.ctp:51
+msgid "Creator"
+msgstr ""
+
+#: /views/courses/view.ctp:56
+#: /views/elements/creator_block.ctp:16
+msgid "Updater"
+msgstr ""
+
+#: /views/courses/view.ctp:60
+#: /views/elements/creator_block.ctp:11
+#: /views/elements/framework/view_user_detail.ctp:57
+msgid "Create Date"
+msgstr ""
+
+#: /views/courses/view.ctp:62
+#: /views/elements/creator_block.ctp:25
+#: /views/elements/framework/view_user_detail.ctp:59
+msgid "Update Date"
+msgstr ""
+
+#: /views/elements/courses/ajax_personalize_Course.SubMenu.EvalEvents.Show.ctp:17
+msgid "List Evaluation Events / Results"
+msgstr ""
+
+#: /views/elements/courses/ajax_personalize_Course.SubMenu.EvalEvents.Show.ctp:20
+#: /views/elements/courses/ajax_personalize_Course.SubMenu.EvalResults.Show.ctp:10
+#: /views/evaluations/export.ctp:8
+#: /views/evaluations/export_all.ctp:8
+msgid "Export Evaluation Results"
+msgstr ""
+
+#: /views/elements/courses/ajax_personalize_Course.SubMenu.EvalResults.Show.ctp:6
+msgid "List Evaluation Results"
+msgstr ""
+
+#: /views/elements/courses/ajax_personalize_Course.SubMenu.Group.Show.ctp:14
+msgid "List Groups"
+msgstr ""
+
+#: /views/elements/courses/ajax_personalize_Course.SubMenu.Group.Show.ctp:21
+msgid "Send Group Email"
+msgstr ""
+
+#: /views/elements/courses/ajax_personalize_Course.SubMenu.Rubric.Show.ctp:6
+#: /views/evaltools/index.ctp:70
+#: /views/events/add.ctp:53;53
+#: /views/events/edit.ctp:71
+#: /views/rubrics/index.ctp:5;6
+msgid "Add Rubric"
+msgstr ""
+
+#: /views/elements/courses/ajax_personalize_Course.SubMenu.Rubric.Show.ctp:11
+msgid "List Rubrics"
+msgstr ""
+
+#: /views/elements/courses/ajax_personalize_Course.SubMenu.SimpleEvals.Show.ctp:6
+#: /views/evaltools/index.ctp:28;28
+#: /views/events/add.ctp:52;52
+#: /views/events/edit.ctp:70
+msgid "Add Simple Evaluation"
+msgstr ""
+
+#: /views/elements/courses/ajax_personalize_Course.SubMenu.SimpleEvals.Show.ctp:11
+msgid "List Simple Evaulations"
+msgstr ""
+
+#: /views/elements/courses/ajax_personalize_Course.SubMenu.Student.Show.ctp:9
+msgid "Add Student"
+msgstr ""
+
+#: /views/elements/courses/ajax_personalize_Course.SubMenu.Student.Show.ctp:16
+msgid "List Students"
+msgstr ""
+
+#: /views/elements/courses/ajax_personalize_Course.SubMenu.Student.Show.ctp:23
+msgid "Email to All Students"
+msgstr ""
+
+#: /views/elements/courses/ajax_personalize_Course.SubMenu.TeamMaker.Show.ctp:6
+msgid " Edit Survey"
+msgstr ""
+
+#: /views/elements/courses/ajax_personalize_Course.SubMenu.TeamMaker.Show.ctp:10
+msgid " View Survey Results"
+msgstr ""
+
+#: /views/elements/courses/ajax_personalize_Course.SubMenu.TeamMaker.Show.ctp:14
+msgid " Create Groups (Auto)"
+msgstr ""
+
+#: /views/elements/courses/ajax_personalize_Course.SubMenu.TeamMaker.Show.ctp:18
+msgid " List Survey Group Sets"
+msgstr ""
+
+#: /views/elements/courses/edit_instructor.ctp:7
+msgid "Are you sure to remove instructor "
+msgstr ""
+
+#: /views/elements/courses/edit_instructor.ctp:7
+msgid " from this course?"
+msgstr ""
+
+#: /views/elements/courses/edit_instructor.ctp:9
+msgid "Failed to remove the instructor form this course.\nReason"
+msgstr ""
+
+#: /views/elements/courses/edit_instructor.ctp:10
+#: /views/elements/emailer/edit_recipient.ctp:9
+#: /views/emailer/write.ctp:33
+msgid "Communication error!"
+msgstr ""
+
+#: /views/elements/email/html/addEvent.ctp:1
+#: /views/elements/evaluations/ajax_evaluation_result_list.ctp:13
+#: /views/elements/searchs/evaluation_result_search_panel.ctp:21
+msgid "Event"
+msgstr ""
+
+#: /views/elements/email/html/addEvent.ctp:1
+#: /views/elements/email/html/addUser.ctp:1
+msgid "is created"
+msgstr ""
+
+#: /views/elements/email/html/addEvent.ctp:2
+#: /views/elements/evaluations/simple_preview.ctp:80
+#: /views/elements/evaluations/student_view_event_info.ctp:25
+#: /views/elements/evaluations/view_event_info.ctp:28
+#: /views/email_templates/add.ctp:52
+#: /views/evaltools/index.ctp:240
+msgid "Description"
+msgstr ""
+
+#: /views/elements/email/html/addEvent.ctp:3
+msgid "Due"
+msgstr ""
+
+#: /views/elements/email/html/addUser.ctp:1
+msgid "User"
+msgstr ""
+
+#: /views/elements/email/html/addUser.ctp:2
+#: /views/elements/framework/view_user_detail.ctp:10
+#: /views/elements/users/ajax_user_list.ctp:25
+#: /views/elements/users/user_summary_list.ctp:3
+msgid "Username"
+msgstr ""
+
+#: /views/elements/email/html/addUser.ctp:3
+#: /views/elements/users/user_summary_list.ctp:6
+msgid "Password"
+msgstr ""
+
+#: /views/elements/emailer/edit_recipient.ctp:3
+#: /views/elements/events/ajax_event_list.ctp:31
+#: /views/elements/survey_groups/ajax_survey_group_list.ctp:24
+#: /views/elements/users/ajax_user_list.ctp:53
+msgid "Delete"
+msgstr ""
+
+#: /views/elements/emailer/edit_recipient.ctp:6
+msgid "Are you sure to remove recipient "
+msgstr ""
+
+#: /views/elements/emailer/edit_recipient.ctp:6
+msgid " from this field?"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_list.ctp:8
+msgid "Page Size"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_list.ctp:26
+msgid "Evaluation Event Title"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_list.ctp:28
+#: /views/elements/evaluations/simple_preview.ctp:76
+#: /views/elements/evaluations/student_view_event_info.ctp:21
+#: /views/elements/evaluations/view_event_info.ctp:24
+#: /views/elements/events/ajax_event_list.ctp:17
+#: /views/elements/searchs/evaluation_search_panel.ctp:28
+#: /views/evaltools/index.ctp:190
+#: /views/events/add.ctp:115
+msgid "Due Date"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_list.ctp:30
+#: /views/elements/events/ajax_event_list.ctp:19
+msgid "Self Evaluation"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_list.ctp:45
+#: /views/elements/evaluations/ajax_evaluation_result_list.ctp:11;28
+#: /views/elements/survey_groups/ajax_survey_group_list.ctp:22
+msgid "View"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_list.ctp:45
+msgid "View "
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_list.ctp:92
+#: /views/elements/users/ajax_user_list.ctp:99
+msgid "Page %page% of %pages%, showing %current% records out of %count% total<br/>"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_result_list.ctp:14
+#: /views/elements/evaluations/view_event_info.ctp:9
+#: /views/elements/groups/ajax_group_validate.ctp:6
+#: /views/events/edit_group.ctp:10
+msgid "Group"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_result_list.ctp:15
+msgid "Completion Rate"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_result_list.ctp:17
+msgid "Reviewed"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_result_list.ctp:18
+msgid "Released Comments"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_result_list.ctp:19
+msgid "Released Grades"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_result_list.ctp:28
+msgid "View Evaluation Result"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_result_list.ctp:34
+#: /views/events/add.ctp:16
+msgid "Event Title"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_result_list.ctp:37
+msgid "Group Submission Detail"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_result_list.ctp:37
+msgid "Group "
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_result_list.ctp:39
+msgid "completed"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_result_list.ctp:47
+msgid "Completed"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_result_list.ctp:50
+msgid "Not Completed"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_result_list.ctp:61
+msgid "marked"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_result_list.ctp:64
+msgid "Ready to Review"
+msgstr ""
+
+#: /views/elements/evaluations/ajax_evaluation_result_list.ctp:67
+msgid "Not Ready to Review"
+msgstr ""
+
+#: /views/elements/evaluations/group_submission_details.ctp:13
+#: /views/events/edit_group.ctp:14
+msgid "Group Number"
+msgstr ""
+
+#: /views/elements/evaluations/group_submission_details.ctp:15
+#: /views/elements/events/event_groups_detail.ctp:5
+#: /views/events/edit_group.ctp:18
+msgid "Group Name"
+msgstr ""
+
+#: /views/elements/evaluations/group_submission_details.ctp:25
+msgid "Group Member"
+msgstr ""
+
+#: /views/elements/evaluations/group_submission_details.ctp:26
+msgid "Date Submitted"
+msgstr ""
+
+#: /views/elements/evaluations/group_submission_details.ctp:27
+msgid "Late By"
+msgstr ""
+
+#: /views/elements/evaluations/group_submission_details.ctp:28
+msgid "RE-release Evaluation?"
+msgstr ""
+
+#: /views/elements/evaluations/group_submission_details.ctp:38
+msgid "(not submitted)"
+msgstr ""
+
+#: /views/elements/evaluations/group_submission_details.ctp:42
+msgid " day(s)"
+msgstr ""
+
+#: /views/elements/evaluations/group_submission_details.ctp:44
+msgid "(on time)"
+msgstr ""
+
+#: /views/elements/evaluations/group_submission_details.ctp:61;63
+msgid "Re-release Selected Evaluation"
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:65
+#: /views/elements/evaluations/view_event_info.ctp:6
+#: /views/evaluations/mixeval_eval_form.ctp:23
+#: /views/evaluations/rubric_eval_form.ctp:20
+msgid "Evaluation Event Detail"
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:68
+msgid "Evaluator"
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:70
+msgid "Evaluating"
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:71
+msgid "Test Group"
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:74
+#: /views/elements/evaluations/student_view_event_info.ctp:19
+#: /views/elements/evaluations/view_event_info.ctp:22
+msgid "Event Name"
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:75
+msgid "Simple Evaluation Preview"
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:81
+msgid "Preview for simple evaluation tool."
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:90
+msgid "Instructions"
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:91
+msgid "Rate your peer's relative performance by using the slider. [Weight 1-10]"
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:92
+msgid "Click \"Distribute\" button to distribute points."
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:93
+msgid "Allocate any remaining point."
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:94
+#: /views/evaluations/mixeval_eval_form.ctp:51
+#: /views/evaluations/rubric_eval_form.ctp:48
+msgid "Enter Comments"
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:94
+msgid "Must"
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:94;103
+#: /views/evaluations/mixeval_eval_form.ctp:51
+#: /views/evaluations/rubric_eval_form.ctp:48
+msgid "(Optional)"
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:100
+msgid "Member(s)"
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:101
+msgid "Relative Weight"
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:102
+#: /views/elements/rubrics/ajax_rubric_preview.ctp:52
+#: /views/elements/rubrics/ajax_rubric_view.ctp:56
+msgid "Mark"
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:103
+#: /views/elements/evaluations/student_view_mixeval_details.ctp:144
+#: /views/elements/evaluations/student_view_rubric_details.ctp:69
+msgid "Comment"
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:113
+msgid "Min."
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:120
+msgid "Max."
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:157
+msgid "Points Allocated/Total"
+msgstr ""
+
+#: /views/elements/evaluations/simple_preview.ctp:170
+msgid "Submit Evaluation"
+msgstr ""
+
+#: /views/elements/evaluations/student_view_event_info.ctp:4
+msgid "Evaluation Result Detail"
+msgstr ""
+
+#: /views/elements/evaluations/student_view_event_info.ctp:7
+msgid "Evaluated By"
+msgstr ""
+
+#: /views/elements/evaluations/student_view_event_info.ctp:9
+#: /views/elements/evaluations/view_event_info.ctp:12
+msgid "Self-Evaluation"
+msgstr ""
+
+#: /views/elements/evaluations/student_view_event_info.ctp:12
+#: /views/elements/mixevals/ajax_mixeval_details.ctp:121
+msgid "Yes"
+msgstr ""
+
+#: /views/elements/evaluations/student_view_event_info.ctp:14
+#: /views/elements/mixevals/ajax_mixeval_details.ctp:122
+msgid "No"
+msgstr ""
+
+#: /views/elements/evaluations/student_view_event_info.ctp:30
+msgid "Rating"
+msgstr ""
+
+#: /views/elements/evaluations/student_view_event_info.ctp:35;45
+msgid "Not Released"
+msgstr ""
+
+#: /views/elements/evaluations/student_view_event_info.ctp:40
+msgid "Group Average"
+msgstr ""
+
+#: /views/elements/evaluations/student_view_mixeval_details.ctp:13
+#: /views/elements/mixevals/view_mixeval_details.ctp:4
+msgid "Section One"
+msgstr ""
+
+#: /views/elements/evaluations/student_view_mixeval_details.ctp:16;97
+#: /views/elements/evaluations/student_view_rubric_details.ctp:9
+msgid "Person Being Evaluated"
+msgstr ""
+
+#: /views/elements/evaluations/student_view_mixeval_details.ctp:32;112
+#: /views/elements/evaluations/student_view_rubric_details.ctp:22
+msgid "Comments/Grades Not Released Yet."
+msgstr ""
+
+#: /views/elements/evaluations/student_view_mixeval_details.ctp:94
+#: /views/elements/mixevals/ajax_mixeval_details.ctp:95
+#: /views/elements/mixevals/view_mixeval_details.ctp:114
+msgid "Section Two"
+msgstr ""
+
+#: /views/elements/evaluations/student_view_rubric_details.ctp:86
+msgid "General Comment"
+msgstr ""
+
+#: /views/elements/evaluations/student_view_survey_info.ctp:12
+msgid "Team Maker Survey"
+msgstr ""
+
+#: /views/elements/evaluations/student_view_survey_info.ctp:72
+msgid "Submit"
+msgstr ""
+
+#: /views/elements/evaluations/view_event_info.ctp:3
+msgid "[X] Close Window"
+msgstr ""
+
+#: /views/elements/events/ajax_event_list.ctp:14
+msgid "Actions"
+msgstr ""
+
+#: /views/elements/events/ajax_event_list.ctp:18
+#: /views/evaltools/index.ctp:191
+msgid "Released?"
+msgstr ""
+
+#: /views/elements/events/ajax_event_list.ctp:31
+msgid "Are you sure you want to delete event"
+msgstr ""
+
+#: /views/elements/events/ajax_event_list.ctp:39;42
+#: /views/elements/mixevals/view_mixeval_details.ctp:145
+msgid "YES"
+msgstr ""
+
+#: /views/elements/events/ajax_event_list.ctp:39;42
+#: /views/elements/mixevals/view_mixeval_details.ctp:147
+msgid "NO"
+msgstr ""
+
+#: /views/elements/events/ajax_event_list.ctp:45;45
+msgid "View Groups"
+msgstr ""
+
+#: /views/elements/events/ajax_event_list.ctp:54
+#: /views/elements/users/ajax_user_list.ctp:81
+#: /views/evaltools/index.ctp:56;105;167;219;252
+msgid "Record Not Found"
+msgstr ""
+
+#: /views/elements/events/ajax_event_list.ctp:69
+#: /views/elements/survey_groups/ajax_survey_group_list.ctp:58
+#: /views/elements/survey_groups/ajax_survey_result_list.ctp:66
+msgid "Results: "
+msgstr ""
+
+#: /views/elements/events/ajax_event_list.ctp:73
+#: /views/elements/survey_groups/ajax_survey_group_list.ctp:60
+#: /views/elements/survey_groups/ajax_survey_result_list.ctp:69
+msgid "Prev"
+msgstr ""
+
+#: /views/elements/events/ajax_event_list.ctp:75
+#: /views/elements/survey_groups/ajax_survey_group_list.ctp:60
+#: /views/elements/survey_groups/ajax_survey_result_list.ctp:71
+#: /views/rubrics/edit.ctp:86
+msgid "Next"
+msgstr ""
+
+#: /views/elements/events/ajax_event_template_list.ctp:35
+msgid "Preview This Simple Evaluation"
+msgstr ""
+
+#: /views/elements/events/ajax_event_template_list.ctp:37
+msgid "Preview This Rubric"
+msgstr ""
+
+#: /views/elements/events/ajax_event_template_list.ctp:39
+msgid "Preview this Mixed Evaluaiton"
+msgstr ""
+
+#: /views/elements/events/ajax_event_template_list.ctp:51
+msgid "Unknown Evaluation Type"
+msgstr ""
+
+#: /views/elements/events/ajax_event_template_list.ctp:54
+msgid "No %s Evaluations available. You need to create a %s Evaluation first! <br />"
+msgstr ""
+
+#: /views/elements/events/ajax_event_template_list.ctp:55
+msgid "<ul><li>Just Click on <i>Add %s Evaluation</i> above.</li></ul><br />"
+msgstr ""
+
+#: /views/elements/events/ajax_title_validate.ctp:5
+#: /views/elements/surveys/ajax_survey_validate.ctp:4
+msgid "already exists."
+msgstr ""
+
+#: /views/elements/events/event_groups_detail.ctp:4
+msgid "Group No."
+msgstr ""
+
+#: /views/elements/events/event_groups_detail.ctp:6
+msgid "Members"
+msgstr ""
+
+#: /views/elements/events/event_groups_detail.ctp:43
+msgid "Close Window"
+msgstr ""
+
+#: /views/elements/events/event_selection_box.ctp:12
+#: /views/elements/searchs/ajax_event_box.ctp:12
+msgid "No event Selected"
+msgstr ""
+
+#: /views/elements/events/event_selection_box.ctp:14
+msgid "All events"
+msgstr ""
+
+#: /views/elements/framework/view_user_detail.ctp:7
+msgid "View User"
+msgstr ""
+
+#: /views/elements/framework/view_user_detail.ctp:12
+#: /views/elements/users/ajax_user_list.ctp:26
+msgid "Role"
+msgstr ""
+
+#: /views/elements/framework/view_user_detail.ctp:16
+msgid "Student"
+msgstr ""
+
+#: /views/elements/framework/view_user_detail.ctp:18
+msgid "Admin"
+msgstr ""
+
+#: /views/elements/framework/view_user_detail.ctp:19
+msgid "Unknown User Role "
+msgstr ""
+
+#: /views/elements/framework/view_user_detail.ctp:24
+#: /views/elements/users/ajax_user_list.ctp:28
+#: /views/elements/users/user_summary_list.ctp:5
+msgid "Last Name"
+msgstr ""
+
+#: /views/elements/framework/view_user_detail.ctp:28
+#: /views/elements/users/ajax_user_list.ctp:27
+#: /views/elements/users/user_summary_list.ctp:4
+msgid "First Name"
+msgstr ""
+
+#: /views/elements/framework/view_user_detail.ctp:33
+msgid "Student No."
+msgstr ""
+
+#: /views/elements/framework/view_user_detail.ctp:53
+msgid "Updater:"
+msgstr ""
+
+#: /views/elements/groups/ajax_group_validate.ctp:6
+msgid "already exists"
+msgstr ""
+
+#: /views/elements/groups/group_list_chooser.ctp:19
+msgid "Assign"
+msgstr ""
+
+#: /views/elements/groups/group_list_chooser.ctp:21
+msgid "Remove"
+msgstr ""
+
+#: /views/elements/list/ajaxList.ctp:24
+msgid "You need the PHP json extension."
+msgstr ""
+
+#: /views/elements/list/ajaxList.ctp:25
+msgid "  Please use PHP >= 5.2 and enable it in php.ini <br />"
+msgstr ""
+
+#: /views/elements/list/ajaxList.ctp:26
+msgid "  (uncomment or create the line:<br />"
+msgstr ""
+
+#: /views/elements/list/ajaxList.ctp:30;32;34
+msgid " variable not set or empty!"
+msgstr ""
+
+#: /views/elements/list/checkBoxList.ctp:8
+msgid "Error: Please set all parameters for checkBoxList.<br/>"
+msgstr ""
+
+#: /views/elements/list/checkBoxList.ctp:56
+msgid "Use the checkmarks to"
+msgstr ""
+
+#: /views/elements/list/checkBoxList.ctp:57
+msgid "in <b><u>bold</u></b> are the ones selected initially.)<br/>"
+msgstr ""
+
+#: /views/elements/list/checkBoxList.ctp:59
+msgid "(The selected %s are check-marked and in <b><u>bold</u></b>)</br />"
+msgstr ""
+
+#: /views/elements/mixevals/ajax_mixeval_details.ctp:85
+#: /views/elements/rubrics/ajax_rubric_edit.ctp:77
+#: /views/elements/rubrics/ajax_rubric_preview.ctp:130
+#: /views/elements/rubrics/ajax_rubric_view.ctp:74
+#: /views/evaltools/index.ctp:79;129
+msgid "Total Marks"
+msgstr ""
+
+#: /views/elements/mixevals/ajax_mixeval_details.ctp:95
+msgid "Comments (No weight on this section)"
+msgstr ""
+
+#: /views/elements/mixevals/ajax_mixeval_details.ctp:106
+msgid "Question"
+msgstr ""
+
+#: /views/elements/mixevals/ajax_mixeval_details.ctp:107
+msgid "Question Prompt"
+msgstr ""
+
+#: /views/elements/mixevals/ajax_mixeval_details.ctp:113
+#: /views/elements/mixevals/view_mixeval_details.ctp:144
+msgid "Mandatory?"
+msgstr ""
+
+#: /views/elements/mixevals/ajax_mixeval_details.ctp:132
+msgid "Instructions: (optional)"
+msgstr ""
+
+#: /views/elements/mixevals/ajax_mixeval_details.ctp:142
+msgid "Student's Answer Option:"
+msgstr ""
+
+#: /views/elements/mixevals/ajax_mixeval_details.ctp:151
+msgid "Single line of text input box"
+msgstr ""
+
+#: /views/elements/mixevals/ajax_mixeval_details.ctp:152
+msgid "Multiple lines of text input box"
+msgstr ""
+
+#: /views/elements/mixevals/ajax_mixeval_details.ctp:164
+#: /views/evaltools/index.ctp:119;119
+#: /views/events/add.ctp:54;54
+#: /views/events/edit.ctp:72
+msgid "Add Mix Evaluation"
+msgstr ""
+
+#: /views/elements/mixevals/ajax_mixeval_details.ctp:166
+msgid "Edit Mix Evaluation"
+msgstr ""
+
+#: /views/elements/mixevals/view_mixeval_details.ctp:4
+msgid "Lickert Scales"
+msgstr ""
+
+#: /views/elements/mixevals/view_mixeval_details.ctp:13
+msgid "Scale Weight"
+msgstr ""
+
+#: /views/elements/mixevals/view_mixeval_details.ctp:114
+msgid "Comments (No Weight on this Section)"
+msgstr ""
+
+#: /views/elements/mixevals/view_mixeval_details.ctp:174
+msgid "Maximum 65535 characters."
+msgstr ""
+
+#: /views/elements/mixevals/view_mixeval_details.ctp:183
+msgid "Respond Type?"
+msgstr ""
+
+#: /views/elements/mixevals/view_mixeval_details.ctp:188
+msgid "Long Answer Text Input"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_edit.ctp:22
+#: /views/elements/rubrics/ajax_rubric_preview.ctp:6
+msgid "Rubric Preview"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_edit.ctp:26
+#: /views/elements/rubrics/ajax_rubric_view.ctp:17
+msgid "Level of Mastery"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_edit.ctp:33
+#: /views/elements/rubrics/ajax_rubric_preview.ctp:27
+msgid "Criteria Weight"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_edit.ctp:42
+#: /views/evaltools/index.ctp:78
+msgid "Criteria"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_edit.ctp:51
+#: /views/elements/rubrics/ajax_rubric_preview.ctp:51;87
+msgid "Specific Comment"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_preview.ctp:10
+msgid "Poor"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_preview.ctp:10
+msgid "Below Average"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_preview.ctp:10
+msgid "Average"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_preview.ctp:10
+msgid "Above Average"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_preview.ctp:10
+msgid "Excellent"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_preview.ctp:11
+msgid "Participated in Team Meetings"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_preview.ctp:11
+msgid "Was Helpful and Co-operative"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_preview.ctp:11
+msgid "Submitted Work on Time"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_preview.ctp:11
+msgid "Worked Efficiently"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_preview.ctp:11
+msgid "Contributed"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_preview.ctp:15
+msgid "LOM General Comment "
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_preview.ctp:35;83
+msgid "Criteria "
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_view.ctp:13
+msgid "Rubric View"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_view.ctp:21
+msgid "Comments"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_view.ctp:36
+msgid " mark(s)"
+msgstr ""
+
+#: /views/elements/rubrics/ajax_rubric_view.ctp:76
+msgid "General Comments"
+msgstr ""
+
+#: /views/elements/searchs/ajax_event_box.ctp:14
+msgid " --- All events --- "
+msgstr ""
+
+#: /views/elements/searchs/evaluation_result_search_panel.ctp:9
+msgid "Evaluation Result Search Panel"
+msgstr ""
+
+#: /views/elements/searchs/evaluation_result_search_panel.ctp:36
+msgid "--- None ---"
+msgstr ""
+
+#: /views/elements/searchs/evaluation_result_search_panel.ctp:37
+msgid "List Not Reviewed Evaluations"
+msgstr ""
+
+#: /views/elements/searchs/evaluation_result_search_panel.ctp:38
+msgid "List Late Evaluations"
+msgstr ""
+
+#: /views/elements/searchs/evaluation_result_search_panel.ctp:39
+msgid "List Ranged Mark Evaluations (set mark range below)"
+msgstr ""
+
+#: /views/elements/searchs/evaluation_result_search_panel.ctp:54
+msgid "Result Mark(%)"
+msgstr ""
+
+#: /views/elements/searchs/evaluation_result_search_panel.ctp:56
+#: /views/elements/searchs/evaluation_search_panel.ctp:31;49
+msgid "FROM"
+msgstr ""
+
+#: /views/elements/searchs/evaluation_result_search_panel.ctp:60
+#: /views/elements/searchs/evaluation_search_panel.ctp:36;53
+msgid "TO"
+msgstr ""
+
+#: /views/elements/searchs/evaluation_search_panel.ctp:12
+msgid "Evaluation Event Search Panel"
+msgstr ""
+
+#: /views/elements/searchs/evaluation_search_panel.ctp:22
+msgid "Event Type"
+msgstr ""
+
+#: /views/elements/searchs/evaluation_search_panel.ctp:24
+msgid "--- All Event Types ---"
+msgstr ""
+
+#: /views/elements/searchs/evaluation_search_panel.ctp:46
+#: /views/events/add.ctp:123
+#: /views/events/view.ctp:82
+msgid "Release Date:"
+msgstr ""
+
+#: /views/elements/searchs/evaluation_search_panel.ctp:59
+msgid "specify a date range to search any event that are being released during that period of time."
+msgstr ""
+
+#: /views/elements/searchs/instructor_search_panel.ctp:9
+msgid "Instructor Search Panel"
+msgstr ""
+
+#: /views/elements/searchs/instructor_search_panel.ctp:20
+#: /views/email_templates/add.ctp:25
+#: /views/evaltools/index.ctp:32;74;124;187;239
+msgid "Name"
+msgstr ""
+
+#: /views/elements/searchs/search_menu.ctp:6
+msgid "Evaluation Results"
+msgstr ""
+
+#: /views/elements/searchs/search_menu.ctp:7
+msgid "Instructors"
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_group_list.ctp:17
+msgid "Release Now"
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_group_list.ctp:24
+msgid "Edit"
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_group_list.ctp:24
+msgid "Are you sure you want to delete survey group set"
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_group_list.ctp:38
+msgid "Confirm Survey Release"
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_makegroups.ctp:14
+msgid "Team Making - Step One"
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_makegroups.ctp:18
+msgid " students were specified for this survey,"
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_makegroups.ctp:18
+msgid "students responded"
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_makegroups.ctp:22
+msgid "Group Configuration"
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_makegroups.ctp:27
+msgid "There must be at least one question."
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_makegroups.ctp:53
+msgid "Gather<br />Similar"
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_makegroups.ctp:53
+msgid "Ignore"
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_makegroups.ctp:54
+msgid "Gather<br />Dissimilar"
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_makegroups.ctp:60
+msgid "Note: It may take up to 10mins to create groups."
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_result_list.ctp:31
+msgid "View Summary"
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_result_list.ctp:38
+msgid "Student Name"
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_result_list.ctp:39
+msgid "Student Number"
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_result_list.ctp:40
+msgid "Time Submitted"
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_result_list.ctp:55
+msgid "Not submitted"
+msgstr ""
+
+#: /views/elements/survey_groups/ajax_survey_result_list.ctp:81
+msgid "No survey available."
+msgstr ""
+
+#: /views/elements/surveys/ajax_survey_validate.ctp:4
+msgid "Survey"
+msgstr ""
+
+#: /views/elements/users/ajax_user_list.ctp:53
+msgid "Delete "
+msgstr ""
+
+#: /views/elements/users/ajax_user_list.ctp:55
+msgid "Are you sure you want to delete user"
+msgstr ""
+
+#: /views/elements/users/ajax_user_list.ctp:61
+msgid "Reset "
+msgstr ""
+
+#: /views/elements/users/ajax_user_list.ctp:61
+msgid "'s password"
+msgstr ""
+
+#: /views/elements/users/ajax_user_list.ctp:63
+msgid "Are you sure you want to reset password for user"
+msgstr ""
+
+#: /views/elements/users/ajax_user_list.ctp:104
+msgid "Prev "
+msgstr ""
+
+#: /views/elements/users/ajax_user_list.ctp:108
+msgid " Next"
+msgstr ""
+
+#: /views/elements/users/ajax_username_validate.ctp:5
+msgid "Username \""
+msgstr ""
+
+#: /views/elements/users/ajax_username_validate.ctp:5
+msgid "\" already exists."
+msgstr ""
+
+#: /views/elements/users/user_import_info.ctp:3
+#: /views/elements/users/user_import_info_cwl.ctp:3
+msgid "Username</strong> <u>must</u> the same at the <strong>Student Number"
+msgstr ""
+
+#: /views/elements/users/user_import_info.ctp:4
+#: /views/elements/users/user_import_info_cwl.ctp:4
+msgid "All fields mandatory, except email and password."
+msgstr ""
+
+#: /views/elements/users/user_import_info.ctp:5
+#: /views/elements/users/user_import_info_cwl.ctp:5
+msgid "If email column is missing, students will be requested to fill in when they log in the first time."
+msgstr ""
+
+#: /views/elements/users/user_import_info.ctp:6
+#: /views/elements/users/user_import_info_cwl.ctp:6
+msgid "If password column is missing, system will generate random password for each student."
+msgstr ""
+
+#: /views/elements/users/user_import_info.ctp:7
+#: /views/elements/users/user_import_info_cwl.ctp:7
+msgid "If an external authentication module is enabled (e.g. CWL or Shiboleth), password column can be ignored. Students will use external authentication module to login."
+msgstr ""
+
+#: /views/elements/users/user_import_info.ctp:8
+#: /views/elements/users/user_import_info_cwl.ctp:8
+msgid "Please make sure to remove header from the CSV file."
+msgstr ""
+
+#: /views/elements/users/user_import_info.ctp:11
+#: /views/elements/users/user_import_info_cwl.ctp:11
+msgid "Formatting:"
+msgstr ""
+
+#: /views/elements/users/user_import_info.ctp:13
+#: /views/elements/users/user_import_info_cwl.ctp:13
+msgid "Username,First Name,Last Name,Student#,<i>Email(optional),Password(optional)"
+msgstr ""
+
+#: /views/elements/users/user_import_info_cwl.ctp:17
+msgid "Examples:"
+msgstr ""
+
+#: /views/elements/users/user_summary_list.ctp:8
+#: /views/emailer/write.ctp:112
+msgid "Message"
+msgstr ""
+
+#: /views/elements/users/user_summary_list.ctp:28
+msgid "<i>Not availalble for existing users</i>"
+msgstr ""
+
+#: /views/email_templates/add.ctp:22
+msgid "Custom Email Template"
+msgstr ""
+
+#: /views/email_templates/add.ctp:33
+msgid "Availability"
+msgstr ""
+
+#: /views/email_templates/add.ctp:48
+msgid "Public Allows Template Sharing Amongst Instructors"
+msgstr ""
+
+#: /views/email_templates/add.ctp:59
+msgid "Insert Merge Field"
+msgstr ""
+
+#: /views/email_templates/add.ctp:65
+msgid "-- Select Merge Field --"
+msgstr ""
+
+#: /views/email_templates/add.ctp:74
+msgid "Content"
+msgstr ""
+
+#: /views/email_templates/index.ctp:6;7
+#: /views/emailer/write.ctp:87
+#: /views/evaltools/index.ctp:234
+msgid "Add Email Template"
+msgstr ""
+
+#: /views/emailer/view.ctp:6
+msgid "View Email"
+msgstr ""
+
+#: /views/emailer/view.ctp:23
+#: /views/emailer/write.ctp:107
+msgid "Subject"
+msgstr ""
+
+#: /views/emailer/view.ctp:29
+msgid "Scheduled on"
+msgstr ""
+
+#: /views/emailer/view.ctp:35
+msgid "Sent?"
+msgstr ""
+
+#: /views/emailer/view.ctp:46
+#: /views/emailer/write.ctp:117
+msgid "Content: "
+msgstr ""
+
+#: /views/emailer/view.ctp:57
+msgid "Created:"
+msgstr ""
+
+#: /views/emailer/write.ctp:8
+msgid "Write Email"
+msgstr ""
+
+#: /views/emailer/write.ctp:29
+msgid " Add Recipient"
+msgstr ""
+
+#: /views/emailer/write.ctp:50
+msgid "Schedule?"
+msgstr ""
+
+#: /views/emailer/write.ctp:67
+msgid "Date :"
+msgstr ""
+
+#: /views/emailer/write.ctp:69
+#: /views/events/add.ctp:118;128;134
+msgid "Please enter a valid date."
+msgstr ""
+
+#: /views/emailer/write.ctp:73
+msgid "Multiple Emails: "
+msgstr ""
+
+#: /views/emailer/write.ctp:74
+msgid " / Every"
+msgstr ""
+
+#: /views/emailer/write.ctp:75
+msgid "day(s)"
+msgstr ""
+
+#: /views/emailer/write.ctp:83
+msgid "Template"
+msgstr ""
+
+#: /views/emailer/write.ctp:94
+msgid "-- No Template --"
+msgstr ""
+
+#: /views/emailer/write.ctp:131
+msgid "Send"
+msgstr ""
+
+#: /views/errors/missing_connection.ctp:2
+msgid "No iPeer database found. You may want to run <a href=\"/install\">installation</a> first. Otherwise make sure you define in it <u><tt>app/config/database.php</tt></u> in the following format:"
+msgstr ""
+
+#: /views/errors/missing_connection.ctp:15
+msgid "For more details, also see this file:"
+msgstr ""
+
+#: /views/errors/permission_denied.ctp:2
+msgid "Access Denied"
+msgstr ""
+
+#: /views/errors/permission_denied.ctp:4
+msgid "You don't have permission to access this page."
+msgstr ""
+
+#: /views/errors/permission_denied.ctp:5
+msgid "Click here to go back"
+msgstr ""
+
+#: /views/evaltools/index.ctp:8
+#: /views/evaluations/index.ctp:7
+msgid "Magnify Icon"
+msgstr ""
+
+#: /views/evaltools/index.ctp:28
+msgid "add"
+msgstr ""
+
+#: /views/evaltools/index.ctp:33;75;125;188
+msgid "In Use"
+msgstr ""
+
+#: /views/evaltools/index.ctp:34
+msgid "Base Point Per Member"
+msgstr ""
+
+#: /views/evaltools/index.ctp:76;126
+msgid "Public"
+msgstr ""
+
+#: /views/evaltools/index.ctp:77
+msgid "LOM"
+msgstr ""
+
+#: /views/evaltools/index.ctp:112
+msgid "Mixed Evaluations"
+msgstr ""
+
+#: /views/evaltools/index.ctp:127
+msgid "Lickert Scale Questions"
+msgstr ""
+
+#: /views/evaltools/index.ctp:128
+msgid "Prefill Questions"
+msgstr ""
+
+#: /views/evaltools/index.ctp:182;182;234
+msgid "Add Survey"
+msgstr ""
+
+#: /views/evaltools/index.ctp:228
+msgid "Email Templates"
+msgstr ""
+
+#: /views/evaluations/export.ctp:11
+msgid "Export Filename:"
+msgstr ""
+
+#: /views/evaluations/export.ctp:14
+#: /views/evaluations/export_all.ctp:14
+msgid "Header"
+msgstr ""
+
+#: /views/evaluations/export.ctp:17
+#: /views/evaluations/export_all.ctp:17
+msgid "Include Course Name:"
+msgstr ""
+
+#: /views/evaluations/export.ctp:20
+#: /views/evaluations/export_all.ctp:20
+msgid "Include Date of Export:"
+msgstr ""
+
+#: /views/evaluations/export.ctp:23
+#: /views/evaluations/export_all.ctp:23
+msgid "Include Instructor Name:"
+msgstr ""
+
+#: /views/evaluations/export.ctp:29
+#: /views/evaluations/export_all.ctp:29
+msgid "Include Evaluation Event Names:"
+msgstr ""
+
+#: /views/evaluations/export.ctp:32
+#: /views/evaluations/export_all.ctp:32
+msgid "Include Evaluation Type:"
+msgstr ""
+
+#: /views/evaluations/export.ctp:35
+#: /views/evaluations/export_all.ctp:35
+msgid "Include Group Names:"
+msgstr ""
+
+#: /views/evaluations/export.ctp:38
+#: /views/evaluations/export_all.ctp:38
+msgid "Include Group Status:"
+msgstr ""
+
+#: /views/evaluations/export.ctp:41
+#: /views/evaluations/export_all.ctp:41
+msgid "Include Student First Name:"
+msgstr ""
+
+#: /views/evaluations/export.ctp:44
+#: /views/evaluations/export_all.ctp:44
+msgid "Include Student Last Name:"
+msgstr ""
+
+#: /views/evaluations/export.ctp:47
+#: /views/evaluations/export_all.ctp:47
+msgid "Include Student Id:"
+msgstr ""
+
+#: /views/evaluations/export.ctp:50
+#: /views/evaluations/export_all.ctp:50
+msgid "Include Student Email:"
+msgstr ""
+
+#: /views/evaluations/export.ctp:53
+#: /views/evaluations/export_all.ctp:53
+msgid "Include Criteria Legend:"
+msgstr ""
+
+#: /views/evaluations/export.ctp:56
+#: /views/evaluations/export_all.ctp:56
+msgid "Include Criteria Marks:"
+msgstr ""
+
+#: /views/evaluations/export.ctp:58
+#: /views/evaluations/export_all.ctp:58
+msgid "Include General Comments:"
+msgstr ""
+
+#: /views/evaluations/export.ctp:61
+#: /views/evaluations/export_all.ctp:64
+msgid "Include Final Marks:"
+msgstr ""
+
+#: /views/evaluations/export_all.ctp:11
+msgid "Export Filename"
+msgstr ""
+
+#: /views/evaluations/export_all.ctp:26
+msgid "Body"
+msgstr ""
+
+#: /views/evaluations/export_all.ctp:61
+msgid "Include Criteria Comments:"
+msgstr ""
+
+#: /views/evaluations/export_all.ctp:67
+msgid "Export"
+msgstr ""
+
+#: /views/evaluations/index.ctp:8
+msgid "Search:"
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:26
+#: /views/evaluations/rubric_eval_form.ctp:23
+msgid "Evaluator:"
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:29
+#: /views/evaluations/rubric_eval_form.ctp:26
+msgid "Evaluating:"
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:33
+#: /views/evaluations/rubric_eval_form.ctp:30
+msgid "Event Name:"
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:35
+#: /views/evaluations/rubric_eval_form.ctp:32
+#: /views/events/view.ctp:76
+msgid "Due Date:"
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:39
+#: /views/evaluations/rubric_eval_form.ctp:36
+#: /views/events/add.ctp:43
+#: /views/events/view.ctp:30
+msgid "Description:"
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:48
+msgid "instructions"
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:49
+#: /views/evaluations/rubric_eval_form.ctp:46
+msgid "Instructions:"
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:50
+msgid "Click your peer's name to rate his/her performance."
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:51
+#: /views/evaluations/rubric_eval_form.ctp:48
+msgid "(Must)"
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:52
+msgid " Press \"Save This Section\" or \"Edit This Section\" once to save the evaluation on individual peer."
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:53
+#: /views/evaluations/rubric_eval_form.ctp:50
+msgid "Press \"Submit to Complete the Evaluation\" to submit your evlauation to all peers."
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:92
+msgid "Entered"
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:94
+msgid "Incomplete"
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:118
+msgid "Edit This Section (Click this button to save now or you may lose your input)"
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:120
+msgid "Save This Section (Click this button to save now or you may lose your input)"
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:188;191
+#: /views/evaluations/rubric_eval_form.ctp:151;154
+msgid "Submit to Complete the Evaluation"
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:188
+#: /views/evaluations/rubric_eval_form.ctp:151
+msgid "Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?"
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:192
+msgid "Please complete the questions for all group members, pressing 'Save This Section' button for each one."
+msgstr ""
+
+#: /views/evaluations/mixeval_eval_form.ctp:193
+msgid "Please Enter all the comments for all the group members before submitting."
+msgstr ""
+
+#: /views/evaluations/rubric_eval_form.ctp:47
+msgid "Click <font color =\"#FF6666\"><i>EACH</i></font> of your peer's name to rate his/her performance."
+msgstr ""
+
+#: /views/evaluations/rubric_eval_form.ctp:49
+msgid "Press \"Save This Section\" or \"Edit This Section\" once to save the evaluation on individual peer."
+msgstr ""
+
+#: /views/evaluations/rubric_eval_form.ctp:51
+msgid "<i>NOTE:</i> You can click the \"Submit to Complete the Evaluation\" button only <font color =\"#FF6666\">AFTER</font> all evaluations are completed."
+msgstr ""
+
+#: /views/evaluations/rubric_eval_form.ctp:70
+msgid "(click to expand)"
+msgstr ""
+
+#: /views/evaluations/rubric_eval_form.ctp:75
+msgid "Important! Comments are required in this evaluation."
+msgstr ""
+
+#: /views/evaluations/rubric_eval_form.ctp:85
+msgid "Make sure you save this section before moving on to the other ones!"
+msgstr ""
+
+#: /views/evaluations/rubric_eval_form.ctp:155
+msgid "Please complete the questions for all group members, pressing 'Save This Section' button for each one.</div>"
+msgstr ""
+
+#: /views/evaluations/rubric_eval_form.ctp:156
+msgid "Please Enter all the comments for all the group members before submitting.</div>"
+msgstr ""
+
+#: /views/evaluations/simple_eval_form.ctp:31
+msgid "All points are allocated."
+msgstr ""
+
+#: /views/evaluations/simple_eval_form.ctp:36
+msgid "All points are allocated.<br />There are still"
+msgstr ""
+
+#: /views/evaluations/simple_eval_form.ctp:36;51
+msgid "comments to be filled."
+msgstr ""
+
+#: /views/evaluations/simple_eval_form.ctp:40
+msgid "All points are allocated.<br />All comments are filled."
+msgstr ""
+
+#: /views/evaluations/simple_eval_form.ctp:48;51;54
+msgid "Too many points, need to unallocate"
+msgstr ""
+
+#: /views/evaluations/simple_eval_form.ctp:48
+msgid "points."
+msgstr ""
+
+#: /views/evaluations/simple_eval_form.ctp:51
+msgid "points.<br />There are still"
+msgstr ""
+
+#: /views/evaluations/simple_eval_form.ctp:54
+msgid "points.<br />All comments are filled."
+msgstr ""
+
+#: /views/evaluations/simple_eval_form.ctp:62
+msgid "Please allocate"
+msgstr ""
+
+#: /views/evaluations/simple_eval_form.ctp:62
+msgid "more points."
+msgstr ""
+
+#: /views/events/add.ctp:13
+#: /views/events/edit.ctp:19
+msgid " Evaluation Event"
+msgstr ""
+
+#: /views/events/add.ctp:24
+msgid "validate required TEXT_FORMAT newtitle_msg Invalid_Event_Title_Format."
+msgstr ""
+
+#: /views/events/add.ctp:36
+msgid "Event.title"
+msgstr ""
+
+#: /views/events/add.ctp:37
+msgid "Event.title_unique"
+msgstr ""
+
+#: /views/events/add.ctp:48
+#: /views/events/view.ctp:35
+msgid "Evaluation Format:"
+msgstr ""
+
+#: /views/events/add.ctp:87
+#: /views/events/view.ctp:62
+msgid "Allow Self-Evaluation?:"
+msgstr ""
+
+#: /views/events/add.ctp:101
+#: /views/events/view.ctp:69
+msgid "Require Student Comments?:"
+msgstr ""
+
+#: /views/events/add.ctp:116
+msgid "Due Date :"
+msgstr ""
+
+#: /views/events/add.ctp:120
+#: /views/events/edit.ctp:155
+msgid "(24 HOUR)"
+msgstr ""
+
+#: /views/events/add.ctp:133
+msgid "To :"
+msgstr ""
+
+#: /views/events/add.ctp:142
+#: /views/events/edit.ctp:177
+#: /views/events/view.ctp:101
+msgid "Groups Assignment:"
+msgstr ""
+
+#: /views/events/add.ctp:146
+#: /views/events/edit.ctp:183
+msgid "Avaliable Groups"
+msgstr ""
+
+#: /views/events/add.ctp:146
+#: /views/events/edit.ctp:183
+msgid "Participating Groups"
+msgstr ""
+
+#: /views/events/add.ctp:155
+msgid " Event"
+msgstr ""
+
+#: /views/events/edit.ctp:23
+#: /views/events/view.ctp:13
+msgid "Course:"
+msgstr ""
+
+#: /views/events/edit.ctp:66
+msgid "Evaluation Format"
+msgstr ""
+
+#: /views/events/edit.ctp:109
+msgid "Allow Self-Evaluation?"
+msgstr ""
+
+#: /views/events/edit.ctp:124
+msgid "Require Student Comments?"
+msgstr ""
+
+#: /views/events/edit.ctp:158
+msgid "Release Date"
+msgstr ""
+
+#: /views/events/edit.ctp:161
+#: /views/events/view.ctp:85
+msgid "FROM:"
+msgstr ""
+
+#: /views/events/edit.ctp:167
+#: /views/events/view.ctp:91
+msgid "TO:"
+msgstr ""
+
+#: /views/events/edit.ctp:192
+msgid "Edit Event"
+msgstr ""
+
+#: /views/events/edit_group.ctp:31
+msgid "Filtered Students"
+msgstr ""
+
+#: /views/events/edit_group.ctp:40
+msgid "Add Student(s)"
+msgstr ""
+
+#: /views/events/edit_group.ctp:43
+msgid "Show Unassigned Students Only "
+msgstr ""
+
+#: /views/events/edit_group.ctp:44
+msgid "Remove Student(s)"
+msgstr ""
+
+#: /views/events/edit_group.ctp:53
+msgid "Update Group"
+msgstr ""
+
+#: /views/events/index.ctp:9;11
+msgid "Add Event"
+msgstr ""
+
+#: /views/events/view.ctp:10
+msgid "View Evaluation Event"
+msgstr ""
+
+#: /views/events/view.ctp:23
+msgid "Event Title:"
+msgstr ""
+
+#: /views/events/view.ctp:116
+msgid "Edit this Event"
+msgstr ""
+
+#: /views/events/view.ctp:116
+msgid "Back to Event Listing"
+msgstr ""
+
+#: /views/helpers/paginator.php:98
+msgid "%s does not implement a link() method, it is incompatible with PaginatorHelper"
+msgstr ""
+
+#: /views/helpers/paginator.php:533
+msgid " of "
+msgstr ""
+
+#: /views/mixevals/edit.ctp:91;99
+#: /views/rubrics/edit.ctp:94
+msgid "Save"
+msgstr ""
+
+#: /views/mixevals/edit.ctp:94
+msgid "Edit Mixed Evaluation"
+msgstr ""
+
+#: /views/rubrics/edit.ctp:89
+msgid "Edit Rubric"
+msgstr ""
+
+#: /views/rubrics/edit.ctp:93
+msgid "Preview (Update Format)"
+msgstr ""
+
+#: /views/simple_evaluations/edit.ctp:22
+msgid "Duplicate name found. Please change the name."
+msgstr ""
+
+#: /views/users/edit_profile.ctp:18
+msgid "Duplicate Username found. Please change the username."
+msgstr ""
+
+#: /webroot/test.php:88
+msgid "Debug setting does not allow access to this url."
+msgstr ""
+

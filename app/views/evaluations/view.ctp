@@ -18,32 +18,32 @@
         <td>
             <?php 
                 echo $html->link(
-                        $html->image('icons/export_excel.gif', array('alt'=>'Export'))." Export Evaluations",
+                        $html->image('icons/export_excel.gif', array('alt'=>'Export')).__(" Export Evaluations", true),
                         "export/".$courseId,
                         array('escape' => false)
                 );
             ?>
         </td>
         <td>            
-            <?php echo $html->link('Release All Comments',
+            <?php echo $html->link(__('Release All Comments', true),
                             'changeAllCommentRelease/'.$eventId.';1',
                             array('escape' => false));
             ?>
         </td>
         <td>
-            <?php echo $html->link('Unrelease All Comments',
+            <?php echo $html->link(__('Unrelease All Comments', true),
                             'changeAllCommentRelease/'.$eventId.';0',
                             array('escape' => false));
             ?>
         </td>
         <td>
-            <?php echo $html->link('Release All Grades',
+            <?php echo $html->link(__('Release All Grades', true),
                             'changeAllGradeRelease/'.$eventId.';1',
                             array('escape' => false));
             ?>
         </td>
         <td>
-            <?php echo $html->link('Unrelease All Grades',
+            <?php echo $html->link(__('Unrelease All Grades', true),
                             'changeAllGradeRelease/'.$eventId.';0',
                             array('escape' => false));
             ?>
@@ -55,10 +55,10 @@
         </td></tr>
   <tr>
     <td>
-     <?php echo $html->link('Back to Evaluation Event Listing', '/evaluations/index/'); ?>
+     <?php echo $html->link(__('Back to Evaluation Event Listing', true), '/evaluations/index/'); ?>
      <?php if (!empty($rdAuth->courseId)) {
         echo '&nbsp;|&nbsp;';
-        echo $html->link('Back to Course Home', '/courses/home/'.$rdAuth->courseId);
+        echo $html->link(__('Back to Course Home', true), '/courses/home/'.$rdAuth->courseId);
       } ?>
     </td>
   </tr>

@@ -9,9 +9,9 @@ else {
   echo '<select name="event_id" id="event_id" '.$disabled.'>';
 
   if ($defaultOpt == '1') {
-    echo '<option value="-1" SELECTED >No event Selected</option>';
+    echo '<option value="-1" SELECTED >'.__('No event Selected', true).'</option>';
   } else if ($defaultOpt == 'A') {
-    echo '<option value="A" SELECTED > --- All events --- </option>';
+    echo '<option value="A" SELECTED >'.__(' --- All events --- ').'</option>';
   }
 
   foreach($eventList as $index => $value) {

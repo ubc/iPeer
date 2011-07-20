@@ -18,27 +18,27 @@
   ?>
   <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
-    <td colspan="4" align="center"><?php echo ucfirst($this->action)?> Group</td>
+    <td colspan="4" align="center"><?php echo ucfirst($this->action)?> <?php __('Group')?></td>
   </tr>
 
   <tr class="tablecell2">
     <?php echo $this->Form->input('group_num', array('size'=>'50', 'class'=>'input',
-                                                  'readonly' => true, 'value' => $group_num)) ?>
+                                                  'readonly' => true, 'value' => $group_num, 'label' => __('Group Number:', true))) ?>
   </tr>
 
   <tr class="tablecell2">
-    <?php echo $this->Form->input('group_name', array('size'=>'50', 'class'=>'input',
+    <?php echo $this->Form->input('group_name', array('size'=>'50', 'class'=>'input', 'label' => __('Group Name:', true),
                                                       'readonly' => $readonly)) ?>
   </tr>
 
   <tr class="tablecell2">
-    <td>Status:</td>
+    <td><?php __('Status')?>:</td>
     <td><?php echo $this->Form->select('record_status', array('A' => 'Active', 'I' => 'Inactive'), null, array('empty' => false,
                                                                                                                'disabled' => $readonly))?></td>
   </tr>
 
   <tr class="tablecell2">
-    <td>Members:</td>
+    <td><?php __('Members')?>:</td>
     <td>    
     <?php if($readonly):?>
       <?php if(!empty($members)):?>
@@ -51,21 +51,21 @@
       <?php endforeach;?>
     </table>
       <?php else:?>
-        No members in this group.
+        <?php __('No members in this group.')?>
       <?php endif;?>
     <?php else:?>
     <?php echo $this->element("groups/group_list_chooser",
                 array('all' => $user_data,
-                      'allName' =>  "Filtered Students", 'selectedName' => 'Students in Group'));
+                      'allName' =>  __("Filtered Students", true), 'selectedName' => __('Students in Group', true)));
     ?>
     <?php endif;?>
-        * : Student is already assigned in some group in this course
+        * : <?php __('Student is already assigned in some group in this course')?>
     </td>
   </tr>
 
   <?php if(!$readonly):?>
   <tr class="tablecell2">
-    <td colspan="2" align="center"><?php echo $this->Form->submit(ucfirst($this->action).' Group', array('div' => false,
+    <td colspan="2" align="center"><?php echo $this->Form->submit(ucfirst($this->action).__(' Group', true), array('div' => false,
                                                                                                          'onClick' => "processSubmit(document.getElementById('selected_groups'))")) ?>
     </td>
   </tr>
@@ -84,8 +84,8 @@
   <table width="95%"  border="0" cellspacing="2" cellpadding="4">
   <tr>
     <td>
-      <?php echo $this->Html->link('Edit this Group', '/groups/edit/'.$data['Group']['id']); ?> | 
-      <?php echo $html->link('Back to Group Listing', '/groups/index/'.$data['Group']['course_id']); ?>
+      <?php echo $this->Html->link(__('Edit this Group', true), '/groups/edit/'.$data['Group']['id']); ?> | 
+      <?php echo $html->link(__('Back to Group Listing', true), '/groups/index/'.$data['Group']['course_id']); ?>
     </td>
   </tr>
   </table>

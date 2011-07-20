@@ -15,12 +15,13 @@
 
   <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
-    <td colspan="3" align="center"><?php echo ucfirst($this->action)?> Course</td>
+    <td colspan="3" align="center"><?php echo ucfirst($this->action)?> <?php __('Course')?></td>
   </tr>
 
   <tr class="tablecell2">
-    <?php echo $this->Form->input('course', array('size'=>'50', 'class'=>'input',
-                                                  'readonly' => $readonly)) ?>
+      <td><?php __('Course')?>:</td>
+    <?php echo $this->Form->input(__('course', true), array('size'=>'50', 'class'=>'input',
+                                                  'readonly' => $readonly, 'label' => false, 'format' => array('before','input','after', 'error'))) ?>
     <?php
       $this->Js->get('#CourseCourse');
       $this->Js->event('blur', $this->Js->request(array('action' => 'checkDuplicateName', 'course_id' => $course_id), 
@@ -30,18 +31,19 @@
                                                         'data' => '$(this).serialize()',
                                                         'dataExpression' => true)));
     ?>
-    <td width="243">eg. APSC 201 001 <div id="courseErr" class='error-message'></div></td>
+    <td width="243"><?php __('eg. APSC 201 001')?> <div id="courseErr" class='error-message'></div></td>
   </tr>
 
   <tr class="tablecell2">
+    <td width="200px"><?php __('Title')?>:</td>
     <?php echo $this->Form->input('title', array('size'=>'50', 'class'=>'input',
-                                                  'readonly' => $readonly)) ?>
-    <td> eg. Intro to APSCI </td>
+                                                  'readonly' => $readonly, 'label' => false, 'format' => array('before','input','after', 'error'))) ?>
+    <td><?php __('eg. Intro to APSCI')?> </td>
   </tr>
 
   <?php if('add' != $this->action):?>
   <tr class="tablecell2">
-    <td valign="top">Instructor(s):</td>
+    <td valign="top"><?php __('Instructor(s)')?>:</td>
     <td>
       <?php if (isset($data['Instructor'])):?>
         <?php foreach($data['Instructor'] as $i):?>
@@ -50,7 +52,7 @@
       <?php endif;?>
 	<div id="add-div">
   <?php echo $this->Form->select('instructors', $instructors_rest);?>
-	<?php echo $this->Js->link($html->image('icons/add.gif', array('alt'=>'Add Instructor', 'valign'=>'middle', 'border'=>'0')).' Add Instructor',
+	<?php echo $this->Js->link($html->image('icons/add.gif', array('alt'=>__('Add Instructor',true), 'valign'=>'middle', 'border'=>'0')).__(' Add Instructor', true),
                              array('action' => 'addInstructor'),
                              array('escape' => false,
                                    'success' => '$("add-div").insert({before: "<div>"+response.responseText+"</div>"});$$("option[value="+$F("CourseInstructors")+"]").invoke("remove")',
@@ -66,35 +68,37 @@
   <?php endif;?>
 
   <tr class="tablecell2">
-    <td>Status:</td>
+    <td><?php __('Status')?>:</td>
     <td>
-    <?php echo $this->Form->select('record_status', array('A' => 'Active', 'I' => 'Inactive'), null, array('empty' => false))?>
+    <?php echo $this->Form->select('record_status', array('A' => __('Active',true), 'I' => __('Inactive', true)), null, array('empty' => false))?>
 	</td>
     <td>&nbsp;</td>
   </tr>
   <!--<?php if (!(isset($rdAuth->customIntegrateCWL) && $rdAuth->customIntegrateCWL)) { ?>
   <tr class="tablecell2">
-    <td> Enable Student Self Enrollment: </td>
+    <td><?php __('Enable Student Self Enrollment')?>: </td>
     <td><input type="checkbox" name="self_enroll" value="on" <?php if( $course['self_enroll'] == "on" ) echo " checked";?>>
 	</td>
     <td>&nbsp;</td>
   </tr>
   <tr class="tablecell2">
-    <td> Password for Self Enroll: </td>
-    <td><?php echo $html->input('Course/password', array('size'=>'50','class'=>'input')) ?></td>
+    <td><?php __('Password for Self Enroll')?>: </td>
+    <td><?php echo $html->input(__('Course/password', true), array('size'=>'50','class'=>'input')) ?></td>
     <td>&nbsp;</td>
   </tr>
 <?php }?>-->
 
   <tr class="tablecell2">
-    <?php echo $this->Form->input('homepage', array('size'=>'50', 'class'=>'input',
-                                                  'readonly' => $readonly)) ?>
-    <td> eg. http://mycoursehome.com </td>
+      <td><?php __('Homepage')?>:</td>
+  
+    <?php echo $this->Form->input(__('homepage', true), array('size'=>'50', 'class'=>'input',
+                                                  'readonly' => $readonly, 'label' => false, 'format' => array('before','input','after', 'error'))) ?>
+    <td><?php __('eg.')?> http://mycoursehome.com </td>
   </tr>
 
   <tr class="tablecell2">
-    <td colspan="3" align="center"><?php echo $this->Form->submit(ucfirst($this->action).' Course', array('div' => false)) ?>
-	<input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
+    <td colspan="3" align="center"><?php echo $this->Form->submit(ucfirst($this->action).__(' Course', true), array('div' => false)) ?>
+	<input type="button" name="Back" value="<?php __('Back')?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
 	</td>
   </tr>
 </table>

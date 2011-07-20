@@ -15,43 +15,43 @@
               <td colspan="6" align="center" class="tableheader"><?php echo $data['Course']['course']; ?> - <?php echo $data['Course']['title']; ?></td>
             </tr>
             <tr>
-              <td width="100" class="tablesubheader">Instructor:</td>
+              <td width="100" class="tablesubheader"><?php __('Instructor')?>:</td>
               <td class="tablecell2" colspan="5">
               <?php echo $this->element('courses/course_instructors', array('instructors'=>$data['Instructor']));?>
               </td>
             </tr>
             <tr>
-              <td width="100" class="tablesubheader">Class Size:</td>
+              <td width="100" class="tablesubheader"><?php __('Class Size')?>:</td>
               <td width="300" class="tablecell2"><?php
                 if ($studentCount == 0) {
-                  echo 'No student is enrolled';
+                  echo __('No student is enrolled', true);
                 } else {
-                  echo $studentCount.' students';
+                  echo $studentCount.__(' students', true);
                 } ?></td>
-              <td width="100" valign="top" class="tablesubheader">Class Statistics: </td>
+              <td width="100" valign="top" class="tablesubheader"><?php __('Class Statistics')?>: </td>
               <td class="tablecell2" colspan="3"><?php
                 if ($groupCount == 0) {
-                  echo 'No group has been made';
+                  echo __('No group has been made', true);
                 } else {
-                  echo $groupCount.' groups';
+                  echo $groupCount.__(' groups', true);
                 } ?>
                 <br><?php
                 if ($eventCount == 0) {
-                  echo 'No Evaluation Event has been created';
+                  echo __('No Evaluation Event has been created',true);
                 } else {
-                  echo $eventCount.' Evaluation Events';
+                  echo $eventCount.__(' Evaluation Events', true);
                 } ?></td>
             </tr>
             <!--<?php if (!(isset($rdAuth->customIntegrateCWL) && $rdAuth->customIntegrateCWL)) { ?>
             <tr>
-              <td class="tablesubheader">Self Enrollment:</td>
-              <td class="tablecell2"><?php echo $data['Course']['self_enroll'] == 'off'? 'Not Enabled' : 'Enabled'; ?></td>
-              <td class="tablesubheader">Self Enrollment Password: </td>
-              <td width="300" class="tablecell2"><?php echo $data['Course']['password']==null? 'N/A' : $data['Course']['password']; ?></td>
+              <td class="tablesubheader"><?php __('Self Enrollment')?>:</td>
+              <td class="tablecell2"><?php echo $data['Course']['self_enroll'] == 'off'? __('Not Enabled', true) : __('Enabled', true); ?></td>
+              <td class="tablesubheader"><?php __('Self Enrollment Password')?>: </td>
+              <td width="300" class="tablecell2"><?php echo $data['Course']['password']==null? __('N/A', true) : $data['Course']['password']; ?></td>
             </tr>
             <tr>
-              <td class="tablesubheader">Self Enrollment URL: </td>
-              <td width="150" class="tablecell2" colspan="3"><?php echo $data['Course']['homepage']==null? 'N/A' : $data['Course']['homepage']; ?></td>
+              <td class="tablesubheader"><?php __('Self Enrollment URL')?>: </td>
+              <td width="150" class="tablecell2" colspan="3"><?php echo $data['Course']['homepage']==null? __('N/A', true) : $data['Course']['homepage']; ?></td>
             </tr>
           <?php }?>-->
           </table>
@@ -77,7 +77,7 @@
                 <td style="padding-bottom:0px">
              <?php
                 $submenu = 'Course.SubMenu.Student.Show';
-                $submenuTitle = 'Students';
+                $submenuTitle = __('Students', true);
                 $params = array('controller'=>'courses', 'userPersonalize'=>$userPersonalize,
                     'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$course_id);
                 echo $this->element('courses/ajax_course_submenu', $params);
@@ -102,7 +102,7 @@
 
             <?php
               $submenu = 'Course.SubMenu.Group.Show';
-              $submenuTitle = 'Groups';
+              $submenuTitle = __('Groups', true);
               $params = array('controller'=>'courses', 'userPersonalize'=>$userPersonalize, 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'courseId'=>$course_id);
               echo $this->element('courses/ajax_course_submenu', $params);?>
                  </td>
@@ -128,12 +128,12 @@
                 <td>
           <?php
             $submenu = 'Course.SubMenu.Rubric.Show';
-            $submenuTitle = 'Rubrics';
+            $submenuTitle = __('Rubrics', true);
             $params = array('controller'=>'courses', 'userPersonalize'=>$userPersonalize, 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$course_id);
             echo $this->element('courses/ajax_course_submenu', $params);
 
             $submenu = 'Course.SubMenu.SimpleEvals.Show';
-            $submenuTitle = 'Simple Evaluations';
+            $submenuTitle = __('Simple Evaluations', true);
             $params = array('controller'=>'courses', 'userPersonalize'=>$userPersonalize, 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$course_id);
             echo $this->element('courses/ajax_course_submenu', $params); ?>
       		    </td>
@@ -159,7 +159,7 @@
                 <td>
           <?php
             $submenu = 'Course.SubMenu.EvalEvents.Show';
-            $submenuTitle = 'Evaluation Events';
+            $submenuTitle = __('Evaluation Events', true);
             $params = array('controller'=>'courses', 'userPersonalize'=>$userPersonalize, 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'courseId'=>$course_id);
             echo $this->element('courses/ajax_course_submenu', $params);
         ?>
@@ -184,7 +184,7 @@
         <?php
             if (!empty($access['SURVEY'])) {
               $submenu = 'Course.SubMenu.TeamMaker.Show';
-              $submenuTitle = 'Surveys (Team Maker)';
+              $submenuTitle = __('Surveys (Team Maker)', true);
               $params = array('controller'=>'courses', 'userPersonalize'=>$userPersonalize, 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$course_id);
               echo $this->element('courses/ajax_course_submenu', $params);
             }

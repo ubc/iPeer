@@ -28,16 +28,16 @@
 	  <tr style="background-color:#CCCCDD;">
 	    <td colspan="3" align="center">
 	    <table cellspacing="0" cellpadding="0" width="100%"><tr><td align="left"><?php echo $data['Survey']['name']; ?></td>
-	    <td align="right"><?php echo $this->Html->link('View Summary', '/evaluations/viewSurveySummary/'.$data['Survey']['id'], 
+	    <td align="right"><?php echo $this->Html->link(__('View Summary', true), '/evaluations/viewSurveySummary/'.$data['Survey']['id'], 
                                                      array('onClick' => "wopen(this.href, 'popup', 650, 500); return false;"))?></td>
       </tr>
       </table>
       </td>
 	  </tr>
 	  <tr class="tableheader">
-	    <th>Student Name</th>
-	    <th>Student Number</th>
-	    <th>Time Submitted</th>
+	    <th><?php __('Student Name')?></th>
+	    <th><?php __('Student Number')?></th>
+	    <th><?php __('Time Submitted')?></th>
 	  </tr>
 	  <?php foreach ($data['Course']['Enrol'] as $student):?>
 	  <tr class="tablecell">
@@ -52,7 +52,7 @@
 	    </td>
 
 		  <td align="center">
-		    <?php echo empty($student['date_submitted']) ? 'Not submitted' : Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($student['date_submitted'])))?>
+		    <?php echo empty($student['date_submitted']) ? __('Not submitted', true) : Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($student['date_submitted'])))?>
 	    </td>
 	  </tr>
 	  <?php endforeach; ?>
@@ -63,12 +63,12 @@
 	<div id="page-numbers">
 <table width="95%"  border="0" cellspacing="0" cellpadding="4">
   <tr>
-    <td width="33%"><?php echo $pagination->result('Results: ')?></td>
+    <td width="33%"><?php echo $pagination->result(__('Results: ', true))?></td>
     <td width="33%"></td>
     <td width="33%" align="right">
-		<?php echo $pagination->prev('Prev')?>
+		<?php echo $pagination->prev(__('Prev', true))?>
 		<?php echo $pagination->numbers()?>
-		<?php echo $pagination->next('Next')?>
+		<?php echo $pagination->next(__('Next', true))?>
 	</td>
   </tr>
 </table>
@@ -78,7 +78,7 @@
     </td></tr>
   </table>
   <?php else:?>
-    No survey available.
+    <?php __('No survey available.')?>
   <?php endif;?>
 </div>
 <!-- elements::ajax_survey_result_list end -->

@@ -17,9 +17,9 @@
   <tr>
     <td colspan="3"><?php echo $html->image('icons/instructions.gif',array('alt'=>'instructions'));?>
       <b> Summary:</b>(
-      <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Basic">Basic</a>
+      <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Basic"><?php __('Basic')?></a>
        |
-      <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Detail" >Detail</a>
+      <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Detail" ><?php __('Detail')?></a>
         )
     </td>
   </tr>
@@ -27,7 +27,7 @@
   if (!$allMembersCompleted) {?>
   <tr>
     <td colspan="3">
-	      <font color="red">These student(s) have yet to submit their evaluations: <br>
+	      <font color="red"><?php __('These student(s) have yet to submit their evaluations:')?> <br>
 	         <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
 	          &nbsp;-&nbsp; <?php echo $user['first_name'].' '.$user['last_name']?> <br>
 	      <?php endforeach; ?>
@@ -145,10 +145,10 @@ $groupAve = 0;
 
       	<?php
 				if ($event['group_event_marked'] == "reviewed") {
-					echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_not_reviewed\" value=\"Mark Peer Evaluations as Not Reviewed\" />";
+					echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_not_reviewed\" value=\" ".__('Mark Peer Evaluations as Not Reviewed', true)."\" />";
 				}
 				else {
-					echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_reviewed\" value=\"Mark Peer Evaluations as Reviewed\" />";
+					echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_reviewed\" value=\" ".__('Mark Peer Evaluations as Reviewed', true)."\" />";
 				}
 			?>
 			</form></td>
@@ -178,19 +178,19 @@ $groupAve = 0;
 			                  if ($memberAve == $groupAve) {
 			                    echo "&nbsp;&nbsp;<< Same Mark as Group Average >>";
 			                  } else if ($memberAve < $groupAve) {
-			                    echo "&nbsp;&nbsp;<font color='#cc0033'><< Below Group Average >></font>";
+			                    echo "&nbsp;&nbsp;<font color='#cc0033'><< ".__('Below Group Average', true)." >></font>";
 			                  } else if ($memberAve > $groupAve) {
-			                    echo "&nbsp;&nbsp;<font color='#000099'><< Above Group Average >></font>";
+			                    echo "&nbsp;&nbsp;<font color='#000099'><< ".__('Above Group Average', true)." >></font>";
 			                  }
 			                ?> </b>
 			        <br><br>
 			  <!-- Section One -->
         <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
           <tr>
-            <td colspan="<?php echo $mixeval['Mixeval']["lickert_question_max"] ?>"><b> Section One: </b></td>
+            <td colspan="<?php echo $mixeval['Mixeval']["lickert_question_max"] ?>"><b> <?php __('Section One:')?> </b></td>
           </tr>
         	<tr class="tableheader" align="center">
-            <td width="100" valign="top">Evaluator</td>
+            <td width="100" valign="top"><?php __('Evaluator')?></td>
             <?php
               for ($i=0; $i<$mixeval['Mixeval']["lickert_question_max"]; $i++) {
             		echo "<td><strong><font color=" . $color[ ($i+1) % sizeof($color) ] . ">" . ($i+1) . ". "  . "</font></strong>";
@@ -264,7 +264,7 @@ $groupAve = 0;
             <td colspan="<?php echo $mixeval['Mixeval']["total_question"] ?>"><b> Section Two: </b></td>
           </tr>
         	<tr class="tableheader" align="center">
-            <td width="100" valign="top">Evaluator</td>
+            <td width="100" valign="top"><?php __('Evaluator')?></td>
             <?php
               for ($i=$numerical_index; $i<=$mixeval['Mixeval']["total_question"]; $i++) {
                 if (isset($mixevalQuestion[$i-1])) {
@@ -315,16 +315,16 @@ $groupAve = 0;
        echo "<br>";
        //Grade Released
        if (isset($scoreRecords[$user['id']]['grade_released']) && $scoreRecords[$user['id']]['grade_released']) {?>
-        <input type="button" name="UnreleaseGrades" value="Unrelease Grades" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';0'; ?>'">
+        <input type="button" name="UnreleaseGrades" value="<?php __('Unrelease Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';0'; ?>'">
        <?php } else {?>
-        <input type="button" name="ReleaseGrades" value="Release Grades" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';1'; ?>'">
+        <input type="button" name="ReleaseGrades" value="<?php __('Release Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';1'; ?>'">
        <?php }
 
        //Comment Released
        if (isset($scoreRecords[$user['id']]['comment_released']) && $scoreRecords[$user['id']]['comment_released']) {?>
-        <input type="button" name="UnreleaseComments" value="Unrelease Comments" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';0'; ?>'">
+        <input type="button" name="UnreleaseComments" value="<?php __('Unrelease Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';0'; ?>'">
        <?php } else {?>
-        <input type="button" name="ReleaseComments" value="Release Comments" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';1'; ?>'">
+        <input type="button" name="ReleaseComments" value="<?php __('Release Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';1'; ?>'">
        <?php }
        ?>
 		  </div>

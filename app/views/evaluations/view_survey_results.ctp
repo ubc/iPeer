@@ -5,7 +5,7 @@
       <form name="frm" id="frm" method="POST" action="<?php echo $html->url('makeSurveyEvaluation') ?>">
         <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
           <tr class="tableheader">
-            <td align="center">Team Maker Survey</td>
+            <td align="center"><?php __('Team Maker Survey')?></td>
           </tr>
           <tr class="tablecell2">
             <td>

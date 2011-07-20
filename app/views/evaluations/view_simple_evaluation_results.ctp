@@ -17,7 +17,7 @@
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr>
     <td colspan="3">
-	      <font color="red">These student(s) have yet to submit their evaluations: <br>
+	      <font color="red"><?php __('These student(s) have yet to submit their evaluations:')?> <br>
 	         <?php foreach($inCompletedMembers as $row): $user = $row['User']; array_push($incompletedMembersArr, $user['first_name'].' '.$user['last_name']);?>
 	          &nbsp;-&nbsp; <?php echo $user['first_name'].' '.$user['last_name']?> <br>
 	      <?php endforeach; ?>
@@ -33,7 +33,7 @@
   </tr>
   <tr class="tablecell2">
   	<td rowspan="2">Evaluator</td>
-  	<td colspan="<?php echo count($groupMembers); ?>">Members Evaluated</td>
+  	<td colspan="<?php echo count($groupMembers); ?>"><?php __('Members Evaluated')?></td>
   </tr>
   <tr class="tablecell2">
   <?php if ($groupMembers) {
@@ -62,7 +62,7 @@
     		  echo '</tr>';
     	  }   ?>
   <tr class="tablesummary">
-    	<td>Average Received</td>
+    	<td><?php __('Average Received')?></td>
       <?php
       $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;
        foreach ($groupMembers as $member_col) {
@@ -89,7 +89,7 @@
   		 }?>
 	</tr>
 	<tr class="tablesummary2">
-	    <td>Grade Released</td>
+	    <td><?php __('Grade Released')?></td>
       <?php
 
        $n=0;
@@ -107,14 +107,14 @@
            <?php }
            echo '</td>' . "\n\t\t";
         } else
-          echo '<td><input type="button" value="marks n/a" disabled /></td>';
+          echo '<td><input type="button" value="'.__('marks n/a', true).'" disabled /></td>';
   		 }?>
  </tr>
 <?php  }
 else { // if no members are present
 ?>
 <tr class="tablecell2">
-	<td colspan="4"><em>No group members</em></td>
+	<td colspan="4"><em><?php __('No group members')?></em></td>
 </tr>
 <?php }?>
 <tr class="tablecell2" align="center">
@@ -125,10 +125,10 @@ else { // if no members are present
   <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id']?>" />
   <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" /><?php
 	if ($event['group_event_marked'] == "reviewed") {
-		echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_not_reviewed\" value=\"Mark Peer Evaluations as Not Reviewed\" />";
+		echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_not_reviewed\" value=\" ".__('Mark Peer Evaluations as Not Reviewed', true)."\" />";
 	}
 	else {
-		echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_reviewed\" value=\"Mark Peer Evaluations as Reviewed\" />";
+		echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_reviewed\" value=\" ".__('Mark Peer Evaluations as Reviewed', true)."\" />";
 	}
 ?>
 </form></td>
@@ -141,14 +141,14 @@ else { // if no members are present
 
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
-    <td width="10" height="32" align="center">Comment Sections</td>
+    <td width="10" height="32" align="center"><?php __('Comment Sections')?></td>
   </tr>
 	<tr>
 	<td width="100%" height="32"><?php echo $html->image('icons/instructions.gif',array('alt'=>'instructions'));?>
-		<b> Instructions:</b><br>
-		1. Click evaluator's name to view his/her evaluation on group members.<br>
-		2. Check the "Released" checkbox and click "Save Changes" to release individual comments , or
-		   Click "Release All" or "Unrelease All" buttons to release or unrelease all comments.<br>
+		<b> <?php __('Instructions:')?></b><br>
+		1. <?php __("Click evaluator's name to view his/her evaluation on group members.")?><br>
+		2. <?php __('Check the "Released" checkbox and click "Save Changes" to release individual comments , or')?>
+		   <?php __('Click "Release All" or "Unrelease All" buttons to release or unrelease all comments.')?><br>
 	</td>
 	</tr>
 	<tr>
@@ -163,9 +163,9 @@ else { // if no members are present
 			<div style="height: 200px;" id="panel1Content" class="panelContent">
 <table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
 <tr class="tablecell2">
-	<td>Evaluatee</td>
-	<td>Comment</td>
-	<td colspan="2">Released</td>
+	<td><?php __('Evaluatee')?></td>
+	<td><?php __('Comment')?></td>
+	<td colspan="2"><?php __('Released')?></td>
 </tr>
 	<?php
 $i = 0;
@@ -181,7 +181,7 @@ foreach($evalResult[$user['id']] AS $row ) {
     if (isset($evalMark)) {
         echo '<td width="30%">'.$evaluatee['last_name'].' '.$evaluatee['first_name'].'</td>' . "\n";
         echo '<td width="60%">';
-        echo (isset($evalMark['eval_comment']))? $evalMark['eval_comment'] : 'No Comments';
+        echo (isset($evalMark['eval_comment']))? $evalMark['eval_comment'] : __('No Comments', true);
         echo '</td>' ;
         if ($evalMark['release_status'] == 1) { // made explicit comparison with 1
             echo '<td colspan="2" width="10%">' . '<input type="checkbox" name="release' .  $evalMark['evaluator']  . '[]" value="' . $evalMark['evaluatee'] . '" checked />';
@@ -191,7 +191,7 @@ foreach($evalResult[$user['id']] AS $row ) {
         echo '<input type="hidden" name="evaluator_ids[]" value="' .  $evalMark['evaluator']  . '" /></td>';
     } else {
         echo 'ss';
-        echo '<td colspan="4">n/a</td>';
+        echo '<td colspan="4">'.__('n/a', true).'</td>';
     }
     echo '</tr>';
 }
@@ -209,9 +209,9 @@ foreach($evalResult[$user['id']] AS $row ) {
   <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
   <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id']?>" />
   <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" />
-	&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="submit" value="Save Changes" />
-	&nbsp;&nbsp;&nbsp;<input type="submit" name="submit" value="Release All" />
-	&nbsp;&nbsp;&nbsp;<input type="submit" name="submit" value="Unrelease All" />
+	&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="submit" value="<?php __('Save Changes')?>" />
+	&nbsp;&nbsp;&nbsp;<input type="submit" name="submit" value="<?php __('Release All')?>" />
+	&nbsp;&nbsp;&nbsp;<input type="submit" name="submit" value="<?php __('Unrelease All')?>" />
 </td>
 </tr>
 </table>

@@ -8,10 +8,10 @@
     <td>
         <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
           <tr class="tableheader">
-            <td colspan="2" align="center">View Group</td>
+            <td colspan="2" align="center"><?php __('View Group')?></td>
           </tr>
           <tr class="tablecell2">
-            <td width="265">Group Number:&nbsp;</td>
+            <td width="265"><?php __('Group Number')?>:&nbsp;</td>
             <td><?php echo $data['Group']['group_num']; ?></td>
           </tr>
           <tr class="tablecell2">
@@ -20,17 +20,17 @@
           </tr>
           <tr class="tablecell2">
             <td>Status:</td>
-            <td><?php if( $data['Group']['record_status'] == "A" ) echo "Active"; else echo "Inactive"; ?></td>
+            <td><?php if( $data['Group']['record_status'] == "A" ) echo __("Active", true); else echo __("Inactive", true); ?></td>
           </tr>
           <tr class="tablecell2">
-            <td valign="top">Members:</td>
+            <td valign="top"><?php __('Members')?>:</td>
             <td>
               <table width="100%" border="0" cellspacing="2" cellpadding="2">                
               <?php if (!empty($group_data)) :?>
                 <tr>
                   <td colspan="3"><?php 
                   echo $html->link(
-                        $html->image('icons/email.gif',array('border'=>'0','alt'=>'Email')).' Email To All Members',
+                        $html->image('icons/email.gif',array('border'=>'0','alt'=>'Email')).__(' Email To All Members', true),
                         array(
                             'controller' => 'emailer',
                             'action' => 'write',
@@ -52,11 +52,11 @@
                         array('escape'=>false)
                     );?>
                   </td>
-                  <td width="15"><a href="../../users/view/<?php echo $user['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View', 'title' => 'View '.$user['full_name']))?></a></td>
+                  <td width="15"><a href="../../users/view/<?php echo $user['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>__('View', true), 'title' => 'View '.$user['full_name']))?></a></td>
                   <td><?php echo $user['full_name']?><br></td>
                  </tr>
 				      <?php endforeach;
-                            else: echo "No members in this group.";
+                            else: echo __("No members in this group.", true);
                             endif;?>
 				      </table>
 			      </td>
@@ -76,7 +76,7 @@
               <table width="403" border="0" cellspacing="0" cellpadding="4">
               <tr>
                 <td colspan="3"><?php echo $html->link('Edit this Group', '/groups/edit/'.$data['Group']['id']); ?> |
-                <?php echo $html->link('Back to Group Listing', '/groups/index/'.$course_id); ?>
+                <?php echo $html->link(__('Back to Group Listing', true), '/groups/index/'.$course_id); ?>
                 </td>
               </tr>
               </table>

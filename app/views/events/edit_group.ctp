@@ -7,28 +7,28 @@
 	  <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
     <td colspan="4" align="center">
-      <?php echo empty($params['data']['Group']['id'])?'Add':'Edit' ?> Group
+      <?php echo empty($params['data']['Group']['id'])?'Add':'Edit' ?> <?php __('Group')?>
     </td>
     </tr>
   <tr class="tablecell2">
-    <td width="265">Group Number:&nbsp;</td>
+    <td width="265"><?php __('Group Number')?>:&nbsp;</td>
     <td colspan="3"><?php echo $html->input('Group/group_num', array('size'=>'50','class'=>'input')) ?></td>
     </tr>
   <tr class="tablecell2">
-    <td>Group Name:&nbsp;</td>
+    <td><?php __('Group Name')?>:&nbsp;</td>
     <td colspan="3"><?php echo $html->input('Group/group_name', array('size'=>'50','class'=>'input')) ?>  </td>
     </tr>
   <tr class="tablecell2">
-    <td>Status:</td>
+    <td><?php __('Status')?>:</td>
     <td colspan="3">
 	  <input type="hidden" name="assigned" id="assigned"/>
-		<input type="radio" name="record_status" value="A" <?php if( $params['data']['Group']['record_status'] == "A" ) echo "checked";?>> - Active&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <input type="radio" name="record_status" value="I" <?php if( $params['data']['Group']['record_status'] == "I" ) echo "checked";?>> - Inactive<br>
+		<input type="radio" name="record_status" value="A" <?php if( $params['data']['Group']['record_status'] == "A" ) echo "checked";?>> - <?php __('Active')?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="radio" name="record_status" value="I" <?php if( $params['data']['Group']['record_status'] == "I" ) echo "checked";?>> - <?php __('Inactive')?><br>
 	</td>
     </tr>
   <tr class="tablecell2">
     <td align="center">&nbsp;</td>
-    <td width="250" align="center">Filtered Students<br>
+    <td width="250" align="center"><?php __('Filtered Students')?><br>
       <br>
 	  <select name="filtered" id="filtered" style="width:90%; height:200px;" multiple>
         <?php foreach($user_data as $row): $user = $row['users'];?>
@@ -37,11 +37,11 @@
       </select>
 	  </td>
     <td width="124" align="center">
-      <input type="button" style="width:150px;" onClick="move(document.getElementById('filtered'),document.getElementById('group_members'))" value="Add Student(s) >>" />
+      <input type="button" style="width:150px;" onClick="move(document.getElementById('filtered'),document.getElementById('group_members'))" value="<?php __('Add Student(s)')?> >>" />
       <br><br><br>
       <input name="filter" type="checkbox" id="filter" value="filter">
-- Show Unassigned Students Only <br><br><br>
-      <input type="button" style="width:150px;" onClick="move(document.getElementById('group_members'),document.getElementById('filtered'))" value="<< Remove Student(s)" /></td>
+- <?php __('Show Unassigned Students Only ')?><br><br><br>
+      <input type="button" style="width:150px;" onClick="move(document.getElementById('group_members'),document.getElementById('filtered'))" value="<< <?php __('Remove Student(s)')?>" /></td>
     <td width="251" align="center">Group List<br><br>
       <select name="group_members" multiple id="group_members" style="width:90%; height:200px;">
 	  	<?php if (isset($group_data)) foreach($group_data as $row): $user = $row['users'];?>
@@ -50,7 +50,7 @@
 	  </select></td>
   </tr>
   <tr class="tablecell2">
-    <td colspan="4" align="center"><?php echo $html->submit('Update Group', array('onClick'=>"processSubmit(document.getElementById('group_members'))")) ?></td>
+    <td colspan="4" align="center"><?php echo $html->submit(__('Update Group', true), array('onClick'=>"processSubmit(document.getElementById('group_members'))")) ?></td>
     </tr>
 </table>
       <table width="95%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">

@@ -5,7 +5,7 @@
 <!--form id="searchForm" action="">
 <table width="95%" border="0" cellspacing="0" cellpadding="2">
   <tr>
-    <td width="10" height="32"><?php echo $html->image('magnify.png', array('alt'=>'Magnify Icon'));?></td>
+    <td width="10" height="32"><?php echo $html->image('magnify.png', array('alt'=>__('Magnify Icon', true)));?></td>
     <td width="35"> <b>Search:</b> </td>
     <td width="35"><select name="select" id="select2">
       <option value="name" >Name</option>
@@ -19,19 +19,19 @@
 </form-->
 	<table class="list-table">
 	  <tr class="tableheader">
-	    <td colspan="7">Simple Evaluations</td>
+	    <td colspan="7"><?php __('Simple Evaluations')?></td>
 	  </tr>
 	  <tr class="panelContent">
 	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
 	      <tr class="panelContent">
 	        <td colspan="5" align="right">
-          <?php echo $html->image('icons/add.gif', array('alt'=>'Add Simple Evaluation', 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link('Add Simple Evaluation', '/simpleevaluations/add'); ?>&nbsp;
+          <?php echo $html->image('icons/add.gif', array('alt'=>__('Add Simple Evaluation', true), 'align'=>'middle','alt'=>__('add', true))); ?>&nbsp;<?php echo $html->link(__('Add Simple Evaluation', true), '/simpleevaluations/add'); ?>&nbsp;
           </td>
 	      </tr>
     	  <tr class="panelContent">
-    	    <th colspan="2" width="60%">Name</th>
-    	    <th width="50">In Use</th>
-    	    <th>Base Point Per Member</th>
+    	    <th colspan="2" width="60%"><?php __('Name')?></th>
+    	    <th width="50"><?php __('In Use')?></th>
+    	    <th><?php __('Base Point Per Member')?></th>
     	  </tr>
       	<?php $i = '0';?>
     	  <?php foreach($simpleEvalData as $row): $eval = $row['SimpleEvaluation']; ?>
@@ -53,30 +53,30 @@
     	  <?php endforeach; ?>
         <?php if ($i == 0) :?>
       	<tr class="tablecell" align="center">
-      	    <td colspan="4">Record Not Found</td>
+      	    <td colspan="4"><?php __('Record Not Found')?></td>
         </tr>
         <?php endif;?>
     	  </table>
 	  </td>
 	  </tr>
 	  <tr class="tableheader">
-	    <td colspan="7">Rubrics</td>
+	    <td colspan="7"><?php __('Rubrics')?></td>
 	  </tr>
 	  <tr class="panelContent">
 	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
 	      <tr class="panelContent">
 	        <td colspan="8" align="right">
           <?php if (!empty($access['RUBRIC_RECORD'])) {   ?>
-          <?php echo $html->image('icons/add.gif', array('alt'=>'Add Rubric', 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link('Add Rubric', '/rubrics/add'); ?>
+          <?php echo $html->image('icons/add.gif', array('alt'=>'Add Rubric', 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link(__('Add Rubric', true), '/rubrics/add'); ?>
           <?php }?>          </td>
 	      </tr>
     	  <tr class="panelContent">
-    	    <th colspan="2" width="60%">Name</th>
-    	    <th width="50">In Use</th>
-    	    <th>Public</th>
-    	    <th>LOM</th>
-    	    <th>Criteria</th>
-    	    <th>Total Marks</th>
+    	    <th colspan="2" width="60%"><?php __('Name')?></th>
+    	    <th width="50"><?php __('In Use')?></th>
+    	    <th><?php __('Public')?></th>
+    	    <th><?php __('LOM')?></th>
+    	    <th><?php __('Criteria')?></th>
+    	    <th><?php __('Total Marks')?></th>
     	  </tr>
       	<?php $i = '0';?>
     	  <?php foreach($rubricData as $row): $rubric = $row['Rubric']; ?>
@@ -102,31 +102,31 @@
     	  <?php endforeach; ?>
         <?php if ($i == 0) :?>
       	<tr class="tablecell" align="center">
-      	    <td colspan="7">Record Not Found</td>
+      	    <td colspan="7"><?php __('Record Not Found')?></td>
         </tr>
         <?php endif;?>
     	  </table>
 	  </td>
 	  </tr>
 	  <tr class="tableheader">
-	    <td colspan="7">Mixed Evaluations</td>
+	    <td colspan="7"><?php __('Mixed Evaluations')?></td>
 	  </tr>
 	  <tr class="panelContent">
 	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
 	      <tr class="panelContent">
 	        <td colspan="8" align="right">
           <?php if (!empty($access['MIX_EVAL_RECORD'])) {   ?>
-          <?php echo $html->image('icons/add.gif', array('alt'=>'Add Mix Evaluation', 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link('Add Mix Evaluation', '/mixevals/add'); ?>
+          <?php echo $html->image('icons/add.gif', array('alt'=>__('Add Mix Evaluation', true), 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link(__('Add Mix Evaluation', true), '/mixevals/add'); ?>
           <?php }?>
           </td>
 	      </tr>
     	  <tr class="panelContent">
-    	    <th colspan="2" width="60%">Name</th>
-    	    <th width="50">In Use</th>
-    	    <th>Public</th>
-    	    <th>Lickert Scale Questions</th>
-    	    <th>Prefill Questions</th>
-    	    <th>Total Marks</th>
+    	    <th colspan="2" width="60%"><?php __('Name')?></th>
+    	    <th width="50"><?php __('In Use')?></th>
+    	    <th><?php __('Public')?></th>
+    	    <th><?php __('Lickert Scale Questions')?></th>
+    	    <th><?php __('Prefill Questions')?></th>
+    	    <th><?php __('Total Marks')?></th>
     	  </tr>
         <?php $i = '0';?>
         <?php
@@ -164,7 +164,7 @@
         <?php endforeach; ?>
         <?php if ($i == 0) :?>
       	<tr class="tablecell" align="center">
-      	    <td colspan="8">Record Not Found</td>
+      	    <td colspan="8"><?php __('Record Not Found')?></td>
         </tr>
         <?php endif;?>
     	  </table>
@@ -172,23 +172,23 @@
 	  </tr>
 <?php if (!empty($access['SURVEY'])):?>
 	  <tr class="tableheader">
-	    <td colspan="7">Surveys (Team Maker)</td>
+	    <td colspan="7"><?php __('Surveys (Team Maker)')?></td>
 	  </tr>
 	  <tr class="panelContent">
 	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
 	      <tr class="panelContent">
 	        <td colspan="6" align="right">
           <?php if (!empty($access['SURVEY_RECORD'])):?>
-          <?php echo $html->image('icons/add.gif', array('alt'=>'Add Survey', 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link('Add Survey', '/surveys/add'); ?>
+          <?php echo $html->image('icons/add.gif', array('alt'=>__('Add Survey', true), 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link(__('Add Survey', true), '/surveys/add'); ?>
           <?php endif;?>
           </td>
 	      </tr>
     	  <tr class="panelContent">
-    	    <th colspan="2" width="42%">Name</th>
-    	    <th width="45">In Use</th>
-    	    <th>Course</th>
-    	    <th width="170">Due Date</th>
-          <th>Released?</th>
+    	    <th colspan="2" width="42%"><?php __('Name')?></th>
+    	    <th width="45"><?php __('In Use')?></th>
+    	    <th><?php __('Course')?></th>
+    	    <th width="170"><?php __('Due Date')?></th>
+          <th><?php __('Released?')?></th>
     	  </tr>
         <?php if(!empty($surveyData)):?>
     	  <?php foreach($surveyData as $row): $survey = $row['Survey'];?>
@@ -216,7 +216,7 @@
     	  <?php endforeach; ?>
         <?php else:?>
       	<tr class="tablecell" align="center">
-      	    <td colspan="6">Record Not Found</td>
+      	    <td colspan="6"><?php __('Record Not Found')?></td>
         </tr>
         <?php endif;?>
     	  </table>
@@ -225,20 +225,21 @@
 <?php endif; ?>
 <?php if (!empty($access['EMAIL_TEMPLATE'])):?>
 	  <tr class="tableheader">
-	    <td colspan="7">Email Templates</td>
+	    <td colspan="7"><?php __('Email Templates')?></td>
 	  </tr>
 	  <tr class="panelContent">
 	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
 	      <tr class="panelContent">
 	        <td colspan="6" align="right">
-          <?php echo $html->image('icons/add.gif', array('alt'=>'Add Survey', 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link('Add Email Template', '/emailtemplates/add'); ?>
+          <?php echo $html->image('icons/add.gif', array('alt'=>__('Add Survey', true), 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link(__('Add Email Template', true), '/emailtemplates/add'); ?>
           
           </td>
 	      </tr>
     	  <tr class="panelContent">
-            <th colspan="2" width="10">Name</th>
-            <th width="20%">Subject</th>
-    	    <th width="60%">Description</th>
+            <th colspan="2" width="20"><?php __('Name')?></th>
+             <th width="20%"><?php __('Subject')?></th>
+    	    <th width="60%"><?php __('Description')?></th>
+
     	  </tr>
         <?php if(!empty($emailTemplates)):?>
     	  <?php foreach($emailTemplates as $row): $emailTemplate = $row['EmailTemplate'];?>
@@ -251,7 +252,7 @@
     	  <?php endforeach; ?>
         <?php else:?>
       	<tr class="tablecell" align="center">
-      	    <td colspan="6">Record Not Found</td>
+      	    <td colspan="6"><?php __('Record Not Found')?></td>
         </tr>
         <?php endif;?>
     	  </table>

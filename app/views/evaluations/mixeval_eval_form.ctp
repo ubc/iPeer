@@ -20,23 +20,23 @@
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
       
   <tr class="tableheader">
-    <td colspan="4" align="center">Evaluation Event Detail</td>
+    <td colspan="4" align="center"><?php __('Evaluation Event Detail')?></td>
     </tr>
   <tr class="tablecell2">
-    <td width="10%">Evaluator:</td>
+    <td width="10%"><?php __('Evaluator:')?></td>
     <td width="25%"><?php echo $full_name ?>;
     </td>
-    <td width="10%">Evaluating:</td>
+    <td width="10%"><?php __('Evaluating:')?></td>
 	<td width="25%"><?php echo $event['group_name']; ?></td>
   </tr>
   <tr class="tablecell2">
-    <td>Event Name:</td>
+    <td><?php __('Event Name:')?></td>
     <td><?php echo $event['Event']['title'] ?></td>
-    <td>Due Date:</td>
+    <td><?php __('Due Date:')?></td>
     <td><?php if (isset($event['Event']['due_date'])) echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($event['Event']['due_date']))) ?></td>
   </tr>
   <tr class="tablecell2">
-    <td>Description:&nbsp;</td>
+    <td><?php __('Description:')?>&nbsp;</td>
     <td colspan="3"><?php echo $event['Event']['description'] ?></td>
   </tr>
   <tr>
@@ -45,12 +45,12 @@
 </table>
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr>
-    <td colspan="3"><?php echo $html->image('icons/instructions.gif',array('alt'=>'instructions'));?>
-      <b> Instructions:</b><br>
-      1. Click your peer's name to rate his/her performance.<br>
-      2. Enter Comments <?php echo  $event['Event']['com_req']? '<font color="red"> (Must) </font>' : '(Optional)' ;?> .<br>
-      3. Press "Save This Section" or "Edit This Section" once to save the evaluation on individual peer.<br>
-      4. Press "Submit to Complete the Evaluation" to submit your evlauation to all peers. <br>
+    <td colspan="3"><?php echo $html->image('icons/instructions.gif',array('alt'=>__('instructions', true)));?>
+      <b> <?php __('Instructions:')?></b><br>
+      1. <?php __("Click your peer's name to rate his/her performance.")?><br>
+      2. <?php __('Enter Comments')?>' <?php echo  $event['Event']['com_req']? '<font color="red">'.__('(Must)', true). '</font>' : __('(Optional)', true) ;?> .<br>
+      3. <?php __(' Press "Save This Section" or "Edit This Section" once to save the evaluation on individual peer.')?><br>
+      4. <?php __('Press "Submit to Complete the Evaluation" to submit your evlauation to all peers.')?> <br>
     </td>
   </tr>
 </table>
@@ -89,9 +89,9 @@
           }
         ?>
 
-		  	  <font color="#66FF33"> ( <?php echo $partial?>Entered )</font>
+		  	  <font color="#66FF33"> ( <?php echo $partial?><?php __('Entered')?> )</font>
 		  	<?php else:?>
-		  	  <font color="#FF6666"> - Incomplete </font>
+		  	  <font color="#FF6666"> - <?php __('Incomplete')?> </font>
 		  	<?php endif;?>
 		  </div>
 		  <div style="height: 200px;" id="panel1Content" class="panelContent">
@@ -115,9 +115,9 @@
         <tr class="tablecell2">
           <td align="center"><?php
             if (isset($user['Evaluation'])) {
-              echo $form->submit('Edit This Section (Click this button to save now or you may lose your input)', array('name'=>$user['id']));
+              echo $form->submit(__('Edit This Section (Click this button to save now or you may lose your input)', true), array('name'=>$user['id']));
             } else {
-              echo $form->submit('Save This Section (Click this button to save now or you may lose your input)', array('name'=>$user['id']));
+              echo $form->submit(__('Save This Section (Click this button to save now or you may lose your input)', true), array('name'=>$user['id']));
             }
 
             ?></td>
@@ -185,12 +185,12 @@
         }
     }
   if (!$mustCompleteUsers && !$commentsNeeded) {
-     echo $form->submit('Submit to Complete the Evaluation', array('onClick' => "javascript:return confirm('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?')"));
+     echo $form->submit(__('Submit to Complete the Evaluation', true), array('onClick' => "javascript:return confirm('".__('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?', true)."')"));
   }
   else {
-    echo $form->submit('Submit to Complete the Evaluation', array('disabled'=>'true')); echo "<br />";
-    echo $mustCompleteUsers ? "<div style='color: red'>Please complete the questions for all group members, pressing 'Save This Section' button for each one.</div>" : "";
-    echo $commentsNeeded ? "<div style='color: red'>Please Enter all the comments for all the group members before submitting.</div>" : "";
+    echo $form->submit(__('Submit to Complete the Evaluation', true), array('disabled'=>'true')); echo "<br />";
+    echo $mustCompleteUsers ? "<div style='color: red'>".__("Please complete the questions for all group members, pressing 'Save This Section' button for each one.", true)."</div>" : "";
+    echo $commentsNeeded ? "<div style='color: red'>".__("Please Enter all the comments for all the group members before submitting.", true)."</div>" : "";
   }
 
 ?>

@@ -3,17 +3,17 @@
     <td>
       <table class="title" width="100%"  border="0" cellspacing="0" cellpadding="0">
         <tr>
-          <td><a name="evaldue" />Peer Evaluations Due</td>
+          <td><a name="evaldue" /><?php __('Peer Evaluations Due')?></td>
           <td><div align="right"><!--a href="#evaldue" onClick="showhide('evaldue'); toggle(this);">[-]</a--></div></td>
         </tr>
       </table>
       <div style="background: #FFF;"> <br />
       <table width="95%"  border="0" align="center" cellpadding="4" cellspacing="2">
 		  <tr class="tableheader">
-			<td width="40%">Event</td>
-			<td width="20%">Course</td>
-			<td width="20%">Due Date </td>
-			<td width="20%">Due In/Late By (red) </td>
+			<td width="40%"><?php __('Event')?></td>
+			<td width="20%"><?php __('Course')?></td>
+			<td width="20%"><?php __('Due Date')?> </td>
+			<td width="20%"><?php __('Due In/Late By (red)')?> </td>
 		  </tr>	  
   	<?php $i = '0';?>
 	  <?php
@@ -56,7 +56,7 @@
 	  <?php $i++; } ?>
 	  <?php endforeach; ?>
 	  <?php if ($i == 0):
-	          print "<tr class=\"tablecell\"><td colspan=\"4\" align=\"center\"><b>No peer evaluations due at this time</b></td></tr>";
+	          print "<tr class=\"tablecell\"><td colspan=\"4\" align=\"center\"><b>".__('No peer evaluations due at this time')."</b></td></tr>";
 	        endif; ?>
 		</table>
 		<table width="95%"  border="0" cellpadding="0" align="center" cellspacing="0" bgcolor="#E5E5E5">
@@ -69,17 +69,17 @@
       </div>
         <table width="100%" class="title" border="0" cellspacing="0" cellpadding="0">
           <tr>
-            <td><a name="evalsub" />Peer Evaluations Submitted</td>
+            <td><a name="evalsub" /><?php __('Peer Evaluations Submitted')?></td>
             <td><div align="right"> <!--a href="#evalsub" onClick="showhide('evalsub'); toggle(this);">[-]</a--></div></td>
           </tr>
         </table>
       <div style="background: #FFF;"> <br>
       <table width="95%"  border="0" align="center" cellpadding="4" cellspacing="2">
 		  <tr class="tableheader">
-			<td width="40%">Event</td>
-			<td width="20%">Course</td>
-			<td width="20%">Due Date</td>
-			<td width="20%">Date Submitted</td>
+			<td width="40%"><?php __('Event')?></td>
+			<td width="20%"><?php __('Course')?></td>
+			<td width="20%"><?php __('Due Date')?></td>
+			<td width="20%"><?php __('Date Submitted')?></td>
 		  </tr>
   	<?php $i = 0;?>
 	  <?php
@@ -114,7 +114,7 @@
 	  <?php $i++;} ?>
 	  <?php endforeach; ?>
 	  <?php if ($i == 0):?>
-	          <tr class=\"tablecell\"><td colspan=\"4\" align=\"center\"><b>No peer evaluations submitted.</b></td></tr>
+	          <tr class=\"tablecell\"><td colspan=\"4\" align=\"center\"><b><?php __('No peer evaluations submitted.')?></b></td></tr>
 	  <?php endif;?>
 		</table>
 		<table width="95%"  border="0" cellpadding="0" align="center" cellspacing="0" bgcolor="#E5E5E5">

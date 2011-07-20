@@ -9,7 +9,7 @@
     <td>
         <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
           <tr class="tableheader">
-            <td align="center">Team Maker Survey</td>
+            <td align="center"><?php __('Team Maker Survey')?></td>
           </tr>
           <tr class="tablecell2">
             <td>
@@ -69,7 +69,7 @@
 			</td>
           </tr>
           <tr class="tablecell2">
-            <td><div align="center"><?php echo $html->submit('Submit') ?>
+            <td><div align="center"><?php echo $html->submit(__('Submit', true)) ?>
 			</div></td>
           </tr>
       </table>

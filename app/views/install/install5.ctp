@@ -11,12 +11,12 @@
   </tr>
   <tr>
     <td colspan="3" align="center">
-    Configuration! <a href="../loginout/login">iPeer sucessfully installed!</a><br /><br/>
+    <?php __('Configuration!')?> <a href="../loginout/login"><?php __('iPeer sucessfully installed!')?></a><br /><br/>
     <?php if($config_writable):?>
-      <font color="red">Important!!! </font> Your configuration directory (app/config) is still writable. Please change it to read only.<br /><br/>
+      <font color="red"><?php __('Important!!!')?> </font> <?php __('Your configuration directory (app/config) is still writable. Please change it to read only.')?><br /><br/>
     <?php endif;?>
-    You may now login as '<?php echo $superAdmin ?>'. <br/><br/>
-		If you chose to install example data, you can login all user accounts using password 'ipeer'</p></span>
+    <?php __('You may now login as')?> '<?php echo $superAdmin ?>'. <br/><br/>
+		<?php __("If you chose to install example data, you can login all user accounts using password 'ipeer'")?></p></span>
     </td>
   </tr>
 </table>

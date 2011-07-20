@@ -1,9 +1,9 @@
 <table width="100%"  border="0" align="center" cellpadding="4" cellspacing="2" bgcolor="#FFFFFF">
 <?php if (count($data) > 0):?>
     <tr>
-	    <th align="left" width="25%">Group No.</th>
-	    <th align="left" width="25%">Group Name</th>
-	    <th align="left" width="50%">Members</th>
+	    <th align="left" width="25%"><?php __('Group No.')?></th>
+	    <th align="left" width="25%"><?php __('Group Name')?></th>
+	    <th align="left" width="50%"><?php __('Members')?></th>
 	  </tr>
 	  <?php foreach($data as $group):?>
 	  <?php if (isset($group['id'])): ?>
@@ -40,7 +40,7 @@
 
 <?php if(isset($popup) && $popup == 'y'): ?>
     <tr><td colspan="3" align="center">
-		<input type="button" value="Close Window" onclick="window.close()">
+		<input type="button" value="<?php __('Close Window')?>" onclick="window.close()">
     </td></tr>
 <?php endif; ?>    
 </table>

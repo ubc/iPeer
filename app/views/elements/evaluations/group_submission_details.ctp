@@ -10,9 +10,9 @@
         <input type="hidden" name="group_event_id" value="<?php echo $groupEventId?>" /></td>
           </tr>
         <tr class="tablecell2">
-          <td width="15%">Group Number:</td>
+          <td width="15%"><?php __('Group Number')?>:</td>
           <td width="20%"><?php echo $group['Group']['group_num']?></td>
-          <td width="15%">Group Name:</td>
+          <td width="15%"><?php __('Group Name')?>:</td>
           <td width="20%"><?php echo $group['Group']['group_name']?></td>
         </tr>
         <tr>
@@ -22,10 +22,10 @@
 
     <table width="95%"  border="0" align="center" cellpadding="4" cellspacing="2" bgcolor="#FFFFFF">
       <tr class="tableheader">
-  	    <th width="40%">Group Member</th>
-  	    <th width="15%">Date Submitted</th>
-  	    <th width="20%">Late By</th>
-  	    <th width="15%">RE-release Evaluation?</th>
+  	    <th width="40%"><?php __('Group Member')?></th>
+  	    <th width="15%"><?php __('Date Submitted')?></th>
+  	    <th width="20%"><?php __('Late By')?></th>
+  	    <th width="15%"><?php __('RE-release Evaluation?')?></th>
 	    </tr>
       <?php $i = '0';  $enable = false;?>
 	    <?php foreach($data as $row): $member = $row['Member']; ?>
@@ -35,13 +35,13 @@
               if ($row['users']['submitted']) {
                 echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($row['users']['date_submitted'])));
               }else {
-                echo "(not submitted)";
+                echo __("(not submitted)", true);
               } ?></td>
             <td align="center"><?php
               if (isset($row['users']['time_diff'])) {
-                echo $row['users']['time_diff']. ' day(s)';
+                echo $row['users']['time_diff']. __(' day(s)', true);
               }else {
-                echo $row['users']['submitted'] ?  "(on time)" : "---";
+                echo $row['users']['submitted'] ?  __("(on time)", true) : "---";
               } ?></td>
             <td align="center"><?php
               if ($row['users']['submitted']) {
@@ -58,9 +58,9 @@
         <tr class="tablecell">
           <td colspan="4" align="center"><?php
             if ($enable) {
-             echo $form->submit('Re-release Selected Evaluation');
+             echo $form->submit(__('Re-release Selected Evaluation', true));
             } else {
-             echo $form->submit('Re-release Selected Evaluation', array('disabled'=>1));
+             echo $form->submit(__('Re-release Selected Evaluation', true), array('disabled'=>1));
             } ?></td>
         </tr>
     </table>

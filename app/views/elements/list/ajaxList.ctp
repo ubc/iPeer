@@ -21,17 +21,17 @@
 
     //Check all the parameters
     if (!function_exists('json_encode') || !function_exists('json_decode')) {
-        $message = "<b>You need the PHP json extension.</b><br />";
-        $message.= "  Please use PHP >= 5.2 and enable it in php.ini <br />";
-        $message.= "  (uncomment or create the line:<br />";
+        $message = "<b>".__('You need the PHP json extension.', true)."</b><br />";
+        $message.= __("  Please use PHP >= 5.2 and enable it in php.ini <br />", true);
+        $message.= __("  (uncomment or create the line:<br />", true);
         $message.= "<tt>extension=json.so</tt> )";
         showProgrammerError($message);
     } else if (empty($paramsForList['controller'])) {
-        showProgrammerError('$paramsForList[controller] variable not set or empty!');
+        showProgrammerError('$paramsForList[controller]'. __(' variable not set or empty!', true));
     } else if (empty($paramsForList['webroot'])) {
-        showProgrammerError('$paramsForList[webroot] variable not set or empty!');
+        showProgrammerError('$paramsForList[webroot]'. __(' variable not set or empty!', true));
     } else if (empty($paramsForList['columns'])) {
-        showProgrammerError('$paramsForList[columns] variable not set or empty!');
+        showProgrammerError('$paramsForList[columns]'.__(' variable not set or empty!', true));
     } else {
 
         // Start Up the element

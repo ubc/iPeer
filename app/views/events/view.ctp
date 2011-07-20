@@ -7,10 +7,10 @@
 
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
-    <td colspan="3" align="center">View Evaluation Event</td>
+    <td colspan="3" align="center"><?php __('View Evaluation Event')?></td>
     </tr>
     <tr class="tablecell2">
-    	<td width="150" id="course_label">Course:</td>
+    	<td width="150" id="course_label"><?php __('Course:')?></td>
     	<td width="405">
       <?php
         $params = array('controller'=>'courses', 'coursesList'=>$coursesList, 'courseId'=>$course_id, 'view'=>1);
@@ -20,19 +20,19 @@
     	<td width="243" id="course_msg" class="error"/>
     </tr>
     <tr class="tablecell2">
-    	<td id="newtitle_label">Event Title:&nbsp;</td>
+    	<td id="newtitle_label"><?php __('Event Title:')?>&nbsp;</td>
     	<td>
     	  <?php echo $event['Event']['title']; ?>
     	</td>
     	<td id="newtitle_msg" class="error" />
     </tr>
   <tr class="tablecell2">
-    <td>Description:&nbsp;</td>
+    <td><?php __('Description:')?>&nbsp;</td>
     <td><?php echo $event['Event']['description']; ?></td>
     <td>&nbsp;</td>
   </tr>
   <tr class="tablecell2">
-    <td>Evaluation Format:&nbsp;</td>
+    <td><?php __('Evaluation Format:')?>&nbsp;</td>
     <td>
       <table border="0" align="left" cellpadding="4" cellspacing="2">
       <tr>
@@ -59,36 +59,36 @@
     <td>&nbsp;</td>
   </tr>
   <tr class="tablecell2">
-    <td>Allow Self-Evaluation?:</td>
+    <td><?php __('Allow Self-Evaluation?:')?></td>
     <td>
       <?php echo $event['Event']['self_eval']==1? 'Enable' : 'Disable'; ?>
 	  </td>
     <td>&nbsp;</td>
   </tr>
   <tr class="tablecell2">
-    <td>Require Student Comments?: </td>
+    <td><?php __('Require Student Comments?:')?> </td>
     <td>
       <?php echo $event['Event']['com_req']==1? 'Yes' : 'No'; ?>
 	  </td>
     <td>&nbsp;</td>
   </tr>
   <tr class="tablecell2">
-    <td>Due Date:&nbsp;</td>
+    <td><?php __('Due Date:')?>&nbsp;</td>
     <td><?php echo Toolkit::formatDate($event['Event']['due_date']) ?>
 		</td>
     <td></td>
   </tr>
   <tr class="tablecell2">
-    <td>Release Date:&nbsp;<font color="red">*</font></td>
+    <td><?php __('Release Date:')?>&nbsp;<font color="red">*</font></td>
   	<td id="release_date_begin">
   	  <table width="100%"><tr align="left">
-				<td width="10%">FROM:</td>
+				<td width="10%"><?php __('FROM:')?></td>
 				<td width="90%">
 				  <?php echo Toolkit::formatDate($event['Event']['release_date_begin']) ?>
       	</td>
       </tr>
       <tr>
-      	<td width="10%">TO:</td>
+      	<td width="10%"><?php __('TO:')?></td>
       	<td width="90%">
 				  <?php echo Toolkit::formatDate($event['Event']['release_date_end']) ?>
       	</td>
@@ -98,7 +98,7 @@
   	</td>
   </tr>
   <tr class="tablecell2">
-    <td valign="top">Groups Assignment:&nbsp;</td>
+    <td valign="top"><?php __('Groups Assignment:')?>&nbsp;</td>
     <td>
       <?php
         $params = array('controller'=>'events', 'data'=>$event['Group'], 'event_id' => $event_id, 'popup' => 'y');
@@ -113,7 +113,7 @@
     <td width="45%"><table width="403" border="0" cellspacing="0" cellpadding="4">
       <tr>
         <td colspan="2"><?php
-        echo $html->link('Edit this Event', '/events/edit/'.$event['Event']['id']); ?> | <?php echo $html->link('Back to Event Listing', '/events/index/'.$course_id); ?></td>
+        echo $html->link(__('Edit this Event', true), '/events/edit/'.$event['Event']['id']); ?> | <?php echo $html->link(__('Back to Event Listing', true), '/events/index/'.$course_id); ?></td>
       </tr></table>
     </td>
     <td align="right" width="55%"></td>

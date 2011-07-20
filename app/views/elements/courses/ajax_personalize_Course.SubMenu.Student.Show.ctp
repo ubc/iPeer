@@ -6,21 +6,21 @@
     <td width="96%" class="tablecell">
         <A HREF="<?php echo $this->webroot.$this->theme;?>users/add/S">
         <?php echo $html->image('layout/yellow_arrow.gif',
-            array('align'=>'middle', 'border'=>'0', 'alt'=>'yellow_arrow'))?> &nbsp;Add Student</a></td>
+            array('align'=>'middle', 'border'=>'0', 'alt'=>'yellow_arrow'))?> &nbsp;<?php __('Add Student')?></a></td>
   </tr>
   <tr>
     <td bgcolor="#FFB66F">&nbsp;</td>
     <td class="tablecell"><A HREF="<?php echo $this->webroot.$this->theme;?>users/goToClassList/<?php echo $course_id;?>">
         <?php echo $html->image('layout/yellow_arrow.gif',
                             array('align'=>'middle', 'border'=>'0', 'alt'=>'yellow_arrow'))?>
-                            &nbsp;List Students </a></td>
+                            &nbsp;<?php __('List Students')?> </a></td>
   </tr>
   <tr>
     <td bgcolor="#FFB66F">&nbsp;</td>
     <td class="tablecell"><A HREF="<?php echo $this->webroot.$this->theme;?>emailer/write/<?php echo 'C'.$course_id;?>">
         <?php echo $html->image('layout/yellow_arrow.gif',
                             array('align'=>'middle', 'border'=>'0', 'alt'=>'yellow_arrow'))?>
-                            &nbsp;Email to All Students </a></td>
+                            &nbsp;<?php __('Email to All Students')?></a></td>
   </tr>
 </table>
 <?php endif; ?>

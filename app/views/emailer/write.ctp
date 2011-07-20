@@ -8,7 +8,7 @@
     <td>
         <table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
           <tr class="tableheader">
-            <td colspan="3" align="center">Write Email</td>
+            <td colspan="3" align="center"><?php __('Write Email')?></td>
           </tr>
           <tr class="tablecell2">
             <td>To:&nbsp;</td>
@@ -20,11 +20,13 @@
               <br/><br/>
               <div id="add-div"></div>              
               <?php echo $this->Form->select('recipients', $recipients_rest);?>
-              <?php echo $this->Js->link($html->image('icons/add.gif', array('alt'=>'Add Additional Recipient', 'valign'=>'middle', 'border'=>'0')).' Add Additional Recipient',
+
+              <?php echo $this->Js->link($html->image('icons/add.gif', array('alt'=>'Add Additional Recipient', 'valign'=>'middle', 'border'=>'0')).__(' Add Additional Recipient', true),
+
                                    array('action' => 'addRecipient'),
                                    array('escape' => false,
                                          'success' => '$("add-div").insert({before: "<div>"+response.responseText+"</div>"});$$("option[value="+$F("recipients")+"]").invoke("remove")',
-                                         'error' => 'alert("Communication error!")',
+                                         'error' => 'alert("'.__('Communication error!', true).'")',
                                          'dataExpression' => true,
                                          'evalScripts' => true,
                                          'data' => '{recipient_id:$F("recipients")}'))?>
@@ -41,7 +43,8 @@
             <td><?php echo $form->input('Email.bcc', array('size' => '80%','label' => false));?></td>
           </tr>-->
           <tr class="tablecell2">
-            <td>Schedule:</td>
+            <td><?php __('Schedule?')?>:</td>
+
             <td>
               <table>
               <tr><td>
@@ -63,12 +66,16 @@
               ?>
               </td></tr>
               <tr id="scheduling"><td>
+
                 <table>
+
                 <tr><td>
                 <?php
+
                   echo $form->input('Email.times', array('div'=>false, 'label'=>' ', 'value' => '1', 'size' => '3')).' time(s), ';
-                  echo $form->input('Email.interval_num', array('div'=>false, 'label'=>'  Every '));
+                  echo $form->input('Email.interval_num', array('div'=>false, 'label'=>__('  Every ', true)));
                   echo $form->input('Email.interval_type', array('div'=>false, 'label'=>false, 'options'=> array('60' => 'minute(s)','3600' => 'hour(s)','86400' => 'day(s)'), 'selected'=>'3600'));
+
                 ?>
                 </td></tr></table>
               </td></tr></table>
@@ -76,18 +83,18 @@
             <td>&nbsp;</td>
           </tr>
           <tr id="tablecell2" class="tablecell2">
-            <td>Template:&nbsp;</td>
+            <td><?php __('Template')?>:&nbsp;</td>
             <td>
               <table>
               <tr><td>
-              <?php echo $html->link('Add Email Template', 'add/', array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"));?>
+              <?php echo $html->link(__('Add Email Template', true), 'add/', array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"));?>
               </td></tr>
               <tr><td>
               <?php echo $form->input('Email.template', array(
                 'type' => 'select',
                 'id' => 'template',
                 'options' => $templatesList,
-                'empty' => '-- No Template --',
+                'empty' => __('-- No Template --', true),
                 'label' => false,
                 'onChange' => "new Ajax.Updater('email_content','".
                     $this->webroot.$this->theme."emailtemplates/displayTemplateContent/'+this.options[this.selectedIndex].value,
@@ -104,7 +111,7 @@
             <td>&nbsp;</td>
           </tr>
           <tr class="tablecell2">
-            <td>Subject:&nbsp;</td>
+            <td><?php __('Subject')?>:&nbsp;</td>
             <td><?php echo $form->textarea('Email.subject', array('id' => 'email_subject','cols' => '60'));?></td>
             <td>&nbsp;</td>
           </tr>
@@ -122,11 +129,14 @@
             <td>&nbsp;</td>
           </tr>
           <tr class="tablecell2">
-            <td>Content:</td>
+
+            <td><?php __('Content')?>:</td>
+
             <td><table><tr>
             <td><?php
                 echo $form->textarea('Email.content', array(
                   'id' => 'email_content',
+
                   'cols' => '60',
                   'rows' => '15',
                   'escape' => false
@@ -140,7 +150,7 @@
             <td>&nbsp;</td>
           </tr>
         </table>
-        <div><?php echo $form->submit('Send'); ?></div>
+        <div><?php echo $form->submit(__('Send', true)); ?></div>
     </td>
   </tr>
 </table>

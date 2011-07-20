@@ -18,7 +18,7 @@ function defaultagree(el){
 		if (window.checkobj&&checkobj.checked)
 			return true;
 		else{
-			alert("Please read/accept license to continue installation");
+			alert(__("Please read/accept license to continue installation", true));
 			return false;
 		}
 	}
@@ -35,18 +35,18 @@ function defaultagree(el){
 <table width="95%"  border="0" cellspacing="2" cellpadding="4">
   <tr>
     <td>&nbsp;</td>
-    <td>Step 2: License Agreement</td>
+    <td><?php __('Step 2: License Agreement')?></td>
     <td>&nbsp;</td>
   </tr>
   <tr>
-    <td colspan="3" align="center"><a href="http://ipeer.olt.ubc.ca">iPeer </a> is Free Software released under the GNU/GPL License. </td>
+    <td colspan="3" align="center"><a href="http://ipeer.olt.ubc.ca">iPeer </a> <?php __('is Free Software released under the GNU/GPL License.')?> </td>
   </tr>
   <!-- Property of System Requirements -->
   <tr>
     <td colspan="3"><table width="100%"  border="0" cellspacing="0" cellpadding="0">
        <tr>
         <td width="10%">&nbsp;</td>
-        <td><strong>GNU/GPL License: </strong></td>
+        <td><strong><?php __('GNU/GPL License')?>: </strong></td>
         <td width="10%">&nbsp;</td>
       </tr>
       <tr>
@@ -66,7 +66,7 @@ function defaultagree(el){
     <td width="80%" colspan="2"  align="center">
 
       <input type="checkbox" name="agreecheck"  class="inputbox" onClick="agreesubmit(this)" />
-          <span class="style3"> I Accept the GPL License</span></td>
+          <span class="style3"><?php __(' I Accept the GPL License')?></span></td>
     <td align="right">
       <?php echo $html->submit('Next >>', array('disabled'=>'true', 'name'=>'next')) ?>
     </td>

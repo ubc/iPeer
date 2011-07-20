@@ -17,9 +17,9 @@
   <tr>
     <td colspan="3"><?php echo $html->image('icons/instructions.gif',array('alt'=>'instructions'));?>
       <b> Summary:</b>(
-      <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Basic">Basic</a>
+      <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Basic"><?php __('Basic')?></a>
        |
-      <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Detail" >Detail</a>
+      <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Detail" ><?php __('Detail')?></a>
         )
     </td>
   </tr>
@@ -27,7 +27,7 @@
   if (!$allMembersCompleted) {?>
   <tr>
     <td colspan="3">
-	      <font color="red">These student(s) have yet to submit their evaluations: <br>
+	      <font color="red"><?php __('These student(s) have yet to submit their evaluations:')?> <br>
 	         <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
 	          &nbsp;-&nbsp; <?php echo $user['last_name'].' '.$user['first_name']?> <br>
 	      <?php endforeach; ?>
@@ -47,7 +47,7 @@ $groupAve = 0;
 
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr class="tableheader">
-		<td valign="middle">Student Name:</td>
+		<td valign="middle"><?php __('Student Name:')?></td>
     <?php
     	for ($i = 1; $i <= $rubric['Rubric']["criteria"]; $i++) {
     		echo "<td>";
@@ -101,7 +101,7 @@ $groupAve = 0;
       //averages
       echo '<tr class="tablesummary">';
       echo "<td><b>";
-      echo "Group Average: ";
+      echo __("Group Average: ", true);
       echo "</b></td>";
       if ( $allMembersCompleted ) {
       	foreach ($scoreRecords['group_criteria_ave'] AS $groupAveIndex => $groupAveGrade) {
@@ -133,10 +133,10 @@ $groupAve = 0;
 
       	<?php
 				if ($event['group_event_marked'] == "reviewed") {
-					echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_not_reviewed\" value=\"Mark Peer Evaluations as Not Reviewed\" />";
+					echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_not_reviewed\" value=\" ".__('Mark Peer Evaluations as Not Reviewed', true)."\" />";
 				}
 				else {
-					echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_reviewed\" value=\"Mark Peer Evaluations as Reviewed\" />";
+					echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_reviewed\" value=\" ".__('Mark Peer Evaluations as Reviewed', true)."\" />";
 				}
 			?>
 			</form></td>
@@ -166,9 +166,9 @@ $groupAve = 0;
 			                  if ($memberTotalScore == $groupAve) {
 			                    echo "&nbsp;&nbsp;<< Same Mark as Group Average >>";
 			                  } else if ($memberTotalScore < $groupAve) {
-			                    echo "&nbsp;&nbsp;<font color='#cc0033'><< Below Group Average >></font>";
+			                    echo "&nbsp;&nbsp;<font color='#cc0033'><< ".__('Below Group Average')." >></font>";
 			                  } else if ($memberTotalScore > $groupAve) {
-			                    echo "&nbsp;&nbsp;<font color='#000099'><< Above Group Average >></font>";
+			                    echo "&nbsp;&nbsp;<font color='#000099'><< ".__('Above Group Average')." >></font>";
 			                  }
 			                ?> </b>
 			        <br><br>
@@ -217,7 +217,7 @@ $groupAve = 0;
                 	echo "n/a<br />";
                 }
                 //Grade Detail
-                echo "<strong>Grade: </strong>";
+                echo "<strong>".__('Grade:', true)." </strong>";
                 if (isset($rubDet)) {
                   echo $rubDet["grade"] . " / " . $rubricCriteria[$i]['multiplier'] . "<br />";
                   $i++;
@@ -225,7 +225,7 @@ $groupAve = 0;
                 	echo "n/a<br />";
                 }
                 //Comments
-                echo "<br/><strong>Comment: </strong>";
+                echo "<br/><strong>".__('Comment:', true)." </strong>";
                 if (isset($rubDet)) {
                 	echo $rubDet["criteria_comment"];
                 } else {
@@ -241,7 +241,7 @@ $groupAve = 0;
          echo "<td></td>";
          $col = $rubric['Rubric']['criteria'] + 1;
          echo "<td colspan=".$col.">";
-         echo "<strong>General Comment: </strong><br>";
+         echo "<strong>".__('General Comment:', true)." </strong><br>";
          echo $memberRubric['general_comment'];
          echo "<br><br></td>";
          echo "</tr>";
@@ -254,16 +254,16 @@ $groupAve = 0;
        //Grade Released
        if (isset($scoreRecords[$user['id']]['grade_released']) && $scoreRecords[$user['id']]['grade_released']) {?>
 
-        <input type="button" name="UnreleaseGrades" value="Unrelease Grades" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';0'; ?>'">
+        <input type="button" name="UnreleaseGrades" value="<?php __('Unrelease Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';0'; ?>'">
        <?php } else {?>
-        <input type="button" name="ReleaseGrades" value="Release Grades" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';1'; ?>'">
+        <input type="button" name="ReleaseGrades" value="<?php __('Release Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';1'; ?>'">
        <?php }
 
        //Comment Released
        if (isset($scoreRecords[$user['id']]['comment_released']) && $scoreRecords[$user['id']]['comment_released']) {?>
-        <input type="button" name="UnreleaseComments" value="Unrelease Comments" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';0'; ?>'">
+        <input type="button" name="UnreleaseComments" value="<?php __('Unrelease Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';0'; ?>'">
        <?php } else { ?>
-        <input type="button" name="ReleaseComments" value="Release Comments" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';1'; ?>'">
+        <input type="button" name="ReleaseComments" value="<?php __('Release Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';1'; ?>'">
        <?php }
        ?>
 		  </div>

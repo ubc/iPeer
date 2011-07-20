@@ -8,15 +8,15 @@
     </table>
 	<table width="95%" border="0" cellspacing="2" cellpadding="4" bgcolor="#FFFFFF">
 	  <tr class="tableheader">
-	    <th>View</th>
+	    <th><?php __('View')?></th>
 <!--	    <th>Email<br>Group</th>-->
-            <th>Event</th>
-	    <th>Group</th>
-	    <th>Completion Rate</th>
-	    <th>Status</th>
-	    <th>Reviewed</th>
-	    <th>Released Comments</th>
-	    <th>Released Grades</th>
+            <th><?php __('Event')?></th>
+	    <th><?php __('Group')?></th>
+	    <th><?php __('Completion Rate')?></th>
+	    <th><?php __('Status')?></th>
+	    <th><?php __('Reviewed')?></th>
+	    <th><?php __('Released Comments')?></th>
+	    <th><?php __('Released Grades')?></th>
 	  </tr>
   	<?php $i = 0;?>
 	  <?php
@@ -25,18 +25,18 @@
 	    if (isset($group['id'])) {?>
   	  <tr class="tablecell">
   	    <td align="center">
-  		    <a href="<?php echo $this->webroot.$this->theme.'evaluations/viewEvaluationResults/'.$group['event_id'].'/'.$group['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View','title'=>'View Evaluation Result'))?></a>
+  		    <a href="<?php echo $this->webroot.$this->theme.'evaluations/viewEvaluationResults/'.$group['event_id'].'/'.$group['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>__('View', true),'title'=>__('View Evaluation Result', true)))?></a>
   	    </td>
 <!--  		  <td>
   		    <a href="<?php echo $this->webroot.$this->theme.'evaluations/view/'.$group['id']?>"><?php echo $html->image('icons/email.gif',array('border'=>'0','alt'=>'View'))?></a>
   	    </td>-->
             <td>
-              <a title="Event Title" href="<?php echo $this->webroot.$this->theme;?>events/view/<?php echo $group['event_id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $group['event_title'] ?></a> &nbsp;
+              <a title=<?php __('Event Title')?> href="<?php echo $this->webroot.$this->theme;?>events/view/<?php echo $group['event_id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $group['event_title'] ?></a> &nbsp;
             </td>
   		  <td>
-  	      <a title="Group Submission Detail" href="<?php echo $this->webroot.$this->theme;?>evaluations/viewGroupSubmissionDetails/<?php echo $group['event_id']?>/<?php echo $group['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo 'Group '.$group['group_num'].' - '.$group['group_name'] ?></a> &nbsp;
+  	      <a title=<?php __('Group Submission Detail')?> href="<?php echo $this->webroot.$this->theme;?>evaluations/viewGroupSubmissionDetails/<?php echo $group['event_id']?>/<?php echo $group['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo __('Group ', true).$group['group_num'].' - '.$group['group_name'] ?></a> &nbsp;
   	    </td>
-        <td align="center"><?php echo '<b>'.$group['num_completed'].'</b> / <b>'.$group['num_members'].'</b> completed' ?></td>
+        <td align="center"><?php echo '<b>'.$group['num_completed'].'</b> / <b>'.$group['num_members'].'</b>'. __('completed', true) ?></td>
   	    <td>
   	      <?php
   	      $imageFile = '';
@@ -44,10 +44,10 @@
 
   	      if ($group['complete_status']) {
   	        $imageFile = '/icons/green_check.gif';
-  	        $imageText = 'Completed';
+  	        $imageText = __('Completed', true);
   	      } else {
   	        $imageFile = '/icons/red_x.gif';
-  	        $imageText = 'Not Completed';
+  	        $imageText = __('Not Completed', true);
   	      }
   	      echo $html->image($imageFile, array('alt'=>$imageText, 'title'=>$imageText));?>
   	    </td>
@@ -58,13 +58,13 @@
 
   	      if ($group['marked'] == "reviewed") {
   	        $imageFile = '/icons/green_check.gif';
-  	        $imageText = 'marked';
+  	        $imageText = __('marked', true);
   	      } else if ($group['marked'] == "to review") {
   	        $imageFile = '/icons/yellow_x.gif';
-  	        $imageText = 'Ready to Review';
+  	        $imageText = __('Ready to Review', true);
   	      } else {
   	        $imageFile = '/icons/red_x.gif';
-  	        $imageText = 'Not Ready to Review';
+  	        $imageText = __('Not Ready to Review', true);
   	      }
   	      echo $html->image($imageFile, array('alt'=>$imageText, 'title'=>$imageText));?>
 

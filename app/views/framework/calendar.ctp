@@ -13,17 +13,17 @@ About us: Our company provides offshore IT consulting services.
 -->
 <html>
 <head>
-<title>iPeer Date Picker</title>
+<title>iPeer <?php __('Date Picker')?></title>
 <style type="text/css">
 	td {font-family: Tahoma, Verdana, sans-serif; font-size: 12px;}
 </style>
 <script language="javascript" type="text/javascript">
 
 // months as they appear in the calendar's title
-var ARR_MONTHS = ["January", "February", "March", "April", "May", "June",
-		"July", "August", "September", "October", "November", "December"];
+var ARR_MONTHS = [__("January", true), __("February", true), __("March", true), __("April", true), __("May", true), __("June", true),
+		__("July", true), __("August", true), __("September", true), __("October", true), __("November", true), __("December", true)];
 // week day titles as they appear on the calendar
-var ARR_WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+var ARR_WEEKDAYS = [__("Su", true), __("Mo", true), __("Tu", true), __("We", true), __("Th", true), __("Fr", true), __("Sa", true)];
 // day week starts from (normally 0-Su or 1-Mo)
 var NUM_WEEKSTART = 1;
 // path to the directory where calendar images are stored. trailing slash req.

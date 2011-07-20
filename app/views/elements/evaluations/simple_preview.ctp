@@ -62,23 +62,23 @@
 
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
-    <td colspan="4" align="center">Evaluation Event Detail</td>
+    <td colspan="4" align="center"><?php __('Evaluation Event Detail')?></td>
     </tr>
   <tr class="tablecell2">
-    <td width="10%">Evaluator:</td>
+    <td width="10%"><?php __('Evaluator')?>:</td>
     <td width="25%"><?php echo $current_user['full_name'] ?></td>
-    <td width="10%">Evaluating:</td>
-    <td width="25%"><?php echo 'Test Group'?></td>
+    <td width="10%"><?php __('Evaluating')?>:</td>
+    <td width="25%"><?php echo __('Test Group', true)?></td>
   </tr>
   <tr class="tablecell2">
-    <td>Event Name:</td>
-    <td><?php echo 'Simple Evaluation Preview' ?></td>
-    <td>Due Date:</td>
+    <td><?php __('Event Name')?>:</td>
+    <td><?php echo __('Simple Evaluation Preview', true) ?></td>
+    <td><?php __('Due Date')?>:</td>
     <td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime('0000-00-00'))) ?></td>
   </tr>
   <tr class="tablecell2">
-    <td>Description:&nbsp;</td>
-    <td colspan="3"><?php echo 'Preview for simple evaluation tool.' ?></td>
+    <td><?php __('Description')?>:&nbsp;</td>
+    <td colspan="3"><?php echo __('Preview for simple evaluation tool.', true) ?></td>
   </tr>
   <tr>
     <td colspan="3" align="center">&nbsp;</td>
@@ -87,20 +87,20 @@
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr>
     <td colspan="3"><?php echo $html->image('icons/instructions.gif',array('alt'=>'instructions'));?>
-      <b> Instructions:</b><br>
-      1. Rate your peer's relative performance by using the slider. [Weight 1-10]<br>
-      2. Click "Distribute" button to distribute points.<br>
-      3. Allocate any remaining point.<br>
-      4. Enter Comments <?php echo  1? '<font color="red"> (Must) </font>' : '(Optional)' ;?> .<br>
+      <b><?php __('Instructions')?>:</b><br>
+      1. <?php __("Rate your peer's relative performance by using the slider. [Weight 1-10]")?><br>
+      2. <?php __('Click "Distribute" button to distribute points.')?><br>
+      3. <?php __('Allocate any remaining point.')?><br>
+      4. <?php __('Enter Comments')?> <?php echo  1? '<font color="red">'.__('Must', true).'</font>' : __('(Optional)', true) ;?> .<br>
     </td>
   </tr>
 </table>
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr class="tableheader">
-		<td width="30%">Member(s)</td>
-		<td width="20%">Relative Weight</td>
-		<td width="15%">Mark</td>
-		<td width="35%">Comment  <?php echo  1? '<font color=red>*</font>' : '(Optional)' ;?></td>
+		<td width="30%"><?php __('Member(s)')?></td>
+		<td width="20%"><?php __('Relative Weight')?></td>
+		<td width="15%"><?php __('Mark')?></td>
+		<td width="35%"><?php __('Comment')?>  <?php echo  1? '<font color=red>*</font>' : __('(Optional)', true) ;?></td>
 	</tr>
 
 
@@ -110,14 +110,14 @@
         <td><?php echo $user['last_name'].' '.$user['first_name']?>
       <input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/></td>
       <td width="110"><table><tr>
-        <td width="5">Min.</td>
+        <td width="5"><?php __('Min.')?></td>
         <td width="110">
         <div id="track<?php echo $user['id']?>" style="width:120px;background-color:#aaa;height:10px;">
           <div id="handle<?php echo $user['id']?>" style="width:10px;height:15px;background-color:#fa7e04;cursor:move;"> </div>
         </div>
         <div style="height:10px;padding-top:10px;" align="center" id="score<?php echo $user['id']?>"></div>&nbsp;&nbsp;
       </td>
-      <td width="5">Max.</td>
+      <td width="5"><?php __('Max.')?></td>
       </tr></table>
         </td>
         <td><input type="text" name="points[]" id="point<?php echo $user['id']?>" value="<?php echo empty($params['data']['Evaluation']['point'.$user['id']])? '' : $params['data']['Evaluation']['point'.$user['id']] ?>" size="5" onkeyup="updateCount('total', 'remaining');">
@@ -154,7 +154,7 @@
   </td>
 		<td align="center"> <input type="button" name="distr" id="distr_button" value="Distribute" onClick="distribute()"/></td>
 		<td align="center">
-		  <table width="95%" border="0" align="center"><tr><td colspan="2">Points Allocated/Total:</td></tr>
+		  <table width="95%" border="0" align="center"><tr><td colspan="2"><?php __('Points Allocated/Total')?>:</td></tr>
       	 <tr>
       	  <td align="right"><div id="total" style="padding-top: 5px;">0</div></td>
       	  <td align="left"><div id="remaining" style="padding-top: 5px;" >&nbsp;/&nbsp;<?php echo $remaining?></div></td>
@@ -167,7 +167,7 @@
   <tr class="tablecell2">
     <td colspan="4" align="center"><?php
       if (!isset($preview)) {
-        echo $this->Form->submit('Submit Evaluation', array("disabled"=>'true') );
+        echo $this->Form->submit(__('Submit Evaluation', true), array("disabled"=>'true') );
       }
       ?></td>
     </tr>

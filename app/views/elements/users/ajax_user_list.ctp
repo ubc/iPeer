@@ -22,11 +22,11 @@
 	    <?php if($currentUser['role'] == 'A' || $currentUser['role'] == 'I'):?>
 	    <th>Actions</th>
 	    <?php endif;?>
-	    <th><?php echo $this->Paginator->sort('Username','username')?></th>
-	    <th><?php echo $this->Paginator->sort('Role','role')?></th>
-	    <th><?php echo $this->Paginator->sort('First Name','first_name')?></th>
-	    <th><?php echo $this->Paginator->sort('Last Name','last_name')?></th>
-	    <th><?php echo $this->Paginator->sort('Email','email')?></th>
+	    <th><?php echo $this->Paginator->sort(__('Username', true),'username')?></th>
+	    <th><?php echo $this->Paginator->sort(__('Role', true),'role')?></th>
+	    <th><?php echo $this->Paginator->sort(__('First Name', true),'first_name')?></th>
+	    <th><?php echo $this->Paginator->sort(__('Last Name', true),'last_name')?></th>
+	    <th><?php echo $this->Paginator->sort(__('Email', true),'email')?></th>
 <!--	    <th><?php //echo $pagination->sortLink('Created By',array('created','desc'))?></th> -->
 <!--	    <th><?php //echo $pagination->sortLink('Last Updated By',array('modified','desc'))?></th> -->
 	  </tr>
@@ -50,17 +50,17 @@
             ?>
    	    <?php if($currentUser['role'] == 'A'):
                   echo $html->link(
-                                    $html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete', 'title'=>'Delete '.$user['full_name'])),
+                                    $html->image('icons/delete.gif',array('border'=>'0','alt'=>__('Delete', true), 'title'=>__('Delete ', true).$user['full_name'])),
                                     "/users/delete/".$user['id'],
-                                    array('onClick' => "return confirm('Are you sure you want to delete user &ldquo;".$user["username"]."&rdquo;?')",'escape'=>false)
+                                    array('onClick' => "return confirm('".__('Are you sure you want to delete user', true)."&ldquo;".$user["username"]."&rdquo;?')",'escape'=>false)
                   );
                   endif;
             ?>
             <?php
                   echo $html->link(
-                                    $html->image('icons/key_email.gif',array('border'=>'0','alt'=>'Reset password', 'title'=>'Reset '.$user['full_name']."'s password")),
+                                    $html->image('icons/key_email.gif',array('border'=>'0','alt'=>'Reset password', 'title'=>__('Reset ', true).$user['full_name'].__("'s password", true))),
                                     "/users/resetPassword/".$user['id'],
-                                    array('onClick' => "return confirm('Are you sure you want to reset password for user &ldquo;".$user["username"]."&rdquo;?')",'escape'=>false)
+                                    array('onClick' => "return confirm('".__('Are you sure you want to reset password for user', true)." &ldquo;".$user["username"]."&rdquo;?')",'escape'=>false)
                   );
                   endif;
             ?>
@@ -78,7 +78,7 @@
 	 
     <?php if (0 == count($data)) :?>
   	<tr class="tablecell" align="center">
-  	    <td colspan="9">Record Not Found</td>
+  	    <td colspan="9"><?php __('Record Not Found')?></td>
     </tr>
     <?php endif;?>
   </table>
@@ -96,16 +96,16 @@
   <tr>
     <td width="33%" align="left"><?php //Display page infomation
 	echo '<br/>'.$this->Paginator->counter(array(
-		'format' => 'Page %page% of %pages%, showing %current% records out of %count% total<br/>'
+		'format' => __('Page %page% of %pages%, showing %current% records out of %count% total<br/>', true)
 	));?></td>
     <td colspan="2" align="right">
 <?php
 	//Prev page link
-        echo $this->Paginator->prev('Prev ',null,' ',array('class' => 'disabled'));
+        echo $this->Paginator->prev(__('Prev ', true),null,' ',array('class' => 'disabled'));
 	//Shows the page numbers
 	echo $this->Paginator->numbers();
 	//Next page link
-        echo $this->Paginator->next(' Next',null,' ',array('class' => 'disabled'));
+        echo $this->Paginator->next(__(' Next', true),null,' ',array('class' => 'disabled'));
 ?>
 	</td>
   </tr>

@@ -28,15 +28,16 @@
       echo "var submitButton = document.getElementById('submit0');";
       echo "if (totalPoints == parseFloat(allPoints)) {";
       echo "  if (commentsRequired == 0) {";
-      echo "    $('statusMsg').innerHTML = 'All points are allocated.';";
+      echo "    $('statusMsg').innerHTML = '".__('All points are allocated.', true)."';";
+      
       echo "    submitButton.disabled = false;";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments != 0) {";
-      echo "    $('statusMsg').innerHTML = 'All points are allocated.<br />There are still <font color=red>' + emptyComments + '</font> comments to be filled.';";
+      echo "    $('statusMsg').innerHTML = '".__('All points are allocated.<br />There are still', true)."<font color=red>' + emptyComments + '</font> ".__('comments to be filled.', true)." ';";
       echo "    submitButton.disabled = true;";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments == 0) {";
-      echo "    $('statusMsg').innerHTML = 'All points are allocated.<br />All comments are filled.';";
+      echo "    $('statusMsg').innerHTML = '".__('All points are allocated.<br />All comments are filled.', true)." ';";
       echo "    submitButton.disabled = false;";
       echo "  }";
       echo "}";
@@ -44,13 +45,13 @@
       echo "else if (totalPoints > parseFloat(allPoints)) {";
       echo "  diff = totalPoints - parseFloat(allPoints);";
       echo "  if (commentsRequired == 0) {";
-      echo "    $('statusMsg').innerHTML = 'Too many points, need to unallocate <font color=red>' + diff + '</font> points.';";
+      echo "    $('statusMsg').innerHTML = '".__('Too many points, need to unallocate', true)." <font color=red>' + diff + '</font> ".__('points.')." ';";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments != 0) {";
-      echo "    $('statusMsg').innerHTML = 'Too many points, need to unallocate <font color=red>' + diff + '</font> points.<br />There are still <font color=red>' + emptyComments + '</font> comments to be filled.';";
+      echo "    $('statusMsg').innerHTML = '".__('Too many points, need to unallocate', true)." <font color=red>' + diff + '</font> ".__('points.<br />There are still', true)." <font color=red>' + emptyComments + '</font> ".__('comments to be filled.', true)." ';";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments == 0) {";
-      echo "    $('statusMsg').innerHTML = 'Too many points, need to unallocate <font color=red>' + diff + '</font> points.<br />All comments are filled.';";
+      echo "    $('statusMsg').innerHTML = '".__('Too many points, need to unallocate', true)." <font color=red>' + diff + '</font ".__('points.<br />All comments are filled.', true)." ';";
       echo "  }";
       echo "  submitButton.disabled = true;";
       echo "}";
@@ -58,13 +59,13 @@
       echo "else if (totalPoints < parseFloat(allPoints)) {";
       echo "  diff = parseFloat(allPoints) - totalPoints;";
       echo "  if (commentsRequired == 0) {";
-      echo "    $('statusMsg').innerHTML = 'Please allocate <font color=green>' + diff + '</font> more points.';";
+      echo "    $('statusMsg').innerHTML = '".__('Please allocate', true)." <font color=green>' + diff + '</font> ".__('more points.', true)."';";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments != 0) {";
-      echo "    $('statusMsg').innerHTML = 'Please allocate <font color=green>' + diff + '</font> more points.<br />There are still <font color=red>' + emptyComments+ '</font> comments to be filled.';";
+      echo "    $('statusMsg').innerHTML = '".__('Please allocate', true)." <font color=green>' + diff + '</font>".__(' more points.<br />There are still', true)." <font color=red>' + emptyComments+ '</font>".__('comments to be filled.', true)."';";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments == 0) {";
-      echo "    $('statusMsg').innerHTML = 'Please allocate <font color=green>' + diff + '</font> more points.<br />All comments are filled.';";
+      echo "    $('statusMsg').innerHTML = '".__('Please allocate', true)." <font color=green>' + diff + '</font>".__(' more points.<br />All comments are filled.', true)."';";
       echo "  }";
       echo "  submitButton.disabled = true;";
       echo "}";
@@ -136,23 +137,23 @@ if ($event['Event']['id']==292) {
 
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
-    <td colspan="4" align="center">Evaluation Event Detail</td>
+    <td colspan="4" align="center"><?php __('Evaluation Event Detail')?></td>
     </tr>
   <tr class="tablecell2">
-    <td width="10%">Evaluator:</td>
+    <td width="10%"><?php __('Evaluator')?>:</td>
     <td width="25%"><?php echo $fullName ?>
     </td>
-    <td width="10%">Evaluating:</td>
+    <td width="10%"><?php __('Evaluating')?>:</td>
     <td width="25%"><?php echo $event['group_name'] ?></td>
   </tr>
   <tr class="tablecell2">
-    <td>Event Name:</td>
+    <td><?php __('Event Name')?>:</td>
     <td><?php echo $event['Event']['title'] ?></td>
-    <td>Due Date:</td>
+    <td><?php __('Due Date')?>:</td>
     <td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($event['Event']['due_date']))) ?></td>
   </tr>
   <tr class="tablecell2">
-    <td>Description:&nbsp;</td>
+    <td><?php __('Description')?>:&nbsp;</td>
     <td colspan="3"><?php echo $event['Event']['description'] ?></td>
   </tr>
   <tr>
@@ -162,21 +163,21 @@ if ($event['Event']['id']==292) {
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr>
     <td colspan="3"><?php echo $html->image('icons/instructions.gif',array('alt'=>'instructions'));?>
-      <b> Instructions:</b><br>
-      1. Rate your peer's relative performance by using the slider. [Weight 1-10]<br>
-      2. Click "Distribute" button to distribute points.<br>
-      3. Allocate any remaining point.<br>
-      4. Enter Comments <?php echo  $event['Event']['com_req']? '<font color="red"> (Must) </font>' : '(Optional)' ;?> .<br>
-      5: <font color="red"><blink>NOTE:</blink></font> "Submit Evaluation" button will only be enabled when all points, and comments (if required), are filled!
+      <b><?php __(' Instructions')?>:</b><br>
+      1. <?php __("Rate your peer's relative performance by using the slider. [Weight 1-10]")?><br>
+      2. <?php __('Click "Distribute" button to distribute points.')?><br>
+      3. <?php __('Allocate any remaining point.')?><br>
+      4. <?php __('Enter Comments')?> <?php echo  $event['Event']['com_req']? '<font color="red"> (Must) </font>' : '(Optional)' ;?> .<br>
+      5: <font color="red"><blink><?php __('NOTE:')?></blink></font> <?php __('"Submit Evaluation" button will only be enabled when all points, and comments (if required), are filled!')?>
     </td>
   </tr>
 </table>
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr class="tableheader">
-		<td width="30%">Member(s)</td>
-		<td width="20%">Relative Weight</td>
-		<td width="15%">Mark</td>
-		<td width="35%">Comment  <?php echo $event['Event']['com_req']? '<font color=red>*</font>' : '(Optional)' ;?></td>
+		<td width="30%"><?php __('Member(s)')?></td>
+		<td width="20%"><?php __('Relative Weight')?></td>
+		<td width="15%"><?php __('Mark')?></td>
+		<td width="35%"><?php __('Comment')?>  <?php echo $event['Event']['com_req']? '<font color=red>*</font>' : __('(Optional)', true) ;?></td>
 	</tr>
                    <?php $i = 0;
     foreach($groupMembers as $row): $user = $row['User'];
@@ -229,7 +230,7 @@ if ($event['Event']['id']==292) {
   </td>
 		<td align="center"> <input type="button" name="distr" id="distr_button" value="Distribute" onClick="distribute()"/></td>
 		<td align="center">
-		  <table width="95%" border="0" align="center"><tr><td colspan="2">Points Allocated/Total:</td></tr>
+		  <table width="95%" border="0" align="center"><tr><td colspan="2"><?php __('Points Allocated/Total:')?></td></tr>
       	 <tr>
       	  <td align="right"><div id="total" style="padding-top: 5px;">0</div></td>
       	  <td align="left"><div id="remaining" style="padding-top: 5px;" >&nbsp;/&nbsp;<?php echo $remaining?></div></td>
@@ -242,7 +243,7 @@ if ($event['Event']['id']==292) {
   <tr class="tablecell2">
     <td colspan="4" align="center"><?php
       if (!isset($preview)) {
-        echo $form->submit('Submit Evaluation', array('id' => 'submit0', 'disabled' => 'true', 'onClick' => "javascript:return confirm('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?')"));
+        echo $form->submit(__('Submit Evaluation', true), array('id' => 'submit0', 'disabled' => 'true', 'onClick' => "javascript:return confirm('".__('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?', true)."')"));
       }
       ?></td>
     </tr>

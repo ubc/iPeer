@@ -25,9 +25,7 @@ class SurveyQuestion extends AppModel
    * @param type_INT $surveyId : survey's id
    */
   function getQuestionsID($surveyId=null) {
-  	$data = $this->find('all', array('conditions'=> array('survey_id' => $surveyId),
-                                     'fields' => array('number', 'question_id', 'id'),
-                                     'order' => 'number'));
+  	$data = $this->find('all');
     $data['count'] = count($data);
     return $data;
   }

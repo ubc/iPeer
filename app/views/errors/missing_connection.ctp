@@ -1,5 +1,5 @@
 <div style="margin-left:120px">
-<h1>No iPeer database found. You may want to run <a href="/install">installation</a> first. Otherwise make sure you define in it <u><tt>app/config/database.php</tt></u> in the following format:</h1>
+<h1><?php __('No iPeer database found. You may want to run <a href="/install">installation</a> first. Otherwise make sure you define in it <u><tt>app/config/database.php</tt></u> in the following format:')?></h1>
 
 <pre style="background-color:#FFFFDD;">
 &lt;?php
@@ -12,6 +12,6 @@ var $default = array('driver'   => 'mysql',
                      'database' => 'your_ipeer_database_in_mysql',
                      'prefix'   => 'prefix_(if_any)');  }
 ?&gt;</pre>
-For more details, also see this file:
+<?php __('For more details, also see this file:')?>
 <u><tt>app/config/database.php.default</tt></u>.
 </div>

@@ -11,20 +11,20 @@
   <?php echo $this->Form->input('survey_id', array('type' => 'hidden', 'value' => $data['Survey']['id']))?>
   <table width="65%" border="0" align="center" cellpadding="4" cellspacing="2">
     <tr class="tableheader">
-      <td align="center">Team Making - Step One</td>
+      <td align="center"><?php __('Team Making - Step One')?></td>
     </tr>
     <tr class="tablecell2">
       <td>
-  			<?php echo $data['Course']['student_count']?> students were specified for this survey, <?php echo $data['Event'][0]['response_count']?> students responded<br />
+  			<?php echo $data['Course']['student_count']?><?php __(' students were specified for this survey,')?> <?php echo $data['Event'][0]['response_count']?> <?php __('students responded')?><br />
 			</td>
 		</tr>
 		<tr class="tablecell2">
-			<td>Group Configuration:
+			<td><?php __('Group Configuration')?>:
         <?php echo $this->Form->select('group_config', $group_list, null)?>
       </td>
     </tr><?php if (!isset($data['Question'])||count($data['Question'])<1): ?>
     <tr class="tablecell2"><td>
-       <?php echo "There must be at least one question."; ?>
+       <?php echo __("There must be at least one question.", true); ?>
        </td>
     </tr>
     <?php endif;?>
@@ -50,14 +50,14 @@
           <td bgcolor="#ff0f0f"><input type="radio" name="weight[<?php echo $q['id'];?>]" value="5"></td>
           <td align="center"><?php echo $html->image('survey/differentiate.gif',array('alt'=>'differentiate')); ?></td>
         </tr>
-        <tr><td>Gather<br />Similar</td><td colspan="11" align="center">Ignore</td>
-          <td align="center">Gather<br />Dissimilar</td></tr>
+        <tr><td><?php __('Gather<br />Similar')?></td><td colspan="11" align="center"><?php __('Ignore')?></td>
+          <td align="center"><?php __('Gather<br />Dissimilar')?></td></tr>
       </table>
       </td>
     </tr>
      <?php endif;?>
    <?php endforeach;?>
-    <tr class="tablecell2"><td><b>Note: It may take up to 10mins to create groups.</b></td></tr>
+    <tr class="tablecell2"><td><b><?php __('Note: It may take up to 10mins to create groups.')?></b></td></tr>
     <tr class="tablecell2">
       <td>
         <div align="center">

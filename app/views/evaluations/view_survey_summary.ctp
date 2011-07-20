@@ -4,7 +4,7 @@
     <td>
         <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
           <tr class="tableheader">
-            <td align="center">Team Maker Survey Summary</td>
+            <td align="center"><?php __('Team Maker Survey Summary')?></td>
           </tr>
           <tr class="tablecell2">
             <td>

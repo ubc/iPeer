@@ -32,11 +32,11 @@
                 ?>
 
       <?php if ($model == 'SimpleEvaluation'):?>
-        <a title="Simple Evaluation Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'simpleevaluations', '<?php echo $url?>'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview This Simple Evaluation</a>
+        <a title="Simple Evaluation Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'simpleevaluations', '<?php echo $url?>'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;<?php __('Preview This Simple Evaluation')?></a>
       <?php elseif ($model == 'Rubric'):?>
-        <a title="Rubric Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'rubrics', '<?php echo $url?>'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview This Rubric</a>
+        <a title="Rubric Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'rubrics', '<?php echo $url?>'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;<?php __('Preview This Rubric')?></a>
       <?php elseif ($model == 'Mixeval'):?>
-        <a title="Mix Evaluation Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'mixevals', '<?php echo $url?>'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;Preview this Mixed Evaluaiton</a>
+        <a title="Mix Evaluation Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'mixevals', '<?php echo $url?>'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;<?php __('Preview this Mixed Evaluaiton')?></a>
       <?php endif;?> 
     <?php
     }
@@ -48,11 +48,11 @@
     } else if ($model == 'Mixeval') {
         $evalTypeString = "Mixed";
     } else {
-        $evalTypeString = "(Unknown Evaluation Type : $model)";
+        $evalTypeString = "(".__('Unknown Evaluation Type')." : $model)";
     }
 
-    echo "No $evalTypeString Evaluations available. You need to create a $evalTypeString Evaluation first! <br />";
-    echo "<ul><li>Just Click on <i>Add $evalTypeString Evaluation</i> above.</li></ul><br />";
+    printf (__("No %s Evaluations available. You need to create a %s Evaluation first! <br />", true), $evalTypeString, $evalTypeString);
+    printf (__("<ul><li>Just Click on <i>Add %s Evaluation</i> above.</li></ul><br />", true), $evalTypeString);
     echo $form->hidden('ModelType', array('value' => $model));
 }
 

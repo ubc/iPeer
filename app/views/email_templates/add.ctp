@@ -19,10 +19,10 @@
       echo $readonly ?
             ('View') :
             (empty($this->data['EmailTemplate']['id'])?'Add':'Edit');
-    ?> Custom Email Template</td>
+    ?> <?php __('Custom Email Template')?></td>
   </tr>
   <tr class="tablecell2">
-  	<td width="20%">Name:</td>
+  	<td width="20%"><?php __('Name')?>:</td>
   	<td>
         <?php echo $form->input('EmailTemplate.name', array('size'=>'50','label'=>false,'readonly'=>$readonly));?>
         </td>
@@ -37,7 +37,7 @@
   </tr>
 
   <tr class="tablecell2">
-    <td>Availability:</td>
+    <td><?php __('Availability')?>:</td>
     <td>
       <?php
         echo $form->input('EmailTemplate.availability', array(
@@ -52,24 +52,24 @@
         ));
       ?>
     </td>
-    <td>Public Allows Template Sharing Amongst Instructors</td>
+    <td><?php __('Public Allows Template Sharing Amongst Instructors')?></td>
   </tr>
 
   <tr class="tablecell2">
-    <td>Description:&nbsp;</td>
+    <td><?php __('Description')?>:&nbsp;</td>
     <td><?php echo $form->textarea('EmailTemplate.description', array('rows' => '5', 'style'=>'width:90%;', 'readonly'=>$readonly)) ?>  </td>
     <td>&nbsp;</td>
   </tr>
 
   <?php if(!$readonly): ?>
   <tr class="tablecell2">
-    <td>Insert Merge Field:&nbsp;</td>
+    <td><?php __('Insert Merge Field')?>:&nbsp;</td>
     <td><?php echo $form->input('Email.merge', array(
                 'type' => 'select',
                 'id' => 'merge',
                 'name' => 'merge',
                 'options' => $mergeList,
-                'empty' => '-- Select Merge Field --',
+                'empty' => __('-- Select Merge Field --', true),
                 'label' => false,
                 'onChange' => "insertAtCursor(document.frm.emailContent, this.value)"
               ));?>  </td>
@@ -78,7 +78,7 @@
   <?php endif; ?>
   
   <tr class="tablecell2">
-    <td>Content:&nbsp;</td>
+    <td><?php __('Content')?>:&nbsp;</td>
     <td><?php echo $form->textarea('EmailTemplate.content', array(
         'id' => 'emailContent',
         'rows' => '30',

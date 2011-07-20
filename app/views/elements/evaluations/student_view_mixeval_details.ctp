@@ -10,10 +10,10 @@
 <br/><br/>
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr class="tableheader" align="center">
-    <td width="100" valign="top" colspan="<?php echo ($mixeval['Mixeval']["lickert_question_max"]+1)?>">Section One:</td>
+    <td width="100" valign="top" colspan="<?php echo ($mixeval['Mixeval']["lickert_question_max"]+1)?>"><?php __('Section One')?>:</td>
   </tr>
 	<tr class="tableheader" align="center">
-    <td width="100" valign="top">Person Being Evaluated</td>
+    <td width="100" valign="top"><?php __('Person Being Evaluated')?></td>
     <?php
       for ($i=1; $i<=$mixeval['Mixeval']["lickert_question_max"]; $i++) {
         if (isset($mixevalQuestion[$i-1])) {
@@ -29,7 +29,7 @@
 if (!$gradeReleased && !$commentReleased) {
   $cols = $mixeval['Mixeval']["lickert_question_max"]+1;
   echo "<tr class=\"tablecell2\" align=\"center\"><td colspan=".$cols.">";
-  echo "<font color=\"red\">Comments/Grades Not Released Yet.</font></td></td>";
+  echo "<font color=\"red\">".__('Comments/Grades Not Released Yet.', true)."</font></td></td>";
 }
 else if ($gradeReleased || $commentReleased) {
  //Retrieve the individual mixeval detail
@@ -91,10 +91,10 @@ else if ($gradeReleased || $commentReleased) {
 <br/><br/>
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr class="tableheader" align="center">
-    <td width="100" valign="top" colspan="<?php echo ($mixeval['Mixeval']["prefill_question_max"]+1)?>">Section Two:</td>
+    <td width="100" valign="top" colspan="<?php echo ($mixeval['Mixeval']["prefill_question_max"]+1)?>"><?php __('Section Two')?>:</td>
   </tr>
 	<tr class="tableheader" align="center">
-    <td width="100" valign="top">Person Being Evaluated</td>
+    <td width="100" valign="top"><?php __('Person Being Evaluated')?></td>
     <?php
       for ($i=$pos; $i<=$mixeval['Mixeval']["total_question"]; $i++) {
         if (isset($mixevalQuestion[$i-1])) {
@@ -109,7 +109,7 @@ else if ($gradeReleased || $commentReleased) {
 if (!$gradeReleased && !$commentReleased) {
   $cols = $mixeval['Mixeval']["prefill_question_max"]+1;
   echo "<tr class=\"tablecell2\" align=\"center\"><td colspan=".$cols.">";
-  echo "<font color=\"red\">Comments/Grades Not Released Yet.</font></td></td>";
+  echo "<font color=\"red\">".__('Comments/Grades Not Released Yet.', true)."</font></td></td>";
 }else if ($gradeReleased || $commentReleased) {
 
  if (isset($evalResult[$userId])) {
@@ -141,7 +141,7 @@ if (!$gradeReleased && !$commentReleased) {
           echo "<td valign=\"middle\">";
 
           //Comments
-          echo "<br/><strong>Comment: </strong>";
+          echo "<br/><strong>".__('Comment').": </strong>";
           if ($commentReleased && isset($mixevalDet)) {
           	echo $mixevalDet["question_comment"];
           } else {

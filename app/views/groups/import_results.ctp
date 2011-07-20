@@ -3,30 +3,30 @@
     <td align="center">
 <table width="95%" border="0" cellspacing="0" cellpadding="2">
     <tr><td>
-    <center style="font-size:150%">The group CVS file was processed.</center><br />
-    <center>Click OK to return
-    to the list of groups, or look bellow for the results of the import.
+    <center style="font-size:150%"><?php __('The group CVS file was processed.')?></center><br />
+    <center><?php __('Click OK to return
+    to the list of groups, or look bellow for the results of the import.')?>
     <br /> <br />
     <input type="button" name="Okay" value="OK" onClick="window.location='<?php echo $this->webroot . "groups/goToClassList/". $rdAuth->courseId ?>'";>
     </center>
     <br /> <br />
     <div style="border:1px solid;">
-    <center><span style="font-size:150%">Group Import Results</span></center>
+    <center><span style="font-size:150%"><?php __('Group Import Results')?></span></center>
     <br />
-    <center><u style="font-size:130%">Group Creation</u></center>
+    <center><u style="font-size:130%"><?php __('Group Creation')?></u></center>
     <br />
     <center>
     <?php // Group List ?>
-    <span style="background:#CCFFCC">Groups Created: <?php echo $results['groups_added']; ?></span>
+    <span style="background:#CCFFCC"><?php __('Groups Created')?>: <?php echo $results['groups_added']; ?></span>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <span style="background:#FFFFCC">Groups Skipped: <?php echo $results['groups_skipped']; ?></span>
+    <span style="background:#FFFFCC"><?php __('Groups Skipped')?>: <?php echo $results['groups_skipped']; ?></span>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <span style="background:#FFDDDD"> Errors in Groups: <?php echo $results['groups_error']; ?></span>
+    <span style="background:#FFDDDD"> <?php __('Errors in Groups')?>: <?php echo $results['groups_error']; ?></span>
 
     <table>
     <tr><td>&nbsp;</td></tr>
     <?php if (empty($results['groups'])) : ?>
-        <tr><td style='background:#FFCC99'>No groups Listed</td></tr>
+        <tr><td style='background:#FFCC99'><?php __('No groups Listed')?></td></tr>
     <?php else: ?>
         <?php foreach ($results['groups'] as $group) : ?>
             <?php $bgColor = $group['present'] ? ( $group['created'] ? '#CCFFCC' : '#FFFFCC') : '$FFCCC'; ?>
@@ -45,19 +45,19 @@
     </table>
     </center>
     <br />
-    <center><u style="font-size:130%">User->Group Assignment</u></center>
+    <center><u style="font-size:130%"><?php __('User->Group Assignment')?></u></center>
     <br />
     <center>
     <?php // User List ?>
-    <span style="background:#CCFFCC">Users Added To Groups: <?php echo $results['users_added']; ?></span>
+    <span style="background:#CCFFCC"><?php __('Users Added To Groups')?>: <?php echo $results['users_added']; ?></span>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <span style="background:#FFFFCC">Entries Skipped: <?php echo $results['users_skipped']; ?></span>
+    <span style="background:#FFFFCC"><?php __('Entries Skipped')?>: <?php echo $results['users_skipped']; ?></span>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <span style="background:#FFDDDD"> Errors in Entries: <?php echo $results['users_error']; ?></span>
+    <span style="background:#FFDDDD"> <?php __('Errors in Entries')?>: <?php echo $results['users_error']; ?></span>
     <br /><br />
     <table>
     <?php if (empty($results['users'])) : ?>
-        <tr><td style='background:#FFCC99'>No Students Listed</td></tr>
+        <tr><td style='background:#FFCC99'><?php __('No Students Listed')?></td></tr>
     <?php else: ?>
         <?php foreach ($results['users'] as $user) : ?>
             <?php $bgColor = $user['valid'] ? ( $user['added'] ? '#CCFFCC' : '#FFFFCC') : '#FFDDDD'; ?>
@@ -76,14 +76,14 @@
                     <?php echo ("$data[first_name]"); ?>
                 </td>
             <?php else: ?>
-                <td colspan=10><b>Error.</b> See the 'Results:' line for details</td>
+                <td colspan=10><b><?php __('Error.')?></b> <?php __("See the 'Results:' line for details")?></td>
             <?php endif; ?>
             </tr>
-            <tr><td style="background:<?php echo $bgColor; ?>">Entry :</td>
+            <tr><td style="background:<?php echo $bgColor; ?>"><?php __('Entry')?> :</td>
             <td colspan=10 style="background:#E0E8FF">
                 <?php echo $user['line']; ?>
             </td></tr>
-            <tr<tr style="background:<?php echo $bgColor; ?>"><td>Result:</td>
+            <tr style="background:<?php echo $bgColor; ?>"><td><?php __('Result')?>:</td>
             <td colspan=10>
                 <?php echo $user['status']; ?>
             </td></tr>

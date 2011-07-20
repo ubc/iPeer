@@ -2,7 +2,7 @@
 <?php 
 if (empty($fieldvalue)) $fieldvalue = '';
 if (!empty($data[0])){
-  echo 'Title "'.$data.'" already exists.'; 
+  echo __('Title', true).'"'.$data.'"'.__('already exists.', true); 
 }
 //echo the hidden field for real username
 echo ' <input type="hidden" name="data[Event][title]"  value="'.$fieldvalue.'" />';

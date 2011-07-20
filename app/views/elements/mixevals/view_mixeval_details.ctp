@@ -1,7 +1,7 @@
 <!-- elements::ajax_rubric_preview start -->
     <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
       <tr class="tableheader" align="center">
-      <td valign="top" width="75%" align='left'>Section One: &nbsp;Lickert Scales</td>
+      <td valign="top" width="75%" align='left'><?php __('Section One')?>: &nbsp;<?php __('Lickert Scales')?></td>
     <?php
     $descriptor_des = array('1'=>'Lowest','2'=>'','3'=>'Middle','4'=>'','5'=>'Highest');
     isset($data['Question'])? $questions = $data['Question'] : $questions = null;
@@ -10,7 +10,7 @@
   //  echo "<td width=\"50%\" colspan=\"".$scale_default."\">Scale</td>";
     //for loop to display the top header row with LOM comments
     if (!$evaluate) {
-      echo "<td width=\"10%\">Scale Weight</td>";
+      echo "<td width=\"10%\">".__('Scale Weight')."</td>";
     }
     echo "</tr>";
     $pos = 1;
@@ -111,7 +111,7 @@
   </table>
   <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
     <tr class="tableheader" align="center">
-      <td align="left">Section Two: &nbsp;Comments (No Weight on this Section)</td>
+      <td align="left"><?php __('Section Two')?>: &nbsp;<?php __('Comments (No Weight on this Section)')?></td>
       <?php $descriptor_des = array('1'=>'Lowest','2'=>'','3'=>'Middle','4'=>'','5'=>'Highest'); ?>
     </tr>
   <?php //for loop to display the criteria rows
@@ -141,10 +141,10 @@
               <?php if (!$evaluate) { ?>
               <tr>
                 <td/>
-                <td>Mandatory?:
-                  <?php $checkRequired = 'YES';
+                <td><?php __('Mandatory?')?>:
+                  <?php $checkRequired = __('YES', true);
                    if (isset($mixevalQuestion['required']) && $mixevalQuestion['required']==0) {
-                     $checkRequired = 'NO';
+                     $checkRequired = __('NO', true);
                    }
                    echo $checkRequired;
                    ?>
@@ -171,7 +171,7 @@
                    
                       ?>
                      <textarea name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['question_num']?>" cols="80" rows="10"><?php echo $text?></textarea>
-                     <br />Maximum 65535 characters.
+                     <br /><?php __('Maximum 65535 characters.')?>
                    <?php } else { ?>
                    
                      <input type="text" name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['question_num']?>" size="92" value="<?php
@@ -180,12 +180,12 @@
 
                 </td></tr>
             <?php else: ?>
-            <tr><td width="15%">Respond Type?: </td>
+            <tr><td width="15%"><?php __('Respond Type?')?>: </td>
                 <td width="85%" align="left">
                   <?php
                    $responseType = 'Single Text Input';
                    if (isset($mixevalQuestion['response_type']) && $mixevalQuestion['response_type']=='L') {
-                       $responseType = 'Long Answer Text Input';
+                       $responseType = __('Long Answer Text Input', true);
                    }
                    echo $responseType;?>
                 </td></tr>
@@ -199,7 +199,7 @@
     <td colspan="3" align="center">
 <?php echo $form->hidden('Mixeval.total_question', array('value'=>($pos-1)));?>
 <?php if (!$evaluate) :?>
-    <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
+    <input type="button" name="Back" value="<?php __('Back')?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
 <?php endif; ?>
   </td>
   </tr>

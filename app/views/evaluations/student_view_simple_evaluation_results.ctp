@@ -9,7 +9,7 @@
 
  			<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
         <tr class="tableheader">
-          <td width="10" height="32" align="center">Comment&nbsp;(Randomly Ordered)</td>
+          <td width="10" height="32" align="center"><?php __('Comment&nbsp;(Randomly Ordered)')?></td>
         </tr>
 				<?php $i = 0;
 				if (isset($studentResult['comments']) && $studentResult['commentReleaseStatus']) {

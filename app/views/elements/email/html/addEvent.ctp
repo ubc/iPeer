@@ -1,4 +1,4 @@
-<b>Event <?php echo $eventTitle?> is created !!! </b>
-<p>Description: <?php echo $eventDesc?></p>
-<p>Due: <?php echo $eventDue?></p>
+<b><?__('Event')?> <?php echo $eventTitle?> <?php __('is created')?> !!! </b>
+<p><?__('Description')?>: <?php echo $eventDesc?></p>
+<p><?__('Due')?>: <?php echo $eventDue?></p>
 

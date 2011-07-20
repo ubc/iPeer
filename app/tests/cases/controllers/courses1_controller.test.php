@@ -52,17 +52,24 @@ class CoursesControllerTest extends CakeTestCase {
   }
 
   function testIndex() {
-    $result = $this->testAction('/courses/index', array('connection' => 'test_suite', 'return' => 'vars'));
+    $result = $this->testAction('/courses/index', array('connection' => 'test_suite', 'return' => 'contents'));
+var_dump($result);
     $expected = array(
-      array('Course' => array('id' => 3, 'course' => 'Math100', 'title' => 'Math', 
-                              'homepage' => null, 'creator_id' => 0, 'record_status' => '', 'creator' => null),
-            'Instructor' => array('id' => 8)),
+      array('Course' => array('id' => 3, 'homepage' => null, 'course' => 'Math100', 'title' => 'Math', 
+                               'creator_id' => 0, 'record_status' => '', 'creator' => null),
+            'Instructor' => array('id' => 2),
+            'CreatorId' => array(),
+            'UpdaterId' => array()),
       array('Course' => array('id' => 1, 'course' => 'Math303', 'title' => 'Stochastic Process',
                               'homepage' => null, 'creator_id' => 0, 'record_status' => '', 'creator' => null),
-            'Instructor' => array('id' => 1)),
+            'Instructor' => array('id' => 1),
+            'CreatorId' => array(),
+            'UpdaterId' => array()),
       array('Course' => array('id' => 2, 'course' => 'Math321', 'title' => 'Analysis II',
                               'homepage' => null, 'creator_id' => 0, 'record_status' => '', 'creator' => null),
-            'Instructor' => array('id' => 1)),
+            'Instructor' => array('id' => 1),
+            'CreatorId' => array(),
+            'UpdaterId' => array()),
       );
     $this->assertEqual($result['paramsForList']['data']['entries'], $expected);
   }

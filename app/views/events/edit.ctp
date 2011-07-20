@@ -16,11 +16,11 @@
 echo $this->Form->input('id', array('type' => 'hidden'))?>
     <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
     <tr class="tableheader">
-      <td colspan="3" align="center"><?php echo ucfirst($this->action)?> Evaluation Event</td>
+      <td colspan="3" align="center"><?php echo ucfirst($this->action)?><?php __(' Evaluation Event')?></td>
     </tr>
 
     <tr class="tablecell2">
-      <td width="150" id="course_label">Course:</td>
+      <td width="150" id="course_label"><?php __('Course:')?></td>
       <td width="405">
 
       <?php
@@ -36,7 +36,7 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
       <td width="243" id="course_msg" class="error"/>
     </tr>
     <tr class="tablecell2">
-    <?php echo $this->Form->input('title', array('size'=>'50', 'class'=>'input',
+    <?php echo $this->Form->input('title', array('size'=>'50', 'class'=>'input', 'label' => __('Title:', true),
                                                  'readonly' => $readonly)) ?>
                                                  
                                                  <td></td>
@@ -58,18 +58,18 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
 
     <tr class="tablecell2">
     <?php echo $this->Form->input('description', array('class'=>'input', 'cols'=>'35', 'style'=>'width:85%;',
-                                                 'readonly' => $readonly)) ?>
+                                                 'readonly' => $readonly, 'label' => __('Description:', true))) ?>
     <td></td>
     </tr>
 
     <tr class="tablecell2">
-    <td>Evaluation Format:&nbsp;<font color="red">*</font></td>
+    <td><?php __('Evaluation Format')?>:&nbsp;<font color="red">*</font></td>
     <td>
       <table border="0" align="left" cellpadding="4" cellspacing="2">
 			<tr><td>
-			<?php echo $this->Html->link('Add Simple Evaluation', '/simpleevaluations/add/pop_up', array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"))?>&nbsp;|
-			<?php echo $this->Html->link('Add Rubric', '/rubrics/add/pop_up', array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"))?>&nbsp;|
-			<?php echo $this->Html->link('Add Mix Evaluation', '/mixevals/add/pop_up', array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"))?>
+			<?php echo $this->Html->link(__('Add Simple Evaluation', true), '/simpleevaluations/add/pop_up', array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"))?>&nbsp;|
+			<?php echo $this->Html->link(__('Add Rubric', true), '/rubrics/add/pop_up', array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"))?>&nbsp;|
+			<?php echo $this->Html->link(__('Add Mix Evaluation', true), '/mixevals/add/pop_up', array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"))?>
       </td></tr>
 
      <tr>
@@ -106,7 +106,7 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
   </tr>
 
   <tr class="tablecell2">
-    <td>Allow Self-Evaluation?:</td>
+    <td><?php __('Allow Self-Evaluation?')?>:</td>
     <td>
     <?php
       echo $form->input('Event.self_eval', array(
@@ -121,7 +121,7 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
     <td>&nbsp;</td>
   </tr>
   <tr class="tablecell2">
-    <td>Require Student Comments?: </td>
+    <td><?php __('Require Student Comments?')?>: </td>
     <td>
     <?php
       echo $form->input('Event.com_req', array(
@@ -139,7 +139,7 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
    
     <?php
 
-    echo $form->input('Event.due_date', array('size'=>'50','class'=>'input', 'style'=>'width:75%;', 'type'=>'text', 'label'=>'Due Date:<font color="red">*</font>', 'value'=>$this->data['Event']['due_date'], 'after'=>'')) ?>&nbsp;&nbsp;
+    echo $form->input('Event.due_date', array('size'=>'50','class'=>'input', 'style'=>'width:75%;', 'type'=>'text', 'label'=>__('Due Date', true).':<font color="red">*</font>', 'value'=>$this->data['Event']['due_date'], 'after'=>'')) ?>&nbsp;&nbsp;
     
     
                         <?php // echo $form->input('Search.due_date_begin', array('size'=>'50','class'=>'input',  'label'=> false, 'style'=>'width:75%;','value'=>(isset($sticky['due_date_begin']))? $sticky['due_date_begin']:'')) 
@@ -152,19 +152,19 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
    
    
    	
-    <td>eg. YYYY-MM-DD HH:MM:SS (24 HOUR)</td>
+    <td><?php __('eg. YYYY-MM-DD HH:MM:SS (24 HOUR)')?></td>
   </tr>
   <tr class="tablecell2">
-    <td>Release Date:&nbsp;<font color="red">*</font></td>
+    <td><?php __('Release Date')?>:&nbsp;<font color="red">*</font></td>
   	<td id="release_date_begin">
   	  <table width="100%"><tr align="left">
-				<td width="10%">FROM:</td>
+				<td width="10%"><?php __('FROM:')?></td>
 				<td width="90%">
       		<?php echo $form->input('Event.release_date_begin', array('size'=>'50','class'=>'input', 'format'=>array('input'), 'type'=>'text','style'=>'width:75%;', 'value'=>$this->data['Event']['release_date_begin'])) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal2.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
       	</td>
       </tr>
       <tr>
-      	<td width="10%">TO:</td>
+      	<td width="10%"><?php __('TO:')?></td>
       	<td width="90%">
       		<?php echo $form->input('Event.release_date_end', array('size'=>'50','class'=>'input', 'format'=>array('input'),  'type'=>'text','style'=>'width:75%;', 'value'=>$this->data['Event']['release_date_end'])) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal3.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
       	</td>
@@ -174,13 +174,13 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
   	</td>
   </tr>
   <tr class="tablecell2">
-    <td>Groups Assignment:&nbsp;</td>
+    <td><?php __('Groups Assignment:')?>&nbsp;</td>
     <td>
     
         <?php
         echo $this->element("groups/group_list_chooser",
             array('all' => $unassignedGroups,   'assigned'  =>$assignedGroups,
-            'allName' =>  'Avaliable Groups', 'selectedName' => 'Participating Groups'
+            'allName' =>  __('Avaliable Groups', true), 'selectedName' => __('Participating Groups', true)
           ));
         ?>
 
@@ -189,7 +189,7 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
   </tr>
   <tr class="tablecell2">
     <?php echo $html->script('events')?>
-    <td colspan="3" align="center"><?php echo $form->submit('Edit Event', array('onclick' =>
+    <td colspan="3" align="center"><?php echo $form->submit(__('Edit Event', true), array('onclick' =>
         "processSubmit(document.getElementById('selected_groups')); return validateEventDates('EventReleaseDateBegin','EventReleaseDateEnd','EventDueDate'); ")); ?></td>
     </tr>
 </table>

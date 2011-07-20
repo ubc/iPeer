@@ -6,7 +6,7 @@ $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","
 ?>
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr class="tableheader" align="center">
-    <td width="100" valign="top">Person Being Evaluated</td>
+    <td width="100" valign="top"><?php __('Person Being Evaluated')?></td>
     <?php
       for ($i=1; $i<=$rubric['Rubric']["criteria"]; $i++) {
     		echo "<td><strong><font color=" . $color[ $i % sizeof($color) ] . ">" . ($i) . ". "  . "</font></strong>";
@@ -19,7 +19,7 @@ $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","
 if (!$gradeReleased && !$commentReleased) {
   $cols = $rubric['Rubric']["criteria"]+1;
   echo "<tr class=\"tablecell2\" align=\"center\"><td colspan=".$cols.">";
-  echo "<font color=\"red\">Comments/Grades Not Released Yet.</font></td></td>";
+  echo "<font color=\"red\">".__('Comments/Grades Not Released Yet.')."</font></td></td>";
 }else if ($gradeReleased || $commentReleased) {
   if (isset($evalResult[$userId])) {
    //Retrieve the individual rubric detail
@@ -66,7 +66,7 @@ if (!$gradeReleased && !$commentReleased) {
         	echo "n/a<br />";
         }*/
         //Comments
-        echo "<br/><strong>Comment: </strong>";
+        echo "<br/><strong>".__('Comment', true).": </strong>";
         if ($commentReleased && isset($rubDet)) {
         	echo $rubDet["criteria_comment"];
         } else {
@@ -83,7 +83,7 @@ if (!$gradeReleased && !$commentReleased) {
      echo "<td></td>";
      $col = $rubric['Rubric']['criteria'] + 1;
      echo "<td colspan=".$col.">";
-     echo "<strong>General Comment: </strong><br>";
+     echo "<strong>".__('General Comment').": </strong><br>";
      if ($commentReleased) {
        echo $memberRubric['general_comment'];
      }else {

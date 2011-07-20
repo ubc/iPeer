@@ -1,16 +1,16 @@
 <span class="required">NOTE</span>: <br />
 <ul>
-  <li><strong>Username</strong> <u>must</u> the same at the <strong>Student Number</strong>.</li>
-  <li>All fields mandatory, except email and password.</li> 
-  <li>If email column is missing, students will be requested to fill in when they log in the first time.</li>
-  <li>If password column is missing, system will generate random password for each student.</li>
-  <li>If an external authentication module is enabled (e.g. CWL or Shiboleth), password column can be ignored. Students will use external authentication module to login.</li>
-  <li>Please make sure to remove header from the CSV file.</li>
+  <li><strong><?php __('Username</strong> <u>must</u> the same at the <strong>Student Number')?></strong>.</li>
+  <li><?php __('All fields mandatory, except email and password.')?></li> 
+  <li><?php __('If email column is missing, students will be requested to fill in when they log in the first time.')?></li>
+  <li><?php __('If password column is missing, system will generate random password for each student.')?></li>
+  <li><?php __('If an external authentication module is enabled (e.g. CWL or Shiboleth), password column can be ignored. Students will use external authentication module to login.')?></li>
+  <li><?php __('Please make sure to remove header from the CSV file.')?></li>
 </ul>
 <br />
-Formatting:
+<?php __('Formatting:')?>
 <pre style='background-color: white; border:1px solid black; padding:5px; margin:5px'>
-Username,First Name,Last Name,Student#,<i>Email(optional),Password(optional)</i>
+<?php __('Username,First Name,Last Name,Student#,<i>Email(optional),Password(optional)')?></i>
 </pre>
 
 <br />

@@ -5,7 +5,7 @@
 	<table width="95%"  border="0" cellspacing="2" cellpadding="4">
       <tr>
         <td><div align="right" id="page-numbers">
-            <b>Page Size: </b>
+            <b><?php __('Page Size')?>: </b>
             <?php                
                 echo $form->input('radio', $this->Paginator->pageSize($this->params["paging"]["Event"]["options"]["limit"]));
             ?>
@@ -23,11 +23,11 @@
 	    <th>Course</th>
 	    <?php } ?>
 <!--	    <th>Email <br>All Groups</th>-->
-	    <th><?php echo $this->Paginator->sort('Evaluation Event Title','title')?></th>
+	    <th><?php echo $this->Paginator->sort(__('Evaluation Event Title', true),'title')?></th>
 	    <th>Event Type</th>
-	    <th><?php echo $this->Paginator->sort('Due Date','due_date')?></th>
+	    <th><?php echo $this->Paginator->sort(__('Due Date', true),'due_date')?></th>
 	    <th>Released?</th>
-	    <th><?php echo $this->Paginator->sort('Self Evaluation','self_eval')?></th>
+	    <th><?php echo $this->Paginator->sort(__('Self Evaluation', true),'self_eval')?></th>
 	  </tr>
   	<?php $i = 0;?>
 	  <?php
@@ -42,7 +42,7 @@
   	    </td>
   	    <td align="center">
   	    <?php if($currentUser['role'] == 'A' || $currentUser['role'] == 'I'):?>
-  		    <a href="<?php echo $this->webroot.$this->theme.'evaluations/view/'.$evaluation['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View', 'title'=>'View '.$evaluation['title']))?></a>
+  		    <a href="<?php echo $this->webroot.$this->theme.'evaluations/view/'.$evaluation['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>__('View', true), 'title'=>__('View ', true).$evaluation['title']))?></a>
   	    <?php endif;?>
   	    </td>
   	    <?php
@@ -89,7 +89,7 @@
   <tr>
     <td width="33%" align="left"><?php //Display page infomation
 	echo '<br/>'.$this->Paginator->counter(array(
-		'format' => 'Page %page% of %pages%, showing %current% records out of %count% total<br/>'
+		'format' => __('Page %page% of %pages%, showing %current% records out of %count% total<br/>', true)
 	));?></td>
     <td width="33%"></td>
     <td width="33%" align="right">

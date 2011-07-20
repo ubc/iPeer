@@ -5,7 +5,7 @@
     if (empty($eachName) || empty($setName) || empty($verbIn) || empty($verbOut)||
         !isset($list) || !is_array($list) || !isset($selection) || !is_array($selection) || 
         !isset($readOnly)) {
-        echo "Error: Please set all parameters for checkBoxList.<br/>";
+        echo __("Error: Please set all parameters for checkBoxList.<br/>", true);
     } else {
         if (empty($list)) {
             // No entries to choose from? say so.
@@ -53,10 +53,10 @@
             echo "</tr></table>";
             echo "</div><br/><center>";
             if (!$readOnly) {
-              echo "Use the checkmarks to $verbIn / $verbOut $setName.<br/>";
-              echo "($setName in <b><u>bold</u></b> are the ones selected initially.)<br/>";
+              echo __("Use the checkmarks to", true). $verbIn." / ".$verbOut." ".$setName.".<br/>";
+              echo "(".$setName.__('in <b><u>bold</u></b> are the ones selected initially.)<br/>', true);
             } else {
-              echo "(The selected $setName are check-marked and in <b><u>bold</u></b>)</br />";
+              printf (__("(The selected %s are check-marked and in <b><u>bold</u></b>)</br />", true), $setName);
             }
             echo "</center>";
         }

@@ -3,16 +3,16 @@
 <form name="frmList" id="frmList" action="">
     <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
     	<tr class="tableheader" align="center">
-			<td valign="top" width="23%">Rubric Preview</td>
+			<td valign="top" width="23%"><?php __('Rubric Preview')?></td>
 		<?php
 
 		//default values for a 5x5 rubric
-		$LOM_des = array('1'=>'Poor','2'=>'Below Average','3'=>'Average','4'=>'Above Average','5'=>'Excellent');
-		$crit = array('1'=>'Participated in Team Meetings','2'=>'Was Helpful and Co-operative','3'=>'Submitted Work on Time','4'=>'Worked Efficiently','5'=>'Contributed');
+		$LOM_des = array('1'=>__('Poor', true),'2'=>__('Below Average', true),'3'=>__('Average', true),'4'=>__('Above Average', true),'5'=>__('Excellent', true));
+		$crit = array('1'=>__('Participated in Team Meetings', true),'2'=>__('Was Helpful and Co-operative', true),'3'=>__('Submitted Work on Time', true),'4'=>__('Worked Efficiently', true),'5'=>__('Contributed', true));
 
 		//for loop to display the top header row with LOM comments
 		for($i=1; $i<=$LOM_num; $i++){
-			echo '<td align="left">LOM General Comment '.$i.'<br>'.
+			echo '<td align="left">'.__('LOM General Comment ').$i.'<br>'.
 			$html->areaTag('Rubric/lom_comment'.$i,'',2,
                 array('style'=>'width:90%;',
                 'value'=>(!empty($data['Rubric']['lom_comment'.$i]) ?
@@ -24,7 +24,7 @@
                 )
             )."</td>";
 		}
-		echo "<td>Criteria Weight</td>";
+		echo "<td>".__('Criteria Weight', true)."</td>";
 		echo "</tr>";
 
 		// horizontal template type
@@ -32,7 +32,7 @@
 			//for loop to display the criteria rows
 			for($i=1; $i<=$criteria_num; $i++){
 				echo '<tr class="tablecell" align="center">';
-				echo '<td class="tableheader2" valign="top"><table border="0" width="95%" cellpadding="2"><tr><td align="left">Criteria '.$i.'</td></tr><tr><td>'
+				echo '<td class="tableheader2" valign="top"><table border="0" width="95%" cellpadding="2"><tr><td align="left">'.__('Criteria ', true).$i.'</td></tr><tr><td>'
 					  .$html->areaTag('Rubric/criteria'.$i,15,2,
                             array('value'=>( isset($data['Rubric']['criteria'.$i]) ?
                                                 $data['Rubric']['criteria'.$i] :
@@ -48,8 +48,8 @@
 					else{
 						$mark_value = round( (1/$LOM_num*$j) , 2);
 					}
-					echo '<td align="left"><table border="0" width="95%" cellpadding="2"><tr><td align="left">Specific Comment</td></tr><tr><td align="left">'.$html->areaTag('Rubric/criteria_comment_'
-						 .$i.'_'.$j,'',2, array('style'=>'width:90%;'))."</td></tr><tr><td>Mark: ".'<input type="text" name="criteria_mark_'.$i."_".$j.'" class="input" size="3" readonly value="'.$mark_value.'">'."</td></tr></table></td>";
+					echo '<td align="left"><table border="0" width="95%" cellpadding="2"><tr><td align="left">'.__('Specific Comment', true).'</td></tr><tr><td align="left">'.$html->areaTag('Rubric/criteria_comment_'
+						 .$i.'_'.$j,'',2, array('style'=>'width:90%;'))."</td></tr><tr><td>".__('Mark', true).": ".'<input type="text" name="criteria_mark_'.$i."_".$j.'" class="input" size="3" readonly value="'.$mark_value.'">'."</td></tr></table></td>";
 				}
 
 				echo '<td>';
@@ -80,11 +80,11 @@
 			//for loop to display the criteria rows
 			for($i=1; $i<=$criteria_num; $i++){
 				echo '<tr class="tablecell" align="center">';
-				echo '<td class="tableheader2" valign="top"><table border="0" width="95%" cellpadding="2"><tr><td>Criteria $i</td></tr><tr><td>'
+				echo '<td class="tableheader2" valign="top"><table border="0" width="95%" cellpadding="2"><tr><td>'.__('Criteria ', true). $i.'</td></tr><tr><td>'
 					  .$html->areaTag('Rubric/criteria'.$i,15,2, array('value'=> !empty($data['Rubric']['criteria'.$i]) ? $data['Rubric']['criteria'.$i] : $crit[$i]))."<br>"
 					  ."</td></tr></table></td>";
 
-				echo '<td colspan="'.$LOM_num.'"><table border="0" width="95%" cellpadding="4"><tr><td colspan="3">Specific Comment</td></tr>';
+				echo '<td colspan="'.$LOM_num.'"><table border="0" width="95%" cellpadding="4"><tr><td colspan="3">'.__('Specific Comment', true).'</td></tr>';
 
 				//for loop to display the criteria comment rows for each LOM
 				for($j=1; $j<=$LOM_num; $j++){
@@ -127,7 +127,7 @@
 			}
 		}
 		echo '<tr class="tableheader2">';
-		echo '<td colspan="'.($LOM_num+1).'" align="right">Total Marks: </td>';
+		echo '<td colspan="'.($LOM_num+1).'" align="right">'.__('Total Marks').': </td>';
 		echo '<td><input type="text" name="total_marks" id="total_marks" class="input" value='.$criteria_num.' size="5" readonly></td>';
 		echo "</tr>";
 		?>

@@ -1,48 +1,48 @@
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
 
   <tr class="tableheader">
-    <td colspan="4" align="center">Evaluation Result Detail</td>
+    <td colspan="4" align="center"><?php __('Evaluation Result Detail')?></td>
     </tr>
   <tr class="tablecell2">
-    <td width="10%">Evaluated By:</td>
+    <td width="10%"><?php __('Evaluated By')?>:</td>
     <td width="25%"><?php echo $event['group_name'] ?></td>
-    <td width="10%">Self-Evaluation:</td>
+    <td width="10%"><?php __('Self-Evaluation')?>:</td>
     <td width="25%"><?php
       if ($event['Event']['self_eval']) {
-        echo 'Yes';
+        echo __('Yes', true);
        } else {
-        echo 'No';
+        echo __('No', true);
        }
       ?></td>
   </tr>
   <tr class="tablecell2">
-    <td>Event Name:</td>
+    <td><?php __('Event Name')?>:</td>
     <td><?php echo $event['Event']['title'] ?></td>
-    <td>Due Date:</td>
+    <td><?php __('Due Date')?>:</td>
     <td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($event['Event']['due_date']))) ?></td>
   </tr>
   <tr class="tablecell2">
-    <td>Description:&nbsp;</td>
+    <td><?php __('Description')?>:&nbsp;</td>
     <td colspan="3"><?php echo $event['Event']['description'] ?></td>
   </tr>
  <?php if (isset($groupAve)) {?>
   <tr class="tablecell2">
-    <td>Rating:&nbsp;</td>
+    <td><?php __('Rating')?>:&nbsp;</td>
     <td colspan="3"><?php
       if ($gradeReleaseStatus) {
         echo number_format($aveScore, 2);
       } else {
-        echo 'Not Released';
+        echo __('Not Released', true);
       } ?></td>
   </tr>
 
   <tr class="tablecell2">
-    <td>Group Average:&nbsp;</td>
+    <td><?php __('Group Average')?>:&nbsp;</td>
     <td colspan="3"><?php
       if ($gradeReleaseStatus) {
         echo number_format($groupAve, 2);
       } else {
-        echo 'Not Released';
+        echo __('Not Released', true);
       }?></td>
   </tr>
   <?php }?>

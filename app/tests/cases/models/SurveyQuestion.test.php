@@ -142,6 +142,10 @@ class SurveyQuestionTestCase extends CakeTestCase {
   	$this->assertEqual($surveyQ2['question_id'], 2);
   	$this->assertEqual($surveyQ3['question_id'], 6);
   	$this->assertEqual($result['count'], 3);
+  	
+  	$result = $this->SurveyQuestion->getQuestionsID(null);
+  	$this->assertFalse($result);
+  	
   }
   
   function testCopyQuestions() {

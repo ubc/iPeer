@@ -10,15 +10,15 @@ isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = nu
 <?php //var_dump($user); ?>
 <table class="form-table">
   <tr class="tableheader" align="center">
-		<td width=100 valign="top">Rubric View</td>
+		<td width=100 valign="top"><?php __('Rubric View')?></td>
 		<!-- // horizontal template type -->
 		<?php if( $rubric_type == "horizontal" ):?>
       <?php foreach($data['RubricsLom'] as $lom): ?>
-        <td>Level of Mastery <?php echo $lom['lom_num']?>:<br><?php echo $lom['lom_comment']?>
+        <td><?php __('Level of Mastery')?> <?php echo $lom['lom_num']?>:<br><?php echo $lom['lom_comment']?>
       <?php endforeach ?>
 			<!-- //Comment for Evaluation Form -->
 			<?php if ($evaluate):?>
-        <td align='left'>Comments</td>
+        <td align='left'><?php __('Comments')?></td>
 			<?php endif ?>
   </tr>
 
@@ -33,7 +33,7 @@ isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = nu
 
 			<table border="0" width="95%" cellpadding="2">
         <tr><td><?php echo $i.': '.$criteria['criteria']?></td></tr>
-        <tr><td><i><?php echo $criteria['multiplier']?> mark(s)</i></td></tr>
+        <tr><td><i><?php echo $criteria['multiplier']?><?php __(' mark(s)')?></i></td></tr>
       </table>
     </td>
 
@@ -53,7 +53,7 @@ isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = nu
              onClick="document.evalForm.selected_lom_<?php echo $userId."_".$i?>.value=<?php echo $lom['lom_num']?>;" <?php echo $check?>/></div>
 
       <?php if (!$evaluate): ?>
-        <div class="rubric-mark">Mark: <?php echo $mark_value?></div>
+        <div class="rubric-mark"><?php __('Mark')?>: <?php echo $mark_value?></div>
       <?php endif; ?>
     </td>
     <?php endforeach ?>
@@ -71,9 +71,9 @@ isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = nu
   <?php endif; ?>
   <tr>
 	<?php if (!$evaluate): ?>
- 		<td colspan="<?php echo $LOM_num+1?>" align="right">Total Marks: <?php echo $data['Rubric']['total_marks']?></td>
+ 		<td colspan="<?php echo $LOM_num+1?>" align="right"><?php __('Total Marks')?>: <?php echo $data['Rubric']['total_marks']?></td>
 	<?php else: ?>
-    <td colspan="<?php echo $LOM_num+2?>" align="center" class="tableheader2">General Comments<br>
+    <td colspan="<?php echo $LOM_num+2?>" align="center" class="tableheader2"><?php __('General Comments')?><br>
     <textarea cols="80" rows="2" name="<?php echo $userId?>gen_comment" >
       <?php echo (isset($evaluation) ? $evaluation['EvaluationRubric']['general_comment'] : '')?>
   	</textarea></td>

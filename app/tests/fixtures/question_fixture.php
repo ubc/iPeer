@@ -13,7 +13,7 @@ class QuestionFixture extends CakeTestFixture {
   		array('id' => 3, 'prompt' => 'First Question', 'type' => 'M'),
   		array('id' => 4, 'prompt' => 'Second Question', 'type' => 'M'),
   		array('id' => 5, 'prompt' => 'Third Question', 'type' => 'M'),
-  		array('id' => 6, 'prompt' => 'Did u like the prof ?', 'type' => 'M')
+  		array('id' => 6, 'prompt' => 'Did u like the prof ?', 'type' => 'A')
   	);
 }
 

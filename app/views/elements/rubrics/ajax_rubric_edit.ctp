@@ -19,18 +19,18 @@ $default_options = array('type' => 'text',
 
 <table class="form-table">
 <tr class="tableheader" align="center">
-  <td valign="top">Rubric Preview</td>
+  <td valign="top"><?php __('Rubric Preview')?></td>
 
 	<?php for($i = 0; $i < $LOM_num; $i++): ?>
 	<td align="left">
-    <div>Level of Mastery <?php echo $i+1?></div>
+    <div><?php __('Level of Mastery')?> <?php echo $i+1?></div>
     <div><?php echo $this->Form->input('RubricsLom.'.$i.'.lom_comment', $default_options)?></div>
     <?php echo $this->Form->input('RubricsLom.'.$i.'.id', array('type' => 'hidden'))?>
     <?php echo $this->Form->input('RubricsLom.'.$i.'.lom_num', array('type' => 'hidden', 'value' => $i+1))?>
   </td>
 	<?php endfor;?>
 
-	<td>Criteria Weight</td>
+	<td><?php __('Criteria Weight')?></td>
 </tr>
 
 <!-- // horizontal template type -->
@@ -39,7 +39,7 @@ $default_options = array('type' => 'text',
 <?php for($i = 0; $i < $criteria_num; $i++): ?>
 <tr class="tablecell" align="center">
 	<td class="tableheader2" valign="top" align="left">
-    <?php if(!$readonly):?><div>Criteria <?php echo $i+1?></div><?php endif;?>
+    <?php if(!$readonly):?><div><?php __('Criteria')?> <?php echo $i+1?></div><?php endif;?>
     <div><?php echo $this->Form->input('RubricsCriteria.'.$i.'.criteria', $default_options)?>
          <?php echo $this->Form->input('RubricsCriteria.'.$i.'.id', array('type' => 'hidden'))?>
          <?php echo $this->Form->input('RubricsCriteria.'.$i.'.criteria_num', array('type' => 'hidden', 'value' => $i+1))?>
@@ -48,7 +48,7 @@ $default_options = array('type' => 'text',
 
 	<?php for($j=0; $j<$LOM_num; $j++):?>
 	<td align="left">
-    <?php if(!$readonly):?><div>Specific Comment</div><?php endif;?>
+    <?php if(!$readonly):?><div><?php __('Specific Comment')?></div><?php endif;?>
     <div><?php echo $this->Form->input('RubricsCriteria.'.$i.'.RubricsCriteriaComment.'.$j.'.criteria_comment', $default_options)?></div>
     <?php echo $this->Form->input('RubricsCriteria.'.$i.'.RubricsCriteriaComment.'.$j.'.id', array('type' => 'hidden'))?>
     <div>Mark: <?php echo $this->Form->text('criteria_mark_'.$i.'_'.$j, array('size' =>3,
@@ -74,7 +74,7 @@ $default_options = array('type' => 'text',
 <?php endif; ?>
 
 <tr class="tableheader2">
-	<td colspan="<?php echo $LOM_num+1?>" align=right>Total Marks: </td>
+	<td colspan="<?php echo $LOM_num+1?>" align=right><?php __('Total Marks')?>: </td>
  	<td><input type="text" name="total_marks" id="total" class="input" size="5" readonly></td>
 </tr>
 </table>
