@@ -445,7 +445,7 @@ class EvaluationMixevalHelperComponent extends Object
 		if ($displayFormat == 'Detail') {
 		  $mixevalQuestion = $this->MixevalsQuestion->getQuestion($mixeval['Mixeval']['id']);
 		  foreach ($mixevalQuestion AS $row) {
-        $row['MixevalsQuestion']['Description'] = $this->MixevalsQuestionDesc->getQuestionDescriptor($row['MixevalsQuestion']['id']);
+        $row['MixevalsQuestion']['Description'] = $this->MixevalsQuestionDesc->getQuestionDescriptor($mixeval['Mixeval']['id'], $row['MixevalsQuestion']['question_num']);
         $question = $row['MixevalsQuestion'];
         $result['mixevalQuestion'][$question['question_num']] = $question;
       }
