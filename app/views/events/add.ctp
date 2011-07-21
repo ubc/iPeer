@@ -10,7 +10,7 @@
       <input type="hidden" name="assigned" id="assigned" />
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
-  <td colspan="3" align="center"><?php echo empty($params['data']['Event']['id'])?'Add':'Edit' ?><?php __(' Evaluation Event')?></td>
+  <td colspan="3" align="center"><?php echo empty($params['data']['Event']['id'])?__('Add'):__('Edit') ?><?php __(' Evaluation Event')?></td>
   </tr>
   <tr class="tablecell2">
   	<td id="newtitle_label"><?php __('Event Title')?>:&nbsp;<font color="red">*</font></td>
@@ -113,14 +113,14 @@
   </tr>
   <tr class="tablecell2">
     <td><?php __('Due Date')?>:&nbsp;<font color="red">*</font></td>
-    <td><?php echo $form->input('Event.due_date', array('div'=>false, 'label'=> __('Due Date :', true), 'type'=>'text', 'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;
+    <td><?php echo $form->input('Event.due_date', array('div'=>false, 'label'=>false, 'type'=>'text', 'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;
 		    <a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
        <?php echo $form->error('Event.due_date', __('Please enter a valid date.', true))?>
 		</td>
     <td><?php __('eg. YYYY-MM-DD HH:MM:SS (24 HOUR)')?></td>
   </tr>
   <tr class="tablecell2">
-    <td><?php __('Release Date:')?>&nbsp;<font color="red">*</font></td>
+    <td><?php __('Evaluation Release Date:')?>&nbsp;<font color="red">*</font></td>
   	<td id="release_date_begin">
   	  <table width="100%"><tr align="left">
 				<td width="90%">
@@ -132,6 +132,25 @@
       	<td width="90%">
       		<?php echo $form->input('Event.release_date_end', array('div'=>false, 'label'=> __('To :', true), 'type'=>'text', 'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal3.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
           <?php echo $form->error('Event.release_date_end', __('Please enter a valid date.', true))?>
+      	</td>
+  	  </tr></table>
+  	</td>
+  	<td>
+  	</td>
+  </tr>
+  <tr class="tablecell2">
+    <td><?php __('Result Release Date:')?>&nbsp;<font color="red">*</font></td>
+  	<td id="result_release_date_begin">
+  	  <table width="100%"><tr align="left">
+				<td width="90%">
+      	  <?php echo $form->input('Event.result_release_date_begin', array('div'=>false, 'label'=>'From :' ,'type'=>'text',  'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal4.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+          <?php echo $form->error('Event.result_release_date_begin', __('Please enter a valid date.', true))?>
+      	</td>
+      </tr>
+      <tr>
+      	<td width="90%">
+      		<?php echo $form->input('Event.result_release_date_end', array('div'=>false, 'label'=> __('To :', true), 'type'=>'text', 'size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal5.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+          <?php echo $form->error('Event.result_release_date_end', __('Please enter a valid date.', true))?>
       	</td>
   	  </tr></table>
   	</td>
@@ -177,5 +196,13 @@ cal2.time_comp = true;
 var cal3 = new calendar1(document.forms[0].elements['data[Event][release_date_end]']);
 cal3.year_scroll = false;
 cal3.time_comp = true;
+
+var cal4 = new calendar1(document.forms[0].elements['data[Event][result_release_date_begin]']);
+cal4.year_scroll = false;
+cal4.time_comp = true;
+
+var cal5 = new calendar1(document.forms[0].elements['data[Event][result_release_date_end]']);
+cal5.year_scroll = false;
+cal5.time_comp = true;
 
 </script>

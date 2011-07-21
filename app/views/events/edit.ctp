@@ -155,7 +155,7 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
     <td><?php __('eg. YYYY-MM-DD HH:MM:SS (24 HOUR)')?></td>
   </tr>
   <tr class="tablecell2">
-    <td><?php __('Release Date')?>:&nbsp;<font color="red">*</font></td>
+    <td><?php __('Evaluation Release Date')?>:&nbsp;<font color="red">*</font></td>
   	<td id="release_date_begin">
   	  <table width="100%"><tr align="left">
 				<td width="10%"><?php __('FROM:')?></td>
@@ -167,6 +167,25 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
       	<td width="10%"><?php __('TO:')?></td>
       	<td width="90%">
       		<?php echo $form->input('Event.release_date_end', array('size'=>'50','class'=>'input', 'format'=>array('input'),  'type'=>'text','style'=>'width:75%;', 'value'=>$this->data['Event']['release_date_end'])) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal3.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+      	</td>
+  	  </tr></table>
+  	</td>
+  	<td>
+  	</td>
+  </tr>
+  <tr class="tablecell2">
+    <td><?php __('Result Release Date')?>:&nbsp;<font color="red">*</font></td>
+  	<td id="release_date_begin">
+  	  <table width="100%"><tr align="left">
+				<td width="10%"><?php __('FROM:')?></td>
+				<td width="90%">
+      		<?php echo $form->input('Event.result_release_date_begin', array('size'=>'50','class'=>'input', 'format'=>array('input'), 'type'=>'text','style'=>'width:75%;', 'value'=>$this->data['Event']['result_release_date_begin'])) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal4.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+      	</td>
+      </tr>
+      <tr>
+      	<td width="10%"><?php __('TO:')?></td>
+      	<td width="90%">
+      		<?php echo $form->input('Event.result_release_date_end', array('size'=>'50','class'=>'input', 'format'=>array('input'),  'type'=>'text','style'=>'width:75%;', 'value'=>$this->data['Event']['result_release_date_end'])) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal5.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
       	</td>
   	  </tr></table>
   	</td>
@@ -216,4 +235,13 @@ cal2.time_comp = true;
 var cal3 = new calendar1(document.forms[0].elements['data[Event][release_date_end]']);
 cal3.year_scroll = false;
 cal3.time_comp = true;
+
+var cal4 = new calendar1(document.forms[0].elements['data[Event][result_release_date_begin]']);
+cal4.year_scroll = false;
+cal4.time_comp = true;
+
+var cal5 = new calendar1(document.forms[0].elements['data[Event][result_release_date_end]']);
+cal5.year_scroll = false;
+cal5.time_comp = true;
+
 </script>

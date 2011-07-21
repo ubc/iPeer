@@ -79,7 +79,7 @@
     <td></td>
   </tr>
   <tr class="tablecell2">
-    <td><?php __('Release Date:')?>&nbsp;<font color="red">*</font></td>
+    <td><?php __('Evaluation Release Date:')?>&nbsp;<font color="red">*</font></td>
   	<td id="release_date_begin">
   	  <table width="100%"><tr align="left">
 				<td width="10%"><?php __('FROM:')?></td>
@@ -91,6 +91,25 @@
       	<td width="10%"><?php __('TO:')?></td>
       	<td width="90%">
 				  <?php echo Toolkit::formatDate($event['Event']['release_date_end']) ?>
+      	</td>
+  	  </tr></table>
+  	</td>
+  	<td>
+  	</td>
+  </tr>
+  <tr class="tablecell2">
+    <td><?php __('Result Release Date:')?>&nbsp;<font color="red">*</font></td>
+  	<td id="result_release_date_begin">
+  	  <table width="100%"><tr align="left">
+				<td width="10%"><?php __('FROM:')?></td>
+				<td width="90%">
+				  <?php echo Toolkit::formatDate($event['Event']['result_release_date_begin']) ?>
+      	</td>
+      </tr>
+      <tr>
+      	<td width="10%"><?php __('TO:')?></td>
+      	<td width="90%">
+				  <?php echo Toolkit::formatDate($event['Event']['result_release_date_end']) ?>
       	</td>
   	  </tr></table>
   	</td>

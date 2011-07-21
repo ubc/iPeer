@@ -824,53 +824,61 @@ function makeSurveyEvaluation ($param = null) {
 
       //Get Group Event
       $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($event['Event']['id'], $event['group_id']);
-      
-      switch ($event['Event']['event_template_type_id'])
-      {
-          case 1: //View Simple Evaluation Result
-              $studentResult = $this->Evaluation->formatStudentViewOfSimpleEvaluationResult($event);
-              $this->set('studentResult', $studentResult);
-              $this->render('student_view_simple_evaluation_results');
-              break;
+      $currentDate = strtotime('NOW');
 
-          case 2: //View Rubric Evaluation Result
-              $formattedResult = $this->Evaluation->formatRubricEvaluationResult($event, 'Detail', 1, $currentUser);
-              $this->set('rubric', $formattedResult['rubric']);
-              if (isset($formattedResult['groupMembers'])) $this->set('groupMembers', $formattedResult['groupMembers']);
-              if (isset($formattedResult['reviewEvaluations'])) $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);
-              if (isset($formattedResult['rubric']['RubricsCriteria'])) $this->set('rubricCriteria', $formattedResult['rubric']['RubricsCriteria']);
-              $this->set('allMembersCompleted', $formattedResult['allMembersCompleted']);
-              $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
-              $this->set('scoreRecords', $formattedResult['scoreRecords']);
-              $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
-              $this->set('evalResult', $formattedResult['evalResult']);
-              $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
-              $this->render('student_view_rubric_evaluation_results');
-              break;
+      //Check if event is in range of result release date
+      if($currentDate>=strtotime($event['Event']['result_release_date_begin'])&&$currentDate<strtotime($event['Event']['result_release_date_end'])){
+        switch ($event['Event']['event_template_type_id'])
+        {
+            case 1: //View Simple Evaluation Result
+                $studentResult = $this->Evaluation->formatStudentViewOfSimpleEvaluationResult($event);
+                $this->set('studentResult', $studentResult);
+                $this->render('student_view_simple_evaluation_results');
+                break;
 
-          case 3: //View Survey Result
-              $formattedResult = $this->Evaluation->formatSurveyEvaluationResult($event);
-              $this->set('survey_id', $result['survey_id']);
-              $this->set('answers', $result['answers']);
-              $this->set('questions', $result['questions']);
-              $this->set('event', $result['event']);
-              $this->render('student_view_survey_evaluation_results');
-              break;
+            case 2: //View Rubric Evaluation Result
+                $formattedResult = $this->Evaluation->formatRubricEvaluationResult($event, 'Detail', 1, $currentUser);
+                $this->set('rubric', $formattedResult['rubric']);
+                if (isset($formattedResult['groupMembers'])) $this->set('groupMembers', $formattedResult['groupMembers']);
+                if (isset($formattedResult['reviewEvaluations'])) $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);
+                if (isset($formattedResult['rubric']['RubricsCriteria'])) $this->set('rubricCriteria', $formattedResult['rubric']['RubricsCriteria']);
+                $this->set('allMembersCompleted', $formattedResult['allMembersCompleted']);
+                $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
+                $this->set('scoreRecords', $formattedResult['scoreRecords']);
+                $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
+                $this->set('evalResult', $formattedResult['evalResult']);
+                $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
+                $this->render('student_view_rubric_evaluation_results');
+                break;
 
-          case 4: //View Mix Evaluation Result
-              $formattedResult = $this->Evaluation->formatMixevalEvaluationResult($event, 'Detail', 1);
-              $this->set('mixeval', $formattedResult['mixeval']);
-              if (isset($formattedResult['groupMembers'])) $this->set('groupMembers', $formattedResult['groupMembers']);
-              if (isset($formattedResult['reviewEvaluations'])) $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);
-              if (isset($formattedResult['mixevalQuestion'])) $this->set('mixevalQuestion', $formattedResult['mixevalQuestion']);
-              $this->set('allMembersCompleted', $formattedResult['allMembersCompleted']);
-              $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
-              $this->set('scoreRecords', $formattedResult['scoreRecords']);
-              $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
-              $this->set('evalResult', $formattedResult['evalResult']);
+            case 3: //View Survey Result
+                $formattedResult = $this->Evaluation->formatSurveyEvaluationResult($event);
+                $this->set('survey_id', $result['survey_id']);
+                $this->set('answers', $result['answers']);
+                $this->set('questions', $result['questions']);
+                $this->set('event', $result['event']);
+                $this->render('student_view_survey_evaluation_results');
+                break;
 
-              $this->render('student_view_mixeval_evaluation_results');
-              break;
+            case 4: //View Mix Evaluation Result
+                $formattedResult = $this->Evaluation->formatMixevalEvaluationResult($event, 'Detail', 1);
+                $this->set('mixeval', $formattedResult['mixeval']);
+                if (isset($formattedResult['groupMembers'])) $this->set('groupMembers', $formattedResult['groupMembers']);
+                if (isset($formattedResult['reviewEvaluations'])) $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);
+                if (isset($formattedResult['mixevalQuestion'])) $this->set('mixevalQuestion', $formattedResult['mixevalQuestion']);
+                $this->set('allMembersCompleted', $formattedResult['allMembersCompleted']);
+                $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
+                $this->set('scoreRecords', $formattedResult['scoreRecords']);
+                $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
+                $this->set('evalResult', $formattedResult['evalResult']);
+
+                $this->render('student_view_mixeval_evaluation_results');
+                break;
+        }
+      }
+      else{//If current date is not in result release date range
+        $this->Session->setFlash('The result is not released');
+        $this->redirect('/home/index/');
       }
   }
 

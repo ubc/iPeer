@@ -713,7 +713,9 @@ class EvaluationComponent extends Object
         }
       } else {
         foreach ($groupMembers as $user) {
-          $matrix[$index][$user['User']['id']] = 'n/a';
+          if(isset($user['User']))
+            $user = $user['User'];
+          $matrix[$index][$user['id']] = 'n/a';
         }
       }
       //Get Ave Criteria Grade
@@ -808,10 +810,10 @@ class EvaluationComponent extends Object
       $this->User->id = $this->Auth->user('id');
       $this->User->recursive = -1;
       $user = $this->User->read();
-      $rubricResultDetail = $this->getRubricResultDetail($event, $user);
+      //$rubricResultDetail = $this->getRubricResultDetail($event, $user);
       $groupMembers = $this->GroupsMembers->getEventGroupMembers(
         $event['group_id'], $event['Event']['self_eval'],$currentUser['id']);
-
+      $rubricResultDetail = $this->getRubricResultDetail($event, $groupMembers);
       $membersAry = array();
       foreach ($groupMembers as $member) {
         $membersAry[$member['User']['id']] = $member;
@@ -1136,7 +1138,8 @@ class EvaluationComponent extends Object
         }
       }	else {
         foreach ($groupMembers as $user) {
-          $user = $user['User'];
+          if(isset($user['User']))
+            $user = $user['User'];
           if (!empty($user)) {
             // The array's format varries. Sometime a sub-array [0] is present
             $id = !empty($user['id']) ? $user['id'] : $user['User']['id'];
@@ -1240,6 +1243,7 @@ class EvaluationComponent extends Object
 
      $this->User->id = $this->Auth->user('id');
 
+     $this->User->recursive = -1;
      $user = $this->User->read();
      $mixevalResultDetail = $this->getMixevalResultDetail($event, $user);
      $groupMembers = $this->GroupsMembers->getEventGroupMembers(
