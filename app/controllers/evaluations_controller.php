@@ -877,7 +877,7 @@ function makeSurveyEvaluation ($param = null) {
         }
       }
       else{//If current date is not in result release date range
-        $this->Session->setFlash('The result is not released');
+        $this->Session->setFlash(__('The result is not released',true));
         $this->redirect('/home/index/');
       }
   }

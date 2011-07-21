@@ -15,12 +15,11 @@
 			<td width="20%"><?php __('Due Date')?> </td>
 			<td width="20%"><?php __('Due In/Late By (red)')?> </td>
 		  </tr>	  
-  	<?php $i = '0';?>
+  	<?php $i = '0';$currentDate = strtotime('NOW');?>
 	  <?php
 	  foreach($data as $row): isset($row['comingEvent'])? $comingUpEvent = $row['comingEvent']: $comingUpEvent = null;
 	 if(!empty($row['comingEvent']['Event']['release_date_end'])) { 
-	 	$releaseEndDate = strtotime( $row['comingEvent']['Event']['release_date_end']);}	    
-	  $currentDate = strtotime('NOW');
+	 	$releaseEndDate = strtotime( $row['comingEvent']['Event']['release_date_end']);}  
 	    if (isset($comingUpEvent['Event']['id']) && $currentDate<=$releaseEndDate && !isset($row['eventSubmitted'])) {?>
 		  <tr class="tablecell">
 			<td>
@@ -77,30 +76,50 @@
       <table width="95%"  border="0" align="center" cellpadding="4" cellspacing="2">
 		  <tr class="tableheader">
 			<td width="40%"><?php __('Event')?></td>
-			<td width="20%"><?php __('Course')?></td>
+			<td width="10%"><?php __('Course')?></td>
+                        <td width="10%"><?php __('Result')?></td>
 			<td width="20%"><?php __('Due Date')?></td>
 			<td width="20%"><?php __('Date Submitted')?></td>
 		  </tr>
   	<?php $i = 0;?>
 	  <?php
 	  foreach($data as $row): isset($row['eventSubmitted'])? $eventSubmitted = $row['eventSubmitted']: $eventSubmitted =null;
-	    if (isset($eventSubmitted['Event']['id'])) {?>
+	    if (isset($eventSubmitted['Event']['id'])&&$eventSubmitted['Event']['event_template_type_id'] != 3) {
+              $isResultReleased = ($currentDate>=strtotime($eventSubmitted['Event']['result_release_date_begin'])&&$currentDate<strtotime($eventSubmitted['Event']['result_release_date_end']))
+          ?>
 		  <tr class="tablecell">
 			<td>
-			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 1):?>
+			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 1): 
+                            if ($isResultReleased):?>
 			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/studentViewEvaluationResult/<?php echo $eventSubmitted['Event']['id']?>;<?php echo $eventSubmitted['Event']['group_id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
-			  <?php endif;?>
-			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 2):?>
+			  <?php
+                            else:
+                              echo $eventSubmitted['Event']['title'];
+                          endif;endif;?>
+			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 2):
+                            if ($isResultReleased):?>
 			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/studentViewEvaluationResult/<?php echo $eventSubmitted['Event']['id']?>;<?php echo $eventSubmitted['Event']['group_id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
-			  <?php endif;?>
-			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 3):?>
+			  <?php
+                            else:
+                              echo $eventSubmitted['Event']['title'];
+                          endif; endif;?>
+			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 3):
+                            if ($isResultReleased):?>
 			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/makeSurveyEvaluation/<?php echo $eventSubmitted['Event']['id']?>"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
-			  <?php endif;?>
-			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 4):?>
+			  <?php
+                            else:
+                              echo $eventSubmitted['Event']['title'];
+                          endif; endif;?>
+			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 4):
+                            if ($isResultReleased):?>
 			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/studentViewEvaluationResult/<?php echo $eventSubmitted['Event']['id']?>;<?php echo $eventSubmitted['Event']['group_id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
-			  <?php endif;?>
+			  <?php
+                            else:
+                              echo $eventSubmitted['Event']['title'];
+                          endif; endif;?>
 			</td>
 			<td><?php echo $eventSubmitted['Event']['course'] ?>&nbsp;</td>
+                        <td><?php $isResultReleased ? __('Released'): __('Not Released'); ?></td>
 			<td><?php 
 				$due_date = $eventSubmitted['Event']['due_date'];
 				//var_dump($eventSubmitted['Event']['due_date']);
