@@ -13,10 +13,10 @@
     <td>
         <table width="95%" align="center" cellpadding="4" cellspacing="2">
           <tr class="tableheader">
-            <td align="center">Teams Summary</td>
+            <td align="center"><?php __('Teams Summary')?></td>
           </tr>
           <tr class="tablecell2">
-            <td>Click on any user name to view their answers to this survey. To adjust weightings and create a new set of teams, just go <a href="javascript:history.go(-1);">back</a>.<br/><br/>To edit these teams, first save them below.<br/><br/><b>Note:</b> Higher 'Match Score' is better. <br/><br/>
+            <td><?php __('Click on any user name to view their answers to this survey. To adjust weightings and create a new set of teams, just go ')?><a href="javascript:history.go(-1);"><?php __('back')?></a>.<br/><br/><?php __('To edit these teams, first save them below.')?><br/><br/><b><?php __('Note:')?></b> <?php __("Higher 'Match Score' is better.")?> <br/><br/>
 
             <table style="border-collapse:collapse;border-top:hidden;">
             <tr>
@@ -24,8 +24,8 @@
       			<?php for ($j=0; $j < (count($scores[0])-2); $j++):?>
     			    <th width="40"><?php echo $this->Html->link('Q'.($j+1), 'evaluations/viewSurveySummary/'.$survey_id, array('onClick' => "wopen(this.href, \'popup\', 650, 500); return false;"))?></th>
             <?php endfor;?>
-      			  <th>Match Score</th>
-              <th colspan="400">Team Members</th>
+      			  <th><?php __('Match Score')?></th>
+              <th colspan="400"><?php __('Team Members')?></th>
             </tr>
 
             <?php for ($i=0; $i < count($teams); $i++):?>
@@ -49,11 +49,11 @@
       			</td>
           </tr>
 
-          <tr class="tablecell2"><td><?php echo $this->Form->input('team_set_name', array('label' => 'Group Set Name: '))?></td></tr>
+          <tr class="tablecell2"><td><?php echo $this->Form->input('team_set_name', array('label' => __('Group Set Name: ', true)))?></td></tr>
 
           <tr class="tablecell2">
             <td><div align="center">
-              <?php echo $this->Form->submit('Save Groups', array('div' => false)) ?> 
+              <?php echo $this->Form->submit(__('Save Groups', true), array('div' => false)) ?> 
               <input type="button" name="Cancel" value="Cancel" onClick="javascript:history.go(-1);" />
 	      		</div></td>
           </tr>

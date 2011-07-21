@@ -5,7 +5,7 @@
 <tr>
 <td>
 <b><?php
-echo empty($data['SysParameter']['id'])?'Add':'Edit' ?> Sys Parameters</b>
+echo empty($data['SysParameter']['id'])?'Add':'Edit' ?> <?php __('Sys Parameters')?></b>
 
 
     <?php    
@@ -23,17 +23,17 @@ echo empty($data['SysParameter']['id'])?'Add':'Edit' ?> Sys Parameters</b>
 	<td width="663" id="id_msg" class="error"/>
 </tr>
 <tr>
-	<td width="130" id="parameter_code_label">Parameter Code:</td>
+	<td width="130" id="parameter_code_label"><?php __('Parameter Code')?>:</td>
 	<td width="337" align="left"><?php echo $form->input('SysParameter.parameter_code', array('id'=>'function_name', 'type'=>'text', 'label'=>false, 'size'=>'50', 'class'=>'validate required TEXT_FORMAT parameter_code_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
 	<td width="663" id="parameter_code_msg" class="error"/>
 </tr>
 <tr>
-	<td width="130" id="parameter_value_label">Parameter Value:</td>
+	<td width="130" id="parameter_value_label"><?php __('Parameter Value')?>:</td>
 	<td width="337" align="left"><?php echo $form->input('SysParameter.parameter_value', array('id'=>'parameter_value', 'size'=>'50', 'type'=>'text', 'label'=>false, 'class'=>'validate required TEXT_FORMAT parameter_value_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
 	<td width="663" id="parameter_value_msg" class="error"/>
 </tr>
 <tr>
-	<td width="130" id="parameter_type_label">Paramenter Type:</td>
+	<td width="130" id="parameter_type_label"><?php __('Paramenter Type')?>:</td>
 	<td align="left"><?php
 	  $types = array('S'=>'String','I'=>'Integer', 'B'=>'Boolean');
 		echo $form->select('SysParameter.parameter_type', $types, $html->value('SysParameter.parameter_type'));
@@ -42,7 +42,7 @@ echo empty($data['SysParameter']['id'])?'Add':'Edit' ?> Sys Parameters</b>
 	<td width="663" id="parameter_type_msg" class="error"/>
 </tr>
 <tr>
-	<td width="130" id="description_label">Description:</td>
+	<td width="130" id="description_label"><?php __('Description')?>:</td>
 	<td align="left"><?php echo $form->input('SysParameter.description', array('id'=>'description', 'size'=>'50', 'type'=>'text', 'label'=>false, 'class'=>'validate none TEXT_FORMAT description_msg Invalid_Text._At_Least_One_Word_Is_Required.')) ?>
 	</td>
 	<td width="663" id="description_msg" class="error"/>
@@ -50,14 +50,14 @@ echo empty($data['SysParameter']['id'])?'Add':'Edit' ?> Sys Parameters</b>
 <tr>
   <td colspan="3" align="left">
   <br />
-  * &nbsp;&nbsp;<strong>id</strong> of sys_parameters table are manually assigned and grouped by module as follow:<br/>
+  * &nbsp;&nbsp;<strong><?php __('id</strong> of sys_parameters table are manually assigned and grouped by module as follow')?>:<br/>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1000 &nbsp; 	system<br/>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2000 &nbsp; 	display<br/>
   </td>
 </tr>
 </table>
 <p>
-	<?php echo $form->submit('Save') ?><?php echo $html->link('Back', '/sysparameters'); ?>
+	<?php echo $form->submit(__('Save'), true) ?><?php echo $html->link(__('Back', true), '/sysparameters'); ?>
 </p>
 </form>
 </td>

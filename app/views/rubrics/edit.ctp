@@ -34,7 +34,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
                                                      'label' => 'Level of Mastery:',
                                                      'style'=>'width:50px;',
                                                      'disabled' => $readonly));?>
-      <td>aka LOM, Evaluation Range (Max 10)</td>
+      <td><?php __('aka LOM, Evaluation Range (Max 10)')?></td>
     </tr>
 
     <tr class="tablecell2">
@@ -44,11 +44,11 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
                                                       'label' => 'Number of Criteria:',
                                                       'style'=>'width:50px;',
                                                       'disabled' => $readonly));?>
-      <td>Number of Evaluation Aspects (Max 25)</td>
+      <td><?php __('Number of Evaluation Aspects (Max 25)')?></td>
     </tr>
 
     <tr class="tablecell2">
-      <td>Availability:</td>
+      <td><?php __('Availability')?>:</td>
       <?php echo $this->Form->input('availability', array('id' => 'availability',
                                                           'type' => 'radio',
                                                           'legend' => false,
@@ -59,17 +59,17 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
                                                           'between' => '',
                                                           'separator' => '&nbsp;',
                                                           'disabled' => $readonly));?>
-      <td>Public Allows Rubric Sharing Amongst Instructors</td>
+      <td><?php __('Public Allows Rubric Sharing Amongst Instructors')?></td>
     </tr>
 
     <tr class="tablecell2">
-      <td>Zero Mark</td>
+      <td><?php __('Zero Mark')?></td>
       <td>
       <?php echo $this->Form->checkbox('zero_mark', array('id' => 'zero_mark', 'class'=>'self_enroll',
                                                        'size' => 50,
                                                        'disabled' => $readonly));?>
       </td>
-      <td>No Marks Given for Level of Mastery of 1</td>
+      <td><?php __('No Marks Given for Level of Mastery of 1')?></td>
     </tr>
 
     <?php if('view' == $this->action):?>
@@ -108,7 +108,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 
 <?php if(!empty($data)):?>
 <div class='title'>
-  <span class="text"><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> Rubric Preview</span>
+  <span class="text"><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> <?php __('Rubric Preview<')?>/span>
 	<span class="controls"><a href="#rpreview" onclick="$('rpreview').toggle(); toggle1(this);"><?php echo empty($this->data) ? '[-]' : '[-]'; ?></a></span>
 </div>
 

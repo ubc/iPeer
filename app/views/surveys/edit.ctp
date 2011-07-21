@@ -17,7 +17,7 @@
 
 	  <table width="95%"  border="0" align="center" cellpadding="4" cellspacing="2">
         <tr class="tableheader">
-          <td colspan="3" align="center"><?php echo ucfirst($this->action)?> Survey </td>
+          <td colspan="3" align="center"><?php echo ucfirst($this->action)?> <?php __('Survey')?> </td>
           </tr>
         <tr class="tablecell2">
         <?php echo $this->Form->input('name', array('size'=>'50', 'class'=>'input',
@@ -30,12 +30,12 @@
               ?>
             </div>
             <?php //echo $ajax->observeField('name', array('update'=>'surveyErr', 'url'=>"/surveys/checkDuplicateName", 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');stripe();")) ?> </td>
-          <td width="35%"> i.e. "CS100 Experience" </td>
+          <td width="35%"> <?php __('i.e. "CS100 Experience"')?> </td>
         </tr>
 
         <?php if('add' == $this->action):?>
         <tr class="tablecell2">
-        <?php echo $this->Form->input('template_id', array('empty' => '(No Template)'))?>
+        <?php echo $this->Form->input('template_id', array('empty' => __('(No Template)', true)))?>
         <td>&nbsp;</td>
         </tr>
         <?php elseif('copy' == $this->action):?>
@@ -48,9 +48,9 @@
           <td>&nbsp;</td>
         </tr>
         <tr class="tablecell2">
-        <td><?php echo 'Due Date:<font color="red">*</font>'?></td>
+        <td><?php echo __('Due Date', true).':<font color="red">*</font>'?></td>
         <td><?php echo $form->input('Survey.due_date', array('div'=>false, 
-        														'label'=>'From :',
+        														'label'=>__('From :', true),
         														'type'=>'text',
         	  													'size'=>'50',
         														'format'=>array('input'),
@@ -59,14 +59,14 @@
 				<a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');">
 				<?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a></td>
           <!--<td><?php //echo $html->input('Survey/due_date', array('size'=>'25','class'=>'input')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a></td>-->
-          <td> eg. YYYY-MM-DD HH:MM (24 HOUR) </td>
+          <td> <?php __('eg. YYYY-MM-DD HH:MM (24 HOUR)')?> </td>
         </tr>
 		
         <tr class="tablecell2">
-        <td><?php echo 'Release Date:<font color="red">*</font>' ?>
-        <td><?php echo 'From :'?>
+        <td><?php echo __('Release Date', true).':<font color="red">*</font>' ?>
+        <td><?php echo __('From :', true)?>
         	<?php echo $form->input('Survey.release_date_begin', array('div'=>false, 
-        														'label'=>'From :',
+        														'label'=>__('From :', true),
         														'type'=>'text',
         	  													'size'=>'50',
         														'format'=>array('input'),
@@ -77,7 +77,7 @@
 		    
 		<br><?php echo 'To :'?>
 	   		<?php echo $form->input('Survey.release_date_end', array('div'=>false, 
-                                                        	'label'=> 'Due Date :',
+                                                        	'label'=> __('Due Date :', true),
         													'format'=> array('input'), 
                                                         	'type'=>'text', 
                                                         	'size'=>'50',
@@ -88,13 +88,13 @@
                                                                	
 		</td>              
           <!--<td><?php //echo $html->input('Survey/due_date', array('size'=>'25','class'=>'input')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a></td>-->
-          <td> eg. YYYY-MM-DD HH:MM (24 HOUR) </td>
+          <td><?php __(' eg. YYYY-MM-DD HH:MM (24 HOUR) ')?></td>
         </tr>
 	
         <tr class="tablecell2">
           <td colspan="3" align="center">
         <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
-        <?php echo $this->Form->submit(ucfirst($this->action).' Survey', array('div' => false))?></td>
+        <?php echo $this->Form->submit(ucfirst($this->action).__(' Survey', true), array('div' => false))?></td>
           </tr>
 		  </td>
           </tr>

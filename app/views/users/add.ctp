@@ -1,5 +1,5 @@
 <?php $readonly = isset($readonly) ? $readonly : false;?>
-<?php $username_msg = $readonly ? '' : '<br /><u>Remember:</u> Usernames must be at least 6 characters long and contain only:<li>letters and numbers</li>';?>
+<?php $username_msg = $readonly ? '' : __('<br /><u>Remember:</u> Usernames must be at least 6 characters long and contain only:<li>letters and numbers</li>', true);?>
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>
@@ -12,7 +12,7 @@
                                                                   'between' => '</td><td>')))?>
       <input type="hidden" name="required" id="required" value="username" />
       <table width="75%" border="0" align="center" cellpadding="4" cellspacing="2">
-        <tr class="tableheader"><td colspan="3" align="center"><?php echo ucfirst($this->action)?> User</td></tr>
+        <tr class="tableheader"><td colspan="3" align="center"><?php echo ucfirst($this->action)?> <?php __('User')?></td></tr>
 
         <!-- User Name -->
         <tr class="tablecell2">
@@ -26,28 +26,28 @@
         <?php if(!$readonly && !$isEdit):?>
         <!-- Password -->
           <tr class="tablecell2"><td  colspan="3">
-          A password will be automatically generated, and shown on the next page, after you click "Save".<br />
-          <strong>Note:</strong> If using CWL logons, students should use CWL username/password for iPeer, instead of the generated one.
+          <?php __('A password will be automatically generated, and shown on the next page, after you click "Save".')?><br />
+          <strong><?php __('Note:</strong> If using CWL logons, students should use CWL username/password for iPeer, instead of the generated one.')?>
           </td></tr>        
         <!-- Email Notification -->
         <tr class="tablecell2">
-            <td>Send Email Notification?</td>
+            <td><?php __('Send Email Notification?')?></td>
             <td><?php echo $this->Form->input('send_email_notification', array('type'=>'checkbox','label'=>false,'format' => array('input'))) ?></td>
-            <td>If checked, send a notification email to user include username, password and instruction</td>
+            <td><?php __('If checked, send a notification email to user include username, password and instruction')?></td>
         </tr>
         <?php endif;?>
 
         <!-- First Name -->
         <tr class="tablecell2">
             <?php echo $this->Form->input('first_name', array('size'=>'50', 'class'=>'validate none TEXT_FORMAT first_name_msg Invalid_Text._At_Least_One_Word_Is_Required.',
-                                                              'readonly' => $readonly)) ?>
+                                                              'readonly' => $readonly, 'label'=>__('First Name', true))) ?>
             <td id="first_name_msg" class="error">&nbsp;</td>
         </tr>
 
         <!-- Last Name -->
         <tr class="tablecell2">
             <?php echo $this->Form->input('last_name', array('size'=>'50', 'class'=>'validate none TEXT_FORMAT last_name_msg Invalid_Text._At_Least_One_Word_Is_Required.',
-                                                             'readonly' => $readonly))?>
+                                                             'readonly' => $readonly, 'label' => __('Last Name', true)))?>
             <td id="last_name_msg" class="error">&nbsp;</td>
         </tr>
 
@@ -55,13 +55,13 @@
         <!-- Email  -->
         <tr class="tablecell2">
             <?php echo $this->Form->input('email', array('size'=>'50', 'class'=>'validate none EMAIL_FORMAT email_msg Invalid_Email_Format.',
-                                                         'after' => '',
+                                                         'after' => '', 'label' => __('Email', true),
                                                          'readonly' => $readonly)) ?>                                          
             <td id="email_msg" class="error">&nbsp;</td>
         </tr>
 
         <tr class="tablecell2">
-          <?php echo $this->Form->input('Role.Role', array('disabled' => $readonly ));?>
+          <?php echo $this->Form->input('Role.Role', array('disabled' => $readonly, 'label' => __('Role', true)));?>
           <?php //echo $this->Form->select('record_status', array('A' => 'Active', 'I' => 'Inactive'), null, array('empty' => false))?>
            <td id="role_msg" class="error">&nbsp;</td>
         </tr>
@@ -92,20 +92,20 @@
         <!-- Title  -->
         <tr class="tablecell2 nonstudent_field" style="display:none;">
           <?php echo $this->Form->input('title', array('size'=>'50', 'class'=>'validate none TEXT_FORMAT title_msg Invalid_Text._At_Least_One_Word_Is_Required.',
-                                                       'readonly' => $readonly)) ?>
+                                                       'readonly' => $readonly, 'label' => __('Title', true))) ?>
           <td id="title_msg" class="error">&nbsp;</td>
         </tr>
 
         <!-- student no-->
         <tr class="tablecell2 student_field" style="display:none;">
           <?php echo $this->Form->input('student_no', array('size'=>'50', 'class'=>'validate none',
-                                                            'readonly' => $readonly)) ?>
+                                                            'readonly' => $readonly, 'label' => __('Student No', true))) ?>
           <td id="student_no_msg" class="error">&nbsp;</td>
         </tr>
         
         <!-- student courses-->
         <?php if ($isStudent) : ?>
-          <tr class="tablecell2"> <td width="130" id="courses_label">This student's<br />Courses:</td>
+          <tr class="tablecell2"> <td width="130" id="courses_label"><?php __("This student's<br />Courses")?>:</td>
           <td colspan=2><?php
             // Render the course list, with check box selections
             echo $this->element("list/checkBoxList", array(
@@ -122,26 +122,26 @@
         <?php if($readonly):?>
         <tr class="tablecell2">
           <?php echo $this->Form->input('creator', array('size'=>'50', 'class'=>'validate none',
-                                                         'readonly' => $readonly)) ?>
+                                                         'readonly' => $readonly, 'label' => __('Creator', true))) ?>
           <td></td>
         </tr>
 
         <tr class="tablecell2">
           <?php echo $this->Form->input('updater', array('size'=>'50', 'class'=>'validate none',
-                                                         'readonly' => $readonly)) ?>
+                                                         'readonly' => $readonly, 'label' => __('Updater', true))) ?>
           <td></td>
         </tr>
 
         <tr class="tablecell2">
           <?php echo $this->Form->input('created', array('type' => 'text',
                                                          'size'=>'50', 'class'=>'validate none',
-                                                         'readonly' => $readonly)) ?>
+                                                         'readonly' => $readonly, 'label' => __('Created', true))) ?>
           <td></td>
         </tr>
         <tr class="tablecell2">
           <?php echo $this->Form->input('modified', array('type' => 'text',
                                                          'size'=>'50', 'class'=>'validate none',
-                                                         'readonly' => $readonly)) ?>
+                                                         'readonly' => $readonly, 'label' => __('Modified', true))) ?>
           <td></td>
         </tr>
         <?php endif;?>
@@ -149,8 +149,8 @@
         <!-- Back / Save -->
         <tr class="tablecell2">
             <td colspan="3" align="center">
-            <input type="button" value="Back" onClick="javascript:window.location='javascript: history.go(-1)'";>
-            <?php if (!$readonly) echo $this->Form->submit('Save', array('div' => false));?>
+            <input type="button" value="<?php __('Back')?>" onClick="javascript:window.location='javascript: history.go(-1)'";>
+            <?php if (!$readonly) echo $this->Form->submit(__('Save', true), array('div' => false));?>
             </td>
         </tr>
         </table>

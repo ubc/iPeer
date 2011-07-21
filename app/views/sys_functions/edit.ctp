@@ -6,7 +6,7 @@
 <tr>
 <td>
 <b><?php
-echo empty($data['SysFunction']['id'])?'Add':'Edit' ?> Sys Functions</b>
+echo empty($data['SysFunction']['id'])?'Add':'Edit' ?><?php __(' Sys Functions')?></b>
 
 
 
@@ -29,45 +29,45 @@ echo empty($data['SysFunction']['id'])?'Add':'Edit' ?> Sys Functions</b>
       <td width="663" id="id_msg" class="error"/>
   </tr>
   <tr>
-      <td width="130" id="function_code_label">Function Code:</td>
+      <td width="130" id="function_code_label"><?php __('Function Code')?>:</td>
       <td width="337" align="right"><?php echo $form->input('SysFunction.function_code', array('id'=>'function_code', 'size'=>'50', 'type'=>'text', 'label'=>false, 'class'=>'validate required TEXT_FORMAT function_code_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
       <td width="663" id="function_code_msg" class="error"/>
   </tr>
   <tr>
-      <td width="130" id="sys_function_name_label">Function Name:</td>
+      <td width="130" id="sys_function_name_label"><?php __('Function Name')?>:</td>
       <td width="337" align="right"><?php echo $form->input('SysFunction.function_name', array('id'=>'function_name', 'size'=>'50', 'type'=>'text', 'label'=>false, 'class'=>'validate required TEXT_FORMAT sys_function_name_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
       <td width="663" id="sys_function_name_msg" class="error"/>
 
   </tr>
 
   <tr>
-      <td width="130" id="parent_id_label">Parent Id:</td>
+      <td width="130" id="parent_id_label"><?php __('Parent Id')?>:</td>
       <td align="right"><?php echo $form->input('SysFunction.parent_id', array('id'=>'parent_id', 'size'=>'50', 'type'=>'text', 'type'=>'text', 'label'=>false, 'class'=>'validate required NUMERIC_FORMAT parent_id_msg Invalid_Number.')) ?>
       </td>
       <td width="663" id="parent_id_msg" class="error"/>
   </tr>
 
   <tr>
-      <td width="130" id="controller_name_label">Controller Name:</td>
+      <td width="130" id="controller_name_label"><?php __('Controller Name')?>:</td>
       <td align="right"><?php echo $form->input('SysFunction.controller_name', array('id'=>'controller_name', 'size'=>'50', 'type'=>'text', 'label'=>false, 'class'=>'validate none TEXT_FORMAT controller_name_msg Invalid_Text._At_Least_One_Word_Is_Required.')) ?>
       </td>
       <td width="663" id="controller_name_msg" class="error"/>
   </tr>
   <tr>
-      <td width="130" id="url_link_label">URL Link:</td>
+      <td width="130" id="url_link_label"><?php __('URL Link')?>:</td>
       <td align="right"><?php echo $form->input('SysFunction.url_link', array('id'=>'url_link', 'size'=>'50', 'type'=>'text', 'label'=>false, 'class'=>'validate none TEXT_FORMAT url_link_msg Invalid_Email_Format.')) ?>
     </td>
     <td width="663" id="url_link_msg" class="error"/>
   </tr>
 
   <tr>
-      <td width="130" id="permission_type_label">Permission Type:</td>
+      <td width="130" id="permission_type_label"><?php __('Permission Type')?>:</td>
       <td align="right"><?php echo $form->input('SysFunction.permission_type', array('id'=>'permission_type', 'size'=>'50', 'type'=>'text', 'label'=>false, 'class'=>'validate none TEXT_FORMAT permission_type_msg Invalid_Email_Format.')) ?>
     </td>
     <td width="663" id="permission_type_msg" class="error"/>
   </tr>
   <tr><td>
-  <?php echo $form->submit('Save') ?></td><td><?php echo $html->link('Back', '/sysfunctions'); ?>
+  <?php echo $form->submit(__('Save', true)) ?></td><td><?php echo $html->link(__('Back', true), '/sysfunctions'); ?>
   </td></tr>
   </form>
   </table>
@@ -75,25 +75,25 @@ echo empty($data['SysFunction']['id'])?'Add':'Edit' ?> Sys Functions</b>
   <form>
   <!-- Render the input helper-->
   <table style="background-color: #FFFFD0">
-    <tr><td colspan="2"><b>Entry Helper:</b></td><tr>
-    <tr><td colspan="2" style="color:gray"> (overwrites entries to the left)</td><tr>
-    <tr><td align="right">ID:</td><td>          <input type="text" id="helperID"    onkeyup="updateID();"></td></tr>
-    <tr><td align="right">Controller:</td><td>  <input type="text" id="helperCont"  onkeyup="updateContFuncParam();"></td></tr>
-    <tr><td align="right">Function:</td><td>    <input type="text" id="helperFunc"  onkeyup="updateContFuncParam();"></td></tr>
-    <tr><td align="right">First Param:</td><td> <input type="text" id="helperParam" onkeyup="updateContFuncParam();"></td></tr>
+    <tr><td colspan="2"><b><?php __('Entry Helper')?>:</b></td><tr>
+    <tr><td colspan="2" style="color:gray"> <?php __('(overwrites entries to the left)')?></td><tr>
+    <tr><td align="right"><?php __('ID')?>:</td><td>          <input type="text" id="helperID"    onkeyup="updateID();"></td></tr>
+    <tr><td align="right"><?php __('Controller')?>:</td><td>  <input type="text" id="helperCont"  onkeyup="updateContFuncParam();"></td></tr>
+    <tr><td align="right"><?php __('Function')?>:</td><td>    <input type="text" id="helperFunc"  onkeyup="updateContFuncParam();"></td></tr>
+    <tr><td align="right"><?php __('First Param')?>:</td><td> <input type="text" id="helperParam" onkeyup="updateContFuncParam();"></td></tr>
 
     <tr><td colspan="2">
       <table>
-      <tr><td colspan="2"><b>Permission Levels:</b></td><tr>
-      <tr><td align="center">Admin</td><td align="center">Instructor</td><td align="center">Student</td></tr>
+      <tr><td colspan="2"><b><?php __('Permission Levels')?>:</b></td><tr>
+      <tr><td align="center"><?php __('Admin')?></td><td align="center"><?php __('Instructor')?></td><td align="center"><?php __('Student')?></td></tr>
       <tr><td align="center"><input name="helperRole" type="radio" onchange="updatePermissionType('A');"></td>
           <td align="center"><input name="helperRole" type="radio" onchange="updatePermissionType('AI');"></td>
           <td align="center"><input name="helperRole" type="radio" onchange="updatePermissionType('AIS');"></td>
       </tr>
       <tr><td><br /></td></tr>
-      <tr><td><b>Prnt.ID:</b></td>
-          <td><input type="submit" onclick="updateParentID(0);  return false;" value="Set to 0" ></td>
-          <td><input type="submit" onclick="updateParentID(1000);return false;" value="Set to 1000" ></td>
+      <tr><td><b><?php __('Prnt.ID')?>:</b></td>
+          <td><input type="submit" onclick="updateParentID(0);  return false;" value="<?php __('Set to 0')?>" ></td>
+          <td><input type="submit" onclick="updateParentID(1000);return false;" value="<?php __('Set to 1000')?>" ></td>
           </tr>
       </table>
     </td></tr>
@@ -110,7 +110,7 @@ echo empty($data['SysFunction']['id'])?'Add':'Edit' ?> Sys Functions</b>
   dCont = $("controller_name"); dURL = $("url_link"); dPerm = $("permission_type");
   // Check that all of the above were actually found
   if (!(hID && hCont && hFunc && hParam && dID && dCode && dFunc && dParent && dCont && dURL && dPerm)) {
-    alert("Entry Helper:\nSome Input Fields not found!");
+    alert(__("Entry Helper:\nSome Input Fields not found!", true));
   }
 
   // Updates just the ID

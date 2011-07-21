@@ -31,36 +31,36 @@ $evaluate = isset($evaluate) ? $evaluate : false;?>
   <tr class="tableheader">
     <td colspan="3" align="center">
 	    <?php echo $form->hidden('Mixeval/user_id', array('value'=>$Auth->user('id'))); ?>
-      View Mix Evaluation
+      <?php __('View Mix Evaluation')?>
     </td>
     </tr>
   <tr class="tablecell2">
-    <td width="209" id="mixeval_name_label">Mix Evaluation Name:</td>
+    <td width="209" id="mixeval_name_label"><?php __('Mix Evaluation Name')?>:</td>
     <td width="301"><?php echo $data['Mixeval']['name']?></td>
     <td width="353" id="mixeval_name_msg" class="error" />
   </tr>
 
   <tr class="tablecell2">
-    <td>Number of Lickert Question:</td>
+    <td><?php __('Number of Lickert Question')?>:</td>
     <td><?php echo $data['Mixeval']['lickert_question_max']?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	
 		</td>
-    <td>Number of Lickert Question Aspects (Max 25) </td>
+    <td><?php __('Number of Lickert Question Aspects (Max 25) ')?></td>
   </tr>
   <tr class="tablecell2">
-    <td>Number of Pre-fill Text Question:</td>
+    <td><?php __('Number of Pre-fill Text Question')?>:</td>
     <td><?php echo $data['Mixeval']['prefill_question_max']?></td>
-    <td>Number of Pre-fill Text Question Aspects (Max 10) </td>
+    <td><?php __('Number of Pre-fill Text Question Aspects (Max 10)')?> </td>
   </tr>
   <tr class="tablecell2">
-    <td>Mix Evaluation Availability:</td>
+    <td><?php __('Mix Evaluation Availability')?>:</td>
     <td><?php echo $data['Mixeval']['availability']?></td>
-    <td>Public Allows Mixeval Sharing Amongst Instructors </td>
+    <td><?php __('Public Allows Mixeval Sharing Amongst Instructors')?> </td>
   </tr>
   <tr class="tablecell2">
-    <td>Zero Mark: </td>
+    <td><?php __('Zero Mark')?>: </td>
     <td><?php echo $data['Mixeval']['zero_mark']?></td>
-    <td>No Marks Given for Level of Scale of 1</td>
+    <td><?php __('No Marks Given for Level of Scale of 1')?></td>
   </tr>
   <tr class="tablecell2">
 		<td colspan="3" align="center">
@@ -81,7 +81,7 @@ $evaluate = isset($evaluate) ? $evaluate : false;?>
 
 <table class="title" width="100%"  border="0" cellspacing="0" cellpadding="0">
 <div class='title'>
-  <span class="text"><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> Mixed Evaluation Preview</span>
+  <span class="text"><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> <?php __('Mixed Evaluation Preview<')?>/span>
 	<span class="controls"><a href="#rpreview" onclick="$('rpreview').toggle(); toggle1(this);"><?php echo empty($data) ? '[+]' : '[-]'; ?></a></span>
 </div>
 </table>

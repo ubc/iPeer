@@ -13,7 +13,7 @@
       <input type="hidden" name="required" id="required" value="SimpleEvaluationName SimpleEvaluationPointPerMember" />
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
         <tr class="tableheader">
-          <td colspan="3" align="center"><?php echo ucfirst($this->action)?> Simple Evaluation</td>
+          <td colspan="3" align="center"><?php echo ucfirst($this->action)?><?php __(' Simple Evaluation')?></td>
         </tr>
 
         <!-- Evaluation Name -->
@@ -66,7 +66,7 @@ function ensureEntriesValid() {
     return true;
   }
 
-  alert ("Base points per member *must be* at least 1 point.\nHowever, at least 10 is recommended.");
+  alert (__("Base points per member *must be* at least 1 point.\nHowever, at least 10 is recommended.", true));
   bppm.value = 10; bppm.focus();bppm.select();
   return false;
 }

@@ -8,7 +8,7 @@
       <td width="45%"><table width="403" border="0" cellspacing="0" cellpadding="4">
         <tr>
           <td width="300">
-            <b><font color="#FF0000">User(s) failed on creation:</font></b>
+            <b><font color="#FF0000"><?php __('User(s) failed on creation:')?></font></b>
           </td>
           <td></td>
         </tr></table>
@@ -19,7 +19,7 @@
 <?php echo $this->element('users/user_summary_list', array('data'=>$data['failed_students']));?>
 <?php endif; ?>
 
-<?php $msg = ('resetPassword' == $this->action || 'edit' == $this->action) ? 'User(s) modified successfully:' : 'User(s) created successfully:';?>
+<?php $msg = ('resetPassword' == $this->action || 'edit' == $this->action) ? __('User(s) modified successfully:', true) : __('User(s) created successfully:', true);?>
 
 <?php if (isset($data['created_students'])) : ?>
   <table width="95%"  border="0" cellspacing="2" cellpadding="4">
@@ -58,9 +58,9 @@
   <table width="95%"  border="0" cellspacing="2" cellpadding="4">
     <tr>
       <td>
-      <?php echo $html->link('Back to User Add', '/users/add/'); ?>&nbsp;|&nbsp;
-      <?php echo $html->link('Back to User Listing', '/users/index/'); ?>
-      <?php echo (!empty($course_id)) ? '&nbsp;|&nbsp;' . $html->link('Back to Course Home', '/courses/home/'.$course_id) : '';?>
+      <?php echo $html->link(__('Back to User Add', true), '/users/add/'); ?>&nbsp;|&nbsp;
+      <?php echo $html->link(__('Back to User Listing', true), '/users/index/'); ?>
+      <?php echo (!empty($course_id)) ? '&nbsp;|&nbsp;' . $html->link(__('Back to Course Home', true), '/courses/home/'.$course_id) : '';?>
       </td>
     </tr>
   </table>

@@ -6,17 +6,17 @@
 	  <table width="95%"  border="0" align="center" cellpadding="4" cellspacing="2">
         <?php if (!$createSurveyPossible) : ?>
         <tr><td style="text-align: center; color: red;">
-            You must create a course before you create a survey!<br />
-            Please do so from the link bellow:<br />
+            <?php __('You must create a course before you create a survey!<br />
+            Please do so from the link bellow')?>:<br />
             <?php   $webroot = $this->controller->webroot;
-                    echo "<a href='" . $webroot . "'courses/add'>Add a course to iPeer.</a>";?>
+                    echo "<a href='" . $webroot . "'courses/add'>".__('Add a course to iPeer', true).".</a>";?>
 
         <?php else: ?>
             <tr class="tableheader">
-              <td colspan="3" align="center"><?php echo empty($params['data']['Survey']['id'])?'Add':'Edit' ?> Survey </td>
+              <td colspan="3" align="center"><?php echo empty($params['data']['Survey']['id'])?'Add':'Edit' ?> <?php __('Survey')?> </td>
             </tr>
             <tr class="tablecell2">
-              <td width="13%">Survey Title:<font color="red">*</font></td>
+              <td width="13%"><?php __('Survey Title')?>:<font color="red">*</font></td>
               <td width="52%"><input type="hidden" name="assigned" id="assigned"/>
                 <input type="text" name="name" id="name" style="width:85%;" class="input" value="<?php echo empty($params['data']['Survey']['name'])? '' : $params['data']['Survey']['name'] ?>" >
                 <div id="surveyErr">
@@ -27,13 +27,13 @@
                   ?>
                 </div>
                 <?php echo $ajax->observeField('name', array('update'=>'surveyErr', 'url'=>"/surveys/checkDuplicateName", 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');stripe();")) ?> </td>
-              <td width="35%"> i.e. "CS100 Experience" </td>
+              <td width="35%"><?php __(' i.e. "CS100 Experience"')?> </td>
             </tr>
             <tr class="tablecell2">
               <td>Survey Template:</td>
               <td>
               <select name="survey_template" id="survey_template" style="width:85%;">
-                <option value=>(No Template)</option>
+                <option value=><?php __('(No Template)')?></option>
                 <?php
                     for($i=0; $i<sizeof($templates); $i++)
                     {
@@ -42,38 +42,38 @@
                 ?>
               </select>
               </td>
-              <td>Template used for survey. </td>
+              <td><?php __('Template used for survey.')?> </td>
             </tr>
             <tr class="tablecell2">
-              <td>Assigned Course:<font color="red">*</font></td>
+              <td><?php __('Assigned Course')?>:<font color="red">*</font></td>
               <td><?php
                   $params = array('controller'=>'surveys', 'coursesList'=>$courseList, "courseId" => $this->controller->rdAuth->courseId);
                   echo $this->element('courses/course_selection_box', $params);
             ?></td>
-              <td>Which course may take this survey?</td>
+              <td><?php __('Which course may take this survey?')?></td>
             </tr>
             <tr class="tablecell2">
-              <td>Due Date:<font color="red">*</font></td>
+              <td><?php __('Due Date')?>:<font color="red">*</font></td>
               <td><?php echo $html->input('Survey/due_date', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>  </td>
-              <td> eg. YYYY-MM-DD HH:MM:SS (24 HOUR) </td>
+              <td> <?php __('eg. YYYY-MM-DD HH:MM:SS (24 HOUR)')?> </td>
             </tr>
             <tr class="tablecell2">
-              <td valign="top">Release Date:<font color="red">*</font></td>
+              <td valign="top"><?php __('Release Date')?>:<font color="red">*</font></td>
               <td><table width="97%" border="0" cellspacing="2" cellpadding="4">
                 <tr>
-                  <td width="12%">From: </td><td nowrap><?php echo $html->input('Survey/release_date_begin', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal2.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>  </td>
+                  <td width="12%"><?php __('From')?>: </td><td nowrap><?php echo $html->input('Survey/release_date_begin', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal2.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>  </td>
                 </tr>
                 <tr>
                   <td>To: </td><td nowrap><?php echo $html->input('Survey/release_date_end', array('size'=>'50','class'=>'input', 'style'=>'width:75%;')) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal3.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>  </td>
                 </tr>
               </table>            </td>
-              <td valign="top"> eg. YYYY-MM-DD HH:MM:SS (24 HOUR) </td>
+              <td valign="top"><?php __(' eg. YYYY-MM-DD HH:MM:SS (24 HOUR)')?> </td>
             </tr>
             <tr class="tablecell2">
               <td colspan="3" align="center">
             <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
             <?php echo $html->script('events'); // For vallidation of dates?>
-            <?php echo $html->submit('Add Survey', array('onclick' =>
+            <?php echo $html->submit(__('Add Survey', true), array('onclick' =>
             "return validateEventDates('SurveyReleaseDateBegin','SurveyReleaseDateEnd','SurveyDueDate');")); ?></td>
               </tr>
           </table>

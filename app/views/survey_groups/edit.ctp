@@ -13,7 +13,7 @@
     <td>
         <table width="85%" align="center" cellpadding="4" cellspacing="2">
           <tr class="tableheader">
-            <td align="center">Edit Survey Group Set</td>
+            <td align="center"><?php __('Edit Survey Group Set')?></td>
           </tr>
           <tr class="tablecell2">
             <td>
@@ -25,7 +25,7 @@
         			  <tr class="tablecell2" style="border-top:solid #cccccc;">
                   <td class="header_link"><b><?php echo $this->Html->link('team '.($i+1), 'evaluations/viewSurveyGroupEvaluationResults/'.$survey_id.';'.$survey_group['id'], array('onclick' => "wopen(this.href, \'popup\', 650, 500); return false;"))?></b></td>
         			  <?php if (isset($score[$i])):?>
-                  <td style="color:#339977;"><i><b>match score: <?php echo $score[$i]['percent']?></b></i></td>
+                  <td style="color:#339977;"><i><b><?php __('match score')?>: <?php echo $score[$i]['percent']?></b></i></td>
         			  <?php else:?>
         			    <td></td>
                 <?php endif;?>
@@ -99,7 +99,7 @@
       			</td>
           </tr>
           <tr class="tablecell2">
-            <td><div align="center"><?php echo $this->Form->submit('Save Groups', array('div' => false)) ?>
+            <td><div align="center"><?php echo $this->Form->submit(__('Save Groups', true), array('div' => false)) ?>
 			<input type=button name="Cancel" value="Cancel" onClick="javascript:history.go(-1);" />
 			</div></td>
           </tr>

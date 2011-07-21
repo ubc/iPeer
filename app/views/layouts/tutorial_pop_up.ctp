@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>iPeer V2 with TeamMaker </title>
+<title><?php __('iPeer V2 with TeamMaker')?> </title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <meta http-equiv="Content-Language" content="en-us" />
 <meta http-equiv="pragma" content="no-cache" />

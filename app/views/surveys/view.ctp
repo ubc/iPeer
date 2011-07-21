@@ -4,46 +4,46 @@
         <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
           <tr class="tableheader">
             <td colspan="2" align="center">
-                View Survey
+                <?php __('View Survey')?>
             </td>
           </tr>
           <tr class="tablecell2">
-            <td width="265">Survey Title:&nbsp;</td>
+            <td width="265"><?php __('Survey Title')?>:&nbsp;</td>
             <td><?php echo $data['Survey']['name']; ?></td>
           </tr>
           <tr class="tablecell2">
-            <td>Assigned Course:&nbsp;</td>
+            <td><?php __('Assigned Course')?>:&nbsp;</td>
             <td><?php echo $this->Html->link($data['Course']['course'], '/courses/view/'.$data['Survey']['course_id'])?></td>
           </tr>
           <tr class="tablecell2">
-            <td>Creator:</td>
+            <td><?php __('Creator')?>:</td>
             <td><?php echo $this->Html->link($data['Survey']['creator'], '/users/view/'.$data['Survey']['user_id'])?></td>
           </tr>
           <tr class="tablecell2">
-            <td>Due Date:</td>
+            <td><?php __('Due Date')?>:</td>
             <td><?php echo $data['Survey']['due_date']; ?></td>
           </tr>
           <tr class="tablecell2">
-            <td valign="top">Release Date:</td>
+            <td valign="top"><?php __('Release Date')?>:</td>
             <td>
 			<table width="294" border="0" cellspacing="2" cellpadding="4">
             <tr>
-              <td width="48" valign="top">From:</td>
+              <td width="48" valign="top"><?php __('From')?>:</td>
               <td width="224"><?php echo $data['Survey']['release_date_begin'] ?></td>
             </tr>
             <tr>
-              <td valign="top">To:</td>
+              <td valign="top"><?php __('To')?>:</td>
               <td><?php echo $data['Survey']['release_date_end'] ?></td>
             </tr>
           </table>
 			</td>
           </tr>
           <tr class="tablecell2">
-            <td>Created:</td>
+            <td><?php __('Created')?>:</td>
             <td><?php echo $data['Survey']['created']; ?></td>
           </tr>
           <tr class="tablecell2">
-            <td>Modified:</td>
+            <td><?php __('Modified')?>:</td>
             <td><?php echo $data['Survey']['modified']; ?></td>
           </tr>
           <tr class="tablecell2">

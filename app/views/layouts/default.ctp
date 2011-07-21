@@ -36,7 +36,7 @@ function checkEmailAddress()
 {
   var redirectURL = "<?php echo $this->webroot.$this->theme;?> " + "users/editProfile";
   if (document.forms[0].elements['data[User][email]'].value == '') {
-    alert("You don't have an email address on file.\nPlease enter your email address now.");
+    alert(__("You don't have an email address on file.\nPlease enter your email address now.", true));
     <?php if ($this->params['controller'] == 'users') { ?>
     document.forms[0].elements['data[User][email]'].focus();
     <?php }else {?>

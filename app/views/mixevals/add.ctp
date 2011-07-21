@@ -37,17 +37,17 @@
   <tr class="tableheader">
     <td colspan="3" align="center">
 	    <?php echo $html->hidden('Mixeval/user_id', array('value'=>$this->Auth->user('id'))); ?>
-      <?php echo empty($params['data']['Mixeval']['id'])?'Add':'Edit' ?> Mix Evaluation
+      <?php echo empty($params['data']['Mixeval']['id'])?'Add':'Edit' ?> <?php __('Mix Evaluation')?>
     </td>
     </tr>
   <tr class="tablecell2">
-    <td width="209" id="mixeval_name_label">Mix Evaluation Name:<font color="red">*</font></td>
+    <td width="209" id="mixeval_name_label"><?php __('Mix Evaluation Name')?>:<font color="red">*</font></td>
     <td width="301"><?php echo $html->input('Mixeval/name', array('size'=>'30','class'=>'validate required TEXT_FORMAT mixeval_name_msg Invalid_Text._At_Least_One_Word_Is_Required.','value'=>$mixeval_name, 'id'=>'mixeval_name')) ?></td>
     <td width="353" id="mixeval_name_msg" class="error" />
   </tr>
 
   <tr class="tablecell2">
-    <td>Number of Lickert Question:</td>
+    <td><?php __('Number of Lickert Question')?>:</td>
     <td>
 
     <?php if (empty($data)) { ?>
@@ -61,7 +61,7 @@
               <?php echo "<b>&nbsp;&nbsp;$question_default&nbsp;&nbsp;</b>";?>
         <?php } // ?>
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		Level of Scale:
+		<?php __('Level of Scale')?>:
 		&nbsp;&nbsp;
 		<?php echo $html->selectTag('Mixeval/scale_max', array('2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8',
 									'9'=>'9','10'=>'10'), $scale_default, array('style'=>'width:50px;','id'=>'LOM'),'',false) ?>
@@ -69,20 +69,20 @@
     <td><!--Number of Lickert Question Aspects (Max 25)--> </td>
   </tr>
   <tr class="tablecell2">
-    <td>Number of Pre-fill Text Question:</td>
+    <td><?php __('Number of Pre-fill Text Question')?>:</td>
     <td><?php echo $html->selectTag('Mixeval/prefill_question_max', array('1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8',
 									'9'=>'9','10'=>'10'), $prefill_question_max, array('style'=>'width:50px;','id'=>'LOM'),'',false) ?></td>
     <td><!--Number of Pre-fill Text Question Aspects (Max 10)--> </td>
   </tr>
   <tr class="tablecell2">
-    <td>Mixed Evaluation Availability:<font color="red">*</font></td>
+    <td><?php __('Mixed Evaluation Availability')?>:<font color="red">*</font></td>
     <td><?php echo $html->selectTag('Mixeval/availability', array('public'=>'public','private'=>'private'), $mixeval_avail, array('style'=>'width:100px;'),'',false) ?></td>
-    <td>Public allows Mixed Evaluations sharing amongst instructors </td>
+    <td><?php __('Public allows Mixed Evaluations sharing amongst instructors')?> </td>
   </tr>
   <tr class="tablecell2">
-    <td>Zero Mark: </td>
+    <td><?php __('Zero Mark')?>: </td>
     <td><?php echo $html->checkbox('Mixeval/zero_mark', array('size'=>'50','class'=>'self_enroll', 'id'=>'zero_mark',  'checked'=>$zero_mark)) ?></td>
-    <td>No marks given for Level of Scale of 1</td>
+    <td><?php __('No marks given for Level of Scale of 1')?></td>
   </tr>
   <tr class="tablecell2">
   		<td colspan="3" align="center">
@@ -90,9 +90,9 @@
         &nbsp;&nbsp;
 		<?php
 		if(!empty($data)){
-		  echo $html->submit('Add Mixed Evaluation');
+		  echo $html->submit(__('Add Mixed Evaluation', true));
 		} else {
-		  echo $html->submit('Next', array('Name'=>'next'));
+		  echo $html->submit(__('Next', true), array('Name'=>'next'));
 		} ?>
 		</td>
     </tr>
@@ -110,7 +110,7 @@
 <?php if(!empty($data)){ ?>
 <table class="title" width="100%"  border="0" cellspacing="0" cellpadding="0">
   <tr>
-	<td><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> Mix Evaluation Preview </td>
+	<td><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> <?php __('Mix Evaluation Preview')?> </td>
 	<td><div align="right"><a href="#rpreview" onclick="showhide('rpreview'); toggle(this);"><?php echo empty($data) ? '[+]' : '[-]'; ?></a></div></td>
   </tr>
 </table>

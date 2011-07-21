@@ -15,17 +15,17 @@
       <div align="justify">
         <table border="0" cellpadding="0" cellspacing="0" bordercolor="e2e2e2" class="subTable">
           <tr>
-            <td height="21" background="../img/layout/header_back.gif"><div align="center" class="smallHeader">Forgot Your Password?</div></td>
+            <td height="21" background="../img/layout/header_back.gif"><div align="center" class="smallHeader"><?php __('Forgot Your Password?')?></div></td>
           </tr>
           <tr>
             <td height="115" background="../img/layout/small_table_back.gif">
               <table width="199" border="0" cellpadding="6" cellspacing="0">
                 <tr>
-                  <td>Student Number:</td>
+                  <td><?php __('Student Number')?>:</td>
                   <td><?php echo $student_no; ?></td>
                 </tr>
                 <tr>
-                  <td >Email address:</td>
+                  <td ><?php __('Email address')?>:</td>
                   <td ><?php echo $email; ?></td>
                 </tr>
               </table>

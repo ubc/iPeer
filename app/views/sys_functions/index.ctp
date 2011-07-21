@@ -7,9 +7,9 @@
   <tr>
     <td align="right" width="55%" style="padding:0px">
         <?php echo $html->image('icons/add.gif',
-            array('alt'=>'Add Sys Function', 'align'=>'middle')); ?>
+            array('alt'=>__('Add Sys Function', true), 'align'=>'middle')); ?>
             &nbsp;
-            <?php echo $html->link('Add Sys Function', '/sysfunctions/edit'); ?>
+            <?php echo $html->link(__('Add Sys Function', true), '/sysfunctions/edit'); ?>
             &nbsp;
     </td></tr>
     <tr><td style="padding:0px">

@@ -52,7 +52,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 
 
     <tr class="tablecell2">
-      <td>Availability:</td>
+      <td><?php __('Availability')?>:</td>
       <?php echo $this->Form->input('availability', array('id' => 'availability',
                                                           'type' => 'radio',
                                                           'legend' => false,
@@ -64,17 +64,17 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
                                                           'between' => '',
                                                           'separator' => '&nbsp;',
                                                           'disabled' => $readonly));?>
-      <td>Public Allows Mixed Evaluation Sharing Amongst Instructors</td>
+      <td><?php __('Public Allows Mixed Evaluation Sharing Amongst Instructors')?></td>
     </tr>
 
     <tr class="tablecell2">
-      <td>Zero Mark</td>
+      <td><?php __('Zero Mark')?></td>
       <td>
       <?php echo $this->Form->checkbox('zero_mark', array('id' => 'zero_mark', 'class'=>'self_enroll',
                                                        'size' => 50,
                                                        'disabled' => $readonly));?>
       </td>
-      <td>No Marks Given for Level of Scale of 1</td>
+      <td><?php __('No Marks Given for Level of Scale of 1')?></td>
     </tr>
 
     <?php if('view' == $this->action):?>
@@ -113,7 +113,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 
 <?php if(!empty($data)):?>
 <div class='title'>
-  <span class="text"><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> Mixed Evaluation Editor</span>
+  <span class="text"><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> <?php __('Mixed Evaluation Editor')?></span>
 	<span class="controls"><a href="#rpreview" onclick="$('rpreview').toggle(); toggle1(this);"><?php echo empty($data) ? '[+]' : '[-]'; ?></a></span>
 </div>
 
