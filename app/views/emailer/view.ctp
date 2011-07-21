@@ -32,7 +32,7 @@
             <td>&nbsp;</td>
           </tr>
           <tr class="tablecell2">
-            <td width="15%"><?php __('Sent?')?> :&nbsp;</td>
+            <td width="15%"><?php __('Sent?')?>:&nbsp;</td>
             <td><?php echo $data['EmailSchedule']['sent'] == 1 ?
                      $html->image('icons/green_check.gif',array('border'=>'0','alt'=>'green_check')) :
                      $html->image('icons/red_x.gif',array('border'=>'0','alt'=>'red_x'));?>
@@ -40,10 +40,9 @@
             <td>&nbsp;</td>
           </tr>
           <tr class="tablecell2">
-            <td width="15%">Content:&nbsp;</td>
+            <td width="15%"><?php __('Content')?>:&nbsp;</td>
             <td><?php echo $form->textarea('Email.content', array(
                   'id' => 'email_content',
-                  'lable' => __("Content: ", true),
                   'value' => $data['EmailSchedule']['content'],
                   'cols' => '60',
                   'rows' => '15',

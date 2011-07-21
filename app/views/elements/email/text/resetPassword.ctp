@@ -1,5 +1,5 @@
 <?php
- echo 'Reset Password!!';
- echo '</br>Username: '.$user_data['User']['username'];
- echo '</br>Password: '.$user_data['User']['tmp_password'];
+ echo __('Reset Password').'!!';
+ echo '</br>'.__('Username').': '.$user_data['User']['username'];
+ echo '</br>'.__('Password').': '.$user_data['User']['tmp_password'];
 ?>

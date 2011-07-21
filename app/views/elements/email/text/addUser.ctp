@@ -1,6 +1,6 @@
 <?php
- echo 'User '.$addedUser['first_name'].' '.$addedUser['last_name'].' is created !!!';
- echo '</br>Username: '.$addedUser['username'];
- echo '</br>Password: '.$addedUser['tmp_password'];
+ echo __('User ').$addedUser['first_name'].' '.$addedUser['last_name'].__(' is created').' !!!';
+ echo '</br>'.__('Username').': '.$addedUser['username'];
+ echo '</br>'.__('Password').': '.$addedUser['tmp_password'];
 ?>
 

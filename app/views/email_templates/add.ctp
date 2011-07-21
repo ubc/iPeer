@@ -17,7 +17,7 @@
   <td colspan="3" align="center">
     <?php
       echo $readonly ?
-            ('View') :
+            __('View') :
             (empty($this->data['EmailTemplate']['id'])?'Add':'Edit');
     ?> <?php __('Custom Email Template')?></td>
   </tr>
@@ -42,8 +42,8 @@
       <?php
         echo $form->input('EmailTemplate.availability', array(
            'type' => 'radio',
-           'options' => array('0' => ' - Private&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-                              '1' => ' - Public&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+           'options' => array('0' => ' - '.__('Private',true).'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+                              '1' => ' - '.__('Public',true).'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
                               //'2' => ' - shared&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
                              ),
            'default' => '0',

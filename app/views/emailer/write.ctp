@@ -11,7 +11,7 @@
             <td colspan="3" align="center"><?php __('Write Email')?></td>
           </tr>
           <tr class="tablecell2">
-            <td>To:&nbsp;</td>
+            <td><?php __('To')?>:&nbsp;</td>
             <td>
               <?php
                 if(!empty($recipients))
@@ -34,14 +34,6 @@
             </td>
             <td>&nbsp;</td>
           </tr>
-<!--          <tr class="tablecell2">
-            <td>Cc:&nbsp;</td>
-            <td><?php echo $form->input('Email.bcc', array('size' => '80%','label' => false));?></td>
-          </tr>
-          <tr class="tablecell2">
-            <td>Bcc:&nbsp;</td>
-            <td><?php echo $form->input('Email.bcc', array('size' => '80%','label' => false));?></td>
-          </tr>-->
           <tr class="tablecell2">
             <td><?php __('Schedule?')?>:</td>
 
@@ -56,8 +48,8 @@
               <?php
                 echo $form->input('Email.schedule', array(
                    'type' => 'radio',
-                   'options' => array('0' => ' - Single Email&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-                                      '1' => ' - Multiple Emails&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+                   'options' => array('0' => ' - '.__('Single Email',true).'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+                                      '1' => ' - '.__('Multiple Emails',true).'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
                                      ),
                    'default' => '0',
                    'onClick' => "toggle_schedule(this)",
@@ -72,9 +64,9 @@
                 <tr><td>
                 <?php
 
-                  echo $form->input('Email.times', array('div'=>false, 'label'=>' ', 'value' => '1', 'size' => '3')).' time(s), ';
+                  echo $form->input('Email.times', array('div'=>false, 'label'=>' ', 'value' => '1', 'size' => '3')).__(' time(s), ',true);
                   echo $form->input('Email.interval_num', array('div'=>false, 'label'=>__('  Every ', true)));
-                  echo $form->input('Email.interval_type', array('div'=>false, 'label'=>false, 'options'=> array('60' => 'minute(s)','3600' => 'hour(s)','86400' => 'day(s)'), 'selected'=>'3600'));
+                  echo $form->input('Email.interval_type', array('div'=>false, 'label'=>false, 'options'=> array('60' => __('minute(s)',true),'3600' => __('hour(s)',true),'86400' => __('day(s)',true)), 'selected'=>'3600'));
 
                 ?>
                 </td></tr></table>
@@ -116,13 +108,13 @@
             <td>&nbsp;</td>
           </tr>
           <tr class="tablecell2">
-            <td>Insert Merge Field:&nbsp;</td>
+            <td><?php __('Insert Merge Field')?>:&nbsp;</td>
             <td><?php echo $form->input('Email.merge', array(
                         'type' => 'select',
                         'id' => 'merge',
                         'name' => 'merge',
                         'options' => $mergeList,
-                        'empty' => '-- Select Merge Field --',
+                        'empty' => __('-- Select Merge Field --',true),
                         'label' => false,
                         'onChange' => "insertAtCursor(document.emailer.email_content, this.value)"
                       ));?>  </td>
@@ -170,6 +162,3 @@
                 $('scheduling').style.visibility = 'hidden';
   }
 </script>
-<!--<script type="text/javascript">
-  new Autocomplete('query', { serviceUrl: '/ipeer/users/user_list'});
-</script>-->
