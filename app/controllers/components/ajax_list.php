@@ -269,8 +269,9 @@ class AjaxListComponent extends Object {
         } else {
             //$count = $this->betterCount
             //    ($conditions, $groupBy, $this->recursive, array($joinTable));
-          $count = $this->model->$customModelFindFunction('count', array('conditions' => $conditions,
-                                                                         'joins'      => array($joinTable)));
+          $count = count($this->model->$customModelFindFunction('all', array('conditions' => $conditions,
+                                                                         'group' => $this->model->name.'.id',
+                                                                         'joins'      => array($joinTable))));
         }
 
         // Format the dates as given in the iPeer database

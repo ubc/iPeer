@@ -216,6 +216,12 @@ class UsersController extends AppController
     // Set up the basic static ajax list variables
     $this->setUpAjaxList();
 
+    //If User role isn't Admin, display student as default
+    if($this->Auth->user('role')!='A'){
+      $mapFilterSelections->{"User.role"} = "S";
+      $this->AjaxList->setStateVariable("mapFilterSelections", $mapFilterSelections);
+    }  
+
     // Set the display list
     $this->set('paramsForList', $this->AjaxList->getParamsForList());
 
@@ -224,8 +230,7 @@ class UsersController extends AppController
     
     $fields = array('Enrolment');
     
-    $tempVar=$this->User->getEnrolledStudents(1,$fields);
-    //$this->log($tempVar);
+    $tempVar=$this->User->getEnrolledStudents(1,$fields);      
   }
 
   // Show a class list
