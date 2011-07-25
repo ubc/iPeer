@@ -209,8 +209,8 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
   <tr class="tablecell2">
     <?php echo $html->script('events')?>
     <td colspan="3" align="center"><?php echo $form->submit(__('Edit Event', true), array('onclick' =>
-        "processSubmit(document.getElementById('selected_groups')); return validateEventDates('EventReleaseDateBegin','EventReleaseDateEnd','EventDueDate'); ")); ?></td>
-    </tr>
+        "processSubmit(document.getElementById('selected_groups')); return validateEventDates('EventReleaseDateBegin','EventReleaseDateEnd','EventDueDate','EventResultReleaseDateBegin','EventResultReleaseDateEnd'); ")); ?></td>
+  </tr>
 </table>
 
     </form>

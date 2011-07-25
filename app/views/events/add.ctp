@@ -172,7 +172,7 @@
   <?php echo $html->script('events')?>
 
 <td colspan="3" align="center"><?php echo $this->Form->submit(ucfirst($this->action).__(' Event', true), array('div' => false,
-  											'onClick' => "processSubmit(document.getElementById('selected_groups'))")) ?></td>
+  											'onClick' => "processSubmit(document.getElementById('selected_groups')); return validateEventDates('EventReleaseDateBegin','EventReleaseDateEnd','EventDueDate','EventResultReleaseDateBegin','EventResultReleaseDateEnd'); ")) ?></td>
     </tr>
 </table>
 
