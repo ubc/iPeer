@@ -77,7 +77,7 @@
          if (!(isset($rdAuth->customIntegrateCWL) && $rdAuth->customIntegrateCWL)) :?>
           <tr class="tablecell2">
             <td id="password_label"><?php __('Password')?>:</td>
-            <td colspan="2"><?php echo $html->link('Reset Password', '/users/resetPassword/'.$params['data']['User']['id'], '', __('Are you sure to reset the password of the current user?', true)) ?> </td>
+            <td colspan="2"><?php echo $html->link(__('Reset Password', true), '/users/resetPassword/'.$params['data']['User']['id'], '', __('Are you sure to reset the password of the current user?', true)) ?> </td>
           </tr>
 <?php    endif; ?>
 <?php  } else { ?>
@@ -89,7 +89,7 @@
 
     <tr class="tablecell2">
       <td align="center" colspan="3" id="password_label">
-      <input type="button" name="Back" value="Back" onClick="window.location='<?php echo $this->webroot . "users/index" ?>'";>
+      <input type="button" name="Back" value="<?php __('Back')?>" onClick="window.location='<?php echo $this->webroot . "users/index" ?>'";>
 
       <?php echo $html->submit(__('Save', true)) ?>
 

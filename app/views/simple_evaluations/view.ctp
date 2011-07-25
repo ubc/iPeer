@@ -30,9 +30,9 @@
         <tr class="tablecell2">
           <td colspan="3" align="center">
             <?php if (!empty($popUp) && $popUp) { ?>
-            <input type="button" name="Close" value="Close" onClick="window.close()">
+            <input type="button" name="Close" value="<?php __('Close')?>" onClick="window.close()">
             <?php } else { ?>
-      	    <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
+      	    <input type="button" name="Back" value="<?php __('Back')?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
             <?php }?>
 
       	</td>

@@ -46,7 +46,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
     <tr class="tablecell2">
       <?php echo $this->Form->input('name', array('id' => 'name', 'size'=>'30', 
                                                   'class'=>'validate required TEXT_FORMAT mixeval_name_msg Invalid_Text._At_Least_One_Word_Is_Required.',
-                                                  'readonly' => $readonly));?>
+                                                  'label' => __('Name', true), 'readonly' => $readonly));?>
       <td id="mixeval_name_msg" class="error">&nbsp;</td>
     </tr>
 
@@ -56,7 +56,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
       <?php echo $this->Form->input('availability', array('id' => 'availability',
                                                           'type' => 'radio',
                                                           'legend' => false,
-                                                          'options' => array('public'=>'Public','private'=>'Private'),
+                                                          'options' => array('public'=>__('Public', true),'private'=>__('Private', true)),
                                                           'label' => false,
       													  'default' => 'public',	     			
                                                           'before' => '<td>',

@@ -51,28 +51,28 @@ class SysParametersController extends AppController
 		$this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
- 		$this->set('title_for_layout', 'Sys Parameters');
+ 		$this->set('title_for_layout', __('Sys Parameters', true));
 		parent::__construct();
 	}
 
 	function setUpAjaxList() {
         $columns = array(
-            array("SysParameter.id",             "ID",      "3em", "number"),
-            array("SysParameter.parameter_code", "Code",    "15em", "string"),
-            array("SysParameter.parameter_value","Value",   "auto","string"),
-            array("SysParameter.parameter_type", "Type",    "6em",   "map",
+            array("SysParameter.id",             __("ID", true),      "3em", "number"),
+            array("SysParameter.parameter_code", __("Code", true),    "15em", "string"),
+            array("SysParameter.parameter_value",__("Value", true),   "auto","string"),
+            array("SysParameter.parameter_type", __("Type", true),    "6em",   "map",
                 array("I" => "Interger", "B" => "Boolean", "S" => "String")),
-            array("SysParameter.record_status",  "Status",   "5em", "map",
+            array("SysParameter.record_status",  __("Status", true),   "5em", "map",
                 array("A" => "Active", "I" => "Inactive")),
-            array("SysParameter.created",        "Created", "10em", "date"),
-            array("SysParameter.modified",       "Updated", "10em", "date"));
+            array("SysParameter.created",        __("Created", true), "10em", "date"),
+            array("SysParameter.modified",       __("Updated", true), "10em", "date"));
 
-        $warning = "Are you sure you wish to delete this System Parameter?";
+        $warning = __("Are you sure you wish to delete this System Parameter?", true);
 
         $actions = array(
-            array("View", "", "", "", "view", "SysParameter.id"),
-            array("Edit", "", "", "", "edit", "SysParameter.id"),
-            array("Delete", $warning, "", "", "delete", "SysParameter.id"));
+            array(__("View", true), "", "", "", "view", "SysParameter.id"),
+            array(__("Edit", true), "", "", "", "edit", "SysParameter.id"),
+            array(__("Delete", true), $warning, "", "", "delete", "SysParameter.id"));
 
         $this->AjaxList->setUp($this->SysParameter, $columns, $actions,
             "SysParameter.id", "SysParameter.parameter_code");
@@ -111,7 +111,7 @@ class SysParametersController extends AppController
 			$this->render();
 		} else {
 			if ($this->SysParameter->save($this->params['data'])) {
-				$message = 'The record is saved successfully';
+				$message = __('The record is saved successfully', true);
 				$this->redirect('sysparameters/index/'.$message);
 			} else {
 				$this->set('data', $this->data);

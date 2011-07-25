@@ -107,7 +107,7 @@ $groupAve = 0;
       //averages
       echo '<tr class="tablesummary">';
       echo "<td><b>";
-      echo "Group Average: ";
+      echo __("Group Average: ", true);
       echo "</b></td>";
      // if ( $allMembersCompleted ) {
       	//foreach ($scoreRecords['group_question_ave'] AS $groupAveIndex => $groupAveGrade) {
@@ -176,7 +176,7 @@ $groupAve = 0;
 			                  echo $memberAve;
 			                  echo '('.$memberAvePercent .'%)';
 			                  if ($memberAve == $groupAve) {
-			                    echo "&nbsp;&nbsp;<< Same Mark as Group Average >>";
+			                    echo "&nbsp;&nbsp;<< ".__('Same Mark as Group Average')." >>";
 			                  } else if ($memberAve < $groupAve) {
 			                    echo "&nbsp;&nbsp;<font color='#cc0033'><< ".__('Below Group Average', true)." >></font>";
 			                  } else if ($memberAve > $groupAve) {
@@ -223,7 +223,7 @@ $groupAve = 0;
                 	echo "n/a<br />";
                 }
                 //Points Detail
-                echo "<strong>Points: </strong>";
+                echo "<strong>".__('Points:', true)."</strong>";
                 if (isset($rubDet)) {
                 	$lom = $rubDet["grade"];
                 	$empty = $mixevalQuestion[$i-1]['multiplier'];
@@ -240,7 +240,7 @@ $groupAve = 0;
                 }
 
                 //Grade Detail
-                echo "<strong>Grade: </strong>";
+                echo "<strong>".__('Grade', true).": </strong>";
                 if (isset($rubDet)) {
                   //echo $rubDet["grade"] . " / " . $mixevalQuestion[$j-1]['MixevalsQuestion']['multiplier'] . "<br />";
                   echo $rubDet["grade"] . " / " . $mixevalQuestion[$j-1]['multiplier'] . "<br />";
@@ -293,7 +293,7 @@ $groupAve = 0;
                  $rubDet = $resultDetails[$j-1]['EvaluationMixevalDetail'];
                   echo '<td valign="middle">';
                   //Comments
-                  echo "<strong>Comment: </strong>";
+                  echo "<strong>".__('Comment', true).": </strong>";
                   if (isset($rubDet)) {
                   	echo $rubDet["question_comment"];
                   } else {

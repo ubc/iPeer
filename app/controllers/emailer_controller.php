@@ -38,12 +38,12 @@ class EmailerController extends AppController
     // Set up Columns
     $columns = array(
             array("EmailSchedule.id",   "",       "",        "hidden"),
-            array("EmailSchedule.subject", "Subject",   "auto",    "action",   "View Email"),
-            array("EmailSchedule.date", "Scheduled On","15em",  "date"),
-            array("EmailSchedule.sent",       "Sent",         "5em",   "map",
-                     array(  "0" => "Not Yet",  "1" => "Sent")),
+            array("EmailSchedule.subject", __("Subject", true),   "auto",    "action",   "View Email"),
+            array("EmailSchedule.date", __("Scheduled On", true),"15em",  "date"),
+            array("EmailSchedule.sent",       __("Sent", true),         "5em",   "map",
+                     array(  "0" => __("Not Yet", true),  "1" => __("Sent", true))),
             array("EmailSchedule.creator_id",           "",            "",     "hidden"),
-            array("EmailSchedule.created", "Creation Date", "15em", "date"));
+            array("EmailSchedule.created", __("Creation Date", true), "15em", "date"));
 
     $userList = array($myID => "My Email");
     
@@ -51,7 +51,7 @@ class EmailerController extends AppController
     $jointTableCreator =
       array("id"         => "Creator.id",
             "localKey"   => "creator_id",
-            "description" => "Email to show:",
+            "description" => __("Email to show:", true),
             "default" => $myID,
             "list" => $userList,
             "joinTable"  => "users",
@@ -71,11 +71,11 @@ class EmailerController extends AppController
     }
 
     // Set up actions
-    $warning = "Are you sure you want to cancel this email?";
+    $warning = __("Are you sure you want to cancel this email?", true);
     $actions = array(
-                     array("View Email", "", "", "", "view", "EmailSchedule.id"),
-                     array("Cancel Email", $warning, $restrictions, "", "cancel", "EmailSchedule.id"),
-                     array("View Creator", "",    "", "users", "view", "EmailSchedule.creator_id"));
+                     array(__("View Email", true), "", "", "", "view", "EmailSchedule.id"),
+                     array(__("Cancel Email", true), $warning, $restrictions, "", "cancel", "EmailSchedule.id"),
+                     array(__("View Creator", true), "",    "", "users", "view", "EmailSchedule.creator_id"));
 
     // Set up the list itself
     $this->AjaxList->setUp($this->EmailSchedule, $columns, $actions,
@@ -158,7 +158,7 @@ class EmailerController extends AppController
         //Push an email into email_schedules table
         $this->EmailSchedule->saveAll($data);        
 
-        $this->Session->setFlash('The Email was saved successfully');
+        $this->Session->setFlash(__('The Email was saved successfully', true));
         $this->redirect('index/');
       }
     }
@@ -174,19 +174,19 @@ class EmailerController extends AppController
     if($creator_id == $user_id){
       if(!$this->EmailSchedule->getSent($id)){
         if ($this->EmailSchedule->delete($id)) {
-          $this->Session->setFlash('The Email was canceled successfully.');
+          $this->Session->setFlash(__('The Email was canceled successfully.', true));
         } else {
-          $this->Session->setFlash('Email cancellation failed.');
+          $this->Session->setFlash(__('Email cancellation failed.', true));
         }
         $this->redirect('index/');
       }
       else{//If email is already sent
-        $this->Session->setFlash('Cannot cancel: Email is already sent.');
+        $this->Session->setFlash(__('Cannot cancel: Email is already sent.', true));
         $this->redirect('index/');
       }
     }
     else{//If user is not creator of the email
-      $this->Session->setFlash('No Permission');
+      $this->Session->setFlash(__('No Permission', true));
       $this->redirect('/emailer/index');
     }
   }
@@ -308,7 +308,7 @@ class EmailerController extends AppController
             'fields' => array('id','course'),
             'conditions' => array('Course.id' => $id)
         ));
-        $display['name'] = 'All students in course: '.$course['Course']['course'];
+        $display['name'] = __('All students in course: ', true).$course['Course']['course'];
         $display['link'] = '/users/goToClassList/'.$course['Course']['id'];
         break;
       case 'G': //Email addresses for all in group
@@ -320,7 +320,7 @@ class EmailerController extends AppController
             'fields' => array('id','group_name'),
             'conditions' => array('Group.id' => $id)
         ));
-        $display['name'] = 'All students in  group: '.$group['Group']['group_name'];
+        $display['name'] = __('All students in  group: ', true).$group['Group']['group_name'];
         $display['link'] = '/groups/view/'.$group['Group']['id'];
         break;
       default: //Email address for a user
@@ -419,7 +419,7 @@ class EmailerController extends AppController
           $this->EmailSchedule->save($tmp);          
         }
         else{
-          echo "Failed";
+          echo __("Failed", true);
         }
 
       }
@@ -429,4 +429,3 @@ class EmailerController extends AppController
 
 }
 ?>
-

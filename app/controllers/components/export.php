@@ -280,13 +280,13 @@ class ExportComponent extends Object
     }
 
     //group header
-    $content .= empty($params['form']['include_group_status']) ? '':'Status(X/OK),';
-    $content .= empty($params['form']['include_group_names']) ? '':'Group Name,';
-    $content .= empty($params['form']['include_student_first']) ? '':'First Name,';
-    $content .= empty($params['form']['include_student_last']) ? '':'Last Name,';
-    $content .= empty($params['form']['include_student_id']) ? '':'Student Number,';
-    $content .= empty($params['form']['include_student_email']) ? '':'Email,';
-    $content .= empty($params['form']['include_criteria_marks']) ? '':'Final Mark,';
+    $content .= empty($params['form']['include_group_status']) ? '':__('Status(X/OK),', true);
+    $content .= empty($params['form']['include_group_names']) ? '':__('Group Name,', true);
+    $content .= empty($params['form']['include_student_first']) ? '':__('First Name,',true);
+    $content .= empty($params['form']['include_student_last']) ? '':__('Last Name,', true);
+    $content .= empty($params['form']['include_student_id']) ? '':__('Student Number,', true);
+    $content .= empty($params['form']['include_student_email']) ? '':__('Email,', true);
+    $content .= empty($params['form']['include_criteria_marks']) ? '':__('Final Mark,', true);
     //$content .= empty($params['form']['include_']) ? '':'/Total,';
 
     //question count... print 1..2..3..
@@ -294,7 +294,7 @@ class ExportComponent extends Object
     for ($i=1; $i <= $question_count; $i++) {
       $content .= $i.',';
     }
-    $content .= !isset($params['form']['include_general_comments']) ? '':'Comments';
+    $content .= !isset($params['form']['include_general_comments']) ? '':__('Comments', true);
     if ($hasContent) $content .= "\n\n";
 
     foreach ($data as $group) {

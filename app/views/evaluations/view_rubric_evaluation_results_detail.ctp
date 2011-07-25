@@ -150,7 +150,7 @@ $groupAve = 0;
 	foreach($groupMembers as $row): $user = $row['User']; ?>
 		<div id="panel<?php echo $user['id']?>">
 		  <div id="panel<?php echo $user['id']?>Header" class="panelheader">
-		  	<?php echo 'Evaluatee: '.$user['last_name'].' '.$user['first_name']?>
+		  	<?php echo __('Evaluatee: ', true).$user['last_name'].' '.$user['first_name']?>
 		  </div>
 		  <div style="height: 200px;" id="panel1Content" class="panelContent">
 			 <br><b>Total: <?php if (isset($membersAry[$user['id']]['received_ave_score'])) {
@@ -174,7 +174,7 @@ $groupAve = 0;
 			        <br><br>
         <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
         	<tr class="tableheader" align="center">
-            <td width="100" valign="top">Evaluator</td>
+            <td width="100" valign="top"><?php __('Evaluator')?></td>
             <?php
               for ($i=1; $i<=$rubric['Rubric']["criteria"]; $i++) {
             		echo "<td><strong><font color=" . $color[ $i % sizeof($color) ] . ">" . ($i) . ". "  . "</font></strong>";
@@ -201,7 +201,7 @@ $groupAve = 0;
                 echo '<td valign="middle">';
                 echo "<br />";
                 //Points Detail
-                echo "<strong>Points: </strong>";
+                echo "<strong>".__('Points').": </strong>";
                 if (isset($rubDet)) {
                 		$lom = $rubDet["selected_lom"];
                 	$empty = $rubric["Rubric"]["lom_max"];

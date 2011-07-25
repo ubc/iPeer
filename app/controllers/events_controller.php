@@ -48,7 +48,7 @@ class EventsController extends AppController
     $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
     $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
     $this->order = $this->sortBy.' '.strtoupper($this->direction);
-    $this->set('title_for_layout', 'Events');
+    $this->set('title_for_layout', __('Events', true));
     parent::__construct();
   }
 
@@ -68,11 +68,11 @@ class EventsController extends AppController
 
       $isReleased = "";
       if ($timeNow < $releaseDate) {
-        $isReleased = "Not Yet Open";
+        $isReleased = __("Not Yet Open", true);
       } else if ($timeNow > $endDate) {
-        $isReleased = "Already Closed";
+        $isReleased = __("Already Closed", true);
       } else {
-        $isReleased = "Open Now";
+        $isReleased = __("Open Now", true);
       }
 
 
@@ -80,7 +80,7 @@ class EventsController extends AppController
       $entry['!Custom']['isReleased'] = $isReleased;
 
       // Set the view results column
-      $entry['!Custom']['results'] = "Results";
+      $entry['!Custom']['results'] = __("Results", true);
 
       // Write the entry back
       $data[$i] = $entry;
@@ -103,17 +103,17 @@ class EventsController extends AppController
     $columns = array(
             array("Event.id",             "",            "",     "hidden"),
             array("Course.id",            "",            "",     "hidden"),
-            array("Course.course",        "Course",      "13em", "action", "View Course"),
-            array("Event.Title",          "Title",       "auto", "action", "View Event"),
-            array("!Custom.results",       "View",       "4em", "action", "View Results"),
-            array("Event.event_template_type_id", "Type", "", "map",
-                array("1" => "Simple", "2" => "Rubric", "4" => "Mixed")),
-            array("Event.due_date",       "Due Date",    "10em", "date"),
-            array("!Custom.isReleased",    "Released ?", "10em", "string"),
-            array("Event.self_eval",       "Self Eval",   "6em", "map",
-                array("0" => "Disabled", "1" => "Enabled")),
-            array("Event.com_req",        "Comment",      "6em", "map",
-                array("0" => "Optional", "1" => "Required")),
+            array("Course.course",        __("Course", true),      "13em", "action", "View Course"),
+            array("Event.Title",          __("Title", true),       "auto", "action", "View Event"),
+            array("!Custom.results",       __("View", true),       "4em", "action", "View Results"),
+            array("Event.event_template_type_id", __("Type", true), "", "map",
+                array("1" => __("Simple", true), "2" => __("Rubric", true), "4" => __("Mixed", true))),
+            array("Event.due_date",       __("Due Date", true),    "10em", "date"),
+            array("!Custom.isReleased",    __("Released ?", true), "10em", "string"),
+            array("Event.self_eval",       __("Self Eval", true),   "6em", "map",
+                array("0" => __("Disabled", true), "1" => __("Enabled", true))),
+            array("Event.com_req",        __("Comment", true),      "6em", "map",
+                array("0" => __("Optional", true), "1" => __("Required", true))),
 
             // Release window
             array("Event.release_date_begin", "", "",    "hidden"),
@@ -124,7 +124,7 @@ class EventsController extends AppController
     $joinTables =  array( array (
                 // GUI aspects
                 "id" => "course_id",
-                "description" => "for Course:",
+                "description" => __("for Course:", true),
                 // The choise and default values
                 "list" => $coursesList,
                 "default" => $this->Session->read('ipeerSession.courseId'),
@@ -150,14 +150,14 @@ class EventsController extends AppController
 
 
     // Set up actions
-    $warning = "Are you sure you want to delete this event permanently?";
+    $warning = __("Are you sure you want to delete this event permanently?", true);
     $actions = array(
-                     array("View Results", "", "", "evaluations", "view", "Event.id"),
-                     array("View Event", "", "", "", "!view", "Event.id"),
-                     array("Edit Event", "", "", "", "edit", "Event.id"),
-                     array("View Course", "", "", "courses", "view", "Course.id"),
-                     array("View Groups", "", "", "", "!viewGroups", "Event.id"),
-                     array("Delete Event", $warning, "", "", "delete", "Event.id"));
+                     array(__("View Results", true), "", "", "evaluations", "view", "Event.id"),
+                     array(__("View Event", true), "", "", "", "!view", "Event.id"),
+                     array(__("Edit Event", true), "", "", "", "edit", "Event.id"),
+                     array(__("View Course", true), "", "", "courses", "view", "Course.id"),
+                     array(__("View Groups", true), "", "", "", "!viewGroups", "Event.id"),
+                     array(__("Delete Event", true), $warning, "", "", "delete", "Event.id"));
 
     $recursive = 0;
 
@@ -223,7 +223,7 @@ class EventsController extends AppController
     $event = $this->Event->find('first', array('conditions' => array('Event.id' => $id),
                                    'contain' => array('Group.Member')));
     $courseId = $event['Event']['course_id'];
-    $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
+    $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events', true));
 
     //Format Evaluation Selection Boxes
     $default = null;
@@ -318,7 +318,7 @@ class EventsController extends AppController
     $this->set('currentUser', $currentUser);
     
     $courseId = $this->Session->read('ipeerSession.courseId');
-    $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
+    $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events', true));
     //List Add Page
     if (empty($this->params['data'])) {
 
@@ -328,7 +328,7 @@ class EventsController extends AppController
       //Get all display event types
       $this->set('eventTypes', $eventTypes);
       //Set default template
-      $default = '-- Select a Evaluation Tool -- ';
+      $default = __('-- Select a Evaluation Tool -- ', true);
       $model = 'SimpleEvaluation';
       $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'));
       $this->set('eventTemplates', $eventTemplates);
@@ -351,7 +351,7 @@ class EventsController extends AppController
       if ($this->Event->save($this->params['data'])) {
         //Save Groups for the Event
         $this->GroupEvent->insertGroups($this->Event->id, $this->params['data']['Member']);
-        $this->redirect('/events/index/The event is added successfully.');
+        $this->redirect('/events/index/'.__('The event is added successfully.', true));
       }
       //Found error
       else {
@@ -375,7 +375,7 @@ class EventsController extends AppController
         $this->set('default',$default);
         $this->set('model', $model);
 
-        $this->set('errmsg', 'Please correct errors below.');
+        $this->set('errmsg', __('Please correct errors below.', true));
         $this->render();
       }//end if
 		}
@@ -385,7 +385,7 @@ class EventsController extends AppController
   function edit($id) {
   	
     if(!is_numeric($id)) {
-      $this->Session->setFlash('Invalid survey ID.');
+      $this->Session->setFlash(__('Invalid survey ID.', true));
       $this->redirect('index');
     }
     $data = $this->Event->find('first', array('conditions' => array('id' => $id),
@@ -397,7 +397,7 @@ class EventsController extends AppController
 		$id = $this->Sanitize->paranoid($id);
         $this->set('event_id', $id);
 
-		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
+		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events', true));
 
 		$event = $this->Event->find('first', array('conditions' => array('Event.id' => $id),
                                                'contain' => array('Group.Member')));
@@ -453,7 +453,7 @@ class EventsController extends AppController
     $this->set('model', $model);
     $this->set('id', $id);
     $courseId = $data['Event']['course_id'];
-		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
+		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events', true));
 $forsave =array();
 
 		if (!empty($this->data)) {
@@ -462,7 +462,7 @@ $forsave =array();
 				 //Save Groups for the Event
 		//$this->GroupEvent->insertGroups($this->Event->id, $this->data['Member']);
 		$this->GroupEvent->updateGroups($this->Event->id, $this->data['Member']);
-        $this->Session->setFlash('The event was edited successfully.');
+        $this->Session->setFlash(__('The event was edited successfully.', true));
         $this->redirect('index');
 			} else {
         $this->Session->setFlash($this->Survey->errorMessage);
@@ -601,7 +601,7 @@ $forsave =array();
 		$id = $this->Sanitize->paranoid($id);
 
 
-		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Events');
+		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events', true));
 		if (empty($this->params['data']))
 		{
 
@@ -704,7 +704,7 @@ $forsave =array();
         //Save Groups for the Event
 			  $this->GroupEvent->updateGroups($this->Event->id, $this->params['data']['Event']);
 
-				$this->redirect('/events/index/The event is updated successfully.');
+				$this->redirect('/events/index/'.__('The event is updated successfully.', true));
 			}//Error Found
 			else
 			{
@@ -736,7 +736,7 @@ $forsave =array();
       //var_dump($id);
     }   //end if
     if ($this->Event->delete($id)) {
-			$this->redirect('/events/index/The event is deleted successfully.');
+			$this->redirect('/events/index/'.__('The event is deleted successfully.', true));
     }
   }
 
@@ -825,9 +825,9 @@ $forsave =array();
 				$this->GroupsMembers->updateMembers($this->Group->id, $this->params['data']['Group']);
 
 				if(isset($popup) && $popup == 'y')
-					$this->flash('Group Updated', '/events/viewGroups/'.$event_id, 1);
+					$this->flash(__('Group Updated', true), '/events/viewGroups/'.$event_id, 1);
 				else
-					$this->flash('Group Updated', '/events/view/'.$event_id, 1);
+					$this->flash(__('Group Updated', true), '/events/view/'.$event_id, 1);
 			}
 			else
 			{

@@ -67,7 +67,7 @@
 			</td>
           </tr>
           <tr class="tablecell2">
-            <td><div align="center"><?php echo $form->submit('Submit') ?>
+            <td><div align="center"><?php echo $form->submit(__('Submit', true)) ?>
 			</div></td>
           </tr>
       </table>

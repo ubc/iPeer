@@ -32,7 +32,7 @@ class InstallController extends Controller
 	function __construct()
 	{
 		$this->Sanitize = new Sanitize;
- 		$this->set('title_for_layout', 'Install Wizards');
+ 		$this->set('title_for_layout', __('Install Wizards', true));
 		parent::__construct();
 	}
 		
@@ -47,7 +47,7 @@ class InstallController extends Controller
 	  $this->autoRender = false;
     if(file_exists('../config/database.php'))
     {
-      $this->set('message_content', 'It looks like you already have a instance running. Please install a fresh copy or remove app/config/database.php.');
+      $this->set('message_content', __('It looks like you already have a instance running. Please install a fresh copy or remove app/config/database.php.', true));
       $this->render(null, null, 'views/pages/message.tpl.php');
     }else{
       return $this->render('install');
@@ -58,7 +58,7 @@ class InstallController extends Controller
 	{
     if(!$this->Session->check('progress') || 'index' != $this->Session->read('progress'))
     {
-      $this->set('message_content', 'You seems to miss some steps. Please start the installation from beginning.');
+      $this->set('message_content', __('You seems to miss some steps. Please start the installation from beginning.', true));
       $this->render(null, null, 'views/pages/message.tpl.php');
     }
     $this->Session->write('progress', 'install2');
@@ -74,7 +74,7 @@ class InstallController extends Controller
 
     $writable = is_writable("../config");
   
-    if(!$writable) $this->set('errmsg', '"app/config" is not writable. Please check the permission on config directory, e.g., chmod 777 app/config. After installation, please change the permission back.');
+    if(!$writable) $this->set('errmsg', __('"app/config" is not writable. Please check the permission on config directory, e.g., chmod 777 app/config. After installation, please change the permission back.', true));
 
     if (!empty($this->params['data'])) 
     {
@@ -89,7 +89,7 @@ class InstallController extends Controller
       if (!($dbConfig && $insertDataStructure))
       {
         $this->set('data', $this->params['data']);
-        $this->set('errmsg', 'Create Database Configuration Failed');
+        $this->set('errmsg', __('Create Database Configuration Failed', true));
         $this->render('install3');
       }
 
@@ -147,7 +147,7 @@ class InstallController extends Controller
 			}	else {
         //Found error
         $this->set('data', $this->params['data']);
-        $this->set('errmsg', 'Configuration of iPeer System Parameters Failed.');
+        $this->set('errmsg', __('Configuration of iPeer System Parameters Failed.', true));
         $this->render('install4');
       }//end if
 		}	  
@@ -168,7 +168,7 @@ class InstallController extends Controller
 		//create and write file 
     if(!$confile = fopen("../config/database.php", "wb")) 
     {
-        $errMsg= "Error creating ../config/database.php; check your permissions<br />" ;
+        $errMsg= __("Error creating ../config/database.php; check your permissions<br />", true) ;
         $this->set('errmsg', $errMsg);
         return false;
     }else{

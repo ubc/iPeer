@@ -39,9 +39,9 @@ class UpgradeController extends Controller
   function index()
   {
     $this->checkPermission();
-    $message  = "You are about to upgrade your iPeer instance. ";
-    $message .= "Please make sure you have backed up your database and files before proceeding!<br />";
-    $message .= "<a href='" . $this->webroot . "upgrade/step2'>Confirm</a>";
+    $message  = __("You are about to upgrade your iPeer instance. ", true);
+    $message .= __("Please make sure you have backed up your database and files before proceeding!<br />", true);
+    $message .= "<a href='" . $this->webroot . "upgrade/step2'>".__('Confirm', true)."</a>";
     $this->set('message_content', $message);
     $this->render(null, null, 'views/pages/message.tpl.php');
   }
@@ -66,8 +66,8 @@ class UpgradeController extends Controller
 		$this->Session->delete('Message');
 		$this->Session->delete('CWLErr');
 
-    $message  = "Your iPeer instance has been upgraded. Please login again.<br />";
-    $message .= "<a href='" . $this->webroot . "loginout/login'>Login</a>";
+    $message  = __("Your iPeer instance has been upgraded. Please login again.<br />", true);
+    $message .= "<a href='" . $this->webroot . "loginout/login'>".__('Login', true)."</a>";
     $this->set('message_content', $message);
     $this->render(null, null, 'views/pages/message.tpl.php');
   }
@@ -78,7 +78,7 @@ class UpgradeController extends Controller
   {
     if('A' != $this->Auth->user('role'))
     {
-      $this->set('message_content', 'Sorry, you do not have access to this page. Only administrator can perform a upgrade. If you are an administrator, please login and then go to this page to perform the upgrade.');
+      $this->set('message_content', __('Sorry, you do not have access to this page. Only administrator can perform a upgrade. If you are an administrator, please login and then go to this page to perform the upgrade.', true));
       $this->render(null, null, 'views/pages/message.tpl.php');
       exit;
     }

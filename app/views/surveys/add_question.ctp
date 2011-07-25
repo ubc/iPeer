@@ -23,19 +23,19 @@
 
           <tr class="tablecell2">
             <?php echo $this->Form->input('prompt', array('size'=>'50','class'=>'input', 'style'=>'width:85%;',
-                                                          'label' => 'Question: <font color="red">*</font>')) ?>
+                                                          'label' => __('Question:', true).' <font color="red">*</font>')) ?>
             <td><?php __('E.g. What grade do you expect to earn in this class?')?></td>
           </tr>
 
           <tr class="tablecell2">
-            <?php echo $this->Form->input('master', array('label' => 'Master Question?',
+            <?php echo $this->Form->input('master', array('label' => __('Master Question?', true),
                                                          'type' => 'select', 
-                                                          'options' => array('no' => 'No', 'yes' => 'Yes')))?>
+                                                          'options' => array('no' => __('No', true), 'yes' => __('Yes', true))))?>
             <td> <?php __('Master question can be used as a template of a new question. ')?></td>
           </tr>
 
           <tr class="tablecell2">
-          <?php echo $this->Form->input('type', array('label' => 'Question Type:  <font color="red">*</font>',
+          <?php echo $this->Form->input('type', array('label' => __('Question Type:', true).' <font color="red">*</font>',
                                              //           'type' => 'radio', 
                                              //           'separator' => '<br />',
                                                         'options' => array('M' => __('Multiple Choice (Single Answer)', true), 

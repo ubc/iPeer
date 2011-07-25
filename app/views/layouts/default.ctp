@@ -66,7 +66,7 @@ function checkEmailAddress()
     <td width="2%" rowspan="2"><?php echo $html->image('layout/banner_left.gif',array('alt'=>'banner_left'))?></td>
     <td width="25%" height="72" valign="top"><span class="style1">
         <?php echo $html->image('layout/ipeer_banner.gif',array('alt'=>'ipeer_banner'))?></span>
-    <span class="bannerText"><span style='font-size: 120%;'>2.2</span>&nbsp;&nbsp;with TeamMaker</span></td>
+    <span class="bannerText"><span style='font-size: 120%;'>2.2</span>&nbsp;&nbsp;<?php __('with TeamMaker')?></span></td>
     <td width="46%" valign="top"><br />
       <table width="100%" border="0" align="right" cellpadding="0" cellspacing="4" class="miniLinks">
       <tr class="miniLinks">
@@ -197,7 +197,7 @@ function checkEmailAddress()
         <?php echo $this->Session->flash('email'); ?>
         <div align="left" id="loading"><?php echo $html->image('spinner.gif',array('alt'=>'spinner'))?></div>
         <div id="content"><?php echo $content_for_layout;?></div>
-      <h1 align="center"><span class="footer">Powered by iPeer and TeamMaker - Created by UBC and Rose-Hulman</span></h1>
+      <h1 align="center"><span class="footer"><?php __('Powered by iPeer and TeamMaker - Created by UBC and Rose-Hulman')?></span></h1>
       </div>
 
       <div class="bb"><div>&nbsp;</div></div>
@@ -224,7 +224,7 @@ function checkEmailAddress()
     </script>
     <?php
     exec ("svn info ../..", $lines, $retval);
-    $revision = "revision (unknown)";
+    $revision = __("revision (unknown)", true);
     //Ouput each line as a table
     $svnTable = "<table style='background-color:#FFF5EE'>";
     foreach ($lines as $line) {
@@ -261,7 +261,7 @@ function checkEmailAddress()
         <a href="javascript:toggleDivision('params-data');">(details)</a></td>
     <td>SQL Log
         <a href="javascript:toggleDivision('SQL-data');">(details)</a></td>
-    <td> <a style="color:blue" href="javascript:toggleDivision('allowedBy-data')">Allowed By&hellip;</a></td>
+    <td> <a style="color:blue" href="javascript:toggleDivision('allowedBy-data')"><?php __('Allowed By', true)?>&hellip;</a></td>
     </tr>
 
 </table>
@@ -274,23 +274,23 @@ function checkEmailAddress()
         <?php if(!empty($user)) var_dump($user); else echo "(Empty)"?></div>
     <div style="display: none; background-color:#E9FFFF; width: 90%;" id="coursesList-data">
         <h1>$coursesList variable</h1>
-        <?php if(!empty($coursesList)) var_dump($coursesList); else echo "(Empty)"?></div>
+        <?php if(!empty($coursesList)) var_dump($coursesList); else echo __("(Empty)", true)?></div>
     <div style="display: none; background-color:#FFE9FF; width: 90%;" id="actions-data">
         <h1>$actions variable</h1>
-        <?php if(!empty($action)) var_dump($action); else echo "(Empty)"?></div>
+        <?php if(!empty($action)) var_dump($action); else echo __("(Empty)", true)?></div>
     <div style="display: none; background-color:#E9FFFF; width: 90%;" id="access-data">
         <h1>$access variable</h1>
-        <?php if(!empty($access)) var_dump($access); else echo "(Empty)"?></div>
+        <?php if(!empty($access)) var_dump($access); else echo __("(Empty)", true)?></div>
     <div style="display: none; background-color:#E9FFFF; width: 90%;" id="params-data">
         <h1>$params variable</h1>
-        <?php if(!empty($params)) var_dump($params); else echo "(Empty)"?></div>
+        <?php if(!empty($params)) var_dump($params); else echo __("(Empty)", true)?></div>
     <div style="display: none; width: 95%; text-align: right;" id="allowedBy-data">
-        <?php echo !empty($allowedBy)? $allowedBy : "No AllowedBy data was set"; ?></div>
+        <?php echo !empty($allowedBy)? $allowedBy : __("No AllowedBy data was set", true); ?></div>
 
     <div style="display: none; width: 95%; background-color: #FFE9FF;" id="SQL-data">
         <?php
             $dataSource = ConnectionManager::getDataSource('default');
-            echo !empty($dataSource) ? $dataSource->showLog() : "No SQL data";
+            echo !empty($dataSource) ? $dataSource->showLog() : __("No SQL data", true);
         ?></div>
 
 <?php } // end if(!constant('DEBUG') == 0) ?>

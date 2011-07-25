@@ -70,12 +70,12 @@ class SysFunction extends AppModel
     	empty($this->data['SysFunction']['url_link']) || 
     	empty($this->data['SysFunction']['permission_type'])){
     			     
-    		$this->errorMessage = "All fields are required";
+    		$this->errorMessage = __("All fields are required", true);
       		return false;
     }
      
 	if(!is_numeric($this->data['SysFunction']['id'])){
-    	 $this->errorMessage = "Id must be a number";
+    	 $this->errorMessage = __("Id must be a number", true);
       	 return false;
 	}
          return parent::beforeSave();

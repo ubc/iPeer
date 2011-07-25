@@ -56,7 +56,7 @@ class EvaluationsController extends AppController
     $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
     $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
     $this->order = $this->sortBy.' '.strtoupper($this->direction);
-    $this->set('title_for_layout', 'Evaluations');
+    $this->set('title_for_layout', __('Evaluations', true));
     parent::__construct();
   }
 
@@ -83,7 +83,7 @@ class EvaluationsController extends AppController
             (($completedEvaluations == $totalMembers) ? "green_check.gif" : "red_x.gif")
             . "'>&nbsp;&nbsp;&nbsp;<b>$completedEvaluations</b> / <b>$totalMembers </b></center>";
 
-        $custom['results'] = 'Results';
+        $custom['results'] = __('Results', true);
 
         // Include missing submissions into the lates
         $lates = $this->GroupEvent->getLateGroupMembers($groupEventID) +
@@ -93,9 +93,9 @@ class EvaluationsController extends AppController
         $eventIsNowLate = $this->Event->checkIfNowLate($eventID);
 
         if ($eventIsNowLate) {
-            $custom['lates'] = ($lates > 0) ? " <b>$lates</b> Late" : "No Lates";
+            $custom['lates'] = ($lates > 0) ? " <b>$lates</b> ".__("Late", true) : __("No Lates", true);
         } else {
-            $custom['lates'] = "Not Yet";
+            $custom['lates'] = __("Not Yet", true);
         }
 
         $data[$key]['!Custom'] = $custom;
@@ -115,24 +115,24 @@ class EvaluationsController extends AppController
       //    Model   columns       (Display Title) (Type Description)
       array("GroupEvent.id",     "",           "",    "hidden"),
       array("Group.id",          "",           "",    "hidden"),
-      array("Group.group_num",   "Group #",    "7em", "action", "View Group"),
-      array("Group.group_name",  "Group Name", "auto","action", "View Results"),
-      array("!Custom.completion","Completed",  "6em", "string"),
-      array("!Custom.results",    "View",      "4em", "action", "View Results"),
-      array("!Custom.lates",     "Late?",      "7em", "action", "View Submission"),
+      array("Group.group_num",   __("Group #", true),    "7em", "action", "View Group"),
+      array("Group.group_name",  __("Group Name", true), "auto","action", "View Results"),
+      array("!Custom.completion", __("Completed", true),  "6em", "string"),
+      array("!Custom.results",    __("View", true),      "4em", "action", "View Results"),
+      array("!Custom.lates",     __("Late?", true),      "7em", "action", "View Submission"),
 
       // Release and mark status
-      array("GroupEvent.marked", "Status",      "9em",  "map",
-          array("not reviewed" => "Not Reviewed", "to review" => "To Review",
-                "reviewed" => "Reviewed")),
-      array("GroupEvent.grade_release_status","Grade", "7em",   "map",
-          array("None" => "Not Released", "Some" => "Some Released", "All" => "Released")),
-      array("GroupEvent.comment_release_status", "Comment", "7em",   "map",
-          array("None" => "Not Released", "Some" => "Some Released", "All" => "Released")),
+      array("GroupEvent.marked", __("Status", true),      "9em",  "map",
+          array("not reviewed" => __("Not Reviewed", true), "to review" => "To Review",
+                "reviewed" => __("Reviewed", true))),
+      array("GroupEvent.grade_release_status",__("Grade", true), "7em",   "map",
+          array("None" => __("Not Released", true), "Some" => __("Some Released", true), "All" => __("Released", true))),
+      array("GroupEvent.comment_release_status", __("Comment", true), "7em",   "map",
+          array("None" => __("Not Released", true), "Some" => __("Some Released", true), "All" => __("Released", true))),
 
       // Extra info about course and Event
       array("Event.id", "", "","hidden"),
-      array("Event.title",       "Event",        "10em",    "action", "View Event"),
+      array("Event.title",       __("Event", true),        "10em",    "action", "View Event"),
     );
 
     $joinTables = array(
@@ -153,11 +153,11 @@ class EvaluationsController extends AppController
     $actions = array(
       //   parameters to cakePHP controller:,
       //   display name, (warning shown), fixed parameters or Column ids
-      array("View Results",    "", "", "", "!viewEvaluationResults", "Event.id", "Group.id"),
-      array("View Submission", "", "", "", "!viewGroupSubmissionDetails", "Event.id", "Group.id"),
-      array("View Group",      "", "", "groups", "!view", "Group.id"),
-      array("View Event",      "", "", "events", "!view", "Event.id"),
-      array("Edit Event",      "", "", "events", "edit", "Event.id"),
+      array(__("View Results", true),    "", "", "", "!viewEvaluationResults", "Event.id", "Group.id"),
+      array(__("View Submission", true), "", "", "", "!viewGroupSubmissionDetails", "Event.id", "Group.id"),
+      array(__("View Group", true),      "", "", "groups", "!view", "Group.id"),
+      array(__("View Event", true),      "", "", "events", "!view", "Event.id"),
+      array(__("Edit Event", true),      "", "", "events", "edit", "Event.id"),
     );
 
     $recursive = (-1);
@@ -227,7 +227,7 @@ class EvaluationsController extends AppController
     //$this->rdAuth->noStudentsAllowed();
 
     $courseId = $this->rdAuth->courseId;
-    $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > List Evaluation Results');
+    $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > List Evaluation Results', true));
 
     $personalizeData = $this->Personalize->find('all', 'user_id = '.$this->Auth->user('id'));
     $this->userPersonalize->setPersonalizeList($personalizeData);
@@ -302,7 +302,7 @@ class EvaluationsController extends AppController
   function export($courseId=null) {
       // Make sure the present user is not a student
       $this->rdAuth->noStudentsAllowed();
-      $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Export Evaluation Results');
+      $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Export Evaluation Results', true));
       $this->set('courseId',$courseId);
       //do stuff
       if (isset($this->params['form']) && !empty($this->params['form'])) {
@@ -339,7 +339,7 @@ class EvaluationsController extends AppController
           //$this->rdAuth->setCourseId($event['Event']['course_id']);
           $this->set('courseId', $event['Event']['course_id']);
           $courseId = $event['Event']['course_id'];
-          $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers');
+          $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
 
           //Set userId, first_name, last_name
           $this->set('userId', $userId);
@@ -388,12 +388,12 @@ class EvaluationsController extends AppController
               $this->redirect('/evaluations/makeSimpleEvaluation/'.$this->params['form']['event_id']);
           }*/
           if ($this->Evaluation->saveSimpleEvaluation($this->params, $groupEvent, $evaluationSubmission)) {
-              $this->redirect('/home/index/Your Evaluation was submitted successfully.');
+              $this->redirect('/home/index/'.__('Your Evaluation was submitted successfully.', true));
           } else {
               //Found error
               //Validate the error why the Event->save() method returned false
               $this->validateErrors($this->Event);
-              $this->set('errmsg', 'Save Evaluation failure.');
+              $this->set('errmsg', __('Save Evaluation failure.', true));
               $this->redirect('/evaluations/makeSimpleEvaluation');
           }//end if
       }
@@ -428,7 +428,7 @@ function makeSurveyEvaluation ($param = null) {
           $courseId = $event['Event']['course_id'];
               $survey_id = $event['Event']['template_id'];
 
-          $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').' > Survey');
+          $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').__(' > Survey', true));
           //$survey_id = $this->Survey->getSurveyIdByCourseIdTitle($courseId, $courseName);
           $this->set('survey_id', $survey_id);
 
@@ -458,9 +458,9 @@ function makeSurveyEvaluation ($param = null) {
               //$this->redirect('/evaluations/makeSurveyEvaluation/'.$eventId);
           }
           if ($this->Evaluation->saveSurveyEvaluation($this->params)) {
-              $this->redirect('/home/index/Your survey was submitted successfully.');
+              $this->redirect('/home/index/'.__('Your survey was submitted successfully.', true));
           } else {
-              echo "<h1>Hello!</h1>";
+              echo __("<h1>Hello!</h1>", true);
               //Validate the error why the Event->save() method returned false
               // $this->validateErrors($this->Event);
               //this->redirect('/evaluations/makeSurveyEvaluation/'.$eventId);
@@ -502,7 +502,7 @@ function makeSurveyEvaluation ($param = null) {
           $rubricEvalViewData = $this->Rubric->compileViewData($rubric);
           //var_dump($rubricEvalViewData);
           $this->set('viewData',$rubricEvalViewData);
-          $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers');
+          $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
 
           $rubricDetail = $this->Evaluation->loadRubricEvaluationDetail($event, $groupId);
           $this->set('rubric', $rubricDetail['rubric']);
@@ -527,7 +527,7 @@ function makeSurveyEvaluation ($param = null) {
           else {
               //Validate the error why the Event->save() method returned false
               $this->validateErrors($this->Event);
-              $this->set('errmsg', 'Save Evaluation failure.');
+              $this->set('errmsg', __('Save Evaluation failure.', true));
               $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
           }//end if
       }
@@ -581,7 +581,7 @@ function makeSurveyEvaluation ($param = null) {
       }
 
       if ($status) {
-          $this->redirect('/home/index/Your Evaluation was submitted successfully.');
+          $this->redirect('/home/index/'.__('Your Evaluation was submitted successfully.', true));
       } else {
           $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
       }
@@ -602,7 +602,7 @@ function makeSurveyEvaluation ($param = null) {
           $this->rdAuth->setCourseId($event['Event']['course_id']);
           $courseId = $event['Event']['course_id'];
           $this->set('courseId', $courseId);
-          $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').' > Evaluate Peers');
+          $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
           $mixEvalDetail = $this->Evaluation->loadMixEvaluationDetail($event);
           $this->set('view_data', $this->Mixeval->compileViewDataShort($mixEvalDetail['mixeval'], $this));
           $this->set('data', $mixEvalDetail['mixeval']);
@@ -626,7 +626,7 @@ function makeSurveyEvaluation ($param = null) {
           else {
               //Validate the error why the Event->save() method returned false
               $this->validateErrors($this->Event);
-              $this->set('errmsg', 'Save Evaluation failure.');
+              $this->set('errmsg', __('Save Evaluation failure.', true));
               $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
           }//end if
       }
@@ -681,7 +681,7 @@ function makeSurveyEvaluation ($param = null) {
       }
 
       if ($status) {
-          $this->redirect('/home/index/Your Evaluation was submitted successfully.');
+          $this->redirect('/home/index/'.__('Your Evaluation was submitted successfully.', true));
       } else {
           $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
       }
@@ -707,7 +707,7 @@ function makeSurveyEvaluation ($param = null) {
       $this->Event->formatEventObj($eventId, $groupId));
     
     $this->set('event', $event);
-    $this->set('title_for_layout', !empty($event['Event']) ? $this->sysContainer->getCourseName($courseId).' > '.$event['Event']['title']. ' > Results ':'');
+    $this->set('title_for_layout', !empty($event['Event']) ? $this->sysContainer->getCourseName($courseId).' > '.$event['Event']['title']. __(' > Results ', true):'');
 
 
     switch ($event['Event']['event_template_type_id'])
@@ -820,7 +820,7 @@ function makeSurveyEvaluation ($param = null) {
       //Setup the courseId to session
       $this->rdAuth->setCourseId($event['Event']['course_id']);
       $courseId = $this->rdAuth->courseId;
-      $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId,$this->Auth->user('role')).' > '.$event['Event']['title']. ' > View My Results ');
+      $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId,$this->Auth->user('role')).' > '.$event['Event']['title']. __(' > View My Results ', true));
 
       //Get Group Event
       $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($event['Event']['id'], $event['group_id']);
@@ -1140,7 +1140,7 @@ function makeSurveyEvaluation ($param = null) {
 
     $this->layout = 'pop_up';
 
-    $this->set('title_for_layout', 'Submission Details');
+    $this->set('title_for_layout', __('Submission Details', true));
 
     $this->Event->id = $eventId;
     $event = $this->Event->read();
@@ -1319,7 +1319,7 @@ $this->pre(array_keys($evalutorToEvaluateesByGroup)); die;
                       if (isset($evalutorToEvaluateesArray[$evaluators[$rowIndex-1]][$evaluators[$columnIndex-1]][$mode][$questionIndex]))
                           echo "<td>".$evalutorToEvaluateesArray[$evaluators[$rowIndex-1]][$evaluators[$columnIndex-1]][$mode][$questionIndex]."&nbsp</td>";
                       else
-                          echo "<td>N/A</td>";
+                          echo "<td>".__('N/A', true)."</td>";
                   }
               }
               echo "</tr>";
@@ -1410,7 +1410,7 @@ function export_test($eventId=null,$groupID=null)
        foreach ($rubric_criteria as $key=>$value)
        fputcsv($fh,array($key,$value));
 
-      $header=array("Group Number","Group Name","First Name","Last Name","Student Number","Email","General Comments","Score","Specific Comments");
+      $header=array(__("Group Number", true), __("Group Name", true), __("First Name", true), __("Last Name", true), __("Student Number", true), __("Email", true), __("General Comments", true), __("Score", true), __("Specific Comments", true));
 
       fputcsv($fh,$header);
       foreach ($user_data as $key=>$value)
@@ -1453,7 +1453,7 @@ function export_test($eventId=null,$groupID=null)
       unset($line);
       }
       fclose($fh);
-  header("Location: ../tmp/test/output.csv");
+  header(__("Location:", true)." ../tmp/test/output.csv");
 
 
 

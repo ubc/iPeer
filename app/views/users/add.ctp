@@ -17,7 +17,10 @@
         <!-- User Name -->
         <tr class="tablecell2">
           <?php echo $this->Form->input('username', array('id' => 'username', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'after' => $username_msg,
-                                                          //'error' => array('unique' => __('Duplicate Username found. Please change the username.', true)),
+                                                          'error' => array( 'minLength' => __('Usernames must be at least 6 characters long', true), 
+                                                          'character' => __('Usernames must be at least 6 characters long', true),
+                                                          'unique' => __('Duplicate Username found. Please change the username.', true)),
+                                                          'label' => __('Username', true),
                                                           'readonly' => $readonly));?>
           <?php echo $readonly ? '' : $ajax->observeField('username', array('update'=>'usernameErr', 'url'=>'checkDuplicateName/', 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');stripe();")); ?>
           <td width="255"><div id='username_msg' class="error"></div><div id='usernameErr' class="error"></div></td>
@@ -56,6 +59,7 @@
         <tr class="tablecell2">
             <?php echo $this->Form->input('email', array('size'=>'50', 'class'=>'validate none EMAIL_FORMAT email_msg Invalid_Email_Format.',
                                                          'after' => '', 'label' => __('Email', true),
+                                                         'error' => __('Invalid email format', true), 
                                                          'readonly' => $readonly)) ?>                                          
             <td id="email_msg" class="error">&nbsp;</td>
         </tr>

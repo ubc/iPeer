@@ -47,7 +47,7 @@ class MixevalsController extends AppController
 		$this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
-		$this->set('title_for_layout', 'Mixed Evaluations');
+		$this->set('title_for_layout', __('Mixed Evaluations', true));
 		$this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
 		parent::__construct();
 	}
@@ -60,7 +60,7 @@ class MixevalsController extends AppController
 				$inUse = (0 != $entry['Mixeval']['event_count']);
 
 				// Put in the custom column
-				$data[$key]['!Custom']['inUse'] = $inUse ? "Yes" : "No";
+				$data[$key]['!Custom']['inUse'] = $inUse ? __("Yes", true) : __("No", true);
 			}
 		}
 		// Return the processed data back
@@ -74,16 +74,16 @@ class MixevalsController extends AppController
           // Set up Columns
           $columns = array(
           array("Mixeval.id",            "",              "",  "hidden"),
-          array("Mixeval.name",          "Name",         "auto", "action", "View Evaluation"),
-          array("!Custom.inUse",         "In Use",       "4em",  "number"),
-          array("Mixeval.availability",  "Availability", "6em",  "string"),
-          array("Mixeval.scale_max",     "LOM",          "3em",  "number"),
-          array("Mixeval.total_question",  "Questions",    "4em", "number"),
-          array("Mixeval.total_marks",  "Total Marks",    "4em", "number"),
+          array("Mixeval.name",          __("Name", true),         "auto", "action", "View Evaluation"),
+          array("!Custom.inUse",         __("In Use", true),       "4em",  "number"),
+          array("Mixeval.availability",  __("Availability", true), "6em",  "string"),
+          array("Mixeval.scale_max",     __("LOM", true),          "3em",  "number"),
+          array("Mixeval.total_question",  __("Questions", true),    "4em", "number"),
+          array("Mixeval.total_marks",  __("Total Marks", true),    "4em", "number"),
           array("Mixeval.event_count",   "",       "",        "hidden"),
           array("Mixeval.creator_id",           "",               "",    "hidden"),
-          array("Mixeval.creator",     "Creator",        "8em", "action", "View Creator"),
-          array("Mixeval.created",      "Creation Date",  "10em", "date"));
+          array("Mixeval.creator",     __("Creator", true),        "8em", "action", "View Creator"),
+          array("Mixeval.created",      __("Creation Date", true),  "10em", "date"));
 
           // Just list all and my evaluations for selections
           $userList = array($this->Auth->user('id') => "My Evaluations");
@@ -92,7 +92,7 @@ class MixevalsController extends AppController
           $jointTableCreator =
             array("id"         => "Creator.id",
                   "localKey"   => "creator_id",
-                  "description" => "Evaluations to show:",
+                  "description" => __("Evaluations to show:", true),
                   "default" => $myID,
                   "list" => $userList,
                   "joinTable"  => "users",
@@ -114,13 +114,13 @@ class MixevalsController extends AppController
           }
 
           // Set up actions
-          $warning = "Are you sure you want to delete this evaluation permanently?";
+          $warning = __("Are you sure you want to delete this evaluation permanently?", true);
           $actions = array(
-          array("View Evaluation", "", "", "", "view", "Mixeval.id"),
-          array("Edit Evaluation", "", $restrictions, "", "edit", "Mixeval.id"),
-          array("Copy Evaluation", "", "", "", "copy", "Mixeval.id"),
-          array("Delete Evaluation", $warning, $restrictions, "", "delete", "Mixeval.id"),
-          array("View Creator", "",    "", "users", "view", "Creator.id"));
+          array(__("View Evaluation", true), "", "", "", "view", "Mixeval.id"),
+          array(__("Edit Evaluation", true), "", $restrictions, "", "edit", "Mixeval.id"),
+          array(__("Copy Evaluation", true), "", "", "", "copy", "Mixeval.id"),
+          array(__("Delete Evaluation", true), $warning, $restrictions, "", "delete", "Mixeval.id"),
+          array(__("View Creator", true), "",    "", "users", "view", "Creator.id"));
 
           // No recursion in results
           $recursive = 0;
@@ -203,7 +203,7 @@ class MixevalsController extends AppController
 			}
 		}
 		$this->set('data', $this->data);
-		$this->set('action', 'Add Mixed Evaluation');
+		$this->set('action', __('Add Mixed Evaluation', true));
 		$this->render('edit');
 	}
 
@@ -244,7 +244,7 @@ class MixevalsController extends AppController
 			
 			
 		$this->set('data', $this->data);
-		$this->set('action', 'Edit Mixed Evaluation');
+		$this->set('action', __('Edit Mixed Evaluation', true));
 		$this->render('edit');
 	}
 
@@ -265,7 +265,7 @@ class MixevalsController extends AppController
 
 	function copy($id=null)
 	{
-		$this->set('action', 'Copy Mixed Evaluation');
+		$this->set('action', __('Copy Mixed Evaluation', true));
 		$this->render = false;
 		$this->Mixeval->id = $id;
 		$data = $this->Mixeval->read();
@@ -284,8 +284,8 @@ class MixevalsController extends AppController
 
 		if ($inUse) {
 			$message = "<span style='color:red'>";
-			$message.= "This evaluation is now in use, and can NOT be deleted.<br />";
-			$message.= "Please remove all the events assosiated with this evaluation first.";
+			$message.= __("This evaluation is now in use, and can NOT be deleted.<br />", true);
+			$message.= __("Please remove all the events assosiated with this evaluation first.", true);
 			$message.= "</span>";
 			$this->Session->setFlash(__($message, true));
 			$this->redirect('index');

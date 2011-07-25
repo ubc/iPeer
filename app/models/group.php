@@ -119,7 +119,7 @@ class Group extends AppModel
   function beforeSave(){ //serverside validation
     // Ensure the name is not empty
     if (empty($this->data[$this->name]['group_name'])) {
-      $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
+      $this->errorMessage = __("Please enter a new name for this ", true) . $this->name . ".";
       return false;
     }
 

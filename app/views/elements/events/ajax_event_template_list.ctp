@@ -32,21 +32,21 @@
                 ?>
 
       <?php if ($model == 'SimpleEvaluation'):?>
-        <a title="Simple Evaluation Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'simpleevaluations', '<?php echo $url?>'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;<?php __('Preview This Simple Evaluation')?></a>
+        <a title=<?php __("Simple Evaluation Preview", true)?> target="_blank" href="javascript:void;" onclick="getIndex(this,'simpleevaluations', '<?php echo $url?>'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;<?php __('Preview This Simple Evaluation')?></a>
       <?php elseif ($model == 'Rubric'):?>
-        <a title="Rubric Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'rubrics', '<?php echo $url?>'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;<?php __('Preview This Rubric')?></a>
+        <a title=<?php __("Rubric Preview")?> target="_blank" href="javascript:void;" onclick="getIndex(this,'rubrics', '<?php echo $url?>'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;<?php __('Preview This Rubric')?></a>
       <?php elseif ($model == 'Mixeval'):?>
-        <a title="Mix Evaluation Preview" target="_blank" href="javascript:void;" onclick="getIndex(this,'mixevals', '<?php echo $url?>'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;<?php __('Preview this Mixed Evaluaiton')?></a>
+        <a title=<?php __("Mix Evaluation Preview")?> target="_blank" href="javascript:void;" onclick="getIndex(this,'mixevals', '<?php echo $url?>'); wopen(this.href, 'popup', 650, 500); return false;">&nbsp;<?php __('Preview this Mixed Evaluaiton')?></a>
       <?php endif;?> 
     <?php
     }
   } else {
     if ($model == 'SimpleEvaluation') {
-        $evalTypeString = "Simple";
+        $evalTypeString = __("Simple", true);
     } else if ($model == 'Rubric') {
-        $evalTypeString = "Rubric";
+        $evalTypeString = __("Rubric", true);
     } else if ($model == 'Mixeval') {
-        $evalTypeString = "Mixed";
+        $evalTypeString = __("Mixed", true);
     } else {
         $evalTypeString = "(".__('Unknown Evaluation Type')." : $model)";
     }

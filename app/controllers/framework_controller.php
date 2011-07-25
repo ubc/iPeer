@@ -39,7 +39,7 @@ class FrameworkController extends AppController
 	function __construct()
 	{
 		$this->Sanitize = new Sanitize;
- 		$this->set('title_for_layout', 'Framework');
+ 		$this->set('title_for_layout', __('Framework', true));
 		parent::__construct();
 	}
 
@@ -54,13 +54,13 @@ class FrameworkController extends AppController
     $this->AccessControl->check('functions/user', 'read');
 
     if (!is_numeric($id) || !($this->data = $this->User->findUserByid($id))) {
-      $this->Session->setFlash('Invalid user ID.');
+      $this->Session->setFlash(__('Invalid user ID.', true));
       $this->redirect('index');
     }
 
     $roles = $this->User->getRoles($id);
     if(!$this->AccessControl->hasPermissionDoActionOnUserWithRoles('ViewUser', $roles)) {
-      $this->Session->setFlash('You do not have permission to view this user.');
+      $this->Session->setFlash(__('You do not have permission to view this user.', true));
       $this->redirect('index');
     }
 

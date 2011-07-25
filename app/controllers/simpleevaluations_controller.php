@@ -53,7 +53,7 @@ class SimpleevaluationsController extends AppController
 		$this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
- 		$this->set('title_for_layout', 'Simple Evaluations');
+ 		$this->set('title_for_layout', __('Simple Evaluations', true));
     $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
 
 		parent::__construct();
@@ -82,13 +82,13 @@ class SimpleevaluationsController extends AppController
     $columns = array(
             array("SimpleEvaluation.id",   "",       "",        "hidden"),
             array("SimpleEvaluation.event_count",   "",       "",        "hidden"),
-            array("SimpleEvaluation.name", "Name",   "12em",    "action",   "View Evaluation"),
-            array("SimpleEvaluation.description", "Description","auto",  "action", "View Evaluation"),
-            array("!Custom.inUse", "In Use",          "4em",    "number"),
-            array("SimpleEvaluation.point_per_member", "Points/Member", "10em", "number"),
+            array("SimpleEvaluation.name", __("Name", true),   "12em",    "action",   "View Evaluation"),
+            array("SimpleEvaluation.description", __("Description", true),"auto",  "action", "View Evaluation"),
+            array("!Custom.inUse", __("In Use", true),          "4em",    "number"),
+            array("SimpleEvaluation.point_per_member", __("Points/Member", true), "10em", "number"),
             array("SimpleEvaluation.creator_id",           "",            "",     "hidden"),
-            array("SimpleEvaluation.creator",     "Creator",  "10em", "action", "View Creator"),
-            array("SimpleEvaluation.created", "Creation Date", "10em", "date"));
+            array("SimpleEvaluation.creator",     __("Creator", true),  "10em", "action", "View Creator"),
+            array("SimpleEvaluation.created", __("Creation Date", true), "10em", "date"));
 
     $userList = array($myID => "My Evaluations");
 
@@ -96,7 +96,7 @@ class SimpleevaluationsController extends AppController
     $jointTableCreator =
       array("id"         => "Creator.id",
             "localKey"   => "creator_id",
-            "description" => "Evaluations to show:",
+            "description" => __("Evaluations to show:", true),
             "default" => $myID,
             "list" => $userList,
             "joinTable"  => "users",
@@ -116,13 +116,13 @@ class SimpleevaluationsController extends AppController
     }
 
     // Set up actions
-    $warning = "Are you sure you want to delete this evaluation permanently?";
+    $warning = __("Are you sure you want to delete this evaluation permanently?", true);
     $actions = array(
-                     array("View Evaluation", "", "", "", "view", "SimpleEvaluation.id"),
-                     array("Edit Evaluation", "", $restrictions, "", "edit", "SimpleEvaluation.id"),
-                     array("Copy Evaluation", "", "", "", "copy", "SimpleEvaluation.id"),
-                     array("Delete Evaluation", $warning, $restrictions, "", "delete", "SimpleEvaluation.id"),
-                     array("View Creator", "",    "", "users", "view", "SimpleEvaluation.creator_id"));
+                     array(__("View Evaluation", true), "", "", "", "view", "SimpleEvaluation.id"),
+                     array(__("Edit Evaluation", true), "", $restrictions, "", "edit", "SimpleEvaluation.id"),
+                     array(__("Copy Evaluation", true), "", "", "", "copy", "SimpleEvaluation.id"),
+                     array(__("Delete Evaluation", true), $warning, $restrictions, "", "delete", "SimpleEvaluation.id"),
+                     array(__("View Creator", true), "",    "", "users", "view", "SimpleEvaluation.creator_id"));
 
     // No recursion in results
     $recursive = 0;
@@ -163,7 +163,7 @@ class SimpleevaluationsController extends AppController
 
     if(!empty($this->data)) {
       if($this->__processForm()) {
-        $this->Session->setFlash("The evaluation was added successfully.");
+        $this->Session->setFlash(__("The evaluation was added successfully.", true));
         $this->redirect('index');
       } else {
         $this->Session->setFlash($this->SimpleEvaluation->errorMessage);
@@ -189,14 +189,14 @@ class SimpleevaluationsController extends AppController
 
 	function edit($id) {
     if(!is_numeric($id)) {
-      $this->Session->setFlash('Invalid ID.');
+      $this->Session->setFlash(__('Invalid ID.', true));
       $this->redirect('index');
     }
 
     $this->data['SimpleEvaluation']['id'] = $id;
 
 		if ($this->__processForm()) {
-      $this->Session->setFlash('The simple evaluation was updated successfully.');
+      $this->Session->setFlash(__('The simple evaluation was updated successfully.', true));
       $this->redirect('index');
     } else {
 			$this->data = $this->SimpleEvaluation->find('first', array('conditions' => array('id' => $id),
@@ -221,8 +221,8 @@ class SimpleevaluationsController extends AppController
 	function delete($id) {
     // Deny Deleting evaluations in use:
     if ($this->SimpleEvaluation->getEventCount($id)) {
-      $message = "This evaluation is now in use, and can NOT be deleted.<br />";
-      $message.= "Please remove all the events assosiated with this evaluation first.";
+      $message = __("This evaluation is now in use, and can NOT be deleted.<br />", true);
+      $message.= __("Please remove all the events assosiated with this evaluation first.", true);
       $this->Session->setFlash($message);
       $this->redirect('index');
     }
@@ -232,9 +232,9 @@ class SimpleevaluationsController extends AppController
     }   //end if*/
 
     if ($this->SimpleEvaluation->delete($id)) {
-			$this->Session->setFlash('The evaluation was deleted successfully.');
+			$this->Session->setFlash(__('The evaluation was deleted successfully.', true));
 		} else {
-      $this->Session->setFlash('Evaluation delete failed.');
+      $this->Session->setFlash(__('Evaluation delete failed.', true));
 		}
     $this->redirect('index');
 	}

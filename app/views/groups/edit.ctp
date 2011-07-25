@@ -33,7 +33,7 @@
 
   <tr class="tablecell2">
     <td><?php __('Status')?>:</td>
-    <td><?php echo $this->Form->select('record_status', array('A' => 'Active', 'I' => 'Inactive'), null, array('empty' => false,
+    <td><?php echo $this->Form->select('record_status', array('A' => __('Active', true), 'I' => __('Inactive', true)), null, array('empty' => false,
                                                                                                                'disabled' => $readonly))?></td>
   </tr>
 

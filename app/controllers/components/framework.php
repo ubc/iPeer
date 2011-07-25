@@ -21,18 +21,18 @@ class frameworkComponent
     $result = true;
   	$fileParts = pathinfo('dir/' . $filename);
     if (empty($fileParts['extension'])) {
-      $result = "No filename extension. Must be csv.";
+      $result = __("No filename extension. Must be csv.", true);
       return $result;
     }
     //echo "tem file is ".$tmpFile.' file name is  '.$fileName.' upload file is '.$uploadFile.'<br>';
   	$fileExtension = strtolower($fileParts['extension']); 
   	if ($fileExtension == 'txt' || $fileExtension == 'csv')  {
   		if (!move_uploaded_file($tmpFile, $uploadFile)) {
-  			$result = "Error reading file";
+  			$result = __("Error reading file", true);
   		}
   	} else {
-  		$result = "iPeer does not support the file type '." . $fileExtension .
-  					 "'. Please use only text files (.txt) or comma seperated values files (.csv).";
+  		$result = __("iPeer does not support the file type '.", true) . $fileExtension .
+  					 __("'. Please use only text files (.txt) or comma seperated values files (.csv).", true);
   	}
   	return $result;
   }
@@ -44,16 +44,16 @@ class frameworkComponent
   	$hours = $minutes / 60;
   	$days = $hours / 24;
 
-  	if ($format == 'days') {
+  	if ($format == __('days', true)) {
   		return $days;
   	}
-  	else if ($format == 'hours') {
+  	else if ($format == __('hours', true)) {
   		return $hours;
   	}
-  	else if ($format == 'minutes') {
+  	else if ($format == __('minutes', true)) {
   		return $minutes;
   	}
-  	else if ($format == 'seconds') {
+  	else if ($format == __('seconds', true)) {
   		return $seconds;
   	}
   	else {

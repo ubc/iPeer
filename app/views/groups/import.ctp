@@ -42,7 +42,7 @@
 <form name="importfrm" id="importfrm" method="POST" action="<?php echo $html->url('import') ?>" enctype="multipart/form-data" >
     <h3>1) <?php __('Please select a CSV file to import')?>:</h3>
     &nbsp;&nbsp;&nbsp;&nbsp;
-    <input type="file" name="file" value="Browse" /><br>
+    <input type="file" name="file" value="<?php __('Browse')?>" /><br>
     <?php
         $params = array('controller'=>'users', 'coursesList'=>$coursesList, "defaultOpt" => $courseId);
     ?>

@@ -42,7 +42,7 @@
                 <br />
         		  	<?php if ($event['to_review_count']>0): ?>
                   <font color='darkred' style='padding-left:2em'>
-                    <?php echo $event['to_review_count'] . ' new group evaluation' . (($event['to_review_count'] > 1) ? 's' : '') . ' to review.'?>
+                    <?php echo $event['to_review_count'] . __(' new group evaluation', true) . (($event['to_review_count'] > 1) ? 's' : '') . __(' to review.', true)?>
                   </font>
             		<?php endif;?>       
           		</td>
@@ -70,7 +70,7 @@
         <div class="course">
           <div class="course-header"><?php echo $row['Course']['course'] ?></div>
           <div class="instructor">
-  			    <b>Instructor(s): </b>&nbsp;
+  			    <b><?php __('Instructor(s)')?>: </b>&nbsp;
             <?php echo $this->element('courses/course_instructors',
                                   array('instructors' => $row['Instructor']));?>
           </div>

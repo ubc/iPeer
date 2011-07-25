@@ -45,24 +45,24 @@ class SysParameter extends AppModel
     if (empty($this->data['SysParameter']['id'])) {
     	
     	
-    	   $this->errorMessage = "Id is required";
+    	   $this->errorMessage = __("Id is required", true);
       return false;
     } 
     
          if (!is_numeric($this->data['SysParameter']['id'])) {
     	
-    	   $this->errorMessage = "Id must be a number";
+    	   $this->errorMessage = __("Id must be a number", true);
       return false;
     }
     
     
         if (empty($this->data['SysParameter']['parameter_code'])) {
     	
-    	   $this->errorMessage = "Parameter code is required";
+    	   $this->errorMessage = __("Parameter code is required", true);
       return false;
     } 
      if (empty($this->data['SysParameter']['parameter_type'])) {
-      $this->errorMessage = "Parameter type is required";
+      $this->errorMessage = __("Parameter type is required", true);
       return false;
     }
   

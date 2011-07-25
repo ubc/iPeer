@@ -7,11 +7,11 @@
           <div class="table-header"><?php __('iPeer Login')?></div>
           <div class="table-content">
             <?php echo $form->create('loginout', array('url' => array('controller' => 'loginout', 'action' => 'loginByDefault'), 'onSubmit' => 'return validate();'))?>
-              <?php echo $form->input("User.username", array('label' => 'Username: ')); ?>
+              <?php echo $form->input("User.username", array('label' => __('Username: ', true))); ?>
               <script>
                 $("UserUsername").focus();
               </script>
-              <?php echo $form->input("User.password", array('label' => 'Password: ')); ?>
+              <?php echo $form->input("User.password", array('label' => __('Password: ', true))); ?>
               <?php echo $form->end("Submit") ?>
           </div>
         </div>

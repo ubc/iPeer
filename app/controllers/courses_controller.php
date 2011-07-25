@@ -55,12 +55,12 @@ class CoursesController extends AppController
     // Set up Columns
     $columns = array(
         array("Course.id",            "",            "",      "hidden"),
-        array("Course.homepage",      "Web",         "4em",  "link",   "home.gif"),
-        array("Course.course",        "Course",      "15em",  "action", "Course Home"),
-        array("Course.title",         "Title",       "auto", "action", "Course Home"),
+        array("Course.homepage",      __("Web", true),         "4em",  "link",   "home.gif"),
+        array("Course.course",        __("Course", true),      "15em",  "action", "Course Home"),
+        array("Course.title",         __("Title", true),       "auto", "action", "Course Home"),
         array("Course.creator_id",           "",            "",     "hidden"),
-        array("Course.record_status", "Status",      "5em",  "map",     array("A" => "Active", "I" => "Inactive")),
-        array("Course.creator",     "Created by",  "10em", "action", "View Creator"),
+        array("Course.record_status", __("Status", true),      "5em",  "map",     array("A" => __("Active", true), "I" => __("Inactive",true))),
+        array("Course.creator",     __("Created by", true),  "10em", "action", "View Creator"),
         array("Instructor.id",        "",            "",     "hidden"));
 
     // put all the joins together
@@ -73,14 +73,14 @@ class CoursesController extends AppController
         
 
     // Set up actions
-    $warning = "Are you sure you want to delete this course permanently?";
+    $warning = __("Are you sure you want to delete this course permanently?", true);
     $actions = array(
-        array("Course Home", "", "", "", "home", "Course.id"),
-        array("View Record", "", "", "", "view", "Course.id"),
-        array("Edit Course", "", "", "", "edit", "Course.id"),
-        array("Delete Course", $warning, "", "", "delete", "Course.id"),
-        array("View Creator", "",    "", "users", "view", "Course.creator_id"),
-        array("View Instructor", "", "", "users", "view", "Instructor.id"));
+        array(__("Course Home", true), "", "", "", "home", "Course.id"),
+        array(__("View Record", true), "", "", "", "view", "Course.id"),
+        array(__("Edit Course", true), "", "", "", "edit", "Course.id"),
+        array(__("Delete Course", true), $warning, "", "", "delete", "Course.id"),
+        array(__("View Creator", true), "",    "", "users", "view", "Course.creator_id"),
+        array(__("View Instructor", true), "", "", "users", "view", "Instructor.id"));
 
     $recursive = 0;
 
@@ -149,14 +149,14 @@ class CoursesController extends AppController
 
 	function edit($id) {
     if(!is_numeric($id)) {
-      $this->Session->setFlash('Invalid course ID.');
+      $this->Session->setFlash(__('Invalid course ID.', true));
       $this->redirect('index');
     }
 
     $this->data['Course']['id'] = $id;
 
 		if (!empty($this->data) && $this->Course->save($this->data)) {
-      $this->Session->setFlash('The course was updated successfully.');
+      $this->Session->setFlash(__('The course was updated successfully.', true));
       $this->redirect('index');
     } else {
       $this->data = $this->Course->read(null, $id);
@@ -208,7 +208,7 @@ class CoursesController extends AppController
             $myCourses = $this->Course->findAccessibleCoursesListByUserIdRole($this->Auth->user('id'), $this->Auth->user('role'));
             $this->sysContainer->setMyCourseList($myCourses);
             // Finished all deletion of course related data
-            $this->redirect('/courses/index/The course was deleted successfully.');
+            $this->redirect('/courses/index/'.__('The course was deleted successfully.', true));
 		} else {
 		  $this->set('errmsg', $this->Course->errorMessage);
 		  $this->redirect('/courses/index');
@@ -240,7 +240,7 @@ class CoursesController extends AppController
       $this->set('course_id', $course_id);
       $this->render('/elements/courses/edit_instructor');
     } else {
-      return 'Unknown error';
+      return __('Unknown error', true);
     }
 
   }
@@ -255,7 +255,7 @@ class CoursesController extends AppController
 		if($this->Course->deleteInstructor($this->passedArgs['course_id'], $this->passedArgs['instructor_id'])) {
       return '';
     } else {
-      return 'Unknown error';
+      return __('Unknown error', true);
     }
 	}
 
@@ -268,7 +268,7 @@ class CoursesController extends AppController
 
       // check if the course is unique or the name is unchanged.
       return (empty($course) || (1 == count($course) && $this->params['named']['course_id'] == $course[0]['Course']['id'])) ?
-        '' : 'Duplicated course.';
+        '' : __('Duplicated course.', true);
   }
 
 	function update($attributeCode='',$attributeValue='')

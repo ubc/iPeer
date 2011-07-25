@@ -5,10 +5,10 @@
   		<tr>
             <td width="80%" align="right">
             <?php if($can_add_user):?>
-                <?php echo $html->image('icons/add.gif', array('alt'=>'Add User', 'valign'=>'middle')); ?>&nbsp;<?php echo $html->link(__('Add User', true), '/users/add'); ?>&nbsp;|&nbsp;
+                <?php echo $html->image('icons/add.gif', array('alt'=>__('Add User', true), 'valign'=>'middle')); ?>&nbsp;<?php echo $html->link(__('Add User', true), '/users/add'); ?>&nbsp;|&nbsp;
             <?php endif;?>
             <?php if($can_import_user):?>
-                <?php echo $html->image('icons/add.gif', array('alt'=>'Import User', 'valign'=>'middle')); ?>&nbsp;<?php echo $html->link(__('Import User', true), '/users/import'); ?>&nbsp;|&nbsp;
+                <?php echo $html->image('icons/add.gif', array('alt'=>__('Import User', true), 'valign'=>'middle')); ?>&nbsp;<?php echo $html->link(__('Import User', true), '/users/import'); ?>&nbsp;|&nbsp;
             <?php endif;?>
             </td>
         </tr>

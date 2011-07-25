@@ -42,7 +42,7 @@ class LoginoutController extends AppController
 	function __construct()
 	{
 		$this->Sanitize = new Sanitize;
-		$this->set('title_for_layout', 'Login');
+		$this->set('title_for_layout', __('Login', true));
 		$this->NeatString = new NeatString;
 		parent::__construct();
 	}
@@ -69,10 +69,10 @@ class LoginoutController extends AppController
 			//Check for CWL login auth
 			$cwlErr = $this->Session->read('CWLErr');
 			if ($cwlErr == 'STUDENT_INVALID_LOGIN'){
-				$this->set('errmsg', 'Access Denied. <br>Student must login by using UBC CWL Authentication.<br>If you are experiencing any issues regarding iPeer, please contact the iPeer administrator at <a href="mailto:ipeer.support@ubc.ca">ipeer.support@ubc.ca</a>.');
+				$this->set('errmsg', __('Access Denied. <br>Student must login by using UBC CWL Authentication.<br>If you are experiencing any issues regarding iPeer, please contact the iPeer administrator at <a href="mailto:ipeer.support@ubc.ca">ipeer.support@ubc.ca</a>.', true));
 				$this->Session->delete('CWLErr');
 			} else if ($cwlErr!=''){
-				$this->set('errmsg', 'Access Denied. <br>You have successfully logged in using your CWL account but you do not have access to the iPeer application.<br>If you are experiencing any issues regarding iPeer, please contact the iPeer administrator at <a href="mailto:ipeer.support@ubc.ca">ipeer.support@ubc.ca</a>.');
+				$this->set('errmsg', __('Access Denied. <br>You have successfully logged in using your CWL account but you do not have access to the iPeer application.<br>If you are experiencing any issues regarding iPeer, please contact the iPeer administrator at <a href="mailto:ipeer.support@ubc.ca">ipeer.support@ubc.ca</a>.', true));
 				$this->Session->delete('CWLErr');
 			}
 
@@ -82,19 +82,19 @@ class LoginoutController extends AppController
 			//$a=print_r($this->rdAuth->Session,true); echo "<pre>$a</pre>"; exit;
 			if (empty($lastURL)){
 				if ($accessErr=='INVALID_LOGIN'){
-					$this->set('errmsg', 'Access Denied. <br>Invalid Username/Password Combination.');
+					$this->set('errmsg', __('Access Denied. <br>Invalid Username/Password Combination.', true));
 					$this->Session->delete('URL');
 					$this->Session->delete('AccessErr');
 				}
 			} else {
 				if ($accessErr=='NO_LOGIN'){
-					$this->set('errmsg', 'please log in to see: '.$lastURL);
+					$this->set('errmsg', __('please log in to see: ', true).$lastURL);
 				}
 				if ($accessErr=='NO_PERMISSION'){
-					$this->set('errmsg', 'Permission Denied to see: '.$lastURL);
+					$this->set('errmsg', __('Permission Denied to see: ', true).$lastURL);
 				}
 				if ($accessErr=='INVALID_USER'){
-					$this->set('errmsg', 'Access Denied. <br>UBC CWL Authentication is only valid for students. <br>If you are experiencing any issues regarding the iPeer, please contact your administrator for details.');
+					$this->set('errmsg', __('Access Denied. <br>UBC CWL Authentication is only valid for students. <br>If you are experiencing any issues regarding the iPeer, please contact your administrator for details.', true));
 				}
 				$this->Session->delete('URL');
 				$this->Session->delete('AccessErr');
@@ -134,11 +134,11 @@ class LoginoutController extends AppController
 				//$this->set('errmsg', 'Session Expired.  Please log in again.');
 			} else {
 				if ($accessErr=='NO_LOGIN'){
-					$this->set('errmsg', 'Please Login to see '.$lastURL);
+					$this->set('errmsg', __('Please Login to see ', true).$lastURL);
 					$this->Session->delete('URL');
 				}
 				if ($accessErr=='NO_PERMISSION'){
-					$this->set('errmsg', 'Permission Denied to see: '.$lastURL);
+					$this->set('errmsg', __('Permission Denied to see: ', true).$lastURL);
 					$this->Session->delete('URL');
 				}
 			}
@@ -229,7 +229,7 @@ class LoginoutController extends AppController
 			$resp = $cli->send($msg);
 			if (!$resp)
 			{
-				echo 'Communication error: ' . $cli->errstr;
+				echo __('Communication error: ', true) . $cli->errstr;
 				exit;
 			}
 
@@ -292,8 +292,8 @@ class LoginoutController extends AppController
 			else
 			{
 				// error
-				echo '<b>Fault Code:</b> ' . $resp->faultCode() . "<br />\n";
-				echo '<b>Fault Reason:</b> ' . $resp->faultString() . "<br />\n";
+				echo __('<b>Fault Code:</b> ', true) . $resp->faultCode() . "<br />\n";
+				echo __('<b>Fault Reason:</b> ', true) . $resp->faultString() . "<br />\n";
 			}
 
 		}
@@ -369,10 +369,10 @@ class LoginoutController extends AppController
 		{
 
 			if($email == '') {
-				$errmsg .= 'Email address is required for password reset. ';
+				$errmsg .= __('Email address is required for password reset. ', true);
 			}
 			if($studentNo == '') {
-				$errmsg .= 'Student number is required for password reset. ';
+				$errmsg .= __('Student number is required for password reset. ', true);
 			}
 			if ($errmsg != '') {
 				$this->set('errmsg', $errmsg);
@@ -387,7 +387,7 @@ class LoginoutController extends AppController
 
 			// check if there is a user with that email
 			if( empty($user)) {
-				$errmsg .= 'There is no one with that email address in the system. ';
+				$errmsg .= __('There is no one with that email address in the system. ', true);
 			}
 			else {
 				// generate random password
@@ -418,18 +418,18 @@ class LoginoutController extends AppController
 					$success = $this->_sendEmail( $to, $from, $subject, $email_msg );
 
 					if($success) {
-						$this->set('message', 'Password reset request sent.');
+						$this->set('message', __('Password reset request sent.', true));
 						$this->set('student_no', $studentNo);
 						$this->set('email', $email);
 						$this->redirect('loginout/login');
 						return;
 					}
 					else {
-						$errmsg .= 'There was a problem in sending email. Please contact your iPeer administrator. ';
+						$errmsg .= __('There was a problem in sending email. Please contact your iPeer administrator. ', true);
 					}
 				}
 				else {
-					$errmsg .= 'There was a problem resetting your password. Please contact your iPeer administrator. ';
+					$errmsg .= __('There was a problem resetting your password. Please contact your iPeer administrator. ', true);
 				}
 			}
 		}

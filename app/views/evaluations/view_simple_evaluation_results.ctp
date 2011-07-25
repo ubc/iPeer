@@ -29,10 +29,10 @@
 
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
-    <td width="10" height="32" align="center" colspan="<?php echo count($groupMembers) +1; ?>">Evaluation Results:</td>
+    <td width="10" height="32" align="center" colspan="<?php echo count($groupMembers) +1; ?>"><?php __('Evaluation Results')?>:</td>
   </tr>
   <tr class="tablecell2">
-  	<td rowspan="2">Evaluator</td>
+  	<td rowspan="2"><?php __('Evaluator')?></td>
   	<td colspan="<?php echo count($groupMembers); ?>"><?php __('Members Evaluated')?></td>
   </tr>
   <tr class="tablecell2">

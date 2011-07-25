@@ -48,7 +48,7 @@ class RubricsController extends AppController
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
     	$this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
- 		$this->set('title_for_layout', 'Rubrics');
+ 		$this->set('title_for_layout', __('Rubrics', true));
     parent::__construct();
 	}
 	
@@ -60,7 +60,7 @@ class RubricsController extends AppController
         $inUse = (0 != $entry['Rubric']['event_count']);
 
         // Put in the custom column
-        $data[$key]['!Custom']['inUse'] = $inUse ? "Yes" : "No";
+        $data[$key]['!Custom']['inUse'] = $inUse ? __("Yes", true) : __("No", true);
       }
     }
     // Return the processed data back
@@ -73,16 +73,16 @@ class RubricsController extends AppController
     // Set up Columns
     $columns = array(
             array("Rubric.id",          "",            "",      "hidden"),
-            array("Rubric.name",        "Name",        "auto",  "action", "View Rubric"),
-            array("!Custom.inUse",      "In Use",      "4em",   "number"),
-            array("Rubric.availability","Availability","6em",   "string"),
-            array("Rubric.lom_max",     "LOM",         "4em",   "number"),
-            array("Rubric.criteria",    "Criteria",    "4em",   "number"),
-            array("Rubric.total_marks", "Total",       "4em",   "number"),
+            array("Rubric.name",        __("Name", true),        "auto",  "action", "View Rubric"),
+            array("!Custom.inUse",      __("In Use", true),      "4em",   "number"),
+            array("Rubric.availability",__("Availability", true), "6em",   "string"),
+            array("Rubric.lom_max",     __("LOM", true),         "4em",   "number"),
+            array("Rubric.criteria",    __("Criteria", true),    "4em",   "number"),
+            array("Rubric.total_marks", __("Total", true),       "4em",   "number"),
             array("Rubric.event_count",   "",       "",        "hidden"),
             array("Rubric.creator_id",         "",            "",      "hidden"),
-            array("Rubric.creator",   "Creator",     "8em",   "action", "View Creator"),
-            array("Rubric.created",     "Creation Date","10em", "date"));
+            array("Rubric.creator",   __("Creator",true),     "8em",   "action", "View Creator"),
+            array("Rubric.created",     __("Creation Date", true),"10em", "date"));
 
     // Just list all and my evaluations for selections
     $userList = array($this->Auth->user('id') => "My Evaluations");
@@ -91,7 +91,7 @@ class RubricsController extends AppController
     $jointTableCreator =
       array("id"         => "Creator.id",
             "localKey"   => "creator_id",
-            "description" => "Evaluations to show:",
+            "description" => __("Evaluations to show:", true),
             "default" => $myID,
             "list" => $userList,
             "joinTable"  => "users",
@@ -112,13 +112,13 @@ class RubricsController extends AppController
     }
 
     // Set up actions
-    $warning = "Are you sure you want to delete this Rubric permanently?";
+    $warning = __("Are you sure you want to delete this Rubric permanently?", true);
     $actions = array(
-            array("View Rubric", "", "", "", "view", "Rubric.id"),
-            array("Edit Rubric", "", $restrictions, "", "edit", "Rubric.id"),
-            array("Copy Rubric", "", "", "", "copy", "Rubric.id"),
-            array("Delete Rubric", $warning, $restrictions, "", "delete", "Rubric.id"),
-            array("View Creator", "",    "", "users", "view", "Creator.id"));
+            array(__("View Rubric", true), "", "", "", "view", "Rubric.id"),
+            array(__("Edit Rubric", true), "", $restrictions, "", "edit", "Rubric.id"),
+            array(__("Copy Rubric", true), "", "", "", "copy", "Rubric.id"),
+            array(__("Delete Rubric", true), $warning, $restrictions, "", "delete", "Rubric.id"),
+            array(__("View Creator", true), "",    "", "users", "view", "Creator.id"));
 
     // No recursion in results
     $recursive = 0;
@@ -155,7 +155,7 @@ class RubricsController extends AppController
     $this->set('data', $this->data);
     $this->set('readonly', true);
     $this->set('evaluate', false);
-    $this->set('action', 'View Rubric');
+    $this->set('action', __('View Rubric', true));
     $this->render('edit');
   }
   
@@ -165,7 +165,7 @@ class RubricsController extends AppController
     }
 
     if(!empty($this->data)) {
-      $this->set('action', 'Add Rubric (Step 2)');
+      $this->set('action', __('Add Rubric (Step 2)', true));
       $this->set('data', $this->data);
 
       if(isset($this->params['form']['submit'])) {
@@ -175,7 +175,7 @@ class RubricsController extends AppController
         } 
       }
     } else {
-      $this->set('action', 'Add Rubric');
+      $this->set('action', __('Add Rubric', true));
     }
     $this->render('edit');
 /*
@@ -218,7 +218,7 @@ class RubricsController extends AppController
         }
       }
     }
-    $this->set('action', 'Edit Rubric');
+    $this->set('action', __('Edit Rubric', true));
     $this->render('edit');
 	}
 
@@ -241,14 +241,14 @@ class RubricsController extends AppController
 	function copy($id) {
     $this->data = $this->Rubric->copy($id);
     $this->set('data', $this->data);
-    $this->set('action', 'Copy Rubric');
+    $this->set('action', __('Copy Rubric', true));
 		$this->render('edit');
 	}
 
 	function delete($id) {
     // Deny Deleting evaluations in use:
     if ($this->Rubric->getEventCount($id)) {
-      $this->Session->setFlash('This evaluation is in use. Please remove all the events assosiated with this evaluation first.', 
+      $this->Session->setFlash(__('This evaluation is in use. Please remove all the events assosiated with this evaluation first.', true), 
                                'error');
     } else {
       if ($this->Rubric->delete($id, true)) {
@@ -264,7 +264,7 @@ class RubricsController extends AppController
 	}
 	
 	function test(){
-		$this->log("Test Success");
+		$this->log(__("Test Success", true));
 	}
 	
 	function setForm_RubricName($name){

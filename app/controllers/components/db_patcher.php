@@ -19,7 +19,7 @@ class DbPatcherComponent extends Object
       {
         mysql_query("ROLLBACK");
         mysql_close($mysql);
-        return 'Failed to apply delta file: '.$file.'. Message = '.$ret;
+        return __('Failed to apply delta file: ', true).$file.'. '.__('Message', true).' = '.$ret;
       }
     }
     $this->disconnectDb($mysql);
@@ -39,7 +39,7 @@ class DbPatcherComponent extends Object
     }
     $mysql = mysql_connect($dbConfig['host'], $dbConfig['login'], $dbConfig['password']);
     if(!$mysql) {
-      $this->set('message_content', 'Could not connect to database!');
+      $this->set('message_content', __('Could not connect to database!', true));
       $this->render(null, null, 'views/pages/message.tpl.php');
       exit;
     } 
@@ -47,7 +47,7 @@ class DbPatcherComponent extends Object
     //Open the database
     $mysqldb = mysql_select_db($dbConfig['database']);
     if (!$mysqldb) {
-      $this->set('message_content', 'Could not find database '.$dbConfig['database'].'!');
+      $this->set('message_content', __('Could not find database ', true).$dbConfig['database'].'!');
       $this->render(null, null, 'views/pages/message.tpl.php');
       exit;
     }	  
@@ -67,7 +67,7 @@ class DbPatcherComponent extends Object
   {
     $fp = fopen( $file, "r" );
     if ( false === $fp ) {
-      return "Could not open ".$fname;
+      return __("Could not open ", true).$fname;
     }
 
     $cmd = "";
@@ -93,7 +93,7 @@ class DbPatcherComponent extends Object
         $result = mysql_query($cmd);
         if (!$result)
         {
-          $error = "Cannot run query";
+          $error = __("Cannot run query", true);
           return $error;
         }
         //if ($this->execute($cmd)) {

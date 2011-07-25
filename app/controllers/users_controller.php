@@ -60,7 +60,7 @@ class UsersController extends AppController
     $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
     $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
     $this->order = $this->sortBy . ' ' . strtoupper($this->direction);
-    $this->set('title_for_layout', 'Users');
+    $this->set('title_for_layout', __('Users', true));
     parent::__construct();
   }
 
@@ -123,12 +123,12 @@ class UsersController extends AppController
     // The columns to show
     $columns = array(
                      //    Model   columns       (Display Title) (Type Description)
-                     array("User.role",       "Role",         "6em",   "map",
-                     array(  "A" => "Admin",  "I" => "Instructor", "S" => "Student")),
+                     array("User.role",       __("Role", true),         "6em",   "map",
+                     array(  "A" => "Admin",  "I" => __("Instructor", true) , "S" => __("Student", true))),
                      array("User.id",         "",             "",      "hidden"),
-                     array("User.username",   "Username",     "10em",  "action", "View User"),
-                     array("User.full_name",  "Full Name",    "15em",  "string"),
-                     array("User.email",      "Email",        "auto",  "action", "Send Email")//,
+                     array("User.username",   __("Username", true),     "10em",  "action", "View User"),
+                     array("User.full_name",  __("Full Name", true),    "15em",  "string"),
+                     array("User.email",      __("Email", true),        "auto",  "action", "Send Email")//,
                      //array("UserEnrol.course_id", "Course ID", "number")
                     );
 
@@ -137,7 +137,7 @@ class UsersController extends AppController
       array(
             array(  // Define the GUI aspecs
                     "id"            => "course_id",
-                    "description"   => "for Course:",
+                    "description"   => __("for Course:", true),
                     // What are the choises and the default values?
                     "list"  => $coursesList,
                     "default" => $this->Session->read('ipeerSession.courseId'),
@@ -171,8 +171,8 @@ class UsersController extends AppController
     $extraFilters = array();
 
     // Define Actions
-    $deleteUserWarning = "Delete this user. Irreversible. Are you sure?";
-    $resetPassWarning = "Resets user Password. Are you sure?";
+    $deleteUserWarning = __("Delete this user. Irreversible. Are you sure?", true);
+    $resetPassWarning = __("Resets user Password. Are you sure?", true);
 
     if ($this->Auth->user('role') != 'A') {
       $actionRestrictions = array(
@@ -186,11 +186,11 @@ class UsersController extends AppController
     $actions = array(
                      //   parameters to cakePHP controller:,
                      //   display name, (warning shown), fixed parameters or Column ids
-                     array("View User",  "", "", "", "view", "User.id"),
-                     array("Send Email",  "", "", "emailer", "write", "User.id"),
-                     array("Edit User",  "", $actionRestrictions, "", "edit", "User.id"),
-                     array("Delete User",    $deleteUserWarning,   $actionRestrictions, "", "delete","User.id"),
-                     array("Reset Password", $resetPassWarning,  $actionRestrictions, "", "resetPassword","User.id")
+                     array(__("View User", true),  "", "", "", "view", "User.id"),
+                     array(__("Send Email", true),  "", "", "emailer", "write", "User.id"),
+                     array(__("Edit User", true),  "", $actionRestrictions, "", "edit", "User.id"),
+                     array(__("Delete User", true),    $deleteUserWarning,   $actionRestrictions, "", "delete","User.id"),
+                     array(__("Reset Password", true), $resetPassWarning,  $actionRestrictions, "", "resetPassword","User.id")
                     );
 
     $this->AjaxList->setUp($this->User, $columns, $actions, "User.id", "User.username",
@@ -264,7 +264,7 @@ class UsersController extends AppController
 
       $course_id = $this->Session->read('ipeerSession.courseId');
       if (!empty($course_id))  {
-        $this->set('title_for_layout', $this->sysContainer->getCourseName($this->Session->read('ipeerSession.courseId')).' > Students');
+        $this->set('title_for_layout', $this->sysContainer->getCourseName($this->Session->read('ipeerSession.courseId')).__(' > Students', true));
       }
 
       $this->set('role', $userType);
@@ -392,7 +392,7 @@ class UsersController extends AppController
         foreach($validationErrors as $error){
           $errorMsg = $errorMsg."\n".$error;
         }
-        $this->Session->setFlash('Failed to save.</br>'.$errorMsg);
+        $this->Session->setFlash(__('Failed to save.</br>', true).$errorMsg);
         
       }
     }
@@ -525,7 +525,7 @@ class UsersController extends AppController
     $roles = $this->User->getRoles($id);
 
     if(!$this->AccessControl->hasPermissionDoActionOnUserWithRoles('ViewUser', $roles)) {
-      $this->Session->setFlash('You do not have permission to view this user.');
+      $this->Session->setFlash(__('You do not have permission to view this user.', true));
       $this->redirect('index');
     }
       
@@ -558,9 +558,9 @@ class UsersController extends AppController
       $this->set('addedUser', $this->params['data']['User']);
       if($this->params['data']['User']['send_email_notification']){
         if($this->_sendEmail('','User Created',$this->Auth->user('email'),$this->params['data']['User']['email'], 'addUser'))
-          $this->Session->setFlash('Sent a notification email to the user');
+          $this->Session->setFlash(__('Sent a notification email to the user', true));
         else
-          $this->Session->setFlash('Failed to Send Email');
+          $this->Session->setFlash(__('Failed to Send Email', true));
       }
       $this->render('userSummary');      
     }
@@ -593,7 +593,7 @@ class UsersController extends AppController
         // Process the course changes list
         $this->processEnrollmentListsPostBack($this->params, $id);
         // Set message for user.
-        $this->Session->setFlash('Changes are saved.');
+        $this->Session->setFlash(__('Changes are saved.', true));
       }
       else{
         $this->User->id = $id;
@@ -740,12 +740,12 @@ class UsersController extends AppController
               $this->data['User']['password'] = md5($this->data['User']['tmp_password']);
             }
             else{
-              $this->Session->setFlash("Confirm password is wrong");
+              $this->Session->setFlash(__("Confirm password is wrong", true));
               $this->redirect('editProfile/'.$id);
             }
           }
           else{
-            $this->Session->setFlash("Old password is wrong");
+            $this->Session->setFlash(__("Old password is wrong", true));
             $this->redirect('editProfile/'.$id);
           }
         }
@@ -756,10 +756,10 @@ class UsersController extends AppController
         if($this->__processForm()) {
           $this->__setSessionData($this->data['User']);
           if (!empty($this->data['User']['email'])) {
-            $this->Session->setFlash("Your Profile Has Been Updated Successfully.<br /><br /> " .
-            "<a href='../../home/' style='font-size:140%'>Go to your iPeer Home page.</a><br /><br />");
+            $this->Session->setFlash(__("Your Profile Has Been Updated Successfully.", true)."<br /><br /> " .
+            "<a href='../../home/' style='font-size:140%'>".__('Go to your iPeer Home page.', true)."</a><br /><br />");
           } else {
-            $this->Session->setFlash("We saved your data, but you still need to enter an email address!");
+            $this->Session->setFlash(__("We saved your data, but you still need to enter an email address!", true));
           }
         }
       }
@@ -784,12 +784,12 @@ class UsersController extends AppController
       // in case of the being deleted user has higher level role
       $roles = $this->User->getRoles($id);
       if(!$this->AccessControl->hasPermissionDoActionOnUserWithRoles('DeleteUser', $roles)) {
-        $this->Session->setFlash('You do not have permission to delete the user.');
+        $this->Session->setFlash(__('You do not have permission to delete the user.', true));
       } else {
         if($this->User->delete($id)) {
-          $this->Session->setFlash('Record is successfully deleted!');
+          $this->Session->setFlash(__('Record is successfully deleted!', true));
         } else {
-          $this->Session->setFlash('Delete failed!');
+          $this->Session->setFlash(__('Delete failed!', true));
         }
       }
 
@@ -806,12 +806,12 @@ class UsersController extends AppController
       // in case of the being deleted user has higher level role
       $roles = $this->User->getRoles($id);
       if(!$this->AccessControl->hasPermissionDoActionOnUserWithRoles('DropUser', $roles)) {
-        $this->Session->setFlash('You do not have permission to drop the user.');
+        $this->Session->setFlash(__('You do not have permission to drop the user.', true));
       } else {
         if($this->User->dropEnrolment($id, $course_id)) {
-          $this->Session->setFlash('The user is dropped from this course!');
+          $this->Session->setFlash(__('The user is dropped from this course!', true));
         } else {
-          $this->Session->setFlash('Drop failed!');
+          $this->Session->setFlash(__('Drop failed!', true));
         }
       }
 
@@ -839,7 +839,7 @@ class UsersController extends AppController
       $this->set('username', $this->params['form']['newuser']);
       $this->set('isEnrolled', $isUserEnrol);*/
       //$this->render('checkDuplicateName');
-      return ($sFound) ? 'Username "'.$this->data['User']['username'].'" already exists.' : '';
+      return ($sFound) ? __('Username "', true).$this->data['User']['username'].__('" already exists.', true) : '';
     }
 
     function resetPassword($user_id, $render=true)
@@ -850,13 +850,13 @@ class UsersController extends AppController
       $user_data = $this->User->findUserByid($user_id, array('contain' => false));
 
       if (empty($user_data)) {
-        $this->Session->setFlash('User Not Found!');
+        $this->Session->setFlash(__('User Not Found!', true));
         $this->redirect("index");
       }
 
       $roles = $this->User->getRoles($user_id);
       if(!$this->AccessControl->hasPermissionDoActionOnUserWithRoles('PasswordReset', $roles)) {
-        $this->Session->setFlash('You do not have permission to drop the user.');
+        $this->Session->setFlash(__('You do not have permission to drop the user.', true));
       }
 
       //General password
@@ -867,19 +867,19 @@ class UsersController extends AppController
 
       //Save Data
       if ($user = $this->User->save($user_data, true, array('password'))) {
-        $message = "Password successfully reset. ";
+        $message = __("Password successfully reset. ", true);
         $this->User->set('id', $user_id);
 
         // send email to user
         $this->set('user_data', $user_data);
         if($this->_sendEmail('','Reset Password',$this->Auth->user('email'),$user_data['User']['email'], 'resetPassword')){
         //if($this->_sendEmail( $to, $from, $subject, $email_msg )) {
-          $message .= "Email has been sent. ";
+          $message .= __("Email has been sent. ", true);
         } else {
           if(!isset($to) || strlen($to) < 1) {
-            $message .= 'No destination email address. ';
+            $message .= __('No destination email address. ', true);
           }
-          $message .= "Email was <u>not</u> sent to the user.";
+          $message .= __("Email was <u>not</u> sent to the user.", true);
         }
         $this->Session->setFlash($message);
         $this->redirect('index');
@@ -902,7 +902,7 @@ class UsersController extends AppController
         if (trim($filename) == "") {
             $coursesList = $this->sysContainer->getMyCourseList();
             $this->set('coursesList', $coursesList);
-            $this->set('errmsg','A File is required for the import!');
+            $this->set('errmsg',__('A File is required for the import!', true));
             $this->set('user_type', 'S');
             $this->set('import_again',"true");
             $this->render('import');
@@ -1000,13 +1000,13 @@ class UsersController extends AppController
                     } else {
                         //Current user already registered
                         $result['failed_students'][$failedPos] = $data;
-                        $result['failed_students'][$failedPos++]['User']['error_message'] = 'This user has been already added to this course.';
+                        $result['failed_students'][$failedPos++]['User']['error_message'] = __('This user has been already added to this course.', true);
                     }
 
                 } else {
                     //Current user already registered
                     $result['failed_students'][$failedPos] = $data;
-                    $result['failed_students'][$failedPos++]['User']['error_message'] = 'This user has been already added to the database.';
+                    $result['failed_students'][$failedPos++]['User']['error_message'] = __('This user has been already added to the database.', true);
                 }
 
             }

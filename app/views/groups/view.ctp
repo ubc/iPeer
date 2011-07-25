@@ -75,7 +75,7 @@
             <td width="45%">
               <table width="403" border="0" cellspacing="0" cellpadding="4">
               <tr>
-                <td colspan="3"><?php echo $html->link('Edit this Group', '/groups/edit/'.$data['Group']['id']); ?> |
+                <td colspan="3"><?php echo $html->link(__('Edit this Group', true), '/groups/edit/'.$data['Group']['id']); ?> |
                 <?php echo $html->link(__('Back to Group Listing', true), '/groups/index/'.$course_id); ?>
                 </td>
               </tr>

@@ -53,7 +53,7 @@ class InstallHelperComponent
     //connect to the server
     $mysql = mysql_connect($dbConfig['host'], $dbConfig['login'], $dbConfig['password']);
     if(!$mysql) {
-      die('Could not connect: ' . mysql_error());
+      die(__('Could not connect: ', true) . mysql_error());
       return($error);
     } 
     else {
@@ -95,7 +95,7 @@ class InstallHelperComponent
   				$result = mysql_query($cmd, $mysql);
           if (!$result)
           {
-            $error = "Cannot run query";
+            $error = __("Cannot run query", true);
             mysql_query('ROLLBACK');
             mysql_close($mysql);
             return $error;

@@ -5,7 +5,7 @@
 <tr>
 <td>
 <b><?php
-echo empty($data['SysParameter']['id'])?'Add':'Edit' ?> <?php __('Sys Parameters')?></b>
+echo empty($data['SysParameter']['id'])?__('Add', true):__('Edit', true) ?> <?php __('Sys Parameters')?></b>
 
 
     <?php    
@@ -18,7 +18,7 @@ echo empty($data['SysParameter']['id'])?'Add':'Edit' ?> <?php __('Sys Parameters
 <p>
 <table width="100%" cellspacing="0" cellpadding="4">
 <tr>
-	<td width="130" id="id_label">id*:</td>
+	<td width="130" id="id_label"><?php __('id*:', true)?></td>
 	<td width="337" align="left"><?php echo $form->input('SysParameter.id', array('id'=>'id', 'size'=>'50', 'type'=>'text', 'label'=>false, 'class'=>'validate required NUMERIC_FORMAT id_msg Invalid_Numeric_Value.'))?></td>
 	<td width="663" id="id_msg" class="error"/>
 </tr>
@@ -35,7 +35,7 @@ echo empty($data['SysParameter']['id'])?'Add':'Edit' ?> <?php __('Sys Parameters
 <tr>
 	<td width="130" id="parameter_type_label"><?php __('Paramenter Type')?>:</td>
 	<td align="left"><?php
-	  $types = array('S'=>'String','I'=>'Integer', 'B'=>'Boolean');
+	  $types = array('S'=>__('String', true),'I'=>__('Integer', true), 'B'=>__('Boolean', true));
 		echo $form->select('SysParameter.parameter_type', $types, $html->value('SysParameter.parameter_type'));
 	   ?>
 	</td>
@@ -51,8 +51,8 @@ echo empty($data['SysParameter']['id'])?'Add':'Edit' ?> <?php __('Sys Parameters
   <td colspan="3" align="left">
   <br />
   * &nbsp;&nbsp;<strong><?php __('id</strong> of sys_parameters table are manually assigned and grouped by module as follow')?>:<br/>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1000 &nbsp; 	system<br/>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2000 &nbsp; 	display<br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1000 &nbsp; 	<?php __('system')?><br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2000 &nbsp; 	<?php __('display')?><br/>
   </td>
 </tr>
 </table>

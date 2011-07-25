@@ -125,7 +125,7 @@ class Event extends AppModel
 	function beforeSave(){
         // Ensure the name is not empty
         if (empty($this->data[$this->name]['title'])) {
-            $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
+            $this->errorMessage = __("Please enter a new name for this ", true) . $this->name . ".";
             return false;
         }
 
@@ -150,7 +150,7 @@ class Event extends AppModel
      }
 
     if ($duplicate == true) {
-      $this->errorMessage='Duplicate Title found. Please change the title of this event.';
+      $this->errorMessage=__('Duplicate Title found. Please change the title of this event.', true);
       return false;
     }
     else {

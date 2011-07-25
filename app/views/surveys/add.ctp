@@ -71,7 +71,7 @@
             </tr>
             <tr class="tablecell2">
               <td colspan="3" align="center">
-            <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
+            <input type="button" name="Back" value="<?php __('Back', true)?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
             <?php echo $html->script('events'); // For vallidation of dates?>
             <?php echo $html->submit(__('Add Survey', true), array('onclick' =>
             "return validateEventDates('SurveyReleaseDateBegin','SurveyReleaseDateEnd','SurveyDueDate');")); ?></td>

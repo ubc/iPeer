@@ -44,7 +44,7 @@
         <?php endif;?>
 
         <tr class="tablecell2">
-        <?php echo $this->Form->input('course_id', array('label' => 'Assigned Course:<font color="red">*</font>'));?>
+        <?php echo $this->Form->input('course_id', array('label' => __('Assigned Course:', true).'<font color="red">*</font>'));?>
           <td>&nbsp;</td>
         </tr>
         <tr class="tablecell2">
@@ -93,7 +93,7 @@
 	
         <tr class="tablecell2">
           <td colspan="3" align="center">
-        <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
+        <input type="button" name="Back" value="<?php __('Back')?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
         <?php echo $this->Form->submit(ucfirst($this->action).__(' Survey', true), array('div' => false))?></td>
           </tr>
 		  </td>

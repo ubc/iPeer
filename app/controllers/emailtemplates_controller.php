@@ -37,12 +37,12 @@ class EmailtemplatesController extends AppController
     // Set up Columns
     $columns = array(
             array("EmailTemplate.id",   "",       "",        "hidden"),
-            array("EmailTemplate.name", "Name",   "12em",    "action",   "View Email Template"),
-            array("EmailTemplate.subject", "Subject",   "12em",    "string"),
-            array("EmailTemplate.description", "Description","auto",  "string"),
+            array("EmailTemplate.name", __("Name", true),   "12em",    "action",   "View Email Template"),
+            array("EmailTemplate.subject", __("Subject", true),   "12em",    "string"),
+            array("EmailTemplate.description", __("Description", true),"auto",  "string"),
             array("EmailTemplate.creator_id",           "",            "",     "hidden"),
-            array("EmailTemplate.creator",     "Creator",  "10em", "action", "View Creator"),
-            array("EmailTemplate.created", "Creation Date", "10em", "date"));
+            array("EmailTemplate.creator",     __("Creator", true),  "10em", "action", "View Creator"),
+            array("EmailTemplate.created", __("Creation Date", true), "10em", "date"));
 
     $userList = array($myID => "My Email Template");
 
@@ -50,7 +50,7 @@ class EmailtemplatesController extends AppController
     $jointTableCreator =
       array("id"         => "Creator.id",
             "localKey"   => "creator_id",
-            "description" => "Email Template to show:",
+            "description" => __("Email Template to show:", true),
             "default" => $myID,
             "list" => $userList,
             "joinTable"  => "users",
@@ -70,12 +70,12 @@ class EmailtemplatesController extends AppController
     }
 
     // Set up actions
-    $warning = "Are you sure you want to delete this email template permanently?";
+    $warning = __("Are you sure you want to delete this email template permanently?", true);
     $actions = array(
-                     array("View Email Template", "", "", "", "view", "EmailTemplate.id"),
-                     array("Edit Email Template", "", $restrictions, "", "edit", "EmailTemplate.id"),
-                     array("Delete Email Template", $warning, $restrictions, "", "delete", "EmailTemplate.id"),
-                     array("View Creator", "",    "", "users", "view", "EmailTemplate.creator_id"));
+                     array(__("View Email Template", true), "", "", "", "view", "EmailTemplate.id"),
+                     array(__("Edit Email Template", true), "", $restrictions, "", "edit", "EmailTemplate.id"),
+                     array(__("Delete Email Template", true), $warning, $restrictions, "", "delete", "EmailTemplate.id"),
+                     array(__("View Creator", true), "",    "", "users", "view", "EmailTemplate.creator_id"));
 
     // Set up the list itself
     $this->AjaxList->setUp($this->EmailTemplate, $columns, $actions,
@@ -113,11 +113,11 @@ class EmailtemplatesController extends AppController
     else{
       //Save Data
       if ($this->EmailTemplate->save($this->params['data'])) {
-        $this->Session->setFlash('Successful');
+        $this->Session->setFlash(__('Successful', true));
         $this->redirect('/emailtemplates/index');
       }
       else{
-        $this->Session->setFlash('Failed to save');
+        $this->Session->setFlash(__('Failed to save', true));
       }
     }
 
@@ -147,16 +147,16 @@ class EmailtemplatesController extends AppController
       else{
         //Save Data
         if ($this->EmailTemplate->save($this->params['data'])) {
-          $this->Session->setFlash('Successful');
+          $this->Session->setFlash(__('Successful', true));
           $this->redirect('/emailtemplates/index');
         }
         else{
-          $this->Session->setFlash('Failed to save');
+          $this->Session->setFlash(__('Failed to save', true));
         }
       }
     }
     else{
-      $this->Session->setFlash('No Permission');
+      $this->Session->setFlash(__('No Permission', true));
       $this->redirect('/emailtemplates/index');
     }
   }
@@ -170,14 +170,14 @@ class EmailtemplatesController extends AppController
     $user_id = $this->Auth->user('id');
     if($creator_id == $user_id){
       if ($this->EmailTemplate->delete($id)) {
-        $this->Session->setFlash('The Email Template was deleted successfully.');
+        $this->Session->setFlash(__('The Email Template was deleted successfully.', true));
       } else {
-        $this->Session->setFlash('Failed to delete the Email Template.');
+        $this->Session->setFlash(__('Failed to delete the Email Template.', true));
       }
       $this->redirect('index/');
     }
     else{
-      $this->Session->setFlash('No Permission');
+      $this->Session->setFlash(__('No Permission', true));
       $this->redirect('/emailtemplates/index');
     }
   }

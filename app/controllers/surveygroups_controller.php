@@ -48,7 +48,7 @@ class SurveyGroupsController extends AppController
     $this->direction = empty($_GET['direction'])? 'desc': $this->Sanitize->paranoid($_GET['direction']);
     $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
     $this->order = $this->sortBy.' '.strtoupper($this->direction);
-    $this->set('title_for_layout', 'Survey Groups');
+    $this->set('title_for_layout', __('Survey Groups', true));
     parent::__construct();
   }
 
@@ -69,19 +69,19 @@ class SurveyGroupsController extends AppController
     // Set up Columns
     $columns = array(
         array("SurveyGroupSet.id",            "",            "",      "hidden"),
-        array("Survey.name",      "Survey",         "auto",  "string",   ""),
-        array("SurveyGroupSet.group_count",        "Number of Groups",      "13em",  "number", ""),
-        array("SurveyGroupSet.released",         "Released?",       "9em", "string", ""),
+        array("Survey.name",      __("Survey", true),         "auto",  "string",   ""),
+        array("SurveyGroupSet.group_count",        __("Number of Groups", true),      "13em",  "number", ""),
+        array("SurveyGroupSet.released",         __("Released?", true),       "9em", "string", ""),
         );
 
     $extraFilters = array("Survey.course_id" => $course_id);
 
     // Set up actions
-    $warning = "Are you sure you want to delete this group set permanently?";
+    $warning = __("Are you sure you want to delete this group set permanently?", true);
     $actions = array(
-        array("Release", "", "", "", "release", "SurveyGroupSet.id"),
-        array("View/Edit Group Set", "", "", "", "edit", "SurveyGroupSet.id"),
-        array("Delete Group Set", $warning, "", "", "delete", "SurveyGroupSet.id"),
+        array(__("Release", true), "", "", "", "release", "SurveyGroupSet.id"),
+        array(__("View/Edit Group Set", true), "", "", "", "edit", "SurveyGroupSet.id"),
+        array(__("Delete Group Set", true), $warning, "", "", "delete", "SurveyGroupSet.id"),
         );
 
     $recursive = 0;
@@ -116,7 +116,7 @@ class SurveyGroupsController extends AppController
        $courseId = $params;
     }
     
-    $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > View Survey Result');
+    $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > View Survey Result', true));
     //get surveys for the course
     $survey_list = $this->Survey->find('list', array('conditions' => array('course_id' => $courseId)));
     $ids = array_keys($survey_list); 
@@ -149,7 +149,7 @@ class SurveyGroupsController extends AppController
     $course = $this->Course->find('first', array('conditions' => array('id' => $course_id),
                                                  'contain' => array()));
     $courseName = $course['Course']['course'];
-    $this->set('title_for_layout', $courseName.' > Create Group Set');
+    $this->set('title_for_layout', $courseName.__(' > Create Group Set', true));
     $this->set('surveys', $this->Survey->find('list', array('conditions' => array('course_id' => $course_id))));
   }
 
@@ -255,9 +255,9 @@ class SurveyGroupsController extends AppController
 
     // use overwritten save method to save all
     if($this->SurveyGroupSet->save($surveyGroupSet)) {
-      $this->Session->setFlash('The group set was added successfully.');
+      $this->Session->setFlash(__('The group set was added successfully.', true));
     } else {
-      $this->Session->setFlash('The group set saving failed..');
+      $this->Session->setFlash(__('The group set saving failed.', true));
     }
     $this->redirect('index');
   }
@@ -265,14 +265,14 @@ class SurveyGroupsController extends AppController
   function release($group_set_id) {
     // Check for a valid parameter
     if (!is_numeric($group_set_id)) {
-      $this->Session->setFlash('Group Set must be a numeric id');
+      $this->Session->setFlash(__('Group Set must be a numeric id', true));
       $this->redirect('index');
     }
 
     if($this->SurveyGroupSet->release($group_set_id)) {
-      $this->Session->setFlash('The group set was released successfully.');
+      $this->Session->setFlash(__('The group set was released successfully.', true));
     } else {
-      $this->Session->setFlash('Releasing group set failed.');
+      $this->Session->setFlash(__('Releasing group set failed.', true));
     }
     $this->redirect('index');
   }
@@ -282,15 +282,15 @@ class SurveyGroupsController extends AppController
     $this->autoRender = false;
 
     if($this->SurveyGroupSet->delete($group_set_id)) {
-      $this->Session->setFlash('The group set was deleted successfully.');
+      $this->Session->setFlash(__('The group set was deleted successfully.', true));
     } else {
-      $this->Session->setFlash('Failed to delete group set.');
+      $this->Session->setFlash(__('Failed to delete group set.', true));
     }
     $this->redirect('index');
   }
 
   function edit($group_set_id, $question_id = null) {
-    $this->set('title_for_layout', $this->sysContainer->getCourseName($this->Session->read('ipeerSession.courseId')).' > Edit Groupset');
+    $this->set('title_for_layout', $this->sysContainer->getCourseName($this->Session->read('ipeerSession.courseId')).__(' > Edit Groupset', true));
     //get group set
     $group_set = $this->SurveyGroupSet->find('first', array('conditions' => array('SurveyGroupSet.id' => $group_set_id),
                                                             'recursive' => 2));
@@ -359,7 +359,7 @@ class SurveyGroupsController extends AppController
       if (!$this->SurveyGroupMember->updateAll(array('group_id' => $data[2]),
                                                array('user_id' => $data[0],
                                                      'group_id' => $data[1]))) {
-        $this->Session->setFlash('Group set change failed.');
+        $this->Session->setFlash(__('Group set change failed.', true));
         $this->redirect('index');
       }
     }
@@ -393,7 +393,7 @@ class SurveyGroupsController extends AppController
     set_time_limit(1200);
     exec($cmdline);*/
 
-    $this->Session->setFlash('Group set changed successfully.');
+    $this->Session->setFlash(__('Group set changed successfully.', true));
     $this->redirect('index');
   }
 

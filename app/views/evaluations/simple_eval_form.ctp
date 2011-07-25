@@ -228,7 +228,7 @@ if ($event['Event']['id']==292) {
 		<td>
 
   </td>
-		<td align="center"> <input type="button" name="distr" id="distr_button" value="Distribute" onClick="distribute()"/></td>
+		<td align="center"> <input type="button" name="distr" id="distr_button" value="<?php __('Distribute')?>" onClick="distribute()"/></td>
 		<td align="center">
 		  <table width="95%" border="0" align="center"><tr><td colspan="2"><?php __('Points Allocated/Total:')?></td></tr>
       	 <tr>

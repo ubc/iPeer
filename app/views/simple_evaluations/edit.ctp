@@ -42,8 +42,8 @@
 
         <tr class="tablecell2">
           <td colspan="3" align="center">
-      	<input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
-        <?php echo $this->Form->submit('Save',  array('div' => false, 'onclick' => 'return validate();')); ?>
+      	<input type="button" name="Back" value="<?php __('Back')?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
+        <?php echo $this->Form->submit(__('Save', true),  array('div' => false, 'onclick' => 'return validate();')); ?>
       	</td>
       </table>
       <table width="95%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">

@@ -50,29 +50,29 @@ class SysFunctionsController extends AppController
 		$this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
 		$this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
- 		$this->set('title_for_layout', 'Sys Functions');
+ 		$this->set('title_for_layout', __('Sys Functions', true));
 		parent::__construct();
 	}
 
 
     function setUpAjaxList() {
         $columns = array(
-            array("SysFunction.id",              "ID",         "3em", "number"),
-            array("SysFunction.function_code",   "Code",       "15em","string"),
-            array("SysFunction.function_name",   "Name",       "auto","string"),
-            array("SysFunction.controller_name", "Controller", "6em", "string"),
-            array("SysFunction.url_link",        "URL Link",   "5em", "string"),
-            array("SysFunction.permission_type", "Permissions","5em", "string"),
-            array("SysFunction.record_status",  "Status",   "5em", "map",
+            array("SysFunction.id",              __("ID", true),         "3em", "number"),
+            array("SysFunction.function_code",   __("Code", true),       "15em","string"),
+            array("SysFunction.function_name",   __("Name", true),      "auto","string"),
+            array("SysFunction.controller_name", __("Controller", true), "6em", "string"),
+            array("SysFunction.url_link",        __("URL Link", true),   "5em", "string"),
+            array("SysFunction.permission_type", __("Permissions", true),"5em", "string"),
+            array("SysFunction.record_status",  __("Status", true),   "5em", "map",
                 array("A" => "Active", "I" => "Inactive")),
-            array("SysFunction.created",        "Created", "10em", "date"),
-            array("SysFunction.modified",       "Updated", "10em", "date"));
+            array("SysFunction.created",        __("Created", true), "10em", "date"),
+            array("SysFunction.modified",       __("Updated", true), "10em", "date"));
 
-        $warning = "Are you sure you wish to delete this System Function?";
+        $warning = __("Are you sure you wish to delete this System Function?", true);
         $actions = array(
-            array("View", "", "", "", "view", "SysFunction.id"),
-            array("Edit", "", "", "", "edit", "SysFunction.id"),
-            array("Delete", $warning, "", "", "delete", "SysFunction.id"));
+            array(__("View", true), "", "", "", "view", "SysFunction.id"),
+            array(__("Edit", true), "", "", "", "edit", "SysFunction.id"),
+            array(__("Delete", true), $warning, "", "", "delete", "SysFunction.id"));
 
         $this->AjaxList->setUp($this->SysFunction, $columns, $actions,
             "SysFunction.id", "SysFunction.function_code");

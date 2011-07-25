@@ -36,7 +36,7 @@
                                                    $questions,
                                                    $selected_question,
                                                    array('onChange' => 'window.location=\''.$this->Html->url('edit').'/'.$group_set_id.'/\'+this.options[this.selectedIndex].value;',
-                                                         'empty' => 'Show reponses for question:'));?>
+                                                         'empty' => __('Show reponses for question:', true)));?>
                   <?php endif;?>
                   </td>
         			  </tr>
@@ -63,7 +63,7 @@
         			    }?>
 
                   <?php echo $this->Form->select('move][', $options, null, // name hacking for multiple dimension array
-                                                 array('empty' => 'Move to ...'))?>
+                                                 array('empty' => __('Move to ...', true)))?>
 
                   <?php
                   //student responses
@@ -100,7 +100,7 @@
           </tr>
           <tr class="tablecell2">
             <td><div align="center"><?php echo $this->Form->submit(__('Save Groups', true), array('div' => false)) ?>
-			<input type=button name="Cancel" value="Cancel" onClick="javascript:history.go(-1);" />
+			<input type=button name="Cancel" value="<?php __('Cancel')?>" onClick="javascript:history.go(-1);" />
 			</div></td>
           </tr>
       </table>

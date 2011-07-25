@@ -48,7 +48,7 @@
           </tr>
           <tr class="tablecell2">
             <td colspan="2" align="center">
-            <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
+            <input type="button" name="Back" value="<?php __('Back')?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
             </td>
           </tr>
       </table>

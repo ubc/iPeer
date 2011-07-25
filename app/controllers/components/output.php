@@ -133,7 +133,7 @@ class OutputComponent extends Object{
 	}*/
 	
 	function weeWa(){
-		$this->log("Does nothing");
+		$this->log(__("Does nothing", true));
 	}	
 	
   function formatDate($timestamp) {

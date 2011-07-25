@@ -163,7 +163,7 @@ class Course extends AppModel
   function beforeSave(){
     // Ensure the name is not empty
     if (empty($this->data[$this->name]['title'])) {
-      $this->errorMessage = "Please enter a title for this " . $this->name . ".";
+      $this->errorMessage = __("Please enter a title for this ", true) . $this->name . ".";
       return false;
     }
 
@@ -178,7 +178,7 @@ class Course extends AppModel
 
     $allowSave = true;
     if (empty($this->data[$this->name]['course'])) { //temp ! to escape ajax bug
-      $this->errorMessage='Course name is required.'; //check empty name
+      $this->errorMessage=__('Course name is required.', true); //check empty name
       $allowSave = false;
     } else {
       $allowSave = $this->__checkDuplicateCourse();//check the duplicate course
@@ -201,7 +201,7 @@ class Course extends AppModel
      }
 
     if ($duplicate == true) {
-      $this->errorMessage='Duplicate Course found. Please change the course name.';
+      $this->errorMessage=__('Duplicate Course found. Please change the course name.', true);
       return false;
     }
     else {

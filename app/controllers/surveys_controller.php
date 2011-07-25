@@ -50,7 +50,7 @@ class SurveysController extends AppController
     $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
     $this->order = $this->sortBy.' '.strtoupper($this->direction);
     $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
-    $this->set('title_for_layout', 'Surveys');
+    $this->set('title_for_layout', __('Surveys', true));
     parent::__construct();
   }
 
@@ -64,7 +64,7 @@ class SurveysController extends AppController
         $inUse = $this->Survey->getEventCount($entry['Survey']['id']);
 
         // Put in the custom inUse column
-        $data[$key]['!Custom']['inUse'] = $inUse ? "Yes" : "No";
+        $data[$key]['!Custom']['inUse'] = $inUse ? __("Yes", true) : __("No", true);
 
         // Decide whether the course is release or not ->
         // (from the events controller postProcess function)
@@ -77,11 +77,11 @@ class SurveysController extends AppController
 
         $isReleased = "";
         if ($timeNow < $releaseDate) {
-          $isReleased = "Not Yet Open";
+          $isReleased = __("Not Yet Open", true);
         } else if ($timeNow > $endDate) {
-          $isReleased = "Already Closed";
+          $isReleased = __("Already Closed", true);
         } else {
-          $isReleased = "Open Now";
+          $isReleased = __("Open Now", true);
         }
 
         // Put in the custom isReleased string
@@ -104,20 +104,20 @@ class SurveysController extends AppController
 
     // Set up Columns
     $columns = array(
-        array("Survey.id",          "ID",          "4em",   "hidden"),
+        array("Survey.id",          __("ID", true),         "4em",   "hidden"),
         array("Course.id",          "",             "",     "hidden"),
-        array("Course.course",      "Course",      "15em",  "action", "View Course"),
-        array("Survey.name",        "Name",        "auto",  "action", "View Survey"),
-        array("!Custom.inUse",      "In Use",      "4em",   "number"),
-        array("Survey.due_date",     "Due Date",   "10em",  "date"),
+        array("Course.course",      __("Course", true),      "15em",  "action", "View Course"),
+        array("Survey.name",        __("Name",true),        "auto",  "action", "View Survey"),
+        array("!Custom.inUse",      __("In Use", true),      "4em",   "number"),
+        array("Survey.due_date",    __("Due Date",true),   "10em",  "date"),
         // The release window columns
         array("now()",   "", "", "hidden"),
         array("Survey.release_date_begin", "", "", "hidden"),
         array("Survey.release_date_end",   "", "", "hidden"),
-        array("!Custom.isReleased", "Released ?",   "  4em",   "string"),
+        array("!Custom.isReleased", __("Released ?",true),   "  4em",   "string"),
         array("Survey.creator_id",   "", "", "hidden"),
-        array("Survey.creator",  "Created By",    "8em", "action", "View Creator"),
-        array("Survey.created",     "Creation Date","10em", "date"));
+        array("Survey.creator",  __("Created By",true),    "8em", "action", "View Creator"),
+        array("Survey.created",     __("Creation Date", true),"10em", "date"));
 
     // Just list all and my evaluations for selections
     $userList = array($myID => "My Evaluations");
@@ -151,15 +151,15 @@ class SurveysController extends AppController
     }
 
     // Set up actions
-    $warning = "Are you sure you want to delete this evaluation permanently?";
+    $warning = __("Are you sure you want to delete this evaluation permanently?", true);
     $actions = array(
-        array("View Event", "", "", "", "view", "Survey.id"),
-        array("Edit Event", "", "", "", "edit", "Survey.id"),
-        array("Edit Questions", "", "", "", "questionsSummary", "Survey.id"),
-        array("Copy Survey", "", "", "", "copy", "Survey.id"),
-        array("Delete Survey", $warning, "", "", "delete", "Survey.id"),
-        array("View Course", "",    "", "courses", "home", "Course.id"),
-        array("View Creator", "",    "", "users", "view", "Survey.creator_id"));
+        array(__("View Event", true), "", "", "", "view", "Survey.id"),
+        array(__("Edit Event", true), "", "", "", "edit", "Survey.id"),
+        array(__("Edit Questions", true), "", "", "", "questionsSummary", "Survey.id"),
+        array(__("Copy Survey", true), "", "", "", "copy", "Survey.id"),
+        array(__("Delete Survey", true), $warning, "", "", "delete", "Survey.id"),
+        array(__("View Course", true), "",    "", "courses", "home", "Course.id"),
+        array(__("View Creator", true), "",    "", "users", "view", "Survey.creator_id"));
 
     // No recursion in results (at all!)
     $recursive = 1;
@@ -224,11 +224,11 @@ class SurveysController extends AppController
 
         //Save Data
         $this->Event->save($eventArray);
-        $this->Session->setFlash('Survey is saved!');
+        $this->Session->setFlash(__('Survey is saved!', true));
         $this->redirect('edit/'.$this->Survey->id);
       } else {
         //$this->set('errmsg', $this->Survey->errorMessage);
-        $this->Session->setFlash('Error on saving survey.');
+        $this->Session->setFlash(__('Error on saving survey.', true));
       }
     }
 
@@ -239,7 +239,7 @@ class SurveysController extends AppController
 
   function edit($id) {
     if(!is_numeric($id)) {
-      $this->Session->setFlash('Invalid survey ID.');
+      $this->Session->setFlash(__('Invalid survey ID.', true));
       $this->redirect('index');
     }
     $data = $this->Survey->find('first', array('conditions' => array('id' => $id),
@@ -255,7 +255,7 @@ class SurveysController extends AppController
       $data['Event'][0]['release_date_end'] = $this->data['Survey']['release_date_end'];
 
       if($result = $this->Survey->save($data)) {
-        $this->Session->setFlash('The Survey was edited successfully.');
+        $this->Session->setFlash(__('The Survey was edited successfully.', true));
         $this->redirect('index');
       } else {
         $this->Session->setFlash($this->Survey->errorMessage);
@@ -311,9 +311,9 @@ class SurveysController extends AppController
         $this->SurveyInputs->del($input['SurveyInput']['id']);
       }*/
 
-      $this->Session->setFlash('The survey was deleted successfully.');
+      $this->Session->setFlash(__('The survey was deleted successfully.', true));
     } else {
-      $this->Session->setFlash('Survey delete failed.');
+      $this->Session->setFlash(__('Survey delete failed.', true));
     }
     $this->redirect('index');
   }
@@ -370,7 +370,7 @@ class SurveysController extends AppController
 
 
 		$this->set('data', $this->Survey->find('all',null, null, 'id'));
-		$this->set('message', 'The survey was released.');
+		$this->set('message', __('The survey was released.', true));
 		$this->index();
 		$this->render('index');
 	}
@@ -413,7 +413,7 @@ class SurveysController extends AppController
     $this->Survey->habtmDelete('Question', $survey_id, $question_id);
     //$this->Question->editCleanUp($question_id);
 
-    $this->Session->setFlash('The question was removed successfully.');
+    $this->Session->setFlash(__('The question was removed successfully.', true));
 
     $this->redirect('questionsSummary/'.$survey_id);
   }
@@ -428,7 +428,7 @@ class SurveysController extends AppController
 //$maxQuestionNum = $this->SurveyQuestion->getMaxSurveyQuestionNumber($this->data['Survey']['id']);
 //$this->data['number'] = $maxQuestionNum+1;
       if ($this->Question->saveAll($this->data)) {
-        $this->Session->setFlash('The question was added successfully.');
+        $this->Session->setFlash(__('The question was added successfully.', true));
         // Need to run reorderQuestions once in order to correctly set the question position numbers
         $surveyQuestionId = $this->SurveyQuestion->find('first', array('conditions' => array('survey_id' => $survey_id), 'fields' => array('MIN(number) as minQuestionId')));
         $this->SurveyQuestion->reorderQuestions($survey_id, $surveyQuestionId['0']['minQuestionId'], 'TOP');
@@ -450,10 +450,10 @@ class SurveysController extends AppController
   function editQuestion( $question_id, $survey_id ) {
     if(!empty($this->data)){
       if ($this->Question->saveAll($this->data)) {
-              $this->Session->setFlash('The question was updated successfully.');
+              $this->Session->setFlash(__('The question was updated successfully.', true));
               $this->redirect('questionsSummary/'.$survey_id);
       }	else{
-        $this->Session->setFlash('Error in saving question.');
+        $this->Session->setFlash(__('Error in saving question.', true));
       }
     } else {
       $this->data = $this->Question->find('first', array('conditions' => array('id' => $question_id)));

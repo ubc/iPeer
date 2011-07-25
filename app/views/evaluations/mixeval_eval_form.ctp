@@ -85,7 +85,7 @@
           }
           $partial = '';
           if($commentsNeeded) {
-            $partial = '<font color="red">Partially </font>';
+            $partial = '<font color="red">'.__('Partially', true).'</font>';
           }
         ?>
 

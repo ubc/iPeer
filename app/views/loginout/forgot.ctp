@@ -26,8 +26,8 @@
 				        <tr>
 					        <td colspan="2">
 						      <div align="center">
-						        <?php echo $html->submit('Submit', array('align'=>'center')); ?>
-                    <input type="button" value="Back to Login" onclick="window.location='<?php echo $html->url('/loginout/login')?>'" />
+						        <?php echo $html->submit(__('Submit', true), array('align'=>'center')); ?>
+                    <input type="button" value=<?php __("Back to Login", true)?> onclick="window.location='<?php echo $html->url('/loginout/login')?>'" />
 					        </div>
 				          </td>
 			          </tr>

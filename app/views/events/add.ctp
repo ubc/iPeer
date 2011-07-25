@@ -21,7 +21,7 @@
             'name' => "newtitle",
             'id' => 'newtitle',
             'style' => 'width:85%',
-            'class' => __("validate required TEXT_FORMAT newtitle_msg Invalid_Event_Title_Format.", true),
+            'class' => "validate required TEXT_FORMAT newtitle_msg Invalid_Event_Title_Format.",
             'size' => '50',
             'label' => false
         ));

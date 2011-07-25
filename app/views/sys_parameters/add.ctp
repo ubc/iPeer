@@ -11,7 +11,7 @@
 <p>
 <table width="100%" cellspacing="0" cellpadding="4">
 <tr>
-	<td width="130" id="id_label">id*:</td>
+	<td width="130" id="id_label"><?php __('id*:', true)?></td>
 	<td width="337" align="left"><?php echo $html->input('SysParameter/id', array('id'=>'id', 'size'=>'50', 'class'=>'validate required NUMERIC_FORMAT id_msg Invalid_Numeric_Value.'))?></td>
 	<td width="663" id="id_msg" class="error"/>
 </tr>
@@ -28,7 +28,7 @@
 <tr>
 	<td width="130" id="parameter_type_label"><?php __('Paramenter Type')?>:</td>
 	<td align="left"><?php
-	  $types = array('S'=>'String','I'=>'Integer', 'B'=>'Boolean');
+	  $types = array('S'=>__('String', true),'I'=>__('Integer', true), 'B'=>__('Boolean', true));
 		echo $html->selectTag('SysParameter/parameter_type', $types, $html->tagValue('SysParameter/parameter_type'), null, null, false);
 	   ?>
 	</td>

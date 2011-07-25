@@ -32,7 +32,7 @@ echo $ajax->observeForm('searchForm', array('update'=>'eval_table', 'url'=>"/eva
 	  <td>
       <?php
           if (!empty($rdAuth->courseId)) {
-            echo $html->link('Back to Course Home', '/courses/home/'.$rdAuth->courseId);
+            echo $html->link(__('Back to Course Home', true), '/courses/home/'.$rdAuth->courseId);
           }
     ?>
     </td>

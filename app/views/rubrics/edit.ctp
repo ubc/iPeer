@@ -23,7 +23,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
     <tr class="tablecell2">
       <?php echo $this->Form->input('name', array('id' => 'name', 'size'=>'30', 
                                                   'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.',
-                                                  'readonly' => $readonly));?>
+                                                  'readonly' => $readonly, 'label' => __('Name')));?>
       <td>&nbsp;</td>
     </tr>
 
@@ -31,7 +31,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
       <?php echo $this->Form->input('lom_max', array('id' => 'LOM', 'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.',
                                                      'options' => array_combine(range(2,10), range(2,10)),
                                                      'default' => 5,
-                                                     'label' => 'Level of Mastery:',
+                                                     'label' => __('Level of Mastery:', true),
                                                      'style'=>'width:50px;',
                                                      'disabled' => $readonly));?>
       <td><?php __('aka LOM, Evaluation Range (Max 10)')?></td>
@@ -41,7 +41,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
       <?php echo $this->Form->input('criteria', array('id' => 'criteria', 'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.',
                                                       'options' => array_combine(range(1,25), range(1,25)),
                                                       'default' => 3,
-                                                      'label' => 'Number of Criteria:',
+                                                      'label' => __('Number of Criteria:', true),
                                                       'style'=>'width:50px;',
                                                       'disabled' => $readonly));?>
       <td><?php __('Number of Evaluation Aspects (Max 25)')?></td>
@@ -52,7 +52,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
       <?php echo $this->Form->input('availability', array('id' => 'availability',
                                                           'type' => 'radio',
                                                           'legend' => false,
-                                                          'options' => array('public'=>'Public','private'=>'Private'),
+                                                          'options' => array('public'=>__('Public', true),'private'=>__('Private', true)),
                                                           'label' => false,
                                                           'before' => '<td>',
                                                           'after' => '</td>',

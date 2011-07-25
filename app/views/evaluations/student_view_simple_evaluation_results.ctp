@@ -25,7 +25,7 @@
 			   }
 			   else { ?>
 			    <tr class="tablecell2" align="center">
-          <td><?php echo 'Not Released.'; ?>	</td>
+          <td><?php echo __('Not Released.', true); ?>	</td>
 				  </tr>
    	  <?php } ?>
 

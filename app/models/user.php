@@ -188,7 +188,7 @@ class User extends AppModel
   //Validation check on duplication of username
   function hasDuplicateUsername($username) {
     if ($this->find('first', array('conditions' => array('username' => $username)))) {
-      $this->errorMessage='Duplicate Username found. Please change the username of this user.';
+      $this->errorMessage=__('Duplicate Username found. Please change the username of this user.', true);
       /*if ($this->data[$this->name]['role'] == 'S') {
         $this->errorMessage.='<br>If you want to enrol this student to one or more courses, use the enrol function on User Listing page.';
         }*/

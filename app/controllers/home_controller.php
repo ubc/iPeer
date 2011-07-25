@@ -79,7 +79,7 @@ class HomeController extends AppController
   function __construct()
   {
     $this->Sanitize = new Sanitize;
-    $this->set('title_for_layout', 'Home');
+    $this->set('title_for_layout', __('Home', true));
     parent::__construct();
   }
 
@@ -198,7 +198,7 @@ class HomeController extends AppController
       $aco->create(array('parent_id' => null, 'model' => null, 'alias' => 'controllers'));
       $root = $aco->save();
       $root['Aco']['id'] = $aco->id;
-      $log[] = 'Created Aco node for controllers';
+      $log[] = __('Created Aco node for controllers', true);
     } else {
       $root = $root[0];
     }
@@ -226,7 +226,7 @@ class HomeController extends AppController
           $aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => $this->_getPluginName($ctrlName)));
           $pluginNode = $aco->save();
           $pluginNode['Aco']['id'] = $aco->id;
-          $log[] = 'Created Aco node for ' . $this->_getPluginName($ctrlName) . ' Plugin';
+          $log[] = __('Created Aco node for ', true) . $this->_getPluginName($ctrlName) . __(' Plugin', true);
         }
       }
       // find / make controller node
@@ -237,12 +237,12 @@ class HomeController extends AppController
           $aco->create(array('parent_id' => $pluginNode['0']['Aco']['id'], 'model' => null, 'alias' => $this->_getPluginControllerName($ctrlName)));
           $controllerNode = $aco->save();
           $controllerNode['Aco']['id'] = $aco->id;
-          $log[] = 'Created Aco node for ' . $this->_getPluginControllerName($ctrlName) . ' ' . $this->_getPluginName($ctrlName) . ' Plugin Controller';
+          $log[] = __('Created Aco node for ', true) . $this->_getPluginControllerName($ctrlName) . ' ' . $this->_getPluginName($ctrlName) . __(' Plugin Controller', true);
         } else {
           $aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => $ctrlName));
           $controllerNode = $aco->save();
           $controllerNode['Aco']['id'] = $aco->id;
-          $log[] = 'Created Aco node for ' . $ctrlName;
+          $log[] = __('Created Aco node for ', true) . $ctrlName;
         }
       } else {
         $controllerNode = $controllerNode[0];
@@ -262,7 +262,7 @@ class HomeController extends AppController
         if (!$methodNode) {
           $aco->create(array('parent_id' => $controllerNode['Aco']['id'], 'model' => null, 'alias' => $method));
           $methodNode = $aco->save();
-          $log[] = 'Created Aco node for '. $method;
+          $log[] = __('Created Aco node for ', true). $method;
         }
       }
     }
@@ -367,7 +367,7 @@ class HomeController extends AppController
         $file = Inflector::camelize(substr($file, 0, strlen($file)-strlen('_controller.php')));
         if (!preg_match('/^'. Inflector::humanize($pluginName). 'App/', $file)) {
           if (!App::import('Controller', $pluginName.'.'.$file)) {
-            debug('Error importing '.$file.' for plugin '.$pluginName);
+            debug(__('Error importing ', true).$file.__(' for plugin ', true).$pluginName);
           } else {
             /// Now prepend the Plugin name ...
             // This is required to allow us to fetch the method names.
