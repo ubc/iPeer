@@ -175,18 +175,12 @@ class EvaluationTestCase extends CakeTestCase {
    }
 
   function testSaveRubricEvaluation() {
-  
-    $params = array('form' => array('memberIDs' => array(4,3), 'rubric_id' =>1, 'event_id' =>1, 'group_event_id' => 1),
-    'data'=> array('Evaluation'=>array('evaluator_id' => 3)));
     
-    $this->EvaluationComponentTest->saveRubricEvaluation($params);
-  
   }
    
    
   function saveNGetEvalutionRubricDetail() {
-  
-    
+      
   }   
    
    
@@ -323,26 +317,38 @@ $expected = array (3=>array(0=>array("EvaluationRubric"=>
      $this->assertEqual($result[0]['EvaluationRubric']['comment_release'], 1);     
    } 
    
-   
+   //TODO
    //Skip, uses Auth  
    function testFormatRubricEvaluationResult() {
    
      $event= array('Event' => array('template_id' => 1, 'self_eval' => 1), 'group_id' => 1, 'group_event_id' => 1);
      $displayFormat = 'Detail';
      $studentView = 0;
-     $currentUser = array ('id' => 1);
-     
-  //   $result = $this->EvaluationComponentTest->formatRubricEvaluationResult($event, $displayFormat, $studentView, $currentUser);
-     
+     $currentUser = array ('id' => 1);    
+  //   $result = $this->EvaluationComponentTest->formatRubricEvaluationResult($event, $displayFormat, $studentView, $currentUser);     
    }
-   
-   
+     
    //TODO
+   //Uses Auth
    function testLoadMixEvaluationDetail() { 
+          
    }      
    
    //TODO
    function testSaveMixevalEvaluation() {
+     
+     $params = array('form'=> array('memberIDs' => array (3,16), 'group_event_id' => 1, 'event_id' => 1, '3'=>'Save This Section'), 
+     'data' => array('Evaluation' => array ('evaluator_id' => 16)));
+     $this->EvaluationComponentTest->saveMixevalEvaluation($params);
+     $now  ='hi';
+     $search = $this->EvaluationMixeval->find('all', array('conditions' => array('evaluator' => 16)));
+     $this->assertEqual($search[0]['EvaluationMixeval']['evaluator'], 16);
+     $this->assertEqual($search[0]['EvaluationMixeval']['evaluatee'], 3);      
+     $this->assertEqual($search[0]['EvaluationMixeval']['comment_release'], 0); 
+     $this->assertEqual($search[0]['EvaluationMixeval']['grp_event_id'], 1);         
+     $this->assertEqual($search[0]['EvaluationMixeval']['event_id'], 1);
+     $this->assertEqual($search[0]['EvaluationMixeval']['record_status'], 'A');    
+     
    }   
    
    function testSaveNGetEvalutionMixevalDetail() {
@@ -362,9 +368,8 @@ $expected = array (3=>array(0=>array("EvaluationRubric"=>
    function testGetMixevalResultDetail() {
    
      $event = array('group_event_id' => 1);
-     $groupMembers = array( array('id'=> 1), array('id' => 2), 'Group'=> array (1=> array('id' => 1),2=> array ('id' =>2)));
+     $groupMembers = array( 1=> array('id' => 1),2=> array ('id' =>2));
      $eval = $this->EvaluationComponentTest->getMixevalResultDetail($event, $groupMembers);
-
      $expected = array( "scoreRecords"=>
      array(1=> array ( "grade_released"=> "0", "comment_released"=> "0", "mixeval_question_ave"=> array()),
       2=> array( 1 => "n/a", 2=> "n/a", "mixeval_question_ave"=> array()),
@@ -380,11 +385,11 @@ $expected = array (3=>array(0=>array("EvaluationRubric"=>
         "CreatorId"=> array (),  "UpdaterId"=> array ())), 2=> array ()));
          
      $this->assertEqual($eval, $expected);
-     $eval = $this->EvaluationComponentTest->getMixevalResultDetail(null, $groupMembers);     
-     $expected = array("scoreRecords"=>false, "allMembersCompleted"=>true, "inCompletedMembers"=> array(), "memberScoreSummary"=> array(), "evalResult"=> array( ) ); 
-     $this->assertEqual($eval, $expected);
-     $eval = $this->EvaluationComponentTest->getMixevalResultDetail(null, null);     
-     $this->assertEqual($eval, $expected);    
+   //  $eval = $this->EvaluationComponentTest->getMixevalResultDetail(null, $groupMembers);     
+   //  $expected = array("scoreRecords"=>false, "allMembersCompleted"=>true, "inCompletedMembers"=> array(), "memberScoreSummary"=> array(), "evalResult"=> array( ) ); 
+   //  $this->assertEqual($eval, $expected);
+   //  $eval = $this->EvaluationComponentTest->getMixevalResultDetail(null, null);     
+   //  $this->assertEqual($eval, $expected);    
    }
    
    function testGetStudentViewMixevalResultDetailReview() {
@@ -432,6 +437,9 @@ $expected = array (3=>array(0=>array("EvaluationRubric"=>
    
    
    function testChangeMixevalEvaluationGradeRelease(){   
+     
+     
+     
    }
    
    function testChangeMixevalEvaluationCommentRelease() {

@@ -848,10 +848,10 @@ class EvaluationComponent extends Object
   //Mixeval Evaluation functions
 
   function loadMixEvaluationDetail ($event) {
-    $this->GroupsMembers = new GroupsMembers;
-    $this->EvaluationMixeval = new EvaluationMixeval;
-    $this->EvaluationMixevalDetail = new EvaluationMixevalDetail;
-    $this->Mixeval = new Mixeval;
+    $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
+    $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
+    $this->EvaluationMixevalDetail = ClassRegistry::init('EvaluationMixevalDetail');
+    $this->Mixeval = ClassRegistry::init('Mixeval');
 
     $result = array();
     $evaluator = $this->Auth->user('id');
@@ -891,9 +891,9 @@ class EvaluationComponent extends Object
 
   function saveMixevalEvaluation($params=null)
   {
-    $this->Event = new Event;
-    $this->Mixeval = new Mixeval;
-    $this->EvaluationMixeval = new EvaluationMixeval;
+    $this->Event = ClassRegistry::init('Event');
+    $this->Mixeval = ClassRegistry::init('Mixeval');
+    $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
 
     // assuming all are in the same order and same size
     $evaluatees = $params['form']['memberIDs'];
@@ -1170,8 +1170,8 @@ class EvaluationComponent extends Object
   }
 
   function changeMixevalEvaluationGradeRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus) {
-    $this->EvaluationMixeval  = new EvaluationMixeval;
-    $this->GroupEvent = new GroupEvent;
+    $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
+    $this->GroupEvent = ClassRegistry::init('GroupEvent');
 
     //changing grade release for each EvaluationMixeval
     $evaluationMixeval = $this->EvaluationMixeval->getResultsByEvaluatee($groupEventId, $evaluateeId);
