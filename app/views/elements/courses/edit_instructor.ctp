@@ -6,7 +6,7 @@
                                  'course_id' => $course_id),
                            array('confirm' => __('Are you sure to remove instructor ', true).$instructor[$displayField].__(' from this course?', true),
                                  'escape' => false,
-                                 'success' => 'if(response.responseText == "") {event.target.up(1).fade();var instructor_id = event.target.readAttribute("instructor_id");var instructor_name = event.target.readAttribute("instructor_name");$("CourseInstructors").insert({bottom: "<option value=\""+instructor_id+"\">"+instructor_name+"</option>"});} else {console.log(response);alert('.__("Failed to remove the instructor form this course.\nReason",true).': "+response.responseText);}',
+                                 'success' => 'if(response.responseText == "") {event.target.up(1).fade();var instructor_id = event.target.readAttribute("instructor_id");var instructor_name = event.target.readAttribute("instructor_name");$("CourseInstructors").insert({bottom: "<option value=\""+instructor_id+"\">"+instructor_name+"</option>"});} else {console.log(response);alert("Failed to remove the instructor form this course.\nReason: "+response.responseText);}',
                                  'error' => 'alert('.__("Communication error!").')',
                                  'buffer' => false,
                                 ))?>
