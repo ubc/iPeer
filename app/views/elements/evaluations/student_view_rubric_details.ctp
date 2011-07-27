@@ -1,4 +1,4 @@
-<?php
+<?php 
 $gradeReleased = isset($currentUser['id'])? $scoreRecords['group_criteria_ave']: 1;
 $commentReleased = isset($scoreRecords[$currentUser['id']])? $scoreRecords[$currentUser['id']]['comment_released']: 1;
 $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
@@ -26,12 +26,12 @@ if (!$gradeReleased && !$commentReleased) {
    $memberResult = $evalResult[$userId];
    if (isset($scoreRecords)) {
      shuffle($memberResult);
-   }
+   } 
    foreach ($memberResult AS $row):
      $memberRubric = $row['EvaluationRubric'];
      echo "<tr class=\"tablecell2\">";
-     if (isset($scoreRecords)) {
-       echo "<td width='15%'>".$currentUser['first_name'].' '.$currentUser['last_name']."</td>";
+     if ($currentUser['id']!=$row['EvaluationRubric']['creator_id']) {
+       echo "<td width='15%'>".$currentUser['full_name']."</td>";
      } else {
         $member = $membersAry[$memberRubric['evaluatee']];
         echo "<td width='15%'>".$member['User']['first_name'].' '.$member['User']['last_name']."</td>";

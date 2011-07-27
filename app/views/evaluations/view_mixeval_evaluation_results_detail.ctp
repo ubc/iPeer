@@ -60,7 +60,7 @@ $groupAve = 0;
     		$numerical_index++;
     	}
     ?>
-    <td> Total:( /<?php echo number_format($mixeval['Mixeval']['total_marks'], 2)?>)</td>
+    <td><?php echo __("Total:( /", true).number_format($mixeval['Mixeval']['total_marks'], 2)?>)</td>
   </tr>
     <?php
     $aveScoreSum = 0;
@@ -94,6 +94,8 @@ $groupAve = 0;
       		echo number_format($memberScoreSummary[$member['User']['id']]['received_ave_score'], 2);
       		$receviedAvePercent = $memberScoreSummary[$member['User']['id']]['received_ave_score'] / $mixeval['Mixeval']['total_marks'] * 100;
       		echo ' ('.number_format($receviedAvePercent) . '%)';
+                $membersAry[$member['User']['id']]['received_total_score'] = $memberScoreSummary[$member['User']['id']]['received_total_score'];
+                $membersAry[$member['User']['id']]['received_count'] = $memberScoreSummary[$member['User']['id']]['received_count'];
       		$membersAry[$member['User']['id']]['received_ave_score'] = $memberScoreSummary[$member['User']['id']]['received_ave_score'];
       		$membersAry[$member['User']['id']]['received_ave_score_%'] = $receviedAvePercent;
       	} else {
@@ -109,12 +111,14 @@ $groupAve = 0;
       echo "<td><b>";
       echo __("Group Average: ", true);
       echo "</b></td>";
+      $groupAve = 0;
      // if ( $allMembersCompleted ) {
       	//foreach ($scoreRecords['group_question_ave'] AS $groupAveIndex => $groupAveGrade) {
       	for ($j = 1; $j <= $mixeval['Mixeval']["lickert_question_max"]; $j++) {
             echo "<td>";
             if(isset($scoreRecords['group_question_ave'][$j-1])){
                 $groupAveGrade = $scoreRecords['group_question_ave'][$j-1];
+                $groupAve += $scoreRecords['group_question_ave'][$j-1];
                 echo number_format($groupAveGrade, 2);
             }
             echo "</td>";
@@ -126,8 +130,8 @@ $groupAve = 0;
       //}
       echo "<td><b>";
       //if ( $allMembersCompleted ) {
-        $groupAve = number_format($aveScoreSum / count($groupMembers), 2);
-      	echo $groupAve;
+        //$groupAve = number_format($aveScoreSum / count($groupMembers), 2);
+      	echo number_format($groupAve, 2);
       	echo ' ('.number_format($groupAve / $mixeval['Mixeval']['total_marks'] * 100) . '%)';
       //} else {
       //	echo '-';
@@ -165,7 +169,10 @@ $groupAve = 0;
 		  	<?php echo 'Evaluatee: '.$user['first_name'].' '.$user['last_name']?>
 		  </div>
 		  <div style="height: 200px;" id="panel1Content" class="panelContent">
-			 <br><b>Total: <?php
+			 <br><b><?php 
+                                          echo __("Sum: ",true).number_format($membersAry[$user['id']]['received_total_score'], 2);
+                                          echo __(" (Number of Evaluator(s): ",true).$membersAry[$user['id']]['received_count'].")<br/>";
+                                          echo __("Total: ", true);
 			                  if (isset($membersAry[$user['id']]['received_ave_score'])) {
   			                  $memberAve = number_format($membersAry[$user['id']]['received_ave_score'], 2);
   			                  $memberAvePercent = number_format($membersAry[$user['id']]['received_ave_score_%']);
@@ -176,7 +183,7 @@ $groupAve = 0;
 			                  echo $memberAve;
 			                  echo '('.$memberAvePercent .'%)';
 			                  if ($memberAve == $groupAve) {
-			                    echo "&nbsp;&nbsp;<< ".__('Same Mark as Group Average')." >>";
+			                    echo "&nbsp;&nbsp;<< ".__('Same Mark as Group Average', true)." >>";
 			                  } else if ($memberAve < $groupAve) {
 			                    echo "&nbsp;&nbsp;<font color='#cc0033'><< ".__('Below Group Average', true)." >></font>";
 			                  } else if ($memberAve > $groupAve) {

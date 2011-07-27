@@ -29,7 +29,7 @@
     <td colspan="3">
 	      <font color="red"><?php __('These student(s) have yet to submit their evaluations:')?> <br>
 	         <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
-	          &nbsp;-&nbsp; <?php echo $user['last_name'].' '.$user['first_name']?> <br>
+	          &nbsp;-&nbsp; <?php echo $user['first_name'].' '.$user['last_name']?> <br>
 	      <?php endforeach; ?>
       </font>
     </td>
@@ -57,7 +57,7 @@ $groupAve = 0;
     		$numerical_index++;
     	}
     ?>
-    <td> Total:( <?php echo number_format($rubric['Rubric']['total_marks'], 2)?>)</td>
+    <td> Total:( /<?php echo number_format($rubric['Rubric']['total_marks'], 2)?>)</td>
   </tr>
     <?php
     $aveScoreSum = 0;
@@ -71,7 +71,7 @@ $groupAve = 0;
       		echo '<td width="30%">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td>' . "\n";
         //if ($allMembersCompleted) {
         if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
-          $aveScoreSum += $memberScoreSummary[$member['User']['id']]['received_total_score'];
+          $aveScoreSum += $memberScoreSummary[$member['User']['id']]['received_ave_score'];
         	foreach ($scoreRecords[$member['User']['id']]['rubric_criteria_ave'] AS $criteriaAveIndex => $criteriaAveGrade) {
           	echo '<td>' . number_format($criteriaAveGrade, 2). "</td>";
           }
@@ -84,9 +84,9 @@ $groupAve = 0;
       	//totals section
       	echo '<td width="30%">';
       	//if ($allMembersCompleted) {
-      	if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
-      		echo number_format($memberScoreSummary[$member['User']['id']]['received_total_score'], 2);
-      		$receviedAvePercent = $memberScoreSummary[$member['User']['id']]['received_total_score'] / $rubric['Rubric']['total_marks'] * 100;
+      	if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) { 
+      		echo number_format($memberScoreSummary[$member['User']['id']]['received_ave_score'], 2);
+      		$receviedAvePercent = $memberScoreSummary[$member['User']['id']]['received_ave_score'] / $rubric['Rubric']['total_marks'] * 100;
       		echo ' ('.number_format($receviedAvePercent) . '%)';
       		$membersAry[$member['User']['id']]['received_ave_score'] = $memberScoreSummary[$member['User']['id']]['received_ave_score'];
       		$membersAry[$member['User']['id']]['received_ave_score_%'] = $receviedAvePercent;
@@ -102,24 +102,15 @@ $groupAve = 0;
       echo '<tr class="tablesummary">';
       echo "<td><b>";
       echo __("Group Average: ", true);
-      echo "</b></td>";
-      if ( $allMembersCompleted ) {
-      	foreach ($scoreRecords['group_criteria_ave'] AS $groupAveIndex => $groupAveGrade) {
-        	echo '<td>' . number_format($groupAveGrade, 2). "</td>";
-        }
-      } else {
-      	for ($i = 1; $i <= $rubric['Rubric']["criteria"]; $i++) {
-      		echo "<td>-</td>";
-      	}
+      echo "</b></td>";      
+      foreach ($scoreRecords['group_criteria_ave'] AS $groupAveIndex => $groupAveGrade) {
+              echo '<td>' . number_format($groupAveGrade, 2). "</td>";
       }
       echo "<td><b>";
-      if ( $allMembersCompleted ) {
-        $groupAve = number_format($aveScoreSum / count($groupMembers, 2));
-      	echo $groupAve;
-      	echo ' ('.number_format($groupAve / $rubric['Rubric']['total_marks'] * 100) . '%)';
-      } else {
-      	echo '-';
-      }
+      $groupAve = number_format($aveScoreSum / count($groupMembers),2);
+      echo $groupAve;
+      echo ' ('.number_format($groupAve / $rubric['Rubric']['total_marks'] * 100) . '%)';
+      
       echo "</b></td>";
     }		?>
 	</tr>
@@ -153,25 +144,29 @@ $groupAve = 0;
 		  	<?php echo __('Evaluatee: ', true).$user['last_name'].' '.$user['first_name']?>
 		  </div>
 		  <div style="height: 200px;" id="panel1Content" class="panelContent">
-			 <br><b>Total: <?php if (isset($membersAry[$user['id']]['received_ave_score'])) {
-			                    //$memberTotalScore = number_format($membersAry[$user['id']]['received_ave_score'], 2);
-			                    $memberTotalScore = $memberScoreSummary[$row['User']['id']]['received_total_score'];
-			                    $memberTotalScorePercent = number_format($membersAry[$user['id']]['received_ave_score_%']);
-			                  }else {
-			                    $memberTotalScore = '-';
-			                    $memberTotalScorePercent = '-';
-			                  }
-			                  echo $memberTotalScore;
-			                  echo '('.$memberTotalScorePercent.'%)';
-			                  if ($memberTotalScore == $groupAve) {
-			                    echo "&nbsp;&nbsp;<< Same Mark as Group Average >>";
-			                  } else if ($memberTotalScore < $groupAve) {
-			                    echo "&nbsp;&nbsp;<font color='#cc0033'><< ".__('Below Group Average')." >></font>";
-			                  } else if ($memberTotalScore > $groupAve) {
-			                    echo "&nbsp;&nbsp;<font color='#000099'><< ".__('Above Group Average')." >></font>";
-			                  }
-			                ?> </b>
-			        <br><br>
+			 <br><b><?php
+                                  echo __("Sum: ",true).number_format($memberScoreSummary[$row['User']['id']]['received_total_score'],2);
+                                  echo __(" (Number of Evaluator(s): ",true).count($evalResult[$user['id']]).")<br/>";
+                                  echo __("Total: ", true);
+                                  if (isset($membersAry[$user['id']]['received_ave_score'])) {
+                                    //$memberTotalScore = number_format($membersAry[$user['id']]['received_ave_score'], 2);
+                                    $memberTotalScore = $memberScoreSummary[$row['User']['id']]['received_ave_score'];
+                                    $memberTotalScorePercent = number_format($membersAry[$user['id']]['received_ave_score_%']);
+                                  }else {
+                                    $memberTotalScore = '-';
+                                    $memberTotalScorePercent = '-';
+                                  }
+                                  echo $memberTotalScore;
+                                  echo '('.$memberTotalScorePercent.'%) ';
+                                  if ($memberTotalScore == $groupAve) {
+                                    echo "&nbsp;&nbsp;((".__("Same Mark as Group Average", true)." ))";
+                                  } else if ($memberTotalScore < $groupAve) {
+                                    echo "&nbsp;&nbsp;<font color='#cc0033'><< ".__('Below Group Average', true)." >></font>";
+                                  } else if ($memberTotalScore > $groupAve) {
+                                    echo "&nbsp;&nbsp;<font color='#000099'><< ".__('Above Group Average', true)." >></font>";
+                                  }
+                                ?> </b>
+			 <br><br>
         <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
         	<tr class="tableheader" align="center">
             <td width="100" valign="top"><?php __('Evaluator')?></td>

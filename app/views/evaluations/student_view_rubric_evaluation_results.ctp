@@ -24,7 +24,7 @@
 $numerical_index = 1;  //use numbers instead of words; get users to refer to the legend
 $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
 $membersAry = array();  //used to format result
-$groupAve = 0;
+$groupAve = 0; 
 if (isset($scoreRecords[$currentUser['id']])) {
     $gradeReleased = $scoreRecords[$currentUser['id']]['grade_released'];
     $commentReleased = $scoreRecords[$currentUser['id']]['comment_released'];
@@ -79,7 +79,7 @@ if (isset($scoreRecords[$currentUser['id']])) {
 		  <div style="height: 200px;" id="panelReviewsContent" class="panelContent">
 
   	  <?php
-    $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$reviewEvaluations, 'userId'=>$currentUser['id'], 'scoreRecords'=>null);
+    $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$reviewEvaluations, 'userId'=>$currentUser['id'], 'scoreRecords'=>$scoreRecords);
     echo $this->element('evaluations/student_view_rubric_details', $params);
     ?>
 		  </div>

@@ -29,7 +29,7 @@ echo $this->element('evaluations/view_event_info', $params);
     <td colspan="3">
 	      <font color="red"><?php __('These student(s) have yet to submit their evaluations:')?> <br>
 	         <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
-	          &nbsp;-&nbsp; <?php echo $user['last_name'].' '.$user['first_name']?> <br>
+	          &nbsp;-&nbsp; <?php echo $user['first_name'].' '.$user['last_name']?> <br>
 	      <?php endforeach; ?>
       </font>
     </td>

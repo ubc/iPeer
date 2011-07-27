@@ -17,16 +17,17 @@ class EvaluationMixevalDetail extends AppModel
 //	    $sql .= ' AND question_number='.$questionNum;
 //	  }
 //		return $this->find($sql);
-            $conditions = array('evaluation_mixeval_id' => $MixevalId);
-            if($questionNum != null)
-                $conditions['question_number'] = $questionNum;
+            $conditions['EvaluationMixevalDetail.evaluation_mixeval_id'] = $MixevalId;
+            if(!is_null($questionNum))
+                $conditions['EvaluationMixevalDetail.question_number'] = $questionNum;
             
-            $type=null;
-            if(null == $questionNum) $type = 'all';
-            	else $type = 'first';
-            return $this->find($type, array(
-                'conditions' => $conditions, 'order'=>'question_number'
-            ));  
+            $type = is_null($questionNum)? 'all':'first';
+            $result = $this->find($type, array(
+                'conditions' => $conditions, 
+                'recursive' => -1,
+                'order'=>'EvaluationMixevalDetail.question_number'
+            ));
+            return $result;
 	}
 }
 ?>

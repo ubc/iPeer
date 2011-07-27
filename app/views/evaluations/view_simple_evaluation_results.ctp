@@ -62,6 +62,35 @@
     		  echo '</tr>';
     	  }   ?>
   <tr class="tablesummary">
+    	<td><?php __('Total Received')?></td>
+      <?php
+      $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;
+       foreach ($groupMembers as $member_col) {
+        if (isset($memberScoreSummary[$member_col['User']['id']])) {
+          echo '<td>'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'],2).'</td>' . "\n\t\t";
+      
+        } else {
+         echo '<td> - </td>';
+        }
+      }?>
+  </tr>
+  <tr class="tablesummary">
+    	<td><?php __('# of Evaluator(s)')?></td>
+      <?php
+      $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;
+       foreach ($groupMembers as $member_col) {
+        if (isset($memberScoreSummary[$member_col['User']['id']])) {
+          if (!empty($incompletedMembersArr) && in_array($member_col['User']['first_name'].' '.$member_col['User']['last_name'], $incompletedMembersArr))
+            echo '<td>'.($memberEvaluatedCount-(count($inCompletedMembers))+1).'</td>' . "\n\t\t";
+          else
+            echo '<td>'.($memberEvaluatedCount-(count($inCompletedMembers))).'</td>' . "\n\t\t";
+
+        } else {
+         echo '<td> - </td>';
+        }
+      }?>
+  </tr>
+  <tr class="tablesummary">
     	<td><?php __('Average Received')?></td>
       <?php
       $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;

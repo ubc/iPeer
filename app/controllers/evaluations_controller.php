@@ -482,7 +482,7 @@ function makeSurveyEvaluation ($param = null) {
           $event = $this->Event->formatEventObj($eventId, $groupId);
           $rubricId = $event['Event']['template_id'];
           $data = $this->Rubric->getRubricById($rubricId);
-          $this->set('data', $data[0]);
+          $this->set('data', $data);
           $this->set('event', $event);
           //Setup the courseId to session
           $courseId = $event['Event']['course_id'];
@@ -811,7 +811,7 @@ function makeSurveyEvaluation ($param = null) {
 
       //Setup current user Info
       $currentUser = $this->User->getCurrentLoggedInUser();
-      $this->set('currentUser', $currentUser);
+      $this->set('currentUser', $currentUser); 
 
       //Get the target event
       $event = $this->Event->formatEventObj($eventId, $groupId);
@@ -848,7 +848,7 @@ function makeSurveyEvaluation ($param = null) {
                 $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
                 $this->set('evalResult', $formattedResult['evalResult']);
                 $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
-                $this->render('student_view_rubric_evaluation_results');
+                $this->render('student_view_rubric_evaluation_results'); 
                 break;
 
             case 3: //View Survey Result

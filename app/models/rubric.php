@@ -264,16 +264,16 @@ class Rubric extends EvaluationBase
     $this->RubricsCriteria = new RubricsCriteria;
     $this->RubricsCriteriaComment = new RubricsCriteriaComment;
 
-    $data = $this->RubricsLom->getLoms($tmp[0]['Rubric']['id'], $tmp[0]['RubricsLom'][0]['id']);
-    $tmp1 = array_merge($tmp[0]['Rubric'],$data);
+    $data = $this->RubricsLom->getLoms($tmp['Rubric']['id'], $tmp['RubricsLom'][0]['id']);
+    $tmp1 = array_merge($tmp['Rubric'],$data);
 
-    $data = $this->RubricsCriteria->getCriteria($tmp[0]['Rubric']['id']);
+    $data = $this->RubricsCriteria->getCriteria($tmp['Rubric']['id']);
     $tmp2 = array_merge($tmp1,$data);
 
     // add some empty ones if needed
     $criteria_count = count($data)/2;
 
-    for(;$criteria_count < $tmp[0]['Rubric']['criteria'];$criteria_count++) {
+    for(;$criteria_count < $tmp['Rubric']['criteria'];$criteria_count++) {
         $tmp2['criteria'.($criteria_count+1)] = '';
         $tmp2['criteria_weight_'.($criteria_count+1)] = 1;
     }
@@ -283,7 +283,7 @@ class Rubric extends EvaluationBase
 
     /* Now, replace all the elements of this database array with the submitted array,
        unless there are missing */
-    $submitedRubric = $tmp[0]['Rubric'];
+    $submitedRubric = $tmp['Rubric'];
     foreach ($tmp3 as $key => $value) {
 
         if (!empty($submitedRubric[$key])) {

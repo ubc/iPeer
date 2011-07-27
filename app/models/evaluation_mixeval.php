@@ -93,7 +93,18 @@ class EvaluationMixeval extends AppModel
 //             'AVG(score) AS received_total_score');
         return $this->find('all', array(
             'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
-            'fields' => array('AVG(score) AS received_total_score')
+            'fields' => array('SUM(score) AS received_total_score')
+        ));
+    }
+
+        // get total mark each member recieved
+    function getReceivedAvgScore($grpEventId=null, $evaluatee=null) {
+//        return $this->find('grp_event_id=' . $grpEventId .
+//             ' AND evaluatee=' . $evaluatee,
+//             'AVG(score) AS received_total_score');
+        return $this->find('all', array(
+            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
+            'fields' => array('AVG(score) AS received_avg_score')
         ));
     }
 
@@ -101,7 +112,7 @@ class EvaluationMixeval extends AppModel
     function getReceivedTotalEvaluatorCount($grpEventId=null, $evaluatee=null) {
         //return $this->find('grp_event_id='.$grpEventId.' AND evaluatee='.$evaluatee, 'COUNT(*) AS ttl_count');
         return $this->find('count', array(
-            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee)
+            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
         ));
     }
 
@@ -130,7 +141,7 @@ class EvaluationMixeval extends AppModel
     function setAllEventCommentRelease($eventId=null, $releaseStatus=null) {
 //        $sql = 'UPDATE evaluation_mixevals SET comment_release = '.$releaseStatus.' WHERE event_id = '.$eventId;
 //        return $this->query($sql);
-      $fields = array('EvaluationMixeval.commnet_release' => $releaseStatus);
+      $fields = array('EvaluationMixeval.comment_release' => $releaseStatus);
       $conditions = array('EvaluationMixeval.event_id' => $eventId);
       return $this->updateAll($fields, $conditions);
     }

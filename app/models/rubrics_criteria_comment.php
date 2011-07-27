@@ -97,9 +97,9 @@ class RubricsCriteriaComment extends AppModel
    */
   function getCriteriaComment($rubric = null) {
   	
-  	$id = $rubric[0]['Rubric']['id'];
-  	$criteria = $rubric[0]['RubricsCriteria'];
-  	$lom = $rubric[0]['RubricsLom'];
+  	$id = $rubric['Rubric']['id'];
+  	$criteria = $rubric['RubricsCriteria'];
+  	$lom = $rubric['RubricsLom'];
   	$tmp = null;
   	
   	for($i = 0; $i<count($criteria); $i++){
