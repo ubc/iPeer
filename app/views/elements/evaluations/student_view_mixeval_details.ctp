@@ -60,7 +60,12 @@ else if ($gradeReleased || $commentReleased) {
      for ($i=1; $i<=$mixeval['Mixeval']["lickert_question_max"]; $i++) {
         $mixevalDet = $memberMixeval['details'][$i-1]['EvaluationMixevalDetail'];
         echo "<td valign=\"middle\">";
+        //Point Description Detail
+        if (isset($mixevalQuestion[$i-1]['Description'][$mixevalDet['selected_lom']-1]['descriptor'])) {
+          echo $mixevalQuestion[$i-1]['Description'][$mixevalDet['selected_lom']-1]['descriptor'];
+        }
         echo "<br />";
+        
         //Points Detail
         echo "<strong>Points: </strong>";
         if ($gradeReleased && isset($mixevalDet)) {

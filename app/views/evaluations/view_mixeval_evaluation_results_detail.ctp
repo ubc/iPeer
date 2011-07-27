@@ -224,11 +224,11 @@ $groupAve = 0;
                $rubDet = $resultDetails[$j-1]['EvaluationMixevalDetail'];
                 echo '<td valign="middle">';
                 //Point Description Detail
-                if (isset($rubDet)) {
-                  echo $mixevalQuestion[$j-1]['Description'][$rubDet['selected_lom']-1]['descriptor']."<br />";
-                } else {
-                	echo "n/a<br />";
+                if (isset($mixevalQuestion[$j-1]['Description'][$rubDet['selected_lom']-1]['descriptor'])) {
+                  echo $mixevalQuestion[$j-1]['Description'][$rubDet['selected_lom']-1]['descriptor'];
                 }
+                echo "<br />";
+                
                 //Points Detail
                 echo "<strong>".__('Points:', true)."</strong>";
                 if (isset($rubDet)) {
