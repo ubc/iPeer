@@ -39,9 +39,56 @@ class Event extends AppModel
       'title' => array('rule' => 'notEmpty',
                        'message' => 'Title is required.',
                        'allowEmpty' => false),
-      'due_date' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/',
-      'release_date_begin' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/',
-      'release_date_end' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/'
+      'due_date' => array(
+          'format' => array(
+            'rule' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/',
+            'message' => 'Invalide Due Date Format'
+          ),
+          'beforeEnd' => array(
+            'rule' =>  array('compareDates', '<', 'release_date_end'),
+            'message' => "Due Date: must be *before* Release To date."
+          ),
+          'afterBegin' => array(
+            'rule' =>  array('compareDates', '>', 'release_date_begin'),
+            'message' => "Due Date: must be *after* Release From date."
+          ),
+      ),
+      'release_date_begin' => array(
+          'format' => array(
+            'rule' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/',
+            'message' => 'Invalide Evaluation From Date Format'
+          ),
+          'beforeEnd' => array(
+            'rule' =>  array('compareDates', '<', 'release_date_end'),
+            'message' => 'Evaluation Release To: must be *after* From date.'
+          ),
+      ),
+      'release_date_end' => array(
+          'format' => array(
+            'rule' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/',
+            'message' => 'Invalide Evaluation To Date Format'
+          )
+      ),
+      'result_release_date_begin' => array(
+          'format' => array(
+            'rule' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/',
+            'message' => 'Invalide Result From Date Format'
+          ),
+          'beforeEnd' => array(
+            'rule' =>  array('compareDates', '<', 'result_release_date_end'),
+            'message' => 'Result Release To: must be *after* From date.'
+          ),
+          'afterDue' => array(
+            'rule' =>  array('compareDates', '>', 'due_date'),
+            'message' => "Result Release From: must be *after* Due Date."
+          )
+      ),
+      'result_release_date_end' => array(
+          'format' => array(
+            'rule' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/',
+            'message' => 'Invalide Result To Date Format'
+          )
+      )
   );
 
   var $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Traceable');
@@ -489,6 +536,31 @@ class Event extends AppModel
           'fields' => array('Event.title')
       ));
       return $event['Event']['title'];
+    }
+
+    /**
+     *
+     * Custom validation function to compare dates
+     * @param <type> $check array('key' => 'value')
+     * @param <type> $operator operator
+     * @param <type> $field field to compare
+     * @return boolean result
+     */
+    function compareDates($check, $operator, $field){
+      $var_1 = strtotime($this->data['Event'][key($check)]);
+      $var_2 = strtotime($this->data['Event'][$field]);
+      $comparison = $operator;
+
+      $map = array(
+          ">" => $var_1 > $var_2,
+          "<" => $var_1 < $var_2,
+          ">=" => $var_1 >= $var_2,
+          "<=" => $var_1 <= $var_2,
+          "==" => $var_1 == $var_2,
+          "!=" => $var_1 != $var_2,
+      );
+
+      return ($map[$comparison]);
     }
 }
 

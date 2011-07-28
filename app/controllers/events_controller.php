@@ -453,24 +453,28 @@ class EventsController extends AppController
     $this->set('model', $model);
     $this->set('id', $id);
     $courseId = $data['Event']['course_id'];
-		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events', true));
-$forsave =array();
+    $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events', true));
+    $forsave =array();
 
-		if (!empty($this->data)) {
-	$this->data['Event']['id'] = $id;
-			if($result = $this->Event->save($this->data)) {
-				 //Save Groups for the Event
-		//$this->GroupEvent->insertGroups($this->Event->id, $this->data['Member']);
-		$this->GroupEvent->updateGroups($this->Event->id, $this->data['Member']);
+    if (!empty($this->data)) {
+      $this->data['Event']['id'] = $id;
+      if($result = $this->Event->save($this->data)) {
+        //Save Groups for the Event
+        //$this->GroupEvent->insertGroups($this->Event->id, $this->data['Member']);
+        $this->GroupEvent->updateGroups($this->Event->id, $this->data['Member']);
         $this->Session->setFlash(__('The event was edited successfully.', true));
         $this->redirect('index');
-			} else {
-        $this->Session->setFlash($this->Survey->errorMessage);
-        $this->render('edit');
-			}
-		} else {
+      } else {
+//        $validationErrors = $this->Event->invalidFields();
+//        $errorMsg = '';
+//        foreach($validationErrors as $error){
+//          $errorMsg = $errorMsg."\n".$error;
+//        }
+//        $this->Session->setFlash(__('Failed to save.</br>', true).$errorMsg);
+      }
+    } else {
       $this->data = $data;
-        }
+    }
         
     $this->set('eventTemplateTypes', $this->EventTemplateType->find('list', array('conditions' => array('NOT' => array('id' => 3)))));
     $this->set('unassignedGroups', $this->Event->getUnassignedGroups($data));

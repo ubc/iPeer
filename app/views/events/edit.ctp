@@ -7,7 +7,7 @@
     <td>
     <?php echo $this->Form->create('Event', 
                                    array('id' => 'frm',
-                                         'url' => array('action' => $this->action.'/'.$event_id),
+                                         'url' => array('action' => $this->action),
                                          'inputDefaults' => array('div' => false,
                                                                   'before' => '<td width="200px">',
                                                                   'after' => '</td>',
@@ -140,18 +140,10 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
     <?php
 
     echo $form->input('Event.due_date', array('size'=>'50','class'=>'input', 'style'=>'width:75%;', 'type'=>'text', 'label'=>__('Due Date', true).':<font color="red">*</font>', 'value'=>$this->data['Event']['due_date'], 'after'=>'')) ?>&nbsp;&nbsp;
-    
-    
-                        <?php // echo $form->input('Search.due_date_begin', array('size'=>'50','class'=>'input',  'label'=> false, 'style'=>'width:75%;','value'=>(isset($sticky['due_date_begin']))? $sticky['due_date_begin']:'')) 
-                        ?>
-    
-    
-		    <a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
-	
-   
-   
-   
-   	
+    <?php // echo $form->input('Search.due_date_begin', array('size'=>'50','class'=>'input',  'label'=> false, 'style'=>'width:75%;','value'=>(isset($sticky['due_date_begin']))? $sticky['due_date_begin']:''))
+    ?>
+    <a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+    <?php echo $form->error('Event.due_date', __('Please enter a valid date.', true))?>  	
     <td><?php __('eg. YYYY-MM-DD HH:MM:SS (24 HOUR)')?></td>
   </tr>
   <tr class="tablecell2">
@@ -161,12 +153,14 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
 				<td width="10%"><?php __('FROM:')?></td>
 				<td width="90%">
       		<?php echo $form->input('Event.release_date_begin', array('size'=>'50','class'=>'input', 'format'=>array('input'), 'type'=>'text','style'=>'width:75%;', 'value'=>$this->data['Event']['release_date_begin'])) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal2.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+                <?php echo $form->error('Event.release_date_begin', __('Please enter a valid date.', true))?>
       	</td>
       </tr>
       <tr>
       	<td width="10%"><?php __('TO:')?></td>
       	<td width="90%">
       		<?php echo $form->input('Event.release_date_end', array('size'=>'50','class'=>'input', 'format'=>array('input'),  'type'=>'text','style'=>'width:75%;', 'value'=>$this->data['Event']['release_date_end'])) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal3.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
+                <?php echo $form->error('Event.release_date_end', __('Please enter a valid date.', true))?>
       	</td>
   	  </tr></table>
   	</td>
@@ -180,13 +174,15 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
 				<td width="10%"><?php __('FROM:')?></td>
 				<td width="90%">
       		<?php echo $form->input('Event.result_release_date_begin', array('size'=>'50','class'=>'input', 'format'=>array('input'), 'type'=>'text','style'=>'width:75%;', 'value'=>$this->data['Event']['result_release_date_begin'])) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal4.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
-      	</td>
+                <?php echo $form->error('Event.result_release_date_begin', __('Please enter a valid date.', true))?>
+        </td>
       </tr>
       <tr>
       	<td width="10%"><?php __('TO:')?></td>
       	<td width="90%">
       		<?php echo $form->input('Event.result_release_date_end', array('size'=>'50','class'=>'input', 'format'=>array('input'),  'type'=>'text','style'=>'width:75%;', 'value'=>$this->data['Event']['result_release_date_end'])) ?>&nbsp;&nbsp;&nbsp;<a href="javascript:cal5.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
-      	</td>
+                <?php echo $form->error('Event.result_release_date_end', __('Please enter a valid date.', true))?>
+        </td>
   	  </tr></table>
   	</td>
   	<td>
