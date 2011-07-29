@@ -14,8 +14,9 @@ class EmailSchedule extends AppModel
    * @return Emails to send
    */
   function getEmailsToSend(){
+    $this->recursive = -1;
     return $this->find('all', array(
-        'conditions' => array('now() >= EmailSchedule.date', 'EmailSchedule.sent' => '0')
+        'conditions' => array('now() >= EmailSchedule.date', 'EmailSchedule.sent' => '0'),
     ));
   }
 

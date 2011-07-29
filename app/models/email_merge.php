@@ -24,7 +24,7 @@ class EmailMerge extends AppModel
    * @param $value value
    * @return field name
    */
-  function getFieldNameByValue($value = ''){
+  function getFieldAndTableNameByValue($value = ''){
     $table = $this->find('first', array(
           'conditions' => array('value' => $value),
           'fields' => array('table_name','field_name')

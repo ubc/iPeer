@@ -66,7 +66,7 @@ class EmailtemplatesController extends AppController
       $restrictions = array(
           "EmailTemplate.creator_id" => array($myID => true, "!default" => false)
       );
-      $extraFilters = "(EmailTemplate.creator_id=$myID or EmailTemplate.availability='0')";
+      $extraFilters = "(EmailTemplate.creator_id=$myID or EmailTemplate.availability='1')";
     }
 
     // Set up actions

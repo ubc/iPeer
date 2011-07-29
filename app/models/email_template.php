@@ -16,6 +16,7 @@ class EmailTemplate extends AppModel
    * @return List of my email templates
    */
   function getMyEmailTemplate($user_id, $type = 'all'){
+    $this->recursive = -1;
     return $this->find($type, array(
         'conditions' => array('creator_id' => $user_id)
     ));
@@ -28,6 +29,7 @@ class EmailTemplate extends AppModel
    * @return List of available email templates
    */
   function getPermittedEmailTemplate($user_id, $type= 'all'){
+    $this->recursive = -1;
     return $this->find($type, array(
         'conditions' => array('OR' => array(
             array('creator_id' => $user_id),

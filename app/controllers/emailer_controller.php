@@ -382,7 +382,7 @@ class EmailerController extends AppController
     foreach($matches[0] as $key => $match){      
       $patterns[$key] = '/'.$match[0].'/';
       
-      $table = $this->EmailMerge->getFieldNameByValue($match[0]);
+      $table = $this->EmailMerge->getFieldAndTableNameByValue($match[0]);
       $table_name = $table['table_name'];
       $field_name = $table['field_name'];
       $this->$table_name->recursive = -1;
