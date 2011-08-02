@@ -132,20 +132,23 @@ class CoursesController extends AppController
     $this->render('home');
 	}
 
-	function add() {
-		if (!empty($this->data)) {
-			if ($this->data = $this->Course->save($this->data)) {
+  function add() {
+    if (!empty($this->data)) {
+      if ($this->data = $this->Course->save($this->data)) {
         // add current user to the new course
         $this->Course->addInstructor($this->Course->id, $this->Auth->user('id'));
         $this->Session->setFlash('The course has been created.');
         //$this->sysContainer->setMyCourseList($myCourses);
-				$this->redirect(array('action' => 'edit', $this->Course->id));
-			}
+        $this->redirect(array('action' => 'edit', $this->Course->id));
+      }
+      else{
+        $this->Session->setFlash('Failed');
+      }
     }
     $this->set('course_id', 0);
     $this->set('data', $this->data);
     $this->render('edit');
-	}
+  }
 
 	function edit($id) {
     if(!is_numeric($id)) {

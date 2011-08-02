@@ -19,7 +19,7 @@
   </tr>
 
   <tr class="tablecell2">
-      <td><?php __('Course')?>:</td>
+      <td><?php __('Course')?>:&nbsp;<font color="red">*</font></td>
     <?php echo $this->Form->input(__('course', true), array('size'=>'50', 'class'=>'input',
                                                   'readonly' => $readonly, 'label' => false, 'format' => array('before','input','after', 'error'))) ?>
     <?php
@@ -35,7 +35,7 @@
   </tr>
 
   <tr class="tablecell2">
-    <td width="200px"><?php __('Title')?>:</td>
+    <td width="200px"><?php __('Title')?>:&nbsp;<font color="red">*</font></td>
     <?php echo $this->Form->input('title', array('size'=>'50', 'class'=>'input',
                                                   'readonly' => $readonly, 'label' => false, 'format' => array('before','input','after', 'error'))) ?>
     <td><?php __('eg. Intro to APSCI')?> </td>

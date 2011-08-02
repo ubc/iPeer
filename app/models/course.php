@@ -92,6 +92,18 @@ class Course extends AppModel
 
   var $STATUS = array('I' => 'Inactive', 'A' => 'Active');
 
+  var $validate = array(
+      'course' => array('rule' => 'notEmpty',
+                       'message' => 'Course is required.',
+                       'allowEmpty' => false),
+      'title' => array('rule' => 'notEmpty',
+                       'message' => 'Title is required.',
+                       'allowEmpty' => false),
+      'homepage' => array('rule' => 'url',
+                       'message' => 'Invalid Homepage Format',
+                       'allowEmpty' => true),
+  );
+
 
   function __construct($id = false, $table = null, $ds = null) {
     parent::__construct($id, $table, $ds);

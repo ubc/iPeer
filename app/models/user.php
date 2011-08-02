@@ -141,7 +141,7 @@ class User extends AppModel
 
   var $validate = array('username'  => array('character' => array('rule' => 'alphaNumeric',
                                                                   'required' => true,
-                                                                  'message' => 'Alphabets and numbers only'),
+                                                                  'message' => 'Letters and numbers only'),
                                              'minLength' => array('rule' => array('minLength', 6),
                                                               'message' => 'Usernames must be at least 6 characters long'),
                                              'unique' => array('rule' => 'isUnique',

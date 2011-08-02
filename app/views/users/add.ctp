@@ -20,7 +20,7 @@
                                                           'error' => array( 'minLength' => __('Usernames must be at least 6 characters long', true), 
                                                           'character' => __('Usernames must be at least 6 characters long', true),
                                                           'unique' => __('Duplicate Username found. Please change the username.', true)),
-                                                          'label' => __('Username', true),
+                                                          'label' => __('Username', true).'&nbsp;<font color="red">*</font>',
                                                           'readonly' => $readonly));?>
           <?php echo $readonly ? '' : $ajax->observeField('username', array('update'=>'usernameErr', 'url'=>'checkDuplicateName/', 'frequency'=>1, 'loading'=>"Element.show('loading');", 'complete'=>"Element.hide('loading');stripe();")); ?>
           <td width="255"><div id='username_msg' class="error"></div><div id='usernameErr' class="error"></div></td>
