@@ -142,7 +142,7 @@ class CoursesController extends AppController
         $this->redirect(array('action' => 'edit', $this->Course->id));
       }
       else{
-        $this->Session->setFlash('Failed');
+        $this->Session->setFlash('Cannot add a course. Check errors below');
       }
     }
     $this->set('course_id', 0);

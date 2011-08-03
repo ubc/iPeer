@@ -93,9 +93,11 @@ class Course extends AppModel
   var $STATUS = array('I' => 'Inactive', 'A' => 'Active');
 
   var $validate = array(
-      'course' => array('rule' => 'notEmpty',
+      'course' => array('notEmpty' => array('rule' => 'notEmpty',
                        'message' => 'Course is required.',
                        'allowEmpty' => false),
+                        'isUnique' => array('rule' => 'isUnique',
+                       'message' => 'Duplicate Course found. Please change the course name.')),
       'title' => array('rule' => 'notEmpty',
                        'message' => 'Title is required.',
                        'allowEmpty' => false),
@@ -173,12 +175,6 @@ class Course extends AppModel
 
   //Overwriting Function - will be called before save operation
   function beforeSave(){
-    // Ensure the name is not empty
-    if (empty($this->data[$this->name]['title'])) {
-      $this->errorMessage = __("Please enter a title for this ", true) . $this->name . ".";
-      return false;
-    }
-
     // Add an http or https to address
     if (!empty($this->data[$this->name]['homepage']) &&
         stripos($this->data[$this->name]['homepage'], "http") !== 0) {
@@ -187,38 +183,7 @@ class Course extends AppModel
 
     // Remove any single quotes in the name, so that custom SQL queries are not confused.
     $this->data[$this->name]['title'] = str_replace("'", "", $this->data[$this->name]['title']);
-
-    $allowSave = true;
-    if (empty($this->data[$this->name]['course'])) { //temp ! to escape ajax bug
-      $this->errorMessage=__('Course name is required.', true); //check empty name
-      $allowSave = false;
-    } else {
-      $allowSave = $this->__checkDuplicateCourse();//check the duplicate course
-    }
-
-    return $allowSave && parent::beforeSave();
-  }
-
-  //Validation check on duplication of course
-  function __checkDuplicateCourse() {
-    $duplicate = false;
-    $field = 'course';
-    $value = $this->data[$this->name]['course'];
-    if ($result = $this->find('first', array('conditions' => array($field => $value)))){
-      if ($this->data[$this->name]['id'] == $result[$this->name]['id']) {
-        $duplicate = false;
-      } else {
-        $duplicate = true;
-      }
-     }
-
-    if ($duplicate == true) {
-      $this->errorMessage=__('Duplicate Course found. Please change the course name.', true);
-      return false;
-    }
-    else {
-      return true;
-    }
+    parent::beforeSave();
   }
   
   /**
