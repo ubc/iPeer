@@ -75,12 +75,12 @@ class MixevalsQuestion extends AppModel
  * 
  * @param Tpye_int $mixEvalId : mix evaluation id
  */
-  function getQuestion($mixEvalId=null){
-//  	$data = $this->find('all','mixeval_id='.$id, null, 'question_num ASC');
-  	return $this->find('all', array(
-            'conditions' => array('mixeval_id' => $mixEvalId),
-            'order' => 'question_num ASC'
-        ));
+  function getQuestion($mixEvalId=null, $questionType=null){
+  	isset($questionType) ? $condition = array('mixeval_id' => $mixEvalId, 'question_type' => $questionType) :
+  						   $condition = array('mixeval_id' => $mixEvalId); 
+  	return $this->find('all', array('conditions' => $condition,
+            						'order' => array('question_num ASC')
+		   ));
   }  
 }
 ?>

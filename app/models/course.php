@@ -92,20 +92,6 @@ class Course extends AppModel
 
   var $STATUS = array('I' => 'Inactive', 'A' => 'Active');
 
-  var $validate = array(
-      'course' => array('notEmpty' => array('rule' => 'notEmpty',
-                       'message' => 'Course is required.',
-                       'allowEmpty' => false),
-                        'isUnique' => array('rule' => 'isUnique',
-                       'message' => 'Duplicate Course found. Please change the course name.')),
-      'title' => array('rule' => 'notEmpty',
-                       'message' => 'Title is required.',
-                       'allowEmpty' => false),
-      'homepage' => array('rule' => 'url',
-                       'message' => 'Invalid Homepage Format',
-                       'allowEmpty' => true),
-  );
-
 
   function __construct($id = false, $table = null, $ds = null) {
     parent::__construct($id, $table, $ds);
@@ -175,6 +161,12 @@ class Course extends AppModel
 
   //Overwriting Function - will be called before save operation
   function beforeSave(){
+    // Ensure the name is not empty
+    if (empty($this->data[$this->name]['title'])) {
+      $this->errorMessage = "Please enter a title for this " . $this->name . ".";
+      return false;
+    }
+
     // Add an http or https to address
     if (!empty($this->data[$this->name]['homepage']) &&
         stripos($this->data[$this->name]['homepage'], "http") !== 0) {
@@ -183,7 +175,38 @@ class Course extends AppModel
 
     // Remove any single quotes in the name, so that custom SQL queries are not confused.
     $this->data[$this->name]['title'] = str_replace("'", "", $this->data[$this->name]['title']);
-    parent::beforeSave();
+
+    $allowSave = true;
+    if (empty($this->data[$this->name]['course'])) { //temp ! to escape ajax bug
+      $this->errorMessage='Course name is required.'; //check empty name
+      $allowSave = false;
+    } else {
+      $allowSave = $this->__checkDuplicateCourse();//check the duplicate course
+    }
+
+    return $allowSave && parent::beforeSave();
+  }
+
+  //Validation check on duplication of course
+  function __checkDuplicateCourse() {
+    $duplicate = false;
+    $field = 'course';
+    $value = $this->data[$this->name]['course'];
+    if ($result = $this->find('first', array('conditions' => array($field => $value)))){
+      if ($this->data[$this->name]['id'] == $result[$this->name]['id']) {
+        $duplicate = false;
+      } else {
+        $duplicate = true;
+      }
+     }
+
+    if ($duplicate == true) {
+      $this->errorMessage='Duplicate Course found. Please change the course name.';
+      return false;
+    }
+    else {
+      return true;
+    }
   }
   
   /**
@@ -542,12 +565,16 @@ class Course extends AppModel
 		
 	}
 
-        function getCourseList(){
+	function getCourseList(){
           $this->displayField = 'course';
           return $this->find('list', array(
               'conditions' => array()
           ));
         }
+        
+	function getCourseById($courseId){
+		return $this->find('first', array('conditions' => array('Course.id' => $courseId)));
+	}
 	
 ### Helper functions for testing purposes ###	
 	function deleteAllTuples($table){	

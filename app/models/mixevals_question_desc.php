@@ -95,5 +95,18 @@ class MixevalsQuestionDesc extends AppModel
   	return $this->find('all', array('conditions' => array('question_id' => $questionId), 
   								  	'order' => 'MixevalsQuestionDesc.id ASC'));
   }
+  
+  /**
+   * 
+   * Gets the mixeval comment type questions.
+   * @param tpye_INT : $mixEvalId mixeval id.
+   */
+  function getCommentQuestionsByMixEvalId($mixEvalId) {
+  	return $this->find('all', array('conditions' => array(
+  													'mixeval_id' => $mixEvalId,
+  													'question_type' => 'T')));
+  }
+  
+  
 }
 ?>

@@ -68,6 +68,10 @@ class EvaluationSubmission extends AppModel
       )
     ));
   }
+  
+  function countSubmissions($grpEventId) {
+  	return $this->find('count', array('conditions' => array('grp_event_id' => $grpEventId)));
+  }
 
   // Deprecated: replaced by virtual field in event model
 	/*function numCountInEventCompleted($eventId=null) {

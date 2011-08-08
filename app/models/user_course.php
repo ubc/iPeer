@@ -5,7 +5,10 @@ class UserCourse extends AppModel
 
   var $belongsTo = array('User');
   var $actsAs = array('Traceable');
-
+  
+  function hi() {
+  	return "Hi";
+  }
   /**
    * 
    * Saves all the instructors associated with a course to the user_courses table
@@ -39,12 +42,19 @@ class UserCourse extends AppModel
    * @param $id instructor id
    * @return UserCourse data
    */
-  function getInstructors($id=null){
+  function getInstructors($id){
   	//$result = $this->query('SELECT User.id, User.first_name, User.last_name, User.email FROM user_courses JOIN users as User ON User.id=user_courses.user_id AND User.id <> 1 WHERE course_id='.$id);
   	//return $result;
     return $this->find('all', array(
-        'conditions' => array('UserCourse.course_id' => $id),
-        'fields' => array('User.id', 'User.first_name', 'User.last_name', 'User.email')
+        'conditions' => array('course_id' => $id),
+        'fields' => array('User.id', 'User.first_name', 'User.last_name', 'User.email'),
+    	'joins' => array(
+    			 	  array(
+    			 	 	'table' => 'user',
+    			 	  	'alias' => 'User',
+    			 	  	'type' => 'LEFT',
+    			 	  	'conditions' => array('User.id = UserCourse.user_id')
+    			 	  ))
     ));
   } 
   
@@ -71,8 +81,6 @@ class UserCourse extends AppModel
     $tmp = array( 'user_id'=>1, 'course_id'=>$id, 'access_right'=>'A', 'record_status'=>'A' );
   	$this->save($tmp);
   }
-
-
 }
 
 ?>

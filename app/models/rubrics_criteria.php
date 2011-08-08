@@ -50,7 +50,8 @@ class RubricsCriteria extends AppModel
 //          return $this->query($sql);
     return $this->find('all', array(
         'conditions' => array('RubricsCriteria.rubric_id' => $rubric_id),
-        'fields' => array('RubricsCriteria.criteria')
+        'fields' => array('RubricsCriteria.criteria'),
+    	'order' => array('criteria_num ASC')
     ));
   }
 /*  // called by rubrics controller during add/edit of rubric

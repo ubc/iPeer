@@ -11,23 +11,30 @@ class EvaluationMixevalDetail extends AppModel
 									 			 )
 						);
   
+	function getLickertScaleQuestionResults($mixedEvalId=null) {
+	  return $this->find('all', array(
+	  				'conditions' => array('evaluation_mixeval_id' => $mixedEvalId, 'grade >' => 0),
+	  				'order' => array('question_number' => 'ASC')
+	  		));
+	} 						
+						
 	function getByEvalMixevalIdCritera($MixevalId=null, $questionNum=null){
 //	  $sql = 'evaluation_mixeval_id='.$MixevalId;
 //	  if ($questionNum != null) {
 //	    $sql .= ' AND question_number='.$questionNum;
 //	  }
 //		return $this->find($sql);
-            $conditions['EvaluationMixevalDetail.evaluation_mixeval_id'] = $MixevalId;
-            if(!is_null($questionNum))
-                $conditions['EvaluationMixevalDetail.question_number'] = $questionNum;
+            $conditions = array('evaluation_mixeval_id' => $MixevalId);
+            if($questionNum != null)
+                $conditions['question_number'] = $questionNum;
             
-            $type = is_null($questionNum)? 'all':'first';
-            $result = $this->find($type, array(
-                'conditions' => $conditions, 
-                'recursive' => -1,
-                'order'=>'EvaluationMixevalDetail.question_number'
-            ));
-            return $result;
+            $type=null;
+            if(null == $questionNum) $type = 'all';
+            	else $type = 'first';
+            return $this->find($type, array(
+                'conditions' => $conditions, 'order'=>'question_number'
+            ));  
 	}
+	
 }
 ?>

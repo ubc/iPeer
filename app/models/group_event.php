@@ -94,7 +94,7 @@ class GroupEvent extends AppModel
 
   
   /**
-   * Returns list of group id within the selected Event
+   * Returns list of group events for the correspoding eventId input
    * @param $eventId event id
    * @return array of grops associated with the event
    */
@@ -237,13 +237,28 @@ class GroupEvent extends AppModel
         'order' => 'GroupEvent.group_id'
     ));
   }
+  
+  function getGroupMembers($groupEventId) {
+  	return $this->find('all', array(
+  						'conditions' => array('GroupEvent.id' => $groupEventId),
+  						'fields' => array('GroupsMembers.*'),
+  						'joins' => array(
+  							array(
+  								'table' => 'groups_members',
+  								'alias' => 'GroupsMembers',
+  								'type' => 'LEFT',
+  								'conditions' => array('GroupEvent.group_id = GroupsMembers.group_id')
+  								)
+  							),
+  						 'order' => array('GroupsMembers.user_id' => 'ASC')	
+  				));
+  }
 
   /**
    * Get group members with late evaluations
    * @param $groupEventId GroupEvent id
    * @return late Group Members
    */
-
     function getLateGroupMembers($groupEventId) {
         return $this->find('count', array(
                     'conditions' => array('GroupEvent.id' => $groupEventId, 'EvaluationSubmission.date_submitted > Event.due_date'),
@@ -320,6 +335,42 @@ class GroupEvent extends AppModel
         'fields' => array('GroupEvent.id')
     ));
     return $returning['GroupEvent']['id'];
+  }
+  
+  /**
+   * Returns the type of evaluation for the group_event
+   * 
+   * @param INT $grpEventId : group_event_id
+   * @return The type of evaluation corresponding to this grpEvent
+   */
+  function getEvalType($grpEventId){
+  	$returning = $this->find('first', array(
+  				'conditions' => array('GroupEvent.id' => $grpEventId),
+  				'joins' => array(
+  							array(
+  								'table' => 'events',
+  								'alias' => 'Event',
+  								'type' => 'LEFT',
+  								'conditions' => array('GroupEvent.event_id = Event.id')
+  								)
+  							),
+  				 'fields' => array('Event.event_template_type_id')
+  			));
+	return $returning['Event']['event_template_type_id'];
+  }
+
+  /**
+   * Returns a grpEvent tuple with the desired fields.
+   * @param INT $grpEventid : group_event_id
+   * @return group_event_tuple.
+   */
+  function getGrpEvent($grpEventid=null, $fields=array()){
+  	return $this->find('first', array('conditions' => array('GroupEvent.id' => $grpEventid),
+  									  'fields' => $fields));
+  }
+  
+  function getGrpEventByEventId($eventId) {
+  	return $this->find('all', array('conditions' => array('event_id' => $eventId)));
   }
 }
 ?>

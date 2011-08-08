@@ -16,7 +16,7 @@ class EvaluationBase extends AppModel {
   function beforeSave(){
     // Ensure the name is not empty
     if (empty($this->data[$this->name]['name'])) {
-      $this->errorMessage = __("Please enter a new name for this ", true) . $this->name . ".";
+      $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
       return false;
     }
 
@@ -33,14 +33,14 @@ class EvaluationBase extends AppModel {
     if(!empty($this->data['Question'])&&$this->name =='Mixeval') {
      foreach ($this->data['Question'] as $row) {
     	 if ($row['question_type']== 'S' &&(empty($row['Description'] ) || (count($row['Description'])) < 2)) {
-    	 	$this->errorMessage = __("Please add at least two descriptors for each of the Lickert questions.", true);
+    	 	$this->errorMessage = "Please add at least two descriptors for each of the Lickert questions.";
     	 	 return false;
     	 }
      }
     }
     
     if(empty($this->data['Question'])&&($this->name =='Mixeval')){
-       $this->errorMessage = __("Please add at least one question for this ", true) . $this->name . ".";
+       $this->errorMessage = "Please add at least one question for this " . $this->name . ".";
        return false;
      }
     return parent::beforeSave();
@@ -50,7 +50,7 @@ class EvaluationBase extends AppModel {
 	function __checkDuplicateName() {
     $result = $this->find('first', array('conditions' => array('name' => $this->data[$this->name]['name'])));
     if ($result) {
-      $this->errorMessage=__('Duplicate name found. Please change the name.', true);
+      $this->errorMessage='Duplicate name found. Please change the name.';
       return false;
     }
 

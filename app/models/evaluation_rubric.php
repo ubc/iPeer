@@ -19,23 +19,29 @@ class EvaluationRubric extends AppModel
 									 			  'className' => 'Rubric',
 									 			)
 									 );*/
-
-	function getEvalRubricByGrpEventIdEvaluatorEvaluatee($grpEventId=null, $evaluator=null, $evaluatee=null){
-
-            //return $this->find('grp_event_id='.$grpEventId.' AND evaluator='.$evaluator.' AND evaluatee='.$evaluatee);
+  								
+	function getEvalRubricByGrpEventIdEvaluatorEvaluatee($grpEventId=null, $evaluator=null, $evaluatee=null){		
             return $this->find('first', array(
-                'conditions' => array('grp_event_id' => $grpEventId, 'evaluator' => $evaluator, 'evaluatee' => $evaluatee)
+                'conditions' => array('grp_event_id' => $grpEventId, 
+                					  'evaluator' => $evaluator, 'evaluatee' => $evaluatee)
             ));
-
 	}
 
 	// gets rubric evaluation result for a specific assignment and evaluator
-	function getResultsByEvaluatee($grpEventId=null, $evaluatee=null) {
-            //return $this->find('all','grp_event_id='.$grpEventId.' AND evaluatee='.$evaluatee, null, 'evaluator ASC');
+	function getResultsByEvaluatee($grpEventId=null, $evaluatee=null, $includeEvaluator=false) {
+			$includeEvaluator ? $user = 'User.*' : $user = '';
             return $this->find('all', array(
                 'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
-                'order' => 'evaluator ASC'
-            ));
+                'joins' => array(
+      					array(
+	  						'table' => 'users',
+	  						'alias' => 'User',
+	  						'type' => 'LEFT',
+	  						'conditions' => array('User.id = EvaluationRubric.evaluator'))),
+      	  'fields' => array('EvaluationRubric.*', $user),
+      	  'order' => array('EvaluationRubric.evaluator' => 'ASC')
+      	));
+            
 	}
 
 	// gets rubric evaluation result for a specific assignment and evaluator
@@ -140,13 +146,24 @@ class EvaluationRubric extends AppModel
             ));
 	}
 
-	function getAllComments($grpEventId=null, $evaluatee=null) {
+	function getAllComments($grpEventId=null, $evaluatee=null, $evaluators=false) {
         //return $this->find('all','grp_event_id='.$grpEventId.' AND evaluatee='.$evaluatee,'general_comment');
-            return $this->find('all', array(
+        $temp = $this->find('all', array(
                 'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
-                'fields' => array('general_comment')
-            ));
-
+                'fields' => array('general_comment', 'event_id', 'evaluatee AS evaluateeId', 'User.first_name AS evaluator_first_name', 'User.last_name AS evaluator_last_name', 'User.student_no AS evaluator_student_no'),
+            	'joins' => array(
+            				 array(
+            				 'table' => 'users',
+            				 'alias' => 'User',
+            				 'type' => 'LEFT',
+            				 'conditions' => array('User.id = EvaluationRubric.evaluator')))
+            				 ));
+		if(!$evaluators){
+			for($i=0; $i<count($temp); $i++){
+				unset($temp[$i]['User']);
+			}
+		}
+		return $temp;			
 	}
 
 	// get total evaluator each member recieved
@@ -195,6 +212,14 @@ class EvaluationRubric extends AppModel
           $fields = array('EvaluationRubric.grade_release' => $releaseStatus);
           $conditions = array('EvaluationRubric.event_id' => $eventId);
           return $this->updateAll($fields, $conditions);
+	}
+	
+	function getRubricsCriteriaResult($grpEventId, $evaluatee, $evaluator){
+		$evalRubric = $this->find('first', array(
+							'conditions' => array('evaluator' => $evaluator, 'evaluatee' => $evaluatee, 
+												  'grp_event_id' => $grpEventId)));
+		$result = $this->EvaluationRubricDetail->getAllByEvalRubricId($evalRubric['EvaluationRubric']['id']);
+		return $result;
 	}
 }
 ?>

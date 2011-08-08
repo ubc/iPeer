@@ -37,8 +37,10 @@ class EvaluationRubricDetail extends AppModel
                 $conditions = array('criteria_number' => $criteriaNum);
             return $this->find('all', array(
                 'conditions' => $condtions*/
-          return $this->find('all', array('conditions'=>array('evaluation_rubric_id'=> $rubricId)));
-	}	
+		  $condition = array('evaluation_rubric_id'=> $rubricId);
+          return $this->find('all', array('conditions' => $condition,
+          								  'order' => array('criteria_number ASC')));
+	}
 }
 
 ?>

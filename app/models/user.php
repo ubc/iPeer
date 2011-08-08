@@ -141,7 +141,7 @@ class User extends AppModel
 
   var $validate = array('username'  => array('character' => array('rule' => 'alphaNumeric',
                                                                   'required' => true,
-                                                                  'message' => 'Letters and numbers only'),
+                                                                  'message' => 'Alphabets and numbers only'),
                                              'minLength' => array('rule' => array('minLength', 6),
                                                               'message' => 'Usernames must be at least 6 characters long'),
                                              'unique' => array('rule' => 'isUnique',
@@ -149,9 +149,7 @@ class User extends AppModel
                         'email'     => array('rule' => 'email',
                                              'required' => false,
                                              'allowEmpty' => true,
-                                             'message' => 'Invalid email format'),
-                        'tmp_password'     => array('minLength' => array('rule' => array('minLength', 6),
-                                             'message' => 'Password must be at least 6 characters long')));
+                                             'message' => 'Invalid email format'));
 
   function __construct($id = false, $table = null, $ds = null) {
     parent::__construct($id, $table, $ds);
@@ -188,7 +186,7 @@ class User extends AppModel
   //Validation check on duplication of username
   function hasDuplicateUsername($username) {
     if ($this->find('first', array('conditions' => array('username' => $username)))) {
-      $this->errorMessage=__('Duplicate Username found. Please change the username of this user.', true);
+      $this->errorMessage='Duplicate Username found. Please change the username of this user.';
       /*if ($this->data[$this->name]['role'] == 'S') {
         $this->errorMessage.='<br>If you want to enrol this student to one or more courses, use the enrol function on User Listing page.';
         }*/
@@ -235,6 +233,12 @@ class User extends AppModel
                                                             )),
                                             $params));
   }
+  
+  function findUserByidWithFields($id , $fields = array()){
+  	$result = $this->find('first', array('conditions' => array('User.id' => $id), 
+  										 'fields' => $fields));
+  	return $result['User'];
+  }
 
   /**
    * 
@@ -271,10 +275,6 @@ class User extends AppModel
     return $this->find('all', array('conditions' => array('Enrolment.id' => $course_id),
                                     'fields' => 'User.*',
                                     'order' => 'User.student_no'));
-  }
-  
-  function printHelp($temp){
-  	$this->log($temp);
   }
 
   /**
@@ -395,18 +395,6 @@ class User extends AppModel
     
     $user = $this->find('first', array('conditions' => array('id'=>$id)));
     return (!empty($user['Role'][0]['name'])) ? $user['Role'][0]['name'] : null;
-  }
-
-  /**
-   *
-   * Get user's email by id
-   * @param $id user id
-   * @return email
-   */
-  function getEmailById($id) {
-
-    $user = $this->find('first', array('conditions' => array('User.id'=>$id)));
-    return (!empty($user['User']['email'])) ? $user['User']['email'] : null;
   }
   
   /**
@@ -654,13 +642,10 @@ class User extends AppModel
    * @return $user logged in user
    */
   function getCurrentLoggedInUser(){
-
-      App::import('Component', 'Session');
+    App::import('Component', 'Session');
     $Session = new SessionComponent();
     $user = $Session->read('Auth.User');
     return $user;
-  
-  	
   }
 }
 ?>
