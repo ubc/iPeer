@@ -85,6 +85,7 @@ class ExportComponent extends Object
   }
   //
   function createBody ($groupEvents,$params,$eventTemplateId,$eventTypeId) {
+  	
     global $globEventId;
     $this->Group = new Group;
     $this->GroupsMembers = new GroupsMembers;

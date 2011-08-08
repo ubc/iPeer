@@ -293,7 +293,7 @@ class EvaluationComponent extends Object
     return $studentResult;
   }
 
-  function changeSimpleEvaluationGradeRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus) {
+  function changeSimpleEvaluationGradeRelease($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus) {
     $this->EvaluationSimple = new EvaluationSimple;
     $this->GroupEvent = new GroupEvent;
 
@@ -316,7 +316,7 @@ class EvaluationComponent extends Object
     $this->GroupEvent->save($groupEvent);
   }
 
-  function changeSimpleEvaluationCommentRelease ($eventId, $groupId, $groupEventId, $evaluatorIds, $params) {
+  function changeSimpleEvaluationCommentRelease($eventId, $groupId, $groupEventId, $evaluatorIds, $params) {
 
     $this->GroupEvent = new GroupEvent;
     $this->EvaluationSimple = new EvaluationSimple;

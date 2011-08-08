@@ -152,12 +152,13 @@ class EventsController extends AppController
     // Set up actions
     $warning = __("Are you sure you want to delete this event permanently?", true);
     $actions = array(
-                     array(__("View Results", true), "", "", "evaluations", "view", "Event.id"),
-                     array(__("View Event", true), "", "", "", "!view", "Event.id"),
-                     array(__("Edit Event", true), "", "", "", "edit", "Event.id"),
-                     array(__("View Course", true), "", "", "courses", "view", "Course.id"),
-                     array(__("View Groups", true), "", "", "", "!viewGroups", "Event.id"),
-                     array(__("Delete Event", true), $warning, "", "", "delete", "Event.id"));
+                     array("View Results", "", "", "evaluations", "view", "Event.id"),
+                     array("View Event", "", "", "", "!view", "Event.id"),
+                     array("Edit Event", "", "", "", "edit", "Event.id"),
+                     array("View Course", "", "", "courses", "view", "Course.id"),
+                     array("View Groups", "", "", "", "!viewGroups", "Event.id"),
+                     array("Test", "", "", "evaluations", "export", "Event.id"),
+                     array("Delete Event", $warning, "", "", "delete", "Event.id"));
 
     $recursive = 0;
 

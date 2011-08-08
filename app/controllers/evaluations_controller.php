@@ -43,9 +43,9 @@ class EvaluationsController extends AppController
                     'RubricsCriteriaComment', 'Personalize',
                     'Question','Response','Survey','SurveyInput','Course','MixevalsQuestion',
                     'EvaluationMixeval','EvaluationMixevalDetail', 'Mixeval', 'MixevalsQuestionDesc');
-  var $components = array( 'Auth','AjaxList', 'rdAuth','Output','sysContainer',
+  var $components = array('ExportBaseNew', 'Auth','AjaxList', 'rdAuth','Output','sysContainer',
                           'globalConstant', 'userPersonalize','framework', 
-                          'Evaluation', 'Export');
+                          'Evaluation', 'Export', 'ExportCsv');
 
   function __construct()
   {
@@ -299,21 +299,39 @@ class EvaluationsController extends AppController
   }
 
 
-  function export($courseId=null) {
+  function export($eventId=null, $errmsg = null) {
       // Make sure the present user is not a student
       $this->rdAuth->noStudentsAllowed();
-      $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Export Evaluation Results', true));
-      $this->set('courseId',$courseId);
+      $courseId = $this->Event->getCourseByEventId($eventId);
+      $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Export Evaluation Results');
+      $this->set('eventId', $eventId);
       //do stuff
-      if (isset($this->params['form']) && !empty($this->params['form'])) {
+      if(isset($this->params['form']) && !empty($this->params['form'])){
           $this->autoRender = false;
-          $fileContent = $this->Export->createCSV($this->params, $courseId);
-          $fileName = isset($this->params['form']['file_name']) && empty($this->params['form']['file_name']) ? $this->params['form']['file_name']:date('m.d.y');
-
-          header('Content-Type: application/csv');
-          header('Content-Disposition: attachment; filename=' . $fileName . '.csv');
-          echo $fileContent;
+		  if(!$this->ExportCsv->checkAll($this->params['form'], $eventId)) {
+		  	$this->Session->setFlash("Error : at least ONE of each coloured fields (*) must be selected.");
+		  	$this->redirect('');
+		  }
+		  else{
+            $fileName = isset($this->params['form']['file_name']) && !empty($this->params['form']['file_name']) ? $this->params['form']['file_name']:date('m.d.y');
+            switch($this->params['form']['export_type']) {
+              case "csv" : 
+		    	$fileContent = $this->ExportCsv->createCsv($this->params['form'], $eventId);
+		    	break;
+              case "excel" :
+              	$fileContent = $this->ExportCsv->createExcel($this->params['form'], $eventId);
+              	break;
+              default :
+              	throw new Exception("Invalid evaluation selection.");
+            }
+            header('Content-Type: application/csv');
+            header('Content-Disposition: attachment; filename=' . $fileName . '.csv');
+            echo $fileContent;
+		  }
       } else {
+      	  $event = $this->Event->getEventById($eventId);
+      	  $eventType = $event['Event']['event_template_type_id'];
+      	  $this->set('eventType', $eventType);
           $this->set('file_name',date('m.d.y'));
       }
   }
@@ -500,7 +518,6 @@ function makeSurveyEvaluation ($param = null) {
           $rubricId = $event['Event']['template_id'];
           $rubric = $this->Rubric->getRubricById($rubricId);
           $rubricEvalViewData = $this->Rubric->compileViewData($rubric);
-          //var_dump($rubricEvalViewData);
           $this->set('viewData',$rubricEvalViewData);
           $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
 
@@ -974,7 +991,6 @@ function makeSurveyEvaluation ($param = null) {
       // Make sure the present user is not a student
       $this->rdAuth->noStudentsAllowed();
 
-
     $this->autoRender = false;
     if ($param !=null) {
            $tok = strtok($param, ';');
@@ -995,6 +1011,7 @@ function makeSurveyEvaluation ($param = null) {
       {
               $groupEventId = $this->params['form']['group_event_id'];
               $evaluatorIds = $this->params['form']['evaluator_ids'];
+              $this->log($this->params);
               $this->Evaluation->changeSimpleEvaluationCommentRelease ($eventId, $groupId, $groupEventId, $evaluatorIds, $this->params);
       }
 
