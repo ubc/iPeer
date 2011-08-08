@@ -18,13 +18,22 @@
 	?>
 		<!-- Summary for import record creation -->
 		<?php foreach($data as $row): ?>
-            <?php $user = $row['User'];?>
+            <?php 
+              $user = $row['User'];
+              if(isset($user['tmp_password']))
+                $password = $user['tmp_password'];
+              else if(isset($user['password']))
+                $password = $user['password'];
+              else
+                $password = '';
+            
+            ?>
             <tr class='tablecell'>
             <td><?php echo $user['username']?></td>
             <td><?php echo $user['first_name']?></td>
             <td><?php echo $user['last_name']?></td>
-            <td><?php echo !empty($user['password']) ? 
-              "<strong style='color:red;letter-spacing:3px'>".$user['password']."</strong></tt>" : 
+            <td><?php echo $password != '' ? 
+              "<strong style='color:red;letter-spacing:3px'>".$password."</strong></tt>" : 
               __("<i>Not availalble for existing users</i>", true);?></td>
             <?php if(isset($user['error_message'])):?>
                     <td><font color='#FF0000'><?php echo $user['error_message']?></font></td>

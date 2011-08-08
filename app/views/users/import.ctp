@@ -1,7 +1,7 @@
     <table class="title" width="100%"  border="0" cellspacing="0" cellpadding="0">
         <tr>
           <td><?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?> <?php __('Import Students From Text (.txt) or CSV File (.csv)')?></td>
-          <td><div align="right"><a href="#import" onclick="$('import').style.display='block'; toggle(this);"><?php __('[click here to start]')?></a> </div></td>
+<!--          <td><div align="right"><a href="#import" onclick="$('import').style.display='block'; toggle(this);"><?php __('[click here to start]')?></a> </div></td>-->
         </tr>
     </table>
   <div id="import" style="display: <?php echo isset($import_again) ? "block" : "none" ?>; background: #FFF;">

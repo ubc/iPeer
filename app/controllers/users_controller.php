@@ -562,6 +562,7 @@ class UsersController extends AppController
         else
           $this->Session->setFlash(__('Failed to Send Email', true));
       }
+      $this->set('data', $this->params['data']);
       $this->render('userSummary');      
     }
 
@@ -891,9 +892,10 @@ class UsersController extends AppController
 
     function import() {
         $this->autoRender = false;
-        $this->Session->write('ipeerSession.courseId', $this->params['form']['course_id']);
-        $filename = $this->params['form']['file']['name'];
-        $tmpFile = $this->params['form']['file']['tmp_name'];
+        if(isset($this->params['form']['course_id']))
+            $this->Session->write('ipeerSession.courseId', $this->params['form']['course_id']);
+        $filename = isset($this->params['form']['file']['name'])? $this->params['form']['file']['name']:'';
+        $tmpFile = isset($this->params['form']['file']['tmp_name'])? $this->params['form']['file']['tmp_name']: NULL;
         
         //$uploadDir = $this->sysContainer->getParamByParamCode('system.upload_dir');
         $uploadDir="../tmp/";
@@ -901,11 +903,11 @@ class UsersController extends AppController
         //check for blank value
         if (trim($filename) == "") {
             $coursesList = $this->sysContainer->getMyCourseList();
-            $this->set('coursesList', $coursesList);
-            $this->set('errmsg',__('A File is required for the import!', true));
+            $this->set('coursesList', $coursesList);            
             $this->set('user_type', 'S');
             $this->set('import_again',"true");
             $this->render('import');
+            $this->set('errmsg',__('A File is required for the import!', true));
             return false;
         }
 
@@ -965,7 +967,7 @@ class UsersController extends AppController
             $data['User']['student_no']   = isset($line[IMPORT_STUDENT_NO]) ? trim($line[IMPORT_STUDENT_NO]) : "";
             $data['User']['email']        = isset($line[IMPORT_EMAIL]) ? trim($line[IMPORT_EMAIL]) : "";
             $data['User']['tmp_password'] = $trimmedPassword;
-            $data['User']['password']     = $trimmedPassword; // Will be hashed by the Users controller
+            $data['User']['password']     = md5($trimmedPassword); // Will be hashed by the Users controller
             $data['User']['creator_id']   = $this->Auth->user('id');
 
             if ($this->User->save($data))
