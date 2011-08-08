@@ -1,0 +1,1 @@
+<p>Edit "<b>C:\wwwroot\ipeer2\app\views\sysparameters\delete.tpl.php</b>" to change this message.</p>
