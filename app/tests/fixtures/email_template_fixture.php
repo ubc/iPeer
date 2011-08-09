@@ -27,3 +27,4 @@ class EmailTemplateFixture extends CakeTestFixture {
 }
 
 ?>
+

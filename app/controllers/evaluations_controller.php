@@ -308,11 +308,11 @@ class EvaluationsController extends AppController
       //do stuff
       if(isset($this->params['form']) && !empty($this->params['form'])){
           $this->autoRender = false;
-		  if(!$this->ExportCsv->checkAll($this->params['form'], $eventId)) {
+		 /* if(!$this->ExportCsv->checkAll($this->params['form'], $eventId)) {
 		  	$this->Session->setFlash("Error : at least ONE of each coloured fields (*) must be selected.");
 		  	$this->redirect('');
-		  }
-		  else{
+		   }
+		 else{*/
             $fileName = isset($this->params['form']['file_name']) && !empty($this->params['form']['file_name']) ? $this->params['form']['file_name']:date('m.d.y');
             switch($this->params['form']['export_type']) {
               case "csv" : 
@@ -327,7 +327,7 @@ class EvaluationsController extends AppController
             header('Content-Type: application/csv');
             header('Content-Disposition: attachment; filename=' . $fileName . '.csv');
             echo $fileContent;
-		  }
+	//	  }
       } else {
       	  $event = $this->Event->getEventById($eventId);
       	  $eventType = $event['Event']['event_template_type_id'];

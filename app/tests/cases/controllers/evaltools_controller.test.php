@@ -8,7 +8,7 @@
  * http://42pixels.com/blog/testing-controllers-the-slightly-less-hard-way
  */
 
-App::import('Controller', 'Courses');
+App::import('Controller', 'Evaltools');
 
 class FakeController extends Controller {
   var $name = 'FakeController';
@@ -18,12 +18,12 @@ class FakeController extends Controller {
   var $autoRender = false;
 }
 
-class CoursesControllerTest extends CakeTestCase {
-  var $fixtures = array('app.course', 'app.role', 'app.user', 'app.group', 
-                        'app.roles_user', 'app.event', 'app.event_template_type',
-                        'app.group_event', 'app.evaluation_submission',
-                        'app.survey_group_set', 'app.survey_group',
-                        'app.survey_group_member', 'app.question', 
+class EvaltoolsControllerTest extends CakeTestCase {
+  var $fixtures = array('app.course', 'app.role', 'app.user', 'app.group',   'app.mixeval', 'app.mixevals_question',
+                        'app.roles_user', 'app.event', 'app.event_template_type',  'app.rubrics_lom', 'app.mixevals_question_desc',
+                        'app.group_event', 'app.evaluation_submission',  'app.rubrics_criteria_comment',
+                        'app.survey_group_set', 'app.survey_group', 'app.rubric', 'app.rubrics_criteria',
+                        'app.survey_group_member', 'app.question', 'app.simple_evaluation', 'app.email_template',
                         'app.response', 'app.survey_question', 'app.user_course',
                         'app.user_enrol', 'app.groups_member', 'app.survey', 
                         'app.personalize', 'app.sys_parameter',
@@ -53,8 +53,9 @@ class CoursesControllerTest extends CakeTestCase {
   }
 
   function testIndex() {
-    $result = $this->testAction('/courses/index', array('connection' => 'test_suite', 'return' => 'vars'));
-    $expected = array(
+    $result = $this->testAction('/evaltools/index', array('connection' => 'test_suite', 'return' => 'contents'));
+var_dump($result);
+/*    $expected = array(
       array('Course' => array('id' => 3, 'homepage' => null, 'course' => 'Math100', 'title' => 'Math', 
                                'creator_id' => 0, 'record_status' => '', 'creator' => null),
             'Instructor' => array('id' => 2),
@@ -71,10 +72,10 @@ class CoursesControllerTest extends CakeTestCase {
             'CreatorId' => array(),
             'UpdaterId' => array()),
       );
-    $this->assertEqual($result['paramsForList']['data']['entries'], $expected);
+    $this->assertEqual($result['paramsForList']['data']['entries'], $expected);*/
   }
   
-  function testView() {
+/*  function testView() {
   	$result1 = $this->testAction('/courses/view/1', array('connection' => 'test_suite', 'return' => 'vars'));
   	$result2 = $this->testAction('/courses/view/2', array('connection' => 'test_suite', 'return' => 'vars'));
   	$expect1 = array('id' => 1, 'course' => 'Math303', 'title' => 'Stochastic Process', 'homepage' => null, 
@@ -155,5 +156,5 @@ class CoursesControllerTest extends CakeTestCase {
  //TODO uses Auth
  function testUpdate(){
  }
-  
+  */
 }

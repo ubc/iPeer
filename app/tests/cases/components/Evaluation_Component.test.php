@@ -190,33 +190,16 @@ class EvaluationTestCase extends CakeTestCase {
     $event = array('group_event_id' => 1);
     $groupMembers = array(array('id' => 4));
     $result = $this->EvaluationComponentTest->getRubricResultDetail($event, $groupMembers); 
-    $expected = array("scoreRecords"=>array(4=>array("grade_released"=>0, "comment_released"=>0,
-		"rubric_criteria_ave"=>array (1=>10)),"group_criteria_ave"=> array (1=>10)),
-  	"allMembersCompleted"=>false,"inCompletedMembers"=>array (0=>array ("id"=>4)),
-    "memberScoreSummary"=>array(4=>array("received_total_score"=>15.00,"received_ave_score"=>15)),
-  	"evalResult"=>array (4=>array(0=> array ("EvaluationRubric"=>
-    array("id"=>1,"evaluator"=>3,"evaluatee"=>4, "general_comment"=>"general comment1",
-    "score"=>15.00, "comment_release"=>0,"grade_release"=>0,"grp_event_id"=>1,
-    "event_id"=>1, "record_status"=>"A","creator_id"=>1, "created"=>"0000-00-00 00:00:00",
-    "updater_id"=>NULL,"modified"=>NULL,"rubric_id"=>0,"creator"=>"steveslade",
-    "updater"=>NULL,"details"=>array ( 0=>array("EvaluationRubricDetail"=>
-    array ("id"=>3,"evaluation_rubric_id"=>1,"criteria_number"=>1,
-    "criteria_comment"=>"criteria comment1","selected_lom"=>0,"grade"=>10.00,
-    "record_status"=>"A","creator_id"=>0,"created"=>"0000-00-00 00:00:00",
-    "updater_id"=>NULL,"modified"=>NULL,"creator"=>NULL,"updater"=>NULL),
-    "EvaluationRubric"=>array( "id"=>1,"evaluator"=>3,"evaluatee"=>4,
-    "general_comment"=>"general comment1","score"=>15.00,"comment_release"=>0,
-    "grade_release"=>0,"grp_event_id"=>1, "event_id"=>1,"record_status"=>"A",
-    "creator_id"=>1,"created"=>"0000-00-00 00:00:00","updater_id"=>NULL,
-    "modified"=>NULL,"rubric_id"=>0,"creator"=>"steveslade","updater"=>NULL),
-    "CreatorId"=>array(), "UpdaterId"=>array ()))),
-    "EvaluationRubricDetail"=>array (0=>array ("id"=>3,"evaluation_rubric_id"=>1,
-    "criteria_number"=>1,"criteria_comment"=>"criteria comment1","selected_lom"=>0,
-    "grade"=>10.00, "record_status"=>"A", "creator_id"=>0,"created"=>"0000-00-00 00:00:00",
-    "updater_id"=>NULL, "modified"=>NULL, "creator"=>NULL,"updater"=> NULL)),
-        "CreatorId"=>array (),"UpdaterId"=>array ()))));
     
-    $this->assertEqual($result, $expected);
+    $this->assertEqual($result['scoreRecords'][4]['grade_released'], 0);
+    $this->assertEqual($result['scoreRecords'][4]['comment_released'], 0);
+    $this->assertEqual($result['scoreRecords'][4]['rubric_criteria_ave'][1], 10);    
+    $this->assertEqual($result['memberScoreSummary'][4]['received_total_score'], 15.00);
+    $this->assertEqual($result['memberScoreSummary'][4]['received_ave_score'], 15);
+    $this->assertEqual($result['evalResult'][4][0]['EvaluationRubric']['id'], 1);
+    $this->assertEqual($result['evalResult'][4][0]['EvaluationRubric']['evaluator'], 3);
+    $this->assertEqual($result['evalResult'][4][0]['EvaluationRubric']['evaluatee'], 4);    
+
     $result = $this->EvaluationComponentTest->getRubricResultDetail(null, $groupMembers); 
     $this->assertFalse($result);
     $result = $this->EvaluationComponentTest->getRubricResultDetail($event, null); 
@@ -230,34 +213,16 @@ class EvaluationTestCase extends CakeTestCase {
   
     $event = array('group_event_id' => 1);
     $result = $this->EvaluationComponentTest->getStudentViewRubricResultDetailReview($event, 3);
-$expected = array (3=>array(0=>array("EvaluationRubric"=>
-      array ("id"=>1, "evaluator"=> 3, "evaluatee"=>4, "general_comment"=>"general comment1",
-        "score"=>15.00, "comment_release"=>0, "grade_release"=>0, "grp_event_id"=>1,
-        "event_id"=>1, "record_status"=> "A", "creator_id"=>1, "created"=>"0000-00-00 00:00:00",
-        "updater_id"=>NULL, "modified"=>NULL, "rubric_id"=>0, "creator"=>"steveslade",
-        "updater"=> NULL, "details"=>
-        array( 0=>array ( "EvaluationRubricDetail"=> array (
-          "id"=>3, "evaluation_rubric_id"=>1, "criteria_number"=>1,
-          "criteria_comment"=> "criteria comment1", "selected_lom"=>0, "grade"=>10.00,
-              "record_status"=>"A", "creator_id"=>0, "created"=> "0000-00-00 00:00:00",
-              "updater_id"=> NULL, "modified"=> NULL, "creator"=> NULL, "updater"=> NULL
-            ),
-            "EvaluationRubric"=>
-            array ("id"=>1, "evaluator"=>3,"evaluatee"=>4,"general_comment"=> "general comment1",
-              "score"=>15.00, "comment_release"=>0, "grade_release"=>0, "grp_event_id"=>1,
-              "event_id"=>1, "record_status"=>"A", "creator_id"=>1, "created"=> "0000-00-00 00:00:00",
-              "updater_id"=> NULL, "modified"=> NULL, "rubric_id"=>0, "creator"=>"steveslade",
-              "updater"=>NULL),
-            "CreatorId"=>array (), "UpdaterId"=> array ()))),
-      "EvaluationRubricDetail"=>array (0=>array ("id"=>3, "evaluation_rubric_id"=>1,
-          "criteria_number"=>1, "criteria_comment"=> "criteria comment1",
-          "selected_lom"=>0, "grade"=>10.00, "record_status"=>"A", "creator_id"=>0,
-          "created"=> "0000-00-00 00:00:00","updater_id"=>NULL,
-          "modified"=>NULL, "creator"=> NULL, "updater"=> NULL)),
-      "CreatorId"=>array (), "UpdaterId"=> array())));
     
+    $this->assertEqual($result[3][0]['EvaluationRubric']['id'], 1);
+    $this->assertEqual($result[3][0]['EvaluationRubric']['evaluator'], 3);
+    $this->assertEqual($result[3][0]['EvaluationRubric']['evaluatee'], 4);                
+    $this->assertEqual($result[3][0]['EvaluationRubric']['general_comment'], 'general comment1'); 
+    $this->assertEqual($result[3][0]['EvaluationRubric']['score'], 15.00);    
+    $this->assertEqual($result[3][0]['EvaluationRubric']['details'][0]['EvaluationRubricDetail']['id'], 3);
+    $this->assertEqual($result[3][0]['EvaluationRubric']['details'][0]['EvaluationRubricDetail']['evaluation_rubric_id'], 1);
+    $this->assertEqual($result[3][0]['EvaluationRubric']['details'][0]['EvaluationRubricDetail']['grade'], 10.00);
     
-    $this->assertEqual($expected, $result);
     $result = $this->EvaluationComponentTest->getStudentViewRubricResultDetailReview(null, 3);
     $this->assertFalse($result);   
     $result = $this->EvaluationComponentTest->getStudentViewRubricResultDetailReview($event, null);

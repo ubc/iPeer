@@ -149,8 +149,8 @@ class GroupsController extends AppController
             $joinTables, $extraFilters, $recursive, "postProcess", null, null, null, $conditions);
     }
 
-    function index($course_id) {
-      $this->set('course_id', $course_id);
+    function index() {
+      $this->set('course_id', $this->Session->read('ipeerSession.courseId'));
       // Set up the basic static ajax list variables
       $this->setUpAjaxList();
       // Set the display list
