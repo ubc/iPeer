@@ -1,6 +1,59 @@
 <?php
 
 Class ExportCsvComponent extends ExportBaseNewComponent {
+
+  function creteCsvSubHeaderHelper($params, &$subHeader) {
+    if(!empty($params['include_group_names'])) {
+	  $subHeader .= "Group Name,";
+  	}
+  	if(!empty($params['include_student_email'])) {
+  	  $subHeader .= "Email,";
+  	}
+  	if(!empty($params['include_student_name'])) {
+  	  $subHeader .= ",Evaluatee,";
+  	  $subHeader .= ",Evaluator,";
+  	}
+  	if(!empty($params['include_student_id'])) {
+  	  $subHeader .= "student #,";
+  	}
+  } 
+	
+  function createMixEvalCsvSubHeader($params, $eventId) {
+  	$this->Event = ClassRegistry::init('Event');
+  	$this->MixevalsQuestion = ClassRegistry::init('MixevalsQuestion');
+  	$event = $this->Event->getEventById($eventId);
+  	$questions = $this->MixevalsQuestion->getQuestion($event['Event']['template_id'], 'S');
+  	
+  	$subHeader = '';
+  	$this->creteCsvSubHeaderHelper($params, $subHeader);
+  	$count = 1;
+  	for($i=0; $i<count($questions); $i++) {
+  	  $subHeader .= "Question".$count.","; 	
+  	}
+  	return $subHeader;
+  }
+  
+  function createRubricsMixEvalCsvSubHeader($params, $eventId) {
+  	$this->Event = ClassRegistry::init('Event');
+  	$this->Rubric = ClassRegistry::init('Rubric');
+  	$event = $this->Event->getEventById($eventId);
+  	$rubric = $this->Rubric->getRubricById($event['Event']['template_id']);
+  	
+  	$subHeader = '';
+  	$this->creteCsvSubHeaderHelper($params, $subHeader);
+  	$count = 1;
+  	for($i=0; $i<$rubric['Rubric']['criteria']; $i++) {
+  	  $subHeader .= "Criteria Q".$count.",";
+  	}
+  	return $subHeader;
+  }
+  
+  function createSimpleMixEvalCsvSubHeader($params) {
+  	$subHeader = '';
+  	$this->creteCsvSubHeaderHelper($params, $subHeader);
+  	$subHeader .= "Grade".",";
+  	return $subHeader;
+  }
 	
   function createCsv($params, $eventId) {
   	$this->GroupEvent = ClassRegistry::init('GroupEvent');
@@ -14,21 +67,28 @@ Class ExportCsvComponent extends ExportBaseNewComponent {
   	
   	switch($event['Event']['event_template_type_id']) {
   		case 1:
+  		  $subHeader = $this->createSimpleMixEvalCsvSubHeader($params);
+  		  $csv .= $subHeader."\n\n";
 		  $resultTable = $this->buildSimpleEvaluationScoreTableByEvent($params, $eventId);
 		  $csv .= $resultTable;
   		  break;
   			
   		case 2:
+  		  $subHeader = $this->createRubricsMixEvalCsvSubHeader($params, $eventId);
+  		  $csv .= $subHeader."\n\n";
   		  $resultTable = $this->buildRubricsEvalTableByEventId($params, $eventId);
   		  $csv .= $resultTable;
   		  break;
   		  
   		case 4:
+  		  $subHeader = $this->createMixEvalCsvSubHeader($params, $eventId);
+  		  $csv .= $subHeader."\n\n";
   		  foreach($groupEvents as $ge) {
   	        $resultTable = $this->buildMixedEvalScoreTableByGroupEvent($params ,$ge['GroupEvent']['id']);
   	 	    $csv .= $resultTable;
   		  }
   		  break;
+  		  
   		default: throw new Exception("Invalid event_id");
   	}
     return $csv;

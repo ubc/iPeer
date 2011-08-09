@@ -30,17 +30,20 @@ class EvaluationTestCase extends CakeTestCase {
 	$this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
 	$this->EvaluationRubricDetail   = ClassRegistry::init('EvaluationRubricDetail');
 	$this->Event = ClassRegistry::init('Event');
+
 	$this->EvaluationMixevalDetail = ClassRegistry::init('EvaluationMixevalDetail');
 	$admin = array('User' => array('username' => 'root',
                                    'password' => 'ipeer'));
     $this->controller = new FakeEvaluationController();
+
     $this->controller->constructClasses();
     $this->controller->startupProcess();
     $this->controller->Component->startup($this->controller);
     $this->controller->Auth->startup($this->controller);
     ClassRegistry::addObject('view', new View($this->Controller));
-    ClassRegistry::addObject('auth_component', $this->controller->Auth);
-
+    ClassRegistry::addObject('Auth', $this->controller->Auth);
+    $admin = array('User' => array('username' => 'Admin',
+                                   'password' => 'passwordA'));
     $this->controller->Auth->login($admin);
   }  
   
@@ -499,7 +502,7 @@ class EvaluationTestCase extends CakeTestCase {
  //     $this->assertFalse($survey);  
       
    }
-   
+
    function testFormatSurveyEvaluationSummary() {
 
     $survey = $this->EvaluationComponentTest->formatSurveyEvaluationSummary(1);

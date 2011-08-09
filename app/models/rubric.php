@@ -253,7 +253,6 @@ class Rubric extends EvaluationBase
    * @return returns Rubric and all of its associated models
    */
   function getRubricById($id=null){
-
   	return $this->find('first', array('conditions' => array('id' => $id),
                                        'contain' => array('RubricsCriteria.RubricsCriteriaComment',
                                                      'RubricsLom')));

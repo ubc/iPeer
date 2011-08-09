@@ -10,7 +10,7 @@
           <td colspan="3" align="center">Export Evaluation Results</td>
         </tr>
         <tr class="tablecell2">
-          <td width="30%">Export Filename:</td><td width="40%"><input type="text" name="file_name" value="<?php if(isset($file_name)) echo $file_name;?>" />.csv</td><td width="30%"></td>
+          <td width="30%">Export Filename:</td><td width="40%"><input type="text" name="file_name" value="<?php if(isset($file_name)) echo $file_name;?>" /></td><td width="30%"></td>
         </tr>
         <tr class="tablecell2">
         

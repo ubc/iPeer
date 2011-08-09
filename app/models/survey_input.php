@@ -38,17 +38,12 @@ class SurveyInput extends AppModel
 	}
 
 	function findCountInSurveyGroup($surveyId=null,$questionId=null,$responseId=null,$surveyGroupId=null) {
-		  if($surveyId !=null&& $questionId != null && $surveyGroupId = null){  $tmp = $this->query('SELECT user_id FROM survey_inputs WHERE survey_id='.$surveyId.' AND question_id='.$questionId.' AND response_id='.$responseId.' AND user_id=ANY(SELECT user_id FROM survey_group_members WHERE group_id='.$surveyGroupId.')');
-	}
-	else $tmp = null;
-	return count($tmp);
+	  $tmp = $this->query('SELECT user_id FROM survey_inputs WHERE survey_id='.$surveyId.' AND question_id='.$questionId.' AND response_id='.$responseId.' AND user_id=ANY(SELECT user_id FROM survey_group_members WHERE group_id='.$surveyGroupId.')');
+	  return count($tmp);
 	}
 
 	function findResponseInSurveyGroup($surveyId=null,$questionId=null,$surveyGroupId=null) {
-	  if($surveyId !=null&& $questionId != null && $surveyGroupId = null) {
-	    $tmp = $this->query('SELECT user_id,response_text FROM survey_inputs WHERE survey_id='.$surveyId.' AND question_id='.$questionId.' AND user_id=ANY(SELECT user_id FROM survey_group_members WHERE group_id='.$surveyGroupId.')');
-	  }
-	  else $tmp = null;
+	  $tmp = $this->query('SELECT user_id,response_text FROM survey_inputs WHERE survey_id='.$surveyId.' AND question_id='.$questionId.' AND user_id=ANY(SELECT user_id FROM survey_group_members WHERE group_id='.$surveyGroupId.')');
 	  return $tmp;
 	}
 }

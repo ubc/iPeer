@@ -77,6 +77,7 @@ class EvaluationMixevalTestCase extends CakeTestCase {
   	// Set up test data
   	$result = $this->EvaluationMixeval->getResultsByEvaluatee(2, 1);
   	// Assert the queried data matches and is correctly ordered according to the fixture data
+  	var_dump($result);	
   	$this->assertTrue(!empty($result[0]));
   	$this->assertTrue(!empty($result[1]));
   	$this->assertEqual($result[0]['EvaluationMixeval']['grp_event_id'], 2);

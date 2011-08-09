@@ -1,6 +1,5 @@
 <?php
 /* SVN FILE: $Id$ */
-
 /**
  * Enter description here ....
  *
@@ -37,7 +36,7 @@ class CoursesController extends AppController
 	var $order;
 	var $Sanitize;
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination', 'Js' => array('Prototype'));
-	var $components = array("AjaxList");
+	var $components = array('ExportBaseNew', 'AjaxList', 'ExportCsv');
 
 	function __construct() {
 		$this->Sanitize = new Sanitize;
@@ -63,17 +62,19 @@ class CoursesController extends AppController
         array("Course.creator",     __("Created by", true),  "10em", "action", "View Creator"),
         array("Instructor.id",        "",            "",     "hidden"));
 
+
     // put all the joins together
     $joinTables = array();
 
     // For instructors: only list their own courses
     $extraFilters = $this->Auth->user('role') == 'A' ?
-            array("Instructor.id" => $this->User->find('list',array('fields'=>array('User.id')))) :
-            array("Instructor.id" => $this->Auth->user('id'));
+            array('Instructor.id' => $this->User->find('list',array('fields'=>array('User.id')))) :
+            array('Instructor.id' => $this->Auth->user('id'));
         
 
     // Set up actions
     $warning = __("Are you sure you want to delete this course permanently?", true);
+
     $actions = array(
         array(__("Course Home", true), "", "", "", "home", "Course.id"),
         array(__("View Record", true), "", "", "", "view", "Course.id"),
@@ -85,16 +86,16 @@ class CoursesController extends AppController
     $recursive = 0;
 
     $this->AjaxList->setUp($this->Course, $columns, $actions,
-        "Course.course", "Course.course", $joinTables, $extraFilters, $recursive);
+        'Course.course', 'Course.course', $joinTables, $extraFilters, $recursive);
   }
-
-  function index() {
+  
+  function index() {	
     // Set up the basic static ajax list variables
     $this->setUpAjaxList();
     // Set the display list
     $this->set('paramsForList', $this->AjaxList->getParamsForList());
   }
-
+  
   function ajaxList() {
     // Set up the list
     $this->setUpAjaxList();
@@ -292,5 +293,45 @@ class CoursesController extends AppController
       }
 		}
 	}
+	
+	
+	
+	
+  function inputParams() {
+  	  	$params = array(
+  'assigned'=>
+   '',
+  'file_name'=>
+   '07.25.11',
+  'include_course'=>
+   'on',
+  'include_date'=>
+   'on',
+  'include_instructors'=>
+
+   'on',
+  'include_eval_event_names'=>
+   'on',
+  'include_eval_event_type'=>
+   'on',
+  'include_group_names'=>
+   'on',
+  'include_student_name'=>
+   'on',
+  'include_student_id'=>
+   'on',
+  'include_student_email'=>
+
+   'on',
+  'simple_evaluator_comment'=>
+   'on',
+  'include_mixeval_question_comment' => 'on',
+  'include_mixeval_grades' => 'on',
+  'email' => 'on',
+  'include_final_marks'=>
+   'on');
+  return $params;
+  }
 }
+
 ?>
