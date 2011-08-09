@@ -69,8 +69,21 @@ class EvaluationSubmission extends AppModel
     ));
   }
   
+  function daysLate($event, $submissionDate)
+  {
+   $days = 0; 
+   $dueDate = $this->Event->find('first', array('conditions' => array('Event.id' => $event), 'fields' => array('Event.due_date')));
+   $dueDate = new DateTime($dueDate['Event']['due_date']); 
+   $submissionDate = new DateTime($submissionDate);
+   $dateDiff = $dueDate->diff($submissionDate);
+   if(!$dateDiff->format('%r')){
+   $days = $dateDiff->format('%d');
+   if($dateDiff->format('%i') || $dateDiff->format('%s')){$days++;}}
+   return $days;  
+  }
+  
   function countSubmissions($grpEventId) {
-  	return $this->find('count', array('conditions' => array('grp_event_id' => $grpEventId)));
+  	return $this->find('count', array('conditions' => array('Event.grp_event_id' => $grpEventId,)));
   }
 
   // Deprecated: replaced by virtual field in event model
