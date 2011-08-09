@@ -68,7 +68,7 @@ function defaultagree(el){
       <input type="checkbox" name="agreecheck"  class="inputbox" onClick="agreesubmit(this)" />
           <span class="style3"><?php __(' I Accept the GPL License')?></span></td>
     <td align="right">
-      <?php echo $html->submit('Next >>', array('disabled'=>'true', 'name'=>'next')) ?>
+      <?php echo $form->submit('Next >>', array('disabled'=>'true', 'name'=>'next')) ?>
     </td>
   </tr>
 </table>

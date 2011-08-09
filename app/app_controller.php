@@ -114,7 +114,7 @@ class AppController extends Controller  {
 		//check if user not logined
 		if ($this->params['controller']=='' || $this->params['controller']=="loginout" || $this->params['controller']=="install")
 		{
-			$this->set('rdAuth',$this->rdAuth);
+			//$this->set('rdAuth',$this->rdAuth);
 
 		}/* else {
       //Check whether the user is current login yet

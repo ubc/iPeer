@@ -109,7 +109,7 @@
                   	<td width="337" align="left">
 										<?php
 										$dbDriver = array('mysql'=>'MySQL');
-										echo $html->selectTag('DBConfig/driver', $dbDriver, null, null, null, false);
+										echo $form->select('DBConfig.driver', $dbDriver);
 										 ?>
 										</td>
                   	<td width="663" id="driver_msg" class="error">&nbsp;</td>
@@ -119,29 +119,29 @@
                   	<td width="337" align="left">
 										<?php
 										$dbConnection = array('mysql_pconnect'=>'mysql_pconnect');
-										echo $html->selectTag('DBConfig/connect', $dbConnection, null, null, null, false);
+										echo $form->select('DBConfig.connect', $dbConnection);
 										 ?>
 										</td>
                   	<td width="663" id="connect_msg" class="error">&nbsp;</td>
                   </tr>
                   <tr>
                   	<td width="130" id="host_name_label"><?php __('Host Name')?>:</td>
-                  	<td width="337" align="left"><?php echo $html->input('DBConfig/host', array('id'=>'host_name', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT host_name_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'value'=>'localhost'))?></td>
+                  	<td width="337" align="left"><?php echo $form->input('DBConfig.host', array('id'=>'host_name', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT host_name_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'value'=>'localhost'))?></td>
                   	<td width="663" id="host_name_msg" class="error">&nbsp;</td>
                   </tr>
                   <tr>
                   	<td width="130" id="db_user_label"><?php __('DB Username')?>:</td>
-                  	<td width="337" align="left"><?php echo $html->input('DBConfig/login', array('id'=>'db_user', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT db_user_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
+                  	<td width="337" align="left"><?php echo $form->input('DBConfig.login', array('id'=>'db_user', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT db_user_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
                   	<td width="663" id="db_user_msg" class="error">&nbsp;</td>
                   </tr>
                   <tr>
                   	<td width="130" id="db_password_label"><?php __('DB Password')?>:</td>
-                  	<td width="337" align="left"><?php echo $html->password('DBConfig/password', array('id'=>'db_password', 'size'=>'50', 'class'=>'TEXT_FORMAT'))?></td>
+                  	<td width="337" align="left"><?php echo $form->password('DBConfig.password', array('id'=>'db_password', 'size'=>'50', 'class'=>'TEXT_FORMAT'))?></td>
                   	<td width="663" id="db_password_msg" class="error">&nbsp;</td>
                   </tr>
                   <tr>
                   	<td width="140" id="db_name_label"><?php __('Database Name')?>:</td>
-                  	<td width="337" align="left"><?php echo $html->input('DBConfig/database', array('id'=>'db_name', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT db_name_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
+                  	<td width="337" align="left"><?php echo $form->input('DBConfig.database', array('id'=>'db_name', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT db_name_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
                   	<td width="663" id="db_name_msg" class="error">&nbsp;</td>
                   </tr>
 
@@ -156,7 +156,7 @@
   </tr>
   <tr>
     <td colspan="3" align="right">
-    <?php echo $html->submit('Next >>', array('name'=>'next')) ?><br />
+    <?php echo $form->submit('Next >>', array('name'=>'next')) ?><br />
     </td>
   </tr>
   <tr>

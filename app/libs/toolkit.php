@@ -1,5 +1,5 @@
 <?php
-App::import('Model', 'SysParameter');
+
 
 class Toolkit {
 
@@ -32,6 +32,7 @@ class Toolkit {
   }*/
   
   static function formatDate($timestamp) {
+    App::import('Model', 'SysParameter');
     $sys_parameter = new SysParameter;
     $data = $sys_parameter->findParameter('display.date_format');
     $dateFormat = $data['SysParameter']['parameter_value'];

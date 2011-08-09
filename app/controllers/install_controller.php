@@ -20,52 +20,55 @@
  */
 class InstallController extends Controller
 {
-	var $Sanitize;
+  var $Sanitize;
   var $uses         = null; 
-	var $components   = array('Output', 
-                            'framework',
-                            'Session',
-                            'installHelper',
-                            'DbPatcher');
+  var $components   = array(
+                      'Output', 
+                      //'framework',
+                      'Session',
+                      'installHelper',
+                      'DbPatcher'
+                      );
+  var $helpers = array('Session','Html','Js');
 
 	
-	function __construct()
-	{
-		$this->Sanitize = new Sanitize;
- 		$this->set('title_for_layout', __('Install Wizards', true));
-		parent::__construct();
-	}
+  function __construct()
+  {
+    $this->Sanitize = new Sanitize;
+    $this->set('title_for_layout', __('Install Wizards', true));
+    parent::__construct();
+  }
 		
   function checkDatabaseFile()
   {
     return file_exists('../config/database.php');
   }
 
-	function index()
-	{
+  function index()
+  {    
     $this->Session->write('progress', 'index');
 	  $this->autoRender = false;
     if(file_exists('../config/database.php'))
     {
       $this->set('message_content', __('It looks like you already have a instance running. Please install a fresh copy or remove app/config/database.php.', true));
-      $this->render(null, null, 'views/pages/message.tpl.php');
+      $this->render('/pages/message');
     }else{
       return $this->render('install');
     }
-	}
+  }
 	
-	function install2()
-	{
+  function install2()
+  {
     if(!$this->Session->check('progress') || 'index' != $this->Session->read('progress'))
     {
       $this->set('message_content', __('You seems to miss some steps. Please start the installation from beginning.', true));
-      $this->render(null, null, 'views/pages/message.tpl.php');
+      $this->render('/pages/message');
     }
     $this->Session->write('progress', 'install2');
-	}
+  }
 
-	function install3()
-	{
+  function install3()
+  {
     if(!$this->Session->check('progress') || ('install2' != $this->Session->read('progress') && 'install3' != $this->Session->read('progress')))
     {
       $this->render('wrongstep');
@@ -81,9 +84,9 @@ class InstallController extends Controller
       //setup parameter
       $dbConfig = $this->__createDBConfigFile();
 			
-			//Retain the data setup option: A - With Sample,  B - Basic, C - Import from iPeer 1.6
-			$dbConfig['data_setup_option'] = $this->params['form']['data_setup_option'];
-			$insertDataStructure = $this->installHelper->runInsertDataStructure($dbConfig, $this->params);
+      //Retain the data setup option: A - With Sample,  B - Basic, C - Import from iPeer 1.6
+      $dbConfig['data_setup_option'] = $this->params['form']['data_setup_option'];
+      $insertDataStructure = $this->installHelper->runInsertDataStructure($dbConfig, $this->params);
 			
       //Found error
       if (!($dbConfig && $insertDataStructure))
@@ -92,25 +95,29 @@ class InstallController extends Controller
         $this->set('errmsg', __('Create Database Configuration Failed', true));
         $this->render('install3');
       }
-
-      // apply the patches
-      $dbv = $this->sysContainer->getParamByParamCode('database.version', array('parameter_value' => 0));
-
-      // patch the database
-      if(true !== ($ret = $this->DbPatcher->patch($dbv['parameter_value'], $dbConfig)))
-      {
-        $this->set('message_content', $ret);
-        $this->render(null, null, 'views/pages/message.tpl.php');
-        exit;
-      }
+    
+//      //Conditionally load sysContainer
+//      App::import('Component', 'SysContainer');
+//      $SysContainer = new SysContainer();
+//      
+//      // apply the patches
+//      $dbv = $SysContainer->getParamByParamCode('database.version', array('parameter_value' => 0));
+//
+//      // patch the database
+//      if(true !== ($ret = $this->DbPatcher->patch($dbv['parameter_value'], $dbConfig)))
+//      {
+//        $this->set('message_content', $ret);
+//        $this->render(null, null, 'views/pages/message.tpl.php');
+//        exit;
+//      }
       
       $this->set('data', array());
-      $this->redirect('install/install4');  
-		}	  
-	}
+      $this->redirect('install4');  
+    }	  
+  }
 
 	function install4()
-	{
+	{ 
 	  $this->autoRender = false;
 
     if(!$this->Session->check('progress') || ('install3' != $this->Session->read('progress') && 'install4' != $this->Session->read('progress')))
@@ -137,14 +144,15 @@ class InstallController extends Controller
                                        'email'          => $this->params['data']['SysParameter']['system.admin_email'],
                                        'record_status'  => 'A',
                                        'creator_id'     => 0));
-        $user = new User();
-        $user->save($admin); 
+//        $this->loadModel('User');
+//        //$user = new User();
+//        $this->User->saveAll($admin); 
 
         // test if the config directory is still writable by http user
         $this->set('config_writable', $writable = is_writable("../config"));
 
 				$this->render('install5');  
-			}	else {
+			}	else { 
         //Found error
         $this->set('data', $this->params['data']);
         $this->set('errmsg', __('Configuration of iPeer System Parameters Failed.', true));

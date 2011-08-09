@@ -39,6 +39,13 @@ function get_php_setting($val) {
                     <td><?php __('MySQL Support')?></td>
                     <td><?php echo function_exists( 'mysql_connect' ) ? '<b><font color="green">'.__('Available', true).'</font></b>' : '<b><font color="red">'.__('Unavailable', true).'</font></b>';?></td>
                   </tr>
+<!--                  <tr>
+                    <td><div align="center"></div></td>
+                    <td><?php __('app/config/ Folder Permission == 777')?></td>
+                    <td><?php 
+                      $perm = substr(sprintf('%o', fileperms('../config/')), -3);
+                      echo ($perm=='777') ? '<b><font color="green">'.__('Yes', true).'</font></b>' : '<b><font color="red">'.__("No, it's ", true).$perm.'</font></b>';?></td>
+                  </tr>-->
 <!--          			  <tr>
           			   <td>&nbsp;</td>
           			   <td>PEAR extensions</td>
@@ -86,7 +93,7 @@ function get_php_setting($val) {
                         //echo | at `date +%H:%M` //this one might work.. but generates an empty job
                         exec("atq",$output,$return_var); //won't work on windows
                         if($return_var != 0)
-                        	echo '<b><font color="red">'.__('Denied. Remove Apache daemon').' ('. exec("whoami") . ")".__('from', true)." \"/etc/at.deny\" or \"/var/at/at.deny\"</font></b>";
+                        	echo '<b><font color="red">'.__('Denied. Remove Apache daemon').'<br/> ('. exec("whoami") . ") ".__('from', true)." \"/etc/at.deny\" or \"/var/at/at.deny\"</font></b>";
                         else
                         	echo '<b><font color="green">'.__('Allowed', true).'</font></b>';
                         ?></td>
@@ -150,7 +157,7 @@ function get_php_setting($val) {
   <!-- Next -->
   <tr>
     <td colspan="3" align="right">
-      <?php echo $html->submit(__('Next >>', true), array('name'=>'next')) ?>
+      <?php echo $form->submit(__('Next >>', true), array('name'=>'next')) ?>
 
     </td>
   </tr>

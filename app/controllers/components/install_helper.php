@@ -8,6 +8,7 @@
  * @license		OPPL
  *
  */
+
 class InstallHelperComponent
 {
 	function runInsertDataStructure($dbConfig, $params) 
@@ -117,6 +118,7 @@ class InstallHelperComponent
 	
 	function updateSystemParameters($data) 
   {
+        App::import('Model', 'SysParameter');
   	$this->SysParameter = new SysParameter;
   	$superAdmin = null;
   	
