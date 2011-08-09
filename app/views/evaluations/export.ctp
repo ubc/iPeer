@@ -4,14 +4,17 @@
     <form name="frm" id="frm" method="POST" action="<?php echo $html->url('export/'.$eventId) ?>">
       <input type="hidden" name="assigned" id="assigned"/>
       <table width="85%" border="0" align="center" cellpadding="4" cellspacing="2">
+      	<tr><td style="color:darkred; font-size:smaller"> *Please check at least one of similarly coloured fields</td></tr>
         <tr class="tableheader">
+       
           <td colspan="3" align="center">Export Evaluation Results</td>
         </tr>
         <tr class="tablecell2">
           <td width="30%">Export Filename:</td><td width="40%"><input type="text" name="file_name" value="<?php if(isset($file_name)) echo $file_name;?>" />.csv</td><td width="30%"></td>
         </tr>
         <tr class="tablecell2">
-          <td width="30%">Export File Type:</td><td width="40%"><select name="export_type"><option value="csv">csv</option><option value="excel">excel</option></select></td> <td></td>
+        
+          <td width="30%">Export File Type:</td><td width="40%"><select name="export_type" class= "export_type"><option value="excel">excel</option><option value="csv">csv</option></select></td> <td></td>
         </tr>
         <tr class="tablesubheader">
           <td colspan="3" align="center">Header</td>
@@ -46,16 +49,16 @@
         <tr class="tablecell2">
           <td>Include Student Email:</td><td><input type="checkbox" name="include_student_email" checked /></td><td></td>
         </tr>
-        
+
  	<?php 
  		switch($eventType){
  		  //Simple Evaluation
  		  case 1 :
  		    echo '<tr class="tablecell2">
-          		    <td>Include Evaluator Comments:&nbsp;<font color="orange">*</td><td><input type="checkbox" name="simple_evaluator_comment" checked /></td><td></td>
+          		    <td>Include Evaluator Comments:&nbsp;<font color="orange">*</td><td><input class = "csv" type="checkbox" name="simple_evaluator_comment" checked /></td><td></td>
         	      </tr>
         	      <tr class="tablecell2">
-          		    <td>Include Simple Evaluation Grade Table:&nbsp;<font color="orange">*</td><td><input type="checkbox" name="simple_eval_grade_table" checked /></td><td></td>
+          		    <td>Include Simple Evaluation Grade Table:&nbsp;<font color="orange">*</td><td><input class = "csv" type="checkbox" name="simple_eval_grade_table" checked /></td><td></td>
         	      </tr>';
 			break;
  		  // Rubrics Evaluation
@@ -64,18 +67,18 @@
           		    <td>Include Rubrics Criteria Comments:</td><td><input type="checkbox" name="rubric_criteria_comment" checked /></td><td></td>
 			</tr>*/
  		    echo '<tr class="tablecell2">
-		            <td>Include Rubrics Criteria Marks:&nbsp;<font color="orange">*</td><td><input type="checkbox" name="rubric_criteria_marks" checked /></td><td></td>
+		            <td>Include Rubrics Criteria Marks:&nbsp;<font color="orange">*</td><td><input class = "csv" type="checkbox" name="rubric_criteria_marks" checked /></td><td></td>
 		          <tr class="tablecell2">
-		            <td>Include Rubrics General Comments:&nbsp;<font color="orange">*</td><td><input type="checkbox" name="rubric_general_comments" checked /></td><td></td>
+		            <td>Include Rubrics General Comments:&nbsp;<font color="orange">*</td><td><input class = "csv" type="checkbox" name="rubric_general_comments" checked /></td><td></td>
 		          </tr>';
  		    break;
  		  // Mix Evaluation
  		  case 4:
 		    echo '<tr class="tablecell2">
-		            <td>Include Comments Table:&nbsp;<font color="orange">*</td><td><input type="checkbox" name="include_mixeval_question_comment" checked /></td><td></td>
+		            <td>Include Comments Table:&nbsp;<font color="orange">*</td><td><input type="checkbox" class = "csv" name="include_mixeval_question_comment" checked /></td><td></td>
 		          </tr>
 		          <tr class="tablecell2">
-		            <td>Include Grades Table:&nbsp;<font color="orange">*</td><td><input type="checkbox" name="include_mixeval_grades" checked /></td><td></td>
+		            <td>Include Grades Table:&nbsp;<font color="orange">*</td><td><input type="checkbox" class = "csv" name="include_mixeval_grades" checked /></td><td></td>
 		          </tr>';
 		    break;
 		  // Invalid Event Id
@@ -83,15 +86,21 @@
  		  	throw new Exception("INVALID EVENT ID !");
  		}
  	?>
+
         <tr class="tablecell2">
           <td>Include Final Marks:</td><td><input type="checkbox" name="include_final_marks" checked /></td><td></td>
         </tr>
         
         <tr class="tablecell2">
-          <td colspan="3" align="center"><?php echo $this->Form->submit('Export') ?></td>
+          <td colspan="3" align="center"><?php echo $this->Form->submit('Export', array('onClick'=>'return checkSubmit()')) ?></td>
         </tr>
       </table>
     </form>
   </td>
   </tr>
 </table>
+<?php echo $html->script('export');
+?>
+<style type="text/css">
+.cssDisabled { color: #aaa; }
+</style>

@@ -24,7 +24,7 @@ echo empty($data['SysFunction']['id'])?__('Add', true):__('Edit', true) ?><?php 
   <table width="100%" cellspacing="0" cellpadding="4">
   <input type="hidden" name="required" id="required" value="id function_code function_name" />
   <tr>
-      <td width="130" id="id_label"><?php __('id*:', true)</td>
+      <td width="130" id="id_label"><?php __('id*:', true)?></td>
       <td width="337" align="right"><?php echo $form->input('SysFunction.id', array('id'=>'id', 'size'=>'50', 'type'=>'text', 'label'=>false, 'class'=>'validate required NUMERIC_FORMAT id_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?></td>
       <td width="663" id="id_msg" class="error"/>
   </tr>
