@@ -1,1 +1,0 @@
-<p>Edit "<b>C:\wwwroot\ipeer2\app\views\simpleevaluations\delete.tpl.php</b>" to change this message.</p>
