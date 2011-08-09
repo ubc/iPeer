@@ -12,6 +12,5 @@ class Penalty extends AppModel {
   	return $this->find('first', array('conditions' => array('Penalty.id' => $penaltyId)));
   }
   
-
 }
 ?>
