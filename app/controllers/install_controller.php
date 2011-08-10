@@ -130,6 +130,8 @@ class InstallController extends Controller
 
     if (empty($this->params['data'])) {
       //render default
+      $this->set('absolute_url', str_replace($this->here,'',Router::url($this->here, true)));
+      $this->set('domain_name', $_SERVER['HTTP_HOST']);
       $this->render();
     }else{
       //update parameters
@@ -140,7 +142,7 @@ class InstallController extends Controller
         //Create Super Admin
         $my_db =& ConnectionManager::getDataSource('default');
         $my_db->query("INSERT INTO `users` (`id`, `role`, `username`, `password`, `first_name`, `last_name`, `student_no`, `title`, `email`, `last_login`, `last_logout`, `last_accessed`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) 
-          VALUES (NULL, 'A', '".$username."', '".md5($this->params['data']['Admin']['password'])."', 'Super', 'Admin', NULL, NULL, '".$this->params['data']['SysParameter']['system.admin_email']."', NULL, NULL, NULL, 'A', '0', '".date("Y-m-d H:i:s", time())."', NULL, NULL)
+          VALUES ('1', 'A', '".$username."', '".md5($this->params['data']['Admin']['password'])."', 'Super', 'Admin', NULL, NULL, '".$this->params['data']['SysParameter']['system.admin_email']."', NULL, NULL, NULL, 'A', '0', '".date("Y-m-d H:i:s", time())."', NULL, NULL)
           ON DUPLICATE KEY UPDATE password = '".md5($this->params['data']['Admin']['password'])."', email = '".$this->params['data']['SysParameter']['system.admin_email']."';");
         
         //Get Super Admin's id and insert into roles_users table

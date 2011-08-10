@@ -499,7 +499,7 @@ CREATE TABLE `courses` (
   `instructor_id` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `course` (`course`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -863,6 +863,10 @@ CREATE TABLE IF NOT EXISTS `mixevals` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
+--
+-- Dumping data for table `mixevals`
+--
+
 INSERT INTO `mixevals` (`id`, `name`, `zero_mark`, `total_question`, `lickert_question_max`, `scale_max`, `prefill_question_max`, `availability`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
 (1, 'Default Mix Evalution', 0, 7, 3, 5, 3, 'public', 1, '2006-09-12 13:34:30', 1, '2006-09-12 13:47:57');
 
@@ -881,6 +885,10 @@ CREATE TABLE IF NOT EXISTS `mixevals_question_descs` (
   PRIMARY KEY (`id`),
   KEY `question_num` (`question_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=11 ;
+
+--
+-- Dumping data for table `mixevals_question_descs`
+--
 
 INSERT INTO `mixevals_question_descs` (`id`, `question_id`, `scale_level`, `descriptor`) VALUES
 (46, 1, 1, 'Lowest'),
@@ -919,6 +927,10 @@ CREATE TABLE IF NOT EXISTS `mixevals_questions` (
   `response_type` char(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
+
+--
+-- Dumping data for table `mixevals_questions`
+--
 
 INSERT INTO `mixevals_questions` (`id`, `mixeval_id`, `question_num`, `title`, `instructions`, `question_type`, `required`, `multiplier`, `scale_level`, `response_type`) VALUES
 (19, 1, 1, 'Participated in Team Meetings', NULL, 'S', 1, 1, 5, NULL),

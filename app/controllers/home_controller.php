@@ -419,6 +419,9 @@ class HomeController extends AppController
         }
       }
     }
+    else{
+      $this->redirect('/login');
+    }
   }
 
   function preparePeerEvals()

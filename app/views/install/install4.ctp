@@ -28,7 +28,7 @@
                   	<td width="337" align="left"><?php echo $form->input('SysParameter.session_name', array('id'=>'session_name', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT session_name_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'value'=>'ipeer'))?></td>
                   	<td width="663" id="session_name_msg" class="error"/>
                   </tr>-->
-                  <tr>
+<!--                  <tr>
                   	<td width="130" id="debug_mode_label"><?php __('Debug Mode')?>:</td>
                   	<td width="337" align="left">
 										<?php
@@ -43,7 +43,7 @@
                           </select>
 										</td>
                   	<td width="663" id="debug_mode_msg" class="error"/>
-                  </tr>
+                  </tr>-->
                   <!--tr>
                   	<td width="130" id="debug_verbosity_label">Debug Verbosity:</td>
                   	<td width="337" align="left"><?php echo $form->input('SysParameter.system.debug_verbosity', array('id'=>'debug_verbosity', 'size'=>'50', 'class'=>'validate required NUMERIC_FORMAT debug_verbosity_msg Invalid_Numeric_Value.', 'value'=>'1'))?></td>
@@ -53,7 +53,7 @@
                   	<td width="130" id="login_text_label"><?php __('Custom Login Text')?>:</td>
                   	<td width="337" align="left">
                         <?php //echo $form->input('SysParameter.display.login_text', array('id'=>'login_text', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT login_text_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'value'=>'<a href=\'http://www.ubc.ca\' target=\'_blank\'>UBC</a>'))?>
-                        <div class="input text"><label for="login_text">Login Text</label><input name="data[SysParameter][display.login_text]" type="text" id="login_text" size="50" class="validate required TEXT_FORMAT login_text_msg Invalid_Text._At_Least_One_Word_Is_Required." value="&lt;a href=&#039;http://www.ubc.ca&#039; target=&#039;_blank&#039;&gt;UBC&lt;/a&gt;" /></div>
+                        <textarea name="data[SysParameter][display.login_text]" id="login_text" class="validate required TEXT_FORMAT login_text_msg Invalid_Text._At_Least_One_Word_Is_Required." cols="40" rows="4" >&lt;a href=&#039;http://www.ubc.ca&#039; target=&#039;_blank&#039;&gt;UBC&lt;/a&gt;</textarea>
                         </td>
                   	<td width="663" id="login_text_msg" class="error"/>
                   </tr>
@@ -66,7 +66,7 @@
                   	<td width="130" id="absolute_url_label"><?php __('Absolute URL')?> (e.g. http://myserver.com/ipeer):</td>
                   	<td width="337" align="left">
                         <?php //echo $form->input('SysParameter.system.absolute_url', array('id'=>'absolute_url', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT absolute_url_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'value'=>'http://'))?>
-                        <div class="input text"><label for="absolute_url">Absolute Url</label><input name="data[SysParameter][system.absolute_url]" type="text" id="absolute_url" size="50" class="validate required TEXT_FORMAT absolute_url_msg Invalid_Text._At_Least_One_Word_Is_Required." value="http://" /></div>
+                        <div class="input text"><input name="data[SysParameter][system.absolute_url]" type="text" id="absolute_url" size="50" class="validate required TEXT_FORMAT absolute_url_msg Invalid_Text._At_Least_One_Word_Is_Required." value=<?php echo $absolute_url; ?> /></div>
                         </td>
                   	<td width="663" id="absolute_url_msg" class="error"/>
                   </tr>
@@ -74,7 +74,7 @@
                   	<td width="130" id="domain_label"><?php __('Domain')?>:</td>
                   	<td width="337" align="left">
                         <?php //echo $form->input('SysParameter.system.domain', array('id'=>'domain', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT domain_msg Invalid_Text._At_Least_One_Word_Is_Required.'))?>
-                        <div class="input text"><label for="domain">Domain</label><input name="data[SysParameter][system.domain]" type="text" id="domain" size="50" class="validate required TEXT_FORMAT domain_msg Invalid_Text._At_Least_One_Word_Is_Required." value="test" /></div>
+                        <div class="input text"><input name="data[SysParameter][system.domain]" type="text" id="domain" size="50" class="validate required TEXT_FORMAT domain_msg Invalid_Text._At_Least_One_Word_Is_Required." value=<?php echo $domain_name; ?> /></div>
                         </td>
                   	<td width="663" id="domain_msg" class="error"/>
                   </tr>
@@ -107,7 +107,7 @@
                     </td>
                     <td width="663" class="error" />
                   </tr>
-                  <tr>
+<!--                  <tr>
                     <td width="130"><?php __('Password Reset Email Subject')?></td>
                     <td width="337" align="left">
                     <?php //echo $form->input('SysParameter.system.password_reset_emailsubject', array('id'=>'password_reset_emailsubject', 'size'=>'50', 'class'=>'validate required TEXT_FORMAT super_admin_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'value'=>__('iPeer Password Reset Notification', true)))?>
@@ -122,7 +122,7 @@
                     <textarea name="data[SysParameter][system.password_reset_email]" id="password_reset_email" class="validate required TEXT_FORMAT super_admin_msg Invalid_Text._At_Least_One_Word_Is_Required." cols="40" rows="10" >Dear &amp;lt;username&amp;gt;, &amp;lt;br&amp;gt; Your iPeer password has been reset to &#039;&amp;lt;newpassword&amp;gt;&#039;. &amp;lt;br&amp;gt;&amp;lt;br&amp;gt; iPeer Administrator</textarea>
                     </td>
                     <td width="663" class="error"/>
-                  </tr>
+                  </tr>-->
                   </table>
               </td>
             </tr>
