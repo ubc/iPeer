@@ -39,8 +39,7 @@
                           <option value=""></option>
                           <option value="0">Production</option>
                           <option value="1">Development</option>
-                          <option value="2">Full Debug With SQL</option>
-                          <option value="3">Full Debug With SQL and Dump of the Current Object</option>
+                          <option value="2">Development with Full Debug Messages and SQL Output</option>
                           </select>
 										</td>
                   	<td width="663" id="debug_mode_msg" class="error"/>

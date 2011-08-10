@@ -52,6 +52,7 @@ class sysContainerComponent
   function initialize(&$controller, $settings=array()) {
     $this->controller = $controller;
     $this->SysParameter = new SysParameter;
+    //parent::initialize($controller);
   }
 
 	/**
@@ -170,7 +171,7 @@ class sysContainerComponent
 		endforeach;
 
 		$this->paramList = $result;
-		$this->Session->write('ipeerSession.paramList', $this->paramList);
+		$this->controller->Session->write('ipeerSession.paramList', $this->paramList);
 	}
 
 	/**
@@ -182,14 +183,14 @@ class sysContainerComponent
 	 */
 	function getParamByParamCode($paraCode, $default = null)
 	{
-		$paramList = $this->Session->read('ipeerSession.paramList');
-    if($paramList === null) {
-      $paramList = $this->SysParameter->find('all', array('fields' => array('id', 'parameter_code', 'parameter_value', 'parameter_type')));
-      $this->setParamList($paramList);
-    }
+          $paramList = $this->controller->Session->read('ipeerSession.paramList');
+          if($paramList === null) {
+            $paramList = $this->SysParameter->find('all', array('fields' => array('id', 'parameter_code', 'parameter_value', 'parameter_type')));
+            $this->setParamList($paramList);
+          }
 
-		$sysParameter = isset($paramList[$paraCode]) ? $paramList[$paraCode] : $default;
-		return $sysParameter;
+          $sysParameter = isset($paramList[$paraCode]) ? $paramList[$paraCode] : $default;
+          return $sysParameter;
 	}
 
 	/**

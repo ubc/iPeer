@@ -37,7 +37,7 @@ class EventsController extends AppController
 	var $NeatString;
 	var $Sanitize;
 	var $uses = array('GroupEvent', 'User', 'Group', 'Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers');
-  var $components = array("AjaxList", "SysContainer", "Session");
+  var $components = array("AjaxList", "sysContainer", "Session");
 
   function __construct()
   {
@@ -93,7 +93,7 @@ class EventsController extends AppController
   function setUpAjaxList() {
 
     // Grab the course list
-    $userCourseList = $this->SysContainer->getMyCourseList();
+    $userCourseList = $this->sysContainer->getMyCourseList();
     $coursesList = array();
     foreach ($userCourseList as $id => $course) {
       $coursesList[$id] = $course['course'];

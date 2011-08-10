@@ -11,7 +11,7 @@
   </tr>
   <tr>
     <td colspan="3" align="center">
-    <?php __('Configuration!')?> <a href="../loginout/login"><?php __('iPeer sucessfully installed!')?></a><br /><br/>
+    <?php __('Configuration!')?> <a href="../login"><?php __('iPeer sucessfully installed!')?></a><br /><br/>
     <?php if($config_writable):?>
       <font color="red"><?php __('Important!!!')?> </font> <?php __('Your configuration directory (app/config) is still writable. Please change it to read only.')?><br /><br/>
     <?php endif;?>

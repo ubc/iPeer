@@ -11,46 +11,46 @@
 
 class InstallHelperComponent
 {
-	function runInsertDataStructure($dbConfig, $params) 
-	{
-		$this->params = $params;
-		$basicSQLFile = "../config/sql/ipeer.sql";
-		$samplesFile = "../config/sql/ipeer_samples_data.sql";
-		$xml_file = $this->params['form']['data_file']['tmp_name'];
+  function runInsertDataStructure($dbConfig, $params) 
+  {
+    $this->params = $params;
+    $basicSQLFile = "../config/sql/ipeer.sql";
+    $samplesFile = "../config/sql/ipeer_samples_data.sql";
+    $xml_file = $this->params['form']['data_file']['tmp_name'];
     $to_import = $this->params['form']['to_import'];
-		
-		//Install database with sample data
-		$dataOption = $dbConfig['data_setup_option'];
+
+    //Install database with sample data
+    $dataOption = $dbConfig['data_setup_option'];
     if ($dataOption == 'A') {
-  		//Install database with sample data structure
-		  $dbConfig['filename'] = $samplesFile;
-  		$runQuery = $this->dbSource($dbConfig);		  
-		}		 
-		else if ($dataOption == 'B') {
-  		//Install database with basic structure
-		  $dbConfig['filename'] = $basicSQLFile;
-  		$runQuery = $this->dbSource($dbConfig);
-		}
+      //Install database with sample data structure
+      $dbConfig['filename'] = $samplesFile;
+      $runQuery = $this->dbSource($dbConfig);		  
+    }		 
+    else if ($dataOption == 'B') {
+      //Install database with basic structure
+      $dbConfig['filename'] = $basicSQLFile;
+      $runQuery = $this->dbSource($dbConfig);
+    }
     else if($dataOption == 'C') {
-    	// Install database with basic structure
+      // Install database with basic structure
       $dbConfig['filename'] = $basicSQLFile;
       $runQuery = $this->dbSource($dbConfig);
       // Import data from 1.6 
       set_time_limit(1200);
       $this->importData($xml_file, $to_import, $dbConfig);
     }
-		
-		return $runQuery; 
-	}
 
-	#
-	# Read and execute SQL commands from a file
-	#
-	function dbSource($dbConfig) {
+    return $runQuery; 
+  }
 
-		$executeStaus = false;
-	  $fname = $dbConfig['filename'];
-	  
+  #
+  # Read and execute SQL commands from a file
+  #
+  function dbSource($dbConfig) {
+
+    $executeStaus = false;
+    $fname = $dbConfig['filename'];
+
     //connect to the server
     $mysql = mysql_connect($dbConfig['host'], $dbConfig['login'], $dbConfig['password']);
     if(!$mysql) {
@@ -58,82 +58,86 @@ class InstallHelperComponent
       return($error);
     } 
     else {
+      //Create the database if not exists
+      if (!mysql_query("CREATE DATABASE IF NOT EXISTS ".$dbConfig['database'],$mysql))    
+        echo "Error creating database: " . mysql_error();
+      
       //Open the database
       $mysqldb = mysql_select_db($dbConfig['database']);
       if (!$mysqldb) {
-        //TODO create database
-        //return($error);
+        die(__('Could not open the database: ', true) . mysql_error());
+        return($error);
       }	  
-  		
-  		$fp = fopen( $fname, "r" );
-  		if ( false === $fp ) {
-  			//print "Could not open \"{$fname}\".\n";
-  			return false;
-  		}
-  	
+
+      $fp = fopen( $fname, "r" );
+      if ( false === $fp ) {
+        //print "Could not open \"{$fname}\".\n";
+        return false;
+      }
+
       mysql_query('BEGIN');
 
-  		$cmd = "";
-  		$done = false;
-  	
-  		while ( ! feof( $fp ) ) {
-  			$line = trim( fgets( $fp, 1024 ) );
-  			$sl = strlen( $line ) - 1;
-  	
-  			if ( $sl < 0 ) { continue; }
-  			if ( "-" == $line{0} && "-" == $line{1} ) { continue; }
-  	
-  			if ( ";" == $line{$sl} ) {
-  				$done = true;
-  				$line = substr( $line, 0, $sl );
-  			}
-  	
-  			if ( "" != $cmd ) { $cmd .= " "; }
-  			$cmd .= $line;
-  	
-  			if ( $done ) {
-  				//echo $cmd . ";<br /><br /><br />";
-  				$result = mysql_query($cmd, $mysql);
-          if (!$result)
-          {
-            $error = __("Cannot run query", true);
-            mysql_query('ROLLBACK');
-            mysql_close($mysql);
-            return $error;
-          }
-  				//if ($this->execute($cmd)) {
-  				//	return false;
-  				//}
-  				$cmd = "";
-  				$done = false;
-  			}
-  		}
-  		fclose( $fp );
-  		mysql_query("COMMIT");
-  		mysql_close($mysql);
-  	}
-		return true;
-		
-	}    	
+      $cmd = "";
+      $done = false;
+
+      while ( ! feof( $fp ) ) {
+      $line = trim( fgets( $fp, 1024 ) );
+      $sl = strlen( $line ) - 1;
+
+      if ( $sl < 0 ) { continue; }
+      if ( "-" == $line{0} && "-" == $line{1} ) { continue; }
+
+      if ( ";" == $line{$sl} ) {
+              $done = true;
+              $line = substr( $line, 0, $sl );
+      }
+
+      if ( "" != $cmd ) { $cmd .= " "; }
+      $cmd .= $line;
+
+      if ( $done ) {
+              //echo $cmd . ";<br /><br /><br />";
+              $result = mysql_query($cmd, $mysql);
+      if (!$result)
+      {
+      $error = __("Cannot run query", true);
+      mysql_query('ROLLBACK');
+      mysql_close($mysql);
+      return $error;
+      }
+              //if ($this->execute($cmd)) {
+              //	return false;
+              //}
+              $cmd = "";
+              $done = false;
+      }
+      }
+      fclose( $fp );
+      mysql_query("COMMIT");
+      mysql_close($mysql);
+      }
+      return true;
+
+  }    	
 	
-	function updateSystemParameters($data) 
+  function updateSystemParameters($data) 
   {
-        App::import('Model', 'SysParameter');
-  	$this->SysParameter = new SysParameter;
-  	$superAdmin = null;
-  	
-		if (!empty($data)) {
-			foreach($data['SysParameter'] as $key => $value){
-				$tmpSysParam = $this->SysParameter->findParameter($key);
-				$tmpSysParam['SysParameter']['parameter_value'] = $value;
-				$this->SysParameter->save($tmpSysParam);
-				
-				if ($key == 'system.super_admin') {
-					$superAdmin = $value;
-				}
-			}
+    App::import('Model', 'SysParameter');
+    $this->SysParameter = new SysParameter;
+    $superAdmin = null;
+
+    if (!empty($data)) {
+            foreach($data['SysParameter'] as $key => $value){
+                    $tmpSysParam = $this->SysParameter->findParameter($key);
+                    $tmpSysParam['SysParameter']['parameter_value'] = $value;
+                    $this->SysParameter->save($tmpSysParam);
+
+                    if ($key == 'system.super_admin') {
+                            $superAdmin = $value;
+                    }
+            }
     }  
-   	return $superAdmin;
+    return $superAdmin;
   }
   
   function importData($xml_file, $to_import, $dbConfig)
