@@ -160,8 +160,8 @@ class EvaluationTestCase extends CakeTestCase {
    	  $search1 = $this->EvaluationSimple->find('first', array('conditions' => array('eval_comment' => 'Kevin Luk was smart')));
    	  $search2 = $this->EvaluationSimple->find('first', array('conditions' => array('eval_comment' => 'Zion Au was also smart')));
    	  $searchEvalSubmission = $this->EvaluationSubmission->find('all', array('conditions' => array('grp_event_id' => 999)));
-	    $this->assertFalse($search1);
-	    $this->assertFalse($search2);
+	  $this->assertFalse($search1);
+	  $this->assertFalse($search2);
   	  $this->assertFalse($searchEvalSubmission);
    	  
    	  // Set up test data

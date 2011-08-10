@@ -40,7 +40,7 @@ class EvaluationsController extends AppController
                     'EvaluationSubmission', 'Event', 'EvaluationSimple',
                     'SimpleEvaluation', 'Rubric', 'Group', 'User',
                     'GroupsMembers','RubricsLom','RubricsCriteria',
-                    'RubricsCriteriaComment', 'Personalize',
+                    'RubricsCriteriaComment', 'Personalize', 'Penalty',
                     'Question','Response','Survey','SurveyInput','Course','MixevalsQuestion',
                     'EvaluationMixeval','EvaluationMixevalDetail', 'Mixeval', 'MixevalsQuestionDesc');
   var $components = array('ExportBaseNew', 'Auth','AjaxList', 'rdAuth','Output','sysContainer',
@@ -586,6 +586,16 @@ function makeSurveyEvaluation ($param = null) {
           $status = false;
       }
 
+      // Apply penalty; if evaluator submitted late
+      $late = $this->Evaluation->isLate($eventId); 
+      // check to see if the evaluator's submission is late; if so, apply a penalty to the evaluator.
+	  if($late > 0){ 
+	    if(!$this->Evaluation->saveGradePenalty($groupEventId, $eventId, $evaluator, $late))	
+	      return false;
+	  }
+      
+      
+      
       //checks if all members in the group have submitted
       //the number of submission equals the number of members
       //means that this group is ready to review
@@ -740,6 +750,8 @@ function makeSurveyEvaluation ($param = null) {
         $this->set('allMembersCompleted', $formattedResult['allMembersCompleted']);
         $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
         $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
+        
+		        
         $this->render('view_simple_evaluation_results');
         break;
 
@@ -846,7 +858,7 @@ function makeSurveyEvaluation ($param = null) {
       $currentDate = strtotime('NOW');
 
       //Check if event is in range of result release date
-      if($currentDate>=strtotime($event['Event']['result_release_date_begin'])&&$currentDate<strtotime($event['Event']['result_release_date_end'])){
+      if($currentDate>=strtotime($event['Event']['release_date_begin'])&&$currentDate<strtotime($event['Event']['release_date_end'])){
         switch ($event['Event']['event_template_type_id'])
         {
             case 1: //View Simple Evaluation Result

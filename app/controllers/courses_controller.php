@@ -89,7 +89,23 @@ class CoursesController extends AppController
         'Course.course', 'Course.course', $joinTables, $extraFilters, $recursive);
   }
   
-  function index() {	
+  function daysLate($event, $submissionDate)
+  {
+   $days = 0; 
+   $dueDate = $this->Event->find('first', array('conditions' => array('Event.id' => $event), 'fields' => array('Event.due_date')));
+   $dueDate = new DateTime($dueDate['Event']['due_date']); 
+   $submissionDate = new DateTime($submissionDate);
+   $dateDiff = $dueDate->diff($submissionDate);
+   if(!$dateDiff->format('%r')){
+   $days = $dateDiff->format('%d');
+   if($dateDiff->format('%i') || $dateDiff->format('%s')){$days++;}}
+   return $days;  
+  }
+  
+  function index() {
+  	
+  	echo "This is <font color=\"red\">blue</font>!";
+  	
     // Set up the basic static ajax list variables
     $this->setUpAjaxList();
     // Set the display list

@@ -165,24 +165,25 @@ class EvaluationComponent extends Object
     $unwantedChar = array("_","0","1","2","3","4","5","6","7","8","9");
     return str_replace($unwantedChar, "", $string);
   }
+  
   function isLate($event) {    
     $submitted = date('Y-m-d H:i:s');
     $lateDays = $this->daysLate($event, $submitted);    
-	  return $lateDays;     
+	return $lateDays;     
   }
   
   function saveGradePenalty($grp_event, $event, $evaluator, $lateDays) {
     $this->UserGradePenalty = ClassRegistry::init('UserGradePenalty');
     $this->Penalty = ClassRegistry::init('Penalty');
-      $penalty = $this->Penalty->getPenaltyByEventAndDaysLate($event, $lateDays);	 
-      $data = array();
-      if(!empty($penalty)){
-        $data['grp_event_id'] = $grp_event;
-        $data['penalty_id'] = $penalty['Penalty']['id'];
-        $data['user_id'] = $evaluator;
-        if(!$this->UserGradePenalty->save($data)){return false;}
-	  }
-	  return true;
+    $penalty = $this->Penalty->getPenaltyByEventAndDaysLate($event, $lateDays);	 
+    $data = array();
+    if(!empty($penalty)) {
+      $data['grp_event_id'] = $grp_event;
+      $data['penalty_id'] = $penalty['Penalty']['id'];
+      $data['user_id'] = $evaluator;
+      if(!$this->UserGradePenalty->save($data)){return false;}
+	}
+	return true;
   }
   
   function daysLate($event, $submissionDate)  {
@@ -253,7 +254,7 @@ class EvaluationComponent extends Object
     }	
     $late = $this->isLate($event); 
     // check to see if the evaluator's submission is late; if so, apply a penalty to the evaluator.
-	  if($late){ 
+	  if($late > 0){ 
 	    if(!$this->saveGradePenalty($grpEvent, $event, $evaluator, $late))	return false;
 	  }
     
@@ -272,6 +273,7 @@ class EvaluationComponent extends Object
     }
     return true;
   }
+  
   function formatStudentViewOfSimpleEvaluationResult($event=null){
     $this->EvaluationSimple = ClassRegistry::init('EvaluationSimple');
     $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
@@ -986,7 +988,6 @@ class EvaluationComponent extends Object
       $this->EvaluationMixeval->save($evalMixeval);
       $evalMixeval['EvaluationMixeval']['id']=$this->EvaluationMixeval->id;
       $evalMixeval = $this->EvaluationMixeval->read();
-
     }
     $score = $this->saveNGetEvalutionMixevalDetail(
       $evalMixeval['EvaluationMixeval']['id'], $mixeval,$targetEvaluatee, $params);
@@ -995,8 +996,8 @@ class EvaluationComponent extends Object
     if (!$this->EvaluationMixeval->save($evalMixeval)){
        return false;
     }
-    $late = $this->isLate($eventId); 
- 	  if($late){
+    $late = $this->isLate($eventId);
+ 	  if($late > 0){
  	   if(!$this->saveGradePenalty($groupEventId, $eventId, $evaluator, $late))	return false;
  	  }
     

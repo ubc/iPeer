@@ -67,7 +67,7 @@
       $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;
        foreach ($groupMembers as $member_col) {
         if (isset($memberScoreSummary[$member_col['User']['id']])) {
-          echo '<td>'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'],2).'</td>' . "\n\t\t";
+          echo '<td>'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'],2).' - '.'</td>' . "\n\t\t";
       
         } else {
          echo '<td> - </td>';
