@@ -105,5 +105,11 @@ class EvaluationSubmissionTestCase extends CakeTestCase {
   
   } 
 
+  function testDaysLate() {
+    $result = $this->EvaluationSubmission->daysLate(1, '2011-06-10 00:00:01');
+    var_dump($result);
+    
+  }
+  
 }
 ?>

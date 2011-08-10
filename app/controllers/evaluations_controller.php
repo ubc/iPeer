@@ -538,6 +538,7 @@ function makeSurveyEvaluation ($param = null) {
           if (!$this->validRubricEvalComplete($this->params['form'])) {
               $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
           }
+          var_dump($this->params);
           if ($this->Evaluation->saveRubricEvaluation($this->params)) {
               $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
           }

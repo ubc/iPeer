@@ -9,7 +9,7 @@ class FakeEvaluationController extends Controller {
 }
 
 class EvaluationTestCase extends CakeTestCase {
-  	var $fixtures = array('app.course', 'app.role', 'app.user', 'app.group', 
+  	var $fixtures = array('app.course', 'app.role', 'app.user', 'app.group', 'app.penalty',
                         'app.roles_user', 'app.event', 'app.event_template_type',
                         'app.group_event', 'app.evaluation_submission','app.evaluation_mixeval', 
                         'app.survey_group_set', 'app.survey_group', 'app.groups_member',
@@ -46,6 +46,16 @@ class EvaluationTestCase extends CakeTestCase {
                                    'password' => 'passwordA'));
     $this->controller->Auth->login($admin);
   }  
+  
+  function testDaysLate() {
+    $result = $this->EvaluationComponentTest->daysLate(1, '2011-06-10 00:00:01');
+    var_dump($result);    
+  }
+
+  function testSaveGradePenalty() {
+    $result = $this->EvaluationComponentTest->saveGradePenalty(1, 3);
+    var_dump($result);    
+  }
   
   function testFormatGradeReleaseStatus() { 
  	// Set up test data
