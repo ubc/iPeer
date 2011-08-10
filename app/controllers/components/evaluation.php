@@ -198,31 +198,6 @@ class EvaluationComponent extends Object
 
   //Simple Evaluation functions
 
-  function saveGradePenalty($event, $evaluatee) {
-    $this->Penalty = ClassRegistry::init('Penalty');
-    $submitted = date('Y-m-d H:i:s');
-    $lateDays = $this->daysLate($event, $submitted);
-    $penanty_id = $this->Penalty->find('all');
-    $data = array();
-    //$data['penalty_id'] =;
-    $data['evaluatee_id'] = $evaluatee;
-    
-    return $penalty_id;
-  }
-  
-  function daysLate($event, $submissionDate)
-  {
-   $this->Event = ClassRegistry::init('Event');
-   $days = 0; 
-   $dueDate = $this->Event->find('first', array('conditions' => array('Event.id' => $event), 'fields' => array('Event.due_date')));
-   $dueDate = $dueDate['Event']['due_date']; 
-   $seconds = strtotime($dueDate) - strtotime($submissionDate);
-  	$diff = $seconds / 60 /60 /24;
-  	if($diff<0){
-    $days = abs(floor($diff));}
-   return $days;  
-  }
-  
   function saveSimpleEvaluation($params=null, $groupEvent=null, $evaluationSubmission=null){
     $this->EvaluationSimple = ClassRegistry::init('EvaluationSimple');
     $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');

@@ -643,7 +643,6 @@ class ExportBaseNewComponent extends Object {
 	  $this->ExportHelper2->fillGridHorizonally($grid, $xPosition + 1, $yRowPosition, $evaluatorRow);
 	  $yRowPosition++;
     }*/
-    //var_dump($evalResults);
     for($i=0; $i<count($groupMembers); $i++) {
       $evaluator = $groupMembers[$i];
       // Insert evaluator rows, we can utilize the format evaluatee header function with some modifications
