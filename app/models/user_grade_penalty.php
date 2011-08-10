@@ -1,5 +1,6 @@
 <?php
-
+class UserGradePenalty extends AppModel
+{
   var $name = 'UserGradePenalty';
   var $belongsTo = array('GroupEvent' => array(
 								'className' => 'GroupEvent',
@@ -8,5 +9,5 @@
   function getUserGradePenaltyById($id) {
   	return $this->find('first', array('conditions' => array('UserGradePenalty.id' => $id)));
   }
-
+}
 ?>

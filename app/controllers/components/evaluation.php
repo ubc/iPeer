@@ -171,6 +171,8 @@ class EvaluationComponent extends Object
     $this->EvaluationSimple = ClassRegistry::init('EvaluationSimple');
     $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
     $this->GroupEvent = ClassRegistry::init('GroupEvent');
+    $this->Penalty = ClassRegistry::init('Penalty');
+    $this->UserGradePenalty = ClassRegistry::init('UserGradePenalty');
 
     // assuming all are in the same order and same size
     $evaluatees = $params['form']['memberIDs'];
@@ -208,14 +210,29 @@ class EvaluationComponent extends Object
     // if no submission exists, create one
     $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEvent['GroupEvent']['id'];
     $evaluationSubmission['EvaluationSubmission']['event_id'] = $groupEvent['GroupEvent']['event_id'];
-    $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
+    $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;    
     // save evaluation submission
     $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
     $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
     if (!$this->EvaluationSubmission->save($evaluationSubmission)){
       return false;
     }
-
+	
+    // check to see if the evaluator's submission is late; if so, apply a penalty to the evaluator.
+	$daysLate = $this->daysLate($groupEvent['GroupEvent']['event_id'], date('Y-m-d H:i:s'));
+    if($daysLate > 0) {
+	  $penalty = $this->Penalty->getPenaltyByEventAndDaysLate($groupEvent['GroupEvent']['event_id'], $daysLate);
+	  // check if penalty scale is set for this event
+	  if(!empty($penalty)) {
+	  	$evaluator_grade_penalty['penalty_id'] = $penalty['Penalty']['id'];
+	  	$evaluator_grade_penalty['user_id'] = $evaluator;
+	  }
+	  // save penalty to evaluator
+	  if(!$this->UserGradePenalty->save($evaluator_grade_penalty)) {
+	  	return false;
+	  }
+    }
+    
     //checks if all members in the group have submitted
     //the number of submission equals the number of members
     //means that this group is ready to review
@@ -230,6 +247,23 @@ class EvaluationComponent extends Object
       }
     }
     return true;
+  }
+  
+  function daysLate($eventId, $submissionDate) {
+  	$this->Event = ClassRegistry::init('Event');
+  	
+    $days = 0; 
+    $dueDate = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId), 'fields' => array('Event.due_date')));
+    $dueDate = new DateTime($dueDate['Event']['due_date']); 
+    $submissionDate = new DateTime($submissionDate);
+    $dateDiff = $dueDate->diff($submissionDate);
+    if (!$dateDiff->format('%r')) {
+      $days = $dateDiff->format('%d');
+      if ($dateDiff->format('%i') || $dateDiff->format('%s')){
+        $days++;
+      }
+    }
+ 	return $days;  
   }
 
   function formatStudentViewOfSimpleEvaluationResult($event=null){

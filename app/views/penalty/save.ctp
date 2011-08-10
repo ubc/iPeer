@@ -1,5 +1,5 @@
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
-  <form name="frm" id="frm" method="POST" action="<?php echo $html->url('save/'.$grp_event_id) ?>">
+  <form name="frm" id="frm" method="POST" action="<?php echo $html->url('save/'.$eventId) ?>">
   <td class="tablecell2">
       days Late: <br>
       <input type="text" name="day1" /><br />

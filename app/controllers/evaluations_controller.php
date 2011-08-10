@@ -405,6 +405,7 @@ class EvaluationsController extends AppController
           /*if (!$this->validSimpleEvalComplete($this->params)) {
               $this->redirect('/evaluations/makeSimpleEvaluation/'.$this->params['form']['event_id']);
           }*/
+          
           if ($this->Evaluation->saveSimpleEvaluation($this->params, $groupEvent, $evaluationSubmission)) {
               $this->redirect('/home/index/'.__('Your Evaluation was submitted successfully.', true));
           } else {

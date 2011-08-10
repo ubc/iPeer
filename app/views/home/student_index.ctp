@@ -85,7 +85,7 @@
 	  <?php
 	  foreach($data as $row): isset($row['eventSubmitted'])? $eventSubmitted = $row['eventSubmitted']: $eventSubmitted =null;
 	    if (isset($eventSubmitted['Event']['id'])&&$eventSubmitted['Event']['event_template_type_id'] != 3) {
-              $isResultReleased = ($currentDate>=strtotime($eventSubmitted['Event']['result_release_date_begin'])&&$currentDate<strtotime($eventSubmitted['Event']['result_release_date_end']))
+              $isResultReleased = ($currentDate>=strtotime($eventSubmitted['Event']['release_date_begin'])&&$currentDate<strtotime($eventSubmitted['Event']['release_date_end']))
           ?>
 		  <tr class="tablecell">
 			<td>
