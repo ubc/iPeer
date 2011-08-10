@@ -165,21 +165,22 @@ class EvaluationComponent extends Object
     $unwantedChar = array("_","0","1","2","3","4","5","6","7","8","9");
     return str_replace($unwantedChar, "", $string);
   }
-  
-  function saveGradePenalty($grp_event, $event, $evaluator) {
-    $this->UserGradePenalty = ClassRegistry::init('UserGradePenalty');
-    $this->Penalty = ClassRegistry::init('Penalty');
+  function isLate($event) {    
     $submitted = date('Y-m-d H:i:s');
     $lateDays = $this->daysLate($event, $submitted);    
-	  if($lateDays > 0) {
+	  return $lateDays;     
+  }
+  
+  function saveGradePenalty($grp_event, $event, $evaluator, $lateDays) {
+    $this->UserGradePenalty = ClassRegistry::init('UserGradePenalty');
+    $this->Penalty = ClassRegistry::init('Penalty');
       $penalty = $this->Penalty->getPenaltyByEventAndDaysLate($event, $lateDays);	 
       $data = array();
       if(!empty($penalty)){
         $data['grp_event_id'] = $grp_event;
         $data['penalty_id'] = $penalty['Penalty']['id'];
         $data['user_id'] = $evaluator;
-      }
-      if(!$this->UserGradePenalty->save($data)){return false;}
+        if(!$this->UserGradePenalty->save($data)){return false;}
 	  }
 	  return true;
   }
@@ -250,10 +251,11 @@ class EvaluationComponent extends Object
     if (!$this->EvaluationSubmission->save($evaluationSubmission)){
       return false;
     }	
+    $late = $this->isLate($event); 
     // check to see if the evaluator's submission is late; if so, apply a penalty to the evaluator.
-	  	  if(!$this->saveGradePenalty($grpEvent, $event, $evaluator)) {
-	  	return false;
-    }
+	  if($late){ 
+	    if(!$this->saveGradePenalty($grpEvent, $event, $evaluator, $late))	return false;
+	  }
     
     //checks if all members in the group have submitted
     //the number of submission equals the number of members
@@ -565,11 +567,11 @@ class EvaluationComponent extends Object
     if (!$this->EvaluationRubric->save($evalRubric)){
       return false;
     }
-    if(!$this->saveGradePenalty($groupEventId, $eventId, $evaluator)) {
-	  	return false;
-    }
-    
-    
+    $late = $this->isLate($eventId); 
+  	if($late){ 
+  	  if(!$this->saveGradePenalty($grpEvent, $event, $evaluator, $late))	return false;
+  	}
+
     return true;
   }
 
@@ -993,11 +995,10 @@ class EvaluationComponent extends Object
     if (!$this->EvaluationMixeval->save($evalMixeval)){
        return false;
     }
-    
-  	if(!$this->saveGradePenalty($groupEventId, $eventId, $evaluator)) {
-	  	return false;
-    }
-    
+    $late = $this->isLate($eventId); 
+ 	  if($late){
+ 	   if(!$this->saveGradePenalty($groupEventId, $eventId, $evaluator, $late))	return false;
+ 	  }
     
     return true;
   }
