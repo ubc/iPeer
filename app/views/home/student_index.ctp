@@ -84,8 +84,10 @@
   	<?php $i = 0;?>
 	  <?php
 	  foreach($data as $row): isset($row['eventSubmitted'])? $eventSubmitted = $row['eventSubmitted']: $eventSubmitted =null;
-	    if (isset($eventSubmitted['Event']['id'])&&$eventSubmitted['Event']['event_template_type_id'] != 3) {
-              $isResultReleased = ($currentDate>=strtotime($eventSubmitted['Event']['release_date_begin'])&&$currentDate<strtotime($eventSubmitted['Event']['release_date_end']))
+            //Display if event is submitted, before result release end date and not survey
+	    if (isset($eventSubmitted['Event']['id'])&&$currentDate<strtotime($eventSubmitted['Event']['result_release_date_end'])&&$eventSubmitted['Event']['event_template_type_id'] != 3) {
+              //Condition to check; if after result release begin date, display link to result view page: else just display event title.
+              $isResultReleased = ($currentDate>=strtotime($eventSubmitted['Event']['result_release_date_begin']))
           ?>
 		  <tr class="tablecell">
 			<td>
