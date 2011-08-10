@@ -996,6 +996,7 @@ class EvaluationComponent extends Object
     if (!$this->EvaluationMixeval->save($evalMixeval)){
        return false;
     }
+
     $late = $this->isLate($eventId);
  	  if($late > 0){
  	   if(!$this->saveGradePenalty($groupEventId, $eventId, $evaluator, $late))	return false;

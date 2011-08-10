@@ -539,6 +539,8 @@ function makeSurveyEvaluation ($param = null) {
               $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
           }
           
+
+          
           if ($this->Evaluation->saveRubricEvaluation($this->params)) {
               $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
           }
@@ -585,7 +587,7 @@ function makeSurveyEvaluation ($param = null) {
       if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
           $status = false;
       }
-
+      
       // Apply penalty; if evaluator submitted late
       $late = $this->Evaluation->isLate($eventId); 
       // check to see if the evaluator's submission is late; if so, apply a penalty to the evaluator.
@@ -696,6 +698,11 @@ function makeSurveyEvaluation ($param = null) {
           $status = false;
       }
 
+      $late = $this->Evaluation->isLate($eventId); 
+      if($late){
+        if(!$this->Evaluation->saveGradePenalty($groupEventId, $eventId, $evaluator, $late))	return false;
+      }
+          
       //checks if all members in the group have submitted
       //the number of submission equals the number of members
       //means that this group is ready to review
