@@ -137,28 +137,28 @@ class InstallController extends Controller
       //update parameters
       $username = $this->installHelper->updateSystemParameters($this->params['data']);
       if (!empty($username)) {
-	$this->set('superAdmin', $username);
+        $this->set('superAdmin', $username);
 
         //Create Super Admin
         $my_db =& ConnectionManager::getDataSource('default');
         $my_db->query("INSERT INTO `users` (`id`, `role`, `username`, `password`, `first_name`, `last_name`, `student_no`, `title`, `email`, `last_login`, `last_logout`, `last_accessed`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) 
-          VALUES ('1', 'A', '".$username."', '".md5($this->params['data']['Admin']['password'])."', 'Super', 'Admin', NULL, NULL, '".$this->params['data']['SysParameter']['system.admin_email']."', NULL, NULL, NULL, 'A', '0', '".date("Y-m-d H:i:s", time())."', NULL, NULL)
+          VALUES ('1', 'A', '".$username."', '".md5($this->params['data']['Admin']['password'])."', 'Super', 'Admin', NULL, NULL, '".$this->params['data']['SysParameter']['system.admin_email']."', NULL, NULL, NULL, 'A', '0', '".date("Y-m-d H:i:s")."', NULL, NULL)
           ON DUPLICATE KEY UPDATE password = '".md5($this->params['data']['Admin']['password'])."', email = '".$this->params['data']['SysParameter']['system.admin_email']."';");
-        
+
         //Get Super Admin's id and insert into roles_users table
         $user_id = $my_db->query("SELECT id FROM users WHERE username = '".$username."'");
         $my_db->query("INSERT INTO `roles_users` (`id`, `role_id`, `user_id`, `created`, `modified`)
-          VALUES (NULL, '1', '".$user_id[0]['users']['id']."', '".date("Y-m-d H:i:s", time())."', '".date("Y-m-d H:i:s", time())."');");
-        
+          VALUES (NULL, '1', '".$user_id[0]['users']['id']."', '".date("Y-m-d H:i:s")."', '".date("Y-m-d H:i:s")."');");
+
         // test if the config directory is still writable by http user
         $this->set('config_writable', $writable = is_writable("../config"));
-	$this->render('install5');  
+        $this->render('install5');  
       }	else { 
         //Found error
         $this->set('data', $this->params['data']);
         $this->set('errmsg', __('Configuration of iPeer System Parameters Failed.', true));
         $this->render('install4');
-      }//end if
+      }//end if      
     }	  
   }	
 

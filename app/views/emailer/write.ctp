@@ -40,7 +40,7 @@
             <td>
               <table>
               <tr><td>
-              <?php echo $form->input('Email.date', array('div'=>false, 'label'=> 'Date :', 'type'=>'text', 'size'=>'50','class'=>'input', 'style'=>'width:75%;', 'value'=>date("Y-m-d H:i:s", time()))) ?>&nbsp;&nbsp;
+              <?php echo $form->input('Email.date', array('div'=>false, 'label'=> 'Date :', 'type'=>'text', 'size'=>'50','class'=>'input', 'style'=>'width:75%;', 'value'=>date("Y-m-d H:i:s"))) ?>&nbsp;&nbsp;
               <a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');"><?php echo $html->image('icons/cal.gif',array('align'=>'middle', 'border'=>'0','alt'=>'cal'))?></a>
               <?php echo $form->error('Email.date', 'Please enter a valid date.')?>
               </td></tr>

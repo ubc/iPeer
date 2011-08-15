@@ -1,3 +1,14 @@
+<script type="text/javascript">
+  function validPassword(){
+    var pw = $('password').value;
+    if(!pw){
+      alert("Please Enter a valid password.");
+      return false;
+    }
+    return true;
+  }
+    
+</script>
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" align="center">
 <tr>
 <td align="center">
@@ -134,7 +145,7 @@
   </tr>
   <tr>
     <td colspan="3" align="right">
-    <?php echo $form->submit(__('Install iPeer', true), array('name'=>'next')) ?></br>
+    <?php echo $form->submit(__('Install iPeer', true), array('name'=>'next', 'onClick' => "return validPassword();")) ?></br>
     </td>
   </tr>
   <tr>

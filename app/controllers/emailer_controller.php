@@ -144,7 +144,7 @@ class EmailerController extends AppController
 
         //Set current date if no schedule
         if(!$data['schedule']){
-          $data['date'] = date("Y-m-d H:i:s", time());
+          $data['date'] = date("Y-m-d H:i:s");
         }
         else{
           $tmp_data = array();
