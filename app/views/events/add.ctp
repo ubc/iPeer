@@ -157,6 +157,55 @@
   	<td>
   	</td>
   </tr>
+  
+  <tr class="tablecell2">
+  <td><?php __('Late Penalty:')?></td>
+  <td>
+    <?php
+      echo $form->input('Event.penalty', array(
+           'type' => 'radio',
+           'options' => array('1' => ' - Yes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '0' => ' - No'),
+           'default' => '0',
+           'legend' => false,
+       'onChange'=>"javascript:$('penalty').toggle();return false;"
+        ));
+      ?>
+     <div id = 'penalty' style ='width:400px;'>
+            <?php echo $form->input('PenaltySetup.type', array('value' => 'simple', 'div' => false, 'label' => false));?>
+     <div id="simplePenalty", width="400px">
+         
+              
+    	 <div style="text-align:right"><a href="#" onClick="javascript:$('PenaltySetupType').value = 'advanced'; $('penaltyAdvanced').toggle(); $('simplePenalty').toggle(); 
+        	  return false;">( <?php __('Use Advanced Penalty Scale')?> )</a>
+    	 </div>
+ 
+       Deduct <?php echo $form->input('PenaltySetup.percentagePerDay', array('div'=>false, 'label' => false, 'type'=>'text', 'size' => 5, 'value'=> 20))?> per day
+       </br>
+       For <?php echo $form->input('PenaltySetup.numberOfDays', array('div'=>false, 'label' => false, 'type'=>'text', 'size' => 5, 'value'=> 2))?> days
+       </br>
+       Deduct <?php echo $form->input('PenaltySetup.penaltyAfterSimple', array('div'=>false, 'label' => false, 'type'=>'text', 'size' => 5, 'value'=> 40))?> afterwards
+
+       </br>
+       </div>
+       <div  id = 'penaltyAdvanced' style="display:none">
+        <div style="text-align:right"><a href="#" onClick="javascript:$('PenaltySetupType').value = 'simple'; $('penaltyAdvanced').toggle(); $('simplePenalty').toggle(); return false;">( <?php __('Use Simple Penalty Scale')?> )</a>
+      </div>
+       <table  id = 'penaltyTable'>
+     
+       <tr>
+       <td>Days late</td>
+       <td>Penalty %</td>
+       </tr>
+       </table>
+        Deduct <?php echo $form->input('PenaltySetup.penaltyAfterAdvanced', array('div'=>false, 'label' => false, 'type'=>'text', 'size' => 5, 'value'=> 20))?> afterwards
+       </br>
+       <a onClick = "addDay(<?php ?>)" class="text-button">Add day</a>
+       <a onClick = "removeDay()" class="text-button">Remove day</a>
+       </div>
+  	 </div>
+  </td>
+  <td></td>
+  </tr>  
   <tr class="tablecell2">
     <td><?php __('Groups Assignment:')?>&nbsp;</td>
     <td>
@@ -180,7 +229,37 @@
 	</td>
   </tr>
 </table>
+
+<style type="text/css">
+.percentage{width:50px;}
+</style>
 <script type="text/javascript">
+var i = 0;
+
+
+addDay();
+addDay();
+
+function addDay() {
+	i++ 
+    var day = Builder.node("tr", {id: "penaltyDay" + i}, [ Builder.node("td", {class: "numberOfDays"}, i), 
+                                                          
+                                                           Builder.node("td", {class: "per"},[ 
+																											Builder.node("input", {class: "percentage", name: "data[Penalty][" + i + "][percent_penalty]"})
+																										]), Builder.node("input", {type:"hidden", name:"data[Penalty][" + i + "][days_late]", value: i})                                                 
+                                                   ]);
+    $('penaltyTable').appendChild(day);    
+    
+}
+
+
+function removeDay(){
+
+	$('penaltyDay'+ i).remove();
+	i--;
+	 
+}
+
 
 // create calendar object(s) just after form tag closed
 // specify form element as the only parameter (document.forms['formname'].elements['inputname']);

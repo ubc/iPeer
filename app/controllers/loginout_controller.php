@@ -176,7 +176,6 @@ class LoginoutController extends AppController
 				//sets up the session vars
 				$this->rdAuth->setFromData($this->params['data']['User']);
 
-                //var_dump($this->rdAuth);
 
 				//sets up the system container for accessible functions
 				$accessFunction = $this->SysFunction->getAllAccessibleFunction($this->params['data']['User']['role']);

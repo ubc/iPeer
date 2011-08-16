@@ -328,7 +328,6 @@ class XmlHandlerComponent extends Object {
       	  if ($i > $lineSkip) {
       	    if (($i-2)%($questionCount+2)==0) {
       	      $score[$i-$lineSkip-1]['team_name'] = $item->nodeValue;
-              var_dump($item->nodeValue);
             } elseif (($i-2)%($questionCount+2) <= $questionCount) {
       	      $score[($i-$lineSkip-(($i-2)%($questionCount+2)))-1]['q_'.(($i-1)%($questionCount))] = $item->nodeValue;
             } else {

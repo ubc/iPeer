@@ -543,7 +543,6 @@ class HomeController extends AppController
 
     foreach ($course_list as $row) {
       for ($i = 0; $i < count($row['Event']); $i++) {
-        //var_dump($row['Event']);
         $event_id = $row['Event'][$i]['id'];
         if ($row['Event'][$i]['event_template_type_id'] == 3) {
               $row['Event'][$i]['student_count'] = $row['Course']['student_count'];

@@ -36,7 +36,7 @@ class EventsController extends AppController
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $NeatString;
 	var $Sanitize;
-	var $uses = array('GroupEvent', 'User', 'Group', 'Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers');
+	var $uses = array('GroupEvent', 'User', 'Group', 'Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers', 'Penalty');
   var $components = array("AjaxList", "sysContainer", "Session");
 
   function __construct()
@@ -351,8 +351,32 @@ class EventsController extends AppController
       //Save Data
       if ($this->Event->save($this->params['data'])) {
         //Save Groups for the Event
+        
+        $penaltyType = $this->params['data']['PenaltySetup']['type'];
+        $finalDeduction= array();
+        $finalDeduction['days_late'] = -2;
+        $finalDeduction['event_id'] =  $this->Event->id;
+        $finalDeduction['percent_penalty'] = $this->params['data']['PenaltySetup']['penaltyAfterAdvanced'];
+     
+        if($penaltyType == 'simple'){
+          $finalDeduction['days_late'] = -1;
+          $finalDeduction['penalty_percentage'] = $this->params['data']['PenaltySetup']['penaltyAfterSimple'];
+          for($i = 1; $i <= $this->params['data']['PenaltySetup']['numberOfDays']; $i++){
+            $this->params['data']['Penalty'][$i]['days_late'] = $i;
+            $this->params['data']['Penalty'][$i]['percent_penalty'] = $this->params['data']['PenaltySetup']['percentagePerDay'] * $i;          
+          }             
+        }  
+
+ 
+        foreach($this->params['data']['Penalty'] as $value => $key){
+          $this->params['data']['Penalty'][$value]['event_id'] = $this->Event->id;
+          $this->Penalty->save($this->params['data']['Penalty'][$value]);
+          $this->Penalty->id = null;                
+        }        
+        $this->Penalty->save($finalDeduction);
+
         $this->GroupEvent->insertGroups($this->Event->id, $this->params['data']['Member']);
-        $this->redirect('/events/index/'.__('The event is added successfully.', true));
+        $this->redirect('/events/index/'.__('The event is added successfully.', true));        
       }
       //Found error
       else {
@@ -738,7 +762,7 @@ class EventsController extends AppController
     if (isset($this->params['form']['id']))
     {
       $id = intval(substr($this->params['form']['id'], 5));
-      //var_dump($id);
+
     }   //end if
     if ($this->Event->delete($id)) {
 			$this->redirect('/events/index/'.__('The event is deleted successfully.', true));
