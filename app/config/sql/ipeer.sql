@@ -943,6 +943,27 @@ INSERT INTO `mixevals_questions` (`id`, `mixeval_id`, `question_num`, `title`, `
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `penalties`
+--
+
+CREATE TABLE `penalties` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `event_id` int(11) DEFAULT NULL,
+  `days_late` int(11) NOT NULL,
+  `percent_penalty` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_events` (`event_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=36 ;
+
+--
+-- Constraints for table `penalties`
+--
+ALTER TABLE `penalties`
+  ADD CONSTRAINT `fk_events` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `personalizes`
 --
 
@@ -1402,3 +1423,26 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_grade_penalties`
+--
+
+CREATE TABLE `user_grade_penalties` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `penalty_id` int(11) DEFAULT NULL,
+  `grp_event_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_penalties` (`penalty_id`),
+  KEY `fk_users` (`user_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=15 ;
+
+--
+-- Constraints for table `user_grade_penalties`
+--
+ALTER TABLE `user_grade_penalties`
+  ADD CONSTRAINT `fk_penalties` FOREIGN KEY (`penalty_id`) REFERENCES `penalties` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;

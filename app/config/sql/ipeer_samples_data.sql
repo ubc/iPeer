@@ -1026,6 +1026,27 @@ INSERT INTO `mixevals_questions` (`id`, `mixeval_id`, `question_num`, `title`, `
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `penalties`
+--
+
+CREATE TABLE `penalties` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `event_id` int(11) DEFAULT NULL,
+  `days_late` int(11) NOT NULL,
+  `percent_penalty` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_events` (`event_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=36 ;
+
+--
+-- Constraints for table `penalties`
+--
+ALTER TABLE `penalties`
+  ADD CONSTRAINT `fk_events` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `personalizes`
 --
 
@@ -1742,3 +1763,26 @@ INSERT INTO `users` VALUES (30, 'S', '27879030', '46a7c75feecfdf87ce0b9a1796d7f3
 INSERT INTO `users` VALUES (31, 'S', '10186039', '84c94d12e8b8629c4d4e37879bc7043b', 'Hui', 'Jing', '10186039', NULL, '', NULL, NULL, NULL, 'A', 1, '2006-06-20 15:10:16', NULL, '2006-06-20 15:10:16');
 INSERT INTO `users` VALUES (32, 'S', '19803030', '8328f0ce00854e307cfeda1119e73d26', 'Bowinn', 'Ma', '19803030', NULL, '', NULL, NULL, NULL, 'A', 1, '2006-06-20 15:10:32', NULL, '2006-06-20 15:10:32');
 INSERT INTO `users` VALUES (33, 'S', '51516498', '25cef707046231c80a9d4546744879db', 'Joe', 'Deon', '51516498', NULL, 'joe.deon@ubc.ca', NULL, NULL, NULL, 'A', 1, '2006-06-21 08:44:09', 33, '2006-06-21 08:45:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_grade_penalties`
+--
+
+CREATE TABLE `user_grade_penalties` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `penalty_id` int(11) DEFAULT NULL,
+  `grp_event_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_penalties` (`penalty_id`),
+  KEY `fk_users` (`user_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=15 ;
+
+--
+-- Constraints for table `user_grade_penalties`
+--
+ALTER TABLE `user_grade_penalties`
+  ADD CONSTRAINT `fk_penalties` FOREIGN KEY (`penalty_id`) REFERENCES `penalties` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
