@@ -47,7 +47,7 @@ class ExportHelper2Component extends Object {
   }
   
   function arrayDraw($grid) {
-  	$formatCSV = array();
+  	$formatCSV = '';
   	$xLim = count($grid);
   	$yLim = count($grid[0]);
   	for ($y=0; $y<$yLim; $y++) {
@@ -87,8 +87,9 @@ class ExportHelper2Component extends Object {
   function formatEvaluateeHeaderArray($params, $evaluatee) {
   	$evaluateeHeader = array("Evaluatee :");
   	if(!empty($params['include_student_name'])) {
-  	  array_push($evaluateeHeader, $evaluatee['last_name']);
-  	  array_push($evaluateeHeader, $evaluatee['first_name']);
+  	  /*array_push($evaluateeHeader, $evaluatee['last_name']);
+  	  array_push($evaluateeHeader, $evaluatee['first_name']);*/
+  	  array_push($evaluateeHeader, $evaluatee['first_name'].' '.$evaluatee['last_name']);
   	}
   	if(!empty($params['include_student_id'])) {
   	  array_push($evaluateeHeader, $evaluatee['student_no']);
@@ -145,14 +146,16 @@ class ExportHelper2Component extends Object {
   
   function formatEvaluatorsHeaderArray($evaluators) {
   	$first_name = array(); $last_name = array(); $student_no = array();
+  	$headerArray['name'] = array();
   	$headerArray['last_name'] = array();
   	$headerArray['first_name'] = array();
   	$headerArray['student_no'] = array();
   	$headerArray['email'] = array();
   	
   	foreach($evaluators as $e) {
-  		array_push($headerArray['first_name'], $e['first_name']);
-  		array_push($headerArray['last_name'], $e['last_name']);
+  	//	array_push($headerArray['first_name'], $e['first_name'].' '.$e['last_name']);
+  		array_push($headerArray['name'], $e['first_name'].' '.$e['last_name']);
+  	//	array_push($headerArray['last_name'], $e['last_name']);
   		array_push($headerArray['student_no'], $e['student_no']);
   		array_push($headerArray['email'], $e['email']);
   	}

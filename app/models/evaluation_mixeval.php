@@ -22,7 +22,14 @@ class EvaluationMixeval extends AppModel
         ));
         return $eval; 
     }
-
+    
+    function getReceivedAvgScore($grpEventId=null, $evaluatee=null) {
+        return $this->find('all', array(
+            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
+            'fields' => array('AVG(score) AS received_avg_score')
+        ));
+    }
+    
     // gets Mixeval evaluation result for a specific assignment and evaluator
     function getResultsByEvaluatee($grpEventId=null, $evaluatee=null) {
         //return $this->find('all','grp_event_id='.$grpEventId.' AND evaluatee='.$evaluatee, null, 'evaluator ASC');

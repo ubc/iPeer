@@ -91,7 +91,6 @@ class GroupEvent extends AppModel
   	  }
   	return $this->find('all', array('conditions'=>array('event_id'=>$eventId), 'fields' => 'group_id'));
   }
-
   
   /**
    * Returns list of group events for the correspoding eventId input

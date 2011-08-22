@@ -27,10 +27,14 @@
   </tr>
  <?php if (isset($groupAve)) {?>
   <tr class="tablecell2">
-    <td><?php __('Rating')?>:&nbsp;</td>
+    <td><?php __('Rating')?>: &nbsp;</td>
     <td colspan="3"><?php
       if ($gradeReleaseStatus) {
-        echo number_format($aveScore, 2);
+      	$finalAvg = $aveScore - $ratingPenalty;
+      	$ratingPenalty > 0 ? $stringAddOn = ' - '.'('."<font color=\"red\">".$ratingPenalty."</font>".')'."<font color=\"red\">*</font>".' = '.number_format($finalAvg, 2):
+      						 $stringAddon = '';
+        echo number_format($aveScore, 2).$stringAddOn;
+        echo "&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp ( )"."<font color=\"red\">*</font>"." : Denotes late penalty.";
       } else {
         echo __('Not Released', true);
       } ?></td>

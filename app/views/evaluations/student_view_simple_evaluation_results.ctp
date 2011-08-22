@@ -3,7 +3,7 @@
     <td>
 	<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
 	  <?php
-    $params = array('controller'=>'evaluations', 'event'=>$event, 'gradeReleaseStatus'=>$studentResult['gradeReleaseStatus'], 'aveScore'=>isset($studentResult['aveScore'])? $studentResult['aveScore']: 0, 'groupAve'=>isset($studentResult['groupAve'])? $studentResult['groupAve']: 0);
+    $params = array('controller'=>'evaluations', 'event'=>$event, 'ratingPenalty' => $studentResult['avePenalty'], 'gradeReleaseStatus'=>$studentResult['gradeReleaseStatus'], 'aveScore'=>isset($studentResult['aveScore'])? $studentResult['aveScore']: 0, 'groupAve'=>isset($studentResult['groupAve'])? $studentResult['groupAve']: 0);
     echo $this->element('evaluations/student_view_event_info', $params);
     ?>
 

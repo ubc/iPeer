@@ -34,14 +34,14 @@ class GroupsController extends AppController
 {
   var $name = 'Groups';
 	var $uses =  array('Group','GroupsMembers', 'User','UserEnrol','Personalize','GroupEvent');
-  var $show;
+  	var $show;
 	var $sortBy;
 	var $direction;
 	var $page;
 	var $order;
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $Sanitize;
-  var $components = array('AjaxList');
+  	var $components = array('AjaxList', 'ExportBaseNew', 'ExportCsv');
 
 
     function __construct()
@@ -214,7 +214,7 @@ class GroupsController extends AppController
     $user_data = $this->User->getEnrolledStudentsForList($course_id);
 
     //Check if student is already assigned in a group
-    $groups = $this->Group->getGroupsByCouseId($course_id);;
+    $groups = $this->Group->getGroupsByCouseId($course_id);
     $assigned_users = $this->GroupsMembers->getUserListInGroups($groups);
     foreach($assigned_users as $assigned_user){
       $user_data[$assigned_user] = $user_data[$assigned_user].'*';
@@ -564,6 +564,42 @@ class GroupsController extends AppController
 		{
 			$this->params['data'] = $this->Personalize->updateAttribute($this->Auth->user('id'), $attributeCode, $attributeValue);
 		}
+	}
+	
+	function export($courseId) {	
+      $this->set('courseId', $courseId);
+      if (isset($this->params['form']) && !empty($this->params['form'])) {
+      	// check that at least one group has been selected
+      	if(empty($this->data['Member']['Member'])) {
+      	  $this->Session->setFlash("Please select at least one group to export.");
+      	  $this->redirect('');
+      	}
+      	$this->autoRender = false;
+      	$fileContent = '';
+      	$groups = $this->data['Member']['Member'];
+        if(!empty($this->params['form']['include_group_names'])) {
+	  	  $fileContent .= "Group Name,";
+	  	}
+	    if(!empty($this->params['form']['include_student_id'])) {
+	  	  $fileContent .= "Student #,";
+	  	}
+	   	if(!empty($this->params['form']['include_student_name'])) {
+	   	  $fileContent .= "Last Name, First Name,";
+	  	}
+	  	if(!empty($this->params['form']['include_student_email'])) {
+		  $fileContent .= "Email Address\n\n";
+	  	}
+      	foreach ($groups as $groupId) {
+		  $fileContent .= $this->ExportCsv->buildGroupExportCsvByGroup($this->params['form'], $groupId);
+      	}
+        header('Content-Type: application/csv');
+        header('Content-Disposition: attachment; filename=' .$this->params['form']['file_name']. '.csv');
+        echo $fileContent;
+      } else {
+      	// format data
+        $unassignedGroups = $this->Group->find('list', array('conditions'=> array('course_id'=>$courseId), 'fields'=>array('group_name')));
+        $this->set('unassignedGroups', $unassignedGroups);
+      }
 	}
 
 /*    function getFilteredStudent()

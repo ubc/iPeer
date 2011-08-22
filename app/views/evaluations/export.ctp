@@ -5,15 +5,13 @@
       <input type="hidden" name="assigned" id="assigned"/>
       <table width="85%" border="0" align="center" cellpadding="4" cellspacing="2">
       	<tr><td style="color:darkred; font-size:smaller"> *Please check at least one of similarly coloured fields</td></tr>
-        <tr class="tableheader">
-       
+        <tr class="tableheader"> 
           <td colspan="3" align="center">Export Evaluation Results</td>
         </tr>
         <tr class="tablecell2">
           <td width="30%">Export Filename:</td><td width="40%"><input type="text" name="file_name" value="<?php if(isset($file_name)) echo $file_name;?>" /></td><td width="30%"></td>
         </tr>
         <tr class="tablecell2">
-        
           <td width="30%">Export File Type:</td><td width="40%"><select name="export_type" class= "export_type"><option value="excel">excel</option><option value="csv">csv</option></select></td> <td></td>
         </tr>
         <tr class="tablesubheader">
@@ -49,7 +47,6 @@
         <tr class="tablecell2">
           <td>Include Student Email:</td><td><input type="checkbox" name="include_student_email" checked /></td><td></td>
         </tr>
-
  	<?php 
  		switch($eventType){
  		  //Simple Evaluation

@@ -28,6 +28,7 @@
 <?php } ?>
 
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+  <?php echo '<font size = "1" face = "arial" color = "red" > &nbsp &nbsp *Numerics in red denotes late submission penalty.</font>';?>
   <tr class="tableheader">
     <td width="10" height="32" align="center" colspan="<?php echo count($groupMembers) +1; ?>"><?php __('Evaluation Results')?>:</td>
   </tr>
@@ -62,12 +63,20 @@
     		  echo '</tr>';
     	  }   ?>
   <tr class="tablesummary">
-    	<td><?php __('Total Received')?></td>
+    	<td><?php __('Total Received');?></td>
       <?php
       $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;
        foreach ($groupMembers as $member_col) {
         if (isset($memberScoreSummary[$member_col['User']['id']])) {
-          echo '<td>'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'],2).' - '.'</td>' . "\n\t\t";
+          $totalGrade = number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'],2);
+          $gradePenalty = ($penalties[$member_col['User']['id']] / 100) * $totalGrade;
+          $finalGrade = $totalGrade - $gradePenalty;
+          
+          (!empty($gradePenalty) && $gradePenalty > 0) ? $stringAddOn = ' - ('."<font color=\"red\">".$gradePenalty."</font>".")".
+          	   								 				"<font color=\"red\">".'*'."</font>".' = '.$finalGrade :
+          					  							 $stringAddOn = ''; 
+          
+          echo '<td>'.$totalGrade.$stringAddOn.'</td>'."\n\t\t";
       
         } else {
          echo '<td> - </td>';
@@ -95,21 +104,24 @@
       <?php
       $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;
        foreach ($groupMembers as $member_col) {
+       	$totalScore = $memberScoreSummary[$member_col['User']['id']]['received_total_score'];
+       	$gradePenalty = ($penalties[$member_col['User']['id']] / 100) * $totalScore;
+       	$finalGrade = $totalScore - $gradePenalty;
         if (isset($memberScoreSummary[$member_col['User']['id']])) {
           if (!empty($incompletedMembersArr) && in_array($member_col['User']['first_name'].' '.$member_col['User']['last_name'], $incompletedMembersArr)) {
             if ($memberEvaluatedCount > count($inCompletedMembers)) {
-              echo '<td>'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'] / ($memberEvaluatedCount-(count($inCompletedMembers))+1), 2).'</td>' . "\n\t\t";
+              echo '<td>'.number_format($finalGrade / ($memberEvaluatedCount-(count($inCompletedMembers))+1), 2).'</td>' . "\n\t\t";
             }
             else {
-              echo '<td>'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score']) . "\n\t\t";
+              echo '<td>'.number_format($finalGrade) . "\n\t\t";
             }
           }
           else {
             if ($memberEvaluatedCount > count($inCompletedMembers)) {
-              echo '<td>'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'] / ($memberEvaluatedCount-count($inCompletedMembers)), 2).'</td>' . "\n\t\t";
+              echo '<td>'.number_format($finalGrade / ($memberEvaluatedCount-count($inCompletedMembers)), 2).'</td>' . "\n\t\t";
             }
             else {
-              echo '<td>'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score']) . "\n\t\t";
+              echo '<td>'.number_format($finalGrade) . "\n\t\t";
             }
           }
         } else {

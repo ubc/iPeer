@@ -1,11 +1,51 @@
 <?php
 
 class ExportBaseNewComponent extends Object {
-
-  var $globUsersArr = array();
-  var $globEventId;
-  var $mixedEvalNumeric;
+	
   var $components = array('ExportHelper2');
+  
+  function generateHeader2($params, $eventId, $type){
+  	$this->Course = ClassRegistry::init('Course');
+  	$this->Event = ClassRegistry::init('Event');
+  	$this->UserCourse = ClassRegistry::init('UserCourse');
+  	$this->GroupEvent = ClassRegistry::init('GroupEvent');
+  	$this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
+  	$eventType = array('1' => 'Simple Evaluation', '2' => 'Rubrics Evaluation', '4' => 'Mixed Evaluation');
+  		
+  	$courseId = $this->Event->getCourseByEventId($eventId);
+  	$event = $this->Event->getEventById($eventId);
+  	$course = $this->Course->getCourseById($courseId);
+
+  	$grid = $this->ExportHelper2->buildExporterGrid(8, 8);
+  	$grid[0][0] = "********************************************";
+  	$yIndex = 1;
+    if(!empty($params['include_course'])) {
+      $grid[0][$yIndex] = "Course Name : ,,".$course['Course']['title'];
+    }
+    if(!empty($params['include_eval_event_names'])) { 
+	  $yIndex++;
+	  $grid[0][$yIndex] = "Event : ,,".$event['Event']['title'];
+    }
+    if(!empty($params['include_eval_event_type'])) {
+      $yIndex++;
+  	  $grid[0][$yIndex] = "Evaluation Type : ,,".$eventType[$event['Event']['event_template_type_id']];
+  	}
+    if(!empty($params['include_date'])) {
+      $yIndex += 2;
+  	  $grid[0][$yIndex] = "Date : ,,".date("F j Y g:i a");
+  	}
+  	$yIndex++;
+  	$grid[0][$yIndex] = "********************************************";
+  	if($type == 'CSV') {
+  	  return $this->ExportHelper2->arrayDraw($grid);
+  	}
+  	else {
+  	  for($y=1; $y<count($grid); $y++) {
+		$grid[0][$y] = str_replace(array(","), "", $grid[0][$y]);
+  	  }
+  	  return $grid;
+  	}
+  }
   
   function generateHeader($params, $eventId){
   	$this->Course = ClassRegistry::init('Course');
@@ -37,10 +77,10 @@ class ExportBaseNewComponent extends Object {
   	  $header .= "Date : ,,".date("F j Y g:i a")."\n";
   	}
   	if(!empty($params['include_instructors'])) {
-  		$header .= "Instructors :,,";
+  	  $header .= "Instructors :,,";
   	  foreach($instructors as $i) {
   	  	$header .= $i['first_name']." ".$i['last_name'].",\n";
-  	  }
+  	   }
   	}
   	$header .= "********************************************\n";
   	return $header;
@@ -51,6 +91,8 @@ class ExportBaseNewComponent extends Object {
   	$this->Group = ClassRegistry::init('Group');
   	$this->User = ClassRegistry::init('User');
   	$this->EvaluationSimple = ClassRegistry::init('EvaluationSimple');
+  	$this->UserGradePenalty = ClassRegistry::init('UserGradePenalty');
+  	$this->Penalty = ClassRegistry::init('Penalty');
   	
   	$grpEvent = $this->GroupEvent->getGrpEvent($grpEventId);
   	$group = $this->Group->getGroupByGroupId($grpEvent['GroupEvent']['group_id']);
@@ -71,12 +113,17 @@ class ExportBaseNewComponent extends Object {
   	    array_push($row, $group[0]['Group']['group_name']);
   	  }
   	  if(!empty($params['include_student_email'])) {
-  	  	array_push($row, $evaluator['email']);
+  	  	array_push($row, $evaluatee['User']['email']);
   	  }
   	  if(!empty($params['include_student_name'])) {
   	    array_push($row, $evaluatee['User']['first_name']." ".$evaluatee['User']['last_name']);
-  	    array_push($row, $evaluator['first_name']." ".$evaluator['last_name']);
-  	  }  
+  	  }
+   	  if(!empty($params['include_student_id'])) {
+  	    array_push($row, $evaluatee['User']['student_no']);
+  	  }
+  	  if(!empty($params['include_student_name'])) {
+  	  	array_push($row, $evaluator['first_name']." ".$evaluator['last_name']);
+  	  }
   	  if(!empty($params['include_student_id'])) {
   	    array_push($row, $evaluator['student_no']);
   	  }
@@ -93,7 +140,16 @@ class ExportBaseNewComponent extends Object {
   	  	continue;
   	  }
   	  array_push($row, $simpleEvalResults[$index]['EvaluationSimple']['score']);
-  	  $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition + $yInc, $row);
+  	  $userPenalty = $this->UserGradePenalty->getByUserIdGrpEventId($grpEventId, $evaluateeId);
+  	  $penalty = $this->Penalty->getPenaltyById($userPenalty['UserGradePenalty']['penalty_id']);
+  	  if(!empty($penalty)) {
+  	  	array_push($row, $penalty['Penalty']['percent_penalty']."%");
+  	  } else {
+  	  	array_push($row, "0%");
+  	  }
+  	  $finalGrade = $simpleEvalResults[$index]['EvaluationSimple']['score'] * (1 - ($penalty['Penalty']['percent_penalty']/100));
+  	  array_push($row, $finalGrade);
+	  $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition + $yInc, $row);
   	  $index++;
   	  $yInc++;
   	}
@@ -105,7 +161,7 @@ class ExportBaseNewComponent extends Object {
   	$csv = '';
   	foreach($groupMembers as $evaluatee) {
   	  $resultTable = $this->buildSimpleEvaluationScoreTableByEvaluatee($params, $grpEventId, $evaluatee);
-  	  $csv .= $resultTable."\n";
+  	  $csv .= $resultTable;
   	}
   	return $csv;
   }
@@ -127,6 +183,8 @@ class ExportBaseNewComponent extends Object {
   	$this->User = ClassRegistry::init('User');
   	$this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
   	$this->EvaluationMixevalDetail = ClassRegistry::init('EvaluationMixevalDetail');
+  	$this->UserGradePenalty = ClassRegistry::init('UserGradePenalty');
+  	$this->Penalty = ClassRegistry::init('Penalty');
   	
   	$grpEvent = $this->GroupEvent->getGrpEvent($grpEventId);
   	$group = $this->Group->getGroupByGroupId($grpEvent['GroupEvent']['group_id']);
@@ -135,7 +193,7 @@ class ExportBaseNewComponent extends Object {
   	$questions = $this->ExportHelper2->getEvaluationQuestions($grpEventId);
   	
   	// Creat grid
-  	$xDimension = 7 + count($questions);
+  	$xDimension = 10 + count($questions);
   	$yDimensions = count($groupMembers);
   	$grid = $this->ExportHelper2->buildExporterGrid($xDimension, $yDimensions);
   	$xPosition = 0;
@@ -149,12 +207,17 @@ class ExportBaseNewComponent extends Object {
   	    array_push($row, $group[0]['Group']['group_name']);
   	  }
   	  if(!empty($params['include_student_email'])) {
-  	  	array_push($row, $evaluator['email']);
+  	  	array_push($row, $evaluatee['User']['email']);
   	  }
   	  if(!empty($params['include_student_name'])) {
   	    array_push($row, $evaluatee['User']['first_name']." ".$evaluatee['User']['last_name']);
-  	    array_push($row, $evaluator['first_name']." ".$evaluator['last_name']);
-  	  }  
+  	  }
+  	  if(!empty($params['include_student_id'])) {
+  	  	array_push($row, $evaluatee['User']['student_no']);
+  	  }
+  	  if(!empty($params['include_student_name'])) {
+  	  	array_push($row, $evaluator['first_name']." ".$evaluator['last_name']);
+  	  }
   	  if(!empty($params['include_student_id'])) {
   	    array_push($row, $evaluator['student_no']);
   	  }
@@ -170,7 +233,16 @@ class ExportBaseNewComponent extends Object {
 	  foreach($mixEvalResults as $result) {
 	  	array_push($row, $result['EvaluationMixevalDetail']['grade']);
 	  }
-	  array_push($row, $result['EvaluationMixevalDetail']['question_comment']);	
+	  array_push($row, $mixEval['EvaluationMixeval']['score']);
+  	  $userPenalty = $this->UserGradePenalty->getByUserIdGrpEventId($grpEventId, $evaluateeId);
+  	  $penalty = $this->Penalty->getPenaltyById($userPenalty['UserGradePenalty']['penalty_id']);
+  	  if(!empty($penalty)) {
+  	  	array_push($row, $penalty['Penalty']['percent_penalty']."%");
+  	  } else {
+  	  	array_push($row, "0%");
+  	  }
+  	  $finalGrade = $mixEval['EvaluationMixeval']['score'] * (1 - ($penalty['Penalty']['percent_penalty']/100));
+  	  array_push($row, $finalGrade);
 	  $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition + $yInc, $row);
 	  $yInc++;
   	}
@@ -182,8 +254,9 @@ class ExportBaseNewComponent extends Object {
   	$csv = '';
   	foreach($groupMembers as $evalutee) {
   	   $resultTable =  $this->buildMixedEvalScoreTableByEvaluatee($params, $grpEventId, $evalutee['id']);
-  	   $csv .= $resultTable."\n";
+  	   $csv .= $resultTable;
   	}
+  	$csv .= "\n";
   	return $csv;
   }
   
@@ -203,6 +276,8 @@ class ExportBaseNewComponent extends Object {
   	$this->Group = ClassRegistry::init('Group');
   	$this->User = ClassRegistry::init('User');
 	$this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
+	$this->UserGradePenalty = ClassRegistry::init('UserGradePenalty');
+	$this->Penalty = ClassRegistry::init('Penalty');
   	
   	$grpEvent = $this->GroupEvent->getGrpEvent($grpEventId);
   	$group = $this->Group->getGroupByGroupId($grpEvent['GroupEvent']['group_id']);
@@ -211,7 +286,7 @@ class ExportBaseNewComponent extends Object {
   	$questions = $this->ExportHelper2->getEvaluationQuestions($grpEventId);
   	
   	// Creat grid
-  	$xDimension = 7 + count($questions);
+  	$xDimension = 10 + count($questions);
   	$yDimensions = count($groupMembers);
   	$grid = $this->ExportHelper2->buildExporterGrid($xDimension, $yDimensions);
   	$xPosition = 0;
@@ -225,12 +300,17 @@ class ExportBaseNewComponent extends Object {
   	    array_push($row, $group[0]['Group']['group_name']);
   	  }
   	  if(!empty($params['include_student_email'])) {
-  	  	array_push($row, $evaluator['email']);
+  	  	array_push($row, $evaluatee['User']['email']);
   	  }
   	  if(!empty($params['include_student_name'])) {
   	    array_push($row, $evaluatee['User']['first_name']." ".$evaluatee['User']['last_name']);
-  	    array_push($row, $evaluator['first_name']." ".$evaluator['last_name']);
-  	  }  
+  	  }
+  	  if(!empty($params['include_student_id'])) {
+  	  	array_push($row, $evaluatee['User']['student_no']);
+  	  }
+  	  if(!empty($params['include_student_name'])) {
+  	  	array_push($row, $evaluator['first_name']." ".$evaluator['last_name']);
+  	  }
   	  if(!empty($params['include_student_id'])) {
   	    array_push($row, $evaluator['student_no']);
   	  }
@@ -245,7 +325,17 @@ class ExportBaseNewComponent extends Object {
   	  foreach($rubricsEvalResult as $result) {
   	  	array_push($row, $result['grade']);
   	  }
-  	  $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition+$yInc, $row);
+  	  array_push($row, $rubricsEvaluation['EvaluationRubric']['score']);
+  	  $userPenalty = $this->UserGradePenalty->getByUserIdGrpEventId($grpEventId, $evaluateeId);
+  	  $penalty = $this->Penalty->getPenaltyById($userPenalty['UserGradePenalty']['penalty_id']);
+  	  if(!empty($penalty)) {
+  	  	array_push($row, $penalty['Penalty']['percent_penalty']."%");
+  	  } else {
+  	  	array_push($row, "0%");
+  	  }
+  	  $finalGrade = $rubricsEvaluation['EvaluationRubric']['score'] * (1 - ($penalty['Penalty']['percent_penalty']/100));
+  	  array_push($row, $finalGrade);
+	  $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition + $yInc, $row);
   	  $yInc++;
   	}
   	return $this->ExportHelper2->arrayDraw($grid);
@@ -369,7 +459,7 @@ class ExportBaseNewComponent extends Object {
   	  }
   	  $commentRowYPos += $sectionSpacing; 
   	  $headerYPos += $sectionSpacing;
-  	}
+  	} 
 	$csv = $this->ExportHelper2->arrayDraw($grid);
 	return $csv;
   }
@@ -398,9 +488,7 @@ class ExportBaseNewComponent extends Object {
   	$evaluatorHeaderArray = $this->ExportHelper2->formatEvaluatorsHeaderArray($groupMembers);
   	if(!empty($params['include_student_name'])) {
   	  $grid[$xPosition+1][$yPosition] = "Evaluators :";
- 	  $this->ExportHelper2->fillGridHorizonally($grid, $xPosition + 3, $yPosition, $evaluatorHeaderArray['first_name']);
- 	  $yPosition++;
-	  $this->ExportHelper2->fillGridHorizonally($grid, $xPosition + 3, $yPosition, $evaluatorHeaderArray['last_name']);
+ 	  $this->ExportHelper2->fillGridHorizonally($grid, $xPosition + 3, $yPosition, $evaluatorHeaderArray['name']);
   	}
   	if(!empty($params['include_student_id'])) {
   	  $yPosition++;
@@ -416,7 +504,7 @@ class ExportBaseNewComponent extends Object {
 	$questionArray = array();
 	// Insert in question column
 	foreach($questions as $q) {
-	  array_push($questionArray, $q['RubricsCriteria']['criteria']);
+	  array_push($questionArray, $q['RubricsCriteria']['criteria']." ( /".$q['RubricsCriteria']['multiplier'].")");
 	}
 	$this->ExportHelper2->fillGridVertically($grid, $yPosition + 2, $xPosition + 1, $questionArray);
 	$xPosition += 2;
@@ -475,9 +563,7 @@ class ExportBaseNewComponent extends Object {
   	 $evaluatorHeaderArray = $this->ExportHelper2->formatEvaluatorsHeaderArray($groupMembers);
   	 if(!empty($params['include_student_name'])) {
   	   $grid[$xPosition + 1][$yPosition] = "Evaluators :";
- 	   $this->ExportHelper2->fillGridHorizonally($grid, $xPosition + 3, $yPosition, $evaluatorHeaderArray['first_name']);
- 	   $yPosition++;
-	   $this->ExportHelper2->fillGridHorizonally($grid, $xPosition + 3, $yPosition, $evaluatorHeaderArray['last_name']);
+ 	   $this->ExportHelper2->fillGridHorizonally($grid, $xPosition + 3, $yPosition, $evaluatorHeaderArray['name']);
   	 }
   	 if(!empty($params['include_student_id'])) {
   	   $yPosition++;
@@ -495,7 +581,7 @@ class ExportBaseNewComponent extends Object {
 	 foreach($questions as $q) {
 	 	$totalScore = 0;
 	  	$row = array();
-	  	array_push($row, $q['MixevalsQuestion']['title'],'');
+	  	array_push($row, $q['MixevalsQuestion']['title'].' (/'.$q['MixevalsQuestion']['multiplier'].')'.',');
 	 	foreach($groupMembers as $evaluator) {
 		  $evalResult = $this->EvaluationMixeval->getResultDetailByQuestion($grpEventId, $evaluatee['id'],
 									$evaluator['id'], $q['MixevalsQuestion']['question_num']);
@@ -553,9 +639,9 @@ class ExportBaseNewComponent extends Object {
   	$xRange = 9 + count($groupMembers); 
   	$yRange = 6 + count($groupMembers);
   	$grid = $this->ExportHelper2->buildExporterGrid($xRange, $yRange);
-  	$grid[1][1] = "Simple Evaluation Grades Table :";
+  	$grid[0][1] = "Simple Evaluation Grades Table :";
     $evaluatorsArray = $this->ExportHelper2->formatEvaluatorsHeaderArray($groupMembers);
-    $xPosition = 2;
+    $xPosition = 0;
     // Fill in Evaluatee Rows
     if(!empty($params['include_student_email'])) {
       $this->ExportHelper2->fillGridVertically($grid, 6, $xPosition, $evaluatorsArray['email']);
@@ -566,9 +652,7 @@ class ExportBaseNewComponent extends Object {
     }
     if(!empty($params['include_student_name'])) {
       $xPosition++;
-      $this->ExportHelper2->fillGridVertically($grid, 6, $xPosition, $evaluatorsArray['first_name']);
-      $xPosition++;
-      $this->ExportHelper2->fillGridVertically($grid, 6, $xPosition, $evaluatorsArray['last_name']);
+      $this->ExportHelper2->fillGridVertically($grid, 6, $xPosition, $evaluatorsArray['name']);
     }
 
     $xPosition ++;
@@ -595,9 +679,11 @@ class ExportBaseNewComponent extends Object {
   	// Fill in Evaluator Columns
 	$yPosition = 5;
     if(!empty($params['include_student_name'])) {
-	  $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition, $evaluatorsArray['last_name']);
+	  /*$this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition, $evaluatorsArray['last_name']);
 	  $yPosition--;
-      $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition, $evaluatorsArray['first_name']);
+	  $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition, $evaluatorsArray['first_name']);*/
+      $yPosition--;
+	  $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition, $evaluatorsArray['name']);
     }
     if(!empty($params['include_student_id'])) {
       $yPosition--;
@@ -632,17 +718,6 @@ class ExportBaseNewComponent extends Object {
 						($evalType = 'EvaluationRubric') &&
 						($commentType = 'general_comment');
     $yRowPosition = 2;
-    /*
-    foreach($evalResults as $result) {
-   	  $evaluator = $result['User'];
-	  // Insert evaluator rows, we can utilize the format evaluatee header function with some modifications
-	  $evaluatorRow = $this->ExportHelper2->formatEvaluateeHeaderArray($params, $evaluator);
-	  array_shift($evaluatorRow);
-	  array_pop($evaluatorRow);
-	  array_push($evaluatorRow, $result[$evalType][$commentType]);
-	  $this->ExportHelper2->fillGridHorizonally($grid, $xPosition + 1, $yRowPosition, $evaluatorRow);
-	  $yRowPosition++;
-    }*/
     for($i=0; $i<count($groupMembers); $i++) {
       $evaluator = $groupMembers[$i];
       // Insert evaluator rows, we can utilize the format evaluatee header function with some modifications

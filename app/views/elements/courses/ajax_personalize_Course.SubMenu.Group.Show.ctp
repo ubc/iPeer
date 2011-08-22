@@ -16,6 +16,15 @@
                                                        array('escape' => false))?>
       </a></td>
   </tr>
+  <tr>
+    <td width="10" bgcolor="#FFB66F">&nbsp;</td>
+    <td width="96%" class="tablecell">
+    <?php echo $this->Html->link($this->Html->image('layout/yellow_arrow.gif',array('valign'=>'middle', 'border'=>'0', 'alt'=>'yellow_arrow')).'&nbsp;Export Groups Infomation', 
+                                 '/groups/export/'.$course_id, 
+                                 array('escape' => false))?>
+    </td>
+  </tr>
+  <tr>
 <!--  <tr>
     <td bgcolor="#FFB66F">&nbsp;</td>
     <td class="tablecell"><?php echo $html->image('layout/yellow_arrow.gif',array('align'=>'middle','alt'=>'yellow_arrow'))?> &nbsp;<?php __('Send Group Email')?>

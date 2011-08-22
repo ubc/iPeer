@@ -24,7 +24,8 @@
  * @subpackage
  * @since
  */
-
+App::import('Vendor','PHPExcel',array('file' => 'excel/PHPExcel.php'));
+App::import('Vendor','PHPExcelWriter',array('file' => 'excel/PHPExcel/Writer/Excel5.php'));
 class CoursesController extends AppController
 {
 	var $name = 'Courses';
@@ -35,9 +36,17 @@ class CoursesController extends AppController
 	var $page;
 	var $order;
 	var $Sanitize;
-	var $helpers = array('Html','Ajax','Javascript','Time','Pagination', 'Js' => array('Prototype'));
-	var $components = array('ExportBaseNew', 'AjaxList', 'ExportCsv');
+	var $helpers = array('Html','Ajax', 'excel', 'Javascript','Time','Pagination', 'Js' => array('Prototype'));
+	var $components = array('ExportBaseNew', 'AjaxList', 'ExportCsv', 'ExportExcel');
 
+	function export() {
+	  	
+	  $params = $this->inputParams();
+	  $resultTable = $this->ExportBaseNew->buildSimpleEvalResults(31, $params);	
+	  $excelExporter = $this->ExportExcel->drawToExcelSheetAtCoordinates($resultTable, 33, 33);
+		
+	}
+	
 	function __construct() {
 		$this->Sanitize = new Sanitize;
 		$this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
@@ -103,9 +112,6 @@ class CoursesController extends AppController
   }
   
   function index() {
-  	
-  	echo "This is <font color=\"red\">blue</font>!";
-  	
     // Set up the basic static ajax list variables
     $this->setUpAjaxList();
     // Set the display list
@@ -349,5 +355,4 @@ class CoursesController extends AppController
   return $params;
   }
 }
-
 ?>

@@ -277,27 +277,35 @@ class EvaluationComponent extends Object
   function formatStudentViewOfSimpleEvaluationResult($event=null){
     $this->EvaluationSimple = ClassRegistry::init('EvaluationSimple');
     $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
+    $this->UserGradePenalty = ClassRegistry::init('UserGradePenalty');
+    $this->User = ClassRegistry::init('User');
+    $this->Penalty = ClassRegistry::init('Penalty');
+    
     $gradeReleaseStatus = 0;
     $aveScore = 0; 
     $groupAve = 0;
     $studentResult = array();
+    $results = $this->EvaluationSimple->getResultsByEvaluatee($event['group_event_id'], $this->Auth->user('id'));
     
-  $results = $this->EvaluationSimple->getResultsByEvaluatee($event['group_event_id'], $this->Auth->user('id'));
     if ($results !=null) {
       //Get Grade Release: grade_release will be the same for all evaluatee records
       $gradeReleaseStatus = $results[0]['EvaluationSimple']['grade_release'];
       if ($gradeReleaseStatus) {
         //Grade is released; retrieve all grades
         //Get total mark each member received
-	$receivedTotalScore = $this->EvaluationSimple->getReceivedTotalScore(
+		$receivedTotalScore = $this->EvaluationSimple->getReceivedTotalScore(
         $event['group_event_id'], $this->Auth->user('id'));
-  	$totalScore = $receivedTotalScore[0][0]['received_total_score'];	
+	  	$totalScore = $receivedTotalScore[0][0]['received_total_score'];	
         $numMemberSubmissions = $this->EvaluationSimple->find('count',array(
             'conditions' => array(
                 'EvaluationSimple.evaluatee' => $this->Auth->user('id'),
                 'EvaluationSimple.event_id' => $event['Event']['id'],
                 'EvaluationSimple.grp_event_id' => $event['group_event_id'])));
 
+        $userPenalty = $this->UserGradePenalty->getByUserIdGrpEventId($event['group_event_id'], $this->Auth->user('id'));
+        $scorePenalty = $this->Penalty->getPenaltyById($userPenalty['UserGradePenalty']['penalty_id']);
+		$subtractAvgScore = ((($scorePenalty['Penalty']['percent_penalty']) / 100) * $totalScore) / $numMemberSubmissions;
+		
         $aveScore = $totalScore / $numMemberSubmissions;
         $studentResult['numMembers'] = $numMemberSubmissions;
         $studentResult['receivedNum'] = count($receivedTotalScore);
@@ -305,20 +313,31 @@ class EvaluationComponent extends Object
         $tmp_total = 0;
         $avg = $this->EvaluationSimple->find('all', array(
             'conditions' => array('EvaluationSimple.grp_event_id' => $event['group_event_id']),
-            'fields' => array('AVG(score) as avg'),
+            'fields' => array('AVG(score) as avg', 'sum(score) as sum','evaluatee'),
             'group' => 'evaluatee'
         ));
-        if(isset($avg)){
-          foreach($avg as $a){
-            $tmp_total += $a['0']['avg'];
+        
+        if(isset($avg)) {
+       	  $i = 0;
+       	  // Deduct marks if the evaluator submitted a late evaluation.
+          foreach($avg as $a) {
+            $userId = $a['EvaluationSimple']['evaluatee'];
+            $userPenalty = $this->UserGradePenalty->getByUserIdGrpEventId($event['group_event_id'], $userId);
+            $avgSubtract = 0;
+            if(!empty($userPenalty)) {
+              $penalty = $this->Penalty->getPenaltyById($userPenalty['UserGradePenalty']['penalty_id']);
+              $avgSubtract = ($penalty['Penalty']['percent_penalty'] / 100) * ($avg[$i][0]['sum']) / $numMemberSubmissions;
+            }
+            $tmp_total += $a['0']['avg'] - $avgSubtract;
+            $i++;
           }
         }
         $groupAve = $tmp_total/count($avg);
        }
-
+	   $studentResult['avePenalty'] = $subtractAvgScore;
        $studentResult['aveScore'] = $aveScore;
        $studentResult['groupAve'] = $groupAve;
-
+       
        //Get Comment Release: release_status will be the same for all evaluatee
        $commentReleaseStatus = $results['0']['EvaluationSimple']['release_status'];
        if ($commentReleaseStatus) {
@@ -1094,14 +1113,13 @@ class EvaluationComponent extends Object
             //Get total mark each member received
             $receivedTotalScore = $this->EvaluationMixeval->getReceivedTotalScore(
               $event['group_event_id'],$userId);
-            $receivedAvgScore = $this->EvaluationMixeval->getReceivedAvgScore(
-              $event['group_event_id'],$userId);
+            $receivedAvgScore = $this->EvaluationMixeval->getReceivedAvgScore($event['group_event_id'],$userId);
             $ttlEvaluatorCount = $this->EvaluationMixeval->getReceivedTotalEvaluatorCount(
               $event['group_event_id'],$userId);
             if ($ttlEvaluatorCount > 0 ) {
               $memberScoreSummary[$userId]['received_count'] = $ttlEvaluatorCount;
-              $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0][0]['received_total_score'];
-              $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0][0]['received_total_score'] /
+              $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0]['received_total_score'];
+              $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0]['received_total_score'] /
               $ttlEvaluatorCount;
             }
             // $memberScoreSummary =   $receivedTotalScore;
@@ -1728,6 +1746,18 @@ class EvaluationComponent extends Object
     return $questions;
   }
 
+  function formatPenaltyArray($grpEventId, $groupMembers) {
+  	$this->UserGradePenalty = ClassRegistry::init('UserGradePenalty');
+  	$this->Penalty = ClassRegistry::init('Penalty');
+	$userPenalty = array();
+	foreach($groupMembers as $evaluatee) {
+	  $userGradePenalty = $this->UserGradePenalty->getByUserIdGrpEventId($grpEventId, $evaluatee['User']['id']);
+	  $penalty = $this->Penalty->getPenaltyById($userGradePenalty['UserGradePenalty']['penalty_id']);
+ 	  $userPenalty[$evaluatee['User']['id']] = $penalty['Penalty']['percent_penalty'];  
+	}
+	return $userPenalty;
+  }
+  
 }
 
 ?>

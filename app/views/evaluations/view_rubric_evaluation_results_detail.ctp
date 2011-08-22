@@ -21,6 +21,8 @@
        |
       <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Detail" ><?php __('Detail')?></a>
         )
+      <BR>
+      <BR> <?php echo '<font size = "1" face = "arial" color = "red" >*Numerics in red denotes late submission penalty.</font>';?>
     </td>
   </tr>
 	<?php $i = 0;
@@ -64,6 +66,7 @@ $groupAve = 0;
     //This section will display the evaluatees' name
     //as display the average scores their peers gave them
     //for various criteria
+    $questionSum = array_fill(0, $rubric['Rubric']['criteria'], 0);
     if ($groupMembers) {
       foreach ($groupMembers as $member) {
         $membersAry[$member['User']['id']] = $member;
@@ -71,9 +74,19 @@ $groupAve = 0;
       		echo '<td width="30%">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td>' . "\n";
         //if ($allMembersCompleted) {
         if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
-          $aveScoreSum += $memberScoreSummary[$member['User']['id']]['received_ave_score'];
+      	    $avgScore = $memberScoreSummary[$member['User']['id']]['received_ave_score'];
+      	    $penalty = ($penalties[$member['User']['id']] / 100) * $avgScore;
+      	    $avgQuestionPenalty = $penalty/$rubric['Rubric']["criteria"];
+      	//    $questionPenalty =
+      		$questionIndex = 0; 
         	foreach ($scoreRecords[$member['User']['id']]['rubric_criteria_ave'] AS $criteriaAveIndex => $criteriaAveGrade) {
-          	echo '<td>' . number_format($criteriaAveGrade, 2). "</td>";
+        	  $scaledQuestionGrade = $criteriaAveGrade - $avgQuestionPenalty;
+        	  $questionSum[$questionIndex] += $scaledQuestionGrade;
+        	  $questionIndex++;
+        	  $penalty > 0 ? $stringAddOn = ' - '."<font color=\"red\">".$avgQuestionPenalty.
+        	  								"</font> = ".number_format($scaledQuestionGrade, 2).'</td>' :
+        	  				 $stringAddOn = '';
+          	  echo '<td>' . number_format($criteriaAveGrade, 2).$stringAddOn;
           }
         } else {
         	for ($i = 1; $i <= $rubric['Rubric']["criteria"]; $i++) {
@@ -84,9 +97,13 @@ $groupAve = 0;
       	//totals section
       	echo '<td width="30%">';
       	//if ($allMembersCompleted) {
-      	if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) { 
-      		echo number_format($memberScoreSummary[$member['User']['id']]['received_ave_score'], 2);
-      		$receviedAvePercent = $memberScoreSummary[$member['User']['id']]['received_ave_score'] / $rubric['Rubric']['total_marks'] * 100;
+      	if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
+		  	$finalAvgScore = $avgScore - $penalty;
+		  	$penalty > 0 ? $stringAddOn = ' - '."<font color=\"red\">".$penalty."</font> = ".number_format($finalAvgScore, 2) :
+		  				   $stringAddOn = '';
+           	$aveScoreSum += $finalAvgScore; 
+      		echo number_format($avgScore, 2).$stringAddOn;
+      		$receviedAvePercent = $finalAvgScore / $rubric['Rubric']['total_marks'] * 100;
       		echo ' ('.number_format($receviedAvePercent) . '%)';
       		$membersAry[$member['User']['id']]['received_ave_score'] = $memberScoreSummary[$member['User']['id']]['received_ave_score'];
       		$membersAry[$member['User']['id']]['received_ave_score_%'] = $receviedAvePercent;
@@ -102,12 +119,13 @@ $groupAve = 0;
       echo '<tr class="tablesummary">';
       echo "<td><b>";
       echo __("Group Average: ", true);
-      echo "</b></td>";      
+      echo "</b></td>";
+      $questionIndex = 0;      
       foreach ($scoreRecords['group_criteria_ave'] AS $groupAveIndex => $groupAveGrade) {
-              echo '<td>' . number_format($groupAveGrade, 2). "</td>";
+		echo '<td>' . number_format($questionSum[$questionIndex] / count($groupMembers), 2). "</td>";
       }
       echo "<td><b>";
-      $groupAve = number_format($aveScoreSum / count($groupMembers),2);
+      $groupAve = number_format($aveScoreSum / count($groupMembers), 2);
       echo $groupAve;
       echo ' ('.number_format($groupAve / $rubric['Rubric']['total_marks'] * 100) . '%)';
       

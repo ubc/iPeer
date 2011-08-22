@@ -21,6 +21,8 @@
        |
       <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Detail" ><?php __('Detail')?></a>
         )
+      <BR>
+      <BR> <?php echo '<font size = "1" face = "arial" color = "red" >*Numerics in red denotes late submission penalty.</font>';?>
     </td>
   </tr>
 	<?php $i = 0;
@@ -63,23 +65,34 @@ $groupAve = 0;
     <td><?php echo __("Total:( /", true).number_format($mixeval['Mixeval']['total_marks'], 2)?>)</td>
   </tr>
     <?php
-    $aveScoreSum = 0;
     //This section will display the evaluatees' name
     //as display the average scores their peers gave them
     //for various criteria
     if ($groupMembers) {
       foreach ($groupMembers as $member) {
+      	$aveScoreSum = 0;
         $membersAry[$member['User']['id']] = $member;
       	echo '<tr class="tablecell2">';
-      	echo '<td width="30%">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td>' . "\n";
+      	echo '<td width="25%">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td>' . "\n";
         //if ($allMembersCompleted) {
         if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
-          $aveScoreSum += $memberScoreSummary[$member['User']['id']]['received_ave_score'];
+      	    $avgScore = $memberScoreSummary[$member['User']['id']]['received_ave_score'];
+      	    $penalty = ($penalties[$member['User']['id']] / 100) * $avgScore;
+      	    $avgQuestionPenalty = number_format($penalty/$mixeval['Mixeval']["lickert_question_max"], 2);
+      	//    $questionPenalty =
+      		$questionIndex = 0; 
         	//foreach ($scoreRecords[$member['User']['id']]['mixeval_question_ave'] AS $criteriaAveIndex => $criteriaAveGrade) {
-        	for ($j = 1; $j <= $mixeval['Mixeval']["lickert_question_max"]; $j++) {
-
+        	for ($j = 1; $j <= $mixeval['Mixeval']["lickert_question_max"]; $j++) {        		
         	  $criteriaAveGrade = $scoreRecords[$member['User']['id']]['mixeval_question_ave'][$j-1];
-          	echo '<td>' . number_format($criteriaAveGrade, 2). "</td>";
+        	  $scaledQuestionGrade = $criteriaAveGrade - $avgQuestionPenalty;
+        	  $questionIndex++;
+        	  $penalty > 0 ? $stringAddOn = ' - '."<font color=\"red\">".$avgQuestionPenalty.
+        	  								"</font> = ".number_format($scaledQuestionGrade, 2).'</td>' :
+        	  				 $stringAddOn = '';
+			  $aveScoreSum += $criteriaAveGrade;
+			  echo '<td>' . number_format($criteriaAveGrade, 2).$stringAddOn;
+        	  
+          	//echo '<td>' . number_format($criteriaAveGrade, 2). "</td>";
           }
         } else {
         	for ($i = 1; $i <= $mixeval['Mixeval']["lickert_question_max"]; $i++) {
@@ -91,7 +104,8 @@ $groupAve = 0;
       	echo '<td width="30%">';
       //	if ($allMembersCompleted) {
         if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
-      		echo number_format($memberScoreSummary[$member['User']['id']]['received_ave_score'], 2);
+        	$finalAvgScore = $aveScoreSum - $penalty;
+      		echo number_format($aveScoreSum, 2).' - '.'<font color="red">'.number_format($penalty, 2).'</font> = '.number_format($finalAvgScore, 2);
       		$receviedAvePercent = $memberScoreSummary[$member['User']['id']]['received_ave_score'] / $mixeval['Mixeval']['total_marks'] * 100;
       		echo ' ('.number_format($receviedAvePercent) . '%)';
                 $membersAry[$member['User']['id']]['received_total_score'] = $memberScoreSummary[$member['User']['id']]['received_total_score'];

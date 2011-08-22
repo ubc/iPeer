@@ -21,6 +21,8 @@ echo $this->element('evaluations/view_event_info', $params);
        |
       <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Detail" ><?php __('Detail')?></a>
         )
+      <BR>
+      <BR> <?php echo '<font size = "1" face = "arial" color = "red" >*Numerics in red denotes late submission penalty.</font>';?>
     </td>
   </tr>
 	<?php $i = 0;
@@ -55,8 +57,13 @@ echo $this->element('evaluations/view_event_info', $params);
       	echo '<td width="30%">';
       	//if ($allMembersCompleted) {
       	if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
-          $aveScoreSum += $memberScoreSummary[$member['User']['id']]['received_ave_score'];
-       		echo number_format($memberScoreSummary[$member['User']['id']]['received_ave_score'], 2);
+      	  $avgScore = $memberScoreSummary[$member['User']['id']]['received_ave_score'];
+		  $penalty = ($penalties[$member['User']['id']] / 100) * $avgScore;
+		  $finalAvgScore = $avgScore - $penalty;
+		  $penalty > 0 ? $stringAddOn = ' - '."<font color=\"red\">".$penalty."</font> = ".number_format($finalAvgScore, 2) :
+		  				 $stringAddOn = '';
+          $aveScoreSum += $finalAvgScore;
+       	  echo number_format($memberScoreSummary[$member['User']['id']]['received_ave_score'], 2).$stringAddOn;
       	} else {
       		echo '-';
       	}

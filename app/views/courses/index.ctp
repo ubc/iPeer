@@ -1,6 +1,4 @@
-<?php     Configure::write('Config.language', 'eng');
-?>
-
+<?php     Configure::write('Config.language', 'eng');?>
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
 <tr><td align="center">
     <table width="95%" border="0" cellspacing="0" cellpadding="2">

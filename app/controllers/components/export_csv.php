@@ -1,7 +1,40 @@
 <?php
 
 Class ExportCsvComponent extends ExportBaseNewComponent {
-
+	
+  function buildGroupExportCsvByGroup($params, $groupId) {
+  	$this->GroupsMembers = ClassRegistry::init('GroupsMembers');
+  	$groupMemberId = $this->GroupsMembers->getMembers($groupId);
+  	$CSV = '';
+  	foreach($groupMemberId as $userId){
+  	  $CSV .= $this->_buildGroupExportCsvByUser($userId, $params, $groupId)."\n";
+  	}
+  	
+  	return $CSV;
+  }
+	
+  function _buildGroupExportCsvByUser($userId, $params, $groupId) {
+  	$this->User = ClassRegistry::init('User');
+  	$this->Group = ClassRegistry::init('Group');
+  	$row = '';
+	$user = $this->User->findUserByid($userId);
+	$group = $this->Group->getGroupById($groupId);
+  	if(!empty($params['include_group_names'])) {
+  	  $row .= $group['Group']['group_name'].",";
+  	}
+    if(!empty($params['include_student_id'])) {
+  	  $row .= $user['User']['student_no'].",";
+  	}
+   	if(!empty($params['include_student_name'])) {
+  	  $row .= $user['User']['first_name'].",";
+  	  $row .= $user['User']['last_name'].",";
+  	}
+  	if(!empty($params['include_student_email'])) {
+  	  $row .= $user['User']['email'];
+  	}
+  	return $row;
+  }	
+	
   function creteCsvSubHeaderHelper($params, &$subHeader) {
     if(!empty($params['include_group_names'])) {
 	  $subHeader .= "Group Name,";
@@ -10,11 +43,16 @@ Class ExportCsvComponent extends ExportBaseNewComponent {
   	  $subHeader .= "Email,";
   	}
   	if(!empty($params['include_student_name'])) {
-  	  $subHeader .= ",Evaluatee,";
-  	  $subHeader .= ",Evaluator,";
+  	  $subHeader .= "Evaluatee,";
+  	}
+    if(!empty($params['include_student_id'])) {
+  	  $subHeader .= "Evaluatee S#,";
+  	}
+    if(!empty($params['include_student_name'])) {
+  	  $subHeader .= "Evaluator,";
   	}
   	if(!empty($params['include_student_id'])) {
-  	  $subHeader .= "student #,";
+  	  $subHeader .= "Evaluator S#,";
   	}
   } 
 	
@@ -26,32 +64,38 @@ Class ExportCsvComponent extends ExportBaseNewComponent {
   	
   	$subHeader = '';
   	$this->creteCsvSubHeaderHelper($params, $subHeader);
-  	$count = 1;
   	for($i=0; $i<count($questions); $i++) {
-  	  $subHeader .= "Question".$count.","; 	
+  	  $subHeader .= "Q".($i+1)." (/".$questions[$i]['MixevalsQuestion']['multiplier']."),"; 	
   	}
+  	$subHeader .= "Raw Score, Late Penalty, Final Score";
   	return $subHeader;
   }
   
   function createRubricsMixEvalCsvSubHeader($params, $eventId) {
   	$this->Event = ClassRegistry::init('Event');
   	$this->Rubric = ClassRegistry::init('Rubric');
+  	$this->RubricsCriteria = ClassRegistry::init('RubricsCriteria');
+  	
   	$event = $this->Event->getEventById($eventId);
   	$rubric = $this->Rubric->getRubricById($event['Event']['template_id']);
+  	$rubricCriterias = $this->RubricsCriteria->getCriteria($rubric['Rubric']['id']);
   	
   	$subHeader = '';
   	$this->creteCsvSubHeaderHelper($params, $subHeader);
-  	$count = 1;
-  	for($i=0; $i<$rubric['Rubric']['criteria']; $i++) {
-  	  $subHeader .= "Criteria Q".$count.",";
+  	for($i=1; $i<=$rubric['Rubric']['criteria']; $i++) {
+  	  $rubricCriteriaMark = $rubricCriterias[$i-1]['RubricsCriteria']['multiplier'];
+  	  $subHeader .= "Q".$i." ( /".$rubricCriteriaMark."),";
   	}
+	$subHeader .= "Raw Score, Late Penalty, Final Score";
   	return $subHeader;
   }
   
-  function createSimpleMixEvalCsvSubHeader($params) {
+  function createSimpleCsvSubHeader($params) {
   	$subHeader = '';
   	$this->creteCsvSubHeaderHelper($params, $subHeader);
-  	$subHeader .= "Grade".",";
+  	$subHeader .= "Raw Grade";
+  	$subHeader .= ",Mark Penalty";
+  	$subHeader .= ",Final Grade";
   	return $subHeader;
   }
 	
@@ -63,11 +107,11 @@ Class ExportCsvComponent extends ExportBaseNewComponent {
   	$groupEvents = $this->GroupEvent->getGroupsByEventId($eventId);
   	$csv = '';
   	$eventHeader = $this->generateHeader($params, $eventId);
-  	$csv .= $eventHeader."\n";  	
+  	$csv = $eventHeader."\n";  	
   	
   	switch($event['Event']['event_template_type_id']) {
   		case 1:
-  		  $subHeader = $this->createSimpleMixEvalCsvSubHeader($params);
+  		  $subHeader = $this->createSimpleCsvSubHeader($params);
   		  $csv .= $subHeader."\n\n";
 		  $resultTable = $this->buildSimpleEvaluationScoreTableByEvent($params, $eventId);
 		  $csv .= $resultTable;
@@ -88,7 +132,6 @@ Class ExportCsvComponent extends ExportBaseNewComponent {
   	 	    $csv .= $resultTable;
   		  }
   		  break;
-  		  
   		default: throw new Exception("Invalid event_id");
   	}
     return $csv;
@@ -118,10 +161,10 @@ Class ExportCsvComponent extends ExportBaseNewComponent {
   	        $CSV .= $simpleResults."\n\n";
   	      }
   	      if(!empty($params['simple_evaluator_comment'])) {
-  	      	$CSV .= ", Simple Evaluation Comments :\n\n";
+  	      	$CSV .= "Simple Evaluation Comments :\n\n";
   	      	foreach($groupMembers as $evaluatee) {
 			  $simpleEvalComments = $this->buildSimpleOrRubricsCommentByEvaluatee($grpEventId, $evaluatee['GroupsMembers']['user_id'], $params, 'S');
-			  $CSV .= $simpleEvalComments."\n";   		
+			  $CSV .= $simpleEvalComments."\n";
   	      	}
   	      }
   	    }
@@ -135,7 +178,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent {
 		  $groupMembers = $this->GroupEvent->getGroupMembers($grpEventId);
 		  if(!empty($params['include_group_names'])) {
 		    $CSV .= "Group Name : ".$group[0]['Group']['group_name']."\n\n";
-		  }	
+		  }
 		  if(!empty($params['rubric_criteria_marks'])) {
 		  	$CSV .= "Rubrics Evaluation Grade Tables:\n\n";
 			$gradeTable = $this->buildRubricsResultTable($params, $grpEventId);

@@ -40,12 +40,12 @@ class EvaluationsController extends AppController
                     'EvaluationSubmission', 'Event', 'EvaluationSimple',
                     'SimpleEvaluation', 'Rubric', 'Group', 'User',
                     'GroupsMembers','RubricsLom','RubricsCriteria',
-                    'RubricsCriteriaComment', 'Personalize', 'Penalty',
+                    'RubricsCriteriaComment', 'Personalize', 'Penalty', 'UserGradePenalty',
                     'Question','Response','Survey','SurveyInput','Course','MixevalsQuestion',
                     'EvaluationMixeval','EvaluationMixevalDetail', 'Mixeval', 'MixevalsQuestionDesc');
   var $components = array('ExportBaseNew', 'Auth','AjaxList', 'rdAuth','Output','sysContainer',
                           'globalConstant', 'userPersonalize','framework', 
-                          'Evaluation', 'Export', 'ExportCsv');
+                          'Evaluation', 'Export', 'ExportCsv', 'ExportExcel');
 
   function __construct()
   {
@@ -319,7 +319,7 @@ class EvaluationsController extends AppController
 		    	$fileContent = $this->ExportCsv->createCsv($this->params['form'], $eventId);
 		    	break;
               case "excel" :
-              	$fileContent = $this->ExportCsv->createExcel($this->params['form'], $eventId);
+              	$fileContent = $this->ExportExcel->createExcel($this->params['form'], $eventId);
               	break;
               default :
               	throw new Exception("Invalid evaluation selection.");
@@ -737,6 +737,7 @@ function makeSurveyEvaluation ($param = null) {
     $this->layout = 'pop_up';
 
     $templateTypeId = $this->Event->getEventTemplateTypeId($eventId);
+    $grpEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
     //$courseId = $this->rdAuth->courseId;
     $courseId = $this->Event->getCourseByEventId($eventId);
     $event = ($templateTypeId == '3' ? $this->Event->formatEventObj($eventId, null):
@@ -757,8 +758,9 @@ function makeSurveyEvaluation ($param = null) {
         $this->set('allMembersCompleted', $formattedResult['allMembersCompleted']);
         $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
         $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
-        
-		        
+        // Set penalty
+        $penalties = $this->Evaluation->formatPenaltyArray($grpEvent['GroupEvent']['id'], $formattedResult['groupMembers']);
+        $this->set('penalties', $penalties);		        
         $this->render('view_simple_evaluation_results');
         break;
 
@@ -776,6 +778,10 @@ function makeSurveyEvaluation ($param = null) {
           $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
           $this->set('evalResult', $formattedResult['evalResult']);
           $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
+          // set penalty data
+          $formattedPenalty = $this->Evaluation->formatPenaltyArray($grpEvent['GroupEvent']['id'], $formattedResult['groupMembers']);
+          $this->set('penalties', $formattedPenalty);
+          
         if ($displayFormat == 'Detail') {
           $this->render('view_rubric_evaluation_results_detail');
         } else {
@@ -812,8 +818,10 @@ function makeSurveyEvaluation ($param = null) {
           $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
           $this->set('evalResult', $formattedResult['evalResult']);
           $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
-
-
+			
+          // Set Penalty
+		  $penalties = $this->Evaluation->formatPenaltyArray($grpEvent['GroupEvent']['id'], $formattedResult['groupMembers']);
+          $this->set('penalties', $penalties);	
 
         if ($displayFormat == 'Detail') {
           $this->render('view_mixeval_evaluation_results_detail');

@@ -83,7 +83,7 @@ class EvaluationSubmission extends AppModel
   }
   
   function countSubmissions($grpEventId) {
-  	return $this->find('count', array('conditions' => array('Event.grp_event_id' => $grpEventId,)));
+  	return $this->find('count', array('conditions' => array('grp_event_id' => $grpEventId,)));
   }
 
   // Deprecated: replaced by virtual field in event model
