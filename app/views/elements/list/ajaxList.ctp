@@ -13,9 +13,7 @@
     function showProgrammerError ($message) {
         echo "<span style='color:red'>ajaxList: $message</span><br />";
     }
-
     $divisionName = "ajaxListDiv";
-
     // The main div containing the controll
     echo "<div id='$divisionName'>";
 

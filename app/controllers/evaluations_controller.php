@@ -299,12 +299,13 @@ class EvaluationsController extends AppController
   }
 
 
-  function export($eventId=null, $errmsg = null) {
+  function export($eventId=null) {
       // Make sure the present user is not a student
       $this->rdAuth->noStudentsAllowed();
       $courseId = $this->Event->getCourseByEventId($eventId);
-      $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Export Evaluation Results');
       $this->set('eventId', $eventId);
+      $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Export Evaluation Results');
+      
       //do stuff
       if(isset($this->params['form']) && !empty($this->params['form'])){
           $this->autoRender = false;
@@ -329,6 +330,7 @@ class EvaluationsController extends AppController
             echo $fileContent;
 	//	  }
       } else {
+      	  // Set up data
       	  $event = $this->Event->getEventById($eventId);
       	  $eventType = $event['Event']['event_template_type_id'];
       	  $this->set('eventType', $eventType);

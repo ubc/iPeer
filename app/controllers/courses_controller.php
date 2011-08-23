@@ -29,7 +29,7 @@ App::import('Vendor','PHPExcelWriter',array('file' => 'excel/PHPExcel/Writer/Exc
 class CoursesController extends AppController
 {
 	var $name = 'Courses';
-	var $uses =  array('Course', 'Personalize', 'UserCourse', 'UserEnrol', 'Group', 'Event', 'User');
+	var $uses =  array('GroupEvent', 'Course', 'Personalize', 'UserCourse', 'UserEnrol', 'Group', 'Event', 'User');
 	var $show;
 	var $sortBy;
 	var $direction;
@@ -38,16 +38,8 @@ class CoursesController extends AppController
 	var $Sanitize;
 	var $helpers = array('Html','Ajax', 'excel', 'Javascript','Time','Pagination', 'Js' => array('Prototype'));
 	var $components = array('ExportBaseNew', 'AjaxList', 'ExportCsv', 'ExportExcel');
-
-	function export() {
-	  	
-	  $params = $this->inputParams();
-	  $resultTable = $this->ExportBaseNew->buildSimpleEvalResults(31, $params);	
-	  $excelExporter = $this->ExportExcel->drawToExcelSheetAtCoordinates($resultTable, 33, 33);
-		
-	}
 	
-	function __construct() {
+  function __construct() {
 		$this->Sanitize = new Sanitize;
 		$this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
 		if ($this->show == 'all') $this->show = 99999999;
@@ -57,8 +49,8 @@ class CoursesController extends AppController
 		$this->order = $this->sortBy.' '.strtoupper($this->direction);
  		$this->set('title_for_layout', 'Courses');
 		parent::__construct();
-	}
-
+	} 
+	
   function setUpAjaxList() {
     // Set up Columns
     $columns = array(
@@ -111,6 +103,8 @@ class CoursesController extends AppController
    return $days;  
   }
   
+  function export() {}
+   
   function index() {
     // Set up the basic static ajax list variables
     $this->setUpAjaxList();

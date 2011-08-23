@@ -32,10 +32,10 @@ Class ExportExcelComponent extends ExportBaseNewComponent {
   	$this->cursor = array('x' => 0, 'y' => 1);
   }
   
-  function _output() {
+  function _output($fileName) {
 	$starting_pos = ord('C');
     header("Content-type: application/vnd.ms-excel"); 
-	header('Content-Disposition: attachment;filename="export.xls"');
+	header('Content-Disposition: attachment;filename='.$fileName.".xls");
     header('Cache-Control: max-age=0');
     $objWriter = new PHPExcel_Writer_Excel5($this->xls);
     $objWriter->setTempDir(TMP);
@@ -483,7 +483,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent {
   	  default: throw new Exception("Event id input seems to be invalid!");
   	}
 	//return $CSV;
-	$this->_output();
+	$this->_output($params['file_name']);
   }
   
 }

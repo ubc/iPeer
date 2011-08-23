@@ -12,8 +12,25 @@
           <td width="30%">Export Filename:</td><td width="40%"><input type="text" name="file_name" value="<?php if(isset($file_name)) echo $file_name;?>" /></td><td width="30%"></td>
         </tr>
         <tr class="tablecell2">
-          <td width="30%">Export File Type:</td><td width="40%"><select name="export_type" class= "export_type"><option value="excel">excel</option><option value="csv">csv</option></select></td> <td></td>
-        </tr>
+          <td width="30%">Export File Type:</td><td width="40%"><select name="export_type" class="export_type">
+			<option value="csv">csv</option>          
+            <option value="excel">excel</option>
+            </select>
+          </td>
+          <td></td>
+        </tr>   
+
+        <tr class="tablecell2">
+          <td width="30%">Event Name:</td><td width="40%"><select name="export_type" class="export_type">
+			<option value="1">1</option>          
+            <option value="2">2</option>
+            <option value="4">4</option>
+            </select>
+          </td>
+          <td></td>
+        </tr>   
+
+        
         <tr class="tablesubheader">
           <td colspan="3" align="center">Header</td>
         </tr>

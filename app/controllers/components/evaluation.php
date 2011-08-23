@@ -1085,8 +1085,8 @@ class EvaluationComponent extends Object
               $event['group_event_id'],$userId);
             $ttlEvaluatorCount = $this->EvaluationMixeval->getReceivedTotalEvaluatorCount($event['group_event_id'],$userId);
             if ($ttlEvaluatorCount >0 ) {
-              $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0][0]['received_total_score'];
-              $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0][0]['received_total_score'] / $ttlEvaluatorCount;
+              $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0]['received_total_score'];
+              $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0]['received_total_score'] / $ttlEvaluatorCount;
             }
             foreach($mixevalResult AS $row ) {
               $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
