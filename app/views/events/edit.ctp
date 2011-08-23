@@ -1,7 +1,7 @@
 <?php echo $html->script('calendar1')?>
 <?php echo $html->script('groups')?>
+    <?php echo $html->script('penalty')?>
 <?php $readonly = isset($readonly) ? $readonly : false;?>
-
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>
@@ -188,6 +188,71 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
   	<td>
   	</td>
   </tr>
+  
+  <tr class="tablecell2">
+  <td><?php __('Late Penalty:')?></td>
+  <td>
+    <?php
+
+      echo $form->input('Event.penalty', array(
+           'type' => 'radio',
+           'options' => array('1' => ' - Yes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '0' => ' - No'),
+           'default' => (bool)$penaltyDays,
+           'legend' => false,
+      'format' => array('input'), 
+       'onChange'=>"javascript:$('penalty').toggle();return false;"
+        ));
+      ?>
+     <div id = 'penalty' style ='width:550px; display:none;'>
+            <?php echo $form->hidden('PenaltySetup.type', array('value' => 'simple', 'div' => false, 'format' => array('input'),  'label' => false));?>
+     <div id="simplePenalty" width="400px">
+         
+              
+    	 <div style="text-align:right"><a href="#" onClick="javascript:$('PenaltySetupType').value = 'advanced'; displayPenalty();
+        	  return false;">( <?php __('Use Advanced Penalty Scale')?> )</a>
+    	 </div>
+ 
+       <div class = 'penaltyInput'>
+       		<label class = "penaltyLabel">Deduct</label> <?php echo $form->input('PenaltySetup.percentagePerDay', array(
+            'div'=>false, 'format' => array('input'), 'onBlur' => 'maximum(this)', 'label' => false, 'type'=>'text', 'size' => 5, 'value' =>  isset($penaltySetup['percentagePerDay'])?$penaltySetup['percentagePerDay']:'20'))?> % per day
+       <span class = "warning"></span>
+       </div>
+       <div class = 'penaltyInput'>
+       		<label class = "penaltyLabel">For</label> <?php echo $form->input('PenaltySetup.numberOfDays', array(
+            'div'=>false, 'onBlur' =>'calculateDays()', 'format' => array('input'),  'label' => false, 'type'=>'text', 'size' => 5, 'value' =>  (isset($penaltyDays) && ($penaltyDays > 0))?$penaltyDays:'2'))?> days
+			 <span class = "warning"></span>
+			 </div>
+			 
+       </div>
+       <div  id = 'penaltyAdvanced' style="display:none; margin-bottom: 1em;">
+        <div style="text-align:right"><a href="#" onClick="javascript:$('PenaltySetupType').value = 'simple'; displayPenalty(); return false;">( <?php __('Use Simple Penalty Scale')?> )</a>
+      
+      </div>
+       <table  id = 'penaltyTable'>
+     
+       <tr>
+       <td width="65px" height="20px">Days late</td>
+       <td>Penalty %</td>
+       <td></td>
+       </tr>
+       </table>
+       <a onClick = "addDay()" class="text-button" style="margin-left: .5em">Add</a>
+       <a onClick = "removeDay()" class="text-button" style="margin-left: 3.8em">Remove</a>
+
+       </div>
+  	 
+  	 <div class = 'penaltyInput'>
+  	    <label class = "penaltyLabel">Deduct</label> <?php echo $form->input('PenaltySetup.penaltyAfter', array(
+            'div'=>false, 'format' => array('input'), 'label' => false, 'type'=>'text', 'size' => 5, 'style' => 'width:50px;', 'onBlur' => 'maximum(this); minimum()', 'value' =>  isset($penaltySetup['penaltyAfter'])?$penaltySetup['penaltyAfter']:'100'))?> % afterwards
+  	 <span class = "warning"></span>
+  	 </div>
+  	 </div>
+  </td>
+  <td>
+
+ </td>
+  </tr>  
+  
   <tr class="tablecell2">
     <td><?php __('Groups Assignment:')?>&nbsp;</td>
     <td>
@@ -205,7 +270,7 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
   <tr class="tablecell2">
     <?php echo $html->script('events')?>
     <td colspan="3" align="center"><?php echo $form->submit(__('Edit Event', true), array('onclick' =>
-        "processSubmit(document.getElementById('selected_groups')); return validateEventDates('EventReleaseDateBegin','EventReleaseDateEnd','EventDueDate','EventResultReleaseDateBegin','EventResultReleaseDateEnd'); ")); ?></td>
+        "processSubmit(document.getElementById('selected_groups')); return validate(); ")); ?></td>
   </tr>
 </table>
 
@@ -213,8 +278,54 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
 	</td>
   </tr>
 </table>
+
+<style type="text/css">
+#penalty{width: 500px; padding: 0 0 1em 1em; }
+#penalty a{color: #fa7e04;}
+#penalty a:hover{color: #333;}
+.percentage{width:50px;}
+.penaltyLabel{width:70px; float:left; margin-top:0.2em}
+div.penaltyInput{padding:.2em;}
+.numberOfDays{ padding-left:1em;}
+.warning{float: right; margin-top:0.25em; width: 370px; color:red;}
+td.warning{padding-left:2em;}
+</style>
 <script type="text/javascript">
-<!--
+
+Event.observe(window, 'load', function(){
+var penalty = <?php echo (!empty($penalty))?json_encode($penalty):'new Array(0)'?>;
+	var perc = '';
+	var k = 0;
+
+	for(k = 0; k < <?php echo $penaltyDays;?>; k++) {
+			if (penalty[i]['Penalty']["days_late"]>0){
+				perc = penalty[i]['Penalty']["percent_penalty"];
+				addDay(perc);
+			}
+		}
+	
+ 	$('PenaltySetupType').value = '<?php echo isset($penaltyType)?$penaltyType:'simple';?>'; 
+	var display = <?php echo $penaltyDays;?>;
+	if(display) {
+		$('penalty').show();
+	}else{
+		$('penalty').hide();
+	}
+ 	if(display == 0){
+ 		 
+		addDay(20);
+		addDay(40);
+ 	 	}
+ 	});
+	
+ 	displayPenalty();
+
+function validate() {
+	//if (!validateEventDates('EventReleaseDateBegin','EventReleaseDateEnd','EventDueDate','EventResultReleaseDateBegin','EventResultReleaseDateEnd')){return false;}
+	if (!validatePenalty()) {return false;}
+}
+
+
 
 // create calendar object(s) just after form tag closed
 // specify form element as the only parameter (document.forms['formname'].elements['inputname']);

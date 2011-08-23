@@ -1,3 +1,4 @@
+<?php echo $html->script('penalty')?>
 <body onunload="window.opener.document.getElementById('eval_dropdown').onchange()">
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
@@ -157,54 +158,69 @@
   	<td>
   	</td>
   </tr>
-  
-  <tr class="tablecell2">
+    <tr class="tablecell2">
   <td><?php __('Late Penalty:')?></td>
-  <td>
+  <td style="width: 600px">
     <?php
+
       echo $form->input('Event.penalty', array(
            'type' => 'radio',
            'options' => array('1' => ' - Yes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '0' => ' - No'),
-           'default' => '0',
+           'default' => 0,
            'legend' => false,
+      'format' => array('input'), 
        'onChange'=>"javascript:$('penalty').toggle();return false;"
         ));
       ?>
-     <div id = 'penalty' style ='width:400px;'>
-            <?php echo $form->input('PenaltySetup.type', array('value' => 'simple', 'div' => false, 'label' => false));?>
-     <div id="simplePenalty", width="400px">
+     <div id = 'penalty' style ='width:550px; display:none;'>
+            <?php echo $form->hidden('PenaltySetup.type', array('value' => 'simple', 'div' => false, 'format' => array('input'),  'label' => false));?>
+     <div id="simplePenalty" width="400px">
          
               
-    	 <div style="text-align:right"><a href="#" onClick="javascript:$('PenaltySetupType').value = 'advanced'; $('penaltyAdvanced').toggle(); $('simplePenalty').toggle(); 
+    	 <div style="text-align:right"><a href="#" onClick="javascript:$('PenaltySetupType').value = 'advanced'; displayPenalty();
         	  return false;">( <?php __('Use Advanced Penalty Scale')?> )</a>
     	 </div>
  
-       Deduct <?php echo $form->input('PenaltySetup.percentagePerDay', array('div'=>false, 'label' => false, 'type'=>'text', 'size' => 5, 'value'=> 20))?> per day
-       </br>
-       For <?php echo $form->input('PenaltySetup.numberOfDays', array('div'=>false, 'label' => false, 'type'=>'text', 'size' => 5, 'value'=> 2))?> days
-       </br>
-       Deduct <?php echo $form->input('PenaltySetup.penaltyAfterSimple', array('div'=>false, 'label' => false, 'type'=>'text', 'size' => 5, 'value'=> 40))?> afterwards
-
-       </br>
+       <div class = 'penaltyInput'>
+       		<label class = "penaltyLabel">Deduct</label> <?php echo $form->input('PenaltySetup.percentagePerDay', array(
+            'div'=>false, 'format' => array('input'), 'onBlur' => 'maximum(this)', 'label' => false, 'type'=>'text', 'size' => 5, 'value' =>  20))?> % per day
+       <span class = "warning"></span>
        </div>
-       <div  id = 'penaltyAdvanced' style="display:none">
-        <div style="text-align:right"><a href="#" onClick="javascript:$('PenaltySetupType').value = 'simple'; $('penaltyAdvanced').toggle(); $('simplePenalty').toggle(); return false;">( <?php __('Use Simple Penalty Scale')?> )</a>
+       <div class = 'penaltyInput'>
+       		<label class = "penaltyLabel">For</label> <?php echo $form->input('PenaltySetup.numberOfDays', array(
+            'div'=>false, 'onBlur' =>'calculateDays()', 'format' => array('input'),  'label' => false, 'type'=>'text', 'size' => 5, 'value' => 2))?> days
+			 <span class = "warning"></span>
+			 </div>
+			 
+       </div>
+       <div  id = 'penaltyAdvanced' style="display:none; margin-bottom: 1em;">
+        <div style="text-align:right"><a href="#" onClick="javascript:$('PenaltySetupType').value = 'simple'; displayPenalty(); return false;">( <?php __('Use Simple Penalty Scale')?> )</a>
+      
       </div>
        <table  id = 'penaltyTable'>
      
        <tr>
-       <td>Days late</td>
+       <td width="65px" height="20px">Days late</td>
        <td>Penalty %</td>
+       <td></td>
        </tr>
        </table>
-        Deduct <?php echo $form->input('PenaltySetup.penaltyAfterAdvanced', array('div'=>false, 'label' => false, 'type'=>'text', 'size' => 5, 'value'=> 20))?> afterwards
-       </br>
-       <a onClick = "addDay(<?php ?>)" class="text-button">Add day</a>
-       <a onClick = "removeDay()" class="text-button">Remove day</a>
+       <a onClick = "addDay()" class="text-button" style="margin-left: .5em">Add</a>
+       <a onClick = "removeDay()" class="text-button" style="margin-left: 3.8em">Remove</a>
+
        </div>
+  	 
+  	 <div class = 'penaltyInput'>
+  	    <label class = "penaltyLabel">Deduct</label> <?php echo $form->input('PenaltySetup.penaltyAfter', array(
+            'div'=>false, 'format' => array('input'), 'label' => false, 'type'=>'text', 'size' => 5, 'style' => 'width:50px;', 'onBlur' => 'maximum(this); minimum()', 'value' =>  100))?> % afterwards
+  	 <span class = "warning"></span>
+  	 </div>
   	 </div>
   </td>
-  <td></td>
+  <td>
+
+ </td>
+  </tr>  
   </tr>  
   <tr class="tablecell2">
     <td><?php __('Groups Assignment:')?>&nbsp;</td>
@@ -221,7 +237,7 @@
   <?php echo $html->script('events')?>
 
 <td colspan="3" align="center"><?php echo $this->Form->submit(ucfirst($this->action).__(' Event', true), array('div' => false,
-  											'onClick' => "processSubmit(document.getElementById('selected_groups')); return validateEventDates('EventReleaseDateBegin','EventReleaseDateEnd','EventDueDate','EventResultReleaseDateBegin','EventResultReleaseDateEnd'); ")) ?></td>
+  											'onClick' => "processSubmit(document.getElementById('selected_groups')); return validate();")) ?></td>
     </tr>
 </table>
 
@@ -231,35 +247,30 @@
 </table>
 
 <style type="text/css">
+#penalty{width: 500px; padding: 0 0 1em 1em; }
+#penalty a{color: #fa7e04;}
+#penalty a:hover{color: #333;}
 .percentage{width:50px;}
+.penaltyLabel{width:70px; float:left; margin-top:0.2em}
+div.penaltyInput{padding:.2em;}
+.numberOfDays{ padding-left:1em;}
+.warning{float: right; margin-top:0.25em; width: 370px; color:red;}
+td.warning{padding-left:2em;}
 </style>
 <script type="text/javascript">
-var i = 0;
 
 
-addDay();
-addDay();
+Event.observe(window, 'load', function(){
 
-function addDay() {
-	i++ 
-    var day = Builder.node("tr", {id: "penaltyDay" + i}, [ Builder.node("td", {class: "numberOfDays"}, i), 
-                                                          
-                                                           Builder.node("td", {class: "per"},[ 
-																											Builder.node("input", {class: "percentage", name: "data[Penalty][" + i + "][percent_penalty]"})
-																										]), Builder.node("input", {type:"hidden", name:"data[Penalty][" + i + "][days_late]", value: i})                                                 
-                                                   ]);
-    $('penaltyTable').appendChild(day);    
-    
+	addDay(20);
+	addDay(40);
+
+});
+
+function validate() {
+	if (!validateEventDates('EventReleaseDateBegin','EventReleaseDateEnd','EventDueDate','EventResultReleaseDateBegin','EventResultReleaseDateEnd')){return false;}
+	if (!validatePenalty()) {return false;}
 }
-
-
-function removeDay(){
-
-	$('penaltyDay'+ i).remove();
-	i--;
-	 
-}
-
 
 // create calendar object(s) just after form tag closed
 // specify form element as the only parameter (document.forms['formname'].elements['inputname']);

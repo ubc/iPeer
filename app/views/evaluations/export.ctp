@@ -63,9 +63,9 @@
  		  	/*<tr class="tablecell2">
           		    <td>Include Rubrics Criteria Comments:</td><td><input type="checkbox" name="rubric_criteria_comment" checked /></td><td></td>
 			</tr>*/
- 		    echo '<tr class="tablecell2">
+ 		    echo '<tr class="tablecell2 wannahide">
 		            <td>Include Rubrics Criteria Marks:&nbsp;<font color="orange">*</td><td><input class = "csv" type="checkbox" name="rubric_criteria_marks" checked /></td><td></td>
-		          <tr class="tablecell2">
+		          <tr class="tablecell2 wannahide">
 		            <td>Include Rubrics General Comments:&nbsp;<font color="orange">*</td><td><input class = "csv" type="checkbox" name="rubric_general_comments" checked /></td><td></td>
 		          </tr>';
  		    break;
@@ -100,4 +100,5 @@
 ?>
 <style type="text/css">
 .cssDisabled { color: #aaa; }
+
 </style>

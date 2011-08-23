@@ -356,24 +356,21 @@ class EventsController extends AppController
         $finalDeduction= array();
         $finalDeduction['days_late'] = -2;
         $finalDeduction['event_id'] =  $this->Event->id;
-        $finalDeduction['percent_penalty'] = $this->params['data']['PenaltySetup']['penaltyAfterAdvanced'];
+        $finalDeduction['percent_penalty'] = $this->params['data']['PenaltySetup']['penaltyAfter'];
      
         if($penaltyType == 'simple'){
           $finalDeduction['days_late'] = -1;
-          $finalDeduction['penalty_percentage'] = $this->params['data']['PenaltySetup']['penaltyAfterSimple'];
           for($i = 1; $i <= $this->params['data']['PenaltySetup']['numberOfDays']; $i++){
             $this->params['data']['Penalty'][$i]['days_late'] = $i;
             $this->params['data']['Penalty'][$i]['percent_penalty'] = $this->params['data']['PenaltySetup']['percentagePerDay'] * $i;          
           }             
-        }  
-
- 
+        }   
         foreach($this->params['data']['Penalty'] as $value => $key){
           $this->params['data']['Penalty'][$value]['event_id'] = $this->Event->id;
           $this->Penalty->save($this->params['data']['Penalty'][$value]);
           $this->Penalty->id = null;                
         }        
-        $this->Penalty->save($finalDeduction);
+        if(!$this->Penalty->save($finalDeduction)){return false;}
 
         $this->GroupEvent->insertGroups($this->Event->id, $this->params['data']['Member']);
         $this->redirect('/events/index/'.__('The event is added successfully.', true));        
@@ -399,10 +396,9 @@ class EventsController extends AppController
         $this->set('eventTemplates', $eventTemplates);
         $this->set('default',$default);
         $this->set('model', $model);
-
         $this->set('errmsg', __('Please correct errors below.', true));
         $this->render();
-      }//end if
+      }
 		}
   }
 
@@ -415,18 +411,35 @@ class EventsController extends AppController
     }
     $data = $this->Event->find('first', array('conditions' => array('id' => $id),
                                                'contain' => array('Group')));
-
-      $courseId = $this->Session->read('ipeerSession.courseId');
-
+    $penalty = $this->Penalty->find('all', array('conditions' => array('event_id' => $id)));
+    
+    $penaltyDays = $this->Penalty->find('count', array('conditions' => array('event_id' => $id, 'days_late >' => 0)));
+    $this->set('penaltyDays', $penaltyDays);
+    $penaltySetup = array();
+    if($penaltyDays > 0){
+      $penaltyAfter = $this->Penalty->find('first', array('conditions' => array('event_id' => $id), 'order' => 'days_late'));
+      $this->set('penaltyAfter', $penaltyAfter);
+ 
+      $penaltySetup['penaltyAfter'] = $penaltyAfter['Penalty']['percent_penalty'];    
+      $penaltyType =  $penaltyAfter['Penalty']['days_late']; 
+      if($penaltyType == -1) {
+        $penaltySetup['percentagePerDay'] = $penalty[0]['Penalty']['percent_penalty'];
+        $penaltyType = 'simple';      
+      } else {
+        $penaltyType = 'advanced';   
+      }          
+      $this->set('penaltySetup', $penaltySetup);
+      $this->set('penaltyType', $penaltyType);        
+    }          
+    $courseId = $this->Session->read('ipeerSession.courseId');
 	  //Clear $id to only the alphanumeric value
 		$id = $this->Sanitize->paranoid($id);
-        $this->set('event_id', $id);
-
+    $this->set('event_id', $id);   
 		$this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events', true));
-
 		$event = $this->Event->find('first', array('conditions' => array('Event.id' => $id),
                                                'contain' => array('Group.Member')));
 
+		
     //Format Evaluation Selection Boxes
     $default = null;
     $model = '';
@@ -459,6 +472,7 @@ class EventsController extends AppController
       }
 
     }
+    
   	// Sets up the already assigned groups
     $assignedGroupIds = $this->GroupEvent->getGroupListByEventId($id);
     $assignedGroups=array();
@@ -470,6 +484,7 @@ class EventsController extends AppController
     $this->set('eventTypes', $eventTypes);
     $this->set('assignedGroups', $assignedGroups);
     $this->set('data', $data); 
+    $this->set('penalty', $penalty); 
     $this->set('event', $event);
     $this->set('course_id', $courseId);
     $this->set('courses', $this->Course->getCourseList());
@@ -484,6 +499,35 @@ class EventsController extends AppController
     if (!empty($this->data)) {
       $this->data['Event']['id'] = $id;
       if($result = $this->Event->save($this->data)) {
+        $this->Penalty->deleteAll(array('event_id' => $id));
+        if($this->params['data']['Event']['penalty']){
+          $penaltyType = $this->params['data']['PenaltySetup']['type'];
+          $finalDeduction= array();
+          $finalDeduction['days_late'] = -2;
+          $finalDeduction['event_id'] =  $this->Event->id;
+          $finalDeduction['percent_penalty'] = $this->params['data']['PenaltySetup']['penaltyAfter'];
+       
+          if($penaltyType == 'simple'){
+            $finalDeduction['days_late'] = -1;
+            for($i = 1; $i <= $this->params['data']['PenaltySetup']['numberOfDays']; $i++){
+              $this->params['data']['Penalty'][$i]['days_late'] = $i;
+              $this->params['data']['Penalty'][$i]['percent_penalty'] = $this->params['data']['PenaltySetup']['percentagePerDay'] * $i;    
+              $this->params['data']['Penalty'][$i]['event_id'] = $this->Event->id;  
+              $this->Penalty->save($this->params['data']['Penalty'][$i]);
+              $this->Penalty->id = null;             
+            }             
+          }   
+         if($penaltyType == 'advanced'){
+          foreach($this->params['data']['Penalty'] as $value => $key){
+            $this->params['data']['Penalty'][$value]['event_id'] = $this->Event->id;
+            $this->Penalty->save($this->params['data']['Penalty'][$value]);
+            $this->Penalty->id = null;           
+          }        
+         }
+          if(!$this->Penalty->save($finalDeduction)){return false;}
+        }
+        
+        
         //Save Groups for the Event
         //$this->GroupEvent->insertGroups($this->Event->id, $this->data['Member']);
         $this->GroupEvent->updateGroups($this->Event->id, $this->data['Member']);
@@ -499,6 +543,7 @@ class EventsController extends AppController
       }
     } else {
       $this->data = $data;
+      $this->penalty = $penalty;
     }
         
     $this->set('eventTemplateTypes', $this->EventTemplateType->find('list', array('conditions' => array('NOT' => array('id' => 3)))));
