@@ -18,10 +18,12 @@ Event.observe(window, 'load', function(){
     $$('.export_type').each(function(chk1){
       chk1.observe('click', function(evt){
         var csv = ($('frm')['export_type'].getValue() =='excel');
-				$$('input.csv').each(function(s) {
+				$$('.wannahide').each(function(s) {
         	if (csv) {
         		s.enable().up('tr').removeClassName('cssDisabled');
+        		s.show();
         	} else { 
+        		s.hide();
         		s.disable().up('tr').addClassName('cssDisabled');
         	}
         });
