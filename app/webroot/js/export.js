@@ -15,18 +15,55 @@ function checkSubmit(){
 }
 
 Event.observe(window, 'load', function(){
-    $$('.export_type').each(function(chk1){
-      chk1.observe('click', function(evt){
-        var csv = ($('frm')['export_type'].getValue() =='excel');
-				$$('.wannahide').each(function(s) {
-        	if (csv) {
+
+  $$('.simple').each(function(s) {
+    s.show();});
+  $$('.rubrics').each(function(s) {
+   	s.hide();});
+  $$('.mix').each(function(s) {
+    s.hide();});
+	
+  $$('.export_type').each(function(chk1){
+    chk1.observe('click', function(evt){
+       var csv = ($('frm')['export_type'].getValue() =='excel');
+	     $$('input.csv').each(function(s) {
+           if (csv) {
+
         		s.enable().up('tr').removeClassName('cssDisabled');
-        		s.show();
-        	} else { 
-        		s.hide();
+           } else { 
         		s.disable().up('tr').addClassName('cssDisabled');
-        	}
+           }
         });
+      });
+    });
+
+    $$('.eval_type').each(function(chk1){
+      chk1.observe('click', function(evt){
+        var type = $('frm')['eval_type'].getValue();
+		if(type == 1) {
+		  $$('.simple').each(function(s) {
+            s.show();});
+          $$('.rubrics').each(function(s) {
+           	s.hide();});
+          $$('.mix').each(function(s) {
+            s.hide();});
+		}
+		if(type == 2) {
+			  $$('.simple').each(function(s) {
+	            s.hide();});
+	          $$('.rubrics').each(function(s) {
+	           	s.show();});
+	          $$('.mix').each(function(s) {
+	            s.hide();});
+		}
+		if(type == 4) {
+			  $$('.simple').each(function(s) {
+	            s.hide();});
+	          $$('.rubrics').each(function(s) {
+	           	s.hide();});
+	          $$('.mix').each(function(s) {
+	            s.show();});
+		}		
       });
     });
 });

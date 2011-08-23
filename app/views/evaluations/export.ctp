@@ -13,23 +13,21 @@
         </tr>
         <tr class="tablecell2">
           <td width="30%">Export File Type:</td><td width="40%"><select name="export_type" class="export_type">
+			  <option value="excel">excel</option>
 			<option value="csv">csv</option>          
-            <option value="excel">excel</option>
+          
             </select>
           </td>
           <td></td>
-        </tr>   
-
+        </tr>  
+                
         <tr class="tablecell2">
-          <td width="30%">Event Name:</td><td width="40%"><select name="export_type" class="export_type">
-			<option value="1">1</option>          
-            <option value="2">2</option>
-            <option value="4">4</option>
-            </select>
-          </td>
-          <td></td>
-        </tr>   
-
+          <td width="30%">Event Name:</td><td width="40%"><select name="eval_type" class= "eval_type">
+          	<option value="1">1</option>
+          	<option value="2">2</option>
+          	<option value="4">4</option>
+          	</select></td> <td></td>
+        </tr>        
         
         <tr class="tablesubheader">
           <td colspan="3" align="center">Header</td>
@@ -64,42 +62,28 @@
         <tr class="tablecell2">
           <td>Include Student Email:</td><td><input type="checkbox" name="include_student_email" checked /></td><td></td>
         </tr>
- 	<?php 
- 		switch($eventType){
- 		  //Simple Evaluation
- 		  case 1 :
- 		    echo '<tr class="tablecell2">
+ 		<?php //Simple Evaluation?>
+ 		    <tr class="tablecell2 simple">
           		    <td>Include Evaluator Comments:&nbsp;<font color="orange">*</td><td><input class = "csv" type="checkbox" name="simple_evaluator_comment" checked /></td><td></td>
         	      </tr>
-        	      <tr class="tablecell2">
+        	      <tr class="tablecell2 simple">
           		    <td>Include Simple Evaluation Grade Table:&nbsp;<font color="orange">*</td><td><input class = "csv" type="checkbox" name="simple_eval_grade_table" checked /></td><td></td>
-        	      </tr>';
-			break;
- 		  // Rubrics Evaluation
- 		  case 2 :
- 		  	/*<tr class="tablecell2">
-          		    <td>Include Rubrics Criteria Comments:</td><td><input type="checkbox" name="rubric_criteria_comment" checked /></td><td></td>
-			</tr>*/
- 		    echo '<tr class="tablecell2 wannahide">
+        	      </tr>
+	
+ 		<?php // Rubrics Evaluation?>
+ 		    <tr class="tablecell2 rubrics">
 		            <td>Include Rubrics Criteria Marks:&nbsp;<font color="orange">*</td><td><input class = "csv" type="checkbox" name="rubric_criteria_marks" checked /></td><td></td>
-		          <tr class="tablecell2 wannahide">
+		          <tr class="tablecell2 rubrics">
 		            <td>Include Rubrics General Comments:&nbsp;<font color="orange">*</td><td><input class = "csv" type="checkbox" name="rubric_general_comments" checked /></td><td></td>
-		          </tr>';
- 		    break;
- 		  // Mix Evaluation
- 		  case 4:
-		    echo '<tr class="tablecell2">
+		          </tr>
+
+ 		 <?php // Mix Evaluation?>
+		    <tr class="tablecell2 mix">
 		            <td>Include Comments Table:&nbsp;<font color="orange">*</td><td><input type="checkbox" class = "csv" name="include_mixeval_question_comment" checked /></td><td></td>
 		          </tr>
-		          <tr class="tablecell2">
+		          <tr class="tablecell2 mix">
 		            <td>Include Grades Table:&nbsp;<font color="orange">*</td><td><input type="checkbox" class = "csv" name="include_mixeval_grades" checked /></td><td></td>
-		          </tr>';
-		    break;
-		  // Invalid Event Id
- 		  default:
- 		  	throw new Exception("INVALID EVENT ID !");
- 		}
- 	?>
+		          </tr>
 
         <tr class="tablecell2">
           <td>Include Final Marks:</td><td><input type="checkbox" name="include_final_marks" checked /></td><td></td>
@@ -117,5 +101,4 @@
 ?>
 <style type="text/css">
 .cssDisabled { color: #aaa; }
-
 </style>

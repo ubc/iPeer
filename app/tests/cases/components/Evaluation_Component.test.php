@@ -53,7 +53,7 @@ class EvaluationTestCase extends CakeTestCase {
   }
 
   function testSaveGradePenalty() {
-    $result = $this->EvaluationComponentTest->saveGradePenalty(1, 3);
+    $result = $this->EvaluationComponentTest->saveGradePenalty(1, 1, 3);
     var_dump($result);    
   }
   
