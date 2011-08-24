@@ -26,8 +26,8 @@
 				echo '<option value='.$selectedEvent['Event']['event_template_type_id'].'>'.$selectedEvent['Event']['title'].'</option>';
           	  } else {
           	      foreach($events as $e) {
-          	  	  echo '<option value='.$e['Event']['event_template_type_id'].'>'.$e['Event']['title'].'</option>';
-          	  	  
+          	  	  //.json_encode
+          	    	        echo "<option value= '".json_encode($e)."'>".$e["Event"]["title"]."</option>";          	  	  
           	    }
           	  }
           	?>

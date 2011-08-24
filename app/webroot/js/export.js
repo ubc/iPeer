@@ -39,7 +39,7 @@ Event.observe(window, 'load', function(){
 
     $$('.eval_type').each(function(chk1){
       chk1.observe('click', function(evt){
-        var type = $('frm')['eval_type'].getValue();
+        var type = $('frm')['eval_type'].getValue().evalJSON().Event.event_template_type_id;
 		if(type == 1) {
 		  $$('.simple').each(function(s) {
             s.show();});
