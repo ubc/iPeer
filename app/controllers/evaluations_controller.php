@@ -300,20 +300,34 @@ class EvaluationsController extends AppController
 
 
   function export($eventId=null) {
-      // Make sure the present user is not a student
-      $this->rdAuth->noStudentsAllowed();
+    // Make sure the present user is not a student
+    $this->rdAuth->noStudentsAllowed();
+    if(!is_numeric($eventId)) {
+      $courseId = substr($eventId, -1);
+	  $events = $this->Event->getCourseEvent($courseId);
+      $this->set('events', $events);
+      $this->set('fromEvent', false);
+    }
+    else {
       $courseId = $this->Event->getCourseByEventId($eventId);
-      $this->set('eventId', $eventId);
-      $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Export Evaluation Results');
+      $selectedEvent = $this->Event->getEventById($eventId);
+      $this->set('selectedEvent', $selectedEvent);
+      $this->set('fromEvent', true);
+    }
+    $this->set('eventId', $eventId);
+    $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Export Evaluation Results');
       
-      //do stuff
-      if(isset($this->params['form']) && !empty($this->params['form'])){
-          $this->autoRender = false;
-		 /* if(!$this->ExportCsv->checkAll($this->params['form'], $eventId)) {
-		  	$this->Session->setFlash("Error : at least ONE of each coloured fields (*) must be selected.");
-		  	$this->redirect('');
-		   }
+    //do stuff
+    if(isset($this->params['form']) && !empty($this->params['form'])){
+      $this->autoRender = false;
+	  /* if(!$this->ExportCsv->checkAll($this->params['form'], $eventId)) {
+		 $this->Session->setFlash("Error : at least ONE of each coloured fields (*) must be selected.");
+		 $this->redirect('');
+		 }
 		 else{*/
+      if(!is_numeric($eventId)) {
+      	
+      }
             $fileName = isset($this->params['form']['file_name']) && !empty($this->params['form']['file_name']) ? $this->params['form']['file_name']:date('m.d.y');
             switch($this->params['form']['export_type']) {
               case "csv" : 

@@ -127,6 +127,7 @@ class CoursesController extends AppController
     $course = $this->Course->find('first', array('conditions' => array('id' => $id), 'recursive' => 2));
     $this->set('data', $course);
     $this->set('course_id', $id);
+    $this->set('export_eval_link', 'courses/export/'.$id);
     
     $students = $course['Course']['student_count'];
     $this->set('studentCount', $students);
@@ -309,44 +310,5 @@ class CoursesController extends AppController
       }
 		}
 	}
-	
-	
-	
-	
-  function inputParams() {
-  	  	$params = array(
-  'assigned'=>
-   '',
-  'file_name'=>
-   '07.25.11',
-  'include_course'=>
-   'on',
-  'include_date'=>
-   'on',
-  'include_instructors'=>
-
-   'on',
-  'include_eval_event_names'=>
-   'on',
-  'include_eval_event_type'=>
-   'on',
-  'include_group_names'=>
-   'on',
-  'include_student_name'=>
-   'on',
-  'include_student_id'=>
-   'on',
-  'include_student_email'=>
-
-   'on',
-  'simple_evaluator_comment'=>
-   'on',
-  'include_mixeval_question_comment' => 'on',
-  'include_mixeval_grades' => 'on',
-  'email' => 'on',
-  'include_final_marks'=>
-   'on');
-  return $params;
-  }
 }
 ?>

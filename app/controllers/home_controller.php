@@ -381,10 +381,14 @@ class HomeController extends AppController
 
   function index() {
   	
+  	$result = $this->Acl->check(array('model' => 'Role', 'foreign_key' => 1), 'controllers/Sysparameters/index');
+    var_dump($result);
+  	
+  	
     $this->autoRender = false;   
     $role = $this->Auth->user('role');
     $userId = $this->Auth->user('id');
-    
+        
     if (isset ($role)) {
       //General Home Rendering for Admin
       if ($role == $this->User->USER_TYPE_ADMIN)

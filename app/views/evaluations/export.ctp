@@ -13,18 +13,24 @@
         </tr>
         <tr class="tablecell2">
           <td width="30%">Export File Type:</td><td width="40%"><select name="export_type" class="export_type">
-			  <option value="excel">excel</option>
+			<option value="excel">excel</option>
 			<option value="csv">csv</option>          
-          
             </select>
           </td>
           <td></td>
         </tr>                  
         <tr class="tablecell2">
           <td width="30%">Event Name:</td><td width="40%"><select name="eval_type" class= "eval_type">
-          	<option value="1">1</option>
-          	<option value="2">2</option>
-          	<option value="4">4</option>
+          	<?php 
+          	  if($fromEvent) {
+				echo '<option value='.$selectedEvent['Event']['event_template_type_id'].'>'.$selectedEvent['Event']['title'].'</option>';
+          	  } else {
+          	      foreach($events as $e) {
+          	  	  echo '<option value='.$e['Event']['event_template_type_id'].'>'.$e['Event']['title'].'</option>';
+          	  	  
+          	    }
+          	  }
+          	?>
           	</select></td> <td></td>
         </tr>        
         
