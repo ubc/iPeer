@@ -12,7 +12,7 @@ class DbPatcherComponent extends Object
     $mysql = $this->connectDb($dbConfig);
 
     // apply the delta files
-    for($i = $from_version+1; $i <= DATABASE_VERSION; $i++)
+    for($i = $from_version+1; $i <= Configure::read('DATABASE_VERSION'); $i++)
     {
       $file = '../config/sql/delta_'.$i.'.sql';
       if(!(is_readable($file) && true === ($ret = $this->applyDelta($file))))
@@ -119,10 +119,10 @@ class DbPatcherComponent extends Object
     if($dbv = $sysParam->find("parameter_code = 'database.version'"))
     {
       $sysParam->id = $dbv['SysParameter']['id'];
-      $sysParam->saveField('parameter_value', DATABASE_VERSION);
+      $sysParam->saveField('parameter_value', Configure::read('DATABASE_VERSION'));
     }else{
       $dbv = array('SysParameter' => array('parameter_code' => 'database.version',
-                                           'parameter_value'=> DATABASE_VERSION,
+                                           'parameter_value'=> Configure::read('DATABASE_VERSION'),
                                            'parameter_type' => 'I',
                                            'description'    => 'database version',
                                            'record_status'  => 'A',
