@@ -32,7 +32,7 @@ class HomeController extends AppController
    *
    * @var $uses
    */
-  var $uses =  array( 'UserEnrol', 'Group', 'GroupEvent', 'User', 'UserCourse', 'Event', 'EvaluationSubmission', 'Course', 'Role','UserEnrol', 'Rubric');
+  var $uses =  array( 'UserEnrol', 'Group', 'GroupEvent', 'User', 'UserCourse', 'Event', 'EvaluationSubmission', 'Course', 'Role','UserEnrol', 'Rubric', 'Penalty');
 
   var $page;
   var $Sanitize;
@@ -480,14 +480,25 @@ class HomeController extends AppController
     $diff = $this->framework->getTimeDifference($event['due_date'], $this->framework->getTime());
     $isLate = ($diff < 0);
     $dueIn = abs(floor($diff));
-    
     // if eval submission is not submitted or doesn't exist, output
     if (!$isSubmitted) {
+
+
+
       $result['comingEvent']['Event'] = $event;
       $result['comingEvent']['Event']['is_late'] = $isLate;
       $result['comingEvent']['Event']['days_to_due'] = $dueIn;
       $result['comingEvent']['Event']['group_id'] = $groupEvent['group_id'];
       $result['comingEvent']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
+    
+      if($isLate) {
+        $penalty = $this->Penalty->find('first', array(
+        	'conditions' => array('event_id' => $event['id'], 'OR' => array(
+              array('days_late' => $dueIn), array('days_late <' => 0))),
+          'order' => array('days_late DESC')));       
+        $result['comingEvent']['Event']['penalty'] = $penalty['Penalty']['percent_penalty'];
+      }
+      
     }
     else {
       $result['eventSubmitted']['Event'] = $event;

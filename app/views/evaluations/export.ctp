@@ -19,8 +19,7 @@
             </select>
           </td>
           <td></td>
-        </tr>  
-                
+        </tr>                  
         <tr class="tablecell2">
           <td width="30%">Event Name:</td><td width="40%"><select name="eval_type" class= "eval_type">
           	<option value="1">1</option>

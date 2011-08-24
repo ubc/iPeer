@@ -43,11 +43,15 @@
 				echo $this->requestAction('home/formatDate/'.$timeStamp); ?>&nbsp;</td>
 			<td><?php
 			  if ($comingUpEvent['Event']['is_late']) {
-			     echo "<font color=\"red\"><b>" . $comingUpEvent['Event']["days_to_due"] . "</b>".__(' day(s)', true)." !</font>";
+			     echo "<font color=\"red\"><b>" . $comingUpEvent['Event']["days_to_due"] . "</b>".__(' day(s)', true)."!  ";
+			   if (isset($comingUpEvent['Event']['penalty'])){
+			     echo ($comingUpEvent['Event']['penalty'].'% penalty');
+			  }
+			  echo "</font>";
 			  } else {
 			     echo "<b>".$comingUpEvent['Event']['days_to_due']."</b>".__(' day(s)', true);
 			  		if ($comingUpEvent['Event']['days_to_due'] <= 2) {
-    				print " <b>!</b>";
+    				print "<b>!</b>";
     			}
 			  }
 			  ?>&nbsp;</td>
