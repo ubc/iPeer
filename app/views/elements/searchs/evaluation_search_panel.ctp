@@ -1,5 +1,4 @@
 <?php echo $html->script('datepicker');
-//var_dump($this->params);
 ?>
 <form name="frm" id="frm" method="POST">
 <input type="hidden" id="search_type" name="search_type" value="<?php echo $display?>"/>

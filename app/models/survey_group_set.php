@@ -116,7 +116,6 @@ class SurveyGroupSet extends AppModel
     $result = true;
     $groups = array();
 
-    //var_dump($group_set);return;
     //get last group number if exists
     $max_group_num = $Group->getLastGroupNumByCourseId($group_set['Survey']['course_id']);
 

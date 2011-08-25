@@ -73,9 +73,7 @@ class Question extends AppModel
     for( $i=0; $i<$data['count']; $i++ ){
       $data[$i]['Question'] = $this->find('all',array('conditions' => array('id' => $data[$i]['SurveyQuestion']['question_id']),
       									  			  'fields' => array('prompt', 'type')));
-	  //var_dump($data[$i]['Question'][0]['Question']);
       $data[$i]['Question'] = $data[$i]['Question'][0]['Question'];
-      //var_dump($data[$i]['surveyQuestion']['number']);
       $data[$i]['Question']['number'] = $data[$i]['SurveyQuestion']['number'];
       $data[$i]['Question']['id'] = $data[$i]['SurveyQuestion']['question_id'];
       $data[$i]['Question']['sq_id'] = $data[$i]['SurveyQuestion']['id'];

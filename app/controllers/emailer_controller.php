@@ -106,7 +106,6 @@ class EmailerController extends AppController
   function write($to = ' '){
     //TODO: preview function
     if(isset($this->params['form']['preview'])){
-      var_dump($this->data);
       $this->render('preview');
     }
     else{

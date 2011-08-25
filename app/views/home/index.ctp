@@ -9,7 +9,6 @@
   ?>
       <div class="course">
 	  	  <div class="course-header">
-	  	  <?php //var_dump($row);?>
           <?php echo $html->link($html->image("icons/home.gif", array("border"=>"0","alt"=>$row['Course']['course'])).$row['Course']['course'], 
                                  "/courses/home/".$row['Course']['id'],
                                  array('escape'=>false)
@@ -17,7 +16,6 @@
 		    </div>
 
         <div class="instructor">
-        <?php //var_dump($row);?>
             <b><?php __('Instructor')?> <?php echo count($row['Instructor']) > 2 ? 's':''; ?>: </b>&nbsp;
             <?php echo $this->element('courses/course_instructors',
                                       array('instructors' => $row['Instructor']));?>

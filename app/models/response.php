@@ -32,7 +32,6 @@ class Response extends AppModel {
   // Function is Obsolete
 	// saves all the responses in the database
 	/*function linkResponses($question_id, $data) {
-		var_dump($data);
 		for($i = 1; $i <= $data['Question']['count']; $i++){
 			if(!empty($data['Question']['response_'.$i])){
 				$tmpData['response'] = $data['Question']['response_'.$i];

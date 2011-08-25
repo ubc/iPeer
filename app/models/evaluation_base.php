@@ -29,7 +29,6 @@ class EvaluationBase extends AppModel {
       return false;
     }
        //check if questions are entered
-    //   var_dump($this->data['Question']);
     if(!empty($this->data['Question'])&&$this->name =='Mixeval') {
      foreach ($this->data['Question'] as $row) {
     	 if ($row['question_type']== 'S' &&(empty($row['Description'] ) || (count($row['Description'])) < 2)) {

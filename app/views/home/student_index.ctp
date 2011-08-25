@@ -128,7 +128,6 @@
                         <td><?php $isResultReleased ? __('Released'): __('Not Released'); ?></td>
 			<td><?php 
 				$due_date = $eventSubmitted['Event']['due_date'];
-				//var_dump($eventSubmitted['Event']['due_date']);
 				$timeStamp = strtotime($due_date);
 				echo $this->requestAction('home/formatDate/'.$timeStamp); ?>&nbsp;</td>
 			<td><?php 
