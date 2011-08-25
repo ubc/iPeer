@@ -94,7 +94,7 @@
 		  	  <font color="#FF6666"> - <?php __('Incomplete')?> </font>
 		  	<?php endif;?>
 		  </div>
-		  <div style="height: 200px;" id="panel1Content" class="panelContent">
+		  <div id="panel1Content" class="panelContent">
 			 <br><br>
 
       <?php
@@ -198,8 +198,7 @@
 </tr>
 </table>
 	<script type="text/javascript"> new Rico.Accordion( 'accordion',
-								{panelHeight:800,
-								 hoverClass: 'mdHover',
+								{hoverClass: 'mdHover',
 								 selectedClass: 'mdSelected',
 								 clickedClass: 'mdClicked',
 								 unselectedClass: 'panelheader'});
