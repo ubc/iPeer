@@ -1326,7 +1326,7 @@ CREATE TABLE IF NOT EXISTS `sys_parameters` (
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `parameter_code` (`parameter_code`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=21 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=25 ;
 
 --
 -- Dumping data for table `sys_parameters`
@@ -1351,7 +1351,11 @@ INSERT INTO `sys_parameters` (`id`, `parameter_code`, `parameter_value`, `parame
 (16, 'system.password_reset_mail', 'Dear <user>,<br> Your password has been reset to <newpassword>. Please use this to log in from now on. <br><br>iPeer Administrator', 'S', NULL, 'A', 0, '2010-07-27 16:42:17', NULL, '2010-07-27 16:42:17'),
 (17, 'system.password_reset_emailsubject', 'iPeer Password Reset Notification', 'S', NULL, 'A', 0, '2010-07-27 16:42:17', NULL, '2011-08-09 21:22:59'),
 (18, 'display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', 0, '2010-07-27 16:42:17', NULL, '2010-07-27 16:42:17'),
-(20, 'database.version', '4', 'I', 'database version', 'A', 0, '2010-07-27 16:42:18', NULL, '2010-10-13 15:19:27');
+(20, 'database.version', '4', 'I', 'database version', 'A', 0, '2010-07-27 16:42:18', NULL, '2010-10-13 15:19:27'),
+(21, 'email.port', '465', 'S', 'port number for email smtp option', 'A', '0', '2011-07-18 14:23:26', NULL , '2011-07-18 14:23:26'),
+(22, 'email.host', 'email_host', 'S', 'host address for email smtp option', 'A', '0', '2011-07-18 14:23:26', NULL , '2011-07-18 14:23:26'),
+(23 , 'email.username', 'your_email_address', 'S', 'username for email smtp option', 'A', '0', '2011-07-18 14:23:26', NULL , '2011-07-18 14:23:26'),
+(24 , 'email.password', 'your_email_password', 'S', 'password for email smtp option', 'A', '0', '2011-07-18 14:23:26', NULL , '2011-07-18 14:23:26');
 
 -- --------------------------------------------------------
 
