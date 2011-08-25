@@ -106,7 +106,6 @@ class CoursesController extends AppController
   function export() {}
    
   function index() {
-  	var_dump("AD");
     // Set up the basic static ajax list variables
     $this->setUpAjaxList();
     // Set the display list
@@ -114,7 +113,6 @@ class CoursesController extends AppController
   }
   
   function ajaxList() {
-  	var_dump("D");
     // Set up the list
     $this->setUpAjaxList();
     // Process the request for data
@@ -314,3 +312,4 @@ class CoursesController extends AppController
 	}
 }
 ?>
+

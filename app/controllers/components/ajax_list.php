@@ -231,7 +231,8 @@ class AjaxListComponent extends Object {
 
         // Figure out the table joins, if any
         $joinTable = "";
-        if (!empty($this->joinFilters)) {
+        // comment out by compass. use association and default join format
+/*        if (!empty($this->joinFilters)) {
             for ($i = 0; $i < sizeof($this->joinFilters); $i++) {
                 $joinFilter = $this->joinFilters[$i];
                 if (!empty($joinFilter)) {
@@ -244,7 +245,9 @@ class AjaxListComponent extends Object {
                     $joinTable .= " on `$localModel`.`$localKey`=`$joinFilter[joinModel]`.`$foreignKey`";
                 }
             }
-        }
+        }*/
+
+
 
         // Get the group By // we always group by this models's id, to make
         // sure there is only 1 result per entry even when using inner join.
@@ -269,9 +272,8 @@ class AjaxListComponent extends Object {
         } else {
             //$count = $this->betterCount
             //    ($conditions, $groupBy, $this->recursive, array($joinTable));
-          $count = count($this->model->$customModelFindFunction('all', array('conditions' => $conditions,
-                                                                         'group' => $this->model->name.'.id',
-                                                                         'joins'      => array($joinTable))));
+          $count = $this->model->$customModelFindFunction('count', array('conditions' => $conditions,
+                                                                         ));
         }
 
         // Format the dates as given in the iPeer database
@@ -428,14 +430,15 @@ class AjaxListComponent extends Object {
 
 
     function getParamsForList() {
-                // Collect the parameters
-        return array(
-            "webroot"     => $this->webroot,
-            "controller"  => $this->controllerName,
-            "columns"     => $this->columns,
-            "actions"     => $this->actions,
-            "joinFilters" => $this->joinFilters,
-            "data"        => $this->getListByState());
+      // Collect the parameters
+      return array(
+            'webroot'     => $this->webroot,
+            'controller'  => $this->controllerName,
+            'columns'     => $this->columns,
+            'actions'     => $this->actions,
+            'joinFilters' => $this->joinFilters,
+            'data'        => $this->getListByState()
+            );
     }
 }
 

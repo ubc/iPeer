@@ -39,11 +39,7 @@ class UsersController extends AppController
 {
 		
   var $name = 'Users';
-  var $show;
-  var $sortBy;
   var $direction;
-  var $page;
-  var $order;
   var $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Pagination');
   var $NeatString;
   var $Sanitize;
@@ -54,12 +50,7 @@ class UsersController extends AppController
   {
     $this->Sanitize = new Sanitize;
     $this->NeatString = new NeatString;
-    $this->show = empty($_GET['show'])? 'null':$this->Sanitize->paranoid($_GET['show']);
-    if ($this->show == 'all') $this->show = 99999999;
-    $this->sortBy = empty($_GET['sort'])? 'id': $_GET['sort'];
     $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
-    $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
-    $this->order = $this->sortBy . ' ' . strtoupper($this->direction);
     $this->set('title_for_layout', __('Users', true));
     parent::__construct();
   }
@@ -128,23 +119,25 @@ class UsersController extends AppController
                      array("User.id",         "",             "",      "hidden"),
                      array("User.username",   __("Username", true),     "10em",  "action", "View User"),
                      array("User.full_name",  __("Full Name", true),    "15em",  "string"),
-                     array("User.email",      __("Email", true),        "auto",  "action", "Send Email")//,
-                     //array("UserEnrol.course_id", "Course ID", "number")
+                     array("User.email",      __("Email", true),        "auto",  "action", "Send Email"),
+                     //array("UserEnrol.course_id", "Course ID", "number"),
                     );
 
     // The course to list for is the extra filter in this case
-    $joinTables =
+    $joinTables = 
       array(
             array(  // Define the GUI aspecs
-                    "id"            => "course_id",
+                    "id"            => "Enrolment.id",
                     "description"   => __("for Course:", true),
                     // What are the choises and the default values?
                     "list"  => $coursesList,
                     "default" => $this->Session->read('ipeerSession.courseId'),
                     // What table do we join to get these
-                    "joinTable"     => "user_enrols",
-                    "joinModel"     => "UserEnrol",
-                    "foreignKey"    => "user_id",
+                    // commented out by compass. use association and default 
+                    // join format
+//                    "joinTable"     => "user_enrols",
+//                    "joinModel"     => "UserEnrol",
+//                    "foreignKey"    => "user_id",
 
                     // Any show/hide features based on maps
                     "dependsMap"    => "User.role",    // Look to this column
@@ -167,8 +160,6 @@ class UsersController extends AppController
 //                    "dependsValues" => array("S")  // Display only when this column is one of these values
 //                 )
            );
-
-    $extraFilters = array();
 
     // Define Actions
     $deleteUserWarning = __("Delete this user. Irreversible. Are you sure?", true);
@@ -194,7 +185,7 @@ class UsersController extends AppController
                     );
 
     $this->AjaxList->setUp($this->User, $columns, $actions, "User.id", "User.username",
-                           $joinTables, $extraFilters);
+                           $joinTables);
   }
 
   function ajaxList($pageForRedirect=null) {
@@ -1017,7 +1008,8 @@ class UsersController extends AppController
     }
 
 
-    function getQueryAttribute($displayUserType = null, $courseId = null, $is_count = false)
+    // unused function
+/*    function getQueryAttribute($displayUserType = null, $courseId = null, $is_count = false)
     {
         $attributes = array('fields'    => 'User.id, User.username, User.role, User.first_name, User.last_name, User.email, User.created, User.creator_id, User.modified, User.updater_id',
                             'condition' => array(),
@@ -1064,7 +1056,7 @@ class UsersController extends AppController
 
         $attributes['joinTable'] = $joinTable;
         return $attributes;
-    }
+    }*/
 
     function update($attributeCode='',$attributeValue='') {
         if ($attributeCode != '' && $attributeValue != '') //check for empty params

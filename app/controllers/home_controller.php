@@ -102,6 +102,10 @@ class HomeController extends AppController
     $this->Role->save();
 
     $this->Role->set('id', '');
+    $this->Role->set('name', 'tutor');
+    $this->Role->save();
+
+    $this->Role->set('id', '');
     $this->Role->set('name', 'student');
     $this->Role->save();
   }
