@@ -236,7 +236,7 @@ class UsersController extends AppController
         // Clear the state first, we don't want any previous searches/selections.
         $this->AjaxList->clearState();
         // Set and update session state Variable
-        $joinFilterSelections->course_id = $course;
+        $joinFilterSelections->{'Enrolment.id'} = $course;
         $this->AjaxList->setStateVariable("joinFilterSelections", $joinFilterSelections);
         // but since that join filter depends on user role, we should set that too.
         $mapFilterSelections->{"User.role"} = "S";
