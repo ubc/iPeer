@@ -114,6 +114,7 @@ class CoursesController extends AppController
   }
   
   function ajaxList() {
+  	var_dump("D");
     // Set up the list
     $this->setUpAjaxList();
     // Process the request for data
