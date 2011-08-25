@@ -286,16 +286,15 @@ class EvaluationComponent extends Object
     $groupAve = 0;
     $studentResult = array();
     $results = $this->EvaluationSimple->getResultsByEvaluatee($event['group_event_id'], $this->Auth->user('id'));
-    
     if ($results !=null) {
       //Get Grade Release: grade_release will be the same for all evaluatee records
       $gradeReleaseStatus = $results[0]['EvaluationSimple']['grade_release'];
       if ($gradeReleaseStatus) {
         //Grade is released; retrieve all grades
         //Get total mark each member received
-		$receivedTotalScore = $this->EvaluationSimple->getReceivedTotalScore(
+	    	$receivedTotalScore = $this->EvaluationSimple->getReceivedTotalScore(
         $event['group_event_id'], $this->Auth->user('id'));
-	  	$totalScore = $receivedTotalScore[0][0]['received_total_score'];	
+	    	$totalScore = $receivedTotalScore[0][0]['received_total_score'];	
         $numMemberSubmissions = $this->EvaluationSimple->find('count',array(
             'conditions' => array(
                 'EvaluationSimple.evaluatee' => $this->Auth->user('id'),
@@ -304,8 +303,8 @@ class EvaluationComponent extends Object
 
         $userPenalty = $this->UserGradePenalty->getByUserIdGrpEventId($event['group_event_id'], $this->Auth->user('id'));
         $scorePenalty = $this->Penalty->getPenaltyById($userPenalty['UserGradePenalty']['penalty_id']);
-		$subtractAvgScore = ((($scorePenalty['Penalty']['percent_penalty']) / 100) * $totalScore) / $numMemberSubmissions;
-		
+	    	$subtractAvgScore = ((($scorePenalty['Penalty']['percent_penalty']) / 100) * $totalScore) / $numMemberSubmissions;
+
         $aveScore = $totalScore / $numMemberSubmissions;
         $studentResult['numMembers'] = $numMemberSubmissions;
         $studentResult['receivedNum'] = count($receivedTotalScore);
@@ -334,7 +333,7 @@ class EvaluationComponent extends Object
         }
         $groupAve = $tmp_total/count($avg);
        }
-	   $studentResult['avePenalty'] = $subtractAvgScore;
+	     $studentResult['avePenalty'] = $subtractAvgScore;
        $studentResult['aveScore'] = $aveScore;
        $studentResult['groupAve'] = $groupAve;
        

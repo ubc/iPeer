@@ -31,8 +31,9 @@
     <td colspan="3"><?php
       if ($gradeReleaseStatus) {
       	$finalAvg = $aveScore - $ratingPenalty;
-      	$ratingPenalty > 0 ? $stringAddOn = ' - '.'('."<font color=\"red\">".$ratingPenalty."</font>".')'."<font color=\"red\">*</font>".' = '.number_format($finalAvg, 2):
-      						 $stringAddon = '';
+      	($ratingPenalty > 0)?($stringAddOn = ' - '.'('."<font color=\"red\">".$ratingPenalty."</font>".')'."<font color=\"red\">*</font>".' = '.number_format($finalAvg, 2)):
+      	                    $stringAddOn = '';
+      						 
         echo number_format($aveScore, 2).$stringAddOn;
         echo "&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp ( )"."<font color=\"red\">*</font>"." : Denotes late penalty.";
       } else {
