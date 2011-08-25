@@ -106,7 +106,6 @@ class CoursesController extends AppController
   function export() {}
    
   function index() {
-  	var_dump("d");
     // Set up the basic static ajax list variables
     $this->setUpAjaxList();
     // Set the display list
