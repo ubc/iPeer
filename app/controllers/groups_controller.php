@@ -566,41 +566,44 @@ class GroupsController extends AppController
 		}
 	}
 	
-	function export($courseId) {	
-      $this->set('courseId', $courseId);
-      if (isset($this->params['form']) && !empty($this->params['form'])) {
-      	// check that at least one group has been selected
-      	if(empty($this->data['Member']['Member'])) {
-      	  $this->Session->setFlash("Please select at least one group to export.");
-      	  $this->redirect('');
-      	}
-      	$this->autoRender = false;
-      	$fileContent = '';
-      	$groups = $this->data['Member']['Member'];
-        if(!empty($this->params['form']['include_group_names'])) {
-	  	  $fileContent .= "Group Name,";
-	  	}
-	    if(!empty($this->params['form']['include_student_id'])) {
-	  	  $fileContent .= "Student #,";
-	  	}
-	   	if(!empty($this->params['form']['include_student_name'])) {
-	   	  $fileContent .= "Last Name, First Name,";
-	  	}
-	  	if(!empty($this->params['form']['include_student_email'])) {
-		  $fileContent .= "Email Address\n\n";
-	  	}
-      	foreach ($groups as $groupId) {
-		  $fileContent .= $this->ExportCsv->buildGroupExportCsvByGroup($this->params['form'], $groupId);
-      	}
-        header('Content-Type: application/csv');
-        header('Content-Disposition: attachment; filename=' .$this->params['form']['file_name']. '.csv');
-        echo $fileContent;
-      } else {
-      	// format data
-        $unassignedGroups = $this->Group->find('list', array('conditions'=> array('course_id'=>$courseId), 'fields'=>array('group_name')));
-        $this->set('unassignedGroups', $unassignedGroups);
+  function export($courseId) {	
+    $this->set('courseId', $courseId);
+    if (isset($this->params['form']) && !empty($this->params['form'])) {
+      // check that at least one group has been selected
+      if(empty($this->data['Member']['Member'])) {
+        $this->Session->setFlash("Please select at least one group to export.");
+        $this->redirect('');
       }
-	}
+      $this->autoRender = false;
+      $fileContent = '';
+      $groups = $this->data['Member']['Member'];
+      if(!empty($this->params['form']['include_group_names'])) {
+        $fileContent .= "Group Name,";
+      }
+      if(!empty($this->params['form']['include_student_id'])) {
+        $fileContent .= "Student #,";
+      }
+      if(!empty($this->params['form']['include_student_name'])) {
+        $fileContent .= "Last Name, First Name,";
+      }
+      if(!empty($this->params['form']['include_student_email'])) {
+        $fileContent .= "Email Address";
+      }
+
+      $fileContent .= "\n";
+
+      foreach ($groups as $groupId) {
+        $fileContent .= $this->ExportCsv->buildGroupExportCsvByGroup($this->params['form'], $groupId);
+      }
+      header('Content-Type: application/csv');
+      header('Content-Disposition: attachment; filename=' .$this->params['form']['file_name']. '.csv');
+      echo $fileContent;
+    } else {
+      // format data
+      $unassignedGroups = $this->Group->find('list', array('conditions'=> array('course_id'=>$courseId), 'fields'=>array('group_name')));
+      $this->set('unassignedGroups', $unassignedGroups);
+    }
+  }
 
 /*    function getFilteredStudent()
     {

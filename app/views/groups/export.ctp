@@ -20,7 +20,7 @@
           <td width="60%">Include Group Names:</td><td><input type="checkbox" name="include_group_names" checked /></td>
         </tr>
         <tr class="tablecell2">
-          <td>Include Studenta Name:&nbsp;<font color="Red">*</td><td><input type="checkbox" name="include_student_name" checked /></td>
+          <td>Include Student Name:&nbsp;<font color="Red">*</td><td><input type="checkbox" name="include_student_name" checked /></td>
         </tr>
         <tr class="tablecell2">
           <td>Include Student Id:&nbsp;<font color="Red">*</td><td><input type="checkbox" name="include_student_id" checked /></td>
@@ -45,7 +45,7 @@
 		</tr>
         <tr class="tablecell2">
           <td colspan="3" align="center">
-          <?php echo $this->Form->submit(ucfirst($this->action).__(' Event', true), array('div' => false,
+          <?php echo $this->Form->submit(ucfirst($this->action).__(' Group', true), array('div' => false,
 			'onClick' => "processSubmit(document.getElementById('selected_groups'));")) ?>
 		  </td>
         </tr>
