@@ -172,6 +172,32 @@ if ($event['Event']['id']==292) {
     </td>
   </tr>
 </table>
+
+    <div style="text-align:left; margin-left:3em;"><a href="#" onClick="javascript:$('penalty').toggle();return false;">( <?php __('Show/Hide late penalty policy')?> )</a></div>
+    <div id ="penalty" style ="border:1px solid red; margin: 0.5em 0 0 3em; width: 450px; padding:0.5em; color:darkred; display:none">
+    	   	
+	<?php if(!empty($penalty)){
+	  
+	  if($penaltyType == -1){
+      echo $penalty[0]['Penalty']['percent_penalty'].'% is deducted every day for '.$penaltyDays.' days. '.$penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';	    
+	  }
+	  
+	  if($penaltyType == -2){
+      foreach($penalty as $day){  
+        $mult = ($day['Penalty']['days_late']>1)?'s':'';
+        echo $day['Penalty']['days_late'].' day'.$mult.' late: '.$day['Penalty']['percent_penalty'].'% deduction. </br>'; 
+      }
+      echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';	    
+	  }	 
+	 } else {
+	   echo 'No penalty is specified for this evaluation.';	   
+	 }
+	
+	?>    
+
+  </div>
+
+    </br>
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr class="tableheader">
 		<td width="30%"><?php __('Member(s)')?></td>

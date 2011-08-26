@@ -369,6 +369,17 @@ class EvaluationsController extends AppController
           $event = $this->Event->formatEventObj($eventId, $groupId);
           $this->set('event', $event);
 
+          
+          $penalty = $this->Penalty->getPenaltyByEventId($eventId);
+          $penaltyType = $this->Penalty->getPenaltyType($eventId);
+          $penaltyDays = $this->Penalty->getPenaltyDays($eventId);
+          $penaltyFinal = $this->Penalty->getPenaltyFinal($eventId);
+          $this->set('penaltyFinal', $penaltyFinal);
+          $this->set('penaltyDays', $penaltyDays);
+          $this->set('penalty', $penalty);
+          $this->set('penaltyType', $penaltyType['Penalty']['days_late']);
+          
+          
           //Setup the courseId to session
           //$this->rdAuth->setCourseId($event['Event']['course_id']);
           $this->set('courseId', $event['Event']['course_id']);
@@ -516,7 +527,18 @@ function makeSurveyEvaluation ($param = null) {
           //$msg = strtok(';');
           $event = $this->Event->formatEventObj($eventId, $groupId);
           $rubricId = $event['Event']['template_id'];
-          $data = $this->Rubric->getRubricById($rubricId);
+          $data = $this->Rubric->getRubricById($rubricId);          
+                    
+          $penalty = $this->Penalty->getPenaltyByEventId($eventId);
+          $penaltyType = $this->Penalty->getPenaltyType($eventId);
+          $penaltyDays = $this->Penalty->getPenaltyDays($eventId);
+          $penaltyFinal = $this->Penalty->getPenaltyFinal($eventId);
+          $this->set('penaltyFinal', $penaltyFinal);
+          $this->set('penaltyDays', $penaltyDays);
+          $this->set('penalty', $penalty);
+          $this->set('penaltyType', $penaltyType['Penalty']['days_late']);
+          
+          
           $this->set('data', $data);
           $this->set('event', $event);
           //Setup the courseId to session
