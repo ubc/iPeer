@@ -634,13 +634,26 @@ function makeSurveyEvaluation ($param = null) {
       }
   }
 
+  
+  
   function makeMixevalEvaluation ($param = '') {
+
       $this->autoRender = false;
       if (empty($this->params['data'])) {
           $tok = strtok($param, ';');
           $eventId = $tok;
           $groupId = strtok(';');
           //$msg = strtok(';');
+     
+          $eventId = $tok;
+          $penalty = $this->Penalty->getPenaltyByEventId($eventId);
+          $penaltyType = $this->Penalty->getPenaltyType($eventId);
+          $penaltyDays = $this->Penalty->getPenaltyDays($eventId);
+          $penaltyFinal = $this->Penalty->getPenaltyFinal($eventId);
+          $this->set('penaltyFinal', $penaltyFinal);
+          $this->set('penaltyDays', $penaltyDays);
+          $this->set('penalty', $penalty);
+          $this->set('penaltyType', $penaltyType['Penalty']['days_late']);
           $event = $this->Event->formatEventObj($eventId, $groupId);
           $this->set('event', $event);
           $this->set('evaluator_id',$this->Auth->user('id'));
@@ -887,7 +900,6 @@ function makeSurveyEvaluation ($param = null) {
       //Get Group Event
       $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($event['Event']['id'], $event['group_id']);
       $currentDate = strtotime('NOW');
-
       //Check if event is in range of result release date
       if($currentDate>=strtotime($event['Event']['release_date_begin'])&&$currentDate<strtotime($event['Event']['release_date_end'])){
         switch ($event['Event']['event_template_type_id'])

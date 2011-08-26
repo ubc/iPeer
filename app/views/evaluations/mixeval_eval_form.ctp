@@ -49,11 +49,35 @@
       <b> <?php __('Instructions:')?></b><br>
       1. <?php __("Click your peer's name to rate his/her performance.")?><br>
       2. <?php __('Enter Comments')?>' <?php echo  $event['Event']['com_req']? '<font color="red">'.__('(Must)', true). '</font>' : __('(Optional)', true) ;?> .<br>
-      3. <?php __(' Press "Save This Section" or "Edit This Section" once to save the evaluation on individual peer.')?><br>
-      4. <?php __('Press "Submit to Complete the Evaluation" to submit your evlauation to all peers.')?> <br>
+      3. <?php __('Press "Save This Section" or "Edit This Section" once to save the evaluation on individual peer.')?><br>
+      4. <?php __('Press "Submit to Complete the Evaluation" to submit your evaluation to all peers.')?> <br>
     </td>
   </tr>
 </table>
+    <div style="text-align:left; margin-left:3em;"><a href="#" onClick="javascript:$('penalty').toggle();return false;">( <?php __('Show/Hide late penalty policy')?> )</a></div>
+    <div id ="penalty" style ="border:1px solid red; margin-left: 3em; margin-top:0.5em; width: 450px; padding:0.5em; color:darkred; display:none">
+    	
+	<?php if(!empty($penalty)){
+	  
+	  if($penaltyType == -1){
+      echo $penalty[0]['Penalty']['percent_penalty'].'% is deducted every day for '.$penaltyDays.' days. '.$penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';	    
+	  }
+	  
+	  if($penaltyType == -2){
+      foreach($penalty as $day){  
+        $mult = ($day['Penalty']['days_late']>1)?'s':'';
+        echo $day['Penalty']['days_late'].' day'.$mult.' late: '.$day['Penalty']['percent_penalty'].'% deduction. </br>'; 
+      }
+      echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';	    
+	  }	 
+	 } else {
+	   echo 'No penalty is specified for this evaluation.';	   
+	 }
+	
+	?>    
+    
+  </div>
+ 
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr>
 		<td>
