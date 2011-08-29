@@ -384,10 +384,6 @@ class HomeController extends AppController
   }
 
   function index() {
-  	
-  	$result = $this->Acl->check(array('model' => 'Role', 'foreign_key' => 1), 'controllers/Sysparameters/index');
-  	
-  	
     $this->autoRender = false;   
     $role = $this->Auth->user('role');
     $userId = $this->Auth->user('id');
@@ -396,14 +392,13 @@ class HomeController extends AppController
       //General Home Rendering for Admin
       if ($role == $this->User->USER_TYPE_ADMIN)
       {
-        
-        
-//            $inactiveCourseDetail = array();
-//            $inactiveCourseList = $this->Course->getInactiveCourses();
-//            $inactiveCourseDetail = $this->formatCourseList($inactiveCourseList);
+      	
+//          $inactiveCourseDetail = array();
+//          $inactiveCourseList = $this->Course->getInactiveCourses();
+//          $inactiveCourseDetail = $this->formatCourseList($inactiveCourseList);
 //
-//            $this->set('course_list', $inactiveCourseDetail);
-//            $this->render('index');
+//          $this->set('course_list', $inactiveCourseDetail);
+//          $this->render('index');
 
             $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
             $this->set('course_list', $this->formatCourseList($course_list));

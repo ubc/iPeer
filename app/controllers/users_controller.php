@@ -215,7 +215,7 @@ class UsersController extends AppController
 
     // Set the display list
     $this->set('paramsForList', $this->AjaxList->getParamsForList());
-
+    
     $this->set('can_add_user', $this->AccessControl->hasPermission('functions/user', 'create'));
     $this->set('can_import_user', $this->AccessControl->hasPermission('functions/user/import'));
     

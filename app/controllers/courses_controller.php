@@ -37,7 +37,7 @@ class CoursesController extends AppController
 	var $order;
 	var $Sanitize;
 	var $helpers = array('Html','Ajax', 'excel', 'Javascript','Time','Pagination', 'Js' => array('Prototype'));
-	var $components = array('ExportBaseNew', 'AjaxList', 'ExportCsv', 'ExportExcel');
+	var $components = array('ExportBaseNew', 'AjaxList', 'ExportCsv', 'ExportExcel', 'FacultyCoursesAccessControl', 'TreeBuilder');
 	
   function __construct() {
 		$this->Sanitize = new Sanitize;
@@ -102,10 +102,13 @@ class CoursesController extends AppController
    if($dateDiff->format('%i') || $dateDiff->format('%s')){$days++;}}
    return $days;  
   }
-  
-  function export() {}
    
   function index() {
+	$this->FacultyAco = ClassRegistry::init('FacultyAco');
+	$this->FacultyAcoUser = ClassRegistry::init('FacultyAcoUser');
+	
+	$this->TreeBuilder->addChildNode(1, 'Science');
+
     // Set up the basic static ajax list variables
     $this->setUpAjaxList();
     // Set the display list

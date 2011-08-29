@@ -1,0 +1,1 @@
+<?phpclass FacultyAco extends AppModel{	  var $actsAs = array('Tree');  var $name = 'FacultyAco';}?>

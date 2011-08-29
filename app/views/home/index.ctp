@@ -29,7 +29,6 @@
               <td width="254"><b><?php __('Completion Ratio')?></b></td>
               <td width="243"><b><?php __('Due Date')?> </b></td>
             </tr>
-
             <?php if (count($row['Event']) == 0):?>
             <tr><td colspan='3'><?php __('None')?></td></tr>
             <?php else:?>

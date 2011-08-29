@@ -1,0 +1,1 @@
+<?phpclass DepartmentCourse extends AppModel {	  var $name = 'DepartmentCourse';  }?>
