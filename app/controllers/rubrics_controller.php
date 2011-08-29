@@ -36,7 +36,7 @@ class RubricsController extends AppController
 	var $order;
 	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
 	var $Sanitize;
-  var $components = array('AjaxList','Output','sysContainer', 'globalConstant', 'userPersonalize', 'framework');
+  var $components = array('AjaxList','Output','sysContainer', 'userPersonalize', 'framework');
 
 	function __construct()
 	{

@@ -38,7 +38,7 @@ class SurveysController extends AppController
   var $order;
   var $Sanitize;
   var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
-  var $components = array('AjaxList','rdAuth','Output','sysContainer', 'globalConstant','userPersonalize', 'framework');
+  var $components = array('AjaxList','rdAuth','Output','sysContainer', 'framework');
 
 
   function __construct() {

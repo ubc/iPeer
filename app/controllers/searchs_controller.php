@@ -17,7 +17,7 @@ class SearchsController extends AppController
   var $Sanitize;
   var $functionCode = 'ADV_SEARCH';
   var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
-  var $components = array('Output','sysContainer', 'globalConstant', 'Search',
+  var $components = array('Output','sysContainer', 'Search',
       'userPersonalize', 'framework', 'sysContainer', 'Evaluation');
   
 	

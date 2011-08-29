@@ -90,7 +90,13 @@ class Course extends AppModel
                                          )
                                   );
 
-  var $STATUS = array('I' => 'Inactive', 'A' => 'Active');
+  /* Record Status - Active, Inactive */
+  const STATUS_ACTIVE = 'A';
+  const STATUS_INACTIVE = 'I';
+  var $STATUS = array(
+	  self::STATUS_ACTIVE => 'Active',
+	  self::STATUS_INACTIVE => 'Inactive' 
+  );
 
 
   function __construct($id = false, $table = null, $ds = null) {

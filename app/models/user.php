@@ -469,49 +469,49 @@ class User extends AppModel
   }
   
   /**
-   * 
-   * Remove user from a course
-   * @param $id
-   * @param $course_id
-   */
-
-  function dropCourses($id, $course_id) {
-    $this->habtmDelete('Course', $id, $course_id);
-  }
-
-  /**
-   * 
-   * Add user to the course
+   * Remove enrolled user from course. For student enrolment in a course.
+   *
    * @param $id user id
    * @param $course_id course id
-   * @return true if user is added
-   */
-  function registerCourses($id, $course_id) {
-    $this->habtmAdd('Course', $id, $course_id);
-  }
-
-  /**
-   * 
-   * Remove enrolled user from course
-   * @param $id user id
-   * @param $course_id course id
-   * @return true if user is added
+   * @return False on failure, true otherwise.
    */
   function dropEnrolment($id, $course_id) {
-    $this->habtmDelete('Enrolment', $id, $course_id);
+    return $this->habtmDelete('Enrolment', $id, $course_id);
   }
 
   /**
-   * 
-   * Enroll user in a course
+   * Enroll user in a course. For student enrolment in a course.
+   *
    * @param $id user id
    * @param $course_id course id
-   * @return true if user is enrolled
+   * @return False on failure, true otherwise.
    */
   function registerEnrolment($id, $course_id) {
-    $this->habtmAdd('Enrolment', $id, $course_id);
+    return $this->habtmAdd('Enrolment', $id, $course_id);
   }
    
+  /**
+   * Remove a user's role.
+   *
+   * @param $id user id
+   * @param $role_id role id
+   * @return False on failure, true otherwise.
+   */
+  function dropRole($id, $role_id) {
+    return $this->habtmDelete('Role', $id, $role_id);
+  }
+
+  /**
+   * Assign user a role.
+   *
+   * @param $id user id
+   * @param $role_id role id
+   * @return False on failure, true otherwise.
+   */
+  function registerRole($id, $role_id) {
+    return $this->habtmAdd('Role', $id, $role_id);
+  }
+
   /**
    * 
    * Get list of instructors

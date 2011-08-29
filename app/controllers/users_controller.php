@@ -485,22 +485,19 @@ class UsersController extends AppController
     $simpleEnrolledList = $data['simpleEnrolledList'];
     // Put students into newly selected courses
     foreach ($checkedCourseList as $key => $value) {
-      if(!in_array($value, $simpleEnrolledList) && is_numeric($userId) && is_numeric($value)) {
-        // Direct Delete SQL  - Serge - custom methods in UserEnrol Model did not function.
-        //$this->UserEnrol->query("DELETE FROM user_enrols WHERE course_id=$value AND user_id=$userId");
-        $this->UserEnrol->deleteAll(array('UserEnrol.course_id' => $value, 'UserEnrol.user_id' => $userId));
-        // Save a new entry
-        $this->UserEnrol->id = null;
-        $this->UserEnrol->save(array("user_id" => $userId, "course_id" => $value));
+		if(!in_array($value, $simpleEnrolledList) && 
+			is_numeric($userId) && 
+			is_numeric($value)) {
+		$this->User->registerEnrolment($userId, $value);
       }
     }
 
     // Take them out of the de-selected courses
     foreach ($simpleEnrolledList as $key => $value) {
-      if (!in_array($value, $checkedCourseList) && is_numeric($userId) && is_numeric($value)) {
-        // Direct Delete SQL  - Serge - custom methods in UserEnrol Model did not function.
-        //$this->UserEnrol->query("DELETE FROM user_enrols WHERE course_id=$value AND user_id=$userId");
-        $this->UserEnrol->deleteAll(array('UserEnrol.course_id' => $value, 'UserEnrol.user_id' => $userId));
+		if (!in_array($value, $checkedCourseList) && 
+			is_numeric($userId) && 
+			is_numeric($value)) {
+		$this->User->dropEnrolment($userId, $value);
       }
     }
   }

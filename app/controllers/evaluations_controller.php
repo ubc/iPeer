@@ -44,7 +44,7 @@ class EvaluationsController extends AppController
                     'Question','Response','Survey','SurveyInput','Course','MixevalsQuestion',
                     'EvaluationMixeval','EvaluationMixevalDetail', 'Mixeval', 'MixevalsQuestionDesc');
   var $components = array('ExportBaseNew', 'Auth','AjaxList', 'rdAuth','Output','sysContainer',
-                          'globalConstant', 'userPersonalize','framework', 
+                          'userPersonalize','framework', 
                           'Evaluation', 'Export', 'ExportCsv', 'ExportExcel');
 
   function __construct()

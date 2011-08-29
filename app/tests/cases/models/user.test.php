@@ -538,39 +538,6 @@ class UserTestCase extends CakeTestCase {
 		$this->assertEqual($roles['2'], 'Student');
 	}
 
-	function testDropCourses() {	  
-	
- 	 $search = $this->UserCourse->find('all', array ('conditions' => array('course_id' => 1), 'fields' => 'user_id'));
-	 $courses = array();
-	  
-	 foreach($search as $c){
-     array_push($courses, $c['UserCourse']['user_id']);		
-	 }
-	 $this->assertEqual($courses, array(1,2));
-	 	 
-	 $this->User->dropCourses(1,1);
-	 $search = $this->UserCourse->find('all', array ('conditions' => array('course_id' => 1), 'fields' => 'user_id'));
-	 
-	 $courses = array();
-	  
-	 foreach($search as $c){
-     array_push($courses, $c['UserCourse']['user_id']);		
-	 }
-	 $this->assertEqual($courses, array(2));
-
-	 $drop = $this->User->dropCourses(1,999);
-	 $this->assertFalse($drop);
-
-	 $drop = $this->User->dropCourses(999,1);
-	 $this->assertFalse($drop);	 
-	 
-	 $drop = $this->User->dropCourses(null,1);
-	 $this->assertFalse($drop);	
-
-	 $drop = $this->User->dropCourses(1,null);
-	 $this->assertFalse($drop);		 
-	}
-	
 	function testGetInstructors() {	  
 	
 	  $instructors = $this->User->GetInstructors('all', array());
