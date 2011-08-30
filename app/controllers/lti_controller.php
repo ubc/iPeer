@@ -35,13 +35,12 @@ class LtiController extends AppController {
 
     // APP SPECIFIC CODE STARTS HERE
     // Check whether the course already exists
-    $course = $this->Course
-        ->find('first',
-            array('conditions' => array('Course.course' => $ret['course']),));
-    debug($course);
-    if (empty($course)) { // Non-existing course, create course
-
-    // Create course
+    $course = $this->Course->find(
+      'first',
+      array('conditions' => array('Course.course' => $ret['course']),)
+    );
+    if (empty($course)) { 
+      // Non-existing course, create course
       $this->data = array();
       $this->data['course'] = $ret['course'];
       $this->data['title'] = $ret['title'];
@@ -52,55 +51,44 @@ class LtiController extends AppController {
         return;
       }
 
-      // Create users
+      // Create users, if needed, and enrol them to the course
       foreach ($roster as $person) {
-        $first = $person['person_name_given'];
-        $last = $person['person_name_family'];
-        $email = $person['person_contact_email_primary'];
-        $lti_id = $person['user_id'];
+        $this->addUser($person, $this->Course->id);
+      }
 
-        $instructor = stripos($person['roles'], 'Instructor');
-
-        $cdata = array();
-        $cdata['User']['username'] = $first . $last;
-        $cdata['User']['first_name'] = $first;
-        $cdata['User']['last_name'] = $last;
-        $cdata['User']['email'] = $email;
-        $cdata['User']['send_email_notification'] = false;
-        $cdata['User']['lti_id'] = $lti_id;
-        $cdata['User']['role'] = $this->User->USER_TYPE_STUDENT;
-
-        # note that !== is required, we MUST compare type since
-        # stripos() may return 0 for a valid match
-        if ($instructor !== FALSE) { # this guy is a prof
-          $cdata['User']['role'] = $this->User->USER_TYPE_INSTRUCTOR;
-        }
-
-        $this->User->create();
-        if ($this->User->save($cdata)) {
-          debug("User saved");
-          if ($instructor === FALSE) {
-            $student_role_id = $this->Role
-                ->field('id', array('Role.name =' => 'student',));
-
-            $this->User
-                ->registerRole($this->User->id, $student_role_id);
-
-            $this->User
-                ->registerEnrolment($this->User->id, $this->Course->id);
-          } else {
-            $instructor_role_id = $this->Role
-                ->field('id', array('name' => 'instructor'));
-            $this->User
-                ->registerRole($this->User->id, $instructor_role_id);
-            $this->Course
-                ->addInstructor($this->Course->id, $this->User->id);
+    }
+    else { 
+      // Existing course, update course
+      // Get current roster in iPeer
+      $courseid = $course['Course']['id'];
+      $ipeerroster = $this->User->getEnrolledStudents($courseid);
+      debug($ipeerroster);
+      debug($roster);
+      // Compare with roster from LTI
+      # Remove users that are on both lists
+      foreach ($roster as $ltikey => $ltiuser) {
+        foreach ($ipeerroster as $ipeerkey => $ipeeruser) {
+          if ($ltiuser['user_id'] == $ipeeruser['User']['lti_id']) {
+            unset($roster[$ltikey]);
+            unset($ipeerroster[$ipeerkey]);
+            continue;
           }
-        } else {
-          debug("User cannot be saved");
         }
       }
-    } else { // Existing course, update
+      # Remaining users in ipeerroster needs to be dropped
+      debug($ipeerroster);
+      foreach ($ipeerroster as $ipeeruser) {
+        $this->User->dropEnrolment($ipeeruser['User']['id'], $courseid);
+      }
+      # Remaining users in roster needs to be added
+      debug($roster);
+      foreach ($roster as $person) {
+        if (!$this->isLTIInstructor($person)) {
+          $this->addUser($person, $courseid);
+        }
+      }
+      $this->set('invalidlti', "Oops, no update");
+      return;
     }
     // END APP SPECIFIC CODE
 
@@ -114,6 +102,75 @@ class LtiController extends AppController {
     }
     debug($this->Auth->user());
 
+  }
+
+  private function addUser($info, $courseid) {
+    $first = $info['person_name_given'];
+    $last = $info['person_name_family'];
+    $email = $info['person_contact_email_primary'];
+    $lti_id = $info['user_id'];
+    $instructor = $this->isLTIInstructor($info);
+
+    // Prepare user data
+    $cdata = array();
+    $cdata['User']['username'] = $first . $last;
+    $cdata['User']['first_name'] = $first;
+    $cdata['User']['last_name'] = $last;
+    $cdata['User']['email'] = $email;
+    $cdata['User']['send_email_notification'] = false;
+    $cdata['User']['lti_id'] = $lti_id;
+    // TODO USER_TYPE_STUDENT needs to change to const instead of var later
+    $cdata['User']['role'] = $this->User->USER_TYPE_STUDENT;
+    $cdata['User']['created'] = date('Y-m-d H:i:s');
+    if ($instructor !== FALSE) { # this guy is a prof
+      $cdata['User']['role'] = $this->User->USER_TYPE_INSTRUCTOR;
+    }
+
+    // Check if user already exists
+    $user = $this->User->getByUsername($cdata['User']['username']);
+    if (!empty($user)) { # pre-existing user, just need to add them to course
+      $this->addUserToCourse($user['User']['id'], $courseid, $instructor);
+      # user might not have an lti_id, so save one
+      $user['User']['lti_id'] = $lti_id;
+      $this->User->save($user);
+      return false;
+    }
+
+    // Need to create a new user
+    $this->User->create();
+    if ($this->User->save($cdata)) {
+      // User enrolment
+      $this->addUserToCourse($this->User->id, $courseid, $instructor);
+      return false;
+    } else {
+      return $cdata['User']['username'];
+    }
+  }
+
+  private function addUserToCourse($userid, $courseid, $instructor) {
+    // TODO use Role methods instead of this if possible
+    $student_role_id = $this->Role->field('id', array('name =' => 'student'));
+    $instructor_role_id = $this->Role->field(
+      'id', array('name' => 'instructor'));
+
+    if ($instructor === false) {
+      $this->User->registerRole($userid, $student_role_id);
+      $this->User->registerEnrolment($userid, $courseid);
+    }
+    else {
+      $this->User->registerRole($userid, $instructor_role_id);
+      $this->Course->addInstructor($courseid, $userid);
+    }
+  }
+
+  private function isLTIInstructor($info) {
+    $instructor = stripos($info['roles'], 'Instructor');
+    # note that !== is required, we MUST compare type since
+    # stripos() may return 0 for a valid match
+    if ($instructor === false) {
+      return false;
+    }
+    return true;
   }
 
 }
