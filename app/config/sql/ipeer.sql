@@ -1424,8 +1424,10 @@ CREATE TABLE IF NOT EXISTS `users` (
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `updater_id` int(11) DEFAULT NULL,
   `modified` datetime DEFAULT NULL,
+  `lti_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `username` (`username`)
+  UNIQUE KEY `username` (`username`),
+  UNIQUE (`lti_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
