@@ -32,12 +32,12 @@ class HomeController extends AppController
    *
    * @var $uses
    */
-  var $uses =  array( 'UserEnrol', 'Group', 'GroupEvent', 'User', 'UserCourse', 'Event', 'EvaluationSubmission', 'Course', 'Role','UserEnrol', 'Rubric', 'Penalty');
+  var $uses =  array( 'UserEnrol', 'Group', 'GroupEvent', 'User', 'UserCourse', 'Event', 'EvaluationSubmission', 'Course', 'Role','UserEnrol', 'Rubric', 'Penalty', 'FacultyAcoUser', 'UserDept');
 
   var $page;
   var $Sanitize;
   var $functionCode = 'HOME';
-  var $components = array( 'Auth', 'Acl', 'Output');
+  var $components = array( 'Auth', 'Acl', 'Output', 'FacultyCoursesAccessControl');
   
   //Temporary formatDate function
   function formatDate($timestamp) {
@@ -387,7 +387,6 @@ class HomeController extends AppController
     $this->autoRender = false;   
     $role = $this->Auth->user('role');
     $userId = $this->Auth->user('id');
-        
     if (isset ($role)) {
       //General Home Rendering for Admin
       if ($role == $this->User->USER_TYPE_ADMIN)
