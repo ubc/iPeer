@@ -93,6 +93,7 @@ class CoursesController extends AppController
   function daysLate($event, $submissionDate)
   {
    $days = 0; 
+   $dueDate = $this->Event->find('first', array('conditions' => array('Event.id' => $event), 'fields' => array('Event.due_date')));
    $dueDate = new DateTime($dueDate['Event']['due_date']); 
    $submissionDate = new DateTime($submissionDate);
    $dateDiff = $dueDate->diff($submissionDate);

@@ -128,10 +128,6 @@ class EventsController extends AppController
                 // The choise and default values
                 "list" => $coursesList,
                 "default" => $this->Session->read('ipeerSession.courseId'),
-                // What tables do we join?
-                "joinTable" => "courses",
-                "joinModel" => "Course",
-                "localKey" => "course_id"
         ));
 
     // For instructors: only list their own course events

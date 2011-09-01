@@ -53,7 +53,7 @@ class Event extends AppModel
      * evaluation_mixevals, evaluation_mixeval_details
      */
 
-  var $belongsTo = array('EventTemplateType');
+  var $belongsTo = array('EventTemplateType','Course');
 
   var $hasAndBelongsToMany = array('Group' =>
                                    array('className'    =>  'Group',

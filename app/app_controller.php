@@ -19,6 +19,15 @@ class AppController extends Controller  {
   var $access = array ();
   var $actionList = array ();
 
+  function __construct() {
+    // redirect to installation script if database.php doesn't exist
+    if(!file_exists(CONFIGS.'/database.php')) {
+      header('Location: '.Router::url('/install', true));
+    }
+
+    parent::__construct();
+  }
+
   function beforeFilter() {
     $this->Auth->authenticate = ClassRegistry::init('User');
     ClassRegistry::addObject('AuthComponent', $this->Auth);

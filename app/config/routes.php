@@ -44,6 +44,9 @@
   Router::connect('/login', array('controller' => 'users', 'action' => 'login'));
   Router::connect('/logout', array('controller' => 'users', 'action' => 'logout'));
 
+  // Installation route
+  Router::connect('/install', array('controller' => 'install', 'action' => 'index'));
+
   // with guard plugin
   //Router::connect('/login', array('plugin' => 'guard', 'controller' => 'guard', 'action' => 'login'));
   //Router::connect('/logout', array('plugin' => 'guard', 'controller' => 'guard', 'action' => 'logout'));

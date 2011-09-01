@@ -13,23 +13,13 @@ Class ExportExcelComponent extends ExportBaseNewComponent {
   	  $MixevalsQuestion, $Event, $Group;
   
   function __construct() {
-	$this->xls = new PHPExcel();
-	$this->sheet = $this->xls->getActiveSheet();
-	$this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
-  	$this->EvaluationSimple = ClassRegistry::init('EvaluationSimple');
-  	$this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
-  	$this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
-  	$this->Event = ClassRegistry::init('Event');
-  	$this->Group = ClassRegistry::init('Group');
-  	$this->GroupsMembers = ClassRegistry::init('GroupsMembers');
-  	$this->GroupEvent = ClassRegistry::init('GroupEvent');
-  	$this->User = ClassRegistry::init('User');
-  	$this->MixevalsQuestion = ClassRegistry::init('MixevalsQuestion');
-  	$this->alphaNumeric = array();
+    $this->xls = new PHPExcel();
+    $this->sheet = $this->xls->getActiveSheet();
+    $this->alphaNumeric = array();
     foreach(range('A', 'Z') as $letters) {
-  	  array_push($this->alphaNumeric, $letters);
-  	}
-  	$this->cursor = array('x' => 0, 'y' => 1);
+      array_push($this->alphaNumeric, $letters);
+    }
+    $this->cursor = array('x' => 0, 'y' => 1);
   }
   
   function _output($fileName) {
