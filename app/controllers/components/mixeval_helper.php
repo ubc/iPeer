@@ -30,7 +30,7 @@ class MixevalHelperComponent extends Object
     	  $tmp['questions'][$evalQuestion['question_num']] = $evalQuestion;
     	  if ($evalQuestion['question_type'] == 'S') {
     	    //Retrieve the lickert descriptor 
-    	    $descriptors = $this->MixevalsQuestionDesc->getQuestionDescriptorByMixevalId($mixeval_id, $evalQuestion['question_num']);
+    	    $descriptors = $this->MixevalsQuestionDesc->getQuestionDescriptor($mixeval_id, $evalQuestion['question_num']);
     	    $tmp['questions'][$evalQuestion['question_num']]['descriptors'] = $descriptors;
     	  }
     	}
