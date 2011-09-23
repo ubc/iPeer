@@ -71,11 +71,17 @@ function checkEmailAddress()
       <table width="100%" border="0" align="right" cellpadding="0" cellspacing="4" class="miniLinks">
       <tr class="miniLinks">
         <?php if (!empty($user)) :?>
-          <td width="350" align="right"><?php echo $html->image('layout/icon_edit.gif',array('alt'=>'icon_edit'))?> <a href="<?php echo $this->webroot.$this->theme;?>users/editProfile" class="miniLinks">Edit Profile (<?php echo $user['full_name']?>)</a></td>
-          <td width="57" align="right"><?php echo $html->image('layout/icon_arrow.gif',array('alt'=>'icon_arrow'))?> <?php echo $html->link('Logout', Router::url('/logout', true), array('class' => 'miniLinks'))?></td>
+          <td width="350" align="right">
+		<?php echo $html->image('layout/icon_edit.gif',array('alt'=>'icon_edit'))?> 
+		<?php echo $this->Html->link('Edit Profile ('.$user['full_name'].')', '/usrs/editProfile', array('class' => 'miniLinks')); ?>
+	  </td>
+          <td width="57" align="right">
+		<?php echo $html->image('layout/icon_arrow.gif',array('alt'=>'icon_arrow'))?> 
+		<?php echo $this->Html->link('Logout', Router::url('/logout', true), array('class' => 'miniLinks'))?>
+	  </td>
         <?php else:?>
           <td width="157">&nbsp;</td>
-          <td width="57" align="right"><?php echo $html->image('layout/icon_arrow.gif',array('alt'=>'icon_arrow'))?> <a href="<?php echo $this->webroot.$this->theme;?>loginout/login" class="miniLinks">Login</a></td>
+          <td width="57" align="right"><?php echo $html->image('layout/icon_arrow.gif',array('alt'=>'icon_arrow'))?> <?php echo $this->Html->link('Login', 'loginout/login', array('class' => "miniLinks")); ?></td>
         <?php endif;?>
 
       </tr>
@@ -195,6 +201,7 @@ function checkEmailAddress()
         <?php endif; ?>
         <?php if($session->check('Message.flash')): echo $session->flash(); endif;?>
         <?php echo $this->Session->flash('email'); ?>
+        <?php echo $this->Session->flash('auth'); ?>
         <div align="left" id="loading"><?php echo $html->image('spinner.gif',array('alt'=>'spinner'))?></div>
         <div id="content"><?php echo $content_for_layout;?></div>
       <h1 align="center"><span class="footer"><?php __('Powered by iPeer and TeamMaker - Created by UBC and Rose-Hulman')?></span></h1>

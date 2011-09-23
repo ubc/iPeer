@@ -1,5 +1,4 @@
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
-<table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
 <tr>
 <td>
   <table width="421" border="0" align="center" cellpadding="0" cellspacing="1">

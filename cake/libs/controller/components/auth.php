@@ -721,6 +721,8 @@ class AuthComponent extends Object {
 	function user($key = null) {
 		$this->__setDefaults();
 		if (!$this->Session->check($this->sessionKey)) {
+			Debugger::log('did not find session key: '.$this->sessionKey);
+			Debugger::log($_SESSION);
 			return null;
 		}
 

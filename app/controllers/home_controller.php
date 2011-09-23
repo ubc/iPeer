@@ -32,12 +32,12 @@ class HomeController extends AppController
    *
    * @var $uses
    */
-  var $uses =  array( 'UserEnrol', 'Group', 'GroupEvent', 'User', 'UserCourse', 'Event', 'EvaluationSubmission', 'Course', 'Role','UserEnrol', 'Rubric', 'Penalty', 'FacultyAcoUser', 'UserDept');
+  var $uses =  array( 'UserEnrol', 'Group', 'GroupEvent', 'User', 'UserCourse', 'Event', 'EvaluationSubmission', 'Course', 'Role','UserEnrol', 'Rubric', 'Penalty');
 
   var $page;
   var $Sanitize;
   var $functionCode = 'HOME';
-  var $components = array( 'Auth', 'Acl', 'Output', 'FacultyCoursesAccessControl');
+  var $components = array( 'Auth', 'Acl', 'Output');
   
   //Temporary formatDate function
   function formatDate($timestamp) {
@@ -86,7 +86,7 @@ class HomeController extends AppController
   /* temp code */
   function beforeFilter() {
     parent::beforeFilter();
-    $this->Auth->allow('*');
+//    $this->Auth->allow('*');
   }
 
   function createAro() {

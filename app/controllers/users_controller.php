@@ -66,7 +66,7 @@ class UsersController extends AppController
     $admin_email = $admin_email['parameter_value'];
     $this->set('admin_email', $admin_email);
 
-    if(!(empty($this->data)) && $this->Auth->user()) {
+    if($this->Auth->user()) {
       $user = $this->Auth->user();
       //sets up the system container for accessible functions
       $accessFunction = $this->SysFunction->getAllAccessibleFunction($this->Auth->user('role'));
@@ -79,6 +79,7 @@ class UsersController extends AppController
       $this->sysContainer->setMyCourseList($myCourses);
 
       $this->redirect($this->Auth->redirect());
+	exit;
     }
   }
 

@@ -14,7 +14,7 @@ App::import('Lib', 'toolkit');
 
 class AppController extends Controller  {
   var $startpage = 'pages';
-  var $components = array('Session', 'Output', 'sysContainer', 'userPersonalize', 'framework', 'Auth', 'Acl', 'AccessControl', 'Email');
+  var $components = array('Session', 'Output', 'sysContainer', 'userPersonalize', 'framework', 'Guard.Guard', 'Acl', 'AccessControl', 'Email');
   var $helpers = array('Session', 'Html', 'Js');
   var $access = array ();
   var $actionList = array ();
@@ -29,7 +29,7 @@ class AppController extends Controller  {
   }
 
   function beforeFilter() {
-    $this->Auth->authenticate = ClassRegistry::init('User');
+    /*$this->Auth->authenticate = ClassRegistry::init('User');
     ClassRegistry::addObject('AuthComponent', $this->Auth);
     if($this->Auth->isAuthorized()) {
   //    $this->AccessControl->check('controllers/'.ucwords($this->params['controller']).'/'.$this->params['action']);
@@ -40,7 +40,7 @@ class AppController extends Controller  {
       // pass user variable to view
       $user_array = $this->Auth->user();
       $this->set('user', $user_array['User']);
-    }
+    }*/
 
     parent::beforeFilter();
   }
