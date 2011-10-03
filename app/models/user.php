@@ -25,6 +25,13 @@
  * @subpackage
  * @since
  */
+define('IMPORT_USERNAME', 0);
+define('IMPORT_FIRSTNAME', 1);
+define('IMPORT_LASTNAME', 2);
+define('IMPORT_STUDENT_NO', 3);
+define('IMPORT_EMAIL', 4);
+define('IMPORT_PASSWORD', 5);
+
 App::import('Lib', 'neat_string');
 
 class User extends AppModel
@@ -159,7 +166,6 @@ class User extends AppModel
   
   //Overwriting Function - will be called before save operation
   function beforeSave() {
-
     if(!isset($this->data[$this->name]['id']) && empty($this->data[$this->name]['password'])) {
       $tmp_pw = NeatString::randomPassword(6);
       $this->data[$this->name]['password'] = md5($tmp_pw);
@@ -184,17 +190,17 @@ class User extends AppModel
   }
 
   //Validation check on duplication of username
-  function hasDuplicateUsername($username) {
+/*  function hasDuplicateUsername($username) {
     if ($this->find('first', array('conditions' => array('username' => $username)))) {
-      $this->errorMessage='Duplicate Username found. Please change the username of this user.';
+      $this->errorMessage[] = array('Username' => __('Duplicate Username found. Please change the username of this user.'));
       /*if ($this->data[$this->name]['role'] == 'S') {
         $this->errorMessage.='<br>If you want to enrol this student to one or more courses, use the enrol function on User Listing page.';
-        }*/
+        }
       return false;
     }
 
     return true;
-  }
+  }*/
 
   /**
    * 
@@ -249,6 +255,11 @@ class User extends AppModel
   function getByUsername($username) {
     return $this->find('first', array('conditions' => array('username' => $username,
                                                             )));
+  }
+
+  function getByUsernames($usernames) {
+    return $this->find('all', array('conditions' => array('username' => $usernames,
+                                                         )));
   }
 
   /**
@@ -542,16 +553,11 @@ class User extends AppModel
     $ret = array();
 
     if('list' == $type) {
-      // list doesn't auto join tables. Have to do it manually
-      $temp = $this->find('all', $params);
-      foreach($temp as $t) {
-        $ret[$t['User']['id']] = $t['User'][$this->displayField];
-      }
-    } else {
-      $ret = $this->find($type, $params);
-    }
+      // list doesn't auto join tables as the recursive is set to -1. 
+      $params['recursive'] = 0;
+    } 
 
-    return $ret;
+    return $this->find($type, $params);
   }
 
   /**
@@ -646,6 +652,205 @@ class User extends AppModel
     $Session = new SessionComponent();
     $user = $Session->read('Auth.User');
     return $user;
+  }
+
+  /**
+   * addUserByArray add users with an array
+   * 
+   * @param mixed $userList array list of users
+   * @access public
+   * @return array result
+   */
+  function addUserByArray($userList, $updateExisting = false) {
+    $data = array();
+
+    foreach($userList as $line => $u) {
+      $tmp = array();
+
+      if(count($u) > IMPORT_PASSWORD + 1) {
+        $this->errorMessage[] = array('addUser' => sprintf(__('Invalid column number on line %d', true), $line));
+        continue;
+      }
+
+      if(!isset($u[IMPORT_USERNAME]) || trim($u[IMPORT_USERNAME]) == '') {
+        $this->errorMessage[] = array('addUser' => sprintf(__('Username can not be empty. line %d', true), $line));
+        continue;
+      }
+
+      // handle password
+      if (isset($u[IMPORT_PASSWORD])) {
+        $u[IMPORT_PASSWORD] = trim($u[IMPORT_PASSWORD]);
+      } 
+      if($u[IMPORT_PASSWORD]) {
+        App::import('Lib', 'neat_string');
+        $u[IMPORT_PASSWORD] = NeatString::randomPassword(6);
+        $tmp['generated_password'] = true;
+      }
+
+      $tmp['username']     = $u[IMPORT_USERNAME];
+      $tmp['first_name']   = isset($u[IMPORT_FIRSTNAME]) ? trim($u[IMPORT_FIRSTNAME]) : "";
+      $tmp['last_name']    = isset($u[IMPORT_LASTNAME]) ? trim($u[IMPORT_LASTNAME]) : "";
+      $tmp['student_no']   = isset($u[IMPORT_STUDENT_NO]) ? trim($u[IMPORT_STUDENT_NO]) : "";
+      $tmp['email']        = isset($u[IMPORT_EMAIL]) ? trim($u[IMPORT_EMAIL]) : "";
+      $tmp['tmp_password'] = $u[IMPORT_PASSWORD];
+      $tmp['password']     = md5($u[IMPORT_PASSWORD]); // Will be hashed by the Users controller
+      $tmp['creator_id']   = User::get('id');
+      $data[$u[IMPORT_USERNAME]] = $tmp;
+    }
+
+    if(!count($data)) {
+      $this->errorMessage[] = array('addUser' => __('No valid user to add', true));
+      return false;
+    }
+
+    // remove the existings
+    $existings = $this->getByUsernames(Set::extract('/username', array_values($data)));
+    foreach($existings as $e) {
+      unset($data[$e['User']['username']]);
+    }
+
+    if(!empty($data) && !($this->saveAll(array_values($data)))) {
+      $this->errorMessage = array_merge($this->errorMessage, $this->validationErrors);
+      return false;
+    }
+
+    if($updateExisting) {
+      foreach($existings as $key => $e) {
+        $new = $data[$e['User']['username']];
+        $tmp['username'] = $e['User']['username'];
+        // update updatable column and changed field
+        if($e['User']['first_name'] != $new['first_name']) {
+          $tmp['first_name'] = $new['first_name'];
+        }
+        if($e['User']['last_name'] != $new['last_name']) {
+          $tmp['last_name'] = $new['last_name'];
+        }
+        if($e['User']['email'] != $new['email']) {
+          $tmp['email'] = $new['email'];
+        }
+        if($e['User']['student_no'] != $new['student_no']) {
+          $tmp['student_no'] = $new['student_no'];
+        }
+        // ignore the password if not exists in import source
+        if(!$new['generated_password']) {
+          $tmp['password'] = $new['password'];
+        }
+        // don't need creator_id either
+        unset($tmp['creator_id']);
+
+        $existings[$key]['User'] = $tmp;
+      }
+      if(!$this->saveAll($existings)) {
+        return false;
+      }
+    }
+
+    return array('created_students' => $data, 'updated_students' => $existings);
+
+    /*  if ($this->User->save($data))
+      {
+        //New user, save it as usual
+        $result['created_students'][$createdPos++] = $data;
+
+        //Save enrol record
+        if (isset($this->params['form']['course_id']) && $this->params['form']['course_id'] > 0)
+        {
+          $userEnrol['UserEnrol']['course_id'] = $this->params['form']['course_id'];
+          $userEnrol['UserEnrol']['user_id'] = $this->User->id;
+          $userEnrol['UserEnrol']['creator_id'] = $this->Auth->user('id');
+          $this->UserEnrol->save($userEnrol);
+          $this->UserEnrol->id = null;
+        }
+
+      } else {
+        if (isset($this->params['form']['course_id']))
+        {
+          $curUser = $this->User->find('username="'.$data['User']['username'].'"');
+          //Existing user, get this user with the course id
+          $enrolled = $this->UserEnrol->getEnrolledStudents($this->params['form']['course_id'], null, 'User.username="'.$data['User']['username'].'"');
+          //Current user does not registered to this course yet
+          if (empty($enrolled)) {
+            $userEnrol['UserEnrol']['course_id'] = $this->params['form']['course_id'];
+            $userEnrol['UserEnrol']['user_id'] = $curUser['User']['id'];
+            $userEnrol['UserEnrol']['creator_id'] = $this->Auth->user('id');
+            $this->UserEnrol->save($userEnrol);
+            $this->UserEnrol->id = null;
+            $result['created_students'][$createdPos++] = $data;
+          } else {
+            //Current user already registered
+            $result['failed_students'][$failedPos] = $data;
+            $result['failed_students'][$failedPos++]['User']['error_message'] = __('This user has been already added to this course.', true);
+          }
+
+        } else {
+          //Current user already registered
+          $result['failed_students'][$failedPos] = $data;
+          $result['failed_students'][$failedPos++]['User']['error_message'] = __('This user has been already added to the database.', true);
+        }
+
+      }
+    }
+    return $result;*/
+  }
+
+  /*********************************
+   * Static functions
+   * *******************************/
+  function getInstance($user=null) {
+    static $instance = array();
+
+    if ($user) {
+      $instance[0] =& $user;
+    }
+
+    if (!$instance) {
+      return null;
+    }
+
+    return $instance[0];
+  }
+
+  function store($user) {
+    if (empty($user)) {
+      return false;
+    }
+
+    User::getInstance($user);
+  }
+
+  function get($path) {
+    $_user =& User::getInstance();
+
+    $path = str_replace('.', '/', $path);
+    if (strpos($path, 'User') !== 0) {
+      $path = sprintf('User/%s', $path);
+    }
+
+    if (strpos($path, '/') !== 0) {
+      $path = sprintf('/%s', $path);
+    }
+
+    $value = Set::extract($path, $_user);
+
+    if (!$value) {
+      return false;
+    }
+
+    return $value[0];
+  }
+
+  function isLoggedIn() {
+    return self::getInstance() !== null;
+  }
+
+  function getMyCourses() {
+    $model = Classregistry::init('Course');
+    return $model->getCourseByInstructor(self::get('id'));
+  }
+
+  function getMyCourseList() {
+    $model = Classregistry::init('Course');
+    return $model->getCourseListByInstructor(self::get('id'));
   }
 }
 ?>

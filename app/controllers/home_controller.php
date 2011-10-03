@@ -399,14 +399,14 @@ class HomeController extends AppController
 //          $this->set('course_list', $inactiveCourseDetail);
 //          $this->render('index');
 
-            $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
-            $this->set('course_list', $this->formatCourseList($course_list));
-            $this->render('index');
+        $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
+        $this->set('course_list', $this->formatCourseList($course_list));
+        $this->render('index');
       }////General Home Rendering for Instructor
       else if($role == $this->User->USER_TYPE_INSTRUCTOR){
-            $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
-            $this->set('course_list', $this->formatCourseList($course_list));
-            $this->render('index');
+        $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
+        $this->set('course_list', $this->formatCourseList($course_list));
+        $this->render('index');
       }//Student Home Rendering
       else if ($role == $this->User->USER_TYPE_STUDENT) {
         $this->set('data', $this->preparePeerEvals());
@@ -431,7 +431,7 @@ class HomeController extends AppController
     $eventAry = array();
     $pos = 0;
     //Get enrolled courses
-	$enrolledCourseIds = $this->UserEnrol->getEnrolledCourses($curUserId);
+    $enrolledCourseIds = $this->UserEnrol->getEnrolledCourses($curUserId);
     foreach($enrolledCourseIds as $enrolledCourse) {
     	$courseId = $enrolledCourse['UserEnrol']['course_id'];
       //$courseDetail = $this->Course->find('id='.$courseId);

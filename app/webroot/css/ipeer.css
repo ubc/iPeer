@@ -783,3 +783,7 @@ textarea.question-title-textarea, textarea.question-descriptor {
   padding: 5px 0 5px 20px;
   background-color: #EAEAEA;
 }
+
+#importfrm li {
+  margin:1em 0 3em 1em;
+}

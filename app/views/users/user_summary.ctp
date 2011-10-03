@@ -38,7 +38,9 @@
 <?php echo $this->element('users/user_summary_list', array('data'=>$data['created_students']));?>
 <?php endif; ?>
 
-<?php if (isset($data['User'])) : ?>
+<?php $msg = ('resetPassword' == $this->action || 'edit' == $this->action) ? __('User(s) modified successfully:', true) : __('User(s) updated successfully:', true);?>
+
+<?php if (isset($data['updated_students'])) : ?>
   <table width="95%"  border="0" cellspacing="2" cellpadding="4">
     <tr>
       <td width="45%"><table width="403" border="0" cellspacing="0" cellpadding="4">
@@ -52,7 +54,7 @@
       <td width="55%">&nbsp; </td>
     </tr>
   </table>
-<?php echo $this->element('users/user_summary_list', array('data'=>$data['User']));?>
+<?php echo $this->element('users/user_summary_list', array('data'=>$data['updated_students']));?>
 <?php endif; ?>
 
   <table width="95%"  border="0" cellspacing="2" cellpadding="4">

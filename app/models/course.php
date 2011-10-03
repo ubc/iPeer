@@ -80,7 +80,7 @@ class Course extends AppModel
                                          'joinTable'    =>  'user_enrols',
                                          'foreignKey'   =>  'course_id',
                                          'associationForeignKey'    =>  'user_id',
-                                         'conditions'   =>  'Enrol.role = "S"',
+                                         'conditions'   =>  /*'Enrol.role = "S"'*/'',
                                          'order'        =>  '',
                                          'limit'        => '',
                                          'unique'       => true,
@@ -529,9 +529,47 @@ class Course extends AppModel
    * @param unknown_type $params search params
    * @return course data
    */
-  function getCourseByInstructor($instructor_id) {
-    return $this->find('all', array('conditions' => array('Instructor.id' => $instructor_id),
-                                    'fields' => array('Course.*')));
+  function getCourseByInstructor($instructorId, $type = 'all') {
+    $fields = array('Course.*');
+    if($type == 'list') {
+      $fields = array(); 
+      $this->displayField = 'course';
+    }
+    return $this->find($type, array('conditions' => array('Instructor.id' => $instructorId),
+                                    'fields' => $fields,
+                                    'recursive' => 0));
+  }
+
+  /**
+   * 
+   * Get course data by instructor id
+   * @param unknown_type $course instructor id
+   * @param unknown_type $params search params
+   * @return course data
+   */
+  function getCourseListByInstructor($instructorId) {
+    return $this->getCourseByInstructor($instructorId, 'list');
+  }
+
+  /**
+   * enrolStudents enrol student to a course
+   * 
+   * @param mixed $ids id array of the students
+   * @param mixed $courseId the course the students are enrolled into. If null, 
+   * read the current id in the course object
+   * @access public
+   * @return boolean true for success, false for failed.
+   */
+  function enrolStudents($ids, $courseId = null) {
+    if(null == $courseId) {
+      $courseId = $this->id;
+    }
+
+    if(null == $courseId) {
+      return false;
+    }
+
+    return $this->habtmAdd('Enrol', $courseId, $ids);
   }
 
 ##########################################################################################################     

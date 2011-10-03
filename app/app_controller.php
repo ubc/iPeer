@@ -11,6 +11,7 @@ ini_set('auto_detect_line_endings', true);
 
 uses('sanitize');
 App::import('Lib', 'toolkit');
+App::import('Model', 'User');
 
 class AppController extends Controller  {
   var $startpage = 'pages';
@@ -29,8 +30,12 @@ class AppController extends Controller  {
   }
 
   function beforeFilter() {
-    /*$this->Auth->authenticate = ClassRegistry::init('User');
-    ClassRegistry::addObject('AuthComponent', $this->Auth);
+    // backward compatible with original ipeer hash  method
+    Security::setHash('md5');
+    Configure::write('Security.salt', '');
+    
+    User::store($this->Auth->user());
+
     if($this->Auth->isAuthorized()) {
   //    $this->AccessControl->check('controllers/'.ucwords($this->params['controller']).'/'.$this->params['action']);
 
@@ -38,9 +43,10 @@ class AppController extends Controller  {
 //      $this->checkDatabaseVersion();
 
       // pass user variable to view
-      $user_array = $this->Auth->user();
-      $this->set('user', $user_array['User']);
-    }*/
+      // Replace with User::get() function, can be used anywhere
+//      $user_array = $this->Auth->user();
+//      $this->set('user', $user_array['User']);
+    }
 
     parent::beforeFilter();
   }

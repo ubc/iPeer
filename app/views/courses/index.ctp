@@ -9,7 +9,7 @@
         <tr><td style="padding:0px">
             <?php echo $this->element("list/ajaxList", $paramsForList);?>
         <?php // For admin, show this note about insturctor column?>
-        <?php if ($user['role'] == 'A') : ?>
+        <?php if (User::get('role') == 'A') : ?>
         <div style="text-align:right">
             <strong>*<?php __('Note') ?>:</strong> <?php __('When searching by Instructor, the results will return any course they<br />
               are leading. However, only one instructor is listed above by when not searching.') ?><br/>

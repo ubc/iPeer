@@ -17,9 +17,9 @@
         }
 	?>
 		<!-- Summary for import record creation -->
-		<?php foreach($data as $row): ?>
+		<?php foreach($data as $u): ?>
             <?php 
-              $user = $row['User'];
+              $user = $u['User'];
               if(isset($user['tmp_password']))
                 $password = $user['tmp_password'];
               else if(isset($user['password']))

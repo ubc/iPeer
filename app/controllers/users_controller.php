@@ -26,31 +26,19 @@
  * @since
  */
 
-define('IMPORT_USERNAME', 0);
-define('IMPORT_FIRSTNAME', 1);
-define('IMPORT_LASTNAME', 2);
-define('IMPORT_STUDENT_NO', 3);
-define('IMPORT_EMAIL', 4);
-define('IMPORT_PASSWORD', 5);
-
 App::import('Lib', 'neat_string');
 
 class UsersController extends AppController
 {
 		
   var $name = 'Users';
-  var $direction;
-  var $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Pagination');
+  var $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Pagination', 'FileUpload.FileUpload');
   var $NeatString;
-  var $Sanitize;
   var $uses = array('User', 'UserEnrol', 'Personalize', 'Course', 'SysParameter', 'SysFunction','Role', 'Group');
-  var $components = array('Session', 'AjaxList', 'RequestHandler', 'Email');
+  var $components = array('Session', 'AjaxList', 'RequestHandler', 'Email', 'FileUpload.FileUpload');
   
-  function __construct()
-  {
-    $this->Sanitize = new Sanitize;
+  function __construct() {
     $this->NeatString = new NeatString;
-    $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
     $this->set('title_for_layout', __('Users', true));
     parent::__construct();
   }
@@ -58,6 +46,13 @@ class UsersController extends AppController
   function beforeFilter() {
     $this->Auth->autoRedirect = false;
     parent::beforeFilter();
+
+    $this->FileUpload->allowedTypes(array(
+      'txt' => array('text/plain'),
+      'csv' => array('text/csv')));
+    $this->FileUpload->uploadDir('../tmp');
+    $this->FileUpload->fileModel(null);
+    $this->FileUpload->attr('required', true);
   }
   
   function login() {
@@ -219,7 +214,6 @@ class UsersController extends AppController
     
     $this->set('can_add_user', $this->AccessControl->hasPermission('functions/user', 'create'));
     $this->set('can_import_user', $this->AccessControl->hasPermission('functions/user/import'));
-    
     $fields = array('Enrolment');
     
     $tempVar=$this->User->getEnrolledStudents(1,$fields);      
@@ -880,131 +874,45 @@ class UsersController extends AppController
     }
 
     function import() {
-        $this->autoRender = false;
+        $this->set('title_for_layout', __('Import Students From Text (.txt) or CSV File (.csv)', true));
         if(isset($this->params['form']['course_id']))
             $this->Session->write('ipeerSession.courseId', $this->params['form']['course_id']);
-        $filename = isset($this->params['form']['file']['name'])? $this->params['form']['file']['name']:'';
-        $tmpFile = isset($this->params['form']['file']['tmp_name'])? $this->params['form']['file']['tmp_name']: NULL;
-        
-        //$uploadDir = $this->sysContainer->getParamByParamCode('system.upload_dir');
-        $uploadDir="../tmp/";
-        $uploadFile = $uploadDir.$filename;
-        //check for blank value
-        if (trim($filename) == "") {
-            $coursesList = $this->sysContainer->getMyCourseList();
-            $this->set('coursesList', $coursesList);            
-            $this->set('user_type', 'S');
-            $this->set('import_again',"true");
-            $this->render('import');
-            $this->set('errmsg',__('A File is required for the import!', true));
-            return false;
+
+        $courseList = User::getMyCourseList();
+        $this->set('courseList', $courseList);            
+        $this->set('courseParams', array('courseList' => $courseList, 'id_prefix' => 'import'));
+        $this->set('user_type', 'S');
+    }
+
+    function importFile() {
+        $this->autoRender = false;
+
+        if(!empty($this->data)) { 
+           if($this->FileUpload->success) {
+             $uploadFile = $this->FileUpload->uploadDir.DS.$this->FileUpload->finalFile;
+           }else{
+             $this->Session->setFlash($this->FileUpload->showErrors());
+             $this->redirect('import');
+           }
         }
 
-        //Return true if valid, else error msg
-        $validUploads = $this->framework->validateUploadFile($tmpFile, $filename, $uploadFile);
-        if ($validUploads !== true) {
-          $this->set('errmsg', $validUploads);
-          $this->set('user_type', 'S');
-          $this->set('import_again',"true");
-          $this->render('import');
-          return false;
+        $data = Toolkit::parseCSV($uploadFile);
+        $result = $this->User->addUserByArray($data);
+
+        if(!$result) {
+          $this->Session->setFlash($this->User->showErrors());
+          $this->redirect('import');
         }
 
-        // Get file into an array.
-        $lines = file($uploadFile);
-        // Delete the uploaded file
-        unlink($uploadFile);
+        $enrolResult = $this->Course->enrolStudents($this->User->insertedIds, $this->data['User']['course_id']);
 
-        //Mass create students
-        $resultAry = $this->addUserByImport($this->params['data'], $lines);
-        $this->set('data', $resultAry);
+        $this->FileUpload->removeFile($uploadFile);
+
+        $this->set('data', $result);
         
-        $this->set('userRole', $this->params['data']['User/role']);
+        #$this->set('userRole', $this->params['data']['User/role']);
         $this->render('userSummary');
     }
-
-    function addUserByImport($data, $lines)
-    {
-        // Make sure the present user is not a student
-        //$this->rdAuth->noStudentsAllowed();
-		if('S' == $this->Auth->user('role'))
-		  return false;	  
-        $result = array();
-        $createdPos = $failedPos = 0;
-
-        // Loop through our array
-        for ($i = 0; $i < count($lines); $i++) {
-
-            // Get rid of '"', it just  confuses iPeer in CSV Files
-            $filteredLine = $lines[$i];
-            $filteredLine = str_replace('"','', $filteredLine);
-
-            // Split fields up on line by ','
-            $line = @split(',', $filteredLine);
-
-            // Set up the password lines
-            if (isset($line[IMPORT_PASSWORD])) {
-                $trimmedPassword = trim($line[IMPORT_PASSWORD]);
-            } else {
-                $trimmedPassword = $this->NeatString->randomPassword(6);
-            }
-
-            $data['User']['id'] = null;
-            $data['User']['username']     = isset($line[IMPORT_USERNAME]) ? trim($line[IMPORT_USERNAME]) : "";
-            $data['User']['first_name']   = isset($line[IMPORT_FIRSTNAME]) ? trim($line[IMPORT_FIRSTNAME]) : "";
-            $data['User']['last_name']    = isset($line[IMPORT_LASTNAME]) ? trim($line[IMPORT_LASTNAME]) : "";
-            $data['User']['student_no']   = isset($line[IMPORT_STUDENT_NO]) ? trim($line[IMPORT_STUDENT_NO]) : "";
-            $data['User']['email']        = isset($line[IMPORT_EMAIL]) ? trim($line[IMPORT_EMAIL]) : "";
-            $data['User']['tmp_password'] = $trimmedPassword;
-            $data['User']['password']     = md5($trimmedPassword); // Will be hashed by the Users controller
-            $data['User']['creator_id']   = $this->Auth->user('id');
-
-            if ($this->User->save($data))
-            {
-                //New user, save it as usual
-                $result['created_students'][$createdPos++] = $data;
-
-                //Save enrol record
-                if (isset($this->params['form']['course_id']) && $this->params['form']['course_id'] > 0)
-                {
-                    $userEnrol['UserEnrol']['course_id'] = $this->params['form']['course_id'];
-                    $userEnrol['UserEnrol']['user_id'] = $this->User->id;
-                    $userEnrol['UserEnrol']['creator_id'] = $this->Auth->user('id');
-                    $this->UserEnrol->save($userEnrol);
-                    $this->UserEnrol->id = null;
-                }
-
-            } else {
-                if (isset($this->params['form']['course_id']))
-                {
-                    $curUser = $this->User->find('username="'.$data['User']['username'].'"');
-                    //Existing user, get this user with the course id
-                    $enrolled = $this->UserEnrol->getEnrolledStudents($this->params['form']['course_id'], null, 'User.username="'.$data['User']['username'].'"');
-                    //Current user does not registered to this course yet
-                    if (empty($enrolled)) {
-                        $userEnrol['UserEnrol']['course_id'] = $this->params['form']['course_id'];
-                        $userEnrol['UserEnrol']['user_id'] = $curUser['User']['id'];
-                        $userEnrol['UserEnrol']['creator_id'] = $this->Auth->user('id');
-                        $this->UserEnrol->save($userEnrol);
-                        $this->UserEnrol->id = null;
-                        $result['created_students'][$createdPos++] = $data;
-                    } else {
-                        //Current user already registered
-                        $result['failed_students'][$failedPos] = $data;
-                        $result['failed_students'][$failedPos++]['User']['error_message'] = __('This user has been already added to this course.', true);
-                    }
-
-                } else {
-                    //Current user already registered
-                    $result['failed_students'][$failedPos] = $data;
-                    $result['failed_students'][$failedPos++]['User']['error_message'] = __('This user has been already added to the database.', true);
-                }
-
-            }
-        }
-        return $result;
-    }
-
 
     // unused function
 /*    function getQueryAttribute($displayUserType = null, $courseId = null, $is_count = false)

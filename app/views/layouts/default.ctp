@@ -51,8 +51,10 @@ function checkEmailAddress()
 <body <?php
     if (!empty($this->params)) {
         if ($this->params['controller'] != 'loginout') {
-            if (!empty($user['role']) && $user['role'] == 'S') {
-                if (empty($user['email']))
+            $role = User::get('role');
+            if (!empty($role) && $role == 'S') {
+                $email = User::get('email');
+                if (empty($email))
                 echo 'onload="checkEmailAddress()"';
                 }
         } elseif (substr($_SERVER['REQUEST_URI'],-14) == "loginByDefault") {
@@ -70,10 +72,10 @@ function checkEmailAddress()
     <td width="46%" valign="top"><br />
       <table width="100%" border="0" align="right" cellpadding="0" cellspacing="4" class="miniLinks">
       <tr class="miniLinks">
-        <?php if (!empty($user)) :?>
+        <?php if (User::isLoggedIn()) :?>
           <td width="350" align="right">
 		<?php echo $html->image('layout/icon_edit.gif',array('alt'=>'icon_edit'))?> 
-		<?php echo $this->Html->link('Edit Profile ('.$user['full_name'].')', '/usrs/editProfile', array('class' => 'miniLinks')); ?>
+		<?php echo $this->Html->link('Edit Profile ('.User::get('full_name').')', '/users/editProfile', array('class' => 'miniLinks')); ?>
 	  </td>
           <td width="57" align="right">
 		<?php echo $html->image('layout/icon_arrow.gif',array('alt'=>'icon_arrow'))?> 
@@ -121,7 +123,7 @@ function checkEmailAddress()
             <?php
                 if (!empty($access)) {
                 
-                if($user['role']== 'S'){
+                if(User::get('role')== 'S'){
 					//Home Tab
                 	generateTab($this, $access, 'HOME', array('home'),
                                 $html->image('layout/icon_home.gif',array('border'=>'0','alt'=>'icon_home')));
@@ -139,7 +141,7 @@ function checkEmailAddress()
                     generateTab($this, $access, 'COURSE', array('courses', 'events', 'groups', 'evaluations', 'surveygroups'));
 
                    // Users Tab
-                    $isStudent = ($user['role'] == 'S');
+                    $isStudent = (User::get('role') == 'S');
                     if (!$isStudent) {
                         generateTab($this, $access, 'USERS' , array('users'));
                     } else {
@@ -185,7 +187,7 @@ function checkEmailAddress()
                   'install' != $this->params['controller'] &&
                   'upgrade' != $this->params['controller'] &&
                   'loginout' != $this->params['controller'] &&
-                  isset($user) && $user['role'] != 'S'): ?>
+                  User::get('role') != 'S'): ?>
 
             <a href="<?php echo $this->webroot . $this->theme?>framework/tutIndex" onclick="wopen(this.href, \'popup\', 800, 600); return false;">
               <?php echo $html->image('layout/button_ipeer_tutorial.gif', array('border'=>'0','alt'=>'button_ipeer_tutorial'))?></a>
@@ -200,6 +202,7 @@ function checkEmailAddress()
         <div align="center" class="title2"><?php echo $message; ?></div>
         <?php endif; ?>
         <?php if($session->check('Message.flash')): echo $session->flash(); endif;?>
+        <?php echo $this->Session->flash('auth'); ?>
         <?php echo $this->Session->flash('email'); ?>
         <?php echo $this->Session->flash('auth'); ?>
         <div align="left" id="loading"><?php echo $html->image('spinner.gif',array('alt'=>'spinner'))?></div>
@@ -256,7 +259,7 @@ function checkEmailAddress()
     <table width="95%"><tr>
     <td>SVN <?php echo $revision;?>
         <a href="javascript:toggleDivision('svn-data');">(details)</a></td>
-    <td>User ID: <?php echo empty($user) ? "none" : $user['id'] ?>
+    <td>User ID: <?php echo User::isLoggedIn() ? User::get('id') : "none" ?>
         <a href="javascript:toggleDivision('user-data');">(details)</a></td>
     <td>Courses: <?php echo empty($coursesList) ? 0 : count($coursesList); ?>
         <a href="javascript:toggleDivision('coursesList-data');">(details)</a></td>
@@ -278,7 +281,7 @@ function checkEmailAddress()
         <?php echo $svnTable?></div>
     <div style="display: none; background-color:#FFFFE9; width: 90%;" id="user-data">
         <h1>$user variable</h1>
-        <?php if(!empty($user)) var_dump($user); else echo "(Empty)"?></div>
+        <?php if(User::isLoggedIn()) echo 'ID: '.User::get('id'); else echo "(Empty)"?></div>
     <div style="display: none; background-color:#E9FFFF; width: 90%;" id="coursesList-data">
         <h1>$coursesList variable</h1>
         <?php if(!empty($coursesList)) var_dump($coursesList); else echo __("(Empty)", true)?></div>

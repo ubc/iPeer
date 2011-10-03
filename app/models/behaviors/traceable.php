@@ -74,8 +74,8 @@ class TraceableBehavior extends ModelBehavior {
             'locked' => 'locked_by'
         ),
         'display_fields' => array(
-            'created' => 'CONCAT(Creator.first_name, Creator.last_name)',
-            'modified' => 'CONCAT(Updater.first_name, Updater.last_name)',
+            'created' => 'CONCAT(Creator.first_name, " ", Creator.last_name)',
+            'modified' => 'CONCAT(Updater.first_name, " ", Updater.last_name)',
         ),
         // The value to which target fields will be set when toggled back.
         'restored_value' => 0,

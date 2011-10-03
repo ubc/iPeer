@@ -9,6 +9,7 @@
  *
  */
 App::import('Model', 'SysParameter');
+App::import('Model', 'SysFunction');
 
 class sysContainerComponent
 {
@@ -48,10 +49,12 @@ class sysContainerComponent
 
 	var $myCourseIDs = '';
   var $SysParameter = null;
+  var $SysFunction = null;
 
   function initialize(&$controller, $settings=array()) {
     $this->controller = $controller;
     $this->SysParameter = new SysParameter;
+    $this->SysFunction= new SysFunction;
     //parent::initialize($controller);
   }
 
@@ -94,8 +97,13 @@ class sysContainerComponent
 	 */
 	function getAccessFunctionList()
 	{
+		$this->accessFunctionList = $this->Session->read('ipeerSession.accessFunctionList');
 
-		$this->accessFunctionList=$this->Session->read('ipeerSession.accessFunctionList');
+    if(empty($this->accessFunctionList)) {
+      $accessFunction = $this->SysFunction->getAllAccessibleFunction(User::get('role'));
+      $this->setAccessFunctionList($accessFunction);
+      $this->accessFunctionList = $this->Session->read('ipeerSession.accessFunctionList');
+    }
 		return $this->accessFunctionList;
 	}
 
@@ -231,6 +239,7 @@ class sysContainerComponent
 	 */
 	function getMyCourseList()
 	{
+    trigger_error('This function is deprecated. Use User::getMyCourseList() instead.', E_USER_DEPRECATED);
 		$this->myCourseList = $this->Session->read('ipeerSession.myCourseList');
     if($this->myCourseList == null) $this->myCourseList = array();
 		return $this->myCourseList;

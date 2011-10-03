@@ -4,7 +4,7 @@ App::import('Model', 'User');
 
 class AccessControlComponent extends Object {
   var $name = 'AccessControl';
-  var $components = array('Session', 'Acl', 'Auth');
+  var $components = array('Session', 'Acl');
   var $controller = null;
   var $User = null;
   var $action_map = array('DeleteUser' => array('aco_prefix'    => 'functions/user',
@@ -36,8 +36,7 @@ class AccessControlComponent extends Object {
 
     // read user roles
     if(!($roles = $this->Session->read('ipeerSession.Roles'))) {
-      $user_id = $this->Auth->user('id');
-      $user = $this->User->find('first',  array('conditions' => array('User.id' => $user_id)));
+      $user = $this->User->find('first',  array('conditions' => array('User.id' => User::get('id'))));
       $roles = $user['Role'];
       $this->Session->write('ipeerSession.Roles', $roles);
     }

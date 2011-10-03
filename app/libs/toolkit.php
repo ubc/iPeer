@@ -45,4 +45,18 @@ class Toolkit {
       return "";
     }
   }
+
+  static function parseCSV($file) {
+    $ret = array();
+    if (($handle = fopen($file, "r")) !== false) {
+      while (($data = fgetcsv($handle, 1000, ",")) !== false) {
+        $ret[] = $data;
+      }
+      fclose($handle);
+    } else {
+      trigger_error('Error to open file '.$file, E_USER_ERROR);
+    }
+
+    return $ret;
+  }
 }

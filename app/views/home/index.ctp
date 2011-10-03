@@ -16,7 +16,7 @@
 		    </div>
 
         <div class="instructor">
-            <b><?php __('Instructor')?> <?php echo count($row['Instructor']) > 2 ? 's':''; ?>: </b>&nbsp;
+            <b><?php ?><?php echo count($row['Instructor']) > 1 ? __('Instructors'):__('Instructor'); ?>: </b>&nbsp;
             <?php echo $this->element('courses/course_instructors',
                                       array('instructors' => $row['Instructor']));?>
 

@@ -69,7 +69,7 @@ class CoursesController extends AppController
 
     // For instructors: only list their own courses
     $extraFilters = $this->Auth->user('role') == 'A' ?
-            array('Instructor.id' => $this->User->find('list',array('fields'=>array('User.id')))) :
+array('Instructor.id' => $this->User->find('list',array('fields'=>array('User.id')))) :
             array('Instructor.id' => $this->Auth->user('id'));
         
 
@@ -122,7 +122,7 @@ class CoursesController extends AppController
 	}
 
 	function home($id) {
-    $course = $this->Course->find('first', array('conditions' => array('id' => $id), 'recursive' => 2));
+    $course = $this->Course->find('first', array('conditions' => array('id' => $id), 'recursive' => 1));
     $this->set('data', $course);
     $this->set('course_id', $id);
     $this->set('export_eval_link', 'courses/export/'.$id);
