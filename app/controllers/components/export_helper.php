@@ -339,5 +339,3 @@ class ExportHelperComponent extends Object
     return $globUsersArr;
   }
 }
-?>
-
