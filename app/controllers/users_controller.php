@@ -726,6 +726,14 @@ class UsersController extends AppController
                 if (isset($this->params['form']['course_id']))
                 {
                     $curUser = $this->User->find('username="'.$data['User']['username'].'"');
+
+                    // update user
+                    $curUser['User']['first_name'] = isset($data['User']['first_name']) ? $data['User']['first_name'] : $curUser['User']['first_name'];
+                    $curUser['User']['last_name'] = isset($data['User']['last_name']) ? $data['User']['last_name'] : $curUser['User']['last_name'];
+                    $curUser['User']['email'] = isset($data['User']['email']) ? $data['User']['email'] : $curUser['User']['email'];
+                    $curUser['User']['student_no'] = isset($data['User']['student_no']) ? $data['User']['student_no'] : $curUser['User']['student_no'];
+                    $this->User->save($curUser);
+
                     //Existing user, get this user with the course id
                     $enrolled = $this->UserEnrol->getEnrolledStudents($this->params['form']['course_id'], null, 'User.username="'.$data['User']['username'].'"');
                     //Current user does not registered to this course yet
