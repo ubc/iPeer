@@ -1,10 +1,10 @@
 <?php
 if (isset($invalidlti))
 {
-	echo "<p>O NOES: $invalidlti</p>";
+	echo "<p>LTI Request failure: $invalidlti</p>";
 }
 else
 {
-	echo "<p>O HAI</p>";
+	echo "<p>The LTI request completed successfully, but the app failed to redirect for some reason. Try clicking <a href='/home'>here</a> to see if you're properly logged in.</p>";
 }
 ?>

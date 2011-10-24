@@ -511,6 +511,93 @@ INSERT INTO `courses` VALUES (2, 'APSC 201', 'Technical Communication', 'http://
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `role` enum('A','I','S','T') DEFAULT 'S',
+  `username` varchar(80) NOT NULL DEFAULT '',
+  `password` varchar(80) NOT NULL DEFAULT '',
+  `first_name` varchar(80) DEFAULT NULL,
+  `last_name` varchar(80) DEFAULT NULL,
+  `student_no` varchar(30) DEFAULT NULL,
+  `title` varchar(80) DEFAULT NULL,
+  `email` varchar(80) DEFAULT NULL,
+  `last_login` datetime DEFAULT NULL,
+  `last_logout` datetime DEFAULT NULL,
+  `last_accessed` varchar(10) DEFAULT NULL,
+  `record_status` char(1) NOT NULL DEFAULT 'A',
+  `creator_id` int(11) NOT NULL DEFAULT '0',
+  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `updater_id` int(11) DEFAULT NULL,
+  `modified` datetime DEFAULT NULL,
+  `lti_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE (`lti_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=34 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `faculties`
+--
+
+DROP TABLE IF EXISTS `faculties`;
+CREATE TABLE IF NOT EXISTS `faculties` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(80) NOT NULL,
+  `creator_id` int(11) NOT NULL DEFAULT '0',
+  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `updater_id` int(11) DEFAULT NULL,
+  `modified` datetime DEFAULT NULL,
+  FOREIGN KEY (`creator_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  PRIMARY KEY (`id`),
+  UNIQUE (`name`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `departments`
+--
+
+DROP TABLE IF EXISTS `departments`;
+CREATE TABLE IF NOT EXISTS `departments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(80) NOT NULL,
+  `faculty_id` int NOT NULL,
+  `creator_id` int(11) NOT NULL DEFAULT '0',
+  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `updater_id` int(11) DEFAULT NULL,
+  `modified` datetime DEFAULT NULL,
+  FOREIGN KEY (`faculty_id`) REFERENCES `faculties` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`creator_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,  
+  PRIMARY KEY (`id`),
+  UNIQUE (`name`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `course_departments`
+--
+
+DROP TABLE IF EXISTS `course_departments`;
+CREATE TABLE `course_departments` (
+  `id` int NOT NULL auto_increment,
+  `course_id` int NOT NULL,
+  `department_id` int NOT NULL,
+  FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`department_id`) REFERENCES `departments` (`id`) ON DELETE CASCADE,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `email_merges`
 --
 
@@ -1704,35 +1791,6 @@ INSERT INTO `user_enrols` VALUES (28, 1, 32, 'A', 0, '2006-06-20 15:10:32', NULL
 INSERT INTO `user_enrols` VALUES (29, 1, 33, 'A', 0, '2006-06-21 08:44:09', NULL, '2006-06-21 08:44:09');
 
 -- --------------------------------------------------------
-
---
--- Table structure for table `users`
---
-
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `role` enum('A','I','S','T') DEFAULT 'S',
-  `username` varchar(80) NOT NULL DEFAULT '',
-  `password` varchar(80) NOT NULL DEFAULT '',
-  `first_name` varchar(80) DEFAULT NULL,
-  `last_name` varchar(80) DEFAULT NULL,
-  `student_no` varchar(30) DEFAULT NULL,
-  `title` varchar(80) DEFAULT NULL,
-  `email` varchar(80) DEFAULT NULL,
-  `last_login` datetime DEFAULT NULL,
-  `last_logout` datetime DEFAULT NULL,
-  `last_accessed` varchar(10) DEFAULT NULL,
-  `record_status` char(1) NOT NULL DEFAULT 'A',
-  `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
-  `lti_id` int DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `username` (`username`),
-  UNIQUE (`lti_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=34 ;
 
 --
 -- Dumping data for table `users`

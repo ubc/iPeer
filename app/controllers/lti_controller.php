@@ -10,7 +10,6 @@ class LtiController extends AppController {
 
   public function index() {
     // First verify that this is a legit LTI request
-    debug($this->params['form']);
     $ret = $this->LtiVerifier->checkParams($this->params['form']);
     if ($ret) { // param check failed
       $this->set('invalidlti', $ret);
@@ -23,7 +22,6 @@ class LtiController extends AppController {
       $this->set('invalidlti', $roster);
       return;
     }
-    debug($roster);
 
     // Get course information
     $ret = $this->LtiVerifier->getCourseInfo($this->params['form']);
@@ -31,7 +29,6 @@ class LtiController extends AppController {
       $this->set('invalidlti', "Missing course info in LTI request");
       return;
     }
-    debug($ret);
 
     // APP SPECIFIC CODE STARTS HERE
     // Check whether the course already exists
@@ -62,8 +59,6 @@ class LtiController extends AppController {
       // Get current roster in iPeer
       $courseid = $course['Course']['id'];
       $ipeerroster = $this->User->getEnrolledStudents($courseid);
-      debug($ipeerroster);
-      debug($roster);
       // Compare with roster from LTI
       # Remove users that are on both lists
       foreach ($roster as $ltikey => $ltiuser) {
@@ -76,23 +71,17 @@ class LtiController extends AppController {
         }
       }
       # Remaining users in ipeerroster needs to be dropped
-      debug($ipeerroster);
       foreach ($ipeerroster as $ipeeruser) {
         $this->User->dropEnrolment($ipeeruser['User']['id'], $courseid);
       }
       # Remaining users in roster needs to be added
-      debug($roster);
       foreach ($roster as $person) {
         if (!$this->isLTIInstructor($person)) {
           $this->addUser($person, $courseid);
         }
       }
-      $this->set('invalidlti', "Oops, no update");
-      return;
     }
     // END APP SPECIFIC CODE
-
-    // Populate course according to the class roster
 
     // Let's try logging in:
     $ret = $this->LtiVerifier->login($this->params['form'], $this->User);
@@ -100,7 +89,9 @@ class LtiController extends AppController {
       $this->set('invalidlti', $ret);
       return;
     }
-    debug($this->Auth->user());
+
+    // APP SPECIFIC CODE BELOW
+    $this->redirect('/home');
 
   }
 
