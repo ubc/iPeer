@@ -21,11 +21,6 @@ class AppController extends Controller  {
   var $actionList = array ();
 
   function __construct() {
-    // redirect to installation script if database.php doesn't exist
-    if(!file_exists(CONFIGS.'/database.php')) {
-      header('Location: '.Router::url('/install', true));
-    }
-
     parent::__construct();
   }
 

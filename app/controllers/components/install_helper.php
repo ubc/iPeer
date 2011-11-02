@@ -14,8 +14,8 @@ class InstallHelperComponent
   function runInsertDataStructure($dbConfig, $params) 
   {
     $this->params = $params;
-    $basicSQLFile = "../config/sql/ipeer.sql";
-    $samplesFile = "../config/sql/ipeer_samples_data.sql";
+    $basicSQLFile = CONFIGS . "sql/ipeer.sql";
+    $samplesFile = CONFIGS . "sql/ipeer_samples_data.sql";
     $xml_file = $this->params['form']['data_file']['tmp_name'];
     $to_import = $this->params['form']['to_import'];
 
@@ -43,81 +43,82 @@ class InstallHelperComponent
     return $runQuery; 
   }
 
-  #
-  # Read and execute SQL commands from a file
-  #
-  function dbSource($dbConfig) {
-
-    $executeStaus = false;
-    $fname = $dbConfig['filename'];
-
-    //connect to the server
-    $mysql = mysql_connect($dbConfig['host'], $dbConfig['login'], $dbConfig['password']);
-    if(!$mysql) {
-      die(__('Could not connect: ', true) . mysql_error());
-      return($error);
+  /**
+   * Reads an SQL template file and executes the queries inside.
+   *
+   * @param $dbConfig - login configuration for the mysql db and the sql
+   * template filename
+   * @return false if everything executed successfully, an error message
+   * otherwise.
+   */
+  function dbSource($dbConfig) 
+  {
+    // Connect to the server
+    $mysql = mysql_connect($dbConfig['host'], 
+      $dbConfig['login'], 
+      $dbConfig['password']);
+    if(!$mysql) 
+    {
+      return('Could not connect: ' . mysql_error());
     } 
-    else {
-      //Create the database if not exists
-      if (!mysql_query("CREATE DATABASE IF NOT EXISTS ".$dbConfig['database'],$mysql))    
-        echo "Error creating database: " . mysql_error();
-      
-      //Open the database
-      $mysqldb = mysql_select_db($dbConfig['database']);
-      if (!$mysqldb) {
-        die(__('Could not open the database: ', true) . mysql_error());
-        return($error);
-      }	  
 
-      $fp = fopen( $fname, "r" );
-      if ( false === $fp ) {
-        //print "Could not open \"{$fname}\".\n";
-        return false;
+    // Create the database if not exists
+    $ret = mysql_query("CREATE DATABASE IF NOT EXISTS ".$dbConfig['database'],
+                        $mysql);
+    if (!$ret) 
+    {
+      return 'Error creating database: ' . mysql_error();
+    }
+
+    // Open the database
+    $mysqldb = mysql_select_db($dbConfig['database']);
+    if (!$mysqldb) 
+    {
+      return 'Could not open the database: '. mysql_error();
+    }
+
+    // Read the SQL template file
+    $template = file($dbConfig['filename'], FILE_SKIP_EMPTY_LINES);
+    if ( false === $template ) 
+    {
+      return 'Unable to open SQL template "' . $dbConfig['filename'] . '"';
+    }
+
+    // Do the queries
+    mysql_query('BEGIN');
+    $query = ''; // Query variable
+    foreach ($template as $line)
+    {
+      // Skip comments
+      if (substr($line, 0, 2) == '--')
+        continue;
+
+      // Add this line to the current query
+      $query .= $line;
+      // Semicolon indicates end of query
+      if (substr(trim($line), -1, 1) == ';')
+      { // Perform query to queue
+        $ret = mysql_query($query);
+        if (!$ret)
+        { // Query failed, undo everything and cry
+          $err = mysql_error();
+          mysql_query('ROLLBACK');
+          mysql_close($mysql);
+          return 'Query failed: ' . $err;
+        }
+        // Reset query variable to empty
+        $query = '';
       }
+    }
 
-      mysql_query('BEGIN');
-
-      $cmd = "";
-      $done = false;
-
-      while ( ! feof( $fp ) ) {
-      $line = trim( fgets( $fp, 1024 ) );
-      $sl = strlen( $line ) - 1;
-
-      if ( $sl < 0 ) { continue; }
-      if ( "-" == $line{0} && "-" == $line{1} ) { continue; }
-
-      if ( ";" == $line{$sl} ) {
-              $done = true;
-              $line = substr( $line, 0, $sl );
-      }
-
-      if ( "" != $cmd ) { $cmd .= " "; }
-      $cmd .= $line;
-
-      if ( $done ) {
-              //echo $cmd . ";<br /><br /><br />";
-              $result = mysql_query($cmd, $mysql);
-      if (!$result)
-      {
-      $error = __("Cannot run query", true);
-      mysql_query('ROLLBACK');
-      mysql_close($mysql);
-      return $error;
-      }
-              //if ($this->execute($cmd)) {
-              //	return false;
-              //}
-              $cmd = "";
-              $done = false;
-      }
-      }
-      fclose( $fp );
-      mysql_query("COMMIT");
-      mysql_close($mysql);
-      }
-      return true;
-
+    // Commit all queries 
+    $ret = mysql_query("COMMIT");
+    if (!$ret)
+    {
+      return "Unable to commit queries: " . mysql_error();
+    }
+    mysql_close($mysql);
+    return false;
   }    	
 	
   function updateSystemParameters($data) 

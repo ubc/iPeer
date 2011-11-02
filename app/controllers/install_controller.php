@@ -20,11 +20,9 @@
  */
 class InstallController extends Controller
 {
-  var $Sanitize;
   var $uses         = null; 
   var $components   = array(
                       'Output', 
-                      //'framework',
                       'Session',
                       'installHelper',
                       'DbPatcher'
@@ -34,175 +32,132 @@ class InstallController extends Controller
 	
   function __construct()
   {
-    $this->Sanitize = new Sanitize;
     $this->set('title_for_layout', __('Install Wizards', true));
     parent::__construct();
   }
 		
-  function checkDatabaseFile()
-  {
-    return file_exists('../config/database.php');
-  }
-
+  /**
+   * Check prereqs for installing iPeer
+   * */
   function index()
   {    
-    $this->Session->write('progress', 'index');
-	  $this->autoRender = false;
-    if(file_exists('../config/database.php'))
+    if(file_exists(CONFIGS.'installed.txt'))
     {
-      $this->set('message_content', __('It looks like you already have a instance running. Please install a fresh copy or remove app/config/database.php.', true));
-      $this->render('/pages/message');
-    }else{
-      return $this->render('install');
+      $this->Session->setFlash(__('WARNING: It looks like you already have a instance running. Proceed at your own risk. Remove app/config/installed.txt if you do not want to see this warning.', true));
     }
   }
 	
+  /***
+   * Ask the user if they agree to the GPL license.
+   * */
   function install2()
   {
-    if(!$this->Session->check('progress') || 'index' != $this->Session->read('progress'))
-    {
-      $this->set('message_content', __('You seems to miss some steps. Please start the installation from beginning.', true));
-      $this->render('/pages/message');
-    }
-    $this->Session->write('progress', 'install2');
   }
 
+  /**
+   * Ask the user for how to access the database
+   * */
   function install3()
   {
-    if(!$this->Session->check('progress') || ('install2' != $this->Session->read('progress') && 'install3' != $this->Session->read('progress')))
-    {
-      $this->render('wrongstep');
+    if(!is_writable(CONFIGS))
+    { 
+      $this->Session->setFlash(__('The config directory is not writable. Please change the permission on config directory, e.g., "chmod 777 app/config". After installation, change the permission back.', true));
     }
-    $this->Session->write('progress', 'install3');
-
-    $writable = is_writable("../config");
-  
-    if(!$writable) $this->set('errmsg', __('"app/config" is not writable. Please check the permission on config directory, e.g., chmod 777 app/config. After installation, please change the permission back.', true));
-
-    if (!empty($this->params['data'])) 
+    else if (!is_writable(CONFIGS.'database.php'))
     {
-      //setup parameter
-      $dbConfig = $this->__createDBConfigFile();
-			
-      //Retain the data setup option: A - With Sample,  B - Basic, C - Import from iPeer 1.6
-      $dbConfig['data_setup_option'] = $this->params['form']['data_setup_option'];
-      $insertDataStructure = $this->installHelper->runInsertDataStructure($dbConfig, $this->params);
-			
-      //Found error
-      if (!($dbConfig && $insertDataStructure))
-      {
-        $this->set('data', $this->params['data']);
-        $this->set('errmsg', __('Create Database Configuration Failed', true));
-        $this->render('install3');
-      }
-    
-      //Conditionally load sysContainer
-      App::import('Component', 'sysContainer');
-      $this->sysContainer = new sysContainerComponent();
-      $this->sysContainer->initialize($this);
-      //$this->sysContainer->startup($this);
-      
-      // apply the patches
-      $dbv = $this->sysContainer->getParamByParamCode('database.version', array('parameter_value' => 0));
+      $this->Session->setFlash(__('The database config file is not writable. Please change the permission on config directory, e.g., "chmod 777 app/config/database.php". After installation, change the permission back.', true));
+    }
+  }
 
-      // patch the database
-      if(true !== ($ret = $this->DbPatcher->patch($dbv['parameter_value'], $dbConfig)))
-      {
-        $this->set('message_content', $ret);
-        $this->render('/pages/message');
-        exit;
-      }
-      
-      $this->set('data', array());
-      $this->redirect('install4');  
-    }	  
+  /**
+   * This is an unrenderable page (no associated ctp file). Its only purpose
+   * is to create the database configuration file. Unfortunately, this page
+   * is needed because the database patcher in the next step needs to read
+   * the database. If the DB patching and writing of the configuration file
+   * takes place in the same step, CakePHP does not reread the DB config file,
+   * so uses the wrong credentials to try to access the database.
+   * */
+  function configdb()
+  {
+    if (empty($this->data))
+    { // Can't configure database if no data was entered on the prev page
+      $this->Session->setFlash(__('No data entered.',true));
+      $this->redirect(array('action' => 'install3'));
+      return;
+    }
+
+    // Try to configure the database, configureDatabase() will setFlash
+    // with error msg so don't need to do it again
+    $ret = $this->configureDatabase();
+    if ($ret)
+    { // Failed to configure database
+      $this->Session->setFlash(__('Database config failed - '.$ret, true));
+      $this->redirect(array('action' => 'install3'));
+      return;
+    }
+
+    // Success
+    $this->redirect(array('action' => 'install4'));
   }
 
   function install4()
   { 
-    $this->autoRender = false;
-
-    if(!$this->Session->check('progress') || ('install3' != $this->Session->read('progress') && 'install4' != $this->Session->read('progress')))
+    // Try to patch the database if needed
+    $ret = $this->patchDB();
+    if ($ret)
     {
-      $this->render('wrongstep');
+      $this->Session->setFlash(__('Database upgrade failed - '.$ret, true));
+      $this->redirect(array('action' => 'install3'));
+      return;
     }
-    $this->Session->write('progress', 'install4');
 
-    if (empty($this->params['data'])) {
-      //render default
-      $this->set('absolute_url', str_replace($this->here,'',Router::url($this->here, true)));
-      $this->set('domain_name', $_SERVER['HTTP_HOST']);
-      $this->render();
-    }else{
-      //update parameters
-      $username = $this->installHelper->updateSystemParameters($this->params['data']);
-      if (!empty($username)) {
-        $this->set('superAdmin', $username);
-
-        //Create Super Admin
-        $my_db =& ConnectionManager::getDataSource('default');
-        $my_db->query("INSERT INTO `users` (`id`, `role`, `username`, `password`, `first_name`, `last_name`, `student_no`, `title`, `email`, `last_login`, `last_logout`, `last_accessed`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) 
-          VALUES ('1', 'A', '".$username."', '".md5($this->params['data']['Admin']['password'])."', 'Super', 'Admin', NULL, NULL, '".$this->params['data']['SysParameter']['system.admin_email']."', NULL, NULL, NULL, 'A', '0', '".date("Y-m-d H:i:s")."', NULL, NULL)
-          ON DUPLICATE KEY UPDATE password = '".md5($this->params['data']['Admin']['password'])."', email = '".$this->params['data']['SysParameter']['system.admin_email']."';");
-
-        //Get Super Admin's id and insert into roles_users table
-        $user_id = $my_db->query("SELECT id FROM users WHERE username = '".$username."'");
-        $my_db->query("INSERT INTO `roles_users` (`id`, `role_id`, `user_id`, `created`, `modified`)
-          VALUES (NULL, '1', '".$user_id[0]['users']['id']."', '".date("Y-m-d H:i:s")."', '".date("Y-m-d H:i:s")."');");
-
-        // test if the config directory is still writable by http user
-        $this->set('config_writable', $writable = is_writable("../config"));
-        $this->render('install5');  
-      }	else { 
-        //Found error
-        $this->set('data', $this->params['data']);
-        $this->set('errmsg', __('Configuration of iPeer System Parameters Failed.', true));
-        $this->render('install4');
-      }//end if      
-    }	  
+    // Set variables needed to render the page
+    $this->set('absolute_url', str_replace($this->here,'',
+      Router::url($this->here, true)));
+    $this->set('domain_name', $_SERVER['HTTP_HOST']);
   }	
 
-  function __createDBConfigFile() 
+  function install5()
   {
-		//End of line based on OS platform
-    $endl = (substr(PHP_OS,0,3)=='WIN')? "\r\n" : "\n"; 
-		$dbDriver = '';
-		$dbConnect = '';
-    $hostName ='';
-		$dbUser = '';
-		$dbPassword = '';
-		$dbName = '';
-		$dbConfig = array();
-		
-		//create and write file 
-    if(!$confile = fopen("../config/database.php", "wb")) 
+    if (empty($this->params['data'])) 
     {
-        $errMsg= __("Error creating ../config/database.php; check your permissions<br />", true) ;
-        $this->set('errmsg', $errMsg);
-        return false;
-    }else{
-     	if (!empty($this->params['data'])) {
-          //Setup the database config parameters
-          $dbConfig = $this->params['data']['DBConfig'];
+      $this->Session->setFlash(__('No iPeer configuration entered'), true);
+      $this->redirect(array('action' => 'install4'));
+      return;
+    }
 
-          //Write Config file
-          fwrite($confile, "<?php" . $endl);
-          fwrite($confile, "class DATABASE_CONFIG {".$endl);
-          fwrite($confile, "var \$default = array(".$endl);
-          foreach($dbConfig as $k => $v)
-          {
-            fwrite($confile, "                     '".$k."'   => '".$v."',".$endl);
-          }
-          fwrite($confile,"                     'prefix'   => '');  }".$endl);
-          fwrite($confile,"?>" . $endl);
-        } else {
-          return false; 
-      }
-			
-    }  
-    return $dbConfig;
+    //update parameters
+    $username = $this->installHelper->updateSystemParameters($this->params['data']);
+    // TODO Replace raw SQL queries with CakePHP Model calls once the database
+    // conflicts where both the users and roles_users table stores role data
+    // has been fixed
+    $this->set('superAdmin', $username);
+
+    //Create Super Admin
+    $my_db =& ConnectionManager::getDataSource('default');
+    $my_db->query("INSERT INTO `users` (`id`, `role`, `username`, `password`, `first_name`, `last_name`, `student_no`, `title`, `email`, `last_login`, `last_logout`, `last_accessed`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) 
+      VALUES ('1', 'A', '".$username."', '".md5($this->params['data']['Admin']['password'])."', 'Super', 'Admin', NULL, NULL, '".$this->params['data']['SysParameter']['system.admin_email']."', NULL, NULL, NULL, 'A', '0', '".date("Y-m-d H:i:s")."', NULL, NULL)
+      ON DUPLICATE KEY UPDATE password = '".md5($this->params['data']['Admin']['password'])."', email = '".$this->params['data']['SysParameter']['system.admin_email']."';");
+
+    //Get Super Admin's id and insert into roles_users table
+    $user_id = $my_db->query("SELECT id FROM users WHERE username = '".$username."'");
+    $my_db->query("INSERT INTO `roles_users` (`id`, `role_id`, `user_id`, `created`, `modified`)
+      VALUES (NULL, '1', '".$user_id[0]['users']['id']."', '".date("Y-m-d H:i:s")."', '".date("Y-m-d H:i:s")."');");
+
+    // test if the config directory is still writable by http user
+    $this->set('config_writable', $writable = is_writable("../config"));
+
+    $f = fopen(CONFIGS.'installed.txt', 'w');
+    if (!$f)
+    {
+      $this->Session->setFlash(__('Installation failed, unable to write to '. CONFIGS .' dir'), true);
+      $this->redirect(array('action' => 'install4'));
+      return;
+    }
+    fclose($f);
   }
-	
+
+
   function gpl()
   {
     $this->layout = false;
@@ -212,6 +167,84 @@ class InstallController extends Controller
   function manualdoc()
   {
     $this->render('manualdoc');
+  }
+
+  private function configureDatabase()
+  {
+    // We have user credentials for the database, write it to conf file
+    $dbConfig = $this->createDBConfigFile();
+    if (!$dbConfig)
+    { // Writing to config file failed
+      return "Unable to write to ".CONFIGS."database.php";
+    }
+
+    // Get the data setup option: A-With Sample,B-Basic,C-Import from iPeer 1.6
+    $dbConfig['data_setup_option'] = $this->params['form']['data_setup_option'];
+    $ret = $this->installHelper->runInsertDataStructure($dbConfig, $this->params);
+
+    //Found error
+    if ($ret)
+    {
+      return 'Create Database Failed - ' . $ret;
+    }
+
+    return false;
+  }
+
+  private function createDBConfigFile() 
+  {
+		// Workaround for Windows portability
+    $endl = (substr(PHP_OS,0,3)=='WIN')? "\r\n" : "\n"; 
+		
+		//create and write file 
+    $confile = fopen(CONFIGS.'database.php', 'wb');
+    if (!$confile)
+    {
+      return false;
+    }
+    $dbConfig = array();
+    //Setup the database config parameters
+    $dbConfig = $this->params['data']['DBConfig'];
+
+    //Write Config file
+    fwrite($confile, "<?php" . $endl);
+    fwrite($confile, "class DATABASE_CONFIG {".$endl);
+    fwrite($confile, "var \$default = array(".$endl);
+    foreach($dbConfig as $k => $v)
+    {
+      fwrite($confile, "                     '".$k."'   => '".$v."',".$endl);
+    }
+    fwrite($confile,"                     'prefix'   => '');  }".$endl);
+    fwrite($confile,"?>" . $endl);
+    fflush($confile);
+    fclose($confile);
+    return $dbConfig;
+  }
+
+  // TODO PATCHER PROBABLY BROKEN. Not needed now, but should check later.
+  /**
+   * Updates an existing database to the current version.
+   * */
+  private function patchDB()
+  {
+    // Conditionally load sysContainer
+    // Note that this load assumes we have valid db access credentials
+    App::import('Component', 'sysContainer');
+    $this->sysContainer = new sysContainerComponent();
+    $this->sysContainer->initialize($this);
+
+    // Get database version
+    $dbv = $this->sysContainer->getParamByParamCode('database.version', 
+      array('parameter_value' => 0));
+
+    // Run the patcher
+    $ret = $this->DbPatcher->patch($dbv['parameter_value']);
+    if ($ret)
+    { // Patcher failed
+      return $ret;
+    }
+
+    return false;
   }
 }
 

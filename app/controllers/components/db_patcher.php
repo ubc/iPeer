@@ -9,29 +9,43 @@ class DbPatcherComponent extends Object
 
   function patch($from_version, $dbConfig = null)
   {
-    $mysql = $this->connectDb($dbConfig);
+    $ret = $this->connectDb($dbConfig);
+    if ($ret)
+    { // Unable to connect
+      return $ret;
+    }
 
-    // apply the delta files
+    // Apply the delta files
     for($i = $from_version+1; $i <= Configure::read('DATABASE_VERSION'); $i++)
     {
-      $file = '../config/sql/delta_'.$i.'.sql';
-      if(!(is_readable($file) && true === ($ret = $this->applyDelta($file))))
+      // Check that we can read the delta file 
+      $file = CONFIGS.'sql/delta_'.$i.'.sql';
+      if (!is_readable($file))
       {
-        mysql_query("ROLLBACK");
-        mysql_close($mysql);
-        return __('Failed to apply delta file: ', true).$file.'. '.__('Message', true).' = '.$ret;
+        mysql_close();
+        return "Cannot read delta file $file";
+      }
+      $ret = $this->applyDelta($file);
+      if ($ret)
+      {
+        mysql_close();
+        return 'Failed to apply delta file: '.$file.'. Message = '.$ret;
       }
     }
-    $this->disconnectDb($mysql);
+    mysql_close();
 
     // apply the other changes
     $this->updateDatabaseVersion();
 
-    return true;
+    return false;
   }
 
   function connectDb($dbConfig)
   {
+    // Read the database configuration from database.php
+    $dbConfig = new DATABASE_CONFIG();
+    $dbConfig = $dbConfig->default;
+
     if(null == $dbConfig)
     {
       $db = new DATABASE_CONFIG();
@@ -39,36 +53,25 @@ class DbPatcherComponent extends Object
     }
     $mysql = mysql_connect($dbConfig['host'], $dbConfig['login'], $dbConfig['password']);
     if(!$mysql) {
-      $this->set('message_content', __('Could not connect to database!', true));
-      $this->render(null, null, 'views/pages/message.tpl.php');
-      exit;
+      return 'Could not connect to database!';
     } 
 
     //Open the database
     $mysqldb = mysql_select_db($dbConfig['database']);
     if (!$mysqldb) {
-      $this->set('message_content', __('Could not find database ', true).$dbConfig['database'].'!');
-      $this->render(null, null, 'views/pages/message.tpl.php');
-      exit;
+      return 'Could not find database '.$dbConfig['database'].'!';
     }	  
   
-    mysql_query('BEGIN');
-
-    return $mysql;
-  }
-
-  function disconnectDb($mysql)
-  {
-    mysql_query("COMMIT");
-    mysql_close($mysql);
+    return false;
   }
 
   function applyDelta($file)
   {
     $fp = fopen( $file, "r" );
     if ( false === $fp ) {
-      return __("Could not open ", true).$fname;
+      return "Could not open ".$file;
     }
+    mysql_query('BEGIN');
 
     $cmd = "";
     $done = false;
@@ -89,29 +92,26 @@ class DbPatcherComponent extends Object
       $cmd .= $line;
 
       if ( $done ) {
-        //echo $cmd . ";<br /><br /><br />";
         $result = mysql_query($cmd);
         if (!$result)
         {
-          $error = __("Cannot run query", true);
-          return $error;
+          mysql_query("ROLLBACK");
+          return "Cannot run query from $file - $cmd";
         }
-        //if ($this->execute($cmd)) {
-        //	return false;
-        //}
         $cmd = "";
         $done = false;
       }
     }
     fclose( $fp );
-    return true;
+    mysql_query("COMMIT");
+    return false;
   }
 
   function updateDatabaseVersion()
   {
     if(!class_exists('DATABASE_CONFIG'))
     {
-      include_once('../config/database.php');
+      include_once(CONFIGS.'database.php');
     }
 
     // update database version

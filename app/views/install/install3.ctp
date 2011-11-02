@@ -2,7 +2,7 @@
 <tr>
 <td align="center">
   <br>
-<form name="frm" id="frm" method="POST" action="<?php echo $html->url('install3') ?>" onSubmit="return validate()" enctype="multipart/form-data">
+<form name="frm" id="frm" method="POST" action="<?php echo $html->url('configdb') ?>" onSubmit="return validate()" enctype="multipart/form-data">
 <input type="hidden" name="required" id="required" value="host_name db_user db_name" />
 
 <table width="95%"  border="0" cellspacing="2" cellpadding="4">

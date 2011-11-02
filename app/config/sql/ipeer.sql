@@ -195,7 +195,6 @@ INSERT INTO `acos` (`id`, `parent_id`, `model`, `foreign_key`, `alias`, `lft`, `
 (158, 144, NULL, NULL, 'view', 313, 314),
 (159, 144, NULL, NULL, 'delete', 315, 316),
 (160, 1, NULL, NULL, 'Install', 318, 341),
-(161, 160, NULL, NULL, 'checkDatabaseFile', 319, 320),
 (162, 160, NULL, NULL, 'index', 321, 322),
 (163, 160, NULL, NULL, 'install2', 323, 324),
 (164, 160, NULL, NULL, 'install3', 325, 326),

@@ -22,33 +22,39 @@
  * @since         CakePHP(tm) v 0.2.9
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
+
 /**
- * Here, we are connecting '/' (base path) to controller called 'Pages',
- * its action called 'display', and we pass a param to select the view file
- * to use (in this case, /app/views/pages/home.ctp)...
- */
-#Router::connect('/', array('controller' => 'pages', 'action' => 'display', 'home'));
+ * Configure routing so that if iPeer has not been installed, the user
+ * is directed to the installation page. Setup normal router otherwise.
+ *
+ * iPeer is considered to be installed if the text file installed.txt
+ * is located in the CONFIGS directory.
+ * */
+
+if (file_exists(CONFIGS.'installed.txt')) 
+{ 
+  // Connect default index page to the home controller
 	Router::connect('/', array('controller' => 'home', 'action' => 'index'));
-/**
- * ...and connect the rest of 'Pages' controller's urls.
- */
-	Router::connect('/pages/*', array('controller' => 'pages', 'action' => 'display'));
-
-/**
- * Then we connect url '/test' to our test controller. This is helpfull in
- * developement.
- */
-  Router::connect('/tests', array('controller' => 'tests', 'action' => 'index'));
-
+  // Connect static pages to the pages controller
+  Router::connect('/pages/*', array('controller' => 'pages', 
+    'action' => 'display'));
+  // Connect url '/test' to our test controller. For dev use
+  Router::connect('/tests', array('controller' => 'tests', 
+    'action' => 'index'));
   // Authentication routes
-  Router::connect('/login', array('controller' => 'users', 'action' => 'login'));
-  Router::connect('/logout', array('controller' => 'users', 'action' => 'logout'));
+  Router::connect('/login', array('controller' => 'users', 
+    'action' => 'login'));
+  Router::connect('/logout', array('controller' => 'users', 
+    'action' => 'logout'));
+}
+else 
+{
+  // Note, order of routes specified matters. If install didn't come first
+  // the /* directive would just redirect every page to the index page
+  // of install, including the install/install2/, etc. steps of install
+  Router::connect('/install/:action/*', array('controller' => 'install'));
+  Router::connect('/*', array('controller' => 'install'));
+}
 
-  // Installation route
-  Router::connect('/install', array('controller' => 'install', 'action' => 'index'));
-
-  // with guard plugin
-  //Router::connect('/login', array('plugin' => 'guard', 'controller' => 'guard', 'action' => 'login'));
-  //Router::connect('/logout', array('plugin' => 'guard', 'controller' => 'guard', 'action' => 'logout'));
 
 ?>
