@@ -38,12 +38,12 @@
   </tr>
 
   <tr class="tablecell2">
-    <td>Number of Lickert Question:</td>
+    <td>Number of Likert Question:</td>
     <td><?php echo $data['Mixeval']['lickert_question_max']?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		Level of Scale:&nbsp;&nbsp;
 		<?php echo $data['Mixeval']['scale_max']?>
 		</td>
-    <td>Number of Lickert Question Aspects (Max 25) </td>
+    <td>Number of Likert Question Aspects (Max 25) </td>
   </tr>
   <tr class="tablecell2">
     <td>Number of Pre-fill Text Question:</td>

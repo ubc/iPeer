@@ -47,7 +47,7 @@
   </tr>
 
   <tr class="tablecell2">
-    <td>Number of Lickert Question:</td>
+    <td>Number of Likert Question:</td>
     <td>
 
     <?php if (empty($data)) { ?>
@@ -66,7 +66,7 @@
 		<?php echo $html->selectTag('Mixeval/scale_max', array('2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8',
 									'9'=>'9','10'=>'10','11'=>'11'), $scale_default, array('style'=>'width:50px;','id'=>'LOM'),'',false) ?>
 		</td>
-    <td><!--Number of Lickert Question Aspects (Max 25)--> </td>
+    <td><!--Number of Likert Question Aspects (Max 25)--> </td>
   </tr>
   <tr class="tablecell2">
     <td>Number of Pre-fill Text Question:</td>

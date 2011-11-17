@@ -127,7 +127,7 @@
     	    <th colspan="2" width="60%">Name</th>
     	    <th width="50">In Use</th>
     	    <th>Public</th>
-    	    <th>Lickert Scale Questions</th>
+    	    <th>Likert Scale Questions</th>
     	    <th>Prefill Questions</th>
     	    <th>Total Marks</th>
     	  </tr>

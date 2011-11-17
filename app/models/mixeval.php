@@ -89,7 +89,7 @@ class Mixeval extends AppModel
       isset($tmp['data']['Mixeval']['response_type'.$i])? $question['response_type'] = $tmp['data']['Mixeval']['response_type'.$i] : $question['response_type'] = null;
       $questions[$i]['MixevalsQuestion'] = $question;
 
-      //Format lickert descriptors
+      //Format likert descriptors
       if ($question['question_type'] == 'S') {
         for ($j = 1; $j <= $question['scale_level']; $j++) {
          $desc['question_num'] = $question['question_num'];

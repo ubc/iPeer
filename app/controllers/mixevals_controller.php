@@ -80,7 +80,7 @@ class MixevalsController extends AppController
             array("!Custom.inUse",         "In Use",       "4em",  "number"),
             array("Mixeval.availability",  "Availability", "6em",  "string"),
             array("Mixeval.scale_max",     "LOM",          "3em",  "number"),
-            array("Mixeval.lickert_question_max", "Lickert","4em", "number"),
+            array("Mixeval.lickert_question_max", "Likert", "4em", "number"),
             array("Mixeval.prefill_question_max", "Pre-fill","4em","number"),
             array("Mixeval.total_marks",  "Total Marks",    "4em", "number"),
             array("Creator.id",           "",               "",    "hidden"),

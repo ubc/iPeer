@@ -2,7 +2,7 @@
 <?php echo $javascript->link('calculate_marks'); ?>
     <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
     	<tr class="tableheader" align="center">
-			<td valign="top" colspan="<?php echo $scale_default?>" width="90%"  align='left'>Section One: &nbsp;Lickert Scales</td>
+			<td valign="top" colspan="<?php echo $scale_default?>" width="90%"  align='left'>Section One: &nbsp;Likert Scales</td>
 		<?php
 		$descriptor_des = array();//array('1'=>'Lowest','2'=>'','3'=>'Middle','4'=>'','5'=>'Highest');
 
@@ -142,13 +142,13 @@
             <tr><td width="15%" align="left">Student's Answer Option: </td>
                 <td width="85%" align="left">
                   <?php
-                   $responseLickert = 'checked';
+                   $responseLikert = 'checked';
                    $responseText = '';
                    if (isset($mixevalQuestion['response_type']) && $mixevalQuestion['response_type']=='L') {
-                   $responseLickert = '';
+                   $responseLikert = '';
                    $responseText = 'checked';
                    }?>
-          		    <input type="radio" name="data[Mixeval][response_type<?php echo $pos?>]" value="S" <?php echo $responseLickert?>  > Single line of text input box<br>
+          		    <input type="radio" name="data[Mixeval][response_type<?php echo $pos?>]" value="S" <?php echo $responseLikert?>  > Single line of text input box<br>
           		    <input type="radio" name="data[Mixeval][response_type<?php echo $pos?>]" value="L" <?php echo $responseText?> > Multiple lines of text input box<br>
                 </td></tr>
 			 </table></td>
