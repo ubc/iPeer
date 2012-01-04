@@ -63,8 +63,8 @@ class InstallHelperComponent
     } 
 
     // Create the database if not exists
-    $ret = mysql_query("CREATE DATABASE IF NOT EXISTS ".$dbConfig['database'],
-                        $mysql);
+    $ret = mysql_query("CREATE DATABASE IF NOT EXISTS `".$dbConfig['database'].
+      "` CHARACTER SET `utf8` COLLATE `utf8_general_ci`;", $mysql);
     if (!$ret) 
     {
       return 'Error creating database: ' . mysql_error();
@@ -85,7 +85,7 @@ class InstallHelperComponent
     }
 
     // Do the queries
-    mysql_query('BEGIN');
+    mysql_query('START TRANSACTION');
     $query = ''; // Query variable
     foreach ($template as $line)
     {

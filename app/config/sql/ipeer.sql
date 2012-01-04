@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `acos` (
   PRIMARY KEY (`id`),
   KEY `parent_id` (`parent_id`),
   KEY `alias` (`alias`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=365 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=365 ;
 
 --
 -- Dumping data for table `acos`
@@ -415,7 +415,7 @@ CREATE TABLE IF NOT EXISTS `aros` (
   `lft` int(10) DEFAULT NULL,
   `rght` int(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 --
 -- Dumping data for table `aros`
@@ -444,7 +444,7 @@ CREATE TABLE IF NOT EXISTS `aros_acos` (
   `_delete` varchar(2) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `ARO_ACO_KEY` (`aro_id`,`aco_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=25 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=25 ;
 
 --
 -- Dumping data for table `aros_acos`
@@ -498,7 +498,7 @@ CREATE TABLE `courses` (
   `instructor_id` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `course` (`course`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -529,7 +529,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE (`lti_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 --
@@ -547,7 +547,7 @@ CREATE TABLE IF NOT EXISTS `faculties` (
   FOREIGN KEY (`creator_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   PRIMARY KEY (`id`),
   UNIQUE (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -568,7 +568,7 @@ CREATE TABLE IF NOT EXISTS `departments` (
   FOREIGN KEY (`creator_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   PRIMARY KEY (`id`),
   UNIQUE (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -584,7 +584,7 @@ CREATE TABLE `course_departments` (
   FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE,
   FOREIGN KEY (`department_id`) REFERENCES `departments` (`id`) ON DELETE CASCADE,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -602,7 +602,7 @@ CREATE TABLE IF NOT EXISTS `email_merges` (
   `created` datetime NOT NULL,
   `modified` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 --
 -- Dumping data for table `email_merges`
@@ -635,7 +635,7 @@ CREATE TABLE IF NOT EXISTS `email_schedules` (
   `creator_id` int(11) NOT NULL,
   `created` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=11 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
 
 -- --------------------------------------------------------
 
@@ -656,7 +656,7 @@ CREATE TABLE IF NOT EXISTS `email_templates` (
   `updater_id` int(11) DEFAULT NULL,
   `updated` date DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=13 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=13 ;
 
 -- --------------------------------------------------------
 
@@ -679,7 +679,7 @@ CREATE TABLE IF NOT EXISTS `evaluation_mixeval_details` (
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `evaluation_mixeval_id` (`evaluation_mixeval_id`,`question_number`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -703,7 +703,7 @@ CREATE TABLE IF NOT EXISTS `evaluation_mixevals` (
   `updater_id` int(11) DEFAULT NULL,
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
 -- --------------------------------------------------------
@@ -727,7 +727,7 @@ CREATE TABLE IF NOT EXISTS `evaluation_rubric_details` (
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `evaluation_rubric_id` (`evaluation_rubric_id`,`criteria_number`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -753,7 +753,7 @@ CREATE TABLE IF NOT EXISTS `evaluation_rubrics` (
   `modified` datetime DEFAULT NULL,
   `rubric_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -779,7 +779,7 @@ CREATE TABLE IF NOT EXISTS `evaluation_simples` (
   `updater_id` int(11) DEFAULT NULL,
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -802,7 +802,7 @@ CREATE TABLE IF NOT EXISTS `evaluation_submissions` (
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `grp_event_id` (`grp_event_id`,`submitter_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -825,7 +825,7 @@ CREATE TABLE IF NOT EXISTS `event_template_types` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `type_name` (`type_name`),
   UNIQUE KEY `table_name` (`table_name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 --
 -- Dumping data for table `event_template_types`
@@ -864,7 +864,7 @@ CREATE TABLE IF NOT EXISTS `events` (
   `updater_id` int(11) DEFAULT NULL,
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -888,7 +888,7 @@ CREATE TABLE IF NOT EXISTS `group_events` (
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `group_id` (`event_id`,`group_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -908,7 +908,7 @@ CREATE TABLE IF NOT EXISTS `groups` (
   `updater_id` int(11) DEFAULT NULL,
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -923,7 +923,7 @@ CREATE TABLE IF NOT EXISTS `groups_members` (
   `user_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `group_id` (`group_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -946,7 +946,7 @@ CREATE TABLE IF NOT EXISTS `mixevals` (
   `updater_id` int(11) DEFAULT NULL,
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 --
 -- Dumping data for table `mixevals`
@@ -969,7 +969,7 @@ CREATE TABLE IF NOT EXISTS `mixevals_question_descs` (
   `descriptor` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `question_num` (`question_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=11 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
 
 --
 -- Dumping data for table `mixevals_question_descs`
@@ -1011,7 +1011,7 @@ CREATE TABLE IF NOT EXISTS `mixevals_questions` (
   `scale_level` int(11) NOT NULL DEFAULT '0',
   `response_type` char(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
 
 --
 -- Dumping data for table `mixevals_questions`
@@ -1038,7 +1038,7 @@ CREATE TABLE `penalties` (
   `percent_penalty` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_events` (`event_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=36 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=36 ;
 
 --
 -- Constraints for table `penalties`
@@ -1062,7 +1062,7 @@ CREATE TABLE IF NOT EXISTS `personalizes` (
   `updated` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`,`attribute_code`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
 -- --------------------------------------------------------
 
@@ -1077,7 +1077,7 @@ CREATE TABLE IF NOT EXISTS `questions` (
   `type` enum('M','C','S','L') DEFAULT NULL,
   `master` enum('yes','no') NOT NULL DEFAULT 'yes',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1091,7 +1091,7 @@ CREATE TABLE IF NOT EXISTS `responses` (
   `question_id` int(11) NOT NULL DEFAULT '0',
   `response` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1106,7 +1106,7 @@ CREATE TABLE IF NOT EXISTS `roles` (
   `created` datetime NOT NULL,
   `modified` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 --
 -- Dumping data for table `roles`
@@ -1132,7 +1132,7 @@ CREATE TABLE IF NOT EXISTS `roles_users` (
   `created` datetime NOT NULL,
   `modified` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1154,7 +1154,7 @@ CREATE TABLE IF NOT EXISTS `rubrics` (
   `updater_id` int(11) DEFAULT NULL,
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1171,7 +1171,7 @@ CREATE TABLE IF NOT EXISTS `rubrics_criteria_comments` (
   PRIMARY KEY (`id`),
   KEY `criteria_id` (`criteria_id`),
   KEY `rubrics_loms_id` (`rubrics_loms_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1187,7 +1187,7 @@ CREATE TABLE IF NOT EXISTS `rubrics_criterias` (
   `criteria` varchar(255) DEFAULT NULL,
   `multiplier` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1202,7 +1202,7 @@ CREATE TABLE IF NOT EXISTS `rubrics_loms` (
   `lom_num` int(11) NOT NULL DEFAULT '999',
   `lom_comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1222,7 +1222,7 @@ CREATE TABLE IF NOT EXISTS `simple_evaluations` (
   `updater_id` int(11) DEFAULT NULL,
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1237,7 +1237,7 @@ CREATE TABLE IF NOT EXISTS `survey_group_members` (
   `group_id` int(11) NOT NULL DEFAULT '0',
   `user_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1255,7 +1255,7 @@ CREATE TABLE IF NOT EXISTS `survey_group_sets` (
   `released` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `survey_id` (`survey_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1269,7 +1269,7 @@ CREATE TABLE IF NOT EXISTS `survey_groups` (
   `group_set_id` int(11) NOT NULL DEFAULT '0',
   `group_number` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1287,7 +1287,7 @@ CREATE TABLE IF NOT EXISTS `survey_inputs` (
   `response_text` text,
   `response_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1304,7 +1304,7 @@ CREATE TABLE IF NOT EXISTS `survey_questions` (
   PRIMARY KEY (`id`),
   KEY `question_id` (`question_id`),
   KEY `survey_id` (`survey_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1327,7 +1327,7 @@ CREATE TABLE IF NOT EXISTS `surveys` (
   `updater_id` int(11) DEFAULT NULL,
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1350,7 +1350,7 @@ CREATE TABLE IF NOT EXISTS `sys_functions` (
   `updater_id` int(11) DEFAULT NULL,
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `sys_functions`
@@ -1411,36 +1411,36 @@ CREATE TABLE IF NOT EXISTS `sys_parameters` (
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `parameter_code` (`parameter_code`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=25 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=25 ;
 
 --
 -- Dumping data for table `sys_parameters`
 --
 
 INSERT INTO `sys_parameters` (`id`, `parameter_code`, `parameter_value`, `parameter_type`, `description`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
-(1, 'system.soft_delete_enable', 'true', 'B', 'Whether soft deletion of records is enabled.', 'A', 0, '2010-07-27 16:42:17', 0, '2010-07-27 16:42:17'),
-(2, 'system.debug_mode', '0', 'I', 'Debug Mode of the system', 'A', 0, '2010-07-27 16:42:17', NULL, '2011-08-09 21:22:59'),
-(3, 'system.debug_verbosity', '1', 'I', NULL, 'A', 0, '2010-07-27 16:42:17', NULL, '2010-07-27 16:42:17'),
-(4, 'system.absolute_url', 'http://', 'S', '', 'A', 0, '2010-07-27 16:42:17', NULL, '2011-08-09 21:22:59'),
-(5, 'system.domain', 'test', 'S', '', 'A', 0, '2010-07-27 16:42:17', NULL, '2011-08-09 21:22:59'),
-(6, 'system.super_admin', 'root', 'S', NULL, 'A', 0, '2010-07-27 16:42:17', NULL, '2011-08-09 21:22:59'),
-(7, 'system.upload_dir', 'uploads/', 'S', NULL, 'A', 0, '2010-07-27 16:42:17', NULL, '2010-07-27 16:42:17'),
-(8, 'display.contact_info', 'Please enter your custom contact info. HTML tabs are acceptable.', 'S', NULL, 'A', 0, '2010-07-27 16:42:17', NULL, '2011-08-09 21:22:59'),
-(9, 'display.page_title', 'iPeer v2 with TeamMaker', 'S', 'Page title show in HTML.', 'A', 0, '2010-07-27 16:42:17', 0, '2010-07-27 16:42:17'),
-(10, 'display.logo_file', 'LayoutLogoDefault.gif', 'S', 'Logo image name.', 'A', 0, '2010-07-27 16:42:17', 0, '2010-07-27 16:42:17'),
-(11, 'display.login_logo_file', 'LayoutLoginLogoDefault.gif', 'S', 'Login Image File Name.', 'A', 0, '2010-07-27 16:42:17', 0, '2010-07-27 16:42:17'),
-(12, 'display.login_text', '<a href=''http://www.ubc.ca'' target=''_blank''>UBC</a>', 'S', 'Login Image File Name.', 'A', 0, '2010-07-27 16:42:17', 0, '2011-08-09 21:22:59'),
-(13, 'custom.login_control', 'ipeer', 'S', 'The login control for iPeer: ipeer; CWL: UBC_CWL', 'A', 0, '2010-07-27 16:42:17', NULL, '2010-10-08 15:48:12'),
-(14, 'custom.login_page_pathname', 'custom_ubc_cwl_login', 'S', 'The file pathname for the custom login page; CWL:custom_ubc_cwl_login', 'A', 0, '2010-07-27 16:42:17', NULL, '2010-07-27 16:42:17'),
-(15, 'system.admin_email', 'Please enter the iPeer administrator\\''s email address.', 'S', NULL, 'A', 0, '2010-07-27 16:42:17', NULL, '2011-08-09 21:22:59'),
-(16, 'system.password_reset_mail', 'Dear <user>,<br> Your password has been reset to <newpassword>. Please use this to log in from now on. <br><br>iPeer Administrator', 'S', NULL, 'A', 0, '2010-07-27 16:42:17', NULL, '2010-07-27 16:42:17'),
-(17, 'system.password_reset_emailsubject', 'iPeer Password Reset Notification', 'S', NULL, 'A', 0, '2010-07-27 16:42:17', NULL, '2011-08-09 21:22:59'),
-(18, 'display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', 0, '2010-07-27 16:42:17', NULL, '2010-07-27 16:42:17'),
-(20, 'database.version', '4', 'I', 'database version', 'A', 0, '2010-07-27 16:42:18', NULL, '2010-10-13 15:19:27'),
-(21, 'email.port', '465', 'S', 'port number for email smtp option', 'A', '0', '2011-07-18 14:23:26', NULL , '2011-07-18 14:23:26'),
-(22, 'email.host', 'email_host', 'S', 'host address for email smtp option', 'A', '0', '2011-07-18 14:23:26', NULL , '2011-07-18 14:23:26'),
-(23 , 'email.username', 'your_email_address', 'S', 'username for email smtp option', 'A', '0', '2011-07-18 14:23:26', NULL , '2011-07-18 14:23:26'),
-(24 , 'email.password', 'your_email_password', 'S', 'password for email smtp option', 'A', '0', '2011-07-18 14:23:26', NULL , '2011-07-18 14:23:26');
+(1, 'system.soft_delete_enable', 'true', 'B', 'Whether soft deletion of records is enabled.', 'A', 0, NOW(), 0, NOW()),
+(2, 'system.debug_mode', '0', 'I', 'Debug Mode of the system', 'A', 0, NOW(), NULL, NOW()),
+(3, 'system.debug_verbosity', '1', 'I', NULL, 'A', 0, NOW(), NULL, NOW()),
+(4, 'system.absolute_url', 'http://', 'S', '', 'A', 0, NOW(), NULL, NOW()),
+(5, 'system.domain', 'test', 'S', '', 'A', 0, NOW(), NULL, NOW()),
+(6, 'system.super_admin', 'root', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
+(7, 'system.upload_dir', 'uploads/', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
+(8, 'display.contact_info', 'Please enter your custom contact info. HTML tabs are acceptable.', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
+(9, 'display.page_title', 'iPeer v2 with TeamMaker', 'S', 'Page title show in HTML.', 'A', 0, NOW(), 0, NOW()),
+(10, 'display.logo_file', 'LayoutLogoDefault.gif', 'S', 'Logo image name.', 'A', 0, NOW(), 0, NOW()),
+(11, 'display.login_logo_file', 'LayoutLoginLogoDefault.gif', 'S', 'Login Image File Name.', 'A', 0, NOW(), 0, NOW()),
+(12, 'display.login_text', '<a href=''http://www.ubc.ca'' target=''_blank''>UBC</a>', 'S', 'Login Image File Name.', 'A', 0, NOW(), 0, NOW()),
+(13, 'custom.login_control', 'ipeer', 'S', 'The login control for iPeer: ipeer; CWL: UBC_CWL', 'A', 0, NOW(), NULL, NOW()),
+(14, 'custom.login_page_pathname', 'custom_ubc_cwl_login', 'S', 'The file pathname for the custom login page; CWL:custom_ubc_cwl_login', 'A', 0, NOW(), NULL, NOW()),
+(15, 'system.admin_email', 'Please enter the iPeer administrator\\''s email address.', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
+(16, 'system.password_reset_mail', 'Dear <user>,<br> Your password has been reset to <newpassword>. Please use this to log in from now on. <br><br>iPeer Administrator', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
+(17, 'system.password_reset_emailsubject', 'iPeer Password Reset Notification', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
+(18, 'display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', 0, NOW(), NULL, NOW()),
+(20, 'database.version', '4', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
+(21, 'email.port', '465', 'S', 'port number for email smtp option', 'A', '0', NOW(), NULL , NOW()),
+(22, 'email.host', 'email_host', 'S', 'host address for email smtp option', 'A', '0', NOW(), NULL , NOW()),
+(23 , 'email.username', 'your_email_address', 'S', 'username for email smtp option', 'A', '0', NOW(), NULL , NOW()),
+(24 , 'email.password', 'your_email_password', 'S', 'password for email smtp option', 'A', '0', NOW(), NULL , NOW());
 
 -- --------------------------------------------------------
 
@@ -1460,7 +1460,7 @@ CREATE TABLE IF NOT EXISTS `user_courses` (
   `updater_id` int(11) DEFAULT NULL,
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1482,7 +1482,7 @@ CREATE TABLE IF NOT EXISTS `user_enrols` (
   UNIQUE KEY `course_id` (`course_id`,`user_id`),
   KEY `user_id` (`user_id`),
   KEY `user_id_index` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1498,7 +1498,7 @@ CREATE TABLE `user_grade_penalties` (
   PRIMARY KEY (`id`),
   KEY `fk_penalties` (`penalty_id`),
   KEY `fk_users` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=15 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15 ;
 
 --
 -- Constraints for table `user_grade_penalties`

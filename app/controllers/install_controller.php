@@ -100,13 +100,18 @@ class InstallController extends Controller
     $this->redirect(array('action' => 'install4'));
   }
 
+  /**
+   * iPeer configuration page, enter the administrator user's name, password,
+   * email, site info, etc.
+   * */
   function install4()
   { 
-    // Try to patch the database if needed
+    // Try to patch the database if needed, note that this database patching
+    // is only for small changes, not for large version changes
     $ret = $this->patchDB();
     if ($ret)
     {
-      $this->Session->setFlash(__('Database upgrade failed - '.$ret, true));
+      $this->Session->setFlash(__('Database patching failed - '.$ret, true));
       $this->redirect(array('action' => 'install3'));
       return;
     }
@@ -117,6 +122,9 @@ class InstallController extends Controller
     $this->set('domain_name', $_SERVER['HTTP_HOST']);
   }	
 
+  /**
+   * Installation done page
+   * */
   function install5()
   {
     if (empty($this->params['data'])) 
@@ -156,7 +164,6 @@ class InstallController extends Controller
     }
     fclose($f);
   }
-
 
   function gpl()
   {
@@ -221,21 +228,22 @@ class InstallController extends Controller
     return $dbConfig;
   }
 
-  // TODO PATCHER PROBABLY BROKEN. Not needed now, but should check later.
   /**
-   * Updates an existing database to the current version.
+   * Our base SQL file might not have the most recent database changes.
+   * Updates a newly created database from the base to the current version.
    * */
   private function patchDB()
   {
-    // Conditionally load sysContainer
-    // Note that this load assumes we have valid db access credentials
-    App::import('Component', 'sysContainer');
-    $this->sysContainer = new sysContainerComponent();
-    $this->sysContainer->initialize($this);
-
-    // Get database version
-    $dbv = $this->sysContainer->getParamByParamCode('database.version', 
-      array('parameter_value' => 0));
+    // There is an intermittent error with importing sysContainer
+    // so instead of using that to get the database.version
+    // we have to use this workaround
+    $my_db =& ConnectionManager::getDataSource('default');    
+    $ret = $my_db->query("SELECT `parameter_value` FROM `sys_parameters` WHERE `parameter_code` = 'database.version';");
+    if ($ret == false)
+    { // Unable to retrieve the db version
+      return "Unable to retrieve the DB version, please try again.";
+    }
+    $dbv = $ret[0]['sys_parameters']['parameter_value'];
 
     // Run the patcher
     $ret = $this->DbPatcher->patch($dbv['parameter_value']);

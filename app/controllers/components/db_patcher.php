@@ -7,7 +7,7 @@ class DbPatcherComponent extends Object
 {
   var $controller = true;
 
-  function patch($from_version, $dbConfig = null)
+  public function patch($from_version, $dbConfig = null)
   {
     $ret = $this->connectDb($dbConfig);
     if ($ret)
@@ -29,18 +29,23 @@ class DbPatcherComponent extends Object
       if ($ret)
       {
         mysql_close();
-        return 'Failed to apply delta file: '.$file.'. Message = '.$ret;
+        return 'DB Version '. $from_version . ' Failed to apply delta file: '.$file.'. Message = '.$ret;
       }
     }
-    mysql_close();
 
     // apply the other changes
-    $this->updateDatabaseVersion();
+    $ret = $this->updateDatabaseVersion();
+    if ($ret)
+    {
+      mysql_close();
+      return "Database upgrade successful, however, failed to increment database version counter, please do this manually: " . $ret;
+    }
+    mysql_close();
 
     return false;
   }
 
-  function connectDb($dbConfig)
+  private function connectDb($dbConfig)
   {
     // Read the database configuration from database.php
     $dbConfig = new DATABASE_CONFIG();
@@ -65,7 +70,7 @@ class DbPatcherComponent extends Object
     return false;
   }
 
-  function applyDelta($file)
+  private function applyDelta($file)
   {
     $fp = fopen( $file, "r" );
     if ( false === $fp ) {
@@ -95,8 +100,9 @@ class DbPatcherComponent extends Object
         $result = mysql_query($cmd);
         if (!$result)
         {
+          $err = mysql_error();
           mysql_query("ROLLBACK");
-          return "Cannot run query from $file - $cmd";
+          return "Cannot run query from $file - $cmd - $err";
         }
         $cmd = "";
         $done = false;
@@ -107,31 +113,17 @@ class DbPatcherComponent extends Object
     return false;
   }
 
-  function updateDatabaseVersion()
+  private function updateDatabaseVersion()
   {
-    if(!class_exists('DATABASE_CONFIG'))
+    // it should be safe to assume that we have a database.version entry
+    // since we're starting from version 3
+    $ret = mysql_query("update `sys_parameters` set `parameter_value` = ".
+      Configure::read('DATABASE_VERSION')." where `parameter_code` = 'database.version';");
+    if ($ret == false)
     {
-      include_once(CONFIGS.'database.php');
+      return mysql_error();
     }
-
-    // update database version
-    $sysParam = new SysParameter();
-    if($dbv = $sysParam->find("parameter_code = 'database.version'"))
-    {
-      $sysParam->id = $dbv['SysParameter']['id'];
-      $sysParam->saveField('parameter_value', Configure::read('DATABASE_VERSION'));
-    }else{
-      $dbv = array('SysParameter' => array('parameter_code' => 'database.version',
-                                           'parameter_value'=> Configure::read('DATABASE_VERSION'),
-                                           'parameter_type' => 'I',
-                                           'description'    => 'database version',
-                                           'record_status'  => 'A',
-                                           'creator_id'     => 0,
-                                           'created'        => date('Y-m-d H:i:s'),
-                                           'updater_id'     => 0
-                                           ));
-      $sysParam->save($dbv);
-    }
+    return false;
   }
 }
 
