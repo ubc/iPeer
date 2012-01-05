@@ -14,6 +14,10 @@
 /**
  * Controller :: Installs
  *
+ * Note that the InstallController inherits from Controller instead of
+ * AppController. AppController brings in dependencies on the currently
+ * non-existing database.
+ *
  * @package
  * @subpackage
  * @since
@@ -32,7 +36,7 @@ class InstallController extends Controller
 	
   function __construct()
   {
-    $this->set('title_for_layout', __('Install Wizards', true));
+    $this->set('title_for_layout', __('Install Wizard', true));
     parent::__construct();
   }
 		
@@ -246,7 +250,7 @@ class InstallController extends Controller
     $dbv = $ret[0]['sys_parameters']['parameter_value'];
 
     // Run the patcher
-    $ret = $this->DbPatcher->patch($dbv['parameter_value']);
+    $ret = $this->DbPatcher->patch($dbv);
     if ($ret)
     { // Patcher failed
       return $ret;

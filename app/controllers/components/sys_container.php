@@ -8,6 +8,15 @@
  * @license		OPPL
  *
  */
+
+// ************* WARNING ******************
+// PLEASE PHASE OUT THIS COMPONENT
+// JUST USE THE SysParameter AND SysFunction
+// MODELS DIRECTLY INSTEAD 
+// 
+// It's generally a bad idea to use models in
+// a component.
+
 App::import('Model', 'SysParameter');
 App::import('Model', 'SysFunction');
 
@@ -30,14 +39,6 @@ class sysContainerComponent
 	 * @access private
 	 */
 	var $actionList = array();
-
-	/**
-	 * List of system parameters
-	 *
-	 * @var array
-	 * @access private
-	 */
-	var $paramList = array();
 
 	/**
 	 * List of my courses
@@ -178,8 +179,8 @@ class sysContainerComponent
 		$result[$sysParameter['parameter_code']] = $sysParameter;
 		endforeach;
 
-		$this->paramList = $result;
-		$this->controller->Session->write('ipeerSession.paramList', $this->paramList);
+    $this->controller->Session->write('ipeerSession.paramList', $result);
+    return $result;
 	}
 
 	/**
@@ -194,7 +195,7 @@ class sysContainerComponent
           $paramList = $this->controller->Session->read('ipeerSession.paramList');
           if($paramList === null) {
             $paramList = $this->SysParameter->find('all', array('fields' => array('id', 'parameter_code', 'parameter_value', 'parameter_type')));
-            $this->setParamList($paramList);
+            $paramList = $this->setParamList($paramList);
           }
 
           $sysParameter = isset($paramList[$paraCode]) ? $paramList[$paraCode] : $default;

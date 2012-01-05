@@ -18,69 +18,64 @@
  * @subpackage
  * @since
  */
-class UpgradeController extends Controller
+class UpgradeController extends AppController
 {
-	var $Sanitize;
+  var $name = "Upgrade";
   var $uses         = array();
 	var $components   = array('Output',
                             'framework',
                             'Session',
-                            'rdAuth',
-                            'DbPatcher'
+                            'Guard.Guard',
+                            'DbPatcher',
+                            'sysContainer'
                             );
-	var $beforeFilter =	 array('preExecute');
 
-  function preExecute()
+  function __construct()
   {
- 		$this->rdAuth->loadFromSession();
-    $this->set('rdAuth',$this->rdAuth);
+    $this->set('title_for_layout', __('Upgrade Database', true));
+    parent::__construct();
   }
 
   function index()
   {
-    $this->checkPermission();
-    $message  = __("You are about to upgrade your iPeer instance. ", true);
-    $message .= __("Please make sure you have backed up your database and files before proceeding!<br />", true);
-    $message .= "<a href='" . $this->webroot . "upgrade/step2'>".__('Confirm', true)."</a>";
-    $this->set('message_content', $message);
-    $this->render(null, null, 'views/pages/message.tpl.php');
+    if ($this->checkPermission())
+    {
+      $this->set('isadmin', false); // tell view user doesn't have access
+    }
+    else
+    {
+      $this->set('isadmin', true);
+    }
   }
 
   function step2()
   {
-    $this->checkPermission();
-    $dbv = $this->sysContainer->getParamByParamCode('database.version', array('parameter_value' => 0));
-
-    // patch the database
-    if(true !== ($ret = $this->DbPatcher->patch($dbv['parameter_value'])))
+    if ($this->checkPermission())
     {
-        $this->set('message_content', $ret);
-        $this->render(null, null, 'views/pages/message.tpl.php');
-        return;
+      $this->set('isadmin', false);
     }
-
-    // logout the user
-		$this->rdAuth->logout();
-		$this->Session->delete('URL');
-		$this->Session->delete('AccessErr');
-		$this->Session->delete('Message');
-		$this->Session->delete('CWLErr');
-
-    $message  = __("Your iPeer instance has been upgraded. Please login again.<br />", true);
-    $message .= "<a href='" . $this->webroot . "loginout/login'>".__('Login', true)."</a>";
-    $this->set('message_content', $message);
-    $this->render(null, null, 'views/pages/message.tpl.php');
+    else
+    {
+      $this->set('isadmin', true);
+      $this->set('upgradefailed', false); // tell view the upgrade worked fine
+      $dbv = $this->sysContainer->getParamByParamCode('database.version', array('parameter_value' => 0));
+      $ret = $this->DbPatcher->patch($dbv['parameter_value']);
+      if ($ret)
+      {
+        $this->set('upgradefailed', $ret);
+      }
+    }
   }
-
-
 
   function checkPermission()
   {
     if('A' != $this->Auth->user('role'))
     {
-      $this->set('message_content', __('Sorry, you do not have access to this page. Only administrator can perform a upgrade. If you are an administrator, please login and then go to this page to perform the upgrade.', true));
-      $this->render(null, null, 'views/pages/message.tpl.php');
-      exit;
+      $this->Session->setFlash(__('Sorry, you do not have access to this page. Only administrators can perform a database upgrade. If you are an administrator, please login and then go to this page to perform the upgrade.', true));
+      return true;
     }
+    return false;
   }
 }
+
+?>

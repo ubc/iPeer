@@ -35,7 +35,7 @@ class AppController extends Controller  {
   //    $this->AccessControl->check('controllers/'.ucwords($this->params['controller']).'/'.$this->params['action']);
 
       $this->checkAccess();
-//      $this->checkDatabaseVersion();
+      $this->checkDatabaseVersion();
 
       // pass user variable to view
       // Replace with User::get() function, can be used anywhere
@@ -48,8 +48,10 @@ class AppController extends Controller  {
 
   function checkDatabaseVersion()
   {
-    $dbv = $this->sysContainer->getParamByParamCode('database.version', array('parameter_value' => 0));
-    if('A' == $this->Auth->user('role') && Configure::read('DATABASE_VERSION') > $dbv['parameter_value']) {
+    $dbv = $this->sysContainer->getParamByParamCode('database.version');
+    if('A' == $this->Auth->user('role') && 
+      Configure::read('DATABASE_VERSION') > $dbv['parameter_value']) 
+    {
       $flashMessage  = "<span class='notice'>Your database version is older than the current version. ";
       $flashMessage .= "Please do the <a href=" . $this->webroot ."upgrade" .">upgrade</a>.</span>";
       $this->Session->setFlash($flashMessage);
