@@ -21,7 +21,7 @@
 class UpgradeController extends AppController
 {
   var $name = "Upgrade";
-  var $uses         = array('SysParameter');
+  var $uses         = array();
 	var $components   = array('Output',
                             'framework',
                             'Session',
