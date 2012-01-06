@@ -70,6 +70,16 @@ class SysParameter extends AppModel
 
       return true;
   }
+
+  public function getDatabaseVersion()
+  {
+    $ret = $this->field('parameter_value', array('parameter_code' => 'database.version'));
+    if ($ret == false)
+    {
+      throw new UnexpectedValueException(__('Could not retrieve database version from the database.',true));
+    }
+    return $ret;
+  }
 }
 
 ?>

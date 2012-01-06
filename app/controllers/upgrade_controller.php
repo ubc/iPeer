@@ -21,13 +21,12 @@
 class UpgradeController extends AppController
 {
   var $name = "Upgrade";
-  var $uses         = array();
+  var $uses         = array('SysParameter');
 	var $components   = array('Output',
                             'framework',
                             'Session',
                             'Guard.Guard',
-                            'DbPatcher',
-                            'sysContainer'
+                            'DbPatcher'
                             );
 
   function __construct()
@@ -58,8 +57,8 @@ class UpgradeController extends AppController
     {
       $this->set('isadmin', true);
       $this->set('upgradefailed', false); // tell view the upgrade worked fine
-      $dbv = $this->sysContainer->getParamByParamCode('database.version', array('parameter_value' => 0));
-      $ret = $this->DbPatcher->patch($dbv['parameter_value']);
+      $dbv = $this->SysParameter->getDatabaseVersion();
+      $ret = $this->DbPatcher->patch($dbv);
       if ($ret)
       {
         $this->set('upgradefailed', $ret);

@@ -15,6 +15,7 @@ App::import('Model', 'User');
 
 class AppController extends Controller  {
   var $startpage = 'pages';
+  var $uses = array('SysParameter');
   var $components = array('Session', 'Output', 'sysContainer', 'userPersonalize', 'framework', 'Guard.Guard', 'Acl', 'AccessControl', 'Email');
   var $helpers = array('Session', 'Html', 'Js');
   var $access = array ();
@@ -48,9 +49,10 @@ class AppController extends Controller  {
 
   function checkDatabaseVersion()
   {
-    $dbv = $this->sysContainer->getParamByParamCode('database.version');
+    $dbv = $this->SysParameter->getDatabaseVersion();
+
     if('A' == $this->Auth->user('role') && 
-      Configure::read('DATABASE_VERSION') > $dbv['parameter_value']) 
+      Configure::read('DATABASE_VERSION') > $dbv) 
     {
       $flashMessage  = "<span class='notice'>Your database version is older than the current version. ";
       $flashMessage .= "Please do the <a href=" . $this->webroot ."upgrade" .">upgrade</a>.</span>";

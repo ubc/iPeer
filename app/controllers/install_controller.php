@@ -32,6 +32,7 @@ class InstallController extends Controller
                       'DbPatcher'
                       );
   var $helpers = array('Session','Html','Js');
+  var $layout = 'installer';
 
 	
   function __construct()
@@ -238,16 +239,10 @@ class InstallController extends Controller
    * */
   private function patchDB()
   {
-    // There is an intermittent error with importing sysContainer
-    // so instead of using that to get the database.version
-    // we have to use this workaround
-    $my_db =& ConnectionManager::getDataSource('default');    
-    $ret = $my_db->query("SELECT `parameter_value` FROM `sys_parameters` WHERE `parameter_code` = 'database.version';");
-    if ($ret == false)
-    { // Unable to retrieve the db version
-      return "Unable to retrieve the DB version, please try again.";
-    }
-    $dbv = $ret[0]['sys_parameters']['parameter_value'];
+    // using the SysParameter model directly as bringing in sysContainer
+    // introduces seemingly random bugs due to its use of sessions
+    $this->loadModel('SysParameter');
+    $dbv = $this->SysParameter->getDatabaseVersion();
 
     // Run the patcher
     $ret = $this->DbPatcher->patch($dbv);
