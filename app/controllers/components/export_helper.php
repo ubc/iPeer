@@ -4,8 +4,6 @@ class ExportHelperComponent extends Object
   var $components = array('rdAuth');
   var $globUsersArr = array();
   var $globEventId;
-  var $mixedEvalNumeric;
-
 
   function createCSV($params) {
     $this->Course = new Course;
@@ -98,6 +96,7 @@ class ExportHelperComponent extends Object
     $this->EvaluationSimple = new EvaluationSimple;
     $this->EvaluationRubric = new EvaluationRubric;
     $this->EvaluationMixeval = new EvaluationMixeval;
+    $mixedEvalNumeric  = '';
 
     $globEventId = $groupEvents[0]['GroupEvent']['event_id'];
 
@@ -196,7 +195,6 @@ class ExportHelperComponent extends Object
 
             #Here we add some generic information to the mixedEvalNumeric variable. First we add the name of the person being evaluated in this particular mixed eval(evaluatee)
             #then we sample index 0 of the userResults array to just get the number of numeric questions. Then we can make column headers for each question (1,2,3...)
-            global $mixedEvalNumeric;
             $nameArray = $this->User->findUserByid($userId);
             $name=$nameArray['User']['first_name'] . ' ' . $nameArray['User']['last_name'];
             $mixedEvalNumeric .= "\n".$name . "," . $data[$i]['group_name'] . "\n";
@@ -256,10 +254,10 @@ class ExportHelperComponent extends Object
       //calculate final mark
       $i++;
     }
-    return $this->formatBody($data, $params, $legends);
+    return $this->formatBody($data, $params, $legends, $mixedEvalNumeric);
   }
 
-  function formatBody($data, $params, $legends=null) {
+  function formatBody($data, $params, $legends=null, $mixedEvalNumeric) {
     $content = '';
     //sloppy code... sorry...
     $fields = array('group_status','group_names','student_first','student_last','student_id','student_id','criteria_marks','general_comments');
@@ -323,7 +321,6 @@ class ExportHelperComponent extends Object
 ####
 #Append the numeric mixed evaluation variable to the end of the .csv. This should be a list of tables for each evaluatee. 
 #This is not a good way of doing things, but it works.
-    global $mixedEvalNumeric;
     $content .= $mixedEvalNumeric;
 ###
     return $content;
