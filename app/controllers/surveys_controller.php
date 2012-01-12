@@ -128,7 +128,7 @@ class SurveysController extends AppController
 
         // Join in the course name
         $joinTableCourse =
-             array("id"        => "Course.id",
+             array("id"        => "course_id",
                    "localKey"  => "course_id",
                    "description" => "Course:",
                    "default"   => $this->rdAuth->courseId,
@@ -560,6 +560,25 @@ class SurveysController extends AppController
 		if ($attributeCode != '' && $attributeValue != '') //check for empty params
   		$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
 	}
+
+  function goToClassList($course) {
+    if (is_numeric($course)) {
+      $courses = $this->sysContainer->getMyCourseList();
+      if (!empty($courses[$course])) {
+        // We need to change the session state to point to this
+        // course:
+        // Initialize a basic non-funcional AjaxList
+        $this->AjaxList->quickSetUp();
+        // Clear the state first, we don't want any previous searches/selections.
+        $this->AjaxList->clearState(); 
+        // Set and update session state Variable
+        $joinFilterSelections->course_id = $course;
+        $this->AjaxList->setStateVariable("joinFilterSelections", $joinFilterSelections);
+      }
+    }
+    // Redirect to user list after state modifications (or in case of error)
+    $this->redirect("/surveys/index");
+  }
 }
 
 ?>
