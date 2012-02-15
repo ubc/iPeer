@@ -7,12 +7,12 @@
  * PHP versions 4 and 5
  *
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
- * Copyright 2005-2010, Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright 2005-2010, Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * @copyright     Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @link          http://cakephp.org CakePHP(tm) Project
  * @package       cake
  * @subpackage    cake.cake.console.libs
@@ -147,8 +147,6 @@ class ContainableBehavior extends ModelBehavior {
 					if (!empty($unbind)) {
 						if (!$reset && empty($instance->__backOriginalAssociation)) {
 							$instance->__backOriginalAssociation = $backupBindings;
-						} else if ($reset && empty($instance->__backContainableAssociation)) {
-							$instance->__backContainableAssociation = $backupBindings;
 						}
 						$instance->unbindModel(array($type => $unbind), $reset);
 					}
@@ -217,24 +215,6 @@ class ContainableBehavior extends ModelBehavior {
 		}
 		$query['fields'] = array_unique($query['fields']);
 		return $query;
-	}
-
-/**
- * Resets original associations on models that may have receive multiple,
- * subsequent unbindings.
- *
- * @param object $Model Model on which we are resetting
- * @param array $results Results of the find operation
- * @param bool $primary true if this is the primary model that issued the find operation, false otherwise
- * @access public
- */
-	function afterFind(&$Model, $results, $primary) {
-		if (!empty($Model->__backContainableAssociation)) {
-			foreach ($Model->__backContainableAssociation as $relation => $bindings) {
-				$Model->{$relation} = $bindings;
-				unset($Model->__backContainableAssociation);
-			}
-		}
 	}
 
 /**

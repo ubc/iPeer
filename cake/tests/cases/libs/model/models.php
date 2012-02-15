@@ -7,12 +7,12 @@
  * PHP versions 4 and 5
  *
  * CakePHP(tm) Tests <http://book.cakephp.org/view/1196/Testing>
- * Copyright 2005-2010, Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  *  Licensed under The Open Group Test Suite License
  *  Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright 2005-2010, Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * @copyright     Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @link          http://book.cakephp.org/view/1196/Testing CakePHP(tm) Tests
  * @package       cake
  * @subpackage    cake.tests.cases.libs.model
@@ -1102,6 +1102,76 @@ class Bid extends CakeTestModel {
  * @access public
  */
 	var $belongsTo = array('Message');
+}
+
+/**
+ * BiddingMessage class
+ *
+ * @package       cake
+ * @subpackage    cake.tests.cases.libs.model
+ */
+class BiddingMessage extends CakeTestModel {
+
+/**
+ * name property
+ *
+ * @var string 'BiddingMessage'
+ * @access public
+ */
+	var $name = 'BiddingMessage';
+
+/**
+ * primaryKey property
+ *
+ * @var string 'bidding'
+ * @access public
+ */
+	var $primaryKey = 'bidding';
+
+
+/**
+ * belongsTo property
+ *
+ * @var array
+ * @access public
+ */
+	var $belongsTo = array(
+		'Bidding' => array(
+			'foreignKey' => false,
+			'conditions' => array('BiddingMessage.bidding = Bidding.bid')
+		)
+	);
+}
+
+/**
+ * Bidding class
+ *
+ * @package       cake
+ * @subpackage    cake.tests.cases.libs.model
+ */
+class Bidding extends CakeTestModel {
+
+/**
+ * name property
+ *
+ * @var string 'Bidding'
+ * @access public
+ */
+	var $name = 'Bidding';
+
+/**
+ * hasOne property
+ *
+ * @var array
+ * @access public
+ */
+	var $hasOne = array(
+		'BiddingMessage' => array(
+			'foreignKey' => false,
+			'conditions' => array('BiddingMessage.bidding = Bidding.bid'),
+			'dependent' => true
+		)
+	);
 }
 
 /**
@@ -3591,4 +3661,15 @@ class TransactionTestModel extends CakeTestModel {
 		);
 		$this->saveAll($data, array('atomic' => true, 'callbacks' => false));
 	}
+}
+
+/**
+ * Test model for datasource prefixes
+ *
+ */
+class PrefixTestModel extends CakeTestModel {
+}
+class PrefixTestUseTableModel extends CakeTestModel {
+	var $name = 'PrefixTest';
+	var $useTable = 'prefix_tests';
 }

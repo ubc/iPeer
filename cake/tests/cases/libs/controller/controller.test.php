@@ -5,12 +5,12 @@
  * PHP versions 4 and 5
  *
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
- * Copyright 2005-2010, Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright 2005-2010, Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * @copyright     Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @link          http://cakephp.org CakePHP Project
  * @package       cake
  * @subpackage    cake.tests.cases.libs.controller
@@ -830,6 +830,36 @@ class ControllerTest extends CakeTestCase {
 		$Controller->passedArgs = array('sort' => 'offset_test', 'direction' => 'asc');
 		$result = $Controller->paginate('ControllerPost');
 		$this->assertEqual(Set::extract($result, '{n}.ControllerPost.offset_test'), array(2, 3, 4));
+	}
+
+/**
+ * test paginate() and virtualField overlapping with real fields.
+ *
+ * @return void
+ */
+	function testPaginateOrderVirtualFieldSharedWithRealField() {
+		$Controller =& new Controller();
+		$Controller->uses = array('ControllerPost', 'ControllerComment');
+		$Controller->params['url'] = array();
+		$Controller->constructClasses();
+		$Controller->ControllerComment->virtualFields = array(
+			'title' => 'ControllerComment.comment'
+		);
+		$Controller->ControllerComment->bindModel(array(
+			'belongsTo' => array(
+				'ControllerPost' => array(
+					'className' => 'ControllerPost',
+					'foreignKey' => 'article_id'
+				)
+			)
+		), false);
+
+		$Controller->paginate = array(
+			'fields' => array('ControllerComment.id', 'title', 'ControllerPost.title'),
+		);
+		$Controller->passedArgs = array('sort' => 'ControllerPost.title', 'dir' => 'asc');
+		$result = $Controller->paginate('ControllerComment');
+		$this->assertEqual(Set::extract($result, '{n}.ControllerComment.id'), array(1, 2, 3, 4, 5, 6));
 	}
 
 /**
