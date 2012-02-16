@@ -1,6 +1,5 @@
 <span class="required">NOTE</span>: <br />
 <ul>
-  <li><strong><?php __('Username</strong> <u>must</u> the same at the <strong>Student Number')?></strong>.</li>
   <li><?php __('All fields mandatory, except email and password.')?></li> 
   <li><?php __('If email column is missing, students will be requested to fill in when they log in the first time.')?></li>
   <li><?php __('If password column is missing, system will generate random password for each student.')?></li>

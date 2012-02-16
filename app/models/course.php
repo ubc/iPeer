@@ -529,15 +529,15 @@ class Course extends AppModel
    * @param unknown_type $params search params
    * @return course data
    */
-  function getCourseByInstructor($instructorId, $type = 'all') {
+  function getCourseByInstructor($instructorId, $type = 'all', $recursive = 1) {
     $fields = array('Course.*');
     if($type == 'list') {
-      $fields = array(); 
-      $this->displayField = 'course';
+      $fields = array('Course.course'); 
+      $recursive = 0;
     }
     return $this->find($type, array('conditions' => array('Instructor.id' => $instructorId),
                                     'fields' => $fields,
-                                    'recursive' => 0));
+                                    'recursive' => $recursive));
   }
 
   /**

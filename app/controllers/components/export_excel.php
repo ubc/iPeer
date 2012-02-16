@@ -477,4 +477,3 @@ Class ExportExcelComponent extends ExportBaseNewComponent {
   }
   
 }
-?>

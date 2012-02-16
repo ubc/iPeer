@@ -30,6 +30,9 @@ class AppController extends Controller  {
     Security::setHash('md5');
     Configure::write('Security.salt', '');
     
+    // set default language for now
+    Configure::write('Config.language', 'eng');
+
     User::store($this->Auth->user());
 
     if($this->Auth->isAuthorized()) {

@@ -75,6 +75,8 @@
         <?php endforeach; ?>
       </div>
     <?php endif;?>
+
+
   <div class="content-container">
   <div id="short_help" <?php echo ($course_list == 0) ? '':'style="display:none"'?>>
   <h5><?php __('To use iPeer you have to add a course.')?></h5>
@@ -87,5 +89,3 @@
     </div>
     <div style="text-align:right"><a href="#" onClick="javascript:$('short_help').toggle();return false;">( <?php __('Show/Hide short help')?> )</a></div>
     </div>
-
-</div>

@@ -884,6 +884,10 @@ class UsersController extends AppController
         $this->set('user_type', 'S');
     }
 
+    //TODO: add import preview
+    function importPreview() {
+    }
+
     function importFile() {
         $this->autoRender = false;
 
@@ -897,7 +901,7 @@ class UsersController extends AppController
         }
 
         $data = Toolkit::parseCSV($uploadFile);
-        $result = $this->User->addUserByArray($data);
+        $result = $this->User->addUserByArray($data, true);
 
         if(!$result) {
           $this->Session->setFlash($this->User->showErrors());

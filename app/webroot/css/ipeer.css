@@ -787,3 +787,48 @@ textarea.question-title-textarea, textarea.question-descriptor {
 #importfrm li {
   margin:1em 0 3em 1em;
 }
+
+.button-row {
+  margin: 0.5em 0 0.5em 0;
+}
+
+.button-row ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  float: right;
+}
+
+.button-row li {
+  display: inline;
+  margin: 0 0 0 1em;
+  padding: 0;
+}
+
+.list-title {
+  font-weight: bold;
+  margin: 1em 0 0.5em 1em;
+}
+
+.user-list-table {
+  width: 100%;
+  border-width: 0px;
+  border-spacing: 2px;
+  background-color: white;
+}
+
+.user-list-table tr {
+  background-color: #EAEAEA;
+}
+
+.user-list-table th {
+  background-color: #4478AC;
+  color: white;
+  font-size: 0.9em;
+  padding: 4px;
+}
+
+.user-list-table td {
+  padding: 4px;
+  font-size: 0.9em;
+}

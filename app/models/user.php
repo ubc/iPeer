@@ -74,23 +74,6 @@ class User extends AppModel
   var $hasMany =array('Submission' => array('className' => 'EvaluationSubmission',
                                             'foreignKey' => 'submitter_id',
                                             'dependent' => true));
-/*  var $hasMany = array('UserCourse' => array('className'   => 'UserCourse',
-                                             'conditions'  => 'UserCourse.record_status = "A"',
-                                             'order'       => 'UserCourse.course_id ASC',
-                                             'limit'       => '99999',
-                                             'foreignKey'  => 'user_id',
-                                             'dependent'   => true,
-                                             'exclusive'   => false,
-                                             'finderSql'   => ''),
-                       'UserEnrol' => array('className'   => 'UserEnrol',
-                                            'conditions'  => 'UserEnrol.record_status = "A"',
-                                            'order'       => 'UserEnrol.course_id ASC',
-                                            'limit'       => '99999',
-                                            'foreignKey'  => 'user_id',
-                                            'dependent'   => true,
-                                            'exclusive'   => false,
-                                            'finderSql'   => '')
-                      );*/
 
   var $hasAndBelongsToMany = array('Course' =>
                                    array('className'    => 'Course',
@@ -176,6 +159,7 @@ class User extends AppModel
     if(empty($this->data[$this->name]['password'])) {
       unset($this->data[$this->name]['password']);
     }
+    //var_dump(debug_backtrace());exit;
     return parent::beforeSave();
   }
 
@@ -257,9 +241,10 @@ class User extends AppModel
                                                             )));
   }
 
-  function getByUsernames($usernames) {
+  function getByUsernames($usernames, $contain = false) {
     return $this->find('all', array('conditions' => array('username' => $usernames,
-                                                         )));
+                                                         ),
+                                    'contain' => $contain));
   }
 
   /**
@@ -705,17 +690,8 @@ class User extends AppModel
 
     // remove the existings
     $existings = $this->getByUsernames(Set::extract('/username', array_values($data)));
-    foreach($existings as $e) {
-      unset($data[$e['User']['username']]);
-    }
-
-    if(!empty($data) && !($this->saveAll(array_values($data)))) {
-      $this->errorMessage = array_merge($this->errorMessage, $this->validationErrors);
-      return false;
-    }
-
-    if($updateExisting) {
-      foreach($existings as $key => $e) {
+    foreach($existings as $key => $e) {
+      if($updateExisting) {
         $new = $data[$e['User']['username']];
         $tmp['username'] = $e['User']['username'];
         // update updatable column and changed field
@@ -740,12 +716,22 @@ class User extends AppModel
 
         $existings[$key]['User'] = $tmp;
       }
-      if(!$this->saveAll($existings)) {
+      // remove the existings from the data array
+      unset($data[$e['User']['username']]);
+    }
+
+    if(!empty($data) && !($this->saveAll(array_values($data)))) {
+      $this->errorMessage = array_merge($this->errorMessage, $this->validationErrors);
+      return false;
+    }
+
+    if($updateExisting) {
+      if(!$this->saveAll($existings, array('validate' => false))) {
         return false;
       }
     }
 
-    return array('created_students' => $data, 'updated_students' => $existings);
+    return array('created_students' => $data, 'updated_students' => Set::classicExtract($existings, '{n}.User'));
 
     /*  if ($this->User->save($data))
       {
