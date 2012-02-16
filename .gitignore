@@ -1,2 +1,4 @@
 *.swp
+database.php
+installed.txt
 app/tmp/
