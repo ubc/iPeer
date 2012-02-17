@@ -860,10 +860,10 @@ class UsersController extends AppController
         //if($this->_sendEmail( $to, $from, $subject, $email_msg )) {
           $message .= __("Email has been sent. ", true);
         } else {
-          if(!isset($to) || strlen($to) < 1) {
+          if(!isset($user_data['User']['email']) || strlen($user_data['User']['email']) < 1) {
             $message .= __('No destination email address. ', true);
           }
-          $message .= __("Email was <u>not</u> sent to the user.", true);
+          $message .= __("Email was <u>not</u> sent to the user.", true) . $this->Email->smtpError;
         }
         $this->Session->setFlash($message);
         $this->redirect('index');

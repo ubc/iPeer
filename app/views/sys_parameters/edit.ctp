@@ -57,7 +57,7 @@ echo empty($data['SysParameter']['id'])?__('Add', true):__('Edit', true) ?> <?ph
 </tr>
 </table>
 <p>
-	<?php echo $form->submit(__('Save'), true) ?><?php echo $html->link(__('Back', true), '/sysparameters'); ?>
+	<?php echo $form->submit(__('Save', true)) ?><?php echo $html->link(__('Back', true), '/sysparameters'); ?>
 </p>
 </form>
 </td>
