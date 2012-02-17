@@ -977,6 +977,11 @@ HTMLBLOC;
 		$result  = $this->Controller->EmailTest->strip($content, true);
 		$expected = $content;
 		$this->assertEqual($result, $expected);
+
+		$content = 'This is a test email to: you and whomever you forward it to';
+		$result  = $this->Controller->EmailTest->strip($content, true);
+		$expected = $content;
+		$this->assertEqual($result, $expected);
 	}
 
 /**
@@ -1176,6 +1181,7 @@ HTMLBLOC;
 		$this->assertIdentical($this->Controller->EmailTest->attachments, array());
 		$this->assertNull($this->Controller->EmailTest->textMessage);
 		$this->assertTrue($this->Controller->EmailTest->messageId);
+		$this->assertEqual('mail', $this->Controller->EmailTest->delivery);
 	}
 
 	function testPluginCustomViewClass() {

@@ -438,6 +438,7 @@ class EmailComponent extends Object{
 		$this->htmlMessage = null;
 		$this->textMessage = null;
 		$this->messageId = true;
+		$this->delivery = 'mail';
 		$this->__header = array();
 		$this->__boundary = null;
 		$this->__message = array();
@@ -799,7 +800,7 @@ class EmailComponent extends Object{
  */
 	function _strip($value, $message = false) {
 		$search  = '%0a|%0d|Content-(?:Type|Transfer-Encoding)\:';
-		$search .= '|charset\=|mime-version\:|multipart/mixed|(?:[^a-z]to|b?cc)\:.*';
+		$search .= '|charset\=|mime-version\:|multipart/mixed|(?:[\n\r]+to|b?cc)\:.*';
 
 		if ($message !== true) {
 			$search .= '|\r|\n';
