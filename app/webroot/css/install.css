@@ -1,0 +1,228 @@
+/* CSS RESET */
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* html5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/* GLOBAL */
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	background-image: url(bg.gif);
+}
+
+.floatleft
+{
+	float: left;
+}
+
+.floatright
+{
+	float: right;
+}
+
+.pagewidth
+{
+	min-width: 600px;
+	max-width: 900px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 0.3em;
+}
+
+.hide
+{
+	display: none;
+}
+
+/* BANNER */
+#bannerOuter
+{
+	border-top-left-radius: 10px; 
+	border-top-right-radius: 10px; 
+	border: 1px solid #777;
+	padding: 0.4em; 
+	background: white;
+	box-shadow: 0 0 5px #555;
+}
+
+#bannerInner
+{
+	border-top-left-radius: 8px; 
+	border-top-right-radius: 8px; 
+	border: 1px solid #ddd;
+	background: #f4f4f4 url('../img/layout/banner_back_noborder.gif') repeat-x;
+	height: 98px;
+}
+
+#bannerLogoImgLeft
+{
+	padding-left: 1.5em;
+}
+
+#bannerLogoImgRight
+{
+	padding-right: 1.5em;
+}
+
+#bannerLogoText
+{
+	padding-top: 50px; 
+	font-size: 1em; 
+	font-weight: bold; color: white;
+	text-shadow: 0 0 7px #222
+}
+
+/* CONTENT CONTAINER */
+#containerOuter
+{
+	border-bottom-left-radius: 10px; 
+	border-bottom-right-radius: 10px; 
+	border: 1px solid #777;
+	padding: 0.4em; 
+	background: white;
+	box-shadow: 0 0 5px #555;
+}
+
+/* FOOTER */
+#footer
+{
+	font-size: 0.72em;
+	padding-top: 0.5em;
+	color: #333;
+	text-align: center;
+}
+
+/* DEBUG */
+#debugsection
+{
+	margin: 2em;
+	font-size: 0.8em;
+}
+
+#debugsection h5
+{
+	padding: 0.5em;
+	font-size: 1em;
+	font-weight: bold;
+	background-color: #ccff99;
+}
+
+#debugsection pre
+{
+	padding: 0.5em;
+}
+
+#debugsection table
+{
+	width: 100%;
+}
+
+/* INSTALL VIEWS */
+.title 
+{
+	font-weight: bold;
+	background: #e2e2e2;
+	border-top: 1px solid #cfcfcf;
+	border-bottom: 1px solid #cfcfcf;
+	padding: 0.2em 0.5em;
+}
+div.install 
+{
+	margin-left: auto;
+	margin-right: auto;
+	width: 90%;
+}
+
+.install h3
+{
+	font-size: 1.5em;
+	font-weight: bolder;
+	margin: 1em 0;
+}
+
+.install h4
+{
+	font-size: 1.1em;
+	font-weight: bold;
+	margin: 1.5em 0 1em 0;
+}
+
+.install table
+{
+	width: 100%;
+}
+
+.install th
+{
+	font-weight: bold;
+	text-align: left;
+	padding-top: 1em;
+}
+
+.install td
+{
+	border-bottom: 1px solid #dedede;
+	padding-bottom: 0.4em;
+	padding-top: 1em;
+}
+
+.install form
+{
+	margin-top: 1em;
+	margin-bottom: 0.5em;
+	height: 3em;
+}
+
+.install form input
+{
+	width: 6em;
+	font-size: 1em;
+	font-weight: bold;
+	height: 3em;
+	float: right;
+	display: block;
+}

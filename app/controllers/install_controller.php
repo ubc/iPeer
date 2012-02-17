@@ -37,7 +37,7 @@ class InstallController extends Controller
 	
   function __construct()
   {
-    $this->set('title_for_layout', __('Install Wizard', true));
+    $this->set('title_for_layout', __('Installation Wizard', true));
     parent::__construct();
   }
 		

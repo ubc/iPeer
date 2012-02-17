@@ -281,7 +281,7 @@ function checkEmailAddress()
         <?php echo $svnTable?></div>
     <div style="display: none; background-color:#FFFFE9; width: 90%;" id="user-data">
         <h1>$user variable</h1>
-        <?php if(User::isLoggedIn()) echo 'ID: '.User::get('id'); else echo "(Empty)"?></div>
+        <?php print_r($this->Auth->user()); if(User::isLoggedIn()) echo 'ID: '.User::get('id'); else echo "(Empty)"?></div>
     <div style="display: none; background-color:#E9FFFF; width: 90%;" id="coursesList-data">
         <h1>$coursesList variable</h1>
         <?php if(!empty($coursesList)) var_dump($coursesList); else echo __("(Empty)", true)?></div>
