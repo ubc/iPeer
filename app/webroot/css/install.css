@@ -49,9 +49,15 @@ table {
 }
 
 /* GLOBAL */
-body {
+body 
+{
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	background-image: url(bg.gif);
+}
+
+p
+{
+	padding-bottom: 1em;
 }
 
 .floatleft
@@ -214,10 +220,19 @@ div.install
 {
 	margin-top: 1em;
 	margin-bottom: 0.5em;
+}
+
+.install #sysreqform
+{
 	height: 3em;
 }
 
-.install form input
+.install #gplform
+{
+	height: 4em;
+}
+
+.install form #next
 {
 	width: 6em;
 	font-size: 1em;

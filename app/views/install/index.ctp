@@ -153,7 +153,9 @@ foreach ($php_recommended_settings as &$setting)
   }
   ?>
 </table>
-<form action="<?php echo $html->url('install2') ?>">
-      <?php echo $form->submit('Next >>') ?>
+<form action="<?php echo $html->url('install2') ?>" id="sysreqform">
+  <?php 
+  echo $form->submit('Next >>', array('id' => 'next')); 
+  ?>
 </form>
 </div>
