@@ -1,8 +1,6 @@
 <script type="text/javascript">
 <!--
-var checkobj;
-
-function agreesubmit(el){
+function agreesubmit() {
   if ($('#agreecheck').is(':checked'))
   {
     $('#next').removeAttr('disabled');
@@ -29,11 +27,9 @@ function agreesubmit(el){
   <form action="<?php echo $html->url('install3') ?>" 
   method="post" name="adminForm" 
   onsubmit="return defaultagree(this)" id="gplform">
-    <input type="hidden" name="required" id="required" value="agreecheck"
-    class="floatleft" />
     <input type="checkbox" name="agreecheck" id="agreecheck" 
     onclick="agreesubmit(this)" class="floatleft" />
-    <span>I Accept the GPL License</span>
+    <label for="agreecheck">I Accept the GPL License</label>
     <?php 
     echo $form->submit('Next >>', 
       array('disabled'=>'true', 'name'=>'next', 'id' => 'next')) 

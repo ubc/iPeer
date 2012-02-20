@@ -24,7 +24,7 @@
  */
 class InstallController extends Controller
 {
-  var $uses         = null; 
+  var $uses         = array('InstallValidation'); 
   var $components   = array(
                       'Output', 
                       'Session',
@@ -64,45 +64,33 @@ class InstallController extends Controller
    * */
   function install3()
   {
-    if(!is_writable(CONFIGS))
-    { 
-      $this->Session->setFlash(__('The config directory is not writable. Please change the permission on config directory, e.g., "chmod 777 app/config". After installation, change the permission back.', true));
-    }
-    else if (!is_writable(CONFIGS.'database.php'))
+    if (!is_writable(CONFIGS.'database.php'))
     {
-      $this->Session->setFlash(__('The database config file is not writable. Please change the permission on config directory, e.g., "chmod 777 app/config/database.php". After installation, change the permission back.', true));
+      $this->Session->setFlash(__('Cannot write to the database configuration file. Please change the permission on app/config/database.php so that it is writable.', true));
     }
-  }
+  
+    if ($this->data)
+    { // we have data submitted
+      $this->InstallValidation->set($this->data);
+      if (!$this->InstallValidation->validates())
+      { // fails validation
+        $this->Session->setFlash(__('Please fill in all fields.',true));
+        $errors = $this->InstallValidation->invalidFields();
+        return;
+      }
 
-  /**
-   * This is an unrenderable page (no associated ctp file). Its only purpose
-   * is to create the database configuration file. Unfortunately, this page
-   * is needed because the database patcher in the next step needs to read
-   * the database. If the DB patching and writing of the configuration file
-   * takes place in the same step, CakePHP does not reread the DB config file,
-   * so uses the wrong credentials to try to access the database.
-   * */
-  function configdb()
-  {
-    if (empty($this->data))
-    { // Can't configure database if no data was entered on the prev page
-      $this->Session->setFlash(__('No data entered.',true));
-      $this->redirect(array('action' => 'install3'));
-      return;
+      // Try to configure the database, configureDatabase() will setFlash
+      // with error msg so don't need to do it again
+      $ret = $this->configureDatabase();
+      if ($ret)
+      { // Failed to configure database
+        $this->Session->setFlash(__('Database config failed - '.$ret, true));
+        return;
+      }
+
+      // Success
+      $this->redirect(array('action' => 'install4'));
     }
-
-    // Try to configure the database, configureDatabase() will setFlash
-    // with error msg so don't need to do it again
-    $ret = $this->configureDatabase();
-    if ($ret)
-    { // Failed to configure database
-      $this->Session->setFlash(__('Database config failed - '.$ret, true));
-      $this->redirect(array('action' => 'install3'));
-      return;
-    }
-
-    // Success
-    $this->redirect(array('action' => 'install4'));
   }
 
   /**
@@ -192,7 +180,7 @@ class InstallController extends Controller
 
     // Get the data setup option: A-With Sample,B-Basic,C-Import from iPeer 1.6
     $dbConfig['data_setup_option'] = $this->params['form']['data_setup_option'];
-    $ret = $this->installHelper->runInsertDataStructure($dbConfig, $this->params);
+    $ret = $this->installHelper->runInsertDataStructure($dbConfig);
 
     //Found error
     if ($ret)
@@ -216,17 +204,23 @@ class InstallController extends Controller
     }
     $dbConfig = array();
     //Setup the database config parameters
-    $dbConfig = $this->params['data']['DBConfig'];
+    $dbConfig['host'] = $this->data['InstallValidation']['host'];
+    $dbConfig['login'] = $this->data['InstallValidation']['login'];
+    $dbConfig['password'] = $this->data['InstallValidation']['password'];
+    $dbConfig['database'] = $this->data['InstallValidation']['database'];
 
     //Write Config file
     fwrite($confile, "<?php" . $endl);
     fwrite($confile, "class DATABASE_CONFIG {".$endl);
     fwrite($confile, "var \$default = array(".$endl);
+    fwrite($confile, "    'driver' => 'mysql',". $endl);
+    fwrite($confile, "    'connect' => 'mysql_pconnect',".$endl);
     foreach($dbConfig as $k => $v)
     {
-      fwrite($confile, "                     '".$k."'   => '".$v."',".$endl);
+      fwrite($confile, "    '".$k."'   => '".$v."',".$endl);
     }
-    fwrite($confile,"                     'prefix'   => '');  }".$endl);
+    fwrite($confile,"    'prefix'   => ''" . $endl);
+    fwrite($confile, "  );" . $endl . "}".$endl);
     fwrite($confile,"?>" . $endl);
     fflush($confile);
     fclose($confile);

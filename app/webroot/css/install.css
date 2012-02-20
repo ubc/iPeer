@@ -133,6 +133,31 @@ p
 	box-shadow: 0 0 5px #555;
 }
 
+.message
+{
+  clear: left;
+  margin: 1em;
+  padding: 0.7em;
+  font-size: 0.9em;
+  font-weight: bold;
+  text-align: center;
+}
+
+#flashMessage, #authMessage, .error-message
+{
+  	color: #990044;
+	text-align: center;
+	border: 1px solid #990044;
+}
+
+.error-message
+{
+	padding: 0.5em;
+	margin-bottom: 1em;
+	width: 20em;
+	display: block;
+}
+
 /* FOOTER */
 #footer
 {
@@ -176,6 +201,7 @@ p
 	border-bottom: 1px solid #cfcfcf;
 	padding: 0.2em 0.5em;
 }
+
 div.install 
 {
 	margin-left: auto;
@@ -222,7 +248,7 @@ div.install
 	margin-bottom: 0.5em;
 }
 
-.install #sysreqform
+.install #sysreqform, .install .dbform
 {
 	height: 3em;
 }
@@ -240,4 +266,23 @@ div.install
 	height: 3em;
 	float: right;
 	display: block;
+}
+
+.install .radio input
+{
+	margin: 0.5em 1em;
+}
+
+.install .text label, .install .password label
+{
+	width: 6em;
+	float: left;
+	display: block;
+	margin: 0.5em 0; 
+}
+
+.install .text input, .install .password input
+{
+	width: 15em;
+	margin: 0.5em 0; 
 }
