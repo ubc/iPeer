@@ -164,11 +164,6 @@ class InstallController extends Controller
     $this->render('gpl');
   }
 
-  function manualdoc()
-  {
-    $this->render('manualdoc');
-  }
-
   private function configureDatabase()
   {
     // We have user credentials for the database, write it to conf file
