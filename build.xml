@@ -59,6 +59,8 @@
   <phpdepend>
    <fileset dir="${project.basedir}/app">
     <include name="**/*.php" />
+    <exclude name="tests/**" />
+    <exclude name="vendors/**" />
    </fileset>
    <logger type="jdepend-xml" outfile="${project.basedir}/build/logs/jdepend.xml" />
    <logger type="jdepend-chart" outfile="${project.basedir}/build/pdepend/dependencies.svg" />
@@ -68,30 +70,57 @@
 
  <target name="phpmd"
          description="Perform project mess detection using PHPMD and print human readable output. Intended for usage on the command line before committing.">
-  <phpmd file="${project.basedir}/app" rulesets="codesize,unusedcode" />
+  <phpmd rulesets="codesize,unusedcode">
+   <fileset dir="${project.basedir}/app">
+    <include name="**/*.php" />
+    <exclude name="tests/**" />
+    <exclude name="vendors/**" />
+   </fileset>
+  </phpmd>
  </target>
 
  <target name="phpmd-ci"
          description="Perform project mess detection using PHPMD creating a log file for the continuous integration server">
-  <phpmd file="${project.basedir}/app" rulesets="codesize,unusedcode">
-    <formatter type="xml" outfile="${project.basedir}/build/logs/phpmd.xml"/>
+  <phpmd rulesets="codesize,unusedcode">
+   <fileset dir="${project.basedir}/app">
+    <include name="**/*.php" />
+    <exclude name="tests/**" />
+    <exclude name="vendors/**" />
+   </fileset>
+   <formatter type="xml" outfile="${project.basedir}/build/logs/phpmd.xml"/>
   </phpmd>
  </target>
 
  <target name="phpcs"
          description="Find coding standard violations using PHP_CodeSniffer and print human readable output. Intended for usage on the command line before committing.">
-  <phpcodesniffer file="${project.basedir}/app" standard="${project.basedir}/build/phpcs.xml" />
+  <phpcodesniffer standard="${project.basedir}/build/phpcs.xml">
+   <fileset dir="${project.basedir}/app">
+    <include name="**/*.php" />
+    <exclude name="tests/**" />
+    <exclude name="vendors/**" />
+   </fileset>
+  </phpcodesniffer>
  </target>
 
  <target name="phpcs-ci"
          description="Find coding standard violations using PHP_CodeSniffer creating a log file for the continuous integration server">
-  <phpcodesniffer file="${project.basedir}/app" standard="${project.basedir}/build/phpcs.xml">
+  <phpcodesniffer standard="${project.basedir}/build/phpcs.xml">
+   <fileset dir="${project.basedir}/app">
+    <include name="**/*.php" />
+    <exclude name="tests/**" />
+    <exclude name="vendors/**" />
+   </fileset>
    <formatter type="checkstyle" outfile="${project.basedir}/build/logs/checkstyle.xml" />
   </phpcodesniffer>
  </target>
 
  <target name="phpcpd" description="Find duplicate code using PHPCPD">
-  <phpcpd file="${project.basedir}/app">
+  <phpcpd>
+   <fileset dir="${project.basedir}/app">
+    <include name="**/*.php" />
+    <exclude name="tests/**" />
+    <exclude name="vendors/**" />
+   </fileset>
    <formatter type="pmd" outfile="${project.basedir}/build/logs/pmd-cpd.xml" />
   </phpcpd>
  </target>
@@ -101,6 +130,8 @@
   <phpdoc destdir="${project.basedir}/build/api" output="HTML:Smarty:PHP" sourcecode="false" >
    <fileset dir="${project.basedir}/app">
     <include name="**/*.php" />
+    <exclude name="tests/**" />
+    <exclude name="vendors/**" />
    </fileset>
   </phpdoc>
  </target>
