@@ -47,10 +47,10 @@
     <modified />
    </fileset>
 
-   <fileset dir="${basedir}/tests">
+   <!--   <fileset dir="${basedir}/tests">
     <include name="**/*.php" />
     <modified />
-   </fileset>
+  </fileset>-->
   </apply>
  </target>
 
