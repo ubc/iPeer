@@ -4,3 +4,10 @@ installed.txt
 app/tmp/
 app/config/bootstrap.local.php
 app/config/guard.php
+
+build/api/
+build/code-browser/
+build/logs/
+build/pdepend/
+cache.properties
+tags
