@@ -137,11 +137,12 @@
  </target>
 
  <target name="test" description="Run unit tests">
-     <exec command="cake/console/cake testsuite app case models/user" output="stdout"/>
+     <exec command="cake/console/cake testsuite app case models/user" passthru="true"/>
  </target>
 
  <target name="test-ci" description="Run unit tests for continuous integration(output as xml)">
-     <exec command="cake/console/cake testreport app case models/user" output="stdout"/>
+     <copy file="app/config/database.php.default" tofile="app/config/database.php" overwrite="true"/>
+     <exec command="cake/console/cake testreport app case models/user" passthru="true"/>
  </target>
 
  <target name="phpcb"
