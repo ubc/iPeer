@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="iPeer" basedir="." default="build">
- <target name="build"
-   depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpdoc,phpunit,phpcb"/>
+    <target name="build"
+        depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpdoc,test,phpcb"/>
 
- <!-- <target name="build-parallel"
+    <!-- <target name="build-parallel"
    depends="prepare,lint,tools-parallel,phpunit,phpcb"/>
 
  <target name="tools-parallel"
@@ -22,133 +22,137 @@
 </target>-->
 
  <target name="clean" description="Cleanup build artifacts">
-  <delete dir="${project.basedir}/build/api"/>
-  <delete dir="${project.basedir}/build/code-browser"/>
-  <delete dir="${project.basedir}/build/coverage"/>
-  <delete dir="${project.basedir}/build/logs"/>
-  <delete dir="${project.basedir}/build/pdepend"/>
+     <delete dir="${project.basedir}/build/api"/>
+     <delete dir="${project.basedir}/build/code-browser"/>
+     <delete dir="${project.basedir}/build/coverage"/>
+     <delete dir="${project.basedir}/build/logs"/>
+     <delete dir="${project.basedir}/build/pdepend"/>
  </target>
 
  <target name="prepare" depends="clean"
-         description="Prepare for build">
-  <mkdir dir="${project.basedir}/build/api"/>
-  <mkdir dir="${project.basedir}/build/code-browser"/>
-  <mkdir dir="${project.basedir}/build/coverage"/>
-  <mkdir dir="${project.basedir}/build/logs"/>
-  <mkdir dir="${project.basedir}/build/pdepend"/>
+     description="Prepare for build">
+     <mkdir dir="${project.basedir}/build/api"/>
+     <mkdir dir="${project.basedir}/build/code-browser"/>
+     <mkdir dir="${project.basedir}/build/coverage"/>
+     <mkdir dir="${project.basedir}/build/logs"/>
+     <mkdir dir="${project.basedir}/build/pdepend"/>
  </target>
 
  <target name="lint">
-  <phplint haltonfailure="true">
-   <fileset dir="${project.basedir}/app">
-    <include name="**/*.php" />
-   </fileset>
-  </phplint>
+     <phplint haltonfailure="true">
+         <fileset dir="${project.basedir}/app">
+             <include name="**/*.php" />
+         </fileset>
+     </phplint>
  </target>
 
  <target name="phploc" description="Measure project size using PHPLOC">
-  <exec executable="phploc">
-   <arg value="--log-csv" />
-   <arg value="${project.basedir}/build/logs/phploc.csv" />
-   <arg path="${project.basedir}/app" />
-  </exec>
+     <exec executable="phploc">
+         <arg value="--log-csv" />
+         <arg value="${project.basedir}/build/logs/phploc.csv" />
+         <arg path="${project.basedir}/app" />
+     </exec>
  </target>
 
  <target name="pdepend"
-         description="Calculate software metrics using PHP_Depend">
-  <phpdepend>
-   <fileset dir="${project.basedir}/app">
-    <include name="**/*.php" />
-    <exclude name="tests/**" />
-    <exclude name="vendors/**" />
-   </fileset>
-   <logger type="jdepend-xml" outfile="${project.basedir}/build/logs/jdepend.xml" />
-   <logger type="jdepend-chart" outfile="${project.basedir}/build/pdepend/dependencies.svg" />
-   <logger type="overview-pyramid" outfile="${project.basedir}/build/pdepend/overview-pyramid.svg" />
-  </phpdepend>
+     description="Calculate software metrics using PHP_Depend">
+     <phpdepend>
+         <fileset dir="${project.basedir}/app">
+             <include name="**/*.php" />
+             <exclude name="tests/**" />
+             <exclude name="vendors/**" />
+         </fileset>
+         <logger type="jdepend-xml" outfile="${project.basedir}/build/logs/jdepend.xml" />
+         <logger type="jdepend-chart" outfile="${project.basedir}/build/pdepend/dependencies.svg" />
+         <logger type="overview-pyramid" outfile="${project.basedir}/build/pdepend/overview-pyramid.svg" />
+     </phpdepend>
  </target>
 
  <target name="phpmd"
-         description="Perform project mess detection using PHPMD and print human readable output. Intended for usage on the command line before committing.">
-  <phpmd rulesets="codesize,unusedcode">
-   <fileset dir="${project.basedir}/app">
-    <include name="**/*.php" />
-    <exclude name="tests/**" />
-    <exclude name="vendors/**" />
-   </fileset>
-  </phpmd>
+     description="Perform project mess detection using PHPMD and print human readable output. Intended for usage on the command line before committing.">
+     <phpmd rulesets="codesize,unusedcode">
+         <fileset dir="${project.basedir}/app">
+             <include name="**/*.php" />
+             <exclude name="tests/**" />
+             <exclude name="vendors/**" />
+         </fileset>
+     </phpmd>
  </target>
 
  <target name="phpmd-ci"
-         description="Perform project mess detection using PHPMD creating a log file for the continuous integration server">
-  <phpmd rulesets="codesize,unusedcode">
-   <fileset dir="${project.basedir}/app">
-    <include name="**/*.php" />
-    <exclude name="tests/**" />
-    <exclude name="vendors/**" />
-   </fileset>
-   <formatter type="xml" outfile="${project.basedir}/build/logs/phpmd.xml"/>
-  </phpmd>
+     description="Perform project mess detection using PHPMD creating a log file for the continuous integration server">
+     <phpmd rulesets="codesize,unusedcode">
+         <fileset dir="${project.basedir}/app">
+             <include name="**/*.php" />
+             <exclude name="tests/**" />
+             <exclude name="vendors/**" />
+         </fileset>
+         <formatter type="xml" outfile="${project.basedir}/build/logs/phpmd.xml"/>
+     </phpmd>
  </target>
 
  <target name="phpcs"
-         description="Find coding standard violations using PHP_CodeSniffer and print human readable output. Intended for usage on the command line before committing.">
-  <phpcodesniffer standard="${project.basedir}/build/phpcs.xml">
-   <fileset dir="${project.basedir}/app">
-    <include name="**/*.php" />
-    <exclude name="tests/**" />
-    <exclude name="vendors/**" />
-   </fileset>
-  </phpcodesniffer>
+     description="Find coding standard violations using PHP_CodeSniffer and print human readable output. Intended for usage on the command line before committing.">
+     <phpcodesniffer standard="${project.basedir}/build/phpcs.xml">
+         <fileset dir="${project.basedir}/app">
+             <include name="**/*.php" />
+             <exclude name="tests/**" />
+             <exclude name="vendors/**" />
+         </fileset>
+     </phpcodesniffer>
  </target>
 
  <target name="phpcs-ci"
-         description="Find coding standard violations using PHP_CodeSniffer creating a log file for the continuous integration server">
-  <phpcodesniffer standard="${project.basedir}/build/phpcs.xml">
-   <fileset dir="${project.basedir}/app">
-    <include name="**/*.php" />
-    <exclude name="tests/**" />
-    <exclude name="vendors/**" />
-   </fileset>
-   <formatter type="checkstyle" outfile="${project.basedir}/build/logs/checkstyle.xml" />
-  </phpcodesniffer>
+     description="Find coding standard violations using PHP_CodeSniffer creating a log file for the continuous integration server">
+     <phpcodesniffer standard="${project.basedir}/build/phpcs.xml">
+         <fileset dir="${project.basedir}/app">
+             <include name="**/*.php" />
+             <exclude name="tests/**" />
+             <exclude name="vendors/**" />
+         </fileset>
+         <formatter type="checkstyle" outfile="${project.basedir}/build/logs/checkstyle.xml" />
+     </phpcodesniffer>
  </target>
 
  <target name="phpcpd" description="Find duplicate code using PHPCPD">
-  <phpcpd>
-   <fileset dir="${project.basedir}/app">
-    <include name="**/*.php" />
-    <exclude name="tests/**" />
-    <exclude name="vendors/**" />
-   </fileset>
-   <formatter type="pmd" outfile="${project.basedir}/build/logs/pmd-cpd.xml" />
-  </phpcpd>
+     <phpcpd>
+         <fileset dir="${project.basedir}/app">
+             <include name="**/*.php" />
+             <exclude name="tests/**" />
+             <exclude name="vendors/**" />
+         </fileset>
+         <formatter type="pmd" outfile="${project.basedir}/build/logs/pmd-cpd.xml" />
+     </phpcpd>
  </target>
 
  <target name="phpdoc"
-         description="Generate API documentation using PHPDocumentor">
-  <phpdoc destdir="${project.basedir}/build/api" output="HTML:Smarty:PHP" sourcecode="false" >
-   <fileset dir="${project.basedir}/app">
-    <include name="**/*.php" />
-    <exclude name="tests/**" />
-    <exclude name="vendors/**" />
-   </fileset>
-  </phpdoc>
+     description="Generate API documentation using PHPDocumentor">
+     <phpdoc destdir="${project.basedir}/build/api" output="HTML:Smarty:PHP" sourcecode="false" >
+         <fileset dir="${project.basedir}/app">
+             <include name="**/*.php" />
+             <exclude name="tests/**" />
+             <exclude name="vendors/**" />
+         </fileset>
+     </phpdoc>
  </target>
 
- <target name="phpunit" description="Run unit tests with PHPUnit">
-  <!--<exec executable="phpunit" failonerror="true"/>-->
+ <target name="test" description="Run unit tests">
+     <exec command="cake/console/cake testsuite app case models/user" output="stdout"/>
+ </target>
+
+ <target name="test-ci" description="Run unit tests for continuous integration(output as xml)">
+     <exec command="cake/console/cake testreport app case models/user" output="stdout"/>
  </target>
 
  <target name="phpcb"
-         description="Aggregate tool output with PHP_CodeBrowser">
-  <exec executable="phpcb">
-   <arg value="--log" />
-   <arg path="${project.basedir}/build/logs" />
-   <arg value="--source" />
-   <arg path="${project.basedir}/app" />
-   <arg value="--output" />
-   <arg path="${project.basedir}/build/code-browser" />
-  </exec>
+     description="Aggregate tool output with PHP_CodeBrowser">
+     <exec executable="phpcb">
+         <arg value="--log" />
+         <arg path="${project.basedir}/build/logs" />
+         <arg value="--source" />
+         <arg path="${project.basedir}/app" />
+         <arg value="--output" />
+         <arg path="${project.basedir}/build/code-browser" />
+     </exec>
  </target>
 </project>
