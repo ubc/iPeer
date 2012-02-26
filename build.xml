@@ -2,7 +2,7 @@
 
 <project name="iPeer" basedir="." default="build">
     <target name="build"
-        depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpdoc,test,phpcb"/>
+        depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpdoc,test-ci,phpcb"/>
 
     <!-- <target name="build-parallel"
    depends="prepare,lint,tools-parallel,phpunit,phpcb"/>
