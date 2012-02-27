@@ -18,7 +18,7 @@ class CakeXmlReporter extends XmlReporter
      * @var integer
      * @access protected
      */
-    var $_timeStart = 0;
+    protected $_timeStart = 0;
 
     /**
      * Time the test runs ended
@@ -26,7 +26,7 @@ class CakeXmlReporter extends XmlReporter
      * @var integer
      * @access protected
      */
-    var $_timeEnd = 0;
+    protected $_timeEnd = 0;
 
     /**
      * Duration of all test methods.
@@ -34,14 +34,14 @@ class CakeXmlReporter extends XmlReporter
      * @var integer
      * @access protected
      */
-    var $_timeDuration = 0;
+    protected $_timeDuration = 0;
 
     /**
      * Array of request parameters.  Usually parsed GET params.
      *
      * @var array
      */
-    var $params = array();
+    protected $params = array();
 
     /**
      * Character set for the output of test reporting.
@@ -49,7 +49,7 @@ class CakeXmlReporter extends XmlReporter
      * @var string
      * @access protected
      */
-    var $_characterSet;
+    protected $_characterSet;
 
     /* public __construct($charset = 'utf-8', $params = array()) {{{ */
     /**
@@ -70,12 +70,31 @@ class CakeXmlReporter extends XmlReporter
     /* }}} */
 
 
+    /* public paintMethodStart($test_name) {{{ */
+    /**
+     * paintMethodStart
+     *
+     * @param mixed $test_name the name of the test going to run
+     *
+     * @access public
+     * @return void
+     */
     public function paintMethodStart($test_name)
     {
         $this->pre = microtime();
         parent::paintMethodStart($test_name);
     }
+    /* }}} */
 
+    /* public paintMethodEnd($test_name) {{{ */
+    /**
+     * paintMethodEnd
+     *
+     * @param mixed $test_name the name of the test going to end
+     *
+     * @access public
+     * @return void
+     */
     function paintMethodEnd($test_name)
     {
         $post = microtime();
@@ -91,6 +110,7 @@ class CakeXmlReporter extends XmlReporter
         parent::paintMethodEnd($test_name);
         $this->pre = null;
     }
+    /* }}} */
 
     /**
      * Retrieves a list of test cases from the active Manager class,

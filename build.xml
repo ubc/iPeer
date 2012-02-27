@@ -137,12 +137,41 @@
  </target>
 
  <target name="test" description="Run unit tests">
-     <exec command="cake/console/cake testsuite app case models/user" passthru="true"/>
+     <reflexive file="app/config/core.php">
+         <filterchain>
+             <replaceregexp>
+                 <regexp pattern="'Acl.database', 'default'" replace="'Acl.database', 'test'"/>
+             </replaceregexp>
+         </filterchain>
+     </reflexive>
+     <exec command="cake/console/cake -connection test testsuite app case models/user" passthru="true"/>
+     <reflexive file="app/config/core.php">
+         <filterchain>
+             <replaceregexp>
+                 <regexp pattern="'Acl.database', 'test'" replace="'Acl.database', 'default'"/>
+             </replaceregexp>
+         </filterchain>
+     </reflexive>
  </target>
 
  <target name="test-ci" description="Run unit tests for continuous integration(output as xml)">
      <copy file="app/config/database.php.default" tofile="app/config/database.php" overwrite="true"/>
-     <exec command="cake/console/cake testreport app case models/user" passthru="true"/>
+     <chmod file="app/tmp" mode="0777"/>
+     <reflexive file="app/config/core.php">
+         <filterchain>
+             <replaceregexp>
+                 <regexp pattern="'Acl.database', 'default'" replace="'Acl.database', 'test'"/>
+             </replaceregexp>
+         </filterchain>
+     </reflexive>
+     <exec command="cake/console/cake -connection test testreport app case models/user" passthru="true"/>
+     <reflexive file="app/config/core.php">
+         <filterchain>
+             <replaceregexp>
+                 <regexp pattern="'Acl.database', 'test'" replace="'Acl.database', 'default'"/>
+             </replaceregexp>
+         </filterchain>
+     </reflexive>
  </target>
 
  <target name="phpcb"

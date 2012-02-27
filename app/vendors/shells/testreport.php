@@ -29,7 +29,7 @@ class TestReportShell extends TestSuiteShell
      * @return void
      * @access private
      */
-    function __run()
+    protected function __run()
     {
         $Reporter = new CakeXmlReporter('utf-8', array(
             'app' => $this->Manager->appTest,
@@ -96,7 +96,7 @@ class TestReportShell extends TestSuiteShell
      * @return void
      * @access private
      */
-    function __installSimpleTest()
+    protected function __installSimpleTest()
     {
         /*if (!App::import('Vendor', 'simpletest' . DS . 'reporter')) {
             $this->err(__('Sorry, Simpletest could not be found. Download it from http://simpletest.org and install it to your vendors directory.', true));
