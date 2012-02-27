@@ -87,7 +87,7 @@
              <exclude name="tests/**" />
              <exclude name="vendors/**" />
          </fileset>
-         <formatter type="xml" outfile="${project.basedir}/build/logs/phpmd.xml"/>
+         <formatter type="xml" outfile="${project.basedir}/build/logs/pmd.xml"/>
      </phpmd>
  </target>
 
