@@ -84,7 +84,7 @@ class DATABASE_CONFIG {
 		//'encoding' => 'utf8',
 	);
 
-    var $test_suite = array(
+    var $test = array(
         'driver'       => 'mysql',
         'persistent'   => false,
         'host'         => 'localhost',

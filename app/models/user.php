@@ -20,8 +20,8 @@ App::import('Lib', 'neat_string');
 class User extends AppModel
 {
     //The model name
-    protected $name = 'User';
-    protected $displayField = 'full_name';
+    public $name = 'User';
+    public $displayField = 'full_name';
     protected $unhashed_password = '';
 
     /* User Type - Admin, Instructor, TA, Student */
@@ -30,7 +30,7 @@ class User extends AppModel
     public $USER_TYPE_TA = 'T';
     public $USER_TYPE_STUDENT = 'S';
 
-    protected $_schema = array(
+    public $_schema = array(
         'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
         'username' => array('type' => 'string', 'null' => false, 'length' => 80, 'key' => 'unique', 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
         'password' => array('type' => 'string', 'null' => false, 'length' => 80, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
@@ -52,9 +52,9 @@ class User extends AppModel
         'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'InnoDB')
     );
 
-    protected $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Traceable');
+    public $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Traceable');
 
-    protected $hasMany = array(
+    public $hasMany = array(
         'Submission' => array(
             'className' => 'EvaluationSubmission',
             'foreignKey' => 'submitter_id',
@@ -62,7 +62,7 @@ class User extends AppModel
         )
     );
 
-    protected $hasAndBelongsToMany = array(
+    public $hasAndBelongsToMany = array(
         'Course' => array(
             'className'    => 'Course',
             'joinTable'    => 'user_courses',
@@ -329,7 +329,7 @@ class User extends AppModel
     function getUserIdByStudentNo($studentNo)
     {
         if (!empty($studentNo)) {
-            $tmp = $this->findUserByEmailAndStudentNo(erByStudentNo($studentNo));
+            $tmp = $this->findUserByStudentNo($studentNo);
 
             return $tmp['User']['id'];
         }

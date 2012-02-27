@@ -11,10 +11,10 @@
 class Role extends AppModel
 {
     //The model name
-    protected $name = 'Role';
-    protected $test = 'a';
+    public $name = 'Role';
+    public $test = 'a';
 
-    protected $hasAndBelongsToMany = array(
+    public $hasAndBelongsToMany = array(
         'User' => array(
             'className'             => 'User',
             'joinTable'             => 'roles_users',
@@ -25,7 +25,7 @@ class Role extends AppModel
         )
     );
 
-    protected $actsAs = array('Acl' => array('type' => 'requester'));
+    public $actsAs = array('Acl' => array('type' => 'requester'));
 
     function parentNode()
     {
