@@ -1,15 +1,6 @@
 <?php
 App::import('Model', 'User');
 App::import('Model', 'UserCourse');
-App::import('Component', 'Auth');
-
-class FakeController extends Controller
-{
-    public $name       = 'FakeController';
-    public $components = array('Auth');
-    public $uses       = null;
-    public $params     = array('action' => 'test');
-}
 
 class UserTestCase extends CakeTestCase
 {
@@ -29,31 +20,14 @@ class UserTestCase extends CakeTestCase
     {
         $this->User = ClassRegistry::init('User');
         $this->UserCourse = ClassRegistry::init('UserCourse');
-        $admin = array('User' => array(
-            'username' => 'root',
-            'password' => 'ipeer')
-        );
-        $this->controller = new FakeController();
-        $this->controller->constructClasses();
-        $this->controller->startupProcess();
-        $this->controller->Component->startup($this->controller);
-        $this->controller->Auth->startup($this->controller);
-        ClassRegistry::addObject('view', new View($this->Controller));
-        ClassRegistry::addObject('auth_component', $this->controller->Auth);
-
-        $this->controller->Auth->login($admin);
     }
 
     public function endCase()
     {
-        $this->controller->Component->shutdown($this->controller);
-        $this->controller->shutdownProcess();
     }
 
-    /*Run before EVERY test.*/
     public function startTest($method)
     {
-        // extra setup stuff here
     }
 
     public function endTest($method)
@@ -358,67 +332,6 @@ class UserTestCase extends CakeTestCase
         //null input
         $nullInput = $this->User->getRoleById(null);
         $this->assertEqual($nullInput, $empty);
-    }
-
-    public function testGetMembersByGroupId()
-    {
-        $this->User =& ClassRegistry::init('User');
-        $empty=null;
-
-        //Set up test data students
-
-        $group1=$this->User->getMembersByGroupId(1);
-        $group2=$this->User->getMembersByGroupId(2);
-        $this->assertEqual($group1[0]['User']['username'], $group2[0]['User']['username']);
-
-        //Run tests on group with multiple members
-        $groupMembers = $this->User->getMembersByGroupId(1);
-        $groupMembersArray=array();
-        foreach ($groupMembers as $student) {
-            array_push($groupMembersArray, $student['User']['username']);
-        }
-        $expect=array('StudentZ', 'StudentY');
-        $this->assertEqual($groupMembersArray, $expect);
-
-        //Run test on group with NO members
-        $groupMembers = $this->User->getMembersByGroupId(3);
-        $this->assertEqual($groupMembers, $empty);
-
-        //Run test on invalid group; "group_id==213123" (invalid)
-        $invalidGroup = $this->User->getMembersByGroupId(213123);
-        $this->assertEqual($invalidGroup, $empty);
-
-        //Run test on NULL group_id input
-        $nullGroupId = $this->User->getMembersByGroupId(null);
-        $this->assertEqual($nullGroupId, $empty);
-    }
-
-
-    public function testGetStudentsNotInGroup()
-    {
-        $this->User =& ClassRegistry::init('User');
-        $empty=null;
-
-        //Test function for valid users and course
-        $studentNotInGroup = $this->User->getStudentsNotInGroup(3);
-        $studentsArray=array();
-        foreach ($studentNotInGroup as $student) {
-            array_push($studentsArray, $student['User']['username']);
-        }
-
-        $expect = array('StudentZ', 'StudentY',);
-        $this->User->log($studentNotInGroup);
-        $this->assertEqual($studentsArray, $expect);
-
-        //Test function for invalid course_id input, course_id==99999 (invalid)
-        $studentNotInGroup = $this->User->getStudentsNotInGroup(99999);
-        $this->assertEqual($studentNotInGroup, $empty);
-
-        //Test function for NULL course_id input
-        $studentNotInGroup = $this->User->getStudentsNotInGroup(null);
-        $this->assertEqual($studentNotInGroup, $empty);
-
-
     }
 
     public function testFindUserByid()

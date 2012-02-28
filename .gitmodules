@@ -1,3 +1,6 @@
 [submodule "app/plugins/guard"]
 	path = app/plugins/guard
 	url = https://github.com/xcompass/CakePHP-Guard-Plugin.git
+[submodule "app/plugins/extended_test_case"]
+	path = app/plugins/extended_test_case
+	url = https://github.com/jeremyharris/extended_test_case.git

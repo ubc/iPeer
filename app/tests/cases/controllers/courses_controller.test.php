@@ -8,7 +8,7 @@
  * http://42pixels.com/blog/testing-controllers-the-slightly-less-hard-way
  */
 
-App::import('Lib', 'ExtendedTestCase');
+App::import('Lib', 'ExtendedTestCase.ExtendedTestCase');
 App::import('Controller', 'Courses');
 
 // mock instead of needing to create a new controller for every test
@@ -35,7 +35,6 @@ class CoursesControllerTest extends ExtendedTestCase
         'app.personalize',
     );
 
-    /* public startCase() {{{ */
     /**
      * startCase case startup
      *
@@ -44,11 +43,8 @@ class CoursesControllerTest extends ExtendedTestCase
      */
     public function startCase()
     {
-        echo '<h1>Starting Test Case</h1>';
     }
-    /* }}} */
 
-    /* public endCase() {{{ */
     /**
      * endCase case ending
      *
@@ -57,11 +53,8 @@ class CoursesControllerTest extends ExtendedTestCase
      */
     public function endCase()
     {
-        echo '<h1>Ending Test Case</h1>';
     }
-    /* }}} */
 
-    /* public startTest() {{{ */
     /**
      * startTest prepare tests
      *
@@ -77,11 +70,8 @@ class CoursesControllerTest extends ExtendedTestCase
         $admin = array('User' => array('username' => 'root',
             'password' => 'ipeer'));
         //$this->testController->Auth->login($admin);
-        $this->testController = $this->testController;
     }
-    /* }}} */
 
-    /* public endTest() {{{ */
     /**
      * endTest clean up
      *
@@ -93,20 +83,107 @@ class CoursesControllerTest extends ExtendedTestCase
         unset($this->testController);
         ClassRegistry::flush();
     }
-    /* }}} */
 
-    /* public testIndex() {{{ */
-    /**
-     * testIndex testing index action
-     *
-     * @access public
-     * @return void
-     */
-    public function testIndex()
-    {
-        $result = $this->testAction('/courses/index');
-        debug($result['coursesList']);
-        exit;
+    function testIndex() {
+        $result = $this->testAction('/courses/index', array('connection' => 'test', 'return' => 'vars'));
+        $expected = array(
+            array('Course' => array('id' => 3, 'homepage' => null, 'course' => 'Math100', 'title' => 'Math',
+            'creator_id' => 0, 'record_status' => '', 'creator' => null),
+            'Instructor' => array('id' => 2),
+            'CreatorId' => array(),
+            'UpdaterId' => array()),
+            array('Course' => array('id' => 1, 'course' => 'Math303', 'title' => 'Stochastic Process',
+            'homepage' => null, 'creator_id' => 0, 'record_status' => '', 'creator' => null),
+            'Instructor' => array('id' => 1),
+            'CreatorId' => array(),
+            'UpdaterId' => array()),
+            array('Course' => array('id' => 2, 'course' => 'Math321', 'title' => 'Analysis II',
+            'homepage' => null, 'creator_id' => 0, 'record_status' => '', 'creator' => null),
+            'Instructor' => array('id' => 1),
+            'CreatorId' => array(),
+            'UpdaterId' => array()),
+        );
+        $this->assertEqual($result['paramsForList']['data']['entries'], $expected);
     }
-    /* }}} */
+
+    function testView() {
+        $result1 = $this->testAction('/courses/view/1', array('connection' => 'test', 'return' => 'vars'));
+        $result2 = $this->testAction('/courses/view/2', array('connection' => 'test', 'return' => 'vars'));
+        $expect1 = array('id' => 1, 'course' => 'Math303', 'title' => 'Stochastic Process', 'homepage' => null,
+            'self_enroll' => null, 'password' => null, 'record_status' => null,
+            'creator_id' => 0, 'created' => "0000-00-00 00:00:00", 'updater_id' => null,
+            'modified' => null, 'instructor_id' => 0,
+            'creator'=> null, 'updater'=> null, 'student_count'=> 4,
+        );
+        $expect2 = array('id' => 2, 'course' => 'Math321', 'title' => 'Analysis II',
+            'homepage' => null, 'self_enroll' => null, 'password' => null,'homepage' => null,
+            'self_enroll' => null, 'password' => null, 'record_status' => null,
+            'creator_id' => 0, 'created' => "0000-00-00 00:00:00", 'updater_id' => null,
+            'modified' => null, 'instructor_id' => 0,
+            'creator'=> null, 'updater'=> null, 'student_count'=> 1,
+        );
+
+        $this->assertEqual($result1['data']['Course'], $expect1);
+        $this->assertEqual($result2['data']['Course'], $expect2);
+    }
+
+    function testHome() {
+        $this->Course = ClassRegistry::init('Course');
+        $result = $this->testAction('/courses/home/1', array('connection' => 'test', 'return' => 'vars'));
+        $result1 = $this->testAction('/courses/home/2', array('connection' => 'test', 'return' => 'vars'));
+
+        $this->assertEqual($result['studentCount'], 4);
+        $this->assertEqual($result['course_id'], 1);
+        $this->assertEqual($result['data']['Course']['id'], 1);
+        $this->assertEqual($result['data']['Course']['course'], 'Math303');
+        $this->assertEqual($result['data']['Course']['title'], 'Stochastic Process');
+        $this->assertEqual($result['data']['Group'][0]['group_name'], 'group1');
+
+        $this->assertEqual($result1['studentCount'], 1);
+        $this->assertEqual($result1['course_id'], 2);
+        $this->assertEqual($result1['data']['Course']['id'], 2);
+        $this->assertEqual($result1['data']['Course']['course'], 'Math321');
+        $this->assertEqual($result1['data']['Course']['title'], 'Analysis II');
+    }
+
+
+    //TODO (redirect)
+
+    function testAdd() {
+        $this->Course = ClassRegistry::init('Course');
+        $data = array('course' => 10, 'title' => 'Some Course');
+        //$result = $this->testAction('/courses/add', array('connection' => 'test', 'data' => $data, 'return' => 'vars'));
+        //  $search = $this->Course->find('all', array('conditions' => array ('course' => 10)));
+        //var_dump($search);
+        //   $result1 = $this->testAction('/courses/home/2', array('connection' => 'test', 'return' => 'vars'));
+
+    }
+
+    //TODO redirect
+    function testEdit () {
+    }
+
+    function testDelete() {
+    }
+
+    function testAddInstructor() {
+        $this->Course = ClassRegistry::init('Course');
+        $data = array('instructor_id'=> 2, 'course_id' => 1);
+        //$result = $this->testAction('/courses/addInstructor', array('connection' => 'test', 'data' => $data, 'return' => 'vars'));
+    }
+
+    function testDeleteInstructor() {
+        $data = array('instructor_id'=> 2, 'course_id' => 1);
+        // $result = $this->testAction('/courses/deleteInstructor', array('connection' => 'test', 'data' => $data, 'return' => 'vars'));
+        //  $search = $this->UserCourse->find('all', array( 'conditions' => array('user_id' => 1)));
+    }
+
+    function testCheckDuplicateName(){
+        $data['Course']['course'] = 'Course';
+        // $result = $this->testAction('/courses/deleteInstructor', array('connection' => 'test', 'data' => $data, 'return' => 'vars'));
+    }
+
+    //TODO uses Auth
+    function testUpdate(){
+    }
 }

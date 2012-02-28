@@ -144,7 +144,7 @@
              </replaceregexp>
          </filterchain>
      </reflexive>
-     <exec command="cake/console/cake -connection test testsuite app case models/user" passthru="true"/>
+     <exec command="cake/console/cake -connection test testsuite app group model" passthru="true"/>
      <reflexive file="app/config/core.php">
          <filterchain>
              <replaceregexp>
@@ -164,7 +164,7 @@
              </replaceregexp>
          </filterchain>
      </reflexive>
-     <exec command="cake/console/cake -connection test testreport app case models/user" passthru="true"/>
+     <exec command="cake/console/cake -connection test testreport app group model" passthru="true"/>
      <reflexive file="app/config/core.php">
          <filterchain>
              <replaceregexp>

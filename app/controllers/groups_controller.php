@@ -25,11 +25,11 @@
  * @subpackage
  * @since
  */
- 
-define('IMPORT_USERNAME', 0);
-define('IMPORT_GROUP_NUMBER', 1);
-define('IMPORT_GROUP_NAME', 2);
- 
+
+define('IMPORT_GROUP_USERNAME', 0);
+define('IMPORT_GROUP_GROUP_NUMBER', 1);
+define('IMPORT_GROUP_GROUP_NAME', 2);
+
 class GroupsController extends AppController
 {
   var $name = 'Groups';
@@ -198,7 +198,7 @@ class GroupsController extends AppController
     $this->set('group_data', $group_data);
   }
 
-  function add ($course_id) {  	
+  function add ($course_id) {
     if (!empty($this->data)) {
       //$this->params = $this->Group->prepData($this->params);
       if ($this->Group->save($this->data)) {
@@ -244,7 +244,7 @@ class GroupsController extends AppController
     }
 
     $group = $this->Group->find('first', array('conditions' => array('Group.id' => $group_id)));
-    
+
     if(!($this->data = $group)) {
       $this->Session->setFlash(__('Group Not Found.', true));
       $this->redirect('index/'.$this->Session->read('ipeerSession.courseId'));
@@ -323,7 +323,7 @@ class GroupsController extends AppController
           $this->set('errmsg', $validUploads);
       }
     }
-   
+
     $courseId = $this->Session->read('ipeerSession.courseId');
     $this->set("courseId", $courseId);
   }
@@ -372,9 +372,9 @@ class GroupsController extends AppController
                   __(" expected 3.", true);
           } else {
               // assign the parts into their appropriate places
-              $entry['username'] = trim($split[IMPORT_USERNAME]);
-              $entry['group_num'] = trim($split[IMPORT_GROUP_NUMBER]);
-              $entry['group_name'] = trim($split[IMPORT_GROUP_NAME]);
+              $entry['username'] = trim($split[IMPORT_GROUP_USERNAME]);
+              $entry['group_num'] = trim($split[IMPORT_GROUP_GROUP_NUMBER]);
+              $entry['group_name'] = trim($split[IMPORT_GROUP_GROUP_NAME]);
 
               // Check the entries for empty spots
               if (empty($entry['username'])) {
@@ -565,8 +565,8 @@ class GroupsController extends AppController
 			$this->params['data'] = $this->Personalize->updateAttribute($this->Auth->user('id'), $attributeCode, $attributeValue);
 		}
 	}
-	
-  function export($courseId) {	
+
+  function export($courseId) {
     $this->set('courseId', $courseId);
     if (isset($this->params['form']) && !empty($this->params['form'])) {
       // check that at least one group has been selected

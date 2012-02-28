@@ -48,8 +48,6 @@ class User extends AppModel
         'created' => array('type' => 'datetime', 'null' => false, 'default' => '0000-00-00 00:00:00'),
         'updater_id' => array('type' => 'integer', 'null' => true, 'default' => null),
         'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
-        'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1), 'username' => array('column' => 'username', 'unique' => 1)),
-        'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'InnoDB')
     );
 
     public $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Traceable');
@@ -694,11 +692,14 @@ class User extends AppModel
      * @param id     $group_id group id
      * @param string $type     type of search
      *
+     * @deprecated moved this function into group model
      * @access public
      * @return search results
      */
+    /*
     function getStudentsNotInGroup($group_id, $type = 'all')
     {
+        trigger_error("Deprecated function called.", E_USER_NOTICE);
         if ($group_id = null) {
             return false;
         }
@@ -742,7 +743,7 @@ class User extends AppModel
                 'recursive' => 1
             )
         );
-    }
+    }*/
 
     /**
      * Get members in a group
@@ -750,9 +751,11 @@ class User extends AppModel
      * @param int $group_id group id
      * @param int $type     type of search
      *
+     * @deprecated moved this function into group model
      * @access public
      * @return search result
      */
+    /*
     function getMembersByGroupId($group_id, $type = 'all')
     {
         $groups_member = Classregistry::init('GroupsMember');
@@ -796,7 +799,7 @@ class User extends AppModel
                 'recursive' => 1
             )
         );
-    }
+    }*/
 
     /**
      * Get current logged in user
