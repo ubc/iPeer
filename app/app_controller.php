@@ -1,10 +1,10 @@
 <?php
-/*
+/**
  * Custom AppController for iPeer
  *
- * @author
- * @version     0.10.6.1865
- * @license		OPPL
+ * @author  Pan Luo <pan.luo@ubc.ca>
+ * @license MIT http://www.opensource.org/licenses/MIT
+ * @version GIT:
  *
  */
 ini_set('auto_detect_line_endings', true);
@@ -13,220 +13,319 @@ uses('sanitize');
 App::import('Lib', 'toolkit');
 App::import('Model', 'User');
 
-class AppController extends Controller  {
-  var $startpage = 'pages';
-  var $uses = array('SysParameter');
-  var $components = array('Session', 'Output', 'sysContainer', 'userPersonalize', 'framework', 'Guard.Guard', 'Acl', 'AccessControl', 'Email');
-  var $helpers = array('Session', 'Html', 'Js');
-  var $access = array ();
-  var $actionList = array ();
+/**
+ * AppController the base controller
+ *
+ * @uses Controller
+ * @package App
+ */
+class AppController extends Controller
+{
+    public $startpage  = 'pages';
+    public $uses       = array('SysParameter');
+    public $components = array('Session', 'Output', 'sysContainer',
+        'userPersonalize', 'framework', 'Guard.Guard', 'Acl',
+        'AccessControl', 'Email');
+    public $helpers    = array('Session', 'Html', 'Js');
+    public $access     = array ();
+    public $actionList = array ();
 
-  function __construct() {
-    parent::__construct();
-  }
-
-  function beforeFilter() {
-    // backward compatible with original ipeer hash  method
-    Security::setHash('md5');
-    Configure::write('Security.salt', '');
-    
-    // set default language for now
-    Configure::write('Config.language', 'eng');
-
-    User::store($this->Auth->user());
-
-    if($this->Auth->isAuthorized()) {
-  //    $this->AccessControl->check('controllers/'.ucwords($this->params['controller']).'/'.$this->params['action']);
-
-      $this->checkAccess();
-      $this->checkDatabaseVersion();
-
-      // pass user variable to view
-      // Replace with User::get() function, can be used anywhere
-//      $user_array = $this->Auth->user();
-//      $this->set('user', $user_array['User']);
-    }
-
-    parent::beforeFilter();
-  }
-
-  function checkDatabaseVersion()
-  {
-    $dbv = $this->SysParameter->getDatabaseVersion();
-
-    if('A' == $this->Auth->user('role') && 
-      Configure::read('DATABASE_VERSION') > $dbv) 
+    /* protected __construct() {{{ */
+    /**
+     * __construct constructor function
+     *
+     * @access protected
+     * @return void
+     */
+    public function __construct()
     {
-      $flashMessage  = "<span class='notice'>Your database version is older than the current version. ";
-      $flashMessage .= "Please do the <a href=" . $this->webroot ."upgrade" .">upgrade</a>.</span>";
-      $this->Session->setFlash($flashMessage);
+        parent::__construct();
     }
-  }
+    /* }}} */
 
-  function __setAccess()
-	{
-		$access = $this->sysContainer->getAccessFunctionList();
-		if (!empty($access)){
-			$this->set('access', $access);
-		}
-	}
+    /* public beforeFilter() {{{ */
+    /**
+     * beforeFilter function called before filter
+     *
+     * @access public
+     * @return void
+     */
+    public function beforeFilter()
+    {
+        // backward compatible with original ipeer hash  method
+        Security::setHash('md5');
+        Configure::write('Security.salt', '');
 
-	function __setActions()
-	{
-		$actionList = $this->sysContainer->getActionList();
-		if (!empty($actionList)){
-			$this->set('action', $actionList);
-		}
-	}
+        // set default language for now
+        Configure::write('Config.language', 'eng');
 
-	function __setCourses()
-	{
-		$coursesList = $this->sysContainer->getMyCourseList();
+        User::store($this->Auth->user());
 
-		if (!empty($coursesList)){
-			$this->set('coursesList', $coursesList);
-		}
-	}
+        if ($this->Auth->isAuthorized()) {
+            //    $this->AccessControl->check('controllers/'.ucwords($this->params['controller']).'/'.$this->params['action']);
 
-	function extractModel($model,$array,$field)
-	{
-		$return = array();
-		foreach ($array as $row)
-      array_push($return,$row[$model][$field]);
-		return $return;
-	}
+            $this->checkAccess();
+            $this->checkDatabaseVersion();
 
-	function checkAccess()
-	{
-		//$this->rdAuth->loadFromSession();
-		/*if($this->Session->check('ipeerSession') && $this->Session->valid('ipeerSession')) {
-			$this->Auth->id = $this->Session->read('ipeerSession.id');
-			$this->username = $this->Session->read('ipeerSession.username');
-			$this->fullname = $this->Session->read('ipeerSession.fullname');
-			$this->role = $this->Session->read('ipeerSession.role');
-			$this->email = $this->Session->read('ipeerSession.email');
-			$this->customIntegrateCWL = $this->Session->read('ipeerSession.customIntegrateCWL');
-			$this->courseId = $this->Session->read('ipeerSession.courseId');
-		}*/
-
-    // Used when error messasges are displayed, just let cake display them.
-    // No controller -> no security risk.
-    if (empty($this->params)) {
-      return true;
-    }
-
-		//set access function list
-		$this->__setAccess();
-		$this->__setActions();
-		$this->__setCourses();
-
-		// Enable for debug output
-		//$a=print_r($this->rdAuth,true);echo "<pre>$a</pre>";
-
-		//Save the current URL in session
-		$pass = (!empty($this->params['pass'])) ? join('/',$this->params['pass']) : null;
-
-    $URL = $this->params['controller'].'/'.$this->params['action'].'/'.$pass;
-		//$a=print_r($this->rdAuth,true);echo "<pre>$a</pre>";
-		//check if user not logined
-		if ($this->params['controller']=='' || $this->params['controller']=="loginout" || $this->params['controller']=="install")
-		{
-			//$this->set('rdAuth',$this->rdAuth);
-
-		}/* else {
-      //Check whether the user is current login yet
-      $role = $this->Auth->user('role');
-      if (!isset($role)){
-        $this->Session->write('URL', $URL);
-        $this->Session->write('AccessErr', 'NO_LOGIN');
-        $this->redirect(array('controller' => 'Users',
-                              'action'     => 'login'));
-        exit;
-      }
-
-      //check permission
-      $functions = $this->sysContainer->getActionList();
-
-      $url = $this->params['url']['url'];
-      // Cut a trailing shash in url if it exists
-      if ($url[strlen($url) - 1] == "/") {
-        $url = substr($url, 0, (-1) );
-      }
-
-      $allowedExplicitly = false;
-      $allowedByEntry = "";
-      // First, check that this URL has been explicitly specified in Sys functions table.
-      foreach ($functions as $func) {
-        if ($func['url_link'] === $url) {
-          $allowedExplicitly = true;
-          $allowedByEntry = $url;
-          break;
+            // pass user variable to view
+            // Replace with User::get() function, can be used anywhere
+            //      $user_array = $this->Auth->user();
+            //      $this->set('user', $user_array['User']);
         }
-      }
 
-      // If not allower explicitly, check in allowed by controller
-      $allowedByControllerEntry = false;
+        parent::beforeFilter();
+    }
+    /* }}} */
 
-      if (!$allowedExplicitly) {
+    /* public checkDatabaseVersion() {{{ */
+    /**
+     * checkDatabaseVersion
+     *
+     * @access public
+     * @return void
+     */
+    public function checkDatabaseVersion()
+    {
+        $dbv = $this->SysParameter->getDatabaseVersion();
+
+        if ('A' == $this->Auth->user('role') &&
+            Configure::read('DATABASE_VERSION') > $dbv) {
+            $flashMessage  = "<span class='notice'>Your database version is older than the current version. ";
+            $flashMessage .= "Please do the <a href=" . $this->webroot ."upgrade" .">upgrade</a>.</span>";
+            $this->Session->setFlash($flashMessage);
+        }
+    }
+    /* }}} */
+
+    /* protected _setAccess() {{{ */
+    /**
+     * _setAccess set access for current user
+     *
+     * @access protected
+     * @return void
+     */
+    protected function _setAccess()
+    {
+        $access = $this->sysContainer->getAccessFunctionList();
+        if (!empty($access)) {
+            $this->set('access', $access);
+        }
+    }
+    /* }}} */
+
+    /* protected _setActions() {{{ */
+    /**
+     * _setActions
+     *
+     * @access protected
+     * @return void
+     */
+    protected function _setActions()
+    {
+        $actionList = $this->sysContainer->getActionList();
+        if (!empty($actionList)) {
+            $this->set('action', $actionList);
+        }
+    }
+    /* }}} */
+
+    /* protected _setCourses() {{{ */
+    /**
+     * _setCourses
+     *
+     * @access protected
+     * @return void
+     */
+    protected function _setCourses()
+    {
+        $coursesList = $this->sysContainer->getMyCourseList();
+
+        if (!empty($coursesList)) {
+            $this->set('coursesList', $coursesList);
+        }
+    }
+    /* }}} */
+
+    /* public extractModel($model,$array,$field) {{{ */
+    /**
+     * extractModel extract the model
+     *
+     * @param mixed $model model name
+     * @param mixed $array model of array
+     * @param mixed $field field
+     *
+     * @access public
+     * @return void
+     */
+    public function extractModel($model,$array,$field)
+    {
+        $return = array();
+        foreach ($array as $row) {
+            array_push($return, $row[$model][$field]);
+        }
+
+        return $return;
+    }
+    /* }}} */
+
+    /* public checkAccess() {{{ */
+    /**
+     * checkAccess checking access
+     *
+     * @access public
+     * @return void
+     */
+    public function checkAccess()
+    {
+        //$this->rdAuth->loadFromSession();
+        /*if($this->Session->check('ipeerSession') &&
+         * $this->Session->valid('ipeerSession')) {
+            $this->Auth->id = $this->Session->read('ipeerSession.id');
+            $this->username = $this->Session->read('ipeerSession.username');
+            $this->fullname = $this->Session->read('ipeerSession.fullname');
+            $this->role = $this->Session->read('ipeerSession.role');
+            $this->email = $this->Session->read('ipeerSession.email');
+            $this->customIntegrateCWL = $this->Session->read('ipeerSession.customIntegrateCWL');
+            $this->courseId = $this->Session->read('ipeerSession.courseId');
+        }*/
+
+        // Used when error messasges are displayed, just let cake display them.
+        // No controller -> no security risk.
+        if (empty($this->params)) {
+            return true;
+        }
+
+        //set access function list
+        $this->_setAccess();
+        $this->_setActions();
+        $this->_setCourses();
+
+        // Enable for debug output
+        //$a=print_r($this->rdAuth,true);echo "<pre>$a</pre>";
+
+        //Save the current URL in session
+        $pass = (!empty($this->params['pass'])) ? join('/', $this->params['pass']) : null;
+
+        $url = $this->params['controller'].'/'.$this->params['action'].'/'.$pass;
+        //$a=print_r($this->rdAuth,true);echo "<pre>$a</pre>";
+        //check if user not logined
+        if ($this->params['controller']==''
+            || $this->params['controller']=="loginout"
+            || $this->params['controller']=="install"
+        ) {
+            //$this->set('rdAuth',$this->rdAuth
+        }/* else {
+            //Check whether the user is current login yet
+            $role = $this->Auth->user('role');
+            if (!isset($role)){
+                $this->Session->write('URL', $url);
+                $this->Session->write('AccessErr', 'NO_LOGIN');
+                $this->redirect(array('controller' => 'Users',
+                    'action'     => 'login'));
+                exit;
+        }
+
+        //check permission
+        $functions = $this->sysContainer->getActionList();
+
+        $url = $this->params['url']['url'];
+        // Cut a trailing shash in url if it exists
+        if ($url[strlen($url) - 1] == "/") {
+            $url = substr($url, 0, (-1) );
+        }
+
+        $allowedExplicitly = false;
+        $allowedByEntry = "";
+        // First, check that this URL has been explicitly specified in Sys functions
+        // table.
         foreach ($functions as $func) {
-          if ($func['controller_name'] === $this->params['controller']) {
-            $allowedByControllerEntry = true;
-            $allowedByEntry = $this->params['controller'];
-            break;
-          }
+            if ($func['url_link'] === $url) {
+                $allowedExplicitly = true;
+                $allowedByEntry = $url;
+                break;
+            }
         }
-      }
+
+        // If not allower explicitly, check in allowed by controller
+        $allowedByControllerEntry = false;
+
+        if (!$allowedExplicitly) {
+            foreach ($functions as $func) {
+                if ($func['controller_name'] === $this->params['controller']) {
+                    $allowedByControllerEntry = true;
+                    $allowedByEntry = $this->params['controller'];
+                    break;
+                }
+            }
+        }
 
 
-      // Debug output: Display how this page was allowed.
-      if ($allowedExplicitly){
-        $this->set("allowedBy", "<span style='color:green'>Allowed Explicitly by <u>$allowedByEntry</u> entry in SysFunctions. </span>");
-      } else if ($allowedByControllerEntry) {
-        $this->set("allowedBy", "<span style='color:darkblue'>Allowed Implicitly by a controller <u>$allowedByEntry</u> entry in SysFunctions. </span>");
-      }
+        // Debug output: Display how this page was allowed.
+        if ($allowedExplicitly){
+            $this->set("allowedBy", "<span style='color:green'>Allowed Explicitly by <u>$allowedByEntry</u> entry in SysFunctions. </span>");
+        } else if ($allowedByControllerEntry) {
+            $this->set("allowedBy", "<span style='color:darkblue'>Allowed Implicitly by a controller <u>$allowedByEntry</u> entry in SysFunctions. </span>");
+        }
 
-      // Rdirect the user away if they have no permission to render this page.
-      if (!$allowedExplicitly && !$allowedByControllerEntry) {
-        $this->redirect('home/index');
-        exit;
-      }
+        // Rdirect the user away if they have no permission to render this page.
+        if (!$allowedExplicitly && !$allowedByControllerEntry) {
+            $this->redirect('home/index');
+            exit;
+        }
 
-      //render the authorized controller
-      $this->set('rdAuth',$this->rdAuth);
-      $this->set('sysContainer', $this->sysContainer);
-      $this->set('Output', $this->Output);
+        //redirectnder the authorized controller
+        $this->set('rdAuth',$this->rdAuth);
+        $this->set('sysContainer', $this->sysContainer);
+        $this->set('Output', $this->Output);
 
-      $this->Session->delete('URL');
-    }*/
-    return true;
-  }
+        $this->Session->delete('URL');
+        }*/
+            return true;
+    }
+    /* }}} */
 
-  function _sendEmail($content,$subject,$from,$to, $templateName = 'default', $cc = array(),$bcc= array()) {
-    $smtp['port'] = $this->sysContainer->getParamByParamCode('email.port');
-    $smtp['host'] = $this->sysContainer->getParamByParamCode('email.host');
-    $smtp['username'] = $this->sysContainer->getParamByParamCode('email.username');
-    $smtp['password'] = $this->sysContainer->getParamByParamCode('email.password');
-    
-    $this->Email->reset();
+    /* protected _sendEmail($content,$subject,$from,$to, $templateName = 'default', $cc = array(),$bcc= array()) {{{ */
+    /**
+     * _sendEmail send email wrapper
+     *
+     * @param mixed $content      email body
+     * @param mixed $subject      email subject
+     * @param mixed $from         sender address
+     * @param mixed $to           receiver address
+     * @param bool  $templateName email template name
+     * @param bool  $cc           cc field
+     * @param bool  $bcc          bcc field
+     *
+     * @access protected
+     * @return void
+     */
+    protected function _sendEmail($content,$subject,$from,$to, $templateName = 'default', $cc = array(),$bcc= array())
+    {
+        $smtp['port'] = $this->sysContainer->getParamByParamCode('email.port');
+        $smtp['host'] = $this->sysContainer->getParamByParamCode('email.host');
+        $smtp['username'] = $this->sysContainer->getParamByParamCode('email.username');
+        $smtp['password'] = $this->sysContainer->getParamByParamCode('email.password');
 
-    $this->Email->smtpOptions = array(
-      'port'=>$smtp['port']['parameter_value'],
-      'timeout'=>'30',
-      'host' => $smtp['host']['parameter_value'],
-      'username'=>$smtp['username']['parameter_value'],
-      'password'=>$smtp['password']['parameter_value'],
-    );
-    
-    $this->Email->delivery = 'smtp';
-    $this->Email->to = $to;
-    $this->Email->cc = $cc;
-    $this->Email->bcc = $bcc;
-    $this->Email->subject = $subject;
-    $this->Email->from = $from;
-    $this->Email->template = $templateName;
-    $this->Email->sendAs = 'both';
-    
-    return $this->Email->send($content);
-  }
+        $this->Email->reset();
+
+        $this->Email->smtpOptions = array(
+            'port'=>$smtp['port']['parameter_value'],
+            'timeout'=>'30',
+            'host' => $smtp['host']['parameter_value'],
+            'username'=>$smtp['username']['parameter_value'],
+            'password'=>$smtp['password']['parameter_value'],
+        );
+
+        $this->Email->delivery = 'smtp';
+        $this->Email->to = $to;
+        $this->Email->cc = $cc;
+        $this->Email->bcc = $bcc;
+        $this->Email->subject = $subject;
+        $this->Email->from = $from;
+        $this->Email->template = $templateName;
+        $this->Email->sendAs = 'both';
+
+        return $this->Email->send($content);
+    }
+    /* }}} */
 }
-?>

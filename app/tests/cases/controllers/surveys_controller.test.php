@@ -112,7 +112,7 @@ class SurveyControllerTest extends CakeTestCase {
    // var_dump($result);
   }  
   
-    function testAddQuestion() {
+    function testEditQuestion() {
     //$result = $this->testAction('surveys/editQuestion/1/1', array('connection' => 'test_suite', 'return' => 'vars'));
    // var_dump($result);
   }  

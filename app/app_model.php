@@ -1,51 +1,100 @@
-<?php 
+<?php
 App::import('Lib', 'Toolkit');
 
-class AppModel extends Model {
-  var $errorMessage = array();
-  var $insertedIds = array();
+/**
+ * AppModel
+ *
+ * @uses Model
+ * @package App
+ * @author  Pan Luo <pan.luo@ubc.ca>
+ */
+class AppModel extends Model
+{
+    protected $errorMessage = array();
+    protected $insertedIds = array();
 
-  function afterSave($created) {
-    if($created) {
-      $this->insertedIds[] = $this->getInsertID();
+    /* public afterSave($created) {{{ */
+    /**
+     * afterSave callback for after the save function
+     *
+     * @param mixed $created if the record has been created
+     *
+     * @access public
+     * @return void
+     */
+    function afterSave($created)
+    {
+        if ($created) {
+            $this->insertedIds[] = $this->getInsertID();
+        }
+
+        return true;
     }
+    /* }}} */
 
-    return true;
-  }
-
-  function __construct($id = false, $table = null, $ds = null) {
-    parent::__construct($id, $table, $ds);
-  }
-
-  function save($data = null, $validate = true, $fieldList = array()) {
-    //clear modified field value before each save
-    if (isset($this->data) && isset($this->data[$this->alias]))
-      unset($this->data[$this->alias]['modified']);
-    if (isset($data) && isset($data[$this->alias]))
-      unset($data[$this->alias]['modified']);
-
-    return parent::save($data, $validate, $fieldList);
-  }
-
-
-  /**
-    * showErrors itterates through the errors array
-    * and returns a concatinated string of errors sepearated by
-    * the $sep
-    *
-    * @param string $sep A seperated defaults to <br />
-    * @return string
-    * @access public
-    */
-  function showErrors($sep = "<br />"){
-    $retval = "";
-    foreach($this->errorMessage as $key => $error){
-      if(!is_numeric($key)) {
-        $error = $key.': '.$error;
-      }
-      $retval .= "$error $sep";
+    /* protected __construct($id = false, $table = null, $ds = null) {{{ */
+    /**
+     * __construct constructor function
+     *
+     * @param bool $id    the id
+     * @param bool $table table
+     * @param bool $ds    ds
+     *
+     * @access protected
+     * @return void
+     */
+    function __construct($id = false, $table = null, $ds = null)
+    {
+        parent::__construct($id, $table, $ds);
     }
+    /* }}} */
 
-    return $retval;
-  }
+    /* public save($data = null, $validate = true, $fieldList = array()) {{{ */
+    /**
+     * save override save function
+     *
+     * @param bool $data      data to be saved
+     * @param bool $validate  is validated
+     * @param bool $fieldList the list of fields
+     *
+     * @access public
+     * @return void
+     */
+    function save($data = null, $validate = true, $fieldList = array())
+    {
+        //clear modified field value before each save
+        if (isset($this->data) && isset($this->data[$this->alias])) {
+            unset($this->data[$this->alias]['modified']);
+        }
+        if (isset($data) && isset($data[$this->alias])) {
+            unset($data[$this->alias]['modified']);
+        }
+
+        return parent::save($data, $validate, $fieldList);
+    }
+    /* }}} */
+
+
+    /**
+     * showErrors itterates through the errors array
+     * and returns a concatinated string of errors sepearated by
+     * the $sep
+     *
+     * @param string $sep A seperated defaults to <br />
+     *
+     * @return string
+     * @access public
+     */
+    function showErrors($sep = "<br />")
+    {
+        $retval = "";
+        foreach ($this->errorMessage as $key => $error) {
+            if (!is_numeric($key)) {
+                $error = $key.': '.$error;
+            }
+            $retval .= "$error $sep";
+        }
+
+        return $retval;
+    }
 }
