@@ -28,6 +28,10 @@ class InstallHelperComponent
       $dbConfig['filename'] = $basicSQLFile;
       $runQuery = $this->dbSource($dbConfig);
     }
+    else
+    {
+      return "Invalid database data setup option.";
+    }
 
     return $runQuery; 
   }

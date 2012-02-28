@@ -38,45 +38,71 @@ if(!Configure::read('debug') == 0 &&
   <h5>$user variable</h5>
   <pre style="background-color:#E9FFFF;" id="user-data" >
 <?php 
-    User::isLoggedIn() ?
-      print_r(User::getInstance()) :
-      print_r(__("(Empty)", true));
+  // echo prevent the use of the short form conditional operator for some reason
+  if (User::isLoggedIn())
+  { // escape html so they're not interpreted by the browser
+    echo htmlspecialchars(print_r(User::getInstance(), true));
+  }
+  else
+  {
+    print_r(__("(Empty)", true));
+  }
     ?>
   </pre>
 
   <h5>$coursesList variable</h5>
   <pre style="background-color:#FFE9FF;" id="coursesList-data" >
 <?php 
-    empty($courseList) ?
-      print_r(__("(Empty)", true)) :
-      print_r($courseList);
+    if (empty($courseList))
+    {
+      print_r(__("(Empty)", true));
+    }
+    else
+    {
+      echo htmlspecialchars(print_r($courseList, true));
+    }
     ?>
   </pre>
 
   <h5>$actions variable</h5>
   <pre style="background-color:#FFFFE9;" id="actions-data" >
 <?php 
-    empty($action) ?
-      print_r(__("(Empty)", true)) :
-      print_r($action);
+    if (empty($action))
+    {
+      print_r(__("(Empty)", true));
+    }
+    else
+    {
+      echo htmlspecialchars(print_r($action, true));
+    }
     ?>
   </pre>
 
   <h5>$access variable</h5>
   <pre style="background-color:#E9FFFF;" id="access-data" >
 <?php 
-    empty($access) ?
-      print_r(__("(Empty)", true)) :
-      print_r($access);
+    if (empty($access))
+    {
+      print_r(__("(Empty)", true));
+    }
+    else
+    {
+      echo htmlspecialchars(print_r($access, true));
+    }
     ?>
   </pre>
 
   <h5>$this->params variable</h5>
   <pre style="background-color:#FFE9FF;" id="params-data" >
 <?php 
-    empty($this->params) ?
-      print_r(__("(Empty)", true)) :
-      print_r($this->params);
+    if (empty($this->params))
+    {
+      print_r(__("(Empty)", true));
+    }
+    else
+    {
+      echo htmlspecialchars(print_r($this->params, true));
+    }
     ?>
   </pre>
 
@@ -86,9 +112,14 @@ if(!Configure::read('debug') == 0 &&
     if ($this->params['controller'] != 'install')
     {
       $dataSource = ConnectionManager::getDataSource('default');
-      empty($dataSource) ?
-        print_r(__("(No SQL Data)", true)) :
+      if (empty($dataSource))
+      {
+        print_r(__("(No SQL Data)", true));
+      }
+      else
+      {
         $dataSource->showLog();
+      }
     }
     else
     {
@@ -100,9 +131,14 @@ if(!Configure::read('debug') == 0 &&
   <h5>$allowedBy variable</h5>
   <pre style="background-color: #E9FFFF;" id="allowedBy-data" >
 <?php 
-    empty($allowedBy) ?
-      print_r(__("(Empty)", true)) :
-      print_r($allowedBy);
+    if (empty($allowedBy))
+    {
+      print_r(__("(Empty)", true));
+    }
+    else
+    {
+      echo htmlspecialchars(print_r($allowedBy, true));
+    }
     ?>
   </pre>
 </div>

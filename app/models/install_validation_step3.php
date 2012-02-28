@@ -3,7 +3,7 @@
  * This is a dummy model class used only for validating the
  * database configuration form during installation.
  * */
-class InstallValidation extends AppModel
+class InstallValidationStep3 extends AppModel
 {
   var $useTable = false;
   var $_schema = array(

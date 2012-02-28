@@ -1,5 +1,4 @@
 *.swp
-database.php
 installed.txt
 app/tmp/
 app/config/bootstrap.local.php
