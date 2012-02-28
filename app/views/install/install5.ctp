@@ -1,24 +1,15 @@
-
-<table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" align="center">
-<tr>
-<td align="center">
-  <br>
-<table width="95%"  border="0" cellspacing="2" cellpadding="4">
-  <tr>
-    <td>&nbsp;</td>
-    <td></td>
-    <td>&nbsp;</td>
-  </tr>
-  <tr>
-    <td colspan="3" align="center">
-    <?php __('Configuration!')?> <a href="../home"><?php __('iPeer sucessfully installed!')?></a><br /><br/>
-    <?php if($config_writable):?>
-      <font color="red"><?php __('Important!!!')?> </font> <?php __('Your configuration directory (app/config) is still writable. Please change it to read only.')?><br /><br/>
-    <?php endif;?>
-    <?php __('You may now login as')?> '<?php echo $superAdmin ?>'. <br/><br/>
-		<?php __("If you chose to install example data, you can login all user accounts using password 'ipeer'")?></p></span>
-    </td>
-  </tr>
-</table>
-</td></tr>
-</table>
+<div class='install'>
+  <h3>iPeer Installation Complete!</h3>
+  <p>
+    Try logging in with your superadmin account: 
+    <?php echo $this->Html->link('iPeer Home', '/home'); ?>
+  </p>
+  <h4>Installation Notes</h4>
+  <p>
+    <span class='red'><?php __('Important!')?></span>
+    <?php __('For security reasons, please set the configuration directory ('.CONFIGS.') and database.php ('.CONFIGS.'database.php) back to read only.')?>
+  </p>
+  <p>
+  <?php __("If you opted to install with example data, you can login to the example user accounts with the password 'ipeer'")?>
+  </p>
+</div>

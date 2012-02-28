@@ -4,7 +4,7 @@
 
 <?php 
 echo $this->Form->create(
-  'InstallValidation',
+  'InstallValidationStep3',
   array('url' => '/install/install3')
 ); 
 ?>

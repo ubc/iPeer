@@ -12,13 +12,14 @@ function get_php_setting($val) {
 	return $r ? 'ON' : 'OFF';
 }
 
-$no = '<b><font color="red">'.__('No', true).'</font></b>';
-$yes = '<b><font color="green">'.__('Yes', true).'</font></b>';
+$no = '<b class="red">'.__('No', true).'</b>';
+$yes = '<b class="green">'.__('Yes', true).'</b>';
 
 // mandatory requirements init
 $phpver = $no;
 $REQPHPVER = '5.0';
 $mysql = $no;
+$configwritable = $no;
 $dbconfig = $no;
 
 // optional requirements init
@@ -33,6 +34,10 @@ if (version_compare(phpversion(), $REQPHPVER) >= 0)
 if (function_exists('mysql_connect'))
 {
   $mysql = $yes;
+}
+if (is_writable(CONFIGS))
+{
+  $configwritable = $yes;
 }
 if (is_writable(CONFIGS.'database.php'))
 {
@@ -92,11 +97,11 @@ foreach ($php_recommended_settings as &$setting)
   $actual = get_php_setting($setting['directive']);
   if ($actual == $setting['recommend'])
   {
-    $setting['actual'] = "<font color='green'><b>".$actual."</b></font>";
+    $setting['actual'] = "<b class='green'>".$actual."</b>";
   }
   else
   {
-    $setting['actual'] = "<font color='red'><b>".$actual."</b></font>";
+    $setting['actual'] = "<b class='red'>".$actual."</b>";
   }
 }
 
@@ -115,6 +120,10 @@ foreach ($php_recommended_settings as &$setting)
   <tr>
     <td><?php __('MySQL support')?></td>
     <td><?php echo $mysql; ?></td>
+  </tr>
+  <tr>
+    <td><?php __('Directory app/config writable ')?></td>
+    <td><?php echo $configwritable; ?></td>
   </tr>
   <tr>
     <td><?php __('File app/config/database.php writable ')?></td>

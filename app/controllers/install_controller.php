@@ -24,7 +24,10 @@
  */
 class InstallController extends Controller
 {
-  var $uses         = array('InstallValidation'); 
+  var $uses         = array(
+    'InstallValidationStep3',
+    'InstallValidationStep4'
+  ); 
   var $components   = array(
                       'Output', 
                       'Session',
@@ -66,16 +69,16 @@ class InstallController extends Controller
   {
     if (!is_writable(CONFIGS.'database.php'))
     {
-      $this->Session->setFlash(__('Cannot write to the database configuration file. Please change the permission on app/config/database.php so that it is writable.', true));
+      $this->Session->setFlash(__('Cannot write to the database configuration file. Please change the permission on '.CONFIGS.'/database.php so that it is writable.', true));
     }
   
     if ($this->data)
     { // we have data submitted
-      $this->InstallValidation->set($this->data);
-      if (!$this->InstallValidation->validates())
+      $this->InstallValidationStep3->set($this->data);
+      if (!$this->InstallValidationStep3->validates())
       { // fails validation
         $this->Session->setFlash(__('Please fill in all fields.',true));
-        $errors = $this->InstallValidation->invalidFields();
+        $errors = $this->InstallValidationStep3->invalidFields();
         return;
       }
 
@@ -99,20 +102,75 @@ class InstallController extends Controller
    * */
   function install4()
   { 
-    // Try to patch the database if needed, note that this database patching
-    // is only for small changes, not for large version changes
-    $ret = $this->patchDB();
-    if ($ret)
+    if (!is_writable(CONFIGS))
     {
-      $this->Session->setFlash(__('Database patching failed - '.$ret, true));
-      $this->redirect(array('action' => 'install3'));
-      return;
+      $this->Session->setFlash(__('Cannot write to the configuration directory. Please change the permission on '.CONFIGS.' so that it is writable.', true));
     }
 
-    // Set variables needed to render the page
-    $this->set('absolute_url', str_replace($this->here,'',
-      Router::url($this->here, true)));
-    $this->set('domain_name', $_SERVER['HTTP_HOST']);
+    if ($this->data)
+    { // we have data submitted
+      // Set variables needed to render the page
+      $this->set('absolute_url', 
+        $this->data['InstallValidationStep4']['absolute_url']);
+      $this->set('domain_name', 
+        $this->data['InstallValidationStep4']['domain']);
+
+      $this->InstallValidationStep4->set($this->data);
+      if (!$this->InstallValidationStep4->validates())
+      { // fails validation
+        $this->Session->setFlash(__('Please fill in all fields.',true));
+        $errors = $this->InstallValidationStep4->invalidFields();
+        return;
+      }
+
+      // validation successful
+      $this->createSuperAdmin(
+        $this->data['InstallValidationStep4']['super_admin'],
+        $this->data['InstallValidationStep4']['password'],
+        $this->data['InstallValidationStep4']['admin_email']
+      );
+
+      //update parameters
+      $sysparams = array(
+        'SysParameter' => array(
+          'system.absolute_url' => $this->data['InstallValidationStep4']['absolute_url'],
+          'system.domain' => $this->data['InstallValidationStep4']['domain'],
+          'system.super_admin' => $this->data['InstallValidationStep4']['super_admin'],
+          'system.admin_email' => $this->data['InstallValidationStep4']['admin_email'],
+          'display.login_text' => $this->data['InstallValidationStep4']['login_text'],
+          'display.contact_info' => $this->data['InstallValidationStep4']['contact_info'],
+        )
+      );
+      $this->installHelper->updateSystemParameters($sysparams);
+      // mark this instance as installed
+      $f = fopen(CONFIGS.'installed.txt', 'w');
+      if (!$f)
+      {
+        $this->Session->setFlash(__('Installation failed, unable to write to '. CONFIGS .' dir'), true);
+        $this->redirect(array('action' => 'install4'));
+        return;
+      }
+      fclose($f);
+
+      // congratulate the user for a successful install
+      $this->redirect(array('action' => 'install5'));
+    }
+    else
+    {
+      // Try to patch the database if needed, note that this database patching
+      // is only for small changes, not for large version changes
+      $ret = $this->patchDB();
+      if ($ret)
+      {
+        $this->Session->setFlash(__('Database patching failed - '.$ret, true));
+        $this->redirect(array('action' => 'install3'));
+        return;
+      }
+      // Set variables needed to render the page
+      $this->set('absolute_url', str_replace($this->here,'',
+        Router::url($this->here, true)));
+      $this->set('domain_name', $_SERVER['HTTP_HOST']);
+    }
   }	
 
   /**
@@ -120,43 +178,7 @@ class InstallController extends Controller
    * */
   function install5()
   {
-    if (empty($this->params['data'])) 
-    {
-      $this->Session->setFlash(__('No iPeer configuration entered'), true);
-      $this->redirect(array('action' => 'install4'));
-      return;
-    }
-
-    //update parameters
-    $username = $this->installHelper->updateSystemParameters($this->params['data']);
-    // TODO Replace raw SQL queries with CakePHP Model calls once the database
-    // conflicts where both the users and roles_users table stores role data
-    // has been fixed
-    $this->set('superAdmin', $username);
-
-    //Create Super Admin
-    $my_db =& ConnectionManager::getDataSource('default');
-    $my_db->query("INSERT INTO `users` (`id`, `role`, `username`, `password`, `first_name`, `last_name`, `student_no`, `title`, `email`, `last_login`, `last_logout`, `last_accessed`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) 
-      VALUES ('1', 'A', '".$username."', '".md5($this->params['data']['Admin']['password'])."', 'Super', 'Admin', NULL, NULL, '".$this->params['data']['SysParameter']['system.admin_email']."', NULL, NULL, NULL, 'A', '0', '".date("Y-m-d H:i:s")."', NULL, NULL)
-      ON DUPLICATE KEY UPDATE password = '".md5($this->params['data']['Admin']['password'])."', email = '".$this->params['data']['SysParameter']['system.admin_email']."';");
-
-    //Get Super Admin's id and insert into roles_users table
-    $user_id = $my_db->query("SELECT id FROM users WHERE username = '".$username."'");
-    $my_db->query("INSERT INTO `roles_users` (`id`, `role_id`, `user_id`, `created`, `modified`)
-      VALUES (NULL, '1', '".$user_id[0]['users']['id']."', '".date("Y-m-d H:i:s")."', '".date("Y-m-d H:i:s")."');");
-
-    // test if the config directory is still writable by http user
-    $this->set('config_writable', $writable = is_writable("../config"));
-
-    $f = fopen(CONFIGS.'installed.txt', 'w');
-    if (!$f)
-    {
-      $this->Session->setFlash(__('Installation failed, unable to write to '. CONFIGS .' dir'), true);
-      $this->redirect(array('action' => 'install4'));
-      return;
-    }
-    fclose($f);
-  }
+  } 
 
   function gpl()
   {
@@ -174,7 +196,7 @@ class InstallController extends Controller
     }
 
     // Get the data setup option: A-With Sample,B-Basic,C-Import from iPeer 1.6
-    $dbConfig['data_setup_option'] = $this->params['form']['data_setup_option'];
+    $dbConfig['data_setup_option'] = $this->data['InstallValidationStep3']['data_setup_option'];
     $ret = $this->installHelper->runInsertDataStructure($dbConfig);
 
     //Found error
@@ -199,10 +221,10 @@ class InstallController extends Controller
     }
     $dbConfig = array();
     //Setup the database config parameters
-    $dbConfig['host'] = $this->data['InstallValidation']['host'];
-    $dbConfig['login'] = $this->data['InstallValidation']['login'];
-    $dbConfig['password'] = $this->data['InstallValidation']['password'];
-    $dbConfig['database'] = $this->data['InstallValidation']['database'];
+    $dbConfig['host'] = $this->data['InstallValidationStep3']['host'];
+    $dbConfig['login'] = $this->data['InstallValidationStep3']['login'];
+    $dbConfig['password'] = $this->data['InstallValidationStep3']['password'];
+    $dbConfig['database'] = $this->data['InstallValidationStep3']['database'];
 
     //Write Config file
     fwrite($confile, "<?php" . $endl);
@@ -230,7 +252,11 @@ class InstallController extends Controller
   {
     // using the SysParameter model directly as bringing in sysContainer
     // introduces seemingly random bugs due to its use of sessions
-    $this->loadModel('SysParameter');
+    $ret = $this->loadModel('SysParameter');
+    if ($ret !== true)
+    { // failed to load model
+      return false;
+    }
     $dbv = $this->SysParameter->getDatabaseVersion();
 
     // Run the patcher
@@ -242,6 +268,24 @@ class InstallController extends Controller
 
     return false;
   }
+
+  private function createSuperAdmin($username, $password, $email)
+  {
+    // TODO Replace raw SQL queries with CakePHP Model calls once the database
+    // conflicts where both the users and roles_users table stores role data
+    // has been fixed
+    //Create Super Admin
+    $my_db =& ConnectionManager::getDataSource('default');
+    $my_db->query("INSERT INTO `users` (`id`, `role`, `username`, `password`, `first_name`, `last_name`, `student_no`, `title`, `email`, `last_login`, `last_logout`, `last_accessed`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) 
+      VALUES ('1', 'A', '".$username."', '".md5($password)."', 'Super', 'Admin', NULL, NULL, '".$email."', NULL, NULL, NULL, 'A', '0', '".date("Y-m-d H:i:s")."', NULL, NULL)
+      ON DUPLICATE KEY UPDATE password = '".md5($password)."', email = '".$email."';");
+
+    //Get Super Admin's id and insert into roles_users table
+    $user_id = $my_db->query("SELECT id FROM users WHERE username = '".$username."'");
+    $my_db->query("INSERT INTO `roles_users` (`id`, `role_id`, `user_id`, `created`, `modified`)
+      VALUES (NULL, '1', '".$user_id[0]['users']['id']."', '".date("Y-m-d H:i:s")."', '".date("Y-m-d H:i:s")."');");
+  }
+
 }
 
 ?>
