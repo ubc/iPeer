@@ -1738,8 +1738,8 @@ class EvaluationComponent extends Object
 
         // Sort the resultant array by question number
         $count = 1;
-        for ($i=0; $i<=$tmp['count']; $i++) {
-            for ($j=0; $j<$tmp['count']; $j++) {
+        for ($i = 0; $i <= count($tmp); $i++) {
+            for ($j=0; $j<count($tmp); $j++) {
                 if ($i == $tmp[$j]['Question']['number']) {
                     $questions[$count]['Question'] = $tmp[$j]['Question'];
                     $count++;
@@ -1775,8 +1775,8 @@ class EvaluationComponent extends Object
 
         // Sort the resultant array by question number
         $count = 1;
-        for ($i=0; $i<=$tmp['count']; $i++) {
-            for ($j=0; $j<$tmp['count']; $j++) {
+        for ($i=0; $i<=count($tmp); $i++) {
+            for ($j=0; $j<count($tmp); $j++) {
                 if ($i == $tmp[$j]['Question']['number']) {
                     $questions[$count]['Question'] = $tmp[$j]['Question'];
                     $count++;
@@ -1849,8 +1849,8 @@ class EvaluationComponent extends Object
 
         // Sort the resultant array by question number
         $count = 1;
-        for ($i=0; $i<=$tmp['count']; $i++) {
-            for ($j=0; $j<$tmp['count']; $j++) {
+        for ($i=0; $i<=count($tmp); $i++) {
+            for ($j=0; $j<count($tmp); $j++) {
                 if ($i == $tmp[$j]['Question']['number']) {
                     $questions[$count]['Question'] = $tmp[$j]['Question'];
                     $count++;

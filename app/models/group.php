@@ -181,17 +181,21 @@ class Group extends AppModel
      */
     function getStudentsNotInGroup($group_id, $type = 'all')
     {
-        return $this->Member->getStudentsNotInGroup($group_id, $type);
-        $students = $this->getMembersByGroupId($group_id, 'list');
-        return $this->Course->Enrol->find(
-            $type,
-            array(
-                'conditions' => array(
-                    'Group.id' => $group_id,
-                    'NOT' => array('Enrol.id' => array_keys($students))
-                )
-            )
-        );
+        $students = $this->getMembersByGroupId($group_id, 'all');
+        $students = Set::extract('/Member/id', $students);
+
+        $course = $this->Course->getCourseByGroupId($group_id);
+        if (empty($course)) {
+            return array();
+        }
+
+        return $this->Member->find($type, array(
+            'conditions' => array(
+                'NOT' => array('Member.id' => $students),
+                'Enrolment.id' => $course['Course']['id'],
+            ),
+            'contain' => array('Enrolment'),
+        ));
     }
 
     /**
@@ -204,7 +208,10 @@ class Group extends AppModel
      */
     function getMembersByGroupId($group_id, $type = 'all')
     {
-        return $this->Member->find($type, array('conditions' => array('Group.id' => $group_id)));
+        return $this->Member->find($type, array(
+            'conditions' => array('Group.id' => $group_id),
+            'contain' => 'Group')
+        );
     }
 
     /**
@@ -217,7 +224,7 @@ class Group extends AppModel
      */
     function getGroupByGroupId($groupId, $fields = null)
     {
-        return $this->find('all', array('conditions'=>array('Group.id'=>$groupId), 'fields' => $fields));
+        return $this->find('all', array('conditions' => array('Group.id' => $groupId), 'fields' => $fields));
     }
 
     /**
@@ -233,18 +240,4 @@ class Group extends AppModel
             'conditions' => array('Group.course_id' => $course_id)
         ));
     }
-
-    /**
-     * getGroupById
-     *
-     * @param int $groupId group id
-     *
-     * @access public
-     * @return void
-     */
-    function getGroupById($groupId)
-    {
-        return $this->find('first', array('conditions' => array('Group.id' => $groupId)));
-    }
-
 }

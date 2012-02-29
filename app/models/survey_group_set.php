@@ -79,7 +79,7 @@ class SurveyGroupSet extends AppModel
         }
         // begin transaction
         $dataSource = $this->getDataSource();
-        $DatetaSource->begin($this);
+        $dataSource->begin($this);
         if ($result = parent::save($data, $validate, $fieldList)) {
             if (isset($data['SurveyGroup'])) {
                 $SurveyGroup = ClassRegistry::init('SurveyGroup');

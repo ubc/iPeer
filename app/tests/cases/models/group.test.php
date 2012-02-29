@@ -1,7 +1,8 @@
 <?php
 App::import('Model', 'Group');
 
-class GroupTestCase extends CakeTestCase {
+class GroupTestCase extends CakeTestCase
+{
     public $name = 'Group';
     public $fixtures = array('app.course', 'app.role', 'app.user', 'app.group',
         'app.roles_user', 'app.event', 'app.event_template_type',
@@ -80,15 +81,15 @@ class GroupTestCase extends CakeTestCase {
 
         // Test group with some students in it
         $students = $this->Group->getStudentsNotInGroup(4);
-        $this->assertEqual(Set::extract('/Member/username', $students), array('StudentY'));
+        $this->assertEqual(Set::extract('/Member/username', $students), array('Peterson', 'StudentY'));
 
         // Test group with all students in it
-        $students = $this->Group->getStudentsNotInGroup(1);
+        $students = $this->Group->getStudentsNotInGroup(2);
         $this->assertEqual(Set::extract('/Member/username', $students), $empty);
 
         // Test group with no students in it
         $students = $this->Group->getStudentsNotInGroup(3);
-        $this->assertEqual(Set::extract('/Member/username', $students), array('StudentZ', 'StudentY'));
+        $this->assertEqual(Set::extract('/Member/username', $students), array('Peterson', 'StudentY', 'StudentZ'));
 
         // Test invalid group
         $students = $this->Group->getStudentsNotInGroup(999);
@@ -105,7 +106,9 @@ class GroupTestCase extends CakeTestCase {
 
         // Test group with students in it
         $students = $this->Group->getMembersByGroupId(1);
-        $this->assertEqual(Set::extract('/Member/username', $students), array('StudentZ', 'StudentY'));
+        $students = Set::extract('/Member/username', $students);
+        sort($students);
+        $this->assertEqual($students, array('StudentY', 'StudentZ'));
 
         // Test group with no students in it
         $students = $this->Group->getMembersByGroupId(3);

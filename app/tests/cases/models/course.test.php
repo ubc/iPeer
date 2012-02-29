@@ -224,7 +224,7 @@ class CourseTestCase extends CakeTestCase {
         $this->Course->deleteInstructor(999999, 2);
         $validCourseInstructor = $this->Course->getCourseByInstructor(2);
         $invalidCourseInstructor = $this->Course->getCourseByInstructor(999999);
-        $this->assertEqual($validCourseInstructor[2]['Course']['course'], 'Math321');
+        $this->assertEqual($validCourseInstructor[0]['Course']['course'], 'Math321');
         $this->assertEqual($invalidCourseInstructor, $empty);
 
 
@@ -586,12 +586,24 @@ class CourseTestCase extends CakeTestCase {
     function testGetCourseByCourse()
     {
         //test valid course
-
         $empty = null;
         $course = $this->Course->getCourseByCourse('Math100', array());
         $expected = 'Math100';
         $this->assertEqual($course[0]['Course']['course'], $expected);
+    }
 
+    function testGetCourseByGroupId()
+    {
+        $this->Course = ClassRegistry::init('Course');
+
+        //test valid group id
+        $empty = null;
+        $course = $this->Course->getCourseByGroupId(1);
+        $this->assertEqual($course['Course']['course'], 'Math303');
+
+        // invalid group id
+        $course = $this->Course->getCourseByGroupId(999);
+        $this->assertEqual($course, array());
     }
 
     function testDeleteAll()

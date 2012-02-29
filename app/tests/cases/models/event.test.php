@@ -4,7 +4,8 @@ App::import('Model', 'Event');
 class EventTestCase extends CakeTestCase
 {
     public $name = 'Event';
-    public $fixtures = array('app.course', 'app.role', 'app.user', 'app.group',
+    public $fixtures = array(
+        'app.course', 'app.role', 'app.user', 'app.group',
         'app.roles_user', 'app.event', 'app.event_template_type',
         'app.group_event', 'app.evaluation_submission',
         'app.survey_group_set', 'app.survey_group',
@@ -106,29 +107,8 @@ class EventTestCase extends CakeTestCase
 
     }
 
-    function testGetSurveyEventIdByCourseIdDescription()
-    {
-
-        $empty = null;
-        $this->Event = & ClassRegistry::init('Event');
-
-        //Test a valid course number
-        $event = $this->Event->getSurveyEventIdByCourseIdDescription(2, 'Event4');
-        $this->assertEqual($event['Event']['id'], 4);
-
-        //Test an invalid course number
-        $course = $this->Event->getSurveyEventIdByCourseIdDescription(999, 'Event4');
-        $this->assertEqual($course, $empty);
-
-        //Test an invalid event name
-        $course = $this->Event->getSurveyEventIdByCourseIdDescription(2, 'invalidName');
-        $this->assertEqual($course, $empty);
-
-    }
-
     function testGetActiveSurveyEvents()
     {
-
         $empty = null;
         $this->Event = & ClassRegistry::init('Event');
 
@@ -153,12 +133,10 @@ class EventTestCase extends CakeTestCase
      */
     function testRemoveEventsBySurveyId()
     {
-
     }
 
     function testCheckIfNowLate()
     {
-
         $late = $this->Event->checkIfNowLate(1);
         $this->assertTrue($late);
         $late = $this->Event->checkIfNowLate(2);
@@ -168,13 +146,11 @@ class EventTestCase extends CakeTestCase
         $this->assertFalse($late);
         $late = $this->Event->checkIfNowLate(null);
         $this->assertFalse($late);
-
     }
 
 
     function testGetUnassignedGroups()
     {
-
         $empty = null;
         $this->Event = & ClassRegistry::init('Event');
 

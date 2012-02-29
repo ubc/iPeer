@@ -121,16 +121,11 @@ class SurveyQuestionTestCase extends CakeTestCase
     {
         // Set question data
         $result = $this->SurveyQuestion->getQuestionsID(1);
-        $surveyQ1 = $result[0]['SurveyQuestion'];
-        $surveyQ2 = $result[1]['SurveyQuestion'];
-        $surveyQ3 = $result[2]['SurveyQuestion'];
-        $this->assertEqual($surveyQ1['question_id'], 1);
-        $this->assertEqual($surveyQ2['question_id'], 2);
-        $this->assertEqual($surveyQ3['question_id'], 6);
-        $this->assertEqual($result['count'], 3);
+        $this->assertEqual(Set::extract('/SurveyQuestion/question_id', $result), array(1,2,6));
+        $this->assertEqual(count($result), 3);
 
         $result = $this->SurveyQuestion->getQuestionsID(null);
-        $this->assertFalse($result);
+        $this->assertEqual($result, array());
 
     }
 

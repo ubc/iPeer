@@ -83,10 +83,10 @@ class EvaluationMixevalTestCase extends CakeTestCase
         $result = $this->EvaluationMixeval->getResultsDetailByEvaluatee(2, 1);
         // Assert the queried data matches with fixture data
         $this->assertTrue(!empty($result));
-        $this->assertTrue(!empty($result[0]['EvaluationMixevalDetail']));
         $this->assertTrue(!empty($result[1]['EvaluationMixevalDetail']));
-        $evalMixDetail1 = $result[0]['EvaluationMixevalDetail']['question_comment'];
-        $evalMixDetail2 = $result[1]['EvaluationMixevalDetail']['question_comment'];
+        $this->assertTrue(!empty($result[2]['EvaluationMixevalDetail']));
+        $evalMixDetail1 = $result[1]['EvaluationMixevalDetail']['question_comment'];
+        $evalMixDetail2 = $result[2]['EvaluationMixevalDetail']['question_comment'];
         $this->assertEqual($evalMixDetail1, 'Q1');
         $this->assertEqual($evalMixDetail2, 'Q2');
     }
@@ -111,7 +111,7 @@ class EvaluationMixevalTestCase extends CakeTestCase
         $result = $this->EvaluationMixeval->getReceivedTotalScore(2, 1);
         // Assert the queried data matches with fixture data
         $this->assertTrue(!empty($result));
-        $this->assertEqual($result[0][0]['received_total_score'], 12.5);
+        $this->assertEqual($result[0]['received_total_score'], 12.5);
     }
 
     function testGetReceivedTotalEvaluatorCount()

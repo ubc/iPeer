@@ -29,8 +29,6 @@ class EventFixture extends CakeTestFixture
         'created' => array('type' => 'datetime', 'null' => false, 'default' => '0000-00-00 00:00:00'),
         'updater_id' => array('type' => 'integer', 'null' => true, 'default' => null),
         'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
-        'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),
-        'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'InnoDB')
     );
 
     public $records = array(

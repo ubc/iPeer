@@ -17,7 +17,7 @@ class Course extends AppModel
     public $hasMany = array(
         'Group' => array(
             'className'   => 'Group',
-            'conditions'  => 'Group.record_status = "A"',
+            'conditions'  => array('Group.record_status = "A"'),
             'order'       => 'Group.created DESC',
             'foreignKey'  => 'course_id',
             'dependent'   => true,
@@ -743,6 +743,23 @@ class Course extends AppModel
      */
     function getCourseById($courseId)
     {
+        return $this->find('first', array('conditions' => array('Course.id' => $courseId)));
+    }
+
+    /**
+     * getCourseIdByGroup get the course by group id
+     *
+     * @param mixed $groupId
+     *
+     * @access public
+     * @return object course object
+     */
+    function getCourseByGroupId($groupId)
+    {
+        $courseId = $this->Group->field('course_id', array('id' => $groupId));
+        if (!$courseId) {
+            return array();
+        }
         return $this->find('first', array('conditions' => array('Course.id' => $courseId)));
     }
 }
