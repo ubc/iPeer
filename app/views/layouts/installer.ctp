@@ -8,7 +8,7 @@
     <!--link rel="shortcut icon" href="favicon.ico" type="image/x-icon"-->
     <?php
     // CSS files
-    #echo $html->css('ipeer');
+    echo $html->css('ipeer');
     echo $html->css('install');
     
     // Scripts 
@@ -22,11 +22,11 @@
   </head>
 <body>
 
+<div id="containerOuter" class='pagewidth'>
 <!-- BANNER -->
 <?php echo $this->element('global/banner'); ?>
 
 <!-- CONTENT -->
-<div id="containerOuter" class='pagewidth'>
   <!-- TITLE BAR -->
   <div class='title'>
     <span class='text'>

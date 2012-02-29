@@ -1,195 +1,271 @@
-body {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 76%;
-	background: #C4C7D2;
-	background-image: url(bg.gif);
-	margin-left: 0px;
-	margin-top: 8px;
-	margin-right: 0px;
-	margin-bottom: 0px;
-}
-textarea {
-  overflow: visible;
-}
-form {
-  margin: 0px;
-  padding: 0px;
-}
-.bannerText {
-	color: #FFFFFF;
-	font-weight: bold;
-	text-shadow: black 0.0em 0.0em 0.5em
-}
-#header {
-  float:left;
-  width:100%;
-  font-size:93%;
-  line-height:normal;
-  color:#333;
-  margin-bottom:1px;
-  }
-html>body #header {
-  margin-bottom:0px;
-}
-#header ul {
-  margin:0;
-  padding:10px 10px 0;
-  list-style:none;
-  }
-#header li {
-  display:inline;
-  margin:0;
-  padding:0;
-  color:#333;
-  }
-#header a {
-  float:left;
-  background:url("left_both.gif") no-repeat left top;
-  font-size: 12px;
-  margin:0;
-  padding:0 0 0 9px;
-  border-bottom:1px solid #8E4501;
-  text-decoration:none;
-  color:#333;
-  }
-#header a span {
-  float:left;
-  display:block;
-  background:url("right_both.gif") no-repeat right top;
-  padding:5px 15px 4px 6px;
-  font-weight:bold;
-  }
-/* Commented Backslash Hack hides rule from IE5-Mac \*/
-#header a span {float:none;}
-/* End IE5-Mac hack */
-#header a:hover span {
-  color:#333;
-  }
-#header #current a {
-  background-position:0 -300px;
-  border-width:0;
-  }
-#header #current a span {
-  background-position:100% -300px;
-  padding-bottom:5px;
-  color:#333;
-  }
-#header a:hover {
-  background-position:0% -150px;
-  }
-#header a:hover span {
-  background-position:100% -150px;
-  }
+/* CSS RESET */
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
 
-#subheader {
-	height: 60px;
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
 	margin: 0;
 	padding: 0;
-	vertical-align: middle;
-	border: solid #000;
-	border-width: 0px 0px 1px 0px;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* html5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
 }
 
-a:link, a:visited {
-  font-family: Verdana, Arial, Helvetica, sans-serif;
-  color: #FA7E04;
-	text-decoration: none;
-  }
-a:hover {
-  color: #333;
-  text-decoration: none;
-  }
-a:active {
-    color: #FA7E04;
-  text-decoration: none;
-  }
+/* Start iPeer CSS */
 
-a.miniLinks:link, a.miniLinks:visited {
+/* GLOBAL */
+body 
+{
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 10px;
-	color: #FFFFFF;
+	background-image: url(bg.gif);
+}
+
+p
+{
+	padding-bottom: 1em;
+}
+
+.floatleft
+{
+	float: left;
+}
+
+.floatright
+{
+	float: right;
+}
+
+.pagewidth
+{
+	min-width: 800px;
+	max-width: 1000px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 0.3em;
+}
+
+.hide
+{
+	display: none;
+}
+
+/* BANNER */
+#banner
+{
+	border-top-left-radius: 8px; 
+	border-top-right-radius: 8px; 
+	border: 1px solid #ddd;
+	border-bottom: none;
+	background: #f4f4f4 url('../img/layout/banner_back_noborder.gif') repeat-x;
+	height: 98px;
+}
+
+#bannerLogoImgLeft
+{
+	padding-left: 1.5em;
+}
+
+#bannerLogoImgRight
+{
+	padding-right: 1.5em;
+}
+
+#bannerLogoText
+{
+	padding-top: 50px; 
+	font-size: 1em; 
+	font-weight: bold; color: white;
+	text-shadow: 0 0 7px #222
+}
+
+/* NAVIGATION */
+#navigationOuter
+{
+	border: 1px solid #ddd;
+	border-top: none;
+}
+
+.navigation ul
+{
+	padding: 0.5em 0; /* needed to expand the div, keep a from overflowing the ul */
+	background-color: #0a2a64;
+}
+
+.navigation li 
+{
+	display: inline;
+	list-style: none;
+	text-align: center;
+}
+
+.navigation a 
+{
+	border-right: 1px solid #ddd;
+	border-top: 1px solid #ddd;
+	color: white;
 	font-weight: bold;
+	font-size: 0.85em;
+	text-align: center;
 	text-decoration: none;
+	padding: 0.5em;
+	padding-left: 0.6em;
 }
-a.miniLinks:hover {
-	color: #FA7E04;
-	text-decoration: none;
+
+.navigation a:hover,a:active 
+{
+	/*background-color: #ff9933;*/
+	background-color: #ff2;
+	color: #333;
 }
-a.miniLinks:active {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 10px;
-	color: #FFFFFF;
+
+.navigation #current a 
+{
+	color: #333;
+	background-color: #ed0;
+}
+
+.navigation .miniLinks
+{
+	font-size: 0.6em;
+	border: none;
+	margin-right: 0.5em;
+}
+
+/* CONTENT CONTAINER */
+#containerOuter
+{
+	border-top-left-radius: 10px; 
+	border-top-right-radius: 10px; 
+	border-bottom-left-radius: 10px; 
+	border-bottom-right-radius: 10px; 
+	border: 1px solid #777;
+	padding: 0.4em; 
+	background: white;
+	box-shadow: 0 0 5px #555;
+}
+
+.message, .error-message
+{
+	margin-top: 0.5em;
+	margin-bottom: 1em;
+	clear: left;
+	padding: 0.7em;
+	font-size: 0.9em;
 	font-weight: bold;
+	text-align: center;
 }
 
-#wrap {
- width:94%; /* Change this to the width of your layout */
- margin:0 auto;
+#flashMessage, #authMessage, .error-message
+{
+	color: #990044;
+	text-align: center;
+	border: 2px solid #990044;
 }
 
-.input {
-
+.error-message
+{
+	margin-bottom: 1em;
+	padding: 0.5em;
+	width: 20em;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
 }
 
-.error, .error_message {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 12px;
+.red
+{
 	color: red;
 }
 
-/* CSS for the box starts here */
-.box {
-	padding:0 12px 0 0;
-	background:#fff url(borders.gif) 100% 0 repeat-y;
-}
-.bi {
-	padding:0 0 0 12px;
-	background:#fff url(borders.gif) 0 0 repeat-y;
-}
-.bt {
-	height:17px;
-	margin:0 -12px;
-	background:url(box.gif) 100% 0 no-repeat;
-}
-.bt div {
-	width:18px;
-	height:17px;
-	background:url(box.gif) 0 0 no-repeat;
-}
-.bb {
-	height:17px;
-	margin:0 -12px;
-	background:url(box.gif) 100% 100% no-repeat;
-}
-.bb div {
-	width:18px;
-	height:17px;
-	background:url(box.gif) 0 100% no-repeat;
-}
-.content-wrap {
-  background-color: #FFFFFF;
-  position: relative;
-}
-.title {
-	margin: 0;
-	padding:5px 10px;
-	background:#E2E2E2;
-	font:bold 1.2em/1 Arial, Helvetica, sans-serif;
-	border-top: 1px solid #CFCFCF;
-	border-bottom: 1px solid #CFCFCF;
-  position: relative;
+.green
+{
+	color: green;
 }
 
-.title .text {
-  text-align: left;
+.title 
+{
+	margin-top: 0.5em;
+	font-weight: bold;
+	background: #e2e2e2;
+	border-top: 1px solid #cfcfcf;
+	border-bottom: 1px solid #cfcfcf;
+	padding: 0.2em 0.5em;
 }
 
-.title .controls {
-  text-align: right;
-  position: absolute;
-  right: 10px;
+/* FOOTER */
+#footer
+{
+	font-size: 0.72em;
+	padding-top: 0.5em;
+	color: #333;
+	text-align: center;
 }
 
+/* DEBUG */
+#debugsection
+{
+	margin: 2em;
+	font-size: 0.8em;
+}
+
+#debugsection h5
+{
+	padding: 0.5em;
+	font-size: 1em;
+	font-weight: bold;
+	background-color: #ccff99;
+}
+
+#debugsection pre
+{
+	padding: 0.5em;
+}
+
+#debugsection table
+{
+	width: 100%;
+}
+
+/* TO BE REFACTORED LATER */
+
+/* BOX STYLE */
 .title2 {
 	margin:0;
 	padding:2px 5px;
@@ -226,26 +302,11 @@ a.miniLinks:active {
 	border-bottom: 1px solid #CFCFCF;
 }
 
-.box p, .box ul {
-	margin:0;
-	padding:4px 20px;
-	background:#fff;
-}
-.box li {
-	margin:0 0 0 2em;
-	padding:0;
-}
 .smallHeader {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 10px;
 	font-weight: bold;
 	color: #FFF;
-}
-.footer {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 10px;
-	font-weight: bold;
-	color: #333;
 }
 
 .subTable {
@@ -444,83 +505,98 @@ div.table-content li img{
 	font-weight:bold;
 }
 
-/* Main Navigation */
-#nav {
-  padding: 5px 0 5px 0;
-	text-align: left;
-	border: solid #fff;
-	border-width: 0px 0px 0px 0px;
+/* Home styles */
+.course {
+  margin-top: 15px;
+}
+
+.course-header {
+  color: white;
+  background-color: #4478AC;
+  padding: 3px 5px;
+  font-size: 0.9em;
+  font-weight: bold;
+  text-decoration: underline;
+  vertical-align: top;
+}
+
+.course-header A {
+  color: white;
+  vertical-align: top;
+}
+
+.course-header IMG {
+  margin-right: 5px;
+}
+
+.course .instructor {
+  padding: 5px 0 5px 20px;
+  background-color: #EAEAEA;
+  border-top: 2px solid white;
+  border-bottom: 2px solid white;
+}
+
+.course .event {
+  padding: 5px 0 5px 20px;
+  background-color: #EAEAEA;
+}
+
+#importfrm li {
+  margin:1em 0 3em 1em;
+}
+
+.button-row {
+  margin: 0.5em 0 0.5em 0;
+}
+
+.button-row ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  float: right;
+}
+
+.button-row li {
+  display: inline;
+  margin: 0 0 0 1em;
+  padding: 0;
+}
+
+.list-title {
+  font-weight: bold;
+  margin: 1em 0 0.5em 1em;
+}
+
+.user-list-table {
   width: 100%;
+  border-width: 0px;
+  border-spacing: 2px;
   background-color: white;
 }
-#nav ul {
-	margin: 0px;
-	padding: 0;
-}
-#nav li {
-	display: inline;
-	list-style: none;
-	line-height: 18px;
-  margin: 10px 0 0px 0px;
-  padding:0;
+
+.user-list-table tr {
+  background-color: #EAEAEA;
 }
 
-#nav a {
-	color: #333;
-	font:bold 1em/1 Arial, Helvetica, sans-serif;
-	padding: 2px 2px 4px 2px;
-	text-decoration: none;
-
-}
-#nav a:hover,a:active {
-	color: #8E4501;
-	text-decoration: none;
-	margin:0;
+.user-list-table th {
+  background-color: #4478AC;
+  color: white;
+  font-size: 0.9em;
+  padding: 4px;
 }
 
-#nav .on {
-	background-color: #333;
-	color: #fff;
+.user-list-table td {
+  padding: 4px;
+  font-size: 0.9em;
 }
-#nav .current a {
-  background-position:0 -300px;
-  border-width:0;
-  }
-#nav .current a span {
-  background-position:100% -300px;
-  padding: 2px 2px 4px 2px;
-  color:#fff;
-  background-color: #24588C;
-  }
-.header_link a {
-  color: #7777dd;
-}
-#header_link a:hover {
-  color: #5555bb;
-}
-/* end Main Navigation */
 
+/* No clue what these does */
 #loading {
   padding-left: 2px;
   padding-top:2px;
   position:absolute;
   float:left;
   display:none;
-}
-
-.message {
-  text-align: center;
-	margin:0;
-	padding:2px 5px;
-	background:#F4F4F4;
-	font:bold 1em/1 Arial, Helvetica, sans-serif;
-	color: red;
-	border-top: 1px solid #CFCFCF;
-	border-bottom: 1px solid #CFCFCF;
-}
-
-.error-message {
-  background: yellow;
 }
 
 #adddelcourses select.course-selector{
@@ -748,87 +824,3 @@ textarea.question-title-textarea, textarea.question-descriptor {
   text-align: right;
 }
 
-/* Home styles */
-.course {
-  margin-top: 15px;
-}
-
-.course-header {
-  color: white;
-  background-color: #4478AC;
-  padding: 3px 5px;
-  font-size: 0.9em;
-  font-weight: bold;
-  text-decoration: underline;
-  vertical-align: top;
-}
-
-.course-header A {
-  color: white;
-  vertical-align: top;
-}
-
-.course-header IMG {
-  margin-right: 5px;
-}
-
-.course .instructor {
-  padding: 5px 0 5px 20px;
-  background-color: #EAEAEA;
-  border-top: 2px solid white;
-  border-bottom: 2px solid white;
-}
-
-.course .event {
-  padding: 5px 0 5px 20px;
-  background-color: #EAEAEA;
-}
-
-#importfrm li {
-  margin:1em 0 3em 1em;
-}
-
-.button-row {
-  margin: 0.5em 0 0.5em 0;
-}
-
-.button-row ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  float: right;
-}
-
-.button-row li {
-  display: inline;
-  margin: 0 0 0 1em;
-  padding: 0;
-}
-
-.list-title {
-  font-weight: bold;
-  margin: 1em 0 0.5em 1em;
-}
-
-.user-list-table {
-  width: 100%;
-  border-width: 0px;
-  border-spacing: 2px;
-  background-color: white;
-}
-
-.user-list-table tr {
-  background-color: #EAEAEA;
-}
-
-.user-list-table th {
-  background-color: #4478AC;
-  color: white;
-  font-size: 0.9em;
-  padding: 4px;
-}
-
-.user-list-table td {
-  padding: 4px;
-  font-size: 0.9em;
-}
