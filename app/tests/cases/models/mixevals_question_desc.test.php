@@ -44,7 +44,7 @@ class MixevalsQuestionDescTestCase extends CakeTestCase
     function testInsertQuestionDescriptor()
     {
         // Set up test inputs
-        $question_ids = $this->MixevalsQuestion->find('all', array('conditions' => array('mixeval_id'=> 2), 'fields' => array('MixevalsQuestion.id, question_num')));
+        $question_ids = $this->MixevalsQuestion->find('all', array('conditions' => array('mixeval_id'=> 1), 'fields' => array('MixevalsQuestion.id, question_num')));
         $data = $this->setUpTestData();
         // Set up test
         $this->MixevalsQuestionDesc->insertQuestionDescriptor($data, $question_ids);

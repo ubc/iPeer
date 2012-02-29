@@ -62,7 +62,7 @@ class MixevalsQuestionTestCase extends CakeTestCase
 
     function testGetQuestion()
     {
-        $result = $this->MixevalsQuestion->getQuestion(2);
+        $result = $this->MixevalsQuestion->getQuestion(1);
         $this->assertEqual($result[0]['MixevalsQuestion']['id'], 1);
         $this->assertEqual($result[1]['MixevalsQuestion']['id'], 2);
         $this->assertEqual($result[2]['MixevalsQuestion']['id'], 3);

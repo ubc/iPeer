@@ -1,86 +1,91 @@
 <?php
-/* SVN FILE: $Id$ */
-
-/**
- * Enter description here ....
- *
- * @filesource
- * @copyright    Copyright (c) 2006, .
- * @link
- * @package
- * @subpackage
- * @since
- * @version      $Revision$
- * @modifiedby   $LastChangedBy$
- * @lastmodified $Date: 2006/06/20 18:44:18 $
- * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
- */
-
 /**
  * MixevalsQuestion
  *
- * Enter description here...
- *
- * @package
- * @subpackage
- * @since
+ * @uses AppModel
+ * @package   CTLT.iPeer
+ * @author    Pan Luo <pan.luo@ubc.ca>
+ * @copyright 2012 All rights reserved.
+ * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
 class MixevalsQuestion extends AppModel
 {
-  var $name = 'MixevalsQuestion';
-  var $hasMany = array(
-                  'Description' =>
-                     array('className'   => 'MixevalsQuestionDesc',
-                           'order'       => '',
-                           'foreignKey'  => 'question_id',
-                           'dependent'   => true,
-                           'exclusive'   => true,
-                           'finderSql'   => ''
-                          ),
-                     );
+    public $name = 'MixevalsQuestion';
+    public $hasMany = array(
+        'Description' =>
+        array('className'   => 'MixevalsQuestionDesc',
+            'order'       => '',
+            'foreignKey'  => 'question_id',
+            'dependent'   => true,
+            'exclusive'   => true,
+            'finderSql'   => ''
+        ),
+    );
 
-  /**
-   * Saves Mix evaluation questions to database
-   * 
-   * @param Type_int $id: id of mix corresponding mix evaluation
-   * @param Type_array $data: array of the mixevals questions to be inserted
-   */
-  function insertQuestion($id=null, $data=null) {
-    if(!is_null($id) && !is_null($data)){
-      foreach($data as $value){
-   		$value['mixeval_id'] = $id;
-   		$this->save($value);
-  		$this->id = null;
-      }
+    /**
+     * Saves Mix evaluation questions to database
+     *
+     * @param int   $id   id of mix corresponding mix evaluation
+     * @param array $data array of the mixevals questions to be inserted
+     *
+     * @access public
+     * @return void
+     */
+    function insertQuestion($id=null, $data=null)
+    {
+        if (!is_null($id) && !is_null($data)) {
+            foreach ($data as $value) {
+                $value['mixeval_id'] = $id;
+                $this->save($value);
+                $this->id = null;
+            }
+        } else {
+            return false;
+        }
     }
-	else return false;    
-  }
-   
+
+
   /*FUNCTION NOT BEING USED
     called by mixevals controller during an edit of an
-    existing mixeval question(s)*/
-  /*function updateQuestion($id, $data){
+  existing mixeval question(s)*/
+  /*function updateQuestion($id, $data)
+{
     $this->deleteQuestions($id);
     $this->insertQuestion($id, $data);
   }*/
-  
-  // called by the delete function in the controller
-  function deleteQuestions($id){
-//  	$this->query('DELETE FROM mixevals_questions WHERE mixeval_id='.$id);
-    $this->delete($id);
-  }
-  
-/**
- * Get corresponding mix evaluation question corresponding to some mix evaluation
- * 
- * @param Tpye_int $mixEvalId : mix evaluation id
- */
-  function getQuestion($mixEvalId=null, $questionType=null){
-  	isset($questionType) ? $condition = array('mixeval_id' => $mixEvalId, 'question_type' => $questionType) :
-  						   $condition = array('mixeval_id' => $mixEvalId); 
-  	return $this->find('all', array('conditions' => $condition,
-            						'order' => array('question_num ASC')
-		   ));
-  }  
+
+    /**
+     * deleteQuestions called by the delete function in the controller
+     *
+     * @param mixed $id
+     *
+     * @access public
+     * @return void
+     */
+    function deleteQuestions($id)
+    {
+        //  	$this->query('DELETE FROM mixevals_questions WHERE mixeval_id='.$id);
+        $this->delete($id);
+    }
+
+
+    /**
+     * Get corresponding mix evaluation question corresponding to some mix evaluation
+     *
+     * @param int  $mixEvalId    mix evaluation id
+     * @param bool $questionType question type
+     *
+     * @access public
+     * @return void
+     */
+    function getQuestion($mixEvalId=null, $questionType=null)
+    {
+        if (isset($questionType)) {
+            $condition = array('mixeval_id' => $mixEvalId, 'question_type' => $questionType);
+        } else {
+            $condition = array('mixeval_id' => $mixEvalId);
+        }
+
+        return $this->find('all', array('conditions' => $condition, 'order' => array('question_num ASC')));
+    }
 }
-?>

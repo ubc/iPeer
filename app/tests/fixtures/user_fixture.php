@@ -11,6 +11,7 @@
 class UserFixture extends CakeTestFixture
 {
     public $name = 'User';
+
     public $fields = array(
         'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
         'username' => array('type' => 'string', 'null' => false, 'length' => 80, 'key' => 'unique', 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),

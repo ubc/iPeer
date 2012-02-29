@@ -26,5 +26,4 @@ class GroupsMemberFixture extends CakeTestFixture
         array('id' => 5, 'group_id' => '2', 'user_id' => '4'),
         array('id' => 6, 'group_id' => '4', 'user_id' => '4'),
     );
-
 }

@@ -46,6 +46,7 @@ class MixevalTestCase extends CakeTestCase
 
         // Set up test data
         $result = $this->Mixeval->compileViewData($input);
+    //    var_dump($result);
 
         // Assert that old input still exists in the result
         $this->assertEqual($input['Mixeval'], $result['Mixeval']);
@@ -61,14 +62,14 @@ class MixevalTestCase extends CakeTestCase
     {
 
         // Set up test input with some fake questions
-        $input = array('Mixeval' => array('id' => 2),
+        $input = array('Mixeval' => array('id' => 1),
             'Question' => array('Q1' => 1, 'Q2' => 2));
         // Set up test data
         $result = $this->Mixeval->compileViewDataShort($input);
         // Assert that a new Question array is merged with real fixture questions
         $this->assertEqual($result['Question'][0]['MixevalsQuestion']['id'], 1);
-        $this->assertEqual($result['Question'][1]['MixevalsQuestion']['id'], 5);
-        $this->assertEqual($result['Question'][2]['MixevalsQuestion']['id'], 6);
+        $this->assertEqual($result['Question'][1]['MixevalsQuestion']['id'], 2);
+        $this->assertEqual($result['Question'][2]['MixevalsQuestion']['id'], 3);
 
 
         // Set up alternate input without Question index
@@ -82,7 +83,7 @@ class MixevalTestCase extends CakeTestCase
     {
         $tmp = array(
             'Mixeval' => array(
-                'id' => 5,
+                'id' => 1,
                 'name' => 'mixed2',
                 'zero_mark' => 0,
                 'scale_max' => 0,

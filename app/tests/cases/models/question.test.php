@@ -76,6 +76,7 @@ class QuestionTestCase extends CakeTestCase
         // Check for faulty inputs
         $faultyId = $this->Question->getTypeById(332);
         $nullId = $this->Question->getTypeById(null);
+
         $this->assertNull($faultyId);
         $this->assertNull($nullId);
     }

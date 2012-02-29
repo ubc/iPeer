@@ -179,7 +179,7 @@ class GroupEventTestCase extends CakeTestCase {
     {
         //Test events with late groups
         $events = $this->GroupEvent->getLate(1);
-        $this->assertEqual(Set::extract('/GroupEvent/id', $events), array(1,2));
+        $this->assertEqual(Set::extract('/GroupEvent/id', $events), array(1, 2));
 
         //Test events with no late groups
         $events = $this->GroupEvent->getLate(2);
@@ -194,7 +194,7 @@ class GroupEventTestCase extends CakeTestCase {
     {
         //Test valid event
         $groups = $this->GroupEvent->getGroupEventByEventId(1);
-        $this->assertEqual(Set::extract('/GroupEvent/id', $events), array(1,2));
+        $this->assertEqual(Set::extract('/GroupEvent/id', $groups), array(1, 2));
 
         //Test valid event with no groups
         $groups = $this->GroupEvent->getGroupEventByEventId(3);

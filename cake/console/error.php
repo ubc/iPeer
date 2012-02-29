@@ -127,6 +127,7 @@ class ErrorHandler extends Object {
  */
 	function missingTable($params) {
 		extract($params, EXTR_OVERWRITE);
+        debug_print_backtrace();
 		$this->stderr(sprintf(__("Missing database table '%s' for model '%s'", true), $table, $className));
 		$this->_stop(1);
 	}

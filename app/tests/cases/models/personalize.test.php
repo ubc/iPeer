@@ -18,7 +18,7 @@ class PersonalizeTestCase extends CakeTestCase
     function startCase()
     {
         $this->Personalize = ClassRegistry::init('Personalize');
-   }
+    }
 
     function endCase()
     {
@@ -30,7 +30,6 @@ class PersonalizeTestCase extends CakeTestCase
 
     function endTest($method)
     {
-        $this->flushDatabase();
     }
 
     function testPersonalizeInstance()
@@ -38,10 +37,8 @@ class PersonalizeTestCase extends CakeTestCase
         $this->assertTrue(is_a($this->Personalize, 'Personalize'));
     }
 
-
     function testUpdateAttribute()
     {
-
         $this->Personalize->updateAttribute(1, 'code', 'newValue');
         $data = $this->Personalize->find('first', array(
             'conditions' => array('user_id' => 1, 'attribute_code' => 'code')
@@ -56,37 +53,13 @@ class PersonalizeTestCase extends CakeTestCase
             'conditions' => array('user_id' => 1, 'attribute_code' => 'invalidCode')
         ));
 
-        $this->assertEqual($data['Personalize']['user_id'], null);
+        $this->assertEqual($data['Personalize']['user_id'], 1);
 
-        $this->Personalize->updateAttribute(999, 'Code', 'null');
+        // invalid user id
+        $this->Personalize->updateAttribute(999, 'Code', 'value');
         $data = $this->Personalize->find('first', array(
             'conditions' => array('user_id' => 999, 'attribute_code' => 'Code')
         ));
-        $this->assertEqual($data['Personalize']['user_id'], null);
-    }
-
-
-    ##########################################################################################################
-    ##################   HELPER FUNCTION USED FOR UNIT TESTING PURPOSES   ####################################
-    ##########################################################################################################
-
-
-    function deleteAllTuples($table)
-    {
-        $this->Personalize= & ClassRegistry::init('Personalize');
-        $sql = "DELETE FROM $table";
-        $this->Personalize->query($sql);
-    }
-
-    function flushDatabase()
-    {
-        $this->deleteAllTuples('personalizes');
-        $this->deleteAllTuples('courses');
-        $this->deleteAllTuples('users');
-        $this->deleteAllTuples('user_courses');
-        $this->deleteAllTuples('user_enrols');
-        $this->deleteAllTuples('roles_users');
-        $this->deleteAllTuples('groups');
-        $this->deleteAllTuples('groups_members');
+        $this->assertEqual($data, null);
     }
 }

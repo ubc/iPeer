@@ -74,7 +74,6 @@ class RubricTestCase extends CakeTestCase
 
     function testAfterFind()
     {
-
         // Set up test data
         $rubric = $this->Rubric->find('first', array('conditions' => array('id' => 4),
             'contain' => array('RubricsCriteria.RubricsCriteriaComment',

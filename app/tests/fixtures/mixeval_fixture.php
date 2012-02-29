@@ -1,26 +1,31 @@
 <?php
+/**
+ * MixevalFixture
+ *
+ * @uses CakeTestFixture
+ * @package   CTLT.iPeer
+ * @author    Pan Luo <pan.luo@ubc.ca>
+ * @copyright 2012 All rights reserved.
+ * @license   MIT {@link http://www.opensource.org/licenses/MIT}
+ */
+class MixevalFixture extends CakeTestFixture
+{
+    public $name = 'Mixeval';
+    public $fields = array(
+        'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
+        'name' => array('type' => 'string', 'null' => false, 'length' => 80, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+        'zero_mark' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
+        'scale_max' => array('type' => 'integer', 'null' => false, 'default' => '0'),
+        'availability' => array('type' => 'string', 'null' => false, 'default' => 'public', 'length' => 10, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+        'creator_id' => array('type' => 'integer', 'null' => false, 'default' => '0'),
+        'created' => array('type' => 'datetime', 'null' => false, 'default' => '0000-00-00 00:00:00'),
+        'updater_id' => array('type' => 'integer', 'null' => true, 'default' => null),
+        'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
+    );
 
-class MixevalFixture extends CakeTestFixture {
-  var $name = 'Mixeval';
-  var $fields = array(
-    'id' => array('type' => 'integer', 'key' => 'primary'),
-    'name' => array('type' => 'string'),
-    'zero_mark' => array('type' => 'integer'),
-    'total_question' => array('type' => 'integer'),
-    'lickert_question_max' => array('type' => 'integer'),
-    'scale_max' => array('type' => 'integer'),
-    'prefill_question_max' => array('type' => 'integer'),
-    'availability' => array('type' => 'integer'),
-    'creator_id' => array('type' => 'integer'),
-    'created' => array('type' => 'datetime'),
-    'updater_id' => array('type' => 'integer'),
-    'modified' => array('type' => 'datetime')
-  );
-  
-  var $records = array(
-  
-	array('id' => 2, 'name' => 'Rubric', 'zero_mark' => 0, 'total_question' => 0, 'lickert_question_max' => 0,
-		  'scale_max' => 0, 'prefill_question_max' => null, 'availability' => 0, 'creator_id' => 1, 'created' => '0000-00-00 00:00:00',
-		  'updater_id' => null, 'modified' => '0000-00-00 00:00:00')
-   );
+    public $records = array(
+        array('id' => 1, 'name' => 'Mixeval', 'zero_mark' => 0,
+        'scale_max' => 0, 'availability' => 1, 'creator_id' => 1, 'created' => '0000-00-00 00:00:00',
+        'updater_id' => null, 'modified' => '0000-00-00 00:00:00')
+    );
 }
