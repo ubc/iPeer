@@ -6,16 +6,16 @@
       <tr>
         <td><div align="right" id="page-numbers">
             <b><?php __('Page Size')?>: </b>
-            <?php                
-                echo $form->input('radio', $this->Paginator->pageSize($this->params["paging"]["Event"]["options"]["limit"]));
+            <?php
+                echo $form->input('radio', Toolkit::pageSize($this->params["paging"]["Event"]["options"]["limit"]));
             ?>
         </div></td>
       </tr>
     </table>
 	<table width="95%" border="0" cellspacing="2" cellpadding="4" bgcolor="#FFFFFF">
 	  <tr class="tableheader">
-	    <th><?php echo $this->Paginator->sort('ID','Event.id')?></th>
-	   <?php ?> 
+	    <th><?php echo $this->Paginator->sort('ID', 'Event.id')?></th>
+	   <?php ?>
 <?php if($currentUser['role'] == 'A' || $currentUser['role'] == 'I'):?>
 	        <th>View</th>
 	    <?php endif;?>
@@ -32,7 +32,7 @@
   	<?php $i = 0;?>
 	  <?php
 	  if (isset($data) && !empty($data)) {
-  	  foreach($data as $row): 
+  	  foreach($data as $row):
         $evaluation = $row['Event'];
         $template_type = $row['EventTemplateType'];
   	  if (isset($evaluation['id'])) {?>
@@ -48,9 +48,9 @@
   	    <?php
   	    if (isset($display) && $display == 'search') { ?>
   		  <td>
-  		    <?php 
-  	
-  		//    echo $sysContainer->getCourseName($evaluation['course_id']); 
+  		    <?php
+
+  		//    echo $sysContainer->getCourseName($evaluation['course_id']);
   		  echo $names[$i]; ?>
   	    </td>
   	    <?php } ?>
@@ -93,7 +93,7 @@
 	));?></td>
     <td width="33%"></td>
     <td width="33%" align="right">
-<?php	
+<?php
 	//Prev page link
         echo $this->Paginator->prev('Prev ',null,' ',array('class' => 'disabled'));
 	//Shows the page numbers

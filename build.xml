@@ -2,8 +2,10 @@
 
 <project name="iPeer" basedir="." default="build">
     <target name="build"
-        depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpdoc,test-ci,phpcb"/>
+        depends="prepare,lint,phploc,pdepend,phpmd,phpcs,phpcpd,phpdoc,test,phpcb"/>
 
+    <target name="build-ci"
+        depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpdoc,test-ci,phpcb"/>
     <!-- <target name="build-parallel"
    depends="prepare,lint,tools-parallel,phpunit,phpcb"/>
 
@@ -61,6 +63,7 @@
              <include name="**/*.php" />
              <exclude name="tests/**" />
              <exclude name="vendors/**" />
+             <exclude name="plugins/**" />
          </fileset>
          <logger type="jdepend-xml" outfile="${project.basedir}/build/logs/jdepend.xml" />
          <logger type="jdepend-chart" outfile="${project.basedir}/build/pdepend/dependencies.svg" />
@@ -75,6 +78,7 @@
              <include name="**/*.php" />
              <exclude name="tests/**" />
              <exclude name="vendors/**" />
+             <exclude name="plugins/**" />
          </fileset>
      </phpmd>
  </target>
@@ -86,6 +90,7 @@
              <include name="**/*.php" />
              <exclude name="tests/**" />
              <exclude name="vendors/**" />
+             <exclude name="plugins/**" />
          </fileset>
          <formatter type="xml" outfile="${project.basedir}/build/logs/pmd.xml"/>
      </phpmd>
@@ -98,6 +103,7 @@
              <include name="**/*.php" />
              <exclude name="tests/**" />
              <exclude name="vendors/**" />
+             <exclude name="plugins/**" />
          </fileset>
      </phpcodesniffer>
  </target>
@@ -109,6 +115,7 @@
              <include name="**/*.php" />
              <exclude name="tests/**" />
              <exclude name="vendors/**" />
+             <exclude name="plugins/**" />
          </fileset>
          <formatter type="checkstyle" outfile="${project.basedir}/build/logs/checkstyle.xml" />
      </phpcodesniffer>
@@ -120,6 +127,7 @@
              <include name="**/*.php" />
              <exclude name="tests/**" />
              <exclude name="vendors/**" />
+             <exclude name="plugins/**" />
          </fileset>
          <formatter type="pmd" outfile="${project.basedir}/build/logs/pmd-cpd.xml" />
      </phpcpd>
@@ -132,6 +140,7 @@
              <include name="**/*.php" />
              <exclude name="tests/**" />
              <exclude name="vendors/**" />
+             <exclude name="plugins/**" />
          </fileset>
      </phpdoc>
  </target>

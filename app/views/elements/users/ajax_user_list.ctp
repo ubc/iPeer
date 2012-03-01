@@ -12,7 +12,7 @@
         <td align="right">
           <b>Page Size: </b>
             <?php
-                echo $form->input('radio', $this->Paginator->pageSize($this->params["paging"]["User"]["options"]["limit"]));
+                echo $form->input('radio', Toolkit::pageSize($this->params["paging"]["User"]["options"]["limit"]));
             ?>
         </td>
       </tr>
@@ -30,7 +30,7 @@
 <!--	    <th><?php //echo $pagination->sortLink('Created By',array('created','desc'))?></th> -->
 <!--	    <th><?php //echo $pagination->sortLink('Last Updated By',array('modified','desc'))?></th> -->
 	  </tr>
-	  
+
 	  <?php foreach($data as $row): $user = $row['User']; ?>
 	  <tr class="tablecell">
 	    <td align="center">
@@ -69,13 +69,13 @@
 		  <td><?php echo User::getRoleText($user['role'])?></td>
 	    <td><?php echo $user['first_name'] ?></td>
 	    <td><?php echo $user['last_name'] ?></td>
-	   
+
 	    <td><a href="mailto:<?php echo $user['email']; ?>"><?php echo $user['email']; ?></a></td>
  </tr>
-	  
-	  
+
+
 	  <?php endforeach; ?>
-	 
+
     <?php if (0 == count($data)) :?>
   	<tr class="tablecell" align="center">
   	    <td colspan="9"><?php __('Record Not Found')?></td>
@@ -88,8 +88,8 @@
         <td align="right"><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'right','alt'=>'right'))?></td>
       </tr>
     </table>
-    
-    
+
+
   <?php $pagination->loadingId = 'loading2';?>
 	<div id="page-numbers">
 <table width="95%"  border="0" cellspacing="0" cellpadding="4">
