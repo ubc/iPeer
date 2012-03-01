@@ -47,12 +47,12 @@ div.install
 
 .install #sysreqform, .install .dbform
 {
-	height: 3em;
+	height: 4em;
 }
 
 .install #gplform
 {
-	height: 4em;
+	height: 5em;
 }
 
 .install form #next
@@ -73,21 +73,11 @@ div.install
 .install .text label, .install .password label, .install .textarea label
 {
 	width: 13em;
-	float: left;
-	display: block;
-	text-align: right;
 	padding-right: 1em;
-	margin: 0.5em 0; 
-	clear: left;
 }
 
 .install .text input, .install .password input, .install .textarea textarea
 {
 	width: 21em;
-	margin: 0.5em 0; 
-	border-radius: 3px; 
-	border: 1px solid #999;
-	padding: 0.3em 0.5em;;
-	clear: right;
 }
 

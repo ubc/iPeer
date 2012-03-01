@@ -28,12 +28,10 @@
 
 <!-- CONTENT -->
   <!-- TITLE BAR -->
-  <div class='title'>
-    <span class='text'>
-      <?php echo $html->image('layout/icon_ipeer_logo.gif',array('alt'=>'icon_ipeer_logo'))?>
-      <?php echo $title_for_layout;?>
-    </span>
-  </div>
+  <h1 class='title'>
+    <?php echo $html->image('layout/icon_ipeer_logo.gif',array('alt'=>'icon_ipeer_logo'))?>
+    <?php echo $title_for_layout;?>
+  </h1>
   <!-- ERRORS -->
   <?php echo $this->Session->flash(); ?>
   <?php echo $this->Session->flash('auth'); ?>

@@ -54,9 +54,9 @@ if (User::isLoggedIn())
       // Advanced Search Tab
       generateTab($this, $access, 'ADV_SEARCH', array('searchs'), 'Search');
       // System Parameters Tab
-      generateTab($this, $access, 'SYS_PARA',  array('sysparameters'));
+      generateTab($this, $access, 'SYS_PARA',  array('sysparameters'), 'Sys Parameters');
       // System Functions Tab
-      generateTab($this, $access, 'SYS_FUNC', array('sysfunctions'));
+      generateTab($this, $access, 'SYS_FUNC', array('sysfunctions'), 'Sys Functions');
   }
 
   echo "<li>";
