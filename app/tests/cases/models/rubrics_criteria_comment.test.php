@@ -1,6 +1,6 @@
 <?php
+App::import('Model', 'Rubric');
 App::import('Model', 'RubricsCriteriaComment');
-App::import('Controller', 'RubricsCriteriaComments');
 
 class RubricsCriteriaCommentTestCase extends CakeTestCase
 {
@@ -43,7 +43,7 @@ class RubricsCriteriaCommentTestCase extends CakeTestCase
     function testGetCriteriaComment()
     {
         // Set up test data by querying from fixture
-        $rubric = $this->Rubric->find('all', array('conditions' => array('Rubric.id' => 4)));
+        $rubric = $this->Rubric->find('first', array('conditions' => array('Rubric.id' => 4)));
         $result = $this->RubricsCriteriaComment->getCriteriaComment($rubric);
         // Assert that the query was successful
         $this->assertTrue(!empty($result));

@@ -1,6 +1,5 @@
 <?php
 App::import('Model', 'SurveyGroup');
-App::import('Controller', 'SurveyGroup');
 
 class SurveyGroupTestCase extends CakeTestCase {
     public $name = 'SurveyGroup';

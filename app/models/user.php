@@ -259,6 +259,10 @@ class User extends AppModel
      */
     function findUserByid ($id, $params = array())
     {
+        if (null == $id) {
+            return null;
+        }
+
         return $this->find(
             'first',
             array_merge(array('conditions' => array($this->name.'.id' => $id,)), $params)
@@ -498,7 +502,14 @@ class User extends AppModel
      */
     function getRoleById($id)
     {
-        $user = $this->find('first', array('conditions' => array('id'=>$id)));
+        if (null == $id) {
+            return null;
+        }
+
+        $user = $this->find('first', array(
+            'conditions' => array('id' => $id),
+            'contain'    => array('Role'),
+        ));
 
         return (!empty($user['Role'][0]['name'])) ? $user['Role'][0]['name'] : null;
     }

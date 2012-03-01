@@ -50,7 +50,7 @@ class SurveyInputTestCase extends CakeTestCase
                     'question_id' => 1,
                     'sub_id' => null,
                     'response_text' => null,
-                    'response_id' => null)
+                    'response_id' => 1)
                 )
             );
         $this->assertEqual($result1, $expect1);
@@ -65,7 +65,7 @@ class SurveyInputTestCase extends CakeTestCase
                     'question_id' => 2,
                     'sub_id' => null,
                     'response_text' => null,
-                    'response_id' => null)
+                    'response_id' => 1)
                 )
             );
         $this->assertEqual($result2, $expect2);
@@ -92,7 +92,7 @@ class SurveyInputTestCase extends CakeTestCase
                     'question_id' => 1,
                     'sub_id' => null,
                     'response_text' => null,
-                    'response_id' => null)
+                    'response_id' => 1)
                 )
             );
         $this->assertEqual($result1, $expect1);
@@ -107,7 +107,7 @@ class SurveyInputTestCase extends CakeTestCase
                     'question_id' => 2,
                     'sub_id' => null,
                     'response_text' => null,
-                    'response_id' => null)
+                    'response_id' => 1)
                 )
             );
         $this->assertEqual($result2, $expect2);
@@ -144,6 +144,6 @@ class SurveyInputTestCase extends CakeTestCase
     {
         // Test for survey with three enrollment
         $count = $this->SurveyInput->findCountInSurveyGroup(1, 1, 1, 1);
-        $this->assertEqual($count, 5);
+        $this->assertEqual($count, 1);
     }
 }

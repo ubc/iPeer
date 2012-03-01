@@ -12,7 +12,7 @@ class Group extends AppModel
 {
     public $name = 'Group';
 
-    public $schema = array(
+/*    public $schema = array(
         'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
         'group_num' => array('type' => 'integer', 'null' => false, 'default' => 0, 'length' => 4),
         'group_name' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 80, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
@@ -22,7 +22,7 @@ class Group extends AppModel
         'updater_id' => array('type' => 'integer', 'null' => true, 'default' => null),
         'created' => array('type' => 'datetime', 'null' => false, 'default' => '0000-00-00 00:00:00'),
         'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
-    );
+    );*/
 
     public $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Traceable');
 
@@ -82,17 +82,18 @@ class Group extends AppModel
 
     /**
      * schema
+     * NOTE: forgot why this function is here, causing trouble in unit test
      *
      * @param bool $field field
      *
      * @access public
      * @return void
      */
-    function schema($field = false)
+    /*function schema($field = false)
     {
         $this->_schema = $this->schema;
         return $this->schema;
-    }
+    }*/
 
     /**
      * beforeSave

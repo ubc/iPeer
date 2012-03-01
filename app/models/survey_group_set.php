@@ -106,20 +106,21 @@ class SurveyGroupSet extends AppModel
 
     /**
      * Sets SurveyGroupSet.release == 1 and creates a entry in Group based on the
-     * corresponding groupSet.  Note, SurveyGroupSet.release is set to 1 if and only if a
+     * corresponding groupSet.
+     * Note: SurveyGroupSet.release is set to 1 if and only if a
      * correspond group entry is successfully added to the database.
      *
      * @param type_INT $group_set_id : SurveyGroupSet.id
      *
      * @access public
-     * @return void
+     * @return bool   released or not
      */
     function release($group_set_id)
     {
         $group_set = $this->find('first', array('conditions' => array('SurveyGroupSet.id' => $group_set_id),
             'contain' => array('Survey', 'SurveyGroup' => array('Member.id')),
         ));
-        if ($group_set['SurveyGroupSet']['released']) {
+        if (empty($group_set) || $group_set['SurveyGroupSet']['released']) {
             return false;
         }
 
@@ -130,7 +131,7 @@ class SurveyGroupSet extends AppModel
         //get last group number if exists
         $max_group_num = $Group->getLastGroupNumByCourseId($group_set['Survey']['course_id']);
 
-        // begin transaction
+        // begin transaction for saving the records
         $dataSource = $this->getDataSource();
         $dataSource->begin($this);
         foreach ($group_set['SurveyGroup'] as $surveyGroup) {

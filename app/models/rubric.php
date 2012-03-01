@@ -183,7 +183,6 @@ class Rubric extends EvaluationBase
     {
         $return = array();
 
-        var_dump($results);
         foreach ($results as $r) {
             if (isset($r['RubricsCriteria']) && isset($r['RubricsLom']) &&
                 isset($r['RubricsCriteria'][0]['RubricsCriteriaComment'])) {

@@ -97,4 +97,16 @@ class AppModel extends Model
 
         return $retval;
     }
+
+    /**
+     * getErrorMessage access method for $errorMessage
+     *
+     * @access public
+     * @return string the error message
+     */
+    public function getErrorMessage()
+    {
+        return $this->errorMessage;
+    }
 }
+

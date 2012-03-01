@@ -75,12 +75,13 @@ class RubricTestCase extends CakeTestCase
     function testAfterFind()
     {
         // Set up test data
-        $rubric = $this->Rubric->find('first', array('conditions' => array('id' => 4),
-            'contain' => array('RubricsCriteria.RubricsCriteriaComment',
-            'RubricsLom')));
+        $rubric = $this->Rubric->find('first', array(
+            'conditions' => array('id' => 4),
+            'contain' => array('RubricsCriteria.RubricsCriteriaComment', 'RubricsLom'),
+        ));
         $this->assertEqual($rubric['RubricsCriteria'][0]['RubricsCriteriaComment'][0]['criteria_comment'], 'HELLO 11');
-        $this->assertEqual($rubric['RubricsCriteria'][0]['RubricsCriteriaComment'][1]['criteria_comment'], 'HELLO 21');
-        $this->assertEqual($rubric['RubricsCriteria'][1]['RubricsCriteriaComment'][0]['criteria_comment'], 'HELLO 12');
+        $this->assertEqual($rubric['RubricsCriteria'][0]['RubricsCriteriaComment'][1]['criteria_comment'], 'HELLO 12');
+        $this->assertEqual($rubric['RubricsCriteria'][1]['RubricsCriteriaComment'][0]['criteria_comment'], 'HELLO 21');
         $this->assertEqual($rubric['RubricsCriteria'][1]['RubricsCriteriaComment'][1]['criteria_comment'], 'HELLO 22');
     }
 

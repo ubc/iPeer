@@ -80,50 +80,61 @@ class SysFunctionTestCase extends CakeTestCase
     function testBeforeSave()
     {
         // Set up test input
-        $validSaveinput = array('SysFunction' => array('id' => 1, 'function_code' => 'code1', 'function_name' => 'name1',
-            'parent_id' => 0, 'controller_name' => 'controller1', 'url_link' => 'link1',
-            'permission_type' => 'I', 'record_status' => 'A', 'creator_id' => 0,
-            'created' => 0, 'updater_id' => null, 'modified' => null));
-        $result = $this->beforeSaveDuplicate($validSaveinput);
-        $this->assertTrue($result);
+        $validSaveinput = array(
+            'SysFunction' => array(
+                'id' => 1,
+                'function_code' => 'code1',
+                'function_name' => 'name1',
+                'parent_id' => 1,
+                'controller_name' => 'controller1',
+                'url_link' => 'link1',
+                'permission_type' => 'I',
+                'record_status' => 'A',
+                'creator_id' => 1,
+                'created' => null,
+                'updater_id' => null,
+                'modified' => null
+            )
+        );
+        $result = $this->SysFunction->save($validSaveinput);
+        $this->assertTrue($result, 'Saving valid record. Error message: ' . $this->SysFunction->getErrorMessage());
 
-        $falseInputType1 = array('SysFunction' => array('id' => 'fd', 'function_code' => 'code1', 'function_name' => 'name1',
-            'parent_id' => 0, 'controller_name' => 'controller1', 'url_link' => 'link1',
-            'permission_type' => 'I', 'record_status' => 'A', 'creator_id' => 0,
-            'created' => 0, 'updater_id' => null, 'modified' => null));
-        $result = $this->beforeSaveDuplicate($falseInputType1);
+        $falseInputType1 = array(
+            'SysFunction' => array(
+                'id' => 'fd',
+                'function_code' => 'code1',
+                'function_name' => 'name1',
+                'parent_id' => 0,
+                'controller_name' => 'controller1',
+                'url_link' => 'link1',
+                'permission_type' => 'I',
+                'record_status' => 'A',
+                'creator_id' => 0,
+                'created' => 0,
+                'updater_id' => null,
+                'modified' => null
+            )
+        );
+        $result = $this->SysFunction->save($falseInputType1);
         $this->assertFalse($result);
 
-        $falseInputType2 = array('SysFunction' => array('id' => 1, 'function_code' => 'code1', 'function_name' => 'name1',
-            'parent_id' => 0, 'controller_name' => '', 'url_link' => 'link1',
-            'permission_type' => 'I', 'record_status' => 'A', 'creator_id' => 0,
-            'created' => 0, 'updater_id' => null, 'modified' => null));
-        $result = $this->beforeSaveDuplicate($falseInputType2);
+        $falseInputType2 = array(
+            'SysFunction' => array(
+                'id' => 1,
+                'function_code' => 'code1',
+                'function_name' => 'name1',
+                'parent_id' => 0,
+                'controller_name' => '',
+                'url_link' => 'link1',
+                'permission_type' => 'I',
+                'record_status' => 'A',
+                'creator_id' => 0,
+                'created' => 0,
+                'updater_id' => null,
+                'modified' => null
+            )
+        );
+        $result = $this->SysFunction->save($falseInputType2);
         $this->assertFalse($result);
-    }
-
-    function beforeSaveDuplicate($input)
-    {
-        $input[$this->name]['modified'] = date('Y-m-d H:i:s');
-        // Ensure the name is not empty
-        if (empty($input['SysFunction']['id']) ||
-            empty($input['SysFunction']['function_code']) ||
-            empty($input['SysFunction']['function_name']) ||
-            !isset($input['SysFunction']['parent_id']) ||
-            is_null($input['SysFunction']['parent_id']) ||
-            empty($input['SysFunction']['controller_name']) ||
-            empty($input['SysFunction']['url_link']) ||
-            empty($input['Sysfunction']['permission_type']))
-        {
-            $this->errorMessage = "All fields are required";
-            return false;
-        }
-
-        if (!is_numeric($input['Sysfunction']['id'])) {
-            $this->errorMessage = "Id must be a number";
-            return false;
-        }
-        //return parent::beforeSave();
-        return true;
     }
 }

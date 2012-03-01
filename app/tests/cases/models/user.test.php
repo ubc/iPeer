@@ -1,6 +1,5 @@
 <?php
 App::import('Model', 'User');
-App::import('Model', 'UserCourse');
 
 class UserTestCase extends CakeTestCase
 {
@@ -14,12 +13,10 @@ class UserTestCase extends CakeTestCase
         'app.response', 'app.survey_question', 'app.user_course',
         'app.user_enrol', 'app.groups_member', 'app.survey'
     );
-    protected $Course = null;
 
     public function startCase()
     {
         $this->User = ClassRegistry::init('User');
-        $this->UserCourse = ClassRegistry::init('UserCourse');
     }
 
     public function endCase()
@@ -32,7 +29,6 @@ class UserTestCase extends CakeTestCase
 
     public function endTest($method)
     {
-        $this->flushDatabase();
     }
 
     public function testCourseInstance()
@@ -42,7 +38,6 @@ class UserTestCase extends CakeTestCase
 
     public function testGetByUsername()
     {
-        $this->User= & ClassRegistry::init('User');
         $empty=null;
 
         //Test on valid student input
@@ -67,14 +62,10 @@ class UserTestCase extends CakeTestCase
         //null input
         $nullInput = $this->User->getByUserName(null);
         $this->assertEqual($nullInput['username'], $empty);
-
-        //delete previous test data
-        $this->flushDatabase();
     }
 
     public function testFindUser()
     {
-        $this->User =& ClassRegistry::init('User');
         $empty=null;
 
         //On valid student user_name and password
@@ -125,7 +116,6 @@ class UserTestCase extends CakeTestCase
 
     public function testFindUserByStudentNo()
     {
-        $this->User =& ClassRegistry::init('User');
         $empty=null;
 
         //Test findUserByStudentNo() on valid users
@@ -158,7 +148,6 @@ class UserTestCase extends CakeTestCase
 
     public function testGetEnrolledStudents()
     {
-        $this->User =& ClassRegistry::init('User');
         $empty=null;
 
         //Run tests
@@ -208,7 +197,6 @@ class UserTestCase extends CakeTestCase
 
     public function testCanRemoveCourse()
     {
-        $this->User =& ClassRegistry::init('User');
         $empty=null;
 
         //Test on valid admin and valid course
@@ -258,7 +246,6 @@ class UserTestCase extends CakeTestCase
 
     public function testGetUserIdByStudentNo()
     {
-        $this->User =& ClassRegistry::init('User');
         $empty=null;
 
         //Test function on valid users
@@ -281,7 +268,6 @@ class UserTestCase extends CakeTestCase
 
     public function testGetRoleText()
     {
-        $this->User =& ClassRegistry::init('User');
         $empty = null;
 
         $student = $this->User->getRoleText('S');
@@ -306,7 +292,6 @@ class UserTestCase extends CakeTestCase
 
     function testGetRoleById()
     {
-        $this->User =& ClassRegistry::init('User');
         $empty=null;
 
         //user_id==1 : role(superadmin)
@@ -336,7 +321,6 @@ class UserTestCase extends CakeTestCase
 
     public function testFindUserByid()
     {
-        $this->User =& ClassRegistry::init('User');
         $empty=null;
 
         //For students
@@ -360,8 +344,6 @@ class UserTestCase extends CakeTestCase
         //Test function for null input
         $nullInput = $this->User->findUserByid(null);
         $this->assertEqual($nullInput, $empty);
-
-
     }
 
     public function testGetRoles()
@@ -432,9 +414,7 @@ class UserTestCase extends CakeTestCase
 
     public function testGetRolesByRole()
     {
-        $this->User =& ClassRegistry::init('User');
         $empty=null;
-        $this->flushDatabase();
 
         $roles = array('Admin','Instructor','Student');
         $temp=$this->User->getRolesByRole($roles);
@@ -458,7 +438,7 @@ class UserTestCase extends CakeTestCase
 
     public function testRegisterEnrolment()
     {
-        /* TO DO */
+        /* TODO: test RegisterEnrolment */
 
         /*
         $this->User =& ClassRegistry::init('User');
@@ -480,8 +460,6 @@ class UserTestCase extends CakeTestCase
 
     public function testDropEnrolment()
     {
-        $this->User =& ClassRegistry::init('User');
-        $this->Course =& ClassRegistry::init('Course');
         $empty=null;
         //	$this->flushDatabase();
 
@@ -494,26 +472,5 @@ class UserTestCase extends CakeTestCase
         $this->User->DropEnrolment(1, 1);
         $enrolCount=$this->User->getEnrolledStudentsForList(1);
         $this->User->log($enrolCount);
-    }
-
-    /************************************************
-     * HELPER FUNCTION USED FOR UNIT TESTING PURPOSES
-     ************************************************/
-    public function deleteAllTuples($table)
-    {
-        $this->User= & ClassRegistry::init('User');
-        $sql = "DELETE FROM $table";
-        $this->User->query($sql);
-    }
-
-    public function flushDatabase()
-    {
-        $this->deleteAllTuples('courses');
-        $this->deleteAllTuples('users');
-        $this->deleteAllTuples('user_courses');
-        $this->deleteAllTuples('user_enrols');
-        $this->deleteAllTuples('roles_users');
-        $this->deleteAllTuples('groups');
-        $this->deleteAllTuples('groups_members');
     }
 }
