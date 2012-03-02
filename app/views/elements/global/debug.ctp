@@ -11,25 +11,25 @@ if(!Configure::read('debug') == 0 &&
   <table>
   <tr>
     <td>User ID: <?php echo User::isLoggedIn() ? User::get('id') : "none" ?>
-      <input type="button" onclick="$('#user-data').toggle();" value="show/hide" />
+      <input type="button" onclick="jQuery('#user-data').toggle();" value="show/hide" />
     </td>
     <td>Courses: <?php echo empty($coursesList) ? 0 : count($coursesList); ?>
-      <input type="button" onclick="$('#coursesList-data').toggle();" value="show/hide" />
+      <input type="button" onclick="jQuery('#coursesList-data').toggle();" value="show/hide" />
     </td>
     <td>Actions: <?php echo empty($action) ? 0 : count($action); ?>
-      <input type="button" onclick="$('#access-data').toggle();" value="show/hide" />
+      <input type="button" onclick="jQuery('#access-data').toggle();" value="show/hide" />
     </td>
     <td>Access: <?php echo empty($access) ? 0 : count($access); ?>
-      <input type="button" onclick="$('#actions-data').toggle();" value="show/hide" />
+      <input type="button" onclick="jQuery('#actions-data').toggle();" value="show/hide" />
     </td>
     <td>Params: <?php echo empty($this->params) ? 0 : count($this->params); ?>
-      <input type="button" onclick="$('#params-data').toggle();" value="show/hide" />
+      <input type="button" onclick="jQuery('#params-data').toggle();" value="show/hide" />
     </td>
     <td>SQL Log:
-      <input type="button" onclick="$('#SQL-data').toggle();" value="show/hide" />
+      <input type="button" onclick="jQuery('#SQL-data').toggle();" value="show/hide" />
     </td>
     <td>Allowed By: 
-      <input type="button" onclick="$('#allowedBy-data').toggle();" value="show/hide" />
+      <input type="button" onclick="jQuery('#allowedBy-data').toggle();" value="show/hide" />
     </td>
   </tr>
   </table>

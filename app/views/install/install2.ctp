@@ -1,13 +1,13 @@
 <script type="text/javascript">
 <!--
 function agreesubmit() {
-  if ($('#agreecheck').is(':checked'))
+  if (jQuery('#agreecheck').is(':checked'))
   {
-    $('#next').removeAttr('disabled');
+    jQuery('#next').removeAttr('disabled');
   }
   else
   {
-    $('#next').attr('disabled', 'disabled');
+    jQuery('#next').attr('disabled', 'disabled');
   }
 }
 //-->
