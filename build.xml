@@ -64,6 +64,7 @@
              <exclude name="tests/**" />
              <exclude name="vendors/**" />
              <exclude name="plugins/**" />
+             <exclude name="config/**" />
          </fileset>
          <logger type="jdepend-xml" outfile="${project.basedir}/build/logs/jdepend.xml" />
          <logger type="jdepend-chart" outfile="${project.basedir}/build/pdepend/dependencies.svg" />
@@ -79,6 +80,7 @@
              <exclude name="tests/**" />
              <exclude name="vendors/**" />
              <exclude name="plugins/**" />
+             <exclude name="config/**" />
          </fileset>
      </phpmd>
  </target>
@@ -91,6 +93,7 @@
              <exclude name="tests/**" />
              <exclude name="vendors/**" />
              <exclude name="plugins/**" />
+             <exclude name="config/**" />
          </fileset>
          <formatter type="xml" outfile="${project.basedir}/build/logs/pmd.xml"/>
      </phpmd>
@@ -104,6 +107,7 @@
              <exclude name="tests/**" />
              <exclude name="vendors/**" />
              <exclude name="plugins/**" />
+             <exclude name="config/**" />
          </fileset>
      </phpcodesniffer>
  </target>
@@ -116,6 +120,7 @@
              <exclude name="tests/**" />
              <exclude name="vendors/**" />
              <exclude name="plugins/**" />
+             <exclude name="config/**" />
          </fileset>
          <formatter type="checkstyle" outfile="${project.basedir}/build/logs/checkstyle.xml" />
      </phpcodesniffer>
@@ -128,6 +133,7 @@
              <exclude name="tests/**" />
              <exclude name="vendors/**" />
              <exclude name="plugins/**" />
+             <exclude name="config/**" />
          </fileset>
          <formatter type="pmd" outfile="${project.basedir}/build/logs/pmd-cpd.xml" />
      </phpcpd>
@@ -141,6 +147,7 @@
              <exclude name="tests/**" />
              <exclude name="vendors/**" />
              <exclude name="plugins/**" />
+             <exclude name="config/**" />
          </fileset>
      </phpdoc>
  </target>

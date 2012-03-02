@@ -10,6 +10,15 @@
  */
 Class ExportCsvComponent extends ExportBaseNewComponent
 {
+    /**
+     * buildGroupExportCsvByGroup
+     *
+     * @param mixed $params  params
+     * @param mixed $groupId group id
+     *
+     * @access public
+     * @return void
+     */
     function buildGroupExportCsvByGroup($params, $groupId)
     {
         $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
@@ -22,6 +31,17 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         return $CSV;
     }
 
+
+    /**
+     * _buildGroupExportCsvByUser
+     *
+     * @param mixed $userId  user id
+     * @param mixed $params  params
+     * @param mixed $groupId group id
+     *
+     * @access protected
+     * @return void
+     */
     function _buildGroupExportCsvByUser($userId, $params, $groupId)
     {
         $this->User = ClassRegistry::init('User');
@@ -29,44 +49,64 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         $row = '';
         $user = $this->User->findUserByid($userId);
         $group = $this->Group->getGroupByGroupId($groupId);
-        if(!empty($params['include_group_names'])) {
-            $row .= $group['Group']['group_name'].",";
+        if (!empty($params['include_group_names'])) {
+            $row .= $group['Group']['group_name'].", ";
         }
-        if(!empty($params['include_student_id'])) {
-            $row .= $user['User']['student_no'].",";
+        if (!empty($params['include_student_id'])) {
+            $row .= $user['User']['student_no'].", ";
         }
-        if(!empty($params['include_student_name'])) {
-            $row .= $user['User']['first_name'].",";
-            $row .= $user['User']['last_name'].",";
+        if (!empty($params['include_student_name'])) {
+            $row .= $user['User']['first_name'].", ";
+            $row .= $user['User']['last_name'].", ";
         }
-        if(!empty($params['include_student_email'])) {
+        if (!empty($params['include_student_email'])) {
             $row .= $user['User']['email'];
         }
         return $row;
     }
 
+
+    /**
+     * creteCsvSubHeaderHelper
+     *
+     * @param mixed $params     params
+     * @param mixed &$subHeader sub header
+     *
+     * @access public
+     * @return void
+     */
     function creteCsvSubHeaderHelper($params, &$subHeader)
     {
-        if(!empty($params['include_group_names'])) {
-            $subHeader .= "Group Name,";
+        if (!empty($params['include_group_names'])) {
+            $subHeader .= "Group Name, ";
         }
-        if(!empty($params['include_student_email'])) {
-            $subHeader .= "Email,";
+        if (!empty($params['include_student_email'])) {
+            $subHeader .= "Email, ";
         }
-        if(!empty($params['include_student_name'])) {
-            $subHeader .= "Evaluatee,";
+        if (!empty($params['include_student_name'])) {
+            $subHeader .= "Evaluatee, ";
         }
-        if(!empty($params['include_student_id'])) {
-            $subHeader .= "Evaluatee S#,";
+        if (!empty($params['include_student_id'])) {
+            $subHeader .= "Evaluatee S#, ";
         }
-        if(!empty($params['include_student_name'])) {
-            $subHeader .= "Evaluator,";
+        if (!empty($params['include_student_name'])) {
+            $subHeader .= "Evaluator, ";
         }
-        if(!empty($params['include_student_id'])) {
-            $subHeader .= "Evaluator S#,";
+        if (!empty($params['include_student_id'])) {
+            $subHeader .= "Evaluator S#, ";
         }
     }
 
+
+    /**
+     * createMixEvalCsvSubHeader
+     *
+     * @param mixed $params  params
+     * @param mixed $eventId event id
+     *
+     * @access public
+     * @return void
+     */
     function createMixEvalCsvSubHeader($params, $eventId)
     {
         $this->Event = ClassRegistry::init('Event');
@@ -76,13 +116,23 @@ Class ExportCsvComponent extends ExportBaseNewComponent
 
         $subHeader = '';
         $this->creteCsvSubHeaderHelper($params, $subHeader);
-        for($i=0; $i<count($questions); $i++) {
-            $subHeader .= "Q".($i+1)." (/".$questions[$i]['MixevalsQuestion']['multiplier']."),";
+        for ($i=0; $i<count($questions); $i++) {
+            $subHeader .= "Q".($i+1)." (/".$questions[$i]['MixevalsQuestion']['multiplier']."), ";
         }
         $subHeader .= "Raw Score, Late Penalty, Final Score";
         return $subHeader;
     }
 
+
+    /**
+     * createRubricsMixEvalCsvSubHeader
+     *
+     * @param mixed $params  params
+     * @param mixed $eventId event id
+     *
+     * @access public
+     * @return void
+     */
     function createRubricsMixEvalCsvSubHeader($params, $eventId)
     {
         $this->Event = ClassRegistry::init('Event');
@@ -97,12 +147,21 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         $this->creteCsvSubHeaderHelper($params, $subHeader);
         for ($i=1; $i<=$rubric['Rubric']['criteria']; $i++) {
             $rubricCriteriaMark = $rubricCriterias[$i-1]['RubricsCriteria']['multiplier'];
-            $subHeader .= "Q".$i." ( /".$rubricCriteriaMark."),";
+            $subHeader .= "Q".$i." ( /".$rubricCriteriaMark."), ";
         }
         $subHeader .= "Raw Score, Late Penalty, Final Score";
         return $subHeader;
     }
 
+
+    /**
+     * createSimpleCsvSubHeader
+     *
+     * @param mixed $params params
+     *
+     * @access public
+     * @return void
+     */
     function createSimpleCsvSubHeader($params)
     {
         $subHeader = '';
@@ -113,6 +172,16 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         return $subHeader;
     }
 
+
+    /**
+     * createCsv
+     *
+     * @param mixed $params  params
+     * @param mixed $eventId event id
+     *
+     * @access public
+     * @return void
+     */
     function createCsv($params, $eventId)
     {
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
@@ -144,7 +213,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
             $subHeader = $this->createMixEvalCsvSubHeader($params, $eventId);
             $csv .= $subHeader."\n\n";
             foreach ($groupEvents as $ge) {
-                $resultTable = $this->buildMixedEvalScoreTableByGroupEvent($params ,$ge['GroupEvent']['id']);
+                $resultTable = $this->buildMixedEvalScoreTableByGroupEvent($params, $ge['GroupEvent']['id']);
                 $csv .= $resultTable;
             }
             break;
@@ -153,6 +222,16 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         return $csv;
     }
 
+
+    /**
+     * createExcel
+     *
+     * @param mixed $params  params
+     * @param mixed $eventId event id
+     *
+     * @access public
+     * @return void
+     */
     function createExcel($params, $eventId)
     {
         $this->Event = ClassRegistry::init('Event');
@@ -170,14 +249,14 @@ Class ExportCsvComponent extends ExportBaseNewComponent
                 $group = $this->Group->getGroupByGroupId($groupEvents[$i]['GroupEvent']['group_id']);
                 $grpEventId = $groupEvents[$i]['GroupEvent']['id'];
                 $groupMembers = $this->GroupEvent->getGroupMembers($grpEventId);
-                if(!empty($params['include_group_names'])) {
+                if (!empty($params['include_group_names'])) {
                     $CSV .= "Group Name : ".$group[0]['Group']['group_name']."\n";
                 }
-                if(!empty($params['simple_eval_grade_table'])){
+                if (!empty($params['simple_eval_grade_table'])) {
                     $simpleResults = $this->buildSimpleEvalResults($groupEvents[$i]['GroupEvent']['id'], $params);
                     $CSV .= $simpleResults."\n\n";
                 }
-                if(!empty($params['simple_evaluator_comment'])) {
+                if (!empty($params['simple_evaluator_comment'])) {
                     $CSV .= "Simple Evaluation Comments :\n\n";
                     foreach ($groupMembers as $evaluatee) {
                         $simpleEvalComments = $this->buildSimpleOrRubricsCommentByEvaluatee($grpEventId, $evaluatee['GroupsMembers']['user_id'], $params, 'S');
@@ -189,19 +268,19 @@ Class ExportCsvComponent extends ExportBaseNewComponent
 
             //Rubrics Evaluation Event
         case 2:
-            for($i=0; $i<count($groupEvents); $i++) {
+            for ($i=0; $i<count($groupEvents); $i++) {
                 $grpEventId = $groupEvents[$i]['GroupEvent']['id'];
                 $group = $this->Group->getGroupByGroupId($groupEvents[$i]['GroupEvent']['group_id']);
                 $groupMembers = $this->GroupEvent->getGroupMembers($grpEventId);
-                if(!empty($params['include_group_names'])) {
+                if (!empty($params['include_group_names'])) {
                     $CSV .= "Group Name : ".$group[0]['Group']['group_name']."\n\n";
                 }
-                if(!empty($params['rubric_criteria_marks'])) {
+                if (!empty($params['rubric_criteria_marks'])) {
                     $CSV .= "Rubrics Evaluation Grade Tables:\n\n";
                     $gradeTable = $this->buildRubricsResultTable($params, $grpEventId);
                     $CSV .= $gradeTable."\n";
                 }
-                if(!empty($params['rubric_general_comments'])) {
+                if (!empty($params['rubric_general_comments'])) {
                     $CSV .= "Rubrics General Comments\n\n";
                     foreach ($groupMembers as $evaluatee) {
                         $rubricGeneralComments = $this->buildSimpleOrRubricsCommentByEvaluatee($grpEventId, $evaluatee['GroupsMembers']['user_id'], $params, 'R');
@@ -218,10 +297,10 @@ Class ExportCsvComponent extends ExportBaseNewComponent
                 $grpEventId = $groupEvents[$i]['GroupEvent']['id'];
                 $group = $this->Group->getGroupByGroupId($groupEvents[$i]['GroupEvent']['group_id']);
                 $groupMembers = $this->GroupEvent->getGroupMembers($grpEventId);
-                if(!empty($params['include_group_names'])) {
+                if (!empty($params['include_group_names'])) {
                     $CSV .= "Group Name : ".$group[0]['Group']['group_name']."\n\n\n";
                 }
-                if(!empty($params['include_mixeval_grades'])) {
+                if (!empty($params['include_mixeval_grades'])) {
                     $CSV .= "Part 1: Licket Scale Questions Grade Table :\n\n";
                     $gradeTable = $this->buildMixevalResult($params, $groupEvents[$i]['GroupEvent']['id'], $groupMembers[$i]['GroupsMembers']['id']);
                     $CSV .= $gradeTable."\n\n";
@@ -239,6 +318,16 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         return $CSV;
     }
 
+
+    /**
+     * checkAll
+     *
+     * @param mixed $params  params
+     * @param mixed $eventId event id
+     *
+     * @access public
+     * @return void
+     */
     function checkAll($params, $eventId)
     {
         $this->Event = ClassRegistry::init('Event');
@@ -248,24 +337,27 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         switch($eventType) {
             // Simple Evaluation
         case 1:
-            if(!$this->checkSimpleEvaluationParams($params)) {
+            if (!$this->checkSimpleEvaluationParams($params)) {
                 return false;
+            } else {
+                return true;
             }
-            else return true;
             break;
             //Rubrics Evaluation
         case 2:
-            if(!$this->checkRubricsEvaluationParams($params)) {
+            if (!$this->checkRubricsEvaluationParams($params)) {
                 return false;
+            } else {
+                return true;
             }
-            else return true;
             break;
             // Mixed Evaluation
         case 4:
-            if(!$this->checkMixedEvaluationParams($params)) {
+            if (!$this->checkMixedEvaluationParams($params)) {
                 return false;
+            } else {
+                return true;
             }
-            else return true;
             break;
 
         default:
@@ -274,50 +366,87 @@ Class ExportCsvComponent extends ExportBaseNewComponent
 
     }
 
+
+    /**
+     * checkSimpleEvaluationParams
+     *
+     * @param mixed $params
+     *
+     * @access public
+     * @return void
+     */
     function checkSimpleEvaluationParams($params)
     {
         // Check that the basic param requirements are met
-        if(!$this->checkBasicParamsRequirement($params)) {
+        if (!$this->checkBasicParamsRequirement($params)) {
             return false;
-        }
-        else if(empty($params['simple_evaluator_comment']) && empty($params['simple_eval_grade_table'])) {
+        } else if (empty($params['simple_evaluator_comment']) && empty($params['simple_eval_grade_table'])) {
             return false;
+        } else {
+            return true;
         }
-        else return true;
     }
 
+
+    /**
+     * checkRubricsEvaluationParams
+     *
+     * @param mixed $params
+     *
+     * @access public
+     * @return void
+     */
     function checkRubricsEvaluationParams($params)
     {
         // Check that the basic param requirements are met
-        if(!$this->checkBasicParamsRequirement($params)) {
+        if (!$this->checkBasicParamsRequirement($params)) {
             return false;
-        }
-        else if(empty($params['rubric_criteria_marks']) && empty($params['rubric_general_comments'])) {
+        } else if (empty($params['rubric_criteria_marks']) && empty($params['rubric_general_comments'])) {
             return false;
+        } else {
+            return true;
         }
-        else return true;
     }
 
+
+    /**
+     * checkMixedEvaluationParams
+     *
+     * @param mixed $params
+     *
+     * @access public
+     * @return void
+     */
     function checkMixedEvaluationParams($params)
     {
         // Check that the basic param requirements are met
         if (!$this->checkBasicParamsRequirement($params)) {
             return false;
-        }
-        else if(empty($params['include_mixeval_question_comment']) && empty($params['include_mixeval_grades'])) {
+        } else if (empty($params['include_mixeval_question_comment']) && empty($params['include_mixeval_grades'])) {
             return false;
+        } else {
+            return true;
         }
-        else return true;
     }
 
+
+    /**
+     * checkBasicParamsRequirement
+     *
+     * @param mixed $params
+     *
+     * @access public
+     * @return void
+     */
     function checkBasicParamsRequirement($params)
     {
-        if(empty($params['include_course']) && empty($params['include_eval_event_names'])){
+        if (empty($params['include_course']) && empty($params['include_eval_event_names'])) {
             return false;
-        }
-        else if(empty($params['include_student_name']) && empty($params['include_student_id'])) {
+        } else if (empty($params['include_student_name']) && empty($params['include_student_id'])) {
             return false;
+        } else {
+            return true;
         }
-        else return true;
     }
+
 }
