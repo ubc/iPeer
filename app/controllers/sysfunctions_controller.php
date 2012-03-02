@@ -34,7 +34,7 @@ class SysFunctionsController extends AppController
 	var $direction;
 	var $page;
 	var $order;
-	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
+	var $helpers = array('Html','Ajax','Javascript','Time');
 	var $NeatString;
 	var $Sanitize;
   var $uses = array('SysFunction','Personalize');
@@ -109,7 +109,7 @@ class SysFunctionsController extends AppController
 
 	function edit($id=null)
 	{
-		
+
 		if (empty($this->data))
 		{
 			$this->SysFunction->id = $id;
@@ -121,7 +121,7 @@ class SysFunctionsController extends AppController
 		{
 			if ( $this->SysFunction->save($this->data))
 			{
-				
+
 				$this->Session->setFlash(__('The record is edited successfully.', true));
 				$this->redirect('index');
 				}

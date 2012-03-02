@@ -35,7 +35,7 @@ class SysParametersController extends AppController
 	var $direction;
 	var $page;
 	var $order;
-	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
+	var $helpers = array('Html','Ajax','Javascript','Time');
 	var $NeatString;
 	var $Sanitize;
 	var $uses = array('SysParameter','Personalize');

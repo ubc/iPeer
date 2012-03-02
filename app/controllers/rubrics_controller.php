@@ -34,7 +34,7 @@ class RubricsController extends AppController
 	var $direction;
 	var $page;
 	var $order;
-	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
+	var $helpers = array('Html','Ajax','Javascript','Time');
 	var $Sanitize;
   var $components = array('AjaxList','Output','sysContainer', 'userPersonalize', 'framework');
 
@@ -51,7 +51,7 @@ class RubricsController extends AppController
  		$this->set('title_for_layout', __('Rubrics', true));
     parent::__construct();
 	}
-	
+
   function postProcess($data) {
     // Creates the custom in use column
     if ($data) {
@@ -69,7 +69,7 @@ class RubricsController extends AppController
 
   function setUpAjaxList() {
     $myID = $this->Auth->user('id');
-    
+
     // Set up Columns
     $columns = array(
             array("Rubric.id",          "",            "",      "hidden"),
@@ -158,7 +158,7 @@ class RubricsController extends AppController
     $this->set('action', __('View Rubric', true));
     $this->render('edit');
   }
-  
+
   function add($layout='') {
     if ($layout != '') {
       $this->layout = $layout;
@@ -172,7 +172,7 @@ class RubricsController extends AppController
         if($this->__processForm()) {
           $this->Session->setFlash(__('The rubric was added successfully.', true));
           $this->redirect('index');
-        } 
+        }
       }
     } else {
       $this->set('action', __('Add Rubric', true));
@@ -226,7 +226,7 @@ class RubricsController extends AppController
     if (!empty($this->data)) {
       $this->Output->filter($this->data);//always filter
       //Save Data
-      
+
       //$this->log($this->data);
       if ($this->Rubric->saveAllWithCriteriaComment($this->data)) {
         $this->data['Rubric']['id'] = $this->Rubric->id;
@@ -248,7 +248,7 @@ class RubricsController extends AppController
 	function delete($id) {
     // Deny Deleting evaluations in use:
     if ($this->Rubric->getEventCount($id)) {
-      $this->Session->setFlash(__('This evaluation is in use. Please remove all the events assosiated with this evaluation first.', true), 
+      $this->Session->setFlash(__('This evaluation is in use. Please remove all the events assosiated with this evaluation first.', true),
                                'error');
     } else {
       if ($this->Rubric->delete($id, true)) {
@@ -262,11 +262,11 @@ class RubricsController extends AppController
     }
     $this->redirect('index');
 	}
-	
+
 	function test(){
 		$this->log(__("Test Success", true));
 	}
-	
+
 	function setForm_RubricName($name){
 		$this->data['Rubric']['name'] = $name;
 		//$this->log($this->data['Rubric']['name']);

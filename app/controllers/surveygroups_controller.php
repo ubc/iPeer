@@ -36,7 +36,7 @@ class SurveyGroupsController extends AppController
   var $page;
   var $order;
   var $Sanitize;
-  var $helpers = array('Html','Ajax','Javascript','Pagination');
+  var $helpers = array('Html','Ajax','Javascript');
   var $components = array('Output','sysContainer', 'userPersonalize', 'framework','XmlHandler','AjaxList');
 
   function __construct()
@@ -115,11 +115,11 @@ class SurveyGroupsController extends AppController
 //      $this->rdAuth->setCourseId($courseId);
        $courseId = $params;
     }
-    
+
     $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > View Survey Result', true));
     //get surveys for the course
     $survey_list = $this->Survey->find('list', array('conditions' => array('course_id' => $courseId)));
-    $ids = array_keys($survey_list); 
+    $ids = array_keys($survey_list);
     $survey = $this->Survey->getSurveyWithSubmissionById($ids);
 
     $this->set('survey_list', $survey_list);
@@ -129,7 +129,7 @@ class SurveyGroupsController extends AppController
   function viewresultsearch() {
     $this->layout = false;
     $conditions = array();
-    
+
     //search function
     if (!empty($this->data['livesearch2']) && !empty($this->data['select']))
     {
@@ -140,7 +140,7 @@ class SurveyGroupsController extends AppController
       $conditions = array('OR' => array('Enrol.first_name LIKE' => '%'.$searchValue.'%',
                                         'Enrol.last_name LIKE' => '%'.$searchValue.'%'));
     }
-	
+
     $survey = $this->Survey->getSurveyWithSubmissionById($this->data['survey_select'], $conditions);
     $this->set('data',$survey);
   }

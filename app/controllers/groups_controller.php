@@ -39,7 +39,7 @@ class GroupsController extends AppController
 	var $direction;
 	var $page;
 	var $order;
-	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
+	var $helpers = array('Html','Ajax','Javascript','Time');
 	var $Sanitize;
   	var $components = array('AjaxList', 'ExportBaseNew', 'ExportCsv');
 

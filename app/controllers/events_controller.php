@@ -16,7 +16,7 @@ class EventsController extends AppController
     public $direction;
     public $page;
     public $order;
-    public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Pagination');
+    public $helpers = array('Html', 'Ajax', 'Javascript', 'Time');
     public $NeatString;
     public $Sanitize;
     public $uses = array('GroupEvent', 'User', 'Group', 'Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers', 'Penalty');

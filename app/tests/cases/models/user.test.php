@@ -426,12 +426,10 @@ class UserTestCase extends CakeTestCase
     public function testGetInstructors()
     {
         $instructors = $this->User->GetInstructors('all', array());
+        $instructors = Set::extract('/User/id', $instructors);
+        sort($instructors);
 
-        $instructor = array();
-        foreach ($instructors as $c) {
-            array_push($instructor, $c['User']['id']);
-        }
-        $this->assertEqual($instructor, array(5,6,7,2,1));
+        $this->assertEqual($instructors, array(1, 2, 5, 6, 7));
     }
 
     //is not used anywhere

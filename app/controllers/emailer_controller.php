@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -7,10 +7,10 @@
 class EmailerController extends AppController
 {
   var $name = 'Emailer';
-  var $uses = array('GroupsMembers', 'UserEnrol', 'User', 'EmailTemplate', 'EmailMerge', 
+  var $uses = array('GroupsMembers', 'UserEnrol', 'User', 'EmailTemplate', 'EmailMerge',
       'EmailSchedule', 'Personalize', 'SysParameter', 'SysFunction', 'Group', 'Course');
   var $components = array('AjaxList', 'Session', 'RequestHandler', 'Email');
-  var $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Pagination', 'Js' => array('Prototype'));
+  var $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Js' => array('Prototype'));
   var $show;
   var $sortBy;
   var $direction;
@@ -46,7 +46,7 @@ class EmailerController extends AppController
             array("EmailSchedule.created", __("Creation Date", true), "15em", "date"));
 
     $userList = array($myID => "My Email");
-    
+
     // Join with Users
     $jointTableCreator =
       array("id"         => "Creator.id",
@@ -152,10 +152,10 @@ class EmailerController extends AppController
             $tmp_data[$i]['date'] = date("Y-m-d H:i:s", strtotime($date) + ($i-1)*$data['interval_type']*$data['interval_num']);
           }
           $data = $tmp_data;
-        }        
+        }
 
         //Push an email into email_schedules table
-        $this->EmailSchedule->saveAll($data);        
+        $this->EmailSchedule->saveAll($data);
 
         $this->Session->setFlash(__('The Email was saved successfully', true));
         $this->redirect('index/');
@@ -224,7 +224,7 @@ class EmailerController extends AppController
     //$this->autoRender = false;
     $this->layout = false;
     $this->ajax = true;
-    
+
     $tmp_recipients = $this->Session->read('email_recipients');
     array_push($tmp_recipients, $recipient);
     //Store added recipient to session
@@ -378,9 +378,9 @@ class EmailerController extends AppController
     $replacements = array();
     $merge_count = 0;
     $patterns = $matches[0];
-    foreach($matches[0] as $key => $match){      
+    foreach($matches[0] as $key => $match){
       $patterns[$key] = '/'.$match[0].'/';
-      
+
       $table = $this->EmailMerge->getFieldAndTableNameByValue($match[0]);
       $table_name = $table['table_name'];
       $field_name = $table['field_name'];
@@ -388,7 +388,7 @@ class EmailerController extends AppController
       $value = $this->$table_name->find('first',array(
           'conditions' => array($table_name.'.id' => $user_id),
           'fields' => $field_name
-      )); 
+      ));
 
       $replacements[$key] = $value[$table_name][$field_name];
     }
@@ -396,7 +396,7 @@ class EmailerController extends AppController
   }
 
   /**
-   * Send emails 
+   * Send emails
    */
   function send(){
     $this->layout = 'ajax';
@@ -409,13 +409,13 @@ class EmailerController extends AppController
       $from = $this->User->getEmailById($from_id);
 
       $to_ids = explode(';', $e['to']);
-      foreach($to_ids as $to_id){        
+      foreach($to_ids as $to_id){
         $to = $this->User->getEmailById($to_id);
         $subject = $e['subject'];
         $content = $this->doMerge($e['content'], $this->mergeStart, $this->mergeEnd, $to_id);
         if($this->_sendEmail($content,$subject,$from,$to)){
           $tmp = array('id' => $e['id'],'sent' => '1');
-          $this->EmailSchedule->save($tmp);          
+          $this->EmailSchedule->save($tmp);
         }
         else{
           echo __("Failed", true);

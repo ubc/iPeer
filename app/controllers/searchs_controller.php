@@ -16,11 +16,11 @@ class SearchsController extends AppController
   var $order;
   var $Sanitize;
   var $functionCode = 'ADV_SEARCH';
-  var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
+  var $helpers = array('Html','Ajax','Javascript','Time');
   var $components = array('Output','sysContainer', 'Search',
       'userPersonalize', 'framework', 'sysContainer', 'Evaluation');
-  
-	
+
+
   function __construct() {
     $this->Sanitize = new Sanitize;
     $this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
@@ -106,7 +106,7 @@ class SearchsController extends AppController
 
     $searchMartix = $this->formatSearchEvaluationResult($maxPercent,$minPercent,$eventId,$status, $this->order, $this->sortBy, $this->show);
 
-    $eventList = $this->Auth->user('role') == 'A' ? 
+    $eventList = $this->Auth->user('role') == 'A' ?
       $this->Event->find('all', array(
           'conditions' => array('event_template_type_id !=' => '3'))) :
       $this->Event->find('all', array(
@@ -140,7 +140,7 @@ class SearchsController extends AppController
   function eventBoxSearch() {
     $this->layout = false;
     $courseId = $this->params['form']['course_id'];
-    $condition['course_id'] = $courseId;    
+    $condition['course_id'] = $courseId;
     if ($courseId == 'A') {
       $condition = array();
     }
@@ -206,20 +206,20 @@ class SearchsController extends AppController
    */
   function formatSearchEvaluationResult($maxPercent=1,$minPercent=0,$eventId=null,$status=null, $sortBy, $limit) {
     $matrixAry = array();
-    
+
     $assignedGroupIDs = array();
     $course_id = isset($this->params['form']['course_id'])? $this->params['form']['course_id']: "0";
 
     $conditions = $course_id == "A" ?
       ($eventId == "A"?
-        ($this->Auth->user('role') == 'A' ? 
+        ($this->Auth->user('role') == 'A' ?
             array():
             array('Event.creator_id' => $this->Auth->user('id'))):
         array('Event.id' => $eventId)) :
       ($eventId == "A"? array('Event.course_id' => $course_id): array('Event.id' => $eventId));
 
     $conditions['event_template_type_id !='] = '3';
-    
+
     $this->Event->recursive = -1;
     $events = $this->Event->find('all', array(
         'conditions' => $conditions
@@ -243,7 +243,7 @@ class SearchsController extends AppController
           break;
       }
     }
-    
+
     if (!empty($assignedGroupIDs)) {
       $assignedGroups = array();
 

@@ -9,7 +9,7 @@ class EmailtemplatesController extends AppController
   var $name = 'EmailTemplates';
   var $uses = array('GroupsMembers', 'UserEnrol', 'User', 'EmailTemplate', 'EmailMerge', 'EmailSchedule', 'Personalize', 'SysParameter', 'SysFunction');
   var $components = array('AjaxList', 'Session', 'RequestHandler', 'Email');
-  var $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Pagination', 'Js' => array('Prototype'));
+  var $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Js' => array('Prototype'));
   var $show;
   var $sortBy;
   var $direction;

@@ -37,7 +37,7 @@ class SurveysController extends AppController
   var $page;
   var $order;
   var $Sanitize;
-  var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
+  var $helpers = array('Html','Ajax','Javascript','Time');
   var $components = array('AjaxList','rdAuth','Output','sysContainer', 'framework');
 
 
@@ -245,7 +245,7 @@ class SurveysController extends AppController
     $data = $this->Survey->find('first', array('conditions' => array('id' => $id),
                                                'contain' => array('Event')));
     if (!empty($this->data)) {
-      //alter dates for the event 
+      //alter dates for the event
       //TODO: separte date from survey
       $data['Survey'] = $this->data['Survey'];
       $data['Event'][0]['title'] = $this->data['Survey']['name'];
@@ -384,7 +384,7 @@ class SurveysController extends AppController
       'conditions' => array('Survey.id' => $survey_id),
       //'contain' => array('Question', 'Response'),
       'order' => 'SurveyQuestion.number',
-      'recursive' => 1));  
+      'recursive' => 1));
     $this->set('survey_id', $survey_id);
     $this->set('questions', $questions);
     $this->set('is_editable', true);//TODO: check permission $this->controller->rdAuth->id == $data['Survey']['creator_id'] || $this->controller->rdAuth->id == 1

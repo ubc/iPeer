@@ -36,7 +36,7 @@ class SimpleevaluationsController extends AppController
 	var $direction;
 	var $page;
 	var $order;
-	var $helpers = array('Html','Ajax','Javascript','Time','Pagination');
+	var $helpers = array('Html','Ajax','Javascript','Time');
 	var $NeatString;
 	var $Sanitize;
 	var $uses = array('SimpleEvaluation', 'Event', 'Personalize');
@@ -181,7 +181,7 @@ class SimpleevaluationsController extends AppController
       if ($this->SimpleEvaluation->save($this->data)) {
         $this->data['SimpleEvaluation']['id'] = $this->SimpleEvaluation->id;
         return true;
-      } 
+      }
     }
 
     return false;
@@ -205,7 +205,7 @@ class SimpleevaluationsController extends AppController
 			$this->Output->filter($this->data);//always filter
 			//converting nl2br back so it looks better
 			$this->Output->br2nl($this->data);
-		} 
+		}
 	}
 
   function copy($id) {
