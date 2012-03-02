@@ -437,7 +437,63 @@ i
 	padding-bottom: 0.5em;
 }
 
+/* POPUP */
+
+#pop_title {
+	margin:0;
+	padding:0;
+	background:#f4f4f4 url(small_header_back.gif) repeat-x;
+	font:bold 1em/1 Arial, Helvetica, sans-serif;
+	color: #0A2C64;
+	border-top: 1px solid #CFCFCF;
+	border-bottom: 1px solid #CFCFCF;
+}
+
 /* TO BE REFACTORED LATER */
+
+/* TEMPORARY */
+/* temporary padding to be used until refactoring finished */
+table
+{
+	border-spacing: 2px;
+	border-collapse: separate;
+}
+th
+{
+	vertical-align: middle;
+	padding: 0.5em;
+}
+
+td
+{
+	vertical-align: middle;
+	padding: 0.5em;
+}
+
+/* temp nav ul fix */
+#nav ul
+{
+	margin: 1em;
+}
+
+#nav li
+{
+	display: inline;
+	list-style: none;
+}
+
+#nav a
+{
+	text-decoration: none;
+	font-size: 0.9em;
+	padding: 0.2em 0.5em;
+}
+
+#nav .current a
+{
+	background-color: #ed0;
+}
+
 
 /* BOX STYLE */
 .title2 {
@@ -461,15 +517,6 @@ i
 	margin:0;
 	padding:2px 5px;
 	background:#F4F4F4;
-	font:bold 1em/1 Arial, Helvetica, sans-serif;
-	color: #0A2C64;
-	border-top: 1px solid #CFCFCF;
-	border-bottom: 1px solid #CFCFCF;
-}
-#pop_title {
-	margin:0;
-	padding:0;
-	background:#f4f4f4 url(small_header_back.gif) repeat-x;
 	font:bold 1em/1 Arial, Helvetica, sans-serif;
 	color: #0A2C64;
 	border-top: 1px solid #CFCFCF;
