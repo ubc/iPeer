@@ -85,7 +85,7 @@ class ExportHelper2Component extends Object
      * @access public
      * @return void
      */
-    function fillGridHorizonally (&$grid, array(), $xFrom, $yIndex, $values = array())
+    function fillGridHorizonally (&$grid, $xFrom, $yIndex, $values = array())
     {
         $index = count($values);
         for ($i=0; $i<$index; $i++) {
