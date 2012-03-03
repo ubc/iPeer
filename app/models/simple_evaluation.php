@@ -1,62 +1,43 @@
 <?php
-/* SVN FILE: $Id$ */
-
-/**
- * Enter description here ....
- *
- * @filesource
- * @copyright    Copyright (c) 2006, .
- * @link
- * @package
- * @subpackage
- * @since
- * @version      $Revision$
- * @modifiedby   $LastChangedBy$
- * @lastmodified $Date: 2006/09/25 17:31:54 $
- * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
- */
+App::import('Model', 'EvaluationBase');
 
 /**
  * SimpleEvaluation
  *
- * Enter description here...
- *
- * @package
- * @subpackage
- * @since
+ * @uses EvaluationBase
+ * @package   CTLT.iPeer
+ * @author    Pan Luo <pan.luo@ubc.ca>
+ * @copyright 2012 All rights reserved.
+ * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-App::import('Model', 'EvaluationBase');
-
 class SimpleEvaluation extends EvaluationBase
 {
-  const TEMPLATE_TYPE_ID = 1;
-  var $name = 'SimpleEvaluation';
-  // use default table
-  var $useTable = null;
-  /*var $validate = array(
+    const TEMPLATE_TYPE_ID = 1;
+    public $name = 'SimpleEvaluation';
+    // use default table
+    public $useTable = null;
+  /*public $validate = array(
       'name' => array('rule' => 'notEmpty',
                       'required' => true,
                       'allowEmpty' => false),
       'point_per_member' => 'numeric',
   );*/
 
-/*  var $hasMany = array(
+/*  public $hasMany = array(
                        'EvaluationSimple' => array(
                         'className' => 'EvaluationSimple',
                         'dependent' => true
                        )
-  );*/
-  var $hasMany = array(
-    'Event' =>
-      array('className'   => 'Event',
+);*/
+    public $hasMany = array(
+        'Event' =>
+        array('className'   => 'Event',
             'conditions'  => array('Event.event_template_type_id' => self::TEMPLATE_TYPE_ID),
             'order'       => '',
             'foreignKey'  => 'template_id',
             'dependent'   => true,
             'exclusive'   => false,
             'finderSql'   => ''
-           ),
-      );
+        ),
+    );
 }
-
-?>

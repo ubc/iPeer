@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * Automagically adds the logged in user's id to the specified fields when certain
  * events occur within the model.
  *
@@ -8,7 +7,7 @@
  * trigger field. If you do, no other fields (including the target field) will be saved.
  * Instead use a standard model->save call. This is a cake issue so nothing can be
  * done without altering the core.
- * 
+ *
  * This works on a system of trigger fields and target fields. When a 'trigger' field
  * is saved, and it updates a corresponding 'target' field. For example, if you have
  * a trigger field called 'deleted' with a corresponding target field of 'deleted_by',
@@ -16,13 +15,13 @@
  * then the deleted_by field is set to a specified value (by default, 0). When deleted
  * is saved with a non-empty value, deleted_by is updated with the id of the currently
  * Authed user.
- * 
+ *
  * When using find queries on a model which implements this behaviour, a
  * user model will be generated for each target field and stored under a corresponding
  * name in the data array (assuming the recursive level permits of course).
- * For example, a User model for user identified in the created_by field will 
+ * For example, a User model for user identified in the created_by field will
  * be stored under the CreatedBy key in the returned data array:
- * 
+ *
  * Array (
  *     'Webpages' => Array (
  *         'id' => 1
@@ -47,16 +46,17 @@
  *     'CreatedBy' => Array ()
  * )
  *
- * @author Karl Rixon <karl@karlrixon.co.uk>
+ * @author  Karl Rixon <karl@karlrixon.co.uk>
  * @version 1.0
  *
  * Modifed by Compass for iPeer Project
- * 
+ *
  **/
-class TraceableBehavior extends ModelBehavior {
+class TraceableBehavior extends ModelBehavior
+{
 
     /**
-     * @var mixed An array of default configuration options
+     * @public mixed An array of default configuration options
      * @access private
      */
     private $_defaults = array(
@@ -85,15 +85,15 @@ class TraceableBehavior extends ModelBehavior {
         'auto_bind' => 'embed',
         'map' => array()
     );
-    
+
     /**
-     * @var int Stores the id of the currently Authed user.
+     * @public int Stores the id of the currently Authed user.
      * @access private
      */
     private $_userId = 0;
-    
+
     /**
-     * @var mixed An array of values which should indicate that a field has been emptied. There
+     * @public mixed An array of values which should indicate that a field has been emptied. There
      * is no need to specify the values which evaluate true using PHP's empty() function;
      * this is intended for custom values which would not normally be considered empty().
      * @access private
@@ -101,55 +101,57 @@ class TraceableBehavior extends ModelBehavior {
     private $_empty = array(
         '0000-00-00 00:00:00' // empty datetime
     );
-    
+
     private $_noTrace = false;
 
     /**
      * Initialises the behaviour.
      *
-     * @param Model $model A reference to the model object to which this behaviour is attached.
+     * @param Model $model  A reference to the model object to which this behaviour is attached.
      * @param mixed $config An array of behaviour configuration options to be merged with the defaults.
+     *
      * @return void
      * @author Karl Rixon <karlrixon@gmail.com>
      * @version 1.0
      * @since 1.0
      */
-    function setup($model, $config = array()) {
-        
+    function setup($model, $config = array())
+    {
+
         if (!$model->useTable) {
             // Model is not tied to a database table.
             return;
         }
-        
+
         $this->settings[$model->alias] = array_merge($this->_defaults, (array) $config);
 
         if (empty($this->_userId)) {
             $this->_userId = $this->_getAuthedUserId($model);
         }
         $this->settings[$model->alias]['map'] = $this->_buildFieldMap($model);
-        
+
         if ('model' == $this->settings[$model->alias]['auto_bind']) {
             $this->_bindModels($model);
         } else if ('embed' == $this->settings[$model->alias]['auto_bind']) {
-          // auto grab the creator and updater name for those tables that have 
-          // creator_id and updater_id
-          $local_alias = $model->alias.'1';
-          if($model->hasField($this->settings[$model->alias]['fields']['created'])) {
-            $model->virtualFields['creator'] = sprintf('SELECT %s FROM users as Creator JOIN %s as %s ON Creator.id = %s.%s WHERE %s.id = %s.id', 
-                                                       $this->settings[$model->alias]['display_fields']['created'], $model->table, 
-                                                       $local_alias, $local_alias, $this->settings[$model->alias]['fields']['created'],
-                                                       $local_alias, $model->alias);
-          }
+            // auto grab the creator and updater name for those tables that have
+            // creator_id and updater_id
+            $local_alias = $model->alias.'1';
+            if ($model->hasField($this->settings[$model->alias]['fields']['created'])) {
+                $model->virtualFields['creator'] = sprintf('SELECT %s FROM users as Creator JOIN %s as %s ON Creator.id = %s.%s WHERE %s.id = %s.id',
+                    $this->settings[$model->alias]['display_fields']['created'], $model->table,
+                    $local_alias, $local_alias, $this->settings[$model->alias]['fields']['created'],
+                    $local_alias, $model->alias);
+            }
 
-          if($model->hasField($this->settings[$model->alias]['fields']['modified'])) {
-            $model->virtualFields['updater'] = sprintf('SELECT %s FROM users as Updater JOIN %s as %s ON Updater.id = %s.%s WHERE %s.id = %s.id', 
-                                                       $this->settings[$model->alias]['display_fields']['modified'], $model->table, 
-                                                       $local_alias, $local_alias, $this->settings[$model->alias]['fields']['modified'],
-                                                       $local_alias, $model->alias);
-          }
+            if ($model->hasField($this->settings[$model->alias]['fields']['modified'])) {
+                $model->virtualFields['updater'] = sprintf('SELECT %s FROM users as Updater JOIN %s as %s ON Updater.id = %s.%s WHERE %s.id = %s.id',
+                    $this->settings[$model->alias]['display_fields']['modified'], $model->table,
+                    $local_alias, $local_alias, $this->settings[$model->alias]['fields']['modified'],
+                    $local_alias, $model->alias);
+            }
         }
     }
-    
+
     /**
      * Called before model data is saved.
      *
@@ -157,18 +159,20 @@ class TraceableBehavior extends ModelBehavior {
      * does all the hard work of managing the trigger/target fields.
      *
      * @param Model $model A reference to the model object to which this behaviour is attached.
+     *
      * @return boolean Always returns true to allow the save to continue as normal.
      * @author Karl Rixon <karlrixon@gmail.com>
      * @version 1.0
      * @since 1.0
      */
-    function beforeSave($model) {
+    function beforeSave($model)
+    {
         if (!empty($this->settings[$model->alias]['map'])) {
             $this->_trace($model);
         }
         return true;
     }
-    
+
     /**
      * Cleans up the found data, changing empty association models to empty arrays.
      *
@@ -176,23 +180,26 @@ class TraceableBehavior extends ModelBehavior {
      * from the User model's table. It seems neater to return an empty array for any
      * items which do not have a matching user model.
      *
-     * @param Model $model A reference to the model object to which this behaviour is attached.
+     * @param Model $model   A reference to the model object to which this behaviour is attached.
      * @param mixed $results An array containing the data returned from the find.
+     * @param mixed $primary primary
+     *
      * @return void
      * @author Karl Rixon <karlrixon@gmail.com>
      * @version 1.0
      * @since 1.0
-    */
-    function afterFind($model, $results, $primary) {
-        
+     */
+    function afterFind($model, $results, $primary)
+    {
+
         if (empty($this->settings[$model->alias]['map'])) {
             return $results;
         }
-        
+
         if ($model->recursive == -1) {
             return $results;
         }
-        
+
         if (!empty($results) && $primary) {
             foreach ($results as &$result) {
                 if (!isset($result[$model->alias])) {
@@ -205,11 +212,12 @@ class TraceableBehavior extends ModelBehavior {
                 }
             }
         }
-        
+
         return $results;
-        
+
     }
-    
+
+
     /**
      * Checks for any triggered fields, and sets the corresponding target field accordingly.
      *
@@ -218,7 +226,8 @@ class TraceableBehavior extends ModelBehavior {
      * set to the restored_value. If it is not empty, its target field is set to the
      * id of the currently Authed user.
      *
-     * @param Model $model A reference to the model object to which this behaviour is attached.
+     * @param Model &$model A reference to the model object to which this behaviour is attached.
+     *
      * @return bool True if succesful, false if an error occured. Note that true will be
      *  returned even if no trigger fields were found. False will only be returned if
      *  an actual error occured - the lack of trigger fields is not considered an error.
@@ -226,14 +235,15 @@ class TraceableBehavior extends ModelBehavior {
      * @version 1.0
      * @since 1.0
      */
-    private function _trace(&$model) {
-        
+    private function _trace(&$model)
+    {
+
         if (!isset($this->settings[$model->alias]['fields'])) {
             return false;
         } elseif (!$this->_userId) {
             return false;
         }
-        
+
         foreach ($this->settings[$model->alias]['fields'] as $trigger => $target) {
             if (isset($model->data[$model->alias][$trigger])) {
                 if (empty($model->data[$model->alias][$trigger]) || in_array($model->data[$model->alias][$trigger], $this->_empty)) {
@@ -243,52 +253,75 @@ class TraceableBehavior extends ModelBehavior {
                 }
             }
         }
-        
+
         return true;
-        
+
     }
 
     /**
+     * _getAuthedUserId
      * Gets the id of the currently Authed user.
+     *
+     * @param mixed $model
+     *
+     * @access private
+     * @return void
      */
-    private function _getAuthedUserId($model) {
+    private function _getAuthedUserId($model)
+    {
         App::import('Component', 'Session');
         $session = new SessionComponent();
         return $session->read('Auth.' . $this->settings[$model->alias]['user_model'] . '.id');
     }
 
+
     /**
+     * _buildFieldMap
      * Builds an array with field names as keys, and camelized versions of
      * the field names as values.
+     *
+     * @param mixed $model
+     *
+     * @access private
+     * @return void
      */
-    private function _buildFieldMap($model) {
-        
+    private function _buildFieldMap($model)
+    {
+
         // Get an array of all fields which exist in both the model's table, and in
         // the behaviour settings for this model.
         $fields = array_values(array_intersect(
             $this->settings[$model->alias]['fields'],
             array_keys($model->_schema)
         ));
-        
+
         $map = array();
         foreach ($fields as $field) {
             $map[$field] = Inflector::camelize($field);
         }
 
         return $map;
-    
+
     }
 
+
     /**
+     * _bindModels
      * Binds any models which should be bound in order to represent the
      * User who is to be traced.
+     *
+     * @param mixed $model
+     *
+     * @access private
+     * @return void
      */
-    private function _bindModels($model) {
-        
+    private function _bindModels($model)
+    {
+
         if (empty($this->settings[$model->alias]['map'])) {
             return false;
         }
-        
+
         $models = array();
         foreach ($this->settings[$model->alias]['map'] as $foreignKey => $associationName) {
             $models['belongsTo'][$associationName] = array(
@@ -300,5 +333,4 @@ class TraceableBehavior extends ModelBehavior {
             $model->bindModel($models, false);
         }
     }
-
 }

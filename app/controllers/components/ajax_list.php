@@ -5,64 +5,113 @@
 
 // This code will substitute in json_encode and json_decode implemented in PHP.
 // the problem with these functions is that they're slower than PHP 5.2's c implementationss
-if ( !function_exists('json_decode') ){
-    function json_decode($content, $assoc=false){
+if (!function_exists('json_decode') ) {
+    /**
+     * json_decode
+     *
+     * @param mixed $content content
+     * @param bool  $assoc   assoc
+     *
+     * @access public
+     * @return void
+     */
+    function json_decode($content, $assoc=false)
+    {
         require_once 'vendors/JSON.php';
-        if ( $assoc ){
+        if ($assoc ) {
             $json = new Services_JSON(SERVICES_JSON_LOOSE_TYPE);
         } else {
             $json = new Services_JSON;
         }
         return $json->decode($content);
     }
+
 }
 
-if (!function_exists('json_encode') ){
-    function json_encode($content){
+if (!function_exists('json_encode') ) {
+    /**
+     * json_encode
+     *
+     * @param mixed $content
+     *
+     * @access public
+     * @return void
+     */
+    function json_encode($content)
+    {
         require_once 'vendors/JSON.php';
         $json = new Services_JSON;
         return $json->encode($content);
     }
+
 }
 
-class AjaxListComponent extends Object {
+/**
+ * AjaxListComponent
+ *
+ * @uses Object
+ * @package   CTLT.iPeer
+ * @author    Pan Luo <pan.luo@ubc.ca>
+ * @copyright 2012 All rights reserved.
+ * @license   MIT {@link http://www.opensource.org/licenses/MIT}
+ */
+class AjaxListComponent extends Object
+{
 
     // Will hold a reference to the controller
-    var $controller = null;
-    var $controllerName = null;
-    var $webroot = null;
+    public $controller = null;
+    public $controllerName = null;
+    public $webroot = null;
 
-    var $listName = null;
-    var $sessionVariableName = null;
+    public $listName = null;
+    public $sessionVariableName = null;
 
-    var $model = null;
-    var $columns = null;
-    var $actions = null;
-    var $joinFilters = null;
-    var $extraFilters = null;
+    public $model = null;
+    public $columns = null;
+    public $actions = null;
+    public $joinFilters = null;
+    public $extraFilters = null;
 
-    var $fields = null;
+    public $fields = null;
 
-    var $customModelFindFunction = null;
-    var $customModelCountFunction = null;
-    var $recursive = 0;
-    var $postProcessFunction = null;
+    public $customModelFindFunction = null;
+    public $customModelCountFunction = null;
+    public $recursive = 0;
+    public $postProcessFunction = null;
 
-    var $conditions = array();
+    public $conditions = array();
 
     // Initialize other componenets
-    var $components = array('Session', 'Output');
+    public $components = array('Session', 'Output');
 
-    // On start up , just remember the contoller, so we can get it's name later
-    function startup($controller) {
+    /**
+     * startup
+     * On start up , just remember the contoller, so we can get it's name later
+     *
+     * @param mixed $controller
+     *
+     * @access public
+     * @return void
+     */
+    function startup($controller)
+    {
         $this->controller = $controller;
         $this->controllerName = strtolower($controller->name);
         $this->webroot = $controller->webroot;
         $this->sessionVariableName = $this->controllerName . "-ajaxListState";
     }
 
-    // Constructs the state for this ajaxList
-    function getState() {
+
+    /**
+     * getState
+     * Constructs the state for this ajaxList
+     *
+     *
+     * @access public
+     * @return void
+     */
+    function getState()
+    {
         // Read the state out of the session
         $state = $this->Session->read($this->sessionVariableName);
         // Got it okay?
@@ -80,8 +129,18 @@ class AjaxListComponent extends Object {
         return $state;
     }
 
-    // Do a quick state check to fix any error inside
-    function checkState($state) {
+
+    /**
+     * checkState
+     * Do a quick state check to fix any error inside
+     *
+     * @param mixed $state
+     *
+     * @access public
+     * @return void
+     */
+    function checkState($state)
+    {
         if (empty($state->sortBy)) {
             $state->sortBy = $this->sortBy;
         }
@@ -100,40 +159,64 @@ class AjaxListComponent extends Object {
         return $state;
     }
 
-
-    function formatDates($data) {
-      // Process data if it's there
-      if (!empty($data) && is_array($data)) {
-        // For each column defined
-        foreach ($this->columns as $column) {
-          // Is this column maked as a date?
-          if ($column[3] == "date") {
-            $split = explode(".", $column[0], 2);
-            $model = $split[0];
-            $col = $split[1];
-            foreach ($data as $key => $entry) {
-              $date = strtotime($entry[$model][$col]);
-              $date = Toolkit::formatDate($date);
-              $data[$key][$model][$col] = $date;
+    /**
+     * formatDates
+     *
+     * @param mixed $data
+     *
+     * @access public
+     * @return void
+     */
+    function formatDates($data)
+    {
+        // Process data if it's there
+        if (!empty($data) && is_array($data)) {
+            // For each column defined
+            foreach ($this->columns as $column) {
+                // Is this column maked as a date?
+                if ($column[3] == "date") {
+                    $split = explode(".", $column[0], 2);
+                    $model = $split[0];
+                    $col = $split[1];
+                    foreach ($data as $key => $entry) {
+                        $date = strtotime($entry[$model][$col]);
+                        $date = Toolkit::formatDate($date);
+                        $data[$key][$model][$col] = $date;
+                    }
+                }
             }
-          }
         }
-      }
-      return $data;
+        return $data;
     }
 
-
-    // Special values start with a '!'
-    function isSpecialValue($value) {
+    /**
+     * isSpecialValue
+     * Special values start with a '!'
+     *
+     * @param mixed $value
+     *
+     * @access public
+     * @return void
+     */
+    function isSpecialValue($value)
+    {
         return strlen($value)>3  &&  $value[0]=='!'  &&  $value[1]=='!'  &&  $value[2]=='!';
     }
 
-    // Get data function for the ajaxList
-    // Example call:
-    //  $this->AjaxList->getListByState($state, $this->User, "User.id, User.username");
-    // Remember:
-    //  if you use custom functions, they must be take parameters just like:
 
+
+    /**
+     * getListByState
+     * Get data function for the ajaxList
+     * Example call:
+     *  $this->AjaxList->getListByState($state, $this->User, "User.id, User.username");
+     * Remember:
+     *  if you use custom functions, they must be take parameters just like:
+     *
+     *
+     * @access public
+     * @return void
+     */
     function getListByState()
     {
         // Get the session state, or create a new session state
@@ -162,34 +245,34 @@ class AjaxListComponent extends Object {
         // Add in any join filter conditions
         if (!empty($state->joinFilterSelections)) {
             foreach ($state->joinFilterSelections as $filter => $value) {
-                 // Find the joinFilter object relating to this one
-                 $joinFilter = null;
-                 foreach ($this->joinFilters as $index => $thisJoinFilter) {
+                // Find the joinFilter object relating to this one
+                $joinFilter = null;
+                foreach ($this->joinFilters as $index => $thisJoinFilter) {
                     if ($thisJoinFilter['id'] == $filter) {
                         $joinFilter = $thisJoinFilter;
                         break;
                     }
-                 }
+                }
 
                 // Make sure we found this filter
-                 if ($joinFilter == null) {
+                if ($joinFilter == null) {
                     continue;
-                 }
+                }
 
-                 // Check to make sure we should be considering this value at this time
-                 if (!empty($joinFilter['dependsMap']) && !empty($joinFilter['dependsValues'])) {
+                // Check to make sure we should be considering this value at this time
+                if (!empty($joinFilter['dependsMap']) && !empty($joinFilter['dependsValues'])) {
                     if (!empty($state->mapFilterSelections)) {
                         if (!in_array($state->mapFilterSelections->$joinFilter['dependsMap'],
                             $joinFilter['dependsValues'])) {
                                 // do not concider at this time
-                            continue;
+                                continue;
                         }
                     } else {
                         continue;
                     }
-                 }
+                }
 
-                 if (!empty($filter) && !empty($value)) {
+                if (!empty($filter) && !empty($value)) {
                     // Keywords starting with !!! are a special case
                     if (!$this->isSpecialValue($value)) {
                         $conditions[mysql_real_escape_string($filter)] = mysql_real_escape_string($value);
@@ -207,7 +290,7 @@ class AjaxListComponent extends Object {
                 /*foreach ($this->extraFilters as $column => $value) {
                     $conditions[$column] = $value;
                 }*/
-              $conditions = array_merge($conditions, $this->extraFilters);
+                $conditions = array_merge($conditions, $this->extraFilters);
             } else if (is_string($this->extraFilters)) {
                 $conditions[] = $this->extraFilters;
             }
@@ -216,7 +299,7 @@ class AjaxListComponent extends Object {
         // Add in the search conditions
         if (!empty($state->searchBy) && !empty($state->searchValue)) {
             $conditions[mysql_real_escape_string($state->searchBy) . " LIKE"] = '%' .  mysql_real_escape_string($state->searchValue) . '%';
-        } 
+        }
 
         // The default functions for searhing
         $customModelFindFunction = "find";
@@ -245,7 +328,7 @@ class AjaxListComponent extends Object {
                     $joinTable .= " on `$localModel`.`$localKey`=`$joinFilter[joinModel]`.`$foreignKey`";
                 }
             }
-        }*/
+}*/
 
 
 
@@ -257,13 +340,13 @@ class AjaxListComponent extends Object {
         // Group by needs to be "hacked" onto the conditions, since Cake php 1.1 has no direct support
         //  for it. However, in findCound, the group by must be absent.
         $data = $this->model->$customModelFindFunction('all', array('conditions' => $conditions,
-                                                                    'group'      => $groupBy,
-                                                                    'fields'     => $this->fields, 
-                                                                    'order'      => $order, 
-                                                                    'limit'      => $limit, 
-                                                                    'page'       => $page, 
-                                                                    'recursive'  => $this->recursive,
-                                                                    'joins'      => array($joinTable)));
+            'group'      => $groupBy,
+            'fields'     => $this->fields,
+            'order'      => $order,
+            'limit'      => $limit,
+            'page'       => $page,
+            'recursive'  => $this->recursive,
+            'joins'      => array($joinTable)));
 
         // Counts a a bit more difficult with grouped, joint tables.
         if (isset($customModelCountFunction)) {
@@ -272,8 +355,8 @@ class AjaxListComponent extends Object {
         } else {
             //$count = $this->betterCount
             //    ($conditions, $groupBy, $this->recursive, array($joinTable));
-          $count = $this->model->$customModelFindFunction('count', array('conditions' => $conditions,
-                                                                         ));
+            $count = $this->model->$customModelFindFunction('count', array('conditions' => $conditions,
+            ));
         }
 
         // Format the dates as given in the iPeer database
@@ -287,22 +370,35 @@ class AjaxListComponent extends Object {
 
         // Package up the list, and return it to caller
         $result = array ("entries" =>   $data,
-                         "count"   =>   $count,
-                         "state" =>     $state,
-                         "timeStamp" => time());
+            "count"   =>   $count,
+            "state" =>     $state,
+            "timeStamp" => time());
 
         return $result;
     }
 
 
-    // Find all can't handle joint tables that and GROUP By well,
-    //  so this custom function is its replacement
-    function betterCount ($conditions, $groupBy, $recursive, $joinTable) {
+
+    /**
+     * betterCount
+     * Find all can't handle joint tables that and GROUP By well,
+     *  so this custom function is its replacement
+     *
+     * @param mixed $conditions conditions
+     * @param mixed $groupBy    group by
+     * @param mixed $recursive  recursive
+     * @param mixed $joinTable  join table
+     *
+     * @access public
+     * @return void
+     */
+    function betterCount ($conditions, $groupBy, $recursive, $joinTable)
+    {
 
         $table = $this->model->table;
         $name = $this->model->name;
 
-         // Initial Statement
+        // Initial Statement
         $sql  = "SELECT count(*) as count FROM ( SELECT count(*) FROM `$table` as `$name` ";
 
         // Add table joins
@@ -326,16 +422,27 @@ class AjaxListComponent extends Object {
     }
 
 
-    // Returns the search results to JSON, or redirects to the list again, that will be rendered with the
-    //  new state
-    function asyncGet($pageForRedirect = "index", $parameters = "") {
 
-      // remove the escape backslashs if magic quotes is OK. Otherwise, 
-      // json_decode will not work properly 
-      $json = get_magic_quotes_gpc() ? stripslashes($_POST['json']) : $_POST['json'];
-      // Grab the next state the browser sent over, and save it
-      $state = json_decode(str_replace("\\", "", $_POST['json']));
-    
+    /**
+     * asyncGet
+     * Returns the search results to JSON, or redirects to the list again, that will be rendered with the
+     * new state
+     *
+     * @param bool   $pageForRedirect page for redirect
+     * @param string $parameters      parameters
+     *
+     * @access public
+     * @return void
+     */
+    function asyncGet($pageForRedirect = "index", $parameters = "")
+    {
+
+        // remove the escape backslashs if magic quotes is OK. Otherwise,
+        // json_decode will not work properly
+        $json = get_magic_quotes_gpc() ? stripslashes($_POST['json']) : $_POST['json'];
+        // Grab the next state the browser sent over, and save it
+        $state = json_decode(str_replace("\\", "", $_POST['json']));
+
         // If not state was sent: fetch it from session.
         if ($state == null) {
             $state = $this->getState();
@@ -351,9 +458,9 @@ class AjaxListComponent extends Object {
         //   or just the data.
         if ($_POST['fullPage'] == "true") {
             // Render the index page for a full page  (for ie 6)
-            $redirect = $this->controllerName . "/" . $pageForRedirect . 
-            (!empty($parameters) ? ("/" . $parameters) : ""); 
-            $this->controller->redirect($redirect); 
+            $redirect = $this->controllerName . "/" . $pageForRedirect .
+                (!empty($parameters) ? ("/" . $parameters) : "");
+            $this->controller->redirect($redirect);
         } else {
             // Send the reponse in JSON only ( for non-ie 6)
             // Don't cache these, please, from : http://php.net/manual/en/function.header.php
@@ -365,34 +472,73 @@ class AjaxListComponent extends Object {
         }
     }
 
-    // Set a state variable manually
-    function setStateVariable($variableName, $value) {
+
+    /**
+     * setStateVariable
+     * Set a state variable manually
+     *
+     * @param mixed $variableName variable name
+     * @param mixed $value        value
+     *
+     * @access public
+     * @return void
+     */
+    function setStateVariable($variableName, $value)
+    {
         $state = $this->getState();
         $state->$variableName = $value;
         $this->Session->write($this->sessionVariableName, $state);
     }
 
-    // Clears the state completelly.
-    function clearState() {
+
+    /**
+     * clearState
+     * Clears the state completelly.
+     *
+     * @access public
+     * @return void
+     */
+    function clearState()
+    {
         $this->Session->write($this->sessionVariableName, null);
     }
 
-    // Create a non-operational version of the stucture
-    function quickSetUp() {
-        $this->setUp (null, null, null, null, null);
+
+    /**
+     * quickSetUp
+     * Create a non-operational version of the stucture
+     *
+     * @access public
+     * @return void
+     */
+    function quickSetUp()
+    {
+        $this->setUp(null, null, null, null, null);
     }
 
-    // Sets up the basic info about the list
-    function setUp ($model, $columns, $actions,
-                    $sortBy, $searchBy,
-                    $joinFilters = null,
-                    $extraFilters = null,
-                    $recursive = 0,
-                    $postProcess = null,
-                    $listName = null,
-                    $customModelFindFunction = null,
-                    $customModelCountFunction = null,
-                    $conditions = array())
+
+    /**
+     * setUp
+     * Sets up the basic info about the list
+     *
+     * @param mixed $model                    model
+     * @param mixed $columns                  columns
+     * @param mixed $actions                  actions
+     * @param mixed $sortBy                   sortBy
+     * @param mixed $searchBy                 searchBy
+     * @param array $joinFilters              joinFilters
+     * @param array $extraFilters             extra filters
+     * @param int   $recursive                recursive
+     * @param bool  $postProcess              post process
+     * @param bool  $listName                 list name
+     * @param bool  $customModelFindFunction  constom model find function
+     * @param bool  $customModelCountFunction custom model count function
+     * @param bool  $conditions               condition
+     *
+     * @access public
+     * @return void
+     */
+    function setUp($model, $columns, $actions, $sortBy, $searchBy, $joinFilters = null, $extraFilters = null, $recursive = 0, $postProcess = null, $listName = null, $customModelFindFunction = null, $customModelCountFunction = null, $conditions = array())
     {
         // Set up the basics
         $this->model = $model;
@@ -422,26 +568,30 @@ class AjaxListComponent extends Object {
         }
 
         // If this list has a name, name it!
-        if (!empty($listName))  {
+        if (!empty($listName)) {
             $this->listName = $listName;
             $this->sessionVariableName = $this->controllerName . "-ajaxListState" . "-" . $listName;
         }
     }
 
 
-    function getParamsForList() {
-      // Collect the parameters
-      return array(
+
+    /**
+     * getParamsForList
+     *
+     * @access public
+     * @return void
+     */
+    function getParamsForList()
+    {
+        // Collect the parameters
+        return array(
             'webroot'     => $this->webroot,
             'controller'  => $this->controllerName,
             'columns'     => $this->columns,
             'actions'     => $this->actions,
             'joinFilters' => $this->joinFilters,
             'data'        => $this->getListByState()
-            );
+        );
     }
 }
-
-
-
-?>

@@ -96,7 +96,7 @@ class ExportHelper2Component extends Object
     /**
      * fillGridVertically
      *
-     * @param bool  &$grid   grid
+     * @param bool  &$grid  grid
      * @param mixed $yFrom  y from
      * @param mixed $xIndex x index
      * @param bool  $values values
@@ -343,7 +343,7 @@ class ExportHelper2Component extends Object
     /**
      * unsetMultipleGridRow
      *
-     * @param mixed $grid       grid
+     * @param mixed &$grid      grid
      * @param mixed $initRowNum init row num
      * @param mixed $repetition repetition
      * @param mixed $indexing   indexing

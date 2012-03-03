@@ -27,17 +27,43 @@ class Role extends AppModel
 
     public $actsAs = array('Acl' => array('type' => 'requester'));
 
+    /**
+     * parentNode
+     *
+     * @access public
+     * @return void
+     */
     function parentNode()
     {
         return null;
     }
 
+
+    /**
+     * getRoleByRoleNumber
+     *
+     * @param string $roleNum
+     *
+     * @access public
+     * @return void
+     */
     function getRoleByRoleNumber($roleNum = '')
     {
-        if($roleNum==1)return 'SA';
-        if($roleNum==2)return 'A';
-        if($roleNum==3)return 'I';
-        if($roleNum==4)return 'S';
-        else return null;
+        if($roleNum==1) {
+            return 'SA';
+        }
+
+        if($roleNum==2) {
+            return 'A';
+        }
+        if($roleNum==3) {
+            return 'I';
+        }
+        if($roleNum==4) {
+            return 'S';
+        } else {
+            return null;
+        }
     }
+
 }

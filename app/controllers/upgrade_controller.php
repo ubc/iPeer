@@ -1,80 +1,91 @@
 <?php
-/* SVN FILE: $Id$ */
-
 /**
- * @filesource
- * @copyright    Copyright (c) 2006, .
- * @link
- * @package
- * @subpackage
- * @since
- * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
- */
-
-/**
- * Controller :: Upgrade
+ * UpgradeController
  *
- * @package
- * @subpackage
- * @since
+ * @uses AppController
+ * @package   CTLT.iPeer
+ * @author    Pan Luo <pan.luo@ubc.ca>
+ * @copyright 2012 All rights reserved.
+ * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
 class UpgradeController extends AppController
 {
-  var $name = "Upgrade";
-  var $uses         = array();
-	var $components   = array('Output',
-                            'framework',
-                            'Session',
-                            'Guard.Guard',
-                            'DbPatcher'
-                            );
+    public $name = "Upgrade";
+    public $uses         = array();
+    public $components   = array('Output',
+        'framework',
+        'Session',
+        'Guard.Guard',
+        'DbPatcher'
+    );
 
-  function __construct()
-  {
-    $this->set('title_for_layout', __('Upgrade Database', true));
-    parent::__construct();
-  }
+    /**
+     * __construct
+     *
+     *
+     * @access protected
+     * @return void
+     */
+    function __construct()
+    {
+        $this->set('title_for_layout', __('Upgrade Database', true));
+        parent::__construct();
+    }
 
-  function index()
-  {
-    if ($this->checkPermission())
-    {
-      $this->set('isadmin', false); // tell view user doesn't have access
-    }
-    else
-    {
-      $this->set('isadmin', true);
-    }
-  }
 
-  function step2()
-  {
-    if ($this->checkPermission())
+    /**
+     * index
+     *
+     *
+     * @access public
+     * @return void
+     */
+    function index()
     {
-      $this->set('isadmin', false);
+        if ($this->checkPermission()) {
+            $this->set('isadmin', false); // tell view user doesn't have access
+        } else {
+            $this->set('isadmin', true);
+        }
     }
-    else
-    {
-      $this->set('isadmin', true);
-      $this->set('upgradefailed', false); // tell view the upgrade worked fine
-      $dbv = $this->SysParameter->getDatabaseVersion();
-      $ret = $this->DbPatcher->patch($dbv);
-      if ($ret)
-      {
-        $this->set('upgradefailed', $ret);
-      }
-    }
-  }
 
-  function checkPermission()
-  {
-    if('A' != $this->Auth->user('role'))
+
+    /**
+     * step2
+     *
+     *
+     * @access public
+     * @return void
+     */
+    function step2()
     {
-      $this->Session->setFlash(__('Sorry, you do not have access to this page. Only administrators can perform a database upgrade. If you are an administrator, please login and then go to this page to perform the upgrade.', true));
-      return true;
+        if ($this->checkPermission()) {
+            $this->set('isadmin', false);
+        } else {
+            $this->set('isadmin', true);
+            $this->set('upgradefailed', false); // tell view the upgrade worked fine
+            $dbv = $this->SysParameter->getDatabaseVersion();
+            $ret = $this->DbPatcher->patch($dbv);
+            if ($ret) {
+                $this->set('upgradefailed', $ret);
+            }
+        }
     }
-    return false;
-  }
+
+
+    /**
+     * checkPermission
+     *
+     *
+     * @access public
+     * @return void
+     */
+    function checkPermission()
+    {
+        if ('A' != $this->Auth->user('role')) {
+            $this->Session->setFlash(__('Sorry, you do not have access to this page. Only administrators can perform a database upgrade. If you are an administrator, please login and then go to this page to perform the upgrade.', true));
+            return true;
+        }
+        return false;
+    }
 }
-
-?>

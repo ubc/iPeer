@@ -222,7 +222,7 @@ class EvaluationComponent extends Object
      */
     function filterString($string = null)
     {
-        $unwantedChar = array("_","0","1","2","3","4","5","6","7","8","9");
+        $unwantedChar = array("_", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
         return str_replace($unwantedChar, "", $string);
     }
 
@@ -379,6 +379,14 @@ class EvaluationComponent extends Object
         return true;
     }
 
+    /**
+     * formatStudentViewOfSimpleEvaluationResult
+     *
+     * @param bool $event
+     *
+     * @access public
+     * @return void
+     */
     function formatStudentViewOfSimpleEvaluationResult($event=null)
     {
         $this->EvaluationSimple = ClassRegistry::init('EvaluationSimple');
@@ -418,7 +426,7 @@ class EvaluationComponent extends Object
                 $tmp_total = 0;
                 $avg = $this->EvaluationSimple->find('all', array(
                     'conditions' => array('EvaluationSimple.grp_event_id' => $event['group_event_id']),
-                    'fields' => array('AVG(score) as avg', 'sum(score) as sum','evaluatee'),
+                    'fields' => array('AVG(score) as avg', 'sum(score) as sum', 'evaluatee'),
                     'group' => 'evaluatee'
                 ));
 
@@ -459,6 +467,19 @@ class EvaluationComponent extends Object
         return $studentResult;
     }
 
+
+    /**
+     * changeSimpleEvaluationGradeRelease
+     *
+     * @param mixed $eventId       event id
+     * @param mixed $groupId       group id
+     * @param mixed $groupEventId  group event id
+     * @param mixed $evaluateeId   evaluatee id
+     * @param mixed $releaseStatus release status
+     *
+     * @access public
+     * @return void
+     */
     function changeSimpleEvaluationGradeRelease($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus)
     {
         $this->EvaluationSimple = new EvaluationSimple;
@@ -483,6 +504,19 @@ class EvaluationComponent extends Object
         $this->GroupEvent->save($groupEvent);
     }
 
+
+    /**
+     * changeSimpleEvaluationCommentRelease
+     *
+     * @param mixed $eventId      event id
+     * @param mixed $groupId      group id
+     * @param mixed $groupEventId group event id
+     * @param mixed $evaluatorIds evaluator ids
+     * @param mixed $params       params
+     *
+     * @access public
+     * @return void
+     */
     function changeSimpleEvaluationCommentRelease($eventId, $groupId, $groupEventId, $evaluatorIds, $params)
     {
 
@@ -545,6 +579,15 @@ class EvaluationComponent extends Object
         $this->GroupEvent->save($groupEvent);
     }
 
+
+    /**
+     * formatSimpleEvaluationResult
+     *
+     * @param bool $event
+     *
+     * @access public
+     * @return void
+     */
     function formatSimpleEvaluationResult($event=null)
     {
         $this->GroupsMembers = new GroupsMembers;
@@ -594,8 +637,17 @@ class EvaluationComponent extends Object
         return $result;
     }
 
-    //Rubric Evaluation functions
 
+
+    /**
+     * loadRubricEvaluationDetail
+     * Rubric Evaluation functions
+     *
+     * @param mixed $event
+     *
+     * @access public
+     * @return void
+     */
     function loadRubricEvaluationDetail($event)
     {
         $this->EvaluationRubric = new EvaluationRubric;
@@ -643,6 +695,15 @@ class EvaluationComponent extends Object
         return $result;
     }
 
+
+    /**
+     * saveRubricEvaluation
+     *
+     * @param bool $params
+     *
+     * @access public
+     * @return void
+     */
     function saveRubricEvaluation($params=null)
     {
         $this->Event = ClassRegistry::init('Event');
@@ -708,6 +769,18 @@ class EvaluationComponent extends Object
         return true;
     }
 
+
+    /**
+     * saveNGetEvalutionRubricDetail
+     *
+     * @param mixed $evalRubricId    eval rubric id
+     * @param mixed $rubric          rubric
+     * @param mixed $targetEvaluatee target evaluatee
+     * @param mixed $form            form
+     *
+     * @access public
+     * @return void
+     */
     function saveNGetEvalutionRubricDetail ($evalRubricId, $rubric, $targetEvaluatee, $form)
     {
         $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
@@ -740,6 +813,16 @@ class EvaluationComponent extends Object
         return $totalGrade;
     }
 
+
+    /**
+     * getRubricResultDetail
+     *
+     * @param mixed $event        event
+     * @param mixed $groupMembers group members
+     *
+     * @access public
+     * @return void
+     */
     function getRubricResultDetail ($event, $groupMembers)
     {
         $pos = 0;
@@ -828,6 +911,16 @@ class EvaluationComponent extends Object
         return $rubricResultDetail;
     }
 
+
+    /**
+     * getStudentViewRubricResultDetailReview
+     *
+     * @param mixed $event  event
+     * @param mixed $userId user id
+     *
+     * @access public
+     * @return void
+     */
     function getStudentViewRubricResultDetailReview ($event, $userId)
     {
         $userPOS = 0;
@@ -864,6 +957,17 @@ class EvaluationComponent extends Object
         return $evalResult;
     }
 
+
+    /**
+     * formatRubricEvaluationResultsMatrix
+     *
+     * @param mixed $event        event
+     * @param mixed $groupMembers group members
+     * @param mixed $evalResult   evel result
+     *
+     * @access public
+     * @return void
+     */
     function formatRubricEvaluationResultsMatrix($event, $groupMembers, $evalResult)
     {
         //
@@ -938,6 +1042,19 @@ class EvaluationComponent extends Object
         return $matrix;
     }
 
+
+    /**
+     * changeRubricEvaluationGradeRelease
+     *
+     * @param mixed $eventId       event id
+     * @param mixed $groupId       group id
+     * @param mixed $groupEventId  group even tid
+     * @param mixed $evaluateeId   evaluatee id
+     * @param mixed $releaseStatus release status
+     *
+     * @access public
+     * @return void
+     */
     function changeRubricEvaluationGradeRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus)
     {
         $this->EvaluationRubric  = ClassRegistry::init('EvaluationRubric');
@@ -962,6 +1079,19 @@ class EvaluationComponent extends Object
         $this->GroupEvent->save($groupEvent);
     }
 
+
+    /**
+     * changeRubricEvaluationCommentRelease
+     *
+     * @param mixed $eventId       event id
+     * @param mixed $groupId       group id
+     * @param mixed $groupEventId  group event id
+     * @param mixed $evaluateeId   evaluatee id
+     * @param mixed $releaseStatus release status
+     *
+     * @access public
+     * @return void
+     */
     function changeRubricEvaluationCommentRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus)
     {
         $this->EvaluationRubric  =  ClassRegistry::init('EvaluationRubric');
@@ -989,6 +1119,18 @@ class EvaluationComponent extends Object
         $this->GroupEvent->save($groupEvent);
     }
 
+
+    /**
+     * formatRubricEvaluationResult
+     *
+     * @param bool   $event         event
+     * @param string $displayFormat display format
+     * @param int    $studentView   student view
+     * @param bool   $currentUser   current user
+     *
+     * @access public
+     * @return void
+     */
     function formatRubricEvaluationResult($event=null, $displayFormat='', $studentView=0, $currentUser=null)
     {
         $this->Rubric =  ClassRegistry::init('Rubric');
@@ -1046,8 +1188,17 @@ class EvaluationComponent extends Object
         return $result;
     }
 
-    //Mixeval Evaluation functions
 
+
+    /**
+     * loadMixEvaluationDetail
+     * Mixeval Evaluation functions
+     *
+     * @param mixed $event
+     *
+     * @access public
+     * @return void
+     */
     function loadMixEvaluationDetail ($event)
     {
         $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
@@ -1091,6 +1242,15 @@ class EvaluationComponent extends Object
         return $result;
     }
 
+
+    /**
+     * saveMixevalEvaluation
+     *
+     * @param bool $params
+     *
+     * @access public
+     * @return void
+     */
     function saveMixevalEvaluation($params=null)
     {
         $this->Event = ClassRegistry::init('Event');
@@ -1153,7 +1313,19 @@ class EvaluationComponent extends Object
         return true;
     }
 
-    function saveNGetEvalutionMixevalDetail ($evalMixevalId, $mixeval, $targetEvaluatee, $form)
+
+    /**
+     * saveNGetEvalutionMixevalDetail
+     *
+     * @param mixed $evalMixevalId   mixeval id
+     * @param mixed $mixeval         mixeval
+     * @param mixed $targetEvaluatee target evaluatee
+     * @param mixed $form            form
+     *
+     * @access public
+     * @return void
+     */
+    function saveNGetEvalutionMixevalDetail($evalMixevalId, $mixeval, $targetEvaluatee, $form)
     {
         $this->EvaluationMixevalDetail = ClassRegistry::init('EvaluationMixevalDetail');
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
@@ -1187,8 +1359,19 @@ class EvaluationComponent extends Object
         return $totalGrade;
     }
 
+
+    /**
+     * getMixevalResultDetail
+     *
+     * @param mixed $event        event
+     * @param mixed $groupMembers group members
+     *
+     * @access public
+     * @return void
+     */
     function getMixevalResultDetail ($event, $groupMembers)
     {
+
         $pos = 0;
         $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
@@ -1277,6 +1460,15 @@ class EvaluationComponent extends Object
         return $mixevalResultDetail;
     }
 
+    /**
+     * getStudentViewMixevalResultDetailReview
+     *
+     * @param mixed $event  event
+     * @param mixed $userId user id
+     *
+     * @access public
+     * @return void
+     */
     function getStudentViewMixevalResultDetailReview ($event, $userId)
     {
         $userPOS = 0;
@@ -1306,6 +1498,7 @@ class EvaluationComponent extends Object
         }
         return $evalResult;
     }
+
 
     /**
      * formatMixevalEvaluationResultsMatrix
@@ -1398,6 +1591,18 @@ class EvaluationComponent extends Object
     }
 
 
+    /**
+     * changeMixevalEvaluationGradeRelease
+     *
+     * @param mixed $eventId       event id
+     * @param mixed $groupId       group id
+     * @param mixed $groupEventId  group event id
+     * @param mixed $evaluateeId   evaluatee id
+     * @param mixed $releaseStatus release status
+     *
+     * @access public
+     * @return void
+     */
     function changeMixevalEvaluationGradeRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus)
     {
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
@@ -1422,6 +1627,19 @@ class EvaluationComponent extends Object
         $this->GroupEvent->save($groupEvent);
     }
 
+
+    /**
+     * changeMixevalEvaluationCommentRelease
+     *
+     * @param mixed $eventId       event id
+     * @param mixed $groupId       group id
+     * @param mixed $groupEventId  group event id
+     * @param mixed $evaluateeId   evaluatee id
+     * @param mixed $releaseStatus release status
+     *
+     * @access public
+     * @return void
+     */
     function changeMixevalEvaluationCommentRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus)
     {
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
@@ -1450,6 +1668,17 @@ class EvaluationComponent extends Object
         $this->GroupEvent->save($groupEvent);
     }
 
+
+    /**
+     * formatMixevalEvaluationResult
+     *
+     * @param bool   $event         event
+     * @param string $displayFormat display format
+     * @param int    $studentView   student view
+     *
+     * @access public
+     * @return void
+     */
     function formatMixevalEvaluationResult($event=null, $displayFormat='', $studentView=0)
     {
         $this->Course = ClassRegistry::init('Mixeval');
@@ -1518,8 +1747,17 @@ class EvaluationComponent extends Object
         return $result;
     }
 
-    //Survey Evaluation functions
 
+
+    /**
+     * saveSurveyEvaluation
+     * Survey Evaluation functions
+     *
+     * @param bool $params
+     *
+     * @access public
+     * @return void
+     */
     function saveSurveyEvaluation($params=null)
     {
         $this->Response = ClassRegistry::init('Response');
@@ -1667,6 +1905,15 @@ class EvaluationComponent extends Object
      */
     }
 
+
+    /**
+     * formatStudentViewOfSurveyEvaluationResult
+     *
+     * @param bool $event
+     *
+     * @access public
+     * @return void
+     */
     function formatStudentViewOfSurveyEvaluationResult($event=null)
     {
         $this->EvaluationSimple = new EvaluationSimple;
@@ -1716,6 +1963,16 @@ class EvaluationComponent extends Object
         return $studentResult;
     }
 
+
+    /**
+     * formatSurveyEvaluationResult
+     *
+     * @param bool $event     event
+     * @param bool $studentId student id
+     *
+     * @access public
+     * @return void
+     */
     function formatSurveyEvaluationResult($event=null, $studentId=null)
     {
         $this->Survey = ClassRegistry::init('Survey');
@@ -1756,6 +2013,16 @@ class EvaluationComponent extends Object
         return $result;
     }
 
+
+    /**
+     * formatSurveyGroupEvaluationResult
+     *
+     * @param bool $surveyId      survey id
+     * @param bool $surveyGroupId survey group id
+     *
+     * @access public
+     * @return void
+     */
     function formatSurveyGroupEvaluationResult($surveyId=null, $surveyGroupId=null)
     {
         $this->Survey = ClassRegistry::init('Survey');
@@ -1786,7 +2053,7 @@ class EvaluationComponent extends Object
 
         for ($i=1; $i < count($questions)+1; $i++) {
             $questionType = $questions[$i]['Question']['type'];
-            $questionTypeAllowed = array('C','M');
+            $questionTypeAllowed = array('C', 'M');
             $questionId = $questions[$i]['Question']['id'];
 
             //count the choice responses
@@ -1827,6 +2094,15 @@ class EvaluationComponent extends Object
         return $questions;
     }
 
+
+    /**
+     * formatSurveyEvaluationSummary
+     *
+     * @param bool $surveyId
+     *
+     * @access public
+     * @return void
+     */
     function formatSurveyEvaluationSummary($surveyId=null)
     {
         $this->Survey = ClassRegistry::init('Survey');
@@ -1860,7 +2136,7 @@ class EvaluationComponent extends Object
 
         for ($i=1; $i < count($questions)+1; $i++) {
             $questionType = $questions[$i]['Question']['type'];
-            $questionTypeAllowed = array('C','M');
+            $questionTypeAllowed = array('C', 'M');
             $questionId = $questions[$i]['Question']['id'];
 
             //count the choice responses
@@ -1880,7 +2156,7 @@ class EvaluationComponent extends Object
                 $responses = $this->SurveyInput->find('all', array(
                     'conditions' => array('SurveyInput.survey_id' => $surveyId,
                     'SurveyInput.question_id' => $questionId),
-                    'fields' => array('response_text','user_id')
+                    'fields' => array('response_text', 'user_id')
 
                 ));
                 $questions[$i]['Question']['Responses'] = array();
@@ -1906,6 +2182,16 @@ class EvaluationComponent extends Object
         return $questions;
     }
 
+
+    /**
+     * formatPenaltyArray
+     *
+     * @param mixed $grpEventId   group event id
+     * @param mixed $groupMembers group members
+     *
+     * @access public
+     * @return void
+     */
     function formatPenaltyArray($grpEventId, $groupMembers)
     {
         $this->UserGradePenalty = ClassRegistry::init('UserGradePenalty');
@@ -1918,5 +2204,6 @@ class EvaluationComponent extends Object
         }
         return $userPenalty;
     }
+
 
 }

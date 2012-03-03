@@ -29,12 +29,29 @@ class CakeXmlReporter extends CakeBaseReporter
     /* }}} */
 
 
+    /**
+     * paintMethodStart
+     *
+     * @param mixed $test_name
+     *
+     * @access public
+     * @return void
+     */
     public function paintMethodStart($test_name)
     {
         $this->pre = microtime();
         parent::paintMethodStart($test_name);
     }
 
+
+    /**
+     * paintMethodEnd
+     *
+     * @param mixed $test_name
+     *
+     * @access public
+     * @return void
+     */
     function paintMethodEnd($test_name)
     {
         $post = microtime();
@@ -50,4 +67,5 @@ class CakeXmlReporter extends CakeBaseReporter
         parent::paintMethodEnd($test_name);
         $this->pre = null;
     }
+
 }

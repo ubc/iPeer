@@ -9,4 +9,5 @@ build/code-browser/
 build/logs/
 build/pdepend/
 cache.properties
+lint.cache
 tags
