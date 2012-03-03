@@ -49,17 +49,17 @@ class Role extends AppModel
      */
     function getRoleByRoleNumber($roleNum = '')
     {
-        if($roleNum==1) {
+        if ($roleNum==1) {
             return 'SA';
         }
 
-        if($roleNum==2) {
+        if ($roleNum==2) {
             return 'A';
         }
-        if($roleNum==3) {
+        if ($roleNum==3) {
             return 'I';
         }
-        if($roleNum==4) {
+        if ($roleNum==4) {
             return 'S';
         } else {
             return null;

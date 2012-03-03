@@ -1,5 +1,7 @@
 <?php
 /**
+ * Modifed by Compass for iPeer Project
+ *
  * Automagically adds the logged in user's id to the specified fields when certain
  * events occur within the model.
  *
@@ -46,11 +48,8 @@
  *     'CreatedBy' => Array ()
  * )
  *
- * @author  Karl Rixon <karl@karlrixon.co.uk>
- * @version 1.0
- *
- * Modifed by Compass for iPeer Project
- *
+ * @author Karl Rixon <karl@karlrixon.co.uk>
+ * @Release 1.0
  **/
 class TraceableBehavior extends ModelBehavior
 {
