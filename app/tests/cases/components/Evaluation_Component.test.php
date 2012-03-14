@@ -512,12 +512,21 @@ class EvaluationTestCase extends CakeTestCase
                     'id' => 1,
                     'number' => 1,
                     'sq_id' => 1,
-                    'Responses' => array('response_0' =>
-                    array('response' => 'YES FOR Q1', 'id' => 1, 'count' =>0),
-                        'response_1' =>
-                        array('response' => 'NO FOR Q1', 'id' => 5, 'count' => 0)),
-                            'total_response' => 0)),
-
+                    'Responses' => array(
+                        'response_0' => array(
+                            'response' => 'YES FOR Q1',
+                            'id' => 1,
+                            'count' =>0
+                        ),
+                        'response_1' => array(
+                            'response' => 'NO FOR Q1',
+                            'id' => 5,
+                            'count' => 0
+                        )
+                    ),
+                    'total_response' => 0
+                )
+            ),
             2 => array(
                 'Question' => array(
                     'prompt' => 'What was the hardest part ?',
@@ -525,9 +534,14 @@ class EvaluationTestCase extends CakeTestCase
                     'id' => 2,
                     'number' => 2,
                     'sq_id' => 2,
-                    'Responses' => array('response_0' =>
-                    array('response' => 'NO FOR Q2', 'id' => 2, 'count' =>0)),
-                        'total_response' => 0)),
+                    'Responses' => array(
+                        'response_0' => array(
+                            'response' => 'NO FOR Q2',
+                            'id' => 2,
+                            'count' =>0
+                        )
+                    ),
+                    'total_response' => 0)),
 
             3 => array(
                 'Question' => array(
@@ -538,7 +552,7 @@ class EvaluationTestCase extends CakeTestCase
                     'sq_id' => 6,
                     'Responses' => array(),
                 )));
-        $this->assertEqual($expected, $survey);
+        $this->assertEqual($survey, $expected);
 
         $survey = $this->EvaluationComponentTest->formatSurveyGroupEvaluationResult(null, null);
         //     $this->assertFalse($survey);

@@ -167,6 +167,7 @@
              </replaceregexp>
          </filterchain>
      </reflexive>
+     <exec command="cake/console/cake -connection test schema_ci create DbAcl" passthru="true"/>
      <exec command="cake/console/cake -connection test testsuite app group model" passthru="true"/>
      <reflexive file="app/config/core.php">
          <filterchain>
@@ -187,6 +188,7 @@
              </replaceregexp>
          </filterchain>
      </reflexive>
+     <exec command="cake/console/cake -connection test schema_ci create DbAcl" passthru="true"/>
      <exec command="cake/console/cake -connection test testreport app group model" passthru="true"/>
      <reflexive file="app/config/core.php">
          <filterchain>

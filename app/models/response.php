@@ -38,7 +38,7 @@ class Response extends AppModel
      */
     function fillResponse($data)
     {
-        for ($i=0; $i<$data['count']; $i++) {
+        for ($i=0; $i<count($data); $i++) {
             $tmp = $this->find('all', array('conditions' => array('question_id' => $data[$i]['Question']['id']),
                 'fields' => array('response', 'id')));
             $count = count($tmp);

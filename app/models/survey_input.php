@@ -180,7 +180,6 @@ class SurveyInput extends AppModel
         $conditions = array(
             'survey_id' => $surveyId,
             'question_id' => $questionId,
-            'response_id' => $responseId,
         );
         $conditions[] = $subQueryExpression;
         return $this->find('all',

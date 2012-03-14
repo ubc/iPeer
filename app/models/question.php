@@ -57,7 +57,7 @@ class Question extends AppModel
      */
     function fillQuestion($data)
     {
-        for ($i=0; $i<$data['count']; $i++) {
+        for ($i=0; $i<count($data); $i++) {
             $data[$i]['Question'] = $this->find('all', array('conditions' => array('id' => $data[$i]['SurveyQuestion']['question_id']),
                 'fields' => array('prompt', 'type')));
             $data[$i]['Question'] = $data[$i]['Question'][0]['Question'];
