@@ -40,7 +40,9 @@ class CourseTestCase extends CakeTestCase {
     function testGetAllInstructors()
     {
         $instructors = $this->Course->getAllInstructors('all', array());
-        $this->assertEqual(Set::extract('/User/id', $instructors), array('5', '6', '7', '2', '1'));
+        $instructorIds = Set::extract('/User/id', $instructors);
+        sort($instructorIds);
+        $this->assertEqual($instructorIds, array('1', '2', '5', '6', '7'));
     }
 
     function testGetCourseByInstructor()
