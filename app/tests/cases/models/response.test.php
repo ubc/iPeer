@@ -94,7 +94,6 @@ class ResponseTestCase extends CakeTestCase
         $data = $this->SurveyQuestion->find('all', array('conditions'=> array('survey_id' => 1),
             'fields' => array('number', 'question_id', 'id'),
             'order' => 'number'));
-        $data['count'] = count($data);
         $result = $this->Question->fillQuestion($data);
         return $result;
     }

@@ -49,7 +49,7 @@ class QuestionTestCase extends CakeTestCase
 
     function testFillQuestion()
     {
-        $input = $this->setUpTestInput();
+        $input = $this->setupTestInput();
         $result = $this->Question->fillQuestion($input);
         // Compare the result with fixture data
         $firstQuestion = $result[0]['Question'];
@@ -86,7 +86,6 @@ class QuestionTestCase extends CakeTestCase
         $data = $this->SurveyQuestion->find('all', array('conditions'=> array('survey_id' => 1),
             'fields' => array('number', 'question_id', 'id'),
             'order' => 'number'));
-        $data['count'] = count($data);
         return $data;
     }
 }
