@@ -1,4 +1,4 @@
-/* CSS RESET */
+
 /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
    License: none (public domain)
@@ -354,17 +354,21 @@ i
 /* HOME */
 .course
 {
-	border: 1px solid #fd8;
 	margin-bottom: 1em;
-	background-color: #fec;
+	background-color: #EAEAEA;
 }
 
 .course h3
 {
 	font-size: 0.9em;
 	font-weight: bold;
-	background-color: #fd8;
-	padding: 0.3em 0.5em;
+	background-color: #4478AC;
+	padding: 0.5em 0.5em;
+}
+
+.course h3 a:link, .course h3 a:visited
+{
+	color: white;
 }
 
 .course h4
@@ -387,7 +391,7 @@ i
 {
 	margin: 0.5em;
 	width: 100%;
-	font-size: 0.8em;
+	font-size: 0.9em;
 }
 
 .course th
@@ -583,15 +587,14 @@ div.table-content li img{
 }
 .tableheader {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	font-weight: bold;
 	color: #FFFFFF;
 	background-color: #4478AC;
+	font-size: 0.9em;
 }
 
 .tablesubheader {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	font-weight: bold;
 	color: #FFFFFF;
 	background-color: #3E83B6;
@@ -599,7 +602,6 @@ div.table-content li img{
 
 .tablesummary {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	font-weight: bold;
 	color: #000000;
 	background-color: #99cc99;
@@ -607,7 +609,6 @@ div.table-content li img{
 
 .tablesummary2 {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	font-weight: bold;
 	color: #000000;
 	background-color: #bce9bc;
@@ -619,7 +620,6 @@ div.table-content li img{
 
 .tableheader2 {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	font-weight: bold;
 	color: #000;
 	background-color: #C0C0C0;
@@ -627,7 +627,6 @@ div.table-content li img{
 
 .searchtable1 {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	font-weight: bold;
 	color: #000000;
 	background-color: #cc9933;
@@ -635,7 +634,6 @@ div.table-content li img{
 
 .searchtable2 {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	font-weight: bold;
 	color: #000000;
 	background-color: #cccc00;
@@ -643,32 +641,28 @@ div.table-content li img{
 
 .searchtable3 {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	font-weight: bold;
 	color: #000000;
 	background-color: #99cc99;
 }
 
 .tablecell {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	color: #000000;
 	background-color: #EAEAEA;
+	line-height: 1.5; /* needed or bottom of letters like g will cut off */
+	font-size: 0.9em;
 }
 .tablecell a:link,.tablecell a:visited {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	color: #FA7E04;
+	text-decoration: none;
 }
 .tablecell a:hover {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	color: #333;
+	text-decoration: underline;
 }
 .tablecell:hover {
 	background-color: #C7D0E7;
 }
 .tablecell2 {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	color: #000000;
     background-color: #EAEAEA;
 }
@@ -722,7 +716,6 @@ div.table-content li img{
 	border-bottom : 1px solid #24588C;
 	margin-top : 6px;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	font-weight:bold;
 }
 
@@ -769,13 +762,11 @@ div.table-content li img{
 .user-list-table th {
   background-color: #4478AC;
   color: white;
-  font-size: 0.9em;
   padding: 4px;
 }
 
 .user-list-table td {
   padding: 4px;
-  font-size: 0.9em;
 }
 
 /* No clue what these does */
