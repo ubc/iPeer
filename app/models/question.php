@@ -68,4 +68,3 @@ class Question extends AppModel
   }
 }
 
-?>

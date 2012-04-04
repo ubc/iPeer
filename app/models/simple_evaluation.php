@@ -90,4 +90,3 @@ class SimpleEvaluation extends AppModel
     }
 }
 
-?>

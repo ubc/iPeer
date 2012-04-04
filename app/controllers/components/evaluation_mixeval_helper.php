@@ -462,4 +462,3 @@ class EvaluationMixevalHelperComponent extends Object
     return $result;
 	}
 }
-?>

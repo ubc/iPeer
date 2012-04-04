@@ -21,21 +21,21 @@
 class InstallController extends Controller
 {
 	var $Sanitize;
-  var $uses         = array(); 
-	var $components   = array('Output', 
+  var $uses         = array();
+	var $components   = array('Output',
                             'framework',
                             'Session',
                             'installHelper',
                             'DbPatcher');
 
-	
+
 	function __construct()
 	{
 		$this->Sanitize = new Sanitize;
- 		$this->pageTitle = 'Install Wizards';		
+ 		$this->pageTitle = 'Install Wizards';
 		parent::__construct();
 	}
-		
+
   function checkDatabaseFile()
   {
     return file_exists('../config/database.php');
@@ -53,7 +53,7 @@ class InstallController extends Controller
       return $this->render('install');
     }
 	}
-	
+
 	function install2()
 	{
     if(!$this->Session->check('progress') || 'index' != $this->Session->read('progress'))
@@ -73,18 +73,18 @@ class InstallController extends Controller
     $this->Session->write('progress', 'install3');
 
     $writable = is_writable("../config");
-  
+
     if(!$writable) $this->set('errmsg', '"app/config" is not writable. Please check the permission on config directory, e.g., chmod 777 app/config. After installation, please change the permission back.');
 
-    if (!empty($this->params['data'])) 
+    if (!empty($this->params['data']))
     {
       //setup parameter
       $dbConfig = $this->__createDBConfigFile();
-			
+
 			//Retain the data setup option: A - With Sample,  B - Basic, C - Import from iPeer 1.6
 			$dbConfig['data_setup_option'] = $this->params['form']['data_setup_option'];
 			$insertDataStructure = $this->installHelper->runInsertDataStructure($dbConfig, $this->params);
-			
+
       //Found error
       if (!($dbConfig && $insertDataStructure))
       {
@@ -103,10 +103,10 @@ class InstallController extends Controller
         $this->render(null, null, 'views/pages/message.tpl.php');
         exit;
       }
-      
+
       $this->set('data', array());
-      $this->redirect('install/install4');  
-		}	  
+      $this->redirect('install/install4');
+		}
 	}
 
 	function install4()
@@ -138,25 +138,25 @@ class InstallController extends Controller
                                        'record_status'  => 'A',
                                        'creator_id'     => 0));
         $user = new User();
-        $user->save($admin); 
+        $user->save($admin);
 
         // test if the config directory is still writable by http user
         $this->set('config_writable', $writable = is_writable("../config"));
 
-				$this->render('install5');  
+				$this->render('install5');
 			}	else {
         //Found error
         $this->set('data', $this->params['data']);
         $this->set('errmsg', 'Configuration of iPeer System Parameters Failed.');
         $this->render('install4');
       }//end if
-		}	  
-	}	
+		}
+	}
 
-  function __createDBConfigFile() 
+  function __createDBConfigFile()
   {
 		//End of line based on OS platform
-    $endl = (substr(PHP_OS,0,3)=='WIN')? "\r\n" : "\n"; 
+    $endl = (substr(PHP_OS,0,3)=='WIN')? "\r\n" : "\n";
 		$dbDriver = '';
 		$dbConnect = '';
     $hostName ='';
@@ -164,9 +164,9 @@ class InstallController extends Controller
 		$dbPassword = '';
 		$dbName = '';
 		$dbConfig = array();
-		
-		//create and write file 
-    if(!$confile = fopen("../config/database.php", "wb")) 
+
+		//create and write file
+    if(!$confile = fopen("../config/database.php", "wb"))
     {
         $errMsg= "Error creating ../config/database.php; check your permissions<br />" ;
         $this->set('errmsg', $errMsg);
@@ -187,13 +187,13 @@ class InstallController extends Controller
         fwrite($confile,"                     'prefix'   => '');  }".$endl);
         fwrite($confile,"?>" . $endl);
       } else {
-			  return false; 
+			  return false;
 			}
-			
-    }  
+
+    }
     return $dbConfig;
   }
-	
+
   function gpl()
   {
     $this->layout = false;
@@ -206,4 +206,3 @@ class InstallController extends Controller
   }
 }
 
-?>

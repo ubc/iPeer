@@ -24,12 +24,12 @@ class EmailComponent extends Object
         ob_start();
         $this->controller->render($this->thtml);
         $mail = ob_get_clean();
-        return $mail; 
+        return $mail;
     }
 
     function send()
     {
-		
+
         $headers  = $this->headers
 			."Content-Transfer-Encoding: quoted-printable\n"
 			."From: $this->from\n"
@@ -43,4 +43,3 @@ class EmailComponent extends Object
 
 }
 
-?>

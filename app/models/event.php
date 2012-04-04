@@ -269,4 +269,3 @@ class Event extends AppModel
 
 }
 
-?>

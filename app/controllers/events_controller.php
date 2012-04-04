@@ -800,4 +800,3 @@ function add ()
   		$this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
 	}
 }
-?>

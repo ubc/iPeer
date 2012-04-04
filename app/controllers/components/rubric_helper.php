@@ -51,4 +51,3 @@ class RubricHelperComponent extends Object
     }
 
 }
-?>

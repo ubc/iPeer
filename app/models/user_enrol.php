@@ -50,4 +50,3 @@ class UserEnrol extends AppModel
 
 }
 
-?>

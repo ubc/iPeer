@@ -89,4 +89,3 @@ class EvaltoolsController extends AppController
     $this->render('index');
   }
 }
-?>

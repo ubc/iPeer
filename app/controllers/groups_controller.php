@@ -615,4 +615,3 @@ class GroupsController extends AppController
     }
 }
 
-?>

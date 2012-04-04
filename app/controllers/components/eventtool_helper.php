@@ -8,7 +8,7 @@
  * @license		OPPL
  *
  */
-class EventtoolHelperComponent extends Object  
+class EventtoolHelperComponent extends Object
 {
   function checkEvaluationToolInUse($evalTool=null, $templateId=null)
   {
@@ -21,4 +21,3 @@ class EventtoolHelperComponent extends Object
 
 }
 
-?>

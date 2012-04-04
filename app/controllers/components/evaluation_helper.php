@@ -100,18 +100,17 @@ class EvaluationHelperComponent
     }
  	  return $groupEvent;
  	}
- 	
+
  	function getEventType ($eventTemplateTypeId, $field='type_name')
  	{
  	  $this->EventTemplateType = new EventTemplateType;
  	  $this->EventTemplateType->setId($eventTemplateTypeId);
  	  $eventTemplate = $this->EventTemplateType->read();
- 	  
+
  	  return $eventTemplate['EventTemplateType'][$field];
  	}
 
 
- 	
+
 }
 
-?>

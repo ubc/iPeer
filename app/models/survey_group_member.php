@@ -34,4 +34,3 @@ class SurveyGroupMember extends AppModel
     }
 }
 
-?>

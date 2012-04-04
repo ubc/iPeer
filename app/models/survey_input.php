@@ -45,4 +45,3 @@ class SurveyInput extends AppModel
 	}
 }
 
-?>

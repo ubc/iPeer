@@ -28,9 +28,9 @@
 class RubricsCriteria extends AppModel
 {
   var $name = 'RubricsCriteria';
-  
+
   var $belongsTo = array( 'Rubric' => array(
-                     'className' => 'Rubric'                     
+                     'className' => 'Rubric'
                    ));
 
   // called by rubrics controller during add/edit of rubric
@@ -61,7 +61,7 @@ class RubricsCriteria extends AppModel
   // function to return the criteria description and weight from the
   // rubrics_loms table
   function getCriteria( $id=null){
-    
+
   	$data = $this->findAll($conditions = 'rubric_id='.$id, $fields = 'criteria, multiplier');
 
   	for( $i=0; $i<count($data); $i++ ){
@@ -81,4 +81,3 @@ class RubricsCriteria extends AppModel
 
 }
 
-?>

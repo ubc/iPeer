@@ -62,4 +62,3 @@ class EvaluationResultComponent extends Object
 
 
 }
-?>

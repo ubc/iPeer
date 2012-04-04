@@ -308,4 +308,3 @@ class Course extends AppModel
     return count($course['Enrol']);
   }
 }
-?>

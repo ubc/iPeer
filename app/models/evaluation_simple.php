@@ -77,9 +77,8 @@ class EvaluationSimple extends AppModel
     foreach($status as $s) {
       $ret[$s['EvaluationSimple']['evaluatee']] = $s['EvaluationSimple'];
     }
-    return $ret;  
+    return $ret;
   }
 
 }
 
-?>

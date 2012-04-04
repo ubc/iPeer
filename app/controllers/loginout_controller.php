@@ -460,4 +460,3 @@ class LoginoutController extends AppController
 	}
 }
 
-?>

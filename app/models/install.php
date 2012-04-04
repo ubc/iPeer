@@ -30,4 +30,3 @@ class Install extends AppModel
     var $name = 'Install';
 }
 
-?>

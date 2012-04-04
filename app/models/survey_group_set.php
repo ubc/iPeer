@@ -28,7 +28,7 @@
 class SurveyGroupSet extends AppModel
 {
     var $name = 'SurveyGroupSet';
-    var $belongsTo = array('Survey' => 
+    var $belongsTo = array('Survey' =>
                            array('className'    => 'Survey',
                                  'condition'    => '',
                                  'order'        => '',
@@ -47,4 +47,3 @@ class SurveyGroupSet extends AppModel
     }
 }
 
-?>

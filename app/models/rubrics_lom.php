@@ -73,4 +73,3 @@ class RubricsLom extends AppModel
   }
 }
 
-?>

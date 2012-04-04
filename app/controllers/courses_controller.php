@@ -335,4 +335,3 @@ class CoursesController extends AppController
 		}
 	}
 }
-?>

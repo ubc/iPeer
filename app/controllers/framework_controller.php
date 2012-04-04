@@ -77,4 +77,3 @@ class FrameworkController extends AppController
 	}
 }
 
-?>

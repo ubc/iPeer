@@ -1335,4 +1335,3 @@ function export_test($eventId=null,$groupID=null)
     }
 
 }
-?>

@@ -764,4 +764,3 @@ class SurveyGroupsController extends AppController
       $this->params['data'] = $this->Personalize->updateAttribute($this->rdAuth->id, $attributeCode, $attributeValue);
   }
 }
-?>

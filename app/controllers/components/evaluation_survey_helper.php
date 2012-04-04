@@ -341,4 +341,4 @@ class EvaluationSurveyHelperComponent extends Object
     return $questions;
 	}
 
-}?>
+}

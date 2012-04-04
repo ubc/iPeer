@@ -26,7 +26,7 @@ class Baker extends AppModel
     var $web_baker = null;
 
     /**
-     * Constructor. 
+     * Constructor.
      * Here, Baker model doesn't inherit constructor from class 'Model', because it need not bind any database.
      */
     function __construct()
@@ -40,7 +40,7 @@ class Baker extends AppModel
      * @param array $data POST data.
      * @return boolean
      */
-    function createFiles($data) 
+    function createFiles($data)
     {
         $this->set($data);
         if (!$this->validates())
@@ -49,7 +49,7 @@ class Baker extends AppModel
         }   //end if
         //  Setting the WebBaker Instance.
         empty($data['Baker']['overwrite']) or $this->web_baker->setOverwrite(true);
-        $this->web_baker->setType($data['Baker']['type']);        
+        $this->web_baker->setType($data['Baker']['type']);
         $this->web_baker->setModelName($data['Baker']['name']);
         $actions = (trim($data['Baker']['actions'])) ? explode(',', $data['Baker']['actions']) : array();
         $this->web_baker->setActions($actions);
@@ -68,4 +68,3 @@ class Baker extends AppModel
     }   //end function
 
 }   ///:~
-?>

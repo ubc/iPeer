@@ -11,7 +11,7 @@ class BakersController extends AppController
 
     /**
      * Initial values of form fields.
-     * 
+     *
      * @var     array
      * @access  private
      */
@@ -25,7 +25,7 @@ class BakersController extends AppController
 
     function index()
     {
-        if (empty($this->params['data'])) 
+        if (empty($this->params['data']))
         {
             // Init fields ...
             $this->params['data']['Baker'] =& $this->_fields;
@@ -40,7 +40,7 @@ class BakersController extends AppController
                 $this->set('url', $this->base.'/'.Inflector::underscore($ctrl_name));
                 $this->render('ok');
             }
-            else 
+            else
             {
                 $this->set('data', $this->params['data']);
                 $this->validateErrors($this->Baker);
@@ -50,4 +50,3 @@ class BakersController extends AppController
         }   //end if
     }   //end function
 }   ///:~
-?>

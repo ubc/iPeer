@@ -570,7 +570,7 @@ class SurveysController extends AppController
         // Initialize a basic non-funcional AjaxList
         $this->AjaxList->quickSetUp();
         // Clear the state first, we don't want any previous searches/selections.
-        $this->AjaxList->clearState(); 
+        $this->AjaxList->clearState();
         // Set and update session state Variable
         $joinFilterSelections->course_id = $course;
         $this->AjaxList->setStateVariable("joinFilterSelections", $joinFilterSelections);
@@ -581,4 +581,3 @@ class SurveysController extends AppController
   }
 }
 
-?>

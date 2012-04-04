@@ -244,4 +244,3 @@ class HomeController extends AppController
 	}
 }
 
-?>

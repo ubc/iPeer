@@ -135,7 +135,7 @@ class EvaluationSimpleHelperComponent extends Object
   function changeEvaluationGradeRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus) {
     $this->EvaluationSimple = new EvaluationSimple;
     $this->GroupEvent = new GroupEvent;
-    
+
 		$courseId = $this->rdAuth->courseId;
 
     //changing grade release for each EvaluationSimple
@@ -156,14 +156,14 @@ class EvaluationSimpleHelperComponent extends Object
 	                                                                  $oppositGradeReleaseCount);
 	  $this->GroupEvent->save($groupEvent);
 
-		
+
   }
-  
+
   function changeEvaluationCommentRelease ($eventId, $groupId, $groupEventId, $evaluatorIds, $params) {
-    
+
     $this->GroupEvent = new GroupEvent;
     $this->EvaluationSimple = new EvaluationSimple;
-    
+
 		$this->GroupEvent->setId($groupEventId);
 		$groupEvent = $this->GroupEvent->read();
 		$courseId = $this->rdAuth->courseId;
@@ -226,19 +226,19 @@ class EvaluationSimpleHelperComponent extends Object
     }
   	$this->GroupEvent->save($groupEvent);
 
-  }  
-  
+  }
+
 	function formatSimpleEvaluationResult($event=null)
 	{
 	  $this->GroupsMembers = new GroupsMembers;
 	  $this->EvaluationSimple = new EvaluationSimple;
 	  $this->EvaluationSubmission = new EvaluationSubmission;
 	  $result = array();
-	  
+
      //Get Members for this evaluation
     $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'],
                                                                $event['Event']['self_eval'], $this->rdAuth->id);
-                                                               
+
 		// get comment records - do changes to records above this.
 		$commentRecords = array();
 		$memberScoreSummary = array();
@@ -250,8 +250,8 @@ class EvaluationSimpleHelperComponent extends Object
 			  //Check if this memeber submitted evaluation
 			  $evalSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($event['group_event_id'],
 			                                                                                        $user['User']['id']);
-			                                                                                        			  
-			  if (empty($evalSubmission['EvaluationSubmission'])) {                                                                                      			  
+
+			  if (empty($evalSubmission['EvaluationSubmission'])) {
 			     $allMembersCompleted = false;
 			     $inCompletedMembers[$pos++]=$user;
 			  }
@@ -279,5 +279,5 @@ class EvaluationSimpleHelperComponent extends Object
 		return $result;
 	}
 
-  
-}?>
+
+}

@@ -15,7 +15,7 @@
  * @lastmodified $Date: 2006/06/20 18:44:18 $
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
- 
+
 /**
  * Personalize
  *
@@ -58,4 +58,3 @@ class Personalize extends AppModel
   }
 }
 
-?>

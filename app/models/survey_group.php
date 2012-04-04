@@ -38,4 +38,3 @@ class SurveyGroup extends AppModel
     }
 }
 
-?>

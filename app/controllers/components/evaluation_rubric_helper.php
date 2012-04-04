@@ -451,4 +451,3 @@ class EvaluationRubricHelperComponent extends Object
     return $result;
 	}
 }
-?>

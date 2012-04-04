@@ -241,4 +241,3 @@ class XmlHandlerComponent extends Object
     return $score;
 	}
 }
-?>

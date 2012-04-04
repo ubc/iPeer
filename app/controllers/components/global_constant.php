@@ -27,24 +27,23 @@
  */
 class GlobalConstantComponent
 {
-  
+
   var $DEFAULT_PASSWORD = 'ipeer';
 
 
   /* Record Status - Active, Inactive */
   var $STATUS_ACTIVE = 'A';
   var $STATUS_INACTIVE = 'I';
-  
 
-  
+
+
   /* Access Right - Owner, All, ReadOnly*/
   var $ACCESS_RIGHT_OWNER = 'O';
   var $ACCESS_RIGHT_ALL = 'A';
   var $ACCESS_RIGHT_READ_ONLY = 'R';
-  
+
   /* System Function Code */
   var $SYS_FUNCTION_HOME = 'HOME';
   var $SYS_FUNCTION_USER = 'USR';
 }
 
-?>

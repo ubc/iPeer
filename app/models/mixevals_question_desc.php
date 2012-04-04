@@ -65,4 +65,3 @@ class MixevalsQuestionDesc extends AppModel
   	return $data;
   }
 }
-?>

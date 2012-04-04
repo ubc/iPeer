@@ -28,11 +28,11 @@
 class RubricsCriteriaComment extends AppModel
 {
   var $name = 'RubricsCriteriaComment';
-  
+
   var $belongsTo = array( 'Rubric' => array(
-                     'className' => 'Rubric'                     
+                     'className' => 'Rubric'
                    ));
-  
+
   // called by rubrics controller during add/edit of rubric
   // inserts/updates with criteria comments for each rubric
   function insertCriteriaComm($id=null, $data){
@@ -42,18 +42,18 @@ class RubricsCriteriaComment extends AppModel
   				$tmp = array( 'rubric_id'=>$id, 'criteria_num'=>$i, 'lom_num'=>$j, 'criteria_comment'=>$data['criteria_comment_'.$i.'_'.$j]);
   			else
   				$tmp = array( 'rubric_id'=>$id, 'criteria_num'=>$i, 'lom_num'=>$j, 'criteria_comment'=>null);
-  				
+
   			$this->save($tmp);
   			$this->id = null;
   		}
   	}
   }
-  
+
   // called by rubrics controller during an edit of an
   // existing rubric criteria comment(s)
   function updateCriteriaComm($data){
   	$this->query('DELETE FROM rubrics_criteria_comments WHERE rubric_id='.$data['id']);
-  	
+
   	for( $i=1; $i<=$data['criteria']; $i++ ){
   		for( $j=1; $j<=$data['lom_max']; $j++ ){
   			if( !empty($data['criteria_comment_'.$i.'_'.$j]) )
@@ -63,14 +63,14 @@ class RubricsCriteriaComment extends AppModel
   		}
   	}
   }
-  
+
   // called by the delete function in the controller
   function deleteCriteriaComments( $id ){
   	$this->query('DELETE FROM rubrics_criteria_comments WHERE rubric_id='.$id);
   }
-  
+
   // function to return the criteria x lom comments
-  function getCriteriaComment( $id=null, $criteria=null, $lom=null ){	
+  function getCriteriaComment( $id=null, $criteria=null, $lom=null ){
   	for( $i=0; $i<$criteria; $i++ ){
   		for( $j=0; $j<$lom; $j++ ){
   			$data = $this->findAll($conditions = 'rubric_id='.$id." AND ".'criteria_num='.($i+1)." AND ".'lom_num='.($j+1), $fields = 'criteria_comment');
@@ -84,4 +84,3 @@ class RubricsCriteriaComment extends AppModel
   }
 }
 
-?>

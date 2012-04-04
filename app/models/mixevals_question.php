@@ -38,24 +38,23 @@ class MixevalsQuestion extends AppModel
   		$this->id = null;
   	}
   }
-  
+
    // called by mixevals controller during an edit of an
    // existing mixeval question(s)
   function updateQuestion($id, $data){
     $this->deleteQuestions($id);
     $this->insertQuestion($id, $data);
   }
-  
+
   // called by the delete function in the controller
   function deleteQuestions( $id ){
   	$this->query('DELETE FROM mixevals_questions WHERE mixeval_id='.$id);
   }
-  
+
   // function to return the question description and weight from the
   // mixevals_loms table
   function getQuestion( $id=null){
   	$data = $this->findAll('mixeval_id='.$id, null, 'question_num ASC');
   	return $data;
-  }  
+  }
 }
-?>

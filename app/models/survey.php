@@ -115,4 +115,3 @@ class Survey extends AppModel
   }
 }
 
-?>

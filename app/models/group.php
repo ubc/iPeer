@@ -168,4 +168,3 @@ class Group extends AppModel
     }
 }
 
-?>

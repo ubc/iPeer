@@ -90,4 +90,3 @@ class Response extends AppModel
 	}
 }
 
-?>

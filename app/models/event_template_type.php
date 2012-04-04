@@ -28,8 +28,7 @@
 class EventTemplateType extends AppModel
 {
   var $name = 'EventTemplateType';
-  
+
 
 }
 
-?>

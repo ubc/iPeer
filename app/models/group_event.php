@@ -222,4 +222,3 @@ class GroupEvent extends AppModel
   }
 }
 
-?>

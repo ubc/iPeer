@@ -162,4 +162,4 @@ class SearchsController extends AppController
     $this->set('eventList',$this->Event->findAll($condition));
   }
 
-}?>
+}
