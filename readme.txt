@@ -1,6 +1,22 @@
-iPeer 2.2.2.1
+iPeer 2.3
 
-Changelog from 2.2.2
+Changelog from 2.2.2.1
+1) Removed PHP closing brackets that may causing issue (the blank page when submitting evaluation)
+2) Fixed it didn't select current course by default when clicking on edit survey in teammaker survey menu
+3) Fixed the duplicated numeric result in export when there are more than one event for the same group in a course
+4) Added updating user when import students
+5) Fixed missing descriptors in mix eval
+6) Fixed displaying descriptor for mixeval
+7) Added displaying descriptor on view_mixeval_evaluation_results-details.ctp
+8) Fixed find list function to 1.1 syntax
+9) Fixed some format on the report
+10) Fixed empty results in export issue for rubric
+11) Fixed the wrong order of first name and last name in rd_auth fullname field
+12) Fixed the wrong calculation on instructor detailed result page
+13) Fixed total marks not calculated
+14) Fixed a bug when submitting quote in a input text box in student interface
+
+Changelo from 2.2.2
 1) Fixed password reset double hash bug
 
 Changelog from 2.2.1
