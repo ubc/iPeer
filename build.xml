@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="iPeer" basedir="." default="build">
+    <target name="release" description="Prepare the release" depends="debug-off,packaging" />
+
     <target name="debug-off" description="turn off the debug">
         <reflexive file="app/config/core.php">
             <filterchain>
@@ -9,5 +11,22 @@
                 </replaceregexp>
             </filterchain>
         </reflexive>
+    </target>
+
+    <target name="packaging" description="Packaging the release">
+        <tar destfile="archive.tar.gz" compression="gzip">
+            <fileset dir=".">
+                <exclude name="**/.git/" />
+                <exclude name="archive.tar.gz" />
+                <exclude name="archive.zip" />
+            </fileset>
+        </tar>
+        <zip destfile="archive.zip">
+            <fileset dir=".">
+                <exclude name="**/.git/" />
+                <exclude name="archive.tar.gz" />
+                <exclude name="archive.zip" />
+            </fileset>
+        </zip>
     </target>
 </project>
