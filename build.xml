@@ -18,25 +18,29 @@
         <php function="trim" returnProperty="version.number">
             <param value="${version.number}" />
         </php>
-        <mkdir dir="build/${version.number}" />
+        <mkdir dir="${version.number}" />
 
-        <tar destfile="build/${version.number}/${phing.project.name}-${version.number}.tar.gz" compression="gzip">
+        <tar destfile="${version.number}/${phing.project.name}-${version.number}.tar.gz" compression="gzip">
             <fileset dir=".">
                 <exclude name="**/.git/" />
                 <exclude name="build/" />
+                <exclude name="${version.number}/" />
             </fileset>
         </tar>
-        <filehash file="build/${version.number}/${phing.project.name}-${version.number}.tar.gz" hashtype="0" />
-        <echo msg="${filehashvalue}" file="build/${version.number}/${phing.project.name}-${version.number}.tar.gz.md5" />
+        <filehash file="${version.number}/${phing.project.name}-${version.number}.tar.gz" hashtype="0" />
+        <echo msg="${filehashvalue}" file="${version.number}/${phing.project.name}-${version.number}.tar.gz.md5" />
 
-        <zip destfile="build/${version.number}/${phing.project.name}-${version.number}.zip">
+        <zip destfile="${version.number}/${phing.project.name}-${version.number}.zip">
             <fileset dir=".">
                 <exclude name="**/.git/" />
                 <exclude name="build/" />
+                <exclude name="${version.number}/" />
             </fileset>
         </zip>
-        <filehash file="build/${version.number}/${phing.project.name}-${version.number}.zip" hashtype="0" />
-        <echo msg="${filehashvalue}" file="build/${version.number}/${phing.project.name}-${version.number}.zip.md5" />
+        <filehash file="${version.number}/${phing.project.name}-${version.number}.zip" hashtype="0" />
+        <echo msg="${filehashvalue}" file="${version.number}/${phing.project.name}-${version.number}.zip.md5" />
+
+        <move file="readme.txt" todir="${version.number}/" />
     </target>
 
     <target name="bump" description="bump a version">
