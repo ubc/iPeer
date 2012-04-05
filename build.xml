@@ -14,30 +14,35 @@
     </target>
 
     <target name="packaging" description="Packaging the release">
-        <tar destfile="${phing.project.name}.tar.gz" compression="gzip">
+        <loadfile property="version.number" file="version.txt"/>
+        <php function="trim" returnProperty="version.number">
+            <param value="${version.number}" />
+        </php>
+        <mkdir dir="build/${version.number}" />
+
+        <tar destfile="build/${version.number}/${phing.project.name}-${version.number}.tar.gz" compression="gzip">
             <fileset dir=".">
                 <exclude name="**/.git/" />
-                <exclude name="${phing.project.name}.tar.gz" />
-                <exclude name="${phing.project.name}.zip" />
+                <exclude name="build/" />
             </fileset>
         </tar>
-        <filehash file="${phing.project.name}.tar.gz" hashtype="0" />
-        <echo msg="${filehashvalue}" file="${phing.project.name}.tar.gz.md5" />
-        <zip destfile="${phing.project.name}.zip">
+        <filehash file="build/${version.number}/${phing.project.name}-${version.number}.tar.gz" hashtype="0" />
+        <echo msg="${filehashvalue}" file="build/${version.number}/${phing.project.name}-${version.number}.tar.gz.md5" />
+
+        <zip destfile="build/${version.number}/${phing.project.name}-${version.number}.zip">
             <fileset dir=".">
                 <exclude name="**/.git/" />
-                <exclude name="${phing.project.name}.tar.gz" />
-                <exclude name="${phing.project.name}.zip" />
+                <exclude name="build/" />
             </fileset>
         </zip>
-        <filehash file="${phing.project.name}.zip" hashtype="0" />
-        <echo msg="${filehashvalue}" file="${phing.project.name}.zip.md5" />
+        <filehash file="build/${version.number}/${phing.project.name}-${version.number}.zip" hashtype="0" />
+        <echo msg="${filehashvalue}" file="build/${version.number}/${phing.project.name}-${version.number}.zip.md5" />
     </target>
 
-    <target name="versioning" description="versioning the files">
-        <move file="${phing.project.name}.tar.gz" tofile="${phing.project.name}-${project.version}.tar.gz" overwrite="true" />
-        <move file="${phing.project.name}.zip" tofile="${phing.project.name}-${project.version}.zip" overwrite="true" />
-        <move file="${phing.project.name}.tar.gz.md5" tofile="${phing.project.name}-${project.version}.tar.gz.md5" overwrite="true" />
-        <move file="${phing.project.name}.zip.md5" tofile="${phing.project.name}-${project.version}.zip.md5" overwrite="true" />
+    <target name="bump" description="bump a version">
+        <input propertyname="release_option" defaultValue="Minor" validargs="Major,Minor,BugFix" promptChar=":">
+            Please choose a release type
+        </input>
+        <version releasetype="${release_option}" file="version.txt" property="version.number" />
     </target>
 </project>

@@ -16,7 +16,7 @@ Changelog from 2.2.2.1
 13) Fixed total marks not calculated
 14) Fixed a bug when submitting quote in a input text box in student interface
 
-Changelo from 2.2.2
+Changelog from 2.2.2
 1) Fixed password reset double hash bug
 
 Changelog from 2.2.1
