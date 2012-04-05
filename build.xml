@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="iPeer" basedir="." default="build">
+<project name="ipeer" basedir="." default="build">
     <target name="release" description="Prepare the release" depends="debug-off,packaging" />
 
     <target name="debug-off" description="turn off the debug">
@@ -32,5 +32,12 @@
         </zip>
         <filehash file="${phing.project.name}.zip" hashtype="0" />
         <echo msg="${filehashvalue}" file="${phing.project.name}.zip.md5" />
+    </target>
+
+    <target name="versioning" description="versioning the files">
+        <move file="${phing.project.name}.tar.gz" tofile="${phing.project.name}-${project.version}.tar.gz" overwrite="true" />
+        <move file="${phing.project.name}.zip" tofile="${phing.project.name}-${project.version}.zip" overwrite="true" />
+        <move file="${phing.project.name}.tar.gz.md5" tofile="${phing.project.name}-${project.version}.tar.gz.md5" overwrite="true" />
+        <move file="${phing.project.name}.zip.md5" tofile="${phing.project.name}-${project.version}.zip.md5" overwrite="true" />
     </target>
 </project>
