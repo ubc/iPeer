@@ -16,7 +16,7 @@ if (isset($course_list['A']))
 
     echo "<h4>Instructors: ";
     echo $this->element(
-      'courses/course_instructors',
+      'courses/list_instructors',
       array('instructors' => $course['Instructor'])
     );
     echo "</h4>";
@@ -60,7 +60,7 @@ if (isset($course_list['I']))
     echo "<h3>$coursename</h3>";
     echo "<h4>Instructors: ";
     echo $this->element(
-      'courses/course_instructors',
+      'courses/list_instructors',
       array('instructors' => $course['Instructor'])
     );
     echo "</h4>";

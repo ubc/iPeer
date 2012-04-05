@@ -337,7 +337,7 @@ class sysContainerComponent
             if (isset($this->myCourseList[$courseId])) {
                 $course= $this->myCourseList[$courseId];
             } else {
-                $courseLink = '&nbsp;<img alt="home" src="'. dirname($_SERVER['PHP_SELF']).'/img/icons/home.gif" border="0" valign="middle" />&nbsp;'.$this->Course->getCourseName($courseId);
+                $courseLink = $this->Course->getCourseName($courseId);
                 return $courseLink;
             }
         }

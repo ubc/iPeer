@@ -12,7 +12,7 @@
     <?php if (User::get('role') == 'A') : // For admin, show this note about insturctor column?>
       <div style="text-align:right">
         <strong>*<?php __('Note') ?>:</strong> <?php __('When searching by Instructor, the results will return any course they<br />
-         are leading. However, only one instructor is listed above by when not searching.') ?><br/>
+         are leading. However, only one instructor is listed above when not searching.') ?><br/>
       </div>
     <?php endif; ?>
   </div>

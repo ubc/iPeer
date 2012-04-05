@@ -131,6 +131,16 @@ p
 	display: block;
 }
 
+a:link, a:visited
+{
+	text-decoration: none;
+}
+
+a:hover
+{
+	text-decoration: underline;
+}
+
 /* BANNER */
 #banner
 {
@@ -188,7 +198,6 @@ p
 	font-weight: bolder;
 	font-size: 0.85em;
 	text-align: center;
-	text-decoration: none;
 	padding: 0.5em;
 	padding-left: 0.6em;
 }
@@ -246,12 +255,11 @@ p
 
 .error-message
 {
+	margin: 0 auto;
 	margin-bottom: 1em;
 	padding: 0.5em;
 	width: 20em;
 	display: block;
-	margin-left: auto;
-	margin-right: auto;
 }
 
 .red
@@ -377,14 +385,15 @@ i
 	padding: 0.5em;
 }
 
-.course a 
+.course h4 ul
 {
-	text-decoration: none;
+	display: inline;
 }
 
-.course a:hover
+.course h4 li
 {
-	text-decoration: underline;
+	display: inline;
+	padding-right: 1em;
 }
 
 .course table
@@ -453,25 +462,80 @@ i
 	border-bottom: 1px solid #CFCFCF;
 }
 
+/* COURSE */
+
+.course_summary {
+	border-spacing: 0;
+	width: 100%;
+	margin-top: 0.5em;
+	font-size: 0.9em;
+}
+
+.course_summary th {
+	background-color: #3E83B6;
+	color: white;
+	font-weight: bold;
+}
+
+.course_summary td {
+	background-color: #EAEAEA;
+	text-align: center;
+}
+
+.course_summary li {
+	padding: 0.2em 0; /* space out the instructors more */
+}
+
+.course_actions {
+	margin-bottom: 0.5em;
+}
+
+.course_submenu {
+	margin: 1em 0;
+	width: 49.7%;
+	vertical-align: top;
+	display: inline-block;
+}
+
+.course_submenu h3 {
+	background-color: #EAEAEA;
+	color: #0A2C64;
+	font-weight: bold;
+	padding: 0.5em;
+}
+
+.course_submenu ul {
+	background-color: white;
+}
+
+.course_submenu li {
+	padding-left: 2em;
+	margin-top: 1em;
+	background-image: url("../img/layout/yellow_arrow.gif");
+	background-repeat: no-repeat;
+	background-position: 0.5em;
+}
+
 /* TO BE REFACTORED LATER */
 
 /* TEMPORARY */
 /* temporary padding to be used until refactoring finished */
+
 table
 {
-	border-spacing: 2px;
+	border-spacing: 1px;
 	border-collapse: separate;
 }
 th
 {
 	vertical-align: middle;
-	padding: 0.5em;
+	padding: 0.3em;
 }
 
 td
 {
 	vertical-align: middle;
-	padding: 0.5em;
+	padding: 0.3em;
 }
 
 /* temp nav ul fix */
@@ -488,7 +552,6 @@ td
 
 #nav a
 {
-	text-decoration: none;
 	font-size: 0.9em;
 	padding: 0.2em 0.5em;
 }
@@ -651,12 +714,6 @@ div.table-content li img{
 	background-color: #EAEAEA;
 	line-height: 1.5; /* needed or bottom of letters like g will cut off */
 	font-size: 0.9em;
-}
-.tablecell a:link,.tablecell a:visited {
-	text-decoration: none;
-}
-.tablecell a:hover {
-	text-decoration: underline;
 }
 .tablecell:hover {
 	background-color: #C7D0E7;
