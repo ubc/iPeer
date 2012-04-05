@@ -14,19 +14,23 @@
     </target>
 
     <target name="packaging" description="Packaging the release">
-        <tar destfile="archive.tar.gz" compression="gzip">
+        <tar destfile="${phing.project.name}.tar.gz" compression="gzip">
             <fileset dir=".">
                 <exclude name="**/.git/" />
-                <exclude name="archive.tar.gz" />
-                <exclude name="archive.zip" />
+                <exclude name="${phing.project.name}.tar.gz" />
+                <exclude name="${phing.project.name}.zip" />
             </fileset>
         </tar>
-        <zip destfile="archive.zip">
+        <filehash file="${phing.project.name}.tar.gz" hashtype="0" />
+        <echo msg="${filehashvalue}" file="${phing.project.name}.tar.gz.md5" />
+        <zip destfile="${phing.project.name}.zip">
             <fileset dir=".">
                 <exclude name="**/.git/" />
-                <exclude name="archive.tar.gz" />
-                <exclude name="archive.zip" />
+                <exclude name="${phing.project.name}.tar.gz" />
+                <exclude name="${phing.project.name}.zip" />
             </fileset>
         </zip>
+        <filehash file="${phing.project.name}.zip" hashtype="0" />
+        <echo msg="${filehashvalue}" file="${phing.project.name}.zip.md5" />
     </target>
 </project>
