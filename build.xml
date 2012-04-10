@@ -7,7 +7,7 @@
         <reflexive file="app/config/core.php">
             <filterchain>
                 <replaceregexp>
-                    <regexp pattern="'DEBUG', 1" replace="'DEBUG', 0"/>
+                    <regexp pattern="'DEBUG', \d" replace="'DEBUG', 0"/>
                 </replaceregexp>
             </filterchain>
         </reflexive>
@@ -48,5 +48,13 @@
             Please choose a release type
         </input>
         <version releasetype="${release_option}" file="version.txt" property="version.number" />
+        <reflexive file="app/config/core.php">
+            <filterchain>
+                <replaceregexp>
+                    <regexp pattern="'IPEER_VERSION', '\d.\d.\d'" replace="'IPEER_VERSION', '${version.number}'"/>
+                </replaceregexp>
+            </filterchain>
+        </reflexive>
+
     </target>
 </project>

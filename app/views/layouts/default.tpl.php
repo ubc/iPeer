@@ -68,7 +68,7 @@ function checkEmailAddress()
     <td width="2%" rowspan="2"><?php echo $html->image('layout/banner_left.gif',array('alt'=>'banner_left'))?></td>
     <td width="25%" height="72" valign="top"><span class="style1">
         <?php echo $html->image('layout/ipeer_banner.gif',array('alt'=>'ipeer_banner'))?></span>
-    <span class="bannerText"><span style='font-size: 120%;'>2.2</span>&nbsp;&nbsp;with TeamMaker</span></td>
+        <span class="bannerText"><span style='font-size: 120%;'><?php echo IPEER_VERSION?></span>&nbsp;&nbsp;with TeamMaker</span></td>
     <td width="46%" valign="top"><br />
       <table width="100%" border="0" align="right" cellpadding="0" cellspacing="4" class="miniLinks">
       <tr class="miniLinks">
