@@ -95,86 +95,63 @@ class UsersController extends AppController
 
 
     /**
-     * setUpAjaxList
+     * Setup the ajax list component. The ajax list component is used to
+     * display many iPeer tables since it allows easy sorting and filtering
+     * by columns. 
      *
+     * Note that there was an attempt at filtering users by course enrolment
+     * but the code for that does not work even in the master branch, so it 
+     * looks like either the course filtering was broken somewhere along the
+     * way or it was never completed.
+     * 
      * @access public
      * @return void
      */
     function setUpAjaxList ()
     {
-        // Set up the ajax list component
-
-        // Get the course data
-        $userCourseList = $this->sysContainer->getMyCourseList();
-        $coursesList = array();
-        // Add in the unassigned course entry:
-        $coursesList{"!!!null"} = "-- Unassigned --";
-
-        foreach ($userCourseList as $id => $course) {
-            $coursesList{$id} = $course['course'];
-        }
-
-        //    (isset($this->AjaxList->getState()->joinFilterSelections->course_id))?
-        //      $selected_course_id = $this->AjaxList->getState()->joinFilterSelections->course_id:
-        //      $selected_course_id = '0';
-        //
-        //    $groupsList = array($this->Group->find('list', array(
-        //        'fields' => array('group_name'),
-        //        'conditions' => array('course_id' => $selected_course_id)
-        //    )));
-        //    $groupsList = $groupsList['0'];
-
-        // The columns to show
+        // The columns to be shown in the table
         $columns = array(
-            //    Model   columns       (Display Title) (Type Description)
-            array("User.role",       __("Role", true),         "6em",   "map",
-            array(  "A" => "Admin",  "I" => __("Instructor", true) , "S" => __("Student", true))),
-            array("User.id",         "",             "",      "hidden"),
-            array("User.username",   __("Username", true),     "10em",  "action", "View User"),
-            array("User.full_name",  __("Full Name", true),    "15em",  "string"),
-            array("User.email",      __("Email", true),        "auto",  "action", "Send Email"),
-            //array("UserEnrol.course_id", "Course ID", "number"),
+          // Model, Columns, (Display Title), (Type Description)
+          array(
+            "User.role",
+            __("Role", true),
+            "6em",
+            "map",
+            array(
+              "A" => "Admin",
+              "I" => __("Instructor", true),
+              "S" => __("Student", true)
+            )
+          ),
+          array(
+            "User.id",
+            "",
+            "",
+            "hidden"
+          ),
+          array(
+            "User.username",
+            __("Username", true),
+            "10em",
+            "action",
+            "View User"
+          ),
+          array(
+            "User.full_name",
+            __("Full Name", true),
+            "15em",
+            "string"
+          ),
+          array(
+            "User.email",
+            __("Email", true),
+            "auto",
+            "action",
+            "Send Email"
+          ),
         );
 
-        // The course to list for is the extra filter in this case
-        $joinTables =
-            array(
-                array(  // Define the GUI aspecs
-                    "id"            => "Enrolment.id",
-                    "description"   => __("for Course:", true),
-                    // What are the choises and the default values?
-                    "list"  => $coursesList,
-                    "default" => $this->Session->read('ipeerSession.courseId'),
-                    // What table do we join to get these
-                    // commented out by compass. use association and default
-                    // join format
-                    //                    "joinTable"     => "user_enrols",
-                    //                    "joinModel"     => "UserEnrol",
-                    //                    "foreignKey"    => "user_id",
-
-                    // Any show/hide features based on maps
-                    "dependsMap"    => "User.role",    // Look to this column
-                    "dependsValues" => array("S")  // Display only when this column is one of these values
-                ),
-                //            array(  // Define the GUI aspecs
-                //                    "id"            => "group_id",
-                //                    "description"   => "for Group:",
-                //                    // What are the choises and the default values?
-                //                    "list"  => $groupsList,
-                //                    "default" => '',
-                //                    // What table do we join to get these
-                //                    "joinTable"     => "groups_members",
-                //                    "joinModel"     => "GroupsMember",
-                //                    "foreignKey"    => "user_id",
-                //                    "conditions" => array('course_id' => $selected_course_id),
-                //
-                //                    // Any show/hide features based on maps
-                //                    "dependsMap"    => "User.role",    // Look to this column
-                //                    "dependsValues" => array("S")  // Display only when this column is one of these values
-                //                 )
-            );
-
-        // Define Actions
+        // define action warnings
         $deleteUserWarning = __("Delete this user. Irreversible. Are you sure?", true);
         $resetPassWarning = __("Resets user Password. Are you sure?", true);
 
@@ -187,8 +164,8 @@ class UsersController extends AppController
             $actionRestrictions = "";
         }
 
+        // define right click menu actions
         $actions = array(
-            //   parameters to cakePHP controller:,
             //   display name, (warning shown), fixed parameters or Column ids
             array(__("View User", true),  "", "", "", "view", "User.id"),
             array(__("Send Email", true),  "", "", "emailer", "write", "User.id"),
@@ -197,8 +174,8 @@ class UsersController extends AppController
             array(__("Reset Password", true), $resetPassWarning,  $actionRestrictions, "", "resetPassword", "User.id")
         );
 
-        $this->AjaxList->setUp($this->User, $columns, $actions, "User.id", "User.username",
-            $joinTables);
+        $this->AjaxList->setUp($this->User, $columns, $actions, 
+          "User.id", "User.username", array());
     }
 
 
@@ -254,7 +231,8 @@ class UsersController extends AppController
     }
 
     /**
-     * goToClassList
+     * Attempts to setup conditions to get a list of users enrolled in a course
+     * for display, but fails.
      *
      * @param mixed $course
      *
