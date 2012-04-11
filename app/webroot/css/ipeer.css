@@ -142,14 +142,20 @@ a:hover
 }
 
 /* BANNER */
-#banner
+.banner
 {
 	border-top-left-radius: 8px; 
 	border-top-right-radius: 8px; 
 	border: 1px solid #ddd;
 	border-bottom: none;
-	background: #f4f4f4 url('../img/layout/banner_back_noborder.gif') repeat-x;
+	background-color: #f4f4f4;
+}
+
+#bannerLarge
+{
 	height: 98px;
+	background-image: url('../img/layout/banner_back_noborder.gif');
+	background-repeat: repeat-x;
 }
 
 #bannerLogoImgLeft
@@ -223,12 +229,9 @@ a:hover
 }
 
 /* CONTENT CONTAINER */
-#containerOuter
+.containerOuter
 {
-	border-top-left-radius: 10px; 
-	border-top-right-radius: 10px; 
-	border-bottom-left-radius: 10px; 
-	border-bottom-right-radius: 10px; 
+	border-radius: 10px; 
 	border: 1px solid #777;
 	padding: 0.4em; 
 	background: white;
@@ -452,14 +455,29 @@ i
 
 /* POPUP */
 
-#pop_title {
-	margin:0;
-	padding:0;
-	background:#f4f4f4 url(small_header_back.gif) repeat-x;
-	font:bold 1em/1 Arial, Helvetica, sans-serif;
-	color: #0A2C64;
-	border-top: 1px solid #CFCFCF;
-	border-bottom: 1px solid #CFCFCF;
+
+#pop_container {
+	width: 95%;
+	margin: 0.5em auto;
+}
+
+#pop_container table {
+	width: 100%;
+	margin-top: 0.5em;
+}
+
+#pop_container h1 {
+	text-align: center;
+}
+
+#bannerSmall {
+	background-image: url(small_header_back.gif);
+	background-repeat: repeat=x;
+}
+
+#bannerSmall img {
+	display: block;
+	margin: 0 auto;
 }
 
 /* COURSE */
@@ -492,7 +510,7 @@ i
 
 .course_submenu {
 	margin: 1em 0;
-	width: 49.7%;
+	width: 49.6%;
 	vertical-align: top;
 	display: inline-block;
 }
@@ -721,7 +739,6 @@ div.table-content li img{
 .tablecell2 {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	color: #000000;
-    background-color: #EAEAEA;
 }
 #detailside {
 	margin-left : 280px;
