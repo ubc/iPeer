@@ -73,7 +73,6 @@ div.install
 .install .text label, .install .password label, .install .textarea label
 {
 	width: 13em;
-	padding-right: 1em;
 }
 
 .install .text input, .install .password input, .install .textarea textarea

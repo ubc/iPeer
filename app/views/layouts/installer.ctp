@@ -22,7 +22,7 @@
   </head>
 <body>
 
-<div id="containerOuter" class='pagewidth'>
+<div class='containerOuter pagewidth'>
 <!-- BANNER -->
 <?php echo $this->element('global/banner'); ?>
 

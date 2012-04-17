@@ -77,13 +77,14 @@ class InstallValidationStep4 extends AppModel
     );
 
     /**
-     * identicalWith
+     * Custom validation rule that for checking to see that the password
+     * and confirm password fields are identical.
      *
-     * @param mixed $check   check
-     * @param mixed $compare compare
+     * @param mixed $check the values of the field being validated
+     * @param mixed $compare the value of the field that needs to be enabled
      *
      * @access public
-     * @return void
+     * @return boolean - true if both fields have the same value
      */
     public function identicalWith($check, $compare)
     {

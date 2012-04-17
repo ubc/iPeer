@@ -105,12 +105,13 @@ p
 	width: 100%;
 }
 
-.text label, .password label, .textarea label
+.text label, .password label, .textarea label, .select label
 {
 	float: left;
 	text-align: right;
 	margin: 0.5em 0;
 	clear: left;
+	padding-right: 1em;
 }
 
 .text input, .password input, .textarea textarea
@@ -244,18 +245,24 @@ a:hover
 	margin-bottom: 1em;
 	clear: left;
 	padding: 0.7em;
-	font-size: 0.9em;
 	font-weight: bold;
 	text-align: center;
 }
 
+.good-message
+{
+	border: 2px solid green;
+}
+
+/* TODO find out of authMessage is still used, if so,
+ * switch it to flash, since it seems redundant */
 #flashMessage, #authMessage, .error-message
 {
 	color: #990044;
-	text-align: center;
 	border: 2px solid #990044;
 }
 
+/* TODO find out if error-message is still used */
 .error-message
 {
 	margin: 0 auto;
@@ -277,7 +284,7 @@ a:hover
 
 h1.title 
 {
-	margin-top: 0.5em;
+	margin: 0.5em 0;
 	font-weight: bold;
 	background: #eee;
 	border: 1px solid #ddd;
