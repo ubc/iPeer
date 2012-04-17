@@ -541,6 +541,60 @@ i
 	background-position: 0.5em;
 }
 
+/* USERS */
+
+/* users/add */
+#UserAddForm .text label, #UserAddForm .select label {
+	width: 13em;
+}
+
+#UserAddForm .checkbox label {
+	float: none;
+}
+
+#UserAddForm .checkbox {
+	vertical-align: middle;
+	margin-top: 0.5em;
+}
+
+#UserAddForm #usernameErr {
+	margin-left: 14em;
+}
+
+#UserAddForm select {
+	width: 13em;
+	margin-top: 0.5em;
+	margin-bottom: 0.3em;
+	background: transparent;
+	font-size: 1em;
+}
+
+#UserAddForm .select .checkbox {
+	margin-left: 14em;
+}
+
+#UserAddForm .select .checkbox label {
+	width: 30em;
+	text-align: left;
+}
+
+#UserAddForm .select .checkbox input {
+	margin-right: 0.5em;
+}
+
+#UserAddForm .text input {
+	width: 21em;
+}
+
+#UserAddForm #email {
+	margin: 0 0.5em 1em 16em;
+}
+
+#UserAddForm .submit {
+	width: 10em;
+	margin: 1em auto;
+}
+
 /* TO BE REFACTORED LATER */
 
 /* TEMPORARY */

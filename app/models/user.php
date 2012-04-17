@@ -115,28 +115,40 @@ class User extends AppModel
         ),
     );
 
-    public $validate = array(
-        'username'  => array(
-            'character' => array(
-                'rule'     => 'alphaNumeric',
-                'required' => true,
-                'message'  => 'Alphabets and numbers only'),
-            'minLength' => array(
-                'rule'    => array('minLength', 6),
-                'message' => 'Usernames must be at least 6 characters long'
-            ),
-            'unique'    => array(
-                'rule'    => 'isUnique',
-                'message' => 'Duplicate Username found. Please change the username.'
-            )
-        ),
-        'email'     => array(
-            'rule'       => 'email',
-            'required'   => false,
-            'allowEmpty' => true,
-            'message'    => 'Invalid email format'
-        )
-    );
+  public $validate = array(
+    'username'  => array(
+      'character' => array(
+        'rule' => 'alphaNumeric',
+        'message' => 'Usernames may only have letters and numbers.'
+      ),
+      'minLength' => array(
+        'rule' => array('minLength', 6),
+        'message' => 'Usernames must be at least 6 characters.'
+      ),
+      'unique' => array(
+        'rule' => 'isUnique',
+        'message' => 'Duplicate Username found. Please select another.'
+      )
+    ),
+    'email'     => array(
+      'rule'       => 'email',
+      'allowEmpty' => true,
+      'message'    => 'Invalid email format.'
+    ),
+    'first_name' => array(
+      'rule' => 'notEmpty',
+      'message' => "Cannot be empty, used as display name in some places."
+    ),
+    'role'     => array(
+      'rule' => 'notEmpty',
+      'message' => 'Role field may not be left blank.'
+    ),
+    'send_email_notification' => array(
+      'rule' => array('requiredWith', 'email'),
+      'message' => 'Email notification requires an email address.'
+    )
+  );
+
 
     /**
      * __construct
@@ -1084,4 +1096,25 @@ return $result;*/
 
         return $model->getCourseListByInstructor(self::get('id'));
     }
+
+  /**
+   * Custom validation rule makes a field required if another field is
+   * enabled.
+   *
+   * @param mixed $check the field that needs to be enabled
+   * @param mixed $with the field that needs to be filled if the previous param
+   * was enabled
+   *
+   * @access public
+   * @return boolean - true if the $with field is enabled and all the $check
+   * fields are filled in too, false otherwise
+   * */
+  public function requiredWith($check, $with) {
+    foreach ($check as $key => $val) {
+      if ($val && empty($this->data[$this->name][$with])) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

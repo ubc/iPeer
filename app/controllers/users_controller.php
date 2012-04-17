@@ -16,7 +16,8 @@ class UsersController extends AppController
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'FileUpload.FileUpload');
     public $NeatString;
     public $uses = array('User', 'UserEnrol', 'Personalize', 'Course', 'SysParameter', 'SysFunction', 'Role', 'Group');
-    public $components = array('Session', 'AjaxList', 'RequestHandler', 'Email', 'FileUpload.FileUpload');
+    public $components = array('Session', 'AjaxList', 'RequestHandler', 
+      'Email', 'FileUpload.FileUpload', 'PasswordGenerator');
 
     /**
      * __construct
@@ -599,50 +600,140 @@ class UsersController extends AppController
     }
 
 
-    /**
-     * add
-     *
-     * @access public
-     * @return void
-     */
-    function add()
-    {
-        // $this->AccessControl->check('functions/user', 'create');
+  /**
+   * add
+   * 
+   * @param course_id - if a student, will automatically enroll the user in
+   * this course.
+   * @access public
+   * @return void
+   */
+  function add($course_id = null) {
+    $this->set('title_for_layout', 'Add User');
 
-        $course_id = $this->Session->read('ipeerSession.courseId');
-        if (!empty($course_id)) {
-            $this->set('title_for_layout', $this->sysContainer->getCourseName($this->Session->read('ipeerSession.courseId')).' > Students');
-        }
-
-        $this->set('course_id', $course_id);
-
-        if ($this->__processForm()) {
-            // Process the course changes list
-            $this->processEnrollmentListsPostBack($this->params, $this->User->id);
-            //Send email w/ params
-            $this->set('addedUser', $this->params['data']['User']);
-            if ($this->params['data']['User']['send_email_notification']) {
-                if ($this->_sendEmail('', 'User Created', $this->Auth->user('email'), $this->params['data']['User']['email'], 'addUser')) {
-                    $this->Session->setFlash(__('Sent a notification email to the user', true));
-                }
-            } else {
-                    $this->Session->setFlash(__('Failed to Send Email', true));
-            }
-            $this->set('data', $this->params['data']);
-            $this->render('userSummary');
-        }
-
-        $thisUser = $this->Auth->user();
-        $thisUserRoles = $this->User->getRoles($thisUser['User']['id']);
-        $addingStudent = in_array("instructor", $thisUserRoles); // If this is an instructor, they can only add students.
-        $this->setUpCourseEnrollmentLists(null);
-        $courseID = $this->set('courseId', $this->Session->read('ipeerSession.courseId'));
-
-        $this->set('roles', $this->AccessControl->getEditableRoles());
-        $this->set('isEdit', false);
-        $this->set('isStudent', $addingStudent);
-        $this->set('readonly', false);
+    // get the courses that this user is instructor in
+    // TODO need to implement separate behaviours for admins and superadmins
+    // superadmins should have access to all courses regardless
+    // admins should have access only to their department
+    $user = $this->User->find(
+      'first', 
+      array('conditions' => array('id' => $this->Auth->user('id')))
+    );
+    $courses = $user['Course'];
+    $coursesOptions = array();
+    foreach ($courses as $course) {
+      $coursesOptions[$course['id']] = $course['course'].' - '.$course['title'];
     }
+    $this->set('coursesOptions', $coursesOptions);
+    $this->set('coursesSelected', $course_id);
+
+    // get the roles assignable to the new user 
+    // TODO Update for admin/superadmin cases once access control done
+    // basically, superadmin is 1, and has the highest access
+    // student is 4, and has the lowest access.
+    // so the roles you are allowed to assign are any number
+    // greater than your role id.
+    $roles = $this->Role->find('list');
+    $highestRole = 99999999;
+    $roleDefault = null;
+    foreach($user['Role'] as $role) {
+      if ($role['id'] < $highestRole) {
+        $highestRole = $role['id'];
+      }
+    }
+    foreach($roles as $key => $val) {
+      if ($val == 'student') {
+        $roleDefault = $key;
+      }
+      if ($key <= $highestRole) {
+        unset($roles[$key]);
+      }
+    }
+    $this->set('roleOptions', $roles);
+    $this->set('roleDefault', $roleDefault);
+
+    // validate the form data
+    if ($this->data) {
+      $this->User->set($this->data);
+      if (!$this->User->validates()) {
+        $this->Session->setFlash('Unable to validate data.');
+        $errors = $this->User->invalidFields();
+        // note we're counting on the browser to persist form data so the user
+        // don't have to fill everything back in
+        return;
+      }
+    }
+
+    // save the data which involves:
+    // create the user entry
+    // create the rolesusers entry
+    // create the enrolment entry depending on if instructor or student
+    if ($this->data) {
+      // To properly enrol the user in the course, we're going to use some
+      // cakephp dark magic by massaging the data in such a way that we
+      // get cakephp to save to the right related models.
+      // * Course-Instructor relations are stored by the UserCourses table.
+      // * Course-Student relations are stored by the UserEnrols table.
+      // The relations as defined for some reason puts these related tables
+      // deep in the array.
+      foreach ($this->data['Courses']['id'] as $id) {
+        $wantedRole = $this->data['Role']['RolesUser']['role_id'];
+        if ($wantedRole < $highestRole) {
+          // trying to create a user with higher access than yourself
+          $this->Session->setFlash('Invalid role permission');
+          return;
+        }
+        if ($wantedRole == $roleDefault) {
+          // we should add this user as a student
+          $this->data['Enrolment'][]['UserEnrol']['course_id'] = 
+            $id;
+        }
+        else {
+          // we should add this user as an instructor
+          $this->data['Course'][]['UserCourse']['course_id'] = 
+            $id;
+        }
+      }
+      // Remove the unneeded intermediate data
+      unset($this->data['Courses']);
+
+      // Now we add in the password
+      $password = $this->PasswordGenerator->generate();
+      $this->data['User']['password'] = $password;
+
+      // Now we actually attempt to save the data
+      if ($this->User->save($this->data)) {
+        // Success!
+        $message = "User sucessfully created! 
+          <br />Password: <b>$password</b> <br />";
+        if ($this->data['User']['send_email_notification'] &&
+            $this->data['User']['email']) {
+          // TODO fix email sending
+          if ($this->_sendEmail(
+            '', 
+            'User Created', 
+            $this->Auth->user('email'), 
+            $this->data['User']['email'], 
+            'addUser')) {
+            # email notification successful
+            $message .= "Email notification sent.";
+          }
+          else {
+            # email notification failed
+            $message .= "<div class='red'>User created but unable to send
+              email notification.</div>";
+          }
+        }
+        $this->Session->setFlash($message, 'good');
+        return;
+      }
+      else {
+        // Failed
+        $this->Session->setFlash("Error while trying to save, try again.");
+        return;
+      }
+    }
+  }
 
 
     /**
