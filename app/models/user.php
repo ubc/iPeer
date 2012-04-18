@@ -131,7 +131,7 @@ class User extends AppModel
       )
     ),
     'email'     => array(
-      'rule'       => 'email',
+      'rule'       => array('validEmail'),
       'allowEmpty' => true,
       'message'    => 'Invalid email format.'
     ),
@@ -1109,12 +1109,50 @@ return $result;*/
    * @return boolean - true if the $with field is enabled and all the $check
    * fields are filled in too, false otherwise
    * */
-  public function requiredWith($check, $with) {
+  protected function requiredWith($check, $with) {
     foreach ($check as $key => $val) {
       if ($val && empty($this->data[$this->name][$with])) {
         return false;
       }
     }
     return true;
+  }
+
+  /**
+   * Custom validation rule for emails. The built-in CakePHP email validation
+   * improperly rejects valid email addresses. e.g.: won't let me use a
+   * email like john@localhost.localdomain, probably due to it having a white
+   * list of valid domains. This makes testing with email a pain though, so
+   * we're not using that.
+   *
+   * Sadly, even the built in PHP email validation using filter_var fails
+   * to follow all of the RFCs. But at least it's better than the built-in
+   * CakePHP one.
+   *
+   * The built in PHP validation requires PHP >= 5.2.0, if it's not available,
+   * we use a really simple fallback validation that simply checks if there's
+   * text on both sides of the @ sign.
+   *
+   * @param mixed $check contains the parameters to validate
+   *
+   * @access public
+   * @return boolean - true if the $with field is enabled and all the $check
+   * fields are filled in too, false otherwise
+   * */
+  protected function validEmail($check) {
+    $email = $check['email'];
+    if (function_exists('filter_var')) {
+      // filter_var() requires php >= 5.2.0
+      if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return true;
+      }
+    }
+    else {
+      // really basic fallback validation
+      if (preg_match('/.+@.+/', $email)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

@@ -263,117 +263,6 @@ class UsersController extends AppController
         $this->redirect("index");
     }
 
-    /*function add($userType = null)
-{
-      if (empty($userType)) {
-        $userType = $this->data['User']['role'];
-      }
-      $this->AccessControl->check('functions/role/'.$userType, 'create');
-
-      $course_id = $this->Session->read('ipeerSession.courseId');
-      if (!empty($course_id)) {
-        $this->set('title_for_layout', $this->sysContainer->getCourseName($this->Session->read('ipeerSession.courseId')).__(' > Students', true));
-      }
-
-      $this->set('role', $userType);
-      $this->set('course_id', $course_id);
-
-      //List Add Page
-      if (empty($this->params['data'])) {
-
-        //check and set user type
-        if (empty($this->params['data']['User']['role'])) {
-          $this->params['data']['User']['role'] = $userType;
-        }
-
-        if ('student' == $userType) {
-          // We need a coursesList, even if it's empty
-          $coursesList = $this->sysContainer->getMyCourseList();
-          $course_params = array('controller' => 'courses',
-                                 'coursesList' => $coursesList,
-                                 'courseId'=> $course_id,
-                                 'defaultOpt' => (empty($course_id) ? '-1' : $course_id));
-          $this->set('course_params', $course_params);
-        }
-        $this->set('isStudent', 'student' == $userType);
-      } else {
-        $sFound = $this->User->findUserByStudentNo($this->params['data']['User']['username']);
-        $duplicate = $sFound ? true : false; // Convert to boolean
-
-        if (!$duplicate) {
-          //Generate password
-          if(!$duplicate)
-            $this->params['data']['User']['password'] = $this->NeatString->randomPassword(6);
-
-          if (empty($this->params['data']['User']['username']))
-            $this->params['data']['User']['username'] = $this->params['form']['newuser'];
-
-          if ($this->params['data']['User']['role'] == 'S') {
-            $this->params['data']['User']['student_no'] = $this->params['data']['User']['username'];
-          }
-
-          $this->Output->filter($this->params['data']);//always filter
-
-          //Save Data
-          if ($this->User->save($this->params['data'])) {
-
-            //Save enrol record
-            if (isset($this->params['form']['course_id']) && $this->params['form']['course_id'] > 0) {
-              $userEnrol['UserEnrol']['course_id'] = $this->params['form']['course_id'];
-              $userEnrol['UserEnrol']['user_id'] = $this->User->id;
-
-              $this->UserEnrol->save($userEnrol);
-            }
-
-            $this->set('tmpPassword', $this->params['data']['User']['password']);
-            $this->set('data', $this->User->read());
-            $this->set('userRole', $this->params['data']['User']['role']);
-            $this->set('courseId', $this->Session->read('ipeerSession.courseId'));
-
-            //Render to view page to display saved data
-            $this->render('userSummary');
-          }
-          //Found error
-          else {
-            $this->set('data', $this->params['data']);
-
-            //Validate the error why the User->save() method returned false
-            $this->validateErrors($this->User);
-            $this->set('errmsg', $this->User->errorMessage);
-            $this->set('courseId', $this->Session->read('ipeerSession.courseId'));
-
-          }//end if
-        } else {
-          $sFound['User']['first_name'] = $this->data['User']['first_name'];
-          $sFound['User']['last_name'] = $this->data['User']['last_name'];
-          $sFound['User']['email'] = $this->data['User']['email'];
-
-          //Save enrol record
-          if (isset($this->params['form']['course_id']) && $this->params['form']['course_id'] > 0) {
-            $userEnrol['UserEnrol']['course_id'] = $this->params['form']['course_id'];
-            $userEnrol['UserEnrol']['user_id'] = $sFound['User']['id'];
-
-            if ($this->UserEnrol->save($userEnrol) && $this->User->save($sFound['User'])) {
-              $this->set('tmpPassword', '<Hidden>');
-              $this->set('data', $sFound);
-              $this->set('userRole', $sFound['User']['role']);
-              $this->set('courseId', $this->Session->read('ipeerSession.courseId'));
-
-              //Render to view page to display saved data
-              $this->render('userSummary');
-            } else {
-              $this->set('data', $this->params['data']);
-
-              //Validate the error why the User->save() method returned false
-              $this->validateErrors($this->UserEnrol);
-              $this->set('errmsg', 'Data not saved.  The student is already enrolled in the course.  Please use the edit function to edit the student\'s details.');
-              $this->set('courseId', $this->Session->read('ipeerSession.courseId'));
-            }
-          }
-        }
-
-      }
-    }*/
     /**
      * __processForm
      *
@@ -601,14 +490,15 @@ class UsersController extends AppController
 
 
   /**
-   * add
+   * Add a user to iPeer.
+   *
+   * Note that enrolment as admins or superadmins is not working right now.
    * 
-   * @param course_id - if a student, will automatically enroll the user in
-   * this course.
+   * @param course_id - will automatically enroll the user in this course.
    * @access public
    * @return void
    */
-  function add($course_id = null) {
+  public function add($course_id = null) {
     $this->set('title_for_layout', 'Add User');
 
     // get the courses that this user is instructor in
@@ -658,7 +548,7 @@ class UsersController extends AppController
       if (!$this->User->validates()) {
         $this->Session->setFlash('Unable to validate data.');
         $errors = $this->User->invalidFields();
-        // note we're counting on the browser to persist form data so the user
+        // note we're counting on automagic to persist form data so the user
         // don't have to fill everything back in
         return;
       }
@@ -676,6 +566,7 @@ class UsersController extends AppController
       // * Course-Student relations are stored by the UserEnrols table.
       // The relations as defined for some reason puts these related tables
       // deep in the array.
+      $coursesEnrolled = array();
       foreach ($this->data['Courses']['id'] as $id) {
         $wantedRole = $this->data['Role']['RolesUser']['role_id'];
         if ($wantedRole < $highestRole) {
@@ -693,6 +584,8 @@ class UsersController extends AppController
           $this->data['Course'][]['UserCourse']['course_id'] = 
             $id;
         }
+        // For email, store a mapping of enrolled course id to name
+        $coursesEnrolled[$id] = $coursesOptions[$id];
       }
       // Remove the unneeded intermediate data
       unset($this->data['Courses']);
@@ -707,14 +600,16 @@ class UsersController extends AppController
         $message = "User sucessfully created! 
           <br />Password: <b>$password</b> <br />";
         if ($this->data['User']['send_email_notification'] &&
-            $this->data['User']['email']) {
-          // TODO fix email sending
-          if ($this->_sendEmail(
-            '', 
-            'User Created', 
+          $this->data['User']['email']
+        ) {
+          if ($this->sendAddUserEmail(
             $this->Auth->user('email'), 
             $this->data['User']['email'], 
-            'addUser')) {
+            $this->data['User']['username'],
+            $password,
+            $this->data['User']['first_name'].' '.$this->data['User']['last_name'],
+            $coursesEnrolled
+          )) {
             # email notification successful
             $message .= "Email notification sent.";
           }
@@ -1290,4 +1185,36 @@ class UsersController extends AppController
         $this->Session->write('ipeerSession.email', $userData['email']);
         //return $this->__loadFromSession();
     }
+
+
+  /**
+   * Helper function to send an email notification about to a user about
+   * being added to iPeer.
+   *
+   * @param $from - who the email is from
+   * @param $to - where the email is going to
+   * @param $username - the username given to the user
+   * @param $password - the password to the username
+   * @param $name - first name + last name
+   * @param $courses - the courses that the user is enrolled in
+   *
+   * @return true if successful, false otherwise
+   * */
+  private function sendAddUserEmail($from, $to, $username, 
+    $password, $name, $courses
+  ) {
+    // prep variables used by the email template layout for addUser
+    $this->set('name', $name);
+    $this->set('username', $username);
+    $this->set('password', $password);
+    $this->set('courses', $courses);
+    $this->set('siteurl', $this->sysContainer->getParamByParamCode('system.absolute_url'));
+
+    // call send mail 
+    $subject = "iPeer Account Creation";
+    $template = "addUser";
+
+    return $this->_sendEmail("", $subject, $from, $to, $template);
+  }
+
 }
