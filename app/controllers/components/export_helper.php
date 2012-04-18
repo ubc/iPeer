@@ -47,7 +47,7 @@ class ExportHelperComponent extends Object
 
       //too much garbage... outsourced to createBody
       if (!empty($groupEvents)) {
-        $csvContent .= $this->createBody($groupEvents,$params,$eventTemplateId,$eventTypeId);
+        $csvContent .= $this->createBody($event, $groupEvents,$params,$eventTemplateId,$eventTypeId);
       }
     }
 
@@ -83,7 +83,7 @@ class ExportHelperComponent extends Object
     }
   }
   //
-  function createBody ($groupEvents,$params,$eventTemplateId,$eventTypeId) {
+  function createBody ($event, $groupEvents,$params,$eventTemplateId,$eventTypeId) {
     global $globEventId;
     $this->Group = new Group;
     $this->GroupsMembers = new GroupsMembers;
@@ -100,7 +100,6 @@ class ExportHelperComponent extends Object
 
     $globEventId = $groupEvents[0]['GroupEvent']['event_id'];
 
-    //bigass IF
     $data = array();
     $legends = array();
     $i=0;
@@ -126,13 +125,13 @@ class ExportHelperComponent extends Object
         $globUsersArr[$student['User']['student_no']] = $userId;
       }
       if (!empty($globUsersArr)) {
-        $submittedArr = $this->buildSubmittedArr();
+        $incompletedArr = $this->buildIncompletedArr();
       } else {
-        $submittedArr = array();
+        $incompletedArr = array();
       }
       $count = 0;
       foreach($groupMembers as $groupMember) {
-        if(in_array($groupMember['GroupsMembers']['user_id'], $submittedArr)) {
+        if(in_array($groupMember['GroupsMembers']['user_id'], $incompletedArr)) {
           $count++;
         }
       }
@@ -155,11 +154,22 @@ class ExportHelperComponent extends Object
             }
             $data[$i]['students'][$j]['score'] = '';
             $score_tmp = $this->EvaluationSimple->getReceivedTotalScore($groupEventId,$userId);
-            if (in_array($userId, $submittedArr)) {
-              $data[$i]['students'][$j]['score'] = !isset($score_tmp[0]['received_total_score']) ? '':($score_tmp[0]['received_total_score']/((count($groupMembers)-1)-$count+1));
-            } else {
-              $data[$i]['students'][$j]['score'] = !isset($score_tmp[0]['received_total_score']) ? '':($score_tmp[0]['received_total_score']/((count($groupMembers)-1)-$count));
-            }
+	    /** 
+	     * 6 in the group, 4 incompleted
+	     * ----------------------------------------------
+	     * |             | self eval on | self eval off |
+             * | incompleted |    6-4       |    5-4+1      |
+             * | completed   |    6-4       |    5-4        |
+             * ---------------------------------------------- */
+	    if ($event['Event']['self_eval']) {
+                $data[$i]['students'][$j]['score'] = !isset($score_tmp[0]['received_total_score']) ? '':($score_tmp[0]['received_total_score']/(count($groupMembers)-$count));
+	    } else {
+                if (in_array($userId, $incompletedArr)) {
+                    $data[$i]['students'][$j]['score'] = !isset($score_tmp[0]['received_total_score']) ? '':($score_tmp[0]['received_total_score']/((count($groupMembers)-1)-$count+1));
+                } else {
+                    $data[$i]['students'][$j]['score'] = !isset($score_tmp[0]['received_total_score']) ? '':($score_tmp[0]['received_total_score']/((count($groupMembers)-1)-$count));
+                }
+	    }
             break;
           case 2://rubric
             //get the legend
@@ -298,9 +308,9 @@ class ExportHelperComponent extends Object
     foreach ($data as $group) {
       foreach ($group['students'] as $student) {
         if (!empty($params['form']['include_group_status'])) {
-          $submittedArr = $this->buildSubmittedArr();
+          $incompletedArr = $this->buildIncompletedArr();
           set_time_limit(1200);
-          if(array_key_exists($student['student_id'], $submittedArr) )
+          if(array_key_exists($student['student_id'], $incompletedArr) )
             $content .= 'X,';
           else
             $content .= 'OK,';
@@ -326,7 +336,7 @@ class ExportHelperComponent extends Object
     return $content;
   }
 
-  function buildSubmittedArr() {
+  function buildIncompletedArr() {
     global $globEventId, $globUsersArr;
     $this->EvalSubmission = new EvaluationSubmission();
     foreach ($globUsersArr as $globUserStuNum=>$globUserId) {

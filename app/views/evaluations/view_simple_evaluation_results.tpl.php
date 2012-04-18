@@ -67,27 +67,28 @@
 
       $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;
        foreach ($groupMembers as $member_col) {
-        if (isset($memberScoreSummary[$member_col['User']['id']])) {
-          if (!empty($incompletedMembersArr) && in_array($member_col['User']['first_name'].' '.$member_col['User']['last_name'], $incompletedMembersArr)) {
+         if (isset($memberScoreSummary[$member_col['User']['id']]) && $memberEvaluatedCount > count($inCompletedMembers)) {
+             if ($event['Event']['self_eval']) {
+                 echo '<td>'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'] / ($memberEvaluatedCount-count($inCompletedMembers)), 2).'</td>' . "\n\t\t";
+             } else {
+           if (!empty($incompletedMembersArr) && in_array($member_col['User']['first_name'].' '.$member_col['User']['last_name'], $incompletedMembersArr)) {
             if ($memberEvaluatedCount > count($inCompletedMembers)) {
               echo '<td>'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'] / ($memberEvaluatedCount-(count($inCompletedMembers))+1), 2).'</td>' . "\n\t\t";
-            }
-            else {
+            } else {
               echo '<td>'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score']) . "\n\t\t";
             }
-          }
-          else {
+           } else {
             if ($memberEvaluatedCount > count($inCompletedMembers)) {
               echo '<td>'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'] / ($memberEvaluatedCount-count($inCompletedMembers)), 2).'</td>' . "\n\t\t";
-            }
-            else {
+            } else {
               echo '<td>'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score']) . "\n\t\t";
             }
-          }
-        } else {
-         echo '<td> - </td>';
-        }
-  		 }?>
+           }
+             }
+         } else {
+             echo '<td> - </td>';
+         }
+       }?>
 	</tr>
 	<tr class="tablesummary2">
 	    <td>Grade Released</td>
