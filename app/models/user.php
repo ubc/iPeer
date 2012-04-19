@@ -1097,6 +1097,17 @@ return $result;*/
         return $model->getCourseListByInstructor(self::get('id'));
     }
 
+  public function isRole($id, $role) {
+    $this->id = $id;
+    $data = $this->read();
+    foreach ($data['Role'] as $r) {
+      if ($r['name'] == $role) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * Custom validation rule makes a field required if another field is
    * enabled.

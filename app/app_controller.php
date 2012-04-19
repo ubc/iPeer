@@ -22,7 +22,7 @@ App::import('Model', 'User');
 class AppController extends Controller
 {
     public $startpage  = 'pages';
-    public $uses       = array('SysParameter');
+    public $uses       = array('User', 'SysParameter');
     public $components = array('Session', 'Output', 'sysContainer',
         'userPersonalize', 'framework', 'Guard.Guard', 'Acl',
         'AccessControl', 'Email');
@@ -67,10 +67,16 @@ class AppController extends Controller
             $this->checkAccess();
             $this->checkDatabaseVersion();
 
-            // pass user variable to view
-            // Replace with User::get() function, can be used anywhere
-            //      $user_array = $this->Auth->user();
-            //      $this->set('user', $user_array['User']);
+            // set the parameters needed to generate the navigation tabs
+            $id = $this->Auth->user('id');
+            $issuperadmin = $this->User->isRole($id, "superadmin");
+            $isadmin = $this->User->isRole($id, "admin");
+            $isinstructor = $this->User->isRole($id, "instructor");
+            $isstudent = $this->User->isRole($id, "student");
+            $this->set('issuperadmin', $issuperadmin);
+            $this->set('isadmin', $isadmin);
+            $this->set('isinstructor', $isinstructor);
+            $this->set('isstudent', $isstudent);
         }
 
         parent::beforeFilter();
