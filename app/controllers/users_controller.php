@@ -592,7 +592,7 @@ class UsersController extends AppController
 
       // Now we add in the password
       $password = $this->PasswordGenerator->generate();
-      $this->data['User']['password'] = $password;
+      $this->data['User']['password'] = $this->Auth->password($password);
 
       // Now we actually attempt to save the data
       if ($this->User->save($this->data)) {

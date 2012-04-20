@@ -176,17 +176,6 @@ class User extends AppModel
      */
     public function beforeSave()
     {
-        if (!isset($this->data[$this->name]['id']) && empty($this->data[$this->name]['password'])) {
-            $tmp_pw = NeatString::randomPassword(6);
-            $this->data[$this->name]['password'] = md5($tmp_pw);
-            $this->data[$this->name]['tmp_password'] = $tmp_pw;
-        }
-
-        // clear password to avoid updating to a empty one
-        if (empty($this->data[$this->name]['password'])) {
-            unset($this->data[$this->name]['password']);
-        }
-        //var_dump(debug_backtrace());exit;
         return parent::beforeSave();
     }
 
@@ -1098,8 +1087,7 @@ return $result;*/
     }
 
   public function isRole($id, $role) {
-    $this->id = $id;
-    $data = $this->read();
+    $data = $this->findById($id);
     foreach ($data['Role'] as $r) {
       if ($r['name'] == $role) {
         return true;
