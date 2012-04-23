@@ -14,7 +14,7 @@ switch($submenu) {
   case "Student":
     array_push(
       $items,
-      array('name' => 'Add Student', 'link' => '/users/add/S'),
+      array('name' => 'Add Student', 'link' => "/users/add/$course_id"),
       array('name' => 'List Students',
         'link' => "/users/goToClassList/$course_id"),
       array('name' => 'Email to All Students',
