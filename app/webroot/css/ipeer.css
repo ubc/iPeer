@@ -254,22 +254,11 @@ a:hover
 	border: 2px solid green;
 }
 
-/* TODO find out of authMessage is still used, if so,
- * switch it to flash, since it seems redundant */
+/* authMessage is only used for cake generated login errors. */
 #flashMessage, #authMessage, .error-message
 {
 	color: #990044;
 	border: 2px solid #990044;
-}
-
-/* TODO find out if error-message is still used */
-.error-message
-{
-	margin: 0 auto;
-	margin-bottom: 1em;
-	padding: 0.5em;
-	width: 20em;
-	display: block;
 }
 
 .red

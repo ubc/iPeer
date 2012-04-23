@@ -47,7 +47,7 @@ class InstallController extends Controller
     function index()
     {
         if (file_exists(CONFIGS.'installed.txt')) {
-            $this->Session->setFlash(__('WARNING: It looks like you already have a instance running. Proceed at your own risk. Remove app/config/installed.txt if you do not want to see this warning.', true));
+            $this->Session->setFlash(__('WARNING: It looks like you already have a instance running. Reinstalling will remove all your current data. Remove app/config/installed.txt to proceed.', true));
         }
     }
 
@@ -145,6 +145,10 @@ class InstallController extends Controller
                     'system.admin_email' => $this->data['InstallValidationStep4']['admin_email'],
                     'display.login_text' => $this->data['InstallValidationStep4']['login_text'],
                     'display.contact_info' => $this->data['InstallValidationStep4']['contact_info'],
+                    'email.host' => $this->data['InstallValidationStep4']['email_host'],
+                    'email.port' => $this->data['InstallValidationStep4']['email_port'],
+                    'email.username' => $this->data['InstallValidationStep4']['email_username'],
+                    'email.password' => $this->data['InstallValidationStep4']['email_password'],
                 )
             );
             $this->installHelper->updateSystemParameters($sysparams);

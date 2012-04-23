@@ -20,6 +20,12 @@ class InstallValidationStep4 extends AppModel
         'domain' => array(
             'type' => 'string',
         ),
+        'login_text' => array(
+            'type' => 'string',
+        ),
+        'contact_info' => array(
+            'type' => 'string',
+        ),
         'super_admin' => array(
             'type' => 'string',
         ),
@@ -32,20 +38,25 @@ class InstallValidationStep4 extends AppModel
         'admin_email' => array(
             'type' => 'string',
         ),
-        'login_text' => array(
+        'email_domain' => array(
             'type' => 'string',
         ),
-        'contact_info' => array(
+        'email_port' => array(
+            'type' => 'string',
+        ),
+        'email_username' => array(
+            'type' => 'string',
+        ),
+        'email_password' => array(
             'type' => 'string',
         ),
     );
 
     public $validate = array(
         'absolute_url' => array(
-            // cakephp's url validator doesn't like my host file alias
-            // for some reasons
-            //'rule' => 'url',
-            'rule' => 'notEmpty',
+          // note for testing, cakephp's url validator doesn't like localhost,
+          // but you can use 127.0.0.1 instead
+            'rule' => 'url',
             'message' => 'Please enter a properly formatted URL.'
         ),
         'domain' => array(
@@ -72,16 +83,28 @@ class InstallValidationStep4 extends AppModel
         ),
         'admin_email' => array(
             'rule' => 'email',
+            'allowEmpty' => true,
             'message' => 'Please enter a valid email address.'
+        ),
+        'email_host' => array(
+        ),
+        'email_port' => array(
+            'rule' => 'numeric',
+            'allowEmpty' => true,
+            'message' => 'Port must be a number.'
+        ),
+        'email_username' => array(
+        ),
+        'email_password' => array(
         ),
     );
 
     /**
-     * Custom validation rule that for checking to see that the password
+     * Custom validation rule for checking to see that the password
      * and confirm password fields are identical.
      *
      * @param mixed $check the values of the field being validated
-     * @param mixed $compare the value of the field that needs to be enabled
+     * @param mixed $compare the name of the field that needs to be enabled
      *
      * @access public
      * @return boolean - true if both fields have the same value

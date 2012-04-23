@@ -137,7 +137,7 @@ class User extends AppModel
     ),
     'first_name' => array(
       'rule' => 'notEmpty',
-      'message' => "Cannot be empty, used as display name in some places."
+      'message' => "First name cannot be empty, it is used as the display name."
     ),
     'role'     => array(
       'rule' => 'notEmpty',
