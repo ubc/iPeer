@@ -143,8 +143,6 @@ class InstallController extends Controller
                     'system.domain' => $this->data['InstallValidationStep4']['domain'],
                     'system.super_admin' => $this->data['InstallValidationStep4']['super_admin'],
                     'system.admin_email' => $this->data['InstallValidationStep4']['admin_email'],
-                    'display.login_text' => $this->data['InstallValidationStep4']['login_text'],
-                    'display.contact_info' => $this->data['InstallValidationStep4']['contact_info'],
                     'email.host' => $this->data['InstallValidationStep4']['email_host'],
                     'email.port' => $this->data['InstallValidationStep4']['email_port'],
                     'email.username' => $this->data['InstallValidationStep4']['email_username'],

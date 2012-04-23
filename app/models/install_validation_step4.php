@@ -20,12 +20,6 @@ class InstallValidationStep4 extends AppModel
         'domain' => array(
             'type' => 'string',
         ),
-        'login_text' => array(
-            'type' => 'string',
-        ),
-        'contact_info' => array(
-            'type' => 'string',
-        ),
         'super_admin' => array(
             'type' => 'string',
         ),

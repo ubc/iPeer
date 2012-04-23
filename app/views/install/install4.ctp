@@ -25,24 +25,6 @@ echo $this->Form->input(
   )
 );
 
-echo $this->Form->input(
-  'login_text', 
-  array(
-    'type' => 'textarea',
-    'value' => '<a href="http://www.ubc.ca" target="_blank">UBC</a>',
-    'label' => 'Custom Login Text',
-  )
-);
-
-echo $this->Form->input(
-  'contact_info', 
-  array(
-    'type' => 'textarea',
-    'value' => 'Please enter your custom contact info. HTML tabs are acceptable.',
-    'label' => 'Custom Contact Info',
-  )
-);
-
 echo "<h4>Super Admin Configuration</h4>";
 
 echo $this->Form->input(
