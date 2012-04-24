@@ -50,7 +50,7 @@
  * With the other debug levels you get to click the "flash message" to continue.
  *
  */
-	define('DEBUG', 1);
+	define('DEBUG', 0);
 
 set_time_limit(300);
 /**
@@ -173,4 +173,9 @@ set_time_limit(300);
    */
   $CWL['applicationID'] = '';
   $CWL['applicationPassword'] = '';
+
+  /**
+   * iPeer version
+   */
+  define('IPEER_VERSION', '2.3.0');
 ?>
