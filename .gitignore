@@ -3,6 +3,7 @@ installed.txt
 app/tmp/
 app/config/bootstrap.local.php
 app/config/guard.php
+app/config/database.php
 
 build/api/
 build/code-browser/
