@@ -50,7 +50,7 @@
  * With the other debug levels you get to click the "flash message" to continue.
  *
  */
-	define('DEBUG', 0);
+	define('DEBUG', 1);
 
 set_time_limit(300);
 /**
@@ -177,5 +177,5 @@ set_time_limit(300);
   /**
    * iPeer version
    */
-  define('IPEER_VERSION', '2.3.0');
+  define('IPEER_VERSION', '2.3.1');
 ?>
