@@ -43,11 +43,11 @@ class ExportHelperComponent extends Object
       $eventId = $event['Event']['id'];
       $eventTemplateId = $event['Event']['template_id'];
       $eventTypeId = $event['Event']['event_template_type_id'];
-      $groupEvents = $this->GroupEvent->findAll('event_id='.$eventId);
+      $groupEvents = $this->GroupEvent->findAll('event_id='.$eventId.' AND group_id != 0');
 
       //too much garbage... outsourced to createBody
       if (!empty($groupEvents)) {
-        $csvContent .= $this->createBody($event, $groupEvents,$params,$eventTemplateId,$eventTypeId);
+        $csvContent .= $this->createBody($event, $groupEvents, $params, $eventTemplateId, $eventTypeId);
       }
     }
 
@@ -90,12 +90,13 @@ class ExportHelperComponent extends Object
     $this->User = new User;
     $this->SimpleEvaluation = new SimpleEvaluation;
     $this->Rubric = new Rubric;
-    $this->Mixeval = new Mixeval;
     $this->RubricsCriteria = new RubricsCriteria;
     $this->MixEvalsQuestionDesc = new MixevalsQuestionDesc;
     $this->EvaluationSimple = new EvaluationSimple;
     $this->EvaluationRubric = new EvaluationRubric;
     $this->EvaluationMixeval = new EvaluationMixeval;
+    $this->EvaluationMixevalDetail = new EvaluationMixevalDetail;
+    $this->User = new User;
     $mixedEvalNumeric  = '';
 
     $globEventId = $groupEvents[0]['GroupEvent']['event_id'];
@@ -103,6 +104,7 @@ class ExportHelperComponent extends Object
     $data = array();
     $legends = array();
     $i=0;
+
     foreach ($groupEvents as $groupEvent) {
       //*******beef
       $groupId = $groupEvent['GroupEvent']['group_id'];
@@ -113,37 +115,41 @@ class ExportHelperComponent extends Object
       //get group stati
       $data[$i]['group_status'] = $groupEvent['GroupEvent']['marked'];
 
-      $groupMembers = $this->GroupsMembers->getMembers($groupId);
-      unset($groupMembers['member_count']);
+//      $groupMembers = $this->GroupsMembers->getMembers($groupId, null);
+      $groupMembers = $this->User->getGroupMembers($groupId);
       $j=0;
       $data[$i]['students'] = array();
 
       global $globUsersArr;
       foreach($groupMembers as $groupMember) {
-        $userId = $groupMember['GroupsMembers']['user_id'];
-        $student = $this->User->findUserByid($userId);
-        $globUsersArr[$student['User']['student_no']] = $userId;
+        $userId = $groupMember['User']['id'];
+        $globUsersArr[] = $userId;
       }
+
       if (!empty($globUsersArr)) {
-        $incompletedArr = $this->buildIncompletedArr();
+        $incompletedArr = $this->buildIncompletedArr($groupEventId);
       } else {
         $incompletedArr = array();
       }
+
       $count = 0;
-      foreach($groupMembers as $groupMember) {
-        if(in_array($groupMember['GroupsMembers']['user_id'], $incompletedArr)) {
-          $count++;
-        }
+      foreach ($groupMembers as $key => $groupMember) {
+          if (in_array($groupMember['User']['id'], $incompletedArr)) {
+              $groupMembers[$key]['User']['incomplete'] = true;
+              $count++;
+          } else {
+              $groupMembers[$key]['User']['incomplete'] = false;
+          }
       }
 
       foreach ($groupMembers as $groupMember) {
         //get student info: first_name, last_name, id, email
-        $userId = $groupMember['GroupsMembers']['user_id'];
-        $student = $this->User->findUserByid($userId);
-        $data[$i]['students'][$j]['student_id'] = $student['User']['student_no'];
-        $data[$i]['students'][$j]['first_name'] = $student['User']['first_name'];
-        $data[$i]['students'][$j]['last_name'] = $student['User']['last_name'];
-        $data[$i]['students'][$j]['email'] = $student['User']['email'];
+        $userId = $groupMember['User']['id'];
+        $data[$i]['students'][$j]['student_id'] = $groupMember['User']['student_no'];
+        $data[$i]['students'][$j]['first_name'] = $groupMember['User']['first_name'];
+        $data[$i]['students'][$j]['last_name'] = $groupMember['User']['last_name'];
+        $data[$i]['students'][$j]['email'] = $groupMember['User']['email'];
+        $data[$i]['students'][$j]['incomplete'] = $groupMember['User']['incomplete'];
 
         switch ($eventTypeId) {
           case 1://simple
@@ -154,7 +160,7 @@ class ExportHelperComponent extends Object
             }
             $data[$i]['students'][$j]['score'] = '';
             $score_tmp = $this->EvaluationSimple->getReceivedTotalScore($groupEventId,$userId);
-	    /** 
+	    /**
 	     * 6 in the group, 4 incompleted
 	     * ----------------------------------------------
 	     * |             | self eval on | self eval off |
@@ -196,68 +202,62 @@ class ExportHelperComponent extends Object
             }
             break;
           case 4://mixeval
+              // get the score
+              $score_tmp = $this->EvaluationMixeval->getReceivedTotalScore($groupEventId, $userId);
+              $data[$i]['students'][$j]['score'] = !isset($score_tmp[0]['received_total_score'])?'':$score_tmp[0]['received_total_score'];
 
-            $score_tmp = $this->EvaluationMixeval->getReceivedTotalScore($groupEventId,$userId);
-            #Text data for specific questions is inside the userResults variable
-            $userResults = $this->EvaluationMixeval->getResultsDetailByEvaluatee($groupEventId,$userId);
-            $data[$i]['students'][$j]['score'] = !isset($score_tmp[0]['received_total_score'])?'':$score_tmp[0]['received_total_score'];
-            $data[$i]['students'][$j]['comments'] = '';
+              // Text data for specific questions is inside the userResults variable
+              $userResults = $this->EvaluationMixevalDetail->getResultsDetailByEvaluatee($groupEventId, $userId);
+              $data[$i]['students'][$j]['comments'] = '';
 
-            #Here we add some generic information to the mixedEvalNumeric variable. First we add the name of the person being evaluated in this particular mixed eval(evaluatee)
-            #then we sample index 0 of the userResults array to just get the number of numeric questions. Then we can make column headers for each question (1,2,3...)
-            $nameArray = $this->User->findUserByid($userId);
-            $name=$nameArray['User']['first_name'] . ' ' . $nameArray['User']['last_name'];
-            $mixedEvalNumeric .= "\n".$name . "," . $data[$i]['group_name'] . "\n";
-            $tempEvaluatee = '';
-            $counter = 0;
+              //Here we add some generic information to the mixedEvalNumeric variable. First we add the name of the person being evaluated in this particular mixed eval(evaluatee)
+              //then we sample index 0 of the userResults array to just get the number of numeric questions. Then we can make column headers for each question (1,2,3...)
+              //$nameArray = $this->User->findUserByid($userId);
+              $name = $groupMember['User']['first_name'] . ' ' . $groupMember['User']['last_name'];
+              $mixedEvalNumeric .= "\n".$name . "," . $data[$i]['group_name'] . "\n";
+              $tempEvaluatee = '';
+              $mixedEvalNumeric .= "Evaluator,";
 
-            #go through userResults just to get the number of numeric questions.
-            #YES we could combine this with the other loop but I'm running out of time and this is so much easier.
-            foreach($userResults as $comment){
-              if(!isset($comment['EvaluationMiexevalDetail']['question_comment'])){
-                if(is_null($comment['EvaluationMixevalDetail']['question_comment'])){
+              //go through userResults just to get the number of numeric questions.
+              $counter = 1;
+              $lastQ = 0;
+              foreach ($userResults as $comment) {
+                  if ($lastQ > $comment['EvaluationMixevalDetail']['question_number']) {
+                      break;
+                  }
+                  //Here we create the columns for our .csv file, to be imported into excel
+                  $mixedEvalNumeric .= "Q$counter".",";
                   $counter++;
-                } else {
-                  break;
-                }
+                  $lastQ = $comment['EvaluationMixevalDetail']['question_number'];
               }
 
-            }
-#Here we create the columns for our .csv file, to be imported into excel
-            $mixedEvalNumeric .= ",";
-            for ($k = 1; $k < $counter+1; $k++) {
-              $mixedEvalNumeric .= "Q$k".",";
-            }
-            $mixedEvalNumeric .= "\n";
-##########
-            foreach ($userResults as $comment){
-              $results = $this->EvaluationMixeval->find('id='.$comment['EvaluationMixevalDetail']['evaluation_mixeval_id']);
+              foreach ($userResults as $comment) {
+                  //Set some variables that hold the USER data for the evaluator and evaluatee, then set the names for convenience
+                  $evaluatorArray = $groupMembers[$comment['EvaluationMixeval']['evaluator']];
+                  $evaluatorName = $evaluatorArray['User']['first_name'] . ' ' . $evaluatorArray['User']['last_name'];
+                  $evaluateeName = $groupMember['User']['first_name'].' '.$groupMember['User']['last_name'];
 
-#Set some variables that hold the USER data for the evaluator and evaluatee, then set the names for convenience
-              $evaluatorArray = $this->User->find('id='.$results['EvaluationMixeval']['evaluator']);
-              $evaluatorName = $evaluatorArray['User']['first_name'] . ' ' . $evaluatorArray['User']['last_name'];
-              $evaluateeArray = $this->User->find('id='.$results['EvaluationMixeval']['evaluatee']);
-              $evaluateeName = $evaluateeArray['User']['first_name'] . ' ' . $evaluateeArray['User']['last_name'];
+                  //The $userResults variable is a long list of entries for EVERY evaluatee. If the evaluator changes, it means we are on a new 'survey' created by a different person.
+                  //Then we want to add a new line to our numeric data variable.
+                  if($comment['EvaluationMixeval']['evaluator'] != $tempEvaluatee) {
+                      $mixedEvalNumeric .= "\n";
+                      $mixedEvalNumeric .= $evaluatorName. ",";
+                  }
+                  //Set the temp variable
+                  $tempEvaluatee = $comment['EvaluationMixeval']['evaluator'];
 
-#The $userResults variable is a long list of entries for EVERY evaluatee. If the evaluator changes, it means we are on a new 'survey' created by a different person.
-#Then we want to add a new line to our numeric data variable.
-              if($evaluatorArray['User']['username'] != $tempEvaluatee){
-                $mixedEvalNumeric .= "\n";
-                $mixedEvalNumeric .= $evaluatorName. ",";
+                  //Here we go through the text responses for the mixed evaluation answers. If there is text content, we append it to the contents of the comments parameter for the evaluatee.
+                  //$data[$i]['students'][$j]['comments'] .= isset($comment['EvaluationMixevalDetail']['question_comment'])&&!empty($comment['EvaluationMixevalDetail']['question_comment']) ? $evaluatorName.' on ' .$evaluateeName. ' Q'.$comment['EvaluationMixevalDetail']['question_number'] .' : '.$comment['EvaluationMixevalDetail']['question_comment']."\n".'':'';
+                  if(!isset($comment['EvaluationMixevalDetail']['question_comment'])){
+                      $mixedEvalNumeric .= trim($comment['EvaluationMixevalDetail']['grade']).",";
+                  } else {
+                      $mixedEvalNumeric .= '"'.trim($comment['EvaluationMixevalDetail']['question_comment']).'"'.",";
+                  }
               }
-#Set the temp variable
-              $tempEvaluatee = $evaluatorArray['User']['username'];
-
-#Here we go through the text responses for the mixed evaluation answers. If there is text content, we append it to the contents of the comments parameter for the evaluatee.
-              $data[$i]['students'][$j]['comments'] .= isset($comment['EvaluationMixevalDetail']['question_comment'])&&!empty($comment['EvaluationMixevalDetail']['question_comment']) ? $evaluatorName.' on ' .$evaluateeName. ' Q'.$comment['EvaluationMixevalDetail']['question_number'] .' : '.$comment['EvaluationMixevalDetail']['question_comment']."\n".'':'';
-              if(!isset($comment['EvaluationMixevalDetail']['question_comment'])){
-                $mixedEvalNumeric .= trim($comment['EvaluationMixevalDetail']['grade']).",";
-              }
-            }
-            $mixedEvalNumeric .= "\n";
-            break;
+              $mixedEvalNumeric .= "\n";
+              break;
           default:
-            break;
+              break;
         }
         $j++;
       }
@@ -302,46 +302,48 @@ class ExportHelperComponent extends Object
     for ($i=1; $i <= $question_count; $i++) {
       $content .= $i.',';
     }
-    $content .= !isset($params['form']['include_general_comments']) ? '':'Comments';
+    //$content .= !isset($params['form']['include_general_comments']) ? '':'Comments';
     if ($hasContent) $content .= "\n\n";
 
     foreach ($data as $group) {
-      foreach ($group['students'] as $student) {
-        if (!empty($params['form']['include_group_status'])) {
-          $incompletedArr = $this->buildIncompletedArr();
-          set_time_limit(1200);
-          if(array_key_exists($student['student_id'], $incompletedArr) )
-            $content .= 'X,';
-          else
-            $content .= 'OK,';
-        }
-        $content .= empty($params['form']['include_group_names']) ? '':$group['group_name'].",";$stuff=true;
-        $content .= empty($params['form']['include_student_first']) ? '':"\"".$student['first_name']."\",";
-        $content .= empty($params['form']['include_student_last']) ? '':"\"".$student['last_name']."\",";
-        $content .= empty($params['form']['include_student_id']) ? '':$student['student_id'].",";
-        $content .= empty($params['form']['include_student_email']) ? '':"\"".$student['email']."\",";
-        $content .= empty($params['form']['include_criteria_marks']) ? '':$student['score'].",";
-        $content .= (empty($params['form']['include_criteria_legend'])||!isset($student['sub_score']))? '':$student['sub_score'];
-        $content .= empty($params['form']['include_general_comments']) ? '': "\"".str_replace('"', '""', $student['comments'])."\",";
+        foreach ($group['students'] as $student) {
+            if (!empty($params['form']['include_group_status'])) {
+                if ($student['incomplete']) {
+                    $content .= 'X,';
+                } else {
+                    $content .= 'OK,';
+                }
+            }
+            $content .= empty($params['form']['include_group_names']) ? '':$group['group_name'].",";$stuff=true;
+            $content .= empty($params['form']['include_student_first']) ? '':"\"".$student['first_name']."\",";
+            $content .= empty($params['form']['include_student_last']) ? '':"\"".$student['last_name']."\",";
+            $content .= empty($params['form']['include_student_id']) ? '':$student['student_id'].",";
+            $content .= empty($params['form']['include_student_email']) ? '':"\"".$student['email']."\",";
+            $content .= empty($params['form']['include_criteria_marks']) ? '':$student['score'].",";
+            $content .= (empty($params['form']['include_criteria_legend'])||!isset($student['sub_score']))? '':$student['sub_score'];
+            $content .= empty($params['form']['include_general_comments']) ? '': "\"".str_replace('"', '""', $student['comments'])."\",";
 
+            if ($hasContent) $content .= "\n";
+        }
         if ($hasContent) $content .= "\n";
-      }
-      if ($hasContent) $content .= "\n";
     }
 ####
-#Append the numeric mixed evaluation variable to the end of the .csv. This should be a list of tables for each evaluatee. 
+#Append the numeric mixed evaluation variable to the end of the .csv. This should be a list of tables for each evaluatee.
 #This is not a good way of doing things, but it works.
     $content .= $mixedEvalNumeric;
-###
+
     return $content;
   }
 
-  function buildIncompletedArr() {
-    global $globEventId, $globUsersArr;
+  function buildIncompletedArr($groupEventId) {
+    global $globUsersArr;
     $this->EvalSubmission = new EvaluationSubmission();
+    $submitters = $this->EvalSubmission->getSubmittersByGroupEventId($groupEventId);
     foreach ($globUsersArr as $globUserStuNum=>$globUserId) {
-      if($this->EvalSubmission->getEvalSubmissionByEventIdSubmitter($globEventId, $globUserId) != null)
-        unset($globUsersArr[$globUserStuNum]);
+  //    if($this->EvalSubmission->getEvalSubmissionByEventIdSubmitter($globEventId, $globUserId) != null)
+        if (array_search($globUserId, $submitters) !== false) {
+            unset($globUsersArr[$globUserStuNum]);
+        }
     }
     return $globUsersArr;
   }

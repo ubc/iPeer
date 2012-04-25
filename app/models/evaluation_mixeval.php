@@ -29,17 +29,6 @@ class EvaluationMixeval extends AppModel
     }
 
     // gets Mixeval evaluation result for a specific assignment and evaluator
-    function getResultsDetailByEvaluatee($grpEventId=null, $evaluatee=null) {
-        $condition = 'EvaluationMixeval.grp_event_id=' . $grpEventId .
-            ' AND EvaluationMixeval.evaluatee=' .$evaluatee;
-        $fields = 'EvaluationMixevalDetail.*';
-        $joinTable = array(' LEFT JOIN evaluation_mixeval_details AS EvaluationMixevalDetail ' .
-            'ON EvaluationMixeval.id=EvaluationMixevalDetail.evaluation_mixeval_id');
-
-        return $this->findAll($condition, $fields, 'EvaluationMixeval.id ASC', null, null, null, $joinTable );
-    }
-
-    // gets Mixeval evaluation result for a specific assignment and evaluator
     function getResultsDetailByEvaluator($grpEventId=null, $evaluator=null) {
         $condition = 'EvaluationMixeval.grp_event_id='.$grpEventId.' AND EvaluationMixeval.evaluator='.$evaluator;
         $fields = 'EvaluationMixevalDetail.*';
@@ -52,7 +41,7 @@ class EvaluationMixeval extends AppModel
     function getReceivedTotalScore($grpEventId=null, $evaluatee=null) {
         return $this->find('grp_event_id=' . $grpEventId .
              ' AND evaluatee=' . $evaluatee,
-             'AVG(score) AS received_total_score');
+             'AVG(score) AS received_total_score', null, 0);
     }
 
     // get total evaluator each member recieved

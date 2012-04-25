@@ -19,6 +19,16 @@ class EvaluationSubmission extends AppModel
 	  return $this->find('event_id='.$eventId.' AND submitter_id='.$submitter);
 	}
 
+	function getSubmittersByEventId($eventId=null) {
+        $submitters = $this->generateList('event_id='.$eventId, 'submitter_id ASC', null, '{n}.EvaluationSubmission.submitter_id', '{n}.EvaluationSubmission.submitter_id');
+        return array_keys($submitters);
+	}
+
+	function getSubmittersByGroupEventId($groupEventId=null) {
+        $submitters = $this->generateList('grp_event_id='.$groupEventId, 'submitter_id ASC', null, '{n}.EvaluationSubmission.submitter_id', '{n}.EvaluationSubmission.submitter_id');
+        return array_keys($submitters);
+	}
+
   // check if an entire group has completed all the evaluations
 	// for a particular assignment
 	function numInGroupCompleted($groupId=null, $groupEventId=null) {

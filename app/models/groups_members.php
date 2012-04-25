@@ -50,13 +50,23 @@ class GroupsMembers extends AppModel
  }
 
   // returns the user_id of all members in a specific group
-  function getMembers($id=null){
-  	  $tmp = $this->findAll($conditions = 'group_id='.$id, $fields = 'user_id');
+  function getMembers($id=null, $fields = 'user_id'){
+  	  $tmp = $this->findAll('group_id='.$id, $fields);
 	  $tmp['member_count'] = count($tmp); //$this->findCount($conditions = 'group_id='.$id);
 
 	  return $tmp;
   }
 
+  // returns the user_id of all members in a specific group
+  function getMemberList($id){
+  	  $tmp = $this->generateList('group_id='.$id, 'user_id', null, null, '{n}.GroupsMembers.user_id');
+
+      if (empty($tmp)) {
+          $tmp = array();
+      }
+
+	  return $tmp;
+  }
 
     function countMembers($groupID) {
         if (!is_numeric($groupID)) {

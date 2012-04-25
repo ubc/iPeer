@@ -59,19 +59,20 @@ class User extends AppModel
                   'finderSql'   => '')
 	);
 
-  var $hasAndBelongsToMany = array('Course' =>
-                                   array('className'    =>  'Course',
-                                         'joinTable'    =>  'user_courses',
-                                         'foreignKey'   =>  'user_id',
-                                         'associationForeignKey'    =>  'course_id',
-                                         'conditions'   =>  '',
-                                         'order'        =>  '',
-                                         'limit'        => '',
-                                         'unique'       => true,
-                                         'finderQuery'  => '',
-                                         'deleteQuery'  => '',
-                                         )
-                                  );
+    var $hasAndBelongsToMany = array(
+        'Course' =>
+        array('className'    =>  'Course',
+            'joinTable'    =>  'user_courses',
+            'foreignKey'   =>  'user_id',
+            'associationForeignKey'    =>  'course_id',
+            'conditions'   =>  '',
+            'order'        =>  '',
+            'limit'        => '',
+            'unique'       => true,
+            'finderQuery'  => '',
+            'deleteQuery'  => '',
+        ),
+    );
 
 
 	//Overwriting Function - will be called before save operation
@@ -189,6 +190,20 @@ class User extends AppModel
       $text = 'Unknown';
     }
     return $text;
+  }
+
+  function getGroupMembers($groupId) {
+      $joinTable = array(' LEFT JOIN groups_members as GroupMember ON GroupMember.user_id=User.id');
+      $members = $this->findAll(array('group_id' => $groupId), null, null, null, null, 0, $joinTable);
+      if (empty($members)) {
+          return array();
+      }
+      $ret = array();
+      foreach($members as $member) {
+          $ret[$member['User']['id']] = $member;
+      }
+
+      return $ret;
   }
 }
 
