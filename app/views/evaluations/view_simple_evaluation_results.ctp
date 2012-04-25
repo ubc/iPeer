@@ -71,13 +71,13 @@
           $totalGrade = number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'],2);
           $gradePenalty = ($penalties[$member_col['User']['id']] / 100) * $totalGrade;
           $finalGrade = $totalGrade - $gradePenalty;
-          
+
           (!empty($gradePenalty) && $gradePenalty > 0) ? $stringAddOn = ' - ('."<font color=\"red\">".$gradePenalty."</font>".")".
           	   								 				"<font color=\"red\">".'*'."</font>".' = '.$finalGrade :
-          					  							 $stringAddOn = ''; 
-          
+          					  							 $stringAddOn = '';
+
           echo '<td>'.$totalGrade.$stringAddOn.'</td>'."\n\t\t";
-      
+
         } else {
          echo '<td> - </td>';
         }
@@ -97,44 +97,48 @@
         } else {
          echo '<td> - </td>';
         }
-      }?>
+       }?>
   </tr>
   <tr class="tablesummary">
-    	<td><?php __('Average Received')?></td>
-      <?php
-      $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;
-       foreach ($groupMembers as $member_col) {
-       	$totalScore = $memberScoreSummary[$member_col['User']['id']]['received_total_score'];
-       	$gradePenalty = ($penalties[$member_col['User']['id']] / 100) * $totalScore;
-       	$finalGrade = $totalScore - $gradePenalty;
-        if (isset($memberScoreSummary[$member_col['User']['id']])) {
-          if (!empty($incompletedMembersArr) && in_array($member_col['User']['first_name'].' '.$member_col['User']['last_name'], $incompletedMembersArr)) {
-            if ($memberEvaluatedCount > count($inCompletedMembers)) {
-              echo '<td>'.number_format($finalGrade / ($memberEvaluatedCount-(count($inCompletedMembers))+1), 2).'</td>' . "\n\t\t";
-            }
-            else {
-              echo '<td>'.number_format($finalGrade) . "\n\t\t";
-            }
-          }
-          else {
-            if ($memberEvaluatedCount > count($inCompletedMembers)) {
-              echo '<td>'.number_format($finalGrade / ($memberEvaluatedCount-count($inCompletedMembers)), 2).'</td>' . "\n\t\t";
-            }
-            else {
-              echo '<td>'.number_format($finalGrade) . "\n\t\t";
-            }
-          }
-        } else {
-         echo '<td> - </td>';
-        }
-  		 }?>
-	</tr>
-	<tr class="tablesummary2">
-	    <td><?php __('Grade Released')?></td>
-      <?php
+        <td><?php __('Average Received')?></td>
+<?php
+          $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;
+          foreach ($groupMembers as $member_col) {
+              $totalScore = $memberScoreSummary[$member_col['User']['id']]['received_total_score'];
+              $gradePenalty = ($penalties[$member_col['User']['id']] / 100) * $totalScore;
+              $finalGrade = $totalScore - $gradePenalty;
+              if (isset($memberScoreSummary[$member_col['User']['id']]) && $memberEvaluatedCount > count($inCompletedMembers)) {
+                  if ($event['Event']['self_eval']) {
+                      // with self_eval on, calculation is simple
+                      echo '<td>'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'] / ($memberEvaluatedCount-count($inCompletedMembers)), 2).'</td>' . "\n\t\t";
+                  } else {
+                      // with self_eval off, we need to handle the case that
+                      // the member hasn't completed the survey
+                      if (!empty($incompletedMembersArr) && in_array($member_col['User']['first_name'].' '.$member_col['User']['last_name'], $incompletedMembersArr)) {
+                          if ($memberEvaluatedCount > count($inCompletedMembers)) {
+                              echo '<td>'.number_format($finalGrade / ($memberEvaluatedCount-(count($inCompletedMembers))+1), 2).'</td>' . "\n\t\t";
+                          } else {
+                              echo '<td>'.number_format($finalGrade) . "\n\t\t";
+                          }
+                      } else {
+                          if ($memberEvaluatedCount > count($inCompletedMembers)) {
+                              echo '<td>'.number_format($finalGrade / ($memberEvaluatedCount-count($inCompletedMembers)), 2).'</td>' . "\n\t\t";
+                          } else {
+                              echo '<td>'.number_format($finalGrade) . "\n\t\t";
+                          }
+                      }
+                  }
+              } else {
+                  echo '<td> - </td>';
+              }
+          }?>
+    </tr>
+    <tr class="tablesummary2">
+        <td><?php __('Grade Released')?></td>
+<?php
 
-       $n=0;
-       for ($m=0;$m < count($groupMembers); $m++) {
+$n=0;
+for ($m=0; $m<count($groupMembers); $m++) {
 
 #	if (isset($gradeReleaseStatus[$n]['EvaluationSimple']['evaluatee']) && $groupMembers[$m]['User']['id']==$gradeReleaseStatus[$n]['EvaluationSimple']['evaluatee']) {
 #          $gradeRelease = $gradeReleaseStatus[$n++]['EvaluationSimple'];
