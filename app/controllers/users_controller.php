@@ -198,9 +198,18 @@ class UsersController extends AppController
         $this->AjaxList->asyncGet();
     }
 
-
     /**
-     * index
+     * Lists all users.
+     *
+     * Note that this is using the prototype based ajaxList. It should be
+     * converted to the newer jquery based DataTable when possible. The only
+     * problem with the DataTable migration is speed. The way DataTable works
+     * is to convert an existing table with all the data into a paginated
+     * table. If there are a lot of users, then this might be a bit slow.
+     * E.g.: current production has about 10 000 users. But we might expect
+     * some 60 000 users later. While the loading speed was fine for 10 000,
+     * I have doubts about handling 60 000 users. The ajaxList code retrieves
+     * users on demand, so does not have this problem.
      *
      * @param string $message
      *
@@ -231,37 +240,63 @@ class UsersController extends AppController
         $tempVar=$this->User->getEnrolledStudents(1, $fields);
     }
 
-    /**
-     * Attempts to setup conditions to get a list of users enrolled in a course
-     * for display, but fails.
-     *
-     * @param mixed $course
-     *
-     * @access public
-     * @return void
-     */
-    function goToClassList($course)
-    {
-        if (is_numeric($course)) {
-            $courses = $this->sysContainer->getMyCourseList();
-            if (!empty($courses[$course])) {
-                // We need to change the session state to point to this
-                // course:
-                // Initialize a basic non-funcional AjaxList
-                $this->AjaxList->quickSetUp();
-                // Clear the state first, we don't want any previous searches/selections.
-                $this->AjaxList->clearState();
-                // Set and update session state Variable
-                $joinFilterSelections->{'Enrolment.id'} = $course;
-                $this->AjaxList->setStateVariable("joinFilterSelections", $joinFilterSelections);
-                // but since that join filter depends on user role, we should set that too.
-                $mapFilterSelections->{"User.role"} = "S";
-                $this->AjaxList->setStateVariable("mapFilterSelections", $mapFilterSelections);
-            }
-        }
-        // Redirect to user list after state modifications (or in case of error)
-        $this->redirect("index");
+  /**
+   * Display a list of users enrolled in a given course. 
+   *
+   * Note that this uses a different listing method than the index. The index
+   * uses the old prototype based ajaxList, this one uses a newer jquery
+   * based DataTable. The switch was done mostly because the ajaxList code
+   * to filter based on class wasn't working and a long look at the ajaxList
+   * code base produced only puzzlement. As we want to move off of prototype
+   * and to jquery anyways, it was easier to just rewrite this part.
+   *
+   * @param mixed $course - the course id to list users for
+   *
+   * @access public
+   * @return void
+   */
+  function goToClassList($course) {
+    $classStudents = array(); // holds all the students enrolled in this course
+    $classInstructors = array(); // holds instructors for this course
+    $classList = array(); // holds all users in this course for display in view
+
+    // get the instructors
+    $classInstructors = $this->User->find(
+      'all',
+      array(
+        'conditions' => array('Course.id' => $course),
+      )
+    );
+    // get the students
+    $classStudents = $this->User->find(
+      'all',
+      array(
+        'conditions' => array('Enrolment.id' => $course),
+      )
+    );
+
+    // put only the data needed for display into classList
+    // TODO role based data retrival restrictions
+    foreach ($classInstructors as $user) {
+      $tmp = array();
+      $tmp['Role'] = 'Instructor';
+      $tmp['Username'] = $user['User']['username'];
+      $tmp['Full Name'] = $user['User']['first_name'] .' '. 
+        $user['User']['last_name'];
+      $tmp['Email'] = $user['User']['email'];
+      $classList[] = $tmp;
     }
+    foreach ($classStudents as $user) {
+      $tmp = array();
+      $tmp['Role'] = 'Student';
+      $tmp['Username'] = $user['User']['username'];
+      $tmp['Full Name'] = $user['User']['first_name'] .' '. 
+        $user['User']['last_name'];
+      $tmp['Email'] = $user['User']['email'];
+      $classList[] = $tmp;
+    }
+    $this->set('classList', $classList);
+  }
 
     /**
      * __processForm
