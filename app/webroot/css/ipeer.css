@@ -1,4 +1,4 @@
-/* CSS RESET */
+
 /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
    License: none (public domain)
@@ -105,12 +105,13 @@ p
 	width: 100%;
 }
 
-.text label, .password label, .textarea label
+.text label, .password label, .textarea label, .select label
 {
 	float: left;
 	text-align: right;
 	margin: 0.5em 0;
 	clear: left;
+	padding-right: 1em;
 }
 
 .text input, .password input, .textarea textarea
@@ -131,15 +132,31 @@ p
 	display: block;
 }
 
+a:link, a:visited
+{
+	text-decoration: none;
+}
+
+a:hover
+{
+	text-decoration: underline;
+}
+
 /* BANNER */
-#banner
+.banner
 {
 	border-top-left-radius: 8px; 
 	border-top-right-radius: 8px; 
 	border: 1px solid #ddd;
 	border-bottom: none;
-	background: #f4f4f4 url('../img/layout/banner_back_noborder.gif') repeat-x;
+	background-color: #f4f4f4;
+}
+
+#bannerLarge
+{
 	height: 98px;
+	background-image: url('../img/layout/banner_back_noborder.gif');
+	background-repeat: repeat-x;
 }
 
 #bannerLogoImgLeft
@@ -188,7 +205,6 @@ p
 	font-weight: bolder;
 	font-size: 0.85em;
 	text-align: center;
-	text-decoration: none;
 	padding: 0.5em;
 	padding-left: 0.6em;
 }
@@ -214,12 +230,9 @@ p
 }
 
 /* CONTENT CONTAINER */
-#containerOuter
+.containerOuter
 {
-	border-top-left-radius: 10px; 
-	border-top-right-radius: 10px; 
-	border-bottom-left-radius: 10px; 
-	border-bottom-right-radius: 10px; 
+	border-radius: 10px; 
 	border: 1px solid #777;
 	padding: 0.4em; 
 	background: white;
@@ -232,26 +245,20 @@ p
 	margin-bottom: 1em;
 	clear: left;
 	padding: 0.7em;
-	font-size: 0.9em;
 	font-weight: bold;
 	text-align: center;
 }
 
+.good-message
+{
+	border: 2px solid green;
+}
+
+/* authMessage is only used for cake generated login errors. */
 #flashMessage, #authMessage, .error-message
 {
 	color: #990044;
-	text-align: center;
 	border: 2px solid #990044;
-}
-
-.error-message
-{
-	margin-bottom: 1em;
-	padding: 0.5em;
-	width: 20em;
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
 }
 
 .red
@@ -266,7 +273,7 @@ p
 
 h1.title 
 {
-	margin-top: 0.5em;
+	margin: 0.5em 0;
 	font-weight: bold;
 	background: #eee;
 	border: 1px solid #ddd;
@@ -354,17 +361,21 @@ i
 /* HOME */
 .course
 {
-	border: 1px solid #fd8;
 	margin-bottom: 1em;
-	background-color: #fec;
+	background-color: #EAEAEA;
 }
 
 .course h3
 {
 	font-size: 0.9em;
 	font-weight: bold;
-	background-color: #fd8;
-	padding: 0.3em 0.5em;
+	background-color: #4478AC;
+	padding: 0.5em 0.5em;
+}
+
+.course h3 a:link, .course h3 a:visited
+{
+	color: white;
 }
 
 .course h4
@@ -373,21 +384,22 @@ i
 	padding: 0.5em;
 }
 
-.course a 
+.course h4 ul
 {
-	text-decoration: none;
+	display: inline;
 }
 
-.course a:hover
+.course h4 li
 {
-	text-decoration: underline;
+	display: inline;
+	padding-right: 1em;
 }
 
 .course table
 {
 	margin: 0.5em;
 	width: 100%;
-	font-size: 0.8em;
+	font-size: 0.9em;
 }
 
 .course th
@@ -439,35 +451,159 @@ i
 
 /* POPUP */
 
-#pop_title {
-	margin:0;
-	padding:0;
-	background:#f4f4f4 url(small_header_back.gif) repeat-x;
-	font:bold 1em/1 Arial, Helvetica, sans-serif;
+
+#pop_container {
+	width: 95%;
+	margin: 0.5em auto;
+}
+
+#pop_container table {
+	width: 100%;
+	margin-top: 0.5em;
+}
+
+#pop_container h1 {
+	text-align: center;
+}
+
+#bannerSmall {
+	background-image: url(small_header_back.gif);
+	background-repeat: repeat=x;
+}
+
+#bannerSmall img {
+	display: block;
+	margin: 0 auto;
+}
+
+/* COURSE */
+
+.course_summary {
+	border-spacing: 0;
+	width: 100%;
+	margin-top: 0.5em;
+	font-size: 0.9em;
+}
+
+.course_summary th {
+	background-color: #3E83B6;
+	color: white;
+	font-weight: bold;
+}
+
+.course_summary td {
+	background-color: #EAEAEA;
+	text-align: center;
+}
+
+.course_summary li {
+	padding: 0.2em 0; /* space out the instructors more */
+}
+
+.course_actions {
+	margin-bottom: 0.5em;
+}
+
+.course_submenu {
+	margin: 1em 0;
+	width: 49.6%;
+	vertical-align: top;
+	display: inline-block;
+}
+
+.course_submenu h3 {
+	background-color: #EAEAEA;
 	color: #0A2C64;
-	border-top: 1px solid #CFCFCF;
-	border-bottom: 1px solid #CFCFCF;
+	font-weight: bold;
+	padding: 0.5em;
+}
+
+.course_submenu ul {
+	background-color: white;
+}
+
+.course_submenu li {
+	padding-left: 2em;
+	margin-top: 1em;
+	background-image: url("../img/layout/yellow_arrow.gif");
+	background-repeat: no-repeat;
+	background-position: 0.5em;
+}
+
+/* USERS */
+
+/* users/add */
+#UserAddForm .text label, #UserAddForm .select label {
+	width: 13em;
+}
+
+#UserAddForm .checkbox label {
+	float: none;
+}
+
+#UserAddForm .checkbox {
+	vertical-align: middle;
+	margin-top: 0.5em;
+}
+
+#UserAddForm #usernameErr {
+	margin-left: 14em;
+}
+
+#UserAddForm select {
+	width: 13em;
+	margin-top: 0.5em;
+	margin-bottom: 0.3em;
+	background: transparent;
+	font-size: 1em;
+}
+
+#UserAddForm .select .checkbox {
+	margin-left: 14em;
+}
+
+#UserAddForm .select .checkbox label {
+	width: 30em;
+	text-align: left;
+}
+
+#UserAddForm .select .checkbox input {
+	margin-right: 0.5em;
+}
+
+#UserAddForm .text input {
+	width: 21em;
+}
+
+#UserAddForm #email {
+	margin: 0 0.5em 1em 16em;
+}
+
+#UserAddForm .submit {
+	width: 10em;
+	margin: 1em auto;
 }
 
 /* TO BE REFACTORED LATER */
 
 /* TEMPORARY */
 /* temporary padding to be used until refactoring finished */
+
 table
 {
-	border-spacing: 2px;
+	border-spacing: 1px;
 	border-collapse: separate;
 }
 th
 {
 	vertical-align: middle;
-	padding: 0.5em;
+	padding: 0.3em;
 }
 
 td
 {
 	vertical-align: middle;
-	padding: 0.5em;
+	padding: 0.3em;
 }
 
 /* temp nav ul fix */
@@ -484,7 +620,6 @@ td
 
 #nav a
 {
-	text-decoration: none;
 	font-size: 0.9em;
 	padding: 0.2em 0.5em;
 }
@@ -583,15 +718,14 @@ div.table-content li img{
 }
 .tableheader {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	font-weight: bold;
 	color: #FFFFFF;
 	background-color: #4478AC;
+	font-size: 0.9em;
 }
 
 .tablesubheader {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	font-weight: bold;
 	color: #FFFFFF;
 	background-color: #3E83B6;
@@ -599,7 +733,6 @@ div.table-content li img{
 
 .tablesummary {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	font-weight: bold;
 	color: #000000;
 	background-color: #99cc99;
@@ -607,7 +740,6 @@ div.table-content li img{
 
 .tablesummary2 {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	font-weight: bold;
 	color: #000000;
 	background-color: #bce9bc;
@@ -619,7 +751,6 @@ div.table-content li img{
 
 .tableheader2 {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	font-weight: bold;
 	color: #000;
 	background-color: #C0C0C0;
@@ -627,7 +758,6 @@ div.table-content li img{
 
 .searchtable1 {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	font-weight: bold;
 	color: #000000;
 	background-color: #cc9933;
@@ -635,7 +765,6 @@ div.table-content li img{
 
 .searchtable2 {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	font-weight: bold;
 	color: #000000;
 	background-color: #cccc00;
@@ -643,34 +772,23 @@ div.table-content li img{
 
 .searchtable3 {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	font-weight: bold;
 	color: #000000;
 	background-color: #99cc99;
 }
 
 .tablecell {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	color: #000000;
 	background-color: #EAEAEA;
-}
-.tablecell a:link,.tablecell a:visited {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	color: #FA7E04;
-}
-.tablecell a:hover {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	color: #333;
+	line-height: 1.5; /* needed or bottom of letters like g will cut off */
+	font-size: 0.9em;
 }
 .tablecell:hover {
 	background-color: #C7D0E7;
 }
 .tablecell2 {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	color: #000000;
-    background-color: #EAEAEA;
 }
 #detailside {
 	margin-left : 280px;
@@ -722,7 +840,6 @@ div.table-content li img{
 	border-bottom : 1px solid #24588C;
 	margin-top : 6px;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
 	font-weight:bold;
 }
 
@@ -769,13 +886,11 @@ div.table-content li img{
 .user-list-table th {
   background-color: #4478AC;
   color: white;
-  font-size: 0.9em;
   padding: 4px;
 }
 
 .user-list-table td {
   padding: 4px;
-  font-size: 0.9em;
 }
 
 /* No clue what these does */

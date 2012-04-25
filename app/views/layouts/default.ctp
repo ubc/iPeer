@@ -10,11 +10,13 @@
   // CSS files
   echo $html->css('ipeer');
   echo $html->css('datepicker');
+  echo $html->css('jquery.dataTables');
 
   // Scripts 
   // as prototype does not appear to be maintained anymore, we should
   // switch to jquery. Load jquery from Google.
   echo $html->script('https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js');
+  echo $html->script('jquery.dataTables.min');
   ?>
   <script type='text/javascript'>
   jQuery.noConflict(); // prevent conflicts with prototype
@@ -36,7 +38,7 @@
 </head>
 <body>
 
-<div id="containerOuter" class='pagewidth'>
+<div class='containerOuter pagewidth'>
 <!-- BANNER -->
 <?php echo $this->element('global/banner'); ?>
 
@@ -57,7 +59,7 @@ if (isset($access))
   <!-- ERRORS -->
   <?php echo $this->Session->flash(); ?>
   <?php echo $this->Session->flash('auth'); ?>
-  <?php echo $this->Session->flash('email'); ?>
+  <?php echo $this->Session->flash('good'); ?>
   <!-- ACTUAL PAGE -->
   <?php echo $content_for_layout; ?>
 </div>

@@ -53,15 +53,15 @@ var ACTION_RESTRICTIONS = 2;
 var ACTION_CONTROLLER = 3;
 var ACTION_URL_PARTS_START = 4;
 
-var ListUsage =  "<u style='font-size:115%'>How to use Lists in iPeer:</u><br />";
-    ListUsage += "<i>Left-Clicking</i> on an <span style='background:#EEEEEE;color:#D85000'>brown</span> ";
-    ListUsage += "link will take you to that item's display. ";
-    ListUsage += "<i>Left-Clicking</i> the gray ";
+var ListUsage =  "<div id='short_help'><h6>How to use Lists in iPeer:</h6>";
+    ListUsage += "<ol><li><i>Left-Clicking</i> on a ";
+    ListUsage += "link will take you to that item's display.</li>";
+    ListUsage += "<li><i>Left-Clicking</i> the gray ";
     ListUsage += "(<span style='background:#DDDDDD'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>) ";
-    ListUsage += "background of an item will open the <b>pop-up menu.</b><br />";
-    ListUsage += "<p style='margin-left=6em'>The <b>pop-up menu</b> displays all available actions for this item, ";
-    ListUsage += "like 'View', 'Edit', 'Copy', 'Delete', etc...</p>";
-    ListUsage += "<i>Right-Clicking</i> anywhere on a list will also open the <b style='color:#909090'>pop-up menu</b>.";
+    ListUsage += "background of an item will open the <b>pop-up menu.</b></li>";
+    ListUsage += "<li>The <b>pop-up menu</b> displays all available actions for this item, ";
+    ListUsage += "like 'View', 'Edit', 'Copy', 'Delete', etc...</li>";
+    ListUsage += "<li><i>Right-Clicking</i> anywhere on a list will also open the <b>pop-up menu</b>.</li></ol></div>";
 
 // Small Helper function library class
 function AjaxListLibrary () {
@@ -794,7 +794,7 @@ AjaxList.prototype.renderTableBody = function(tbody) {
                     div.update(contents);
                 } else if (column[TYPE_COL] == "action") {
                     // If this is an "action" type entry, we need to create a link for it
-                    var link = new Element("a", {"style":"color:#D84800;text-shadow: white 0px 0px 1px"}).update(contents);
+                    var link = new Element("a").update(contents);
                     link.href="";
                     link.onclick = ajaxListLibrary.createDelegateWithParams(this,
                         this.doAction, entry, column[ACTION_COL]);

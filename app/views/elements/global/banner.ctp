@@ -1,4 +1,4 @@
-<div id='banner'>
+<div id='bannerLarge' class='banner'>
   <?php 
   echo $html->image('layout/ipeer_banner_noborder.gif',
     array('id' => 'bannerLogoImgLeft', 'alt' => 'banner')

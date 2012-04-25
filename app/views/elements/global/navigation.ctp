@@ -1,62 +1,61 @@
 <?php
+// TODO temporary solution until access control is worked out, we're 
+// hardcoding what is accessible by different roles
+
 /**
  * Creates a user interface tab:
- *      $object and $access should always be set at $this and $access respectively.
- *      $accessVar is the key inside the sys_function function list.
- *      $activeControllers is an aeeay containg all the controllers for which this tab will be
- *        highlighted as active.
- *      $prefix and $postfix will be shown if passesed. Can be text or HTML.
+ *
+ * @param $object - should be set to $this to access the view object
+ * @param $url - where the tab should go to when clicked on
+ * @param $activeControllers - array containing all the controllers for which 
+ * this tab will be highlighted as active.
  */
-function generateTab (
-  $object, $access, $accessVar, 
-  $activeControllers, $name='') 
-{
-  if (!empty($access[$accessVar])) {
-    // Get the variables
-    $sysFunc = $access[$accessVar];
-    if (empty($name))
-    {
-      $name = $sysFunc['function_name'];
-    }
-    $url = $object->webroot . $object->theme . $sysFunc['url_link'];
-    // Generate the HTML
-    $current = in_array($object->params['controller'], $activeControllers) ? "id='current'" : "";
-    echo "<li $current><a href='$url'>$name</a></li>";
-  }
+
+function generateTab ($view, $url, $activeControllers, $name) {
+  $url = $view->webroot . $view->theme . $url;
+  // Generate the HTML
+  $current = in_array($view->params['controller'], $activeControllers) ? 
+    "id='current'" : "";
+  echo "<li $current><a href='$url'>$name</a></li>";
 }
 
-?>
-
-<?php
-if (User::isLoggedIn())
-{
+if (User::isLoggedIn()) {
   echo "<div id='navigationOuter' class='navigation'><ul>";
-  if (!empty($access)) {
-      //Home Tab
-      generateTab($this, $access, 'HOME', array('home'));
-      // Course Tab
-      generateTab($this, $access, 'COURSE', 
-        array('courses', 'events', 'groups', 'evaluations', 'surveygroups')
-      );
-      // Users Tab
-      $isStudent = (User::get('role') == 'S');
-      if (!$isStudent) {
-        generateTab($this, $access, 'USERS' , array('users'));
-      }
-      //Evaluation Tools Tab
-      generateTab($this, $access, 'EVAL_TOOL',
-        array(
-          'evaltools', 'simpleevaluations', 'rubrics', 
-          'surveys', 'mixevals', 'emailer', 'emailtemplates'
-        ),
-        'Evaluation'
-      );
-      // Advanced Search Tab
-      generateTab($this, $access, 'ADV_SEARCH', array('searchs'), 'Search');
-      // System Parameters Tab
-      generateTab($this, $access, 'SYS_PARA',  array('sysparameters'), 'Sys Parameters');
-      // System Functions Tab
-      generateTab($this, $access, 'SYS_FUNC', array('sysfunctions'), 'Sys Functions');
+
+  //Home Tab
+  generateTab($this, 'home', array('home'), 'Home');
+
+  if ($issuperadmin || $isadmin || $isinstructor) {
+    // Course Tab
+    generateTab(
+      $this, 
+      'courses', 
+      array('courses', 'events', 'groups', 'evaluations', 'surveygroups'),
+      'Courses'
+    );
+
+    // Users Tab
+    generateTab($this, 'users' , array('users'), 'Users');
+
+    //Evaluation Tools Tab
+    generateTab($this, 'evaltools',
+      array(
+        'evaltools', 'simpleevaluations', 'rubrics', 
+        'surveys', 'mixevals', 'emailer', 'emailtemplates'
+      ),
+      'Evaluation'
+    );
+
+    // Advanced Search Tab
+    generateTab($this, 'searchs', array('searchs'), 'Search');
+  }
+
+  if ($issuperadmin) {
+    // System Parameters Tab
+    generateTab($this, 'sysparameters', array('sysparameters'), 
+      'Sys Parameters');
+    // System Functions Tab
+    generateTab($this, 'sysfunctions', array('sysfunctions'), 'Sys Functions');
   }
 
   echo "<li>";

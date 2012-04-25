@@ -21,6 +21,8 @@
  * @since         CakePHP(tm) v 0.2.9
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
+
+
 /**
  * Configure routing so that if iPeer has not been installed, the user
  * is directed to the installation page. Setup normal router otherwise.
@@ -29,8 +31,13 @@
  * is located in the CONFIGS directory.
  * */
 
-if (file_exists(CONFIGS.'installed.txt')) 
-{ 
+if (file_exists(CONFIGS.'installed.txt')) {
+  // Disable access to the installer by redirecting all attempts to access
+  // the installer to the index page. Except for install5, which is needed
+  // to tell the user that an install was successful.
+  Router::connect('/install/install5', array(
+    'controller' => 'install', 'action' => 'install5'));
+  Router::connect('/install/*', array('controller' => 'install'));
   // Connect default index page to the home controller
 	Router::connect('/', array('controller' => 'home', 'action' => 'index'));
   // Connect static pages to the pages controller
@@ -45,8 +52,7 @@ if (file_exists(CONFIGS.'installed.txt'))
   Router::connect('/logout', array('controller' => 'users', 
     'action' => 'logout'));
 }
-else 
-{
+else {
   // Note, order of routes specified matters. If install didn't come first
   // the /* directive would just redirect every page to the index page
   // of install, including the install/install2/, etc. steps of install

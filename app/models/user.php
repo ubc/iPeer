@@ -115,28 +115,40 @@ class User extends AppModel
         ),
     );
 
-    public $validate = array(
-        'username'  => array(
-            'character' => array(
-                'rule'     => 'alphaNumeric',
-                'required' => true,
-                'message'  => 'Alphabets and numbers only'),
-            'minLength' => array(
-                'rule'    => array('minLength', 6),
-                'message' => 'Usernames must be at least 6 characters long'
-            ),
-            'unique'    => array(
-                'rule'    => 'isUnique',
-                'message' => 'Duplicate Username found. Please change the username.'
-            )
-        ),
-        'email'     => array(
-            'rule'       => 'email',
-            'required'   => false,
-            'allowEmpty' => true,
-            'message'    => 'Invalid email format'
-        )
-    );
+  public $validate = array(
+    'username'  => array(
+      'character' => array(
+        'rule' => 'alphaNumeric',
+        'message' => 'Usernames may only have letters and numbers.'
+      ),
+      'minLength' => array(
+        'rule' => array('minLength', 6),
+        'message' => 'Usernames must be at least 6 characters.'
+      ),
+      'unique' => array(
+        'rule' => 'isUnique',
+        'message' => 'Duplicate Username found. Please select another.'
+      )
+    ),
+    'email'     => array(
+      'rule'       => array('validEmail'),
+      'allowEmpty' => true,
+      'message'    => 'Invalid email format.'
+    ),
+    'first_name' => array(
+      'rule' => 'notEmpty',
+      'message' => "First name cannot be empty, it is used as the display name."
+    ),
+    'role'     => array(
+      'rule' => 'notEmpty',
+      'message' => 'Role field may not be left blank.'
+    ),
+    'send_email_notification' => array(
+      'rule' => array('requiredWith', 'email'),
+      'message' => 'Email notification requires an email address.'
+    )
+  );
+
 
     /**
      * __construct
@@ -164,17 +176,6 @@ class User extends AppModel
      */
     public function beforeSave()
     {
-        if (!isset($this->data[$this->name]['id']) && empty($this->data[$this->name]['password'])) {
-            $tmp_pw = NeatString::randomPassword(6);
-            $this->data[$this->name]['password'] = md5($tmp_pw);
-            $this->data[$this->name]['tmp_password'] = $tmp_pw;
-        }
-
-        // clear password to avoid updating to a empty one
-        if (empty($this->data[$this->name]['password'])) {
-            unset($this->data[$this->name]['password']);
-        }
-        //var_dump(debug_backtrace());exit;
         return parent::beforeSave();
     }
 
@@ -1084,4 +1085,73 @@ return $result;*/
 
         return $model->getCourseListByInstructor(self::get('id'));
     }
+
+  public function isRole($id, $role) {
+    $data = $this->findById($id);
+    foreach ($data['Role'] as $r) {
+      if ($r['name'] == $role) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Custom validation rule makes a field required if another field is
+   * enabled.
+   *
+   * @param mixed $check the field that needs to be enabled
+   * @param mixed $with the field that needs to be filled if the previous param
+   * was enabled
+   *
+   * @access public
+   * @return boolean - true if the $with field is enabled and all the $check
+   * fields are filled in too, false otherwise
+   * */
+  protected function requiredWith($check, $with) {
+    foreach ($check as $key => $val) {
+      if ($val && empty($this->data[$this->name][$with])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Custom validation rule for emails. The built-in CakePHP email validation
+   * improperly rejects valid email addresses. e.g.: won't let me use a
+   * email like john@localhost.localdomain, probably due to it having a white
+   * list of valid domains. This makes testing with email a pain though, so
+   * we're not using that.
+   *
+   * Sadly, even the built in PHP email validation using filter_var fails
+   * to follow all of the RFCs. But at least it's better than the built-in
+   * CakePHP one.
+   *
+   * The built in PHP validation requires PHP >= 5.2.0, if it's not available,
+   * we use a really simple fallback validation that simply checks if there's
+   * text on both sides of the @ sign.
+   *
+   * @param mixed $check contains the parameters to validate
+   *
+   * @access public
+   * @return boolean - true if the $with field is enabled and all the $check
+   * fields are filled in too, false otherwise
+   * */
+  protected function validEmail($check) {
+    $email = $check['email'];
+    if (function_exists('filter_var')) {
+      // filter_var() requires php >= 5.2.0
+      if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return true;
+      }
+    }
+    else {
+      // really basic fallback validation
+      if (preg_match('/.+@.+/', $email)) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

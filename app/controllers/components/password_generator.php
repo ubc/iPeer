@@ -1,0 +1,141 @@
+<?php
+/** 
+ * Low entrophy recovery passwords may be guessed relatively easily by an 
+ * attacker, this module attempts to generate more secure recovery passwords.
+ *
+ * Both of the built in PHP random number generators, rand() and mt_rand()
+ * are considered inadequate for crytopgraphic usages. A more secure built-in
+ * random number generator is in discussion, but for now, we have to make do
+ * with a few work arounds to get quality random numbers.
+ * */
+class PasswordGeneratorComponent extends Object {
+
+  public $name = 'PasswordGenerator';
+
+  /** 
+   * Generate a secure password by first generating a random number of $len
+   * bytes and then converting the resulting binary string into something
+   * printable.
+   *
+   * To maintain cross-platform compatibility, we have 3 different methods
+   * for generating the secure method.
+   * - Using the OpenSSL extension
+   * - Using /dev/urandom on Linux/Unix
+   * - Using the Windows API
+   *
+   * @param $len - strength of the password in bytes, defaults to 16
+   * @return a printable password string
+   * */
+  public function generate($len=16) {
+    $ret = $this->tryOpenSSL($len);
+    if (!empty($ret)) {
+      return $ret;
+    }
+
+    $ret = $this->tryLinux($len);
+    if (!empty($ret)) {
+      return $ret;
+    }
+
+    $ret = $this->tryWindows($len);
+    if (!empty($ret)) {
+      return $ret;
+    }
+
+    throw new Exception("No secure password generation method found." .
+    " Please install the PHP OpenSSL extension.");
+  }
+
+  /** 
+   * Convert a binary string into a printable string. Basically performs a 
+   * base64 conversion and then remove the trailing '=' delimiters.
+   *
+   * @param $bin - the binary string
+   * @return the binary string represented by printable characters
+   * */
+  private function binconvert($bin) {
+    $ret = base64_encode($bin);
+    $ret = str_replace("=", "", $ret);
+    return $ret;
+  }
+
+  /* Use the OpenSSL PHP extension to generate a secure password. We 
+   * basically generate a random number of $len bytes and convert the 
+   * resulting binary string to something user readable.
+   *
+   * Helper for generate().
+   *
+   * @param $len - strength of the password in bytes
+   * @return a printable password string
+   * */
+  private function tryOpenSSL($len) {
+    $output = "";
+    if (function_exists('openssl_random_pseudo_bytes')) {
+      $output = openssl_random_pseudo_bytes($len, $strong);
+
+      if($strong !== true) {
+        // not cryptographically strong, so discard
+        return "";
+      }
+    }
+    return $this->binconvert($output);
+  }
+
+  /** 
+   * Uses built-in Linux special files to generate a secure password. We 
+   * basically generate a random number of $len bytes and convert the 
+   * resulting binary string to something user readable.
+   *
+   * Helper for generate().
+   *
+   * @param $len - strength of the password in bytes
+   * @return a printable password string
+   * */
+  private function tryLinux($len) {
+    // Note that /dev/urandom is less secure than /dev/random as /dev/random
+    // will block in order to collect more entrophy if necessary while
+    // /dev/urandom will try to make do with what it has. However, we're using
+    // urandom since the blocking random call is unpredictable and may take 
+    // from minutes to hours for it to get enough randomness.
+    if (@is_readable('/dev/urandom')) {
+      $f = fopen('/dev/urandom', 'r');
+      $ret = fread($f, $len);
+      fclose($f);
+    }
+    #return base64_encode($ret);
+    return $this->binconvert($ret);
+  }
+
+  // TODO Please test to see if it works
+  /** 
+   * Uses Windows API to generate a secure password. We basically generate
+   * a random number of $len bytes and convert the resulting binary string
+   * to something user readable.
+   *
+   * Helper for generate().
+   *
+   * @param $len - strength of the password in bytes
+   * @return a printable password string
+   * */
+  private function tryWindows($len) {
+    $pr_bits = "";
+    if (@class_exists('COM')) {
+      // http://msdn.microsoft.com/en-us/library/aa388176(VS.85).aspx
+      try {
+        $CAPI_Util = new COM('CAPICOM.Utilities.1');
+        $pr_bits .= $CAPI_Util->GetRandom(16,0);
+
+        // if we ask for binary data PHP munges it, so we
+        // request base64 return value.  We squeeze out the
+        // redundancy and useless ==CRLF by hashing...
+        if ($pr_bits) { $pr_bits = $this->binconvert($pr_bits,TRUE); }
+      } 
+      catch (Exception $ex) {
+        return "";
+      }
+    }
+
+    return $pr_bits;
+  }
+
+}

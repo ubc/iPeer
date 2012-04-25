@@ -36,12 +36,14 @@
   ?>
 </head>
 <body>
-  <div id="pop_title" align="center">
-  <?php 
-  echo $html->image('layout/small_header.gif', array('alt' => 'Small Header'));
-  ?>
+  <div id="pop_container" class="containerOuter">
+    <div id="bannerSmall" class="banner">
+    <?php 
+    echo $html->image('layout/small_header.gif', array('alt' => 'iPeer Logo'));
+    ?>
+    </div>
+    <h1 class='title'><?php echo $title_for_layout;?></h1>
+    <?php echo $content_for_layout;?>
   </div>
-	<h1><?php echo $title_for_layout;?></h1>
-  <?php echo $content_for_layout;?>
 </body>
 </html>

@@ -7,6 +7,8 @@ echo $this->Form->create(
   array('url' => '/install/install4')
 );
 
+echo "<h4>Site Configuration</h4>";
+
 echo $this->Form->input(
   'absolute_url', 
   array(
@@ -23,18 +25,20 @@ echo $this->Form->input(
   )
 );
 
+echo "<h4>Super Admin Configuration</h4>";
+
 echo $this->Form->input(
   'super_admin', 
   array(
     'value' => "root",
-    'label' => 'Super admin username',
+    'label' => 'Username',
   )
 );
 
 echo $this->Form->input(
   'password', 
   array(
-    'label' => 'Super admin password',
+    'label' => 'Password',
   )
 );
 
@@ -42,32 +46,44 @@ echo $this->Form->input(
   'confirm_password', 
   array(
     'type' => 'password',
-    'label' => 'Super admin confirm password',
+    'label' => 'Confirm Password',
   )
 );
 
 echo $this->Form->input(
   'admin_email', 
   array(
-    'label' => 'Super admin email',
+    'label' => 'Email',
+  )
+);
+
+echo "<h4>Email Server Configuration</h4>";
+
+echo $this->Form->input(
+  'email_host', 
+  array(
+    'label' => "Host",
   )
 );
 
 echo $this->Form->input(
-  'login_text', 
+  'email_port', 
   array(
-    'type' => 'textarea',
-    'value' => '<a href="http://www.ubc.ca" target="_blank">UBC</a>',
-    'label' => 'Custom Login Text',
+    'label' => 'Port',
   )
 );
 
 echo $this->Form->input(
-  'contact_info', 
+  'email_username', 
   array(
-    'type' => 'textarea',
-    'value' => 'Please enter your custom contact info. HTML tabs are acceptable.',
-    'label' => 'Custom Contact Info',
+    'label' => 'Username',
+  )
+);
+
+echo $this->Form->input(
+  'email_password', 
+  array(
+    'label' => 'Password',
   )
 );
 

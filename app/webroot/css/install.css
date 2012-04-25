@@ -17,12 +17,13 @@ div.install
 {
 	font-size: 1.1em;
 	font-weight: bold;
-	margin: 1.5em 0 1em 0;
+	margin: 1em 0;
 }
 
 .install table
 {
 	width: 100%;
+	margin-bottom: 2em;
 }
 
 .install th
@@ -72,8 +73,7 @@ div.install
 
 .install .text label, .install .password label, .install .textarea label
 {
-	width: 13em;
-	padding-right: 1em;
+	width: 16em;
 }
 
 .install .text input, .install .password input, .install .textarea textarea
