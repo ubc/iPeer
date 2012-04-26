@@ -210,4 +210,19 @@
          <arg path="${project.basedir}/build/code-browser" />
      </exec>
  </target>
+
+    <target name="bump" description="bump a version">
+        <input propertyname="release_option" defaultValue="Minor" validargs="Major,Minor,BugFix" promptChar=":">
+            Please choose a release type
+        </input>
+        <version releasetype="${release_option}" file="version.txt" property="version.number" />
+        <reflexive file="app/config/core.php">
+            <filterchain>
+                <replaceregexp>
+                    <regexp pattern="'IPEER_VERSION', '\d.\d.\d'" replace="'IPEER_VERSION', '${version.number}'"/>
+                </replaceregexp>
+            </filterchain>
+        </reflexive>
+    </target>
+
 </project>
