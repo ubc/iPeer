@@ -52,3 +52,16 @@
 if(file_exists(dirname(__FILE__).'/bootstrap.local.php')) { 
   include('bootstrap.local.php');
 }
+
+/** 
+ * Create an empty database.php file if one isn't found.
+ *
+ * This lets us remove database.php from version control. This was a bit of
+ * a pain to version control since each dev install can have different
+ * credentials. It was initially added to version control since CakePHP1.3
+ * complains loudly if it couldn't find database.php.
+ **/
+if (!file_exists(CONFIGS.'database.php')) {
+  $fd = fopen(CONFIGS.'database.php', 'x');
+  fclose($fd);
+}
