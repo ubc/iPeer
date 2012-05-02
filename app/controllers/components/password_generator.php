@@ -106,11 +106,15 @@ class PasswordGeneratorComponent extends Object {
     return $this->binconvert($ret);
   }
 
-  // TODO Please test to see if it works
   /** 
    * Uses Windows API to generate a secure password. We basically generate
    * a random number of $len bytes and convert the resulting binary string
    * to something user readable.
+   *
+   * This relies on the now obsolete CAPICOM library from MS:
+   * http://www.microsoft.com/en-us/download/details.aspx?id=25281
+   * Which is no longer supported after Vista. It was replaced with the
+   * .net x509 crypto lib. 
    *
    * Helper for generate().
    *
