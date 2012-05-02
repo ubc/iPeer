@@ -89,7 +89,7 @@ class DATABASE_CONFIG {
 		'persistent' => false,
 		'host' => 'localhost',
 		'login' => 'root',
-		'password' => 'password',
+		'password' => '',
 		'database' => 'ipeer_test',
 		'prefix' => '',
 		//'encoding' => 'utf8',
