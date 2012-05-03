@@ -1002,7 +1002,7 @@ class UsersController extends AppController
         }
 
         //General password
-        $tmp_password = $this->NeatString->randomPassword(6);
+        $tmp_password = $this->PasswordGenerator->generate();
         $user_data['User']['tmp_password'] = $tmp_password;
         $user_data['User']['password'] =  md5($tmp_password);
         $user_data['User']['id'] =  $user_id;

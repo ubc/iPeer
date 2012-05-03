@@ -859,7 +859,7 @@ class User extends AppModel
             }
             if ($u[IMPORT_PASSWORD]) {
                 App::import('Lib', 'neat_string');
-                $u[IMPORT_PASSWORD] = NeatString::randomPassword(6);
+                $u[IMPORT_PASSWORD] = PasswordGenerator::generate();
                 $tmp['generated_password'] = true;
             }
 
