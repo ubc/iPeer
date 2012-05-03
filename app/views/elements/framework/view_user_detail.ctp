@@ -1,4 +1,4 @@
-<table>
+<table class="userViewTable">
   <tr class="tablecell2">
     <td width="17%" id="username_label"><?php __('Username')?>:</td>
     <td width="33%" ><?php echo $data['User']['username']; ?></td>
@@ -42,9 +42,9 @@
   </tr>
   <tr class="tablecell2">
     <td id="creator_label"><?php __('Creator')?>:</td>
-    <td align="left"><?php echo $data['User']['creator']//$this->element('users/user_info', array('data'=>$data['User']['creator_id']));?></td>
+    <td align="left"><?php echo $data['User']['creator_id'];?></td>
     <td id="updater_label"><?php __('Updater:')?></td>
-    <td align="left"><?php echo $data['User']['updater']//$this->element('users/user_info', array('data'=>$data['User']['updater_id']));?></td>
+    <td align="left"><?php echo $data['User']['updater_id'];?></td>
   </tr>
   <tr class="tablecell2">
     <td id="created_label"><?php __('Create Date')?>:</td>

@@ -84,7 +84,7 @@ p
 	max-width: 1000px;
 	margin-left: auto;
 	margin-right: auto;
-	margin-top: 0.3em;
+	margin-top: 0.5em;
 }
 
 .hide
@@ -140,6 +140,11 @@ a:link, a:visited
 a:hover
 {
 	text-decoration: underline;
+}
+
+.center
+{
+	margin: 0 auto;
 }
 
 /* BANNER */
@@ -582,6 +587,30 @@ i
 #UserAddForm .submit {
 	width: 10em;
 	margin: 1em auto;
+}
+
+/* users/goToClassList/ */
+
+.userActionPanel {
+	width: 100%;
+	background-color: #dfd;
+}
+.userActionPanel ul {
+	text-align: center;
+	width: 100%;
+	background-color: #dfd;
+}
+.userActionPanel li {
+	padding: 0 1em;
+	text-align: center;
+	display: inline;
+	list-style: none;
+}
+
+/* users/view */
+
+.userViewTable {
+	width: 100%;
 }
 
 /* TO BE REFACTORED LATER */

@@ -279,6 +279,7 @@ class UsersController extends AppController
     // TODO role based data retrival restrictions
     foreach ($classInstructors as $user) {
       $tmp = array();
+      $tmp['id'] = $user['User']['id'];
       $tmp['Role'] = 'Instructor';
       $tmp['Username'] = $user['User']['username'];
       $tmp['Full Name'] = $user['User']['first_name'] .' '. 
@@ -288,6 +289,7 @@ class UsersController extends AppController
     }
     foreach ($classStudents as $user) {
       $tmp = array();
+      $tmp['id'] = $user['User']['id'];
       $tmp['Role'] = 'Student';
       $tmp['Username'] = $user['User']['username'];
       $tmp['Full Name'] = $user['User']['first_name'] .' '. 
@@ -904,7 +906,7 @@ class UsersController extends AppController
             }
         }
 
-        $this->redirect('index');
+        $this->redirect($this->referer());
     }
 
 
@@ -1022,10 +1024,10 @@ class UsersController extends AppController
                 $message .= __("Email was <u>not</u> sent to the user.", true) . $this->Email->smtpError;
             }
             $this->Session->setFlash($message);
-            $this->redirect('index');
+            $this->redirect($this->referer());
         } else {
             //Get render page according to the user type
-            $this->redirect('index');
+            $this->redirect($this->referer());
         }
     }
 
