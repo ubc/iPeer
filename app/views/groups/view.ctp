@@ -34,7 +34,7 @@
                         array(
                             'controller' => 'emailer',
                             'action' => 'write',
-                            'G'.$data['Group']['id']
+                            'G/'.$data['Group']['id']
                         ),
                         array('escape'=>false)
                   );?>

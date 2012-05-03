@@ -169,7 +169,7 @@ class UsersController extends AppController
         $actions = array(
             //   display name, (warning shown), fixed parameters or Column ids
             array(__("View User", true),  "", "", "", "view", "User.id"),
-            array(__("Send Email", true),  "", "", "emailer", "write", "User.id"),
+            array(__("Send Email", true),  "", "", "emailer", "write", 'U', "User.id"),
             array(__("Edit User", true),  "", $actionRestrictions, "", "edit", "User.id"),
             array(__("Delete User", true),    $deleteUserWarning,   $actionRestrictions, "", "delete", "User.id"),
             array(__("Reset Password", true), $resetPassWarning,  $actionRestrictions, "", "resetPassword", "User.id")

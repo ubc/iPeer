@@ -42,7 +42,7 @@ function fnFormatDetails ( oTable, nTr )
     sOut += '</li>';
 
     sOut += '<li>';
-    sOut += '<a href="/emailer/write/'+aData[0]+'">Email</a>'; 
+    sOut += '<a href="/emailer/write/U/'+aData[0]+'">Email</a>'; 
     sOut += '</li>';
 
     sOut += '<li>';
