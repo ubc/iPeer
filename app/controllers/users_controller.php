@@ -513,16 +513,8 @@ class UsersController extends AppController
             $this->redirect('index');
         }
 
-        $isStudent = $this->determineIfStudentFromThisData($this->data);
-        if ($isStudent) {
-            $this->setUpCourseEnrollmentLists($id);
-        }
-
-        $this->setUpCourseEnrollmentLists($id);
-        $this->set('roles', $this->User->getRoles($id));
-        $this->set('readonly', true);
-        $this->set('isStudent', $isStudent);
-        $this->render('add');
+        $this->set('title_for_layout', __('View User', true));
+        $this->set('user', $this->data);
     }
 
 

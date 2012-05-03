@@ -42,9 +42,9 @@
   </tr>
   <tr class="tablecell2">
     <td id="creator_label"><?php __('Creator')?>:</td>
-    <td align="left"><?php echo $data['User']['creator_id'];?></td>
+    <td align="left"><?php echo $data['User']['creator'];?></td>
     <td id="updater_label"><?php __('Updater:')?></td>
-    <td align="left"><?php echo $data['User']['updater_id'];?></td>
+    <td align="left"><?php echo $data['User']['updater'];?></td>
   </tr>
   <tr class="tablecell2">
     <td id="created_label"><?php __('Create Date')?>:</td>
