@@ -4,13 +4,8 @@
     <td width="33%" ><?php echo $data['User']['username']; ?></td>
     <td width="17%" id="username_label"> <?php __('Role')?>:
     <td width="33%" > <?php
-        $role = $data['User']['role'];
-        switch ($role) {
-            case "S" : echo __("Student", true); break;
-            case "I" : echo __("Instructor", true); break;
-            case "A" : echo __("Admin", true); break;
-            default  : echo __("Unknown User Role ",true). $role;
-        }
+        $role = $data['Role']['0']['name'];
+        echo ucfirst($role);
         ?></td>
   </tr>
   <tr class="tablecell2">

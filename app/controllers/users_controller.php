@@ -507,7 +507,7 @@ class UsersController extends AppController
         }
 
         $roles = $this->User->getRoles($id);
-
+        
         if (!$this->AccessControl->hasPermissionDoActionOnUserWithRoles('ViewUser', $roles)) {
             $this->Session->setFlash(__('You do not have permission to view this user.', true));
             $this->redirect('index');
