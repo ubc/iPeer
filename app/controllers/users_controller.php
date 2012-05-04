@@ -51,37 +51,6 @@ class UsersController extends AppController
         $this->FileUpload->attr('required', true);
     }
 
-
-    /**
-     * login
-     *
-     * @access public
-     * @return void
-     */
-    function login()
-    {
-        // Get iPeer Admin's email address
-        $admin_email = $this->sysContainer->getParamByParamCode('system.admin_email');
-        $admin_email = $admin_email['parameter_value'];
-        $this->set('admin_email', $admin_email);
-
-        if ($this->Auth->user()) {
-            $user = $this->Auth->user();
-            //sets up the system container for accessible functions
-            $accessFunction = $this->SysFunction->getAllAccessibleFunction($this->Auth->user('role'));
-            $accessController = $this->SysFunction->getTopAccessibleFunction($this->Auth->user('role'));
-            $this->sysContainer->setAccessFunctionList($accessFunction);
-            $this->sysContainer->setActionList($accessController);
-
-            //setup my accessible courses
-            $myCourses = $this->Course->findAccessibleCoursesList($user['User']);
-            $this->sysContainer->setMyCourseList($myCourses);
-
-            $this->redirect($this->Auth->redirect());
-            exit;
-        }
-    }
-
     /**
      * logout
      *
@@ -93,7 +62,6 @@ class UsersController extends AppController
         $this->Session->destroy();
         $this->redirect($this->Auth->logout());
     }
-
 
     /**
      * Setup the ajax list component. The ajax list component is used to

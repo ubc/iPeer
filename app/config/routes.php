@@ -47,8 +47,6 @@ if (file_exists(CONFIGS.'installed.txt')) {
   Router::connect('/tests', array('controller' => 'tests', 
     'action' => 'index'));
   // Authentication routes
-  Router::connect('/login', array('controller' => 'users', 
-    'action' => 'login'));
   Router::connect('/logout', array('controller' => 'users', 
     'action' => 'logout'));
 }
