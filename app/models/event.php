@@ -157,8 +157,9 @@ class Event extends AppModel
     {
         $duplicate = false;
         $field = 'title';
+
         $value = null === $title ? $this->data[$this->name]['title'] : $title;
-        if ($result =  $this->find('all', array('conditions' => array('title'=>$value), 'fields'=>'title' ))) {
+        if ($result =  $this->find('all', array('conditions' => array('Event.title'=>$value), 'fields'=>'title' ))) {
             $duplicate = true;
         }
 
