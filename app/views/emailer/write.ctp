@@ -80,7 +80,7 @@ echo $html->script('calendar1');
             <td>
               <table>
               <tr><td>
-              <?php echo $html->link(__('Add Email Template', true), 'add/', array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"));?>
+              <?php echo $html->link(__('Add Email Template', true), '/emailtemplates/add/', array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"));?>
               </td></tr>
               <tr><td>
               <?php echo $form->input('Email.template', array(

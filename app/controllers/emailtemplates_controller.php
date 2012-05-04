@@ -146,6 +146,7 @@ class EmailtemplatesController extends AppController
      */
     function add()
     {
+        $this->layout= 'pop_up';
         //Set up user info
         $currentUser = $this->User->getCurrentLoggedInUser();
         $this->set('currentUser', $currentUser);
