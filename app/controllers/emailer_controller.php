@@ -45,6 +45,12 @@ class EmailerController extends AppController
         parent::__construct();
     }
 
+    function beforeFilter() {
+        parent::beforeFilter();
+        // Need to be able to cron job send, so should allow unauthed access
+        $this->Auth->allow('send');
+    }
+
     /**
      * setUpAjaxList
      *
