@@ -232,11 +232,11 @@ class MixevalsController extends AppController
                 $id = $this->Mixeval->id;
                 $question_ids= $this->MixevalsQuestion->find('all', array('conditions' => array('mixeval_id'=> $id), 'fields' => array('MixevalsQuestion.id, question_num')));
                 $this->MixevalsQuestionDesc->insertQuestionDescriptor($this->data['Question'], $question_ids);
-                $this->Session->setFlash(__('The Mixed Evaluation was added successfully.', true));
+                $this->Session->setFlash(__('The Mixed Evaluation was added successfully.', true), 'good');
                 $this->redirect('index');
             } else {
                 $this->set('data', $this->data);
-                $this->set('errmsg', $this->Mixeval->errorMessage);
+                $this->Session->setFlash($this->Mixeval->getErrorMessage());
             }
         }
         $this->set('data', $this->data);
