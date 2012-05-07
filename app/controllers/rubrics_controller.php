@@ -267,7 +267,7 @@ class RubricsController extends AppController
                 $this->set('data', $this->data);
             } else {
                 if ($this->__processForm()) {
-                    $this->Session->setFlash(__('The rubric evaluation was updated successfully'));
+                    $this->Session->setFlash(__('The rubric evaluation was updated successfully',true),'good');
                     $this->redirect('index');
                 }
             }
