@@ -2,10 +2,10 @@
 ?>
 <form name="frm" id="frm" method="POST">
 <input type="hidden" id="search_type" name="search_type" value="<?php echo $display?>"/>
-<table width="95%"  border="0" cellspacing="2" cellpadding="4">
+<table border="0" cellspacing="2" cellpadding="4">
     <tr>
       <td width="80%"><div align="left" id="criteria_panel">
-        <table width="60%" border="0" align="center" cellpadding="4" cellspacing="2">
+        <table border="0" align="center" cellpadding="4" cellspacing="2">
 
           <tr class="searchtable1">
             <td height="25" colspan="3" align="center"><?php __('Evaluation Event Search Panel')?></td>
@@ -13,7 +13,7 @@
          <tr class="tablecell2">
             <td width="186" id="course_label"><?php __('Course')?>:</td>
             <td width="437"><?php
-                $params = array('controller'=>'searchs', 'coursesList'=>$coursesList, 'courseId'=>null, 'defaultOpt'=>'A','sticky_course_id'=>(isset($sticky['course_id'])? $sticky['course_id']:null));
+                $params = array('defaultOpt'=>'A');
                 echo $this->element('courses/course_selection_box', $params);
                 ?></td>
             <td width="201" id="course_msg" class="error">&nbsp;</td>
@@ -63,12 +63,6 @@
             <td colspan="3"><div align="center"><?php echo $form->submit('Search',array('url'=>'/searchs/searchEvaluation')) ?>
         	  <input type="button" name="Reset" value="Reset" onClick="window.location.href=window.location.href;">
             </div></td>
-          </tr>
-        </table>
-        <table width="60%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">
-          <tr>
-            <td align="left"><?php echo $html->image('layout/corner_bot_left.gif',array('align'=>'left','alt'=>'left'))?></td>
-            <td align="right"><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'right','alt'=>'right'))?></td>
           </tr>
         </table>
         </div>

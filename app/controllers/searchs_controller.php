@@ -135,6 +135,13 @@ class SearchsController extends AppController
             $name[$i] = $this->sysContainer->getCourseName($evaluation['course_id']);
             $i++;
         }
+        $user = $this->User->findById($this->Auth->user('id'));
+        $courseList = array();
+        foreach ($user['Course'] as $course) {
+            $courseList[$course['id']] = $course['course'];
+        }
+        $this->set('courseList', $courseList);
+
         $this->set('eventTypes', $this->EventTemplateType->getEventTemplateTypeList(false));
         $this->set('names', $name);
         $this->set('data', $searchMartix);
