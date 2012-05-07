@@ -190,6 +190,8 @@ class SimpleevaluationsController extends AppController
         }
         $data = $this->SimpleEvaluation->read(null, $id);
         $this->set('data', $data);
+        $user = $this->Auth->user();
+        $this->set('user', $user['User']);
     }
 
     /**
