@@ -128,7 +128,7 @@ class MixevalsController extends AppController
             array(__("Edit Evaluation", true), "", $restrictions, "", "edit", "Mixeval.id"),
             array(__("Copy Evaluation", true), "", "", "", "copy", "Mixeval.id"),
             array(__("Delete Evaluation", true), $warning, $restrictions, "", "delete", "Mixeval.id"),
-            array(__("View Creator", true), "",    "", "users", "view", "Creator.id"));
+            array(__("View Creator", true), "",    "", "users", "view", "Mixeval.creator_id"));
 
         // No recursion in results
         $recursive = 0;
