@@ -347,9 +347,11 @@ class MixevalsController extends AppController
         $this->set('action', __('Copy Mixed Evaluation', true));
         $this->render = false;
         $this->Mixeval->id = $id;
-        $data = $this->Mixeval->read();
-        $data['Mixeval']['name'] = ""; // Clear the name when evaluation copied
-        $this->set('data', $data);
+        $this->data = $this->Mixeval->find('first', array('conditions' => array('id' => $id),
+                'contain' => array('Question.Description',
+                )));
+        $this->data['Mixeval']['name'] = "Copy of ".$this->data['Mixeval']['name']; 
+        $this->set('data', $this->data);
         $this->render('edit');
     }
 
