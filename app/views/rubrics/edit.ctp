@@ -23,7 +23,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
     <tr class="tablecell2">
       <?php echo $this->Form->input('name', array('id' => 'name', 'size'=>'30', 
                                                   'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.',
-                                                  'readonly' => $readonly, 'label' => __('Name')));?>
+                                                  'readonly' => $readonly, 'label' => __('Name', true)));?>
       <td>&nbsp;</td>
     </tr>
 
