@@ -45,6 +45,11 @@ class EmailerController extends AppController
         parent::__construct();
     }
 
+    /**
+     * Need this to allow the send page to be accessed by unloggedin users.
+     * The send page needs this free access in order to accomdate cron jobs
+     * which enable the scheduled email delivery feature.
+     * */
     function beforeFilter() {
         parent::beforeFilter();
         // Need to be able to cron job send, so should allow unauthed access
@@ -138,10 +143,17 @@ class EmailerController extends AppController
     }
 
     /**
-     * write
-     * Write an email
+     * Write an email to either a class, group, or user.
      *
-     * @param mixed $to parameter for recipients
+     * There are 3 possible character values for type:
+     * 'C' - for class
+     * 'G' - for group
+     * ' ' - no clue what this is used for, but it returns an empty list
+     *
+     * All others characters indicate single user.
+     *
+     * @param string $type - a class, group, or user
+     * @param int $id - the id of the class, group, or user we're writing to
      *
      * @access public
      * @return void
@@ -296,10 +308,19 @@ class EmailerController extends AppController
     }
 
     /**
-     * Get recipients
+     * Get a list of email addresses from the id. If type is a class, then
+     * we get the email address of all the students in the class. Same if
+     * it's a group. If it's a single user, then we only get a single address.
      *
-     * @param mixed $to     recipients
-     * @param mixed $s_type find type
+     * There are 3 possible character values for type:
+     * 'C' - for class
+     * 'G' - for group
+     * ' ' - no clue what this is used for, but it returns an empty list
+     *
+     * All others characters indicate single user.
+     *
+     * @param string $type - a class, group, or user
+     * @param int $id - the id of the class, group, or user we're writing to
      *
      * @return array of recipients and info
      */
@@ -449,7 +470,7 @@ class EmailerController extends AppController
     /**
      * Given a user id, get the email address associated with that id, if any.
      *
-     * @param $id - the user id
+     * @param int $id - the user id
      *
      * @return The user's email address, if it exists, empty string if not
      */

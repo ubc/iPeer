@@ -205,8 +205,8 @@ class CoursesController extends AppController
         $this->set('groupCount', count($course['Group']));
         $this->set('eventCount', count($course['Event']));
 
-		$this->set('title_for_layout', 
-			$course['Course']['course'].' - '.$course['Course']['title']);
+        $this->set('title_for_layout', 
+            $course['Course']['course'].' - '.$course['Course']['title']);
 
         //Setup the Personalization list
         if (empty($this->userPersonalize->personalizeList)) {

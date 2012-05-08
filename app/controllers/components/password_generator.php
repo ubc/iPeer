@@ -23,7 +23,8 @@ class PasswordGeneratorComponent extends Object {
    * - Using /dev/urandom on Linux/Unix
    * - Using the Windows API
    *
-   * @param $len - strength of the password in bytes, defaults to 16
+   * @param int $len - strength of the password in bytes, defaults to 16
+   *
    * @return a printable password string
    * */
   public function generate($len=16) {
@@ -43,14 +44,15 @@ class PasswordGeneratorComponent extends Object {
     }
 
     throw new Exception("No secure password generation method found." .
-    " Please install the PHP OpenSSL extension.");
+        " Please install the PHP OpenSSL extension.");
   }
 
   /** 
    * Convert a binary string into a printable string. Basically performs a 
    * base64 conversion and then remove the trailing '=' delimiters.
    *
-   * @param $bin - the binary string
+   * @param string $bin - the binary string
+   *
    * @return the binary string represented by printable characters
    * */
   private function binconvert($bin) {
@@ -59,13 +61,15 @@ class PasswordGeneratorComponent extends Object {
     return $ret;
   }
 
-  /* Use the OpenSSL PHP extension to generate a secure password. We 
+  /** 
+   * Use the OpenSSL PHP extension to generate a secure password. We 
    * basically generate a random number of $len bytes and convert the 
    * resulting binary string to something user readable.
    *
    * Helper for generate().
    *
-   * @param $len - strength of the password in bytes
+   * @param int $len - strength of the password in bytes
+   *
    * @return a printable password string
    * */
   private function tryOpenSSL($len) {
@@ -73,7 +77,7 @@ class PasswordGeneratorComponent extends Object {
     if (function_exists('openssl_random_pseudo_bytes')) {
       $output = openssl_random_pseudo_bytes($len, $strong);
 
-      if($strong !== true) {
+      if ($strong !== true) {
         // not cryptographically strong, so discard
         return "";
       }
@@ -89,6 +93,7 @@ class PasswordGeneratorComponent extends Object {
    * Helper for generate().
    *
    * @param $len - strength of the password in bytes
+   *
    * @return a printable password string
    * */
   private function tryLinux($len) {
@@ -102,7 +107,6 @@ class PasswordGeneratorComponent extends Object {
       $ret = fread($f, $len);
       fclose($f);
     }
-    #return base64_encode($ret);
     return $this->binconvert($ret);
   }
 
@@ -118,7 +122,8 @@ class PasswordGeneratorComponent extends Object {
    *
    * Helper for generate().
    *
-   * @param $len - strength of the password in bytes
+   * @param int $len - strength of the password in bytes
+   *
    * @return a printable password string
    * */
   private function tryWindows($len) {
@@ -127,12 +132,14 @@ class PasswordGeneratorComponent extends Object {
       // http://msdn.microsoft.com/en-us/library/aa388176(VS.85).aspx
       try {
         $CAPI_Util = new COM('CAPICOM.Utilities.1');
-        $pr_bits .= $CAPI_Util->GetRandom(16,0);
+        $pr_bits .= $CAPI_Util->GetRandom(16, 0);
 
         // if we ask for binary data PHP munges it, so we
         // request base64 return value.  We squeeze out the
         // redundancy and useless ==CRLF by hashing...
-        if ($pr_bits) { $pr_bits = $this->binconvert($pr_bits,TRUE); }
+        if ($pr_bits) { 
+            $pr_bits = $this->binconvert($pr_bits, true); 
+        }
       } 
       catch (Exception $ex) {
         return "";
