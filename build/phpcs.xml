@@ -52,6 +52,14 @@
         <exclude name="PEAR.ControlStructures.ControlSignature"/>
 
         <exclude name="PEAR.Commenting.FunctionComment.SpacingBeforeTags"/>
+		<!-- Remove rule that requires manually lining up comments -->
+        <exclude name="PEAR.Commenting.FunctionComment.ParameterCommentsNotAligned"/>
+        <exclude name="PEAR.Commenting.FunctionComment.ParameterNamesNotAligned"/>
+		<!-- Remove rule for opening brace on it's own line -->
+        <exclude name="PEAR.Classes.ClassDeclaration.OpenBraceNewLine"/>
+
+		<!-- Remove rule for inconsistent else structure -->
+        <exclude name="PEAR.ControlStructures.ControlSignature"/>
 
         <!-- do not check line length -->
         <exclude name="Generic.Files.LineLength"/>
@@ -89,4 +97,19 @@
     <rule ref="Symfony2.Commenting.ClassComment.SpacingBeforeTags">
         <message>There should always be a description, followed by a blank line, before the tags of a class comment.</message>
     </rule>
+
+	<!-- Remove rule for opening brace on it's own line -->
+	<rule ref="Generic.Functions.OpeningFunctionBraceBsdAllman.BraceOnSameLine">
+		<severity>0</severity>
+	</rule>
+
+	<!-- Rule removal for symfony2 duplicates -->
+    <rule ref="Symfony2.Commenting.FunctionComment.ParameterCommentsNotAligned">
+        <severity>0</severity>
+    </rule>
+
+    <rule ref="Symfony2.Commenting.FunctionComment.ParameterNamesNotAligned">
+        <severity>0</severity>
+    </rule>
+
 </ruleset>
