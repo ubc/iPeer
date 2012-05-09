@@ -932,6 +932,8 @@ class User extends AppModel
      *
      * @param int $id - the user id
      * @param string $role - the name of the role to check for
+     *
+     * @return true if the user $id has $role, false otherwise
      * */
     public function isRole($id, $role) {
         $data = $this->findById($id);

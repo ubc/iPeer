@@ -132,7 +132,7 @@ class PasswordGeneratorComponent extends Object {
       // http://msdn.microsoft.com/en-us/library/aa388176(VS.85).aspx
       try {
         $CAPI_Util = new COM('CAPICOM.Utilities.1');
-        $pr_bits .= $CAPI_Util->GetRandom(16, 0);
+        $pr_bits .= $CAPI_Util->GetRandom($len, 0);
 
         // if we ask for binary data PHP munges it, so we
         // request base64 return value.  We squeeze out the

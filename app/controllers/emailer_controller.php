@@ -417,7 +417,6 @@ class EmailerController extends AppController
         preg_match_all('/'.$start.'(.*?)'.$end.'/', $string, $matches, PREG_OFFSET_CAPTURE);
         $patterns = array();
         $replacements = array();
-        $merge_count = 0;
         $patterns = $matches[0];
         foreach ($matches[0] as $key => $match) {
             $patterns[$key] = '/'.$match[0].'/';
