@@ -612,6 +612,63 @@ i
     width: 100%;
 }
 
+/* Courses */
+
+/* courses/add */
+
+#CourseAddForm .text label, #CourseAddForm .select label {
+    width: 13em;
+}
+
+#CourseAddForm .text input {
+    width: 21em;
+    text-align: left;
+}
+
+#CourseAddForm .select #status {
+    margin-top: 0.7em;
+    margin-bottom: 1em;
+}
+
+#CourseAddForm .input input{
+    margin-right: 10em;
+    position: relative;
+}
+
+#CourseAddForm .submit {
+    width: 10em;
+    margin: 1em auto;
+}
+
+/* courses/add */
+
+#CourseEditForm .text label, #CourseEditForm .select label {
+    width: 13em;
+}
+
+#CourseEditForm .text input {
+    width: 21em;
+    text-align: left;
+}
+
+#CourseEditForm .select #status {
+    margin-top: 0.7em;
+    margin-bottom: 1em;
+}
+
+#CourseEditForm .select #instruct {
+    margin-top: 0.5em;
+}
+
+#CourseEditForm .input input{
+    margin-right: 10em;
+    position: relative;
+}
+
+#CourseEditForm .submit {
+    width: 10em;
+    margin: 1em auto;
+}
 /* TO BE REFACTORED LATER */
 
 /* TEMPORARY */

@@ -229,20 +229,26 @@ class CoursesController extends AppController
      */
     function add()
     {
+        $this->set('title_for_layout', 'Add Course');
         if (!empty($this->data)) {
             if ($this->data = $this->Course->save($this->data)) {
                 // add current user to the new course
                 $this->Course->addInstructor($this->Course->id, $this->Auth->user('id'));
-                $this->Session->setFlash('The course has been created.');
+                $this->Session->setFlash('The course has been created.', 'good');
                 //$this->sysContainer->setMyCourseList($myCourses);
-                $this->redirect(array('action' => 'edit', $this->Course->id));
+                $this->redirect(array('action' => 'add', $this->Course->id));
             } else {
                 $this->Session->setFlash('Cannot add a course. Check errors below');
             }
         }
         $this->set('course_id', 0);
         $this->set('data', $this->data);
-        $this->render('edit');
+
+        $statusOptions = array( 'A' => 'Active', 'I' => 'Inactive');
+        $statusDefault = 'A';
+
+        $this->set('statusOptions', $statusOptions);
+        $this->set('statusDefault', $statusDefault);
     }
 
     /**
@@ -255,24 +261,61 @@ class CoursesController extends AppController
      */
     function edit($id)
     {
+        $this->set('title_for_layout', 'Edit Course');
         if (!is_numeric($id)) {
             $this->Session->setFlash(__('Invalid course ID.', true));
             $this->redirect('index');
         }
 
-        $this->data['Course']['id'] = $id;
+        $this->set('course_id', 0);
+        $this->set('data', $this->data);
 
-        if (!empty($this->data) && $this->Course->save($this->data)) {
-            $this->Session->setFlash(__('The course was updated successfully.', true));
-            $this->redirect('index');
+        $statusOptions = array( 'A' => 'Active', 'I' => 'Inactive');
+
+        $this->set('statusOptions', $statusOptions);
+
+        $user = $this->User->findById($this->Auth->user('id'));
+        $courses = $this->Course->findById($id);
+
+        $this->set('course', $courses['Course']['course']);
+        $this->set('title', $courses['Course']['title']);
+        $instructors = $this->User->getInstructors('list', array('User.username'));
+        $this->set('instructors', $instructors);
+        $selected = $this->User->find('list', array(
+            'conditions' => array('UserCourse.course_id' => $id),
+            'recursive' => 1,
+        ));
+        $this->set('selected', array_keys($selected));
+        $this->set('homepage', $courses['Course']['homepage']);
+        if ('A' == $courses['Course']['record_status'])
+            $status = 'A';
+        else if ('I' == $courses['Course']['record_status'])
+            $status = 'I';
+        $this->set('status', $status);
+        
+        if (!empty($this->data)) {
+            if(!empty($this->data['Instructor']['id'])) {
+                foreach ($this->data['Instructor']['id'] as $key => $val) {
+                    $this->data['Instructor'][$key]['UserCourse']['user_id'] = $val;
+			    }
+            }
+            $this->data['Instructor'][]['UserCourse']['user_id'] = '1';
+            unset($this->data['Instructors']);
+            $this->data['Course']['id'] = $id;
+            $success = $this->Course->save($this->data);
+            if ($success) {
+                $this->Session->setFlash('The course was updated successfully.', 'good');
+                $this->redirect('index');
+            }
+            else if (!$success) {
+                $this->Session->setFlash('Cannot edit the course. Check errors below');
+            }
         } else {
             $this->data = $this->Course->read(null, $id);
-
             $this->set('instructors_rest',
                 $this->Course->getAllInstructors('list', array('excludes' => $this->data['Instructor'])));
             $this->set('data', $this->data);
-            $this->set('course_id', $this->data['Course']['id']);
-            //$this->set('errmsg', $this->Course->errorMessage);
+            $this->set('course_id', $this->data['Course']['id']);  
         }
     }
 
@@ -323,9 +366,10 @@ class CoursesController extends AppController
             $myCourses = $this->Course->findAccessibleCoursesListByUserIdRole($this->Auth->user('id'), $this->Auth->user('role'));
             $this->sysContainer->setMyCourseList($myCourses);
             // Finished all deletion of course related data
+            $this->Session->setFlash('The course was deleted successfully', 'good');
             $this->redirect('/courses/index/'.__('The course was deleted successfully.', true));
         } else {
-            $this->set('errmsg', $this->Course->errorMessage);
+            $this->Session->setFlash('Cannot delete the course. Check errors below');
             $this->redirect('/courses/index');
         }
     }

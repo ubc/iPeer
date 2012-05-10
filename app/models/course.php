@@ -81,6 +81,18 @@ class Course extends AppModel
         self::STATUS_INACTIVE => 'Inactive'
     );
 
+    var $validate = array (
+        'course' => array (
+            'courseRule1' => array(
+                'rule' => 'isUnique',
+                'message' => 'A course with this name already exists',
+            ),
+            'courseRule2' => array(
+                'rule' => 'notEmpty',
+                'message' => 'The course name is required.'
+            )
+        )
+    );
 
     /**
      * __construct
@@ -180,72 +192,6 @@ class Course extends AppModel
 
         return $data;
     }
-
-
-    /**
-     * beforeSave Overwriting Function - will be called before save operation
-     *
-     *
-     * @access public
-     * @return void
-     */
-    function beforeSave()
-    {
-        // Ensure the name is not empty
-        if (empty($this->data[$this->name]['title'])) {
-            $this->errorMessage = "Please enter a title for this " . $this->name . ".";
-            return false;
-        }
-
-        // Add an http or https to address
-        if (!empty($this->data[$this->name]['homepage'])
-            && stripos($this->data[$this->name]['homepage'], "http") !== 0) {
-            $this->data[$this->name]['homepage'] = "http://" . $this->data[$this->name]['homepage'];
-        }
-
-        // Remove any single quotes in the name, so that custom SQL queries are not confused.
-        $this->data[$this->name]['title'] = str_replace("'", "", $this->data[$this->name]['title']);
-
-        $allowSave = true;
-        if (empty($this->data[$this->name]['course'])) {
-            //temp ! to escape ajax bug
-            $this->errorMessage='Course name is required.'; //check empty name
-            $allowSave = false;
-        } else {
-            $allowSave = $this->__checkDuplicateCourse();//check the duplicate course
-        }
-
-        return $allowSave && parent::beforeSave();
-    }
-
-
-    /**
-     * __checkDuplicateCourse Validation check on duplication of course
-     *
-     * @access protected
-     * @return void
-     */
-    function __checkDuplicateCourse()
-    {
-        $duplicate = false;
-        $field = 'course';
-        $value = $this->data[$this->name]['course'];
-        if ($result = $this->find('first', array('conditions' => array($field => $value)))) {
-            if ($this->data[$this->name]['id'] == $result[$this->name]['id']) {
-                $duplicate = false;
-            } else {
-                $duplicate = true;
-            }
-        }
-
-        if ($duplicate == true) {
-            $this->errorMessage='Duplicate Course found. Please change the course name.';
-            return false;
-        } else {
-            return true;
-        }
-    }
-
 
     /**
      * Find all accessible courses id
