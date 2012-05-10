@@ -516,93 +516,6 @@ class User extends AppModel
     }
 
     /**
-     * Get user's roles
-     *
-     * @param int $id user id
-     *
-     * @access public
-     * @return array of user's roles
-     * */
-    function getRoles($id)
-    {
-        $user = $this->read(null, $id);
-
-        return $this->getRolesByRole($user['Role']);
-    }
-
-    /**
-     * Get role names by role ids
-     *
-     * @param array $roles array of role ids
-     *
-     * @access public
-     * @return role names
-     * */
-    function getRolesByRole($roles)
-    {
-        $ret = array();
-        if (!empty($roles)) {
-            foreach ($roles as $role) {
-                $ret[$role['id']] = $role['name'];
-            }
-        }
-
-        return $ret;
-    }
-
-    /**
-     * Return true if roles is any other then student
-     *
-     * @param array $roles roles
-     *
-     * @access public
-     * @return true if role isnt a student
-     * */
-    function hasTitle($roles)
-    {
-        $hasTitle = false;
-        foreach ($roles as $key => $role) {
-            if (is_array($role)) {
-                if ('student' != $role['name']) {
-                    $hasTitle = true;
-                }
-            } else {
-                if ('student' != $role) {
-                    $hasTitle = true;
-                }
-            }
-        }
-
-        return $hasTitle;
-    }
-
-    /**
-     * Return true if role is a student
-     *
-     * @param array $roles roles
-     *
-     * @access public
-     * @return true if role is a student
-     * */
-    function hasStudentNo($roles)
-    {
-        $hasStudentNo = false;
-        foreach ($roles as $key => $role) {
-            if (is_array($role)) {
-                if (isset($role['name']) && ('student' == $role['name'])) {
-                    $hasStudentNo = true;
-                }
-            } else {
-                if ('student' == $role) {
-                    $hasStudentNo = true;
-                }
-            }
-        }
-
-        return $hasStudentNo;
-    }
-
-    /**
      * Remove enrolled user from course. For student enrolment in a course.
      *
      * @param int $id        user id
@@ -896,35 +809,6 @@ class User extends AppModel
     {
         return self::getInstance() !== null;
     }
-
-
-    /**
-     * getMyCourses return the courses that the current user teaches
-     *
-     * @access public
-     * @return array list of courses
-     * */
-    function getMyCourses()
-    {
-        $model = Classregistry::init('Course');
-
-        return $model->getCourseByInstructor(self::get('id'));
-    }
-
-
-    /**
-     * getMyCourseList get the list of courses
-     *
-     * @access public
-     * @return array list of courses
-     * */
-    function getMyCourseList()
-    {
-        $model = Classregistry::init('Course');
-
-        return $model->getCourseListByInstructor(self::get('id'));
-    }
-
 
     /**
      * Given a user id and a role string, check if that user has that
