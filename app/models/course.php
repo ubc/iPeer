@@ -81,7 +81,7 @@ class Course extends AppModel
         self::STATUS_INACTIVE => 'Inactive'
     );
 
-    protected $validate = array (
+    public $validate = array (
         'course' => array (
             'courseRule1' => array(
                 'rule' => 'isUnique',

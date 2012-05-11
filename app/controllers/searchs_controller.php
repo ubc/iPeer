@@ -285,7 +285,7 @@ class SearchsController extends AppController
 
         $conditions = $course_id == "A" ?
             ($eventId == "A"?
-            ((User::hasRole('superadmin') || (User::hasRole('admin')) ?
+            ((User::hasRole('superadmin') || User::hasRole('admin')) ?
             array():
             array('Event.creator_id' => $this->Auth->user('id'))):
             array('Event.id' => $eventId)) :
