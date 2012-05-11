@@ -127,7 +127,7 @@ class RubricsController extends AppController
             array(__("Edit Rubric", true), "", $restrictions, "", "edit", "Rubric.id"),
             array(__("Copy Rubric", true), "", "", "", "copy", "Rubric.id"),
             array(__("Delete Rubric", true), $warning, $restrictions, "", "delete", "Rubric.id"),
-            array(__("View Creator", true), "",    "", "users", "view", "Creator.id"));
+            array(__("View Creator", true), "",    "", "users", "view", "Rubric.creator_id"));
 
         // No recursion in results
         $recursive = 0;
@@ -267,7 +267,7 @@ class RubricsController extends AppController
                 $this->set('data', $this->data);
             } else {
                 if ($this->__processForm()) {
-                    $this->Session->setFlash(__('The rubric evaluation was updated successfully'));
+                    $this->Session->setFlash(__('The rubric evaluation was updated successfully',true),'good');
                     $this->redirect('index');
                 }
             }

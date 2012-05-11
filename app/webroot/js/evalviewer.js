@@ -127,7 +127,7 @@ var EvalViewer = Class.create({
 
     options = Object.extend(defaults, options || { });
 
-    var descriptor = Builder.node("div", {class: "descriptor"}, [
+    var descriptor = Builder.node("div", {'class': "descriptor"}, [
       Builder.node("input", {type: "hidden",
                              name: "data[Question]["+options.question_index+"][Description]["+options.index+"][id]",
                              className: "descriptor-id",
@@ -161,17 +161,17 @@ var EvalViewer = Class.create({
     var descriptors = Builder.node("div", {className: "descriptors"});
 
     // generate multiplier element
-    var multiplier  = Builder.node("div", {name: "data[Question]["+options.index+"][multiplier]",
-                                              className: "multiplier", style:"width: 18px; float:right"}, options.multiplier);
+    var multiplier  = Builder.node("span", {name: "data[Question]["+options.index+"][multiplier]",
+                                              className: "multiplier", style:""}, options.multiplier);
 
 
     // generate question body
     var question_body = Builder.node("div", {className: "question-body"}, [
-      Builder.node("div", {class: "descriptor-title"}, [
+      Builder.node("div", {'class': "descriptor-title"}, [
         "Descriptors: "
           ]),
          
-      Builder.node("div", {class: "scale-weight", style:"width:110px"}, ["Scale Weight:", multiplier]),
+      Builder.node("div", {'class': "scale-weight", style:""}, ["Scale Weight:", multiplier]),
       descriptors
     ]);
 

@@ -1278,10 +1278,7 @@ AjaxListAction.prototype.performAction = function(event, action) {
 
     this.close();
 
-    if (newWindow) {
-        var link = new Element("a");
-        window.open(this.root + url,"_blank", "width=770,height=700,scrollbars=yes");
-    } else {
-        window.location = this.root + url;
-    }
+    if (!newWindow) {
+       window.location = this.root + url;
+    } 
 }

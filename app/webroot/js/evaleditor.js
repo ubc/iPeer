@@ -120,7 +120,7 @@ var EvalEditor = Class.create({
       ])
     ]);
    
-    var elem = Builder.node("div", {class: "remove-button"}, "X");
+    var elem = Builder.node("div", {"class": "remove-button"}, "X");
     $(elem).observe('click', this.onRemoveQuestion.bindAsEventListener(this));
 
     questionElement.down(".question-tab").insert({after: elem});
@@ -174,7 +174,7 @@ var EvalEditor = Class.create({
 
     options = Object.extend(defaults, options || { });
 
-    var descriptor = Builder.node("div", {class: "descriptor"}, [
+    var descriptor = Builder.node("div", {"class": "descriptor"}, [
       Builder.node("input", {type: "hidden",
                              name: "data[Question]["+options.question_index+"][Description]["+options.index+"][id]",
                              className: "descriptor-id",
@@ -183,7 +183,7 @@ var EvalEditor = Class.create({
                                                     cols: 20,
                                                     rows: 3,
                                                     className:"question-descriptor"}, options.descriptor)),
-      Builder.node("div", {class: "remove-descriptor-button text-button"}, "X"),
+      Builder.node("div", {"class": "remove-descriptor-button text-button"}, "X"),
       "Mark:",
       Builder.node("input", {name: "marks",
                              readonly: "readonly",
@@ -223,11 +223,11 @@ var EvalEditor = Class.create({
 
     // generate question body
     var question_body = Builder.node("div", {className: "question-body"}, [
-      Builder.node("div", {class: "descriptor-title"}, [
+      Builder.node("div", {"class": "descriptor-title"}, [
         "Descriptors: ", 
         Builder.node("span", {className: "add-descriptor-button text-button"}, "[Add]")
       ]),
-      Builder.node("div", {class: "scale-weight"}, ["Scale Weight", multiplier]),
+      Builder.node("div", {"class": "scale-weight"}, ["Scale Weight", multiplier]),
       descriptors
     ]);
 

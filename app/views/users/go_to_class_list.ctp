@@ -27,9 +27,65 @@ foreach ($classList as $person) {
 </table>
 
 <script type="text/javascript">
+/* Formating function for row details */
+function fnFormatDetails ( oTable, nTr )
+{
+    var aData = oTable.fnGetData( nTr );
+    var sOut = '<div class="userActionPanel"><ul>';
+
+    sOut += '<li>';
+    sOut += '<a href="/users/view/'+aData[0]+'">View</a>'; 
+    sOut += '</li>';
+
+    sOut += '<li>';
+    sOut += '<a href="/users/edit/'+aData[0]+'">Edit</a>'; 
+    sOut += '</li>';
+
+    sOut += '<li>';
+    sOut += '<a href="/emailer/write/U/'+aData[0]+'">Email</a>'; 
+    sOut += '</li>';
+
+    sOut += '<li>';
+    sOut += '<a href="/users/resetPassword/'+aData[0]+'">Reset Password</a>'; 
+    sOut += '</li>';
+
+    sOut += '<li>';
+    sOut += '<a href="/users/delete/'+aData[0]+'">Delete</a>'; 
+    sOut += '</li>';
+
+    sOut += '</ul></div>';
+     
+    return sOut;
+}
+ 
 jQuery(document).ready(function() {
-  jQuery('#table_id').dataTable( {
-    "sPaginationType" : "full_numbers"
-  } );
+    /*
+     * Initialse DataTables, with no sorting on the 'details' column
+     */
+    var oTable = jQuery('#table_id').dataTable( {
+      "sPaginationType" : "full_numbers",
+      "aoColumnDefs": [
+        { "bSearchable": false, "bVisible": false, "bSortable":false, "aTargets": [ 0 ] }
+        ],
+        "aaSorting" : [[1, 'asc']]
+    });
+     
+    /* Add event listener for opening and closing details
+     * Note that the indicator for showing which row is open is not controlled by DataTables,
+     * rather it is done here
+     */
+    jQuery('#table_id tbody td').live('click', function () {
+        var nTr = jQuery(this).parents('tr')[0];
+        if ( oTable.fnIsOpen(nTr) )
+        {
+            /* This row is already open - close it */
+            oTable.fnClose( nTr );
+        }
+        else
+        {
+            /* Open this row */
+            oTable.fnOpen( nTr, fnFormatDetails(oTable, nTr), 'userActionPanel' );
+        }
+    } );
 } );
 </script>

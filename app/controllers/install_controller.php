@@ -84,7 +84,6 @@ class InstallController extends Controller
             if (!$this->InstallValidationStep3->validates()) {
                 // fails validation
                 $this->Session->setFlash(__('Please fill in all fields.', true));
-                $errors = $this->InstallValidationStep3->invalidFields();
                 return;
             }
 
@@ -125,7 +124,6 @@ class InstallController extends Controller
             if (!$this->InstallValidationStep4->validates()) {
                 // fails validation
                 $this->Session->setFlash(__('Please fill in all fields.', true));
-                $errors = $this->InstallValidationStep4->invalidFields();
                 return;
             }
 

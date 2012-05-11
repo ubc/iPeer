@@ -115,39 +115,39 @@ class User extends AppModel
         ),
     );
 
-  public $validate = array(
-    'username'  => array(
-      'character' => array(
-        'rule' => 'alphaNumeric',
-        'message' => 'Usernames may only have letters and numbers.'
-      ),
-      'minLength' => array(
-        'rule' => array('minLength', 6),
-        'message' => 'Usernames must be at least 6 characters.'
-      ),
-      'unique' => array(
-        'rule' => 'isUnique',
-        'message' => 'Duplicate Username found. Please select another.'
-      )
-    ),
-    'email'     => array(
-      'rule'       => array('validEmail'),
-      'allowEmpty' => true,
-      'message'    => 'Invalid email format.'
-    ),
-    'first_name' => array(
-      'rule' => 'notEmpty',
-      'message' => "First name cannot be empty, it is used as the display name."
-    ),
-    'role'     => array(
-      'rule' => 'notEmpty',
-      'message' => 'Role field may not be left blank.'
-    ),
-    'send_email_notification' => array(
-      'rule' => array('requiredWith', 'email'),
-      'message' => 'Email notification requires an email address.'
-    )
-  );
+    public $validate = array(
+        'username'  => array(
+            'character' => array(
+                'rule' => 'alphaNumeric',
+                'message' => 'Usernames may only have letters and numbers.'
+            ),
+            'minLength' => array(
+                'rule' => array('minLength', 6),
+                'message' => 'Usernames must be at least 6 characters.'
+            ),
+            'unique' => array(
+                'rule' => 'isUnique',
+                'message' => 'Duplicate Username found. Please select another.'
+            )
+        ),
+        'email'     => array(
+            'rule'       => array('validEmail'),
+            'allowEmpty' => true,
+            'message'    => 'Invalid email format.'
+        ),
+        'first_name' => array(
+            'rule' => 'notEmpty',
+            'message' => "First name cannot be empty, it is used as the display name."
+        ),
+        'role'     => array(
+            'rule' => 'notEmpty',
+            'message' => 'Role field may not be left blank.'
+        ),
+        'send_email_notification' => array(
+            'rule' => array('requiredWith', 'email'),
+            'message' => 'Email notification requires an email address.'
+        )
+    );
 
 
     /**
@@ -225,7 +225,7 @@ class User extends AppModel
      *
      * @access public
      * @return array with user data
-     */
+     * */
     public function findUser ($username, $password)
     {
         return $this->find('first', array('conditions' => array('username' => $username,
@@ -240,7 +240,7 @@ class User extends AppModel
      *
      * @access public
      * @return array with user data
-     */
+     * */
     function findUserByStudentNo ($studentNo = null)
     {
         if (!empty($studentNo)) {
@@ -257,7 +257,7 @@ class User extends AppModel
      *
      * @access public
      * @return array with user data
-     */
+     * */
     function findUserByid ($id, $params = array())
     {
         if (null == $id) {
@@ -278,7 +278,7 @@ class User extends AppModel
      *
      * @access public
      * @return void
-     */
+     * */
     function findUserByidWithFields($id , $fields = array())
     {
         $result = $this->find('first', array('conditions' => array('User.id' => $id),
@@ -295,7 +295,7 @@ class User extends AppModel
      *
      * @access public
      * @return array with user data
-     */
+     * */
     function getByUsername($username)
     {
         return $this->find(
@@ -312,7 +312,7 @@ class User extends AppModel
      *
      * @access public
      * @return void
-     */
+     * */
     function getByUsernames($usernames, $contain = false)
     {
         return $this->find(
@@ -328,7 +328,7 @@ class User extends AppModel
      *
      * @access public
      * @return user id
-     */
+     * */
     function getUserIdByStudentNo($studentNo)
     {
         if (!empty($studentNo)) {
@@ -349,7 +349,7 @@ class User extends AppModel
      *
      * @access public
      * @return students enrolled in a course
-     */
+     * */
     function getEnrolledStudents($course_id, $fields = array(), $conditions = null)
     {
         return $this->find('all', array('conditions' => array('Enrolment.id' => $course_id),
@@ -364,7 +364,7 @@ class User extends AppModel
      *
      * @access public
      * @return list of enrolled students
-     */
+     * */
     function getEnrolledStudentsForList($course_id)
     {
         $this->displayField = 'student_no_with_full_name';
@@ -384,7 +384,7 @@ class User extends AppModel
      *
      * @access public
      * @return array with user data
-     */
+     * */
     function getUserByEmail($email = '')
     {
         //return $this->find( "email='" . $email );
@@ -401,7 +401,7 @@ class User extends AppModel
      *
      * @access public
      * @return array with user data
-     */
+     * */
     function findUserByEmailAndStudentNo($email = '', $studentNo = '')
     {
         //return $this->find("email='" .$email . "' AND student_no='" . $studentNo . "'");
@@ -419,7 +419,7 @@ class User extends AppModel
      *
      * @access public
      * @return boolean whether or not user can remove the course from the student
-     */
+     * */
     function canRemoveCourse($user, $course_id)
     {
 
@@ -454,7 +454,7 @@ class User extends AppModel
      *
      * @access public
      * @return full name of a role
-     */
+     * */
     function getRoleText($role)
     {
         if (!empty($role)) {
@@ -481,7 +481,7 @@ class User extends AppModel
      *
      * @access public
      * @return hashed password
-     */
+     * */
     function hashPasswords($data)
     {
         if (isset($data['User']['password'])) {
@@ -500,7 +500,7 @@ class User extends AppModel
      *
      * @access public
      * @return role
-     */
+     * */
     function getRoleById($id)
     {
         if (null == $id) {
@@ -516,93 +516,6 @@ class User extends AppModel
     }
 
     /**
-     * Get user's roles
-     *
-     * @param int $id user id
-     *
-     * @access public
-     * @return array of user's roles
-     */
-    function getRoles($id)
-    {
-        $user = $this->read(null, $id);
-
-        return $this->getRolesByRole($user['Role']);
-    }
-
-    /**
-     * Get role names by role ids
-     *
-     * @param array $roles array of role ids
-     *
-     * @access public
-     * @return role names
-     */
-    function getRolesByRole($roles)
-    {
-        $ret = array();
-        if (!empty($roles)) {
-            foreach ($roles as $role) {
-                $ret[$role['id']] = $role['name'];
-            }
-        }
-
-        return $ret;
-    }
-
-    /**
-     * Return true if roles is any other then student
-     *
-     * @param array $roles roles
-     *
-     * @access public
-     * @return true if role isnt a student
-     */
-    function hasTitle($roles)
-    {
-        $hasTitle = false;
-        foreach ($roles as $key => $role) {
-            if (is_array($role)) {
-                if ('student' != $role['name']) {
-                    $hasTitle = true;
-                }
-            } else {
-                if ('student' != $role) {
-                    $hasTitle = true;
-                }
-            }
-        }
-
-        return $hasTitle;
-    }
-
-    /**
-     * Return true if role is a student
-     *
-     * @param array $roles roles
-     *
-     * @access public
-     * @return true if role is a student
-     */
-    function hasStudentNo($roles)
-    {
-        $hasStudentNo = false;
-        foreach ($roles as $key => $role) {
-            if (is_array($role)) {
-                if (isset($role['name']) && ('student' == $role['name'])) {
-                    $hasStudentNo = true;
-                }
-            } else {
-                if ('student' == $role) {
-                    $hasStudentNo = true;
-                }
-            }
-        }
-
-        return $hasStudentNo;
-    }
-
-    /**
      * Remove enrolled user from course. For student enrolment in a course.
      *
      * @param int $id        user id
@@ -610,7 +523,7 @@ class User extends AppModel
      *
      * @access public
      * @return False on failure, true otherwise.
-     */
+     * */
     function dropEnrolment($id, $course_id)
     {
         return $this->habtmDelete('Enrolment', $id, $course_id);
@@ -624,7 +537,7 @@ class User extends AppModel
      *
      * @access public
      * @return False on failure, true otherwise.
-     */
+     * */
     function registerEnrolment($id, $course_id)
     {
         return $this->habtmAdd('Enrolment', $id, $course_id);
@@ -638,7 +551,7 @@ class User extends AppModel
      *
      * @access public
      * @return False on failure, true otherwise.
-     */
+     * */
     function dropRole($id, $role_id)
     {
         return $this->habtmDelete('Role', $id, $role_id);
@@ -652,7 +565,7 @@ class User extends AppModel
      *
      * @access public
      * @return False on failure, true otherwise.
-     */
+     * */
     function registerRole($id, $role_id)
     {
         return $this->habtmAdd('Role', $id, $role_id);
@@ -666,7 +579,7 @@ class User extends AppModel
      *
      * @access public
      * @return list of instructors
-     */
+     * */
     function getInstructors($type, $params)
     {
         $defaults = array('order' => $this->alias.'.first_name');
@@ -703,7 +616,7 @@ class User extends AppModel
      *
      * @access public
      * @return $user logged in user
-     */
+     * */
     function getCurrentLoggedInUser()
     {
         App::import('Component', 'Session');
@@ -720,7 +633,7 @@ class User extends AppModel
      *
      * @access public
      * @return array result
-     */
+     * */
     function addUserByArray($userList, $updateExisting = false)
     {
         $data = array();
@@ -744,7 +657,7 @@ class User extends AppModel
             }
             if ($u[IMPORT_PASSWORD]) {
                 App::import('Lib', 'neat_string');
-                $u[IMPORT_PASSWORD] = NeatString::randomPassword(6);
+                $u[IMPORT_PASSWORD] = PasswordGenerator::generate();
                 $tmp['generated_password'] = true;
             }
 
@@ -808,52 +721,6 @@ class User extends AppModel
         }
 
         return array('created_students' => $data, 'updated_students' => Set::classicExtract($existings, '{n}.User'));
-
-    /*  if ($this->User->save($data))
-      {
-        //New user, save it as usual
-        $result['created_students'][$createdPos++] = $data;
-
-        //Save enrol record
-        if (isset($this->params['form']['course_id']) && $this->params['form']['course_id'] > 0)
-        {
-          $userEnrol['UserEnrol']['course_id'] = $this->params['form']['course_id'];
-          $userEnrol['UserEnrol']['user_id'] = $this->User->id;
-          $userEnrol['UserEnrol']['creator_id'] = $this->Auth->user('id');
-          $this->UserEnrol->save($userEnrol);
-          $this->UserEnrol->id = null;
-        }
-
-      } else {
-        if (isset($this->params['form']['course_id']))
-        {
-          $curUser = $this->User->find('username="'.$data['User']['username'].'"');
-          //Existing user, get this user with the course id
-          $enrolled = $this->UserEnrol->getEnrolledStudents($this->params['form']['course_id'], null, 'User.username="'.$data['User']['username'].'"');
-          //Current user does not registered to this course yet
-          if (empty($enrolled)) {
-            $userEnrol['UserEnrol']['course_id'] = $this->params['form']['course_id'];
-            $userEnrol['UserEnrol']['user_id'] = $curUser['User']['id'];
-            $userEnrol['UserEnrol']['creator_id'] = $this->Auth->user('id');
-            $this->UserEnrol->save($userEnrol);
-            $this->UserEnrol->id = null;
-            $result['created_students'][$createdPos++] = $data;
-          } else {
-            //Current user already registered
-            $result['failed_students'][$failedPos] = $data;
-            $result['failed_students'][$failedPos++]['User']['error_message'] = __('This user has been already added to this course.', true);
-          }
-
-        } else {
-          //Current user already registered
-          $result['failed_students'][$failedPos] = $data;
-          $result['failed_students'][$failedPos++]['User']['error_message'] = __('This user has been already added to the database.', true);
-        }
-
-      }
-    }
-
-return $result;*/
     }
 
     /**
@@ -888,7 +755,7 @@ return $result;*/
      *
      * @access public
      * @return void
-     */
+     * */
     function getInstance($user = null)
     {
         static $instance = array();
@@ -912,7 +779,7 @@ return $result;*/
      *
      * @access public
      * @return void
-     */
+     * */
     function store($user)
     {
         if (empty($user)) {
@@ -929,7 +796,7 @@ return $result;*/
      *
      * @access public
      * @return void
-     */
+     * */
     function get($path)
     {
         $_user =& User::getInstance();
@@ -958,38 +825,30 @@ return $result;*/
      *
      * @access public
      * @return bool if user is logged in
-     */
+     * */
     function isLoggedIn()
     {
         return self::getInstance() !== null;
     }
 
-
     /**
-     * getMyCourses return the courses that the current user teaches
+     * Given a user id and a role string, check if that user has that
+     * role. E.g.: isRole(1, 'superadmin')
      *
-     * @access public
-     * @return array list of courses
-     */
-    function getMyCourses()
-    {
-        $model = Classregistry::init('Course');
-
-        return $model->getCourseByInstructor(self::get('id'));
-    }
-
-
-    /**
-     * getMyCourseList get the list of courses
+     * @param int    $id   - the user id
+     * @param string $role - the name of the role to check for
      *
-     * @access public
-     * @return array list of courses
-     */
-    function getMyCourseList()
+     * @return true if the user $id has $role, false otherwise
+     * */
+    public function isRole($id, $role)
     {
-        $model = Classregistry::init('Course');
-
-        return $model->getCourseListByInstructor(self::get('id'));
+        $data = $this->findById($id);
+        foreach ($data['Role'] as $r) {
+            if ($r['name'] == $role) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

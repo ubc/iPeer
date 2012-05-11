@@ -46,6 +46,17 @@ class EmailerController extends AppController
     }
 
     /**
+     * Need this to allow the send page to be accessed by unloggedin users.
+     * The send page needs this free access in order to accomdate cron jobs
+     * which enable the scheduled email delivery feature.
+     * */
+    function beforeFilter() {
+        parent::beforeFilter();
+        // Need to be able to cron job send, so should allow unauthed access
+        $this->Auth->allow('send');
+    }
+
+    /**
      * setUpAjaxList
      *
      * @access public
@@ -123,7 +134,7 @@ class EmailerController extends AppController
      * @access public
      * @return void
      */
-    function index()
+    public function index()
     {
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
@@ -132,70 +143,68 @@ class EmailerController extends AppController
     }
 
     /**
-     * write
-     * Write an email
+     * Write an email to either a class, group, or user.
      *
-     * @param mixed $to parameter for recipients
+     * There are 3 possible character values for type:
+     * 'C' - for class
+     * 'G' - for group
+     * ' ' - no clue what this is used for, but it returns an empty list
+     *
+     * All others characters indicate single user.
+     *
+     * @param string $type - a class, group, or user
+     * @param int $id - the id of the class, group, or user we're writing to
      *
      * @access public
      * @return void
      */
-    function write($to = ' ')
-    {
-        //TODO: preview function
-        if (isset($this->params['form']['preview'])) {
-            $this->render('preview');
+    public function write($type, $id) {
+        $this->set('title_for_layout', 'Write Email');
+
+        if (!isset($this->data)) {
+            //Get recipients' email address
+            $recipients = $this->getRecipient($type, $id);
+            $this->set('recipients', $recipients['Display']);
+            //Write current recipients into session
+            $this->Session->write('email_recipients', $recipients['Users']);
+            //Users who are not in recipients of the email
+            $this->set('recipients_rest', $this->User->find('list', array(
+                'conditions'=>array('NOT' => array('User.id' => array_flip($this->getRecipient($type, $id, 'list')))))));
+            $this->set('from', $this->Auth->user('email'));
+            $this->set('templatesList', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id'), 'list'));
+            $this->set('templates', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id')));
+            $this->set('mergeList', $this->EmailMerge->getMergeList());
         } else {
-            if (!isset($this->data)) {
-                //Get recipients' email address
-                $emailAddress = $this->getEmailAddress($to);
-                if (is_array($emailAddress)) {
-                    $emailAddress = implode('; ', $emailAddress);
-                }
+            $recipients = $this->Session->read('email_recipients');
+            $data = $this->data;
+            $data = $data['Email'];
 
-                $recipients = $this->getRecipient($to);
-                $this->set('recipients', $recipients['Display']);
-                //Write current recipients into session
-                $this->Session->write('email_recipients', $recipients['Users']);
-                //Users who are not in recipients of the email
-                $this->set('recipients_rest', $this->User->find('list', array(
-                    'conditions'=>array('NOT' => array('User.id' => array_flip($this->getRecipient($to, 'list')))))));
-                $this->set('from', $this->Auth->user('email'));
-                $this->set('templatesList', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id'), 'list'));
-                $this->set('templates', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id')));
-                $this->set('mergeList', $this->EmailMerge->getMergeList());
-            } else {
-                $recipients = $this->Session->read('email_recipients');
-                $data = $this->data;
-                $data = $data['Email'];
-
-                $data['from'] = $this->Auth->user('id');
-                $to = array();
-                foreach ($recipients as $key => $r) {
-                    $to[$key] = $r['User']['id'];
-                }
-                $to = implode(';', $to);
-                $data['to'] = $to;
-                $date = $data['date'];
-
-                //Set current date if no schedule
-                if (!$data['schedule']) {
-                    $data['date'] = date("Y-m-d H:i:s");
-                } else {
-                    $tmp_data = array();
-                    for ($i=1; $i<=$data['times']; $i++) {
-                        $tmp_data[$i] = $data;
-                        $tmp_data[$i]['date'] = date("Y-m-d H:i:s", strtotime($date) + ($i-1)*$data['interval_type']*$data['interval_num']);
-                    }
-                    $data = $tmp_data;
-                }
-
-                //Push an email into email_schedules table
-                $this->EmailSchedule->saveAll($data);
-
-                $this->Session->setFlash(__('The Email was saved successfully', true));
-                $this->redirect('index/');
+            $data['from'] = $this->Auth->user('id');
+            $to = array();
+            foreach ($recipients as $key => $r) {
+                $to[$key] = $r['User']['id'];
             }
+            $to = implode(';', $to);
+            $data['to'] = $to;
+            $date = $data['date'];
+
+            //Set current date if no schedule
+            if (!$data['schedule']) {
+                $data['date'] = date("Y-m-d H:i:s");
+            } else {
+                $tmp_data = array();
+                for ($i=1; $i<=$data['times']; $i++) {
+                    $tmp_data[$i] = $data;
+                    $tmp_data[$i]['date'] = date("Y-m-d H:i:s", strtotime($date) + ($i-1)*$data['interval_type']*$data['interval_num']);
+                }
+                $data = $tmp_data;
+            }
+
+            //Push an email into email_schedules table
+            $this->EmailSchedule->saveAll($data);
+
+            $this->Session->setFlash(__('The Email was saved successfully', true));
+            $this->redirect('index/');
         }
     }
 
@@ -299,56 +308,26 @@ class EmailerController extends AppController
     }
 
     /**
-     * Get email addresses
+     * Get a list of email addresses from the id. If type is a class, then
+     * we get the email address of all the students in the class. Same if
+     * it's a group. If it's a single user, then we only get a single address.
      *
-     * @param mixed $to recipients
+     * There are 3 possible character values for type:
+     * 'C' - for class
+     * 'G' - for group
+     * ' ' - no clue what this is used for, but it returns an empty list
      *
-     * @return List of users' email address
-     */
-    function getEmailAddress($to)
-    {
-
-        $type = $to[0];
-        $id = substr($to, 1);
-        switch($type){
-        case ' ':
-            return '';
-            break;
-        case 'C': //Email addresses for all in Course
-            return $this->User->find('list', array(
-                'fields' => array('email'),
-                'conditions' => array('User.id' => $this->UserEnrol->getUserListByCourse($id))
-            ));
-            break;
-        case 'G': //Email addresses for all in group
-            return $this->User->find('list', array(
-                'fields' => array('email'),
-                'conditions' => array('User.id' => $this->GroupsMembers->getMembers($id))
-            ));
-            break;
-        default: //Email address for a user
-            return $this->User->find('list', array(
-                'fields' => array('email'),
-                'conditions' => array('User.id' => $to)
-            ));
-
-        }
-    }
-
-    /**
-     * Get recipients
+     * All others characters indicate single user.
      *
-     * @param mixed $to     recipients
-     * @param mixed $s_type find type
+     * @param string $type - a class, group, or user
+     * @param int $id - the id of the class, group, or user we're writing to
      *
      * @return array of recipients and info
      */
-    function getRecipient($to, $s_type = 'all')
+    function getRecipient($type, $id, $s_type = 'all')
     {
         $result = array();
         $this->User->recursive = -1;
-        $type = $to[0];
-        $id = substr($to, 1);
         switch($type){
         case ' ':
             $display = array();
@@ -381,11 +360,11 @@ class EmailerController extends AppController
         default: //Email address for a user
             $users = $this->User->find($s_type, array(
                 //'fields' => array('email'),
-                'conditions' => array('User.id' => $to)
+                'conditions' => array('User.id' => $id)
             ));
             $user = $this->User->find('first', array(
                 //'fields' => array('email'),
-                'conditions' => array('User.id' => $to)
+                'conditions' => array('User.id' => $id)
             ));
             $display['name'] = $user['User']['full_name'];
             $display['link'] = '/users/view/'.$user['User']['id'];
@@ -438,7 +417,6 @@ class EmailerController extends AppController
         preg_match_all('/'.$start.'(.*?)'.$end.'/', $string, $matches, PREG_OFFSET_CAPTURE);
         $patterns = array();
         $replacements = array();
-        $merge_count = 0;
         $patterns = $matches[0];
         foreach ($matches[0] as $key => $match) {
             $patterns[$key] = '/'.$match[0].'/';
@@ -458,10 +436,10 @@ class EmailerController extends AppController
     }
 
     /**
-     * Send emails
+     * Goes through scheduled emails that have not yet been sent,
+     * send them if they're due and mark them them as sent.
      */
-    function send()
-    {
+    public function send() {
         $this->layout = 'ajax';
         $emails = $this->EmailSchedule->getEmailsToSend();
 
@@ -469,11 +447,12 @@ class EmailerController extends AppController
             $e = $e['EmailSchedule'];
 
             $from_id = $e['from'];
-            $from = $this->User->getEmailById($from_id);
+            $from = $this->getEmailAddress($from_id);
+            // TODO what to do if no from address?
 
             $to_ids = explode(';', $e['to']);
             foreach ($to_ids as $to_id) {
-                $to = $this->User->getEmailById($to_id);
+                $to = $this->getEmailAddress($to_id);
                 $subject = $e['subject'];
                 $content = $this->doMerge($e['content'], $this->mergeStart, $this->mergeEnd, $to_id);
                 if ($this->_sendEmail($content, $subject, $from, $to)) {
@@ -485,5 +464,16 @@ class EmailerController extends AppController
 
             }
         }
+    }
+
+    /**
+     * Given a user id, get the email address associated with that id, if any.
+     *
+     * @param int $id - the user id
+     *
+     * @return The user's email address, if it exists, empty string if not
+     */
+    private function getEmailAddress($id) {
+        return $this->User->field('email', array('User.id' => $id));
     }
 }

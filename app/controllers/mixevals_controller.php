@@ -128,7 +128,7 @@ class MixevalsController extends AppController
             array(__("Edit Evaluation", true), "", $restrictions, "", "edit", "Mixeval.id"),
             array(__("Copy Evaluation", true), "", "", "", "copy", "Mixeval.id"),
             array(__("Delete Evaluation", true), $warning, $restrictions, "", "delete", "Mixeval.id"),
-            array(__("View Creator", true), "",    "", "users", "view", "Creator.id"));
+            array(__("View Creator", true), "",    "", "users", "view", "Mixeval.creator_id"));
 
         // No recursion in results
         $recursive = 0;
@@ -232,11 +232,11 @@ class MixevalsController extends AppController
                 $id = $this->Mixeval->id;
                 $question_ids= $this->MixevalsQuestion->find('all', array('conditions' => array('mixeval_id'=> $id), 'fields' => array('MixevalsQuestion.id, question_num')));
                 $this->MixevalsQuestionDesc->insertQuestionDescriptor($this->data['Question'], $question_ids);
-                $this->Session->setFlash(__('The Mixed Evaluation was added successfully.', true));
+                $this->Session->setFlash(__('The Mixed Evaluation was added successfully.', true), 'good');
                 $this->redirect('index');
             } else {
                 $this->set('data', $this->data);
-                $this->set('errmsg', $this->Mixeval->errorMessage);
+                $this->Session->setFlash($this->Mixeval->getErrorMessage());
             }
         }
         $this->set('data', $this->data);
@@ -347,9 +347,11 @@ class MixevalsController extends AppController
         $this->set('action', __('Copy Mixed Evaluation', true));
         $this->render = false;
         $this->Mixeval->id = $id;
-        $data = $this->Mixeval->read();
-        $data['Mixeval']['name'] = ""; // Clear the name when evaluation copied
-        $this->set('data', $data);
+        $this->data = $this->Mixeval->find('first', array('conditions' => array('id' => $id),
+                'contain' => array('Question.Description',
+                )));
+        $this->data['Mixeval']['name'] = "Copy of ".$this->data['Mixeval']['name']; 
+        $this->set('data', $this->data);
         $this->render('edit');
     }
 

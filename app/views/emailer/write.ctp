@@ -1,7 +1,8 @@
 <?php 
-  echo $html->script('emailtemplates.js');
-  echo $html->script('calendar1');
+echo $html->script('emailtemplates.js');
+echo $html->script('calendar1');
 ?>
+
 <form method="post" action="<?php echo $html->url('/emailer/write/'); ?>" name="emailer" id="emailer" class="emailer">
   <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
@@ -35,7 +36,7 @@
             <td>&nbsp;</td>
           </tr>
           <tr class="tablecell2">
-            <td><?php __('Schedule?')?>:</td>
+            <td><?php __('Schedule')?>:</td>
 
             <td>
               <table>
@@ -79,7 +80,7 @@
             <td>
               <table>
               <tr><td>
-              <?php echo $html->link(__('Add Email Template', true), 'add/', array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"));?>
+              <?php echo $html->link(__('Add Email Template', true), '/emailtemplates/add/', array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"));?>
               </td></tr>
               <tr><td>
               <?php echo $form->input('Email.template', array(
