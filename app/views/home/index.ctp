@@ -27,16 +27,16 @@ if (isset($course_list['A']))
     {
       $eventTitle = $this->Html->link(
         $event['title'],
-        ($event['event_template_type_id'] == 3) ? 
-        '/surveygroups/viewresult/'.$event['id'] : 
+        ($event['event_template_type_id'] == 3) ?
+        '/surveygroups/viewresult/'.$event['id'] :
         '/evaluations/view/'.$event['id']);
       $eventReview = '';
       if ($event['to_review_count'] > 0)
       {
-        $eventReview = $event['to_review_count'] . 
+        $eventReview = $event['to_review_count'] .
            ' unreviewed group evaluations.';
       }
-      $eventRatio = $event['completed_count'] .' of '. 
+      $eventRatio = $event['completed_count'] .' of '.
         $event['student_count'] . ' Students';
       $eventDue = Toolkit::formatDate($event['due_date']);
       echo $this->Html->tableCells(
@@ -69,6 +69,10 @@ if (isset($course_list['I']))
 }
 
 ?>
+
+<?php if (empty($course_list)):?>
+    <?php echo __('You do not have any course.') ?>
+<?php endif; ?>
 
 <div class='toggle' style="text-align:right">
 <a href="#" onclick="javascript:$('short_help').toggle();return false;">

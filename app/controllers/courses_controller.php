@@ -93,10 +93,9 @@ class CoursesController extends AppController
         $joinTables = array();
 
         // For instructors: only list their own courses
-        $extraFilters = $this->Auth->user('role') == 'A' ?
+        $extraFilters = (User::hasRole('superadmin') || User::hasRole('admin')) ?
             array('Instructor.id' => $this->User->find('list', array('fields'=>array('User.id')))) :
             array('Instructor.id' => $this->Auth->user('id'));
-
 
         // Set up actions
         $warning = __("Are you sure you want to delete this course permanently?", true);
@@ -205,7 +204,7 @@ class CoursesController extends AppController
         $this->set('groupCount', count($course['Group']));
         $this->set('eventCount', count($course['Event']));
 
-		$this->set('title_for_layout', 
+		$this->set('title_for_layout',
 			$course['Course']['course'].' - '.$course['Course']['title']);
 
         //Setup the Personalization list
@@ -319,11 +318,8 @@ class CoursesController extends AppController
             if (!empty($events)) {
 
             }
-            //refresh my accessible courses on session
-            $myCourses = $this->Course->findAccessibleCoursesListByUserIdRole($this->Auth->user('id'), $this->Auth->user('role'));
-            $this->sysContainer->setMyCourseList($myCourses);
-            // Finished all deletion of course related data
-            $this->redirect('/courses/index/'.__('The course was deleted successfully.', true));
+
+            $this->Session->setFlash(__('The course was deleted successfully.', true));
         } else {
             $this->set('errmsg', $this->Course->errorMessage);
             $this->redirect('/courses/index');

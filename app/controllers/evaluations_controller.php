@@ -1104,7 +1104,7 @@ class EvaluationsController extends AppController
         //Setup the courseId to session
         $this->rdAuth->setCourseId($event['Event']['course_id']);
         $courseId = $this->rdAuth->courseId;
-        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, $this->Auth->user('role')).' > '.$event['Event']['title']. __(' > View My Results ', true));
+        $this->set('title_for_layout', __(' > View My Results ', true));
 
         //Get Group Event
         $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($event['Event']['id'], $event['group_id']);

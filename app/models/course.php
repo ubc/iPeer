@@ -246,22 +246,6 @@ class Course extends AppModel
         }
     }
 
-
-    /**
-     * Find all accessible courses id
-     *
-     * @param unknown_type $user user data
-     *
-     * @return list of accessible courses
-     */
-
-    function findAccessibleCoursesList($user=null)
-    {
-        $userId=$user['id'];
-        $userRole=$user['role'];
-        return $this->findAccessibleCoursesListByUserIdRole($userId, $userRole);
-    }
-
     /**
      * Find all accessible courses id
      *
@@ -269,90 +253,77 @@ class Course extends AppModel
      * @param unknown_type $userRole  user role
      * @param unknown_type $condition search conditions
      *
-     * @return list of course ids
+     * @return array list of course ids
      */
 
-    function findAccessibleCoursesListByUserIdRole($userId=null, $userRole='', $condition=null)
+    /*
+    function findAccessibleCoursesListByUserIdRole($userId, $userRole, $condition=null)
     {
-        switch($userRole){
-        case 'S':
-            //$course =  $this->query('SELECT * FROM courses WHERE id IN ( SELECT DISTINCT course_id FROM user_enrols WHERE user_id = '.$userId.') ORDER BY course');
-            $conditionsSubQuery['UserEnrol.user_id'] = $userId;
-            $dbo = $this->UserEnrol->getDataSource();
-            $subQuery = $dbo->buildStatement(
-                array(
-                    'fields' => array('DISTINCT UserEnrol.course_id'),
-                    'table' => $dbo->fullTableName($this->UserEnrol),
-                    'alias' => 'UserEnrol',
-                    'conditions' => $conditionsSubQuery,
-                    'order' => null,
-                    'limit' => null,
-                    'group' => null
-                ),
-                $this->UserEnrol
-            );
-            $subQuery = 'Course.id IN (' . $subQuery . ') ';
-            $subQueryExpression = $dbo->expression($subQuery);
-            $conditions[] = $subQueryExpression;
-            $this->recursive = 0;
-            $course = $this->find('all', compact('conditions'));
-            return $course;
-            break;
-
-        case 'I':
-            //$course =  $this->query('SELECT * FROM courses WHERE id IN ( SELECT DISTINCT course_id FROM user_enrols WHERE user_id = '.$userId.') ORDER BY course');
-            $conditionsSubQuery['UserCourse.user_id'] = $userId;
-            $dbo = $this->UserCourse->getDataSource();
-            $subQuery = $dbo->buildStatement(
-                array(
-                    'fields' => array('DISTINCT UserCourse.course_id'),
-                    'table' => $dbo->fullTableName($this->UserCourse),
-                    'alias' => 'UserCourse',
-                    'conditions' => $conditionsSubQuery,
-                    'order' => null,
-                    'limit' => null,
-                    'group' => null
-                ),
-                $this->UserCourse
-            );
-            $subQuery = 'Course.id IN (' . $subQuery . ') ';
-            $subQueryExpression = $dbo->expression($subQuery);
-            $conditions[] = $subQueryExpression;
-            $this->recursive = 0;
-            $course = $this->find('all', compact('conditions'));
-            return $course;
-            break;
-        case 'A':
-            return $this->find('all', array(
-                'conditions' => $condition,
-                'order' => 'Course.course'
-            ));
-            break;
-
-        default:
-            $conditionsSubQuery['UserEnrol.user_id'] = $userId;
-            $dbo = $this->UserEnrol->getDataSource();
-            $subQuery = $dbo->buildStatement(
-                array(
-                    'fields' => array('DISTINCT UserEnrol.course_id'),
-                    'table' => $dbo->fullTableName($this->UserEnrol),
-                    'alias' => 'UserEnrol',
-                    'conditions' => $conditionsSubQuery,
-                    'order' => null,
-                    'limit' => null,
-                    'group' => null
-                ),
-                $this->UserEnrol
-            );
-            $subQuery = 'Course.id IN (' . $subQuery . ') ';
-            $subQueryExpression = $dbo->expression($subQuery);
-            $conditions[] = $condition + $subQueryExpression;
-            $conditions['Course.record_status'] = 'A';
-            $this->recursive = 0;
-            $course = $this->find('all', compact('conditions'));
-            return $course;
+        if (!is_numeric($userId) || empty($userRole)) {
+            return array();
         }
-    }
+
+        $courses = array();
+
+        foreach ((array) $userRole as $role) {
+            switch($role){
+            case 'instructor':
+                //$course =  $this->query('SELECT * FROM courses WHERE id IN ( SELECT DISTINCT course_id FROM user_enrols WHERE user_id = '.$userId.') ORDER BY course');
+                $conditionsSubQuery['UserCourse.user_id'] = $userId;
+                $dbo = $this->UserCourse->getDataSource();
+                $subQuery = $dbo->buildStatement(
+                    array(
+                        'fields' => array('DISTINCT UserCourse.course_id'),
+                        'table' => $dbo->fullTableName($this->UserCourse),
+                        'alias' => 'UserCourse',
+                        'conditions' => $conditionsSubQuery,
+                        'order' => null,
+                        'limit' => null,
+                        'group' => null
+                    ),
+                    $this->UserCourse
+                );
+                $subQuery = 'Course.id IN (' . $subQuery . ') ';
+                $subQueryExpression = $dbo->expression($subQuery);
+                $conditions[] = $subQueryExpression;
+                $this->recursive = 0;
+                $courses = $this->find('all', compact('conditions'));
+                break;
+            case 'superadmin':
+            case 'admin':
+                return $this->find('all', array(
+                    'conditions' => $condition,
+                    'order' => 'Course.course'
+                ));
+                break;
+
+            case 'student':
+            default:
+                //$course =  $this->query('SELECT * FROM courses WHERE id IN ( SELECT DISTINCT course_id FROM user_enrols WHERE user_id = '.$userId.') ORDER BY course');
+                $conditionsSubQuery['UserEnrol.user_id'] = $userId;
+                $dbo = $this->UserEnrol->getDataSource();
+                $subQuery = $dbo->buildStatement(
+                    array(
+                        'fields' => array('DISTINCT UserEnrol.course_id'),
+                        'table' => $dbo->fullTableName($this->UserEnrol),
+                        'alias' => 'UserEnrol',
+                        'conditions' => $conditionsSubQuery,
+                        'order' => null,
+                        'limit' => null,
+                        'group' => null
+                    ),
+                    $this->UserEnrol
+                );
+                $subQuery = 'Course.id IN (' . $subQuery . ') ';
+                $subQueryExpression = $dbo->expression($subQuery);
+                $conditions[] = $subQueryExpression;
+                $this->recursive = 0;
+                $course = $this->find('all', compact('conditions'));
+                return $course;
+                break;
+            }
+        }
+    }*/
 
     /**
      * Find the record count of all accessible courses

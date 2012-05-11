@@ -34,7 +34,7 @@
       <td width="663" id="first_name_msg" class="error"></td>
     </tr class="tablecell2">
     <?php if (isset($params['data']['User']['role']) && $params['data']['User']['role'] == 'S') { ?>
-        <?php if ($this->Auth->user('role') == 'A') { ?>
+        <?php if (User::hasRole('superadmin') || User::hasRole('admin')) { ?>
             <tr class="tablecell2">
             <td width="130" id="student_no_label"><?php __('Student No.')?>:</td>
             <td><?php echo $html->input('User/student_no', array('id'=>'student_no', 'size'=>'50', 'class'=>'validate none TEXT_FORMAT student_no_msg Invalid_Text._At_Least_One_Word_Is_Required.')) ?> </td>
@@ -55,7 +55,7 @@
       <td><?php echo $html->input('User/email', array('id'=>'email', 'size'=>'50', 'class'=>'validate none EMAIL_FORMAT email_msg Invalid_Email_Format.')) ?> </td>
       <td width="663" id="email_msg" class="error"></td>
     </tr>
-    <?php if (isset($params['data']['User']['role']) &&($params['data']['User']['role'] == 'S') && (($this->Auth->user('role') == 'I') || ($this->Auth->user('role') == 'A'))):?>
+    <?php if (isset($params['data']['User']['role']) &&($params['data']['User']['role'] == 'S') && (User::hasRole('instructor') || User::hasRole('admin') || User::hasRole('superadmin'))):?>
     <tr class="tablecell2">
       <td width="130" id="courses_label"><?php __("This student's<br />Courses")?>:</td>
       <td colspan=2>

@@ -85,7 +85,7 @@ class EmailtemplatesController extends AppController
 
         // Restriction for Instructor
         $restrictions = "";
-        if ($this->Auth->user('role') != 'A') {
+        if (!User::hasRole('superadmin') && !User::hasRole('admin')) {
             $restrictions = array(
                 "EmailTemplate.creator_id" => array($myID => true, "!default" => false)
             );

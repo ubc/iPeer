@@ -114,7 +114,7 @@ class MixevalsController extends AppController
 
         // Instructors can only edit their own evaluations
         $restrictions = "";
-        if ($this->Auth->user('role') != 'A') {
+        if (!User::hasRole('superadmin') && !User::hasRole('admin')) {
             $restrictions = array(
                 "Mixeval.creator_id" => array(
                     $myID => true,

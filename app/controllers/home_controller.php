@@ -23,54 +23,6 @@ class HomeController extends AppController
     public $components = array( 'Auth', 'Acl', 'Output');
 
     /**
-     * formatDate
-     * Temporary formatDate function
-     *
-     * @param mixed $timestamp
-     *
-     * @access public
-     * @return void
-     */
-    function formatDate($timestamp)
-    {
-        $sys_parameter = new SysParameter;
-        $data = $sys_parameter->findParameter('display.date_format');
-        $dateFormat = $data['SysParameter']['parameter_value'];
-
-        return date($dateFormat, $timestamp);
-/*
-    if (is_string($timestamp)) {
-      return date($dateFormat,strtotime($timestamp));
-    } else if (is_numeric($timestamp)) {
-      return date($dateFormat, $timestamp);
-    } else {
-      return "";
-    }
- */
-    }
-
-
-/*
-  function formatDate($events)
-{
-    $timestamp = date("Y-m2-d H:i:s", strtotime($comingUpEvent['Event']['due_date']));
-    $sys_parameter = new SysParameter;
-    $data = $sys_parameter->findParameter('display.date_format');
-    $dateFormat = $data['SysParameter']['parameter_value'];
-
-    $this->log($events);
-
-    if (is_string($timestamp)) {
-      return date($dateFormat,strtotime($timestamp));
-    } else if (is_numeric($timestamp)) {
-        $this->log(date($dateFormat, $timestamp));
-      return date($dateFormat, $timestamp);
-    } else {
-      return "";
-    }
-}*/
-
-    /**
      * __construct
      *
      * @access protected
@@ -497,42 +449,29 @@ class HomeController extends AppController
      */
     function index()
     {
-        $this->autoRender = false;
-        $role = $this->Auth->user('role');
-        $userId = $this->Auth->user('id');
-        if (isset ($role)) {
-            //General Home Rendering for Admin
-            if ($role == $this->User->USER_TYPE_ADMIN) {
+        //General Home Rendering for Admin
+        if (User::hasRole('superadmin') || User::hasRole('admin') || User::hasRole('instructor')) {
 
-                //          $inactiveCourseDetail = array();
-                //          $inactiveCourseList = $this->Course->getInactiveCourses();
-                //          $inactiveCourseDetail = $this->formatCourseList($inactiveCourseList);
-                //
-                //          $this->set('course_list', $inactiveCourseDetail);
-                //          $this->render('index');
+            //          $inactiveCourseDetail = array();
+            //          $inactiveCourseList = $this->Course->getInactiveCourses();
+            //          $inactiveCourseDetail = $this->formatCourseList($inactiveCourseList);
+            //
+            //          $this->set('course_list', $inactiveCourseDetail);
+            //          $this->render('index');
 
-                $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
-                $this->set('course_list', $this->formatCourseList($course_list));
-                $this->render('index');
-            }////General Home Rendering for Instructor
-            else if ($role == $this->User->USER_TYPE_INSTRUCTOR) {
-                $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
-                $this->set('course_list', $this->formatCourseList($course_list));
-                $this->render('index');
-            }//Student Home Rendering
-            else if ($role == $this->User->USER_TYPE_STUDENT) {
-                $this->set('data', $this->preparePeerEvals());
-
-                //Check if the student has a email in his/her profile
-                $email = $this->Auth->user('email');
-                if (!empty($email)) {
-                    $this->render('studentIndex');
-                } else {
-                    $this->redirect('/users/editProfile');
-                }
+            $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
+            $this->set('course_list', $this->formatCourseList($course_list));
+        } else if (User::hasRole('student')) {
+            //Check if the student has a email in his/her profile
+            $email = $this->Auth->user('email');
+            if (!empty($email)) {
+                $this->render('studentIndex');
+            } else {
+                $this->redirect('/users/editProfile');
             }
-        } else {
-            $this->redirect('/login');
+
+            //Student Home Rendering
+            $this->set('data', $this->_preparePeerEvals());
         }
     }
 
@@ -544,7 +483,7 @@ class HomeController extends AppController
      * @access public
      * @return void
      */
-    function preparePeerEvals()
+    function _preparePeerEvals()
     {
         $curUserId = $this->Auth->user('id');
         $eventAry = array();
@@ -570,7 +509,7 @@ class HomeController extends AppController
                     break;
                 default:
                     //Simple, Rubric and Mixed Evaluation
-                    $evaluation = $this->getEvaluation($curUserId, $event);
+                    $evaluation = $this->_getEvaluation($curUserId, $event);
                     if ($evaluation!=null) {
                         $eventAry[$pos] = $evaluation;
                         $pos++;
@@ -584,7 +523,7 @@ class HomeController extends AppController
 
 
     /**
-     * getEvaluation
+     * _getEvaluation
      *
      * @param mixed $userId user id
      * @param bool  $event  event
@@ -592,7 +531,7 @@ class HomeController extends AppController
      * @access public
      * @return void
      */
-    function getEvaluation($userId, $event=null)
+    function _getEvaluation($userId, $event=null)
     {
         $result = null;
         $groupsEvents = $this->GroupEvent->getGroupEventByUserId($userId, $event['id']);

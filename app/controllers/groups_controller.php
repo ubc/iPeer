@@ -124,7 +124,7 @@ class GroupsController extends AppController
 
             // For instructors: only list their own course events
             $extraFilters = "";
-        if ($this->Auth->user('role') != 'A') {
+        if (!User::hasRole('superadmin') && !User::hasRole('admin')) {
             $extraFilters = " ( ";
             foreach ($coursesList as $id => $course) {
                 $extraFilters .= "course_id=$id or ";

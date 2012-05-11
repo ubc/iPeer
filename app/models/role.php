@@ -13,6 +13,7 @@ class Role extends AppModel
     //The model name
     public $name = 'Role';
     public $test = 'a';
+    public $displayField = 'name';
 
     public $hasAndBelongsToMany = array(
         'User' => array(
@@ -25,7 +26,7 @@ class Role extends AppModel
         )
     );
 
-    public $actsAs = array('Acl' => array('type' => 'requester'));
+    public $actsAs = array('Acl' => array('type' => 'requester'), 'ExtendAssociations', 'Containable', 'Habtamable');
 
     /**
      * parentNode

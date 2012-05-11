@@ -67,7 +67,6 @@ class SearchsController extends AppController
         $coursesList = $this->sysContainer->getMyCourseList();
         $this->set('coursesList', $coursesList);
 
-        $role = $this->Auth->user('role');
         $personalizeData = $this->Personalize->find('all', array('conditions' =>'user_id = '.$this->Auth->user('id')));
         $this->userPersonalize->setPersonalizeList($personalizeData);
         if ($personalizeData && $this->userPersonalize->inPersonalizeList('Search.ListMenu.Limit.Show')) {
@@ -157,7 +156,7 @@ class SearchsController extends AppController
 
         $searchMartix = $this->formatSearchEvaluationResult($maxPercent, $minPercent, $eventId, $status, $this->order, $this->sortBy, $this->show);
 
-        $eventList = $this->Auth->user('role') == 'A' ?
+        $eventList = (User::hasRole('superadmin') || User::hasRole('admin')) ?
             $this->Event->find('all', array(
                 'conditions' => array('event_template_type_id !=' => '3'))) :
                 $this->Event->find('all', array(
@@ -243,7 +242,6 @@ class SearchsController extends AppController
      */
     function formatSearchInstructor($conditions, $sortBy, $limit)
     {
-        //$conditions .= empty($conditions) ? 'role = "I"':' AND role ="I" ';
         if (!isset($conditions['role'])) {
             $conditions['role'] = 'I';
         }
@@ -280,7 +278,7 @@ class SearchsController extends AppController
 
         $conditions = $course_id == "A" ?
             ($eventId == "A"?
-            ($this->Auth->user('role') == 'A' ?
+            ((User::hasRole('superadmin') || (User::hasRole('admin')) ?
             array():
             array('Event.creator_id' => $this->Auth->user('id'))):
             array('Event.id' => $eventId)) :

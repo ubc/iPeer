@@ -20,7 +20,7 @@
       <?php foreach ($data as $row): $survey = $row['SurveyGroupSet']; ?>
       <tr class="tablecell">
         <td align="center"> <a href="<?php echo $this->webroot.$this->theme.'/surveys/questionssummary/'.$survey['survey_id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>__('View', true)))?></a>
-          <?php if($this->Auth->user('role') == 'A' || $this->Auth->user('role') == 'I'):?>
+	      <?php if(User::hasRole('superadmin') || User::hasRole('admin') || User::hasRole('instructor')):?>
           <a href="<?php echo $this->webroot.$this->theme.'surveygroups/editgroupset/'.$survey['id']?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>__('Edit', true)))?></a> <a href="<?php echo $this->webroot.$this->theme.'surveygroups/deletesurveygroupset/'.$survey['id']?>" onclick="return confirm('<?php __('Are you sure you want to delete survey group set')?> &ldquo;<?php echo $survey['set_description']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>__('Delete', true)))?></a>
           <?php endif;?></td>
         <td><?php echo $html->link($survey['set_description'], '/surveys/questionssummary/'.$survey['survey_id']) ?></td>

@@ -699,121 +699,6 @@ class User extends AppModel
     }
 
     /**
-     * Get students not in group
-     *
-     * @param id     $group_id group id
-     * @param string $type     type of search
-     *
-     * @deprecated moved this function into group model
-     * @access public
-     * @return search results
-     */
-    /*
-    function getStudentsNotInGroup($group_id, $type = 'all')
-    {
-        trigger_error("Deprecated function called.", E_USER_NOTICE);
-        if ($group_id = null) {
-            return false;
-        }
-
-        $groups_member = Classregistry::init('GroupsMember');
-        $dbo = $groups_member->getDataSource();
-        $subQuery = $dbo->buildStatement(
-            array(
-                'fields' => array('GroupsMember.user_id'),
-                'table' => $dbo->fullTableName($groups_member),
-                'alias' => 'GroupsMember',
-                'limit' => null,
-                'offset' => null,
-                'joins' => array(),
-                'conditions' => array('group_id' => $group_id),
-                'order' => null,
-                'group' => null),
-            $groups_member);
-        $subQuery = ' `'.$this->alias.'`.`id` NOT IN (' . $subQuery . ') ';
-        $subQueryExpression = $dbo->expression($subQuery);
-        $this->displayField = 'student_no_with_full_name';
-        return $this->find(
-            $type,
-            array(
-                'conditions' => array('GM.id' => $group_id, $this->alias.'.role' => 'S', $subQueryExpression),
-                'joins' => array(
-                    array(
-                        'table' => 'user_enrols',
-                        'alias' => 'UserEnrol',
-                        'type'  => 'LEFT',
-                        'conditions' => array($this->alias.'.id = UserEnrol.user_id')
-                    ),
-                    array(
-                        'table' => 'groups',
-                        'alias' => 'GM',
-                        'type'  => 'LEFT',
-                        'conditions' => array('UserEnrol.course_id = GM.course_id')
-                    )
-                ),
-                'order' => array($this->alias.'.student_no'),
-                'recursive' => 1
-            )
-        );
-    }*/
-
-    /**
-     * Get members in a group
-     *
-     * @param int $group_id group id
-     * @param int $type     type of search
-     *
-     * @deprecated moved this function into group model
-     * @access public
-     * @return search result
-     */
-    /*
-    function getMembersByGroupId($group_id, $type = 'all')
-    {
-        $groups_member = Classregistry::init('GroupsMember');
-        $dbo = $groups_member->getDataSource();
-        $subQuery = $dbo->buildStatement(
-            array(
-                'fields' => array('GroupsMember.user_id'),
-                'table' => $dbo->fullTableName($groups_member),
-                'alias' => 'GroupsMember',
-                'limit' => null,
-                'offset' => null,
-                'joins' => array(),
-                'conditions' => array('group_id' => $group_id),
-                'order' => null,
-                'group' => null
-            ),
-            $groups_member
-        );
-        $subQuery = ' `'.$this->alias.'`.`id` IN (' . $subQuery . ') ';
-        $subQueryExpression = $dbo->expression($subQuery);
-        $this->displayField = 'student_no_with_full_name';
-        return $this->find(
-            $type,
-            array(
-                'conditions' => array('GM.id' => $group_id, $this->alias.'.role' => 'S', $subQueryExpression),
-                'joins' => array(
-                    array(
-                        'table' => 'user_enrols',
-                        'alias' => 'UserEnrol',
-                        'type'  => 'LEFT',
-                        'conditions' => array($this->alias.'.id = UserEnrol.user_id')
-                    ),
-                    array(
-                        'table' => 'groups',
-                        'alias' => 'GM',
-                        'type'  => 'LEFT',
-                        'conditions' => array('UserEnrol.course_id = GM.course_id')
-                    )
-                ),
-                'order' => array($this->alias.'.student_no'),
-                'recursive' => 1
-            )
-        );
-    }*/
-
-    /**
      * Get current logged in user
      *
      * @access public
@@ -971,6 +856,27 @@ class User extends AppModel
 return $result;*/
     }
 
+    /**
+     * loadRoles load the roles from database and store them in session
+     *
+     * @param mixed $id the user id to load the role
+     *
+     * @access public
+     * @return array the role array for user $id ($role_id => $role_name)
+     */
+    public function loadRoles($id)
+    {
+        $data = $this->Role->find('all', array('conditions' => array('User.id' => $id), 'recursive' => 0));
+        $roles = array_combine(Set::extract('/Role/id', $data), Set::extract('/Role/name', $data));
+
+        App::import('Component', 'Session');
+        $Session = new SessionComponent();
+        $Session->write('ipeerSession.Roles', $roles);
+
+        return $roles;
+    }
+
+
     /*********************************
      * Static functions
      * *******************************/
@@ -1086,72 +992,151 @@ return $result;*/
         return $model->getCourseListByInstructor(self::get('id'));
     }
 
-  public function isRole($id, $role) {
-    $data = $this->findById($id);
-    foreach ($data['Role'] as $r) {
-      if ($r['name'] == $role) {
-        return true;
-      }
-    }
-    return false;
-  }
+    /**
+     * hasRole test if the user has a specific role
+     *
+     * @param mixed $role the role name to test
+     *
+     * @access public
+     * @return boolean true if the user has $role, false otherwise
+     */
+    static function hasRole($role)
+    {
+        App::import('Component', 'Session');
+        $Session = new SessionComponent();
+        if (!($roles = $Session->read('ipeerSession.Roles'))) {
+            return false;
+        }
 
-  /**
-   * Custom validation rule makes a field required if another field is
-   * enabled.
-   *
-   * @param mixed $check the field that needs to be enabled
-   * @param mixed $with the field that needs to be filled if the previous param
-   * was enabled
-   *
-   * @access public
-   * @return boolean - true if the $with field is enabled and all the $check
-   * fields are filled in too, false otherwise
-   * */
-  protected function requiredWith($check, $with) {
-    foreach ($check as $key => $val) {
-      if ($val && empty($this->data[$this->name][$with])) {
+        return array_search($role, $roles) !== false;
+    }
+
+    /**
+     * getRoleArray get all roles associated with current user
+     *
+     *
+     * @static
+     * @access public
+     * @return array the role array
+     */
+    static function getRoleArray()
+    {
+        App::import('Component', 'Session');
+        $Session = new SessionComponent();
+        return $Session->read('ipeerSession.Roles');
+    }
+
+
+    /**
+     * getPermissions return the stored permissions for current user
+     *
+     *
+     * @static
+     * @access public
+     * @return void
+     */
+    static function getPermissions()
+    {
+        App::import('Component', 'Session');
+        $Session = new SessionComponent();
+        return $Session->read('ipeerSession.Permissions');
+    }
+
+
+    /**
+     * hasPermission test if the user has permssion to aco and action
+     *
+     * @param mixed  $aco    aco
+     * @param string $action action
+     *
+     * @access public
+     * @return boolean
+     */
+    static function hasPermission($aco, $action = '*')
+    {
+        App::import('Component', 'Session');
+        $Session = new SessionComponent();
+        if (!($permission = $Session->read('ipeerSession.Permissions'))) {
+            return false;
+        }
+
+        if (!Toolkit::isStartWith($aco, 'functions')) {
+            // controller branch for acl tree, looking for permission directly
+            return in_array($aco, $permission);
+        } else {
+            while (!empty($aco)) {
+                if (in_array($aco, $permission)) {
+                    return true;
+                }
+
+                // trace to a higher level of aco to see if we have permission there
+                $aco = explode('/', $aco);
+                array_pop($aco);
+                $aco = implode('/', $aco);
+            }
+            return false;
+        }
+
         return false;
-      }
     }
-    return true;
-  }
 
-  /**
-   * Custom validation rule for emails. The built-in CakePHP email validation
-   * improperly rejects valid email addresses. e.g.: won't let me use a
-   * email like john@localhost.localdomain, probably due to it having a white
-   * list of valid domains. This makes testing with email a pain though, so
-   * we're not using that.
-   *
-   * Sadly, even the built in PHP email validation using filter_var fails
-   * to follow all of the RFCs. But at least it's better than the built-in
-   * CakePHP one.
-   *
-   * The built in PHP validation requires PHP >= 5.2.0, if it's not available,
-   * we use a really simple fallback validation that simply checks if there's
-   * text on both sides of the @ sign.
-   *
-   * @param mixed $check contains the parameters to validate
-   *
-   * @access public
-   * @return boolean - true if the $with field is enabled and all the $check
-   * fields are filled in too, false otherwise
-   * */
-  protected function validEmail($check) {
-    $email = $check['email'];
-    if (function_exists('filter_var')) {
-      // filter_var() requires php >= 5.2.0
-      if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    /**
+     * Custom validation rule makes a field required if another field is
+     * enabled.
+     *
+     * @param mixed $check the field that needs to be enabled
+     * @param mixed $with  the field that needs to be filled if the previous param
+     * was enabled
+     *
+     * @access public
+     * @return boolean - true if the $with field is enabled and all the $check
+     * fields are filled in too, false otherwise
+     * */
+    protected function requiredWith($check, $with)
+    {
+        foreach ($check as $key => $val) {
+            if ($val && empty($this->data[$this->name][$with])) {
+                return false;
+            }
+        }
         return true;
-      }
     }
-    else {
-      // really basic fallback validation
-      if (preg_match('/.+@.+/', $email)) {
-        return true;
-      }
+
+    /**
+     * Custom validation rule for emails. The built-in CakePHP email validation
+     * improperly rejects valid email addresses. e.g.: won't let me use a
+     * email like john@localhost.localdomain, probably due to it having a white
+     * list of valid domains. This makes testing with email a pain though, so
+     * we're not using that.
+     *
+     * Sadly, even the built in PHP email validation using filter_var fails
+     * to follow all of the RFCs. But at least it's better than the built-in
+     * CakePHP one.
+     *
+     * The built in PHP validation requires PHP >= 5.2.0, if it's not available,
+     * we use a really simple fallback validation that simply checks if there's
+     * text on both sides of the @ sign.
+     *
+     * @param mixed $check contains the parameters to validate
+     *
+     * @access public
+     * @return boolean - true if the $with field is enabled and all the $check
+     * fields are filled in too, false otherwise
+     * */
+    protected function validEmail($check)
+    {
+        $email = $check['email'];
+        if (function_exists('filter_var')) {
+            // filter_var() requires php >= 5.2.0
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                return true;
+            }
+        } else {
+            // really basic fallback validation
+            if (preg_match('/.+@.+/', $email)) {
+                return true;
+            }
+        }
+        return false;
     }
-    return false;
-  }
 }

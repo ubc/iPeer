@@ -286,69 +286,69 @@ class CourseTestCase extends CakeTestCase {
         $this->assertEqual($inactiveCoursesArray, $expectedResults);
     }
 
-    function testFindAccessibleCoursesListByUserIdRole()
-    {
-        $empty = null;
-
-        /*
-         * Check findAccessibleCourseList for student
-         * user_id==3 : "StudentY"
-         */
-        //Run Tests
-        $testStudentAccessibleCourses = $this->Course->findAccessibleCoursesListByUserIdRole(3, 'S', null);
-        $studentAccessibleCourseArray=array();
-        foreach ($testStudentAccessibleCourses as $course) {
-            array_push($studentAccessibleCourseArray, $course['Course']['course']);
-        }
-        sort($studentAccessibleCourseArray);
-        $expectedCourseIDArray=array('Math303', 'Math321');
-        $this->assertEqual($studentAccessibleCourseArray, $expectedCourseIDArray);
-
-        /*
-         * Check findAccessibleCourseList for instructor
-         * user_id==2 : "Peterson"
-         */
-
-        $this->Course->addInstructor(1, 2);
-        $this->Course->addInstructor(2, 2);
-
-        $testInstructorAccessibleCourses = $this->Course->findAccessibleCoursesListByUserIdRole(2, 'I', null);
-        $instructorAccessibleCourseArray=array();
-        foreach ($testInstructorAccessibleCourses as $course) {
-            array_push($instructorAccessibleCourseArray, $course['Course']['course']);
-        }
-        $expectedCourseIDArray = array('Math303', 'Math321', 'Math100');
-        $this->assertEqual($instructorAccessibleCourseArray, $expectedCourseIDArray);
-
-        /*
-         * Check findAccessibleCourseList for admin
-         * user_id==8 : "Admin"
-         * Admin should have access to all course
-         */
-        //Run test
-        $testAdminAccessibleCourses = $this->Course->findAccessibleCoursesListByUserIdRole(8, 'A', null);
-        $adminAccessibleCourseArray=array();
-        foreach ($testAdminAccessibleCourses as $course) {
-            array_push($adminAccessibleCourseArray, $course['Course']['course']);
-        }
-        sort($adminAccessibleCourseArray);
-        $expectedCourseIDArray=array('Math303', 'Math321', 'Math100', 'Math200', 'Math250', 'InactiveCourse1', 'InactiveCourse2');
-        sort($expectedCourseIDArray);
-        $this->assertEqual($adminAccessibleCourseArray, $expectedCourseIDArray);
-
-        /*
-         * Check invlid user_id input;
-         * should return NULL
-         */
-        //Run tests
-        $testInvalidStudentID = $this->Course->findAccessibleCoursesListByUserIdRole(434324, 'S', null);
-        $this->assertEqual($testInvalidStudentID, $empty);
-        $testInvalidInstructorID = $this->Course->findAccessibleCoursesListByUserIdRole(2312124, 'I', null);
-        $this->assertEqual($testInvalidInstructorID, $empty);
-        $testInvaldAdminId = $this->Course->findAccessibleCoursesListByUserIdRole(67868767, 'A', null);
-
-
-    }
+//    function testFindAccessibleCoursesListByUserIdRole()
+//    {
+//        $empty = null;
+//
+//        /*
+//         * Check findAccessibleCourseList for student
+//         * user_id==3 : "StudentY"
+//         */
+//        //Run Tests
+//        $testStudentAccessibleCourses = $this->Course->findAccessibleCoursesListByUserIdRole(3, 'S', null);
+//        $studentAccessibleCourseArray=array();
+//        foreach ($testStudentAccessibleCourses as $course) {
+//            array_push($studentAccessibleCourseArray, $course['Course']['course']);
+//        }
+//        sort($studentAccessibleCourseArray);
+//        $expectedCourseIDArray=array('Math303', 'Math321');
+//        $this->assertEqual($studentAccessibleCourseArray, $expectedCourseIDArray);
+//
+//        /*
+//         * Check findAccessibleCourseList for instructor
+//         * user_id==2 : "Peterson"
+//         */
+//
+//        $this->Course->addInstructor(1, 2);
+//        $this->Course->addInstructor(2, 2);
+//
+//        $testInstructorAccessibleCourses = $this->Course->findAccessibleCoursesListByUserIdRole(2, 'I', null);
+//        $instructorAccessibleCourseArray=array();
+//        foreach ($testInstructorAccessibleCourses as $course) {
+//            array_push($instructorAccessibleCourseArray, $course['Course']['course']);
+//        }
+//        $expectedCourseIDArray = array('Math303', 'Math321', 'Math100');
+//        $this->assertEqual($instructorAccessibleCourseArray, $expectedCourseIDArray);
+//
+//        /*
+//         * Check findAccessibleCourseList for admin
+//         * user_id==8 : "Admin"
+//         * Admin should have access to all course
+//         */
+//        //Run test
+//        $testAdminAccessibleCourses = $this->Course->findAccessibleCoursesListByUserIdRole(8, 'A', null);
+//        $adminAccessibleCourseArray=array();
+//        foreach ($testAdminAccessibleCourses as $course) {
+//            array_push($adminAccessibleCourseArray, $course['Course']['course']);
+//        }
+//        sort($adminAccessibleCourseArray);
+//        $expectedCourseIDArray=array('Math303', 'Math321', 'Math100', 'Math200', 'Math250', 'InactiveCourse1', 'InactiveCourse2');
+//        sort($expectedCourseIDArray);
+//        $this->assertEqual($adminAccessibleCourseArray, $expectedCourseIDArray);
+//
+//        /*
+//         * Check invlid user_id input;
+//         * should return NULL
+//         */
+//        //Run tests
+//        $testInvalidStudentID = $this->Course->findAccessibleCoursesListByUserIdRole(434324, 'S', null);
+//        $this->assertEqual($testInvalidStudentID, $empty);
+//        $testInvalidInstructorID = $this->Course->findAccessibleCoursesListByUserIdRole(2312124, 'I', null);
+//        $this->assertEqual($testInvalidInstructorID, $empty);
+//        $testInvaldAdminId = $this->Course->findAccessibleCoursesListByUserIdRole(67868767, 'A', null);
+//
+//
+//    }
 
     function testFindAccessibleCoursesCount()
     {

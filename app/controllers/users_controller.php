@@ -16,7 +16,7 @@ class UsersController extends AppController
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'FileUpload.FileUpload');
     public $NeatString;
     public $uses = array('User', 'UserEnrol', 'Personalize', 'Course', 'SysParameter', 'SysFunction', 'Role', 'Group');
-    public $components = array('Session', 'AjaxList', 'RequestHandler', 
+    public $components = array('Session', 'AjaxList', 'RequestHandler',
       'Email', 'FileUpload.FileUpload', 'PasswordGenerator');
 
     /**
@@ -40,7 +40,6 @@ class UsersController extends AppController
      */
     function beforeFilter()
     {
-        $this->Auth->autoRedirect = false;
         parent::beforeFilter();
 
         $this->FileUpload->allowedTypes(array(
@@ -60,26 +59,13 @@ class UsersController extends AppController
      */
     function login()
     {
-        // Get iPeer Admin's email address
-        $admin_email = $this->sysContainer->getParamByParamCode('system.admin_email');
-        $admin_email = $admin_email['parameter_value'];
-        $this->set('admin_email', $admin_email);
-
-        if ($this->Auth->user()) {
-            $user = $this->Auth->user();
-            //sets up the system container for accessible functions
-            $accessFunction = $this->SysFunction->getAllAccessibleFunction($this->Auth->user('role'));
-            $accessController = $this->SysFunction->getTopAccessibleFunction($this->Auth->user('role'));
-            $this->sysContainer->setAccessFunctionList($accessFunction);
-            $this->sysContainer->setActionList($accessController);
-
-            //setup my accessible courses
-            $myCourses = $this->Course->findAccessibleCoursesList($user['User']);
-            $this->sysContainer->setMyCourseList($myCourses);
-
-            $this->redirect($this->Auth->redirect());
-            exit;
+        if ($this->Auth->isAuthorized()) {
+            // after login stuff
+            $this->AccessControl->getPermissions();
+            $this->User->loadRoles(User::get('id'));
+            //TODO logging!
         }
+        $this->redirect($this->Auth->redirect());
     }
 
     /**
@@ -98,13 +84,13 @@ class UsersController extends AppController
     /**
      * Setup the ajax list component. The ajax list component is used to
      * display many iPeer tables since it allows easy sorting and filtering
-     * by columns. 
+     * by columns.
      *
      * Note that there was an attempt at filtering users by course enrolment
-     * but the code for that does not work even in the master branch, so it 
+     * but the code for that does not work even in the master branch, so it
      * looks like either the course filtering was broken somewhere along the
      * way or it was never completed.
-     * 
+     *
      * @access public
      * @return void
      */
@@ -156,7 +142,7 @@ class UsersController extends AppController
         $deleteUserWarning = __("Delete this user. Irreversible. Are you sure?", true);
         $resetPassWarning = __("Resets user Password. Are you sure?", true);
 
-        if ($this->Auth->user('role') != 'A') {
+        if (!User::hasRole('superadmin') && !User::hasRole('admin')) {
             $actionRestrictions = array(
                 "User.role" => array (
                     "S" => true,
@@ -175,7 +161,7 @@ class UsersController extends AppController
             array(__("Reset Password", true), $resetPassWarning,  $actionRestrictions, "", "resetPassword", "User.id")
         );
 
-        $this->AjaxList->setUp($this->User, $columns, $actions, 
+        $this->AjaxList->setUp($this->User, $columns, $actions,
           "User.id", "User.username", array());
     }
 
@@ -225,7 +211,7 @@ class UsersController extends AppController
         $this->setUpAjaxList();
 
         //If User role isn't Admin, display student as default
-        if ($this->Auth->user('role')!='A') {
+        if (!User::hasRole('superadmin') && !User::hasRole('admin')) {
             $mapFilterSelections->{"User.role"} = "S";
             $this->AjaxList->setStateVariable("mapFilterSelections", $mapFilterSelections);
         }
@@ -233,70 +219,70 @@ class UsersController extends AppController
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
 
-        $this->set('can_add_user', $this->AccessControl->hasPermission('functions/user', 'create'));
-        $this->set('can_import_user', $this->AccessControl->hasPermission('functions/user/import'));
+        $this->set('can_add_user', User::hasPermission('functions/user', 'create'));
+        $this->set('can_import_user', User::hasPermission('functions/user/import'));
         $fields = array('Enrolment');
 
         $tempVar=$this->User->getEnrolledStudents(1, $fields);
     }
 
-  /**
-   * Display a list of users enrolled in a given course. 
-   *
-   * Note that this uses a different listing method than the index. The index
-   * uses the old prototype based ajaxList, this one uses a newer jquery
-   * based DataTable. The switch was done mostly because the ajaxList code
-   * to filter based on class wasn't working and a long look at the ajaxList
-   * code base produced only puzzlement. As we want to move off of prototype
-   * and to jquery anyways, it was easier to just rewrite this part.
-   *
-   * @param mixed $course - the course id to list users for
-   *
-   * @access public
-   * @return void
-   */
-  function goToClassList($course) {
-    $classStudents = array(); // holds all the students enrolled in this course
-    $classInstructors = array(); // holds instructors for this course
-    $classList = array(); // holds all users in this course for display in view
+    /**
+     * Display a list of users enrolled in a given course.
+     *
+     * Note that this uses a different listing method than the index. The index
+     * uses the old prototype based ajaxList, this one uses a newer jquery
+     * based DataTable. The switch was done mostly because the ajaxList code
+     * to filter based on class wasn't working and a long look at the ajaxList
+     * code base produced only puzzlement. As we want to move off of prototype
+     * and to jquery anyways, it was easier to just rewrite this part.
+     *
+     * @param mixed $course - the course id to list users for
+     *
+     * @access public
+     * @return void
+     */
+    function goToClassList($course) {
+        $classStudents = array(); // holds all the students enrolled in this course
+        $classInstructors = array(); // holds instructors for this course
+        $classList = array(); // holds all users in this course for display in view
 
-    // get the instructors
-    $classInstructors = $this->User->find(
-      'all',
-      array(
-        'conditions' => array('Course.id' => $course),
-      )
-    );
-    // get the students
-    $classStudents = $this->User->find(
-      'all',
-      array(
-        'conditions' => array('Enrolment.id' => $course),
-      )
-    );
+        // get the instructors
+        $classInstructors = $this->User->find(
+            'all',
+            array(
+                'conditions' => array('Course.id' => $course),
+            )
+        );
+        // get the students
+        $classStudents = $this->User->find(
+            'all',
+            array(
+                'conditions' => array('Enrolment.id' => $course),
+            )
+        );
 
-    // put only the data needed for display into classList
-    // TODO role based data retrival restrictions
-    foreach ($classInstructors as $user) {
-      $tmp = array();
-      $tmp['Role'] = 'Instructor';
-      $tmp['Username'] = $user['User']['username'];
-      $tmp['Full Name'] = $user['User']['first_name'] .' '. 
-        $user['User']['last_name'];
-      $tmp['Email'] = $user['User']['email'];
-      $classList[] = $tmp;
+        // put only the data needed for display into classList
+        // TODO role based data retrival restrictions
+        foreach ($classInstructors as $user) {
+            $tmp = array();
+            $tmp['Role'] = 'Instructor';
+            $tmp['Username'] = $user['User']['username'];
+            $tmp['Full Name'] = $user['User']['first_name'] .' '.
+                $user['User']['last_name'];
+            $tmp['Email'] = $user['User']['email'];
+            $classList[] = $tmp;
+        }
+        foreach ($classStudents as $user) {
+            $tmp = array();
+            $tmp['Role'] = 'Student';
+            $tmp['Username'] = $user['User']['username'];
+            $tmp['Full Name'] = $user['User']['first_name'] .' '.
+                $user['User']['last_name'];
+            $tmp['Email'] = $user['User']['email'];
+            $classList[] = $tmp;
+        }
+        $this->set('classList', $classList);
     }
-    foreach ($classStudents as $user) {
-      $tmp = array();
-      $tmp['Role'] = 'Student';
-      $tmp['Username'] = $user['User']['username'];
-      $tmp['Full Name'] = $user['User']['first_name'] .' '. 
-        $user['User']['last_name'];
-      $tmp['Email'] = $user['User']['email'];
-      $classList[] = $tmp;
-    }
-    $this->set('classList', $classList);
-  }
 
     /**
      * __processForm
@@ -524,146 +510,148 @@ class UsersController extends AppController
     }
 
 
-  /**
-   * Add a user to iPeer.
-   *
-   * Note that enrolment as admins or superadmins is not working right now.
-   * 
-   * @param course_id - will automatically enroll the user in this course.
-   * @access public
-   * @return void
-   */
-  public function add($course_id = null) {
-    $this->set('title_for_layout', 'Add User');
+    /**
+     * Add a user to iPeer.
+     *
+     * TODO this function need to be rewrite....
+     * Note that enrolment as admins or superadmins is not working right now.
+     *
+     * @param course_id - will automatically enroll the user in this course.
+     * @access public
+     * @return void
+     */
+    public function add($course_id = null)
+    {
+        $this->set('title_for_layout', 'Add User');
 
-    // get the courses that this user is instructor in
-    // TODO need to implement separate behaviours for admins and superadmins
-    // superadmins should have access to all courses regardless
-    // admins should have access only to their department
-    $user = $this->User->find(
-      'first', 
-      array('conditions' => array('id' => $this->Auth->user('id')))
-    );
-    $courses = $user['Course'];
-    $coursesOptions = array();
-    foreach ($courses as $course) {
-      $coursesOptions[$course['id']] = $course['course'].' - '.$course['title'];
-    }
-    $this->set('coursesOptions', $coursesOptions);
-    $this->set('coursesSelected', $course_id);
-
-    // get the roles assignable to the new user 
-    // TODO Update for admin/superadmin cases once access control done
-    // basically, superadmin is 1, and has the highest access
-    // student is 4, and has the lowest access.
-    // so the roles you are allowed to assign are any number
-    // greater than your role id.
-    $roles = $this->Role->find('list');
-    $highestRole = 99999999;
-    $roleDefault = null;
-    foreach($user['Role'] as $role) {
-      if ($role['id'] < $highestRole) {
-        $highestRole = $role['id'];
-      }
-    }
-    foreach($roles as $key => $val) {
-      if ($val == 'student') {
-        $roleDefault = $key;
-      }
-      if ($key <= $highestRole) {
-        unset($roles[$key]);
-      }
-    }
-    $this->set('roleOptions', $roles);
-    $this->set('roleDefault', $roleDefault);
-
-    // validate the form data
-    if ($this->data) {
-      $this->User->set($this->data);
-      if (!$this->User->validates()) {
-        $this->Session->setFlash('Unable to validate data.');
-        $errors = $this->User->invalidFields();
-        // note we're counting on automagic to persist form data so the user
-        // don't have to fill everything back in
-        return;
-      }
-    }
-
-    // save the data which involves:
-    // create the user entry
-    // create the rolesusers entry
-    // create the enrolment entry depending on if instructor or student
-    if ($this->data) {
-      // To properly enrol the user in the course, we're going to use some
-      // cakephp dark magic by massaging the data in such a way that we
-      // get cakephp to save to the right related models.
-      // * Course-Instructor relations are stored by the UserCourses table.
-      // * Course-Student relations are stored by the UserEnrols table.
-      // The relations as defined for some reason puts these related tables
-      // deep in the array.
-      $coursesEnrolled = array();
-      foreach ($this->data['Courses']['id'] as $id) {
-        $wantedRole = $this->data['Role']['RolesUser']['role_id'];
-        if ($wantedRole < $highestRole) {
-          // trying to create a user with higher access than yourself
-          $this->Session->setFlash('Invalid role permission');
-          return;
+        // get the courses that this user is instructor in
+        // TODO need to implement separate behaviours for admins and superadmins
+        // superadmins should have access to all courses regardless
+        // admins should have access only to their department
+        $user = $this->User->find(
+            'first',
+            array('conditions' => array('id' => $this->Auth->user('id')))
+        );
+        $courses = $user['Course'];
+        $coursesOptions = array();
+        foreach ($courses as $course) {
+            $coursesOptions[$course['id']] = $course['course'].' - '.$course['title'];
         }
-        if ($wantedRole == $roleDefault) {
-          // we should add this user as a student
-          $this->data['Enrolment'][]['UserEnrol']['course_id'] = 
-            $id;
-        }
-        else {
-          // we should add this user as an instructor
-          $this->data['Course'][]['UserCourse']['course_id'] = 
-            $id;
-        }
-        // For email, store a mapping of enrolled course id to name
-        $coursesEnrolled[$id] = $coursesOptions[$id];
-      }
-      // Remove the unneeded intermediate data
-      unset($this->data['Courses']);
+        $this->set('coursesOptions', $coursesOptions);
+        $this->set('coursesSelected', $course_id);
 
-      // Now we add in the password
-      $password = $this->PasswordGenerator->generate();
-      $this->data['User']['password'] = $this->Auth->password($password);
-
-      // Now we actually attempt to save the data
-      if ($this->User->save($this->data)) {
-        // Success!
-        $message = "User sucessfully created! 
-          <br />Password: <b>$password</b> <br />";
-        if ($this->data['User']['send_email_notification'] &&
-          $this->data['User']['email']
-        ) {
-          if ($this->sendAddUserEmail(
-            $this->Auth->user('email'), 
-            $this->data['User']['email'], 
-            $this->data['User']['username'],
-            $password,
-            $this->data['User']['first_name'].' '.$this->data['User']['last_name'],
-            $coursesEnrolled
-          )) {
-            # email notification successful
-            $message .= "Email notification sent.";
-          }
-          else {
-            # email notification failed
-            $message .= "<div class='red'>User created but unable to send
-              email notification.</div>";
-          }
+        // get the roles assignable to the new user
+        // TODO Update for admin/superadmin cases once access control done
+        // basically, superadmin is 1, and has the highest access
+        // student is 4, and has the lowest access.
+        // so the roles you are allowed to assign are any number
+        // greater than your role id.
+        $roles = $this->Role->find('list');
+        $highestRole = 99999999;
+        $roleDefault = null;
+        foreach($user['Role'] as $role) {
+            if ($role['id'] < $highestRole) {
+                $highestRole = $role['id'];
+            }
         }
-        $this->Session->setFlash($message, 'good');
-        return;
-      }
-      else {
-        // Failed
-        $this->Session->setFlash("Error while trying to save, try again.");
-        return;
-      }
+        foreach($roles as $key => $val) {
+            if ($val == 'student') {
+                $roleDefault = $key;
+            }
+            if ($key <= $highestRole) {
+                unset($roles[$key]);
+            }
+        }
+        $this->set('roleOptions', $roles);
+        $this->set('roleDefault', $roleDefault);
+
+        // validate the form data
+        if ($this->data) {
+            $this->User->set($this->data);
+            if (!$this->User->validates()) {
+                $this->Session->setFlash('Unable to validate data.');
+                $errors = $this->User->invalidFields();
+                // note we're counting on automagic to persist form data so the user
+                // don't have to fill everything back in
+                return;
+            }
+        }
+
+        // save the data which involves:
+        // create the user entry
+        // create the rolesusers entry
+        // create the enrolment entry depending on if instructor or student
+        if ($this->data) {
+            // To properly enrol the user in the course, we're going to use some
+            // cakephp dark magic by massaging the data in such a way that we
+            // get cakephp to save to the right related models.
+            // * Course-Instructor relations are stored by the UserCourses table.
+            // * Course-Student relations are stored by the UserEnrols table.
+            // The relations as defined for some reason puts these related tables
+            // deep in the array.
+            $coursesEnrolled = array();
+            foreach ($this->data['Courses']['id'] as $id) {
+                $wantedRole = $this->data['Role']['RolesUser']['role_id'];
+                if ($wantedRole < $highestRole) {
+                    // trying to create a user with higher access than yourself
+                    $this->Session->setFlash('Invalid role permission');
+                    return;
+                }
+                if ($wantedRole == $roleDefault) {
+                    // we should add this user as a student
+                    $this->data['Enrolment'][]['UserEnrol']['course_id'] =
+                        $id;
+                }
+                else {
+                    // we should add this user as an instructor
+                    $this->data['Course'][]['UserCourse']['course_id'] =
+                        $id;
+                }
+                // For email, store a mapping of enrolled course id to name
+                $coursesEnrolled[$id] = $coursesOptions[$id];
+            }
+            // Remove the unneeded intermediate data
+            unset($this->data['Courses']);
+
+            // Now we add in the password
+            $password = $this->PasswordGenerator->generate();
+            $this->data['User']['password'] = $this->Auth->password($password);
+
+            // Now we actually attempt to save the data
+            if ($this->User->save($this->data)) {
+                // Success!
+                $message = "User sucessfully created!
+                    <br />Password: <b>$password</b> <br />";
+                if ($this->data['User']['send_email_notification'] &&
+                    $this->data['User']['email']
+                ) {
+                    if ($this->sendAddUserEmail(
+                        $this->Auth->user('email'),
+                        $this->data['User']['email'],
+                        $this->data['User']['username'],
+                        $password,
+                        $this->data['User']['first_name'].' '.$this->data['User']['last_name'],
+                        $coursesEnrolled
+                    )) {
+                        # email notification successful
+                        $message .= "Email notification sent.";
+                    }
+                    else {
+                        # email notification failed
+                        $message .= "<div class='red'>User created but unable to send
+                            email notification.</div>";
+                    }
+                }
+                $this->Session->setFlash($message, 'good');
+                return;
+            }
+            else {
+                // Failed
+                $this->Session->setFlash("Error while trying to save, try again.");
+                return;
+            }
+        }
     }
-  }
 
 
     /**
@@ -1235,7 +1223,7 @@ class UsersController extends AppController
    *
    * @return true if successful, false otherwise
    * */
-  private function sendAddUserEmail($from, $to, $username, 
+  private function sendAddUserEmail($from, $to, $username,
     $password, $name, $courses
   ) {
     // prep variables used by the email template layout for addUser
@@ -1245,7 +1233,7 @@ class UsersController extends AppController
     $this->set('courses', $courses);
     $this->set('siteurl', $this->sysContainer->getParamByParamCode('system.absolute_url'));
 
-    // call send mail 
+    // call send mail
     $subject = "iPeer Account Creation";
     $template = "addUser";
 

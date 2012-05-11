@@ -135,4 +135,20 @@ class Toolkit
         );
     }
 
+    /**
+     * isStartWith test if the haystack starts with needle
+     *
+     * @param mixed $haystack the string to test
+     * @param mixed $needle   the string to search
+     *
+     * @static
+     * @access public
+     * @return boolean true if the haystack starts with needle, false otherwise
+     */
+    static function isStartWith($haystack, $needle)
+    {
+        return (substr($haystack, 0, strlen($needle)) == $needle);
+    }
+
+
 }

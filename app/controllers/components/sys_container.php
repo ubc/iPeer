@@ -264,6 +264,7 @@ class sysContainerComponent
      */
     function setMyCourseList($coursesList='')
     {
+        trigger_error('This function is deprecated. ', E_USER_DEPRECATED);
         $result = array();
 
         if ($coursesList!=null) {

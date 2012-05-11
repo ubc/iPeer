@@ -52,6 +52,7 @@ class AppController extends Controller
      */
     public function beforeFilter()
     {
+        $this->Auth->autoRedirect = false;
         // backward compatible with original ipeer hash  method
         Security::setHash('md5');
         Configure::write('Security.salt', '');
@@ -59,24 +60,14 @@ class AppController extends Controller
         // set default language for now
         Configure::write('Config.language', 'eng');
 
+        // store user in the singleton for global access
         User::store($this->Auth->user());
 
         if ($this->Auth->isAuthorized()) {
-            //    $this->AccessControl->check('controllers/'.ucwords($this->params['controller']).'/'.$this->params['action']);
+            // check if the user has permission to access the controller/action
+            User::hasPermission('controllers/'.ucwords($this->params['controller']).'/'.$this->params['action']);
 
-            $this->checkAccess();
-            $this->checkDatabaseVersion();
-
-            // set the parameters needed to generate the navigation tabs
-            $id = $this->Auth->user('id');
-            $issuperadmin = $this->User->isRole($id, "superadmin");
-            $isadmin = $this->User->isRole($id, "admin");
-            $isinstructor = $this->User->isRole($id, "instructor");
-            $isstudent = $this->User->isRole($id, "student");
-            $this->set('issuperadmin', $issuperadmin);
-            $this->set('isadmin', $isadmin);
-            $this->set('isinstructor', $isinstructor);
-            $this->set('isstudent', $isstudent);
+            $this->_checkDatabaseVersion();
         }
 
         parent::beforeFilter();
@@ -90,11 +81,11 @@ class AppController extends Controller
      * @access public
      * @return void
      */
-    public function checkDatabaseVersion()
+    public function _checkDatabaseVersion()
     {
         $dbv = $this->SysParameter->getDatabaseVersion();
 
-        if ('A' == $this->Auth->user('role') &&
+        if (User::hasPermission('controllers/upgrade') &&
             Configure::read('DATABASE_VERSION') > $dbv) {
             $flashMessage  = "<span class='notice'>Your database version is older than the current version. ";
             $flashMessage .= "Please do the <a href=" . $this->webroot ."upgrade" .">upgrade</a>.</span>";
@@ -103,53 +94,6 @@ class AppController extends Controller
     }
     /* }}} */
 
-    /* protected _setAccess() {{{ */
-    /**
-     * _setAccess set access for current user
-     *
-     * @access protected
-     * @return void
-     */
-    protected function _setAccess()
-    {
-        $access = $this->sysContainer->getAccessFunctionList();
-        if (!empty($access)) {
-            $this->set('access', $access);
-        }
-    }
-    /* }}} */
-
-    /* protected _setActions() {{{ */
-    /**
-     * _setActions
-     *
-     * @access protected
-     * @return void
-     */
-    protected function _setActions()
-    {
-        $actionList = $this->sysContainer->getActionList();
-        if (!empty($actionList)) {
-            $this->set('action', $actionList);
-        }
-    }
-    /* }}} */
-
-    /* protected _setCourses() {{{ */
-    /**
-     * _setCourses
-     *
-     * @access protected
-     * @return void
-     */
-    protected function _setCourses()
-    {
-        $coursesList = $this->sysContainer->getMyCourseList();
-
-        if (!empty($coursesList)) {
-            $this->set('coursesList', $coursesList);
-        }
-    }
     /* }}} */
 
     /* public extractModel($model,$array,$field) {{{ */
@@ -171,122 +115,6 @@ class AppController extends Controller
         }
 
         return $return;
-    }
-    /* }}} */
-
-    /* public checkAccess() {{{ */
-    /**
-     * checkAccess checking access
-     *
-     * @access public
-     * @return void
-     */
-    public function checkAccess()
-    {
-        //$this->rdAuth->loadFromSession();
-        /*if($this->Session->check('ipeerSession') &&
-         * $this->Session->valid('ipeerSession')) {
-            $this->Auth->id = $this->Session->read('ipeerSession.id');
-            $this->username = $this->Session->read('ipeerSession.username');
-            $this->fullname = $this->Session->read('ipeerSession.fullname');
-            $this->role = $this->Session->read('ipeerSession.role');
-            $this->email = $this->Session->read('ipeerSession.email');
-            $this->customIntegrateCWL = $this->Session->read('ipeerSession.customIntegrateCWL');
-            $this->courseId = $this->Session->read('ipeerSession.courseId');
-        }*/
-
-        // Used when error messasges are displayed, just let cake display them.
-        // No controller -> no security risk.
-        if (empty($this->params)) {
-            return true;
-        }
-
-        //set access function list
-        $this->_setAccess();
-        $this->_setActions();
-        $this->_setCourses();
-
-        // Enable for debug output
-        //$a=print_r($this->rdAuth,true);echo "<pre>$a</pre>";
-
-        //Save the current URL in session
-        $pass = (!empty($this->params['pass'])) ? join('/', $this->params['pass']) : null;
-
-        $url = $this->params['controller'].'/'.$this->params['action'].'/'.$pass;
-        //$a=print_r($this->rdAuth,true);echo "<pre>$a</pre>";
-        //check if user not logined
-        if ($this->params['controller']==''
-            || $this->params['controller']=="loginout"
-            || $this->params['controller']=="install"
-        ) {
-            //$this->set('rdAuth',$this->rdAuth
-        }/* else {
-            //Check whether the user is current login yet
-            $role = $this->Auth->user('role');
-            if (!isset($role)){
-                $this->Session->write('URL', $url);
-                $this->Session->write('AccessErr', 'NO_LOGIN');
-                $this->redirect(array('controller' => 'Users',
-                    'action'     => 'login'));
-                exit;
-        }
-
-        //check permission
-        $functions = $this->sysContainer->getActionList();
-
-        $url = $this->params['url']['url'];
-        // Cut a trailing shash in url if it exists
-        if ($url[strlen($url) - 1] == "/") {
-            $url = substr($url, 0, (-1) );
-        }
-
-        $allowedExplicitly = false;
-        $allowedByEntry = "";
-        // First, check that this URL has been explicitly specified in Sys functions
-        // table.
-        foreach ($functions as $func) {
-            if ($func['url_link'] === $url) {
-                $allowedExplicitly = true;
-                $allowedByEntry = $url;
-                break;
-            }
-        }
-
-        // If not allower explicitly, check in allowed by controller
-        $allowedByControllerEntry = false;
-
-        if (!$allowedExplicitly) {
-            foreach ($functions as $func) {
-                if ($func['controller_name'] === $this->params['controller']) {
-                    $allowedByControllerEntry = true;
-                    $allowedByEntry = $this->params['controller'];
-                    break;
-                }
-            }
-        }
-
-
-        // Debug output: Display how this page was allowed.
-        if ($allowedExplicitly){
-            $this->set("allowedBy", "<span style='color:green'>Allowed Explicitly by <u>$allowedByEntry</u> entry in SysFunctions. </span>");
-        } else if ($allowedByControllerEntry) {
-            $this->set("allowedBy", "<span style='color:darkblue'>Allowed Implicitly by a controller <u>$allowedByEntry</u> entry in SysFunctions. </span>");
-        }
-
-        // Rdirect the user away if they have no permission to render this page.
-        if (!$allowedExplicitly && !$allowedByControllerEntry) {
-            $this->redirect('home/index');
-            exit;
-        }
-
-        //redirectnder the authorized controller
-        $this->set('rdAuth',$this->rdAuth);
-        $this->set('sysContainer', $this->sysContainer);
-        $this->set('Output', $this->Output);
-
-        $this->Session->delete('URL');
-        }*/
-            return true;
     }
     /* }}} */
 

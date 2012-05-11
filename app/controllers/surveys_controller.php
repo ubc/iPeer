@@ -155,7 +155,7 @@ class SurveysController extends AppController
 
         // For instructors: only list their own course events (surveys
         $extraFilters = $conditions;
-        if ($this->Auth->user('role') != 'A') {
+        if (!User::hasRole('superadmin') && !User::hasRole('admin')) {
             $extraFilters = " ( ";
             foreach ($coursesList as $id => $course) {
                 $extraFilters .= "course_id=$id or ";

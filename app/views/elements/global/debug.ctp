@@ -1,9 +1,9 @@
 <!-- Debugging output -->
-<?php 
+<?php
 // only show this section if we have debug on and we're in a controller
 if(!Configure::read('debug') == 0 &&
-  isset($this->params['controller'])) 
-{ 
+  isset($this->params['controller']))
+{
 ?>
 
 <div id='debugsection'>
@@ -13,14 +13,17 @@ if(!Configure::read('debug') == 0 &&
     <td>User ID: <?php echo User::isLoggedIn() ? User::get('id') : "none" ?>
       <input type="button" onclick="jQuery('#user-data').toggle();" value="show/hide" />
     </td>
+    <td>Role: <?php echo count(User::getRoleArray()); ?>
+      <input type="button" onclick="jQuery('#role-data').toggle();" value="show/hide" />
+    </td>
+    <td>Permission: <?php echo count(User::getPermissions()); ?>
+      <input type="button" onclick="jQuery('#permission-data').toggle();" value="show/hide" />
+    </td>
     <td>Courses: <?php echo empty($coursesList) ? 0 : count($coursesList); ?>
       <input type="button" onclick="jQuery('#coursesList-data').toggle();" value="show/hide" />
     </td>
     <td>Actions: <?php echo empty($action) ? 0 : count($action); ?>
       <input type="button" onclick="jQuery('#access-data').toggle();" value="show/hide" />
-    </td>
-    <td>Access: <?php echo empty($access) ? 0 : count($access); ?>
-      <input type="button" onclick="jQuery('#actions-data').toggle();" value="show/hide" />
     </td>
     <td>Params: <?php echo empty($this->params) ? 0 : count($this->params); ?>
       <input type="button" onclick="jQuery('#params-data').toggle();" value="show/hide" />
@@ -28,7 +31,7 @@ if(!Configure::read('debug') == 0 &&
     <td>SQL Log:
       <input type="button" onclick="jQuery('#SQL-data').toggle();" value="show/hide" />
     </td>
-    <td>Allowed By: 
+    <td>Allowed By:
       <input type="button" onclick="jQuery('#allowedBy-data').toggle();" value="show/hide" />
     </td>
   </tr>
@@ -37,7 +40,7 @@ if(!Configure::read('debug') == 0 &&
   <!-- The actual debugging data -->
   <h5>$user variable</h5>
   <pre style="background-color:#E9FFFF;" id="user-data" >
-<?php 
+<?php
   // echo prevent the use of the short form conditional operator for some reason
   if (User::isLoggedIn())
   { // escape html so they're not interpreted by the browser
@@ -50,9 +53,34 @@ if(!Configure::read('debug') == 0 &&
     ?>
   </pre>
 
+  <h5>Roles</h5>
+  <pre style="background-color:#E9FFFF;" id="role-data" >
+<?php
+  // echo prevent the use of the short form conditional operator for some reason
+  if (User::isLoggedIn()) {
+      // escape html so they're not interpreted by the browser
+      echo htmlspecialchars(print_r(User::getRoleArray(), true));
+  } else {
+      print_r(__("(Empty)", true));
+  }
+    ?>
+  </pre>
+
+  <h5>Permissions</h5>
+  <pre style="background-color:#E9FFFF;" id="permission-data" >
+<?php
+    $perms = User::getPermissions();
+    if (empty($perms)) {
+      print_r(__("(Empty)", true));
+    } else {
+      echo htmlspecialchars(print_r($perms, true));
+    }
+    ?>
+  </pre>
+
   <h5>$coursesList variable</h5>
   <pre style="background-color:#FFE9FF;" id="coursesList-data" >
-<?php 
+<?php
     if (empty($courseList))
     {
       print_r(__("(Empty)", true));
@@ -66,7 +94,7 @@ if(!Configure::read('debug') == 0 &&
 
   <h5>$actions variable</h5>
   <pre style="background-color:#FFFFE9;" id="actions-data" >
-<?php 
+<?php
     if (empty($action))
     {
       print_r(__("(Empty)", true));
@@ -78,23 +106,10 @@ if(!Configure::read('debug') == 0 &&
     ?>
   </pre>
 
-  <h5>$access variable</h5>
-  <pre style="background-color:#E9FFFF;" id="access-data" >
-<?php 
-    if (empty($access))
-    {
-      print_r(__("(Empty)", true));
-    }
-    else
-    {
-      echo htmlspecialchars(print_r($access, true));
-    }
-    ?>
-  </pre>
 
   <h5>$this->params variable</h5>
   <pre style="background-color:#FFE9FF;" id="params-data" >
-<?php 
+<?php
     if (empty($this->params))
     {
       print_r(__("(Empty)", true));
@@ -130,7 +145,7 @@ if(!Configure::read('debug') == 0 &&
 
   <h5>$allowedBy variable</h5>
   <pre style="background-color: #E9FFFF;" id="allowedBy-data" >
-<?php 
+<?php
     if (empty($allowedBy))
     {
       print_r(__("(Empty)", true));
@@ -142,7 +157,7 @@ if(!Configure::read('debug') == 0 &&
     ?>
   </pre>
 </div>
-<?php 
-} // end if(!constant('DEBUG') == 0) 
+<?php
+} // end if(!constant('DEBUG') == 0)
 ?>
 

@@ -82,7 +82,7 @@ class UpgradeController extends AppController
      */
     function checkPermission()
     {
-        if ('A' != $this->Auth->user('role')) {
+        if (User::hasPermission('controllers/upgrade')) {
             $this->Session->setFlash(__('Sorry, you do not have access to this page. Only administrators can perform a database upgrade. If you are an administrator, please login and then go to this page to perform the upgrade.', true));
             return true;
         }

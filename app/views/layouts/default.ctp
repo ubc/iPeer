@@ -12,7 +12,7 @@
   echo $html->css('datepicker');
   echo $html->css('jquery.dataTables');
 
-  // Scripts 
+  // Scripts
   // as prototype does not appear to be maintained anymore, we should
   // switch to jquery. Load jquery from Google.
   echo $html->script('https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js');
@@ -33,7 +33,7 @@
   echo $html->script('submitvalidate');
 
   // Custom View Include Files
-  echo $scripts_for_layout; 
+  echo $scripts_for_layout;
   ?>
 </head>
 <body>
@@ -43,12 +43,7 @@
 <?php echo $this->element('global/banner'); ?>
 
 <!-- NAVIGATION -->
-<?php 
-if (isset($access))
-{
-  echo $this->element('global/navigation', array('access' => $access)); 
-}
-?>
+<?php echo $this->element('global/navigation', array());?>
 
 <!-- CONTENT -->
   <!-- TITLE BAR -->

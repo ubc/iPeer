@@ -10,7 +10,7 @@
     </table>
 	<table width="95%" border="0" cellspacing="2" cellpadding="4" bgcolor="#FFFFFF">
 	  <tr class="tableheader">
-	    <?php if($this->Auth->user('role') == 'A' || $this->Auth->user('role') == 'I'):?>
+	    <?php if(User::hasRole('superadmin') || User::hasRole('admin') || User::hasRole('instructor')):?>
 	    <th><?php __('Actions')?></th>
 	    <?php endif;?>
 	    <th><?php echo $pagination->sortLink(__('Title', true),array('title','desc'))?></th>
@@ -26,7 +26,7 @@
   	  <tr class="tablecell">
   	    <td align="center">
   		    <a href="<?php echo $this->webroot.$this->theme.'events/view/'.$event['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>'View'))?></a>
-  	    <?php if($this->Auth->user('role') == 'A' || $this->Auth->user('role') == 'I'):?>
+	    <?php if(User::hasRole('superadmin') || User::hasRole('admin') || User::hasRole('instructor')):?>
   	      <a href="<?php echo $this->webroot.$this->theme.'events/edit/'.$event['id']?>"><?php echo $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit'))?></a>
   	      <a href="<?php echo $this->webroot.$this->theme.'events/delete/'.$event['id']?>" onclick="return confirm(<?php __('Are you sure you want to delete event')?>&ldquo;<?php echo $event['title']?>&rdquo;?')"><?php echo $html->image('icons/delete.gif',array('border'=>'0','alt'=>__('Delete', true)))?></a>
   	    <?php endif;?>
@@ -43,7 +43,7 @@
   	    </td>
   	    <td>
   	    <a title="<?php __('View Groups')?>" href="<?php echo $this->webroot.$this->theme;?>events/viewGroups/<?php echo $event['id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;">&nbsp;<?php __('View Groups')?></a> &nbsp;
-		
+
   	    </td>
   	  </tr>
   	  <?php $i++;?>
