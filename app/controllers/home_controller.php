@@ -37,20 +37,6 @@ class HomeController extends AppController
         parent::__construct();
     }
 
-    /* temp code */
-    /**
-     * beforeFilter
-     *
-     *
-     * @access public
-     * @return void
-     */
-    function beforeFilter()
-    {
-        parent::beforeFilter();
-        //    $this->Auth->allow('*');
-    }
-
     /**
      * index
      *

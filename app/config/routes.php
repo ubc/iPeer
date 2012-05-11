@@ -41,16 +41,17 @@ if (file_exists(CONFIGS.'installed.txt')) {
   // Connect default index page to the home controller
 	Router::connect('/', array('controller' => 'home', 'action' => 'index'));
   // Connect static pages to the pages controller
-  Router::connect('/pages/*', array('controller' => 'pages', 
+  Router::connect('/pages/*', array('controller' => 'pages',
     'action' => 'display'));
   // Connect url '/test' to our test controller. For dev use
-  Router::connect('/tests', array('controller' => 'tests', 
+  Router::connect('/tests', array('controller' => 'tests',
     'action' => 'index'));
   // Authentication routes
-  Router::connect('/logout', array('controller' => 'users', 
+  Router::connect('/login', array('controller' => 'users',
+    'action' => 'login'));
+  Router::connect('/logout', array('controller' => 'users',
     'action' => 'logout'));
-}
-else {
+} else {
   // Note, order of routes specified matters. If install didn't come first
   // the /* directive would just redirect every page to the index page
   // of install, including the install/install2/, etc. steps of install

@@ -1,29 +1,4 @@
 <?php
-/* SVN FILE: $Id$ */
-/**
- * Enter description here ....
- *
- * @filesource
- * @copyright    Copyright (c) 2006, .
- * @link
- * @package
- * @subpackage
- * @since
- * @version      $Revision$
- * @modifiedby   $LastChangedBy$
- * @lastmodified $Date: 2006/07/20 18:10:32 $
- * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
- */
-
-/**
- * Controller :: Courses
- *
- * Enter description here...
- *
- * @package
- * @subpackage
- * @since
- */
 App::import('Vendor', 'PHPExcel', array('file' => 'excel/PHPExcel.php'));
 App::import('Vendor', 'PHPExcelWriter', array('file' => 'excel/PHPExcel/Writer/Excel5.php'));
 /**
@@ -70,12 +45,12 @@ class CoursesController extends AppController
     }
 
     /**
-     * setUpAjaxList
+     * _setUpAjaxList
      *
      * @access public
      * @return void
      */
-    function setUpAjaxList()
+    function _setUpAjaxList()
     {
         // Set up Columns
         $columns = array(
@@ -149,7 +124,7 @@ class CoursesController extends AppController
     function index()
     {
         // Set up the basic static ajax list variables
-        $this->setUpAjaxList();
+        $this->_setUpAjaxList();
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
     }
@@ -164,7 +139,7 @@ class CoursesController extends AppController
     function ajaxList()
     {
         // Set up the list
-        $this->setUpAjaxList();
+        $this->_setUpAjaxList();
         // Process the request for data
         $this->AjaxList->asyncGet();
     }
@@ -286,17 +261,18 @@ class CoursesController extends AppController
         ));
         $this->set('selected', array_keys($selected));
         $this->set('homepage', $courses['Course']['homepage']);
-        if ('A' == $courses['Course']['record_status'])
+        if ('A' == $courses['Course']['record_status']) {
             $status = 'A';
-        else if ('I' == $courses['Course']['record_status'])
+        } else if ('I' == $courses['Course']['record_status']) {
             $status = 'I';
+        }
         $this->set('status', $status);
 
         if (!empty($this->data)) {
-            if(!empty($this->data['Instructor']['id'])) {
+            if (!empty($this->data['Instructor']['id'])) {
                 foreach ($this->data['Instructor']['id'] as $key => $val) {
                     $this->data['Instructor'][$key]['UserCourse']['user_id'] = $val;
-			    }
+                }
             }
             $this->data['Instructor'][]['UserCourse']['user_id'] = '1';
             unset($this->data['Instructors']);
@@ -305,8 +281,7 @@ class CoursesController extends AppController
             if ($success) {
                 $this->Session->setFlash('The course was updated successfully.', 'good');
                 $this->redirect('index');
-            }
-            else if (!$success) {
+            } else if (!$success) {
                 $this->Session->setFlash('Cannot edit the course. Check errors below');
             }
         } else {
