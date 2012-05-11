@@ -15,7 +15,9 @@ class HomeController extends AppController
      *
      * @public $uses
      */
-    public $uses =  array( 'UserEnrol', 'Group', 'GroupEvent', 'User', 'UserCourse', 'Event', 'EvaluationSubmission', 'Course', 'Role', 'UserEnrol', 'Rubric', 'Penalty');
+    public $uses =  array( 'UserEnrol', 'Group', 'GroupEvent',
+        'User', 'UserCourse', 'Event', 'EvaluationSubmission',
+        'Course', 'Role', 'UserEnrol', 'Rubric', 'Penalty');
 
     public $page;
     public $Sanitize;
@@ -35,7 +37,6 @@ class HomeController extends AppController
         parent::__construct();
     }
 
-
     /* temp code */
     /**
      * beforeFilter
@@ -48,396 +49,6 @@ class HomeController extends AppController
     {
         parent::beforeFilter();
         //    $this->Auth->allow('*');
-    }
-
-
-    /**
-     * createAro
-     *
-     *
-     * @access public
-     * @return void
-     */
-    function createAro()
-    {
-        $this->Role->set('name', 'superadmin');
-        $this->Role->save();
-
-        $this->Role->set('id', '');
-        $this->Role->set('name', 'admin');
-        $this->Role->save();
-
-        $this->Role->set('id', '');
-        $this->Role->set('name', 'instructor');
-        $this->Role->save();
-
-        $this->Role->set('id', '');
-        $this->Role->set('name', 'tutor');
-        $this->Role->save();
-
-        $this->Role->set('id', '');
-        $this->Role->set('name', 'student');
-        $this->Role->save();
-    }
-
-
-    /**
-     * createPermissions
-     *
-     *
-     * @access public
-     * @return void
-     */
-    function createPermissions()
-    {
-        $role = $this->Role;
-        $role->id = 1;  // superadmin
-        $this->Acl->allow($role, 'controllers');
-        $this->Acl->allow($role, 'functions');
-
-        $role->id = 2;  // admin
-        $this->Acl->deny($role, 'controllers');
-        $this->Acl->allow($role, 'controllers/Home');
-        $this->Acl->allow($role, 'controllers/Courses');
-        $this->Acl->allow($role, 'controllers/Users');
-        $this->Acl->deny($role, 'functions');
-        $this->Acl->allow($role, 'functions/user');
-        $this->Acl->deny($role, 'functions/user/admin');
-        $this->Acl->deny($role, 'functions/user/superadmin');
-
-        $role->id = 3; // instructor
-        $this->Acl->deny($role, 'controllers');
-        $this->Acl->allow($role, 'controllers/Home');
-        $this->Acl->allow($role, 'controllers/Courses');
-        $this->Acl->allow($role, 'controllers/Users');
-        $this->Acl->deny($role, 'functions');
-        $this->Acl->allow($role, 'functions/user');
-        $this->Acl->deny($role, 'functions/user/admin');
-        $this->Acl->deny($role, 'functions/user/superadmin');
-        $this->Acl->deny($role, 'functions/user/instructor');
-
-        $role->id = 4; // student
-        $this->Acl->deny($role, 'controllers');
-        $this->Acl->allow($role, 'controllers/Home');
-        $this->Acl->allow($role, 'controllers/Courses');
-        $this->Acl->deny($role, 'controllers/Users');
-        $this->Acl->deny($role, 'functions');
-    }
-
-
-    /**
-     * createAcos
-     *
-     *
-     * @access public
-     * @return void
-     */
-    function createAcos()
-    {
-        $this->__buildAcoControllers();
-        $this->__buildAcoFunctions();
-    }
-
-
-    /**
-     * __buildAcoFunctions
-     *
-     *
-     * @access protected
-     * @return void
-     */
-    function __buildAcoFunctions()
-    {
-        $roles = $this->Role->find('all');
-
-        $this->Acl->Aco->create(array('parent_id' => null, 'alias' => 'functions'));
-        $root = $this->Acl->Aco->save();
-        $root['Aco']['id'] = $this->Acl->Aco->id;
-
-        // functions/user
-        $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'user'));
-        $aco_user = $this->Acl->Aco->save();
-        $aco_user['Aco']['id'] = $this->Acl->Aco->id;
-
-        foreach ($roles as $r) {
-            $this->Acl->Aco->create(array('parent_id' => $aco_user['Aco']['id'], 'model' => null, 'alias' => $r['Role']['name']));
-            $this->Acl->Aco->save();
-        }
-
-        $this->Acl->Aco->create(array('parent_id' => $aco_user['Aco']['id'], 'model' => null, 'alias' => 'import'));
-        $this->Acl->Aco->save();
-
-        $this->Acl->Aco->create(array('parent_id' => $aco_user['Aco']['id'], 'model' => null, 'alias' => 'password_reset'));
-        $pwd_reset = $this->Acl->Aco->save();
-        $pwd_reset['Aco']['id'] = $this->Acl->Aco->id;
-
-        foreach ($roles as $r) {
-            $this->Acl->Aco->create(array('parent_id' => $pwd_reset['Aco']['id'], 'model' => null, 'alias' => $r['Role']['name']));
-            $this->Acl->Aco->save();
-        }
-
-        // functions/role
-        $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'role'));
-        $role = $this->Acl->Aco->save();
-        $role['Aco']['id'] = $this->Acl->Aco->id;
-
-        foreach ($roles as $r) {
-            $this->Acl->Aco->create(array('parent_id' => $role['Aco']['id'], 'model' => null, 'alias' => $r['Role']['name']));
-            $this->Acl->Aco->save();
-        }
-    }
-
-
-    /**
-     * __buildAcoControllers
-     *
-     *
-     * @access protected
-     * @return void
-     */
-    function __buildAcoControllers()
-    {
-        if (!Configure::read('debug')) {
-            return $this->_stop();
-        }
-        $log = array();
-
-        $aco =& $this->Acl->Aco;
-        $root = $aco->node('controllers');
-        if (!$root) {
-            $aco->create(array('parent_id' => null, 'model' => null, 'alias' => 'controllers'));
-            $root = $aco->save();
-            $root['Aco']['id'] = $aco->id;
-            $log[] = __('Created Aco node for controllers', true);
-        } else {
-            $root = $root[0];
-        }
-
-        App::import('Core', 'File');
-        $Controllers = Configure::listObjects('controller');
-        $appIndex = array_search('App', $Controllers);
-        if ($appIndex !== false ) {
-            unset($Controllers[$appIndex]);
-        }
-        $baseMethods = get_class_methods('Controller');
-        $baseMethods[] = 'buildAcl';
-
-        $Plugins = $this->_getPluginControllerNames();
-        $Controllers = array_merge($Controllers, $Plugins);
-
-        // look at each controller in app/controllers
-        foreach ($Controllers as $ctrlName) {
-            $methods = $this->_getClassMethods($this->_getPluginControllerPath($ctrlName));
-
-            // Do all Plugins First
-            if ($this->_isPlugin($ctrlName)) {
-                $pluginNode = $aco->node('controllers/'.$this->_getPluginName($ctrlName));
-                if (!$pluginNode) {
-                    $aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => $this->_getPluginName($ctrlName)));
-                    $pluginNode = $aco->save();
-                    $pluginNode['Aco']['id'] = $aco->id;
-                    $log[] = __('Created Aco node for ', true) . $this->_getPluginName($ctrlName) . __(' Plugin', true);
-                }
-            }
-            // find / make controller node
-            $controllerNode = $aco->node('controllers/'.$ctrlName);
-            if (!$controllerNode) {
-                if ($this->_isPlugin($ctrlName)) {
-                    $pluginNode = $aco->node('controllers/' . $this->_getPluginName($ctrlName));
-                    $aco->create(array('parent_id' => $pluginNode['0']['Aco']['id'], 'model' => null, 'alias' => $this->_getPluginControllerName($ctrlName)));
-                    $controllerNode = $aco->save();
-                    $controllerNode['Aco']['id'] = $aco->id;
-                    $log[] = __('Created Aco node for ', true) . $this->_getPluginControllerName($ctrlName) . ' ' . $this->_getPluginName($ctrlName) . __(' Plugin Controller', true);
-                } else {
-                    $aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => $ctrlName));
-                    $controllerNode = $aco->save();
-                    $controllerNode['Aco']['id'] = $aco->id;
-                    $log[] = __('Created Aco node for ', true) . $ctrlName;
-                }
-            } else {
-                $controllerNode = $controllerNode[0];
-            }
-
-            //clean the methods. to remove those in Controller and private actions.
-            foreach ($methods as $k => $method) {
-                if (strpos($method, '_', 0) === 0) {
-                    unset($methods[$k]);
-                    continue;
-                }
-                if (in_array($method, $baseMethods)) {
-                    unset($methods[$k]);
-                    continue;
-                }
-                $methodNode = $aco->node('controllers/'.$ctrlName.'/'.$method);
-                if (!$methodNode) {
-                    $aco->create(array('parent_id' => $controllerNode['Aco']['id'], 'model' => null, 'alias' => $method));
-                    $methodNode = $aco->save();
-                    $log[] = __('Created Aco node for ', true). $method;
-                }
-            }
-        }
-        if (count($log)>0) {
-            debug($log);
-        }
-    }
-
-
-    /**
-     * _getClassMethods
-     *
-     * @param bool $ctrlName
-     *
-     * @access protected
-     * @return void
-     */
-    function _getClassMethods($ctrlName = null)
-    {
-        App::import('Controller', $ctrlName);
-        if (strlen(strstr($ctrlName, '.')) > 0) {
-            // plugin's controller
-            $num = strpos($ctrlName, '.');
-            $ctrlName = substr($ctrlName, $num+1);
-        }
-        $ctrlclass = $ctrlName . 'Controller';
-        $methods = get_class_methods($ctrlclass);
-
-        // Add scaffold defaults if scaffolds are being used
-        $properties = get_class_vars($ctrlclass);
-        if (array_key_exists('scaffold', $properties)) {
-            if ($properties['scaffold'] == 'admin') {
-                $methods = array_merge($methods, array('admin_add', 'admin_edit', 'admin_index', 'admin_view', 'admin_delete'));
-            } else {
-                $methods = array_merge($methods, array('add', 'edit', 'index', 'view', 'delete'));
-            }
-        }
-        return $methods;
-    }
-
-
-    /**
-     * _isPlugin
-     *
-     * @param bool $ctrlName
-     *
-     * @access protected
-     * @return void
-     */
-    function _isPlugin($ctrlName = null)
-    {
-        $arr = String::tokenize($ctrlName, '/');
-        if (count($arr) > 1) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
-    /**
-     * _getPluginControllerPath
-     *
-     * @param bool $ctrlName
-     *
-     * @access protected
-     * @return void
-     */
-    function _getPluginControllerPath($ctrlName = null)
-    {
-        $arr = String::tokenize($ctrlName, '/');
-        if (count($arr) == 2) {
-            return $arr[0] . '.' . $arr[1];
-        } else {
-            return $arr[0];
-        }
-    }
-
-
-    /**
-     * _getPluginName
-     *
-     * @param bool $ctrlName
-     *
-     * @access protected
-     * @return void
-     */
-    function _getPluginName($ctrlName = null)
-    {
-        $arr = String::tokenize($ctrlName, '/');
-        if (count($arr) == 2) {
-            return $arr[0];
-        } else {
-            return false;
-        }
-    }
-
-
-    /**
-     * _getPluginControllerName
-     *
-     * @param bool $ctrlName
-     *
-     * @access protected
-     * @return void
-     */
-    function _getPluginControllerName($ctrlName = null)
-    {
-        $arr = String::tokenize($ctrlName, '/');
-        if (count($arr) == 2) {
-            return $arr[1];
-        } else {
-            return false;
-        }
-    }
-
-
-    /**
-     * Get the names of the plugin controllers ...
-     *
-     * This function will get an array of the plugin controller names, and
-     * also makes sure the controllers are available for us to get the
-     * method names by doing an App::import for each plugin controller.
-     *
-     * @return array of plugin names.
-     */
-    function _getPluginControllerNames()
-    {
-        App::import('Core', 'File', 'Folder');
-        $paths = Configure::getInstance();
-        $folder = new Folder();
-        $folder->cd(APP . 'plugins');
-
-        // Get the list of plugins
-        $Plugins = $folder->read();
-        $Plugins = $Plugins[0];
-        $arr = array();
-
-        // Loop through the plugins
-        foreach ($Plugins as $pluginName) {
-            // Change directory to the plugin
-            $didCD = $folder->cd(APP . 'plugins'. DS . $pluginName . DS . 'controllers');
-            // Get a list of the files that have a file name that ends
-            // with controller.php
-            $files = $folder->findRecursive('.*_controller\.php');
-
-            // Loop through the controllers we found in the plugins directory
-            foreach ($files as $fileName) {
-                // Get the base file name
-                $file = basename($fileName);
-
-                // Get the controller name
-                $file = Inflector::camelize(substr($file, 0, strlen($file)-strlen('_controller.php')));
-                if (!preg_match('/^'. Inflector::humanize($pluginName). 'App/', $file)) {
-                    if (!App::import('Controller', $pluginName.'.'.$file)) {
-                        debug(__('Error importing ', true).$file.__(' for plugin ', true).$pluginName);
-                    } else {
-                        /// Now prepend the Plugin name ...
-                        // This is required to allow us to fetch the method names.
-                        $arr[] = Inflector::humanize($pluginName) . "/" . $file;
-                    }
-                }
-            }
-        }
-        return $arr;
     }
 
     /**
@@ -454,13 +65,13 @@ class HomeController extends AppController
 
             //          $inactiveCourseDetail = array();
             //          $inactiveCourseList = $this->Course->getInactiveCourses();
-            //          $inactiveCourseDetail = $this->formatCourseList($inactiveCourseList);
+            //          $inactiveCourseDetail = $this->_formatCourseList($inactiveCourseList);
             //
             //          $this->set('course_list', $inactiveCourseDetail);
             //          $this->render('index');
 
             $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
-            $this->set('course_list', $this->formatCourseList($course_list));
+            $this->set('course_list', $this->_formatCourseList($course_list));
         } else if (User::hasRole('student')) {
             //Check if the student has a email in his/her profile
             $email = $this->Auth->user('email');
@@ -501,7 +112,7 @@ class HomeController extends AppController
                 switch ($event['event_template_type_id']) {
                 case 3:
                     //Survey
-                    $survey = $this->getSurveyEvaluation($courseId, $event, $curUserId);
+                    $survey = $this->_getSurveyEvaluation($courseId, $event, $curUserId);
                     if ($survey!=null) {
                         $eventAry[$pos] = $survey;
                         $pos++;
@@ -582,7 +193,7 @@ class HomeController extends AppController
 
 
     /**
-     * getSurveyEvaluation
+     * _getSurveyEvaluation
      *
      * @param mixed $courseId course id
      * @param bool  $event    event
@@ -591,7 +202,7 @@ class HomeController extends AppController
      * @access public
      * @return void
      */
-    function getSurveyEvaluation($courseId, $event = null, $userId=null)
+    function _getSurveyEvaluation($courseId, $event = null, $userId=null)
     {
         $result = null;
         $surveyEvents = $this->Event->getActiveSurveyEvents($courseId);
@@ -630,14 +241,14 @@ class HomeController extends AppController
 
 
     /**
-     * formatCourseList
+     * _formatCourseList
      *
      * @param mixed $course_list
      *
      * @access public
      * @return void
      */
-    function formatCourseList($course_list)
+    function _formatCourseList($course_list)
     {
         $result = array();
 
