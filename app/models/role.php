@@ -39,7 +39,6 @@ class Role extends AppModel
         return null;
     }
 
-
     /**
      * getRoleByRoleNumber
      *
@@ -65,6 +64,16 @@ class Role extends AppModel
         } else {
             return null;
         }
+    }
+
+    /**
+     * Returns the default role for users. This is usually the lowest level
+     * of access, in this case, it is the student role.
+     *
+     * @return The id of role with the lowest level of access
+     * */
+    public function getDefaultId() {
+        return $this->field('id', array('name' => 'student'));
     }
 
 }

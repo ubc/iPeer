@@ -494,25 +494,27 @@ class User extends AppModel
     }
 
     /**
-     * Get user's role by id
+     * Given a user id, get that user's role name
      *
      * @param int $id user id
      *
-     * @access public
+     * @return role name
+     * */
+    public function getRoleName($id) {
+        $user = $this->findById($id);
+        return $user['Role'][0]['name'];
+    }
+
+    /**
+     * Given a user id, get that user's role id
+     *
+     * @param int $id user id
+     *
      * @return role
      * */
-    function getRoleById($id)
-    {
-        if (null == $id) {
-            return null;
-        }
-
-        $user = $this->find('first', array(
-            'conditions' => array('id' => $id),
-            'contain'    => array('Role'),
-        ));
-
-        return (!empty($user['Role'][0]['name'])) ? $user['Role'][0]['name'] : null;
+    public function getRoleId($id) {
+        $user = $this->findById($id);
+        return $user['Role'][0]['id'];
     }
 
     /**

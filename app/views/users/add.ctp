@@ -4,8 +4,8 @@ Usernames must be at least 6 characters long and contain only letters and number
 
 
 <div>
-<?php
-echo $this->Form->create('User');
+<?php 
+echo $this->Form->create('User', array('id' => 'UserForm'));
 echo '<input type="hidden" name="required" id="required" value="username" />';
 echo $this->Form->input('username');
 echo "<div id='usernameErr' class='red'></div>";

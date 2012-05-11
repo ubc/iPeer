@@ -502,22 +502,53 @@ class UsersController extends AppController
         $this->set('user', $this->data);
     }
 
+    /**
+     * Set the variables needed to preselect values in the select element on
+     * the add user form.
+     *
+     * @param int coursesId - automatically enroll the user in this course.
+     *
+     * @return void
+     * */
+    private function _initAddFormEnv($courseId) {
+        $this->_initFormEnv();
+        $roleDefault = $this->Role->getDefaultId();
+        $this->set('roleDefault', $roleDefault);
+        $this->set('coursesSelected', $courseId);
+    }
 
     /**
-     * Add a user to iPeer.
+     * Set the variables needed to preselect values in the select element on
+     * the edit user form.
      *
-     * TODO this function need to be rewrite....
-     * Note that enrolment as admins or superadmins is not working right now.
+     * @param int userId - user being edited
      *
-     * @param int course_id - will automatically enroll the user in this course.
-     *
-     * @access public
      * @return void
-     */
-    public function add($course_id = null)
-    {
-        $this->set('title_for_layout', 'Add User');
+     * */
+    private function _initEditFormEnv($userId) {
+        $this->_initFormEnv();
 
+        // set this user's role
+        $user = $this->User->findById($userId);
+        $this->set('roleDefault', $user['Role'][0]['id']);
+        // set the courses that this user is already in
+        $coursesId = array();
+        foreach ($user['Course'] as $course) {
+            $coursesId[] = $course['id'];
+        }
+        foreach ($user['Enrolment'] as $course) {
+            $coursesId[] = $course['id'];
+        }
+        $this->set('coursesSelected', $coursesId);
+    }
+
+    /**
+     * Set the variables needed to fill in form elements on the add and edit
+     * user forms.
+     *
+     * @return void
+     * */
+    private function _initFormEnv() {
         // get the courses that this user is instructor in
         // TODO need to implement separate behaviours for admins and superadmins
         // superadmins should have access to all courses regardless
@@ -529,256 +560,151 @@ class UsersController extends AppController
         $courses = $user['Course'];
         $coursesOptions = array();
         foreach ($courses as $course) {
-            $coursesOptions[$course['id']] = $course['course'].' - '.$course['title'];
+            $coursesOptions[$course['id']] = 
+                $course['course'].' - '.$course['title'];
         }
         $this->set('coursesOptions', $coursesOptions);
-        $this->set('coursesSelected', $course_id);
 
         $this->set('roleOptions', $this->AccessControl->getEditableRoles());
-        $this->set('roleDefault', 5);
+    }
 
-        // validate the form data
-        if ($this->data) {
-            $this->User->set($this->data);
-            if (!$this->User->validates()) {
-                $this->Session->setFlash('Unable to validate data.');
-                $errors = $this->User->invalidFields();
-                // note we're counting on automagic to persist form data so the user
-                // don't have to fill everything back in
+    /**
+     * Convert course selection from Form submit data into a format
+     * that CakePHP will understand to properly enrol users in the right
+     * courses.
+     *
+     * - Course-Instructor relations are stored by the UserCourses table.
+     *
+     * - Course-Student relations are stored by the UserEnrols table.
+     * The relations as defined for some reason puts these related tables 
+     * deep in the array.
+     *
+     * @param array $courses - the form data from the course selection
+     * element
+     * @param int $wantedRole - the role id of the role of the user being 
+     * created
+     *
+     * @return the arrays to be added to $this->data
+     * */
+    private function _convertCourseEnrolment($courses, $wantedRole) {
+        $ret = array();
+        $roleDefault = $this->Role->getDefaultId();
+        $ownRole = $this->User->getRoleId($this->Auth->user('id'));
+        foreach ($courses as $id) {
+            if ($wantedRole < $ownRole) {
+                // trying to create a user with higher access than yourself
+                $this->Session->setFlash('Invalid role permission');
                 return;
+            }
+            if ($wantedRole == $roleDefault) {
+                // we should add this user as a student
+                $ret['Enrolment'][]['UserEnrol']['course_id'] = $id;
+            }
+            else {
+                // we should add this user as an instructor
+                $ret['Course'][]['UserCourse']['course_id'] = $id;
             }
         }
 
+        return $ret;
+    }
+
+    /**
+     * Add a user to iPeer.
+     *
+     * Note that enrolment as admins or superadmins is not working right now.
+     * 
+     * @param int course_id - will automatically enroll the user in this course.
+     *
+     * @access public
+     * @return void
+     */
+    public function add($course_id = null) {
+        $this->set('title_for_layout', 'Add User');
+
+        // set up the course and role variables to fill the form elements
+        $this->_initAddFormEnv($course_id);
+
         // save the data which involves:
-        // create the user entry
-        // create the rolesusers entry
-        // create the enrolment entry depending on if instructor or student
         if ($this->data) {
-            // To properly enrol the user in the course, we're going to use some
-            // cakephp dark magic by massaging the data in such a way that we
-            // get cakephp to save to the right related models.
-            // * Course-Instructor relations are stored by the UserCourses table.
-            // * Course-Student relations are stored by the UserEnrols table.
-            // The relations as defined for some reason puts these related tables
-            // deep in the array.
-            $coursesEnrolled = array();
-            foreach ($this->data['Courses']['id'] as $id) {
-                $wantedRole = $this->data['Role']['RolesUser']['role_id'];
-                if ($wantedRole < $highestRole) {
-                    // trying to create a user with higher access than yourself
-                    $this->Session->setFlash('Invalid role permission');
-                    return;
-                }
-                if ($wantedRole == $roleDefault) {
-                    // we should add this user as a student
-                    $this->data['Enrolment'][]['UserEnrol']['course_id'] = $id;
-                } else {
-                    // we should add this user as an instructor
-                    $this->data['Course'][]['UserCourse']['course_id'] = $id;
-                }
-                // For email, store a mapping of enrolled course id to name
-                $coursesEnrolled[$id] = $coursesOptions[$id];
-            }
-            // Remove the unneeded intermediate data
-            unset($this->data['Courses']);
+            // create the enrolment entry depending on if instructor or student
+            // and also convert it into a CakePHP dark magic friendly format
+            $enrolments = $this->_convertCourseEnrolment(
+                $this->data['Courses']['id'],
+                $this->data['Role']['RolesUser']['role_id']
+            );
+            $this->data = array_merge($this->data, $enrolments);
 
             // Now we add in the password
             $password = $this->PasswordGenerator->generate();
             $this->data['User']['password'] = $this->Auth->password($password);
 
             // Now we actually attempt to save the data
-            if ($this->User->save($this->data)) {
+            if ($ret = $this->User->save($this->data)) {
                 // Success!
                 $message = "User sucessfully created!
                     <br />Password: <b>$password</b> <br />";
-                if ($this->data['User']['send_email_notification'] &&
-                    $this->data['User']['email']
-                ) {
-                    if ($this->sendAddUserEmail(
-                        $this->Auth->user('email'),
-                        $this->data['User']['email'],
-                        $this->data['User']['username'],
-                        $password,
-                        $this->data['User']['first_name'].' '.$this->data['User']['last_name'],
-                        $coursesEnrolled
-                    )) {
-                        // email notification successful
-                        $message .= "Email notification sent.";
-                    } else {
-                        // email notification failed
-                        $message .= "<div class='red'>User created but unable to send
-                            email notification.</div>";
-                    }
-                }
+                $message .= 
+                    $this->_sendAddUserEmail($ret, $password, $enrolments);
                 $this->Session->setFlash($message, 'good');
-                return;
-            } else {
+            }
+            else {
                 // Failed
-                $this->Session->setFlash("Error while trying to save, try again.");
-                return;
+                $this->Session->setFlash("Unable to create user.");
             }
         }
     }
 
 
     /**
-     * edit
+     * Given a user id, edit the information for that user
      *
-     * @param mixed $id
+     * @param int $id - the user being edited
      *
      * @access public
      * @return void
      */
-    function edit($id)
-    {
-        // Ensure that the id is valid
-        if (!is_numeric($id)) {
-            $this->cakeError('error404');
-        }
+    public function edit($userId) {
+        $this->set('title_for_layout', 'Edit User');
 
-        $this->AccessControl->check('functions/user/' . $this->User->getRoleById($id), 'update');
-        if (empty($this->data)) {
-            $this->User->id = $id;
-            $this->data = $this->User->read();
-        } else {
-            $this->data['User']['id'] = $id;
-            if ($this->__processForm()) {
-                // Process the course changes list
-                $this->processEnrollmentListsPostBack($this->params, $id);
-                // Set message for user.
-                $this->Session->setFlash(__('Changes are saved.', true));
-            } else {
-                $this->User->id = $id;
-                $this->data = $this->User->read();
+        // stop if don't have required params
+		if (!$userId && empty($this->data)) {
+			$this->Session->setFlash(__('Invalid user', true));
+            $this->redirect($this->referer());
+		}
+
+        // save the data which involves:
+        if ($this->data) {
+            // create the enrolment entry depending on if instructor or student
+            // and also convert it into a CakePHP dark magic friendly format
+            $enrolments = $this->_convertCourseEnrolment(
+                $this->data['Courses']['id'],
+                $this->data['Role']['RolesUser']['role_id']
+            );
+            $this->data = array_merge($this->data, $enrolments);
+
+            // Now we actually attempt to save the data
+            if ($ret = $this->User->save($this->data)) {
+                // Success!
+                $message = "User sucessfully updated! <br />";
+                $this->Session->setFlash($message, 'good');
             }
-        }
-        $isStudent = $this->determineIfStudentFromThisData($this->data);
-        if ($isStudent) {
-            $this->_setUpCourseEnrollmentLists($id);
+            else {
+                // Failed
+                $this->Session->setFlash("Unable to update user.");
+            }
+            // set up the course and role variables to fill the form elements
+            // only load this after save, or we won't get the correct values
+            $this->_initEditFormEnv($userId);
+            return;
         }
 
-        $this->set('roleOptions', $this->AccessControl->getEditableRoles());
-        $this->set('roleDefault', $this->data['Role'][0]['id']);
-        $this->set('data', $this->data);
-        $this->set('isStudent', $isStudent);
-        $this->set('readonly', false);
-        $this->set('isEdit', true);
-        $this->render('add');
+        // set up the course and role variables to fill the form elements
+        $this->_initEditFormEnv($userId);
+
+        // not saving, need to load data for forms to fill in
+        $this->data = $this->User->read(null, $userId);
     }
-
-
-  /*function edit($id)
-  {
-      // If a form was submitted, user that id instead
-      if (!empty($this->params['data'])) {
-        $id = $this->params['data']['User']['id'];
-      }
-
-      // Ensure that the id is valid
-      if (!is_numeric($id)) {
-        $this->cakeError('error404');
-      }
-
-      $this->AccessControl->check('functions/role/' . $this->User->getRoleById($id), 'update');
-
-      $enrolled_courses = $this->Course->findRegisteredCoursesList($id, $this->Auth->user('id'), $this->Auth->user('role'));
-      $this->set('enrolled_courses', $enrolled_courses);
-      $course_count = $this->Course->findNonRegisteredCoursesCount($id, $this->Auth->user('id'), $this->Auth->user('role'));
-      $this->set('course_count', $course_count[0][0]['total']);
-      $all_courses = $this->Course->findNonRegisteredCoursesList($id, $this->Auth->user('id'), $this->Auth->user('role'));
-      $this->set('all_courses', $all_courses);
-
-
-      // Get accessible courses
-      $coursesList = $this->sysContainer->getMyCourseList();
-
-      // List the entrolled courses
-      $simpleEnrolledList = array();
-      foreach ($enrolled_courses as $key => $value) {
-        if (!empty($coursesList[$value['Course']['id']])) {
-          array_push($simpleEnrolledList, $value['Course']['id']);
-        }
-      }
-
-      $this->set("simpleEnrolledList", $simpleEnrolledList);
-
-      // List the avaliable courses
-      $simpleCoursesList = array();
-      foreach ($coursesList as $key => $value) {
-        $simpleCoursesList[$key] = $value['course'];
-      }
-      $this->set("simpleCoursesList", $simpleCoursesList);
-
-      $this->set('user_id', $id);
-
-      if (empty($this->params['data'])) {
-        $this->params['data'] = $this->User->findUserById($id);
-        $this->render();
-      } else {
-        $this->Output->filter($this->params['data']);//always filter
-
-
-        if ($this->params['data']['User']['role'] == 'S') {
-          // For existing students
-          $data2save = $this->User->findUserByStudentNo($this->params['data']['User']['student_no']);
-          $data2save['User']['first_name'] = $this->data['User']['first_name'];
-          $data2save['User']['last_name'] = $this->data['User']['last_name'];
-          $data2save['User']['email'] = $this->data['User']['email'];
-        } else {
-
-          // For other users
-          $data2save = $this->params['data'];
-        }
-
-        // Prevent User role changes (also stops privilege escalation)
-        if (!empty($data2save['User']['role'])) {
-          unset ($data2save['User']['role']);
-        }
-
-        if ($this->User->save($data2save['User'])) {
-          if (!empty($this->params['form']['course_ids'])) {
-            $this->UserEnrol->insertCourses($this->User->id, $this->params['form']['course_ids']);
-          }
-
-          // Build up a list of checkboxed courses
-          $checkedCourseList = array();
-          foreach ($this->params['form'] as $key => $value) {
-            if (strstr($key, "checkBoxList_")) {
-              $aCourse = substr($key, 13);
-              array_push($checkedCourseList, $aCourse);
-            }
-          }
-
-          // Put students into newly selected courses
-          foreach ($checkedCourseList as $key => $value) {
-            if (!isset($simpleEnrolledList[$value])) {
-              $this->UserEnrol->insertCourses($data2save['User']['id'], array($value));
-            }
-          }
-
-          // Take them out of the de-selected courses
-          foreach ($simpleEnrolledList as $key => $value) {
-            if (!isset($checkedCourseList[$value])) {
-              $this->UserEnrol->removeStudentFromCourse($data2save['User']['id'], $value);
-            }
-          }
-
-
-          //Render to view page to display saved data
-          //TODO: Display list of users after import
-          // $data = $this->User->read();
-          // $this->set('data', $data);
-          // $this->set('userRole', $data['User']['role']);
-          // $this->render('userSummary');
-          $this->redirect("/users/index/The user was edited.");
-        } else {
-          $this->Output->br2nl($this->params['data']);
-          $this->set('errmsg', $this->User->errorMessage);
-          $this->set('data', $this->params['data']);
-          $this->render();
-        }
-      }
-  }*/
 
     /**
      * editProfile
@@ -1145,23 +1071,38 @@ class UsersController extends AppController
      * @param string $name - first name + last name
      * @param string $courses - the courses that the user is enrolled in
      *
-     * @return true if successful, false otherwise
+     * @return Status message indicating success or error, empty string
+     * if no email notification
      * */
-    private function sendAddUserEmail($from, $to, $username,
-        $password, $name, $courses
-    ) {
+    private function _sendAddUserEmail($user, $password, $courses) {
+        if (!($user['User']['send_email_notification'] && 
+            $user['User']['email'])
+        ) {
+            return "";
+        }
+        // get username and address
+        $from = $this->Auth->user('email'); 
+        $to = $user['User']['email']; 
+        $username = $user['User']['username'];
+        $name = $user['User']['first_name'].' '.$user['User']['last_name'];
+
         // prep variables used by the email template layout for addUser
         $this->set('name', $name);
         $this->set('username', $username);
         $this->set('password', $password);
         $this->set('courses', $courses);
-        $this->set('siteurl', $this->sysContainer->getParamByParamCode('system.absolute_url'));
+        $this->set('siteurl', 
+            $this->sysContainer->getParamByParamCode('system.absolute_url'));
 
         // call send mail
         $subject = "iPeer Account Creation";
         $template = "addUser";
 
-        return $this->_sendEmail("", $subject, $from, $to, $template);
+        if ($this->_sendEmail("", $subject, $from, $to, $template)) {
+            return "Email notification sent.";
+        }
+        return "<div class='red'>User created but unable to send email 
+            notification: ". $this->Email->smtpError ."</div>";
     }
 
 }

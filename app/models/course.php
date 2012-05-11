@@ -531,7 +531,7 @@ class Course extends AppModel
      *
      * @return course data
      */
-    function getCourseListByInstructor($instructorId)
+    function getListByInstructor($instructorId)
     {
         return $this->getCourseByInstructor($instructorId, 'list');
     }

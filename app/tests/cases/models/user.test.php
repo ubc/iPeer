@@ -290,32 +290,61 @@ class UserTestCase extends CakeTestCase
 
     }
 
-    function testGetRoleById()
+    public function testGetRoleName()
     {
         $empty=null;
 
         //user_id==1 : role(superadmin)
-        $superAdminRole=$this->User->getRoleById(8);
+        $superAdminRole=$this->User->getRoleName(8);
         $this->assertEqual($superAdminRole, 'superadmin');
 
         //user_id==3 : role(student)
-        $studentRole=$this->User->getRoleById(3);
+        $studentRole=$this->User->getRoleName(3);
         $this->assertEqual($studentRole, 'student');
 
         //user_id==13 : role(instructor)
-        $instructorRole=$this->User->getRoleById(1);
+        $instructorRole=$this->User->getRoleName(1);
         $this->assertEqual($instructorRole, 'instructor');
 
         //user_id==20 : role(admin)
-        $adminRole = $this->User->getRoleById(9);
+        $adminRole = $this->User->getRoleName(9);
         $this->assertEqual($adminRole, 'admin');
 
         //user_id==9 : role(unassigned)
-        $unassignedRole = $this->User->getRoleById(13);
+        $unassignedRole = $this->User->getRoleName(13);
         $this->assertEqual($unassignedRole, $empty);
 
         //null input
-        $nullInput = $this->User->getRoleById(null);
+        $nullInput = $this->User->getRoleName(null);
+        $this->assertEqual($nullInput, $empty);
+    }
+
+    public function testGetRoleId()
+    {
+        $empty=null;
+
+        //user_id==1 : role(superadmin)
+        $superAdminRole=$this->User->getRoleId(8);
+        $this->assertEqual($superAdminRole, '1');
+
+        //user_id==3 : role(student)
+        $studentRole=$this->User->getRoleId(3);
+        $this->assertEqual($studentRole, '4');
+
+        //user_id==13 : role(instructor)
+        $instructorRole=$this->User->getRoleId(1);
+        $this->assertEqual($instructorRole, '3');
+
+        //user_id==20 : role(admin)
+        $adminRole = $this->User->getRoleId(9);
+        $this->assertEqual($adminRole, '2');
+
+        //user_id==9 : role(unassigned)
+        $unassignedRole = $this->User->getRoleId(13);
+        $this->assertEqual($unassignedRole, $empty);
+
+        //null input
+        $nullInput = $this->User->getRoleId(null);
         $this->assertEqual($nullInput, $empty);
     }
 
