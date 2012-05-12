@@ -30,6 +30,11 @@ class CreateAclShell extends Shell
         $this->Auth = new AuthComponent(null);
         $this->Acl = new AclComponent(null);
 
+        $this->Role->query('TRUNCATE acos;');
+        $this->Role->query('TRUNCATE aros;');
+        $this->Role->query('TRUNCATE aros_acos;');
+        $this->Role->query('TRUNCATE roles;');
+
         $this->out('Creating Aros...');
         $this->createAros();
 

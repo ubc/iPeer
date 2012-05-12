@@ -411,7 +411,7 @@ class UsersController extends AppController
 
 
     /**
-     * setUpCourseEnrollmentLists
+     * _setUpCourseEnrollmentLists
      *
      * @param mixed $id         id
      * @param bool  $thisCourse this course
@@ -419,7 +419,7 @@ class UsersController extends AppController
      * @access public
      * @return void
      */
-    function setUpCourseEnrollmentLists($id, $thisCourse = null)
+    function _setUpCourseEnrollmentLists($id, $thisCourse = null)
     {
         $data = $this->getSimpleEntrollmentLists($id);
         $this->set("simpleEnrolledList", $data['simpleEnrolledList']);
@@ -680,11 +680,12 @@ class UsersController extends AppController
         }
         $isStudent = $this->determineIfStudentFromThisData($this->data);
         if ($isStudent) {
-            $this->setUpCourseEnrollmentLists($id);
+            $this->_setUpCourseEnrollmentLists($id);
         }
 
+        $this->set('roleOptions', $this->AccessControl->getEditableRoles());
+        $this->set('roleDefault', $this->data['Role'][0]['id']);
         $this->set('data', $this->data);
-        $this->set('roles', $this->AccessControl->getEditableRoles());
         $this->set('isStudent', $isStudent);
         $this->set('readonly', false);
         $this->set('isEdit', true);

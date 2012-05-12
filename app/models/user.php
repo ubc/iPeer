@@ -919,6 +919,8 @@ class User extends AppModel
             return false;
         }
 
+        return in_array($aco, $permission);
+        /*
         if (!Toolkit::isStartWith($aco, 'functions')) {
             // controller branch for acl tree, looking for permission directly
             return in_array($aco, $permission);
@@ -936,7 +938,7 @@ class User extends AppModel
             return false;
         }
 
-        return false;
+        return false;*/
     }
 
     /**
