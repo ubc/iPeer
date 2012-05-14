@@ -1074,7 +1074,7 @@ class UsersController extends AppController
      * @return Status message indicating success or error, empty string
      * if no email notification
      * */
-    private function _sendAddUserEmail($user, $password, $courses) {
+    private function _sendAddUserEmail($user, $password, $enrolments) {
         if (!($user['User']['send_email_notification'] && 
             $user['User']['email'])
         ) {
@@ -1085,6 +1085,14 @@ class UsersController extends AppController
         $to = $user['User']['email']; 
         $username = $user['User']['username'];
         $name = $user['User']['first_name'].' '.$user['User']['last_name'];
+
+        // this means only students will get a list of courses they're
+        // enroled in, since instructors are stored in another array
+        foreach ($enrolments['Enrolment'] as $course) {
+            $cid = $course['UserEnrol']['course_id'];
+            $courses[] = $this->Course->field('course', array('id' => $cid)) .
+                ' - ' . $this->Course->field('title', array('id' => $cid));
+        }
 
         // prep variables used by the email template layout for addUser
         $this->set('name', $name);
