@@ -36,11 +36,11 @@ class AccessControlComponent extends Object
         ),
     );
 
-    var $options = array('model'=>'Aco', 'field'=>'alias');
+    protected $options = array('model'=>'Aco', 'field'=>'alias');
     //used for recursive variable setting/checking
-    var $perms = array();   //for ACL defined permissions
-    var $permissionsArray = array();    //for all permissions
-    var $inheritPermission = array();   //array indexed by level to hold the inherited permission
+    protected $perms = array();   //for ACL defined permissions
+    protected $permissionsArray = array();    //for all permissions
+    protected $inheritPermission = array();   //array indexed by level to hold the inherited permission
 
     /**
      * initialize
@@ -69,7 +69,7 @@ class AccessControlComponent extends Object
      */
     function check($aco, $action = '*')
     {
-        if (!$this->hasPermission($aco, $action)) {
+        if (!User::hasPermission($aco, $action)) {
             $this->controller->cakeError('permissionDenied');
         }
 
@@ -167,7 +167,7 @@ class AccessControlComponent extends Object
         $all_roles = $this->User->Role->find('list', array('fields'=>array('id', 'name')));
         $roles = array();
         foreach ($all_roles as $key => $r) {
-            if ($this->hasPermission('functions/user/'.$r, 'create')) {
+            if (User::hasPermission('functions/user/'.$r, 'create')) {
                 $roles[$key] = $r;
             }
         }
@@ -194,45 +194,12 @@ class AccessControlComponent extends Object
         }
 
         foreach ($roles as $role) {
-            if ($pass = $pass | $this->hasPermission($this->action_map[$action]['aco_prefix'].'/'.$role,
+            if ($pass = $pass | User::hasPermission($this->action_map[$action]['aco_prefix'].'/'.$role,
                 $this->action_map[$action]['action'])) {
                     break;
             }
         }
         return $pass;
-    }
-
-    /**
-     * getPermissions get the permssions and cache them into session
-     *
-     *
-     * @access public
-     * @return void
-     */
-    function getPermissions()
-    {
-        $perms = array();
-        if (!($perms = $this->Session->read('ipeerSession.Permissions'))) {
-            $roles = $this->getRoles();
-            $roleIds = array_keys($roles);
-
-            //GET ACL PERMISSIONS
-            $acos = $this->Acl->Aco->find('threaded');
-            $group_aro = $this->Acl->Aro->find('threaded', array('conditions'=>array('Aro.foreign_key'=>$roleIds, 'Aro.model'=>'Role')));
-            $group_perms = Set::extract('{n}.Aco', $group_aro);
-            $gpAco = array();
-            foreach ($group_perms[0] as $value) {
-                $gpAco[$value['id']] = $value;
-            }
-
-            $this->perms = $gpAco;
-            $this->permissionsArray = array();
-            $this->_addPermissions($acos, $this->options['model'], $this->options['field'], 0, '');
-
-            $this->Session->write('ipeerSession.Permissions', $this->permissionsArray);
-        }
-
-        return $this->permissionsArray;
     }
 
     /**
@@ -263,45 +230,92 @@ class AccessControlComponent extends Object
         return $roles;
     }
 
+    /**
+     * getPermissions get the permssions and cache them into session
+     *
+     *
+     * @access public
+     * @return array all the permissions for current user
+     */
+    function getPermissions()
+    {
+        $perms = array();
+        if (!($perms = $this->Session->read('ipeerSession.Permissions'))) {
+            $roles = $this->getRoles();
+            $roleIds = array_keys($roles);
 
-    function _addPermissions($acos, $modelName, $fieldName, $level, $alias) {
+            //GET ACL PERMISSIONS
+            $acos = $this->Acl->Aco->find('threaded');
+            $group_aro = $this->Acl->Aro->find('threaded', array('conditions'=>array('Aro.foreign_key'=>$roleIds, 'Aro.model'=>'Role')));
+            $group_perms = Set::extract('{n}.Aco', $group_aro);
+            $gpAco = array();
+            foreach ($group_perms[0] as $value) {
+                $gpAco[$value['id']] = $value;
+            }
 
-        foreach ($acos as $key=>$val)
-        {
-            $thisAlias = $alias . $val[$modelName][$fieldName];
+            $this->perms = $gpAco;
+            $this->permissionsArray = array();
+            $this->_addPermissions($acos, 0);
 
-            if(isset($this->perms[$val[$modelName]['id']])) {
-                $curr_perm = $this->perms[$val[$modelName]['id']];
-                if($curr_perm['Permission']['_create'] == 1) {
+            $this->Session->write('ipeerSession.Permissions', $this->permissionsArray);
+        }
+
+        return $this->permissionsArray;
+    }
+
+
+    /**
+     * _addPermissions
+     *
+     * @param mixed $acos              all acos
+     * @param mixed $level             level
+     * @param mixed $alias             alias
+     * @param array $inheritPermission inherit permission
+     *
+     * @access protected
+     * @return void
+     */
+    function _addPermissions($acos, $level, $alias = '', $inheritPermission = array())
+    {
+        foreach ($acos as $val) {
+            $thisAlias = $alias . $val[$this->options['model']][$this->options['field']];
+
+            if (isset($this->perms[$val[$this->options['model']]['id']])) {
+                $curr_perm = $this->perms[$val[$this->options['model']]['id']];
+                if ($curr_perm['Permission']['_create'] == 1) {
                     $this->permissionsArray[] = strtolower($thisAlias);
-                    $this->inheritPermission[$level] = 1;
+                    $inheritPermission[$level] = 1;
                 } else {
-                    $this->inheritPermission[$level] = -1;
+                    $inheritPermission[$level] = -1;
                 }
             } else {
-                if(!empty($this->inheritPermission)) {
+                if (!empty($inheritPermission)) {
                     //echo $level.'::'.$thisAlias;
-                    //var_dump($this->inheritPermission);
+                    //var_dump($inheritPermission);
                     //check for inheritedPermissions, by checking closest array element
-                    $revPerms = array_reverse($this->inheritPermission);
-                    if($revPerms[0] == 1) {
+                    $revPerms = array_reverse($inheritPermission);
+                    if ($revPerms[0] == 1) {
                         $this->permissionsArray[] = strtolower($thisAlias); //the level above was set to 1, so this should be a 1
                     }
 
                 }
             }
 
-            if(isset($val['children'][0])) {
+            if (isset($val['children'][0])) {
                 $old_alias = $alias;
-                $alias .= $val[$modelName][$fieldName] .'/';
-                $this->_addPermissions($val['children'], $modelName, $fieldName, $level+1, $alias);
-                unset($this->inheritPermission[$level+1]);  //don't want the last level's inheritance, in case it was set
-                unset($this->inheritPermission[$level]);    //don't want this inheritance anymore, in case it was set
+                $alias .= $val[$this->options['model']][$this->options['field']] .'/';
+                $this->_addPermissions($val['children'], $level+1, $alias, $inheritPermission);
+                //unset($inheritPermission[$level+1]);  //don't want the last level's inheritance, in case it was set
                 $alias = $old_alias;
             }
+
+            // clear the inherit permission for next branch
+            unset($inheritPermission[$level]);    //don't want this inheritance anymore, in case it was set
         }
 
         return;
     }
+
+
 
 }
