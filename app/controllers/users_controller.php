@@ -93,7 +93,7 @@ class UsersController extends AppController
      * @access public
      * @return void
      */
-    function setUpAjaxList ()
+    function _setUpAjaxList ()
     {
         // The columns to be shown in the table
         $columns = array(
@@ -178,7 +178,7 @@ class UsersController extends AppController
         // Make sure the present user is not a student
         //$this->rdAuth->noStudentsAllowed();
         // Set up the list
-        $this->setUpAjaxList();
+        $this->_setUpAjaxList();
         // Process the request for data
         $this->AjaxList->asyncGet();
     }
@@ -207,7 +207,7 @@ class UsersController extends AppController
         $this->set('message', $message);
 
         // Set up the basic static ajax list variables
-        $this->setUpAjaxList();
+        $this->_setUpAjaxList();
 
         //If User role isn't Admin, display student as default
         if (!User::hasRole('superadmin') && !User::hasRole('admin')) {
@@ -514,7 +514,8 @@ class UsersController extends AppController
      * @access public
      * @return void
      */
-    public function add($course_id = null) {
+    public function add($course_id = null)
+    {
         $this->set('title_for_layout', 'Add User');
 
         // get the courses that this user is instructor in
@@ -533,30 +534,8 @@ class UsersController extends AppController
         $this->set('coursesOptions', $coursesOptions);
         $this->set('coursesSelected', $course_id);
 
-        // get the roles assignable to the new user
-        // TODO Update for admin/superadmin cases once access control done
-        // basically, superadmin is 1, and has the highest access
-        // student is 4, and has the lowest access.
-        // so the roles you are allowed to assign are any number
-        // greater than your role id.
-        $roles = $this->Role->find('list');
-        $highestRole = 99999999;
-        $roleDefault = null;
-        foreach ($user['Role'] as $role) {
-            if ($role['id'] < $highestRole) {
-                $highestRole = $role['id'];
-            }
-        }
-        foreach ($roles as $key => $val) {
-            if ($val == 'student') {
-                $roleDefault = $key;
-            }
-            if ($key <= $highestRole) {
-                unset($roles[$key]);
-            }
-        }
-        $this->set('roleOptions', $roles);
-        $this->set('roleDefault', $roleDefault);
+        $this->set('roleOptions', $this->AccessControl->getEditableRoles());
+        $this->set('roleDefault', 5);
 
         // validate the form data
         if ($this->data) {
@@ -592,13 +571,10 @@ class UsersController extends AppController
                 }
                 if ($wantedRole == $roleDefault) {
                     // we should add this user as a student
-                    $this->data['Enrolment'][]['UserEnrol']['course_id'] =
-                        $id;
-                }
-                else {
+                    $this->data['Enrolment'][]['UserEnrol']['course_id'] = $id;
+                } else {
                     // we should add this user as an instructor
-                    $this->data['Course'][]['UserCourse']['course_id'] =
-                        $id;
+                    $this->data['Course'][]['UserCourse']['course_id'] = $id;
                 }
                 // For email, store a mapping of enrolled course id to name
                 $coursesEnrolled[$id] = $coursesOptions[$id];
@@ -628,8 +604,7 @@ class UsersController extends AppController
                     )) {
                         // email notification successful
                         $message .= "Email notification sent.";
-                    }
-                    else {
+                    } else {
                         // email notification failed
                         $message .= "<div class='red'>User created but unable to send
                             email notification.</div>";
@@ -637,8 +612,7 @@ class UsersController extends AppController
                 }
                 $this->Session->setFlash($message, 'good');
                 return;
-            }
-            else {
+            } else {
                 // Failed
                 $this->Session->setFlash("Error while trying to save, try again.");
                 return;
