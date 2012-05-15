@@ -248,7 +248,6 @@ class CoursesController extends AppController
 
         $this->set('statusOptions', $statusOptions);
 
-        $user = $this->User->findById($this->Auth->user('id'));
         $courses = $this->Course->findById($id);
 
         $this->set('course', $courses['Course']['course']);
@@ -365,7 +364,7 @@ class CoursesController extends AppController
             $this->cakeError('error404');
         }
 
-        if (!($course = $this->Course->find('first', array('conditions' => array('Course.id' => $course_id))))) {
+        if (!($this->Course->find('first', array('conditions' => array('Course.id' => $course_id))))) {
             $this->cakeError('error404');
         }
 

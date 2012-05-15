@@ -135,8 +135,6 @@ class HomeController extends AppController
         foreach ($groupsEvents as $row) {
             $groupEvent = $row['GroupEvent'];
 
-            //get corresponding group
-            $group = $this->Group->getGroupByGroupId($groupEvent['group_id']);
             // get corresponding evaluation submission that is not submitted
             $isSubmitted = false;
             $eventSubmit = $this->EvaluationSubmission->find('first', array( 'conditions'=>array( 'grp_event_id'=>$groupEvent['id'], 'submitter_id'=>$userId)));
@@ -240,7 +238,6 @@ class HomeController extends AppController
 
         foreach ($course_list as $row) {
             for ($i = 0; $i < count($row['Event']); $i++) {
-                $event_id = $row['Event'][$i]['id'];
                 if ($row['Event'][$i]['event_template_type_id'] == 3) {
                     $row['Event'][$i]['student_count'] = $row['Course']['student_count'];
                 }

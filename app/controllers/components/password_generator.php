@@ -92,7 +92,7 @@ class PasswordGeneratorComponent extends Object {
    *
    * Helper for generate().
    *
-   * @param $len - strength of the password in bytes
+   * @param int $len - strength of the password in bytes
    *
    * @return a printable password string
    * */

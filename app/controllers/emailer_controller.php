@@ -321,6 +321,7 @@ class EmailerController extends AppController
      *
      * @param string $type - a class, group, or user
      * @param int $id - the id of the class, group, or user we're writing to
+     * @param string $s_type - first parameter of a model's find method 
      *
      * @return array of recipients and info
      */

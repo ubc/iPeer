@@ -168,12 +168,10 @@ class UsersController extends AppController
     /**
      * ajaxList
      *
-     * @param bool $pageForRedirect
-     *
      * @access public
      * @return void
      */
-    function ajaxList($pageForRedirect=null)
+    function ajaxList()
     {
         // Make sure the present user is not a student
         //$this->rdAuth->noStudentsAllowed();
@@ -220,9 +218,6 @@ class UsersController extends AppController
 
         $this->set('can_add_user', User::hasPermission('functions/user', 'create'));
         $this->set('can_import_user', User::hasPermission('functions/user/import'));
-        $fields = array('Enrolment');
-
-        $tempVar=$this->User->getEnrolledStudents(1, $fields);
     }
 
     /**
@@ -381,8 +376,6 @@ class UsersController extends AppController
         } else {
             // New Student = display a courses list.
             $enrolled_courses = array();
-            $course_couha = 0;
-            $all_courses = array();
         }
 
         // Get accessible courses
@@ -413,13 +406,12 @@ class UsersController extends AppController
     /**
      * _setUpCourseEnrollmentLists
      *
-     * @param mixed $id         id
-     * @param bool  $thisCourse this course
+     * @param mixed $id - user id
      *
      * @access public
      * @return void
      */
-    function _setUpCourseEnrollmentLists($id, $thisCourse = null)
+    function _setUpCourseEnrollmentLists($id)
     {
         $data = $this->getSimpleEntrollmentLists($id);
         $this->set("simpleEnrolledList", $data['simpleEnrolledList']);
@@ -458,18 +450,20 @@ class UsersController extends AppController
         foreach ($checkedCourseList as $key => $value) {
             if (!in_array($value, $simpleEnrolledList) &&
                 is_numeric($userId) &&
-                is_numeric($value)) {
-                    $this->User->registerEnrolment($userId, $value);
-                }
+                is_numeric($value)
+            ) {
+                $this->User->registerEnrolment($userId, $value);
+            }
         }
 
         // Take them out of the de-selected courses
         foreach ($simpleEnrolledList as $key => $value) {
             if (!in_array($value, $checkedCourseList) &&
                 is_numeric($userId) &&
-                is_numeric($value)) {
-                    $this->User->dropEnrolment($userId, $value);
-                }
+                is_numeric($value)
+            ) {
+                $this->User->dropEnrolment($userId, $value);
+            }
         }
     }
 
@@ -506,7 +500,7 @@ class UsersController extends AppController
      * Set the variables needed to preselect values in the select element on
      * the add user form.
      *
-     * @param int coursesId - automatically enroll the user in this course.
+     * @param int $courseId - automatically enroll the user in this course.
      *
      * @return void
      * */
@@ -521,7 +515,7 @@ class UsersController extends AppController
      * Set the variables needed to preselect values in the select element on
      * the edit user form.
      *
-     * @param int userId - user being edited
+     * @param int $userId - user being edited
      *
      * @return void
      * */
@@ -614,16 +608,16 @@ class UsersController extends AppController
      *
      * Note that enrolment as admins or superadmins is not working right now.
      * 
-     * @param int course_id - will automatically enroll the user in this course.
+     * @param int $courseId - will automatically enroll the user in this course.
      *
      * @access public
      * @return void
      */
-    public function add($course_id = null) {
+    public function add($courseId = null) {
         $this->set('title_for_layout', 'Add User');
 
         // set up the course and role variables to fill the form elements
-        $this->_initAddFormEnv($course_id);
+        $this->_initAddFormEnv($courseId);
 
         // save the data which involves:
         if ($this->data) {
@@ -659,7 +653,7 @@ class UsersController extends AppController
     /**
      * Given a user id, edit the information for that user
      *
-     * @param int $id - the user being edited
+     * @param int $userId - the user being edited
      *
      * @access public
      * @return void
@@ -668,10 +662,10 @@ class UsersController extends AppController
         $this->set('title_for_layout', 'Edit User');
 
         // stop if don't have required params
-		if (!$userId && empty($this->data)) {
-			$this->Session->setFlash(__('Invalid user', true));
+        if (!$userId && empty($this->data)) {
+            $this->Session->setFlash(__('Invalid user', true));
             $this->redirect($this->referer());
-		}
+        }
 
         // save the data which involves:
         if ($this->data) {
@@ -684,7 +678,7 @@ class UsersController extends AppController
             $this->data = array_merge($this->data, $enrolments);
 
             // Now we actually attempt to save the data
-            if ($ret = $this->User->save($this->data)) {
+            if ($this->User->save($this->data)) {
                 // Success!
                 $message = "User sucessfully updated! <br />";
                 $this->Session->setFlash($message, 'good');
@@ -758,13 +752,12 @@ class UsersController extends AppController
     /**
      * delete
      *
-     * @param mixed $id   id
-     * @param bool  $type type
+     * @param mixed $id - user id to delete
      *
      * @access public
      * @return void
      */
-    function delete($id, $type = null)
+    function delete($id)
     {
         $this->AccessControl->check('functions/user', 'delete');
 
@@ -837,20 +830,8 @@ class UsersController extends AppController
         $this->layout = 'ajax';
         $this->autoRender = false;
 
-        $isUserEnrol = false;
         $sFound = $this->User->getByUsername($this->data['User']['username']);
 
-        /*if (!empty($sFound)) {
-             foreach ($sFound['UserEnrol'] as $uEnrol) {
-                if($uEnrol['course_id'] == $this->Session->read('ipeerSession.courseId'))
-                    $isUserEnrol = true;
-             }
-        }
-
-      $this->set('role', $role);
-      $this->set('username', $this->params['form']['newuser']);
-        $this->set('isEnrolled', $isUserEnrol);*/
-        //$this->render('checkDuplicateName');
         return ($sFound) ? __('Username "', true).$this->data['User']['username'].__('" already exists.', true) : '';
     }
 
@@ -859,12 +840,11 @@ class UsersController extends AppController
      * resetPassword
      *
      * @param mixed $user_id user id
-     * @param bool  $render  render
      *
      * @access public
      * @return void
      */
-    function resetPassword($user_id, $render=true)
+    function resetPassword($user_id)
     {
         $this->AccessControl->check('functions/user/password_reset');
 
@@ -888,7 +868,7 @@ class UsersController extends AppController
         $user_data['User']['id'] =  $user_id;
 
         //Save Data
-        if ($user = $this->User->save($user_data, true, array('password'))) {
+        if ($this->User->save($user_data, true, array('password'))) {
             $message = __("Password successfully reset. ", true);
             $this->User->set('id', $user_id);
 
@@ -971,13 +951,12 @@ class UsersController extends AppController
             $this->redirect('import');
         }
 
-        $enrolResult = $this->Course->enrolStudents($this->User->insertedIds, $this->data['User']['course_id']);
+        $this->Course->enrolStudents($this->User->insertedIds, $this->data['User']['course_id']);
 
         $this->FileUpload->removeFile($uploadFile);
 
         $this->set('data', $result);
 
-        //$this->set('userRole', $this->params['data']['User/role']);
         $this->render('userSummary');
     }
 
@@ -1064,12 +1043,10 @@ class UsersController extends AppController
      * Helper function to send an email notification about to a user about
      * being added to iPeer.
      *
-     * @param string $from - who the email is from
-     * @param string $to - where the email is going to
-     * @param string $username - the username given to the user
+     * @param string $user - the return value from $this->User->save,
+     * which is basically $this->data, contains all the form values
      * @param string $password - the password to the username
-     * @param string $name - first name + last name
-     * @param string $courses - the courses that the user is enrolled in
+     * @param string $enrolments - the courses that the user is enrolled in
      *
      * @return Status message indicating success or error, empty string
      * if no email notification
