@@ -313,10 +313,6 @@ class UserTestCase extends CakeTestCase
         //user_id==9 : role(unassigned)
         $unassignedRole = $this->User->getRoleName(13);
         $this->assertEqual($unassignedRole, $empty);
-
-        //null input
-        $nullInput = $this->User->getRoleName(null);
-        $this->assertEqual($nullInput, $empty);
     }
 
     public function testGetRoleId()
@@ -342,10 +338,6 @@ class UserTestCase extends CakeTestCase
         //user_id==9 : role(unassigned)
         $unassignedRole = $this->User->getRoleId(13);
         $this->assertEqual($unassignedRole, $empty);
-
-        //null input
-        $nullInput = $this->User->getRoleId(null);
-        $this->assertEqual($nullInput, $empty);
     }
 
     public function testFindUserByid()
