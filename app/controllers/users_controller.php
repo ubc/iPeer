@@ -478,17 +478,20 @@ class UsersController extends AppController
      */
     function view($id)
     {
-        $this->AccessControl->check('functions/user', 'read');
-
         if (!is_numeric($id) || !($this->data = $this->User->findUserByid($id))) {
             $this->Session->setFlash('Invalid user ID.');
             $this->redirect('index');
         }
-
-        $roles = $this->User->getRoles($id);
-
-        if (!$this->AccessControl->hasPermissionDoActionOnUserWithRoles('ViewUser', $roles)) {
-            $this->Session->setFlash(__('You do not have permission to view this user.', true));
+        
+        $role = $this->User->getRoleName($id);
+        
+        if (!User::hasPermission('functions/user')) {
+            $this->Session->setFlash('You do not have permission to view users.' , true);
+            $this->redirect('/home');
+        }
+        
+        if (!User::hasPermission('functions/user/'.$role)) {
+            $this->Session->setFlash('You do not have permission to view this user.', true);
             $this->redirect('index');
         }
 
@@ -616,6 +619,11 @@ class UsersController extends AppController
     public function add($courseId = null) {
         $this->set('title_for_layout', 'Add User');
 
+        if(!User::hasPermission('functions/user')) {
+            $this->Session->setFlash('You do not have permission to add users', true);
+            $this->redirect('/home');
+        }
+
         // set up the course and role variables to fill the form elements
         $this->_initAddFormEnv($courseId);
 
@@ -660,6 +668,18 @@ class UsersController extends AppController
      */
     public function edit($userId) {
         $this->set('title_for_layout', 'Edit User');
+        
+        $role = $this->User->getRoleName($userId);
+        
+        if(!User::hasPermission('functions/user')) {
+            $this->Session->setFlash('You do not have permission to edit users.' , true);
+            $this->redirect('/home');
+        }
+        
+        if(!User::hasPermission('functions/user/'.$role)) {
+            $this->Session->setFlash('You do not have permission to edit this user.', true);
+            $this->redirect('index');
+        }
 
         // stop if don't have required params
         if (!$userId && empty($this->data)) {
@@ -733,8 +753,8 @@ class UsersController extends AppController
             if ($this->__processForm()) {
                 $this->__setSessionData($this->data['User']);
                 if (!empty($this->data['User']['email'])) {
-                    $this->Session->setFlash(__("Your Profile Has Been Updated Successfully.", true)."<br /><br /> " .
-                        "<a href='../../home/' style='font-size:140%'>".__('Go to your iPeer Home page.', true)."</a><br /><br />");
+                    $this->Session->setFlash((__("Your Profile Has Been Updated Successfully.", true)."<br /><br />" .
+                        "<a href='../../home/'>".__('Go to your iPeer Home page.', true)."</a><br />"), 'good');
                 } else {
                     $this->Session->setFlash(__("We saved your data, but you still need to enter an email address!", true));
                 }
@@ -759,26 +779,31 @@ class UsersController extends AppController
      */
     function delete($id)
     {
-        $this->AccessControl->check('functions/user', 'delete');
+        $role = $this->User->getRoleName($id);
+        
+        if(!User::hasPermission('functions/user')) {
+            $this->Session->setFlash('You do not have permission to delete users');
+            $this->redirect('/home');
+        }
+        
+        // check if current user has permission to delete this user
+        // in case of the being deleted user has higher level role
+        if(!User::hasPermission('functions/user/'.$role)) {
+            $this->Session->setFlash('You do not have permission to delete this user');
+            $this->redirect('index');
+        }
 
         // Ensure that the id is valid
         if (!is_numeric($id)) {
             $this->cakeError('error404');
         }
 
-        // check if current user has permission to delete this user
-        // in case of the being deleted user has higher level role
-        $roles = $this->User->getRoles($id);
-        if (!$this->AccessControl->hasPermissionDoActionOnUserWithRoles('DeleteUser', $roles)) {
-            $this->Session->setFlash(__('You do not have permission to delete the user.', true));
+        if ($this->User->delete($id)) {
+            $this->Session->setFlash(__('Record is successfully deleted!', true), 'good');
         } else {
-            if ($this->User->delete($id)) {
-                $this->Session->setFlash(__('Record is successfully deleted!', true));
-            } else {
-                $this->Session->setFlash(__('Delete failed!', true));
-            }
+            $this->Session->setFlash(__('Delete failed!', true));
         }
-
+        
         $this->redirect($this->referer());
     }
 
@@ -846,7 +871,17 @@ class UsersController extends AppController
      */
     function resetPassword($user_id)
     {
-        $this->AccessControl->check('functions/user/password_reset');
+        $role = $this->User->getRoleName($user_id);
+        
+        if(!User::hasPermission('functions/user')) {
+            $this->Session->setFlash('You do not have permission to reset passwords', true);
+            $this->redirect('/home');
+        }
+        
+        if(!User::hasPermission('functions/user/'.$role)) {
+            $this->Session->setFlash('You do not have permission to reset the password for this user.', true);
+            $this->redirect('index');
+        }
 
         // Read the user
         $user_data = $this->User->findUserByid($user_id, array('contain' => false));
@@ -854,11 +889,6 @@ class UsersController extends AppController
         if (empty($user_data)) {
             $this->Session->setFlash(__('User Not Found!', true));
             $this->redirect("index");
-        }
-
-        $roles = $this->User->getRoles($user_id);
-        if (!$this->AccessControl->hasPermissionDoActionOnUserWithRoles('PasswordReset', $roles)) {
-            $this->Session->setFlash(__('You do not have permission to drop the user.', true));
         }
 
         //General password
@@ -881,7 +911,7 @@ class UsersController extends AppController
                 if (!isset($user_data['User']['email']) || strlen($user_data['User']['email']) < 1) {
                     $message .= __('No destination email address. ', true);
                 }
-                $message .= __("Email was <u>not</u> sent to the user.", true) . $this->Email->smtpError;
+                $message .= __("Email was <u>not</u> sent to the user. ", true) . $this->Email->smtpError;
             }
             $this->Session->setFlash($message);
             $this->redirect($this->referer());
