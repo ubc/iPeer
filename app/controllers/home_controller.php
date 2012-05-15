@@ -60,8 +60,8 @@ class HomeController extends AppController
             $this->set('course_list', $this->_formatCourseList($course_list));
         } else if (User::hasRole('student')) {
             //Check if the student has a email in his/her profile
-            $email = $this->Auth->user('email');
-            if (!empty($email)) {
+            $user = $this->User->findUserById($this->Auth->user('id'));
+            if (!empty($user['User']['email'])) {
                 $this->render('studentIndex');
             } else {
                 $this->redirect('/users/editProfile');
