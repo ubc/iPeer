@@ -436,7 +436,7 @@ class CreateAclShell extends Shell
         $role->id = 4; // student
         $this->Acl->deny($role, 'controllers');
         $this->Acl->allow($role, 'controllers/Home');
-        $this->Acl->allow($role, 'controllers/Courses');
+        $this->Acl->deny($role, 'controllers/Courses');
         $this->Acl->deny($role, 'controllers/Users');
         $this->Acl->deny($role, 'functions');
     }
