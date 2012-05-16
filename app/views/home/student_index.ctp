@@ -11,8 +11,8 @@
       <table width="95%"  border="0" align="center" cellpadding="4" cellspacing="2">
 		  <tr class="tableheader">
 			<td width="40%"><?php __('Event')?></td>
-			<td width="20%"><?php __('Course')?></td>
-			<td width="20%"><?php __('Due Date')?> </td>
+			<td width="15%"><?php __('Course')?></td>
+			<td width="25%"><?php __('Due Date')?> </td>
 			<td width="20%"><?php __('Due In/Late By (red)')?> </td>
 		  </tr>	  
   	<?php $i = '0';$currentDate = strtotime('NOW');?>
@@ -40,7 +40,7 @@
 			<td><?php 
 				$dueDate=$row['comingEvent']['Event']['due_date'];
 				$timeStamp = strtotime($dueDate);
-				echo $this->requestAction('home/formatDate/'.$timeStamp); ?>&nbsp;</td>
+				echo date('F j, y g:i a', $timeStamp); ?>&nbsp;</td>
 			<td><?php
 			  if ($comingUpEvent['Event']['is_late']) {
 			     echo "<font color=\"red\"><b>" . $comingUpEvent['Event']["days_to_due"] . "</b>".__(' day(s)', true)."!  ";
@@ -129,11 +129,11 @@
 			<td><?php 
 				$due_date = $eventSubmitted['Event']['due_date'];
 				$timeStamp = strtotime($due_date);
-				echo $this->requestAction('home/formatDate/'.$timeStamp); ?>&nbsp;</td>
+				echo date('F j, y g:i a', $timeStamp); ?>&nbsp;</td>
 			<td><?php 
 				$submit_date = $eventSubmitted['Event']['date_submitted'];
 				$timeStamp = strtotime($submit_date);
-				echo $this->requestAction('home/formatDate/'.$timeStamp); ?>&nbsp;</td>
+				echo date('F j, y g:i a', $timeStamp); ?>&nbsp;</td>
 		  </tr>
 	  <?php $i++;} ?>
 	  <?php endforeach; ?>

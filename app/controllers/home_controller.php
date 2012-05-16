@@ -15,7 +15,7 @@ class HomeController extends AppController
      *
      * @public $uses
      */
-    public $uses =  array( 'UserEnrol', 'Group', 'GroupEvent',
+    public $uses =  array( 'Group', 'GroupEvent',
         'User', 'UserCourse', 'Event', 'EvaluationSubmission',
         'Course', 'Role', 'UserEnrol', 'Rubric', 'Penalty');
 
@@ -62,15 +62,23 @@ class HomeController extends AppController
             //Check if the student has a email in his/her profile
             $user = $this->User->findUserById($this->Auth->user('id'));
             if (!empty($user['User']['email'])) {
-                $this->render('studentIndex');
+                $this->redirect('studentIndex');
             } else {
                 $this->redirect('/users/editProfile');
             }
-
-            //Student Home Rendering
-            $this->set('data', $this->_preparePeerEvals());
         }
     }
+    
+    /**
+     * studentIndex
+     *
+     *
+     * @access public
+     * @return void
+     */
+     function studentIndex() {
+        $this->set('data', $this->_preparePeerEvals());
+     }
 
 
     /**
@@ -86,8 +94,9 @@ class HomeController extends AppController
         $eventAry = array();
         $pos = 0;
         //Get enrolled courses
-        $enrolledCourseIds = $this->UserEnrol->getEnrolledCourses($curUserId);
-        foreach ($enrolledCourseIds as $enrolledCourse) {
+        $user = $this->User->findUserByid($this->Auth->user('id'));
+        $enrol = $user['Enrolment'];
+        foreach ($enrol as $enrolledCourse) {
             $courseId = $enrolledCourse['UserEnrol']['course_id'];
             //$courseDetail = $this->Course->find('id='.$courseId);
             //Get Events for this course that are due
