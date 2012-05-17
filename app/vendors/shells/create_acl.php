@@ -411,6 +411,13 @@ class CreateAclShell extends Shell
         $role->id = 1;  // superadmin
         $this->Acl->allow($role, 'controllers');
         $this->Acl->allow($role, 'functions');
+        $this->Acl->allow($role, 'controllers/Evaltools');
+        $this->Acl->allow($role, 'controllers/Simpleevaluations');
+        $this->Acl->allow($role, 'controllers/Rubrics');
+        $this->Acl->allow($role, 'controllers/Mixevals');
+        $this->Acl->allow($role, 'controllers/Surveys');
+        $this->Acl->allow($role, 'controllers/Emailer');
+        $this->Acl->allow($role, 'controllers/Emailtemplates');
 
         $role->id = 2;  // admin
         $this->Acl->deny($role, 'controllers');
@@ -421,6 +428,13 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'functions/user');
         $this->Acl->deny($role, 'functions/user/admin');
         $this->Acl->deny($role, 'functions/user/superadmin');
+        $this->Acl->allow($role, 'controllers/Evaltools');
+        $this->Acl->allow($role, 'controllers/Simpleevaluations');
+        $this->Acl->allow($role, 'controllers/Rubrics');
+        $this->Acl->allow($role, 'controllers/Mixevals');
+        $this->Acl->allow($role, 'controllers/Surveys');
+        $this->Acl->allow($role, 'controllers/Emailer');
+        $this->Acl->allow($role, 'controllers/Emailtemplates');    
 
         $role->id = 3; // instructor
         $this->Acl->deny($role, 'controllers');
@@ -432,6 +446,13 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'functions/user/admin');
         $this->Acl->deny($role, 'functions/user/superadmin');
         $this->Acl->deny($role, 'functions/user/instructor');
+        $this->Acl->allow($role, 'controllers/Evaltools');
+        $this->Acl->allow($role, 'controllers/Simpleevaluations');
+        $this->Acl->allow($role, 'controllers/Rubrics');
+        $this->Acl->allow($role, 'controllers/Mixevals');
+        $this->Acl->allow($role, 'controllers/Surveys');
+        $this->Acl->allow($role, 'controllers/Emailer');
+        $this->Acl->allow($role, 'controllers/Emailtemplates');    
 
         $role->id = 4; // student
         $this->Acl->deny($role, 'controllers');
@@ -439,6 +460,13 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'controllers/Courses');
         $this->Acl->deny($role, 'controllers/Users');
         $this->Acl->deny($role, 'functions');
+        $this->Acl->deny($role, 'controllers/Evaltools');
+        $this->Acl->deny($role, 'controllers/Simpleevaluations');
+        $this->Acl->deny($role, 'controllers/Rubrics');
+        $this->Acl->deny($role, 'controllers/Mixevals');
+        $this->Acl->deny($role, 'controllers/Surveys');
+        $this->Acl->deny($role, 'controllers/Emailer');
+        $this->Acl->deny($role, 'controllers/Emailtemplates');     
     }
 
 
