@@ -201,7 +201,7 @@ class UsersController extends AppController
      */
     function index($message='')
     {
-        if (!User::hasPermission('functions')) {
+        if (!User::hasPermission('functions/user')) {
             $this->Session->setFlash('You do not have permission to view users.');
             $this->redirect('/home');
         }

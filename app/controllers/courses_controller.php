@@ -123,7 +123,7 @@ class CoursesController extends AppController
      */
     function index()
     {
-    	if (!User::hasPermission('functions')) {
+    	if (!User::hasPermission('functions/user')) {
     		$this->Session->setFlash('You do not have permission to view courses.');
     		$this->redirect('/home');
     	}
@@ -160,7 +160,7 @@ class CoursesController extends AppController
      */
     function view($id)
     {
-    	if (!User::hasPermission('functions')) {
+    	if (!User::hasPermission('functions/user')) {
     		$this->Session->setFlash('You do not have permission to view courses.');
     		$this->redirect('/home');
     	}
@@ -178,7 +178,7 @@ class CoursesController extends AppController
      */
     function home($id)
     {
-    	if  (!User::hasPermission('functions')) {
+    	if  (!User::hasPermission('functions/user')) {
     		$this->Session->setFlash('You do not have permission to view courses.');
     		$this->redirect('/home');
     	}
@@ -218,7 +218,7 @@ class CoursesController extends AppController
      */
     function add()
     {
-    	if (!User::hasPermission('functions')) {
+    	if (!User::hasPermission('functions/user')) {
     		$this->Session->setFlash('You do not have permission to add courses');
     		$this->redirect('/home');
     	}
@@ -255,7 +255,7 @@ class CoursesController extends AppController
      */
     function edit($id)
     {
-    	if (!User::hasPermission('functions')) {
+    	if (!User::hasPermission('functions/user')) {
     		$this->Session->setFlash('You do not have permission to edit courses.');
     		$this->redirect('/home');
     	}
@@ -328,7 +328,7 @@ class CoursesController extends AppController
      */
     function delete($id)
     {
-    	if(!User::hasPermission('functions')) {
+    	if(!User::hasPermission('functions/user')) {
     		$this->Session->setFlash('You do not have permission to delete courses');
     		$this->redirect('/home');
     	}
