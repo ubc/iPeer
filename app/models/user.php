@@ -945,7 +945,7 @@ class User extends AppModel
     {
         $model = Classregistry::init('Course');
 
-        return $model->getCourseListByInstructor(self::get('id'));
+        return $model->getListByInstructor(self::get('id'));
     }
 
 
@@ -1031,32 +1031,25 @@ class User extends AppModel
      */
     static function hasPermission($aco, $action = '*')
     {
+        $aco = strtolower($aco);
         App::import('Component', 'Session');
         $Session = new SessionComponent();
         if (!($permission = $Session->read('ipeerSession.Permissions'))) {
             return false;
         }
 
-        return in_array($aco, $permission);
-        /*
-        if (!Toolkit::isStartWith($aco, 'functions')) {
-            // controller branch for acl tree, looking for permission directly
-            return in_array($aco, $permission);
-        } else {
-            while (!empty($aco)) {
-                if (in_array($aco, $permission)) {
-                    return true;
-                }
-
-                // trace to a higher level of aco to see if we have permission there
-                $aco = explode('/', $aco);
-                array_pop($aco);
-                $aco = implode('/', $aco);
-            }
+        // no permission for aco
+        if (!isset($permission[$aco])) {
             return false;
         }
 
-        return false;*/
+        if ("*" == $action) {
+            // no need to check action
+            return true;
+        }
+
+        // check action
+        return in_array($action, $permission[$aco]);
     }
 
     /**

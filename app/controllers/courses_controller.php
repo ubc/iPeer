@@ -123,11 +123,11 @@ class CoursesController extends AppController
      */
     function index()
     {
-    	if (!User::hasPermission('functions/user')) {
-    		$this->Session->setFlash('You do not have permission to view courses.');
-    		$this->redirect('/home');
-    	}
-    	
+        if (!User::hasPermission('functions/user')) {
+            $this->Session->setFlash('You do not have permission to view courses.');
+            $this->redirect('/home');
+        }
+
         // Set up the basic static ajax list variables
         $this->_setUpAjaxList();
         // Set the display list
@@ -160,10 +160,10 @@ class CoursesController extends AppController
      */
     function view($id)
     {
-    	if (!User::hasPermission('functions/user')) {
-    		$this->Session->setFlash('You do not have permission to view courses.');
-    		$this->redirect('/home');
-    	}
+        if (!User::hasPermission('functions/user')) {
+            $this->Session->setFlash('You do not have permission to view courses.');
+            $this->redirect('/home');
+        }
 
         $this->set('data', $this->Course->read(null, $id));
     }
@@ -178,11 +178,11 @@ class CoursesController extends AppController
      */
     function home($id)
     {
-    	if  (!User::hasPermission('functions/user')) {
-    		$this->Session->setFlash('You do not have permission to view courses.');
-    		$this->redirect('/home');
-    	}
-    	
+        if (!User::hasPermission('functions/user')) {
+            $this->Session->setFlash('You do not have permission to view courses.');
+            $this->redirect('/home');
+        }
+
         $course = $this->Course->find('first', array('conditions' => array('id' => $id), 'recursive' => 1));
         $this->set('data', $course);
         $this->set('course_id', $id);
@@ -218,11 +218,11 @@ class CoursesController extends AppController
      */
     function add()
     {
-    	if (!User::hasPermission('functions/user')) {
-    		$this->Session->setFlash('You do not have permission to add courses');
-    		$this->redirect('/home');
-    	}
-    	
+        if (!User::hasPermission('functions/user')) {
+            $this->Session->setFlash('You do not have permission to add courses');
+            $this->redirect('/home');
+        }
+
         $this->set('title_for_layout', 'Add Course');
         if (!empty($this->data)) {
             if ($this->data = $this->Course->save($this->data)) {
@@ -255,11 +255,11 @@ class CoursesController extends AppController
      */
     function edit($id)
     {
-    	if (!User::hasPermission('functions/user')) {
-    		$this->Session->setFlash('You do not have permission to edit courses.');
-    		$this->redirect('/home');
-    	}
-    	
+        if (!User::hasPermission('functions/user')) {
+            $this->Session->setFlash('You do not have permission to edit courses.');
+            $this->redirect('/home');
+        }
+
         $this->set('title_for_layout', 'Edit Course');
         if (!is_numeric($id)) {
             $this->Session->setFlash(__('Invalid course ID.', true));
@@ -332,7 +332,7 @@ class CoursesController extends AppController
     		$this->Session->setFlash('You do not have permission to delete courses');
     		$this->redirect('/home');
     	}
-    	
+
         if ($this->Course->delete($id)) {
             //Delete all corresponding data start here
             $course = $this->Course->findById($id);

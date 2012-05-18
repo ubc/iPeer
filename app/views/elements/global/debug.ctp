@@ -67,7 +67,7 @@ if(!Configure::read('debug') == 0 &&
   </pre>
 
   <h5>Permissions</h5>
-  <pre style="background-color:#E9FFFF;" id="permission-data" >
+  <pre style="background-color:#E9FFFF;display: none;" id="permission-data" >
 <?php
     $perms = User::getPermissions();
     if (empty($perms)) {

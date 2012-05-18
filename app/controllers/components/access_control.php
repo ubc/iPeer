@@ -277,40 +277,54 @@ class AccessControlComponent extends Object
      */
     function _addPermissions($acos, $level, $alias = '', $inheritPermission = array())
     {
+        //echo "Going into level $level<br />";
         foreach ($acos as $val) {
             $thisAlias = $alias . $val[$this->options['model']][$this->options['field']];
+            //echo "alias: $thisAlias<br />";
 
             if (isset($this->perms[$val[$this->options['model']]['id']])) {
                 $curr_perm = $this->perms[$val[$this->options['model']]['id']];
-                if ($curr_perm['Permission']['_create'] == 1) {
-                    $this->permissionsArray[] = strtolower($thisAlias);
-                    $inheritPermission[$level] = 1;
+                $access = array();
+                foreach ($curr_perm['Permission'] as $key => $p) {
+                    // looking for the records start with '_' for permissions
+                    if (substr($key, 0, 1) != '_') {
+                        continue;
+                    }
+
+                    if ($p == 1) {
+                        $access[] = substr($key, 1);
+                    }
+                }
+                if (!empty($access)) {
+                    $this->permissionsArray[strtolower($thisAlias)] = $access;
+                    $inheritPermission[$level] = $access;
                 } else {
                     $inheritPermission[$level] = -1;
                 }
             } else {
+                //echo "perms not found<br />";
                 if (!empty($inheritPermission)) {
                     //echo $level.'::'.$thisAlias;
                     //var_dump($inheritPermission);
                     //check for inheritedPermissions, by checking closest array element
-                    $revPerms = array_reverse($inheritPermission);
-                    if ($revPerms[0] == 1) {
-                        $this->permissionsArray[] = strtolower($thisAlias); //the level above was set to 1, so this should be a 1
+                    if ($inheritPermission[$level-1] != -1) {
+                        //the level above was set to 1, so this should be a 1
+                        $this->permissionsArray[strtolower($thisAlias)] = $inheritPermission[$level-1];
                     }
-
+                    $inheritPermission[$level] = $inheritPermission[$level-1];
                 }
             }
 
+            //var_dump($this->permissionsArray);
             if (isset($val['children'][0])) {
                 $old_alias = $alias;
                 $alias .= $val[$this->options['model']][$this->options['field']] .'/';
+                //var_dump('Child '.$alias);
                 $this->_addPermissions($val['children'], $level+1, $alias, $inheritPermission);
-                //unset($inheritPermission[$level+1]);  //don't want the last level's inheritance, in case it was set
+                // clear the inherit permission for next branch
+                unset($inheritPermission[$level+1]);  //don't want the last level's inheritance, in case it was set
                 $alias = $old_alias;
             }
-
-            // clear the inherit permission for next branch
-            unset($inheritPermission[$level]);    //don't want this inheritance anymore, in case it was set
         }
 
         return;
