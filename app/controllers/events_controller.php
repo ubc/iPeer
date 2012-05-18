@@ -103,11 +103,7 @@ class EventsController extends AppController
     function setUpAjaxList()
     {
         // Grab the course list
-        $userCourseList = $this->sysContainer->getMyCourseList();
-        $coursesList = array();
-        foreach ($userCourseList as $id => $course) {
-            $coursesList[$id] = $course['course'];
-        }
+        $coursesList = User::getMyCourseList();
 
         // Set up Columns
         $columns = array(
@@ -222,7 +218,7 @@ class EventsController extends AppController
     function goToClassList($course)
     {
         if (is_numeric($course)) {
-            $courses = $this->sysContainer->getMyCourseList();
+            $courses = User::getMyCourseList();
             if (!empty($courses[$course])) {
                 // We need to change the session state to point to this
                 // course:
