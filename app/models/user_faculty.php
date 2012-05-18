@@ -1,6 +1,6 @@
 <?php
 /**
- * DepartmentUser
+ * UserFaculty
  *
  * @uses AppModel
  * @package   CTLT.iPeer
@@ -8,19 +8,20 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class DepartmentUser extends AppModel
+class UserFaculty extends AppModel
 {
-    public $name = 'DepartmentUser';
+    public $name = 'UserFaculty';
+    public $belongsTo = array('User', 'Faculty');
 
     /**
-     * getDepartment
+     * getFaculty
      *
      * @param bool $user_id
      *
      * @access public
      * @return void
      */
-    function getDepartment($user_id=null)
+    function getFaculty($user_id=null)
     {
         return $this->find('first', array('conditions' =>
             array('user_id' => $user_id)));

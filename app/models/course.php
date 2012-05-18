@@ -41,7 +41,8 @@ class Course extends AppModel
             'dependent'   => true,
             'exclusive'   => false,
             'finderSql'   => ''
-        )
+        ),
+        'CourseDepartment'
     );
 
     public $hasAndBelongsToMany = array(
