@@ -241,6 +241,13 @@ class UsersController extends AppController
      * @return void
      */
     function goToClassList($course) {
+
+        if (!User::hasPermission('functions/user')) {
+            $this->Session->setFlash(
+                'You do not have permission to view users.', true);
+            $this->redirect('/home');
+        }
+
         $classStudents = array(); // holds all the students enrolled in this course
         $classInstructors = array(); // holds instructors for this course
         $classList = array(); // holds all users in this course for display in view
@@ -261,7 +268,6 @@ class UsersController extends AppController
         );
 
         // put only the data needed for display into classList
-        // TODO role based data retrival restrictions
         foreach ($classInstructors as $user) {
             $tmp = array();
             $tmp['id'] = $user['User']['id'];
@@ -483,20 +489,25 @@ class UsersController extends AppController
      */
     function view($id)
     {
-        if (!is_numeric($id) || !($this->data = $this->User->findUserByid($id))) {
+        if (!is_numeric($id)) {
             $this->Session->setFlash('Invalid user ID.');
             $this->redirect('index');
         }
         
-        $role = $this->User->getRoleName($id);
-        
         if (!User::hasPermission('functions/user')) {
-            $this->Session->setFlash('You do not have permission to view users.' , true);
+            $this->Session->setFlash(
+                'You do not have permission to view users.', true);
             $this->redirect('/home');
         }
         
+        $role = $this->User->getRoleName($id);
         if (!User::hasPermission('functions/user/'.$role)) {
             $this->Session->setFlash('You do not have permission to view this user.', true);
+            $this->redirect('index');
+        }
+
+        if(!($this->data = $this->User->findUserByid($id))) {
+            $this->Session->setFlash('Invalid user ID.');
             $this->redirect('index');
         }
 
@@ -677,12 +688,14 @@ class UsersController extends AppController
         $role = $this->User->getRoleName($userId);
         
         if(!User::hasPermission('functions/user')) {
-            $this->Session->setFlash('You do not have permission to edit users.' , true);
+            $this->Session->setFlash(
+                'You do not have permission to edit users.', true);
             $this->redirect('/home');
         }
         
         if(!User::hasPermission('functions/user/'.$role)) {
-            $this->Session->setFlash('You do not have permission to edit this user.', true);
+            $this->Session->setFlash(
+                'You do not have permission to edit this user.', true);
             $this->redirect('index');
         }
 
