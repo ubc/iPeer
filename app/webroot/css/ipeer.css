@@ -287,6 +287,13 @@ h1.title
 h2
 {
     margin: 1em 0;
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+h3
+{
+    margin: 1em 0 1.5em 0;
     font-weight: bold;
 }
 
