@@ -25,7 +25,7 @@ foreach ($departments as $department) {
         echo "<td>";
         echo $this->Html->link(
             $val, 
-            array('action' => 'view', 'controller' => 'department', $id)
+            array('action' => 'view', 'controller' => 'departments', $id)
         );
         echo "</td>";
     }
