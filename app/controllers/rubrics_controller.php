@@ -98,7 +98,7 @@ class RubricsController extends AppController
 
         // Join with Users
         $jointTableCreator =
-            array("id"         => "Creator.id",
+            array("id"         => "Creator_id",
                 "localKey"   => "creator_id",
                 "description" => __("Evaluations to show:", true),
                 "default" => $myID,
