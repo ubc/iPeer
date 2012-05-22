@@ -11,7 +11,8 @@ class SimpleEvaluationTestCase extends CakeTestCase
         'app.survey_group_set', 'app.survey_group',
         'app.survey_group_member', 'app.question',
         'app.response', 'app.survey_question', 'app.user_course',
-        'app.user_enrol', 'app.groups_member', 'app.survey', 'app.simple_evaluation'
+        'app.user_enrol', 'app.groups_member', 'app.survey', 
+        'app.simple_evaluation', 'app.user_faculty'
     );
     public $Course = null;
     public $empty = null;

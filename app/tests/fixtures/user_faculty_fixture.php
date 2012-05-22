@@ -1,9 +1,9 @@
 <?php
 /* UserFaculty Fixture generated on: 2012-05-18 17:00:55 : 1337385655 */
 class UserFacultyFixture extends CakeTestFixture {
-	var $name = 'UserFaculty';
+	public $name = 'UserFaculty';
 
-	var $fields = array(
+	public $fields = array(
 		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
 		'user_id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'index'),
 		'faculty_id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'index'),
@@ -11,7 +11,7 @@ class UserFacultyFixture extends CakeTestFixture {
 		'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_general_ci', 'engine' => 'InnoDB')
 	);
 
-	var $records = array(
+	public $records = array(
 		array(
 			'id' => 1,
 			'user_id' => 1,
