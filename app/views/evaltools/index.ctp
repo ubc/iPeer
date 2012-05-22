@@ -66,9 +66,8 @@
 	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
 	      <tr class="panelContent">
 	        <td colspan="8" align="right">
-          <?php if (!empty($access['RUBRIC_RECORD'])) {   ?>
           <?php echo $html->image('icons/add.gif', array('alt'=>'Add Rubric', 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link(__('Add Rubric', true), '/rubrics/add'); ?>
-          <?php }?>          </td>
+            </td>
 	      </tr>
     	  <tr class="panelContent">
     	    <th colspan="2" width="60%"><?php __('Name')?></th>
@@ -115,10 +114,8 @@
 	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
 	      <tr class="panelContent">
 	        <td colspan="8" align="right">
-          <?php if (!empty($access['MIX_EVAL_RECORD'])) {   ?>
           <?php echo $html->image('icons/add.gif', array('alt'=>__('Add Mix Evaluation', true), 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link(__('Add Mix Evaluation', true), '/mixevals/add'); ?>
-          <?php }?>
-          </td>
+            </td>
 	      </tr>
     	  <tr class="panelContent">
     	    <th colspan="2" width="60%"><?php __('Name')?></th>
