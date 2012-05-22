@@ -18,7 +18,8 @@ class EvaluationTestCase extends CakeTestCase
         'app.response', 'app.survey_question', 'app.user_course', 'app.rubric', 'app.rubrics_criteria', 'app.rubrics_criteria_comment',
         'app.user_enrol', 'app.groups_member', 'app.survey', 'app.mixeval', 'app.mixevals_question', 'app.mixevals_question_desc',
         'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
-        'app.evaluation_simple'
+        'app.evaluation_simple', 'app.faculty', 'app.user_faculty',
+        'app.department', 'app.course_department'
     );
 
     function startCase()

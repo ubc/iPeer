@@ -11,7 +11,8 @@ class UserCourseTestCase extends CakeTestCase
         'app.survey_group_set', 'app.survey_group',
         'app.survey_group_member', 'app.question',
         'app.response', 'app.survey_question', 'app.user_course',
-        'app.user_enrol', 'app.groups_member', 'app.survey'
+        'app.user_enrol', 'app.groups_member', 'app.survey', 'app.faculty',
+        'app.user_faculty', 'app.department', 'app.course_department'
     );
     public $UserCourse = null;
 

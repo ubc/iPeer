@@ -480,18 +480,6 @@ class Course extends AppModel
     }
 
     /**
-     * Count students enrolled in a course
-     *
-     * @param unknown_type $course_id course id
-     *
-     * @return  count of enrolled students
-     */
-    function getEnrolledStudentCount($course_id)
-    {
-        return $this->Instructor->find('count', array('conditions' => array('Enrolment.id' => $course_id)));
-    }
-
-    /**
      * Get course data by course name
      *
      * @param unknown_type $course course name
