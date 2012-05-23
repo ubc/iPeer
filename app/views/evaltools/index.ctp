@@ -114,7 +114,7 @@
 	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
 	      <tr class="panelContent">
 	        <td colspan="8" align="right">
-          <?php echo $html->image('icons/add.gif', array('alt'=>__('Add Mix Evaluation', true), 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link(__('Add Mix Evaluation', true), '/mixevals/add'); ?>
+          <?php echo $html->image('icons/add.gif', array('alt'=>__('Add Mix Evaluation', true), 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link(__('Add Mixed Evaluation', true), '/mixevals/add'); ?>
             </td>
 	      </tr>
     	  <tr class="panelContent">
