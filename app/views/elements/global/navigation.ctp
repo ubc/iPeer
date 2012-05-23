@@ -10,10 +10,10 @@
  */
 
 function generateTab ($view, $url, $activeControllers, $name) {
-  $url = $view->webroot . $view->theme . $url;
   // Generate the HTML
-  $current = in_array($view->params['controller'], $activeControllers) ?
+  $current = ($view->params['url']['url'] == $url) ?
     "id='current'" : "";
+  $url = $view->webroot . $view->theme . $url;
   echo "<li $current><a href='$url'>$name</a></li>";
 }
 
@@ -54,15 +54,11 @@ if (User::isLoggedIn()) {
         generateTab($this, 'searchs', array('searchs'), 'Search');
     }
 
-    // System Parameters Tab
-    if (User::hasPermission('controllers/sysparameters')) {
-        generateTab($this, 'sysparameters',
-            array('sysparameters'),
-            'Sys Parameters');
-    }
-    // System Functions Tab
-    if (User::hasPermission('controllers/sysfunctions')) {
-        generateTab($this, 'sysfunctions', array('sysfunctions'), 'Sys Functions');
+    // Admin Tab
+    if (User::hasPermission('adminpage')) {
+        generateTab($this, 'pages/admin',
+            array('pages/admin'),
+            'Admin');
     }
 
     echo "<li>";

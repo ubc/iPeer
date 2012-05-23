@@ -58,6 +58,13 @@ class CreateAclShell extends Shell
      */
     function createAcos()
     {
+        // could make it 'pages/admin' but unfortunately, there is a 
+        // pages controller brought in somewhere when generating the ACOs
+        // for the controller. 
+        $this->Acl->Aco->create(
+            array('parent_id' => null, 'alias' => 'adminpage'));
+        $this->Acl->Aco->save();
+
         $this->__buildAcoControllers();
         $this->__buildAcoFunctions();
     }
@@ -418,6 +425,9 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Surveys');
         $this->Acl->allow($role, 'controllers/Emailer');
         $this->Acl->allow($role, 'controllers/Emailtemplates');
+        $this->Acl->allow($role, 'controllers/faculties');
+        $this->Acl->allow($role, 'controllers/departments');
+        $this->Acl->allow($role, 'adminpage');
 
         $role->id = 2;  // admin
         $this->Acl->deny($role, 'controllers');
@@ -435,6 +445,8 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Surveys');
         $this->Acl->allow($role, 'controllers/Emailer');
         $this->Acl->allow($role, 'controllers/Emailtemplates');    
+        $this->Acl->allow($role, 'controllers/departments');
+        $this->Acl->allow($role, 'adminpage');
 
         $role->id = 3; // instructor
         $this->Acl->deny($role, 'controllers');
