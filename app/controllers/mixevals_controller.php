@@ -297,7 +297,7 @@ class MixevalsController extends AppController
                 $id = $this->Mixeval->id;
                 $question_ids= $this->MixevalsQuestion->find('all', array('conditions' => array('mixeval_id'=> $id), 'fields'=>'id, question_num'));
                 $this->MixevalsQuestionDesc->insertQuestionDescriptor($this->data['Question'], $question_ids);
-                $this->Session->setFlash(__('The Mixed Evaluation was edited successfully.', true));
+                $this->Session->setFlash(__('The Mixed Evaluation was edited successfully.', true), 'good');
                 $this->redirect('index');
 
             } else {
@@ -344,14 +344,9 @@ class MixevalsController extends AppController
      */
     function copy($id=null)
     {
-        $this->set('action', __('Copy Mixed Evaluation', true));
-        $this->render = false;
-        $this->Mixeval->id = $id;
-        $this->data = $this->Mixeval->find('first', array('conditions' => array('id' => $id),
-                'contain' => array('Question.Description',
-                )));
-        $this->data['Mixeval']['name'] = "Copy of ".$this->data['Mixeval']['name']; 
+        $this->data = $this->Mixeval->copy($id);
         $this->set('data', $this->data);
+        $this->set('action', __('Copy Mixed Evaluation', true));
         $this->render('edit');
     }
 
@@ -386,7 +381,7 @@ class MixevalsController extends AppController
                 //				$this->MixevalsQuestionDesc->deleteQuestionDescriptors($id);
                 //				$this->MixevalsQuestion->deleteQuestions($id);
 
-                $this->Session->setFlash(__('The Mixed Evaluation was removed successfully.', true));
+                $this->Session->setFlash(__('The Mixed Evaluation was removed successfully.', true), 'good');
                 $this->redirect('index');
 
             } else {
