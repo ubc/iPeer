@@ -496,7 +496,7 @@ class EvaluationsController extends AppController
           }*/
 
             if ($this->Evaluation->saveSimpleEvaluation($this->params, $groupEvent, $evaluationSubmission)) {
-                $this->Session->setFlash(('Your Evaluation was submitted successfully.', true));
+                $this->Session->setFlash(__('Your Evaluation was submitted successfully.', true));
                 $this->redirect('/home/index/', true);
             } else {
                 //Found error
@@ -768,7 +768,7 @@ class EvaluationsController extends AppController
         }
 
         if ($status) {
-            $this->Session->setFlash(('Your Evaluation was submitted successfully.', true));
+            $this->Session->setFlash(__('Your Evaluation was submitted successfully.', true));
             $this->redirect('/home/index/', true);
         } else {
             $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
@@ -915,7 +915,7 @@ class EvaluationsController extends AppController
         }
 
         if ($status) {
-            $this->Session->setFlash(('Your Evaluation was submitted successfully.', true));
+            $this->Session->setFlash(__('Your Evaluation was submitted successfully.', true));
             $this->redirect('/home/index/', true);
         } else {
             $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
