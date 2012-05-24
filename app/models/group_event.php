@@ -13,6 +13,25 @@ class GroupEvent extends AppModel
     public $name = 'GroupEvent';
     public $actsAs = array('Traceable');
 
+    public $belongsTo= array(
+        'Group' =>
+        array(
+            'className' => 'Group',
+            'conditions' => '',
+            'order' => '',
+            'dependent' => true,
+            'foreignKey' => 'group_id'
+        ),
+        'Event' =>
+        array(
+            'className' => 'Event',
+            'conditions' => '',
+            'order' => '',
+            'dependent' => true,
+            'foreignKey' => 'event_id'
+        ),
+    );
+
     /**
      * insertGroups inserts all members into the groups_events table
      *
@@ -299,12 +318,6 @@ class GroupEvent extends AppModel
         return $this->find('count', array(
             'conditions' => array('GroupEvent.id' => $groupEventId, 'EvaluationSubmission.date_submitted > Event.due_date'),
             'joins' => array(
-                array(
-                    'table' => 'events',
-                    'alias' => 'Event',
-                    'type' => 'LEFT',
-                    'conditions' => array('GroupEvent.event_id = Event.id')
-                ),
                 array(
                     'table' => 'evaluation_submissions',
                     'alias' => 'EvaluationSubmission',

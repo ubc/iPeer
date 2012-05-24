@@ -142,19 +142,9 @@ class EvaluationsController extends AppController
             array("Event.title",       __("Event", true),        "10em",    "action", "View Event"),
         );
 
-        $joinTables = array(
-            array( "joinTable" => "groups",
-            "joinModel" => "Group",
-            "localKey" => "group_id"),
-            array( "joinTable" => "events",
-            "joinModel" => "Event",
-            "localKey" => "event_id"),
-        );
-
-        $extraFilters ="`Group`.`id` is not null and `Event`.`id` is not null ";
-
+        $extraFilters = array();
         if (!empty($eventId)) {
-            $extraFilters .="and `Event`.`id`=$eventId ";
+            $extraFilters = array('Event.id' => $eventId);
         }
 
         $actions = array(
@@ -167,11 +157,11 @@ class EvaluationsController extends AppController
             array(__("Edit Event", true),      "", "", "events", "edit", "Event.id"),
         );
 
-        $recursive = (-1);
+        $recursive = 0;
 
         $this->AjaxList->setUp($this->GroupEvent, $columns, $actions,
             "Group.group_num", "Group.group_name",
-            $joinTables, $extraFilters, $recursive, "postProcess");
+            array(), $extraFilters, $recursive, "postProcess");
     }
 
 
@@ -201,9 +191,6 @@ class EvaluationsController extends AppController
      */
     function view($eventId='')
     {
-        // Make sure the present user is not a student
-        //$this->rdAuth->noStudentsAllowed();
-
         // Record the event id into the session
         if (!empty($eventId) && is_numeric($eventId)) {
             $this->Session->write("evaluationsControllerEventIdSession", $eventId);

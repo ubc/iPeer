@@ -33,6 +33,17 @@ class Group extends AppModel
         )
     );
 
+    public $hasMany = array(
+        'GroupEvent' =>
+        array(
+            'className' => 'GroupEvent',
+            'conditions' => '',
+            'order' => '',
+            'dependent' => true,
+            'foreignKey' => 'group_id'
+        ),
+    );
+
     public $hasAndBelongsToMany = array(
         'Member' => array(
             'className'    =>  'User',
