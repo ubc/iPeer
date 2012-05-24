@@ -11,5 +11,4 @@
 class UserFaculty extends AppModel
 {
     public $name = 'UserFaculty';
-    public $belongsTo = array('User', 'Faculty');
 }

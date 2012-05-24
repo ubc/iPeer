@@ -22,6 +22,10 @@ echo $this->Form->input(
     'options' => $roleOptions,
   )
 );
+if (User::hasPermission('functions/user/admin')) {
+    echo $this->Form->input('Faculty', 
+        array('label' => 'Faculty (admin only)'));
+}
 echo $this->Form->input('title');
 echo $this->Form->input('student_no', array('label' => 'Student Number'));
 echo $this->Form->input(
@@ -52,3 +56,24 @@ echo $ajax->observeField(
 
 ?>
 </div>
+
+<?php
+if (User::hasPermission('functions/user/admin')) {
+    echo "
+<script type='text/javascript'>
+// If the user is supposed to be a student, disable adding as an
+// instructor. Any other role, disable adding as a student.
+jQuery('#RoleRolesUserRoleId').change(function() {
+    var str = jQuery('#RoleRolesUserRoleId option:selected').text();
+    if (str == 'admin') {
+        jQuery('#FacultyFaculty').removeAttr('disabled');
+    }
+    else {
+        jQuery('#FacultyFaculty').attr('disabled', 'disabled');
+    }
+});
+// run once on initial page load
+jQuery('#RoleRolesUserRoleId').change();
+</script>";
+}
+?>

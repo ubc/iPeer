@@ -10,5 +10,4 @@ class Faculty extends AppModel {
         ),
     );
 
-    var $hasMany = array('Department', 'UserFaculty');
 }
