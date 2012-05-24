@@ -10,7 +10,8 @@ class GroupEventTestCase extends CakeTestCase {
         'app.survey_group_set', 'app.survey_group',
         'app.survey_group_member', 'app.question',
         'app.response', 'app.survey_question', 'app.user_course', 'app.evaluation_rubric', 'app.rubrics_criteria',
-        'app.user_enrol', 'app.groups_member', 'app.survey', 'app.rubric'
+        'app.user_enrol', 'app.groups_member', 'app.survey', 'app.rubric', 'app.faculty', 'app.course_department',
+        'app.department', 'app.user_faculty'
     );
     public $GroupEvent = null;
 
