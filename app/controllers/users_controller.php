@@ -99,17 +99,6 @@ class UsersController extends AppController
         $columns = array(
             // Model, Columns, (Display Title), (Type Description)
             array(
-                "User.role",
-                __("Role", true),
-                "6em",
-                "map",
-                array(
-                    "A" => "Admin",
-                    "I" => __("Instructor", true),
-                    "S" => __("Student", true)
-                )
-            ),
-            array(
                 "User.id",
                 "",
                 "",
@@ -150,6 +139,17 @@ class UsersController extends AppController
             $actionRestrictions = "";
         }
 
+        $joinTables =  array(
+            array (
+                // GUI aspects
+                "id" => "Role.id",
+                "description" => __("Show role:", true),
+                // The choise and default values
+                "list" => $this->AccessControl->getEditableRoles(),
+                "default" => 0,
+            )
+        );
+
         // define right click menu actions
         $actions = array(
             //   display name, (warning shown), fixed parameters or Column ids
@@ -161,7 +161,7 @@ class UsersController extends AppController
         );
 
         $this->AjaxList->setUp($this->User, $columns, $actions,
-            "User.id", "User.username", array());
+            "User.id", "User.username", $joinTables);
     }
 
 
@@ -205,7 +205,7 @@ class UsersController extends AppController
             $this->Session->setFlash('You do not have permission to view users.');
             $this->redirect('/home');
         }
-        
+
         // Set the top message
         $this->set('message', $message);
 
@@ -493,13 +493,13 @@ class UsersController extends AppController
             $this->Session->setFlash('Invalid user ID.');
             $this->redirect('index');
         }
-        
+
         if (!User::hasPermission('functions/user')) {
             $this->Session->setFlash(
                 'You do not have permission to view users.', true);
             $this->redirect('/home');
         }
-        
+
         $role = $this->User->getRoleName($id);
         if (!User::hasPermission('functions/user/'.$role)) {
             $this->Session->setFlash('You do not have permission to view this user.', true);
@@ -573,7 +573,7 @@ class UsersController extends AppController
         $courses = $user['Course'];
         $coursesOptions = array();
         foreach ($courses as $course) {
-            $coursesOptions[$course['id']] = 
+            $coursesOptions[$course['id']] =
                 $course['course'].' - '.$course['title'];
         }
         $this->set('coursesOptions', $coursesOptions);
@@ -589,12 +589,12 @@ class UsersController extends AppController
      * - Course-Instructor relations are stored by the UserCourses table.
      *
      * - Course-Student relations are stored by the UserEnrols table.
-     * The relations as defined for some reason puts these related tables 
+     * The relations as defined for some reason puts these related tables
      * deep in the array.
      *
      * @param array $courses - the form data from the course selection
      * element
-     * @param int $wantedRole - the role id of the role of the user being 
+     * @param int $wantedRole - the role id of the role of the user being
      * created
      *
      * @return the arrays to be added to $this->data
@@ -626,7 +626,7 @@ class UsersController extends AppController
      * Add a user to iPeer.
      *
      * Note that enrolment as admins or superadmins is not working right now.
-     * 
+     *
      * @param int $courseId - will automatically enroll the user in this course.
      *
      * @access public
@@ -662,7 +662,7 @@ class UsersController extends AppController
                 // Success!
                 $message = "User sucessfully created!
                     <br />Password: <b>$password</b> <br />";
-                $message .= 
+                $message .=
                     $this->_sendAddUserEmail($ret, $password, $enrolments);
                 $this->Session->setFlash($message, 'good');
             }
@@ -684,15 +684,15 @@ class UsersController extends AppController
      */
     public function edit($userId) {
         $this->set('title_for_layout', 'Edit User');
-        
+
         $role = $this->User->getRoleName($userId);
-        
+
         if(!User::hasPermission('functions/user')) {
             $this->Session->setFlash(
                 'You do not have permission to edit users.', true);
             $this->redirect('/home');
         }
-        
+
         if(!User::hasPermission('functions/user/'.$role)) {
             $this->Session->setFlash(
                 'You do not have permission to edit this user.', true);
@@ -798,12 +798,12 @@ class UsersController extends AppController
     function delete($id)
     {
         $role = $this->User->getRoleName($id);
-        
+
         if(!User::hasPermission('functions/user')) {
             $this->Session->setFlash('You do not have permission to delete users');
             $this->redirect('/home');
         }
-        
+
         // check if current user has permission to delete this user
         // in case of the being deleted user has higher level role
         if(!User::hasPermission('functions/user/'.$role)) {
@@ -821,7 +821,7 @@ class UsersController extends AppController
         } else {
             $this->Session->setFlash(__('Delete failed!', true));
         }
-        
+
         $this->redirect($this->referer());
     }
 
@@ -890,12 +890,12 @@ class UsersController extends AppController
     function resetPassword($user_id)
     {
         $role = $this->User->getRoleName($user_id);
-        
+
         if(!User::hasPermission('functions/user')) {
             $this->Session->setFlash('You do not have permission to reset passwords', true);
             $this->redirect('/home');
         }
-        
+
         if(!User::hasPermission('functions/user/'.$role)) {
             $this->Session->setFlash('You do not have permission to reset the password for this user.', true);
             $this->redirect('index');
@@ -1100,14 +1100,14 @@ class UsersController extends AppController
      * if no email notification
      * */
     private function _sendAddUserEmail($user, $password, $enrolments) {
-        if (!($user['User']['send_email_notification'] && 
+        if (!($user['User']['send_email_notification'] &&
             $user['User']['email'])
         ) {
             return "";
         }
         // get username and address
-        $from = $this->Auth->user('email'); 
-        $to = $user['User']['email']; 
+        $from = $this->Auth->user('email');
+        $to = $user['User']['email'];
         $username = $user['User']['username'];
         $name = $user['User']['first_name'].' '.$user['User']['last_name'];
 
@@ -1124,7 +1124,7 @@ class UsersController extends AppController
         $this->set('username', $username);
         $this->set('password', $password);
         $this->set('courses', $courses);
-        $this->set('siteurl', 
+        $this->set('siteurl',
             $this->sysContainer->getParamByParamCode('system.absolute_url'));
 
         // call send mail
@@ -1134,7 +1134,7 @@ class UsersController extends AppController
         if ($this->_sendEmail("", $subject, $from, $to, $template)) {
             return "Email notification sent.";
         }
-        return "<div class='red'>User created but unable to send email 
+        return "<div class='red'>User created but unable to send email
             notification: ". $this->Email->smtpError ."</div>";
     }
 
