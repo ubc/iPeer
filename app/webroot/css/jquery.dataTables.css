@@ -261,3 +261,8 @@ table.dataTable th:active {
 .dataTable tr.odd:hover td.sorting_3 {
   background-color: #DBFF70;
 }
+
+.dataTable .tableActions li {
+    display: inline;
+    padding-right: 0.5em;
+}

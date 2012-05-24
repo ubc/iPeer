@@ -16,7 +16,9 @@ class SearchTestCase extends CakeTestCase {
                         'app.survey_group_member', 'app.question', 
                         'app.response', 'app.survey_question', 'app.user_course', 
                         'app.user_enrol', 'app.groups_member', 'app.survey', 
-                        'app.evaluation_mixeval', 'app.evaluation_mixeval_detail'
+                        'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
+                        'app.faculty', 'app.user_faculty', 
+                        'app.department', 'app.course_department'
                         );
                     
   function startCase() {

@@ -98,7 +98,7 @@ class RubricsController extends AppController
 
         // Join with Users
         $jointTableCreator =
-            array("id"         => "Creator.id",
+            array("id"         => "Creator_id",
                 "localKey"   => "creator_id",
                 "description" => __("Evaluations to show:", true),
                 "default" => $myID,
@@ -214,7 +214,7 @@ class RubricsController extends AppController
 
             if (isset($this->params['form']['submit'])) {
                 if ($this->__processForm()) {
-                    $this->Session->setFlash(__('The rubric was added successfully.', true));
+                    $this->Session->setFlash(__('The rubric was added successfully.', true), 'good');
                     $this->redirect('index');
                 }
             }
@@ -339,7 +339,7 @@ class RubricsController extends AppController
           $this->RubricsCriteriaComment->deleteCriteriaComments($id);
         //$this->set('data', $this->Rubric->find('all',null, null, 'id'));
         $this->index();*/
-                $this->Session->setFlash(__('The rubric was deleted successfully.', true));
+                $this->Session->setFlash(__('The rubric was deleted successfully.', true), 'good');
             }
         }
         $this->redirect('index');

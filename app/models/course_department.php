@@ -8,7 +8,8 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class DepartmentCourse extends AppModel
+class CourseDepartment extends AppModel
 {
-    public $name = 'DepartmentCourse';
+    public $name = 'CourseDepartment';
+    public $belongsTo = array('Course', 'Department');
 }

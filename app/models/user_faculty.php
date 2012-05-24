@@ -1,6 +1,6 @@
 <?php
 /**
- * FacultyAco
+ * UserFaculty
  *
  * @uses AppModel
  * @package   CTLT.iPeer
@@ -8,10 +8,8 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class FacultyAco extends AppModel
+class UserFaculty extends AppModel
 {
-
-    public $actsAs = array('Tree');
-    public $name = 'FacultyAco';
-
+    public $name = 'UserFaculty';
+    public $belongsTo = array('User', 'Faculty');
 }

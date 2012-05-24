@@ -57,7 +57,8 @@ class User extends AppModel
             'className' => 'EvaluationSubmission',
             'foreignKey' => 'submitter_id',
             'dependent' => true,
-        )
+        ),
+        'UserFaculty'
     );
 
     public $hasAndBelongsToMany = array(

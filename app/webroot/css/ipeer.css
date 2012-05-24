@@ -287,6 +287,13 @@ h1.title
 h2
 {
     margin: 1em 0;
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+h3
+{
+    margin: 1em 0 0.5em 0;
     font-weight: bold;
 }
 
@@ -669,6 +676,17 @@ i
     width: 10em;
     margin: 1em auto;
 }
+
+/* PAGES/ADMIN */
+
+.adminpage ul {
+    margin: 1em;
+}
+.adminpage li {
+    list-style: circle inside;
+    margin: 0.5em;
+}
+
 /* TO BE REFACTORED LATER */
 
 /* TEMPORARY */

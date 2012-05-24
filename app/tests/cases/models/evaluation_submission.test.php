@@ -11,7 +11,8 @@ class EvaluationSubmissionTestCase extends CakeTestCase
         'app.survey_group_member', 'app.question',
         'app.response', 'app.survey_question', 'app.user_course',
         'app.user_enrol', 'app.groups_member', 'app.survey',
-        'app.evaluation_simple'
+        'app.evaluation_simple', 'app.user_faculty', 'app.course_department',
+        'app.department', 'app.faculty'
     );
     public $Course = null;
 

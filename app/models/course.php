@@ -41,7 +41,8 @@ class Course extends AppModel
             'dependent'   => true,
             'exclusive'   => false,
             'finderSql'   => ''
-        )
+        ),
+        'CourseDepartment'
     );
 
     public $hasAndBelongsToMany = array(
@@ -476,18 +477,6 @@ class Course extends AppModel
             $events = $this->Event->find('all', array('conditions' => array('course_id' => $id)));
             $this->Event->deleteAll(array('course_id' => $id));
         }
-    }
-
-    /**
-     * Count students enrolled in a course
-     *
-     * @param unknown_type $course_id course id
-     *
-     * @return  count of enrolled students
-     */
-    function getEnrolledStudentCount($course_id)
-    {
-        return $this->Instructor->find('count', array('conditions' => array('Enrolment.id' => $course_id)));
     }
 
     /**

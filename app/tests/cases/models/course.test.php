@@ -9,7 +9,9 @@ class CourseTestCase extends CakeTestCase {
         'app.survey_group_set', 'app.survey_group',
         'app.survey_group_member', 'app.question',
         'app.response', 'app.survey_question', 'app.user_course',
-        'app.user_enrol', 'app.groups_member', 'app.survey'
+        'app.user_enrol', 'app.groups_member', 'app.survey',
+        'app.user_faculty', 'app.faculty', 'app.department',
+        'app.course_department'
     );
     public $Course = null;
 
@@ -84,41 +86,6 @@ class CourseTestCase extends CakeTestCase {
         $instructor = $this->Course->getCourseByInstructor(null);
         $this->assertEqual($instructor, $empty);
     }
-
-    function testGetEnrolledStudentCount()
-    {
-        $empty=null;
-
-        /*
-         * Test course with multiple enrolled students
-         * Course_id == 1
-         */
-        $enrollmentCount = $this->Course->getEnrolledStudentCount(1);
-        $this->assertEqual($enrollmentCount, 3);
-        // Delete test data
-        $this->flushDatabase();
-
-        /*
-         * Test Course with zero students enrolled
-         * Course_id ==1
-         */
-
-
-        // Run test
-        $enrollmentCount = $this->Course->getEnrolledStudentCount(1);
-        $this->assertEqual($enrollmentCount, 0);
-        // Delete database
-        $this->flushDatabase();
-
-        /*
-         * Test invalid course_id
-         * Course_id == 1000 (invalid)*/
-
-        // Run tests
-        $enrollmentCount = $this->Course->getEnrolledStudentCount(1000);
-        $this->assertEqual($enrollmentCount, $empty);
-    }
-
 
     function testGetCourseName()
     {

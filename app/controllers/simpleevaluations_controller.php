@@ -104,7 +104,7 @@ class SimpleevaluationsController extends AppController
 
         // Join with Users
         $jointTableCreator =
-            array("id"         => "Creator.id",
+            array("id"         => "Creator_id",
                 "localKey"   => "creator_id",
                 "description" => __("Evaluations to show:", true),
                 "default" => $myID,
@@ -210,7 +210,7 @@ class SimpleevaluationsController extends AppController
 
         if (!empty($this->data)) {
             if ($this->__processForm()) {
-                $this->Session->setFlash(__("The evaluation was added successfully.", true));
+                $this->Session->setFlash(__("The evaluation was added successfully.", true), 'good');
                 $this->redirect('index');
             } else {
                 $this->Session->setFlash($this->SimpleEvaluation->errorMessage);
@@ -259,7 +259,7 @@ class SimpleevaluationsController extends AppController
         $this->data['SimpleEvaluation']['id'] = $id;
 
         if ($this->__processForm()) {
-            $this->Session->setFlash(__('The simple evaluation was updated successfully.', true));
+            $this->Session->setFlash(__('The simple evaluation was updated successfully.', true), 'good');
             $this->redirect('index');
         } else {
             $this->data = $this->SimpleEvaluation->find('first', array('conditions' => array('id' => $id),
@@ -313,7 +313,7 @@ class SimpleevaluationsController extends AppController
     }   //end if*/
 
         if ($this->SimpleEvaluation->delete($id)) {
-            $this->Session->setFlash(__('The evaluation was deleted successfully.', true));
+            $this->Session->setFlash(__('The evaluation was deleted successfully.', true), 'good');
         } else {
             $this->Session->setFlash(__('Evaluation delete failed.', true));
         }
