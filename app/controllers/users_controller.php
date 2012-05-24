@@ -579,6 +579,8 @@ class UsersController extends AppController
         $this->set('coursesOptions', $coursesOptions);
 
         $this->set('roleOptions', $this->AccessControl->getEditableRoles());
+        $this->set('faculties', $this->User->Faculty->find('list', 
+            array('order' => 'Faculty.name ASC')));
     }
 
     /**
