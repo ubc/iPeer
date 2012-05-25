@@ -13,9 +13,11 @@ echo $this->Form->input(
         'options' => $statusOptions,
     )
 );
+echo $this->Form->input('Department');
 echo $this->Form->input('homepage', array('after' => 'eg. http://mycoursehome.com'));
 echo $this->Form->submit('Save');
 echo $this->Form->end();
 
 ?>
 </div>
+

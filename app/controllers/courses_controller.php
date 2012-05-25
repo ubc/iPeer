@@ -13,7 +13,8 @@ App::import('Vendor', 'PHPExcelWriter', array('file' => 'excel/PHPExcel/Writer/E
 class CoursesController extends AppController
 {
     public $name = 'Courses';
-    public $uses =  array('GroupEvent', 'Course', 'Personalize', 'UserCourse', 'UserEnrol', 'Group', 'Event', 'User');
+    public $uses =  array('GroupEvent', 'Course', 'Personalize', 'UserCourse', 
+        'UserEnrol', 'Group', 'Event', 'User', 'UserFaculty', 'Department');
     public $show;
     public $sortBy;
     public $direction;
@@ -210,39 +211,66 @@ class CoursesController extends AppController
         $this->render('home');
     }
 
+    public function _initFormEnv() {
+        // set the list of departments
+        if (User::hasPermission('functions/user/superadmin')) {
+            // superadmin permission means you see all departments regardless
+            $departments = $this->Course->Department->find('list');
+            $this->set('departments', $departments);
+        }
+        else {
+            // need to limit the departments this user can see
+            // get the user's faculties
+            $uf = $this->UserFaculty->findAllByUserId($this->Auth->user('id'));
+            // get the departments of those faculties
+            $ret = $this->Department->getByUserFaculties($uf);
+            $departments = array();
+            foreach ($ret as $department) {
+                $departments[$department['Department']['id']] =
+                    $department['Department']['name'];
+            }
+            $this->set('departments', $departments);
+        }
+
+        // set the list available statuses
+        $statusOptions = array( 'A' => 'Active', 'I' => 'Inactive');
+        $this->set('statusOptions', $statusOptions);
+
+        // set the list of instructors
+        $instructors = $this->User->getInstructors('list', 
+            array('User.username'));
+        $this->set('instructors', $instructors);
+
+    }
+
     /**
      * add
      *
      * @access public
      * @return void
      */
-    function add()
+    public function add()
     {
-        if (!User::hasPermission('functions/user')) {
+        if (!User::hasPermission('controllers/courses/add')) {
             $this->Session->setFlash('You do not have permission to add courses');
             $this->redirect('/home');
         }
-
         $this->set('title_for_layout', 'Add Course');
+
+        $this->_initFormEnv();
+
         if (!empty($this->data)) {
-            if ($this->data = $this->Course->save($this->data)) {
+            if ($this->Course->save($this->data)) {
                 // add current user to the new course
-                $this->Course->addInstructor($this->Course->id, $this->Auth->user('id'));
-                $this->Session->setFlash('The course has been created.', 'good');
-                //$this->sysContainer->setMyCourseList($myCourses);
-                $this->redirect(array('action' => 'add', $this->Course->id));
+                $this->Course->addInstructor($this->Course->id, 
+                    $this->Auth->user('id'));
+                $this->Session->setFlash('Course created!', 'good');
+                $this->redirect(array('action' => 'index'));
             } else {
-                $this->Session->setFlash('Cannot add a course. Check errors below');
+                $this->Session->setFlash('Add course failed.');
             }
         }
-        $this->set('course_id', 0);
-        $this->set('data', $this->data);
 
-        $statusOptions = array( 'A' => 'Active', 'I' => 'Inactive');
-        $statusDefault = 'A';
-
-        $this->set('statusOptions', $statusOptions);
-        $this->set('statusDefault', $statusDefault);
     }
 
     /**
@@ -253,54 +281,20 @@ class CoursesController extends AppController
      * @access public
      * @return void
      */
-    function edit($id)
+    public function edit($id)
     {
-        if (!User::hasPermission('functions/user')) {
+        if (!User::hasPermission('controllers/courses/edit')) {
             $this->Session->setFlash('You do not have permission to edit courses.');
             $this->redirect('/home');
         }
-
-        $this->set('title_for_layout', 'Edit Course');
         if (!is_numeric($id)) {
             $this->Session->setFlash(__('Invalid course ID.', true));
             $this->redirect('index');
         }
-
-        $this->set('course_id', 0);
-        $this->set('data', $this->data);
-
-        $statusOptions = array( 'A' => 'Active', 'I' => 'Inactive');
-
-        $this->set('statusOptions', $statusOptions);
-
-        $courses = $this->Course->findById($id);
-
-        $this->set('course', $courses['Course']['course']);
-        $this->set('title', $courses['Course']['title']);
-        $instructors = $this->User->getInstructors('list', array('User.username'));
-        $this->set('instructors', $instructors);
-        $selected = $this->User->find('list', array(
-            'conditions' => array('UserCourse.course_id' => $id),
-            'recursive' => 1,
-        ));
-        $this->set('selected', array_keys($selected));
-        $this->set('homepage', $courses['Course']['homepage']);
-        if ('A' == $courses['Course']['record_status']) {
-            $status = 'A';
-        } else if ('I' == $courses['Course']['record_status']) {
-            $status = 'I';
-        }
-        $this->set('status', $status);
+        $this->set('title_for_layout', 'Edit Course');
+        $this->_initFormEnv();
 
         if (!empty($this->data)) {
-            if (!empty($this->data['Instructor']['id'])) {
-                foreach ($this->data['Instructor']['id'] as $key => $val) {
-                    $this->data['Instructor'][$key]['UserCourse']['user_id'] = $val;
-                }
-            }
-            $this->data['Instructor'][]['UserCourse']['user_id'] = '1';
-            unset($this->data['Instructors']);
-            $this->data['Course']['id'] = $id;
             $success = $this->Course->save($this->data);
             if ($success) {
                 $this->Session->setFlash('The course was updated successfully.', 'good');
@@ -308,12 +302,9 @@ class CoursesController extends AppController
             } else if (!$success) {
                 $this->Session->setFlash('Cannot edit the course. Check errors below');
             }
-        } else {
+        }
+        if (empty($this->data)) {
             $this->data = $this->Course->read(null, $id);
-            $this->set('instructors_rest',
-                $this->Course->getAllInstructors('list', array('excludes' => $this->data['Instructor'])));
-            $this->set('data', $this->data);
-            $this->set('course_id', $this->data['Course']['id']);
         }
     }
 
@@ -369,8 +360,8 @@ class CoursesController extends AppController
             $this->Session->setFlash(__('The course was deleted successfully.', true));
         } else {
             $this->Session->setFlash('Cannot delete the course. Check errors below');
-            $this->redirect('/courses/index');
         }
+        $this->redirect('index');
     }
 
 

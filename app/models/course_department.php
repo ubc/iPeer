@@ -11,5 +11,4 @@
 class CourseDepartment extends AppModel
 {
     public $name = 'CourseDepartment';
-    public $belongsTo = array('Course', 'Department');
 }

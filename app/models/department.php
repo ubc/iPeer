@@ -16,5 +16,14 @@ class Department extends AppModel {
     );
 
     public $belongsTo = array('Faculty');
-    public $hasMany = array('CourseDepartment');
+
+    public function getByUserFaculties($userfaculties) {
+        $departments = array();
+        foreach ($userfaculties as $userfaculty) {
+            $fid = $userfaculty['UserFaculty']['faculty_id'];
+            $ret = $this->findAllByFacultyId($fid);
+            $departments = array_merge($departments, $ret);
+        }
+        return $departments;
+    }
 }

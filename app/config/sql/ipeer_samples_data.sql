@@ -641,6 +641,14 @@ CREATE TABLE `course_departments` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
+--
+-- Dumping data for table `course_departments`
+--
+
+INSERT INTO `course_departments` (`id`, `course_id`, `department_id`) VALUES
+(1, 2, 2),
+(3, 1, 1);
+
 -- --------------------------------------------------------
 
 --

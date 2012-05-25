@@ -11,6 +11,7 @@
 class Course extends AppModel
 {
     public $name = 'Course';
+    public $displayField = 'full_name';
 
     public $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Traceable');
 
@@ -41,11 +42,13 @@ class Course extends AppModel
             'dependent'   => true,
             'exclusive'   => false,
             'finderSql'   => ''
-        ),
-        'CourseDepartment'
+        )
     );
 
     public $hasAndBelongsToMany = array(
+        'Department' => array(
+            'joinTable' => 'course_departments'
+        ),
         'Instructor' => array(
             'className'    =>  'User',
             'joinTable'    =>  'user_courses',
@@ -96,6 +99,22 @@ class Course extends AppModel
     );
 
     /**
+     * For some reason, HABTM fields can't be validated with $validate.
+     * So this is a workaround, make sure courses have at least 1
+     * department selected.
+     * */
+    public function beforeValidate() {
+        if (empty($this->data['Department']['Department'])) {
+            // make sure this model fails when saving without department
+            $this->invalidate('Department');
+            // make the error message appear in the right place
+            $this->Department->invalidate('Department',
+                'Please select a department.');
+        }
+        return true;
+    }
+
+    /**
      * __construct
      *
      * @param bool $id    id
@@ -109,6 +128,8 @@ class Course extends AppModel
     {
         parent::__construct($id, $table, $ds);
         $this->virtualFields['student_count'] = sprintf('SELECT count(*) as count FROM user_enrols as enrol WHERE enrol.course_id = %s.id', $this->alias);
+        $this->virtualFields['full_name'] = sprintf('CONCAT(%s.course, " - ", %s.title)', $this->alias, $this->alias);
+
     }
 
 
@@ -670,4 +691,5 @@ class Course extends AppModel
         }
         return $this->find('first', array('conditions' => array('Course.id' => $courseId)));
     }
+
 }

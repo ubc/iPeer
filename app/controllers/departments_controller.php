@@ -2,10 +2,17 @@
 class DepartmentsController extends AppController {
 
     public $name = 'Departments';
-    public $uses = array('Department', 'Faculty', 'CourseDepartment');
+    public $uses = array('Department', 'Faculty', 'CourseDepartment', 
+        'UserFaculty');
 
     public function index() {
-        $ret = $this->Department->find('all');
+        if (User::hasPermission('functions/user/superadmin')) {
+            $ret = $this->Department->find('all');
+        }
+        else {
+            $uf = $this->UserFaculty->findAllByUserId($this->Auth->user('id'));
+            $ret = $this->Department->getByUserFaculties($uf);
+        }
         $departments = array();
         foreach ($ret as $department) {
             $tmp = array(); 
