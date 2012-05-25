@@ -173,6 +173,25 @@ class AccessControlComponent extends Object
         }
         return $roles;
     }
+    
+   /**
+    * getViewableRoles
+    *
+    *
+    * @access public
+    * @return void
+    */
+    function getViewableRoles()
+    {
+        $all_roles = $this->User->Role->find('list', array('fields'=>array('id', 'name')));
+        $roles = array();
+        foreach ($all_roles as $key => $r) {
+            if (User::hasPermission('functions/user/'.$r, 'read')) {
+                $roles[$key] = $r;
+            }
+        }
+        return $roles;
+    }
 
 
     /**

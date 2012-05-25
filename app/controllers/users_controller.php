@@ -145,7 +145,7 @@ class UsersController extends AppController
                 "id" => "Role.id",
                 "description" => __("Show role:", true),
                 // The choise and default values
-                "list" => $this->AccessControl->getEditableRoles(),
+                "list" => $this->AccessControl->getViewableRoles(),
                 "default" => 0,
             )
         );
@@ -213,10 +213,10 @@ class UsersController extends AppController
         $this->_setUpAjaxList();
 
         //If User role isn't Admin, display student as default
-        if (!User::hasRole('superadmin') && !User::hasRole('admin')) {
+        /*if (!User::hasRole('superadmin') && !User::hasRole('admin')) {
             $mapFilterSelections->{"User.role"} = "S";
             $this->AjaxList->setStateVariable("mapFilterSelections", $mapFilterSelections);
-        }
+        }*/
 
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
@@ -695,7 +695,7 @@ class UsersController extends AppController
             $this->redirect('/home');
         }
 
-        if(!User::hasPermission('functions/user/'.$role)) {
+        if(!User::hasPermission('functions/user/'.$role, 'edit')) {
             $this->Session->setFlash(
                 'You do not have permission to edit this user.', true);
             $this->redirect('index');
@@ -808,7 +808,7 @@ class UsersController extends AppController
 
         // check if current user has permission to delete this user
         // in case of the being deleted user has higher level role
-        if(!User::hasPermission('functions/user/'.$role)) {
+        if(!User::hasPermission('functions/user/'.$role, 'delete')) {
             $this->Session->setFlash('You do not have permission to delete this user');
             $this->redirect('index');
         }

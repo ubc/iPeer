@@ -436,7 +436,10 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Users');
         $this->Acl->deny($role, 'functions');
         $this->Acl->allow($role, 'functions/user');
-        $this->Acl->deny($role, 'functions/user/admin');
+        $this->Acl->allow($role, 'functions/user/admin');
+        $this->Acl->deny($role, 'functions/user/admin', 'create');
+        $this->Acl->deny($role, 'functions/user/admin', 'update');
+        $this->Acl->deny($role, 'functions/user/admin', 'delete');
         $this->Acl->deny($role, 'functions/user/superadmin');
         $this->Acl->allow($role, 'controllers/Evaltools');
         $this->Acl->allow($role, 'controllers/Simpleevaluations');
@@ -457,7 +460,10 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'functions/user');
         $this->Acl->deny($role, 'functions/user/admin');
         $this->Acl->deny($role, 'functions/user/superadmin');
-        $this->Acl->deny($role, 'functions/user/instructor');
+        $this->Acl->allow($role, 'functions/user/instructor');
+        $this->Acl->deny($role, 'functions/user/instructor', 'create');
+        $this->Acl->deny($role, 'functions/user/instructor', 'update');
+        $this->Acl->deny($role, 'functions/user/instructor', 'delete');
         $this->Acl->allow($role, 'controllers/Evaltools');
         $this->Acl->allow($role, 'controllers/Simpleevaluations');
         $this->Acl->allow($role, 'controllers/Rubrics');
