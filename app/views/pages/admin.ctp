@@ -1,6 +1,11 @@
 <div class='adminpage'>
 <ul>
 <?php
+if (!User::hasPermission('adminpage')) {
+    echo "<p class='message error-message'>
+        No permission to access the admin page found.</p>";
+}
+
 if (User::hasPermission('controllers/faculties')) {
     echo '<li>';
     echo $this->Html->link(

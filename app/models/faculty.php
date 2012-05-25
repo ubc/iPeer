@@ -1,8 +1,11 @@
 <?php
+/**
+ * Faculty model, stores a list of faculties.
+ * */
 class Faculty extends AppModel {
-    var $name = 'Faculty';
-    var $displayField = 'name';
-    var $validate = array(
+    public $name = 'Faculty';
+    public $displayField = 'name';
+    public $validate = array(
         'name' => array(
             'notempty' => array(
                 'rule' => array('notempty'),

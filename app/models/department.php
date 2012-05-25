@@ -1,4 +1,7 @@
 <?php
+/**
+ * Department model, stores a list of departments.
+ * */
 class Department extends AppModel {
     public $name = 'Department';
     public $displayField = 'name';
@@ -17,6 +20,13 @@ class Department extends AppModel {
 
     public $belongsTo = array('Faculty');
 
+    /**
+     * Given a list of userfaculties, return the departments
+     * belonging to those faculties.
+     *
+     * @param $userfaculties - the list of userfaculties entries to get
+     * the departments for.
+     * */
     public function getByUserFaculties($userfaculties) {
         $departments = array();
         foreach ($userfaculties as $userfaculty) {

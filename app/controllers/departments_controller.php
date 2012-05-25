@@ -1,10 +1,29 @@
 <?php
+/**
+ * DepartmentsController
+ *
+ */
 class DepartmentsController extends AppController {
 
     public $name = 'Departments';
     public $uses = array('Department', 'Faculty', 'CourseDepartment', 
-        'UserFaculty');
+        'UserFaculty', 'Course');
 
+    /**
+     * Make sure the user has permission to access the departments pages.
+     * */
+    public function beforeFilter() {
+        parent::beforeFilter();
+        if (!User::hasPermission('controllers/Departments')) {
+            $this->Session->setFlash(__('Permission to access departments '.
+                'not found.', true));
+            $this->redirect('/home');
+        }
+    }
+
+    /**
+     * Displays the list of departments appropriate to access level.
+     * */
     public function index() {
         if (User::hasPermission('functions/user/superadmin')) {
             $ret = $this->Department->find('all');
@@ -24,6 +43,12 @@ class DepartmentsController extends AppController {
         $this->set('departments', $departments);
     }
 
+    /**
+     * View a department entry.
+     *
+     * @param $id - The department id to be viewed.
+     *
+     * */
     public function view($id = null) {
         $this->set('title_for_layout', 'View Department');
         if (!$id) {
@@ -36,7 +61,9 @@ class DepartmentsController extends AppController {
 
         $ret = $this->CourseDepartment->findAllByDepartmentId($id);
         $courses = array();
-        foreach ($ret as $course) {
+        foreach ($ret as $val) {
+            $course = $this->Course->findById(
+                $val['CourseDepartment']['course_id']);
             $tmp = array();
             $tmp['id'] = $course['Course']['id'];
             $tmp['Course'] = $course['Course']['course'];
@@ -47,6 +74,9 @@ class DepartmentsController extends AppController {
         $this->set('courses', $courses);
     }
 
+    /**
+     * Add a new department entry.
+     * */
     public function add() {
         $this->set('title_for_layout', 'Add Department');
         $this->_initFormEnv();
@@ -64,6 +94,12 @@ class DepartmentsController extends AppController {
         }
     }
 
+    /**
+     * Edit an existing department entry.
+     *
+     * @param $id - The id of the department entry to be edited.
+     *
+     * */
     public function edit($id = null) {
         $this->set('title_for_layout', 'Edit Department');
         $this->_initFormEnv();
@@ -86,6 +122,12 @@ class DepartmentsController extends AppController {
         }
     }
 
+    /**
+     * Delete an existing department entry.
+     *
+     * @param $id - The id of the department entry to be edited.
+     *
+     * */
     public function delete($id = null) {
         if (!$id) {
             $this->Session->setFlash(__('Invalid id for department', true));
@@ -99,6 +141,10 @@ class DepartmentsController extends AppController {
         $this->redirect(array('action' => 'index'));
     }
 
+    /**
+     * Set the necessary variables needed to display the Add and Edit
+     * form elements.
+     * */
     private function _initFormEnv() {
         // prepare the faculty drop down options 
         $ret = $this->Faculty->find('all');

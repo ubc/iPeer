@@ -113,7 +113,6 @@ class Course extends AppModel
             $this->Department->invalidate('Department',
                 'Please select a department.');
         }
-        return true;
     }
 
     /**

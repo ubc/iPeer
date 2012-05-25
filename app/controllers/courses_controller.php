@@ -211,6 +211,11 @@ class CoursesController extends AppController
         $this->render('home');
     }
 
+    /**
+     * Set all the necessary variables for the Add and Edit form elements.
+     *
+     * @return void
+     * */
     public function _initFormEnv() {
         // set the list of departments
         if (User::hasPermission('functions/user/superadmin')) {
@@ -319,10 +324,10 @@ class CoursesController extends AppController
      */
     function delete($id)
     {
-    	if(!User::hasPermission('functions/user')) {
-    		$this->Session->setFlash('You do not have permission to delete courses');
-    		$this->redirect('/home');
-    	}
+        if(!User::hasPermission('functions/user')) {
+            $this->Session->setFlash('You do not have permission to delete courses');
+            $this->redirect('/home');
+        }
 
         if ($this->Course->delete($id)) {
             //Delete all corresponding data start here
@@ -357,7 +362,8 @@ class CoursesController extends AppController
 
             }
 
-            $this->Session->setFlash(__('The course was deleted successfully.', true));
+            $this->Session->setFlash(
+                __('The course was deleted successfully.', true), 'good');
         } else {
             $this->Session->setFlash('Cannot delete the course. Check errors below');
         }

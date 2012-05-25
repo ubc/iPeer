@@ -1,8 +1,26 @@
 <?php
+/**
+ * Faculties Controller
+ */
 class FacultiesController extends AppController {
     public $name = 'Faculties';
     public $uses = array('Faculty', 'Department', 'UserFaculty');
 
+    /**
+     * Make sure the user has permission to access the faculties pages.
+     * */
+    public function beforeFilter() {
+        parent::beforeFilter();
+        if (!User::hasPermission('controllers/Faculties')) {
+            $this->Session->setFlash(__('Permission to access departments '.
+                'not found.', true));
+            $this->redirect('/home');
+        }
+    }
+
+    /**
+     * Display all faculties.
+     * */
     public function index() {
         $ret = $this->Faculty->find('all');
         $faculties = array();
@@ -15,6 +33,12 @@ class FacultiesController extends AppController {
         $this->set('faculties', $faculties);
     }
 
+    /**
+     * Display a specific faculty.
+     *
+     * @param $id - the id of the faculty to be displayed.
+     *
+     * */
     function view($id = null) {
         $this->set('title_for_layout', 'View Faculty');
 
@@ -54,6 +78,9 @@ class FacultiesController extends AppController {
         $this->set('userfaculty', $userfaculty);
     }
 
+    /**
+     * Add a new faculty.
+     * */
     function add() {
         $this->set('title_for_layout', 'Add Faculty');
         if (!empty($this->data)) {
@@ -68,6 +95,12 @@ class FacultiesController extends AppController {
         }
     }
 
+    /**
+     * Edit an existing faculty.
+     *
+     * @param $id - the id of the faculty to be edited.
+     *
+     * */
     function edit($id = null) {
         if (!$id && empty($this->data)) {
             $this->Session->setFlash(__('Invalid faculty', true));
@@ -86,6 +119,12 @@ class FacultiesController extends AppController {
         }
     }
 
+    /**
+     * Delete a faculty
+     *
+     * @param $id - the id of the faculty to be deleted.
+     *
+     * */
     function delete($id = null) {
         if (!$id) {
             $this->Session->setFlash(__('Invalid id for faculty', true));
