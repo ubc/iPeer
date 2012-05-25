@@ -46,9 +46,6 @@ class Course extends AppModel
     );
 
     public $hasAndBelongsToMany = array(
-        'Department' => array(
-            'joinTable' => 'course_departments'
-        ),
         'Instructor' => array(
             'className'    =>  'User',
             'joinTable'    =>  'user_courses',
@@ -74,7 +71,10 @@ class Course extends AppModel
             'finderQuery'  => '',
             'deleteQuery'  => '',
             'dependent'    => false,
-        )
+        ),
+        'Department' => array(
+            'joinTable' => 'course_departments'
+        ),
     );
 
     /* Record Status - Active, Inactive */
@@ -104,7 +104,9 @@ class Course extends AppModel
      * department selected.
      * */
     public function beforeValidate() {
-        if (empty($this->data['Department']['Department'])) {
+        if (array_key_exists('Department', $this->data) &&
+            empty($this->data['Department']['Department'])) 
+        {
             // make sure this model fails when saving without department
             $this->invalidate('Department');
             // make the error message appear in the right place
@@ -158,24 +160,21 @@ class Course extends AppModel
      */
     function deleteInstructor($course_id, $user_id)
     {
-        return $this->habtmDelete('Instructor', $course_id, $user_id);
+        $this->habtmDelete('Instructor', $course_id, $user_id);
     }
 
     /**
      * Add instructor to a course
      *
      * @param unknown_type $course_id course id
-     * @param unknown_type $user_id   user id
+     * @param unknown_type $user_id   user i/
      *
      * @access public
      * @return void
      */
     function addInstructor($course_id, $user_id)
     {
-        $user = ClassRegistry::init('User')->findUserByid($user_id);
-        if ($user['User']['role'] != 'S') {
-            return $this->habtmAdd('Instructor', $course_id, $user_id);
-        }
+        $this->habtmAdd('Instructor', $course_id, $user_id);
     }
 
     /**
@@ -529,9 +528,14 @@ class Course extends AppModel
             $fields = array('Course.course');
             $recursive = 0;
         }
-        return $this->find($type, array('conditions' => array('Instructor.id' => $instructorId),
-            'fields' => $fields,
-            'recursive' => $recursive));
+        return $this->find(
+            $type, 
+            array(
+                'conditions' => array('Instructor.id' => $instructorId),
+                'fields' => $fields,
+                'recursive' => $recursive
+            )
+        );
     }
 
     /**
