@@ -15,7 +15,10 @@ class UsersController extends AppController
     public $name = 'Users';
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'FileUpload.FileUpload');
     public $NeatString;
-    public $uses = array('User', 'UserEnrol', 'Personalize', 'Course', 'SysParameter', 'SysFunction', 'Role', 'Group');
+    public $uses = array('User', 'UserEnrol', 'Personalize', 'Course', 
+        'SysParameter', 'SysFunction', 'Role', 'Group', 'UserFaculty',
+        'Department', 'CourseDepartment'
+    );
     public $components = array('Session', 'AjaxList', 'RequestHandler',
         'Email', 'FileUpload.FileUpload', 'PasswordGenerator');
 
@@ -562,19 +565,39 @@ class UsersController extends AppController
      * @return void
      * */
     private function _initFormEnv() {
-        // get the courses that this user is instructor in
-        // TODO need to implement separate behaviours for admins and superadmins
-        // superadmins should have access to all courses regardless
-        // admins should have access only to their department
         $user = $this->User->find(
             'first',
             array('conditions' => array('id' => $this->Auth->user('id')))
         );
-        $courses = $user['Course'];
+        // get the courses that this user is allowed access to
         $coursesOptions = array();
-        foreach ($courses as $course) {
-            $coursesOptions[$course['id']] =
-                $course['course'].' - '.$course['title'];
+        if (User::hasPermission('functions/user/superadmin')) {
+            // superadmins should have access to all courses regardless
+            $coursesOptions = $this->Course->find('list');
+        }
+        else if (User::hasPermission('functions/user/admin')) {
+            // admins should have access only in their faculty
+            // get user's faculties
+            $uf = $this->UserFaculty->findAllByUserId($this->Auth->user('id'));
+            // based on the faculties, get the user's departments
+            $ret = $this->Department->getByUserFaculties($uf);
+            // based on the departments, get the user's allowed courses
+            foreach ($ret as $department) {
+                $courses = $this->CourseDepartment->findAllByDepartmentId(
+                    $department['Department']['id']);
+                foreach ($courses as $course) {
+                    $cid = $course['CourseDepartment']['course_id'];
+                    $coursesOptions[$cid] =
+                        $this->Course->field('full_name', array('id' => $cid));
+                }
+            }
+        }
+        else if (User::hasPermission('functions/user/instructor')) {
+            // instructors can only access courses they teach
+            $courses = $user['Course'];
+            foreach ($courses as $course) {
+                $coursesOptions[$course['id']] = $course['full_name'];
+            }
         }
         $this->set('coursesOptions', $coursesOptions);
 
@@ -695,7 +718,7 @@ class UsersController extends AppController
             $this->redirect('/home');
         }
 
-        if(!User::hasPermission('functions/user/'.$role, 'edit')) {
+        if(!User::hasPermission('functions/user/'.$role, 'update')) {
             $this->Session->setFlash(
                 'You do not have permission to edit this user.', true);
             $this->redirect('index');
