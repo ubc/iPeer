@@ -146,43 +146,44 @@ class SurveyGroupsController extends AppController
             //      $event = $this->Event->findById($eventId);
             //      $courseId = $event['Event']['course_id'];
             //      $this->rdAuth->setCourseId($courseId);
-            $courseId = $params;
+            $event = $this->Event->findById($params);
+            $courseId = $event['Event']['course_id'];
+            $eventId = $params;
         }
 
         $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > View Survey Result', true));
-        //get surveys for the course
-        $survey_list = $this->Survey->find('list', array('conditions' => array('course_id' => $courseId)));
-        $ids = array_keys($survey_list);
-        $survey = $this->Survey->getSurveyWithSubmissionById($ids);
-
-        $this->set('survey_list', $survey_list);
-        $this->set('data', $survey);
-    }
-
-
-    /**
-     * viewresultsearch
-     *
-     * @access public
-     * @return void
-     */
-    function viewresultsearch()
-    {
-        $this->layout = false;
-        $conditions = array();
-
-        //search function
-        if (!empty($this->data['livesearch2']) && !empty($this->data['select'])) {
-            $pagination->loadingId = 'loading';
-            //parse the parameters
-            $searchField=$this->data['select'];
-            $searchValue=$this->data['livesearch2'];
-            $conditions = array('OR' => array('Enrol.first_name LIKE' => '%'.$searchValue.'%',
-                'Enrol.last_name LIKE' => '%'.$searchValue.'%'));
+        
+        $class = array(); //holds all the students enrolled in the course
+        $view = array(); //holds all the details for display in view
+        
+        $class = $this->User->find(
+            'all',
+            array(
+                'conditions' => array('Enrolment.id' => $courseId)
+            )
+        );
+        
+        foreach ($class as $student) {
+            $temp = array();
+            $temp['ID'] = $student['User']['id'];
+            $temp['Full Name'] = $student['User']['full_name'];
+            $temp['Student No.'] = $student['User']['student_no'];
+            
+            foreach ($student['Submission'] as $submission) {
+                if ($submission['event_id'] == $eventId) {
+                    $temp['Date Submitted'] = date('D, M j, Y g:i a', strtotime($submission['date_submitted']));
+                } else {
+                    $temp['Date Submitted'] = 'Not Submitted';
+                } 
+            }
+            if (empty($student['Submission'])) {
+                $temp['Date Submitted'] = 'Not Submitted';
+            }
+            $view[] = $temp;
         }
-
-        $survey = $this->Survey->getSurveyWithSubmissionById($this->data['survey_select'], $conditions);
-        $this->set('data', $survey);
+        
+        $this->set('view', $view);
+        //debug($students);
     }
 
     /**
