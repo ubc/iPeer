@@ -252,16 +252,8 @@ class UsersController extends AppController
         }
 
         $classStudents = array(); // holds all the students enrolled in this course
-        $classInstructors = array(); // holds instructors for this course
         $classList = array(); // holds all users in this course for display in view
 
-        // get the instructors
-        $classInstructors = $this->User->find(
-            'all',
-            array(
-                'conditions' => array('Course.id' => $course),
-            )
-        );
         // get the students
         $classStudents = $this->User->find(
             'all',
@@ -271,16 +263,6 @@ class UsersController extends AppController
         );
 
         // put only the data needed for display into classList
-        foreach ($classInstructors as $user) {
-            $tmp = array();
-            $tmp['id'] = $user['User']['id'];
-            $tmp['Role'] = 'Instructor';
-            $tmp['Username'] = $user['User']['username'];
-            $tmp['Full Name'] = $user['User']['first_name'] .' '.
-                $user['User']['last_name'];
-            $tmp['Email'] = $user['User']['email'];
-            $classList[] = $tmp;
-        }
         foreach ($classStudents as $user) {
             $tmp = array();
             $tmp['id'] = $user['User']['id'];
