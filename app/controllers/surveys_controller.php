@@ -109,7 +109,7 @@ class SurveysController extends AppController
         $myID = $this->Auth->user('id');
 
         // Get the course data
-        $userCourseList = $this->sysContainer->getMyCourseList();
+        $userCourseList = User::getMyCourseList();
         $coursesList = array();
         foreach ($userCourseList as $id => $course) {
             $coursesList{$id} = $course['course'];

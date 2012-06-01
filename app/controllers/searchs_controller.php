@@ -64,7 +64,7 @@ class SearchsController extends AppController
         parent::beforeFilter();
         $currentUser = $this->User->getCurrentLoggedInUser();
         $this->set('currentUser', $currentUser);
-        $coursesList = $this->sysContainer->getMyCourseList();
+        $coursesList = User::getMyCourseList();
         $this->set('coursesList', $coursesList);
 
         $personalizeData = $this->Personalize->find('all', array('conditions' =>'user_id = '.$this->Auth->user('id')));

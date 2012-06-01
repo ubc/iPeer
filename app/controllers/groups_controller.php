@@ -82,7 +82,7 @@ class GroupsController extends AppController
         // Set up the ajax list component
 
         // Get the course data
-        $userCourseList = $this->sysContainer->getMyCourseList();
+        $userCourseList = User::getMyCourseList();
         $coursesList = array();
 
         foreach ($userCourseList as $id => $course) {
@@ -199,7 +199,7 @@ class GroupsController extends AppController
     function goToClassList($course)
     {
         if (is_numeric($course)) {
-            $courses = $this->sysContainer->getMyCourseList();
+            $courses = User::getMyCourseList();
             if (!empty($courses[$course])) {
                 // We need to change the session state to point to this
                 // course:

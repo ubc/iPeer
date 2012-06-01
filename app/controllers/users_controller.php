@@ -375,7 +375,7 @@ class UsersController extends AppController
         }
 
         // Get accessible courses
-        $coursesList = $this->sysContainer->getMyCourseList();
+        $coursesList = User::getMyCourseList();
 
         // List the entrolled courses
         $simpleEnrolledList = array();
