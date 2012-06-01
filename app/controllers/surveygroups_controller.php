@@ -179,11 +179,15 @@ class SurveyGroupsController extends AppController
             if (empty($student['Submission'])) {
                 $temp['Date Submitted'] = 'Not Submitted';
             }
+            
+            $temp['Event Id'] = $eventId;
+            
             $view[] = $temp;
         }
         
         $this->set('view', $view);
-        //debug($students);
+        $this->set('survey', $event['Event']['title']);
+        $this->set('survey_id', $event['Event']['template_id']);
     }
 
     /**
