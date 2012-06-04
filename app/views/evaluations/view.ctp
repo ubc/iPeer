@@ -56,9 +56,9 @@
   <tr>
     <td>
      <?php echo $html->link(__('Back to Evaluation Event Listing', true), '/evaluations/index/'); ?>
-     <?php if (!empty($rdAuth->courseId)) {
+     <?php if (!empty($data)) {
         echo '&nbsp;|&nbsp;';
-        echo $html->link(__('Back to Course Home', true), '/courses/home/'.$rdAuth->courseId);
+        echo $html->link(__('Back to Course Home', true), '/courses/home/'.$data['Event']['course_id']);
       } ?>
     </td>
   </tr>
