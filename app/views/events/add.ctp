@@ -90,8 +90,8 @@
       <?php
         echo $form->input('Event.self_eval', array(
            'type' => 'radio',
-           'options' => array('1' => ' - Enable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '0' => ' - Disable'),
-           'default' => '0',
+           'options' => array('2' => ' - Enable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '1' => ' - Disable'),
+           'default' => '1',
            'legend' => false
         ));
       ?>
@@ -104,8 +104,8 @@
       <?php
         echo $form->input('Event.com_req', array(
            'type' => 'radio',
-           'options' => array('1' => ' - Yes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '0' => ' - No'),
-           'default' => '0',
+           'options' => array('2' => ' - Yes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '1' => ' - No'),
+           'default' => '1',
            'legend' => false
         ));
       ?>

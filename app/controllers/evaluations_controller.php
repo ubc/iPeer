@@ -129,7 +129,7 @@ class EvaluationsController extends AppController
             array("!Custom.lates",     __("Late?", true),      "7em", "action", "View Submission"),
 
             // Release and mark status
-            array("GroupEvent.marked", __("Status", true),      "9em",  "map",
+            array("GroupEvent.marked", __("Status", true),      "7em",  "map",
             array("not reviewed" => __("Not Reviewed", true), "to review" => "To Review",
             "reviewed" => __("Reviewed", true))),
             array("GroupEvent.grade_release_status",__("Grade", true), "7em",   "map",
