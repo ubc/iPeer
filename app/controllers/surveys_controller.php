@@ -266,8 +266,8 @@ class SurveysController extends AppController
                 $eventArray['Event']['course_id'] = $this->data['Survey']['course_id'];
                 $eventArray['Event']['event_template_type_id'] = 3;
                 $eventArray['Event']['template_id'] = $this->data['Survey']['id'];
-                $eventArray['Event']['self_eval'] = 0;
-                $eventArray['Event']['com_req'] = 0;
+                $eventArray['Event']['self_eval'] = 1;
+                $eventArray['Event']['com_req'] = 1;
                 $eventArray['Event']['due_date'] = $this->data['Survey']['due_date'];
                 $eventArray['Event']['release_date_begin'] = $this->data['Survey']['release_date_begin'];
                 $eventArray['Event']['release_date_end'] = $this->data['Survey']['release_date_end'];

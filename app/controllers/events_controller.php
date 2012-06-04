@@ -109,17 +109,21 @@ class EventsController extends AppController
         $columns = array(
             array("Event.id",             "",            "",     "hidden"),
             array("Course.id",            "",            "",     "hidden"),
-            array("Course.course",        __("Course", true),      "13em", "action", "View Course"),
+            array("Course.course",        __("Course", true),      "9em", "action", "View Course"),
             array("Event.Title",          __("Title", true),       "auto", "action", "View Event"),
             array("!Custom.results",       __("View", true),       "4em", "action", "View Results"),
             array("Event.event_template_type_id", __("Type", true), "", "map",
             array("1" => __("Simple", true), "2" => __("Rubric", true), "4" => __("Mixed", true))),
             array("Event.due_date",       __("Due Date", true),    "10em", "date"),
-            array("!Custom.isReleased",    __("Released ?", true), "10em", "string"),
+            array("!Custom.isReleased",    __("Released ?", true), "8em", "string"),
             array("Event.self_eval",       __("Self Eval", true),   "6em", "map",
-            array("0" => __("Disabled", true), "1" => __("Enabled", true))),
+            //values been changed from 0 & 1 to 1 & 2 because the filtering for Disabled did not work
+            //array("0" => __("Disabled", true), "1" => __("Enabled", true))),
+            array("1" => __("Disabled", true), "2" => __("Enabled", true))),
             array("Event.com_req",        __("Comment", true),      "6em", "map",
-            array("0" => __("Optional", true), "1" => __("Required", true))),
+            //values been changed from 0 & 1 to 1 & 2 because the filtering for Optional did not work
+            //array("0" => __("Optional", true), "1" => __("Required", true))),            
+            array("1" => __("Optional", true), "2" => __("Required", true))),
 
             // Release window
             array("Event.release_date_begin", "", "",    "hidden"),
