@@ -38,7 +38,7 @@ $submenuTitle = __('Evaluation Events', true);
 $params = array('controller'=>'courses', 'userPersonalize'=>$userPersonalize, 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'courseId'=>$course_id);
 echo $this->element('courses/submenu', $params);
 
-if (!empty($access['SURVEY'])) {
+if (User::hasPermission('controllers/Surveys')) {
   $submenu = 'TeamMaker';
   $submenuTitle = __('Surveys (Team Maker)', true);
   $params = array('controller'=>'courses', 'userPersonalize'=>$userPersonalize, 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$course_id);
