@@ -225,39 +225,10 @@ class EvaluationsController extends AppController
      */
     function index ($message="")
     {
-        $currentUser = $this->User->getCurrentLoggedInUser();
-        $this->set('currentUser', $currentUser);
         // Make sure the present user is not a student
         //$this->rdAuth->noStudentsAllowed();
-
-        $courseId = $this->rdAuth->courseId;
-        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > List Evaluation Results', true));
-
-        $personalizeData = $this->Personalize->find('all', 'user_id = '.$this->Auth->user('id'));
-        $this->userPersonalize->setPersonalizeList($personalizeData);
-        if ($personalizeData && $this->userPersonalize->inPersonalizeList('Eval.ListMenu.Limit.Show')
-            && $this->userPersonalize->getPersonalizeValue('Eval.ListMenu.Limit.Show') != 'null') {
-                $this->show = $this->userPersonalize->getPersonalizeValue('Eval.ListMenu.Limit.Show');
-                $this->set('userPersonalize', $this->userPersonalize);
-        } else {
-                $this->show = '10';
-                $this->update($attributeCode = 'Eval.ListMenu.Limit.Show', $attributeValue = $this->show);
-        }
-        $conditions = 'course_id = '.$courseId.' AND event_template_type_id <> 3';
-        $data = $this->Event->find('all', $conditions, '*, (NOW() >= release_date_begin AND NOW() <= release_date_end) AS is_released', $this->order, $this->show, $this->page);
-
-        $paging['style'] = 'ajax';
-        $paging['link'] = '/evaluations/search/?show='.$this->show.'&sort='.$this->sortBy.'&direction='.$this->direction.'&page=';
-
-        $paging['count'] = count($data);
-        $paging['show'] = array('10', '25', '50', 'all');
-        $paging['page'] = $this->page;
-        $paging['limit'] = $this->show;
-        $paging['direction'] = $this->direction;
-
-        $this->set('paging', $paging);
-        $this->set('data', $data);
-        $this->set('courseId', $courseId);
+        // Evaluation index was merged with events ajaxList
+        $this->redirect('/events/index');
     }
 
     /**

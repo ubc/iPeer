@@ -100,11 +100,11 @@ class EventsController extends AppController
      * @access public
      * @return void
      */
-    function setUpAjaxList()
+    function setUpAjaxList($courseId = null)
     {
         // Grab the course list
         $coursesList = User::getMyCourseList();
-
+        
         // Set up Columns
         $columns = array(
             array("Event.id",             "",            "",     "hidden"),
@@ -131,14 +131,27 @@ class EventsController extends AppController
             array("now()",           "",          "",    "hidden"));
 
         // put all the joins together
-        $joinTables =  array( array (
-            // GUI aspects
-            "id" => "course_id",
-            "description" => __("for Course:", true),
-            // The choise and default values
-            "list" => $coursesList,
-            "default" => $this->Session->read('ipeerSession.courseId'),
-        ));
+        // shows all events of courses the user (not student) has access to
+        if($courseId == null) {
+            $joinTables =  array( array (
+                // GUI aspects
+                "id" => "course_id",
+                "description" => __("for Course:", true),
+                // The choice and default values
+                "list" => $coursesList,
+            ));
+        // shows only the events from the current selected course (parameter)
+        // non-numeric and invalid ids will result in "No Results"
+        } else {
+            $joinTables =  array( array (
+                // GUI aspects
+                "id" => "course_id",
+                "description" => __("for Course:", true),
+                // The choice and default values
+                "list" => $coursesList,
+                "default" => $courseId,
+            )); 
+        }
 
         // For instructors: only list their own course events
         $extraFilters = "";
@@ -181,15 +194,25 @@ class EventsController extends AppController
      * @access public
      * @return void
      */
-    function index($message = '')
+    function index($courseId = null, $message = '')
     {
-
-        $this->set('message', $message);
-
         // Make sure the present user is not a student
         //$this->rdAuth->noStudentsAllowed();
+        $this->set('message', $message);
+
+        // We need to change the session state to point to this
+        // course:
+        // Initialize a basic non-funcional AjaxList
+        $this->AjaxList->quickSetUp();
+        // Clear the state first, we don't want any previous searches/selections.
+        $this->AjaxList->clearState();
+        // Set and update session state Variable
+        $joinFilterSelections->course_id = $courseId;
+        $this->AjaxList->setStateVariable("joinFilterSelections", $joinFilterSelections);
+
         // Set up the basic static ajax list variables
-        $this->setUpAjaxList();
+        $this->Session->write('eventsControllerCourseId', $courseId);
+        $this->setUpAjaxList($courseId);
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
     }
@@ -206,20 +229,21 @@ class EventsController extends AppController
         // Make sure the present user is not a student
         //$this->rdAuth->noStudentsAllowed();
         // Set up the list
-        $this->setUpAjaxList();
+        $courseId = $this->Session->read('eventsControllerCourseId');
+        $this->setUpAjaxList($courseId);
         // Process the request for data
         $this->AjaxList->asyncGet();
     }
 
     /**
-     * goToClassList Show a class list
+     *           Show a class list
      *
      * @param mixed $course
      *
      * @access public
      * @return void
      */
-    function goToClassList($course)
+    /*function goToClassList($course)
     {
         if (is_numeric($course)) {
             $courses = User::getMyCourseList();
@@ -237,7 +261,7 @@ class EventsController extends AppController
         }
         // Redirect to user list after state modifications (or in case of error)
         $this->redirect("/events/index");
-    }
+    }*/
 
     /**
      * view

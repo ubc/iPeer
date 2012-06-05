@@ -37,7 +37,7 @@ switch($submenu) {
       $items,
       array('name' => 'Add Event', 'link' => "/events/add"),
       array('name' => 'List Evaluation Events', 
-        'link' => "/events/goToClassList/$course_id"),
+        'link' => "/events/index/$course_id"),
       array('name' => 'Export Evaluation Results', 
         'link' => "/evaluations/export/courseId=$course_id")
     );
