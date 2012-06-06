@@ -47,7 +47,7 @@ switch($submenu) {
       $items,
       array('name' => 'Edit Survey', 'link' => "/surveys/index/$course_id"),
       array('name' => 'View Survey Results', 
-        'link' => "/surveygroups/viewresult/$course_id"),
+        'link' => "/surveygroups/viewresult/"),
       array('name' => 'Create Groups (Auto)', 
         'link' => "/surveygroups/makegroups/$course_id"),
       array('name' => 'List Survey Group Sets', 

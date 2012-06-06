@@ -1,4 +1,27 @@
-<h2><?php echo __('Survey: ', true).$this->Html->link(__($survey, true), '/evaluations/viewSurveySummary/'.$survey_id) ?></h2>
+<form name="surveyForm">
+    <?php echo __('Survey: ', true) ?>
+    <select name="survey_select" onChange="go()">
+        <?php
+        for ($i=0; $i < count($surveysList); $i++) {
+            if ($surveysList[$i]['id'] == $eventId) {
+                echo '<option selected="selected" value="/surveygroups/viewresult/'.$surveysList[$i]['id'].'">'.$surveysList[$i]['title'].'</option>';        
+            } else {
+                echo '<option value="/surveygroups/viewresult/'.$surveysList[$i]['id'].'">'.$surveysList[$i]['title'].'</option>';
+            }
+        }
+        ?>
+    </select>
+    <?php 
+        if (!empty($survey_id)) {
+            echo '('.$html->link(__('View Summary', true), '/evaluations/viewSurveySummary/'.$survey_id).')';
+        }
+    ?>
+    <script type="text/javascript">
+        function go() {
+            location = document.surveyForm.survey_select.options[document.surveyForm.survey_select.selectedIndex].value
+        }
+    </script>
+</form><br>
 <table id="table_id">
     <thead>
         <tr>

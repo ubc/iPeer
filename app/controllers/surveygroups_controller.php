@@ -136,58 +136,88 @@ class SurveyGroupsController extends AppController
      * @access public
      * @return void
      */
-    function viewresult($params=null)
+    function viewresult($eventId=null)
     {
-        if (is_null($params)) {
-            $courseId = $this->Session->read('ipeerSession.courseId');
-        } else {
-            //TODO
-            //      $eventId = $params;
-            //      $event = $this->Event->findById($eventId);
-            //      $courseId = $event['Event']['course_id'];
-            //      $this->rdAuth->setCourseId($courseId);
-            $event = $this->Event->findById($params);
-            $courseId = $event['Event']['course_id'];
-            $eventId = $params;
+        $class = array(); // holds all the students enrolled in the course
+        $view = array(); // holds all the details for display in view
+        $surveys = array(); // holds all the surveys' titles in the course
+        $survey = ""; // holds the event title
+        $survey_id = ""; // holds the id of the survey
+        $event = array(); // holds the current survey
+        $courseId = ""; // hold the course id
+        
+        // if an event id is entered
+        if ($eventId != null) {
+            $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId, 'Event.event_template_type_id' => 3)));
         }
-
-        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > View Survey Result', true));
+        // event id not entered but a course id stored in Session
+        else if ('' != $this->Session->read('ipeerSession.courseId')) {
+            $courseId = $this->Session->read('ipeerSession.courseId');
+            $event = $this->Event->find('first', array('conditions' => array('Course.id' => $courseId, 'Event.event_template_type_id' => 3)));
+        // event id not entered and no course id stored in Session
+        } else {
+            $userid = $this->Auth->user('id');
+            $user = $this->User->find('first', array('conditions' => array('User.id' => $userid)));
+            foreach ($user['Course'] as $course) {
+                $courses[] = $course['id'];
+            }
+            $event = $this->Event->find('first', array('conditions' => array('Course.id' => $courses, 'Event.event_template_type_id' => 3)));
+        }
         
-        $class = array(); //holds all the students enrolled in the course
-        $view = array(); //holds all the details for display in view
+        if (!empty($event)) {
+            $courseId = $event['Course']['id'];
         
-        $class = $this->User->find(
-            'all',
-            array(
-                'conditions' => array('Enrolment.id' => $courseId)
-            )
-        );
+            $this->set('title_for_layout', $this->Course->getCourseName($courseId).__(' > View Survey Result', true));
         
-        foreach ($class as $student) {
-            $temp = array();
-            $temp['ID'] = $student['User']['id'];
-            $temp['Full Name'] = $student['User']['full_name'];
-            $temp['Student No.'] = $student['User']['student_no'];
+            $class = $this->User->find(
+                'all',
+                array(
+                    'conditions' => array('Enrolment.id' => $courseId)
+                )
+            );
+        
+            foreach ($class as $student) {
+                $temp = array();
+                $temp['ID'] = $student['User']['id'];
+                $temp['Full Name'] = $student['User']['full_name'];
+                $temp['Student No.'] = $student['User']['student_no'];
             
-            foreach ($student['Submission'] as $submission) {
-                if ($submission['event_id'] == $eventId) {
-                    $temp['Date Submitted'] = date('D, M j, Y g:i a', strtotime($submission['date_submitted']));
-                } else {
+                foreach ($student['Submission'] as $submission) {
+                    if ($submission['event_id'] == $eventId) {
+                        $temp['Date Submitted'] = date('D, M j, Y g:i a', strtotime($submission['date_submitted']));
+                    } else {
+                        $temp['Date Submitted'] = 'Not Submitted';
+                    } 
+                }
+                if (empty($student['Submission'])) {
                     $temp['Date Submitted'] = 'Not Submitted';
-                } 
-            }
-            if (empty($student['Submission'])) {
-                $temp['Date Submitted'] = 'Not Submitted';
-            }
+                }
             
-            $temp['Event Id'] = $eventId;
+                $temp['Event Id'] = $eventId;
             
-            $view[] = $temp;
+                $view[] = $temp;
+            }
+
+            $events = $this->Event->find('all', array('conditions' => array('Course.id' => $courseId, 'Event.event_template_type_id' => 3)));
+
+
+            foreach ($events as $key => $survey) {
+                $surveys[$key]['id'] = $survey['Event']['id'];
+                $surveys[$key]['title'] = $survey['Event']['title'];            
+            }
+            $survey = $event['Event']['title'];
+            $survey_id = $event['Event']['template_id'];
+        } else {
+            $this->set('title_for_layout', __('View Survey Result', true));
+            $this->Session->setFlash(__('No surveys found', true));
         }
         
         $this->set('view', $view);
-        $this->set('survey', $event['Event']['title']);
-        $this->set('survey_id', $event['Event']['template_id']);
+        $this->set('courseId', $courseId);
+        $this->set('eventId', $eventId);
+        $this->set('surveysList', $surveys);
+        $this->set('survey', $survey);
+        $this->set('survey_id', $survey_id);
     }
 
     /**
