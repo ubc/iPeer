@@ -474,7 +474,7 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Emailer');
         $this->Acl->allow($role, 'controllers/Emailtemplates');    
 
-        $role->id = 4; // student
+        $role->id = 5; // student
         $this->Acl->deny($role, 'controllers');
         $this->Acl->allow($role, 'controllers/Home');
         $this->Acl->deny($role, 'controllers/Courses');
