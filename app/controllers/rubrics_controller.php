@@ -147,6 +147,11 @@ class RubricsController extends AppController
      */
     function index()
     {
+        if (!User::hasPermission('controllers/rubrics')) {
+            $this->Session->setFlash(__('You do not have permission to access rubrics', true));
+            $this->redirect('/home');
+        }
+
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
         // Set the display list
@@ -179,6 +184,25 @@ class RubricsController extends AppController
      */
     function view($id, $layout='')
     {
+        if (!User::hasPermission('controllers/rubrics')) {
+            $this->Session->setFlash(__('You do not have permission to view rubrics', true));
+            $this->redirect('/home');
+        }
+
+        $eval = $this->Rubric->find(
+            'first',
+            array(
+                'conditions' => array('Rubric.id' => $id),
+                'contain' => array('Event' => 'EvaluationSubmission')
+            )
+        );
+        
+        // check to see if $id is valid - numeric & is a rubric
+        if (!is_numeric($id) || empty($eval)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+
         if ($layout != '') {
             $this->layout = $layout;
         }
@@ -204,6 +228,11 @@ class RubricsController extends AppController
      */
     function add($layout='')
     {
+        if (!User::hasPermission('controllers/rubrics')) {
+            $this->Session->setFlash(__('You do not have permission to add rubrics', true));
+            $this->redirect('/home');
+        }
+        
         if ($layout != '') {
             $this->layout = $layout;
         }
@@ -256,6 +285,49 @@ class RubricsController extends AppController
      */
     function edit($id)
     {
+        if (!User::hasPermission('controllers/rubrics')) {
+            $this->Session->setFlash(__('You do not have permission to edit rubrics', true));
+            $this->redirect('/home');
+        }
+        
+        // for checking the user's role
+        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
+        // retrieving the requested rubric
+        $eval = $this->Rubric->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id), 
+                'contain' => array('Event' => 'EvaluationSubmission')
+            )
+        );
+        // for storing submissions - for checking if there are any submissions
+        $submissions = array();
+        
+        // check to see if $id is valid - numeric & is a rubric
+        if (!is_numeric($id) || empty($eval)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
+        // check to see if the user is the creator, admin, or superadmin
+        if (!($eval['Rubric']['creator_id'] == $user['User']['id'] || '1' == $user['Role']['0']['id'] ||
+            '2' == $user['Role']['0']['id'])) {
+            $this->Session->setFlash(__('You do not have permission to edit this rubric.', true));
+            $this->redirect('index');
+        }
+        
+        foreach ($eval['Event'] as $event) {
+            if (!empty($event['EvaluationSubmission'])) {
+                $submissions[] = $event['EvaluationSubmission'];
+            }
+        }
+        
+        // check to see if submissions had been made - if yes - rubric can't be edited
+        if(!empty($submissions)) {
+            $this->Session->setFlash(__('Submissions had been made. '.$eval['Rubric']['name'].' cannot be edited. Please make a copy.', true));
+            $this->redirect('index');
+        }
+
         if (empty($this->data)) {
             $this->data = $this->Rubric->find('first', array('conditions' => array('id' => $id),
                 'contain' => array('RubricsCriteria.RubricsCriteriaComment',
@@ -311,6 +383,25 @@ class RubricsController extends AppController
      */
     function copy($id)
     {
+        if (!User::hasPermission('controllers/rubrics')) {
+            $this->Session->setFlash(__('You do not have permission to copy rubrics.', true));
+            $this->redirect('/home');
+        }
+        
+        $eval = $this->Rubric->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id), 
+                'contain' => array('Event' => 'EvaluationSubmission')
+            )
+        );
+        
+        // check to see if $id is valid - numeric & is a rubric
+        if (!is_numeric($id) || empty($eval)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+
         $this->data = $this->Rubric->copy($id);
         $this->set('data', $this->data);
         $this->set('action', __('Copy Rubric', true));
@@ -328,6 +419,35 @@ class RubricsController extends AppController
      */
     function delete($id)
     {
+        if (!User::hasPermission('controllers/rubrics')) {
+            $this->Session->setFlash(__('You do not have permission to delete rubrics', true));
+            $this->redirect('/home');
+        }
+        
+        // for checking the user's role
+        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
+        // retrieving the requested rubric
+        $eval = $this->Rubric->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id), 
+                'contain' => array('Event' => 'EvaluationSubmission')
+            )
+        );
+        
+        // check to see if $id is valid - numeric & is a rubric
+        if (!is_numeric($id) || empty($eval)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
+        // check to see if the user is the creator, admin, or superadmin
+        if (!($eval['Rubric']['creator_id'] == $user['User']['id'] || '1' == $user['Role']['0']['id'] ||
+            '2' == $user['Role']['0']['id'])) {
+            $this->Session->setFlash(__('You do not have permission to delete this rubric.', true));
+            $this->redirect('index');
+        }
+
         // Deny Deleting evaluations in use:
         if ($this->Rubric->getEventCount($id)) {
             $this->Session->setFlash(__('This evaluation is in use. Please remove all the events assosiated with this evaluation first.', true),

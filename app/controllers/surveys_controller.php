@@ -193,6 +193,11 @@ class SurveysController extends AppController
      */
     function index($course_id = null)
     {
+        if (!User::hasPermission('controllers/surveys')) {
+            $this->Session->setFlash(__('You do not have permission to access surveys', true));
+            $this->redirect('/home');
+        }
+        debug($this->Survey->find('first'));
         // Set up the basic static ajax list variables
         $conditions = array();
         if (null != $course_id) {
@@ -232,6 +237,25 @@ class SurveysController extends AppController
      */
     function view($id)
     {
+        if (!User::hasPermission('controllers/surveys')) {
+            $this->Session->setFlash(__('You do not have permission to view surveys', true));
+            $this->redirect('/home');
+        }
+        
+        $eval = $this->Survey->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id), 
+                'contain' => array('Event' => 'EvaluationSubmission')
+            )
+        );
+        
+        // check to see if $id is valid - numeric & is a survey
+        if (!is_numeric($id) || empty($eval)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
         $data = $this->Survey->read(null, $id);
         $this->set('data', $data);
     }
@@ -246,6 +270,11 @@ class SurveysController extends AppController
      */
     function add()
     {
+        if (!User::hasPermission('controllers/surveys')) {
+            $this->Session->setFlash(__('You do not have permission to add surveys', true));
+            $this->redirect('/home');
+        }
+
         if (!empty($this->data)) {
             if ($result = $this->Survey->save($this->data)) {
                 $this->data = $result;
@@ -274,7 +303,7 @@ class SurveysController extends AppController
 
                 //Save Data
                 $this->Event->save($eventArray);
-                $this->Session->setFlash(__('Survey is saved!', true));
+                $this->Session->setFlash(__('Survey is saved!', true), 'good');
                 $this->redirect('edit/'.$this->Survey->id);
             } else {
                 //$this->set('errmsg', $this->Survey->errorMessage);
@@ -298,10 +327,49 @@ class SurveysController extends AppController
      */
     function edit($id)
     {
-        if (!is_numeric($id)) {
-            $this->Session->setFlash(__('Invalid survey ID.', true));
+        if (!User::hasPermission('controllers/surveys')) {
+            $this->Session->setFlash(__('You do not have permission to edit surveys', true));
+            $this->redirect('/home');
+        }
+    
+        // for checking the user's role
+        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
+        // retrieving the requested survey
+        $eval = $this->Survey->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id), 
+                'contain' => array('Event' => 'EvaluationSubmission')
+            )
+        );
+        // for storing submissions - for checking if there are any submissions
+        $submissions = array();
+        
+        // check to see if $id is valid - numeric & is a survey
+        if (!is_numeric($id) || empty($eval)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
             $this->redirect('index');
         }
+        
+        // check to see if the user is the creator, admin, or superadmin
+        if (!($eval['Survey']['creator_id'] == $user['User']['id'] || '1' == $user['Role']['0']['id'] ||
+            '2' == $user['Role']['0']['id'])) {
+            $this->Session->setFlash(__('You do not have permission to edit this survey.', true));
+            $this->redirect('index');
+        }
+        
+        foreach ($eval['Event'] as $event) {
+            if (!empty($event['EvaluationSubmission'])) {
+                $submissions[] = $event['EvaluationSubmission'];
+            }
+        }
+        
+        // check to see if submissions had been made - if yes - survey can't be edited
+        if(!empty($submissions)) {
+            $this->Session->setFlash(__('Submissions had been made. '.$eval['Survey']['name'].' cannot be edited. Please make a copy.', true));
+            $this->redirect('index');
+        }
+
         $data = $this->Survey->find('first', array('conditions' => array('id' => $id),
             'contain' => array('Event')));
         if (!empty($this->data)) {
@@ -315,7 +383,7 @@ class SurveysController extends AppController
             $data['Event'][0]['release_date_end'] = $this->data['Survey']['release_date_end'];
 
             if ($result = $this->Survey->save($data)) {
-                $this->Session->setFlash(__('The Survey was edited successfully.', true));
+                $this->Session->setFlash(__('The Survey was edited successfully.', true), 'good');
                 $this->redirect('index');
             } else {
                 $this->Session->setFlash($this->Survey->errorMessage);
@@ -338,6 +406,25 @@ class SurveysController extends AppController
      */
     function copy($id)
     {
+        if (!User::hasPermission('controllers/surveys')) {
+            $this->Session->setFlash(__('You do not have permission to copy surveys', true));
+            $this->redirect('/home');
+        }
+        
+        $eval = $this->Survey->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id), 
+                'contain' => array('Event' => 'EvaluationSubmission')
+            )
+        );
+        
+        // check to see if $id is valid - numeric & is a survey
+        if (!is_numeric($id) || empty($eval)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
         $this->data = $this->Survey->read(null, $id);
         unset($this->data['Survey']['id']);
         $this->data['Survey']['name'] = 'Copy of '.$this->data['Survey']['name'];
@@ -360,6 +447,35 @@ class SurveysController extends AppController
      */
     function delete($id)
     {
+        if (!User::hasPermission('controllers/surveys')) {
+            $this->Session->setFlash(__('You do not have permission to delete surveys', true));
+            $this->redirect('/home');
+        }
+        
+        // for checking the user's role
+        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
+        // retrieving the requested survey
+        $eval = $this->Survey->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id), 
+                'contain' => array('Event' => 'EvaluationSubmission')
+            )
+        );
+        
+        // check to see if $id is valid - numeric & is a survey
+        if (!is_numeric($id) || empty($eval)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
+        // check to see if the user is the creator, admin, or superadmin
+        if (!($eval['Survey']['creator_id'] == $user['User']['id'] || '1' == $user['Role']['0']['id'] ||
+            '2' == $user['Role']['0']['id'])) {
+            $this->Session->setFlash(__('You do not have permission to delete this survey.', true));
+            $this->redirect('index');
+        }
+        
         if ($this->Survey->delete($id)) {
       /*$groupSets = $this->SurveyGroupSet->find('all', 'survey_id='.$id);
 
@@ -390,7 +506,7 @@ class SurveysController extends AppController
         $this->SurveyInputs->del($input['SurveyInput']['id']);
       }*/
 
-            $this->Session->setFlash(__('The survey was deleted successfully.', true));
+            $this->Session->setFlash(__('The survey was deleted successfully.', true), 'good');
         } else {
             $this->Session->setFlash(__('Survey delete failed.', true));
         }
@@ -542,7 +658,7 @@ class SurveysController extends AppController
       $this->Survey->habtmDelete('Question', $survey_id, $question_id);
       //$this->Question->editCleanUp($question_id);
 
-      $this->Session->setFlash(__('The question was removed successfully.', true));
+      $this->Session->setFlash(__('The question was removed successfully.', true), 'good');
 
       $this->redirect('questionsSummary/'.$survey_id);
   }
@@ -567,7 +683,7 @@ class SurveysController extends AppController
           //$maxQuestionNum = $this->SurveyQuestion->getMaxSurveyQuestionNumber($this->data['Survey']['id']);
           //$this->data['number'] = $maxQuestionNum+1;
           if ($this->Question->saveAll($this->data)) {
-              $this->Session->setFlash(__('The question was added successfully.', true));
+              $this->Session->setFlash(__('The question was added successfully.', true), 'good');
               // Need to run reorderQuestions once in order to correctly set the question position numbers
               $surveyQuestionId = $this->SurveyQuestion->find('first', array('conditions' => array('survey_id' => $survey_id), 'fields' => array('MIN(number) as minQuestionId')));
               $this->SurveyQuestion->reorderQuestions($survey_id, $surveyQuestionId['0']['minQuestionId'], 'TOP');
@@ -600,7 +716,7 @@ class SurveysController extends AppController
   {
       if (!empty($this->data)) {
           if ($this->Question->saveAll($this->data)) {
-              $this->Session->setFlash(__('The question was updated successfully.', true));
+              $this->Session->setFlash(__('The question was updated successfully.', true), 'good');
               $this->redirect('questionsSummary/'.$survey_id);
           } else {
               $this->Session->setFlash(__('Error in saving question.', true));

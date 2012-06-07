@@ -146,6 +146,11 @@ class MixevalsController extends AppController
      */
     function index()
     {
+        if (!User::hasPermission('controllers/mixevals')) {
+            $this->Session->setFlash(__('You do not have permission to access mixed evaluations', true));
+            $this->redirect('/home');
+        }
+
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
         // Set the display list
@@ -181,6 +186,25 @@ class MixevalsController extends AppController
      */
     function view($id, $layout='')
     {
+        if (!User::hasPermission('controllers/mixevals')) {
+            $this->Session->setFlash(__('You do not have permission to view mixed evaluations', true));
+            $this->redirect('/home');
+        }
+        
+        $eval = $this->Mixeval->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id), 
+                'contain' => array('Event' => 'EvaluationSubmission')
+            )
+        );
+        
+        // check to see if $id is valid - numeric & is a mixed evaluation
+        if (!is_numeric($id) || empty($eval)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
         if ($layout != '') {
             $this->layout = $layout;
         }
@@ -214,6 +238,11 @@ class MixevalsController extends AppController
      */
     function add($layout='')
     {
+        if (!User::hasPermission('controllers/mixevals')) {
+            $this->Session->setFlash(__('You do not have permission to add mixed evaluations', true));
+            $this->redirect('/home');
+        }
+        
         if ($layout != '') {
             $this->layout = $layout;
             $this->set('layout', $layout);
@@ -284,6 +313,49 @@ class MixevalsController extends AppController
      */
     function edit($id)
     {
+        if (!User::hasPermission('controllers/mixevals')) {
+            $this->Session->setFlash(__('You do not have permission to edit mixed evaluations', true));
+            $this->redirect('/home');
+        }
+        
+        // for checking the user's role
+        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
+        // retrieving the requested mixed evaluation
+        $eval = $this->Mixeval->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id), 
+                'contain' => array('Event' => 'EvaluationSubmission')
+            )
+        );
+        // for storing submissions - for checking if there are any submissions
+        $submissions = array();
+        
+        // check to see if $id is valid - numeric & is a mixed evaluation
+        if (!is_numeric($id) || empty($eval)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
+        // check to see if the user is the creator, admin, or superadmin
+        if (!($eval['Mixeval']['creator_id'] == $user['User']['id'] || '1' == $user['Role']['0']['id'] ||
+            '2' == $user['Role']['0']['id'])) {
+            $this->Session->setFlash(__('You do not have permission to edit this mixed evaluation.', true));
+            $this->redirect('index');
+        }
+        
+        foreach ($eval['Event'] as $event) {
+            if (!empty($event['EvaluationSubmission'])) {
+                $submissions[] = $event['EvaluationSubmission'];
+            }
+        }
+        
+        // check to see if submissions had been made - if yes - mixed evaluation can't be edited
+        if(!empty($submissions)) {
+            $this->Session->setFlash(__('Submissions had been made. '.$eval['Mixeval']['name'].' cannot be edited. Please make a copy.', true));
+            $this->redirect('index');
+        }
+     
         if (empty($this->data)) {
             $this->data = $this->Mixeval->find('first', array('conditions' => array('id' => $id),
                 'contain' => array('Question.Description',
@@ -344,6 +416,25 @@ class MixevalsController extends AppController
      */
     function copy($id=null)
     {
+        if (!User::hasPermission('controllers/mixevals')) {
+            $this->Session->setFlash(__('You do not have permission to copy mixed evaluations', true));
+            $this->redirect('/home');
+        }
+    
+        $eval = $this->Mixeval->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id), 
+                'contain' => array('Event' => 'EvaluationSubmission')
+            )
+        );
+        
+        // check to see if $id is valid - numeric & is a mixed evaluation
+        if (!is_numeric($id) || empty($eval)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
         $this->data = $this->Mixeval->copy($id);
         $this->set('data', $this->data);
         $this->set('action', __('Copy Mixed Evaluation', true));
@@ -361,6 +452,35 @@ class MixevalsController extends AppController
      */
     function delete($id)
     {
+        if (!User::hasPermission('controllers/mixevals')) {
+            $this->Session->setFlash(__('You do not have permission to delete mixed evaluations', true));
+            $this->redirect('/home');
+        }
+        
+        // for checking the user's role
+        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
+        // retrieving the requested mixed evaluation
+        $eval = $this->Mixeval->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id), 
+                'contain' => array('Event' => 'EvaluationSubmission')
+            )
+        );
+        
+        // check to see if $id is valid - numeric & is a mixed evaluation
+        if (!is_numeric($id) || empty($eval)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
+        // check to see if the user is the creator, admin, or superadmin
+        if (!($eval['Mixeval']['creator_id'] == $user['User']['id'] || '1' == $user['Role']['0']['id'] ||
+            '2' == $user['Role']['0']['id'])) {
+            $this->Session->setFlash(__('You do not have permission to delete this mixed evaluation.', true));
+            $this->redirect('index');
+        }
+        
         // Deny Deleting evaluations in use:
         $this->Mixeval->id = $id;
         $data = $this->Mixeval->read();
