@@ -151,6 +151,10 @@ class SimpleevaluationsController extends AppController
      */
     function index()
     {
+        if (!User::hasPermission('controllers/simpleevaluations')) {
+            $this->Session->setFlash(__('You do not have permission to access simple evaluations.', true));
+            $this->redirect('/home');
+        }
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
         // Set the display list
@@ -182,6 +186,25 @@ class SimpleevaluationsController extends AppController
      */
     function view($id, $layout='')
     {
+        if (!User::hasPermission('controllers/simpleevaluations')) {
+            $this->Session->setFlash(__('You do not have permission to view simple evaluations.', true));
+            $this->redirect('/home');
+        }
+        
+        $eval = $this->SimpleEvaluation->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id), 
+                'contain' => array('Event' => 'EvaluationSubmission')
+            )
+        );
+        
+        // check to see if $id is valid - numeric & is a simple evaluation
+        if (!is_numeric($id) || empty($eval)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
         if ($layout != '') {
             $this->layout = $layout;
             if ($layout == 'pop_up') {
@@ -204,6 +227,10 @@ class SimpleevaluationsController extends AppController
      */
     function add($layout='')
     {
+        if (!User::hasPermission('controllers/simpleevaluations')) {
+            $this->Session->setFlash(__('You do not have permission to add simple evaluations.', true));
+            $this->redirect('/home');
+        }
         if ($layout != '') {
             $this->layout = $layout;
         }
@@ -251,8 +278,46 @@ class SimpleevaluationsController extends AppController
      */
     function edit($id)
     {
-        if (!is_numeric($id)) {
+        if (!User::hasPermission('controllers/simpleevaluations')) {
+            $this->Session->setFlash(__('You do not have permission to edit simple evaluations', true));
+            $this->redirect('/home');
+        }
+        
+        // for checking the user's role
+        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
+        // retrieving the requested simple evaluation
+        $eval = $this->SimpleEvaluation->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id), 
+                'contain' => array('Event' => 'EvaluationSubmission')
+            )
+        );
+        // for storing submissions - for checking if there are any submissions
+        $submissions = array();
+        
+        // check to see if $id is valid - numeric & is a simple evaluation
+        if (!is_numeric($id) || empty($eval)) {
             $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
+        // check to see if the user is the creator, admin, or superadmin
+        if (!($eval['SimpleEvaluation']['creator_id'] == $user['User']['id'] || '1' == $user['Role']['0']['id'] ||
+            '2' == $user['Role']['0']['id'])) {
+            $this->Session->setFlash(__('You do not have permission to edit this simple evaluation.', true));
+            $this->redirect('index');
+        }
+        
+        foreach ($eval['Event'] as $event) {
+            if (!empty($event['EvaluationSubmission'])) {
+                $submissions[] = $event['EvaluationSubmission'];
+            }
+        }
+        
+        // check to see if submissions had been made - if yes - simple evaluation can't be edited
+        if(!empty($submissions)) {
+            $this->Session->setFlash(__('Submissions had been made. '.$eval['SimpleEvaluation']['name'].' cannot be edited. Please make a copy.', true));
             $this->redirect('index');
         }
 
@@ -281,6 +346,25 @@ class SimpleevaluationsController extends AppController
      */
     function copy($id)
     {
+        if (!User::hasPermission('controllers/simpleevaluations')) {
+            $this->Session->setFlash(__('You do not have permission to copy simple evaluations.', true));
+            $this->redirect('/home');
+        }
+        
+        $eval = $this->SimpleEvaluation->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id), 
+                'contain' => array('Event' => 'EvaluationSubmission')
+            )
+        );
+        
+        // check to see if $id is valid - numeric & is a simple evaluation
+        if (!is_numeric($id) || empty($eval)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
         $this->render = false;
         $this->data = $this->SimpleEvaluation->read(null, $id);
         $this->data['SimpleEvaluation']['id'] = null;
@@ -300,6 +384,35 @@ class SimpleevaluationsController extends AppController
      */
     function delete($id)
     {
+        if (!User::hasPermission('controllers/simpleevaluations')) {
+            $this->Session->setFlash(__('You do not have permission to delete simple evaluations', true));
+            $this->redirect('/home');
+        }
+        
+        // for checking the user's role
+        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
+        // retrieving the requested simple evaluation
+        $eval = $this->SimpleEvaluation->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id), 
+                'contain' => array('Event' => 'EvaluationSubmission')
+            )
+        );
+        
+        // check to see if $id is valid - numeric & is a simple evaluation
+        if (!is_numeric($id) || empty($eval)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
+        // check to see if the user is the creator, admin, or superadmin
+        if (!($eval['SimpleEvaluation']['creator_id'] == $user['User']['id'] || '1' == $user['Role']['0']['id'] ||
+            '2' == $user['Role']['0']['id'])) {
+            $this->Session->setFlash(__('You do not have permission to delete this simple evaluation.', true));
+            $this->redirect('index');
+        }
+
         // Deny Deleting evaluations in use:
         if ($this->SimpleEvaluation->getEventCount($id)) {
             $message = __("This evaluation is now in use, and can NOT be deleted.<br />", true);

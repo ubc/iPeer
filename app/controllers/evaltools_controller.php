@@ -45,6 +45,10 @@ class EvaltoolsController extends AppController
      */
     function index($evaltool = null)
     {
+        if (!User::hasPermission('controllers/evaltools')) {
+            $this->Session->setFlash(__('You do not have permission to view evaluation tools.', true));
+            $this->redirect('/home');
+        }
         //Disable the autorender, base the role to render the custom home
         $this->autoRender = false;
 
