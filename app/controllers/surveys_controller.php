@@ -197,7 +197,7 @@ class SurveysController extends AppController
             $this->Session->setFlash(__('You do not have permission to access surveys', true));
             $this->redirect('/home');
         }
-        debug($this->Survey->find('first'));
+
         // Set up the basic static ajax list variables
         $conditions = array();
         if (null != $course_id) {
@@ -331,9 +331,7 @@ class SurveysController extends AppController
             $this->Session->setFlash(__('You do not have permission to edit surveys', true));
             $this->redirect('/home');
         }
-    
-        // for checking the user's role
-        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
+
         // retrieving the requested survey
         $eval = $this->Survey->find(
             'first', 
@@ -352,8 +350,8 @@ class SurveysController extends AppController
         }
         
         // check to see if the user is the creator, admin, or superadmin
-        if (!($eval['Survey']['creator_id'] == $user['User']['id'] || '1' == $user['Role']['0']['id'] ||
-            '2' == $user['Role']['0']['id'])) {
+        if (!($eval['Survey']['creator_id'] == $this->Auth->user('id') || 
+            User::hasPermission('functions/evaluation', 'update'))) {
             $this->Session->setFlash(__('You do not have permission to edit this survey.', true));
             $this->redirect('index');
         }
@@ -451,9 +449,7 @@ class SurveysController extends AppController
             $this->Session->setFlash(__('You do not have permission to delete surveys', true));
             $this->redirect('/home');
         }
-        
-        // for checking the user's role
-        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
+
         // retrieving the requested survey
         $eval = $this->Survey->find(
             'first', 
@@ -470,8 +466,8 @@ class SurveysController extends AppController
         }
         
         // check to see if the user is the creator, admin, or superadmin
-        if (!($eval['Survey']['creator_id'] == $user['User']['id'] || '1' == $user['Role']['0']['id'] ||
-            '2' == $user['Role']['0']['id'])) {
+        if (!($eval['Survey']['creator_id'] == $this->Auth->user('id') || 
+            User::hasPermission('functions/evaluation', 'delete'))) {
             $this->Session->setFlash(__('You do not have permission to delete this survey.', true));
             $this->redirect('index');
         }

@@ -289,9 +289,7 @@ class RubricsController extends AppController
             $this->Session->setFlash(__('You do not have permission to edit rubrics', true));
             $this->redirect('/home');
         }
-        
-        // for checking the user's role
-        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
+
         // retrieving the requested rubric
         $eval = $this->Rubric->find(
             'first', 
@@ -310,8 +308,8 @@ class RubricsController extends AppController
         }
         
         // check to see if the user is the creator, admin, or superadmin
-        if (!($eval['Rubric']['creator_id'] == $user['User']['id'] || '1' == $user['Role']['0']['id'] ||
-            '2' == $user['Role']['0']['id'])) {
+        if (!($eval['Rubric']['creator_id'] == $this->Auth->user('id') || 
+            User::hasPermission('functions/evaluation', 'update'))) {
             $this->Session->setFlash(__('You do not have permission to edit this rubric.', true));
             $this->redirect('index');
         }
@@ -423,9 +421,7 @@ class RubricsController extends AppController
             $this->Session->setFlash(__('You do not have permission to delete rubrics', true));
             $this->redirect('/home');
         }
-        
-        // for checking the user's role
-        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
+
         // retrieving the requested rubric
         $eval = $this->Rubric->find(
             'first', 
@@ -442,8 +438,8 @@ class RubricsController extends AppController
         }
         
         // check to see if the user is the creator, admin, or superadmin
-        if (!($eval['Rubric']['creator_id'] == $user['User']['id'] || '1' == $user['Role']['0']['id'] ||
-            '2' == $user['Role']['0']['id'])) {
+        if (!($eval['Rubric']['creator_id'] == $this->Auth->user('id') || 
+            User::hasPermission('functions/evaluation', 'delete'))) {
             $this->Session->setFlash(__('You do not have permission to delete this rubric.', true));
             $this->redirect('index');
         }

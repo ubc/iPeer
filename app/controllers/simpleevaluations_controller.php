@@ -282,9 +282,7 @@ class SimpleevaluationsController extends AppController
             $this->Session->setFlash(__('You do not have permission to edit simple evaluations', true));
             $this->redirect('/home');
         }
-        
-        // for checking the user's role
-        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
+
         // retrieving the requested simple evaluation
         $eval = $this->SimpleEvaluation->find(
             'first', 
@@ -303,8 +301,8 @@ class SimpleevaluationsController extends AppController
         }
         
         // check to see if the user is the creator, admin, or superadmin
-        if (!($eval['SimpleEvaluation']['creator_id'] == $user['User']['id'] || '1' == $user['Role']['0']['id'] ||
-            '2' == $user['Role']['0']['id'])) {
+        if (!($eval['SimpleEvaluation']['creator_id'] == $this->Auth->user('id') || 
+            User::hasPermission('functions/evaluation', 'update'))) {
             $this->Session->setFlash(__('You do not have permission to edit this simple evaluation.', true));
             $this->redirect('index');
         }
@@ -388,9 +386,7 @@ class SimpleevaluationsController extends AppController
             $this->Session->setFlash(__('You do not have permission to delete simple evaluations', true));
             $this->redirect('/home');
         }
-        
-        // for checking the user's role
-        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
+
         // retrieving the requested simple evaluation
         $eval = $this->SimpleEvaluation->find(
             'first', 
@@ -407,8 +403,8 @@ class SimpleevaluationsController extends AppController
         }
         
         // check to see if the user is the creator, admin, or superadmin
-        if (!($eval['SimpleEvaluation']['creator_id'] == $user['User']['id'] || '1' == $user['Role']['0']['id'] ||
-            '2' == $user['Role']['0']['id'])) {
+        if (!($eval['SimpleEvaluation']['creator_id'] == $this->Auth->user('id') || 
+            User::hasPermission('functions/evaluation', 'delete'))) {
             $this->Session->setFlash(__('You do not have permission to delete this simple evaluation.', true));
             $this->redirect('index');
         }
