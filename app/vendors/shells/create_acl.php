@@ -116,6 +116,26 @@ class CreateAclShell extends Shell
             $this->Acl->Aco->create(array('parent_id' => $role['Aco']['id'], 'model' => null, 'alias' => $r['Role']['name']));
             $this->Acl->Aco->save();
         }
+        
+        // functions/evaluation
+        $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'evaluation'));
+        $eval = $this->Acl->Aco->save();
+        $eval['Aco']['id'] = $this->Acl->Aco->id;
+
+        // functions/email
+        $this->Acl->Aco->create(array('parent_id'=> $root['Aco']['id'], 'model' => null, 'alias' => 'email'));
+        $email = $this->Acl->Aco->save();
+        $email['Aco']['id'] = $this->Acl->Aco->id;
+        
+        $this->Acl->Aco->create(array('parent_id' => $email['Aco']['id'], 'model' => null, 'alias' => 'allUsers'));
+        $this->Acl->Aco->save();
+        
+        $this->Acl->Aco->create(array('parent_id' => $email['Aco']['id'], 'model' => null, 'alias' => 'allGroups'));
+        $this->Acl->Aco->save();
+        
+        $this->Acl->Aco->create(array('parent_id' => $email['Aco']['id'], 'model' => null, 'alias' => 'allCourses'));
+        $this->Acl->Aco->save();
+        
     }
 
 
@@ -442,11 +462,13 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'functions/user/admin', 'delete');
         $this->Acl->deny($role, 'functions/user/superadmin');
         $this->Acl->allow($role, 'controllers/Evaltools');
+        $this->Acl->allow($role, 'functions/evaluation');
         $this->Acl->allow($role, 'controllers/Simpleevaluations');
         $this->Acl->allow($role, 'controllers/Rubrics');
         $this->Acl->allow($role, 'controllers/Mixevals');
         $this->Acl->allow($role, 'controllers/Surveys');
         $this->Acl->allow($role, 'controllers/Emailer');
+        $this->Acl->allow($role, 'functions/email');
         $this->Acl->allow($role, 'controllers/Emailtemplates');    
         $this->Acl->allow($role, 'controllers/Departments');
         $this->Acl->allow($role, 'adminpage');
@@ -467,11 +489,18 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'functions/user/instructor', 'update');
         $this->Acl->deny($role, 'functions/user/instructor', 'delete');
         $this->Acl->allow($role, 'controllers/Evaltools');
+        $this->Acl->allow($role, 'functions/evaluation');
+        $this->Acl->deny($role, 'functions/evaluation', 'update');
+        $this->Acl->deny($role, 'functions/evaluation', 'delete');
         $this->Acl->allow($role, 'controllers/Simpleevaluations');
         $this->Acl->allow($role, 'controllers/Rubrics');
         $this->Acl->allow($role, 'controllers/Mixevals');
         $this->Acl->allow($role, 'controllers/Surveys');
         $this->Acl->allow($role, 'controllers/Emailer');
+        $this->Acl->allow($role, 'functions/email');
+        $this->Acl->deny($role, 'functions/email/allUsers');
+        $this->Acl->deny($role, 'functions/email/allGroups');
+        $this->Acl->deny($role, 'functions/email/allCourses');
         $this->Acl->allow($role, 'controllers/Emailtemplates');    
 
         $role->id = 5; // student
