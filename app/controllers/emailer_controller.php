@@ -136,6 +136,11 @@ class EmailerController extends AppController
      */
     public function index()
     {
+        if (!User::hasPermission('controllers/emailer')) {
+            $this->Session->setFlash(__('You do not have permission to use the emailer.', true));
+            $this->redirect('/home');
+        }
+
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
         // Set the display list
@@ -158,7 +163,88 @@ class EmailerController extends AppController
      * @access public
      * @return void
      */
-    public function write($type, $id) {
+    public function write($type=null, $id=null) {
+        
+        if (!User::hasPermission('controllers/emailer')) {
+            $this->Session->setFlash(__('You do not have permission to write emails.', true));
+            $this->redirect('/home');
+        }
+
+        // class, group, user
+        if ('C' == $type || 'G' == $type || null != $id) {
+            if ('C' == $type) {
+                $group = $this->Course->find('first', array('conditions' => array('Course.id' => $id)));
+            } else if ('G' == $type) {
+                $group = $this->Group->find('first', array('conditions' => array('Group.id' => $id)));
+            } else if (null != $id) {
+                $group = $this->User->find('first', array('conditions' => array('User.id' => $id)));
+            }
+        
+            // check for valid id
+            if (empty($group)) {
+                $this->Session->setFlash(__('Invalid Id', true));
+                $this->redirect('index');
+            }
+        }
+        
+        // list of courses the user has access to
+        $courseList = array();
+        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
+        foreach ($user['Course'] as $course) {
+            $courseList[] = $course['id'];
+        }
+
+        //for checking if the user can email to class with $id
+        if ('C' == $type && !User::hasPermission('functions/email/allcourses')) {
+             // check if they have access to class with $id
+             $course = $this->User->find(
+                'first', 
+                array(
+                    'conditions' => array(
+                        'User.id' => $this->Auth->user('id'), 
+                        'Course.id' => $id
+                    )
+                )
+            );
+             if (empty($course)) {
+                $this->Session->setFlash(__('You do not have permission to write emails to this class.', true));
+                $this->redirect('index');
+             }
+        // for checking if the user can email to group with $id
+        } else if ('G' == $type && !User::hasPermission('functions/email/allgroups')) {
+            // check if they have access to group with $id           
+            $group = $this->Group->find(
+                'first', 
+                array(
+                    'conditions' => array(
+                        'Group.id' => $id, 
+                        'Course.id' => $courseList
+                    )
+                )
+            );
+            if (empty($group)) {
+                $this->Session->setFlash(__('You do not have permission to write emails to this group.', true));
+                $this->redirect('index');
+            }
+        // for checking if the user can email to user with $id
+        } else if (!User::hasPermission('functions/email/allusers') && null != $id) {
+            // check if they have access to user with $id
+            $user = $this->User->find(
+                'all', 
+                array(
+                    'conditions' => array(
+                        'User.id' => $id, 
+                        'Enrolment.id' => $courseList
+                    )
+                )
+            );
+            if (empty($user)) {
+                $this->Session->setFlash(__('You do not have permission to write emails to this user.', true));
+                $this->redirect('index');
+            }
+        }
+        
+    
         $this->set('title_for_layout', 'Write Email');
 
         if (!isset($this->data)) {
@@ -203,7 +289,7 @@ class EmailerController extends AppController
             //Push an email into email_schedules table
             $this->EmailSchedule->saveAll($data);
 
-            $this->Session->setFlash(__('The Email was saved successfully', true));
+            $this->Session->setFlash(__('The Email was saved successfully', true), 'good');
             $this->redirect('index/');
         }
     }
@@ -215,12 +301,38 @@ class EmailerController extends AppController
      */
     function cancel ($id)
     {
+        if (!User::hasPermission('controllers/emailer')) {
+            $this->Session->setFlash(__('You do not have permission to cancel email schedules', true));
+            $this->redirect('/home');
+        }
+
+        // retrieving the requested email schedule
+        $email = $this->EmailSchedule->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id)
+            )
+        );
+
+        // check to see if $id is valid - numeric & is a email schedule
+        if (!is_numeric($id) || empty($email)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+
+        // check to see if the user is the creator, admin, or superadmin
+        if (!($email['EmailSchedule']['creator_id'] == $this->Auth->user('id') || User::hasPermission('functions/email/allusers') ||
+            User::hasPermission('functions/email/allgroups') || User::hasPermission('functions/email/allcourses'))) {
+            $this->Session->setFlash(__('You do not have permission to cancel this email schedule.', true));
+            $this->redirect('index');
+        }
+        
         $creator_id = $this->EmailSchedule->getCreatorId($id);
         $user_id = $this->Auth->user('id');
         if ($creator_id == $user_id) {
             if (!$this->EmailSchedule->getSent($id)) {
                 if ($this->EmailSchedule->delete($id)) {
-                    $this->Session->setFlash(__('The Email was canceled successfully.', true));
+                    $this->Session->setFlash(__('The Email was canceled successfully.', true), 'good');
                 } else {
                     $this->Session->setFlash(__('Email cancellation failed.', true));
                 }
@@ -243,9 +355,31 @@ class EmailerController extends AppController
      */
     function view ($id)
     {
-        $email = $this->EmailSchedule->find('first', array(
-            'conditions' => array('EmailSchedule.id' => $id)
-        ));
+        if (!User::hasPermission('controllers/emailer')) {
+            $this->Session->setFlash(__('You do not have permission to view email schedules.', true));
+            $this->redirect('/home');
+        }
+        
+        // retrieving the requested email schedule
+        $email = $this->EmailSchedule->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id)
+            )
+        );
+
+        // check to see if $id is valid - numeric & is a email schedule
+        if (!is_numeric($id) || empty($email)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+
+        if ($email['EmailSchedule']['creator_id'] !=  $this->Auth->user('id') && !(User::hasPermission('functions/email/allusers') && 
+            User::hasPermission('functions/email/allgroups') && User::hasPermission('functions/email/allcourses'))) {
+            $this->Session->setFlash(__('You do not have permission to view this email schedule.', true));
+            $this->redirect('index');
+        }
+
         $email['EmailSchedule']['to'] = explode(';', $email['EmailSchedule']['to']);
         $this->User->recursive = -1;
         $email['User'] = $this->User->find('all', array(
