@@ -130,6 +130,11 @@ class EmailtemplatesController extends AppController
      */
     function index()
     {
+        if (!User::hasPermission('controllers/emailtemplates')) {
+            $this->Session->setFlash(__('You do not have permission to access email templates.', true));
+            $this->redirect('/home');
+        }
+        
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
         // Set the display list
@@ -146,6 +151,11 @@ class EmailtemplatesController extends AppController
      */
     function add()
     {
+        if (!User::hasPermission('controllers/emailtemplates')) {
+            $this->Session->setFlash(__('You do not have permission to add email templates.', true));
+            $this->redirect('/home');
+        }
+        
         $this->layout= 'pop_up';
         //Set up user info
         $currentUser = $this->User->getCurrentLoggedInUser();
@@ -176,6 +186,32 @@ class EmailtemplatesController extends AppController
      */
     function edit ($id)
     {
+        if (!User::hasPermission('controllers/emailtemplates')) {
+            $this->Session->setFlash(__('You do not have permission to edit email templates.', true));
+            $this->redirect('/home');
+        }
+
+        // retrieving the requested email template
+        $template = $this->EmailTemplate->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id), 
+            )
+        );
+        
+        // check to see if $id is valid - numeric & is a email template
+        if (!is_numeric($id) || empty($template)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
+        // check to see if the user is the creator, admin, or superadmin
+        if (!($template['EmailTemplate']['creator_id'] == $this->Auth->user('id') ||
+            User::hasPermission('functions/emailtemplate'))) {
+            $this->Session->setFlash(__('You do not have permission to edit this email template.', true));
+            $this->redirect('index');
+        }
+        
         $creator_id = $this->EmailTemplate->getCreatorId($id);
         $user_id = $this->Auth->user('id');
         if ($creator_id == $user_id) {
@@ -213,6 +249,32 @@ class EmailtemplatesController extends AppController
      */
     function delete ($id)
     {
+        if (!User::hasPermission('controllers/emailtemplates')) {
+            $this->Session->setFlash(__('You do not have permission to delete email templates.', true));
+            $this->redirect('/home');
+        }
+
+        // retrieving the requested email template
+        $template = $this->EmailTemplate->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id), 
+            )
+        );
+        
+        // check to see if $id is valid - numeric & is a email template
+        if (!is_numeric($id) || empty($template)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
+        // check to see if the user is the creator, admin, or superadmin
+        if (!($template['EmailTemplate']['creator_id'] == $this->Auth->user('id') ||
+            User::hasPermission('functions/emailtemplate'))) {
+            $this->Session->setFlash(__('You do not have permission to delete this email template.', true));
+            $this->redirect('index');
+        }
+        
         $creator_id = $this->EmailTemplate->getCreatorId($id);
         $user_id = $this->Auth->user('id');
         if ($creator_id == $user_id) {
@@ -234,6 +296,32 @@ class EmailtemplatesController extends AppController
      */
     function view ($id)
     {
+        if (!User::hasPermission('controllers/emailtemplates')) {
+            $this->Session->setFlash(__('You do not have permission to view email templates.', true));
+            $this->redirect('/home');
+        }
+        
+        // retrieving the requested email template
+        $template = $this->EmailTemplate->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id), 
+            )
+        );
+        
+        // check to see if $id is valid - numeric & is a email template
+        if (!is_numeric($id) || empty($template)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
+        // check to see if the user is the creator, admin, or superadmin
+        if (!($template['EmailTemplate']['creator_id'] == $this->Auth->user('id') ||
+            User::hasPermission('functions/emailtemplate'))) {
+            $this->Session->setFlash(__('You do not have permission to view this email template.', true));
+            $this->redirect('index');
+        }
+        
         $this->data = $this->EmailTemplate->find('first', array(
             'conditions' => array('EmailTemplate.id' => $id)
         ));

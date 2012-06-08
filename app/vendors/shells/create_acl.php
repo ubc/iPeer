@@ -123,7 +123,7 @@ class CreateAclShell extends Shell
         $eval['Aco']['id'] = $this->Acl->Aco->id;
 
         // functions/email
-        $this->Acl->Aco->create(array('parent_id'=> $root['Aco']['id'], 'model' => null, 'alias' => 'email'));
+        $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'email'));
         $email = $this->Acl->Aco->save();
         $email['Aco']['id'] = $this->Acl->Aco->id;
         
@@ -135,6 +135,11 @@ class CreateAclShell extends Shell
         
         $this->Acl->Aco->create(array('parent_id' => $email['Aco']['id'], 'model' => null, 'alias' => 'allCourses'));
         $this->Acl->Aco->save();
+        
+        // functions/emailtemplate
+        $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'emailtemplate'));
+        $emailtemplate = $this->Acl->Aco->save();
+        $emailtemplate['Aco']['id'] = $this->Acl->Aco->id;
         
     }
 
@@ -469,7 +474,8 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Surveys');
         $this->Acl->allow($role, 'controllers/Emailer');
         $this->Acl->allow($role, 'functions/email');
-        $this->Acl->allow($role, 'controllers/Emailtemplates');    
+        $this->Acl->allow($role, 'controllers/Emailtemplates');
+        $this->Acl->allow($role, 'functions/emailtemplate');
         $this->Acl->allow($role, 'controllers/Departments');
         $this->Acl->allow($role, 'adminpage');
 
