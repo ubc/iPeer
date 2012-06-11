@@ -191,11 +191,12 @@ class Group extends AppModel
      *
      * @return array students not in the group
      */
-    function getStudentsNotInGroup($group_id, $type = 'all')
+    function getStudentsNotInGroup($group_id, $type = 'list')
     {
         $students = $this->getMembersByGroupId($group_id, 'all');
         $students = Set::extract('/Member/id', $students);
-
+        $studentsInGroups = array();
+        
         $course = $this->Course->getCourseByGroupId($group_id);
         if (empty($course)) {
             return array();
@@ -217,9 +218,11 @@ class Group extends AppModel
             $studentsInGroups[] = $key;
         }
 
+        $excludedStudents = array_merge($students, $studentsInGroups);
+
         $studentsListNotinGroups = $this->Member->find($type, array(
             'conditions' => array(
-                'NOT' => array('Member.id' => $students, 'Member.id' => $studentsInGroups),
+                'NOT' => array('Member.id' => $excludedStudents),
                 'Enrolment.id' => $course['Course']['id'],
             ),
             'recursive' => 1,

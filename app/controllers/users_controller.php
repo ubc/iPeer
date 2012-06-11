@@ -335,8 +335,8 @@ class UsersController extends AppController
         // But on a post back, it's a little funny...  Yeah, go figure :-)
         if (!empty($data['Role']['Role']) && is_array($data['Role']['Role'])) {
             foreach ($data['Role']['Role'] as $value) {
-                if ($value == 4) {
-                    // 4 means student
+                if ($value == 5) {
+                    // 5 means student
                     return true;
                 }
             }

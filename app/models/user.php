@@ -152,6 +152,12 @@ class User extends AppModel
         )
     );
 
+    
+    public $virtualFields = array(
+    	'full_name' => 'CONCAT_WS(" ", first_name, last_name)',
+    	'student_no_with_full_name' => 'CONCAT_WS("-", student_no,CONCAT_WS(" ", first_name, last_name))'
+    );
+
 
     /**
      * __construct
@@ -166,10 +172,7 @@ class User extends AppModel
     public function __construct($id = false, $table = null, $ds = null)
     {
         parent::__construct($id, $table, $ds);
-        $this->virtualFields['full_name'] = sprintf('CONCAT(%s.first_name, " ", %s.last_name)', $this->alias, $this->alias);
-        $this->virtualFields['student_no_with_full_name'] = sprintf('CONCAT(%s.student_no, " - ", %s.first_name, " ", %s.last_name)', $this->alias, $this->alias, $this->alias);
     }
-
 
     /**
      * beforeSave Overwriting Function - will be called before save operation
