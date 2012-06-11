@@ -47,7 +47,7 @@
                         array(
                             'controller' => 'emailer',
                             'action' => 'write',
-                            $user['id']
+                            'U/'.$user['id']
                         ),
                         array('escape'=>false)
                     );?>
