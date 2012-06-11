@@ -86,7 +86,7 @@ class GroupsController extends AppController
         $coursesList = array();
 
         foreach ($userCourseList as $id => $course) {
-            $coursesList{$id} = $course['course'];
+            $coursesList{$id} = $course;
         }
 
         // The columns to show
@@ -255,7 +255,7 @@ class GroupsController extends AppController
             if ($this->Group->save($this->data)) {
                 // add members into the groups_members table
                 //$this->GroupsMembers->insertMembers($this->Group->id, $this->params['data']['Group']);
-                $this->Session->setFlash(__('The groups were added successfully.', true));
+                $this->Session->setFlash(__('The groups were added successfully.', true), 'good');
                 $this->redirect('index/'.$course_id);
             } else {
                 // Error occured
@@ -296,7 +296,7 @@ class GroupsController extends AppController
             //$this->data['Group']['id'] = $group_id;
             if ($this->Group->save($this->data)) {
                 //$this->GroupsMembers->updateMembers($this->Group->id, $data2save['data']['Group']);
-                $this->Session->setFlash(__('The group was updated successfully.', true));
+                $this->Session->setFlash(__('The group was updated successfully.', true), 'good');
             } else {
                 // Error occurs:
                 $this->Session->setFlash(__('Error saving that group.', true));
@@ -333,7 +333,7 @@ class GroupsController extends AppController
     function delete ($id)
     {
         if ($this->Group->delete($id)) {
-            $this->Session->setFlash(__('The group was deleted successfully.', true));
+            $this->Session->setFlash(__('The group was deleted successfully.', true), 'good');
         } else {
             $this->Session->setFlash(__('Group delete failed.', true));
         }

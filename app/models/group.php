@@ -201,13 +201,37 @@ class Group extends AppModel
             return array();
         }
 
-        return $this->Member->find($type, array(
+        $studentsListinGroups = $this->Member->find($type, array(
             'conditions' => array(
                 'NOT' => array('Member.id' => $students),
                 'Enrolment.id' => $course['Course']['id'],
+                'Group.course_id' => $course['Course']['id'],
             ),
-            'contain' => array('Enrolment'),
+            'recursive' => 1,
+            'fields' => array('Member.student_no_with_full_name'),
+            'contain' => array('Enrolment', 'Group'),
         ));
+
+        foreach ($studentsListinGroups as $key => $student) {
+            $studentsListinGroups[$key] = $student.'*';
+            $studentsInGroups[] = $key;
+        }
+
+        $studentsListNotinGroups = $this->Member->find($type, array(
+            'conditions' => array(
+                'NOT' => array('Member.id' => $students, 'Member.id' => $studentsInGroups),
+                'Enrolment.id' => $course['Course']['id'],
+            ),
+            'recursive' => 1,
+            'fields' => array('Member.student_no_with_full_name'),
+            'contain' => array('Enrolment', 'Group')
+        ));
+
+        $studentsList = array_merge($studentsListinGroups, $studentsListNotinGroups);
+        
+        $sorted_list = Set::sort($studentsList, '{n}.Member.student_no', 'asc');
+        
+        return $sorted_list;
     }
 
     /**
@@ -220,10 +244,13 @@ class Group extends AppModel
      */
     function getMembersByGroupId($group_id, $type = 'all')
     {
-        return $this->Member->find($type, array(
+        $students = $this->Member->find($type, array(
             'conditions' => array('Group.id' => $group_id),
+            'recursive' => 1,
             'contain' => 'Group')
         );
+        
+        return $students;
     }
 
     /**

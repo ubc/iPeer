@@ -304,7 +304,7 @@ class SurveysController extends AppController
                 //Save Data
                 $this->Event->save($eventArray);
                 $this->Session->setFlash(__('Survey is saved!', true), 'good');
-                $this->redirect('edit/'.$this->Survey->id);
+                $this->redirect('index');
             } else {
                 //$this->set('errmsg', $this->Survey->errorMessage);
                 $this->Session->setFlash(__('Error on saving survey.', true));
