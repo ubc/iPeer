@@ -418,7 +418,11 @@ class GroupsController extends AppController
                 $this->set('errmsg', $validUploads);
             }
         }
-
+        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
+        foreach ($user['Course'] as $course) {
+            $coursesList[$course['id']] = $course['course'];
+        }
+        $this->set("coursesList", $coursesList);
         $courseId = $this->Session->read('ipeerSession.courseId');
         $this->set("courseId", $courseId);
     }

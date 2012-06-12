@@ -26,6 +26,8 @@ switch($submenu) {
       $items,
       array('name' => 'Create Groups (Manual)', 
         'link' => "/groups/add/$course_id"),
+      array('name' => 'Create Groups (Import)',
+        'link' => "/groups/import"),
       array('name' => 'List Groups', 
         'link' => "/groups/goToClassList/$course_id"),
       array('name' => 'Export Groups Information', 

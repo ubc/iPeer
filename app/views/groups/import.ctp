@@ -10,7 +10,7 @@
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>
-	<table width="95%"  border="0" cellspacing="2" cellpadding="8" align="center">
+	<table width="100%"  border="0" cellspacing="2" cellpadding="8" align="center">
   <tr class="tableheader">
     <td width="50%"><?php __('Instructions')?></td>
     <td width="50%"><?php __('Import')?></td>
@@ -23,7 +23,6 @@
         <li><?php __('Please make sure to remove the header in CSV file.')?></li>
         <li><?php __('All columns are required.')?></li>
       </ul>
-
       <br />
       <?php __('Format')?>:
       <pre style='background-color: white; border:1px solid black; padding:5px; margin:5px'>
@@ -32,9 +31,9 @@
 
       <?php __('Example')?>:
       <pre style='background-color: white; border:1px solid black; padding:5px; margin:5px'>
-29978037, 1, <?php __('Team A')?>
-29978063, 1, <?php __('Team A')?>
-29978043, 2, <?php __('Team B')?>
+29978037, 1, <?php __('Team A')?><br>
+29978063, 1, <?php __('Team A')?><br>
+29978043, 2, <?php __('Team B')?><br>
 29978051, 2, <?php __('Team B')?>
       </pre>
 	</td>
@@ -44,7 +43,7 @@
     &nbsp;&nbsp;&nbsp;&nbsp;
     <input type="file" name="file" value="<?php __('Browse')?>" /><br>
     <?php
-        $params = array('controller'=>'users', 'coursesList'=>$coursesList, "defaultOpt" => $courseId);
+        $params = array('controller'=>'users', 'courseList'=>$coursesList, "defaultOpt" => $courseId);
     ?>
     <br /><h3>2) <?php __('Select the course to import into')?>:</h3>
     &nbsp;&nbsp;&nbsp;&nbsp;
