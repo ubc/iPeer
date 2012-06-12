@@ -279,7 +279,7 @@ class EventsController extends AppController
         $this->set('event_id', $id);
 
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $id),
-            'contain' => array('Group.Member')));
+            'contain' => array('Group.Member', 'Course')));
         $courseId = $event['Event']['course_id'];
         $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events', true));
 
