@@ -150,10 +150,10 @@ class EvaluationsController extends AppController
         $actions = array(
             //   parameters to cakePHP controller:,
             //   display name, (warning shown), fixed parameters or Column ids
-            array(__("View Results", true),    "", "", "", "!viewEvaluationResults", "Event.id", "Group.id"),
-            array(__("View Submission", true), "", "", "", "!viewGroupSubmissionDetails", "Event.id", "Group.id"),
-            array(__("View Group", true),      "", "", "groups", "!view", "Group.id"),
-            array(__("View Event", true),      "", "", "events", "!view", "Event.id"),
+            array(__("View Results", true),    "", "", "", "viewEvaluationResults", "Event.id", "Group.id"),
+            array(__("View Submission", true), "", "", "", "viewGroupSubmissionDetails", "Event.id", "Group.id"),
+            array(__("View Group", true),      "", "", "groups", "view", "Group.id"),
+            array(__("View Event", true),      "", "", "events", "view", "Event.id"),
             array(__("Edit Event", true),      "", "", "events", "edit", "Event.id"),
         );
 
