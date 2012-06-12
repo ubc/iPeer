@@ -91,7 +91,8 @@
             //Display if event is submitted, before result release end date and not survey
 	    if (isset($eventSubmitted['Event']['id'])&&$currentDate<strtotime($eventSubmitted['Event']['release_date_end'])&&$eventSubmitted['Event']['event_template_type_id'] != 3) {
               //Condition to check; if after result release begin date, display link to result view page: else just display event title.
-              $isResultReleased = ($currentDate>=strtotime($eventSubmitted['Event']['release_date_begin']))
+              $isResultReleased = ($currentDate >= strtotime($eventSubmitted['Event']['result_release_date_begin']) &&
+                $currentDate < strtotime($eventSubmitted['Event']['result_release_date_end']))
           ?>
 		  <tr class="tablecell">
 			<td>
