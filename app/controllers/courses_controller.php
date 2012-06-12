@@ -61,8 +61,7 @@ class CoursesController extends AppController
             array("Course.title",         __("Title", true),       "auto", "action", "Course Home"),
             array("Course.creator_id",           "",            "",     "hidden"),
             array("Course.record_status", __("Status", true),      "5em",  "map",     array("A" => __("Active", true), "I" => __("Inactive", true))),
-            array("Course.creator",     __("Created by", true),  "10em", "action", "View Creator"),
-            array("Instructor.id",        "",            "",     "hidden"));
+            array("Course.creator",     __("Created by", true),  "10em", "action", "View Creator"));
 
 
         // put all the joins together
@@ -70,7 +69,7 @@ class CoursesController extends AppController
 
         // For instructors: only list their own courses
         $extraFilters = (User::hasRole('superadmin') || User::hasRole('admin')) ?
-            array('Instructor.id' => $this->User->find('list', array('fields'=>array('User.id')))) :
+            array() :
             array('Instructor.id' => $this->Auth->user('id'));
 
         // Set up actions
