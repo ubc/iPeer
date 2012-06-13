@@ -18,7 +18,7 @@ echo $this->Form->input(
     'EmailTemplate.availability',array(
         'type' => 'radio',
         'options' => array(
-            '0' => __('Private',true).'<br>',
+            '0' => __('Private',true).'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
             '1' => __('Public',true).'  <font size="2">(Allows Template Sharing Among Instructors)</font>',
         )
     )
