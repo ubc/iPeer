@@ -11,7 +11,8 @@
 class EmailtemplatesController extends AppController
 {
     public $name = 'EmailTemplates';
-    public $uses = array('GroupsMembers', 'UserEnrol', 'User', 'EmailTemplate', 'EmailMerge', 'EmailSchedule', 'Personalize', 'SysParameter', 'SysFunction');
+    public $uses = array('GroupsMembers', 'UserEnrol', 'User', 'EmailTemplate',
+        'EmailMerge', 'EmailSchedule', 'Personalize', 'SysParameter', 'SysFunction');
     public $components = array('AjaxList', 'Session', 'RequestHandler', 'Email');
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Js' => array('Prototype'));
     public $show;
@@ -24,31 +25,26 @@ class EmailtemplatesController extends AppController
     /**
      * __construct
      *
-     *
      * @access protected
      * @return void
      */
     function __construct()
     {
         $this->Sanitize = new Sanitize;
-        $this->show = empty($_GET['show'])? 'null':$this->Sanitize->paranoid($_GET['show']);
+        $this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
         if ($this->show == 'all') {
             $this->show = 99999999;
         }
-        $this->sortBy = empty($_GET['sort'])? 'EmailTemplate.description': $_GET['sort'];
+        $this->sortBy = empty($_GET['sort'])? 'EmailTemplate.description': $this->Sanitize->paranoid($_GET['sort']);
         $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
         $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
-        $this->order = $this->sortBy . ' ' . strtoupper($this->direction);
-        $this->pageTitle = 'Email';
-        $this->mergeStart = '{{{';
-        $this->mergeEnd = '}}}';
+        $this->order = $this->sortBy.' '.strtoupper($this->direction);
+        $this->set('title_for_layout', 'Email');
         parent::__construct();
     }
 
-
     /**
      * setUpAjaxList
-     *
      *
      * @access public
      * @return void
@@ -94,6 +90,7 @@ class EmailtemplatesController extends AppController
 
         // Set up actions
         $warning = __("Are you sure you want to delete this email template permanently?", true);
+		
         $actions = array(
             array(__("View Email Template", true), "", "", "", "view", "EmailTemplate.id"),
             array(__("Edit Email Template", true), "", $restrictions, "", "edit", "EmailTemplate.id"),
@@ -294,7 +291,7 @@ class EmailtemplatesController extends AppController
      * View an email template
      * @param <type> $id template id
      */
-    function view ($id)
+    function view($id)
     {
         if (!User::hasPermission('controllers/emailtemplates')) {
             $this->Session->setFlash(__('You do not have permission to view email templates.', true));
@@ -327,7 +324,6 @@ class EmailtemplatesController extends AppController
         ));
         $this->set('readonly', true);
         $this->render('add');
-
     }
 
     /**
@@ -345,7 +341,7 @@ class EmailtemplatesController extends AppController
 
     /**
      * displayTemplateSubject
-     * display template subjec for updating field by selecting a template
+     * display template subject for updating field by selecting a template
      *
      * @param int $templateId template id
      *

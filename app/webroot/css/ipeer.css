@@ -50,44 +50,38 @@ table {
 /* Start iPeer CSS */
 
 /* GLOBAL */
-body 
-{
+body {
     font-family: Verdana, Arial, Helvetica, sans-serif;
     background-image: url(bg.gif);
 }
 
-p
-{
+p {
     padding-bottom: 1em;
 }
 
-.floatleft
-{
+.floatleft {
     float: left;
 }
 
-.floatright
-{
+.floatright {
     float: right;
 }
 
-.pagewidth
-{
+.pagewidth {
     /* 780px is Wide enough for someone with a 800px device to 
      * view the whole app without horizontal scrolling. I assume
      * most people's computers are at least 1024x768. However
      * many smartphones have at least a 800x480 display now,
      * so we shouldn't use a higher min width.
      * */
-min-width: 780px; 
-max-width: 1000px;
-margin-left: auto;
-margin-right: auto;
-margin-top: 0.5em;
+    min-width: 780px; 
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0.5em;
 }
 
-.hide
-{
+.hide {
     display: none;
 }
 
@@ -98,14 +92,12 @@ margin-top: 0.5em;
  * their appropriate sections, particularly, the
  * width of the text boxes.
  * */
-.text
-{
+.text {
     margin: 0 auto;
     width: 100%;
 }
 
-.text label, .password label, .textarea label, .select label
-{
+.text label, .password label, .textarea label, .select label {
     float: left;
     text-align: right;
     margin: 0.5em 0;
@@ -113,17 +105,15 @@ margin-top: 0.5em;
     padding-right: 1em;
 }
 
-.text input, .password input, .textarea textarea
-{
-    margin: 0.5em 0; 
+.text input, .password input, .textarea textarea {   
+    margin: 0.35em 0; 
     border-radius: 3px; 
     border: 1px solid #999;
-    padding: 0.3em 0.5em;
     clear: right;
+    padding: 0.3em 0.5em;
 }
 
-.submit input
-{
+.submit input {
     margin-top: 1em;
     width: 6em;
     height: 2em;
@@ -131,24 +121,20 @@ margin-top: 0.5em;
     display: block;
 }
 
-a:link, a:visited
-{
+a:link, a:visited {
     text-decoration: none;
 }
 
-a:hover
-{
+a:hover {
     text-decoration: underline;
 }
 
-.center
-{
+.center {
     margin: 0 auto;
 }
 
 /* BANNER */
-.banner
-{
+.banner {
     border-top-left-radius: 8px; 
     border-top-right-radius: 8px; 
     border: 1px solid #ddd;
@@ -156,25 +142,21 @@ a:hover
     background-color: #f4f4f4;
 }
 
-#bannerLarge
-{
+#bannerLarge {
     height: 98px;
     background-image: url('../img/layout/banner_back_noborder.gif');
     background-repeat: repeat-x;
 }
 
-#bannerLogoImgLeft
-{
+#bannerLogoImgLeft {
     padding-left: 1.5em;
 }
 
-#bannerLogoImgRight
-{
+#bannerLogoImgRight {
     padding-right: 1.5em;
 }
 
-#bannerLogoText
-{
+#bannerLogoText {
     padding-top: 50px; 
     font-size: 1em; 
     font-weight: bold; color: white;
@@ -182,27 +164,23 @@ a:hover
 }
 
 /* NAVIGATION */
-#navigationOuter
-{
+#navigationOuter {
     border: 1px solid #ddd;
     border-top: none;
 }
 
-.navigation ul
-{
+.navigation ul {
     padding: 0.5em 0; /* needed to expand the div, keep a from overflowing the ul */
     background-color: #0a2a64;
 }
 
-.navigation li 
-{
+.navigation li {
     display: inline;
     list-style: none;
     text-align: center;
 }
 
-.navigation a 
-{
+.navigation a {
     border-right: 1px solid #ddd;
     border-top: 1px solid #ddd;
     color: white;
@@ -213,29 +191,25 @@ a:hover
     padding-left: 0.6em;
 }
 
-.navigation a:hover,a:active 
-{
+.navigation a:hover,a:active {
     /*background-color: #ff9933;*/
     background-color: #ff2;
     color: #333;
 }
 
-.navigation #current a 
-{
+.navigation #current a {
     color: #333;
     background-color: #ed0;
 }
 
-.navigation .miniLinks
-{
+.navigation .miniLinks {
     font-size: 0.65em;
     border: none;
     margin-right: 0.5em;
 }
 
 /* CONTENT CONTAINER */
-.containerOuter
-{
+.containerOuter {
     border-radius: 10px; 
     border: 1px solid #777;
     padding: 0.4em; 
@@ -243,8 +217,7 @@ a:hover
     box-shadow: 0 0 5px #555;
 }
 
-.message, .error-message
-{
+.message, .error-message {
     margin-top: 0.5em;
     margin-bottom: 1em;
     clear: left;
@@ -253,30 +226,25 @@ a:hover
     text-align: center;
 }
 
-.good-message
-{
+.good-message {
     border: 2px solid green;
 }
 
 /* authMessage is only used for cake generated login errors. */
-#flashMessage, #authMessage, .error-message
-{
+#flashMessage, #authMessage, .error-message {
     color: #990044;
     border: 2px solid #990044;
 }
 
-.red
-{
+.red {
     color: red;
 }
 
-.green
-{
+.green {
     color: green;
 }
 
-h1.title 
-{
+h1.title {
     margin: 0.5em 0;
     font-weight: bold;
     background: #eee;
@@ -284,27 +252,23 @@ h1.title
     padding: 0.3em 0.5em;
 }
 
-h2
-{
+h2 {
     margin: 1em 0;
     font-size: 1.3em;
     font-weight: bold;
 }
 
-h3
-{
+h3 {
     margin: 1em 0 0.5em 0;
     font-weight: bold;
 }
 
-i
-{
+i {
     font-style: italic;
 }
 
 /* FOOTER */
-#footer
-{
+#footer {
     font-size: 0.72em;
     padding-top: 0.5em;
     color: #333;
@@ -312,40 +276,34 @@ i
 }
 
 /* DEBUG */
-#debugsection
-{
+#debugsection {
     margin: 2em;
     font-size: 0.8em;
 }
 
-#debugsection h5
-{
+#debugsection h5 {
     padding: 0.5em;
     font-size: 1em;
     font-weight: bold;
     background-color: #ccff99;
 }
 
-#debugsection pre
-{
+#debugsection pre {
     padding: 0.5em;
 }
 
-#debugsection table
-{
+#debugsection table {
     width: 100%;
 }
 
 /* LOGIN BOX */
-.login
-{
+.login {
     width: 20em;
     margin: 1em auto;
     border: 1px solid #ccc;
 }
 
-.login h4
-{
+.login h4 {
     background-color: #f71; 
     padding: 0.5em;
     color: white;
@@ -353,111 +311,152 @@ i
     font-size: 0.9em;
 }
 
-.login .text label, .login .password label
-{
+.login .text label, .login .password label {
     width: 20%;
 }
 
-.login .text input, .login .password input
-{
+.login .text input, .login .password input {
     width: 60%;
 }
 
-.login form
-{
+.login form {
     padding: 1em;
     padding-right: 0;
 }
 
 /* HOME */
-.course
-{
+.course {
     margin-bottom: 1em;
     background-color: #EAEAEA;
 }
 
-.course h3
-{
+.course h3 {
     font-size: 0.9em;
     font-weight: bold;
     background-color: #4478AC;
     padding: 0.5em 0.5em;
 }
 
-.course h3 a:link, .course h3 a:visited
-{
+.course h3 a:link, .course h3 a:visited {
     color: white;
 }
 
-.course h4
-{
+.course h4 {
     font-size: 0.9em;
     padding: 0.5em;
 }
 
-.course h4 ul
-{
+.course h4 ul {
     display: inline;
 }
 
-.course h4 li
-{
+.course h4 li {
     display: inline;
     padding-right: 1em;
 }
 
-.course table
-{
+.course table {
     margin: 0.5em;
     width: 100%;
     font-size: 0.9em;
 }
 
-.course th
-{
+.course th {
     width: 33%;
     text-align: left;
     font-weight: bold;
     padding: 0.5em;
 }
 
-.course td
-{
+.course td {
     padding: 0.5em;
 }
 
-.course img
-{
+.course img {
     padding-right: 0.5em;
 }
 
-.toggle
-{
+.toggle {
     font-size: 0.8em;
 }
 
-#short_help h5
-{
+#short_help h5 {
     font-weight: bold;
     padding: 0.5em;
 }
 
-#short_help
-{
+#short_help {
     font-size: 0.8em;
 }
 
-#short_help ol
-{
+#short_help ol {
     list-style-type: decimal;
     margin-left: 0;
     padding-left: 3em;
     padding-bottom: 0.5em;
 }
 
-#short_help li
-{
+#short_help li {
     padding-bottom: 0.5em;
+}
+
+/* Emailtemplate Form settings */
+
+/* view */
+
+#EmailtemplateViewForm .text label, .textarea label, .radio legend {
+    float: left;
+    text-align: right;
+    margin: 0.5em 0;
+    clear: left;
+    padding-right: 1em;
+    width: 13em;
+}
+
+#EmailtemplateViewForm .text input { 
+    width: 21em;
+}
+
+#EmailtemplateViewForm .textarea textarea { 
+    width: 21.5em;
+}
+
+#EmailtemplateViewForm .radio input { 
+    margin: 0.65em;
+}
+
+#EmailtemplateViewForm .submit {
+    width: 10em;
+    margin: 1em auto;
+}
+
+/* add */
+
+#EmailtemplateAddForm .text label {
+    width: 13em;
+}
+
+#EmailtemplateAddForm .text input { 
+    width: 21em;
+}
+
+
+#EmailtemplateAddForm .textarea textarea { 
+    width: 21.5em;
+}
+
+#EmailtemplateAddForm .select label {
+    margin: 0 0;
+    width: 13em;
+}
+
+#EmailtemplateAddForm .radio input {
+    margin: 0.65em;
+}
+
+#EmailtemplateAddForm .submit {
+    width: 10em;
+    margin: 1em auto;
 }
 
 /* POPUP */
@@ -647,9 +646,9 @@ i
     margin: 1em auto;
 }
 
-/* courses/add */
+/* courses/edit */
 
-#CourseEditForm .text label, #CourseEditForm .select label {
+#CourseEditForm .text label, .select label {
     width: 13em;
 }
 
@@ -692,46 +691,38 @@ i
 /* TEMPORARY */
 /* temporary padding to be used until refactoring finished */
 
-table
-{
+table {
     border-spacing: 1px;
     border-collapse: separate;
 }
-th
-{
+th {
     vertical-align: middle;
     padding: 0.3em;
 }
 
-td
-{
+td {
     vertical-align: middle;
     padding: 0.3em;
 }
 
 /* temp nav ul fix */
-#nav ul
-{
+#nav ul {
     margin: 1em;
 }
 
-#nav li
-{
+#nav li {
     display: inline;
     list-style: none;
 }
 
-#nav a
-{
+#nav a {
     font-size: 0.9em;
     padding: 0.2em 0.5em;
 }
 
-#nav .current a
-{
+#nav .current a {
     background-color: #ed0;
 }
-
 
 /* BOX STYLE */
 .title2 {
@@ -790,7 +781,7 @@ td
     position: relative;
 }
 
-div.subTable .table-header{
+div.subTable .table-header {
     height: 2.2em;
     background-image: url("../img/layout/header_back.gif");
     text-align: center;
@@ -801,18 +792,18 @@ div.subTable .table-header{
     color: #FFF;
 }
 
-div.subTable .table-content{
+div.subTable .table-content {
     background-image: url("../img/layout/small_table_back.gif");
     height: 115px;
     padding-top: 20px;
 }
 
-div.table-content li{
+div.table-content li {
     list-style: none;
     line-height: 20px;
 }
 
-div.table-content li img{
+div.table-content li img {
     vertical-align: middle;
 }
 
@@ -1005,25 +996,25 @@ div.table-content li img{
     display:none;
 }
 
-#adddelcourses select.course-selector{
+#adddelcourses select.course-selector {
     width: 250px;
     margin: 2px;
 }
 
-#content{
+#content {
     width: 100%;
     height: auto;
     background-color: white;
     padding-bottom: 1em;
 }
 
-#login-form-div{
+#login-form-div {
     margin-left: auto;
     margin-right: auto;
     width: 500px;
 }
 
-.notice{
+.notice {
     color: red;
 }
 
@@ -1224,4 +1215,3 @@ textarea.question-title-textarea, textarea.question-descriptor {
 #controls {
     text-align: right;
 }
-
