@@ -135,13 +135,13 @@
 
       echo $this->element('mixevals/view_mixeval_details', $params);
       ?>
-      <table align="center" >
+      <table align="center" width=95%>
         <tr class="tablecell2">
           <td align="center"><?php
             if (isset($user['Evaluation'])) {
-              echo $form->submit(__('Edit This Section (Click this button to save now or you may lose your input)', true), array('name'=>$user['id']));
+              echo $form->submit(__('Edit This Section (Click this button to save now or you may lose your input)', true), array('name'=>$user['id'], 'div'=>'editSection'));
             } else {
-              echo $form->submit(__('Save This Section (Click this button to save now or you may lose your input)', true), array('name'=>$user['id']));
+              echo $form->submit(__('Save This Section (Click this button to save now or you may lose your input)', true), array('name'=>$user['id'], 'div'=>'editSection'));
             }
 
             ?></td>
@@ -209,10 +209,10 @@
         }
     }
   if (!$mustCompleteUsers && !$commentsNeeded) {
-     echo $form->submit(__('Submit to Complete the Evaluation', true), array('onClick' => "javascript:return confirm('".__('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?', true)."')"));
+     echo $form->submit(__('Submit to Complete the Evaluation', true), array('onClick' => "javascript:return confirm('".__('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?', true)."')", 'div'=>'submitMixeval'));
   }
   else {
-    echo $form->submit(__('Submit to Complete the Evaluation', true), array('disabled'=>'true')); echo "<br />";
+    echo $form->submit(__('Submit to Complete the Evaluation', true), array('disabled'=>'true', 'div'=>'submitMixeval')); echo "<br />";
     echo $mustCompleteUsers ? "<div style='color: red'>".__("Please complete the questions for all group members, pressing 'Save This Section' button for each one.", true)."</div>" : "";
     echo $commentsNeeded ? "<div style='color: red'>".__("Please Enter all the comments for all the group members before submitting.", true)."</div>" : "";
   }

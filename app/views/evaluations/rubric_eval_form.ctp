@@ -103,10 +103,10 @@
       $params = array('controller'=>'rubrics', $viewData , 'evaluate'=>1, 'user'=>$user);
       echo $this->element('rubrics/ajax_rubric_view', $params);
       ?>
-      <table align="center" >
+      <table align="center" width=100% >
         <tr class="tablecell2">
           <td align="center"><?php
-            echo $form->submit('Save This Section', array('name'=>$user['id']));
+            echo $form->submit('Save This Section', array('name'=>$user['id'], 'div'=>'saveThisSection'));
             echo "<br />".__('Make sure you save this section before moving on to the other ones!', true)." <br /><br />";
             ?></td>
         </tr>
@@ -173,10 +173,10 @@
     
     
   if (!$mustCompleteUsers && !$commentsNeeded) {
-    echo $form->submit(__('Submit to Complete the Evaluation', true), array('onClick' => "javascript:return confirm('".__('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?', true)."')"));
+    echo $form->submit(__('Submit to Complete the Evaluation', true), array('onClick' => "javascript:return confirm('".__('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?', true)."')", 'div'=>'submitComplete'));
   }
   else {
-    echo $form->submit(__('Submit to Complete the Evaluation', true), array('disabled'=>'true')); echo "<br />";
+    echo $form->submit(__('Submit to Complete the Evaluation', true), array('disabled'=>'true','div'=>'submitComplete')); echo "<br />";
     echo $mustCompleteUsers ? "<div style='color: red'>".__("Please complete the questions for all group members, pressing 'Save This Section' button for each one.</div>", true) : "";
     echo $commentsNeeded ? "<div style='color: red'>".__('Please Enter all the comments for all the group members before submitting.</div>', true) : "";
   }

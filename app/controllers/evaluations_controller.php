@@ -744,7 +744,6 @@ class EvaluationsController extends AppController
      */
     function makeMixevalEvaluation ($param = '')
     {
-
         $this->autoRender = false;
         if (empty($this->params['data'])) {
             $tok = strtok($param, ';');
@@ -1061,11 +1060,11 @@ class EvaluationsController extends AppController
         //Get the target event
         $event = $this->Event->formatEventObj($eventId, $groupId);
         $this->set('event', $event);
-
+        $course = $this->Course->getCourseName($event['Event']['course_id']);
         //Setup the courseId to session
         $this->rdAuth->setCourseId($event['Event']['course_id']);
         $courseId = $this->rdAuth->courseId;
-        $this->set('title_for_layout', __(' > View My Results ', true));
+        $this->set('title_for_layout', $course.' > '.$event['Event']['title'].__(' > View My Results ', true));
 
         //Get Group Event
         $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($event['Event']['id'], $event['group_id']);

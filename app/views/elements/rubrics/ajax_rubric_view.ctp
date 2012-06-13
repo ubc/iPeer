@@ -58,10 +58,8 @@ isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = nu
     <?php endforeach ?>
 
     <?php if ($evaluate): ?>
-    <td align="left">
-      <textarea cols="20" rows="2" name="<?php echo $userId?>comments[]">
-      <?php echo (isset($evaluation) ? $evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['criteria_comment'] : '')?>
-      </textarea>
+    <td>
+      <textarea cols="20" rows="2" name="<?php echo $userId?>comments[]"><?php echo (isset($evaluation) ? $evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['criteria_comment'] : '')?></textarea>
     </td>
 		<?php endif;?>	
   <?php endforeach;?>	
@@ -73,9 +71,7 @@ isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = nu
  		<td colspan="<?php echo $LOM_num+1?>" align="right"><?php __('Total Marks')?>: <?php echo $data['Rubric']['total_marks']?></td>
 	<?php else: ?>
     <td colspan="<?php echo $LOM_num+2?>" align="center" class="tableheader2"><?php __('General Comments')?><br>
-    <textarea cols="80" rows="2" name="<?php echo $userId?>gen_comment" >
-      <?php echo (isset($evaluation) ? $evaluation['EvaluationRubric']['general_comment'] : '')?>
-  	</textarea></td>
+    <textarea cols="80" rows="2" name="<?php echo $userId?>gen_comment" ><?php echo (isset($evaluation) ? $evaluation['EvaluationRubric']['general_comment'] : '')?></textarea></td>
   <?php endif;?>	
   </tr>
 </table>

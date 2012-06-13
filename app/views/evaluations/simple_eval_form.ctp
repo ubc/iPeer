@@ -269,7 +269,7 @@ if ($event['Event']['id']==292) {
   <tr class="tablecell2">
     <td colspan="4" align="center"><?php
       if (!isset($preview)) {
-        echo $form->submit(__('Submit Evaluation', true), array('id' => 'submit0', 'disabled' => 'true', 'onClick' => "javascript:return confirm('".__('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?', true)."')"));
+        echo $form->submit(__('Submit Evaluation', true), array('id' => 'submit0', 'disabled' => 'true', 'onClick' => "javascript:return confirm('".__('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?', true)."')", 'div'=>'submitSimple'));
       }
       ?></td>
     </tr>

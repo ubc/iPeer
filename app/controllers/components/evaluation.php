@@ -399,6 +399,7 @@ class EvaluationComponent extends Object
         $aveScore = 0;
         $groupAve = 0;
         $studentResult = array();
+        $subtractAvgScore = 0;
         $results = $this->EvaluationSimple->getResultsByEvaluatee($event['group_event_id'], $this->Auth->user('id'));
         if ($results !=null) {
             //Get Grade Release: grade_release will be the same for all evaluatee records
@@ -715,6 +716,7 @@ class EvaluationComponent extends Object
         $evaluator = $params['data']['Evaluation']['evaluator_id'];
         $groupEventId = $params['form']['group_event_id'];
         $rubricId = $params['form']['rubric_id'];
+        $grpEvent = $params['form']['group_event_id'];
 
         //Get the target event
         $eventId = $params['form']['event_id'];
@@ -761,7 +763,7 @@ class EvaluationComponent extends Object
         }
         $late = $this->isLate($eventId);
         if ($late) {
-            if (!$this->saveGradePenalty($grpEvent, $event, $evaluator, $late)) {
+            if (!$this->saveGradePenalty($grpEvent, $eventId, $evaluator, $late)) {
                 return false;
             }
         }
