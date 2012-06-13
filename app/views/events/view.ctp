@@ -114,6 +114,19 @@
     </td>
     </tr>
     <tr class="tablecell2">
+    	<td id="newtitle_label"><?php __('Late Penalty:')?>&nbsp;</td>
+        <td width=100%>
+            <?php 
+            if (!empty($penalty)) {
+                echo 'Deduct '.$penalty['0']['Penalty']['percent_penalty'].'% per day for '.$days.' days. 
+                    Deduct '.$penalty[$days]['Penalty']['percent_penalty'].'% afterwards.'; 
+            } else {
+                echo 'N/A';
+            }
+            ?>
+        </td>
+    </tr>
+    <tr class="tablecell2">
         <td valign="top"><?php __('Groups Assignment:')?>&nbsp;</td>
         <td>
         <?php

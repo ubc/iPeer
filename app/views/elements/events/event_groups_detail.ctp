@@ -32,13 +32,7 @@
     <tr><th cols="3" align="left" width="25%">
         <?php echo "No Groups"; ?>
     </td></tr>
-<?php endif; ?>
-
-<?php if(isset($popup) && $popup == 'y'): ?>
-    <tr><td colspan="3" align="center">
-        <input type="button" value="<?php __('Close Window')?>" onclick="window.close()">
-    </td></tr>
-<?php endif; ?>    
+<?php endif; ?>   
 </table>
 <div align = "center">
 

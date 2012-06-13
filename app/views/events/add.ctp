@@ -34,7 +34,6 @@
           $params = array('controller'=>'events', 'data'=>null, 'fieldvalue'=>$fieldValue);
           echo $this->element('events/ajax_title_validate', $params);
           ?>
-           <?php echo $form->error('Event.title', __('Title is required.', true))?>
            <?php echo $form->error('Event.title_unique', __('Duplicate Title found. Please change the title of this event.', true))?>
       </div>
   	</td>

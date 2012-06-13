@@ -172,10 +172,10 @@ class EventsController extends AppController
         $warning = __("Are you sure you want to delete this event permanently?", true);
         $actions = array(
             array("View Results", "", "", "evaluations", "view", "Event.id"),
-            array("View Event", "", "", "", "!view", "Event.id"),
+            array("View Event", "", "", "", "view", "Event.id"),
             array("Edit Event", "", "", "", "edit", "Event.id"),
             array("View Course", "", "", "courses", "view", "Course.id"),
-            array("View Groups", "", "", "", "!viewGroups", "Event.id"),
+            array("View Groups", "", "", "", "viewGroups", "Event.id"),
             array("Export Results", "", "", "evaluations", "export", "Event.id"),
             array("Delete Event", $warning, "", "", "delete", "Event.id"));
 
@@ -305,7 +305,10 @@ class EventsController extends AppController
                 $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'));
             }
         }
-
+        $days = $this->Penalty->find('count', array('conditions' => array('Penalty.event_id' => $id))) - 1;
+        $penalty = $this->Penalty->find('all', array('conditions' => array('Penalty.event_id' => $id)));
+        $this->set('days', $days);
+        $this->set('penalty', $penalty);
         $this->set('event', $event);
         $this->set('course_id', $courseId);
         $this->set('eventTemplates', $eventTemplates);
@@ -408,31 +411,33 @@ class EventsController extends AppController
             //Save Data
             if ($this->Event->save($this->params['data'])) {
                 //Save Groups for the Event
+                if ('1' == $this->params['data']['Event']['penalty']) {
+                    $penaltyType = $this->params['data']['PenaltySetup']['type'];
+                    $finalDeduction= array();
+                    $finalDeduction['days_late'] = -2;
+                    $finalDeduction['event_id'] =  $this->Event->id;
+                    $finalDeduction['percent_penalty'] = $this->params['data']['PenaltySetup']['penaltyAfter'];
 
-                $penaltyType = $this->params['data']['PenaltySetup']['type'];
-                $finalDeduction= array();
-                $finalDeduction['days_late'] = -2;
-                $finalDeduction['event_id'] =  $this->Event->id;
-                $finalDeduction['percent_penalty'] = $this->params['data']['PenaltySetup']['penaltyAfter'];
-
-                if ($penaltyType == 'simple') {
-                    $finalDeduction['days_late'] = -1;
-                    for ($i = 1; $i <= $this->params['data']['PenaltySetup']['numberOfDays']; $i++) {
-                        $this->params['data']['Penalty'][$i]['days_late'] = $i;
-                        $this->params['data']['Penalty'][$i]['percent_penalty'] = $this->params['data']['PenaltySetup']['percentagePerDay'] * $i;
+                    if ($penaltyType == 'simple') {
+                        $finalDeduction['days_late'] = -1;
+                        for ($i = 1; $i <= $this->params['data']['PenaltySetup']['numberOfDays']; $i++) {
+                            $this->params['data']['Penalty'][$i]['days_late'] = $i;
+                            $this->params['data']['Penalty'][$i]['percent_penalty'] = $this->params['data']['PenaltySetup']['percentagePerDay'] * $i;
+                        }
+                    }
+                    foreach ($this->params['data']['Penalty'] as $value => $key) {
+                        $this->params['data']['Penalty'][$value]['event_id'] = $this->Event->id;
+                        $this->Penalty->save($this->params['data']['Penalty'][$value]);
+                        $this->Penalty->id = null;
+                    }
+                    if (!$this->Penalty->save($finalDeduction)) {
+                        return false;
                     }
                 }
-                foreach ($this->params['data']['Penalty'] as $value => $key) {
-                    $this->params['data']['Penalty'][$value]['event_id'] = $this->Event->id;
-                    $this->Penalty->save($this->params['data']['Penalty'][$value]);
-                    $this->Penalty->id = null;
-                }
-                if (!$this->Penalty->save($finalDeduction)) {
-                    return false;
-                }
 
-                    $this->GroupEvent->insertGroups($this->Event->id, $this->params['data']['Member']);
-                $this->redirect('/events/index/'.__('The event is added successfully.', true));
+                $this->GroupEvent->insertGroups($this->Event->id, $this->params['data']['Member']);
+                $this->Session->setFlash(__('The event is added successfully.', true), 'good');
+                $this->redirect('index');
             }
             //Found error
             else {
@@ -588,13 +593,16 @@ class EventsController extends AppController
                     if (!$this->Penalty->save($finalDeduction)) {
                         return false;
                     }
+                // switching from Yes to No for penalty
+                } else if (!empty($penalty) && 0 == $this->data['Event']['penalty']) {
+                    $this->Penalty->deleteAll(array('Penalty.event_id' => $id));
                 }
 
 
                 //Save Groups for the Event
                 //$this->GroupEvent->insertGroups($this->Event->id, $this->data['Member']);
                 $this->GroupEvent->updateGroups($this->Event->id, $this->data['Member']);
-                $this->Session->setFlash(__('The event was edited successfully.', true));
+                $this->Session->setFlash(__('The event was edited successfully.', true), 'good');
                 $this->redirect('index');
             } else {
                 //        $validationErrors = $this->Event->invalidFields();
@@ -867,7 +875,8 @@ class EventsController extends AppController
 
         }   //end if
         if ($this->Event->delete($id)) {
-            $this->redirect('/events/index/'.__('The event is deleted successfully.', true));
+            $this->Session->setFlash(__('The event is deleted successfully.', true), 'good');
+            $this->redirect('index');
         }
     }
 
