@@ -323,7 +323,7 @@ class EmailtemplatesController extends AppController
             'conditions' => array('EmailTemplate.id' => $id)
         ));
         $this->set('readonly', true);
-        $this->render('add');
+        //$this->render('add');
     }
 
     /**
