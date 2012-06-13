@@ -111,7 +111,7 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
     <?php
       echo $form->input('Event.self_eval', array(
            'type' => 'radio',
-           'options' => array('1' => ' - Enable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '0' => ' - Disable'),
+           'options' => array('2' => ' - Enable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '1' => ' - Disable'),
            'default' => $event['Event']['self_eval'],
            'legend' => false,
            'format' => array('input')
@@ -126,7 +126,7 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
     <?php
       echo $form->input('Event.com_req', array(
          'type' => 'radio',
-         'options' => array('1' => ' - Yes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '0' => ' - No'),
+         'options' => array('2' => ' - Yes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', '1' => ' - No'),
          'default' => $event['Event']['com_req'],
          'legend' => false,
          'format' => array('input')
@@ -270,7 +270,7 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
   <tr class="tablecell2">
     <?php echo $html->script('events')?>
     <td colspan="3" align="center"><?php echo $form->submit(__('Edit Event', true), array('onclick' =>
-        "processSubmit(document.getElementById('selected_groups')); return validate(); ", 'div'=>'editEvent')); ?></td>
+        "processSubmit(document.getElementById('selected_groups')); return validate(); ")); ?></td>
   </tr>
 </table>
 
