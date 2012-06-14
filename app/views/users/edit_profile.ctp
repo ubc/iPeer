@@ -1,4 +1,4 @@
-<table width="102%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
+<table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
 <tr>
 <td>
     <?php echo $this->Form->create('User', 

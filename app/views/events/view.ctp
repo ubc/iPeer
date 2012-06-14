@@ -58,14 +58,14 @@
                 <tr class="tablecell2">
                     <td><?php __('Allow Self-Evaluation?:')?></td>
                     <td>
-                        <?php echo $event['Event']['self_eval']==2? 'Enable' : 'Disable'; ?>
+                        <?php echo $event['Event']['self_eval']==1? 'Enable' : 'Disable'; ?>
                     </td>
                     <td>&nbsp;</td>
                 </tr>
                 <tr class="tablecell2">
                     <td><?php __('Require Student Comments?:')?> </td>
                     <td>
-                        <?php echo $event['Event']['com_req']==2? 'Yes' : 'No'; ?>
+                        <?php echo $event['Event']['com_req']==1? 'Yes' : 'No'; ?>
                     </td>
                     <td>&nbsp;</td>
                 </tr>

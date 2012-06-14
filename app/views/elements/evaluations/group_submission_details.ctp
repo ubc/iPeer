@@ -58,9 +58,9 @@
         <tr class="tablecell">
           <td colspan="4" align="center"><?php
             if ($enable) {
-             echo $form->submit(__('Re-release Selected Evaluation', true));
+             echo $form->submit(__('Re-release Selected Evaluation', true), array('div'=>'rereleaseEval'));
             } else {
-             echo $form->submit(__('Re-release Selected Evaluation', true), array('disabled'=>1));
+             echo $form->submit(__('Re-release Selected Evaluation', true), array('disabled'=>1, 'div'=>'rereleaseEval'));
             } ?></td>
         </tr>
     </table>

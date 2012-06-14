@@ -117,13 +117,9 @@ class EventsController extends AppController
             array("Event.due_date",       __("Due Date", true),    "10em", "date"),
             array("!Custom.isReleased",    __("Released ?", true), "8em", "string"),
             array("Event.self_eval",       __("Self Eval", true),   "6em", "map",
-            //values been changed from 0 & 1 to 1 & 2 because the filtering for Disabled did not work
-            //array("0" => __("Disabled", true), "1" => __("Enabled", true))),
-            array("1" => __("Disabled", true), "2" => __("Enabled", true))),
+            array("0" => __("Disabled", true), "1" => __("Enabled", true))),
             array("Event.com_req",        __("Comment", true),      "6em", "map",
-            //values been changed from 0 & 1 to 1 & 2 because the filtering for Optional did not work
-            //array("0" => __("Optional", true), "1" => __("Required", true))),            
-            array("1" => __("Optional", true), "2" => __("Required", true))),
+            array("0" => __("Optional", true), "1" => __("Required", true))),            
 
             // Release window
             array("Event.release_date_begin", "", "",    "hidden"),
