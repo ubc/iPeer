@@ -80,7 +80,7 @@ class EmailerController extends AppController
 
         // Join with Users
         $jointTableCreator =
-            array("id"         => "Creator.id",
+            array("id"         => "Creator_id",
                 "localKey"   => "creator_id",
                 "description" => __("Email to show:", true),
                 "default" => $myID,
@@ -275,7 +275,7 @@ class EmailerController extends AppController
             $date = $data['date'];
 
             //Set current date if no schedule
-            if (!$data['schedule']) {
+            if ("" == $data['date']) {
                 $data['date'] = date("Y-m-d H:i:s");
             } else {
                 $tmp_data = array();
