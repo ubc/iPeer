@@ -175,7 +175,7 @@ class SurveyGroupsController extends AppController
                     'conditions' => array('Enrolment.id' => $courseId)
                 )
             );
-        
+            //filtering for the data to be printed in the view
             foreach ($class as $student) {
                 $temp = array();
                 $temp['ID'] = $student['User']['id'];
@@ -200,7 +200,7 @@ class SurveyGroupsController extends AppController
 
             $events = $this->Event->find('all', array('conditions' => array('Course.id' => $courseId, 'Event.event_template_type_id' => 3)));
 
-
+            // for populating the drop down menu to switch to different surveys in the course
             foreach ($events as $key => $survey) {
                 $surveys[$key]['id'] = $survey['Event']['id'];
                 $surveys[$key]['title'] = $survey['Event']['title'];            

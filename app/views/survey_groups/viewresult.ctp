@@ -25,6 +25,7 @@
 <table id="table_id">
     <thead>
         <tr>
+            <!-- column headings -->
             <?php if(!empty($view)) {
                 $sample = $view[0];
                 foreach ($sample as $key => $val) {
@@ -47,6 +48,7 @@
 
 <script type="text/javascript">
 
+// creates the drop down section to links to View Student and View Result
 function fnFormatDetails ( oTable, nTr )
 {
     var aData = oTable.fnGetData( nTr );
@@ -67,6 +69,7 @@ function fnFormatDetails ( oTable, nTr )
     return sOut;
 }
 
+// customizing the table - hiding some fields, and jQuery for opening and closing drop down menu
 jQuery(document).ready(function() {
 
     var oTable= jQuery('#table_id').dataTable( {
