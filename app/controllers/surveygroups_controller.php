@@ -620,7 +620,7 @@ class SurveyGroupsController extends AppController
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             $cmdline .= '.exe';
         } elseif(strtoupper(PHP_OS) == 'DARWIN') {
-            $cmdlin .= '.osx';
+            $cmdline .= '.osx';
         }
         return $cmdline;
     }
