@@ -138,20 +138,20 @@ class GroupTestCase extends CakeTestCase
         $this->assertEqual($group, $empty);
     }
 
-    function testGetGroupsByCouseId()
+    function testGetGroupsByCourseId()
     {
         $empty=null;
 
         // Test valid course with groups
-        $groups = $this->Group->getGroupsByCouseId(1);
+        $groups = $this->Group->getGroupsByCourseId(1);
         $this->assertEqual($groups, array(1=>1,2=>2,3=>3,4=>4));
 
         // Test valid course with no groups
-        $groups = $this->Group->getGroupsByCouseId(2);
+        $groups = $this->Group->getGroupsByCourseId(2);
         $this->assertEqual($groups, $empty);
 
         // Test invalid course
-        $groups = $this->Group->getGroupsByCouseId(999);
+        $groups = $this->Group->getGroupsByCourseId(999);
         $this->assertEqual($groups, $empty);
     }
 }

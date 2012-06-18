@@ -72,7 +72,10 @@ class Group extends AppModel
             'dependent'    => false,
         ),
     );
-    public $validate = array('group_num' => 'notEmpty');
+    public $validate = array(
+        'group_num' => 'notEmpty',
+        'group_name' => array('rule' => 'notEmpty', 'message' => 'Please insert group name')
+        );
 
     /**
      * __construct
@@ -276,10 +279,31 @@ class Group extends AppModel
      *
      * @return groups in a course
      */
-    function getGroupsByCouseId($course_id)
+    function getGroupsByCourseId($course_id)
     {
         return $this->find('list', array(
             'conditions' => array('Group.course_id' => $course_id)
         ));
+    }
+    
+    /**
+     * findGroupByid Get group by group id
+     *
+     * @param mixed $id     group id
+     * @param bool  $params search parameters
+     *
+     * @access public
+     * @return array with user data
+     * */
+    function findGroupByid ($id, $params = array())
+    {
+        if (null == $id) {
+            return null;
+        }
+
+        return $this->find(
+            'first',
+            array_merge(array('conditions' => array($this->name.'.id' => $id,)), $params)
+        );
     }
 }

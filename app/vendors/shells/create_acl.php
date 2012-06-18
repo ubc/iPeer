@@ -441,6 +441,7 @@ class CreateAclShell extends Shell
     {
         $role = $this->Role;
         $role->id = 1;  // superadmin
+        {
         $this->Acl->allow($role, 'controllers');
         $this->Acl->allow($role, 'functions');
         $this->Acl->allow($role, 'controllers/Evaltools');
@@ -450,43 +451,67 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Surveys');
         $this->Acl->allow($role, 'controllers/Emailer');
         $this->Acl->allow($role, 'controllers/Emailtemplates');
+        $this->Acl->allow($role, 'controllers/Events');
         $this->Acl->allow($role, 'controllers/Faculties');
         $this->Acl->allow($role, 'controllers/Departments');
+        $this->Acl->allow($role, 'controllers/Groups');
         $this->Acl->allow($role, 'adminpage');
+        }
 
         $role->id = 2;  // admin
+        {
         $this->Acl->deny($role, 'controllers');
         $this->Acl->allow($role, 'controllers/Home');
         $this->Acl->allow($role, 'controllers/Courses');
+        $this->Acl->allow($role, 'controllers/Departments');
+        $this->Acl->allow($role, 'controllers/Emailer');
+        $this->Acl->allow($role, 'controllers/Emailtemplates');
+        $this->Acl->allow($role, 'controllers/Evaltools');
+        $this->Acl->allow($role, 'controllers/Events');
+        $this->Acl->allow($role, 'controllers/Groups');
+        $this->Acl->allow($role, 'controllers/Mixevals');
+        $this->Acl->allow($role, 'controllers/Rubrics');
+        $this->Acl->allow($role, 'controllers/Simpleevaluations');
+        $this->Acl->allow($role, 'controllers/Surveys');
         $this->Acl->allow($role, 'controllers/Users');
         $this->Acl->deny($role, 'functions');
+        $this->Acl->allow($role, 'functions/email');
+        $this->Acl->allow($role, 'functions/emailtemplate');
+        $this->Acl->allow($role, 'functions/evaluation');
         $this->Acl->allow($role, 'functions/user');
         $this->Acl->allow($role, 'functions/user/admin');
         $this->Acl->deny($role, 'functions/user/admin', 'create');
         $this->Acl->deny($role, 'functions/user/admin', 'update');
         $this->Acl->deny($role, 'functions/user/admin', 'delete');
         $this->Acl->deny($role, 'functions/user/superadmin');
-        $this->Acl->allow($role, 'controllers/Evaltools');
-        $this->Acl->allow($role, 'functions/evaluation');
-        $this->Acl->allow($role, 'controllers/Simpleevaluations');
-        $this->Acl->allow($role, 'controllers/Rubrics');
-        $this->Acl->allow($role, 'controllers/Mixevals');
-        $this->Acl->allow($role, 'controllers/Surveys');
-        $this->Acl->allow($role, 'controllers/Emailer');
-        $this->Acl->allow($role, 'functions/email');
-        $this->Acl->allow($role, 'controllers/Emailtemplates');
-        $this->Acl->allow($role, 'functions/emailtemplate');
-        $this->Acl->allow($role, 'controllers/Departments');
         $this->Acl->allow($role, 'adminpage');
+        }
 
         $role->id = 3; // instructor
+        {
         $this->Acl->deny($role, 'controllers');
         $this->Acl->allow($role, 'controllers/Home');
         $this->Acl->allow($role, 'controllers/Courses');
         $this->Acl->deny($role, 'controllers/Courses/add');
         $this->Acl->deny($role, 'controllers/Courses/edit');
+        $this->Acl->allow($role, 'controllers/Emailer');
+        $this->Acl->allow($role, 'controllers/Emailtemplates');
+        $this->Acl->allow($role, 'controllers/Evaltools');
+        $this->Acl->allow($role, 'controllers/Events');
+        $this->Acl->allow($role, 'controllers/Groups');
+        $this->Acl->allow($role, 'controllers/Mixevals');
+        $this->Acl->allow($role, 'controllers/Rubrics');
+        $this->Acl->allow($role, 'controllers/Simpleevaluations');
+        $this->Acl->allow($role, 'controllers/Surveys');
         $this->Acl->allow($role, 'controllers/Users');
         $this->Acl->deny($role, 'functions');
+        $this->Acl->allow($role, 'functions/email');
+        $this->Acl->deny($role, 'functions/email/allUsers');
+        $this->Acl->deny($role, 'functions/email/allGroups');
+        $this->Acl->deny($role, 'functions/email/allCourses');
+        $this->Acl->allow($role, 'functions/evaluation');
+        $this->Acl->deny($role, 'functions/evaluation', 'update');
+        $this->Acl->deny($role, 'functions/evaluation', 'delete');
         $this->Acl->allow($role, 'functions/user');
         $this->Acl->deny($role, 'functions/user/admin');
         $this->Acl->deny($role, 'functions/user/superadmin');
@@ -494,35 +519,42 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'functions/user/instructor', 'create');
         $this->Acl->deny($role, 'functions/user/instructor', 'update');
         $this->Acl->deny($role, 'functions/user/instructor', 'delete');
-        $this->Acl->allow($role, 'controllers/Evaltools');
-        $this->Acl->allow($role, 'functions/evaluation');
-        $this->Acl->deny($role, 'functions/evaluation', 'update');
-        $this->Acl->deny($role, 'functions/evaluation', 'delete');
-        $this->Acl->allow($role, 'controllers/Simpleevaluations');
-        $this->Acl->allow($role, 'controllers/Rubrics');
-        $this->Acl->allow($role, 'controllers/Mixevals');
-        $this->Acl->allow($role, 'controllers/Surveys');
-        $this->Acl->allow($role, 'controllers/Emailer');
-        $this->Acl->allow($role, 'functions/email');
-        $this->Acl->deny($role, 'functions/email/allUsers');
-        $this->Acl->deny($role, 'functions/email/allGroups');
-        $this->Acl->deny($role, 'functions/email/allCourses');
-        $this->Acl->allow($role, 'controllers/Emailtemplates');    
-
+        }
+        
+        //$role->id = 4; // tutor
+        {
+        //$this->Acl->deny($role, 'controllers');
+        //$this->Acl->allow($role, 'controllers/Home');
+        //$this->Acl->deny($role, 'controllers/Courses');
+        //$this->Acl->deny($role, 'controllers/Emailer');
+        //$this->Acl->deny($role, 'controllers/Emailtemplates');
+        //$this->Acl->deny($role, 'controllers/Evaltools');
+        //$this->Acl->deny($role, 'controllers/Events');
+        //$this->Acl->deny($role, 'controllers/Groups');
+        //$this->Acl->deny($role, 'controllers/Mixevals');
+        //$this->Acl->deny($role, 'controllers/Rubrics');
+        //$this->Acl->deny($role, 'controllers/Simpleevaluations');
+        //$this->Acl->deny($role, 'controllers/Surveys');
+        //$this->Acl->deny($role, 'controllers/Users');
+        //$this->Acl->deny($role, 'functions');
+        }
+        
         $role->id = 5; // student
+        {
         $this->Acl->deny($role, 'controllers');
         $this->Acl->allow($role, 'controllers/Home');
         $this->Acl->deny($role, 'controllers/Courses');
+        $this->Acl->deny($role, 'controllers/Emailer');
+        $this->Acl->deny($role, 'controllers/Emailtemplates');
+        $this->Acl->deny($role, 'controllers/Evaltools');
+        $this->Acl->deny($role, 'controllers/Events');
+        $this->Acl->deny($role, 'controllers/Groups');
+        $this->Acl->deny($role, 'controllers/Mixevals');
+        $this->Acl->deny($role, 'controllers/Rubrics');
+        $this->Acl->deny($role, 'controllers/Simpleevaluations');
+        $this->Acl->deny($role, 'controllers/Surveys');
         $this->Acl->deny($role, 'controllers/Users');
         $this->Acl->deny($role, 'functions');
-        $this->Acl->deny($role, 'controllers/Evaltools');
-        $this->Acl->deny($role, 'controllers/Simpleevaluations');
-        $this->Acl->deny($role, 'controllers/Rubrics');
-        $this->Acl->deny($role, 'controllers/Mixevals');
-        $this->Acl->deny($role, 'controllers/Surveys');
-        $this->Acl->deny($role, 'controllers/Emailer');
-        $this->Acl->deny($role, 'controllers/Emailtemplates');     
+        }
     }
-
-
 }

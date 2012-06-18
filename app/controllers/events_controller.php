@@ -192,6 +192,11 @@ class EventsController extends AppController
      */
     function index($courseId = null, $message = '')
     {
+        if (!User::hasPermission('controllers/events')) {
+            $this->Session->setFlash('You do not have permission to view events.');
+            $this->redirect('/home');
+        }
+        
         // Make sure the present user is not a student
         //$this->rdAuth->noStudentsAllowed();
         $this->set('message', $message);
@@ -269,7 +274,15 @@ class EventsController extends AppController
      */
     function view ($id)
     {
-
+        if (!User::hasPermission('controllers/events')) {
+            $this->Session->setFlash('You do not have permission to view events.');
+            $this->redirect('/home');
+        }
+        if (!is_numeric($id) || !($this->data = $this->Event->getEventByid($id))) {
+            $this->Session->setFlash(__('Event does not exist.', true));
+            $this->redirect('index');
+        }
+        
         //Clear $id to only the alphanumeric value
         $id = $this->Sanitize->paranoid($id);
         $this->set('event_id', $id);
@@ -369,6 +382,11 @@ class EventsController extends AppController
      */
     function add()
     {
+        if (!User::hasPermission('controllers/events/add')) {
+            $this->Session->setFlash('You do not have permission to add events.');
+            $this->redirect('index');
+        }
+        
         $eventTypes = $this->EventTemplateType->find('list', array(
             'conditions'=> array('EventTemplateType.display_for_selection'=>1)
         ));
@@ -378,6 +396,10 @@ class EventsController extends AppController
 
         $courseId = $this->Session->read('ipeerSession.courseId');
         $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events', true));
+        if ($courseId==null) {
+            $this->Session->setFlash(__('Please create events through course page.', true));
+            $this->redirect('/home');
+        }
         //List Add Page
         if (empty($this->params['data'])) {
 
@@ -472,11 +494,15 @@ class EventsController extends AppController
      */
     function edit($id)
     {
-
-        if (!is_numeric($id)) {
-            $this->Session->setFlash(__('Invalid survey ID.', true));
+        if (!User::hasPermission('controllers/events/edit')) {
+            $this->Session->setFlash('You do not have permission to edit events.');
             $this->redirect('index');
         }
+        if (!is_numeric($id) || !($this->data = $this->Event->getEventByid($id))) {
+            $this->Session->setFlash(__('Event does not exist.', true));
+            $this->redirect('index');
+        }
+
         $data = $this->Event->find('first', array('conditions' => array('id' => $id),
             'contain' => array('Group')));
         $penalty = $this->Penalty->find('all', array('conditions' => array('event_id' => $id)));
@@ -736,7 +762,7 @@ class EventsController extends AppController
      * @access public
      * @return void
      */
-    function editOld ($id=null)
+    /*function editOld ($id=null)
     {
 
         $courseId = $this->rdAuth->courseId;
@@ -853,7 +879,7 @@ class EventsController extends AppController
                 $this->set('errmsg', $this->Event->errorMessage);
             }
         }
-    }
+    }*/
 
 
     /**
@@ -866,6 +892,11 @@ class EventsController extends AppController
      */
     function delete ($id=null)
     {
+        if (!User::hasPermission('controllers/events/add')) {
+            $this->Session->setFlash('You do not have permission to delete events.');
+            $this->redirect('index');
+        }
+        
         if (isset($this->params['form']['id'])) {
             $id = intval(substr($this->params['form']['id'], 5));
 
@@ -931,15 +962,20 @@ class EventsController extends AppController
      * @access public
      * @return void
      */
-    function viewGroups ($eventId)
+    function viewGroups ($groupId)
     {
+        if (!is_numeric($groupId) || !($this->data = $this->Group->findGroupByid($groupId))) {
+            $this->Session->setFlash(__('Group does not exist.', true));
+            $this->redirect('index');
+        }
+        
         $this->layout = 'pop_up';
 
         //Clear $id to only the alphanumeric value
-        $id = $this->Sanitize->paranoid($eventId);
+        $id = $this->Sanitize->paranoid($groupId);
 
         $this->set('event_id', $id);
-        $this->set('assignedGroups', $this->getAssignedGroups($eventId));
+        $this->set('assignedGroups', $this->getAssignedGroups($groupId));
     }
 
     /**

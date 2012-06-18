@@ -66,13 +66,13 @@ class FrameworkController extends AppController
 
         if (!is_numeric($id) || !($this->data = $this->User->findUserByid($id))) {
             $this->Session->setFlash(__('Invalid user ID.', true));
-            $this->redirect('index');
+            $this->redirect('/user/index');
         }
 
         $roles = $this->User->getRoles($id);
         if (!$this->AccessControl->hasPermissionDoActionOnUserWithRoles('ViewUser', $roles)) {
             $this->Session->setFlash(__('You do not have permission to view this user.', true));
-            $this->redirect('index');
+            $this->redirect($this->referer());
         }
 
         $this->set('title_for_layout', __('View User', true));

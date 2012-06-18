@@ -38,7 +38,7 @@
           <?php
 	  	    echo $this->element("groups/group_list_chooser",
 	   	    array('all' => $unassignedGroups, 'assigned'=>'',
-	          'allName' =>  __('Avaliable Groups', true), 'selectedName' => __('Participating Groups', true),
+	          'allName' =>  __('Available Groups', true), 'selectedName' => __('Participating Groups', true),
 	          'itemName' => 'Group', 'listStrings' => array("Group #", "group_num"," - ","group_name")));   
 		  ?>
 		  </td>

@@ -95,8 +95,7 @@ class GroupsController extends AppController
             array("Group.member_count",       "",         "",     "hidden"),
             array("Course.course",   __("Course", true),   "15em", "action", "Course Home"),
             array("Group.group_num", __("Group #", true),  "6em",  "number"),
-            array("Group.group_name",__("Group Name", true), "auto", "action",
-            "View Group"),
+            array("Group.group_name",__("Group Name", true), "auto", "action", "View Group"),
             array("Group.creator_id",      "",         "",     "hidden"),
             array("Group.creator", __("Creator", true),  "10em", "action", "View Creator"),
             array("Group.created",  __("Date", true),     "10em", "date"),
@@ -107,8 +106,8 @@ class GroupsController extends AppController
         $conditions = array('Group.course_id' => $this->Session->read('ipeerSession.courseId'));
 
         // The course to list for is the extra filter in this case
-        $joinTables = array();/*
-            array(
+        $joinTables = array();
+            /*array(
                 array(  // Define the GUI aspecs
                     "id"            => "Group.course_id",
                     "description"   => "for Course:",
@@ -163,6 +162,11 @@ class GroupsController extends AppController
      */
     function index()
     {
+        if (!User::hasPermission('controllers/groups')) {
+            $this->Session->setFlash('You do not have permission to view groups.');
+            $this->redirect('/home');
+        }
+        
         $this->set('course_id', $this->Session->read('ipeerSession.courseId'));
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
@@ -224,8 +228,17 @@ class GroupsController extends AppController
      * @access public
      * @return void
      */
-    function view ($id)
+    function view($id)
     {
+        if (!User::hasPermission('controllers/groups')) {
+            $this->Session->setFlash('You do not have permission to view groups.');
+            $this->redirect('/home');
+        }
+        if (!is_numeric($id) || !($this->data = $this->Group->findGroupByid($id))) {
+            $this->Session->setFlash(__('Group does not exist.', true));
+            $this->redirect('index');
+        }
+        
         $this->data = $this->Group->read(null, $id);
         $this->set('data', $this->data);
         $this->set('course_id', $this->data['Group']['course_id']);
@@ -250,22 +263,24 @@ class GroupsController extends AppController
      */
     function add ($course_id)
     {
+        if (!User::hasPermission('controllers/groups/add')) {
+            $this->Session->setFlash('You do not have permission to add groups');
+            $this->redirect('index');
+        }
+        
         if (!empty($this->data)) {
             //$this->params = $this->Group->prepData($this->params);
             if ($this->Group->save($this->data)) {
                 // add members into the groups_members table
                 //$this->GroupsMembers->insertMembers($this->Group->id, $this->params['data']['Group']);
-                $this->Session->setFlash(__('The groups were added successfully.', true), 'good');
+                $this->Session->setFlash(__('The group was added successfully.', true), 'good');
                 $this->redirect('index/'.$course_id);
-            } else {
-                // Error occured
-                $this->Session->setFlash(__('Please correct the error below.', true));
             }
         }
         $user_data = $this->User->getEnrolledStudentsForList($course_id);
 
         //Check if student is already assigned in a group
-        $groups = $this->Group->getGroupsByCouseId($course_id);
+        $groups = $this->Group->getGroupsByCourseId($course_id);
         $assigned_users = $this->GroupsMembers->getUserListInGroups($groups);
         foreach ($assigned_users as $assigned_user) {
             $user_data[$assigned_user] = $user_data[$assigned_user].'*';
@@ -292,6 +307,15 @@ class GroupsController extends AppController
      */
     function edit ($group_id)
     {
+        if (!User::hasPermission('controllers/groups/edit')) {
+            $this->Session->setFlash('You do not have permission to edit groups.');
+            $this->redirect('index');
+        }
+        if (!is_numeric($group_id) || !($this->data = $this->Group->findGroupByid($group_id))) {
+            $this->Session->setFlash(__('Group does not exist.', true));
+            $this->redirect('index');
+        }
+        
         if (!empty($this->data)) {
             //$this->data['Group']['id'] = $group_id;
             if ($this->Group->save($this->data)) {
@@ -332,6 +356,15 @@ class GroupsController extends AppController
      */
     function delete ($id)
     {
+        if(!User::hasPermission('controllers/groups/add')) {
+            $this->Session->setFlash('You do not have permission to delete groups');
+            $this->redirect('index');
+        }
+        if (!is_numeric($id) || !($this->data = $this->Group->findGroupByid($id))) {
+            $this->Session->setFlash(__('Group does not exist.', true));
+            $this->redirect('index');
+        }
+        
         if ($this->Group->delete($id)) {
             $this->Session->setFlash(__('The group was deleted successfully.', true), 'good');
         } else {
@@ -387,6 +420,11 @@ class GroupsController extends AppController
      */
     function import()
     {
+        if (!User::hasPermission('controllers/groups/add')) {
+            $this->Session->setFlash('You do not have permission to add groups');
+            $this->redirect('index');
+        }
+        
         // Just render :-)
         if (!empty($this->params['form'])) {
             $courseId = $this->params['form']['course_id'];
@@ -698,6 +736,11 @@ class GroupsController extends AppController
      */
     function export($courseId)
     {
+        if (!User::hasPermission('controllers/groups')) {
+            $this->Session->setFlash('You do not have permission to export groups.');
+            $this->redirect('index');
+        }
+        
         $this->set('courseId', $courseId);
         if (isset($this->params['form']) && !empty($this->params['form'])) {
             // check that at least one group has been selected
