@@ -437,7 +437,6 @@ class EmailerController extends AppController
         $tmp_recipients = $this->Session->read('email_recipients');
         unset($tmp_recipients[$tmp_index]);
         $this->Session->write('email_recipients', $tmp_recipients);
-        $this->autoRender = false;
         $this->ajax = true;
     }
 
