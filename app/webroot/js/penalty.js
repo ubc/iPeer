@@ -33,7 +33,7 @@ function validatePenalty(){
   
   	  if (!days) {alert('Please enter number of days for deduction.'); return false;}
   	  if (!deduction) {alert('Please enter Penalty Deduction per day.'); return false;}
-  	  if (deduction<1 || deduction>100) {alert('Deduction per Day should be between 1% and 100%.'); return false;}
+  	  if (deduction<0 || deduction>100) {alert('Deduction per Day should be between 1% and 100% (inclusively).'); return false;}
   	 
   	  var maximum = (100/deduction).ceil();
     	if(days>maximum) {

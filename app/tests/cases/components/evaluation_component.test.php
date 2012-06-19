@@ -60,12 +60,6 @@ class EvaluationTestCase extends CakeTestCase
         $this->assertEqual($result, 0);
     }
 
-    function testSaveGradePenalty()
-    {
-        //TODO
-        //$result = $this->EvaluationComponentTest->saveGradePenalty(1, 1, 3);
-    }
-
     function testFormatGradeReleaseStatus()
     {
         // Set up test data

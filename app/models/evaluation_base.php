@@ -134,4 +134,58 @@ class EvaluationBase extends AppModel
         return $eval[$this->alias]['event_count'];
     }
 
+    /**
+     * formatPenaltyArray
+     *
+     * @param mixed $grpEventId   group event id
+     * @param mixed $groupMembers group members
+     *
+     * @access public
+     * @return void
+     */
+    function formatPenaltyArray($grpEventId, $groupMembers, $eventId)
+    {
+        $this->Penalty = ClassRegistry::init('Penalty');
+        $userPenalty = array();
+        $event = $this->Event->find(
+            'first', 
+            array(
+                'conditions' => array('Event.id' => $eventId), 
+            )
+        );
+        // storing the timestamp of the due date of the event
+        $event_due = strtotime($event['Event']['due_date']);
+        $event_end = strtotime($event['Event']['release_date_end']);
+        // assign penalty to groupMember if they submitted late or never submitted by release_date_end
+        foreach ($groupMembers as $evaluator) {
+            $penalty = null;
+            $event = $this->Event->find(
+                'first', 
+                array(
+                    'conditions' => array('Event.id' => $eventId), 
+                    'contain' => array('EvaluationSubmission' => array(
+                        'conditions' => array('EvaluationSubmission.submitter_id' => $evaluator['User']['id'])
+                    ))
+                )
+            );
+            // no submission - if now is after release date end then - gets final deduction
+            if (empty($event['EvaluationSubmission'])) {
+                if (time() > $event_end) {
+                    $penalty = $this->Penalty->getPenaltyFinal($eventId);
+                }
+            // there is submission - may be on time or late
+            } else {
+                $late_diff = strtotime($event['EvaluationSubmission'][0]['date_submitted']) - $event_due;
+                // late
+                if (0 < $late_diff) {
+                    $days_late = $late_diff/(24*60*60);
+                    $penalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId,$days_late);
+                }
+            }
+            $userPenalty[$evaluator['User']['id']] = $penalty['Penalty']['percent_penalty'];
+        }
+        return $userPenalty;
+    }
+
+
 }

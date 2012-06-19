@@ -36,6 +36,12 @@ Class ExportExcelComponent extends ExportBaseNewComponent
             array_push($this->alphaNumeric, $letters);
         }
         $this->cursor = array('x' => 0, 'y' => 1);
+        $this->Group = ClassRegistry::init('Group');
+        $this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
+        $this->EvaluationSimple = ClassRegistry::init('EvaluationSimple');
+        $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
+        $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
+        $this->User = ClassRegistry::init('User');
     }
 
     /**
@@ -156,7 +162,9 @@ Class ExportExcelComponent extends ExportBaseNewComponent
             $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition, $resultRowArray);
             if (!empty($params['include_final_marks'])) {
                 $submissionCount = $this->EvaluationSubmission->countSubmissions($grpEventId);
-                $grid[$xPosition + count($groupMembers) + 1][$yPosition] = $totalScore/$submissionCount;
+                if ($submissionCount > 0) {
+                    $grid[$xPosition + count($groupMembers) + 1][$yPosition] = $totalScore/$submissionCount;
+                }
             }
             $yPosition++;
         }
@@ -198,6 +206,8 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         $xRange = 5;
         $yRange = count($groupMembers) + 2;
         $grid = $this->ExportHelper2->buildExporterGrid($xRange, $yRange);
+        $evalType = "";
+        $commentType = "";
         // Insert Evaluatee Header
         $xPosition = 1;
         $evaluateeHeaderArray = $this->ExportHelper2->formatEvaluateeHeaderArray($params, $evaluatee['User']);
@@ -243,8 +253,6 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
         $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
-        $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
-        $this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
         $this->User = ClassRegistry::init('User');
 
         $groupMembers = $this->ExportHelper2->getGroupMemberHelper($grpEventId);

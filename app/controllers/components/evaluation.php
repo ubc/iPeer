@@ -17,31 +17,6 @@ class EvaluationComponent extends Object
     public $uses =  array('Mixeval');
     public $components = array('Session', 'Auth');
 
-    //General functions
-    // Moved to Event Model
-    //  function formatEventObj ($eventId, $groupId=null)
-    //  {
-    //    //Get the target event
-    //    $this->Event = new Event;
-    //    $this->Event->id = $eventId;
-    //    $event = $this->Event->read();
-    //
-    //    //Get the group name
-    //    if ($groupId != null) {
-    //      $this->Group = new Group;
-    //      $this->Group->id = $groupId;
-    //
-    //      $group = $this->Group->read();
-    //      $event['group_name'] = 'Group '.$group['Group']['group_num'].' - '.$group['Group']['group_name'];
-    //      $event['group_id'] = $group['Group']['id'];
-    //
-    //      $this->GroupEvent = new GroupEvent;
-    //      $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
-    //      $event['group_event_id'] = $groupEvent['GroupEvent']['id'];
-    //      $event['group_event_marked'] = $groupEvent['GroupEvent']['marked'];
-    //    }
-    //    return $event;
-    //  }
 
     /**
      * formatGradeReleaseStatus
@@ -241,33 +216,6 @@ class EvaluationComponent extends Object
         return $lateDays;
     }
 
-    /**
-     * saveGradePenalty
-     *
-     * @param mixed $grp_event group event
-     * @param mixed $event     event
-     * @param mixed $evaluator evaluator
-     * @param mixed $lateDays  late days
-     *
-     * @access public
-     * @return bool if saved successfully
-     */
-    function saveGradePenalty($grp_event, $event, $evaluator, $lateDays)
-    {
-        $this->UserGradePenalty = ClassRegistry::init('UserGradePenalty');
-        $this->Penalty = ClassRegistry::init('Penalty');
-        $penalty = $this->Penalty->getPenaltyByEventAndDaysLate($event, $lateDays);
-        $data = array();
-        if (!empty($penalty)) {
-            $data['grp_event_id'] = $grp_event;
-            $data['penalty_id'] = $penalty['Penalty']['id'];
-            $data['user_id'] = $evaluator;
-            if (!$this->UserGradePenalty->save($data)) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     /**
      * daysLate
@@ -309,7 +257,6 @@ class EvaluationComponent extends Object
         $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $this->Penalty = ClassRegistry::init('Penalty');
-        $this->UserGradePenalty = ClassRegistry::init('UserGradePenalty');
 
         // assuming all are in the same order and same size
         $evaluatees = $params['form']['memberIDs'];
@@ -355,13 +302,6 @@ class EvaluationComponent extends Object
         if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
             return false;
         }
-        $late = $this->isLate($event);
-        // check to see if the evaluator's submission is late; if so, apply a penalty to the evaluator.
-        if ($late > 0) {
-            if (!$this->saveGradePenalty($grpEvent, $event, $evaluator, $late)) {
-                return false;
-            }
-        }
 
         //checks if all members in the group have submitted
         //the number of submission equals the number of members
@@ -379,94 +319,6 @@ class EvaluationComponent extends Object
         return true;
     }
 
-    /**
-     * formatStudentViewOfSimpleEvaluationResult
-     *
-     * @param bool $event
-     *
-     * @access public
-     * @return void
-     */
-    function formatStudentViewOfSimpleEvaluationResult($event=null)
-    {
-        $this->EvaluationSimple = ClassRegistry::init('EvaluationSimple');
-        $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
-        $this->UserGradePenalty = ClassRegistry::init('UserGradePenalty');
-        $this->User = ClassRegistry::init('User');
-        $this->Penalty = ClassRegistry::init('Penalty');
-
-        $gradeReleaseStatus = 0;
-        $aveScore = 0;
-        $groupAve = 0;
-        $studentResult = array();
-        $subtractAvgScore = 0;
-        $results = $this->EvaluationSimple->getResultsByEvaluatee($event['group_event_id'], $this->Auth->user('id'));
-        if ($results !=null) {
-            //Get Grade Release: grade_release will be the same for all evaluatee records
-            $gradeReleaseStatus = $results[0]['EvaluationSimple']['grade_release'];
-            if ($gradeReleaseStatus) {
-                //Grade is released; retrieve all grades
-                //Get total mark each member received
-                $receivedTotalScore = $this->EvaluationSimple->getReceivedTotalScore(
-                    $event['group_event_id'], $this->Auth->user('id'));
-                $totalScore = $receivedTotalScore[0][0]['received_total_score'];
-                $numMemberSubmissions = $this->EvaluationSimple->find('count', array(
-                    'conditions' => array(
-                        'EvaluationSimple.evaluatee' => $this->Auth->user('id'),
-                        'EvaluationSimple.event_id' => $event['Event']['id'],
-                        'EvaluationSimple.grp_event_id' => $event['group_event_id'])));
-
-                $userPenalty = $this->UserGradePenalty->getByUserIdGrpEventId($event['group_event_id'], $this->Auth->user('id'));
-                $scorePenalty = $this->Penalty->getPenaltyById($userPenalty['UserGradePenalty']['penalty_id']);
-                $subtractAvgScore = ((($scorePenalty['Penalty']['percent_penalty']) / 100) * $totalScore) / $numMemberSubmissions;
-
-                $aveScore = $totalScore / $numMemberSubmissions;
-                $studentResult['numMembers'] = $numMemberSubmissions;
-                $studentResult['receivedNum'] = count($receivedTotalScore);
-
-                $tmp_total = 0;
-                $avg = $this->EvaluationSimple->find('all', array(
-                    'conditions' => array('EvaluationSimple.grp_event_id' => $event['group_event_id']),
-                    'fields' => array('AVG(score) as avg', 'sum(score) as sum', 'evaluatee'),
-                    'group' => 'evaluatee'
-                ));
-
-                if (isset($avg)) {
-                    $i = 0;
-                    // Deduct marks if the evaluator submitted a late evaluation.
-                    foreach ($avg as $a) {
-                        $userId = $a['EvaluationSimple']['evaluatee'];
-                        $userPenalty = $this->UserGradePenalty->getByUserIdGrpEventId($event['group_event_id'], $userId);
-                        $avgSubtract = 0;
-                        if (!empty($userPenalty)) {
-                            $penalty = $this->Penalty->getPenaltyById($userPenalty['UserGradePenalty']['penalty_id']);
-                            $avgSubtract = ($penalty['Penalty']['percent_penalty'] / 100) * ($avg[$i][0]['sum']) / $numMemberSubmissions;
-                        }
-                        $tmp_total += $a['0']['avg'] - $avgSubtract;
-                        $i++;
-                    }
-                }
-                $groupAve = $tmp_total/count($avg);
-            }
-            $studentResult['avePenalty'] = $subtractAvgScore;
-            $studentResult['aveScore'] = $aveScore;
-            $studentResult['groupAve'] = $groupAve;
-
-            //Get Comment Release: release_status will be the same for all evaluatee
-            $commentReleaseStatus = $results['0']['EvaluationSimple']['release_status'];
-            if ($commentReleaseStatus) {
-                //Comment is released; retrieve all comments
-                $comments = $this->EvaluationSimple->getAllComments($event['group_event_id'], $this->Auth->user('id'));
-                if (shuffle($comments)) {
-                    $studentResult['comments'] = $comments;
-                }
-                $studentResult['commentReleaseStatus'] = $commentReleaseStatus;
-            }
-
-        }
-        $studentResult['gradeReleaseStatus'] = $gradeReleaseStatus;
-        return $studentResult;
-    }
 
 
     /**
@@ -760,12 +612,6 @@ class EvaluationComponent extends Object
 
         if (!$this->EvaluationRubric->save($evalRubric)) {
             return false;
-        }
-        $late = $this->isLate($eventId);
-        if ($late) {
-            if (!$this->saveGradePenalty($grpEvent, $eventId, $evaluator, $late)) {
-                return false;
-            }
         }
 
         return true;
@@ -1303,13 +1149,6 @@ class EvaluationComponent extends Object
         $evalMixeval['EvaluationMixeval']['score'] = $score;
         if (!$this->EvaluationMixeval->save($evalMixeval)) {
             return false;
-        }
-
-        $late = $this->isLate($eventId);
-        if ($late > 0) {
-            if (!$this->saveGradePenalty($groupEventId, $eventId, $evaluator, $late)) {
-                return false;
-            }
         }
 
         return true;
@@ -2183,29 +2022,5 @@ class EvaluationComponent extends Object
         }
         return $questions;
     }
-
-
-    /**
-     * formatPenaltyArray
-     *
-     * @param mixed $grpEventId   group event id
-     * @param mixed $groupMembers group members
-     *
-     * @access public
-     * @return void
-     */
-    function formatPenaltyArray($grpEventId, $groupMembers)
-    {
-        $this->UserGradePenalty = ClassRegistry::init('UserGradePenalty');
-        $this->Penalty = ClassRegistry::init('Penalty');
-        $userPenalty = array();
-        foreach ($groupMembers as $evaluatee) {
-            $userGradePenalty = $this->UserGradePenalty->getByUserIdGrpEventId($grpEventId, $evaluatee['User']['id']);
-            $penalty = $this->Penalty->getPenaltyById($userGradePenalty['UserGradePenalty']['penalty_id']);
-            $userPenalty[$evaluatee['User']['id']] = $penalty['Penalty']['percent_penalty'];
-        }
-        return $userPenalty;
-    }
-
 
 }

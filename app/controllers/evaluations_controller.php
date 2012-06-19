@@ -22,7 +22,7 @@ class EvaluationsController extends AppController
         'EvaluationSubmission', 'Event', 'EvaluationSimple',
         'SimpleEvaluation', 'Rubric', 'Group', 'User',
         'GroupsMembers', 'RubricsLom', 'RubricsCriteria',
-        'RubricsCriteriaComment', 'Personalize', 'Penalty', 'UserGradePenalty',
+        'RubricsCriteriaComment', 'Personalize', 'Penalty',
         'Question', 'Response', 'Survey', 'SurveyInput', 'Course', 'MixevalsQuestion',
         'EvaluationMixeval', 'EvaluationMixevalDetail', 'Mixeval', 'MixevalsQuestionDesc');
     public $components = array('ExportBaseNew', 'Auth', 'AjaxList', 'rdAuth', 'Output', 'sysContainer',
@@ -701,15 +701,6 @@ class EvaluationsController extends AppController
             $status = false;
         }
 
-        // Apply penalty; if evaluator submitted late
-        $late = $this->Evaluation->isLate($eventId);
-        // check to see if the evaluator's submission is late; if so, apply a penalty to the evaluator.
-        if ($late > 0) {
-            if (!$this->Evaluation->saveGradePenalty($groupEventId, $eventId, $evaluator, $late)) {
-                return false;
-            }
-        }
-
 
 
         //checks if all members in the group have submitted
@@ -851,13 +842,6 @@ class EvaluationsController extends AppController
             $status = false;
         }
 
-        $late = $this->Evaluation->isLate($eventId);
-        if ($late) {
-            if (!$this->Evaluation->saveGradePenalty($groupEventId, $eventId, $evaluator, $late)) {
-                return false;
-            }
-        }
-
         //checks if all members in the group have submitted
         //the number of submission equals the number of members
         //means that this group is ready to review
@@ -926,7 +910,7 @@ class EvaluationsController extends AppController
             $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
             $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
             // Set penalty
-            $penalties = $this->Evaluation->formatPenaltyArray($grpEvent['GroupEvent']['id'], $formattedResult['groupMembers']);
+            $penalties = $this->SimpleEvaluation->formatPenaltyArray($grpEvent['GroupEvent']['id'], $formattedResult['groupMembers'], $eventId);
             $this->set('penalties', $penalties);
             $this->render('view_simple_evaluation_results');
             break;
@@ -952,7 +936,7 @@ class EvaluationsController extends AppController
             $this->set('evalResult', $formattedResult['evalResult']);
             $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
             // set penalty data
-            $formattedPenalty = $this->Evaluation->formatPenaltyArray($grpEvent['GroupEvent']['id'], $formattedResult['groupMembers']);
+            $formattedPenalty = $this->Rubric->formatPenaltyArray($grpEvent['GroupEvent']['id'], $formattedResult['groupMembers'], $eventId);
             $this->set('penalties', $formattedPenalty);
 
             if ($displayFormat == 'Detail') {
@@ -999,7 +983,7 @@ class EvaluationsController extends AppController
             $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
 
             // Set Penalty
-            $penalties = $this->Evaluation->formatPenaltyArray($grpEvent['GroupEvent']['id'], $formattedResult['groupMembers']);
+            $penalties = $this->Mixeval->formatPenaltyArray($grpEvent['GroupEvent']['id'], $formattedResult['groupMembers'], $eventId);
             $this->set('penalties', $penalties);
 
             if ($displayFormat == 'Detail') {
@@ -1071,10 +1055,11 @@ class EvaluationsController extends AppController
         $currentDate = strtotime('NOW');
         //Check if event is in range of result release date
         if ($currentDate>=strtotime($event['Event']['release_date_begin'])&&$currentDate<strtotime($event['Event']['release_date_end'])) {
+            $userId = $this->Auth->user('id');
             switch ($event['Event']['event_template_type_id'])
             {
             case 1: //View Simple Evaluation Result
-                $studentResult = $this->Evaluation->formatStudentViewOfSimpleEvaluationResult($event);
+                $studentResult = $this->EvaluationSimple->formatStudentViewOfSimpleEvaluationResult($event, $userId);
                 $this->set('studentResult', $studentResult);
                 $this->render('student_view_simple_evaluation_results');
                 break;

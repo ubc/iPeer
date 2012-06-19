@@ -270,7 +270,7 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
   <tr class="tablecell2">
     <?php echo $html->script('events')?>
     <td colspan="3" align="center"><?php echo $form->submit(__('Edit Event', true), array('onclick' =>
-        "processSubmit(document.getElementById('selected_groups')); return validate(); ")); ?></td>
+        "processSubmit(document.getElementById('selected_groups')); return validate(); ", 'div'=>'editEvent')); ?></td>
   </tr>
 </table>
 

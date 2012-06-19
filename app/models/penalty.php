@@ -12,6 +12,7 @@ class Penalty extends AppModel
 {
 
     public $name = 'Penalty';
+    
 
     /**
      * getPenaltyById
@@ -98,14 +99,16 @@ class Penalty extends AppModel
     function getPenaltyByEventAndDaysLate($eventId, $daysLate)
     {
         $penalty = $this->find('all',
-            array('conditions' => array('event_id' => $eventId, 'days_late <=' => $daysLate),
-            'order' => array('days_late' => 'DESC'))
+            array('conditions' => array('event_id' => $eventId, 'days_late >=' => $daysLate),
+            'order' => array('days_late' => 'ASC'))
         );
         // returns the max late penalty index
         if (!empty($penalty)) {
             return $penalty[0];
-        } else {
+        } else if (0 >= $daysLate) {
             return null;
+        } else {
+            return $this->getPenaltyFinal($eventId);
         }
     }
 }
