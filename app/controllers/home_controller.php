@@ -59,13 +59,9 @@ class HomeController extends AppController
             $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
             $this->set('course_list', $this->_formatCourseList($course_list));
         } else if (User::hasRole('student')) {
-            //Check if the student has a email in his/her profile
-            $user = $this->User->findUserById($this->Auth->user('id'));
-            if (!empty($user['User']['email'])) {
-                $this->redirect('studentIndex');
-            } else {
-                $this->redirect('/users/editProfile');
-            }
+            // Check if the student has a email in his/her profile - code for requirement removed (don't want it)
+            $this->redirect('studentIndex');
+
         }
     }
     
