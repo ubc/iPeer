@@ -39,7 +39,7 @@ class EmailtemplatesController extends AppController
         $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
         $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
         $this->order = $this->sortBy.' '.strtoupper($this->direction);
-        $this->set('title_for_layout', 'Email');
+        $this->set('title_for_layout', __('Email', true));
         parent::__construct();
     }
 
@@ -150,11 +150,12 @@ class EmailtemplatesController extends AppController
     {
         if (!User::hasPermission('controllers/emailtemplates')) {
             $this->Session->setFlash(__('You do not have permission to add email templates.', true));
-            $this->redirect('/home');
+            $this->redirect('index');
         }
         
-        $this->layout= 'pop_up';
-        //Set up user info
+        $this->set('title_for_layout', __('Add Email Template', true));
+        $this->layout = 'pop_up';
+        // Set up user info
         $currentUser = $this->User->getCurrentLoggedInUser();
         $this->set('currentUser', $currentUser);
         $this->set('mergeList', $this->EmailMerge->getMergeList());
@@ -168,7 +169,6 @@ class EmailtemplatesController extends AppController
                 $this->Session->setFlash(__('Save failed.', true));
             }
         }
-
     }
 
 
@@ -183,60 +183,43 @@ class EmailtemplatesController extends AppController
      */
     function edit ($id)
     {
-        if (!User::hasPermission('controllers/emailtemplates')) {
+        if (!User::hasPermission('controllers/emailtemplates/edit')) {
             $this->Session->setFlash(__('You do not have permission to edit email templates.', true));
-            $this->redirect('/home');
+            $this->redirect('index');
         }
-
-        // retrieving the requested email template
-        $template = $this->EmailTemplate->find(
-            'first', 
-            array(
-                'conditions' => array('id' => $id), 
-            )
-        );
+        if ($this->data) {
+            //Save Data
+            if ($this->EmailTemplate->save($this->data)) {
+                $this->Session->setFlash(__('Save Successful', true), 'good');
+                $this->redirect('index');
+            } else {
+                $this->Session->setFlash(__('Failed to save', true));
+            }
+            return;
+        }
         
+        // retrieving the requested email template
+        $template = $this->EmailTemplate->find('first', array('conditions' => array('id' => $id)));
+        
+        $this->set('title_for_layout', __('Edit Email Template', true));
         // check to see if $id is valid - numeric & is a email template
-        if (!is_numeric($id) || empty($template)) {
+        if (empty($template)) {
             $this->Session->setFlash(__('Invalid ID.', true));
             $this->redirect('index');
         }
-        
         // check to see if the user is the creator, admin, or superadmin
         if (!($template['EmailTemplate']['creator_id'] == $this->Auth->user('id') ||
             User::hasPermission('functions/emailtemplate'))) {
             $this->Session->setFlash(__('You do not have permission to edit this email template.', true));
             $this->redirect('index');
         }
+
+        //Set up user info
+        $currentUser = $this->User->getCurrentLoggedInUser();
+        $this->set('currentUser', $currentUser);
+        $this->set('mergeList', $this->EmailMerge->getMergeList());
         
-        $creator_id = $this->EmailTemplate->getCreatorId($id);
-        $user_id = $this->Auth->user('id');
-        if ($creator_id == $user_id) {
-            //Set up user info
-            $currentUser = $this->User->getCurrentLoggedInUser();
-            $this->set('currentUser', $currentUser);
-            $this->set('mergeList', $this->EmailMerge->getMergeList());
-
-            $data = $this->EmailTemplate->find('first', array(
-                'conditions' => array('EmailTemplate.id' => $id)
-            ));
-
-            if (empty($this->params['data'])) {
-                $this->data = $data;
-                $this->render('add');
-            } else {
-                //Save Data
-                if ($this->EmailTemplate->save($this->params['data'])) {
-                    $this->Session->setFlash(__('Successful', true));
-                    $this->redirect('/emailtemplates/index');
-                } else {
-                    $this->Session->setFlash(__('Failed to save', true));
-                }
-            }
-        } else {
-            $this->Session->setFlash(__('No Permission', true));
-            $this->redirect('/emailtemplates/index');
-        }
+        $this->data = $template;
     }
 
 
@@ -260,7 +243,7 @@ class EmailtemplatesController extends AppController
         );
         
         // check to see if $id is valid - numeric & is a email template
-        if (!is_numeric($id) || empty($template)) {
+        if (empty($template)) {
             $this->Session->setFlash(__('Invalid ID.', true));
             $this->redirect('index');
         }
@@ -276,14 +259,14 @@ class EmailtemplatesController extends AppController
         $user_id = $this->Auth->user('id');
         if ($creator_id == $user_id) {
             if ($this->EmailTemplate->delete($id)) {
-                $this->Session->setFlash(__('The Email Template was deleted successfully.', true));
+                $this->Session->setFlash(__('The Email Template was deleted successfully.', true), 'good');
             } else {
                 $this->Session->setFlash(__('Failed to delete the Email Template.', true));
             }
-            $this->redirect('index/');
+            $this->redirect('index');
         } else {
             $this->Session->setFlash(__('No Permission', true));
-            $this->redirect('/emailtemplates/index');
+            $this->redirect('index');
         }
     }
 
@@ -298,13 +281,10 @@ class EmailtemplatesController extends AppController
             $this->redirect('/home');
         }
         
+        $this->set('title_for_layout', __('View Email Template', true));   //title for view
+        
         // retrieving the requested email template
-        $template = $this->EmailTemplate->find(
-            'first', 
-            array(
-                'conditions' => array('id' => $id), 
-            )
-        );
+        $template = $this->EmailTemplate->find('first', array('conditions' => array('id' => $id)));
         
         // check to see if $id is valid - numeric & is a email template
         if (!is_numeric($id) || empty($template)) {
@@ -319,11 +299,8 @@ class EmailtemplatesController extends AppController
             $this->redirect('index');
         }
         
-        $this->data = $this->EmailTemplate->find('first', array(
-            'conditions' => array('EmailTemplate.id' => $id)
-        ));
+        $this->data = $this->EmailTemplate->find('first', array('conditions' => array('EmailTemplate.id' => $id)));
         $this->set('readonly', true);
-        //$this->render('add');
     }
 
     /**

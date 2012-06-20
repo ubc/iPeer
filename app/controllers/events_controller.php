@@ -193,7 +193,7 @@ class EventsController extends AppController
     function index($courseId = null, $message = '')
     {
         if (!User::hasPermission('controllers/events')) {
-            $this->Session->setFlash('You do not have permission to view events.');
+            $this->Session->setFlash(__('You do not have permission to view events.', true));
             $this->redirect('/home');
         }
         
@@ -383,7 +383,7 @@ class EventsController extends AppController
     function add()
     {
         if (!User::hasPermission('controllers/events/add')) {
-            $this->Session->setFlash('You do not have permission to add events.');
+            $this->Session->setFlash(__('You do not have permission to add events.', true));
             $this->redirect('index');
         }
         
@@ -495,7 +495,7 @@ class EventsController extends AppController
     function edit($id)
     {
         if (!User::hasPermission('controllers/events/edit')) {
-            $this->Session->setFlash('You do not have permission to edit events.');
+            $this->Session->setFlash(__('You do not have permission to edit events.', true));
             $this->redirect('index');
         }
         if (!is_numeric($id) || !($this->data = $this->Event->getEventByid($id))) {
@@ -755,134 +755,6 @@ class EventsController extends AppController
     }
 
     /**
-     * editOld
-     *
-     * @param bool $id
-     *
-     * @access public
-     * @return void
-     */
-    /*function editOld ($id=null)
-    {
-
-        $courseId = $this->rdAuth->courseId;
-
-        //Clear $id to only the alphanumeric value
-        $id = $this->Sanitize->paranoid($id);
-
-
-        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events', true));
-        if (empty($this->params['data'])) {
-
-            $this->Event->id = $id;
-            $event = $this->Event->read();
-            $this->params['data'] = $event;
-            $this->Output->br2nl($this->params['data']);
-
-            //$assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($id);
-            // No need to use getGroupIDsByEventId method, can call Cake's findAllBy... directly
-            //$assignedGroupIDs =    $this->GroupEvent->findAllByEvent_id($id);
-            $assignedGroupIDs =    $this->GroupEvent->find('all', "event_id=$id", null, null, null, 1, false);
-            //$assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($id);
-            //$a=print_r($assignedGroupIDs,true);
-            //print "<pre>($a)</pre>";
-
-            $groupIDs = '';
-            $groupIDSQL = '';
-
-            if (!empty($assignedGroupIDs)) {
-
-                // retrieve string of group ids
-                for ($i = 0; $i < count($assignedGroupIDs); $i++) {
-                    $groupIDs .= $assignedGroupIDs[$i]['GroupEvent']['group_id']. ":";
-                    $groupIDSQL .= $assignedGroupIDs[$i]['GroupEvent']['group_id'];
-                    if ($i != count($assignedGroupIDs) -1 ) {
-                        $groupIDs .= ":";
-                        $groupIDSQL .= ", ";
-                    }
-                }
-                $assignedGroups = $this->Group->find('all', 'id IN ('.$groupIDSQL.')');
-
-                $this->set('assignedGroups', $assignedGroups);
-
-                $unassignedGroups = $this->Group->find('all', 'course_id='.$courseId.' AND id NOT IN ('.$groupIDSQL.')');
-                $this->set('unassignedGroups', $unassignedGroups);
-
-            } else {
-                $unassignedGroups = $this->Group->find('all', 'course_id = '.$courseId);
-                $this->set('unassignedGroups', $unassignedGroups);
-
-            }
-            $this->set('groupIDs', $groupIDs);
-
-
-            //Format Evaluation Selection Boxes
-            $default = null;
-            $model = '';
-            $eventTemplates = array();
-
-            $templateId = $this->params['data']['Event']['event_template_type_id'];
-            if (!empty($templateId)) {
-                $eventTemplateType = $this->EventTemplateType->find('id = '.$templateId);
-
-                if ($templateId == 1) {
-                    $default = 'Default Simple Evaluation';
-                    $model = 'SimpleEvaluation';
-                    $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'));
-                } else if ($templateId == 2) {
-                    $default = 'Default Rubric';
-                    $model = 'Rubric';
-                    $eventTemplates = $this->Rubric->getBelongingOrPublic($this->Auth->user('id'));
-                } else if ($templateId == 4) {
-                    $default = 'Default Mixed Evaluation';
-                    $model = 'Mixeval';
-                    $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'));
-                }
-
-            }
-
-
-            $this->set('eventTemplates', $eventTemplates);
-            $this->set('default', $default);
-            $this->set('model', $model);
-
-
-            //Get all display event types
-            $eventTypes = $this->EventTemplateType->find('all', array('conditions'=>array('display_for_selection'=>1)));
-            $this->set('eventTypes', $eventTypes);
-
-            $this->render();
-        } else {
-            //Format Data
-            $this->params['data']['Event']['course_id'] = $courseId;
-            $this->params = $this->Event->prepData($this->params);
-
-            $this->Output->filter($this->params['data']);//always filter
-
-            if ($this->Event->save($this->params['data'])) {
-                //Save Groups for the Event
-                $this->GroupEvent->updateGroups($this->Event->id, $this->params['data']['Event']);
-
-                $this->redirect('/events/index/'.__('The event is updated successfully.', true));
-            } else {
-                //Error Found
-                $this->Output->br2nl($this->params['data']);
-                $this->set('data', $this->params['data']);
-
-                $unassignedGroups = $this->Group->find('all', 'course_id = '.$courseId);
-                $this->set('unassignedGroups', $unassignedGroups);
-                $eventTypes = $this->EventTemplateType->find('all', array('conditions'=>array('display_for_selection'=>1)));
-                $this->set('eventTypes', $eventTypes);
-
-                //Validate the error why the Event->save() method returned false
-                $this->validateErrors($this->Event);
-                $this->set('errmsg', $this->Event->errorMessage);
-            }
-        }
-    }*/
-
-
-    /**
      * delete
      *
      * @param bool $id
@@ -893,7 +765,7 @@ class EventsController extends AppController
     function delete ($id=null)
     {
         if (!User::hasPermission('controllers/events/add')) {
-            $this->Session->setFlash('You do not have permission to delete events.');
+            $this->Session->setFlash(__('You do not have permission to delete events.', true));
             $this->redirect('index');
         }
         
@@ -902,7 +774,7 @@ class EventsController extends AppController
 
         }   //end if
         if ($this->Event->delete($id)) {
-            $this->Session->setFlash(__('The event is deleted successfully.', true), 'good');
+            $this->Session->setFlash(__('The event has been deleted successfully.', true), 'good');
             $this->redirect('index');
         }
     }

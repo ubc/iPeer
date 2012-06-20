@@ -430,7 +430,7 @@ i {
     margin: 1em auto;
 }
 
-/* add */
+/* add and edit */
 
 #EmailtemplateAddForm .text label {
     width: 13em;
@@ -455,6 +455,15 @@ i {
 }
 
 #EmailtemplateAddForm .submit {
+    width: 10em;
+    margin: 1em auto;
+}
+
+#EmailtemplateEditForm .input label {
+    width: 13em;
+}
+
+#EmailtemplateEditForm .submit {
     width: 10em;
     margin: 1em auto;
 }
