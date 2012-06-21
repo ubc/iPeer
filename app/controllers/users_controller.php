@@ -777,12 +777,8 @@ class UsersController extends AppController
 
             if ($this->__processForm()) {
                 $this->__setSessionData($this->data['User']);
-                if (!empty($this->data['User']['email'])) {
-                    $this->Session->setFlash((__("Your Profile Has Been Updated Successfully.", true)."<br /><br />" .
-                        "<a href='../../home/'>".__('Go to your iPeer Home page.', true)."</a><br />"), 'good');
-                } else {
-                    $this->Session->setFlash(__("We saved your data, but you still need to enter an email address!", true));
-                }
+                $this->Session->setFlash((__("Your Profile Has Been Updated Successfully.", true)."<br /><br />" .
+                    "<a href='../../home/'>".__('Go to your iPeer Home page.', true)."</a><br />"), 'good');
             }
         }
         $this->data = $this->User->read(null, $id);
