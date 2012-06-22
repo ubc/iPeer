@@ -39,7 +39,7 @@ echo $this->element('evaluations/view_event_info', $params);
 <?php } ?>
 </table>
 <div id='mixeval_result'>
-<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+<table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr class="tableheader">
 		<td valign="middle"><?php __('Student Name:')?></td>
     <td> <?php __('Total:')?>( /<?php echo number_format($mixeval['Mixeval']['total_marks'], 2)?>)</td>
@@ -56,14 +56,14 @@ echo $this->element('evaluations/view_event_info', $params);
       	//totals section
       	echo '<td width="30%">';
       	//if ($allMembersCompleted) {
-      	if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
-		  $avgScore = $memberScoreSummary[$member['User']['id']]['received_ave_score'];
-		  $penalty = number_format(($penalties[$member['User']['id']] / 100) * $avgScore, 2);
-		  $finalAvgScore = $avgScore - $penalty;
-		  $penalty > 0 ? $stringAddOn = ' - '."<font color=\"red\">".$penalty."</font> = ".number_format($finalAvgScore, 2) :
+      	if (isset($memberScoreSummary[$member['User']['id']]['received_total_score'])) {
+		  $totalScore = $memberScoreSummary[$member['User']['id']]['received_total_score'];
+		  $penalty = number_format(($penalties[$member['User']['id']] / 100) * $totalScore, 2);
+		  $finalTotalScore = $totalScore - $penalty;
+		  $penalty > 0 ? $stringAddOn = ' - '."<font color=\"red\">".$penalty."</font> = ".number_format($finalTotalScore, 2) :
 		  				 $stringAddOn = '';
-          $aveScoreSum += $finalAvgScore;
-       	  echo number_format($avgScore, 2).$stringAddOn;
+          $aveScoreSum += $finalTotalScore;
+       	  echo number_format($totalScore, 2).$stringAddOn;
       	} else {
       		echo '-';
       	}

@@ -211,6 +211,7 @@ class EvaluationsController extends AppController
 
         //Set up the course Id
         $this->set('courseId', $data['0']['Event']['course_id']);
+        $this->set('eventId', $eventId);
 
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
@@ -885,7 +886,6 @@ class EvaluationsController extends AppController
 
 
         $this->autoRender = false;
-        $this->layout = 'pop_up';
 
         $templateTypeId = $this->Event->getEventTemplateTypeId($eventId);
         $grpEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);

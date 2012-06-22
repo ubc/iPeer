@@ -15,6 +15,7 @@
     echo "</tr>";
     $pos = 1;
     //for loop to display the criteria rows
+    $id = 0; // for question id 
     for($i=0; $i<count($questions); $i++){
        //Get and set Mixeval Question
     isset($questions[$i])? $mixevalQuestion = $questions[$i]['MixevalsQuestion'] : $mixevalQuestion = null;
@@ -32,12 +33,12 @@
       
           echo '<tr><td class="tableheader2">';
 		  if (isset($evaluate)) {
-		     echo '<input type="hidden" name="selected_lom_'.$userId.'_'.$i.'"';
+		     echo '<input type="hidden" name="selected_lom_'.$userId.'_'.$id.'"';
 		     echo 'value="'.(isset($evaluation['EvaluationDetail'][$i-1]['EvaluationMixevalDetail']['selected_lom']) ?
                     $evaluation['EvaluationDetail'][$i-1]['EvaluationMixevalDetail']['selected_lom'] :
                     '1') . '">';
 		  } else {
-        echo '<input type="hidden" name="selected_lom_'.$userId.'_'.$i.'" value="1" size="4" >';
+        echo '<input type="hidden" name="selected_lom_'.$userId.'_'.$id.'" value="1" size="4" >';
       }
   
       echo $pos. ': &nbsp &nbsp '. $mixevalQuestion['title']; 
@@ -95,8 +96,8 @@
 //      }
       echo "</tr>";
        $pos++;
+       $id++;
       }
-     
     }
     if (!$evaluate) {
       echo '<tr class="tableheader2">';
@@ -170,14 +171,15 @@
 					// $Output->br2nl($text);
                    
                       ?>
-                     <textarea name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['question_num']?>" cols="80" rows="10"><?php echo $text?></textarea>
+                     <textarea name="response_text_<?php echo $userId?>_<?php echo $id?>" cols="80" rows="10"><?php echo $text?></textarea>
                      <br /><?php __('Maximum 65535 characters.')?>
                    <?php } else { ?>
                    
-                     <input type="text" name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['question_num']?>" size="92" value="<?php
+                     <input type="text" name="response_text_<?php echo $userId?>_<?php echo $id?>" size="92" value="<?php
                       echo htmlentities($evaluation['EvaluationDetail'][$pos-1]['EvaluationMixevalDetail']['question_comment'])?>"/>
                    <?php }?>
-
+                    <?php $id++; ?>
+                
                 </td></tr>
             <?php else: ?>
             <tr><td width="15%"><?php __('Respond Type?')?>: </td>

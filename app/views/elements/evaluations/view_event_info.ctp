@@ -1,7 +1,4 @@
-<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
-  <tr>
-    <td colspan="4" align="right"><a href="" onClick="window.close();"><?php __('[X] Close Window')?></a></td>
-    </tr>
+<table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
     <td colspan="4" align="center"><?php __('Evaluation Event Detail')?></td>
     </tr>

@@ -1224,3 +1224,50 @@ textarea.question-title-textarea, textarea.question-descriptor {
 #controls {
     text-align: right;
 }
+
+/* evaluation result tables */
+
+.result-header-td {
+    vertical-align: middle;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #FFFFFF;
+    background-color: #4478AC;
+    font-size: 0.9em;
+    height: 40px;
+    padding: 0em;
+}
+
+.inner-table-cell {
+    padding: 0em;
+}
+
+.group-members {
+    height: 40px;
+}
+
+.total-cell {
+    height: 40px;
+    width: 250px;
+}
+
+.result-cell {
+    height: 40px;
+    width: 200px;
+    padding: 0em;
+}
+
+.inner-table {
+    width: 100%;
+    margin-top: 0em;
+    table-layout: fixed;
+}
+
+.outer-table {
+    table-layout: fixed;
+}
+
+.scrollbar {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
