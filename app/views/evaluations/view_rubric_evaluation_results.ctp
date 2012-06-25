@@ -58,7 +58,7 @@ echo $this->element('evaluations/view_event_info', $params);
       	//if ($allMembersCompleted) {
       	if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
       	  $avgScore = $memberScoreSummary[$member['User']['id']]['received_ave_score'];
-		  $penalty = ($penalties[$member['User']['id']] / 100) * $avgScore;
+		  $penalty = number_format(($penalties[$member['User']['id']] / 100) * $avgScore, 2);
 		  $finalAvgScore = $avgScore - $penalty;
 		  $penalty > 0 ? $stringAddOn = ' - '."<font color=\"red\">".$penalty."</font> = ".number_format($finalAvgScore, 2) :
 		  				 $stringAddOn = '';

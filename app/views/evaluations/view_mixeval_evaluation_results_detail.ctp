@@ -47,7 +47,7 @@
         $averagePerQuestion = array();
         ?>
         <!-- summary table -->
-        <?php echo '<table width="100%" align="center" class="outer-table" style="border:1 solid red;">'; ?>
+        <?php echo '<table width="100%" align="center" class="outer-table">'; ?>
             <tr>
                 <?php echo '<td width="25%" valign="middle" class="result-header-td">Student Name:</td>';
                 echo '<td width="75%" rowspan="'.$rowspan.'" class="inner-table-cell"><div class="scrollbar"><table class="inner-table"><tr class="result-header-td">';

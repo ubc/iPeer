@@ -133,6 +133,10 @@ a:hover {
     margin: 0 auto;
 }
 
+strong {
+    font-weight: bold;
+}
+
 /* BANNER */
 .banner {
     border-top-left-radius: 8px; 
