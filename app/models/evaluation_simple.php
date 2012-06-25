@@ -125,7 +125,7 @@ class EvaluationSimple extends AppModel
         $conditions = array('EvaluationSimple.grp_event_id' => $grpEventId);
         if ($evaluateeIds !=null) {
             $conditions['EvaluationSimple.evaluator'] = $evaluator;
-            $conditions['EvaluationSimple.evaluatee IN'] = $evaluateeIds;
+            $conditions['EvaluationSimple.evaluatee'] = $evaluateeIds;
         }
         return $this->updateAll($fields, $conditions);
     }
@@ -254,6 +254,31 @@ class EvaluationSimple extends AppModel
         return $temp;
     }
 
+    /**
+     * getComment
+     *
+     * @param bool $grpEventId       group event id
+     * @param bool $evaluateeId      evaluatee id
+     * @param bool $includeEvaluator include evaluator
+     *
+     * @access public
+     * @return void
+     */
+    function getComment($id)
+    {
+        $temp = $this->find('first', array(
+            'conditions' => array('EvaluationSimple.id' => $id),
+            'fields' => array('evaluatee AS evaluateeId', 'eval_comment', 'event_id', 'User.first_name AS evaluator_first_name', 'User.last_name AS evaluator_last_name', 'User.student_no AS evaluator_student_no'),
+            'joins' => array(
+                array(
+                    'table' => 'users',
+                    'alias' => 'User',
+                    'type' => 'LEFT',
+                    'conditions' => array('User.id = EvaluationSimple.evaluator')))
+                ));
+        return $temp;
+    }
+
 
     /**
      * getOppositeGradeReleaseStatus
@@ -328,7 +353,7 @@ class EvaluationSimple extends AppModel
         $this->User = ClassRegistry::init('User');
         $this->Penalty = ClassRegistry::init('Penalty');
         $this->Event = ClassRegistry::init('Event');
-
+        
         $gradeReleaseStatus = 0;
         $aveScore = 0;
         $groupAve = 0;
@@ -389,6 +414,7 @@ class EvaluationSimple extends AppModel
                 $aveScore = $totalScore / $numMemberSubmissions;
                 $studentResult['numMembers'] = $numMemberSubmissions;
                 $studentResult['receivedNum'] = count($receivedTotalScore);
+                $studentResult['penalty'] = $scorePenalty['Penalty']['percent_penalty'];
 
                 $tmp_total = 0;
                 $avg = $this->find('all', array(
@@ -401,7 +427,7 @@ class EvaluationSimple extends AppModel
                     $i = 0;
                     // Deduct marks if the evaluator submitted a late evaluation.
                     foreach ($avg as $a) {
-                        $userId = $a['EvaluationSimple']['evaluatee'];
+                        $user_id = $a['EvaluationSimple']['evaluatee'];
                         $userPenalty = array();
                         $event_info = $this->Event->find(
                             'first', 
@@ -419,7 +445,7 @@ class EvaluationSimple extends AppModel
                             array(
                                 'conditions' => array('Event.id' => $eventId), 
                                 'contain' => array('EvaluationSubmission' => array(
-                                'conditions' => array('EvaluationSubmission.submitter_id' => $userId)
+                                'conditions' => array('EvaluationSubmission.submitter_id' => $user_id)
                             )))
                         );
                         // no submission - if now is after release date end then - gets final deduction
@@ -450,15 +476,16 @@ class EvaluationSimple extends AppModel
             $studentResult['aveScore'] = $aveScore;
             $studentResult['groupAve'] = $groupAve;
 
-            //Get Comment Release: release_status will be the same for all evaluatee
-            $commentReleaseStatus = $results['0']['EvaluationSimple']['release_status'];
-            if ($commentReleaseStatus) {
-                //Comment is released; retrieve all comments
-                $comments = $this->getAllComments($event['group_event_id'], $userId);
-                if (shuffle($comments)) {
-                    $studentResult['comments'] = $comments;
+            $releasedComments = array();
+            //Get Comment Release: release_status may not be the same for all evaluators
+            foreach ($results as $comment) {
+                if ($comment['EvaluationSimple']['release_status']) {
+                    //comment is released
+                    $releasedComments[] = $this->getComment($comment['EvaluationSimple']['id']);
                 }
-                $studentResult['commentReleaseStatus'] = $commentReleaseStatus;
+            }
+            if (!empty($releasedComments) && shuffle($releasedComments)) {
+                $studentResult['comments'] = $releasedComments;
             }
 
         }

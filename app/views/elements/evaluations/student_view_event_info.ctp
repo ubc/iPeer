@@ -35,7 +35,9 @@
       	                    $stringAddOn = '';
       						 
         echo number_format($aveScore, 2).$stringAddOn;
-        echo "&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp ( )"."<font color=\"red\">*</font>"." : Denotes late penalty.";
+        $penalty > 0 ? $penaltyNote = "&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp ( )"."<font color=\"red\">*</font>"." : ".$penalty."% late penalty." : 
+            $penaltyNote = "";
+        echo $penaltyNote;
       } else {
         echo __('Not Released', true);
       } ?></td>

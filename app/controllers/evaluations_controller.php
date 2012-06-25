@@ -1054,8 +1054,9 @@ class EvaluationsController extends AppController
         $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($event['Event']['id'], $event['group_id']);
         $currentDate = strtotime('NOW');
         //Check if event is in range of result release date
-        if ($currentDate>=strtotime($event['Event']['release_date_begin'])&&$currentDate<strtotime($event['Event']['release_date_end'])) {
+        if ($currentDate>=strtotime($event['Event']['result_release_date_begin'])&&$currentDate<strtotime($event['Event']['result_release_date_end'])) {
             $userId = $this->Auth->user('id');
+
             switch ($event['Event']['event_template_type_id'])
             {
             case 1: //View Simple Evaluation Result

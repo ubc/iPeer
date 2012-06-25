@@ -2,8 +2,8 @@
   <tr>
     <td>
 	<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
-	  <?php
-    $params = array('controller'=>'evaluations', 'event'=>$event, 'ratingPenalty' => $studentResult['avePenalty'], 'gradeReleaseStatus'=>$studentResult['gradeReleaseStatus'], 'aveScore'=>isset($studentResult['aveScore'])? $studentResult['aveScore']: 0, 'groupAve'=>isset($studentResult['groupAve'])? $studentResult['groupAve']: 0);
+	  <?php 
+    $params = array('controller'=>'evaluations', 'event'=>$event, 'penalty' => $studentResult['penalty'], 'ratingPenalty' => $studentResult['avePenalty'], 'gradeReleaseStatus'=>$studentResult['gradeReleaseStatus'], 'aveScore'=>isset($studentResult['aveScore'])? $studentResult['aveScore']: 0, 'groupAve'=>isset($studentResult['groupAve'])? $studentResult['groupAve']: 0);
     echo $this->element('evaluations/student_view_event_info', $params);
     ?>
 
@@ -12,7 +12,7 @@
           <td width="10" height="32" align="center"><?php __('Comment&nbsp;(Randomly Ordered)')?></td>
         </tr>
 				<?php $i = 0;
-				if (isset($studentResult['comments']) && $studentResult['commentReleaseStatus']) {
+				if (isset($studentResult['comments'])) {
 				foreach($studentResult['comments'] as $row): $evalMarkSimple = $row['EvaluationSimple']; ?>
     				<?php
           		  if (!empty($evalMarkSimple['eval_comment'])) {
