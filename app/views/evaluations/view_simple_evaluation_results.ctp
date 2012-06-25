@@ -27,19 +27,19 @@
 </table>
 <?php } ?>
 
-<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
-  <?php echo '<font size = "1" face = "arial" color = "red" > &nbsp &nbsp *Numerics in red denotes late submission penalty.</font>';?>
+<table width="100%" border="0" align="center" cellpadding="4">
   <tr class="tableheader">
     <td width="10" height="32" align="center" colspan="<?php echo count($groupMembers) +1; ?>"><?php __('Evaluation Results')?>:</td>
   </tr>
   <tr class="tablecell2">
-  	<td rowspan="2"><?php __('Evaluator')?></td>
+  	<td width="25%" rowspan="2"><?php __('Evaluator')?></td>
   	<td colspan="<?php echo count($groupMembers); ?>"><?php __('Members Evaluated')?></td>
   </tr>
   <tr class="tablecell2">
   <?php if ($groupMembers) {
+        $width = 75 / count($groupMembers);
         	foreach ($groupMembers as $member) {
-        		echo '<td>' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td>' . "\n";
+        		echo '<td width="'.$width.'">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td>' . "\n";
         	}  ?>
   </tr>
   <?php
@@ -63,7 +63,7 @@
     		  echo '</tr>';
     	  }   ?>
   <tr class="tablesummary">
-    	<td><?php __('Total Received');?></td>
+    	<td><?php __('Total');?></td>
       <?php
       $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;
        foreach ($groupMembers as $member_col) {
@@ -76,12 +76,49 @@
           	   								 				"<font color=\"red\">".'*'."</font>".' = '.$finalGrade :
           					  							 $stringAddOn = '';
 
-          echo '<td>'.$totalGrade.$stringAddOn.'</td>'."\n\t\t";
+          echo '<td height="40">'.$totalGrade.'</td>'."\n\t\t";
 
         } else {
-         echo '<td> - </td>';
+         echo '<td height="40"> - </td>';
         }
       }?>
+  </tr>
+  <tr class="tablesummary">
+    <td><?php __('Penalty'); ?> </td>
+      <?php
+      $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;
+       foreach ($groupMembers as $member_col) {
+        if (isset($memberScoreSummary[$member_col['User']['id']])) {
+          $totalGrade = number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'],2);
+          $gradePenalty = number_format(($penalties[$member_col['User']['id']] / 100) * $totalGrade, 2);
+
+          (!empty($gradePenalty) && $gradePenalty > 0) ? $stringAddOn = "<font color=\"red\">".$gradePenalty." </font>".
+                                                            "(".$penalties[$member_col['User']['id']]."%)":
+          					  							 $stringAddOn = '-';
+
+          echo '<td height="40">'.$stringAddOn.'</td>'."\n\t\t";
+
+        } else {
+         echo '<td height="40"> - </td>';
+        }
+      }?>
+  </tr>
+  <tr class="tablesummary">
+    <td><?php __('Final Mark'); ?></td>
+    <?php
+      $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;
+       foreach ($groupMembers as $member_col) {
+        if (isset($memberScoreSummary[$member_col['User']['id']])) {
+          $totalGrade = number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'],2);
+          $gradePenalty = ($penalties[$member_col['User']['id']] / 100) * $totalGrade;
+          $finalGrade = number_format($totalGrade - $gradePenalty, 2);
+
+          echo '<td height="40">'.$finalGrade.'</td>'."\n\t\t";
+
+        } else {
+         echo '<td height="40"> - </td>';
+        }
+    }?>
   </tr>
   <tr class="tablesummary">
     	<td><?php __('# of Evaluator(s)')?></td>
@@ -90,12 +127,12 @@
        foreach ($groupMembers as $member_col) {
         if (isset($memberScoreSummary[$member_col['User']['id']])) {
           if (!empty($incompletedMembersArr) && in_array($member_col['User']['first_name'].' '.$member_col['User']['last_name'], $incompletedMembersArr))
-            echo '<td>'.($memberEvaluatedCount-(count($inCompletedMembers))+1).'</td>' . "\n\t\t";
+            echo '<td height="40">'.($memberEvaluatedCount-(count($inCompletedMembers))+1).'</td>' . "\n\t\t";
           else
-            echo '<td>'.($memberEvaluatedCount-(count($inCompletedMembers))).'</td>' . "\n\t\t";
+            echo '<td height="40">'.($memberEvaluatedCount-(count($inCompletedMembers))).'</td>' . "\n\t\t";
 
         } else {
-         echo '<td> - </td>';
+         echo '<td height="40"> - </td>';
         }
        }?>
   </tr>
@@ -110,26 +147,26 @@
               if (isset($memberScoreSummary[$member_col['User']['id']]) && $memberEvaluatedCount > count($inCompletedMembers)) {
                   if ($event['Event']['self_eval']) {
                       // with self_eval on, calculation is simple
-                      echo '<td>'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'] / ($memberEvaluatedCount-count($inCompletedMembers)), 2).'</td>' . "\n\t\t";
+                      echo '<td height="40">'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'] / ($memberEvaluatedCount-count($inCompletedMembers)), 2).'</td>' . "\n\t\t";
                   } else {
                       // with self_eval off, we need to handle the case that
                       // the member hasn't completed the survey
                       if (!empty($incompletedMembersArr) && in_array($member_col['User']['first_name'].' '.$member_col['User']['last_name'], $incompletedMembersArr)) {
                           if ($memberEvaluatedCount > count($inCompletedMembers)) {
-                              echo '<td>'.number_format($finalGrade / ($memberEvaluatedCount-(count($inCompletedMembers))+1), 2).'</td>' . "\n\t\t";
+                              echo '<td height="40">'.number_format($finalGrade / ($memberEvaluatedCount-(count($inCompletedMembers))+1), 2).'</td>' . "\n\t\t";
                           } else {
-                              echo '<td>'.number_format($finalGrade) . "\n\t\t";
+                              echo '<td height="40">'.number_format($finalGrade) . "\n\t\t";
                           }
                       } else {
                           if ($memberEvaluatedCount > count($inCompletedMembers)) {
-                              echo '<td>'.number_format($finalGrade / ($memberEvaluatedCount-count($inCompletedMembers)), 2).'</td>' . "\n\t\t";
+                              echo '<td height="40">'.number_format($finalGrade / ($memberEvaluatedCount-count($inCompletedMembers)), 2).'</td>' . "\n\t\t";
                           } else {
-                              echo '<td>'.number_format($finalGrade) . "\n\t\t";
+                              echo '<td height="40">'.number_format($finalGrade) . "\n\t\t";
                           }
                       }
                   }
               } else {
-                  echo '<td> - </td>';
+                  echo '<td height="40"> - </td>';
               }
           }?>
     </tr>
@@ -144,7 +181,7 @@ for ($m=0; $m<count($groupMembers); $m++) {
 #          $gradeRelease = $gradeReleaseStatus[$n++]['EvaluationSimple'];
   if(array_key_exists($groupMembers[$m]['User']['id'], $gradeReleaseStatus)){
     $gradeRelease = $gradeReleaseStatus[$groupMembers[$m]['User']['id']];
-           echo '<td>';
+           echo '<td height="40">';
            if (isset($gradeRelease['grade_release']) && $gradeRelease['grade_release']) {?>
             <input type="button" name="Unrelease" value="Unrelease" onclick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$groupMembers[$m]['User']['id'].';'.$event['group_event_id'].';0'; ?>'">
            <?php } else { ?>
@@ -152,7 +189,7 @@ for ($m=0; $m<count($groupMembers); $m++) {
            <?php }
            echo '</td>' . "\n\t\t";
         } else
-          echo '<td><input type="button" value="'.__('marks n/a', true).'" disabled /></td>';
+          echo '<td height="40"><input type="button" value="'.__('marks n/a', true).'" disabled /></td>';
   		 }?>
  </tr>
 <?php  }
@@ -184,7 +221,7 @@ else { // if no members are present
 </table>
 <form name="evalForm2" id="evalForm2" method="POST" action="<?php echo $html->url('markCommentRelease') ?>">
 
-<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+<table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr class="tableheader">
     <td width="10" height="32" align="center"><?php __('Comment Sections')?></td>
   </tr>
