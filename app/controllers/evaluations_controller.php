@@ -1082,6 +1082,11 @@ class EvaluationsController extends AppController
                 $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
                 $this->set('evalResult', $formattedResult['evalResult']);
                 $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
+                $this->set('penalty', $formattedResult['penalty']);
+
+                $ratingPenalty = $formattedResult['memberScoreSummary'][$userId]['received_ave_score'] * ($formattedResult['penalty'] / 100);
+                $this->set('ratingPenalty', $ratingPenalty);
+                
                 $this->render('student_view_rubric_evaluation_results');
                 break;
 

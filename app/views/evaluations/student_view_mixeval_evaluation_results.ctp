@@ -17,7 +17,7 @@
   	  $releaseStatus = array();
   	}
     $params = array('controller'=>'evaluations', 'event'=>$event, 'gradeReleaseStatus'=>$releaseStatus, 'ratingPenalty' => number_format($avePenalty, 2), 
-        'penalty' => $penalty, 'aveScore'=>$memberScoreSummary[$currentUser['id']]['received_total_score'], 'groupAve'=>null);
+        'penalty' => $penalty, 'aveScore'=>isset($memberScoreSummary[$currentUser['id']]['received_total_score']) ? number_format($memberScoreSummary[$currentUser['id']]['received_total_score'], 2) : 0, 'groupAve'=>null);
     echo $this->element('evaluations/student_view_event_info', $params);
     ?>
 <div id='mixeval_result'>

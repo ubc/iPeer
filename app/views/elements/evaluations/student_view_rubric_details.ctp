@@ -1,10 +1,10 @@
 <?php 
-$gradeReleased = isset($currentUser['id'])? $scoreRecords['group_criteria_ave']: 1;
+$gradeReleased = isset($scoreRecords[$currentUser['id']])? $scoreRecords[$currentUser['id']]['grade_released']: 1;
 $commentReleased = isset($scoreRecords[$currentUser['id']])? $scoreRecords[$currentUser['id']]['comment_released']: 1;
 $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
 
 ?>
-<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+<table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr class="tableheader" align="center">
     <td width="100" valign="top"><?php __('Person Being Evaluated')?></td>
     <?php

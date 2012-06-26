@@ -15,7 +15,8 @@
   	} else {
   	  $receviedAvePercent = 0;
   	}
-    $params = array('controller'=>'evaluations', 'event'=>$event, 'gradeReleaseStatus'=>isset($scoreRecords[$currentUser['id']]['grade_released'])?$scoreRecords[$currentUser['id']]['grade_released'] : array(), 'aveScore'=>number_format($receviedAvePercent).'%', 'groupAve'=>null);
+    $params = array('controller'=>'evaluations', 'event'=>$event, 'ratingPenalty' => $ratingPenalty, 'gradeReleaseStatus'=>isset($scoreRecords[$currentUser['id']]['grade_released'])?$scoreRecords[$currentUser['id']]['grade_released'] : array(), 
+        'aveScore'=>isset($memberScoreSummary[$currentUser['id']]['received_ave_score']) ? number_format($memberScoreSummary[$currentUser['id']]['received_ave_score'], 2) : 0, 'groupAve'=>null);
     echo $this->element('evaluations/student_view_event_info', $params);
     ?>
 <div id='rubric_result'>
@@ -46,7 +47,7 @@ if (isset($scoreRecords[$currentUser['id']])) {
 			                  ?>
 			        <br><br-->
 
-<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+<table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr>
 		<td>
 <div id="accordion">
