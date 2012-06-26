@@ -16,7 +16,8 @@
   	  $receviedAvePercent = 0;
   	  $releaseStatus = array();
   	}
-    $params = array('controller'=>'evaluations', 'event'=>$event, 'gradeReleaseStatus'=>$releaseStatus, 'aveScore'=>number_format($receviedAvePercent).'%', 'groupAve'=>null);
+    $params = array('controller'=>'evaluations', 'event'=>$event, 'gradeReleaseStatus'=>$releaseStatus, 'ratingPenalty' => number_format($avePenalty, 2), 
+        'penalty' => $penalty, 'aveScore'=>$memberScoreSummary[$currentUser['id']]['received_total_score'], 'groupAve'=>null);
     echo $this->element('evaluations/student_view_event_info', $params);
     ?>
 <div id='mixeval_result'>
@@ -50,7 +51,7 @@ $commentReleased = !empty($scoreRecords[$currentUser['id']]['comment_released'])
 			                  ?>
 			        <br><br-->
 
-<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+<table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr>
 		<td>
 <div id="accordion">

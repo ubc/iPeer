@@ -1528,6 +1528,8 @@ class EvaluationComponent extends Object
         $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
         $this->MixevalsQuestion = ClassRegistry::init('MixevalsQuestion');
         $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
+        $this->Event = ClassRegistry::init('Event');
+        $this->Penalty = ClassRegistry::init('Penalty');
 
         $evalResult = array();
         $groupMembers = array();
@@ -1537,6 +1539,7 @@ class EvaluationComponent extends Object
 
         $mixeval = $this->Mixeval->read();
         $result['mixeval'] = $mixeval;
+        $eventId = $event['Event']['id'];
 
         $currentUser = $this->User->getCurrentLoggedInUser();
 
@@ -1565,7 +1568,42 @@ class EvaluationComponent extends Object
             $mixevalResultDetail = $this->getMixevalResultDetail($event, $groupMembers);
             $result['groupMembers'] = $groupMembers;
         }
-
+        $event_info = $this->Event->find(
+            'first',
+            array(
+                'conditions' => array('Event.id' => $eventId),
+            )
+        );
+        
+        // storing the timestamp of the due date/end date of the event
+        $event_due = strtotime($event_info['Event']['due_date']);
+        $event_end = strtotime($event_info['Event']['release_date_end']);
+        // assign penalty to user if they submitted late or never submitted by release_date_end
+        $scorePenalty = null;
+        $event_sub = $this->Event->find(
+            'first',
+            array(
+                'conditions' => array('Event.id' => $eventId),
+                'contain' => array('EvaluationSubmission' => array(
+                    'conditions' => array('EvaluationSubmission.submitter_id' => $this->Auth->user('id'))
+            )))
+        );
+        // no submission - if now is after release date end then - gets final deduction
+        if (empty($event_sub['EvaluationSubmission'])) {
+            if (time() > $event_end) {
+                $scorePenalty = $this->Penalty->getPenaltyFinal($eventId);
+            }
+        // there is submission - may be on time or late
+        } else {
+            $late_diff = strtotime($event_sub['EvaluationSubmission'][0]['date_submitted']) - $event_due;
+            // late
+            if (0 < $late_diff) {
+                $days_late = $late_diff/(24*60*60);
+                $scorePenalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId, $days_late);
+            }
+        }
+        $result['penalty'] = $scorePenalty['Penalty']['percent_penalty'];
+        
         //Get Detail information on Mixeval score
         if ($displayFormat == 'Detail') {
             //echo 'ss';

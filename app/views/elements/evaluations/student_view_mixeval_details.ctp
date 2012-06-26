@@ -8,7 +8,7 @@
     $pos = 1;
 ?>
 <br/><br/>
-<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+<table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr class="tableheader" align="center">
     <td width="100" valign="top" colspan="<?php echo ($mixeval['Mixeval']["lickert_question_max"]+1)?>"><?php __('Section One')?>:</td>
   </tr>
@@ -16,9 +16,9 @@
     <td width="100" valign="top"><?php __('Person Being Evaluated')?></td>
     <?php
       for ($i=1; $i<=$mixeval['Mixeval']["lickert_question_max"]; $i++) {
-        if (isset($mixevalQuestion[$i-1])) {
+        if (isset($mixevalQuestion[$i])) {
       		echo "<td><strong><font color=" . $color[ $i % sizeof($color) ] . ">" . ($i) . ". "  . "</font></strong>";
-      		echo $mixevalQuestion[$i-1]['title'];
+      		echo $mixevalQuestion[$i]['title'];
       		echo "</td>";
       		$pos++;
       	}
@@ -81,6 +81,7 @@ else if ($gradeReleased || $commentReleased) {
         		echo $html->image('evaluations/circle_empty.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle_empty'));
         	}
         	echo "<br />";
+        	echo "<strong>Grade: </strong>".number_format($lom, 2)." / ".number_format($mixeval["Question"][$i-1]["multiplier"], 2)."<br>";
         } else {
         	echo "n/a<br />";
         }
@@ -95,7 +96,7 @@ else if ($gradeReleased || $commentReleased) {
  ?>
 </table>
 <br/><br/>
-<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+<table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr class="tableheader" align="center">
     <td width="100" valign="top" colspan="<?php echo ($mixeval['Mixeval']["prefill_question_max"]+1)?>"><?php __('Section Two')?>:</td>
   </tr>
@@ -147,7 +148,7 @@ if (!$gradeReleased && !$commentReleased) {
           echo "<td valign=\"middle\">";
 
           //Comments
-          echo "<br/><strong>".__('Comment').": </strong>";
+          echo "<br/><strong>".__('Comment', true).": </strong>";
           if ($commentReleased && isset($mixevalDet)) {
           	echo $mixevalDet["question_comment"];
           } else {

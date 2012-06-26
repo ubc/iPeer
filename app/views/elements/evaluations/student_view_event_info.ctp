@@ -1,4 +1,4 @@
-<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+<table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
 
   <tr class="tableheader">
     <td colspan="4" align="center"><?php __('Evaluation Result Detail')?></td>
@@ -25,7 +25,7 @@
     <td><?php __('Description')?>:&nbsp;</td>
     <td colspan="3"><?php echo $event['Event']['description'] ?></td>
   </tr>
- <?php if (isset($groupAve)) {?>
+ <?php if (isset($aveScore)) {?>
   <tr class="tablecell2">
     <td><?php __('Rating')?>: &nbsp;</td>
     <td colspan="3"><?php
@@ -42,7 +42,8 @@
         echo __('Not Released', true);
       } ?></td>
   </tr>
-
+<?php } 
+if (isset($groupAve)) { ?>
   <tr class="tablecell2">
     <td><?php __('Group Average')?>:&nbsp;</td>
     <td colspan="3"><?php

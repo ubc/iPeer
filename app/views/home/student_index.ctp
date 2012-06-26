@@ -98,14 +98,14 @@
 			<td>
 			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 1): 
                             if ($isResultReleased):?>
-			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/studentViewEvaluationResult/<?php echo $eventSubmitted['Event']['id']?>;<?php echo $eventSubmitted['Event']['group_id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
+			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/studentViewEvaluationResult/<?php echo $eventSubmitted['Event']['id']?>;<?php echo $eventSubmitted['Event']['group_id']?>"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
 			  <?php
                             else:
                               echo $eventSubmitted['Event']['title'];
                           endif;endif;?>
 			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 2):
                             if ($isResultReleased):?>
-			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/studentViewEvaluationResult/<?php echo $eventSubmitted['Event']['id']?>;<?php echo $eventSubmitted['Event']['group_id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
+			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/studentViewEvaluationResult/<?php echo $eventSubmitted['Event']['id']?>;<?php echo $eventSubmitted['Event']['group_id']?>"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
 			  <?php
                             else:
                               echo $eventSubmitted['Event']['title'];
@@ -119,7 +119,7 @@
                           endif; endif;?>
 			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 4):
                             if ($isResultReleased):?>
-			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/studentViewEvaluationResult/<?php echo $eventSubmitted['Event']['id']?>;<?php echo $eventSubmitted['Event']['group_id']?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
+			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/studentViewEvaluationResult/<?php echo $eventSubmitted['Event']['id']?>;<?php echo $eventSubmitted['Event']['group_id']?>"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
 			  <?php
                             else:
                               echo $eventSubmitted['Event']['title'];

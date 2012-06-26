@@ -1032,7 +1032,6 @@ class EvaluationsController extends AppController
     function studentViewEvaluationResult($param=null)
     {
         $this->autoRender = false;
-        $this->layout = 'pop_up';
         $tok = strtok($param, ';');
         $eventId = $tok;
         $groupId = strtok(';');
@@ -1112,6 +1111,10 @@ class EvaluationsController extends AppController
                 $this->set('scoreRecords', $formattedResult['scoreRecords']);
                 $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
                 $this->set('evalResult', $formattedResult['evalResult']);
+                $this->set('penalty', $formattedResult['penalty']);
+                
+                $avePenalty = $formattedResult['memberScoreSummary'][$userId]['received_total_score'] * ($formattedResult['penalty'] / 100);
+                $this->set('avePenalty', $avePenalty);
 
                 $this->render('student_view_mixeval_evaluation_results');
                 break;

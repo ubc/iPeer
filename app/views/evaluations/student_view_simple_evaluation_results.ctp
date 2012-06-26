@@ -7,7 +7,7 @@
     echo $this->element('evaluations/student_view_event_info', $params);
     ?>
 
- 			<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+ 			<table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
         <tr class="tableheader">
           <td width="10" height="32" align="center"><?php __('Comment&nbsp;(Randomly Ordered)')?></td>
         </tr>
