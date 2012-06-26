@@ -61,10 +61,12 @@ else if ($gradeReleased || $commentReleased) {
         $mixevalDet = $memberMixeval['details'][$i-1]['EvaluationMixevalDetail'];
         echo "<td valign=\"middle\">";
         //Point Description Detail
-        if (isset($mixevalQuestion[$i-1]['Description'][$mixevalDet['selected_lom']-1]['descriptor'])) {
-          echo $mixevalQuestion[$i-1]['Description'][$mixevalDet['selected_lom']-1]['descriptor'];
-        }
+        if ($gradeReleased && isset($mixevalDet)) {
+            if (isset($mixevalQuestion[$i-1]['Description'][$mixevalDet['selected_lom']-1]['descriptor'])) {
+                echo $mixevalQuestion[$i-1]['Description'][$mixevalDet['selected_lom']-1]['descriptor'];
+            }
         echo "<br />";
+        }
         
         //Points Detail
         echo "<strong>Points: </strong>";
@@ -81,7 +83,14 @@ else if ($gradeReleased || $commentReleased) {
         		echo $html->image('evaluations/circle_empty.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle_empty'));
         	}
         	echo "<br />";
-        	echo "<strong>Grade: </strong>".number_format($lom, 2)." / ".number_format($mixeval["Question"][$i-1]["multiplier"], 2)."<br>";
+        } else {
+        	echo "n/a<br />";
+        }
+
+        //Grades Detail
+        echo "<strong>Grades: </strong>";
+        if ($gradeReleased && isset($mixevalDet)) {
+            echo number_format($lom, 2)." / ".number_format($mixeval["Question"][$i-1]["multiplier"], 2)."<br>";
         } else {
         	echo "n/a<br />";
         }
