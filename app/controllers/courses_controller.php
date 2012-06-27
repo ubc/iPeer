@@ -164,6 +164,11 @@ class CoursesController extends AppController
             $this->Session->setFlash('You do not have permission to view courses.');
             $this->redirect('/home');
         }
+        $course = $this->Course->find('first', array('conditions' => array('id' => $id), 'recursive' => 1));
+        if (empty($course)) {
+            $this->Session->setFlash(__('Error: That course does not exist.', true));
+            $this->redirect('index');
+        }
 
         $this->set('data', $this->Course->read(null, $id));
     }
@@ -184,6 +189,10 @@ class CoursesController extends AppController
         }
 
         $course = $this->Course->find('first', array('conditions' => array('id' => $id), 'recursive' => 1));
+        if (empty($course)) {
+            $this->Session->setFlash(__('Error: That course does not exist.', true));
+            $this->redirect('index');
+        }
         $this->set('data', $course);
         $this->set('course_id', $id);
         $this->set('export_eval_link', 'courses/export/'.$id);
@@ -288,11 +297,12 @@ class CoursesController extends AppController
     public function edit($id)
     {
         if (!User::hasPermission('controllers/courses/edit')) {
-            $this->Session->setFlash('You do not have permission to edit courses.');
+            $this->Session->setFlash(__('You do not have permission to edit courses.',true));
             $this->redirect('/home');
         }
-        if (!is_numeric($id)) {
-            $this->Session->setFlash(__('Invalid course ID.', true));
+        $course = $this->Course->find('first', array('conditions' => array('id' => $id), 'recursive' => 1));
+        if (empty($course)) {
+            $this->Session->setFlash(__('Error: That course does not exist.', true));
             $this->redirect('index');
         }
         $this->set('title_for_layout', 'Edit Course');
@@ -301,10 +311,10 @@ class CoursesController extends AppController
         if (!empty($this->data)) {
             $success = $this->Course->save($this->data);
             if ($success) {
-                $this->Session->setFlash('The course was updated successfully.', 'good');
+                $this->Session->setFlash(__('The course was updated successfully.', true), 'good');
                 $this->redirect('index');
             } else if (!$success) {
-                $this->Session->setFlash('Cannot edit the course. Check errors below');
+                $this->Session->setFlash(__('Error: Course edits could not be saved', true));
             }
         }
         if (empty($this->data)) {

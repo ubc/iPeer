@@ -277,7 +277,9 @@ class GroupsController extends AppController
                 $this->redirect('index/'.$course_id);
             }
         }
-        $user_data = $this->User->getEnrolledStudentsForList($course_id);
+        $user_data1 = $this->User->getEnrolledStudentsForList($course_id);
+        $user_data2 = $this->User->getCourseTutorsForList($course_id);
+        $user_data = Set::pushDiff($user_data1,$user_data2);
 
         //Check if student is already assigned in a group
         $groups = $this->Group->getGroupsByCourseId($course_id);
@@ -286,14 +288,13 @@ class GroupsController extends AppController
             $user_data[$assigned_user] = $user_data[$assigned_user].'*';
         }
 
-        $this->set('title_for_layout', $this->sysContainer->getCourseName($course_id).__(' > Groups', true));
+        $this->set('title_for_layout', $this->sysContainer->getCourseName($course_id).__(' > Groups > Add', true));
         $this->data['Group']['course_id'] = $course_id;
         // gets all the students in db for the unfiltered students list
         $this->set('user_data', $user_data);
         $this->set('group_data', array());
         $this->set('course_id', $course_id);
         $this->set('group_num', $this->Group->getCourseGroupCount($course_id)+1);
-        $this->render('edit');
     }
 
 
@@ -311,10 +312,6 @@ class GroupsController extends AppController
             $this->Session->setFlash('You do not have permission to edit groups.');
             $this->redirect('index');
         }
-        if (!is_numeric($group_id) || !($this->data = $this->Group->findGroupByid($group_id))) {
-            $this->Session->setFlash(__('Group does not exist.', true));
-            $this->redirect('index');
-        }
         
         if (!empty($this->data)) {
             //$this->data['Group']['id'] = $group_id;
@@ -323,19 +320,17 @@ class GroupsController extends AppController
                 $this->Session->setFlash(__('The group was updated successfully.', true), 'good');
             } else {
                 // Error occurs:
-                $this->Session->setFlash(__('Error saving that group.', true));
+                $this->Session->setFlash(__('Error updating that group.', true));
             }
             $this->redirect('index/'.$this->data['Group']['course_id']);
         }
+        
+        if (!($this->data = $this->Group->findGroupByid($group_id))) {
+            $this->Session->setFlash(__('Group does not exist.', true));
+            $this->redirect('index'.$this->Session->read('ipeerSession.courseId'));
+        }
 
-        $group = $this->Group->find('first', array('conditions' => array('Group.id' => $group_id)));
-
-        if (!($this->data = $group)) {
-            $this->Session->setFlash(__('Group Not Found.', true));
-            $this->redirect('index/'.$this->Session->read('ipeerSession.courseId'));
-        };
-
-        $this->set('title_for_layout', $this->sysContainer->getCourseName($this->data['Group']['course_id']).__(' > Groups', true));
+        $this->set('title_for_layout', $this->sysContainer->getCourseName($this->data['Group']['course_id']).__(' > Groups > Edit', true));
 
         // gets all students not listed in the group for unfiltered box
         $this->set('user_data', $this->Group->getStudentsNotInGroup($group_id, 'list'));

@@ -187,56 +187,67 @@ class Group extends AppModel
     }
 
     /**
-     * Get students not in a group
+     * Get students and tutors not in a group
      *
      * @param int    $group_id group id
      * @param string $type     type of user
      *
-     * @return array students not in the group
+     * @return array students and tutors not in the group
      */
     function getStudentsNotInGroup($group_id, $type = 'list')
     {
-        $students = $this->getMembersByGroupId($group_id, 'all');
-        $students = Set::extract('/Member/id', $students);
-        $studentsInGroups = array();
+        // $people includes id of both students and tutors/TAs in group
+        $people = $this->getMembersByGroupId($group_id, 'all');
+        $people = Set::extract('/Member/id', $people);
+        $peopleInGroups = array();
         
         $course = $this->Course->getCourseByGroupId($group_id);
         if (empty($course)) {
             return array();
         }
 
-        $studentsListinGroups = $this->Member->find($type, array(
+        $peopleListinGroups = $this->Member->find($type, array(
             'conditions' => array(
-                'NOT' => array('Member.id' => $students),
-                'Enrolment.id' => $course['Course']['id'],
-                'Group.course_id' => $course['Course']['id'],
+                'NOT' => array('Member.id' => $people),
+                'Group.course_id' => $course['Course']['id']
             ),
             'recursive' => 1,
             'fields' => array('Member.student_no_with_full_name'),
-            'contain' => array('Enrolment', 'Group'),
+            'contain' => array('Group'),
+            'order' => 'Member.student_no'
         ));
 
-        foreach ($studentsListinGroups as $key => $student) {
-            $studentsListinGroups[$key] = $student.'*';
-            $studentsInGroups[] = $key;
+        foreach ($peopleListinGroups as $key => $student) {
+            $peopleListinGroups[$key] = $student.' *';
+            $peopleInGroups[] = $key;
         }
 
-        $excludedStudents = array_merge($students, $studentsInGroups);
+        $excludedPeople = array_merge($people, $peopleInGroups);
 
         $studentsListNotinGroups = $this->Member->find($type, array(
             'conditions' => array(
-                'NOT' => array('Member.id' => $excludedStudents),
+                'NOT' => array('Member.id' => $excludedPeople),
                 'Enrolment.id' => $course['Course']['id'],
             ),
             'recursive' => 1,
             'fields' => array('Member.student_no_with_full_name'),
-            'contain' => array('Enrolment', 'Group')
+            'order' => 'Member.student_no'
         ));
 
-        $studentsList = array_merge($studentsListinGroups, $studentsListNotinGroups);
-        
-        $sorted_list = Set::sort($studentsList, '{n}.Member.student_no', 'asc');
-        
+        $tutorsListNotinGroups = $this->Member->find($type, array(
+            'conditions' => array(
+                'NOT' => array('Member.id' => $excludedPeople),
+                'Course.id' => $course['Course']['id'],
+                'Role.id' => 4
+            ),
+            'recursive' => 1,
+            'fields' => array('Member.full_name'),
+            'order' => 'Member.last_name'
+        ));
+
+        $peopleList = Set::pushDiff($studentsListNotinGroups, $peopleListinGroups);
+        $sorted_list = Set::pushDiff($tutorsListNotinGroups, $peopleList);
+
         return $sorted_list;
     }
 
@@ -253,6 +264,7 @@ class Group extends AppModel
         $students = $this->Member->find($type, array(
             'conditions' => array('Group.id' => $group_id),
             'recursive' => 1,
+            'fields' => array('Member.student_no_with_full_name'),
             'contain' => 'Group')
         );
         

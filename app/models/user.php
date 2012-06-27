@@ -155,7 +155,7 @@ class User extends AppModel
     
     public $virtualFields = array(
     	'full_name' => 'CONCAT_WS(" ", first_name, last_name)',
-    	'student_no_with_full_name' => 'CONCAT_WS("-", student_no,CONCAT_WS(" ", first_name, last_name))'
+    	'student_no_with_full_name' => 'CONCAT_WS(" ", student_no,CONCAT_WS(" ", first_name, last_name))'
     );
 
 
@@ -374,13 +374,42 @@ class User extends AppModel
     function getEnrolledStudentsForList($course_id)
     {
         $this->displayField = 'student_no_with_full_name';
-        return $this->find('list', array('conditions' => array('UserEnrol.course_id' => $course_id, 'User.role' => 'S'),
+        return $this->find('list', array(
+            'conditions' => array('UserEnrol.course_id' => $course_id),
             'joins' => array(array('table' => 'user_enrols',
-            'alias' => 'UserEnrol',
-            'type'  => 'LEFT',
-            'conditions' => array('User.id = UserEnrol.user_id'))
-        ),
-        'order' => 'User.student_no'));
+                'alias' => 'UserEnrol',
+                'type'  => 'LEFT',
+                'conditions' => array('User.id = UserEnrol.user_id'))
+            ),
+            'order' => 'User.student_no'));
+    }
+    
+    /**
+     * Get list of course tutors
+     *
+     * @param int $course_id course id
+     *
+     * @access public
+     * @return list of course tutors
+     * */
+    function getCourseTutorsForList($course_id)
+    {
+        $this->displayField = 'full_name';
+        $temp = $this->find('list', array(
+            'conditions' => array('UserCourse.course_id' => $course_id),
+            'joins' => array(array('table' => 'user_courses',
+                'alias' => 'UserCourse',
+                'type'  => 'LEFT',
+                'conditions' => array('User.id = UserCourse.user_id'))
+            ),
+            'order' => 'User.last_name'));
+        foreach ($temp as $id => $name) {
+            $role = $this->getRoleId($id);
+            if ($role != 4)
+                unset($temp[$id]);
+        }
+
+        return $temp;
     }
 
     /**

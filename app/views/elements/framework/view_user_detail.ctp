@@ -16,7 +16,7 @@
     <td id="first_name_label"><?php __('First Name')?>:</td>
     <td align="left" colspan="3"><?php echo $data['User']['first_name']; ?> </td>
   </tr>
-  <?php if ($data['User']['role'] == 'S'): ?>
+  <?php if ($data['Role']['0']['name'] == 'student'): ?>
   <tr class="tablecell2">
     <td id="student_no_label"><?php __('Student No.')?>:</td>
     <td align="left" colspan="3"><?php echo $data['User']['student_no']; ?> </td>

@@ -202,7 +202,7 @@ class EmailtemplatesController extends AppController
         $template = $this->EmailTemplate->find('first', array('conditions' => array('id' => $id)));
         
         $this->set('title_for_layout', __('Edit Email Template', true));
-        // check to see if $id is valid - numeric & is a email template
+        // check to see if $id is valid - is an email template
         if (empty($template)) {
             $this->Session->setFlash(__('Invalid ID.', true));
             $this->redirect('index');

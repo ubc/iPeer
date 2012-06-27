@@ -59,7 +59,8 @@
                       'allName' =>  __("Filtered Students", true), 'selectedName' => __('Students in Group', true)));
     ?>
     <?php endif;?>
-        * : <?php __('Student is already assigned in some group in this course')?>
+        <?php __('<font size=2>Note: Students already in one or more groups are marked<br>
+            &nbsp; &nbsp; &nbsp; &nbsp; with * and are listed under those without groups</font>')?>
     </td>
   </tr>
 

@@ -361,7 +361,7 @@ class UsersController extends AppController
         if ($id) {
             // This needs a custom query:
             //   The getSimpleEntrollmentLists() can be called twice in one page rendering.
-            //    There's a problem with Cake PHP caching resutls (I could not turn this off)
+            //    There's a problem with Cake PHP caching results (I could not turn this off)
             //      $enrolled_courses = $this->UserEnrol->query(
             //        "SELECT `course_id` from `user_enrols` WHERE user_id=$id",
             //         /* No cache!! (undoc.) */ false );
@@ -474,25 +474,19 @@ class UsersController extends AppController
      */
     function view($id)
     {
-        if (!is_numeric($id)) {
-            $this->Session->setFlash('Invalid user ID.');
-            $this->redirect('index');
-        }
-
         if (!User::hasPermission('functions/user')) {
-            $this->Session->setFlash(
-                'You do not have permission to view users.', true);
+            $this->Session->setFlash(__('You do not have permission to view users.', true));
             $this->redirect('/home');
         }
 
-        $role = $this->User->getRoleName($id);
-        if (!User::hasPermission('functions/user/'.$role)) {
-            $this->Session->setFlash('You do not have permission to view this user.', true);
+        if(!($this->data = $this->User->findUserByid($id))) {
+            $this->Session->setFlash(__('This user does not exist.', true));
             $this->redirect('index');
         }
-
-        if(!($this->data = $this->User->findUserByid($id))) {
-            $this->Session->setFlash('Invalid user ID.');
+        
+        $role = $this->User->getRoleName($id);
+        if (!User::hasPermission('functions/user/'.$role)) {
+            $this->Session->setFlash(__('You do not have permission to view this user.', true));
             $this->redirect('index');
         }
 
@@ -667,11 +661,12 @@ class UsersController extends AppController
             // Now we actually attempt to save the data
             if ($ret = $this->User->save($this->data)) {
                 // Success!
-                $message = "User sucessfully created!
-                    <br />Password: <b>$password</b> <br />";
+                $message = "User successfully created!
+                    <br>Password: <b>$password</b><br>";
                 $message .=
                     $this->_sendAddUserEmail($ret, $password, $enrolments);
                 $this->Session->setFlash($message, 'good');
+                $this->redirect('index');
             }
             else {
                 // Failed
@@ -695,23 +690,10 @@ class UsersController extends AppController
         $role = $this->User->getRoleName($userId);
 
         if(!User::hasPermission('functions/user')) {
-            $this->Session->setFlash(
-                'You do not have permission to edit users.', true);
+            $this->Session->setFlash(__('You do not have permission to edit users.', true));
             $this->redirect('/home');
         }
-
-        if(!User::hasPermission('functions/user/'.$role, 'update')) {
-            $this->Session->setFlash(
-                'You do not have permission to edit this user.', true);
-            $this->redirect('index');
-        }
-
-        // stop if don't have required params
-        if (!$userId && empty($this->data)) {
-            $this->Session->setFlash(__('Invalid user', true));
-            $this->redirect($this->referer());
-        }
-
+        
         // save the data which involves:
         if ($this->data) {
             // create the enrolment entry depending on if instructor or student
@@ -725,17 +707,26 @@ class UsersController extends AppController
             // Now we actually attempt to save the data
             if ($this->User->save($this->data)) {
                 // Success!
-                $message = "User sucessfully updated! <br />";
-                $this->Session->setFlash($message, 'good');
+                $this->Session->setFlash(__('User successfully updated!', true), 'good');
             }
             else {
                 // Failed
-                $this->Session->setFlash("Unable to update user.");
+                $this->Session->setFlash(__('Unable to update user.', true));
             }
             // set up the course and role variables to fill the form elements
             // only load this after save, or we won't get the correct values
             $this->_initEditFormEnv($userId);
             return;
+        }
+
+        if(!($this->data = $this->User->findUserByid($userId))) {
+            $this->Session->setFlash(__('This user does not exist.', true));
+            $this->redirect($this->referer());
+        }
+
+        if(!User::hasPermission('functions/user/'.$role, 'update')) {
+            $this->Session->setFlash(__('You do not have permission to edit this user.', true));
+            $this->redirect('index');
         }
 
         // set up the course and role variables to fill the form elements
