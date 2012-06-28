@@ -198,7 +198,7 @@ class ExportBaseNewComponent extends Object
                 array(
                     'conditions' => array('Event.id' => $eventId),
                     'contain' => array('EvaluationSubmission' => array(
-                        'conditions' => array('EvaluationSubmission.submitter_id' => $evaluator['id'])
+                        'conditions' => array('EvaluationSubmission.submitter_id' => $evaluateeId)
                 )))
             );
             // no submission - if now is after release date end then - gets final deduction
@@ -218,7 +218,7 @@ class ExportBaseNewComponent extends Object
             if (!empty($penalty)) {
                 array_push($row, $penalty['Penalty']['percent_penalty']."%");
             } else {
-                array_push($row, "0%");
+                array_push($row, "-");
             }
             $finalGrade = $simpleEvalResults[$index]['EvaluationSimple']['score'] * (1 - ($penalty['Penalty']['percent_penalty']/100));
             array_push($row, $finalGrade);
@@ -356,7 +356,7 @@ class ExportBaseNewComponent extends Object
                 array(
                     'conditions' => array('Event.id' => $eventId),
                     'contain' => array('EvaluationSubmission' => array(
-                        'conditions' => array('EvaluationSubmission.submitter_id' => $evaluator['id'])
+                        'conditions' => array('EvaluationSubmission.submitter_id' => $evaluateeId)
                 )))
             );
             // no submission - if now is after release date end then - gets final deduction
@@ -370,13 +370,13 @@ class ExportBaseNewComponent extends Object
                 //late
                 if (0 < $late_diff) {
                     $days_late = $late_diff/(24*60*60);
-                    $penalty - $this->Penalty->getPenaltyByEventAndDaysLate($eventId, $days_late);
+                    $penalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId, $days_late);
                 }
             }
             if (!empty($penalty)) {
                 array_push($row, $penalty['Penalty']['percent_penalty']."%");
             } else {
-                array_push($row, "0%");
+                array_push($row, "-");
             }
             $finalGrade = $mixEval['EvaluationMixeval']['score'] * (1 - ($penalty['Penalty']['percent_penalty']/100));
             array_push($row, $finalGrade);
@@ -512,7 +512,7 @@ class ExportBaseNewComponent extends Object
                 array(
                     'conditions' => array('Event.id' => $eventId),
                     'contain' => array('EvaluationSubmission' => array(
-                        'conditions' => array('EvaluationSubmission.submitter_id' => $evaluator['id'])
+                        'conditions' => array('EvaluationSubmission.submitter_id' => $evaluateeId)
                 )))
             );
             // no submission - if now is after release date end then - gets final deduction
@@ -533,10 +533,10 @@ class ExportBaseNewComponent extends Object
             if (!empty($penalty)) {
                 array_push($row, $penalty['Penalty']['percent_penalty']."%");
             } else {
-                array_push($row, "0%");
+                array_push($row, "-");
             }
             $finalGrade = $rubricsEvaluation['EvaluationRubric']['score'] * (1 - ($penalty['Penalty']['percent_penalty']/100));
-            array_push($row, $finalGrade);
+            array_push($row, number_format($finalGrade, 2));
             $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition + $yInc, $row);
             $yInc++;
         }

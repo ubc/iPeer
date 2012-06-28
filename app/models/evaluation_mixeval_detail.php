@@ -55,7 +55,7 @@ class EvaluationMixevalDetail extends AppModel
         //		return $this->find($sql);
         $conditions = array('evaluation_mixeval_id' => $MixevalId);
         if ($questionNum != null) {
-            $conditions['question_number'] = $questionNum;
+            $conditions['question_number'] = $questionNum-1;
         }
 
         $type=null;
@@ -64,6 +64,7 @@ class EvaluationMixevalDetail extends AppModel
         } else {
             $type = 'first';
         }
+        
         return $this->find($type, array(
             'conditions' => $conditions, 'order'=>'question_number'
         ));

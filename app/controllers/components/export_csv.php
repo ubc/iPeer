@@ -213,7 +213,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
             $subHeader = $this->createMixEvalCsvSubHeader($params, $eventId);
             $csv .= $subHeader."\n\n";
             foreach ($groupEvents as $ge) {
-                $resultTable = $this->buildMixedEvalScoreTableByGroupEvent($params, $ge['GroupEvent']['id']);
+                $resultTable = $this->buildMixedEvalScoreTableByGroupEvent($params, $ge['GroupEvent']['id'], $eventId);
                 $csv .= $resultTable;
             }
             break;
