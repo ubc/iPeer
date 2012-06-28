@@ -83,7 +83,7 @@ class GroupTestCase extends CakeTestCase
 
         // Test group with some students in it
         $students = $this->Group->getStudentsNotInGroup(4);
-        $this->assertEqual($students, array('123-TestName TestLastname*', 'sam peterson*'));
+        $this->assertEqual($students, array('2' => 'sam peterson *', '3' => '123 TestName TestLastname *'));
 
         // Test group with all students in it
         $students = $this->Group->getStudentsNotInGroup(2);
@@ -91,7 +91,7 @@ class GroupTestCase extends CakeTestCase
 
         // Test group with no students in it
         $students = $this->Group->getStudentsNotInGroup(3);
-        $this->assertEqual($students, array('100-name lastname*', '123-TestName TestLastname*', 'sam peterson*'));
+        $this->assertEqual($students, array('2' => 'sam peterson *', '4' => '100 name lastname *', '3' => '123 TestName TestLastname *'));
 
         // Test invalid group
         $students = $this->Group->getStudentsNotInGroup(999);
@@ -108,9 +108,9 @@ class GroupTestCase extends CakeTestCase
 
         // Test group with students in it
         $students = $this->Group->getMembersByGroupId(1);
-        $students = Set::extract('/Member/username', $students);
+        $students = Set::extract('/Member/student_no_with_full_name', $students);
         sort($students);
-        $this->assertEqual($students, array('StudentY', 'StudentZ'));
+        $this->assertEqual($students, array('100 name lastname', '123 TestName TestLastname'));
 
         // Test group with no students in it
         $students = $this->Group->getMembersByGroupId(3);
