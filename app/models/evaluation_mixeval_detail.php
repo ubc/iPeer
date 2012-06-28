@@ -55,11 +55,11 @@ class EvaluationMixevalDetail extends AppModel
         //		return $this->find($sql);
         $conditions = array('evaluation_mixeval_id' => $MixevalId);
         if ($questionNum != null) {
-            $conditions['question_number'] = $questionNum-1;
+            $conditions['question_number'] = $questionNum;
         }
 
         $type=null;
-        if (null == $questionNum) {
+        if (!is_numeric($questionNum)) {
             $type = 'all';
         } else {
             $type = 'first';

@@ -84,7 +84,6 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                 $colAlphabetIndex = $this->_convertToRowAlphabetIndex($row + $rowOffSet);
                 $this->sheet->getColumnDimension($colAlphabetIndex)->setColumnIndex($colAlphabetIndex)->setWidth(10);
                 $cell = $colAlphabetIndex.($col + $colOffSet);
-                //debug($grid[$row][$col].' row '.$row. ' col '.$col);
                 if (!empty($grid[$row][$col])) {
                     $this->sheet->setCellValue($cell, $grid[$row][$col]);
                 }
@@ -324,7 +323,6 @@ Class ExportExcelComponent extends ExportBaseNewComponent
 
         $grid[$xPosition + count($groupMembers) + 4][$yPosition + 1] = "Question Avg Mark";
         $rowNum = 7; $finalMark = 0;
-
         foreach ($questions as $q) {
             $totalScore = 0;
             $row = array();
@@ -333,12 +331,15 @@ Class ExportExcelComponent extends ExportBaseNewComponent
             array_push($ques, $q['MixevalsQuestion']['title'].' (/'.$q['MixevalsQuestion']['multiplier'].')'.',');
             foreach ($groupMembers as $evaluator) {
                 $evalResult = $this->EvaluationMixeval->getResultDetailByQuestion($grpEventId, $evaluatee['id'],
-                    $evaluator['id'], $q['MixevalsQuestion']['question_num']);
+                    $evaluator['id'], $q['MixevalsQuestion']['question_num']-1);
                 if (!empty($evalResult)) {
                     $submissionCount++;
+                    $result = $evalResult['EvaluationMixevalDetail']['grade'];
+                } else {
+                    $result = '';
                 }
-                array_push($row, $evalResult['EvaluationMixevalDetail']['grade']);
-                $totalScore += $evalResult['EvaluationMixevalDetail']['grade'];
+                array_push($row, $result);
+                $totalScore += $result;
             }
             array_push($row, ' ');
             // $sumbissionCount = $this->EvaluationSubmission->countSubmissions($grpEventId);

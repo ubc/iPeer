@@ -845,7 +845,7 @@ for ($inc=0; $inc<$count($groupMembers); $inc++) {
             array_push($row, $q['MixevalsQuestion']['title'].' (/'.$q['MixevalsQuestion']['multiplier'].')'.',');
             foreach ($groupMembers as $evaluator) {
                 $evalResult = $this->EvaluationMixeval->getResultDetailByQuestion($grpEventId, $evaluatee['id'],
-                    $evaluator['id'], $q['MixevalsQuestion']['question_num']);
+                    $evaluator['id'], $q['MixevalsQuestion']['question_num']-1);
                 array_push($row, $evalResult['EvaluationMixevalDetail']['grade']);
                 $totalScore += $evalResult['EvaluationMixevalDetail']['grade'];
             }
