@@ -96,8 +96,25 @@ class HomeController extends AppController
                 $courseId = $enrolledCourse['UserEnrol']['course_id'];
                 //$courseDetail = $this->Course->find('id='.$courseId);
                 //Get Events for this course that are due
-                //$events = $this->Event->find('all', array('conditions' => array('release_date_begin < NOW() AND NOW() <= release_date_end AND course_id='.$courseId)));
-                $events = $this->Event->find('all', array('conditions' => array('release_date_begin < NOW()', 'NOW() <= result_release_date_end', 'course_id' => $courseId)));
+                $evals = $this->Event->find(
+                    'all', 
+                    array(
+                        'conditions' => array(
+                            'release_date_begin < NOW()', 
+                            'NOW() <= result_release_date_end', 
+                            'course_id' => $courseId,
+                            'NOT' => array('event_template_type_id' => 3)
+                )));
+                $surveys = $this->Event->find(
+                    'all', 
+                    array(
+                        'conditions' => array(
+                            'release_date_begin < NOW()', 
+                            'NOW() <= release_date_end', 
+                            'course_id' => $courseId,
+                            'event_template_type_id' => 3
+                )));
+                $events = array_merge($evals, $surveys);
                 foreach ($events as $row) {
                     $event = $row['Event'];
                     switch ($event['event_template_type_id']) {
@@ -245,13 +262,13 @@ class HomeController extends AppController
                 $result['comingEvent']['Event'] = $event;
                 $result['comingEvent']['Event']['is_late'] = $isLate;
                 $result['comingEvent']['Event']['days_to_due'] = $dueIn;
-                //   $result['comingEvent']['Event']['group_id'] = $groupEvent['group_id'];
+                $result['comingEvent']['Event']['group_name'] = '-';
                 $result['comingEvent']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
             } else {
                 $result['eventSubmitted']['Event'] = $event;
                 $result['comingEvent']['Event']['is_late'] = $isLate;
                 $result['eventSubmitted']['Event']['date_submitted'] = $eventSubmit['EvaluationSubmission']['date_submitted'];
-                //   $result['eventSubmitted']['Event']['group_id'] = $groupEvent['group_id'];
+                $result['eventSubmitted']['Event']['group_name'] = '-';
                 $result['eventSubmitted']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
             }
         }

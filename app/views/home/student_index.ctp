@@ -21,6 +21,7 @@
 	  foreach($data as $row): isset($row['comingEvent'])? $comingUpEvent = $row['comingEvent']: $comingUpEvent = null;
 	 if(!empty($row['comingEvent']['Event']['release_date_end'])) { 
 	 	$releaseEndDate = strtotime( $row['comingEvent']['Event']['release_date_end']);}  
+	 	//debug(!isset($row['eventSubmitted']));
 	    if (isset($comingUpEvent['Event']['id']) && $currentDate<=$releaseEndDate && !isset($row['eventSubmitted'])) {?>
 		  <tr class="tablecell">
 			<td>
@@ -81,8 +82,7 @@
       <div style="background: #FFF;"> <br>
       <table width="99%"  border="0" align="center" cellpadding="4" cellspacing="2">
 		  <tr class="tableheader">
-			<td width="25%"><?php __('Event')?></td>
-            <td width="10%"><?php __('Result')?></td>
+			<td width="34%"><?php __('Event')?></td>
             <td width="15%"><?php __('Group')?></td>
 			<td width="10%"><?php __('Course')?></td>
 			<td width="20%"><?php __('Due Date')?></td>
@@ -92,7 +92,8 @@
 	  <?php
 	  foreach($data as $row): isset($row['eventSubmitted'])? $eventSubmitted = $row['eventSubmitted']: $eventSubmitted =null;
             //Display if event is submitted, before result release end date and not survey
-	    if (isset($eventSubmitted['Event']['id'])&&$currentDate<strtotime($eventSubmitted['Event']['result_release_date_end'])&&$eventSubmitted['Event']['event_template_type_id'] != 3) {
+	    if (isset($eventSubmitted['Event']['id'])&&(($currentDate<strtotime($eventSubmitted['Event']['result_release_date_end'])&&$eventSubmitted['Event']['event_template_type_id'] != 3)
+	        || ($currentDate<strtotime($eventSubmitted['Event']['release_date_end'])&&$eventSubmitted['Event']['event_template_type_id'] == 3))) {
               //Condition to check; if after result release begin date, display link to result view page: else just display event title.
               $isResultReleased = ($currentDate >= strtotime($eventSubmitted['Event']['result_release_date_begin']) &&
                 $currentDate < strtotime($eventSubmitted['Event']['result_release_date_end']))
@@ -114,12 +115,8 @@
                               echo $eventSubmitted['Event']['title'];
                           endif; endif;?>
 			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 3):
-                            if ($isResultReleased):?>
-			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/makeSurveyEvaluation/<?php echo $eventSubmitted['Event']['id']?>"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
-			  <?php
-                            else:
                               echo $eventSubmitted['Event']['title'];
-                          endif; endif;?>
+                        endif;?>
 			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 4):
                             if ($isResultReleased):?>
 			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/studentViewEvaluationResult/<?php echo $eventSubmitted['Event']['id']?>;<?php echo $eventSubmitted['Event']['group_id']?>"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
@@ -130,7 +127,6 @@
 			</td>
             <td><?php echo $eventSubmitted['Event']['group_name'] ?></td>
 			<td><?php echo $eventSubmitted['Event']['course'] ?></td>
-                        <td><?php $isResultReleased ? __('Released'): __('Not Released'); ?></td>
 			<td><?php 
 				$due_date = $eventSubmitted['Event']['due_date'];
 				$timeStamp = strtotime($due_date);

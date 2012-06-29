@@ -517,7 +517,8 @@ class EvaluationsController extends AppController
             $this->set('survey_id', $survey_id);
 
             // Get all required data from each table for every question
-            $tmp = $this->SurveyQuestion->getQuestionsID($survey_id);
+            $surveyQuestion = new SurveyQuestion();
+            $tmp = $surveyQuestion->getQuestionsID($survey_id);
             $tmp = $this->Question->fillQuestion($tmp);
             $tmp = $this->Response->fillResponse($tmp);
             $result = null;
