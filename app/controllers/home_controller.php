@@ -58,10 +58,8 @@ class HomeController extends AppController
 
             $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
             $this->set('course_list', $this->_formatCourseList($course_list));
-        } else if (User::hasRole('student')) {
-            // Check if the student has a email in his/her profile - code for requirement removed (don't want it)
+        } else if (User::hasRole('student') || User::hasRole('tutor')) {
             $this->redirect('studentIndex');
-
         }
     }
     
@@ -89,34 +87,66 @@ class HomeController extends AppController
         $curUserId = $this->Auth->user('id');
         $eventAry = array();
         $pos = 0;
-        //Get enrolled courses
         $user = $this->User->findUserByid($this->Auth->user('id'));
-        $enrol = $user['Enrolment'];
-        foreach ($enrol as $enrolledCourse) {
-            $courseId = $enrolledCourse['UserEnrol']['course_id'];
-            //$courseDetail = $this->Course->find('id='.$courseId);
-            //Get Events for this course that are due
-            //$events = $this->Event->find('all', array('conditions' => array('release_date_begin < NOW() AND NOW() <= release_date_end AND course_id='.$courseId)));
-            $events = $this->Event->find('all', array('conditions' => array('release_date_begin < NOW()', 'NOW() <= result_release_date_end', 'course_id' => $courseId)));
-            foreach ($events as $row) {
-                $event = $row['Event'];
-                switch ($event['event_template_type_id']) {
-                case 3:
-                    //Survey
-                    $survey = $this->_getSurveyEvaluation($courseId, $event, $curUserId);
-                    if ($survey!=null) {
-                        $eventAry[$pos] = $survey;
-                        $pos++;
+        $test_var = $user['Role'][0]['id'];
+        if ($test_var == 5) {
+            //Get enrolled courses
+            $enrol = $user['Enrolment'];
+            foreach ($enrol as $enrolledCourse) {
+                $courseId = $enrolledCourse['UserEnrol']['course_id'];
+                //$courseDetail = $this->Course->find('id='.$courseId);
+                //Get Events for this course that are due
+                //$events = $this->Event->find('all', array('conditions' => array('release_date_begin < NOW() AND NOW() <= release_date_end AND course_id='.$courseId)));
+                $events = $this->Event->find('all', array('conditions' => array('release_date_begin < NOW()', 'NOW() <= result_release_date_end', 'course_id' => $courseId)));
+                foreach ($events as $row) {
+                    $event = $row['Event'];
+                    switch ($event['event_template_type_id']) {
+                    case 3:
+                        //Survey
+                        $survey = $this->_getSurveyEvaluation($courseId, $event, $curUserId);
+                        if ($survey!=null) {
+                            $eventAry[$pos] = $survey;
+                            $pos++;
+                        }
+                        break;
+                    default:
+                        //Simple, Rubric and Mixed Evaluation
+                        $evaluation = $this->_getEvaluation($curUserId, $event);
+                        if ($evaluation!=null) {
+                            $eventAry[$pos] = $evaluation;
+                            $pos++;
+                        }
+                        break;
                     }
-                    break;
-                default:
-                    //Simple, Rubric and Mixed Evaluation
-                    $evaluation = $this->_getEvaluation($curUserId, $event);
-                    if ($evaluation!=null) {
-                        $eventAry[$pos] = $evaluation;
-                        $pos++;
+                }
+            }
+        }
+        else if ($test_var == 4) {
+            //Get assigned courses
+            $courses = $user['Course'];
+            foreach ($courses as $assignedCourse) {
+                $courseId = $assignedCourse['UserCourse']['course_id'];
+                $events = $this->Event->find('all', array('conditions' => array('release_date_begin < NOW()', 'NOW() <= result_release_date_end', 'course_id' => $courseId)));
+                foreach ($events as $row) {
+                    $event = $row['Event'];
+                    switch ($event['event_template_type_id']) {
+                    case 3:
+                        //Survey
+                        $survey = $this->_getSurveyEvaluation($courseId, $event, $curUserId);
+                        if ($survey!=null) {
+                            $eventAry[$pos] = $survey;
+                            $pos++;
+                        }
+                        break;
+                    default:
+                        //Simple, Rubric and Mixed Evaluation
+                        $evaluation = $this->_getEvaluation($curUserId, $event);
+                        if ($evaluation!=null) {
+                            $eventAry[$pos] = $evaluation;
+                            $pos++;
+                        }
+                        break;
                     }
-                    break;
                 }
             }
         }
@@ -139,6 +169,7 @@ class HomeController extends AppController
         $groupsEvents = $this->GroupEvent->getGroupEventByUserId($userId, $event['id']);
         foreach ($groupsEvents as $row) {
             $groupEvent = $row['GroupEvent'];
+            $group = $this->Group->findGroupByid($groupEvent['group_id']);
 
             // get corresponding evaluation submission that is not submitted
             $isSubmitted = false;
@@ -152,13 +183,11 @@ class HomeController extends AppController
             $dueIn = abs(floor($diff));
             // if eval submission is not submitted or doesn't exist, output
             if (!$isSubmitted) {
-
-
-
                 $result['comingEvent']['Event'] = $event;
                 $result['comingEvent']['Event']['is_late'] = $isLate;
                 $result['comingEvent']['Event']['days_to_due'] = $dueIn;
                 $result['comingEvent']['Event']['group_id'] = $groupEvent['group_id'];
+                $result['comingEvent']['Event']['group_name'] = $group['Group']['group_name'];
                 $result['comingEvent']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
 
                 if ($isLate) {
@@ -174,6 +203,7 @@ class HomeController extends AppController
                 $result['eventSubmitted']['Event']['is_late'] = $isLate;
                 $result['eventSubmitted']['Event']['date_submitted'] = $eventSubmit['EvaluationSubmission']['date_submitted'];
                 $result['eventSubmitted']['Event']['group_id'] = $groupEvent['group_id'];
+                $result['eventSubmitted']['Event']['group_name'] = $group['Group']['group_name'];
                 $result['eventSubmitted']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
             }
         }

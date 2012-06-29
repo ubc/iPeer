@@ -86,7 +86,7 @@ if (isset($course_list['I']))
     <li><?php __('Please <i>add a course</i> from the yellow "Courses" tab above')?>
     </li>
 
-    <li><?php __('Then <i>register students</i> into that course from that courses summary display. This display will avaliable (once the course is created) by clicking on the courses name from most menus .')?>
+    <li><?php __('Then <i>register students</i> into that course from that courses summary display. This display will available (once the course is created) by clicking on the courses name from most menus .')?>
     </li>
 
     <li><?php __('Put your students into <i>groups</i> manually, (or, if you have the students complete a survey, iPeer can do it for you, using TeamMaker).')?>

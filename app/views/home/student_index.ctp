@@ -8,11 +8,12 @@
         </tr>
       </table>
       <div style="background: #FFF;"> <br />
-      <table width="95%"  border="0" align="center" cellpadding="4" cellspacing="2">
+      <table width="99%"  border="0" align="center" cellpadding="4" cellspacing="2">
 		  <tr class="tableheader">
-			<td width="40%"><?php __('Event')?></td>
-			<td width="15%"><?php __('Course')?></td>
-			<td width="25%"><?php __('Due Date')?> </td>
+			<td width="35%"><?php __('Event')?></td>
+            <td width="15%"><?php __('Group')?></td>
+			<td width="10%"><?php __('Course')?></td>
+			<td width="20%"><?php __('Due Date')?> </td>
 			<td width="20%"><?php __('Due In/Late By (red)')?> </td>
 		  </tr>	  
   	<?php $i = '0';$currentDate = strtotime('NOW');?>
@@ -36,6 +37,7 @@
 			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/makeMixevalEvaluation/<?php echo $comingUpEvent['Event']['id']?>;<?php echo $comingUpEvent['Event']['group_id']?>"><?php echo $comingUpEvent['Event']['title'] ?>&nbsp;</a>
 			  <?php endif;?>
 			</td>
+            <td><?php echo $comingUpEvent['Event']['group_name'] ?>&nbsp;</td>
 			<td><?php echo $comingUpEvent['Event']['course'] ?>&nbsp;</td>
 			<td><?php 
 				$dueDate=$row['comingEvent']['Event']['due_date'];
@@ -62,7 +64,7 @@
 	          <tr class=\"tablecell\"><td colspan=\"4\" align=\"center\"><b><?php __('No peer evaluations due at this time')?></b></td></tr>
 	        <?php endif; ?>
 		</table>
-		<table width="95%"  border="0" cellpadding="0" align="center" cellspacing="0" bgcolor="#E5E5E5">
+		<table width="99%"  border="0" cellpadding="0" align="center" cellspacing="0" bgcolor="#E5E5E5">
 		  <tr>
 			<td><?php echo $html->image('layout/corner_bot_left.gif',array('align'=>'middle','alt'=>'corner_bot_left'))?></td>
 			<td align="right"><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'middle','alt'=>'corner_bot_right'))?></td>
@@ -77,11 +79,12 @@
           </tr>
         </table>
       <div style="background: #FFF;"> <br>
-      <table width="95%"  border="0" align="center" cellpadding="4" cellspacing="2">
+      <table width="99%"  border="0" align="center" cellpadding="4" cellspacing="2">
 		  <tr class="tableheader">
-			<td width="40%"><?php __('Event')?></td>
+			<td width="25%"><?php __('Event')?></td>
+            <td width="10%"><?php __('Result')?></td>
+            <td width="15%"><?php __('Group')?></td>
 			<td width="10%"><?php __('Course')?></td>
-                        <td width="10%"><?php __('Result')?></td>
 			<td width="20%"><?php __('Due Date')?></td>
 			<td width="20%"><?php __('Date Submitted')?></td>
 		  </tr>
@@ -125,7 +128,8 @@
                               echo $eventSubmitted['Event']['title'];
                           endif; endif;?>
 			</td>
-			<td><?php echo $eventSubmitted['Event']['course'] ?>&nbsp;</td>
+            <td><?php echo $eventSubmitted['Event']['group_name'] ?></td>
+			<td><?php echo $eventSubmitted['Event']['course'] ?></td>
                         <td><?php $isResultReleased ? __('Released'): __('Not Released'); ?></td>
 			<td><?php 
 				$due_date = $eventSubmitted['Event']['due_date'];
@@ -142,7 +146,7 @@
 	          <tr class=\"tablecell\"><td colspan=\"4\" align=\"center\"><b><?php __('No peer evaluations submitted.')?></b></td></tr>
 	  <?php endif;?>
 		</table>
-		<table width="95%"  border="0" cellpadding="0" align="center" cellspacing="0" bgcolor="#E5E5E5">
+		<table width="99%"  border="0" cellpadding="0" align="center" cellspacing="0" bgcolor="#E5E5E5">
 		  <tr>
 			<td><?php echo $html->image('layout/corner_bot_left.gif',array('align'=>'middle','alt'=>'corner_bot_left'))?></td>
 			<td align="right"><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'middle','alt'=>'corner_bot_right'))?></td>
