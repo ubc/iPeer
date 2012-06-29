@@ -498,10 +498,6 @@ class EventsController extends AppController
             $this->Session->setFlash(__('You do not have permission to edit events.', true));
             $this->redirect('index');
         }
-        if (!is_numeric($id) || !($this->data = $this->Event->getEventByid($id))) {
-            $this->Session->setFlash(__('Event does not exist.', true));
-            $this->redirect('index');
-        }
 
         $data = $this->Event->find('first', array('conditions' => array('id' => $id),
             'contain' => array('Group')));
@@ -533,7 +529,6 @@ class EventsController extends AppController
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $id),
             'contain' => array('Group.Member')));
 
-
         //Format Evaluation Selection Boxes
         $default = null;
         $model = '';
@@ -558,7 +553,6 @@ class EventsController extends AppController
                 $model = 'Mixeval';
                 $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'));
             }
-
         }
 
         // Sets up the already assigned groups
@@ -620,7 +614,6 @@ class EventsController extends AppController
                     $this->Penalty->deleteAll(array('Penalty.event_id' => $id));
                 }
 
-
                 //Save Groups for the Event
                 //$this->GroupEvent->insertGroups($this->Event->id, $this->data['Member']);
                 $this->GroupEvent->updateGroups($this->Event->id, $this->data['Member']);
@@ -637,6 +630,11 @@ class EventsController extends AppController
         } else {
             $this->data = $data;
             $this->penalty = $penalty;
+        }
+        
+        if (!($this->data = $this->Event->getEventByid($id))) {
+            $this->Session->setFlash(__('Event does not exist.', true));
+            $this->redirect('index');
         }
 
         $this->set('eventTemplateTypes', $this->EventTemplateType->find('list', array('conditions' => array('NOT' => array('id' => 3)))));
