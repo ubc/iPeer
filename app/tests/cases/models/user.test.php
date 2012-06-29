@@ -327,7 +327,7 @@ class UserTestCase extends CakeTestCase
 
         //user_id==3 : role(student)
         $studentRole=$this->User->getRoleId(3);
-        $this->assertEqual($studentRole, '4');
+        $this->assertEqual($studentRole, '5');
 
         //user_id==13 : role(instructor)
         $instructorRole=$this->User->getRoleId(1);
