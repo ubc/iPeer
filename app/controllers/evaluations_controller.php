@@ -417,8 +417,7 @@ class EvaluationsController extends AppController
             $this->set('groupMembers', $groupMembers);
 
             // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
-            $numMembers=$event['Event']['self_eval'] ? $this->GroupsMembers->find('count', array('conditions' => array('group_id' => $event['group_id']))) :
-                $this->GroupsMembers->find('count', array('conditions' => array('group_id' => $event['group_id']))) - 1;
+            $numMembers = count($groupMembers);
             $simpleEvaluation = $this->SimpleEvaluation->find('id='.$event['Event']['template_id']);
             $remaining = $simpleEvaluation['SimpleEvaluation']['point_per_member'] * $numMembers;
             //          if ($in['points']) $out['points']=$in['points']; //saves previous points
