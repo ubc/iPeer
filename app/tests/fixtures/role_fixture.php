@@ -23,7 +23,8 @@ class RoleFixture extends CakeTestFixture
         array('id' => 1, 'name' => 'superadmin'),
         array('id' => 2, 'name' => 'admin'),
         array('id' => 3, 'name' => 'instructor'),
-        array('id' => 4, 'name' => 'student'),
+        array('id' => 4, 'name' => 'tutor'),
+        array('id' => 5, 'name' => 'student'),
 
     );
 
