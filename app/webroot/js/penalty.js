@@ -52,6 +52,7 @@ function validatePenalty(){
 					if(pen<0 || pen>100) {alert('Penalty for day ' + k + ' has to be between 0 and 100'); return false;}
 					if(k>1) {
 			  	  var prev = $("penaltyDay" + (k-1)).down('.percentage').getValue();
+			  	        alert(prev." ".pen);
 						if(prev>pen) {
 							alert('Penalty for day ' + k + ' cannot be less then the previous day entry'); return false;
 						}

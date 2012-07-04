@@ -537,12 +537,7 @@ class EvaluationComponent extends Object
         $result['rubric'] = $this->Rubric->read();
 
         // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
-        $numMembers=$event['Event']['self_eval'] ?
-            $this->GroupsMembers->find('count', array(
-                'conditions'=>array('group_id' => $event['group_id']))) :
-                ($this->GroupsMembers->find('count', array(
-                    'conditions'=> array('group_id' => $event['group_id'])))-1);
-
+        $numMembers=count($this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'], $evaluator));
         //$this->set('evaluateeCount', $numMembers);
         $result['evaluateeCount'] = $numMembers;
         return $result;
@@ -1116,11 +1111,8 @@ class EvaluationComponent extends Object
         $result['mixeval'] = $this->Mixeval->read();
 
         // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
-        $numMembers=$event['Event']['self_eval'] ?
-            $this->GroupsMembers->find('count', array(
-                'conditions'=>(array ('group_id' => $event['group_id'])))) :
-                $this->GroupsMembers->find('count', array(
-                    'conditions'=>(array ('group_id' => $event['group_id'])))) - 1;
+        $numMembers=count($this->GroupsMembers->getEventGroupMembers($event['group_id'], 
+            $event['Event']['self_eval'], $evaluator));
         //$this->set('evaluateeCount', $numMembers);
         $result['evaluateeCount'] = $numMembers;
 

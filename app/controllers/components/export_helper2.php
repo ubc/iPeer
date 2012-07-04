@@ -35,6 +35,32 @@ class ExportHelper2Component extends Object
         }
         return $groupMembers;
     }
+    
+    /**
+     * getGroupMemberwithoutTutorsHelper
+     *
+     * @param mixed $grpEventId
+     *
+     * @access public
+     * @return void
+     */
+    function getGroupMemberwithoutTutorsHelper($grpEventId)
+    {
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
+        $this->User = ClassRegistry::init('User');
+
+        $group = $this->GroupEvent->getGroupMembers($grpEventId);
+        $i = 0;
+        foreach ($group as $g) {
+            if (5 == $this->User->getRoleId($g['GroupsMembers']['user_id'])) {
+                $fields = array('id', 'first_name', 'last_name', 'student_no', 'email');
+                $user = $this->User->findUserByidWithFields($g['GroupsMembers']['user_id'], $fields);
+                $groupMembers[$i] = $user;
+                $i++;
+            }
+        }
+        return $groupMembers;
+    }
 
     /**
      * buildExporterGrid

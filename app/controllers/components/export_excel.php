@@ -127,23 +127,25 @@ Class ExportExcelComponent extends ExportBaseNewComponent
     function _buildSimpleEvalResults($grpEventId, $params)
     {
         $groupMembers = $this->ExportHelper2->getGroupMemberHelper($grpEventId);
+        $groupMembersNoTutors = $this->ExportHelper2->getGroupMemberWithoutTutorsHelper($grpEventId);
         // Build grid
         $xRange = 9 + count($groupMembers);
         $yRange = 4 + count($groupMembers);
         $grid = $this->ExportHelper2->buildExporterGrid($xRange, $yRange);
         $evaluatorsArray = $this->ExportHelper2->formatEvaluatorsHeaderArray($groupMembers);
+        $evaluateesArray = $this->ExportHelper2->formatEvaluatorsHeaderArray($groupMembersNoTutors);
         $xPosition = 0;
         // Fill in Evaluatee Rows
         if (!empty($params['include_student_email'])) {
-            $this->ExportHelper2->fillGridVertically($grid, 6, $xPosition, $evaluatorsArray['email']);
+            $this->ExportHelper2->fillGridVertically($grid, 6, $xPosition, $evaluateesArray['email']);
         }
         if (!empty($params['include_student_id'])) {
             $xPosition++;
-            $this->ExportHelper2->fillGridVertically($grid, 6, $xPosition, $evaluatorsArray['student_no']);
+            $this->ExportHelper2->fillGridVertically($grid, 6, $xPosition, $evaluateesArray['student_no']);
         }
         if (!empty($params['include_student_name'])) {
             $xPosition++;
-            $this->ExportHelper2->fillGridVertically($grid, 6, $xPosition, $evaluatorsArray['name']);
+            $this->ExportHelper2->fillGridVertically($grid, 6, $xPosition, $evaluateesArray['name']);
         }
 
         $xPosition ++;
@@ -343,7 +345,8 @@ Class ExportExcelComponent extends ExportBaseNewComponent
             }
             array_push($row, ' ');
             // $sumbissionCount = $this->EvaluationSubmission->countSubmissions($grpEventId);
-            $questionAvg = $totalScore/$submissionCount;
+            $submissionCount > 0 ? $questionAvg = $totalScore/$submissionCount :
+                $questionAvg = 0;
             array_push($row, number_format($questionAvg, 2));
             $this->ExportHelper2->fillGridHorizonally($grid, $xPosition + 1, $yPosition+2, $ques);
             $this->ExportHelper2->fillGridHorizonally($grid, $xPosition + 3, $yPosition+2, $row);
@@ -458,7 +461,8 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         $xPosition++; $finalMark = 0;
         $submissionCount = $this->EvaluationSubmission->countSubmissions($grpEventId);
         foreach ($questionTotalMarkArray as $questionTotal) {
-            $questionAverage = number_format($questionTotal/$countEvaluators, 2);
+            $countEvaluators > 0 ? $questionAverage = number_format($questionTotal/$countEvaluators, 2) :
+                $questionAverage = number_format(0, 2);
             $grid[$xPosition + 1][$yPosition + 2] = $questionAverage;
             $finalMark += $questionAverage;
             $yPosition++;
@@ -518,13 +522,14 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         $this->Event = ClassRegistry::init('Event');
 
         $groupMembers = $this->ExportHelper2->getGroupMemberHelper($grpEventId);
-        $groupCount = count($groupMembers);
+        $groupMembersNoTutors = $this->ExportHelper2->getGroupMemberWithoutTutorsHelper($grpEventId);
+        $groupCount = count($groupMembersNoTutors);
         $grpEvent = $this->GroupEvent->getGrpEvent($grpEventId);
         $evaluation = $this->Event->getEventById($grpEvent['GroupEvent']['event_id']);
         $questions = $this->MixevalsQuestion->getQuestion($evaluation['Event']['template_id'], 'T');
         $validQuestionNum = array();
         foreach ($questions as $q) {
-            array_push($validQuestionNum, $q['MixevalsQuestion']['question_num']);
+            array_push($validQuestionNum, $q['MixevalsQuestion']['question_num']-1);
         }
         $qCount = count($questions);
         // Create grid
@@ -535,6 +540,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         // Fill in the questions
         $questionNum = 1; $questionYPos = 2; $xPosition = 2;
         $submissionCount = $this->EvaluationSubmission->countSubmissions($grpEventId);
+        // if someone didn't submit - not everyone has the same number of evaluators
         foreach ($questions as $q) {
             $this->ExportHelper2->repeatDrawByCoordinateVertical($grid, $xPosition, $questionYPos, $sectionSpacing, $groupCount,
                 "Question ".$questionNum.": ".$q['MixevalsQuestion']['title']);
@@ -543,7 +549,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         }
         // Fill in the comments
         $headerYPos = 0; $commentRowYPos = 3;
-        foreach ($groupMembers as $evaluatee) {
+        foreach ($groupMembersNoTutors as $evaluatee) {
             // First fill in the evaluatee headers
             $evaluateeHeader = $this->ExportHelper2->formatEvaluateeHeaderArray($params, $evaluatee);
             $this->ExportHelper2->fillGridHorizonally($grid, $xPosition - 1, $headerYPos, $evaluateeHeader);
@@ -622,6 +628,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                 $group = $this->Group->getGroupByGroupId($groupEvents[$i]['GroupEvent']['group_id']);
                 $grpEventId = $groupEvents[$i]['GroupEvent']['id'];
                 $groupMembers = $this->GroupEvent->getGroupMembers($grpEventId);
+                $groupMembersNoTutors = $this->ExportHelper2->getGroupMemberWithoutTutorsHelper($grpEventId);
                 if (!empty($params['include_group_names'])) {
                     $this->sheet->setCellValue('A'.$this->cursor['y'], "Group Name : ".$group[0]['Group']['group_name']);
                     $this->cursor['y'] += 2;
@@ -638,8 +645,8 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                     $this->sheet->setCellValue('A'.$this->cursor['y'], "Evaluation Comments");
                     $this->cursor['y']++;
                     //  	      	$CSV .= "Simple Evaluation Comments :\n\n";
-                    foreach ($groupMembers as $evaluatee) {
-                        $simpleEvalComments = $this->_buildSimpleOrRubricsCommentByEvaluatee($grpEventId, $evaluatee['GroupsMembers']['user_id'], $params, 'S');
+                    foreach ($groupMembersNoTutors as $evaluatee) {
+                        $simpleEvalComments = $this->_buildSimpleOrRubricsCommentByEvaluatee($grpEventId, $evaluatee['id'], $params, 'S');
                         $this->_drawToExcelSheetAtCoordinates($simpleEvalComments, $this->cursor['x'], $this->cursor['y']);
                         $this->cursor['y'] += (count($simpleEvalComments[0]) + 1);
                     }
@@ -653,6 +660,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                 $grpEventId = $groupEvents[$i]['GroupEvent']['id'];
                 $group = $this->Group->getGroupByGroupId($groupEvents[$i]['GroupEvent']['group_id']);
                 $groupMembers = $this->GroupEvent->getGroupMembers($grpEventId);
+                $groupMembersNoTutors = $this->ExportHelper2->getGroupMemberWithoutTutorsHelper($grpEventId);
                 if (!empty($params['include_group_names'])) {
                     $this->sheet->setCellValue('A'.$this->cursor['y'], "Group Name : ".$group[0]['Group']['group_name']);
                     $this->sheet->getStyle('A'.$this->cursor['y'])->getFont()->setSize(14);
@@ -661,8 +669,8 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                 if (!empty($params['rubric_criteria_marks'])) {
                     $this->sheet->setCellValue('A'.$this->cursor['y'], "Rubrics Evaluation Grade Table :");
                     $this->cursor['y'] += 2;
-                    foreach ($groupMembers as $evaluatee) {
-                        $gradeTable = $this->_buildRubricsResultByEvalatee($params, $grpEventId, $evaluatee['GroupsMembers']['user_id']);
+                    foreach ($groupMembersNoTutors as $evaluatee) {
+                        $gradeTable = $this->_buildRubricsResultByEvalatee($params, $grpEventId, $evaluatee['id']);
                         $this->_drawToExcelSheetAtCoordinates($gradeTable, 0, $this->cursor['y']);
                         $this->cursor['y'] += (count($gradeTable[0]));
                     }
@@ -670,8 +678,8 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                 if (!empty($params['rubric_general_comments'])) {
                     $this->sheet->setCellValue('A'.$this->cursor['y'], "Rubrics General Comments");
                     $this->cursor['y'] += 2;
-                    foreach ($groupMembers as $evaluatee) {
-                        $rubricGeneralComments = $this->_buildSimpleOrRubricsCommentByEvaluatee($grpEventId, $evaluatee['GroupsMembers']['user_id'], $params, 'R');
+                    foreach ($groupMembersNoTutors as $evaluatee) {
+                        $rubricGeneralComments = $this->_buildSimpleOrRubricsCommentByEvaluatee($grpEventId, $evaluatee['id'], $params, 'R');
                         $this->_drawToExcelSheetAtCoordinates($rubricGeneralComments, 0, $this->cursor['y']);
                         $this->cursor['y'] += (count($rubricGeneralComments[0]) + 1);
                     }
@@ -686,6 +694,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                 $grpEventId = $groupEvents[$i]['GroupEvent']['id'];
                 $group = $this->Group->getGroupByGroupId($groupEvents[$i]['GroupEvent']['group_id']);
                 $groupMembers = $this->GroupEvent->getGroupMembers($grpEventId);
+                $groupMembersNoTutors = $this->ExportHelper2->getGroupMemberWithoutTutorsHelper($grpEventId);
                 if (!empty($params['include_group_names'])) {
                     $this->sheet->setCellValue('A'.$this->cursor['y'], "Group Name : ".$group[0]['Group']['group_name']);
                     $this->sheet->getStyle('A'.$this->cursor['y'])->getFont()->setSize(14);
@@ -694,8 +703,8 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                     $this->cursor['y'] += 2;
                 }
                 if (!empty($params['include_mixeval_grades'])) {
-                    foreach ($groupMembers as $evaluatee) {
-                        $gradeTable = $this->_buildMixevalResultByEvaluatee($params, $grpEventId, $evaluatee['GroupsMembers']['user_id']);
+                    foreach ($groupMembersNoTutors as $evaluatee) {
+                        $gradeTable = $this->_buildMixevalResultByEvaluatee($params, $grpEventId, $evaluatee['id']);
                         $this->_drawToExcelSheetAtCoordinates($gradeTable, 0, $this->cursor['y']);
                         $this->cursor['y'] += (count($gradeTable[0]));
                     }
