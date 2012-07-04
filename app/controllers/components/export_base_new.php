@@ -241,7 +241,7 @@ class ExportBaseNewComponent extends Object
      */
     function buildSimpleEvaluationScoreTableByGroup($params, $grpEventId, $eventId)
     {
-        $groupMembers = $this->ExportHelper2->getGroupMemberHelper($grpEventId);
+        $groupMembers = $this->ExportHelper2->getGroupMemberWithoutTutorsHelper($grpEventId);
         $csv = '';
         foreach ($groupMembers as $evaluatee) {
             $resultTable = $this->buildSimpleEvaluationScoreTableByEvaluatee($params, $grpEventId, $evaluatee, $eventId);
@@ -398,7 +398,7 @@ class ExportBaseNewComponent extends Object
      */
     function buildMixedEvalScoreTableByGroupEvent($params, $grpEventId, $eventId)
     {
-        $groupMembers = $this->ExportHelper2->getGroupMemberHelper($grpEventId);
+        $groupMembers = $this->ExportHelper2->getGroupMemberWithoutTutorsHelper($grpEventId);
         $csv = '';
         foreach ($groupMembers as $evalutee) {
             $resultTable =  $this->buildMixedEvalScoreTableByEvaluatee($params, $grpEventId, $evalutee['id'], $eventId);
@@ -555,7 +555,7 @@ class ExportBaseNewComponent extends Object
      */
     function buildRubricsEvalTableByGroupEvent($params, $grpEventId, $eventId)
     {
-        $groupMembers = $this->ExportHelper2->getGroupMemberHelper($grpEventId);
+        $groupMembers = $this->ExportHelper2->getGroupMemberWithoutTutorsHelper($grpEventId);
         $csv = '';
         foreach ($groupMembers as $evaluatee) {
             $resultTable =  $this->buildRubricsScoreTableByEvaluatee($params, $grpEventId, $evaluatee['id'], $eventId);
