@@ -139,7 +139,6 @@ class EvaluationsController extends AppController
 
             // Extra info about course and Event
             array("Event.id", "", "", "hidden"),
-            array("Event.title",       __("Event", true),        "10em",    "action", "View Event"),
         );
 
         $extraFilters = array();
