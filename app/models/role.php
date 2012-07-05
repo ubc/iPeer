@@ -59,7 +59,7 @@ class Role extends AppModel
         if ($roleNum==3) {
             return 'I';
         }
-        if ($roleNum==4) {
+        if ($roleNum==5) {
             return 'S';
         } else {
             return null;

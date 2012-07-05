@@ -77,6 +77,19 @@ class User extends AppModel
             'deleteQuery'  => '',
             'dependent'    => true,
         ),
+        'Tutor' => array(
+            'className'    => 'Course',
+            'joinTable'    => 'user_tutors',
+            'foreignKey'   => 'user_id',
+            'associationForeignKey'    =>  'course_id',
+            'conditions'   => '',
+            'order'        => '',
+            'limit'        => '',
+            'unique'       => true,
+            'finderQuery'  => '',
+            'deleteQuery'  => '',
+            'dependent'    => true,
+        ),
         'Enrolment' => array(
             'className'    => 'Course',
             'joinTable'    => 'user_enrols',
@@ -396,19 +409,13 @@ class User extends AppModel
     {
         $this->displayField = 'full_name';
         $temp = $this->find('list', array(
-            'conditions' => array('UserCourse.course_id' => $course_id),
-            'joins' => array(array('table' => 'user_courses',
-                'alias' => 'UserCourse',
+            'conditions' => array('UserTutor.course_id' => $course_id),
+            'joins' => array(array('table' => 'user_tutors',
+                'alias' => 'UserTutor',
                 'type'  => 'LEFT',
-                'conditions' => array('User.id = UserCourse.user_id'))
+                'conditions' => array('User.id = UserTutor.user_id'))
             ),
             'order' => 'User.last_name'));
-        foreach ($temp as $id => $name) {
-            $role = $this->getRoleId($id);
-            if ($role != 4)
-                unset($temp[$id]);
-        }
-
         return $temp;
     }
 

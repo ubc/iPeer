@@ -1,6 +1,7 @@
 <table class='course_summary'>
   <tr>
     <th>Instructors</th>
+    <th>Tutors</th>
     <th>Class Size</th>
     <th>Groups Count</th>
     <th>Evaluation Events</th>
@@ -9,8 +10,16 @@
     <td>
       <?php
       echo $this->element(
-        'courses/list_instructors', 
+        'list/unordered_list_users', 
         array('instructors'=>$data['Instructor'])
+      );
+      ?>
+    </td>
+    <td>
+      <?php
+      echo $this->element(
+        'list/unordered_list_users', 
+        array('instructors'=>$data['Tutor'])
       );
       ?>
     </td>

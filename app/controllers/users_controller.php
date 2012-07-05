@@ -603,6 +603,7 @@ class UsersController extends AppController
     private function _convertCourseEnrolment($courses, $wantedRole) {
         $ret = array('Enrolment' => array());
         $roleDefault = $this->Role->getDefaultId();
+        $tutorRole = $this->Role->field('id', array('name'=>'tutor'));
         $ownRole = $this->User->getRoleId($this->Auth->user('id'));
         if (!isset($courses)) {
             return $ret;
@@ -616,6 +617,10 @@ class UsersController extends AppController
             if ($wantedRole == $roleDefault) {
                 // we should add this user as a student
                 $ret['Enrolment'][]['UserEnrol']['course_id'] = $id;
+            }
+            else if ($wantedRole == $tutorRole) {
+                // we should add this user as a tutor
+                $ret['Tutor'][]['UserTutor']['course_id'] = $id;
             }
             else {
                 // we should add this user as an instructor
