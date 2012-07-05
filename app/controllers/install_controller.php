@@ -114,11 +114,6 @@ class InstallController extends Controller
 
         if ($this->data) {
             // we have data submitted
-            // Set variables needed to render the page
-            $this->set('absolute_url',
-                $this->data['InstallValidationStep4']['absolute_url']);
-            $this->set('domain_name',
-                $this->data['InstallValidationStep4']['domain']);
 
             $this->InstallValidationStep4->set($this->data);
             if (!$this->InstallValidationStep4->validates()) {
@@ -137,8 +132,6 @@ class InstallController extends Controller
             //update parameters
             $sysparams = array(
                 'SysParameter' => array(
-                    'system.absolute_url' => $this->data['InstallValidationStep4']['absolute_url'],
-                    'system.domain' => $this->data['InstallValidationStep4']['domain'],
                     'system.super_admin' => $this->data['InstallValidationStep4']['super_admin'],
                     'system.admin_email' => $this->data['InstallValidationStep4']['admin_email'],
                     'email.host' => $this->data['InstallValidationStep4']['email_host'],
@@ -168,10 +161,6 @@ class InstallController extends Controller
                 $this->redirect(array('action' => 'install3'));
                 return;
             }
-            // Set variables needed to render the page
-            $this->set('absolute_url', str_replace($this->here, '',
-                Router::url($this->here, true)));
-            $this->set('domain_name', $_SERVER['HTTP_HOST']);
         }
     }
 

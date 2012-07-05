@@ -7,24 +7,6 @@ echo $this->Form->create(
   array('url' => '/install/install4')
 );
 
-echo "<h4>Site Configuration</h4>";
-
-echo $this->Form->input(
-  'absolute_url', 
-  array(
-    'value' => "$absolute_url",
-    'label' => 'Absolute URL ',
-  )
-);
-
-echo $this->Form->input(
-  'domain', 
-  array(
-    'value' => "$domain_name",
-    'label' => 'Domain',
-  )
-);
-
 echo "<h4>Super Admin Configuration</h4>";
 
 echo $this->Form->input(

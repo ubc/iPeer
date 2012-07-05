@@ -14,12 +14,6 @@ class InstallValidationStep4 extends AppModel
 {
     public $useTable = false;
     public $_schema = array(
-        'absolute_url' => array(
-            'type' => 'string',
-        ),
-        'domain' => array(
-            'type' => 'string',
-        ),
         'super_admin' => array(
             'type' => 'string',
         ),
@@ -47,15 +41,6 @@ class InstallValidationStep4 extends AppModel
     );
 
     public $validate = array(
-        'absolute_url' => array(
-          // note for testing, cakephp's url validator doesn't like localhost,
-          // but you can use 127.0.0.1 instead
-            'rule' => 'url',
-            'message' => 'Please enter a properly formatted URL.'
-        ),
-        'domain' => array(
-            'rule' => 'notEmpty',
-        ),
         'super_admin' => array(
             'rule' => 'notEmpty',
         ),

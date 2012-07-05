@@ -1755,8 +1755,6 @@ INSERT INTO `sys_parameters` (`id`, `parameter_code`, `parameter_value`, `parame
 (1, 'system.soft_delete_enable', 'true', 'B', 'Whether soft deletion of records is enabled.', 'A', 0, NOW(), 0, NOW()),
 (2, 'system.debug_mode', '0', 'I', 'Debug Mode of the system', 'A', 0, NOW(), NULL, NOW()),
 (3, 'system.debug_verbosity', '1', 'I', NULL, 'A', 0, NOW(), NULL, NOW()),
-(4, 'system.absolute_url', 'http://', 'S', '', 'A', 0, NOW(), NULL, NOW()),
-(5, 'system.domain', 'test', 'S', '', 'A', 0, NOW(), NULL, NOW()),
 (6, 'system.super_admin', 'root', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 (7, 'system.upload_dir', 'uploads/', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 (9, 'display.page_title', 'iPeer v2 with TeamMaker', 'S', 'Page title show in HTML.', 'A', 0, NOW(), 0, NOW()),
