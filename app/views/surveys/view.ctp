@@ -17,7 +17,7 @@
           </tr>
           <tr class="tablecell2">
             <td><?php __('Creator')?>:</td>
-            <td><?php echo $this->Html->link($data['Survey']['creator'], '/users/view/'.$data['Survey']['user_id'])?></td>
+            <td><?php echo $this->Html->link($data['Survey']['creator'], '/users/view/'.$data['Survey']['creator_id'])?></td>
           </tr>
           <tr class="tablecell2">
             <td><?php __('Due Date')?>:</td>

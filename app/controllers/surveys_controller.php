@@ -120,7 +120,7 @@ class SurveysController extends AppController
             array("Survey.id",          __("ID", true),         "4em",   "hidden"),
             array("Course.id",          "",             "",     "hidden"),
             array("Course.course",      __("Course", true),      "15em",  "action", "View Course"),
-            array("Survey.name",        __("Name", true),        "auto",  "action", "View Survey"),
+            array("Survey.name",        __("Name", true),        "auto",  "action", "View Event"),
             array("!Custom.inUse",      __("In Use", true),      "4em",   "number"),
             array("Survey.due_date",    __("Due Date", true),   "10em",  "date"),
             // The release window columns
