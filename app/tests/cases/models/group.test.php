@@ -12,7 +12,7 @@ class GroupTestCase extends CakeTestCase
         'app.response', 'app.survey_question', 'app.user_course',
         'app.user_enrol', 'app.groups_member', 'app.survey',
         'app.user_faculty', 'app.faculty', 'app.department',
-        'app.course_department'
+        'app.course_department', 'app.sys_parameter', 'app.user_tutor'
     );
     public $Group = null;
 

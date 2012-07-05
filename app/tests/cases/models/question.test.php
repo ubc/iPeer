@@ -13,7 +13,8 @@ class QuestionTestCase extends CakeTestCase
         'app.response', 'app.survey_question', 'app.user_course',
         'app.user_enrol', 'app.groups_member', 'app.rubric', 'app.rubrics_lom',
         'app.rubrics_criteria', 'app.rubrics_criteria_comment', 'app.faculty',
-        'app.user_faculty', 'app.department', 'app.course_department'
+        'app.user_faculty', 'app.department', 'app.course_department',
+        'app.user_tutor', 'app.sys_parameter'
     );
     public $Question = null;
 

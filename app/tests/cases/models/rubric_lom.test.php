@@ -15,7 +15,7 @@ class RubricsLomTestCase extends CakeTestCase
         'app.user_enrol', 'app.groups_member', 'app.rubric', 'app.rubrics_lom',
         'app.rubrics_criteria', 'app.rubrics_criteria_comment',
         'app.faculty', 'app.user_faculty', 'app.department',
-        'app.course_department'
+        'app.course_department', 'app.sys_parameter', 'app.user_tutor'
     );
     public $RubricsLom = null;
 
