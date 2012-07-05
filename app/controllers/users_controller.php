@@ -601,9 +601,12 @@ class UsersController extends AppController
      * @return the arrays to be added to $this->data
      * */
     private function _convertCourseEnrolment($courses, $wantedRole) {
-        $ret = array();
+        $ret = array('Enrolment' => array());
         $roleDefault = $this->Role->getDefaultId();
         $ownRole = $this->User->getRoleId($this->Auth->user('id'));
+        if (!isset($courses)) {
+            return $ret;
+        }
         foreach ($courses as $id) {
             if ($wantedRole < $ownRole) {
                 // trying to create a user with higher access than yourself
@@ -1107,6 +1110,7 @@ class UsersController extends AppController
 
         // this means only students will get a list of courses they're
         // enroled in, since instructors are stored in another array
+        $courses = array();
         foreach ($enrolments['Enrolment'] as $course) {
             $cid = $course['UserEnrol']['course_id'];
             $courses[] = $this->Course->field('course', array('id' => $cid)) .
@@ -1119,7 +1123,7 @@ class UsersController extends AppController
         $this->set('password', $password);
         $this->set('courses', $courses);
         $this->set('siteurl',
-            $this->sysContainer->getParamByParamCode('system.absolute_url'));
+            str_replace($this->here, '', Router::url($this->here, true)));
 
         // call send mail
         $subject = "iPeer Account Creation";
