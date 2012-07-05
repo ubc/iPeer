@@ -29,9 +29,13 @@ echo $this->element('evaluations/view_event_info', $params);
   if (!$allMembersCompleted) {?>
   <tr>
     <td colspan="3">
-	      <font color="red"><?php __('These student(s) have yet to submit their evaluations:')?> <br>
+	      <font color="red"><?php __('These people have yet to submit their evaluations:')?> <br>
 	         <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
-	          &nbsp;-&nbsp; <?php echo $user['first_name'].' '.$user['last_name']?> <br>
+	          &nbsp;-&nbsp; <?php echo $user['first_name'].' '.$user['last_name'];
+              if($row['Role']['role_id']==4)
+                echo ' (TA)';
+              else
+                echo ' (student)';?><br>
 	      <?php endforeach; ?>
       </font>
     </td>
@@ -51,7 +55,9 @@ echo $this->element('evaluations/view_event_info', $params);
     //for various criteria
     if ($groupMembers) {
       foreach ($groupMembers as $member) {
-      	echo '<tr class="tablecell2">';
+      	if ($member['Role']['role_id']==4) //hide tutor's score
+            break;
+        echo '<tr class="tablecell2">';
       	echo '<td width="70%">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td>' . "\n";
       	//totals section
       	echo '<td width="30%">';

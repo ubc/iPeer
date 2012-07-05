@@ -260,7 +260,7 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
         <?php
         echo $this->element("groups/group_list_chooser",
             array('all' => $unassignedGroups,   'assigned'  =>$assignedGroups,
-            'allName' =>  __('Avaliable Groups', true), 'selectedName' => __('Participating Groups', true)
+            'allName' =>  __('Available Groups', true), 'selectedName' => __('Participating Groups', true)
           ));
         ?>
 
@@ -270,7 +270,7 @@ echo $this->Form->input('id', array('type' => 'hidden'))?>
   <tr class="tablecell2">
     <?php echo $html->script('events')?>
     <td colspan="3" align="center"><?php echo $form->submit(__('Edit Event', true), array('onclick' =>
-        "processSubmit(document.getElementById('selected_groups')); return validate(); ", 'div'=>'editEvent'.)); ?></td>
+        "processSubmit(document.getElementById('selected_groups')); return validate(); ", 'div'=>'editEvent')); ?></td>
   </tr>
 </table>
 

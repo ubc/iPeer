@@ -395,7 +395,7 @@ class EventsController extends AppController
         $this->set('currentUser', $currentUser);
 
         $courseId = $this->Session->read('ipeerSession.courseId');
-        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events', true));
+        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events > Add', true));
         if ($courseId==null) {
             $this->Session->setFlash(__('Please create events through course page.', true));
             $this->redirect('/home');
@@ -525,7 +525,7 @@ class EventsController extends AppController
         //Clear $id to only the alphanumeric value
         $id = $this->Sanitize->paranoid($id);
         $this->set('event_id', $id);
-        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events', true));
+        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events > Edit', true));
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $id),
             'contain' => array('Group.Member')));
 

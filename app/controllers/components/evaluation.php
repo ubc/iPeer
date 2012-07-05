@@ -792,8 +792,8 @@ class EvaluationComponent extends Object
             foreach ($rubricResult as $row) {
                 $evalMark = isset($row['EvaluationRubric'])? $row['EvaluationRubric']: null;
                 if ($evalMark!=null) {
-                    $rubriDetail = $this->EvaluationRubricDetail->getAllByEvalRubricId($evalMark['id']);
-                    $evalResult[$userId][$userPOS++]['EvaluationRubric']['details'] = $rubriDetail;
+                    $rubricDetail = $this->EvaluationRubricDetail->getAllByEvalRubricId($evalMark['id']);
+                    $evalResult[$userId][$userPOS++]['EvaluationRubric']['details'] = $rubricDetail;
                 }
             }
         }
@@ -1304,6 +1304,10 @@ class EvaluationComponent extends Object
                         $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0]['received_total_score'];
                         $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0]['received_total_score'] /
                             $ttlEvaluatorCount;
+                    } else {
+                        $memberScoreSummary[$userId]['received_count'] = 0;
+                        $memberScoreSummary[$userId]['received_total_score'] = 0;
+                        $memberScoreSummary[$userId]['received_ave_score'] = 0;
                     }
                     // $memberScoreSummary =   $receivedTotalScore;
                     foreach ($mixevalResult as $row) {

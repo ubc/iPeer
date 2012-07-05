@@ -123,7 +123,7 @@ class GroupsMembers extends AppModel
     function getEventGroupMembers ($groupId, $selfEval, $userId)
     {
         $conditions['GroupsMembers.group_id'] = $groupId;
-        $conditions['Role.role_id'] = 5;        // only students (eg. not tutors);
+        //$conditions['Role.role_id'] = 5;        // only students (eg. not tutors);
         if (!$selfEval) {
             $conditions['GroupsMembers.user_id !='] = $userId;
         }

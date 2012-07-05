@@ -1672,7 +1672,7 @@ class EvaluationsController extends AppController
                         }
                         echo "</tr>";
                     }
-                    echo "</table";
+                    echo "</table>";
 
                 }
             }

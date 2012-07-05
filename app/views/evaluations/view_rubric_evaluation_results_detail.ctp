@@ -29,9 +29,13 @@ echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluati
     if (!$allMembersCompleted) {?>
     <tr>
         <td colspan="3">
-            <font color="red"><?php __('These student(s) have yet to submit their evaluations:')?> <br>
+            <font color="red"><?php __('These people have yet to submit their evaluations:')?> <br>
             <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
-                &nbsp;-&nbsp; <?php echo $user['first_name'].' '.$user['last_name']?> <br>
+                &nbsp;-&nbsp; <?php echo $user['first_name'].' '.$user['last_name'];
+                if($row['Role']['role_id']==4) //label roles for clarity
+                    echo ' (TA)';
+                else
+                    echo ' (student)';?><br>
             <?php endforeach; ?>
             </font>
         </td>
@@ -72,6 +76,8 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
     $questionSum = array_fill(0, $rubric['Rubric']['criteria'], 0);
     if ($groupMembers) {
         foreach ($groupMembers as $member) {
+            if ($member['Role']['role_id']==4)
+                break;
             $membersAry[$member['User']['id']] = $member;
             echo '<tr class="result-cell">';
             if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
@@ -98,7 +104,8 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
 		// for calculating average percentage per question (ratio)
         $ratio = 0;
         for ($i = 0; $i < $rubric['Rubric']["criteria"]; $i++) {
-            $ratio += $scoreRecords[$member['User']['id']]['rubric_criteria_ave'][$i+1] / $rubricCriteria[$i]['multiplier'];
+            if (!empty($scoreRecords[$member['User']['id']]['rubric_criteria_ave']))
+                $ratio += $scoreRecords[$member['User']['id']]['rubric_criteria_ave'][$i+1] / $rubricCriteria[$i]['multiplier'];
         }
         $avgPerQues[$member['User']['id']] = $ratio /  $rubric['Rubric']['criteria'];
         //totals section
@@ -133,11 +140,13 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
         echo ' ('.number_format($groupAve / $rubric['Rubric']['total_marks'] * 100) . '%)';
       
         echo "</b></td>";
-    }		?>
+    }	?>
     </tr></table></td></tr>
     <?php
     if ($groupMembers) {
         foreach ($groupMembers as $member) {
+            if ($member['Role']['role_id']==4)
+                break;
             echo '<tr class="tablecell2" cellpadding="4" cellspacing="2" >';
             $membersAry[$member['User']['id']]['member'] = $member;
             echo '<td width="25%" class="group-members">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td></tr>' . "\n";
@@ -171,7 +180,10 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
         <td align="center">
 <div id="accordion">
     <?php $i = 0;
-    foreach($groupMembers as $row): $user = $row['User']; ?>
+    foreach($groupMembers as $row):
+        if ($row['Role']['role_id']==4)
+            break;
+        $user = $row['User']; ?>
         <div id="panel<?php echo $user['id']?>">
         <div id="panel<?php echo $user['id']?>Header" class="panelheader">
             <?php echo __('Evaluatee: ', true).$user['last_name'].' '.$user['first_name']?>

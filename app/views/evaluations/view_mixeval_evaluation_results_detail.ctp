@@ -28,9 +28,13 @@
         if (!$allMembersCompleted) {?>
             <tr>
                 <td colspan="3">
-                    <font color="red"><?php __('These student(s) have yet to submit their evaluations:')?> <br>
+                    <font color="red"><?php __('These people have yet to submit their evaluations:')?> <br>
 	                    <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
-	                        &nbsp;-&nbsp; <?php echo $user['first_name'].' '.$user['last_name']?> <br>
+	                        &nbsp;-&nbsp; <?php echo $user['first_name'].' '.$user['last_name'];
+                            if($row['Role']['role_id']==4) //label roles for clarity
+                                echo ' (TA)';
+                            else
+                                echo ' (student)';?><br>
 	                    <?php endforeach; ?>
                     </font>
                 </td>
@@ -52,7 +56,7 @@
                 <?php echo '<td width="25%" valign="middle" class="result-header-td">Student Name:</td>';
                 echo '<td width="75%" rowspan="'.$rowspan.'" class="inner-table-cell"><div class="scrollbar"><table class="inner-table"><tr class="result-header-td">';
     	            for ($i = 1; $i <= $mixeval['Mixeval']["lickert_question_max"]; $i++) {
-    		            echo "<td width='200' style='inner-table-cell'>";
+    		            echo "<td width='200' class='inner-table-cell'>";
     		                echo "<strong><font color=" . $color[ $numerical_index % sizeof($color) ] . ">" . $numerical_index . ". </font></strong>";
     		                echo "(" . "/" . $mixevalQuestion[$i]['multiplier']. ")";
     		            echo "</td>";
@@ -62,6 +66,8 @@
                 echo __("Total:( /", true).number_format($mixeval['Mixeval']['total_marks'], 2)?>)</td></tr>
             <?php  if ($groupMembers) {
                 foreach ($groupMembers as $member) {
+                    if ($member['Role']['role_id']==4)
+                        break;
                     $aveScoreSum = 0;
                     echo "<tr class='result-cell'>";
                     if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
@@ -69,8 +75,12 @@
       	                $penalty = ($penalties[$member['User']['id']] / 100) * $totalScore;
       		            $questionIndex = 0; 
       		            $avgPerQuestion = 0;
-        	            for ($j = 1; $j <= $mixeval['Mixeval']["lickert_question_max"]; $j++) {                            
-        	                $criteriaAveGrade = $scoreRecords[$member['User']['id']]['mixeval_question_ave'][$j-1];
+        	            for ($j = 1; $j <= $mixeval['Mixeval']["lickert_question_max"]; $j++) {
+                            if (!empty($scoreRecords[$member['User']['id']]['mixeval_question_ave'])) {
+                                $criteriaAveGrade = $scoreRecords[$member['User']['id']]['mixeval_question_ave'][$j-1];
+                            } else {
+                                $criteriaAveGrade = 0;
+                            }
         	                $scaledQuestionGrade = $criteriaAveGrade * (1 - $penalties[$member['User']['id']] / 100);
         	                $questionPenalty = $criteriaAveGrade * $penalties[$member['User']['id']] / 100;
     	                    // for adding up the average percentage per question
@@ -137,6 +147,8 @@
     <?php 
     if ($groupMembers) {
         foreach ($groupMembers as $member) {
+            if ($member['Role']['role_id']==4)
+                break;
             echo '<tr class="tablecell2" cellpadding="4" cellspacing="2" >';
             $membersAry[$member['User']['id']]['member'] = $member;
             echo '<td width="25%" class="group-members">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td></tr>' . "\n";
@@ -170,7 +182,10 @@
         <td align="center">
             <div id="accordion">
 	            <?php $i = 0;
-                foreach($groupMembers as $row): $user = $row['User']; ?>
+                foreach($groupMembers as $row):
+                    if ($row['Role']['role_id']==4)
+                        break;
+                    $user = $row['User']; ?>
                     <div id="panel<?php echo $user['id']?>">
                     <div id="panel<?php echo $user['id']?>Header" class="panelheader">
                     <?php echo 'Evaluatee: '.$user['first_name'].' '.$user['last_name']?>

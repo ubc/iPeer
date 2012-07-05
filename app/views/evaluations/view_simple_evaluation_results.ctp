@@ -17,28 +17,42 @@
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
   <tr>
     <td colspan="3">
-	      <font color="red"><?php __('These student(s) have yet to submit their evaluations:')?> <br>
+	      <font color="red"><?php __('These people have yet to submit their evaluations:')?> <br>
 	         <?php foreach($inCompletedMembers as $row): $user = $row['User']; array_push($incompletedMembersArr, $user['first_name'].' '.$user['last_name']);?>
-	          &nbsp;-&nbsp; <?php echo $user['first_name'].' '.$user['last_name']?> <br>
+	          &nbsp;-&nbsp; <?php echo $user['first_name'].' '.$user['last_name'];
+              if($row['Role']['role_id']==4) //label roles for clarity
+                echo ' (TA)';
+              else
+                echo ' (student)';?><br>
 	      <?php endforeach; ?>
       </font>
     </td>
   </tr>
 </table>
-<?php } ?>
+<?php }
 
+// count how many members are tutors
+$count = 0;
+foreach ($groupMembers as $member) {
+    if ($member['Role']['role_id'] == 4)
+        ++$count;
+}
+
+?>
 <table width="100%" border="0" align="center" cellpadding="4">
   <tr class="tableheader">
-    <td width="10" height="32" align="center" colspan="<?php echo count($groupMembers) +1; ?>"><?php __('Evaluation Results')?>:</td>
+    <td width="10" height="32" align="center" colspan="<?php echo count($groupMembers)+1-$count; ?>"><?php __('Evaluation Results')?>:</td>
   </tr>
   <tr class="tablecell2">
   	<td width="25%" rowspan="2"><?php __('Evaluator')?></td>
-  	<td colspan="<?php echo count($groupMembers); ?>"><?php __('Members Evaluated')?></td>
+  	<td colspan="<?php echo count($groupMembers)-$count; ?>"><?php __('Members Evaluated')?></td>
   </tr>
   <tr class="tablecell2">
   <?php if ($groupMembers) {
-        $width = 75 / count($groupMembers);
+        $width = 75 / (count($groupMembers)-$count);
         	foreach ($groupMembers as $member) {
+                if($member['Role']['role_id'] == 4)
+                    break;
         		echo '<td width="'.$width.'">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td>' . "\n";
         	}  ?>
   </tr>
@@ -47,14 +61,15 @@
           echo '<tr class="tablecell2">';
     	  	echo '<td>' . $member_row['User']['first_name'] . ' ' . $member_row['User']['last_name']  . '</td>' . "\n\t\t";
     		  foreach ($groupMembers as $member_col) {
-    		    //Blank the disgonal for not self-evaluation
-    		    if (($member_row['User']['id'] == $member_col['User']['id']) && !$event['Event']['self_eval']) {
+    		    //Blank the diagonal for not self-evaluation
+    		    if (($member_row['User']['id'] == $member_col['User']['id']) && !$event['Event']['self_eval'] && ($member['Role']['role_id'] != 4)) {
     		       echo '<td> - </td>' . "\n\t\t";
-        		}else {
-      		    if (isset($scoreRecords[$member_row['User']['id']][$member_col['User']['id']])) {
+        		} else {
+      		    if (isset($scoreRecords[$member_row['User']['id']][$member_col['User']['id']]) && ($member_col['Role']['role_id'] != 4)) {
                 $score = $scoreRecords[$member_row['User']['id']][$member_col['User']['id']];
         		    echo '<td>'.(is_numeric($score) ? number_format($score, 2) : $score).'</td>' . "\n\t\t";
         		  } else {
+                     if ($member_col['Role']['role_id'] != 4)
         		     echo '<td>0.00</td>' . "\n\t\t";
         		  }
 
@@ -67,7 +82,7 @@
       <?php
       $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;
        foreach ($groupMembers as $member_col) {
-        if (isset($memberScoreSummary[$member_col['User']['id']])) {
+        if (isset($memberScoreSummary[$member_col['User']['id']]) && ($member_col['Role']['role_id'] != 4)) {
           $totalGrade = number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'],2);
           $gradePenalty = ($penalties[$member_col['User']['id']] / 100) * $totalGrade;
           $finalGrade = $totalGrade - $gradePenalty;
@@ -79,7 +94,8 @@
           echo '<td height="40">'.$totalGrade.'</td>'."\n\t\t";
 
         } else {
-         echo '<td height="40"> - </td>';
+          if ($member_col['Role']['role_id'] != 4)
+            echo '<td height="40"> - </td>';
         }
       }?>
   </tr>
@@ -88,7 +104,7 @@
       <?php
       $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;
        foreach ($groupMembers as $member_col) {
-        if (isset($memberScoreSummary[$member_col['User']['id']])) {
+        if (isset($memberScoreSummary[$member_col['User']['id']]) && ($member_col['Role']['role_id'] != 4)) {
           $totalGrade = number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'],2);
           $gradePenalty = number_format(($penalties[$member_col['User']['id']] / 100) * $totalGrade, 2);
 
@@ -99,7 +115,8 @@
           echo '<td height="40">'.$stringAddOn.'</td>'."\n\t\t";
 
         } else {
-         echo '<td height="40"> - </td>';
+          if ($member_col['Role']['role_id'] != 4)
+            echo '<td height="40"> - </td>';
         }
       }?>
   </tr>
@@ -108,7 +125,7 @@
     <?php
       $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;
        foreach ($groupMembers as $member_col) {
-        if (isset($memberScoreSummary[$member_col['User']['id']])) {
+        if (isset($memberScoreSummary[$member_col['User']['id']]) && ($member_col['Role']['role_id'] != 4)) {
           $totalGrade = number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'],2);
           $gradePenalty = ($penalties[$member_col['User']['id']] / 100) * $totalGrade;
           $finalGrade = number_format($totalGrade - $gradePenalty, 2);
@@ -116,7 +133,8 @@
           echo '<td height="40">'.$finalGrade.'</td>'."\n\t\t";
 
         } else {
-         echo '<td height="40"> - </td>';
+          if ($member_col['Role']['role_id'] != 4)
+            echo '<td height="40"> - </td>';
         }
     }?>
   </tr>
@@ -125,14 +143,15 @@
       <?php
       $memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) : count($scoreRecords) - 1;
        foreach ($groupMembers as $member_col) {
-        if (isset($memberScoreSummary[$member_col['User']['id']])) {
+        if (isset($memberScoreSummary[$member_col['User']['id']]) && ($member_col['Role']['role_id'] != 4)) {
           if (!empty($incompletedMembersArr) && in_array($member_col['User']['first_name'].' '.$member_col['User']['last_name'], $incompletedMembersArr))
             echo '<td height="40">'.($memberEvaluatedCount-(count($inCompletedMembers))+1).'</td>' . "\n\t\t";
           else
             echo '<td height="40">'.($memberEvaluatedCount-(count($inCompletedMembers))).'</td>' . "\n\t\t";
 
         } else {
-         echo '<td height="40"> - </td>';
+          if ($member_col['Role']['role_id'] != 4)
+            echo '<td height="40"> - </td>';
         }
        }?>
   </tr>
@@ -144,7 +163,7 @@
               $totalScore = $memberScoreSummary[$member_col['User']['id']]['received_total_score'];
               $gradePenalty = ($penalties[$member_col['User']['id']] / 100) * $totalScore;
               $finalGrade = $totalScore - $gradePenalty;
-              if (isset($memberScoreSummary[$member_col['User']['id']]) && $memberEvaluatedCount > count($inCompletedMembers)) {
+              if (isset($memberScoreSummary[$member_col['User']['id']])  && ($member_col['Role']['role_id'] != 4) && $memberEvaluatedCount > count($inCompletedMembers)) {
                   if ($event['Event']['self_eval']) {
                       // with self_eval on, calculation is simple
                       echo '<td height="40">'.number_format($memberScoreSummary[$member_col['User']['id']]['received_total_score'] / ($memberEvaluatedCount-count($inCompletedMembers)), 2).'</td>' . "\n\t\t";
@@ -166,7 +185,8 @@
                       }
                   }
               } else {
-                  echo '<td height="40"> - </td>';
+                  if ($member_col['Role']['role_id'] != 4)
+                    echo '<td height="40"> - </td>';
               }
           }?>
     </tr>
@@ -189,7 +209,8 @@ for ($m=0; $m<count($groupMembers); $m++) {
            <?php }
            echo '</td>' . "\n\t\t";
         } else
-          echo '<td height="40"><input type="button" value="'.__('marks n/a', true).'" disabled /></td>';
+          if ($groupMembers[$m]['Role']['role_id'] != 4)
+            echo '<td height="40"><input type="button" value="'.__('marks n/a', true).'" disabled /></td>';
   		 }?>
  </tr>
 <?php  }
@@ -237,18 +258,22 @@ else { // if no members are present
 		<td>
 <div id="accordion">
 	<?php $i = 0;
-	foreach($groupMembers as $row): $user = $row['User']; ?>
+	foreach($groupMembers as $row):
+        if($row['Role']['role_id']==4)
+            break;
+        $user = $row['User'];
+    ?>
 		<div id="panel<?php echo $user['id']?>">
 			<div id="panel<?php echo $user['id']?>Header" class="panelheader">
 				<?php echo 'Evaluator: '.$user['last_name'].' '.$user['first_name']?>
 			</div>
 			<div style="height: 200px;" id="panel1Content" class="panelContent">
 <table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
-<tr class="tablecell2">
-	<td><?php __('Evaluatee')?></td>
-	<td><?php __('Comment')?></td>
-	<td colspan="2"><?php __('Released')?></td>
-</tr>
+    <tr class="tablecell2">
+        <td><?php __('Evaluatee')?></td>
+        <td><?php __('Comment')?></td>
+        <td colspan="2"><?php __('Released')?></td>
+    </tr>
 	<?php
 $i = 0;
 foreach($evalResult[$user['id']] AS $row ) {
