@@ -15,7 +15,7 @@ define('IMPORT_GROUP_GROUP_NAME', 2);
 class GroupsController extends AppController
 {
     public $name = 'Groups';
-    public $uses =  array('Group', 'GroupsMembers', 'User', 'UserEnrol', 'Personalize', 'GroupEvent');
+    public $uses =  array('Group', 'GroupsMembers', 'User', 'UserEnrol', 'Personalize', 'GroupEvent', 'Course');
     public $show;
     public $sortBy;
     public $direction;
@@ -93,7 +93,7 @@ class GroupsController extends AppController
         $columns = array(
             array("Group.id",        "",         "",     "hidden"),
             array("Group.member_count",       "",         "",     "hidden"),
-            array("Course.course",   __("Course", true),   "15em", "action", "Course Home"),
+            array("Course.course", "", "", "hidden"),
             array("Group.group_num", __("Group #", true),  "6em",  "number"),
             array("Group.group_name",__("Group Name", true), "auto", "action", "View Group"),
             array("Group.creator_id",      "",         "",     "hidden"),
@@ -162,12 +162,15 @@ class GroupsController extends AppController
      */
     function index()
     {
+        $courseId = $this->Session->read('ipeerSession.courseId');
+        $courseName = $this->Course->field('course', array('id' => $courseId));
+        $this->set('title_for_layout', $courseName . " - Groups");
         if (!User::hasPermission('controllers/groups')) {
             $this->Session->setFlash('You do not have permission to view groups.');
             $this->redirect('/home');
         }
         
-        $this->set('course_id', $this->Session->read('ipeerSession.courseId'));
+        $this->set('course_id', $courseId);
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
         // Set the display list
