@@ -150,9 +150,9 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
     }
     echo '<tr class="tablesummary"><td class="group-members"><b>';
     echo __("Group Average: ", true);
-    echo "</b></td></tr>";
+    echo "</b></td></tr><tr><td> </td></tr>";
     ?>
-
+    <tr><td>  </td></tr>
     <tr class="tablecell2" align="center"><td colspan="<?php echo $rubric['Rubric']["criteria"] +2; ?>">
         <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
             <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
