@@ -1025,8 +1025,6 @@ INSERT INTO `group_events` VALUES (3, 1, 2, 'not reviewed', NULL, 'None', 'None'
 INSERT INTO `group_events` VALUES (4, 2, 2, 'not reviewed', NULL, 'None', 'None', 'A', 0, '2006-06-21 08:52:20', NULL, '2006-06-21 08:52:20');
 INSERT INTO `group_events` VALUES (5, 1, 3, 'not reviewed', NULL, 'None', 'None', 'A', 0, '2006-06-21 08:53:23', NULL, '2006-06-21 08:53:23');
 INSERT INTO `group_events` VALUES (6, 2, 3, 'not reviewed', NULL, 'None', 'None', 'A', 0, '2006-06-21 08:53:23', NULL, '2006-06-21 08:53:23');
-INSERT INTO `group_events` VALUES (7, 0, 2, 'not reviewed', NULL, 'None', 'None', 'A', 0, '2006-06-21 08:54:25', NULL, '2006-06-21 08:54:25');
-INSERT INTO `group_events` VALUES (8, 0, 3, 'not reviewed', NULL, 'None', 'None', 'A', 0, '2006-06-21 09:07:26', NULL, '2006-06-21 09:07:26');
 
 -- --------------------------------------------------------
 
