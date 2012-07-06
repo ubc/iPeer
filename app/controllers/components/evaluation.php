@@ -514,7 +514,7 @@ class EvaluationComponent extends Object
         $evaluator = $user['id'];
         $result = array();
         //Get Members for this evaluation
-        $groupMembers = $this->GroupsMembers->getEventGroupMembers(
+        $groupMembers = $this->GroupsMembers->getEventGroupMembersNoTutors(
             $event['group_id'], $event['Event']['self_eval'], $evaluator);
         for ($i = 0; $i<count($groupMembers); $i++) {
             $targetEvaluatee = $groupMembers[$i]['User']['id'];
@@ -537,7 +537,7 @@ class EvaluationComponent extends Object
         $result['rubric'] = $this->Rubric->read();
 
         // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
-        $numMembers=count($this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'], $evaluator));
+        $numMembers=count($this->GroupsMembers->getEventGroupMembersNoTutors($event['group_id'], $event['Event']['self_eval'], $evaluator));
         //$this->set('evaluateeCount', $numMembers);
         $result['evaluateeCount'] = $numMembers;
         return $result;
@@ -986,6 +986,7 @@ class EvaluationComponent extends Object
 
         $evalResult = array();
         $groupMembers = array();
+        $groupMembersNoTutors = array();
         $result = array();
 
         $this->Rubric->id = $event['Event']['template_id'];
@@ -1002,12 +1003,19 @@ class EvaluationComponent extends Object
             //$rubricResultDetail = $this->getRubricResultDetail($event, $user);
             $groupMembers = $this->GroupsMembers->getEventGroupMembers(
                 $event['group_id'], $event['Event']['self_eval'], $currentUser['id']);
+            $groupMembersNoTutors = $this->GroupsMembers->getEventGroupMembersNoTutors(
+                $event['group_id'], $event['Event']['self_eval'], $currentUser['id']);
             $rubricResultDetail = $this->getRubricResultDetail($event, $user);
             $membersAry = array();
+            $membersAryNoTutors = array();
             foreach ($groupMembers as $member) {
                 $membersAry[$member['User']['id']] = $member;
             }
+            foreach ($groupMembersNoTutors as $member) {
+                $membersAryNoTutors[$member['User']['id']] = $member;
+            }
             $result['groupMembers'] = $membersAry;
+            $result['groupMembersNoTutors'] = $membersAryNoTutors;
 
             $reviewEvaluations = $this->getStudentViewRubricResultDetailReview($event, $currentUser['id']);
             $result['reviewEvaluations'] = $reviewEvaluations;
@@ -1048,8 +1056,10 @@ class EvaluationComponent extends Object
             $result['penalty'] = $scorePenalty['Penalty']['percent_penalty'];
         } else {
             $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'], $event['Event']['self_eval'], $currentUser['id']);
+            $groupMembersNoTutors = $this->GroupsMembers->getEventGroupMembersNoTutors($event['group_id'], $event['Event']['self_eval'], $currentUser['id']);
             $rubricResultDetail = $this->getRubricResultDetail($event, $groupMembers);
             $result['groupMembers'] = $groupMembers;
+            $result['groupMembersNoTutors'] = $groupMembersNoTutors;
         }
 
         //Get Detail information on Rubric score

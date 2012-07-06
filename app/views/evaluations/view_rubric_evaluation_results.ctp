@@ -54,9 +54,7 @@ echo $this->element('evaluations/view_event_info', $params);
     //as display the average scores their peers gave them
     //for various criteria
     if ($groupMembers) {
-      foreach ($groupMembers as $member) {
-      	if ($member['Role']['role_id']==4) //hide tutor's score
-            break;
+      foreach ($groupMembersNoTutors as $member) {
         echo '<tr class="tablecell2">';
       	echo '<td width="70%">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td>' . "\n";
       	//totals section

@@ -74,10 +74,8 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
     //as display the average scores their peers gave them
     //for various criteria
     $questionSum = array_fill(0, $rubric['Rubric']['criteria'], 0);
-    if ($groupMembers) {
-        foreach ($groupMembers as $member) {
-            if ($member['Role']['role_id']==4)
-                break;
+    if ($groupMembersNoTutors) {
+        foreach ($groupMembersNoTutors as $member) {
             $membersAry[$member['User']['id']] = $member;
             echo '<tr class="result-cell">';
             if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
@@ -143,10 +141,8 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
     }	?>
     </tr></table></td></tr>
     <?php
-    if ($groupMembers) {
-        foreach ($groupMembers as $member) {
-            if ($member['Role']['role_id']==4)
-                break;
+    if ($groupMembersNoTutors) {
+        foreach ($groupMembersNoTutors as $member) {
             echo '<tr class="tablecell2" cellpadding="4" cellspacing="2" >';
             $membersAry[$member['User']['id']]['member'] = $member;
             echo '<td width="25%" class="group-members">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td></tr>' . "\n";
@@ -154,7 +150,7 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
     }
     echo '<tr class="tablesummary"><td class="group-members"><b>';
     echo __("Group Average: ", true);
-    echo "</b></td></tr><tr><td>  </td></tr>";
+    echo "</b></td></tr>";
     ?>
 
     <tr class="tablecell2" align="center"><td colspan="<?php echo $rubric['Rubric']["criteria"] +2; ?>">
@@ -180,9 +176,7 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
         <td align="center">
 <div id="accordion">
     <?php $i = 0;
-    foreach($groupMembers as $row):
-        if ($row['Role']['role_id']==4)
-            break;
+    foreach($groupMembersNoTutors as $row):
         $user = $row['User']; ?>
         <div id="panel<?php echo $user['id']?>">
         <div id="panel<?php echo $user['id']?>Header" class="panelheader">

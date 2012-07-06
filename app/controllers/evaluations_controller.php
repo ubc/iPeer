@@ -921,6 +921,9 @@ class EvaluationsController extends AppController
             if (isset($formattedResult['groupMembers'])) {
                 $this->set('groupMembers', $formattedResult['groupMembers']);
             }
+            if (isset($formattedResult['groupMembersNoTutors'])) {
+                $this->set('groupMembersNoTutors', $formattedResult['groupMembersNoTutors']);
+            }
             if (isset($formattedResult['reviewEvaluations'])) {
                 $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);
             }
