@@ -88,8 +88,8 @@ class HomeController extends AppController
         $eventAry = array();
         $pos = 0;
         $user = $this->User->findUserByid($this->Auth->user('id'));
-        $test_var = $user['Role'][0]['id'];
-        if ($test_var == 5) {
+        $roleId = $user['Role'][0]['id'];
+        if ($roleId == 5) {
             //Get enrolled courses
             $enrol = $user['Enrolment'];
             foreach ($enrol as $enrolledCourse) {
@@ -138,11 +138,11 @@ class HomeController extends AppController
                 }
             }
         }
-        else if ($test_var == 4) {
+        else if ($roleId == 4) {
             //Get assigned courses
-            $courses = $user['Course'];
+            $courses = $user['Tutor'];
             foreach ($courses as $assignedCourse) {
-                $courseId = $assignedCourse['UserCourse']['course_id'];
+                $courseId = $assignedCourse['id'];
                 $events = $this->Event->find('all', array('conditions' => array('release_date_begin < NOW()', 'NOW() <= result_release_date_end', 'course_id' => $courseId)));
                 foreach ($events as $row) {
                     $event = $row['Event'];

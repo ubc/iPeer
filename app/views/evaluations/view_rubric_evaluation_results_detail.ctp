@@ -50,6 +50,7 @@ $rowspan = count($groupMembers) + 3;
 $numerical_index = 1;  //use numbers instead of words; get users to refer to the legend
 $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
 $membersAry = array();  //used to format result
+$noTutorsAry = array();
 $groupAve = 0;
 $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
 ?>
@@ -138,7 +139,13 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
         echo ' ('.number_format($groupAve / $rubric['Rubric']['total_marks'] * 100) . '%)';
       
         echo "</b></td>";
-    }	?>
+    }	
+    if ($groupMembers) {
+        foreach ($groupMembers as $member) {
+            $noTutorsAry[$member['User']['id']]['first_name'] = $member['User']['first_name'];
+            $noTutorsAry[$member['User']['id']]['last_name'] = $member['User']['last_name'];
+        }
+    } ?>
     </tr></table></td></tr>
     <?php
     if ($groupMembersNoTutors) {
@@ -235,11 +242,11 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
             if (isset($evalResult[$user['id']])) {
 
                 $memberResult = $evalResult[$user['id']];
-                
+
                 foreach ($memberResult AS $row): $memberRubric = $row['EvaluationRubric'];
-                    $evalutor = $membersAry[$memberRubric['evaluator']];
+                    $evalutor = $noTutorsAry[$memberRubric['evaluator']];
                     echo "<tr class=\"tablecell2\">";
-                    echo "<td width='15%'>".$evalutor['User']['last_name'].' '.$evalutor['User']['first_name']."</td>";
+                    echo "<td width='15%'>".$evalutor['last_name'].' '.$evalutor['first_name']."</td>";
 
                     $resultDetails = $memberRubric['details'];
                     foreach ($resultDetails AS $detail) : $rubDet = $detail['EvaluationRubricDetail'];
@@ -328,12 +335,6 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
 </script>
 </div>
 
-<table width="95%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">
-    <tr>
-        <td align="left"><?php echo $html->image('layout/corner_bot_left.gif',array('align'=>'middle','alt'=>'corner_bot_left'))?></td>
-        <td align="right"><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'middle','alt'=>'corner_bot_right'))?></td>
-    </tr>
-</table>
         </td>
     </tr>
 </table>

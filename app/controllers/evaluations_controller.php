@@ -412,7 +412,7 @@ class EvaluationsController extends AppController
 
 
             //Get Members for this evaluation
-            $groupMembers = $this->GroupsMembers->getEventGroupMembers($groupId, $event['Event']['self_eval'], $userId);
+            $groupMembers = $this->GroupsMembers->getEventGroupMembersNoTutors($groupId, $event['Event']['self_eval'], $userId);
             $this->set('groupMembers', $groupMembers);
 
             // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
@@ -905,11 +905,12 @@ class EvaluationsController extends AppController
             $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
             $this->set('evalResult', $formattedResult['evalResult']);
             $this->set('groupMembers', $formattedResult['groupMembers']);
+            $this->set('groupMembersNoTutors', $formattedResult['groupMembersNoTutors']);
             $this->set('allMembersCompleted', $formattedResult['allMembersCompleted']);
             $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
             $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
             // Set penalty
-            $penalties = $this->SimpleEvaluation->formatPenaltyArray($grpEvent['GroupEvent']['id'], $formattedResult['groupMembers'], $eventId);
+            $penalties = $this->SimpleEvaluation->formatPenaltyArray($grpEvent['GroupEvent']['id'], $formattedResult['groupMembersNoTutors'], $eventId);
             $this->set('penalties', $penalties);
             $this->render('view_simple_evaluation_results');
             break;

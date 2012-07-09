@@ -451,13 +451,15 @@ class EvaluationComponent extends Object
         //Get Members for this evaluation
         $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'],
             $event['Event']['self_eval'], $this->Auth->user('id'));
+        $groupMembersNoTutors = $this->GroupsMembers->getEventGroupMembersNoTutors($event['group_id'],
+            $event['Event']['self_eval'], $this->Auth->user('id'));
 
         // get comment records - do changes to records above this.
         $commentRecords = array();
         $memberScoreSummary = array();
         $inCompletedMembers = array();
         $allMembersCompleted = true;
-        if ($event['group_event_id'] && $groupMembers) {
+        if ($event['group_event_id'] && $groupMembersNoTutors) {
             $pos = 0;
             foreach ($groupMembers as $user) {
                 //Check if this memeber submitted evaluation
@@ -478,12 +480,13 @@ class EvaluationComponent extends Object
 
             }
         }
-        $scoreRecords = $this->formatSimpleEvaluationResultsMatrix($event, $groupMembers, $evalResult);
+        $scoreRecords = $this->formatSimpleEvaluationResultsMatrix($event, $groupMembersNoTutors, $evalResult);
         $gradeReleaseStatus = $this->EvaluationSimple->getTeamReleaseStatus($event['group_event_id']);
         $result['scoreRecords'] = $scoreRecords;
         $result['memberScoreSummary'] = $memberScoreSummary;
         $result['evalResult'] = $evalResult;
         $result['groupMembers'] = $groupMembers;
+        $result['groupMembersNoTutors'] = $groupMembersNoTutors;
         $result['inCompletedMembers'] = $inCompletedMembers;
         $result['allMembersCompleted'] = $allMembersCompleted;
         $result['gradeReleaseStatus'] = $gradeReleaseStatus;
