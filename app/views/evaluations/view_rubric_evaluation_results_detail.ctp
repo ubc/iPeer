@@ -46,11 +46,11 @@ echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluati
 <div id='rubric_result'>
 
 <?php
-$rowspan = count($groupMembers) + 3;
+$rowspan = count($groupMembersNoTutors) + 3;
 $numerical_index = 1;  //use numbers instead of words; get users to refer to the legend
 $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
-$membersAry = array();  //used to format result
-$noTutorsAry = array();
+$membersAry = array();  //used to format result (students)
+$withTutorsAry = array(); //used to format result (students,tutors)
 $groupAve = 0;
 $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
 ?>
@@ -131,23 +131,23 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
         echo '<tr class="tablesummary">';
         $questionIndex = 0;      
         foreach ($groupAverage AS $sum) {
-            echo '<td class="total-cell">' . number_format($sum / count($groupMembers), 2). "</td>";
+            echo '<td class="total-cell">' . number_format($sum / count($groupMembersNoTutors), 2). "</td>";
         }
         echo "<td><b>";
-        $groupAve = number_format($aveScoreSum / count($groupMembers), 2);
+        $groupAve = number_format($aveScoreSum / count($groupMembersNoTutors), 2);
         echo $groupAve;
         echo ' ('.number_format($groupAve / $rubric['Rubric']['total_marks'] * 100) . '%)';
       
         echo "</b></td>";
-    }	
-    if ($groupMembers) {
-        foreach ($groupMembers as $member) {
-            $noTutorsAry[$member['User']['id']]['first_name'] = $member['User']['first_name'];
-            $noTutorsAry[$member['User']['id']]['last_name'] = $member['User']['last_name'];
-        }
     } ?>
     </tr></table></td></tr>
     <?php
+    if ($groupMembers) {
+        foreach ($groupMembers as $member) {
+            $withTutorsAry[$member['User']['id']]['first_name'] = $member['User']['first_name'];
+            $withTutorsAry[$member['User']['id']]['last_name'] = $member['User']['last_name'];
+        }
+    }
     if ($groupMembersNoTutors) {
         foreach ($groupMembersNoTutors as $member) {
             echo '<tr class="tablecell2" cellpadding="4" cellspacing="2" >';
@@ -244,7 +244,7 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
                 $memberResult = $evalResult[$user['id']];
 
                 foreach ($memberResult AS $row): $memberRubric = $row['EvaluationRubric'];
-                    $evalutor = $noTutorsAry[$memberRubric['evaluator']];
+                    $evalutor = $withTutorsAry[$memberRubric['evaluator']];
                     echo "<tr class=\"tablecell2\">";
                     echo "<td width='15%'>".$evalutor['last_name'].' '.$evalutor['first_name']."</td>";
 

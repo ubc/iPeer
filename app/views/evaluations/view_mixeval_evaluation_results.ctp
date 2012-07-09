@@ -53,10 +53,8 @@ echo $this->element('evaluations/view_event_info', $params);
     //This section will display the evaluatees' name
     //as display the average scores their peers gave them
     //for various criteria
-    if ($groupMembers) {
-      foreach ($groupMembers as $member) {
-        if ($member['Role']['role_id']==4)
-            break;
+    if ($groupMembersNoTutors) {
+      foreach ($groupMembersNoTutors as $member) {
       	echo '<tr class="tablecell2">';
       	echo '<td width="70%">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td>' . "\n";
       	//totals section
@@ -102,7 +100,7 @@ echo $this->element('evaluations/view_event_info', $params);
 			  <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" />
 			  <input type="hidden" name="display_format" value="Basic" />
 
-      	<td colspan="<?php echo count($groupMembers) +1; ?>">
+      	<td colspan="<?php echo count($groupMembersNoTutors) +1; ?>">
       	<?php
   				if ($event['group_event_marked'] == "reviewed") {
   					echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_not_reviewed\" value=\" ".__('Mark Peer Evaluations as Not Reviewed', true)."\" />";

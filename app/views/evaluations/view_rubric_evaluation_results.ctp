@@ -53,7 +53,7 @@ echo $this->element('evaluations/view_event_info', $params);
     //This section will display the evaluatees' name
     //as display the average scores their peers gave them
     //for various criteria
-    if ($groupMembers) {
+    if ($groupMembersNoTutors) {
       foreach ($groupMembersNoTutors as $member) {
         echo '<tr class="tablecell2">';
       	echo '<td width="70%">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td>' . "\n";
@@ -82,7 +82,7 @@ echo $this->element('evaluations/view_event_info', $params);
       echo __("Group Average: ", true);
       echo "</b></td>";
       echo "<td><b>";
-      echo number_format($aveScoreSum / count($groupMembers), 2);
+      echo number_format($aveScoreSum / count($groupMembersNoTutors), 2);
       
       echo "</b></td>";
     }		?>

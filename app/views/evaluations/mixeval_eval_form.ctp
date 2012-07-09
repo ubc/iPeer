@@ -179,8 +179,6 @@
   }
     $mustCompleteUsers = ($count != $evaluateeCount);
 
-
-
     $commentsNeeded = false;
     // Check if any comment fields were left empty.
     if ($event['Event']['com_req']) {

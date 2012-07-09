@@ -1,7 +1,7 @@
 <!-- elements::ajax_rubric_preview start -->
     <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
       <tr class="tableheader" align="center">
-      <td valign="top" width="75%" align='left'><?php __('Section One')?>: &nbsp;<?php __('Lickert Scales')?></td>
+      <td valign="top" width="75%" align='left'><?php __('Section One: Lickert Scales')?></td>
     <?php
     $descriptor_des = array('1'=>'Lowest','2'=>'','3'=>'Middle','4'=>'','5'=>'Highest');
     isset($data['Question'])? $questions = $data['Question'] : $questions = null;
@@ -176,7 +176,7 @@
                    <?php } else { ?>
                    
                      <input type="text" name="response_text_<?php echo $userId?>_<?php echo $id?>" size="92" value="<?php
-                      echo htmlentities($evaluation['EvaluationDetail'][$pos-1]['EvaluationMixevalDetail']['question_comment'])?>"/>
+                      echo htmlentities($evaluation['EvaluationDetail'][$pos-1]['EvaluationMixevalDetail']['question_comment'])?>">
                    <?php }?>
                     <?php $id++; ?>
                 

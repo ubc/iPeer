@@ -939,7 +939,7 @@ class EvaluationsController extends AppController
             $this->set('evalResult', $formattedResult['evalResult']);
             $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
             // set penalty data
-            $formattedPenalty = $this->Rubric->formatPenaltyArray($grpEvent['GroupEvent']['id'], $formattedResult['groupMembers'], $eventId);
+            $formattedPenalty = $this->Rubric->formatPenaltyArray($grpEvent['GroupEvent']['id'], $formattedResult['groupMembersNoTutors'], $eventId);
             $this->set('penalties', $formattedPenalty);
 
             if ($displayFormat == 'Detail') {
@@ -972,6 +972,9 @@ class EvaluationsController extends AppController
             if (isset($formattedResult['groupMembers'])) {
                 $this->set('groupMembers', $formattedResult['groupMembers']);
             }
+            if (isset($formattedResult['groupMembersNoTutors'])) {
+                $this->set('groupMembersNoTutors', $formattedResult['groupMembersNoTutors']);
+            }
             if (isset($formattedResult['reviewEvaluations'])) {
                 $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);
             }
@@ -986,7 +989,7 @@ class EvaluationsController extends AppController
             $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
 
             // Set Penalty
-            $penalties = $this->Mixeval->formatPenaltyArray($grpEvent['GroupEvent']['id'], $formattedResult['groupMembers'], $eventId);
+            $penalties = $this->Mixeval->formatPenaltyArray($grpEvent['GroupEvent']['id'], $formattedResult['groupMembersNoTutors'], $eventId);
             $this->set('penalties', $penalties);
 
             if ($displayFormat == 'Detail') {

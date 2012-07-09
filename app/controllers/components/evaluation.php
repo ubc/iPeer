@@ -135,7 +135,7 @@ class EvaluationComponent extends Object
      *
      * @param mixed $event        event
      * @param mixed $groupMembers group members
-     * @param mixed $evalResult   evalution result
+     * @param mixed $evalResult   evaluation result
      *
      * @access public
      * @return array matrix
@@ -1003,7 +1003,7 @@ class EvaluationComponent extends Object
             $this->User->id = $this->Auth->user('id');
             $this->User->recursive = -1;
             $user = $this->User->read();
-            //$rubricResultDetail = $this->getRubricResultDetail($event, $user);
+            $rubricResultDetail = $this->getRubricResultDetail($event, $user);
             $groupMembers = $this->GroupsMembers->getEventGroupMembers(
                 $event['group_id'], $event['Event']['self_eval'], $currentUser['id']);
             $groupMembersNoTutors = $this->GroupsMembers->getEventGroupMembersNoTutors(
@@ -1103,7 +1103,7 @@ class EvaluationComponent extends Object
         $evaluator = $this->Auth->user('id');
 
         //Get Members for this evaluation
-        $groupMembers = $this->GroupsMembers->getEventGroupMembers(
+        $groupMembers = $this->GroupsMembers->getEventGroupMembersNoTutors(
             $event['group_id'], $event['Event']['self_eval'], $this->Auth->user('id'));
         for ($i = 0; $i<count($groupMembers); $i++) {
             $targetEvaluatee = $groupMembers[$i]['User']['id'];
@@ -1124,7 +1124,7 @@ class EvaluationComponent extends Object
         $result['mixeval'] = $this->Mixeval->read();
 
         // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
-        $numMembers=count($this->GroupsMembers->getEventGroupMembers($event['group_id'], 
+        $numMembers=count($this->GroupsMembers->getEventGroupMembersNoTutors($event['group_id'], 
             $event['Event']['self_eval'], $evaluator));
         //$this->set('evaluateeCount', $numMembers);
         $result['evaluateeCount'] = $numMembers;
@@ -1280,7 +1280,7 @@ class EvaluationComponent extends Object
                     $receivedTotalScore = $this->EvaluationMixeval->getReceivedTotalScore(
                         $event['group_event_id'], $userId);
                     $ttlEvaluatorCount = $this->EvaluationMixeval->getReceivedTotalEvaluatorCount($event['group_event_id'], $userId);
-                    if ($ttlEvaluatorCount >0) {
+                    if ($ttlEvaluatorCount > 0) {
                         $memberScoreSummary[$userId]['received_total_score'] = $receivedTotalScore[0]['received_total_score'];
                         $memberScoreSummary[$userId]['received_ave_score'] = $receivedTotalScore[0]['received_total_score'] / $ttlEvaluatorCount;
                     }
@@ -1579,6 +1579,7 @@ class EvaluationComponent extends Object
 
         $evalResult = array();
         $groupMembers = array();
+        $groupMembersNoTutors = array();
         $result = array();
 
         $this->Mixeval->id = $event['Event']['template_id'];
@@ -1599,11 +1600,18 @@ class EvaluationComponent extends Object
             $mixevalResultDetail = $this->getMixevalResultDetail($event, $user);
             $groupMembers = $this->GroupsMembers->getEventGroupMembers(
                 $event['group_id'], $event['Event']['self_eval'], $currentUser['id']);
+            $groupMembersNoTutors = $this->GroupsMembers->getEventGroupMembersNoTutors(
+                $event['group_id'], $event['Event']['self_eval'], $currentUser['id']);
             $membersAry = array();
+            $membersAryNoTutors = array();
             foreach ($groupMembers as $member) {
                 $membersAry[$member['User']['id']] = $member;
             }
+            foreach ($groupMembersNoTutors as $member) {
+                $membersAryNoTutors[$member['User']['id']] = $member;
+            }
             $result['groupMembers'] = $membersAry;
+            $result['groupMembersNoTutors'] = $membersAryNoTutors;
 
             $reviewEvaluations = $this->getStudentViewMixevalResultDetailReview(
                 $event, $this->Auth->user('id'));
@@ -1646,8 +1654,11 @@ class EvaluationComponent extends Object
         } else {
             $groupMembers = $this->GroupsMembers->getEventGroupMembers(
                 $event['group_id'], $event['Event']['self_eval'], $this->Auth->user('id'));
+            $groupMembersNoTutors = $this->GroupsMembers->getEventGroupMembersNoTutors(
+                $event['group_id'], $event['Event']['self_eval'], $this->Auth->user('id'));
             $mixevalResultDetail = $this->getMixevalResultDetail($event, $groupMembers);
             $result['groupMembers'] = $groupMembers;
+            $result['groupMembersNoTutors'] = $groupMembersNoTutors;
         }
         
         //Get Detail information on Mixeval score

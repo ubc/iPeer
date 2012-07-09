@@ -288,7 +288,7 @@ class GroupsController extends AppController
         $groups = $this->Group->getGroupsByCourseId($course_id);
         $assigned_users = $this->GroupsMembers->getUserListInGroups($groups);
         foreach ($assigned_users as $assigned_user) {
-            $user_data[$assigned_user] = $user_data[$assigned_user].'*';
+            $user_data[$assigned_user] = $user_data[$assigned_user].' *';
         }
 
         $this->set('title_for_layout', $this->sysContainer->getCourseName($course_id).__(' > Groups > Add', true));
@@ -422,6 +422,7 @@ class GroupsController extends AppController
             $this->Session->setFlash('You do not have permission to add groups');
             $this->redirect('index');
         }
+        $this->set('title_for_layout', __('Import Groups From Text (.txt) or CSV File (.csv)', true));
         
         // Just render :-)
         if (!empty($this->params['form'])) {

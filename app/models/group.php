@@ -237,7 +237,7 @@ class Group extends AppModel
         $tutorsListNotinGroups = $this->Member->find($type, array(
             'conditions' => array(
                 'NOT' => array('Member.id' => $excludedPeople),
-                'Course.id' => $course['Course']['id'],
+                'Tutor.id' => $course['Course']['id'],
                 'Role.id' => 4
             ),
             'recursive' => 1,

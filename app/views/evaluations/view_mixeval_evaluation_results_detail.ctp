@@ -26,26 +26,27 @@
     </tr>
 	<?php $i = 0;
         if (!$allMembersCompleted) {?>
-            <tr>
-                <td colspan="3">
-                    <font color="red"><?php __('These people have yet to submit their evaluations:')?> <br>
-	                    <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
-	                        &nbsp;-&nbsp; <?php echo $user['first_name'].' '.$user['last_name'];
-                            if($row['Role']['role_id']==4) //label roles for clarity
-                                echo ' (TA)';
-                            else
-                                echo ' (student)';?><br>
-	                    <?php endforeach; ?>
-                    </font>
-                </td>
-            </tr>
+        <tr>
+            <td colspan="3">
+                <font color="red"><?php __('These people have yet to submit their evaluations:')?> <br>
+                    <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
+                        &nbsp;-&nbsp; <?php echo $user['first_name'].' '.$user['last_name'];
+                        if($row['Role']['role_id']==4) //label roles for clarity
+                            echo ' (TA)';
+                        else
+                            echo ' (student)';?><br>
+                    <?php endforeach; ?>
+                </font>
+            </td>
+        </tr>
         <?php } ?>
         </table>
         <?php
-        $rowspan = count($groupMembers) + 3;
+        $rowspan = count($groupMembersNoTutors) + 3;
         $numerical_index = 1;  //use numbers instead of words; get users to refer to the legend
         $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
-        $membersAry = array();  //used to format result
+        $membersAry = array();  //used to format result (students)
+        $withTutorsAry = array(); //used to format result (students,tutors)
         $groupAve = 0;
         $groupAverage = array_fill(1, $mixeval['Mixeval']['lickert_question_max'], 0);
         $averagePerQuestion = array();
@@ -64,10 +65,8 @@
     	            }
                 echo '<td width="250" class="inner-table-cell">';
                 echo __("Total:( /", true).number_format($mixeval['Mixeval']['total_marks'], 2)?>)</td></tr>
-            <?php  if ($groupMembers) {
-                foreach ($groupMembers as $member) {
-                    if ($member['Role']['role_id']==4)
-                        break;
+            <?php  if ($groupMembersNoTutors) {
+                foreach ($groupMembersNoTutors as $member) {
                     $aveScoreSum = 0;
                     echo "<tr class='result-cell'>";
                     if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
@@ -124,7 +123,7 @@
                 }
             }
             for ($j = 1; $j <= $mixeval['Mixeval']['lickert_question_max']; $j++) {
-                $scoreRecords['group_question_ave'][$j-1] = $groupAverage[$j] / count($groupMembers);
+                $scoreRecords['group_question_ave'][$j-1] = $groupAverage[$j] / count($groupMembersNoTutors);
             }
             ?> <tr class="tablesummary"> <?php
             $groupAve = 0;
@@ -145,15 +144,19 @@
         </table></div></td>
     </tr>
     <?php 
-    if ($groupMembers) {
-        foreach ($groupMembers as $member) {
-            if ($member['Role']['role_id']==4)
-                break;
+    if ($groupMembersNoTutors) {
+        foreach ($groupMembersNoTutors as $member) {
             echo '<tr class="tablecell2" cellpadding="4" cellspacing="2" >';
             $membersAry[$member['User']['id']]['member'] = $member;
             echo '<td width="25%" class="group-members">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td></tr>' . "\n";
         }
     }
+    if ($groupMembers) {
+        foreach ($groupMembers as $member) {
+            $withTutorsAry[$member['User']['id']]['member'] = $member;
+        }
+    }
+            
     echo '<tr class="tablesummary"><td class="group-members"><b>';
     echo __("Group Average: ", true);
     echo "</b></td></tr><tr><td>  </td></tr>";
@@ -182,9 +185,7 @@
         <td align="center">
             <div id="accordion">
 	            <?php $i = 0;
-                foreach($groupMembers as $row):
-                    if ($row['Role']['role_id']==4)
-                        break;
+                foreach($groupMembersNoTutors as $row):
                     $user = $row['User']; ?>
                     <div id="panel<?php echo $user['id']?>">
                     <div id="panel<?php echo $user['id']?>Header" class="panelheader">
@@ -250,7 +251,7 @@
                     if (isset($evalResult[$user['id']])) {
                         $memberResult = $evalResult[$user['id']];
                             foreach ($memberResult AS $row): $memberMixeval = $row['EvaluationMixeval'];
-                                $evalutor = $membersAry[$memberMixeval['evaluator']];
+                                $evalutor = $withTutorsAry[$memberMixeval['evaluator']];
                                 echo "<tr class=\"tablecell2\">";
                                 echo "<td width='15%'>".$evalutor['member']['User']['first_name'].' '.$evalutor['member']['User']['last_name']."</td>";
                                 $width = 85 / $mixeval['Mixeval']['lickert_question_max'];
@@ -318,7 +319,7 @@
                 if (isset($evalResult[$user['id']])) {
                     $memberResult = $evalResult[$user['id']];
                     foreach ($memberResult AS $row): $memberMixeval = $row['EvaluationMixeval'];
-                        $evalutor = $membersAry[$memberMixeval['evaluator']];
+                        $evalutor = $withTutorsAry[$memberMixeval['evaluator']];
                         echo "<tr class=\"tablecell2\">";
                         echo "<td width='15%'>".$evalutor['member']['User']['first_name'].' '.$evalutor['member']['User']['last_name']."</td>";
                         $width = 85 / ($mixeval['Mixeval']["total_question"] - $mixeval['Mixeval']["lickert_question_max"]);
