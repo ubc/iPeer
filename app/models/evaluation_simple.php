@@ -358,6 +358,12 @@ class EvaluationSimple extends AppModel
         $aveScore = 0;
         $groupAve = 0;
         $studentResult = array();
+        $studentResult['numMembers'] = null;
+        $studentResult['receivedNum'] = null;
+        $studentResult['penalty'] = null;
+        $studentResult['avePenalty'] = null;
+        $studentResult['aveScore'] = null;
+        $studentResult['groupAve'] = null;
         $subtractAvgScore = 0;
         $eventId = $event['Event']['id'];
         $results = $this->getResultsByEvaluatee($event['group_event_id'], $userId);
