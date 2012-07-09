@@ -15,6 +15,7 @@ switch($submenu) {
     array_push(
       $items,
       array('name' => 'Add Student', 'link' => "/users/add/$course_id"),
+      array('name' => 'Import Students', 'link' => "/users/import"),
       array('name' => 'List Students',
         'link' => "/users/goToClassList/$course_id"),
       array('name' => 'Email to All Students',

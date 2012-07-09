@@ -34,23 +34,23 @@ function fnFormatDetails ( oTable, nTr )
     var sOut = '<div class="userActionPanel"><ul>';
 
     sOut += '<li>';
-    sOut += '<a href="/users/view/'+aData[0]+'">View</a>'; 
+    sOut += '<a href="<?php echo $this->base; ?>/users/view/'+aData[0]+'">View</a>'; 
     sOut += '</li>';
 
     sOut += '<li>';
-    sOut += '<a href="/users/edit/'+aData[0]+'">Edit</a>'; 
+    sOut += '<a href="<?php echo $this->base; ?>/users/edit/'+aData[0]+'">Edit</a>'; 
     sOut += '</li>';
 
     sOut += '<li>';
-    sOut += '<a href="/emailer/write/U/'+aData[0]+'">Email</a>'; 
+    sOut += '<a href="<?php echo $this->base; ?>/emailer/write/U/'+aData[0]+'">Email</a>'; 
     sOut += '</li>';
 
     sOut += '<li>';
-    sOut += '<a href="/users/resetPassword/'+aData[0]+'">Reset Password</a>'; 
+    sOut += '<a href="<?php echo $this->base; ?>/users/resetPassword/'+aData[0]+'">Reset Password</a>'; 
     sOut += '</li>';
 
     sOut += '<li>';
-    sOut += '<a href="/users/delete/'+aData[0]+'">Delete</a>'; 
+    sOut += '<a href="<?php echo $this->base; ?>/users/delete/'+aData[0]+'">Delete</a>'; 
     sOut += '</li>';
 
     sOut += '</ul></div>';
