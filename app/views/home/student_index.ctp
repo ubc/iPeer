@@ -65,12 +65,6 @@
 	          <tr class=\"tablecell\"><td colspan=\"4\" align=\"center\"><b><?php __('No peer evaluations due at this time')?></b></td></tr>
 	        <?php endif; ?>
 		</table>
-		<table width="99%"  border="0" cellpadding="0" align="center" cellspacing="0" bgcolor="#E5E5E5">
-		  <tr>
-			<td><?php echo $html->image('layout/corner_bot_left.gif',array('align'=>'middle','alt'=>'corner_bot_left'))?></td>
-			<td align="right"><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'middle','alt'=>'corner_bot_right'))?></td>
-		  </tr>
-		</table>
 		<br>
       </div>
         <table width="100%" class="title" border="0" cellspacing="0" cellpadding="0">
@@ -101,14 +95,14 @@
 		  <tr class="tablecell">
 			<td>
 			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 1): 
-                            if ($isResultReleased):?>
+                            if ($isResultReleased && User::hasPermission('functions/viewstudentresults')):?>
 			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/studentViewEvaluationResult/<?php echo $eventSubmitted['Event']['id']?>;<?php echo $eventSubmitted['Event']['group_id']?>"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
 			  <?php
                             else:
                               echo $eventSubmitted['Event']['title'];
                           endif;endif;?>
 			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 2):
-                            if ($isResultReleased):?>
+                            if ($isResultReleased && User::hasPermission('functions/viewstudentresults')):?>
 			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/studentViewEvaluationResult/<?php echo $eventSubmitted['Event']['id']?>;<?php echo $eventSubmitted['Event']['group_id']?>"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
 			  <?php
                             else:
@@ -118,7 +112,7 @@
                               echo $eventSubmitted['Event']['title'];
                         endif;?>
 			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 4):
-                            if ($isResultReleased):?>
+                            if ($isResultReleased && User::hasPermission('functions/viewstudentresults')):?>
 			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/studentViewEvaluationResult/<?php echo $eventSubmitted['Event']['id']?>;<?php echo $eventSubmitted['Event']['group_id']?>"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
 			  <?php
                             else:
@@ -141,12 +135,6 @@
 	  <?php if ($i == 0):?>
 	          <tr class=\"tablecell\"><td colspan=\"4\" align=\"center\"><b><?php __('No peer evaluations submitted.')?></b></td></tr>
 	  <?php endif;?>
-		</table>
-		<table width="99%"  border="0" cellpadding="0" align="center" cellspacing="0" bgcolor="#E5E5E5">
-		  <tr>
-			<td><?php echo $html->image('layout/corner_bot_left.gif',array('align'=>'middle','alt'=>'corner_bot_left'))?></td>
-			<td align="right"><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'middle','alt'=>'corner_bot_right'))?></td>
-		  </tr>
 		</table>
 		<br>
 	  </div>

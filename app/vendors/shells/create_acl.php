@@ -141,6 +141,11 @@ class CreateAclShell extends Shell
         $emailtemplate = $this->Acl->Aco->save();
         $emailtemplate['Aco']['id'] = $this->Acl->Aco->id;
         
+        // functions/viewstudentresults
+        $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'viewstudentresults'));
+        $viewstudentresults = $this->Acl->Aco->save();
+        $viewstudentresults['Aco']['id'] = $this->Acl->Aco->id;
+        
     }
 
 
@@ -547,5 +552,6 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'controllers/Surveys');
         $this->Acl->deny($role, 'controllers/Users');
         $this->Acl->deny($role, 'functions');
+        $this->Acl->allow($role, 'functions/viewstudentresults');
     }
 }
