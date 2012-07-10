@@ -1,10 +1,4 @@
 <?php
-define('IMPORT_USERNAME', 0);
-define('IMPORT_FIRSTNAME', 1);
-define('IMPORT_LASTNAME', 2);
-define('IMPORT_STUDENT_NO', 3);
-define('IMPORT_EMAIL', 4);
-define('IMPORT_PASSWORD', 5);
 
 App::import('Lib', 'neat_string');
 
@@ -22,6 +16,7 @@ class User extends AppModel
     //The model name
     public $name = 'User';
     public $displayField = 'full_name';
+    public $insertedIds = array();
     protected $unhashed_password = '';
 
     /* User Type - Admin, Instructor, TA, Student */
@@ -29,6 +24,14 @@ class User extends AppModel
     public $USER_TYPE_INSTRUCTOR = 'I';
     public $USER_TYPE_TA = 'T';
     public $USER_TYPE_STUDENT = 'S';
+    
+    const IMPORT_USERNAME = '0';
+    const IMPORT_FIRSTNAME = '1';
+    const IMPORT_LASTNAME = '2';
+    const IMPORT_STUDENT_NO = '3';
+    const IMPORT_EMAIL = '4';
+    const IMPORT_PASSWORD = '5';
+    const GENERATED_PASSWORD = '6';
 
     public $_schema = array(
         'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
@@ -170,6 +173,24 @@ class User extends AppModel
     	'full_name' => 'CONCAT_WS(" ", first_name, last_name)',
     	'student_no_with_full_name' => 'CONCAT_WS(" ", student_no,CONCAT_WS(" ", first_name, last_name))'
     );
+
+    /* public afterSave($created) {{{ */
+    /**
+     * afterSave callback for after the save function
+     *
+     * @param mixed $created if the record has been created
+     *
+     * @access public
+     * @return void
+     */
+    function afterSave($created)
+    {
+        if ($created) {
+            $this->insertedIds[] = $this->getInsertID();
+        }
+
+        return true;
+    }
 
 
     /**
@@ -772,35 +793,40 @@ class User extends AppModel
         foreach ($userList as $line => $u) {
             $tmp = array();
 
-            if (count($u) > IMPORT_PASSWORD + 1) {
+            if (count($u) > User::IMPORT_PASSWORD + 2) {
                 $this->errorMessage[] = array('addUser' => sprintf(__('Invalid column number on line %d', true), $line));
                 continue;
             }
 
-            if (!isset($u[IMPORT_USERNAME]) || trim($u[IMPORT_USERNAME]) == '') {
+            if (!isset($u[User::IMPORT_USERNAME]) || trim($u[User::IMPORT_USERNAME]) == '') {
                 $this->errorMessage[] = array('addUser' => sprintf(__('Username can not be empty. line %d', true), $line));
                 continue;
             }
 
             // handle password
-            if (isset($u[IMPORT_PASSWORD])) {
-                $u[IMPORT_PASSWORD] = trim($u[IMPORT_PASSWORD]);
-            }
-            if ($u[IMPORT_PASSWORD]) {
-                App::import('Lib', 'neat_string');
-                $u[IMPORT_PASSWORD] = PasswordGenerator::generate();
-                $tmp['generated_password'] = true;
+            if (isset($u[User::IMPORT_PASSWORD])) {
+                $u[User::IMPORT_PASSWORD] = trim($u[User::IMPORT_PASSWORD]);
             }
 
-            $tmp['username']     = $u[IMPORT_USERNAME];
-            $tmp['first_name']   = isset($u[IMPORT_FIRSTNAME]) ? trim($u[IMPORT_FIRSTNAME]) : "";
-            $tmp['last_name']    = isset($u[IMPORT_LASTNAME]) ? trim($u[IMPORT_LASTNAME]) : "";
-            $tmp['student_no']   = isset($u[IMPORT_STUDENT_NO]) ? trim($u[IMPORT_STUDENT_NO]) : "";
-            $tmp['email']        = isset($u[IMPORT_EMAIL]) ? trim($u[IMPORT_EMAIL]) : "";
-            $tmp['tmp_password'] = $u[IMPORT_PASSWORD];
-            $tmp['password']     = md5($u[IMPORT_PASSWORD]); // Will be hashed by the Users controller
+            $tmp['username']     = $u[User::IMPORT_USERNAME];
+            $tmp['first_name']   = isset($u[User::IMPORT_FIRSTNAME]) ? trim($u[User::IMPORT_FIRSTNAME]) : "";
+            $tmp['last_name']    = isset($u[User::IMPORT_LASTNAME]) ? trim($u[User::IMPORT_LASTNAME]) : "";
+            $tmp['student_no']   = isset($u[User::IMPORT_STUDENT_NO]) ? trim($u[User::IMPORT_STUDENT_NO]) : "";
+            $tmp['email']        = isset($u[User::IMPORT_EMAIL]) ? trim($u[User::IMPORT_EMAIL]) : "";
+
+            if (empty($u[User::IMPORT_PASSWORD])) {
+            	$tmp['import_password'] = "";
+            	$tmp['tmp_password'] = $u[User::GENERATED_PASSWORD];
+            } else {
+            	$tmp['import_password'] = $u[User::IMPORT_PASSWORD];
+            	$tmp['tmp_password'] = "";
+            }
+
+            empty($u[User::IMPORT_PASSWORD]) ? $tmp['password'] = md5($u[User::GENERATED_PASSWORD]) :
+            	$tmp['password'] = md5($u[User::IMPORT_PASSWORD]); // Will be hashed by the Users controller
+            
             $tmp['creator_id']   = User::get('id');
-            $data[$u[IMPORT_USERNAME]] = $tmp;
+            $data[$u[User::IMPORT_USERNAME]] = $tmp;
         }
 
         if (!count($data)) {
@@ -810,31 +836,47 @@ class User extends AppModel
 
         // remove the existings
         $existings = $this->getByUsernames(Set::extract('/username', array_values($data)));
+
         foreach ($existings as $key => $e) {
             if ($updateExisting) {
                 $new = $data[$e['User']['username']];
-                $tmp['username'] = $e['User']['username'];
-                // update updatable column and changed field
+                $temp['id'] = $e['User']['id'];
+                $temp['username'] = $e['User']['username'];
+                // update updatable colun and changed field
                 if ($e['User']['first_name'] != $new['first_name']) {
-                    $tmp['first_name'] = $new['first_name'];
+                    $temp['first_name'] = $new['first_name'];
+                } else {
+                	$temp['first_name'] = $e['User']['first_name'];
                 }
+                
                 if ($e['User']['last_name'] != $new['last_name']) {
-                    $tmp['last_name'] = $new['last_name'];
+                    $temp['last_name'] = $new['last_name'];
+                } else {
+                	$temp['last_name'] = $e['User']['last_name'];
                 }
+                
                 if ($e['User']['email'] != $new['email']) {
-                    $tmp['email'] = $new['email'];
+                    $temp['email'] = $new['email'];
+                } else {
+                	$temp['email'] = $e['User']['email'];
                 }
+                
                 if ($e['User']['student_no'] != $new['student_no']) {
-                    $tmp['student_no'] = $new['student_no'];
+                    $temp['student_no'] = $new['student_no'];
+                } else {
+                	$temp['student_no'] = $e['User']['student_no'];
                 }
+                
                 // ignore the password if not exists in import source
-                if (!$new['generated_password']) {
-                    $tmp['password'] = $new['password'];
+                if ($new['import_password']) {
+                    $temp['password'] = $new['password'];
+                } else {
+                	$temp['password'] = $e['User']['password'];
                 }
                 // don't need creator_id either
-                unset($tmp['creator_id']);
+                unset($temp['creator_id']);
 
-                $existings[$key]['User'] = $tmp;
+                $existings[$key]['User'] = $temp;
             }
             // remove the existings from the data array
             unset($data[$e['User']['username']]);
@@ -845,7 +887,7 @@ class User extends AppModel
             return false;
         }
 
-        if ($updateExisting) {
+        if ($updateExisting && !empty($existings)) {
             if (!$this->saveAll($existings, array('validate' => false))) {
                 return false;
             }

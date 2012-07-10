@@ -11,25 +11,7 @@ App::import('Lib', 'Toolkit');
 class AppModel extends Model
 {
     protected $errorMessage = array();
-    protected $insertedIds = array();
 
-    /* public afterSave($created) {{{ */
-    /**
-     * afterSave callback for after the save function
-     *
-     * @param mixed $created if the record has been created
-     *
-     * @access public
-     * @return void
-     */
-    function afterSave($created)
-    {
-        if ($created) {
-            $this->insertedIds[] = $this->getInsertID();
-        }
-
-        return true;
-    }
     /* }}} */
 
     /* protected __construct($id = false, $table = null, $ds = null) {{{ */

@@ -994,14 +994,29 @@ class UsersController extends AppController
         }
 
         $data = Toolkit::parseCSV($uploadFile);
+        foreach ($data as &$user) {
+            if (empty($user[User::IMPORT_PASSWORD]))
+                $user[User::GENERATED_PASSWORD] = $this->PasswordGenerator->generate();
+            else
+                $user[User::GENERATED_PASSWORD] = '';
+        }
+
         $result = $this->User->addUserByArray($data, true);
 
         if (!$result) {
             $this->Session->setFlash($this->User->showErrors());
             $this->redirect('import');
         }
-
-        $this->Course->enrolStudents($this->User->insertedIds, $this->data['User']['course_id']);
+        
+        $insertedIds = array();
+        foreach ($result['created_students'] as $new) {
+            $insertedIds[] = $new['id'];
+        }
+        foreach ($result['updated_students'] as $old) {
+            $insertedIds[] = $old['id'];
+        }
+        
+        $this->Course->enrolStudents($insertedIds, $this->data['User']['course_id']);
 
         $this->FileUpload->removeFile($uploadFile);
 
