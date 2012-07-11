@@ -88,7 +88,6 @@ INSERT INTO `acos` (`id`, `parent_id`, `model`, `foreign_key`, `alias`, `lft`, `
 (51, 46, NULL, NULL, 'goToClassList', 99, 100),
 (52, 46, NULL, NULL, 'determineIfStudentFromThisData', 101, 102),
 (53, 46, NULL, NULL, 'getSimpleEntrollmentLists', 103, 104),
-(54, 46, NULL, NULL, 'processEnrollmentListsPostBack', 105, 106),
 (55, 46, NULL, NULL, 'view', 107, 108),
 (56, 46, NULL, NULL, 'add', 109, 110),
 (57, 46, NULL, NULL, 'edit', 111, 112),

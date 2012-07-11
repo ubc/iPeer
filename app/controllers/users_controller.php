@@ -414,56 +414,6 @@ class UsersController extends AppController
         $this->set("simpleCoursesList", $data['simpleCoursesList']);
     }
 
-
-    /**
-     * processEnrollmentListsPostBack
-     *
-     * @param mixed $params params
-     * @param mixed $userId user id
-     *
-     * @access public
-     * @return void
-     */
-    function processEnrollmentListsPostBack($params, $userId)
-    {
-        // Check if the course list was submitted at all.
-        if (empty($params['form']['Courses'])) {
-            // No Courses list? Then don't do anything.
-            return;
-        }
-        // Build up a list of checkboxed courses
-        $checkedCourseList = array();
-        foreach ($params['form'] as $key => $value) {
-            if (strstr($key, "checkBoxList_")) {
-                $aCourse = substr($key, 13);
-                array_push($checkedCourseList, $aCourse);
-            }
-        }
-
-        $data = $this->getSimpleEntrollmentLists($userId);
-        $simpleEnrolledList = $data['simpleEnrolledList'];
-        // Put students into newly selected courses
-        foreach ($checkedCourseList as $key => $value) {
-            if (!in_array($value, $simpleEnrolledList) &&
-                is_numeric($userId) &&
-                is_numeric($value)
-            ) {
-                $this->User->registerEnrolment($userId, $value);
-            }
-        }
-
-        // Take them out of the de-selected courses
-        foreach ($simpleEnrolledList as $key => $value) {
-            if (!in_array($value, $checkedCourseList) &&
-                is_numeric($userId) &&
-                is_numeric($value)
-            ) {
-                $this->User->dropEnrolment($userId, $value);
-            }
-        }
-    }
-
-
     /**
      * view
      *
