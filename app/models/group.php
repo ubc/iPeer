@@ -187,6 +187,21 @@ class Group extends AppModel
     }
 
     /**
+     * findGroupByGroupNumber Get group id by group number
+     *
+     * @param mixed $course_id  course id
+     * @param mixed $group_num  group number
+     *
+     * @access public
+     *
+     * @return array of the group
+     */
+    function findGroupByGroupNumber($course_id, $group_num)
+    {
+        return $this->find('first', array('conditions' => array('group_num' => $group_num, 'course_id' => $course_id)));
+    }
+
+    /**
      * Get students and tutors not in a group
      *
      * @param int    $group_id group id

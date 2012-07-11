@@ -3,11 +3,11 @@
     <td align="center">
 <table width="95%" border="0" cellspacing="0" cellpadding="2">
     <tr><td>
-    <center style="font-size:150%"><?php __('The group CVS file was processed.')?></center><br />
+    <center style="font-size:150%"><?php __('The group CSV file was processed.')?></center><br />
     <center><?php __('Click OK to return
     to the list of groups, or look bellow for the results of the import.')?>
     <br /> <br />
-    <input type="button" name="Okay" value="OK" onClick="window.location='<?php echo $this->webroot . "groups/goToClassList/". $rdAuth->courseId ?>'";>
+    <input type="button" name="Okay" value="OK" onClick="window.location='<?php echo $this->webroot . "groups/goToClassList/". $courseId ?>'";>
     </center>
     <br /> <br />
     <div style="border:1px solid;">
@@ -76,7 +76,7 @@
                     <?php echo ("$data[first_name]"); ?>
                 </td>
             <?php else: ?>
-                <td colspan=10><b><?php __('Error.')?></b> <?php __("See the 'Results:' line for details")?></td>
+                <td colspan=10><b><?php __('Error.')?></b> <?php __("See the 'Result:' line for details")?></td>
             <?php endif; ?>
             </tr>
             <tr><td style="background:<?php echo $bgColor; ?>"><?php __('Entry')?> :</td>

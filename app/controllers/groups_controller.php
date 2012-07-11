@@ -15,7 +15,7 @@ define('IMPORT_GROUP_GROUP_NAME', 2);
 class GroupsController extends AppController
 {
     public $name = 'Groups';
-    public $uses =  array('Group', 'GroupsMembers', 'User', 'UserEnrol', 'Personalize', 'GroupEvent', 'Course');
+    public $uses =  array('Group', 'GroupsMembers', 'User', 'Personalize', 'GroupEvent', 'Course');
     public $show;
     public $sortBy;
     public $direction;
@@ -426,7 +426,7 @@ class GroupsController extends AppController
         
         // Just render :-)
         if (!empty($this->params['form'])) {
-            $courseId = $this->params['form']['course_id'];
+            $courseId = $this->params['data']['course_id'];
             $this->params['data']['Group']['course_id'] = $courseId;
             $filename = $this->params['form']['file']['name'];
             $tmpFile = $this->params['form']['file']['tmp_name'];
@@ -537,9 +537,20 @@ class GroupsController extends AppController
                         $entry['status'] = __("User ", true). $entry['username'].__(" is unknown. Please add this user first.", true);
                     } else {
                         $entry['id'] = $userData['User']['id'];
-                        if (!$this->UserEnrol->isEnrolledInByUsername($entry['username'], $courseId)) {
+                        $enrolled = false;
+                        foreach ($userData['Enrolment'] as $checkData) {
+                            if ($checkData['id'] == $courseId) {
+                                $enrolled = true;
+                            }
+                        }
+                        foreach ($userData['Tutor'] as $checkData) {
+                            if ($checkData['id'] == $courseId) {
+                                $enrolled = true;
+                            }
+                        }
+                        if (!$enrolled) {
                             $entry['status'] = __("User ", true). $entry['username'].__(" is not enrolled in your selected course. ", true);
-                            $entry['status'] .= __("Please entroll them first.", true);
+                            $entry['status'] .= __("Please enrol them first.", true);
                         } else {
                             // So, the user exists, and is enrolled in the course - they pass validation
                             $entry['status'] = __("Validated Entry", true);
@@ -584,7 +595,9 @@ class GroupsController extends AppController
         // Check the groups' existance, and create them if they're missing.
         // Here I assume that the above code will not add a group without users.
         foreach ($groups as $key => $group) {
-            $groupId = $this->Group->findGroup($courseId, $group['number'], $group['name']);
+            $groupAry = array();
+            $groupAry = $this->Group->findGroupByGroupNumber($courseId, $group['number']);
+            $groupId = $groupAry['Group']['id'];
             if (is_numeric($groupId)) {
                 $groups[$key]['present'] = true;
                 $groups[$key]['id'] = $groupId;
@@ -605,7 +618,7 @@ class GroupsController extends AppController
                     $groups[$key]['present'] = true;
                     $groups[$key]['created'] = true;
                     $groups[$key]['id'] = $this->Group->id;
-                    $groups[$key]['reason'] = __("This is a new group; it was created sucessfully.", true);
+                    $groups[$key]['reason'] = __("This is a new group; it was created successfully.", true);
                 } else {
                     $groups[$key]['reason'] = __("The group could not be created in the database!", true);
                 }
@@ -625,10 +638,16 @@ class GroupsController extends AppController
                     }
                 }
                 if (is_numeric($groupId)) {
-                    $alreadyAdded = $this->GroupsMembers->isMemberOf($user['id'], $groupId);
+                    $groupAry = $this->Group->findGroupByid($groupId);
+                    $alreadyAdded = false;
+                    foreach ($groupAry['Member'] as $checkMember) {
+                        if ($user['id'] == $checkMember['id']) {
+                            $alreadyAdded = true;
+                        }
+                    }
                     if ($alreadyAdded) {
                         // User Already in group
-                        $users[$key]['status'] = __("User ", true). $user['username']. __("is already in group ", true);
+                        $users[$key]['status'] = __("User ", true). $user['username']. __(" is already in group ", true);
                         $users[$key]['status'].= "$user[group_num] - $user[group_name]";
                     } else {
                         $groupMemberData = array();
@@ -636,7 +655,7 @@ class GroupsController extends AppController
                         $groupMemberData['user_id'] = $user['id'];
                         $groupMemberData['group_id'] = $groupId;
                         if ($this->GroupsMembers->save($groupMemberData)) {
-                            $users[$key]['status'] = __("User added sucessfully to group ", true);
+                            $users[$key]['status'] = __("User added successfully to group ", true);
                             $users[$key]['status'].= "$user[group_num] - $user[group_name]";
                             $users[$key]['added'] = true;
                         } else {
@@ -703,8 +722,8 @@ class GroupsController extends AppController
         $results['users'] = $users;
 
         $this->set("results", $results);
+        $this->set("courseId", $courseId);
         $this->render('import_results');
-        exit;
     }
 
 

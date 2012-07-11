@@ -959,8 +959,8 @@ class UsersController extends AppController
         }
         
         $insertedIds = array();
-        foreach ($result['created_students'] as $new) {
-            $insertedIds[] = $new['id'];
+        foreach ($this->User->insertedIds as $new) {
+            $insertedIds[] = $new;
         }
         foreach ($result['updated_students'] as $old) {
             $insertedIds[] = $old['id'];
