@@ -164,7 +164,7 @@ class GroupsController extends AppController
     {
         $courseId = $this->Session->read('ipeerSession.courseId');
         $courseName = $this->Course->field('course', array('id' => $courseId));
-        $this->set('title_for_layout', $courseName . " - Groups");
+        $this->set('title_for_layout', $courseName . " > Groups");
         if (!User::hasPermission('controllers/groups')) {
             $this->Session->setFlash('You do not have permission to view groups.');
             $this->redirect('/home');

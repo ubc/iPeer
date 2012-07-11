@@ -4,7 +4,9 @@
 <table width="95%" border="0" cellspacing="0" cellpadding="2">
   <tr><td align='right'>
     <?php echo $html->link($html->image('icons/add.gif', array('alt'=>'Add Group', 'valign'=>'middle')) . __(' Add Group', true), 
-                           '/groups/add/'.$course_id, array('escape' => false)); ?>
+                           '/groups/add/'.$course_id, array('escape' => false)); ?> &nbsp; 
+    <?php echo $html->link($html->image('icons/add.gif', array('alt'=>'Import Group(s)', 'valign'=>'middle')) . __(' Import Group(s)', true), 
+                           '/groups/import/'.$course_id, array('escape' => false)); ?>
   </td></tr>
   <tr><td>
     <?php echo $this->element("list/ajaxList", array ("paramsForList" =>$paramsForList)); ?>
