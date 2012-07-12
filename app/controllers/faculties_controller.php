@@ -36,7 +36,7 @@ class FacultiesController extends AppController {
     /**
      * Display a specific faculty.
      *
-     * @param $id - the id of the faculty to be displayed.
+     * @param mixed $id - the id of the faculty to be displayed
      *
      * */
     function view($id = null) {
@@ -98,7 +98,7 @@ class FacultiesController extends AppController {
     /**
      * Edit an existing faculty.
      *
-     * @param $id - the id of the faculty to be edited.
+     * @param mixed $id - the id of the faculty to be edited
      *
      * */
     function edit($id = null) {
@@ -122,7 +122,7 @@ class FacultiesController extends AppController {
     /**
      * Delete a faculty
      *
-     * @param $id - the id of the faculty to be deleted.
+     * @param mixed $id - the id of the faculty to be deleted
      *
      * */
     function delete($id = null) {

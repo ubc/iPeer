@@ -417,7 +417,7 @@ class UsersController extends AppController
             $this->redirect('/home');
         }
 
-        if(!($this->data = $this->User->findUserByid($id))) {
+        if (!($this->data = $this->User->findUserByid($id))) {
             $this->Session->setFlash(__('This user does not exist.', true));
             $this->redirect('index');
         }
@@ -488,8 +488,7 @@ class UsersController extends AppController
         if (User::hasPermission('functions/user/superadmin')) {
             // superadmins should have access to all courses regardless
             $coursesOptions = $this->Course->find('list');
-        }
-        else if (User::hasPermission('functions/user/admin')) {
+        } else if (User::hasPermission('functions/user/admin')) {
             // admins should have access only in their faculty
             // get user's faculties
             $uf = $this->UserFaculty->findAllByUserId($this->Auth->user('id'));
@@ -505,8 +504,7 @@ class UsersController extends AppController
                         $this->Course->field('full_name', array('id' => $cid));
                 }
             }
-        }
-        else if (User::hasPermission('functions/user/instructor')) {
+        } else if (User::hasPermission('functions/user/instructor')) {
             // instructors can only access courses they teach
             $courses = $user['Course'];
             foreach ($courses as $course) {
@@ -555,12 +553,10 @@ class UsersController extends AppController
             if ($wantedRole == $roleDefault) {
                 // we should add this user as a student
                 $ret['Enrolment'][]['UserEnrol']['course_id'] = $id;
-            }
-            else if ($wantedRole == $tutorRole) {
+            } else if ($wantedRole == $tutorRole) {
                 // we should add this user as a tutor
                 $ret['Tutor'][]['UserTutor']['course_id'] = $id;
-            }
-            else {
+            } else {
                 // we should add this user as an instructor
                 $ret['Course'][]['UserCourse']['course_id'] = $id;
             }
@@ -582,7 +578,7 @@ class UsersController extends AppController
     public function add($courseId = null) {
         $this->set('title_for_layout', 'Add User');
 
-        if(!User::hasPermission('functions/user')) {
+        if (!User::hasPermission('functions/user')) {
             $this->Session->setFlash('You do not have permission to add users', true);
             $this->redirect('/home');
         }
@@ -613,8 +609,7 @@ class UsersController extends AppController
                     $this->_sendAddUserEmail($ret, $password, $enrolments);
                 $this->Session->setFlash($message, 'good');
                 $this->redirect('index');
-            }
-            else {
+            } else {
                 // Failed
                 $this->Session->setFlash("Unable to create user.");
             }
@@ -635,7 +630,7 @@ class UsersController extends AppController
 
         $role = $this->User->getRoleName($userId);
 
-        if(!User::hasPermission('functions/user')) {
+        if (!User::hasPermission('functions/user')) {
             $this->Session->setFlash(__('You do not have permission to edit users.', true));
             $this->redirect('/home');
         }
@@ -654,8 +649,7 @@ class UsersController extends AppController
             if ($this->User->save($this->data)) {
                 // Success!
                 $this->Session->setFlash(__('User successfully updated!', true), 'good');
-            }
-            else {
+            } else {
                 // Failed
                 $this->Session->setFlash(__('Unable to update user.', true));
             }
@@ -665,12 +659,12 @@ class UsersController extends AppController
             return;
         }
 
-        if(!($this->data = $this->User->findUserByid($userId))) {
+        if (!($this->data = $this->User->findUserByid($userId))) {
             $this->Session->setFlash(__('This user does not exist.', true));
             $this->redirect($this->referer());
         }
 
-        if(!User::hasPermission('functions/user/'.$role, 'update')) {
+        if (!User::hasPermission('functions/user/'.$role, 'update')) {
             $this->Session->setFlash(__('You do not have permission to edit this user.', true));
             $this->redirect('index');
         }
@@ -739,14 +733,14 @@ class UsersController extends AppController
     {
         $role = $this->User->getRoleName($id);
 
-        if(!User::hasPermission('functions/user')) {
+        if (!User::hasPermission('functions/user')) {
             $this->Session->setFlash('You do not have permission to delete users');
             $this->redirect('/home');
         }
 
         // check if current user has permission to delete this user
         // in case of the being deleted user has higher level role
-        if(!User::hasPermission('functions/user/'.$role, 'delete')) {
+        if (!User::hasPermission('functions/user/'.$role, 'delete')) {
             $this->Session->setFlash('You do not have permission to delete this user');
             $this->redirect('index');
         }
@@ -831,12 +825,12 @@ class UsersController extends AppController
     {
         $role = $this->User->getRoleName($user_id);
 
-        if(!User::hasPermission('functions/user')) {
+        if (!User::hasPermission('functions/user')) {
             $this->Session->setFlash('You do not have permission to reset passwords', true);
             $this->redirect('/home');
         }
 
-        if(!User::hasPermission('functions/user/'.$role)) {
+        if (!User::hasPermission('functions/user/'.$role)) {
             $this->Session->setFlash('You do not have permission to reset the password for this user.', true);
             $this->redirect('index');
         }
@@ -933,10 +927,11 @@ class UsersController extends AppController
 
         $data = Toolkit::parseCSV($uploadFile);
         foreach ($data as &$user) {
-            if (empty($user[User::IMPORT_PASSWORD]))
+            if (empty($user[User::IMPORT_PASSWORD])) {
                 $user[User::GENERATED_PASSWORD] = $this->PasswordGenerator->generate();
-            else
+            } else {
                 $user[User::GENERATED_PASSWORD] = '';
+            }
         }
 
         $result = $this->User->addUserByArray($data, true);

@@ -131,7 +131,7 @@ class SurveyGroupsController extends AppController
     /**
      * viewresult
      *
-     * @param bool $params
+     * @param mixed $eventId - Event id
      *
      * @access public
      * @return void

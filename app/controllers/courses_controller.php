@@ -230,8 +230,7 @@ class CoursesController extends AppController
             // superadmin permission means you see all departments regardless
             $departments = $this->Course->Department->find('list');
             $this->set('departments', $departments);
-        }
-        else {
+        } else {
             // need to limit the departments this user can see
             // get the user's faculties
             $uf = $this->UserFaculty->findAllByUserId($this->Auth->user('id'));
@@ -297,7 +296,7 @@ class CoursesController extends AppController
     public function edit($id)
     {
         if (!User::hasPermission('controllers/courses/edit')) {
-            $this->Session->setFlash(__('You do not have permission to edit courses.',true));
+            $this->Session->setFlash(__('You do not have permission to edit courses.', true));
             $this->redirect('/home');
         }
         $course = $this->Course->find('first', array('conditions' => array('id' => $id), 'recursive' => 1));
@@ -333,7 +332,7 @@ class CoursesController extends AppController
      */
     function delete($id)
     {
-        if(!User::hasPermission('functions/user')) {
+        if (!User::hasPermission('functions/user')) {
             $this->Session->setFlash('You do not have permission to delete courses');
             $this->redirect('/home');
         }

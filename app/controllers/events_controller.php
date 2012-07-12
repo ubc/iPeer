@@ -128,7 +128,7 @@ class EventsController extends AppController
 
         // put all the joins together
         // shows all events of courses the user (not student) has access to
-        if($courseId == null) {
+        if ($courseId == null) {
             $joinTables =  array( array (
                 // GUI aspects
                 "id" => "course_id",

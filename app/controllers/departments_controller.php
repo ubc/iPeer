@@ -27,8 +27,7 @@ class DepartmentsController extends AppController {
     public function index() {
         if (User::hasPermission('functions/user/superadmin')) {
             $ret = $this->Department->find('all');
-        }
-        else {
+        } else {
             $uf = $this->UserFaculty->findAllByUserId($this->Auth->user('id'));
             $ret = $this->Department->getByUserFaculties($uf);
         }
@@ -46,7 +45,7 @@ class DepartmentsController extends AppController {
     /**
      * View a department entry.
      *
-     * @param $id - The department id to be viewed.
+     * @param mixed $id - The department id to be viewed
      *
      * */
     public function view($id = null) {
@@ -97,7 +96,7 @@ class DepartmentsController extends AppController {
     /**
      * Edit an existing department entry.
      *
-     * @param $id - The id of the department entry to be edited.
+     * @param mixed $id - The id of the department entry to be edited
      *
      * */
     public function edit($id = null) {
@@ -125,7 +124,7 @@ class DepartmentsController extends AppController {
     /**
      * Delete an existing department entry.
      *
-     * @param $id - The id of the department entry to be edited.
+     * @param mixed $id - The id of the department entry to be edited
      *
      * */
     public function delete($id = null) {

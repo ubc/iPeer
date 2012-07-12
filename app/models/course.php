@@ -118,8 +118,7 @@ class Course extends AppModel
      * */
     public function beforeValidate() {
         if (array_key_exists('Department', $this->data) &&
-            empty($this->data['Department']['Department'])) 
-        {
+            empty($this->data['Department']['Department'])) {
             // make sure this model fails when saving without department
             $this->invalidate('Department');
             // make the error message appear in the right place

@@ -257,9 +257,7 @@ class EvaluationSimple extends AppModel
     /**
      * getComment
      *
-     * @param bool $grpEventId       group event id
-     * @param bool $evaluateeId      evaluatee id
-     * @param bool $includeEvaluator include evaluator
+     * @param mixed $id       simple evaluation id
      *
      * @access public
      * @return void
@@ -343,6 +341,7 @@ class EvaluationSimple extends AppModel
      * formatStudentViewOfSimpleEvaluationResult
      *
      * @param bool $event
+     * @param mixed $userId
      *
      * @access public
      * @return void
@@ -412,7 +411,7 @@ class EvaluationSimple extends AppModel
                     // late
                     if (0 < $late_diff) {
                         $days_late = $late_diff/(24*60*60);
-                        $scorePenalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId,$days_late);
+                        $scorePenalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId, $days_late);
                     }
                 }
                 $subtractAvgScore = ((($scorePenalty['Penalty']['percent_penalty']) / 100) * $totalScore) / $numMemberSubmissions;
@@ -465,7 +464,7 @@ class EvaluationSimple extends AppModel
                             // late
                             if (0 < $late_diff) {
                                 $days_late = $late_diff/(24*60*60);
-                                $scorePenalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId,$days_late);
+                                $scorePenalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId, $days_late);
                             }
                         }
                         $avgSubtract = 0;

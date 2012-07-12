@@ -137,8 +137,7 @@ class HomeController extends AppController
                     }
                 }
             }
-        }
-        else if ($roleId == 4) {
+        } else if ($roleId == 4) {
             //Get assigned courses
             $courses = $user['Tutor'];
             foreach ($courses as $assignedCourse) {

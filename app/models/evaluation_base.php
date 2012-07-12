@@ -139,6 +139,7 @@ class EvaluationBase extends AppModel
      *
      * @param mixed $grpEventId   group event id
      * @param mixed $groupMembers group members
+     * @param mixed $eventId      event id
      *
      * @access public
      * @return void
@@ -179,7 +180,7 @@ class EvaluationBase extends AppModel
                 // late
                 if (0 < $late_diff) {
                     $days_late = $late_diff/(24*60*60);
-                    $penalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId,$days_late);
+                    $penalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId, $days_late);
                 }
             }
             $userPenalty[$evaluator['User']['id']] = $penalty['Penalty']['percent_penalty'];

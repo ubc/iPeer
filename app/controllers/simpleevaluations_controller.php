@@ -314,7 +314,7 @@ class SimpleevaluationsController extends AppController
         }
         
         // check to see if submissions had been made - if yes - simple evaluation can't be edited
-        if(!empty($submissions)) {
+        if (!empty($submissions)) {
             $this->Session->setFlash(__('Submissions had been made. '.$eval['SimpleEvaluation']['name'].' cannot be edited. Please make a copy.', true));
             $this->redirect('index');
         }

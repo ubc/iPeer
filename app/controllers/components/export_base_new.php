@@ -124,6 +124,7 @@ class ExportBaseNewComponent extends Object
      * @param mixed $params      params
      * @param mixed $grpEventId  group event id
      * @param mixed $evaluateeId evaluatee id
+     * @param mixed $eventId     event id
      *
      * @access public
      * @return void
@@ -235,6 +236,7 @@ class ExportBaseNewComponent extends Object
      *
      * @param mixed $params     params
      * @param mixed $grpEventId group event id
+     * @param mixed $eventId    event id
      *
      * @access public
      * @return void
@@ -279,6 +281,7 @@ class ExportBaseNewComponent extends Object
      * @param mixed $params      params
      * @param mixed $grpEventId  group event id
      * @param mixed $evaluateeId evalutee id
+     * @param mixed $eventId     event id
      *
      * @access public
      * @return void
@@ -392,6 +395,7 @@ class ExportBaseNewComponent extends Object
      *
      * @param mixed $params     params
      * @param mixed $grpEventId group event id
+     * @param mixed $eventId    event id
      *
      * @access public
      * @return void
@@ -437,6 +441,7 @@ class ExportBaseNewComponent extends Object
      * @param mixed $params      params
      * @param mixed $grpEventId  group event id
      * @param mixed $evaluateeId evaluatee id
+     * @param mixed $eventId     event id
      *
      * @access public
      * @return void
@@ -517,7 +522,7 @@ class ExportBaseNewComponent extends Object
             );
             // no submission - if now is after release date end then - gets final deduction
             if (empty($event_sub['EvaluationSubmission'])) {
-                if(time() > $event_end) {
+                if (time() > $event_end) {
                     $penalty = $this->Penalty->getPenaltyfinal($eventId);
                 }
             // there is submission - may be on time or late
@@ -549,6 +554,7 @@ class ExportBaseNewComponent extends Object
      *
      * @param mixed $params     params
      * @param mixed $grpEventId group event id
+     * @param mixed $eventId    event id
      *
      * @access public
      * @return void

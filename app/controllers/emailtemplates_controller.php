@@ -90,7 +90,7 @@ class EmailtemplatesController extends AppController
 
         // Set up actions
         $warning = __("Are you sure you want to delete this email template permanently?", true);
-		
+
         $actions = array(
             array(__("View Email Template", true), "", "", "", "view", "EmailTemplate.id"),
             array(__("Edit Email Template", true), "", $restrictions, "", "edit", "EmailTemplate.id"),

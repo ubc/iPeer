@@ -321,7 +321,7 @@ class RubricsController extends AppController
         }
         
         // check to see if submissions had been made - if yes - rubric can't be edited
-        if(!empty($submissions)) {
+        if (!empty($submissions)) {
             $this->Session->setFlash(__('Submissions had been made. '.$eval['Rubric']['name'].' cannot be edited. Please make a copy.', true));
             $this->redirect('index');
         }

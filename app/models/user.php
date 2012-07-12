@@ -169,8 +169,8 @@ class User extends AppModel
 
     
     public $virtualFields = array(
-    	'full_name' => 'CONCAT_WS(" ", first_name, last_name)',
-    	'student_no_with_full_name' => 'CONCAT_WS(" ", student_no,CONCAT_WS(" ", first_name, last_name))'
+        'full_name' => 'CONCAT_WS(" ", first_name, last_name)',
+        'student_no_with_full_name' => 'CONCAT_WS(" ", student_no,CONCAT_WS(" ", first_name, last_name))'
     );
 
     /* public afterSave($created) {{{ */
@@ -684,15 +684,15 @@ class User extends AppModel
             $tmp['email']        = isset($u[User::IMPORT_EMAIL]) ? trim($u[User::IMPORT_EMAIL]) : "";
 
             if (empty($u[User::IMPORT_PASSWORD])) {
-            	$tmp['import_password'] = "";
-            	$tmp['tmp_password'] = $u[User::GENERATED_PASSWORD];
+                $tmp['import_password'] = "";
+                $tmp['tmp_password'] = $u[User::GENERATED_PASSWORD];
             } else {
-            	$tmp['import_password'] = $u[User::IMPORT_PASSWORD];
-            	$tmp['tmp_password'] = "";
+                $tmp['import_password'] = $u[User::IMPORT_PASSWORD];
+                $tmp['tmp_password'] = "";
             }
 
             empty($u[User::IMPORT_PASSWORD]) ? $tmp['password'] = md5($u[User::GENERATED_PASSWORD]) :
-            	$tmp['password'] = md5($u[User::IMPORT_PASSWORD]); // Will be hashed by the Users controller
+                $tmp['password'] = md5($u[User::IMPORT_PASSWORD]); // Will be hashed by the Users controller
             
             $tmp['creator_id']   = User::get('id');
             $data[$u[User::IMPORT_USERNAME]]['User'] = $tmp;
@@ -716,32 +716,32 @@ class User extends AppModel
                 if ($e['User']['first_name'] != $new['User']['first_name']) {
                     $temp['first_name'] = $new['User']['first_name'];
                 } else {
-                	$temp['first_name'] = $e['User']['first_name'];
+                    $temp['first_name'] = $e['User']['first_name'];
                 }
                 
                 if ($e['User']['last_name'] != $new['User']['last_name']) {
                     $temp['last_name'] = $new['User']['last_name'];
                 } else {
-                	$temp['last_name'] = $e['User']['last_name'];
+                    $temp['last_name'] = $e['User']['last_name'];
                 }
                 
                 if ($e['User']['email'] != $new['User']['email']) {
                     $temp['email'] = $new['User']['email'];
                 } else {
-                	$temp['email'] = $e['User']['email'];
+                    $temp['email'] = $e['User']['email'];
                 }
                 
                 if ($e['User']['student_no'] != $new['User']['student_no']) {
                     $temp['student_no'] = $new['User']['student_no'];
                 } else {
-                	$temp['student_no'] = $e['User']['student_no'];
+                    $temp['student_no'] = $e['User']['student_no'];
                 }
                 
                 // ignore the password if not exists in import source
                 if ($new['User']['import_password']) {
                     $temp['password'] = $new['User']['password'];
                 } else {
-                	$temp['password'] = $e['User']['password'];
+                    $temp['password'] = $e['User']['password'];
                 }
                 // don't need creator_id either
                 unset($temp['creator_id']);

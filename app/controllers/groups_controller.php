@@ -282,7 +282,7 @@ class GroupsController extends AppController
         }
         $user_data1 = $this->User->getEnrolledStudentsForList($course_id);
         $user_data2 = $this->User->getCourseTutorsForList($course_id);
-        $user_data = Set::pushDiff($user_data1,$user_data2);
+        $user_data = Set::pushDiff($user_data1, $user_data2);
 
         //Check if student is already assigned in a group
         $groups = $this->Group->getGroupsByCourseId($course_id);
@@ -354,7 +354,7 @@ class GroupsController extends AppController
      */
     function delete ($id)
     {
-        if(!User::hasPermission('controllers/groups/add')) {
+        if (!User::hasPermission('controllers/groups/add')) {
             $this->Session->setFlash('You do not have permission to delete groups');
             $this->redirect('index');
         }

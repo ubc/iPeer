@@ -206,10 +206,10 @@ class EmailerController extends AppController
                     )
                 )
             );
-             if (empty($course)) {
+            if (empty($course)) {
                 $this->Session->setFlash(__('You do not have permission to write emails to this class.', true));
                 $this->redirect('index');
-             }
+            }
         // for checking if the user can email to group with $id
         } else if ('G' == $type && !User::hasPermission('functions/email/allgroups')) {
             // check if they have access to group with $id           

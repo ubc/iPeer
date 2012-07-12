@@ -24,8 +24,10 @@ class Department extends AppModel {
      * Given a list of userfaculties, return the departments
      * belonging to those faculties.
      *
-     * @param $userfaculties - the list of userfaculties entries to get
+     * @param mixed $userfaculties - the list of userfaculties entries to get
      * the departments for.
+     *
+     * @return departments in the given list of faculties
      * */
     public function getByUserFaculties($userfaculties) {
         $departments = array();
