@@ -150,11 +150,11 @@ class LtiController extends AppController
         $cdata['User']['send_email_notification'] = false;
         $cdata['User']['lti_id'] = $lti_id;
         // TODO USER_TYPE_STUDENT needs to change to const instead of public later
-        $cdata['User']['role'] = $this->User->USER_TYPE_STUDENT;
+        $cdata['Role']['RolesUser']['role_id'] = $this->User->USER_TYPE_STUDENT;
         $cdata['User']['created'] = date('Y-m-d H:i:s');
         if ($instructor !== false) {
             // this guy is a prof
-            $cdata['User']['role'] = $this->User->USER_TYPE_INSTRUCTOR;
+            $cdata['Role']['RolesUser']['role_id'] = $this->User->USER_TYPE_INSTRUCTOR;
         }
 
         // Check if user already exists

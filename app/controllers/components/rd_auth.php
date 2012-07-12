@@ -84,39 +84,6 @@ class rdAuthComponent extends AppController // This component is in fact a
 
     public $customIntegrateCWL = 0;
 
-    // =-=-=-==-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
-    // User privilege level functions
-    /**
-     * getPrivilegeLevel
-     * Get the privilege level for a user ID or a user type.
-     *
-     * @param bool $user
-     *
-     * @access public
-     * @return void
-     */
-    function getPrivilegeLevel($user=null)
-    {
-        // For no parameters passed, get the privilege level of this user.
-        if (empty($user)) {
-            //return $this->getPrivilegeLevel($this->role);
-            return $this->getPrivilegeLevel($this->Auth->user('role'));
-        } else if (is_numeric($user)) {
-            // If $user is a numberic user ID, look it up in the database.
-            $data = $this->User->findById($user);
-            return $data ? $this->getPrivilegeLevel($data['User']['role']) : 0;
-        } else {
-            // Or if this is a string, look up the user type, and return privilege
-            switch (strtolower($user)) {
-            case "s" : return 200;
-            case "i" : return 600;
-            case "a" : return 1200;
-            default : return 0;
-            }
-        }
-    }
-
-
     /**
      * studentPrivilegeLevel
      *
@@ -184,25 +151,6 @@ class rdAuthComponent extends AppController // This component is in fact a
         }
     }
 
-
-    /**
-     * setFromData
-     * Updates the user session from the user data passed, and loads it into this rdAuth object.
-     *
-     * @param mixed $userData
-     *
-     * @access public
-     * @return void
-     */
-    function setFromData($userData)
-    {
-        $this->Session->write('ipeerSession.id', $userData['id']);
-        $this->Session->write('ipeerSession.username', $userData['username']);
-        $this->Session->write('ipeerSession.fullname', $userData['last_name'].' '.$userData['first_name']);
-        $this->Session->write('ipeerSession.role', $userData['role']);
-        $this->Session->write('ipeerSession.email', $userData['email']);
-        return $this->loadFromSession();
-    }
 
     /**
      * clearUserDataFromSession

@@ -52,7 +52,6 @@ class UserTestCase extends CakeTestCase
         $this->assertEqual($instructorName['User']['username'], "Peterson");
 
         //Test on valid admin input
-        //		$this->createUserHelper(3,'tonychiu','A','Password');
         $adminName = $this->User->getByUserName('Admin');
         $this->assertEqual($adminName['User']['username'], "Admin");
 
@@ -197,55 +196,6 @@ class UserTestCase extends CakeTestCase
         $this->assertEqual($user['User']['username'], 'StudentY');
     }
 
-    public function testCanRemoveCourse()
-    {
-        $empty=null;
-
-        //Test on valid admin and valid course
-        //Set up test data
-        $admin = $this->User->getByUsername('Admin');
-        $canRemove = $this->User->canRemoveCourse($admin, 1);
-        $this->assertEqual($canRemove, true);
-
-        //Test if instructor can remove a course
-        $instructor = $this->User->getByUsername('GSlade');
-        $canRemove = $this->User->canRemoveCourse($instructor, 1);
-        $this->assertEqual($canRemove, true);
-
-        //Test if instructor can remove a course
-        $instructor = $this->User->getByUsername('GSlade');
-        $canRemove = $this->User->canRemoveCourse($instructor, 3);
-        $this->assertEqual($canRemove, false);
-        //Test if student can remove a course
-        $student = $this->User->getByUsername('StudentY');
-        $canRemove = $this->User->canRemoveCourse($student, 1);
-        $this->assertEqual($canRemove, false);
-
-        //Test if user can remove an invalid course, course_id==23123 (invalid)
-        //Student
-        $canRemove = $this->User->canRemoveCourse($student, 23123);
-        $this->assertEqual($canRemove, false);
-        //Instructor
-        $canRemove = $this->User->canRemoveCourse($instructor, 23123);
-        $this->assertEqual($canRemove, false);
-        //Admin, should really return false
-        $canRemove = $this->User->canRemoveCourse($admin, 23123);
-        $this->assertEqual($canRemove, true);
-
-        //Test invalid user
-        $canRemove = $this->User->canRemoveCourse('invalid', 1);
-        $this->assertEqual($canRemove, false);
-
-        //Test null inputs
-        $canRemove = $this->User->canRemoveCourse(null, 1);
-        $this->assertEqual($canRemove, false);
-        $canRemove = $this->User->canRemoveCourse($student, null);
-        $this->assertEqual($canRemove, false);
-        $canRemove = $this->User->canRemoveCourse(null, null);
-        $this->assertEqual($canRemove, false);
-
-    }
-
     public function testGetUserIdByStudentNo()
     {
         $empty=null;
@@ -266,30 +216,6 @@ class UserTestCase extends CakeTestCase
         //Test function on null input
         $null =  $this->User->getUserIdByStudentNo(null);
         $this->assertEqual($null, $empty);
-    }
-
-    public function testGetRoleText()
-    {
-        $empty = null;
-
-        $student = $this->User->getRoleText('S');
-        $this->assertEqual($student, 'Student');
-
-        $TA = $this->User->getRoleText('T');
-        $this->assertEqual($TA, 'TA');
-
-        $instructor = $this->User->getRoleText('I');
-        $this->assertEqual($instructor, 'Instructor');
-
-        $admin = $this->User->getRoleText('A');
-        $this->assertEqual($admin, 'Administrator');
-
-        $invalidRole = $this->User->getRoleText('X');
-        $this->assertEqual($invalidRole, 'Unknown');
-
-        $nullInput = $this->User->getRoleText(null);
-        $this->assertEqual($nullInput, $empty);
-
     }
 
     public function testGetRoleName()
@@ -396,45 +322,6 @@ class UserTestCase extends CakeTestCase
 
     }
 
-    public function testHasTitle()
-    {
-        $roles = $this->User->getRoles(3);
-        $roles = $this->User->hasTitle($roles);
-        $this->assertFalse($roles);
-
-        $roles = $this->User->getRoles(1);
-        $roles = $this->User->hasTitle($roles);
-        $this->assertTrue($roles);
-
-        $roles = $this->User->getRoles(999);
-        $roles = $this->User->hasTitle($roles);
-        $this->assertFalse($roles);
-
-        $roles = $this->User->getRoles(null);
-        $roles = $this->User->hasTitle($roles);
-        $this->assertFalse($roles);
-
-    }
-
-    public function testHasStudentNo()
-    {
-        $roles = $this->User->getRoles(3);
-        $roles = $this->User->hasStudentNo($roles);
-        $this->assertTrue($roles);
-
-        $roles = $this->User->getRoles(1);
-        $roles = $this->User->hasStudentNo($roles);
-        $this->assertFalse($roles);
-
-        $roles = $this->User->getRoles(999);
-        $roles = $this->User->hasStudentNo($roles);
-        $this->assertFalse($roles);
-
-        $roles = $this->User->getRoles(null);
-        $roles = $this->User->hasStudentNo($roles);
-        $this->assertFalse($roles);
-    }
-
     public function testGetRolesByRole()
     {
         $empty=null;
@@ -469,8 +356,6 @@ class UserTestCase extends CakeTestCase
 
         //Test for valid instructor and course
         //Set up test data
-    //	$this->createUserHelper(1,'KevinLuk','S','Password');
-    //	$this->createUserHelper(2,'GSlade','I','Password');
 //		$this->createCoursesHelper(1, 'Math320', 'AnalysisI');
         //Run tests
         $this->User->registerEnrolment(3,3);
@@ -485,8 +370,6 @@ class UserTestCase extends CakeTestCase
         //	$this->flushDatabase();
 
         //set up test data
-        //	$this->createUserHelper(1,'KevinLuk','S','Password');
-        //		$this->createUserHelper(2,'GSlade','I','Password');
         //	$this->createCoursesHelper(1, 'Math320', 'AnalysisI');
         //Run tests
         $this->User->registerEnrolment(1, 1);

@@ -16,7 +16,7 @@
 	  <tr class="tableheader">
 	    <th><?php echo $this->Paginator->sort('ID', 'Event.id')?></th>
 	   <?php ?>
-<?php if($currentUser['role'] == 'A' || $currentUser['role'] == 'I'):?>
+<?php if($currentUser['Role']['name'] == 'superadmin' || $currentUser['Role']['name'] == 'admin' || $currentUser['Role']['name'] == 'instructor'):?>
 	        <th>View</th>
 	    <?php endif;?>
 	    <?php if (isset($display) && $display == 'search') { ?>
@@ -41,7 +41,7 @@
   		  <?php echo $evaluation['id'] ?>
   	    </td>
   	    <td align="center">
-  	    <?php if($currentUser['role'] == 'A' || $currentUser['role'] == 'I'):?>
+  	    <?php if($currentUser['Role']['name'] == 'superadmin' || $currentUser['Role']['name'] == 'admin' || $currentUser['Role']['name'] == 'instructor'):?>
   		    <a href="<?php echo $this->webroot.$this->theme.'evaluations/view/'.$evaluation['id']?>"><?php echo $html->image('icons/view.gif',array('border'=>'0','alt'=>__('View', true), 'title'=>__('View ', true).$evaluation['title']))?></a>
   	    <?php endif;?>
   	    </td>

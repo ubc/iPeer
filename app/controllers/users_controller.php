@@ -215,12 +215,6 @@ class UsersController extends AppController
         // Set up the basic static ajax list variables
         $this->_setUpAjaxList();
 
-        //If User role isn't Admin, display student as default
-        /*if (!User::hasRole('superadmin') && !User::hasRole('admin')) {
-            $mapFilterSelections->{"User.role"} = "S";
-            $this->AjaxList->setStateVariable("mapFilterSelections", $mapFilterSelections);
-        }*/
-
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
 
@@ -286,12 +280,6 @@ class UsersController extends AppController
     {
         if (!empty($this->data)) {
             $this->Output->filter($this->data);//always filter
-            if (!empty($roleNum)) {
-                $roleNum = $this->data['Role']['Role'];
-
-                $role = $this->Role->getRoleByRoleNumber($roleNum[0]);
-                $this->data['User']['role'] = $role;
-            }
             //Save Data
             if ($this->data = $this->User->save($this->data)) {
                 $this->data['User']['id'] = $this->User->id;
@@ -993,24 +981,6 @@ class UsersController extends AppController
         }
     }
 
-
-    /**
-     * nonRegisteredCourses
-     *
-     * @param mixed $user_id        user id
-     * @param bool  $requester      requester
-     * @param bool  $requester_role requester role
-     *
-     * @access public
-     * @return void
-     */
-    function nonRegisteredCourses($user_id, $requester = null, $requester_role = null)
-    {
-        return $this->Course->findNonRegisteredCoursesList($user_id, $requester, $requester_role);
-    }
-
-
-
     /**
      * __loadFromSession
      * Loads the rdAuth data from the Session.
@@ -1048,9 +1018,7 @@ class UsersController extends AppController
         $this->Session->write('ipeerSession.id', $userData['id']);
         $this->Session->write('ipeerSession.username', $userData['username']);
         $this->Session->write('ipeerSession.fullname', $userData['last_name'].' '.$userData['first_name']);
-        //$this->Session->write('ipeerSession.role', $userData['Role']);
         $this->Session->write('ipeerSession.email', $userData['email']);
-        //return $this->__loadFromSession();
     }
 
 

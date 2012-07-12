@@ -557,7 +557,6 @@ CREATE TABLE `courses` (
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `role` enum('A','I','S','T') DEFAULT 'S',
   `username` varchar(80) NOT NULL DEFAULT '',
   `password` varchar(80) NOT NULL DEFAULT '',
   `first_name` varchar(80) DEFAULT NULL,

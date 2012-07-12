@@ -54,7 +54,6 @@
     </tr>
     <?php endif;?>
     <?php
-        //echo $this->Form->hidden('role', array('value'=>$data['User']['role']));
     ?>
      
     <?php //if (!(isset($rdAuth->customIntegrateCWL) && $rdAuth->customIntegrateCWL)) :?>

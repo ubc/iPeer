@@ -309,8 +309,8 @@ class InstallController extends Controller
         // has been fixed
         //Create Super Admin
         $my_db =& ConnectionManager::getDataSource('default');
-        $my_db->query("INSERT INTO `users` (`id`, `role`, `username`, `password`, `first_name`, `last_name`, `student_no`, `title`, `email`, `last_login`, `last_logout`, `last_accessed`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`)
-            VALUES ('1', 'A', '".$username."', '".md5($password)."', 'Super', 'Admin', NULL, NULL, '".$email."', NULL, NULL, NULL, 'A', '0', '".date("Y-m-d H:i:s")."', NULL, NULL)
+        $my_db->query("INSERT INTO `users` (`id`, `username`, `password`, `first_name`, `last_name`, `student_no`, `title`, `email`, `last_login`, `last_logout`, `last_accessed`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`)
+            VALUES ('1', '".$username."', '".md5($password)."', 'Super', 'Admin', NULL, NULL, '".$email."', NULL, NULL, NULL, 'A', '0', '".date("Y-m-d H:i:s")."', NULL, NULL)
             ON DUPLICATE KEY UPDATE password = '".md5($password)."', email = '".$email."';");
 
         //Get Super Admin's id and insert into roles_users table

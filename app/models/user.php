@@ -20,10 +20,10 @@ class User extends AppModel
     protected $unhashed_password = '';
 
     /* User Type - Admin, Instructor, TA, Student */
-    public $USER_TYPE_ADMIN = 'A';
-    public $USER_TYPE_INSTRUCTOR = 'I';
-    public $USER_TYPE_TA = 'T';
-    public $USER_TYPE_STUDENT = 'S';
+    public $USER_TYPE_ADMIN = 2;
+    public $USER_TYPE_INSTRUCTOR = 3;
+    public $USER_TYPE_TA = 4;
+    public $USER_TYPE_STUDENT = 5;
     
     const IMPORT_USERNAME = '0';
     const IMPORT_FIRSTNAME = '1';
@@ -37,7 +37,6 @@ class User extends AppModel
         'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
         'username' => array('type' => 'string', 'null' => false, 'length' => 80, 'key' => 'unique', 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
         'password' => array('type' => 'string', 'null' => false, 'length' => 80, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-        //'role' => array('type' => 'string', 'null' => false, 'default' => 'S', 'length' => 1, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
         'first_name' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 80, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
         'last_name' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 80, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
         'student_no' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 30, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
@@ -474,70 +473,6 @@ class User extends AppModel
     }
 
     /**
-     * canRemoveCourse check if user has permission to remove the course from a
-     * student
-     *
-     * @param mixed $user      the user array returned by findUserByxxxx
-     * @param mixed $course_id target course id
-     *
-     * @access public
-     * @return boolean whether or not user can remove the course from the student
-     * */
-    function canRemoveCourse($user, $course_id)
-    {
-
-        if (!isset($user['User']) || !is_array($user['User'])) {
-            return false;
-        }
-        if ('A' == $user['User']['role']) {
-            return true;
-        }
-        if ('SA' == $user['User']['role']) {
-            return true;
-        }
-        if ('S' == $user['User']['role']) {
-            return false;
-        }
-        if (!isset($user['Course']) || !is_array($user['Course'])) {
-            return false;
-        }
-
-        foreach ($user['Course'] as $c) {
-            if ($c['id'] == $course_id) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Get full name of a role by letter abbreviation
-     *
-     * @param string $role abbreviation
-     *
-     * @access public
-     * @return full name of a role
-     * */
-    function getRoleText($role)
-    {
-        if (!empty($role)) {
-            $ROLE_TEXT = array('A'  => 'Administrator',
-                'I'  => 'Instructor',
-                'T'  => 'TA',
-                'S'  => 'Student');
-            if (isset($ROLE_TEXT[$role])) {
-                $text = $ROLE_TEXT[$role];
-            } else {
-                $text = 'Unknown';
-            }
-
-            return $text;
-        }
-
-        return null;
-    }
-
-    /**
      * Hash password
      *
      * @param array $data array containing password
@@ -616,58 +551,6 @@ class User extends AppModel
     }
 
     /**
-     * Return true if roles is any other then student
-     *
-     * @param array $roles roles
-     *
-     * @access public
-     * @return true if role isnt a student
-     * */
-    function hasTitle($roles)
-    {
-        $hasTitle = false;
-        foreach ($roles as $key => $role) {
-            if (is_array($role)) {
-                if ('student' != $role['name']) {
-                    $hasTitle = true;
-                }
-            } else {
-                if ('student' != $role) {
-                    $hasTitle = true;
-                }
-            }
-        }
-
-        return $hasTitle;
-    }
-
-    /**
-     * Return true if role is a student
-     *
-     * @param array $roles roles
-     *
-     * @access public
-     * @return true if role is a student
-     * */
-    function hasStudentNo($roles)
-    {
-        $hasStudentNo = false;
-        foreach ($roles as $key => $role) {
-            if (is_array($role)) {
-                if (isset($role['name']) && ('student' == $role['name'])) {
-                    $hasStudentNo = true;
-                }
-            } else {
-                if ('student' == $role) {
-                    $hasStudentNo = true;
-                }
-            }
-        }
-
-        return $hasStudentNo;
-    }
-
-    /**
      * Remove enrolled user from course. For student enrolment in a course.
      *
      * @param int $id        user id
@@ -693,20 +576,6 @@ class User extends AppModel
     function registerEnrolment($id, $course_id)
     {
         return $this->habtmAdd('Enrolment', $id, $course_id);
-    }
-
-    /**
-     * Remove a user's role.
-     *
-     * @param int $id      user id
-     * @param int $role_id role id
-     *
-     * @access public
-     * @return False on failure, true otherwise.
-     * */
-    function dropRole($id, $role_id)
-    {
-        return $this->habtmDelete('Role', $id, $role_id);
     }
 
     /**
@@ -1031,27 +900,6 @@ class User extends AppModel
         $model = Classregistry::init('Course');
 
         return $model->getListByInstructor(self::get('id'));
-    }
-
-
-    /**
-     * Given a user id and a role string, check if that user has that
-     * role. E.g.: isRole(1, 'superadmin')
-     *
-     * @param int    $id   - the user id
-     * @param string $role - the name of the role to check for
-     *
-     * @return true if the user $id has $role, false otherwise
-     * */
-    public function isRole($id, $role)
-    {
-        $data = $this->findById($id);
-        foreach ($data['Role'] as $r) {
-            if ($r['name'] == $role) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

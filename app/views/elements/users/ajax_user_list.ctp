@@ -19,7 +19,7 @@
     </table>
 	<table width="95%" border="0" cellspacing="2" cellpadding="4" bgcolor="#FFFFFF">
 	  <tr class="tableheader">
-	    <?php if($currentUser['role'] == 'A' || $currentUser['role'] == 'I'):?>
+	    <?php if($currentUser['Role']['name'] == 'superadmin' || $currentUser['Role']['name'] == 'admin' || $currentUser['Role']['name'] == 'instructor'):?>
 	    <th>Actions</th>
 	    <?php endif;?>
 	    <th><?php echo $this->Paginator->sort(__('Username', true),'username')?></th>
@@ -41,14 +41,14 @@
                             array('escape'=>false, 'title'=>'View '.$user['full_name'])
                   );
             ?>
-	    <?php if($currentUser['role'] == 'A' || $currentUser['role'] != 'I' && ($currentUser['role'] == 'A' || $currentUser['role'] == 'I')):
+	    <?php if($currentUser['Role']['name'] == 'superadmin' || $currentUser['Role']['name'] == 'admin'):
                    echo $html->link(
                                     $html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit')),
                                     "/users/edit/".$user['id'],
                                     array('escape'=>false, 'title'=>'Edit '.$user['full_name'])
                    );
             ?>
-   	    <?php if($currentUser['role'] == 'A'):
+   	    <?php if($currentUser['Role']['name'] == 'superadmin' || $currentUser['Role']['name'] == 'admin'):
                   echo $html->link(
                                     $html->image('icons/delete.gif',array('border'=>'0','alt'=>__('Delete', true), 'title'=>__('Delete ', true).$user['full_name'])),
                                     "/users/delete/".$user['id'],
@@ -66,7 +66,7 @@
             ?>
 	    </td>
 		  <td><?php echo $user['username'] ?></td>
-		  <td><?php echo User::getRoleText($user['role'])?></td>
+		  <td></td>
 	    <td><?php echo $user['first_name'] ?></td>
 	    <td><?php echo $user['last_name'] ?></td>
 
