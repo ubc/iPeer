@@ -1938,25 +1938,3 @@ CREATE TABLE `user_faculties` (
 INSERT INTO `user_faculties` (`id`, `user_id`, `faculty_id`) VALUES
 (1, 34, 1);
 
--- --------------------------------------------------------
-
---
--- Table structure for table `user_grade_penalties`
---
-
-CREATE TABLE `user_grade_penalties` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `penalty_id` int(11) DEFAULT NULL,
-  `grp_event_id` int(11) NOT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `fk_penalties` (`penalty_id`),
-  KEY `fk_users` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15 ;
-
---
--- Constraints for table `user_grade_penalties`
---
-ALTER TABLE `user_grade_penalties`
-  ADD CONSTRAINT `fk_penalties` FOREIGN KEY (`penalty_id`) REFERENCES `penalties` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
