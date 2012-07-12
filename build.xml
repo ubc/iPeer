@@ -37,11 +37,14 @@
      <mkdir dir="${project.basedir}/build/code-browser"/>
      <mkdir dir="${project.basedir}/build/coverage"/>
      <mkdir dir="${project.basedir}/build/logs"/>
-     <mkdir dir="${project.basedir}/build/pdepend"/>
+	 <mkdir dir="${project.basedir}/build/pdepend"/>
+	 <exec executable="php" dir="${project.basedir}/build/sqlclean">
+		 <arg value="clean.php" />
+	 </exec>
  </target>
 
  <target name="lint">
-     <phplint haltonfailure="true" cachefile="${project.basedir}/build/lint.cache">
+	 <phplint haltonfailure="true" cachefile="${project.basedir}/build/lint.cache">
          <fileset dir="${project.basedir}/app">
              <include name="**/*.php" />
          </fileset>
