@@ -12,7 +12,7 @@ class GroupsMemberFixture extends CakeTestFixture
 {
     public $name = 'GroupsMember';
 
-    public $import = 'GroupsMember';
+    public $import = 'GroupsMembers';
 
     public $records = array(
         array('id' => 1, 'group_id' => '1', 'user_id' => '3'),
