@@ -12,18 +12,7 @@ class MixevalsQuestionFixture extends CakeTestFixture
 {
     public $name = 'MixevalsQuestion';
 
-    public $fields = array(
-        'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
-        'mixeval_id' => array('type' => 'integer', 'null' => false, 'default' => '0'),
-        'question_num' => array('type' => 'integer', 'null' => false, 'default' => '0'),
-        'title' => array('type' => 'text', 'null' => true, 'default' => null, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-        'instructions' => array('type' => 'text', 'null' => true, 'default' => null, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-        'question_type' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 1, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-        'required' => array('type' => 'boolean', 'null' => false, 'default' => '1'),
-        'multiplier' => array('type' => 'integer', 'null' => false, 'default' => '0'),
-        'scale_level' => array('type' => 'integer', 'null' => false, 'default' => '0'),
-        'response_type' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 1, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-    );
+    public $import = 'MixevalsQuestion';
 
     public $records = array(
         array('id' => 1, 'mixeval_id' => 1, 'question_num' => 0, 'title' => '1st Question', 'instructions' => null,

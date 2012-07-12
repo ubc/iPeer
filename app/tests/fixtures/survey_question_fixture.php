@@ -11,12 +11,9 @@
 class SurveyQuestionFixture extends CakeTestFixture
 {
     public $name = 'SurveyQuestion';
-    public $fields = array(
-        'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
-        'survey_id' => array('type' => 'integer', 'null' => false, 'default' => '0', 'key' => 'index'),
-        'number' => array('type' => 'integer', 'null' => false, 'default' => '9999'),
-        'question_id' => array('type' => 'integer', 'null' => false, 'default' => '0', 'key' => 'index'),
-    );
+
+    public $import = 'SurveyQuestion';
+
     public $records = array(
         array('id' => 1, 'survey_id' => 1, 'number' => 1, 'question_id' => 1),
         array('id' => 2, 'survey_id' => 1, 'number' => 2, 'question_id' => 2),

@@ -11,12 +11,9 @@
 class SurveyGroupMemberFixture extends CakeTestFixture
 {
     public $name = 'SurveyGroupMember';
-    public $fields = array(
-        'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
-        'group_set_id' => array('type' => 'integer', 'null' => true, 'default' => '0'),
-        'group_id' => array('type' => 'integer', 'null' => false, 'default' => '0'),
-        'user_id' => array('type' => 'integer', 'null' => false, 'default' => '0'),
-    );
+
+    public $import = 'SurveyGroupMember';
+
     public $records = array(
         array('id' => 1, 'group_set_id' => 1, 'group_id' => 1, 'user_id' => 1),
         array('id' => 2, 'group_set_id' => 1, 'group_id' => 2, 'user_id' => 2)

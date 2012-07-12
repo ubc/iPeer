@@ -12,20 +12,7 @@ class SysFunctionFixture extends CakeTestFixture
 {
     public $name = 'SysFunction';
 
-    public $fields = array(
-        'id' => array('type' => 'integer', 'null' => false, 'default' => '0', 'key' => 'primary'),
-        'function_code' => array('type' => 'string', 'null' => false, 'length' => 80, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-        'function_name' => array('type' => 'string', 'null' => false, 'length' => 200, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-        'parent_id' => array('type' => 'integer', 'null' => false, 'default' => '0'),
-        'controller_name' => array('type' => 'string', 'null' => false, 'length' => 80, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-        'url_link' => array('type' => 'string', 'null' => false, 'length' => 80, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-        'permission_type' => array('type' => 'string', 'null' => false, 'default' => 'A', 'length' => 10, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-        'record_status' => array('type' => 'string', 'null' => false, 'default' => 'A', 'length' => 1, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-        'creator_id' => array('type' => 'integer', 'null' => false, 'default' => '0'),
-        'created' => array('type' => 'datetime', 'null' => false, 'default' => '0000-00-00 00:00:00'),
-        'updater_id' => array('type' => 'integer', 'null' => true, 'default' => null),
-        'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
-    );
+    public $import = 'SysFunction';
 
     public $records = array(
         array('id' => 1, 'function_code' => 'code1', 'function_name' => 'name1',

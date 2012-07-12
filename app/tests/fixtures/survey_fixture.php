@@ -12,20 +12,7 @@ class SurveyFixture extends CakeTestFixture
 {
     public $name = 'Survey';
 
-    public $fields = array(
-        'id' => array('type' => 'integer', 'key' => 'primary'),
-        'course_id' => array('type' => 'integer'),
-        'user_id' => array('type' => 'integer'),
-        'name' => array('type' => 'string'),
-        'due_date' => array('type' => 'datetime'),
-        'release_date_begin' => array('type' => 'datetime'),
-        'release_date_end' => array('type' => 'datetime'),
-        'released' => array('type' => 'integer'),
-        'creator_id' => array('type' => 'integer'),
-        'created' => array('type' => 'datetime'),
-        'updater_id' => array('type' => 'integer'),
-        'modified' => array('type' => 'datetime')
-    );
+    public $import = 'Survey';
 
     public $records = array(
         array('id' => 1, 'course_id' => 1, 'user_id' => 3, 'name' => 'Math303 Survey', 'due_date' => '2012-06-16 12:28:0',

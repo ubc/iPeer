@@ -12,14 +12,7 @@ class PersonalizeFixture extends CakeTestFixture
 {
     public $name = 'Personalize';
 
-    public $fields = array(
-        'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
-        'user_id' => array('type' => 'integer', 'null' => false, 'default' => '0', 'key' => 'index'),
-        'attribute_code' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 80, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-        'attribute_value' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 80, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-        'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
-        'updated' => array('type' => 'datetime', 'null' => true, 'default' => null),
-    );
+    public $import = 'Personalize';
 
     public $records = array(
         array('id' => 1, 'user_id' => 1, 'attribute_code' => 'code', 'attribute_value' => 'value'),

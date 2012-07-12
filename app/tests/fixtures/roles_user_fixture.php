@@ -12,13 +12,7 @@ class RolesUserFixture extends CakeTestFixture
 {
     public $name = 'RolesUser';
 
-    public $fields = array(
-        'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
-        'role_id' => array('type' => 'integer', 'null' => false, 'default' => null),
-        'user_id' => array('type' => 'integer', 'null' => false, 'default' => null),
-        'created' => array('type' => 'datetime', 'null' => false, 'default' => null),
-        'modified' => array('type' => 'datetime', 'null' => false, 'default' => null),
-    );
+    public $import = 'RolesUser';
 
     public $records = array(
         array('id' => 1, 'role_id' => '3', 'user_id' => 1),

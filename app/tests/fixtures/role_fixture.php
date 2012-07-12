@@ -12,12 +12,7 @@ class RoleFixture extends CakeTestFixture
 {
     public $name = 'Role';
 
-    public $fields = array(
-        'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
-        'name' => array('type' => 'string', 'null' => false, 'default' => null, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-        'created' => array('type' => 'datetime', 'null' => false, 'default' => null),
-        'modified' => array('type' => 'datetime', 'null' => false, 'default' => null),
-    );
+    public $import = 'Role';
 
     public $records = array(
         array('id' => 1, 'name' => 'superadmin'),

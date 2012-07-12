@@ -3,12 +3,7 @@ class PenaltyFixture extends CakeTestFixture
 {
     public $name = 'Penalty';
 
-    public $fields = array(
-        'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
-        'event_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'key' => 'index'),
-        'days_late' => array('type' => 'integer', 'null' => false, 'default' => null),
-        'percent_penalty' => array('type' => 'integer', 'null' => false, 'default' => null),
-    );
+    public $import = 'Penalty';
 
     public $records = array(
         array('id' => 1, 'event_id' => '1', 'days_late' => '1', 'percent_penalty' =>10),

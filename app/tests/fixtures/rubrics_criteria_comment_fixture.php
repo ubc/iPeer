@@ -12,12 +12,7 @@ class RubricsCriteriaCommentFixture extends CakeTestFixture
 {
     public $name = 'RubricsCriteriaComment';
 
-    public $fields = array(
-        'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
-        'criteria_id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'index'),
-        'rubrics_loms_id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'index'),
-        'criteria_comment' => array('type' => 'string', 'null' => true, 'default' => null, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-    );
+    public $import = 'RubricsCriteriaComment';
 
     public $records = array(
         array('id' => 1, 'criteria_id' => 1, 'rubrics_loms_id' => 1,
