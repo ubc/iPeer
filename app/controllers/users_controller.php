@@ -963,7 +963,7 @@ class UsersController extends AppController
             $insertedIds[] = $new;
         }
         foreach ($result['updated_students'] as $old) {
-            $insertedIds[] = $old['id'];
+            $insertedIds[] = $old['User']['id'];
         }
         
         $this->Course->enrolStudents($insertedIds, $this->data['User']['course_id']);

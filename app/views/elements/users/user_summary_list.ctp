@@ -23,10 +23,10 @@ if (isset($data['id'])) {
 		<?php foreach($data as $user): ?>
             <?php 
               if($showPasswords) {
-                if(isset($user['tmp_password']))
-                  $password = $user['tmp_password'];
-                else if(isset($user['password']))
-                  $password = $user['password'];
+                if(isset($user['User']['tmp_password']))
+                  $password = $user['User']['tmp_password'];
+                else if(isset($user['User']['password']))
+                  $password = $user['User']['password'];
                 else
                   $password = '';
               } else {
@@ -35,7 +35,7 @@ if (isset($data['id'])) {
             ?>
             <tr>
               <?php foreach($columns as $k => $v): ?>
-                <td><?php echo $user[$k]?></td>
+                <td><?php echo $user['User'][$k]?></td>
               <?php endforeach; ?>
             </tr>
      <?php endforeach;?> 

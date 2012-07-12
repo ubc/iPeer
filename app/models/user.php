@@ -826,7 +826,8 @@ class User extends AppModel
             	$tmp['password'] = md5($u[User::IMPORT_PASSWORD]); // Will be hashed by the Users controller
             
             $tmp['creator_id']   = User::get('id');
-            $data[$u[User::IMPORT_USERNAME]] = $tmp;
+            $data[$u[User::IMPORT_USERNAME]]['User'] = $tmp;
+            $data[$u[User::IMPORT_USERNAME]]['Role']['RolesUser']['role_id'] = '5';
         }
 
         if (!count($data)) {
@@ -835,7 +836,7 @@ class User extends AppModel
         }
 
         // remove the existings
-        $existings = $this->getByUsernames(Set::extract('/username', array_values($data)));
+        $existings = $this->getByUsernames(Set::extract('/User/username', array_values($data)));
 
         foreach ($existings as $key => $e) {
             if ($updateExisting) {
@@ -843,33 +844,33 @@ class User extends AppModel
                 $temp['id'] = $e['User']['id'];
                 $temp['username'] = $e['User']['username'];
                 // update updatable colun and changed field
-                if ($e['User']['first_name'] != $new['first_name']) {
-                    $temp['first_name'] = $new['first_name'];
+                if ($e['User']['first_name'] != $new['User']['first_name']) {
+                    $temp['first_name'] = $new['User']['first_name'];
                 } else {
                 	$temp['first_name'] = $e['User']['first_name'];
                 }
                 
-                if ($e['User']['last_name'] != $new['last_name']) {
-                    $temp['last_name'] = $new['last_name'];
+                if ($e['User']['last_name'] != $new['User']['last_name']) {
+                    $temp['last_name'] = $new['User']['last_name'];
                 } else {
                 	$temp['last_name'] = $e['User']['last_name'];
                 }
                 
-                if ($e['User']['email'] != $new['email']) {
-                    $temp['email'] = $new['email'];
+                if ($e['User']['email'] != $new['User']['email']) {
+                    $temp['email'] = $new['User']['email'];
                 } else {
                 	$temp['email'] = $e['User']['email'];
                 }
                 
-                if ($e['User']['student_no'] != $new['student_no']) {
-                    $temp['student_no'] = $new['student_no'];
+                if ($e['User']['student_no'] != $new['User']['student_no']) {
+                    $temp['student_no'] = $new['User']['student_no'];
                 } else {
                 	$temp['student_no'] = $e['User']['student_no'];
                 }
                 
                 // ignore the password if not exists in import source
-                if ($new['import_password']) {
-                    $temp['password'] = $new['password'];
+                if ($new['User']['import_password']) {
+                    $temp['password'] = $new['User']['password'];
                 } else {
                 	$temp['password'] = $e['User']['password'];
                 }
@@ -893,7 +894,7 @@ class User extends AppModel
             }
         }
 
-        return array('created_students' => $data, 'updated_students' => Set::classicExtract($existings, '{n}.User'));
+        return array('created_students' => $data, 'updated_students' => $existings);
     }
 
     /**
