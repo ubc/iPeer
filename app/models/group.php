@@ -189,8 +189,8 @@ class Group extends AppModel
     /**
      * findGroupByGroupNumber Get group id by group number
      *
-     * @param mixed $course_id  course id
-     * @param mixed $group_num  group number
+     * @param mixed $course_id
+     * @param mixed $group_num
      *
      * @access public
      *

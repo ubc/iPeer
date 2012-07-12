@@ -198,13 +198,13 @@ class EmailerController extends AppController
         if ('C' == $type && !User::hasPermission('functions/email/allcourses')) {
              // check if they have access to class with $id
              $course = $this->User->find(
-                'first', 
-                array(
+                 'first', 
+                 array(
                     'conditions' => array(
                         'User.id' => $this->Auth->user('id'), 
                         'Course.id' => $id
                     )
-                )
+                 )
             );
             if (empty($course)) {
                 $this->Session->setFlash(__('You do not have permission to write emails to this class.', true));

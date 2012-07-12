@@ -97,6 +97,8 @@ class EventsController extends AppController
     /**
      * setUpAjaxList
      *
+     * @param mixed $courseId
+     *
      * @access public
      * @return void
      */
@@ -185,6 +187,7 @@ class EventsController extends AppController
     /**
      * index
      *
+     * @param mixed $courseId
      * @param string $message
      *
      * @access public
@@ -827,7 +830,7 @@ class EventsController extends AppController
     /**
      * viewGroups
      *
-     * @param mixed $eventId
+     * @param mixed $groupId
      *
      * @access public
      * @return void

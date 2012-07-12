@@ -257,7 +257,7 @@ class EvaluationSimple extends AppModel
     /**
      * getComment
      *
-     * @param mixed $id       simple evaluation id
+     * @param mixed $id
      *
      * @access public
      * @return void
