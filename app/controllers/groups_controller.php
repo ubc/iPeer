@@ -761,6 +761,11 @@ class GroupsController extends AppController
         
         $this->set('courseId', $courseId);
         if (isset($this->params['form']) && !empty($this->params['form'])) {
+            // check that filename field is not empty
+            if (empty($this->params['form']['file_name'])) {
+                $this->Session->setFlash("Please enter a valid filename.");
+                $this->redirect('');
+            }
             // check that at least one group has been selected
             if (empty($this->data['Member']['Member'])) {
                 $this->Session->setFlash("Please select at least one group to export.");
@@ -769,6 +774,9 @@ class GroupsController extends AppController
             $this->autoRender = false;
             $fileContent = '';
             $groups = $this->data['Member']['Member'];
+            if (!empty($this->params['form']['include_group_numbers'])) {
+                $fileContent .= "Group Number, ";
+            }
             if (!empty($this->params['form']['include_group_names'])) {
                 $fileContent .= "Group Name, ";
             }
@@ -776,10 +784,17 @@ class GroupsController extends AppController
                 $fileContent .= "Student #, ";
             }
             if (!empty($this->params['form']['include_student_name'])) {
-                $fileContent .= "Last Name, First Name, ";
+                $fileContent .= "First Name, Last Name, ";
             }
             if (!empty($this->params['form']['include_student_email'])) {
                 $fileContent .= "Email Address";
+            }
+            // check that at least one export field has been selected
+            if (empty($this->params['form']['include_group_numbers']) && empty($this->params['form']['include_group_names'])
+              && empty($this->params['form']['include_student_id']) && empty($this->params['form']['include_student_name'])
+              && empty($this->params['form']['include_student_email'])) {
+                $this->Session->setFlash("Please select at least one field to export.");
+                $this->redirect('');
             }
 
             $fileContent .= "\n";
@@ -795,6 +810,9 @@ class GroupsController extends AppController
             $unassignedGroups = $this->Group->find('list', array('conditions'=> array('course_id'=>$courseId), 'fields'=>array('group_name')));
             $this->set('unassignedGroups', $unassignedGroups);
         }
+        
+        $courseName = $this->Course->field('course', array('id' => $courseId));
+        $this->set('title_for_layout', $courseName . " > Export Groups");
     }
 
 

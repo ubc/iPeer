@@ -6,9 +6,8 @@
     <td>
     <form name="frm" id="frm" method="POST" action="<?php echo $html->url('export/'.$courseId) ?>">
       <table width="75%" border="0" align="center" cellpadding="10" cellspacing="2">
-	 	<tr><td style="color:darkred; font-size:smaller"> *Please check at least one of similarly coloured fields</td></tr>
         <tr class="tableheader"> 
-          <td colspan="2" align="center">Export Groups</td>
+          <td colspan="2" align="center">Export As</td>
         </tr>	 	
         <tr class="tablecell2">
           <td width="30%">Export Filename:</td><td width="40%"><input type="text" name="file_name" value="<?php if(isset($file_name)) echo $file_name;?>" />.csv</td>
@@ -16,22 +15,26 @@
         <tr class="tableheader"> 
           <td colspan="2" align="center">Export Group Fields</td>
         </tr>
+        <tr><td style="color:darkred; font-size:smaller"> (Please select at least one of the fields)</td></tr>
         <tr class="tablecell2">
-          <td width="60%">Include Group Names:</td><td><input type="checkbox" name="include_group_names" checked /></td>
+          <td width="60%">Include Group Number(s):</td><td><input type="checkbox" name="include_group_numbers" checked /></td>
         </tr>
         <tr class="tablecell2">
-          <td>Include Student Name:&nbsp;<font color="Red">*</td><td><input type="checkbox" name="include_student_name" checked /></td>
+          <td width="60%">Include Group Name(s):</td><td><input type="checkbox" name="include_group_names" checked /></td>
         </tr>
         <tr class="tablecell2">
-          <td>Include Student Id:&nbsp;<font color="Red">*</td><td><input type="checkbox" name="include_student_id" checked /></td>
+          <td>Include Student Name(s):</td><td><input type="checkbox" name="include_student_name" checked /></td>
         </tr>
         <tr class="tablecell2">
-          <td>Include Student Email:</td><td><input type="checkbox" name="include_student_email" checked /></td>
+          <td>Include Student Id #:</td><td><input type="checkbox" name="include_student_id" checked /></td>
+        </tr>
+        <tr class="tablecell2">
+          <td>Include Student Email(s):</td><td><input type="checkbox" name="include_student_email" /></td>
         </tr>
         </table>
         <table width="75%" border="0" align="center" cellpadding="10" cellspacing="1">
         <tr class="tableheader">
-          <td colspan="1" align="center">Export Groups</td>
+          <td colspan="1" align="center">Group Selection</td>
         </tr>
         <tr class="tablecell2">
           <td align="center"> 		  
