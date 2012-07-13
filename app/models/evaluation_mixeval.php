@@ -101,22 +101,6 @@ class EvaluationMixeval extends AppModel
         ));
     }
 
-
-    /**
-     * getResultsDetailByEvaluateeByQuestion
-     *
-     * @param bool $grpEventId        group event id
-     * @param bool $evaluatee         evaluatee
-     * @param bool $includeEvaluators include evaluators
-     *
-     * @access public
-     * @return void
-     */
-    function getResultsDetailByEvaluateeByQuestion($grpEventId=null, $evaluatee=null, $includeEvaluators=false)
-    {
-
-    }
-
     /**
      * getResultsDetailByEvaluatee
      * gets Mixeval evaluation result for a specific assignment and evaluatee
@@ -251,7 +235,6 @@ class EvaluationMixeval extends AppModel
      */
     function getOppositeGradeReleaseStatus($groupEventId, $releaseStatus)
     {
-        //return $this->find(count, 'grp_event_id='.$groupEventId.' AND grade_release != '.$releaseStatus);
         return $this->find('count', array(
             'conditions' => array('grp_event_id' => $groupEventId, 'grade_release !=' => $releaseStatus)
         ));

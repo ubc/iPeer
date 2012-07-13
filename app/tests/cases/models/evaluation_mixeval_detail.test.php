@@ -41,21 +41,21 @@ class EvaluationMixevalDetailTestCase extends CakeTestCase {
     function testGetByEvalMixevalIdCritera()
     {
         // Run test on valid data
-        $mixEvalDetail1 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera(1, 1);
-        $mixEvalDetail2 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera(1, 2);
-        $this->assertEqual($mixEvalDetail1['EvaluationMixevalDetail']['id'], 1);
-        $this->assertEqual($mixEvalDetail1['EvaluationMixevalDetail']['question_number'], 1);
-        $this->assertEqual($mixEvalDetail1['EvaluationMixevalDetail']['question_comment'], 'Q1');
-        $this->assertEqual($mixEvalDetail2['EvaluationMixevalDetail']['id'], 2);
-        $this->assertEqual($mixEvalDetail2['EvaluationMixevalDetail']['question_number'], 2);
-        $this->assertEqual($mixEvalDetail2['EvaluationMixevalDetail']['question_comment'], 'Q2');
+        $mixEvalDetail1 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera(1, 3);
+        $mixEvalDetail2 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera(1, 4);
+        $this->assertEqual($mixEvalDetail1['EvaluationMixevalDetail']['id'], 4);
+        $this->assertEqual($mixEvalDetail1['EvaluationMixevalDetail']['question_number'], 3);
+        $this->assertEqual($mixEvalDetail1['EvaluationMixevalDetail']['question_comment'], 'work very efficiently');
+        $this->assertEqual($mixEvalDetail2['EvaluationMixevalDetail']['id'], 5);
+        $this->assertEqual($mixEvalDetail2['EvaluationMixevalDetail']['question_number'], 4);
+        $this->assertEqual($mixEvalDetail2['EvaluationMixevalDetail']['question_comment'], 'Contributed his part');
         // Run test on one valid input
         $mixEvalDetail3 = $invalid3 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera(1, null);
         $this->assertTrue(!empty($mixEvalDetail3));
         $this->assertEqual($mixEvalDetail3[0]['EvaluationMixevalDetail']['id'], 1);
         $this->assertEqual($mixEvalDetail3[1]['EvaluationMixevalDetail']['id'], 2);
-        $this->assertEqual($mixEvalDetail3[0]['EvaluationMixevalDetail']['question_comment'], 'Q1');
-        $this->assertEqual($mixEvalDetail3[1]['EvaluationMixevalDetail']['question_comment'], 'Q2');
+        $this->assertEqual($mixEvalDetail3[0]['EvaluationMixevalDetail']['question_comment'], null);
+        $this->assertEqual($mixEvalDetail3[1]['EvaluationMixevalDetail']['question_comment'], null);
         // Run tests on invalid data
         $invalid1 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera(232, 1);
         $invalid2 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera(1, 1232);
