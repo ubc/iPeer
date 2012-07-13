@@ -36,15 +36,6 @@ class Question extends AppModel
 
     public $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable');
 
-    // prepares the data by moving varibles in the form to the data question sub array
-  /*function prepData($data)
-  {
-    $data['data']['Question']['master'] = $data['form']['master'];
-    $data['data']['Question']['type'] = $data['form']['type'];
-    $data['data']['Question']['count'] = $data['form']['data']['Question']['count'];
-
-    return $data;
-  }*/
 
     /**
      * sets the data variable up with proper formating in the array for display
@@ -69,14 +60,6 @@ class Question extends AppModel
         return $data;
     }
 
-
-    //  // delete old question references in each table
-    //  function editCleanUp($question_id)
-    //  {
-    //  		$this->query('DELETE FROM questions WHERE id='.$question_id);
-    //		$this->query('DELETE FROM responses WHERE question_id='.$question_id);
-    //		$this->query('DELETE FROM survey_questions WHERE question_id='.$question_id);
-    //  }
 
     /**
      * getTypeById

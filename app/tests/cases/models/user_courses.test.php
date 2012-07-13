@@ -34,18 +34,4 @@ class UserCourseTestCase extends CakeTestCase
     {
     }
 
-    function testUserCourseInstance()
-    {
-        $this->assertTrue(is_a($this->UserCourse, 'UserCourse'));
-    }
-
-
-    /*
-     *Function is not used anywhere
-     *
-     */
-
-    function testInsertAdmin()
-    {
-    }
 }

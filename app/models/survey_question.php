@@ -216,31 +216,5 @@ class SurveyQuestion extends AppModel
         return $tmp[0][0]['max(number)'];
     }
 
-  /*function deleteGroupSet($groupSetId=null)
-{
-    $this->SurveyGroup = new SurveyGroup;
-    $this->SurveyGroupMember = new SurveyGroupMember;
-    $this->SurveyGroupSet = new SurveyGroupSet;
-    //delete members
-    //get member id's
-    $memberIds = $this->SurveyGroupMember->getIdsByGroupSetId($groupSetId);
-    foreach ($memberIds as $memberId) {
-      $id = $memberId['SurveyGroupMember']['id'];
-      $this->SurveyGroupMember->id = $id;
-      $this->SurveyGroupMember->del();
-      $this->SurveyGroupMember->id = null;
-    }
-    //delete groups
-    $groupIds = $this->SurveyGroup->getIdsByGroupSetId($groupSetId);
-    foreach ($groupIds as $groupId) {
-      $id = $groupId['SurveyGroup']['id'];
-      $this->SurveyGroup->id = $id;
-      $this->SurveyGroup->del();
-      $this->SurveyGroup->id = null;
-    }
-    //delete group set
-    $this->SurveyGroupSet->id = $groupSetId;
-    $this->SurveyGroupSet->del();
-  }*/
 
 }

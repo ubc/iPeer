@@ -13,20 +13,6 @@ class Response extends AppModel
     public $name = 'Response';
     public $belongsTo = array('Question');
 
-    // Function is Obsolete
-    // saves all the responses in the database
-    /*function linkResponses($question_id, $data)
-{
-        for ($i = 1; $i <= $data['Question']['count']; $i++) {
-            if (!empty($data['Question']['response_'.$i])) {
-                $tmpData['response'] = $data['Question']['response_'.$i];
-                $tmpData['question_id'] = $question_id;
-                $this->save($tmpData);
-                $this->id=null;
-            }
-        }
-    }*/
-
     /**
      * fillResponse
      * prepares the data public with all the response info from the form for display
@@ -75,39 +61,6 @@ class Response extends AppModel
         return $data;
     }
 
-
-    /**
-     * countResponses
-     *
-     * @param mixed $questionId
-     *
-     * @access public
-     * @return void
-     */
-    function countResponses($questionId)
-    {
-        return $this->find('count', array('conditions' => array('question_id' => $questionId)));
-    }
-
-
-    // Function is obsolete
-    /*function prepData($data, $questionID)
-{
-        $tmp = $this->find('all', array('conditions' => array('question_id' => $questionId),
-                                    'fields' => array('response')));
-        for ($i=0; $i<$data['Question']['count']; $i++ ) {
-            $data['Question']['response_'.($i+1)] = $tmp[$i]['Response']['response'];
-        }
-        return $data;
-    }*/
-
-    // Function is obsolete
-    /*function getResponseById($id=null)
-{
-      $tmp = $this->find('first', array('conditions' => array('id' => $id),
-                                      'fields' => array('response')));
-      return $tmp['Response']['response'];
-    }*/
 
     /**
      * getResponseId

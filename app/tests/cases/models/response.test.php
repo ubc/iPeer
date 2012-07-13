@@ -75,17 +75,6 @@ class ResponseTestCase extends CakeTestCase
         $this->assertEqual($question2['Responses']['response_1']['response'], 'no');
     }
 
-    function testCountResponses()
-    {
-        // Assert the correct question count
-        $Q1ResponseCount = $this->Response->countResponses(1);
-        $Q2ResponseCount = $this->Response->countResponses(2);
-        $Q3ResponseCount = $this->Response->countResponses(3);
-        $this->assertEqual($Q1ResponseCount, 4);
-        $this->assertEqual($Q2ResponseCount, 2);
-        $this->assertEqual($Q3ResponseCount, 0);
-    }
-
     function testGetResponseId()
     {
         $respose1 = $this->Response->getResponseId(1, '4+');
