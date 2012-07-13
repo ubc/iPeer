@@ -310,9 +310,10 @@ class SurveysController extends AppController
                 $this->Session->setFlash(__('Error on saving survey.', true));
             }
         }
-
+        $whoAmI = $this->User->getCurrentLoggedInUser();
+        $cList = $this->Course->getListByInstructor($whoAmI['id']);
         $this->set('templates', $this->Survey->find('list', array('fields' => array('id', 'name'))));
-        $this->set('courses', $this->Survey->Course->find('list', array('fields' => array('Course.course'), 'recursive' => -1)));
+        $this->set('courses', $cList);
         $this->render('edit');
     }
 
@@ -389,8 +390,10 @@ class SurveysController extends AppController
         } else {
             $this->data = $data;
         }
-
-        $this->set('courses', $this->Course->find('list', array('recursive' => -1, 'fields' => array('Course.course'))));
+        
+        $whoAmI = $this->User->getCurrentLoggedInUser();
+        $cList = $this->Course->getListByInstructor($whoAmI['id']);
+        $this->set('courses', $cList);
     }
 
 
@@ -429,8 +432,10 @@ class SurveysController extends AppController
         //converting nl2br back so it looks better
         $this->Output->br2nl($this->data);
 
+        $whoAmI = $this->User->getCurrentLoggedInUser();
+        $cList = $this->Course->getListByInstructor($whoAmI['id']);
         $this->set('template_id', $id);
-        $this->set('courses', $this->Survey->Course->getCourseList());
+        $this->set('courses', $cList);
         $this->render('edit');
     }
 
