@@ -239,7 +239,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
     function _buildSimpleOrRubricsCommentByEvaluatee($grpEventId, $evaluateeId, $params, $eventType=null)
     {
         $groupMembers = $this->ExportHelper2->getGroupMemberHelper($grpEventId);
-        $evaluatee = $this->User->findUserByid($evaluateeId);
+        $evaluatee = $this->User->findById($evaluateeId);
         // Build Grid
         $xRange = 5;
         $yRange = count($groupMembers) + 2;

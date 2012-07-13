@@ -149,7 +149,6 @@ class EvaluationComponent extends Object
         $matrix = array();
 
         //$this->User = new User;
-        //print_r($this->User->findUserByStudentNo('36241032'));
         foreach ($evalResult as $index => $value) {
             $evalMarkArray = $value;
             $evalTotal = 0;
@@ -2012,7 +2011,7 @@ class EvaluationComponent extends Object
                 for ($j=0; $j < count($responses); $j++) {
                     $responseText = $responses[$j]['SurveyInput']['response_text'];
                     $userId = $responses[$j]['SurveyInput']['user_id'];
-                    $userName = $this->User->findUserByid($userId);
+                    $userName = $this->User->findById($userId);
                     $userName = $userName['User']['last_name'].", ".$userName['User']['first_name'];
                     $tmpUserResponse[$userName]['response_text'] = $responseText;
                 }
@@ -2102,7 +2101,7 @@ class EvaluationComponent extends Object
                 for ($j=0; $j < count($responses); $j++) {
                     $responseText = $responses[$j]['SurveyInput']['response_text'];
                     $userId = $responses[$j]['SurveyInput']['user_id'];
-                    $userName = $this->User->findUserByid($userId);
+                    $userName = $this->User->findById($userId);
                     $userName = $userName['User']['last_name'].", ".$userName['User']['first_name'];
                     $tmpUserResponse[$userName]['response_text'] = $responseText;
                 }

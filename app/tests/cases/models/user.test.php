@@ -1,59 +1,48 @@
 <?php
+/* User Test cases generated on: 2012-07-12 16:56:56 : 1342137416*/
 App::import('Model', 'User');
 
-class UserTestCase extends CakeTestCase
-{
-    protected $name = 'User';
-    protected $fixtures = array(
-        'app.course', 'app.role', 'app.user', 'app.group',
-        'app.roles_user', 'app.event', 'app.event_template_type',
-        'app.group_event', 'app.evaluation_submission',
-        'app.survey_group_set', 'app.survey_group',
-        'app.survey_group_member', 'app.question',
-        'app.response', 'app.survey_question', 'app.user_course',
-        'app.user_enrol', 'app.groups_member', 'app.survey',
-        'app.faculty', 'app.department', 'app.course_department',
-        'app.user_faculty', 'app.user_tutor'
-    );
+class UserTestCase extends CakeTestCase {
+	var $fixtures = array('app.user', 'app.evaluation_submission', 'app.event', 'app.event_template_type', 'app.course', 'app.group', 'app.group_event', 'app.groups_member', 'app.survey', 'app.survey_group_set', 'app.survey_group', 'app.survey_group_member', 'app.question', 'app.response', 'app.survey_question', 'app.user_course', 'app.user_tutor', 'app.user_enrol', 'app.department', 'app.faculty', 'app.course_department', 'app.user_faculty', 'app.role', 'app.roles_user');
 
-    public function startCase()
-    {
-        $this->User = ClassRegistry::init('User');
-    }
+	function startTest() {
+		$this->User =& ClassRegistry::init('User');
+	}
 
-    public function endCase()
-    {
-    }
+	function endTest() {
+		unset($this->User);
+		ClassRegistry::flush();
+	}
 
-    public function startTest($method)
-    {
-    }
+	function testFindUserByidWithField() {
+        // no field restrictions, should be a flat array of 
+        // only data from the user field, no associations
+        $ret = $this->User->findUserByidWithFields(4);
+        $this->assertEqual($ret['id'], 4);
+        $this->assertEqual($ret['username'], 'instructor3');
+        // field restrictions, for some reason, means it's no longer
+        // a flat array of data, it includes all the associational data too
+        $ret = $this->User->findById(4, array('username'));
+        $this->assertEqual(count($ret['User']), 2);
+        $this->assertEqual($ret['User']['username'], 'instructor3');
+        $this->assertEqual($ret['User']['id'], 4);
+	}
 
-    public function endTest($method)
-    {
-    }
-
-    public function testCourseInstance()
-    {
-        $this->assertTrue(is_a($this->User, 'User'));
-    }
-
-    public function testGetByUsername()
-    {
+	function testGetByUsername() {
         $empty=null;
 
         //Test on valid student input
         //Run tests
-        $studentName = $this->User->getByUsername('StudentY');
-        $this->assertEqual($studentName['User']['username'], "StudentY");
+        $studentName = $this->User->getByUsername('65498451');
+        $this->assertEqual($studentName['User']['username'], "65498451");
 
         //Test on valid instructor input
-        $instructorName = $this->User->getByUserName('Peterson');
-        $this->assertEqual($instructorName['User']['username'], "Peterson");
+        $instructorName = $this->User->getByUserName('instructor1');
+        $this->assertEqual($instructorName['User']['username'], "instructor1");
 
         //Test on valid admin input
-        $adminName = $this->User->getByUserName('Admin');
-        $this->assertEqual($adminName['User']['username'], "Admin");
+        $adminName = $this->User->getByUserName('admin1');
+        $this->assertEqual($adminName['User']['username'], "admin1");
 
         //Testing invalid inputs; all tests should return NULL
         //invalid username input
@@ -63,318 +52,185 @@ class UserTestCase extends CakeTestCase
         //null input
         $nullInput = $this->User->getByUserName(null);
         $this->assertEqual($nullInput['username'], $empty);
-    }
+	}
 
-    public function testFindUser()
-    {
-        $empty=null;
-
-        //On valid student user_name and password
-
-        //Students
-        $validStudent = $this->User->findUser('StudentY', 'password1');
-        $this->assertEqual($validStudent['User']['username'], "StudentY");
-
-        //Instructor
-        $validInstructor = $this->User->findUser('INSTRUCTOR1', 'password2');
-        $this->assertEqual($validInstructor['User']['username'], "INSTRUCTOR1");
-
-        //Admin
-        $validAdmin = $this->User->findUser('Admin', 'passwordA');
-        $this->assertEqual($validAdmin['User']['username'], "Admin");
-
-
-        //On invalid user_name
-        $invalidUserName = $this->User->findUser('invalidUser', 'password1');
-        $this->assertEqual($invalidUserName, $empty);
-
-        //On invalid passWord
-        $invalidPassword = $this->User->findUser('StudentY', 'invalidPassword');
-        $this->assertEqual($invalidPassword, $empty);
-
-        //ALL invalid paramters
-        $allInvalid = $this->User->findUser('invalid', 'invalid');
-        $this->assertEqual($allInvalid, $empty);
-
-        //null inputs
-        $nullInput = $this->User->findUser(null, 'password1');
-        $this->assertEqual($nullInput, $empty);
-
-        $nullInput = $this->User->findUser('StudentY', null);
-        $this->assertEqual($nullInput, $empty);
-
-        $nullInput = $this->User->findUser(null, null);
-        $this->assertEqual($nullInput, $empty);
-
-
-        //On duplicate password
-        $checkDuplicate1 = $this->User->findUser('StudentY', 'password1');
-        $checkDuplicate2 = $this->User->findUser('StudentZ', 'password1');
-        //run tests
-        $this->assertEqual($checkDuplicate1['User']['username'], "StudentY");
-        $this->assertEqual($checkDuplicate2['User']['username'], "StudentZ");
-    }
-
-    public function testFindUserByStudentNo()
-    {
-        $empty=null;
-
-        //Test findUserByStudentNo() on valid users
-        //Students
-        $student = $this->User->findUserByStudentNo(123);
-        $this->assertEqual($student['User']['username'], "StudentY");
-
-        //Instructors
-        $instructors = $this->User->findUserByStudentNo(321);
-        $this->assertEqual($instructors['User']['username'], "INSTRUCTOR1");
-
-        //Admin
-        $admin = $this->User->findUserByStudentNo(111);
-        $this->assertEqual($admin['User']['username'], "Admin");
-
-        //Test studentNo==0
-        $zero  = $this->User->findUserByStudentNo(0);
-        $zero1 = $this->User->findUserByStudentNo(000000);
-        $this->assertEqual($zero['User']['username'], $zero1['User']['username']);
-
-        //Test invalid student number : 2332353 (invalid)
-        $invalidStudentNo = $this->User->findUserByStudentNo(2332353);
-        $this->assertEqual($invalidStudentNo, $empty);
-
-        //Test null student number input
-        $nullInput = $this->User->findUserByStudentNo(null);
-        $this->assertEqual($nullInput, $empty);
-    }
-
-
-    public function testGetEnrolledStudents()
-    {
-        $empty=null;
-
+	function testGetEnrolledStudent() {
         //Run tests
         $enrolledStudentList = $this->User->getEnrolledStudents(1);
-        $enrolledStudentArray=array();
+        $actual = array();
         foreach ($enrolledStudentList as $student) {
-            array_push($enrolledStudentArray, $student['User']['username']);
+            array_push($actual, $student['User']['username']);
         }
-        $expect = array('GSlade','Peterson','StudentY','StudentZ');
-        $this->assertEqual(sort($enrolledStudentArray), sort($expect));
-
-        //Test a course with no students enrolled
-        $enrolledStudentList = $this->User->getEnrolledStudents(3);
-        $this->assertEqual($enrolledStudentList, $empty);
+        $expect = array(
+            19524032,
+            19803030,
+            22784037,
+            37116036,
+            38058020,
+            48877031,
+            51516498,
+            65468188,
+            65498451,
+            84188465,
+            90938044,
+            98985481
+        );
+        $this->assertTrue(count(array_diff($actual, $expect)) == 0);
 
         //Test an invalid corse, course_id==231321 (invalid)
         $invalidCourse = $this->User->getEnrolledStudents(231321);
-        $this->assertEqual($invalidCourse, $empty);
-    }
+        $this->assertEqual($invalidCourse, null);
+	}
 
-    public function testGetEnrolledStudentsForList()
-    {
-        /* TODO */
-        $this->User =& ClassRegistry::init('User');
-        $empty=null;
-
+	function testGetEnrolledStudentsForList() {
         //Test on a valid course with some student enrollment
         //Set up test data
-        $temp = $this->User->getEnrolledStudentsForList(1);
-        $this->User->log($temp);
-    }
+        $ret = $this->User->getEnrolledStudentsForList(1);
+        $expected = array(
+            '26' => '19524032 Bill Student',
+            '32' => '19803030 Bowinn Student',
+            '21' => '22784037 Nicole Student',
+            '17' => '37116036 Edna Student',
+            '28' => '38058020 Michael Student',
+            '15' => '48877031 Jennifer Student',
+            '33' => '51516498 Joe Student',
+            '6' => '65468188 Alex Student',
+            '5' => '65498451 Ed Student',
+            '13' => '84188465 Damien Student',
+            '19' => '90938044 Jonathan Student',
+            '7' => '98985481 Matt Student'
+        );
+        $this->assertTrue(count(array_diff_assoc($ret, $expected)) == 0);
+	}
 
-    public function testGetUserByEmail()
-    {
-        $user = $this->User->getUserByEmail('email1');
-        $this->assertEqual($user['User']['username'], 'StudentY');
+	function testHashPassword() {
+        $input = array('User' => array('password' => 'frogleg'));
+        $ret = $this->User->hashPasswords($input);
+        $this->assertEqual($ret['User']['password'], 
+            '6f40a1a25eec7d325310dea310949005');
+	}
 
-        $user = $this->User->getUserByEmail('invalid email');
-        $this->assertFalse($user);
-    }
-
-    public function testFindUserByEmailAndStudentNo()
-    {
-        $user = $this->User->findUserByEmailAndStudentNo('email1', 123);
-        $this->assertEqual($user['User']['username'], 'StudentY');
-    }
-
-    public function testGetUserIdByStudentNo()
-    {
-        $empty=null;
-
-        //Test function on valid users
-        $student1ID = $this->User->getUserIdByStudentNo(123);
-        $student2ID = $this->User->getUserIdByStudentNo(100);
-        $instructorID =$this->User->getUserIdByStudentNo(321);
-        $adminID = $this->User->getUserIdByStudentNo(111);
-        $this->assertEqual($student1ID, 3);
-        $this->assertEqual($student2ID, 4);
-        $this->assertEqual($instructorID, 5);
-        $this->assertEqual($adminID, 8);
-
-        //Test function on invalid users
-        $invalid = $this->User->getUserIdByStudentNo(23123123);
-        $this->assertEqual($invalid, $empty);
-        //Test function on null input
-        $null =  $this->User->getUserIdByStudentNo(null);
-        $this->assertEqual($null, $empty);
-    }
-
-    public function testGetRoleName()
-    {
-        $empty=null;
-
+	function testGetRoleName() {
         //user_id==1 : role(superadmin)
-        $superAdminRole=$this->User->getRoleName(8);
+        $superAdminRole=$this->User->getRoleName(1);
         $this->assertEqual($superAdminRole, 'superadmin');
 
-        //user_id==3 : role(student)
-        $studentRole=$this->User->getRoleName(3);
+        //user_id==5 : role(student)
+        $studentRole=$this->User->getRoleName(5);
         $this->assertEqual($studentRole, 'student');
 
-        //user_id==13 : role(instructor)
-        $instructorRole=$this->User->getRoleName(1);
+        //user_id==2 : role(instructor)
+        $instructorRole=$this->User->getRoleName(2);
         $this->assertEqual($instructorRole, 'instructor');
 
-        //user_id==20 : role(admin)
-        $adminRole = $this->User->getRoleName(9);
+        //user_id==34 : role(admin)
+        $adminRole = $this->User->getRoleName(34);
         $this->assertEqual($adminRole, 'admin');
 
-        //user_id==9 : role(unassigned)
-        $unassignedRole = $this->User->getRoleName(13);
-        $this->assertEqual($unassignedRole, $empty);
-    }
+        //user_id==9999 : role(unassigned)
+        $unassignedRole = $this->User->getRoleName(9999);
+        $this->assertEqual($unassignedRole, null);
+	}
 
-    public function testGetRoleId()
-    {
-        $empty=null;
-
+	function testGetRoleId() {
         //user_id==1 : role(superadmin)
-        $superAdminRole=$this->User->getRoleId(8);
+        $superAdminRole = $this->User->getRoleId(1);
         $this->assertEqual($superAdminRole, '1');
 
-        //user_id==3 : role(student)
-        $studentRole=$this->User->getRoleId(3);
+        //user_id==5 : role(student)
+        $studentRole=$this->User->getRoleId(5);
         $this->assertEqual($studentRole, '5');
 
-        //user_id==13 : role(instructor)
-        $instructorRole=$this->User->getRoleId(1);
+        //user_id==2 : role(instructor)
+        $instructorRole=$this->User->getRoleId(2);
         $this->assertEqual($instructorRole, '3');
 
-        //user_id==20 : role(admin)
-        $adminRole = $this->User->getRoleId(9);
+        //user_id==34 : role(admin)
+        $adminRole = $this->User->getRoleId(34);
         $this->assertEqual($adminRole, '2');
 
-        //user_id==9 : role(unassigned)
-        $unassignedRole = $this->User->getRoleId(13);
-        $this->assertEqual($unassignedRole, $empty);
-    }
+        //user_id==9999 : role(unassigned)
+        $unassignedRole = $this->User->getRoleId(9999);
+        $this->assertEqual($unassignedRole, null);
+	}
 
-    public function testFindUserByid()
-    {
-        $empty=null;
+	function testGetRole() {
+        // NOTE: that we don't officially support multiple roles for
+        // one user yet, so that's not tested.
+        
+        // test single user's role
+        $ret = $this->User->getRoles(1);
+        $this->assertEqual($ret[1], 'superadmin');
+	}
 
-        //For students
-        $student=$this->User->findUserByid(3);
-        $this->assertEqual($student['User']['username'], "StudentY");
-        //For instructors
-        $instructors = $this->User->findUserByid(1);
-        $this->assertEqual($instructors['User']['username'], "GSlade");
-        //For admin
-        $admin = $this->User->findUserByid(8);
-        $this->assertEqual($admin['User']['username'], "Admin");
-        //For Super-admin
-        $superAdmin = $this->User->findUserByid(9);
-        $this->assertEqual($superAdmin['User']['username'], "SuperAdmin");
+	function testGetInstructor() {
+        $actual = $this->User->GetInstructors('all', array());
+        $actual = Set::extract('/User/id', $actual);
+        $expected = array('0' => 4, '1' => 2, '2' => 3);
+        $this->assertTrue(count(array_diff_assoc($actual, $expected) == 0));
+	}
 
-        //Test function for invalid user_id
-        //user_id==323123 (invalid)
-        $invalidUser = $this->User->findUserByid(323123);
-        $this->assertEqual($invalidUser, $empty);
+	function testLoadRole() {
+        $ret = $this->User->loadRoles(1);
+        $this->assertEqual($ret['1'], 'superadmin');
+        $ret = $this->User->loadRoles(2);
+        $this->assertEqual($ret['3'], 'instructor');
+	}
 
-        //Test function for null input
-        $nullInput = $this->User->findUserByid(null);
-        $this->assertEqual($nullInput, $empty);
-    }
+	function testGetCourseTutorsForList() {
+        // TODO
+	}
 
-    public function testGetRoles()
-    {
-        $roles = $this->User->getRoles(1);
-        $role = array();
-        foreach ($roles as $r) {
-            array_push($role, $r);
-        }
+	function testRegisterRole() {
+        // TODO
+	}
 
-        $this->assertEqual($role, array('instructor'));
+	function testGetMyCourse() {
+        // TODO
+	}
 
-        $roles = $this->User->getRoles(3);
-        $role = array();
+	function testGetMyCourseList() {
+        // TODO
+	}
 
-        foreach ($roles as $r) {
-            array_push($role, $r);
-        }
+	function testAddUserByArray() {
+        // TODO
+	}
 
-        $this->assertEqual($role, array('student'));
+	function testGetCurrentLoggedInUser() {
+        // can't test, no session without a browser!
+	}
 
-        $role = $this->User->getRoles(999);
-        $this->assertFalse($role);
+	function testGetInstance() {
+        // can't test, no session without a browser!
+	}
 
-        $role = $this->User->getRoles(null);
-        $this->assertFalse($role);
+	function testStore() {
+        // can't test, no session without a browser!
+	}
 
-    }
+	function testGet() {
+        // can't test, no session without a browser!
+	}
 
-    public function testGetRolesByRole()
-    {
-        $empty=null;
+	function testIsLoggedIn() {
+        // can't test, no session without a browser!
+	}
 
-        $roles = array('Admin','Instructor','Student');
-        $temp=$this->User->getRolesByRole($roles);
-        $this->assertEqual($roles['0'], 'Admin');
-        $this->assertEqual($roles['1'], 'Instructor');
-        $this->assertEqual($roles['2'], 'Student');
-    }
+	function testHasRole() {
+        // can't test, no session without a browser!
+	}
 
-    public function testGetInstructors()
-    {
-        $instructors = $this->User->GetInstructors('all', array());
-        $instructors = Set::extract('/User/id', $instructors);
-        sort($instructors);
+	function testGetRoleArray() {
+        // can't test, no session without a browser!
+	}
 
-        $this->assertEqual($instructors, array(1, 2, 5, 6, 7));
-    }
+	function testGetPermission() {
+        // can't test, no session without a browser!
+	}
 
-    //is not used anywhere
+	function testHasPermission() {
+        // can't test, no session without a browser!
+	}
 
-    public function testRegisterEnrolment()
-    {
-        /* TODO: test RegisterEnrolment */
-
-        /*
-        $this->User =& ClassRegistry::init('User');
-        $this->Course =& ClassRegistry::init('Course');
-        $empty=null;
-//		$this->flushDatabase();
-
-        //Test for valid instructor and course
-        //Set up test data
-//		$this->createCoursesHelper(1, 'Math320', 'AnalysisI');
-        //Run tests
-        $this->User->registerEnrolment(3,3);
-        $students=$this->User->getEnrolledStudentsForList(3);
-        $this->assertEqual($students[0],'StudentY');
-         */
-    }
-
-    public function testDropEnrolment()
-    {
-        $empty=null;
-        //	$this->flushDatabase();
-
-        //set up test data
-        //	$this->createCoursesHelper(1, 'Math320', 'AnalysisI');
-        //Run tests
-        $this->User->registerEnrolment(1, 1);
-        $this->User->DropEnrolment(1, 1);
-        $enrolCount=$this->User->getEnrolledStudentsForList(1);
-        $this->User->log($enrolCount);
-    }
 }

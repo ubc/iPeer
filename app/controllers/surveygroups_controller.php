@@ -306,7 +306,8 @@ class SurveyGroupsController extends AppController
             $members = explode(' ', $team);
             for ($j=0; $j < count($members); $j++) {
                 $member = $members[$j];
-                $member_id = $this->User->getUserIdByStudentNo($member);
+                $member_id = 
+                    $this->User->field('id', array('student_no' => $member));
                 $teams[$i]['member_'.$j]['student_no'] = $member;
                 $teams[$i]['member_'.$j]['id'] = $member_id;
             }
@@ -358,7 +359,8 @@ class SurveyGroupsController extends AppController
             $group_members = array();
             foreach ($members as $member) {
                 //save group members
-                $member_id = $this->User->getUserIdByStudentNo($member);
+                $member_id = 
+                    $this->User->field('id', array('student_no' => $member));
                 $surveyGroupMember = array();
                 $surveyGroupMember['user_id'] = $member_id;
                 $group_members[] = $surveyGroupMember;

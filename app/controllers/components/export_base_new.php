@@ -157,7 +157,7 @@ class ExportBaseNewComponent extends Object
         $xPosition = 0;
         $yPosition = 0;
         // Fill in grid Results
-        $evaluatee = $this->User->findUserByid($evaluateeId);
+        $evaluatee = $this->User->findById($evaluateeId);
         $yInc = 0; $index = 0;
         foreach ($groupMembers as $evaluator) {
             $row = array();
@@ -317,7 +317,7 @@ class ExportBaseNewComponent extends Object
         $xPosition = 0;
         $yPosition = 0;
         // Fill in grid with results
-        $evaluatee = $this->User->findUserByid($evaluateeId);
+        $evaluatee = $this->User->findById($evaluateeId);
         $yInc = 0;
         foreach ($groupMembers as $evaluator) {
             $row = array();
@@ -476,7 +476,7 @@ class ExportBaseNewComponent extends Object
         $xPosition = 0;
         $yPosition = 0;
         // Fill in grid with results
-        $evaluatee = $this->User->findUserByid($evaluateeId);
+        $evaluatee = $this->User->findById($evaluateeId);
         $yInc = 0;
         foreach ($groupMembers as $evaluator) {
             $row = array();
@@ -1013,7 +1013,7 @@ for ($inc=0; $inc<$count($groupMembers); $inc++) {
         $this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
 
         $groupMembers = $this->ExportHelper2->getGroupMemberHelper($grpEventId);
-        $evaluatee = $this->User->findUserByid($evaluateeId);
+        $evaluatee = $this->User->findById($evaluateeId);
         // Build Grid
         $xRange = 9;
         $yRange = count($groupMembers) + 2;

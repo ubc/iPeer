@@ -242,73 +242,6 @@ class User extends AppModel
         return parent::find($conditions, $fields, $order, $recursive);
     }
 
-
-    //Validation check on duplication of username
-/*  function hasDuplicateUsername($username) {
-    if ($this->find('first', array('conditions' => array('username' => $username)))) {
-      $this->errorMessage[] = array('Username' => __('Duplicate Username found. Please change the username of this user.'));
-      /*if ($this->data[$this->name]['role'] == 'S') {
-        $this->errorMessage.='<br>If you want to enrol this student to one or more courses, use the enrol function on User Listing page.';
-        }
-      return false;
-    }
-
-    return true;
-}*/
-
-    /**
-     * findUser Find user by username and password
-     *
-     * @param mixed $username user's username
-     * @param mixed $password user's password
-     *
-     * @access public
-     * @return array with user data
-     * */
-    public function findUser ($username, $password)
-    {
-        return $this->find('first', array('conditions' => array('username' => $username,
-            'password' => $password)));
-    }
-
-
-    /**
-     * Find user by student number
-     *
-     * @param mixed $studentNo student number
-     *
-     * @access public
-     * @return array with user data
-     * */
-    function findUserByStudentNo ($studentNo = null)
-    {
-        if (!empty($studentNo)) {
-            return $this->find('first',
-                array('conditions' => array('student_no' => $studentNo,)));
-        }
-    }
-
-    /**
-     * findUserByid Get user by user id
-     *
-     * @param mixed $id     user id
-     * @param bool  $params search parameters
-     *
-     * @access public
-     * @return array with user data
-     * */
-    function findUserByid ($id, $params = array())
-    {
-        if (null == $id) {
-            return null;
-        }
-
-        return $this->find(
-            'first',
-            array_merge(array('conditions' => array($this->name.'.id' => $id,)), $params)
-        );
-    }
-
     /**
      * findUserByidWithFields
      *
@@ -358,25 +291,6 @@ class User extends AppModel
             'all',
             array('conditions' => array('username' => $usernames,), 'contain' => $contain)
         );
-    }
-
-    /**
-     * Get user id by student no
-     *
-     * @param string $studentNo student number
-     *
-     * @access public
-     * @return user id
-     * */
-    function getUserIdByStudentNo($studentNo)
-    {
-        if (!empty($studentNo)) {
-            $tmp = $this->findUserByStudentNo($studentNo);
-
-            return $tmp['User']['id'];
-        }
-
-        return null;
     }
 
     /**
@@ -440,39 +354,6 @@ class User extends AppModel
     }
 
     /**
-     * Get user by email
-     *
-     * @param string $email user's email
-     *
-     * @access public
-     * @return array with user data
-     * */
-    function getUserByEmail($email = '')
-    {
-        //return $this->find( "email='" . $email );
-        return $this->find('first', array(
-            'conditions' => array('email' => $email)
-        ));
-    }
-
-    /**
-     * Get user by email and student number
-     *
-     * @param string $email     user's email
-     * @param string $studentNo user's student number
-     *
-     * @access public
-     * @return array with user data
-     * */
-    function findUserByEmailAndStudentNo($email = '', $studentNo = '')
-    {
-        //return $this->find("email='" .$email . "' AND student_no='" . $studentNo . "'");
-        return $this->find('first', array(
-            'conditions' => array('email' => $email, 'student_no'=> $studentNo)
-        ));
-    }
-
-    /**
      * Hash password
      *
      * @param array $data array containing password
@@ -527,55 +408,12 @@ class User extends AppModel
     {
         $user = $this->read(null, $id);
 
-        return $this->getRolesByRole($user['Role']);
-    }
-
-    /**
-     * Get role names by role ids
-     *
-     * @param array $roles array of role ids
-     *
-     * @access public
-     * @return role names
-     * */
-    function getRolesByRole($roles)
-    {
         $ret = array();
-        if (!empty($roles)) {
-            foreach ($roles as $role) {
-                $ret[$role['id']] = $role['name'];
-            }
+        foreach ($user['Role'] as $role) {
+            $ret[$role['id']] = $role['name'];
         }
 
         return $ret;
-    }
-
-    /**
-     * Remove enrolled user from course. For student enrolment in a course.
-     *
-     * @param int $id        user id
-     * @param int $course_id course id
-     *
-     * @access public
-     * @return False on failure, true otherwise.
-     * */
-    function dropEnrolment($id, $course_id)
-    {
-        return $this->habtmDelete('Enrolment', $id, $course_id);
-    }
-
-    /**
-     * Enroll user in a course. For student enrolment in a course.
-     *
-     * @param int $id        user id
-     * @param int $course_id course id
-     *
-     * @access public
-     * @return False on failure, true otherwise.
-     * */
-    function registerEnrolment($id, $course_id)
-    {
-        return $this->habtmAdd('Enrolment', $id, $course_id);
     }
 
     /**
@@ -792,7 +630,7 @@ class User extends AppModel
      * *******************************/
 
     /**
-     * getInstance
+     * getInstance - used by debug
      *
      * @param object $user user object
      *

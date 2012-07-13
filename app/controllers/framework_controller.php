@@ -64,7 +64,7 @@ class FrameworkController extends AppController
     {
         $this->AccessControl->check('functions/user', 'read');
 
-        if (!is_numeric($id) || !($this->data = $this->User->findUserByid($id))) {
+        if (!is_numeric($id) || !($this->data = $this->User->findById($id))) {
             $this->Session->setFlash(__('Invalid user ID.', true));
             $this->redirect('/user/index');
         }

@@ -417,7 +417,7 @@ class UsersController extends AppController
             $this->redirect('/home');
         }
 
-        if (!($this->data = $this->User->findUserByid($id))) {
+        if (!($this->data = $this->User->findById($id))) {
             $this->Session->setFlash(__('This user does not exist.', true));
             $this->redirect('index');
         }
@@ -660,7 +660,7 @@ class UsersController extends AppController
             return;
         }
 
-        if (!($this->data = $this->User->findUserByid($userId))) {
+        if (!($this->data = $this->User->findById($userId))) {
             $this->Session->setFlash(__('This user does not exist.', true));
             $this->redirect($this->referer());
         }
@@ -760,40 +760,6 @@ class UsersController extends AppController
         $this->redirect($this->referer());
     }
 
-
-    /**
-     * drop
-     *
-     * @param mixed $id        id
-     * @param mixed $course_id course id
-     *
-     * @access public
-     * @return void
-     */
-    function drop($id, $course_id)
-    {
-        // Ensure that the id is valid
-        if (!is_numeric($id) && !is_numeric($course_id)) {
-            $this->cakeError('error404');
-        }
-
-        // check if current user has permission to delete this user
-        // in case of the being deleted user has higher level role
-        $roles = $this->User->getRoles($id);
-        if (!$this->AccessControl->hasPermissionDoActionOnUserWithRoles('DropUser', $roles)) {
-            $this->Session->setFlash(__('You do not have permission to drop the user.', true));
-        } else {
-            if ($this->User->dropEnrolment($id, $course_id)) {
-                $this->Session->setFlash(__('The user is dropped from this course!', true));
-            } else {
-                $this->Session->setFlash(__('Drop failed!', true));
-            }
-        }
-
-        $this->redirect('index');
-    }
-
-
     /**
      * checkDuplicateName
      *
@@ -837,7 +803,7 @@ class UsersController extends AppController
         }
 
         // Read the user
-        $user_data = $this->User->findUserByid($user_id, array('contain' => false));
+        $user_data = $this->User->findById($user_id, array('contain' => false));
 
         if (empty($user_data)) {
             $this->Session->setFlash(__('User Not Found!', true));

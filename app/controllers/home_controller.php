@@ -87,7 +87,7 @@ class HomeController extends AppController
         $curUserId = $this->Auth->user('id');
         $eventAry = array();
         $pos = 0;
-        $user = $this->User->findUserByid($this->Auth->user('id'));
+        $user = $this->User->findById($this->Auth->user('id'));
         $roleId = $user['Role'][0]['id'];
         if ($roleId == 5) {
             //Get enrolled courses

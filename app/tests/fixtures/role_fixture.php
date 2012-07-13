@@ -12,16 +12,6 @@ class RoleFixture extends CakeTestFixture
 {
     public $name = 'Role';
 
-    public $import = 'Role';
-
-    public $records = array(
-        array('id' => 1, 'name' => 'superadmin'),
-        array('id' => 2, 'name' => 'admin'),
-        array('id' => 3, 'name' => 'instructor'),
-        array('id' => 4, 'name' => 'tutor'),
-        array('id' => 5, 'name' => 'student'),
-
-    );
-
+    public $import = array('model' => 'Role', 'records' => true);
 }
 

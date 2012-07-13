@@ -171,7 +171,7 @@ class ExportComponent extends Object
             global $globUsersArr;
             foreach ($groupMembers as $groupMember) {
                 $userId = $groupMember;
-                $student = $this->User->findUserByid($userId);
+                $student = $this->User->findById($userId);
                 $globUsersArr[$student['User']['student_no']] = $userId;
             }
             if (!empty($globUsersArr)) {
@@ -189,7 +189,7 @@ class ExportComponent extends Object
             foreach ($groupMembers as $groupMember) {
                 //get student info: first_name, last_name, id, email
                 $userId = $groupMember;
-                $student = $this->User->findUserByid($userId);
+                $student = $this->User->findById($userId);
                 $data[$i]['students'][$j]['student_id'] = $student['User']['student_no'];
                 $data[$i]['students'][$j]['first_name'] = $student['User']['first_name'];
                 $data[$i]['students'][$j]['last_name'] = $student['User']['last_name'];
@@ -244,7 +244,7 @@ class ExportComponent extends Object
                     //Here we add some generic information to the mixedEvalNumeric variable. First we add the name of the person being evaluated in this particular mixed eval(evaluatee)
                     //then we sample index 0 of the userResults array to just get the number of numeric questions. Then we can make column headers for each question (1,2,3...)
                     global $mixedEvalNumeric;
-                    $nameArray = $this->User->findUserByid($userId);
+                    $nameArray = $this->User->findById($userId);
                     $name=$nameArray['User']['first_name'] . ' ' . $nameArray['User']['last_name'];
                     $mixedEvalNumeric .= "\n".$name . "," . $data[$i]['group_name'] . "\n";
                     $tempEvaluatee = '';

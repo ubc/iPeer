@@ -47,7 +47,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         $this->User = ClassRegistry::init('User');
         $this->Group = ClassRegistry::init('Group');
         $row = '';
-        $user = $this->User->findUserByid($userId);
+        $user = $this->User->findById($userId);
         $group = $this->Group->getGroupByGroupId($groupId);
         if (!empty($params['include_group_names'])) {
             $row .= $group['0']['Group']['group_name'].", ";
