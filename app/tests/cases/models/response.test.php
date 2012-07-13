@@ -37,26 +37,29 @@ class ResponseTestCase extends CakeTestCase
     {
     }
 
-    function testResponseInstance()
-    {
-        $this->assertTrue(is_a($this->Response, 'Response'));
-    }
-
     function testFillQuestion()
     {
-        $input = $this->setupTestInput();
+        $data = $this->SurveyQuestion->find('all', array('conditions'=> array('survey_id' => 1),
+            'fields' => array('number', 'question_id', 'id'),
+            'order' => 'number'));
+        $ret = $this->Question->fillQuestion($data);
         // Assert reponse index didn't exist in the input prior to calling fillResponse
-        $this->assertTrue(empty($input[0]['Question']['Responses']['response_0']['response']));
-        $this->assertTrue(empty($input[1]['Question']['Responses']['response_0']['response']));
-        $this->assertTrue(empty($input[2]['Question']['Responses']['response_0']['response']));
-        $result = $this->Response->fillResponse($input);
+        $this->assertTrue(empty($ret[0]['Question']['Responses']['response_0']['response']));
+        $this->assertTrue(empty($ret[1]['Question']['Responses']['response_0']['response']));
+        $result = $this->Response->fillResponse($ret);
         // Assert that responses index are merged with array
-        $this->assertEqual($result[0]['Question']['Responses']['response_0']['response'], 'YES FOR Q1');
+        $this->assertEqual($result[0]['Question']['Responses']['response_0']['response'], '4+');
         $this->assertEqual($result[0]['Question']['Responses']['response_0']['id'], 1);
-        $this->assertEqual($result[1]['Question']['Responses']['response_0']['response'], 'NO FOR Q2');
-        $this->assertEqual($result[1]['Question']['Responses']['response_0']['id'], 2);
-        $this->assertEqual($result[2]['Question']['Responses']['response_0']['response'], 'YES FOR Q3');
-        $this->assertEqual($result[2]['Question']['Responses']['response_0']['id'], 3);
+        $this->assertEqual($result[0]['Question']['Responses']['response_1']['response'], '3-4');
+        $this->assertEqual($result[0]['Question']['Responses']['response_1']['id'], 2);
+        $this->assertEqual($result[0]['Question']['Responses']['response_2']['response'], '2-3');
+        $this->assertEqual($result[0]['Question']['Responses']['response_2']['id'], 3);
+        $this->assertEqual($result[0]['Question']['Responses']['response_3']['response'], '< 2');
+        $this->assertEqual($result[0]['Question']['Responses']['response_3']['id'], 4);
+        $this->assertEqual($result[1]['Question']['Responses']['response_0']['response'], 'yes');
+        $this->assertEqual($result[1]['Question']['Responses']['response_0']['id'], 5);
+        $this->assertEqual($result[1]['Question']['Responses']['response_1']['response'], 'no');
+        $this->assertEqual($result[1]['Question']['Responses']['response_1']['id'], 6);
     }
 
     function testGetResponseByQuestionId()
@@ -64,12 +67,12 @@ class ResponseTestCase extends CakeTestCase
         // Assert that response index are merged with array
         $question1 = $this->Response->getResponseByQuestionId(1);
         $question2 = $this->Response->getResponseByQuestionId(2);
-        $question6 = $this->Response->getResponseByQuestionId(6);
-        $question4 = $this->Response->getResponseByQuestionId(4);
-        $this->assertEqual($question1['Responses']['response_0']['response'], 'YES FOR Q1');
-        $this->assertEqual($question2['Responses']['response_0']['response'], 'NO FOR Q2');
-        $this->assertEqual($question6['Responses']['response_0']['response'], 'YES FOR Q3');
-        $this->assertEqual($question4['Responses']['response_0']['response'], 'YES FOR Q4');
+        $this->assertEqual($question1['Responses']['response_0']['response'], '4+');
+        $this->assertEqual($question1['Responses']['response_1']['response'], '3-4');
+        $this->assertEqual($question1['Responses']['response_2']['response'], '2-3');
+        $this->assertEqual($question1['Responses']['response_3']['response'], '< 2');
+        $this->assertEqual($question2['Responses']['response_0']['response'], 'yes');
+        $this->assertEqual($question2['Responses']['response_1']['response'], 'no');
     }
 
     function testCountResponses()
@@ -77,26 +80,26 @@ class ResponseTestCase extends CakeTestCase
         // Assert the correct question count
         $Q1ResponseCount = $this->Response->countResponses(1);
         $Q2ResponseCount = $this->Response->countResponses(2);
-        $Q5ResponseCount = $this->Response->countResponses(5);
-        $this->assertEqual($Q1ResponseCount, 2);
-        $this->assertEqual($Q2ResponseCount, 1);
-        $this->assertEqual($Q5ResponseCount, 0);
+        $Q3ResponseCount = $this->Response->countResponses(3);
+        $this->assertEqual($Q1ResponseCount, 4);
+        $this->assertEqual($Q2ResponseCount, 2);
+        $this->assertEqual($Q3ResponseCount, 0);
     }
 
     function testGetResponseId()
     {
-        $respose1 = $this->Response->getResponseId(1, 'YES FOR Q1');
-        $respose2 = $this->Response->getResponseId(2, 'NO FOR Q2');
+        $respose1 = $this->Response->getResponseId(1, '4+');
+        $respose2 = $this->Response->getResponseId(1, '3-4');
+        $respose3 = $this->Response->getResponseId(1, '2-3');
+        $respose4 = $this->Response->getResponseId(1, '< 2');
+        $respose5 = $this->Response->getResponseId(2, 'yes');
+        $respose6 = $this->Response->getResponseId(2, 'no');
         $this->assertEqual($respose1, 1);
         $this->assertEqual($respose2, 2);
+        $this->assertEqual($respose3, 3);
+        $this->assertEqual($respose4, 4);
+        $this->assertEqual($respose5, 5);
+        $this->assertEqual($respose6, 6);
     }
 
-    function setupTestInput()
-    {
-        $data = $this->SurveyQuestion->find('all', array('conditions'=> array('survey_id' => 1),
-            'fields' => array('number', 'question_id', 'id'),
-            'order' => 'number'));
-        $result = $this->Question->fillQuestion($data);
-        return $result;
-    }
 }
