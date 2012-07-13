@@ -581,8 +581,8 @@ CREATE TABLE `courses` (
 -- Dumping data for table `courses`
 --
 
-INSERT INTO `courses` VALUES (1, 'MECH 328', 'Mechanical Engineering Design Project', 'http://www.mech.ubc.ca', 'off', NULL, 'A', 1, '2006-06-20 14:14:45', NULL, '2006-06-20 14:14:45', 0);
-INSERT INTO `courses` VALUES (2, 'APSC 201', 'Technical Communication', 'http://www.apsc.ubc.ca', 'off', NULL, 'A', 1, '2006-06-20 14:15:38', 1, '2006-06-20 14:39:31', 0);
+INSERT INTO `courses` VALUES (1, 'MECH 328', 'Mechanical Engineering Design Project', 'http://www.mech.ubc.ca', 'off', NULL, 'A', 1, '2006-06-20 14:14:45', NULL, '2006-06-20 14:14:45', NULL);
+INSERT INTO `courses` VALUES (2, 'APSC 201', 'Technical Communication', 'http://www.apsc.ubc.ca', 'off', NULL, 'A', 1, '2006-06-20 14:15:38', NULL, '2006-06-20 14:39:31', NULL);
 
 -- --------------------------------------------------------
 
@@ -691,7 +691,7 @@ CREATE TABLE `course_departments` (
 
 INSERT INTO `course_departments` (`id`, `course_id`, `department_id`) VALUES
 (1, 2, 2),
-(3, 1, 1);
+(2, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -800,6 +800,31 @@ CREATE TABLE IF NOT EXISTS `evaluation_mixeval_details` (
 -- Dumping data for table `evaluation_mixeval_details`
 --
 
+INSERT INTO evaluation_mixeval_details (id, evaluation_mixeval_id, question_number, question_comment, selected_lom, grade, record_status, creator_id, created, updater_id, modified) VALUES
+(1, 1, 0, NULL, 5, 1.00, 'A', 7, '2012-07-13 10:38:20', 7, '2012-07-13 10:38:20'),
+(2, 1, 1, NULL, 5, 1.00, 'A', 7, '2012-07-13 10:38:20', 7, '2012-07-13 10:38:20'),
+(3, 1, 2, NULL, 5, 1.00, 'A', 7, '2012-07-13 10:38:20', 7, '2012-07-13 10:38:20'),
+(4, 1, 3, 'work very efficiently', 0, 0.00, 'A', 7, '2012-07-13 10:38:20', 7, '2012-07-13 10:38:20'),
+(5, 1, 4, 'Contributed his part', 0, 0.00, 'A', 7, '2012-07-13 10:38:20', 7, '2012-07-13 10:38:20'),
+(6, 1, 5, 'very easy to work with', 0, 0.00, 'A', 7, '2012-07-13 10:38:20', 7, '2012-07-13 10:38:20'),
+(7, 2, 0, NULL, 4, 0.80, 'A', 7, '2012-07-13 10:39:28', 7, '2012-07-13 10:39:28'),
+(8, 2, 1, NULL, 4, 0.80, 'A', 7, '2012-07-13 10:39:28', 7, '2012-07-13 10:39:28'),
+(9, 2, 2, NULL, 4, 0.80, 'A', 7, '2012-07-13 10:39:28', 7, '2012-07-13 10:39:28'),
+(10, 2, 3, 'Yes', 0, 0.00, 'A', 7, '2012-07-13 10:39:28', 7, '2012-07-13 10:39:28'),
+(11, 2, 4, 'He contributed in all parts of the project.', 0, 0.00, 'A', 7, '2012-07-13 10:39:28', 7, '2012-07-13 10:39:28'),
+(12, 2, 5, 'He is very easy to communicate with.', 0, 0.00, 'A', 7, '2012-07-13 10:39:28', 7, '2012-07-13 10:39:28'),
+(13, 3, 0, NULL, 5, 1.00, 'A', 31, '2012-07-13 10:42:49', 31, '2012-07-13 10:42:49'),
+(14, 3, 1, NULL, 5, 1.00, 'A', 31, '2012-07-13 10:42:49', 31, '2012-07-13 10:42:49'),
+(15, 3, 2, NULL, 5, 1.00, 'A', 31, '2012-07-13 10:42:49', 31, '2012-07-13 10:42:49'),
+(16, 3, 3, 'does great work', 0, 0.00, 'A', 31, '2012-07-13 10:42:49', 31, '2012-07-13 10:42:49'),
+(17, 3, 4, 'willing to do their part', 0, 0.00, 'A', 31, '2012-07-13 10:42:49', 31, '2012-07-13 10:42:49'),
+(18, 3, 5, 'absolutely easy to work with', 0, 0.00, 'A', 31, '2012-07-13 10:42:49', 31, '2012-07-13 10:42:49'),
+(19, 4, 0, NULL, 4, 0.80, 'A', 31, '2012-07-13 10:43:59', 31, '2012-07-13 10:43:59'),
+(20, 4, 1, NULL, 4, 0.80, 'A', 31, '2012-07-13 10:43:59', 31, '2012-07-13 10:43:59'),
+(21, 4, 2, NULL, 5, 1.00, 'A', 31, '2012-07-13 10:43:59', 31, '2012-07-13 10:43:59'),
+(22, 4, 3, 'produce efficient work', 0, 0.00, 'A', 31, '2012-07-13 10:43:59', 31, '2012-07-13 10:43:59'),
+(23, 4, 4, 'definitely', 0, 0.00, 'A', 31, '2012-07-13 10:43:59', 31, '2012-07-13 10:43:59'),
+(24, 4, 5, 'very easy to get along with', 0, 0.00, 'A', 31, '2012-07-13 10:43:59', 31, '2012-07-13 10:43:59');
 
 -- --------------------------------------------------------
 
@@ -829,6 +854,11 @@ CREATE TABLE IF NOT EXISTS `evaluation_mixevals` (
 -- Dumping data for table `evaluation_mixevals`
 --
 
+INSERT INTO evaluation_mixevals (id, evaluator, evaluatee, score, comment_release, grade_release, grp_event_id, event_id, record_status, creator_id, created, updater_id, modified) VALUES
+(1, 7, 5, 3.00, 0, 0, 5, 3, 'A', 7, '2012-07-13 10:38:20', 7, '2012-07-13 10:38:20'),
+(2, 7, 6, 2.40, 0, 0, 5, 3, 'A', 7, '2012-07-13 10:39:28', 7, '2012-07-13 10:39:28'),
+(3, 31, 32, 3.00, 0, 0, 6, 3, 'A', 31, '2012-07-13 10:42:49', 31, '2012-07-13 10:42:49'),
+(4, 31, 33, 2.60, 0, 0, 6, 3, 'A', 31, '2012-07-13 10:43:59', 31, '2012-07-13 10:43:59');
 
 -- --------------------------------------------------------
 
@@ -857,6 +887,19 @@ CREATE TABLE IF NOT EXISTS `evaluation_rubric_details` (
 -- Dumping data for table `evaluation_rubric_details`
 --
 
+INSERT INTO evaluation_rubric_details (id, evaluation_rubric_id, criteria_number, criteria_comment, selected_lom, grade, record_status, creator_id, created, updater_id, modified) VALUES
+(1, 1, 1, 'always on time', 5, 5.00, 'A', 31, '2012-07-13 10:26:47', 31, '2012-07-13 10:26:47'),
+(2, 1, 2, 'willing to do their part', 5, 5.00, 'A', 31, '2012-07-13 10:26:47', 31, '2012-07-13 10:26:47'),
+(3, 1, 3, 'everything was done a day early', 5, 5.00, 'A', 31, '2012-07-13 10:26:47', 31, '2012-07-13 10:26:47'),
+(4, 2, 1, 'attended most meetings', 4, 4.00, 'A', 31, '2012-07-13 10:29:15', 31, '2012-07-13 10:29:15'),
+(5, 2, 2, 'very co-operative', 5, 5.00, 'A', 31, '2012-07-13 10:29:15', 31, '2012-07-13 10:29:15'),
+(6, 2, 3, 'finished all his work on time', 5, 5.00, 'A', 31, '2012-07-13 10:29:15', 31, '2012-07-13 10:29:15'),
+(7, 3, 1, 'Yes', 5, 5.00, 'A', 7, '2012-07-13 10:30:29', 7, '2012-07-13 10:30:29'),
+(8, 3, 2, 'Absolutely', 4, 4.00, 'A', 7, '2012-07-13 10:30:29', 7, '2012-07-13 10:30:29'),
+(9, 3, 3, 'Definitely', 5, 5.00, 'A', 7, '2012-07-13 10:30:29', 7, '2012-07-13 10:30:29'),
+(10, 4, 1, 'attended all of our team meetings', 5, 5.00, 'A', 7, '2012-07-13 10:31:19', 7, '2012-07-13 10:31:19'),
+(11, 4, 2, 'very helpful in all parts of the project', 5, 5.00, 'A', 7, '2012-07-13 10:31:19', 7, '2012-07-13 10:31:19'),
+(12, 4, 3, 'Yes', 5, 5.00, 'A', 7, '2012-07-13 10:31:19', 7, '2012-07-13 10:31:19');
 
 -- --------------------------------------------------------
 
@@ -888,6 +931,11 @@ CREATE TABLE IF NOT EXISTS `evaluation_rubrics` (
 -- Dumping data for table `evaluation_rubrics`
 --
 
+INSERT INTO evaluation_rubrics (id, evaluator, evaluatee, general_comment, score, comment_release, grade_release, grp_event_id, event_id, record_status, creator_id, created, updater_id, modified, rubric_id) VALUES
+(1, 31, 32, 'We work well together.', 15.00, 0, 0, 4, 2, 'A', 31, '2012-07-13 10:26:47', 31, '2012-07-13 10:26:47', 1),
+(2, 31, 33, 'He did a great job.', 14.00, 0, 0, 4, 2, 'A', 31, '2012-07-13 10:29:14', 31, '2012-07-13 10:29:15', 1),
+(3, 7, 5, 'Good group member.', 14.00, 0, 0, 3, 2, 'A', 7, '2012-07-13 10:30:29', 7, '2012-07-13 10:30:29', 1),
+(4, 7, 6, 'Good job.', 15.00, 0, 0, 3, 2, 'A', 7, '2012-07-13 10:31:19', 7, '2012-07-13 10:31:19', 1);
 
 -- --------------------------------------------------------
 
@@ -919,6 +967,11 @@ CREATE TABLE IF NOT EXISTS `evaluation_simples` (
 -- Dumping data for table `evaluation_simples`
 --
 
+INSERT INTO evaluation_simples (id, evaluator, evaluatee, score, eval_comment, release_status, grp_event_id, event_id, date_submitted, grade_release, record_status, creator_id, created, updater_id, modified) VALUES
+(1, 7, 5, 95, 'very hard working', 0, 1, 1, '2012-07-13 10:21:57', 0, 'A', 7, '2012-07-13 10:21:57', 7, '2012-07-13 10:21:57'),
+(2, 7, 6, 105, 'did a decent job', 0, 1, 1, '2012-07-13 10:21:57', 0, 'A', 7, '2012-07-13 10:21:57', 7, '2012-07-13 10:21:57'),
+(3, 31, 32, 125, 'very good job', 0, 2, 1, '2012-07-13 10:23:11', 0, 'A', 31, '2012-07-13 10:23:11', 31, '2012-07-13 10:23:11'),
+(4, 31, 33, 75, 'he participated', 0, 2, 1, '2012-07-13 10:23:11', 0, 'A', 31, '2012-07-13 10:23:11', 31, '2012-07-13 10:23:11');
 
 -- --------------------------------------------------------
 
@@ -947,6 +1000,15 @@ CREATE TABLE IF NOT EXISTS `evaluation_submissions` (
 -- Dumping data for table `evaluation_submissions`
 --
 
+INSERT INTO evaluation_submissions (id, event_id, grp_event_id, submitter_id, submitted, date_submitted, record_status, creator_id, created, updater_id, modified) VALUES
+(1, 1, 1, 7, 1, '2012-07-13 10:21:57', 'A', 7, '2012-07-13 10:21:57', 7, '2012-07-13 10:21:57'),
+(2, 2, 3, 7, 1, '2012-07-13 11:04:11', 'A', 7, '2012-07-13 11:04:11', 7, '2012-07-13 11:04:11'),
+(3, 3, 5, 7, 1, '2012-07-13 11:04:23', 'A', 7, '2012-07-13 11:04:23', 7, '2012-07-13 11:04:23'),
+(4, 1, 2, 31, 1, '2012-07-13 10:23:11', 'A', 31, '2012-07-13 10:23:11', 31, '2012-07-13 10:23:11'),
+(5, 2, 4, 31, 1, '2012-07-13 11:04:11', 'A', 31, '2012-07-13 11:04:11', 31, '2012-07-13 11:04:11'),
+(6, 3, 6, 31, 1, '2012-07-13 11:06:23', 'A', 31, '2012-07-13 11:06:23', 31, '2012-07-13 11:06:23'),
+(7, 4, NULL, 7, 1, '2012-07-13 11:23:31', 'A', 7, '2012-07-13 11:23:31', 7, '2012-07-13 11:23:31'),
+(8, 4, NULL, 31, 1, '2012-07-13 11:24:09', 'A', 31, '2012-07-13 11:24:09', 31, '2012-07-13 11:24:09');
 
 -- --------------------------------------------------------
 
@@ -1014,9 +1076,11 @@ CREATE TABLE IF NOT EXISTS `events` (
 -- Dumping data for table `events`
 --
 
-INSERT INTO `events` VALUES (1, 'Term 1 Evaluation', 1, '', 1, 1, '0', 0, '2006-07-02 16:34:43', '2006-06-16 16:34:49', '2006-07-22 16:34:53', '2006-07-04 16:34:43', '2006-07-30 16:34:43', 'A', 0, '2006-06-20 16:27:33', NULL, '2006-06-21 08:51:20');
-INSERT INTO `events` VALUES (2, 'Term Report Evaluation', 1, '', 2, 1, '0', 0, '2006-06-08 08:59:29', '2006-06-06 08:59:35', '2006-07-02 08:59:41', '2006-06-09 08:59:29', '2006-07-08 08:59:29', 'A', 0, '2006-06-21 08:52:20', NULL, '2006-06-21 08:54:25');
-INSERT INTO `events` VALUES (3, 'Project Evaluation', 1, '', 4, 1, '0', 0, '2006-07-02 09:00:28', '2006-06-07 09:00:35', '2006-07-09 09:00:39', '2006-07-04 09:00:28', '2006-07-12 09:00:28', 'A', 0, '2006-06-21 08:53:14', NULL, '2006-06-21 09:07:26');
+INSERT INTO events (id, title, course_id, description, event_template_type_id, template_id, self_eval, com_req, due_date, release_date_begin, release_date_end, result_release_date_begin, result_release_date_end, record_status, creator_id, created, updater_id, modified) VALUES
+(1, 'Term 1 Evaluation', 1, '', 1, 1, '0', 0, '2013-07-02 16:34:43', '2011-06-16 16:34:49', '2013-07-22 16:34:53', '2012-07-04 16:34:43', '2013-07-30 16:34:43', 'A', 1, '2006-06-20 16:27:33', 1, '2006-06-21 08:51:20'),
+(2, 'Term Report Evaluation', 1, '', 2, 1, '0', 0, '2013-06-08 08:59:29', '2011-06-06 08:59:35', '2013-07-02 08:59:41', '2012-06-09 08:59:29', '2013-07-08 08:59:29', 'A', 1, '2006-06-21 08:52:20', 1, '2006-06-21 08:54:25'),
+(3, 'Project Evaluation', 1, '', 4, 1, '0', 0, '2013-07-02 09:00:28', '2011-06-07 09:00:35', '2013-07-09 09:00:39', '2012-07-04 09:00:28', '2013-07-12 09:00:28', 'A', 1, '2006-06-21 08:53:14', 1, '2006-06-21 09:07:26'),
+(4, 'Team Creation Survey', 1, NULL, 3, 2, '1', 1, '2013-07-31 11:20:00', '2012-07-01 11:20:00', '2013-12-31 11:20:00', NULL, NULL, 'A', 2, '2012-07-13 11:18:56', 2, '2012-07-13 11:18:56');
 
 -- --------------------------------------------------------
 
@@ -1100,11 +1164,13 @@ CREATE TABLE IF NOT EXISTS `groups_members` (
 --
 
 INSERT INTO `groups_members` VALUES (1, 1, 5);
-INSERT INTO `groups_members` VALUES (2, 1, 7);
-INSERT INTO `groups_members` VALUES (3, 1, 6);
+INSERT INTO `groups_members` VALUES (2, 1, 6);
+INSERT INTO `groups_members` VALUES (3, 1, 7);
+INSERT INTO `groups_members` VALUES (4, 1, 35);
+INSERT INTO `groups_members` VALUES (5, 2, 31);
+INSERT INTO `groups_members` VALUES (6, 2, 32);
 INSERT INTO `groups_members` VALUES (7, 2, 33);
-INSERT INTO `groups_members` VALUES (8, 2, 31);
-INSERT INTO `groups_members` VALUES (9, 2, 32);
+INSERT INTO `groups_members` VALUES (8, 2, 36);
 
 -- --------------------------------------------------------
 
@@ -1157,21 +1223,21 @@ CREATE TABLE IF NOT EXISTS `mixevals_question_descs` (
 --
 
 INSERT INTO `mixevals_question_descs` (`id`, `question_id`, `scale_level`, `descriptor`) VALUES
-(46, 1, 1, 'Lowest'),
-(47, 1, 2, NULL),
-(48, 1, 3, 'Middle'),
-(49, 1, 4, NULL),
-(50, 1, 5, 'Highest'),
-(51, 1, 1, 'Lowest'),
-(52, 1, 2, NULL),
-(53, 1, 3, 'Middle'),
-(54, 1, 4, NULL),
-(55, 1, 5, 'Highest'),
-(56, 1, 1, 'Lowest'),
-(57, 1, 2, NULL),
-(58, 1, 3, 'Middle'),
-(59, 1, 4, NULL),
-(60, 1, 5, 'Highest');
+(1, 1, 1, 'Lowest'),
+(2, 1, 2, NULL),
+(3, 1, 3, 'Middle'),
+(4, 1, 4, NULL),
+(5, 1, 5, 'Highest'),
+(6, 2, 1, 'Lowest'),
+(7, 2, 2, NULL),
+(8, 2, 3, 'Middle'),
+(9, 2, 4, NULL),
+(10, 2, 5, 'Highest'),
+(11, 3, 1, 'Lowest'),
+(12, 3, 2, NULL),
+(13, 3, 3, 'Middle'),
+(14, 3, 4, NULL),
+(15, 3, 5, 'Highest');
 
 -- --------------------------------------------------------
 
@@ -1199,12 +1265,12 @@ CREATE TABLE IF NOT EXISTS `mixevals_questions` (
 --
 
 INSERT INTO `mixevals_questions` (`id`, `mixeval_id`, `question_num`, `title`, `instructions`, `question_type`, `required`, `multiplier`, `scale_level`, `response_type`) VALUES
-(19, 1, 1, 'Participated in Team Meetings', NULL, 'S', 1, 1, 5, NULL),
-(20, 1, 2, 'Was Helpful and co-operative', NULL, 'S', 1, 1, 5, NULL),
-(21, 1, 3, 'Submitted work on time', NULL, 'S', 1, 1, 5, NULL),
-(22, 1, 4, 'Produced efficient work?', NULL, 'T', 1, 0, 5, 'S'),
-(23, 1, 5, 'Contributed?', NULL, 'T', 1, 0, 5, 'L'),
-(24, 1, 6, 'Easy to work with?', NULL, 'T', 0, 0, 5, 'S');
+(1, 1, 1, 'Participated in Team Meetings', NULL, 'S', 1, 1, 5, NULL),
+(2, 1, 2, 'Was Helpful and co-operative', NULL, 'S', 1, 1, 5, NULL),
+(3, 1, 3, 'Submitted work on time', NULL, 'S', 1, 1, 5, NULL),
+(4, 1, 4, 'Produced efficient work?', NULL, 'T', 1, 0, 5, 'S'),
+(5, 1, 5, 'Contributed?', NULL, 'T', 1, 0, 5, 'L'),
+(6, 1, 6, 'Easy to work with?', NULL, 'T', 0, 0, 5, 'S');
 
 -- --------------------------------------------------------
 
@@ -1375,24 +1441,27 @@ INSERT INTO `roles_users` (`id`, `role_id`, `user_id`, `created`, `modified`) VA
 (13, 5, 14, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
 (14, 5, 15, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
 (15, 5, 16, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(17, 5, 17, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(18, 5, 18, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(19, 5, 19, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(20, 5, 20, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(21, 5, 21, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(22, 5, 22, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(23, 5, 23, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(24, 5, 24, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(25, 5, 25, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(27, 5, 26, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(28, 5, 27, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(29, 5, 28, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(30, 5, 29, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(31, 5, 30, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(32, 5, 31, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(33, 5, 32, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(34, 5, 33, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(35, 2, 34, '2010-10-27 16:17:29', '2010-10-27 16:17:29');
+(16, 5, 17, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(17, 5, 18, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(18, 5, 19, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(19, 5, 20, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(20, 5, 21, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(21, 5, 22, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(22, 5, 23, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(23, 5, 24, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(24, 5, 25, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(25, 5, 26, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(26, 5, 27, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(27, 5, 28, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(28, 5, 29, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(29, 5, 30, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(30, 5, 31, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(31, 5, 32, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(32, 5, 33, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(33, 2, 34, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(34, 4, 35, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(35, 4, 36, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(36, 4, 37, '2010-10-27 16:17:29', '2010-10-27 16:17:29');
 
 -- --------------------------------------------------------
 
@@ -1634,6 +1703,11 @@ CREATE TABLE IF NOT EXISTS `survey_inputs` (
 -- Dumping data for table `survey_inputs`
 --
 
+INSERT INTO survey_inputs (id, survey_id, user_id, question_id, sub_id, response_text, response_id) VALUES
+(1, 2, 7, 1, NULL, '+', NULL),
+(2, 2, 7, 2, NULL, 'yes', 5),
+(3, 2, 31, 1, NULL, '-', NULL),
+(4, 2, 31, 2, NULL, 'no', 6);
 
 -- --------------------------------------------------------
 
@@ -1656,8 +1730,9 @@ CREATE TABLE IF NOT EXISTS `survey_questions` (
 -- Dumping data for table `survey_questions`
 --
 
-INSERT INTO `survey_questions` VALUES (1, 1, 1, 1);
-INSERT INTO `survey_questions` VALUES (2, 1, 2, 2);
+INSERT INTO survey_questions (id, survey_id, number, question_id) VALUES
+(1, 1, 1, 1),
+(2, 1, 2, 2);
 
 -- --------------------------------------------------------
 
@@ -1686,8 +1761,8 @@ CREATE TABLE IF NOT EXISTS `surveys` (
 -- Dumping data for table `surveys`
 --
 
-INSERT INTO `surveys` VALUES (1, 1, 1, 'Team Creation Survey', '2006-07-01 15:31:08', '2006-06-01 15:31:17', '2006-07-02 15:31:21', 0, 0, '2006-06-20 15:23:59', NULL, '2006-06-21 09:43:24');
-
+INSERT INTO surveys (id, course_id, user_id, name, due_date, release_date_begin, release_date_end, released, creator_id, created, updater_id, modified) VALUES
+(1, 1, 1, 'Team Creation Survey', '2013-07-31 11:20:00', '2012-07-01 11:20:00', '2013-12-31 11:20:00', 0, 2, '2012-07-13 11:18:56', 2, '2012-07-13 11:18:56');
 -- --------------------------------------------------------
 
 --
@@ -1830,26 +1905,6 @@ INSERT INTO `user_courses` VALUES (5, 4, 2, 'A', 'A', 0, '2006-06-20 14:39:31', 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `user_tutors`
---
-
-DROP TABLE IF EXISTS `user_tutors`;
-CREATE TABLE IF NOT EXISTS `user_tutors` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL DEFAULT '0',
-  `course_id` int(11) NOT NULL DEFAULT '0',
-  `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `user_enrols`
 --
 
@@ -1899,7 +1954,7 @@ INSERT INTO `user_enrols` VALUES (23, 2, 27, 'A', 0, '2006-06-20 15:07:37', NULL
 INSERT INTO `user_enrols` VALUES (24, 1, 28, 'A', 0, '2006-06-20 15:08:04', NULL, '2006-06-20 15:08:04');
 INSERT INTO `user_enrols` VALUES (25, 2, 29, 'A', 0, '2006-06-20 15:08:31', NULL, '2006-06-20 15:08:31');
 INSERT INTO `user_enrols` VALUES (26, 2, 30, 'A', 0, '2006-06-20 15:08:47', NULL, '2006-06-20 15:08:47');
-INSERT INTO `user_enrols` VALUES (27, 2, 31, 'A', 0, '2006-06-20 15:10:16', NULL, '2006-06-20 15:10:16');
+INSERT INTO `user_enrols` VALUES (27, 1, 31, 'A', 0, '2006-06-20 15:10:16', NULL, '2006-06-20 15:10:16');
 INSERT INTO `user_enrols` VALUES (28, 1, 32, 'A', 0, '2006-06-20 15:10:32', NULL, '2006-06-20 15:10:32');
 INSERT INTO `user_enrols` VALUES (29, 1, 33, 'A', 0, '2006-06-21 08:44:09', NULL, '2006-06-21 08:44:09');
 
@@ -1942,7 +1997,10 @@ INSERT INTO `users` (`id`, `username`, `password`, `first_name`, `last_name`, `s
 (31, '10186039', '6f40a1a25eec7d325310dea310949005', 'Hui', 'Student', '10186039', NULL, '', NULL, NULL, NULL, 'A', 1, '2006-06-20 15:10:16', NULL, '2006-06-20 15:10:16', NULL),
 (32, '19803030', '6f40a1a25eec7d325310dea310949005', 'Bowinn', 'Student', '19803030', NULL, '', NULL, NULL, NULL, 'A', 1, '2006-06-20 15:10:32', NULL, '2006-06-20 15:10:32', NULL),
 (33, '51516498', '6f40a1a25eec7d325310dea310949005', 'Joe', 'Student', '51516498', NULL, '', NULL, NULL, NULL, 'A', 1, '2006-06-21 08:44:09', 33, '2006-06-21 08:45:00', NULL),
-(34, 'admin1', '6f40a1a25eec7d325310dea310949005', 'admin1', '', '', '', '', NULL, NULL, NULL, 'A', 1, '2012-05-25 15:48:08', 1, '2012-05-25 15:48:08', NULL);
+(34, 'admin1', '6f40a1a25eec7d325310dea310949005', '', '', '', '', '', NULL, NULL, NULL, 'A', 1, '2012-05-25 15:48:08', 1, '2012-05-25 15:48:08', NULL),
+(35, 'tutor1', '6f40a1a25eec7d325310dea310949005', 'Tutor', '1', '', '', '', NULL, NULL, NULL, 'A', 1, '2012-05-25 15:48:08', 1, '2012-05-25 15:48:08', NULL),
+(36, 'tutor2', '6f40a1a25eec7d325310dea310949005', 'Tutor', '2', '', '', '', NULL, NULL, NULL, 'A', 1, '2012-05-25 15:48:08', 1, '2012-05-25 15:48:08', NULL),
+(37, 'tutor3', '6f40a1a25eec7d325310dea310949005', 'Tutor', '3', '', '', '', NULL, NULL, NULL, 'A', 1, '2012-05-25 15:48:08', 1, '2012-05-25 15:48:08', NULL);
 
 -- --------------------------------------------------------
 
@@ -1967,3 +2025,31 @@ CREATE TABLE `user_faculties` (
 INSERT INTO `user_faculties` (`id`, `user_id`, `faculty_id`) VALUES
 (1, 34, 1);
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_tutors`
+--
+
+DROP TABLE IF EXISTS `user_tutors`;
+CREATE TABLE IF NOT EXISTS `user_tutors` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL DEFAULT '0',
+  `course_id` int(11) NOT NULL DEFAULT '0',
+  `creator_id` int(11) NOT NULL DEFAULT '0',
+  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `updater_id` int(11) DEFAULT NULL,
+  `modified` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+--
+-- Dumping data for table `user_tutors`
+--
+
+INSERT INTO user_tutors (id, user_id, course_id, creator_id, created, updater_id, modified) VALUES
+(1, 35, 1, 0, '0000-00-00 00:00:00', NULL, '2012-07-13 09:45:57'),
+(2, 36, 1, 0, '0000-00-00 00:00:00', NULL, '2012-07-13 09:48:16'),
+(3, 37, 2, 0, '0000-00-00 00:00:00', NULL, '2012-07-13 09:48:24');

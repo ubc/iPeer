@@ -649,6 +649,7 @@ class UsersController extends AppController
             if ($this->User->save($this->data)) {
                 // Success!
                 $this->Session->setFlash(__('User successfully updated!', true), 'good');
+                $this->redirect('index');
             } else {
                 // Failed
                 $this->Session->setFlash(__('Unable to update user.', true));
