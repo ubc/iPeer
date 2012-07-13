@@ -37,26 +37,23 @@ class SurveyQuestionTestCase extends CakeTestCase
     {
     }
 
-    function testSurveyQuestionInstance()
-    {
-        $this->assertTrue(is_a($this->SurveyQuestion, 'SurveyQuestion'));
-    }
 
     function testReorderQuestions()
     {
         // Set up test data
-        $result = $this->SurveyQuestion->reorderQuestions(2);
+        $ret = $this->SurveyQuestion->reorderQuestions(1);
+
         /* Assert the function returns a result with correctly ordered
          * question number, instead of the default 9999.
          */
-        $this->assertEqual($result[0]['SurveyQuestion']['number'], 1);
-        $this->assertEqual($result[1]['SurveyQuestion']['number'], 2);
+        $this->assertEqual($ret[0]['SurveyQuestion']['number'], 1);
+        $this->assertEqual($ret[1]['SurveyQuestion']['number'], 2);
 
         // Assert the result is saved in the fixtures
         $DBResult1 = $this->SurveyQuestion->find('first',
-            array('conditions' => array('SurveyQuestion.id' => 3)));
+            array('conditions' => array('SurveyQuestion.id' => 1)));
         $DBResult2 = $this->SurveyQuestion->find('first',
-            array('conditions' => array('SurveyQuestion.id' => 4)));
+            array('conditions' => array('SurveyQuestion.id' => 2)));
         $this->assertEqual($DBResult1['SurveyQuestion']['number'], 1);
         $this->assertEqual($DBResult2['SurveyQuestion']['number'], 2);
     }
@@ -64,92 +61,90 @@ class SurveyQuestionTestCase extends CakeTestCase
     function testMoveQuestion()
     {
         /*
-         * The data structure is set up as fallows
+         * The data structure is set up as follows
          * Question_id = 1 | Question_num = 1
          * Question_id = 2 | Question_num = 2
-         * Question_id = 6 | Question_num = 3
          */
         // Test move TOP
-        $this->SurveyQuestion->moveQuestion(1, 6, 'TOP');
+        $this->SurveyQuestion->moveQuestion(1, 2, 'TOP');
         $movedQuestion = $this->SurveyQuestion->find('first',
-            array('conditions' => array('question_id' => 6)));
+            array('conditions' => array('question_id' => 2)));
         $this->assertEqual($movedQuestion['SurveyQuestion']['number'], 1);
 
         // Test move BOTTOM
-        $this->SurveyQuestion->moveQuestion(1, 6, 'BOTTOM');
+        $this->SurveyQuestion->moveQuestion(1, 1, 'BOTTOM');
         $movedQuestion = $this->SurveyQuestion->find('first',
-            array('conditions' => array('question_id' => 6)));
-        $this->assertEqual($movedQuestion['SurveyQuestion']['number'], 3);
-
-        // Test move UP
-        $this->SurveyQuestion->moveQuestion(1, 6, 'UP');
-        $movedQuestion = $this->SurveyQuestion->find('first',
-            array('conditions' => array('question_id' => 6)));
+            array('conditions' => array('question_id' => 1)));
         $this->assertEqual($movedQuestion['SurveyQuestion']['number'], 2);
 
-        // Test move DOWN
-        $this->SurveyQuestion->moveQuestion(1, 6, 'DOWN');
+        // Test move UP
+        $this->SurveyQuestion->moveQuestion(1, 2, 'UP');
         $movedQuestion = $this->SurveyQuestion->find('first',
-            array('conditions' => array('question_id' => 6)));
-        $this->assertEqual($movedQuestion['SurveyQuestion']['number'], 3);
+            array('conditions' => array('question_id' => 2)));
+        $this->assertEqual($movedQuestion['SurveyQuestion']['number'], 1);
+
+        // Test move DOWN
+        $this->SurveyQuestion->moveQuestion(1, 1, 'DOWN');
+        $movedQuestion = $this->SurveyQuestion->find('first',
+            array('conditions' => array('question_id' => 1)));
+        $this->assertEqual($movedQuestion['SurveyQuestion']['number'], 2);
 
         // Test move BOTTOM on the bottom question
-        $this->SurveyQuestion->moveQuestion(1, 6, 'BOTTOM');
+        $this->SurveyQuestion->moveQuestion(1, 2, 'BOTTOM');
         $movedQuestion = $this->SurveyQuestion->find('first',
-            array('conditions' => array('question_id' => 6)));
-        $this->assertEqual($movedQuestion['SurveyQuestion']['number'], 3);
+            array('conditions' => array('question_id' => 2)));
+        $this->assertEqual($movedQuestion['SurveyQuestion']['number'], 2);
 
         // Test move DOWN on the bottom question
-        $this->SurveyQuestion->moveQuestion(1, 6, 'BOTTOM');
+        $this->SurveyQuestion->moveQuestion(1, 2, 'DOWN');
         $movedQuestion = $this->SurveyQuestion->find('first',
-            array('conditions' => array('question_id' => 6)));
-        $this->assertEqual($movedQuestion['SurveyQuestion']['number'], 3);
+            array('conditions' => array('question_id' => 2)));
+        $this->assertEqual($movedQuestion['SurveyQuestion']['number'], 2);
 
         // Test move TOP on the TOP question
-        $this->SurveyQuestion->moveQuestion(1, 6, 'TOP');
-        $this->SurveyQuestion->moveQuestion(1, 6, 'TOP');
+        $this->SurveyQuestion->moveQuestion(1, 1, 'TOP');
         $movedQuestion = $this->SurveyQuestion->find('first',
-            array('conditions' => array('question_id' => 6)));
+            array('conditions' => array('question_id' => 1)));
         $this->assertEqual($movedQuestion['SurveyQuestion']['number'], 1);
 
         // Test move UP on the top question
-        $this->SurveyQuestion->moveQuestion(1, 6, 'UP');
+        $this->SurveyQuestion->moveQuestion(1, 1, 'UP');
         $movedQuestion = $this->SurveyQuestion->find('first',
-            array('conditions' => array('question_id' => 6)));
+            array('conditions' => array('question_id' => 1)));
         $this->assertEqual($movedQuestion['SurveyQuestion']['number'], 1);
     }
 
     function testGetQuestionsID()
     {
         // Set question data
-        $result = $this->SurveyQuestion->getQuestionsID(1);
-        $this->assertEqual(Set::extract('/SurveyQuestion/question_id', $result), array(1,2,6));
-        $this->assertEqual(count($result), 3);
+        $ret = $this->SurveyQuestion->getQuestionsID(1);
+        
+        $this->assertEqual(Set::extract('/SurveyQuestion/question_id', $ret), array(1,2));
+        $this->assertEqual(count($ret), 2);
 
-        $result = $this->SurveyQuestion->getQuestionsID(null);
-        $this->assertEqual($result, array());
+        $ret = $this->SurveyQuestion->getQuestionsID(null);
+        $this->assertEqual($ret, array());
 
     }
 
     function testCopyQuestions()
     {
-        // Set up test data copy survey.id = 1 to survey.id =3 (empty survey)
-        $this->SurveyQuestion->copyQuestions(1, 3);
+        // Set up test data copy survey.id = 1 to survey.id =2 (empty survey)
+        $this->SurveyQuestion->copyQuestions(1, 2);
         $surveyOriginal = $this->Survey->find('all',
             array('conditions' => array('Survey.id' => 1)));
         $surveyCopied = $this->Survey->find('all',
-            array('conditions' => array('Survey.id' => 3)));
+            array('conditions' => array('Survey.id' => 2)));
         $surveyOriginalQuestion = $surveyOriginal[0]['Question'];
         $surveyCopiedQuestion = $surveyCopied[0]['Question'];
         // Assert that survey has been copied
         $this->assertEqual($surveyOriginalQuestion[0]['prompt'], $surveyCopiedQuestion[0]['prompt']);
         $this->assertEqual($surveyOriginalQuestion[1]['prompt'], $surveyCopiedQuestion[1]['prompt']);
-        $this->assertEqual($surveyOriginalQuestion[2]['prompt'], $surveyCopiedQuestion[2]['prompt']);
     }
 
     function testGetLastSurveyQuestionNum()
     {
         $lastQuestionNum = $this->SurveyQuestion->getLastSurveyQuestionNum(1);
-        $this->assertEqual($lastQuestionNum, 3);
+        $this->assertEqual($lastQuestionNum, 2);
     }
 }
