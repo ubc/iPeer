@@ -144,6 +144,32 @@ class Group extends AppModel
             'conditions' => array('course_id' => $courseId)
         ));
     }
+    
+    /**
+     * Find lowest missing group number in a course
+     *
+     * @param int $courseId course id
+     *
+     * @return int n
+     */
+    function getFirstAvailGroupNum($courseId=null)
+    {
+        $temp = $this->find('all', array('conditions' => array('course_id' => $courseId)));
+        $i = 0;
+        foreach ($temp as $data) {
+            $groupNumAry[] = $data['Group']['group_num'];
+            $i++;
+        }
+        $compare = range(1,max($groupNumAry));
+        $avail = array_diff($compare,$groupNumAry);
+        sort($avail);
+        if (empty($avail)) {
+            $avail['0'] = $i;
+        }
+        //debug($groupNumAry);
+        
+        return $avail['0'];
+    }
 
     /**
      * Prepares group member data in an array

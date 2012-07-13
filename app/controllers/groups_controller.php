@@ -297,7 +297,7 @@ class GroupsController extends AppController
         $this->set('user_data', $user_data);
         $this->set('group_data', array());
         $this->set('course_id', $course_id);
-        $this->set('group_num', $this->Group->getCourseGroupCount($course_id)+1);
+        $this->set('group_num', $this->Group->getFirstAvailGroupNum(($course_id)));
     }
 
 
