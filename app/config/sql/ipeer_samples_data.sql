@@ -760,9 +760,9 @@ CREATE TABLE IF NOT EXISTS `email_templates` (
   `content` text NOT NULL,
   `availability` tinyint(4) NOT NULL,
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` date NOT NULL DEFAULT '0000-00-00',
+  `created` datetime NOT NULL DEFAULT '0000-00-00',
   `updater_id` int(11) DEFAULT NULL,
-  `updated` date DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=13 ;
 

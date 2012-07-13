@@ -66,9 +66,12 @@ class MixevalsQuestionTestCase extends CakeTestCase
         $this->assertEqual($result[0]['MixevalsQuestion']['id'], 1);
         $this->assertEqual($result[1]['MixevalsQuestion']['id'], 2);
         $this->assertEqual($result[2]['MixevalsQuestion']['id'], 3);
-        $this->assertEqual($result[0]['MixevalsQuestion']['title'], '1st Question');
-        $this->assertEqual($result[1]['MixevalsQuestion']['title'], '2nd Question');
-        $this->assertEqual($result[2]['MixevalsQuestion']['title'], '3rd Question');
+        $this->assertEqual($result[0]['MixevalsQuestion']['title'], 
+            'Participated in Team Meetings');
+        $this->assertEqual($result[1]['MixevalsQuestion']['title'], 
+            'Was Helpful and co-operative');
+        $this->assertEqual($result[2]['MixevalsQuestion']['title'], 
+            'Submitted work on time');
     }
 
     function setUpInserQuestionTestData()

@@ -57,7 +57,7 @@ class MixevalTestCase extends CakeTestCase
         // Assert that a new array is merged with the old input
         $this->assertFalse(isset($input['questions']));
         $this->assertNotNull($result['questions']);
-        $this->assertEqual(count($result['questions']), 3);
+        $this->assertEqual(count($result['questions']), 6);
     }
 
     function testCompileViewDataShort()

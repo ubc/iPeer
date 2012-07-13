@@ -53,7 +53,7 @@ class EmailScheduleTestCase extends CakeTestCase
             'sent'       => 0,
             'creator_id' => 1,
             'created'    => '2011-06-10 00:00:00',
-            'creator'    => 'steve slade'
+            'creator'    => null 
         );
         $emails = $this->EmailSchedule->getEmailsToSend();
         $this->assertEqual($emails, $expected);

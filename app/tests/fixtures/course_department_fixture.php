@@ -3,13 +3,5 @@
 class CourseDepartmentFixture extends CakeTestFixture {
 	public $name = 'CourseDepartment';
 
-	public $import = 'CourseDepartment';
-
-	public $records = array(
-		array(
-			'id' => 1,
-			'course_id' => 1,
-			'department_id' => 1
-		),
-	);
+	public $import = array('model' => 'CourseDepartment', 'records' => true);
 }

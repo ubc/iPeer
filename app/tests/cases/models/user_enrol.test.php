@@ -32,7 +32,7 @@ class UserEnrolTestCase extends CakeTestCase
 
     function endTest($method)
     {
-        $this->flushDatabase();
+        //$this->flushDatabase();
     }
 
     function testUserEnrolInstance()
