@@ -36,30 +36,19 @@ class QuestionTestCase extends CakeTestCase
     {
     }
 
-    function testQuestionInstance()
-    {
-        $this->assertTrue(is_a($this->Question, 'Question'));
-    }
-
-    function testSetupTestInput()
-    {
-        $result = $this->setupTestInput();
-        // Compare with fixture data
-        $this->assertEqual($result[0]['SurveyQuestion']['question_id'], 1);
-        $this->assertEqual($result[1]['SurveyQuestion']['question_id'], 2);
-    }
-
     function testFillQuestion()
     {
-        $input = $this->setupTestInput();
-        $result = $this->Question->fillQuestion($input);
+        $data = $this->SurveyQuestion->find('all', array('conditions'=> array('survey_id' => 1),
+            'fields' => array('number', 'question_id', 'id'),
+            'order' => 'number'));
+        $ret = $this->Question->fillQuestion($data);
         // Compare the result with fixture data
-        $firstQuestion = $result[0]['Question'];
-        $this->assertEqual($firstQuestion['prompt'], 'Did you learn a lot from this course ?');
+        $firstQuestion = $ret[0]['Question'];
+        $this->assertEqual($firstQuestion['prompt'], 'What was your GPA last term?');
         $this->assertEqual($firstQuestion['id'], 1);
         $this->assertEqual($firstQuestion['number'], 1);
-        $secondQuestion = $result[1]['Question'];
-        $this->assertEqual($secondQuestion['prompt'], 'What was the hardest part ?');
+        $secondQuestion = $ret[1]['Question'];
+        $this->assertEqual($secondQuestion['prompt'], 'Do you own a laptop?');
         $this->assertEqual($secondQuestion['id'], 2);
         $this->assertEqual($secondQuestion['number'], 2);
         // Check that Survey Question has been unset
@@ -83,11 +72,4 @@ class QuestionTestCase extends CakeTestCase
         $this->assertNull($nullId);
     }
 
-    function setupTestInput()
-    {
-        $data = $this->SurveyQuestion->find('all', array('conditions'=> array('survey_id' => 1),
-            'fields' => array('number', 'question_id', 'id'),
-            'order' => 'number'));
-        return $data;
-    }
 }

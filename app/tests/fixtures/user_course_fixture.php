@@ -11,15 +11,8 @@
 class UserCourseFixture extends CakeTestFixture {
     public $name = 'UserCourse';
 
-    public $import = 'UserCourse';
+    public $import = array('model' => 'UserCourse', 'records' => true);
 
-    public $records = array(
-        array('id' => 1, 'user_id' => 1, 'course_id' => 1),
-        array('id' => 2, 'user_id' => 1, 'course_id' => 2),
-        array('id' => 3, 'user_id' => 2, 'course_id' => 3),
-        array('id' => 4, 'user_id' => 2, 'course_id' => 1),
-
-    );
 }
 
 
