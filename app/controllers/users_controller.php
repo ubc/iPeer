@@ -696,11 +696,11 @@ class UsersController extends AppController
                     if ($this->data['User']['tmp_password']==$this->data['User']['confirm_password']) {
                         $this->data['User']['password'] = md5($this->data['User']['tmp_password']);
                     } else {
-                        $this->Session->setFlash(__("Confirm password is wrong", true));
+                        $this->Session->setFlash(__("New passwords do not match", true));
                         $this->redirect('editProfile/'.$id);
                     }
                 } else {
-                    $this->Session->setFlash(__("Old password is wrong", true));
+                    $this->Session->setFlash(__("Old password is incorrect", true));
                     $this->redirect('editProfile/'.$id);
                 }
             } else {
@@ -713,11 +713,15 @@ class UsersController extends AppController
                     "<a href='../../home/'>".__('Go to your iPeer Home page.', true)."</a><br />"), 'good');
             }
         }
+        if ($this->User->getRoleName($id) == "student")
+            $isStudent = true;
+        else
+            $isStudent = false;
         $this->data = $this->User->read(null, $id);
         $this->Output->br2nl($this->data);
-        $this->set('has_title', $this->User->hasTitle($this->data['Role']));
-        $this->set('is_student', $this->User->hasStudentNo($this->data['Role']));
+        $this->set('is_student', $isStudent);
         $this->set('data', $this->data);
+        $this->set('title_for_layout', __('Edit Profile', true));
         return;
     }
 
@@ -1009,7 +1013,7 @@ class UsersController extends AppController
         $name = $user['User']['first_name'].' '.$user['User']['last_name'];
 
         // this means only students will get a list of courses they're
-        // enroled in, since instructors are stored in another array
+        // enrolled in, since instructors are stored in another array
         $courses = array();
         foreach ($enrolments['Enrolment'] as $course) {
             $cid = $course['UserEnrol']['course_id'];
