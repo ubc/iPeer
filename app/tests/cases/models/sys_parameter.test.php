@@ -34,18 +34,13 @@ class SysParameterTestCase extends CakeTestCase
     {
     }
 
-    function testSysParameterInstance()
-    {
-        $this->assertTrue(is_a($this->SysParameter, 'SysParameter'));
-    }
-
     function testFindParameter ()
     {
 
-        $result = $this->SysParameter->findParameter('code2');
-        $this->assertEqual($result['SysParameter']['id'], 2);
-        $this->assertEqual($result['SysParameter']['parameter_code'], 'code2');
-        $this->assertEqual($result['SysParameter']['parameter_value'], 'value2');
+        $result = $this->SysParameter->findParameter('display.logo_file');
+        $this->assertEqual($result['SysParameter']['id'], 10);
+        $this->assertEqual($result['SysParameter']['parameter_code'], 'display.logo_file');
+        $this->assertEqual($result['SysParameter']['parameter_value'], 'LayoutLogoDefault.gif');
 
         $result = $this->SysParameter->findParameter('invalid');
         $this->assertFalse($result);
