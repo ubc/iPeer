@@ -32,7 +32,6 @@ class UserEnrolTestCase extends CakeTestCase
 
     function endTest($method)
     {
-        //$this->flushDatabase();
     }
 
     function testUserEnrolInstance()
@@ -137,31 +136,5 @@ class UserEnrolTestCase extends CakeTestCase
         $courses = $this->UserEnrol->getEnrolledCourses(999);
         $this->assertEqual($courses, null);
 
-    }
-
-
-    ##########################################################################################################
-    ##################   HELPER FUNCTION USED FOR UNIT TESTING PURPOSES   ####################################
-    ##########################################################################################################
-
-
-    function deleteAllTuples($table)
-    {
-
-        $this->UserEnrol= & ClassRegistry::init('UserEnrol');
-        $sql = "DELETE FROM $table";
-        $this->UserEnrol->query($sql);
-    }
-
-    function flushDatabase()
-    {
-
-        $this->deleteAllTuples('courses');
-        $this->deleteAllTuples('users');
-        $this->deleteAllTuples('user_courses');
-        $this->deleteAllTuples('user_enrols');
-        $this->deleteAllTuples('roles_users');
-        $this->deleteAllTuples('groups');
-        $this->deleteAllTuples('groups_members');
     }
 }

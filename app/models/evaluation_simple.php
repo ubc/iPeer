@@ -197,7 +197,6 @@ class EvaluationSimple extends AppModel
      */
     function getGroupResultsByGroupEventId($grpEventId=null)
     {
-        //return $this->find('grp_event_id='.$grpEventId, 'SUM(score) AS received_total_score');
         return $this->find('all', array(
             'conditions' => array('grp_event_id' => $grpEventId),
             'fields' => array('SUM(score) AS received_total_score')
@@ -215,7 +214,6 @@ class EvaluationSimple extends AppModel
      */
     function getGroupResultsCountByGroupEventId($grpEventId=null)
     {
-        //return $this->find('grp_event_id='.$grpEventId, 'COUNT(*) AS received_total_count');
         return $this->find('count', array(
             'conditions' => array('grp_event_id' => $grpEventId),
             'order' => 'EvaluationSimple.evaluatee ASC'
@@ -233,9 +231,8 @@ class EvaluationSimple extends AppModel
      * @access public
      * @return void
      */
-    function getAllComments($grpEventId=null, $evaluateeId=null, $includeEvaluator=false)
+    function getAllComments($grpEventId, $evaluateeId, $includeEvaluator=false)
     {
-        //return $this->find('all', 'grp_event_id='.$grpEventId.' AND evaluatee='.$evaluatee, 'eval_comment');
         $temp = $this->find('all', array(
             'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluateeId),
             'fields' => array('evaluatee AS evaluateeId', 'eval_comment', 'event_id', 'User.first_name AS evaluator_first_name', 'User.last_name AS evaluator_last_name', 'User.student_no AS evaluator_student_no'),
@@ -289,7 +286,6 @@ class EvaluationSimple extends AppModel
      */
     function getOppositeGradeReleaseStatus($grpEventId, $releaseStatus)
     {
-        //return $this->find(count, 'grp_event_id='.$groupEventId.' AND grade_release != '.$releaseStatus);
         return $this->find('count', array(
             'conditions' => array('grp_event_id' => $grpEventId, 'grade_release !='=>$releaseStatus)
         ));
