@@ -30,12 +30,6 @@ class GroupsMembersTestCase extends CakeTestCase
 
     function endTest($method)
     {
-        $this->flushDatabase();
-    }
-
-    function testCourseInstance()
-    {
-        $this->assertTrue(is_a($this->GroupsMembers, 'GroupsMembers'));
     }
 
     function testInsertMembers()
@@ -81,7 +75,7 @@ class GroupsMembersTestCase extends CakeTestCase
     {
         //Test valid group with members
         $members = $this->GroupsMembers->getMembers(1);
-        $this->assertEqual($members, array(1=>3,2=>4));
+        $this->assertEqual($members, array(1=>5,2=>6,3=>7,4=>35));
 
         //Test valid group with no members
         $members = $this->GroupsMembers->getMembers(3);
@@ -95,12 +89,8 @@ class GroupsMembersTestCase extends CakeTestCase
     function testCountMembers()
     {
         //Test valid group with members
-        $members = $this->GroupsMembers->countMembers(4);
-        $this->assertEqual($members, 1);
-
-        //Test valid group with no members
-        $members = $this->GroupsMembers->countMembers(3);
-        $this->assertEqual($members, 0);
+        $members = $this->GroupsMembers->countMembers(1);
+        $this->assertEqual($members, 4);
 
         //Test invalid group
         $members = $this->GroupsMembers->countMembers(999);
@@ -110,16 +100,16 @@ class GroupsMembersTestCase extends CakeTestCase
     function testGetEventGroupMembers ()
     {
         //Test group, selfeval
-        $members = $this->GroupsMembers->getEventGroupMembers(1, true, 0);
-        $this->assertEqual(Set::extract('/User/username', $members), array('StudentY', 'StudentZ'));
+        $members = $this->GroupsMembers->getEventGroupMembers(1, true, 5);
+        $this->assertEqual(Set::extract('/User/username', $members), array('65498451', '65468188', '98985481', 'tutor1'));
 
         //Test group, no selfeval, valid used id
-        $members = $this->GroupsMembers->getEventGroupMembers(1, false, 3);
-        $this->assertEqual(Set::extract('/User/username', $members), array('StudentZ'));
+        $members = $this->GroupsMembers->getEventGroupMembers(1, false, 6);
+        $this->assertEqual(Set::extract('/User/username', $members), array('65498451', '98985481', 'tutor1'));
 
         //Test group, no selfeval, invalid used id
         $members = $this->GroupsMembers->getEventGroupMembers(1, false, 999);
-        $this->assertEqual(Set::extract('/User/username', $members), array('StudentY', 'StudentZ'));
+        $this->assertEqual(Set::extract('/User/username', $members), array('65498451', '65468188', '98985481', 'tutor1'));
 
         //Test invalid group
         $members = $this->GroupsMembers->getEventGroupMembers(999, false, 3);
@@ -134,37 +124,38 @@ class GroupsMembersTestCase extends CakeTestCase
 
     function testGetGroupsByUserId()
     {
-        $groups=$this->GroupsMembers->getGroupsByUserId(3);
+        $groups=$this->GroupsMembers->getGroupsByUserId(5);
+        $this->assertEqual($groups['0']['GroupsMembers']['group_id'], 1);
     }
 
     function testCheckMembershipInGroup()
     {
         //Test student in existing group
-        $inGroup = $this->GroupsMembers->checkMembershipInGroup(1, 3);
-        $this->assertEqual($inGroup, true);
+        $inGroup = $this->GroupsMembers->checkMembershipInGroup(1, 7);
+        $this->assertTrue($inGroup);
 
         //Test student not in existing group
-        $inGroup = $this->GroupsMembers->checkMembershipInGroup(4, 3);
-        $this->assertEqual($inGroup, false);
+        $inGroup = $this->GroupsMembers->checkMembershipInGroup(2, 7);
+        $this->assertFalse($inGroup);
 
         //Test invalid student in existing group
-        $inGroup = $this->GroupsMembers->checkMembershipInGroup(4, 999);
-        $this->assertEqual($inGroup, false);
+        $inGroup = $this->GroupsMembers->checkMembershipInGroup(1, 999);
+        $this->assertFalse($inGroup);
 
         //Test student in invalid existing group
         $inGroup = $this->GroupsMembers->checkMembershipInGroup(999, 3);
-        $this->assertEqual($inGroup, false);
+        $this->assertFalse($inGroup);
 
         //Test invalid student in invalid existing group
         $inGroup = $this->GroupsMembers->checkMembershipInGroup(999, 999);
-        $this->assertEqual($inGroup, false);
+        $this->assertFalse($inGroup);
     }
 
     function testGetUserListInGroups()
     {
         //Test valid group with members
         $users = $this->GroupsMembers->getUserListInGroups(1);
-        $this->assertEqual($users, array(1=>3, 2=>4));
+        $this->assertEqual($users, array(1=>5, 2=>6, 3=>7, 4=>35));
 
         //Test valid group with no members
         $users = $this->GroupsMembers->getUserListInGroups(3);
@@ -175,27 +166,4 @@ class GroupsMembersTestCase extends CakeTestCase
         $this->assertEqual($users, null);
     }
 
-
-    #####################################################################################################################################################
-    ###############################################     HELPER FUNCTIONS     ############################################################################
-    #####################################################################################################################################################
-
-    function deleteAllTuples($table)
-    {
-
-        $this->GroupsMembers= & ClassRegistry::init('GroupsMembers');
-        $sql = "DELETE FROM $table";
-        $this->GroupsMembers->query($sql);
-    }
-
-    function flushDatabase()
-    {
-        $this->deleteAllTuples('courses');
-        $this->deleteAllTuples('users');
-        $this->deleteAllTuples('user_courses');
-        $this->deleteAllTuples('user_enrols');
-        $this->deleteAllTuples('roles_users');
-        $this->deleteAllTuples('groups');
-        $this->deleteAllTuples('groups_members');
-    }
 }

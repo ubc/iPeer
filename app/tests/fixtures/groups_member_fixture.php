@@ -12,14 +12,5 @@ class GroupsMemberFixture extends CakeTestFixture
 {
     public $name = 'GroupsMember';
 
-    public $import = 'GroupsMembers';
-
-    public $records = array(
-        array('id' => 1, 'group_id' => '1', 'user_id' => '3'),
-        array('id' => 2, 'group_id' => '1', 'user_id' => '4'),
-        array('id' => 3, 'group_id' => '2', 'user_id' => '2'),
-        array('id' => 4, 'group_id' => '2', 'user_id' => '3'),
-        array('id' => 5, 'group_id' => '2', 'user_id' => '4'),
-        array('id' => 6, 'group_id' => '4', 'user_id' => '4'),
-    );
+    public $import = array('model' => 'GroupsMembers', 'records' => true);
 }

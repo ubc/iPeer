@@ -57,8 +57,6 @@ class GroupsMembers extends AppModel
         foreach ($tmp as $user_id) {
             array_push($oldUsers, $user_id);
         }
-        //  for ($i = 0; $i < $tmp['member_count']; $i++) array_push($oldUsers, $tmp[$i]['GroupsMembers']['user_id']);
-
 
         //compare
         $insertUsers = array_diff($newUsers, $oldUsers);
@@ -91,7 +89,6 @@ class GroupsMembers extends AppModel
     {
         $tmp = $this->find('list', array('conditions' => array('group_id' => $id),
             'fields' => array('user_id')));
-        //$tmp['member_count'] = count($tmp);
         return $tmp;
     }
 

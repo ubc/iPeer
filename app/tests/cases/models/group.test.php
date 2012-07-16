@@ -33,21 +33,16 @@ class GroupTestCase extends CakeTestCase
     {
     }
 
-    function testGroupInstance()
-    {
-        $this->assertTrue(is_a($this->Group, 'Group'));
-    }
-
     function testGetCourseGroupCount()
     {
         $empty = null;
 
         // Test valid course id
         $group= $this->Group->getCourseGroupCount(1);
-        $this->assertEqual($group, 4);
+        $this->assertEqual($group, 2);
 
         // Test course with no groups
-        $group= $this->Group->getCourseGroupCount(3);
+        $group= $this->Group->getCourseGroupCount(2);
         $this->assertEqual($group, 0);
 
         // Test invalid course id
@@ -66,14 +61,10 @@ class GroupTestCase extends CakeTestCase
 
         // Test valid course
         $group = $this->Group->getLastGroupNumByCourseId(1);
-        $this->assertEqual($group, 4);
+        $this->assertEqual($group, 1);
 
         // Test course with no groups;
-        $group = $this->Group->getLastGroupNumByCourseId(3);
-        $this->assertEqual($group, $empty);
-
-        // Test course with no groups;
-        $group = $this->Group->getLastGroupNumByCourseId(3);
+        $group = $this->Group->getLastGroupNumByCourseId(2);
         $this->assertEqual($group, $empty);
     }
 
@@ -82,16 +73,20 @@ class GroupTestCase extends CakeTestCase
         $empty = null;
 
         // Test group with some students in it
-        $students = $this->Group->getStudentsNotInGroup(4);
-        $this->assertEqual($students, array('2' => 'sam peterson *', '3' => '123 TestName TestLastname *'));
-
-        // Test group with all students in it
         $students = $this->Group->getStudentsNotInGroup(2);
-        $this->assertEqual($students, $empty);
-
-        // Test group with no students in it
-        $students = $this->Group->getStudentsNotInGroup(3);
-        $this->assertEqual($students, array('2' => 'sam peterson *', '4' => '100 name lastname *', '3' => '123 TestName TestLastname *'));
+        $this->assertEqual($students, array(
+            '26' => '19524032 Bill Student', 
+            '21' => '22784037 Nicole Student',
+            '17' => '37116036 Edna Student',
+            '28' => '38058020 Michael Student',
+            '15' => '48877031 Jennifer Student', 
+            '13' => '84188465 Damien Student',
+            '19' => '90938044 Jonathan Student',
+            '35' => ' Tutor 1 *',
+            '6' => '65468188 Alex Student *',
+            '5' => '65498451 Ed Student *',
+            '7' => '98985481 Matt Student *'
+        ));
 
         // Test invalid group
         $students = $this->Group->getStudentsNotInGroup(999);
@@ -107,14 +102,15 @@ class GroupTestCase extends CakeTestCase
         $empty = null;
 
         // Test group with students in it
-        $students = $this->Group->getMembersByGroupId(1);
+        $students = $this->Group->getMembersByGroupId(2);
         $students = Set::extract('/Member/student_no_with_full_name', $students);
         sort($students);
-        $this->assertEqual($students, array('100 name lastname', '123 TestName TestLastname'));
-
-        // Test group with no students in it
-        $students = $this->Group->getMembersByGroupId(3);
-        $this->assertEqual($students, $empty);
+        $this->assertEqual($students, array(
+            ' Tutor 2',
+            '10186039 Hui Student',
+            '19803030 Bowinn Student',
+            '51516498 Joe Student'
+        ));
 
         // Test invalid group
         $students = $this->Group->getMembersByGroupId(999);
@@ -131,7 +127,7 @@ class GroupTestCase extends CakeTestCase
 
         // Test valid group
         $group = $this->Group->getGroupByGroupId(1);
-        $this->assertEqual($group[0]['Group']['group_name'], 'group1');
+        $this->assertEqual($group[0]['Group']['group_name'], 'Reapers');
 
         // Test invalid group
         $group = $this->Group->getGroupByGroupId(999);
@@ -144,7 +140,7 @@ class GroupTestCase extends CakeTestCase
 
         // Test valid course with groups
         $groups = $this->Group->getGroupsByCourseId(1);
-        $this->assertEqual($groups, array(1=>1,2=>2,3=>3,4=>4));
+        $this->assertEqual($groups, array(1=>1,2=>2));
 
         // Test valid course with no groups
         $groups = $this->Group->getGroupsByCourseId(2);
