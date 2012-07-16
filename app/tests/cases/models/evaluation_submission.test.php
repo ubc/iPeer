@@ -33,18 +33,15 @@ class EvaluationSubmissionTestCase extends CakeTestCase
     {
     }
 
-    function testEvaluationSubmissionInstance()
-    {
-        $this->assertTrue(is_a($this->EvaluationSubmission, 'EvaluationSubmission'));
-    }
-
     function testGetEvalSubmissionByGrpEventIdSubmitter()
     {
-        $result = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter(1, 3);
+        // valid params
+        $result = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter(1, 7);
         $this->assertEqual($result['EvaluationSubmission']['id'], 1);
         $this->assertEqual($result['EvaluationSubmission']['grp_event_id'], 1);
-        $this->assertEqual($result['EvaluationSubmission']['submitter_id'], 3);
+        $this->assertEqual($result['EvaluationSubmission']['submitter_id'], 7);
 
+        // invalid params
         $result = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter(null, 3);
         $this->assertFalse($result);
         $result = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter(1, null);
@@ -53,36 +50,25 @@ class EvaluationSubmissionTestCase extends CakeTestCase
 
     function testGetEvalSubmissionByEventIdSubmitter()
     {
-        $result = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(2, 3);
+        // valid params
+        $result = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(3, 7);
         $this->assertEqual($result['EvaluationSubmission']['id'], 3);
-        $this->assertEqual($result['EvaluationSubmission']['event_id'], 2);
-        $this->assertEqual($result['EvaluationSubmission']['submitter_id'], 3);
+        $this->assertEqual($result['EvaluationSubmission']['event_id'], 3);
+        $this->assertEqual($result['EvaluationSubmission']['submitter_id'], 7);
 
+        // invalid params
         $result = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(null, 3);
         $this->assertFalse($result);
         $result = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(2, null);
         $this->assertFalse($result);
     }
 
-    function testNumInGroupCompleted()
-    {
-        $result = $this->EvaluationSubmission->numInGroupCompleted(2, 1);
-        $this->assertEqual($result[0]['GroupMember']['user_id'], 3);
-
-        $result = $this->EvaluationSubmission->numInGroupCompleted(null, 1);
-        $this->assertFalse($result);
-        $result = $this->EvaluationSubmission->numInGroupCompleted(2, null);
-        $this->assertFalse($result);
-    }
-
     function testNumCountInGroupCompleted()
     {
         $result = $this->EvaluationSubmission->numCountInGroupCompleted(2, 1);
-        $this->assertEqual($result, 1);
+        $this->assertEqual($result, 2);
 
-        $result = $this->EvaluationSubmission->numCountInGroupCompleted(null, 1);
-        $this->assertFalse($result);
-        $result = $this->EvaluationSubmission->numCountInGroupCompleted(2, null);
+        $result = $this->EvaluationSubmission->numCountInGroupCompleted(100);
         $this->assertFalse($result);
     }
 

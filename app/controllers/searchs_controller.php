@@ -327,8 +327,7 @@ class SearchsController extends AppController
                 $group = $this->Group->find('first', array('conditions' => array('Group.id' => $groupid)));
                 $assignedGroups[$i] = $group;
                 //Get Members whom completed evaluation
-                $numOfCompletedCount = $this->EvaluationSubmission->numCountInGroupCompleted($group['Group']['id'],
-                    $groupEventId);
+                $numOfCompletedCount = $this->EvaluationSubmission->numCountInGroupCompleted($groupEventId);
                 //Check to see if all members are completed this evaluation
 
                 $numMembers=$this->GroupsMembers->find('count', array('conditions' => 'group_id='.$group['Group']['id']));

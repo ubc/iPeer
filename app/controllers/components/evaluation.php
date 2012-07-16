@@ -305,8 +305,9 @@ class EvaluationComponent extends Object
         //checks if all members in the group have submitted
         //the number of submission equals the number of members
         //means that this group is ready to review
-        $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted(
-            $groupEvent['GroupEvent']['group_id'], $groupEvent['GroupEvent']['id']);
+        $memberCompletedNo = 
+            $this->EvaluationSubmission->numCountInGroupCompleted(
+                $groupEvent['GroupEvent']['id']);
         $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
         //Check to see if all members are completed this evaluation
         if ($numOfCompletedCount == $evaluateeCount) {

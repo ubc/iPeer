@@ -706,7 +706,7 @@ class EvaluationsController extends AppController
         //checks if all members in the group have submitted
         //the number of submission equals the number of members
         //means that this group is ready to review
-        $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupId, $groupEventId);
+        $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupEventId);
         $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
         //Check to see if all members are completed this evaluation
         if ($numOfCompletedCount == $evaluateeCount ) {
@@ -845,7 +845,7 @@ class EvaluationsController extends AppController
         //checks if all members in the group have submitted
         //the number of submission equals the number of members
         //means that this group is ready to review
-        $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupId, $groupEventId);
+        $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupEventId);
         $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
         //Check to see if all members are completed this evaluation
         if ($numOfCompletedCount == $evaluateeCount ) {
@@ -1173,7 +1173,7 @@ class EvaluationsController extends AppController
         //if not all members submitted, then it should be 'not reviewed'
         else if ($reviewStatus == "mark_not_reviewed") {
             //Get Members whom completed evaluation
-            $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupId, $groupEventId);
+            $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupEventId);
             //Check to see if all members are completed this evaluation
             $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
             $numMembers=$event['Event']['self_eval'] ?
@@ -1343,8 +1343,7 @@ class EvaluationsController extends AppController
             $this->GroupEvent->id = $groupEvent['GroupEvent']['group_id'];
 
             //Get the total number of members who has completed this evaluation
-            $numOfCompletedCount = $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent['GroupEvent']['group_id'],
-                $groupEvent['GroupEvent']['id']);
+            $numOfCompletedCount = $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent['GroupEvent']['id']);
             //$numMembers = $this->GroupsMembers->find(count, 'group_id='.$groupEvent['GroupEvent']['group_id']);
             $numMembers = $this->GroupsMembers->find('count', array('conditions' => array('group_id' => $groupEvent['GroupEvent']['group_id'])));
 
@@ -1408,8 +1407,7 @@ class EvaluationsController extends AppController
             $this->GroupEvent->id = $groupEvent['GroupEvent']['group_id'];
 
             //Get Members count whom completed evaluation
-            $numOfCompletedCount = $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent['GroupEvent']['group_id'],
-                $groupEvent['GroupEvent']['id']);
+            $numOfCompletedCount = $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent['GroupEvent']['id']);
             $numMembers = $this->GroupsMembers->find('count', array('conditions' => array('group_id' => $groupEvent['GroupEvent']['group_id'])));
             if (($numOfCompletedCount != 0) && ($numOfCompletedCount < $numMembers)) {
                 $completeStatus = 'Some';
