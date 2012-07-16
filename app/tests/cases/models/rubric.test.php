@@ -41,11 +41,6 @@ class RubricTestCase extends CakeTestCase
     {
     }
 
-    function testRubricInstance()
-    {
-        $this->assertTrue(is_a($this->Rubric, 'Rubric'));
-    }
-
     function testSaveAllWithCriteriaComment()
     {
         //Set up test data
@@ -54,23 +49,24 @@ class RubricTestCase extends CakeTestCase
         $this->Rubric->SaveAllWithCriteriaComment($tmp);
 
         // Assert that Rubrics was saved correctly
-        $rubric = $this->Rubric->find('first', array('conditions' => array('Rubric.id' => 1)));
+        $rubric = $this->Rubric->find('first', array('conditions' => array('Rubric.id' => 50)));
         $this->assertEqual($rubric['Rubric']['id'], $tmp['Rubric']['id']);
         $this->assertEqual($rubric['Rubric']['name'], $tmp['Rubric']['name']);
 
         // Assert that RubricsLom was saved correctly
-        $rubricsLom1 = $this->RubricsLom->find('first', array('conditions' => array('RubricsLom.id' => 1)));
-        $rubricsLom2 = $this->RubricsLom->find('first', array('conditions' => array('RubricsLom.id' => 2)));
+        $rubricsLom1 = $this->RubricsLom->find('first', array('conditions' => array('RubricsLom.id' => 50)));
+        $rubricsLom2 = $this->RubricsLom->find('first', array('conditions' => array('RubricsLom.id' => 51)));
         $this->assertEqual($rubricsLom1['RubricsLom']['lom_comment'], $tmp['RubricsLom'][0]['lom_comment']);
         $this->assertEqual($rubricsLom2['RubricsLom']['lom_comment'], $tmp['RubricsLom'][1]['lom_comment']);
 
         // Assert that RubricsCriteria was saved correctly
-        $rubricsCriteria = $this->RubricsCriteria->find('first', array('conditions' => array('RubricsCriteria.id' => 1)));
+        $rubricsCriteria = $this->RubricsCriteria->find('first', array('conditions' => array('RubricsCriteria.id' => 50)));
         $this->assertEqual($rubricsCriteria['RubricsCriteria']['criteria'], $tmp['RubricsCriteria'][0]['criteria']);
 
         // Assert that RubricsCriteriaComment was saved correctly
-        $rubricsCriteriaComment0 = $this->RubricsCriteriaComment->find('first', array('conditions' => array('criteria_num' => 1)));
-        $this->assertEqual($rubricsCriteriaComment0['RubricsCriteriaComment']['criteria_comment'],
+        $rubricsCriteriaComment0 = $this->RubricsCriteriaComment->find('first', array('conditions' => array('criteria_num' => 50)));
+        $this->assertEqual(
+            $rubricsCriteriaComment0['RubricsCriteriaComment']['criteria_comment'],
             $tmp['RubricsCriteria'][0]['RubricsCriteriaComment'][0]['criteria_comment']);
     }
 
@@ -78,22 +74,21 @@ class RubricTestCase extends CakeTestCase
     {
         // Set up test data
         $rubric = $this->Rubric->find('first', array(
-            'conditions' => array('id' => 4),
+            'conditions' => array('id' => 1),
             'contain' => array('RubricsCriteria.RubricsCriteriaComment', 'RubricsLom'),
         ));
-        $this->assertEqual($rubric['RubricsCriteria'][0]['RubricsCriteriaComment'][0]['criteria_comment'], 'HELLO 11');
-        $this->assertEqual($rubric['RubricsCriteria'][0]['RubricsCriteriaComment'][1]['criteria_comment'], 'HELLO 12');
-        $this->assertEqual($rubric['RubricsCriteria'][1]['RubricsCriteriaComment'][0]['criteria_comment'], 'HELLO 21');
-        $this->assertEqual($rubric['RubricsCriteria'][1]['RubricsCriteriaComment'][1]['criteria_comment'], 'HELLO 22');
+        $this->assertEqual($rubric['RubricsCriteria'][0]['RubricsCriteriaComment'][0]['criteria_comment'], 'No participation.');
+        $this->assertEqual($rubric['RubricsCriteria'][0]['RubricsCriteriaComment'][1]['criteria_comment'], 'Little participation.');
+        $this->assertEqual($rubric['RubricsCriteria'][0]['RubricsCriteriaComment'][2]['criteria_comment'], 'Some participation.');
     }
 
     function testCopy()
     {
-
-        $copyRubric = $this->Rubric->copy(4);
+        $copyRubric = $this->Rubric->copy(1);
 
         // Assert the Rubric name is copied
-        $this->assertEqual($copyRubric['Rubric']['name'], 'Copy of Some Rubric');
+        $this->assertEqual($copyRubric['Rubric']['name'], 
+            'Copy of Term Report Evaluation');
         // Assert that the Rubric and all of its associated id's are delete
         $this->assertTrue(!isset($copyRubric['Rubric']['id']));
         $this->assertTrue(!isset($copyRubric['RubricsCriteria'][0]['id']));
@@ -109,8 +104,8 @@ class RubricTestCase extends CakeTestCase
     function testGetRubricById()
     {
 
-        $rubric = $this->Rubric->getRubricById(4);
-        $this->assertEqual(4, $rubric['Rubric']['id']);
+        $rubric = $this->Rubric->getRubricById(1);
+        $this->assertEqual(1, $rubric['Rubric']['id']);
         $this->assertTrue(isset($rubric['RubricsCriteria']));
         $this->assertTrue(isset($rubric['RubricsLom']));
     }
@@ -123,11 +118,11 @@ class RubricTestCase extends CakeTestCase
     {
         $tmp = array(
             'Rubric' => array(
-                'id' => 1,
+                'id' => 50,
                 'template' => 'horizontal',
                 'name' => 'Some Rubric',
                 'lom_max' => 2,
-                'criteria' => 1,
+                'criteria' => 50,
                 'availability' => '',
                 'zero_mark' => 0,
                 'criteria_mark_0_0' => 0.5,
@@ -136,20 +131,20 @@ class RubricTestCase extends CakeTestCase
             'RubricsLom' => Array(
                 '0' => Array(
                     'lom_comment' => 'LOM 1',
-                    'id' => 1,
+                    'id' => 50,
                     'lom_num' => 1
                 ),
                 '1' => Array(
                     'lom_comment' => 'LOM 2',
-                    'id' => 2,
+                    'id' => 51,
                     'lom_num' => 2
                 )
             ),
             'RubricsCriteria' => Array(
                 '0' => Array(
                     'criteria' => 'Criteria 1',
-                    'id' => 1,
-                    'criteria_num' => 1,
+                    'id' => 50,
+                    'criteria_num' => 50,
                     'RubricsCriteriaComment' => Array(
                         '0' => Array(
                             'criteria_comment' => 'HELLO 11',

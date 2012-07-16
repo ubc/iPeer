@@ -36,20 +36,19 @@ class RubricsCriteriaTestCase extends CakeTestCase
     {
     }
 
-    function testRubricsCriteriaInstance()
-    {
-        $this->assertTrue(is_a($this->RubricsCriteria, 'RubricsCriteria'));
-    }
-
     function testGetCriteria()
     {
         // Set up test data
-        $criteria1 = $this->RubricsCriteria->getCriteria(4);
+        $criteria1 = $this->RubricsCriteria->getCriteria(1);
         // Compare result to fixture data
         $this->assertTrue(!empty($criteria1));
         $this->assertNotNull($criteria1);
-        $this->assertEqual($criteria1[0]['RubricsCriteria']['criteria'], 'CRITERIA 1');
-        $this->assertEqual($criteria1[1]['RubricsCriteria']['criteria'], 'CRITERIA 2');
+        $this->assertEqual($criteria1[0]['RubricsCriteria']['criteria'], 
+            'Participated in Team Meetings');
+        $this->assertEqual($criteria1[1]['RubricsCriteria']['criteria'], 
+            'Was Helpful and Co-operative');
+        $this->assertEqual($criteria1[2]['RubricsCriteria']['criteria'], 
+            'Submitted Work on Time');
 
     }
 }

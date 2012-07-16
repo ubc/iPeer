@@ -36,20 +36,15 @@ class RubricsLomTestCase extends CakeTestCase
     {
     }
 
-    function testRubricsLomInstance()
-    {
-        $this->assertTrue(is_a($this->RubricsLom, 'RubricsLom'));
-    }
-
     function testGetLoms()
     {
         // Set up test data
-        $rubricLom1 = $this->RubricsLom->getLoms(4, 1);
-        $rubricLom2 = $this->RubricsLom->getLoms(4, 2);
+        $rubricLom1 = $this->RubricsLom->getLoms(1, 1);
+        $rubricLom2 = $this->RubricsLom->getLoms(1, 2);
         // Assert the function queried the fixture data
-        $this->assertEqual($rubricLom1[0]['RubricsLom']['rubric_id'], 4);
+        $this->assertEqual($rubricLom1[0]['RubricsLom']['rubric_id'], 1);
         $this->assertEqual($rubricLom1[0]['RubricsLom']['lom_num'], 1);
-        $this->assertEqual($rubricLom2[0]['RubricsLom']['rubric_id'], 4);
+        $this->assertEqual($rubricLom2[0]['RubricsLom']['rubric_id'], 1);
         $this->assertEqual($rubricLom2[0]['RubricsLom']['lom_num'], 2);
         // Test faulty inputs
         $nullLom = $this->RubricsLom->getLoms(null, null);

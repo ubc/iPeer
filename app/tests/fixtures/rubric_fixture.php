@@ -12,15 +12,5 @@ class RubricFixture extends CakeTestFixture
 {
     public $name = 'Rubric';
 
-    public $import = 'Rubric';
-
-    public $records = array(
-        array(
-            'id' => 4,
-            'name' => 'Some Rubric',
-            'zero_mark' => 0,
-            'lom_max' => 2,
-            'criteria' => 2
-        )
-    );
+    public $import = array('model' => 'Rubric', 'records' => true);
 }

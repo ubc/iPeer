@@ -1520,11 +1520,11 @@ CREATE TABLE IF NOT EXISTS `rubrics_criteria_comments` (
 -- Dumping data for table `rubrics_criteria_comments`
 --
 
-INSERT INTO `rubrics_criteria_comments` VALUES (1, 1, 1, NULL);
-INSERT INTO `rubrics_criteria_comments` VALUES (2, 1, 2, NULL);
-INSERT INTO `rubrics_criteria_comments` VALUES (3, 1, 3, NULL);
-INSERT INTO `rubrics_criteria_comments` VALUES (4, 1, 4, NULL);
-INSERT INTO `rubrics_criteria_comments` VALUES (5, 1, 5, NULL);
+INSERT INTO `rubrics_criteria_comments` VALUES (1, 1, 1, "No participation.");
+INSERT INTO `rubrics_criteria_comments` VALUES (2, 1, 2, "Little participation.");
+INSERT INTO `rubrics_criteria_comments` VALUES (3, 1, 3, "Some participation.");
+INSERT INTO `rubrics_criteria_comments` VALUES (4, 1, 4, "Good participation.");
+INSERT INTO `rubrics_criteria_comments` VALUES (5, 1, 5, "Great participation.");
 INSERT INTO `rubrics_criteria_comments` VALUES (6, 2, 1, NULL);
 INSERT INTO `rubrics_criteria_comments` VALUES (7, 2, 2, NULL);
 INSERT INTO `rubrics_criteria_comments` VALUES (8, 2, 3, NULL);

@@ -37,24 +37,24 @@ class RubricsCriteriaCommentTestCase extends CakeTestCase
     {
     }
 
-    function testRubricsCriteriaCommentInstance()
-    {
-        $this->assertTrue(is_a($this->RubricsCriteriaComment, 'RubricsCriteriaComment'));
-    }
-
     function testGetCriteriaComment()
     {
         // Set up test data by querying from fixture
-        $rubric = $this->Rubric->find('first', array('conditions' => array('Rubric.id' => 4)));
+        $rubric = $this->Rubric->find('first', array('conditions' => array('Rubric.id' => 1)));
         $result = $this->RubricsCriteriaComment->getCriteriaComment($rubric);
         // Assert that the query was successful
         $this->assertTrue(!empty($result));
         $this->assertNotNull($result);
         // Assert the queried result matches with the fixture data
-        $this->assertEqual($result['criteria_comment_1_1'], 'HELLO 11');
-        $this->assertEqual($result['criteria_comment_1_2'], 'HELLO 12');
-        $this->assertEqual($result['criteria_comment_2_1'], 'HELLO 21');
-        $this->assertEqual($result['criteria_comment_2_2'], 'HELLO 22');
+        $this->assertEqual($result['criteria_comment_1_1'], 'No participation.');
+        $this->assertEqual($result['criteria_comment_1_2'], 'Little participation.');
+        $this->assertEqual($result['criteria_comment_1_3'], 'Some participation.');
+        $this->assertEqual($result['criteria_comment_1_4'], 'Good participation.');
+        $this->assertEqual($result['criteria_comment_1_5'], 'Great participation.');
+        $this->assertEqual($result['criteria_comment_2_1'], '');
+        $this->assertEqual($result['criteria_comment_2_5'], '');
+        $this->assertEqual($result['criteria_comment_3_1'], '');
+        $this->assertEqual($result['criteria_comment_3_5'], '');
     }
 
     function testDeleteCriteriaComments()
@@ -67,7 +67,7 @@ class RubricsCriteriaCommentTestCase extends CakeTestCase
         $this->assertTrue(!empty($criteria1));
         $this->assertTrue(!empty($criteria2));
         // Set up test data
-        $this->RubricsCriteriaComment->deleteCriteriaComments(4);
+        $this->RubricsCriteriaComment->deleteCriteriaComments(1);
         $criteria1 = $this->RubricsCriteriaComment->find('all', array(
             'conditions' => array('criteria_id' => 1)));
         $criteria2 = $this->RubricsCriteriaComment->find('all', array(
