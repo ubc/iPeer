@@ -14,33 +14,16 @@ class SimpleEvaluationTestCase extends CakeTestCase
         'app.user_enrol', 'app.groups_member', 'app.survey', 
         'app.simple_evaluation', 'app.user_faculty'
     );
-    public $Course = null;
-    public $empty = null;
 
     function startCase()
     {
-        /*$this->SimpleEvaluation = ClassRegistry::init('SimpleEvaluation');
-        $admin = array('User' => array('username' => 'root',
-            'password' => 'ipeer'));
-        $this->controller = new FakeController();
-        $this->controller->constructClasses();
-        $this->controller->startupProcess();
-        $this->controller->Component->startup($this->controller);
-        $this->controller->Auth->startup($this->controller);
-        ClassRegistry::addObject('view', new View($this->Controller));
-        ClassRegistry::addObject('auth_component', $this->controller->Auth);
-
-        $this->controller->Auth->login($admin);*/
     }
 
     function endCase()
     {
-        /*$this->controller->Component->shutdown($this->controller);
-        $this->controller->shutdownProcess();*/
     }
 
     function startTest($method)
     {
-        // extra setup stuff here
     }
 }

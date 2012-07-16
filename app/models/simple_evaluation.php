@@ -16,19 +16,7 @@ class SimpleEvaluation extends EvaluationBase
     public $name = 'SimpleEvaluation';
     // use default table
     public $useTable = null;
-  /*public $validate = array(
-      'name' => array('rule' => 'notEmpty',
-                      'required' => true,
-                      'allowEmpty' => false),
-      'point_per_member' => 'numeric',
-  );*/
 
-/*  public $hasMany = array(
-                       'EvaluationSimple' => array(
-                        'className' => 'EvaluationSimple',
-                        'dependent' => true
-                       )
-);*/
     public $hasMany = array(
         'Event' =>
         array('className'   => 'Event',
