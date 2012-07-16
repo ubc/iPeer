@@ -33,25 +33,24 @@ class EvaluationRubricDetailTestCase extends CakeTestCase
     {
     }
 
-    function testCourseInstance()
-    {
-        $this->assertTrue(is_a($this->EvaluationRubricDetail, 'EvaluationRubricDetail'));
-    }
-
     function testGetByEvalRubricIdCritera()
     {
         // Run test on valid data
         $rubricEvalDetail1 = $this->EvaluationRubricDetail->getByEvalRubricIdCritera(2, 1);
         $rubricEvalDetail2 = $this->EvaluationRubricDetail->getByEvalRubricIdCritera(2, 2);
-        $this->assertEqual($rubricEvalDetail1['EvaluationRubricDetail']['id'], 1);
+        $rubricEvalDetail3 = $this->EvaluationRubricDetail->getByEvalRubricIdCritera(2, 3);
+        $this->assertEqual($rubricEvalDetail1['EvaluationRubricDetail']['id'], 4);
         $this->assertEqual($rubricEvalDetail1['EvaluationRubricDetail']['criteria_number'], 1);
-        $this->assertEqual($rubricEvalDetail1['EvaluationRubricDetail']['criteria_comment'], 'criteria comment1');
-        $this->assertEqual($rubricEvalDetail2['EvaluationRubricDetail']['id'], 2);
+        $this->assertEqual($rubricEvalDetail1['EvaluationRubricDetail']['criteria_comment'], 'attended most meetings');
+        $this->assertEqual($rubricEvalDetail2['EvaluationRubricDetail']['id'], 5);
         $this->assertEqual($rubricEvalDetail2['EvaluationRubricDetail']['criteria_number'], 2);
-        $this->assertEqual($rubricEvalDetail2['EvaluationRubricDetail']['criteria_comment'], 'criteria comment2');
+        $this->assertEqual($rubricEvalDetail2['EvaluationRubricDetail']['criteria_comment'], 'very co-operative');
+        $this->assertEqual($rubricEvalDetail3['EvaluationRubricDetail']['id'], 6);
+        $this->assertEqual($rubricEvalDetail3['EvaluationRubricDetail']['criteria_number'], 3);
+        $this->assertEqual($rubricEvalDetail3['EvaluationRubricDetail']['criteria_comment'], 'finished all his work on time');
         // Run test on one valid input
-        $rubricEvalDetail3 = $invalid3 = $this->EvaluationRubricDetail->getByEvalRubricIdCritera(2, null);
-        $this->assertFalse($rubricEvalDetail3);
+        $rubricEvalDetail4 = $invalid3 = $this->EvaluationRubricDetail->getByEvalRubricIdCritera(2, null);
+        $this->assertFalse($rubricEvalDetail4);
         // Run tests on invalid data
         $invalid1 = $this->EvaluationRubricDetail->getByEvalRubricIdCritera(232, 1);
         $invalid2 = $this->EvaluationRubricDetail->getByEvalRubricIdCritera(1, 1232);
@@ -65,12 +64,14 @@ class EvaluationRubricDetailTestCase extends CakeTestCase
     function testGetAllByEvalRubricId()
     {
 
-        $rubricEvalDetail  = $this->EvaluationRubricDetail->getAllByEvalRubricId(2);
+        $rubricEvalDetail  = $this->EvaluationRubricDetail->getAllByEvalRubricId(3);
         $this->assertTrue(!empty($rubricEvalDetail));
-        $this->assertEqual($rubricEvalDetail[0]['EvaluationRubricDetail']['id'], 1);
-        $this->assertEqual($rubricEvalDetail[1]['EvaluationRubricDetail']['id'], 2);
-        $this->assertEqual($rubricEvalDetail[0]['EvaluationRubricDetail']['criteria_comment'], 'criteria comment1');
-        $this->assertEqual($rubricEvalDetail[1]['EvaluationRubricDetail']['criteria_comment'], 'criteria comment2');
+        $this->assertEqual($rubricEvalDetail[0]['EvaluationRubricDetail']['id'], 7);
+        $this->assertEqual($rubricEvalDetail[1]['EvaluationRubricDetail']['id'], 8);
+        $this->assertEqual($rubricEvalDetail[2]['EvaluationRubricDetail']['id'], 9);
+        $this->assertEqual($rubricEvalDetail[0]['EvaluationRubricDetail']['criteria_comment'], 'Yes');
+        $this->assertEqual($rubricEvalDetail[1]['EvaluationRubricDetail']['criteria_comment'], 'Absolutely');
+        $this->assertEqual($rubricEvalDetail[2]['EvaluationRubricDetail']['criteria_comment'], 'Definitely');
         // Run tests on invalid data
         $invalid1 = $this->EvaluationRubricDetail->getAllByEvalRubricId(232);
         $invalid2 = $this->EvaluationRubricDetail->getAllByEvalRubricId(null);
