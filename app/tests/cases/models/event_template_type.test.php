@@ -32,22 +32,19 @@ class EventTemplateTypeTestCase extends CakeTestCase {
 
     }
 
-    function testCourseInstance()
-    {
-        $this->assertTrue(is_a($this->EventTemplateType, 'EventTemplateType'));
-    }
-
     function testGetEventTemplateTypeList()
     {
         // Test for returning ALL template results
         $result = $this->EventTemplateType->getEventTemplateTypeList(false);
         $this->assertTrue(!empty($result));
-        $this->assertEqual($result[1], 'RUBRIC');
-        $this->assertEqual($result[2], 'SIMPLE');
-        $this->assertEqual($result[3], 'SIMPLE');
+        $this->assertEqual($result[1], 'SIMPLE');
+        $this->assertEqual($result[2], 'RUBRIC');
+        $this->assertEqual($result[3], 'SURVEY');
+        $this->assertEqual($result[4], 'MIX EVALUATION');
+        
         // Test for returning ONLY display_for_selection==1 templates
         $result = $this->EventTemplateType->getEventTemplateTypeList(true);
         $this->assertTrue(!empty($result));
-        $this->assertTrue($result[1], 'RUBRIC');
+        $this->assertTrue($result[1], 'SIMPLE');
     }
 }

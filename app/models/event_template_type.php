@@ -31,14 +31,4 @@ class EventTemplateType extends AppModel
             'order' => 'EventTemplateType.id'
         ));
     }
-
-
-    // Function is obsolete.
-  /*function getEventType($eventTemplateTypeId, $field='type_name')
-{
-    $eventTemplate = $this->find('first', array(
-        'conditions' => array('EventTemplateType.id' => $eventTemplateTypeId)
-    ));
-    return $eventTemplate['EventTemplateType'][$field];
-  }*/
 }
