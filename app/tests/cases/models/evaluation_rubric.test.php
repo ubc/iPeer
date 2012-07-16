@@ -34,22 +34,18 @@ class EvaluationRubricTestCase extends CakeTestCase
     {
     }
 
-    function testCourseInstance()
-    {
-        $this->assertTrue(is_a($this->EvaluationRubric, 'EvaluationRubric'));
-    }
 
     //getEvalRubricByGrpEventIdEvaluatorEvaluatee($grpEventId=null, $evaluator=null, $evaluatee=null)
     function testGetEvalRubricByGrpEventIdEvaluatorEvaluatee()
     {
         // Set up test data
-        $result = $this->EvaluationRubric->getEvalRubricByGrpEventIdEvaluatorEvaluatee(1, 3, 4);
+        $ret = $this->EvaluationRubric->getEvalRubricByGrpEventIdEvaluatorEvaluatee(4, 31, 32);
         // Assert the queried data is correct
-        $this->assertTrue(!empty($result));
+        $this->assertTrue(!empty($ret));
 
-        $this->assertEqual($result['EvaluationRubric']['grp_event_id'], 1);
-        $this->assertEqual($result['EvaluationRubric']['evaluator'], 3);
-        $this->assertEqual($result['EvaluationRubric']['evaluatee'], 4);
+        $this->assertEqual($ret['EvaluationRubric']['general_comment'], 'We work well together.');
+        $this->assertEqual($ret['EvaluationRubric']['score'], 15.00);
+        $this->assertEqual($ret['EvaluationRubric']['event_id'], 2);
         // Test invalid inputs
         $invalidInputs = $this->EvaluationRubric->getEvalRubricByGrpEventIdEvaluatorEvaluatee(999, 3, 4);
         $invalidInputs1 = $this->EvaluationRubric->getEvalRubricByGrpEventIdEvaluatorEvaluatee(1, 999, 4);
@@ -64,11 +60,11 @@ class EvaluationRubricTestCase extends CakeTestCase
     function testGetResultsByEvaluatee()
     {
         // Set up test data
-        $result = $this->EvaluationRubric->getResultsByEvaluatee(1, 4);
+        $ret = $this->EvaluationRubric->getResultsByEvaluatee(4, 33);
         // Assert the queried data matches and is correctly ordered according to the fixture data
-        $this->assertTrue(!empty($result[0]));
-        $this->assertEqual($result[0]['EvaluationRubric']['grp_event_id'], 1);
-        $this->assertEqual($result[0]['EvaluationRubric']['score'], 15);
+        $this->assertTrue(!empty($ret[0]));
+        $this->assertEqual($ret[0]['EvaluationRubric']['general_comment'], 'He did a great job.');
+        $this->assertEqual($ret[0]['EvaluationRubric']['score'], 14.00);
         // Test invalid inputs
         $invalidInputs = $this->EvaluationRubric->getResultsByEvaluatee(1, 999);
         $invalidInputs1 = $this->EvaluationRubric->getResultsByEvaluatee(999, 1);
@@ -81,108 +77,121 @@ class EvaluationRubricTestCase extends CakeTestCase
     function testGetResultsDetailByEvaluatee()
     {
         // Set up test data
-        $result = $this->EvaluationRubric->getResultsDetailByEvaluatee(2, 3);
+        $ret = $this->EvaluationRubric->getResultsDetailByEvaluatee(3, 5);
         // Assert the queried data matches with fixture data
-        $this->assertTrue(!empty($result));
-        $this->assertTrue(!empty($result[0]['EvaluationRubricDetail']));
-        $this->assertTrue(!empty($result[1]['EvaluationRubricDetail']));
-        $evalRubricDetail1 = $result[0]['EvaluationRubricDetail']['criteria_comment'];
-        $evalRubricDetail2 = $result[1]['EvaluationRubricDetail']['criteria_comment'];
-        $this->assertEqual($evalRubricDetail1, 'criteria comment1');
-        $this->assertEqual($evalRubricDetail2, 'criteria comment2');
+        $this->assertTrue(!empty($ret));
+        $this->assertTrue(!empty($ret[0]['EvaluationRubricDetail']));
+        $this->assertTrue(!empty($ret[1]['EvaluationRubricDetail']));
+        $this->assertTrue(!empty($ret[2]['EvaluationRubricDetail']));
+        $evalRubricDetail1 = $ret[0]['EvaluationRubricDetail']['criteria_comment'];
+        $evalRubricDetail2 = $ret[1]['EvaluationRubricDetail']['criteria_comment'];
+        $evalRubricDetail3 = $ret[2]['EvaluationRubricDetail']['criteria_comment'];
+        $this->assertEqual($evalRubricDetail1, 'Yes');
+        $this->assertEqual($evalRubricDetail2, 'Absolutely');
+        $this->assertEqual($evalRubricDetail3, 'Definitely');
     }
 
     function testGetResultsDetailByEvaluator()
     {
         // Set up test data
-        $result = $this->EvaluationRubric->getResultsDetailByEvaluator(2, 4);
+        $ret = $this->EvaluationRubric->getResultsDetailByEvaluator(3, 7);
         // Assert the queried data matches with fixture data
-        $this->assertTrue(!empty($result));
-        $this->assertTrue(!empty($result[0]['EvaluationRubricDetail']));
-        $this->assertTrue(!empty($result[1]['EvaluationRubricDetail']));
-        $evalMixDetail1 = $result[0]['EvaluationRubricDetail']['criteria_comment'];
-        $evalMixDetail2 = $result[1]['EvaluationRubricDetail']['criteria_comment'];
-        $this->assertEqual($evalMixDetail1, 'criteria comment1');
-        $this->assertEqual($evalMixDetail2, 'criteria comment2');
+        $this->assertTrue(!empty($ret));
+        $this->assertTrue(!empty($ret[0]['EvaluationRubricDetail']));
+        $this->assertTrue(!empty($ret[1]['EvaluationRubricDetail']));
+        $this->assertTrue(!empty($ret[2]['EvaluationRubricDetail']));
+        $this->assertTrue(!empty($ret[3]['EvaluationRubricDetail']));
+        $this->assertTrue(!empty($ret[4]['EvaluationRubricDetail']));
+        $this->assertTrue(!empty($ret[5]['EvaluationRubricDetail']));
+        $evalMixDetail1 = $ret[0]['EvaluationRubricDetail']['criteria_comment'];
+        $evalMixDetail2 = $ret[1]['EvaluationRubricDetail']['criteria_comment'];
+        $evalMixDetail3 = $ret[2]['EvaluationRubricDetail']['criteria_comment'];
+        $evalMixDetail4 = $ret[3]['EvaluationRubricDetail']['criteria_comment'];
+        $evalMixDetail5 = $ret[4]['EvaluationRubricDetail']['criteria_comment'];
+        $evalMixDetail6 = $ret[5]['EvaluationRubricDetail']['criteria_comment'];
+        $this->assertEqual($evalMixDetail1, 'Yes');
+        $this->assertEqual($evalMixDetail2, 'attended all of our team meetings');
+        $this->assertEqual($evalMixDetail3, 'Absolutely');
+        $this->assertEqual($evalMixDetail4, 'very helpful in all parts of the project');
+        $this->assertEqual($evalMixDetail5, 'Yes');
+        $this->assertEqual($evalMixDetail6, 'Definitely');
     }
 
 
     function testGetCriteriaResults()
     {
-
-        $result = $this->EvaluationRubric->getCriteriaResults(2, 3);
-        $this->assertEqual($result[1], 10);
-        $this->assertEqual($result[2], 5);
+        $ret = $this->EvaluationRubric->getCriteriaResults(4, 32);
+        $this->assertEqual($ret[1], 5);
+        $this->assertEqual($ret[2], 5);
+        $this->assertEqual($ret[3], 5);
     }
 
     function testGetReceivedTotalScore()
     {
         // Set up test data
-        $result = $this->EvaluationRubric->getReceivedTotalScore(2, 3);
+        $ret = $this->EvaluationRubric->getReceivedTotalScore(4, 33);
         // Assert the queried data matches with fixture data
-        $this->assertTrue(!empty($result));
-        $this->assertEqual($result[0][0]['received_total_score'], 10);
+        $this->assertTrue(!empty($ret));
+        $this->assertEqual($ret[0][0]['received_total_score'], 14.00);
     }
 
     function testGetAllComments()
     {
-
-        $result = $this->EvaluationRubric->getAllComments(2, 3);
-        $this->assertEqual($result[0]['EvaluationRubric']['general_comment'], 'general comment2');
+        $ret = $this->EvaluationRubric->getAllComments(3, 5);
+        $this->assertEqual($ret[0]['EvaluationRubric']['general_comment'], 'Good group member.');
     }
 
     function testGetReceivedTotalEvaluatorCount()
     {
         // Set up test data
-        $grpEvent1 = $this->EvaluationRubric->getReceivedTotalEvaluatorCount(2, 3);
+        $grpEvent1 = $this->EvaluationRubric->getReceivedTotalEvaluatorCount(3, 5);
         // Assert the queried data matches with fixture data
         $this->assertTrue(!empty($grpEvent1));
         $this->assertEqual($grpEvent1, 1);
-        $grpEvent2 = $this->EvaluationRubric->getReceivedTotalEvaluatorCount(1, 4);
+        $grpEvent2 = $this->EvaluationRubric->getReceivedTotalEvaluatorCount(3, 6);
         $this->assertTrue(!empty($grpEvent2));
         $this->assertEqual($grpEvent2, 1);
     }
 
     function testGetOppositeGradeReleaseStatus()
     {
-        $result = $this->EvaluationRubric->getOppositeGradeReleaseStatus(1, 0);
-        $this->assertEqual($result, 1);
-        $result = $this->EvaluationRubric->getOppositeGradeReleaseStatus(1, 1);
-        $this->assertEqual($result, 1);
-        $result = $this->EvaluationRubric->getOppositeGradeReleaseStatus(2, 0);
-        $this->assertEqual($result, 0);
+        $ret = $this->EvaluationRubric->getOppositeGradeReleaseStatus(4, 0);
+        $this->assertEqual($ret, 0);
+        $ret = $this->EvaluationRubric->getOppositeGradeReleaseStatus(4, 1);
+        $this->assertEqual($ret, 2);
+        $ret = $this->EvaluationRubric->getOppositeGradeReleaseStatus(3, 0);
+        $this->assertEqual($ret, 0);
     }
 
     function testGetOppositeCommentReleaseStatus()
     {
 
-        $result = $this->EvaluationRubric->getOppositeCommentReleaseStatus(1, 0);
-        $this->assertEqual($result, 1);
-        $result = $this->EvaluationRubric->getOppositeCommentReleaseStatus(1, 1);
-        $this->assertEqual($result, 1);
-        $result = $this->EvaluationRubric->getOppositeCommentReleaseStatus(2, 0);
-        $this->assertEqual($result, 0);
+        $ret = $this->EvaluationRubric->getOppositeCommentReleaseStatus(3, 0);
+        $this->assertEqual($ret, 0);
+        $ret = $this->EvaluationRubric->getOppositeCommentReleaseStatus(3, 1);
+        $this->assertEqual($ret, 2);
+        $ret = $this->EvaluationRubric->getOppositeCommentReleaseStatus(4, 0);
+        $this->assertEqual($ret, 0);
     }
 
     function testGetTeamReleaseStatus()
     {
 
-        $result = $this->EvaluationRubric->getTeamReleaseStatus(1);
-        $this->assertEqual($result[0]['EvaluationRubric']['comment_release'], 1);
-        $this->assertEqual($result[0]['EvaluationRubric']['grade_release'], 1);
-        $this->assertEqual($result[1]['EvaluationRubric']['comment_release'], 0);
-        $this->assertEqual($result[1]['EvaluationRubric']['grade_release'], 0);
+        $ret = $this->EvaluationRubric->getTeamReleaseStatus(3);
+        $this->assertEqual($ret[0]['EvaluationRubric']['comment_release'], 0);
+        $this->assertEqual($ret[0]['EvaluationRubric']['grade_release'], 0);
+        $this->assertEqual($ret[1]['EvaluationRubric']['comment_release'], 0);
+        $this->assertEqual($ret[1]['EvaluationRubric']['grade_release'], 0);
 
         $result = $this->EvaluationRubric->getTeamReleaseStatus(999);
         $this->assertFalse($result);
     }
 
-
     function testSetAllEventCommentRelease()
     {
 
-        $this->EvaluationRubric->setAllEventCommentRelease(1, 1);
-        $result = $this->EvaluationRubric->getTeamReleaseStatus(1);
+        $this->EvaluationRubric->setAllEventCommentRelease(2, 1);
+        $result = $this->EvaluationRubric->getTeamReleaseStatus(3);
         $this->assertEqual($result[1]['EvaluationRubric']['comment_release'], 1);
 
         $this->EvaluationRubric->setAllEventCommentRelease(999, 1);
@@ -193,8 +202,8 @@ class EvaluationRubricTestCase extends CakeTestCase
     function testSetAllEventGradeRelease()
     {
 
-        $this->EvaluationRubric->setAllEventGradeRelease(1, 1);
-        $result = $this->EvaluationRubric->getTeamReleaseStatus(1);
+        $this->EvaluationRubric->setAllEventGradeRelease(2, 1);
+        $result = $this->EvaluationRubric->getTeamReleaseStatus(4);
         $this->assertEqual($result[1]['EvaluationRubric']['grade_release'], 1);
 
         $this->EvaluationRubric->setAllEventGradeRelease(999, 1);
