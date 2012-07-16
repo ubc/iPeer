@@ -62,6 +62,7 @@ class UserTestCase extends CakeTestCase {
             array_push($actual, $student['User']['username']);
         }
         $expect = array(
+            10186039,
             19524032,
             19803030,
             22784037,
@@ -87,6 +88,7 @@ class UserTestCase extends CakeTestCase {
         //Set up test data
         $ret = $this->User->getEnrolledStudentsForList(1);
         $expected = array(
+            '31' => '10186039 Hui Student',
             '26' => '19524032 Bill Student',
             '32' => '19803030 Bowinn Student',
             '21' => '22784037 Nicole Student',

@@ -34,11 +34,6 @@ class PersonalizeTestCase extends CakeTestCase
     {
     }
 
-    function testPersonalizeInstance()
-    {
-        $this->assertTrue(is_a($this->Personalize, 'Personalize'));
-    }
-
     function testUpdateAttribute()
     {
         $this->Personalize->updateAttribute(1, 'code', 'newValue');

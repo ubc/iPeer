@@ -3,13 +3,5 @@
 class UserFacultyFixture extends CakeTestFixture {
 	public $name = 'UserFaculty';
 
-	public $import = 'UserFaculty';
-
-	public $records = array(
-		array(
-			'id' => 1,
-			'user_id' => 1,
-			'faculty_id' => 1
-		),
-	);
+	public $import = array('model' => 'UserFaculty', 'records' => true);
 }
