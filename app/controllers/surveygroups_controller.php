@@ -181,13 +181,11 @@ class SurveyGroupsController extends AppController
                 $temp['ID'] = $student['User']['id'];
                 $temp['Full Name'] = $student['User']['full_name'];
                 $temp['Student No.'] = $student['User']['student_no'];
-            
+                $temp['Date Submitted'] = 'Not Submitted';
                 foreach ($student['Submission'] as $submission) {
                     if ($submission['event_id'] == $eventId) {
                         $temp['Date Submitted'] = date('D, M j, Y g:i a', strtotime($submission['date_submitted']));
-                    } else {
-                        $temp['Date Submitted'] = 'Not Submitted';
-                    } 
+                    }
                 }
                 if (empty($student['Submission'])) {
                     $temp['Date Submitted'] = 'Not Submitted';
@@ -203,7 +201,7 @@ class SurveyGroupsController extends AppController
             // for populating the drop down menu to switch to different surveys in the course
             foreach ($events as $key => $survey) {
                 $surveys[$key]['id'] = $survey['Event']['id'];
-                $surveys[$key]['title'] = $survey['Event']['title'];            
+                $surveys[$key]['title'] = $survey['Event']['title'];
             }
             $survey = $event['Event']['title'];
             $survey_id = $event['Event']['template_id'];

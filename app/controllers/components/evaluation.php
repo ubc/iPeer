@@ -1720,23 +1720,61 @@ class EvaluationComponent extends Object
         $surveyInput['SurveyInput']['user_id'] = $userId;
         $surveyInput['SurveyInput']['survey_id'] = $surveyId;
         $successfullySaved = true;
+        $j = 0;
         for ($i=1; $i<=$params['form']['question_count']; $i++) {
             $this->SurveyInput = new SurveyInput;
             //Set survey and user id
-            $surveyInput[$i]['SurveyInput']['user_id'] = $userId;
-            $surveyInput[$i]['SurveyInput']['survey_id'] = $surveyId;
+            $surveyInput[$i+$j]['SurveyInput']['user_id'] = $userId;
+            $surveyInput[$i+$j]['SurveyInput']['survey_id'] = $surveyId;
             //Set question Id
             $questionId = $params['form']['question_id'.$i];
-            $surveyInput[$i]['SurveyInput']['question_id'] = $questionId;
+            $surveyInput[$i+$j]['SurveyInput']['question_id'] = $questionId;
             //Set answers
             $answer = $params['form']['answer_'.$questionId];
             $modAnswer =  $this->filterString($answer);
-            $surveyInput[$i]['SurveyInput']['response_text']=$modAnswer;
+            $surveyInput[$i+$j]['SurveyInput']['response_text']=$modAnswer;
+            foreach ($modAnswer as $data) {     // checkbox loop
+                $surveyInput[$i+$j]['SurveyInput']['response_text']=$data;
+                $response = $params['form']['answer_'.$questionId];
+                $responseId = $this->Response->getResponseId($questionId, $data);
+                $surveyInput[$i+$j]['SurveyInput']['response_id']=$responseId;
+                $surveyInput[$i+$j]['SurveyInput']['chkbx_id']=$j;
+                $this->SurveyInput->recursive = 0;
+                $surveyInputId = $this->SurveyInput->find('first', array(
+                'conditions' => array('SurveyInput.survey_id' => $surveyId,
+                'SurveyInput.user_id' => $userId,
+                'SurveyInput.question_id' => $questionId,
+                'SurveyInput.chkbx_id' => $j),
+                'fields' => array('SurveyInput.id')
+                ));
+                if ($surveyInputId) {
+                    $surveyInput[$i+$j]['SurveyInput']['id'] = $surveyInputId['SurveyInput']['id'];
+                }
+                // Save data
+                if (!$this->SurveyInput->save($surveyInput[$i+$j]['SurveyInput'])) {
+                    $successfullySaved=false;
+                }
+                $j++;
+                if ($j == count($modAnswer)) {
+                    $i++;
+                }
+                $this->SurveyInput = new SurveyInput;
+                //Set survey and user id
+                $surveyInput[$i+$j]['SurveyInput']['user_id'] = $userId;
+                $surveyInput[$i+$j]['SurveyInput']['survey_id'] = $surveyId;
+                //Set question Id
+                $questionId = $params['form']['question_id'.$i];
+                $surveyInput[$i+$j]['SurveyInput']['question_id'] = $questionId;
+                //Set answers
+                $answer = $params['form']['answer_'.$questionId];
+                $modAnswer =  $this->filterString($answer);
+                $surveyInput[$i+$j]['SurveyInput']['response_text']=$modAnswer;
+            }
             //Set reponse_id
             $response = $params['form']['answer_'.$questionId];
             $modResponse = $this->filterString($response);
             $responseId = $this->Response->getResponseId($questionId, $modResponse);
-            $surveyInput[$i]['SurveyInput']['response_id']=$responseId;
+            $surveyInput[$i+$j]['SurveyInput']['response_id']=$responseId;
             //Check SurveyInput existed
             $this->SurveyInput->recursive = 0;
             $surveyInputId = $this->SurveyInput->find('first', array(
@@ -1746,10 +1784,10 @@ class EvaluationComponent extends Object
                 'fields' => array('SurveyInput.id')
             ));
             if ($surveyInputId) {
-                $surveyInput[$i]['SurveyInput']['id'] = $surveyInputId['SurveyInput']['id'];
+                $surveyInput[$i+$j]['SurveyInput']['id'] = $surveyInputId['SurveyInput']['id'];
             }
             //Save data
-            if (!$this->SurveyInput->save($surveyInput[$i]['SurveyInput'])) {
+            if (!$this->SurveyInput->save($surveyInput[$i+$j]['SurveyInput'])) {
                 $successfullySaved=false;
             }
         }
@@ -2050,9 +2088,10 @@ class EvaluationComponent extends Object
 
         $result = array();
         $survey_id = $surveyId;
-
+        
         // Get all required data from each table for every question
-        $tmp = $this->SurveyQuestion->getQuestionsID($survey_id);
+        $surveyQuestion = new SurveyQuestion();
+        $tmp = $surveyQuestion->getQuestionsID($survey_id);
         $tmp = $this->Question->fillQuestion($tmp);
         $tmp = $this->Response->fillResponse($tmp);
 

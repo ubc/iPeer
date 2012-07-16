@@ -4,9 +4,9 @@
         <?php
         for ($i=0; $i < count($surveysList); $i++) {
             if ($surveysList[$i]['id'] == $eventId) {
-                echo '<option selected="selected" value="/surveygroups/viewresult/'.$surveysList[$i]['id'].'">'.$surveysList[$i]['title'].'</option>';        
+                echo '<option selected="selected" value="'.$surveysList[$i]['id'].'">'.$surveysList[$i]['title'].'</option>';        
             } else {
-                echo '<option value="/surveygroups/viewresult/'.$surveysList[$i]['id'].'">'.$surveysList[$i]['title'].'</option>';
+                echo '<option value="'.$surveysList[$i]['id'].'">'.$surveysList[$i]['title'].'</option>';
             }
         }
         ?>
@@ -55,12 +55,12 @@ function fnFormatDetails ( oTable, nTr )
     var sOut = '<div class="userActionPanel"><ul>';
     
     sOut += '<li>';
-    sOut += '<a href="/users/view/'+aData[0]+'">View Student</a>';
+    sOut += '<a href="<?php echo $this->base; ?>/users/view/'+aData[0]+'">View Student</a>';
     sOut += '</li>';
     
     if (aData[3] != 'Not Submitted') {
         sOut += '<li>';
-        sOut += '<a href="/evaluations/viewEvaluationResults/'+aData[4]+'/'+aData[0]+'">View Result</a>';
+        sOut += '<a href="<?php echo $this->base; ?>/evaluations/viewEvaluationResults/'+aData[4]+'/'+aData[0]+'">View Result</a>';
         sOut += '</li>';
     }
     
