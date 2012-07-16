@@ -33,15 +33,10 @@ class EmailMergeTestCase extends CakeTestCase
     {
     }
 
-    function testCourseInstance()
-    {
-        $this->assertTrue(is_a($this->EmailMerge, 'EmailMerge'));
-    }
-
     function testGetMergeList()
     {
         $mergeList = $this->EmailMerge->getMergeList();
-        $expectedResults = array('{{{USERNAME}}}' => 'Username', '{{{FIRSTNAME}}}' => 'First Name', '{{{LASTNAME}}}' => 'Last Name', '{{{EMAIL}}}' => 'Email Address');
+        $expectedResults = array('{{{USERNAME}}}' => 'Username', '{{{FIRSTNAME}}}' => 'First Name', '{{{LASTNAME}}}' => 'Last Name', '{{{Email}}}' => 'Email Address');
 
         $this->assertEqual($mergeList, $expectedResults);
     }
