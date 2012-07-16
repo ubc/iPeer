@@ -219,7 +219,6 @@ class Event extends AppModel
      */
     function getCourseEvent($courseId=null)
     {
-        //return $this->find('all', 'course_id ='.$courseId);
         return $this->find('all', array(
             'conditions' => array('course_id' => $courseId)
         ));
@@ -234,7 +233,6 @@ class Event extends AppModel
      */
     function getCourseEvalEvent($courseId=null)
     {
-        //return $this->find('all', 'course_id='.$courseId.' AND event_template_type_id!=3');
         return $this->find('all', array(
             'conditions' => array('course_id' => $courseId, 'event_template_type_id !=' => '3')
         ));
@@ -269,22 +267,6 @@ class Event extends AppModel
         return $tmp[0]['Event']['course_id'];
     }
 
-    /**
-     * Get survey id by course id description, this function is not use anymore
-     *
-     * @param int    $courseId course id
-     * @param string $title    title of the event
-     *
-     * @return survey id
-     */
-    /*function getSurveyEventIdByCourseIdDescription($courseId = null)
-{
-        //return $this->find('course_id='.$courseId.' AND title=\''.$title.'\' AND event_template_type_id=3', 'id');
-        return $this->find('first', array(
-            'conditions' => array('course_id' => $courseId, 'event_template_type_id' => '3'),
-            'fields' => array('Event.id')
-        ));
-    }*/
 
     /**
      * Get active survey events by course id
@@ -301,12 +283,6 @@ class Event extends AppModel
         ));
     }
 
-    // deprecated function, use event_count attribute instead
-    /*function checkEvaluationToolInUse($evalTool=null, $templateId=null)
-    {
-        $event = $this->find('event_template_type_id = '.$evalTool.' AND template_id = '.$templateId);
-        return !empty($event);
-    }*/
 
     /**
      * cascadeRemove
@@ -336,7 +312,6 @@ class Event extends AppModel
         $evaluation_mixeval = new EvaluationMixeval();
         $evaluation_mixeval_detail = new EvaluationMixevalDetail();
 
-        //$ems = $evaluation_mixeval->find('all', 'event_id = '.$this->id);
         $ems = $evaluation_mixeval->find('all', array(
             'conditions' => array('event_id' => $this->id)
         ));
@@ -382,7 +357,6 @@ class Event extends AppModel
      */
     function removeEventsBySurveyId($survey_id)
     {
-        //$events = $this->find('all', $this->name.'.event_template_type_id = 3 AND '.$this->name.'.template_id = '.$survey_id);
         $events = $this->find('all', array(
             'conditions' => array($this->name.'.event_template_type_id' => '3' , $this->name.'.template_id' => $survey_id)
         ));
@@ -494,25 +468,6 @@ class Event extends AppModel
      */
     function formatEventObj ($eventId, $groupId=null)
     {
-        //      //Get the target event
-        //      $this->Event = new Event;
-        //      $this->Event->id = $eventId;
-        //      $event = $this->Event->read();
-        //
-        //      //Get the group name
-        //      if ($groupId != null) {
-        //        $this->Group = new Group;
-        //        $this->Group->id = $groupId;
-        //
-        //        $group = $this->Group->read();
-        //        $event['group_name'] = 'Group '.$group['Group']['group_num'].' - '.$group['Group']['group_name'];
-        //        $event['group_id'] = $group['Group']['id'];
-        //
-        //        $this->GroupEvent = new GroupEvent;
-        //        $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
-        //        $event['group_event_id'] = $groupEvent['GroupEvent']['id'];
-        //        $event['group_event_marked'] = $groupEvent['GroupEvent']['marked'];
-        //      }
         $this->recursive = 0;
         $conditions['Event.id'] = $eventId;
         if ($groupId != null) {

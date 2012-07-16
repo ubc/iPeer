@@ -32,12 +32,6 @@ class EventTestCase extends CakeTestCase
 
     function endTest($method)
     {
-        $this->flushDatabase();
-    }
-
-    function testCourseInstance()
-    {
-        $this->assertTrue(is_a($this->Event, 'Event'));
     }
 
     function testGetCourseEvent()
@@ -48,11 +42,13 @@ class EventTestCase extends CakeTestCase
         $this->Event = & ClassRegistry::init('Event');
 
         //Test a valid course number
-        $course = $this->Event->getCourseEvent(2);
+        $course = $this->Event->getCourseEvent(1);
         $events = $this->toEventNameArray($course);
-        $this->assertEqual($events, array('Event3', 'Event4'));
-        $this->assertEqual($course[0]['Event']['title'], 'Event3');
-        $this->assertEqual($course[1]['Event']['title'], 'Event4');
+        $this->assertEqual($events, array('Term 1 Evaluation', 'Term Report Evaluation', 'Project Evaluation', 'Team Creation Survey'));
+        $this->assertEqual($course[0]['Event']['title'], 'Term 1 Evaluation');
+        $this->assertEqual($course[1]['Event']['title'], 'Term Report Evaluation');
+        $this->assertEqual($course[2]['Event']['title'], 'Project Evaluation');
+        $this->assertEqual($course[3]['Event']['title'], 'Team Creation Survey');
 
         //Test an invalid course number
         $course = $this->Event->getCourseEvent(999);
@@ -68,11 +64,13 @@ class EventTestCase extends CakeTestCase
 
         //Test a valid course number
 
-        $course = $this->Event->GetCourseEvalEvent(2);
+        $course = $this->Event->GetCourseEvalEvent(1);
         $events = $this->toEventNameArray($course);
-        $this->assertEqual($events, array('Event3'));
+        $this->assertEqual($events['0'], 'Term 1 Evaluation');
+        $this->assertEqual($events['1'], 'Term Report Evaluation');
+        $this->assertEqual($events['2'], 'Project Evaluation');
+        
         //Test an invalid course number
-
         $course = $this->Event->GetCourseEvalEvent(999);
         $this->assertEqual($course, $empty);
 
@@ -85,8 +83,8 @@ class EventTestCase extends CakeTestCase
         $this->Event = & ClassRegistry::init('Event');
 
         //Test a valid course number
-        $course = $this->Event->getCourseEventCount(2);
-        $this->assertEqual($course, 2);
+        $course = $this->Event->getCourseEventCount(1);
+        $this->assertEqual($course, 4);
 
         //Test an invalid course number
         $course = $this->Event->getCourseEventCount(999);
@@ -115,32 +113,25 @@ class EventTestCase extends CakeTestCase
         $this->Event = & ClassRegistry::init('Event');
 
         //Test a valid course number
-        $event = $this->Event->getActiveSurveyEvents(2);
+        $event = $this->Event->getActiveSurveyEvents(1);
         $events = $this->toEventNameArray($event);
-        $this->assertEqual($events, array('Event4'));
+        $this->assertEqual($events, array('Team Creation Survey'));
 
         //Test a valid course with one inactive survey
-        $event = $this->Event->getActiveSurveyEvents(3);
+        $event = $this->Event->getActiveSurveyEvents(2);
         $events = $this->toEventNameArray($event);
-        $this->assertEqual($events, array('Event5'));
+        $this->assertEqual($events, array());
 
         //Test invalid course
         $event = $this->Event->getActiveSurveyEvents(4);
         $this->assertEqual($event, $empty);
     }
 
-    /*
-     * this function is not used anywhere
-     *
-     */
-    function testRemoveEventsBySurveyId()
-    {
-    }
 
     function testCheckIfNowLate()
     {
         $late = $this->Event->checkIfNowLate(1);
-        $this->assertTrue($late);
+        $this->assertFalse($late);
         $late = $this->Event->checkIfNowLate(2);
         $this->assertFalse($late);
 
@@ -162,7 +153,8 @@ class EventTestCase extends CakeTestCase
         $groups = $this->Event->getUnassignedGroups($event[0]);
 
         $groups= $this->toGroupArray($groups);
-        $this->assertEqual($groups, array('group3','group4'));
+        // in this case, no unassigned groups
+        $this->assertEqual($groups, array());
 
         //Test valid event with a group assigned
 
@@ -170,17 +162,18 @@ class EventTestCase extends CakeTestCase
         $groups = $this->Event->getUnassignedGroups($event[0], array(1));
 
         $groups= $this->toGroupArray($groups);
-        $this->assertEqual($groups, array('group2', 'group3', 'group4'));
+        $this->assertEqual($groups, array('Lazy Engineers'));
+
         //Test invalid event id
         $event= $this->Event->getCourseEvent(999);
         $this->assertEqual($event, $empty);
 
-        //Test valid event id with invalid gorups
+        //Test valid event id with invalid groups
         $event= $this->Event->getCourseEvent(1);
         $groups = $this->Event->getUnassignedGroups($event[0], 999);
 
         $groups= $this->toGroupArray($groups);
-        $this->assertEqual($groups, array('group1', 'group2', 'group3', 'group4'));
+        $this->assertEqual($groups, array('Reapers', 'Lazy Engineers'));
     }
 
     function testGetEventById()
@@ -191,7 +184,7 @@ class EventTestCase extends CakeTestCase
 
         //Test valid event
         $event = $this->Event->getEventById(1);
-        $this->assertEqual($event['Event']['title'], 'Event1');
+        $this->assertEqual($event['Event']['title'], 'Term 1 Evaluation');
 
         //Test invalid event
         $event = $this->Event->getEventById(999);
@@ -206,19 +199,19 @@ class EventTestCase extends CakeTestCase
         $this->Event = & ClassRegistry::init('Event');
 
         //Test simple eval events
-        $id = $this->Event->getEventTemplateTypeId(2);
+        $id = $this->Event->getEventTemplateTypeId(1);
         $this->assertEqual($id, 1);
 
         //Test rubric events
-        $id = $this->Event->getEventTemplateTypeId(1);
+        $id = $this->Event->getEventTemplateTypeId(2);
         $this->assertEqual($id, 2);
 
         //Test survey eval events
         $id = $this->Event->getEventTemplateTypeId(4);
         $this->assertEqual($id, 3);
 
-        //Test simple eval events
-        $id = $this->Event->getEventTemplateTypeId(7);
+        //Test mixed eval events
+        $id = $this->Event->getEventTemplateTypeId(3);
         $this->assertEqual($id, 4);
 
         //Test invalid events
@@ -227,15 +220,6 @@ class EventTestCase extends CakeTestCase
 
     }
 
-    /*
-     * Function is not used anywhere
-     *
-     */
-
-    function testFormatEventObj()
-    {
-
-    }
 
     function testGetEventTitleById()
     {
@@ -245,7 +229,7 @@ class EventTestCase extends CakeTestCase
 
         //Test valid event
         $title = $this->Event->getEventTitleById(1);
-        $this->assertEqual($title, 'Event1');
+        $this->assertEqual($title, 'Term 1 Evaluation');
 
         //Test invalid event
         $title = $this->Event->getEventTitleById(999);
@@ -257,28 +241,6 @@ class EventTestCase extends CakeTestCase
     #####################################################################################################################################################
     ###############################################     HELPER FUNCTIONS     ############################################################################
     #####################################################################################################################################################
-
-
-    function deleteAllTuples($table)
-    {
-
-        $this->Event= & ClassRegistry::init('Event');
-        $sql = "DELETE FROM $table";
-        $this->Event->query($sql);
-    }
-
-    function flushDatabase()
-    {
-
-        $this->deleteAllTuples('events');
-        $this->deleteAllTuples('courses');
-        $this->deleteAllTuples('users');
-        $this->deleteAllTuples('user_courses');
-        $this->deleteAllTuples('user_enrols');
-        $this->deleteAllTuples('roles_users');
-        $this->deleteAllTuples('groups');
-        $this->deleteAllTuples('groups_members');
-    }
 
 
     function toEventNameArray($events)

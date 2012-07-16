@@ -115,18 +115,27 @@ class GroupsMembersTestCase extends CakeTestCase
         $members = $this->GroupsMembers->getEventGroupMembers(999, false, 3);
         $this->assertEqual(Set::extract('/User/username', $members), null);
     }
+    
 
-    /*
-     * Returns full GroupMembers array instead on group ids only
-     * Not used anywhere anyway
-     *
-     * */
-
-    function testGetGroupsByUserId()
+    function testGetEventGroupMembersNoTutors ()
     {
-        $groups=$this->GroupsMembers->getGroupsByUserId(5);
-        $this->assertEqual($groups['0']['GroupsMembers']['group_id'], 1);
+        //Test group, selfeval
+        $members = $this->GroupsMembers->getEventGroupMembersNoTutors(1, true, 5);
+        $this->assertEqual(Set::extract('/User/username', $members), array('65498451', '65468188', '98985481'));
+
+        //Test group, no selfeval, valid used id
+        $members = $this->GroupsMembers->getEventGroupMembersNoTutors(1, false, 6);
+        $this->assertEqual(Set::extract('/User/username', $members), array('65498451', '98985481'));
+
+        //Test group, no selfeval, invalid used id
+        $members = $this->GroupsMembers->getEventGroupMembersNoTutors(1, false, 999);
+        $this->assertEqual(Set::extract('/User/username', $members), array('65498451', '65468188', '98985481'));
+
+        //Test invalid group
+        $members = $this->GroupsMembers->getEventGroupMembersNoTutors(999, false, 3);
+        $this->assertEqual(Set::extract('/User/username', $members), null);
     }
+
 
     function testCheckMembershipInGroup()
     {

@@ -181,19 +181,6 @@ class GroupsMembers extends AppModel
         ));
     }
 
-    /**
-     * Get groups by user id
-     *
-     * @param int $userId User Id
-     *
-     * @return <type> Groups that the user is in
-     */
-    function getGroupsByUserId($userId)
-    {
-        return $this->find('all', array(
-            'conditions' => array('user_id' => $userId)
-        ));
-    }
 
     /**
      * Check if user is in a group

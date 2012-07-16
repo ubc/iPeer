@@ -70,7 +70,7 @@ class GroupEvent extends AppModel
         $newGroups = array();
         $insertGroups = array();
         $deleteGroups = array();
-        //	for ($i = 1; $i <= $data['group_count']; $i++) array_push($newGroups, $data['group'.$i]);
+
         for ($i = 0; $i < count($data['Member']); $i++) {
             if (!empty($data['Member'])) {
                 array_push($newGroups, $data['Member'][$i]);
@@ -90,7 +90,6 @@ class GroupEvent extends AppModel
             $this->id = null;
         }
         foreach ($deleteGroups as $groupId) {
-            //$tmp = $this->find($conditions = array('event_id'=>$id,'group_id'=>$groupId), $fields = 'id');
             $tmp = $this->find('first', array(
                 'conditions' => array('event_id'=>$id,'group_id'=>$groupId),
                 'fields' => array('GroupEvent.id')

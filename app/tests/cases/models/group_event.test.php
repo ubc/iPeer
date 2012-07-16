@@ -33,11 +33,6 @@ class GroupEventTestCase extends CakeTestCase {
     {
     }
 
-    function testCourseInstance()
-    {
-        $this->assertTrue(is_a($this->GroupEvent, 'GroupEvent'));
-    }
-
     function testUpdateGroups()
     {
         $data = array();
@@ -59,10 +54,6 @@ class GroupEventTestCase extends CakeTestCase {
         $groups = $this->GroupEvent->getGroupIDsByEventId(1);
         $this->assertEqual(Set::extract('/GroupEvent/group_id', $groups), array(1,2));
 
-        //Test valid event with no groups
-        $groups = $this->GroupEvent->getGroupIDsByEventId(3);
-        $this->assertEqual($groups, null);
-
         //Test invalid event
         $groups = $this->GroupEvent->getGroupIDsByEventId(999);
         $this->assertEqual($groups, null);
@@ -73,10 +64,6 @@ class GroupEventTestCase extends CakeTestCase {
         //Test valid event with groups
         $groups = $this->GroupEvent->getGroupListByEventId(1);
         $this->assertEqual(Set::extract('/GroupEvent/group_id', $groups), array(1,2));
-
-        //Test valid event with no groups
-        $groups = $this->GroupEvent->getGroupListByEventId(3);
-        $this->assertEqual($groups, null);
 
         //Test invalid event
         $groups = $this->GroupEvent->getGroupListByEventId(999);
@@ -89,10 +76,6 @@ class GroupEventTestCase extends CakeTestCase {
         $group = $this->GroupEvent->getGroupEventByEventIdGroupId(1, 1);
         $this->assertEqual($group['GroupEvent']['group_id'], '1');
         $this->assertEqual($group['GroupEvent']['event_id'], '1');
-
-        //Test valid event and not related valid group
-        $group = $this->GroupEvent->getGroupEventByEventIdGroupId(1, 3);
-        $this->assertEqual($group, null);
 
         //Test valid event and invalid group
         $group = $this->GroupEvent->getGroupEventByEventIdGroupId(1, 999);
@@ -110,11 +93,11 @@ class GroupEventTestCase extends CakeTestCase {
     function testGetGroupEventByUserId()
     {
         //Test valid user in group
-        $groups = $this->GroupEvent->getGroupEventByUserId(3, 1);
-        $this->assertEqual(Set::extract('/GroupEvent/group_id', $groups), array(1,2));
+        $groups = $this->GroupEvent->getGroupEventByUserId(5, 1);
+        $this->assertEqual(Set::extract('/GroupEvent/group_id', $groups), array(1));
 
         //Test valid user not in group
-        $groups = $this->GroupEvent->getGroupEventByUserId(1, 1);
+        $groups = $this->GroupEvent->getGroupEventByUserId(8, 1);
         $this->assertEqual(Set::extract('/GroupEvent/group_id', $groups), null);
 
         //Test invalid user
@@ -136,9 +119,6 @@ class GroupEventTestCase extends CakeTestCase {
         $this->assertEqual($groups[1]['GroupEvent']['id'], '2');
         $this->assertEqual($groups[1]['GroupEvent']['group_id'], '2');
         $this->assertEqual($groups[1]['GroupEvent']['event_id'], '1');
-        //Test valid event with no groups
-        $groups = $this->GroupEvent->getGroupsByEventId(3);
-        $this->assertEqual($groups, null);
 
         //Test invalid event
         $groups = $this->GroupEvent->getGroupsByEventId(999);
@@ -147,18 +127,15 @@ class GroupEventTestCase extends CakeTestCase {
 
     function testGetLowMark()
     {
-        $event = $this->GroupEvent->getLowMark(1, 2, 100, 0);
+        $event = $this->GroupEvent->getLowMark(1, 1, 100, 0);
+        $this->assertEqual(Set::extract('/GroupEvent/group_id', $event), array(1, 2));
     }
 
     function testGetNotReviewed()
     {
         //Test event with not reviewed
         $events = $this->GroupEvent->getNotReviewed(1);
-        $this->assertEqual(Set::extract('/GroupEvent/id', $events), array(2));
-
-        //Test event with reviewed only
-        $events = $this->GroupEvent->getNotReviewed(2);
-        $this->assertEqual(Set::extract('/GroupEvent/id', $events), null);
+        $this->assertEqual(Set::extract('/GroupEvent/id', $events), array(1, 2));
 
         //Test invalid event
         $events = $this->GroupEvent->getNotReviewed(999);
@@ -168,7 +145,7 @@ class GroupEventTestCase extends CakeTestCase {
     function testGetLateGroupMembers()
     {
         $events = $this->GroupEvent->getLateGroupMembers(1);
-        $this->assertEqual($events, 1);
+        $this->assertEqual($events, 0);
 
         $events = $this->GroupEvent->getLateGroupMembers(999);
         $this->assertFalse($events);
@@ -179,10 +156,6 @@ class GroupEventTestCase extends CakeTestCase {
 
     function testGetLate()
     {
-        //Test events with late groups
-        $events = $this->GroupEvent->getLate(1);
-        $this->assertEqual(Set::extract('/GroupEvent/id', $events), array(1, 2));
-
         //Test events with no late groups
         $events = $this->GroupEvent->getLate(2);
         $this->assertEqual(Set::extract('/GroupEvent/id', $events), null);
@@ -198,10 +171,6 @@ class GroupEventTestCase extends CakeTestCase {
         $groups = $this->GroupEvent->getGroupEventByEventId(1);
         $this->assertEqual(Set::extract('/GroupEvent/id', $groups), array(1, 2));
 
-        //Test valid event with no groups
-        $groups = $this->GroupEvent->getGroupEventByEventId(3);
-        $this->assertEqual($groups, null);
-
         //Test invalid event
         $groups = $this->GroupEvent->getGroupEventByEventId(999);
         $this->assertEqual($groups, null);
@@ -212,10 +181,6 @@ class GroupEventTestCase extends CakeTestCase {
         //Test valid event and valid group
         $group = $this->GroupEvent->getGroupEventByEventIdAndGroupId(2, 1);
         $this->assertEqual($group, 3);
-
-        //Test valid event and valid group not in group-event
-        $group = $this->GroupEvent->getGroupEventByEventIdAndGroupId(3, 3);
-        $this->assertEqual($group, null);
 
         //Test invalid event and valid group
         $group = $this->GroupEvent->getGroupEventByEventIdAndGroupId(999, 1);
