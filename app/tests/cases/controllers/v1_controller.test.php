@@ -28,7 +28,6 @@ class V1ControllerTest extends CakeTestCase {
     public function testUsers()
     {
         $result = $this->testAction('/v1/users', array('return' => 'vars'));
-        debug($result);
         $this->assertEqual($result['test'], 'test');
     }
 }
