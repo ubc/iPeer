@@ -27,7 +27,25 @@ class V1ControllerTest extends CakeTestCase {
 
     public function testUsers()
     {
+        // build the expected data, a list of all users
+        $users = $this->_fixtures['app.user']->records;
+        $expected = array();
+        foreach ($users as $user) {
+            $tmp = array();
+            $tmp['id'] = $user['id'];
+            $tmp['username'] = $user['username'];
+            $tmp['last_name'] = $user['last_name'];
+            $tmp['first_name'] = $user['first_name'];
+            $expected[] = $tmp;
+        }
+
+        // see that the proper variables are set for passing to the view
         $result = $this->testAction('/v1/users', array('return' => 'vars'));
-        $this->assertEqual($result['test'], 'test');
+        $this->assertEqual($result['users'], $expected);
+
+        // grab data, which should be in json format since it's the view
+        $result = $this->testAction('/v1/users', array('return' => 'view'));
+        $result = json_decode($result, true);
+        $this->assertEqual($expected, $result);
     }
 }

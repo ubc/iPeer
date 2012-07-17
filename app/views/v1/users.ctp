@@ -1,1 +1,5 @@
-empty stuff
+<?php
+	echo json_encode($users);
+	
+	
+?>
