@@ -10,8 +10,6 @@ class UserTestCase extends CakeTestCase {
 	}
 
 	function endTest() {
-		unset($this->User);
-		ClassRegistry::flush();
 	}
 
 	function testFindUserByidWithField() {
