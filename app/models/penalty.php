@@ -103,10 +103,10 @@ class Penalty extends AppModel
             'order' => array('days_late' => 'ASC'))
         );
         // returns the max late penalty index
-        if (!empty($penalty)) {
-            return $penalty[0];
-        } else if (0 >= $daysLate) {
+        if (0 >= $daysLate) {
             return null;
+        } else if (!empty($penalty)) {
+            return $penalty[0];
         } else {
             return $this->getPenaltyFinal($eventId);
         }
