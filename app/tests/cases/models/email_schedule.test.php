@@ -33,27 +33,22 @@ class EmailScheduleTestCase extends CakeTestCase
     {
     }
 
-    function testCourseInstance()
-    {
-        $this->assertTrue(is_a($this->EmailSchedule, 'EmailSchedule'));
-    }
-
     function testGetEmailsToSend()
     {
         $expected[0]['EmailSchedule'] = array(
-            'id'         => 1,
-            'subject'    => 'To send',
-            'content'    => 'This is Test Email',
-            'date'       => '2011-07-10 00:00:00',
-            'from'       => '2',
-            'to'         => '2;3',
+            'id'         => 2,
+            'subject'    => 'Email Template',
+            'content'    => 'Hello, {{{USERNAME}}}',
+            'date'       => '2011-07-18 16:52:31',
+            'from'       => '1',
+            'to'         => '5;6;7;13;15;17;19;21;26;28;31;32;33',
             'course_id'  => null,
             'event_id'   => null,
             'grp_id'     => null,
             'sent'       => 0,
             'creator_id' => 1,
-            'created'    => '2011-06-10 00:00:00',
-            'creator'    => null 
+            'created'    => '2010-07-16 16:57:50',
+            'creator'    => 'Super Admin'
         );
         $emails = $this->EmailSchedule->getEmailsToSend();
         $this->assertEqual($emails, $expected);
@@ -77,7 +72,7 @@ class EmailScheduleTestCase extends CakeTestCase
     function testGetSent()
     {
         //Test on valid input
-        $sent = $this->EmailSchedule->getSent('2');
+        $sent = $this->EmailSchedule->getSent('3');
         $this->assertEqual($sent, '1');
 
         //Test on invalid input
