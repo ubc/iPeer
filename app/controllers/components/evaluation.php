@@ -1729,47 +1729,50 @@ class EvaluationComponent extends Object
             $surveyInput[$i+$j]['SurveyInput']['survey_id'] = $surveyId;
             //Set question Id
             $questionId = $params['form']['question_id'.$i];
+            $questionType = $this->Question->getTypeById($questionId);
             $surveyInput[$i+$j]['SurveyInput']['question_id'] = $questionId;
             //Set answers
             $answer = $params['form']['answer_'.$questionId];
-            foreach ($answer as $data) {     // checkbox loop
-                $modAnswer = $this->Response->find('first', array('conditions' => array('Response.id' => $data)));
-                $surveyInput[$i+$j]['SurveyInput']['response_text']=$modAnswer['Response']['response'];
-                $responseId = $data;
-                $surveyInput[$i+$j]['SurveyInput']['response_id']=$responseId;
-                $surveyInput[$i+$j]['SurveyInput']['chkbx_id']=$j;
-                $this->SurveyInput->recursive = 0;
-                $surveyInputId = $this->SurveyInput->find('first', array(
-                    'conditions' => array('SurveyInput.survey_id' => $surveyId,
-                        'SurveyInput.user_id' => $userId,
-                        'SurveyInput.question_id' => $questionId,
-                        'SurveyInput.chkbx_id' => $j),
-                    'fields' => array('SurveyInput.id')
-                ));
-                if ($surveyInputId) {
-                    $surveyInput[$i+$j]['SurveyInput']['id'] = $surveyInputId['SurveyInput']['id'];
+            if ('C' == $questionType) {
+                foreach ($answer as $data) {     // checkbox loop
+                    $modAnswer = $this->Response->find('first', array('conditions' => array('Response.id' => $data)));
+                    $surveyInput[$i+$j]['SurveyInput']['response_text']=$modAnswer['Response']['response'];
+                    $responseId = $data;
+                    $surveyInput[$i+$j]['SurveyInput']['response_id']=$responseId;
+                    $surveyInput[$i+$j]['SurveyInput']['chkbx_id']=$j;
+                    $this->SurveyInput->recursive = 0;
+                    $surveyInputId = $this->SurveyInput->find('first', array(
+                        'conditions' => array('SurveyInput.survey_id' => $surveyId,
+                            'SurveyInput.user_id' => $userId,
+                            'SurveyInput.question_id' => $questionId,
+                            'SurveyInput.chkbx_id' => $j),
+                        'fields' => array('SurveyInput.id')
+                    ));
+                    if ($surveyInputId) {
+                        $surveyInput[$i+$j]['SurveyInput']['id'] = $surveyInputId['SurveyInput']['id'];
+                    }
+                    // Save data
+                    if (!$this->SurveyInput->save($surveyInput[$i+$j]['SurveyInput'])) {
+                        $successfullySaved=false;
+                    }
+                    $j++;
+                    if ($j == count($answer)) {
+                        $i++;
+                    }
+                    $this->SurveyInput = new SurveyInput;
+                    //Set survey and user id
+                    $surveyInput[$i+$j]['SurveyInput']['user_id'] = $userId;
+                    $surveyInput[$i+$j]['SurveyInput']['survey_id'] = $surveyId;
+                    //Set question Id
+                    $questionId = $params['form']['question_id'.$i];
+                    $surveyInput[$i+$j]['SurveyInput']['question_id'] = $questionId;
+                    //Set answers
+                    $answer = $params['form']['answer_'.$questionId];
                 }
-                // Save data
-                if (!$this->SurveyInput->save($surveyInput[$i+$j]['SurveyInput'])) {
-                    $successfullySaved=false;
-                }
-                $j++;
-                if ($j == count($answer)) {
-                    $i++;
-                }
-                $this->SurveyInput = new SurveyInput;
-                //Set survey and user id
-                $surveyInput[$i+$j]['SurveyInput']['user_id'] = $userId;
-                $surveyInput[$i+$j]['SurveyInput']['survey_id'] = $surveyId;
-                //Set question Id
-                $questionId = $params['form']['question_id'.$i];
-                $surveyInput[$i+$j]['SurveyInput']['question_id'] = $questionId;
-                //Set answers
-                $answer = $params['form']['answer_'.$questionId];
             }
-            $modAnswer = $this->Response->find('first', array('conditions' => array('Response.id' => $answer)));
-            // check for fill in blanks (in which $answer holds text answer instead of response id)
-            if ($modAnswer == null) { 
+            if ('M' == $questionType) {
+                $modAnswer = $this->Response->find('first', array('conditions' => array('Response.id' => $answer)));
+            } else { 
                 $modAnswer['Response']['response'] = $answer;
             }
             $surveyInput[$i+$j]['SurveyInput']['response_text']=$modAnswer['Response']['response'];
