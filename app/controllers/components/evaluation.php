@@ -1734,7 +1734,7 @@ class EvaluationComponent extends Object
             //Set answers
             $answer = $params['form']['answer_'.$questionId];
             if ('C' == $questionType) {
-                foreach ($answer as $data) {     // checkbox loop
+                foreach ($answer as $data) {
                     $modAnswer = $this->Response->find('first', array('conditions' => array('Response.id' => $data)));
                     $surveyInput[$i+$j]['SurveyInput']['response_text']=$modAnswer['Response']['response'];
                     $responseId = $data;

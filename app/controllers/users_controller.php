@@ -713,10 +713,11 @@ class UsersController extends AppController
                     "<a href='../../home/'>".__('Go to your iPeer Home page.', true)."</a><br />"), 'good');
             }
         }
-        if ($this->User->getRoleName($id) == "student")
+        if ($this->User->getRoleName($id) == "student") {
             $isStudent = true;
-        else
+        } else {
             $isStudent = false;
+        }
         $this->data = $this->User->read(null, $id);
         $this->Output->br2nl($this->data);
         $this->set('is_student', $isStudent);

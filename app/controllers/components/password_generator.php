@@ -140,8 +140,7 @@ class PasswordGeneratorComponent extends Object {
         if ($pr_bits) { 
             $pr_bits = $this->binconvert($pr_bits, true); 
         }
-      } 
-      catch (Exception $ex) {
+      } catch (Exception $ex) {
         return "";
       }
     }
