@@ -1723,9 +1723,9 @@ CREATE TABLE IF NOT EXISTS `survey_inputs` (
 --
 
 INSERT INTO survey_inputs (id, survey_id, user_id, question_id, sub_id, response_text, response_id) VALUES
-(1, 2, 7, 1, NULL, '+', NULL),
+(1, 2, 7, 1, NULL, '4+', 1),
 (2, 2, 7, 2, NULL, 'yes', 5),
-(3, 2, 31, 1, NULL, '-', NULL),
+(3, 2, 31, 1, NULL, '3-4', 2),
 (4, 2, 31, 2, NULL, 'no', 6);
 
 -- --------------------------------------------------------

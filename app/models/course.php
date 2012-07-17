@@ -211,7 +211,7 @@ class Course extends AppModel
     }
 
     /**
-     * Get cource name by id
+     * Get course name by id
      *
      * @param unknown_type $id course id
      *

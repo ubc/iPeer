@@ -29,7 +29,7 @@
 					echo "<input type=\"hidden\" name=\"question_id".$question['number']."\" value=\"".$question['id']."\"/>";
 					if( !empty($question['Responses'])){
 						foreach ($question['Responses'] as $index => $value):
-							echo "<input type=\"radio\" name=\"answer_".$question['id']."\" value=\"".$value['response']."_".$value['id']."\" > ".$value['response']."<br>";
+							echo "<input type=\"radio\" name=\"answer_".$question['id']."\" value=\"".$value['id']."\" > ".$value['response']."<br>";
 						endforeach;
 					}
 					echo "</td></tr>";
@@ -42,7 +42,7 @@
 
 					if( !empty($question['Responses'])){
 						foreach ($question['Responses'] as $index => $value):
-							echo "<input type=\"checkbox\" name=\"answer_".$question['id']."[]\" value=\"".$value['response']."_".$value['id']."\" > ".$value['response']."<br>";
+							echo "<input type=\"checkbox\" name=\"answer_".$question['id']."[]\" value=\"".$value['id']."\" > ".$value['response']."<br>";
 						endforeach;
 					}
 					echo "</td></tr>";
