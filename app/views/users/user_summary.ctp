@@ -20,7 +20,8 @@
   <?php endif; ?>
 
   <div class="button-row">
-    <?php echo $html->link(__('Back to User Add', true), '/users/add/'); ?>&nbsp;|&nbsp;
+    &nbsp;<?php echo $html->link(__('Back to User Add', true), '/users/add/'); ?> &nbsp;|&nbsp;
+    <?php echo $html->link(__('Back to Student Import', true), '/users/import/'); ?> &nbsp;|&nbsp;
     <?php echo $html->link(__('Back to User Listing', true), '/users/index/'); ?>
     <?php echo (!empty($course_id)) ? '&nbsp;|&nbsp;' . $html->link(__('Back to Course Home', true), '/courses/home/'.$course_id) : '';?>
   </div>

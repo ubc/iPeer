@@ -33,19 +33,19 @@
       <?php echo $this->Form->input('student_no', array('size'=>'50', 'class'=>'validate none', 'label' => __('Student Number', true))) ?>
       <td id="student_no_msg" class="error"></td>
     </tr>
-    <?php } else {
-        if(!$is_student) {?>
+    <?php } else { ?>
     <!-- Title -->
     <tr class="tablecell2 nonstudent_field">
       <?php echo $this->Form->input('title', array('size'=>'50', 'class'=>'validate none TEXT_FORMAT title_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'label' => __('Title', true))) ?>
       <td id="title_msg" class="error"></td>
     </tr>
-    <?php }}?>
+    <?php }?>
+    
     <tr class="tablecell2">
       <td colspan="3"><hr align=left width=100%><h3><?php __('Change Password')?>:</h3></td>
     </tr>
     <tr class="tablecell2">
-      <?php echo $this->Form->input('old_password', array('type' => 'password', 'size'=>'50', 'class'=>'validate none PASSWORD_FORMAT pw_msg0 Invalid_Password_Format.', 'label'=>__('Old Password:', true), 'disabled'=>$viewPage)) ?>
+      <?php echo $this->Form->input('old_password', array('type'=>'password', 'size'=>'50', 'class'=>'validate none PASSWORD_FORMAT pw_msg0 Invalid_Password_Format.', 'label'=>__('Old Password:', true), 'disabled'=>$viewPage)) ?>
       <td id="pw_msg0" class="error"/>
     </tr>
     <tr class="tablecell2">

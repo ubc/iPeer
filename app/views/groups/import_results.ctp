@@ -5,7 +5,7 @@
     <tr><td>
     <center style="font-size:150%"><?php __('The group CSV file was processed.')?></center><br />
     <center><?php __('Click OK to return
-    to the list of groups, or look bellow for the results of the import.')?>
+    to the list of groups, or look below for the results of the import.')?>
     <br /> <br />
     <input type="button" name="Okay" value="OK" onClick="window.location='<?php echo $this->webroot . "groups/goToClassList/". $courseId ?>'";>
     </center>

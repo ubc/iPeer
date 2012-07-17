@@ -1,7 +1,7 @@
 <?php $readonly = isset($readonly) ? $readonly : false;
       $action = ($this->action == 'copy' ? 'add' : $this->action);
 ?>
-<!--<?php //echo $html->script('events'); // For vallidation of dates?>-->
+<!--<?php //echo $html->script('events'); // For validation of dates?>-->
 <?php echo $html->script('calendar1')?>
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
 <tr>
@@ -39,13 +39,12 @@
         <td>&nbsp;</td>
         </tr>
         <?php elseif('copy' == $this->action):?>
-        <?php echo $this->Form->input('template_id', array('type' => 'hidden',
-                                                           'value' => $template_id))?>
+        <?php echo $this->Form->input('template_id', array('type' => 'hidden', 'value' => $template_id))?>
         <?php endif;?>
 
         <tr class="tablecell2">
         <?php echo $this->Form->input('course_id', array('label' => __('Assigned Course:', true).'<font color="red">*</font>'));?>
-          <td>&nbsp;</td>
+          <td></td>
         </tr>
         <tr class="tablecell2">
         <td><?php echo __('Due Date', true).':<font color="red">*</font>'?></td>

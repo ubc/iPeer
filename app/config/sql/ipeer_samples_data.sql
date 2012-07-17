@@ -1713,6 +1713,7 @@ CREATE TABLE IF NOT EXISTS `survey_inputs` (
   `user_id` int(11) NOT NULL DEFAULT '0',
   `question_id` int(11) NOT NULL DEFAULT '0',
   `sub_id` int(11) DEFAULT NULL,
+  `chkbx_id` int(11) DEFAULT NULL,
   `response_text` text,
   `response_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
