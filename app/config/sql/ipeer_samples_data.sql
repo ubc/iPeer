@@ -1027,7 +1027,8 @@ INSERT INTO evaluation_submissions (id, event_id, grp_event_id, submitter_id, su
 (5, 2, 4, 31, 1, '2012-07-13 11:04:11', 'A', 31, '2012-07-13 11:04:11', 31, '2012-07-13 11:04:11'),
 (6, 3, 6, 31, 1, '2012-07-13 11:06:23', 'A', 31, '2012-07-13 11:06:23', 31, '2012-07-13 11:06:23'),
 (7, 4, NULL, 7, 1, '2012-07-13 11:23:31', 'A', 7, '2012-07-13 11:23:31', 7, '2012-07-13 11:23:31'),
-(8, 4, NULL, 31, 1, '2012-07-13 11:24:09', 'A', 31, '2012-07-13 11:24:09', 31, '2012-07-13 11:24:09');
+(8, 4, NULL, 31, 1, '2012-07-13 11:24:09', 'A', 31, '2012-07-13 11:24:09', 31, '2012-07-13 11:24:09'),
+(9, 5, NULL, 17, 1, '2012-07-17 10:10:10', 'A', 17, '2012-07-17 10:10:10', 17, '2012-07-17 10:10:10');
 
 -- --------------------------------------------------------
 
@@ -1099,7 +1100,8 @@ INSERT INTO events (id, title, course_id, description, event_template_type_id, t
 (1, 'Term 1 Evaluation', 1, '', 1, 1, '0', 0, '2013-07-02 16:34:43', '2011-06-16 16:34:49', '2013-07-22 16:34:53', '2012-07-04 16:34:43', '2013-07-30 16:34:43', 'A', 1, '2006-06-20 16:27:33', 1, '2006-06-21 08:51:20'),
 (2, 'Term Report Evaluation', 1, '', 2, 1, '0', 0, '2013-06-08 08:59:29', '2011-06-06 08:59:35', '2013-07-02 08:59:41', '2012-06-09 08:59:29', '2013-07-08 08:59:29', 'A', 1, '2006-06-21 08:52:20', 1, '2006-06-21 08:54:25'),
 (3, 'Project Evaluation', 1, '', 4, 1, '0', 0, '2013-07-02 09:00:28', '2011-06-07 09:00:35', '2013-07-09 09:00:39', '2012-07-04 09:00:28', '2013-07-12 09:00:28', 'A', 1, '2006-06-21 08:53:14', 1, '2006-06-21 09:07:26'),
-(4, 'Team Creation Survey', 1, NULL, 3, 2, '1', 1, '2013-07-31 11:20:00', '2012-07-01 11:20:00', '2013-12-31 11:20:00', NULL, NULL, 'A', 2, '2012-07-13 11:18:56', 2, '2012-07-13 11:18:56');
+(4, 'Team Creation Survey', 1, NULL, 3, 2, '1', 1, '2013-07-31 11:20:00', '2012-07-01 11:20:00', '2013-12-31 11:20:00', NULL, NULL, 'A', 2, '2012-07-13 11:18:56', 2, '2012-07-13 11:18:56'),
+(5, 'Survey, all Q types', 1, NULL, 3, 2, '1', 1, '2013-07-31 11:20:00', '2012-07-01 11:20:00', '2013-12-31 11:20:00', NULL, NULL, 'A', 1, '2012-07-13 11:18:56', 1, '2012-07-13 11:18:56');
 
 -- --------------------------------------------------------
 
@@ -1372,6 +1374,10 @@ CREATE TABLE IF NOT EXISTS `questions` (
 
 INSERT INTO `questions` VALUES (1, 'What was your GPA last term?', 'M', 'no');
 INSERT INTO `questions` VALUES (2, 'Do you own a laptop?', 'M', 'no');
+INSERT INTO `questions` VALUES (3, 'Testing out MC', 'M', 'no');
+INSERT INTO `questions` VALUES (4, 'Testing out checkboxes', 'C', 'no');
+INSERT INTO `questions` VALUES (5, 'Testing out single line answers', 'S', 'no');
+INSERT INTO `questions` VALUES (6, 'Testing out multi-line long answers', 'L', 'no');
 
 -- --------------------------------------------------------
 
@@ -1394,9 +1400,16 @@ CREATE TABLE IF NOT EXISTS `responses` (
 INSERT INTO `responses` VALUES (1, 1, '4+');
 INSERT INTO `responses` VALUES (2, 1, '3-4');
 INSERT INTO `responses` VALUES (3, 1, '2-3');
-INSERT INTO `responses` VALUES (4, 1, '< 2');
+INSERT INTO `responses` VALUES (4, 1, '<2');
 INSERT INTO `responses` VALUES (5, 2, 'yes');
 INSERT INTO `responses` VALUES (6, 2, 'no');
+INSERT INTO `responses` VALUES (7, 3, 'A');
+INSERT INTO `responses` VALUES (8, 3, 'B');
+INSERT INTO `responses` VALUES (9, 3, 'C');
+INSERT INTO `responses` VALUES (10, 3, 'D');
+INSERT INTO `responses` VALUES (11, 4, 'choose me');
+INSERT INTO `responses` VALUES (12, 4, 'no, me');
+INSERT INTO `responses` VALUES (13, 4, 'me please');
 
 -- --------------------------------------------------------
 
@@ -1723,11 +1736,16 @@ CREATE TABLE IF NOT EXISTS `survey_inputs` (
 -- Dumping data for table `survey_inputs`
 --
 
-INSERT INTO survey_inputs (id, survey_id, user_id, question_id, sub_id, response_text, response_id) VALUES
-(1, 2, 7, 1, NULL, '4+', 1),
-(2, 2, 7, 2, NULL, 'yes', 5),
-(3, 2, 31, 1, NULL, '3-4', 2),
-(4, 2, 31, 2, NULL, 'no', 6);
+INSERT INTO survey_inputs (id, survey_id, user_id, question_id, sub_id, chkbx_id, response_text, response_id) VALUES
+(1, 1, 7, 1, NULL, NULL, '4+', 1),
+(2, 1, 7, 2, NULL, NULL, 'yes', 5),
+(3, 1, 31, 1, NULL, NULL, '3-4', 2),
+(4, 1, 31, 2, NULL, NULL, 'no', 6),
+(5, 2, 17, 3, NULL, NULL, 'B', 8),
+(6, 2, 17, 4, NULL, 0, 'choose me', 11),
+(7, 2, 17, 4, NULL, 1, 'no, me', 12),
+(8, 2, 17, 5, NULL, NULL, 'single line rah rah', 0),
+(9, 2, 17, 6, NULL, NULL, 'long answer what what', 0);
 
 -- --------------------------------------------------------
 
@@ -1752,7 +1770,11 @@ CREATE TABLE IF NOT EXISTS `survey_questions` (
 
 INSERT INTO survey_questions (id, survey_id, number, question_id) VALUES
 (1, 1, 1, 1),
-(2, 1, 2, 2);
+(2, 1, 2, 2),
+(3, 2, 1, 3),
+(4, 2, 2, 4),
+(5, 2, 3, 5),
+(6, 2, 4, 6);
 
 -- --------------------------------------------------------
 
@@ -1782,7 +1804,8 @@ CREATE TABLE IF NOT EXISTS `surveys` (
 --
 
 INSERT INTO surveys (id, course_id, user_id, name, due_date, release_date_begin, release_date_end, released, creator_id, created, updater_id, modified) VALUES
-(1, 1, 1, 'Team Creation Survey', '2013-07-31 11:20:00', '2012-07-01 11:20:00', '2013-12-31 11:20:00', 0, 2, '2012-07-13 11:18:56', 2, '2012-07-13 11:18:56');
+(1, 1, 1, 'Team Creation Survey', '2013-07-31 11:20:00', '2012-07-01 11:20:00', '2013-12-31 11:20:00', 0, 2, '2012-07-13 11:18:56', 2, '2012-07-13 11:18:56'),
+(2, 1, 1, 'Survey, all Q types', '2013-07-31 11:20:00', '2012-07-01 11:20:00', '2013-12-31 11:20:00', 0, 1, '2012-07-13 11:18:56', 1, '2012-07-13 11:18:56');
 -- --------------------------------------------------------
 
 --
