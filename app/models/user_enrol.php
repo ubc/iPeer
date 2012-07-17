@@ -26,7 +26,6 @@ class UserEnrol extends AppModel
      */
     function removeStudentFromCourse($user_id=null, $course_id=null)
     {
-        //$course_to_remove = $this->find(array('course_id=' . $course_id, 'user_id=' . $user_id));
         $course_to_remove = $this->find('first', array(
             'conditions' => array('course_id' => $course_id, 'user_id' => $user_id)
         ));

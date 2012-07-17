@@ -1770,6 +1770,7 @@ class EvaluationComponent extends Object
                     $answer = $params['form']['answer_'.$questionId];
                 }
             }
+
             if ('M' == $questionType) {
                 $modAnswer = $this->Response->find('first', array('conditions' => array('Response.id' => $answer)));
             } else { 

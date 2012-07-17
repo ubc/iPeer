@@ -1976,6 +1976,7 @@ INSERT INTO `user_enrols` VALUES (26, 2, 30, 'A', 0, '2006-06-20 15:08:47', NULL
 INSERT INTO `user_enrols` VALUES (27, 1, 31, 'A', 0, '2006-06-20 15:10:16', NULL, '2006-06-20 15:10:16');
 INSERT INTO `user_enrols` VALUES (28, 1, 32, 'A', 0, '2006-06-20 15:10:32', NULL, '2006-06-20 15:10:32');
 INSERT INTO `user_enrols` VALUES (29, 1, 33, 'A', 0, '2006-06-21 08:44:09', NULL, '2006-06-21 08:44:09');
+INSERT INTO `user_enrols` VALUES (30, 2, 7, 'A', 0, '2006-06-21 08:44:09', NULL, '2006-06-21 08:44:09');
 
 -- --------------------------------------------------------
 
