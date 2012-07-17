@@ -33,6 +33,7 @@ class GroupEventTestCase extends CakeTestCase {
     {
     }
 
+    /*
     function testUpdateGroups()
     {
         $data = array();
@@ -195,4 +196,5 @@ class GroupEventTestCase extends CakeTestCase {
         $this->assertEqual($group, null);
 
     }
+*/
 }
