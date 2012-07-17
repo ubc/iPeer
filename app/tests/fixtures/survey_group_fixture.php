@@ -11,9 +11,5 @@ class SurveyGroupFixture extends CakeTestFixture
 {
     public $name = 'SurveyGroup';
 
-    public $import = 'SurveyGroup';
-
-    public $records = array(
-        array('id' => 1, 'group_set_id' => 1, 'group_number' => 1)
-    );
+    public $import = array('model' => 'SurveyGroup', 'records' => true);
 }

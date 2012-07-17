@@ -111,32 +111,31 @@ class SurveyInput extends AppModel
     function findCountInSurveyGroup($surveyId, $questionId, $responseId, $surveyGroupId)
     {
         $this->SurveyGroupMembers = ClassRegistry::init('SurveyGroupMembers');
+        $inputs = $this->find(
+            'all', 
+            array('conditions' => array(
+                    'survey_id' => $surveyId,
+                    'question_id' => $questionId,
+                    'response_id' => $responseId
+                )
+            )
+        );
+        $groupMembers = $this->SurveyGroupMembers->find(
+            'all', 
+            array('conditions' => array('group_id' => $surveyGroupId))
+        );
 
-        $conditionSubQuery['`SurveyGroupMembers2`.`group_id`'] = $surveyGroupId;
-        $dbo = $this->SurveyGroupMembers->getDataSource();
-        $subQuery = $dbo->buildStatement(
-            array(
-                'fields' => array('SurveyGroupMembers2.id'),
-                'table'  => $dbo->fullTableName($this->SurveyGroupMembers),
-                'alias'  => 'SurveyGroupMembers2',
-                'limit'  => null,
-                'offset' => null,
-                'joins'  => array(),
-                'conditions' => $conditionSubQuery,
-                'order'  => null,
-                'group'  => null,
-            ),
-            $this->SurveyGroupMembers
-        );
-        $subQuery = ' user_id IN (' . $subQuery . ') ';
-        $subQueryExpression = $dbo->expression($subQuery);
-        $conditions = array(
-            'survey_id' => $surveyId,
-            'question_id' => $questionId,
-            'response_id' => $responseId,
-        );
-        $conditions[] = $subQueryExpression;
-        return $this->find('count', compact('conditions'));
+        $count = 0;
+        foreach ($groupMembers as $member) {
+            foreach ($inputs as $input) {
+                if ($member['SurveyGroupMembers']['user_id'] == 
+                    $input['SurveyInput']['user_id']) {
+                    $count++;
+                    break;
+                }
+            }
+        } 
+        return $count;
     }
 
 

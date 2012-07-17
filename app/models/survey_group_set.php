@@ -83,15 +83,19 @@ class SurveyGroupSet extends AppModel
         if ($result = parent::save($data, $validate, $fieldList)) {
             if (isset($data['SurveyGroup'])) {
                 $SurveyGroup = ClassRegistry::init('SurveyGroup');
+                $groupNum = 1;
                 foreach ($data['SurveyGroup'] as $survey_group) {
                     $survey_group['SurveyGroup']['group_set_id'] = $this->id;
                     if (isset($survey_group['SurveyGroupMember'])) {
                         foreach ($survey_group['SurveyGroupMember'] as $key => $m) {
-                            $survey_group['SurveyGroupMember'][$key]['group_set_id'] = $this->id;
+                            $survey_group['Member'][$key]['SurveyGroupMember']['group_set_id'] = $this->id;
+                            $survey_group['Member'][$key]['SurveyGroupMember']['user_id'] = $m['user_id'];
+                            $survey_group['Member'][$key]['SurveyGroupMember']['group_id'] = $groupNum;
                         }
                     }
-                    $result = $SurveyGroup->saveAll($survey_group, array('validate' => $validate,
+                    $result = $SurveyGroup->save($survey_group, array('validate' => $validate,
                         'atomic' => false));
+                    $groupNum++;
                 }
             }
         }

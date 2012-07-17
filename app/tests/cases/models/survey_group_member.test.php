@@ -41,11 +41,10 @@ class SurveyGroupMemberTestCase extends CakeTestCase
     function testGetIdsByGroupSetId()
     {
         // Set up test data
-        $data = $this->SurveyGroupMember->getIdsByGroupSetId(1);
+        $data = $this->SurveyGroupMember->getIdsByGroupSetId(3);
         // Assert the queried data is infact the fixture data
-        $entry0 = $data[0]['SurveyGroupMember'];
-        $entry1 = $data[1]['SurveyGroupMember'];
-        $this->assertEqual($entry0['id'], 1);
-        $this->assertEqual($entry1['id'], 2);
+        for ($i = 25; $i <= 36; $i++) {
+            $this->assertEqual($data[$i - 25]['SurveyGroupMember']['id'], $i);
+        }
     }
 }

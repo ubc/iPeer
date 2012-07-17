@@ -34,20 +34,17 @@ class SurveyGroupTestCase extends CakeTestCase {
     {
     }
 
-    function testSurveyGroupInstance()
-    {
-        $this->assertTrue(is_a($this->SurveyGroup, 'SurveyGroup'));
-    }
-
     function testGetIdsByGroupSetId()
     {
         // Grab data from fixture
-        $data = $this->SurveyGroup->getIdsByGroupSetId(1);
+        $data = $this->SurveyGroup->getIdsByGroupSetId(3);
         // Assert the function successfully queried the data
         $this->assertNotNull($data);
         $this->assertTrue(isset($data));
         $this->assertTrue(!empty($data));
         // Assert the data is correct
-        $this->assertEqual($data[0]['SurveyGroup']['id'], 1);
+        $this->assertEqual($data[0]['SurveyGroup']['id'], 5);
+        $this->assertEqual($data[1]['SurveyGroup']['id'], 6);
+        $this->assertEqual($data[2]['SurveyGroup']['id'], 7);
     }
 }

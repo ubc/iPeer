@@ -40,11 +40,6 @@ class SurveyGroupSetTestCase extends CakeTestCase
     {
     }
 
-    function testSurveyGroupSetInstance()
-    {
-        $this->assertTrue(is_a($this->SurveyGroupSet, 'SurveyGroupSet'));
-    }
-
     function testSave()
     {
         // Set up test data
@@ -52,10 +47,10 @@ class SurveyGroupSetTestCase extends CakeTestCase
         $this->SurveyGroupSet->save($input);
 
         // Assert that data has been saved in database
-        $searchedAll = $this->SurveyGroupSet->find('first', array('conditions' => array('SurveyGroupSet.id' => 1)));
-        $searchedSurveyGroup = $this->SurveyGroup->find('first', array('conditions' => array('group_set_id' => 1)));
-        $searchedSurveyGroupMember1 = $this->SurveyGroupMember->find('first', array('conditions' => array('group_set_id' => 1, 'user_id' => 1)));
-        $searchedSurveyGroupMember2 = $this->SurveyGroupMember->find('first', array('conditions' => array('group_set_id' => 1, 'user_id' => 2)));
+        $searchedAll = $this->SurveyGroupSet->find('first', array('conditions' => array('SurveyGroupSet.id' => 50)));
+        $searchedSurveyGroup = $this->SurveyGroup->find('first', array('conditions' => array('group_set_id' => 50)));
+        $searchedSurveyGroupMember1 = $this->SurveyGroupMember->find('first', array('conditions' => array('group_set_id' => 50, 'user_id' => 10)));
+        $searchedSurveyGroupMember2 = $this->SurveyGroupMember->find('first', array('conditions' => array('group_set_id' => 50, 'user_id' => 11)));
         $this->assertTrue(!empty($searchedAll));
         $this->assertTrue(!empty($searchedSurveyGroup));
         $this->assertTrue(!empty($searchedSurveyGroupMember1));
@@ -70,38 +65,43 @@ class SurveyGroupSetTestCase extends CakeTestCase
         $this->assertTrue(isset($searchedSurveyGroupMember2));
 
         // Assert the data is saved correctly
-        $this->assertEqual($searchedAll['SurveyGroupSet']['id'], 1);
+        $this->assertEqual($searchedAll['SurveyGroupSet']['id'], 50);
         $this->assertEqual($searchedAll['SurveyGroupSet']['survey_id'], 1);
-        $this->assertEqual($searchedAll['SurveyGroupSet']['set_description'], '303 GROUP');
-        $this->assertEqual($searchedSurveyGroup['SurveyGroup']['group_set_id'], 1);
-        $this->assertEqual($searchedSurveyGroupMember1['SurveyGroupMember']['id'], 1);
-        $this->assertEqual($searchedSurveyGroupMember2['SurveyGroupMember']['id'], 2);
+        $this->assertEqual($searchedAll['SurveyGroupSet']['set_description'], 'Test Group');
+        $this->assertEqual($searchedSurveyGroup['SurveyGroup']['group_set_id'], 50);
+        $this->assertEqual($searchedSurveyGroupMember1['SurveyGroupMember']['id'], 37);
+        $this->assertEqual($searchedSurveyGroupMember2['SurveyGroupMember']['id'], 38);
     }
 
     function testRelease()
     {
-        // Release surveyGroup 1 in the fixture
-        $this->SurveyGroupSet->release(1);
-        // Assert that surveyGroup 1 is released
-        $released = $this->SurveyGroupSet->find('first', array('conditions' => array('SurveyGroupSet.id' => 1)));
+        // Release surveyGroup in the fixture
+        $this->SurveyGroupSet->release(3);
+        // Assert that surveyGroup is released
+        $released = $this->SurveyGroupSet->find('first', array('conditions' => array('SurveyGroupSet.id' => 3)));
         $this->assertEqual($released['SurveyGroupSet']['released'], 1);
 
         // Assert that an associated group has been added, as specified by the function
-        $expectedGroupName = 'HELLO 1 Team #1';
-        $addedGroup = $this->Group->find('first', array('conditions' => array('group_name' => 'HELLO 1 Team #1')));
+        $groupName = 'test groupset Team #1'; 
+        $addedGroup = $this->Group->find(
+            'first', 
+            array('conditions' => 
+                array('group_name' => $groupName)
+            )
+        );
         $this->assertTrue(!empty($addedGroup));
         $this->assertNotNull($addedGroup);
         $this->assertTrue(isset($addedGroup));
-        $this->assertEqual($addedGroup['Group']['group_name'], $expectedGroupName);
+        $this->assertEqual($addedGroup['Group']['group_name'], $groupName);
     }
 
     function setUpTestInput()
     {
         $tmp = array(
             'SurveyGroupSet' => array(
-                'id' => 1,
+                'id' => 50,
                 'survey_id' => 1,
-                'set_description' => '303 GROUP',
+                'set_description' => 'Test Group',
                 'num_groups' => 1,
                 'date' => 1308770251
             ),
