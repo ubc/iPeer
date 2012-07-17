@@ -66,7 +66,7 @@ class EvaluationSubmissionTestCase extends CakeTestCase
     function testNumCountInGroupCompleted()
     {
         $result = $this->EvaluationSubmission->numCountInGroupCompleted(2, 1);
-        $this->assertEqual($result, 2);
+        $this->assertEqual($result, 1);
 
         $result = $this->EvaluationSubmission->numCountInGroupCompleted(100);
         $this->assertFalse($result);
@@ -74,7 +74,7 @@ class EvaluationSubmissionTestCase extends CakeTestCase
 
     function testDaysLate()
     {
-        $result = $this->EvaluationSubmission->daysLate(1, '2011-06-10 00:00:01');
+        $result = $this->EvaluationSubmission->daysLate(1, '2013-07-03 00:00:01');
         $this->assertEqual($result, 1);
     }
 

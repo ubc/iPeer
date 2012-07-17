@@ -103,18 +103,27 @@ class EvaluationRubricTestCase extends CakeTestCase
         $this->assertTrue(!empty($ret[3]['EvaluationRubricDetail']));
         $this->assertTrue(!empty($ret[4]['EvaluationRubricDetail']));
         $this->assertTrue(!empty($ret[5]['EvaluationRubricDetail']));
-        $evalMixDetail1 = $ret[0]['EvaluationRubricDetail']['criteria_comment'];
-        $evalMixDetail2 = $ret[1]['EvaluationRubricDetail']['criteria_comment'];
-        $evalMixDetail3 = $ret[2]['EvaluationRubricDetail']['criteria_comment'];
-        $evalMixDetail4 = $ret[3]['EvaluationRubricDetail']['criteria_comment'];
-        $evalMixDetail5 = $ret[4]['EvaluationRubricDetail']['criteria_comment'];
-        $evalMixDetail6 = $ret[5]['EvaluationRubricDetail']['criteria_comment'];
-        $this->assertEqual($evalMixDetail1, 'Yes');
-        $this->assertEqual($evalMixDetail2, 'attended all of our team meetings');
-        $this->assertEqual($evalMixDetail3, 'Absolutely');
-        $this->assertEqual($evalMixDetail4, 'very helpful in all parts of the project');
-        $this->assertEqual($evalMixDetail5, 'Yes');
-        $this->assertEqual($evalMixDetail6, 'Definitely');
+        $comment1 = $ret[0]['EvaluationRubricDetail']['criteria_comment'];
+        $comment2 = $ret[1]['EvaluationRubricDetail']['criteria_comment'];
+        $comment3 = $ret[2]['EvaluationRubricDetail']['criteria_comment'];
+        $comment4 = $ret[3]['EvaluationRubricDetail']['criteria_comment'];
+        $comment5 = $ret[4]['EvaluationRubricDetail']['criteria_comment'];
+        $comment6 = $ret[5]['EvaluationRubricDetail']['criteria_comment'];
+
+        // Note that the returned comments are not sorted in any particular
+        // order and must be tested in an order-agnostic way.
+        $actual = array($comment1, $comment2, $comment3, $comment4, 
+            $comment5, $comment6);
+        $expected = array('Yes', 'Yes', 'Absolutely', 'Definitely',
+            'attended all of our team meetings', 
+            'very helpful in all parts of the project'
+        );
+
+        $this->assertFalse(array_diff($expected, $actual));
+        // For dealing with the two 'Yes' entries, since array_diff will
+        // remove both of them even if only one 'Yes' is present
+        $this->assertEqual(count($actual), count($expected));
+
     }
 
 

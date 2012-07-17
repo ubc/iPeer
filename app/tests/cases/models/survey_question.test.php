@@ -129,12 +129,21 @@ class SurveyQuestionTestCase extends CakeTestCase
 
     function testCopyQuestions()
     {
-        // Set up test data copy survey.id = 1 to survey.id =2 (empty survey)
-        $this->SurveyQuestion->copyQuestions(1, 2);
+        // Create an empty survey to copy questions into
+        $ret = $this->Survey->save(array(
+                'Survey' => array(
+                    'id' => 50, 
+                    'course_id' => 1, 
+                    'user_id' => 1, 
+                    'name' => 'Empty'
+                )
+            )
+        );
+        $this->SurveyQuestion->copyQuestions(1, 50);
         $surveyOriginal = $this->Survey->find('all',
             array('conditions' => array('Survey.id' => 1)));
         $surveyCopied = $this->Survey->find('all',
-            array('conditions' => array('Survey.id' => 2)));
+            array('conditions' => array('Survey.id' => 50)));
         $surveyOriginalQuestion = $surveyOriginal[0]['Question'];
         $surveyCopiedQuestion = $surveyCopied[0]['Question'];
         // Assert that survey has been copied
