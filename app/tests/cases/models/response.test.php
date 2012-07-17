@@ -54,7 +54,7 @@ class ResponseTestCase extends CakeTestCase
         $this->assertEqual($result[0]['Question']['Responses']['response_1']['id'], 2);
         $this->assertEqual($result[0]['Question']['Responses']['response_2']['response'], '2-3');
         $this->assertEqual($result[0]['Question']['Responses']['response_2']['id'], 3);
-        $this->assertEqual($result[0]['Question']['Responses']['response_3']['response'], '< 2');
+        $this->assertEqual($result[0]['Question']['Responses']['response_3']['response'], '<2');
         $this->assertEqual($result[0]['Question']['Responses']['response_3']['id'], 4);
         $this->assertEqual($result[1]['Question']['Responses']['response_0']['response'], 'yes');
         $this->assertEqual($result[1]['Question']['Responses']['response_0']['id'], 5);
@@ -70,7 +70,7 @@ class ResponseTestCase extends CakeTestCase
         $this->assertEqual($question1['Responses']['response_0']['response'], '4+');
         $this->assertEqual($question1['Responses']['response_1']['response'], '3-4');
         $this->assertEqual($question1['Responses']['response_2']['response'], '2-3');
-        $this->assertEqual($question1['Responses']['response_3']['response'], '< 2');
+        $this->assertEqual($question1['Responses']['response_3']['response'], '<2');
         $this->assertEqual($question2['Responses']['response_0']['response'], 'yes');
         $this->assertEqual($question2['Responses']['response_1']['response'], 'no');
     }
@@ -80,7 +80,7 @@ class ResponseTestCase extends CakeTestCase
         $respose1 = $this->Response->getResponseId(1, '4+');
         $respose2 = $this->Response->getResponseId(1, '3-4');
         $respose3 = $this->Response->getResponseId(1, '2-3');
-        $respose4 = $this->Response->getResponseId(1, '< 2');
+        $respose4 = $this->Response->getResponseId(1, '<2');
         $respose5 = $this->Response->getResponseId(2, 'yes');
         $respose6 = $this->Response->getResponseId(2, 'no');
         $this->assertEqual($respose1, 1);
