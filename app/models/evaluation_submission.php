@@ -60,7 +60,6 @@ class EvaluationSubmission extends AppModel
     /**
      * numCountInGroupCompleted
      *
-     * @param bool $groupId      group id
      * @param bool $groupEventId group event id
      *
      * @access public

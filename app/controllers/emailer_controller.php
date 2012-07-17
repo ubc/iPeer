@@ -205,7 +205,7 @@ class EmailerController extends AppController
                         'Course.id' => $id
                     )
                  )
-            );
+             );
             if (empty($course)) {
                 $this->Session->setFlash(__('You do not have permission to write emails to this class.', true));
                 $this->redirect('index');

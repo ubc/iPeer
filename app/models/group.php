@@ -148,8 +148,8 @@ class Group extends AppModel
             $groupNumAry[] = $data['Group']['group_num'];
             $i++;
         }
-        $compare = range(1,max($groupNumAry));
-        $avail = array_diff($compare,$groupNumAry);
+        $compare = range(1, max($groupNumAry));
+        $avail = array_diff($compare, $groupNumAry);
         sort($avail);
         if (empty($avail)) {
             $avail['0'] = $i;
