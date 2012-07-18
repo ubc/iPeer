@@ -49,8 +49,8 @@ class V1ControllerTest extends CakeTestCase {
 
         // grab data, which should be in json format since it's the view (no $id);
         $result = $this->testAction('/v1/users', array('return' => 'view'));
-        $ret = json_decode($result, true);
-        $this->assertEqual($expected, $ret);
+        $result = json_decode($result, true);
+        $this->assertEqual($expected, $result);
         
         // get a user with id
         // see that the proper variables are set for passing to the view for a specific person
@@ -59,7 +59,37 @@ class V1ControllerTest extends CakeTestCase {
         
         // grab data for a specific person, which should be in json format since it's the view
         $result = $this->testAction('/v1/users/5', array('return' => 'view'));
-        $ret = json_decode($result, true);
-        $this->assertEqual($expectedPerson, $ret);
+        $result = json_decode($result, true);
+        $this->assertEqual($expectedPerson, $result);
+
+        // create a single user
+        $newUser = array(
+            'User' => 
+                array('username' => 'coolUser', 'first_name' => 'Jack', 'last_name' => 'Hardy'),
+            'Role' =>
+                array('RolesUser' => array('role_id' => 5)),
+            'Faculty' =>
+                array('Faculty' => null),
+            'Courses' =>
+                array('id' => null),
+            'Enrolment' =>
+                array()
+        );
+        $newPerson = array('id' => 38, 'username' => 'coolUser', 'last_name' => 'Hardy', 'first_name' => 'Jack');
+        $this->testAction('/v1/users/', 
+            array('method' => 'post', 'data' => $newUser));
+        $result = $this->testAction('/v1/users/38', array('return' => 'vars'));
+        $this->assertEqual($result['users'], $newPerson);
+        $result = $this->testAction('/v1/users/38', array('return' => 'view'));
+        $result = json_decode($result, true);
+        $this->assertEqual($newPerson, $result);
+        
+        $this->testAction('/v1/users/38', 
+            array('method' => 'delete'));
+        $result = $this->testAction('/v1/users/38', array('return' => 'vars'));
+        $this->assertEqual($result['users'], null);
+        $result = $this->testAction('/v1/users/38', array('return' => 'view'));
+        $result = json_decode($result, true);
+        $this->assertEqual(null, $result);   
     }
 }

@@ -13,6 +13,6 @@ class UserTutor extends AppModel
     public $name = 'UserTutor';
 
     public $belongsTo = array('User');
-    public $actsAs = array('Traceable');
+    //public $actsAs = array('Traceable');
 
 }

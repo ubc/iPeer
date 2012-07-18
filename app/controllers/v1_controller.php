@@ -8,7 +8,7 @@ class V1Controller extends Controller {
      * */
     public function users($id = null) {
         $people = array();
-        
+
         // all users
         if (null == $id) {
             $users = $this->User->find('all', 
@@ -31,6 +31,10 @@ class V1Controller extends Controller {
                 )
             );
             $people = $user['User'];
+        }
+
+        if (!empty($this->data)) {
+            $this->User->save($this->data);
         }
 
         $this->set('users', $people);
