@@ -157,10 +157,6 @@ class User extends AppModel
             'rule' => 'notEmpty',
             'message' => "First name cannot be empty, it is used as the display name."
         ),
-        'role'     => array(
-            'rule' => 'notEmpty',
-            'message' => 'Role field may not be left blank.'
-        ),
         'send_email_notification' => array(
             'rule' => array('requiredWith', 'email'),
             'message' => 'Email notification requires an email address.'

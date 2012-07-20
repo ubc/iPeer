@@ -14,6 +14,8 @@ class V1ControllerTest extends CakeTestCase {
 
     public function startCase() {
         echo '<h1>Starting Test Case</h1>';
+		$this->User =& ClassRegistry::init('User');
+		$this->RolesUser =& ClassRegistry::init('RolesUser');
     }
     public function endCase() {
         echo '<h1>Ending Test Case</h1>';
@@ -27,42 +29,63 @@ class V1ControllerTest extends CakeTestCase {
 
     public function testUsers()
     {
-        // build the expected data, a list of all users
+        // GET - all users
         $users = $this->_fixtures['app.user']->records;
         $expected = array();
-        $expectedPerson = array();
 
         foreach ($users as $user) {
             $tmp = array();
+            $role = array();
             $tmp['id'] = $user['id'];
+            $role = $this->RolesUser->find(
+                'first',
+                array(
+                    'conditions' => array('user_id' => $user['id']),
+                    'fields' => array('role_id')
+                )
+            );
+            $tmp['role_id'] = $role['RolesUser']['role_id'];
             $tmp['username'] = $user['username'];
             $tmp['last_name'] = $user['last_name'];
             $tmp['first_name'] = $user['first_name'];
             $expected[] = $tmp;
         }
-        $expectedPerson = $expected[4];
-
-        // get a list of users
-        // see that the proper variables are set for passing to the view (no $id)
-        $result = $this->testAction('/v1/users', array('return' => 'vars'));
-        $this->assertEqual($result['users'], $expected);
-
-        // grab data, which should be in json format since it's the view (no $id);
-        $result = $this->testAction('/v1/users', array('return' => 'view'));
-        $result = json_decode($result, true);
-        $this->assertEqual($expected, $result);
         
-        // get a user with id
-        // see that the proper variables are set for passing to the view for a specific person
-        $result = $this->testAction('/v1/users/5', array('return' => 'vars'));
-        $this->assertEqual($result['users'], $expectedPerson);
-        
-        // grab data for a specific person, which should be in json format since it's the view
-        $result = $this->testAction('/v1/users/5', array('return' => 'view'));
-        $result = json_decode($result, true);
-        $this->assertEqual($expectedPerson, $result);
+        $opts = array(
+            'http' => array(
+                'method' => "GET",
+                'header' => array('Content-type: application/json')
+            )
+        );
 
-        // create a single user
+        $context = stream_context_create($opts);
+        $file = file_get_contents('http://localhost/v1/users', false, $context);
+        $this->assertEqual($file, json_encode($expected));
+        $this->assertEqual(json_decode($file, true), $expected);
+        
+        // GET - specific user
+        $expectedPerson = array(
+            'id' => '17',
+            'role_id' => '5',
+            'username' => '37116036',
+            'last_name' => 'Student',
+            'first_name' => 'Edna'
+        );
+        
+        $opts = array(
+            'http' => array(
+                'method' => "GET",
+                'header' => array('Content-type: application/json')
+            )
+        );
+
+        $context = stream_context_create($opts);
+        $file = file_get_contents('http://localhost/v1/users/17', false, $context);
+        
+        $this->assertEqual($file, json_encode($expectedPerson));
+        $this->assertEqual(json_decode($file, true), $expectedPerson);
+        
+        // POST - add user
         $newUser = array(
             'User' => 
                 array('username' => 'coolUser', 'first_name' => 'Jack', 'last_name' => 'Hardy'),
@@ -75,21 +98,73 @@ class V1ControllerTest extends CakeTestCase {
             'Enrolment' =>
                 array()
         );
-        $newPerson = array('id' => 38, 'username' => 'coolUser', 'last_name' => 'Hardy', 'first_name' => 'Jack');
-        $this->testAction('/v1/users/', 
-            array('method' => 'post', 'data' => $newUser));
-        $result = $this->testAction('/v1/users/38', array('return' => 'vars'));
-        $this->assertEqual($result['users'], $newPerson);
-        $result = $this->testAction('/v1/users/38', array('return' => 'view'));
-        $result = json_decode($result, true);
-        $this->assertEqual($newPerson, $result);
+        $opts = array(
+            'http' => array(
+                'method' => "POST",
+                'header' => array('Content-type: application/json'),
+                'content' => json_encode($newUser)
+            )
+        );
+
+        $context = stream_context_create($opts);
+        $file = file_get_contents('http://localhost/v1/users', false, $context);
+        $expected = json_decode($file, true);
+        $id = $expected['User']['id'];
+
+        $newPerson = array('id' => $id, 'role_id' => '5', 'username' => 'coolUser', 'last_name' => 'Hardy', 'first_name' => 'Jack');
         
-        $this->testAction('/v1/users/38', 
-            array('method' => 'delete'));
-        $result = $this->testAction('/v1/users/38', array('return' => 'vars'));
-        $this->assertEqual($result['users'], null);
-        $result = $this->testAction('/v1/users/38', array('return' => 'view'));
-        $result = json_decode($result, true);
-        $this->assertEqual(null, $result);   
+        $expectedPerson = array(
+            'id' => $expected['User']['id'],
+            'role_id' => $expected['Role']['0']['id'],
+            'username' => $expected['User']['username'],
+            'last_name' => $expected['User']['last_name'],
+            'first_name' => $expected['User']['first_name']
+        );
+
+        $this->assertEqual($newPerson, $expectedPerson);
+        
+        // PUT - update user
+        $updatedPerson = array(
+            'User' => 
+                array('id' => $id, 'username' => 'coolUser20', 'first_name' => 'Jane', 'last_name' => 'Hardy')
+        );
+        
+        $expectedPerson = array('id' => $id, 'role_id' => '5', 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane');
+
+        $opts = array(
+            'http' => array(
+                'method' => "PUT",
+                'header' => array('Content-type: application/json'),
+                'content' => json_encode($updatedPerson)
+            )
+        );
+
+        $context = stream_context_create($opts);
+        $file = file_get_contents('http://localhost/v1/users/'.$id, false, $context);
+        $result = json_decode($file, true);
+
+        $resultPerson = array(
+            'id' => $result['User']['id'],
+            'role_id' => $result['Role']['0']['id'],
+            'username' => $result['User']['username'],
+            'last_name' => $result['User']['last_name'],
+            'first_name' => $result['User']['first_name']
+        );
+        
+        $this->assertEqual($expectedPerson, $resultPerson);
+        
+        // DELETE - delete the user
+        $opts = array(
+            'http' => array(
+                'method' => "DELETE",
+                'header' => array('Content-type: application/json')
+            )
+        );
+
+        $context = stream_context_create($opts);
+        $file = file_get_contents('http://localhost/v1/users/'.$id, false, $context);
+        $result = json_decode($file, true);
+        
+        $this->assertEqual($result, null);
     }
 }

@@ -1,5 +1,4 @@
 <?php
-	echo json_encode($users);
-
-	
+header('Content-Type: application/json');
+    echo json_encode($user);	
 ?>
