@@ -143,18 +143,23 @@ class Group extends AppModel
     function getFirstAvailGroupNum($courseId=null)
     {
         $temp = $this->find('all', array('conditions' => array('course_id' => $courseId)));
-        $i = 0;
-        foreach ($temp as $data) {
-            $groupNumAry[] = $data['Group']['group_num'];
-            $i++;
+        // if at least one group exist in the course
+        if (!empty($temp)) {
+            $i = 0;
+            foreach ($temp as $data) {
+                $groupNumAry[] = $data['Group']['group_num'];
+                $i++;
+            }
+            $compare = range(1, max($groupNumAry));
+            $avail = array_diff($compare, $groupNumAry);
+            sort($avail);
+            if (empty($avail)) {
+                $avail['0'] = $i;
+            }
+        // if no groups exist in the course - group num starts with 1
+        } else {
+            $avail['0'] = 1;
         }
-        $compare = range(1, max($groupNumAry));
-        $avail = array_diff($compare, $groupNumAry);
-        sort($avail);
-        if (empty($avail)) {
-            $avail['0'] = $i;
-        }
-        //debug($groupNumAry);
         
         return $avail['0'];
     }
