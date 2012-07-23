@@ -61,7 +61,7 @@ class GroupTestCase extends CakeTestCase
 
         // Test valid course
         $group = $this->Group->getLastGroupNumByCourseId(1);
-        $this->assertEqual($group, 1);
+        $this->assertEqual($group, 2);
 
         // Test course with no groups;
         $group = $this->Group->getLastGroupNumByCourseId(2);
