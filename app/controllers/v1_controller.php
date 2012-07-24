@@ -1,12 +1,24 @@
 <?php
+/**
+ * V1Controller
+ *
+ * @uses Controller
+ * @package   CTLT.iPeer
+ * @author    Pan Luo <pan.luo@ubc.ca>
+ * @copyright 2012 All rights reserved.
+ * @license   MIT {@link http://www.opensource.org/licenses/MIT}
+ */
 class V1Controller extends Controller {
 
-    public $uses = array('User', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric', 'EvaluationMixeval');
+    public $uses = array('User', 'Group', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric', 'EvaluationMixeval');
     public $components = array('RequestHandler');
     public $layout = "blank_layout";
 
     /**
      * Get a list of users in iPeer.
+     *
+     * @param mixed $id
+     *
      **/
     public function users($id = null) {
         // view
@@ -61,7 +73,8 @@ class V1Controller extends Controller {
                 $this->set('user', 'Error: the user was not delete');
             }
         // update
-        } else if ($this->RequestHandler->isPut()) {    
+        } else if ($this->RequestHandler->isPut()) {
+            $edit = trim(file_get_contents('php://input'), true);
             if ($this->User->save(json_decode($edit, true))) {
                 $user = $this->User->read('id');
                 $userId = array('id' => $user['User']['id']);
@@ -74,6 +87,9 @@ class V1Controller extends Controller {
 
     /**
      * Get a list of courses in iPeer.
+     *
+     * @param mixed $id
+     *
      **/
     public function courses($id = null) {
         $classes = array();
@@ -100,7 +116,7 @@ class V1Controller extends Controller {
         } else {
             if ($this->RequestHandler->isPost()) {
                 $create = trim(file_get_contents('php://input'), true);
-                if (!$this->Course->save(json_decode($create ,true))) {
+                if (!$this->Course->save(json_decode($create, true))) {
                     $temp = 'Error';
                     $this->set('courses', $temp);
                 } else {
@@ -111,7 +127,7 @@ class V1Controller extends Controller {
             } else {
                 if ($this->RequestHandler->isPut()) {    
                     $update = trim(file_get_contents('php://input'), true);
-                    if (!$this->Course->save(json_decode($update ,true))) {
+                    if (!$this->Course->save(json_decode($update, true))) {
                         $temp = 'Error';
                         $this->set('courses', $temp);
                     } else {
@@ -121,7 +137,7 @@ class V1Controller extends Controller {
                     }
                 } else {
                     if ($this->RequestHandler->isDelete()) {
-                        if(!$this->Course->delete($id)) {
+                        if (!$this->Course->delete($id)) {
                             $temp = 'Error';
                             $this->set('courses', $temp);
                         } else {
