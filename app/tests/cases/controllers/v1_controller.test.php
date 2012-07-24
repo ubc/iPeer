@@ -18,6 +18,7 @@ class V1ControllerTest extends CakeTestCase {
         echo '<h1>Starting Test Case</h1>';
 		$this->User =& ClassRegistry::init('User');
 		$this->RolesUser =& ClassRegistry::init('RolesUser');
+		$this->Group =& ClassRegistry::init('Group');
     }
     public function endCase() {
         echo '<h1>Ending Test Case</h1>';
@@ -62,7 +63,7 @@ class V1ControllerTest extends CakeTestCase {
         );
 
         $context = stream_context_create($opts);
-        $file = file_get_contents('http://localhost:800/iPeer/v1/users', false, $context);
+        $file = file_get_contents('http://localhost/v1/users', false, $context);
         $this->assertEqual($file, json_encode($expected));
         $this->assertEqual(json_decode($file, true), $expected);
         
@@ -83,7 +84,7 @@ class V1ControllerTest extends CakeTestCase {
         );
 
         $context = stream_context_create($opts);
-        $file = file_get_contents('http://localhost:800/iPeer/v1/users/17', false, $context);
+        $file = file_get_contents('http://localhost/v1/users/17', false, $context);
         
         $this->assertEqual($file, json_encode($expectedPerson));
         $this->assertEqual(json_decode($file, true), $expectedPerson);
@@ -111,29 +112,32 @@ class V1ControllerTest extends CakeTestCase {
         );
 
         $context = stream_context_create($opts);
-        $file = file_get_contents('http://localhost:800/iPeer/v1/users', false, $context);
-        $expected = json_decode($file, true);
-        $id = $expected['User']['id'];
 
-        $newPerson = array('id' => $id, 'role_id' => '5', 'username' => 'coolUser', 'last_name' => 'Hardy', 'first_name' => 'Jack');
-        
-        $expectedPerson = array(
-            'id' => $expected['User']['id'],
-            'role_id' => $expected['Role']['0']['id'],
-            'username' => $expected['User']['username'],
-            'last_name' => $expected['User']['last_name'],
-            'first_name' => $expected['User']['first_name']
+        $file = file_get_contents('http://localhost/v1/users', false, $context);
+        $user = json_decode($file, true);
+        $userId = $user['id'];
+
+        $expectedPerson = array('id' => $userId, 'role_id' => '5', 'username' => 'coolUser', 'last_name' => 'Hardy', 'first_name' => 'Jack');
+
+        $opts = array(
+            'http' => array(
+                'method' => "GET",
+                'header' => array('Content-type: application/json'),
+            )
         );
 
-        $this->assertEqual($newPerson, $expectedPerson);
+        $context = stream_context_create($opts);
+        $newPerson = file_get_contents('http://localhost/v1/users/'.$userId, false, $context);
+
+        $this->assertEqual(json_decode($newPerson, true), $expectedPerson);
         
         // PUT - update user
         $updatedPerson = array(
             'User' => 
-                array('id' => $id, 'username' => 'coolUser20', 'first_name' => 'Jane', 'last_name' => 'Hardy')
+                array('id' => $userId, 'username' => 'coolUser20', 'first_name' => 'Jane', 'last_name' => 'Hardy')
         );
         
-        $expectedPerson = array('id' => $id, 'role_id' => '5', 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane');
+        $expectedPerson = array('id' => $userId, 'role_id' => '5', 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane');
 
         $opts = array(
             'http' => array(
@@ -144,18 +148,20 @@ class V1ControllerTest extends CakeTestCase {
         );
 
         $context = stream_context_create($opts);
-        $file = file_get_contents('http://localhost:800/iPeer/v1/users/'.$id, false, $context);
-        $result = json_decode($file, true);
 
-        $resultPerson = array(
-            'id' => $result['User']['id'],
-            'role_id' => $result['Role']['0']['id'],
-            'username' => $result['User']['username'],
-            'last_name' => $result['User']['last_name'],
-            'first_name' => $result['User']['first_name']
+        $file = file_get_contents('http://localhost/v1/users/'.$userId, false, $context);
+
+        $opts = array(
+            'http' => array(
+                'method' => "GET",
+                'header' => array('Content-type: application/json')
+            )
         );
         
-        $this->assertEqual($expectedPerson, $resultPerson);
+        $context = stream_context_create($opts);
+        $editedPerson = file_get_contents('http://localhost/v1/users/'.$userId, false, $context);
+        
+        $this->assertEqual(json_decode($editedPerson, true), $expectedPerson);
         
         // DELETE - delete the user
         $opts = array(
@@ -166,10 +172,20 @@ class V1ControllerTest extends CakeTestCase {
         );
 
         $context = stream_context_create($opts);
-        $file = file_get_contents('http://localhost:800/iPeer/v1/users/'.$id, false, $context);
-        $result = json_decode($file, true);
+
+        $file = file_get_contents('http://localhost/v1/users/'.$userId, false, $context);
         
-        $this->assertEqual($result, null);
+        $opts = array(
+            'http' => array(
+                'method' => "GET",
+                'header' => array('Content-type: application/json')
+            )
+        );
+        
+        $context = stream_context_create($opts);
+        $deletedPerson = file_Get_contents('http://localhost/v1/users/'.$userId, false, $context);
+        
+        $this->assertEqual($deletedPerson, null);
 
     }
     
@@ -196,13 +212,13 @@ class V1ControllerTest extends CakeTestCase {
             )
         );
         $context = stream_context_create($opts);
-        $actualList = file_get_contents('http://localhost:800/iPeer/v1/courses', null, $context);
+        $actualList = file_get_contents('http://localhost/v1/courses', null, $context);
         // grab data, which should be in json format since it's the view (no $id);
         $actualList = json_decode($actualList, true);
         $this->assertEqual($expectedList, $actualList);
         
         // get a course with id (method: get) and compare to expected
-        $actualCourse = file_get_contents('http://localhost:800/iPeer/v1/courses/1', null, $context);
+        $actualCourse = file_get_contents('http://localhost/v1/courses/1', null, $context);
         $actualCourse = json_decode($actualCourse, true);
         $this->assertEqual($expectedCourse, $actualCourse);
         
@@ -220,7 +236,7 @@ class V1ControllerTest extends CakeTestCase {
             )
         );
         $context = stream_context_create($opts);
-        $id = file_get_contents('http://localhost:800/iPeer/v1/courses', null, $context);
+        $id = file_get_contents('http://localhost/v1/courses', null, $context);
         $id = json_decode($id, true);
         $opts = array(
             'http'=>array(
@@ -229,7 +245,7 @@ class V1ControllerTest extends CakeTestCase {
             )
         );
         $context = stream_context_create($opts);
-        $checkCourse = file_get_contents('http://localhost:800/iPeer/v1/courses/'.$id, null, $context);
+        $checkCourse = file_get_contents('http://localhost/v1/courses/'.$id, null, $context);
         $checkCourse = json_decode($checkCourse, true);
         $expectedCourse = array('id' => $id, 'course' => 'BLAH 789', 'title' => 'Title for Blah Course');
         $this->assertEqual($expectedCourse, $checkCourse);
@@ -244,7 +260,7 @@ class V1ControllerTest extends CakeTestCase {
             )
         );
         $context = stream_context_create($opts);
-        $id = file_get_contents('http://localhost:800/iPeer/v1/courses/'.$id, null, $context);
+        $id = file_get_contents('http://localhost/v1/courses/'.$id, null, $context);
         $id = json_decode($id, true);
         $opts = array(
             'http'=>array(
@@ -253,7 +269,7 @@ class V1ControllerTest extends CakeTestCase {
             )
         );
         $context = stream_context_create($opts);
-        $checkCourse = file_get_contents('http://localhost:800/iPeer/v1/courses/'.$id, null, $context);
+        $checkCourse = file_get_contents('http://localhost/v1/courses/'.$id, null, $context);
         $checkCourse = json_decode($checkCourse, true);
         // what the fields of updated course should be
         $expectedUpdate = array('id' => $id, 'course' => 'BLAH 789', 'title' => 'Updated Title for Blah Course');
@@ -267,10 +283,186 @@ class V1ControllerTest extends CakeTestCase {
             )
         );
         $context = stream_context_create($opts);
-        $id = file_get_contents('http://localhost:800/iPeer/v1/courses/'.$id, null, $context);
+        $id = file_get_contents('http://localhost/v1/courses/'.$id, null, $context);
         $id = json_decode($id, true);
         
         $this->assertEqual(null, $id);
+    }
+    
+    public function testGroups() {
+        // GET - list of groups in course
+        $expected = array();
+        $groups = $this->_fixtures['app.group']->records;
+        
+        foreach ($groups as $group) {
+            if ('1' == $group['course_id']) {
+                $tmp = array();
+                $tmp['id'] = $group['id'];
+                $tmp['group_num'] = $group['group_num'];
+                $tmp['group_name'] = $group['group_name'];
+                $tmp['course_id'] = $group['course_id'];
+                $expected[] = $tmp;
+            }
+        }
+        
+        $opts = array(
+            'http' => array(
+                'method' => "GET",
+                'header' => array('Content-type: application/json')
+            )
+        );
+
+        $context = stream_context_create($opts);
+        $file = file_get_contents('http://localhost/v1/courses/1/groups', false, $context);
+        
+        $this->assertEqual($file, json_encode($expected));
+        $this->assertEqual(json_decode($file, true), $expected);
+        
+        // GET - specific group in course
+        $expectedGroup = array();
+        $expectedGroup = $expected['1'];
+        
+        $opts = array(
+            'http' => array(
+                'method' => "GET",
+                'header' => array('Content-type: application/json')
+            )
+        );
+        
+        $context = stream_context_create($opts);
+        $file = file_get_contents('http://localhost/v1/courses/1/groups/2', false, $context);
+        
+        $this->assertEqual($file, json_encode($expectedGroup));
+        $this->assertEqual(json_decode($file, true), $expectedGroup);
+        
+        // POST - add a group
+        
+        $addGroup = array(
+            'Group' => array(
+                'course_id' => '2',
+                'group_num' => '1',
+                'group_name' => 'Best Group Ever',
+                'record_status' =>  'A',
+                'source' => null
+            ),
+            'Member' => array(
+                'Member' => array(
+                    '0' => '16',
+                    '1' => '30',
+                    '2' => '25'
+                )
+            )
+        );
+
+        $opts = array(
+            'http' => array(
+                'method' => "POST",
+                'header' => array('Content-type: application/json'),
+                'content' => json_encode($addGroup)
+            )
+        );
+        
+        $context = stream_context_create($opts);
+        $file = file_get_contents('http://localhost/v1/courses/2/groups', false, $context);
+
+        $expected = json_decode($file, true);
+        $id = $expected['id'];
+        
+        $expectedGroup = array(
+            'id' => $id,
+            'group_num' => '1',
+            'group_name' => 'Best Group Ever',
+            'course_id' => 2
+        );
+        
+        $opts = array(
+            'http' => array(
+                'method' => "GET",
+                'header' => array('Content-type: application/json')
+            )
+        );
+        
+        $context = stream_context_create($opts);
+        $addedGroup = file_get_contents('http://localhost/v1/courses/2/groups/'.$id, false, $context);
+
+        $this->assertEqual(json_decode($addedGroup, true), $expectedGroup);
+        
+        // PUT - edit the group
+        
+        $editGroup = array(
+            'Group' => array(
+                'id' => $id,
+                'course_id' => '2',
+                'group_num' => '1',
+                'group_name' => 'Most Amazing Group Ever',
+                'record_status' =>  'A',
+                'source' => null
+            ),
+            'Member' => array(
+                'Member' => array(
+                    '0' => '16',
+                    '1' => '30',
+                    '2' => '25'
+                )
+            )
+        );
+        
+        $opts = array(
+            'http' => array(
+                'method' => "PUT",
+                'header' => array('Content-type:application/json'),
+                'content' => json_encode($editGroup)
+            )
+        );
+        
+        $context = stream_context_create($opts);
+        file_get_contents('http://localhost/v1/courses/2/groups/'.$id, false, $context);
+
+        $expected = json_decode($file, true);
+        $id = $expected['id'];
+        
+        $expectedGroup = array(
+            'id' => $id,
+            'group_num' => '1',
+            'group_name' => 'Most Amazing Group Ever',
+            'course_id' => 2
+        );
+        
+        $opts = array(
+            'http' => array(
+                'method' => "GET",
+                'header' => array('Content-type:application/json'),
+            )
+        );
+        
+        $context = stream_context_create($opts);
+        $editedGroup = file_get_contents('http://localhost/v1/courses/2/groups/'.$id, false, $context);
+        
+        $this->assertEqual(json_decode($editedGroup, true), $expectedGroup);
+        
+        // DELETE - delete a group
+        
+        $opts = array(
+            'http' => array(
+                'method' => "DELETE",
+                'header' => array('Content-type:application/json')
+            )
+        );
+        
+        $context = stream_context_create($opts);
+        file_get_contents('http://localhost/v1/courses/2/groups/'.$id, false, $context);
+        
+        $opts = array(
+            'http' => array(
+                'method' => "GET",
+                'header' => array('Content-type:application/json')
+            )
+        );
+        
+        $context = stream_context_create($opts);
+        $deletedGroup = file_get_contents('http://localhost/v1/courses/2/groups/'.$id, false, $context);
+        
+        $this->assertEqual($deletedGroup, null);
     }
     
     public function testGrades()
@@ -317,13 +509,14 @@ class V1ControllerTest extends CakeTestCase {
             )
         );
         $context = stream_context_create($opts);
-        $mixevalGrades = file_get_contents('http://localhost:800/iPeer/v1/courses/1/events/3/grades', null, $context);
+        $mixevalGrades = file_get_contents('http://localhost/v1/courses/1/events/3/grades', null, $context);
         $mixevalGrades = json_decode($mixevalGrades, true);
         $this->assertEqual($mixevalList, $mixevalGrades);
 
-        $studentGrade = file_get_contents('http://localhost:800/iPeer/v1/courses/1/events/3/grades/6', null, $context);
+        $studentGrade = file_get_contents('http://localhost/v1/courses/1/events/3/grades/6', null, $context);
         $studentGrade = json_decode($studentGrade, true);
         $expectedGrade = array("evaluatee" => 6, "score" => 2.4, "id" => 2);
         $this->assertEqual($expectedGrade, $studentGrade);
     }
+    
 }

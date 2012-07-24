@@ -37,6 +37,15 @@ if (file_exists(CONFIGS.'installed.txt')) {
   // to tell the user that an install was successful.
   Router::connect('/install/install5', array(
     'controller' => 'install', 'action' => 'install5'));
+  // Connect url to groups api
+  Router::connect(
+    '/:controller/courses/:course_id/groups/:group_id',
+    array('action' => 'groups', 'group_id' => null),
+    array(
+      'course_id' => '[0-9]+',
+      'group_id' => '[0-9]+'
+    )
+  );
   Router::connect('/install/*', array('controller' => 'install'));
   // Connect default index page to the home controller
   Router::connect('/', array('controller' => 'home', 'action' => 'index'));

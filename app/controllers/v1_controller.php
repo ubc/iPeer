@@ -1,5 +1,6 @@
 <?php
 class V1Controller extends Controller {
+
     public $uses = array('User', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric', 'EvaluationMixeval');
     public $components = array('RequestHandler');
     public $layout = "blank_layout";
@@ -29,32 +30,48 @@ class V1Controller extends Controller {
                     'first',
                     array('conditions' => array('User.id' => $id))
                 );
-                
-                $data = array(
-                    'id' => $user['User']['id'],
-                    'role_id' => $user['Role']['0']['id'],
-                    'username' => $user['User']['username'],
-                    'last_name' => $user['User']['last_name'],
-                    'first_name' => $user['User']['first_name']
-                );
+                if (!empty($user)) {
+                    $data = array(
+                        'id' => $user['User']['id'],
+                        'role_id' => $user['Role']['0']['id'],
+                        'username' => $user['User']['username'],
+                        'last_name' => $user['User']['last_name'],
+                        'first_name' => $user['User']['first_name']
+                    );
+                } else {
+                    $data = null;
+                }
             }
             $this->set('user', $data);
         // add
         } else if ($this->RequestHandler->isPost()) {
             $input = trim(file_get_contents('php://input'), true);
-            $this->User->save(json_decode($input, true));
-            $this->set('user', $this->User->read());
+            if ($this->User->save(json_decode($input, true))) {
+                $user = $this->User->read('id');
+                $userId = array('id' => $user['User']['id']);
+                $this->set('user', $userId);
+            } else {
+                $this->set('user', 'Error: the user was not saved');
+            }
         // delete
         } else if ($this->RequestHandler->isDelete()) {
-            $this->User->delete($id);
-            $this->set('user', $this->User->read());
+            if ($this->User->delete($id)) {
+                $this->set('user', null);
+            } else {
+                $this->set('user', 'Error: the user was not delete');
+            }
         // update
         } else if ($this->RequestHandler->isPut()) {    
-            $edit = trim(file_get_contents('php://input'), true);
-            $test = $this->User->save(json_decode($edit, true));
-            $this->set('user', $this->User->read());
+            if ($this->User->save(json_decode($edit, true))) {
+                $user = $this->User->read('id');
+                $userId = array('id' => $user['User']['id']);
+                $this->set('user', $userId);
+            } else {
+                $this->set('user', 'Error: the user was not updated');
+            }
         }
     }
+
     /**
      * Get a list of courses in iPeer.
      **/
@@ -119,7 +136,77 @@ class V1Controller extends Controller {
             }
         }
     }
+    
+    /**
+     * Get a list of groups in iPeer.
+     **/
+    public function groups () {
+        // view
+        if ($this->RequestHandler->isGet()) {
+            $data = array();
+            if (null == $this->params['group_id']) {
+                $groups = $this->Group->find(
+                    'all',
+                    array(
+                        'conditions' => array('course_id' => $this->params['course_id']),
+                        'fields' => array('id', 'group_num', 'group_name', 'course_id'),
+                        'recursive' => 0
+                    )
+                );
+                
+                foreach ($groups as $group) {
+                    $data[] = $group['Group'];
+                }
+            } else {
+                $group = $this->Group->find(
+                    'first',
+                    array(
+                        'conditions' => array(
+                            'Group.id' => $this->params['group_id'],
+                            'course_id' => $this->params['course_id']
+                        ),
+                        'fields' => array('id', 'group_num', 'group_name', 'course_id'),
+                        'recursive' => 0
+                    )
+                );
+                
+                $data = $group['Group'];
+            }
+            $this->set('group', $data);
+        // add
+        } else if ($this->RequestHandler->isPost()) {
+            $add = trim(file_get_contents('php://input'), true);
+            if ($this->Group->save(json_decode($add, true))) {
+                $group = $this->Group->read('id');
+                $groupId = $group['Group']['id'];
+                $this->set('group', array('id' => $groupId));
+            } else {
+                $this->set('group', 'Error: The group was not added');
+            }
+        // delete
+        } else if ($this->RequestHandler->isDelete()) {
+            if ($this->Group->delete($this->params['group_id'])) {
+                $this->set('group', null);
+            } else {
+                $this->set('group', 'Error: The group was not delete');
+            }
+        // update
+        } else if ($this->RequestHandler->isPut()) {
+            $edit = trim(file_get_contents('php://input'), true);
+            if ($this->Group->save(json_decode($edit, true))) {
+                $group = $this->Group->read('id');
+                $groupId = $group['Group']['id'];
+                $this->set('group', array('id' => $groupId));
+            } else {
+                $this->set('group', 'Error: The group was not edited');
+            }
+        }
+        
+    }
 
+    /**
+     * Get a list of grades in iPeer.
+     **/
     public function grades() {
         $course_id = $this->params['course_id'];
         $event_id = $this->params['event_id'];
