@@ -39,7 +39,7 @@ if (file_exists(CONFIGS.'installed.txt')) {
     'controller' => 'install', 'action' => 'install5'));
   Router::connect('/install/*', array('controller' => 'install'));
   // Connect default index page to the home controller
-	Router::connect('/', array('controller' => 'home', 'action' => 'index'));
+  Router::connect('/', array('controller' => 'home', 'action' => 'index'));
   // Connect static pages to the pages controller
   Router::connect('/pages/*', array('controller' => 'pages',
     'action' => 'display'));
@@ -51,6 +51,15 @@ if (file_exists(CONFIGS.'installed.txt')) {
     'action' => 'login'));
   Router::connect('/logout', array('controller' => 'users',
     'action' => 'logout'));
+  // Connect url to groups api
+  Router::connect('/:controller/courses/:course_id/groups/:group_id',
+    array('action' => 'groups', 'group_id' => null),
+    array('course_id' => '[0-9]+', 'group_id' => '[0-9]+'));
+  // Connect url to grades api
+  Router::connect('/:controller/courses/:course_id/events/:event_id/grades/:user_id',
+    array('action' => 'grades', 'user_id' => null),
+    array('course_id' => '[0-9]+', 'event_id' => '[0-9]+', 'user_id' => '[0-9]+'));
+
 } else {
   // Note, order of routes specified matters. If install didn't come first
   // the /* directive would just redirect every page to the index page
