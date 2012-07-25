@@ -861,13 +861,34 @@ class EvaluationsController extends AppController
      */
     function viewEvaluationResults($eventId, $groupId, $displayFormat="")
     {
-        // Make sure the present user is not a student
-        //$this->rdAuth->noStudentsAllowed();
-
-        if (!is_numeric($eventId) || !is_numeric($groupId)) {
-            exit;
+        // Make sure the present user has permission
+        if (!User::hasPermission('controllers/evaluations/viewevaluationresults')) {
+            $this->Session->setFlash('You do not have permission to view evaluation results', true);
+            $this->redirect('/home');
         }
 
+        if (!is_numeric($eventId) || !is_numeric($groupId)) {
+            $this->Session->setFlash('Invalid Id', true);
+            $this->redirect('index');
+        }
+        
+        $courseId = $this->Event->getCourseByEventId($eventId);
+        
+        $course = $this->Course->find(
+            'first',
+            array(
+                'conditions' => array(
+                    'Course.id' => $courseId,
+                    'Instructor.id' => $this->Auth->user('id')
+                )
+            )
+        );
+        
+        // the user is not an instructor or admin of the course
+        if (null == $course) {
+            $this->Session->setFlash('You do not have permission to view evaluation results from this event', true);
+            $this->redirect('index');
+        }
 
         $this->autoRender = false;
 
@@ -1132,8 +1153,11 @@ class EvaluationsController extends AppController
      */
     function markEventReviewed ()
     {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
+        // Make sure the present user has permission
+        if (!User::hasPermission('functions/evaluation')) {
+            $this->Session->setFlash('You do not have permission to mark events reviewed', true);
+            $this->redirect('/home');
+        }
 
         $this->autoRender = false;
         $eventId = $this->params['form']['event_id'];
@@ -1188,8 +1212,11 @@ class EvaluationsController extends AppController
      */
     function markGradeRelease($param)
     {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
+        // Make sure the present user has permission
+        if (!User::hasPermission('functions/evaluation')) {
+            $this->Session->setFlash('You do not have permission to release grades', true);
+            $this->redirect('/home');
+        }
 
         $tok = strtok($param, ';');
         $eventId = $tok;
@@ -1235,8 +1262,34 @@ class EvaluationsController extends AppController
      */
     function markCommentRelease($param = null)
     {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
+        // Make sure the present user has permission
+        if (!User::hasPermission('functions/evaluation')) {
+            $this->Session->setFlash('You do not have permission to release comments', true);
+            $this->redirect('/home');
+        }
+
+        if (!is_numeric($eventId) || !is_numeric($groupId)) {
+            $this->Session->setFlash('Invalid Id', true);
+            $this->redirect('index');
+        }
+        
+        $courseId = $this->Event->getCourseByEventId($eventId);
+        
+        $course = $this->Course->find(
+            'first',
+            array(
+                'conditions' => array(
+                    'Course.id' => $courseId,
+                    'Instructor.id' => $this->Auth->user('id')
+                )
+            )
+        );
+        
+        // the user is not an instructor or admin of the course
+        if (null == $course) {
+            $this->Session->setFlash('You do not have permission to view evaluation results from this event', true);
+            $this->redirect('index');
+        }
 
         $this->autoRender = false;
         if ($param !=null) {
@@ -1298,8 +1351,11 @@ class EvaluationsController extends AppController
      */
     function changeAllCommentRelease ($param=null)
     {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
+        // Make sure the present user has permission
+        if (!User::hasPermission('functions/evaluation')) {
+            $this->Session->setFlash('You do not have permission to change comment release statuses', true);
+            $this->redirect('/home');
+        }
 
         $tok = strtok($param, ';');
         $eventId = $tok;
@@ -1361,8 +1417,11 @@ class EvaluationsController extends AppController
      */
     function changeAllGradeRelease ($param=null)
     {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
+        // Make sure the present user has permission
+        if (!User::hasPermission('functions/evaluation')) {
+            $this->Session->setFlash('You do not have permission to change grade release statuses', true);
+            $this->redirect('/home');
+        }
 
         $this->autoRender = false;
         $tok = strtok($param, ';');
@@ -1425,10 +1484,34 @@ class EvaluationsController extends AppController
      */
     function viewGroupSubmissionDetails ($eventId, $groupId)
     {
-        // Make sure the present user is not a student
-        //$this->rdAuth->noStudentsAllowed();
+        // Make sure the present user has permission
+        if (!User::hasPermission('controllers/evaluations/viewevaluationresults')) {
+            $this->Session->setFlash('You do not have permission to view submission details', true);
+            $this->redirect('/home');
+        }
 
-        $this->layout = 'pop_up';
+        if (!is_numeric($eventId) || !is_numeric($groupId)) {
+            $this->Session->setFlash('Invalid Id', true);
+            $this->redirect('index');
+        }
+        
+        $courseId = $this->Event->getCourseByEventId($eventId);
+        
+        $course = $this->Course->find(
+            'first',
+            array(
+                'conditions' => array(
+                    'Course.id' => $courseId,
+                    'Instructor.id' => $this->Auth->user('id')
+                )
+            )
+        );
+        
+        // the user is not an instructor or admin of the course
+        if (null == $course) {
+            $this->Session->setFlash('You do not have permission to view evaluation results from this event', true);
+            $this->redirect('index');
+        }
 
         $this->set('title_for_layout', __('Submission Details', true));
 
@@ -1444,6 +1527,11 @@ class EvaluationsController extends AppController
             $user = $row['Member'];
             $evalSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'],
                 $user['id']);
+
+            $name = $this->User->findUserByidWithFields($user['id'], array('first_name', 'last_name'));
+
+            $students[$pos]['Member']['first_name'] = $name['first_name'];
+            $students[$pos]['Member']['last_name'] = $name['last_name'];
 
             if (isset($evalSubmission)) {
                 $students[$pos]['users']['submitted'] = $evalSubmission['EvaluationSubmission']['submitted'];
@@ -1474,8 +1562,11 @@ class EvaluationsController extends AppController
      */
     function reReleaseEvaluation ()
     {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
+        // Make sure the present user has permission
+        if (!User::hasPermission('controllers/evaluations/viewevaluationresults')) {
+            $this->Session->setFlash('You do not have permission to re-release evaluations', true);
+            $this->redirect('/home');
+        }
 
         $this->autoRender = false;
 

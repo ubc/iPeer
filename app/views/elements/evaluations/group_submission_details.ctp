@@ -22,7 +22,7 @@
 
     <table width="95%"  border="0" align="center" cellpadding="4" cellspacing="2" bgcolor="#FFFFFF">
       <tr class="tableheader">
-  	    <th width="40%"><?php __('Group Member')?></th>
+  	    <th width="45%"><?php __('Group Member')?></th>
   	    <th width="15%"><?php __('Date Submitted')?></th>
   	    <th width="20%"><?php __('Late By')?></th>
   	    <th width="15%"><?php __('RE-release Evaluation?')?></th>
