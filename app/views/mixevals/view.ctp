@@ -68,12 +68,7 @@ $evaluate = isset($evaluate) ? $evaluate : false;?>
 	  </td>
   </tr>
 </table>
-<table width="95%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">
-  <tr>
-    <td align="left"><?php echo $html->image('layout/corner_bot_left.gif',array('align'=>'middle','alt'=>'corner_bot_left'))?></td>
-    <td align="right"><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'middle','alt'=>'corner_bot_right'))?></td>
-  </tr>
-</table>
+
 </form><br>
 	</td>
   </tr>

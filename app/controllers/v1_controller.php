@@ -151,7 +151,7 @@ class V1Controller extends Controller {
                 $this->set('courses', $message);
             } else {
                 $temp = $this->Course->read();
-                $courseId = $temp['Course']['id'];
+                $courseId = array('id' => $temp['Course']['id']);
                 $this->set('statusCode', 'HTTP/1.0 201 Created');
                 $this->set('courses', $courseId);
             }
@@ -163,7 +163,7 @@ class V1Controller extends Controller {
                 $this->set('courses', $message);
             } else {
                 $temp = $this->Course->read();
-                $courseId = $temp['Course']['id'];
+                $courseId = array('id' => $temp['Course']['id']);
                 $this->set('statusCode', 'HTTP/1.0 200 OK');
                 $this->set('courses', $courseId);
             }

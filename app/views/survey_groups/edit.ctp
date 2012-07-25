@@ -7,7 +7,6 @@
                                                               'between' => '</td><td>')))?>
 <?php echo $this->Form->input('survey_id', array('type' => 'hidden', 'value' => $survey_id))?>
 <?php echo $this->Form->input('group_set_id', array('type' => 'hidden', 'value' => $group_set_id))?>
-<?php echo $html->image('layout/corner_bot_left.gif',array('style'=>'display:none;','alt'=>'corner_bot_left','onload'=>'Element.show(\'loading\')'))?>
 <table width="100%" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>
@@ -104,12 +103,7 @@
 			</div></td>
           </tr>
       </table>
-        <table width="85%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">
-          <tr>
-            <td align="left"><?php echo $html->image('layout/corner_bot_left.gif',array('align'=>'middle','alt'=>'corner_bot_left'))?></td>
-            <td align="right"><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'middle','alt'=>'corner_bot_right','onload'=>'Element.hide(\'loading\')'))?></td>
-          </tr>
-        </table></td>
+    </td>
   </tr>
 </table>
 <?php echo $this->Form->end()?>

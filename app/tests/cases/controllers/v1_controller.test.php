@@ -234,8 +234,9 @@ class V1ControllerTest extends CakeTestCase {
             )
         );
         $context = stream_context_create($opts);
-        $id = file_get_contents($url, null, $context);
-        $id = json_decode($id, true);
+        $file = file_get_contents($url, null, $context);
+        $course = json_decode($file, true);
+        $id = $course['id'];
         $opts = array(
             'http'=>array(
                 'method'=>"GET",
@@ -258,8 +259,9 @@ class V1ControllerTest extends CakeTestCase {
             )
         );
         $context = stream_context_create($opts);
-        $id = file_get_contents($url.'/'.$id, null, $context);
-        $id = json_decode($id, true);
+        $file = file_get_contents($url.'/'.$id, null, $context);
+        $course = json_decode($file, true);
+        $id = $course['id'];
         $opts = array(
             'http'=>array(
                 'method'=>"GET",

@@ -72,12 +72,6 @@
             </div></td>
           </tr>
         </table>
-        <table width="60%"  border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#E5E5E5">
-          <tr>
-            <td align="left"><?php echo $html->image('layout/corner_bot_left.gif',array('align'=>'left','alt'=>'left'))?></td>
-            <td align="right"><?php echo $html->image('layout/corner_bot_right.gif',array('align'=>'right','alt'=>'right'))?></td>
-          </tr>
-        </table>
         </div>
       </td>
     </tr>
