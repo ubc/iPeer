@@ -218,6 +218,7 @@ class EventsController extends AppController
         $this->setUpAjaxList($courseId);
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
+        $this->set('courseId', $courseId);
     }
 
 
@@ -375,113 +376,69 @@ class EventsController extends AppController
 
 
     /**
-     * add
-     *
+     * Add an event
+     * 
      * @access public
      * @return void
      */
-    function add()
+    function add($courseId = null)
     {
+        // Check permissions
         if (!User::hasPermission('controllers/events/add')) {
             $this->Session->setFlash(__('You do not have permission to add events.', true));
-            $this->redirect('index');
-        }
-        
-        $eventTypes = $this->EventTemplateType->find('list', array(
-            'conditions'=> array('EventTemplateType.display_for_selection'=>1)
-        ));
-        //Set up user info
-        $currentUser = $this->User->getCurrentLoggedInUser();
-        $this->set('currentUser', $currentUser);
-
-        $courseId = $this->Session->read('ipeerSession.courseId');
-        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events > Add', true));
-        if ($courseId==null) {
-            $this->Session->setFlash(__('Please create events through course page.', true));
             $this->redirect('/home');
         }
-        //List Add Page
-        if (empty($this->params['data'])) {
+        
+        // Init form variables needed for display
+        $this->set('groups', $this->Group->getGroupsByCourseId($courseId));
+        $this->set(
+            'eventTemplateTypes', 
+            $this->EventTemplateType->getEventTemplateTypeList(true)
+        );
+        $this->set(
+            'mixevals',
+            $this->Mixeval->find('list')
+        );
+        $this->set(
+            'simpleEvaluations',
+            $this->SimpleEvaluation->getBelongingOrPublic(
+                $this->Auth->user('id'))
+        );
+        $this->set(
+            'rubrics',
+            $this->Rubric->getSelectionList($this->Auth->user('id'))
+        );
+        $this->set(
+            'courses',
+            $this->Course->getListByInstructor($this->Auth->user('id'))
+        );
+        $this->set('course_id', $courseId);
 
-            $unassignedGroups = $this->Group->find('list', array('conditions'=> array('course_id'=>$courseId), 'fields'=>array('group_name')));
-            $this->set('unassignedGroups', $unassignedGroups);
-
-            //Get all display event types
-            $this->set('eventTypes', $eventTypes);
-            //Set default template
-            $default = __('-- Select a Evaluation Tool -- ', true);
-            $model = 'SimpleEvaluation';
-            $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'));
-            $this->set('eventTemplates', $eventTemplates);
-            $this->set('default', $default);
-            $this->set('model', $model);
-        } else {
-            //Format Data
-            $this->params['data']['Event']['course_id'] = $courseId;
-            $this->params = $this->Event->prepData($this->params);
-            //print_r($this->params['data']);
-
-            // uniqueness check for title
-            if (!$this->Event->__checkDuplicateTitle($this->params['data']['Event']['title'])) {
-                $this->Event->invalidate('title_unique');
+        // Try to save the data
+        if (!empty($this->data)) {
+            // need to set the template_id based on the event_template_type_id
+            $typeId = $this->data['Event']['event_template_type_id'];
+            if ($typeId == 1) {
+                $this->data['Event']['template_id'] = 
+                    $this->data['Event']['SimpleEvaluation'];
             }
-
-            //Save Data
-            if ($this->Event->save($this->params['data'])) {
-                //Save Groups for the Event
-                if ('1' == $this->params['data']['Event']['penalty']) {
-                    $penaltyType = $this->params['data']['PenaltySetup']['type'];
-                    $finalDeduction= array();
-                    $finalDeduction['days_late'] = -2;
-                    $finalDeduction['event_id'] =  $this->Event->id;
-                    $finalDeduction['percent_penalty'] = $this->params['data']['PenaltySetup']['penaltyAfter'];
-
-                    if ($penaltyType == 'simple') {
-                        $finalDeduction['days_late'] = -1;
-                        for ($i = 1; $i <= $this->params['data']['PenaltySetup']['numberOfDays']; $i++) {
-                            $this->params['data']['Penalty'][$i]['days_late'] = $i;
-                            $this->params['data']['Penalty'][$i]['percent_penalty'] = $this->params['data']['PenaltySetup']['percentagePerDay'] * $i;
-                        }
-                    }
-                    foreach ($this->params['data']['Penalty'] as $value => $key) {
-                        $this->params['data']['Penalty'][$value]['event_id'] = $this->Event->id;
-                        $this->Penalty->save($this->params['data']['Penalty'][$value]);
-                        $this->Penalty->id = null;
-                    }
-                    if (!$this->Penalty->save($finalDeduction)) {
-                        return false;
-                    }
-                }
-
-                $this->GroupEvent->insertGroups($this->Event->id, $this->params['data']['Member']);
-                $this->Session->setFlash(__('The event is added successfully.', true), 'good');
-                $this->redirect('index');
+            else if ($typeId == 2) {
+                $this->data['Event']['template_id'] = 
+                    $this->data['Event']['Rubric'];
             }
-            //Found error
-            else {
-                $this->set('data', $this->params['data']);
-                $this->set('courseId', $courseId);
-                $this->set('unassignedGroups', $this->Group->find('list', array(
-                    'conditions'=> array('course_id'=>$courseId),
-                    'fields'=>array('group_name'))));
-                $this->set('eventTypes', $eventTypes);
-                //Set default template
-                $default = 'Default Simple Evaluation';
-                //Check the event template type
-                $model = $this->EventTemplateType->find('first', array(
-                    'conditions' => array('EventTemplateType.id' => $this->params['data']['Event']['event_template_type_id']),
-                    'fields' => array('model_name')
-                ));
-                $model = $model['EventTemplateType']['model_name'];
-
-                $eventTemplates = $this->$model->getBelongingOrPublic($this->Auth->user('id'));
-                $this->set('eventTemplates', $eventTemplates);
-                $this->set('default', $default);
-                $this->set('model', $model);
-                $this->set('errmsg', __('Please correct errors below.', true));
-                $this->render();
+            else if ($typeId == 4) {
+                $this->data['Event']['template_id'] = 
+                    $this->data['Event']['Mixeval'];
             }
+            if ($this->Event->saveAll($this->data)) {
+                $this->Session->setFlash("Add event successful!", 'good');
+            } else {
+                $this->Session->setFlash("Add event failed.");
+            }
+            $this->redirect('index/'.$courseId);
         }
+
+        return;
     }
 
     /**

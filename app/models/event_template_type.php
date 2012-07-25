@@ -14,6 +14,12 @@ class EventTemplateType extends AppModel
     public $displayField = 'type_name';
     public $actsAs = array('Traceable');
 
+    public $hasMany = array(
+        'Event' => array(
+            'className' => 'Event'
+        )
+    );
+
     /**
      * Return a list of the event templates
      *

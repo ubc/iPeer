@@ -312,4 +312,17 @@ class Rubric extends EvaluationBase
         }
         return $tmp3;
     }
+
+    public function getSelectionList($userid) {
+        $ret = $this->find(
+            'list',
+            array(
+                'conditions' => array(
+                    'Rubric.availability' => 'public',
+                    'Rubric.creator_id' => $userid
+                )
+            )
+        );
+        return $ret;
+    }
 }

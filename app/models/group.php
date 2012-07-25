@@ -11,6 +11,7 @@
 class Group extends AppModel
 {
     public $name = 'Group';
+    public $displayField = 'group_name';
 
     public $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Traceable');
 

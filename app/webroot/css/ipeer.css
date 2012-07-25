@@ -97,23 +97,34 @@ p {
     width: 100%;
 }
 
-.text label, .password label, .textarea label, .select label {
+.text label, .password label, .textarea label, .select label, .datetime label,
+.radio legend, .penaltyLabel
+{
     float: left;
     text-align: right;
     margin: 0.5em 0;
     clear: left;
     padding-right: 1em;
+    width: 13em;
 }
 
-.text input, .password input, .textarea textarea {   
-    margin: 0.35em 0; 
+.text input, .password input, .textarea textarea, .select select, 
+.datetime select, .penaltyInput input
+{   
+    margin: 0.35em 0.35em; 
     border-radius: 3px; 
     border: 1px solid #999;
     clear: right;
     padding: 0.3em 0.5em;
 }
 
+.radio input
+{
+    margin: 0.5em 0.5em 0.5em 1em;
+}
+
 .submit input {
+    margin: 0 auto;
     margin-top: 1em;
     width: 6em;
     height: 2em;
@@ -136,6 +147,15 @@ a:hover {
 strong {
     font-weight: bold;
 }
+
+/* css for timepicker */
+div.ui-datepicker { font-size: 0.85em; }
+.ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
+.ui-timepicker-div dl { text-align: left; }
+.ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
+.ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
+.ui-timepicker-div td { font-size: 90%; }
+.ui-tpicker-grid-label { background:none; border: none; margin: 0; padding: 0; }
 
 /* BANNER */
 .banner {
@@ -407,15 +427,6 @@ i {
 /* Emailtemplate Form settings */
 
 /* view */
-
-#EmailtemplateViewForm .text label, .textarea label, .radio legend {
-    float: left;
-    text-align: right;
-    margin: 0.5em 0;
-    clear: left;
-    padding-right: 1em;
-    width: 13em;
-}
 
 #EmailtemplateViewForm .text input { 
     width: 21em;
@@ -697,6 +708,31 @@ i {
 .adminpage li {
     list-style: circle inside;
     margin: 0.5em;
+}
+
+/* EVENTS */
+
+/* events/add */
+
+.penaltyInput {
+    display: block;
+}
+
+.penaltyInLabel {
+    margin-left: 0.5em;
+    margin-right: 1em;
+}
+
+.penaltyInput input {
+    width: 2em;
+}
+
+.addPenaltyButton {
+    display: block;
+    margin-left: 14em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    width: 10em;
 }
 
 /* TO BE REFACTORED LATER */

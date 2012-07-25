@@ -8,14 +8,16 @@
   <!--link rel="shortcut icon" href="favicon.ico" type="image/x-icon"-->
   <?php
   // CSS files
-  echo $html->css('ipeer');
   echo $html->css('datepicker');
   echo $html->css('jquery.dataTables');
+  echo $html->css('http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/jquery-ui.css');
+  echo $html->css('ipeer');
 
   // Scripts
   // as prototype does not appear to be maintained anymore, we should
   // switch to jquery. Load jquery from Google.
   echo $html->script('https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js');
+  echo $html->script('https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js');
   echo $html->script('jquery.dataTables.min');
   ?>
   <script type='text/javascript'>

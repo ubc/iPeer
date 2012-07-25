@@ -267,7 +267,7 @@ class Course extends AppModel
     {
         $fields = array('Course.*');
         if ($type == 'list') {
-            $fields = array('Course.course');
+            $fields = array('Course.full_name');
             $recursive = 0;
         }
         return $this->find(

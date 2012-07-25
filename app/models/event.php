@@ -17,14 +17,60 @@ class Event extends AppModel
     /* Accordion's panelHeight - Height various based on the no. of questions and evaluation types*/
     public $SIMPLE_EVAL_HEIGHT = array('2'=>'200', '3'=>'250');
     public $RUBRIC_EVAL_HEIGHT = array('2'=>'200', '3'=>'250');
+    const DATETIMEREGEX = '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/';
 
     public $validate = array(
-        'title' => array('rule' => 'notEmpty',
-        'message' => 'Title is required.',
-        'allowEmpty' => false),
-        'due_date' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/',
-        'release_date_begin' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/',
-        'release_date_end' => '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/'
+        'title' => array(
+            'notEmpty' => array(
+                'rule' => 'notEmpty',
+                'message' => 'Title is required.',
+                'allowEmpty' => false
+            ),
+            'isUnique' => array(
+                'rule' => 'isUnique',
+                'message' => 'Duplicate title found.'
+            )
+        ),
+        'course_id' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Please select a course.'
+        ),
+        'event_template_type_id' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Please select a template type.'
+        ),
+        'template_id' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Please select a template.'
+        ),
+        'self_eval' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Please select a self-eval option.'
+        ),
+        'com_req' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Please select whether comments are required.'
+        ),
+        'due_date' => array(
+            'rule' => self::DATETIMEREGEX,
+            'message' => 'Must be in Year-Month-Day Hour:Minute:Second format.'
+        ),
+        'release_date_begin' => array(
+            'rule' => self::DATETIMEREGEX,
+            'message' => 'Must be in Year-Month-Day Hour:Minute:Second format.'
+        ),
+        'release_date_end' => array(
+            'rule' => self::DATETIMEREGEX,
+            'message' => 'Must be in Year-Month-Day Hour:Minute:Second format.'
+        ),
+        'result_release_date_begin' => array(
+            'rule' => self::DATETIMEREGEX,
+            'message' => 'Must be in Year-Month-Day Hour:Minute:Second format.'
+        ),
+        'result_release_date_end' => array(
+            'rule' => self::DATETIMEREGEX,
+            'message' => 'Must be in Year-Month-Day Hour:Minute:Second format.'
+        )
     );
 
     public $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Traceable');
@@ -70,30 +116,14 @@ class Event extends AppModel
             'dependent' => true,
             'foreignKey' => 'event_id'
         ),
- /*                     'EvaluationRubric' =>
-                        array(
-                          'className' => 'EvaluationRubric',
-                          'conditions' => '',
-                          'order' => '',
-                          'dependent' => true,
-                          'foreignKey' => 'event_id'
-                        ),
-                      'EvaluationSimple' =>
-                        array(
-                          'className' => 'EvaluationSimple',
-                          'conditions' => '',
-                          'order' => '',
-                          'dependent' => true,
-                          'foreignKey' => 'event_id'
-                        ),
-                      'EvaluationMixeval' =>
-                        array(
-                          'className' => 'EvaluationMixeval',
-                          'conditions' => '',
-                          'order' => '',
-                          'dependent' => true,
-                          'foreignKey' => 'event_id'
- )*/
+        'Penalty' =>
+        array(
+            'className' => 'Penalty',
+            'conditions' => '',
+            'order' => '',
+            'dependent' => true,
+            'foreignKey' => 'event_id'
+        )
     );
 
     /**
@@ -114,63 +144,6 @@ class Event extends AppModel
         $this->virtualFields['student_count'] = sprintf('SELECT count(*) as count FROM group_events as vge RIGHT JOIN groups_members as vgm ON vge.group_id = vgm.group_id WHERE vge.event_id = %s.id', $this->alias);
         $this->virtualFields['completed_count'] = sprintf('SELECT count(*) as count FROM evaluation_submissions as ves WHERE ves.submitted = 1 AND ves.event_id = %s.id', $this->alias);
     }
-
-
-    /**
-     * beforeSave
-     * Overwriting Function - will be called before save operation
-     *
-     *
-     * @access public
-     * @return void
-     */
-    function beforeSave()
-    {
-        // Ensure the name is not empty
-        if (empty($this->data[$this->name]['title'])) {
-            $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
-            return false;
-        }
-
-        // Remove any signle quotes in the name, so that custom SQL queries are not confused.
-        $this->data[$this->name]['title'] =
-            str_replace("'", "", $this->data[$this->name]['title']);
-
-        $allowSave = true;
-        if (empty($this->data[$this->name]['id'])) {
-            //check the duplicate title
-            $allowSave = $this->__checkDuplicateTitle();
-        }
-        return $allowSave;
-    }
-
-    /**
-     * __checkDuplicateTitle
-     * Validation check on duplication of title
-     *
-     * @param bool $title
-     *
-     * @access protected
-     * @return void
-     */
-    function __checkDuplicateTitle($title = null)
-    {
-        $duplicate = false;
-        $field = 'title';
-
-        $value = null === $title ? $this->data[$this->name]['title'] : $title;
-        if ($result =  $this->find('all', array('conditions' => array('Event.title'=>$value), 'fields'=>'title' ))) {
-            $duplicate = true;
-        }
-
-        if ($duplicate == true) {
-            $this->errorMessage='Duplicate Title found. Please change the title of this event.';
-            return false;
-        } else {
-            return true;
-        }
-    }
-
 
     /**
      * prepData

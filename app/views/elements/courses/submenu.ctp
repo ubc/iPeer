@@ -38,7 +38,7 @@ switch($submenu) {
   case "EvalEvents":
     array_push(
       $items,
-      array('name' => 'Add Event', 'link' => "/events/add"),
+      array('name' => 'Add Event', 'link' => "/events/add/$course_id"),
       array('name' => 'List Evaluation Events', 
         'link' => "/events/index/$course_id"),
       array('name' => 'Export Evaluation Results', 

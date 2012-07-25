@@ -13,6 +13,7 @@ class Penalty extends AppModel
 
     public $name = 'Penalty';
     
+    public $belongsTo = array('Event');
 
     /**
      * getPenaltyById
