@@ -12,7 +12,6 @@
 class PenaltyController extends AppController
 {
     public $name = 'Penalty';
-    //public $components = array('rdAuth');
 
     /**
      * save
@@ -24,8 +23,6 @@ class PenaltyController extends AppController
      */
     function save($eventId)
     {
-        // Make sure the present user is not a student
-        //$this->rdAuth->noStudentsAllowed();
         if (isset($this->params['form']) && !empty($this->params['form'])) {
             $this->autoRender = false;
             $data = $this->params['form'];

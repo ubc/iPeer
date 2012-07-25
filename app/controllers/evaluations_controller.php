@@ -173,8 +173,11 @@ class EvaluationsController extends AppController
      */
     function ajaxList()
     {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
+        // Make sure the present user has permission
+        if (!User::hasPermission('controllers/evaluations')) {
+            $this->Session->setFlash('You do not have permission to view evaluations', true);
+            $this->redirect('/home');
+        }
         // Set up the list
         $eventId = $this->Session->read("evaluationsControllerEventIdSession");
         $this->setUpAjaxList($eventId);
@@ -225,47 +228,8 @@ class EvaluationsController extends AppController
      */
     function index ($message="")
     {
-        // Make sure the present user is not a student
-        //$this->rdAuth->noStudentsAllowed();
         // Evaluation index was merged with events ajaxList
         $this->redirect('/events/index');
-    }
-
-    /**
-     * search
-     *
-     * @access public
-     * @return void
-     */
-    function search()
-    {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
-
-        $this->layout = 'ajax';
-        if ($this->show == 'null') {
-            //check for initial page load, if true, load record limit from db
-            $personalizeData = $this->Personalize->find('all', 'user_id = '.$this->Auth->user('id'));
-            if ($personalizeData) {
-                $this->userPersonalize->setPersonalizeList($personalizeData);
-                $this->show = $this->userPersonalize->getPersonalizeValue('Eval.ListMenu.Limit.Show');
-                $this->set('userPersonalize', $this->userPersonalize);
-            }
-            $this->show = '10';
-        }
-
-        $courseId = $this->rdAuth->courseId;
-        $conditions = 'course_id = '.$courseId;
-
-        if (!empty($this->params['form']['livesearch2']) && !empty($this->params['form']['select'])) {
-            $pagination->loadingId = 'loading';
-            //parse the parameters
-            $searchField=$this->params['form']['select'];
-            $searchValue=$this->params['form']['livesearch2'];
-            $conditions = ' AND '.$searchField." LIKE '%".mysql_real_escape_string($searchValue)."%'";
-        }
-        $this->update($attributeCode = 'Eval.ListMenu.Limit.Show', $attributeValue = $this->show);
-        $this->set('conditions', $conditions);
     }
 
 
@@ -311,8 +275,33 @@ class EvaluationsController extends AppController
      */
     function export($eventId=null)
     {
-        // Make sure the present user is not a student
-        $this->rdAuth->noStudentsAllowed();
+        // Make sure the present user has Permission
+        if (!User::hasPermission('functions/evaluation/export')) {
+            $this->Session->setFlash('You do not have permission to export evaluation results', true);
+            $this->redirect('/home');
+        }
+        
+        if (!is_numeric($eventId)) {
+            $this->Session->setFlash('Invalid Id', true);
+            $this->redirect('index');
+        }
+        
+        $courseId = $this->Event->getCourseByEventId($eventId);
+        $course = $this->Course->find(
+            'first',
+            array(
+                'conditions' => array(
+                    'Course.id' => $courseId,
+                    'Instructor.id' => $this->Auth->user('id')
+                )
+            )
+        );
+        
+        if (null == $course) {
+            $this->Session->setFlash('You do not have permission to export evaluation results for this event.', true);
+            $this->redirect('index');
+        }
+        
         if (!is_numeric($eventId)) {
             $courseId = substr($eventId, -1);
             $events = $this->Event->getCourseEvent($courseId);
@@ -330,10 +319,6 @@ class EvaluationsController extends AppController
         //do stuff
         if (isset($this->params['form']) && !empty($this->params['form'])) {
             $this->autoRender = false;
-      /* if (!$this->ExportCsv->checkAll($this->params['form'], $eventId)) {
-         $this->Session->setFlash("Error : at least ONE of each coloured fields (*) must be selected.");
-         $this->redirect('');
-         } else {*/
             if (!is_numeric($eventId)) {
 
             }

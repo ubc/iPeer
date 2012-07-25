@@ -85,8 +85,11 @@ class SysFunctionsController extends AppController
      */
     function index($message='')
     {
-        // Make sure the present user is not a student
-        //   $this->rdAuth->noStudentsAllowed();
+        // Make sure the present user has permission
+        if (!User::hasPermission('controllers/sysfunctions')) {
+            $this->Session->setFlash('You do not have permission to view system functions', true);
+            $this->redirect('/home');
+        }
         // Set the top message
         $this->set('message', $message);
         // Set up the basic static ajax list variables
@@ -104,8 +107,11 @@ class SysFunctionsController extends AppController
      */
     function ajaxList()
     {
-        // Make sure the present user is not a student
-        //  $this->rdAuth->noStudentsAllowed();
+        // Make sure the present user has permission
+        if (!User::hasPermission('controllers/sysfunctions')) {
+            $this->Session->setFlash('You do not have permission to view system functions', true);
+            $this->redirect('/home');
+        }
         // Set up the list
         $this->setUpAjaxList();
         // Process the request for data
@@ -121,9 +127,10 @@ class SysFunctionsController extends AppController
      * @return void
      */
     function view($id)
-    {	$this->SysFunction->id = $id;
-    $data = $this->SysFunction->read();
-    $this->set('data', $data);
+    {	
+        $this->SysFunction->id = $id;
+        $data = $this->SysFunction->read();
+        $this->set('data', $data);
     }
 
 

@@ -86,8 +86,11 @@ class SysParametersController extends AppController
      */
     function index($message='')
     {
-        // Make sure the present user is not a student
-        //   $this->rdAuth->noStudentsAllowed();
+        // Make sure the present user has permission
+        if (!User::hasPermission('controllers/sysparameters')) {
+            $this->Session->setFlash('You do not have permission to view system parameters', true);
+            $this->redirect('/home');
+        }
         // Set the top message
         $this->set('message', $message);
         // Set up the basic static ajax list variables
@@ -104,8 +107,11 @@ class SysParametersController extends AppController
      */
     function ajaxList()
     {
-        // Make sure the present user is not a student
-        // $this->rdAuth->noStudentsAllowed();
+        // Make sure the present user has permission
+        if (!User::hasPermission('controllers/sysparameters')) {
+            $this->Session->setFlash('You do not have permission to view system parameters', true);
+            $this->redirect('/home');
+        }
         // Set up the list
         $this->setUpAjaxList();
         // Process the request for data

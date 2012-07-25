@@ -176,8 +176,11 @@ class UsersController extends AppController
      */
     function ajaxList()
     {
-        // Make sure the present user is not a student
-        //$this->rdAuth->noStudentsAllowed();
+        // Make sure the present user has permission
+        if (!User::hasPermission('controllers/users')) {
+            $this->Session->setFlash('You do not have permission to view users', true);
+            $this->redirect('/home');
+        }
         // Set up the list
         $this->_setUpAjaxList();
         // Process the request for data

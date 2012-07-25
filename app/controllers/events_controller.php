@@ -195,13 +195,12 @@ class EventsController extends AppController
      */
     function index($courseId = null, $message = '')
     {
+        // Make sure the present user has permission
         if (!User::hasPermission('controllers/events')) {
             $this->Session->setFlash(__('You do not have permission to view events.', true));
             $this->redirect('/home');
         }
-        
-        // Make sure the present user is not a student
-        //$this->rdAuth->noStudentsAllowed();
+
         $this->set('message', $message);
 
         // We need to change the session state to point to this
@@ -230,8 +229,6 @@ class EventsController extends AppController
      */
     function ajaxList()
     {
-        // Make sure the present user is not a student
-        //$this->rdAuth->noStudentsAllowed();
         // Set up the list
         $courseId = $this->Session->read('eventsControllerCourseId');
         $this->setUpAjaxList($courseId);
