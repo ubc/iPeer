@@ -1321,11 +1321,11 @@ INSERT INTO penalties (id, event_id, days_late, percent_penalty) VALUES
 (1, 1, 1, 20),
 (2, 1, 2, 40),
 (3, 1, 3, 60),
-(4, 1, -1, 100),
+(4, 1, 4, 100),
 (5, 2, 1, 15),
 (6, 2, 2, 30),
 (7, 2, 3, 45),
-(8, 2, -1, 60);
+(8, 2, 4, 60);
 
 --
 -- Constraints for table `penalties`

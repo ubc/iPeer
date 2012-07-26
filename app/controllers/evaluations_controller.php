@@ -376,13 +376,11 @@ class EvaluationsController extends AppController
 
 
             $penalty = $this->Penalty->getPenaltyByEventId($eventId);
-            $penaltyType = $this->Penalty->getPenaltyType($eventId);
             $penaltyDays = $this->Penalty->getPenaltyDays($eventId);
             $penaltyFinal = $this->Penalty->getPenaltyFinal($eventId);
             $this->set('penaltyFinal', $penaltyFinal);
             $this->set('penaltyDays', $penaltyDays);
             $this->set('penalty', $penalty);
-            $this->set('penaltyType', $penaltyType['Penalty']['days_late']);
 
 
             //Setup the courseId to session
@@ -572,14 +570,11 @@ class EvaluationsController extends AppController
             $data = $this->Rubric->getRubricById($rubricId);
 
             $penalty = $this->Penalty->getPenaltyByEventId($eventId);
-            $penaltyType = $this->Penalty->getPenaltyType($eventId);
             $penaltyDays = $this->Penalty->getPenaltyDays($eventId);
             $penaltyFinal = $this->Penalty->getPenaltyFinal($eventId);
             $this->set('penaltyFinal', $penaltyFinal);
             $this->set('penaltyDays', $penaltyDays);
             $this->set('penalty', $penalty);
-            $this->set('penaltyType', $penaltyType['Penalty']['days_late']);
-
 
             $this->set('data', $data);
             $this->set('event', $event);
@@ -729,13 +724,11 @@ class EvaluationsController extends AppController
 
             $eventId = $tok;
             $penalty = $this->Penalty->getPenaltyByEventId($eventId);
-            $penaltyType = $this->Penalty->getPenaltyType($eventId);
             $penaltyDays = $this->Penalty->getPenaltyDays($eventId);
             $penaltyFinal = $this->Penalty->getPenaltyFinal($eventId);
             $this->set('penaltyFinal', $penaltyFinal);
             $this->set('penaltyDays', $penaltyDays);
             $this->set('penalty', $penalty);
-            $this->set('penaltyType', $penaltyType['Penalty']['days_late']);
             $event = $this->Event->formatEventObj($eventId, $groupId);
             $this->set('event', $event);
             $this->set('evaluator_id', $this->Auth->user('id'));

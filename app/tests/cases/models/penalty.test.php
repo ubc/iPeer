@@ -88,25 +88,6 @@ class PenaltyTestCase extends CakeTestCase
         $this->assertEqual($ret, array());
     }
     
-    function testGetPenaltyType()
-    {
-        // valid event
-        $ret = $this->Penalty->getPenaltyType(1);
-        $this->assertEqual($ret['Penalty']['days_late'], -1);
-        
-        // valid event but no penalty
-        $ret = $this->Penalty->getPenaltyType(3);
-        $this->assertEqual($ret, array());
-        
-        // id = null
-        $ret = $this->Penalty->getPenaltyType(null);
-        $this->assertEqual($ret, array());
-        
-        // invalid id
-        $ret = $this->Penalty->getPenaltyType(999);
-        $this->assertEqual($ret, array());
-    }
-    
     function testGetPenaltyDays()
     {
         // valid event
