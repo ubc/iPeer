@@ -18,6 +18,7 @@ class SurveyGroupMemberTestCase extends CakeTestCase
 
     function startCase()
     {
+        echo "Start SurveyGroupMember model test.\n";
         $this->SurveyGroupMember = ClassRegistry::init('SurveyGroupMember');
     }
 

@@ -17,6 +17,7 @@ class SysParameterTestCase extends CakeTestCase
 
     function startCase()
     {
+        echo "Start SysParameter model test.\n";
         $this->SysParameter = ClassRegistry::init('SysParameter');
     }
 

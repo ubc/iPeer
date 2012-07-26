@@ -17,6 +17,7 @@ class SimpleEvaluationTestCase extends CakeTestCase
 
     function startCase()
     {
+        echo "Start SimpleEvaluation model test.\n";
     }
 
     function endCase()

@@ -10,6 +10,7 @@ class SysFunctionTestCase extends CakeTestCase
 
     function startCase()
     {
+        echo "Start SysFunction model test.\n";
         $this->SysFunction = ClassRegistry::init('SysFunction');
     }
 

@@ -18,6 +18,7 @@ class SurveyInputTestCase extends CakeTestCase
 
     function startCase()
     {
+        echo "Start SurveyInput model test.\n";
         $this->SurveyInput = ClassRegistry::init('SurveyInput');
     }
 

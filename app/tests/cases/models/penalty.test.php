@@ -18,6 +18,7 @@ class PenaltyTestCase extends CakeTestCase
 
     function startCase()
     {
+        echo "Start Penalty model test.\n";
         $this->Penalty = ClassRegistry::init('Penalty');
     }
 

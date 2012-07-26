@@ -12,12 +12,14 @@ class GroupTestCase extends CakeTestCase
         'app.response', 'app.survey_question', 'app.user_course',
         'app.user_enrol', 'app.groups_member', 'app.survey',
         'app.user_faculty', 'app.faculty', 'app.department',
-        'app.course_department', 'app.sys_parameter', 'app.user_tutor'
+        'app.course_department', 'app.sys_parameter', 'app.user_tutor',
+        'app.penalty'
     );
     public $Group = null;
 
     function startCase()
     {
+        echo "Start Group model test.\n";
         $this->Group = ClassRegistry::init('Group');
     }
 
@@ -140,7 +142,7 @@ class GroupTestCase extends CakeTestCase
 
         // Test valid course with groups
         $groups = $this->Group->getGroupsByCourseId(1);
-        $this->assertEqual($groups, array(1=>1,2=>2));
+        $this->assertEqual($groups, array(1 =>'Reapers', 2 =>'Lazy Engineers'));
 
         // Test valid course with no groups
         $groups = $this->Group->getGroupsByCourseId(2);

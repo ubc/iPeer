@@ -18,6 +18,7 @@ class EmailScheduleTestCase extends CakeTestCase
 
     function startCase()
     {
+        echo "Start Email Schedule test.\n";
         $this->EmailSchedule = ClassRegistry::init('EmailSchedule');
     }
 

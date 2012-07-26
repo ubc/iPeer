@@ -18,6 +18,7 @@ class MixevalsQuestionTestCase extends CakeTestCase
 
     function startCase()
     {
+        echo "Start MixevalsQuestion model test.\n";
         $this->MixevalsQuestion = ClassRegistry::init('MixevalsQuestion');
     }
 

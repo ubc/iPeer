@@ -14,12 +14,14 @@ class SurveyQuestionTestCase extends CakeTestCase
         'app.user_enrol', 'app.groups_member', 'app.rubric', 'app.rubrics_lom',
         'app.rubrics_criteria', 'app.rubrics_criteria_comment',
         'app.faculty', 'app.user_faculty', 'app.department',
-        'app.course_department', 'app.sys_parameter', 'app.user_tutor'
+        'app.course_department', 'app.sys_parameter', 'app.user_tutor',
+        'app.penalty', 'app.sys_function'
     );
     public $SurveyQuestion = null;
 
     function startCase()
     {
+        echo "Start SurveyQuestion model test.\n";
         $this->SurveyQuestion = ClassRegistry::init('SurveyQuestion');
         $this->Survey = ClassRegistry::init('Survey');
         $this->Question = ClassRegistry::init('Question');

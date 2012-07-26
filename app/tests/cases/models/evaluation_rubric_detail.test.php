@@ -18,6 +18,7 @@ class EvaluationRubricDetailTestCase extends CakeTestCase
 
     function startCase()
     {
+        echo "Start EvaluationRubricDetail model test.\n";
         $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
     }
 

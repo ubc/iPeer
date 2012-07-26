@@ -17,6 +17,7 @@ class GroupsMembersTestCase extends CakeTestCase
 
     function startCase()
     {
+        echo "Start GroupsMembers model test.\n";
         $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
     }
 

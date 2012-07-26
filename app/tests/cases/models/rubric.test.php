@@ -15,12 +15,14 @@ class RubricTestCase extends CakeTestCase
         'app.user_enrol', 'app.groups_member', 'app.rubric', 'app.rubrics_lom',
         'app.rubrics_criteria', 'app.rubrics_criteria_comment',
         'app.faculty', 'app.user_faculty', 'app.department',
-        'app.course_department', 'app.sys_parameter', 'app.user_tutor'
+        'app.course_department', 'app.sys_parameter', 'app.user_tutor',
+        'app.penalty'
     );
     public $Rubric = null;
 
     function startCase()
     {
+        echo "Start Rubric model test.\n";
         $this->Rubric = ClassRegistry::init('Rubric');
         $this->RubricsLom = ClassRegistry::init('RubricsLom');
         $this->RubricsCriteria = ClassRegistry::init('RubricsCriteria');

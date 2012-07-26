@@ -18,6 +18,7 @@ class EmailMergeTestCase extends CakeTestCase
 
     function startCase()
     {
+        echo "Start Email Merge test.\n";
         $this->EmailMerge = ClassRegistry::init('EmailMerge');
     }
 

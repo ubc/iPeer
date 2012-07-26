@@ -19,6 +19,7 @@ class EmailTemplateTestCase extends CakeTestCase
 
     function startCase()
     {
+        echo "Start Email Template model test.\n";
         $this->EmailTemplate = ClassRegistry::init('EmailTemplate');
     }
 

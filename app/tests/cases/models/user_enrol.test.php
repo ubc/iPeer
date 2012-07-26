@@ -13,12 +13,13 @@ class UserEnrolTestCase extends CakeTestCase
         'app.response', 'app.survey_question', 'app.user_course',
         'app.user_enrol', 'app.groups_member', 'app.survey', 'app.faculty',
         'app.user_faculty', 'app.department', 'app.course_department',
-        'app.sys_parameter', 'app.user_tutor'
+        'app.sys_parameter', 'app.user_tutor', 'app.penalty'
     );
     public $Course = null;
 
     function startCase()
     {
+        echo "Start UserEnrol model test.\n";
         $this->UserEnrol = ClassRegistry::init('UserEnrol');
     }
 

@@ -18,6 +18,7 @@ class EvaluationSimpleTestCase extends CakeTestCase
 
     function startCase()
     {
+        echo "Start EvaluationSimple model test.\n";
         $this->EvaluationSimple = ClassRegistry::init('EvaluationSimple');
     }
 

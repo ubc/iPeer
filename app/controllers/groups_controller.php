@@ -286,7 +286,8 @@ class GroupsController extends AppController
 
         //Check if student is already assigned in a group
         $groups = $this->Group->getGroupsByCourseId($course_id);
-        $assigned_users = $this->GroupsMembers->getUserListInGroups($groups);
+        $assigned_users = $this->GroupsMembers->getUserListInGroups(
+            array_keys($groups));
         foreach ($assigned_users as $assigned_user) {
             $user_data[$assigned_user] = $user_data[$assigned_user].' *';
         }

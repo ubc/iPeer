@@ -14,12 +14,14 @@ class ResponseTestCase extends CakeTestCase
         'app.user_enrol', 'app.groups_member', 'app.rubric', 'app.rubrics_lom',
         'app.rubrics_criteria', 'app.rubrics_criteria_comment',
         'app.faculty', 'app.user_faculty', 'app.department',
-        'app.course_department', 'app.sys_parameter', 'app.user_tutor'
+        'app.course_department', 'app.sys_parameter', 'app.user_tutor',
+        'app.penalty'
     );
     public $Response = null;
 
     function startCase()
     {
+        echo "Start Response model test.\n";
         $this->Response = ClassRegistry::init('Response');
         $this->SurveyQuestion = ClassRegistry::init('SurveyQuestion');
         $this->Question = ClassRegistry::init('Question');
