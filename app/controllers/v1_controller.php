@@ -273,6 +273,48 @@ class V1Controller extends Controller {
     }
 
     /**
+     * Get a list of events in iPeer.
+     **/
+    public function events() {
+        $course_id = $this->params['course_id'];
+        $event_id = $this->params['event_id'];
+
+        if ($this->RequestHandler->isGet()) {
+            if (null == $event_id) {
+                $list = $this->Event->find('all', array('fields' => array('title', 'course_id', 'event_template_type_id')));
+
+                if (!empty($list)) {
+                    foreach ($list as $data) {
+                        $results[] = $data['Event'];
+                    }
+                    $statusCode = 'HTTP/1.0 200 OK';
+                } else {
+                    $results = 'It appears that there are no events in course with id '.$course_id;
+                    $statusCode = 'HTTP/1.0 404 Not Found';
+                }
+            } else {
+                $list = $this->Event->find('first',
+                    array('fields' => array('title', 'course_id', 'event_template_type_id'),
+                        'conditions' => array('Event.id' => $event_id))
+                );
+                
+                if (!empty($list)) {
+                    $results = $list['Event'];
+                    $statusCode = 'HTTP/1.0 200 OK';
+                } else {
+                    $results = 'This event with id'.$event_id.'doesn\'t seem to exist';
+                    $statusCode = 'HTTP/1.0 404 Not Found';
+                }
+            }
+            $this->set('statusCode', $statusCode);
+            $this->set('events', $results);
+        } else {
+            $this->set('statusCode', 'HTTP/1.0 400 Bad Request');
+            $this->set('events', null);
+        }
+    }
+    
+    /**
      * Get a list of grades in iPeer.
      **/
     public function grades() {
@@ -340,7 +382,7 @@ class V1Controller extends Controller {
                     );
                     
                     if (!empty($list)) {
-                        $results = $data['EvaluationSimple'];
+                        $results = $list['EvaluationSimple'];
                         $statusCode = 'HTTP/1.0 200 OK';
                     } else {
                         $results = 'No grades can be found for user with id '.$user_id;
@@ -354,7 +396,7 @@ class V1Controller extends Controller {
                     );
                     
                     if (!empty($list)) {
-                        $results = $data['EvaluationRubric'];
+                        $results = $list['EvaluationRubric'];
                         $statusCode = 'HTTP/1.0 200 OK';
                     } else {
                         $results = 'No grades can be found for user with id '.$user_id;

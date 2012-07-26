@@ -10,7 +10,7 @@ class V1ControllerTest extends CakeTestCase {
         'app.response', 'app.survey_question', 'app.user_course',
         'app.user_enrol', 'app.groups_member', 'app.survey',
         'app.faculty', 'app.department', 'app.course_department',
-        'app.user_faculty', 'app.user_tutor',
+        'app.user_faculty', 'app.user_tutor', 'app.sys_parameter', 'app.penalty'
         
     );
 
@@ -458,7 +458,7 @@ class V1ControllerTest extends CakeTestCase {
         $context = stream_context_create($opts);
         file_get_contents($url.'/2/groups/'.$id, false, $context);
         
-        if ($this->get_http_response_code($url.'/'.$id) == 404) {
+        if ($this->get_http_response_code($url.'/2/groups/'.$id) == 404) {
             $deleteTest = 'successful';
         } else {
             $deleteTest = 'failed';
@@ -467,42 +467,20 @@ class V1ControllerTest extends CakeTestCase {
         $this->assertEqual($deleteTest, 'successful');
     }
     
-    public function testGrades()
+    public function testEvents()
     {
-        $url = Router::url('v1/courses/1/events/3/grades', true);
+        $url = Router::url('v1/courses/1/events', true);
         $events = $this->_fixtures['app.event']->records;
-        $mixevals = $this->_fixtures['app.evaluation_mixeval']->records;
-        $rubrics = $this->_fixtures['app.evaluation_rubric']->records;
-        $simples = $this->_fixtures['app.evaluation_simple']->records;
         
-        $mixevalList = array();
-        $rubricList = array();
-        $simpleList = array();
-        $listAll = array();
+        $expectedEvents = array();
         
-        foreach ($mixevals as $data) {
+        foreach ($events as $data) {
             $tmp = array();
-            $tmp['evaluatee'] = $data['evaluatee'];
-            $tmp['score'] = $data['score'];
+            $tmp['title'] = $data['title'];
+            $tmp['course_id'] = $data['course_id'];
+            $tmp['event_template_type_id'] = $data['event_template_type_id'];
             $tmp['id'] = $data['id'];
-            $mixevalList[] = $tmp;
-            $listAll[] = $tmp;
-        }
-        foreach ($rubrics as $data) {
-            $tmp = array();
-            $tmp['evaluatee'] = $data['evaluatee'];
-            $tmp['score'] = $data['score'];
-            $tmp['id'] = $data['id'];
-            $rubricList[] = $tmp;
-            $listAll[] = $tmp;
-        }
-        foreach ($simples as $data) {
-            $tmp = array();
-            $tmp['evaluatee'] = $data['evaluatee'];
-            $tmp['score'] = $data['score'];
-            $tmp['id'] = $data['id'];
-            $simpleList[] = $tmp;
-            $listAll[] = $tmp;
+            $expectedEvents[] = $tmp;
         }
         
         $opts = array(
@@ -512,11 +490,82 @@ class V1ControllerTest extends CakeTestCase {
             )
         );
         $context = stream_context_create($opts);
-        $mixevalGrades = file_get_contents($url, null, $context);
+        $actualEvents = file_get_contents($url, null, $context);
+        $actualEvents = json_decode($actualEvents, true);
+        $this->assertEqual($expectedEvents, $actualEvents);
+
+        $actualEvent = file_get_contents($url.'/3', null, $context);
+        $actualEvent = json_decode($actualEvent, true);
+        $expectedEvent = array("title" => 'Project Evaluation', "course_id" => 1, "event_template_type_id" => 4, "id" => 3);
+        $this->assertEqual($expectedEvent, $actualEvent);
+    }
+    
+    public function testGrades()
+    {
+        $url = Router::url('v1/courses/1/events/', true);
+        $events = $this->_fixtures['app.event']->records;
+        $mixevals = $this->_fixtures['app.evaluation_mixeval']->records;
+        $rubrics = $this->_fixtures['app.evaluation_rubric']->records;
+        $simples = $this->_fixtures['app.evaluation_simple']->records;
+        
+        $mixevalList = array();
+        $rubricList = array();
+        $simpleList = array();
+        
+        foreach ($mixevals as $data) {
+            $tmp = array();
+            $tmp['evaluatee'] = $data['evaluatee'];
+            $tmp['score'] = $data['score'];
+            $tmp['id'] = $data['id'];
+            $mixevalList[] = $tmp;
+        }
+        foreach ($rubrics as $data) {
+            $tmp = array();
+            $tmp['evaluatee'] = $data['evaluatee'];
+            $tmp['score'] = $data['score'];
+            $tmp['id'] = $data['id'];
+            $rubricList[] = $tmp;
+        }
+        foreach ($simples as $data) {
+            $tmp = array();
+            $tmp['evaluatee'] = $data['evaluatee'];
+            $tmp['score'] = $data['score'];
+            $simpleList[] = $tmp;
+        }
+        
+        $opts = array(
+            'http'=>array(
+                'method'=>"GET",
+                'header'=>"Content-Type: application/json"
+            )
+        );
+        
+        $context = stream_context_create($opts);
+        $simpleGrades = file_get_contents($url.'1/grades', null, $context);
+        $simpleGrades = json_decode($simpleGrades, true);
+        $this->assertEqual($simpleList, $simpleGrades);
+        
+        $context = stream_context_create($opts);
+        $rubricGrades = file_get_contents($url.'2/grades', null, $context);
+        $rubricGrades = json_decode($rubricGrades, true);
+        $this->assertEqual($rubricList, $rubricGrades);
+        
+        $context = stream_context_create($opts);
+        $mixevalGrades = file_get_contents($url.'3/grades', null, $context);
         $mixevalGrades = json_decode($mixevalGrades, true);
         $this->assertEqual($mixevalList, $mixevalGrades);
 
-        $studentGrade = file_get_contents($url.'/6', null, $context);
+        $studentGrade = file_get_contents($url.'1/grades/33', null, $context);
+        $studentGrade = json_decode($studentGrade, true);
+        $expectedGrade = array("evaluatee" => 33, "score" => 75);
+        $this->assertEqual($expectedGrade, $studentGrade);
+        
+        $studentGrade = file_get_contents($url.'2/grades/5', null, $context);
+        $studentGrade = json_decode($studentGrade, true);
+        $expectedGrade = array("evaluatee" => 5, "score" => 14, "id" => 3);
+        $this->assertEqual($expectedGrade, $studentGrade);
+        
+        $studentGrade = file_get_contents($url.'3/grades/6', null, $context);
         $studentGrade = json_decode($studentGrade, true);
         $expectedGrade = array("evaluatee" => 6, "score" => 2.4, "id" => 2);
         $this->assertEqual($expectedGrade, $studentGrade);
