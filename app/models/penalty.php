@@ -39,7 +39,6 @@ class Penalty extends AppModel
      */
     function getPenaltyByEventId($eventId)
     {
-        //return $this->find('all', array('conditions' => array('Penalty.event_id' => $eventId, 'Penalty.days_late >' => 0), 'order' => array('Penalty.days_late')));
         $penalties = $this->find('all', array('conditions' => array('Penalty.event_id' => $eventId), 'order' => array('Penalty.days_late')));
         // pop off the final deduction
         array_pop($penalties);
@@ -57,7 +56,6 @@ class Penalty extends AppModel
      */
     function getPenaltyFinal($eventId)
     {
-        //return $this->find('first', array('conditions' => array('Penalty.event_id' => $eventId, 'Penalty.days_late <' => 0)));
         $final = $this->find('all', array('conditions' => array('Penalty.event_id' => $eventId)));
         return array_pop($final);
     }
@@ -73,7 +71,6 @@ class Penalty extends AppModel
      */
     function getPenaltyDays($eventId)
     {
-        // subtract the final deduction from the count
         $count = $this->find('count',
             array('conditions'=>array('Penalty.event_id' => $eventId)));
         if ($count > 0) {

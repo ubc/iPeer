@@ -447,10 +447,13 @@ i {
 
 /* add and edit */
 
-#EmailtemplateAddForm .text label {
-    width: 13em;
+#EmailtemplateAddForm .radio fieldset {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    clear: both;
 }
 
+/* makes the text boxes bigger */
 #EmailtemplateAddForm .text input { 
     width: 21em;
 }
@@ -460,28 +463,6 @@ i {
     width: 21.5em;
 }
 
-#EmailtemplateAddForm .select label {
-    margin: 0 0;
-    width: 13em;
-}
-
-#EmailtemplateAddForm .radio input {
-    margin: 0.65em;
-}
-
-#EmailtemplateAddForm .submit {
-    width: 10em;
-    margin: 1em auto;
-}
-
-#EmailtemplateEditForm .input label {
-    width: 13em;
-}
-
-#EmailtemplateEditForm .submit {
-    width: 10em;
-    margin: 1em auto;
-}
 
 /* POPUP */
 
@@ -734,6 +715,7 @@ i {
     margin-bottom: 0.5em;
     width: 10em;
 }
+
 
 /* TO BE REFACTORED LATER */
 
