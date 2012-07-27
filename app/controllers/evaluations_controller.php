@@ -273,62 +273,97 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    function export($eventId=null)
+    function export($type, $id=null)
     {
         // Make sure the present user has Permission
         if (!User::hasPermission('functions/evaluation/export')) {
             $this->Session->setFlash('You do not have permission to export evaluation results', true);
             $this->redirect('/home');
         }
-        
-        if (!is_numeric($eventId)) {
-            $this->Session->setFlash('Invalid Id', true);
-            $this->redirect('index');
+
+        // $type must be course or event
+        if ('course' != $type && 'event' != $type) {
+            $this->Session->setFlash('Invalid export type', true);
+            $this->redirect('/courses');
+        } else if (!is_numeric($id)) {
+            $this->Session->setFlash('Invalid id', true);
+            $this->redirect('/courses');
         }
         
-        $courseId = $this->Event->getCourseByEventId($eventId);
-        $course = $this->Course->find(
-            'first',
-            array(
-                'conditions' => array(
-                    'Course.id' => $courseId,
-                    'Instructor.id' => $this->Auth->user('id')
+        $this->set('type', $type);
+        
+        if ('course' == $type) {
+            $courseId = $id;
+            $course = $this->Course->find(
+                'first',
+                array(
+                    'conditions' => array(
+                        'Course.id' => $id,
+                        'Instructor.id' => $this->Auth->user('id')
+                    )
                 )
-            )
-        );
-        
-        if (null == $course) {
-            $this->Session->setFlash('You do not have permission to export evaluation results for this event.', true);
-            $this->redirect('index');
-        }
-        
-        if (!is_numeric($eventId)) {
-            $courseId = substr($eventId, -1);
-            $events = $this->Event->getCourseEvent($courseId);
+            );
+            
+            if (null == $course) {
+                $this->Session->setFlash('You do not have permission to export evaluation results from this course.', true);
+                $this->redirect('/courses');
+            }
+            
+            $events = $this->Event->getCourseEvalEvent($id);
+
             $this->set('events', $events);
             $this->set('fromEvent', false);
-        } else {
-            $courseId = $this->Event->getCourseByEventId($eventId);
-            $selectedEvent = $this->Event->getEventById($eventId);
+        
+        } else if ('event' == $type) {
+            $courseId = $this->Event->getCourseByEventId($id);
+            $course = $this->Course->find(
+                'first',
+                array(
+                    'conditions' => array(
+                        'Course.id' => $courseId,
+                        'Instructor.id' => $this->Auth->user('id')
+                    )
+                )
+            );
+            
+            $event = $this->Event->find(
+                'first',
+                array(
+                    'conditions' => array(
+                        'Event.id' => $id,
+                        'event_template_type_id !=' => '3'
+                    )
+                )
+            );
+            
+            if (null == $course) {
+                $this->Session->setFlash('You do have permission to export evaluation results for this event.', true);
+                $this->redirect('/courses');
+            } else if (null == $event) {
+                $this->Session->setFlash('Invalid Id', true);
+                $this->redirect('/courses');
+            }
+            
+            $selectedEvent = $this->Event->getEventById($id);
+            
             $this->set('selectedEvent', $selectedEvent);
             $this->set('fromEvent', true);
         }
-        $this->set('eventId', $eventId);
+
+        $this->set('id', $id);
         $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Export Evaluation Results');
 
         //do stuff
         if (isset($this->params['form']) && !empty($this->params['form'])) {
             $this->autoRender = false;
-            if (!is_numeric($eventId)) {
 
-            }
             $fileName = isset($this->params['form']['file_name']) && !empty($this->params['form']['file_name']) ? $this->params['form']['file_name']:date('m.d.y');
             switch($this->params['form']['export_type']) {
             case "csv" :
-                $fileContent = $this->ExportCsv->createCsv($this->params['form'], $eventId);
+                $fileContent = $this->ExportCsv->createCsv($this->params['form'], $this->params['form']['event_id']);
                 break;
             case "excel" :
-                $fileContent = $this->ExportExcel->createExcel($this->params['form'], $eventId);
+                $fileContent = $this->ExportExcel->createExcel($this->params['form'], $this->params['form']['event_id']);
                 break;
             default :
                 throw new Exception("Invalid evaluation selection.");
@@ -339,9 +374,6 @@ class EvaluationsController extends AppController
             //	  }
         } else {
             // Set up data
-            $event = $this->Event->getEventById($eventId);
-            $eventType = $event['Event']['event_template_type_id'];
-            $this->set('eventType', $eventType);
             $this->set('file_name', date('m.d.y'));
         }
     }

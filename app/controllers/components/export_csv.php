@@ -189,7 +189,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
     {
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $this->Event = ClassRegistry::init('Event');
-        //    var_dump($this->GroupEvent);
+
         $event = $this->Event->getEventById($eventId);
 
         $groupEvents = $this->GroupEvent->getGroupsByEventId($eventId);

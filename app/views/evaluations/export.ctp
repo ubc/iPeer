@@ -1,7 +1,7 @@
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>
-    <form name="frm" id="frm" method="POST" action="<?php echo $html->url('export/'.$eventId) ?>">
+    <form name="frm" id="frm" method="POST" action="<?php echo $html->url('export/'.$type.'/'.$id) ?>">
       <input type="hidden" name="assigned" id="assigned"/>
       <table width="85%" border="0" align="center" cellpadding="4" cellspacing="2">
       	<tr><td style="color:darkred; font-size:smaller"> *Please check at least one of similarly coloured fields</td></tr>
@@ -20,14 +20,13 @@
           <td></td>
         </tr>                  
         <tr class="tablecell2">
-          <td width="30%">Event Name:</td><td width="40%"><select name="eval_type" class= "eval_type">
+          <td width="30%">Event Name:</td><td width="40%"><select name="event_id" class= "event_id">
           	<?php 
           	  if($fromEvent) {
-				echo '<option value='.$selectedEvent['Event']['event_template_type_id'].'>'.$selectedEvent['Event']['title'].'</option>';
+				echo '<option value='.$selectedEvent['Event']['id'].'>'.$selectedEvent['Event']['title'].'</option>';
           	  } else {
           	      foreach($events as $e) {
-          	  	  //.json_encode
-          	    	        echo "<option value= '".json_encode($e)."'>".$e["Event"]["title"]."</option>";          	  	  
+          	    	  echo '<option value= '.$e['Event']['id'].'>'.$e["Event"]["title"].'</option>';          	  	  
           	    }
           	  }
           	?>

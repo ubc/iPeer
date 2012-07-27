@@ -19,7 +19,7 @@
             <?php 
                 echo $html->link(
                         $html->image('icons/export_excel.gif', array('alt'=>'Export')).__(" Export Evaluations", true),
-                        "export/".$eventId,
+                        "export/event/".$eventId,
                         array('escape' => false)
                 );
             ?>
