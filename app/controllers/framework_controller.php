@@ -17,7 +17,7 @@ class FrameworkController extends AppController
      */
     public $uses =  array('User', 'SysFunction', 'SysParameter');
     public $Sanitize;
-    public $components = array('rdAuth', 'Output', 'sysContainer', 'userPersonalize', 'framework');
+    public $components = array('Output', 'sysContainer', 'userPersonalize', 'framework');
 
     /**
      * __construct

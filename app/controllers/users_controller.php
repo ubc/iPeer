@@ -958,7 +958,7 @@ class UsersController extends AppController
 
     /**
      * __loadFromSession
-     * Loads the rdAuth data from the Session.
+     * Loads data from the Session.
      *
      *
      * @access protected
@@ -981,7 +981,7 @@ class UsersController extends AppController
 
     /**
      * __setSessionData
-     * Updates the user session from the user data passed, and loads it into this rdAuth object.
+     * Updates the user session from the user data passed.
      *
      * @param mixed $userData
      *

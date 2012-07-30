@@ -11,7 +11,6 @@ App::import('Model', 'UserCourse');
  */
 class ExportComponent extends Object
 {
-    public $components = array('rdAuth');
     public $globUsersArr = array();
     public $globEventId;
     public $mixedEvalNumeric;

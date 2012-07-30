@@ -27,7 +27,7 @@
     <?php endforeach;?>
 	  </table>
 	  <?php if (!empty($maillToAll)): ?>
-	   <a href="mailto:<?php echo $maillToAll?>"><?php echo $html->image('icons/email.gif',array('border'=>'0','alt'=>__('Emaill To All', true)))?><?php __('Email To All Instructors')?></a>
+	   <a href="mailto:<?php echo $maillToAll?>"><?php echo $html->image('icons/email.gif',array('border'=>'0','alt'=>__(' Email To All', true)))?><?php __(' Email To All Instructors')?></a>
 	  <?php endif;?> 
 	  </td>
     </tr>
@@ -35,7 +35,10 @@
       <td><?php __('Status')?>:</td>
       <td colspan="3"><?php if( $data['Course']['record_status'] == "A" ) echo __("Active", true); else echo __("Inactive", true); ?></td>
     </tr>
-  <?php if (!(isset($rdAuth->customIntegrateCWL) && $rdAuth->customIntegrateCWL)) { ?>
+  <?php
+    $customIntegrateCWL = $this->Session->read('ipeerSession.customIntegrateCWL');
+    if (!(isset($customIntegrateCWL) && $customIntegrateCWL)) { 
+  ?>
     <tr class="tablecell">
       <td><?php __('Self Enrollment')?>: </td>
       <td colspan="3"><?php echo $data['Course']['self_enroll']; ?></td>

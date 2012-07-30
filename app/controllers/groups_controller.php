@@ -383,7 +383,7 @@ class GroupsController extends AppController
     function checkDuplicateName()
     {
         $this->layout = 'ajax';
-        $this->set('course_id', $this->rdAuth->courseId);
+        $this->set('course_id', $this->Session->read('ipeerSession.courseId'));
         $this->render('checkDuplicateName');
     }
 
@@ -815,17 +815,6 @@ class GroupsController extends AppController
         $courseName = $this->Course->field('course', array('id' => $courseId));
         $this->set('title_for_layout', $courseName . " > Export Groups");
     }
-
-
-/*    function getFilteredStudent()
-    {
-        $this->layout = 'ajax';
-        $this->set('course_id', $this->rdAuth->courseId);
-        $group_id = $this->params['form']['group_id'];
-        $filter = 'filter' == $this->params['form']['filter'];
-        $this->set('students', $this->Group->getFilteredStudents($group_id, $filter));
-        $this->render('filteredStudents');
-}*/
 
     /**
      * sendGroupEmail

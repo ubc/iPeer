@@ -744,7 +744,7 @@ class EventsController extends AppController
     function search()
     {
         $this->layout = 'ajax';
-        $courseId = $this->rdAuth->courseId;
+        $courseId = $this->Session->read('ipeerSession.courseId');
         $conditions = 'course_id = '.$courseId;
 
         if ($this->show == 'null') {
@@ -821,7 +821,7 @@ class EventsController extends AppController
             $this->layout = 'pop_up';
         }
 
-        $courseId = $this->rdAuth->courseId;
+        $courseId = $this->Session->read('ipeerSession.courseId');
 
         //Clear $id to only the alphanumeric value
         $id = $this->Sanitize->paranoid($groupId);

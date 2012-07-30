@@ -25,7 +25,7 @@ class EvaluationsController extends AppController
         'RubricsCriteriaComment', 'Personalize', 'Penalty',
         'Question', 'Response', 'Survey', 'SurveyInput', 'Course', 'MixevalsQuestion',
         'EvaluationMixeval', 'EvaluationMixevalDetail', 'Mixeval', 'MixevalsQuestionDesc');
-    public $components = array('ExportBaseNew', 'Auth', 'AjaxList', 'rdAuth', 'Output', 'sysContainer',
+    public $components = array('ExportBaseNew', 'Auth', 'AjaxList', 'Output', 'sysContainer',
         'userPersonalize', 'framework',
         'Evaluation', 'Export', 'ExportCsv', 'ExportExcel');
 
@@ -522,7 +522,8 @@ class EvaluationsController extends AppController
             $event = $this->Event->read();
 
             //Setup the courseId to session
-            $this->rdAuth->setCourseId($event['Event']['course_id']);
+            $this->Session->delete('ipeerSession.courseId');
+            $this->Session->write('ipeerSession.courseId', $event['Event']['course_id']);
             $courseId = $event['Event']['course_id'];
             $survey_id = $event['Event']['template_id'];
 
@@ -613,7 +614,8 @@ class EvaluationsController extends AppController
             //Setup the courseId to session
             $courseId = $event['Event']['course_id'];
             $this->set('courseId', $courseId);
-            $this->rdAuth->setCourseId($courseId);
+            $this->Session->delete('ipeerSession.courseId');
+            $this->Session->write('ipeerSession.courseId', $courseId);
             //Setup the evaluator_id
             $evaluatorId = $this->Auth->user('id');
             $this->set('evaluatorId', $evaluatorId);
@@ -766,7 +768,8 @@ class EvaluationsController extends AppController
             $this->set('evaluator_id', $this->Auth->user('id'));
             $this->set('full_name', $this->Auth->user('first_name').' '.$this->Auth->user('last_name'));
             //Setup the courseId to session
-            $this->rdAuth->setCourseId($event['Event']['course_id']);
+            $this->Session->delete('ipeerSession.courseId');
+            $this->Session->write('ipeerSession.courseId', $event['Event']['course_id']);
             $courseId = $event['Event']['course_id'];
             $this->set('courseId', $courseId);
             $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
@@ -919,7 +922,6 @@ class EvaluationsController extends AppController
 
         $templateTypeId = $this->Event->getEventTemplateTypeId($eventId);
         $grpEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
-        //$courseId = $this->rdAuth->courseId;
         $courseId = $this->Event->getCourseByEventId($eventId);
         $event = ($templateTypeId == '3' ? $this->Event->formatEventObj($eventId, null):
             $this->Event->formatEventObj($eventId, $groupId));
@@ -1082,8 +1084,9 @@ class EvaluationsController extends AppController
         $this->set('event', $event);
         $course = $this->Course->getCourseName($event['Event']['course_id']);
         //Setup the courseId to session
-        $this->rdAuth->setCourseId($event['Event']['course_id']);
-        $courseId = $this->rdAuth->courseId;
+        $this->Session->delete('ipeerSession.courseId');
+        $this->Session->write('ipeerSession.courseId', $event['Event']['course_id']);
+        $courseId = $this->Session->read('ipeerSession.courseId');
         $this->set('title_for_layout', $course.' > '.$event['Event']['title'].__(' > View My Results ', true));
 
         //Get Group Event
@@ -1189,7 +1192,7 @@ class EvaluationsController extends AppController
         $groupId =  $this->params['form']['group_id'];
         $groupEventId = $this->params['form']['group_event_id'];
         $reviewStatus = isset($this->params['form']['mark_reviewed'])? "mark_reviewed" : "mark_not_reviewed";
-        $courseId = $this->rdAuth->courseId;
+        $courseId = $this->Session->read('ipeerSession.courseId');
 
         //Get the target event
         $this->Event->id = $eventId;
