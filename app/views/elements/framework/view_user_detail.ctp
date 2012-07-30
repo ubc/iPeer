@@ -32,7 +32,9 @@
     <td align="left" colspan="3">
       <a href="mailto:<?php if(!empty($data['User']['email'])) echo $data['User']['email']; ?>">
       <?php echo $html->image('icons/email_icon.gif',array('border'=>'0','alt'=>'Email'));?></a>
-      <?php echo $data['User']['email']; ?>
+      <?php if (User::hasPermission('functions/viewemailaddress')) {
+        echo $data['User']['email'];
+      } ?>
     </td>
   </tr>
   <tr class="tablecell2">

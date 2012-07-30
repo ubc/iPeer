@@ -149,6 +149,12 @@ class CreateAclShell extends Shell
         $viewstudentresults = $this->Acl->Aco->save();
         $viewstudentresults['Aco']['id'] = $this->Acl->Aco->id;
         
+        // functions/viewemailaddresses
+        // some users can't explicitly see users' email addresses
+        $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'viewemailaddresses'));
+        $viewemailaddresses = $this->Acl->Aco->save();
+        $viewemailaddresses['Aco']['id'] = $this->Acl->Aco->id;
+        
     }
 
 
@@ -464,6 +470,7 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Departments');
         $this->Acl->allow($role, 'controllers/Groups');
         $this->Acl->allow($role, 'adminpage');
+        $this->Acl->deny($role, 'functions/viewemailaddresses');
 
         $role->id = 2;  // admin
         $this->Acl->deny($role, 'controllers');
@@ -491,6 +498,7 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'functions/user/admin', 'delete');
         $this->Acl->deny($role, 'functions/user/superadmin');
         $this->Acl->allow($role, 'adminpage');
+        $this->Acl->deny($role, 'functions/viewemailaddresses');
 
         $role->id = 3; // instructor
         $this->Acl->deny($role, 'controllers');
@@ -523,6 +531,7 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'functions/user/instructor', 'create');
         $this->Acl->deny($role, 'functions/user/instructor', 'update');
         $this->Acl->deny($role, 'functions/user/instructor', 'delete');
+        $this->Acl->deny($role, 'functions/viewemailaddresses');
         
         $role->id = 4; // tutor
         $this->Acl->deny($role, 'controllers');
@@ -539,6 +548,7 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'controllers/Surveys');
         $this->Acl->deny($role, 'controllers/Users');
         $this->Acl->deny($role, 'functions');
+        $this->Acl->deny($role, 'functions/viewemailaddresses');
         
         $role->id = 5; // student
         $this->Acl->deny($role, 'controllers');
@@ -556,5 +566,6 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'controllers/Users');
         $this->Acl->deny($role, 'functions');
         $this->Acl->allow($role, 'functions/viewstudentresults');
+        $this->Acl->deny($role, 'functions/viewemailaddresses');
     }
 }

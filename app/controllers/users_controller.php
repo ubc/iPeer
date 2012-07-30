@@ -120,14 +120,19 @@ class UsersController extends AppController
                 "15em",
                 "string"
             ),
-            array(
+        );
+
+        if (User::hasPermission('functions/viewemailaddresses')) {
+            $email = array(
                 "User.email",
                 __("Email", true),
                 "auto",
                 "action",
                 "Send Email"
-            ),
-        );
+            );
+            
+            array_push($columns, $email);
+        }
 
         // define action warnings
         $deleteUserWarning = __("Delete this user. Irreversible. Are you sure?", true);

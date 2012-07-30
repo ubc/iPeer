@@ -175,7 +175,7 @@ class EvaluationsController extends AppController
     {
         // Make sure the present user has permission
         if (!User::hasPermission('controllers/evaluations')) {
-            $this->Session->setFlash('You do not have permission to view evaluations', true);
+            $this->Session->setFlash(__('You do not have permission to view evaluations', true));
             $this->redirect('/home');
         }
         // Set up the list
@@ -196,23 +196,46 @@ class EvaluationsController extends AppController
         // Record the event id into the session
         if (!empty($eventId) && is_numeric($eventId)) {
             $this->Session->write("evaluationsControllerEventIdSession", $eventId);
-            $data = $this->Event->find('all', array(
-                'conditions' => array('Event.id' => $eventId)));
-            $this->set("data", $data['0']);
-            // Set the course ID to the evaluation's course id
-            // This required, as export functions assume the course id is set
-            // During the view, and will break if it's not.
-            //$this->rdAuth->setCourseId($data['Event']['course_id']);
         } else {
             // Use last event ID if none was passed with a parameter
             $eventId = $this->Session->read("evaluationsControllerEventIdSession");
+        }
+        
+        $data = $this->Event->find('first', array(
+            'conditions' => array(
+                'Event.id' => $eventId,
+                'Event.event_template_type_id !=' => '3'
+            )
+        ));
+    
+        // event does not exist or is a survey
+        if (null == $data) {
+            $this->Session->setFlash(__('Invalid Id', true));
+            $this->redirect('index');
+        }
+        
+        $this->set('data', $data);
+        
+        $courseId = $this->Event->getCourseByEventId($eventId);
+        
+        $course = $this->Course->find('first', array(
+            'conditions' => array(
+                'Course.id' => $courseId,
+                'Instructor.id' => $this->Auth->user('id')
+            )
+        ));
+
+        // the user is not an instructor in the course the event is in
+        if (null == $course) {
+            $this->Session->setFlash(__('You do not have permission to view this event', true));
+            $this->redirect('index');
         }
 
         // Set up the basic static ajax list variables
         $this->setUpAjaxList($eventId);
 
         //Set up the course Id
-        $this->set('courseId', $data['0']['Event']['course_id']);
+        $this->set('courseId', $courseId);
         $this->set('eventId', $eventId);
 
         // Set the display list
@@ -277,7 +300,7 @@ class EvaluationsController extends AppController
     {
         // Make sure the present user has Permission
         if (!User::hasPermission('functions/evaluation/export')) {
-            $this->Session->setFlash('You do not have permission to export evaluation results', true);
+            $this->Session->setFlash(__('You do not have permission to export evaluation results', true));
             $this->redirect('/home');
         }
 
@@ -286,7 +309,7 @@ class EvaluationsController extends AppController
             $this->Session->setFlash('Invalid export type', true);
             $this->redirect('/courses');
         } else if (!is_numeric($id)) {
-            $this->Session->setFlash('Invalid id', true);
+            $this->Session->setFlash(__('Invalid id', true));
             $this->redirect('/courses');
         }
         
@@ -392,14 +415,25 @@ class EvaluationsController extends AppController
         $this->autoRender = false;
         $tok = strtok($param, ';');
         $eventId = $tok;
+        $groupId = strtok(';');
+
+        $group = null;
         $group_events = $this->GroupEvent->getGroupEventByEventId($eventId);
-        $groupId;
         $userId=$this->Auth->user('id');
         foreach ($group_events as $events) {
             if ($this->GroupsMembers->checkMembershipInGroup($events['GroupEvent']['group_id'], $userId) !== 0) {
-                $groupId=$events['GroupEvent']['group_id'];
+                $group=$events['GroupEvent']['group_id'];
             }
         }
+        
+        $templateId = $this->Event->getEventTemplateTypeId($eventId);;
+        
+        // filter out users that don't have access to this eval, invalid ids, not simple eval
+        if ($group != $groupId || '1' != $templateId) {
+            $this->Session->setFlash(__('Invalid Id', true));
+            $this->redirect('/home/index');
+        }
+        
         if (empty($this->params['data'])) {
             //Get the target event
             $eventId = $this->Sanitize->paranoid($eventId);
@@ -463,9 +497,6 @@ class EvaluationsController extends AppController
             $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'],
                 $evaluator);
             $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
-          /*if (!$this->validSimpleEvalComplete($this->params)) {
-              $this->redirect('/evaluations/makeSimpleEvaluation/'.$this->params['form']['event_id']);
-          }*/
 
             if ($this->Evaluation->saveSimpleEvaluation($this->params, $groupEvent, $evaluationSubmission)) {
                 $this->Session->setFlash(__('Your Evaluation was submitted successfully.', true), 'good');
@@ -504,17 +535,39 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    function makeSurveyEvaluation ($param = null)
+    function makeSurveyEvaluation ($param = null) 
     {
-
         $this->autoRender = false;
-        //print_r($this->params);
-        $tok = strtok($param, ';');
-        $eventId = $tok;
-        $this->set('courseId', $eventId);
-        $thisUser = $this->Auth->user();
-        $userId = $thisUser['User']['id'];
-        $this->set('id', $userId);
+        $eventId = $param;
+        
+        if (!is_numeric($eventId)) {
+            $this->Session->setFlash(__('Invalid Id', true));
+            $this->redirect('/home/index');
+        }
+        
+        if (null == $this->Event->getEventById($eventId)) {
+            $this->Session->setFlash(__('Invalid Id', true));
+            $this->redirect('/home/index');
+        }
+        
+        $courseId = $this->Event->getCourseByEventId($eventId);
+        
+        $course = $this->Course->find('first', array(
+            'conditions' => array(
+                'Course.id' => $courseId,
+                'Enrol.id' => $this->Auth->user('id')
+            )
+        ));
+        
+        $templateId = $this->Event->getEventTemplateTypeId($eventId);
+        
+        if (null == $course || '3' != $templateId) {
+            $this->Session->setFlash(__('Invalid Id', true));
+            $this->redirect('/home/index');
+        }
+        
+        $this->set('courseId', $courseId);
+        $this->set('id', $this->Auth->user('id'));
         if (empty($this->params['data'])) {
             //Get the target event
             $eventId = $this->Sanitize->paranoid($eventId);
@@ -528,7 +581,6 @@ class EvaluationsController extends AppController
             $survey_id = $event['Event']['template_id'];
 
             $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').__(' > Survey', true));
-            //$survey_id = $this->Survey->getSurveyIdByCourseIdTitle($courseId, $courseName);
             $this->set('survey_id', $survey_id);
 
             // Get all required data from each table for every question
@@ -553,18 +605,18 @@ class EvaluationsController extends AppController
 
         } else {
             $courseId = $this->params['form']['course_id'];
+            $eventId = $this->params['form']['event_id'];
             if (!$this->validSurveyEvalComplete($this->params)) {
                 $this->set('errmsg', 'validSurveyEvalCompleten failure.');
                 //$this->redirect('/evaluations/makeSurveyEvaluation/'.$eventId);
             }
             if ($this->Evaluation->saveSurveyEvaluation($this->params)) {
-                $this->redirect('/home/index/'.__('Your survey was submitted successfully.', true), 'good');
+                $this->Session->setFlash(__('Your survey was submitted successfully', true), 'good');
+                $this->redirect('/home/index/');
             } else {
-                echo __("<h1>Hello!</h1>", true);
-                //Validate the error why the Event->save() method returned false
-                // $this->validateErrors($this->Event);
-                //this->redirect('/evaluations/makeSurveyEvaluation/'.$eventId);
-            }//end if
+                $this->Session->setFlash(__('Your survey was not submitted successfully', true));
+                $this->redirect('evaluations/makeSurveyEvaluation/'.$eventId);
+            }
         }
     }
 
@@ -597,9 +649,38 @@ class EvaluationsController extends AppController
             $tok = strtok($param, ';');
             $eventId = $tok;
             $groupId = strtok(';');
-            //$msg = strtok(';');
+
+            if (!is_numeric($eventId) || !is_numeric($groupId)) {
+                $this->Session->setFlash(__('Invalid Id', true));
+                $this->redirect('/home/index');
+            }
+
+            if (null == $this->Event->getEventById($eventId)) {
+                $this->Session->setFlash(__('Invalid Id', true));
+                $this->redirect('/home/index');
+            }
+
             $event = $this->Event->formatEventObj($eventId, $groupId);
+
             $rubricId = $event['Event']['template_id'];
+            $courseId = $event['Event']['course_id'];
+            
+            $group = null;
+            $group_events = $this->GroupEvent->getGroupEventByEventId($eventId);
+            $userId=$this->Auth->user('id');
+            foreach ($group_events as $events) {
+                if ($this->GroupsMembers->checkMembershipInGroup($events['GroupEvent']['group_id'], $userId) !== 0) {
+                    $group=$events['GroupEvent']['group_id'];
+                }
+            }
+            
+            // if group id provided does not match the group id the user belongs to or
+            // template type is not rubric - they are redirected
+            if ($group != $groupId || '2' != $event['Event']['event_template_type_id']) {
+                $this->Session->setFlash(__('Invalid Id', true));
+                $this->redirect('/home/index');
+            }
+
             $data = $this->Rubric->getRubricById($rubricId);
 
             $penalty = $this->Penalty->getPenaltyByEventId($eventId);
@@ -612,7 +693,6 @@ class EvaluationsController extends AppController
             $this->set('data', $data);
             $this->set('event', $event);
             //Setup the courseId to session
-            $courseId = $event['Event']['course_id'];
             $this->set('courseId', $courseId);
             $this->Session->delete('ipeerSession.courseId');
             $this->Session->write('ipeerSession.courseId', $courseId);
@@ -640,24 +720,24 @@ class EvaluationsController extends AppController
         } else {
             $eventId = $this->params['form']['event_id'];
             $groupId = $this->params['form']['group_id'];
-            //$groupEventId = $this->params['form']['group_event_id'];
+
             $groupEventId = $this->GroupEvent->getGroupEventByEventIdAndGroupId($eventId, $groupId);
             $courseId = $this->params['form']['course_id'];
             $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
             if (!$this->validRubricEvalComplete($this->params['form'])) {
+                $this->Session->setFlash(__('validRubricEvalCompleten failure', true));
                 $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
             }
 
-
-
             if ($this->Evaluation->saveRubricEvaluation($this->params)) {
-                $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
+                $this->Session->setFlash(__('Your evaluation was saved successfully', true), 'good');
+                $this->redirect('home/index');
             }
             //Found error
             else {
                 //Validate the error why the Event->save() method returned false
                 $this->validateErrors($this->Event);
-                $this->set('errmsg', __('Save Evaluation failure.', true));
+                $this->Session->setFlash(__('Your evaluation was not saved successfully', true));
                 $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
             }//end if
         }
@@ -754,9 +834,36 @@ class EvaluationsController extends AppController
             $tok = strtok($param, ';');
             $eventId = $tok;
             $groupId = strtok(';');
-            //$msg = strtok(';');
+            
+            if (!is_numeric($eventId) || !is_numeric($groupId)) {
+                $this->Session->setFlash(__('Invalid Id', true));
+                $this->redirect('/home/index');
+            }
 
-            $eventId = $tok;
+            if (null == $this->Event->getEventById($eventId)) {
+                $this->Session->setFlash(__('Invalid Id', true));
+                $this->redirect('/home/index');
+            }
+
+            $courseId = $this->Event->getCourseByEventId($eventId);
+            $templateId = $this->Event->getEventTemplateTypeid($eventId);
+            
+            $group = null;
+            $group_events = $this->GroupEvent->getGroupEventByEventId($eventId);
+            $userId=$this->Auth->user('id');
+            foreach ($group_events as $events) {
+                if ($this->GroupsMembers->checkMembershipInGroup($events['GroupEvent']['group_id'], $userId) !== 0) {
+                    $group=$events['GroupEvent']['group_id'];
+                }
+            }
+            
+            // if group id provided does not match the group id the user belongs to or
+            // template type is not rubric - they are redirected
+            if ($group != $groupId || '4' != $templateId) {
+                $this->Session->setFlash(__('Invalid Id', true));
+                $this->redirect('/home/index');
+            }
+
             $penalty = $this->Penalty->getPenaltyByEventId($eventId);
             $penaltyDays = $this->Penalty->getPenaltyDays($eventId);
             $penaltyFinal = $this->Penalty->getPenaltyFinal($eventId);
@@ -1052,6 +1159,32 @@ class EvaluationsController extends AppController
 
         $surveyId = strtok($params, ';');
         $surveyGroupId = strtok(';');
+        
+        // check to see if the ids are numeric
+        if (!is_numeric($surveyId) || !is_numeric($surveyGroupId)) {
+            $this->Session->setFlash(__('Invalid Id', true));
+            // may want to redirect to somewhere else
+            $this->redirect('/home/index');
+        }
+        
+        $survey = $this->Survey->find('first', array(
+            'conditions' => array(
+                'Survey.id' => $surveyId
+            )
+        ));
+        
+        $course = $this->Survey->find('first', array(
+            'conditions' => array(
+                'Course.id' => $survey['Survey']['course_id'],
+                'Instructor.id' => $this->Auth->user('id')
+            )
+        ));
+        
+        // check to see whether the user is an instructor of the course
+        if (null == $course) {
+            $this->Session->setFlash(__('You do not have permission to view these results', true));
+            $this->redirect('/home/index');
+        }
 
         $formattedResult = $this->Evaluation->formatSurveyGroupEvaluationResult($surveyId, $surveyGroupId);
 
@@ -1074,6 +1207,35 @@ class EvaluationsController extends AppController
         $tok = strtok($param, ';');
         $eventId = $tok;
         $groupId = strtok(';');
+        
+        // check to see if the ids are numeric
+        if (!is_numeric($eventId) || !is_numeric($groupId)) {
+            $this->Session->setFlash(__('Invalid Id', true));
+            // may want to redirect to somewhere else
+            $this->redirect('/home/index');
+        }
+
+        $groupMember = $this->GroupsMembers->find('first', array(
+            'conditions' => array(
+                'group_id' => $groupId,
+                'user_id' => $this->Auth->user('id')
+            )
+        ));
+        
+        $event = $this->Event->find('first', array(
+            'conditions' => array(
+                'Event.id' => $eventId
+            )
+        ));
+
+        if (null == $groupMember || null == $event) {
+            $this->Session->setFlash(__('Invalid Id', true));
+            $this->redirect('/home/index');
+        } else if (strtotime('NOW') < strtotime($event['Event']['result_release_date_begin']) ||
+            strtotime('NOW') >= strtotime($event['Event']['result_release_date_end'])) {
+            $this->Session->setFlash(__('The results are not released.', true));
+            $this->redirect('/home/index');
+        }
 
         //Setup current user Info
         $currentUser = $this->User->getCurrentLoggedInUser();
@@ -1628,12 +1790,32 @@ class EvaluationsController extends AppController
     {
         $this->layout = 'pop_up';
 
+        $survey = $this->Survey->find('first', array(
+            'conditions' => array(
+                'Survey.id' => $surveyId
+            )
+        ));
+        
+        if (null == $survey) {
+            $this->Session->setFlash(__('Invalid Id', true));
+            $this->redirect('index');
+        }
+
+        $course = $this->Course->find('first', array(
+            'conditions' => array(
+                'Course.id' => $survey['Survey']['course_id'],
+                'Instructor.id' => $this->Auth->user('id')
+            )
+        ));
+        
+        if (null == $course) {
+            $this->Session->setFlash(__('You have no permission to view the summary', true));
+            $this->redirect('index');
+        }
+
         $formattedResult = $this->Evaluation->formatSurveyEvaluationSummary($surveyId);
 
-        // $this->set('survey_id', $formattedResult['survey_id']);
-        //$this->set('answers', $formattedResult['answers']);
         $this->set('questions', $formattedResult);
-        // print_r($formattedResult);
     }
 
 

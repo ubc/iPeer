@@ -42,7 +42,7 @@ switch($submenu) {
       array('name' => 'List Evaluation Events', 
         'link' => "/events/index/$course_id"),
       array('name' => 'Export Evaluation Results', 
-        'link' => "/evaluations/export/courseId=$course_id")
+        'link' => "/evaluations/export/course/$course_id")
     );
     break;
   case "TeamMaker":
