@@ -389,6 +389,18 @@ class EventsController extends AppController
             $this->redirect('/home');
         }
         
+        $course = $this->Course->find('first', array(
+            'conditions' => array(
+                'Course.id' => $courseId,
+                'Instructor.id' => $this->Auth->user('id')
+            )
+        ));
+        
+        if ($course == null) {
+            $this->Session->setFlash(__('Invalid Id', true));
+            $this->redirect('index');
+        }
+        
         // Init form variables needed for display
         $this->set('groups', $this->Group->getGroupsByCourseId($courseId));
         $this->set(
@@ -598,115 +610,6 @@ class EventsController extends AppController
         $this->set('unassignedGroups', $this->Event->getUnassignedGroups($data));
         $this->set('courses', $this->Course->find('list', array('recursive' => -1)));
         $this->set('course_id', $courseId);
-
-    /*
-        if (empty($this->params['data']))
-        {
-            $event = $this->Event->read(null, $id);
-            $this->data = $event;
-            $this->Output->br2nl($this->data);
-
-      $assignedGroupIDs = $this->GroupEvent->find('all', 'event_id = '.$id);
-//$a=print_r($assignedGroupIDs,true);
-//print "<pre>($a)</pre>";
-            $groupIDs = '';
-            $groupIDSQL = '';
-            if (!empty($assignedGroupIDs))
-            {
-
-            // retrieve string of group ids
-            for ($i = 0; $i < count($assignedGroupIDs); $i++) {
-                $groupIDs .= $assignedGroupIDs[$i]['GroupEvent']['group_id']. ":";
-                $groupIDSQL .= $assignedGroupIDs[$i]['GroupEvent']['group_id'];
-                if ($i != count($assignedGroupIDs) -1 ) {
-                  $groupIDs .= ":";
-                  $groupIDSQL .= ", ";
-                }
-            }
-              $assignedGroups = $this->Group->find('all', 'id IN ('.$groupIDSQL.')');
-
-              $this->set('assignedGroups', $assignedGroups);
-
-            $unassignedGroups = $this->Group->find('all', 'course_id='.$courseId.' AND id NOT IN ('.$groupIDSQL.')');
-            $this->set('unassignedGroups', $unassignedGroups);
-
-        } else {
-            $unassignedGroups = $this->Group->find('all', 'course_id = '.$courseId);
-            $this->set('assignedGroups', $assignedGroups);
-        $this->set('unassignedGroups', $unassignedGroups);
-
-        }
-          $this->set('groupIDs', $groupIDs);
-
-
-      //Format Evaluation Selection Boxes
-      $default = null;
-      $model = '';
-      $eventTemplates = array();
-
-      $templateId = $this->data['Event']['event_template_type_id'];
-      if (!empty($templateId))
-      {
-        $eventTemplateType = $this->EventTemplateType->find('id = '.$templateId);
-
-        if ($templateId == 1 )
-        {
-          $default = 'Default Simple Evaluation';
-          $model = 'SimpleEvaluation';
-          $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'));
-        }
-        else if ($templateId == 2)
-        {
-          $default = 'Default Rubric';
-          $model = 'Rubric';
-              $eventTemplates = $this->Rubric->getBelongingOrPublic($this->Auth->user('id'));
-        }
-        else if ($templateId == 4)
-        {
-          $default = 'Default Mixed Evaluation';
-          $model = 'Mixeval';
-              $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'));
-        }
-
-      }
-      $this->set('eventTemplates', $eventTemplates);
-      $this->set('default', $default);
-      $this->set('model', $model);
-
-
-        //Get all display event types
-        $eventTypes = $this->EventTemplateType->find('all', array('conditions'=>array('display_for_selection'=>1)));
-          $this->set('eventTypes', $eventTypes);
-
-        } else {
-            //Format Data
-            $this->params['data']['Event']['course_id'] = $courseId;
-            $this->params = $this->Event->prepData($this->params);
-
-            $this->Output->filter($this->params['data']);//always filter
-
-            if ( $this->Event->save($this->params['data']))
-            {
-        //Save Groups for the Event
-              $this->GroupEvent->updateGroups($this->Event->id, $this->params['data']['Event']);
-
-                $this->redirect('/events/index/The event is updated successfully.');
-            }//Error Found
-            else
-            {
-              $this->Output->br2nl($this->params['data']);
-        $this->set('data', $this->params['data']);
-
-                $unassignedGroups = $this->Group->find('all', 'course_id = '.$courseId);
-                $this->set('unassignedGroups', $unassignedGroups);
-                $eventTypes = $this->EventTemplateType->find('all', array('conditions'=>array('display_for_selection'=>1)));
-            $this->set('eventTypes', $eventTypes);
-
-        //Validate the error why the Event->save() method returned false
-        $this->validateErrors($this->Event);
-        $this->set('errmsg', $this->Event->errorMessage);
-            }
-    }*/
     }
 
     /**
@@ -721,6 +624,29 @@ class EventsController extends AppController
     {
         if (!User::hasPermission('controllers/events/add')) {
             $this->Session->setFlash(__('You do not have permission to delete events.', true));
+            $this->redirect('index');
+        }
+        
+        $event = $this->Event->find('first', array(
+            'conditions' => array(
+                'Event.id' => $id
+            )
+        ));
+        
+        if (null == $event) {
+            $this->Session->setFlash(__('Invalid Id', true));
+            $this->redirect('index');
+        }
+        
+        $course = $this->Course->find('first', array(
+            'conditions' => array(
+                'Course.id' => $this->Event->getCourseByEventId($id),
+                'Instructor.id' => $this->Auth->user('id')
+            )
+        ));
+        
+        if (null == $course) {
+            $this->Session->setFlash(__('Invalid Id', true));
             $this->redirect('index');
         }
         
