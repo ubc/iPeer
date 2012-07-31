@@ -45,15 +45,15 @@
       <td colspan="3"><hr align=left width=100%><h3><?php __('Change Password')?>:</h3></td>
     </tr>
     <tr class="tablecell2">
-      <?php echo $this->Form->input('old_password', array('type'=>'password', 'size'=>'50', 'class'=>'validate none PASSWORD_FORMAT pw_msg0 Invalid_Password_Format.', 'label'=>__('Old Password:', true), 'disabled'=>$viewPage)) ?>
+      <?php echo $this->Form->input('old_password', array('type'=>'password', 'size'=>'50', 'class'=>'validate none PASSWORD_FORMAT pw_msg0 Must_be_6+_characters,_alphanumeric.', 'label'=>__('Old Password:', true), 'disabled'=>$viewPage)) ?>
       <td id="pw_msg0" class="error"/>
     </tr>
     <tr class="tablecell2">
-      <?php echo $this->Form->input('tmp_password', array('type'=>'password', 'size'=>'50', 'class'=>'validate none PASSWORD_FORMAT pw_msg1 Invalid_Password_Format.', 'label'=>__('New Password:', true), 'disabled'=>$viewPage)) ?>
+      <?php echo $this->Form->input('tmp_password', array('type'=>'password', 'size'=>'50', 'class'=>'validate none PASSWORD_FORMAT pw_msg1 Must_be_6+_characters,_alphanumeric.', 'label'=>__('New Password:', true), 'disabled'=>$viewPage)) ?>
       <td id="pw_msg1" class="error"/>
     </tr>
     <tr class="tablecell2">
-      <?php echo $this->Form->input('confirm_password', array('type'=>'password', 'size'=>'50', 'class'=>'validate none PASSWORD_FORMAT pw_msg2 Invalid_Password_Format.', 'label'=>__('Confirm New Password:', true), 'disabled'=>$viewPage)) ?>
+      <?php echo $this->Form->input('confirm_password', array('type'=>'password', 'size'=>'50', 'class'=>'validate none PASSWORD_FORMAT pw_msg2 Must_be_6+_characters,_alphanumeric.', 'label'=>__('Confirm New Password:', true), 'disabled'=>$viewPage)) ?>
       <td id="pw_msg2" class="error"/>
     </tr>
 

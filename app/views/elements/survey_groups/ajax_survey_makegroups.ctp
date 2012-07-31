@@ -15,7 +15,12 @@
     </tr>
     <tr class="tablecell2">
       <td>
-  			<?php echo $data['Course']['student_count']?><?php __(' students were specified for this survey,')?> <?php echo $data['Event'][0]['response_count']?> <?php __('students responded')?><br />
+  			<?php echo $data['Course']['student_count'].__(' students were specified for this survey,', true); ?>
+            <?php if (empty($data['Event'][0]['response_count'])) {
+                echo "0 students responded";
+            } else {
+                echo $data['Event'][0]['response_count'].__(' students responded', true);
+            } ?><br />
 			</td>
 		</tr>
 		<tr class="tablecell2">

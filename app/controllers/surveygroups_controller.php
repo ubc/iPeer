@@ -276,7 +276,11 @@ class SurveyGroupsController extends AppController
         $survey_id = $this->data['survey_id'];
         $survey = $this->Survey->find('first', array('conditions' => array('Survey.id' => $survey_id),
             'recursive' => 2));
-
+        foreach ($survey['Course']['Event'] as $data) {
+            if ($data['title'] == $survey['Survey']['name']) {
+                $event_id = $data['id'];
+            }
+        }
         //make xml for TeamMaker
         $doc = $this->XmlHandler->makeTeamMakerXML($survey, $numGroups, $this->params['form']['weight']);
 
@@ -288,7 +292,6 @@ class SurveyGroupsController extends AppController
         $this->File->write($doc);
         //execute TeamMaker
         $cmdline = $this->__getTeamMaker().' '.$file_path.'.xml '.$file_path.'.txt';// > ../tmp/tm_log.txt";
-
         set_time_limit(1200);
         if ($make) {
             exec($cmdline);
@@ -304,6 +307,7 @@ class SurveyGroupsController extends AppController
             $members = explode(' ', $team);
             for ($j=0; $j < count($members); $j++) {
                 $member = $members[$j];
+                $member = trim($member);
                 $member_id = 
                     $this->User->field('id', array('student_no' => $member));
                 $teams[$i]['member_'.$j]['student_no'] = $member;
@@ -319,7 +323,7 @@ class SurveyGroupsController extends AppController
 
         $this->set('filename', $time);
         $this->set('survey_id', $survey_id);
-        $this->set('event_id', $survey['Event'][0]['id']);
+        $this->set('event_id', $event_id);
     }
 
 

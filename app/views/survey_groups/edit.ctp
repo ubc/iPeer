@@ -22,8 +22,8 @@
       			  $count=0;?>
         			<?php foreach ($data['SurveyGroup'] as $i => $survey_group):?>
         			  <tr class="tablecell2" style="border-top:solid #cccccc;">
-                  <td class="header_link"><b><?php echo $this->Html->link('team '.($i+1), 'evaluations/viewSurveyGroupEvaluationResults/'.$survey_id.';'.$survey_group['id'], array('onclick' => "wopen(this.href, \'popup\', 650, 500); return false;"))?></b></td>
-        			  <?php if (isset($score[$i])):?>
+                  <td class="header_link"><b><?php echo $this->Html->link('team '.($i+1), '../evaluations/viewSurveyGroupEvaluationResults/'.$survey_id.';'.$survey_group['id'], array('onclick' => "wopen(this.href, \'popup\', 650, 500); return false;"))?></b></td>
+        			  <?php if (isset($score[$i]['percent'])):?>
                   <td style="color:#339977;"><i><b><?php __('match score')?>: <?php echo $score[$i]['percent']?></b></i></td>
         			  <?php else:?>
         			    <td></td>
@@ -35,7 +35,7 @@
                                                    $questions,
                                                    $selected_question,
                                                    array('onChange' => 'window.location=\''.$this->Html->url('edit').'/'.$group_set_id.'/\'+this.options[this.selectedIndex].value;',
-                                                         'empty' => __('Show reponses for question:', true)));?>
+                                                         'empty' => __('Show responses for question:', true)));?>
                   <?php endif;?>
                   </td>
         			  </tr>

@@ -90,17 +90,17 @@ class XmlHandlerComponent extends Object
                                 $value->$setAttributeFunc('answer',1);
                                 $response->$appendChildFunc($value);
                             } else {
-                                $mcResponse = explode('_', $response_tmp['response_text']);
-                                if (isset($mcResponse[1])) {
-                                    $mcTmp = $this->Response->read(null, $mcResponse[1]);
-                                    if ($mcTmp['Response']['response']==$mcResponse[0]) {
+                                //$mcResponse = explode('_', $response_tmp['response_text']);debug($mcResponse);
+                                //if (isset($mcResponse[0])) {
+                                //    $mcTmp = $this->Response->read(null, $mcResponse[1]);
+                                //    if ($mcTmp['Response']['response']==$mcResponse[0]) {
                                         //response/answer
                                         $value = $doc->$createElementFunc('value');
                                         $value->$setAttributeFunc('id', $response_tmp['id']);
                                         //$value->setAttribute('answer',1);
                                         $response->$appendChildFunc($value);
-                                    }
-                                }
+                                //    }
+                                //}
                             }
                         }
                     } else {
@@ -157,7 +157,7 @@ class XmlHandlerComponent extends Object
                 $question->append_child($element_weight);
             }
         }
-        $courseId = $this->rdAuth->courseId;
+        $courseId = $this->Session->read('ipeerSession.courseId');
         $userData = $this->User->getEnrolledStudents($courseId, $fields);
         //	print_r($userData);
         foreach ($userData as $user) {
@@ -255,7 +255,7 @@ class XmlHandlerComponent extends Object
                 $question->appendChild($element_weight);
             }
         }
-        $courseId = $this->rdAuth->courseId;
+        $courseId = $this->Session->read('ipeerSession.courseId');
         $userData = $this->User->getEnrolledStudents($courseId, $fields);
         //	print_r($userData);
         foreach ($userData as $user) {

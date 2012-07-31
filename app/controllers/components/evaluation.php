@@ -2014,7 +2014,8 @@ class EvaluationComponent extends Object
         $result = array();
 
         // Get all required data from each table for every question
-        $tmp = $this->SurveyQuestion->getQuestionsID($surveyId);
+        $surveyQuestion = new SurveyQuestion();
+        $tmp = $surveyQuestion->getQuestionsID($surveyId);
         $tmp = $this->Question->fillQuestion($tmp);
         $tmp = $this->Response->fillResponse($tmp);
         $questions = null;

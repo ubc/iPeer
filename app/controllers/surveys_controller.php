@@ -19,7 +19,7 @@ class SurveysController extends AppController
     public $order;
     public $Sanitize;
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time');
-    public $components = array('AjaxList', 'rdAuth', 'Output', 'sysContainer', 'framework');
+    public $components = array('AjaxList', 'Output', 'sysContainer', 'framework');
 
 
     /**
@@ -533,7 +533,7 @@ class SurveysController extends AppController
    */
   function checkDuplicateName()
   {
-      $course_id = $this->rdAuth->courseId;
+      $course_id = $this->Session->read('ipeerSession.courseId');
       $this->layout = 'ajax';
       $this->set('course_id', $course_id);
       $this->render('checkDuplicateName');
@@ -600,19 +600,58 @@ class SurveysController extends AppController
    * @access public
    * @return void
    */
-  function questionsSummary($survey_id)
-  {
-      // Get all required data from each table for every question
-      $questions = $this->Question->find('all', array(
-          'conditions' => array('Survey.id' => $survey_id),
-          //'contain' => array('Question', 'Response'),
-          'order' => 'SurveyQuestion.number',
-          'recursive' => 1));
-      $this->set('survey_id', $survey_id);
-      $this->set('questions', $questions);
-      $this->set('is_editable', true);//TODO: check permission $this->controller->rdAuth->id == $data['Survey']['creator_id'] || $this->controller->rdAuth->id == 1
-      $this->render('questionssummary');
-  }
+    function questionsSummary($survey_id)
+    {
+        if (!User::hasPermission('controllers/surveys')) {
+            $this->Session->setFlash('You do not have permission to edit this survey\'s questions', true);
+            $this->redirect('/home');
+        }
+        
+        // retrieving the requested survey
+        $eval = $this->Survey->find('first', 
+            array(
+                'conditions' => array('id' => $survey_id), 
+                'contain' => array('Event' => 'EvaluationSubmission')
+            )
+        );
+        // for storing submissions - for checking if there are any submissions
+        $submissions = array();
+        
+        // check to see if $id is valid - numeric & is a survey
+        if (!is_numeric($survey_id) || empty($eval)) {
+            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
+        // check to see if the user is the creator, admin, or superadmin
+        if (!($eval['Survey']['creator_id'] == $this->Auth->user('id') || User::hasPermission('functions/evaluation', 'update'))) {
+            $this->Session->setFlash(__('You do not have permission to edit this survey\'s questions.', true));
+            $this->redirect('index');
+        }
+        
+        foreach ($eval['Event'] as $event) {
+            if (!empty($event['EvaluationSubmission'])) {
+                $submissions[] = $event['EvaluationSubmission'];
+            }
+        }
+        
+        // check to see if submissions had been made - if yes - survey can't be edited
+        if (!empty($submissions)) {
+            $this->Session->setFlash(__('Submissions had been made. Questions for "'.$eval['Survey']['name'].'" cannot be edited.', true));
+            $this->redirect('index');
+        }
+        
+        // Get all required data from each table for every question
+        $questions = $this->Question->find('all', array(
+            'conditions' => array('Survey.id' => $survey_id),
+            //'contain' => array('Question', 'Response'),
+            'order' => 'SurveyQuestion.number',
+            'recursive' => 1));
+        $this->set('survey_id', $survey_id);
+        $this->set('questions', $questions);
+        $this->set('is_editable', true);
+        $this->render('questionssummary');
+    }
 
 
   /**
