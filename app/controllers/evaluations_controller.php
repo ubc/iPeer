@@ -429,7 +429,7 @@ class EvaluationsController extends AppController
         $templateId = $this->Event->getEventTemplateTypeId($eventId);;
         
         // filter out users that don't have access to this eval, invalid ids, not simple eval
-        if ($group != $groupId || '1' != $templateId) {
+        if (($group != $groupId || '1' != $templateId) && empty($this->params['data'])) {
             $this->Session->setFlash(__('Invalid Id', true));
             $this->redirect('/home/index');
         }
@@ -724,8 +724,7 @@ class EvaluationsController extends AppController
             }
 
             if ($this->Evaluation->saveRubricEvaluation($this->params)) {
-                $this->Session->setFlash(__('Your evaluation was saved successfully', true), 'good');
-                $this->redirect('home/index');
+                $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
             }
             //Found error
             else {
