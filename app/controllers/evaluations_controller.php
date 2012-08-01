@@ -1166,7 +1166,7 @@ class EvaluationsController extends AppController
             )
         ));
         
-        $course = $this->Survey->find('first', array(
+        $course = $this->Course->find('first', array(
             'conditions' => array(
                 'Course.id' => $survey['Survey']['course_id'],
                 'Instructor.id' => $this->Auth->user('id')

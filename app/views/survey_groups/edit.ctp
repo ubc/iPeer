@@ -84,7 +84,7 @@
                         }
                       }
                     } else {
-                      echo $response[0]['response_text'].' ';
+                      echo $response['response_text'].' ';
                     }
                     ?>
 

@@ -162,7 +162,7 @@ class SurveyInput extends AppModel
         $dbo = $this->SurveyGroupMembers->getDataSource();
         $subQuery = $dbo->buildStatement(
             array(
-                'fields' => array('SurveyGroupMembers2.id'),
+                'fields' => array('`SurveyGroupMembers2`.`user_id`'),
                 'table'  => $dbo->fullTableName($this->SurveyGroupMembers),
                 'alias'  => 'SurveyGroupMembers2',
                 'limit'  => null,
@@ -183,7 +183,7 @@ class SurveyInput extends AppModel
         $conditions[] = $subQueryExpression;
         return $this->find('all',
             array(
-                compact('conditions'),
+                'conditions' => $conditions,
                 'fields' => array('user_id', 'response_text'),
             )
         );

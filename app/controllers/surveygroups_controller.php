@@ -446,6 +446,14 @@ class SurveyGroupsController extends AppController
         $time = $group_set['SurveyGroupSet']['date'];
         $scoreFilePathAndName = TMP.$time.'.txt.scores';
         $this->__cleanXmlFile($scoreFilePathAndName);
+        
+        $survey = $this->Survey->find('first', array('conditions' => array('Survey.id' => $group_set['Survey']['id']),
+            'recursive' => 2));
+        foreach ($survey['Course']['Event'] as $data) {
+            if ($data['title'] == $group_set['Survey']['name']) {
+                $event_id = $data['id'];
+            }
+        }
 
         $inputs = array();
         foreach ($group_set['SurveyGroup'] as $i => $survey_group) {
@@ -497,7 +505,7 @@ class SurveyGroupsController extends AppController
         $this->set('questions', $questions);
         $this->set('inputs', $inputs);
         $this->set('data', $group_set);
-        $this->set('event_id', $group_set['Survey']['Event'][0]['id']);
+        $this->set('event_id', $event_id);
         $this->set('group_set_id', $group_set_id);
     }
 
