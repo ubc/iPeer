@@ -373,7 +373,7 @@ class SurveyGroupsController extends AppController
 
         // use overwritten save method to save all
         if ($this->SurveyGroupSet->save($surveyGroupSet)) {
-            $this->Session->setFlash(__('The group set was added successfully.', true));
+            $this->Session->setFlash(__('The group set was added successfully.', true), 'good');
         } else {
             $this->Session->setFlash(__('The group set saving failed.', true));
         }

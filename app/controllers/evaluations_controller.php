@@ -1221,23 +1221,26 @@ class EvaluationsController extends AppController
             )
         ));
 
-        // check to see if user is part of the group and whether the event id is valid
-        if (null == $groupMember || null == $event) {
-            $this->Session->setFlash(__('Invalid Id', true));
-            $this->redirect('/home/index');
-        // check to see whether NOW is between the start and end of result release dates
-        } else if (strtotime('NOW') < strtotime($event['Event']['result_release_date_begin']) ||
-            strtotime('NOW') >= strtotime($event['Event']['result_release_date_end'])) {
-            $this->Session->setFlash(__('The results are not released.', true));
-            $this->redirect('/home/index');
+        if ('3' != $event['Event']['event_template_type_id']) {
+            // check to see if user is part of the group and whether the event id is valid
+            if (null == $groupMember || null == $event) {
+                $this->Session->setFlash(__('Invalid Id', true));
+                $this->redirect('/home/index');
+            // check to see whether NOW is between the start and end of result release dates
+            } else if (strtotime('NOW') < strtotime($event['Event']['result_release_date_begin']) ||
+                strtotime('NOW') >= strtotime($event['Event']['result_release_date_end'])) {
+                $this->Session->setFlash(__('The results are not released.', true));
+                $this->redirect('/home/index');
+            }
+            //Get the target event
+            $event = $this->Event->formatEventObj($eventId, $groupId);
+            $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($event['Event']['id'], $event['group_id']);
         }
 
         //Setup current user Info
         $currentUser = $this->User->getCurrentLoggedInUser();
         $this->set('currentUser', $currentUser);
 
-        //Get the target event
-        $event = $this->Event->formatEventObj($eventId, $groupId);
         $this->set('event', $event);
         $course = $this->Course->getCourseName($event['Event']['course_id']);
         //Setup the courseId to session
@@ -1247,10 +1250,10 @@ class EvaluationsController extends AppController
         $this->set('title_for_layout', $course.' > '.$event['Event']['title'].__(' > View My Results ', true));
 
         //Get Group Event
-        $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($event['Event']['id'], $event['group_id']);
         $currentDate = strtotime('NOW');
-        //Check if event is in range of result release date
-        if ($currentDate>=strtotime($event['Event']['result_release_date_begin'])&&$currentDate<strtotime($event['Event']['result_release_date_end'])) {
+        //Check if event is in range of result release date or is a survey
+        if ($currentDate>=strtotime($event['Event']['result_release_date_begin'])&&$currentDate<strtotime($event['Event']['result_release_date_end'])
+            || '3' == $event['Event']['event_template_type_id']) {
             $userId = $this->Auth->user('id');
 
             switch ($event['Event']['event_template_type_id'])
@@ -1288,11 +1291,18 @@ class EvaluationsController extends AppController
                 break;
 
             case 3: //View Survey Result
-                $formattedResult = $this->Evaluation->formatSurveyEvaluationResult($event);
-                $this->set('survey_id', $result['survey_id']);
-                $this->set('answers', $result['answers']);
-                $this->set('questions', $result['questions']);
-                $this->set('event', $result['event']);
+                $answers = array();
+                $studentId = $groupId;
+                $formattedResult = $this->Evaluation->formatSurveyEvaluationResult($event, $studentId);
+                
+                foreach ($formattedResult['answers'] as $answer) {
+                    $answers[$answer['SurveyInput']['question_id']][] = $answer;
+                }
+                
+                $this->set('survey_id', $formattedResult['survey_id']);
+                $this->set('answers', $answers);
+                $this->set('questions', $formattedResult['questions']);
+                $this->set('event', $formattedResult['event']);
                 $this->render('student_view_survey_evaluation_results');
                 break;
 

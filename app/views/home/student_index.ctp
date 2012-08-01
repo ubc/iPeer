@@ -108,9 +108,9 @@
                             else:
                               echo $eventSubmitted['Event']['title'];
                           endif; endif;?>
-			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 3):
-                              echo $eventSubmitted['Event']['title'];
-                        endif;?>
+			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 3): ?>
+            	<a href="<?php echo $this->webroot.$this->theme?>evaluations/studentViewEvaluationResult/<?php echo $eventSubmitted['Event']['id']?>;<?php echo $userId ?>"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>
+                        <?php endif;?>
 			  <?php if ($eventSubmitted['Event']['event_template_type_id'] == 4):
                             if ($isResultReleased && User::hasPermission('functions/viewstudentresults')):?>
 			  <a href="<?php echo $this->webroot.$this->theme?>evaluations/studentViewEvaluationResult/<?php echo $eventSubmitted['Event']['id']?>;<?php echo $eventSubmitted['Event']['group_id']?>"><?php echo $eventSubmitted['Event']['title'] ?>&nbsp;</a>

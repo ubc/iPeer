@@ -72,6 +72,7 @@ class HomeController extends AppController
      */
      function studentIndex() {
         $this->set('data', $this->_preparePeerEvals());
+        $this->set('userId', $this->Auth->user('id'));
      }
 
 
@@ -109,8 +110,6 @@ class HomeController extends AppController
                     'all', 
                     array(
                         'conditions' => array(
-                            'release_date_begin < NOW()', 
-                            'NOW() <= release_date_end', 
                             'course_id' => $courseId,
                             'event_template_type_id' => 3
                 )));
