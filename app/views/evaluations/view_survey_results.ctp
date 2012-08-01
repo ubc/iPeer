@@ -1,76 +1,93 @@
+<div id='SurveyResults'>
+<?php
+$ques_num = 1;
+foreach ($questions as $ques) {
+    if ($ques['Question']['type'] == 'M') {
+        echo '<h3>'.$ques_num.') '.$ques['Question']['prompt'].'</h3>';
+        // a response is given
+        if (isset($answers[$ques['Question']['id']])) {
+            $responses = boldSelected($ques['Question']['Responses'], $answers[$ques['Question']['id']]);
+            echo '<ol>';
+            foreach ($responses as $response) {
+                echo '<li>'.$response.'</li>';
+            }
+            echo '</ol>';
+        // no response
+        } else {
+            echo '<ol>';
+            foreach ($ques['Question']['Responses'] as $response) {
+                echo '<li>'.$response['response'].'</li>';
+            }
+            echo '</ol>';
+        }
+        $ques_num++;
+    } else if ($ques['Question']['type'] == 'C') {
+        echo '<h3>'.$ques_num.') '.$ques['Question']['prompt'].'</h3>';
+        // response is given
+        if (isset($answers[$ques['Question']['id']])) {
+            $responses = boldSelected($ques['Question']['Responses'], $answers[$ques['Question']['id']]);
+            echo '<ul>';
+            foreach ($responses as $response) {
+                echo '<li>'.$response.'</li>';
+            }
+            echo '</ul>';
+        // no response
+        } else {
+            echo '<ul>';
+            foreach ($ques['Question']['Responses'] as $response) {
+                echo '<li>'.$response['response'].'</li>';
+            }
+            echo '</ul>';
+        }
+        $ques_num++;
+    } else if ($ques['Question']['type'] == 'S') {
+        echo '<h3>'.$ques_num.') '.$ques['Question']['prompt'].'</h3>';
+        // response is given
+        if (isset($answers[$ques['Question']['id']])) {
+            echo '<p><i>'.$answers[$ques['Question']['id']]['0']['SurveyInput']['response_text'].'</i></p>';
+        // no response
+        } else {
+            echo '<p>NO RESPONSE</p>';
+        }
+        $ques_num++;
+    } else if ($ques['Question']['type'] == 'L') {
+        echo '<h3>'.$ques_num.') '.$ques['Question']['prompt'].'</h3>';
+        // response is given
+        if (isset($answers[$ques['Question']['id']])) {
+            echo '<p><i>'.$answers[$ques['Question']['id']]['0']['SurveyInput']['response_text'].'</i></p>';
+        // no response
+        } else {
+            echo '<p>NO RESPONSE</p>';
+        }
+        $ques_num++;
+    }
+}
 
-<table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
-  <tr>
-    <td>
-      <form name="frm" id="frm" method="POST" action="<?php echo $html->url('makeSurveyEvaluation') ?>">
-        <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
-          <tr class="tableheader">
-            <td align="center"><?php __('Team Maker Survey')?></td>
-          </tr>
-          <tr class="tablecell2">
-            <td>
-			<?php
-			if( !empty($questions)):
-			for ($i=1; $i <= count($questions); $i++): 
-                          $question = $questions[$i]['Question'];
-                          $answer = $answers[$question['id']];
-				echo "<br><table align=\"center\" width=\"95%\" cellspacing=\"0\" cellpadding=\"5\">
-						<tr class=\"tablecell\">
-						<td width=\"50\"><b><font size=\"2\">Q: ".$question['number']."</font></b><br>";
-				echo "</td></tr>";
-
-				// Multiple Choice Question
-				if( $question['type'] == 'M'){
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\">".$question['prompt']."</td></tr>";
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\">";
-
-					if( !empty($question['Responses'])){
-						foreach ($question['Responses'] as $index => $value):
-  						$checked = '';
-              if($answer['SurveyInput']['question_id'] == $question['id'] && $answer['SurveyInput']['response_id'] == $value['id']) {
-                $checked = 'checked';
-              }
-							echo "<input type=\"radio\" name=\"answer_".$question['number']."\" value=\"".$value['response']."_".$value['id']."\" ".$checked." disabled> ".$value['response']."<br>";
-						endforeach;
-					}
-
-					echo "</td></tr>";
-				}
-				// Choose Any... Question
-				elseif( $question['type'] == 'C'){
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\">".$question['prompt']."</td></tr>";
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\">";
-
-					if( !empty($question['Responses'])){
-						foreach ($question['Responses'] as $index => $value):
-  						$checked = '';
-              if($answer['SurveyInput']['question_id'] == $question['id'] && $answer['SurveyInput']['response_id'] == $value['id']) {
-                $checked = 'checked';
-              }
-							echo "<input type=\"checkbox\" name=\"answer_".$question['number']."[]\" value=\"".$value['response']."_".$value['id']."\" ".$checked." disabled> ".$value['response']."<br>";
-						endforeach;
-					}
-
-					echo "</td></tr>";
-				}
-				// Short Answer Question
-				elseif( $question['type'] == 'S'){
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\">".$question['prompt']."</td></tr>";
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\"><input type=\"text\" name=\"answer_".$question['number']."\" style='width:55%;' value=\"".$answer['SurveyInput']['response_text']."\" disabled></input></td></tr>";
-				}
-				// Long Answer Question
-				elseif( $question['type'] == 'L'){
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\">".$question['prompt']."</td></tr>";
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\"><textarea name=\"answer_".$question['number']."\"  style='width:55%;' rows=\"3\" disabled>".$answer['SurveyInput']['response_text']."</textarea></td></tr>";
-				}
-
-				echo "</tr></table>";
-			endfor;
-			endif;
-			?>
-			</td>
-          </tr>
-      </table>
-    </td>
-  </tr></form>
-</table>
+function boldSelected($choices, $selected) {
+    $options = array();
+    $answers = array();
+    $data = array();
+    
+    // grabbing all the choices
+    foreach ($choices as $choice) {
+        $options[] = $choice['response'];
+    }
+    // grabbing all the chosen values
+    foreach ($selected as $select) {
+        $answers[] = $select['SurveyInput']['response_text'];
+    }
+    
+    foreach ($options as $option) {
+        // option is chosen
+        if (in_array($option, $answers)) {
+            $data[] = '<strong class="green">'.$option.'</strong>';
+        // option is not chosen
+        } else {
+            $data[] = $option;
+        }
+    }
+    
+    return $data;
+}
+?>
+</div>

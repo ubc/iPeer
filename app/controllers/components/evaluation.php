@@ -1961,8 +1961,7 @@ class EvaluationComponent extends Object
 
         $result = array();
 
-        $survey_id = $this->Survey->getSurveyIdByCourseIdTitle($this->Session->read('ipeerSession.courseId'), $event['Event']['title']);
-        //$this->set('survey_id', $survey_id);
+        $survey_id = $this->Survey->getSurveyIdByCourseIdTitle($event['Event']['course_id'], $event['Event']['title']);
         $result['survey_id'] = $survey_id;
 
         // Get all required data from each table for every question
@@ -1983,12 +1982,11 @@ class EvaluationComponent extends Object
             }
         }
         $answers = $this->SurveyInput->getAllSurveyInputBySurveyIdUserId($survey_id, $studentId);
-        //$this->set('answers', $answers);
+
         $result['answers'] = $answers;
-        //$this->set('questions', $result);
         $result['questions'] = $questions;
-        //$this->set('event', $event);
         $result['event'] = $event;
+
         return $result;
     }
 

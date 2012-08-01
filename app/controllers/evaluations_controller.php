@@ -540,12 +540,8 @@ class EvaluationsController extends AppController
         $this->autoRender = false;
         $eventId = $param;
         
-        if (!is_numeric($eventId)) {
-            $this->Session->setFlash(__('Invalid Id', true));
-            $this->redirect('/home/index');
-        }
-        
-        if (null == $this->Event->getEventById($eventId)) {
+        // invalid event ids
+        if (!is_numeric($eventId) || null == $this->Event->getEventById($eventId)) {
             $this->Session->setFlash(__('Invalid Id', true));
             $this->redirect('/home/index');
         }
@@ -561,6 +557,7 @@ class EvaluationsController extends AppController
         
         $templateId = $this->Event->getEventTemplateTypeId($eventId);
         
+        // user is not an instructor of course or event is not a survey
         if (null == $course || '3' != $templateId) {
             $this->Session->setFlash(__('Invalid Id', true));
             $this->redirect('/home/index');
@@ -650,12 +647,9 @@ class EvaluationsController extends AppController
             $eventId = $tok;
             $groupId = strtok(';');
 
-            if (!is_numeric($eventId) || !is_numeric($groupId)) {
-                $this->Session->setFlash(__('Invalid Id', true));
-                $this->redirect('/home/index');
-            }
-
-            if (null == $this->Event->getEventById($eventId)) {
+            // invalid group id or event id
+            if (!is_numeric($eventId) || !is_numeric($groupId) || 
+                null == $this->Event->getEventById($eventId)) {
                 $this->Session->setFlash(__('Invalid Id', true));
                 $this->redirect('/home/index');
             }
@@ -835,12 +829,9 @@ class EvaluationsController extends AppController
             $eventId = $tok;
             $groupId = strtok(';');
             
-            if (!is_numeric($eventId) || !is_numeric($groupId)) {
-                $this->Session->setFlash(__('Invalid Id', true));
-                $this->redirect('/home/index');
-            }
-
-            if (null == $this->Event->getEventById($eventId)) {
+            // invalid event id or group id
+            if (!is_numeric($eventId) || !is_numeric($groupId) ||
+                null == $this->Event->getEventById($eventId)) {
                 $this->Session->setFlash(__('Invalid Id', true));
                 $this->redirect('/home/index');
             }
@@ -858,7 +849,7 @@ class EvaluationsController extends AppController
             }
             
             // if group id provided does not match the group id the user belongs to or
-            // template type is not rubric - they are redirected
+            // template type is not mixeval - they are redirected
             if ($group != $groupId || '4' != $templateId) {
                 $this->Session->setFlash(__('Invalid Id', true));
                 $this->redirect('/home/index');
@@ -1092,16 +1083,18 @@ class EvaluationsController extends AppController
         case 3: // View Survey
             $studentId = $groupId;
             $formattedResult = $this->Evaluation->formatSurveyEvaluationResult($event, $studentId);
+            $user = $this->User->find('first', array('conditions' => array('User.id' => $studentId)));
+            $username = $user['User']['username'];
+            $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > '.$event['Event']['title'].' > '.$username. __("'s Results ", true));
 
             $answers = array();
+
             foreach ($formattedResult['answers'] as $answer) {
-                $answers[$answer['SurveyInput']['question_id']] = $answer;
+                $answers[$answer['SurveyInput']['question_id']][] = $answer;
             }
 
-            $this->set('survey_id', $formattedResult['survey_id']);
             $this->set('answers', $answers);
             $this->set('questions', $formattedResult['questions']);
-            $this->set('event', $formattedResult['event']);
 
             $this->render('view_survey_results');
             break;
@@ -1228,9 +1221,11 @@ class EvaluationsController extends AppController
             )
         ));
 
+        // check to see if user is part of the group and whether the event id is valid
         if (null == $groupMember || null == $event) {
             $this->Session->setFlash(__('Invalid Id', true));
             $this->redirect('/home/index');
+        // check to see whether NOW is between the start and end of result release dates
         } else if (strtotime('NOW') < strtotime($event['Event']['result_release_date_begin']) ||
             strtotime('NOW') >= strtotime($event['Event']['result_release_date_end'])) {
             $this->Session->setFlash(__('The results are not released.', true));
@@ -1457,7 +1452,8 @@ class EvaluationsController extends AppController
             $this->Session->setFlash('You do not have permission to release comments', true);
             $this->redirect('/home');
         }
-
+        
+        // check whether both ids are numeric
         if (!is_numeric($eventId) || !is_numeric($groupId)) {
             $this->Session->setFlash('Invalid Id', true);
             $this->redirect('index');
@@ -1680,6 +1676,7 @@ class EvaluationsController extends AppController
             $this->redirect('/home');
         }
 
+        // check whether $eventId and $groupId are numeric
         if (!is_numeric($eventId) || !is_numeric($groupId)) {
             $this->Session->setFlash('Invalid Id', true);
             $this->redirect('index');
@@ -1796,6 +1793,7 @@ class EvaluationsController extends AppController
             )
         ));
         
+        // check that $surveyId is valid
         if (null == $survey) {
             $this->Session->setFlash(__('Invalid Id', true));
             $this->redirect('index');
@@ -1808,6 +1806,7 @@ class EvaluationsController extends AppController
             )
         ));
         
+        // check that the user is an instructor of the course
         if (null == $course) {
             $this->Session->setFlash(__('You have no permission to view the summary', true));
             $this->redirect('index');

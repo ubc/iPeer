@@ -57,6 +57,7 @@ body {
 
 p {
     padding-bottom: 1em;
+    overflow: auto;
 }
 
 .floatleft {
@@ -716,6 +717,25 @@ i {
     width: 10em;
 }
 
+/* Survey Results */
+
+#SurveyResults ol {
+    list-style-type: lower-alpha;
+    margin-left: 8.5em;
+}
+
+#SurveyResults ul {
+    list-style-type: circle;
+    margin-left: 8em;
+}
+
+#SurveyResults p {
+    margin-left: 7em;
+}
+
+#SurveyResults h3 {
+    margin-left: 3.5em;
+}
 
 /* TO BE REFACTORED LATER */
 
