@@ -472,57 +472,15 @@ class EventsController extends AppController
             'contain' => array('Group')));
         $penalty = $this->Penalty->find('all', array('conditions' => array('event_id' => $id)));
 
-        $penaltyDays = $this->Penalty->find('count', array('conditions' => array('event_id' => $id, 'days_late >' => 0)));
-        $this->set('penaltyDays', $penaltyDays);
-        $penaltySetup = array();
-        if ($penaltyDays > 0) {
-            $penaltyAfter = $this->Penalty->find('first', array('conditions' => array('event_id' => $id), 'order' => 'days_late'));
-            $this->set('penaltyAfter', $penaltyAfter);
-
-            $penaltySetup['penaltyAfter'] = $penaltyAfter['Penalty']['percent_penalty'];
-            $penaltyType =  $penaltyAfter['Penalty']['days_late'];
-            if ($penaltyType == -1) {
-                $penaltySetup['percentagePerDay'] = $penalty[0]['Penalty']['percent_penalty'];
-                $penaltyType = 'simple';
-            } else {
-                $penaltyType = 'advanced';
-            }
-            $this->set('penaltySetup', $penaltySetup);
-            $this->set('penaltyType', $penaltyType);
-        }
-        $courseId = $this->Session->read('ipeerSession.courseId');
+        $courseId = $this->Event->getCourseByEventId($id);
         //Clear $id to only the alphanumeric value
         $id = $this->Sanitize->paranoid($id);
+
         $this->set('event_id', $id);
         $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events > Edit', true));
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $id),
             'contain' => array('Group.Member')));
 
-        //Format Evaluation Selection Boxes
-        $default = null;
-        $model = '';
-        $eventTemplates = array();
-        $templateId = $event['Event']['event_template_type_id'];
-        $eventTypes = $this->EventTemplateType->find('list', array(
-            'conditions'=> array('EventTemplateType.display_for_selection'=>1)
-        ));
-        if (!empty($templateId)) {
-            $eventTemplateType = $this->EventTemplateType->find('id = '.$templateId);
-
-            if ($templateId == 1) {
-                $default = 'Default Simple Evaluation';
-                $model = 'SimpleEvaluation';
-                $eventTemplates = $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'));
-            } else if ($templateId == 2) {
-                $default = 'Default Rubric';
-                $model = 'Rubric';
-                $eventTemplates = $this->Rubric->getBelongingOrPublic($this->Auth->user('id'));
-            } else if ($templateId == 4) {
-                $default = 'Default Mixed Evaluation';
-                $model = 'Mixeval';
-                $eventTemplates = $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'));
-            }
-        }
 
         // Sets up the already assigned groups
         $assignedGroupIds = $this->GroupEvent->getGroupListByEventId($id);
@@ -532,84 +490,55 @@ class EventsController extends AppController
             $groupName = $this->Group->getGroupByGroupId($groupId, array('group_name'));
             $assignedGroups[$groupId] = $groupName[0]['Group']['group_name'];
         }
-        $this->set('eventTypes', $eventTypes);
-        $this->set('assignedGroups', $assignedGroups);
+        
+        $this->set('groups', $this->Group->getGroupsByCourseId($courseId));
+        $this->set(
+            'mixevals',
+            $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'))
+        );
+        $this->set(
+            'simpleEvaluations',
+            $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'))
+        );
+        $this->set(
+            'rubrics',
+            $this->Rubric->getBelongingOrPublic($this->Auth->user('id'))
+        );
+
         $this->set('data', $data);
-        $this->set('penalty', $penalty);
         $this->set('event', $event);
         $this->set('course_id', $courseId);
         $this->set('courses', $this->Course->getCourseList());
-        $this->set('eventTemplates', $eventTemplates);
-        $this->set('default', $default);
-        $this->set('model', $model);
-        $this->set('id', $id);
-        $courseId = $data['Event']['course_id'];
         $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events', true));
-        $forsave =array();
+        $this->set('eventTemplateTypes', $this->EventTemplateType->find('list', array('conditions' => array('NOT' => array('id' => 3)))));
+        $this->set('course_id', $courseId);
 
         if (!empty($this->data)) {
-            $this->data['Event']['id'] = $id;
-            if ($result = $this->Event->save($this->data)) {
-                $this->Penalty->deleteAll(array('event_id' => $id));
-                if ($this->params['data']['Event']['penalty']) {
-                    $penaltyType = $this->params['data']['PenaltySetup']['type'];
-                    $finalDeduction= array();
-                    $finalDeduction['days_late'] = -2;
-                    $finalDeduction['event_id'] =  $this->Event->id;
-                    $finalDeduction['percent_penalty'] = $this->params['data']['PenaltySetup']['penaltyAfter'];
-
-                    if ($penaltyType == 'simple') {
-                        $finalDeduction['days_late'] = -1;
-                        for ($i = 1; $i <= $this->params['data']['PenaltySetup']['numberOfDays']; $i++) {
-                            $this->params['data']['Penalty'][$i]['days_late'] = $i;
-                            $this->params['data']['Penalty'][$i]['percent_penalty'] = $this->params['data']['PenaltySetup']['percentagePerDay'] * $i;
-                            $this->params['data']['Penalty'][$i]['event_id'] = $this->Event->id;
-                            $this->Penalty->save($this->params['data']['Penalty'][$i]);
-                            $this->Penalty->id = null;
-                        }
-                    }
-                    if ($penaltyType == 'advanced') {
-                        foreach ($this->params['data']['Penalty'] as $value => $key) {
-                            $this->params['data']['Penalty'][$value]['event_id'] = $this->Event->id;
-                            $this->Penalty->save($this->params['data']['Penalty'][$value]);
-                            $this->Penalty->id = null;
-                        }
-                    }
-                    if (!$this->Penalty->save($finalDeduction)) {
-                        return false;
-                    }
-                // switching from Yes to No for penalty
-                } else if (!empty($penalty) && 0 == $this->data['Event']['penalty']) {
-                    $this->Penalty->deleteAll(array('Penalty.event_id' => $id));
-                }
-
-                //Save Groups for the Event
-                //$this->GroupEvent->insertGroups($this->Event->id, $this->data['Member']);
-                $this->GroupEvent->updateGroups($this->Event->id, $this->data['Member']);
-                $this->Session->setFlash(__('The event was edited successfully.', true), 'good');
-                $this->redirect('index');
-            } else {
-                //        $validationErrors = $this->Event->invalidFields();
-                //        $errorMsg = '';
-                //        foreach ($validationErrors as $error) {
-                //          $errorMsg = $errorMsg."\n".$error;
-                //        }
-                //        $this->Session->setFlash(__('Failed to save.</br>', true).$errorMsg);
+            // need to set the template_id based on the event_template_type_id
+            $typeId = $this->data['Event']['event_template_type_id'];
+            if ($typeId == 1) {
+                $this->data['Event']['template_id'] = 
+                    $this->data['Event']['SimpleEvaluation'];
             }
-        } else {
-            $this->data = $data;
-            $this->penalty = $penalty;
+            else if ($typeId == 2) {
+                $this->data['Event']['template_id'] = 
+                    $this->data['Event']['Rubric'];
+            }
+            else if ($typeId == 4) {
+                $this->data['Event']['template_id'] = 
+                    $this->data['Event']['Mixeval'];
+            }
+            if ($this->Event->saveAll($this->data)) {
+                $this->Session->setFlash("Add event successful!", 'good');
+            } else {
+                $this->Session->setFlash("Add event failed.");
+            }
+            $this->redirect('index/'.$courseId);
         }
-        
         if (!($this->data = $this->Event->getEventByid($id))) {
             $this->Session->setFlash(__('Event does not exist.', true));
             $this->redirect('index');
         }
-
-        $this->set('eventTemplateTypes', $this->EventTemplateType->find('list', array('conditions' => array('NOT' => array('id' => 3)))));
-        $this->set('unassignedGroups', $this->Event->getUnassignedGroups($data));
-        $this->set('courses', $this->Course->find('list', array('recursive' => -1)));
-        $this->set('course_id', $courseId);
     }
 
     /**

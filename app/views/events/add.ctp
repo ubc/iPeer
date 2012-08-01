@@ -1,3 +1,4 @@
+<div id='Events'>
 <?php
 $html->script("jquery-ui-timepicker-addon", array("inline"=>false));
 
@@ -90,6 +91,7 @@ echo '<a class="addPenaltyButton"
 echo $this->Form->submit();
 echo $this->Form->end();
 ?>
+</div>
 
 <script type="text/javascript">
 // change the datetime text input boxes to show the datetimepicker
