@@ -540,31 +540,35 @@ class EvaluationsController extends AppController
         $this->autoRender = false;
         $eventId = $param;
         
-        // invalid event ids
-        if (!is_numeric($eventId) || null == $this->Event->getEventById($eventId)) {
-            $this->Session->setFlash(__('Invalid Id', true));
-            $this->redirect('/home/index');
+        if (empty($this->params['data'])) {
+        
+            // invalid event ids
+            if (!is_numeric($eventId) || null == $this->Event->getEventById($eventId)) {
+                $this->Session->setFlash(__('Invalid Id', true));
+                $this->redirect('/home/index');
+            }
+            
+            $courseId = $this->Event->getCourseByEventId($eventId);
+            
+            $course = $this->Course->find('first', array(
+                'conditions' => array(
+                    'Course.id' => $courseId,
+                    'Enrol.id' => $this->Auth->user('id')
+                )
+            ));
+            
+            $templateId = $this->Event->getEventTemplateTypeId($eventId);
+            
+            // user is not an instructor of course or event is not a survey
+            if (null == $course || '3' != $templateId) {
+                $this->Session->setFlash(__('Invalid Id', true));
+                $this->redirect('/home/index');
+            }
+            
+            $this->set('courseId', $courseId);
+            $this->set('id', $this->Auth->user('id'));
         }
-        
-        $courseId = $this->Event->getCourseByEventId($eventId);
-        
-        $course = $this->Course->find('first', array(
-            'conditions' => array(
-                'Course.id' => $courseId,
-                'Enrol.id' => $this->Auth->user('id')
-            )
-        ));
-        
-        $templateId = $this->Event->getEventTemplateTypeId($eventId);
-        
-        // user is not an instructor of course or event is not a survey
-        if (null == $course || '3' != $templateId) {
-            $this->Session->setFlash(__('Invalid Id', true));
-            $this->redirect('/home/index');
-        }
-        
-        $this->set('courseId', $courseId);
-        $this->set('id', $this->Auth->user('id'));
+    
         if (empty($this->params['data'])) {
             //Get the target event
             $eventId = $this->Sanitize->paranoid($eventId);
@@ -1292,6 +1296,12 @@ class EvaluationsController extends AppController
             case 3: //View Survey Result
                 $answers = array();
                 $studentId = $groupId;
+                
+                if ($studentId != $this->Auth->user('id')) {
+                    $this->Session->setFlash(__('Invalid Id', true));
+                    $this->redirect('/home');
+                }
+                
                 $formattedResult = $this->Evaluation->formatSurveyEvaluationResult($event, $studentId);
                 
                 foreach ($formattedResult['answers'] as $answer) {

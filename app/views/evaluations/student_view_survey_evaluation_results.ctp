@@ -62,6 +62,7 @@ foreach ($questions as $ques) {
         $ques_num++;
     }
 }
+echo '<br>';
 
 function boldSelected($choices, $selected) {
     $options = array();
