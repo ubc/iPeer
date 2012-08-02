@@ -39,6 +39,7 @@ class ExportBaseNewComponent extends Object
         $grid = $this->ExportHelper2->buildExporterGrid(8, 8);
         $grid[0][0] = "********************************************";
         $yIndex = 1;
+
         if (!empty($params['include_course'])) {
             $grid[0][$yIndex] = "Course Name : ,,".$course['Course']['title'];
         }
@@ -49,6 +50,22 @@ class ExportBaseNewComponent extends Object
         if (!empty($params['include_eval_event_type'])) {
             $yIndex++;
             $grid[0][$yIndex] = "Evaluation Type : ,,".$eventType[$event['Event']['event_template_type_id']];
+        }
+        if (!empty($params['include_instructors'])) {
+            $yIndex++;
+            $instructors = array();
+            foreach ($course['Instructor'] as $instructor) {
+                // has an instructor role
+                if ($this->User->getRoleId($instructor['id']) == 3) {
+                    array_push($instructors, $instructor['first_name'].' '.$instructor['last_name']);
+                }
+            }
+            if (!empty($instructors)) {
+                $listInstructors = implode(", ", $instructors);
+            } else {
+                $listInstructors = $instructors;
+            }
+            $grid[0][$yIndex] = "Instructors : ,,".$listInstructors;
         }
         if (!empty($params['include_date'])) {
             $yIndex += 2;

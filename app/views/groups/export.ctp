@@ -28,9 +28,11 @@
         <tr class="tablecell2">
           <td>Include Student Id #:</td><td><input type="checkbox" name="include_student_id" checked /></td>
         </tr>
-        <tr class="tablecell2">
-          <td>Include Student Email(s):</td><td><input type="checkbox" name="include_student_email" /></td>
-        </tr>
+        <?php if (User::hasPermission('functions/viewemailaddress')) { ?>
+            <tr class="tablecell2">
+              <td>Include Student Email(s):</td><td><input type="checkbox" name="include_student_email" /></td>
+            </tr>
+        <?php } ?>
         </table>
         <table width="75%" border="0" align="center" cellpadding="10" cellspacing="1">
         <tr class="tableheader">

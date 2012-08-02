@@ -63,9 +63,11 @@
         <tr class="tablecell2">
           <td>Include Student Id:&nbsp;<font color="Green">*</td><td><input type="checkbox" name="include_student_id" checked /></td><td></td>
         </tr>
-        <tr class="tablecell2">
-          <td>Include Student Email:</td><td><input type="checkbox" name="include_student_email" checked /></td><td></td>
-        </tr>
+        <?php if (User::hasPermission('functions/viewemailaddress')) { ?>
+            <tr class="tablecell2">
+              <td>Include Student Email:</td><td><input type="checkbox" name="include_student_email"/></td><td></td>
+            </tr>
+        <?php } ?>
  		<?php //Simple Evaluation?>
  		    <tr class="tablecell2 simple">
           		    <td>Include Evaluator Comments:&nbsp;<font color="orange">*</td><td><input class = "csv" type="checkbox" name="simple_evaluator_comment" checked /></td><td></td>

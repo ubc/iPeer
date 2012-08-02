@@ -279,10 +279,16 @@ class EventsController extends AppController
             $this->Session->setFlash('You do not have permission to view events.');
             $this->redirect('/home');
         }
-        if (!is_numeric($id) || !($this->data = $this->Event->getEventByid($id))) {
+        if (!is_numeric($id) || !($event = $this->Event->getEventByid($id))) {
             $this->Session->setFlash(__('Event does not exist.', true));
             $this->redirect('index');
         }
+        if ($event['Event']['event_template_type_id'] == '3') {
+            $this->Session->setFlash(__('Invalid Id', true));
+            $this->redirect('index');        
+        }
+        
+        $this->data = $event;
         
         //Clear $id to only the alphanumeric value
         $id = $this->Sanitize->paranoid($id);
@@ -530,9 +536,9 @@ class EventsController extends AppController
                     $this->data['Event']['Mixeval'];
             }
             if ($this->Event->saveAll($this->data)) {
-                $this->Session->setFlash("Add event successful!", 'good');
+                $this->Session->setFlash("Edit event successful!", 'good');
             } else {
-                $this->Session->setFlash("Add event failed.");
+                $this->Session->setFlash("Edit event failed.");
             }
             $this->redirect('index/'.$courseId);
         }
