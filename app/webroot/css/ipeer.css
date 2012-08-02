@@ -560,6 +560,7 @@ i {
 #UserForm .checkbox {
     vertical-align: middle;
     margin-top: 0.5em;
+    margin-left: 3em;
 }
 
 #UserForm #usernameErr {
@@ -723,9 +724,10 @@ i {
     clear: both;
 }
 
-#Events .text label, .password label, 
-.textarea label, .select label, 
-.datetime label, .radio legend, .penaltyLabel {
+#Events .text label, $Events .password label, 
+#Events .textarea label, $Events .select label, 
+#Events .datetime label, #Events .radio legend, 
+#Events .penaltyLabel {
     width: 18em;
 }
 

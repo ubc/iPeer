@@ -80,8 +80,7 @@ class CoursesController extends AppController
             array(__("View Record", true), "", "", "", "view", "Course.id"),
             array(__("Edit Course", true), "", "", "", "edit", "Course.id"),
             array(__("Delete Course", true), $warning, "", "", "delete", "Course.id"),
-            array(__("View Creator", true), "",    "", "users", "view", "Course.creator_id"),
-            array(__("View Instructor", true), "", "", "users", "view", "Instructor.id"));
+            array(__("View Creator", true), "",    "", "users", "view", "Course.creator_id"));
 
         $recursive = 0;
 

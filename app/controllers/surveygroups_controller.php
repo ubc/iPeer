@@ -154,6 +154,7 @@ class SurveyGroupsController extends AppController
         else if ('' != $this->Session->read('ipeerSession.courseId')) {
             $courseId = $this->Session->read('ipeerSession.courseId');
             $event = $this->Event->find('first', array('conditions' => array('Course.id' => $courseId, 'Event.event_template_type_id' => 3)));
+            $eventId = $event['Event']['id'];
         // event id not entered and no course id stored in Session
         } else {
             $userid = $this->Auth->user('id');
@@ -162,8 +163,9 @@ class SurveyGroupsController extends AppController
                 $courses[] = $course['id'];
             }
             $event = $this->Event->find('first', array('conditions' => array('Course.id' => $courses, 'Event.event_template_type_id' => 3)));
+            $eventId = $event['Event']['id'];
         }
-        
+
         if (!empty($event)) {
             $courseId = $event['Course']['id'];
         
@@ -175,6 +177,7 @@ class SurveyGroupsController extends AppController
                     'conditions' => array('Enrolment.id' => $courseId)
                 )
             );
+
             //filtering for the data to be printed in the view
             foreach ($class as $student) {
                 $temp = array();

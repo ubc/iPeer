@@ -67,12 +67,14 @@ class FacultiesController extends AppController {
         // UserFaculty entry
         $ret = $this->UserFaculty->findAllByFacultyId($id);
         $userfaculty = array();
+
         foreach ($ret as $user) {
             $tmp = array();
-            $tmp['id'] = $user['User']['id'];
-            $tmp['Username'] = $user['User']['username'];
-            $tmp['Full Name'] = $user['User']['full_name'];
-            $tmp['Email'] = $user['User']['email'];
+            $prof = $this->User->findById($user['UserFaculty']['user_id']);
+            $tmp['id'] = $prof['User']['id'];
+            $tmp['Username'] = $prof['User']['username'];
+            $tmp['Full Name'] = $prof['User']['full_name'];
+            $tmp['Email'] = $prof['User']['email'];
             $userfaculty[] = $tmp;
         }
         $this->set('userfaculty', $userfaculty);

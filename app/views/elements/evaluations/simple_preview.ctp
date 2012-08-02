@@ -9,7 +9,7 @@
   $groupMembers[2]['User']['id'] = 3;
   $groupMembers[2]['User']['last_name'] = 'User3';
   $groupMembers[2]['User']['first_name'] = 'Test';
-  $remaining = '0';
+  $remaining = $data['SimpleEvaluation']['point_per_member'] * 3;
 ?>
 
 <script type="text/javascript" language="javascript">
