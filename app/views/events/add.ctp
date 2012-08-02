@@ -4,7 +4,7 @@ $html->script("jquery-ui-timepicker-addon", array("inline"=>false));
 
 echo $this->Form->create('Event', array('action' => "add/$course_id"));
 echo $this->Form->input('course_id', array('default' => $course_id));
-echo $this->Form->input('title');
+echo $this->Form->input('title', array('label' => 'Event Title'));
 echo $this->Form->input('description', array('type' => 'textarea'));
 echo $this->Form->input('event_template_type_id');
 echo $this->Form->input('SimpleEvaluation',
@@ -16,7 +16,8 @@ echo $this->Form->input('Mixeval',
 echo $this->Form->input(
     'self_eval', 
     array(
-        'type' => 'radio', 
+        'legend' => 'Self-Evaluation',
+        'type' => 'radio',
         'options' => array('1' => 'Enabled', '0' => 'Disabled'),
         'default' => '0'
     )
@@ -24,8 +25,8 @@ echo $this->Form->input(
 echo $this->Form->input(
     'com_req', 
     array(
-        'legend' => 'Comments Required', 
-        'type' => 'radio', 
+        'legend' => 'Comments Required',
+        'type' => 'radio',
         'options' => array('1' => 'Enabled', '0' => 'Disabled'),
         'default' => '0'
     )
@@ -33,7 +34,7 @@ echo $this->Form->input(
 echo $this->Form->input('due_date', array('type' => 'text'));
 echo $this->Form->input('release_date_begin', array('type' => 'text'));
 echo $this->Form->input('release_date_end', array('type' => 'text'));
-echo $this->Form->input('result_release_date_begin', array('type' => 'text'));
+echo $this->Form->input('result_release_date_begin', array('type' => 'text', 'label' => 'Result Release Date'));
 echo $this->Form->input('result_release_date_end', array('type' => 'text'));
 echo $this->Form->input('Group');
 

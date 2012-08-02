@@ -297,7 +297,7 @@ class EventsController extends AppController
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $id),
             'contain' => array('Group.Member', 'Course')));
         $courseId = $event['Event']['course_id'];
-        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events', true));
+        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events > View', true));
 
         //Format Evaluation Selection Boxes
         $default = null;
@@ -408,7 +408,7 @@ class EventsController extends AppController
         }
         
         // Init form variables needed for display
-        $this->set('title_for_layout', __('Events > Add', true));
+        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__('Events > Add', true));
         $this->set('groups', $this->Group->getGroupsByCourseId($courseId));
         $this->set(
             'eventTemplateTypes', 
@@ -449,10 +449,32 @@ class EventsController extends AppController
                 $this->data['Event']['template_id'] = 
                     $this->data['Event']['Mixeval'];
             }
+            
+            $deleteThese = array(); // array that stores penalties to delete
+            
+            for ($i = 0; $i < sizeof($penalties); $i++) { // check each existing penalty
+                $isMissing = true;
+                for ($j = 0; $j < sizeof($this->data['Penalty'])+sizeof($penalties); $j++) { // check penalties in $this->data
+                    if ($this->data['Penalty'][$j]['id'] == $penalties[$i]['id']) { // if found, then it isn't missing
+                        $isMissing = false;
+                    }
+                    if (empty($this->data['Penalty'][$j+1]['id'])) { // wasn't sure what to do with excess offset, so just go to next penalty...
+                        break;
+                    }
+                }
+                if ($isMissing) {
+                    $deleteThese[] = $penalties[$i]; // can't find in $this->data ? put into the want-to-delete pile
+                }
+            }
+            
+            foreach($deleteThese as $blah) { // go through the pile and delete them one by one...
+                $this->Penalty->delete($blah);
+            }
+            
             if ($this->Event->saveAll($this->data)) {
-                $this->Session->setFlash("Add event successful!", 'good');
+                $this->Session->setFlash("Edit event successful!", 'good');
             } else {
-                $this->Session->setFlash("Add event failed.");
+                $this->Session->setFlash("Edit event failed.");
             }
             $this->redirect('index/'.$courseId);
         }
@@ -477,7 +499,11 @@ class EventsController extends AppController
 
         $data = $this->Event->find('first', array('conditions' => array('id' => $id),
             'contain' => array('Group')));
-        $penalty = $this->Penalty->find('all', array('conditions' => array('event_id' => $id)));
+        $penaltyData = $this->Penalty->find('all', array('conditions' => array('event_id' => $id)));
+        $penalties = array();
+        foreach ($penaltyData as $tmp) {
+            $penalties[] = $tmp['Penalty'];
+        }
 
         $courseId = $this->Event->getCourseByEventId($id);
         //Clear $id to only the alphanumeric value
@@ -516,9 +542,8 @@ class EventsController extends AppController
         $this->set('event', $event);
         $this->set('course_id', $courseId);
         $this->set('courses', $this->Course->getCourseList());
-        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events', true));
+        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events > Edit', true));
         $this->set('eventTemplateTypes', $this->EventTemplateType->find('list', array('conditions' => array('NOT' => array('id' => 3)))));
-        $this->set('course_id', $courseId);
 
         if (!empty($this->data)) {
             // need to set the template_id based on the event_template_type_id

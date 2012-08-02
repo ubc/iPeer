@@ -65,7 +65,7 @@ for ($i = -1; $i < $numPenalties; $i++) {
     $inputs = 
         '<div class="penaltyInput" id="penaltyInput'.$i.'">' .
         '<input type="hidden" name="required" id="required" value="eventId" />'.
-        $this->Form->input('Penalty.$i.id').
+        $this->Form->input("Penalty.$i.id").
         $this->Form->label("latep$i", '', array('class' => 'penaltyLabel')) .
         $this->Form->text("Penalty.$i.days_late", array('default' => $i + 1)) .
         $this->Form->label('days', 'days', array('class' => 'penaltyInLabel')) .
