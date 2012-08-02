@@ -272,6 +272,7 @@ class SurveyGroupsController extends AppController
     {
       /*$time = 1290644146;
       $make = false;*/
+        $this->set('title_for_layout', __('Survey Groups > Teams Summary', true));
         $numGroups = $this->data['group_config'];
         $survey_id = $this->data['survey_id'];
         $survey = $this->Survey->find('first', array('conditions' => array('Survey.id' => $survey_id),
@@ -314,10 +315,18 @@ class SurveyGroupsController extends AppController
                 $teams[$i]['member_'.$j]['id'] = $member_id;
             }
         }
+        
+        // count how many MC or Checkbox questions are in survey
+        $sq_count = 0;
+        foreach ($survey['Question'] as $tmp) {
+            if ($tmp['type'] == 'M' || $tmp['type'] == 'C') {
+                $sq_count++;
+            }
+        }
 
         $this->__cleanXmlFile($file_path.'.txt.scores');
 
-        $scores = $this->XmlHandler->readTMXml(count($survey['Question']), $file_path.'.txt.scores');
+        $scores = $this->XmlHandler->readTMXml($sq_count, $file_path.'.txt.scores');
         $this->set('scores', $scores);
         $this->set('teams', $teams);
 
@@ -615,7 +624,7 @@ class SurveyGroupsController extends AppController
     function __cleanXmlFile($file_path_name)
     {
         $xmlFile = file_get_contents($file_path_name);
-        $xmlFile = @ereg_replace('(<\?=).*(\?>)', '', $xmlFile);
+        $xmlFile = preg_replace('/(<\?=.+?)+(\?>)/i', '', $xmlFile); // ereg_replace() is deprecated
         file_put_contents($file_path_name, $xmlFile);
     }
 

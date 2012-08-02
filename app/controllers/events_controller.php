@@ -402,6 +402,7 @@ class EventsController extends AppController
         }
         
         // Init form variables needed for display
+        $this->set('title_for_layout', __('Events > Add', true));
         $this->set('groups', $this->Group->getGroupsByCourseId($courseId));
         $this->set(
             'eventTemplateTypes', 

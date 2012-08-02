@@ -14,17 +14,12 @@
       <td align="center"><?php __('Team Making - Step One')?></td>
     </tr>
     <tr class="tablecell2">
-      <td>
-  			<?php echo $data['Course']['student_count'].__(' students were specified for this survey,', true); ?>
-            <?php if (empty($data['Event'][0]['response_count'])) {
-                echo "0 students responded";
-            } else {
-                echo $data['Event'][0]['response_count'].__(' students responded', true);
-            } ?><br />
-			</td>
-		</tr>
-		<tr class="tablecell2">
-			<td><?php __('Group Configuration')?>:
+        <td>
+  			<?php echo $data['Course']['student_count'].__(' students were specified for this survey, ', true).$data['Event'][0]['response_count'].__(' students responded', true); ?>
+        </td>
+    </tr>
+    <tr class="tablecell2">
+        <td><?php __('Group Configuration')?>:
         <?php echo $this->Form->select('group_config', $group_list, null)?>
       </td>
     </tr><?php if (!isset($data['Question'])||count($data['Question'])<1): ?>

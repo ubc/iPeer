@@ -12,9 +12,6 @@
   <tr>
     <td>
         <table width="95%" align="center" cellpadding="4" cellspacing="2">
-          <tr class="tableheader">
-            <td align="center"><?php __('Teams Summary')?></td>
-          </tr>
           <tr class="tablecell2">
             <td><?php __('Click on any user name to view their answers to this survey.<br>To adjust weightings and create a new set of teams, just go ')?><a href="javascript:history.go(-1);"><?php __('back')?></a>.<br/><br/><?php __('To edit these teams, first save them below.')?><br/><br/><b><?php __('Note:')?></b> <?php __("Higher 'Match Score' is better.")?> <br/><br/>
 

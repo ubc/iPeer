@@ -52,7 +52,7 @@ class XmlHandlerComponent extends Object
 
                 //weight
                 $element_weight = $doc->$createElementFunc('weight');
-                $element_weight->$setAttributeFunc('value', $q['id']);
+                $element_weight->$setAttributeFunc('value', $weight[$q['id']]);
                 $question->$appendChildFunc($element_weight);
             }
         }
@@ -353,7 +353,7 @@ class XmlHandlerComponent extends Object
                         } elseif (($i-2)%($questionCount+2) <= $questionCount) {
                             $score[($i-$lineSkip-(($i-2)%($questionCount+2)))-1]['q_'.(($i-1)%($questionCount))] = $item->node_value();
                         } else {
-                            $score[$i-$lineSkip-($questionCount+2)]['percent'] = $item->node_value();
+                           $score[$i-$lineSkip-($questionCount+2)]['percent'] = $item->node_value();
                         }
                     }
                 }
@@ -371,7 +371,7 @@ class XmlHandlerComponent extends Object
                 foreach ($row->childNodes as $j => $item) {
                     if ($j == 0) {
                         $score[$i - $row_skip]['team_name'] = $item->nodeValue;
-                    } elseif ($j == $questionCount) {
+                    } elseif ($j == $questionCount+1) {
                         $score[$i-$row_skip]['percent'] = $item->nodeValue;
                     } else {
                         $score[$i-$row_skip]['q_'.($j-1)] = $item->nodeValue;
