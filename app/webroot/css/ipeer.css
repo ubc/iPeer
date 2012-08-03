@@ -214,6 +214,7 @@ div.ui-datepicker { font-size: 0.85em; }
     text-align: center;
     padding: 0.5em;
     padding-left: 0.6em;
+    text-decoration: none;
 }
 
 .navigation a:hover,a:active {
@@ -231,6 +232,7 @@ div.ui-datepicker { font-size: 0.85em; }
     font-size: 0.65em;
     border: none;
     margin-right: 0.5em;
+    padding: 0.5em 1em;
 }
 
 /* CONTENT CONTAINER */
