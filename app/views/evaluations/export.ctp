@@ -4,7 +4,7 @@
     <form name="frm" id="frm" method="POST" action="<?php echo $html->url('export/'.$type.'/'.$id) ?>">
       <input type="hidden" name="assigned" id="assigned"/>
       <table width="85%" border="0" align="center" cellpadding="4" cellspacing="2">
-      	<tr><td style="color:darkred; font-size:smaller"> *Please check at least one of similarly coloured fields</td></tr>
+      	<tr><td colspan="2" style="color:darkred; font-size:smaller"> *Please check at least one of similarly coloured fields</td></tr>
         <tr class="tableheader"> 
           <td colspan="3" align="center">Export Evaluation Results</td>
         </tr>
@@ -26,13 +26,13 @@
 				echo '<option value='.$selectedEvent['Event']['id'].'>'.$selectedEvent['Event']['title'].'</option>';
           	  } else {
           	      foreach($events as $e) {
-          	    	  echo '<option value= '.$e['Event']['id'].'>'.$e["Event"]["title"].'</option>';          	  	  
+          	    	  echo '<option value= '.$e['Event']['id'].'>'.$e["Event"]["title"].'</option>';
           	    }
           	  }
           	?>
           	</select></td> <td></td>
-        </tr>        
-        
+        </tr>
+
         <tr class="tablesubheader">
           <td colspan="3" align="center">Header</td>
         </tr>
@@ -63,33 +63,15 @@
         <tr class="tablecell2">
           <td>Include Student Id:&nbsp;<font color="Green">*</td><td><input type="checkbox" name="include_student_id" checked /></td><td></td>
         </tr>
-        <?php if (User::hasPermission('functions/viewemailaddress')) { ?>
-            <tr class="tablecell2">
-              <td>Include Student Email:</td><td><input type="checkbox" name="include_student_email"/></td><td></td>
-            </tr>
-        <?php } ?>
- 		<?php //Simple Evaluation?>
- 		    <tr class="tablecell2 simple">
-          		    <td>Include Evaluator Comments:&nbsp;<font color="orange">*</td><td><input class = "csv" type="checkbox" name="simple_evaluator_comment" checked /></td><td></td>
-        	      </tr>
-        	      <tr class="tablecell2 simple">
-          		    <td>Include Simple Evaluation Grade Table:&nbsp;<font color="orange">*</td><td><input class = "csv" type="checkbox" name="simple_eval_grade_table" checked /></td><td></td>
-        	      </tr>
-	
- 		<?php // Rubrics Evaluation?>
- 		    <tr class="tablecell2 rubrics">
-		            <td>Include Rubrics Criteria Marks:&nbsp;<font color="orange">*</td><td><input class = "csv" type="checkbox" name="rubric_criteria_marks" checked /></td><td></td>
-		          <tr class="tablecell2 rubrics">
-		            <td>Include Rubrics General Comments:&nbsp;<font color="orange">*</td><td><input class = "csv" type="checkbox" name="rubric_general_comments" checked /></td><td></td>
-		          </tr>
+        
+        <tr class="tablecell2">
+            <td>Include Comments:&nbsp;<font color="orange">*</td><td><input class="csv" type="checkbox" name="include_comments" checked /></td><td></td>
+        </tr>
+        <tr class="tablecell2">
+            <td>Include Grades:&nbsp;<font color="orange">*</td><td><input class="csv" type="checkbox" name="include_grade_tables" checked /></td><td></td>
+        </tr>
 
- 		 <?php // Mix Evaluation?>
-		    <tr class="tablecell2 mix">
-		            <td>Include Comments Table:&nbsp;<font color="orange">*</td><td><input type="checkbox" class = "csv" name="include_mixeval_question_comment" checked /></td><td></td>
-		          </tr>
-		          <tr class="tablecell2 mix">
-		            <td>Include Grades Table:&nbsp;<font color="orange">*</td><td><input type="checkbox" class = "csv" name="include_mixeval_grades" checked /></td><td></td>
-		          </tr>
+ 		
 
         <tr class="tablecell2">
           <td>Include Final Marks:</td><td><input type="checkbox" name="include_final_marks" checked /></td><td></td>

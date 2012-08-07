@@ -136,22 +136,23 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         $evaluateesArray = $this->ExportHelper2->formatEvaluatorsHeaderArray($groupMembersNoTutors);
         $xPosition = 0;
         // Fill in Evaluatee Rows
-        if (!empty($params['include_student_email'])) {
-            $this->ExportHelper2->fillGridVertically($grid, 6, $xPosition, $evaluateesArray['email']);
-        }
+        //if (!empty($params['include_student_email'])) {
+        //    $this->ExportHelper2->fillGridVertically($grid, 6, $xPosition, $evaluateesArray['email']);
+        //}
+        $grid[$xPosition+1][4] = "Evaluatees:";
         if (!empty($params['include_student_id'])) {
             $xPosition++;
-            $this->ExportHelper2->fillGridVertically($grid, 6, $xPosition, $evaluateesArray['student_no']);
+            $this->ExportHelper2->fillGridVertically($grid, 5, $xPosition, $evaluateesArray['student_no']);
         }
         if (!empty($params['include_student_name'])) {
             $xPosition++;
-            $this->ExportHelper2->fillGridVertically($grid, 6, $xPosition, $evaluateesArray['name']);
+            $this->ExportHelper2->fillGridVertically($grid, 5, $xPosition, $evaluateesArray['name']);
         }
 
         $xPosition ++;
-        $yPosition = 6;
+        $yPosition = 5;
         // Fill in score table
-        $grid[$xPosition + count($groupMembers) + 1][$yPosition - 1] = "Evaluatee Ave Score";
+        $grid[$xPosition + count($groupMembers) + 1][$yPosition - 1] = "Evaluatee Avg Score";
         $grid[$xPosition + count($groupMembers) + 2][$yPosition - 1] = "Penalty";
         $grid[$xPosition + count($groupMembers) + 3][$yPosition - 1] = "Final Mark";
         foreach ($groupMembers as $evaluatee) {
@@ -197,7 +198,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                         }
                     }
                     $penaltyPercent  = $penalty['Penalty']['percent_penalty'];
-                    $penaltyPercent > 0 ?  $perPenalty =  $penaltyPercent.'%' : $perPenalty = '-';
+                    $penaltyPercent > 0 ?  $perPenalty =  '-'.$penaltyPercent.'%' : $perPenalty = '--';
                     $final = number_format($aveScore * (1 - $penaltyPercent / 100), 2);
                     
                     $grid[$xPosition + count($groupMembers) + 2][$yPosition] = $perPenalty;
@@ -309,19 +310,19 @@ Class ExportExcelComponent extends ExportBaseNewComponent
 
         $evaluatorHeaderArray = $this->ExportHelper2->formatEvaluatorsHeaderArray($groupMembers);
         if (!empty($params['include_student_name'])) {
-            $grid[$xPosition + 1][$yPosition] = "Evaluators :";
+            $grid[$xPosition + 1][$yPosition] = "Evaluators:";
             $this->ExportHelper2->fillGridHorizonally($grid, $xPosition + 3, $yPosition, $evaluatorHeaderArray['name']);
         }
         if (!empty($params['include_student_id'])) {
             $yPosition++;
-            $grid[$xPosition + 1][$yPosition] = "Evaluator's Student Id :";
+            $grid[$xPosition + 1][$yPosition] = "Evaluator's Student Id:";
             $this->ExportHelper2->fillGridHorizonally($grid, $xPosition + 3, $yPosition, $evaluatorHeaderArray['student_no']);
         }
-        if (!empty($params['include_student_email'])) {
-            $yPosition++;
-            $grid[$xPosition + 1][$yPosition] = "Evaluator's Email :";
-            $this->ExportHelper2->fillGridHorizonally($grid, $xPosition + 3, $yPosition, $evaluatorHeaderArray['email']);
-        }
+        //if (!empty($params['include_student_email'])) {
+        //    $yPosition++;
+        //    $grid[$xPosition + 1][$yPosition] = "Evaluator's Email:";
+        //    $this->ExportHelper2->fillGridHorizonally($grid, $xPosition + 3, $yPosition, $evaluatorHeaderArray['email']);
+        //}
 
         $grid[$xPosition + count($groupMembers) + 4][$yPosition + 1] = "Question Avg Mark";
         $rowNum = 7; $finalMark = 0;
@@ -356,7 +357,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         }
 
         if (!empty($params['include_final_marks'])) {
-            $grid[$xPosition + count($groupMembers) + 3][$yPosition + 2] = "Final Mark =";
+            $grid[$xPosition + count($groupMembers) + 3][$yPosition + 2] = "Final Mark";
             $grid[$xPosition + count($groupMembers) + 4][$yPosition + 2] = number_format($finalMark, 2);
             $submission = $this->EvaluationSubmission->find('first', array('conditions' => array('EvaluationSubmission.grp_event_id' => $grpEventId, 'EvaluationSubmission.submitter_id' => $evaluatee)));
             $due_date = strtotime($submission['Event']['due_date']);
@@ -380,12 +381,12 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                 }
             }
             $penaltyPercent  = $penalty['Penalty']['percent_penalty'];
-            $penaltyPercent > 0 ?  $perPenalty =  $penaltyPercent.'%' : $perPenalty = '-';
+            $penaltyPercent > 0 ?  $perPenalty =  '-'.$penaltyPercent.'%' : $perPenalty = '--';
             $final = number_format($finalMark * (1 - $penaltyPercent / 100), 2);
             
-            $grid[$xPosition + count($groupMembers) + 3][$yPosition + 3] = "  Penalty=";
+            $grid[$xPosition + count($groupMembers) + 3][$yPosition + 3] = "Penalty";
             $grid[$xPosition + count($groupMembers) + 4][$yPosition + 3] = $perPenalty;
-            $grid[$xPosition + count($groupMembers) + 3][$yPosition + 4] = "Final Mark=";
+            $grid[$xPosition + count($groupMembers) + 3][$yPosition + 4] = "Final Mark";
             $grid[$xPosition + count($groupMembers) + 4][$yPosition + 4] = $final;
         }
         return $grid;
@@ -419,19 +420,19 @@ Class ExportExcelComponent extends ExportBaseNewComponent
 
         $evaluatorHeaderArray = $this->ExportHelper2->formatEvaluatorsHeaderArray($groupMembers);
         if (!empty($params['include_student_name'])) {
-            $grid[$xPosition+1][$yPosition] = "Evaluators :";
+            $grid[$xPosition+1][$yPosition] = "Evaluators:";
             $this->ExportHelper2->fillGridHorizonally($grid, $xPosition + 3, $yPosition, $evaluatorHeaderArray['name']);
         }
         if (!empty($params['include_student_id'])) {
             $yPosition++;
-            $grid[$xPosition + 1][$yPosition] = "Evaluator's Student Id :";
+            $grid[$xPosition + 1][$yPosition] = "Evaluator's Student Id:";
             $this->ExportHelper2->fillGridHorizonally($grid, $xPosition + 3, $yPosition, $evaluatorHeaderArray['student_no']);
         }
-        if (!empty($params['include_student_email'])) {
-            $yPosition++;
-            $grid[$xPosition + 1][$yPosition] = "Evaluator's Email :";
-            $this->ExportHelper2->fillGridHorizonally($grid, $xPosition + 3, $yPosition, $evaluatorHeaderArray['email']);
-        }
+        //if (!empty($params['include_student_email'])) {
+        //    $yPosition++;
+        //    $grid[$xPosition + 1][$yPosition] = "Evaluator's Email:";
+        //    $this->ExportHelper2->fillGridHorizonally($grid, $xPosition + 3, $yPosition, $evaluatorHeaderArray['email']);
+        //}
         $grid[$xPosition + count($groupMembers) + 4][$yPosition + 1] = "Question Avg Mark";
         $questionArray = array();
         // Insert in question column
@@ -469,7 +470,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         }
         // Sum up final mark
         if (!empty($params['include_final_marks'])) {
-            $grid[$xPosition][$yPosition + count($questions)] = "          Total=";
+            $grid[$xPosition][$yPosition + count($questions)] = "Raw Total";
             $grid[$xPosition + 1][$yPosition + count($questions)] = $finalMark;
             $submission = $this->EvaluationSubmission->find('first', array('conditions' => array('EvaluationSubmission.grp_event_id' => $grpEventId, 'EvaluationSubmission.submitter_id' => $evaluatee)));
             $due_date = strtotime($submission['Event']['due_date']);
@@ -493,12 +494,12 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                 }
             }
             $penaltyPercent  = $penalty['Penalty']['percent_penalty'];
-            $penaltyPercent > 0 ?  $perPenalty =  $penaltyPercent.'%' : $perPenalty = '-';
+            $penaltyPercent > 0 ?  $perPenalty =  '-'.$penaltyPercent.'%' : $perPenalty = '--';
             $final = number_format($finalMark * (1 - $penaltyPercent / 100), 2);
             
-            $grid[$xPosition][$yPosition + count($questions) + 1] = "  Penalty=";
+            $grid[$xPosition][$yPosition + count($questions) + 1] = "Penalty";
             $grid[$xPosition + 1][$yPosition + count($questions) + 1] = $perPenalty;
-            $grid[$xPosition][$yPosition + count($questions) + 2] = "Final Mark=";
+            $grid[$xPosition][$yPosition + count($questions) + 2] = "Final Mark";
             $grid[$xPosition + 1][$yPosition + count($questions) + 2] = $final;
         }
         return $grid;
@@ -545,10 +546,10 @@ Class ExportExcelComponent extends ExportBaseNewComponent
             $this->ExportHelper2->repeatDrawByCoordinateVertical($grid, $xPosition, $questionYPos, $sectionSpacing, $groupCount,
                 "Question ".$questionNum.": ".$q['MixevalsQuestion']['title']);
             $questionNum++;
-            $questionYPos += $submissionCount + 1;
+            $questionYPos += $groupCount+1;
         }
         // Fill in the comments
-        $headerYPos = 0; $commentRowYPos = 3;
+        $headerYPos = 0; $commentRowYPos = 2;
         foreach ($groupMembersNoTutors as $evaluatee) {
             // First fill in the evaluatee headers
             $evaluateeHeader = $this->ExportHelper2->formatEvaluateeHeaderArray($params, $evaluatee);
@@ -557,6 +558,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
             // Now start filling in mixeval question comments
             $mixedResults = $this->EvaluationMixeval->getResultsDetailByEvaluatee($grpEventId, $evaluatee['id'], true);
             $tmpYPos = $commentRowYPos;
+            $rCount = 0;
             foreach ($mixedResults as $evaluator) {
                 // Only loop through question comment results
                 if (!in_array($evaluator['EvaluationMixevalDetail']['question_number'], $validQuestionNum)) {
@@ -571,10 +573,16 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                 if (!empty($params['include_student_id'])) {
                     array_push($evaluatorArray, $evaluator['User']['evaluator_student_no']);
                 }
-                array_push($evaluatorArray, $evaluator['EvaluationMixevalDetail']['question_comment']);
-                empty($grid[$xPosition][$tmpYPos]) ? $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $tmpYPos, $evaluatorArray) :
-                    $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $tmpYPos+1, $evaluatorArray);
+                for ($i = 0; $i <= $rCount; $i++) {
+                    if ($evaluator['User']['evaluator_last_name'] == $grid[$xPosition][$tmpYPos-$i] && $evaluator['User']['evaluator_first_name'] == $grid[$xPosition+1][$tmpYPos-$i]) {
+                        $tmpYPos += $groupCount-$i;
+                        $rCount = 0;
+                    }
+                }
                 $tmpYPos++;
+                $rCount++;
+                array_push($evaluatorArray, $evaluator['EvaluationMixevalDetail']['question_comment']);
+                $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $tmpYPos, $evaluatorArray);
             }
             $commentRowYPos += $sectionSpacing;
             $headerYPos += $sectionSpacing;
@@ -630,19 +638,19 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                 $groupMembers = $this->GroupEvent->getGroupMembers($grpEventId);
                 $groupMembersNoTutors = $this->ExportHelper2->getGroupMemberWithoutTutorsHelper($grpEventId);
                 if (!empty($params['include_group_names'])) {
-                    $this->sheet->setCellValue('A'.$this->cursor['y'], "Group Name : ".$group[0]['Group']['group_name']);
                     $this->cursor['y'] += 2;
+                    $this->sheet->setCellValue('A'.$this->cursor['y'], "Group Name :  ".$group[0]['Group']['group_name']);
                     $this->sheet->getStyle('A'.$this->cursor['y'])->getFont()->setSize(14);
                     $this->cursor['y'] += 2;
                 }
-                if (!empty($params['simple_eval_grade_table'])) {
+                if (!empty($params['include_grade_tables'])) {
                     $this->sheet->setCellValue('A'.$this->cursor['y'], "Simple Evaluation Grades Table");
                     $simpleResults = $this->_buildSimpleEvalResults($groupEvents[$i]['GroupEvent']['id'], $params);
                     $this->_drawToExcelSheetAtCoordinates($simpleResults, $this->cursor['x'], $this->cursor['y']);
                     $this->cursor['y'] += (count($simpleResults[0])+2);
                 }
-                if (!empty($params['simple_evaluator_comment'])) {
-                    $this->sheet->setCellValue('A'.$this->cursor['y'], "Evaluation Comments");
+                if (!empty($params['include_comments'])) {
+                    $this->sheet->setCellValue('A'.$this->cursor['y'], "Simple Evaluation Comments:");
                     $this->cursor['y']++;
                     //  	      	$CSV .= "Simple Evaluation Comments :\n\n";
                     foreach ($groupMembersNoTutors as $evaluatee) {
@@ -662,12 +670,13 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                 $groupMembers = $this->GroupEvent->getGroupMembers($grpEventId);
                 $groupMembersNoTutors = $this->ExportHelper2->getGroupMemberWithoutTutorsHelper($grpEventId);
                 if (!empty($params['include_group_names'])) {
-                    $this->sheet->setCellValue('A'.$this->cursor['y'], "Group Name : ".$group[0]['Group']['group_name']);
+                    $this->cursor['y'] += 2;
+                    $this->sheet->setCellValue('A'.$this->cursor['y'], "Group Name :  ".$group[0]['Group']['group_name']);
                     $this->sheet->getStyle('A'.$this->cursor['y'])->getFont()->setSize(14);
                     $this->cursor['y'] += 2;
                 }
-                if (!empty($params['rubric_criteria_marks'])) {
-                    $this->sheet->setCellValue('A'.$this->cursor['y'], "Rubrics Evaluation Grade Table :");
+                if (!empty($params['include_grade_tables'])) {
+                    $this->sheet->setCellValue('A'.$this->cursor['y'], "Rubrics Evaluation Grade Table");
                     $this->cursor['y'] += 2;
                     foreach ($groupMembersNoTutors as $evaluatee) {
                         $gradeTable = $this->_buildRubricsResultByEvalatee($params, $grpEventId, $evaluatee['id']);
@@ -675,8 +684,8 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                         $this->cursor['y'] += (count($gradeTable[0]));
                     }
                 }
-                if (!empty($params['rubric_general_comments'])) {
-                    $this->sheet->setCellValue('A'.$this->cursor['y'], "Rubrics General Comments");
+                if (!empty($params['include_comments'])) {
+                    $this->sheet->setCellValue('A'.$this->cursor['y'], "Rubrics General Comments:");
                     $this->cursor['y'] += 2;
                     foreach ($groupMembersNoTutors as $evaluatee) {
                         $rubricGeneralComments = $this->_buildSimpleOrRubricsCommentByEvaluatee($grpEventId, $evaluatee['id'], $params, 'R');
@@ -696,13 +705,14 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                 $groupMembers = $this->GroupEvent->getGroupMembers($grpEventId);
                 $groupMembersNoTutors = $this->ExportHelper2->getGroupMemberWithoutTutorsHelper($grpEventId);
                 if (!empty($params['include_group_names'])) {
-                    $this->sheet->setCellValue('A'.$this->cursor['y'], "Group Name : ".$group[0]['Group']['group_name']);
+                    $this->cursor['y'] += 2;
+                    $this->sheet->setCellValue('A'.$this->cursor['y'], "Group Name :  ".$group[0]['Group']['group_name']);
                     $this->sheet->getStyle('A'.$this->cursor['y'])->getFont()->setSize(14);
                     $this->cursor['y'] += 2;
+                }
+                if (!empty($params['include_grade_tables'])) {
                     $this->sheet->setCellValue('A'.$this->cursor['y'], "Mixed Evaluation Grade Table");
                     $this->cursor['y'] += 2;
-                }
-                if (!empty($params['include_mixeval_grades'])) {
                     foreach ($groupMembersNoTutors as $evaluatee) {
                         $gradeTable = $this->_buildMixevalResultByEvaluatee($params, $grpEventId, $evaluatee['id']);
                         $this->_drawToExcelSheetAtCoordinates($gradeTable, 0, $this->cursor['y']);
@@ -710,7 +720,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                     }
                     $this->cursor['y'] += 2;
                 }
-                if (!empty($params['include_mixeval_question_comment'])) {
+                if (!empty($params['include_comments'])) {
                     $this->sheet->setCellValue('A'.$this->cursor['y'], "Mixed Evaluation Comments:");
                     $this->cursor['y'] += 2;
                     $questionComments = $this->_buildMixEvalQuestionCommentTable($params, $grpEventId);

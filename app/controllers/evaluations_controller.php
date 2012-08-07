@@ -2054,12 +2054,12 @@ class EvaluationsController extends AppController
         }
         //pre($evaluation_rubric_specific_data);
 
-        //step 5 Get Rubic title
-        $rubtic_id=$this->Event->field('template_id', "id=$eventId");
-        $rubtic_title=$this->Rubric->field("name", "id=$rubtic_id");
-        //step 6 Get Rubic criteria
-        //$rubric_criteria=$this->RubricsCriteria->generateList("rubric_id=$rubtic_id", "rubric_id asc", null, "{n}.RubricsCriteria.criteria_num", "{n}.RubricsCriteria.criteria");
-        $rubric_criteria = $this->RubricsCriteria->find("list", array('conditions' => 'rubric_id = '.$rubtic_id,
+        //step 5 Get Rubric title
+        $rubric_id=$this->Event->field('template_id', "id=$eventId");
+        $rubric_title=$this->Rubric->field("name", "id=$rubric_id");
+        //step 6 Get Rubric criteria
+        //$rubric_criteria=$this->RubricsCriteria->generateList("rubric_id=$rubric_id", "rubric_id asc", null, "{n}.RubricsCriteria.criteria_num", "{n}.RubricsCriteria.criteria");
+        $rubric_criteria = $this->RubricsCriteria->find("list", array('conditions' => 'rubric_id = '.$rubric_id,
             'order'      => 'rubric_id asc',
             'limit'      => null,
             'fields'     => array('RubricsCriteria.criteria_num', 'RubricsCriteria.criteria')

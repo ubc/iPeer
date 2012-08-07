@@ -96,6 +96,7 @@ class ExportBaseNewComponent extends Object
     {
         $this->Course = ClassRegistry::init('Course');
         $this->Event = ClassRegistry::init('Event');
+        $this->User = ClassRegistry::init('User');
         $this->UserCourse = ClassRegistry::init('UserCourse');
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
@@ -105,8 +106,6 @@ class ExportBaseNewComponent extends Object
         $event = $this->Event->getEventById($eventId);
         $course = $this->Course->getCourseById($courseId);
         //$instructors = $this->UserCourse->getInstructors($courseId);
-        $instructors[0]['first_name'] = "Gordon";
-        $instructors[0]['last_name'] = "Slade";
         $header = '';
 
         if (!empty($params['include_course']) || !empty($params['include_eval_event_names'])) {
@@ -126,11 +125,14 @@ class ExportBaseNewComponent extends Object
         }
         if (!empty($params['include_instructors'])) {
             $header .= "Instructors :,,";
-            foreach ($instructors as $i) {
-                $header .= $i['first_name']." ".$i['last_name'].",\n";
+            foreach ($course['Instructor'] as $i) {
+                if ($this->User->getRoleId($i['id']) == 3) {
+                    $header .= $i['first_name']." ".$i['last_name'].",";
+                }
             }
         }
-        $header .= "********************************************\n";
+
+        $header .= "\n********************************************\n";
         return $header;
     }
 
@@ -396,7 +398,7 @@ class ExportBaseNewComponent extends Object
             if (!empty($penalty)) {
                 array_push($row, $penalty['Penalty']['percent_penalty']."%");
             } else {
-                array_push($row, "-");
+                array_push($row, "--");
             }
             $finalGrade = $mixEval['EvaluationMixeval']['score'] * (1 - ($penalty['Penalty']['percent_penalty']/100));
             array_push($row, $finalGrade);
@@ -555,7 +557,7 @@ class ExportBaseNewComponent extends Object
             if (!empty($penalty)) {
                 array_push($row, $penalty['Penalty']['percent_penalty']."%");
             } else {
-                array_push($row, "-");
+                array_push($row, "--");
             }
             $finalGrade = $rubricsEvaluation['EvaluationRubric']['score'] * (1 - ($penalty['Penalty']['percent_penalty']/100));
             array_push($row, number_format($finalGrade, 2));
@@ -804,7 +806,7 @@ for ($inc=0; $inc<$count($groupMembers); $inc++) {
         }
         // Sum up final mark
         if (!empty($params['include_final_marks'])) {
-            $grid[$xPosition][$yPosition + count($questions)] = "Total=";
+            $grid[$xPosition][$yPosition + count($questions)] = "Total";
             $grid[$xPosition + 1][$yPosition + count($questions)] = $finalMark;
         }
         return $this->ExportHelper2->arrayDraw($grid);
@@ -883,7 +885,7 @@ for ($inc=0; $inc<$count($groupMembers); $inc++) {
         }
 
         if (!empty($params['include_final_marks'])) {
-            $grid[$xPosition + count($groupMembers) + 3][$yPosition + 2] = "Final Mark =";
+            $grid[$xPosition + count($groupMembers) + 3][$yPosition + 2] = "Final Mark";
             $grid[$xPosition + count($groupMembers) + 4][$yPosition + 2] = $finalMark;
         }
         return $this->ExportHelper2->arrayDraw($grid);
