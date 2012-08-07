@@ -1214,6 +1214,13 @@ CREATE TABLE IF NOT EXISTS `roles_users` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
+--
+-- Dumping data for table `roles_users`
+--
+
+INSERT INTO `roles_users` (`role_id`, `user_id`, `created`, `modified`) VALUES
+(1, 1, NOW(), NOW());
+
 -- --------------------------------------------------------
 
 --
@@ -1580,6 +1587,16 @@ CREATE TABLE IF NOT EXISTS `user_enrols` (
   KEY `user_id` (`user_id`),
   KEY `user_id_index` (`user_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `password`, `first_name`, `last_name`, `student_no`, `title`, `email`, `last_login`, `last_logout`, `last_accessed`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`, `lti_id`) VALUES
+(1, 'root', '', 'Super', 'Admin', NULL, NULL, '', NULL, NULL, NULL, 'A', 1, NOW(), NULL, NOW(), NULL);
+
 
 -- --------------------------------------------------------
 

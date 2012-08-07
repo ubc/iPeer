@@ -140,7 +140,7 @@ class User extends AppModel
                 'message' => 'Usernames may only have letters and numbers.'
             ),
             'minLength' => array(
-                'rule' => array('minLength', 6),
+                'rule' => array('minLength', 1),
                 'message' => 'Usernames must be at least 6 characters.'
             ),
             'unique' => array(

@@ -40,7 +40,6 @@ class InstallController extends Controller
         parent::__construct();
     }
 
-
     /**
      * Check prereqs for installing iPeer
      * */
@@ -304,18 +303,13 @@ class InstallController extends Controller
      */
     private function createSuperAdmin($username, $password, $email)
     {
-        // TODO Replace raw SQL queries with CakePHP Model calls once the database
-        // conflicts where both the users and roles_users table stores role data
-        // has been fixed
-        //Create Super Admin
-        $my_db =& ConnectionManager::getDataSource('default');
-        $my_db->query("INSERT INTO `users` (`id`, `username`, `password`, `first_name`, `last_name`, `student_no`, `title`, `email`, `last_login`, `last_logout`, `last_accessed`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`)
-            VALUES ('1', '".$username."', '".md5($password)."', 'Super', 'Admin', NULL, NULL, '".$email."', NULL, NULL, NULL, 'A', '0', '".date("Y-m-d H:i:s")."', NULL, NULL)
-            ON DUPLICATE KEY UPDATE password = '".md5($password)."', email = '".$email."';");
-
-        //Get Super Admin's id and insert into roles_users table
-        $user_id = $my_db->query("SELECT id FROM users WHERE username = '".$username."'");
-        $my_db->query("INSERT INTO `roles_users` (`id`, `role_id`, `user_id`, `created`, `modified`)
-            VALUES (NULL, '1', '".$user_id[0]['users']['id']."', '".date("Y-m-d H:i:s")."', '".date("Y-m-d H:i:s")."');");
+        // modify the superadmin to user specs
+        $ret = $this->loadModel('User');
+        $root = $this->User->findById(1);
+        $root['User']['username'] = $username;
+        $root['User']['password'] = $password;
+        $root = $this->User->hashPasswords($root);
+        $root['User']['email'] = $email;
+        $ret = $this->User->save($root);
     }
 }
