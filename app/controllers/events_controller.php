@@ -105,7 +105,13 @@ class EventsController extends AppController
     function setUpAjaxList($courseId = null)
     {
         // Grab the course list
-        $coursesList = User::getMyCourseList();
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $coursesList = User::getMyCourseList();
+        // admins & super admin
+        } else {
+            $coursesList = User::getMyDepartmentsCourseList('list');
+        }
         
         // Set up Columns
         $columns = array(
@@ -200,6 +206,30 @@ class EventsController extends AppController
             $this->Session->setFlash(__('You do not have permission to view events.', true));
             $this->redirect('/home');
         }
+        
+        // check for permission to course ($courseId) only when $courseId is provided
+        if (!is_null($courseId)) {
+            // Check whether the course exists
+            $course = $this->Course->find('first', array('conditions' => array('id' => $courseId), 'recursive' => 1));
+            if (empty($course)) {
+                $this->Session->setFlash(__('Error: That course does not exist.', true));
+                $this->redirect('/events');
+            }
+            
+            // check whether the user has access to the course
+            // instructors
+            if (!User::hasPermission('controllers/departments')) {
+                $courses = User::getMyCourseList();
+            // admins & super admins
+            } else {
+                $courses = User::getMyDepartmentsCourseList('list');
+            }
+    
+            if (!in_array($courseId, array_keys($courses))) {
+                $this->Session->setFlash(__('Error: You do not have permission to view events in this course', true));
+                $this->redirect('/events');
+            }
+        }
 
         $this->set('message', $message);
 
@@ -273,7 +303,7 @@ class EventsController extends AppController
      * @access public
      * @return void
      */
-    function view ($id)
+    function view ($id = null)
     {
         if (!User::hasPermission('controllers/events')) {
             $this->Session->setFlash('You do not have permission to view events.');
@@ -286,6 +316,22 @@ class EventsController extends AppController
         if ($event['Event']['event_template_type_id'] == '3') {
             $this->Session->setFlash(__('Invalid Id', true));
             $this->redirect('index');        
+        }
+        
+        $courseId = $this->Event->getCourseByEventId($id);
+        
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($courseId, array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to view this event', true));
+            $this->redirect('index');
         }
         
         $this->data = $event;
@@ -402,8 +448,24 @@ class EventsController extends AppController
             )
         ));
         
-        if ($course == null) {
-            $this->Session->setFlash(__('Invalid Id', true));
+         // Check whether the course exists
+        $course = $this->Course->find('first', array('conditions' => array('id' => $courseId), 'recursive' => 1));
+        if (empty($course)) {
+            $this->Session->setFlash(__('Error: That course does not exist.', true));
+            $this->redirect('index');
+        }
+        
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($courseId, array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to add users to this course', true));
             $this->redirect('index');
         }
         
@@ -416,21 +478,17 @@ class EventsController extends AppController
         );
         $this->set(
             'mixevals',
-            $this->Mixeval->find('list')
+            $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'))
         );
         $this->set(
             'simpleEvaluations',
-            $this->SimpleEvaluation->getBelongingOrPublic(
-                $this->Auth->user('id'))
+            $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'))
         );
         $this->set(
             'rubrics',
-            $this->Rubric->getSelectionList($this->Auth->user('id'))
+            $this->Rubric->getBelongingOrPublic($this->Auth->user('id'))
         );
-        $this->set(
-            'courses',
-            $this->Course->getListByInstructor($this->Auth->user('id'))
-        );
+        $this->set('courses', $courses);
         $this->set('course_id', $courseId);
 
         // Try to save the data
@@ -490,60 +548,12 @@ class EventsController extends AppController
      * @access public
      * @return void
      */
-    function edit($id)
+    function edit($id = null)
     {
         if (!User::hasPermission('controllers/events/edit')) {
             $this->Session->setFlash(__('You do not have permission to edit events.', true));
             $this->redirect('index');
         }
-
-        $data = $this->Event->find('first', array('conditions' => array('id' => $id),
-            'contain' => array('Group')));
-        $penaltyData = $this->Penalty->find('all', array('conditions' => array('event_id' => $id)));
-        $penalties = array();
-        foreach ($penaltyData as $tmp) {
-            $penalties[] = $tmp['Penalty'];
-        }
-
-        $courseId = $this->Event->getCourseByEventId($id);
-        //Clear $id to only the alphanumeric value
-        $id = $this->Sanitize->paranoid($id);
-
-        $this->set('event_id', $id);
-        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events > Edit', true));
-        $event = $this->Event->find('first', array('conditions' => array('Event.id' => $id),
-            'contain' => array('Group.Member')));
-
-
-        // Sets up the already assigned groups
-        $assignedGroupIds = $this->GroupEvent->getGroupListByEventId($id);
-        $assignedGroups=array();
-        foreach ($assignedGroupIds as $groups) {
-            $groupId = $groups['GroupEvent']['group_id'];
-            $groupName = $this->Group->getGroupByGroupId($groupId, array('group_name'));
-            $assignedGroups[$groupId] = $groupName[0]['Group']['group_name'];
-        }
-        
-        $this->set('groups', $this->Group->getGroupsByCourseId($courseId));
-        $this->set(
-            'mixevals',
-            $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'))
-        );
-        $this->set(
-            'simpleEvaluations',
-            $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'))
-        );
-        $this->set(
-            'rubrics',
-            $this->Rubric->getBelongingOrPublic($this->Auth->user('id'))
-        );
-
-        $this->set('data', $data);
-        $this->set('event', $event);
-        $this->set('course_id', $courseId);
-        $this->set('courses', $this->Course->getCourseList());
-        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events > Edit', true));
-        $this->set('eventTemplateTypes', $this->EventTemplateType->find('list', array('conditions' => array('NOT' => array('id' => 3)))));
 
         if (!empty($this->data)) {
             // need to set the template_id based on the event_template_type_id
@@ -566,10 +576,72 @@ class EventsController extends AppController
                 $this->Session->setFlash("Edit event failed.");
             }
             $this->redirect('index/'.$courseId);
-        }
-        if (!($this->data = $this->Event->getEventByid($id))) {
-            $this->Session->setFlash(__('Event does not exist.', true));
-            $this->redirect('index');
+        } else {
+            // Check whether the course exists
+            if (!($this->data = $this->Event->getEventByid($id))) {
+                $this->Session->setFlash(__('Error: That event does not exist', true));
+                $this->redirect('index');
+            // can't edit survey event from this view
+            } else if ($this->data['Event']['event_template_type_id'] == '3') {
+                $this->Session->setFlash(__('Error: Invalid Id', true));
+                $this->redirect('index');
+            }
+
+            $courseId = $this->Event->getCourseByEventId($id);
+
+            // check whether the user has access to the course
+            // instructors
+            if (!User::hasPermission('controllers/departments')) {
+                $courses = User::getMyCourseList();
+            // admins & super admins
+            } else {
+                $courses = User::getMyDepartmentsCourseList('list');
+            }
+    
+            if (!in_array($courseId, array_keys($courses))) {
+                $this->Session->setFlash(__('Error: You do not have permission to edit events in this course', true));
+                $this->redirect('index');
+            }
+            
+            $data = $this->Event->find('first', array('conditions' => array('id' => $id),
+                'contain' => array('Group')));
+            $penalty = $this->Penalty->find('all', array('conditions' => array('event_id' => $id)));
+    
+            $this->set('event_id', $id);
+            $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events > Edit', true));
+            $event = $this->Event->find('first', array('conditions' => array('Event.id' => $id),
+                'contain' => array('Group.Member')));
+    
+            // Sets up the already assigned groups
+            $assignedGroupIds = $this->GroupEvent->getGroupListByEventId($id);
+            $assignedGroups=array();
+            foreach ($assignedGroupIds as $groups) {
+                $groupId = $groups['GroupEvent']['group_id'];
+                $groupName = $this->Group->getGroupByGroupId($groupId, array('group_name'));
+                $assignedGroups[$groupId] = $groupName[0]['Group']['group_name'];
+            }
+            
+            $this->set('groups', $this->Group->getGroupsByCourseId($courseId));
+            $this->set(
+                'mixevals',
+                $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'))
+            );
+            $this->set(
+                'simpleEvaluations',
+                $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'))
+            );
+            $this->set(
+                'rubrics',
+                $this->Rubric->getBelongingOrPublic($this->Auth->user('id'))
+            );
+    
+            $this->set('data', $data);
+            $this->set('event', $event);
+            $this->set('course_id', $courseId);
+            $this->set('courses', $this->Course->getCourseList());
+            $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events', true));
+            $this->set('eventTemplateTypes', $this->EventTemplateType->find('list', array('conditions' => array('NOT' => array('id' => 3)))));
+            $this->set('course_id', $courseId);
         }
     }
 
@@ -584,30 +656,29 @@ class EventsController extends AppController
     function delete ($id=null)
     {
         if (!User::hasPermission('controllers/events/add')) {
-            $this->Session->setFlash(__('You do not have permission to delete events.', true));
+            $this->Session->setFlash(__('Error: You do not have permission to delete events.', true));
             $this->redirect('index');
         }
         
-        $event = $this->Event->find('first', array(
-            'conditions' => array(
-                'Event.id' => $id
-            )
-        ));
-        
-        if (null == $event) {
-            $this->Session->setFlash(__('Invalid Id', true));
+        // Check whether the event exists
+        if (!($event = $this->Event->getEventByid($id))) {
+            $this->Session->setFlash(__('Error: That event does not exist.', true));
             $this->redirect('index');
         }
-        
-        $course = $this->Course->find('first', array(
-            'conditions' => array(
-                'Course.id' => $this->Event->getCourseByEventId($id),
-                'Instructor.id' => $this->Auth->user('id')
-            )
-        ));
-        
-        if (null == $course) {
-            $this->Session->setFlash(__('Invalid Id', true));
+
+        $courseId = $this->Event->getCourseByEventId($id);
+
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($courseId, array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to delete this event', true));
             $this->redirect('index');
         }
         

@@ -85,9 +85,19 @@ class FacultiesController extends AppController {
      * */
     function add() {
         $this->set('title_for_layout', 'Add Faculty');
+        $this->RolesUser = Classregistry::init('RolesUser');
+        
+        $superadmins = $this->RolesUser->find('all', array('conditions' => array('role_id' => 1)));
+        $userfac = array();
+        
         if (!empty($this->data)) {
             $this->Faculty->create();
             if ($this->Faculty->save($this->data)) {
+                $facultyId = $this->Faculty->getLastInsertID();
+                foreach ($superadmins as $sa) {
+                    $userfac = array_merge($userfac, array('user_id' => $sa['RolesUser']['user_id'], 'faculty_id' => $facultyId));
+                }
+                $this->UserFaculty->saveAll($userfac);
                 $this->Session->setFlash(
                     __('Faculty added!', true), 'good');
                 $this->redirect(array('action' => 'index'));

@@ -210,7 +210,7 @@ class EvaluationsController extends AppController
     
         // event does not exist or is a survey
         if (null == $data) {
-            $this->Session->setFlash(__('Invalid Id', true));
+            $this->Session->setFlash(__('Error: Invalid Id', true));
             $this->redirect('index');
         }
         
@@ -218,16 +218,17 @@ class EvaluationsController extends AppController
         
         $courseId = $this->Event->getCourseByEventId($eventId);
         
-        $course = $this->Course->find('first', array(
-            'conditions' => array(
-                'Course.id' => $courseId,
-                'Instructor.id' => $this->Auth->user('id')
-            )
-        ));
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
 
-        // the user is not an instructor in the course the event is in
-        if (null == $course) {
-            $this->Session->setFlash(__('You do not have permission to view this event', true));
+        if (!in_array($courseId, array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to view this evaluation', true));
             $this->redirect('index');
         }
 
@@ -300,16 +301,16 @@ class EvaluationsController extends AppController
     {
         // Make sure the present user has Permission
         if (!User::hasPermission('functions/evaluation/export')) {
-            $this->Session->setFlash(__('You do not have permission to export evaluation results', true));
+            $this->Session->setFlash(__('Error: You do not have permission to export evaluation results', true));
             $this->redirect('/home');
         }
 
         // $type must be course or event
         if ('course' != $type && 'event' != $type) {
-            $this->Session->setFlash('Invalid export type', true);
+            $this->Session->setFlash('Error: Invalid export type', true);
             $this->redirect('/courses');
         } else if (!is_numeric($id)) {
-            $this->Session->setFlash(__('Invalid id', true));
+            $this->Session->setFlash(__('Error: Invalid id', true));
             $this->redirect('/courses');
         }
         
@@ -317,18 +318,18 @@ class EvaluationsController extends AppController
         
         if ('course' == $type) {
             $courseId = $id;
-            $course = $this->Course->find(
-                'first',
-                array(
-                    'conditions' => array(
-                        'Course.id' => $id,
-                        'Instructor.id' => $this->Auth->user('id')
-                    )
-                )
-            );
             
-            if (null == $course) {
-                $this->Session->setFlash('You do not have permission to export evaluation results from this course.', true);
+            // check whether the user has access to the course
+            // instructors
+            if (!User::hasPermission('controllers/departments')) {
+                $courses = User::getMyCourseList();
+            // admins & super admins
+            } else {
+                $courses = User::getMyDepartmentsCourseList('list');
+            }
+    
+            if (!in_array($courseId, array_keys($courses))) {
+                $this->Session->setFlash(__('Error: You do not have permission to export evaluation results from this course', true));
                 $this->redirect('/courses');
             }
             
@@ -339,35 +340,27 @@ class EvaluationsController extends AppController
         
         } else if ('event' == $type) {
             $courseId = $this->Event->getCourseByEventId($id);
-            $course = $this->Course->find(
-                'first',
-                array(
-                    'conditions' => array(
-                        'Course.id' => $courseId,
-                        'Instructor.id' => $this->Auth->user('id')
-                    )
-                )
-            );
-            
-            $event = $this->Event->find(
-                'first',
-                array(
-                    'conditions' => array(
-                        'Event.id' => $id,
-                        'event_template_type_id !=' => '3'
-                    )
-                )
-            );
-            
-            if (null == $course) {
-                $this->Session->setFlash('You do have permission to export evaluation results for this event.', true);
-                $this->redirect('/courses');
-            } else if (null == $event) {
-                $this->Session->setFlash('Invalid Id', true);
+
+            // check whether the user has access to the course
+            // instructors
+            if (!User::hasPermission('controllers/departments')) {
+                $courses = User::getMyCourseList();
+            // admins & super admins
+            } else {
+                $courses = User::getMyDepartmentsCourseList('list');
+            }
+    
+            if (!in_array($courseId, array_keys($courses))) {
+                $this->Session->setFlash(__('Error: You do not have permission to export evaluation results from this course', true));
                 $this->redirect('/courses');
             }
             
             $selectedEvent = $this->Event->getEventById($id);
+            
+            if ($selectedEvent['Event']['event_template_type_id'] == '3') {
+                $this->Session->setFlash(__('Error: Invalid Id', true));
+                $this->redirect('/courses');
+            }
             
             $this->set('selectedEvent', $selectedEvent);
             $this->set('fromEvent', true);
@@ -544,7 +537,7 @@ class EvaluationsController extends AppController
         
             // invalid event ids
             if (!is_numeric($eventId) || null == $this->Event->getEventById($eventId)) {
-                $this->Session->setFlash(__('Invalid Id', true));
+                $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/home/index');
             }
             
@@ -561,7 +554,7 @@ class EvaluationsController extends AppController
             
             // user is not an instructor of course or event is not a survey
             if (null == $course || '3' != $templateId) {
-                $this->Session->setFlash(__('Invalid Id', true));
+                $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/home/index');
             }
             
@@ -654,7 +647,7 @@ class EvaluationsController extends AppController
             // invalid group id or event id
             if (!is_numeric($eventId) || !is_numeric($groupId) || 
                 null == $this->Event->getEventById($eventId)) {
-                $this->Session->setFlash(__('Invalid Id', true));
+                $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/home/index');
             }
 
@@ -675,7 +668,7 @@ class EvaluationsController extends AppController
             // if group id provided does not match the group id the user belongs to or
             // template type is not rubric - they are redirected
             if ($group != $groupId || '2' != $event['Event']['event_template_type_id']) {
-                $this->Session->setFlash(__('Invalid Id', true));
+                $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/home/index');
             }
 
@@ -835,7 +828,7 @@ class EvaluationsController extends AppController
             // invalid event id or group id
             if (!is_numeric($eventId) || !is_numeric($groupId) ||
                 null == $this->Event->getEventById($eventId)) {
-                $this->Session->setFlash(__('Invalid Id', true));
+                $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/home/index');
             }
 
@@ -854,7 +847,7 @@ class EvaluationsController extends AppController
             // if group id provided does not match the group id the user belongs to or
             // template type is not mixeval - they are redirected
             if ($group != $groupId || '4' != $templateId) {
-                $this->Session->setFlash(__('Invalid Id', true));
+                $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/home/index');
             }
 
@@ -992,7 +985,7 @@ class EvaluationsController extends AppController
     {
         // Make sure the present user has permission
         if (!User::hasPermission('controllers/evaluations/viewevaluationresults')) {
-            $this->Session->setFlash('You do not have permission to view evaluation results', true);
+            $this->Session->setFlash('Error: You do not have permission to view evaluation results', true);
             $this->redirect('/home');
         }
 
@@ -1003,19 +996,17 @@ class EvaluationsController extends AppController
         
         $courseId = $this->Event->getCourseByEventId($eventId);
         
-        $course = $this->Course->find(
-            'first',
-            array(
-                'conditions' => array(
-                    'Course.id' => $courseId,
-                    'Instructor.id' => $this->Auth->user('id')
-                )
-            )
-        );
-        
-        // the user is not an instructor or admin of the course
-        if (null == $course) {
-            $this->Session->setFlash('You do not have permission to view evaluation results from this event', true);
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($courseId, array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to view evaluation results from this event', true));
             $this->redirect('index');
         }
 
@@ -1158,7 +1149,7 @@ class EvaluationsController extends AppController
         
         // check to see if the ids are numeric
         if (!is_numeric($surveyId) || !is_numeric($surveyGroupId)) {
-            $this->Session->setFlash(__('Invalid Id', true));
+            $this->Session->setFlash(__('Error: Invalid Id', true));
             // may want to redirect to somewhere else
             $this->redirect('/home/index');
         }
@@ -1169,17 +1160,20 @@ class EvaluationsController extends AppController
             )
         ));
         
-        $course = $this->Course->find('first', array(
-            'conditions' => array(
-                'Course.id' => $survey['Survey']['course_id'],
-                'Instructor.id' => $this->Auth->user('id')
-            )
-        ));
+        $courseId = $survey['Survey']['course_id'];
         
-        // check to see whether the user is an instructor of the course
-        if (null == $course) {
-            $this->Session->setFlash(__('You do not have permission to view these results', true));
-            $this->redirect('/home/index');
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($courseId, array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to view these results', true));
+            $this->redirect('index');
         }
 
         $formattedResult = $this->Evaluation->formatSurveyGroupEvaluationResult($surveyId, $surveyGroupId);
@@ -1206,7 +1200,7 @@ class EvaluationsController extends AppController
         
         // check to see if the ids are numeric
         if (!is_numeric($eventId) || !is_numeric($groupId)) {
-            $this->Session->setFlash(__('Invalid Id', true));
+            $this->Session->setFlash(__('Error: Invalid Id', true));
             // may want to redirect to somewhere else
             $this->redirect('/home/index');
         }
@@ -1227,12 +1221,12 @@ class EvaluationsController extends AppController
         if ('3' != $event['Event']['event_template_type_id']) {
             // check to see if user is part of the group and whether the event id is valid
             if (null == $groupMember || null == $event) {
-                $this->Session->setFlash(__('Invalid Id', true));
+                $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/home/index');
             // check to see whether NOW is between the start and end of result release dates
             } else if (strtotime('NOW') < strtotime($event['Event']['result_release_date_begin']) ||
                 strtotime('NOW') >= strtotime($event['Event']['result_release_date_end'])) {
-                $this->Session->setFlash(__('The results are not released.', true));
+                $this->Session->setFlash(__('Error: The results are not released.', true));
                 $this->redirect('/home/index');
             }
             //Get the target event
@@ -1342,7 +1336,7 @@ class EvaluationsController extends AppController
             }
         } else {
             //If current date is not in result release date range
-            $this->Session->setFlash(__('The result is not released', true));
+            $this->Session->setFlash(__('Error: The result is not released', true));
             $this->redirect('/home/index/');
         }
     }
@@ -1359,7 +1353,7 @@ class EvaluationsController extends AppController
     {
         // Make sure the present user has permission
         if (!User::hasPermission('functions/evaluation')) {
-            $this->Session->setFlash('You do not have permission to mark events reviewed', true);
+            $this->Session->setFlash('Error: You do not have permission to mark events reviewed', true);
             $this->redirect('/home');
         }
 
@@ -1418,7 +1412,7 @@ class EvaluationsController extends AppController
     {
         // Make sure the present user has permission
         if (!User::hasPermission('functions/evaluation')) {
-            $this->Session->setFlash('You do not have permission to release grades', true);
+            $this->Session->setFlash('Error: You do not have permission to release grades', true);
             $this->redirect('/home');
         }
 
@@ -1468,31 +1462,29 @@ class EvaluationsController extends AppController
     {
         // Make sure the present user has permission
         if (!User::hasPermission('functions/evaluation')) {
-            $this->Session->setFlash('You do not have permission to release comments', true);
+            $this->Session->setFlash('Error: You do not have permission to release comments', true);
             $this->redirect('/home');
         }
         
         // check whether both ids are numeric
         if (!is_numeric($eventId) || !is_numeric($groupId)) {
-            $this->Session->setFlash('Invalid Id', true);
+            $this->Session->setFlash('Error: Invalid Id', true);
             $this->redirect('index');
         }
         
         $courseId = $this->Event->getCourseByEventId($eventId);
         
-        $course = $this->Course->find(
-            'first',
-            array(
-                'conditions' => array(
-                    'Course.id' => $courseId,
-                    'Instructor.id' => $this->Auth->user('id')
-                )
-            )
-        );
-        
-        // the user is not an instructor or admin of the course
-        if (null == $course) {
-            $this->Session->setFlash('You do not have permission to view evaluation results from this event', true);
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($courseId, array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to view evaluation results from this event', true));
             $this->redirect('index');
         }
 
@@ -1558,7 +1550,7 @@ class EvaluationsController extends AppController
     {
         // Make sure the present user has permission
         if (!User::hasPermission('functions/evaluation')) {
-            $this->Session->setFlash('You do not have permission to change comment release statuses', true);
+            $this->Session->setFlash('Error: You do not have permission to change comment release statuses', true);
             $this->redirect('/home');
         }
 
@@ -1624,7 +1616,7 @@ class EvaluationsController extends AppController
     {
         // Make sure the present user has permission
         if (!User::hasPermission('functions/evaluation')) {
-            $this->Session->setFlash('You do not have permission to change grade release statuses', true);
+            $this->Session->setFlash('Error: You do not have permission to change grade release statuses', true);
             $this->redirect('/home');
         }
 
@@ -1687,35 +1679,33 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    function viewGroupSubmissionDetails ($eventId, $groupId)
+    function viewGroupSubmissionDetails ($eventId = null, $groupId = null)
     {
         // Make sure the present user has permission
         if (!User::hasPermission('controllers/evaluations/viewevaluationresults')) {
-            $this->Session->setFlash('You do not have permission to view submission details', true);
+            $this->Session->setFlash('Error: You do not have permission to view submission details', true);
             $this->redirect('/home');
         }
 
         // check whether $eventId and $groupId are numeric
-        if (!is_numeric($eventId) || !is_numeric($groupId)) {
-            $this->Session->setFlash('Invalid Id', true);
+        if (!is_numeric($eventId) || !is_numeric($groupId) || !($event = $this->Event->getEventById($eventId))) {
+            $this->Session->setFlash('Error: Invalid Id', true);
             $this->redirect('index');
         }
         
         $courseId = $this->Event->getCourseByEventId($eventId);
         
-        $course = $this->Course->find(
-            'first',
-            array(
-                'conditions' => array(
-                    'Course.id' => $courseId,
-                    'Instructor.id' => $this->Auth->user('id')
-                )
-            )
-        );
-        
-        // the user is not an instructor or admin of the course
-        if (null == $course) {
-            $this->Session->setFlash('You do not have permission to view evaluation results from this event', true);
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($courseId, array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to view evaluation results from this event', true));
             $this->redirect('index');
         }
 
@@ -1770,7 +1760,7 @@ class EvaluationsController extends AppController
     {
         // Make sure the present user has permission
         if (!User::hasPermission('controllers/evaluations/viewevaluationresults')) {
-            $this->Session->setFlash('You do not have permission to re-release evaluations', true);
+            $this->Session->setFlash('Error: You do not have permission to re-release evaluations', true);
             $this->redirect('/home');
         }
 
@@ -1811,23 +1801,24 @@ class EvaluationsController extends AppController
                 'Survey.id' => $surveyId
             )
         ));
-        
+
         // check that $surveyId is valid
         if (null == $survey) {
-            $this->Session->setFlash(__('Invalid Id', true));
+            $this->Session->setFlash(__('Error: Invalid Id', true));
             $this->redirect('index');
         }
 
-        $course = $this->Course->find('first', array(
-            'conditions' => array(
-                'Course.id' => $survey['Survey']['course_id'],
-                'Instructor.id' => $this->Auth->user('id')
-            )
-        ));
-        
-        // check that the user is an instructor of the course
-        if (null == $course) {
-            $this->Session->setFlash(__('You have no permission to view the summary', true));
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($survey['Survey']['course_id'], array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to view the summary', true));
             $this->redirect('index');
         }
 

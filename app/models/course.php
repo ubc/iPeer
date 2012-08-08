@@ -314,6 +314,31 @@ class Course extends AppModel
 
         return $this->habtmAdd('Enrol', $courseId, $ids);
     }
+    
+    /**
+     * Get course data by departments
+     *
+     * @param unknown_type $departments $departments
+     *
+     * @return course data
+     */
+    function getByDepartments($departments, $findType)
+    {
+    	$this->CourseDepartment = Classregistry::init('CourseDepartment');
+
+		$courses = array();
+
+        foreach ($departments as $department) {
+        	$dp_id = $department['Department']['id'];
+        	$cd = $this->CourseDepartment->find('all', array('conditions' => array('department_id' => $dp_id)));
+        	foreach ($cd as $course) {
+        		array_push($courses, $course['CourseDepartment']['course_id']);
+        	}
+        }
+        $ret = $this->find($findType, array('conditions' => array('Course.id' => $courses)));
+        
+        return $ret;
+    }
 
     /************** HELPER FUNCTION USED FOR UNIT TESTING PURPOSES   *****************/
 

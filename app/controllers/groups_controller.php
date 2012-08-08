@@ -81,14 +81,6 @@ class GroupsController extends AppController
     {
         // Set up the ajax list component
 
-        // Get the course data
-        $userCourseList = User::getMyCourseList();
-        $coursesList = array();
-
-        foreach ($userCourseList as $id => $course) {
-            $coursesList{$id} = $course;
-        }
-
         // The columns to show
         $columns = array(
             array("Group.id",        "",         "",     "hidden"),
@@ -121,15 +113,7 @@ class GroupsController extends AppController
                 "localKey" => "creator_id")
             );*/
 
-            // For instructors: only list their own course events
             $extraFilters = "";
-        if (!User::hasRole('superadmin') && !User::hasRole('admin')) {
-            $extraFilters = " ( ";
-            foreach ($coursesList as $id => $course) {
-                $extraFilters .= "course_id=$id or ";
-            }
-            $extraFilters .= "1=0 ) "; // just terminates the or condition chain with "false"
-        }
 
         // Define Actions
         $deleteUserWarning = __("Delete this group?\n", true).
@@ -160,14 +144,35 @@ class GroupsController extends AppController
      * @access public
      * @return void
      */
-    function index()
+    function index($courseId = null)
     {
-        $courseId = $this->Session->read('ipeerSession.courseId');
+        $this->Session->write('ipeerSession.courseId', $courseId);
         $courseName = $this->Course->field('course', array('id' => $courseId));
         $this->set('title_for_layout', $courseName . " > Groups");
         if (!User::hasPermission('controllers/groups')) {
-            $this->Session->setFlash('You do not have permission to view groups.');
+            $this->Session->setFlash('Error: You do not have permission to view groups.');
             $this->redirect('/home');
+        }
+        
+        // Check whether the course exists
+        $course = $this->Course->find('first', array('conditions' => array('id' => $courseId), 'recursive' => 1));
+        if (empty($course)) {
+            $this->Session->setFlash(__('Error: That course does not exist.', true));
+            $this->redirect('/courses');
+        }
+        
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($courseId, array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to view groups from this course', true));
+            $this->redirect('/courses');
         }
         
         $this->set('course_id', $courseId);
@@ -231,15 +236,32 @@ class GroupsController extends AppController
      * @access public
      * @return void
      */
-    function view($id)
+    function view($id = null)
     {
         if (!User::hasPermission('controllers/groups')) {
-            $this->Session->setFlash('You do not have permission to view groups.');
+            $this->Session->setFlash('Error: You do not have permission to view groups.');
             $this->redirect('/home');
         }
-        if (!is_numeric($id) || !($this->data = $this->Group->findGroupByid($id))) {
-            $this->Session->setFlash(__('Group does not exist.', true));
-            $this->redirect('index');
+        
+        // Check whether the group exists
+        $group = $this->Group->find('first', array('conditions' => array('Group.id' => $id), 'recursive' => 1));
+        if (empty($group)) {
+            $this->Session->setFlash(__('Error: That group does not exist.', true));
+            $this->redirect('/courses');
+        }
+        
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($group['Group']['course_id'], array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to view this group', true));
+            $this->redirect('/courses');
         }
         
         $this->data = $this->Group->read(null, $id);
@@ -264,11 +286,11 @@ class GroupsController extends AppController
      * @access public
      * @return void
      */
-    function add ($course_id)
+    function add ($course_id = null)
     {
         if (!User::hasPermission('controllers/groups/add')) {
-            $this->Session->setFlash('You do not have permission to add groups');
-            $this->redirect('index');
+            $this->Session->setFlash('Error: You do not have permission to add groups');
+            $this->redirect('/home');
         }
         
         if (!empty($this->data)) {
@@ -280,6 +302,28 @@ class GroupsController extends AppController
                 $this->redirect('index/'.$course_id);
             }
         }
+        
+        // Check whether the course exists
+        $course = $this->Course->find('first', array('conditions' => array('id' => $course_id), 'recursive' => 1));
+        if (empty($course)) {
+            $this->Session->setFlash(__('Error: That course does not exist.', true));
+            $this->redirect('/courses');
+        }
+        
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($course_id, array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to add groups to this course', true));
+            $this->redirect('/courses');
+        }
+        
         $user_data1 = $this->User->getEnrolledStudentsForList($course_id);
         $user_data2 = $this->User->getCourseTutorsForList($course_id);
         $user_data = Set::pushDiff($user_data1, $user_data2);
@@ -310,11 +354,11 @@ class GroupsController extends AppController
      * @access public
      * @return void
      */
-    function edit ($group_id)
+    function edit ($group_id = null)
     {
         if (!User::hasPermission('controllers/groups/edit')) {
-            $this->Session->setFlash('You do not have permission to edit groups.');
-            $this->redirect('index');
+            $this->Session->setFlash('Error: You do not have permission to edit groups.');
+            $this->redirect('/home');
         }
         
         if (!empty($this->data)) {
@@ -329,9 +373,25 @@ class GroupsController extends AppController
             $this->redirect('index/'.$this->data['Group']['course_id']);
         }
         
-        if (!($this->data = $this->Group->findGroupByid($group_id))) {
-            $this->Session->setFlash(__('Group does not exist.', true));
-            $this->redirect('index'.$this->Session->read('ipeerSession.courseId'));
+        // Check whether the course exists
+        $this->data = $this->Group->find('first', array('conditions' => array('Group.id' => $group_id), 'recursive' => 1));
+        if (empty($this->data)) {
+            $this->Session->setFlash(__('Error: That group does not exist.', true));
+            $this->redirect('/courses');
+        }
+        
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($this->data['Group']['course_id'], array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to edit this group', true));
+            $this->redirect('/courses');
         }
 
         $this->set('title_for_layout', $this->sysContainer->getCourseName($this->data['Group']['course_id']).__(' > Groups > Edit', true));
@@ -353,14 +413,31 @@ class GroupsController extends AppController
      * @access public
      * @return void
      */
-    function delete ($id)
+    function delete ($id = null)
     {
         if (!User::hasPermission('controllers/groups/add')) {
-            $this->Session->setFlash('You do not have permission to delete groups');
-            $this->redirect('index');
+            $this->Session->setFlash('Error: You do not have permission to delete groups');
+            $this->redirect('/home');
         }
-        if (!is_numeric($id) || !($this->data = $this->Group->findGroupByid($id))) {
-            $this->Session->setFlash(__('Group does not exist.', true));
+        
+        // Check whether the course exists
+        $group = $this->Group->find('first', array('conditions' => array('Group.id' => $id), 'recursive' => 1));
+        if (empty($group)) {
+            $this->Session->setFlash(__('Error: That group does not exist.', true));
+            $this->redirect('/courses');
+        }
+        
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($group['Group']['course_id'], array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to delete groups in this course', true));
             $this->redirect('index');
         }
         
@@ -420,8 +497,8 @@ class GroupsController extends AppController
     function import()
     {
         if (!User::hasPermission('controllers/groups/add')) {
-            $this->Session->setFlash('You do not have permission to add groups');
-            $this->redirect('index');
+            $this->Session->setFlash('Error: You do not have permission to add groups');
+            $this->redirect('/home');
         }
         $this->set('title_for_layout', __('Import Groups From Text (.txt) or CSV File (.csv)', true));
         
@@ -456,10 +533,21 @@ class GroupsController extends AppController
                 $this->set('errmsg', $validUploads);
             }
         }
-        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
-        foreach ($user['Course'] as $course) {
-            $coursesList[$course['id']] = $course['course'];
+        
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
+            foreach ($user['Course'] as $course) {
+                $coursesList[$course['id']] = $course['course'];
+            }
+        // admins & super admin
+        } else {
+            $courses = User::getMyDepartmentsCourseList('all');
+            foreach ($courses as $course) {
+                $coursesList[$course['Course']['id']] = $course['Course']['course']; 
+            }
         }
+        
         $this->set("coursesList", $coursesList);
         $courseId = $this->Session->read('ipeerSession.courseId');
         $this->set("courseId", $courseId);
@@ -753,11 +841,32 @@ class GroupsController extends AppController
      * @access public
      * @return void
      */
-    function export($courseId)
+    function export($courseId = null)
     {
         if (!User::hasPermission('controllers/groups')) {
-            $this->Session->setFlash('You do not have permission to export groups.');
-            $this->redirect('index');
+            $this->Session->setFlash('Error: You do not have permission to export groups.');
+            $this->redirect('/home');
+        }
+        
+        // Check whether the course exists
+        $course = $this->Course->find('first', array('conditions' => array('id' => $courseId), 'recursive' => 1));
+        if (empty($course)) {
+            $this->Session->setFlash(__('Error: That course does not exist.', true));
+            $this->redirect('/courses');
+        }
+        
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($courseId, array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to export groups from this course', true));
+            $this->redirect('/courses');
         }
         
         $this->set('courseId', $courseId);

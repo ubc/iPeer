@@ -31,6 +31,12 @@ class DepartmentsController extends AppController {
             $uf = $this->UserFaculty->findAllByUserId($this->Auth->user('id'));
             $ret = $this->Department->getByUserFaculties($uf);
         }
+        
+        if (empty($ret)) {
+            $this->Session->setFlash(__('You do not have access to any faculties', true));
+            $this->redirect('/pages/admin');
+        }
+        
         $departments = array();
         foreach ($ret as $department) {
             $tmp = array(); 
@@ -145,12 +151,20 @@ class DepartmentsController extends AppController {
      * form elements.
      * */
     private function _initFormEnv() {
-        // prepare the faculty drop down options 
-        $ret = $this->Faculty->find('all');
+        $ret = array();
         $faculties = array();
+        // prepare the faculty drop down options
+        if (User::hasPermission('controllers/faculties')) {
+            $ret = $this->Faculty->find('all');
+        } else {
+            $uf = $this->UserFaculty->findAllByUserId($this->Auth->user('id'));
+            $ret = $this->Department->getByUserFaculties($uf);
+        }
+        
         foreach ($ret as $faculty) {
             $faculties[$faculty['Faculty']['id']] = $faculty['Faculty']['name'];
         }
+
         $this->set('faculties', $faculties);
     }
 }

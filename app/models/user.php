@@ -735,6 +735,25 @@ class User extends AppModel
 
         return $model->getListByInstructor(self::get('id'));
     }
+    
+    /**
+     * getMyDepartmentsCourseList get the list of courses
+     *
+     * @access public
+     * @return array list of courses
+     * */
+    function getMyDepartmentsCourseList($findType = 'list')
+    {
+        $this->UserFaculty = Classregistry::init('UserFaculty');
+        $this->Department = Classregistry::init('Department');
+        $this->Course = Classregistry::init('Course');
+
+        $uf = $this->UserFaculty->findAllByUserId($this->Auth->user('id'));
+        $d = $this->Department->getByUserFaculties($uf);
+        $ret = $this->Course->getByDepartments($d, $findType);
+
+        return $ret;
+    }
 
     /**
      * hasRole test if the user has a specific role

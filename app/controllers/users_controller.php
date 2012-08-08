@@ -181,11 +181,6 @@ class UsersController extends AppController
      */
     function ajaxList()
     {
-        // Make sure the present user has permission
-        if (!User::hasPermission('controllers/users')) {
-            $this->Session->setFlash('You do not have permission to view users', true);
-            $this->redirect('/home');
-        }
         // Set up the list
         $this->_setUpAjaxList();
         // Process the request for data
@@ -245,12 +240,33 @@ class UsersController extends AppController
      * @access public
      * @return void
      */
-    function goToClassList($course) {
+    function goToClassList($course = null) {
 
         if (!User::hasPermission('functions/user')) {
             $this->Session->setFlash(
-                'You do not have permission to view users.', true);
+                'Error: You do not have permission to view users.', true);
             $this->redirect('/home');
+        }
+        
+        // check whether the course exists
+        $class = $this->Course->find('first', array('conditions' => array('Course.id' => $course)));
+        if (empty($course)) {
+            $this->Session->setFlash(__('Error: That course does not exist', true));
+            $this->redirect('index');
+        }
+        
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($course, array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to view this class list', true));
+            $this->redirect('index');
         }
 
         $classStudents = array(); // holds all the students enrolled in this course
@@ -421,18 +437,18 @@ class UsersController extends AppController
     function view($id)
     {
         if (!User::hasPermission('functions/user')) {
-            $this->Session->setFlash(__('You do not have permission to view users.', true));
+            $this->Session->setFlash(__('Error: You do not have permission to view users', true));
             $this->redirect('/home');
         }
 
         if (!($this->data = $this->User->findById($id))) {
-            $this->Session->setFlash(__('This user does not exist.', true));
+            $this->Session->setFlash(__('Error: This user does not exist', true));
             $this->redirect('index');
         }
         
         $role = $this->User->getRoleName($id);
         if (!User::hasPermission('functions/user/'.$role)) {
-            $this->Session->setFlash(__('You do not have permission to view this user.', true));
+            $this->Session->setFlash(__('Error: You do not have permission to view this user', true));
             $this->redirect('index');
         }
 
@@ -587,7 +603,7 @@ class UsersController extends AppController
         $this->set('title_for_layout', 'Add User');
 
         if (!User::hasPermission('functions/user')) {
-            $this->Session->setFlash('You do not have permission to add users', true);
+            $this->Session->setFlash('Error: You do not have permission to add users', true);
             $this->redirect('/home');
         }
 
@@ -624,7 +640,29 @@ class UsersController extends AppController
                 $this->redirect('index');
             } else {
                 // Failed
-                $this->Session->setFlash("Unable to create user.");
+                $this->Session->setFlash("Error: Unable to create user.");
+            }
+        // Permission checking
+        } else {
+            // Check whether the course exists
+            $course = $this->Course->find('first', array('conditions' => array('id' => $courseId), 'recursive' => 1));
+            if (empty($course)) {
+                $this->Session->setFlash(__('Error: That course does not exist.', true));
+                $this->redirect('index');
+            }
+            
+            // check whether the user has access to the course
+            // instructors
+            if (!User::hasPermission('controllers/departments')) {
+                $courses = User::getMyCourseList();
+            // admins & super admins
+            } else {
+                $courses = User::getMyDepartmentsCourseList('list');
+            }
+    
+            if (!in_array($courseId, array_keys($courses))) {
+                $this->Session->setFlash(__('Error: You do not have permission to add users to this course', true));
+                $this->redirect('index');
             }
         }
     }
@@ -644,10 +682,10 @@ class UsersController extends AppController
         $role = $this->User->getRoleName($userId);
 
         if (!User::hasPermission('functions/user')) {
-            $this->Session->setFlash(__('You do not have permission to edit users.', true));
+            $this->Session->setFlash(__('Error: You do not have permission to edit users.', true));
             $this->redirect('/home');
         }
-        
+
         // save the data which involves:
         if ($this->data) {
             // create the enrolment entry depending on if instructor or student
@@ -665,7 +703,7 @@ class UsersController extends AppController
                 $this->redirect('index');
             } else {
                 // Failed
-                $this->Session->setFlash(__('Unable to update user.', true));
+                $this->Session->setFlash(__('Error: Unable to update user.', true));
             }
             // set up the course and role variables to fill the form elements
             // only load this after save, or we won't get the correct values
@@ -674,12 +712,12 @@ class UsersController extends AppController
         }
 
         if (!($this->data = $this->User->findById($userId))) {
-            $this->Session->setFlash(__('This user does not exist.', true));
+            $this->Session->setFlash(__('Error: This user does not exist.', true));
             $this->redirect($this->referer());
         }
 
         if (!User::hasPermission('functions/user/'.$role, 'update')) {
-            $this->Session->setFlash(__('You do not have permission to edit this user.', true));
+            $this->Session->setFlash(__('Error: You do not have permission to edit this user.', true));
             $this->redirect('index');
         }
 
@@ -753,14 +791,14 @@ class UsersController extends AppController
         $role = $this->User->getRoleName($id);
 
         if (!User::hasPermission('functions/user')) {
-            $this->Session->setFlash('You do not have permission to delete users');
+            $this->Session->setFlash('Error: You do not have permission to delete users');
             $this->redirect('/home');
         }
 
         // check if current user has permission to delete this user
         // in case of the being deleted user has higher level role
         if (!User::hasPermission('functions/user/'.$role, 'delete')) {
-            $this->Session->setFlash('You do not have permission to delete this user');
+            $this->Session->setFlash('Error: You do not have permission to delete this user');
             $this->redirect('index');
         }
 
@@ -772,7 +810,7 @@ class UsersController extends AppController
         if ($this->User->delete($id)) {
             $this->Session->setFlash(__('Record is successfully deleted!', true), 'good');
         } else {
-            $this->Session->setFlash(__('Delete failed!', true));
+            $this->Session->setFlash(__('Error: Delete failed!', true));
         }
 
         $this->redirect($this->referer());
@@ -811,12 +849,12 @@ class UsersController extends AppController
         $role = $this->User->getRoleName($user_id);
 
         if (!User::hasPermission('functions/user')) {
-            $this->Session->setFlash('You do not have permission to reset passwords', true);
+            $this->Session->setFlash('Error: You do not have permission to reset passwords', true);
             $this->redirect('/home');
         }
 
         if (!User::hasPermission('functions/user/'.$role)) {
-            $this->Session->setFlash('You do not have permission to reset the password for this user.', true);
+            $this->Session->setFlash('Error: You do not have permission to reset the password for this user.', true);
             $this->redirect('index');
         }
 
@@ -870,8 +908,15 @@ class UsersController extends AppController
         if (isset($this->params['form']['course_id'])) {
             $this->Session->write('ipeerSession.courseId', $this->params['form']['course_id']);
         }
-
-        $courseList = User::getMyCourseList();
+        
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courseList = User::getMyCourseList();
+        // admins/super admin
+        } else {
+            $courseList = User::getMyDepartmentsCourseList('list');
+        }
+        
         $this->set('courseList', $courseList);
         $this->set('courseParams', array('courseList' => $courseList, 'id_prefix' => 'import'));
         $this->set('user_type', 'S');
