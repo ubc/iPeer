@@ -113,9 +113,7 @@ class EvaluationBase extends AppModel
         }
 
         $conditions = array('creator_id' => $user_id);
-        if ($this->name != 'SimpleEvaluation') {
-            $conditions = array('OR' => array_merge(array('availability' => 'public'), $conditions));
-        }
+        $conditions = array('OR' => array_merge(array('availability' => 'public'), $conditions));
         return $this->find('list', array('conditions' => $conditions, 'fields' => array('name')));
     }
 
