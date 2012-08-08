@@ -2085,7 +2085,9 @@ CREATE TABLE `user_faculties` (
 --
 
 INSERT INTO `user_faculties` (`id`, `user_id`, `faculty_id`) VALUES
-(1, 34, 1);
+(1, 34, 1),
+(2, 1, 1),
+(3, 1, 2);
 
 -- --------------------------------------------------------
 
@@ -2115,3 +2117,4 @@ INSERT INTO user_tutors (id, user_id, course_id, creator_id, created, updater_id
 (1, 35, 1, 0, '0000-00-00 00:00:00', NULL, '2012-07-13 09:45:57'),
 (2, 36, 1, 0, '0000-00-00 00:00:00', NULL, '2012-07-13 09:48:16'),
 (3, 37, 2, 0, '0000-00-00 00:00:00', NULL, '2012-07-13 09:48:24');
+
