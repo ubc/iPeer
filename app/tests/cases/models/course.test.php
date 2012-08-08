@@ -43,20 +43,13 @@ class CourseTestCase extends CakeTestCase {
         $empty = null;
 
         // test courses taught by instructor1
-        $course = $this->Course->getCourseByInstructor(1);
-        $expected = array(
-            array('Course' => array('id' => 1, 'course' => 'Math303', 'title' => 'Stochastic Process')),
-            array('Course' => array('id' => 2, 'course' => 'Math321', 'title' => 'Analysis II')),
-        );
+        $course = $this->Course->getCourseByInstructor(2);
 
         $this->assertEqual($course[0]['Course']['course'], "MECH 328");
         $this->assertEqual(
             $course[0]['Course']['title'], 
             "Mechanical Engineering Design Project"
         );
-        $this->assertEqual($course[1]['Course']['course'], "APSC 201");
-        $this->assertEqual(
-            $course[1]['Course']['title'], "Technical Communication");
 
         // Testing invald instructor user_id
         $instructor = $this->Course->getCourseByInstructor(312321);
