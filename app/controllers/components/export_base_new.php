@@ -55,10 +55,7 @@ class ExportBaseNewComponent extends Object
             $yIndex++;
             $instructors = array();
             foreach ($course['Instructor'] as $instructor) {
-                // has an instructor role
-                if ($this->User->getRoleId($instructor['id']) == 3) {
-                    array_push($instructors, $instructor['first_name'].' '.$instructor['last_name']);
-                }
+                array_push($instructors, $instructor['first_name'].' '.$instructor['last_name']);
             }
             if (!empty($instructors)) {
                 $listInstructors = implode(", ", $instructors);
