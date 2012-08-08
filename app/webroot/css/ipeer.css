@@ -551,8 +551,14 @@ i {
 /* USERS */
 
 /* users/add users/edit */
-#UserForm .text label, #UserForm .select label {
+#UserForm .text label {
     width: 13em;
+    margin-top: 0.3em;
+}
+
+#UserForm .select label {
+    width: 13em;
+    margin-top: 0.5em;
 }
 
 #UserForm .checkbox label {
@@ -596,6 +602,7 @@ i {
 
 #UserForm #email {
     margin: 0 0.5em 1em 16em;
+    float: none;
 }
 
 #UserForm .submit {
@@ -722,12 +729,17 @@ i {
 
 /* events/edit */
 
-#Events fieldset {
+#Events fieldset, #Events .submit {
     clear: both;
 }
 
-#Events .text label, $Events .password label, 
-#Events .textarea label, $Events .select label, 
+#Events .select {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+#Events .text label, #Events .password label, 
+#Events .textarea label, #Events .select label, 
 #Events .datetime label, #Events .radio legend, 
 #Events .penaltyLabel {
     width: 18em;

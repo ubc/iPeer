@@ -1304,6 +1304,7 @@ CREATE TABLE IF NOT EXISTS `simple_evaluations` (
   `description` text NOT NULL,
   `point_per_member` int(10) NOT NULL DEFAULT '0',
   `record_status` char(1) NOT NULL DEFAULT 'A',
+  `availability` varchar(10) NOT NULL DEFAULT 'public',
   `creator_id` int(11) NOT NULL DEFAULT '0',
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `updater_id` int(11) DEFAULT NULL,

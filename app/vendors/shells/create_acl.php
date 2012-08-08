@@ -487,6 +487,7 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Simpleevaluations');
         $this->Acl->allow($role, 'controllers/Surveys');
         $this->Acl->allow($role, 'controllers/Users');
+        $this->Acl->allow($role, 'controllers/Evaluations');
         $this->Acl->deny($role, 'functions');
         $this->Acl->allow($role, 'functions/email');
         $this->Acl->allow($role, 'functions/emailtemplate');

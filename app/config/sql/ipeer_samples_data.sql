@@ -1642,6 +1642,7 @@ CREATE TABLE IF NOT EXISTS `simple_evaluations` (
   `description` text NOT NULL,
   `point_per_member` int(10) NOT NULL DEFAULT '0',
   `record_status` char(1) NOT NULL DEFAULT 'A',
+  `availability` varchar(10) NOT NULL DEFAULT 'public',
   `creator_id` int(11) NOT NULL DEFAULT '0',
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `updater_id` int(11) DEFAULT NULL,
@@ -1653,7 +1654,7 @@ CREATE TABLE IF NOT EXISTS `simple_evaluations` (
 -- Dumping data for table `simple_evaluations`
 --
 
-INSERT INTO `simple_evaluations` VALUES (1, 'Module 1 Project Evaluation', '', 100, 'A', 1, '2006-06-20 15:17:47', NULL, '2006-06-20 15:17:47');
+INSERT INTO `simple_evaluations` VALUES (1, 'Module 1 Project Evaluation', '', 100, 'A', 'public', 1, '2006-06-20 15:17:47', NULL, '2006-06-20 15:17:47');
 
 -- --------------------------------------------------------
 
@@ -1959,12 +1960,9 @@ CREATE TABLE IF NOT EXISTS `user_courses` (
 -- Dumping data for table `user_courses`
 --
 
-INSERT INTO `user_courses` VALUES (1, 1, 1, 'A', 'A', 0, '2006-06-20 14:14:45', NULL, '2006-06-20 14:14:45');
-INSERT INTO `user_courses` VALUES (2, 2, 1, 'A', 'A', 0, '2006-06-20 14:14:45', NULL, '2006-06-20 14:14:45');
-INSERT INTO `user_courses` VALUES (3, 1, 2, 'A', 'A', 0, '2006-06-20 14:15:38', NULL, '2006-06-20 14:15:38');
-INSERT INTO `user_courses` VALUES (4, 3, 2, 'A', 'A', 0, '2006-06-20 14:39:31', NULL, '2006-06-20 14:39:31');
-INSERT INTO `user_courses` VALUES (5, 4, 2, 'A', 'A', 0, '2006-06-20 14:39:31', NULL, '2006-06-20 14:39:31');
-INSERT INTO `user_courses` VALUES (6, 1, 3, 'A', 'A', 0, '2006-06-20 14:39:31', NULL, '2006-06-20 14:39:31');
+INSERT INTO `user_courses` VALUES (1, 2, 1, 'A', 'A', 0, '2006-06-20 14:14:45', NULL, '2006-06-20 14:14:45');
+INSERT INTO `user_courses` VALUES (2, 3, 2, 'A', 'A', 0, '2006-06-20 14:39:31', NULL, '2006-06-20 14:39:31');
+INSERT INTO `user_courses` VALUES (3, 4, 2, 'A', 'A', 0, '2006-06-20 14:39:31', NULL, '2006-06-20 14:39:31');
 
 -- --------------------------------------------------------
 
