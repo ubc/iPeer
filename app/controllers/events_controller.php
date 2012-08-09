@@ -510,7 +510,8 @@ class EventsController extends AppController
             
             $deleteThese = array(); // array that stores penalties to delete
             
-            for ($i = 0; $i < sizeof($penalties); $i++) { // check each existing penalty
+            // check each existing penalty
+            for ($i = 0; $i < sizeof($penalties); $i++) {
                 $isMissing = true;
                 // check penalties in $this->data
                 for ($j = 0; $j < sizeof($this->data['Penalty'])+sizeof($penalties); $j++) {
@@ -529,7 +530,7 @@ class EventsController extends AppController
                 }
             }
             // go through the pile and delete them one by one...
-            foreach($deleteThese as $blah) {
+            foreach ($deleteThese as $blah) {
                 $this->Penalty->delete($blah);
             }
             

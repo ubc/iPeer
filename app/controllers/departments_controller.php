@@ -52,8 +52,6 @@ class DepartmentsController extends AppController {
      * View a department entry.
      *
      * @param mixed $id - The department id to be viewed
-     *
-     *
      */
     public function view($id = null) {
         $this->set('title_for_layout', 'View Department');
@@ -104,8 +102,6 @@ class DepartmentsController extends AppController {
      * Edit an existing department entry.
      *
      * @param mixed $id - The id of the department entry to be edited
-     *
-     *
      */
     public function edit($id = null) {
         $this->set('title_for_layout', 'Edit Department');
@@ -133,8 +129,6 @@ class DepartmentsController extends AppController {
      * Delete an existing department entry.
      *
      * @param mixed $id - The id of the department entry to be edited
-     *
-     *
      */
     public function delete($id = null) {
         if (!$id) {

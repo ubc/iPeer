@@ -18,8 +18,6 @@ class V1Controller extends Controller {
      * Get a list of users in iPeer.
      *
      * @param mixed $id
-     *
-     *
      */
     public function users($id = null) {
         // view
@@ -108,8 +106,6 @@ class V1Controller extends Controller {
      * Get a list of courses in iPeer.
      *
      * @param mixed $id
-     *
-     *
      */
     public function courses($id = null) {
         $classes = array();

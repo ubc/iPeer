@@ -37,8 +37,6 @@ class FacultiesController extends AppController {
      * Display a specific faculty.
      *
      * @param mixed $id - the id of the faculty to be displayed
-     *
-     *
      */
     function view($id = null) {
         $this->set('title_for_layout', 'View Faculty');
@@ -112,8 +110,6 @@ class FacultiesController extends AppController {
      * Edit an existing faculty.
      *
      * @param mixed $id - the id of the faculty to be edited
-     *
-     *
      */
     function edit($id = null) {
         if (!$id && empty($this->data)) {
@@ -137,8 +133,6 @@ class FacultiesController extends AppController {
      * Delete a faculty
      *
      * @param mixed $id - the id of the faculty to be deleted
-     *
-     *
      */
     function delete($id = null) {
         if (!$id) {
