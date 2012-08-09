@@ -51,7 +51,7 @@ class CourseTestCase extends CakeTestCase {
             "Mechanical Engineering Design Project"
         );
 
-        // Testing invald instructor user_id
+        // Testing invalid instructor user_id
         $instructor = $this->Course->getCourseByInstructor(312321);
         $this->assertEqual($instructor, $empty);
 
@@ -211,7 +211,7 @@ class CourseTestCase extends CakeTestCase {
     {
         $empty = null;
         /*
-         * Name is missleading, the function actually deletes a single course defined by id and all event related to it.
+         * Name is misleading, the function actually deletes a single course defined by id and all event related to it.
          *
          * */
         $this->Course->deleteAll(1);
@@ -226,6 +226,31 @@ class CourseTestCase extends CakeTestCase {
         $this->assertEqual($course, $empty);
  */
 
+    }
+    
+    function testGetByDepartments()
+    {
+        $this->UserFaculty = Classregistry::init('UserFaculty');
+        $this->Course = ClassRegistry::init('Course');
+        $this->Department = ClassRegistry::init('Department');
+
+        $expected = array(
+            "1" => "MECH 328 - Mechanical Engineering Design Project",
+            "2" => "APSC 201 - Technical Communication",
+            "3" => "CPSC 101 - Connecting with Computer Science"
+        );
+        $empty = null;
+        
+        // super admin: user id 1, should see all courses
+        $uf = $this->UserFaculty->findAllByUserId(1);
+        $dep = $this->Department->getByUserFaculties($uf);
+        $course = $this->Course->getByDepartments($dep, 'list');
+        $this->assertEqual($course, $expected);
+        
+        // if no departments in array, should return nothing
+        $course = $this->Course->getByDepartments(array(), 'all');
+        $this->assertEqual($course, $empty);
+        
     }
 
 }
