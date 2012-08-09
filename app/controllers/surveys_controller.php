@@ -109,10 +109,12 @@ class SurveysController extends AppController
         $myID = $this->Auth->user('id');
 
         // Get the course data
-        $userCourseList = User::getMyCourseList();
-        $coursesList = array();
-        foreach ($userCourseList as $id => $course) {
-            $coursesList{$id} = $course['course'];
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $userCourseList = User::getMyCourseList();
+        // admins & super admin
+        } else {
+            $userCourseList = User::getMyDepartmentsCourseList('list');
         }
 
         // Set up Columns
@@ -141,7 +143,7 @@ class SurveysController extends AppController
                 "localKey"  => "course_id",
                 "description" => "Course:",
                 "default"   => $this->Session->read('ipeerSession.courseId'),
-                "list" => $coursesList,
+                "list" => $userCourseList,
                 "joinTable" => "courses",
                 "joinModel" => "Course");
 
@@ -155,13 +157,11 @@ class SurveysController extends AppController
 
         // For instructors: only list their own course events (surveys
         $extraFilters = $conditions;
-        if (!User::hasRole('superadmin') && !User::hasRole('admin')) {
-            $extraFilters = " ( ";
-            foreach ($coursesList as $id => $course) {
-                $extraFilters .= "course_id=$id or ";
-            }
-            $extraFilters .= "1=0 ) "; // just terminates the or condition chain with "false"
+        $extraFilters = " ( ";
+        foreach ($userCourseList as $id => $course) {
+            $extraFilters .= "course_id=$id or ";
         }
+        $extraFilters .= "1=0 ) "; // just terminates the or condition chain with "false"
 
         // Set up actions
         $warning = __("Are you sure you want to delete this evaluation permanently?", true);
@@ -194,7 +194,7 @@ class SurveysController extends AppController
     function index($course_id = null)
     {
         if (!User::hasPermission('controllers/surveys')) {
-            $this->Session->setFlash(__('You do not have permission to access surveys', true));
+            $this->Session->setFlash(__('Error: You do not have permission to access surveys', true));
             $this->redirect('/home');
         }
 
@@ -238,7 +238,7 @@ class SurveysController extends AppController
     function view($id)
     {
         if (!User::hasPermission('controllers/surveys')) {
-            $this->Session->setFlash(__('You do not have permission to view surveys', true));
+            $this->Session->setFlash(__('Error: You do not have permission to view surveys', true));
             $this->redirect('/home');
         }
         
@@ -249,10 +249,24 @@ class SurveysController extends AppController
                 'contain' => array('Event' => 'EvaluationSubmission')
             )
         );
-        
+
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($id) || empty($eval)) {
-            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->Session->setFlash(__('Error: Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($eval['Survey']['course_id'], array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to view this survey', true));
             $this->redirect('index');
         }
         
@@ -271,7 +285,7 @@ class SurveysController extends AppController
     function add()
     {
         if (!User::hasPermission('controllers/surveys')) {
-            $this->Session->setFlash(__('You do not have permission to add surveys', true));
+            $this->Session->setFlash(__('Error: You do not have permission to add surveys', true));
             $this->redirect('/home');
         }
 
@@ -310,9 +324,16 @@ class SurveysController extends AppController
                 $this->Session->setFlash(__('Error on saving survey.', true));
             }
         }
-        $whoAmI = $this->User->getCurrentLoggedInUser();
-        $cList = $this->Course->getListByInstructor($whoAmI['id']);
-        $this->set('templates', $this->Survey->find('list', array('fields' => array('id', 'name'))));
+        // Get the course data
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $cList = User::getMyCourseList();
+        // admins & super admin
+        } else {
+            $cList = User::getMyDepartmentsCourseList('list');
+        }
+        $templates = $this->Survey->find('list', array('conditions' => array('course_id' => array_keys($cList))));
+        $this->set('templates', $templates);
         $this->set('courses', $cList);
         $this->render('edit');
     }
@@ -329,7 +350,7 @@ class SurveysController extends AppController
     function edit($id)
     {
         if (!User::hasPermission('controllers/surveys')) {
-            $this->Session->setFlash(__('You do not have permission to edit surveys', true));
+            $this->Session->setFlash(__('Error: You do not have permission to edit surveys', true));
             $this->redirect('/home');
         }
 
@@ -346,14 +367,21 @@ class SurveysController extends AppController
         
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($id) || empty($eval)) {
-            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
         }
         
-        // check to see if the user is the creator, admin, or superadmin
-        if (!($eval['Survey']['creator_id'] == $this->Auth->user('id') || 
-            User::hasPermission('functions/evaluation', 'update'))) {
-            $this->Session->setFlash(__('You do not have permission to edit this survey.', true));
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($eval['Survey']['course_id'], array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
             $this->redirect('index');
         }
         
@@ -391,8 +419,14 @@ class SurveysController extends AppController
             $this->data = $data;
         }
         
-        $whoAmI = $this->User->getCurrentLoggedInUser();
-        $cList = $this->Course->getListByInstructor($whoAmI['id']);
+        // Get the course data
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $cList = User::getMyCourseList();
+        // admins & super admin
+        } else {
+            $cList = User::getMyDepartmentsCourseList('list');
+        }
         $this->set('courses', $cList);
     }
 
@@ -408,7 +442,7 @@ class SurveysController extends AppController
     function copy($id)
     {
         if (!User::hasPermission('controllers/surveys')) {
-            $this->Session->setFlash(__('You do not have permission to copy surveys', true));
+            $this->Session->setFlash(__('Error: You do not have permission to copy surveys', true));
             $this->redirect('/home');
         }
         
@@ -422,7 +456,21 @@ class SurveysController extends AppController
         
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($id) || empty($eval)) {
-            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->Session->setFlash(__('Error: Invalid ID.', true));
+            $this->redirect('index');
+        }
+        
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($eval['Survey']['course_id'], array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to copy this survey', true));
             $this->redirect('index');
         }
         
@@ -451,7 +499,7 @@ class SurveysController extends AppController
     function delete($id)
     {
         if (!User::hasPermission('controllers/surveys')) {
-            $this->Session->setFlash(__('You do not have permission to delete surveys', true));
+            $this->Session->setFlash(__('Error: You do not have permission to delete surveys', true));
             $this->redirect('/home');
         }
 
@@ -466,14 +514,33 @@ class SurveysController extends AppController
         
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($id) || empty($eval)) {
-            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
         }
         
-        // check to see if the user is the creator, admin, or superadmin
-        if (!($eval['Survey']['creator_id'] == $this->Auth->user('id') || 
-            User::hasPermission('functions/evaluation', 'delete'))) {
-            $this->Session->setFlash(__('You do not have permission to delete this survey.', true));
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($eval['Survey']['course_id'], array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to delete this survey', true));
+            $this->redirect('index');
+        }
+        
+        foreach ($eval['Event'] as $event) {
+            if (!empty($event['EvaluationSubmission'])) {
+                $submissions[] = $event['EvaluationSubmission'];
+            }
+        }
+        
+        // check to see if submissions had been made - if yes - survey can't be edited
+        if (!empty($submissions)) {
+            $this->Session->setFlash(__('Submissions had been made. '.$eval['Survey']['name'].' cannot be deleted', true));
             $this->redirect('index');
         }
         
@@ -603,7 +670,7 @@ class SurveysController extends AppController
     function questionsSummary($survey_id)
     {
         if (!User::hasPermission('controllers/surveys')) {
-            $this->Session->setFlash('You do not have permission to edit this survey\'s questions', true);
+            $this->Session->setFlash('Error: You do not have permission to edit this survey\'s questions', true);
             $this->redirect('/home');
         }
         
@@ -622,10 +689,18 @@ class SurveysController extends AppController
             $this->Session->setFlash(__('Invalid ID.', true));
             $this->redirect('index');
         }
-        
-        // check to see if the user is the creator, admin, or superadmin
-        if (!($eval['Survey']['creator_id'] == $this->Auth->user('id') || User::hasPermission('functions/evaluation', 'update'))) {
-            $this->Session->setFlash(__('You do not have permission to edit this survey\'s questions.', true));
+
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courses = User::getMyDepartmentsCourseList('list');
+        }
+
+        if (!in_array($eval['Survey']['course_id'], array_keys($courses))) {
+            $this->Session->setFlash(__('Error: You do not have permission to edit this survey\'s questions', true));
             $this->redirect('index');
         }
         

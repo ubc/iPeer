@@ -12,7 +12,7 @@ class EmailerController extends AppController
 {
     public $name = 'Emailer';
     public $uses = array('GroupsMembers', 'UserEnrol', 'User', 'EmailTemplate', 'EmailMerge',
-        'EmailSchedule', 'Personalize', 'SysParameter', 'SysFunction', 'Group', 'Course');
+        'EmailSchedule', 'Personalize', 'SysParameter', 'SysFunction', 'Group', 'Course', 'UserCourse');
     public $components = array('AjaxList', 'Session', 'RequestHandler', 'Email');
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Js' => array('Prototype'));
     public $show;
@@ -90,16 +90,49 @@ class EmailerController extends AppController
         //put all the joins together
         $joinTables = array($jointTableCreator);
 
-        $extraFilters = "";
-
-        // Restriction for Instructor
-        $restrictions = "";
-        if (!User::hasRole('superadmin') && !User::hasRole('admin')) {
-            $restrictions = array(
-                "EmailSchedule.creator_id" => array($myID => true, "!default" => false)
-            );
-            $extraFilters = "(EmailSchedule.creator_id=$myID)";
+        // Join with Users
+        $jointTableCreator =
+            array("id"         => "Creator_id",
+                "localKey"   => "creator_id",
+                "description" => __("Evaluations to show:", true),
+                "default" => $myID,
+                "list" => $userList,
+                "joinTable"  => "users",
+                "joinModel"  => "Creator");
+        // put all the joins together
+        $joinTables = array($jointTableCreator);
+        
+        $creators = array();
+        // grab course ids of the courses admin/super admin has access to
+        $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+        // grab all instructors that have access to the courses above
+        $instructors = $this->UserCourse->find(
+            'all', 
+            array(
+                'conditions' => array('UserCourse.course_id' => $courseIds)
+        ));
+        $extraFilters = "(";
+        // only admins/super admins will go through this loop
+        foreach ($instructors as $instructor) {
+            $id = $instructor['UserCourse']['user_id'];
+            $creators[] = $id;
+            $extraFilters .= "creator_id = $id or ";
         }
+        // allow instructors/admins/super admins to see their own email schedules
+        $extraFilters .= "creator_id = $myID)";
+
+        // Instructors can only edit their own email schedules
+        $restrictions = "";
+        $basicRestrictions = array(
+                $myID => true,
+                "!default" => false);
+        if (User::hasRole('superadmin') || User::hasRole('admin')) {
+            foreach ($creators as $creator) {
+                $basicRestrictions = $basicRestrictions + array($creator => true);
+            }
+        }
+        
+        $restrictions['EmailSchedule.creator_id'] = $basicRestrictions;
 
         // Set up actions
         $warning = __("Are you sure you want to cancel this email?", true);
@@ -137,7 +170,7 @@ class EmailerController extends AppController
     public function index()
     {
         if (!User::hasPermission('controllers/emailer')) {
-            $this->Session->setFlash(__('You do not have permission to use the emailer.', true));
+            $this->Session->setFlash(__('Error: You do not have permission to use the emailer.', true));
             $this->redirect('/home');
         }
 
@@ -166,7 +199,7 @@ class EmailerController extends AppController
     public function write($type=null, $id=null) {
         
         if (!User::hasPermission('controllers/emailer')) {
-            $this->Session->setFlash(__('You do not have permission to write emails.', true));
+            $this->Session->setFlash(__('Error: You do not have permission to write emails.', true));
             $this->redirect('/home');
         }
 
@@ -186,28 +219,20 @@ class EmailerController extends AppController
                 $this->redirect('index');
             }
         }
-        
-        // list of courses the user has access to
-        $courseList = array();
-        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
-        foreach ($user['Course'] as $course) {
-            $courseList[] = $course['id'];
+
+        // check whether the user has access to the course
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courseList = User::getMyCourseList();
+        // admins & super admins
+        } else {
+            $courseList = User::getMyDepartmentsCourseList('list');
         }
 
         //for checking if the user can email to class with $id
         if ('C' == $type && !User::hasPermission('functions/email/allcourses')) {
-             // check if they have access to class with $id
-             $course = $this->User->find(
-                 'first', 
-                 array(
-                    'conditions' => array(
-                        'User.id' => $this->Auth->user('id'), 
-                        'Course.id' => $id
-                    )
-                 )
-             );
-            if (empty($course)) {
-                $this->Session->setFlash(__('You do not have permission to write emails to this class.', true));
+            if (!in_array($id, array_keys($courses))) {
+                $this->Session->setFlash(__('Error: You do not have permission to write emails to this course', true));
                 $this->redirect('index');
             }
         // for checking if the user can email to group with $id
@@ -217,29 +242,41 @@ class EmailerController extends AppController
                 'first', 
                 array(
                     'conditions' => array(
-                        'Group.id' => $id, 
-                        'Course.id' => $courseList
+                        'Group.id' => $id
                     )
                 )
             );
-            if (empty($group)) {
-                $this->Session->setFlash(__('You do not have permission to write emails to this group.', true));
+            if (!in_array($group['Course']['id'], array_keys($courses))) {
+                $this->Session->setFlash(__('Error: You do not have permission to write emails to this group', true));
                 $this->redirect('index');
             }
         // for checking if the user can email to user with $id
         } else if (!User::hasPermission('functions/email/allusers') && null != $id) {
             // check if they have access to user with $id
-            $user = $this->User->find(
+            // if the user is a student
+            $student = $this->User->find(
                 'all', 
                 array(
                     'conditions' => array(
                         'User.id' => $id, 
-                        'Enrolment.id' => $courseList
+                        'Enrolment.id' => array_keys($courseList)
                     )
                 )
             );
-            if (empty($user)) {
-                $this->Session->setFlash(__('You do not have permission to write emails to this user.', true));
+
+            // if the user is an instructor
+            $instructor = $this->User->find(
+                'all',
+                array(
+                    'conditions' => array(
+                        'User.id' => $id,
+                        'Course.id' => array_keys($courseList)
+                    )
+                )
+            );
+
+            if (empty($student) && empty($instructor)) {
+                $this->Session->setFlash(__('Error: You do not have permission to write emails to this user.', true));
                 $this->redirect('index');
             }
         }
@@ -302,7 +339,7 @@ class EmailerController extends AppController
     function cancel ($id)
     {
         if (!User::hasPermission('controllers/emailer')) {
-            $this->Session->setFlash(__('You do not have permission to cancel email schedules', true));
+            $this->Session->setFlash(__('Error: You do not have permission to cancel email schedules', true));
             $this->redirect('/home');
         }
 
@@ -320,32 +357,44 @@ class EmailerController extends AppController
             $this->redirect('index');
         }
 
-        // check to see if the user is the creator, admin, or superadmin
-        if (!($email['EmailSchedule']['creator_id'] == $this->Auth->user('id') || User::hasPermission('functions/email/allusers') ||
-            User::hasPermission('functions/email/allgroups') || User::hasPermission('functions/email/allcourses'))) {
-            $this->Session->setFlash(__('You do not have permission to cancel this email schedule.', true));
-            $this->redirect('index');
+        // instructor
+        if (!User::hasPermission('controllers/departments')) {
+            $instructorIds = array($this->Auth->user('id'));
+        // admins & super admin
+        } else {
+            // course ids
+            $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+            // instructors
+            $instructors = $this->UserCourse->find(
+                'all',
+                array(
+                    'conditions' => array('UserCourse.course_id' => $courseIds)
+            ));
+            $instructorIds = array();
+            foreach ($instructors as $instructor) {
+                $instructorIds[] = $instructor['UserCourse']['user_id'];
+            }
+            // add the user's id
+            array_push($instructorIds, $this->Auth->user('id'));
         }
         
-        $creator_id = $this->EmailSchedule->getCreatorId($id);
-        $user_id = $this->Auth->user('id');
-        if ($creator_id == $user_id) {
-            if (!$this->EmailSchedule->getSent($id)) {
-                if ($this->EmailSchedule->delete($id)) {
-                    $this->Session->setFlash(__('The Email was canceled successfully.', true), 'good');
-                } else {
-                    $this->Session->setFlash(__('Email cancellation failed.', true));
-                }
-                $this->redirect('index/');
+        // creator's id must be in the array of accessible user ids
+        if (!(in_array($eval['EmailSchedule']['creator_id'], $instructorIds))) {
+            $this->Session->setFlash(__('Error: You do not have permission to cancel this email schedule', true));
+            $this->redirect('index');
+        }
+
+        if (!$this->EmailSchedule->getSent($id)) {
+            if ($this->EmailSchedule->delete($id)) {
+                $this->Session->setFlash(__('The Email was canceled successfully.', true), 'good');
             } else {
-                //If email is already sent
-                $this->Session->setFlash(__('Cannot cancel: Email is already sent.', true));
-                $this->redirect('index/');
+                $this->Session->setFlash(__('Email cancellation failed.', true));
             }
+            $this->redirect('index/');
         } else {
-            //If user is not creator of the email
-            $this->Session->setFlash(__('No Permission', true));
-            $this->redirect('/emailer/index');
+            //If email is already sent
+            $this->Session->setFlash(__('Cannot cancel: Email is already sent.', true));
+            $this->redirect('index/');
         }
     }
 
@@ -356,7 +405,7 @@ class EmailerController extends AppController
     function view ($id)
     {
         if (!User::hasPermission('controllers/emailer')) {
-            $this->Session->setFlash(__('You do not have permission to view email schedules.', true));
+            $this->Session->setFlash(__('Error: You do not have permission to view email schedules.', true));
             $this->redirect('/home');
         }
         
@@ -374,9 +423,30 @@ class EmailerController extends AppController
             $this->redirect('index');
         }
 
-        if ($email['EmailSchedule']['creator_id'] !=  $this->Auth->user('id') && !(User::hasPermission('functions/email/allusers') && 
-            User::hasPermission('functions/email/allgroups') && User::hasPermission('functions/email/allcourses'))) {
-            $this->Session->setFlash(__('You do not have permission to view this email schedule.', true));
+        // instructor
+        if (!User::hasPermission('controllers/departments')) {
+            $instructorIds = array($this->Auth->user('id'));
+        // admins & super admin
+        } else {
+            // course ids
+            $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+            // instructors
+            $instructors = $this->UserCourse->find(
+                'all',
+                array(
+                    'conditions' => array('UserCourse.course_id' => $courseIds)
+            ));
+            $instructorIds = array();
+            foreach ($instructors as $instructor) {
+                $instructorIds[] = $instructor['UserCourse']['user_id'];
+            }
+            // add the user's id
+            array_push($instructorIds, $this->Auth->user('id'));
+        }
+        
+        // creator's id must be in the array of accessible user ids
+        if (!(in_array($eval['EmailSchedule']['creator_id'], $instructorIds))) {
+            $this->Session->setFlash(__('Error: You do not have permission to view this email schedule', true));
             $this->redirect('index');
         }
 

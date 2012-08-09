@@ -10,7 +10,7 @@
  */
 class MixevalsController extends AppController
 {
-    public $uses =  array('Event', 'Mixeval','MixevalsQuestion', 'MixevalsQuestionDesc', 'Personalize');
+    public $uses =  array('Event', 'Mixeval','MixevalsQuestion', 'MixevalsQuestionDesc', 'Personalize', 'UserCourse');
     public $name = 'Mixevals';
     public $show;
     public $sortBy;
@@ -108,18 +108,40 @@ class MixevalsController extends AppController
         // put all the joins together
         $joinTables = array($jointTableCreator);
 
-        // List only my own or
         $myID = $this->Auth->user('id');
-        $extraFilters = "(Mixeval.creator_id=$myID or Mixeval.availability='public')";
+        $creators = array();
+        // grab course ids of the courses admin/super admin has access to
+        $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+        // grab all instructors that have access to the courses above
+        $instructors = $this->UserCourse->find(
+            'all', 
+            array(
+                'conditions' => array('UserCourse.course_id' => $courseIds)
+        ));
+        $extraFilters = "(";
+        // only admins/super admins will go through this loop
+        foreach ($instructors as $instructor) {
+            $id = $instructor['UserCourse']['user_id'];
+            $creators[] = $id;
+            $extraFilters .= "creator_id = $id or ";
+        }
+        // allow instructors/admins/super admins to see their own mixeval templates
+        $extraFilters .= "creator_id = $myID or ";
+        // can see all public mixeval templates
+        $extraFilters .= "availability = 'public')";
 
         // Instructors can only edit their own evaluations
         $restrictions = "";
-        if (!User::hasRole('superadmin') && !User::hasRole('admin')) {
-            $restrictions = array(
-                "Mixeval.creator_id" => array(
-                    $myID => true,
-                    "!default" => false));
+        $basicRestrictions = array(
+                $myID => true,
+                "!default" => false);
+        if (User::hasRole('superadmin') || User::hasRole('admin')) {
+            foreach ($creators as $creator) {
+                $basicRestrictions = $basicRestrictions + array($creator => true);
+            }
         }
+        
+        $restrictions['Mixeval.creator_id'] = $basicRestrictions;
 
         // Set up actions
         $warning = __("Are you sure you want to delete this evaluation permanently?", true);
@@ -147,7 +169,7 @@ class MixevalsController extends AppController
     function index()
     {
         if (!User::hasPermission('controllers/mixevals')) {
-            $this->Session->setFlash(__('You do not have permission to access mixed evaluations', true));
+            $this->Session->setFlash(__('Error: You do not have permission to access mixed evaluations', true));
             $this->redirect('/home');
         }
 
@@ -187,7 +209,7 @@ class MixevalsController extends AppController
     function view($id, $layout='')
     {
         if (!User::hasPermission('controllers/mixevals')) {
-            $this->Session->setFlash(__('You do not have permission to view mixed evaluations', true));
+            $this->Session->setFlash(__('Error: You do not have permission to view mixed evaluations', true));
             $this->redirect('/home');
         }
         
@@ -201,8 +223,38 @@ class MixevalsController extends AppController
         
         // check to see if $id is valid - numeric & is a mixed evaluation
         if (!is_numeric($id) || empty($eval)) {
-            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
+        }
+        
+        // check whether the user has access to the evaluation if the eval is not public
+        if ($eval['Mixeval']['availability'] != 'public') {
+            // instructor
+            if (!User::hasPermission('controllers/departments')) {
+                $instructorIds = array($this->Auth->user('id'));
+            // admins & super admin
+            } else {
+                // course ids
+                $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+                // instructors
+                $instructors = $this->UserCourse->find(
+                    'all',
+                    array(
+                        'conditions' => array('UserCourse.course_id' => $courseIds)
+                ));
+                $instructorIds = array();
+                foreach ($instructors as $instructor) {
+                    $instructorIds[] = $instructor['UserCourse']['user_id'];
+                }
+                // add the user's id
+                array_push($instructorIds, $this->Auth->user('id'));
+            }
+            
+            // creator's id must be in the array of accessible user ids
+            if (!(in_array($eval['Mixeval']['creator_id'], $instructorIds))) {
+                $this->Session->setFlash(__('Error: You do not have permission to view this evaluation', true));
+                $this->redirect('index');
+            }
         }
         
         if ($layout != '') {
@@ -239,7 +291,7 @@ class MixevalsController extends AppController
     function add($layout='')
     {
         if (!User::hasPermission('controllers/mixevals')) {
-            $this->Session->setFlash(__('You do not have permission to add mixed evaluations', true));
+            $this->Session->setFlash(__('Error: You do not have permission to add mixed evaluations', true));
             $this->redirect('/home');
         }
         
@@ -314,7 +366,7 @@ class MixevalsController extends AppController
     function edit($id)
     {
         if (!User::hasPermission('controllers/mixevals')) {
-            $this->Session->setFlash(__('You do not have permission to edit mixed evaluations', true));
+            $this->Session->setFlash(__('Error: You do not have permission to edit mixed evaluations', true));
             $this->redirect('/home');
         }
 
@@ -331,14 +383,34 @@ class MixevalsController extends AppController
         
         // check to see if $id is valid - numeric & is a mixed evaluation
         if (!is_numeric($id) || empty($eval)) {
-            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
         }
         
-        // check to see if the user is the creator, admin, or superadmin
-        if (!($eval['Mixeval']['creator_id'] == $this->Auth->user('id') || 
-            User::hasPermission('functions/evaluation', 'update'))) {
-            $this->Session->setFlash(__('You do not have permission to edit this mixed evaluation.', true));
+        // instructor
+        if (!User::hasPermission('controllers/departments')) {
+            $instructorIds = array($this->Auth->user('id'));
+        // admins & super admin
+        } else {
+            // course ids
+            $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+            // instructors
+            $instructors = $this->UserCourse->find(
+                'all',
+                array(
+                    'conditions' => array('UserCourse.course_id' => $courseIds)
+            ));
+            $instructorIds = array();
+            foreach ($instructors as $instructor) {
+                $instructorIds[] = $instructor['UserCourse']['user_id'];
+            }
+            // add the user's id
+            array_push($instructorIds, $this->Auth->user('id'));
+        }
+        
+        // creator's id be in the array of accessible user ids
+        if (!(in_array($eval['Mixeval']['creator_id'], $instructorIds))) {
+            $this->Session->setFlash(__('Error: You do not have permission to edit this evaluation', true));
             $this->redirect('index');
         }
         
@@ -415,7 +487,7 @@ class MixevalsController extends AppController
     function copy($id=null)
     {
         if (!User::hasPermission('controllers/mixevals')) {
-            $this->Session->setFlash(__('You do not have permission to copy mixed evaluations', true));
+            $this->Session->setFlash(__('Error: You do not have permission to copy mixed evaluations', true));
             $this->redirect('/home');
         }
     
@@ -429,10 +501,37 @@ class MixevalsController extends AppController
         
         // check to see if $id is valid - numeric & is a mixed evaluation
         if (!is_numeric($id) || empty($eval)) {
-            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
         }
+
+        // instructor
+        if (!User::hasPermission('controllers/departments')) {
+            $instructorIds = array($this->Auth->user('id'));
+        // admins & super admin
+        } else {
+            // course ids
+            $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+            // instructors
+            $instructors = $this->UserCourse->find(
+                'all',
+                array(
+                    'conditions' => array('UserCourse.course_id' => $courseIds)
+            ));
+            $instructorIds = array();
+            foreach ($instructors as $instructor) {
+                $instructorIds[] = $instructor['UserCourse']['user_id'];
+            }
+            // add the user's id
+            array_push($instructorIds, $this->Auth->user('id'));
+        }
         
+        // creator's id be in the array of accessible user ids
+        if (!(in_array($eval['Mixeval']['creator_id'], $instructorIds))) {
+            $this->Session->setFlash(__('Error: You do not have permission to copy this evaluation', true));
+            $this->redirect('index');
+        }
+
         $this->data = $this->Mixeval->copy($id);
         $this->set('data', $this->data);
         $this->set('action', __('Copy Mixed Evaluation', true));
@@ -472,10 +571,30 @@ class MixevalsController extends AppController
             $this->redirect('index');
         }
         
-        // check to see if the user is the creator, admin, or superadmin
-        if (!($eval['Mixeval']['creator_id'] == $this->Auth->user('id') ||
-            User::hasPermission('functions/evaluation', 'delete'))) {
-            $this->Session->setFlash(__('You do not have permission to delete this mixed evaluation.', true));
+        // instructor
+        if (!User::hasPermission('controllers/departments')) {
+            $instructorIds = array($this->Auth->user('id'));
+        // admins & super admin
+        } else {
+            // course ids
+            $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+            // instructors
+            $instructors = $this->UserCourse->find(
+                'all',
+                array(
+                    'conditions' => array('UserCourse.course_id' => $courseIds)
+            ));
+            $instructorIds = array();
+            foreach ($instructors as $instructor) {
+                $instructorIds[] = $instructor['UserCourse']['user_id'];
+            }
+            // add the user's id
+            array_push($instructorIds, $this->Auth->user('id'));
+        }
+        
+        // creator's id be in the array of accessible user ids
+        if (!(in_array($eval['Mixeval']['creator_id'], $instructorIds))) {
+            $this->Session->setFlash(__('Error: You do not have permission to delete this evaluation', true));
             $this->redirect('index');
         }
         

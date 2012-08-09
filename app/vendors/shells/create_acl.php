@@ -489,7 +489,6 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Users');
         $this->Acl->allow($role, 'controllers/Evaluations');
         $this->Acl->deny($role, 'functions');
-        $this->Acl->allow($role, 'functions/email');
         $this->Acl->allow($role, 'functions/emailtemplate');
         $this->Acl->allow($role, 'functions/evaluation');
         $this->Acl->allow($role, 'functions/user');
@@ -518,10 +517,6 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Surveys');
         $this->Acl->allow($role, 'controllers/Users');
         $this->Acl->deny($role, 'functions');
-        $this->Acl->allow($role, 'functions/email');
-        $this->Acl->deny($role, 'functions/email/allUsers');
-        $this->Acl->deny($role, 'functions/email/allGroups');
-        $this->Acl->deny($role, 'functions/email/allCourses');
         $this->Acl->allow($role, 'functions/evaluation');
         $this->Acl->deny($role, 'functions/evaluation', 'update');
         $this->Acl->deny($role, 'functions/evaluation', 'delete');

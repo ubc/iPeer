@@ -31,6 +31,7 @@
     	  <tr class="panelContent">
     	    <th colspan="2" width="60%"><?php __('Name')?></th>
     	    <th width="50"><?php __('In Use')?></th>
+    	    <th><?php __('Public')?></th>
     	    <th><?php __('Base Point Per Member')?></th>
     	  </tr>
       	<?php $i = '0';?>
@@ -45,6 +46,12 @@
                      $html->image('icons/green_check.gif',array('border'=>'0','alt'=>'green_check')) :
                      $html->image('icons/red_x.gif',array('border'=>'0','alt'=>'red_x'));?>
           </td>
+            <td align="center"><?php
+        	if( $eval['availability'] == "public" )
+        		echo $html->image('icons/green_check.gif',array('border'=>'0','alt'=>'green_check'));
+        	else
+        		echo $html->image('icons/red_x.gif',array('border'=>'0','alt'=>'red_x'));
+        	?></td>
     	    <td align="center">
     	      <?php echo $eval['point_per_member'] ?>
     	    </td>

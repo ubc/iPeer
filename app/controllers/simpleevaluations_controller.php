@@ -252,7 +252,7 @@ class SimpleevaluationsController extends AppController
                 array_push($instructorIds, $this->Auth->user('id'));
             }
             
-            // user must be in the array of accessible user ids
+            // creator's id must be in the array of accessible user ids
             if (!(in_array($eval['SimpleEvaluation']['creator_id'], $instructorIds))) {
                 $this->Session->setFlash(__('Error: You do not have permission to view this evaluation', true));
                 $this->redirect('index');
@@ -375,7 +375,7 @@ class SimpleevaluationsController extends AppController
             array_push($instructorIds, $this->Auth->user('id'));
         }
         
-        // user must be in the array of accessible user ids
+        // creator's id be in the array of accessible user ids
         if (!(in_array($eval['SimpleEvaluation']['creator_id'], $instructorIds))) {
             $this->Session->setFlash(__('Error: You do not have permission to edit this evaluation', true));
             $this->redirect('index');
@@ -419,7 +419,7 @@ class SimpleevaluationsController extends AppController
     function copy($id = null)
     {
         if (!User::hasPermission('controllers/simpleevaluations')) {
-            $this->Session->setFlash(__('You do not have permission to copy simple evaluations.', true));
+            $this->Session->setFlash(__('Error: You do not have permission to copy simple evaluations.', true));
             $this->redirect('/home');
         }
         
@@ -433,7 +433,7 @@ class SimpleevaluationsController extends AppController
         
         // check to see if $id is valid - numeric & is a simple evaluation
         if (!is_numeric($id) || empty($eval)) {
-            $this->Session->setFlash(__('Invalid ID.', true));
+            $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
         }
         
@@ -460,7 +460,7 @@ class SimpleevaluationsController extends AppController
                 array_push($instructorIds, $this->Auth->user('id'));
             }
                 
-            // user must be in the array of accessible user ids
+            // creator's id be in the array of accessible user ids
             if (!(in_array($eval['SimpleEvaluation']['creator_id'], $instructorIds))) {
                 $this->Session->setFlash(__('Error: You do not have permission to copy this evaluation', true));
                 $this->redirect('index');
@@ -527,7 +527,7 @@ class SimpleevaluationsController extends AppController
             array_push($instructorIds, $this->Auth->user('id'));
         }
         
-        // user must be in the array of accessible user ids
+        // creator's id be in the array of accessible user ids
         if (!(in_array($eval['SimpleEvaluation']['creator_id'], $instructorIds))) {
             $this->Session->setFlash(__('Error: You do not have permission to delete this evaluation', true));
             $this->redirect('index');
