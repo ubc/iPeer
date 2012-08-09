@@ -300,19 +300,25 @@ class Rubric extends EvaluationBase
         $data = $this->RubricsCriteriaComment->getCriteriaComment($tmp);
         $tmp3 = array_merge($tmp2, $data);
 
-    /* Now, replace all the elements of this database array with the submitted array,
-    unless there are missing */
+    /* Now, replace all the elements of this database array with the submitted array, unless there are missing */
         $submitedRubric = $tmp['Rubric'];
         foreach ($tmp3 as $key => $value) {
 
             if (!empty($submitedRubric[$key])) {
                 //echo "<b>$key Replacing $tmp3[$key] with $submitedRubric[$key]</b><br />";
-                $tmp3[$key] = $submitedRubric[$key]; // Copy the submited value over, overwriting the one got from the database.
+                $tmp3[$key] = $submitedRubric[$key]; // Copy the submitted value over, overwriting the one got from the database.
             }
         }
         return $tmp3;
     }
 
+    /**
+     * getSelectionList
+     *
+     * @param mixed $userid
+     *
+     * @access public
+     */
     public function getSelectionList($userid) {
         $ret = $this->find(
             'list',

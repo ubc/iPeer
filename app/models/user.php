@@ -739,9 +739,11 @@ class User extends AppModel
     /**
      * getMyDepartmentsCourseList get the list of courses
      *
+     * @param mixed $findType
+     *
      * @access public
      * @return array list of courses
-     * */
+     */
     function getMyDepartmentsCourseList($findType = 'list')
     {
         $this->UserFaculty = Classregistry::init('UserFaculty');
