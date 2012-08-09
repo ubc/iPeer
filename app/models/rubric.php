@@ -318,6 +318,7 @@ class Rubric extends EvaluationBase
      * @param mixed $userid
      *
      * @access public
+     * @return returns related selection list
      */
     public function getSelectionList($userid) {
         $ret = $this->find(
