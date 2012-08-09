@@ -1303,6 +1303,45 @@ INSERT INTO `mixevals_questions` (`id`, `mixeval_id`, `question_num`, `title`, `
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `oauth_clients`
+-- This stores OAuth client credentials (AKA: consumer key and secret).
+-- Client credentails are used to identify client software.
+--
+
+CREATE TABLE `oauth_clients` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `key` varchar(255) DEFAULT NULL,
+  `secret` varchar(255) NOT NULL,
+  `comment` text DEFAULT '',
+  `enabled` tinyint(1) DEFAULT 1,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `oauth_tokens`
+-- This stores OAuth token credentials (AKA: access token and secret).
+-- Token credentials are used to identify a user.
+--
+
+CREATE TABLE `oauth_tokens` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `key` varchar(255) DEFAULT NULL,
+  `secret` varchar(255) NOT NULL,
+  `expires` date NOT NULL,
+  `comment` text DEFAULT '',
+  `enabled` tinyint(1) DEFAULT 1,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `penalties`
 --
 
@@ -1312,7 +1351,7 @@ CREATE TABLE `penalties` (
   `days_late` int(11) NOT NULL,
   `percent_penalty` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `fk_events` (`event_id`)
+  FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=36 ;
 
 --
@@ -1328,12 +1367,6 @@ INSERT INTO penalties (id, event_id, days_late, percent_penalty) VALUES
 (6, 2, 2, 30),
 (7, 2, 3, 45),
 (8, 2, 4, 60);
-
---
--- Constraints for table `penalties`
---
-ALTER TABLE `penalties`
-  ADD CONSTRAINT `fk_events` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE;
 
 -- --------------------------------------------------------
 

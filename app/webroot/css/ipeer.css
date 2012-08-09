@@ -98,8 +98,7 @@ p {
     width: 100%;
 }
 
-.text label, .password label, .textarea label, .select label, .datetime label,
-.radio legend, .penaltyLabel
+.text label, .password label, .textarea label, .select label, .datetime label, .date label, .radio legend, .penaltyLabel
 {
     float: left;
     text-align: right;
@@ -110,7 +109,7 @@ p {
 }
 
 .text input, .password input, .textarea textarea, .select select, 
-.datetime select, .penaltyInput input
+.datetime select, .date select, .penaltyInput input
 {   
     margin: 0.35em 0.35em; 
     border-radius: 3px; 
@@ -781,6 +780,7 @@ th {
 }
 
 td {
+    overflow: hidden;
     vertical-align: middle;
     padding: 0.3em;
 }
@@ -1030,6 +1030,7 @@ div.table-content li img {
 
 .button-row ul {
     margin: 0;
+    margin-bottom: 1em;
     padding: 0;
     list-style: none;
     float: right;

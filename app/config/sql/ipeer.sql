@@ -1095,17 +1095,45 @@ CREATE TABLE IF NOT EXISTS `mixevals_questions` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
 
+
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `mixevals_questions`
+-- Table structure for table `oauth_clients`
+-- This stores OAuth client credentials (AKA: consumer key and secret).
+-- Client credentails are used to identify client software.
 --
 
-INSERT INTO `mixevals_questions` (`id`, `mixeval_id`, `question_num`, `title`, `instructions`, `question_type`, `required`, `multiplier`, `scale_level`, `response_type`) VALUES
-(19, 1, 1, 'Participated in Team Meetings', NULL, 'S', 1, 1, 5, NULL),
-(20, 1, 2, 'Was Helpful and co-operative', NULL, 'S', 1, 1, 5, NULL),
-(21, 1, 3, 'Submitted work on time', NULL, 'S', 1, 1, 5, NULL),
-(22, 1, 4, 'Produced efficient work?', NULL, 'T', 1, 0, 5, 'S'),
-(23, 1, 5, 'Contributed?', NULL, 'T', 1, 0, 5, 'L'),
-(24, 1, 6, 'Easy to work with?', NULL, 'T', 0, 0, 5, 'S');
+CREATE TABLE `oauth_clients` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `key` varchar(255) DEFAULT NULL,
+  `secret` varchar(255) NOT NULL,
+  `comment` text DEFAULT '',
+  `enabled` tinyint(1) DEFAULT 1,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `oauth_tokens`
+-- This stores OAuth token credentials (AKA: access token and secret).
+-- Token credentials are used to identify a user.
+--
+
+CREATE TABLE `oauth_tokens` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `key` varchar(255) DEFAULT NULL,
+  `secret` varchar(255) NOT NULL,
+  `expires` date NOT NULL,
+  `comment` text DEFAULT '',
+  `enabled` tinyint(1) DEFAULT 1,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1119,14 +1147,8 @@ CREATE TABLE `penalties` (
   `days_late` int(11) NOT NULL,
   `percent_penalty` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `fk_events` (`event_id`)
+  FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=36 ;
-
---
--- Constraints for table `penalties`
---
-ALTER TABLE `penalties`
-  ADD CONSTRAINT `fk_events` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE;
 
 -- --------------------------------------------------------
 
@@ -1553,26 +1575,6 @@ CREATE TABLE IF NOT EXISTS `user_courses` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `user_tutors`
---
-
-DROP TABLE IF EXISTS `user_tutors`;
-CREATE TABLE IF NOT EXISTS `user_tutors` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL DEFAULT '0',
-  `course_id` int(11) NOT NULL DEFAULT '0',
-  `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `user_enrols`
 --
 
@@ -1617,4 +1619,25 @@ CREATE TABLE `user_faculties` (
   FOREIGN KEY (`faculty_id`) REFERENCES `faculties` (`id`) ON DELETE CASCADE,
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_tutors`
+--
+
+DROP TABLE IF EXISTS `user_tutors`;
+CREATE TABLE IF NOT EXISTS `user_tutors` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL DEFAULT '0',
+  `course_id` int(11) NOT NULL DEFAULT '0',
+  `creator_id` int(11) NOT NULL DEFAULT '0',
+  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `updater_id` int(11) DEFAULT NULL,
+  `modified` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
 
