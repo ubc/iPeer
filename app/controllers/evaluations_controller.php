@@ -292,7 +292,8 @@ class EvaluationsController extends AppController
     /**
      * export
      *
-     * @param bool $eventId
+     * @param mixed $type
+     * @param mixed $id
      *
      * @access public
      * @return void

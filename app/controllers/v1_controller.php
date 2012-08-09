@@ -19,7 +19,8 @@ class V1Controller extends Controller {
      *
      * @param mixed $id
      *
-     **/
+     *
+     */
     public function users($id = null) {
         // view
         if ($this->RequestHandler->isGet()) {
@@ -108,7 +109,8 @@ class V1Controller extends Controller {
      *
      * @param mixed $id
      *
-     **/
+     *
+     */
     public function courses($id = null) {
         $classes = array();
         if ($this->RequestHandler->isGet()) {

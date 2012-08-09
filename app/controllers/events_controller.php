@@ -429,6 +429,8 @@ class EventsController extends AppController
 
     /**
      * Add an event
+     *
+     * @param mixed $courseId
      * 
      * @access public
      * @return void
@@ -498,12 +500,10 @@ class EventsController extends AppController
             if ($typeId == 1) {
                 $this->data['Event']['template_id'] = 
                     $this->data['Event']['SimpleEvaluation'];
-            }
-            else if ($typeId == 2) {
+            } else if ($typeId == 2) {
                 $this->data['Event']['template_id'] = 
                     $this->data['Event']['Rubric'];
-            }
-            else if ($typeId == 4) {
+            } else if ($typeId == 4) {
                 $this->data['Event']['template_id'] = 
                     $this->data['Event']['Mixeval'];
             }
@@ -512,20 +512,24 @@ class EventsController extends AppController
             
             for ($i = 0; $i < sizeof($penalties); $i++) { // check each existing penalty
                 $isMissing = true;
-                for ($j = 0; $j < sizeof($this->data['Penalty'])+sizeof($penalties); $j++) { // check penalties in $this->data
-                    if ($this->data['Penalty'][$j]['id'] == $penalties[$i]['id']) { // if found, then it isn't missing
+                // check penalties in $this->data
+                for ($j = 0; $j < sizeof($this->data['Penalty'])+sizeof($penalties); $j++) {
+                    // if found, then it isn't missing
+                    if ($this->data['Penalty'][$j]['id'] == $penalties[$i]['id']) {
                         $isMissing = false;
                     }
-                    if (empty($this->data['Penalty'][$j+1]['id'])) { // wasn't sure what to do with excess offset, so just go to next penalty...
+                    // wasn't sure what to do with excess offset, so just go to next penalty...
+                    if (empty($this->data['Penalty'][$j+1]['id'])) {
                         break;
                     }
                 }
+                // can't find in $this->data ? put into the want-to-delete pile
                 if ($isMissing) {
-                    $deleteThese[] = $penalties[$i]; // can't find in $this->data ? put into the want-to-delete pile
+                    $deleteThese[] = $penalties[$i];
                 }
             }
-            
-            foreach($deleteThese as $blah) { // go through the pile and delete them one by one...
+            // go through the pile and delete them one by one...
+            foreach($deleteThese as $blah) {
                 $this->Penalty->delete($blah);
             }
             
@@ -561,12 +565,10 @@ class EventsController extends AppController
             if ($typeId == 1) {
                 $this->data['Event']['template_id'] = 
                     $this->data['Event']['SimpleEvaluation'];
-            }
-            else if ($typeId == 2) {
+            } else if ($typeId == 2) {
                 $this->data['Event']['template_id'] = 
                     $this->data['Event']['Rubric'];
-            }
-            else if ($typeId == 4) {
+            } else if ($typeId == 4) {
                 $this->data['Event']['template_id'] = 
                     $this->data['Event']['Mixeval'];
             }

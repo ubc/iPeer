@@ -140,6 +140,7 @@ class GroupsController extends AppController
     /**
      * index
      *
+     * @param mixed $courseId
      *
      * @access public
      * @return void

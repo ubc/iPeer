@@ -53,7 +53,8 @@ class DepartmentsController extends AppController {
      *
      * @param mixed $id - The department id to be viewed
      *
-     * */
+     *
+     */
     public function view($id = null) {
         $this->set('title_for_layout', 'View Department');
         if (!$id) {
@@ -104,7 +105,8 @@ class DepartmentsController extends AppController {
      *
      * @param mixed $id - The id of the department entry to be edited
      *
-     * */
+     *
+     */
     public function edit($id = null) {
         $this->set('title_for_layout', 'Edit Department');
         $this->_initFormEnv();
@@ -132,7 +134,8 @@ class DepartmentsController extends AppController {
      *
      * @param mixed $id - The id of the department entry to be edited
      *
-     * */
+     *
+     */
     public function delete($id = null) {
         if (!$id) {
             $this->Session->setFlash(__('Invalid id for department', true));

@@ -38,7 +38,8 @@ class FacultiesController extends AppController {
      *
      * @param mixed $id - the id of the faculty to be displayed
      *
-     * */
+     *
+     */
     function view($id = null) {
         $this->set('title_for_layout', 'View Faculty');
 
@@ -112,7 +113,8 @@ class FacultiesController extends AppController {
      *
      * @param mixed $id - the id of the faculty to be edited
      *
-     * */
+     *
+     */
     function edit($id = null) {
         if (!$id && empty($this->data)) {
             $this->Session->setFlash(__('Invalid faculty', true));
@@ -136,7 +138,8 @@ class FacultiesController extends AppController {
      *
      * @param mixed $id - the id of the faculty to be deleted
      *
-     * */
+     *
+     */
     function delete($id = null) {
         if (!$id) {
             $this->Session->setFlash(__('Invalid id for faculty', true));
