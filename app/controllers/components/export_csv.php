@@ -55,6 +55,9 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         if (!empty($params['include_group_names'])) {
             $row .= $group['0']['Group']['group_name'].", ";
         }
+        if (!empty($params['include_usernames'])) {
+            $row .= $user['User']['username'].", ";
+        }
         if (!empty($params['include_student_id'])) {
             $row .= $user['User']['student_no'].", ";
         }
@@ -62,9 +65,9 @@ Class ExportCsvComponent extends ExportBaseNewComponent
             $row .= $user['User']['first_name'].", ";
             $row .= $user['User']['last_name'].", ";
         }
-        if (!empty($params['include_student_email'])) {
-            $row .= $user['User']['email'];
-        }
+        //if (!empty($params['include_student_email'])) {
+        //    $row .= $user['User']['email'];
+        //}
         return $row;
     }
 

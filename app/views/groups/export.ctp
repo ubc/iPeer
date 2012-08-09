@@ -23,16 +23,19 @@
           <td width="60%">Include Group Name(s):</td><td><input type="checkbox" name="include_group_names" checked /></td>
         </tr>
         <tr class="tablecell2">
-          <td>Include Student Name(s):</td><td><input type="checkbox" name="include_student_name" checked /></td>
+          <td width="60%">Include Username(s):</td><td><input type="checkbox" name="include_usernames" checked /></td>
         </tr>
         <tr class="tablecell2">
-          <td>Include Student Id #:</td><td><input type="checkbox" name="include_student_id" checked /></td>
+          <td width="60%">Include Student Id #:</td><td><input type="checkbox" name="include_student_id" checked /></td>
         </tr>
-        <?php if (User::hasPermission('functions/viewemailaddress')) { ?>
+        <tr class="tablecell2">
+          <td width="60%">Include Student Name(s):</td><td><input type="checkbox" name="include_student_name" checked /></td>
+        </tr>
+        <?php /*if (User::hasPermission('functions/viewemailaddress')) { ?>
             <tr class="tablecell2">
               <td>Include Student Email(s):</td><td><input type="checkbox" name="include_student_email" /></td>
             </tr>
-        <?php } ?>
+        <?php }*/ ?>
         </table>
         <table width="75%" border="0" align="center" cellpadding="10" cellspacing="1">
         <tr class="tableheader">

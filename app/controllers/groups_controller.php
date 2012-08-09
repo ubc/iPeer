@@ -890,19 +890,22 @@ class GroupsController extends AppController
             if (!empty($this->params['form']['include_group_names'])) {
                 $fileContent .= "Group Name, ";
             }
+            if (!empty($this->params['form']['include_usernames'])) {
+                $fileContent .= "Username, ";
+            }
             if (!empty($this->params['form']['include_student_id'])) {
                 $fileContent .= "Student #, ";
             }
             if (!empty($this->params['form']['include_student_name'])) {
-                $fileContent .= "First Name, Last Name, ";
+                $fileContent .= "First Name, Last Name";
             }
-            if (!empty($this->params['form']['include_student_email'])) {
-                $fileContent .= "Email Address";
-            }
+            //if (!empty($this->params['form']['include_student_email'])) {
+            //    $fileContent .= "Email Address";
+            //}
             // check that at least one export field has been selected
             if (empty($this->params['form']['include_group_numbers']) && empty($this->params['form']['include_group_names'])
-              && empty($this->params['form']['include_student_id']) && empty($this->params['form']['include_student_name'])
-              && empty($this->params['form']['include_student_email'])) {
+              && empty($this->params['form']['include_usernames']) && empty($this->params['form']['include_student_id']) 
+              && empty($this->params['form']['include_student_name']) && empty($this->params['form']['include_student_email'])) {
                 $this->Session->setFlash("Please select at least one field to export.");
                 $this->redirect('');
             }
