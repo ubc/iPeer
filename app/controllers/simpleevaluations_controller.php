@@ -288,13 +288,13 @@ class SimpleevaluationsController extends AppController
         if ($layout != '') {
             $this->layout = $layout;
         }
-
+        $this->set('title_for_layout', __('Simple Evaluations > Add Template', true));
         if (!empty($this->data)) {
             if ($this->__processForm()) {
                 $this->Session->setFlash(__("The evaluation was added successfully.", true), 'good');
                 $this->redirect('index');
             } else {
-                $this->Session->setFlash($this->SimpleEvaluation->errorMessage);
+                $this->Session->setFlash(__("The evaluation was not added successfully.", true));
                 $this->set('data', $this->data);
             }
         }
@@ -406,6 +406,8 @@ class SimpleevaluationsController extends AppController
             //converting nl2br back so it looks better
             $this->Output->br2nl($this->data);
         }
+        
+        $this->set('title_for_layout', __('Simple Evaluations > Edit Template', true));
     }
 
     /**

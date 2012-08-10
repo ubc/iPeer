@@ -28,4 +28,12 @@ class SimpleEvaluation extends EvaluationBase
             'finderSql'   => ''
         ),
     );
+    
+    var $validate = array(
+        'availability' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Please select an availability option'
+        )
+    );
+
 }
