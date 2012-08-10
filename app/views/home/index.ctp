@@ -57,7 +57,11 @@ if (isset($course_list['I']))
     $courseid = $course['Course']['id'];
     $coursename = $course['Course']['course'];
     echo "<div class='course'>";
-    echo "<h3>$coursename</h3>";
+    $image = $html->image("icons/home.gif", array('alt' => "$coursename home"));
+    $link = "/courses/home/$courseid";
+    echo "<h3>";
+    echo $html->link($coursename, $link, array('escape' => false));
+    echo "</h3>";
     echo "<h4>Instructors: ";
     echo $this->element(
       'list/unordered_list_users',
