@@ -13,6 +13,20 @@ class Penalty extends AppModel
 
     public $name = 'Penalty';
     
+    public $validate = array(
+        'days_late' => array(
+            'notEmpty' => array(
+                'rule' => 'notEmpty',
+                'message' => 'Please enter a value for number of days late',
+                'allowEmpty' => false
+            ),
+            'numeric' => array(
+                'rule' => 'numeric',
+                'message' => 'Please enter a numerical value'
+            )
+        )
+    );
+    
     public $belongsTo = array('Event');
 
     /**
