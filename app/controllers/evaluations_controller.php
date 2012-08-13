@@ -463,7 +463,7 @@ class EvaluationsController extends AppController
             $simpleEvaluation = $this->SimpleEvaluation->find('id='.$event['Event']['template_id']);
             $remaining = $simpleEvaluation['SimpleEvaluation']['point_per_member'] * $numMembers;
             //          if ($in['points']) $out['points']=$in['points']; //saves previous points
-            $points_to_ratio = $numMembers==0 ? 0 : 1 / ($simpleEvaluation['SimpleEvaluation']['point_per_member'] * $numMembers);
+            //$points_to_ratio = $numMembers==0 ? 0 : 1 / ($simpleEvaluation['SimpleEvaluation']['point_per_member'] * $numMembers);
             //          if ($in['comments']) $out['comments']=$in['comments'];
 
             $this->set('remaining', $remaining);
@@ -482,7 +482,6 @@ class EvaluationsController extends AppController
 
             //Get simple evaluation tool
             $this->SimpleEvaluation->id = $event['Event']['template_id'];
-            $seval = $this->SimpleEvaluation->read();
 
             //Get the target group event
             $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
@@ -713,9 +712,7 @@ class EvaluationsController extends AppController
             $eventId = $this->params['form']['event_id'];
             $groupId = $this->params['form']['group_id'];
 
-            $groupEventId = $this->GroupEvent->getGroupEventByEventIdAndGroupId($eventId, $groupId);
             $courseId = $this->params['form']['course_id'];
-            $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
             if (!$this->validRubricEvalComplete($this->params['form'])) {
                 $this->Session->setFlash(__('validRubricEvalCompleten failure', true));
                 $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
@@ -763,7 +760,6 @@ class EvaluationsController extends AppController
 
         $eventId = $this->params['form']['event_id'];
         $groupId = $this->params['form']['group_id'];
-        $courseId = $this->params['form']['course_id'];
         $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
         $evaluateeCount = $this->params['form']['evaluateeCount'];
 
@@ -878,9 +874,7 @@ class EvaluationsController extends AppController
         } else {
             $eventId = $this->params['form']['event_id'];
             $groupId = $this->params['form']['group_id'];
-            $groupEventId = $this->params['form']['group_event_id'];
             $courseId = $this->params['form']['course_id'];
-            $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
             if (!$this->validMixevalEvalComplete($this->params['form'])) {
                 $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
             }
@@ -926,7 +920,6 @@ class EvaluationsController extends AppController
 
         $eventId = $this->params['form']['event_id'];
         $groupId = $this->params['form']['group_id'];
-        $courseId = $this->params['form']['course_id'];
         $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
         $evaluateeCount = $this->params['form']['evaluateeCount'];
 
@@ -1232,7 +1225,6 @@ class EvaluationsController extends AppController
             }
             //Get the target event
             $event = $this->Event->formatEventObj($eventId, $groupId);
-            $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($event['Event']['id'], $event['group_id']);
         }
 
         //Setup current user Info
@@ -1244,7 +1236,6 @@ class EvaluationsController extends AppController
         //Setup the courseId to session
         $this->Session->delete('ipeerSession.courseId');
         $this->Session->write('ipeerSession.courseId', $event['Event']['course_id']);
-        $courseId = $this->Session->read('ipeerSession.courseId');
         $this->set('title_for_layout', $course.' > '.$event['Event']['title'].__(' > View My Results ', true));
 
         //Get Group Event
@@ -1363,7 +1354,6 @@ class EvaluationsController extends AppController
         $groupId =  $this->params['form']['group_id'];
         $groupEventId = $this->params['form']['group_event_id'];
         $reviewStatus = isset($this->params['form']['mark_reviewed'])? "mark_reviewed" : "mark_not_reviewed";
-        $courseId = $this->Session->read('ipeerSession.courseId');
 
         //Get the target event
         $this->Event->id = $eventId;
@@ -1842,7 +1832,6 @@ class EvaluationsController extends AppController
     {
         $this->autoRender=false;
         $this->autoLayout=false;
-        $courseId=$this->Session->read('ipeerSession.courseId');
         $questions= $this->RubricsCriteria->find('all', array('conditions' => array('rubric_id' => $rubicEvalId), 'fields' => array("id", "criteria")));
         $numberOfCriteria = count($questions);
 
@@ -1850,10 +1839,6 @@ class EvaluationsController extends AppController
             'group_id <>' => 0),
         'fields' => array('group_id'),
         'order' => 'group_id ASC'));//, null, null,false);
-
-        foreach ($questions as $key => $array) {
-            $questionsArray[$array['RubricsCriteria']['id']]=$array['RubricsCriteria']['criteria'];
-        }
 
         foreach ($groups as $key => $array) {
             $groupsArray[]=$array['GroupEvent']['group_id'];
@@ -1908,12 +1893,12 @@ class EvaluationsController extends AppController
                 'order' => array('EvaluationRubric.evaluator' => 'ASC', 'EvaluationRubric.evaluatee' => 'ASC')
             ));
             $evalutorToEvaluatees=array();
-            foreach ($result as $resultKey => $resultArray) {
+            foreach ($result as $resultArray) {
                 if (!isset($evalutorToEvaluatees[$resultArray['evaluation_rubrics']['evaluator']])) {
                     $evalutorToEvaluatees[$resultArray['evaluation_rubrics']['evaluator']]=array();
                 }
 
-                foreach ($resultArray as $rubricEvalKey => $rubricEvalValue) {
+                foreach ($resultArray as $rubricEvalValue) {
                     for ($i=1; $i<=$numberOfCriteria; $i++) {
                         $evalutorToEvaluatees[$rubricEvalValue['evaluator']]['evaluatee'][$rubricEvalValue['evaluatee']]['grade'][$i]=$this->EvaluationRubricDetail->field('grade', array('evaluation_rubric_id' => $rubricEvalValue['id'], 'criteria_number' => $i));
 
@@ -1930,7 +1915,7 @@ class EvaluationsController extends AppController
         $evalutorToEvaluateesArray=array();
         foreach ($evalutorToEvaluateesByGroup as $groupIndex => $groupData) {
             foreach ($groupData as $evaluatorId => $evaluateeList) {
-                foreach ($evaluateeList as $evaluateeId => $evalDetails) {
+                foreach ($evaluateeList as $evalDetails) {
                     foreach ($evalDetails as $key => $value) {
                         $evalutorToEvaluateesArray[$evaluatorId][$key]=$value;
                     }
@@ -1950,7 +1935,6 @@ class EvaluationsController extends AppController
                     }
                     echo "<h2>Question $questionIndex Group ".($groupIndex+1)."($optionsIndex)</h2>";
                     echo "<table border=1>";
-                    $numberOfGroupMembers=count($groupMembersArrayComplete[$groupIndex]);
                     //row
                     for ($rowIndex=0; $rowIndex<count($evaluators)+1; $rowIndex++) {
                         echo "<tr>";
@@ -2048,7 +2032,6 @@ class EvaluationsController extends AppController
 
         //step 5 Get Rubric title
         $rubric_id=$this->Event->field('template_id', "id=$eventId");
-        $rubric_title=$this->Rubric->field("name", "id=$rubric_id");
         //step 6 Get Rubric criteria
         //$rubric_criteria=$this->RubricsCriteria->generateList("rubric_id=$rubric_id", "rubric_id asc", null, "{n}.RubricsCriteria.criteria_num", "{n}.RubricsCriteria.criteria");
         $rubric_criteria = $this->RubricsCriteria->find("list", array('conditions' => 'rubric_id = '.$rubric_id,
@@ -2077,7 +2060,7 @@ class EvaluationsController extends AppController
             array_push($line, $group_number);
             $score_total=0;
             //bad coding style
-            foreach ($value['User'] as $key_2 => $value_2) {
+            foreach ($value['User'] as $value_2) {
                 array_push($line, $value_2);
             }
             $general_comments='';
@@ -2097,9 +2080,9 @@ class EvaluationsController extends AppController
             array_push($line, $general_comments);
             array_push($line, $score_total);
             $specific_commens='';
-            foreach ($evaluateesToEvaluators[$value['User']['student_no']] as $index => $value) {
+            foreach ($evaluateesToEvaluators[$value['User']['student_no']] as $value) {
                 //bad coding style
-                foreach ($evaluation_rubric_specific_data[$value] as $index_2 => $array_2) {
+                foreach ($evaluation_rubric_specific_data[$value] as $array_2) {
                     $specific_commens=$specific_commens.''.$array_2['EvaluationRubricDetail']['criteria_comment'].';';
                 }
             }
