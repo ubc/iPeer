@@ -379,7 +379,7 @@ class EmailerController extends AppController
         }
         
         // creator's id must be in the array of accessible user ids
-        if (!(in_array($eval['EmailSchedule']['creator_id'], $instructorIds))) {
+        if (!(in_array($email['EmailSchedule']['creator_id'], $instructorIds))) {
             $this->Session->setFlash(__('Error: You do not have permission to cancel this email schedule', true));
             $this->redirect('index');
         }
@@ -445,7 +445,7 @@ class EmailerController extends AppController
         }
         
         // creator's id must be in the array of accessible user ids
-        if (!(in_array($eval['EmailSchedule']['creator_id'], $instructorIds))) {
+        if (!(in_array($email['EmailSchedule']['creator_id'], $instructorIds))) {
             $this->Session->setFlash(__('Error: You do not have permission to view this email schedule', true));
             $this->redirect('index');
         }

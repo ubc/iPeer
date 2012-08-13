@@ -299,7 +299,7 @@ class User extends AppModel
      * @access public
      * @return students enrolled in a course
      * */
-    function getEnrolledStudents($course_id, $fields = array(), $conditions = null)
+    function getEnrolledStudents($course_id, $conditions = null)
     {
         return $this->find('all', array('conditions' => array('Enrolment.id' => $course_id),
             'fields' => 'User.*',
@@ -455,8 +455,6 @@ class User extends AppModel
 
         $params['contain'] = array('Role');
         $params['conditions']['Role.name'] = 'instructor';
-
-        $ret = array();
 
         if ('list' == $type) {
             // list doesn't auto join tables as the recursive is set to -1.
@@ -854,7 +852,7 @@ class User extends AppModel
      * */
     protected function requiredWith($check, $with)
     {
-        foreach ($check as $key => $val) {
+        foreach ($check as $val) {
             if ($val && empty($this->data[$this->name][$with])) {
                 return false;
             }

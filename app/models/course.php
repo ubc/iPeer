@@ -236,7 +236,7 @@ class Course extends AppModel
         //delete self
         if ($this->delete($id)) {
             //delete user course,user enrol handled by hasMany
-            $events = $this->Event->find('all', array('conditions' => array('course_id' => $id)));
+            //$events = $this->Event->find('all', array('conditions' => array('course_id' => $id)));
             $this->Event->deleteAll(array('course_id' => $id));
         }
     }

@@ -555,7 +555,7 @@ class MixevalsController extends AppController
         }
         
         // for checking the user's role
-        $user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
+        //$user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
         // retrieving the requested mixed evaluation
         $eval = $this->Mixeval->find(
             'first', 

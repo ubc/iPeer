@@ -401,7 +401,7 @@ class SurveysController extends AppController
             'contain' => array('Event')));
         if (!empty($this->data)) {
             //alter dates for the event
-            //TODO: separte date from survey
+            //TODO: separate date from survey
             $data['Survey'] = $this->data['Survey'];
             $data['Event'][0]['title'] = $this->data['Survey']['name'];
             $data['Event'][0]['course_id'] = $this->data['Survey']['course_id'];
@@ -409,7 +409,7 @@ class SurveysController extends AppController
             $data['Event'][0]['release_date_begin'] = $this->data['Survey']['release_date_begin'];
             $data['Event'][0]['release_date_end'] = $this->data['Survey']['release_date_end'];
 
-            if ($result = $this->Survey->save($data)) {
+            if ($this->Survey->save($data)) {
                 $this->Session->setFlash(__('The Survey was edited successfully.', true), 'good');
                 $this->redirect('index');
             } else {

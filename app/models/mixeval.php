@@ -66,9 +66,9 @@ class Mixeval extends EvaluationBase
      * @access public
      * @return boolean
      */
-    function saveAllWithDescription($data)
+    /*function saveAllWithDescription($data)
     {
-    }
+    }*/
 
     //sets the current userid and merges the form values into the data array
     /*function prepData($tmp=null, $userid)

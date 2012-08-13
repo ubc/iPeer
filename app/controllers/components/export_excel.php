@@ -460,7 +460,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         }
         // Calculate question average
         $xPosition++; $finalMark = 0;
-        $submissionCount = $this->EvaluationSubmission->countSubmissions($grpEventId);
+
         foreach ($questionTotalMarkArray as $questionTotal) {
             $countEvaluators > 0 ? $questionAverage = number_format($questionTotal/$countEvaluators, 2) :
                 $questionAverage = number_format(0, 2);
@@ -522,7 +522,6 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $this->Event = ClassRegistry::init('Event');
 
-        $groupMembers = $this->ExportHelper2->getGroupMemberHelper($grpEventId);
         $groupMembersNoTutors = $this->ExportHelper2->getGroupMemberWithoutTutorsHelper($grpEventId);
         $groupCount = count($groupMembersNoTutors);
         $grpEvent = $this->GroupEvent->getGrpEvent($grpEventId);
@@ -540,8 +539,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         $grid = $this->ExportHelper2->buildExporterGrid($gridDimensionX, $gridDimensionY);
         // Fill in the questions
         $questionNum = 1; $questionYPos = 2; $xPosition = 2;
-        $submissionCount = $this->EvaluationSubmission->countSubmissions($grpEventId);
-        // if someone didn't submit - not everyone has the same number of evaluators
+        
         foreach ($questions as $q) {
             $this->ExportHelper2->repeatDrawByCoordinateVertical($grid, $xPosition, $questionYPos, $sectionSpacing, $groupCount,
                 "Question ".$questionNum.": ".$q['MixevalsQuestion']['title']);

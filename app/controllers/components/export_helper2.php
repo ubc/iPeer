@@ -298,7 +298,6 @@ class ExportHelper2Component extends Object
      */
     function formatEvaluatorsHeaderArray($evaluators)
     {
-        $first_name = array(); $last_name = array(); $student_no = array();
         $headerArray['name'] = array();
         $headerArray['last_name'] = array();
         $headerArray['first_name'] = array();
@@ -339,7 +338,8 @@ class ExportHelper2Component extends Object
             $sectionSize++;
             $i++;
         }
-        $evaluatorRow = 2; $evaluateeRow = 0; $emailRow = 5;
+        $evaluatorRow = 2; //$evaluateeRow = 0;
+        $emailRow = 5;
         if (empty($params['include_student_name'])) {
             $this->repeatDrawByCoordinateVertical($grid, 0, 1, $sectionSize, $groupMemberCount, '');
             $this->repeatDrawByCoordinateVertical($grid, 0, 2, $sectionSize, $groupMemberCount, '');
@@ -392,12 +392,12 @@ class ExportHelper2Component extends Object
      * createGroupMemberArrayBlock
      *
      * @param mixed $groupMembers group members
-     * @param mixed $parms        parms
+     * @param mixed $params        params
      *
      * @access public
      * @return void
      */
-    function createGroupMemberArrayBlock($groupMembers, $parms)
+    function createGroupMemberArrayBlock($groupMembers, $params)
     {
         $memberCount = count($groupMembers);
         $grpMemberBlock = array_fill(0, $memberCount, array());

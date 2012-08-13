@@ -48,7 +48,6 @@ class RubricsCriteriaComment extends AppModel
      */
     function getCriteriaComment($rubric = null)
     {
-        $id = $rubric['Rubric']['id'];
         $criteria = $rubric['RubricsCriteria'];
         $lom = $rubric['RubricsLom'];
         $tmp = null;

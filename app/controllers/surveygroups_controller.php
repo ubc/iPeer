@@ -518,8 +518,8 @@ class SurveyGroupsController extends AppController
         }
 
         $inputs = array();
-        foreach ($group_set['SurveyGroup'] as $i => $survey_group) {
-            foreach ($survey_group['Member'] as $j => $surveyGroupMember) {
+        foreach ($group_set['SurveyGroup'] as $survey_group) {
+            foreach ($survey_group['Member'] as $surveyGroupMember) {
                 //if question selected, add responses to data
                 if ($question_id != null) {
                     $surveyInput = $this->SurveyInput->getAllSurveyInputBySurveyIdUserIdQuestionId($group_set['Survey']['id'], $surveyGroupMember['id'], $question_id);

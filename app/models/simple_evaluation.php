@@ -29,7 +29,7 @@ class SimpleEvaluation extends EvaluationBase
         ),
     );
     
-    var $validate = array(
+    public $validate = array(
         'availability' => array(
             'rule' => 'notEmpty',
             'message' => 'Please select an availability option'

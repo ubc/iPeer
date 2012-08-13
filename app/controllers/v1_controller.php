@@ -316,7 +316,6 @@ class V1Controller extends Controller {
      * Get a list of grades in iPeer.
      **/
     public function grades() {
-        $course_id = $this->params['course_id'];
         $event_id = $this->params['event_id'];
         $user_id = $this->params['user_id'];
 

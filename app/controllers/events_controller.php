@@ -351,8 +351,6 @@ class EventsController extends AppController
         $eventTemplates = array();
         $templateId = $event['Event']['event_template_type_id'];
         if (!empty($templateId)) {
-            $eventTemplateType = $this->EventTemplateType->find('id = '.$templateId);
-
             if ($templateId == 1) {
                 $default = 'Default Simple Evaluation';
                 $model = 'SimpleEvaluation';
@@ -403,8 +401,6 @@ class EventsController extends AppController
         $default = null;
         $model = '';
         if (!empty($templateId)) {
-            $eventTemplateType = $this->EventTemplateType->find('id = '.$templateId);
-
             if ($templateId == 1) {
                 $default = 'Default Simple Evaluation';
                 $model = 'SimpleEvaluation';
@@ -654,7 +650,7 @@ class EventsController extends AppController
         }
         
         // Check whether the event exists
-        if (!($event = $this->Event->getEventByid($id))) {
+        if (!($this->Event->getEventByid($id))) {
             $this->Session->setFlash(__('Error: That event does not exist.', true));
             $this->redirect('index');
         }
@@ -771,8 +767,6 @@ class EventsController extends AppController
         if (isset($popup) && $popup == 'y') {
             $this->layout = 'pop_up';
         }
-
-        $courseId = $this->Session->read('ipeerSession.courseId');
 
         //Clear $id to only the alphanumeric value
         $id = $this->Sanitize->paranoid($groupId);

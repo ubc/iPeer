@@ -250,7 +250,7 @@ class UsersController extends AppController
         
         // check whether the course exists
         $class = $this->Course->find('first', array('conditions' => array('Course.id' => $course)));
-        if (empty($course)) {
+        if (empty($class)) {
             $this->Session->setFlash(__('Error: That course does not exist', true));
             $this->redirect('index');
         }

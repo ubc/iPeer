@@ -290,7 +290,6 @@ class Event extends AppModel
         ));
         if (!empty($ems)) {
             foreach ($ems as $em) {
-                //$emds = $evaluation_mixeval_detail->find('all', 'evaluation_mixeval_id = '.$em->id);
                 $emds = $evaluation_mixeval_detail->find('all', array(
                     'conditions' => array('evaluation_mixeval_id' => $em->id)
                 ));

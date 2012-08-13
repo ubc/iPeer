@@ -229,7 +229,7 @@ class AjaxListComponent extends Object
         $page = $state->pageShown;
 
         // Start with no tables, and noconditions
-        $tables = "";
+        //$tables = "";  //unused
         $conditions = $this->conditions;
 
         // Add the main table
@@ -249,7 +249,7 @@ class AjaxListComponent extends Object
             foreach ($state->joinFilterSelections as $filter => $value) {
                 // Find the joinFilter object relating to this one
                 $joinFilter = null;
-                foreach ($this->joinFilters as $index => $thisJoinFilter) {
+                foreach ($this->joinFilters as $thisJoinFilter) {
                     if ($thisJoinFilter['id'] == $filter) {
                         $joinFilter = $thisJoinFilter;
                         break;

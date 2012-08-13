@@ -369,7 +369,7 @@ class ExportComponent extends Object
                         $content .= 'OK,';
                     }
                 }
-                $content .= empty($params['form']['include_group_names']) ? '':$group['group_name'].",";$stuff=true;
+                $content .= empty($params['form']['include_group_names']) ? '':$group['group_name'].",";
                 $content .= empty($params['form']['include_student_first']) ? '':"\"".$student['first_name']."\",";
                 $content .= empty($params['form']['include_student_last']) ? '':"\"".$student['last_name']."\",";
                 $content .= empty($params['form']['include_student_id']) ? '':$student['student_id'].",";

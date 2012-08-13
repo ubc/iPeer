@@ -39,7 +39,7 @@ class MixevalsQuestionDesc extends AppModel
                     }
                 }
 
-                foreach ($descriptors as $index => $value) {
+                foreach ($descriptors as $value) {
                     $desc = $value;
                     //$desc['mixeval_id'] = $id;
                     $desc['question_id'] = $q_id;

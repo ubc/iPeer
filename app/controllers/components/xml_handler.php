@@ -56,8 +56,7 @@ class XmlHandlerComponent extends Object
                 $question->$appendChildFunc($element_weight);
             }
         }
-        $userData = $survey['Course']['Enrol'];//$this->User->getEnrolledStudents($courseId, $fields=null);
-        //	print_r($userData);
+        $userData = $survey['Course']['Enrol'];
         foreach ($userData as $user) {
             //students
             $student = $doc->$createElementFunc('student');
@@ -131,7 +130,7 @@ class XmlHandlerComponent extends Object
      * @access public
      * @return void
      */
-    function makeTMXml4($survey, $numGroups, $weight)
+    /*function makeTMXml4($survey, $numGroups, $weight)
     {
         $this->SurveyInput = new SurveyInput;
         $this->Response = new Response;
@@ -158,7 +157,7 @@ class XmlHandlerComponent extends Object
             }
         }
         $courseId = $this->Session->read('ipeerSession.courseId');
-        $userData = $this->User->getEnrolledStudents($courseId, $fields);
+        $userData = $this->User->getEnrolledStudents($courseId);
         //	print_r($userData);
         foreach ($userData as $user) {
             //students
@@ -216,7 +215,7 @@ class XmlHandlerComponent extends Object
             }
         }
         return $doc->dump_mem(true);
-    }
+    }*/
 
 
     /**
@@ -229,7 +228,7 @@ class XmlHandlerComponent extends Object
      * @access public
      * @return void
      */
-    function makeTMXml5($survey, $numGroups, $weight)
+    /*function makeTMXml5($survey, $numGroups, $weight)
     {
         $this->SurveyInput = new SurveyInput;
         $this->Response = new Response;
@@ -256,7 +255,7 @@ class XmlHandlerComponent extends Object
             }
         }
         $courseId = $this->Session->read('ipeerSession.courseId');
-        $userData = $this->User->getEnrolledStudents($courseId, $fields);
+        $userData = $this->User->getEnrolledStudents($courseId);
         //	print_r($userData);
         foreach ($userData as $user) {
             //students
@@ -316,7 +315,7 @@ class XmlHandlerComponent extends Object
             }
         }
         return $doc->saveXML();
-    }
+    }*/
 
 
     /**
