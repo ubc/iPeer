@@ -64,10 +64,18 @@
         
         <!-- Template Availability -->
         <tr class="tablecell2">
+            <td><?php __('Availability')?></td>
             <?php echo $this->Form->input('availability', array(
+                        'id' => 'availability',
                         'type' => 'radio',
-                        'options' => array('public' => 'Public', 'private' => 'Private'),
-                        'readonly' => $readonly
+                        'legend' => false,
+                        'options' => array('public' => __('Public', true), 'private' => __('Private', true)),
+                        'label' => false,
+                        'before' => '<td>',
+                        'after' => '</td>',
+                        'between' => '',
+                        'separator' => '&nbsp;',
+                        'disabled' => $readonly
                     )
                 )
             ?>

@@ -60,7 +60,7 @@
     	  <?php endforeach; ?>
         <?php if ($i == 0) :?>
       	<tr class="tablecell" align="center">
-      	    <td colspan="4"><?php __('Record Not Found')?></td>
+      	    <td colspan="5"><?php __('Record Not Found')?></td>
         </tr>
         <?php endif;?>
     	  </table>
