@@ -42,7 +42,7 @@
     <?php }?>
     
     <tr class="tablecell2">
-      <td colspan="3"><hr align=left width=100%><h3><?php __('Change Password')?>:</h3></td>
+      <td colspan="4"><hr align=left width=100%><h3><?php __('Change Password')?>:</h3></td>
     </tr>
     <tr class="tablecell2">
       <?php echo $this->Form->input('old_password', array('type'=>'password', 'size'=>'50', 'class'=>'validate none PASSWORD_FORMAT pw_msg0 Must_be_6+_characters,_alphanumeric.', 'label'=>__('Old Password:', true), 'disabled'=>$viewPage)) ?>
@@ -56,11 +56,40 @@
       <?php echo $this->Form->input('confirm_password', array('type'=>'password', 'size'=>'50', 'class'=>'validate none PASSWORD_FORMAT pw_msg2 Must_be_6+_characters,_alphanumeric.', 'label'=>__('Confirm New Password:', true), 'disabled'=>$viewPage)) ?>
       <td id="pw_msg2" class="error"/>
     </tr>
-
-    <tr class="tablecell2">
-      <td colspan="3" align="center">
-      <?php if ($viewPage==false): echo $this->Form->submit(__('Save', true));
-        endif; ?></td>
-    </tr>
   </table>
+    <div class="oauth">
+    <!-- OAuth Client Credentials -->
+    <hr align=left width=95%>
+    <h3><?php __('OAuth Client Credentials')?>:</h3>
+    <?php if (count($clients) == 0 || User::hasPermission('controllers/oauthclients')) { ?>
+        <?php echo $html->image('icons/add.gif', array('alt'=>__('Add Client Credential', true))); ?>&nbsp;<?php echo $html->link(__('Add Client Credential', true), '/oauth_clients/add', array('id' => 'add')); ?>
+    <? } ?>
+    <?php if (count($clients) > 0) { ?>
+        <?php foreach ($clients as $key => $client) { ?>
+            <p><label id=key><?php echo __('Key').': '.$client['OauthClient']['key'];?></label>
+            <label id=secret><?php echo __('Secret').': '.$client['OauthClient']['secret'];?></label>
+            <?php echo $this->Form->select('OauthClient.'.$key.'.enabled', $enabled, $client['OauthClient']['enabled'], array('empty' => false)); ?>
+            <?php echo $this->Form->input('OauthClient.'.$key.'.id', array('value' => $client['OauthClient']['id'])); ?>
+            <?php echo $html->link('X', '/oauth_clients/delete/'.$client['OauthClient']['id'], array('id' => 'delete')); ?></p>
+            <label id=comment><?php echo __('Comment').': '.$client['OauthClient']['comment'];?></label>
+        <?php } ?>
+    <?php } ?>
+    <!-- OAuth Token Credentials -->
+    <hr align=left width=95%>
+    <h3><?php __('OAuth Token Credentials')?>:</h3>
+    <?php echo $html->image('icons/add.gif', array('alt'=>__('Add Token Credential', true), 'valign'=>'middle')); ?>&nbsp;<?php echo $html->link(__('Add Token Credential', true), '/oauth_tokens/add', array('id' => 'add')); ?>
+    <?php if (count($tokens) > 0) { ?>
+            <p><?php foreach ($tokens as $index => $token) { ?>
+            <label id=key><?php echo _('Key').': '.$token['OauthToken']['key'];?></label>
+            <label id=secret><?php echo _('Secret').': '.$token['OauthToken']['secret'];?></label>
+            <?php echo _('Expires').': '.date('M j, Y', strtotime($token['OauthToken']['expires']));?>
+            <?php echo $this->Form->select('OauthToken.'.$index.'.enabled', $enabled, $token['OauthToken']['enabled'], array('empty' => false)); ?>
+            <?php echo $this->Form->input('OauthToken.'.$index.'.id', array('value' => $token['OauthToken']['id'])); ?>
+            <?php echo $html->link('X', '/oauth_tokens/delete/'.$token['OauthToken']['id'], array('id' => 'delete')); ?></p>
+        <?php } ?>
+    <?php } ?>
+    </div>
+    <br>
+    <?php if ($viewPage==false): echo $this->Form->submit(__('Save', true));
+        endif; ?>
 <?php $this->Form->end();?>

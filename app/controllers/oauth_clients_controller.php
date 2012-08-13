@@ -5,6 +5,9 @@ class OauthClientsController extends AppController {
     public $components = array('PasswordGenerator');
 
     public function index() {
+        if (!User::hasPermission('controllers/oauthclients')) {
+            $this->redirect('/users/editProfile');
+        }
         $this->set('title_for_layout', 'OAuth Client Credentials');
         $clientCreds = array();
         $allClients = $this->OauthClient->find('all');
@@ -25,11 +28,14 @@ class OauthClientsController extends AppController {
         $this->set('title_for_layout', 'Create New OAuth Client Credential');
 
         if (!empty($this->data)) {
-            debug($this->data);
             $this->OauthClient->create();
             if ($this->OauthClient->save($this->data)) {
                 $this->Session->setFlash(__('A new OAuth client has been created', true), 'good');
-                $this->redirect(array('action' => 'index'));
+                if (User::hasPermission('controllers/oauthclients')) {
+                    $this->redirect(array('action' => 'index'));
+                } else {
+                    $this->redirect('/users/editProfile');
+                }
             } else {
                 $this->Session->setFlash(__('The OAuth client could not be saved. Please, try again.', true));
             }
@@ -43,6 +49,20 @@ class OauthClientsController extends AppController {
             $this->data['OauthClient']['secret'] = 
                 $this->PasswordGenerator->generate();
         }
+        if (!User::hasPermission('controllers/oauthclients')) {
+            $this->set('hideUser', true);
+            $clients = $this->OauthClient->find(
+                'count', 
+                array(
+                    'conditions' => array('OauthClient.user_id' => $this->Auth->user('id'))
+                )
+            );
+            // only super admins can create more than one client credential for a user
+            if ($clients > 0) {
+                $this->Session->setFlash(__('Error: You do not have permission to create more than one OAuth Client Credential', true));
+                $this->redirect('/users/editProfile');
+            }
+        }
         $users = $this->OauthClient->User->find('list',
             array('fields' => array('User.username')));
         $this->set(compact('users'));
@@ -54,6 +74,9 @@ class OauthClientsController extends AppController {
             $this->Session->setFlash(__('Invalid OAuth client', true));
             $this->redirect(array('action' => 'index'));
         }
+        if (!User::hasPermission('controllers/oauthclients')) {
+            $this->redirect('/users/editProfile');
+        }
         if (!empty($this->data)) {
             if ($this->OauthClient->save($this->data)) {
                 $this->Session->setFlash(__('The OAuth client has been saved', true), 'good');
@@ -64,6 +87,9 @@ class OauthClientsController extends AppController {
         }
         else if (empty($this->data)) {
             $this->data = $this->OauthClient->read(null, $id);
+            if (empty($this->data)) {
+                $this->redirect('index');
+            }
         }
         $users = $this->OauthClient->User->find('list',
             array('fields' => array('User.username')));
@@ -71,15 +97,17 @@ class OauthClientsController extends AppController {
     }
 
     public function delete($id = null) {
-        if (!$id) {
+        $client = $this->OauthClient->find('first', array('conditions' => array('OauthClient.id' => $id)));
+        if (empty($client)) {
             $this->Session->setFlash(__('Invalid id for OAuth client', true));
-            $this->redirect(array('action'=>'index'));
-        }
-        if ($this->OauthClient->delete($id)) {
+        } else if ($client['OauthClient']['user_id'] != $this->Auth->user('id') &&
+            !User::hasPermission('controllers/oauthclients')) {
+            $this->Session->setFlash(__('Invalid id for OAuth client', true));
+        } else if ($this->OauthClient->delete($id)) {
             $this->Session->setFlash(__('OAuth client deleted', true), 'good');
-            $this->redirect(array('action'=>'index'));
+        } else {
+            $this->Session->setFlash(__('OAuth client was not deleted', true));
         }
-        $this->Session->setFlash(__('OAuth client was not deleted', true));
-        $this->redirect(array('action' => 'index'));
+        $this->redirect($this->referer());
     }
 }

@@ -17,7 +17,7 @@ class UsersController extends AppController
     public $NeatString;
     public $uses = array('User', 'UserEnrol', 'Personalize', 'Course', 
         'SysParameter', 'SysFunction', 'Role', 'Group', 'UserFaculty',
-        'Department', 'CourseDepartment'
+        'Department', 'CourseDepartment', 'OauthClient', 'OauthToken'
     );
     public $components = array('Session', 'AjaxList', 'RequestHandler',
         'Email', 'FileUpload.FileUpload', 'PasswordGenerator');
@@ -307,7 +307,6 @@ class UsersController extends AppController
             //Save Data
             if ($this->data = $this->User->save($this->data)) {
                 $this->data['User']['id'] = $this->User->id;
-                return true;
             } else {
                 $validationErrors = $this->User->invalidFields();
                 $errorMsg = '';
@@ -315,11 +314,25 @@ class UsersController extends AppController
                     $errorMsg = $errorMsg."\n".$error;
                 }
                 $this->Session->setFlash(__('Failed to save.</br>', true).$errorMsg);
-
+                return false;
+            }
+            
+            if (isset($this->data['OauthClient'])) {
+                if (!($client = $this->OauthClient->saveAll($this->data['OauthClient']))) {
+                    $this->Session->setFlash(__('Failed to save.</br>', true).$errorMsg);
+                    return false;
+                }
+            }
+            
+            if (isset($this->data['OauthToken'])) {
+                if (!($token = $this->OauthToken->saveAll($this->data['OauthToken']))) {
+                    $this->Session->setFlash(__('Failed to save.</br>', true).$errorMsg);
+                    return false;
+                }
             }
         }
 
-        return false;
+        return true;
     }
 
 
@@ -646,23 +659,25 @@ class UsersController extends AppController
         } else {
             // Check whether the course exists
             $course = $this->Course->find('first', array('conditions' => array('id' => $courseId), 'recursive' => 1));
-            if (empty($course)) {
-                $this->Session->setFlash(__('Error: That course does not exist.', true));
-                $this->redirect('index');
-            }
-            
-            // check whether the user has access to the course
-            // instructors
-            if (!User::hasPermission('controllers/departments')) {
-                $courses = User::getMyCourseList();
-            // admins & super admins
-            } else {
-                $courses = User::getMyDepartmentsCourseList('list');
-            }
-    
-            if (!in_array($courseId, array_keys($courses))) {
-                $this->Session->setFlash(__('Error: You do not have permission to add users to this course', true));
-                $this->redirect('index');
+            if (!is_null($courseId)) {
+                if (empty($course)) {
+                    $this->Session->setFlash(__('Error: That course does not exist.', true));
+                    $this->redirect('index');
+                }
+                
+                // check whether the user has access to the course
+                // instructors
+                if (!User::hasPermission('controllers/departments')) {
+                    $courses = User::getMyCourseList();
+                // admins & super admins
+                } else {
+                    $courses = User::getMyDepartmentsCourseList('list');
+                }
+        
+                if (!in_array($courseId, array_keys($courses))) {
+                    $this->Session->setFlash(__('Error: You do not have permission to add users to this course', true));
+                    $this->redirect('index');
+                }
             }
         }
     }
@@ -738,6 +753,7 @@ class UsersController extends AppController
     {
         // No security checks here, since we're editing the logged-in user
         $id = $this->Auth->user('id');
+
         $this->set('viewPage', false);
         if (!empty($this->data)) {
             $this->data['User']['id'] = $id;
@@ -769,8 +785,15 @@ class UsersController extends AppController
         } else {
             $isStudent = false;
         }
+        $oAuthClient = $this->OauthClient->find('all', array('conditions' => array('OauthClient.user_id' => $id)));
+        $oAuthToken = $this->OauthToken->find('all', array('conditions' => array('OauthToken.user_id' => $id)));
+
+        $enabled = array('0' => 'Disabled', '1' => 'Enabled');
         $this->data = $this->User->read(null, $id);
         $this->Output->br2nl($this->data);
+        $this->set('clients', $oAuthClient);
+        $this->set('tokens', $oAuthToken);
+        $this->set('enabled', $enabled);
         $this->set('is_student', $isStudent);
         $this->set('data', $this->data);
         $this->set('title_for_layout', __('Edit Profile', true));

@@ -5,6 +5,9 @@ class OauthTokensController extends AppController {
     public $components = array('PasswordGenerator');
 
     function index() {
+        if (!User::hasPermission('controllers/oauthtokens')) {
+            $this->redirect('/users/editProfile');
+        }
         $this->set('title_for_layout', 'OAuth Token Credentials');
         $tokenCreds = array();
         $allTokens = $this->OauthToken->find('all');
@@ -48,6 +51,9 @@ class OauthTokensController extends AppController {
             $this->data['OauthToken']['secret'] = 
                 $this->PasswordGenerator->generate();
         }
+        if (!User::hasPermission('controllers/oauthtokens')) {
+            $this->set('hideUser', true);
+        }
         $users = $this->OauthToken->User->find('list');
         $this->set(compact('users'));
     }
@@ -57,6 +63,9 @@ class OauthTokensController extends AppController {
         if (!$id && empty($this->data)) {
             $this->Session->setFlash(__('Invalid oauth token', true));
             $this->redirect(array('action' => 'index'));
+        }
+        if (!User::hasPermission('controllers/oauthtokens')) {
+            $this->redirect('/users/editProfile');
         }
         if (!empty($this->data)) {
             if ($this->OauthToken->save($this->data)) {
@@ -68,17 +77,22 @@ class OauthTokensController extends AppController {
         }
         if (empty($this->data)) {
             $this->data = $this->OauthToken->read(null, $id);
+            if (empty($this->data)) {
+                $this->redirect('index');
+            }
         }
         $users = $this->OauthToken->User->find('list');
         $this->set(compact('users'));
     }
 
     function delete($id = null) {
-        if (!$id) {
-            $this->Session->setFlash(__('Invalid id for oauth token', true));
-            $this->redirect(array('action'=>'index'));
-        }
-        if ($this->OauthToken->delete($id)) {
+        $token = $this->OauthToken->find('first', array('conditions' => array('OauthToken.id' => $id)));
+        if (empty($token)) {
+            $this->Session->setFlash(__('Invalid id for OAuth token', true));
+        } else if ($token['OauthToken']['user_id'] != $this->Auth->user('id') &&
+            !User::hasPermission('controllers/oauthtokens')) {
+            $this->Session->setFlash(__('Invalid id for OAuth token', true));
+        } else if ($this->OauthToken->delete($id)) {
             $this->Session->setFlash(__('OAuth token deleted.', true), 'good');
             $this->redirect(array('action'=>'index'));
         }

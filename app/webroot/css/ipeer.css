@@ -469,6 +469,54 @@ i {
     clear: both;
 }
 
+/* edit profile - Oauth section */
+
+.oauth {
+    margin: 0.5em;
+}
+
+.oauth p{
+    padding-bottom: 0em;
+}
+
+.oauth label, .oauth img,
+.oauth #add{
+    display: inline-block;
+}
+
+.oauth #key {
+    width: 12em;
+}
+
+.oauth #secret {
+    margin-left: 2em;
+    width: 20em;
+}
+
+.oauth select {
+    margin-left: 5em;
+}
+
+.oauth #delete {
+    margin-left: 2em;
+}
+
+.oauth #add, .oauth #comment{
+    margin-bottom: 1em;
+}
+
+/* oauthClients add form */
+
+.oauthClients form label {
+    margin-top: 0.25em;
+}
+
+/* oauthTokens add form */
+
+.oauthTokens form label {
+    margin-top: 0.25em;
+}
+
 
 /* POPUP */
 

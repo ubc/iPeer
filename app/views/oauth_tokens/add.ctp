@@ -1,7 +1,11 @@
 <div class="oauthTokens form">
 <?php 
 echo $this->Form->create('OauthToken');
-echo $this->Form->input('user_id');
+if (isset($hideUser)) {
+    echo $this->Form->input('user_id', array('div' => 'hide'));
+} else {
+    echo $this->Form->input('user_id');
+}
 echo $this->Form->input('key');
 echo $this->Form->input('secret');
 echo $this->Form->input('expires');
