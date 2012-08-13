@@ -6,18 +6,19 @@ echo $this->Form->create('Event', array('action' => "edit/$event_id"));
 echo '<input type="hidden" name="required" id="required" value="eventId" />';
 echo $this->Form->input('id');
 echo $this->Form->input('course_id', array('default' => $course_id));
-echo $this->Form->input('title');
+echo $this->Form->input('title', array('label' => 'Event Title'));
 echo $this->Form->input('description', array('type' => 'textarea'));
 echo $this->Form->input('event_template_type_id');
 echo $this->Form->input('SimpleEvaluation',
-    array('div' => array('id' => 'SimpleEvalDiv')));
+    array('div' => array('id' => 'SimpleEvalDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevS', 'target' => '_blank'))));
 echo $this->Form->input('Rubric',
-    array('div' => array('id' => 'RubricDiv')));
+    array('div' => array('id' => 'RubricDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevR', 'target' => '_blank'))));
 echo $this->Form->input('Mixeval',
-    array('div' => array('id' => 'MixevalDiv')));
+    array('div' => array('id' => 'MixevalDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevM', 'target' => '_blank'))));
 echo $this->Form->input(
     'self_eval', 
     array(
+        'legend' => 'Self-Evaluation',
         'type' => 'radio', 
         'options' => array('1' => 'Enabled', '0' => 'Disabled'),
         'default' => '0'
@@ -33,11 +34,11 @@ echo $this->Form->input(
     )
 );
 echo $this->Form->input('due_date', array('type' => 'text'));
-echo $this->Form->input('release_date_begin', array('type' => 'text'));
-echo $this->Form->input('release_date_end', array('type' => 'text'));
-echo $this->Form->input('result_release_date_begin', array('type' => 'text'));
-echo $this->Form->input('result_release_date_end', array('type' => 'text'));
-echo $this->Form->input('Group');
+echo $this->Form->input('release_date_begin', array('label' => 'Evaluation Released From', 'type' => 'text'));
+echo $this->Form->input('release_date_end', array('label' => 'Until', 'type' => 'text'));
+echo $this->Form->input('result_release_date_begin', array('label' => 'Results Released From', 'type' => 'text'));
+echo $this->Form->input('result_release_date_end', array('label' => 'Until', 'type' => 'text'));
+echo $this->Form->input('Group', array('label' => 'Group(s)'));
 
 // No nice way of inserting new penalty entries using CakePHP, doing it
 // manually.
@@ -104,6 +105,10 @@ initDateTime();
 toggleEventTemplate();
 // attach an event handler to deal with changes in event template type
 jQuery("#EventEventTemplateTypeId").change(toggleEventTemplate);
+// attach event handlers to deal with changes in event template selection
+jQuery("#EventSimpleEvaluation").change(updatePreview);
+jQuery("#EventRubric").change(updatePreview);
+jQuery("#EventMixeval").change(updatePreview);
 // keep track of the number of penalties entered.
 var penaltyCount = <?php echo $numPenalties; ?>;
 
@@ -144,16 +149,40 @@ function toggleEventTemplate() {
         jQuery("#SimpleEvalDiv").show();
         jQuery("#RubricDiv").hide();
         jQuery("#MixevalDiv").hide();
+        updatePreview();
     }
     else if (eventType == '2') {
         jQuery("#SimpleEvalDiv").hide();
         jQuery("#RubricDiv").show();
         jQuery("#MixevalDiv").hide();
+        updatePreview();
     }
     else if (eventType == '4') {
         jQuery("#SimpleEvalDiv").hide();
         jQuery("#RubricDiv").hide();
         jQuery("#MixevalDiv").show();
+        updatePreview();
+    }
+}
+
+// update event id for the preview link
+function updatePreview() {
+    var eventType = jQuery("#EventEventTemplateTypeId").val();
+    var url = null;
+    if (eventType == '1') {
+        var eventIdToPrev = jQuery("#EventSimpleEvaluation").val();
+        url = "<?php echo $this->base; ?>/simpleevaluations/view/";
+        prevS.href = url + eventIdToPrev;
+    }
+    else if (eventType == '2') {
+        var eventIdToPrev = jQuery("#EventRubric").val();
+        url = "<?php echo $this->base; ?>/rubrics/view/";
+        prevR.href = url + eventIdToPrev;
+    }
+    else if (eventType == '4') {
+        var eventIdToPrev = jQuery("#EventMixeval").val();
+        url = "<?php echo $this->base; ?>/mixevals/view/";
+        prevM.href = url + eventIdToPrev;
     }
 }
 </script>
