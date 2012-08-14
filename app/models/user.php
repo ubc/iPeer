@@ -293,7 +293,6 @@ class User extends AppModel
      * Get student enrolled in a course
      *
      * @param int   $course_id  course id
-     * @param mixed $fields     fields to return
      * @param mixed $conditions conditions of search
      *
      * @access public

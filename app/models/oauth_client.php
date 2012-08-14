@@ -1,8 +1,17 @@
 <?php
+/**
+ * OauthClient
+ *
+ * @uses AppModel
+ * @package   CTLT.iPeer
+ * @author    Pan Luo <pan.luo@ubc.ca>
+ * @copyright 2012 All rights reserved.
+ * @license   MIT {@link http://www.opensource.org/licenses/MIT}
+ */
 class OauthClient extends AppModel {
-    var $name = 'OauthClient';
-    var $displayField = 'key';
-    var $validate = array(
+    public $name = 'OauthClient';
+    public $displayField = 'key';
+    public $validate = array(
         'key' => array(
             'notempty' => array(
                 'rule' => array('notempty'),
@@ -26,7 +35,7 @@ class OauthClient extends AppModel {
     );
     //The Associations below have been created with all possible keys, those that are not needed can be removed
 
-    var $belongsTo = array(
+    public $belongsTo = array(
         'User' => array(
             'className' => 'User',
             'foreignKey' => 'user_id',

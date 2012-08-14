@@ -1,9 +1,24 @@
 <?php
+/**
+ * OauthTokensController
+ *
+ * @uses AppController
+ * @package   CTLT.iPeer
+ * @author    Pan Luo <pan.luo@ubc.ca>
+ * @copyright 2012 All rights reserved.
+ * @license   MIT {@link http://www.opensource.org/licenses/MIT}
+ */
 class OauthTokensController extends AppController {
 
     public $name = 'OauthTokens';
     public $components = array('PasswordGenerator');
 
+    /**
+     * index
+     *
+     * @access public
+     * @return void
+     */
     function index() {
         if (!User::hasPermission('controllers/oauthtokens')) {
             $this->redirect('/users/editProfile');
@@ -30,6 +45,13 @@ class OauthTokensController extends AppController {
         $this->set('tokenCreds', $tokenCreds);
     }
 
+
+    /**
+     * add
+     *
+     * @access public
+     * @return void
+     */
     function add() {
         $this->set('title_for_layout', 'Create New OAuth Token Credential');
 
@@ -41,8 +63,7 @@ class OauthTokensController extends AppController {
             } else {
                 $this->Session->setFlash(__('The OAuth token could not be saved. Please, try again.', true));
             }
-        }
-        else if (empty($this->data)) {
+        } else if (empty($this->data)) {
             // fill key and secret with securely generated random values
             // if no existing data found
             $this->data['OauthToken']['user_id'] = $this->Auth->user('id');
@@ -58,6 +79,14 @@ class OauthTokensController extends AppController {
         $this->set(compact('users'));
     }
 
+    /**
+     * edit
+     *
+     * @param mixed $id
+     *
+     * @access public
+     * @return void
+     */
     function edit($id = null) {
         $this->set('title_for_layout', 'Edit OAuth Token Credential');
         if (!$id && empty($this->data)) {
@@ -85,6 +114,14 @@ class OauthTokensController extends AppController {
         $this->set(compact('users'));
     }
 
+    /**
+     * delete
+     *
+     * @param mixed $id
+     *
+     * @access public
+     * @access void
+     */
     function delete($id = null) {
         $token = $this->OauthToken->find('first', array('conditions' => array('OauthToken.id' => $id)));
         if (empty($token)) {

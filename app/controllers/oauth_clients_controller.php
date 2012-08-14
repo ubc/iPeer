@@ -1,9 +1,24 @@
 <?php
+/**
+ * OauthClientsController
+ *
+ * @uses AppController
+ * @package   CTLT.iPeer
+ * @author    Pan Luo <pan.luo@ubc.ca>
+ * @copyright 2012 All rights reserved.
+ * @license   MIT {@link http://www.opensource.org/licenses/MIT}
+ */
 class OauthClientsController extends AppController {
 
     public $name = 'OauthClients';
     public $components = array('PasswordGenerator');
 
+    /**
+     * index
+     *
+     * @access public
+     * @return void
+     */
     public function index() {
         if (!User::hasPermission('controllers/oauthclients')) {
             $this->redirect('/users/editProfile');
@@ -24,6 +39,12 @@ class OauthClientsController extends AppController {
         $this->set('clientCreds', $clientCreds); 
     }
 
+    /**
+     * add
+     *
+     * @access public
+     * @return void
+     */
     public function add() {
         $this->set('title_for_layout', 'Create New OAuth Client Credential');
 
@@ -68,6 +89,14 @@ class OauthClientsController extends AppController {
         $this->set(compact('users'));
     }
 
+    /**
+     * edit
+     *
+     * @param mixed $id
+     *
+     * @access public
+     * @return void
+     */
     public function edit($id = null) {
         $this->set('title_for_layout', 'Edit OAuth Client Credential');
         if (!$id && empty($this->data)) {
@@ -84,8 +113,7 @@ class OauthClientsController extends AppController {
             } else {
                 $this->Session->setFlash(__('The OAuth client could not be saved. Please, try again.', true));
             }
-        }
-        else if (empty($this->data)) {
+        } else if (empty($this->data)) {
             $this->data = $this->OauthClient->read(null, $id);
             if (empty($this->data)) {
                 $this->redirect('index');
@@ -96,6 +124,14 @@ class OauthClientsController extends AppController {
         $this->set(compact('users'));
     }
 
+    /**
+     * delete
+     *
+     * @param mixed $id
+     *
+     * @access public
+     * @return void
+     */
     public function delete($id = null) {
         $client = $this->OauthClient->find('first', array('conditions' => array('OauthClient.id' => $id)));
         if (empty($client)) {
