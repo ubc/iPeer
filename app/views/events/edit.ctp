@@ -4,9 +4,10 @@ $html->script("jquery-ui-timepicker-addon", array("inline"=>false));
 
 echo $this->Form->create('Event', array('action' => "edit/$event_id"));
 echo '<input type="hidden" name="required" id="required" value="eventId" />';
-echo $this->Form->input('id');
-echo $this->Form->input('course_id', array('default' => $course_id));
-echo $this->Form->input('title', array('label' => 'Event Title'));
+echo $this->Form->input('id');?>
+<label class=courseLabel><?php __('Course')?></label>
+<label class=course><?php echo $course ?></label>
+<?php echo $this->Form->input('title', array('label' => 'Event Title'));
 echo $this->Form->input('description', array('type' => 'textarea'));
 echo $this->Form->input('event_template_type_id');
 echo $this->Form->input('SimpleEvaluation',

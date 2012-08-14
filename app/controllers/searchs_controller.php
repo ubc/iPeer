@@ -108,7 +108,8 @@ class SearchsController extends AppController
     function index($msg='')
     {
         $this->set('message', $msg);
-        $this->redirect('/searchs/searchEvaluation');
+        // redirect wanderers back to home - search is not used anymore
+        $this->redirect('/home');
     }
 
     /**
@@ -145,6 +146,8 @@ class SearchsController extends AppController
         $this->set('names', $name);
         $this->set('data', $searchMartix);
         $this->set('display', 'evaluation');
+        // redirect wanderers
+        $this->redirect('/home');
     }
 
 
@@ -173,6 +176,8 @@ class SearchsController extends AppController
         $this->set('data', $searchMartix['data']);
         $this->set('paging', $searchMartix['paging']);
         $this->set('display', 'eval_result');
+        // redirect wanderers
+        $this->redirect('/home');
 
     }
 
@@ -181,7 +186,7 @@ class SearchsController extends AppController
      */
     function searchInstructor()
     {
-        $nibble = $this->Search->setInstructorCondition($this->params);
+        /*$nibble = $this->Search->setInstructorCondition($this->params);
         $condition = $nibble['condition'];
         $sticky = $nibble['sticky'];
 
@@ -189,7 +194,9 @@ class SearchsController extends AppController
 
         $this->set('sticky', $sticky);
         $this->set('data', $searchMartix);
-        $this->set('display', 'instructor');
+        $this->set('display', 'instructor');*/
+        // redirect wanderers
+        $this->redirect('/home');
     }
 
     /**

@@ -53,13 +53,13 @@
       <td colspan="3"><a href="<?php echo !empty($data['Course']['homepage'])? $data['Course']['homepage']:'#'; ?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $data['Course']['homepage']; ?></a>
         </td>
     </tr>
-    <tr class="tablecell2">
+    <tr class="tablecell">
       <td id="creator_label"><small><?php __('Creator')?>:</small></td>
-      <td align="left"><small><?php echo $data['Course']['creator']//$this->element('users/user_info', array('data'=>$data['Course']['creator_id']));?></small></td>
+      <td align="left"><small><?php echo $data['Course']['creator']?></td><!--$this->element('users/user_info', array('data'=>$data['Course']['creator_id']));?></small></td>-->
       <td id="updater_label"><small><?php __('Updater')?>:</small></td>
-      <td align="left"><small><?php echo $data['Course']['updater']//$this->element('users/user_info', array('data'=>$data['Course']['updater_id']));?></small></td>
+      <td align="left"><small><?php echo $data['Course']['updater']?></td><!--$this->element('users/user_info', array('data'=>$data['Course']['updater_id']));?></small></td>-->
     </tr>
-    <tr class="tablecell2">
+    <tr class="tablecell">
       <td id="created_label"><small><?php __('Create Date')?>:</small></td>
       <td align="left"><small><?php echo $data['Course']['created']; ?></small></td>
       <td id="updated_label"><small><?php __('Update Date')?>:</small></td>

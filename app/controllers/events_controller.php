@@ -585,9 +585,11 @@ class EventsController extends AppController
             $this->Rubric->getBelongingOrPublic($this->Auth->user('id'))
         );
 
+        $course = $this->Course->find('first', array('conditions' => array('Course.id' => $courseId)));
+
         $this->set('data', $data);
         $this->set('event', $event);
-        $this->set('course_id', $courseId);
+        $this->set('course', $course['Course']['full_name']);
         $this->set('courses', $this->Course->getCourseList());
         $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).__(' > Events', true));
         $this->set('eventTemplateTypes', $this->EventTemplateType->find('list', array('conditions' => array('NOT' => array('id' => 3)))));

@@ -792,8 +792,24 @@ i {
 #Events .text label, #Events .password label, 
 #Events .textarea label, #Events .select label, 
 #Events .datetime label, #Events .radio legend, 
-#Events .penaltyLabel {
+#Events .penaltyLabel{
     width: 18em;
+}
+
+#Events .courseLabel{
+    display: inline-block;
+    text-align: right;
+    width: 18em;
+    margin-bottom: 0.5em;
+}
+
+#Events .course {
+    margin-left: 1em;
+    background-color: white;
+}
+
+#Events label {
+    margin-top: 0.25em;
 }
 
 

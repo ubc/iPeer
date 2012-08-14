@@ -105,6 +105,10 @@ jQuery("#EventEventTemplateTypeId").change(toggleEventTemplate);
 jQuery("#EventSimpleEvaluation").change(updatePreview);
 jQuery("#EventRubric").change(updatePreview);
 jQuery("#EventMixeval").change(updatePreview);
+// for redirecting to the add event view for the selected course
+changeCourseId();
+// attach event handlers to deal with changes in course selection
+jQuery("#EventCourseId").change(changeCourseId);
 // keep track of the number of penalties entered.
 var penaltyCount = <?php echo $numPenalties; ?>;
 
@@ -158,6 +162,15 @@ function toggleEventTemplate() {
         jQuery("#RubricDiv").hide();
         jQuery("#MixevalDiv").show();
         updatePreview();
+    }
+}
+
+// redirects user to a new events add view based on the course selected
+function changeCourseId() {
+    var courseId = jQuery("#EventCourseId").val();
+    
+    if (courseId != <?php echo $course_id ?>) {
+        window.location.replace("/events/add/" + courseId);
     }
 }
 
