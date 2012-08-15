@@ -135,14 +135,13 @@ class EvaluationBase extends AppModel
     /**
      * formatPenaltyArray
      *
-     * @param mixed $grpEventId   group event id
      * @param mixed $groupMembers group members
      * @param mixed $eventId      event id
      *
      * @access public
      * @return void
      */
-    function formatPenaltyArray($grpEventId, $groupMembers, $eventId)
+    function formatPenaltyArray($groupMembers, $eventId)
     {
         $this->Penalty = ClassRegistry::init('Penalty');
         $userPenalty = array();

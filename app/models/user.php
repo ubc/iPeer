@@ -293,12 +293,11 @@ class User extends AppModel
      * Get student enrolled in a course
      *
      * @param int   $course_id  course id
-     * @param mixed $conditions conditions of search
      *
      * @access public
      * @return students enrolled in a course
      * */
-    function getEnrolledStudents($course_id, $conditions = null)
+    function getEnrolledStudents($course_id)
     {
         return $this->find('all', array('conditions' => array('Enrolment.id' => $course_id),
             'fields' => 'User.*',

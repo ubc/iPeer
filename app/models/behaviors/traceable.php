@@ -101,7 +101,7 @@ class TraceableBehavior extends ModelBehavior
         '0000-00-00 00:00:00' // empty datetime
     );
 
-    private $_noTrace = false;
+    //private $_noTrace = false; //unused
 
     /**
      * Initialises the behaviour.

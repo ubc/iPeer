@@ -266,14 +266,13 @@ class Event extends AppModel
      * @access public
      * @return void
      */
-    function cascadeRemove($id)
+    /*function cascadeRemove($id)
     {
-        /* tables related: events, group_events,
-         * evaluation_submissions,
-         * evaluation_rubrics, evaluation_rubrics_details,
-         * evaluation_simples,
-         * evaluation_mixevals, evaluation_mixeval_details
-         */
+        // tables related: events, group_events,
+        // evaluation_submissions,
+        // evaluation_rubrics, evaluation_rubrics_details,
+        // evaluation_simples,
+        // evaluation_mixevals, evaluation_mixeval_details
 
         if ($id) {
             $this->id = $id;
@@ -316,7 +315,7 @@ class Event extends AppModel
 
         // now, delete this event
         $this->delete();
-    }
+    }*/
 
 
     /**

@@ -131,14 +131,13 @@ class EvaluationComponent extends Object
     /**
      * formatSimpleEvaluationResultsMatrix
      *
-     * @param mixed $event        event
      * @param mixed $groupMembers group members
      * @param mixed $evalResult   evaluation result
      *
      * @access public
      * @return array matrix
      */
-    function formatSimpleEvaluationResultsMatrix($event, $groupMembers, $evalResult)
+    function formatSimpleEvaluationResultsMatrix($groupMembers, $evalResult)
     {
         //
         // results matrix format:
@@ -320,8 +319,6 @@ class EvaluationComponent extends Object
     /**
      * changeSimpleEvaluationGradeRelease
      *
-     * @param mixed $eventId       event id
-     * @param mixed $groupId       group id
      * @param mixed $groupEventId  group event id
      * @param mixed $evaluateeId   evaluatee id
      * @param mixed $releaseStatus release status
@@ -329,7 +326,7 @@ class EvaluationComponent extends Object
      * @access public
      * @return void
      */
-    function changeSimpleEvaluationGradeRelease($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus)
+    function changeSimpleEvaluationGradeRelease($groupEventId, $evaluateeId, $releaseStatus)
     {
         $this->EvaluationSimple = new EvaluationSimple;
         $this->GroupEvent = new GroupEvent;
@@ -357,8 +354,6 @@ class EvaluationComponent extends Object
     /**
      * changeSimpleEvaluationCommentRelease
      *
-     * @param mixed $eventId      event id
-     * @param mixed $groupId      group id
      * @param mixed $groupEventId group event id
      * @param mixed $evaluatorIds evaluator ids
      * @param mixed $params       params
@@ -366,7 +361,7 @@ class EvaluationComponent extends Object
      * @access public
      * @return void
      */
-    function changeSimpleEvaluationCommentRelease($eventId, $groupId, $groupEventId, $evaluatorIds, $params)
+    function changeSimpleEvaluationCommentRelease($groupEventId, $evaluatorIds, $params)
     {
 
         $this->GroupEvent = new GroupEvent;
@@ -475,7 +470,7 @@ class EvaluationComponent extends Object
 
             }
         }
-        $scoreRecords = $this->formatSimpleEvaluationResultsMatrix($event, $groupMembersNoTutors, $evalResult);
+        $scoreRecords = $this->formatSimpleEvaluationResultsMatrix($groupMembersNoTutors, $evalResult);
         $gradeReleaseStatus = $this->EvaluationSimple->getTeamReleaseStatus($event['group_event_id']);
         $result['scoreRecords'] = $scoreRecords;
         $result['memberScoreSummary'] = $memberScoreSummary;
@@ -740,7 +735,7 @@ class EvaluationComponent extends Object
                 }
             }
         }
-        $rubricResultDetail['scoreRecords'] =  $this->formatRubricEvaluationResultsMatrix($event, $groupMembers, $evalResult);
+        $rubricResultDetail['scoreRecords'] =  $this->formatRubricEvaluationResultsMatrix($groupMembers, $evalResult);
         $rubricResultDetail['allMembersCompleted'] = $allMembersCompleted;
         $rubricResultDetail['inCompletedMembers'] = $inCompletedMembers;
         $rubricResultDetail['memberScoreSummary'] = $memberScoreSummary;
@@ -793,14 +788,13 @@ class EvaluationComponent extends Object
     /**
      * formatRubricEvaluationResultsMatrix
      *
-     * @param mixed $event        event
      * @param mixed $groupMembers group members
      * @param mixed $evalResult   evel result
      *
      * @access public
      * @return void
      */
-    function formatRubricEvaluationResultsMatrix($event, $groupMembers, $evalResult)
+    function formatRubricEvaluationResultsMatrix($groupMembers, $evalResult)
     {
         //
         // results matrix format:
@@ -877,8 +871,6 @@ class EvaluationComponent extends Object
     /**
      * changeRubricEvaluationGradeRelease
      *
-     * @param mixed $eventId       event id
-     * @param mixed $groupId       group id
      * @param mixed $groupEventId  group even tid
      * @param mixed $evaluateeId   evaluatee id
      * @param mixed $releaseStatus release status
@@ -886,7 +878,7 @@ class EvaluationComponent extends Object
      * @access public
      * @return void
      */
-    function changeRubricEvaluationGradeRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus)
+    function changeRubricEvaluationGradeRelease ($groupEventId, $evaluateeId, $releaseStatus)
     {
         $this->EvaluationRubric  = ClassRegistry::init('EvaluationRubric');
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
@@ -914,8 +906,6 @@ class EvaluationComponent extends Object
     /**
      * changeRubricEvaluationCommentRelease
      *
-     * @param mixed $eventId       event id
-     * @param mixed $groupId       group id
      * @param mixed $groupEventId  group event id
      * @param mixed $evaluateeId   evaluatee id
      * @param mixed $releaseStatus release status
@@ -923,7 +913,7 @@ class EvaluationComponent extends Object
      * @access public
      * @return void
      */
-    function changeRubricEvaluationCommentRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus)
+    function changeRubricEvaluationCommentRelease ($groupEventId, $evaluateeId, $releaseStatus)
     {
         $this->EvaluationRubric  =  ClassRegistry::init('EvaluationRubric');
         $this->GroupEvent =  ClassRegistry::init('GroupEvent');
@@ -1318,7 +1308,7 @@ class EvaluationComponent extends Object
             }
         }
 
-        $mixevalResultDetail['scoreRecords'] =  $this->formatMixevalEvaluationResultsMatrix($event, $groupMembers, $evalResult);
+        $mixevalResultDetail['scoreRecords'] =  $this->formatMixevalEvaluationResultsMatrix($groupMembers, $evalResult);
         $mixevalResultDetail['allMembersCompleted'] = $allMembersCompleted;
         $mixevalResultDetail['inCompletedMembers'] = $inCompletedMembers;
         $mixevalResultDetail['memberScoreSummary'] = $memberScoreSummary;
@@ -1364,14 +1354,13 @@ class EvaluationComponent extends Object
     /**
      * formatMixevalEvaluationResultsMatrix
      *
-     * @param mixed $event        event
      * @param mixed $groupMembers group member
      * @param mixed $evalResult   evaluation result
      *
      * @access public
      * @return array
      */
-    function formatMixevalEvaluationResultsMatrix($event, $groupMembers, $evalResult)
+    function formatMixevalEvaluationResultsMatrix($groupMembers, $evalResult)
     {
         //
         // results matrix format:
@@ -1463,7 +1452,7 @@ class EvaluationComponent extends Object
      * @access public
      * @return void
      */
-    function changeMixevalEvaluationGradeRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus)
+    function changeMixevalEvaluationGradeRelease ($groupEventId, $evaluateeId, $releaseStatus)
     {
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
@@ -1491,8 +1480,6 @@ class EvaluationComponent extends Object
     /**
      * changeMixevalEvaluationCommentRelease
      *
-     * @param mixed $eventId       event id
-     * @param mixed $groupId       group id
      * @param mixed $groupEventId  group event id
      * @param mixed $evaluateeId   evaluatee id
      * @param mixed $releaseStatus release status
@@ -1500,7 +1487,7 @@ class EvaluationComponent extends Object
      * @access public
      * @return void
      */
-    function changeMixevalEvaluationCommentRelease ($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus)
+    function changeMixevalEvaluationCommentRelease ($groupEventId, $evaluateeId, $releaseStatus)
     {
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
         $this->GroupEvent = ClassRegistry::init('GroupEvent');

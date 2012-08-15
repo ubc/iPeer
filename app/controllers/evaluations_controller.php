@@ -1035,7 +1035,7 @@ class EvaluationsController extends AppController
             $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
             $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
             // Set penalty
-            $penalties = $this->SimpleEvaluation->formatPenaltyArray($grpEvent['GroupEvent']['id'], $formattedResult['groupMembersNoTutors'], $eventId);
+            $penalties = $this->SimpleEvaluation->formatPenaltyArray($formattedResult['groupMembersNoTutors'], $eventId);
             $this->set('penalties', $penalties);
             $this->render('view_simple_evaluation_results');
             break;
@@ -1064,7 +1064,7 @@ class EvaluationsController extends AppController
             $this->set('evalResult', $formattedResult['evalResult']);
             $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
             // set penalty data
-            $formattedPenalty = $this->Rubric->formatPenaltyArray($grpEvent['GroupEvent']['id'], $formattedResult['groupMembersNoTutors'], $eventId);
+            $formattedPenalty = $this->Rubric->formatPenaltyArray($formattedResult['groupMembersNoTutors'], $eventId);
             $this->set('penalties', $formattedPenalty);
 
             if ($displayFormat == 'Detail') {
@@ -1116,7 +1116,7 @@ class EvaluationsController extends AppController
             $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
 
             // Set Penalty
-            $penalties = $this->Mixeval->formatPenaltyArray($grpEvent['GroupEvent']['id'], $formattedResult['groupMembersNoTutors'], $eventId);
+            $penalties = $this->Mixeval->formatPenaltyArray($formattedResult['groupMembersNoTutors'], $eventId);
             $this->set('penalties', $penalties);
 
             if ($displayFormat == 'Detail') {
@@ -1429,18 +1429,18 @@ class EvaluationsController extends AppController
 
         switch ($event['Event']['event_template_type_id']) {
         case "1":
-            $this->Evaluation->changeSimpleEvaluationGradeRelease($eventId, $groupId, $groupEventId, $evaluateeId, $releaseStatus);
+            $this->Evaluation->changeSimpleEvaluationGradeRelease($groupEventId, $evaluateeId, $releaseStatus);
             $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId);
             break;
 
         case "2":
-            $this->Evaluation->changeRubricEvaluationGradeRelease($eventId, $groupId, $groupEventId,
+            $this->Evaluation->changeRubricEvaluationGradeRelease($groupEventId,
                 $evaluateeId, $releaseStatus);
             $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
             break;
 
         case "4":
-            $this->Evaluation->changeMixevalEvaluationGradeRelease($eventId, $groupId, $groupEventId,
+            $this->Evaluation->changeMixevalEvaluationGradeRelease($groupEventId,
                 $evaluateeId, $releaseStatus);
             $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
             break;
@@ -1509,7 +1509,7 @@ class EvaluationsController extends AppController
                 $groupEventId = $this->params['form']['group_event_id'];
                 $evaluatorIds = $this->params['form']['evaluator_ids'];
                 $this->log($this->params);
-                $this->Evaluation->changeSimpleEvaluationCommentRelease($eventId, $groupId, $groupEventId, $evaluatorIds, $this->params);
+                $this->Evaluation->changeSimpleEvaluationCommentRelease($groupEventId, $evaluatorIds, $this->params);
             }
 
             $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId);
@@ -1520,8 +1520,7 @@ class EvaluationsController extends AppController
             $evaluateeId =  strtok(';');
             $groupEventId = strtok(';');
             $releaseStatus = strtok(';');
-            $this->Evaluation->changeRubricEvaluationCommentRelease($eventId, $groupId,
-                $groupEventId, $evaluateeId, $releaseStatus);
+            $this->Evaluation->changeRubricEvaluationCommentRelease($groupEventId, $evaluateeId, $releaseStatus);
             $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
             break;
 
@@ -1530,8 +1529,7 @@ class EvaluationsController extends AppController
             $evaluateeId =  strtok(';');
             $groupEventId = strtok(';');
             $releaseStatus = strtok(';');
-            $this->Evaluation->changeMixevalEvaluationCommentRelease($eventId, $groupId,
-                $groupEventId, $evaluateeId, $releaseStatus);
+            $this->Evaluation->changeMixevalEvaluationCommentRelease($groupEventId, $evaluateeId, $releaseStatus);
             $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
             break;
         }

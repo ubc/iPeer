@@ -127,7 +127,7 @@ class EvaluationTestCase extends CakeTestCase
         $groupMembers[0]['User']['id'] = 1;
         $groupMembers[1]['User']['id'] = 2;
         // Run test
-        $result = $this->EvaluationComponentTest->formatSimpleEvaluationResultsMatrix(null, $groupMembers, $evalResult);
+        $result = $this->EvaluationComponentTest->formatSimpleEvaluationResultsMatrix($groupMembers, $evalResult);
         $expect = array('0' => array('Kevin Luk' => 25),
             '1' => array('Zion Au' => 50));
         $this->assertEqual($result, $expect);
@@ -136,7 +136,7 @@ class EvaluationTestCase extends CakeTestCase
         $evalResultDuplicate1 = $evalResult;
         unset($evalResultDuplicate1[0]['EvaluationSimple']['EvaluationSimple']);
         unset($evalResultDuplicate1[1]['EvaluationSimple']['EvaluationSimple']);
-        $result = $this->EvaluationComponentTest->formatSimpleEvaluationResultsMatrix(null, $groupMembers, $evalResultDuplicate1);
+        $result = $this->EvaluationComponentTest->formatSimpleEvaluationResultsMatrix($groupMembers, $evalResultDuplicate1);
         $expect = array('0' => array('' => 'n/a'),
             '1' => array('' => 'n/a'));
         $this->assertEqual($result, $expect);
@@ -144,7 +144,7 @@ class EvaluationTestCase extends CakeTestCase
         $evalResultDuplicate2 = $evalResult;
         unset($evalResultDuplicate1[0]['EvaluationSimple']);
         unset($evalResultDuplicate1[1]['EvaluationSimple']);
-        $result = $this->EvaluationComponentTest->formatSimpleEvaluationResultsMatrix(null, $groupMembers, $evalResultDuplicate1);
+        $result = $this->EvaluationComponentTest->formatSimpleEvaluationResultsMatrix($groupMembers, $evalResultDuplicate1);
         $expect = array(array('1' => 'n/a', '2' => 'n/a'),
             array('1' => 'n/a', '2' => 'n/a'));
         $this->assertEqual($result, $expect);
@@ -266,14 +266,14 @@ class EvaluationTestCase extends CakeTestCase
         2 => array( array('EvaluationRubric' =>
         array('grade_release' => 1, 'comment_release' => 1, 'evaluatee' => 2,
             'details' => array(array('EvaluationRubricDetail' => array('criteria_number' => 1, 'grade' => 20)))))));
-        $result = $this->EvaluationComponentTest->formatRubricEvaluationResultsMatrix(1, $groupMembers, $evalResult);
+        $result = $this->EvaluationComponentTest->formatRubricEvaluationResultsMatrix($groupMembers, $evalResult);
         $expected = array(1=>array("grade_released"=> 1, "comment_released"=>1, "rubric_criteria_ave"=>array(1=>10)),
             2=>array ("grade_released"=>1,"comment_released"=>1,"rubric_criteria_ave"=>array(1=>20)),
             "group_criteria_ave"=>array (1=>15));
 
         $this->assertEqual($expected, $result);
 
-        $result = $this->EvaluationComponentTest->formatRubricEvaluationResultsMatrix(1, null, null);
+        $result = $this->EvaluationComponentTest->formatRubricEvaluationResultsMatrix(null, null);
         $this->assertFalse($result);
 
     }
@@ -281,15 +281,15 @@ class EvaluationTestCase extends CakeTestCase
     function testChangeRubricEvaluationGradeRelease()
     {
 
-        $this->EvaluationComponentTest->changeRubricEvaluationGradeRelease(1, 1, 1, 3, 0);
+        $this->EvaluationComponentTest->changeRubricEvaluationGradeRelease(1, 3, 0);
         $result = $this->EvaluationRubric->find('all', array('conditions' => array('id' => 3)));
         $this->assertEqual($result[0]['EvaluationRubric']['grade_release'], 0);
 
-        $this->EvaluationComponentTest->changeRubricEvaluationGradeRelease(1, 1, 1, 3, 1);
+        $this->EvaluationComponentTest->changeRubricEvaluationGradeRelease(1, 3, 1);
         $result = $this->EvaluationRubric->find('all', array('conditions' => array('id' => 3)));
         $this->assertEqual($result[0]['EvaluationRubric']['grade_release'], 1);
 
-        $this->EvaluationComponentTest->changeRubricEvaluationGradeRelease(1, 1, 1, null, 0);
+        $this->EvaluationComponentTest->changeRubricEvaluationGradeRelease(1, null, 0);
         $result = $this->EvaluationRubric->find('all', array('conditions' => array('id' => 3)));
         $this->assertEqual($result[0]['EvaluationRubric']['grade_release'], 1);
     }
@@ -297,15 +297,15 @@ class EvaluationTestCase extends CakeTestCase
     function testChangeRubricEvaluationCommentRelease()
     {
 
-        $this->EvaluationComponentTest->changeRubricEvaluationCommentRelease(1, 1, 1, 3, 0);
+        $this->EvaluationComponentTest->changeRubricEvaluationCommentRelease(1, 3, 0);
         $result = $this->EvaluationRubric->find('all', array('conditions' => array('id' => 3)));
         $this->assertEqual($result[0]['EvaluationRubric']['comment_release'], 0);
 
-        $this->EvaluationComponentTest->changeRubricEvaluationCommentRelease(1, 1, 1, 3, 1);
+        $this->EvaluationComponentTest->changeRubricEvaluationCommentRelease(1, 3, 1);
         $result = $this->EvaluationRubric->find('all', array('conditions' => array('id' => 3)));
         $this->assertEqual($result[0]['EvaluationRubric']['comment_release'], 1);
 
-        $this->EvaluationComponentTest->changeRubricEvaluationCommentRelease(1, 1, 1, null, 0);
+        $this->EvaluationComponentTest->changeRubricEvaluationCommentRelease(1, null, 0);
         $result = $this->EvaluationRubric->find('all', array('conditions' => array('id' => 3)));
         $this->assertEqual($result[0]['EvaluationRubric']['comment_release'], 1);
     }
@@ -427,10 +427,10 @@ class EvaluationTestCase extends CakeTestCase
         $groupMembers = array('Group'=> array (1=> array('id' => 1),2=> array ('id' =>2)));
 
         $expected = array( 0 => array('mixeval_question_ave' => array(1=>50)),'group_question_ave' => array(1=>50));
-        $matrix = $this->EvaluationComponentTest->formatMixevalEvaluationResultsMatrix(1,$groupMembers, $evalResult);
+        $matrix = $this->EvaluationComponentTest->formatMixevalEvaluationResultsMatrix($groupMembers, $evalResult);
         $this->assertEqual($expected, $matrix);
 
-        $matrix = $this->EvaluationComponentTest->formatMixevalEvaluationResultsMatrix(null,null, null);
+        $matrix = $this->EvaluationComponentTest->formatMixevalEvaluationResultsMatrix(null, null);
         $this->assertFalse($matrix);
 
     }
@@ -446,7 +446,7 @@ class EvaluationTestCase extends CakeTestCase
     function testChangeMixevalEvaluationCommentRelease()
     {
 
-        $this->EvaluationComponentTest->changeMixevalEvaluationCommentRelease(1, 1, 1, 1, 1);
+        $this->EvaluationComponentTest->changeMixevalEvaluationCommentRelease(1, 1, 1);
         //     $survey =  $this->EvaluationMixeval->find('all', array('conditions' => array('grp_event_id' => 1)));
         //  var_dump($survey);
 

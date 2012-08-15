@@ -90,7 +90,7 @@ class InstallValidationStep4 extends AppModel
      */
     public function identicalWith($check, $compare)
     {
-        foreach ($check as $key => $val) {
+        foreach ($check as $val) {
             if ($val != $this->data[$this->name][$compare]) {
                 return false;
             }

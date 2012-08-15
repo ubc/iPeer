@@ -356,7 +356,7 @@ class AjaxListComponent extends Object
                 ($conditions, $groupBy, $this->recursive, array($joinTable));
         } else {
             //$count = $this->betterCount
-            //    ($conditions, $groupBy, $this->recursive, array($joinTable));
+            //    ($conditions, $groupBy, array($joinTable));
             $count = $this->model->$customModelFindFunction('count', array('conditions' => $conditions,
             ));
         }
@@ -388,13 +388,12 @@ class AjaxListComponent extends Object
      *
      * @param mixed $conditions conditions
      * @param mixed $groupBy    group by
-     * @param mixed $recursive  recursive
      * @param mixed $joinTable  join table
      *
      * @access public
      * @return void
      */
-    function betterCount ($conditions, $groupBy, $recursive, $joinTable)
+    function betterCount ($conditions, $groupBy, $joinTable)
     {
 
         $table = $this->model->table;
@@ -441,7 +440,7 @@ class AjaxListComponent extends Object
 
         // remove the escape backslashs if magic quotes is OK. Otherwise,
         // json_decode will not work properly
-        $json = get_magic_quotes_gpc() ? stripslashes($_POST['json']) : $_POST['json'];
+        //$json = get_magic_quotes_gpc() ? stripslashes($_POST['json']) : $_POST['json'];  //unused
         // Grab the next state the browser sent over, and save it
         $state = json_decode(str_replace("\\", "", $_POST['json']));
 

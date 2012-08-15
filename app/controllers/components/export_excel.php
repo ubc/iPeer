@@ -55,7 +55,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
      */
     function _output($fileName)
     {
-        $starting_pos = ord('C');
+        //$starting_pos = ord('C');  //unused
         header("Content-type: application/vnd.ms-excel");
         header('Content-Disposition: attachment;filename='.$fileName.".xls");
         header('Cache-Control: max-age=0');

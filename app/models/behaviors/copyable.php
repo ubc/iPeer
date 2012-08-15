@@ -234,7 +234,7 @@ class CopyableBehavior extends ModelBehavior
         if (!$this->settings[$Model->alias]['habtm']) {
             return $record;
         }
-        foreach ($Model->hasAndBelongsToMany as $key => $val) {
+        foreach ($Model->hasAndBelongsToMany as $val) {
             if (!isset($record[$val['className']]) || empty($record[$val['className']])) {
                 continue;
             }

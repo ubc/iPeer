@@ -174,12 +174,12 @@ class Rubric extends EvaluationBase
      * such that the criteria comments from the rubrics grid is ordered from left to right, top to bottom.
      *
      * @param array   $results The result of the find->Rubric operation
-     * @param boolean $primary Whether this model is being queried directly (vs. being queried as an association)
+     // * @param boolean $primary Whether this model is being queried directly (vs. being queried as an association)
      *
      * @access public
      * @return void
      */
-    function afterFind(array $results, $primary)
+    function afterFind(array $results)
     {
         $return = array();
 
@@ -301,12 +301,12 @@ class Rubric extends EvaluationBase
         $tmp3 = array_merge($tmp2, $data);
 
     /* Now, replace all the elements of this database array with the submitted array, unless there are missing */
-        $submitedRubric = $tmp['Rubric'];
+        $submittedRubric = $tmp['Rubric'];
         foreach ($tmp3 as $key => $value) {
 
-            if (!empty($submitedRubric[$key])) {
-                //echo "<b>$key Replacing $tmp3[$key] with $submitedRubric[$key]</b><br />";
-                $tmp3[$key] = $submitedRubric[$key]; // Copy the submitted value over, overwriting the one got from the database.
+            if (!empty($submittedRubric[$key])) {
+                //echo "<b>$key Replacing $tmp3[$key] with $submittedRubric[$key]</b><br />";
+                $tmp3[$key] = $submittedRubric[$key]; // Copy the submitted value over, overwriting the one got from the database.
             }
         }
         return $tmp3;
