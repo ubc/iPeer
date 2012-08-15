@@ -17,7 +17,8 @@ class UsersController extends AppController
     public $NeatString;
     public $uses = array('User', 'UserEnrol', 'Personalize', 'Course', 
         'SysParameter', 'SysFunction', 'Role', 'Group', 'UserFaculty',
-        'Department', 'CourseDepartment', 'OauthClient', 'OauthToken'
+        'Department', 'CourseDepartment', 'OauthClient', 'OauthToken',
+        'UserCourse'
     );
     public $components = array('Session', 'AjaxList', 'RequestHandler',
         'Email', 'FileUpload.FileUpload', 'PasswordGenerator');
@@ -139,14 +140,9 @@ class UsersController extends AppController
         $deleteUserWarning = __("Delete this user. Irreversible. Are you sure?", true);
         $resetPassWarning = __("Resets user Password. Are you sure?", true);
 
-        if (!User::hasRole('superadmin') && !User::hasRole('admin')) {
-            $actionRestrictions = array(
-                "User.role" => array (
-                    "S" => true,
-                    "!default" => false));
-        } else {
-            $actionRestrictions = "";
-        }
+        $courses = $this->UserCourse->find('list', array('conditions' => array('user_id' => $this->Auth->user('id'))));
+
+        $actionRestrictions = "";
 
         $joinTables =  array(
             array (
@@ -208,7 +204,7 @@ class UsersController extends AppController
      */
     function index($message='')
     {
-        if (!User::hasPermission('functions/user')) {
+        if (!User::hasPermission('functions/user/index')) {
             $this->Session->setFlash('You do not have permission to view users.');
             $this->redirect('/home');
         }
@@ -260,12 +256,12 @@ class UsersController extends AppController
         // instructors
         if (!User::hasPermission('controllers/departments')) {
             $courses = User::getMyCourseList();
-        // admins & super admins
+        // admins
         } else {
             $courses = User::getMyDepartmentsCourseList('list');
         }
 
-        if (!in_array($course, array_keys($courses))) {
+        if (!in_array($course, array_keys($courses)) && !User::hasPermission('superadmin')) {
             $this->Session->setFlash(__('Error: You do not have permission to view this class list', true));
             $this->redirect('index');
         }
@@ -289,7 +285,9 @@ class UsersController extends AppController
             $tmp['Username'] = $user['User']['username'];
             $tmp['Full Name'] = $user['User']['first_name'] .' '.
                 $user['User']['last_name'];
-            $tmp['Email'] = $user['User']['email'];
+            if (User::hasPermission('functions/viewemailaddresses')) {
+                $tmp['Email'] = $user['User']['email'];
+            }
             $classList[] = $tmp;
         }
         $this->set('classList', $classList);
@@ -464,6 +462,25 @@ class UsersController extends AppController
         if (!User::hasPermission('functions/user/'.$role)) {
             $this->Session->setFlash(__('Error: You do not have permission to view this user', true));
             $this->redirect('index');
+        }
+
+        
+        if (!User::hasPermission('superadmin')) {
+            // instructors
+            if (!User::hasPermission('controllers/departments')) {
+                $courses = User::getMyCourseList();
+            // admins
+            } else {
+                $courses = User::getMyDepartmentsCourseList('list');
+            }
+            $students = $this->UserEnrol->find('list', array(
+                'conditions' => array('course_id' => array_keys($courses)), 
+                'fields' => array('user_id')
+            ));
+            if (!in_array($id, $students)) {
+                $this->Session->setFlash(__('Error: You do not have permission to view this user', true));
+                $this->redirect('index');
+            }
         }
 
         $this->set('title_for_layout', __('View User', true));
@@ -667,17 +684,19 @@ class UsersController extends AppController
                 }
                 
                 // check whether the user has access to the course
-                // instructors
-                if (!User::hasPermission('controllers/departments')) {
-                    $courses = User::getMyCourseList();
-                // admins & super admins
-                } else {
-                    $courses = User::getMyDepartmentsCourseList('list');
-                }
-        
-                if (!in_array($courseId, array_keys($courses))) {
-                    $this->Session->setFlash(__('Error: You do not have permission to add users to this course', true));
-                    $this->redirect('index');
+                if (!User::hasPermission('superadmin')) {
+                    // instructors
+                    if (!User::hasPermission('controllers/departments')) {
+                        $courses = User::getMyCourseList();
+                    // admins
+                    } else {
+                        $courses = User::getMyDepartmentsCourseList('list');
+                    }
+            
+                    if (!in_array($courseId, array_keys($courses))) {
+                        $this->Session->setFlash(__('Error: You do not have permission to add users to this course', true));
+                        $this->redirect('index');
+                    }
                 }
             }
         }
@@ -742,6 +761,19 @@ class UsersController extends AppController
 
         // not saving, need to load data for forms to fill in
         $this->data = $this->User->read(null, $userId);
+        
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+            $students = $this->UserEnrol->find('list', array(
+                'conditions' => array('course_id' => array_keys($courses)), 
+                'fields' => array('user_id')
+            ));
+            if (!in_array($userId, $students)) {
+                $this->Session->setFlash(__('Error: You do not have permission to edit this user', true));
+                $this->redirect('index');
+            }
+        }
     }
 
     /**
@@ -825,6 +857,22 @@ class UsersController extends AppController
             $this->Session->setFlash('Error: You do not have permission to delete this user');
             $this->redirect('index');
         }
+        
+        $user = $this->UserCourse->find('list', array('conditions' => array('user_id' => $this->Auth->user('id'))));
+        $student = $this->User->find('first', array('conditions' => array('User.id' => $id)));
+
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+            $students = $this->UserEnrol->find('list', array(
+                'conditions' => array('course_id' => array_keys($courses)), 
+                'fields' => array('user_id')
+            ));
+            if (!in_array($id, $students)) {
+                $this->Session->setFlash(__('Error: You do not have permission to edit this user', true));
+                $this->redirect('index');
+            }
+        }
 
         // Ensure that the id is valid
         if (!is_numeric($id)) {
@@ -890,6 +938,19 @@ class UsersController extends AppController
             $this->redirect("index");
         }
 
+        // instructors
+        if (!User::hasPermission('controllers/departments')) {
+            $courses = User::getMyCourseList();
+            $students = $this->UserEnrol->find('list', array(
+                'conditions' => array('course_id' => array_keys($courses)), 
+                'fields' => array('user_id')
+            ));
+            if (!in_array($user_id, $students)) {
+                $this->Session->setFlash(__('Error: You do not have permission to reset the password for this user', true));
+                $this->redirect('index');
+            }
+        }
+
         //General password
         $tmp_password = $this->PasswordGenerator->generate();
         $user_data['User']['tmp_password'] = $tmp_password;
@@ -912,7 +973,7 @@ class UsersController extends AppController
                 }
                 $message .= __("Email was <u>not</u> sent to the user. ", true) . $this->Email->smtpError;
             }
-            $this->Session->setFlash($message);
+            $this->Session->setFlash($message, 'good');
             $this->redirect($this->referer());
         } else {
             //Get render page according to the user type

@@ -109,40 +109,49 @@ class RubricsController extends AppController
         $joinTables = array($jointTableCreator);
 
         $myID = $this->Auth->user('id');
-        $creators = array();
-        // grab course ids of the courses admin/super admin has access to
-        $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
-        // grab all instructors that have access to the courses above
-        $instructors = $this->UserCourse->find(
-            'all',
-            array(
-                'conditions' => array('UserCourse.course_id' => $courseIds)    
-        ));
-        
-        $extraFilters = "(";
-        // only admins/super admins will go through this loop
-        foreach ($instructors as $instructor) {
-            $id = $instructor['UserCourse']['user_id'];
-            $creators[] = $id;
-            $extraFilters .= "creator_id = $id or ";
+        if (User::hasPermission('superadmin')) {
+            $extraFilters = "";
+        } else {
+            $creators = array();
+            // grab course ids of the courses admin has access to
+            $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+            // grab all instructors that have access to the courses above
+            $instructors = $this->UserCourse->find(
+                'all', 
+                array(
+                    'conditions' => array('UserCourse.course_id' => $courseIds)
+            ));
+            $extraFilters = "(";
+            // only admins will go through this loop
+            foreach ($instructors as $instructor) {
+                $id = $instructor['UserCourse']['user_id'];
+                $creators[] = $id;
+                $extraFilters .= "creator_id = $id or ";
+            }
+            // allow instructors/admins to see their own simple eval templates
+            $extraFilters .= "creator_id = $myID or ";
+            // can see all public simple evaluation templates
+            $extraFilters .= "availability = 'public')";
         }
-        // allow instructors/admins/superadmins to see their own rubric templates
-        $extraFilters .= "creator_id = $myID or ";
-        // can see all public rubric templates
-        $extraFilters .= "availability = 'public')";
 
-        // Instructors can only edit their own evaluations
+        // Instructors can only edit their own rubric templates
         $restrictions = "";
+        // instructors
         $basicRestrictions = array(
             $myID => true,
             "!default" => false);
-        if (User::hasRole('superadmin') || User::hasRole('superadmin')) {
+        // super admins
+        if (User::hasPermission('superadmin')) {
+            $basicRestrictions = "";
+        // faculty admins
+        } else if (User::hasPermission('controllers/departments')) {
             foreach ($creators as $creator) {
                 $basicRestrictions = $basicRestrictions + array($creator => true);
             }
         }
         
-        $restrictions['Rubric.creator_id'] = $basicRestrictions;
+        empty($basicRestrictions) ? $restrictions = $basicRestrictions :
+            $restrictions['Rubric.creator_id'] = $basicRestrictions;
 
         // Set up actions
         $warning = __("Are you sure you want to delete this Rubric permanently?", true);
@@ -228,7 +237,7 @@ class RubricsController extends AppController
         }
         
         // check whether the user has access to the evaluation if the rubric is not public
-        if ($eval['Rubric']['availability'] != 'public') {
+        if ($eval['Rubric']['availability'] != 'public' && !User::hasPermission('superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));
@@ -361,30 +370,32 @@ class RubricsController extends AppController
             $this->redirect('index');
         }
         
-        // instructor
-        if (!User::hasPermission('controllers/departments')) {
-            $instructorIds = array($this->Auth->user('id'));
-        // admins & super admins
-        } else {
-            // course ids
-            $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
-            // instructors
-            $instructors = $this->UserCourse->find(
-                'all',
-                array(
-                    'conditions' => array('UserCourse.course_id' => $courseIds)
-            ));
-            $instructorIds = array();
-            foreach ($instructors as $instructor) {
-                $instructorIds[] = $instructor['UserCourse']['user_id'];
+        if (!User::hasPermission('superadmin')) {
+            // instructor
+            if (!User::hasPermission('controllers/departments')) {
+                $instructorIds = array($this->Auth->user('id'));
+            // admins
+            } else {
+                // course ids
+                $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+                // instructors
+                $instructors = $this->UserCourse->find(
+                    'all',
+                    array(
+                        'conditions' => array('UserCourse.course_id' => $courseIds)
+                ));
+                $instructorIds = array();
+                foreach ($instructors as $instructor) {
+                    $instructorIds[] = $instructor['UserCourse']['user_id'];
+                }
+                // add the user's id
+                array_push($instructorIds, $this->Auth->user('id'));
             }
-            // add the user's id
-            array_push($instructorIds, $this->Auth->user('id'));
-        }
-        
-        if (!(in_array($eval['Rubric']['creator_id'], $instructorIds))) {
-            $this->Session->setFlash(__('Error: You do not have permission to edit this rubric', true));
-            $this->redirect('index');
+            
+            if (!(in_array($eval['Rubric']['creator_id'], $instructorIds))) {
+                $this->Session->setFlash(__('Error: You do not have permission to edit this rubric', true));
+                $this->redirect('index');
+            }
         }
         
         foreach ($eval['Event'] as $event) {
@@ -474,11 +485,11 @@ class RubricsController extends AppController
         }
         
         // can be copied if rubric is public
-        if ($eval['Rubric']['availability'] != 'public') {
+        if ($eval['Rubric']['availability'] != 'public' && !User::hasPermission('superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));
-            // admins & super admin
+            // admins
             } else {
                 // course ids
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
@@ -540,31 +551,33 @@ class RubricsController extends AppController
             $this->redirect('index');
         }
         
-        // instructor
-        if (!User::hasPermission('controllers/departments')) {
-            $instructorIds = array($this->Auth->user('id'));
-        // admins & super admin
-        } else {
-            // course ids
-            $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
-            // instructors
-            $instructors = $this->UserCourse->find(
-                'all',
-                array(
-                    'conditions' => array('UserCourse.course_id' => $courseIds)
-            ));
-            $instructorIds = array();
-            foreach ($instructors as $instructor) {
-                $instructorIds[] = $instructor['UserCourse']['user_id'];
+        if (!User::hasPermission('superadmin')) {
+            // instructor
+            if (!User::hasPermission('controllers/departments')) {
+                $instructorIds = array($this->Auth->user('id'));
+            // admins
+            } else {
+                // course ids
+                $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+                // instructors
+                $instructors = $this->UserCourse->find(
+                    'all',
+                    array(
+                        'conditions' => array('UserCourse.course_id' => $courseIds)
+                ));
+                $instructorIds = array();
+                foreach ($instructors as $instructor) {
+                    $instructorIds[] = $instructor['UserCourse']['user_id'];
+                }
+                // add the user's id
+                array_push($instructorIds, $this->Auth->user('id'));
             }
-            // add the user's id
-            array_push($instructorIds, $this->Auth->user('id'));
-        }
-        
-        // creator id must be in the array of accessible user ids
-        if (!(in_array($eval['Rubric']['creator_id'], $instructorIds))) {
-            $this->Session->setFlash(__('Error: You do not have permission to delete this rubric', true));
-            $this->redirect('index');
+            
+            // creator id must be in the array of accessible user ids
+            if (!(in_array($eval['Rubric']['creator_id'], $instructorIds))) {
+                $this->Session->setFlash(__('Error: You do not have permission to delete this rubric', true));
+                $this->redirect('index');
+            }
         }
 
         // Deny Deleting evaluations in use:

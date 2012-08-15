@@ -218,18 +218,20 @@ class EvaluationsController extends AppController
         
         $courseId = $this->Event->getCourseByEventId($eventId);
         
-        // check whether the user has access to the course
-        // instructors
-        if (!User::hasPermission('controllers/departments')) {
-            $courses = User::getMyCourseList();
-        // admins & super admins
-        } else {
-            $courses = User::getMyDepartmentsCourseList('list');
-        }
-
-        if (!in_array($courseId, array_keys($courses))) {
-            $this->Session->setFlash(__('Error: You do not have permission to view this evaluation', true));
-            $this->redirect('index');
+        if (!User::hasPermission('superadmin')) {
+            // check whether the user has access to the course
+            // instructors
+            if (!User::hasPermission('controllers/departments')) {
+                $courses = User::getMyCourseList();
+            // admins
+            } else {
+                $courses = User::getMyDepartmentsCourseList('list');
+            }
+    
+            if (!in_array($courseId, array_keys($courses))) {
+                $this->Session->setFlash(__('Error: You do not have permission to view this evaluation', true));
+                $this->redirect('index');
+            }
         }
 
         // Set up the basic static ajax list variables
@@ -320,18 +322,20 @@ class EvaluationsController extends AppController
         if ('course' == $type) {
             $courseId = $id;
             
-            // check whether the user has access to the course
-            // instructors
-            if (!User::hasPermission('controllers/departments')) {
-                $courses = User::getMyCourseList();
-            // admins & super admins
-            } else {
-                $courses = User::getMyDepartmentsCourseList('list');
-            }
-    
-            if (!in_array($courseId, array_keys($courses))) {
-                $this->Session->setFlash(__('Error: You do not have permission to export evaluation results from this course', true));
-                $this->redirect('/courses');
+            if (!User::hasPermission('superadmin')) {
+                // check whether the user has access to the course
+                // instructors
+                if (!User::hasPermission('controllers/departments')) {
+                    $courses = User::getMyCourseList();
+                // admins
+                } else {
+                    $courses = User::getMyDepartmentsCourseList('list');
+                }
+        
+                if (!in_array($courseId, array_keys($courses))) {
+                    $this->Session->setFlash(__('Error: You do not have permission to export evaluation results from this course', true));
+                    $this->redirect('/courses');
+                }
             }
             
             $events = $this->Event->getCourseEvalEvent($id);
@@ -342,18 +346,20 @@ class EvaluationsController extends AppController
         } else if ('event' == $type) {
             $courseId = $this->Event->getCourseByEventId($id);
 
-            // check whether the user has access to the course
-            // instructors
-            if (!User::hasPermission('controllers/departments')) {
-                $courses = User::getMyCourseList();
-            // admins & super admins
-            } else {
-                $courses = User::getMyDepartmentsCourseList('list');
-            }
-    
-            if (!in_array($courseId, array_keys($courses))) {
-                $this->Session->setFlash(__('Error: You do not have permission to export evaluation results from this course', true));
-                $this->redirect('/courses');
+            if (!User::hasPermission('superadmin')) {
+                // check whether the user has access to the course
+                // instructors
+                if (!User::hasPermission('controllers/departments')) {
+                    $courses = User::getMyCourseList();
+                // admins
+                } else {
+                    $courses = User::getMyDepartmentsCourseList('list');
+                }
+        
+                if (!in_array($courseId, array_keys($courses))) {
+                    $this->Session->setFlash(__('Error: You do not have permission to export evaluation results from this course', true));
+                    $this->redirect('/courses');
+                }
             }
             
             $selectedEvent = $this->Event->getEventById($id);
@@ -424,7 +430,7 @@ class EvaluationsController extends AppController
         
         // filter out users that don't have access to this eval, invalid ids, not simple eval
         if (($group != $groupId || '1' != $templateId) && empty($this->params['data'])) {
-            $this->Session->setFlash(__('Invalid Id', true));
+            $this->Session->setFlash(__('Error: Invalid Id', true));
             $this->redirect('/home/index');
         }
         
@@ -994,7 +1000,7 @@ class EvaluationsController extends AppController
         // instructors
         if (!User::hasPermission('controllers/departments')) {
             $courses = User::getMyCourseList();
-        // admins & super admins
+        // admins
         } else {
             $courses = User::getMyDepartmentsCourseList('list');
         }
@@ -1156,18 +1162,20 @@ class EvaluationsController extends AppController
         
         $courseId = $survey['Survey']['course_id'];
         
-        // check whether the user has access to the course
-        // instructors
-        if (!User::hasPermission('controllers/departments')) {
-            $courses = User::getMyCourseList();
-        // admins & super admins
-        } else {
-            $courses = User::getMyDepartmentsCourseList('list');
-        }
-
-        if (!in_array($courseId, array_keys($courses))) {
-            $this->Session->setFlash(__('Error: You do not have permission to view these results', true));
-            $this->redirect('index');
+        if (!User::hasPermission('superadmin')) {
+            // check whether the user has access to the course
+            // instructors
+            if (!User::hasPermission('controllers/departments')) {
+                $courses = User::getMyCourseList();
+            // admins
+            } else {
+                $courses = User::getMyDepartmentsCourseList('list');
+            }
+    
+            if (!in_array($courseId, array_keys($courses))) {
+                $this->Session->setFlash(__('Error: You do not have permission to view these results', true));
+                $this->redirect('index');
+            }
         }
 
         $formattedResult = $this->Evaluation->formatSurveyGroupEvaluationResult($surveyId, $surveyGroupId);
@@ -1465,18 +1473,20 @@ class EvaluationsController extends AppController
         
         $courseId = $this->Event->getCourseByEventId($eventId);
         
-        // check whether the user has access to the course
-        // instructors
-        if (!User::hasPermission('controllers/departments')) {
-            $courses = User::getMyCourseList();
-        // admins & super admins
-        } else {
-            $courses = User::getMyDepartmentsCourseList('list');
-        }
-
-        if (!in_array($courseId, array_keys($courses))) {
-            $this->Session->setFlash(__('Error: You do not have permission to view evaluation results from this event', true));
-            $this->redirect('index');
+        if (!User::hasPermission('superadmin')) {
+            // check whether the user has access to the course
+            // instructors
+            if (!User::hasPermission('controllers/departments')) {
+                $courses = User::getMyCourseList();
+            // admins
+            } else {
+                $courses = User::getMyDepartmentsCourseList('list');
+            }
+    
+            if (!in_array($courseId, array_keys($courses))) {
+                $this->Session->setFlash(__('Error: You do not have permission to view evaluation results from this event', true));
+                $this->redirect('index');
+            }
         }
 
         $this->autoRender = false;
@@ -1686,18 +1696,20 @@ class EvaluationsController extends AppController
         
         $courseId = $this->Event->getCourseByEventId($eventId);
         
-        // check whether the user has access to the course
-        // instructors
-        if (!User::hasPermission('controllers/departments')) {
-            $courses = User::getMyCourseList();
-        // admins & super admins
-        } else {
-            $courses = User::getMyDepartmentsCourseList('list');
-        }
-
-        if (!in_array($courseId, array_keys($courses))) {
-            $this->Session->setFlash(__('Error: You do not have permission to view evaluation results from this event', true));
-            $this->redirect('index');
+        if (!User::hasPermission('superadmin')) {
+            // check whether the user has access to the course
+            // instructors
+            if (!User::hasPermission('controllers/departments')) {
+                $courses = User::getMyCourseList();
+            // admins
+            } else {
+                $courses = User::getMyDepartmentsCourseList('list');
+            }
+    
+            if (!in_array($courseId, array_keys($courses))) {
+                $this->Session->setFlash(__('Error: You do not have permission to view evaluation results from this event', true));
+                $this->redirect('index');
+            }
         }
 
         $this->set('title_for_layout', __('Submission Details', true));
@@ -1799,18 +1811,20 @@ class EvaluationsController extends AppController
             $this->redirect('index');
         }
 
-        // check whether the user has access to the course
-        // instructors
-        if (!User::hasPermission('controllers/departments')) {
-            $courses = User::getMyCourseList();
-        // admins & super admins
-        } else {
-            $courses = User::getMyDepartmentsCourseList('list');
-        }
-
-        if (!in_array($survey['Survey']['course_id'], array_keys($courses))) {
-            $this->Session->setFlash(__('Error: You do not have permission to view the summary', true));
-            $this->redirect('index');
+        if (!User::hasPermission('superadmin')) {
+            // check whether the user has access to the course
+            // instructors
+            if (!User::hasPermission('controllers/departments')) {
+                $courses = User::getMyCourseList();
+            // admins
+            } else {
+                $courses = User::getMyDepartmentsCourseList('list');
+            }
+    
+            if (!in_array($survey['Survey']['course_id'], array_keys($courses))) {
+                $this->Session->setFlash(__('Error: You do not have permission to view the summary', true));
+                $this->redirect('index');
+            }
         }
 
         $formattedResult = $this->Evaluation->formatSurveyEvaluationSummary($surveyId);

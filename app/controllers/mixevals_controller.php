@@ -109,39 +109,49 @@ class MixevalsController extends AppController
         $joinTables = array($jointTableCreator);
 
         $myID = $this->Auth->user('id');
-        $creators = array();
-        // grab course ids of the courses admin/super admin has access to
-        $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
-        // grab all instructors that have access to the courses above
-        $instructors = $this->UserCourse->find(
-            'all', 
-            array(
-                'conditions' => array('UserCourse.course_id' => $courseIds)
-        ));
-        $extraFilters = "(";
-        // only admins/super admins will go through this loop
-        foreach ($instructors as $instructor) {
-            $id = $instructor['UserCourse']['user_id'];
-            $creators[] = $id;
-            $extraFilters .= "creator_id = $id or ";
+        if (User::hasPermission('superadmin')) {
+            $extraFilters = "";
+        } else {
+            $creators = array();
+            // grab course ids of the courses admin has access to
+            $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+            // grab all instructors that have access to the courses above
+            $instructors = $this->UserCourse->find(
+                'all', 
+                array(
+                    'conditions' => array('UserCourse.course_id' => $courseIds)
+            ));
+            $extraFilters = "(";
+            // only admins will go through this loop
+            foreach ($instructors as $instructor) {
+                $id = $instructor['UserCourse']['user_id'];
+                $creators[] = $id;
+                $extraFilters .= "creator_id = $id or ";
+            }
+            // allow instructors/admins to see their own simple eval templates
+            $extraFilters .= "creator_id = $myID or ";
+            // can see all public simple evaluation templates
+            $extraFilters .= "availability = 'public')";
         }
-        // allow instructors/admins/super admins to see their own mixeval templates
-        $extraFilters .= "creator_id = $myID or ";
-        // can see all public mixeval templates
-        $extraFilters .= "availability = 'public')";
 
-        // Instructors can only edit their own evaluations
+        // Instructors can only edit their own mixeval templates
         $restrictions = "";
+        // instructors
         $basicRestrictions = array(
-                $myID => true,
-                "!default" => false);
-        if (User::hasRole('superadmin') || User::hasRole('admin')) {
+            $myID => true,
+            "!default" => false);
+        // super admins
+        if (User::hasPermission('superadmin')) {
+            $basicRestrictions = "";
+        // faculty admins
+        } else if (User::hasPermission('controllers/departments')) {
             foreach ($creators as $creator) {
                 $basicRestrictions = $basicRestrictions + array($creator => true);
             }
         }
         
-        $restrictions['Mixeval.creator_id'] = $basicRestrictions;
+        empty($basicRestrictions) ? $restrictions = $basicRestrictions :
+            $restrictions['Mixeval.creator_id'] = $basicRestrictions;
 
         // Set up actions
         $warning = __("Are you sure you want to delete this evaluation permanently?", true);
@@ -228,7 +238,7 @@ class MixevalsController extends AppController
         }
         
         // check whether the user has access to the evaluation if the eval is not public
-        if ($eval['Mixeval']['availability'] != 'public') {
+        if ($eval['Mixeval']['availability'] != 'public' && !User::hasPermission('superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));
@@ -386,32 +396,33 @@ class MixevalsController extends AppController
             $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
         }
-        
-        // instructor
-        if (!User::hasPermission('controllers/departments')) {
-            $instructorIds = array($this->Auth->user('id'));
-        // admins & super admin
-        } else {
-            // course ids
-            $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
-            // instructors
-            $instructors = $this->UserCourse->find(
-                'all',
-                array(
-                    'conditions' => array('UserCourse.course_id' => $courseIds)
-            ));
-            $instructorIds = array();
-            foreach ($instructors as $instructor) {
-                $instructorIds[] = $instructor['UserCourse']['user_id'];
+        if (!User::hasPermission('superadmin')) {
+            // instructor
+            if (!User::hasPermission('controllers/departments')) {
+                $instructorIds = array($this->Auth->user('id'));
+            // admins
+            } else {
+                // course ids
+                $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+                // instructors
+                $instructors = $this->UserCourse->find(
+                    'all',
+                    array(
+                        'conditions' => array('UserCourse.course_id' => $courseIds)
+                ));
+                $instructorIds = array();
+                foreach ($instructors as $instructor) {
+                    $instructorIds[] = $instructor['UserCourse']['user_id'];
+                }
+                // add the user's id
+                array_push($instructorIds, $this->Auth->user('id'));
             }
-            // add the user's id
-            array_push($instructorIds, $this->Auth->user('id'));
-        }
-        
-        // creator's id be in the array of accessible user ids
-        if (!(in_array($eval['Mixeval']['creator_id'], $instructorIds))) {
-            $this->Session->setFlash(__('Error: You do not have permission to edit this evaluation', true));
-            $this->redirect('index');
+            
+            // creator's id be in the array of accessible user ids
+            if (!(in_array($eval['Mixeval']['creator_id'], $instructorIds))) {
+                $this->Session->setFlash(__('Error: You do not have permission to edit this evaluation', true));
+                $this->redirect('index');
+            }
         }
         
         foreach ($eval['Event'] as $event) {
@@ -505,31 +516,33 @@ class MixevalsController extends AppController
             $this->redirect('index');
         }
 
-        // instructor
-        if (!User::hasPermission('controllers/departments')) {
-            $instructorIds = array($this->Auth->user('id'));
-        // admins & super admin
-        } else {
-            // course ids
-            $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
-            // instructors
-            $instructors = $this->UserCourse->find(
-                'all',
-                array(
-                    'conditions' => array('UserCourse.course_id' => $courseIds)
-            ));
-            $instructorIds = array();
-            foreach ($instructors as $instructor) {
-                $instructorIds[] = $instructor['UserCourse']['user_id'];
+        if (!User::hasPermission('superadmin')) {
+            // instructor
+            if (!User::hasPermission('controllers/departments')) {
+                $instructorIds = array($this->Auth->user('id'));
+            // admins
+            } else {
+                // course ids
+                $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+                // instructors
+                $instructors = $this->UserCourse->find(
+                    'all',
+                    array(
+                        'conditions' => array('UserCourse.course_id' => $courseIds)
+                ));
+                $instructorIds = array();
+                foreach ($instructors as $instructor) {
+                    $instructorIds[] = $instructor['UserCourse']['user_id'];
+                }
+                // add the user's id
+                array_push($instructorIds, $this->Auth->user('id'));
             }
-            // add the user's id
-            array_push($instructorIds, $this->Auth->user('id'));
-        }
-        
-        // creator's id be in the array of accessible user ids
-        if (!(in_array($eval['Mixeval']['creator_id'], $instructorIds))) {
-            $this->Session->setFlash(__('Error: You do not have permission to copy this evaluation', true));
-            $this->redirect('index');
+            
+            // creator's id be in the array of accessible user ids
+            if (!(in_array($eval['Mixeval']['creator_id'], $instructorIds))) {
+                $this->Session->setFlash(__('Error: You do not have permission to copy this evaluation', true));
+                $this->redirect('index');
+            }
         }
 
         $this->data = $this->Mixeval->copy($id);
@@ -571,31 +584,33 @@ class MixevalsController extends AppController
             $this->redirect('index');
         }
         
-        // instructor
-        if (!User::hasPermission('controllers/departments')) {
-            $instructorIds = array($this->Auth->user('id'));
-        // admins & super admin
-        } else {
-            // course ids
-            $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
-            // instructors
-            $instructors = $this->UserCourse->find(
-                'all',
-                array(
-                    'conditions' => array('UserCourse.course_id' => $courseIds)
-            ));
-            $instructorIds = array();
-            foreach ($instructors as $instructor) {
-                $instructorIds[] = $instructor['UserCourse']['user_id'];
+        if (!User::hasPermission('superadmin')) {
+            // instructor
+            if (!User::hasPermission('controllers/departments')) {
+                $instructorIds = array($this->Auth->user('id'));
+            // admins
+            } else {
+                // course ids
+                $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+                // instructors
+                $instructors = $this->UserCourse->find(
+                    'all',
+                    array(
+                        'conditions' => array('UserCourse.course_id' => $courseIds)
+                ));
+                $instructorIds = array();
+                foreach ($instructors as $instructor) {
+                    $instructorIds[] = $instructor['UserCourse']['user_id'];
+                }
+                // add the user's id
+                array_push($instructorIds, $this->Auth->user('id'));
             }
-            // add the user's id
-            array_push($instructorIds, $this->Auth->user('id'));
-        }
-        
-        // creator's id be in the array of accessible user ids
-        if (!(in_array($eval['Mixeval']['creator_id'], $instructorIds))) {
-            $this->Session->setFlash(__('Error: You do not have permission to delete this evaluation', true));
-            $this->redirect('index');
+            
+            // creator's id be in the array of accessible user ids
+            if (!(in_array($eval['Mixeval']['creator_id'], $instructorIds))) {
+                $this->Session->setFlash(__('Error: You do not have permission to delete this evaluation', true));
+                $this->redirect('index');
+            }
         }
         
         // Deny Deleting evaluations in use:

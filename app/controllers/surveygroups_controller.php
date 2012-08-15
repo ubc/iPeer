@@ -169,18 +169,20 @@ class SurveyGroupsController extends AppController
         if (!empty($event)) {
             $courseId = $event['Course']['id'];
         
-            // check whether the user has access to the course
-            // instructors
-            if (!User::hasPermission('controllers/departments')) {
-                $courses = User::getMyCourseList();
-            // admins & super admins
-            } else {
-                $courses = User::getMyDepartmentsCourseList('list');
-            }
-        
-            if (!in_array($courseId, array_keys($courses))) {
-                $this->Session->setFlash(__("Error: You do not have permission to view this event's results", true));
-                $this->redirect('index');
+            if (!User::hasPermission('superadmin')) {
+                // check whether the user has access to the course
+                // instructors
+                if (!User::hasPermission('controllers/departments')) {
+                    $courses = User::getMyCourseList();
+                // admins
+                } else {
+                    $courses = User::getMyDepartmentsCourseList('list');
+                }
+            
+                if (!in_array($courseId, array_keys($courses))) {
+                    $this->Session->setFlash(__("Error: You do not have permission to view this event's results", true));
+                    $this->redirect('index');
+                }
             }
         
             $this->set('title_for_layout', $this->Course->getCourseName($courseId).__(' > View Survey Result', true));
@@ -254,18 +256,20 @@ class SurveyGroupsController extends AppController
             $this->redirect('index');
         }
         
-        // check whether the user has access to the course
-        // instructors
-        if (!User::hasPermission('controllers/departments')) {
-            $courses = User::getMyCourseList();
-        // admins & super admins
-        } else {
-            $courses = User::getMyDepartmentsCourseList('list');
-        }
-
-        if (!in_array($course_id, array_keys($courses))) {
-            $this->Session->setFlash(__('Error: You do not have permission to make groups for this course', true));
-            $this->redirect('index');
+        if (!User::hasPermission('superadmin')) {
+            // check whether the user has access to the course
+            // instructors
+            if (!User::hasPermission('controllers/departments')) {
+                $courses = User::getMyCourseList();
+            // admins
+            } else {
+                $courses = User::getMyDepartmentsCourseList('list');
+            }
+    
+            if (!in_array($course_id, array_keys($courses))) {
+                $this->Session->setFlash(__('Error: You do not have permission to make groups for this course', true));
+                $this->redirect('index');
+            }
         }
         $courseName = $course['Course']['course'];
         $this->set('title_for_layout', $courseName.__(' > Create Group Set', true));
@@ -467,18 +471,20 @@ class SurveyGroupsController extends AppController
         
         $groupSet = $this->SurveyGroupSet->find('first', array('conditions' => array('SurveyGroupSet.id' => $group_set_id)));
         
-        // check whether the user has access to the course
-        // instructors
-        if (!User::hasPermission('controllers/departments')) {
-            $courses = User::getMyCourseList();
-        // admins & super admins
-        } else {
-            $courses = User::getMyDepartmentsCourseList('list');
-        }
-
-        if (!in_array($groupSet['Survey']['course_id'], array_keys($courses))) {
-            $this->Session->setFlash(__('Error: You do not have permission to delete this survey group set', true));
-            $this->redirect('index');
+        if (!User::hasPermission('superadmin')) {
+            // check whether the user has access to the course
+            // instructors
+            if (!User::hasPermission('controllers/departments')) {
+                $courses = User::getMyCourseList();
+            // admins
+            } else {
+                $courses = User::getMyDepartmentsCourseList('list');
+            }
+    
+            if (!in_array($groupSet['Survey']['course_id'], array_keys($courses))) {
+                $this->Session->setFlash(__('Error: You do not have permission to delete this survey group set', true));
+                $this->redirect('index');
+            }
         }
 
         if ($this->SurveyGroupSet->delete($group_set_id)) {

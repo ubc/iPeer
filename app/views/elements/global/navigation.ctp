@@ -34,7 +34,7 @@ if (User::isLoggedIn()) {
     }
 
     // Users Tab
-    if (User::hasPermission('controllers/users')) {
+    if (User::hasPermission('functions/user/index')) {
         generateTab($this, 'users', array('users'), 'Users');
     }
 
