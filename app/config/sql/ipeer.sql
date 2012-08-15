@@ -614,6 +614,14 @@ CREATE TABLE IF NOT EXISTS `users` (
   UNIQUE (`lti_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `password`, `first_name`, `last_name`, `student_no`, `title`, `email`, `last_login`, `last_logout`, `last_accessed`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`, `lti_id`) VALUES
+(1, 'root', '', 'Super', 'Admin', NULL, NULL, '', NULL, NULL, NULL, 'A', 1, NOW(), NULL, NOW(), NULL);
+
+
 -- --------------------------------------------------------
 
 --
@@ -1106,8 +1114,8 @@ CREATE TABLE IF NOT EXISTS `mixevals_questions` (
 
 CREATE TABLE `oauth_clients` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) DEFAULT NULL,
-  `key` varchar(255) DEFAULT NULL,
+  `user_id` int(11) NOT NULL,
+  `key` varchar(255) NOT NULL,
   `secret` varchar(255) NOT NULL,
   `comment` text DEFAULT '',
   `enabled` tinyint(1) DEFAULT 1,
@@ -1118,6 +1126,19 @@ CREATE TABLE `oauth_clients` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `oauth_nonces`
+-- Stores nonces to defeat replay attacks.
+--
+
+CREATE TABLE `oauth_nonces` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nonce` varchar(255) NOT NULL,
+  `expires` TIMESTAMP NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+--
 -- Table structure for table `oauth_tokens`
 -- This stores OAuth token credentials (AKA: access token and secret).
 -- Token credentials are used to identify a user.
@@ -1125,8 +1146,8 @@ CREATE TABLE `oauth_clients` (
 
 CREATE TABLE `oauth_tokens` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) DEFAULT NULL,
-  `key` varchar(255) DEFAULT NULL,
+  `user_id` int(11) NOT NULL,
+  `key` varchar(255) NOT NULL,
   `secret` varchar(255) NOT NULL,
   `expires` date NOT NULL,
   `comment` text DEFAULT '',
@@ -1593,16 +1614,6 @@ CREATE TABLE IF NOT EXISTS `user_enrols` (
   KEY `user_id` (`user_id`),
   KEY `user_id_index` (`user_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`id`, `username`, `password`, `first_name`, `last_name`, `student_no`, `title`, `email`, `last_login`, `last_logout`, `last_accessed`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`, `lti_id`) VALUES
-(1, 'root', '', 'Super', 'Admin', NULL, NULL, '', NULL, NULL, NULL, 'A', 1, NOW(), NULL, NOW(), NULL);
-
 
 -- --------------------------------------------------------
 
