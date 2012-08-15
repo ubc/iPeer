@@ -10,9 +10,239 @@
  */
 class V1Controller extends Controller {
 
-    public $uses = array('User', 'Group', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric', 'EvaluationMixeval');
-    public $components = array('RequestHandler');
+    public $name = 'V1';
+    public $uses = array('User', 'Group', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric', 'EvaluationMixeval', 'OauthClient', 'OauthNonce', 'OauthToken');
+    public $helpers = array('Session');
+    public $components = array('RequestHandler', 'Session');
     public $layout = "blank_layout";
+
+    public function oauth() {
+    }
+
+    private function _checkRequiredParams() {
+        if (!isset($_REQUEST['oauth_consumer_key'])) {
+            $this->set('oauthError', "Parameter Absent: oauth_consumer_key");
+            $this->render('oauth_error');
+            return false;
+        }
+        if (!isset($_REQUEST['oauth_token'])) {
+            $this->set('oauthError', "Parameter Absent: oauth_token");
+            $this->render('oauth_error');
+            return false;
+        }
+        if (!isset($_REQUEST['oauth_signature_method'])) {
+            $this->set('oauthError',"Parameter Absent: oauth_signature_method");
+            $this->render('oauth_error');
+            return false;
+        }
+        if (!isset($_REQUEST['oauth_timestamp'])) {
+            $this->set('oauthError', "Parameter Absent: oauth_timestamp");
+            $this->render('oauth_error');
+            return false;
+        }
+        if (!isset($_REQUEST['oauth_nonce'])) {
+            $this->set('oauthError', "Parameter Absent: oauth_nonce");
+            $this->render('oauth_error');
+            return false;
+        }
+        // oauth_version is optional, but must be set to 1.0
+        if (isset($_REQUEST['oauth_version']) && 
+            $_REQUEST['oauth_version'] != "1.0"
+        ) {
+            $this->set('oauthError',
+                "Parameter Rejected: oauth_version 1.0 only");
+            $this->render('oauth_error');
+            return false;
+        }
+        if ($_REQUEST['oauth_signature_method'] != "HMAC-SHA1") {
+            $this->set('oauthError',
+                "Parameter Rejected: Only HMAC-SHA1 signatures supported.");
+            $this->render('oauth_error');
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Recalculate the oauth signature and check it against the given signature
+     * to make sure that they match.
+     */
+    private function _checkSignature() {
+        // Calculate the signature, note, going to assume that all incoming
+        // parameters are already UTF-8 encoded since it'll be impossible
+        // to convert encodings wit
+        $tmp = $_REQUEST;
+        unset($tmp['oauth_signature']);
+        unset($tmp['url']); // can ignore, mod_rewrite added, not sent by client
+        // percent-encode the keys and values
+        foreach ($tmp as $key => $val) {
+            // change the value
+            $val = rawurlencode($val);
+            $tmp[$key] = $val;
+            // change the key if needed
+            $encodedKey = rawurlencode($key);
+            if ($encodedKey != $key) {
+                $tmp[$encodedKey] = $val;
+                unset($tmp[$key]);
+            }
+        }
+        // sort by keys into byte order, technically should have another
+        // layer that sorts by value if keys are equal, but that shouldn't
+        // happen with our api
+        ksort($tmp);
+        // construct the data string used in hmac calculation
+        $params = "";
+        foreach ($tmp as $key => $val) {
+           $params .= $key . "=" . $val . "&"; 
+        }
+        $params = substr($params, 0, -1);
+        $reqType = "GET";
+        if ($this->RequestHandler->isPost()) {
+            $reqType = "POST";
+        }
+        else if ($this->RequestHandler->isPut()) {
+            $reqType = "PUT";
+        }
+        else if ($this->RequestHandler->isDelete()) {
+            $reqType = "DELETE";
+        }
+        $params = "$reqType&" . rawurlencode(Router::url($this->here, true)) 
+            . "&" . rawurlencode($params);
+        // construct the key used for hmac calculation
+        $clientSecret = $this->_getClientSecret($_REQUEST['oauth_consumer_key']);
+        if (is_null($clientSecret)) {
+            $this->set('oauthError', "Invalid Client");
+            $this->render('oauth_error');
+            return false;
+        }
+        $clientSecret = rawurlencode($clientSecret);
+        $tokenSecret = $this->_getTokenSecret($_REQUEST['oauth_token']);
+        if (is_null($tokenSecret)) {
+            $this->set('oauthError', "Invalid Token");
+            $this->render('oauth_error');
+            return false;
+        }
+        $tokenSecret = rawurlencode($tokenSecret);
+        $secrets = $clientSecret . "&" . $tokenSecret;
+
+        // get the binary result of the hmac calculation
+        $hmac = hash_hmac('sha1', $params, $secrets, true);
+        // need to encode it in base64
+        $expected = base64_encode($hmac);
+        // check to see if we got the signature we expected
+        $actual = $_REQUEST['oauth_signature'];
+        if ($expected != $actual) {
+            $this->set('oauthError', "Invalid Signature");
+            $this->render('oauth_error');
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Confirm that the nonce is valid. The nonce is valid if we have never
+     * seen that nonce used before. Since we can't store every single nonce
+     * ever used in a request, we limit the nonce storage to only 15 minutes.
+     * This necessitates checking that the timestamp given by the client is 
+     * relatively similar to the server's. If a request comes in that is beyond
+     * our 15 minute time frame for nonce storage, we can't be sure that the
+     * nonce hasn't been used before.
+     */
+    private function _checkNonce() {
+        // timestamp must be this many seconds within server time
+        $validTimeWindow = 15 * 60; // 15 minutes 
+        $now = time();
+        $then = $_REQUEST['oauth_timestamp'];
+        $diff = abs($now - $then);
+        // we should reject timestamps that are 15 minutes off from ours
+        if ($diff > $validTimeWindow) {
+            // more than 15 minutes of difference between the two times
+            $this->set('oauthError', "Timestamp Refused");
+            $this->render('oauth_error');
+            return false;
+        }
+
+        // delete nonces that we don't need to keep anymore.
+        // Note that we do this before checking for nonce uniqueness since
+        // we assume that all stored nonces are not expired. There is an edge 
+        // case where if a request reuses a nonce immediately after it expires, 
+        // we would reject the nonce since it hasn't been removed from the db.
+        $this->OauthNonce->deleteAll(
+            array('expires <' => date("Y-m-d H:i:s", $now - $validTimeWindow)));
+
+        // check nonce uniqueness
+        $nonce = $_REQUEST['oauth_nonce'];
+        $ret = $this->OauthNonce->findByNonce($nonce);
+        if ($ret) {
+            // we've seen this nonce already
+            $this->set('oauthError', "Nonce Used");
+            $this->render('oauth_error');
+            return false;
+        }
+        else {
+            // store nonce we haven't encountered before
+            $this->OauthNonce->save(
+                array(
+                    'nonce' => $nonce, 
+                    'expires' => date("Y-m-d H:i:s", $now + $validTimeWindow)
+                )
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * Retrieve the client credential secret based on the key. The client
+     * credential identifies the client program acting on behalf of the
+            iebug($input);
+     * resource owner.
+     *
+     * @param $key - identifier for the secret.
+     *
+     * @return The secret if found, null if not.
+     */
+    private function _getClientSecret($key) {
+        $ret = $this->OauthClient->findByKey($key);
+        if (!empty($ret)) {
+            if ($ret['OauthClient']['enabled']) {
+                return $ret['OauthClient']['secret'];
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Retrieve the token credential secret based on the key. The token
+     * credential identifies the resource owner (user).
+     *
+     * @param $key - identifier for the secret.
+     *
+     * @return The secret if found, null if not.
+     */
+    private function _getTokenSecret($key) {
+        $ret = $this->OauthToken->findByKey($key);
+        if (!empty($ret)) {
+            if ($ret['OauthToken']['enabled'] &&
+                strtotime($ret['OauthToken']['expires']) > time()
+            ) {
+                return $ret['OauthToken']['secret'];
+            }
+        }
+        return null;
+    }
+
+    public function beforeFilter() {
+        return $this->_checkRequiredParams() &&
+        $this->_checkSignature() &&
+        $this->_checkNonce();
+    }
+
+    /**
+     * Empty controller action for displaying the oauth error page.
+     */
+    public function oauth_error() {
+    }
 
     /**
      * Get a list of users in iPeer.
@@ -82,7 +312,7 @@ class V1Controller extends Controller {
                 $this->set('user', null);
             } else {
                 $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
-                $this->set('user', 'Error: the user was not delete');
+                $this->set('user', 'Error: the user was not deleted');
             }
         // update
         } else if ($this->RequestHandler->isPut()) {

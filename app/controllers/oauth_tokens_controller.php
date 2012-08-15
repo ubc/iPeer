@@ -29,7 +29,7 @@ class OauthTokensController extends AppController {
         foreach ($allTokens as $cred) {
             $enabled = "On";
             $expiry = $cred['OauthToken']['expires'];
-            if (strtotime(date("Y-m-d")) > strtotime($expiry)) {
+            if (time() > strtotime($expiry)) {
                 $enabled = "Expired";
             }
             $tmp = array();

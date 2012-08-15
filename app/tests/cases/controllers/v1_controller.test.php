@@ -2,16 +2,15 @@
 class V1ControllerTest extends CakeTestCase {
     public $fixtures = array(
         'app.evaluation_mixeval', 'app.evaluation_rubric',
-        'app.evaluation_simple', 'app.course', 'app.role', 'app.user', 'app.group',
-        'app.roles_user', 'app.event', 'app.event_template_type',
-        'app.group_event', 'app.evaluation_submission',
-        'app.survey_group_set', 'app.survey_group',
-        'app.survey_group_member', 'app.question',
+        'app.evaluation_simple', 'app.course', 'app.role', 'app.user', 
+        'app.group', 'app.roles_user', 'app.event', 'app.event_template_type', 
+        'app.group_event', 'app.evaluation_submission', 'app.survey_group_set', 
+        'app.survey_group', 'app.survey_group_member', 'app.question',
         'app.response', 'app.survey_question', 'app.user_course',
         'app.user_enrol', 'app.groups_member', 'app.survey',
         'app.faculty', 'app.department', 'app.course_department',
-        'app.user_faculty', 'app.user_tutor', 'app.sys_parameter', 'app.penalty'
-        
+        'app.user_faculty', 'app.user_tutor', 'app.sys_parameter', 
+        'app.penalty', 'app.oauth_client', 'app.oauth_token'
     );
 
     public function startCase() {
@@ -25,10 +24,166 @@ class V1ControllerTest extends CakeTestCase {
     }
     public function startTest($method) {
         echo '<h3>Starting method ' . $method . '</h3>';
+        $clients = $this->_fixtures['app.oauth_client']->records;
+        $tokens = $this->_fixtures['app.oauth_token']->records;
+        $this->clientKey = $clients['0']['key'];
+        $this->clientSecret = $clients['0']['secret'];
+        $this->tokenKey = $tokens['0']['key'];
+        $this->tokenSecret = $tokens['0']['secret'];
     }
     public function endTest($method) {
         echo '<h3>Ending method ' . $method . '</h3>';
         echo '<hr />';
+    }
+
+    private function _get_http_response_code($url) {
+        $headers = get_headers($url);
+        return substr($headers[0], 9, 3);
+    }    
+
+    private function _oauthReq($url, $content = null, $reqType = null, 
+        $nonce = null, $timestamp = null) 
+    {
+        try {
+            $oauth = new OAuth(
+                $this->clientKey,
+                $this->clientSecret,
+                OAUTH_SIG_METHOD_HMACSHA1,
+                OAUTH_AUTH_TYPE_URI
+            );
+            $oauth->enableDebug();
+            $oauth->setToken(
+                $this->tokenKey, 
+                $this->tokenSecret
+            );
+            if (!is_null($nonce)) {
+                $oauth->setNonce($nonce);
+            }
+            if (!is_null($timestamp)) {
+                $oauth->setTimestamp($timestamp);
+            }
+            if (is_null($reqType)) {
+                $reqType = OAUTH_HTTP_METHOD_GET;
+            }
+            $oauth->fetch("$url", $content, $reqType);
+            $ret = $oauth->getLastResponse();
+
+            return $ret;
+        } catch(OAuthException $e) {
+            return $e->lastResponse;
+        }
+    }
+
+    private function _req($url) {
+        $opts = array(
+            'http' => array(
+                'method' => "GET",
+                'header' => array('Content-type: application/json'),
+                'ignore_errors' => true
+            )
+        );
+
+        $context = stream_context_create($opts);
+        $ret = @file_get_contents($url, false, $context);
+        return $ret;
+    }
+
+    public function testCheckRequiredParams() {
+        $url = Router::url('v1/oauth', true);
+        // Test required parameters checking
+        // missing oauth_consumer_key
+        $params = "oauth_signature_method=HMAC-SHA1&oauth_nonce=7&oauth_timestamp=1&oauth_version=1.0&oauth_token=1&oauth_signature=4";
+        $this->assertEqual(
+            '{"oauthError":"Parameter Absent: oauth_consumer_key"}', 
+            $this->_req($url."?$params")
+        );
+        // missing oauth_signature_method
+        $params = "oauth_consumer_key=a&oauth_nonce=7&oauth_timestamp=1&oauth_version=1.0&oauth_token=1&oauth_signature=4";
+        $this->assertEqual(
+            '{"oauthError":"Parameter Absent: oauth_signature_method"}', 
+            $this->_req($url."?$params")
+        );
+        // missing oauth_nonce
+        $params = "oauth_consumer_key=a&oauth_signature_method=HMAC-SHA1&oauth_timestamp=1&oauth_version=1.0&oauth_token=1&oauth_signature=4";
+        $this->assertEqual(
+            '{"oauthError":"Parameter Absent: oauth_nonce"}', 
+            $this->_req($url."?$params")
+        );
+        // missing oauth_timestamp
+        $params = "oauth_consumer_key=a&oauth_signature_method=HMAC-SHA1&oauth_nonce=7&oauth_version=1.0&oauth_token=1&oauth_signature=4";
+        $this->assertEqual(
+            '{"oauthError":"Parameter Absent: oauth_timestamp"}', 
+            $this->_req($url."?$params")
+        );
+        // allow no oauth_version
+        $params = "oauth_consumer_key=a&oauth_signature_method=HMAC-SHA1&oauth_nonce=7&oauth_timestamp=1&oauth_token=1&oauth_signature=4";
+        $this->assertEqual(
+            '{"oauthError":"Invalid Client"}', 
+            $this->_req($url."?$params")
+        );
+        // incorrect oauth_version
+        $params = "oauth_consumer_key=a&oauth_signature_method=HMAC-SHA1&oauth_nonce=7&oauth_timestamp=1&oauth_version=2.0&oauth_token=1&oauth_signature=4";
+        $this->assertEqual(
+            '{"oauthError":"Parameter Rejected: oauth_version 1.0 only"}', 
+            $this->_req($url."?$params")
+        );
+        // incorrect signature method
+        $params = "oauth_consumer_key=a&oauth_signature_method=HMAC-MD5&oauth_nonce=7&oauth_timestamp=1&oauth_version=1.0&oauth_token=1&oauth_signature=4";
+        $this->assertEqual(
+            '{"oauthError":"Parameter Rejected: Only HMAC-SHA1 signatures supported."}', 
+            $this->_req($url."?$params")
+        );
+    }
+
+    public function testCheckSignature() {
+        $url = Router::url('v1/oauth', true);
+
+        // No errors thrown
+        $this->assertEqual('', $this->_oauthReq($url));
+        // The client key couldn't be found in the db
+        $original = $this->clientKey;
+        $this->clientKey = "a";
+        $this->assertEqual(
+            '{"oauthError":"Invalid Client"}', $this->_oauthReq($url));
+        $this->clientKey = $original;
+        // The token key couldn't be found in the db
+        $original = $this->tokenKey;
+        $this->tokenKey = "a";
+        $this->assertEqual(
+            '{"oauthError":"Invalid Token"}', $this->_oauthReq($url));
+        $this->tokenKey = $original;
+        // Incorrect client secret 
+        $original = $this->clientSecret;
+        $this->clientSecret = "a";
+        $this->assertEqual(
+            '{"oauthError":"Invalid Signature"}', $this->_oauthReq($url));
+        $this->clientSecret = $original;
+        // Incorrect token secret 
+        $original = $this->tokenSecret;
+        $this->tokenSecret = "a";
+        $this->assertEqual(
+            '{"oauthError":"Invalid Signature"}', $this->_oauthReq($url));
+        $this->tokenSecret = $original;
+        // No errors thrown
+        $this->assertEqual('', $this->_oauthReq($url));
+    }
+
+    public function testCheckNonce() {
+        $url = Router::url('v1/oauth', true);
+        // invalid timestamp 
+        $this->assertEqual(
+            '{"oauthError":"Timestamp Refused"}', 
+            $this->_oauthReq($url, null, null, null, 1344974674)
+        );
+        // test nonce
+        $nonce = rand();
+        // first use nonce to make sure the nonce is used
+        $this->assertEqual("", $this->_oauthReq($url, null, null, $nonce));
+        // then try to reuse the nonce and make sure it is rejected
+        $this->assertEqual(
+            '{"oauthError":"Nonce Used"}', 
+            $this->_oauthReq($url, null, null, $nonce)
+        );
     }
 
     public function testUsers()
@@ -56,17 +211,9 @@ class V1ControllerTest extends CakeTestCase {
             $expected[] = $tmp;
         }
         
-        $opts = array(
-            'http' => array(
-                'method' => "GET",
-                'header' => array('Content-type: application/json')
-            )
-        );
-
-        $context = stream_context_create($opts);
-        $file = file_get_contents($url, false, $context);
-        $this->assertEqual($file, json_encode($expected));
-        $this->assertEqual(json_decode($file, true), $expected);
+        $ret = $this->_oauthReq($url);
+        $this->assertEqual($ret, json_encode($expected));
+        $this->assertEqual(json_decode($ret, true), $expected);
         
         // GET - specific user
         $expectedPerson = array(
@@ -77,18 +224,9 @@ class V1ControllerTest extends CakeTestCase {
             'first_name' => 'Edna'
         );
         
-        $opts = array(
-            'http' => array(
-                'method' => "GET",
-                'header' => array('Content-type: application/json')
-            )
-        );
-
-        $context = stream_context_create($opts);
-        $file = file_get_contents($url.'/17', false, $context);
-        
-        $this->assertEqual($file, json_encode($expectedPerson));
-        $this->assertEqual(json_decode($file, true), $expectedPerson);
+        $ret = $this->_oauthReq($url.'/17');
+        $this->assertEqual($ret, json_encode($expectedPerson));
+        $this->assertEqual(json_decode($ret, true), $expectedPerson);
         
         // POST - add user
         $newUser = array(
@@ -104,31 +242,14 @@ class V1ControllerTest extends CakeTestCase {
                 array()
         );
 
-        $opts = array(
-            'http' => array(
-                'method' => "POST",
-                'header' => array('Content-type: application/json'),
-                'content' => json_encode($newUser)
-            )
-        );
-
-        $context = stream_context_create($opts);
-
-        $file = file_get_contents($url, false, $context);
+        $file = $this->_oauthReq(
+            $url, json_encode($newUser), OAUTH_HTTP_METHOD_POST);
         $user = json_decode($file, true);
         $userId = $user['id'];
 
         $expectedPerson = array('id' => $userId, 'role_id' => '5', 'username' => 'coolUser', 'last_name' => 'Hardy', 'first_name' => 'Jack');
 
-        $opts = array(
-            'http' => array(
-                'method' => "GET",
-                'header' => array('Content-type: application/json'),
-            )
-        );
-
-        $context = stream_context_create($opts);
-        $newPerson = file_get_contents($url.'/'.$userId, false, $context);
+        $newPerson = $this->_oauthReq("$url/$userId");
 
         $this->assertEqual(json_decode($newPerson, true), $expectedPerson);
         
@@ -140,50 +261,22 @@ class V1ControllerTest extends CakeTestCase {
         
         $expectedPerson = array('id' => $userId, 'role_id' => '5', 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane');
 
-        $opts = array(
-            'http' => array(
-                'method' => "PUT",
-                'header' => array('Content-type: application/json'),
-                'content' => json_encode($updatedPerson)
-            )
-        );
+        $file = $this->_oauthReq(
+            $url, json_encode($updatedPerson), OAUTH_HTTP_METHOD_PUT);
 
-        $context = stream_context_create($opts);
-
-        $file = file_get_contents($url.'/'.$userId, false, $context);
-
-        $opts = array(
-            'http' => array(
-                'method' => "GET",
-                'header' => array('Content-type: application/json')
-            )
-        );
-        
-        $context = stream_context_create($opts);
-        $editedPerson = file_get_contents($url.'/'.$userId, false, $context);
+        $editedPerson = $this->_oauthReq("$url/$userId");
         
         $this->assertEqual(json_decode($editedPerson, true), $expectedPerson);
         
         // DELETE - delete the user
-        $opts = array(
-            'http' => array(
-                'method' => "DELETE",
-                'header' => array('Content-type: application/json')
-            )
+        $file = $this->_oauthReq(
+            "$url/$userId", 
+            null, 
+            OAUTH_HTTP_METHOD_DELETE
         );
-
-        $context = stream_context_create($opts);
-
-        $file = file_get_contents($url.'/'.$userId, false, $context);
         
-        if ($this->get_http_response_code($url.'/'.$userId) == 404) {
-            $deleteTest = 'successful';
-        } else {
-            $deleteTest = 'failed';
-        }
-        
-        $this->assertEqual($deleteTest, 'successful');
-
+        $ret = $this->_oauthReq("$url/$userId");
+        $this->assertEqual(substr($ret, 0, 8), '"No user');
     }
     
     public function testCourses()
@@ -203,20 +296,13 @@ class V1ControllerTest extends CakeTestCase {
 
         // get a list of courses (method: get) and compare to expected
         // see that the proper variables are set for passing to the view (no $id)
-        $opts = array(
-            'http'=>array(
-                'method'=>"GET",
-                'header'=>"Content-Type: application/json"
-            )
-        );
-        $context = stream_context_create($opts);
-        $actualList = file_get_contents($url, false, $context);
+        $actualList = $this->_oauthReq($url);
         // grab data, which should be in json format since it's the view (no $id);
         $actualList = json_decode($actualList, true);
         $this->assertEqual($expectedList, $actualList);
         
         // get a course with id (method: get) and compare to expected
-        $actualCourse = file_get_contents($url.'/1', false, $context);
+        $actualCourse = $this->_oauthReq("$url/1");
         $actualCourse = json_decode($actualCourse, true);
         $this->assertEqual($expectedCourse, $actualCourse);
         
@@ -226,15 +312,8 @@ class V1ControllerTest extends CakeTestCase {
             'Course' => array('course' => 'BLAH 789', 'title' => 'Title for Blah Course'),
             'Department' => array('Department' => array('0' => 2))
         );
-        $opts = array(
-            'http' => array(
-                'method' => "POST",
-                'header' => "Content-Type: application/json",
-                'content' => json_encode($newCourse)
-            )
-        );
-        $context = stream_context_create($opts);
-        $file = file_get_contents($url, null, $context);
+        $file = $this->_oauthReq(
+            $url, json_encode($newCourse), OAUTH_HTTP_METHOD_POST);
         $course = json_decode($file, true);
         $id = $course['id'];
         $opts = array(
@@ -244,54 +323,32 @@ class V1ControllerTest extends CakeTestCase {
             )
         );
         $context = stream_context_create($opts);
-        $checkCourse = file_get_contents($url.'/'.$id, null, $context);
+        $checkCourse = $this->_oauthReq("$url/$id");
         $checkCourse = json_decode($checkCourse, true);
         $expectedCourse = array('id' => $id, 'course' => 'BLAH 789', 'title' => 'Title for Blah Course');
         $this->assertEqual($expectedCourse, $checkCourse);
         
         // update a course with id (method: put) and compare results to expected
         $updateCourse = array('Course' => array('id' => $id, 'course' => 'BLAH 789', 'title' => 'Updated Title for Blah Course'));
-        $opts = array(
-            'http' => array(
-                'method' => "PUT",
-                'header' => "Content-Type: application/json",
-                'content' => json_encode($updateCourse)
-            )
-        );
-        $context = stream_context_create($opts);
-        $file = file_get_contents($url.'/'.$id, null, $context);
+        $file = $this->_oauthReq(
+            "$url/$id", json_encode($updateCourse), OAUTH_HTTP_METHOD_PUT);
         $course = json_decode($file, true);
         $id = $course['id'];
-        $opts = array(
-            'http'=>array(
-                'method'=>"GET",
-                'header'=>"Content-Type: application/json"
-            )
-        );
-        $context = stream_context_create($opts);
-        $checkCourse = file_get_contents($url.'/'.$id, null, $context);
+        $checkCourse = $this->_oauthReq("$url/$id");
         $checkCourse = json_decode($checkCourse, true);
         // what the fields of updated course should be
         $expectedUpdate = array('id' => $id, 'course' => 'BLAH 789', 'title' => 'Updated Title for Blah Course');
         $this->assertEqual($expectedUpdate, $checkCourse);
         
         // delete a course with id (method: delete) and check to see if it still exists after
-        $opts = array(
-            'http' => array(
-                'method' => "DELETE",
-                'header' => "Content-Type: application/json"
-            )
+        $file = $this->_oauthReq(
+            "$url/$id", 
+            null,
+            OAUTH_HTTP_METHOD_DELETE
         );
-        $context = stream_context_create($opts);
-        file_get_contents($url.'/'.$id, null, $context);
         
-        if ($this->get_http_response_code($url.'/'.$id) == 404) {
-            $deleteTest = 'successful';
-        } else {
-            $deleteTest = 'failed';
-        }
-        
-        $this->assertEqual($deleteTest, 'successful');
+        $ret = $this->_oauthReq("$url/$id");
+        $this->assertEqual(substr($ret, 0, 10), '"No course');
     }
     
     public function testGroups() {
@@ -311,15 +368,7 @@ class V1ControllerTest extends CakeTestCase {
             }
         }
         
-        $opts = array(
-            'http' => array(
-                'method' => "GET",
-                'header' => array('Content-type: application/json')
-            )
-        );
-
-        $context = stream_context_create($opts);
-        $file = file_get_contents($url.'/1/groups', false, $context);
+        $file = $this->_oauthReq("$url/1/groups");
         
         $this->assertEqual($file, json_encode($expected));
         $this->assertEqual(json_decode($file, true), $expected);
@@ -328,15 +377,7 @@ class V1ControllerTest extends CakeTestCase {
         $expectedGroup = array();
         $expectedGroup = $expected['1'];
         
-        $opts = array(
-            'http' => array(
-                'method' => "GET",
-                'header' => array('Content-type: application/json')
-            )
-        );
-        
-        $context = stream_context_create($opts);
-        $file = file_get_contents($url.'/1/groups/2', false, $context);
+        $file = $this->_oauthReq("$url/1/groups/2");
         
         $this->assertEqual($file, json_encode($expectedGroup));
         $this->assertEqual(json_decode($file, true), $expectedGroup);
@@ -360,16 +401,8 @@ class V1ControllerTest extends CakeTestCase {
             )
         );
 
-        $opts = array(
-            'http' => array(
-                'method' => "POST",
-                'header' => array('Content-type: application/json'),
-                'content' => json_encode($addGroup)
-            )
-        );
-        
-        $context = stream_context_create($opts);
-        $file = file_get_contents($url.'/2/groups', false, $context);
+        $file = $this->_oauthReq("$url/2/groups", json_encode($addGroup),
+            OAUTH_HTTP_METHOD_POST);
 
         $expected = json_decode($file, true);
         $id = $expected['id'];
@@ -381,15 +414,7 @@ class V1ControllerTest extends CakeTestCase {
             'course_id' => 2
         );
         
-        $opts = array(
-            'http' => array(
-                'method' => "GET",
-                'header' => array('Content-type: application/json')
-            )
-        );
-        
-        $context = stream_context_create($opts);
-        $addedGroup = file_get_contents($url.'/2/groups/'.$id, false, $context);
+        $addedGroup = $this->_oauthReq("$url/2/groups/$id");
 
         $this->assertEqual(json_decode($addedGroup, true), $expectedGroup);
         
@@ -413,16 +438,8 @@ class V1ControllerTest extends CakeTestCase {
             )
         );
         
-        $opts = array(
-            'http' => array(
-                'method' => "PUT",
-                'header' => array('Content-type:application/json'),
-                'content' => json_encode($editGroup)
-            )
-        );
-        
-        $context = stream_context_create($opts);
-        file_get_contents($url.'/2/groups/'.$id, false, $context);
+        $this->_oauthReq("$url/2/groups/$id", json_encode($editGroup), 
+            OAUTH_HTTP_METHOD_PUT);
 
         $expected = json_decode($file, true);
         $id = $expected['id'];
@@ -434,39 +451,17 @@ class V1ControllerTest extends CakeTestCase {
             'course_id' => 2
         );
         
-        $opts = array(
-            'http' => array(
-                'method' => "GET",
-                'header' => array('Content-type:application/json'),
-            )
-        );
-        
-        $context = stream_context_create($opts);
-        $editedGroup = file_get_contents($url.'/2/groups/'.$id, false, $context);
+        $editedGroup = $this->_oauthReq("$url/2/groups/$id");
         
         $this->assertEqual(json_decode($editedGroup, true), $expectedGroup);
         
         // DELETE - delete a group
-        
-        $opts = array(
-            'http' => array(
-                'method' => "DELETE",
-                'header' => array('Content-type:application/json')
-            )
-        );
-        
-        $context = stream_context_create($opts);
-        file_get_contents($url.'/2/groups/'.$id, false, $context);
-        
-        if ($this->get_http_response_code($url.'/2/groups/'.$id) == 404) {
-            $deleteTest = 'successful';
-        } else {
-            $deleteTest = 'failed';
-        }
-        
-        $this->assertEqual($deleteTest, 'successful');
+        $this->_oauthReq("$url/2/groups/$id", null, OAUTH_HTTP_METHOD_DELETE);
+        $ret = $this->_oauthReq("$url/2/groups/$id");
+        $this->assertEqual(substr($ret, 0, 9), '"No group');
     }
-    
+
+    /*
     public function testEvents()
     {
         $url = Router::url('v1/courses/1/events', true);
@@ -570,9 +565,6 @@ class V1ControllerTest extends CakeTestCase {
         $expectedGrade = array("evaluatee" => 6, "score" => 2.4, "id" => 2);
         $this->assertEqual($expectedGrade, $studentGrade);
     }
+     */
     
-    function get_http_response_code($url) {
-        $headers = get_headers($url);
-        return substr($headers[0], 9, 3);
-    }    
 }
