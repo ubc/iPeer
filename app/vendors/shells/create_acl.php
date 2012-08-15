@@ -163,6 +163,11 @@ class CreateAclShell extends Shell
         $this->Acl->Aco->create(array('parent_id' => null, 'alias' => 'superadmin'));
         $superadmin = $this->Acl->Aco->save();
         
+        // onlytakeeval
+        // for roles that can only take evaluations
+        $this->Acl->Aco->create(array('parent_id' => null, 'alias' => 'onlytakeeval'));
+        $onlytakeeval = $this->Acl->Aco->save();
+        
     }
 
 
@@ -559,6 +564,7 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'functions');
         $this->Acl->deny($role, 'functions/viewemailaddresses');
         $this->Acl->deny($role, 'superadmin');
+        $this->Acl->allow($role, 'onlytakeeval');
         
         $role->id = 5; // student
         $this->Acl->deny($role, 'controllers');
@@ -578,5 +584,6 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'functions/viewstudentresults');
         $this->Acl->deny($role, 'functions/viewemailaddresses');
         $this->Acl->deny($role, 'superadmin');
+        $this->Acl->allow($role, 'onlytakeeval');
     }
 }

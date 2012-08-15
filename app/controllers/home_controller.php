@@ -47,14 +47,20 @@ class HomeController extends AppController
     function index()
     {
         //General Home Rendering for Admin
-        if (User::hasRole('superadmin') || User::hasRole('admin')) {
+        if (User::hasPermission('superadmin')) {
+            $course_list = $this->Course->find('all');
+            $this->set('course_list', $this->_formatCourseList($course_list));
+        // admins
+        } else if (User::hasPermission('controllers/departments')) {
             $course_list = User::getMyDepartmentsCourseList('all');
             $this->set('course_list', $this->_formatCourseList($course_list));
-        } else if (User::hasRole('instructor')) {
+        // students & tutors
+        } else if (User::hasPermission('onlytakeeval')) {
+            $this->redirect('studentIndex');
+        // instructors
+        } else {
             $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
             $this->set('course_list', $this->_formatCourseList($course_list));
-        } else if (User::hasRole('student') || User::hasRole('tutor')) {
-            $this->redirect('studentIndex');
         }
     }
     

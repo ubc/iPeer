@@ -461,7 +461,7 @@ class V1ControllerTest extends CakeTestCase {
         $this->assertEqual(substr($ret, 0, 9), '"No group');
     }
 
-    /*
+
     public function testEvents()
     {
         $url = Router::url('v1/courses/1/events', true);
@@ -484,10 +484,9 @@ class V1ControllerTest extends CakeTestCase {
                 'header'=>"Content-Type: application/json"
             )
         );
-        $context = stream_context_create($opts);
-        $actualEvents = file_get_contents($url, null, $context);
-        $actualEvents = json_decode($actualEvents, true);
-        $this->assertEqual($expectedEvents, $actualEvents);
+        
+        debug(_oauthReq("$url"));
+        //$this->assertEqual($expectedEvents, $actualEvents);
 
         $actualEvent = file_get_contents($url.'/3', null, $context);
         $actualEvent = json_decode($actualEvent, true);
@@ -495,7 +494,7 @@ class V1ControllerTest extends CakeTestCase {
         $this->assertEqual($expectedEvent, $actualEvent);
     }
     
-    public function testGrades()
+    /*public function testGrades()
     {
         $url = Router::url('v1/courses/1/events/', true);
         $events = $this->_fixtures['app.event']->records;
