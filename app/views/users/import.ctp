@@ -20,7 +20,7 @@
             <input type="hidden" name="required" value="course_id"/>
             <?php echo $this->Form->hidden('User/role'); ?>
             <ol>
-                <li><h3><?php __('Please select a CSV file to import:')?></h3><?php echo $this->Form->file('file', array('name' => 'file', 'class' => 'required')); ?></li>
+                <li><h3><?php __('Please select a TXT or CSV file to import:')?></h3><?php echo $this->Form->file('file', array('name' => 'file', 'class' => 'required')); ?></li>
                 <li><h3><?php __('Select the course to import into:')?></h3><?php echo $this->element('courses/course_selection_box', $courseParams); ?></li>
                 <li><h3><?php __('Click the button below to import the students:')?></h3><?php echo $this->Form->submit(__('Import', true))?></li>
             </ol>

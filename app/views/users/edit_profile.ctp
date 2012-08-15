@@ -63,7 +63,7 @@
     <h3><?php __('OAuth Client Credentials')?>:</h3>
     <?php if (count($clients) == 0 || User::hasPermission('controllers/oauthclients')) { ?>
         <?php echo $html->image('icons/add.gif', array('alt'=>__('Add Client Credential', true))); ?>&nbsp;<?php echo $html->link(__('Add Client Credential', true), '/oauth_clients/add', array('id' => 'add')); ?>
-    <? } ?>
+    <?php } ?>
     <?php if (count($clients) > 0) { ?>
         <?php foreach ($clients as $key => $client) { ?>
             <p><label id=key><?php echo __('Key').': '.$client['OauthClient']['key'];?></label>

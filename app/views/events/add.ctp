@@ -124,7 +124,7 @@ function initDateTime() {
 function addPenaltyInputs() {
     // This is the penalty input template we generated in the penalty section
     var penaltyInputs = '<?php echo $penaltyInputs ?>';
-    console.log("count: " + penaltyCount);
+    //console.log("count: " + penaltyCount);
     // In order to insert multiple entries of Penalty correctly, CakePHP
     // requires that the form name be indexed accordingly. Here, we replace
     // the default index 0 with whatever index the user is on at the moment.
@@ -170,7 +170,7 @@ function changeCourseId() {
     var courseId = jQuery("#EventCourseId").val();
     
     if (courseId != <?php echo $course_id ?>) {
-        window.location.replace("/events/add/" + courseId);
+        window.location.replace("<?php echo $this->base; ?>/events/add/" + courseId);
     }
 }
 
