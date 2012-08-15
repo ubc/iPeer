@@ -1,8 +1,8 @@
 <?php
 class OauthNonce extends AppModel {
-    var $name = 'OauthNonce';
-    var $displayField = 'nonce';
-    var $validate = array(
+    public $name = 'OauthNonce';
+    public $displayField = 'nonce';
+    public $validate = array(
         'nonce' => array(
             'notempty' => array(
                 'rule' => array('notempty'),

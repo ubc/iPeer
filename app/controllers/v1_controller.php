@@ -31,7 +31,7 @@ class V1Controller extends Controller {
             return false;
         }
         if (!isset($_REQUEST['oauth_signature_method'])) {
-            $this->set('oauthError',"Parameter Absent: oauth_signature_method");
+            $this->set('oauthError', "Parameter Absent: oauth_signature_method");
             $this->render('oauth_error');
             return false;
         }
@@ -66,6 +66,8 @@ class V1Controller extends Controller {
     /**
      * Recalculate the oauth signature and check it against the given signature
      * to make sure that they match.
+     * 
+     * @return bool - true if signatures match
      */
     private function _checkSignature() {
         // Calculate the signature, note, going to assume that all incoming
@@ -99,11 +101,9 @@ class V1Controller extends Controller {
         $reqType = "GET";
         if ($this->RequestHandler->isPost()) {
             $reqType = "POST";
-        }
-        else if ($this->RequestHandler->isPut()) {
+        } else if ($this->RequestHandler->isPut()) {
             $reqType = "PUT";
-        }
-        else if ($this->RequestHandler->isDelete()) {
+        } else if ($this->RequestHandler->isDelete()) {
             $reqType = "DELETE";
         }
         $params = "$reqType&" . rawurlencode(Router::url($this->here, true)) 
@@ -147,6 +147,8 @@ class V1Controller extends Controller {
      * relatively similar to the server's. If a request comes in that is beyond
      * our 15 minute time frame for nonce storage, we can't be sure that the
      * nonce hasn't been used before.
+     * 
+     * @return bool - true/false depending on nonce validity
      */
     private function _checkNonce() {
         // timestamp must be this many seconds within server time
@@ -178,8 +180,7 @@ class V1Controller extends Controller {
             $this->set('oauthError', "Nonce Used");
             $this->render('oauth_error');
             return false;
-        }
-        else {
+        } else {
             // store nonce we haven't encountered before
             $this->OauthNonce->save(
                 array(
@@ -198,7 +199,7 @@ class V1Controller extends Controller {
             iebug($input);
      * resource owner.
      *
-     * @param $key - identifier for the secret.
+     * @param mixed $key - identifier for the secret.
      *
      * @return The secret if found, null if not.
      */
@@ -216,7 +217,7 @@ class V1Controller extends Controller {
      * Retrieve the token credential secret based on the key. The token
      * credential identifies the resource owner (user).
      *
-     * @param $key - identifier for the secret.
+     * @param mixed $key - identifier for the secret.
      *
      * @return The secret if found, null if not.
      */
