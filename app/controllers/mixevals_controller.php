@@ -662,13 +662,10 @@ class MixevalsController extends AppController
     /**
      * renderRows
      *
-     * @param bool $row             row
-     * @param bool $criteria_weight criteria weight
-     *
      * @access public
      * @return void
      */
-    function renderRows($row=null, $criteria_weight=null )
+    function renderRows()
     {
         $this->layout = 'ajax';
         $this->render('row');

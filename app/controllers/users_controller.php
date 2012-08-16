@@ -140,8 +140,6 @@ class UsersController extends AppController
         $deleteUserWarning = __("Delete this user. Irreversible. Are you sure?", true);
         $resetPassWarning = __("Resets user Password. Are you sure?", true);
 
-        $courses = $this->UserCourse->find('list', array('conditions' => array('user_id' => $this->Auth->user('id'))));
-
         $actionRestrictions = "";
 
         $joinTables =  array(
@@ -857,9 +855,6 @@ class UsersController extends AppController
             $this->Session->setFlash('Error: You do not have permission to delete this user');
             $this->redirect('index');
         }
-        
-        $user = $this->UserCourse->find('list', array('conditions' => array('user_id' => $this->Auth->user('id'))));
-        $student = $this->User->find('first', array('conditions' => array('User.id' => $id)));
 
         // instructors
         if (!User::hasPermission('controllers/departments')) {

@@ -74,7 +74,7 @@ class SearchsController extends AppController
             $this->set('userPersonalize', $this->userPersonalize);
         } else {
             $this->show = '15';
-            $this->update($attributeCode = 'Search.ListMenu.Limit.Show', $attributeValue = $this->show);
+            //$this->update($attributeCode = 'Search.ListMenu.Limit.Show', $attributeValue = $this->show);
         }
     }
 
@@ -122,11 +122,11 @@ class SearchsController extends AppController
     function searchEvaluation()
     {
         $nibble = $this->Search->setEvaluationCondition($this->params);
-        $sticky = $nibble['sticky'];
+        //$sticky = $nibble['sticky'];
         $condition = $nibble['condition'];
-        $searchMartix = $this->formatSearchEvaluation($condition, $this->sortBy, $this->show);
+        $searchMatrix = $this->formatSearchEvaluation($condition, $this->sortBy, $this->show);
 
-        $courses = $searchMartix;
+        $courses = $searchMatrix;
 
         $i=0;
         $name = array();
@@ -144,7 +144,7 @@ class SearchsController extends AppController
 
         $this->set('eventTypes', $this->EventTemplateType->getEventTemplateTypeList(false));
         $this->set('names', $name);
-        $this->set('data', $searchMartix);
+        $this->set('data', $searchMatrix);
         $this->set('display', 'evaluation');
         // redirect wanderers
         $this->redirect('/home');
@@ -164,7 +164,7 @@ class SearchsController extends AppController
         $maxPercent = $nibble['maxPercent'];
         $minPercent = $nibble['minPercent'];
 
-        $searchMartix = $this->formatSearchEvaluationResult($maxPercent, $minPercent, $eventId, $status, $this->order, $this->sortBy, $this->show);
+        $searchMatrix = $this->formatSearchEvaluationResult($maxPercent, $minPercent, $eventId, $status, $this->show);
 
         $eventList = (User::hasRole('superadmin') || User::hasRole('admin')) ?
             $this->Event->find('all', array(
@@ -173,8 +173,8 @@ class SearchsController extends AppController
                     'conditions' => array('Event.creator_id' => $this->Auth->user('id') , 'event_template_type_id !=' => '3')));
         $this->set('sticky', $sticky);
         $this->set('eventList', $eventList);
-        $this->set('data', $searchMartix['data']);
-        $this->set('paging', $searchMartix['paging']);
+        $this->set('data', $searchMatrix['data']);
+        $this->set('paging', $searchMatrix['paging']);
         $this->set('display', 'eval_result');
         // redirect wanderers
         $this->redirect('/home');
@@ -190,10 +190,10 @@ class SearchsController extends AppController
         $condition = $nibble['condition'];
         $sticky = $nibble['sticky'];
 
-        $searchMartix = $this->formatSearchInstructor($condition, $this->sortBy, $this->show);
+        $searchMatrix = $this->formatSearchInstructor($condition, $this->sortBy, $this->show);
 
         $this->set('sticky', $sticky);
-        $this->set('data', $searchMartix);
+        $this->set('data', $searchMatrix);
         $this->set('display', 'instructor');*/
         // redirect wanderers
         $this->redirect('/home');
@@ -277,13 +277,12 @@ class SearchsController extends AppController
      * @param unknown_type $minPercent min percent
      * @param unknown_type $eventId    event id
      * @param unknown_type $status     status
-     * @param unknown_type $sortBy     the sortBy
      * @param unknown_type $limit      the limit per page
      *
      * @access public
      * @return void
      */
-    function formatSearchEvaluationResult($maxPercent, $minPercent, $eventId, $status, $sortBy, $limit)
+    function formatSearchEvaluationResult($maxPercent, $minPercent, $eventId, $status, $limit)
     {
         $matrixAry = array();
 

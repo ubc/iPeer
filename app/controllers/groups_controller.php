@@ -538,7 +538,7 @@ class GroupsController extends AppController
                 // Delete the uploaded file
                 unlink($uploadFile);
                 //Mass create groups
-                $this->addGroupByImport($this->params['data'], $lines, $courseId);
+                $this->addGroupByImport($lines, $courseId);
                 // We should never get to this line :-)
             } else {
                 $this->set('errmsg', $validUploads);
@@ -569,14 +569,13 @@ class GroupsController extends AppController
      * addGroupByImport
      * Takes an array of imported file lines, and creates groups from them
      *
-     * @param mixed $data     data
      * @param mixed $lines    lines
      * @param mixed $courseId course id
      *
      * @access public
      * @return void
      */
-    function addGroupByImport($data, $lines, $courseId)
+    function addGroupByImport($lines, $courseId)
     {
         // Check for parameters
         if (empty($lines) || empty($courseId)) {

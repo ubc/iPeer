@@ -285,11 +285,11 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    function test($groupEventId, $userId)
+    /*function test($groupEventId, $userId)
     {
         $subScore = $this->EvaluationMixeval->getResultsDetailByEvaluatee($groupEventId, $userId);
         exit;
-    }
+    }*/
 
     /**
      * export
@@ -1013,7 +1013,7 @@ class EvaluationsController extends AppController
         $this->autoRender = false;
 
         $templateTypeId = $this->Event->getEventTemplateTypeId($eventId);
-        $grpEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
+        //$grpEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);  //unused
         $courseId = $this->Event->getCourseByEventId($eventId);
         $event = ($templateTypeId == '3' ? $this->Event->formatEventObj($eventId, null):
             $this->Event->formatEventObj($eventId, $groupId));
