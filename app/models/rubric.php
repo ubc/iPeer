@@ -173,7 +173,7 @@ class Rubric extends EvaluationBase
      * Executes everytime after find is called on Rubircs, and rearranges the resulting criteria comments array
      * such that the criteria comments from the rubrics grid is ordered from left to right, top to bottom.
      *
-     * @param array   $results The result of the find->Rubric operation
+     * @param array $results The result of the find->Rubric operation
      // * @param boolean $primary Whether this model is being queried directly (vs. being queried as an association)
      *
      * @access public

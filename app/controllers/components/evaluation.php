@@ -1443,8 +1443,6 @@ class EvaluationComponent extends Object
     /**
      * changeMixevalEvaluationGradeRelease
      *
-     * @param mixed $eventId       event id
-     * @param mixed $groupId       group id
      * @param mixed $groupEventId  group event id
      * @param mixed $evaluateeId   evaluatee id
      * @param mixed $releaseStatus release status

@@ -292,7 +292,7 @@ class User extends AppModel
     /**
      * Get student enrolled in a course
      *
-     * @param int   $course_id  course id
+     * @param int $course_id course id
      *
      * @access public
      * @return students enrolled in a course
