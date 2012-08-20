@@ -1,6 +1,6 @@
 <div>
-<?php 
-echo $this->Form->create('User', array('id' => 'UserForm'));
+<?php
+echo $this->Form->create('User', array('id' => 'UserForm', 'url' => $this->Html->url()));
 echo '<input type="hidden" name="required" id="required" value="username" />';
 echo $this->Form->input('id');
 echo $this->Form->input('username');
@@ -32,8 +32,9 @@ echo $this->Form->input(
     'selected' => $coursesSelected
   )
 );
-
+?><div class=buttons><?php
 echo $this->Form->submit('Save');
+?></div><?php
 echo $this->Form->end();
 
 // dynamically check username availability

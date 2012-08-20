@@ -218,7 +218,7 @@ class EvaluationsController extends AppController
         
         $courseId = $this->Event->getCourseByEventId($eventId);
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -322,7 +322,7 @@ class EvaluationsController extends AppController
         if ('course' == $type) {
             $courseId = $id;
             
-            if (!User::hasPermission('superadmin')) {
+            if (!User::hasPermission('functions/superadmin')) {
                 // check whether the user has access to the course
                 // instructors
                 if (!User::hasPermission('controllers/departments')) {
@@ -346,7 +346,7 @@ class EvaluationsController extends AppController
         } else if ('event' == $type) {
             $courseId = $this->Event->getCourseByEventId($id);
 
-            if (!User::hasPermission('superadmin')) {
+            if (!User::hasPermission('functions/superadmin')) {
                 // check whether the user has access to the course
                 // instructors
                 if (!User::hasPermission('controllers/departments')) {
@@ -1162,7 +1162,7 @@ class EvaluationsController extends AppController
         
         $courseId = $survey['Survey']['course_id'];
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -1473,7 +1473,7 @@ class EvaluationsController extends AppController
         
         $courseId = $this->Event->getCourseByEventId($eventId);
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -1694,7 +1694,7 @@ class EvaluationsController extends AppController
         
         $courseId = $this->Event->getCourseByEventId($eventId);
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -1809,7 +1809,7 @@ class EvaluationsController extends AppController
             $this->redirect('index');
         }
 
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {

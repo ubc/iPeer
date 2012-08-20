@@ -109,7 +109,7 @@ class MixevalsController extends AppController
         $joinTables = array($jointTableCreator);
 
         $myID = $this->Auth->user('id');
-        if (User::hasPermission('superadmin')) {
+        if (User::hasPermission('functions/superadmin')) {
             $extraFilters = "";
         } else {
             $creators = array();
@@ -141,7 +141,7 @@ class MixevalsController extends AppController
             $myID => true,
             "!default" => false);
         // super admins
-        if (User::hasPermission('superadmin')) {
+        if (User::hasPermission('functions/superadmin')) {
             $basicRestrictions = "";
         // faculty admins
         } else if (User::hasPermission('controllers/departments')) {
@@ -238,7 +238,7 @@ class MixevalsController extends AppController
         }
         
         // check whether the user has access to the evaluation if the eval is not public
-        if ($eval['Mixeval']['availability'] != 'public' && !User::hasPermission('superadmin')) {
+        if ($eval['Mixeval']['availability'] != 'public' && !User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));
@@ -396,7 +396,7 @@ class MixevalsController extends AppController
             $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
         }
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));
@@ -516,7 +516,7 @@ class MixevalsController extends AppController
             $this->redirect('index');
         }
 
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));
@@ -584,7 +584,7 @@ class MixevalsController extends AppController
             $this->redirect('index');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));

@@ -109,7 +109,7 @@ class RubricsController extends AppController
         $joinTables = array($jointTableCreator);
 
         $myID = $this->Auth->user('id');
-        if (User::hasPermission('superadmin')) {
+        if (User::hasPermission('functions/superadmin')) {
             $extraFilters = "";
         } else {
             $creators = array();
@@ -141,7 +141,7 @@ class RubricsController extends AppController
             $myID => true,
             "!default" => false);
         // super admins
-        if (User::hasPermission('superadmin')) {
+        if (User::hasPermission('functions/superadmin')) {
             $basicRestrictions = "";
         // faculty admins
         } else if (User::hasPermission('controllers/departments')) {
@@ -237,7 +237,7 @@ class RubricsController extends AppController
         }
         
         // check whether the user has access to the evaluation if the rubric is not public
-        if ($eval['Rubric']['availability'] != 'public' && !User::hasPermission('superadmin')) {
+        if ($eval['Rubric']['availability'] != 'public' && !User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));
@@ -370,7 +370,7 @@ class RubricsController extends AppController
             $this->redirect('index');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));
@@ -485,7 +485,7 @@ class RubricsController extends AppController
         }
         
         // can be copied if rubric is public
-        if ($eval['Rubric']['availability'] != 'public' && !User::hasPermission('superadmin')) {
+        if ($eval['Rubric']['availability'] != 'public' && !User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));
@@ -551,7 +551,7 @@ class RubricsController extends AppController
             $this->redirect('index');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));

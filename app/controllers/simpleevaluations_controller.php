@@ -115,7 +115,7 @@ class SimpleevaluationsController extends AppController
         // put all the joins together
         $joinTables = array($jointTableCreator);
 
-        if (User::hasPermission('superadmin')) {
+        if (User::hasPermission('functions/superadmin')) {
             $extraFilters = "";
         } else {
             $creators = array();
@@ -147,7 +147,7 @@ class SimpleevaluationsController extends AppController
             $myID => true,
             "!default" => false);
         // super admins
-        if (User::hasPermission('superadmin')) {
+        if (User::hasPermission('functions/superadmin')) {
             $basicRestrictions = "";
         // faculty admins
         } else if (User::hasPermission('controllers/departments')) {
@@ -240,7 +240,7 @@ class SimpleevaluationsController extends AppController
         }
         
         // check whether the user has access to the evaluation if the eval is not public
-        if ($eval['SimpleEvaluation']['availability'] != 'public' && !User::hasPermission('superadmin')) {
+        if ($eval['SimpleEvaluation']['availability'] != 'public' && !User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));
@@ -364,7 +364,7 @@ class SimpleevaluationsController extends AppController
             $this->redirect('index');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));
@@ -452,7 +452,7 @@ class SimpleevaluationsController extends AppController
         }
         
         // can be copied if eval is public
-        if ($eval['SimpleEvaluation']['availability'] != 'public' && !User::hasPermission('superadmin')) {
+        if ($eval['SimpleEvaluation']['availability'] != 'public' && !User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));
@@ -520,7 +520,7 @@ class SimpleevaluationsController extends AppController
             $this->redirect('index');
         }
 
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));

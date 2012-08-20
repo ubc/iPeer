@@ -77,7 +77,7 @@ class EmailtemplatesController extends AppController
         //put all the joins together
         $joinTables = array($jointTableCreator);
 
-        if (User::hasPermission('superadmin')) {
+        if (User::hasPermission('functions/superadmin')) {
             $extraFilters = "";
         } else {
             $creators = array();
@@ -108,7 +108,7 @@ class EmailtemplatesController extends AppController
             $myID => true,
             "!default" => false);
         // super admins
-        if (User::hasPermission('superadmin')) {
+        if (User::hasPermission('functions/superadmin')) {
             $basicRestrictions = "";
         // faculty admins
         } else if (User::hasPermission('controllers/departments')) {
@@ -240,7 +240,7 @@ class EmailtemplatesController extends AppController
             $this->redirect('index');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));
@@ -303,7 +303,7 @@ class EmailtemplatesController extends AppController
             $this->redirect('index');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));
@@ -363,7 +363,7 @@ class EmailtemplatesController extends AppController
         }
         
         // check for permissions if the email template is not public
-        if ($template['EmailTemplate']['availability'] != '1' && !User::hasPermission('superadmin')) {
+        if ($template['EmailTemplate']['availability'] != '1' && !User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));

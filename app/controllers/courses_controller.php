@@ -68,7 +68,7 @@ class CoursesController extends AppController
         $joinTables = array();
         
         // super admins
-        if (User::hasPermission('superadmin')) {
+        if (User::hasPermission('functions/superadmin')) {
             $extraFilters = '';
         // faculty admins
         } else if (User::hasPermission('controllers/departments')) {
@@ -179,7 +179,7 @@ class CoursesController extends AppController
             $this->redirect('index');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -220,7 +220,7 @@ class CoursesController extends AppController
             $this->redirect('index');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -363,7 +363,7 @@ class CoursesController extends AppController
                 $this->redirect('index');
             }
             
-            if (!User::hasPermission('superadmin')) {
+            if (!User::hasPermission('functions/superadmin')) {
                 // check whether the user has access to the course
                 // instructors
                 if (!User::hasPermission('controllers/departments')) {
@@ -406,7 +406,7 @@ class CoursesController extends AppController
             $this->redirect('index');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {

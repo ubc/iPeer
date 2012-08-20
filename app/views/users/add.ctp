@@ -5,7 +5,7 @@ Usernames must be at least 6 characters long and contain only letters and number
 
 <div>
 <?php 
-echo $this->Form->create('User', array('id' => 'UserForm'));
+echo $this->Form->create('User', array('id' => 'UserForm', 'url' => $this->Html->url()));
 echo '<input type="hidden" name="required" id="required" value="username" />';
 echo $this->Form->input('username');
 echo "<div id='usernameErr' class='red'></div>";
@@ -38,8 +38,16 @@ echo $this->Form->input(
     'selected' => $coursesSelected
   )
 );
-
-echo $this->Form->submit('Save');
+?><div class=buttons><?php
+echo $this->Form->submit(
+    'Save',
+    array('name' => 'data[Form][save]')
+);
+echo $this->Form->submit(
+    'Save & Add Another',
+    array('name' => 'data[Form][save]')
+);
+?></div><?php
 echo $this->Form->end();
 
 // dynamically check username availability

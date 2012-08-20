@@ -12,7 +12,8 @@ class EmailerController extends AppController
 {
     public $name = 'Emailer';
     public $uses = array('GroupsMembers', 'UserEnrol', 'User', 'EmailTemplate', 'EmailMerge',
-        'EmailSchedule', 'Personalize', 'SysParameter', 'SysFunction', 'Group', 'Course', 'UserCourse');
+        'EmailSchedule', 'Personalize', 'SysParameter', 'SysFunction', 'Group', 'Course', 'UserCourse',
+        'UserTutor');
     public $components = array('AjaxList', 'Session', 'RequestHandler', 'Email');
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Js' => array('Prototype'));
     public $show;
@@ -102,7 +103,7 @@ class EmailerController extends AppController
         // put all the joins together
         $joinTables = array($jointTableCreator);
         
-        if (User::hasPermission('superadmin')) {
+        if (User::hasPermission('functions/superadmin')) {
             $extraFilters = '';
         } else {
             $creators = array();
@@ -132,7 +133,7 @@ class EmailerController extends AppController
             $myID => true,
             "!default" => false);
         // super admins
-        if (User::hasPermission('superadmin')) {
+        if (User::hasPermission('functions/superadmin')) {
             $basicRestrictions = "";
         // faculty admins
         } else if (User::hasPermission('controllers/departments')) {
@@ -263,40 +264,19 @@ class EmailerController extends AppController
         // for checking if the user can email to user with $id
         } else if (!User::hasPermission('functions/email/allusers') && null != $id) {
             // check if they have access to user with $id
-            // if the user is a student
-            $student = $this->User->find(
-                'all', 
-                array(
-                    'conditions' => array(
-                        'User.id' => $id, 
-                        'Enrolment.id' => array_keys($courseList)
-                    )
-                )
-            );
-
-            // if the user is an instructor
-            $instructor = $this->User->find(
-                'all',
-                array(
-                    'conditions' => array(
-                        'User.id' => $id,
-                        'Course.id' => array_keys($courseList)
-                    )
-                )
-            );
             
-            $tutor = $this->User->find(
-                'all',
-                array(
-                    'conditions' => array(
-                        'User.id' => $id,
-                        'Tutor.id' => array_keys($courseList)
-                    )
-                )
-            );
-                    
+            $accessibleUsers = array();
+            $methods = array('UserCourse', 'UserTutor', 'UserEnrol');
+            
+            foreach ($methods as $method) {
+                $users = $this->$method->find('list', array(
+                    'conditions' => array('course_id' => array_keys($courseList)),
+                    'fields' => 'user_id'
+                ));
+                $accessibleUsers = array_merge($accessibleUsers, $users);
+            }
 
-            if (empty($student) && empty($instructor) && empty($tutor)) {
+            if (!in_array($id, $accessibleUsers)) {
                 $this->Session->setFlash(__('Error: You do not have permission to write emails to this user.', true));
                 $this->redirect('index');
             }
@@ -378,7 +358,7 @@ class EmailerController extends AppController
             $this->redirect('index');
         }
 
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));
@@ -446,7 +426,7 @@ class EmailerController extends AppController
             $this->redirect('index');
         }
 
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));

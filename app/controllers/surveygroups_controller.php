@@ -169,7 +169,7 @@ class SurveyGroupsController extends AppController
         if (!empty($event)) {
             $courseId = $event['Course']['id'];
         
-            if (!User::hasPermission('superadmin')) {
+            if (!User::hasPermission('functions/superadmin')) {
                 // check whether the user has access to the course
                 // instructors
                 if (!User::hasPermission('controllers/departments')) {
@@ -256,7 +256,7 @@ class SurveyGroupsController extends AppController
             $this->redirect('index');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -471,7 +471,7 @@ class SurveyGroupsController extends AppController
         
         $groupSet = $this->SurveyGroupSet->find('first', array('conditions' => array('SurveyGroupSet.id' => $group_set_id)));
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {

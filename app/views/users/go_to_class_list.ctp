@@ -38,7 +38,7 @@ function fnFormatDetails ( oTable, nTr )
     sOut += '</li>';
 
     sOut += '<li>';
-    sOut += '<a href="<?php echo $this->base; ?>/users/edit/'+aData[0]+'">Edit</a>'; 
+    sOut += '<a href="<?php echo $this->base; ?>/users/edit/'+aData[0]+'/<?php echo $courseId?>">Edit</a>'; 
     sOut += '</li>';
 
     sOut += '<li>';
@@ -46,11 +46,11 @@ function fnFormatDetails ( oTable, nTr )
     sOut += '</li>';
 
     sOut += '<li>';
-    sOut += '<a href="<?php echo $this->base; ?>/users/resetPassword/'+aData[0]+'">Reset Password</a>'; 
+    sOut += '<a href="<?php echo $this->base; ?>/users/resetPassword/'+aData[0]+'/<?php echo $courseId?>">Reset Password</a>'; 
     sOut += '</li>';
 
     sOut += '<li>';
-    sOut += '<a href="<?php echo $this->base; ?>/users/delete/'+aData[0]+'">Delete</a>'; 
+    sOut += '<a href="<?php echo $this->base; ?>/users/delete/'+aData[0]+'/<?php echo $courseId?>">Delete</a>'; 
     sOut += '</li>';
 
     sOut += '</ul></div>';

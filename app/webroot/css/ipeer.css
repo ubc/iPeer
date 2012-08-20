@@ -656,9 +656,22 @@ i {
     float: none;
 }
 
+#UserForm .submit input{
+    width: 12em;
+    margin: 2em;
+}
+
 #UserForm .submit {
-    width: 10em;
-    margin: 1em auto;
+    clear: both;
+    display: inline-block;
+}
+
+#UserForm .input.select {
+    margin-bottom: 1em;
+}
+
+#UserForm .buttons {
+    margin-left: 14em;
 }
 
 /* users/goToClassList/ */

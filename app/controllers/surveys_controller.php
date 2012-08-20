@@ -155,7 +155,7 @@ class SurveysController extends AppController
         // Add the join table into the array
         $joinTables = array();
 
-        if (User::hasPermission('superadmin')) {
+        if (User::hasPermission('functions/superadmin')) {
             $extraFilters = "";
         } else {
             // For instructors: only list their own course events (surveys)
@@ -260,7 +260,7 @@ class SurveysController extends AppController
             $this->redirect('index');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -377,7 +377,7 @@ class SurveysController extends AppController
             $this->redirect('index');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -468,7 +468,7 @@ class SurveysController extends AppController
             $this->redirect('index');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -528,7 +528,7 @@ class SurveysController extends AppController
             $this->redirect('index');
         }
 
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -702,7 +702,7 @@ class SurveysController extends AppController
             $this->redirect('index');
         }
 
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {

@@ -47,7 +47,7 @@ class HomeController extends AppController
     function index()
     {
         //General Home Rendering for Admin
-        if (User::hasPermission('superadmin')) {
+        if (User::hasPermission('functions/superadmin')) {
             $course_list = $this->Course->find('all');
             $this->set('course_list', $this->_formatCourseList($course_list));
         // admins
@@ -55,7 +55,7 @@ class HomeController extends AppController
             $course_list = User::getMyDepartmentsCourseList('all');
             $this->set('course_list', $this->_formatCourseList($course_list));
         // students & tutors
-        } else if (User::hasPermission('onlytakeeval')) {
+        } else if (User::hasPermission('functions/onlytakeeval')) {
             $this->redirect('studentIndex');
         // instructors
         } else {

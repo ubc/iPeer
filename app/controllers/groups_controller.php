@@ -162,7 +162,7 @@ class GroupsController extends AppController
             $this->redirect('/courses');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -253,7 +253,7 @@ class GroupsController extends AppController
             $this->redirect('/courses');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -315,7 +315,7 @@ class GroupsController extends AppController
             $this->redirect('/courses');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -387,7 +387,7 @@ class GroupsController extends AppController
             $this->redirect('/courses');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -436,7 +436,7 @@ class GroupsController extends AppController
             $this->redirect('/courses');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -551,7 +551,10 @@ class GroupsController extends AppController
             foreach ($user['Course'] as $course) {
                 $coursesList[$course['id']] = $course['course'];
             }
-        // admins & super admin
+        // super admins
+        } else if (User::hasPermission('functions/superadmin')) {
+            $coursesList = $this->Course->find('list', array('fields' => 'courses'));
+        // admins
         } else {
             $courses = User::getMyDepartmentsCourseList('all');
             foreach ($courses as $course) {
@@ -865,7 +868,7 @@ class GroupsController extends AppController
             $this->redirect('/courses');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {

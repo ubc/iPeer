@@ -108,7 +108,10 @@ class EventsController extends AppController
         // instructors
         if (!User::hasPermission('controllers/departments')) {
             $coursesList = User::getMyCourseList();
-        // admins & super admin
+        // super admins
+        } else if (User::hasPermission('functions/superadmin')) {
+            $coursesList = $this->Course->find('list');
+        // admins
         } else {
             $coursesList = User::getMyDepartmentsCourseList('list');
         }
@@ -158,9 +161,9 @@ class EventsController extends AppController
         }
         
         // super admins
-        if (User::hasPermission('superadmin')) {
+        if (User::hasPermission('functions/superadmin')) {
             $extraFilters = "";
-        // faculty admins or instructors - $courseList from above
+        // faculty admins or instructors - $coursesList from above
         } else {
             $extraFilters = " ( ";
             foreach ($coursesList as $id => $course) {
@@ -218,7 +221,7 @@ class EventsController extends AppController
                 $this->redirect('/events');
             }
             
-            if (!User::hasPermission('superadmin')) {
+            if (!User::hasPermission('functions/superadmin')) {
                 // check whether the user has access to the course
                 // instructors
                 if (!User::hasPermission('controllers/departments')) {
@@ -297,7 +300,7 @@ class EventsController extends AppController
         
         $courseId = $this->Event->getCourseByEventId($id);
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -433,7 +436,7 @@ class EventsController extends AppController
             $this->redirect('index');
         }
         
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -520,7 +523,7 @@ class EventsController extends AppController
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $id),
             'contain' => array('Group.Member')));
 
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
@@ -642,7 +645,7 @@ class EventsController extends AppController
 
         $courseId = $this->Event->getCourseByEventId($id);
 
-        if (!User::hasPermission('superadmin')) {
+        if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
             if (!User::hasPermission('controllers/departments')) {
