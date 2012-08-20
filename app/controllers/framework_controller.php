@@ -15,7 +15,7 @@ class FrameworkController extends AppController
      *
      * @public $uses
      */
-    public $uses =  array('User', 'SysFunction', 'SysParameter');
+    public $uses =  array('User', 'SysFunction', 'SysParameter', 'UserCourse', 'UserTutor', 'UserEnrol');
     public $Sanitize;
     public $components = array('Output', 'sysContainer', 'userPersonalize', 'framework');
 
@@ -64,15 +64,41 @@ class FrameworkController extends AppController
     {
         $this->AccessControl->check('functions/user', 'read');
 
-        if (!is_numeric($id) || !($this->data = $this->User->findById($id))) {
-            $this->Session->setFlash(__('Invalid user ID.', true));
-            $this->redirect('/user/index');
+        if (!User::hasPermission('functions/user')) {
+            $this->Session->setFlash(__('Error: You do not have permission to view users', true));
+            $this->redirect('/home');
         }
 
-        $roles = $this->User->getRoles($id);
-        if (!$this->AccessControl->hasPermissionDoActionOnUserWithRoles('ViewUser', $roles)) {
-            $this->Session->setFlash(__('You do not have permission to view this user.', true));
-            $this->redirect($this->referer());
+        if (!is_numeric($id) || !($this->data = $this->User->findById($id))) {
+            $this->Session->setFlash(__('Error: Invalid user ID.', true));
+            $this->redirect('/user/index');
+        }
+        
+        $role = $this->User->getRoleName($id);
+        if (!User::hasPermission('functions/user/'.$role)) {
+            $this->Session->setFlash(__('Error: You do not have permission to view this user', true));
+            $this->redirect('/users/index');
+        }
+
+        if (!User::hasPermission('controllers/departments')) {
+            // instructors
+            $courses = User::getMyCourseList();
+            $models = array('UserCourse', 'UserTutor', 'UserEnrol');
+            $accessibleUsers = array();
+            
+            // generate a list of instructors, tutors, and students the user has access to
+            foreach ($models as $model) {
+                $users = $this->$model->find('list', array(
+                    'conditions' => array('course_id' => array_keys($courses)),
+                    'fields' => array('user_id')
+                ));
+                $accessibleUsers = array_merge($accessibleUsers, $users);
+            }
+            
+            if (!in_array($id, $accessibleUsers)) {
+                $this->Session->setFlash(__('Error: You do not have permission to view this user', true));
+                $this->redirect('/users/index');
+            }
         }
 
         $this->set('title_for_layout', __('View User', true));

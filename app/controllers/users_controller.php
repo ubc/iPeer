@@ -468,12 +468,12 @@ class UsersController extends AppController
         if (!User::hasPermission('controllers/departments')) {
             // instructors
             $courses = User::getMyCourseList();
-            $methods = array('UserCourse', 'UserTutor', 'UserEnrol');
+            $models = array('UserCourse', 'UserTutor', 'UserEnrol');
             $accessibleUsers = array();
             
             // generate a list of instructors, tutors, and students the user has access to
-            foreach ($methods as $method) {
-                $users = $this->$method->find('list', array(
+            foreach ($models as $model) {
+                $users = $this->$model->find('list', array(
                     'conditions' => array('course_id' => array_keys($courses)),
                     'fields' => array('user_id')
                 ));
@@ -732,7 +732,8 @@ class UsersController extends AppController
     /**
      * Given a user id, edit the information for that user
      *
-     * @param int $userId - the user being edited
+     * @param int $userId   - the user being edited
+     * @param int $courseId - the course the user is accessed from 
      *
      * @access public
      * @return void
@@ -802,11 +803,11 @@ class UsersController extends AppController
         if (!User::hasPermission('controllers/departments')) {
             // instructors
             $courses = User::getMyCourseList();
-            $methods = array('UserTutor', 'UserEnrol');
+            $models = array('UserTutor', 'UserEnrol');
             $accessibleUsers = array();
             
-            foreach ($methods as $method) {
-                $users = $this->$method->find('list', array(
+            foreach ($models as $model) {
+                $users = $this->$model->find('list', array(
                     'conditions' => array('course_id' => array_keys($courses)),
                     'fields' => array('user_id')
                 ));
@@ -885,7 +886,8 @@ class UsersController extends AppController
     /**
      * delete
      *
-     * @param mixed $id - user id to delete
+     * @param mixed $id       - user id to delete
+     * @param mixed $courseId - the course the user is accessed from
      *
      * @access public
      * @return void
@@ -915,11 +917,11 @@ class UsersController extends AppController
         if (!User::hasPermission('controllers/departments')) {
             // instructors
             $courses = User::getMyCourseList();
-            $methods = array('UserTutor', 'UserEnrol');
+            $models = array('UserTutor', 'UserEnrol');
             $accessibleUsers = array();
             
-            foreach ($methods as $method) {
-                $users = $this->$method->find('list', array(
+            foreach ($models as $model) {
+                $users = $this->$model->find('list', array(
                     'conditions' => array('course_id' => array_keys($courses)),
                     'fields' => array('user_id')
                 ));
@@ -973,7 +975,8 @@ class UsersController extends AppController
     /**
      * resetPassword
      *
-     * @param mixed $user_id user id
+     * @param mixed $user_id  user id
+     * @param mixed $courseId course id
      *
      * @access public
      * @return void
@@ -1009,11 +1012,11 @@ class UsersController extends AppController
         if (!User::hasPermission('controllers/departments')) {
             // instructors
             $courses = User::getMyCourseList();
-            $methods = array('UserTutor', 'UserEnrol');
+            $models = array('UserTutor', 'UserEnrol');
             $accessibleUsers = array();
             
-            foreach ($methods as $method) {
-                $users = $this->$method->find('list', array(
+            foreach ($models as $model) {
+                $users = $this->$model->find('list', array(
                     'conditions' => array('course_id' => array_keys($courses)),
                     'fields' => array('user_id')
                 ));
