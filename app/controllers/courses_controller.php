@@ -308,7 +308,7 @@ class CoursesController extends AppController
     {
         if (!User::hasPermission('controllers/courses/add')) {
             $this->Session->setFlash('Error: You do not have permission to add courses');
-            $this->redirect('/home');
+            $this->redirect('index');
         }
         $this->set('title_for_layout', 'Add Course');
 

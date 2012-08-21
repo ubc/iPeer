@@ -5,7 +5,7 @@ Usernames must be at least 6 characters long and contain only letters and number
 
 <div>
 <?php 
-echo $this->Form->create('User', array('id' => 'UserForm', 'url' => $this->Html->url()));
+echo $this->Form->create('User', array('id' => 'UserForm', 'url' => '/'.$this->params['url']['url']));
 echo '<input type="hidden" name="required" id="required" value="username" />';
 echo $this->Form->input('username');
 echo "<div id='usernameErr' class='red'></div>";
@@ -13,7 +13,7 @@ echo $this->Form->input('first_name');
 echo $this->Form->input('last_name');
 echo $this->Form->input('email');
 echo $this->Form->input('send_email_notification',
-  array('type'=>'checkbox', 'id' => 'email'));
+  array('type'=>'checkbox', 'div' => 'email'));
 echo $this->Form->input(
   'Role.RolesUser.role_id',
   array(

@@ -82,7 +82,7 @@
             <p><?php foreach ($tokens as $index => $token) { ?>
             <label id=key><?php echo _('Key').': '.$token['OauthToken']['key'];?></label>
             <label id=secret><?php echo _('Secret').': '.$token['OauthToken']['secret'];?></label>
-            <?php echo _('Expires').': '.date('M j, Y', strtotime($token['OauthToken']['expires']));?>
+            <?php echo _('Expires').': '.$token['OauthToken']['expires'];?>
             <?php echo $this->Form->select('OauthToken.'.$index.'.enabled', $enabled, $token['OauthToken']['enabled'], array('empty' => false)); ?>
             <?php echo $this->Form->input('OauthToken.'.$index.'.id', array('value' => $token['OauthToken']['id'])); ?>
             <?php echo $html->link('X', '/oauth_tokens/delete/'.$token['OauthToken']['id'], array('id' => 'delete')); ?></p>

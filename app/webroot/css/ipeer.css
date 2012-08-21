@@ -447,6 +447,10 @@ i {
     margin: 1em auto;
 }
 
+#EmailtemplateViewForm fieldset {
+    clear: both;
+}
+
 /* add and edit */
 
 #EmailtemplateAddForm .radio fieldset {
@@ -485,7 +489,7 @@ i {
 }
 
 .oauth #key {
-    width: 12em;
+    width: 14em;
 }
 
 .oauth #secret {
@@ -494,7 +498,7 @@ i {
 }
 
 .oauth select {
-    margin-left: 5em;
+    margin-left: 3.5em;
 }
 
 .oauth #delete {
@@ -664,6 +668,17 @@ i {
 #UserForm .submit {
     clear: both;
     display: inline-block;
+}
+
+#UserForm .email.required {
+    clear: both;
+    margin-left: 14em;
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+
+#UserForm .email.required label {
+    margin-left: 0.5em;
 }
 
 #UserForm .input.select {

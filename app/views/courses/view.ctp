@@ -35,19 +35,6 @@
       <td><?php __('Status')?>:</td>
       <td colspan="3"><?php if( $data['Course']['record_status'] == "A" ) echo __("Active", true); else echo __("Inactive", true); ?></td>
     </tr>
-  <?php
-    $customIntegrateCWL = $this->Session->read('ipeerSession.customIntegrateCWL');
-    if (!(isset($customIntegrateCWL) && $customIntegrateCWL)) { 
-  ?>
-    <tr class="tablecell">
-      <td><?php __('Self Enrollment')?>: </td>
-      <td colspan="3"><?php echo $data['Course']['self_enroll']; ?></td>
-    </tr>
-    <tr class="tablecell">
-      <td><?php __('Self Enrollment Password')?>: </td>
-      <td colspan="3"><?php echo $data['Course']['password']; ?></td>
-    </tr>
-  <?php } ?>
     <tr class="tablecell">
       <td><?php __('Homepage')?>:</td>
       <td colspan="3"><a href="<?php echo !empty($data['Course']['homepage'])? $data['Course']['homepage']:'#'; ?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $data['Course']['homepage']; ?></a>

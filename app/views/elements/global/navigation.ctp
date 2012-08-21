@@ -50,9 +50,9 @@ if (User::isLoggedIn()) {
     }
 
     // Advanced Search Tab
-    if (User::hasPermission('controllers/searchs')) {
+    /*if (User::hasPermission('controllers/searchs')) {
         generateTab($this, 'searchs', array('searchs'), 'Search');
-    }
+    }*/
 
     // Admin Tab
     if (User::hasPermission('adminpage')) {

@@ -7,7 +7,12 @@
         $form->hidden('EmailTemplate.id', array('value'=>$this->data['EmailTemplate']['id']));
     echo $form->input('EmailTemplate.name', array('readonly' => $readonly));
     echo $form->input('EmailTemplate.subject', array('readonly' => $readonly));
-    echo $form->input('EmailTemplate.availability', array('type' => 'text', 'readonly' => $readonly));
+    echo $form->input('EmailTemplate.availability', array(
+                                'readonly' => $readonly, 
+                                'type' => 'radio',
+                                'options' => array('0' => 'private', '1' => 'public'), 
+                                'disabled' => $readonly
+    ));
     echo $form->input('EmailTemplate.description', array('readonly' => $readonly));
     if(!$readonly):
         echo $form->input(

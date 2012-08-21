@@ -28,6 +28,12 @@
         	<td id="point_per_member_msg" class="error"/>
         </tr>
         <tr class="tablecell2">
+            <td id="availability"><?php __('Availability')?>:</td>
+            <td align="left"><?php echo $data['SimpleEvaluation']['availability']
+            ?>
+            </td>
+        </tr>
+        <tr class="tablecell2">
           <td colspan="3" align="center">
             <?php if (!empty($popUp) && $popUp) { ?>
             <input type="button" name="Close" value="<?php __('Close')?>" onClick="window.close()">

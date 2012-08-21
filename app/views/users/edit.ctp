@@ -1,6 +1,6 @@
 <div>
 <?php
-echo $this->Form->create('User', array('id' => 'UserForm', 'url' => $this->Html->url()));
+echo $this->Form->create('User', array('id' => 'UserForm', 'url' => '/'.$this->params['url']['url']));
 echo '<input type="hidden" name="required" id="required" value="username" />';
 echo $this->Form->input('id');
 echo $this->Form->input('username');
