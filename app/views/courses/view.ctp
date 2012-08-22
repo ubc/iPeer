@@ -6,8 +6,8 @@
       <td align="center" colspan="4"><?php echo $data['Course']['title']; ?></td>
       </tr>
     <tr class="tablecell">
-      <td width="86"><?php __('Course')?>:</td>
-      <td width="389" colspan="3"><?php echo $data['Course']['course']; ?></td>
+      <td><?php __('Course')?>:</td>
+      <td colspan="3"><?php echo $data['Course']['course']; ?></td>
     </tr>
     <tr class="tablecell">
       <td><?php __('Title')?>:</td>

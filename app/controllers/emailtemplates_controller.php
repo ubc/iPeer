@@ -199,6 +199,7 @@ class EmailtemplatesController extends AppController
             } else {
                 $this->Session->setFlash(__('Save failed.', true));
             }
+            $this->redirect('index');
         }
     }
 
