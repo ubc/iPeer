@@ -464,7 +464,7 @@ class V1ControllerTest extends CakeTestCase {
 
     public function testEvents()
     {
-        $url = Router::url('v1/courses/1/events', true);
+        $url = Router::url('v1/courses', true);
         $events = $this->_fixtures['app.event']->records;
         
         $expectedEvents = array();
@@ -478,25 +478,19 @@ class V1ControllerTest extends CakeTestCase {
             $expectedEvents[] = $tmp;
         }
         
-        $opts = array(
-            'http'=>array(
-                'method'=>"GET",
-                'header'=>"Content-Type: application/json"
-            )
-        );
-        
-        debug(_oauthReq("$url"));
-        //$this->assertEqual($expectedEvents, $actualEvents);
+        $actualEvents = $this->_oauthReq("$url/1/events");
+        $this->assertEqual($actualEvents, json_encode($expectedEvents));
+        $this->assertEqual(json_decode($actualEvents, true), $expectedEvents);
 
-        $actualEvent = file_get_contents($url.'/3', null, $context);
-        $actualEvent = json_decode($actualEvent, true);
-        $expectedEvent = array("title" => 'Project Evaluation', "course_id" => 1, "event_template_type_id" => 4, "id" => 3);
-        $this->assertEqual($expectedEvent, $actualEvent);
+        $actualEvent = $this->_oauthReq("$url/1/events/3");
+        $expectedEvent = array("title" => "Project Evaluation", "course_id" => "1", "event_template_type_id" => "4", "id" => "3");
+        $this->assertEqual($actualEvent, json_encode($expectedEvent));
+        $this->assertEqual(json_decode($actualEvent, true), $expectedEvent);
     }
     
-    /*public function testGrades()
+    public function testGrades()
     {
-        $url = Router::url('v1/courses/1/events/', true);
+        $url = Router::url('v1/courses/1/events', true);
         $events = $this->_fixtures['app.event']->records;
         $mixevals = $this->_fixtures['app.evaluation_mixeval']->records;
         $rubrics = $this->_fixtures['app.evaluation_rubric']->records;
@@ -526,44 +520,33 @@ class V1ControllerTest extends CakeTestCase {
             $tmp['score'] = $data['score'];
             $simpleList[] = $tmp;
         }
-        
-        $opts = array(
-            'http'=>array(
-                'method'=>"GET",
-                'header'=>"Content-Type: application/json"
-            )
-        );
-        
-        $context = stream_context_create($opts);
-        $simpleGrades = file_get_contents($url.'1/grades', null, $context);
+
+        $simpleGrades = $this->_oauthReq("$url/1/grades");
         $simpleGrades = json_decode($simpleGrades, true);
         $this->assertEqual($simpleList, $simpleGrades);
-        
-        $context = stream_context_create($opts);
-        $rubricGrades = file_get_contents($url.'2/grades', null, $context);
+
+        $rubricGrades = $this->_oauthReq("$url/2/grades");
         $rubricGrades = json_decode($rubricGrades, true);
         $this->assertEqual($rubricList, $rubricGrades);
-        
-        $context = stream_context_create($opts);
-        $mixevalGrades = file_get_contents($url.'3/grades', null, $context);
+
+        $mixevalGrades = $this->_oauthReq("$url/3/grades");
         $mixevalGrades = json_decode($mixevalGrades, true);
         $this->assertEqual($mixevalList, $mixevalGrades);
 
-        $studentGrade = file_get_contents($url.'1/grades/33', null, $context);
+        $studentGrade = $this->_oauthReq("$url/1/grades/33");
         $studentGrade = json_decode($studentGrade, true);
-        $expectedGrade = array("evaluatee" => 33, "score" => 75);
+        $expectedGrade = array("evaluatee" => "33", "score" => "75");
+        $this->assertEqual($expectedGrade, $studentGrade);
+
+        $studentGrade = $this->_oauthReq("$url/2/grades/5");
+        $studentGrade = json_decode($studentGrade, true);
+        $expectedGrade = array("evaluatee" => "5", "score" => "14", "id" => "3");
         $this->assertEqual($expectedGrade, $studentGrade);
         
-        $studentGrade = file_get_contents($url.'2/grades/5', null, $context);
+        $studentGrade = $this->_oauthReq("$url/3/grades/6");
         $studentGrade = json_decode($studentGrade, true);
-        $expectedGrade = array("evaluatee" => 5, "score" => 14, "id" => 3);
-        $this->assertEqual($expectedGrade, $studentGrade);
-        
-        $studentGrade = file_get_contents($url.'3/grades/6', null, $context);
-        $studentGrade = json_decode($studentGrade, true);
-        $expectedGrade = array("evaluatee" => 6, "score" => 2.4, "id" => 2);
+        $expectedGrade = array("evaluatee" => "6", "score" => "2.4", "id" => "2");
         $this->assertEqual($expectedGrade, $studentGrade);
     }
-     */
-    
+
 }
