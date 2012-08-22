@@ -27,7 +27,7 @@ foreach ($classList as $person) {
 </table>
 
 <script type="text/javascript">
-/* Formating function for row details */
+/* Formatting function for row details */
 function fnFormatDetails ( oTable, nTr )
 {
     var aData = oTable.fnGetData( nTr );
@@ -60,13 +60,13 @@ function fnFormatDetails ( oTable, nTr )
  
 jQuery(document).ready(function() {
     /*
-     * Initialse DataTables, with no sorting on the 'details' column
+     * Initialise DataTables, with no sorting on the 'details' column
      */
     var oTable = jQuery('#table_id').dataTable( {
       "sPaginationType" : "full_numbers",
       "aoColumnDefs": [
         { "bSearchable": false, "bVisible": false, "bSortable":false, "aTargets": [ 0 ] },
-        { "bSearchable": false, "bVisible": false, "bSortable": false, "aTargets": [ 1 ] }
+        { "bSearchable": false, "bVisible": false, "bSortable":false, "aTargets": [ 1 ] }
         ],
         "aaSorting" : [[1, 'asc']]
     });

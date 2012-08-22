@@ -19,8 +19,6 @@ if (!empty($clientCreds)) {
   foreach ($sample as $key => $val) {
     echo "<th>$key</th>";
   }
-  echo "<th></th>";
-  echo "<th></th>";
 }
 ?>
         </tr>
@@ -37,12 +35,6 @@ foreach ($clientCreds as $client) {
         $id = $val;
     }
   }
-  echo "<td>". 
-      $this->Html->link(__('Edit', true), array('action' => 'edit', $id)) .
-      "</td>";
-  echo "<td>". 
-      $this->Html->link(__('Delete', true), array('action' => 'delete', $id)) .
-      "</td>";
   echo "</tr>";
 }
 ?>
@@ -51,14 +43,50 @@ foreach ($clientCreds as $client) {
 </div>
 
 <script type="text/javascript">
-var oTable = jQuery('#table_id').dataTable( {
-      "sPaginationType" : "full_numbers",
-      "aoColumnDefs": [
-        { "bSearchable": false, "bVisible": false, "bSortable":false, "aTargets": [ 0 ] },
-        { "bSearchable": false, "bSortable":false, "aTargets": [ 5 ] },
-        { "bSearchable": false, "bSortable":false, "aTargets": [ 6 ] }
+/* Formatting function for row details */
+function fnFormatDetails ( oTable, nTr )
+{
+    var aData = oTable.fnGetData( nTr );
+    var sOut = '<div class="userActionPanel"><ul>';
+
+    sOut += '<li>';
+    sOut += '<a href="<?php echo $this->base; ?>/oauth_clients/edit/'+aData[0]+'">Edit</a>'; 
+    sOut += '</li>';
+
+    sOut += '<li>';
+    sOut += '<a href="<?php echo $this->base; ?>/oauth_clients/delete/'+aData[0]+'">Delete</a>'; 
+    sOut += '</li>';
+
+    sOut += '</ul></div>';
+     
+    return sOut;
+}
+
+jQuery(document).ready(function() {
+    var oTable = jQuery('#table_id').dataTable( {
+        "sPaginationType" : "full_numbers",
+        "aoColumnDefs": [
+            { "bSearchable": false, "bVisible": false, "bSortable":false, "aTargets": [ 0 ] }
         ],
         "aaSorting" : [[1, 'asc']]
     });
-
+    
+    /* Add event listener for opening and closing details
+     * Note that the indicator for showing which row is open is not controlled by DataTables,
+     * rather it is done here
+     */
+    jQuery('#table_id tbody td').live('click', function () {
+        var nTr = jQuery(this).parents('tr')[0];
+        if ( oTable.fnIsOpen(nTr) )
+        {
+            /* This row is already open - close it */
+            oTable.fnClose( nTr );
+        }
+        else
+        {
+            /* Open this row */
+            oTable.fnOpen( nTr, fnFormatDetails(oTable, nTr), 'userActionPanel' );
+        }
+    } );
+} );
 </script>
