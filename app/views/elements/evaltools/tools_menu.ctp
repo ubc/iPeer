@@ -9,7 +9,7 @@
 function generateLink ($view, $url, $name) {
     $url = $view->webroot . $view->theme . $url;
     $current = $view->params['controller'] ? "id='current'" : "";
-    echo "<li $current><a href='$url'>$name</a>|</li>";
+    echo "<li $current><a href='$url'>$name</a></li>";
 }
 ?>
 
@@ -21,7 +21,8 @@ function generateLink ($view, $url, $name) {
                 $this,
                 'evaltools',
                 'All My Tools'
-            );  
+            );
+            echo "|";
         }?>
         <?php if (User::hasPermission('controllers/simpleevaluations')) {
             generateLink(
@@ -29,13 +30,15 @@ function generateLink ($view, $url, $name) {
                 'simpleevaluations',
                 'Simple Evaluations'
             );
+            echo "|";
         }?>
         <?php if (User::hasPermission('controllers/rubrics')) {
             generateLink(
                 $this,
                 'rubrics',
                 'Rubrics'
-            );          
+            );
+            echo "|";
         }?>
         <?php if (User::hasPermission('controllers/mixevals')) {
             generateLink(
@@ -43,6 +46,7 @@ function generateLink ($view, $url, $name) {
                 'mixevals',
                 'Mixed Evaluations'
             );
+            echo "|";
         }?>
         <?php if (User::hasPermission('controllers/surveys')) {
             generateLink(
@@ -50,13 +54,15 @@ function generateLink ($view, $url, $name) {
                 'surveys',
                 'Surveys'
             );
+            echo "|";
         }?>
         <?php if (User::hasPermission('controllers/emailer')) {
             generateLink(
                 $this,
                 'emailer',
                 'Emailer'
-            );    
+            );
+            echo "|";
         }?>
         <?php if (User::hasPermission('controllers/emailtemplates')) {
             generateLink(

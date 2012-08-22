@@ -1,5 +1,8 @@
 <div id="EmailerWrite">
-<?php echo $html->script('emailtemplates.js'); echo $html->script('calendar1') ?>
+<?php
+    echo $html->script('emailtemplates.js'); echo $html->script('calendar1');
+    $html->script("jquery-ui-timepicker-addon", array("inline"=>false));
+?>
 <div align=center><form method="post" action="<?php echo $html->url('/emailer/write/') ?>" name="emailer" id="emailer" class="emailer">
     <table>
         <tr>
@@ -30,14 +33,10 @@
             <td><?php echo $form->input('Email.date', array(
                             'div' => false,
                             'label' => false,
-                            'style' => 'width:77%',
-                            'value' => date("Y-m-d H:i:s")
+                            'style' => 'width:77%'
                         )
                     )
                 ?>
-                <a href="javascript:cal1.popup(null,null,'<?php echo preg_replace('/app\/webroot/', '', dirname($_SERVER['PHP_SELF'])); ?>');">
-                    <?php echo $html->image('icons/cal.gif', array('align' => 'middle', 'border' => '0', 'alt' => 'cal')) ?>
-                </a>
                 <?php echo $form->error('Email.date', 'Please enter a valid date.') ?>
             </td>
         </tr>
@@ -162,5 +161,12 @@
             $('scheduling').style.visibility = 'visible';
         else
             $('scheduling').style.visibility = 'hidden';
+    }
+</script>
+<script type="text/javascript">
+    initDateTime();
+    function initDateTime() {
+        var format = { dateFormat: 'yy-mm-dd', timeFormat: 'hh:mm:ss' }
+        jQuery("#EmailDate").datetimepicker(format);
     }
 </script>
