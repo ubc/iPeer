@@ -71,7 +71,7 @@
             <?php echo $this->Form->select('OauthClient.'.$key.'.enabled', $enabled, $client['OauthClient']['enabled'], array('empty' => false)); ?>
             <?php echo $this->Form->input('OauthClient.'.$key.'.id', array('value' => $client['OauthClient']['id'])); ?>
             <?php echo $html->link('X', '/oauth_clients/delete/'.$client['OauthClient']['id'], array('id' => 'delete')); ?></p>
-            <label id=comment><?php echo __('Comment').': '.$client['OauthClient']['comment'];?></label>
+            <label id=comment><?php echo __('&nbsp;Comment: ').$client['OauthClient']['comment'];?></label>
         <?php } ?>
     <?php } ?>
     <!-- OAuth Token Credentials -->
@@ -79,13 +79,14 @@
     <h3><?php __('OAuth Token Credentials')?>:</h3>
     <?php echo $html->image('icons/add.gif', array('alt'=>__('Add Token Credential', true), 'valign'=>'middle')); ?>&nbsp;<?php echo $html->link(__('Add Token Credential', true), '/oauth_tokens/add', array('id' => 'add')); ?>
     <?php if (count($tokens) > 0) { ?>
-            <p><?php foreach ($tokens as $index => $token) { ?>
-            <label id=key><?php echo _('Key').': '.$token['OauthToken']['key'];?></label>
+        <?php foreach ($tokens as $index => $token) { ?>
+            <p><label id=key><?php echo _('Key').': '.$token['OauthToken']['key'];?></label>
             <label id=secret><?php echo _('Secret').': '.$token['OauthToken']['secret'];?></label>
             <?php echo _('Expires').': '.$token['OauthToken']['expires'];?>
             <?php echo $this->Form->select('OauthToken.'.$index.'.enabled', $enabled, $token['OauthToken']['enabled'], array('empty' => false)); ?>
             <?php echo $this->Form->input('OauthToken.'.$index.'.id', array('value' => $token['OauthToken']['id'])); ?>
             <?php echo $html->link('X', '/oauth_tokens/delete/'.$token['OauthToken']['id'], array('id' => 'delete')); ?></p>
+            <label id=comment><?php echo __('&nbsp;Comment: ').$token['OauthToken']['comment'];?></label>
         <?php } ?>
     <?php } ?>
     </div>
