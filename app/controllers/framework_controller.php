@@ -103,7 +103,6 @@ class FrameworkController extends AppController
 
         $this->set('title_for_layout', __('View User', true));
         $this->autoRender = false;
-        $this->layout = 'pop_up';
         $this->set('data', $this->data);
         $this->render("userinfo");
     }

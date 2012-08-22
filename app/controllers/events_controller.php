@@ -422,20 +422,14 @@ class EventsController extends AppController
             $this->redirect('/home');
         }
         
-        $course = $this->Course->find('first', array(
-            'conditions' => array(
-                'Course.id' => $courseId,
-                'Instructor.id' => $this->Auth->user('id')
-            )
-        ));
-        
          // Check whether the course exists
-        $course = $this->Course->find('first', array('conditions' => array('id' => $courseId), 'recursive' => 1));
+        $course = $this->Course->find('first', array('conditions' => array('Course.id' => $courseId), 'recursive' => 1));
         if (empty($course)) {
             $this->Session->setFlash(__('Error: That course does not exist.', true));
             $this->redirect('index');
         }
-        
+
+        $courses = $this->Course->find('list', array('fields' => 'Course.full_name'));
         if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
@@ -497,7 +491,6 @@ class EventsController extends AppController
             $this->redirect('index/'.$courseId);
         }
 
-        return;
     }
 
     /**

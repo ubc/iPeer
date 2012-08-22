@@ -2,7 +2,7 @@
 <?php $displayField = ClassRegistry::init('User')->displayField;?>
 
 <?php if(!isset($with_link) || $with_link):?>
-  <?php echo $this->Html->link($data[$displayField], '/framework/userInfoDisplay/'.$data['id'], array('onclick' =>'wopen(this.href, "popup", 650, 275); return false;'))?>
+  <?php echo $this->Html->link($data[$displayField], '/framework/userInfoDisplay/'.$data['id'], array('target' =>'_blank'))?>
 <?php else:?> 
   <?php echo $data[$displayField];?>
 <?php endif;?> 

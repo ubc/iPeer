@@ -473,6 +473,12 @@ i {
     clear: both;
 }
 
+/* Emailer write */
+
+#EmailerWrite td {
+    text-align: left;
+}
+
 /* edit profile - Oauth section */
 
 .oauth {

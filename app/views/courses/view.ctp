@@ -37,7 +37,7 @@
     </tr>
     <tr class="tablecell">
       <td><?php __('Homepage')?>:</td>
-      <td colspan="3"><a href="<?php echo !empty($data['Course']['homepage'])? $data['Course']['homepage']:'#'; ?>" onclick="wopen(this.href, 'popup', 650, 500); return false;"><?php echo $data['Course']['homepage']; ?></a>
+      <td colspan="3"><a href="<?php echo !empty($data['Course']['homepage'])? $data['Course']['homepage']:'#'; ?>" target="_blank"><?php echo $data['Course']['homepage']; ?></a>
         </td>
     </tr>
     <tr class="tablecell">

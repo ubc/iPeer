@@ -468,6 +468,7 @@ class SurveysController extends AppController
             $this->redirect('index');
         }
         
+        $courses = $this->Course->find('list', array('fields' => array('Course.full_name')));
         if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
@@ -491,9 +492,8 @@ class SurveysController extends AppController
         $this->Output->br2nl($this->data);
 
         $whoAmI = $this->User->getCurrentLoggedInUser();
-        $cList = $this->Course->getListByInstructor($whoAmI['id']);
         $this->set('template_id', $id);
-        $this->set('courses', $cList);
+        $this->set('courses', $courses);
         $this->render('edit');
     }
 

@@ -11,7 +11,7 @@
               $last_item = end($data['User']);
               foreach($data['User'] as $user){
                 $user = $user['User'];
-                echo $html->link($user['full_name'], '/users/view/'.$user['id'], array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"));
+                echo $html->link($user['full_name'], '/users/view/'.$user['id'], array('target' => '_blank'));
                 if($user != $last_item['User'])
                   echo ', ';
               }

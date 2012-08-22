@@ -10,7 +10,7 @@
         'EmailTemplate.availability',array(
             'type' => 'radio',
             'options' => array(
-                '0' => __('Private',true).'<br>',
+                '0' => __('Private',true),
                 '1' => __('Public',true).' <font size="2">(Share Template Among Instructors)</font>'
             )
         )

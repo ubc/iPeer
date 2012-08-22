@@ -22,7 +22,7 @@
       			  $count=0;?>
         			<?php foreach ($data['SurveyGroup'] as $i => $survey_group):?>
         			  <tr class="tablecell2" style="border-top:solid #cccccc;">
-                  <td class="header_link"><b><?php echo $this->Html->link('team '.($i+1), '../evaluations/viewSurveyGroupEvaluationResults/'.$survey_id.';'.$survey_group['id'], array('onclick' => "wopen(this.href, \'popup\', 650, 500); return false;"))?></b></td>
+                  <td class="header_link"><b><?php echo $this->Html->link('team '.($i+1), '../evaluations/viewSurveyGroupEvaluationResults/'.$survey_id.';'.$survey_group['id'], array('target' => '_blank'))?></b></td>
         			  <?php if (isset($score[$i]['percent'])):?>
                   <td style="color:#339977;"><i><b><?php __('match score')?>: <?php echo $score[$i]['percent']?></b></i></td>
         			  <?php else:?>
@@ -45,7 +45,7 @@
                       <?php if (!empty($input[$member['id']])):?>
            			      <?php echo $this->Html->link($member['student_no'], 
                                                    'evaluations/viewEvaluationResults/'.$event_id.'/'.$member['id'], 
-                                                   array('onClick' => "wopen(this.href, \'popup\', 650, 500); return false;"))?></td>
+                                                   array('target' => '_blank'))?></td>
                       <?php else:?>
                       <?php echo $member['student_no']?>
                       <?php endif;?>

@@ -1141,7 +1141,6 @@ class EvaluationsController extends AppController
      */
     function viewSurveyGroupEvaluationResults($params=null)
     {
-        $this->layout = 'pop_up';
         $this->autoRender = false;
 
         $surveyId = strtok($params, ';');

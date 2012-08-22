@@ -1,11 +1,11 @@
+<div id="EmailerWrite">
 <?php echo $html->script('emailtemplates.js'); echo $html->script('calendar1') ?>
-<table width="100%"><tr class="tableheader"><td align="center">Write Email</td></tr></table>
 <div align=center><form method="post" action="<?php echo $html->url('/emailer/write/') ?>" name="emailer" id="emailer" class="emailer">
     <table>
         <tr>
             <td>To:</td>
             <td><p><?php if(!empty($recipients)) {
-                        echo $html->link($recipients['name'], $recipients['link'], array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"));
+                        echo $html->link($recipients['name'], $recipients['link'], array('target' => '_blank'));
                     }
                 ?></p>
                 <div id="add-div"></div>
@@ -91,7 +91,7 @@
         </tr>
         <tr>
             <td>Template:</td>
-            <td><?php echo $html->link(__('Add Email Template', true), '/emailtemplates/add/', array('onclick' => "wopen(this.href, 'popup', 650, 500); return false;"));
+            <td><?php echo $html->link(__('Add Email Template', true), '/emailtemplates/add/', array('target' => '_blank'));
                     echo $form->input('Email.template', array(
                             'type' => 'select',
                             'id' => 'template',
@@ -151,7 +151,7 @@
         </tr>
     </table>
     <?php echo $form->submit('Send') ?>
-</form></div>
+</form></div></div>
 <script>
     var cal1 = new calendar1(document.forms[0].elements['data[Email][date]']);
     cal1.year_scroll = false;
