@@ -434,6 +434,20 @@ class EvaluationsController extends AppController
             $this->redirect('/home/index');
         }
         
+        // students can't submit again
+        $submission = $this->EvaluationSubmission->find(
+            'all', 
+            array(
+                'conditions' => array(
+                    'event_id' => $eventId,
+                    'submitter_id' => $this->Auth->user('id'),
+                    'submitted' => '1'
+            )));
+        if (!empty($submission)) {
+            $this->Session->setFlash(__('Error: Submissions had been made', true));
+            $this->redirect('/home/index');
+        }
+        
         if (empty($this->params['data'])) {
             //Get the target event
             $eventId = $this->Sanitize->paranoid($eventId);
@@ -564,6 +578,20 @@ class EvaluationsController extends AppController
                 $this->redirect('/home/index');
             }
             
+            // students can't submit again
+            $submission = $this->EvaluationSubmission->find(
+                'all', 
+                array(
+                    'conditions' => array(
+                        'event_id' => $eventId,
+                        'submitter_id' => $this->Auth->user('id'),
+                        'submitted' => '1'
+                )));
+            if (!empty($submission)) {
+                $this->Session->setFlash(__('Error: Survey has already been submitted', true));
+                $this->redirect('/home/index');
+            }
+            
             $this->set('courseId', $courseId);
             $this->set('id', $this->Auth->user('id'));
         }
@@ -675,6 +703,20 @@ class EvaluationsController extends AppController
             // template type is not rubric - they are redirected
             if ($group != $groupId || '2' != $event['Event']['event_template_type_id']) {
                 $this->Session->setFlash(__('Error: Invalid Id', true));
+                $this->redirect('/home/index');
+            }
+
+            // students can't submit again
+            $submission = $this->EvaluationSubmission->find(
+                'all', 
+                array(
+                    'conditions' => array(
+                        'event_id' => $eventId,
+                        'submitter_id' => $this->Auth->user('id'),
+                        'submitted' => '1'
+                )));
+            if (!empty($submission)) {
+                $this->Session->setFlash(__('Error: Submissions had been made', true));
                 $this->redirect('/home/index');
             }
 
@@ -851,6 +893,20 @@ class EvaluationsController extends AppController
             // template type is not mixeval - they are redirected
             if ($group != $groupId || '4' != $templateId) {
                 $this->Session->setFlash(__('Error: Invalid Id', true));
+                $this->redirect('/home/index');
+            }
+            
+            // students can't submit again
+            $submission = $this->EvaluationSubmission->find(
+                'all', 
+                array(
+                    'conditions' => array(
+                        'event_id' => $eventId,
+                        'submitter_id' => $this->Auth->user('id'),
+                        'submitted' => '1'
+                )));
+            if (!empty($submission)) {
+                $this->Session->setFlash(__('Error: Submissions had been made', true));
                 $this->redirect('/home/index');
             }
 

@@ -85,7 +85,6 @@ class MixevalsController extends AppController
             array("Mixeval.name",          __("Name", true),         "auto", "action", "View Evaluation"),
             array("!Custom.inUse",         __("In Use", true),       "4em",  "number"),
             array("Mixeval.availability",  __("Availability", true), "6em",  "string"),
-            array("Mixeval.scale_max",     __("LOM", true),          "3em",  "number"),
             array("Mixeval.total_question",  __("Questions", true),    "4em", "number"),
             array("Mixeval.total_marks",  __("Total Marks", true),    "4em", "number"),
             array("Mixeval.event_count",   "",       "",        "hidden"),

@@ -132,7 +132,9 @@
                             'name' => 'merge',
                             'options' => $mergeList,
                             'empty' => __('-- Select Merge Field --', true),
-                            'label' => false
+                            'label' => false,
+                            'onChange' => '$("email_content").value = $F("email_content") + $F("merge");',
+                            'escape' => false
                         )
                     )
                 ?>

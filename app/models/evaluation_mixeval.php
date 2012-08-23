@@ -290,7 +290,7 @@ class EvaluationMixeval extends AppModel
     {
         //        $sql = 'UPDATE evaluation_mixevals SET comment_release = '.$releaseStatus.' WHERE event_id = '.$eventId;
         //        return $this->query($sql);
-        $fields = array('EvaluationMixeval.commnet_release' => $releaseStatus);
+        $fields = array('EvaluationMixeval.comment_release' => $releaseStatus);
         $conditions = array('EvaluationMixeval.event_id' => $eventId);
         return $this->updateAll($fields, $conditions);
     }

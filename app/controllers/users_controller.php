@@ -48,8 +48,7 @@ class UsersController extends AppController
 
         $this->FileUpload->allowedTypes(array(
             'txt' => array('text/plain'),
-            'csv' => array('text/csv'),
-            'csv' => array('application/csv')));
+            'csv' => array('text/csv', 'application/csv')));
         $this->FileUpload->uploadDir('../tmp');
         $this->FileUpload->fileModel(null);
         $this->FileUpload->attr('required', true);
@@ -1121,7 +1120,7 @@ class UsersController extends AppController
                 $uploadFile = $this->FileUpload->uploadDir.DS.$this->FileUpload->finalFile;
             } else {
                 $this->Session->setFlash($this->FileUpload->showErrors());
-                //$this->redirect('import');
+                $this->redirect('import');
             }
         }
 

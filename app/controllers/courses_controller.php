@@ -316,9 +316,11 @@ class CoursesController extends AppController
 
         if (!empty($this->data)) {
             if ($this->Course->save($this->data)) {
-                // add current user to the new course
-                $this->Course->addInstructor($this->Course->id, 
-                    $this->Auth->user('id'));
+                // add current user to the new course if the user is not an admin
+                if (!User::hasPermission('controllers/departments')) {
+                    $this->Course->addInstructor($this->Course->id, 
+                        $this->Auth->user('id'));
+                }
                 $this->Session->setFlash('Course created!', 'good');
                 $this->redirect(array('action' => 'index'));
             } else {

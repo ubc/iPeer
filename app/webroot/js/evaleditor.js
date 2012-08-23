@@ -146,7 +146,6 @@ var EvalEditor = Class.create({
   removeQuestion: function(question) {
     // remove from server if exists
     var id = $(question).down('.question-id').value;
-    console.log(question);
     if( id != "") {
       new Ajax.Request(this.options.delete_question_url+id, {
         onFailure: function(response) {
