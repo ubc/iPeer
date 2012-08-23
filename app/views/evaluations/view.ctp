@@ -15,7 +15,7 @@
       <tr >
         <?php $root = $this->webroot.$this->theme;
               $eventId = $data['Event']['id'];?>
-        <td>
+        <td width="50%">
             <?php 
                 echo $html->link(
                         $html->image('icons/export_excel.gif', array('alt'=>'Export')).__(" Export Evaluations", true),

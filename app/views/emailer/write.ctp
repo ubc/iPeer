@@ -61,14 +61,15 @@
                     <tr id="scheduling">
                         <td><?php echo $form->input('Email.times', array(
                                         'div' => false,
-                                        'label' => false,
-                                        'value' => '1',
+                                        'label' => __('(send ', true),
+                                        'value' => '2',
                                         'size' => '3'
                                     )
                                 );
                                 echo $form->input('Email.interval_num', array(
                                         'div' => false,
-                                        'label' => __(' time(s), every ', true)
+                                        'size' => '3',
+                                        'label' => __(' times, with ', true)
                                     )
                                 );
                                 echo $form->input('Email.interval_type', array(
@@ -81,7 +82,8 @@
                                         ),
                                         'selected' => '3600'
                                     )
-                                )
+                                );
+                                echo ' in between each)';
                             ?>
                         </td>
                     </tr>
