@@ -71,7 +71,7 @@
             <?php echo $this->Form->select('OauthClient.'.$key.'.enabled', $enabled, $client['OauthClient']['enabled'], array('empty' => false)); ?>
             <?php echo $this->Form->input('OauthClient.'.$key.'.id', array('value' => $client['OauthClient']['id'])); ?>
             <?php echo $html->link('X', '/oauth_clients/delete/'.$client['OauthClient']['id'], array('id' => 'delete')); ?></p>
-            <label id=comment><?php echo __('Comment: ').$client['OauthClient']['comment'];?></label>
+            <label id=comment><?php echo __('&nbsp;Comment: ').$client['OauthClient']['comment'];?></label>
         <?php } ?>
     <?php } ?>
     <!-- OAuth Token Credentials -->
@@ -86,7 +86,7 @@
             <?php echo $this->Form->select('OauthToken.'.$index.'.enabled', $enabled, $token['OauthToken']['enabled'], array('empty' => false)); ?>
             <?php echo $this->Form->input('OauthToken.'.$index.'.id', array('value' => $token['OauthToken']['id'])); ?>
             <?php echo $html->link('X', '/oauth_tokens/delete/'.$token['OauthToken']['id'], array('id' => 'delete')); ?></p>
-            <label id=comment><?php echo __('Comment: ').$token['OauthToken']['comment'];?></label>
+            <label id=comment><?php echo __('&nbsp;Comment: ').$token['OauthToken']['comment'];?></label>
         <?php } ?>
     <?php } ?>
     </div>

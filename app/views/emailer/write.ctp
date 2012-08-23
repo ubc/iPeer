@@ -8,7 +8,7 @@
         <tr>
             <td>To:</td>
             <td><p><?php if(!empty($recipients)) {
-                        echo $html->link($recipients['name'], $recipients['link'], array('target' => '_blank'));
+                        echo $html->link($recipients['name'], $recipients['link']);
                     }
                 ?></p>
                 <div id="add-div"></div>
@@ -92,7 +92,7 @@
         </tr>
         <tr>
             <td>Template:</td>
-            <td><?php echo $html->link(__('Add Email Template', true), '/emailtemplates/add/', array('target' => '_blank'));
+            <td><?php echo $html->link(__('Add Email Template', true), '/emailtemplates/add/');
                     echo $form->input('Email.template', array(
                             'type' => 'select',
                             'id' => 'template',

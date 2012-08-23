@@ -11,7 +11,7 @@
               $last_item = end($data['User']);
               foreach($data['User'] as $user){
                 $user = $user['User'];
-                echo $html->link($user['full_name'], '/users/view/'.$user['id'], array('target' => '_blank'));
+                echo $html->link($user['full_name'], '/users/view/'.$user['id']);
                 if($user != $last_item['User'])
                   echo ', ';
               }

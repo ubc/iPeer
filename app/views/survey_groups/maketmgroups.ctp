@@ -19,7 +19,7 @@
             <tr>
               <th>Team Name</th>
       			<?php for ($j=0; $j < (count($scores[0])-2); $j++):?>
-    			    <th width="40"><?php echo $this->Html->link('Q'.($j+1), '../evaluations/viewSurveySummary/'.$survey_id, array('target' => '_blank'))?></th>
+    			    <th width="40"><?php echo $this->Html->link('Q'.($j+1), '../evaluations/viewSurveySummary/'.$survey_id)?></th>
             <?php endfor;?>
       			  <th><?php __('Match Score')?></th>
               <th colspan="400"><?php __('Team Members')?></th>
@@ -36,8 +36,7 @@
                 <td>
                 <?php for ($j=0; $j < count($team);$j++):?>
                 <?php echo $this->Html->link($team['member_'.$j]['student_no'],
-                                  '../evaluations/viewEvaluationResults/'.$event_id.'/'.$team['member_'.$j]['id'],
-                                  array('target' => '_blank'))?>
+                                  '../evaluations/viewEvaluationResults/'.$event_id.'/'.$team['member_'.$j]['id'])?>
                 <?php endfor;?>
                 </td>
       			  </tr>

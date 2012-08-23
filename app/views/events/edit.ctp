@@ -11,11 +11,11 @@ echo $this->Form->input('id');?>
 echo $this->Form->input('description', array('type' => 'textarea'));
 echo $this->Form->input('event_template_type_id');
 echo $this->Form->input('SimpleEvaluation',
-    array('div' => array('id' => 'SimpleEvalDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevS', 'target' => '_blank'))));
+    array('div' => array('id' => 'SimpleEvalDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevS'))));
 echo $this->Form->input('Rubric',
-    array('div' => array('id' => 'RubricDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevR', 'target' => '_blank'))));
+    array('div' => array('id' => 'RubricDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevR'))));
 echo $this->Form->input('Mixeval',
-    array('div' => array('id' => 'MixevalDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevM', 'target' => '_blank'))));
+    array('div' => array('id' => 'MixevalDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevM'))));
 echo $this->Form->input(
     'self_eval', 
     array(
