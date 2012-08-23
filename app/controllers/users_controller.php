@@ -408,7 +408,7 @@ class UsersController extends AppController
             }
         }
 
-        // List the avaliable courses
+        // List the available courses
         $simpleCoursesList = array();
         foreach ($coursesList as $key => $value) {
             $simpleCoursesList[$key] = $value['course'];

@@ -72,12 +72,10 @@ jQuery(document).ready(
     function() {
         var oTable = jQuery('#table_id').dataTable({
             "sPaginationType" : "full_numbers",
-            "aoColumnDefs": [{ 
-                "bSearchable": false, 
-                "bVisible": false, 
-                "bSortable":false, 
-                "aTargets": [ 0 ] 
-            }],
+            "aoColumnDefs": [
+                {"aTargets": [ 0 ], "bSearchable": false, "bVisible": false, "bSortable": false},
+                {"aTargets": [ 3 ], "bSortable": false}
+            ],
             "aaSorting" : [[1, 'asc']]
         });
     }

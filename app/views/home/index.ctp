@@ -75,7 +75,7 @@ if (isset($course_list['I']))
 ?>
 
 <?php if (empty($course_list)):?>
-    <?php echo __('You do not have any course.') ?>
+    <?php echo __('You do not have any courses.') ?>
 <?php endif; ?>
 
 <div class='toggle' style="text-align:right">
@@ -90,7 +90,7 @@ if (isset($course_list['I']))
     <li><?php __('Please <i>add a course</i> from the yellow "Courses" tab above')?>
     </li>
 
-    <li><?php __('Then <i>register students</i> into that course from that courses summary display. This display will available (once the course is created) by clicking on the courses name from most menus .')?>
+    <li><?php __('Then <i>register students</i> into that course from that course\'s summary display. This display will be available (once the course is created) by clicking on the course\'s name from most menus.')?>
     </li>
 
     <li><?php __('Put your students into <i>groups</i> manually, (or, if you have the students complete a survey, iPeer can do it for you, using TeamMaker).')?>
@@ -98,7 +98,7 @@ if (isset($course_list['I']))
 
     <li>
       <?php __('To create evaluations, check out the orange wizard link the top right hand corner "iPeer Tutorial Wizard".')?>
-          <?php __('It has detailed movies on how to create evaluations.')?>
+          <?php __('It has detailed video clips on how to create evaluations.')?>
     </li>
   </ol>
 </div>

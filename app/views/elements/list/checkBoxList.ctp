@@ -11,7 +11,7 @@
             // No entries to choose from? say so.
             echo !empty($emptyMessage) ?
                 $emptyMessage :
-                "No $setName avaliable.";
+                "No $setName available.";
         } else {
             // Create a small hidden field to ID this list's presence
             echo "<input type='hidden' id='$setName' name='$setName' value='present'></input>";
