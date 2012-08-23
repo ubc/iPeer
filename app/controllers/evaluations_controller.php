@@ -417,38 +417,49 @@ class EvaluationsController extends AppController
         $eventId = $tok;
         $groupId = strtok(';');
 
-        $group = null;
-        $group_events = $this->GroupEvent->getGroupEventByEventId($eventId);
-        $userId=$this->Auth->user('id');
-        foreach ($group_events as $events) {
-            if ($this->GroupsMembers->checkMembershipInGroup($events['GroupEvent']['group_id'], $userId) !== 0) {
-                $group=$events['GroupEvent']['group_id'];
-            }
-        }
-        
-        $templateId = $this->Event->getEventTemplateTypeId($eventId);;
-        
-        // filter out users that don't have access to this eval, invalid ids, not simple eval
-        if (($group != $groupId || '1' != $templateId) && empty($this->params['data'])) {
-            $this->Session->setFlash(__('Error: Invalid Id', true));
-            $this->redirect('/home/index');
-        }
-        
-        // students can't submit again
-        $submission = $this->EvaluationSubmission->find(
-            'all', 
-            array(
-                'conditions' => array(
-                    'event_id' => $eventId,
-                    'submitter_id' => $this->Auth->user('id'),
-                    'submitted' => '1'
-            )));
-        if (!empty($submission)) {
-            $this->Session->setFlash(__('Error: Submissions had been made', true));
-            $this->redirect('/home/index');
-        }
-        
         if (empty($this->params['data'])) {
+            $group = null;
+            $group_events = $this->GroupEvent->getGroupEventByEventId($eventId);
+            $userId=$this->Auth->user('id');
+            foreach ($group_events as $events) {
+                if ($this->GroupsMembers->checkMembershipInGroup($events['GroupEvent']['group_id'], $userId) !== 0) {
+                    $group=$events['GroupEvent']['group_id'];
+                }
+            }
+            
+            $templateId = $this->Event->getEventTemplateTypeId($eventId);;
+            
+            // filter out users that don't have access to this eval, invalid ids, not simple eval
+            if (($group != $groupId || '1' != $templateId)) {
+                $this->Session->setFlash(__('Error: Invalid Id', true));
+                $this->redirect('/home/index');
+            }
+            
+            // students can't submit again
+            $submission = $this->EvaluationSubmission->find(
+                'all', 
+                array(
+                    'conditions' => array(
+                        'event_id' => $eventId,
+                        'submitter_id' => $this->Auth->user('id'),
+                        'submitted' => '1'
+                )));
+            if (!empty($submission)) {
+                $this->Session->setFlash(__('Error: Submissions had been made', true));
+                $this->redirect('/home/index');
+            }
+            
+            // students can't submit outside of release date range
+            $event = $this->Event->getEventById($eventId);
+            $now = time();
+            
+            if ($now < strtotime($event['Event']['release_date_begin']) ||
+                $now > strtotime($event['Event']['release_date_end'])) {
+                $this->Session->setFlash(__('Error: Evaluation is unavailable', true));
+                $this->redirect('/home/index');
+                
+            }
+        
             //Get the target event
             $eventId = $this->Sanitize->paranoid($eventId);
             $event = $this->Event->formatEventObj($eventId, $groupId);
@@ -592,6 +603,17 @@ class EvaluationsController extends AppController
                 $this->redirect('/home/index');
             }
             
+            // students can't submit outside of release date range
+            $event = $this->Event->getEventById($eventId);
+            $now = time();
+            
+            if ($now < strtotime($event['Event']['release_date_begin']) ||
+                $now > strtotime($event['Event']['release_date_end'])) {
+                $this->Session->setFlash(__('Error: Survey is unavailable', true));
+                $this->redirect('/home/index');
+                
+            }
+            
             $this->set('courseId', $courseId);
             $this->set('id', $this->Auth->user('id'));
         }
@@ -718,6 +740,17 @@ class EvaluationsController extends AppController
             if (!empty($submission)) {
                 $this->Session->setFlash(__('Error: Submissions had been made', true));
                 $this->redirect('/home/index');
+            }
+            
+            // students can't submit outside of release date range
+            $event = $this->Event->getEventById($eventId);
+            $now = time();
+            
+            if ($now < strtotime($event['Event']['release_date_begin']) ||
+                $now > strtotime($event['Event']['release_date_end'])) {
+                $this->Session->setFlash(__('Error: Evaluation is unavailable', true));
+                $this->redirect('/home/index');
+                
             }
 
             $data = $this->Rubric->getRubricById($rubricId);
@@ -908,6 +941,17 @@ class EvaluationsController extends AppController
             if (!empty($submission)) {
                 $this->Session->setFlash(__('Error: Submissions had been made', true));
                 $this->redirect('/home/index');
+            }
+            
+            // students can't submit outside of release date range
+            $event = $this->Event->getEventById($eventId);
+            $now = time();
+            
+            if ($now < strtotime($event['Event']['release_date_begin']) ||
+                $now > strtotime($event['Event']['release_date_end'])) {
+                $this->Session->setFlash(__('Error: Evaluation is unavailable', true));
+                $this->redirect('/home/index');
+                
             }
 
             $penalty = $this->Penalty->getPenaltyByEventId($eventId);
