@@ -135,7 +135,7 @@ class SurveysController extends AppController
             array("Survey.created",     __("Creation Date", true), "10em", "date"));
 
         // Just list all and my evaluations for selections
-        $userList = array($myID => "My Evaluations");
+        //$userList = array($myID => "My Evaluations");  //unused
 
         // Join in the course name
         $joinTableCourse =
@@ -491,7 +491,6 @@ class SurveysController extends AppController
         //converting nl2br back so it looks better
         $this->Output->br2nl($this->data);
 
-        $whoAmI = $this->User->getCurrentLoggedInUser();
         $this->set('template_id', $id);
         $this->set('courses', $courses);
         $this->render('edit');

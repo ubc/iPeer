@@ -309,7 +309,7 @@ class SurveyGroupsController extends AppController
      * @access public
      * @return void
      */
-    function maketmgroups($params=null, $time=null, $make=true)
+    function maketmgroups($time=null, $make=true)
     {
       /*$time = 1290644146;
       $make = false;*/
