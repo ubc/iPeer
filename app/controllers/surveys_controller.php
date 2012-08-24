@@ -106,7 +106,7 @@ class SurveysController extends AppController
      */
     function setUpAjaxList($conditions = array())
     {
-        $myID = $this->Auth->user('id');
+        //$myID = $this->Auth->user('id');  //unused
 
         // Get the course data
         // instructors

@@ -17,7 +17,7 @@ class V1Controller extends Controller {
     public $layout = "blank_layout";
 
     /**
-     * 
+     * oauth function for use in test?
      */
     public function oauth() {
     }

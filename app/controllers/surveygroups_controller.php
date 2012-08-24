@@ -302,8 +302,8 @@ class SurveyGroupsController extends AppController
     /**
      * maketmgroups
      *
-     * @param bool $time   time
-     * @param bool $make   make
+     * @param bool $time
+     * @param bool $make
      *
      * @access public
      * @return void
