@@ -16,9 +16,17 @@ class V1Controller extends Controller {
     public $components = array('RequestHandler', 'Session');
     public $layout = "blank_layout";
 
+    /**
+     * 
+     */
     public function oauth() {
     }
 
+    /**
+     * Checks to see if required parameters are present?
+     *
+     * @return bool - false if something missing
+     */
     private function _checkRequiredParams() {
         if (!isset($_REQUEST['oauth_consumer_key'])) {
             $this->set('oauthError', "Parameter Absent: oauth_consumer_key");
@@ -233,6 +241,12 @@ class V1Controller extends Controller {
         return null;
     }
 
+    /**
+     * beforeFilter
+     *
+     * @access public
+     * @return void
+     */
     public function beforeFilter() {
         return $this->_checkRequiredParams() &&
         $this->_checkSignature() &&
