@@ -166,7 +166,8 @@ class SurveysController extends AppController
             // For instructors: only list their own course events (surveys)
             $extraFilters = $conditions;
             $extraFilters = " ( ";
-            foreach ($userCourseList as $id => $course) {
+            $courseIds = array_keys($userCourseList);
+            foreach ($courseIds as $id) {
                 $extraFilters .= "course_id=$id or ";
             }
             $extraFilters .= "1=0 ) "; // just terminates the or condition chain with "false"

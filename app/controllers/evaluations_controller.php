@@ -250,9 +250,8 @@ class EvaluationsController extends AppController
     /**
      * Index
      *
-     * @param <type> $message Message
      */
-    function index ($message="")
+    function index ()
     {
         // Evaluation index was merged with events ajaxList
         $this->redirect('/events/index');

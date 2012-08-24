@@ -166,7 +166,8 @@ class EventsController extends AppController
         // faculty admins or instructors - $coursesList from above
         } else {
             $extraFilters = " ( ";
-            foreach ($coursesList as $id => $course) {
+            $courseIds = array_keys($coursesList);
+            foreach ($courseIds as $id) {
                 $extraFilters .= "course_id=$id or ";
             }
             $extraFilters .= "1=0 ) ";

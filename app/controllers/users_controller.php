@@ -316,15 +316,15 @@ class UsersController extends AppController
             }
             
             if (isset($this->data['OauthClient'])) {
-                if (!($client = $this->OauthClient->saveAll($this->data['OauthClient']))) {
-                    $this->Session->setFlash(__('Failed to save.</br>', true).$errorMsg);
+                if (!($this->OauthClient->saveAll($this->data['OauthClient']))) {
+                    $this->Session->setFlash(__('Failed to save.</br>', true));
                     return false;
                 }
             }
             
             if (isset($this->data['OauthToken'])) {
-                if (!($token = $this->OauthToken->saveAll($this->data['OauthToken']))) {
-                    $this->Session->setFlash(__('Failed to save.</br>', true).$errorMsg);
+                if (!($this->OauthToken->saveAll($this->data['OauthToken']))) {
+                    $this->Session->setFlash(__('Failed to save.</br>', true));
                     return false;
                 }
             }
