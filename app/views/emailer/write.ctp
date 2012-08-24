@@ -62,7 +62,7 @@
                         <td><?php echo $form->input('Email.times', array(
                                         'div' => false,
                                         'label' => __('(send ', true),
-                                        'value' => '2',
+                                        'value' => '1',
                                         'size' => '3'
                                     )
                                 );

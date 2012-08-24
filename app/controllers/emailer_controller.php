@@ -90,18 +90,6 @@ class EmailerController extends AppController
                 "joinModel"  => "Creator");
         //put all the joins together
         $joinTables = array($jointTableCreator);
-
-        // Join with Users
-        $jointTableCreator =
-            array("id"         => "Creator_id",
-                "localKey"   => "creator_id",
-                "description" => __("Evaluations to show:", true),
-                "default" => $myID,
-                "list" => $userList,
-                "joinTable"  => "users",
-                "joinModel"  => "Creator");
-        // put all the joins together
-        $joinTables = array($jointTableCreator);
         
         if (User::hasPermission('functions/superadmin')) {
             $extraFilters = '';

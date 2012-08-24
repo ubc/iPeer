@@ -106,13 +106,15 @@ class SurveysController extends AppController
      */
     function setUpAjaxList($conditions = array())
     {
-        //$myID = $this->Auth->user('id');  //unused
+        $myID = $this->Auth->user('id');
 
         // Get the course data
         // instructors
         if (!User::hasPermission('controllers/departments')) {
             $userCourseList = User::getMyCourseList();
-        // admins & super admin
+        } else if (User::hasPermission('functions/superadmin')) {
+            $userCourseList = $this->Course->find('list', array('fields' => array('full_name')));
+        // admins
         } else {
             $userCourseList = User::getMyDepartmentsCourseList('list');
         }
@@ -135,25 +137,28 @@ class SurveysController extends AppController
             array("Survey.created",     __("Creation Date", true), "10em", "date"));
 
         // Just list all and my evaluations for selections
-        //$userList = array($myID => "My Evaluations");  //unused
+        $userList = array($myID => "My Surveys");
 
         // Join in the course name
         $joinTableCourse =
-            array("id"        => "Course.id",
+            array("id"        => "Survey.course_id",
                 "localKey"  => "course_id",
                 "description" => "Course:",
-                "default"   => $this->Session->read('ipeerSession.courseId'),
                 "list" => $userCourseList,
+                "default"   => $this->Session->read('ipeerSession.courseId'),
                 "joinTable" => "courses",
                 "joinModel" => "Course");
 
         $joinTableCreator =
-            array("joinTable"=>"users",
+            array("id" => "Survey.creator_id",
                 "localKey" => "creator_id",
+                "description" => __("Surveys to show:", true),
+                "list" => $userList,
+                "joinTable"=>"users",
                 "joinModel" => "Creator");
 
         // Add the join table into the array
-        $joinTables = array();
+        $joinTables = array($joinTableCreator, $joinTableCourse);
 
         if (User::hasPermission('functions/superadmin')) {
             $extraFilters = "";
