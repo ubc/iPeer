@@ -249,25 +249,6 @@ class EmailerController extends AppController
                 $this->Session->setFlash(__('Error: You do not have permission to write emails to this group', true));
                 $this->redirect('index');
             }
-        // for checking if the user can email to user with $id
-        } else if (!User::hasPermission('functions/email/allusers') && null != $id) {
-            // check if they have access to user with $id
-            
-            $accessibleUsers = array();
-            $methods = array('UserCourse', 'UserTutor', 'UserEnrol');
-            
-            foreach ($methods as $method) {
-                $users = $this->$method->find('list', array(
-                    'conditions' => array('course_id' => array_keys($courseList)),
-                    'fields' => 'user_id'
-                ));
-                $accessibleUsers = array_merge($accessibleUsers, $users);
-            }
-
-            if (!in_array($id, $accessibleUsers)) {
-                $this->Session->setFlash(__('Error: You do not have permission to write emails to this user.', true));
-                $this->redirect('index');
-            }
         }
         
     

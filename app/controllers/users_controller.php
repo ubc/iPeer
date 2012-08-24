@@ -454,13 +454,13 @@ class UsersController extends AppController
 
         if (!($this->data = $this->User->findById($id))) {
             $this->Session->setFlash(__('Error: This user does not exist', true));
-            $this->redirect('index');
+            $this->redirect($this->referer());
         }
         
         $role = $this->User->getRoleName($id);
         if (!User::hasPermission('functions/user/'.$role)) {
             $this->Session->setFlash(__('Error: You do not have permission to view this user', true));
-            $this->redirect('index');
+            $this->redirect($this->referer());
         }
 
         //super admins and faculty admins can view all users
@@ -481,7 +481,7 @@ class UsersController extends AppController
 
             if (!in_array($id, $accessibleUsers)) {
                 $this->Session->setFlash(__('Error: You do not have permission to view this user', true));
-                $this->redirect('index');
+                $this->redirect($this->referer());
             }
         }
 

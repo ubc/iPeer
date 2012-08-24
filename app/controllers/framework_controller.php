@@ -71,13 +71,13 @@ class FrameworkController extends AppController
 
         if (!is_numeric($id) || !($this->data = $this->User->findById($id))) {
             $this->Session->setFlash(__('Error: Invalid user ID.', true));
-            $this->redirect('/user/index');
+            $this->redirect($this->referer());
         }
         
         $role = $this->User->getRoleName($id);
         if (!User::hasPermission('functions/user/'.$role)) {
             $this->Session->setFlash(__('Error: You do not have permission to view this user', true));
-            $this->redirect('/users/index');
+            $this->redirect($this->referer());
         }
 
         if (!User::hasPermission('controllers/departments')) {
@@ -97,7 +97,7 @@ class FrameworkController extends AppController
             
             if (!in_array($id, $accessibleUsers)) {
                 $this->Session->setFlash(__('Error: You do not have permission to view this user', true));
-                $this->redirect('/users/index');
+                $this->redirect($this->referer());
             }
         }
 
