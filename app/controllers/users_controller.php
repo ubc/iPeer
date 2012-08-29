@@ -1065,98 +1065,84 @@ class UsersController extends AppController
     /**
      * import
      *
-     * @access public
+     * @param int $courseId The id the course to import users into
+     *
      * @return void
      */
-    function import()
+    public function import($courseId = null)
     {
-        $this->set('title_for_layout', __('Import Students From Text (.txt) or CSV File (.csv)', true));
-        if (isset($this->params['form']['course_id'])) {
-            $this->Session->write('ipeerSession.courseId', $this->params['form']['course_id']);
-        }
+        $this->set('title_for_layout', 
+            __('Import Students From Text (.txt) or CSV File (.csv)', true));
         
-        // instructors
-        if (!User::hasPermission('controllers/departments')) {
-            $courseList = User::getMyCourseList();
-        // super admins
-        } else if (User::hasPermission('functions/superadmin')) {
+        // users can only import to courses they have access to
+        if (User::hasPermission('functions/superadmin')) {
+            // superadmins have access to everything
             $courseList = $this->Course->find('list');
-        // admins
-        } else {
+        } 
+        else if (User::hasPermission('functions/user/admin')) {
+            // admins have access to their departments
             $courseList = User::getMyDepartmentsCourseList('list');
         }
+        else if (!User::hasPermission('functions/user/instructor')) {
+            // instructors have access to courses they're teaching
+            $courseList = User::getMyCourseList();
+        } 
+        else {
+            // no permission to import user
+            $this->Session->setFlash("Access denied to import user.");
+            $this->redirect('/home');
+        }
+        $this->set('courses', $courseList);
 
-        $this->set('courseList', $courseList);
-        $this->set('courseParams', array('courseList' => $courseList, 'id_prefix' => 'import'));
-        $this->set('user_type', 'S');
-    }
-
-
-    /**
-     * importPreview
-     * TODO: add import preview
-     *
-     *
-     * @access public
-     * @return void
-     */
-    function importPreview()
-    {
-    }
-
-
-    /**
-     * importFile
-     *
-     * @access public
-     * @return void
-     */
-    function importFile()
-    {
-        $this->autoRender = false;
+        // make sure we know the course we're importing users into
+        if ($courseId == null && !empty($this->data)) {
+            $courseId = $this->data['Course']['Course'];
+        }
+        $this->set('courseId', $courseId);
 
         if (!empty($this->data)) {
+            // check that file upload worked
             if ($this->FileUpload->success) {
                 $uploadFile = $this->FileUpload->uploadDir.DS.$this->FileUpload->finalFile;
             } else {
                 $this->Session->setFlash($this->FileUpload->showErrors());
-                $this->redirect('import');
+                return;
             }
-        }
 
-        $data = Toolkit::parseCSV($uploadFile);
-        foreach ($data as &$user) {
-            if (empty($user[User::IMPORT_PASSWORD])) {
-                $user[User::GENERATED_PASSWORD] = $this->PasswordGenerator->generate();
-            } else {
-                $user[User::GENERATED_PASSWORD] = '';
+            $data = Toolkit::parseCSV($uploadFile);
+            // generation password for users who weren't given one
+            foreach ($data as &$user) {
+                if (empty($user[User::IMPORT_PASSWORD])) {
+                    $user[User::GENERATED_PASSWORD] = $this->PasswordGenerator->generate();
+                } else {
+                    $user[User::GENERATED_PASSWORD] = '';
+                }
             }
+
+            // add the users to the database
+            $result = $this->User->addUserByArray($data, true);
+
+            if (!$result) {
+                $this->Session->setFlash("Unable to import users. Do they already exist?");
+                return;
+            }
+            
+            $insertedIds = array();
+            foreach ($this->User->insertedIds as $new) {
+                $insertedIds[] = $new;
+            }
+            foreach ($result['updated_students'] as $old) {
+                $insertedIds[] = $old['User']['id'];
+            }
+            
+            // enrol the users in the selectec course
+            $this->Course->enrolStudents($insertedIds, 
+                $this->data['Course']['Course']);
+            $this->FileUpload->removeFile($uploadFile);
+            $this->set('data', $result);
+            $this->render('userSummary');
         }
-
-        $result = $this->User->addUserByArray($data, true);
-
-        if (!$result) {
-            $this->Session->setFlash($this->User->showErrors());
-            $this->redirect('import');
-        }
-        
-        $insertedIds = array();
-        foreach ($this->User->insertedIds as $new) {
-            $insertedIds[] = $new;
-        }
-        foreach ($result['updated_students'] as $old) {
-            $insertedIds[] = $old['User']['id'];
-        }
-        
-        $this->Course->enrolStudents($insertedIds, $this->data['User']['course_id']);
-
-        $this->FileUpload->removeFile($uploadFile);
-
-        $this->set('data', $result);
-
-        $this->render('userSummary');
     }
-
 
     /**
      * update

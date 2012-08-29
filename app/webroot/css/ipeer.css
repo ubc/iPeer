@@ -98,7 +98,7 @@ p {
     width: 100%;
 }
 
-.text label, .password label, .textarea label, .select label, .datetime label, .date label, .radio legend, .penaltyLabel
+.text label, .password label, .textarea label, .select label, .datetime label, .date label, .radio legend, .penaltyLabel, .file label
 {
     float: left;
     text-align: right;
@@ -109,7 +109,7 @@ p {
 }
 
 .text input, .password input, .textarea textarea, .select select, 
-.datetime select, .date select, .penaltyInput input
+.datetime select, .date select, .penaltyInput input, .file input
 {   
     margin: 0.35em 0.35em; 
     border-radius: 3px; 
@@ -717,6 +717,18 @@ i {
 
 .userViewTable {
     width: 100%;
+}
+
+/* users/import */
+
+#UserImport ul li {
+    list-style-type: circle;
+    list-style-position: inside;
+    margin: 0.5em;
+}
+
+#UserImport .file input {
+    width: 25em;
 }
 
 /* Courses */

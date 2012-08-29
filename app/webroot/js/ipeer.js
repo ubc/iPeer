@@ -83,10 +83,3 @@ function getIndex(obj, type, url) {
   obj.href = url + type + "/view/" + index + "/pop_up";
 }
 
-function import_validate() {
-  if($("import_course_id").value == -1) {
-    alert("Please select a course to import into!");
-    return false;
-  }
-  return true;
-}

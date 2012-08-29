@@ -184,6 +184,7 @@ class FileUploadComponent extends Object{
       $this->errors[] = __('Please select a file to upload.', true);
     }
     // end
+    //
     
     if($this->uploadDetected){
       $this->hasFile = true;
@@ -271,7 +272,7 @@ class FileUploadComponent extends Object{
     //Backporting for manual use processFile(), show error when using.
     if(count($this->uploadedFiles) && empty($this->currentFile)){
       $this->_error('FileUpload: You\'re using a deprecated standard of uploading files manually.  Don\'t call processFile() directly. Instead, call processAllFiles().');
-      $this->setCurrentFile($this->uploadedFiles[0]);
+      return;
     }
     
     $save_data = $this->__prepareSaveData();
@@ -344,25 +345,9 @@ class FileUploadComponent extends Object{
     */
   function processAllFiles(){
     foreach($this->uploadedFiles as $file){
-      $this->_setCurrentFile($file[$this->options['fileVar']]);
+      $this->currentFile = $file[$this->options['fileVar']];
       $this->Uploader->file = $this->options['fileModel'] ? $file[$this->options['fileVar']] : $file;
       $this->processFile();
-    }
-  }
-  
-  /**
-    * Set's the current file to process.
-    *
-    * @access private
-    * @param associative array of file
-    * @return void
-    */
-  function _setCurrentFile($file){
-    if($this->options['fileModel']){
-      $this->currentFile = $file[$this->options['fileVar']];
-    }
-    else {
-      $this->currentFile = $file;
     }
   }
   
