@@ -430,7 +430,7 @@ class V1Controller extends Controller {
     /**
      * Get a list of groups in iPeer.
      **/
-    public function groups () {
+    public function groups() {
         // view
         if ($this->RequestHandler->isGet()) {
             $data = array();
@@ -494,7 +494,7 @@ class V1Controller extends Controller {
                 $this->set('group', null);
             } else {
                 $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
-                $this->set('group', 'Error: The group was not delete');
+                $this->set('group', 'Error: The group was not deleted');
             }
         // update
         } else if ($this->RequestHandler->isPut()) {
@@ -532,7 +532,7 @@ class V1Controller extends Controller {
                     }
                     $statusCode = 'HTTP/1.0 200 OK';
                 } else {
-                    $results = 'It appears that there are no events in course with id '.$course_id;
+                    $results = 'No events in course with id '.$course_id;
                     $statusCode = 'HTTP/1.0 404 Not Found';
                 }
             } else {
@@ -545,7 +545,7 @@ class V1Controller extends Controller {
                     $results = $list['Event'];
                     $statusCode = 'HTTP/1.0 200 OK';
                 } else {
-                    $results = 'This event with id'.$event_id.'doesn\'t seem to exist';
+                    $results = 'The event with id'.$event_id.'doesn\'t exist';
                     $statusCode = 'HTTP/1.0 404 Not Found';
                 }
             }
@@ -580,7 +580,7 @@ class V1Controller extends Controller {
                         }
                         $statusCode = 'HTTP/1.0 200 OK';
                     } else {
-                        $results = 'No grades for an event with id '.$event_id.' can be found';
+                        $results = 'No grades for event with id '.$event_id.' can be found';
                         $statusCode = 'HTTP/1.0 404 Not Found';
                     }
                 } else if (2 == $eventType) {
@@ -596,7 +596,7 @@ class V1Controller extends Controller {
                         }
                         $statusCode = 'HTTP/1.0 200 OK';
                     } else {
-                        $results = 'No grades for an event with id '.$event_id.' can be found';
+                        $results = 'No grades for event with id '.$event_id.' can be found';
                         $statusCode = 'HTTP/1.0 404 Not Found';
                     }
                 } else if (4 == $eventType) {
@@ -611,7 +611,7 @@ class V1Controller extends Controller {
                         }
                         $statusCode = 'HTTP/1.0 200 OK';
                     } else {
-                        $results = 'No grades for an event with id '.$event_id.' can be found';
+                        $results = 'No grades for event with id '.$event_id.' can be found';
                         $statusCode = 'HTTP/1.0 404 Not Found';
                     }
                 }
@@ -627,7 +627,7 @@ class V1Controller extends Controller {
                         $results = $list['EvaluationSimple'];
                         $statusCode = 'HTTP/1.0 200 OK';
                     } else {
-                        $results = 'No grades can be found for user with id '.$user_id;
+                        $results = 'No grades can be found for user '.$user_id.' in event '.$event_id;
                         $statusCode = 'HTTP/1.0 404 Not Found';
                     }
                 } else if (2 == $eventType) {
@@ -641,7 +641,7 @@ class V1Controller extends Controller {
                         $results = $list['EvaluationRubric'];
                         $statusCode = 'HTTP/1.0 200 OK';
                     } else {
-                        $results = 'No grades can be found for user with id '.$user_id;
+                        $results = 'No grades can be found for user '.$user_id.' in event '.$event_id;
                         $statusCode = 'HTTP/1.0 404 Not Found';
                     }
                 } else if (4 == $eventType) {
@@ -655,7 +655,7 @@ class V1Controller extends Controller {
                         $results = $list['EvaluationMixeval'];
                         $statusCode = 'HTTP/1.0 200 OK';
                     } else {
-                        $results = 'No grades can be found for user with id '.$user_id;
+                        $results = 'No grades can be found for user '.$user_id.' in event '.$event_id;
                         $statusCode = 'HTTP/1.0 404 Not Found';
                     }
                 }

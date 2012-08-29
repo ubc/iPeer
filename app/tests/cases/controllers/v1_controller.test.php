@@ -210,11 +210,11 @@ class V1ControllerTest extends CakeTestCase {
             $tmp['first_name'] = $user['first_name'];
             $expected[] = $tmp;
         }
-        
+
         $ret = $this->_oauthReq($url);
         $this->assertEqual($ret, json_encode($expected));
         $this->assertEqual(json_decode($ret, true), $expected);
-        
+
         // GET - specific user
         $expectedPerson = array(
             'id' => '17',
@@ -223,11 +223,11 @@ class V1ControllerTest extends CakeTestCase {
             'last_name' => 'Student',
             'first_name' => 'Edna'
         );
-        
+
         $ret = $this->_oauthReq($url.'/17');
         $this->assertEqual($ret, json_encode($expectedPerson));
         $this->assertEqual(json_decode($ret, true), $expectedPerson);
-        
+
         // POST - add user
         $newUser = array(
             'User' => 
@@ -252,33 +252,33 @@ class V1ControllerTest extends CakeTestCase {
         $newPerson = $this->_oauthReq("$url/$userId");
 
         $this->assertEqual(json_decode($newPerson, true), $expectedPerson);
-        
+
         // PUT - update user
         $updatedPerson = array(
             'User' => 
                 array('id' => $userId, 'username' => 'coolUser20', 'first_name' => 'Jane', 'last_name' => 'Hardy')
         );
-        
+
         $expectedPerson = array('id' => $userId, 'role_id' => '5', 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane');
 
         $file = $this->_oauthReq(
             $url, json_encode($updatedPerson), OAUTH_HTTP_METHOD_PUT);
 
         $editedPerson = $this->_oauthReq("$url/$userId");
-        
+
         $this->assertEqual(json_decode($editedPerson, true), $expectedPerson);
-        
+
         // DELETE - delete the user
         $file = $this->_oauthReq(
             "$url/$userId", 
             null, 
             OAUTH_HTTP_METHOD_DELETE
         );
-        
+
         $ret = $this->_oauthReq("$url/$userId");
         $this->assertEqual(substr($ret, 0, 8), '"No user');
     }
-    
+
     public function testCourses()
     {
         $url = Router::url('v1/courses', true);
@@ -300,12 +300,12 @@ class V1ControllerTest extends CakeTestCase {
         // grab data, which should be in json format since it's the view (no $id);
         $actualList = json_decode($actualList, true);
         $this->assertEqual($expectedList, $actualList);
-        
+
         // get a course with id (method: get) and compare to expected
         $actualCourse = $this->_oauthReq("$url/1");
         $actualCourse = json_decode($actualCourse, true);
         $this->assertEqual($expectedCourse, $actualCourse);
-        
+
         // add a course (method: post)
         // see that the proper variables are set for passing to the view (no $id)
         $newCourse = array(
@@ -316,18 +316,12 @@ class V1ControllerTest extends CakeTestCase {
             $url, json_encode($newCourse), OAUTH_HTTP_METHOD_POST);
         $course = json_decode($file, true);
         $id = $course['id'];
-        $opts = array(
-            'http'=>array(
-                'method'=>"GET",
-                'header'=>"Content-Type: application/json"
-            )
-        );
-        $context = stream_context_create($opts);
+
         $checkCourse = $this->_oauthReq("$url/$id");
         $checkCourse = json_decode($checkCourse, true);
         $expectedCourse = array('id' => $id, 'course' => 'BLAH 789', 'title' => 'Title for Blah Course');
         $this->assertEqual($expectedCourse, $checkCourse);
-        
+
         // update a course with id (method: put) and compare results to expected
         $updateCourse = array('Course' => array('id' => $id, 'course' => 'BLAH 789', 'title' => 'Updated Title for Blah Course'));
         $file = $this->_oauthReq(
@@ -339,24 +333,24 @@ class V1ControllerTest extends CakeTestCase {
         // what the fields of updated course should be
         $expectedUpdate = array('id' => $id, 'course' => 'BLAH 789', 'title' => 'Updated Title for Blah Course');
         $this->assertEqual($expectedUpdate, $checkCourse);
-        
+
         // delete a course with id (method: delete) and check to see if it still exists after
         $file = $this->_oauthReq(
             "$url/$id", 
             null,
             OAUTH_HTTP_METHOD_DELETE
         );
-        
+
         $ret = $this->_oauthReq("$url/$id");
         $this->assertEqual(substr($ret, 0, 10), '"No course');
     }
-    
+
     public function testGroups() {
         $url = Router::url('v1/courses', true);
         // GET - list of groups in course
         $expected = array();
         $groups = $this->_fixtures['app.group']->records;
-        
+
         foreach ($groups as $group) {
             if ('1' == $group['course_id']) {
                 $tmp = array();
@@ -367,23 +361,22 @@ class V1ControllerTest extends CakeTestCase {
                 $expected[] = $tmp;
             }
         }
-        
+
         $file = $this->_oauthReq("$url/1/groups");
-        
+
         $this->assertEqual($file, json_encode($expected));
         $this->assertEqual(json_decode($file, true), $expected);
-        
+
         // GET - specific group in course
         $expectedGroup = array();
         $expectedGroup = $expected['1'];
-        
+
         $file = $this->_oauthReq("$url/1/groups/2");
-        
+
         $this->assertEqual($file, json_encode($expectedGroup));
         $this->assertEqual(json_decode($file, true), $expectedGroup);
-        
+
         // POST - add a group
-        
         $addGroup = array(
             'Group' => array(
                 'course_id' => '2',
@@ -406,20 +399,19 @@ class V1ControllerTest extends CakeTestCase {
 
         $expected = json_decode($file, true);
         $id = $expected['id'];
-        
+
         $expectedGroup = array(
             'id' => $id,
             'group_num' => '1',
             'group_name' => 'Best Group Ever',
             'course_id' => 2
         );
-        
+
         $addedGroup = $this->_oauthReq("$url/2/groups/$id");
 
         $this->assertEqual(json_decode($addedGroup, true), $expectedGroup);
-        
+
         // PUT - edit the group
-        
         $editGroup = array(
             'Group' => array(
                 'id' => $id,
@@ -437,38 +429,37 @@ class V1ControllerTest extends CakeTestCase {
                 )
             )
         );
-        
+
         $this->_oauthReq("$url/2/groups/$id", json_encode($editGroup), 
             OAUTH_HTTP_METHOD_PUT);
 
         $expected = json_decode($file, true);
         $id = $expected['id'];
-        
+
         $expectedGroup = array(
             'id' => $id,
             'group_num' => '1',
             'group_name' => 'Most Amazing Group Ever',
             'course_id' => 2
         );
-        
+
         $editedGroup = $this->_oauthReq("$url/2/groups/$id");
-        
+
         $this->assertEqual(json_decode($editedGroup, true), $expectedGroup);
-        
+
         // DELETE - delete a group
         $this->_oauthReq("$url/2/groups/$id", null, OAUTH_HTTP_METHOD_DELETE);
         $ret = $this->_oauthReq("$url/2/groups/$id");
         $this->assertEqual(substr($ret, 0, 9), '"No group');
     }
 
-
     public function testEvents()
     {
         $url = Router::url('v1/courses', true);
         $events = $this->_fixtures['app.event']->records;
-        
+
         $expectedEvents = array();
-        
+
         foreach ($events as $data) {
             $tmp = array();
             $tmp['title'] = $data['title'];
@@ -477,7 +468,7 @@ class V1ControllerTest extends CakeTestCase {
             $tmp['id'] = $data['id'];
             $expectedEvents[] = $tmp;
         }
-        
+
         $actualEvents = $this->_oauthReq("$url/1/events");
         $this->assertEqual($actualEvents, json_encode($expectedEvents));
         $this->assertEqual(json_decode($actualEvents, true), $expectedEvents);
@@ -495,11 +486,11 @@ class V1ControllerTest extends CakeTestCase {
         $mixevals = $this->_fixtures['app.evaluation_mixeval']->records;
         $rubrics = $this->_fixtures['app.evaluation_rubric']->records;
         $simples = $this->_fixtures['app.evaluation_simple']->records;
-        
+
         $mixevalList = array();
         $rubricList = array();
         $simpleList = array();
-        
+
         foreach ($mixevals as $data) {
             $tmp = array();
             $tmp['evaluatee'] = $data['evaluatee'];
