@@ -276,7 +276,7 @@ class V1ControllerTest extends CakeTestCase {
         );
 
         $ret = $this->_oauthReq("$url/$userId");
-        $this->assertEqual(substr($ret, 0, 8), '"No user');
+        $this->assertEqual(substr($ret, 0, 8), '');
     }
 
     public function testCourses()
@@ -312,37 +312,26 @@ class V1ControllerTest extends CakeTestCase {
             'Course' => array('course' => 'BLAH 789', 'title' => 'Title for Blah Course'),
             'Department' => array('Department' => array('0' => 2))
         );
-        $file = $this->_oauthReq(
-            $url, json_encode($newCourse), OAUTH_HTTP_METHOD_POST);
-        $course = json_decode($file, true);
-        $id = $course['id'];
-
-        $checkCourse = $this->_oauthReq("$url/$id");
-        $checkCourse = json_decode($checkCourse, true);
+        $file = $this->_oauthReq($url, json_encode($newCourse), OAUTH_HTTP_METHOD_POST);
+        $checkCourse = json_decode($file, true);
+        $id = $checkCourse['id'];
         $expectedCourse = array('id' => $id, 'course' => 'BLAH 789', 'title' => 'Title for Blah Course');
         $this->assertEqual($expectedCourse, $checkCourse);
 
         // update a course with id (method: put) and compare results to expected
         $updateCourse = array('Course' => array('id' => $id, 'course' => 'BLAH 789', 'title' => 'Updated Title for Blah Course'));
-        $file = $this->_oauthReq(
-            "$url/$id", json_encode($updateCourse), OAUTH_HTTP_METHOD_PUT);
-        $course = json_decode($file, true);
-        $id = $course['id'];
-        $checkCourse = $this->_oauthReq("$url/$id");
-        $checkCourse = json_decode($checkCourse, true);
+        $file = $this->_oauthReq("$url/$id", json_encode($updateCourse), OAUTH_HTTP_METHOD_PUT);
+        $checkCourse = json_decode($file, true);
+        $id = $checkCourse['id'];
         // what the fields of updated course should be
         $expectedUpdate = array('id' => $id, 'course' => 'BLAH 789', 'title' => 'Updated Title for Blah Course');
         $this->assertEqual($expectedUpdate, $checkCourse);
 
         // delete a course with id (method: delete) and check to see if it still exists after
-        $file = $this->_oauthReq(
-            "$url/$id", 
-            null,
-            OAUTH_HTTP_METHOD_DELETE
-        );
+        $file = $this->_oauthReq("$url/$id", null, OAUTH_HTTP_METHOD_DELETE);
 
         $ret = $this->_oauthReq("$url/$id");
-        $this->assertEqual(substr($ret, 0, 10), '"No course');
+        $this->assertEqual($ret, '');
     }
 
     public function testGroups() {
@@ -450,7 +439,7 @@ class V1ControllerTest extends CakeTestCase {
         // DELETE - delete a group
         $this->_oauthReq("$url/2/groups/$id", null, OAUTH_HTTP_METHOD_DELETE);
         $ret = $this->_oauthReq("$url/2/groups/$id");
-        $this->assertEqual(substr($ret, 0, 9), '"No group');
+        $this->assertEqual(substr($ret, 0, 9), '');
     }
 
     public function testEvents()
@@ -539,5 +528,4 @@ class V1ControllerTest extends CakeTestCase {
         $expectedGrade = array("evaluatee" => "6", "score" => "2.4", "id" => "2");
         $this->assertEqual($expectedGrade, $studentGrade);
     }
-
 }

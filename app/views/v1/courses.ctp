@@ -1,5 +1,7 @@
 <?php
     header('Content-Type: application/json');
     header($statusCode);
-	echo json_encode($courses);
+    if (null != $courses) {
+        echo json_encode($courses);
+    }
 ?>

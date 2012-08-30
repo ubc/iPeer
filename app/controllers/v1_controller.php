@@ -284,7 +284,7 @@ class V1Controller extends Controller {
                     $statusCode = 'HTTP/1.0 200 OK';
                 } else {
                     $statusCode = 'HTTP/1.0 404 Not Found';
-                    $data = 'No users can be found';
+                    $data = null;
                 }
             // specific user
             } else {
@@ -303,7 +303,7 @@ class V1Controller extends Controller {
                     $statusCode = 'HTTP/1.0 200 OK';
                 } else {
                     $statusCode = 'HTTP/1.0 404 Not Found';
-                    $data = 'No user with id '.$id.' can be found';
+                    $data = null;
                 }
             }
             $this->set('user', $data);
@@ -318,7 +318,7 @@ class V1Controller extends Controller {
                 $this->set('user', $userId);
             } else {
                 $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error'); 
-                $this->set('user', 'Error: the user was not added');
+                $this->set('user', null);
             }
         // delete
         } else if ($this->RequestHandler->isDelete()) {
@@ -327,7 +327,7 @@ class V1Controller extends Controller {
                 $this->set('user', null);
             } else {
                 $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
-                $this->set('user', 'Error: the user was not deleted');
+                $this->set('user', null);
             }
         // update
         } else if ($this->RequestHandler->isPut()) {
@@ -339,7 +339,7 @@ class V1Controller extends Controller {
                 $this->set('user', $userId);
             } else {
                 $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
-                $this->set('user', 'Error: the user was not updated');
+                $this->set('user', null);
             }
         } else {
             $this->set('statusCode', 'HTTP/1.0 400 Bad Request');
@@ -365,7 +365,7 @@ class V1Controller extends Controller {
                     }
                     $statusCode = 'HTTP/1.0 200 OK';
                 } else {
-                    $classes = 'No courses can be found';
+                    $classes = null;
                     $statusCode = 'HTTP/1.0 404 Not Found';
                 }
             } else {
@@ -380,7 +380,7 @@ class V1Controller extends Controller {
                     $classes = $course['Course'];
                     $statusCode = 'HTTP/1.0 200 OK';
                 } else {
-                    $classes = 'No course with id '.$id.' can be found';
+                    $classes = null;
                     $statusCode = 'HTTP/1.0 404 Not Found';
                 }
             }
@@ -389,37 +389,32 @@ class V1Controller extends Controller {
         } else if ($this->RequestHandler->isPost()) {
             $create = trim(file_get_contents('php://input'), true);
             if (!$this->Course->save(json_decode($create, true))) {
-                $message = 'Error: the course was not added';
                 $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
-                $this->set('courses', $message);
+                $this->set('courses', null);
             } else {
-                $temp = $this->Course->read();
-                $courseId = array('id' => $temp['Course']['id']);
+                $temp = $this->Course->read(array('id','course','title'));
+                $course = $temp['Course'];
                 $this->set('statusCode', 'HTTP/1.0 201 Created');
-                $this->set('courses', $courseId);
+                $this->set('courses', $course);
             }
         } else if ($this->RequestHandler->isPut()) {   
             $update = trim(file_get_contents('php://input'), true);
             if (!$this->Course->save(json_decode($update, true))) {
-                $message = 'Error: the course was not edited';
                 $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
-                $this->set('courses', $message);
+                $this->set('courses', null);
             } else {
-                $temp = $this->Course->read();
-                $courseId = array('id' => $temp['Course']['id']);
+                $temp = $this->Course->read(array('id','course','title'));
+                $course = $temp['Course'];
                 $this->set('statusCode', 'HTTP/1.0 200 OK');
-                $this->set('courses', $courseId);
+                $this->set('courses', $course);
             }
         } else if ($this->RequestHandler->isDelete()) {
             if (!$this->Course->delete($id)) {
-                $message = 'Error: the course was not deleted';
                 $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
-                $this->set('courses', $message);
+                $this->set('courses', null);
             } else {
-                $temp = $this->Course->read();
-                $courseId = $temp['Course']['id'];
                 $this->set('statusCode', 'HTTP/1.0 204 No Content');
-                $this->set('courses', $courseId);
+                $this->set('courses', null);
             }
         } else {
             $this->set('statusCode', 'HTTP/1.0 400 Bad Request');
@@ -450,7 +445,7 @@ class V1Controller extends Controller {
                     }
                     $statusCode = 'HTTP/1.0 200 OK';
                 } else {
-                    $data = 'No groups are found in the course with the id '.$this->params['course_id'];
+                    $data = null;
                     $statusCode = 'HTTP/1.0 404 Not Found';
                 }
             } else {
@@ -469,7 +464,7 @@ class V1Controller extends Controller {
                     $data = $group['Group'];
                     $statusCode = 'HTTP/1.0 200 OK';
                 } else {
-                    $data = 'No group with id '.$this->params['group_id'].' can be found';
+                    $data = null;
                     $statusCode = 'HTTP/1.0 404 Not Found';
                 }
             }
@@ -485,7 +480,7 @@ class V1Controller extends Controller {
                 $this->set('group', array('id' => $groupId));
             } else {
                 $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
-                $this->set('group', 'Error: The group was not added');
+                $this->set('group', null);
             }
         // delete
         } else if ($this->RequestHandler->isDelete()) {
@@ -494,7 +489,7 @@ class V1Controller extends Controller {
                 $this->set('group', null);
             } else {
                 $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
-                $this->set('group', 'Error: The group was not deleted');
+                $this->set('group', null);
             }
         // update
         } else if ($this->RequestHandler->isPut()) {
@@ -506,7 +501,7 @@ class V1Controller extends Controller {
                 $this->set('group', array('id' => $groupId));
             } else {
                 $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
-                $this->set('group', 'Error: The group was not edited');
+                $this->set('group', null);
             }
         } else {
             $this->set('statusCode', 'HTTP/1.0 400 Bad Request');
@@ -532,7 +527,7 @@ class V1Controller extends Controller {
                     }
                     $statusCode = 'HTTP/1.0 200 OK';
                 } else {
-                    $results = 'No events in course with id '.$course_id;
+                    $results = null;
                     $statusCode = 'HTTP/1.0 404 Not Found';
                 }
             } else {
@@ -545,7 +540,7 @@ class V1Controller extends Controller {
                     $results = $list['Event'];
                     $statusCode = 'HTTP/1.0 200 OK';
                 } else {
-                    $results = 'The event with id'.$event_id.'doesn\'t exist';
+                    $results = null;
                     $statusCode = 'HTTP/1.0 404 Not Found';
                 }
             }
@@ -580,7 +575,7 @@ class V1Controller extends Controller {
                         }
                         $statusCode = 'HTTP/1.0 200 OK';
                     } else {
-                        $results = 'No grades for event with id '.$event_id.' can be found';
+                        $results = null;
                         $statusCode = 'HTTP/1.0 404 Not Found';
                     }
                 } else if (2 == $eventType) {
@@ -596,7 +591,7 @@ class V1Controller extends Controller {
                         }
                         $statusCode = 'HTTP/1.0 200 OK';
                     } else {
-                        $results = 'No grades for event with id '.$event_id.' can be found';
+                        $results = null;
                         $statusCode = 'HTTP/1.0 404 Not Found';
                     }
                 } else if (4 == $eventType) {
@@ -611,7 +606,7 @@ class V1Controller extends Controller {
                         }
                         $statusCode = 'HTTP/1.0 200 OK';
                     } else {
-                        $results = 'No grades for event with id '.$event_id.' can be found';
+                        $results = null;
                         $statusCode = 'HTTP/1.0 404 Not Found';
                     }
                 }
@@ -627,7 +622,7 @@ class V1Controller extends Controller {
                         $results = $list['EvaluationSimple'];
                         $statusCode = 'HTTP/1.0 200 OK';
                     } else {
-                        $results = 'No grades can be found for user '.$user_id.' in event '.$event_id;
+                        $results = null;
                         $statusCode = 'HTTP/1.0 404 Not Found';
                     }
                 } else if (2 == $eventType) {
@@ -641,7 +636,7 @@ class V1Controller extends Controller {
                         $results = $list['EvaluationRubric'];
                         $statusCode = 'HTTP/1.0 200 OK';
                     } else {
-                        $results = 'No grades can be found for user '.$user_id.' in event '.$event_id;
+                        $results = null;
                         $statusCode = 'HTTP/1.0 404 Not Found';
                     }
                 } else if (4 == $eventType) {
@@ -655,7 +650,7 @@ class V1Controller extends Controller {
                         $results = $list['EvaluationMixeval'];
                         $statusCode = 'HTTP/1.0 200 OK';
                     } else {
-                        $results = 'No grades can be found for user '.$user_id.' in event '.$event_id;
+                        $results = null;
                         $statusCode = 'HTTP/1.0 404 Not Found';
                     }
                 }
@@ -667,5 +662,5 @@ class V1Controller extends Controller {
             $this->set('grades', null);
         }
     }
-    
+
 }
