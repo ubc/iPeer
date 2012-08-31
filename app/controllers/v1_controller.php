@@ -335,7 +335,7 @@ class V1Controller extends Controller {
             $edit = trim(file_get_contents('php://input'), true);
             if ($this->User->save(json_decode($edit, true))) {
                 $temp = $this->User->read(array('id','username','last_name','first_name'));
-                $temp2 = $this->RolesUser->read('role_id');
+                $temp2 = $this->RolesUser->find('first', array('conditions' => array('user_id' => $temp['User']['id']), 'fields' => 'role_id'));
                 $user = array_merge($temp['User'], $temp2['RolesUser']);
                 $this->set('statusCode', 'HTTP/1.0 200 OK');
                 $this->set('user', $user);

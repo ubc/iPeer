@@ -245,7 +245,7 @@ class V1ControllerTest extends CakeTestCase {
         $file = $this->_oauthReq($url, json_encode($newUser), OAUTH_HTTP_METHOD_POST);
         $user = json_decode($file, true);
         $userId = $user['id'];
-        $expectedPerson = array('id' => $userId, 'username' => 'coolUser', 'last_name' => 'Hardy', 'first_name' => 'Jack', 'role_id' => 5); //add role to array
+        $expectedPerson = array('id' => $userId, 'username' => 'coolUser', 'last_name' => 'Hardy', 'first_name' => 'Jack', 'role_id' => 5);
         $this->assertEqual($user, $expectedPerson);
 
         // PUT - update user
@@ -253,7 +253,7 @@ class V1ControllerTest extends CakeTestCase {
             'User' => 
                 array('id' => $userId, 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane')
         );
-        $expectedPerson = array('id' => $userId, 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane'); //add role to array
+        $expectedPerson = array('id' => $userId, 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane', 'role_id' => 5);
         $file = $this->_oauthReq($url, json_encode($updatedPerson), OAUTH_HTTP_METHOD_PUT);
         $this->assertEqual(json_decode($file, true), $expectedPerson);
 
