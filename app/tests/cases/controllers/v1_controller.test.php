@@ -240,43 +240,27 @@ class V1ControllerTest extends CakeTestCase {
                 array('id' => null),
             'Enrolment' =>
                 array()
-        );
+        ); //combine User and Role, split or remove the rest
 
-        $file = $this->_oauthReq(
-            $url, json_encode($newUser), OAUTH_HTTP_METHOD_POST);
+        $file = $this->_oauthReq($url, json_encode($newUser), OAUTH_HTTP_METHOD_POST);
         $user = json_decode($file, true);
         $userId = $user['id'];
-
-        $expectedPerson = array('id' => $userId, 'role_id' => '5', 'username' => 'coolUser', 'last_name' => 'Hardy', 'first_name' => 'Jack');
-
+        $expectedPerson = array('id' => $userId, 'username' => 'coolUser', 'last_name' => 'Hardy', 'first_name' => 'Jack'); //add role to array
         $newPerson = $this->_oauthReq("$url/$userId");
-
-        $this->assertEqual(json_decode($newPerson, true), $expectedPerson);
+        $this->assertEqual($user, $expectedPerson);
 
         // PUT - update user
         $updatedPerson = array(
             'User' => 
-                array('id' => $userId, 'username' => 'coolUser20', 'first_name' => 'Jane', 'last_name' => 'Hardy')
+                array('id' => $userId, 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane')
         );
-
-        $expectedPerson = array('id' => $userId, 'role_id' => '5', 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane');
-
-        $file = $this->_oauthReq(
-            $url, json_encode($updatedPerson), OAUTH_HTTP_METHOD_PUT);
-
-        $editedPerson = $this->_oauthReq("$url/$userId");
-
-        $this->assertEqual(json_decode($editedPerson, true), $expectedPerson);
+        $expectedPerson = array('id' => $userId, 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane'); //add role to array
+        $file = $this->_oauthReq($url, json_encode($updatedPerson), OAUTH_HTTP_METHOD_PUT);
+        $this->assertEqual(json_decode($file, true), $expectedPerson);
 
         // DELETE - delete the user
-        $file = $this->_oauthReq(
-            "$url/$userId", 
-            null, 
-            OAUTH_HTTP_METHOD_DELETE
-        );
-
-        $ret = $this->_oauthReq("$url/$userId");
-        $this->assertEqual(substr($ret, 0, 8), '');
+        $file = $this->_oauthReq("$url/$userId", null, OAUTH_HTTP_METHOD_DELETE);
+        $this->assertEqual($file, '');
     }
 
     public function testCourses()
@@ -350,22 +334,18 @@ class V1ControllerTest extends CakeTestCase {
                 $expected[] = $tmp;
             }
         }
-
         $file = $this->_oauthReq("$url/1/groups");
-
         $this->assertEqual($file, json_encode($expected));
         $this->assertEqual(json_decode($file, true), $expected);
 
         // GET - specific group in course
         $expectedGroup = array();
         $expectedGroup = $expected['1'];
-
         $file = $this->_oauthReq("$url/1/groups/2");
-
         $this->assertEqual($file, json_encode($expectedGroup));
         $this->assertEqual(json_decode($file, true), $expectedGroup);
 
-        // POST - add a group
+        // POST - add a group - need to split member from group
         $addGroup = array(
             'Group' => array(
                 'course_id' => '2',
@@ -382,25 +362,18 @@ class V1ControllerTest extends CakeTestCase {
                 )
             )
         );
-
-        $file = $this->_oauthReq("$url/2/groups", json_encode($addGroup),
-            OAUTH_HTTP_METHOD_POST);
-
-        $expected = json_decode($file, true);
-        $id = $expected['id'];
-
+        $file = $this->_oauthReq("$url/2/groups", json_encode($addGroup), OAUTH_HTTP_METHOD_POST);
+        $addedGroup = json_decode($file, true);
+        $id = $addedGroup['id'];
         $expectedGroup = array(
             'id' => $id,
             'group_num' => '1',
             'group_name' => 'Best Group Ever',
             'course_id' => 2
         );
+        $this->assertEqual($addedGroup, $expectedGroup);
 
-        $addedGroup = $this->_oauthReq("$url/2/groups/$id");
-
-        $this->assertEqual(json_decode($addedGroup, true), $expectedGroup);
-
-        // PUT - edit the group
+        // PUT - edit the group - need to split member from group
         $editGroup = array(
             'Group' => array(
                 'id' => $id,
@@ -418,28 +391,19 @@ class V1ControllerTest extends CakeTestCase {
                 )
             )
         );
-
-        $this->_oauthReq("$url/2/groups/$id", json_encode($editGroup), 
-            OAUTH_HTTP_METHOD_PUT);
-
-        $expected = json_decode($file, true);
-        $id = $expected['id'];
-
+        $file = $this->_oauthReq("$url/2/groups/$id", json_encode($editGroup), OAUTH_HTTP_METHOD_PUT);
+        $updatedGroup = json_decode($file, true);
         $expectedGroup = array(
             'id' => $id,
             'group_num' => '1',
             'group_name' => 'Most Amazing Group Ever',
             'course_id' => 2
         );
-
-        $editedGroup = $this->_oauthReq("$url/2/groups/$id");
-
-        $this->assertEqual(json_decode($editedGroup, true), $expectedGroup);
+        $this->assertEqual($updatedGroup, $expectedGroup);
 
         // DELETE - delete a group
-        $this->_oauthReq("$url/2/groups/$id", null, OAUTH_HTTP_METHOD_DELETE);
-        $ret = $this->_oauthReq("$url/2/groups/$id");
-        $this->assertEqual(substr($ret, 0, 9), '');
+        $ret = $this->_oauthReq("$url/2/groups/$id", null, OAUTH_HTTP_METHOD_DELETE);
+        $this->assertEqual($ret, '');
     }
 
     public function testEvents()
@@ -458,10 +422,12 @@ class V1ControllerTest extends CakeTestCase {
             $expectedEvents[] = $tmp;
         }
 
+        // test get all events of a course
         $actualEvents = $this->_oauthReq("$url/1/events");
         $this->assertEqual($actualEvents, json_encode($expectedEvents));
         $this->assertEqual(json_decode($actualEvents, true), $expectedEvents);
 
+        // test get specific event from a course
         $actualEvent = $this->_oauthReq("$url/1/events/3");
         $expectedEvent = array("title" => "Project Evaluation", "course_id" => "1", "event_template_type_id" => "4", "id" => "3");
         $this->assertEqual($actualEvent, json_encode($expectedEvent));
@@ -501,6 +467,7 @@ class V1ControllerTest extends CakeTestCase {
             $simpleList[] = $tmp;
         }
 
+        // test get all grades for an event of a course (test multiple types)
         $simpleGrades = $this->_oauthReq("$url/1/grades");
         $simpleGrades = json_decode($simpleGrades, true);
         $this->assertEqual($simpleList, $simpleGrades);
@@ -513,6 +480,7 @@ class V1ControllerTest extends CakeTestCase {
         $mixevalGrades = json_decode($mixevalGrades, true);
         $this->assertEqual($mixevalList, $mixevalGrades);
 
+        // test get specific student's grades for an event of a course (test multiple types)
         $studentGrade = $this->_oauthReq("$url/1/grades/33");
         $studentGrade = json_decode($studentGrade, true);
         $expectedGrade = array("evaluatee" => "33", "score" => "75");

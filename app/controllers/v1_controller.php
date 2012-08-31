@@ -312,10 +312,10 @@ class V1Controller extends Controller {
         } else if ($this->RequestHandler->isPost()) {
             $input = trim(file_get_contents('php://input'), true);
             if ($this->User->save(json_decode($input, true))) {
-                $user = $this->User->read('id');
-                $userId = array('id' => $user['User']['id']);
+                $temp = $this->User->read(array('id','username','last_name','first_name')); //add role to array
+                $user = $temp['User'];
                 $this->set('statusCode', 'HTTP/1.0 201 Created');
-                $this->set('user', $userId);
+                $this->set('user', $user);
             } else {
                 $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error'); 
                 $this->set('user', null);
@@ -333,10 +333,10 @@ class V1Controller extends Controller {
         } else if ($this->RequestHandler->isPut()) {
             $edit = trim(file_get_contents('php://input'), true);
             if ($this->User->save(json_decode($edit, true))) {
-                $user = $this->User->read('id');
-                $userId = array('id' => $user['User']['id']);
+                $temp = $this->User->read(array('id','username','last_name','first_name')); //add role to array
+                $user = $temp['User'];
                 $this->set('statusCode', 'HTTP/1.0 200 OK');
-                $this->set('user', $userId);
+                $this->set('user', $user);
             } else {
                 $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
                 $this->set('user', null);
@@ -474,10 +474,10 @@ class V1Controller extends Controller {
         } else if ($this->RequestHandler->isPost()) {
             $add = trim(file_get_contents('php://input'), true);
             if ($this->Group->save(json_decode($add, true))) {
-                $group = $this->Group->read('id');
-                $groupId = $group['Group']['id'];
+                $temp = $this->Group->read(array('id','group_num','group_name','course_id'));
+                $group = $temp['Group'];
                 $this->set('statusCode', 'HTTP/1.0 201 Created');
-                $this->set('group', array('id' => $groupId));
+                $this->set('group', $group);
             } else {
                 $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
                 $this->set('group', null);
@@ -495,10 +495,10 @@ class V1Controller extends Controller {
         } else if ($this->RequestHandler->isPut()) {
             $edit = trim(file_get_contents('php://input'), true);
             if ($this->Group->save(json_decode($edit, true))) {
-                $group = $this->Group->read('id');
-                $groupId = $group['Group']['id'];
+                $temp = $this->Group->read(array('id','group_num','group_name','course_id'));
+                $group = $temp['Group'];
                 $this->set('statusCode', 'HTTP/1.0 200 OK');
-                $this->set('group', array('id' => $groupId));
+                $this->set('group', $group);
             } else {
                 $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
                 $this->set('group', null);
