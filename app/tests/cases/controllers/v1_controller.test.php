@@ -245,8 +245,7 @@ class V1ControllerTest extends CakeTestCase {
         $file = $this->_oauthReq($url, json_encode($newUser), OAUTH_HTTP_METHOD_POST);
         $user = json_decode($file, true);
         $userId = $user['id'];
-        $expectedPerson = array('id' => $userId, 'username' => 'coolUser', 'last_name' => 'Hardy', 'first_name' => 'Jack'); //add role to array
-        $newPerson = $this->_oauthReq("$url/$userId");
+        $expectedPerson = array('id' => $userId, 'username' => 'coolUser', 'last_name' => 'Hardy', 'first_name' => 'Jack', 'role_id' => 5); //add role to array
         $this->assertEqual($user, $expectedPerson);
 
         // PUT - update user

@@ -11,7 +11,7 @@
 class V1Controller extends Controller {
 
     public $name = 'V1';
-    public $uses = array('User', 'Group', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric', 'EvaluationMixeval', 'OauthClient', 'OauthNonce', 'OauthToken');
+    public $uses = array('User', 'RolesUser', 'Group', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric', 'EvaluationMixeval', 'OauthClient', 'OauthNonce', 'OauthToken');
     public $helpers = array('Session');
     public $components = array('RequestHandler', 'Session');
     public $layout = "blank_layout";
@@ -312,8 +312,9 @@ class V1Controller extends Controller {
         } else if ($this->RequestHandler->isPost()) {
             $input = trim(file_get_contents('php://input'), true);
             if ($this->User->save(json_decode($input, true))) {
-                $temp = $this->User->read(array('id','username','last_name','first_name')); //add role to array
-                $user = $temp['User'];
+                $temp = $this->User->read(array('id','username','last_name','first_name'));
+                $temp2 = $this->RolesUser->read('role_id');
+                $user = array_merge($temp['User'], $temp2['RolesUser']);
                 $this->set('statusCode', 'HTTP/1.0 201 Created');
                 $this->set('user', $user);
             } else {
@@ -333,8 +334,9 @@ class V1Controller extends Controller {
         } else if ($this->RequestHandler->isPut()) {
             $edit = trim(file_get_contents('php://input'), true);
             if ($this->User->save(json_decode($edit, true))) {
-                $temp = $this->User->read(array('id','username','last_name','first_name')); //add role to array
-                $user = $temp['User'];
+                $temp = $this->User->read(array('id','username','last_name','first_name'));
+                $temp2 = $this->RolesUser->read('role_id');
+                $user = array_merge($temp['User'], $temp2['RolesUser']);
                 $this->set('statusCode', 'HTTP/1.0 200 OK');
                 $this->set('user', $user);
             } else {
