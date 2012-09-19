@@ -311,38 +311,38 @@ class V1Controller extends Controller {
         // add
         } else if ($this->RequestHandler->isPost()) {
             $input = trim(file_get_contents('php://input'), true);
-			$decode = json_decode($input, true);
-			// adding one user
-			if (isset($decode['username'])) {
-				$role = array('Role' => array('RolesUser' => array('role_id' => $decode['role_id'])));
-				unset($decode['role_id']);
-				$user = array('User' => $decode);
-				$user = $user + $role;
-				
-				// does not save role in RolesUser - need to fix
-				if ($this->User->save($user)) {
-					$user = $this->User->read(array('id','username','last_name','first_name'));
-					$role = $this->RolesUser->read('role_id');
-					$combine = $user['User'] + array('role_id' => $role['RolesUser']['role_id']);
-					$statusCode = 'HTTP/1.0 201 Created';
-					$body = $combine;
-				} else {
-					$statusCode = 'HTTP/1.0 500 Internal Server Error'; 
-					$body = null;
-				}
-			// adding multiple users from import (expected input: array)
-			} else if (isset($decode['0'])) {
-				$data = array();
-				// rearrange the data
-				foreach ($decode as $person) {
-					$pRole = array('Role' => array('RolesUser' => array('role_id' => $person['role_id'])));
-					unset($person['role_id']);
-					$pUser = array('User' => $person);
-					$data[] = $pUser + $pRole;
-				}
+            $decode = json_decode($input, true);
+            // adding one user
+            if (isset($decode['username'])) {
+                $role = array('Role' => array('RolesUser' => array('role_id' => $decode['role_id'])));
+                unset($decode['role_id']);
+                $user = array('User' => $decode);
+                $user = $user + $role;
+                
+                // does not save role in RolesUser - need to fix
+                if ($this->User->save($user)) {
+                    $user = $this->User->read(array('id','username','last_name','first_name'));
+                    $role = $this->RolesUser->read('role_id');
+                    $combine = $user['User'] + array('role_id' => $role['RolesUser']['role_id']);
+                    $statusCode = 'HTTP/1.0 201 Created';
+                    $body = $combine;
+                } else {
+                    $statusCode = 'HTTP/1.0 500 Internal Server Error'; 
+                    $body = null;
+                }
+            // adding multiple users from import (expected input: array)
+            } else if (isset($decode['0'])) {
+                $data = array();
+                // rearrange the data
+                foreach ($decode as $person) {
+                    $pRole = array('Role' => array('RolesUser' => array('role_id' => $person['role_id'])));
+                    unset($person['role_id']);
+                    $pUser = array('User' => $person);
+                    $data[] = $pUser + $pRole;
+                }
                 $sUser = array();
                 $uUser = array();
-				$result = $this->User->saveAll($data, array('atomic' => false));
+                $result = $this->User->saveAll($data, array('atomic' => false));
                 $statusCode = 'HTTP/1.0 500 Internal Server Error';
                 foreach ($result as $key => $ret) {
                     if ($ret) {
@@ -375,13 +375,13 @@ class V1Controller extends Controller {
                         $body[] = $verify['User'] + array('role_id' => $verify['Role']['0']['id']);
                     }
                 }
-			// incorrect format
-			} else {
-				$statusCode = 'HTTP/1.0 400 Bad Request';
-				$body = null;
-			}
-			$this->set('statusCode', $statusCode);
-			$this->set('user', $body);
+            // incorrect format
+            } else {
+                $statusCode = 'HTTP/1.0 400 Bad Request';
+                $body = null;
+            }
+            $this->set('statusCode', $statusCode);
+            $this->set('user', $body);
         // delete
         } else if ($this->RequestHandler->isDelete()) {
             if ($this->User->delete($id)) {
@@ -394,13 +394,13 @@ class V1Controller extends Controller {
         // update
         } else if ($this->RequestHandler->isPut()) {
             $edit = trim(file_get_contents('php://input'), true);
-			$decode = json_decode($edit, true);
-			// at the moment each user only has one role
-			$role = array('Role' => array('RolesUser' => array('role_id' => $decode['role_id'])));
-			unset($decode['role_id']);
-			$user = array('User' => $decode);
-			$user = $user + $role;
-			// does not save role in RolesUser - need to fix
+            $decode = json_decode($edit, true);
+            // at the moment each user only has one role
+            $role = array('Role' => array('RolesUser' => array('role_id' => $decode['role_id'])));
+            unset($decode['role_id']);
+            $user = array('User' => $decode);
+            $user = $user + $role;
+            // does not save role in RolesUser - need to fix
             if ($this->User->save($user)) {
                 $user = $this->User->read(array('id','username','last_name','first_name'));
                 $role = $this->RolesUser->find('first', array('conditions' => array('user_id' => $user['User']['id']), 'fields' => 'role_id'));
