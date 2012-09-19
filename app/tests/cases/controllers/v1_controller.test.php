@@ -15,9 +15,9 @@ class V1ControllerTest extends CakeTestCase {
 
     public function startCase() {
         echo '<h1>Starting Test Case</h1>';
-		$this->User =& ClassRegistry::init('User');
-		$this->RolesUser =& ClassRegistry::init('RolesUser');
-		$this->Group =& ClassRegistry::init('Group');
+        $this->User =& ClassRegistry::init('User');
+        $this->RolesUser =& ClassRegistry::init('RolesUser');
+        $this->Group =& ClassRegistry::init('Group');
     }
     public function endCase() {
         echo '<h1>Ending Test Case</h1>';
@@ -70,7 +70,8 @@ class V1ControllerTest extends CakeTestCase {
 
             return $ret;
         } catch(OAuthException $e) {
-            return $e->lastResponse;
+            //return $e->lastResponse;
+            return $e;
         }
     }
 
@@ -143,26 +144,30 @@ class V1ControllerTest extends CakeTestCase {
         // The client key couldn't be found in the db
         $original = $this->clientKey;
         $this->clientKey = "a";
+        $oauth = $this->_oauthReq($url);
         $this->assertEqual(
-            '{"oauthError":"Invalid Client"}', $this->_oauthReq($url));
+            '{"oauthError":"Invalid Client"}', $oauth->lastResponse);
         $this->clientKey = $original;
         // The token key couldn't be found in the db
         $original = $this->tokenKey;
         $this->tokenKey = "a";
+        $oauth = $this->_oauthReq($url);
         $this->assertEqual(
-            '{"oauthError":"Invalid Token"}', $this->_oauthReq($url));
+            '{"oauthError":"Invalid Token"}', $oauth->lastResponse);
         $this->tokenKey = $original;
         // Incorrect client secret 
         $original = $this->clientSecret;
         $this->clientSecret = "a";
+        $oauth = $this->_oauthReq($url);
         $this->assertEqual(
-            '{"oauthError":"Invalid Signature"}', $this->_oauthReq($url));
+            '{"oauthError":"Invalid Signature"}', $oauth->lastResponse);
         $this->clientSecret = $original;
         // Incorrect token secret 
         $original = $this->tokenSecret;
         $this->tokenSecret = "a";
+        $oauth = $this->_oauthReq($url);
         $this->assertEqual(
-            '{"oauthError":"Invalid Signature"}', $this->_oauthReq($url));
+            '{"oauthError":"Invalid Signature"}', $oauth->lastResponse);
         $this->tokenSecret = $original;
         // No errors thrown
         $this->assertEqual('', $this->_oauthReq($url));
@@ -171,19 +176,17 @@ class V1ControllerTest extends CakeTestCase {
     public function testCheckNonce() {
         $url = Router::url('v1/oauth', true);
         // invalid timestamp 
+        $oauth = $this->_oauthReq($url, null, null, null, 1344974674);
         $this->assertEqual(
-            '{"oauthError":"Timestamp Refused"}', 
-            $this->_oauthReq($url, null, null, null, 1344974674)
-        );
+            '{"oauthError":"Timestamp Refused"}', $oauth->lastResponse);
         // test nonce
         $nonce = rand();
         // first use nonce to make sure the nonce is used
         $this->assertEqual("", $this->_oauthReq($url, null, null, $nonce));
         // then try to reuse the nonce and make sure it is rejected
+        $oauth = $this->_oauthReq($url, null, null, $nonce);
         $this->assertEqual(
-            '{"oauthError":"Nonce Used"}', 
-            $this->_oauthReq($url, null, null, $nonce)
-        );
+            '{"oauthError":"Nonce Used"}', $oauth->lastResponse);
     }
 
     public function testUsers()
@@ -229,40 +232,49 @@ class V1ControllerTest extends CakeTestCase {
         $this->assertEqual(json_decode($ret, true), $expectedPerson);
 
         // POST - add user
-        $newUser = array(
-            'User' => 
-                array('username' => 'coolUser', 'first_name' => 'Jack', 'last_name' => 'Hardy'),
-            'Role' =>
-                array('RolesUser' => array('role_id' => 5)),
-            'Faculty' =>
-                array('Faculty' => null),
-            'Courses' =>
-                array('id' => null),
-            'Enrolment' =>
-                array()
-        ); //combine User and Role, split or remove the rest
-
+        $newUser = array('username' => 'coolUser', 'first_name' => 'Jack', 'last_name' => 'Hardy', 'role_id' => 5);
         $file = $this->_oauthReq($url, json_encode($newUser), OAUTH_HTTP_METHOD_POST);
         $user = json_decode($file, true);
         $userId = $user['id'];
+        
         $expectedPerson = array('id' => $userId, 'username' => 'coolUser', 'last_name' => 'Hardy', 'first_name' => 'Jack', 'role_id' => 5);
         $this->assertEqual($user, $expectedPerson);
+        
+        // POST - add multiple users - test with 2 users
+        $newUsers = array(
+            array('username' => 'multipleUser1', 'first_name' => 'multiple1', 'last_name' => 'user', 'role_id' => 4),
+            array('username' => 'multipleUser2', 'first_name' => 'multiple2', 'last_name' => 'user', 'role_id' => 4)
+        );
+        
+        $file = $this->_oauthReq($url, json_encode($newUsers), OAUTH_HTTP_METHOD_POST);
+        $users = json_decode($file, true);
+        $expectedUsers = array();
+        
+        foreach ($newUsers as $key => $nu) {
+            $expectedUsers[] = array('id' => $users[$key]['id']) + $nu;
+        }
+        $importUserId = $expectedUsers['0']['id'];
+        
+        $this->assertEqual($users, $expectedUsers);		
 
         // PUT - update user
-        $updatedPerson = array(
-            'User' => 
-                array('id' => $userId, 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane')
-        );
-        $expectedPerson = array('id' => $userId, 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane', 'role_id' => 5);
+        $updatedPerson = array('id' => $userId, 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane', 'role_id' => 4);
+        
+        $expectedPerson = array('id' => $userId, 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane', 'role_id' => 4);
+        
         $file = $this->_oauthReq($url, json_encode($updatedPerson), OAUTH_HTTP_METHOD_PUT);
         $this->assertEqual(json_decode($file, true), $expectedPerson);
 
         // DELETE - delete the user
         $file = $this->_oauthReq("$url/$userId", null, OAUTH_HTTP_METHOD_DELETE);
+        // delete one of the user from import
+        $this->_oauthReq("$url/$importUserId", null, OAUTH_HTTP_METHOD_DELETE);
+        $ret = $this->_oauthReq("$url/$userId");
         $this->assertEqual($file, '');
+        $this->assertEqual(substr($ret->debugInfo['headers_recv'], 0, 22), 'HTTP/1.0 404 Not Found');
     }
 
-    public function testCourses()
+    /*public function testCourses()
     {
         $url = Router::url('v1/courses', true);
         $courses = $this->_fixtures['app.course']->records;
@@ -494,5 +506,5 @@ class V1ControllerTest extends CakeTestCase {
         $studentGrade = json_decode($studentGrade, true);
         $expectedGrade = array("evaluatee" => "6", "score" => "2.4", "id" => "2");
         $this->assertEqual($expectedGrade, $studentGrade);
-    }
+    }*/
 }
