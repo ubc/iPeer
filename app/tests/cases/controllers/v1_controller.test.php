@@ -507,4 +507,24 @@ class V1ControllerTest extends CakeTestCase {
         $expectedGrade = array("evaluatee" => "6", "score" => "2.4", "id" => "2");
         $this->assertEqual($expectedGrade, $studentGrade);
     }*/
+
+    
+    public function testDepartments() {
+    
+    }
+    
+    public function testCourseDepartments() {
+        $url = Router::url('v1/courses/1/departments', true);
+        
+        // POST - Add a course to a department
+        $file = $this->_oauthReq("$url/2", '', OAUTH_HTTP_METHOD_POST);
+        $cd = json_decode($file, true);
+        $expected = array('id' => $cd['id'], 'course_id' => $course_id, 'department_id' => $department_id);
+        $this->assertEqual($cd, $expected);
+        
+        // DELETE - Delete a course from a department
+        $file = $this->_oauthReq("$url/2", '', OAUTH_HTTP_METHOD_DELETE);
+        $this->assertEqual(json_decode($file), '');
+    }
+
 }

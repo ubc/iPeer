@@ -553,7 +553,7 @@ class GroupsController extends AppController
             }
         // super admins
         } else if (User::hasPermission('functions/superadmin')) {
-            $coursesList = $this->Course->find('list', array('fields' => 'courses'));
+            $coursesList = $this->Course->find('list', array('fields' => 'course'));
         // admins
         } else {
             $courses = User::getMyDepartmentsCourseList('all');

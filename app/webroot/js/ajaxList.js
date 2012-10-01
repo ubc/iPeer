@@ -30,8 +30,10 @@ var BusyImageXOffset = 70;
 var AvailablePageSizes = [15, 30, 90, 270];
 
 // How many page numbers to show before we collapse the page list a bit.
-// must be 4 or greater, no upper limit.
-var maxPageNumbersToShow = 8;
+// must be 6 or greater, no upper limit.
+var maxPageNumbersToShow = 5;
+// on average the current page number is in the middle with two pages on either side
+var averageOffset = 2;
 
 //Contants
 var blackUpTriangleHTMLCode = "&#9650;";
@@ -565,6 +567,7 @@ AjaxList.prototype.renderPageSizes = function (div) {
     while(div.firstChild) div.removeChild(div.firstChild);
 
     div.style.textAlign = "right";
+    div.style.whiteSpace = "nowrap";
     div.appendChild(new Element("b").update("Page Size: "));
 
     // Create a radio button for each page size
@@ -594,17 +597,55 @@ AjaxList.prototype.renderPageSizes = function (div) {
 
 AjaxList.prototype.renderSinglePageRadioButton = function (i, pages) {
     pages.appendChild(document.createTextNode(" "));
+    var a = document.createElement("a");
     if (this.state.pageShown == i) {
-        // Create a link for the non-selecte Pages
-        var span = new Element("b",{"style":"font-size:105%;"})
+        a.setAttribute('class', 'selected_number');
     } else {
-        // Selected Pages
-        var span = new Element("span");
-        span.style.cursor = "pointer";
-        span.onclick = ajaxListLibrary.createDelegateWithParams(this, this.changePage, i);
+        a.setAttribute('class', 'ajax_paginate');
+        a.style.cursor = "pointer";
+        a.onclick = ajaxListLibrary.createDelegateWithParams(this, this.changePage, i);
     }
-    span.appendChild(document.createTextNode(i));
-    pages.appendChild(span);
+    a.appendChild(document.createTextNode(i));
+    pages.appendChild(a);
+}
+
+// Renders "directional buttons" (eg. First, Next)
+AjaxList.prototype.renderDirectionRadioButton = function (index, pages, totalPages) {
+    pages.appendChild(document.createTextNode(" "));
+    var text = new Array("<<", "<", ">", ">>");
+    var a = document.createElement("a");
+    a.setAttribute('class', 'ajax_paginate');
+    // first
+    if (text[index] == "<<") {
+        var i = 1;
+        if (this.state.pageShown != 1) {
+            a.style.cursor = "pointer";
+            a.onclick = ajaxListLibrary.createDelegateWithParams(this, this.changePage, i);
+        }
+    // previous
+    } else if (text[index] == "<") {
+        var i = this.state.pageShown - 1;
+        if (this.state.pageShown != 1) {
+            a.style.cursor = "pointer";
+            a.onclick = ajaxListLibrary.createDelegateWithParams(this, this.changePage, i);
+        }
+    // next
+    } else if (text[index] == ">") {
+        var i = this.state.pageShown + 1;
+        if (this.state.pageShown != totalPages) {
+            a.style.cursor = "pointer";
+            a.onclick = ajaxListLibrary.createDelegateWithParams(this, this.changePage, i);
+        }
+    // last
+    } else {
+        var i = totalPages;
+        if (this.state.pageShown != totalPages) {
+            a.style.cursor = "pointer";
+            a.onclick = ajaxListLibrary.createDelegateWithParams(this, this.changePage, i);
+        }
+    }
+    a.appendChild(document.createTextNode(text[index]));
+    pages.appendChild(a);
 }
 
 // Renders the page listing
@@ -624,41 +665,41 @@ AjaxList.prototype.renderPageList = function(div) {
     div.style.textAlign = "right";
     div.style.paddingTop = "4px";
 
-    div.appendChild(new Element("b").update("Go to Page: "));
+    //div.appendChild(new Element("b").update("Go to Page: "));
     var pages = new Element("span");
     pages.style.color = "chocolate";
+
+    this.renderDirectionRadioButton(0, pages, totalPages);
+    this.renderDirectionRadioButton(1, pages, totalPages);
 
     if (totalPages <= maxPageNumbersToShow) {
         for (i = 1; i <= totalPages; i++) {
             this.renderSinglePageRadioButton(i, pages);
         }
     } else {
-        // Always render the first Page Number
-        this.renderSinglePageRadioButton(1, pages);
-
-        var plusMinusOffset = Math.floor((maxPageNumbersToShow - 2) / 2);
-
-        // Do we need to elipsis?
-        if (this.state.pageShown - plusMinusOffset > 2) {
-            pages.appendChild(document.createTextNode(" ... "));
+        
+        if (this.state.pageShown - averageOffset <= 0) {
+            var minusOffset = this.state.pageShown - 1;
+            var plusOffset = maxPageNumbersToShow - minusOffset - 1;
+        } else if (this.state.pageShown + averageOffset > totalPages) {
+            var plusOffset = totalPages - this.state.pageShown;
+            var minusOffset = maxPageNumbersToShow - plusOffset - 1;
+        } else {
+            var minusOffset = averageOffset;
+            var plusOffset = averageOffset;
         }
 
         // Display the pages around this page
-        for (i = (this.state.pageShown - plusMinusOffset);
-             i <= (this.state.pageShown + plusMinusOffset);
+        for (i = (this.state.pageShown - minusOffset);
+             i <= (this.state.pageShown + plusOffset);
             i++) {
-            if (i > 1 && (i < totalPages)) {
                 this.renderSinglePageRadioButton(i, pages);
-            }
         }
-
-       if (this.state.pageShown + plusMinusOffset < (totalPages - 1)) {
-            pages.appendChild(document.createTextNode(" ... "));
-        }
-
-        // Always render the last Page Number
-        this.renderSinglePageRadioButton(totalPages, pages);
     }
+    
+    this.renderDirectionRadioButton(2, pages, totalPages);
+    this.renderDirectionRadioButton(3, pages, totalPages);
+    
     // Add the pages to the GUI
     div.appendChild(pages);
 }

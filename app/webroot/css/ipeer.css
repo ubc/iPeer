@@ -879,6 +879,58 @@ i {
     margin-left: 3.5em;
 }
 
+/* dataTable */
+
+#table_id th {
+    font-family: Verdana, Arial, Helveica, sans-serif;
+    font-weight: bold;
+    color: white;
+    background-color: #4478AC;
+    font-size: 0.9em;
+    padding: 0.3em;
+}
+
+#table_id td {
+    color: black;
+    background-color: #EAEAEA;
+    line-height: 1.5;
+    font-size: 0.9em;
+}
+
+/* ajax pagination */
+
+.ajax_paginate {
+	border: 1px solid #aaa;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	padding: 2px 5px;
+	/*margin: 0 3px;*/
+	cursor: pointer;
+	*cursor: hand;
+	color: #333 !important;
+	background-color: #DDD;
+}
+
+.selected_number{
+	border: 1px solid #aaa;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	padding: 2px 5px;
+	/*margin: 0 3px;*/
+	cursor: pointer;
+	*cursor: hand;
+	color: #333 !important;
+    background-color: #99B3FF;
+}
+
+.ajax_paginate:hover {
+    background-color: #ccc;
+    text-decoration: none;
+}
+
+
 /* TO BE REFACTORED LATER */
 
 /* TEMPORARY */

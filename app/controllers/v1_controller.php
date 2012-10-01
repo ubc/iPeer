@@ -11,7 +11,7 @@
 class V1Controller extends Controller {
 
     public $name = 'V1';
-    public $uses = array('User', 'RolesUser', 'Group', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric', 'EvaluationMixeval', 'OauthClient', 'OauthNonce', 'OauthToken');
+    public $uses = array('User', 'Group', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric', 'EvaluationMixeval', 'OauthClient', 'OauthNonce', 'OauthToken', 'Department');
     public $helpers = array('Session');
     public $components = array('RequestHandler', 'Session');
     public $layout = "blank_layout";
@@ -730,6 +730,73 @@ class V1Controller extends Controller {
         } else {
             $this->set('statusCode', 'HTTP/1.0 400 Bad Request');
             $this->set('grades', null);
+        }
+    }
+    
+    /**
+     * Get a list of departments in iPeer
+    **/
+    public function departments() {
+        if ($this->RequestHandler->isGet()) {
+            $departments = array();
+            $dps = $this->Department->find('all',
+                array('fields' => array('id', 'name'))
+            );
+            if (!empty($dps)) {
+                foreach ($dps as $dp) {
+                    $departments[] = $dp['Department'];
+                }
+                $statusCode = 'HTTP/1.0 200 OK';
+            } else {
+                $departments = null;
+                $statusCode = 'HTTP/1.0 404 Not Found';
+            }
+            $this->set('departments', $departments);
+            $this->set('statusCode', $statusCode);
+        } else {
+            $this->set('departments', null);
+            $this->set('statusCode', 'HTTP/1.0 400 Bad Request');
+        }
+    }
+    
+    /**
+     * Add or Delete departments in iPeer
+    **/
+    public function courseDepartments() {
+        $department_id = $this->params['department_id'];
+        $course_id = $this->params['course_id'];
+
+        //POST: array{'course_id', 'faculty_id'} ; assume 1 for now
+        if ($this->RequestHandler->isPost()) {
+            $create = array('CourseDepartment' => array(
+                'course_id' => $course_id,
+                'department_id' => $department_id
+            ));
+            if ($this->CourseDepartment->save($create)) {
+                $this->set('statusCode', 'HTTP/1.0 201 Created');
+                $departments = $this->CourseDepartment->read();
+                $this->set('departments', json_encode($departments['Department']));
+            } else {
+                $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
+                $this->set('departments', null);
+            }
+        } else if ($this->RequestHandler->isDelete()) {
+            $cd = $this->CourseDepartment->find('first',
+                    array(
+                        'conditions' => array(
+                            'CourseDepartment.course_id' => $course_id,
+                            'CourseDepartment.department_id' => $department_id
+                        )));
+            if ($this->CourseDepartment->delete($cd['CourseDepartment']['id'])) {
+                $this->set('statusCode', 'HTTP:/1.0 204 No Content');
+                $this->set('departments', null);
+            } else {
+                $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
+                $this->set('departments', null);
+            }
+        } else {
+            $this->set('statusCode', 'HTTP/1.0 400 Bad Request');
+            $this->set('departments', null);
         }
     }
 

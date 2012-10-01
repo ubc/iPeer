@@ -483,7 +483,7 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Departments');
         $this->Acl->allow($role, 'controllers/Groups');
         $this->Acl->allow($role, 'adminpage');
-        $this->Acl->deny($role, 'functions/viewemailaddresses');
+        $this->Acl->allow($role, 'functions/viewemailaddresses');
         $this->Acl->allow($role, 'functions/superadmin');
 
         $role->id = 2;  // admin
@@ -513,7 +513,7 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'functions/user/admin', 'delete');
         $this->Acl->deny($role, 'functions/user/superadmin');
         $this->Acl->allow($role, 'adminpage');
-        $this->Acl->deny($role, 'functions/viewemailaddresses');
+        $this->Acl->allow($role, 'functions/viewemailaddresses');
         $this->Acl->deny($role, 'functions/superadmin');
 
         $role->id = 3; // instructor

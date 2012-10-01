@@ -54,7 +54,7 @@
                 <?php echo $this->element("list/ajaxList", array ("paramsForList" =>$paramsForList)); ?>
         </td></tr>
   <tr>
-    <td>
+    <td colspan="2">
      <?php echo $html->link(__('Back to Evaluation Event Listing', true), '/evaluations/index/'); ?>
      <?php if (!empty($data)) {
         echo '&nbsp;|&nbsp;';
