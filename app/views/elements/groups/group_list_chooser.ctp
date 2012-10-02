@@ -16,9 +16,9 @@
                                                     'style' => $listStyle));?>
     </td>
     <td width="100" align="center">
-      <input type="button" style="width:100px;" onClick="itemMove($('all_groups'), $('selected_groups'))" value="<?php __('Assign')?> >>" />
-      <br><br>
-      <input type="button" style="width:100px;" onClick="itemMove($('selected_groups'), $('all_groups'))" value="<< <?php __('Remove')?> " />
+        <input type="button" style="width:100px;" onClick="itemMove($('all_groups'), $('selected_groups'))" value="<?php __('Assign')?> >>" <?php echo $status ?>/>
+        <br><br>
+        <input type="button" style="width:100px;" onClick="itemMove($('selected_groups'), $('all_groups'))" value="<< <?php __('Remove')?> " <?php echo $status ?> />
     </td>
     <td align="center">
       <h3><?php echo isset($selectedName) ? $selectedName : ''?></h3>

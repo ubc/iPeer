@@ -782,11 +782,11 @@ class V1Controller extends Controller {
             }
         } else if ($this->RequestHandler->isDelete()) {
             $cd = $this->CourseDepartment->find('first',
-                    array(
-                        'conditions' => array(
-                            'CourseDepartment.course_id' => $course_id,
-                            'CourseDepartment.department_id' => $department_id
-                        )));
+                array(
+                    'conditions' => array(
+                        'CourseDepartment.course_id' => $course_id,
+                        'CourseDepartment.department_id' => $department_id
+                )));
             if ($this->CourseDepartment->delete($cd['CourseDepartment']['id'])) {
                 $this->set('statusCode', 'HTTP:/1.0 204 No Content');
                 $this->set('departments', null);

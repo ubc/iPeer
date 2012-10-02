@@ -15,7 +15,7 @@ define('IMPORT_GROUP_GROUP_NAME', 2);
 class GroupsController extends AppController
 {
     public $name = 'Groups';
-    public $uses =  array('Group', 'GroupsMembers', 'User', 'Personalize', 'GroupEvent', 'Course');
+    public $uses =  array('Group', 'GroupsMembers', 'User', 'Personalize', 'GroupEvent', 'Course', 'EvaluationSubmission');
     public $show;
     public $sortBy;
     public $direction;
@@ -402,6 +402,16 @@ class GroupsController extends AppController
                 $this->redirect('/courses');
             }
         }
+        
+        $groupEvent = $this->GroupEvent->find('list',
+            array(
+                'conditions' => array('group_id' => $group_id),
+                'fields' => array('GroupEvent.id')
+            ));
+        $submissions = $this->EvaluationSubmission->find('count',
+            array(
+                'conditions' => array('grp_event_id' => $groupEvent)
+            ));
 
         $this->set('title_for_layout', $this->sysContainer->getCourseName($this->data['Group']['course_id']).__(' > Groups > Edit', true));
 
@@ -412,6 +422,7 @@ class GroupsController extends AppController
         $this->set('group_id', $group_id);
         $this->set('group_num', $this->data['Group']['group_num']);
         $this->set('course_id', $this->data['Group']['course_id']);
+        $this->set('submissions', $submissions);
     }
 
     /**

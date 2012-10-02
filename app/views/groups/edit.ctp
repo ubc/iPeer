@@ -54,8 +54,15 @@
         <?php __('No members in this group.')?>
       <?php endif;?>
     <?php else:?>
+    <?php
+    if ($submissions > 0 && !User::hasPermission('functions/superadmin')) {
+        $status = 'disabled';
+    } else {
+        $status = '';
+    }
+    ?>
     <?php echo $this->element("groups/group_list_chooser",
-                array('all' => $user_data,
+                array('all' => $user_data, 'status' => $status,
                       'allName' =>  __("Filtered Students", true), 'selectedName' => __('Students in Group', true)));
     ?>
     <?php endif;?>
