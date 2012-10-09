@@ -11,7 +11,8 @@
 class V1Controller extends Controller {
 
     public $name = 'V1';
-    public $uses = array('User', 'Group', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric', 'EvaluationMixeval', 'OauthClient', 'OauthNonce', 'OauthToken', 'Department');
+    public $uses = array('User', 'RolesUser', 'Group', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric', 
+        'EvaluationMixeval', 'OauthClient', 'OauthNonce', 'OauthToken', 'GroupsMembers', 'GroupEvent', 'Department');
     public $helpers = array('Session');
     public $components = array('RequestHandler', 'Session');
     public $layout = "blank_layout";
@@ -53,6 +54,7 @@ class V1Controller extends Controller {
             $this->render('oauth_error');
             return false;
         }
+        // oauth_version is optional, but must be set to 1.0
         // oauth_version is optional, but must be set to 1.0
         if (isset($_REQUEST['oauth_version']) && 
             $_REQUEST['oauth_version'] != "1.0"
@@ -281,9 +283,10 @@ class V1Controller extends Controller {
                         $tmp['first_name'] = $user['User']['first_name'];
                         $data[] = $tmp;
                     }
-                    $statusCode = 'HTTP/1.0 200 OK';
+                    $data = $_REQUEST;
+                    $statusCode = 'HTTP/1.1 200 OK';
                 } else {
-                    $statusCode = 'HTTP/1.0 404 Not Found';
+                    $statusCode = 'HTTP/1.1 404 Not Found';
                     $data = null;
                 }
             // specific user
@@ -300,9 +303,9 @@ class V1Controller extends Controller {
                         'last_name' => $user['User']['last_name'],
                         'first_name' => $user['User']['first_name']
                     );
-                    $statusCode = 'HTTP/1.0 200 OK';
+                    $statusCode = 'HTTP/1.1 200 OK';
                 } else {
-                    $statusCode = 'HTTP/1.0 404 Not Found';
+                    $statusCode = 'HTTP/1.1 404 Not Found';
                     $data = null;
                 }
             }
@@ -324,10 +327,10 @@ class V1Controller extends Controller {
                     $user = $this->User->read(array('id','username','last_name','first_name'));
                     $role = $this->RolesUser->read('role_id');
                     $combine = $user['User'] + array('role_id' => $role['RolesUser']['role_id']);
-                    $statusCode = 'HTTP/1.0 201 Created';
+                    $statusCode = 'HTTP/1.1 201 Created';
                     $body = $combine;
                 } else {
-                    $statusCode = 'HTTP/1.0 500 Internal Server Error'; 
+                    $statusCode = 'HTTP/1.1 500 Internal Server Error'; 
                     $body = null;
                 }
             // adding multiple users from import (expected input: array)
@@ -343,10 +346,10 @@ class V1Controller extends Controller {
                 $sUser = array();
                 $uUser = array();
                 $result = $this->User->saveAll($data, array('atomic' => false));
-                $statusCode = 'HTTP/1.0 500 Internal Server Error';
+                $statusCode = 'HTTP/1.1 500 Internal Server Error';
                 foreach ($result as $key => $ret) {
                     if ($ret) {
-                        $statusCode = 'HTTP/1.0 201 Created';
+                        $statusCode = 'HTTP/1.1 201 Created';
                         $sUser[] = $decode[$key]['username'];
                     } else {
                         $temp = array();
@@ -371,13 +374,13 @@ class V1Controller extends Controller {
                         'fields' => array('User.id', 'username', 'first_name', 'last_name')
                     ));
                     if (!empty($verify)) {
-                        $statusCode = 'HTTP/1.0 201 Created';
+                        $statusCode = 'HTTP/1.1 201 Created';
                         $body[] = $verify['User'] + array('role_id' => $verify['Role']['0']['id']);
                     }
                 }
             // incorrect format
             } else {
-                $statusCode = 'HTTP/1.0 400 Bad Request';
+                $statusCode = 'HTTP/1.1 400 Bad Request';
                 $body = null;
             }
             $this->set('statusCode', $statusCode);
@@ -385,10 +388,10 @@ class V1Controller extends Controller {
         // delete
         } else if ($this->RequestHandler->isDelete()) {
             if ($this->User->delete($id)) {
-                $this->set('statusCode', 'HTTP/1.0 204 No Content');
+                $this->set('statusCode', 'HTTP/1.1 204 No Content');
                 $this->set('user', null);
             } else {
-                $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
+                $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
                 $this->set('user', null);
             }
         // update
@@ -405,14 +408,14 @@ class V1Controller extends Controller {
                 $user = $this->User->read(array('id','username','last_name','first_name'));
                 $role = $this->RolesUser->find('first', array('conditions' => array('user_id' => $user['User']['id']), 'fields' => 'role_id'));
                 $combine = $user['User'] + array('role_id' => $role['RolesUser']['role_id']);
-                $this->set('statusCode', 'HTTP/1.0 200 OK');
+                $this->set('statusCode', 'HTTP/1.1 200 OK');
                 $this->set('user', $combine);
             } else {
-                $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
+                $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
                 $this->set('user', null);
             }
         } else {
-            $this->set('statusCode', 'HTTP/1.0 400 Bad Request');
+            $this->set('statusCode', 'HTTP/1.1 400 Bad Request');
             $this->set('user', null);
         }
     }
@@ -433,10 +436,10 @@ class V1Controller extends Controller {
                     foreach ($courses as $course) {
                         $classes[] = $course['Course'];
                     }
-                    $statusCode = 'HTTP/1.0 200 OK';
+                    $statusCode = 'HTTP/1.1 200 OK';
                 } else {
                     $classes = null;
-                    $statusCode = 'HTTP/1.0 404 Not Found';
+                    $statusCode = 'HTTP/1.1 404 Not Found';
                 }
             } else {
             // specific course
@@ -448,10 +451,10 @@ class V1Controller extends Controller {
                 );
                 if (!empty($course)) {
                     $classes = $course['Course'];
-                    $statusCode = 'HTTP/1.0 200 OK';
+                    $statusCode = 'HTTP/1.1 200 OK';
                 } else {
                     $classes = null;
-                    $statusCode = 'HTTP/1.0 404 Not Found';
+                    $statusCode = 'HTTP/1.1 404 Not Found';
                 }
             }
             $this->set('courses', $classes);
@@ -459,35 +462,35 @@ class V1Controller extends Controller {
         } else if ($this->RequestHandler->isPost()) {
             $create = trim(file_get_contents('php://input'), true);
             if (!$this->Course->save(json_decode($create, true))) {
-                $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
+                $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
                 $this->set('courses', null);
             } else {
                 $temp = $this->Course->read(array('id','course','title'));
                 $course = $temp['Course'];
-                $this->set('statusCode', 'HTTP/1.0 201 Created');
+                $this->set('statusCode', 'HTTP/1.1 201 Created');
                 $this->set('courses', $course);
             }
         } else if ($this->RequestHandler->isPut()) {   
             $update = trim(file_get_contents('php://input'), true);
             if (!$this->Course->save(json_decode($update, true))) {
-                $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
+                $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
                 $this->set('courses', null);
             } else {
                 $temp = $this->Course->read(array('id','course','title'));
                 $course = $temp['Course'];
-                $this->set('statusCode', 'HTTP/1.0 200 OK');
+                $this->set('statusCode', 'HTTP/1.1 200 OK');
                 $this->set('courses', $course);
             }
         } else if ($this->RequestHandler->isDelete()) {
             if (!$this->Course->delete($id)) {
-                $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
+                $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
                 $this->set('courses', null);
             } else {
-                $this->set('statusCode', 'HTTP/1.0 204 No Content');
+                $this->set('statusCode', 'HTTP/1.1 204 No Content');
                 $this->set('courses', null);
             }
         } else {
-            $this->set('statusCode', 'HTTP/1.0 400 Bad Request');
+            $this->set('statusCode', 'HTTP/1.1 400 Bad Request');
             $this->set('courses', null);
         }
     }
@@ -513,10 +516,10 @@ class V1Controller extends Controller {
                     foreach ($groups as $group) {
                         $data[] = $group['Group'];
                     }
-                    $statusCode = 'HTTP/1.0 200 OK';
+                    $statusCode = 'HTTP/1.1 200 OK';
                 } else {
                     $data = null;
-                    $statusCode = 'HTTP/1.0 404 Not Found';
+                    $statusCode = 'HTTP/1.1 404 Not Found';
                 }
             } else {
                 $group = $this->Group->find(
@@ -532,10 +535,10 @@ class V1Controller extends Controller {
                 );
                 if (!empty($group)) {
                     $data = $group['Group'];
-                    $statusCode = 'HTTP/1.0 200 OK';
+                    $statusCode = 'HTTP/1.1 200 OK';
                 } else {
                     $data = null;
-                    $statusCode = 'HTTP/1.0 404 Not Found';
+                    $statusCode = 'HTTP/1.1 404 Not Found';
                 }
             }
             $this->set('group', $data);
@@ -543,38 +546,41 @@ class V1Controller extends Controller {
         // add
         } else if ($this->RequestHandler->isPost()) {
             $add = trim(file_get_contents('php://input'), true);
-            if ($this->Group->save(json_decode($add, true))) {
-                $temp = $this->Group->read(array('id','group_num','group_name','course_id'));
-                $group = $temp['Group'];
-                $this->set('statusCode', 'HTTP/1.0 201 Created');
+            $decode = array('Group' => json_decode($add, true));
+            
+            if ($this->Group->save($decode)) {
+                $tempGroup = $this->Group->read(array('id','group_num','group_name','course_id'));
+                $group = $tempGroup['Group'];
+                $this->set('statusCode', 'HTTP/1.1 201 Created');
                 $this->set('group', $group);
             } else {
-                $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
+                $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
                 $this->set('group', null);
             }
         // delete
         } else if ($this->RequestHandler->isDelete()) {
             if ($this->Group->delete($this->params['group_id'])) {
-                $this->set('statusCode', 'HTTP/1.0 204 No Content');
+                $this->set('statusCode', 'HTTP/1.1 204 No Content');
                 $this->set('group', null);
             } else {
-                $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
+                $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
                 $this->set('group', null);
             }
         // update
         } else if ($this->RequestHandler->isPut()) {
             $edit = trim(file_get_contents('php://input'), true);
-            if ($this->Group->save(json_decode($edit, true))) {
+            $decode = array('Group' => json_decode($edit, true));
+            if ($this->Group->save($decode)) {
                 $temp = $this->Group->read(array('id','group_num','group_name','course_id'));
                 $group = $temp['Group'];
-                $this->set('statusCode', 'HTTP/1.0 200 OK');
+                $this->set('statusCode', 'HTTP/1.1 200 OK');
                 $this->set('group', $group);
             } else {
-                $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
+                $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
                 $this->set('group', null);
             }
         } else {
-            $this->set('statusCode', 'HTTP/1.0 400 Bad Request');
+            $this->set('statusCode', 'HTTP/1.1 400 Bad Request');
             $this->set('group', null);
         }
         
@@ -595,10 +601,10 @@ class V1Controller extends Controller {
                     foreach ($list as $data) {
                         $results[] = $data['Event'];
                     }
-                    $statusCode = 'HTTP/1.0 200 OK';
+                    $statusCode = 'HTTP/1.1 200 OK';
                 } else {
                     $results = null;
-                    $statusCode = 'HTTP/1.0 404 Not Found';
+                    $statusCode = 'HTTP/1.1 404 Not Found';
                 }
             } else {
                 $list = $this->Event->find('first',
@@ -608,16 +614,16 @@ class V1Controller extends Controller {
                 
                 if (!empty($list)) {
                     $results = $list['Event'];
-                    $statusCode = 'HTTP/1.0 200 OK';
+                    $statusCode = 'HTTP/1.1 200 OK';
                 } else {
                     $results = null;
-                    $statusCode = 'HTTP/1.0 404 Not Found';
+                    $statusCode = 'HTTP/1.1 404 Not Found';
                 }
             }
             $this->set('statusCode', $statusCode);
             $this->set('events', $results);
         } else {
-            $this->set('statusCode', 'HTTP/1.0 400 Bad Request');
+            $this->set('statusCode', 'HTTP/1.1 400 Bad Request');
             $this->set('events', null);
         }
     }
@@ -643,10 +649,10 @@ class V1Controller extends Controller {
                         foreach ($list as $data) {
                             $results[] = $data['EvaluationSimple'];
                         }
-                        $statusCode = 'HTTP/1.0 200 OK';
+                        $statusCode = 'HTTP/1.1 200 OK';
                     } else {
                         $results = null;
-                        $statusCode = 'HTTP/1.0 404 Not Found';
+                        $statusCode = 'HTTP/1.1 404 Not Found';
                     }
                 } else if (2 == $eventType) {
                     $list = $this->EvaluationRubric->find('all',
@@ -654,15 +660,16 @@ class V1Controller extends Controller {
                             'conditions' => array('event_id' => $event_id)
                         )
                     );
-                    
+                   
                     if (!empty($list)) {
                         foreach ($list as $data) {
+                            unset($data['EvaluationRubric']['id']);
                             $results[] = $data['EvaluationRubric'];
                         }
-                        $statusCode = 'HTTP/1.0 200 OK';
+                        $statusCode = 'HTTP/1.1 200 OK';
                     } else {
                         $results = null;
-                        $statusCode = 'HTTP/1.0 404 Not Found';
+                        $statusCode = 'HTTP/1.1 404 Not Found';
                     }
                 } else if (4 == $eventType) {
                     $list = $this->EvaluationMixeval->find('all',
@@ -670,14 +677,16 @@ class V1Controller extends Controller {
                             'conditions' => array('event_id' => $event_id)
                         )
                     );
+                    
                     if (!empty($list)) {
                         foreach ($list as $data) {
+                            unset($data['EvaluationMixeval']['id']);
                             $results[] = $data['EvaluationMixeval'];
                         }
-                        $statusCode = 'HTTP/1.0 200 OK';
+                        $statusCode = 'HTTP/1.1 200 OK';
                     } else {
                         $results = null;
-                        $statusCode = 'HTTP/1.0 404 Not Found';
+                        $statusCode = 'HTTP/1.1 404 Not Found';
                     }
                 }
             } else {
@@ -690,10 +699,10 @@ class V1Controller extends Controller {
                     
                     if (!empty($list)) {
                         $results = $list['EvaluationSimple'];
-                        $statusCode = 'HTTP/1.0 200 OK';
+                        $statusCode = 'HTTP/1.1 200 OK';
                     } else {
                         $results = null;
-                        $statusCode = 'HTTP/1.0 404 Not Found';
+                        $statusCode = 'HTTP/1.1 404 Not Found';
                     }
                 } else if (2 == $eventType) {
                     $list = $this->EvaluationRubric->find('first',
@@ -704,10 +713,11 @@ class V1Controller extends Controller {
                     
                     if (!empty($list)) {
                         $results = $list['EvaluationRubric'];
-                        $statusCode = 'HTTP/1.0 200 OK';
+                        unset($results['id']);
+                        $statusCode = 'HTTP/1.1 200 OK';
                     } else {
                         $results = null;
-                        $statusCode = 'HTTP/1.0 404 Not Found';
+                        $statusCode = 'HTTP/1.1 404 Not Found';
                     }
                 } else if (4 == $eventType) {
                     $list = $this->EvaluationMixeval->find('first',
@@ -718,17 +728,18 @@ class V1Controller extends Controller {
                     
                     if (!empty($list)) {
                         $results = $list['EvaluationMixeval'];
-                        $statusCode = 'HTTP/1.0 200 OK';
+                        unset($results['id']);
+                        $statusCode = 'HTTP/1.1 200 OK';
                     } else {
                         $results = null;
-                        $statusCode = 'HTTP/1.0 404 Not Found';
+                        $statusCode = 'HTTP/1.1 404 Not Found';
                     }
                 }
             }
             $this->set('statusCode', $statusCode);
             $this->set('grades', $results);
         } else {
-            $this->set('statusCode', 'HTTP/1.0 400 Bad Request');
+            $this->set('statusCode', 'HTTP/1.1 400 Bad Request');
             $this->set('grades', null);
         }
     }
@@ -797,6 +808,40 @@ class V1Controller extends Controller {
         } else {
             $this->set('statusCode', 'HTTP/1.0 400 Bad Request');
             $this->set('departments', null);
+        }
+    }
+
+    public function userEvents() {
+        $user_id = $this->params['user_id'];
+        
+        if ($this->RequestHandler->isGet()) {
+            $this->set('statusCode', 'HTTP/1.1 200 OK');
+            // find all groups the user is associated with - groupMembers
+            $groups = $this->GroupsMembers->find('list', array(
+                'conditions' => array('user_id' => $user_id),
+                'fields' => array('group_id')
+            ));
+            // find all groupEvents relating to the above groups - groupEvents
+            $eventIds = $this->GroupEvent->find('list', array(
+                'conditions' => array('group_id' => $groups),
+                'fields' => array('event_id')
+            ));
+            // from groupEvents - pickout all events and generate list of valid events - Events
+                // after release begin date and before end date
+            $evts = $this->Event->find('all', array(
+                'conditions' => array('Event.id' => $eventIds, 'release_date_begin <=' => date('Y-m-d H-i-s',time()), 'release_date_end >=' => date('Y-m-d H-i-s',time())),
+                'fields' => array('title', 'course_id', 'event_template_type_id', 'id')
+            ));
+
+            $events = array();
+            foreach ($evts as $evt) {
+                $events[] = $evt['Event'];
+            }
+            
+            $this->set('events', $events);
+        } else {
+            $this->set('statusCode', 'HTTP/1.1 400 Bad Request');
+            $this->set('events', null);
         }
     }
 

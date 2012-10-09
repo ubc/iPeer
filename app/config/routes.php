@@ -75,6 +75,9 @@ if (file_exists(CONFIGS.'installed.txt')) {
   Router::connect('/:controller/courses/:course_id/departments/:department_id',
     array('action'=> 'courseDepartments'),
     array('course_id' => '[0-9]+', 'department_id' => '[0-9]+'));
+  Router::connect('/:controller/users/:user_id/events',
+    array('action' => 'userEvents'),
+    array('user_id' => '[0-9]+'));
 
 } else {
   // Note, order of routes specified matters. If install didn't come first
