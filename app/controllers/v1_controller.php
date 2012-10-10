@@ -812,10 +812,12 @@ class V1Controller extends Controller {
     }
 
     public function userEvents() {
-        $user_id = $this->params['user_id'];
+        $username = $this->params['username'];
         
-        if ($this->RequestHandler->isGet()) {
-            $this->set('statusCode', 'HTTP/1.1 200 OK');
+        if ($this->RequestHandler->isGet()) {            
+            $user = $this->User->find('first', array('conditions' => array('User.username' => $username)));
+            $user_id = $user['User']['id'];
+            
             // find all groups the user is associated with - groupMembers
             $groups = $this->GroupsMembers->find('list', array(
                 'conditions' => array('user_id' => $user_id),
@@ -826,10 +828,20 @@ class V1Controller extends Controller {
                 'conditions' => array('group_id' => $groups),
                 'fields' => array('event_id')
             ));
+            
+            $eventConditions = array(
+                        'Event.id' => $eventIds, 
+                        'release_date_begin <=' => date('Y-m-d H-i-s',time()), 
+                        'release_date_end >=' => date('Y-m-d H-i-s',time()));
+            
+            if (isset($this->params['course_id'])) {
+                $eventConditions = $eventConditions + array('course_id' => $this->params['course_id']);
+            }
+            
             // from groupEvents - pickout all events and generate list of valid events - Events
                 // after release begin date and before end date
             $evts = $this->Event->find('all', array(
-                'conditions' => array('Event.id' => $eventIds, 'release_date_begin <=' => date('Y-m-d H-i-s',time()), 'release_date_end >=' => date('Y-m-d H-i-s',time())),
+                'conditions' => $eventConditions,
                 'fields' => array('title', 'course_id', 'event_template_type_id', 'id')
             ));
 
@@ -837,8 +849,13 @@ class V1Controller extends Controller {
             foreach ($evts as $evt) {
                 $events[] = $evt['Event'];
             }
-            
-            $this->set('events', $events);
+            if (empty($events)) {
+                $this->set('statusCode', 'HTTP/1.1 200 OK');
+                $this->set('events', $events);
+            } else {
+                 $this->set('statusCode', 'HTTP/1.1 404 Not Found');
+                 $this->set('events', null);
+            }
         } else {
             $this->set('statusCode', 'HTTP/1.1 400 Bad Request');
             $this->set('events', null);

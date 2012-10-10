@@ -516,7 +516,7 @@ class V1ControllerTest extends CakeTestCase {
     
     function testUsersEvents()
     {
-        $url = Router::url('v1/users/5/events', true);
+        $url = Router::url('v1/users/edward/events', true);
         $expectedEvents = array(
             array(
                 'title' => 'Term 1 Evaluation',
@@ -540,5 +540,9 @@ class V1ControllerTest extends CakeTestCase {
         
         $actualEvents = $this->_oauthReq("$url");
         $this->assertEqual($expectedEvents, json_decode($actualEvents, true));
+        
+        $url = Router::url('v1/courses/1/users/edward/events', true);
+        $courseUserEvents = $this->_oauthReq("$url");
+        $this->assertEqual($expectedEvents, json_decode($courseUserEvents, true));
     }
 }
