@@ -497,22 +497,37 @@ class V1ControllerTest extends CakeTestCase {
 
     
     public function testDepartments() {
-    
+        $url = Router::url('v1/departments', true);
+        
+        $expectedDepartments = array(
+            array('id' => '1', 'name' => 'MECH'),
+            array('id' => '2', 'name' => 'APSC'),
+            array('id' => '3', 'name' => 'CPSC')
+        );
+        
+        $departments = $this->_oauthReq("$url");
+        $this->assertEqual(json_decode($departments, true), $expectedDepartments);
+                
+        $expectedCourses = array(array('id' => '1', 'course' => 'MECH 328', 'title' => 'Mechanical Engineering Design Project'));
+        $courses = $this->_oauthReq("$url/1");
+        $this->assertEqual(json_decode($courses, true), $expectedCourses);
     }
     
-    /*public function testCourseDepartments() {
+    public function testCourseDepartments() {
         $url = Router::url('v1/courses/1/departments', true);
         
         // POST - Add a course to a department
         $file = $this->_oauthReq("$url/2", '', OAUTH_HTTP_METHOD_POST);
         $cd = json_decode($file, true);
-        $expected = array('id' => $cd['id'], 'course_id' => $course_id, 'department_id' => $department_id);
-        $this->assertEqual($cd, $expected);
+        $expected = array('course_id' => '1', 'department_id' => '2');
+        $this->assertEqual(json_decode($cd, true), $expected);
         
         // DELETE - Delete a course from a department
         $file = $this->_oauthReq("$url/2", '', OAUTH_HTTP_METHOD_DELETE);
         $this->assertEqual(json_decode($file), '');
-    }*/
+        
+        // add test to see if course exist using departments
+    }
     
     function testUsersEvents()
     {

@@ -12,7 +12,8 @@ class V1Controller extends Controller {
 
     public $name = 'V1';
     public $uses = array('User', 'RolesUser', 'Group', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric', 
-        'EvaluationMixeval', 'OauthClient', 'OauthNonce', 'OauthToken', 'GroupsMembers', 'GroupEvent', 'Department');
+        'EvaluationMixeval', 'OauthClient', 'OauthNonce', 'OauthToken', 'GroupsMembers', 'GroupEvent', 'Department',
+        'CourseDepartment');
     public $helpers = array('Session');
     public $components = array('RequestHandler', 'Session');
     public $layout = "blank_layout";
@@ -747,20 +748,39 @@ class V1Controller extends Controller {
     /**
      * Get a list of departments in iPeer
     **/
-    public function departments() {
+    public function departments($departmentId = null) {
         if ($this->RequestHandler->isGet()) {
-            $departments = array();
-            $dps = $this->Department->find('all',
-                array('fields' => array('id', 'name'))
-            );
-            if (!empty($dps)) {
-                foreach ($dps as $dp) {
-                    $departments[] = $dp['Department'];
+            if (is_null($departmentId)) {
+                $departments = array();
+                $dps = $this->Department->find('all',
+                    array('fields' => array('id', 'name'))
+                );
+                if (!empty($dps)) {
+                    foreach ($dps as $dp) {
+                        $departments[] = $dp['Department'];
+                    }
+                    $statusCode = 'HTTP/1.1 200 OK';
+                } else {
+                    $departments = null;
+                    $statusCode = 'HTTP/1.1 404 Not Found';
                 }
-                $statusCode = 'HTTP/1.0 200 OK';
             } else {
-                $departments = null;
-                $statusCode = 'HTTP/1.0 404 Not Found';
+                $courseDepts = $this->CourseDepartment->find('list',
+                    array('conditions' => array('department_id' => $departmentId),
+                        'fields' => array('course_id')));
+                $courses = $this->Course->find('all',
+                    array('conditions' => array('Course.id' => $courseDepts),
+                        'fields' => array('Course.id', 'course', 'title')));
+                if (!empty($courses)) {
+                    $departments = array();
+                    foreach ($courses as $course) {
+                        $departments[] = $course['Course'];
+                    }
+                    $statusCode = 'HTTP/1.1 200 OK';
+                } else {
+                    $departments = null;
+                    $statusCode = 'HTTP/1.1 404 Not Found';
+                }  
             }
             $this->set('departments', $departments);
             $this->set('statusCode', $statusCode);
@@ -779,30 +799,23 @@ class V1Controller extends Controller {
 
         //POST: array{'course_id', 'faculty_id'} ; assume 1 for now
         if ($this->RequestHandler->isPost()) {
-            $create = array('CourseDepartment' => array(
-                'course_id' => $course_id,
-                'department_id' => $department_id
-            ));
-            if ($this->CourseDepartment->save($create)) {
-                $this->set('statusCode', 'HTTP/1.0 201 Created');
-                $departments = $this->CourseDepartment->read();
-                $this->set('departments', json_encode($departments['Department']));
+            if ($this->Course->habtmAdd('Department', $course_id, $department_id)) {
+                $this->set('statusCode', 'HTTP/1.1 201 Created');
+                $departments = $this->CourseDepartment->find('first',
+                    array('conditions' => array('course_id' => $course_id, 'department_id' => $department_id)));
+                $departments = $departments['CourseDepartment'];
+                unset($departments['id']);
+                $this->set('departments', json_encode($departments));
             } else {
-                $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
+                $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
                 $this->set('departments', null);
             }
         } else if ($this->RequestHandler->isDelete()) {
-            $cd = $this->CourseDepartment->find('first',
-                array(
-                    'conditions' => array(
-                        'CourseDepartment.course_id' => $course_id,
-                        'CourseDepartment.department_id' => $department_id
-                )));
-            if ($this->CourseDepartment->delete($cd['CourseDepartment']['id'])) {
-                $this->set('statusCode', 'HTTP:/1.0 204 No Content');
+            if ($this->Course->habtmDelete('Department', $course_id, $department_id)) {
+                $this->set('statusCode', 'HTTP:/1.1 204 No Content');
                 $this->set('departments', null);
             } else {
-                $this->set('statusCode', 'HTTP/1.0 500 Internal Server Error');
+                $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
                 $this->set('departments', null);
             }
         } else {
@@ -811,6 +824,9 @@ class V1Controller extends Controller {
         }
     }
 
+    /**
+     * retrieving events a user has access to (eg. student)
+    **/
     public function userEvents() {
         $username = $this->params['username'];
         
@@ -831,8 +847,8 @@ class V1Controller extends Controller {
             
             $eventConditions = array(
                         'Event.id' => $eventIds, 
-                        'release_date_begin <=' => date('Y-m-d H-i-s',time()), 
-                        'release_date_end >=' => date('Y-m-d H-i-s',time()));
+                        'release_date_begin <=' => date('Y-m-d H-i-s', time()), 
+                        'release_date_end >=' => date('Y-m-d H-i-s', time()));
             
             if (isset($this->params['course_id'])) {
                 $eventConditions = $eventConditions + array('course_id' => $this->params['course_id']);
@@ -850,11 +866,11 @@ class V1Controller extends Controller {
                 $events[] = $evt['Event'];
             }
             if (empty($events)) {
-                $this->set('statusCode', 'HTTP/1.1 200 OK');
-                $this->set('events', $events);
+                $this->set('statusCode', 'HTTP/1.1 404 Not Found');
+                $this->set('events', null);
             } else {
-                 $this->set('statusCode', 'HTTP/1.1 404 Not Found');
-                 $this->set('events', null);
+                 $this->set('statusCode', 'HTTP/1.1 200 OK');
+                 $this->set('events', $events);
             }
         } else {
             $this->set('statusCode', 'HTTP/1.1 400 Bad Request');
