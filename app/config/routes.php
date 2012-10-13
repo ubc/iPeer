@@ -61,7 +61,7 @@ if (file_exists(CONFIGS.'installed.txt')) {
   Router::connect('/logout', array('controller' => 'users',
     'action' => 'logout'));
   // Connect url to groups api
-  Router::connect('/v1/courses/:course_id/groups/:group_id',
+  Router::connect('/:controller/courses/:course_id/groups/:group_id',
     array('action' => 'groups', 'group_id' => null),
     array('course_id' => '[0-9]+', 'group_id' => '[0-9]+'));
   // Connect url to events api
@@ -75,6 +75,9 @@ if (file_exists(CONFIGS.'installed.txt')) {
   Router::connect('/:controller/courses/:course_id/departments/:department_id',
     array('action'=> 'courseDepartments'),
     array('course_id' => '[0-9]+', 'department_id' => '[0-9]+'));
+  Router::connect('/:controller/courses/:course_id/users',
+    array('action' => 'userCourse'),
+    array('course_id' => '[0-9]+'));
   Router::connect('/:controller/users/:username/events',
     array('action' => 'userEvents'));
   Router::connect('/:controller/courses/:course_id/users/:username/events',
