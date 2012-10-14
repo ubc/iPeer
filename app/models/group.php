@@ -116,6 +116,15 @@ class Group extends AppModel
         $this->data[$this->name]['group_name'] =
             str_replace("'", "", $this->data[$this->name]['group_name']);
 
+        // generate a group number if empty
+        if (!isset($this->data[$this->name]['group_num']) || empty($this->data[$this->name]['group_num'])) {
+            $max_num = $this->find('first', array(
+                'conditions' => array('course_id' => $this->data[$this->name]['course_id']),
+                'fields' => array('MAX(group_num) as max_num')));
+            Debugger::log(print_r($max_num, true));
+            $this->data[$this->name]['group_num'] = $max_num[0]['max_num'] + 1;
+        }
+
         return parent::beforeSave();
     }
 
@@ -133,7 +142,7 @@ class Group extends AppModel
             'conditions' => array('course_id' => $courseId)
         ));
     }
-    
+
     /**
      * Find lowest missing group number in a course
      *
@@ -163,7 +172,7 @@ class Group extends AppModel
         } else {
             $avail['0'] = 1;
         }
-        
+
         return $avail['0'];
     }
 
@@ -237,7 +246,7 @@ class Group extends AppModel
         $people = $this->getMembersByGroupId($group_id, 'all');
         $people = Set::extract('/Member/id', $people);
         $peopleInGroups = array();
-        
+
         $course = $this->Course->getCourseByGroupId($group_id);
         if (empty($course)) {
             return array();
@@ -304,7 +313,7 @@ class Group extends AppModel
             'fields' => array('Member.student_no_with_full_name'),
             'contain' => 'Group')
         );
-        
+
         return $students;
     }
 
@@ -334,7 +343,7 @@ class Group extends AppModel
             'conditions' => array('Group.course_id' => $course_id)
         ));
     }
-    
+
     /**
      * findGroupByid Get group by group id
      *

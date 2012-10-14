@@ -56,7 +56,6 @@ class V1Controller extends Controller {
             return false;
         }
         // oauth_version is optional, but must be set to 1.0
-        // oauth_version is optional, but must be set to 1.0
         if (isset($_REQUEST['oauth_version']) &&
             $_REQUEST['oauth_version'] != "1.0"
         ) {
@@ -505,7 +504,7 @@ class V1Controller extends Controller {
         // view
         if ($this->RequestHandler->isGet()) {
             $data = array();
-            if (null == $this->params['group_id']) {
+            if (!isset($this->params['group_id']) || null == $this->params['group_id']) {
                 $groups = $this->Group->find(
                     'all',
                     array(
@@ -547,6 +546,7 @@ class V1Controller extends Controller {
         } else if ($this->RequestHandler->isPost()) {
             $add = trim(file_get_contents('php://input'), true);
             $decode = array('Group' => json_decode($add, true));
+            $decode['Group']['course_id'] = $this->params['course_id'];
 
             if ($this->Group->save($decode)) {
                 $tempGroup = $this->Group->read(array('id','group_num','group_name','course_id'));
@@ -591,34 +591,30 @@ class V1Controller extends Controller {
      **/
     public function events() {
         $course_id = $this->params['course_id'];
-        $event_id = $this->params['event_id'];
+        $results = array();
 
         if ($this->RequestHandler->isGet()) {
-            if (null == $event_id) {
-                $list = $this->Event->find('all', array('fields' => array('title', 'course_id', 'event_template_type_id')));
+            if (!isset($this->params['event_id']) || empty($this->params['event_id'])) {
+                $list = $this->Event->find('all', array(
+                    'conditions' => array('course_id' => $course_id),
+                    'fields' => array('title', 'course_id', 'event_template_type_id')));
 
                 if (!empty($list)) {
                     foreach ($list as $data) {
                         $results[] = $data['Event'];
                     }
-                    $statusCode = 'HTTP/1.1 200 OK';
-                } else {
-                    $results = null;
-                    $statusCode = 'HTTP/1.1 404 Not Found';
                 }
+                $statusCode = 'HTTP/1.1 200 OK';
             } else {
                 $list = $this->Event->find('first',
                     array('fields' => array('title', 'course_id', 'event_template_type_id'),
-                        'conditions' => array('Event.id' => $event_id))
+                        'conditions' => array('Event.id' => $this->params['event_id']))
                 );
 
                 if (!empty($list)) {
                     $results = $list['Event'];
-                    $statusCode = 'HTTP/1.1 200 OK';
-                } else {
-                    $results = null;
-                    $statusCode = 'HTTP/1.1 404 Not Found';
                 }
+                $statusCode = 'HTTP/1.1 200 OK';
             }
             $this->set('statusCode', $statusCode);
             $this->set('events', $results);
@@ -837,6 +833,7 @@ class V1Controller extends Controller {
                 'conditions' => array('user_id' => $user_id),
                 'fields' => array('group_id')
             ));
+
             // find all groupEvents relating to the above groups - groupEvents
             $eventIds = $this->GroupEvent->find('list', array(
                 'conditions' => array('group_id' => $groups),
@@ -856,24 +853,21 @@ class V1Controller extends Controller {
                 // after release begin date and before end date
             $evts = $this->Event->find('all', array(
                 'conditions' => $eventConditions,
-                'fields' => array('title', 'course_id', 'event_template_type_id', 'id')
+                'fields' => array('title', 'course_id', 'event_template_type_id', 'due_date', 'id')
             ));
 
             $events = array();
             foreach ($evts as $evt) {
                 $events[] = $evt['Event'];
             }
-            if (empty($events)) {
-                $this->set('statusCode', 'HTTP/1.1 404 Not Found');
-                $this->set('events', null);
-            } else {
-                 $this->set('statusCode', 'HTTP/1.1 200 OK');
-                 $this->set('events', $events);
-            }
+            $this->set('statusCode', 'HTTP/1.1 200 OK');
+            $this->set('events', $events);
         } else {
             $this->set('statusCode', 'HTTP/1.1 400 Bad Request');
             $this->set('events', null);
         }
+
+        $this->render('events');
     }
 
     /* A quick mockup for handling user enrolment. special cases are not
@@ -909,4 +903,40 @@ class V1Controller extends Controller {
         }
     }
 
+    /* A quick mockup for handling group enrolment. special cases are not
+     * considered. It's only used for testing b2.
+     * Please implement it with correct error handling and optimization.
+     * */
+    public function groupUsers() {
+        $group_id = $this->params['group_id'];
+        $ret = array();
+
+        if ($this->RequestHandler->isGet()) {
+            $ret = $this->User->getUsersByGroupId($group_id);
+            $statusCode = 'HTTP/1.1 200 OK';
+        } else if ($this->RequestHandler->isPost()) {
+            $body = trim(file_get_contents('php://input'), true);
+            $decode = json_decode($body, true);
+            $usernames = array();
+            foreach($decode as $user) {
+                $usernames[] = $user['username'];
+            }
+            $users = $this->User->findAllByUsername($usernames);
+            $ret = array();
+            foreach($users as $user) {
+                $this->User->habtmAdd('Group', $user['User']['id'], $group_id);
+                $tmp = array();
+                $tmp['id'] = $user['User']['id'];
+                $tmp['role_id'] = $user['Role']['0']['id'];
+                $tmp['username'] = $user['User']['username'];
+                $tmp['last_name'] = $user['User']['last_name'];
+                $tmp['first_name'] = $user['User']['first_name'];
+                $ret[] = $tmp;
+            }
+            $statusCode = 'HTTP/1.1 201 Created';
+        }
+        $this->set('statusCode', $statusCode);
+        $this->set('user', $ret);
+        $this->render('users');
+    }
 }

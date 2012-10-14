@@ -24,7 +24,7 @@ class User extends AppModel
     public $USER_TYPE_INSTRUCTOR = 3;
     public $USER_TYPE_TA = 4;
     public $USER_TYPE_STUDENT = 5;
-    
+
     const IMPORT_USERNAME = '0';
     const IMPORT_FIRSTNAME = '1';
     const IMPORT_LASTNAME = '2';
@@ -163,7 +163,7 @@ class User extends AppModel
         )
     );
 
-    
+
     public $virtualFields = array(
         'full_name' => 'CONCAT_WS(" ", first_name, last_name)',
         'student_no_with_full_name' => 'CONCAT_WS(" ", student_no,CONCAT_WS(" ", first_name, last_name))'
@@ -324,7 +324,7 @@ class User extends AppModel
             ),
             'order' => 'User.student_no'));
     }
-    
+
     /**
      * Get list of course tutors
      *
@@ -345,6 +345,24 @@ class User extends AppModel
             ),
             'order' => 'User.last_name'));
         return $temp;
+    }
+
+    /**
+     * Get list of users in the group
+     *
+     * @param int $group_id group id
+     *
+     * @access public
+     * @return list of users
+     * */
+    public function getUsersByGroupId($group_id) {
+        $ret = array();
+        $users = $this->find('all', array('conditions' => array('Group.id' => $group_id), 'contain' => array('Group')));
+        foreach ($users as $user) {
+            $ret[] = $user['User'];
+        }
+
+        return $ret;
     }
 
     /**
@@ -523,7 +541,7 @@ class User extends AppModel
 
             empty($u[User::IMPORT_PASSWORD]) ? $tmp['password'] = md5($u[User::GENERATED_PASSWORD]) :
                 $tmp['password'] = md5($u[User::IMPORT_PASSWORD]); // Will be hashed by the Users controller
-            
+
             $tmp['creator_id']   = User::get('id');
             $data[$u[User::IMPORT_USERNAME]]['User'] = $tmp;
             $data[$u[User::IMPORT_USERNAME]]['Role']['RolesUser']['role_id'] = '5';
@@ -548,25 +566,25 @@ class User extends AppModel
                 } else {
                     $temp['first_name'] = $e['User']['first_name'];
                 }
-                
+
                 if ($e['User']['last_name'] != $new['User']['last_name']) {
                     $temp['last_name'] = $new['User']['last_name'];
                 } else {
                     $temp['last_name'] = $e['User']['last_name'];
                 }
-                
+
                 if ($e['User']['email'] != $new['User']['email']) {
                     $temp['email'] = $new['User']['email'];
                 } else {
                     $temp['email'] = $e['User']['email'];
                 }
-                
+
                 if ($e['User']['student_no'] != $new['User']['student_no']) {
                     $temp['student_no'] = $new['User']['student_no'];
                 } else {
                     $temp['student_no'] = $e['User']['student_no'];
                 }
-                
+
                 // ignore the password if not exists in import source
                 if ($new['User']['import_password']) {
                     $temp['password'] = $new['User']['password'];
@@ -731,7 +749,7 @@ class User extends AppModel
 
         return $model->getListByInstructor(self::get('id'));
     }
-    
+
     /**
      * getMyDepartmentsCourseList get the list of courses
      *
