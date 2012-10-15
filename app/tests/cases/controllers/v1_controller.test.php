@@ -560,4 +560,35 @@ class V1ControllerTest extends CakeTestCase {
         $courseUserEvents = $this->_oauthReq("$url");
         $this->assertEqual($expectedEvents, json_decode($courseUserEvents, true));
     }
+
+    function testEnrolments() {
+        // Get the ids of students enrolled in course id 3
+        $url = Router::url('v1/courses/3/users', true);
+        $actual = $this->_oauthReq("$url");
+        $expected = array(
+            array('id' => '8', 'role_id' => '5', 'username' => '16585158'),
+            array('id' => '33', 'role_id' => '5', 'username' => '51516498'),
+            array('id' => '4', 'role_id' => '3', 'username' => 'instructor3'),
+            array('id' => '37', 'role_id' => '4', 'username' => 'tutor3'),
+        );
+        $this->assertEqual($expected, json_decode($actual, true));
+
+        // Add a student to a course
+        $expected = array(array('username' => '81121651', 'role_id' => 5));
+        $actual = $this->_oauthReq(
+            $url, json_encode($expected), OAUTH_HTTP_METHOD_POST);
+        $this->assertEqual($expected, json_decode($actual, true));
+
+        // Add an instructor to a course
+        $expected = array(array('username' => 'instructor2', 'role_id' => 3));
+        $actual = $this->_oauthReq(
+            $url, json_encode($expected), OAUTH_HTTP_METHOD_POST);
+        $this->assertEqual($expected, json_decode($actual, true));
+
+        // Add a tutor to a course
+        $expected = array(array('username' => 'tutor2', 'role_id' => 4));
+        $actual = $this->_oauthReq(
+            $url, json_encode($expected), OAUTH_HTTP_METHOD_POST);
+        $this->assertEqual($expected, json_decode($actual, true));
+    }
 }

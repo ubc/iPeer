@@ -178,6 +178,45 @@ class UserTestCase extends CakeTestCase {
         $this->assertEqual($ret['3'], 'instructor');
 	}
 
+    /*
+     * Test adding a student to a course.
+     */
+    function testAddStudent()
+    {
+        // Try adding students not yet enrolled, should work
+        $ret = $this->User->addStudent(15, 1);
+        $this->assertTrue($ret);
+        // NOTE: Can't test failure cases as they're being
+        // handled by SQL constraints and the fixtures don't
+        // duplicate the constraints.
+    }
+
+    /*
+     * Test adding an instructor to a course.
+     */
+    function testAddInstructor()
+    {
+        // Try adding students not yet enrolled, should work
+        $ret = $this->User->addInstructor(4, 1);
+        $this->assertTrue($ret);
+        // NOTE: Can't test failure cases as they're being
+        // handled by SQL constraints and the fixtures don't
+        // duplicate the constraints.
+    }
+
+    /*
+     * Test adding a tutor to a course.
+     */
+    function testAddTutor()
+    {
+        // Try adding students not yet enrolled, should work
+        $ret = $this->User->addTutor(37, 1);
+        $this->assertTrue($ret);
+        // NOTE: Can't test failure cases as they're being
+        // handled by SQL constraints and the fixtures don't
+        // duplicate the constraints.
+    }
+
 	function testGetCourseTutorsForList() {
         // TODO
 	}

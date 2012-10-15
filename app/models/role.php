@@ -12,7 +12,6 @@ class Role extends AppModel
 {
     //The model name
     public $name = 'Role';
-    public $test = 'a';
     public $displayField = 'name';
 
     public $hasAndBelongsToMany = array(
@@ -40,30 +39,16 @@ class Role extends AppModel
     }
 
     /**
-     * getRoleByRoleNumber
+     * getRoleName - return the name of the role given an role id
      *
-     * @param string $roleNum
+     * @param string $roleId
      *
      * @access public
-     * @return void
+     * @return string name of the role
      */
-    function getRoleByRoleNumber($roleNum = '')
+    public function getRoleName($roleId)
     {
-        if ($roleNum==1) {
-            return 'SA';
-        }
-
-        if ($roleNum==2) {
-            return 'A';
-        }
-        if ($roleNum==3) {
-            return 'I';
-        }
-        if ($roleNum==5) {
-            return 'S';
-        } else {
-            return null;
-        }
+        return $this->field('name', array('id' => $roleId));
     }
 
     /**

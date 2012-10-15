@@ -11,9 +11,11 @@
 class V1Controller extends Controller {
 
     public $name = 'V1';
-    public $uses = array('User', 'RolesUser', 'Group', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric',
-        'EvaluationMixeval', 'OauthClient', 'OauthNonce', 'OauthToken', 'GroupsMembers', 'GroupEvent', 'Department',
-        'CourseDepartment');
+    public $uses = array('User', 'RolesUser', 
+        'Group', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric',
+        'EvaluationMixeval', 'OauthClient', 'OauthNonce', 'OauthToken', 
+        'GroupsMembers', 'GroupEvent', 'Department', 'Role', 'CourseDepartment'
+    );
     public $helpers = array('Session');
     public $components = array('RequestHandler', 'Session');
     public $layout = "blank_layout";
@@ -82,7 +84,7 @@ class V1Controller extends Controller {
     private function _checkSignature() {
         // Calculate the signature, note, going to assume that all incoming
         // parameters are already UTF-8 encoded since it'll be impossible
-        // to convert encodings wit
+        // to convert encodings blindly
         $tmp = $_REQUEST;
         unset($tmp['oauth_signature']);
         unset($tmp['url']); // can ignore, mod_rewrite added, not sent by client
@@ -851,39 +853,6 @@ class V1Controller extends Controller {
         $this->render('events');
     }
 
-    /* A quick mockup for handling user enrolment. special cases are not
-     * considered. It's only used for testing b2.
-     * Please implement it with correct error handling and optimization.
-     * */
-    public function userCourse() {
-        $course_id = $this->params['course_id'];
-
-        if ($this->RequestHandler->isGet()) {
-        } else if ($this->RequestHandler->isPost()) {
-            $body = trim(file_get_contents('php://input'), true);
-            $decode = json_decode($body, true);
-            $usernames = array();
-            foreach($decode as $user) {
-                $usernames[] = $user['username'];
-            }
-            $users = $this->User->findAllByUsername($usernames);
-            $ret = array();
-            foreach($users as $user) {
-                $this->User->habtmAdd('Enrolment', $user['User']['id'], $course_id);
-                $tmp = array();
-                $tmp['id'] = $user['User']['id'];
-                $tmp['role_id'] = $user['Role']['0']['id'];
-                $tmp['username'] = $user['User']['username'];
-                $tmp['last_name'] = $user['User']['last_name'];
-                $tmp['first_name'] = $user['User']['first_name'];
-                $ret[] = $tmp;
-            }
-            $this->set('statusCode', 'HTTP/1.1 201 Created');
-            $this->set('user', $ret);
-            $this->render('users');
-        }
-    }
-
     /* A quick mockup for handling group enrolment. special cases are not
      * considered. It's only used for testing b2.
      * Please implement it with correct error handling and optimization.
@@ -919,5 +888,69 @@ class V1Controller extends Controller {
         $this->set('statusCode', $statusCode);
         $this->set('user', $ret);
         $this->render('users');
+    }
+
+    /**
+     * Enrol users in courses
+     */
+    public function enrolment() {
+        $courseId = $this->params['course_id'];
+
+        // Get request, just return a list of users
+        if ($this->RequestHandler->isGet()) {            
+            $students = $this->User->getEnrolledStudents($courseId);
+            $instructors = $this->User->getInstructorsByCourse($courseId);
+            $tutors = $this->User->getTutorsByCourse($courseId);
+
+            $ret = array_merge($students, $instructors, $tutors);
+            $users = array();
+            foreach ($ret as $entry) {
+                $user = array(
+                    'id' => $entry['User']['id'],
+                    'role_id' => $entry['Role']['0']['id'],
+                    'username' => $entry['User']['username']
+                );
+                $users[] = $user;
+            }
+            $this->set('statusCode', 'HTTP/1.1 200 OK');
+            $this->set('enrolment', $users);
+            return;
+        }
+        // Post request, add user to course
+        // if user already in course, count as successful
+        // if user failed save, stop execution and return an error
+        //
+        else if ($this->RequestHandler->isPost()) {
+            $this->set('statusCode', 'HTTP/1.1 200 OK');
+            $input = trim(file_get_contents('php://input'), true);
+            $users = json_decode($input, true);
+            foreach ($users as $user) {
+                $userId = $this->User->field('id', 
+                    array('username' => $user['username']));
+                $role = $this->Role->getRoleName($user['role_id']);
+                $table = null;
+                if ($role == 'student') {
+                    $ret = $this->User->addStudent($userId, $courseId);
+                }
+                else if ($role == 'instructor') {
+                    $ret = $this->User->addInstructor($userId, $courseId);
+                }
+                else if ($role == 'tutor') {
+                    $ret = $this->User->addTutor($userId, $courseId);
+                }
+                else {
+                    $this->set('statusCode', 
+                        'HTTP/1.1 501 Unsupported role for '.$user['username']);
+                    break;
+                }
+                if (!$ret) {
+                    $this->set('statusCode', 
+                        'HTTP/1.1 501 Fail to enrol ' . $user['username']);
+                    break;
+                }
+            }
+            $this->set('enrolment', $users);
+            return;
+        }
     }
 }

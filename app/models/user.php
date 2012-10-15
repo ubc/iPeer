@@ -299,9 +299,52 @@ class User extends AppModel
      * */
     function getEnrolledStudents($course_id)
     {
-        return $this->find('all', array('conditions' => array('Enrolment.id' => $course_id),
-            'fields' => 'User.*',
-            'order' => 'User.student_no'));
+        return $this->find(
+            'all', 
+            array(
+                'conditions' => array('Enrolment.id' => $course_id),
+                'fields' => 'User.*',
+                'order' => 'User.student_no'
+            )
+        );
+    }
+
+    /**
+     * Get student enrolled in a course
+     *
+     * @param int $course_id course id
+     *
+     * @access public
+     * @return students enrolled in a course
+     * */
+    function getInstructorsByCourse($course_id)
+    {
+        return $this->find(
+            'all', 
+            array(
+                'conditions' => array('Course.id' => $course_id),
+                'fields' => 'User.*',
+            )
+        );
+    }
+
+    /**
+     * Get student enrolled in a course
+     *
+     * @param int $course_id course id
+     *
+     * @access public
+     * @return students enrolled in a course
+     * */
+    function getTutorsByCourse($course_id)
+    {
+        return $this->find(
+            'all', 
+            array(
+                'conditions' => array('Tutor.id' => $course_id),
+                'fields' => 'User.*',
+            )
+        );
     }
 
     /**
@@ -634,6 +677,68 @@ class User extends AppModel
         return $roles;
     }
 
+    /**
+     * Add Student to course
+     *
+     * Note that duplicates should be prevented by SQL constraints
+     * but can't be tested in test cases cause the fixtures
+     * doesn't duplicate that functionality.
+     *
+     * @param int $user_id the user being enrolled
+     * @param int $course_id the course to be enrolled in
+     *
+     * @return true on success, false on failure
+     */
+    public function addStudent($user_id, $course_id)
+    {
+        $newEntry = array();
+        $newEntry['UserEnrol']['course_id'] = $course_id;
+        $newEntry['UserEnrol']['user_id'] = $user_id;
+        $newEntry['UserEnrol']['record_status'] = 'A';
+        return $this->UserEnrol->save($newEntry);
+    }
+
+    /**
+     * Add instructor to course
+     *
+     * Note that duplicates should be prevented by SQL constraints
+     * but can't be tested in test cases cause the fixtures
+     * doesn't duplicate that functionality.
+     *
+     * @param int $user_id the user being enrolled
+     * @param int $course_id the course to be enrolled in
+     *
+     * @return true on success, false on failure
+     */
+    public function addInstructor($user_id, $course_id)
+    {
+        $newEntry = array();
+        $newEntry['UserCourse']['course_id'] = $course_id;
+        $newEntry['UserCourse']['user_id'] = $user_id;
+        $newEntry['UserCourse']['record_status'] = 'A';
+        return $this->UserCourse->save($newEntry);
+    }
+
+    /**
+     * Add tutor to course
+     *
+     * Note that duplicates should be prevented by SQL constraints
+     * but can't be tested in test cases cause the fixtures
+     * doesn't duplicate that functionality.
+     *
+     * @param int $user_id the user being enrolled
+     * @param int $course_id the course to be enrolled in
+     *
+     * @return true on success, false on failure
+     */
+    public function addTutor($user_id, $course_id)
+    {
+        $newEntry = array();
+        $newEntry['UserTutor']['course_id'] = $course_id;
+        $newEntry['UserTutor']['user_id'] = $user_id;
+        $newEntry['UserTutor']['record_status'] = 'A';
+        return $this->UserTutor->save($newEntry);
+    }
 
     /*********************************
      * Static functions

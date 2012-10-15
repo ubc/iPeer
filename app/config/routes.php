@@ -71,6 +71,10 @@ if (file_exists(CONFIGS.'installed.txt')) {
   Router::connect('/:controller/courses/:course_id/events/:event_id',
     array('action' => 'events', 'event_id' => null),
     array('course_id' => '[0-9]+', 'event_id' => '[0-9]+'));
+  // Connect to course enrolment
+  Router::connect('/:controller/courses/:course_id/users',
+    array('action' => 'enrolment'),
+    array('course_id' => '[0-9]+'));
   // Connect url to grades api
   Router::connect('/:controller/courses/:course_id/events/:event_id/grades/:user_id',
     array('action' => 'grades', 'user_id' => null),
@@ -86,7 +90,6 @@ if (file_exists(CONFIGS.'installed.txt')) {
   Router::connect('/:controller/courses/:course_id/users/:username/events',
     array('action' => 'userEvents'),
     array('course_id' => '[0-9]+'));
-
 } else {
   // Note, order of routes specified matters. If install didn't come first
   // the /* directive would just redirect every page to the index page
