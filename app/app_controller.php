@@ -22,13 +22,24 @@ App::import('Model', 'User');
 class AppController extends Controller
 {
     public $startpage  = 'pages';
-    public $uses       = array('User', 'SysParameter');
+    public $uses       = array('User', 'SysParameter', 'OauthToken');
     public $components = array('Session', 'Output', 'sysContainer',
         'userPersonalize', 'framework', 'Guard.Guard', 'Acl',
         'AccessControl', 'Email');
     public $helpers    = array('Session', 'Html', 'Js');
     public $access     = array ();
     public $actionList = array ();
+
+    /**
+     * if this request has session transfer data
+     */
+    public $isSessionTransfer = false;
+
+    /**
+     * session transfer data
+     */
+    public $sessionTransferData = array();
+
 
     /* protected __construct() {{{ */
     /**
@@ -162,4 +173,84 @@ class AppController extends Controller
         return $this->Email->send($content);
     }
     /* }}} */
+
+    /**
+     * beforeLogin callback, called every time in auth compoment
+     */
+    public function beforeLogin() {
+        // if we have a session transfered to us
+        if ($this->hasSessionTransferData()) {
+            if ($this->authenticateWithSessionTransferData()) {
+                if (method_exists($this, 'afterLogin')) {
+                    $this->afterLogin();
+                }
+                return true;
+            } else {
+                $this->Session->setFlash($this->Auth->loginError, $this->Auth->flashElement, array(), 'auth');
+                return false;
+            }
+        }
+    }
+
+    /**
+     * afterLogin callback, called when logging in successfully
+     *
+     * @access public
+     * @return void
+     */
+    public function afterLogin()
+    {
+        if ($this->Auth->isAuthorized()) {
+            User::getInstance($this->Auth->user());
+            // after login stuff
+            $this->AccessControl->getPermissions();
+            $this->User->loadRoles(User::get('id'));
+            //TODO logging!
+        }
+
+        $redirect = $this->Auth->redirect();
+        if (isset($this->params['url']['redirect'])) {
+            $redirect = $this->params['url']['redirect'];
+        }
+
+        $this->redirect($redirect);
+    }
+
+    /**
+     * afterLogout callback, clean up after logout
+     *
+     * @access public
+     * @return void
+     */
+    function afterLogout()
+    {
+        $this->Session->destroy();
+    }
+
+    function hasSessionTransferData() {
+        $params = $this->params['url'];
+        if (isset($params['username']) && isset($params['timestamp']) && isset($params['token']) && isset($params['signature'])) {
+            $this->isSessionTransfer = true;
+            $this->sessionTransferData = $params;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    function authenticateWithSessionTransferData() {
+        $message = $this->sessionTransferData['username'].$this->sessionTransferData['timestamp'].$this->sessionTransferData['token'];
+        $secret = $this->OauthToken->getTokenSecret($this->sessionTransferData['token']);
+        $signature = base64_encode(hash_hmac('sha1', $message, $secret, true));
+        if ($signature == $this->sessionTransferData['signature']) {
+            $user = $this->User->findByUsername($this->sessionTransferData['username']);
+            $this->Session->write($this->Auth->sessionKey, $user);
+            $loggedIn = true;
+            return true;
+        }
+
+        Debugger::log('Invalid signature! Expect '.$signature.', Got '.$this->sessionTransferData['signature']);
+        return false;
+    }
 }

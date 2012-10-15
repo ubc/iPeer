@@ -691,7 +691,6 @@ class User extends AppModel
     function get($path)
     {
         $_user =& User::getInstance();
-
         $path = str_replace('.', '/', $path);
         if (strpos($path, 'User') !== 0) {
             $path = sprintf('User/%s', $path);

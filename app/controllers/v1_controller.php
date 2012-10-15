@@ -126,7 +126,7 @@ class V1Controller extends Controller {
             return false;
         }
         $clientSecret = rawurlencode($clientSecret);
-        $tokenSecret = $this->_getTokenSecret($_REQUEST['oauth_token']);
+        $tokenSecret = $this->OauthToken->getTokenSecret($_REQUEST['oauth_token']);
         if (is_null($tokenSecret)) {
             $this->set('oauthError', "Invalid Token");
             $this->render('oauth_error');
@@ -223,25 +223,6 @@ class V1Controller extends Controller {
         return null;
     }
 
-    /**
-     * Retrieve the token credential secret based on the key. The token
-     * credential identifies the resource owner (user).
-     *
-     * @param mixed $key - identifier for the secret.
-     *
-     * @return The secret if found, null if not.
-     */
-    private function _getTokenSecret($key) {
-        $ret = $this->OauthToken->findByKey($key);
-        if (!empty($ret)) {
-            if ($ret['OauthToken']['enabled'] &&
-                strtotime($ret['OauthToken']['expires']) > time()
-            ) {
-                return $ret['OauthToken']['secret'];
-            }
-        }
-        return null;
-    }
 
     /**
      * beforeFilter

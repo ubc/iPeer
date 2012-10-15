@@ -56,9 +56,9 @@ if (file_exists(CONFIGS.'installed.txt')) {
   Router::connect('/tests', array('controller' => 'tests',
     'action' => 'index'));
   // Authentication routes
-  Router::connect('/login', array('controller' => 'users',
+  Router::connect('/login', array('plugin' => 'guard', 'controller' => 'guard',
     'action' => 'login'));
-  Router::connect('/logout', array('controller' => 'users',
+  Router::connect('/logout', array('plugin' => 'guard', 'controller' => 'guard',
     'action' => 'logout'));
   // Connect url to groups api
   Router::connect('/:controller/courses/:course_id/groups/:group_id',

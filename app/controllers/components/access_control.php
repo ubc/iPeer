@@ -173,7 +173,7 @@ class AccessControlComponent extends Object
         }
         return $roles;
     }
-    
+
    /**
     * getViewableRoles
     *

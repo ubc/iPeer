@@ -54,4 +54,24 @@ class OauthToken extends AppModel {
             'order' => ''
         )
     );
+
+    /**
+     * Retrieve the token credential secret based on the key. The token
+     * credential identifies the resource owner (user).
+     *
+     * @param mixed $key - identifier for the secret.
+     *
+     * @return The secret if found, null if not.
+     */
+    public function getTokenSecret($key) {
+        $ret = $this->findByKey($key);
+        if (!empty($ret)) {
+            if ($ret['OauthToken']['enabled'] &&
+                strtotime($ret['OauthToken']['expires']) > time()
+            ) {
+                return $ret['OauthToken']['secret'];
+            }
+        }
+        return null;
+    }
 }
