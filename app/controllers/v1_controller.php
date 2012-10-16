@@ -566,6 +566,68 @@ class V1Controller extends Controller {
         }
 
     }
+    
+    /**
+     * get, add, and delete group members from a group
+    **/
+    public function groupMembers() {
+        $groupId = $this->params['group_id'];
+        $userId = $this->params['user_id'];
+        
+        if ($this->RequestHandler->isGet()) {
+            $userIds = $this->GroupsMembers->find('list', array(
+                'conditions' => array('group_id' => $groupId),
+                'fields' => array('user_id')));
+        
+            $users = $this->User->find('all', array('conditions' => array('User.id' => $userIds)));
+            
+            $groupMembers = array();
+            foreach ($users as $user) {
+                $tmp = array();
+                $tmp['id'] = $user['User']['id'];
+                $tmp['role_id'] = $user['Role']['0']['id'];
+                $tmp['username'] = $user['User']['username'];
+                $tmp['last_name'] = $user['User']['last_name'];
+                $tmp['first_name'] = $user['User']['first_name'];
+                $groupMembers[] = $tmp;
+            }
+            
+            if(empty($groupMembers)) {
+                $this->set('statusCode', 'HTTP/1.1 404 Not Found');
+                $this->set('groupMembers', null);
+            } else {
+                $this->set('statusCode', 'HTTP/1.1 200 OK');
+                $this->set('groupMembers', $groupMembers);
+            }
+        // return all user ids or only the ones newly added?
+        } else if ($this->RequestHandler->isPost()) {
+            $add = trim(file_get_contents('php://input'), true);
+            $users = json_decode($add, true);
+            
+            if ($this->Group->habtmAdd('Member', $groupId, $users)) {
+                $groupMembers = $this->GroupsMembers->find('list', array(
+                    'conditions' => array('group_id' => $groupId, 'user_id' => $users),
+                    'fields' => array('user_id')
+                ));
+                $this->set('statusCode', 'HTTP/1.1 201 Created');
+                $this->set('groupMembers', array_values($groupMembers));
+            } else {
+                $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
+                $this->set('groupMembers', null);
+            }
+        } else if ($this->RequestHandler->isDelete()) {
+            if ($this->Group->habtmDelete('Member', $groupId, $userId)) {
+                $this->set('statusCode', 'HTTP/1.1 204 No Content');
+                $this->set('groupMembers', null);
+            } else {
+                $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
+                $this->set('groupMembers', null);
+            }
+        } else {
+            $this->set('statusCode', 'HTTP/1.1 400 Bad Request');
+            $this->set('groupMembers', null);        
+        }
+    }
 
     /**
      * Get a list of events in iPeer.

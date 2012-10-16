@@ -405,6 +405,34 @@ class V1ControllerTest extends CakeTestCase {
         $ret = $this->_oauthReq("$url/2/groups/$id");
         $this->assertEqual(substr($ret->debugInfo['headers_recv'], 0, 22), 'HTTP/1.1 404 Not Found');
     }
+    
+    public function testGroupMembers()
+    {
+        $url = Router::url('v1/groups/1/users', true);
+        
+        // 5,6,7,35
+        $expectedGroup = array(
+            array('id' => '5', 'role_id' => '5', 'username' => '65498451', 'last_name' => 'Student', 'first_name' => 'Ed'),
+            array('id' => '6', 'role_id' => '5', 'username' => '65468188', 'last_name' => 'Student', 'first_name' => 'Alex'),
+            array('id' => '7', 'role_id' => '5', 'username' => '98985481', 'last_name' => 'Student', 'first_name' => 'Matt'),
+            array('id' => '35', 'role_id' => '4', 'username' => 'tutor1', 'last_name' => '1', 'first_name' => 'Tutor')
+        );
+        
+        $actualGroup = $this->_oauthReq("$url");
+        $this->assertEqual(json_decode($actualGroup, true), $expectedGroup);
+        
+        $toBeAdded = array('8', '9', '10');
+        $addedMembers = $this->_oauthReq("$url", json_encode($toBeAdded), OAUTH_HTTP_METHOD_POST);
+        
+        $this->assertEqual(json_decode($addedMembers, true), $toBeAdded);
+        
+        $this->_oauthReq("$url/8", null, OAUTH_HTTP_METHOD_DELETE);
+        $this->_oauthReq("$url/9", null, OAUTH_HTTP_METHOD_DELETE);
+        $this->_oauthReq("$url/10", null, OAUTH_HTTP_METHOD_DELETE);
+        
+        $ret = $this->_oauthReq("$url");
+        $this->assertEqual(json_decode($ret, true), $expectedGroup);
+    }
 
     public function testEvents()
     {
@@ -531,7 +559,7 @@ class V1ControllerTest extends CakeTestCase {
     
     function testUsersEvents()
     {
-        $url = Router::url('v1/users/edward/events', true);
+        $url = Router::url('v1/users/65498451/events', true);
         $expectedEvents = array(
             array(
                 'title' => 'Term 1 Evaluation',
@@ -556,7 +584,7 @@ class V1ControllerTest extends CakeTestCase {
         $actualEvents = $this->_oauthReq("$url");
         $this->assertEqual($expectedEvents, json_decode($actualEvents, true));
         
-        $url = Router::url('v1/courses/1/users/edward/events', true);
+        $url = Router::url('v1/courses/1/users/65498451/events', true);
         $courseUserEvents = $this->_oauthReq("$url");
         $this->assertEqual($expectedEvents, json_decode($courseUserEvents, true));
     }

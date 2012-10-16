@@ -79,17 +79,23 @@ if (file_exists(CONFIGS.'installed.txt')) {
   Router::connect('/:controller/courses/:course_id/events/:event_id/grades/:user_id',
     array('action' => 'grades', 'user_id' => null),
     array('course_id' => '[0-9]+', 'event_id' => '[0-9]+', 'user_id' => '[0-9]+'));
+  // Connect url to courses/departments api
   Router::connect('/:controller/courses/:course_id/departments/:department_id',
     array('action'=> 'courseDepartments'),
     array('course_id' => '[0-9]+', 'department_id' => '[0-9]+'));
   Router::connect('/:controller/courses/:course_id/users',
     array('action' => 'userCourse'),
     array('course_id' => '[0-9]+'));
+  // Connect url to users/events api
   Router::connect('/:controller/users/:username/events',
     array('action' => 'userEvents'));
+  // connect url to users/events/course api
   Router::connect('/:controller/courses/:course_id/users/:username/events',
     array('action' => 'userEvents'),
     array('course_id' => '[0-9]+'));
+  Router::connect('/:controller/groups/:group_id/users/:user_id',
+    array('action' => 'groupMembers', 'user_id' => null),
+    array('group_id' => '[0-9]+', 'user_id' => '[0-9]+'));
 } else {
   // Note, order of routes specified matters. If install didn't come first
   // the /* directive would just redirect every page to the index page
