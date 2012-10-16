@@ -41,6 +41,11 @@
 	 <exec executable="php" dir="${project.basedir}/build/sqlclean">
 		 <arg value="clean.php" />
 	 </exec>
+	 <!-- Needed to enable the API controller tests -->
+	 <!-- make ipeer seem to be installed -->
+	 <touch file="${project.basedir}/app/config/installed.txt" />
+	 <!-- let Apache write to cache -->
+	 <exec command="chmod -R 666 ${project.basedir}/app/tmp"/>
  </target>
 
  <target name="lint">

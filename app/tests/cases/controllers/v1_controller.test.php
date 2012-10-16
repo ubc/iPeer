@@ -89,8 +89,19 @@ class V1ControllerTest extends CakeTestCase {
         return $ret;
     }
 
+    /**
+     * helper function to get test cases running in cli on Jenkins
+     **/
+    private function _getURL($path) {
+        $url = Router::url($path, true);
+        if (substr($url,0,4) != "http") {
+            return "http://localhost:2000/$path";
+        }
+        return $url;
+    }
+
     public function testCheckRequiredParams() {
-        $url = Router::url('v1/oauth', true);
+        $url = $this->_getURL('v1/oauth');
         // Test required parameters checking
         // missing oauth_consumer_key
         $params = "oauth_signature_method=HMAC-SHA1&oauth_nonce=7&oauth_timestamp=1&oauth_version=1.0&oauth_token=1&oauth_signature=4";
@@ -137,7 +148,7 @@ class V1ControllerTest extends CakeTestCase {
     }
 
     public function testCheckSignature() {
-        $url = Router::url('v1/oauth', true);
+        $url = $this->_getURL('v1/oauth');
 
         // No errors thrown
         $this->assertEqual('', $this->_oauthReq($url));
@@ -174,7 +185,7 @@ class V1ControllerTest extends CakeTestCase {
     }
 
     public function testCheckNonce() {
-        $url = Router::url('v1/oauth', true);
+        $url = $this->_getURL('v1/oauth');
         // invalid timestamp 
         $oauth = $this->_oauthReq($url, null, null, null, 1344974674);
         $this->assertEqual(
@@ -191,7 +202,7 @@ class V1ControllerTest extends CakeTestCase {
 
     public function testUsers()
     {
-        $url = Router::url('v1/users', true);
+        $url = $this->_getURL('v1/users');
         // GET - all users
         $users = $this->_fixtures['app.user']->records;
         $expected = array();
@@ -285,7 +296,7 @@ class V1ControllerTest extends CakeTestCase {
 
     /*public function testCourses()
     {
-        $url = Router::url('v1/courses', true);
+        $url = $this->_getURL('v1/courses');
         $courses = $this->_fixtures['app.course']->records;
         $expectedList = array();
 
@@ -339,7 +350,7 @@ class V1ControllerTest extends CakeTestCase {
     }*/
 
     public function testGroups() {
-        $url = Router::url('v1/courses', true);
+        $url = $this->_getURL('v3/courses');
         // GET - list of groups in course
         $expected = array();
         $groups = $this->_fixtures['app.group']->records;
@@ -408,7 +419,7 @@ class V1ControllerTest extends CakeTestCase {
     
     public function testGroupMembers()
     {
-        $url = Router::url('v1/groups/1/users', true);
+        $url = $this->_getURL('v1/groups/1/users');
         
         // 5,6,7,35
         $expectedGroup = array(
@@ -436,7 +447,7 @@ class V1ControllerTest extends CakeTestCase {
 
     public function testEvents()
     {
-        $url = Router::url('v1/courses', true);
+        $url = $this->_getURL('v1/courses');
         $events = $this->_fixtures['app.event']->records;
 
         $expectedEvents = array();
@@ -464,7 +475,7 @@ class V1ControllerTest extends CakeTestCase {
     
     public function testGrades()
     {
-        $url = Router::url('v1/courses/1/events', true);
+        $url = $this->_getURL('v1/courses/1/events');
         $events = $this->_fixtures['app.event']->records;
         $mixevals = $this->_fixtures['app.evaluation_mixeval']->records;
         $rubrics = $this->_fixtures['app.evaluation_rubric']->records;
@@ -525,7 +536,7 @@ class V1ControllerTest extends CakeTestCase {
 
     
     public function testDepartments() {
-        $url = Router::url('v1/departments', true);
+        $url = $this->_getURL('v1/departments');
         
         $expectedDepartments = array(
             array('id' => '1', 'name' => 'MECH'),
@@ -542,7 +553,7 @@ class V1ControllerTest extends CakeTestCase {
     }
     
     public function testCourseDepartments() {
-        $url = Router::url('v1/courses/1/departments', true);
+        $url = $this->_getURL('v1/courses/1/departments');
         
         // POST - Add a course to a department
         $file = $this->_oauthReq("$url/2", '', OAUTH_HTTP_METHOD_POST);
@@ -559,7 +570,7 @@ class V1ControllerTest extends CakeTestCase {
     
     function testUsersEvents()
     {
-        $url = Router::url('v1/users/65498451/events', true);
+        $url = $this->_getURL('v1/users/65498451/events');
         $expectedEvents = array(
             array(
                 'title' => 'Term 1 Evaluation',
@@ -584,14 +595,14 @@ class V1ControllerTest extends CakeTestCase {
         $actualEvents = $this->_oauthReq("$url");
         $this->assertEqual($expectedEvents, json_decode($actualEvents, true));
         
-        $url = Router::url('v1/courses/1/users/65498451/events', true);
+        $url = $this->_getURL('v1/courses/1/users/65498451/events');
         $courseUserEvents = $this->_oauthReq("$url");
         $this->assertEqual($expectedEvents, json_decode($courseUserEvents, true));
     }
 
     function testEnrolments() {
         // Get the ids of students enrolled in course id 3
-        $url = Router::url('v1/courses/3/users', true);
+        $url = $this->_getURL('v1/courses/3/users');
         $actual = $this->_oauthReq("$url");
         $expected = array(
             array('id' => '8', 'role_id' => '5', 'username' => '16585158'),
