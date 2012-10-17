@@ -604,19 +604,25 @@ class V1Controller extends Controller {
             $add = trim(file_get_contents('php://input'), true);
             $users = json_decode($add, true);
             
-            if ($this->Group->habtmAdd('Member', $groupId, $users)) {
-                $groupMembers = $this->GroupsMembers->find('list', array(
-                    'conditions' => array('group_id' => $groupId, 'user_id' => $users),
-                    'fields' => array('user_id')
-                ));
-                $this->set('statusCode', 'HTTP/1.1 201 Created');
-                $this->set('groupMembers', array_values($groupMembers));
-            } else {
-                $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
-                $this->set('groupMembers', null);
+            $groupMembers = array();
+            foreach ($users as $user) {
+                $tmp = array();
+                $tmp = array('group_id' => $groupId, 'user_id' => $user);
+                
+                $statusCode = 'HTTP/1.1 200 OK';
+                if ($this->GroupsMembers->save($tmp)) {
+                    $userId = $this->GroupsMembers->read('user_id');
+                    $this->GroupsMembers->id = null;
+                    $groupMembers[] = $userId['GroupsMembers']['user_id'];
+                } else {
+                    $statusCode = 'HTTP/1.1 500 Internal Server Error';
+                }
             }
+            $this->set('statusCode', $statusCode);
+            $this->set('groupMembers', $groupMembers);
         } else if ($this->RequestHandler->isDelete()) {
-            if ($this->Group->habtmDelete('Member', $groupId, $userId)) {
+            $gm = $this->GroupsMembers->find('first', array('conditions' => array('user_id' => $userId, 'group_id' => $groupId)));
+            if ($this->GroupsMembers->delete($gm['GroupsMembers']['id'])) {
                 $this->set('statusCode', 'HTTP/1.1 204 No Content');
                 $this->set('groupMembers', null);
             } else {
