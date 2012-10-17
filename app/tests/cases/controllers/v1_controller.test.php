@@ -350,7 +350,7 @@ class V1ControllerTest extends CakeTestCase {
     }*/
 
     public function testGroups() {
-        $url = $this->_getURL('v3/courses');
+        $url = $this->_getURL('v1/courses');
         // GET - list of groups in course
         $expected = array();
         $groups = $this->_fixtures['app.group']->records;
