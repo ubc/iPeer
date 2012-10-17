@@ -76,13 +76,10 @@ if (file_exists(CONFIGS.'installed.txt')) {
   Router::connect('/:controller/courses/:course_id/events/:event_id/grades/:user_id',
     array('action' => 'grades', 'user_id' => null),
     array('course_id' => '[0-9]+', 'event_id' => '[0-9]+', 'user_id' => '[0-9]+'));
-  // Connect url to courses/departments api
+  // Connect url to departments api
   Router::connect('/:controller/courses/:course_id/departments/:department_id',
     array('action'=> 'courseDepartments'),
     array('course_id' => '[0-9]+', 'department_id' => '[0-9]+'));
-  Router::connect('/:controller/courses/:course_id/users',
-    array('action' => 'userCourse'),
-    array('course_id' => '[0-9]+'));
   // Connect url to users/events api
   Router::connect('/:controller/users/:username/events',
     array('action' => 'userEvents'));
