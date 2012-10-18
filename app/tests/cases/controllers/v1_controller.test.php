@@ -76,16 +76,20 @@ class V1ControllerTest extends CakeTestCase {
     }
 
     private function _req($url) {
-        $opts = array(
-            'http' => array(
-                'method' => "GET",
-                'header' => array('Content-type: application/json'),
-                'ignore_errors' => true
-            )
+        // Initializing curl
+        $ch = curl_init( $url );
+
+        // Configuring curl options
+        $options = array(
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => array('Content-type: application/json') ,
         );
 
-        $context = stream_context_create($opts);
-        $ret = @file_get_contents($url, false, $context);
+        // Setting curl options
+        curl_setopt_array( $ch, $options );
+
+        // Getting results
+        $ret = curl_exec($ch); // Getting jSON result string
         return $ret;
     }
 
