@@ -5,7 +5,7 @@
         depends="prepare,lint,phploc,pdepend,phpmd,phpcs,phpcpd,phpdoc,test,phpcb"/>
 
     <target name="build-ci"
-        depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpdoc,test-ci,phpcb"/>
+        depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpdoc,test-ci-models,test-ci-controllers,phpcb"/>
     <!-- <target name="build-parallel"
    depends="prepare,lint,tools-parallel,phpunit,phpcb"/>
 
@@ -187,7 +187,7 @@
      </reflexive>
  </target>
 
- <target name="test-ci" description="Run unit tests for continuous integration(output as xml)">
+ <target name="test-ci-models" description="Run unit tests for continuous integration(output as xml)">
      <copy file="app/config/database.php.default" tofile="app/config/database.php" overwrite="true"/>
      <chmod file="app/tmp" mode="0777"/>
      <reflexive file="app/config/core.php">
@@ -199,6 +199,26 @@
      </reflexive>
      <exec command="cake/console/cake -connection test schema_ci create DbAcl" passthru="true"/>
      <exec command="cake/console/cake -connection test testreport app group model" passthru="true"/>
+     <reflexive file="app/config/core.php">
+         <filterchain>
+             <replaceregexp>
+                 <regexp pattern="'Acl.database', 'test'" replace="'Acl.database', 'default'"/>
+             </replaceregexp>
+         </filterchain>
+     </reflexive>
+ </target>
+
+ <target name="test-ci-controllers" description="Run unit tests for continuous integration(output as xml)">
+     <copy file="app/config/database.php.default" tofile="app/config/database.php" overwrite="true"/>
+     <chmod file="app/tmp" mode="0777"/>
+     <reflexive file="app/config/core.php">
+         <filterchain>
+             <replaceregexp>
+                 <regexp pattern="'Acl.database', 'default'" replace="'Acl.database', 'test'"/>
+             </replaceregexp>
+         </filterchain>
+     </reflexive>
+     <exec command="cake/console/cake -connection test schema_ci create DbAcl" passthru="true"/>
 	 <exec command="cake/console/cake testreport app case controllers/v1_controller" passthru="true"/>
      <reflexive file="app/config/core.php">
          <filterchain>

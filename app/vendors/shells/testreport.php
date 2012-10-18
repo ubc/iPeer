@@ -85,8 +85,9 @@ class TestReportShell extends TestSuiteShell
         $XSL->load(dirname(__FILE__).DS.'xsl'.DS.'to-junit.xsl');
         $xslt->importStylesheet($XSL);
         $out = $xslt->transformToXML($xmlD);
+        $time = time();
 
-        file_put_contents(ROOT . DS . "build" . DS . "logs" . DS . "junit.xml", $out);
+        file_put_contents(ROOT . DS . "build" . DS . "logs" . DS . "junit-$time.xml", $out);
         echo "Done.\n";
     }
 
