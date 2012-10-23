@@ -230,9 +230,7 @@ class V1ControllerTest extends CakeTestCase {
         }
 
         $ret = $this->_oauthReq($url);
-        debug(json_decode($ret, true));
-        //$this->assertEqual($ret, json_encode($expected));
-        //$this->assertEqual(json_decode($ret, true), $expected);
+        $this->assertEqual(json_decode($ret, true), $expected);
 
         // GET - specific user
         $expectedPerson = array(
@@ -298,7 +296,7 @@ class V1ControllerTest extends CakeTestCase {
         $this->assertEqual(substr($ret->debugInfo['headers_recv'], 0, 22), 'HTTP/1.1 404 Not Found');
     }
 
-    /*public function testCourses()
+    public function testCourses()
     {
         $url = $this->_getURL('v1/courses');
         $courses = $this->_fixtures['app.course']->records;
@@ -350,8 +348,8 @@ class V1ControllerTest extends CakeTestCase {
         $file = $this->_oauthReq("$url/$id", null, OAUTH_HTTP_METHOD_DELETE);
 
         $ret = $this->_oauthReq("$url/$id");
-        $this->assertEqual($ret, '');
-    }*/
+        $this->assertEqual(substr($ret->debugInfo['headers_recv'], 0, 22), 'HTTP/1.1 404 Not Found');
+    }
 
     public function testGroups() {
         $url = $this->_getURL('v1/courses');

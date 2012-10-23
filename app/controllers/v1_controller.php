@@ -266,7 +266,6 @@ class V1Controller extends Controller {
                         $tmp['first_name'] = $user['User']['first_name'];
                         $data[] = $tmp;
                     }
-                    $data = $_REQUEST;
                     $statusCode = 'HTTP/1.1 200 OK';
                 } else {
                     $statusCode = 'HTTP/1.1 404 Not Found';
