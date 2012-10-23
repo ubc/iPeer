@@ -678,7 +678,7 @@ class User extends AppModel
     }
 
     /**
-     * Add Student to course
+     * Add student to course
      *
      * Note that duplicates should be prevented by SQL constraints
      * but can't be tested in test cases cause the fixtures
@@ -696,6 +696,21 @@ class User extends AppModel
         $newEntry['UserEnrol']['user_id'] = $user_id;
         $newEntry['UserEnrol']['record_status'] = 'A';
         return $this->UserEnrol->save($newEntry);
+    }
+
+    /**
+     * Remove student from course
+     *
+     * @param int $user_id the user being dropped
+     * @param int $course_id the course to be dropped from
+     *
+     * @return true on success, false on failure
+     */
+    public function removeStudent($user_id, $course_id)
+    {
+        $id = $this->UserEnrol->field('id', 
+            array('user_id' => $user_id, 'course_id' => $course_id));
+        return $this->UserEnrol->delete($id);
     }
 
     /**
@@ -720,6 +735,21 @@ class User extends AppModel
     }
 
     /**
+     * Remove instructor from course
+     *
+     * @param int $user_id the user being dropped
+     * @param int $course_id the course to be dropped from
+     *
+     * @return true on success, false on failure
+     */
+    public function removeInstructor($user_id, $course_id)
+    {
+        $id = $this->UserCourse->field('id', 
+            array('user_id' => $user_id, 'course_id' => $course_id));
+        return $this->UserCourse->delete($id);
+    }
+
+    /**
      * Add tutor to course
      *
      * Note that duplicates should be prevented by SQL constraints
@@ -738,6 +768,21 @@ class User extends AppModel
         $newEntry['UserTutor']['user_id'] = $user_id;
         $newEntry['UserTutor']['record_status'] = 'A';
         return $this->UserTutor->save($newEntry);
+    }
+
+    /**
+     * Remove tutor from course
+     *
+     * @param int $user_id the user being dropped
+     * @param int $course_id the course to be dropped from
+     *
+     * @return true on success, false on failure
+     */
+    public function removeTutor($user_id, $course_id)
+    {
+        $id = $this->UserTutor->field('id', 
+            array('user_id' => $user_id, 'course_id' => $course_id));
+        return $this->UserTutor->delete($id);
     }
 
     /*********************************

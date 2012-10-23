@@ -191,6 +191,36 @@ class UserTestCase extends CakeTestCase {
         // duplicate the constraints.
     }
 
+    function testRemoveStudent()
+    {
+        //Test remove student
+        $ret = $this->User->removeStudent(26, 1);
+        $this->assertTrue($ret); // operation successful
+        $user = $this->User->UserEnrol->field('id', 
+            array('user_id' => 26, 'course_id' => 1));
+        $this->assertFalse($user); // make sure user really is gone
+
+        //Test remove student twice
+        $ret = $this->User->removeStudent(26, 1);
+        $this->assertFalse($ret); // operation should fail
+
+        //Test remove student from wrong course
+        $ret = $this->User->removeStudent(27, 1);
+        $this->assertFalse($user); // operation should fail
+
+        //Test remove invalid student from  course
+        $ret = $this->User->removeStudent(999, 2);
+        $this->assertFalse($user); // operation should fail
+
+        //Test remove valid student from invalid course
+        $ret = $this->User->removeStudent(27, 999);
+        $this->assertFalse($user); // operation should fail
+
+        //Test remove invalid student from invalid course
+        $ret = $this->User->removeStudent(999, 999);
+        $this->assertFalse($ret);
+    }
+
     /*
      * Test adding an instructor to a course.
      */
@@ -204,6 +234,36 @@ class UserTestCase extends CakeTestCase {
         // duplicate the constraints.
     }
 
+    function testRemoveInstructor()
+    {
+        //Test remove instructor
+        $ret = $this->User->removeInstructor(4, 3);
+        $this->assertTrue($ret); // operation successful
+        $user = $this->User->UserCourse->field('id', 
+            array('user_id' => 4, 'course_id' => 3));
+        $this->assertFalse($user); // make sure user really is gone
+
+        //Test remove instructor twice
+        $ret = $this->User->removeInstructor(4, 3);
+        $this->assertFalse($ret); // operation should fail
+
+        //Test remove instructor from wrong course
+        $ret = $this->User->removeInstructor(4, 1);
+        $this->assertFalse($user); // operation should fail
+
+        //Test remove invalid instructor from  course
+        $ret = $this->User->removeInstructor(999, 2);
+        $this->assertFalse($user); // operation should fail
+
+        //Test remove valid instructor from invalid course
+        $ret = $this->User->removeInstructor(4, 999);
+        $this->assertFalse($user); // operation should fail
+
+        //Test remove invalid instructor from invalid course
+        $ret = $this->User->removeInstructor(999, 999);
+        $this->assertFalse($ret);
+    }
+
     /*
      * Test adding a tutor to a course.
      */
@@ -215,6 +275,36 @@ class UserTestCase extends CakeTestCase {
         // NOTE: Can't test failure cases as they're being
         // handled by SQL constraints and the fixtures don't
         // duplicate the constraints.
+    }
+
+    function testRemoveTutor()
+    {
+        //Test remove Tutor
+        $ret = $this->User->removeTutor(37, 3);
+        $this->assertTrue($ret); // operation successful
+        $user = $this->User->UserTutor->field('id', 
+            array('user_id' => 37, 'course_id' => 3));
+        $this->assertFalse($user); // make sure user really is gone
+
+        //Test remove Tutor twice
+        $ret = $this->User->removeTutor(37, 3);
+        $this->assertFalse($ret); // operation should fail
+
+        //Test remove Tutor from wrong course
+        $ret = $this->User->removeTutor(37, 1);
+        $this->assertFalse($user); // operation should fail
+
+        //Test remove invalid Tutor from  course
+        $ret = $this->User->removeTutor(999, 3);
+        $this->assertFalse($user); // operation should fail
+
+        //Test remove valid Tutor from invalid course
+        $ret = $this->User->removeTutor(37, 999);
+        $this->assertFalse($user); // operation should fail
+
+        //Test remove invalid Tutor from invalid course
+        $ret = $this->User->removeTutor(999, 999);
+        $this->assertFalse($ret);
     }
 
 	function testGetCourseTutorsForList() {

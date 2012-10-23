@@ -100,7 +100,7 @@ class LtiController extends AppController
             }
             // Remaining users in ipeerroster needs to be dropped
             foreach ($ipeerroster as $ipeeruser) {
-                $this->User->UserEnrol->removeStudentFromCourse(
+                $this->User->removeStudent(
                     $ipeeruser['User']['id'], $courseid);
             }
             // Remaining users in roster needs to be added

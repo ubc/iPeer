@@ -960,6 +960,8 @@ class V1Controller extends Controller {
      * Enrol users in courses
      */
     public function enrolment() {
+        $this->set('statusCode', 'HTTP/1.1 400 Unrecognizable Request');
+        $this->set('enrolment', null);
         $courseId = $this->params['course_id'];
 
         // Get request, just return a list of users
@@ -1012,6 +1014,38 @@ class V1Controller extends Controller {
                 if (!$ret) {
                     $this->set('statusCode', 
                         'HTTP/1.1 501 Fail to enrol ' . $user['username']);
+                    break;
+                }
+            }
+            $this->set('enrolment', $users);
+            return;
+        }
+        else if ($this->RequestHandler->isDelete()) {
+            $this->set('statusCode', 'HTTP/1.1 200 OK');
+            $input = trim(file_get_contents('php://input'), true);
+            $users = json_decode($input, true);
+            foreach ($users as $user) {
+                $userId = $this->User->field('id', 
+                    array('username' => $user['username']));
+                $role = $this->Role->getRoleName($user['role_id']);
+                $table = null;
+                if ($role == 'student') {
+                    $ret = $this->User->removeStudent($userId, $courseId);
+                }
+                else if ($role == 'instructor') {
+                    $ret = $this->User->removeInstructor($userId, $courseId);
+                }
+                else if ($role == 'tutor') {
+                    $ret = $this->User->removeTutor($userId, $courseId);
+                }
+                else {
+                    $this->set('statusCode', 
+                        'HTTP/1.1 501 Unsupported role for '.$user['username']);
+                    break;
+                }
+                if (!$ret) {
+                    $this->set('statusCode', 
+                        'HTTP/1.1 501 Fail to drop ' . $user['username']);
                     break;
                 }
             }

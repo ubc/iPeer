@@ -21,6 +21,7 @@ class UserEnrolTestCase extends CakeTestCase
     {
         echo "Start UserEnrol model test.\n";
         $this->UserEnrol = ClassRegistry::init('UserEnrol');
+        $this->User = ClassRegistry::init('User');
     }
 
     function endCase()
@@ -35,86 +36,24 @@ class UserEnrolTestCase extends CakeTestCase
     {
     }
 
-
-    function testRemoveStudentFromCourse()
-    {
-        //Test remove student
-        $this->UserEnrol->removeStudentFromCourse(26, 1);
-        $user = $this->UserEnrol->isEnrolledInByUsername('19524032', 1);
-        $this->assertFalse($user);
-
-        //Test remove student twice
-        $this->UserEnrol->removeStudentFromCourse(26, 1);
-        $user = $this->UserEnrol->isEnrolledInByUsername('19524032', 1);
-        $this->assertFalse($user);
-
-        //Test remove student from wrong course
-        $this->UserEnrol->removeStudentFromCourse(27, 1);
-        $user = $this->UserEnrol->isEnrolledInByUsername('40289059', 2);
-        $this->assertTrue($user);
-
-        //Test remove invalid student from  course
-        $this->UserEnrol->removeStudentFromCourse(999, 2);
-        $user = $this->UserEnrol->isEnrolledInByUsername('40289059', 2);
-        $this->assertTrue($user);
-
-        //Test remove valid student from invalid course
-        $this->UserEnrol->removeStudentFromCourse(27, 999);
-        $user = $this->UserEnrol->isEnrolledInByUsername('40289059', 2);
-        $this->assertTrue($user);
-
-        //Test remove invalid student from invalid course
-        $this->UserEnrol->removeStudentFromCourse(999, 999);
-        $user = $this->UserEnrol->isEnrolledInByUsername('40289059', 2);
-        $this->assertTrue($user);
-
-    }
-
-    function testIsEnrolledInByUsername()
-    {
-
-        //Test valid student enrolled in valid course
-        $user = $this->UserEnrol->isEnrolledInByUsername('88505045', 2);
-        $this->assertTrue($user);
-
-        //Test valid student enrolled not in valid course
-        $user = $this->UserEnrol->isEnrolledInByUsername('88505045', 3);
-        $this->assertFalse($user);
-
-        //Test invalid student and valid course
-        $user = $this->UserEnrol->isEnrolledInByUsername('invalid', 1);
-        $this->assertFalse($user);
-
-        //Test valid student and invalid course
-        $user = $this->UserEnrol->isEnrolledInByUsername('88505045', 9999);
-        $this->assertFalse($user);
-
-        //Test invalid student and invalid course
-        $user = $this->UserEnrol->isEnrolledInByUsername(9999, 9999);
-        $this->assertFalse($user);
-
-    }
-
     function testInsertCourses()
     {
-
         //Test insert valid student into valid courses
-        $this->UserEnrol->insertCourses(26, array(1,2));
-        $user = $this->UserEnrol->isEnrolledInByUsername('19524032', 1);
-        $this->assertTrue($user);
-        $user = $this->UserEnrol->isEnrolledInByUsername('19524032', 2);
-        $this->assertTrue($user);
+        $user = $this->User->UserEnrol->field('id', 
+            array('user_id' => 26, 'course_id' => 2));
+        $this->assertFalse($user);
+        $user = $this->User->UserEnrol->field('id', 
+            array('user_id' => 26, 'course_id' => 3));
+        $this->assertFalse($user);
 
-        //Test insert invalid student into valid course
-        $this->UserEnrol->insertCourses(999, array(1));
-        $user = $this->UserEnrol->isEnrolledInByUsername('19524032', 1);
-        $this->assertTrue($user);
+        $this->UserEnrol->insertCourses(26, array(2,3));
 
-        //Test insert invalid student into invalid course
-        $this->UserEnrol->insertCourses(9999, array(999));
-        $user = $this->UserEnrol->isEnrolledInByUsername('19524032', 1);
+        $user = $this->User->UserEnrol->field('id', 
+            array('user_id' => 26, 'course_id' => 2));
         $this->assertTrue($user);
-
+        $user = $this->User->UserEnrol->field('id', 
+            array('user_id' => 26, 'course_id' => 3));
+        $this->assertTrue($user);
     }
 
     function testGetEnrolledCourses()
@@ -125,7 +64,7 @@ class UserEnrolTestCase extends CakeTestCase
         $this->assertEqual(Set::extract('/UserEnrol/course_id', $courses), array(1,2));
 
         //Test valid user not enrolled in courses
-        $this->UserEnrol->removeStudentFromCourse(20, 2);
+        $this->User->removeStudent(20, 2);
         $courses = $this->UserEnrol->getEnrolledCourses(20);
         $this->assertEqual($courses, null);
         $this->UserEnrol->insertCourses(20, array(2));

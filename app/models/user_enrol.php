@@ -16,39 +16,6 @@ class UserEnrol extends AppModel
     public $belongsTo = array('User');
 
     /**
-     * Remove student from course
-     *
-     * @param int $user_id   user id
-     * @param int $course_id course id
-     *
-     * @access public
-     * @return void
-     */
-    function removeStudentFromCourse($user_id=null, $course_id=null)
-    {
-        $course_to_remove = $this->find('first', array(
-            'conditions' => array('course_id' => $course_id, 'user_id' => $user_id)
-        ));
-        return $this->delete($course_to_remove['UserEnrol']['id']);
-    }
-
-
-    /**
-     * Returns true if the username is enrolled in the course, and false if not.
-     *
-     * @param string $username username
-     * @param int    $courseId course id
-     *
-     * @return true if user is enrolled  in a course
-     */
-    function isEnrolledInByUsername($username, $courseId)
-    {
-        return $this->find('count', array(
-            'conditions' => array('UserEnrol.course_id' => $courseId, 'User.username' => $username)
-        ));
-    }
-
-    /**
      * Enroll user in courses
      *
      * @param int $user_id    user id

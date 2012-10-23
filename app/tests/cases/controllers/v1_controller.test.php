@@ -621,20 +621,38 @@ class V1ControllerTest extends CakeTestCase {
         
         // Add a student to a course
         $expected = array(array('username' => '81121651', 'role_id' => 5));
-        /*$actual = $this->_oauthReq(
+        $actual = $this->_oauthReq(
             $url, json_encode($expected), OAUTH_HTTP_METHOD_POST);
-        $this->assertEqual($expected, json_decode($actual, true));*/
+        $this->assertEqual($expected, json_decode($actual, true));
 
         // Add an instructor to a course
         $expected = array(array('username' => 'instructor2', 'role_id' => 3));
-        /*$actual = $this->_oauthReq(
+        $actual = $this->_oauthReq(
             $url, json_encode($expected), OAUTH_HTTP_METHOD_POST);
-        $this->assertEqual($expected, json_decode($actual, true));*/
+        $this->assertEqual($expected, json_decode($actual, true));
 
         // Add a tutor to a course
         $expected = array(array('username' => 'tutor2', 'role_id' => 4));
-        /*$actual = $this->_oauthReq(
+        $actual = $this->_oauthReq(
             $url, json_encode($expected), OAUTH_HTTP_METHOD_POST);
-        $this->assertEqual($expected, json_decode($actual, true));*/
+        $this->assertEqual($expected, json_decode($actual, true));
+
+        // Remove a student from a course
+        $expected = array(array('username' => '81121651', 'role_id' => 5));
+        $actual = $this->_oauthReq(
+            $url, json_encode($expected), OAUTH_HTTP_METHOD_DELETE);
+        $this->assertEqual($expected, json_decode($actual, true));
+
+        // Remove an instructor from a course
+        $expected = array(array('username' => 'instructor2', 'role_id' => 3));
+        $actual = $this->_oauthReq(
+            $url, json_encode($expected), OAUTH_HTTP_METHOD_DELETE);
+        $this->assertEqual($expected, json_decode($actual, true));
+
+        // Remove a tutor from a course
+        $expected = array(array('username' => 'tutor2', 'role_id' => 4));
+        $actual = $this->_oauthReq(
+            $url, json_encode($expected), OAUTH_HTTP_METHOD_DELETE);
+        $this->assertEqual($expected, json_decode($actual, true));
     }
 }
