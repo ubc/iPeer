@@ -594,7 +594,7 @@ class V1Controller extends Controller {
             
             if(empty($groupMembers)) {
                 $this->set('statusCode', 'HTTP/1.1 404 Not Found');
-                $this->set('groupMembers', null);
+                $this->set('groupMembers', $groupMembers);
             } else {
                 $this->set('statusCode', 'HTTP/1.1 200 OK');
                 $this->set('groupMembers', $groupMembers);
