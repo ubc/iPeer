@@ -1010,7 +1010,7 @@ class UsersController extends AppController
 
         //Save Data
         if ($this->User->save($user_data, true, array('password'))) {
-            $message = __("Password successfully reset. ", true);
+            $message = __("Password successfully reset. The new password is ".$tmp_password.".\n", true);
             $this->User->set('id', $user_id);
 
             // send email to user
