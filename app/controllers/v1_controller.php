@@ -234,7 +234,7 @@ class V1Controller extends Controller {
      * @return void
      */
     public function beforeFilter() {
-        return true;
+        //return true;
         Debugger::log("Got API request: ".$_SERVER['REQUEST_METHOD']." ".$_SERVER['REQUEST_URI']);
         return $this->_checkRequiredParams() && $this->_checkSignature() &&
             $this->_checkNonce();
@@ -946,13 +946,14 @@ class V1Controller extends Controller {
             $ret = array();
             foreach($users as $user) {
                 $this->User->habtmAdd('Group', $user['User']['id'], $group_id);
-                $tmp = array();
-                $tmp['id'] = $user['User']['id'];
-                $tmp['role_id'] = $user['Role']['0']['id'];
-                $tmp['username'] = $user['User']['username'];
-                $tmp['last_name'] = $user['User']['last_name'];
-                $tmp['first_name'] = $user['User']['first_name'];
-                $ret[] = $tmp;
+                //$tmp = array();
+                //$tmp['id'] = $user['User']['id'];
+                //$tmp['role_id'] = $user['Role']['0']['id'];
+                //$tmp['username'] = $user['User']['username'];
+                //$tmp['last_name'] = $user['User']['last_name'];
+                //$tmp['first_name'] = $user['User']['first_name'];
+                //$ret[] = $tmp;
+                $ret[] = array('username' => $user['User']['username']);
             }
             $statusCode = 'HTTP/1.1 201 Created';
         }

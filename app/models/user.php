@@ -400,9 +400,15 @@ class User extends AppModel
      * */
     public function getUsersByGroupId($group_id) {
         $ret = array();
-        $users = $this->find('all', array('conditions' => array('Group.id' => $group_id), 'contain' => array('Group')));
+        $users = $this->find('all', array('conditions' => array('Group.id' => $group_id)));
         foreach ($users as $user) {
-            $ret[] = $user['User'];
+            $tmp = array();
+            $tmp['id'] = $user['User']['id'];
+            $tmp['role_id'] = $user['Role']['0']['id'];
+            $tmp['username'] = $user['User']['username'];
+            $tmp['last_name'] = $user['User']['last_name'];
+            $tmp['first_name'] = $user['User']['first_name'];
+            $ret[] = $tmp;
         }
 
         return $ret;

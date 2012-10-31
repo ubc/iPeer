@@ -434,7 +434,10 @@ class V1ControllerTest extends CakeTestCase {
         $actualGroup = $this->_oauthReq("$url");
         $this->assertEqual(json_decode($actualGroup, true), $expectedGroup);
         
-        $toBeAdded = array('8', '9', '10');
+        $toBeAdded = array(
+            array('username' => '16585158'),
+            array('username' => '81121651'),
+            array('username' => '87800283'));
         $addedMembers = $this->_oauthReq("$url", json_encode($toBeAdded), OAUTH_HTTP_METHOD_POST);
         
         $this->assertEqual(json_decode($addedMembers, true), $toBeAdded);
