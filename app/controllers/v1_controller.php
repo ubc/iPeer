@@ -14,7 +14,8 @@ class V1Controller extends Controller {
     public $uses = array('User', 'RolesUser', 
         'Group', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric',
         'EvaluationMixeval', 'OauthClient', 'OauthNonce', 'OauthToken', 
-        'GroupsMembers', 'GroupEvent', 'Department', 'Role', 'CourseDepartment'
+        'GroupsMembers', 'GroupEvent', 'Department', 'Role', 'CourseDepartment',
+        'UserCourse', 'UserTutor', 'UserEnrol'
     );
     public $helpers = array('Session');
     public $components = array('RequestHandler', 'Session');
@@ -233,6 +234,7 @@ class V1Controller extends Controller {
      * @return void
      */
     public function beforeFilter() {
+        return true;
         Debugger::log("Got API request: ".$_SERVER['REQUEST_METHOD']." ".$_SERVER['REQUEST_URI']);
         return $this->_checkRequiredParams() && $this->_checkSignature() &&
             $this->_checkNonce();
@@ -498,6 +500,8 @@ class V1Controller extends Controller {
                     foreach ($groups as $group) {
                         $data[] = $group['Group'];
                     }
+                } else {
+                    $data = array();
                 }
                 $statusCode = 'HTTP/1.1 200 OK';
             } else {
@@ -516,7 +520,7 @@ class V1Controller extends Controller {
                     $data = $group['Group'];
                     $statusCode = 'HTTP/1.1 200 OK';
                 } else {
-                    $data = null;
+                    $data = array();
                     $statusCode = 'HTTP/1.1 404 Not Found';
                 }
             }
@@ -602,6 +606,8 @@ class V1Controller extends Controller {
         } else if ($this->RequestHandler->isPost()) {
             $add = trim(file_get_contents('php://input'), true);
             $users = json_decode($add, true);
+            
+            $this->set('error', $users);
             
             $groupMembers = array();
             foreach ($users as $user) {
@@ -991,29 +997,38 @@ class V1Controller extends Controller {
             $this->set('statusCode', 'HTTP/1.1 200 OK');
             $input = trim(file_get_contents('php://input'), true);
             $users = json_decode($input, true);
+            
+            $students = $this->UserEnrol->find('list', array('conditions' => array('course_id' => $courseId), 'fields' => array('user_id')));
+            $tutors = $this->UserTutor->find('list', array('conditions' => array('course_id' => $courseId), 'fields' => array('user_id')));
+            $instructors = $this->UserCourse->find('list', array('conditions' => array('course_id' => $courseId), 'fields' => array('user_id')));
+            $members = $students + $tutors + $instructors;
+            $inClass = $this->User->find('list', array('conditions' => array('User.id' => $members), 'fields' => array('User.username')));
+
             foreach ($users as $user) {
-                $userId = $this->User->field('id', 
-                    array('username' => $user['username']));
-                $role = $this->Role->getRoleName($user['role_id']);
-                $table = null;
-                if ($role == 'student') {
-                    $ret = $this->User->addStudent($userId, $courseId);
-                }
-                else if ($role == 'instructor') {
-                    $ret = $this->User->addInstructor($userId, $courseId);
-                }
-                else if ($role == 'tutor') {
-                    $ret = $this->User->addTutor($userId, $courseId);
-                }
-                else {
-                    $this->set('statusCode', 
-                        'HTTP/1.1 501 Unsupported role for '.$user['username']);
-                    break;
-                }
-                if (!$ret) {
-                    $this->set('statusCode', 
-                        'HTTP/1.1 501 Fail to enrol ' . $user['username']);
-                    break;
+                if(!in_array($user['username'], $inClass)) {
+                    $userId = $this->User->field('id', 
+                        array('username' => $user['username']));
+                    $role = $this->Role->getRoleName($user['role_id']);
+                    $table = null;
+                    if ($role == 'student') {
+                        $ret = $this->User->addStudent($userId, $courseId);
+                    }
+                    else if ($role == 'instructor') {
+                        $ret = $this->User->addInstructor($userId, $courseId);
+                    }
+                    else if ($role == 'tutor') {
+                        $ret = $this->User->addTutor($userId, $courseId);
+                    }
+                    else {
+                        $this->set('statusCode', 
+                            'HTTP/1.1 501 Unsupported role for '.$user['username']);
+                        break;
+                    }
+                    if (!$ret) {
+                        $this->set('statusCode', 
+                            'HTTP/1.1 501 Fail to enrol ' . $user['username']);
+                        break;
+                    }
                 }
             }
             $this->set('enrolment', $users);

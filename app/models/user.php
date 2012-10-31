@@ -695,6 +695,7 @@ class User extends AppModel
         $newEntry['UserEnrol']['course_id'] = $course_id;
         $newEntry['UserEnrol']['user_id'] = $user_id;
         $newEntry['UserEnrol']['record_status'] = 'A';
+        $this->UserEnrol->create();
         return $this->UserEnrol->save($newEntry);
     }
 
@@ -731,6 +732,7 @@ class User extends AppModel
         $newEntry['UserCourse']['course_id'] = $course_id;
         $newEntry['UserCourse']['user_id'] = $user_id;
         $newEntry['UserCourse']['record_status'] = 'A';
+        $this->UserCourse->create();
         return $this->UserCourse->save($newEntry);
     }
 
@@ -767,6 +769,7 @@ class User extends AppModel
         $newEntry['UserTutor']['course_id'] = $course_id;
         $newEntry['UserTutor']['user_id'] = $user_id;
         $newEntry['UserTutor']['record_status'] = 'A';
+        $this->UserTutor->create();
         return $this->UserTutor->save($newEntry);
     }
 

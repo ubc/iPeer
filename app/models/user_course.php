@@ -15,6 +15,7 @@ class UserCourse extends AppModel
     public $belongsTo = array('User');
     public $actsAs = array('Traceable');
 
+
     /**
      * Saves all the instructors associated with a course to the user_courses table
      *

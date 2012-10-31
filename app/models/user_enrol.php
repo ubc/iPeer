@@ -15,6 +15,7 @@ class UserEnrol extends AppModel
 
     public $belongsTo = array('User');
 
+    
     /**
      * Enroll user in courses
      *
