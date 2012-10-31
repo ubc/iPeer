@@ -245,7 +245,7 @@ class AppController extends Controller
         $signature = base64_encode(hash_hmac('sha1', $message, $secret, true));
         if ($signature == $this->sessionTransferData['signature']) {
             $user = $this->User->findByUsername($this->sessionTransferData['username']);
-            $this->Session->write($this->Auth->sessionKey, $user);
+            $this->Session->write($this->Auth->sessionKey, $user['User']);
             $loggedIn = true;
             return true;
         }
