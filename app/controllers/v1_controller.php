@@ -786,6 +786,14 @@ class V1Controller extends Controller {
                     }
                 }
             }
+
+            // add in username
+            foreach ($results as &$result) {
+                $username = $this->User->field('username',
+                    array('id' => $result['evaluatee']));
+                $result['username'] = $username;
+            }
+
             $this->set('statusCode', $statusCode);
             $this->set('grades', $results);
         } else {
