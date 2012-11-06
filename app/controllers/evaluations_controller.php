@@ -1893,7 +1893,6 @@ class EvaluationsController extends AppController
      */
     function viewSurveySummary($surveyId)
     {
-        $this->layout = 'pop_up';
 
         $survey = $this->Survey->find('first', array(
             'conditions' => array(
