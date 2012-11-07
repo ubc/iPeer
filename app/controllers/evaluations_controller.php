@@ -742,7 +742,6 @@ class EvaluationsController extends AppController
             }
             
             // students can't submit outside of release date range
-            $event = $this->Event->getEventById($eventId);
             $now = time();
             
             if ($now < strtotime($event['Event']['release_date_begin']) ||
@@ -943,7 +942,7 @@ class EvaluationsController extends AppController
             }
             
             // students can't submit outside of release date range
-            $event = $this->Event->getEventById($eventId);
+            $event = $this->Event->formatEventObj($eventId, $groupId);
             $now = time();
             
             if ($now < strtotime($event['Event']['release_date_begin']) ||
@@ -959,7 +958,6 @@ class EvaluationsController extends AppController
             $this->set('penaltyFinal', $penaltyFinal);
             $this->set('penaltyDays', $penaltyDays);
             $this->set('penalty', $penalty);
-            $event = $this->Event->formatEventObj($eventId, $groupId);
             $this->set('event', $event);
             $this->set('evaluator_id', $this->Auth->user('id'));
             $this->set('full_name', $this->Auth->user('first_name').' '.$this->Auth->user('last_name'));
