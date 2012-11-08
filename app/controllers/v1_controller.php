@@ -683,123 +683,69 @@ class V1Controller extends Controller {
      **/
     public function grades() {
         $event_id = $this->params['event_id'];
-        $user_id = $this->params['user_id'];
+        
+        $username = $this->params['username']; // if set, only want 1 user
+        $user_id = $this->User->field('id',
+                array('username' => $this->params['username']));
+        $type = $this->Event->getEventTemplateTypeId($event_id);
+        
+        // assume failure initially
+        $results = array();
+        $statusCode = 'HTTP/1.1 400 Bad Request'; // unrecognized request type
+
+        // initialize find parameters
+        $fields = array('id', 'evaluatee', 'score');
+        $conditions = array('event_id' => $event_id);
+        // add additional conditions if they only want 1 user
+        if ($user_id) { 
+            $conditions['evaluatee'] = $user_id;
+        }
+        $params = array('fields' => $fields, 'conditions' => $conditions);
 
         if ($this->RequestHandler->isGet()) {
-            $eventType = $this->Event->getEventTemplateTypeId($event_id);
-            if (null == $user_id) {
-                if (1 == $eventType) {
-                    $list = $this->EvaluationSimple->find('all',
-                        array('fields' => array('evaluatee', 'score'),
-                            'conditions' => array('event_id' => $event_id)
-                        )
-                    );
-
-                    if (!empty($list)) {
-                        foreach ($list as $data) {
-                            $results[] = $data['EvaluationSimple'];
-                        }
-                        $statusCode = 'HTTP/1.1 200 OK';
-                    } else {
-                        $results = null;
-                        $statusCode = 'HTTP/1.1 404 Not Found';
-                    }
-                } else if (2 == $eventType) {
-                    $list = $this->EvaluationRubric->find('all',
-                        array('fields' => array('evaluatee', 'score'),
-                            'conditions' => array('event_id' => $event_id)
-                        )
-                    );
-
-                    if (!empty($list)) {
-                        foreach ($list as $data) {
-                            unset($data['EvaluationRubric']['id']);
-                            $results[] = $data['EvaluationRubric'];
-                        }
-                        $statusCode = 'HTTP/1.1 200 OK';
-                    } else {
-                        $results = null;
-                        $statusCode = 'HTTP/1.1 404 Not Found';
-                    }
-                } else if (4 == $eventType) {
-                    $list = $this->EvaluationMixeval->find('all',
-                        array('fields' => array('evaluatee', 'score'),
-                            'conditions' => array('event_id' => $event_id)
-                        )
-                    );
-
-                    if (!empty($list)) {
-                        foreach ($list as $data) {
-                            unset($data['EvaluationMixeval']['id']);
-                            $results[] = $data['EvaluationMixeval'];
-                        }
-                        $statusCode = 'HTTP/1.1 200 OK';
-                    } else {
-                        $results = null;
-                        $statusCode = 'HTTP/1.1 404 Not Found';
-                    }
-                }
-            } else {
-                if (1 == $eventType) {
-                    $list = $this->EvaluationSimple->find('first',
-                        array('fields' => array('evaluatee', 'score'),
-                            'conditions' => array('event_id' => $event_id, 'evaluatee' => $user_id)
-                        )
-                    );
-
-                    if (!empty($list)) {
-                        $results = $list['EvaluationSimple'];
-                        $statusCode = 'HTTP/1.1 200 OK';
-                    } else {
-                        $results = null;
-                        $statusCode = 'HTTP/1.1 404 Not Found';
-                    }
-                } else if (2 == $eventType) {
-                    $list = $this->EvaluationRubric->find('first',
-                        array('fields' => array('evaluatee', 'score'),
-                            'conditions' => array('event_id' => $event_id, 'evaluatee' => $user_id)
-                        )
-                    );
-
-                    if (!empty($list)) {
-                        $results = $list['EvaluationRubric'];
-                        unset($results['id']);
-                        $statusCode = 'HTTP/1.1 200 OK';
-                    } else {
-                        $results = null;
-                        $statusCode = 'HTTP/1.1 404 Not Found';
-                    }
-                } else if (4 == $eventType) {
-                    $list = $this->EvaluationMixeval->find('first',
-                        array('fields' => array('evaluatee', 'score'),
-                            'conditions' => array('event_id' => $event_id, 'evaluatee' => $user_id)
-                        )
-                    );
-
-                    if (!empty($list)) {
-                        $results = $list['EvaluationMixeval'];
-                        unset($results['id']);
-                        $statusCode = 'HTTP/1.1 200 OK';
-                    } else {
-                        $results = null;
-                        $statusCode = 'HTTP/1.1 404 Not Found';
-                    }
-                }
+            $res = array();
+            $key = ""; // name of the table we're querying
+            if ($type == 1) {
+                $res = $this->EvaluationSimple->find('all', $params);
+                $key = "EvaluationSimple"; 
             }
+            else if ($type == 2) {
+                $res = $this->EvaluationRubric->find('all', $params);
+                $key = "EvaluationRubric"; 
+            }
+            else if ($type == 4) {
+                $res = $this->EvaluationMixeval->find('all', $params);
+                $key = "EvaluationMixeval"; 
+            }
+            foreach ($res as $val) {
+                unset($val[$key]['id']);
+                $results[] = $val[$key];
+            }
+            // return error if needed
+            if (empty($results)) {
+                $statusCode = 'HTTP/1.1 404 Not Found';
+            }
+            else {
+                $statusCode = 'HTTP/1.1 200 OK';
+            }
+        }
 
-            // add in username
+        // add in username
+        if ($user_id && !empty($results)) {
+            // remove from array if they wanted only 1 user
+            $results = $results[0];
+            $results['username'] = $username;
+        }
+        else {
             foreach ($results as &$result) {
                 $username = $this->User->field('username',
                     array('id' => $result['evaluatee']));
                 $result['username'] = $username;
             }
-
-            $this->set('statusCode', $statusCode);
-            $this->set('grades', $results);
-        } else {
-            $this->set('statusCode', 'HTTP/1.1 400 Bad Request');
-            $this->set('grades', null);
         }
+
+        $this->set('grades', $results);
+        $this->set('statusCode', $statusCode);
     }
 
     /**

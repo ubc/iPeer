@@ -73,9 +73,9 @@ if (file_exists(CONFIGS.'installed.txt')) {
     array('action' => 'enrolment'),
     array('course_id' => '[0-9]+'));
   // Connect url to grades api
-  Router::connect('/:controller/events/:event_id/grades/:user_id',
-    array('action' => 'grades', 'user_id' => null),
-    array('course_id' => '[0-9]+', 'event_id' => '[0-9]+', 'user_id' => '[0-9]+'));
+  Router::connect('/:controller/events/:event_id/grades/:username',
+    array('action' => 'grades', 'username' => null),
+    array('event_id' => '[0-9]+', 'username' => '.+'));
   // Connect url to departments api
   Router::connect('/:controller/courses/:course_id/departments/:department_id',
     array('action'=> 'courseDepartments'),
