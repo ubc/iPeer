@@ -11,9 +11,9 @@
 class V1Controller extends Controller {
 
     public $name = 'V1';
-    public $uses = array('User', 'RolesUser', 
+    public $uses = array('User', 'RolesUser',
         'Group', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric',
-        'EvaluationMixeval', 'OauthClient', 'OauthNonce', 'OauthToken', 
+        'EvaluationMixeval', 'OauthClient', 'OauthNonce', 'OauthToken',
         'GroupsMembers', 'GroupEvent', 'Department', 'Role', 'CourseDepartment',
         'UserCourse', 'UserTutor', 'UserEnrol'
     );
@@ -234,7 +234,7 @@ class V1Controller extends Controller {
      * @return void
      */
     public function beforeFilter() {
-        //return true;
+//        return true;
         Debugger::log("Got API request: ".$_SERVER['REQUEST_METHOD']." ".$_SERVER['REQUEST_URI']);
         return $this->_checkRequiredParams() && $this->_checkSignature() &&
             $this->_checkNonce();
@@ -420,13 +420,10 @@ class V1Controller extends Controller {
                     foreach ($courses as $course) {
                         $classes[] = $course['Course'];
                     }
-                    $statusCode = 'HTTP/1.1 200 OK';
-                } else {
-                    $classes = null;
-                    $statusCode = 'HTTP/1.1 404 Not Found';
                 }
+                $statusCode = 'HTTP/1.1 200 OK';
             } else {
-            // specific course
+                // specific course
                 $course = $this->Course->find('first',
                     array(
                         'conditions' => array('id' => $id),
@@ -437,7 +434,7 @@ class V1Controller extends Controller {
                     $classes = $course['Course'];
                     $statusCode = 'HTTP/1.1 200 OK';
                 } else {
-                    $classes = null;
+                    $classes = array('code' => 2, 'message' => 'Course does not exists.');
                     $statusCode = 'HTTP/1.1 404 Not Found';
                 }
             }
@@ -447,7 +444,7 @@ class V1Controller extends Controller {
             $create = trim(file_get_contents('php://input'), true);
             if (!$this->Course->save(json_decode($create, true))) {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
-                $this->set('courses', null);
+                $this->set('courses', array('code' => 1, 'message' => 'course already exists.'));
             } else {
                 $temp = $this->Course->read(array('id','course','title'));
                 $course = $temp['Course'];
@@ -569,21 +566,21 @@ class V1Controller extends Controller {
         }
 
     }
-    
+
     /**
      * get, add, and delete group members from a group
     **/
     public function groupMembers() {
         $groupId = $this->params['group_id'];
         $userId = $this->params['user_id'];
-        
+
         if ($this->RequestHandler->isGet()) {
             $userIds = $this->GroupsMembers->find('list', array(
                 'conditions' => array('group_id' => $groupId),
                 'fields' => array('user_id')));
-        
+
             $users = $this->User->find('all', array('conditions' => array('User.id' => $userIds)));
-            
+
             $groupMembers = array();
             foreach ($users as $user) {
                 $tmp = array();
@@ -594,7 +591,7 @@ class V1Controller extends Controller {
                 $tmp['first_name'] = $user['User']['first_name'];
                 $groupMembers[] = $tmp;
             }
-            
+
             if(empty($groupMembers)) {
                 $this->set('statusCode', 'HTTP/1.1 404 Not Found');
                 $this->set('groupMembers', $groupMembers);
@@ -606,14 +603,14 @@ class V1Controller extends Controller {
         } else if ($this->RequestHandler->isPost()) {
             $add = trim(file_get_contents('php://input'), true);
             $users = json_decode($add, true);
-            
+
             $this->set('error', $users);
-            
+
             $groupMembers = array();
             foreach ($users as $user) {
                 $tmp = array();
                 $tmp = array('group_id' => $groupId, 'user_id' => $user);
-                
+
                 $statusCode = 'HTTP/1.1 200 OK';
                 if ($this->GroupsMembers->save($tmp)) {
                     $userId = $this->GroupsMembers->read('user_id');
@@ -636,7 +633,7 @@ class V1Controller extends Controller {
             }
         } else {
             $this->set('statusCode', 'HTTP/1.1 400 Bad Request');
-            $this->set('groupMembers', null);        
+            $this->set('groupMembers', null);
         }
     }
 
@@ -701,8 +698,7 @@ class V1Controller extends Controller {
                         }
                         $statusCode = 'HTTP/1.1 200 OK';
                     } else {
-                        $results = null;
-                        $statusCode = 'HTTP/1.1 404 Not Found';
+                        $results = array();
                     }
                 } else if (2 == $eventType) {
                     $list = $this->EvaluationRubric->find('all',
@@ -718,8 +714,7 @@ class V1Controller extends Controller {
                         }
                         $statusCode = 'HTTP/1.1 200 OK';
                     } else {
-                        $results = null;
-                        $statusCode = 'HTTP/1.1 404 Not Found';
+                        $results = array();
                     }
                 } else if (4 == $eventType) {
                     $list = $this->EvaluationMixeval->find('all',
@@ -735,8 +730,7 @@ class V1Controller extends Controller {
                         }
                         $statusCode = 'HTTP/1.1 200 OK';
                     } else {
-                        $results = null;
-                        $statusCode = 'HTTP/1.1 404 Not Found';
+                        $results = array();
                     }
                 }
             } else {
@@ -751,8 +745,7 @@ class V1Controller extends Controller {
                         $results = $list['EvaluationSimple'];
                         $statusCode = 'HTTP/1.1 200 OK';
                     } else {
-                        $results = null;
-                        $statusCode = 'HTTP/1.1 404 Not Found';
+                        $results = array();
                     }
                 } else if (2 == $eventType) {
                     $list = $this->EvaluationRubric->find('first',
@@ -764,10 +757,9 @@ class V1Controller extends Controller {
                     if (!empty($list)) {
                         $results = $list['EvaluationRubric'];
                         unset($results['id']);
-                        $statusCode = 'HTTP/1.1 200 OK';
+                        $statuscode = 'http/1.1 200 ok';
                     } else {
-                        $results = null;
-                        $statusCode = 'HTTP/1.1 404 Not Found';
+                        $results = array();
                     }
                 } else if (4 == $eventType) {
                     $list = $this->EvaluationMixeval->find('first',
@@ -781,8 +773,7 @@ class V1Controller extends Controller {
                         unset($results['id']);
                         $statusCode = 'HTTP/1.1 200 OK';
                     } else {
-                        $results = null;
-                        $statusCode = 'HTTP/1.1 404 Not Found';
+                        $results = array();
                     }
                 }
             }
@@ -794,6 +785,7 @@ class V1Controller extends Controller {
                 $result['username'] = $username;
             }
 
+            $statusCode = 'HTTP/1.1 200 OK';
             $this->set('statusCode', $statusCode);
             $this->set('grades', $results);
         } else {
@@ -979,7 +971,7 @@ class V1Controller extends Controller {
         $courseId = $this->params['course_id'];
 
         // Get request, just return a list of users
-        if ($this->RequestHandler->isGet()) {            
+        if ($this->RequestHandler->isGet()) {
             $students = $this->User->getEnrolledStudents($courseId);
             $instructors = $this->User->getInstructorsByCourse($courseId);
             $tutors = $this->User->getTutorsByCourse($courseId);
@@ -1006,7 +998,7 @@ class V1Controller extends Controller {
             $this->set('statusCode', 'HTTP/1.1 200 OK');
             $input = trim(file_get_contents('php://input'), true);
             $users = json_decode($input, true);
-            
+
             $students = $this->UserEnrol->find('list', array('conditions' => array('course_id' => $courseId), 'fields' => array('user_id')));
             $tutors = $this->UserTutor->find('list', array('conditions' => array('course_id' => $courseId), 'fields' => array('user_id')));
             $instructors = $this->UserCourse->find('list', array('conditions' => array('course_id' => $courseId), 'fields' => array('user_id')));
@@ -1015,7 +1007,7 @@ class V1Controller extends Controller {
 
             foreach ($users as $user) {
                 if(!in_array($user['username'], $inClass)) {
-                    $userId = $this->User->field('id', 
+                    $userId = $this->User->field('id',
                         array('username' => $user['username']));
                     $role = $this->Role->getRoleName($user['role_id']);
                     $table = null;
@@ -1029,12 +1021,12 @@ class V1Controller extends Controller {
                         $ret = $this->User->addTutor($userId, $courseId);
                     }
                     else {
-                        $this->set('statusCode', 
+                        $this->set('statusCode',
                             'HTTP/1.1 501 Unsupported role for '.$user['username']);
                         break;
                     }
                     if (!$ret) {
-                        $this->set('statusCode', 
+                        $this->set('statusCode',
                             'HTTP/1.1 501 Fail to enrol ' . $user['username']);
                         break;
                     }
@@ -1048,7 +1040,7 @@ class V1Controller extends Controller {
             $input = trim(file_get_contents('php://input'), true);
             $users = json_decode($input, true);
             foreach ($users as $user) {
-                $userId = $this->User->field('id', 
+                $userId = $this->User->field('id',
                     array('username' => $user['username']));
                 $role = $this->Role->getRoleName($user['role_id']);
                 $table = null;
@@ -1062,12 +1054,12 @@ class V1Controller extends Controller {
                     $ret = $this->User->removeTutor($userId, $courseId);
                 }
                 else {
-                    $this->set('statusCode', 
+                    $this->set('statusCode',
                         'HTTP/1.1 501 Unsupported role for '.$user['username']);
                     break;
                 }
                 if (!$ret) {
-                    $this->set('statusCode', 
+                    $this->set('statusCode',
                         'HTTP/1.1 501 Fail to drop ' . $user['username']);
                     break;
                 }
