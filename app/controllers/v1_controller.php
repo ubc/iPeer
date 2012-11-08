@@ -414,7 +414,7 @@ class V1Controller extends Controller {
         if ($this->RequestHandler->isGet()) {
             if (null == $id) {
                 $courses = $this->Course->find('all',
-                    array('fields' => array('id', 'course', 'title'))
+                    array('fields' => array('id', 'course', 'title', 'student_count'))
                 );
                 if (!empty($courses)) {
                     foreach ($courses as $course) {
@@ -427,7 +427,7 @@ class V1Controller extends Controller {
                 $course = $this->Course->find('first',
                     array(
                         'conditions' => array('id' => $id),
-                        'fields' => array('id', 'course', 'title'),
+                        'fields' => array('id', 'course', 'title', 'student_count'),
                     )
                 );
                 if (!empty($course)) {
