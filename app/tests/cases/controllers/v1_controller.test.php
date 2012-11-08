@@ -529,24 +529,23 @@ class V1ControllerTest extends CakeTestCase {
         $this->assertEqual($mixevalList, $mixevalGrades);
 
         // test get specific student's grades for an event of a course (test multiple types)
-        // TODO: FIX, make compatible with username
-        //$studentGrade = $this->_oauthReq("$url/1/grades/33");
-        //$studentGrade = json_decode($studentGrade, true);
-        //$expectedGrade = array("evaluatee" => "33", "score" => "75", 
-        //    'username' => '51516498');
-        //$this->assertEqual($expectedGrade, $studentGrade);
+        $studentGrade = $this->_oauthReq("$url/1/grades/51516498");
+        $studentGrade = json_decode($studentGrade, true);
+        $expectedGrade = array("evaluatee" => "33", "score" => "75", 
+            'username' => '51516498');
+        $this->assertEqual($expectedGrade, $studentGrade);
 
-        //$studentGrade = $this->_oauthReq("$url/2/grades/5");
-        //$studentGrade = json_decode($studentGrade, true);
-        //$expectedGrade = array("evaluatee" => "5", "score" => "14",
-        //    'username' => '65498451');
-        //$this->assertEqual($expectedGrade, $studentGrade);
-        //
-        //$studentGrade = $this->_oauthReq("$url/3/grades/6");
-        //$studentGrade = json_decode($studentGrade, true);
-        //$expectedGrade = array("evaluatee" => "6", "score" => "2.4",
-        //    'username' => '65468188');
-        //$this->assertEqual($expectedGrade, $studentGrade);
+        $studentGrade = $this->_oauthReq("$url/2/grades/65498451");
+        $studentGrade = json_decode($studentGrade, true);
+        $expectedGrade = array("evaluatee" => "5", "score" => "14",
+            'username' => '65498451');
+        $this->assertEqual($expectedGrade, $studentGrade);
+        
+        $studentGrade = $this->_oauthReq("$url/3/grades/65468188");
+        $studentGrade = json_decode($studentGrade, true);
+        $expectedGrade = array("evaluatee" => "6", "score" => "2.4",
+            'username' => '65468188');
+        $this->assertEqual($expectedGrade, $studentGrade);
     }
 
     
