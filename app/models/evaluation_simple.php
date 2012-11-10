@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EvaluationSimple
  *
@@ -13,12 +14,12 @@ class EvaluationSimple extends AppModel
     public $name = 'EvaluationSimple';
     public $actsAs = array('Traceable');
 
-  /*public $belongsTo = array(
-    'SimpleEvaluation' => array(
-    'className' => 'SimpleEvaluation',
-    'foreignKey' => 'simple_evaluation_id'
-    )
-  );*/
+    public $belongsTo = array(
+        'Event' => array(
+            'className' => 'Event',
+            'foreignKey' => 'event_id'
+        ),
+    );
 
     /**
      * getEvalMarkByGrpEventIdEvaluatorEvaluatee
@@ -34,7 +35,7 @@ class EvaluationSimple extends AppModel
     {
         //return $this->find('grp_event_id='.$grpEventId.' AND evaluator='.$evaluator.' AND evaluatee='.$evaluatee);
         return $this->find('first', array(
-            'conditions' => array('grp_event_id' => $grpEventId, 'evaluator' => $evaluator, 'evaluatee' => $evaluatee)
+            'conditions' => array('grp_event_id' => $grpEventId, 'submitter_id' => $evaluator, 'evaluatee' => $evaluatee)
         ));
     }
 
@@ -52,7 +53,7 @@ class EvaluationSimple extends AppModel
     {
         //return $this->find('all', 'grp_event_id='.$grpEventId.' AND evaluator='.$evaluator);
         return $this->find('all', array(
-            'conditions' => array('grp_event_id' => $grpEventId, 'evaluator' => $evaluator)
+            'conditions' => array('grp_event_id' => $grpEventId, 'submitter_id' => $evaluator)
         ));
     }
 
@@ -495,6 +496,76 @@ class EvaluationSimple extends AppModel
         }
         $studentResult['gradeReleaseStatus'] = $gradeReleaseStatus;
         return $studentResult;
+    }
+    
+    /**
+     * simpleEvalScore
+     *
+     * @param mixed $eventId
+     *
+     * @access public
+     * @return void
+     */
+    function simpleEvalScore($eventId) {
+        $evalSub = ClassRegistry::init('EvaluationSubmission');
+        $pen = ClassRegistry::init('Penalty');
+        $simp = ClassRegistry::init('SimpleEvaluation');
+        
+        $list = $this->find('all',
+            array('fields' => array('evaluatee', 'score'),
+                'conditions' => array('event_id' => $eventId)
+            )
+        );   
+        
+        $data = array();
+        foreach($list as $mark) {
+            if (!isset($data[$mark['EvaluationSimple']['evaluatee']])) {
+                $data[$mark['EvaluationSimple']['evaluatee']]['user_id'] = $mark['EvaluationSimple']['evaluatee'];
+                $data[$mark['EvaluationSimple']['evaluatee']]['score'] = $mark['EvaluationSimple']['score'];
+                $data[$mark['EvaluationSimple']['evaluatee']]['numEval']= 1;
+            } else {
+                $data[$mark['EvaluationSimple']['evaluatee']]['score'] += $mark['EvaluationSimple']['score'];
+                $data[$mark['EvaluationSimple']['evaluatee']]['numEval']++;
+            }
+        }
+        
+        $sub = $evalSub->find('all', array('conditions' => array('event_id' => $eventId)));
+        $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId)));
+        $template = $simp->find('first', array('conditions' => array('SimpleEvaluation.id' => $event['Event']['template_id'])));
+        $max = $template['SimpleEvaluation']['point_per_member'];
+        
+        foreach($sub as $stu) {
+            if (isset($data[$stu['EvaluationSubmission']['submitter_id']])) {
+                $diff = strtotime($stu['EvaluationSubmission']['date_submitted']) - strtotime($event['Event']['due_date']);
+                $days = $diff/(60*60*24);
+                $penalty = $pen->getPenaltyByEventAndDaysLate($eventId,$days);
+                $data[$stu['EvaluationSubmission']['submitter_id']]['penalty'] = (isset($penalty['Penalty']['percent_penalty'])) ? $penalty['Penalty']['percent_penalty'] :
+                        0;
+            }
+        }
+        
+        foreach($data as $demo) {
+            if (!isset($demo['penalty'])) {
+                $data[$demo['user_id']]['penalty'] = 0;
+            }
+        }
+        
+        $grades = array();
+        foreach ($data as $student) {
+            $tmp = array();
+            $tmp['id'] = 0;
+            $tmp['evaluatee'] = $student['user_id'];
+            $tmp['score'] = $student['score']/$student['numEval']*(1-$student['penalty']/100);
+            $grades[]['EvaluationSimple'] = $tmp;
+        }
+        
+        foreach ($grades as $key => $student) {
+            if ($student['EvaluationSimple']['score'] > $max) {
+                $grades[$key]['EvaluationSimple']['score'] = $max;
+            }
+        }
+        
+        return $grades;
     }
 
 }

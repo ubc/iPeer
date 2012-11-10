@@ -15,7 +15,7 @@ class V1Controller extends Controller {
         'Group', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric',
         'EvaluationMixeval', 'OauthClient', 'OauthNonce', 'OauthToken',
         'GroupsMembers', 'GroupEvent', 'Department', 'Role', 'CourseDepartment',
-        'UserCourse', 'UserTutor', 'UserEnrol'
+        'UserCourse', 'UserTutor', 'UserEnrol', 'Penalty'
     );
     public $helpers = array('Session');
     public $components = array('RequestHandler', 'Session');
@@ -234,7 +234,11 @@ class V1Controller extends Controller {
      * @return void
      */
     public function beforeFilter() {
+<<<<<<< HEAD
 //        return true;
+=======
+        return true;
+>>>>>>> fixed the grades api for group grades for simple
         Debugger::log("Got API request: ".$_SERVER['REQUEST_METHOD']." ".$_SERVER['REQUEST_URI']);
         return $this->_checkRequiredParams() && $this->_checkSignature() &&
             $this->_checkNonce();
@@ -680,7 +684,6 @@ class V1Controller extends Controller {
      **/
     public function grades() {
         $event_id = $this->params['event_id'];
-
         $username = $this->params['username']; // if set, only want 1 user
         $user_id = $this->User->field('id',
                 array('username' => $this->params['username']));
@@ -703,7 +706,7 @@ class V1Controller extends Controller {
             $res = array();
             $key = ""; // name of the table we're querying
             if ($type == 1) {
-                $res = $this->EvaluationSimple->find('all', $params);
+                $res = $this->EvaluationSimple->simpleEvalScore($event_id);
                 $key = "EvaluationSimple";
             }
             else if ($type == 2) {
