@@ -480,6 +480,7 @@ class V1Controller extends Controller {
      * Get a list of groups in iPeer.
      **/
     public function groups() {
+        $fields = array('id', 'group_num', 'group_name', 'course_id', 'member_count');
         // view
         if ($this->RequestHandler->isGet()) {
             $data = array();
@@ -488,7 +489,7 @@ class V1Controller extends Controller {
                     'all',
                     array(
                         'conditions' => array('course_id' => $this->params['course_id']),
-                        'fields' => array('id', 'group_num', 'group_name', 'course_id'),
+                        'fields' => $fields,
                         'recursive' => 0
                     )
                 );
@@ -509,7 +510,7 @@ class V1Controller extends Controller {
                             'Group.id' => $this->params['group_id'],
                             'course_id' => $this->params['course_id']
                         ),
-                        'fields' => array('id', 'group_num', 'group_name', 'course_id'),
+                        'fields' => $fields,
                         'recursive' => 0
                     )
                 );
@@ -530,7 +531,7 @@ class V1Controller extends Controller {
             $decode['Group']['course_id'] = $this->params['course_id'];
 
             if ($this->Group->save($decode)) {
-                $tempGroup = $this->Group->read(array('id','group_num','group_name','course_id'));
+                $tempGroup = $this->Group->read($fields);
                 $group = $tempGroup['Group'];
                 $this->set('statusCode', 'HTTP/1.1 201 Created');
                 $this->set('group', $group);
@@ -552,7 +553,7 @@ class V1Controller extends Controller {
             $edit = trim(file_get_contents('php://input'), true);
             $decode = array('Group' => json_decode($edit, true));
             if ($this->Group->save($decode)) {
-                $temp = $this->Group->read(array('id','group_num','group_name','course_id'));
+                $temp = $this->Group->read($fields);
                 $group = $temp['Group'];
                 $this->set('statusCode', 'HTTP/1.1 200 OK');
                 $this->set('group', $group);
@@ -643,12 +644,13 @@ class V1Controller extends Controller {
     public function events() {
         $course_id = $this->params['course_id'];
         $results = array();
+        $fields = array('title', 'course_id', 'event_template_type_id', 'due_date');
 
         if ($this->RequestHandler->isGet()) {
             if (!isset($this->params['event_id']) || empty($this->params['event_id'])) {
                 $list = $this->Event->find('all', array(
                     'conditions' => array('course_id' => $course_id),
-                    'fields' => array('title', 'course_id', 'event_template_type_id')));
+                    'fields' => $fields));
 
                 if (!empty($list)) {
                     foreach ($list as $data) {
@@ -658,7 +660,7 @@ class V1Controller extends Controller {
                 $statusCode = 'HTTP/1.1 200 OK';
             } else {
                 $list = $this->Event->find('first',
-                    array('fields' => array('title', 'course_id', 'event_template_type_id'),
+                    array('fields' => $fields,
                         'conditions' => array('Event.id' => $this->params['event_id']))
                 );
 
