@@ -235,7 +235,6 @@ class V1Controller extends Controller {
      */
     public function beforeFilter() {
         // return true;
-        Debugger::log("Got API request: ".$_SERVER['REQUEST_METHOD']." ".$_SERVER['REQUEST_URI']);
         return $this->_checkRequiredParams() && $this->_checkSignature() &&
             $this->_checkNonce();
     }
