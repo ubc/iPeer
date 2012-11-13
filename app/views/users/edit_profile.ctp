@@ -8,7 +8,7 @@
     <tr class="tablecell2">
       <?php echo $this->Form->input('username', array('id' => 'username', 'size'=>'50', 'readonly' => true, 'label' => __('Username', true)));?>
     </tr>
-    
+
     <!-- First Name -->
     <tr class="tablecell2">
       <?php echo $this->Form->input('first_name', array('size'=>'50', 'class'=>'validate none TEXT_FORMAT first_name_msg Invalid_Text._At_Least_One_Word_Is_Required.', 'label' => __('First Name', true))) ?>
@@ -40,7 +40,7 @@
       <td id="title_msg" class="error"></td>
     </tr>
     <?php }?>
-    
+
     <tr class="tablecell2">
       <td colspan="4"><hr align=left width=100%><h3><?php __('Change Password')?>:</h3></td>
     </tr>
@@ -80,9 +80,9 @@
     <?php echo $html->image('icons/add.gif', array('alt'=>__('Add Token Credential', true), 'valign'=>'middle')); ?>&nbsp;<?php echo $html->link(__('Add Token Credential', true), '/oauth_tokens/add', array('id' => 'add')); ?>
     <?php if (count($tokens) > 0) { ?>
         <?php foreach ($tokens as $index => $token) { ?>
-            <p><label id=key><?php echo _('Key').': '.$token['OauthToken']['key'];?></label>
-            <label id=secret><?php echo _('Secret').': '.$token['OauthToken']['secret'];?></label>
-            <?php echo _('Expires').': '.$token['OauthToken']['expires'];?>
+            <p><label id=key><?php echo __('Key').': '.$token['OauthToken']['key'];?></label>
+            <label id=secret><?php echo __('Secret').': '.$token['OauthToken']['secret'];?></label>
+            <?php echo __('Expires').': '.$token['OauthToken']['expires'];?>
             <?php echo $this->Form->select('OauthToken.'.$index.'.enabled', $enabled, $token['OauthToken']['enabled'], array('empty' => false)); ?>
             <?php echo $this->Form->input('OauthToken.'.$index.'.id', array('value' => $token['OauthToken']['id'])); ?>
             <?php echo $html->link('X', '/oauth_tokens/delete/'.$token['OauthToken']['id'], array('id' => 'delete')); ?></p>
