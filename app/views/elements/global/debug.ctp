@@ -4,10 +4,19 @@
 if(!Configure::read('debug') == 0 &&
   isset($this->params['controller']))
 {
+    $branch = `git rev-parse --abbrev-ref HEAD`;
+    if (!$branch) {
+        $branch = "Unknown";
+    }
+    $commit = `git describe --tags --always`;
+    if (!$commit) {
+        $commit = "Unknown";
+    }
 ?>
 
 <div id='debugsection'>
   <!-- Render a few debuging elements -->
+  <div style="text-align:center;">Version: <?php echo IPEER_VERSION?> - Branch: <?php echo $branch?> - Commit/Tag: <?php echo $commit;?></div>
   <table>
   <tr>
     <td>User ID: <?php echo User::isLoggedIn() ? User::get('id') : "none" ?>
@@ -23,7 +32,7 @@ if(!Configure::read('debug') == 0 &&
       <input type="button" onclick="jQuery('#coursesList-data').toggle();" value="show/hide" />
     </td>
     <td>Actions: <?php echo empty($action) ? 0 : count($action); ?>
-      <input type="button" onclick="jQuery('#access-data').toggle();" value="show/hide" />
+      <input type="button" onclick="jQuery('#actions-data').toggle();" value="show/hide" />
     </td>
     <td>Params: <?php echo empty($this->params) ? 0 : count($this->params); ?>
       <input type="button" onclick="jQuery('#params-data').toggle();" value="show/hide" />
