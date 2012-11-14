@@ -677,7 +677,7 @@ AjaxList.prototype.renderPageList = function(div) {
             this.renderSinglePageRadioButton(i, pages);
         }
     } else {
-        
+
         if (this.state.pageShown - averageOffset <= 0) {
             var minusOffset = this.state.pageShown - 1;
             var plusOffset = maxPageNumbersToShow - minusOffset - 1;
@@ -696,10 +696,10 @@ AjaxList.prototype.renderPageList = function(div) {
                 this.renderSinglePageRadioButton(i, pages);
         }
     }
-    
+
     this.renderDirectionRadioButton(2, pages, totalPages);
     this.renderDirectionRadioButton(3, pages, totalPages);
-    
+
     // Add the pages to the GUI
     div.appendChild(pages);
 }
@@ -720,13 +720,13 @@ AjaxList.prototype.renderFooter = function(div) {
     var tr = new Element("tr");
 
     // Display the time of the search
-    var td = new Element("td", {"style" : "text-align: left; width: 33%" });
+    var td = new Element("td", {"class":"timestamp" });
     var date = new Date();
     td.appendChild(document.createTextNode(date.toString()));
     tr.appendChild(td);
 
     // Display the number of results
-    var td = new Element("td", {"style" : "text-align: center;  width: 33%; font-weight: bold; font-size: 110%"});
+    var td = new Element("td", {"class" : "total-result"});
     td.appendChild(document.createTextNode(
         this.count < 1 ?
         "No results" :
@@ -1321,5 +1321,5 @@ AjaxListAction.prototype.performAction = function(event, action) {
 
     if (!newWindow) {
        window.location = this.root + url;
-    } 
+    }
 }

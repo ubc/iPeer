@@ -24,9 +24,7 @@
 	  <tr class="panelContent">
 	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
 	      <tr class="panelContent">
-	        <td colspan="5" align="right">
-          <?php echo $html->image('icons/add.gif', array('alt'=>__('Add Simple Evaluation', true), 'align'=>'middle','alt'=>__('add', true))); ?>&nbsp;<?php echo $html->link(__('Add Simple Evaluation', true), '/simpleevaluations/add'); ?>&nbsp;
-          </td>
+	        <td colspan="5" align="right"><?php echo $html->link(__('Add Simple Evaluation', true), '/simpleevaluations/add', array('class' => 'add-button')); ?></td>
 	      </tr>
     	  <tr class="panelContent">
     	    <th colspan="2" width="60%"><?php __('Name')?></th>
@@ -73,7 +71,7 @@
 	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
 	      <tr class="panelContent">
 	        <td colspan="8" align="right">
-          <?php echo $html->image('icons/add.gif', array('alt'=>'Add Rubric', 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link(__('Add Rubric', true), '/rubrics/add'); ?>
+          <?php echo $html->link(__('Add Rubric', true), '/rubrics/add', array('class' => 'add-button')); ?>
             </td>
 	      </tr>
     	  <tr class="panelContent">
@@ -121,7 +119,7 @@
 	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
 	      <tr class="panelContent">
 	        <td colspan="8" align="right">
-          <?php echo $html->image('icons/add.gif', array('alt'=>__('Add Mix Evaluation', true), 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link(__('Add Mixed Evaluation', true), '/mixevals/add'); ?>
+          <?php echo $html->link(__('Add Mixed Evaluation', true), '/mixevals/add', array('class' => 'add-button')); ?>
             </td>
 	      </tr>
     	  <tr class="panelContent">
@@ -183,7 +181,7 @@
 	      <tr class="panelContent">
 	        <td colspan="6" align="right">
           <?php if (!empty($access['SURVEY_RECORD'])):?>
-          <?php echo $html->image('icons/add.gif', array('alt'=>__('Add Survey', true), 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link(__('Add Survey', true), '/surveys/add'); ?>
+          <?php echo $html->link(__('Add Survey', true), '/surveys/add', array('class' => 'add-button')); ?>
           <?php endif;?>
           </td>
 	      </tr>
@@ -235,8 +233,8 @@
 	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
 	      <tr class="panelContent">
 	        <td colspan="6" align="right">
-          <?php echo $html->image('icons/add.gif', array('alt'=>__('Add Survey', true), 'align'=>'middle','alt'=>'add')); ?>&nbsp;<?php echo $html->link(__('Add Email Template', true), '/emailtemplates/add'); ?>
-          
+          <?php echo $html->link(__('Add Email Template', true), '/emailtemplates/add', array('class' => 'add-button')); ?>
+
           </td>
 	      </tr>
     	  <tr class="panelContent">

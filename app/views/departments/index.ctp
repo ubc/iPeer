@@ -1,10 +1,7 @@
 <div class="button-row">
 <ul>
     <li>
-    <?php 
-    echo $html->image('icons/add.gif', array('valign'=>'middle'));
-    echo $this->Html->link(__('Add Department', true), array('action' => 'add')); 
-    ?>
+    <?php echo $this->Html->link(__('Add Department', true), array('action' => 'add'), array('class' => 'add-button')); ?>
     </li>
 </ul>
 </div>
@@ -37,24 +34,24 @@ foreach ($departments as $department) {
     echo "<ul class='tableActions'>";
     echo "<li>";
     echo $this->Html->link(
-        __('View', true), 
+        __('View', true),
         array('action' => 'view', $id)
     );
     echo "</li>";
     echo "<li>";
     echo $this->Html->link(
-        __('Edit', true), 
+        __('Edit', true),
         array('action' => 'edit', $id)
     );
     echo "</li>";
     echo "<li>";
     echo $this->Html->link(
-        __('Delete', true), 
+        __('Delete', true),
         array(
-            'action' => 'delete', 
-            $id), 
-        null, 
-        sprintf(__('Are you sure you want to delete %s?', true), 
+            'action' => 'delete',
+            $id),
+        null,
+        sprintf(__('Are you sure you want to delete %s?', true),
         $department['Name'])
     );
     echo "</li>";

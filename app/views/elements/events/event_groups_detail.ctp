@@ -8,10 +8,7 @@
     <?php foreach($data as $group):?>
     <?php if (isset($group['id'])): ?>
   	    <tr>
-            <td>
-                <?php echo $this->Html->link($html->image('icons/edit.gif',array('border'=>'0','alt'=>'Edit', 'valign' => 'middle')), 
-                                           '/groups/edit/'.$group['id'], array('escape' => false));?>
-                <?php echo $group['group_num'] ?></td>
+            <td><?php echo $this->Html->link($group['group_num'], '/groups/edit/'.$group['id'], array('class' => 'edit-button'));?></td>
             <td><?php echo $group['group_name']; ?></td>
             <td>
                 <?php if (isset($group['Member'])): ?>
@@ -32,8 +29,5 @@
     <tr><th cols="3" align="left" width="25%">
         <?php echo "No Groups"; ?>
     </td></tr>
-<?php endif; ?>   
+<?php endif; ?>
 </table>
-<div align = "center">
-
-</div>

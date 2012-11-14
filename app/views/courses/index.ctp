@@ -1,10 +1,7 @@
 <div class="content-container">
   <div class="button-row">
     <ul>
-      <li><?php echo $html->image('icons/add.gif', array('valign'=>'middle'))?>
-          <?php echo $html->link( __('Add Course', true), 
-                                 '/courses/add',
-                                 array('escape' => false)); ?></li>
+      <li><?php echo $html->link( __('Add Course', true), '/courses/add', array('class' => 'add-button')); ?></li>
     </ul>
   </div>
   <div>

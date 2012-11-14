@@ -49,10 +49,10 @@
                    );
             ?>
    	    <?php if($currentUser['Role']['name'] == 'superadmin' || $currentUser['Role']['name'] == 'admin'):
-                  echo $html->link(
-                                    $html->image('icons/delete.gif',array('border'=>'0','alt'=>__('Delete', true), 'title'=>__('Delete ', true).$user['full_name'])),
-                                    "/users/delete/".$user['id'],
-                                    array('onClick' => "return confirm('".__('Are you sure you want to delete user', true)."&ldquo;".$user["username"]."&rdquo;?')",'escape'=>false)
+                  echo $html->link($user['full_name'], "/users/delete/".$user['id'],
+                      array('onClick' => "return confirm('".__('Are you sure you want to delete user', true)."&ldquo;".$user["username"]."&rdquo;?')",
+                      'escape'=>false,
+                      'class' => 'delete-button')
                   );
                   endif;
             ?>

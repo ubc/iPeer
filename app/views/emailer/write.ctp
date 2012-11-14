@@ -7,15 +7,16 @@
     <table>
         <tr>
             <td>To:</td>
-            <td><p><?php if(!empty($recipients)) {
+            <td width="600px"><p><?php if(!empty($recipients)) {
                         echo $html->link($recipients['name'], $recipients['link']);
                     }
                 ?></p>
                 <div id="add-div"></div>
                 <?php echo $this->Form->select('recipients', $recipients_rest);
-                    echo $this->Js->link($html->image('icons/add.gif', array('alt'=>'Add Additional Recipient', 'valign'=>'middle', 'border'=>'0')).__(' Add Additional Recipient', true),
+                    echo $this->Js->link(__('Add Additional Recipient', true),
                         array('action' => 'addRecipient'),
                         array('escape' => false,
+                            'class' => 'add-button',
                             'success' => '
                                 $("add-div").insert({before: "<div>"+response.responseText+"</div>"});
                                 $$("option[value="+$F("recipients")+"]").invoke("remove")',
@@ -42,9 +43,9 @@
         </tr>
         <tr>
             <td>Schedule:</td>
-            <td><table>
-                    <tr>
-                        <td><?php echo $form->input('Email.schedule', array(
+            <td>
+                <div>
+                    <?php echo $form->input('Email.schedule', array(
                                         'type' => 'radio',
                                         'options' => array(
                                                 '0' => ' - '.__('Single Email',true).'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
@@ -55,11 +56,10 @@
                                         'legend' => false
                                     )
                                 )
-                            ?>
-                        </td>
-                    </tr>
-                    <tr id="scheduling">
-                        <td><?php echo $form->input('Email.times', array(
+                    ?>
+                </div>
+                <div id="scheduling">
+                        <?php echo $form->input('Email.times', array(
                                         'div' => false,
                                         'label' => __('(send ', true),
                                         'value' => '1',
@@ -85,30 +85,30 @@
                                 );
                                 echo ' in between each)';
                             ?>
-                        </td>
-                    </tr>
-                </table>
+                    </div>
             </td>
         </tr>
         <tr>
             <td>Template:</td>
-            <td><?php echo $html->link(__('Add Email Template', true), '/emailtemplates/add/');
+            <td><?php
                     echo $form->input('Email.template', array(
                             'type' => 'select',
                             'id' => 'template',
                             'options' => $templatesList,
                             'empty' => __('-- No Template --', true),
                             'label' => false,
+                            'div'   => false,
                             'onChange' => "new Ajax.Updater('email_content','".
                                 $this->webroot.$this->theme."emailtemplates/displayTemplateContent/'+this.options[this.selectedIndex].value,
-                                {method: 'post', asynchronous: true, evalScripts:false}); 
+                                {method: 'post', asynchronous: true, evalScripts:false});
                                 new Ajax.Updater('email_subject','".
                                 $this -> webroot.$this -> theme."emailtemplates/displayTemplateSubject/'+this.options[this.selectedIndex].value,
                                 {method: 'post', asynchronous: true, evalScripts:false});
                                 return false;",
                             'escape' => false
                         )
-                    )
+                    );
+                    echo $html->link(__('Add Email Template', true), '/emailtemplates/add/', array('class' => 'add-button'));
                 ?>
             </td>
         </tr>
@@ -159,12 +159,12 @@
     var cal1 = new calendar1(document.forms[0].elements['data[Email][date]']);
     cal1.year_scroll = false;
     cal1.time_comp = true;
-    $('scheduling').style.visibility = 'hidden';
+    $('scheduling').style.display = 'none';
     function toggle_schedule(el) {
         if (el.value == '1')
-            $('scheduling').style.visibility = 'visible';
+            $('scheduling').style.display = 'block';
         else
-            $('scheduling').style.visibility = 'hidden';
+            $('scheduling').style.display = 'none';
     }
 </script>
 <script type="text/javascript">

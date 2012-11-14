@@ -2,11 +2,7 @@
 
 <div class="button-row">
     <ul>
-        <li>
-        <?php echo $html->image('icons/add.gif', array('valign'=>'middle'))?>
-        <?php echo $html->link( __('Add Token', true), 
-                                 array('action' => 'add')); ?>
-        </li>
+        <li><?php echo $html->link( __('Add Token', true), array('action' => 'add'), array('class' => 'add-button')); ?></li>
     </ul>
 </div>
 
@@ -50,15 +46,15 @@ function fnFormatDetails ( oTable, nTr )
     var sOut = '<div class="userActionPanel"><ul>';
 
     sOut += '<li>';
-    sOut += '<a href="<?php echo $this->base; ?>/oauth_tokens/edit/'+aData[0]+'">Edit</a>'; 
+    sOut += '<a href="<?php echo $this->base; ?>/oauth_tokens/edit/'+aData[0]+'">Edit</a>';
     sOut += '</li>';
 
     sOut += '<li>';
-    sOut += '<a href="<?php echo $this->base; ?>/oauth_tokens/delete/'+aData[0]+'">Delete</a>'; 
+    sOut += '<a href="<?php echo $this->base; ?>/oauth_tokens/delete/'+aData[0]+'">Delete</a>';
     sOut += '</li>';
 
     sOut += '</ul></div>';
-     
+
     return sOut;
 }
 
@@ -70,7 +66,7 @@ jQuery(document).ready(function() {
         ],
         "aaSorting" : [[1, 'asc']]
     });
-    
+
     /* Add event listener for opening and closing details
      * Note that the indicator for showing which row is open is not controlled by DataTables,
      * rather it is done here

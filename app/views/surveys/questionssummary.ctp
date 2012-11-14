@@ -1,4 +1,4 @@
-<?php echo $this->Form->create('Course', 
+<?php echo $this->Form->create('Course',
                                array('id' => 'frm',
                                      'url' => array('action' => 'addQuestion'),
                                      'inputDefaults' => array('div' => false,
@@ -26,12 +26,12 @@
        <tr class="tablecell">
        <td width="50"><b><font size="2"><?php __('Q:')?> <?php echo $count++?></font></b></td>
 			  <?php if ($is_editable):?>
-						<td width="50"><?php echo $this->Html->link($html->image('icons/edit.gif',array('border'=>'0','alt'=>__('Edit', true), 'valign' => 'middle')).__(' Edit', true),
+						<td width="50"><?php echo $this->Html->link(__(' Edit', true),
                                                        'editQuestion/'.$question['id'].'/'.$survey_id,
-                                                       array('escape' => false))?>
-						<td width="60"><?php echo $this->Html->link($html->image('icons/delete.gif',array('border'=>'0','alt'=>'Delete', 'valign' => 'middle')).__(' Delete', true),
+                                                       array('class' => 'edit-button'))?>
+						<td width="60"><?php echo $this->Html->link(__(' Delete', true),
                                                        'removeQuestion/'.$survey_id.'/'.$question['id'],
-                                                       array('escape' => false),
+                                                       array('escape' => false, 'class' => 'delete-button'),
                                                        __('Are you sure to delete question &ldquo;', true).$question['prompt'].'&rdquo;?')?>
 				<td align="right" valign="top">
 				<table width="100" align="right" border="0" cellspacing="2" cellpadding="2">
