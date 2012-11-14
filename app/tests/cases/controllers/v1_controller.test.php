@@ -301,12 +301,15 @@ class V1ControllerTest extends CakeTestCase {
         $url = $this->_getURL('v1/courses');
         $courses = $this->_fixtures['app.course']->records;
         $expectedList = array();
+        
+        $enrol = array('13', '15', '2');
 
-        foreach ($courses as $course) {
+        foreach ($courses as $key => $course) {
             $tmp = array();
             $tmp['id'] = $course['id'];
             $tmp['course'] = $course['course'];
             $tmp['title'] = $course['title'];
+            $tmp['student_count'] = $enrol[$key];
             $expectedList[] = $tmp;
         }
         $expectedCourse = $expectedList[0];
@@ -364,6 +367,7 @@ class V1ControllerTest extends CakeTestCase {
                 $tmp['group_num'] = $group['group_num'];
                 $tmp['group_name'] = $group['group_name'];
                 $tmp['course_id'] = $group['course_id'];
+                $tmp['member_count'] = "4";
                 $expected[] = $tmp;
             }
         }
@@ -391,7 +395,8 @@ class V1ControllerTest extends CakeTestCase {
             'id' => $id,
             'group_num' => '1',
             'group_name' => 'Best Group Ever',
-            'course_id' => 2
+            'course_id' => 2,
+            'member_count' => "4"
         );
         $this->assertEqual($addedGroup, $expectedGroup);
 
@@ -442,12 +447,12 @@ class V1ControllerTest extends CakeTestCase {
         
         $this->assertEqual(json_decode($addedMembers, true), $toBeAdded);
         
-        /*$this->_oauthReq("$url/8", null, OAUTH_HTTP_METHOD_DELETE);
+        $this->_oauthReq("$url/8", null, OAUTH_HTTP_METHOD_DELETE);
         $this->_oauthReq("$url/9", null, OAUTH_HTTP_METHOD_DELETE);
         $this->_oauthReq("$url/10", null, OAUTH_HTTP_METHOD_DELETE);
                 
         $ret = $this->_oauthReq("$url");
-        $this->assertEqual(json_decode($ret, true), $expectedGroup);*/
+        $this->assertEqual(json_decode($ret, true), $expectedGroup);
     }
 
     public function testEvents()
@@ -462,10 +467,11 @@ class V1ControllerTest extends CakeTestCase {
             $tmp['title'] = $data['title'];
             $tmp['course_id'] = $data['course_id'];
             $tmp['event_template_type_id'] = $data['event_template_type_id'];
+            $tmp['due_date'] = $data['due_date'];
             $tmp['id'] = $data['id'];
             $expectedEvents[] = $tmp;
         }
-
+        
         // test get all events of a course
         $actualEvents = $this->_oauthReq("$url/1/events");
         $this->assertEqual($actualEvents, json_encode($expectedEvents));
@@ -473,7 +479,7 @@ class V1ControllerTest extends CakeTestCase {
 
         // test get specific event from a course
         $actualEvent = $this->_oauthReq("$url/1/events/3");
-        $expectedEvent = array("title" => "Project Evaluation", "course_id" => "1", "event_template_type_id" => "4", "id" => "3");
+        $expectedEvent = array("title" => "Project Evaluation", "course_id" => "1", "event_template_type_id" => "4", "due_date" => "2013-07-02 09:00:28", "id" => "3");
         $this->assertEqual($actualEvent, json_encode($expectedEvent));
         $this->assertEqual(json_decode($actualEvent, true), $expectedEvent);
     }
