@@ -288,11 +288,12 @@ class V1ControllerTest extends CakeTestCase {
         $this->assertEqual(json_decode($file, true), $expectedPerson);
 
         // DELETE - delete the user
-        $file = $this->_oauthReq("$url/$userId", null, OAUTH_HTTP_METHOD_DELETE);
-        // delete one of the user from import
+        $ret = $this->_oauthReq("$url/$userId", null, OAUTH_HTTP_METHOD_DELETE);
+        // there is no output for delete, so we should just expect empty array
+        $this->assertEqual(json_decode($ret), array()); 
+        // make sure that the user is really gone
         $this->_oauthReq("$url/$importUserId", null, OAUTH_HTTP_METHOD_DELETE);
         $ret = $this->_oauthReq("$url/$userId");
-        $this->assertEqual($file, '');
         $this->assertEqual(substr($ret->debugInfo['headers_recv'], 0, 22), 'HTTP/1.1 404 Not Found');
     }
 
