@@ -711,7 +711,7 @@ class V1Controller extends Controller {
                 $key = "EvaluationRubric";
             }
             else if ($type == 4) {
-                $res = $this->EvaluationMixeval->mixedEvalscore($event_id);
+                $res = $this->EvaluationMixeval->mixedEvalScore($event_id);
                 $key = "EvaluationMixeval";
             }
             foreach ($res as $val) {

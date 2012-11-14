@@ -504,6 +504,8 @@ class V1ControllerTest extends CakeTestCase {
             $tmp['score'] = $data['score'];
             $mixevalList[] = $tmp;
         }
+        array_pop($mixevalList);
+        
         foreach ($rubrics as $data) {
             $tmp = array();
             $tmp['evaluatee'] = $data['evaluatee'];
