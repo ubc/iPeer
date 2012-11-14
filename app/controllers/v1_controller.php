@@ -707,11 +707,11 @@ class V1Controller extends Controller {
                 $key = "EvaluationSimple";
             }
             else if ($type == 2) {
-                $res = $this->EvaluationRubric->find('all', $params);
+                $res = $this->EvaluationRubric->rubricEvalScore($event_id);
                 $key = "EvaluationRubric";
             }
             else if ($type == 4) {
-                $res = $this->EvaluationMixeval->find('all', $params);
+                $res = $this->EvaluationMixeval->mixedEvalScore($event_id);
                 $key = "EvaluationMixeval";
             }
             foreach ($res as $val) {

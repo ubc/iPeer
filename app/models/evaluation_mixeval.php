@@ -23,6 +23,13 @@ class EvaluationMixeval extends AppModel
             'foreignKey' => 'id'
         )
     );
+    
+    public $belongsTo = array(
+        'Event' => array(
+            'className' => 'Event',
+            'foreignKey' => 'event_id'
+        ),
+    );
 
     /**
      * getEvalMixevalByGrpEventIdEvaluatorEvaluatee
@@ -350,4 +357,65 @@ class EvaluationMixeval extends AppModel
         $evalDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera($mixEval['EvaluationMixeval']['id'], $questionNum);
         return $evalDetail;
     }
+    
+    /**
+     * mixedEvalScore
+     *
+     * @param mixed $eventId
+     *
+     * @access public
+     * @return void
+     */
+     function mixedEvalScore($eventId) {
+        $evalSub = ClassRegistry::init('EvaluationSubmission');
+        $pen = ClassRegistry::init('Penalty');
+        
+        $list = $this->find('all',
+            array('fields' => array('evaluatee', 'score'),
+                'conditions' => array('event_id' => $eventId)
+            )
+        );   
+        
+        $data = array();
+        foreach($list as $mark) {
+            if (!isset($data[$mark['EvaluationMixeval']['evaluatee']])) {
+                $data[$mark['EvaluationMixeval']['evaluatee']]['user_id'] = $mark['EvaluationMixeval']['evaluatee'];
+                $data[$mark['EvaluationMixeval']['evaluatee']]['score'] = $mark['EvaluationMixeval']['score'];
+                $data[$mark['EvaluationMixeval']['evaluatee']]['numEval']= 1;
+            } else {
+                $data[$mark['EvaluationMixeval']['evaluatee']]['score'] += $mark['EvaluationMixeval']['score'];
+                $data[$mark['EvaluationMixeval']['evaluatee']]['numEval']++;
+            }
+        }
+        
+        $sub = $evalSub->find('all', array('conditions' => array('event_id' => $eventId)));
+        $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId)));
+        
+        foreach($sub as $stu) {
+            if (isset($data[$stu['EvaluationSubmission']['submitter_id']])) {
+                $diff = strtotime($stu['EvaluationSubmission']['date_submitted']) - strtotime($event['Event']['due_date']);
+                $days = $diff/(60*60*24);
+                $penalty = $pen->getPenaltyByEventAndDaysLate($eventId,$days);
+                $data[$stu['EvaluationSubmission']['submitter_id']]['penalty'] = (isset($penalty['Penalty']['percent_penalty'])) ? $penalty['Penalty']['percent_penalty'] :
+                        0;
+            }
+        }
+        
+        foreach($data as $demo) {
+            if (!isset($demo['penalty'])) {
+                $data[$demo['user_id']]['penalty'] = 0;
+            }
+        }
+        
+        $grades = array();
+        foreach ($data as $student) {
+            $tmp = array();
+            $tmp['id'] = 0;
+            $tmp['evaluatee'] = $student['user_id'];
+            $tmp['score'] = $student['score']/$student['numEval']*(1-$student['penalty']/100);
+            $grades[]['EvaluationMixeval'] = $tmp;
+        }
+        
+        return $grades;
+     }
 }

@@ -1,7 +1,4 @@
 <?php
-App::import('Model', 'EvaluationMixeval');
-App::import('Model', 'EvaluationMixevalDetail');
-
 /**
  * Event
  *
@@ -123,7 +120,15 @@ class Event extends AppModel
             'order' => '',
             'dependent' => true,
             'foreignKey' => 'event_id'
-        )
+        ),
+        'EvaluationSimple' =>
+        array(
+            'className' => 'EvaluationSimple',
+            'conditions' => '',
+            'order' => '',
+            'dependent' => true,
+            'foreignKey' => 'event_id'
+        ),
     );
 
     /**

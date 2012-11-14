@@ -559,11 +559,11 @@ class EvaluationSimple extends AppModel
             $grades[]['EvaluationSimple'] = $tmp;
         }
         
-        foreach ($grades as $key => $student) {
+        /*foreach ($grades as $key => $student) {
             if ($student['EvaluationSimple']['score'] > $max) {
                 $grades[$key]['EvaluationSimple']['score'] = $max;
             }
-        }
+        }*/
         
         return $grades;
     }
