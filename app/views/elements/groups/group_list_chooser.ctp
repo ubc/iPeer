@@ -1,5 +1,7 @@
 <!-- This element renders 2 list of groups, selected and unselected.-->
-<?php $listStyle = 'min-width:13em; height:' . (empty($listSize) ? "20" : $listSize) . 'em;'; ?>
+<?php $listStyle = 'min-width:13em; height:' . (empty($listSize) ? "20" : $listSize) . 'em;';
+$status = isset($status) ? $status : '';
+?>
 
 <table><tr align="center">
     <td align="center">

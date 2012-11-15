@@ -1,47 +1,28 @@
-<table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
-    <tr>
-        <td>
 <?php echo $html->script('ricobase');
 echo $html->script('ricoeffects');
 echo $html->script('ricoanimation');
 echo $html->script('ricopanelcontainer');
 echo $html->script('ricoaccordion');
-echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
+?>
+<div class="content-container">
 <!-- Render Event Info table -->
-    <?php
-    $params = array('controller'=>'evaluations', 'event'=>$event);
-    echo $this->element('evaluations/view_event_info', $params);
-    ?>
+<?php echo $this->element('evaluations/view_event_info', array('controller'=>'evaluations', 'event'=>$event));?>
 
-<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
-    <tr>
-        <td colspan="3"><?php echo $html->image('icons/instructions.gif',array('alt'=>'instructions'));?>
-            <b> Summary:</b>(
-            <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Basic"><?php __('Basic')?></a>
-            |
-            <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Detail" ><?php __('Detail')?></a>
-            )
-            <BR>
-            <BR> <?php echo '<font size = "1" face = "arial" color = "red" >*Numerics in red denotes late submission penalty.</font>';?>
-        </td>
-    </tr>
-    <?php $i = 0;
-    if (!$allMembersCompleted) {?>
-    <tr>
-        <td colspan="3">
-            <font color="red"><?php __('These people have yet to submit their evaluations:')?> <br>
-            <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
-                &nbsp;-&nbsp; <?php echo $user['first_name'].' '.$user['last_name'];
-                if($row['Role']['role_id']==4) //label roles for clarity
-                    echo ' (TA)';
-                else
-                    echo ' (student)';?><br>
-            <?php endforeach; ?>
-            </font>
-        </td>
-    </tr>
-    <?php } ?>
-</table>
+<div class="event-summary">
+    <span class="instruction-icon"><?php __('Summary:')?> ( <?php echo $this->Html->link(__('Basic', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['group_id']."/Basic")?> |
+    <?php echo $html->link(__('Detail', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['group_id']."/Detail")?> )</span>
+    <font size = "1" face = "arial" color = "red" >*Numerics in red denotes late submission penalty.</font>
+    <?php if (!$allMembersCompleted): ?>
+        <div class="incompleted">
+          <?php __('These people have not yet submit their evaluations:')?>
+            <ul>
+                <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
+                    <li><?php echo $user['first_name'].' '.$user['last_name'] . ($row['Role']['role_id']==4 ? ' (TA)' : ' (student)');?></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    <?php endif; ?>
+</div>
 
 <div id='rubric_result'>
 
@@ -83,7 +64,7 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
                 $avgScore = $memberScoreSummary[$member['User']['id']]['received_ave_score'];
                 $penalty = number_format(($penalties[$member['User']['id']] / 100) * $avgScore, 2);
                 $penalty_percent = $penalties[$member['User']['id']] / 100;
-                $questionIndex = 0; 
+                $questionIndex = 0;
                 foreach ($scoreRecords[$member['User']['id']]['rubric_criteria_ave'] AS $criteriaAveIndex => $criteriaAveGrade) {
                     $scaledQuestionGrade = $criteriaAveGrade * (1 - $penalty_percent);
                     $groupAverage[$criteriaAveIndex] += $scaledQuestionGrade;
@@ -113,7 +94,7 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
             $finalAvgScore = $avgScore - $penalty;
             $penalty > 0 ? $stringAddOn = ' - '."<font color=\"red\">".$penalty."</font> = ".number_format($finalAvgScore, 2) :
                 $stringAddOn = '';
-            $aveScoreSum += $finalAvgScore; 
+            $aveScoreSum += $finalAvgScore;
             echo number_format($avgScore, 2).$stringAddOn;
             $receviedAvePercent = $finalAvgScore / $rubric['Rubric']['total_marks'] * 100;
             echo ' ('.number_format($receviedAvePercent) . '%)';
@@ -129,7 +110,7 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
 
         //averages
         echo '<tr class="tablesummary">';
-        $questionIndex = 0;      
+        $questionIndex = 0;
         foreach ($groupAverage AS $sum) {
             echo '<td class="total-cell">' . number_format($sum / count($groupMembersNoTutors), 2). "</td>";
         }
@@ -137,7 +118,7 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
         $groupAve = number_format($aveScoreSum / count($groupMembersNoTutors), 2);
         echo $groupAve;
         echo ' ('.number_format($groupAve / $rubric['Rubric']['total_marks'] * 100) . '%)';
-      
+
         echo "</b></td>";
     } ?>
     </tr></table></td></tr>
@@ -194,7 +175,7 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
                 $scaled = $membersAry[$user['id']]['received_ave_score'] * (1 - ($penalties[$user['id']] / 100));
                 $deduction = number_format($membersAry[$user['id']]['received_ave_score'] * ($penalties[$user['id']] / 100), 2);
                 $percent = number_format($membersAry[$user['id']]['received_ave_score_%']);
-                
+
                 echo __(" (Number of Evaluator(s): ",true).count($evalResult[$user['id']]).")<br/>";
                 echo __("Final Total: ",true).number_format($memberScoreSummary[$row['User']['id']]['received_ave_score'],2);
                 $penalties[$user['id']] > 0 ? $penaltyAddOn = ' - '."<font color=\"red\">".$deduction."</font> = ".number_format($scaled, 2) :
@@ -219,7 +200,7 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
                 echo __("Average Percentage Per Question: ", true);
                 echo $memberAvgScore;
                 $penalties[$user['id']] > 0 ? $penaltyAddOn = ' - '."<font color=\"red\">".$memberAvgScoreDeduction."</font> = ".$memberAvgScoreScaled :
-                    $penaltyAddOn = ''; 
+                    $penaltyAddOn = '';
                 echo $penaltyAddOn.' ('.$memberAvgScorePercent.'%)<br>';
                 $penalties[$user['id']] > 0 ? $penaltyNotice = 'NOTE: <font color=\'red\'>'.$penalties[$user['id']].'% </font>Late Penalty<br>' :
                     $penaltyNotice = '<br>';
@@ -330,11 +311,8 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
                                     {panelHeight:500,
                                     hoverClass: 'mdHover',
                                     selectedClass: 'mdSelected',
-                                    clickedClass: 'mdClicked', 
+                                    clickedClass: 'mdClicked',
                                     unselectedClass: 'panelheader'});
 </script>
 </div>
-
-        </td>
-    </tr>
-</table>
+</div>

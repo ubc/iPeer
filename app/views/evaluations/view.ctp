@@ -1,68 +1,30 @@
-<table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
-<tr>
-<td align="center">
-<table width="95%" border="0" cellspacing="0" cellpadding="2">
-    <?php if (!empty($data)) : ?>
-      <tr>
-        <td align="center" colspan="6">
+<?php $root = $this->webroot.$this->theme;
+$eventId = $data['Event']['id'];?>
+
+<div class="content-container">
+  <div style="text-align: center;">
         <h3><?php echo $data['Event']['title']?></h3>
         <?php echo $html->image('icons/caution.gif', array('alt'=>'Due Date'));?>
         &nbsp;<b>Event Due:</b>&nbsp;
         <?php echo Toolkit::formatDate($data['Event']['due_date']) ?>
-        <br /><br />
-        </td>
-      </tr>
-      <tr >
-        <?php $root = $this->webroot.$this->theme;
-              $eventId = $data['Event']['id'];?>
-        <td width="50%">
-            <?php 
-                echo $html->link(
-                        $html->image('icons/export_excel.gif', array('alt'=>'Export')).__(" Export Evaluations", true),
-                        "export/event/".$eventId,
-                        array('escape' => false)
-                );
-            ?>
-        </td>
-        <td>            
-            <?php echo $html->link(__('Release All Comments', true),
-                            'changeAllCommentRelease/'.$eventId.';1',
-                            array('escape' => false));
-            ?>
-        </td>
-        <td>
-            <?php echo $html->link(__('Unrelease All Comments', true),
-                            'changeAllCommentRelease/'.$eventId.';0',
-                            array('escape' => false));
-            ?>
-        </td>
-        <td>
-            <?php echo $html->link(__('Release All Grades', true),
-                            'changeAllGradeRelease/'.$eventId.';1',
-                            array('escape' => false));
-            ?>
-        </td>
-        <td>
-            <?php echo $html->link(__('Unrelease All Grades', true),
-                            'changeAllGradeRelease/'.$eventId.';0',
-                            array('escape' => false));
-            ?>
-        </td>
-        </tr><tr><td>&nbsp;</td><tr>
-    <?php endif; ?>
-        <tr><td colspan=10>
-                <?php echo $this->element("list/ajaxList", array ("paramsForList" =>$paramsForList)); ?>
-        </td></tr>
-  <tr>
-    <td colspan="2">
+  </div>
+  <div class="button-row">
+    <ul>
+      <li><?php echo $html->link(__(" Export Evaluations", true), "export/event/".$eventId, array('class' => 'export-excel-button'));?></li>
+      <li><?php echo $html->link(__('Release All Comments', true), 'changeAllCommentRelease/'.$eventId.';1', array('class' => 'button'));?></li>
+      <li><?php echo $html->link(__('Unrelease All Comments', true), 'changeAllCommentRelease/'.$eventId.';0', array('class' => 'button'));?></li>
+      <li><?php echo $html->link(__('Release All Grades', true), 'changeAllGradeRelease/'.$eventId.';1',array('class' => 'button'));?></li>
+      <li><?php echo $html->link(__('Unrelease All Grades', true),'changeAllGradeRelease/'.$eventId.';0',array('class' => 'button'));?></li>
+    </ul>
+  </div>
+  <div>
+    <?php echo $this->element("list/ajaxList", array ("paramsForList" =>$paramsForList)); ?>
+  </div>
+  <div>
      <?php echo $html->link(__('Back to Evaluation Event Listing', true), '/evaluations/index/'); ?>
      <?php if (!empty($data)) {
         echo '&nbsp;|&nbsp;';
         echo $html->link(__('Back to Course Home', true), '/courses/home/'.$data['Event']['course_id']);
       } ?>
-    </td>
-  </tr>
-</table>
-</td></tr>
-</table>
-
+  </div>
+</div>

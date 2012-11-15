@@ -1,70 +1,56 @@
-<table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
-    <tr>
-        <td>
-<?php echo $html->script('ricobase');
-    echo $html->script('ricoeffects');
-    echo $html->script('ricoanimation');
-    echo $html->script('ricopanelcontainer');
-    echo $html->script('ricoaccordion');
-    echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id');
-    // Render Event Info table
-    $params = array('controller'=>'evaluations', 'event'=>$event);
-    echo $this->element('evaluations/view_event_info', $params);
+<?php
+$rowspan = count($groupMembersNoTutors) + 3;
+$numerical_index = 1;  //use numbers instead of words; get users to refer to the legend
+$color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
+$membersAry = array();  //used to format result (students)
+$withTutorsAry = array(); //used to format result (students,tutors)
+$groupAve = 0;
+$groupAverage = array_fill(1, $mixeval['Mixeval']['lickert_question_max'], 0);
+$averagePerQuestion = array();
+
+echo $html->script('ricobase');
+echo $html->script('ricoeffects');
+echo $html->script('ricoanimation');
+echo $html->script('ricopanelcontainer');
+echo $html->script('ricoaccordion');
 ?>
 
-<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+<div class="content-container">
+
+<?php echo $this->element('evaluations/view_event_info', array('controller'=>'evaluations', 'event'=>$event));?>
+
+<div class="event-summary">
+    <span class="instruction-icon"><?php __('Summary:')?> ( <?php echo $this->Html->link(__('Basic', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['group_id']."/Basic")?> |
+    <?php echo $html->link(__('Detail', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['group_id']."/Detail")?> )</span>
+    <font size = "1" face = "arial" color = "red" >*Numerics in red denotes late submission penalty.</font>
+    <?php if (!$allMembersCompleted): ?>
+        <div class="incompleted">
+          <?php __('These people have not yet submit their evaluations:')?>
+            <ul>
+                <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
+                    <li><?php echo $user['first_name'].' '.$user['last_name'] . ($row['Role']['role_id']==4 ? ' (TA)' : ' (student)');?></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    <?php endif; ?>
+</div>
+
+<!-- summary table -->
+<table width="100%" align="center" class="outer-table">
     <tr>
-        <td colspan="3"><?php echo $html->image('icons/instructions.gif',array('alt'=>'instructions'));?>
-            <b> Summary:</b>(
-                <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Basic"><?php __('Basic')?></a>
-                |
-                <a href="<?php echo $this->webroot.$this->theme?>evaluations/viewEvaluationResults/<?php echo $event['Event']['id']?>/<?php echo $event['group_id']?>/Detail" ><?php __('Detail')?></a>
-            )
-            <br>
-            <br> <?php echo '<font size = "1" face = "arial" color = "red" >*Numerics in red denotes late submission penalty.</font>';?>
+        <td width="25%" valign="middle" class="result-header-td">Student Name:</td>
+        <td width="75%" rowspan="<?php echo $rowspan?>" class="inner-table-cell"><div class="scrollbar">
+            <table class="inner-table"><tr class="result-header-td">
+            <?php for ($i = 1; $i <= $mixeval['Mixeval']["lickert_question_max"]; $i++):?>
+                <td width='200' class='inner-table-cell'>
+                    <font color="<?php echo $color[ $numerical_index % sizeof($color) ]?>"><?php echo $numerical_index ?></font>(/<?php echo $mixevalQuestion[$i]['multiplier'];?>)
+                </td>
+                <?php $numerical_index++;?>
+            <?php endfor; ?>
+        <td width="250" class="inner-table-cell">
+            <?php echo __("Total:( /", true).number_format($mixeval['Mixeval']['total_marks'], 2)?>)
         </td>
     </tr>
-	<?php $i = 0;
-        if (!$allMembersCompleted) {?>
-        <tr>
-            <td colspan="3">
-                <font color="red"><?php __('These people have yet to submit their evaluations:')?> <br>
-                    <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
-                        &nbsp;-&nbsp; <?php echo $user['first_name'].' '.$user['last_name'];
-                        if($row['Role']['role_id']==4) //label roles for clarity
-                            echo ' (TA)';
-                        else
-                            echo ' (student)';?><br>
-                    <?php endforeach; ?>
-                </font>
-            </td>
-        </tr>
-        <?php } ?>
-        </table>
-        <?php
-        $rowspan = count($groupMembersNoTutors) + 3;
-        $numerical_index = 1;  //use numbers instead of words; get users to refer to the legend
-        $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
-        $membersAry = array();  //used to format result (students)
-        $withTutorsAry = array(); //used to format result (students,tutors)
-        $groupAve = 0;
-        $groupAverage = array_fill(1, $mixeval['Mixeval']['lickert_question_max'], 0);
-        $averagePerQuestion = array();
-        ?>
-        <!-- summary table -->
-        <?php echo '<table width="100%" align="center" class="outer-table">'; ?>
-            <tr>
-                <?php echo '<td width="25%" valign="middle" class="result-header-td">Student Name:</td>';
-                echo '<td width="75%" rowspan="'.$rowspan.'" class="inner-table-cell"><div class="scrollbar"><table class="inner-table"><tr class="result-header-td">';
-    	            for ($i = 1; $i <= $mixeval['Mixeval']["lickert_question_max"]; $i++) {
-    		            echo "<td width='200' class='inner-table-cell'>";
-    		                echo "<strong><font color=" . $color[ $numerical_index % sizeof($color) ] . ">" . $numerical_index . ". </font></strong>";
-    		                echo "(" . "/" . $mixevalQuestion[$i]['multiplier']. ")";
-    		            echo "</td>";
-    		            $numerical_index++;
-    	            }
-                echo '<td width="250" class="inner-table-cell">';
-                echo __("Total:( /", true).number_format($mixeval['Mixeval']['total_marks'], 2)?>)</td></tr>
             <?php  if ($groupMembersNoTutors) {
                 foreach ($groupMembersNoTutors as $member) {
                     $aveScoreSum = 0;
@@ -72,7 +58,7 @@
                     if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
       	                $totalScore = $memberScoreSummary[$member['User']['id']]['received_total_score'];
       	                $penalty = ($penalties[$member['User']['id']] / 100) * $totalScore;
-      		            $questionIndex = 0; 
+      		            $questionIndex = 0;
       		            $avgPerQuestion = 0;
         	            for ($j = 1; $j <= $mixeval['Mixeval']["lickert_question_max"]; $j++) {
                             if (!empty($scoreRecords[$member['User']['id']]['mixeval_question_ave'])) {
@@ -109,7 +95,7 @@
 
       		            $receviedAvePercent = ($memberScoreSummary[$member['User']['id']]['received_total_score'] - $penalty)
       		                / $mixeval['Mixeval']['total_marks'] * 100;
-      		
+
                         echo ' ('.number_format($receviedAvePercent) . '%)';
                         $membersAry[$member['User']['id']]['received_total_score'] = $memberScoreSummary[$member['User']['id']]['received_total_score'];
                         $membersAry[$member['User']['id']]['received_count'] = $memberScoreSummary[$member['User']['id']]['received_count'];
@@ -143,7 +129,7 @@
 	        </tr>
         </table></div></td>
     </tr>
-    <?php 
+    <?php
     if ($groupMembersNoTutors) {
         foreach ($groupMembersNoTutors as $member) {
             echo '<tr class="tablecell2" cellpadding="4" cellspacing="2" >';
@@ -156,7 +142,7 @@
             $withTutorsAry[$member['User']['id']]['member'] = $member;
         }
     }
-            
+
     echo '<tr class="tablesummary"><td class="group-members"><b>';
     echo __("Group Average: ", true);
     echo "</b></td></tr><tr><td>  </td></tr>";
@@ -223,9 +209,9 @@
                         }
                         ?> </b><br>
                         <?php echo __("Average Percentage Per Question: ", true);
-                        echo $memberAve.$ave_penaltyAddOn; 
+                        echo $memberAve.$ave_penaltyAddOn;
                         echo ' ('.$memberAvePercent .'%)';
-			                
+
                         $penalties[$user['id']] > 0 ? $penaltyNotice = '<br>'.__('NOTE: ', true).'<font color=\'red\'>'.$penalties[$user['id']].
                             '%</font>'.__(' Late Penalty', true) : $penaltyNotice = '';
                         echo $penaltyNotice;
@@ -264,7 +250,7 @@
                                         echo $mixevalQuestion[$j-1]['Description'][$rubDet['selected_lom']-1]['descriptor'];
                                     }
                                     echo "<br />";
-                
+
                                     //Points Detail
                                     echo "<strong>".__('Points:', true)."</strong>";
                                     if (isset($rubDet)) {
@@ -373,7 +359,4 @@
 								 unselectedClass: 'panelheader'});
 
 	</script>
-
-</td>
-</tr>
-</table>
+</div>

@@ -1,5 +1,5 @@
-<div id="import" style="background: #FFF;">
-	<table width="99%"  border="0" cellspacing="2" cellpadding="8">
+<div class="content-container">
+	<table class="full-size">
       <tr class="tableheader">
         <td width="50%"><?php __('Instructions')?></td>
         <td width="50%"><?php __('Import')?></td>
@@ -7,7 +7,7 @@
       <tr class="tablecell2">
         <td>
           <?php __('NOTE:')?>
-          <ul>
+          <ul class="instructions">
             <li><?php __('Please make sure the username column matches the username column in student import file.')?></li>
             <li><?php __('Please make sure to remove the header in CSV file.')?></li>
             <li><?php __('All columns are required.')?></li>
@@ -44,4 +44,4 @@
     <br></td>
       </tr>
     </table>
-    </div>
+</div>

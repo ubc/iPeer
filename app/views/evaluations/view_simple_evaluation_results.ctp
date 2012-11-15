@@ -1,44 +1,35 @@
-<table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
-  <tr>
-    <td>
 <?php echo $html->script('ricobase')?>
 <?php echo $html->script('ricoeffects')?>
 <?php echo $html->script('ricoanimation')?>
 <?php echo $html->script('ricopanelcontainer')?>
 <?php echo $html->script('ricoaccordion')?>
 
-	<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
+<div class="content-container">
+    <?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
     <!-- Render Event Info table -->
-	  <?php
-    $params = array('controller'=>'evaluations', 'event'=>$event);
-    echo $this->element('evaluations/view_event_info', $params);
-    ?>
-<?php if (!$allMembersCompleted) { $incompletedMembersArr = array();?>
-<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
-  <tr>
-    <td colspan="3">
-	      <font color="red"><?php __('These people have yet to submit their evaluations:')?> <br>
-	         <?php foreach($inCompletedMembers as $row): $user = $row['User']; array_push($incompletedMembersArr, $user['first_name'].' '.$user['last_name']);?>
-	          &nbsp;-&nbsp; <?php echo $user['first_name'].' '.$user['last_name'];
-              if($row['Role']['role_id']==4) //label roles for clarity
-                echo ' (TA)';
-              else
-                echo ' (student)';?><br>
-	      <?php endforeach; ?>
-      </font>
-    </td>
-  </tr>
-</table>
-<?php }
+    <?php echo $this->element('evaluations/view_event_info', array('controller'=>'evaluations', 'event'=>$event));?>
 
-?>
-<table width="100%" border="0" align="center" cellpadding="4">
+<?php if (!$allMembersCompleted) { $incompletedMembersArr = array();?>
+<div class="event-summary">
+    <span class="instruction-icon"><?php __('Summary:')?></span>
+    <div class="incompleted">
+      <?php __('These people have not yet submit their evaluations:')?>
+        <ul>
+            <?php foreach($inCompletedMembers as $row): $user = $row['User']; array_push($incompletedMembersArr, $user['first_name'].' '.$user['last_name']);?>
+                <li><?php echo $user['first_name'].' '.$user['last_name'] . ($row['Role']['role_id']==4 ? ' (TA)' : ' (student)');?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+</div>
+<?php }?>
+
+<table class="full-size">
   <tr class="tableheader">
     <td width="10" height="32" align="center" colspan="<?php echo count($groupMembersNoTutors)+1; ?>"><?php __('Evaluation Results')?>:</td>
   </tr>
   <tr class="tablecell2">
-  	<td width="25%" rowspan="2"><?php __('Evaluator')?></td>
-  	<td colspan="<?php echo count($groupMembersNoTutors); ?>"><?php __('Members Evaluated')?></td>
+  	<td width="25%" rowspan="2" style="vertical-align: bottom;"><?php __('Evaluator')?></td>
+  	<td colspan="<?php echo count($groupMembersNoTutors); ?>" style="text-align: center;"><?php __('Members Evaluated')?></td>
   </tr>
   <tr class="tablecell2">
   <?php if ($groupMembersNoTutors) {    //evaluators - no tutors
@@ -318,7 +309,4 @@ foreach($evalResult[$user['id']] AS $row ) {
 								 clickedClass: 'mdClicked',
 								 unselectedClass: 'panelheader'});
 	</script>
-
-	</td>
-  </tr>
-</table>
+</div>

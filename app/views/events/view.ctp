@@ -1,26 +1,20 @@
-<?php echo $html->script('groups')?>
 <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($event['Event']['id'])?'add':'edit') ?>">
 <?php echo empty($event['Event']['id']) ? null : $this->Form->hidden('id'); ?>
 
-<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+<table class="full-size event-view">
+    <tr class="tableheader"><td colspan="2">Evaluation Event</td></tr>
     <tr class="tablecell2">
-        <td width="150" id="course_label"><?php __('Course:')?></td>
-        <td width="405">
-            <?php echo $event['Course']['full_name']; ?>
+        <td width="20%" id="course_label"><?php __('Course:')?></td>
+        <td><?php echo $event['Course']['full_name']; ?>
         </td>
-        <td width="243" id="course_msg" class="error"/>
     </tr>
     <tr class="tablecell2">
-        <td id="newtitle_label"><?php __('Event Title:')?>&nbsp;</td>
-        <td>
-            <?php echo $event['Event']['title']; ?>
-        </td>
-        <td id="newtitle_msg" class="error" />
+        <td><?php __('Event Title:')?>&nbsp;</td>
+        <td><?php echo $event['Event']['title']; ?></td>
     </tr>
     <tr class="tablecell2">
         <td><?php __('Description:')?>&nbsp;</td>
         <td><?php echo $event['Event']['description']; ?></td>
-        <td></td>
     </tr>
     <tr class="tablecell2">
         <td><?php __('Evaluation Format:')?>&nbsp;</td>
@@ -47,24 +41,20 @@
                 </tr>
             </table>
         </td>
-        <td></td>
     </tr>
     <tr class="tablecell2">
         <td><?php __('Allow Self-Evaluation?:')?></td>
         <td>
             <?php echo $event['Event']['self_eval']==1? 'Enable' : 'Disable'; ?>
         </td>
-        <td></td>
     </tr>
     <tr class="tablecell2">
         <td><?php __('Require Student Comments?:')?> </td>
         <td><?php echo $event['Event']['com_req']==1? 'Yes' : 'No'; ?></td>
-        <td></td>
     </tr>
     <tr class="tablecell2">
         <td><?php __('Due Date:')?>&nbsp;</td>
         <td><?php echo Toolkit::formatDate($event['Event']['due_date']) ?></td>
-        <td></td>
     </tr>
     <tr class="tablecell2">
         <td><?php __('Evaluation Release Date: <font color="red">*</font>')?></td>
@@ -84,7 +74,6 @@
                 </tr>
             </table>
         </td>
-        <td></td>
     </tr>
     <tr class="tablecell2">
         <td><?php __('Result Release Date: <font color="red">*</font>')?></td>
@@ -104,12 +93,11 @@
                 </tr>
             </table>
         </td>
-        <td></td>
     </tr>
     <tr class="tablecell2">
-        <td id="newtitle_label"><?php __('Late Penalty:')?>&nbsp;</td>
-        <td width=100%>
-            <?php 
+        <td><?php __('Late Penalty:')?>&nbsp;</td>
+        <td>
+            <?php
             if (!empty($penalty)) {
                 foreach ($penalty as $tmp) {
                     echo 'Deduct '.$tmp['Penalty']['percent_penalty'].'% if late by '.$tmp['Penalty']['days_late'].' day';
@@ -133,7 +121,6 @@
             echo $this->element('events/event_groups_detail', $params);
         ?>
         </td>
-        <td></td>
     </tr>
 </table>
 <table width="95%"  border="0" cellspacing="2" cellpadding="4">

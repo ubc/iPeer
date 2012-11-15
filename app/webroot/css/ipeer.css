@@ -37,6 +37,7 @@ q:before, q:after {
     content: '';
     content: none;
 }
+
 table {
     border-collapse: collapse;
     border-spacing: 0;
@@ -946,10 +947,6 @@ i {
 /* TEMPORARY */
 /* temporary padding to be used until refactoring finished */
 
-table {
-    border-spacing: 1px;
-    border-collapse: separate;
-}
 th {
     vertical-align: middle;
     padding: 0.3em;
@@ -1391,6 +1388,26 @@ table.content-table {
     font-size: 0.9em;
 }
 
+.export-excel-button {
+    background:url('/img/icons/export_excel.gif') center left no-repeat;
+    padding: 0 0 0 20px;
+    white-space:nowrap;
+    font-size: 0.9em;
+}
+
+.instruction-icon {
+    background:url('/img/icons/instructions.gif') center left no-repeat;
+    padding: 0 0 0 20px;
+    white-space:nowrap;
+    font-size: 0.9em;
+}
+
+.button {
+    padding: 0 0 0 20px;
+    white-space:nowrap;
+    font-size: 0.9em;
+}
+
 .question {
     margin: 0.8em 0 0.8em 0;
     overflow: visible;
@@ -1543,4 +1560,55 @@ textarea.question-title-textarea, textarea.question-descriptor {
 .scrollbar {
     overflow-x: auto;
     overflow-y: hidden;
+}
+
+table.full-size {
+    width: 100%;
+    border: 0px;
+    font-size: 0.9em;
+    text-align: left;
+    margin-bottom: 2em;
+}
+
+table.event-detail {
+}
+
+.event-summary div.incompleted {
+    color: red;
+    margin: 1em 0 1em 1em;
+    font-size: 0.9em;
+}
+
+.event-summary div.incompleted ul {
+    margin: 20px;
+}
+
+.event-summary div.incompleted li {
+    list-style-type: square; 
+    padding: 0.2em;
+}
+
+ul.instructions {
+    margin: 1em 0 1em 2em;
+}
+
+ul.instructions li {
+    list-style-type: square; 
+    padding: 0.2em;
+}
+
+table.event-view {
+    border-collapse:collapse;
+}
+
+table.event-view tr.tablecell2 {
+    background-color: #EAEAEA;
+}
+
+table.event-view td {
+    border: 1px solid white;
+}
+
+table.event-view table td {
+    border: 0;
 }

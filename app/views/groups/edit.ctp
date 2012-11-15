@@ -1,10 +1,8 @@
 <?php echo $html->script('groups')?>
 <?php $readonly = isset($readonly) ? $readonly : false;?>
 
-<table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
-<tr>
-  <td>    
-  <?php echo $this->Form->create('Group', 
+<div class="content-container">
+  <?php echo $this->Form->create('Group',
                                  array('id' => 'frm',
                                        'url' => array('action' => $this->action.'/'.$course_id),
                                        'inputDefaults' => array('div' => false,
@@ -13,10 +11,10 @@
                                                                 'between' => '</td><td>')))?>
   <?php if(isset($group_id))
             echo $this->Form->hidden('Group.id', array('value' => $group_id));
-            
+
         echo $this->Form->hidden('Group.course_id', array('value' => $course_id));
   ?>
-  <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+  <table class="full-size">
   <tr class="tableheader">
     <td colspan="4" align="center"><?php echo ucfirst($this->action)?> <?php __('Group')?></td>
   </tr>
@@ -39,7 +37,7 @@
 
   <tr class="tablecell2">
     <td><?php __('Members')?>:</td>
-    <td>    
+    <td>
     <?php if($readonly):?>
       <?php if(!empty($members)):?>
     <table width="100%" border="0" cellspacing="2" cellpadding="2">
@@ -85,14 +83,11 @@
   <table width="95%"  border="0" cellspacing="2" cellpadding="4">
   <tr>
     <td>
-      <?php echo $this->Html->link(__('Edit this Group', true), '/groups/edit/'.$data['Group']['id']); ?> | 
+      <?php echo $this->Html->link(__('Edit this Group', true), '/groups/edit/'.$data['Group']['id']); ?> |
       <?php echo $html->link(__('Back to Group Listing', true), '/groups/index/'.$data['Group']['course_id']); ?>
     </td>
   </tr>
   </table>
   <?php endif;?>
-
-	</td>
-</tr>
-</table>
+</div>
 <?php echo $this->Form->end();?>

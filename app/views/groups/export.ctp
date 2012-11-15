@@ -1,18 +1,14 @@
-<?php
-	echo $html->script('groups');
-?>
-<table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
-<tr>
-    <td>
+<?php echo $html->script('groups');?>
+<div class="content-container">
     <form name="frm" id="frm" method="POST" action="<?php echo $html->url('export/'.$courseId) ?>">
-      <table width="75%" border="0" align="center" cellpadding="10" cellspacing="2">
-        <tr class="tableheader"> 
+      <table class="full-size">
+        <tr class="tableheader">
           <td colspan="2" align="center">Export As</td>
-        </tr>	 	
+        </tr>
         <tr class="tablecell2">
           <td width="30%">Export Filename:</td><td width="40%"><input type="text" name="file_name" value="<?php if(isset($file_name)) echo $file_name;?>" />.csv</td>
         </tr>
-        <tr class="tableheader"> 
+        <tr class="tableheader">
           <td colspan="2" align="center">Export Group Fields</td>
         </tr>
         <tr><td style="color:darkred; font-size:smaller"> (Please select at least one of the fields)</td></tr>
@@ -37,28 +33,26 @@
             </tr>
         <?php }*/ ?>
         </table>
-        <table width="75%" border="0" align="center" cellpadding="10" cellspacing="1">
+        <table class="full-size">
         <tr class="tableheader">
           <td colspan="1" align="center">Group Selection</td>
         </tr>
         <tr class="tablecell2">
-          <td align="center"> 		  
-          <?php
-	  	    echo $this->element("groups/group_list_chooser",
-	   	    array('all' => $unassignedGroups, 'assigned'=>'',
-	          'allName' =>  __('Available Groups', true), 'selectedName' => __('Participating Groups', true),
-	          'itemName' => 'Group', 'listStrings' => array("Group #", "group_num"," - ","group_name")));   
-		  ?>
-		  </td>
-		</tr>
+          <td align="center">
+<?php
+echo $this->element("groups/group_list_chooser",
+    array('all' => $unassignedGroups, 'assigned'=>'',
+    'allName' =>  __('Available Groups', true), 'selectedName' => __('Participating Groups', true),
+    'itemName' => 'Group', 'listStrings' => array("Group #", "group_num"," - ","group_name")));
+?>
+          </td>
+        </tr>
         <tr class="tablecell2">
           <td colspan="3" align="center">
-          <?php echo $this->Form->submit(ucfirst($this->action).__(' Group', true), array('div' => false,
-			'onClick' => "processSubmit(document.getElementById('selected_groups'));")) ?>
-		  </td>
+<?php echo $this->Form->submit(ucfirst($this->action).__(' Group', true), array('div' => false,
+    'onClick' => "processSubmit(document.getElementById('selected_groups'));")) ?>
+          </td>
         </tr>
       </table>
     </form>
-  </td>
-  </tr>
-</table>
+</div>
