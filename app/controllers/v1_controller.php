@@ -571,17 +571,23 @@ class V1Controller extends Controller {
      * get, add, and delete group members from a group
     **/
     public function groupMembers() {
+        $status = 'HTTP/1.1 400 Bad Request';
+        $groupMembers = array();
+
         $groupId = $this->params['group_id'];
-        $userId = $this->params['user_id'];
+        $username = $this->params['username'];
 
         if ($this->RequestHandler->isGet()) {
-            $userIds = $this->GroupsMembers->find('list', array(
-                'conditions' => array('group_id' => $groupId),
-                'fields' => array('user_id')));
+            // retrieve a list of users in the given group
+            $userIds = $this->GroupsMembers->find('list', 
+                array(
+                    'conditions' => array('group_id' => $groupId),
+                    'fields' => array('user_id')
+                )
+            );
+            $users = $this->User->find('all', 
+                array('conditions' => array('User.id' => $userIds)));
 
-            $users = $this->User->find('all', array('conditions' => array('User.id' => $userIds)));
-
-            $groupMembers = array();
             foreach ($users as $user) {
                 $tmp = array();
                 $tmp['id'] = $user['User']['id'];
@@ -592,49 +598,41 @@ class V1Controller extends Controller {
                 $groupMembers[] = $tmp;
             }
 
-            if(empty($groupMembers)) {
-                $this->set('statusCode', 'HTTP/1.1 404 Not Found');
-                $this->set('groupMembers', $groupMembers);
-            } else {
-                $this->set('statusCode', 'HTTP/1.1 200 OK');
-                $this->set('groupMembers', $groupMembers);
-            }
-        // return all user ids or only the ones newly added?
+            $status = 'HTTP/1.1 200 OK';
         } else if ($this->RequestHandler->isPost()) {
-            $add = trim(file_get_contents('php://input'), true);
-            $users = json_decode($add, true);
-
-            $this->set('error', $users);
-
-            $groupMembers = array();
+            // add the list of users to the given group
+            $ret = trim(file_get_contents('php://input'), true);
+            $users = json_decode($ret, true);
+            $status = 'HTTP/1.1 200 OK';
             foreach ($users as $user) {
-                $tmp = array();
-                $tmp = array('group_id' => $groupId, 'user_id' => $user);
-
-                $statusCode = 'HTTP/1.1 200 OK';
+                $userId = $this->User->field('id', 
+                    array('username' => $user['username']));
+                $tmp = array('group_id' => $groupId, 'user_id' => $userId);
+                // try to add this user to group
+                $this->GroupsMembers->create();
                 if ($this->GroupsMembers->save($tmp)) {
                     $userId = $this->GroupsMembers->read('user_id');
                     $this->GroupsMembers->id = null;
-                    $groupMembers[] = $userId['GroupsMembers']['user_id'];
+                    $groupMembers[] = $user;
                 } else {
-                    $statusCode = 'HTTP/1.1 500 Internal Server Error';
+                    $status = 'HTTP/1.1 500 Internal Server Error';
+                    break;
                 }
             }
-            $this->set('statusCode', $statusCode);
-            $this->set('groupMembers', $groupMembers);
         } else if ($this->RequestHandler->isDelete()) {
-            $gm = $this->GroupsMembers->find('first', array('conditions' => array('user_id' => $userId, 'group_id' => $groupId)));
-            if ($this->GroupsMembers->delete($gm['GroupsMembers']['id'])) {
-                $this->set('statusCode', 'HTTP/1.1 204 No Content');
-                $this->set('groupMembers', null);
+            // delete a user from the given group
+            $userId = $this->User->field('id', array('username' => $username));
+            $gmId = $this->GroupsMembers->field('id', 
+                array('user_id' => $userId, 'group_id' => $groupId));
+            if ($this->GroupsMembers->delete($gmId)) {
+                $status = 'HTTP/1.1 204 No Content';
             } else {
-                $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
-                $this->set('groupMembers', null);
+                $status = 'HTTP/1.1 500 Internal Server Error';
             }
-        } else {
-            $this->set('statusCode', 'HTTP/1.1 400 Bad Request');
-            $this->set('groupMembers', null);
-        }
+        } 
+
+        $this->set('statusCode', $status);
+        $this->set('groupMembers', $groupMembers);
     }
 
     /**
@@ -866,44 +864,6 @@ class V1Controller extends Controller {
         }
 
         $this->render('events');
-    }
-
-    /* A quick mockup for handling group enrolment. special cases are not
-     * considered. It's only used for testing b2.
-     * Please implement it with correct error handling and optimization.
-     * */
-    public function groupUsers() {
-        $group_id = $this->params['group_id'];
-        $ret = array();
-
-        if ($this->RequestHandler->isGet()) {
-            $ret = $this->User->getUsersByGroupId($group_id);
-            $statusCode = 'HTTP/1.1 200 OK';
-        } else if ($this->RequestHandler->isPost()) {
-            $body = trim(file_get_contents('php://input'), true);
-            $decode = json_decode($body, true);
-            $usernames = array();
-            foreach($decode as $user) {
-                $usernames[] = $user['username'];
-            }
-            $users = $this->User->findAllByUsername($usernames);
-            $ret = array();
-            foreach($users as $user) {
-                $this->User->habtmAdd('Group', $user['User']['id'], $group_id);
-                //$tmp = array();
-                //$tmp['id'] = $user['User']['id'];
-                //$tmp['role_id'] = $user['Role']['0']['id'];
-                //$tmp['username'] = $user['User']['username'];
-                //$tmp['last_name'] = $user['User']['last_name'];
-                //$tmp['first_name'] = $user['User']['first_name'];
-                //$ret[] = $tmp;
-                $ret[] = array('username' => $user['User']['username']);
-            }
-            $statusCode = 'HTTP/1.1 201 Created';
-        }
-        $this->set('statusCode', $statusCode);
-        $this->set('user', $ret);
-        $this->render('users');
     }
 
     /**

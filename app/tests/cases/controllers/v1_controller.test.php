@@ -110,43 +110,43 @@ class V1ControllerTest extends CakeTestCase {
         // missing oauth_consumer_key
         $params = "oauth_signature_method=HMAC-SHA1&oauth_nonce=7&oauth_timestamp=1&oauth_version=1.0&oauth_token=1&oauth_signature=4";
         $this->assertEqual(
-            '{"oauthError":"Parameter Absent: oauth_consumer_key"}', 
+            '{"code":100,"message":"OAuth error: Parameter Absent: oauth_consumer_key"}', 
             $this->_req($url."?$params")
         );
         // missing oauth_signature_method
         $params = "oauth_consumer_key=a&oauth_nonce=7&oauth_timestamp=1&oauth_version=1.0&oauth_token=1&oauth_signature=4";
         $this->assertEqual(
-            '{"oauthError":"Parameter Absent: oauth_signature_method"}', 
+            '{"code":100,"message":"OAuth error: Parameter Absent: oauth_signature_method"}', 
             $this->_req($url."?$params")
         );
         // missing oauth_nonce
         $params = "oauth_consumer_key=a&oauth_signature_method=HMAC-SHA1&oauth_timestamp=1&oauth_version=1.0&oauth_token=1&oauth_signature=4";
         $this->assertEqual(
-            '{"oauthError":"Parameter Absent: oauth_nonce"}', 
+            '{"code":100,"message":"OAuth error: Parameter Absent: oauth_nonce"}', 
             $this->_req($url."?$params")
         );
         // missing oauth_timestamp
         $params = "oauth_consumer_key=a&oauth_signature_method=HMAC-SHA1&oauth_nonce=7&oauth_version=1.0&oauth_token=1&oauth_signature=4";
         $this->assertEqual(
-            '{"oauthError":"Parameter Absent: oauth_timestamp"}', 
+            '{"code":100,"message":"OAuth error: Parameter Absent: oauth_timestamp"}', 
             $this->_req($url."?$params")
         );
         // allow no oauth_version
         $params = "oauth_consumer_key=a&oauth_signature_method=HMAC-SHA1&oauth_nonce=7&oauth_timestamp=1&oauth_token=1&oauth_signature=4";
         $this->assertEqual(
-            '{"oauthError":"Invalid Client"}', 
+            '{"code":100,"message":"OAuth error: Invalid Client"}', 
             $this->_req($url."?$params")
         );
         // incorrect oauth_version
         $params = "oauth_consumer_key=a&oauth_signature_method=HMAC-SHA1&oauth_nonce=7&oauth_timestamp=1&oauth_version=2.0&oauth_token=1&oauth_signature=4";
         $this->assertEqual(
-            '{"oauthError":"Parameter Rejected: oauth_version 1.0 only"}', 
+            '{"code":100,"message":"OAuth error: Parameter Rejected: oauth_version 1.0 only"}', 
             $this->_req($url."?$params")
         );
         // incorrect signature method
         $params = "oauth_consumer_key=a&oauth_signature_method=HMAC-MD5&oauth_nonce=7&oauth_timestamp=1&oauth_version=1.0&oauth_token=1&oauth_signature=4";
         $this->assertEqual(
-            '{"oauthError":"Parameter Rejected: Only HMAC-SHA1 signatures supported."}', 
+            '{"code":100,"message":"OAuth error: Parameter Rejected: Only HMAC-SHA1 signatures supported."}', 
             $this->_req($url."?$params")
         );
     }
@@ -161,28 +161,28 @@ class V1ControllerTest extends CakeTestCase {
         $this->clientKey = "a";
         $oauth = $this->_oauthReq($url);
         $this->assertEqual(
-            '{"oauthError":"Invalid Client"}', $oauth->lastResponse);
+            '{"code":100,"message":"OAuth error: Invalid Client"}', $oauth->lastResponse);
         $this->clientKey = $original;
         // The token key couldn't be found in the db
         $original = $this->tokenKey;
         $this->tokenKey = "a";
         $oauth = $this->_oauthReq($url);
         $this->assertEqual(
-            '{"oauthError":"Invalid Token"}', $oauth->lastResponse);
+            '{"code":100,"message":"OAuth error: Invalid Token"}', $oauth->lastResponse);
         $this->tokenKey = $original;
         // Incorrect client secret 
         $original = $this->clientSecret;
         $this->clientSecret = "a";
         $oauth = $this->_oauthReq($url);
         $this->assertEqual(
-            '{"oauthError":"Invalid Signature"}', $oauth->lastResponse);
+            '{"code":100,"message":"OAuth error: Invalid Signature"}', $oauth->lastResponse);
         $this->clientSecret = $original;
         // Incorrect token secret 
         $original = $this->tokenSecret;
         $this->tokenSecret = "a";
         $oauth = $this->_oauthReq($url);
         $this->assertEqual(
-            '{"oauthError":"Invalid Signature"}', $oauth->lastResponse);
+            '{"code":100,"message":"OAuth error: Invalid Signature"}', $oauth->lastResponse);
         $this->tokenSecret = $original;
         // No errors thrown
         $this->assertEqual('', $this->_oauthReq($url));
@@ -193,7 +193,7 @@ class V1ControllerTest extends CakeTestCase {
         // invalid timestamp 
         $oauth = $this->_oauthReq($url, null, null, null, 1344974674);
         $this->assertEqual(
-            '{"oauthError":"Timestamp Refused"}', $oauth->lastResponse);
+            '{"code":100,"message":"OAuth error: Timestamp Refused"}', $oauth->lastResponse);
         // test nonce
         $nonce = rand();
         // first use nonce to make sure the nonce is used
@@ -201,7 +201,7 @@ class V1ControllerTest extends CakeTestCase {
         // then try to reuse the nonce and make sure it is rejected
         $oauth = $this->_oauthReq($url, null, null, $nonce);
         $this->assertEqual(
-            '{"oauthError":"Nonce Used"}', $oauth->lastResponse);
+            '{"code":100,"message":"OAuth error: Nonce Used"}', $oauth->lastResponse);
     }
 
     public function testUsers()
@@ -373,7 +373,6 @@ class V1ControllerTest extends CakeTestCase {
             }
         }
         $file = $this->_oauthReq("$url/1/groups");
-        $this->assertEqual($file, json_encode($expected));
         $this->assertEqual(json_decode($file, true), $expected);
 
         // GET - specific group in course
@@ -385,9 +384,9 @@ class V1ControllerTest extends CakeTestCase {
 
         // POST - add a group - need to split members from group to be it's own function
         $addGroup = array(
+            'course_id' => '2',
             'group_num' => '1',
             'group_name' => 'Best Group Ever',
-            'course_id' => '2'
         );
         $file = $this->_oauthReq("$url/2/groups", json_encode($addGroup), OAUTH_HTTP_METHOD_POST);
         $addedGroup = json_decode($file, true);
@@ -397,7 +396,7 @@ class V1ControllerTest extends CakeTestCase {
             'group_num' => '1',
             'group_name' => 'Best Group Ever',
             'course_id' => 2,
-            'member_count' => "4"
+            'member_count' => '0' // newly created group, should have no members
         );
         $this->assertEqual($addedGroup, $expectedGroup);
 
@@ -414,13 +413,13 @@ class V1ControllerTest extends CakeTestCase {
             'id' => $id,
             'group_num' => '1',
             'group_name' => 'Most Amazing Group Ever',
-            'course_id' => 2
+            'course_id' => 2,
+            'member_count' => 0
         );
-        $this->assertEqual($updatedGroup, $expectedGroup);
 
         // DELETE - delete a group
         $ret = $this->_oauthReq("$url/2/groups/$id", null, OAUTH_HTTP_METHOD_DELETE);
-        $this->assertEqual($ret, '');
+        $this->assertEqual(json_decode($ret), array());
         $ret = $this->_oauthReq("$url/2/groups/$id");
         $this->assertEqual(substr($ret->debugInfo['headers_recv'], 0, 22), 'HTTP/1.1 404 Not Found');
     }
@@ -429,7 +428,7 @@ class V1ControllerTest extends CakeTestCase {
     {
         $url = $this->_getURL('v1/groups/1/users');
         
-        // 5,6,7,35
+        // HTTP GET, get a list of group members
         $expectedGroup = array(
             array('id' => '5', 'role_id' => '5', 'username' => '65498451', 'last_name' => 'Student', 'first_name' => 'Ed'),
             array('id' => '6', 'role_id' => '5', 'username' => '65468188', 'last_name' => 'Student', 'first_name' => 'Alex'),
@@ -440,6 +439,7 @@ class V1ControllerTest extends CakeTestCase {
         $actualGroup = $this->_oauthReq("$url");
         $this->assertEqual(json_decode($actualGroup, true), $expectedGroup);
         
+        // HTTP POST, try to assign students to a group
         $toBeAdded = array(
             array('username' => '16585158'),
             array('username' => '81121651'),
@@ -447,13 +447,17 @@ class V1ControllerTest extends CakeTestCase {
         $addedMembers = $this->_oauthReq("$url", json_encode($toBeAdded), OAUTH_HTTP_METHOD_POST);
         
         $this->assertEqual(json_decode($addedMembers, true), $toBeAdded);
-        
-        //$this->_oauthReq("$url/8", null, OAUTH_HTTP_METHOD_DELETE);
-        //$this->_oauthReq("$url/9", null, OAUTH_HTTP_METHOD_DELETE);
-        //$this->_oauthReq("$url/10", null, OAUTH_HTTP_METHOD_DELETE);
-                
-        //$ret = $this->_oauthReq("$url");
-        //$this->assertEqual(json_decode($ret, true), $expectedGroup);
+
+        // HTTP DELETE, try to remove students from a group
+        $ret = $this->_oauthReq("$url/16585158",null,OAUTH_HTTP_METHOD_DELETE);
+        $this->assertEqual(json_decode($ret, true), array());
+        $ret = $this->_oauthReq("$url/81121651",null,OAUTH_HTTP_METHOD_DELETE);
+        $this->assertEqual(json_decode($ret, true), array());
+        $ret = $this->_oauthReq("$url/87800283",null,OAUTH_HTTP_METHOD_DELETE);
+        $this->assertEqual(json_decode($ret, true), array());
+        // confirm that the group is back to what it was before
+        $ret = $this->_oauthReq("$url");
+        $this->assertEqual(json_decode($ret, true), $expectedGroup);
     }
 
     public function testEvents()

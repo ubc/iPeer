@@ -87,9 +87,10 @@ if (file_exists(CONFIGS.'installed.txt')) {
   Router::connect('/:controller/courses/:course_id/users/:username/events',
     array('action' => 'userEvents'),
     array('course_id' => '[0-9]+'));
-  Router::connect('/:controller/groups/:group_id/users',
-    array('action' => 'groupUsers'),
-    array('group_id' => '[0-9]+'));
+  // connect url to groups/1/users api, for manipulating groupmembers
+  Router::connect('/:controller/groups/:group_id/users/:username',
+    array('action' => 'groupMembers', 'username' => null),
+    array('group_id' => '[0-9]+', 'username' => '.+'));
 } else {
   // Note, order of routes specified matters. If install didn't come first
   // the /* directive would just redirect every page to the index page

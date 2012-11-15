@@ -1,5 +1,6 @@
 <?php
-    header('Content-Type: application/json');
-    header($statusCode);
-        echo json_encode($groupMembers);	
+header('Content-Type: application/json');
+header($statusCode);
+if ($groupMembers == null) $groupMembers = array();
+echo json_encode($groupMembers);	
 ?>
