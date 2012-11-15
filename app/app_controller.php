@@ -176,8 +176,12 @@ class AppController extends Controller
 
     /**
      * beforeLogin callback, called every time in auth compoment
+     *
+     * @access public
+     * @return void
      */
-    public function beforeLogin() {
+    public function beforeLogin()
+    {
         // if we have a session transfered to us
         if ($this->hasSessionTransferData()) {
             if ($this->authenticateWithSessionTransferData()) {
@@ -227,7 +231,14 @@ class AppController extends Controller
         $this->Session->destroy();
     }
 
-    function hasSessionTransferData() {
+    /**
+     * hasSessionTransferData
+     *
+     * @access public
+     * @return boolean
+     */
+    function hasSessionTransferData()
+    {
         $params = $this->params['url'];
         if (isset($params['username']) && isset($params['timestamp']) && isset($params['token']) && isset($params['signature'])) {
             $this->isSessionTransfer = true;
@@ -239,7 +250,14 @@ class AppController extends Controller
         return false;
     }
 
-    function authenticateWithSessionTransferData() {
+    /**
+     * authenticateWithSessionTransferData
+     *
+     * @access public
+     * @return boolean
+     */
+    function authenticateWithSessionTransferData()
+    {
         $message = $this->sessionTransferData['username'].$this->sessionTransferData['timestamp'].$this->sessionTransferData['token'];
         $secret = $this->OauthToken->getTokenSecret($this->sessionTransferData['token']);
         $signature = base64_encode(hash_hmac('sha1', $message, $secret, true));

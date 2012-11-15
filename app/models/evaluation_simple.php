@@ -333,7 +333,7 @@ class EvaluationSimple extends AppModel
         }
         return $ret;
     }
-    
+
     /**
      * formatStudentViewOfSimpleEvaluationResult
      *
@@ -349,7 +349,7 @@ class EvaluationSimple extends AppModel
         $this->User = ClassRegistry::init('User');
         $this->Penalty = ClassRegistry::init('Penalty');
         $this->Event = ClassRegistry::init('Event');
-        
+
         $gradeReleaseStatus = 0;
         $aveScore = 0;
         $groupAve = 0;
@@ -379,9 +379,9 @@ class EvaluationSimple extends AppModel
                         'EvaluationSimple.grp_event_id' => $event['group_event_id'])));
 
                 $event_info = $this->Event->find(
-                    'first', 
+                    'first',
                     array(
-                        'conditions' => array('Event.id' => $eventId), 
+                        'conditions' => array('Event.id' => $eventId),
                     )
                 );
                 // storing the timestamp of the due date/end date of the event
@@ -390,9 +390,9 @@ class EvaluationSimple extends AppModel
                 // assign penalty to user if they submitted late or never submitted by release_date_end
                 $scorePenalty = null;
                 $event_sub = $this->Event->find(
-                    'first', 
+                    'first',
                     array(
-                        'conditions' => array('Event.id' => $eventId), 
+                        'conditions' => array('Event.id' => $eventId),
                         'contain' => array('EvaluationSubmission' => array(
                             'conditions' => array('EvaluationSubmission.submitter_id' => $userId)
                     )))
@@ -432,9 +432,9 @@ class EvaluationSimple extends AppModel
                         $user_id = $a['EvaluationSimple']['evaluatee'];
                         $userPenalty = array();
                         $event_info = $this->Event->find(
-                            'first', 
+                            'first',
                             array(
-                                'conditions' => array('Event.id' => $eventId), 
+                                'conditions' => array('Event.id' => $eventId),
                             )
                         );
                         // storing the timestamp of the due date of the event
@@ -443,9 +443,9 @@ class EvaluationSimple extends AppModel
                         // assign penalty to groupMember if they submitted late or never submitted by release_date_end
                         $scorePenalty = null;
                         $event_sub = $this->Event->find(
-                            'first', 
+                            'first',
                             array(
-                                'conditions' => array('Event.id' => $eventId), 
+                                'conditions' => array('Event.id' => $eventId),
                                 'contain' => array('EvaluationSubmission' => array(
                                 'conditions' => array('EvaluationSubmission.submitter_id' => $user_id)
                             )))
@@ -497,7 +497,7 @@ class EvaluationSimple extends AppModel
         $studentResult['gradeReleaseStatus'] = $gradeReleaseStatus;
         return $studentResult;
     }
-    
+
     /**
      * simpleEvalScore
      *
@@ -510,10 +510,10 @@ class EvaluationSimple extends AppModel
         $evalSub = ClassRegistry::init('EvaluationSubmission');
         $pen = ClassRegistry::init('Penalty');
         $simp = ClassRegistry::init('SimpleEvaluation');
-        
+
         $list = $this->find('all',
-            array('fields' => $fields, 'conditions' => $conditions));   
-        
+            array('fields' => $fields, 'conditions' => $conditions));
+
         $data = array();
         foreach($list as $mark) {
             if (!isset($data[$mark['EvaluationSimple']['evaluatee']])) {
@@ -525,28 +525,28 @@ class EvaluationSimple extends AppModel
                 $data[$mark['EvaluationSimple']['evaluatee']]['numEval']++;
             }
         }
-        
+
         $sub = $evalSub->find('all', array('conditions' => array('event_id' => $eventId)));
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId)));
         $template = $simp->find('first', array('conditions' => array('SimpleEvaluation.id' => $event['Event']['template_id'])));
         $max = $template['SimpleEvaluation']['point_per_member'];
-        
+
         foreach($sub as $stu) {
             if (isset($data[$stu['EvaluationSubmission']['submitter_id']])) {
                 $diff = strtotime($stu['EvaluationSubmission']['date_submitted']) - strtotime($event['Event']['due_date']);
                 $days = $diff/(60*60*24);
-                $penalty = $pen->getPenaltyByEventAndDaysLate($eventId,$days);
+                $penalty = $pen->getPenaltyByEventAndDaysLate($eventId, $days);
                 $data[$stu['EvaluationSubmission']['submitter_id']]['penalty'] = (isset($penalty['Penalty']['percent_penalty'])) ? $penalty['Penalty']['percent_penalty'] :
                         0;
             }
         }
-        
+
         foreach($data as $demo) {
             if (!isset($demo['penalty'])) {
                 $data[$demo['user_id']]['penalty'] = 0;
             }
         }
-        
+
         $grades = array();
         foreach ($data as $student) {
             $tmp = array();
@@ -555,13 +555,13 @@ class EvaluationSimple extends AppModel
             $tmp['score'] = $student['score']/$student['numEval']*(1-$student['penalty']/100);
             $grades[]['EvaluationSimple'] = $tmp;
         }
-        
+
         /*foreach ($grades as $key => $student) {
             if ($student['EvaluationSimple']['score'] > $max) {
                 $grades[$key]['EvaluationSimple']['score'] = $max;
             }
         }*/
-        
+
         return $grades;
     }
 

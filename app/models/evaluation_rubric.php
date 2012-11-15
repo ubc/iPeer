@@ -22,7 +22,7 @@ class EvaluationRubric extends AppModel
             'dependent' => true
         )
     );
-    
+
     public $belongsTo = array(
         'Event' => array(
             'className' => 'Event',
@@ -375,10 +375,10 @@ class EvaluationRubric extends AppModel
     function rubricEvalScore($eventId, $fields, $conditions) {
         $evalSub = ClassRegistry::init('EvaluationSubmission');
         $pen = ClassRegistry::init('Penalty');
-        
+
         $list = $this->find('all',
             array('fields' => $fields, 'conditions' => $conditions));
-            
+
         $data = array();
         foreach($list as $mark) {
             if (!isset($data[$mark['EvaluationRubric']['evaluatee']])) {
@@ -390,26 +390,26 @@ class EvaluationRubric extends AppModel
                 $data[$mark['EvaluationRubric']['evaluatee']]['numEval']++;
             }
         }
-        
+
         $sub = $evalSub->find('all', array('conditions' => array('event_id' => $eventId)));
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId)));
-        
+
         foreach($sub as $stu) {
             if (isset($data[$stu['EvaluationSubmission']['submitter_id']])) {
                 $diff = strtotime($stu['EvaluationSubmission']['date_submitted']) - strtotime($event['Event']['due_date']);
                 $days = $diff/(60*60*24);
-                $penalty = $pen->getPenaltyByEventAndDaysLate($eventId,$days);
+                $penalty = $pen->getPenaltyByEventAndDaysLate($eventId, $days);
                 $data[$stu['EvaluationSubmission']['submitter_id']]['penalty'] = (isset($penalty['Penalty']['percent_penalty'])) ? $penalty['Penalty']['percent_penalty'] :
                         0;
             }
         }
-        
+
         foreach($data as $demo) {
             if (!isset($demo['penalty'])) {
                 $data[$demo['user_id']]['penalty'] = 0;
             }
         }
-        
+
         $grades = array();
         foreach ($data as $student) {
             $tmp = array();
@@ -418,8 +418,8 @@ class EvaluationRubric extends AppModel
             $tmp['score'] = $student['score']/$student['numEval']*(1-$student['penalty']/100);
             $grades[]['EvaluationRubric'] = $tmp;
         }
-        
+
         return $grades;
     }
-     
+
 }

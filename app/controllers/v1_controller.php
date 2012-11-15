@@ -579,13 +579,13 @@ class V1Controller extends Controller {
 
         if ($this->RequestHandler->isGet()) {
             // retrieve a list of users in the given group
-            $userIds = $this->GroupsMembers->find('list', 
+            $userIds = $this->GroupsMembers->find('list',
                 array(
                     'conditions' => array('group_id' => $groupId),
                     'fields' => array('user_id')
                 )
             );
-            $users = $this->User->find('all', 
+            $users = $this->User->find('all',
                 array('conditions' => array('User.id' => $userIds)));
 
             foreach ($users as $user) {
@@ -605,7 +605,7 @@ class V1Controller extends Controller {
             $users = json_decode($ret, true);
             $status = 'HTTP/1.1 200 OK';
             foreach ($users as $user) {
-                $userId = $this->User->field('id', 
+                $userId = $this->User->field('id',
                     array('username' => $user['username']));
                 $tmp = array('group_id' => $groupId, 'user_id' => $userId);
                 // try to add this user to group
@@ -622,14 +622,14 @@ class V1Controller extends Controller {
         } else if ($this->RequestHandler->isDelete()) {
             // delete a user from the given group
             $userId = $this->User->field('id', array('username' => $username));
-            $gmId = $this->GroupsMembers->field('id', 
+            $gmId = $this->GroupsMembers->field('id',
                 array('user_id' => $userId, 'group_id' => $groupId));
             if ($this->GroupsMembers->delete($gmId)) {
                 $status = 'HTTP/1.1 204 No Content';
             } else {
                 $status = 'HTTP/1.1 500 Internal Server Error';
             }
-        } 
+        }
 
         $this->set('statusCode', $status);
         $this->set('groupMembers', $groupMembers);
@@ -677,11 +677,12 @@ class V1Controller extends Controller {
     /**
      * Get a list of grades in iPeer.
      **/
-    public function grades() {
+    public function grades()
+    {
         $event_id = $this->params['event_id'];
         $username = $this->params['username']; // if set, only want 1 user
         $user_id = $this->User->field('id',
-                array('username' => $username));
+            array('username' => $username));
         $type = $this->Event->getEventTemplateTypeId($event_id);
 
         // assume failure initially
@@ -741,8 +742,13 @@ class V1Controller extends Controller {
 
     /**
      * Get a list of departments in iPeer
-    **/
-    public function departments($departmentId = null) {
+     *
+     * @param bool $departmentId
+     * @access public
+     * @return void
+     */
+    public function departments($departmentId = null)
+    {
         if ($this->RequestHandler->isGet()) {
             if (is_null($departmentId)) {
                 $departments = array();
@@ -786,8 +792,12 @@ class V1Controller extends Controller {
 
     /**
      * Add or Delete departments in iPeer
-    **/
-    public function courseDepartments() {
+     *
+     * @access public
+     * @return void
+     */
+    public function courseDepartments()
+    {
         $department_id = $this->params['department_id'];
         $course_id = $this->params['course_id'];
         //POST: array{'course_id', 'faculty_id'} ; assume 1 for now

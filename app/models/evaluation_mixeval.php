@@ -23,7 +23,7 @@ class EvaluationMixeval extends AppModel
             'foreignKey' => 'id'
         )
     );
-    
+
     public $belongsTo = array(
         'Event' => array(
             'className' => 'Event',
@@ -357,7 +357,7 @@ class EvaluationMixeval extends AppModel
         $evalDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera($mixEval['EvaluationMixeval']['id'], $questionNum);
         return $evalDetail;
     }
-    
+
     /**
      * mixedEvalScore
      *
@@ -369,10 +369,10 @@ class EvaluationMixeval extends AppModel
      function mixedEvalScore($eventId, $fields, $conditions) {
         $evalSub = ClassRegistry::init('EvaluationSubmission');
         $pen = ClassRegistry::init('Penalty');
-        
+
         $list = $this->find('all',
-            array('fields' => $fields, 'conditions' => $conditions));   
-        
+            array('fields' => $fields, 'conditions' => $conditions));
+
         $data = array();
         foreach($list as $mark) {
             if (!isset($data[$mark['EvaluationMixeval']['evaluatee']])) {
@@ -384,26 +384,26 @@ class EvaluationMixeval extends AppModel
                 $data[$mark['EvaluationMixeval']['evaluatee']]['numEval']++;
             }
         }
-        
+
         $sub = $evalSub->find('all', array('conditions' => array('event_id' => $eventId)));
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId)));
-        
+
         foreach($sub as $stu) {
             if (isset($data[$stu['EvaluationSubmission']['submitter_id']])) {
                 $diff = strtotime($stu['EvaluationSubmission']['date_submitted']) - strtotime($event['Event']['due_date']);
                 $days = $diff/(60*60*24);
-                $penalty = $pen->getPenaltyByEventAndDaysLate($eventId,$days);
+                $penalty = $pen->getPenaltyByEventAndDaysLate($eventId, $days);
                 $data[$stu['EvaluationSubmission']['submitter_id']]['penalty'] = (isset($penalty['Penalty']['percent_penalty'])) ? $penalty['Penalty']['percent_penalty'] :
                         0;
             }
         }
-        
+
         foreach($data as $demo) {
             if (!isset($demo['penalty'])) {
                 $data[$demo['user_id']]['penalty'] = 0;
             }
         }
-        
+
         $grades = array();
         foreach ($data as $student) {
             $tmp = array();
@@ -412,7 +412,7 @@ class EvaluationMixeval extends AppModel
             $tmp['score'] = $student['score']/$student['numEval']*(1-$student['penalty']/100);
             $grades[]['EvaluationMixeval'] = $tmp;
         }
-        
+
         return $grades;
      }
 }
