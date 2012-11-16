@@ -1322,11 +1322,12 @@ class EvaluationsController extends AppController
                 $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/home/index');
             // check to see whether NOW is between the start and end of result release dates
-            } else if (strtotime('NOW') < strtotime($event['Event']['result_release_date_begin']) ||
-                strtotime('NOW') >= strtotime($event['Event']['result_release_date_end'])) {
-                $this->Session->setFlash(__('Error: The results are not released.', true));
-                $this->redirect('/home/index');
-            }
+            } 
+	  		else if (strtotime('NOW') < strtotime($event['Event']['result_release_date_begin']) ||
+                  strtotime('NOW') >= strtotime($event['Event']['result_release_date_end'])) {
+                  $this->Session->setFlash(__('Error: The results are not released.', true));
+                  $this->redirect('/home/index');
+             }
             //Get the target event
             $event = $this->Event->formatEventObj($eventId, $groupId);
         }

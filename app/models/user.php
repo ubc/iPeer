@@ -502,9 +502,9 @@ class User extends AppModel
      * */
     function getInstructors($type, $params)
     {
-        $defaults = array('order' => $this->alias.'.first_name');
+        $defaults = array('order' => $this->alias.'.last_name');
         $params = array_merge($defaults, $params);
-
+		
         if (array_key_exists('excludes', $params) && !empty($params['excludes'])) {
             $ids = array();
             if (!is_numeric($params['excludes'][0])) {
@@ -528,7 +528,7 @@ class User extends AppModel
 
         return $this->find($type, $params);
     }
-
+	
     /**
      * Get current logged in user
      *
