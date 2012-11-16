@@ -12,7 +12,8 @@ class EventTemplateTypeTestCase extends CakeTestCase {
         'app.response', 'app.survey_question', 'app.user_course',
         'app.user_enrol', 'app.groups_member', 'app.survey',
         'app.faculty', 'app.user_faculty', 'app.user_tutor',
-        'app.department', 'app.course_department', 'app.penalty'
+        'app.department', 'app.course_department', 'app.penalty',
+        'app.evaluation_simple'
     );
     public $EventTemplateType = null;
 
