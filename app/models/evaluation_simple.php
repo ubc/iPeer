@@ -35,7 +35,7 @@ class EvaluationSimple extends AppModel
     {
         //return $this->find('grp_event_id='.$grpEventId.' AND evaluator='.$evaluator.' AND evaluatee='.$evaluatee);
         return $this->find('first', array(
-            'conditions' => array('grp_event_id' => $grpEventId, 'submitter_id' => $evaluator, 'evaluatee' => $evaluatee)
+            'conditions' => array('grp_event_id' => $grpEventId, 'evaluator' => $evaluator, 'evaluatee' => $evaluatee)
         ));
     }
 
@@ -53,7 +53,7 @@ class EvaluationSimple extends AppModel
     {
         //return $this->find('all', 'grp_event_id='.$grpEventId.' AND evaluator='.$evaluator);
         return $this->find('all', array(
-            'conditions' => array('grp_event_id' => $grpEventId, 'submitter_id' => $evaluator)
+            'conditions' => array('grp_event_id' => $grpEventId, 'evaluator' => $evaluator)
         ));
     }
 
