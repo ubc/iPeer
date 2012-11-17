@@ -681,7 +681,7 @@ class V1Controller extends Controller {
         $event_id = $this->params['event_id'];
         $username = $this->params['username']; // if set, only want 1 user
         $user_id = $this->User->field('id',
-                array('username' => $this->params['username']));
+                array('username' => $username));
         $type = $this->Event->getEventTemplateTypeId($event_id);
 
         // assume failure initially
@@ -701,15 +701,18 @@ class V1Controller extends Controller {
             $res = array();
             $key = ""; // name of the table we're querying
             if ($type == 1) {
-                $res = $this->EvaluationSimple->simpleEvalScore($event_id);
+                $res = $this->EvaluationSimple->simpleEvalScore($event_id,
+                    $fields, $conditions);
                 $key = "EvaluationSimple";
             }
             else if ($type == 2) {
-                $res = $this->EvaluationRubric->rubricEvalScore($event_id);
+                $res = $this->EvaluationRubric->rubricEvalScore($event_id,
+                    $fields, $conditions);
                 $key = "EvaluationRubric";
             }
             else if ($type == 4) {
-                $res = $this->EvaluationMixeval->mixedEvalScore($event_id);
+                $res = $this->EvaluationMixeval->mixedEvalScore($event_id,
+                    $fields, $conditions);
                 $key = "EvaluationMixeval";
             }
             foreach ($res as $val) {

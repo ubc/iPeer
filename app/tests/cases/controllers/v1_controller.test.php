@@ -492,6 +492,8 @@ class V1ControllerTest extends CakeTestCase {
     public function testGrades()
     {
         $url = $this->_getURL('v1/events');
+
+        // prep expected results
         $events = $this->_fixtures['app.event']->records;
         $mixevals = $this->_fixtures['app.evaluation_mixeval']->records;
         $rubrics = $this->_fixtures['app.evaluation_rubric']->records;
@@ -529,31 +531,33 @@ class V1ControllerTest extends CakeTestCase {
         }
 
         // test get all grades for an event of a course (test multiple types)
+        // evaluation simple
         $simpleGrades = $this->_oauthReq("$url/1/grades");
         $simpleGrades = json_decode($simpleGrades, true);
         $this->assertEqual($simpleList, $simpleGrades);
-
+        // evaluation rubric
         $rubricGrades = $this->_oauthReq("$url/2/grades");
         $rubricGrades = json_decode($rubricGrades, true);
         $this->assertEqual($rubricList, $rubricGrades);
-
+        // evaluation mixeval
         $mixevalGrades = $this->_oauthReq("$url/3/grades");
         $mixevalGrades = json_decode($mixevalGrades, true);
         $this->assertEqual($mixevalList, $mixevalGrades);
 
         // test get specific student's grades for an event of a course (test multiple types)
+        // evaluation simple
         $studentGrade = $this->_oauthReq("$url/1/grades/51516498");
         $studentGrade = json_decode($studentGrade, true);
         $expectedGrade = array("evaluatee" => "33", "score" => "75", 
             'username' => '51516498');
         $this->assertEqual($expectedGrade, $studentGrade);
-
+        // evaluation rubric
         $studentGrade = $this->_oauthReq("$url/2/grades/65498451");
         $studentGrade = json_decode($studentGrade, true);
         $expectedGrade = array("evaluatee" => "5", "score" => "14",
             'username' => '65498451');
         $this->assertEqual($expectedGrade, $studentGrade);
-        
+        // evaluation mixeval 
         $studentGrade = $this->_oauthReq("$url/3/grades/65468188");
         $studentGrade = json_decode($studentGrade, true);
         $expectedGrade = array("evaluatee" => "6", "score" => "2.4",

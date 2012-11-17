@@ -366,15 +366,12 @@ class EvaluationMixeval extends AppModel
      * @access public
      * @return void
      */
-     function mixedEvalScore($eventId) {
+     function mixedEvalScore($eventId, $fields, $conditions) {
         $evalSub = ClassRegistry::init('EvaluationSubmission');
         $pen = ClassRegistry::init('Penalty');
         
         $list = $this->find('all',
-            array('fields' => array('evaluatee', 'score'),
-                'conditions' => array('event_id' => $eventId)
-            )
-        );   
+            array('fields' => $fields, 'conditions' => $conditions));   
         
         $data = array();
         foreach($list as $mark) {

@@ -506,16 +506,13 @@ class EvaluationSimple extends AppModel
      * @access public
      * @return void
      */
-    function simpleEvalScore($eventId) {
+    function simpleEvalScore($eventId, $fields, $conditions) {
         $evalSub = ClassRegistry::init('EvaluationSubmission');
         $pen = ClassRegistry::init('Penalty');
         $simp = ClassRegistry::init('SimpleEvaluation');
         
         $list = $this->find('all',
-            array('fields' => array('evaluatee', 'score'),
-                'conditions' => array('event_id' => $eventId)
-            )
-        );   
+            array('fields' => $fields, 'conditions' => $conditions));   
         
         $data = array();
         foreach($list as $mark) {
