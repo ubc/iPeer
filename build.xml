@@ -1,245 +1,225 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="iPeer" basedir="." default="build">
+
+    <target name="load-db-config">
+        <phingcall target="pre-test"/>
+        <loadfile property="dbfile" file="app/config/database.php">
+            <filterchain>
+                <stripphpcomments />
+                <linecontainsregexp>
+                        <regexp pattern="^((?!php).)*$" />
+                </linecontainsregexp>
+                <replaceregexp>
+                    <regexp pattern="public" replace="public static"/>
+                </replaceregexp>
+            </filterchain>
+        </loadfile>
+        <php expression="${dbfile}"/>
+        <php expression="DATABASE_CONFIG::$default['driver']" returnProperty="db.driver"/>
+        <php expression="DATABASE_CONFIG::$default['host']"   returnProperty="db.host"/>
+        <php expression="DATABASE_CONFIG::$default['login']"  returnProperty="db.username"/>
+        <php expression="DATABASE_CONFIG::$default['password']" returnProperty="db.password"/>
+        <php expression="DATABASE_CONFIG::$default['database']" returnProperty="db.name"/>
+    </target>
+
     <target name="build"
         depends="prepare,lint,phploc,pdepend,phpmd,phpcs,phpcpd,phpdoc,test,phpcb"/>
 
     <target name="build-ci"
         depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpdoc,test-ci-models,test-ci-controllers,phpcb"/>
-    <!-- <target name="build-parallel"
-   depends="prepare,lint,tools-parallel,phpunit,phpcb"/>
 
- <target name="tools-parallel"
-         description="Run tools in parallel">
-  <parallel threadCount="2">
-   <sequential>
-    <antcall target="pdepend"/>
-    <antcall target="phpmd-ci"/>
-   </sequential>
-   <antcall target="phpcpd"/>
-   <antcall target="phpcs-ci"/>
-   <antcall target="phploc"/>
-   <antcall target="phpdoc"/>
-  </parallel>
-</target>-->
+    <target name="clean" description="Cleanup build artifacts">
+        <delete dir="${project.basedir}/build/api"/>
+        <delete dir="${project.basedir}/build/code-browser"/>
+        <delete dir="${project.basedir}/build/coverage"/>
+        <delete dir="${project.basedir}/build/logs"/>
+        <delete dir="${project.basedir}/build/pdepend"/>
+    </target>
 
- <target name="clean" description="Cleanup build artifacts">
-     <delete dir="${project.basedir}/build/api"/>
-     <delete dir="${project.basedir}/build/code-browser"/>
-     <delete dir="${project.basedir}/build/coverage"/>
-     <delete dir="${project.basedir}/build/logs"/>
-     <delete dir="${project.basedir}/build/pdepend"/>
- </target>
+    <target name="prepare" depends="clean"
+        description="Prepare for build">
+        <mkdir dir="${project.basedir}/build/api"/>
+        <mkdir dir="${project.basedir}/build/code-browser"/>
+        <mkdir dir="${project.basedir}/build/coverage"/>
+        <mkdir dir="${project.basedir}/build/logs"/>
+        <mkdir dir="${project.basedir}/build/pdepend"/>
+        <!-- Needed to enable the API controller tests -->
+        <!-- make ipeer seem to be installed -->
+        <touch file="${project.basedir}/app/config/installed.txt" />
+        <!-- let Apache write to cache -->
+        <exec command="chmod -R 666 ${project.basedir}/app/tmp"/>
+    </target>
 
- <target name="prepare" depends="clean"
-     description="Prepare for build">
-     <mkdir dir="${project.basedir}/build/api"/>
-     <mkdir dir="${project.basedir}/build/code-browser"/>
-     <mkdir dir="${project.basedir}/build/coverage"/>
-     <mkdir dir="${project.basedir}/build/logs"/>
-	 <mkdir dir="${project.basedir}/build/pdepend"/>
-	 <exec executable="php" dir="${project.basedir}/build/sqlclean">
-		 <arg value="clean.php" />
-	 </exec>
-	 <!-- Needed to enable the API controller tests -->
-	 <!-- make ipeer seem to be installed -->
-	 <touch file="${project.basedir}/app/config/installed.txt" />
-	 <!-- let Apache write to cache -->
-	 <exec command="chmod -R 666 ${project.basedir}/app/tmp"/>
- </target>
+    <target name="init-test-db" depends="load-db-config">
+        <pdosqlexec url="${db.driver}:host=${db.host};dbname=${db.name}" userid="${db.username}" password="${db.password}">
+            <transaction src="app/config/sql/ipeer_samples_data.sql"/>
+        </pdosqlexec>
+        <exec command="cake/console/cake schema_ci create DbAcl" passthru="true"/>
+    </target>
 
- <target name="lint">
-	 <phplint haltonfailure="true" cachefile="${project.basedir}/build/lint.cache">
-         <fileset dir="${project.basedir}/app">
-             <include name="**/*.php" />
-         </fileset>
-     </phplint>
- </target>
+    <target name="lint">
+        <phplint haltonfailure="true" cachefile="${project.basedir}/build/lint.cache">
+            <fileset dir="${project.basedir}/app">
+                <include name="**/*.php" />
+            </fileset>
+        </phplint>
+    </target>
 
- <target name="phploc" description="Measure project size using PHPLOC">
-     <exec executable="phploc">
-         <arg value="--log-csv" />
-         <arg value="${project.basedir}/build/logs/phploc.csv" />
-         <arg path="${project.basedir}/app" />
-     </exec>
- </target>
+    <target name="phploc" description="Measure project size using PHPLOC">
+        <exec executable="phploc">
+            <arg value="--log-csv" />
+            <arg value="${project.basedir}/build/logs/phploc.csv" />
+            <arg path="${project.basedir}/app" />
+        </exec>
+    </target>
 
- <target name="pdepend"
-     description="Calculate software metrics using PHP_Depend">
-     <phpdepend>
-         <fileset dir="${project.basedir}/app">
-             <include name="**/*.php" />
-             <exclude name="tests/**" />
-             <exclude name="vendors/**" />
-             <exclude name="plugins/**" />
-             <exclude name="config/**" />
-             <exclude name="webroot/**" />
-         </fileset>
-         <logger type="jdepend-xml" outfile="${project.basedir}/build/logs/jdepend.xml" />
-         <logger type="jdepend-chart" outfile="${project.basedir}/build/pdepend/dependencies.svg" />
-         <logger type="overview-pyramid" outfile="${project.basedir}/build/pdepend/overview-pyramid.svg" />
-     </phpdepend>
- </target>
+    <target name="pdepend"
+        description="Calculate software metrics using PHP_Depend">
+        <phpdepend>
+            <fileset dir="${project.basedir}/app">
+                <include name="**/*.php" />
+                <exclude name="tests/**" />
+                <exclude name="vendors/**" />
+                <exclude name="plugins/**" />
+                <exclude name="config/**" />
+                <exclude name="webroot/**" />
+            </fileset>
+            <logger type="jdepend-xml" outfile="${project.basedir}/build/logs/jdepend.xml" />
+            <logger type="jdepend-chart" outfile="${project.basedir}/build/pdepend/dependencies.svg" />
+            <logger type="overview-pyramid" outfile="${project.basedir}/build/pdepend/overview-pyramid.svg" />
+        </phpdepend>
+    </target>
 
- <target name="phpmd"
-     description="Perform project mess detection using PHPMD and print human readable output. Intended for usage on the command line before committing.">
-     <phpmd rulesets="codesize,unusedcode">
-         <fileset dir="${project.basedir}/app">
-             <include name="**/*.php" />
-             <exclude name="tests/**" />
-             <exclude name="vendors/**" />
-             <exclude name="plugins/**" />
-             <exclude name="config/**" />
-             <exclude name="webroot/**" />
-         </fileset>
-     </phpmd>
- </target>
+    <target name="phpmd"
+        description="Perform project mess detection using PHPMD and print human readable output. Intended for usage on the command line before committing.">
+        <phpmd rulesets="codesize,unusedcode">
+            <fileset dir="${project.basedir}/app">
+                <include name="**/*.php" />
+                <exclude name="tests/**" />
+                <exclude name="vendors/**" />
+                <exclude name="plugins/**" />
+                <exclude name="config/**" />
+                <exclude name="webroot/**" />
+            </fileset>
+        </phpmd>
+    </target>
 
- <target name="phpmd-ci"
-     description="Perform project mess detection using PHPMD creating a log file for the continuous integration server">
-     <phpmd rulesets="codesize,unusedcode">
-         <fileset dir="${project.basedir}/app">
-             <include name="**/*.php" />
-             <exclude name="tests/**" />
-             <exclude name="vendors/**" />
-             <exclude name="plugins/**" />
-             <exclude name="config/**" />
-             <exclude name="webroot/**" />
-         </fileset>
-         <formatter type="xml" outfile="${project.basedir}/build/logs/pmd.xml"/>
-     </phpmd>
- </target>
+    <target name="phpmd-ci"
+        description="Perform project mess detection using PHPMD creating a log file for the continuous integration server">
+        <phpmd rulesets="codesize,unusedcode">
+            <fileset dir="${project.basedir}/app">
+                <include name="**/*.php" />
+                <exclude name="tests/**" />
+                <exclude name="vendors/**" />
+                <exclude name="plugins/**" />
+                <exclude name="config/**" />
+                <exclude name="webroot/**" />
+            </fileset>
+            <formatter type="xml" outfile="${project.basedir}/build/logs/pmd.xml"/>
+        </phpmd>
+    </target>
 
- <target name="phpcs"
-     description="Find coding standard violations using PHP_CodeSniffer and print human readable output. Intended for usage on the command line before committing.">
-     <phpcodesniffer standard="${project.basedir}/build/phpcs.xml">
-         <fileset dir="${project.basedir}/app">
-             <include name="**/*.php" />
-             <exclude name="tests/**" />
-             <exclude name="vendors/**" />
-             <exclude name="plugins/**" />
-             <exclude name="config/**" />
-             <exclude name="webroot/**" />
-         </fileset>
-     </phpcodesniffer>
- </target>
+    <target name="phpcs"
+        description="Find coding standard violations using PHP_CodeSniffer and print human readable output. Intended for usage on the command line before committing.">
+        <phpcodesniffer standard="${project.basedir}/build/phpcs.xml">
+            <fileset dir="${project.basedir}/app">
+                <include name="**/*.php" />
+                <exclude name="tests/**" />
+                <exclude name="vendors/**" />
+                <exclude name="plugins/**" />
+                <exclude name="config/**" />
+                <exclude name="webroot/**" />
+            </fileset>
+        </phpcodesniffer>
+    </target>
 
- <target name="phpcs-ci"
-     description="Find coding standard violations using PHP_CodeSniffer creating a log file for the continuous integration server">
-     <phpcodesniffer standard="${project.basedir}/build/phpcs.xml">
-         <fileset dir="${project.basedir}/app">
-             <include name="**/*.php" />
-             <exclude name="tests/**" />
-             <exclude name="vendors/**" />
-             <exclude name="plugins/**" />
-             <exclude name="config/**" />
-             <exclude name="webroot/**" />
-         </fileset>
-         <formatter type="checkstyle" outfile="${project.basedir}/build/logs/checkstyle.xml" />
-     </phpcodesniffer>
- </target>
+    <target name="phpcs-ci"
+        description="Find coding standard violations using PHP_CodeSniffer creating a log file for the continuous integration server">
+        <phpcodesniffer standard="${project.basedir}/build/phpcs.xml">
+            <fileset dir="${project.basedir}/app">
+                <include name="**/*.php" />
+                <exclude name="tests/**" />
+                <exclude name="vendors/**" />
+                <exclude name="plugins/**" />
+                <exclude name="config/**" />
+                <exclude name="webroot/**" />
+            </fileset>
+            <formatter type="checkstyle" outfile="${project.basedir}/build/logs/checkstyle.xml" />
+        </phpcodesniffer>
+    </target>
 
- <target name="phpcpd" description="Find duplicate code using PHPCPD">
-     <phpcpd>
-         <fileset dir="${project.basedir}/app">
-             <include name="**/*.php" />
-             <exclude name="tests/**" />
-             <exclude name="vendors/**" />
-             <exclude name="plugins/**" />
-             <exclude name="config/**" />
-             <exclude name="webroot/**" />
-         </fileset>
-         <formatter type="pmd" outfile="${project.basedir}/build/logs/pmd-cpd.xml" />
-     </phpcpd>
- </target>
+    <target name="phpcpd" description="Find duplicate code using PHPCPD">
+        <phpcpd>
+            <fileset dir="${project.basedir}/app">
+                <include name="**/*.php" />
+                <exclude name="tests/**" />
+                <exclude name="vendors/**" />
+                <exclude name="plugins/**" />
+                <exclude name="config/**" />
+                <exclude name="webroot/**" />
+            </fileset>
+            <formatter type="pmd" outfile="${project.basedir}/build/logs/pmd-cpd.xml" />
+        </phpcpd>
+    </target>
 
- <target name="phpdoc"
-     description="Generate API documentation using PHPDocumentor">
-     <phpdoc destdir="${project.basedir}/build/api" output="HTML:Smarty:PHP" sourcecode="false" >
-         <fileset dir="${project.basedir}/app">
-             <include name="**/*.php" />
-             <exclude name="tests/**" />
-             <exclude name="vendors/**" />
-             <exclude name="plugins/**" />
-             <exclude name="config/**" />
-             <exclude name="webroot/**" />
-         </fileset>
-     </phpdoc>
- </target>
+    <target name="phpdoc"
+        description="Generate API documentation using PHPDocumentor">
+        <phpdoc destdir="${project.basedir}/build/api" output="HTML:Smarty:PHP" sourcecode="false" >
+            <fileset dir="${project.basedir}/app">
+                <include name="**/*.php" />
+                <exclude name="tests/**" />
+                <exclude name="vendors/**" />
+                <exclude name="plugins/**" />
+                <exclude name="config/**" />
+                <exclude name="webroot/**" />
+            </fileset>
+        </phpdoc>
+    </target>
 
- <target name="test" description="Run unit tests">
-     <reflexive file="app/config/core.php">
-         <filterchain>
-             <replaceregexp>
-                 <regexp pattern="'Acl.database', 'default'" replace="'Acl.database', 'test'"/>
-             </replaceregexp>
-         </filterchain>
-     </reflexive>
-     <exec command="cake/console/cake -connection test schema_ci create DbAcl" passthru="true"/>
-     <exec command="cake/console/cake -connection test testsuite app group model" passthru="true"/>
-	 <exec command="cake/console/cake -connection test testsuite app case controllers/v1_controller" passthru="true"/>
-     <reflexive file="app/config/core.php">
-         <filterchain>
-             <replaceregexp>
-                 <regexp pattern="'Acl.database', 'test'" replace="'Acl.database', 'default'"/>
-             </replaceregexp>
-         </filterchain>
-     </reflexive>
- </target>
+    <target name="pre-test" description="prepare to run tests">
+        <copy file="app/config/database.php" tofile="app/config/database_test_backup.php" overwrite="true"/>
+        <reflexive file="app/config/database.php">
+            <filterchain>
+                <replaceregexp>
+                    <regexp pattern="'database'.*=>.*'(.*)'" replace="'database'  => '\1_test'"/>
+                </replaceregexp>
+            </filterchain>
+        </reflexive>
+    </target>
 
- <target name="test-ci-models" description="Run unit tests for continuous integration(output as xml)">
-     <copy file="app/config/database.php.default" tofile="app/config/database.php" overwrite="true"/>
-     <chmod file="app/tmp" mode="0777"/>
-     <reflexive file="app/config/core.php">
-         <filterchain>
-             <replaceregexp>
-                 <regexp pattern="'Acl.database', 'default'" replace="'Acl.database', 'test'"/>
-             </replaceregexp>
-         </filterchain>
-     </reflexive>
-     <exec command="cake/console/cake -connection test schema_ci create DbAcl" passthru="true"/>
-     <exec command="cake/console/cake -connection test testreport app group model" passthru="true"/>
-     <reflexive file="app/config/core.php">
-         <filterchain>
-             <replaceregexp>
-                 <regexp pattern="'Acl.database', 'test'" replace="'Acl.database', 'default'"/>
-             </replaceregexp>
-         </filterchain>
-     </reflexive>
- </target>
+    <target name="post-test" description="clean up after running tests">
+        <move file="app/config/database_test_backup.php" tofile="app/config/database.php" overwrite="true"/>
+        <chmod file="app/tmp" mode="0777"/>
+    </target>
 
- <target name="test-ci-controllers" description="Run unit tests for continuous integration(output as xml)">
-     <copy file="app/config/database.php.default" tofile="app/config/database.php" overwrite="true"/>
-     <chmod file="app/tmp" mode="0777"/>
-     <reflexive file="app/config/core.php">
-         <filterchain>
-             <replaceregexp>
-                 <regexp pattern="'Acl.database', 'default'" replace="'Acl.database', 'test'"/>
-             </replaceregexp>
-         </filterchain>
-     </reflexive>
-     <exec command="cake/console/cake -connection test schema_ci create DbAcl" passthru="true"/>
-	 <exec command="cake/console/cake testreport app case controllers/v1_controller" passthru="true"/>
-     <reflexive file="app/config/core.php">
-         <filterchain>
-             <replaceregexp>
-                 <regexp pattern="'Acl.database', 'test'" replace="'Acl.database', 'default'"/>
-             </replaceregexp>
-         </filterchain>
-     </reflexive>
- </target>
+    <target name="test" description="Run unit tests" depends="init-test-db">
+        <exec command="cake/console/cake testsuite app group model" passthru="true"/>
+        <exec command="cake/console/cake testsuite app case controllers/v1_controller" passthru="true"/>
+        <phingcall target="post-test"/>
+    </target>
 
- <target name="phpcb"
-     description="Aggregate tool output with PHP_CodeBrowser">
-     <exec executable="phpcb">
-         <arg value="--log" />
-         <arg path="${project.basedir}/build/logs" />
-         <arg value="--source" />
-         <arg path="${project.basedir}/app" />
-         <arg value="--output" />
-         <arg path="${project.basedir}/build/code-browser" />
-     </exec>
- </target>
+    <target name="test-ci-models" description="Run unit tests for continuous integration(output as xml)" depends="init-test-db">
+        <exec command="cake/console/cake testreport app group model" passthru="true"/>
+        <phingcall target="post-test"/>
+    </target>
+
+    <target name="test-ci-controllers" description="Run unit tests for continuous integration(output as xml)" depends="init-test-db">
+        <exec command="cake/console/cake testreport app case controllers/v1_controller" passthru="true"/>
+        <phingcall target="post-test"/>
+    </target>
+
+    <target name="phpcb"
+        description="Aggregate tool output with PHP_CodeBrowser">
+        <exec executable="phpcb">
+            <arg value="--log" />
+            <arg path="${project.basedir}/build/logs" />
+            <arg value="--source" />
+            <arg path="${project.basedir}/app" />
+            <arg value="--output" />
+            <arg path="${project.basedir}/build/code-browser" />
+        </exec>
+    </target>
 
     <target name="bump" description="bump a version">
         <input propertyname="release_option" defaultValue="Minor" validargs="Major,Minor,BugFix" promptChar=":">

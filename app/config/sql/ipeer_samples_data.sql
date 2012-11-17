@@ -10,6 +10,8 @@
 -- Database: `ipeer2`
 --
 
+SET foreign_key_checks = 0;
+
 -- --------------------------------------------------------
 
 --
@@ -655,7 +657,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `first_name`, `last_name`, `student_no`, `title`, `email`, `last_login`, `last_logout`, `last_accessed`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`, `lti_id`) VALUES
-(1, 'root', '', 'Super', 'Admin', NULL, NULL, '', NULL, NULL, NULL, 'A', 1, NOW(), NULL, NOW(), NULL),
+(1, 'root', 'cbbde255cc20cb7a566d4c7f12298729', 'Super', 'Admin', NULL, NULL, '', NULL, NULL, NULL, 'A', 1, NOW(), NULL, NOW(), NULL),
 (2, 'instructor1', '6f40a1a25eec7d325310dea310949005', 'Instructor', '1', NULL, 'Instructor', 'instructor1@email', NULL, NULL, NULL, 'A', 1, '2006-06-19 16:25:24', NULL, '2006-06-19 16:25:24', NULL),
 (3, 'instructor2', '6f40a1a25eec7d325310dea310949005', 'Instructor', '2', NULL, 'Professor', '', NULL, NULL, NULL, 'A', 1, '2006-06-20 14:17:02', NULL, '2006-06-20 14:17:02', NULL),
 (4, 'instructor3', '6f40a1a25eec7d325310dea310949005', 'Instructor', '3', NULL, 'Assistant Professor', '', NULL, NULL, NULL, 'A', 1, '2006-06-20 14:17:53', NULL, '2006-06-20 14:17:53', NULL),
@@ -1379,8 +1381,8 @@ INSERT INTO `mixevals_questions` (`id`, `mixeval_id`, `question_num`, `title`, `
 -- This stores OAuth client credentials (AKA: consumer key and secret).
 -- Client credentails are used to identify client software.
 --
-
-CREATE TABLE `oauth_clients` (
+DROP TABLE IF EXISTS `oauth_clients`;
+CREATE TABLE IF NOT EXISTS `oauth_clients` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `key` varchar(255) NOT NULL,
@@ -1404,8 +1406,8 @@ INSERT INTO `oauth_clients` (`id`, `user_id`, `key`, `secret`, `comment`, `enabl
 -- Table structure for table `oauth_nonces`
 -- Stores nonces to defeat replay attacks.
 --
-
-CREATE TABLE `oauth_nonces` (
+DROP TABLE IF EXISTS `oauth_nonces`;
+CREATE TABLE IF NOT EXISTS `oauth_nonces` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nonce` varchar(255) NOT NULL,
   `expires` TIMESTAMP NOT NULL,
@@ -1419,7 +1421,8 @@ CREATE TABLE `oauth_nonces` (
 -- Token credentials are used to identify a user.
 --
 
-CREATE TABLE `oauth_tokens` (
+DROP TABLE IF EXISTS `oauth_tokens`;
+CREATE TABLE IF NOT EXISTS `oauth_tokens` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `key` varchar(255) NOT NULL,
@@ -1443,7 +1446,8 @@ INSERT INTO `oauth_tokens` (`id`, `user_id`, `key`, `secret`, `expires`, `commen
 -- Table structure for table `penalties`
 --
 
-CREATE TABLE `penalties` (
+DROP TABLE IF EXISTS `penalties`;
+CREATE TABLE IF NOT EXISTS `penalties` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `event_id` int(11) DEFAULT NULL,
   `days_late` int(11) NOT NULL,
@@ -2214,3 +2218,4 @@ INSERT INTO user_tutors (id, user_id, course_id, creator_id, created, updater_id
 (3, 37, 2, 0, '0000-00-00 00:00:00', NULL, '2012-07-13 09:48:24'),
 (4, 37, 3, 0, '0000-00-00 00:00:00', NULL, '2012-07-13 09:48:24');
 
+SET foreign_key_checks = 1;

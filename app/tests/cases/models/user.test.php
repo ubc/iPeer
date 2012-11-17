@@ -5,16 +5,26 @@ App::import('Model', 'User');
 class UserTestCase extends CakeTestCase {
     var $fixtures = array('app.user', 'app.evaluation_submission', 'app.event', 'app.event_template_type', 'app.course', 'app.group', 'app.group_event', 'app.groups_member', 'app.survey', 'app.survey_group_set', 'app.survey_group', 'app.survey_group_member', 'app.question', 'app.response', 'app.survey_question', 'app.user_course', 'app.user_tutor', 'app.user_enrol', 'app.department', 'app.faculty', 'app.course_department', 'app.user_faculty', 'app.role', 'app.roles_user', 'app.penalty', 'app.evaluation_simple');
 
-	function startTest() {
+    function startCase()
+    {
         echo "Start User model test.\n";
-		$this->User =& ClassRegistry::init('User');
-	}
+        $this->User =& ClassRegistry::init('User');
+    }
 
-	function endTest() {
-	}
+    function endCase()
+    {
+    }
+
+    function startTest($method)
+    {
+    }
+
+    function endTest($method)
+    {
+    }
 
 	function testFindUserByidWithField() {
-        // no field restrictions, should be a flat array of 
+        // no field restrictions, should be a flat array of
         // only data from the user field, no associations
         $ret = $this->User->findUserByidWithFields(4);
         $this->assertEqual($ret['id'], 4);
@@ -107,7 +117,7 @@ class UserTestCase extends CakeTestCase {
 	function testHashPassword() {
         $input = array('User' => array('password' => 'frogleg'));
         $ret = $this->User->hashPasswords($input);
-        $this->assertEqual($ret['User']['password'], 
+        $this->assertEqual($ret['User']['password'],
             '6f40a1a25eec7d325310dea310949005');
 	}
 
@@ -158,7 +168,7 @@ class UserTestCase extends CakeTestCase {
 	function testGetRole() {
         // NOTE: that we don't officially support multiple roles for
         // one user yet, so that's not tested.
-        
+
         // test single user's role
         $ret = $this->User->getRoles(1);
         $this->assertEqual($ret[1], 'superadmin');
@@ -196,7 +206,7 @@ class UserTestCase extends CakeTestCase {
         //Test remove student
         $ret = $this->User->removeStudent(26, 1);
         $this->assertTrue($ret); // operation successful
-        $user = $this->User->UserEnrol->field('id', 
+        $user = $this->User->UserEnrol->field('id',
             array('user_id' => 26, 'course_id' => 1));
         $this->assertFalse($user); // make sure user really is gone
 
@@ -239,7 +249,7 @@ class UserTestCase extends CakeTestCase {
         //Test remove instructor
         $ret = $this->User->removeInstructor(4, 3);
         $this->assertTrue($ret); // operation successful
-        $user = $this->User->UserCourse->field('id', 
+        $user = $this->User->UserCourse->field('id',
             array('user_id' => 4, 'course_id' => 3));
         $this->assertFalse($user); // make sure user really is gone
 
@@ -282,7 +292,7 @@ class UserTestCase extends CakeTestCase {
         //Test remove Tutor
         $ret = $this->User->removeTutor(37, 3);
         $this->assertTrue($ret); // operation successful
-        $user = $this->User->UserTutor->field('id', 
+        $user = $this->User->UserTutor->field('id',
             array('user_id' => 37, 'course_id' => 3));
         $this->assertFalse($user); // make sure user really is gone
 
