@@ -48,7 +48,7 @@
         <!-- make ipeer seem to be installed -->
         <touch file="${project.basedir}/app/config/installed.txt" />
         <!-- let Apache write to cache -->
-        <exec command="chmod -R 666 ${project.basedir}/app/tmp"/>
+        <exec command="chmod -R 777 ${project.basedir}/app/tmp"/>
     </target>
 
     <target name="init-test-db" depends="load-db-config">
