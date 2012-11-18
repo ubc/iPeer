@@ -179,6 +179,7 @@
 
     <target name="pre-test" description="prepare to run tests">
         <copy file="app/config/database.php.default" tofile="app/config/database.php" overwrite="false"/>
+        <copy file="app/plugins/guard/config/guard.php" tofile="app/config/guard.php" overwrite="false"/>
         <copy file="app/config/database.php" tofile="app/config/database_test_backup.php" overwrite="true"/>
         <reflexive file="app/config/database.php">
             <filterchain>
