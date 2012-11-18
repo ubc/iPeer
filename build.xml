@@ -55,7 +55,7 @@
         <pdosqlexec url="${db.driver}:host=${db.host};dbname=${db.name}" userid="${db.username}" password="${db.password}">
             <transaction src="app/config/sql/ipeer_samples_data.sql"/>
         </pdosqlexec>
-        <exec command="cake/console/cake schema_ci create DbAcl" passthru="true"/>
+        <!--<exec command="cake/console/cake schema_ci create DbAcl" passthru="true"/>-->
     </target>
 
     <target name="lint">
@@ -196,6 +196,7 @@
     <target name="test" description="Run unit tests" depends="init-test-db">
         <exec command="cake/console/cake testsuite app group model" passthru="true"/>
         <exec command="cake/console/cake testsuite app case controllers/v1_controller" passthru="true"/>
+        <exec command="cake/console/cake testsuite app case controllers/courses_controller" passthru="true"/>
         <phingcall target="post-test"/>
     </target>
 
@@ -206,6 +207,7 @@
 
     <target name="test-ci-controllers" description="Run unit tests for continuous integration(output as xml)" depends="init-test-db">
         <exec command="cake/console/cake testreport app case controllers/v1_controller" passthru="true"/>
+        <exec command="cake/console/cake testreport app case controllers/courses_controller" passthru="true"/>
         <phingcall target="post-test"/>
     </target>
 

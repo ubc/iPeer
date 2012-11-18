@@ -271,7 +271,7 @@ class Course extends AppModel
             $recursive = 0;
         }
         return $this->find(
-            $type, 
+            $type,
             array(
                 'conditions' => array('Instructor.id' => $instructorId),
                 'fields' => $fields,
@@ -314,7 +314,7 @@ class Course extends AppModel
 
         return $this->habtmAdd('Enrol', $courseId, $ids);
     }
-    
+
     /**
      * Get course data by departments
      *
@@ -337,7 +337,7 @@ class Course extends AppModel
             }
         }
         $ret = $this->find($findType, array('conditions' => array('Course.id' => $courses)));
-        
+
         return $ret;
     }
 

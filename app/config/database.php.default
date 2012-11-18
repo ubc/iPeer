@@ -77,20 +77,9 @@ class DATABASE_CONFIG {
 		'driver' => 'mysql',
 		'persistent' => false,
 		'host' => 'localhost',
-		'login' => 'user',
-		'password' => 'password',
-		'database' => 'database_name',
-		'prefix' => '',
-		//'encoding' => 'utf8',
-	);
-
-	var $test = array(
-		'driver' => 'mysql',
-		'persistent' => false,
-		'host' => 'localhost',
 		'login' => 'root',
 		'password' => '',
-		'database' => 'ipeer_test',
+		'database' => 'ipeer',
 		'prefix' => '',
 		//'encoding' => 'utf8',
 	);
