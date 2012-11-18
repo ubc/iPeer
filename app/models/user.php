@@ -300,7 +300,7 @@ class User extends AppModel
     function getEnrolledStudents($course_id)
     {
         return $this->find(
-            'all', 
+            'all',
             array(
                 'conditions' => array('Enrolment.id' => $course_id),
                 'fields' => 'User.*',
@@ -320,7 +320,7 @@ class User extends AppModel
     function getInstructorsByCourse($course_id)
     {
         return $this->find(
-            'all', 
+            'all',
             array(
                 'conditions' => array('Course.id' => $course_id),
                 'fields' => 'User.*',
@@ -339,7 +339,7 @@ class User extends AppModel
     function getTutorsByCourse($course_id)
     {
         return $this->find(
-            'all', 
+            'all',
             array(
                 'conditions' => array('Tutor.id' => $course_id),
                 'fields' => 'User.*',
@@ -504,7 +504,7 @@ class User extends AppModel
     {
         $defaults = array('order' => $this->alias.'.last_name');
         $params = array_merge($defaults, $params);
-		
+
         if (array_key_exists('excludes', $params) && !empty($params['excludes'])) {
             $ids = array();
             if (!is_numeric($params['excludes'][0])) {
@@ -528,7 +528,7 @@ class User extends AppModel
 
         return $this->find($type, $params);
     }
-	
+
     /**
      * Get current logged in user
      *
@@ -715,7 +715,7 @@ class User extends AppModel
      */
     public function removeStudent($user_id, $course_id)
     {
-        $id = $this->UserEnrol->field('id', 
+        $id = $this->UserEnrol->field('id',
             array('user_id' => $user_id, 'course_id' => $course_id));
         return $this->UserEnrol->delete($id);
     }
@@ -752,7 +752,7 @@ class User extends AppModel
      */
     public function removeInstructor($user_id, $course_id)
     {
-        $id = $this->UserCourse->field('id', 
+        $id = $this->UserCourse->field('id',
             array('user_id' => $user_id, 'course_id' => $course_id));
         return $this->UserCourse->delete($id);
     }
@@ -789,7 +789,7 @@ class User extends AppModel
      */
     public function removeTutor($user_id, $course_id)
     {
-        $id = $this->UserTutor->field('id', 
+        $id = $this->UserTutor->field('id',
             array('user_id' => $user_id, 'course_id' => $course_id));
         return $this->UserTutor->delete($id);
     }

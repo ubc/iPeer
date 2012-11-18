@@ -12,9 +12,6 @@ class AppModel extends Model
 {
     protected $errorMessage = array();
 
-    /* }}} */
-
-    /* protected __construct($id = false, $table = null, $ds = null) {{{ */
     /**
      * __construct constructor function
      *
@@ -29,9 +26,7 @@ class AppModel extends Model
     {
         parent::__construct($id, $table, $ds);
     }
-    /* }}} */
 
-    /* public save($data = null, $validate = true, $fieldList = array()) {{{ */
     /**
      * save override save function
      *
@@ -54,7 +49,6 @@ class AppModel extends Model
 
         return parent::save($data, $validate, $fieldList);
     }
-    /* }}} */
 
 
     /**

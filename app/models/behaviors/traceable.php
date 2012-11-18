@@ -188,6 +188,7 @@ class TraceableBehavior extends ModelBehavior
      * @version 1.0
      * @since 1.0
      */
+    /*
     function afterFind($model, $results, $primary)
     {
 
@@ -214,7 +215,7 @@ class TraceableBehavior extends ModelBehavior
 
         return $results;
 
-    }
+    }*/
 
 
     /**
