@@ -14,6 +14,15 @@ App::import('Lib', 'ExtendedTestCase.ExtendedTestCase');
  */
 class ExtendedAuthTestCase extends ExtendedTestCase
 {
+    /**
+     * testAction
+     *
+     * @param string $url
+     * @param bool   $options
+     *
+     * @access public
+     * @return void
+     */
     function testAction($url = '', $options = array()) {
         if (is_null($this->testController)) {
             return parent::testAction($url, $options);
@@ -84,6 +93,14 @@ class ExtendedAuthTestCase extends ExtendedTestCase
         return $Controller->viewVars;
     }
 
+    /**
+     * _startController callback function
+     *
+     * @param mixed $controller
+     *
+     * @access protected
+     * @return void
+     */
     function _startController($controller) {
     }
 }

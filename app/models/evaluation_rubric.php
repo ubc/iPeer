@@ -368,6 +368,8 @@ class EvaluationRubric extends AppModel
      * rubricEvalScore
      *
      * @param mixed $eventId
+     * @param mixed $fields
+     * @param mixed $conditions
      *
      * @access public
      * @return void
@@ -421,5 +423,6 @@ class EvaluationRubric extends AppModel
 
         return $grades;
     }
+    /* }}} */
 
 }

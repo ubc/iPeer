@@ -362,6 +362,8 @@ class EvaluationMixeval extends AppModel
      * mixedEvalScore
      *
      * @param mixed $eventId
+     * @param mixed $fields
+     * @param mixed $conditions
      *
      * @access public
      * @return void

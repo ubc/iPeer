@@ -294,12 +294,12 @@ class CoursesController extends AppController
 
         // set the list of instructors
         $instructors = $this->User->getInstructors('all', array('User.username'));
-		$instructorlist = array();
+        $instructorlist = array();
 
-		//Display instructor names as "lastname, firstname" and sorted by lastname
-		foreach($instructors as $i) {
-		    $instructorlist[] = $i['User']['last_name'] . ", " . $i['User']['first_name'];
-		}
+        //Display instructor names as "lastname, firstname" and sorted by lastname
+        foreach($instructors as $i) {
+            $instructorlist[] = $i['User']['last_name'] . ", " . $i['User']['first_name'];
+        }
 
         $this->set('instructors', $instructorlist);
     }

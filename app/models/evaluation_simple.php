@@ -502,6 +502,8 @@ class EvaluationSimple extends AppModel
      * simpleEvalScore
      *
      * @param mixed $eventId
+     * @param mixed $fields
+     * @param mixed $conditions
      *
      * @access public
      * @return void
@@ -564,5 +566,6 @@ class EvaluationSimple extends AppModel
 
         return $grades;
     }
+    /* }}} */
 
 }

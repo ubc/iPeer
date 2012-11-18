@@ -744,6 +744,7 @@ class V1Controller extends Controller {
      * Get a list of departments in iPeer
      *
      * @param bool $departmentId
+     *
      * @access public
      * @return void
      */
