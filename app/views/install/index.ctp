@@ -21,6 +21,7 @@ $REQPHPVER = '5.0';
 $mysql = $no;
 $configwritable = $no;
 $dbconfig = $no;
+$magicquotes = $yes;
 
 // optional requirements init
 $sendmail = $no;
@@ -42,6 +43,10 @@ if (is_writable(CONFIGS))
 if (is_writable(CONFIGS.'database.php'))
 {
   $dbconfig = $yes;
+}
+if(get_magic_quotes_gpc())
+{ // magic quotes need to be off or json gets escaped, ref ticket #330
+    $magicquotes = $no;
 }
 
 // optional requirements check
@@ -128,6 +133,10 @@ foreach ($php_recommended_settings as &$setting)
   <tr>
     <td><?php __('File app/config/database.php writable ')?></td>
     <td><?php echo $dbconfig; ?></td>
+  </tr>
+  <tr>
+    <td><?php __('magic_quotes_gpc is off ')?></td>
+    <td><?php echo $magicquotes; ?></td>
   </tr>
 </table>
 
