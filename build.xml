@@ -237,4 +237,45 @@
         </reflexive>
     </target>
 
+    <target name="release" description="Prepare the release" depends="debug-off,packaging" />
+
+    <target name="debug-off" description="turn off the debug">
+        <reflexive file="app/config/core.php">
+            <filterchain>
+                <replaceregexp>
+                    <regexp pattern="'DEBUG', \d" replace="'DEBUG', 0"/>
+                </replaceregexp>
+            </filterchain>
+        </reflexive>
+    </target>
+
+    <target name="packaging" description="Packaging the release">
+        <loadfile property="version.number" file="version.txt"/>
+        <php function="trim" returnProperty="version.number">
+            <param value="${version.number}" />
+        </php>
+        <mkdir dir="${version.number}" />
+
+        <tar destfile="${version.number}/${phing.project.name}-${version.number}.tar.gz" compression="gzip">
+            <fileset dir=".">
+                <exclude name="**/.git/" />
+                <exclude name="build/" />
+                <exclude name="${version.number}/" />
+            </fileset>
+        </tar>
+        <filehash file="${version.number}/${phing.project.name}-${version.number}.tar.gz" hashtype="0" />
+        <echo msg="${filehashvalue}" file="${version.number}/${phing.project.name}-${version.number}.tar.gz.md5" />
+
+        <zip destfile="${version.number}/${phing.project.name}-${version.number}.zip">
+            <fileset dir=".">
+                <exclude name="**/.git/" />
+                <exclude name="build/" />
+                <exclude name="${version.number}/" />
+            </fileset>
+        </zip>
+        <filehash file="${version.number}/${phing.project.name}-${version.number}.zip" hashtype="0" />
+        <echo msg="${filehashvalue}" file="${version.number}/${phing.project.name}-${version.number}.zip.md5" />
+
+        <copy file="readme.txt" todir="${version.number}/" />
+    </target>
 </project>
