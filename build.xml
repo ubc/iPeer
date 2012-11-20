@@ -35,6 +35,7 @@
         <delete dir="${project.basedir}/build/coverage"/>
         <delete dir="${project.basedir}/build/logs"/>
         <delete dir="${project.basedir}/build/pdepend"/>
+        <delete dir="${project.basedir}/dist"/>
     </target>
 
     <target name="prepare" depends="clean"
@@ -250,32 +251,34 @@
     </target>
 
     <target name="packaging" description="Packaging the release">
+        <delete dir="${project.basedir}/dist"/>
+        <mkdir dir="${project.basedir}/dist"/>
         <loadfile property="version.number" file="version.txt"/>
         <php function="trim" returnProperty="version.number">
             <param value="${version.number}" />
         </php>
-        <mkdir dir="${version.number}" />
+        <echo msg="ipeer.version=${version.number}" file="dist/version_for_jenkins.properties" />
 
-        <tar destfile="${version.number}/${phing.project.name}-${version.number}.tar.gz" compression="gzip">
+        <tar destfile="dist/${phing.project.name}-${version.number}.tar.gz" compression="gzip">
             <fileset dir=".">
                 <exclude name="**/.git/" />
                 <exclude name="build/" />
-                <exclude name="${version.number}/" />
+                <exclude name="dist/" />
             </fileset>
         </tar>
-        <filehash file="${version.number}/${phing.project.name}-${version.number}.tar.gz" hashtype="0" />
-        <echo msg="${filehashvalue}" file="${version.number}/${phing.project.name}-${version.number}.tar.gz.md5" />
+        <filehash file="dist/${phing.project.name}-${version.number}.tar.gz" hashtype="0" />
+        <echo msg="${filehashvalue}" file="dist/${phing.project.name}-${version.number}.tar.gz.md5" />
 
-        <zip destfile="${version.number}/${phing.project.name}-${version.number}.zip">
+        <zip destfile="dist/${phing.project.name}-${version.number}.zip">
             <fileset dir=".">
                 <exclude name="**/.git/" />
                 <exclude name="build/" />
-                <exclude name="${version.number}/" />
+                <exclude name="dist/" />
             </fileset>
         </zip>
-        <filehash file="${version.number}/${phing.project.name}-${version.number}.zip" hashtype="0" />
-        <echo msg="${filehashvalue}" file="${version.number}/${phing.project.name}-${version.number}.zip.md5" />
+        <filehash file="dist/${phing.project.name}-${version.number}.zip" hashtype="0" />
+        <echo msg="${filehashvalue}" file="dist/${phing.project.name}-${version.number}.zip.md5" />
 
-        <copy file="readme.txt" todir="${version.number}/" />
+        <copy file="readme.txt" todir="dist/" />
     </target>
 </project>
