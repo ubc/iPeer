@@ -1,3 +1,19 @@
+iPeer 3.0.0 Beta
+New Features:
+ * Improved Installation and Upgrade Wizard
+ * The new Tutur Role and Faculty Admin Role
+ * Evaluation Absence and Mark Deduction 
+ * Fine-grainded Access Control 
+ * New APIs
+ * Group Export
+ * Group Email
+ * CWL/Shibboleth, LDAP Authentication
+ * Basic LTI Support
+ * Internationalization (i18N) support
+ * Upgrade to CakePHP Framework 1.3
+ * A lot bug fixes
+ * And more
+
 iPeer 2.2
 
 Changelog from 2.1
