@@ -236,7 +236,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
 
     function _startController(&$controller, $params = array()) {
         $admin = array('User' => array('username' => 'root',
-            'password' => md5('froglegs')));
+            'password' => md5('ipeeripeer')));
         $controller->Auth->login($admin);
         User::getInstance($controller->Auth->user());
         $controller->AccessControl->getPermissions();
