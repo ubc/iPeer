@@ -21,11 +21,6 @@
         <php expression="DATABASE_CONFIG::$default['login']"  returnProperty="db.username"/>
         <php expression="DATABASE_CONFIG::$default['password']" returnProperty="db.password"/>
         <php expression="DATABASE_CONFIG::$default['database']" returnProperty="db.name"/>
-        <if>
-            <!-- set up database name for Jenkins. Using different db name for different job to avoid conflict when running simultaneously -->
-            <isset property="env.JOB_NAME"/>
-            <then><property name="db.name" value="${env.JOB_NAME}"  override="true"/></then>
-        </if>
     </target>
 
     <target name="build"
@@ -187,13 +182,28 @@
         <copy file="app/config/database.php.default" tofile="app/config/database.php" overwrite="false"/>
         <copy file="app/plugins/guard/config/guard.php" tofile="app/config/guard.php" overwrite="false"/>
         <copy file="app/config/database.php" tofile="app/config/database_test_backup.php" overwrite="true"/>
-        <reflexive file="app/config/database.php">
-            <filterchain>
-                <replaceregexp>
-                    <regexp pattern="'database'.*=>.*'(.*)'" replace="'database'  => '\1_test'"/>
-                </replaceregexp>
-            </filterchain>
-        </reflexive>
+        <if>
+            <!-- set up database name for Jenkins. Using different db name for different job to avoid conflict when running simultaneously -->
+            <isset property="env.JOB_NAME"/>
+            <then>
+                <reflexive file="app/config/database.php">
+                    <filterchain>
+                        <replaceregexp>
+                            <regexp pattern="'database'.*=>.*'(.*)'" replace="'database'  => '${env.JOB_NAME}'"/>
+                        </replaceregexp>
+                    </filterchain>
+                </reflexive>
+            </then>
+            <else>
+                <reflexive file="app/config/database.php">
+                    <filterchain>
+                        <replaceregexp>
+                            <regexp pattern="'database'.*=>.*'(.*)'" replace="'database'  => '\1_test'"/>
+                        </replaceregexp>
+                    </filterchain>
+                </reflexive>
+            </else>
+        </if>
     </target>
 
     <target name="post-test" description="clean up after running tests">
