@@ -84,7 +84,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
             array(
                 'id' => '2',
                 'username' => 'instructor1',
-                'password' => '6f40a1a25eec7d325310dea310949005',
+                'password' => 'b17c3f638781ecd22648b509e138c00f',
                 'first_name' => 'Instructor',
                 'last_name' => '1',
                 'student_no' => null,
@@ -118,7 +118,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
             array (
                 'id' => '3',
                 'username' => 'instructor2',
-                'password' => '6f40a1a25eec7d325310dea310949005',
+                'password' => 'b17c3f638781ecd22648b509e138c00f',
                 'first_name' => 'Instructor',
                 'last_name' => '2',
                 'student_no' => null,
@@ -153,7 +153,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
             array (
                 'id' => '4',
                 'username' => 'instructor3',
-                'password' => '6f40a1a25eec7d325310dea310949005',
+                'password' => 'b17c3f638781ecd22648b509e138c00f',
                 'first_name' => 'Instructor',
                 'last_name' => '3',
                 'student_no' => null,
