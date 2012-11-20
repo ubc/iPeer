@@ -257,7 +257,7 @@
         <php function="trim" returnProperty="version.number">
             <param value="${version.number}" />
         </php>
-        <echo msg="ipeer.version=${version.number}" file="dist/version_for_jenkins.properties" />
+        <echo msg="IPEER_VERSION=${version.number}" file="dist/version_for_jenkins.properties" />
 
         <tar destfile="dist/${phing.project.name}-${version.number}.tar.gz" compression="gzip">
             <fileset dir=".">
