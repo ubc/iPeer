@@ -5,6 +5,7 @@ app/config/bootstrap.local.php
 app/config/guard.php
 app/config/database.php
 
+dist
 build/api/
 build/code-browser/
 build/logs/
