@@ -23,7 +23,7 @@
         <php expression="DATABASE_CONFIG::$default['database']" returnProperty="db.name"/>
         <if>
             <!-- set up database name for Jenkins. Using different db name for different job to avoid conflict when running simultaneously -->
-            <isset property="${env.JOB_NAME}"/>
+            <isset property="env.JOB_NAME"/>
             <then><property name="db.name" value="${env.JOB_NAME}"  override="true"/></then>
         </if>
     </target>
