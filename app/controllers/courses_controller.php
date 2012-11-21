@@ -129,15 +129,22 @@ class CoursesController extends AppController
      */
     function index()
     {
-        if (!User::hasPermission('functions/user')) {
+        if (!User::hasPermission('controllers/Courses')) {
             $this->Session->setFlash('Error: You do not have permission to view courses.');
             $this->redirect('/home');
+        }
+
+        // only create the addcourse link if user can add courses
+        $addlink = false;
+        if (User::hasPermission('controllers/Courses/add')) {
+            $addlink = true;
         }
 
         // Set up the basic static ajax list variables
         $this->_setUpAjaxList();
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
+        $this->set('addlink', $addlink);
     }
 
 
