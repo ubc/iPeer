@@ -1,14 +1,4 @@
-<div class="course_submenu">
-<h3>
-  <?php echo $submenuTitle?>
-</h3>
-
 <?php 
-$params = array(
-  'submenu'=>$submenu, 
-  'submenuTitle'=>$submenuTitle, 
-);
-
 $items = array();
 switch($submenu) {
   case "Student":
@@ -58,8 +48,22 @@ switch($submenu) {
     );
     break;
 }
-echo $this->element('courses/submenu_items',
-  array('items' => $items));
-
 ?>
+<div class="course_submenu">
+<h3>
+  <?php echo $submenuTitle?>
+</h3>
+<ul>
+<?php
+foreach($items as $item) {
+  echo '<li>';
+  echo $this->Html->link(
+    $item['name'], 
+    $item['link'], 
+    array('escape' => false)
+  );
+  echo '</li>';
+}
+?>
+</ul>
 </div>
