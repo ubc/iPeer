@@ -10,6 +10,8 @@
 -- Database: `ipeer2`
 --
 
+SET foreign_key_checks = 0;
+
 -- --------------------------------------------------------
 
 --
@@ -433,6 +435,7 @@ INSERT INTO acos (id, parent_id, model, foreign_key, alias, lft, rght) VALUES
 
 
 
+
 -- --------------------------------------------------------
 
 --
@@ -461,7 +464,6 @@ INSERT INTO `aros` (`id`, `parent_id`, `model`, `foreign_key`, `alias`, `lft`, `
 (3, NULL, 'Role', 3, NULL, 5, 6),
 (4, NULL, 'Role', 4, NULL, 7, 8),
 (5, NULL, 'Role', 5, NULL, 9, 10);
-
 
 -- --------------------------------------------------------
 
@@ -588,7 +590,6 @@ INSERT INTO aros_acos (id, aro_id, aco_id, _create, _read, _update, _delete) VAL
 (99, 5, 393, '-1', '-1', '-1', '-1'),
 (100, 5, 394, '-1', '-1', '-1', '-1'),
 (101, 5, 395, '1', '1', '1', '1');
-
 
 -- --------------------------------------------------------
 
@@ -1141,8 +1142,8 @@ CREATE TABLE IF NOT EXISTS `mixevals_questions` (
 -- This stores OAuth client credentials (AKA: consumer key and secret).
 -- Client credentails are used to identify client software.
 --
-
-CREATE TABLE `oauth_clients` (
+DROP TABLE IF EXISTS `oauth_clients`;
+CREATE TABLE IF NOT EXISTS `oauth_clients` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `key` varchar(255) NOT NULL,
@@ -1159,8 +1160,8 @@ CREATE TABLE `oauth_clients` (
 -- Table structure for table `oauth_nonces`
 -- Stores nonces to defeat replay attacks.
 --
-
-CREATE TABLE `oauth_nonces` (
+DROP TABLE IF EXISTS `oauth_nonces`;
+CREATE TABLE IF NOT EXISTS `oauth_nonces` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nonce` varchar(255) NOT NULL,
   `expires` TIMESTAMP NOT NULL,
@@ -1174,7 +1175,8 @@ CREATE TABLE `oauth_nonces` (
 -- Token credentials are used to identify a user.
 --
 
-CREATE TABLE `oauth_tokens` (
+DROP TABLE IF EXISTS `oauth_tokens`;
+CREATE TABLE IF NOT EXISTS `oauth_tokens` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `key` varchar(255) NOT NULL,
@@ -1192,7 +1194,8 @@ CREATE TABLE `oauth_tokens` (
 -- Table structure for table `penalties`
 --
 
-CREATE TABLE `penalties` (
+DROP TABLE IF EXISTS `penalties`;
+CREATE TABLE IF NOT EXISTS `penalties` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `event_id` int(11) DEFAULT NULL,
   `days_late` int(11) NOT NULL,
@@ -1686,3 +1689,4 @@ CREATE TABLE IF NOT EXISTS `user_tutors` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
+SET foreign_key_checks = 1;
