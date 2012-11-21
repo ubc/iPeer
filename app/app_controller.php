@@ -98,8 +98,8 @@ class AppController extends Controller
 
         if (User::hasPermission('controllers/upgrade') &&
             Configure::read('DATABASE_VERSION') > $dbv) {
-            $flashMessage  = "<span class='notice'>Your database version is older than the current version. ";
-            $flashMessage .= "Please do the <a href=" . $this->webroot ."upgrade" .">upgrade</a>.</span>";
+            $flashMessage  = "Your database version is older than the current version. ";
+            $flashMessage .= "Please do the <a href=" . $this->webroot ."upgrade" .">upgrade</a>.";
             $this->Session->setFlash($flashMessage);
         }
     }

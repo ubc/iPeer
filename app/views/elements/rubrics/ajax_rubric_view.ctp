@@ -39,7 +39,7 @@ isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = nu
     <?php foreach($data['RubricsLom'] as $lom): ?>
     <?php $mark_value = round( ($criteria['multiplier']/(count($data['RubricsLom']) - ('on' == $zero_mark ? 1 : 0))*($lom['lom_num'] - ('on' == $zero_mark ? 1 : 0))) , 2);?>
 		<td>
-      <div class="rubric-comment"><?php echo (!empty($criteria['RubricsCriteriaComment'][$lom['lom_num']-1]['criteria_comment']) ? $criteria['RubricsCriteriaComment'][$lom['lom_num']-1]['criteria_comment'] : '')?></div>
+      <div class="green"><?php echo (!empty($criteria['RubricsCriteriaComment'][$lom['lom_num']-1]['criteria_comment']) ? $criteria['RubricsCriteriaComment'][$lom['lom_num']-1]['criteria_comment'] : '')?></div>
   		<?php 
       $check = '';
       if (isset($evaluation)) {
@@ -52,7 +52,7 @@ isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = nu
              onClick="document.evalForm.selected_lom_<?php echo $userId."_".$i?>.value=<?php echo $lom['lom_num']?>;" <?php echo $check?>/></div>
 
       <?php if (!$evaluate): ?>
-        <div class="rubric-mark"><?php __('Mark')?>: <?php echo $mark_value?></div>
+        <div><?php __('Mark')?>: <?php echo $mark_value?></div>
       <?php endif; ?>
     </td>
     <?php endforeach ?>

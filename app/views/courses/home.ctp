@@ -1,4 +1,4 @@
-<table class='course_summary'>
+<table class='standardtable'>
   <tr>
     <th>Instructors</th>
     <th>Tutors</th>

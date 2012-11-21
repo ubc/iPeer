@@ -52,6 +52,7 @@ body {
 }
 
 p {
+    padding-top: 1em;
     padding-bottom: 1em;
     overflow: auto;
 }
@@ -142,6 +143,23 @@ a:hover {
 
 strong {
     font-weight: bold;
+}
+
+.standardtable {
+    width: 100%;
+}
+
+.standardtable th {
+    padding: 0.4em 0.1em;
+    background-color: #e06800;
+    font-weight: bold;
+    color: white;
+}
+
+.standardtable td {
+    padding: 0.4em 0.1em;
+    background-color: #ECECEC;
+    text-align: center;
 }
 
 /* css for timepicker */
@@ -553,28 +571,6 @@ i {
 
 /* COURSE */
 
-.course_summary {
-    border-spacing: 0;
-    width: 100%;
-    margin-top: 0.5em;
-    font-size: 0.9em;
-}
-
-.course_summary th {
-    background-color: #3E83B6;
-    color: white;
-    font-weight: bold;
-}
-
-.course_summary td {
-    background-color: #EAEAEA;
-    text-align: center;
-}
-
-.course_summary li {
-    padding: 0.2em 0; /* space out the instructors more */
-}
-
 .course_actions {
     margin-bottom: 0.5em;
 }
@@ -942,155 +938,52 @@ i {
     font-weight: bold; 
     font-size: 100%
 }
-/* TO BE REFACTORED LATER */
 
-/* TEMPORARY */
-/* temporary padding to be used until refactoring finished */
-
-th {
-    vertical-align: middle;
-    padding: 0.3em;
-    font-size: 0.9em;
-}
-
-td {
-    overflow: hidden;
-    vertical-align: middle;
-    padding: 0.3em;
-}
-
-/* temp nav ul fix */
-#nav ul {
+/* EVALTOOLS */
+#evaltoolsnav ul {
     margin: 1em;
 }
 
-#nav li {
+#evaltoolsnav li {
     display: inline;
     list-style: none;
 }
 
-#nav a {
+#evaltoolsnav a {
     font-size: 0.9em;
     padding: 0.2em 0.5em;
 }
 
-#nav .current a {
+#evaltoolsnav .current a {
     background-color: #ed0;
 }
 
-/* BOX STYLE */
-.title2 {
-    margin:0;
-    padding:2px 5px;
-    background:#F4F4F4;
-    font:bold 1em/1 Arial, Helvetica, sans-serif;
-    color: #0A2C64;
-    border-top: 1px solid #CFCFCF;
-    border-bottom: 1px solid #CFCFCF;
-}
-.box h1 {
-    margin:0;
-    padding:5px 10px;
-    background:#E2E2E2;
-    font:bold 1.2em/1 Arial, Helvetica, sans-serif;
-    border-top: 1px solid #CFCFCF;
-    border-bottom: 1px solid #CFCFCF;
-}
-.box h2 {
-    margin:0;
-    padding:2px 5px;
-    background:#F4F4F4;
-    font:bold 1em/1 Arial, Helvetica, sans-serif;
-    color: #0A2C64;
-    border-top: 1px solid #CFCFCF;
-    border-bottom: 1px solid #CFCFCF;
-}
+/* TO BE REFACTORED LATER */
 
-.smallHeader {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: 10px;
-    font-weight: bold;
-    color: #FFF;
-}
+/* TEMPORARY */
 
-.subTable {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: 10px;
-    color: #333333;
-    border-top-width: 1px;
-    border-right-width: 1px;
-    border-bottom-width: 1px;
-    border-left-width: 1px;
-    border-top-style: none;
-    border-right-style: solid;
-    border-bottom-style: solid;
-    border-left-style: solid;
-    border-top-color: #e2e2e2;
-    border-right-color: #e2e2e2;
-    border-bottom-color: #e2e2e2;
-    border-left-color: #e2e2e2;
-    width: 240px;
-    float: left;
-    margin: 20px 0 20px 0;
-    position: relative;
-}
-
-div.subTable .table-header {
-    height: 2.2em;
-    background-image: url("../img/layout/header_back.gif");
-    text-align: center;
-    line-height: 2.2em;
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: 10px;
-    font-weight: bold;
-    color: #FFF;
-}
-
-div.subTable .table-content {
-    background-image: url("../img/layout/small_table_back.gif");
-    height: 115px;
-    padding-top: 20px;
-}
-
-div.table-content li {
-    list-style: none;
-    line-height: 20px;
-}
-
-div.table-content li img {
-    vertical-align: middle;
-}
-
-.tableback {
-    background-image: url(banner_back.gif);
-}
 .tableheader {
     font-family: Verdana, Arial, Helvetica, sans-serif;
     font-weight: bold;
     color: #FFFFFF;
     background-color: #4478AC;
-    font-size: 0.9em;
 }
 
-.tablesubheader {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
+.tableheader td, .tableheader th {
+    padding: 0.3em;
+}
+
+.tablesubheader td {
+    padding: 0.3em;
     font-weight: bold;
     color: #FFFFFF;
     background-color: #3E83B6;
 }
 
 .tablesummary {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
     font-weight: bold;
     color: #000000;
     background-color: #99cc99;
-}
-
-.tablesummary2 {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-weight: bold;
-    color: #000000;
-    background-color: #bce9bc;
 }
 
 .tableheader a:link, .tableheader a:visited {
@@ -1128,9 +1021,12 @@ div.table-content li img {
 .tablecell {
     color: #000000;
     background-color: #EAEAEA;
-    line-height: 1.5; /* needed or bottom of letters like g will cut off */
-    font-size: 0.9em;
 }
+
+.tablecell td {
+    padding: 0.4em;
+}
+
 .tablecell:hover {
     background-color: #C7D0E7;
 }
@@ -1138,30 +1034,13 @@ div.table-content li img {
     font-family: Verdana, Arial, Helvetica, sans-serif;
     color: #000000;
 }
-#detailside {
-    margin-left : 280px;
-    height : 420px;
-}
-#masterside {
-    float : left;
-    width : 275px;
-}
+
 .panelheader{
     border : 5px solid #24588C;
     background-color : #24588C;
     color : #A8B0C4;
 }
 
-.masterHover {
-    border : 5px solid #C7D0E7;
-    background-color : #C7D0E7;
-    color : #FA7E04;
-}
-.panelTitle {
-    background-color : #24588C;
-    color : #A8B0C4;
-    border-color : #24588C;
-}
 .mdHover {
     border : 5px solid #C7D0E7;
     background-color : #C7D0E7;
@@ -1198,10 +1077,6 @@ div.table-content li img {
 /* Home styles */
 
 
-#importfrm li {
-    margin:1em 0 3em 1em;
-}
-
 .button-row {
     margin: 0.5em 0 0.5em 0;
 }
@@ -1220,114 +1095,7 @@ div.table-content li img {
     padding: 0;
 }
 
-.list-title {
-    font-weight: bold;
-    margin: 1em 0 0.5em 1em;
-}
-
-.user-list-table {
-    width: 100%;
-    border-width: 0px;
-    border-spacing: 2px;
-    background-color: white;
-}
-
-.user-list-table tr {
-    background-color: #EAEAEA;
-}
-
-.user-list-table th {
-    background-color: #4478AC;
-    color: white;
-    padding: 4px;
-}
-
-.user-list-table td {
-    padding: 4px;
-}
-
 /* No clue what these does */
-#loading {
-    padding-left: 2px;
-    padding-top:2px;
-    position:absolute;
-    float:left;
-    display:none;
-}
-
-#adddelcourses select.course-selector {
-    width: 250px;
-    margin: 2px;
-}
-
-#content {
-    width: 100%;
-    height: auto;
-    background-color: white;
-    padding-bottom: 1em;
-}
-
-#login-form-div {
-    margin-left: auto;
-    margin-right: auto;
-    width: 500px;
-}
-
-.notice {
-    color: red;
-}
-
-#login-form-div div.table-content div {
-    width: 240px;
-    padding-left: 5px;
-    padding-bottom: 15px;
-    text-align: center;
-}
-
-#UserLoginByDefaultForm input {
-    width: 130px;
-}
-
-#UserLoginByDefaultForm label {
-    width: 60px;
-    display: block;
-    float: left;
-    height: 23px;
-    padding: 5px 0 5px 0;
-}
-
-input[readonly='readonly'] {
-    border: 0px;
-    background: transparent;
-}
-
-textarea[readonly='readonly'] {
-    border: 0px;
-    background: transparent;
-}
-
-.rubric-comment {
-    color: #000066;
-    font-weight: bold;
-}
-
-.rubric-mark {
-    color: #FF6600;
-}
-
-table.list-bottom {
-    width: 100%;
-    border-width: 0;
-    background-color: #E5E5E5;
-    border-collapse: collapse;
-    padding: 0;
-    margin: 0 0 2em 0;
-}
-
-table.list-bottom td {
-    border-width: 0;
-    padding: 0;
-}
 
 table.form-table {
     width: 100%;

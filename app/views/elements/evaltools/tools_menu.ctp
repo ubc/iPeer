@@ -13,7 +13,7 @@ function generateLink ($view, $url, $name) {
 }
 ?>
 
-<div id="nav">
+<div id="evaltoolsnav">
     <ul>
         <!-- Sub menu for Evaluation Event Tools -->
         <?php if (User::hasPermission('controllers/evaltools')) { 

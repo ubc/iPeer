@@ -3,7 +3,6 @@
 <?php echo $html->script('ricoanimation')?>
 <?php echo $html->script('ricopanelcontainer')?>
 <?php echo $html->script('ricoaccordion')?>
-
 <div class="content-container">
     <?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
     <!-- Render Event Info table -->
@@ -172,8 +171,8 @@
               }
           }?>
     </tr>
-    <tr class="tablesummary2">
-        <td><?php __('Grade Released')?></td>
+    <tr class="green">
+        <td><?php __('Grade Release')?></td>
 <?php
 
 $n=0;
