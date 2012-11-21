@@ -8,7 +8,7 @@
             <filterchain>
                 <stripphpcomments />
                 <linecontainsregexp>
-                        <regexp pattern="^((?!php).)*$" />
+                        <regexp pattern="^((?!\?php).)*$" />
                 </linecontainsregexp>
                 <replaceregexp>
                     <regexp pattern="public" replace="public static"/>
