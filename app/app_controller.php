@@ -268,7 +268,7 @@ class AppController extends Controller
             return true;
         }
 
-        Debugger::log('Invalid signature! Expect '.$signature.', Got '.$this->sessionTransferData['signature']);
+        $this->log('Invalid signature! Expect '.$signature.', Got '.$this->sessionTransferData['signature']);
         return false;
     }
 }

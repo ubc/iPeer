@@ -121,7 +121,6 @@ class Group extends AppModel
             $max_num = $this->find('first', array(
                 'conditions' => array('course_id' => $this->data[$this->name]['course_id']),
                 'fields' => array('MAX(group_num) as max_num')));
-            Debugger::log(print_r($max_num, true));
             $this->data[$this->name]['group_num'] = $max_num[0]['max_num'] + 1;
         }
 
