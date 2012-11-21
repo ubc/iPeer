@@ -527,6 +527,7 @@ class V1ControllerTest extends CakeTestCase {
             $rubricList[] = $tmp;
         }
         foreach ($simples as $data) {
+            if ($data['event_id'] != 1) continue; # only care about event 1
             $tmp = array();
             $tmp['evaluatee'] = $data['evaluatee'];
             $tmp['username'] = $this->User->field('username',
@@ -628,6 +629,13 @@ class V1ControllerTest extends CakeTestCase {
                 'event_template_type_id' => '4',
                 'due_date' => '2013-07-02 09:00:28',
                 'id' => '3'
+            ),
+            array(
+                'title' => 'simple evaluation 2',
+                'course_id' => '1',
+                'event_template_type_id' => '1',
+                'due_date' => '2012-11-28 00:00:00',
+                'id' => '6'
             )
         );
 

@@ -46,12 +46,17 @@ class EventTestCase extends CakeTestCase
         //Test a valid course number
         $course = $this->Event->getCourseEvent(1);
         $events = $this->toEventNameArray($course);
-        $this->assertEqual($events, array('Term 1 Evaluation', 'Term Report Evaluation', 'Project Evaluation', 'Team Creation Survey', 'Survey, all Q types'));
+        $this->assertEqual($events, array('Term 1 Evaluation', 
+            'Term Report Evaluation', 'Project Evaluation', 
+            'Team Creation Survey', 'Survey, all Q types',
+            'simple evaluation 2'
+        ));
         $this->assertEqual($course[0]['Event']['title'], 'Term 1 Evaluation');
         $this->assertEqual($course[1]['Event']['title'], 'Term Report Evaluation');
         $this->assertEqual($course[2]['Event']['title'], 'Project Evaluation');
         $this->assertEqual($course[3]['Event']['title'], 'Team Creation Survey');
         $this->assertEqual($course[4]['Event']['title'], 'Survey, all Q types');
+        $this->assertEqual($course[5]['Event']['title'], 'simple evaluation 2');
 
         //Test an invalid course number
         $course = $this->Event->getCourseEvent(999);
@@ -87,7 +92,7 @@ class EventTestCase extends CakeTestCase
 
         //Test a valid course number
         $course = $this->Event->getCourseEventCount(1);
-        $this->assertEqual($course, 5);
+        $this->assertEqual($course, 6);
 
         //Test an invalid course number
         $course = $this->Event->getCourseEventCount(999);
