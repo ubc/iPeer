@@ -645,9 +645,7 @@ class V1Controller extends Controller {
 
         if ($this->RequestHandler->isGet()) {
             if (!isset($this->params['event_id']) || empty($this->params['event_id'])) {
-                $list = $this->Event->find('all', array(
-                    'conditions' => array('course_id' => $course_id),
-                    'fields' => $fields));
+                $list = $this->Event->getEventFieldsByCourseId($course_id, $fields);
 
                 if (!empty($list)) {
                     foreach ($list as $data) {
@@ -656,10 +654,7 @@ class V1Controller extends Controller {
                 }
                 $statusCode = 'HTTP/1.1 200 OK';
             } else {
-                $list = $this->Event->find('first',
-                    array('fields' => $fields,
-                        'conditions' => array('Event.id' => $this->params['event_id']))
-                );
+                $list = $this->Event->getEventFieldsByEventId($this->params['event_id'], $fields);
 
                 if (!empty($list)) {
                     $results = $list['Event'];

@@ -479,4 +479,34 @@ class Event extends AppModel
         ));
         return $event['Event']['title'];
     }
+    
+    /**
+     * Get fields of all events by course id
+     *
+     * @param mixed $courseId course id
+     * @param mixed $fields fields
+     *
+     * @return events
+     */
+    function getEventFieldsByCourseId($courseId, $fields)
+    {
+        return $this->find('all', array(
+            'conditions' => array('course_id' => $courseId),
+            'fields' => $fields));
+    }
+    
+    /**
+     * Get fields of all event by event id
+     *
+     * @param mixed $eventId event id
+     * @param mixed $fields fields
+     *
+     * @return events
+     */
+    function getEventFieldsByEventId($eventId, $fields)
+    {
+        return $this->find('first', array(
+            'conditions' => array('Event.id' => $eventId),
+            'fields' => $fields));
+    }
 }
