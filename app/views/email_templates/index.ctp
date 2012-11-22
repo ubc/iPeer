@@ -2,7 +2,7 @@
 
   <?php echo $this->element('evaltools/tools_menu', array());?>
 
-  <div class="list-add">
+  <div class="alignright">
     <?php echo $html->link(__('Add Email Template', true), '/emailtemplates/add/', array('class' => 'add-button'));?>
   </div>
 

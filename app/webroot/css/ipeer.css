@@ -65,6 +65,10 @@ p {
     float: right;
 }
 
+.alignright {
+    text-align: right;
+}
+
 .pagewidth {
     /* 780px is Wide enough for someone with a 800px device to 
      * view the whole app without horizontal scrolling. I assume
@@ -154,9 +158,13 @@ strong {
     background-color: #e06800;
     font-weight: bold;
     color: white;
+    border-left: 2px solid white;
+    border-bottom: 2px solid white;
 }
 
 .standardtable td {
+    border-left: 2px solid white;
+    border-bottom: 2px solid white;
     padding: 0.4em 0.1em;
     background-color: #ECECEC;
     text-align: center;
@@ -940,22 +948,42 @@ i {
 }
 
 /* EVALTOOLS */
-#evaltoolsnav ul {
-    margin: 1em;
+
+.evaltoolsnav {
+    margin-top: 1em;
 }
 
-#evaltoolsnav li {
+.evaltoolsnav ul {
+    padding-bottom: 1em;
+}
+
+.evaltoolsnav li {
     display: inline;
     list-style: none;
+    border-left: 1px solid white;
 }
 
-#evaltoolsnav a {
+.evaltoolsnav a {
+    color: white;
+    font-weight: bold;
     font-size: 0.9em;
-    padding: 0.2em 0.5em;
+    background-color: #0A2C64;
+    text-decoration: none;
+    padding: 0.5em;
 }
 
-#evaltoolsnav .current a {
+.evaltoolsnav a:hover {
+    background-color: #ff2;
+    color: #333;
+}
+
+.evaltoolsnav .current a {
+    color: #333;
     background-color: #ed0;
+}
+
+.evaltoolsadd {
+    margin-bottom: 0.5em;
 }
 
 /* TO BE REFACTORED LATER */
@@ -1131,9 +1159,6 @@ table.content-table {
     margin: 0 auto 0 auto;
 }
 
-.list-add {
-    text-align: right;
-}
 
 .add-button {
     background:url('/img/icons/add.gif') center left no-repeat;

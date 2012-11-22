@@ -2,7 +2,7 @@
 
   <?php echo $this->element('evaltools/tools_menu', array());?>
 
-  <div class="list-add">
+  <div class="alignright">
     <?php echo $html->link(__('Add Simple Evaluation', true), '/simpleevaluations/add', array('class' => 'add-button')); ?>
   </div>
 
