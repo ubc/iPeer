@@ -32,7 +32,7 @@
       <br>
 	  <select name="filtered" id="filtered" style="width:90%; height:200px;" multiple>
         <?php foreach($user_data as $row): $user = $row['users'];?>
-		<option value="<?php echo $user['id'] ?>"><?php echo $user['last_name'] ?>, <?php echo $user['first_name'] ?></option>
+		<option value="<?php echo $user['id'] ?>"><?php echo $user['full_name'] ?></option>
     	<?php endforeach; ?>
       </select>
 	  </td>
@@ -45,7 +45,7 @@
     <td width="251" align="center">Group List<br><br>
       <select name="group_members" multiple id="group_members" style="width:90%; height:200px;">
 	  	<?php if (isset($group_data)) foreach($group_data as $row): $user = $row['users'];?>
-		<option value="<?php echo $user['id'] ?>"><?php echo $user['last_name'] ?>, <?php echo $user['first_name'] ?></option>
+		<option value="<?php echo $user['id'] ?>"><?php echo $user['full_name'] ?></option>
     	<?php endforeach; ?>
 	  </select></td>
   </tr>

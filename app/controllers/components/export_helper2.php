@@ -35,7 +35,7 @@ class ExportHelper2Component extends Object
         }
         return $groupMembers;
     }
-    
+
     /**
      * getGroupMemberwithoutTutorsHelper
      *
@@ -220,7 +220,7 @@ class ExportHelper2Component extends Object
         if (!empty($params['include_student_name'])) {
       /*array_push($evaluateeHeader, $evaluatee['last_name']);
       array_push($evaluateeHeader, $evaluatee['first_name']);*/
-            array_push($evaluateeHeader, $evaluatee['first_name'].' '.$evaluatee['last_name']);
+            array_push($evaluateeHeader, $evaluatee['full_name']);
         }
         if (!empty($params['include_student_id'])) {
             array_push($evaluateeHeader, $evaluatee['student_no']);
@@ -306,7 +306,7 @@ class ExportHelper2Component extends Object
 
         foreach ($evaluators as $e) {
             //	array_push($headerArray['first_name'], $e['first_name'].' '.$e['last_name']);
-            array_push($headerArray['name'], $e['first_name'].' '.$e['last_name']);
+            array_push($headerArray['name'], $e['full_name']);
             //	array_push($headerArray['last_name'], $e['last_name']);
             array_push($headerArray['student_no'], $e['student_no']);
             array_push($headerArray['email'], $e['email']);

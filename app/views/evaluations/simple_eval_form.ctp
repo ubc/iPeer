@@ -29,7 +29,7 @@
       echo "if (totalPoints == parseFloat(allPoints)) {";
       echo "  if (commentsRequired == 0) {";
       echo "    $('statusMsg').innerHTML = '".__('All points are allocated.', true)."';";
-      
+
       echo "    submitButton.disabled = false;";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments != 0) {";
@@ -175,18 +175,18 @@ if ($event['Event']['id']==292) {
 
     <div style="text-align:left; margin-left:3em;"><a href="#" onClick="javascript:$('penalty').toggle();return false;">( <?php __('Show/Hide late penalty policy')?> )</a></div>
     <div id ="penalty" style ="border:1px solid red; margin: 0.5em 0 0 3em; width: 450px; padding:0.5em; color:darkred; display:none">
-    	   	
+
 	<?php if(!empty($penalty)){
-        foreach($penalty as $day){  
+        foreach($penalty as $day){
             $mult = ($day['Penalty']['days_late']>1)?'s':'';
-            echo $day['Penalty']['days_late'].' day'.$mult.' late: '.$day['Penalty']['percent_penalty'].'% deduction. </br>'; 
+            echo $day['Penalty']['days_late'].' day'.$mult.' late: '.$day['Penalty']['percent_penalty'].'% deduction. </br>';
         }
-        echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';	     
+        echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';
     } else {
-        echo 'No penalty is specified for this evaluation.';	   
+        echo 'No penalty is specified for this evaluation.';
     }
-	
-	?>    
+
+	?>
 
   </div>
 
@@ -202,7 +202,7 @@ if ($event['Event']['id']==292) {
     foreach($groupMembers as $row): $user = $row['User'];
     ?>
     <tr class="tablecell">
-        <td><?php echo $user['last_name'].' '.$user['first_name']?>
+        <td><?php echo $user['full_name']?>
       <input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/></td>
       <td width="110"><table><tr>
         <td width="5">Min.</td>

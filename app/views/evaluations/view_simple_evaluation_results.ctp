@@ -14,8 +14,8 @@
     <div class="incompleted">
       <?php __('These people have not yet submit their evaluations:')?>
         <ul>
-            <?php foreach($inCompletedMembers as $row): $user = $row['User']; array_push($incompletedMembersArr, $user['first_name'].' '.$user['last_name']);?>
-                <li><?php echo $user['first_name'].' '.$user['last_name'] . ($row['Role']['role_id']==4 ? ' (TA)' : ' (student)');?></li>
+            <?php foreach($inCompletedMembers as $row): $user = $row['User']; array_push($incompletedMembersArr, $user['full_name']);?>
+                <li><?php echo $user['full_name'] . ($row['Role']['role_id']==4 ? ' (TA)' : ' (student)');?></li>
             <?php endforeach; ?>
         </ul>
     </div>
@@ -34,13 +34,13 @@
   <?php if ($groupMembersNoTutors) {    //evaluators - no tutors
         $width = 75 / (count($groupMembersNoTutors));
         	foreach ($groupMembersNoTutors as $member) {
-        		echo '<td width="'.$width.'">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td>' . "\n";
+        		echo '<td width="'.$width.'">' . $member['User']['full_name'] . '</td>' . "\n";
         	}  ?>
   </tr>
   <?php
   foreach ($groupMembers as $member_row) {  //evaluators - have tutors
           echo '<tr class="tablecell2">';
-    	  	echo '<td>' . $member_row['User']['first_name'] . ' ' . $member_row['User']['last_name']  . '</td>' . "\n\t\t";
+    	  	echo '<td>' . $member_row['User']['full_name'] . '</td>' . "\n\t\t";
     		  foreach ($groupMembersNoTutors as $member_col) {
     		    //Blank the diagonal for not self-evaluation
     		    if (($member_row['User']['id'] == $member_col['User']['id']) && !$event['Event']['self_eval']) {
@@ -127,7 +127,7 @@
             } else {
                 // with self_eval off, we need to handle the case that
                 // the member hasn't completed the evaluation
-                if (!empty($incompletedMembersArr) && in_array($member_col['User']['first_name'].' '.$member_col['User']['last_name'], $incompletedMembersArr))
+                if (!empty($incompletedMembersArr) && in_array($member_col['User']['full_name'], $incompletedMembersArr))
                     echo '<td height="40">'.($memberEvaluatedCount-(count($inCompletedMembers))+1).'</td>' . "\n\t\t";
                 else
                     echo '<td height="40">'.($memberEvaluatedCount-(count($inCompletedMembers))).'</td>' . "\n\t\t";
@@ -152,7 +152,7 @@
                   } else {
                       // with self_eval off, we need to handle the case that
                       // the member hasn't completed the evaluation
-                      if (!empty($incompletedMembersArr) && in_array($member_col['User']['first_name'].' '.$member_col['User']['last_name'], $incompletedMembersArr)) {
+                      if (!empty($incompletedMembersArr) && in_array($member_col['User']['full_name'], $incompletedMembersArr)) {
                           if ($memberEvaluatedCount > count($inCompletedMembers)) {
                               echo '<td height="40">'.number_format($finalGrade / ($memberEvaluatedCount-(count($inCompletedMembers))+1), 2).'</td>' . "\n\t\t";
                           } else {
@@ -243,7 +243,7 @@ else { // if no members are present
     ?>
 		<div id="panel<?php echo $user['id']?>">
 			<div id="panel<?php echo $user['id']?>Header" class="panelheader">
-				<?php echo 'Evaluator: '.$user['last_name'].' '.$user['first_name']?>
+				<?php echo 'Evaluator: '.$user['full_name']?>
 			</div>
 			<div style="height: 200px;" id="panel1Content" class="panelContent">
 <table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
@@ -264,7 +264,7 @@ foreach($evalResult[$user['id']] AS $row ) {
     $evalMark = isset($row['EvaluationSimple'])? $row['EvaluationSimple']: null;
     echo '<tr class="tablecell2">';
     if (isset($evalMark)) {
-        echo '<td width="30%">'.$evaluatee['last_name'].' '.$evaluatee['first_name'].'</td>' . "\n";
+        echo '<td width="30%">'.$evaluatee['full_name'].'</td>' . "\n";
         echo '<td width="60%">';
         echo (isset($evalMark['eval_comment']))? $evalMark['eval_comment'] : __('No Comments', true);
         echo '</td>' ;

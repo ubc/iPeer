@@ -55,18 +55,18 @@
 
  <div style="text-align:left; margin-left:3em;"><a href="#" onClick="javascript:$('penalty').toggle();return false;">( <?php __('Show/Hide late penalty policy')?> )</a></div>
     <div id ="penalty" style ="border:1px solid red; margin: 0.5em 0 0 3em; width: 450px; padding:0.5em; color:darkred; display:none">
-    	   	
+
 	<?php if(!empty($penalty)){
-        foreach($penalty as $day){  
+        foreach($penalty as $day){
             $mult = ($day['Penalty']['days_late']>1)?'s':'';
-            echo $day['Penalty']['days_late'].' day'.$mult.' late: '.$day['Penalty']['percent_penalty'].'% deduction. </br>'; 
+            echo $day['Penalty']['days_late'].' day'.$mult.' late: '.$day['Penalty']['percent_penalty'].'% deduction. </br>';
         }
-        echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';	     
+        echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';
     } else {
-        echo 'No penalty is specified for this evaluation.';	   
+        echo 'No penalty is specified for this evaluation.';
     }
-	
-	?>    
+
+	?>
 
   </div>
 
@@ -80,14 +80,12 @@
 	<input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/>
 		<div id="panel<?php echo $user['id']?>">
 		  <div id="panel<?php echo $user['id']?>Header" class="panelheader">
-		  	<?php
-		  	echo $user['first_name'].' '.$user['last_name'];
-		  	if (isset($row['User']['Evaluation'])) {
-		  	  echo '<font color="#66FF33"> ( Saved )</font>';
-		  	} else {
-		  	  echo '<blink><font color="#FF6666"> - </font></blink>'.__('(click to expand)', true);
-		  	}
-		  	?>
+		  	<?php echo $user['full_name'];?>
+            <?if (isset($row['User']['Evaluation'])): ?>
+                <font color="#66FF33"> ( Saved )</font>
+            <? else: ?>
+                <blink><font color="#FF6666"> - </font></blink><?php __('(click to expand)')?>
+            <? endif; >?>
 		  </div>
 		  <div style="height: 200px;" id="panel1Content" class="panelContent">
 			 <br><?php __('Important! Comments are required in this evaluation.')?><br><br>
@@ -163,8 +161,8 @@
     } else {
         $commentsNeeded = false;
     }
-    
-    
+
+
   if (!$mustCompleteUsers && !$commentsNeeded) {
     echo $form->submit(__('Submit to Complete the Evaluation', true), array('onClick' => "javascript:return confirm('".__('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?', true)."')", 'div'=>'submitComplete'));
   }

@@ -300,7 +300,7 @@ class EvaluationComponent extends Object
         //checks if all members in the group have submitted
         //the number of submission equals the number of members
         //means that this group is ready to review
-        $memberCompletedNo = 
+        $memberCompletedNo =
             $this->EvaluationSubmission->numCountInGroupCompleted(
                 $groupEvent['GroupEvent']['id']);
         $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
@@ -996,7 +996,7 @@ class EvaluationComponent extends Object
 
             $reviewEvaluations = $this->getStudentViewRubricResultDetailReview($event, $currentUser['id']);
             $result['reviewEvaluations'] = $reviewEvaluations;
-            
+
             $event_info = $this->Event->find(
                 'first',
                 array(
@@ -1098,7 +1098,7 @@ class EvaluationComponent extends Object
         $result['mixeval'] = $this->Mixeval->read();
 
         // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
-        $numMembers=count($this->GroupsMembers->getEventGroupMembersNoTutors($event['group_id'], 
+        $numMembers=count($this->GroupsMembers->getEventGroupMembersNoTutors($event['group_id'],
             $event['Event']['self_eval'], $evaluator));
         //$this->set('evaluateeCount', $numMembers);
         $result['evaluateeCount'] = $numMembers;
@@ -1579,7 +1579,7 @@ class EvaluationComponent extends Object
                     'conditions' => array('Event.id' => $eventId),
                 )
             );
-            
+
             // storing the timestamp of the due date/end date of the event
             $event_due = strtotime($event_info['Event']['due_date']);
             $event_end = strtotime($event_info['Event']['release_date_end']);
@@ -1617,7 +1617,7 @@ class EvaluationComponent extends Object
             $result['groupMembers'] = $groupMembers;
             $result['groupMembersNoTutors'] = $groupMembersNoTutors;
         }
-        
+
         //Get Detail information on Mixeval score
         if ($displayFormat == 'Detail') {
             //echo 'ss';
@@ -1730,7 +1730,7 @@ class EvaluationComponent extends Object
 
             if ('M' == $questionType) {
                 $modAnswer = $this->Response->find('first', array('conditions' => array('Response.id' => $answer)));
-            } else { 
+            } else {
                 $modAnswer['Response']['response'] = $answer;
             }
             $surveyInput[$i+$j]['SurveyInput']['response_text']=$modAnswer['Response']['response'];
@@ -2010,7 +2010,7 @@ class EvaluationComponent extends Object
                     $responseText = $responses[$j]['SurveyInput']['response_text'];
                     $userId = $responses[$j]['SurveyInput']['user_id'];
                     $userName = $this->User->findById($userId);
-                    $userName = $userName['User']['last_name'].", ".$userName['User']['first_name'];
+                    $userName = $userName['User']['full_name'];
                     $tmpUserResponse[$userName]['response_text'] = $responseText;
                 }
                 ksort($tmpUserResponse);
@@ -2047,7 +2047,7 @@ class EvaluationComponent extends Object
         $this->User = ClassRegistry::init('User');
 
         $survey_id = $surveyId;
-        
+
         // Get all required data from each table for every question
         $surveyQuestion = new SurveyQuestion();
         $tmp = $surveyQuestion->getQuestionsID($survey_id);
@@ -2100,7 +2100,7 @@ class EvaluationComponent extends Object
                     $responseText = $responses[$j]['SurveyInput']['response_text'];
                     $userId = $responses[$j]['SurveyInput']['user_id'];
                     $userName = $this->User->findById($userId);
-                    $userName = $userName['User']['last_name'].", ".$userName['User']['first_name'];
+                    $userName = $userName['User']['full_name'];
                     $tmpUserResponse[$userName]['response_text'] = $responseText;
                 }
                 ksort($tmpUserResponse);

@@ -397,7 +397,7 @@ class sysContainerComponent
         $this->User = new User;
         $user = $this->User->findById($user_id);
         if ($opt == 'fullname') {
-            return $user['User']['first_name'].' '.$user['User']['last_name'];
+            return $user['User']['full_name'];
         }
     }
 

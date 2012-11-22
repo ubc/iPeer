@@ -42,7 +42,7 @@ else if ($gradeReleased || $commentReleased) {
 
      if ($scoreRecords == null) { // renders self evaluation
      	$member = $membersAry[$memberMixeval['evaluatee']];
-     	
+
      } else { // renders evaluations from peers
         $member = $membersAry[$memberMixeval['evaluator']];
      }
@@ -51,7 +51,7 @@ else if ($gradeReleased || $commentReleased) {
      if (isset($scoreRecords)) {
        echo "<td width='15%'>".$currentUser['full_name']."</td>";
      } else {
-       echo "<td width='15%'>".$member['User']['first_name'].' '.$member['User']['last_name']."</td>";
+       echo "<td width='15%'>".$member['User']['full_name']."</td>";
      }
 
      $resultDetails = $memberMixeval['details'];
@@ -67,14 +67,14 @@ else if ($gradeReleased || $commentReleased) {
             }
         echo "<br />";
         }
-        
+
         //Points Detail
         echo "<strong>Points: </strong>";
         if ($gradeReleased && isset($mixevalDet)) {
           //if (
         	//$lom = $mixeval["Question"][$i-1]["multiplier"]/ $mixevalDet["selected_lom"];
                 $lom = $mixevalDet['grade'];
-        	$empty = $mixeval["Question"][$i-1]["multiplier"]; 
+        	$empty = $mixeval["Question"][$i-1]["multiplier"];
         	for ($v = 0; $v < $lom; $v++) {
         		echo $html->image('evaluations/circle.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle'));
         		$empty--;
@@ -146,7 +146,7 @@ if (!$gradeReleased && !$commentReleased) {
      if (isset($scoreRecords)) {
        echo "<td width='15%'>".$currentUser['full_name']."</td>";
      } else {
-       echo "<td width='15%'>".$member['User']['first_name'].' '.$member['User']['last_name']."</td>";
+       echo "<td width='15%'>".$member['User']['full_name']."</td>";
      }
 
      $resultDetails = $memberMixeval['details'];

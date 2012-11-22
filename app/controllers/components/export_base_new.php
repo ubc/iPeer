@@ -55,7 +55,7 @@ class ExportBaseNewComponent extends Object
             $yIndex++;
             $instructors = array();
             foreach ($course['Instructor'] as $instructor) {
-                array_push($instructors, $instructor['first_name'].' '.$instructor['last_name']);
+                array_push($instructors, $instructor['full_name']);
             }
             if (!empty($instructors)) {
                 $listInstructors = implode(", ", $instructors);
@@ -124,7 +124,7 @@ class ExportBaseNewComponent extends Object
             $header .= "Instructors :,,";
             foreach ($course['Instructor'] as $i) {
                 if ($this->User->getRoleId($i['id']) == 3) {
-                    $header .= $i['first_name']." ".$i['last_name'].",";
+                    $header .= $i['full_name'].",";
                 }
             }
         }
@@ -164,7 +164,7 @@ class ExportBaseNewComponent extends Object
         // storing the timestamp of the due date/end date of the event
         $event_due = strtotime($event_info['Event']['due_date']);
         $event_end = strtotime($event_info['Event']['release_date_end']);
-        
+
         $groupMembers = $this->ExportHelper2->getGroupMemberHelper($grpEventId);
         // Build grid
         $xDimension = 10;
@@ -184,13 +184,13 @@ class ExportBaseNewComponent extends Object
                 array_push($row, $evaluatee['User']['email']);
             }
             if (!empty($params['include_student_name'])) {
-                array_push($row, $evaluatee['User']['first_name']." ".$evaluatee['User']['last_name']);
+                array_push($row, $evaluatee['User']['full_name']);
             }
             if (!empty($params['include_student_id'])) {
                 array_push($row, $evaluatee['User']['student_no']);
             }
             if (!empty($params['include_student_name'])) {
-                array_push($row, $evaluator['first_name']." ".$evaluator['last_name']);
+                array_push($row, $evaluator['full_name']." ".$evaluator['last_name']);
             }
             if (!empty($params['include_student_id'])) {
                 array_push($row, $evaluator['student_no']);
@@ -344,13 +344,13 @@ class ExportBaseNewComponent extends Object
                 array_push($row, $evaluatee['User']['email']);
             }
             if (!empty($params['include_student_name'])) {
-                array_push($row, $evaluatee['User']['first_name']." ".$evaluatee['User']['last_name']);
+                array_push($row, $evaluatee['User']['full_name']);
             }
             if (!empty($params['include_student_id'])) {
                 array_push($row, $evaluatee['User']['student_no']);
             }
             if (!empty($params['include_student_name'])) {
-                array_push($row, $evaluator['first_name']." ".$evaluator['last_name']);
+                array_push($row, $evaluator['full_name']);
             }
             if (!empty($params['include_student_id'])) {
                 array_push($row, $evaluator['student_no']);
@@ -503,13 +503,13 @@ class ExportBaseNewComponent extends Object
                 array_push($row, $evaluatee['User']['email']);
             }
             if (!empty($params['include_student_name'])) {
-                array_push($row, $evaluatee['User']['first_name']." ".$evaluatee['User']['last_name']);
+                array_push($row, $evaluatee['User']['full_name']);
             }
             if (!empty($params['include_student_id'])) {
                 array_push($row, $evaluatee['User']['student_no']);
             }
             if (!empty($params['include_student_name'])) {
-                array_push($row, $evaluator['first_name']." ".$evaluator['last_name']);
+                array_push($row, $evaluator['full_name']);
             }
             if (!empty($params['include_student_id'])) {
                 array_push($row, $evaluator['student_no']);

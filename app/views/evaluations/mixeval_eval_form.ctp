@@ -7,7 +7,7 @@
 <?php echo $html->script('ricopanelcontainer')?>
 <?php echo $html->script('ricoaccordion')?>
 
-	<?php 
+	<?php
 	echo empty($data['Evaluation']['id']) ? null : $html->hidden('Evaluation.id'); ?>
     <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeMixevalEvaluation'); echo '/'.$event['Event']['id'].';'.$event['group_id']; ?>">
       <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
@@ -18,7 +18,7 @@
       <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $evaluator_id ;?>"/>
       <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
-      
+
   <tr class="tableheader">
     <td colspan="4" align="center"><?php __('Evaluation Event Detail')?></td>
     </tr>
@@ -56,21 +56,21 @@
 </table>
     <div style="text-align:left; margin-left:3em;"><a href="#" onClick="javascript:$('penalty').toggle();return false;">( <?php __('Show/Hide late penalty policy')?> )</a></div>
     <div id ="penalty" style ="border:1px solid red; margin-left: 3em; margin-top:0.5em; width: 450px; padding:0.5em; color:darkred; display:none">
-    	
+
 	<?php if(!empty($penalty)){
-        foreach($penalty as $day){  
+        foreach($penalty as $day){
             $mult = ($day['Penalty']['days_late']>1)?'s':'';
-            echo $day['Penalty']['days_late'].' day'.$mult.' late: '.$day['Penalty']['percent_penalty'].'% deduction. </br>'; 
+            echo $day['Penalty']['days_late'].' day'.$mult.' late: '.$day['Penalty']['percent_penalty'].'% deduction. </br>';
         }
-        echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';	    
+        echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';
     } else {
-        echo 'No penalty is specified for this evaluation.';	   
+        echo 'No penalty is specified for this evaluation.';
     }
-	
-	?>    
-    
+
+	?>
+
   </div>
- 
+
 <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
 	<tr>
 		<td>
@@ -83,9 +83,9 @@
   ?>
 		<div id="panel<?php echo $user['id']?>">
 		  <div id="panel<?php echo $user['id']?>Header" class="panelheader">
-		  	<?php echo $user['last_name'].' '.$user['first_name'];?>
+		  	<?php echo $user['full_name']?>
 		  	<?php if (isset($user['Evaluation'])):?>
-        <?php                
+        <?php
           // check if the evaluation comment is empty
           $commentsNeeded = false;
           $evaluationDetails = $user['Evaluation']['EvaluationDetail'];
@@ -180,7 +180,7 @@
 
             if (empty($user['Evaluation'])) {
                 $commentsNeeded = true;      // Not evaluated? Then we need comments for sure
-                //echo "(Please complete evaluation for student $user[first_name] $user[last_name])<br />";
+                //echo "(Please complete evaluation for student $user[full_name])<br />";
             } else {
                 if (isset($params['data']['questions'])) {
                     $evaluationDetails = $user['Evaluation']['EvaluationDetail'];

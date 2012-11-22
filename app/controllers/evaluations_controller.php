@@ -481,7 +481,7 @@ class EvaluationsController extends AppController
 
             //Set userId, first_name, last_name
             $this->set('userId', $userId);
-            $this->set('fullName', $this->Auth->user('first_name').' '.$this->Auth->user('last_name'));
+            $this->set('fullName', $this->Auth->user('full_name'));
 
 
             //Get Members for this evaluation
@@ -960,7 +960,7 @@ class EvaluationsController extends AppController
             $this->set('penalty', $penalty);
             $this->set('event', $event);
             $this->set('evaluator_id', $this->Auth->user('id'));
-            $this->set('full_name', $this->Auth->user('first_name').' '.$this->Auth->user('last_name'));
+            $this->set('full_name', $this->Auth->user('full_name'));
             //Setup the courseId to session
             $this->Session->delete('ipeerSession.courseId');
             $this->Session->write('ipeerSession.courseId', $event['Event']['course_id']);

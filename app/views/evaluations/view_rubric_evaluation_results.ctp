@@ -11,7 +11,7 @@
           <?php __('These people have not yet submit their evaluations:')?>
             <ul>
                 <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
-                    <li><?php echo $user['first_name'].' '.$user['last_name'] . ($row['Role']['role_id']==4 ? ' (TA)' : ' (student)');?></li>
+                    <li><?php echo $user['full_name'] . ($row['Role']['role_id']==4 ? ' (TA)' : ' (student)');?></li>
                 <?php endforeach; ?>
             </ul>
         </div>
@@ -31,7 +31,7 @@
     if ($groupMembersNoTutors) {
       foreach ($groupMembersNoTutors as $member) {
         echo '<tr class="tablecell2">';
-      	echo '<td width="70%">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td>' . "\n";
+      	echo '<td width="70%">' . $member['User']['full_name'] . '</td>' . "\n";
       	//totals section
       	echo '<td width="30%">';
       	//if ($allMembersCompleted) {

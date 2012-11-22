@@ -251,8 +251,7 @@ class UsersController extends AppController
             $tmp['id'] = $user['User']['id'];
             $tmp['Role'] = 'Student';
             $tmp['Username'] = $user['User']['username'];
-            $tmp['Full Name'] = $user['User']['first_name'] .' '.
-                $user['User']['last_name'];
+            $tmp['Full Name'] = $user['User']['full_name'];
             if (User::hasPermission('functions/viewemailaddresses')) {
                 $tmp['Email'] = $user['User']['email'];
             }
@@ -1167,7 +1166,7 @@ class UsersController extends AppController
     {
         $this->Session->write('ipeerSession.id', $userData['id']);
         $this->Session->write('ipeerSession.username', $userData['username']);
-        $this->Session->write('ipeerSession.fullname', $userData['last_name'].' '.$userData['first_name']);
+        $this->Session->write('ipeerSession.fullname', $userData['full_name']);
         $this->Session->write('ipeerSession.email', $userData['email']);
     }
 
@@ -1194,7 +1193,7 @@ class UsersController extends AppController
         $from = $this->Auth->user('email');
         $to = $user['User']['email'];
         $username = $user['User']['username'];
-        $name = $user['User']['first_name'].' '.$user['User']['last_name'];
+        $name = $user['User']['full_name'];
 
         // this means only students will get a list of courses they're
         // enrolled in, since instructors are stored in another array

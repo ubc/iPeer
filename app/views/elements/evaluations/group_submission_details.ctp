@@ -30,7 +30,7 @@
       <?php $i = '0';  $enable = false;?>
 	    <?php foreach($data as $row): $member = $row['Member']; ?>
     	  <tr class="tablecell">
-            <td><?php echo $member['first_name'].' '.$member['last_name'] ?></td>
+            <td><?php echo $member['full_name']?></td>
             <td align="center"><?php
               if ($row['users']['submitted']) {
                 echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($row['users']['date_submitted'])));
