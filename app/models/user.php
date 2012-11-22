@@ -136,12 +136,12 @@ class User extends AppModel
     public $validate = array(
         'username'  => array(
             'character' => array(
-                'rule' => 'alphaNumeric',
-                'message' => 'Usernames may only have letters and numbers.'
+                'rule' => '/^[a-z0-9_.-]{1,}$/i',
+                'message' => 'Usernames may only have letters, numbers, underscore and dot.'
             ),
             'minLength' => array(
                 'rule' => array('minLength', 1),
-                'message' => 'Usernames must be at least 6 characters.'
+                'message' => 'Usernames must be at least 1 characters.'
             ),
             'unique' => array(
                 'rule' => 'isUnique',
@@ -153,10 +153,6 @@ class User extends AppModel
             'allowEmpty' => true,
             'message'    => 'Invalid email format.'
         ),
-        'first_name' => array(
-            'rule' => 'notEmpty',
-            'message' => "First name cannot be empty, it is used as the display name."
-        ),
         'send_email_notification' => array(
             'rule' => array('requiredWith', 'email'),
             'message' => 'Email notification requires an email address.'
@@ -165,7 +161,7 @@ class User extends AppModel
 
 
     public $virtualFields = array(
-        'full_name' => 'CONCAT_WS(" ", first_name, last_name)',
+        'full_name' => 'IF(CONCAT(first_name, last_name)>"", CONCAT_WS(" ", first_name, last_name), username)',
         'student_no_with_full_name' => 'CONCAT_WS(" ", student_no,CONCAT_WS(" ", first_name, last_name))'
     );
 

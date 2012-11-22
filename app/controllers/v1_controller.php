@@ -328,7 +328,7 @@ class V1Controller extends Controller {
                 }
                 $sUser = array();
                 $uUser = array();
-                $result = $this->User->saveAll($data, array('atomic' => false, 'validate' => false));
+                $result = $this->User->saveAll($data, array('atomic' => false));
                 $statusCode = 'HTTP/1.1 500 Internal Server Error';
                 foreach ($result as $key => $ret) {
                     if ($ret) {
