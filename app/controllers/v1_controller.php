@@ -934,14 +934,14 @@ class V1Controller extends Controller {
                         $ret = $this->User->addTutor($userId, $courseId);
                     }
                     else {
-                        $this->set('statusCode',
-                            'HTTP/1.1 501 Unsupported role for '.$user['username']);
-                        break;
+                        $this->set('error', array('code' => 400, 'message' => 'Unsupported role for '.$user['username']));
+                        $this->render('error');
+                        return;
                     }
                     if (!$ret) {
-                        $this->set('statusCode',
-                            'HTTP/1.1 501 Fail to enrol ' . $user['username']);
-                        break;
+                        $this->set('error', array('code' => 401, 'message' => 'Fail to enrol ' . $user['username']));
+                        $this->render('error');
+                        return;
                     }
                 }
             }
@@ -967,14 +967,14 @@ class V1Controller extends Controller {
                     $ret = $this->User->removeTutor($userId, $courseId);
                 }
                 else {
-                    $this->set('statusCode',
-                        'HTTP/1.1 501 Unsupported role for '.$user['username']);
-                    break;
+                    $this->set('error', array('code' => 400, 'message' => 'Unsupported role for '.$user['username']));
+                    $this->render('error');
+                    return;
                 }
                 if (!$ret) {
-                    $this->set('statusCode',
-                        'HTTP/1.1 501 Fail to drop ' . $user['username']);
-                    break;
+                    $this->set('error', array('code' => 401, 'message' => 'Fail to enrol ' . $user['username']));
+                    $this->render('error');
+                    return;
                 }
             }
             $this->set('enrolment', $users);
