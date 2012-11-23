@@ -1561,12 +1561,6 @@ class EvaluationsController extends AppController
             $this->redirect('/home');
         }
 
-        // check whether both ids are numeric
-        if (!is_numeric($eventId) || !is_numeric($groupId)) {
-            $this->Session->setFlash('Error: Invalid Id', true);
-            $this->redirect('index');
-        }
-
         $courseId = $this->Event->getCourseByEventId($eventId);
 
         if (!User::hasPermission('functions/superadmin')) {
