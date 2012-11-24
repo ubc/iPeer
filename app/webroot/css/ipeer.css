@@ -47,8 +47,13 @@ table {
 
 /* GLOBAL */
 body {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-family: 'Lato', serif; /* provided by Google Web Fonts */
     background-image: url(bg.gif);
+}
+
+/* Open Sans to enable font-weight: 600 */
+h1,h2,h3,h4,h5,h6,th {
+    font-family: 'Open Sans', serif; /* provided by Google Web Fonts */
 }
 
 p {
@@ -129,7 +134,7 @@ p {
     margin-top: 1em;
     width: 6em;
     height: 2em;
-    font-weight: bold;
+    font-weight: 600;
     display: block;
 }
 
@@ -146,7 +151,7 @@ a:hover {
 }
 
 strong {
-    font-weight: bold;
+    font-weight: 600;
 }
 
 .standardtable {
@@ -155,9 +160,9 @@ strong {
 
 .standardtable th {
     padding: 0.4em 0.1em;
-    background-color: #e06800;
-    font-weight: bold;
-    color: white;
+    background-color: khaki;
+    font-weight: 600;
+    font-size: 0.95em;
     border-left: 2px solid white;
     border-bottom: 2px solid white;
 }
@@ -166,7 +171,7 @@ strong {
     border-left: 2px solid white;
     border-bottom: 2px solid white;
     padding: 0.4em 0.1em;
-    background-color: #ECECEC;
+    background-color: lightgoldenrodyellow;
     text-align: center;
 }
 
@@ -205,7 +210,7 @@ div.ui-datepicker { font-size: 0.85em; }
 #bannerLogoText {
     padding-top: 50px; 
     font-size: 1em; 
-    font-weight: bold; color: white;
+    font-weight: 600; color: white;
     text-shadow: 0 0 7px #222
 }
 
@@ -230,8 +235,7 @@ div.ui-datepicker { font-size: 0.85em; }
     border-right: 1px solid #ddd;
     border-top: 1px solid #ddd;
     color: white;
-    font-weight: bolder;
-    font-size: 0.85em;
+    font-weight: 600;
     text-align: center;
     padding: 0.5em;
     padding-left: 0.6em;
@@ -239,18 +243,18 @@ div.ui-datepicker { font-size: 0.85em; }
 }
 
 .navigation a:hover,a:active {
-    /*background-color: #ff9933;*/
-    background-color: #ff2;
-    color: #333;
+    background-color: yellow;
+    color: #111;
 }
 
 .navigation #current a {
-    color: #333;
-    background-color: #ed0;
+    color: #111;
+    background-color: gold;
 }
 
 .navigation .miniLinks {
-    font-size: 0.65em;
+    font-family: 'Open Sans', serif;
+    font-size: 0.8em;
     border: none;
     margin-right: 0.5em;
     padding: 0.5em 1em;
@@ -270,7 +274,7 @@ div.ui-datepicker { font-size: 0.85em; }
     margin-bottom: 1em;
     clear: left;
     padding: 0.7em;
-    font-weight: bold;
+    font-weight: 600;
     text-align: center;
 }
 
@@ -294,7 +298,7 @@ div.ui-datepicker { font-size: 0.85em; }
 
 h1.title {
     margin: 0.5em 0;
-    font-weight: bold;
+    font-weight: 600;
     background: #eee;
     border: 1px solid #ddd;
     padding: 0.3em 0.5em;
@@ -303,12 +307,16 @@ h1.title {
 h2 {
     margin: 1em 0;
     font-size: 1.3em;
-    font-weight: bold;
+    font-weight: 600;
 }
 
 h3 {
-    margin: 1em 0 0.5em 0;
-    font-weight: bold;
+    margin: 1em 0;
+    font-weight: 600;
+}
+
+h4 {
+    margin: 0.5em 0;
 }
 
 i {
@@ -332,7 +340,7 @@ i {
 #debugsection h5 {
     padding: 0.5em;
     font-size: 1em;
-    font-weight: bold;
+    font-weight: 600;
     background-color: #ccff99;
 }
 
@@ -355,7 +363,7 @@ i {
     background-color: #f71; 
     padding: 0.5em;
     color: white;
-    font-weight: bold;
+    font-weight: 600;
     font-size: 0.9em;
 }
 
@@ -375,22 +383,19 @@ i {
 /* HOME */
 .course {
     margin-bottom: 1em;
-    background-color: #EAEAEA;
+    background-color: lightgoldenrodyellow;
 }
 
 .course h3 {
-    font-size: 0.9em;
-    font-weight: bold;
-    background-color: #4478AC;
-    padding: 0.5em 0.5em;
+    background-color: khaki;
+    padding: 0.5em;
 }
 
-.course h3 a:link, .course h3 a:visited {
-    color: white;
+.course a:link h3, .course a:visited h3 {
+    color: black;
 }
 
 .course h4 {
-    font-size: 0.9em;
     padding: 0.5em;
 }
 
@@ -406,13 +411,12 @@ i {
 .course table {
     margin: 0.5em;
     width: 100%;
-    font-size: 0.9em;
 }
 
 .course th {
     width: 33%;
     text-align: left;
-    font-weight: bold;
+    font-weight: 600;
     padding: 0.5em;
 }
 
@@ -429,7 +433,7 @@ i {
 }
 
 #short_help h5 {
-    font-weight: bold;
+    font-weight: 600;
     padding: 0.5em;
 }
 
@@ -593,7 +597,7 @@ i {
 .course_submenu h3 {
     background-color: #EAEAEA;
     color: #0A2C64;
-    font-weight: bold;
+    font-weight: 600;
     padding: 0.5em;
 }
 
@@ -699,12 +703,13 @@ i {
 
 .userActionPanel {
     width: 100%;
-    background-color: #dfd;
+    background-color: wheat;
+    padding: 0.2em 0;
+    margin: 0;
 }
 .userActionPanel ul {
     text-align: center;
     width: 100%;
-    background-color: #dfd;
 }
 .userActionPanel li {
     padding: 0 1em;
@@ -879,24 +884,6 @@ i {
     margin-left: 3.5em;
 }
 
-/* dataTable */
-
-#table_id th {
-    font-family: Verdana, Arial, Helveica, sans-serif;
-    font-weight: bold;
-    color: white;
-    background-color: #4478AC;
-    font-size: 0.9em;
-    padding: 0.3em;
-}
-
-#table_id td {
-    color: black;
-    background-color: #EAEAEA;
-    line-height: 1.5;
-    font-size: 0.9em;
-}
-
 /* ajax pagination */
 
 .ajax_paginate {
@@ -943,7 +930,7 @@ i {
 #ajaxListDiv .total-result {
     text-align: center;  
     width: 33%; 
-    font-weight: bold; 
+    font-weight: 600; 
     font-size: 100%
 }
 
@@ -965,7 +952,7 @@ i {
 
 .evaltoolsnav a {
     color: white;
-    font-weight: bold;
+    font-weight: 600;
     font-size: 0.9em;
     background-color: #0A2C64;
     text-decoration: none;
@@ -973,13 +960,13 @@ i {
 }
 
 .evaltoolsnav a:hover {
-    background-color: #ff2;
-    color: #333;
+    background-color: yellow;
+    color: #111;
 }
 
 .evaltoolsnav .current a {
-    color: #333;
-    background-color: #ed0;
+    background-color: gold;
+    color: #111;
 }
 
 .evaltoolsadd {
@@ -991,8 +978,7 @@ i {
 /* TEMPORARY */
 
 .tableheader {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-weight: bold;
+    font-weight: 600;
     color: #FFFFFF;
     background-color: #4478AC;
 }
@@ -1003,13 +989,13 @@ i {
 
 .tablesubheader td {
     padding: 0.3em;
-    font-weight: bold;
+    font-weight: 600;
     color: #FFFFFF;
     background-color: #3E83B6;
 }
 
 .tablesummary {
-    font-weight: bold;
+    font-weight: 600;
     color: #000000;
     background-color: #99cc99;
 }
@@ -1019,29 +1005,25 @@ i {
 }
 
 .tableheader2 {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-weight: bold;
+    font-weight: 600;
     color: #000;
     background-color: #C0C0C0;
 }
 
 .searchtable1 {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-weight: bold;
+    font-weight: 600;
     color: #000000;
     background-color: #cc9933;
 }
 
 .searchtable2 {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-weight: bold;
+    font-weight: 600;
     color: #000000;
     background-color: #cccc00;
 }
 
 .searchtable3 {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-weight: bold;
+    font-weight: 600;
     color: #000000;
     background-color: #99cc99;
 }
@@ -1059,7 +1041,6 @@ i {
     background-color: #C7D0E7;
 }
 .tablecell2 {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
     color: #000000;
 }
 
@@ -1098,8 +1079,7 @@ i {
 #accordion {
     border-bottom : 1px solid #24588C;
     margin-top : 6px;
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-weight:bold;
+    font-weight:600;
 }
 
 /* Home styles */
@@ -1312,8 +1292,7 @@ textarea.question-title-textarea, textarea.question-descriptor {
 
 .result-header-td {
     vertical-align: middle;
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-weight: bold;
+    font-weight: 600;
     color: #FFFFFF;
     background-color: #4478AC;
     font-size: 0.9em;

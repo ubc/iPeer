@@ -10,9 +10,7 @@ if (isset($course_list['A']))
     $image = $html->image("icons/home.gif", array('alt' => "$coursename home"));
     $link = "/courses/home/$courseid";
     echo "<div class='course'>";
-    echo "<h3>";
-    echo $html->link($coursename, $link, array('escape' => false));
-    echo "</h3>";
+    echo $html->link("<h3>$coursename</h3>", $link, array('escape' => false));
 
     echo "<h4>Instructors: ";
     echo $this->element(
@@ -59,9 +57,7 @@ if (isset($course_list['I']))
     echo "<div class='course'>";
     $image = $html->image("icons/home.gif", array('alt' => "$coursename home"));
     $link = "/courses/home/$courseid";
-    echo "<h3>";
-    echo $html->link($coursename, $link, array('escape' => false));
-    echo "</h3>";
+    echo $html->link("<h3>$coursename</h3>", $link, array('escape' => false));
     echo "<h4>Instructors: ";
     echo $this->element(
       'list/unordered_list_users',

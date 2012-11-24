@@ -8,6 +8,10 @@
     <!--link rel="shortcut icon" href="favicon.ico" type="image/x-icon"-->
     <?php
     // CSS files
+    echo $html->css('http://fonts.googleapis.com/css?family=Lato:400,400italic,700');
+    echo $html->css('http://fonts.googleapis.com/css?family=Open+Sans:400,600,700');
+
+// 
     echo $html->css('ipeer');
     echo $html->css('install');
     
