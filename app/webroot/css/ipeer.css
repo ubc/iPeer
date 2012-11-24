@@ -356,15 +356,15 @@ i {
 .login {
     width: 20em;
     margin: 1em auto;
-    border: 1px solid #ccc;
+    border: 1px solid crimson;
 }
 
 .login h4 {
-    background-color: #f71; 
-    padding: 0.5em;
+    background-color: crimson; 
     color: white;
+    margin: 0;
+    padding: 0.5em;
     font-weight: 600;
-    font-size: 0.9em;
 }
 
 .login .text label, .login .password label {
