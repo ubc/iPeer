@@ -434,16 +434,42 @@ class EvaluationComponent extends Object
      */
     function formatSimpleEvaluationResult($event=null)
     {
+        $this->User = ClassRegistry::init('User');
         $this->GroupsMembers = new GroupsMembers;
         $this->EvaluationSimple = new EvaluationSimple;
         $this->EvaluationSubmission = new EvaluationSubmission;
         $result = array();
 
         //Get Members for this evaluation
-        $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['group_id'],
-            $event['Event']['self_eval'], $this->Auth->user('id'));
-        $groupMembersNoTutors = $this->GroupsMembers->getEventGroupMembersNoTutors($event['group_id'],
-            $event['Event']['self_eval'], $this->Auth->user('id'));
+        // cannot use original implementation in GroupMembers that just joins 
+        // together tables since then we don't get the benefit of the virtual 
+        // fields provided by the model such as 'full_name' for User
+        $groupId = $event['group_id'];
+        $selfEval = $event['Event']['self_eval'];
+        $userid = $this->Auth->user('id');
+        $groupMemberIds = $this->GroupsMembers->find(
+            'list',
+            array(
+                'conditions' => array('group_id' => $groupId),
+                'fields' => array('user_id')
+            )
+        );
+        $conditions = array('id' => $groupMemberIds);
+        if (!$selfEval) $conditions['id !='] = $userid;
+        $groupMembers = $this->User->find(
+            'all', 
+            array(
+                'conditions' => $conditions,
+                'contain' => 'Role' 
+            )
+        );
+        // filter out tutors
+        $groupMembersNoTutors = $groupMembers;
+        foreach($groupMembersNoTutors as $key => $member) {
+            if ($member['Role'][0]['name'] == 'tutor') {
+                unset($groupMembersNoTutors[$key]);
+            }
+        }
 
         // get comment records - do changes to records above this.
         $memberScoreSummary = array();

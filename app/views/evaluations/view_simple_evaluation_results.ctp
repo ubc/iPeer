@@ -40,7 +40,7 @@ if (!$allMembersCompleted) {
         $user = $row['User']; 
         array_push($incompletedMembersArr, $user['full_name']);
         $users[] = array($user['full_name'] . 
-            ($row['Role']['role_id']==4 ? ' (TA)' : ' (student)'));
+            ($row['Role'][0]['id']==4 ? ' (TA)' : ' (student)'));
     }
     echo $html->tableCells($users);
 }
