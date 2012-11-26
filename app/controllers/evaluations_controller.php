@@ -1815,10 +1815,17 @@ class EvaluationsController extends AppController
             $evalSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'],
                 $user['id']);
 
-            $name = $this->User->findUserByidWithFields($user['id'], array('first_name', 'last_name'));
+            $name = $this->User->find(
+                'all',
+                array(
+                    'conditions' => array('id' => $user['id']),
+                    'recursive' => -1
+                )
+            );
+            $name = $name[0]['User'];
 
-            $students[$pos]['Member']['first_name'] = $name['first_name'];
-            $students[$pos]['Member']['last_name'] = $name['last_name'];
+            $students[$pos]['Member']['full_name'] = $name['full_name'];
+            $students[$pos]['Member']['student_no'] = $name['student_no'];
 
             if (isset($evalSubmission)) {
                 $students[$pos]['users']['submitted'] = $evalSubmission['EvaluationSubmission']['submitted'];
@@ -1838,40 +1845,6 @@ class EvaluationsController extends AppController
         $this->set('group', $group);
         $this->set('eventId', $eventId);
         $this->set('groupEventId', $groupEvent['GroupEvent']['group_id']);
-    }
-
-
-    /**
-     * reReleaseEvaluation
-     *
-     * @access public
-     * @return void
-     */
-    function reReleaseEvaluation ()
-    {
-        // Make sure the present user has permission
-        if (!User::hasPermission('controllers/evaluations/viewevaluationresults')) {
-            $this->Session->setFlash('Error: You do not have permission to re-release evaluations', true);
-            $this->redirect('/home');
-        }
-
-        $this->autoRender = false;
-
-        $groupEventId = $this->params['form']['group_event_id'];
-        $groupId = $this->params['form']['group_id'];
-        $eventId = $this->params['form']['event_id'];
-        if (!empty($this->params['form']['release_member'])) {
-            // were any students selected?
-            $releaseMemberIds = $this->params['form']['release_member'];
-            foreach ($releaseMemberIds as $userId) {
-                $evalSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $userId);
-                $evalSubmission['EvaluationSubmission']['submitted'] = 0;
-                $this->EvaluationSubmission->id = $evalSubmission['EvaluationSubmission']['id'];
-                //$this->EvaluationSubmission->save($evalSubmission);
-                $this->EvaluationSubmission->delete();
-            }
-        }
-        $this->redirect('/evaluations/viewGroupSubmissionDetails/'.$eventId.'/'.$groupId);
     }
 
 
