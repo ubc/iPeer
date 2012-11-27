@@ -5,8 +5,8 @@ Table for coming Peer Evaluations
 echo "<h3>Peer Evaluations Due</h3>";
 
 echo"<div> 
-        <table style='width:100%'> 
-		  <tr class='tableheader'>
+        <table class='standardtable'> 
+		  <tr>
 			<th width='30%'>Event</th>
             <th width='10%'>Group</th>
 			<th width='20%'>Course</th>
@@ -26,7 +26,7 @@ if(!empty($row['comingEvent']['Event']['release_date_end'])) {
 }
 	
 if (isset($comingUpEvent['Event']['id']) && $currentDate <= $releaseEndDate && !isset($row['eventSubmitted'])){
-    echo "<tr class='tablecell'>";
+    echo "<tr>";
 	
 if ($comingUpEvent['Event']['event_template_type_id'] == 1) {
     echo "<td> <a href ='" .$this->webroot.$this->theme. "evaluations/makeSimpleEvaluation/" 
@@ -104,8 +104,8 @@ Table for submitted peer evaluations
 echo "<h3>Peer Evaluations Submitted</h3>";
 	
 echo"<div> 
-    <table style='width:100%'> 
-        <tr class='tableheader'>
+    <table class='standardtable'> 
+        <tr>
 		    <th width='30%'>Event</th>
             <th width='10%'>Group</th>
 			<th width='20%'>Course</th>
@@ -128,7 +128,7 @@ if (isset($eventSubmitted['Event']['id'])&&(($currentDate<strtotime($eventSubmit
     $isResultReleased = ($currentDate >= strtotime($eventSubmitted['Event']['result_release_date_begin']) &&
     $currentDate < strtotime($eventSubmitted['Event']['result_release_date_end']));
 	
-	echo "<tr class='tablecell'>";
+	echo "<tr>";
 			
     if ($eventSubmitted['Event']['event_template_type_id'] == 1){ 
         if ($isResultReleased && User::hasPermission('functions/viewstudentresults')){

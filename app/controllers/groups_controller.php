@@ -241,6 +241,8 @@ class GroupsController extends AppController
      */
     function view($id = null)
     {
+        $this->set('title_for_layout', 'View Group');
+
         if (!User::hasPermission('controllers/groups')) {
             $this->Session->setFlash('Error: You do not have permission to view groups.');
             $this->redirect('/home');
