@@ -1094,7 +1094,7 @@ i {
     margin-bottom: 1em;
     padding: 0;
     list-style: none;
-    float: right;
+    text-align: right;
 }
 
 .button-row li {
