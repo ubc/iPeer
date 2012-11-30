@@ -41,7 +41,6 @@ class AppController extends Controller
     public $sessionTransferData = array();
 
 
-    /* protected __construct() {{{ */
     /**
      * __construct constructor function
      *
@@ -52,9 +51,7 @@ class AppController extends Controller
     {
         parent::__construct();
     }
-    /* }}} */
 
-    /* public beforeFilter() {{{ */
     /**
      * beforeFilter function called before filter
      *
@@ -83,9 +80,7 @@ class AppController extends Controller
 
         parent::beforeFilter();
     }
-    /* }}} */
 
-    /* public checkDatabaseVersion() {{{ */
     /**
      * checkDatabaseVersion
      *
@@ -103,11 +98,8 @@ class AppController extends Controller
             $this->Session->setFlash($flashMessage);
         }
     }
-    /* }}} */
 
-    /* }}} */
 
-    /* public extractModel($model,$array,$field) {{{ */
     /**
      * extractModel extract the model
      *
@@ -118,7 +110,7 @@ class AppController extends Controller
      * @access public
      * @return void
      */
-    public function extractModel($model,$array,$field)
+    public function _extractModel($model,$array,$field)
     {
         $return = array();
         foreach ($array as $row) {
@@ -127,24 +119,22 @@ class AppController extends Controller
 
         return $return;
     }
-    /* }}} */
 
-    /* protected _sendEmail($content,$subject,$from,$to, $templateName = 'default', $cc = array(),$bcc= array()) {{{ */
     /**
      * _sendEmail send email wrapper
      *
      * @param mixed $content      email body
      * @param mixed $subject      email subject
      * @param mixed $from         sender address
-     * @param mixed $to           receiver address
+     * @param mixed $toAddress    receiver address
      * @param bool  $templateName email template name
-     * @param bool  $cc           cc field
+     * @param bool  $ccAddress    cc field
      * @param bool  $bcc          bcc field
      *
      * @access protected
      * @return void
      */
-    protected function _sendEmail($content,$subject,$from,$to, $templateName = 'default', $cc = array(),$bcc= array())
+    protected function _sendEmail($content, $subject, $from, $toAddress, $templateName = 'default', $ccAddress = array(), $bcc= array())
     {
         $smtp['port'] = $this->sysContainer->getParamByParamCode('email.port');
         $smtp['host'] = $this->sysContainer->getParamByParamCode('email.host');
@@ -162,8 +152,8 @@ class AppController extends Controller
         );
 
         $this->Email->delivery = 'smtp';
-        $this->Email->to = $to;
-        $this->Email->cc = $cc;
+        $this->Email->to = $toAddress;
+        $this->Email->cc = $ccAddress;
         $this->Email->bcc = $bcc;
         $this->Email->subject = $subject;
         $this->Email->from = $from;
@@ -172,7 +162,6 @@ class AppController extends Controller
 
         return $this->Email->send($content);
     }
-    /* }}} */
 
     /**
      * beforeLogin callback, called every time in auth compoment
@@ -180,13 +169,13 @@ class AppController extends Controller
      * @access public
      * @return void
      */
-    public function beforeLogin()
+    public function _beforeLogin()
     {
         // if we have a session transfered to us
-        if ($this->hasSessionTransferData()) {
-            if ($this->authenticateWithSessionTransferData()) {
-                if (method_exists($this, 'afterLogin')) {
-                    $this->afterLogin();
+        if ($this->_hasSessionTransferData()) {
+            if ($this->_authenticateWithSessionTransferData()) {
+                if (method_exists($this, '_afterLogin')) {
+                    $this->_afterLogin();
                 }
                 return true;
             } else {
@@ -202,7 +191,7 @@ class AppController extends Controller
      * @access public
      * @return void
      */
-    public function afterLogin()
+    public function _afterLogin()
     {
         if ($this->Auth->isAuthorized()) {
             User::getInstance($this->Auth->user());
@@ -226,7 +215,7 @@ class AppController extends Controller
      * @access public
      * @return void
      */
-    function afterLogout()
+    function _afterLogout()
     {
         $this->Session->destroy();
     }
@@ -237,7 +226,7 @@ class AppController extends Controller
      * @access public
      * @return boolean
      */
-    function hasSessionTransferData()
+    function _hasSessionTransferData()
     {
         $params = $this->params['url'];
         if (isset($params['username']) && isset($params['timestamp']) && isset($params['token']) && isset($params['signature'])) {
@@ -256,7 +245,7 @@ class AppController extends Controller
      * @access public
      * @return boolean
      */
-    function authenticateWithSessionTransferData()
+    function _authenticateWithSessionTransferData()
     {
         $message = $this->sessionTransferData['username'].$this->sessionTransferData['timestamp'].$this->sessionTransferData['token'];
         $secret = $this->OauthToken->getTokenSecret($this->sessionTransferData['token']);
@@ -264,7 +253,6 @@ class AppController extends Controller
         if ($signature == $this->sessionTransferData['signature']) {
             $user = $this->User->findByUsername($this->sessionTransferData['username']);
             $this->Session->write($this->Auth->sessionKey, $user['User']);
-            $loggedIn = true;
             return true;
         }
 

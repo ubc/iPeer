@@ -2065,7 +2065,7 @@ class EvaluationsController extends AppController
         //step 3: Get Group members
 
         //step 3.1 Get Group Membrer user_id
-        $user_id=$this->extractModel("GroupsMembers", $this->GroupsMembers->find('all', "group_id=$groupID", "user_id", "user_id asc", null, null, false), "user_id");
+        $user_id=$this->_extractModel("GroupsMembers", $this->GroupsMembers->find('all', "group_id=$groupID", "user_id", "user_id asc", null, null, false), "user_id");
         //step 3.2 Get Group Membrer user_data
         $user_data=array();
         foreach ($user_id as $key => $value) {
@@ -2078,7 +2078,7 @@ class EvaluationsController extends AppController
 
         //step 4.1 Get evaluation_rubic id(s)
 
-        $evaluation_rubric_id=$this->extractModel("EvaluationRubric", $this->EvaluationRubric->find('all', "event_id=$eventId", "id", "id asc", null, null, false), "id");
+        $evaluation_rubric_id=$this->_extractModel("EvaluationRubric", $this->EvaluationRubric->find('all', "event_id=$eventId", "id", "id asc", null, null, false), "id");
         //pre($evaluation_rubric_id);
 
         //step 4.2 Get evaluation_rubic general data
