@@ -46,7 +46,6 @@ class SysparametersControllerTest extends CakeTestCase {
 
   function testIndex() {
     $result = $this->testAction('/sysparameters/index', array('connection' => 'test_suite', 'return' => 'vars'));
-var_dump($result);
     $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysFunction']['function_code'], 'code1');
     $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysFunction']['function_name'], 'name1');
     $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysFunction']['controller_name'], 'controller1');

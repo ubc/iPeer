@@ -46,7 +46,6 @@ class HomeControllerTest extends CakeTestCase {
 
   function testIndex() {
     $result = $this->testAction('/home/index', array('connection' => 'test_suite', 'return' => 'contents'));
-    var_dump($result);
     $this->assertEqual($result['paramsForList']['data']['entries'][0]['Course']['course'], 'Math303');
     $this->assertEqual($result['paramsForList']['data']['entries'][0]['Group']['group_num'], '1');
     $this->assertEqual($result['paramsForList']['data']['entries'][0]['Group']['member_count'], '2');

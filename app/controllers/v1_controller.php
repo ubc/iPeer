@@ -90,7 +90,8 @@ class V1Controller extends Controller {
      *
      * @return bool - true if signatures match
      */
-    private function _checkSignature() {
+    private function _checkSignature()
+    {
         // Calculate the signature, note, going to assume that all incoming
         // parameters are already UTF-8 encoded since it'll be impossible
         // to convert encodings blindly
@@ -139,7 +140,7 @@ class V1Controller extends Controller {
         $clientSecret = rawurlencode($clientSecret);
         $tokenSecret = $this->OauthToken->getTokenSecret($_REQUEST['oauth_token']);
         if (is_null($tokenSecret)) {
-            $this->log('Got invalid token "'.$_REQUEST['oauth_toke'].'"!');
+            $this->log('Got invalid token ["'.isset($_REQUEST['oauth_token']) ? $_REQUEST['oauth_token'] : "" .'"]!');
             $this->set('oauthError', "Invalid Token");
             $this->render('oauth_error');
             return false;
