@@ -202,7 +202,7 @@ if ($event['Event']['id']==292) {
     foreach($groupMembers as $row): $user = $row['User'];
     ?>
     <tr class="tablecell">
-        <td><?php echo $user['full_name']?>
+        <td><?php echo $user['first_name'].' '.$user['last_name']?>
       <input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/></td>
       <td width="110"><table><tr>
         <td width="5">Min.</td>
