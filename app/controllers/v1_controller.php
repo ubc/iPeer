@@ -22,6 +22,14 @@ class V1Controller extends Controller {
     public $layout = "blank_layout";
 
     /**
+     * body the request body
+     *
+     * @var string
+     * @access private
+     */
+    private $body = "";
+
+    /**
      * oauth function for use in test?
      */
     public function oauth() {
@@ -131,6 +139,7 @@ class V1Controller extends Controller {
         $clientSecret = rawurlencode($clientSecret);
         $tokenSecret = $this->OauthToken->getTokenSecret($_REQUEST['oauth_token']);
         if (is_null($tokenSecret)) {
+            $this->log('Got invalid token "'.$_REQUEST['oauth_toke'].'"!');
             $this->set('oauthError', "Invalid Token");
             $this->render('oauth_error');
             return false;
@@ -234,7 +243,12 @@ class V1Controller extends Controller {
      * @return void
      */
     public function beforeFilter() {
-        // return true;
+        // expecting a body except get request
+        if (!$this->RequestHandler->isGet()) {
+            $this->body = trim(file_get_contents('php://input'), true);
+        }
+        $this->log('Got API request '. print_r($_REQUEST, true)."\nBody: ".$this->body, 'debug');
+
         return $this->_checkRequiredParams() && $this->_checkSignature() &&
             $this->_checkNonce();
     }
@@ -296,7 +310,7 @@ class V1Controller extends Controller {
             $this->set('statusCode', $statusCode);
         // add
         } else if ($this->RequestHandler->isPost()) {
-            $input = trim(file_get_contents('php://input'), true);
+            $input = $this->body;
             $decode = json_decode($input, true);
             // adding one user
             if (isset($decode['username'])) {
@@ -379,7 +393,7 @@ class V1Controller extends Controller {
             }
         // update
         } else if ($this->RequestHandler->isPut()) {
-            $edit = trim(file_get_contents('php://input'), true);
+            $edit = $this->body;
             $decode = json_decode($edit, true);
             // at the moment each user only has one role
             $role = array('Role' => array('RolesUser' => array('role_id' => $decode['role_id'])));
@@ -440,7 +454,7 @@ class V1Controller extends Controller {
             $this->set('courses', $classes);
             $this->set('statusCode', $statusCode);
         } else if ($this->RequestHandler->isPost()) {
-            $create = trim(file_get_contents('php://input'), true);
+            $create = $this->body;
             if (!$this->Course->save(json_decode($create, true))) {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
                 $this->set('courses', array('code' => 1, 'message' => 'course already exists.'));
@@ -451,7 +465,7 @@ class V1Controller extends Controller {
                 $this->set('courses', $course);
             }
         } else if ($this->RequestHandler->isPut()) {
-            $update = trim(file_get_contents('php://input'), true);
+            $update = $this->body;
             if (!$this->Course->save(json_decode($update, true))) {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
                 $this->set('courses', null);
@@ -525,7 +539,7 @@ class V1Controller extends Controller {
             $this->set('statusCode', $statusCode);
         // add
         } else if ($this->RequestHandler->isPost()) {
-            $add = trim(file_get_contents('php://input'), true);
+            $add = $this->body;
             $decode = array('Group' => json_decode($add, true));
             $decode['Group']['course_id'] = $this->params['course_id'];
 
@@ -549,7 +563,7 @@ class V1Controller extends Controller {
             }
         // update
         } else if ($this->RequestHandler->isPut()) {
-            $edit = trim(file_get_contents('php://input'), true);
+            $edit = $this->body;
             $decode = array('Group' => json_decode($edit, true));
             if ($this->Group->save($decode)) {
                 $temp = $this->Group->read($fields);
@@ -601,7 +615,7 @@ class V1Controller extends Controller {
             $status = 'HTTP/1.1 200 OK';
         } else if ($this->RequestHandler->isPost()) {
             // add the list of users to the given group
-            $ret = trim(file_get_contents('php://input'), true);
+            $ret = $this->body;
             $users = json_decode($ret, true);
             $status = 'HTTP/1.1 200 OK';
             foreach ($users as $user) {
@@ -909,7 +923,7 @@ class V1Controller extends Controller {
         //
         else if ($this->RequestHandler->isPost()) {
             $this->set('statusCode', 'HTTP/1.1 200 OK');
-            $input = trim(file_get_contents('php://input'), true);
+            $input = $this->body;
             $users = json_decode($input, true);
 
             $students = $this->UserEnrol->find('list', array('conditions' => array('course_id' => $courseId), 'fields' => array('user_id')));
@@ -950,7 +964,7 @@ class V1Controller extends Controller {
         }
         else if ($this->RequestHandler->isDelete()) {
             $this->set('statusCode', 'HTTP/1.1 200 OK');
-            $input = trim(file_get_contents('php://input'), true);
+            $input = $this->body;
             $users = json_decode($input, true);
             foreach ($users as $user) {
                 $userId = $this->User->field('id',
