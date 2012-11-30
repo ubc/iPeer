@@ -17,7 +17,7 @@ echo $html->script('ricoaccordion');
           <?php __('These people have not yet submit their evaluations:')?>
             <ul>
                 <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
-                    <li><?php echo $user['full_name'] . ($row['Role']['role_id']==4 ? ' (TA)' : ' (student)');?></li>
+                    <li><?php echo $user['first_name']." ".$user['last_name'] . ($row['Role']['role_id']==4 ? ' (TA)' : ' (student)');?></li>
                 <?php endforeach; ?>
             </ul>
         </div>
@@ -133,7 +133,7 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
         foreach ($groupMembersNoTutors as $member) {
             echo '<tr class="tablecell2" cellpadding="4" cellspacing="2" >';
             $membersAry[$member['User']['id']]['member'] = $member;
-            echo '<td width="25%" class="group-members">' . $member['User']['full_name'] . '</td></tr>' . "\n";
+            echo '<td width="25%" class="group-members">' . $member['User']['first_name']." ".$member['User']['last_name'] . '</td></tr>' . "\n";
         }
     }
     echo '<tr class="tablesummary"><td class="group-members"><b>';
@@ -168,7 +168,7 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
         $user = $row['User']; ?>
         <div id="panel<?php echo $user['id']?>">
         <div id="panel<?php echo $user['id']?>Header" class="panelheader">
-            <?php echo __('Evaluatee: ', true).$user['full_name']?>
+            <?php echo __('Evaluatee: ', true).$user['first_name']." ".$user['last_name']?>
         </div>
         <div style="height: 200px;" id="panel1Content" class="panelContent">
             <br><b><?php
@@ -227,7 +227,7 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
                 foreach ($memberResult AS $row): $memberRubric = $row['EvaluationRubric'];
                     $evalutor = $withTutorsAry[$memberRubric['evaluator']];
                     echo "<tr class=\"tablecell2\">";
-                    echo "<td width='15%'>".$evalutor['full_name'] ."</td>";
+                    echo "<td width='15%'>".$evalutor['first_name']." ".$evalutor['last_name'] ."</td>";
 
                     $resultDetails = $memberRubric['details'];
                     foreach ($resultDetails AS $detail) : $rubDet = $detail['EvaluationRubricDetail'];

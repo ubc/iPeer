@@ -18,7 +18,7 @@ foreach ($groupMembersNoTutors as $member) {
     } else {
         $score = '-';
     }
-    $result[$member['User']['full_name']] = $score;
+    $result[$member['User']['first_name']." ".$member['User']['last_name']] = $score;
 }
 ?>
 
@@ -36,7 +36,7 @@ foreach ($groupMembersNoTutors as $member) {
 	      <?php __('These people have not yet submit their evaluations:')?>
             <ul>
 	            <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
-        	        <li><?php echo $user['full_name'] . ($row['Role']['role_id']==4 ? ' (TA)' : ' (student)');?></li>
+        	        <li><?php echo $user['first_name']." ".$user['last_name'] . ($row['Role']['role_id']==4 ? ' (TA)' : ' (student)');?></li>
                 <?php endforeach; ?>
             </ul>
         </div>

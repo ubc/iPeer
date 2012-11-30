@@ -28,7 +28,7 @@ echo $html->script('ricoaccordion');
           <?php __('These people have not yet submit their evaluations:')?>
             <ul>
                 <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
-                    <li><?php echo $user['full_name'] . ($row['Role']['role_id']==4 ? ' (TA)' : ' (student)');?></li>
+                    <li><?php echo $user['first_name']." ".$user['last_name'] . ($row['Role']['role_id']==4 ? ' (TA)' : ' (student)');?></li>
                 <?php endforeach; ?>
             </ul>
         </div>
@@ -134,7 +134,7 @@ echo $html->script('ricoaccordion');
         foreach ($groupMembersNoTutors as $member) {
             echo '<tr class="tablecell2" cellpadding="4" cellspacing="2" >';
             $membersAry[$member['User']['id']]['member'] = $member;
-            echo '<td width="25%" class="group-members">' . $member['User']['full_name'] . '</td></tr>' . "\n";
+            echo '<td width="25%" class="group-members">' . $member['User']['first_name']." ".$member['User']['last_name'] . '</td></tr>' . "\n";
         }
     }
     if ($groupMembers) {
@@ -175,7 +175,7 @@ echo $html->script('ricoaccordion');
                     $user = $row['User']; ?>
                     <div id="panel<?php echo $user['id']?>">
                     <div id="panel<?php echo $user['id']?>Header" class="panelheader">
-                    <?php echo 'Evaluatee: '.$user['full_name']?>
+                    <?php echo 'Evaluatee: '.$user['first_name']." ".$user['last_name']?>
                     </div>
                     <div style="height: 200px;" id="panel1Content" class="panelContent">
                     <br><b><?php
@@ -239,7 +239,7 @@ echo $html->script('ricoaccordion');
                             foreach ($memberResult AS $row): $memberMixeval = $row['EvaluationMixeval'];
                                 $evalutor = $withTutorsAry[$memberMixeval['evaluator']];
                                 echo "<tr class=\"tablecell2\">";
-                                echo "<td width='15%'>".$evalutor['member']['User']['full_name']."</td>";
+                                echo "<td width='15%'>".$evalutor['member']['User']['first_name']." ".$evalutor['member']['User']['last_name']."</td>";
                                 $width = 85 / $mixeval['Mixeval']['lickert_question_max'];
                                 $resultDetails = $memberMixeval['details'];
                                 for ($j = 1; $j <= $mixeval['Mixeval']["lickert_question_max"]; $j++) {
@@ -307,7 +307,7 @@ echo $html->script('ricoaccordion');
                     foreach ($memberResult AS $row): $memberMixeval = $row['EvaluationMixeval'];
                         $evalutor = $withTutorsAry[$memberMixeval['evaluator']];
                         echo "<tr class=\"tablecell2\">";
-                        echo "<td width='15%'>".$evalutor['member']['User']['full_name']."</td>";
+                        echo "<td width='15%'>".$evalutor['member']['User']['first_name']." ".$evalutor['member']['User']['last_name']."</td>";
                         $width = 85 / ($mixeval['Mixeval']["total_question"] - $mixeval['Mixeval']["lickert_question_max"]);
                         $resultDetails = $memberMixeval['details'];
                         for ($j = $numerical_index; $j <= $mixeval['Mixeval']["total_question"]; $j++) {
