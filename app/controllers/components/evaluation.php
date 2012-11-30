@@ -441,8 +441,8 @@ class EvaluationComponent extends Object
         $result = array();
 
         //Get Members for this evaluation
-        // cannot use original implementation in GroupMembers that just joins 
-        // together tables since then we don't get the benefit of the virtual 
+        // cannot use original implementation in GroupMembers that just joins
+        // together tables since then we don't get the benefit of the virtual
         // fields provided by the model such as 'full_name' for User
         $groupId = $event['group_id'];
         $selfEval = $event['Event']['self_eval'];
@@ -455,17 +455,20 @@ class EvaluationComponent extends Object
             )
         );
         $conditions = array('id' => $groupMemberIds);
-        if (!$selfEval) $conditions['id !='] = $userid;
+        if (!$selfEval) {
+            $conditions['id !='] = $userid;
+        }
+
         $groupMembers = $this->User->find(
-            'all', 
+            'all',
             array(
                 'conditions' => $conditions,
-                'contain' => 'Role' 
+                'contain' => 'Role'
             )
         );
         // filter out tutors
         $groupMembersNoTutors = $groupMembers;
-        foreach($groupMembersNoTutors as $key => $member) {
+        foreach ($groupMembersNoTutors as $key => $member) {
             if ($member['Role'][0]['name'] == 'tutor') {
                 unset($groupMembersNoTutors[$key]);
             }

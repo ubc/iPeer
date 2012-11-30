@@ -299,14 +299,14 @@ class CoursesController extends AppController
         $statusOptions = array( 'A' => 'Active', 'I' => 'Inactive');
         $this->set('statusOptions', $statusOptions);
 
-		// set the list of instructors
-		$instructors = $this->User->getInstructors('all', array('User.username'));
-		$instructorlist = array();
+        // set the list of instructors
+        $instructors = $this->User->getInstructors('all', array('User.username'));
+        $instructorlist = array();
 
-		//Display instructor names as "lastname, firstname" and sorted by lastname
-		foreach($instructors as $i) {
-			$instructorlist[$i['User']['id']] = $i['User']['full_name'];
-		}
+        //Display instructor names as "lastname, firstname" and sorted by lastname
+        foreach($instructors as $i) {
+            $instructorlist[$i['User']['id']] = $i['User']['full_name'];
+        }
 
         $this->set('instructors', $instructorlist);
     }
