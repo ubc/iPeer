@@ -3,18 +3,18 @@
 $html->script("jquery-ui-timepicker-addon", array("inline"=>false));
 
 echo $this->Form->create('Event', array('action' => "add/$course_id"));
-echo $this->Form->input('course_id', array('default' => $course_id));
+echo $this->Form->input('course_id', array('default' => $course_id, 'disabled' => true));
 echo $this->Form->input('title', array('label' => 'Event Title'));
 echo $this->Form->input('description', array('type' => 'textarea'));
 echo $this->Form->input('event_template_type_id');
 echo $this->Form->input('SimpleEvaluation',
-    array('div' => array('id' => 'SimpleEvalDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevS'))));
+    array('div' => array('id' => 'SimpleEvalDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevS', 'target' => '_blank'))));
 echo $this->Form->input('Rubric',
-    array('div' => array('id' => 'RubricDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevR'))));
+    array('div' => array('id' => 'RubricDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevR', 'target' => '_blank'))));
 echo $this->Form->input('Mixeval',
-    array('div' => array('id' => 'MixevalDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevM'))));
+    array('div' => array('id' => 'MixevalDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevM', 'target' => '_blank'))));
 echo $this->Form->input(
-    'self_eval', 
+    'self_eval',
     array(
         'legend' => 'Self-Evaluation',
         'type' => 'radio',
@@ -23,7 +23,7 @@ echo $this->Form->input(
     )
 );
 echo $this->Form->input(
-    'com_req', 
+    'com_req',
     array(
         'legend' => 'Comments Required',
         'type' => 'radio',
@@ -41,7 +41,7 @@ echo $this->Form->input('Group', array('label' => 'Group(s)'));
 // No nice way of inserting new penalty entries using CakePHP, doing it
 // manually.
 echo $this->Form->label(
-    'latep', 
+    'latep',
     'Late Penalties',
     array('class' => 'penaltyLabel')
 );
@@ -61,13 +61,13 @@ if (isset($this->data) && isset($this->data['Penalty'])) {
 $percent = range(0,100); // 0,100 since array index starts from 0, and we want
 unset($percent[0]); // the index to match the percentage value
 for ($i = -1; $i < $numPenalties; $i++) {
-    $inputs = 
+    $inputs =
         '<div class="penaltyInput" id="penaltyInput'.$i.'">' .
         $this->Form->label("latep$i", '', array('class' => 'penaltyLabel')) .
         $this->Form->text("Penalty.$i.days_late", array('default' => $i + 1)) .
         $this->Form->label('days', 'days', array('class' => 'penaltyInLabel')) .
         $this->Form->select(
-            "Penalty.$i.percent_penalty", 
+            "Penalty.$i.percent_penalty",
             $percent,
             null,
             array('empty' => false, 'default' => '1')
@@ -76,7 +76,7 @@ for ($i = -1; $i < $numPenalties; $i++) {
         '<a href="#" onclick="rmPenaltyInputs('.$i.'); return false;">X</a>' .
         "</div>";
     if ($i < 0) {
-        // save for use as a template in javascript, should work in Lin/Win/Mac 
+        // save for use as a template in javascript, should work in Lin/Win/Mac
         $penaltyInputs = str_replace(array("\n", "\r"), "", $inputs);
     }
     else {
@@ -85,7 +85,7 @@ for ($i = -1; $i < $numPenalties; $i++) {
 
 }
 echo "</div>";
-echo '<a class="addPenaltyButton" 
+echo '<a class="addPenaltyButton"
     href="#" onclick="addPenaltyInputs(); return false;">Add Penalty</a>';
 
 
@@ -129,7 +129,7 @@ function addPenaltyInputs() {
     // requires that the form name be indexed accordingly. Here, we replace
     // the default index 0 with whatever index the user is on at the moment.
     penaltyInputs = penaltyInputs.replace(/>0</g, '>' +(penaltyCount + 1)+ '<');
-    penaltyInputs = penaltyInputs.replace(/value="0"/g, 
+    penaltyInputs = penaltyInputs.replace(/value="0"/g,
         'value="' +(penaltyCount + 1)+ '"');
     penaltyInputs = penaltyInputs.replace(/-1/g, penaltyCount);
     jQuery(penaltyInputs).appendTo("#penaltyInputs");
@@ -168,7 +168,7 @@ function toggleEventTemplate() {
 // redirects user to a new events add view based on the course selected
 function changeCourseId() {
     var courseId = jQuery("#EventCourseId").val();
-    
+
     if (courseId != <?php echo $course_id ?>) {
         window.location.replace("<?php echo $this->base; ?>/events/add/" + courseId);
     }

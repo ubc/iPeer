@@ -415,7 +415,7 @@ class EventsController extends AppController
      * @access public
      * @return void
      */
-    function add($courseId = null)
+    function add($courseId)
     {
         // Check permissions
         if (!User::hasPermission('controllers/events/add')) {
