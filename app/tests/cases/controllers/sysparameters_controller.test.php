@@ -18,7 +18,7 @@ class SysparametersControllerTest extends CakeTestCase {
                         'app.survey_group_member', 'app.question', 'app.rubric',
                         'app.response', 'app.survey_question', 'app.user_course',
                         'app.user_enrol', 'app.groups_member', 'app.survey',
-                        'app.personalize', 'app.sys_parameter', 'app.sys_function',
+                        'app.personalize', 'app.sys_parameter',
                        );
 
   function startCase() {
@@ -44,66 +44,67 @@ class SysparametersControllerTest extends CakeTestCase {
     echo '<hr />';
   }
 
+  // This code may be copied from SysParameter, need to be changed
   function testIndex() {
     $result = $this->testAction('/sysparameters/index', array('connection' => 'test_suite', 'return' => 'vars'));
-    $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysFunction']['function_code'], 'code1');
-    $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysFunction']['function_name'], 'name1');
-    $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysFunction']['controller_name'], 'controller1');
-    $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysFunction']['url_link'], 'link1');
-    $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysFunction']['permission_type'], 'I');
-    $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysFunction']['record_status'], 'A');
+    $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysParameter']['function_code'], 'code1');
+    $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysParameter']['function_name'], 'name1');
+    $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysParameter']['controller_name'], 'controller1');
+    $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysParameter']['url_link'], 'link1');
+    $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysParameter']['permission_type'], 'I');
+    $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysParameter']['record_status'], 'A');
 
-    $this->assertEqual($result['paramsForList']['data']['entries'][1]['SysFunction']['function_code'], 'code2');
-    $this->assertEqual($result['paramsForList']['data']['entries'][1]['SysFunction']['function_name'], 'name2');
-    $this->assertEqual($result['paramsForList']['data']['entries'][1]['SysFunction']['controller_name'], 'controller2');
-    $this->assertEqual($result['paramsForList']['data']['entries'][1]['SysFunction']['url_link'], 'link2');
-    $this->assertEqual($result['paramsForList']['data']['entries'][1]['SysFunction']['permission_type'], 'I');
-    $this->assertEqual($result['paramsForList']['data']['entries'][1]['SysFunction']['record_status'], 'A');
+    $this->assertEqual($result['paramsForList']['data']['entries'][1]['SysParameter']['function_code'], 'code2');
+    $this->assertEqual($result['paramsForList']['data']['entries'][1]['SysParameter']['function_name'], 'name2');
+    $this->assertEqual($result['paramsForList']['data']['entries'][1]['SysParameter']['controller_name'], 'controller2');
+    $this->assertEqual($result['paramsForList']['data']['entries'][1]['SysParameter']['url_link'], 'link2');
+    $this->assertEqual($result['paramsForList']['data']['entries'][1]['SysParameter']['permission_type'], 'I');
+    $this->assertEqual($result['paramsForList']['data']['entries'][1]['SysParameter']['record_status'], 'A');
 
-    $this->assertEqual($result['paramsForList']['data']['entries'][2]['SysFunction']['function_code'], 'code3');
-    $this->assertEqual($result['paramsForList']['data']['entries'][2]['SysFunction']['function_name'], 'name3');
-    $this->assertEqual($result['paramsForList']['data']['entries'][2]['SysFunction']['controller_name'], 'controller3');
-    $this->assertEqual($result['paramsForList']['data']['entries'][2]['SysFunction']['url_link'], 'link3');
-    $this->assertEqual($result['paramsForList']['data']['entries'][2]['SysFunction']['permission_type'], 'A');
-    $this->assertEqual($result['paramsForList']['data']['entries'][2]['SysFunction']['record_status'], 'A');
+    $this->assertEqual($result['paramsForList']['data']['entries'][2]['SysParameter']['function_code'], 'code3');
+    $this->assertEqual($result['paramsForList']['data']['entries'][2]['SysParameter']['function_name'], 'name3');
+    $this->assertEqual($result['paramsForList']['data']['entries'][2]['SysParameter']['controller_name'], 'controller3');
+    $this->assertEqual($result['paramsForList']['data']['entries'][2]['SysParameter']['url_link'], 'link3');
+    $this->assertEqual($result['paramsForList']['data']['entries'][2]['SysParameter']['permission_type'], 'A');
+    $this->assertEqual($result['paramsForList']['data']['entries'][2]['SysParameter']['record_status'], 'A');
 
-    $this->assertEqual($result['paramsForList']['data']['entries'][3]['SysFunction']['function_code'], 'code4');
-    $this->assertEqual($result['paramsForList']['data']['entries'][3]['SysFunction']['function_name'], 'name4');
-    $this->assertEqual($result['paramsForList']['data']['entries'][3]['SysFunction']['controller_name'], 'controller4');
-    $this->assertEqual($result['paramsForList']['data']['entries'][3]['SysFunction']['url_link'], 'link4');
-    $this->assertEqual($result['paramsForList']['data']['entries'][3]['SysFunction']['permission_type'], 'A');
-    $this->assertEqual($result['paramsForList']['data']['entries'][3]['SysFunction']['record_status'], 'A');
+    $this->assertEqual($result['paramsForList']['data']['entries'][3]['SysParameter']['function_code'], 'code4');
+    $this->assertEqual($result['paramsForList']['data']['entries'][3]['SysParameter']['function_name'], 'name4');
+    $this->assertEqual($result['paramsForList']['data']['entries'][3]['SysParameter']['controller_name'], 'controller4');
+    $this->assertEqual($result['paramsForList']['data']['entries'][3]['SysParameter']['url_link'], 'link4');
+    $this->assertEqual($result['paramsForList']['data']['entries'][3]['SysParameter']['permission_type'], 'A');
+    $this->assertEqual($result['paramsForList']['data']['entries'][3]['SysParameter']['record_status'], 'A');
 
   }
 
 
   function testView() {
-    $result = $this->testAction('/sysfunctions/view/1', array('connection' => 'test_suite', 'return' => 'vars'));
+    $result = $this->testAction('/sysparameters/view/1', array('connection' => 'test_suite', 'return' => 'vars'));
 //var_dump($result);
-    $this->assertEqual($result['data']['SysFunction']['function_code'], 'code1');
-    $this->assertEqual($result['data']['SysFunction']['function_name'], 'name1');
-    $this->assertEqual($result['data']['SysFunction']['controller_name'], 'controller1');
-    $this->assertEqual($result['data']['SysFunction']['url_link'], 'link1');
-    $this->assertEqual($result['data']['SysFunction']['permission_type'], 'I');
-    $this->assertEqual($result['data']['SysFunction']['record_status'], 'A');
+    $this->assertEqual($result['data']['SysParameter']['function_code'], 'code1');
+    $this->assertEqual($result['data']['SysParameter']['function_name'], 'name1');
+    $this->assertEqual($result['data']['SysParameter']['controller_name'], 'controller1');
+    $this->assertEqual($result['data']['SysParameter']['url_link'], 'link1');
+    $this->assertEqual($result['data']['SysParameter']['permission_type'], 'I');
+    $this->assertEqual($result['data']['SysParameter']['record_status'], 'A');
   }
 
   //TODO test saving
     function testEdit() {
-    $result = $this->testAction('/sysfunctions/edit/1', array('connection' => 'test_suite', 'return' => 'vars'));
+    $result = $this->testAction('/sysparameters/edit/1', array('connection' => 'test_suite', 'return' => 'vars'));
 //var_dump($result);
-    $this->assertEqual($result['data']['SysFunction']['function_code'], 'code1');
-    $this->assertEqual($result['data']['SysFunction']['function_name'], 'name1');
-    $this->assertEqual($result['data']['SysFunction']['controller_name'], 'controller1');
-    $this->assertEqual($result['data']['SysFunction']['url_link'], 'link1');
-    $this->assertEqual($result['data']['SysFunction']['permission_type'], 'I');
-    $this->assertEqual($result['data']['SysFunction']['record_status'], 'A');
+    $this->assertEqual($result['data']['SysParameter']['function_code'], 'code1');
+    $this->assertEqual($result['data']['SysParameter']['function_name'], 'name1');
+    $this->assertEqual($result['data']['SysParameter']['controller_name'], 'controller1');
+    $this->assertEqual($result['data']['SysParameter']['url_link'], 'link1');
+    $this->assertEqual($result['data']['SysParameter']['permission_type'], 'I');
+    $this->assertEqual($result['data']['SysParameter']['record_status'], 'A');
 
     }
 
    //TODO test redirect
     function testDelete() {
-//    $result = $this->testAction('/sysfunctions/delete/1', array('connection' => 'test_suite', 'return' => 'vars'));
+//    $result = $this->testAction('/sysparameters/delete/1', array('connection' => 'test_suite', 'return' => 'vars'));
 //var_dump($result);
       }
 

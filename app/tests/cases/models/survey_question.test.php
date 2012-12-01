@@ -15,7 +15,7 @@ class SurveyQuestionTestCase extends CakeTestCase
         'app.rubrics_criteria', 'app.rubrics_criteria_comment',
         'app.faculty', 'app.user_faculty', 'app.department',
         'app.course_department', 'app.sys_parameter', 'app.user_tutor',
-        'app.penalty', 'app.sys_function', 'app.evaluation_simple'
+        'app.penalty', 'app.evaluation_simple'
     );
     public $SurveyQuestion = null;
 
@@ -120,7 +120,7 @@ class SurveyQuestionTestCase extends CakeTestCase
     {
         // Set question data
         $ret = $this->SurveyQuestion->getQuestionsID(1);
-        
+
         $this->assertEqual(Set::extract('/SurveyQuestion/question_id', $ret), array(1,2));
         $this->assertEqual(count($ret), 2);
 
@@ -134,9 +134,9 @@ class SurveyQuestionTestCase extends CakeTestCase
         // Create an empty survey to copy questions into
         $ret = $this->Survey->save(array(
                 'Survey' => array(
-                    'id' => 50, 
-                    'course_id' => 1, 
-                    'user_id' => 1, 
+                    'id' => 50,
+                    'course_id' => 1,
+                    'user_id' => 1,
                     'name' => 'Empty'
                 )
             )

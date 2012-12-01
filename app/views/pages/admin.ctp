@@ -9,7 +9,7 @@ if (!User::hasPermission('adminpage')) {
 if (User::hasPermission('controllers/faculties')) {
     echo '<li>';
     echo $this->Html->link(
-        'Faculties', 
+        'Faculties',
         array('controller' => 'faculties')
     );
     echo '</li>';
@@ -18,7 +18,7 @@ if (User::hasPermission('controllers/faculties')) {
 if (User::hasPermission('controllers/departments')) {
     echo '<li>';
     echo $this->Html->link(
-        'Departments', 
+        'Departments',
         array('controller' => 'departments')
     );
     echo '</li>';
@@ -27,7 +27,7 @@ if (User::hasPermission('controllers/departments')) {
 if (User::hasPermission('functions/user/superadmin')) {
     echo "<li>";
         echo $this->Html->link(
-            'OAuth Client Credentials', 
+            'OAuth Client Credentials',
             array('controller' => 'oauth_clients')
         );
     echo "</li>";
@@ -36,7 +36,7 @@ if (User::hasPermission('functions/user/superadmin')) {
 if (User::hasPermission('functions/user/superadmin')) {
     echo "<li>";
         echo $this->Html->link(
-            'OAuth Token Credentials', 
+            'OAuth Token Credentials',
             array('controller' => 'oauth_tokens')
         );
     echo "</li>";
@@ -46,18 +46,8 @@ if (User::hasPermission('functions/user/superadmin')) {
 if (User::hasPermission('controllers/sysparameters')) {
     echo '<li>';
     echo $this->Html->link(
-        'System Parameters', 
+        'System Parameters',
         array('controller' => 'sysparameters')
-    );
-    echo '</li>';
-}
-
-// System Functions
-if (User::hasPermission('controllers/sysfunctions')) {
-    echo '<li>';
-    echo $this->Html->link(
-        'System Functions', 
-        array('controller' => 'sysfunctions')
     );
     echo '</li>';
 }

@@ -16,7 +16,7 @@ class UsersController extends AppController
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'FileUpload.FileUpload');
     public $NeatString;
     public $uses = array('User', 'UserEnrol', 'Personalize', 'Course',
-        'SysParameter', 'SysFunction', 'Role', 'Group', 'UserFaculty',
+        'SysParameter', 'Role', 'Group', 'UserFaculty',
         'Department', 'CourseDepartment', 'OauthClient', 'OauthToken',
         'UserCourse', 'UserTutor'
     );

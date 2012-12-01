@@ -15,7 +15,7 @@ class FrameworkController extends AppController
      *
      * @public $uses
      */
-    public $uses =  array('User', 'SysFunction', 'SysParameter', 'UserCourse', 'UserTutor', 'UserEnrol');
+    public $uses =  array('User', 'SysParameter', 'UserCourse', 'UserTutor', 'UserEnrol');
     public $Sanitize;
     public $components = array('Output', 'userPersonalize', 'framework');
 
