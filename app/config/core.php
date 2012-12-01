@@ -301,7 +301,18 @@
  *	));
  *
  */
-	Cache::config('default', array('engine' => 'File'));
+    Cache::config('default', array('engine' => 'File'));
+
+    // additional cache for configuration/sys parameters
+    Cache::config('configuration', array(
+        'engine' => 'File', //[required]
+        'duration'=> '+1 week', //[optional]
+        'probability'=> 100, //[optional]
+        'path' => CACHE, //[optional] use system tmp directory - remember to use absolute path
+        'prefix' => 'configuration_', //[optional]  prefix every cache file with this string
+        'lock' => false, //[optional]  use file locking
+        'serialize' => true, //[optional]
+    ));
 
 
   /**

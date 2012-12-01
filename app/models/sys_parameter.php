@@ -23,10 +23,17 @@ class SysParameter extends AppModel
      */
     function findParameter ($paramCode='')
     {
-        return $this->find('first', array(
-            'conditions' => array('parameter_code' => $paramCode),
-            'fields' => array('id', 'parameter_code', 'parameter_value', 'parameter_type')
-        ));
+        // search in cache first
+        $result = Cache::read($paramCode, 'configuration');
+        if (null == $result ) {
+            $result = $this->find('first', array(
+                'conditions' => array('parameter_code' => $paramCode),
+                'fields' => array('id', 'parameter_code', 'parameter_value', 'parameter_type')
+            ));
+            Cache::write($paramCode, $result, 'configuration');
+        }
+
+        return $result;
     }
 
 
@@ -64,6 +71,8 @@ class SysParameter extends AppModel
             $this->errorMessage = "Parameter type is required";
             return false;
         }
+
+        Cache::write($this->data['SysParameter']['parameter_code'], $this->data['SysParameter'], 'configuration');
 
         return true;
     }
