@@ -63,7 +63,7 @@ class HomeController extends AppController
             $this->set('course_list', $this->_formatCourseList($course_list));
         }
     }
-    
+
     /**
      * studentIndex
      *
@@ -99,16 +99,16 @@ class HomeController extends AppController
                 //$courseDetail = $this->Course->find('id='.$courseId);
                 //Get Events for this course that are due
                 $evals = $this->Event->find(
-                    'all', 
+                    'all',
                     array(
                         'conditions' => array(
-                            'release_date_begin < NOW()', 
-                            'NOW() <= result_release_date_end', 
+                            'release_date_begin < NOW()',
+                            'NOW() <= result_release_date_end',
                             'course_id' => $courseId,
                             'NOT' => array('event_template_type_id' => 3)
                 )));
                 $surveys = $this->Event->find(
-                    'all', 
+                    'all',
                     array(
                         'conditions' => array(
                             'course_id' => $courseId,
@@ -204,7 +204,7 @@ class HomeController extends AppController
                 $result['comingEvent']['Event']['days_to_due'] = $dueIn;
                 $result['comingEvent']['Event']['group_id'] = $groupEvent['group_id'];
                 $result['comingEvent']['Event']['group_name'] = $group['Group']['group_name'];
-                $result['comingEvent']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
+                $result['comingEvent']['Event']['course'] = $this->Course->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
 
                 if ($isLate) {
                     $penalty = $this->Penalty->find('first', array(
@@ -220,7 +220,7 @@ class HomeController extends AppController
                 $result['eventSubmitted']['Event']['date_submitted'] = $eventSubmit['EvaluationSubmission']['date_submitted'];
                 $result['eventSubmitted']['Event']['group_id'] = $groupEvent['group_id'];
                 $result['eventSubmitted']['Event']['group_name'] = $group['Group']['group_name'];
-                $result['eventSubmitted']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
+                $result['eventSubmitted']['Event']['course'] = $this->Course->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
             }
         }
         return $result;
@@ -262,13 +262,13 @@ class HomeController extends AppController
                 $result['comingEvent']['Event']['is_late'] = $isLate;
                 $result['comingEvent']['Event']['days_to_due'] = $dueIn;
                 $result['comingEvent']['Event']['group_name'] = '-';
-                $result['comingEvent']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
+                $result['comingEvent']['Event']['course'] = $this->Course->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
             } else {
                 $result['eventSubmitted']['Event'] = $event;
                 $result['comingEvent']['Event']['is_late'] = $isLate;
                 $result['eventSubmitted']['Event']['date_submitted'] = $eventSubmit['EvaluationSubmission']['date_submitted'];
                 $result['eventSubmitted']['Event']['group_name'] = '-';
-                $result['eventSubmitted']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
+                $result['eventSubmitted']['Event']['course'] = $this->Course->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
             }
         }
         return $result;

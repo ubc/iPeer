@@ -25,8 +25,8 @@ class SearchsController extends AppController
     public $Sanitize;
     public $functionCode = 'ADV_SEARCH';
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time');
-    public $components = array('Output', 'sysContainer', 'Search',
-        'userPersonalize', 'framework', 'sysContainer', 'Evaluation');
+    public $components = array('Output', 'Search',
+        'userPersonalize', 'framework', 'Evaluation');
 
 
     /**
@@ -128,12 +128,12 @@ class SearchsController extends AppController
 
         $courses = $searchMatrix;
 
-        $i=0;
+        $index = 0;
         $name = array();
         foreach ($courses as $row) {
             $evaluation = $row['Event'];
-            $name[$i] = $this->sysContainer->getCourseName($evaluation['course_id']);
-            $i++;
+            $name[$index] = $this->Course->getCourseName($evaluation['course_id']);
+            $index++;
         }
         $user = $this->User->findById($this->Auth->user('id'));
         $courseList = array();
@@ -226,13 +226,6 @@ class SearchsController extends AppController
      */
     function formatSearchEvaluation($conditions, $sortBy, $limit)
     {
-
-        $courseIDs =  $this->sysContainer->getMyCourseIDs();
-        //$conditions .= !empty($conditions) ? ' AND course_id IN ('.$courseIDs.')':'course_id IN ('.$courseIDs.')';
-        if (!isset($conditions['course_id'])) {
-            $conditions['course_id'] = $courseIDs;
-        }
-
         $this->paginate = array(
             'conditions' => $conditions,
             'fields' => array('*', '(NOW() >= release_date_begin AND NOW() <= release_date_end) AS is_released'),

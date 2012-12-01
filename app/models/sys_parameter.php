@@ -21,7 +21,7 @@ class SysParameter extends AppModel
      * @access public
      * @return void
      */
-    function findParameter ($paramCode='')
+    function findParameter ($paramCode)
     {
         // search in cache first
         $result = Cache::read($paramCode, 'configuration');
@@ -36,6 +36,24 @@ class SysParameter extends AppModel
         return $result;
     }
 
+    /**
+     * get the value of a parameter
+     *
+     * @param string $paramCode
+     *
+     * @access public
+     * @return void
+     */
+    function get($paramCode)
+    {
+        $result = null;
+        $parameter = $this->findParameter($paramCode);
+        if ($parameter != null) {
+            $result = $parameter['SysParameter']['parameter_value'];
+        }
+
+        return $result;
+    }
 
     /**
      * beforeSave

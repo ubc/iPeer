@@ -19,7 +19,7 @@ class SurveyGroupsController extends AppController
     public $order;
     public $Sanitize;
     public $helpers = array('Html', 'Ajax', 'Javascript');
-    public $components = array('Output', 'sysContainer', 'userPersonalize', 'framework', 'XmlHandler', 'AjaxList');
+    public $components = array('Output', 'userPersonalize', 'framework', 'XmlHandler', 'AjaxList');
 
     /**
      * __construct
@@ -145,7 +145,7 @@ class SurveyGroupsController extends AppController
         $survey_id = ""; // holds the id of the survey
         $event = array(); // holds the current survey
         $courseId = ""; // hold the course id
-        
+
         // if an event id is entered
         if ($eventId != null) {
             $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId, 'Event.event_template_type_id' => 3)));
@@ -168,7 +168,7 @@ class SurveyGroupsController extends AppController
 
         if (!empty($event)) {
             $courseId = $event['Course']['id'];
-        
+
             if (!User::hasPermission('functions/superadmin')) {
                 // check whether the user has access to the course
                 // instructors
@@ -178,15 +178,15 @@ class SurveyGroupsController extends AppController
                 } else {
                     $courses = User::getMyDepartmentsCourseList('list');
                 }
-            
+
                 if (!in_array($courseId, array_keys($courses))) {
                     $this->Session->setFlash(__("Error: You do not have permission to view this event's results", true));
                     $this->redirect('index');
                 }
             }
-        
+
             $this->set('title_for_layout', $this->Course->getCourseName($courseId).__(' > View Survey Result', true));
-        
+
             $class = $this->User->find(
                 'all',
                 array(
@@ -209,9 +209,9 @@ class SurveyGroupsController extends AppController
                 if (empty($student['Submission'])) {
                     $temp['Date Submitted'] = 'Not Submitted';
                 }
-            
+
                 $temp['Event Id'] = $eventId;
-            
+
                 $view[] = $temp;
             }
 
@@ -228,7 +228,7 @@ class SurveyGroupsController extends AppController
             $this->set('title_for_layout', __('View Survey Result', true));
             $this->Session->setFlash(__('No surveys found', true));
         }
-        
+
         $this->set('view', $view);
         $this->set('courseId', $courseId);
         $this->set('eventId', $eventId);
@@ -247,7 +247,7 @@ class SurveyGroupsController extends AppController
      */
     function makegroups($course_id)
     {
-    
+
         $course = $this->Course->find('first', array('conditions' => array('id' => $course_id),
             'contain' => array()));
 
@@ -255,7 +255,7 @@ class SurveyGroupsController extends AppController
             $this->Session->setFlash(__('Error: That course does not exist.', true));
             $this->redirect('index');
         }
-        
+
         if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
@@ -265,7 +265,7 @@ class SurveyGroupsController extends AppController
             } else {
                 $courses = User::getMyDepartmentsCourseList('list');
             }
-    
+
             if (!in_array($course_id, array_keys($courses))) {
                 $this->Session->setFlash(__('Error: You do not have permission to make groups for this course', true));
                 $this->redirect('index');
@@ -349,13 +349,13 @@ class SurveyGroupsController extends AppController
             for ($j=0; $j < count($members); $j++) {
                 $member = $members[$j];
                 $member = trim($member);
-                $member_id = 
+                $member_id =
                     $this->User->field('id', array('student_no' => $member));
                 $teams[$i]['member_'.$j]['student_no'] = $member;
                 $teams[$i]['member_'.$j]['id'] = $member_id;
             }
         }
-        
+
         // count how many MC or Checkbox questions are in survey
         $sq_count = 0;
         foreach ($survey['Question'] as $tmp) {
@@ -410,7 +410,7 @@ class SurveyGroupsController extends AppController
             $group_members = array();
             foreach ($members as $member) {
                 //save group members
-                $member_id = 
+                $member_id =
                     $this->User->field('id', array('student_no' => $member));
                 $surveyGroupMember = array();
                 $surveyGroupMember['user_id'] = $member_id;
@@ -467,9 +467,9 @@ class SurveyGroupsController extends AppController
     function delete($group_set_id)
     {
         $this->autoRender = false;
-        
+
         $groupSet = $this->SurveyGroupSet->find('first', array('conditions' => array('SurveyGroupSet.id' => $group_set_id)));
-        
+
         if (!User::hasPermission('functions/superadmin')) {
             // check whether the user has access to the course
             // instructors
@@ -479,7 +479,7 @@ class SurveyGroupsController extends AppController
             } else {
                 $courses = User::getMyDepartmentsCourseList('list');
             }
-    
+
             if (!in_array($groupSet['Survey']['course_id'], array_keys($courses))) {
                 $this->Session->setFlash(__('Error: You do not have permission to delete this survey group set', true));
                 $this->redirect('index');
@@ -506,14 +506,14 @@ class SurveyGroupsController extends AppController
      */
     function edit($group_set_id, $question_id = null)
     {
-        $this->set('title_for_layout', $this->sysContainer->getCourseName($this->Session->read('ipeerSession.courseId')).__(' > Edit Groupset', true));
+        $this->set('title_for_layout', $this->Course->getCourseName($this->Session->read('ipeerSession.courseId')).__(' > Edit Groupset', true));
         //get group set
         $group_set = $this->SurveyGroupSet->find('first', array('conditions' => array('SurveyGroupSet.id' => $group_set_id),
             'recursive' => 2));
         $time = $group_set['SurveyGroupSet']['date'];
         $scoreFilePathAndName = TMP.$time.'.txt.scores';
         $this->__cleanXmlFile($scoreFilePathAndName);
-        
+
         $survey = $this->Survey->find('first', array('conditions' => array('Survey.id' => $group_set['Survey']['id']),
             'recursive' => 2));
         foreach ($survey['Course']['Event'] as $data) {

@@ -25,7 +25,7 @@ class EvaluationsController extends AppController
         'RubricsCriteriaComment', 'Personalize', 'Penalty',
         'Question', 'Response', 'Survey', 'SurveyInput', 'Course', 'MixevalsQuestion',
         'EvaluationMixeval', 'EvaluationMixevalDetail', 'Mixeval', 'MixevalsQuestionDesc');
-    public $components = array('ExportBaseNew', 'Auth', 'AjaxList', 'Output', 'sysContainer',
+    public $components = array('ExportBaseNew', 'Auth', 'AjaxList', 'Output',
         'userPersonalize', 'framework',
         'Evaluation', 'Export', 'ExportCsv', 'ExportExcel');
 
@@ -373,7 +373,7 @@ class EvaluationsController extends AppController
         }
 
         $this->set('id', $id);
-        $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > Export Evaluation Results');
+        $this->set('title_for_layout', $this->Course->getCourseName($courseId).' > Export Evaluation Results');
 
         //do stuff
         if (isset($this->params['form']) && !empty($this->params['form'])) {
@@ -474,10 +474,9 @@ class EvaluationsController extends AppController
 
 
             //Setup the courseId to session
-            //$this->rdAuth->setCourseId($event['Event']['course_id']);
             $this->set('courseId', $event['Event']['course_id']);
             $courseId = $event['Event']['course_id'];
-            $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
+            $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
 
             //Set userId, first_name, last_name
             $this->set('userId', $userId);
@@ -629,7 +628,7 @@ class EvaluationsController extends AppController
             $courseId = $event['Event']['course_id'];
             $survey_id = $event['Event']['template_id'];
 
-            $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').__(' > Survey', true));
+            $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S').__(' > Survey', true));
             $this->set('survey_id', $survey_id);
 
             // Get all required data from each table for every question
@@ -779,7 +778,7 @@ class EvaluationsController extends AppController
             $rubric = $this->Rubric->getRubricById($rubricId);
             $rubricEvalViewData = $this->Rubric->compileViewData($rubric);
             $this->set('viewData', $rubricEvalViewData);
-            $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
+            $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
 
             $rubricDetail = $this->Evaluation->loadRubricEvaluationDetail($event, $groupId);
             $this->set('rubric', $rubricDetail['rubric']);
@@ -966,7 +965,7 @@ class EvaluationsController extends AppController
             $this->Session->write('ipeerSession.courseId', $event['Event']['course_id']);
             $courseId = $event['Event']['course_id'];
             $this->set('courseId', $courseId);
-            $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
+            $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
             $mixEvalDetail = $this->Evaluation->loadMixEvaluationDetail($event);
             $this->set('view_data', $this->Mixeval->compileViewDataShort($mixEvalDetail['mixeval'], $this));
             $this->set('data', $mixEvalDetail['mixeval']);
@@ -1116,7 +1115,7 @@ class EvaluationsController extends AppController
             $this->Event->formatEventObj($eventId, $groupId));
 
         $this->set('event', $event);
-        $this->set('title_for_layout', !empty($event['Event']) ? $this->sysContainer->getCourseName($courseId).' > '.$event['Event']['title']. __(' > Results ', true):'');
+        $this->set('title_for_layout', !empty($event['Event']) ? $this->Course->getCourseName($courseId).' > '.$event['Event']['title']. __(' > Results ', true):'');
 
 
         switch ($event['Event']['event_template_type_id'])
@@ -1176,7 +1175,7 @@ class EvaluationsController extends AppController
             $formattedResult = $this->Evaluation->formatSurveyEvaluationResult($event, $studentId);
             $user = $this->User->find('first', array('conditions' => array('User.id' => $studentId)));
             $username = $user['User']['username'];
-            $this->set('title_for_layout', $this->sysContainer->getCourseName($courseId).' > '.$event['Event']['title'].' > '.$username. __("'s Results ", true));
+            $this->set('title_for_layout', $this->Course->getCourseName($courseId).' > '.$event['Event']['title'].' > '.$username. __("'s Results ", true));
 
             $answers = array();
 

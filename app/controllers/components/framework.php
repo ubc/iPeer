@@ -11,8 +11,6 @@
  */
 class frameworkComponent
 {
-    public $components = array('sysContainer');
-
     /**
      * validateUploadFile() - validates the uploaded file format
      *

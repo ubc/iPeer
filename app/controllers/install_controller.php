@@ -271,8 +271,6 @@ class InstallController extends Controller
      */
     private function patchDB()
     {
-        // using the SysParameter model directly as bringing in sysContainer
-        // introduces seemingly random bugs due to its use of sessions
         $ret = $this->loadModel('SysParameter');
         if ($ret !== true) {
             // failed to load model

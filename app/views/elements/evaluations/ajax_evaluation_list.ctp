@@ -50,7 +50,6 @@
   		  <td>
   		    <?php
 
-  		//    echo $sysContainer->getCourseName($evaluation['course_id']);
   		  echo $names[$i]; ?>
   	    </td>
   	    <?php } ?>

@@ -23,7 +23,7 @@ class AppController extends Controller
 {
     public $startpage  = 'pages';
     public $uses       = array('User', 'SysParameter', 'OauthToken');
-    public $components = array('Session', 'Output', 'sysContainer',
+    public $components = array('Session', 'Output',
         'userPersonalize', 'framework', 'Guard.Guard', 'Acl',
         'AccessControl', 'Email');
     public $helpers    = array('Session', 'Html', 'Js');
@@ -136,10 +136,10 @@ class AppController extends Controller
      */
     protected function _sendEmail($content, $subject, $from, $toAddress, $templateName = 'default', $ccAddress = array(), $bcc= array())
     {
-        $smtp['port'] = $this->sysContainer->getParamByParamCode('email.port');
-        $smtp['host'] = $this->sysContainer->getParamByParamCode('email.host');
-        $smtp['username'] = $this->sysContainer->getParamByParamCode('email.username');
-        $smtp['password'] = $this->sysContainer->getParamByParamCode('email.password');
+        $smtp['port'] = $this->SysParameter->get('email.port');
+        $smtp['host'] = $this->SysParameter->get('email.host');
+        $smtp['username'] = $this->SysParameter->get('email.username');
+        $smtp['password'] = $this->SysParameter->get('email.password');
 
         $this->Email->reset();
 
