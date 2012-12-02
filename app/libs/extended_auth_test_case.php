@@ -1,8 +1,15 @@
 <?php
 App::import('Lib', 'ExtendedTestCase.ExtendedTestCase');
 
+// define a line break according to run environment
+if (PHP_SAPI == 'cli') {
+    define('TEST_LB', "\n");
+} else {
+    define('TEST_LB', "<br />");
+}
+
 /**
- * ExtendedAuthTestCase based on ExtendedTestCase, added _startController
+ * ExtendedAuthTestCase based on ExtendedTestCase, added login, afterLogin, logout
  * callback so that we can do authentication within test case
  *
  * @uses ExtendedTestCase
@@ -14,21 +21,39 @@ App::import('Lib', 'ExtendedTestCase.ExtendedTestCase');
  */
 class ExtendedAuthTestCase extends ExtendedTestCase
 {
+    protected $defaultLogin = null;
+    protected $login = null;
+
     /**
      * testAction
      *
      * @param string $url
-     * @param bool   $options
+     * @param array  $params
      *
      * @access public
      * @return void
      */
-    function testAction($url = '', $options = array()) {
-        if (is_null($this->testController)) {
-            return parent::testAction($url, $options);
+    function testAction($url = '', $params = array())
+    {
+        $Controller = $this->getController();
+        if (is_null($Controller)) {
+            return parent::testAction($url, $params);
         }
+        $Controller->__construct();
+        $Controller->constructClasses();
 
-        $Controller = $this->testController;
+        $default = array(
+            'return' => 'result',
+            'fixturize' => false,
+            'data' => array(),
+            'method' => 'post',
+            'connection' => 'default'
+        );
+
+        if (is_string($params)) {
+            $params = array('return' => $params);
+        }
+        $params = array_merge($default, $params);
 
         // reset parameters
         ClassRegistry::flush();
@@ -50,19 +75,19 @@ class ExtendedAuthTestCase extends ExtendedTestCase
             'data' => array(),
             'method' => 'post'
         );
-        $options = array_merge($default, $options);
+        $params = array_merge($default, $params);
 
         // set up the controller based on the url
         $urlParams = Router::parse($url);
-        $extra = array_diff_key($options, array('data' => null, 'method' => null, 'return' => null));
+        $extra = array_diff_key($params, array('data' => null, 'method' => null, 'return' => null));
         $urlParams = array_merge($urlParams, $extra);
         $action = $urlParams['action'];
         $prefix = null;
         $urlParams['url']['url'] = $url;
-        if (strtolower($options['method']) == 'get') {
-            $urlParams['url'] = array_merge($options['data'], $urlParams['url']);
+        if (strtolower($params['method']) == 'get') {
+            $urlParams['url'] = array_merge($params['data'], $urlParams['url']);
         } else {
-            $Controller->data = $options['data'];
+            $Controller->data = $params['data'];
         }
         if (isset($urlParams['prefix'])) {
             $action = $urlParams['prefix'].'_'.$action;
@@ -79,9 +104,11 @@ class ExtendedAuthTestCase extends ExtendedTestCase
             $Controller->Component->initialize($Controller);
         }
 
-
         $Controller->Component->initialize($Controller);
-        $this->_startController($Controller);
+
+        $this->login($Controller);
+        $this->afterLogin($Controller);
+
         $Controller->beforeFilter();
         $Controller->Component->startup($Controller);
 
@@ -94,13 +121,58 @@ class ExtendedAuthTestCase extends ExtendedTestCase
     }
 
     /**
-     * _startController callback function
+     * login callback function
+     *
+     * @param mixed $controller
+     *
+     * @access protected
+     * @return boolean if login is successful
+     */
+    function login($controller)
+    {
+        $login = array();
+        if (null == $this->login && null == $this->defaultLogin) {
+            trigger_error('You have to define at least one login credentials (login or defaultLogin variable)!', E_USER_ERROR);
+        }
+
+        $login = (null == $this->login) ? $this->defaultLogin : $this->login;
+        // reset login so that next test will not be affected
+        $this->login = null;
+
+        return $controller->Auth->login($login);
+    }
+
+    /**
+     * afterLogin callback function
      *
      * @param mixed $controller
      *
      * @access protected
      * @return void
      */
-    function _startController($controller) {
+    function afterLogin($controller)
+    {
+        User::getInstance($controller->Auth->user());
+        $controller->AccessControl->getPermissions();
+        $controller->User->loadRoles(User::get('id'));
     }
+
+    /**
+     * logout callback function
+     *
+     * @param mixed $controller
+     *
+     * @access protected
+     * @return boolean if login is successful
+     */
+    function logout($controller)
+    {
+    }
+
+    function getController() {
+        trigger_error('No getController() method has been defined in the test case. You may use Mock controller in the method. Falling back to default testAction.');
+        return null;
+    }
+
 }
+

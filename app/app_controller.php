@@ -73,7 +73,10 @@ class AppController extends Controller
 
         if ($this->Auth->isAuthorized()) {
             // check if the user has permission to access the controller/action
-            User::hasPermission('controllers/'.ucwords($this->params['controller']).'/'.$this->params['action']);
+            if (!User::hasPermission('controllers/'.ucwords($this->params['controller']).'/'.$this->params['action'])) {
+                $this->Session->setFlash('Error: You do not have permission to access the page.');
+                $this->redirect('/home');
+            }
 
             $this->_checkDatabaseVersion();
         }

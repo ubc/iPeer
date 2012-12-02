@@ -19,11 +19,6 @@ class HomeController extends AppController
         'User', 'UserCourse', 'Event', 'EvaluationSubmission',
         'Course', 'Role', 'UserEnrol', 'Rubric', 'Penalty');
 
-    public $page;
-    public $Sanitize;
-    public $functionCode = 'HOME';
-    public $components = array( 'Auth', 'Acl', 'Output');
-
     /**
      * __construct
      *
@@ -32,7 +27,6 @@ class HomeController extends AppController
      */
     function __construct()
     {
-        $this->Sanitize = new Sanitize;
         $this->set('title_for_layout', __('Home', true));
         parent::__construct();
     }
