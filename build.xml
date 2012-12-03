@@ -253,17 +253,7 @@
         </reflexive>
     </target>
 
-    <target name="release" description="Prepare the release" depends="debug-off,packaging" />
-
-    <target name="debug-off" description="turn off the debug">
-        <reflexive file="app/config/core.php">
-            <filterchain>
-                <replaceregexp>
-                    <regexp pattern="'DEBUG', \d" replace="'DEBUG', 0"/>
-                </replaceregexp>
-            </filterchain>
-        </reflexive>
-    </target>
+    <target name="release" description="Prepare the release" depends="bump, packaging" />
 
     <target name="packaging" description="Packaging the release">
         <delete dir="${project.basedir}/dist"/>

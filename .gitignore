@@ -4,6 +4,7 @@ app/tmp/
 app/config/bootstrap.local.php
 app/config/guard.php
 app/config/database.php
+app/config/config.local.php
 
 dist
 build/api/
