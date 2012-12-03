@@ -565,6 +565,11 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'controllers/Surveys');
         $this->Acl->deny($role, 'controllers/Users');
         $this->Acl->allow($role, 'controllers/guard/guard/logout');
+        $this->Acl->allow($role, 'controllers/Evaluations/makeSimpleEvaluation');
+        $this->Acl->allow($role, 'controllers/Evaluations/makeRubricEvaluation');
+        $this->Acl->allow($role, 'controllers/Evaluations/makeMixevalEvaluation');
+        $this->Acl->allow($role, 'controllers/Evaluations/makeSurveyEvaluation');
+        $this->Acl->allow($role, 'controllers/Evaluations/studentViewEvaluationResult');
         $this->Acl->deny($role, 'functions');
         $this->Acl->deny($role, 'functions/viewemailaddresses');
         $this->Acl->deny($role, 'functions/superadmin');
@@ -585,6 +590,11 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'controllers/Surveys');
         $this->Acl->deny($role, 'controllers/Users');
         $this->Acl->allow($role, 'controllers/guard/guard/logout');
+        $this->Acl->allow($role, 'controllers/Evaluations/makeSimpleEvaluation');
+        $this->Acl->allow($role, 'controllers/Evaluations/makeRubricEvaluation');
+        $this->Acl->allow($role, 'controllers/Evaluations/makeMixevalEvaluation');
+        $this->Acl->allow($role, 'controllers/Evaluations/makeSurveyEvaluation');
+        $this->Acl->allow($role, 'controllers/Evaluations/studentViewEvaluationResult');
         $this->Acl->deny($role, 'functions');
         $this->Acl->allow($role, 'functions/viewstudentresults');
         $this->Acl->deny($role, 'functions/viewemailaddresses');
