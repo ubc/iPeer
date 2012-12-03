@@ -590,6 +590,16 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], 'Error: You do not have permission to delete this course');
     }
+
+    function testLogout()
+    {
+        $this->testAction('/courses/index', array('return' => 'vars'));
+        $this->controller->Auth->logout();
+
+        $this->assertFalse($this->controller->Auth->isAuthorized());
+        $this->assertFalse(array_key_exists('Auth', $_SESSION));
+        $this->assertFalse(array_key_exists('ipeerSession', $_SESSION));
+    }
 /*    function testAddInstructor() {
         $this->Course = ClassRegistry::init('Course');
         $data = array('instructor_id'=> 2, 'course_id' => 1);

@@ -73,7 +73,8 @@ class AppController extends Controller
 
         if ($this->Auth->isAuthorized()) {
             // check if the user has permission to access the controller/action
-            if (!User::hasPermission('controllers/'.ucwords($this->params['controller']).'/'.$this->params['action'])) {
+            $permission = array_filter(array('controllers', ucwords($this->params['plugin']), ucwords($this->params['controller']), $this->params['action']));
+            if (!User::hasPermission(join('/', $permission))) {
                 $this->Session->setFlash('Error: You do not have permission to access the page.');
                 $this->redirect('/home');
             }
