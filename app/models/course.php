@@ -259,25 +259,36 @@ class Course extends AppModel
      *
      * @param mixed $instructorId instructor id
      * @param bool  $type         type
-     * @param int   $recursive    recursive search
+     * @param int   $contain      contained models
      *
      * @return course data
      */
-    function getCourseByInstructor($instructorId, $type = 'all', $recursive = 1)
+    function getCourseByInstructor($instructorId, $type = 'all', $contain = array())
     {
-        $fields = array('Course.*');
+        $contain = array_merge(array('Instructor'), $contain);
         if ($type == 'list') {
             $fields = array('Course.full_name');
-            $recursive = 0;
         }
-        return $this->find(
-            $type,
+
+        // we need two queries to find the courses. becuase if we specifiy the instructor id condition
+        // we can only get one instructor with the id we specified. If the course has more than one
+        // instructor, we will fail to retrieve them.
+
+        // find course ids first
+        $courses = $this->find(
+            'all',
             array(
                 'conditions' => array('Instructor.id' => $instructorId),
-                'fields' => $fields,
-                'recursive' => $recursive
+                'contain' => array('Instructor')
             )
         );
+
+        $courseIds = Set::extract('/Course/id', $courses);
+
+        // find courses with instructor and other models specified in contain
+        $courses = $this->find('all', array('conditions' => array('id' => $courseIds), 'contain' => $contain));
+
+        return $courses;
     }
 
     /**

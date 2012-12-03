@@ -42,20 +42,20 @@ class HomeController extends AppController
     {
         //General Home Rendering for Admin
         if (User::hasPermission('functions/superadmin')) {
-            $course_list = $this->Course->find('all');
-            $this->set('course_list', $this->_formatCourseList($course_list));
+            $course_list = $this->Course->find('all', array('contain' => array('Instructor', 'Event')));
+            var_dump($course_list);
         // admins
         } else if (User::hasPermission('controllers/departments')) {
             $course_list = User::getMyDepartmentsCourseList('all');
-            $this->set('course_list', $this->_formatCourseList($course_list));
         // students & tutors
         } else if (User::hasPermission('functions/onlytakeeval')) {
             $this->redirect('studentIndex');
+            return;
         // instructors
         } else {
-            $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
-            $this->set('course_list', $this->_formatCourseList($course_list));
+            $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'), 'all', array('Event'));
         }
+        $this->set('course_list', $this->_formatCourseList($course_list));
     }
 
     /**
