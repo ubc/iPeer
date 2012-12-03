@@ -502,6 +502,7 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Surveys');
         $this->Acl->allow($role, 'controllers/Users');
         $this->Acl->allow($role, 'controllers/Evaluations');
+        $this->Acl->allow($role, 'controllers/guard/guard/logout');
         $this->Acl->deny($role, 'functions');
         $this->Acl->allow($role, 'functions/emailtemplate');
         $this->Acl->allow($role, 'functions/evaluation');
@@ -532,6 +533,7 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Simpleevaluations');
         $this->Acl->allow($role, 'controllers/Surveys');
         $this->Acl->allow($role, 'controllers/Users');
+        $this->Acl->allow($role, 'controllers/guard/guard/logout');
         $this->Acl->deny($role, 'functions');
         $this->Acl->allow($role, 'functions/evaluation');
         $this->Acl->deny($role, 'functions/evaluation', 'update');
@@ -562,6 +564,7 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'controllers/Simpleevaluations');
         $this->Acl->deny($role, 'controllers/Surveys');
         $this->Acl->deny($role, 'controllers/Users');
+        $this->Acl->allow($role, 'controllers/guard/guard/logout');
         $this->Acl->deny($role, 'functions');
         $this->Acl->deny($role, 'functions/viewemailaddresses');
         $this->Acl->deny($role, 'functions/superadmin');
@@ -581,6 +584,7 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'controllers/Simpleevaluations');
         $this->Acl->deny($role, 'controllers/Surveys');
         $this->Acl->deny($role, 'controllers/Users');
+        $this->Acl->allow($role, 'controllers/guard/guard/logout');
         $this->Acl->deny($role, 'functions');
         $this->Acl->allow($role, 'functions/viewstudentresults');
         $this->Acl->deny($role, 'functions/viewemailaddresses');
