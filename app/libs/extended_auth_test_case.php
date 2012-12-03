@@ -169,6 +169,15 @@ class ExtendedAuthTestCase extends ExtendedTestCase
     {
     }
 
+    /**
+     * getController abstract function to be override by subclass.
+     *
+     * Subclass can provide a real controller or a partially mocked
+     * controller for testing
+     *
+     * @access protected
+     * @return Controller $controller
+     */
     function getController() {
         trigger_error('No getController() method has been defined in the test case. You may use Mock controller in the method. Falling back to default testAction.');
         return null;
