@@ -1,6 +1,7 @@
 <?php
 /**
- * This is core configuration file.
+ * This is core configuration file. It should be set up as production
+ * configuration. To customize it for development, please use config.local.php.
  *
  * Use it to configure core behavior of Cake.
  *
@@ -33,7 +34,7 @@
  * In production mode, flash messages redirect after a time interval.
  * In development mode, you need to click the flash message to continue.
  */
-	Configure::write('debug', 2);
+	Configure::write('debug', 0);
 
 /**
  * CakePHP Log Level:
@@ -342,3 +343,15 @@
   $CWL['applicationPassword'] = '';
 
   define('IPEER_VERSION', '3.0.0 Beta');
+
+
+/**
+ * Load the local configuration. It can override the ones
+ * in this file. Use it for your own customization,
+ * e.g.
+ * Configure::write('debug', 2);
+ * To turn on the debug
+ */
+if (file_exists(dirname(__FILE__).'/config.local.php')) {
+  include('config.local.php');
+}
