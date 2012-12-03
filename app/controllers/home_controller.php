@@ -136,6 +136,7 @@ class HomeController extends AppController
             $courses = $user['Tutor'];
             foreach ($courses as $assignedCourse) {
                 $courseId = $assignedCourse['id'];
+                // will never return surveys because it doesn't have result release date
                 $events = $this->Event->find('all', array('conditions' => array('release_date_begin < NOW()', 'NOW() <= result_release_date_end', 'course_id' => $courseId)));
                 foreach ($events as $row) {
                     $event = $row['Event'];
