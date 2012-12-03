@@ -43,7 +43,6 @@ class HomeController extends AppController
         //General Home Rendering for Admin
         if (User::hasPermission('functions/superadmin')) {
             $course_list = $this->Course->find('all', array('contain' => array('Instructor', 'Event')));
-            var_dump($course_list);
         // admins
         } else if (User::hasPermission('controllers/departments')) {
             $course_list = User::getMyDepartmentsCourseList('all');
