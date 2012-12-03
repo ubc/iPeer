@@ -80,12 +80,12 @@
 	<input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/>
 		<div id="panel<?php echo $user['id']?>">
 		  <div id="panel<?php echo $user['id']?>Header" class="panelheader">
-		  	<?php echo $user['full_name'];?>
+		  	<?php echo $user['first_name'].' '.$user['last_name'];?>
             <?if (isset($row['User']['Evaluation'])): ?>
                 <font color="#66FF33"> ( Saved )</font>
             <? else: ?>
                 <blink><font color="#FF6666"> - </font></blink><?php __('(click to expand)')?>
-            <? endif; >?>
+            <? endif; ?>
 		  </div>
 		  <div style="height: 200px;" id="panel1Content" class="panelContent">
 			 <br><?php __('Important! Comments are required in this evaluation.')?><br><br>

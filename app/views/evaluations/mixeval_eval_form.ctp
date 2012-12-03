@@ -83,7 +83,7 @@
   ?>
 		<div id="panel<?php echo $user['id']?>">
 		  <div id="panel<?php echo $user['id']?>Header" class="panelheader">
-		  	<?php echo $user['full_name']?>
+		  	<?php echo $user['first_name'].' '.$user['last_name']?>
 		  	<?php if (isset($user['Evaluation'])):?>
         <?php
           // check if the evaluation comment is empty
