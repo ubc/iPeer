@@ -400,6 +400,31 @@ class EvaluationsController extends AppController
         }
     }
 
+    /**
+     * makeEvaluation proxy method for makeing different evaluations
+     *
+     * @param mixed $param
+     * @access public
+     * @return void
+     */
+    function makeEvaluation($eventId, $objectId = null) {
+        $this->Event->id = $eventId;
+        $templateTypeId = $this->Event->field('event_template_type_id');
+        switch($templateTypeId) {
+        case 1:
+            $this->_makeSimpleEvaluation($eventId, $objectId);
+            break;
+        case 2:
+            $this->_makeRubricEvaluation($eventId, $objectId);
+            break;
+        case 3:
+            $this->_makeSurveyEvaluation($eventId);
+            break;
+        case 4:
+            $this->_makeMixevalEvaluation($eventId, $objectId);
+            break;
+        }
+    }
 
     /**
      * makeSimpleEvaluation
@@ -409,12 +434,9 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    function makeSimpleEvaluation($param = null)
+    function _makeSimpleEvaluation($eventId, $groupId)
     {
         $this->autoRender = false;
-        $tok = strtok($param, ';');
-        $eventId = $tok;
-        $groupId = strtok(';');
 
         if (empty($this->params['data'])) {
             $group = null;
@@ -528,26 +550,10 @@ class EvaluationsController extends AppController
                 //Validate the error why the Event->save() method returned false
                 $this->validateErrors($this->Event);
                 $this->set('errmsg', __('Save Evaluation failure.', true));
-                $this->redirect('/evaluations/makeSimpleEvaluation');
+                $this->redirect("/evaluations/makeEvaluation/$eventId/$groupId");
             }//end if
         }
     }
-
-    /**
-     * validSimpleEvalComplete
-     *
-     * @param bool $params
-     *
-     * @access public
-     * @return void
-     */
-    function validSimpleEvalComplete ($params=null)
-    {
-        $status = false;
-
-        return $status;
-    }
-
 
     /**
      * makeSurveyEvaluation
@@ -557,10 +563,9 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    function makeSurveyEvaluation ($param = null)
+    function _makeSurveyEvaluation ($eventId)
     {
         $this->autoRender = false;
-        $eventId = $param;
 
         if (empty($this->params['data'])) {
 
@@ -656,14 +661,14 @@ class EvaluationsController extends AppController
             $eventId = $this->params['form']['event_id'];
             if (!$this->validSurveyEvalComplete($this->params)) {
                 $this->set('errmsg', 'validSurveyEvalCompleten failure.');
-                //$this->redirect('/evaluations/makeSurveyEvaluation/'.$eventId);
+                //$this->redirect('/evaluations/makeEvaluation/'.$eventId);
             }
             if ($this->Evaluation->saveSurveyEvaluation($this->params)) {
                 $this->Session->setFlash(__('Your survey was submitted successfully', true), 'good');
                 $this->redirect('/home/index/');
             } else {
                 $this->Session->setFlash(__('Your survey was not submitted successfully', true));
-                $this->redirect('evaluations/makeSurveyEvaluation/'.$eventId);
+                $this->redirect('evaluations/makeEvaluation/'.$eventId);
             }
         }
     }
@@ -690,13 +695,10 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    function makeRubricEvaluation ($param = '')
+    function _makeRubricEvaluation ($eventId, $groupId)
     {
         $this->autoRender = false;
         if (empty($this->params['data'])) {
-            $tok = strtok($param, ';');
-            $eventId = $tok;
-            $groupId = strtok(';');
 
             // invalid group id or event id
             if (!is_numeric($eventId) || !is_numeric($groupId) ||
@@ -793,18 +795,18 @@ class EvaluationsController extends AppController
             $courseId = $this->params['form']['course_id'];
             if (!$this->validRubricEvalComplete($this->params['form'])) {
                 $this->Session->setFlash(__('validRubricEvalCompleten failure', true));
-                $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
+                $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
             }
 
             if ($this->Evaluation->saveRubricEvaluation($this->params)) {
-                $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
+                $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
             }
             //Found error
             else {
                 //Validate the error why the Event->save() method returned false
                 $this->validateErrors($this->Event);
                 $this->Session->setFlash(__('Your evaluation was not saved successfully', true));
-                $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
+                $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
             }//end if
         }
     }
@@ -879,7 +881,7 @@ class EvaluationsController extends AppController
             $this->Session->setFlash(__('Your Evaluation was submitted successfully.', true), 'good');
             $this->redirect('/home/index/', true);
         } else {
-            $this->redirect('/evaluations/makeRubricEvaluation/'.$eventId.';'.$groupId);
+            $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
         }
     }
 
@@ -892,13 +894,10 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    function makeMixevalEvaluation ($param = '')
+    function _makeMixevalEvaluation ($eventId, $groupId)
     {
         $this->autoRender = false;
         if (empty($this->params['data'])) {
-            $tok = strtok($param, ';');
-            $eventId = $tok;
-            $groupId = strtok(';');
 
             // invalid event id or group id
             if (!is_numeric($eventId) || !is_numeric($groupId) ||
@@ -978,17 +977,17 @@ class EvaluationsController extends AppController
             $groupId = $this->params['form']['group_id'];
             $courseId = $this->params['form']['course_id'];
             if (!$this->validMixevalEvalComplete($this->params['form'])) {
-                $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
+                $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
             }
             if ($this->Evaluation->saveMixevalEvaluation($this->params)) {
-                $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
+                $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
             }
             //Found error
             else {
                 //Validate the error why the Event->save() method returned false
                 $this->validateErrors($this->Event);
                 $this->set('errmsg', __('Save Evaluation failure.', true));
-                $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
+                $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
             }//end if
         }
     }
@@ -1062,7 +1061,7 @@ class EvaluationsController extends AppController
             $this->Session->setFlash(__('Your Evaluation was submitted successfully.', true), 'good');
             $this->redirect('/home/index/', true);
         } else {
-            $this->redirect('/evaluations/makeMixevalEvaluation/'.$eventId.';'.$groupId);
+            $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
         }
     }
 

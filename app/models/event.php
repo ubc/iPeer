@@ -148,6 +148,35 @@ class Event extends AppModel
         $this->virtualFields['to_review_count'] = sprintf('SELECT count(*) as count FROM group_events as ge WHERE ge.event_id = %s.id AND marked LIKE "to review"', $this->alias);
         $this->virtualFields['student_count'] = sprintf('SELECT count(*) as count FROM group_events as vge RIGHT JOIN groups_members as vgm ON vge.group_id = vgm.group_id WHERE vge.event_id = %s.id', $this->alias);
         $this->virtualFields['completed_count'] = sprintf('SELECT count(*) as count FROM evaluation_submissions as ves WHERE ves.submitted = 1 AND ves.event_id = %s.id', $this->alias);
+        $this->virtualFields['due_in'] = 'DATEDIFF(due_date, NOW())';
+    }
+
+    /**
+     * afterFind
+     *
+     * @param array $results
+     * @param mixed $primary
+     *
+     * @access public
+     * @return void
+     */
+    function afterFind(array $results, $primary)
+    {
+        $currentDate = strtotime('NOW');
+        foreach ($results as $key => $event) {
+            if (isset($event['Event']['release_date_begin'])) {
+                $results[$key]['Event']['is_released']  =
+                    ($currentDate >= strtotime($event['Event']['release_date_begin']) &&
+                    $currentDate < strtotime($event['Event']['release_date_end']));
+            }
+            if (isset($event['Event']['result_release_date_begin'])) {
+                $results[$key]['Event']['is_result_released']  =
+                    ($currentDate >= strtotime($event['Event']['result_release_date_begin']) &&
+                    $currentDate < strtotime($event['Event']['result_release_date_end']));
+            }
+        }
+
+        return $results;
     }
 
     /**
@@ -479,7 +508,7 @@ class Event extends AppModel
         ));
         return $event['Event']['title'];
     }
-    
+
     /**
      * Get fields of all events by course id
      *
@@ -494,7 +523,7 @@ class Event extends AppModel
             'conditions' => array('course_id' => $courseId),
             'fields' => $fields));
     }
-    
+
     /**
      * Get fields of all event by event id
      *
@@ -508,5 +537,52 @@ class Event extends AppModel
         return $this->find('first', array(
             'conditions' => array('Event.id' => $eventId),
             'fields' => $fields));
+    }
+
+    /**
+     * getEventsByUserId get events that associated with a specific user
+     *
+     * @param mixed $userId
+     *
+     * @access public
+     * @return array array of events with related models, e.g. course, group, submission
+     */
+    function getEventsByUserId($userId)
+    {
+        $groups = $this->Group->find('all', array(
+            'conditions' => array('Member.id' => $userId),
+            'fields' => array('id'),
+            'contain' => array('Member')));
+        $groupIds = Set::extract('/Group/id', $groups);
+
+        // find evaluation events
+        $evaluationEvents = $this->find('all', array(
+            'conditions' => array('Group.id' => $groupIds),
+            'contain' => array(
+                'Course',
+                'Group',
+                'EvaluationSubmission' => 'submitter_id = '.$userId,
+                'Penalty' => array(
+                    'conditions' => array(
+                        'OR' => array(
+                            array('days_late' => 'Event.due_in'),
+                            array('days_late <' => 0)
+                        )
+                    ),
+                    'order' => array('days_late DESC')
+                )
+            )
+        ));
+
+        // find survey events
+        $surveyEvents = $this->find('all', array(
+            'conditions' => array('event_template_type_id' => '3'),
+            'contain' => array(
+                'Course',
+                'EvaluationSubmission' => 'submitter_id = '.$userId,
+            )
+        ));
+
+        return array_merge($evaluationEvents, $surveyEvents);
     }
 }

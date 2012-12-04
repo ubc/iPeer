@@ -118,17 +118,12 @@
   echo "updateCount($remaining, $com_req);";
 ?>
   }<?php
-
-if ($event['Event']['id']==292) {
-	$event['Event']['description']=$this->controller->SimpleEvaluation->field('description','id=50');
-}
-
 ?>
 	//-->
 </script>
 
 	<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
-    <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeSimpleEvaluation/'.$event['Event']['id']) ?>">
+    <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeEvaluation/'.$event['Event']['id'].'/'.$event['group_id']) ?>">
       <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
       <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>"/>
       <input type="hidden" name="course_id" value="<?php echo $courseId?>"/>

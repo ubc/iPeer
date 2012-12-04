@@ -55,7 +55,7 @@
 	//-->
 </script>
 	<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
-    <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeSimpleEvaluation') ?>">
+    <form name="evalForm" id="evalForm" method="POST" action="">
       <input type="hidden" name="course_id" value="<?php echo $course_id?>"/>
       <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $current_user['id']?>"/>
 
