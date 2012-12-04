@@ -19,13 +19,14 @@
 <tr>
     <th><?php __('Description')?></th>
 </tr>
+
 <tr>
     <td><?php echo $event['Event']['description'] ?></td>
 </tr>
 </table>
 
-<h3><?php __('Summary: ')?>
- (<?php echo $this->Html->link(__('Basic', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['group_id']."/Basic")?> |
+<h3><?php __('Summary')?>
+ :(<?php echo $this->Html->link(__('Basic', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['group_id']."/Basic")?> |
     <?php echo $html->link(__('Detail', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['group_id']."/Detail")?> )</h3>
     
 <!-- Users who haven't done the evaluation yet table -->
@@ -48,46 +49,47 @@ if (!$allMembersCompleted) {
 <!-- Show Evaluation Reuslts - Basic -->
  <h3><?php __('Evaluation Results')?></h3>
  
-<table class='standardtable'>
-   
+<table class='standardtable'> 
    <th><?php __('Student Name')?></th>
-   <th><?php __('Total: (/') ?> 
-       <?php echo number_format($rubric['Rubric']['total_marks'], 2) . ")"; ?></th>
+   <th><?php __('Total') ?> 
+       : (/<?php echo number_format($rubric['Rubric']['total_marks'], 2); ?>)</th>
     
-       <?php
-    $aveScoreSum = 0;
-    //This section will display the evaluatees' name
-    //as display the average scores their peers gave them
-    //for various criteria
-    if ($groupMembersNoTutors) {
-        foreach ($groupMembersNoTutors as $member) {
-            //Name Section
-            echo '<tr><td width="70%">' . $member['User']['first_name'] . " " . $member['User']['last_name'] . '</td>';
+<?php
+$aveScoreSum = 0;
+//This section will display the evaluatees' name
+//as display the average scores their peers gave them
+//for various criteria
+if ($groupMembersNoTutors) {
+    foreach ($groupMembersNoTutors as $member) {
+        //Name Section
+        echo '<tr><td width="70%">' . $member['User']['first_name'] . " " . $member['User']['last_name'] . '</td>';
 
-            //Scores Section
-            if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
-                $avgScore = $memberScoreSummary[$member['User']['id']]['received_ave_score'];
-                $penalty = number_format(($penalties[$member['User']['id']] / 100) * $avgScore, 2);
-                $finalAvgScore = $avgScore - $penalty;
-                $penalty > 0 ? $stringAddOn = ' - ' . "<font color=\"red\">" . $penalty . "</font> = " . number_format($finalAvgScore, 2) : $stringAddOn = '';
-                $aveScoreSum += $finalAvgScore;
-                echo '<td width="30%">' . number_format($memberScoreSummary[$member['User']['id']]['received_ave_score'], 2) . $stringAddOn . '</td></tr>';
-            } else {
-                echo '<td width="30%">-</td></tr>';
-            }
+        //Scores Section
+        if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
+            $avgScore = $memberScoreSummary[$member['User']['id']]['received_ave_score'];
+            $penalty = number_format(($penalties[$member['User']['id']] / 100) * $avgScore, 2);
+            $finalAvgScore = $avgScore - $penalty;
+            $penalty > 0 ? $stringAddOn = ' - ' . "<font color=\"red\">" . $penalty . "</font> = " . number_format($finalAvgScore, 2) : $stringAddOn = '';
+            $aveScoreSum += $finalAvgScore;
+            echo '<td width="30%">' . number_format($memberScoreSummary[$member['User']['id']]['received_ave_score'], 2) . $stringAddOn . '</td></tr>';
+        } else {
+            echo '<td width="30%">-</td></tr>';
         }
     }
+}
+?>
 
-    //Display Average Scores
-    echo '<tr class="tablesummary"><td><b>';
-    echo __("Group Average: ", true);
-    echo '</b></td>';
-    echo '<td><b>';
-    echo number_format($aveScoreSum / count($groupMembersNoTutors), 2);
-    echo '</b></td>';
-    ?>
+    <!-- Display Average Scores -->
+    <tr class="tablesummary">
+    <td><b>
+    <?php echo __("Group Average: ", true) ?>
+    </b></td>
+    <td><b>
+    <?php echo number_format($aveScoreSum / count($groupMembersNoTutors), 2); ?>
+    </b></td>
     
-    <?php if ($allMembersCompleted) {?>
+    
+    <?php if ($allMembersCompleted) :?>
     <tr class="tablecell2" align="center">
       <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
               <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
@@ -96,16 +98,15 @@ if (!$allMembersCompleted) {
               <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" />
               <input type="hidden" name="display_format" value="<?php __('Basic')?>" />
 
-              <td colspan="<?php echo count($groupMembers) + 1; ?>"><?php
-            if ($event['group_event_marked'] == "reviewed") {
-                echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_not_reviewed\" value=\" " . __('Mark Peer Evaluations as Not Reviewed', true) . "\" />";
-            } else {
-                echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_reviewed\" value=\" " . __('Mark Peer Evaluations as Reviewed', true) . "\" />";
-            }
-            ?></td>
+              <td colspan="<?php echo count($groupMembers) + 1; ?>">      
+           <?php  if ($event['group_event_marked'] == "reviewed"): ?>
+                 <input class="reviewed" type="submit" name="mark_not_reviewed" value="<?php __('Mark Peer Evaluations as Not Reviewed')?>" />
+            <?php else: ?>
+                  <input class="reviewed" type="submit" name="mark_reviewed" value="<?php __('Mark Peer Evaluations as Reviewed')?>" />
+            </td>
             </form>
   </tr>
-  <?php } ?>          
+  <?php endif; endif; ?>          
 </table>
 
 
