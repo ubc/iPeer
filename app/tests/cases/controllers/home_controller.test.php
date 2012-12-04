@@ -110,10 +110,11 @@ class HomeControllerTest extends ExtendedAuthTestCase
             )
         );
         $result = $this->testAction('/home/index', array('return' => 'vars'));
-        $this->assertEqual($result['userId'], 5);
-        $data = Set::sort($result['data'], '{n}.comingEvent.Event.id', 'asc');
-        $this->assertEqual(count($data), 6);
-        $this->assertEqual(Set::extract('/comingEvent/Event/id', $data), array(1,2,3,4,5));
-        $this->assertEqual(Set::extract('/eventSubmitted/Event/id', $data), array(6));
+        $upcoming = Set::sort($result['upcoming'], '{n}.Event.id', 'asc');
+        $submitted = Set::sort($result['submitted'], '{n}.Event.id', 'asc');
+        $this->assertEqual(count($upcoming), 5);
+        $this->assertEqual(count($submitted), 1);
+        $this->assertEqual(Set::extract('/Event/id', $upcoming), array(1,2,3,4,5));
+        $this->assertEqual(Set::extract('/Event/id', $submitted), array(6));
     }
 }
