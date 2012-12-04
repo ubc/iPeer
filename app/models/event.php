@@ -105,14 +105,6 @@ class Event extends AppModel
             'dependent' => true,
             'foreignKey' => 'event_id'
         ),
-        'EvaluationSubmission' =>
-        array(
-            'className' => 'EvaluationSubmission',
-            'conditions' => '',
-            'order' => '',
-            'dependent' => true,
-            'foreignKey' => 'event_id'
-        ),
         'Penalty' =>
         array(
             'className' => 'Penalty',
@@ -561,7 +553,6 @@ class Event extends AppModel
             'contain' => array(
                 'Course',
                 'Group',
-                'EvaluationSubmission' => 'submitter_id = '.$userId,
                 'Penalty' => array(
                     'conditions' => array(
                         'OR' => array(
@@ -574,14 +565,39 @@ class Event extends AppModel
             )
         ));
 
+        // find submission separately, doesn't work in on query
+        $submissions = $this->GroupEvent->EvaluationSubmission->find('all', array(
+            'conditions' => array('grp_event_id' => Set::extract('/GroupEvent/id', $evaluationEvents), 'submitter_id' => $userId),
+            'contain' => false,
+        ));
+
+        foreach ($submissions as $submission) {
+            foreach ($evaluationEvents as $key => $event) {
+                if ($submission['EvaluationSubmission']['grp_event_id'] == $event['GroupEvent']['id']) {
+                    $evaluationEvents[$key]['EvaluationSubmission'] = $submission['EvaluationSubmission'];
+                }
+            }
+        }
+
         // find survey events
+        $this->bindModel(array(
+            'hasOne' => array(
+                'EvaluationSubmission' => array('conditions' => array('EvaluationSubmission.submitter_id' => $userId))
+        )));
         $surveyEvents = $this->find('all', array(
             'conditions' => array('event_template_type_id' => '3'),
             'contain' => array(
                 'Course',
-                'EvaluationSubmission' => 'submitter_id = '.$userId,
+                'EvaluationSubmission',
             )
         ));
+
+        // clean up the empty EvaluationSubmissions, Cake put them in even if they are empty
+        foreach ($surveyEvents as $key => $events) {
+            if (!isset($events['EvaluationSubmission']['id']) || empty($events['EvaluationSubmission']['id'])) {
+                unset($surveyEvents[$key]['EvaluationSubmission']);
+            }
+        }
 
         return array_merge($evaluationEvents, $surveyEvents);
     }

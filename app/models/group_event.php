@@ -32,6 +32,17 @@ class GroupEvent extends AppModel
         ),
     );
 
+    public $hasMany = array(
+        'EvaluationSubmission' => array(
+            'className' => 'EvaluationSubmission',
+            'conditions' => '',
+            'order' => '',
+            'dependent' => true,
+            'foreignKey' => 'grp_event_id'
+        ),
+    );
+
+
     /**
      * insertGroups inserts all members into the groups_events table
      *
