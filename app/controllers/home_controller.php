@@ -48,7 +48,9 @@ class HomeController extends AppController
             $course_list = User::getMyDepartmentsCourseList('all');
         // students & tutors
         } else if (User::hasPermission('functions/onlytakeeval')) {
-            $this->redirect('studentIndex');
+            $this->set('data', $this->_preparePeerEvals());
+            $this->set('userId', $this->Auth->user('id'));
+            $this->render('studentIndex');
             return;
         // instructors
         } else {
@@ -58,20 +60,8 @@ class HomeController extends AppController
     }
 
     /**
-     * studentIndex
-     *
-     *
-     * @access public
-     * @return void
-     */
-     function studentIndex() {
-        $this->set('data', $this->_preparePeerEvals());
-        $this->set('userId', $this->Auth->user('id'));
-     }
-
-
-    /**
      * preparePeerEvals
+     * TODO: refactor to model
      *
      *
      * @access public
@@ -166,6 +156,7 @@ class HomeController extends AppController
 
     /**
      * _getEvaluation
+     * TODO: refactor to model
      *
      * @param mixed $userId user id
      * @param bool  $event  event
@@ -223,6 +214,7 @@ class HomeController extends AppController
 
     /**
      * _getSurveyEvaluation
+     * TODO: refactor to model
      *
      * @param mixed $courseId course id
      * @param bool  $event    event

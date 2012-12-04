@@ -10,15 +10,17 @@
 App::import('Lib', 'ExtendedAuthTestCase');
 App::import('Controller', 'Home');
 
-// mock instead of needing to create a new controller for every test
-print Mock::generatePartial(
+Mock::generatePartial(
     'HomeController',
     'MockHomeController',
     array('isAuthorized', 'render', 'redirect', '_stop', 'header')
 );
 
-class HomeControllerTest extends ExtendedAuthTestCase {
-    var $fixtures = array(
+class HomeControllerTest extends ExtendedAuthTestCase
+{
+    public $controller = null;
+
+    public $fixtures = array(
         'app.course', 'app.role', 'app.user', 'app.group',
         'app.roles_user', 'app.event', 'app.event_template_type',
         'app.group_event', 'app.evaluation_submission',
@@ -36,52 +38,82 @@ class HomeControllerTest extends ExtendedAuthTestCase {
 
     public function getController()
     {
-        $controller = new MockHomeController;
-        $controller->components = array_diff($controller->components, array("Guard.Guard"));
-        $controller->params['action'] = 'test';
-        $controller->__construct();
-        $controller->constructClasses();
-        return $controller;
+        return $this->controller;
     }
 
     function startCase()
     {
-        echo '<h1>Starting Test Case</h1>';
+        $this->defaultLogin = array(
+            'User' => array(
+                'username' => 'root',
+                'password' => md5('ipeeripeer')
+            )
+        );
     }
 
     function endCase()
     {
-        echo '<h1>Ending Test Case</h1>';
     }
 
-    function startTest()
+    function startTest($method)
     {
-/*    $controller = new FakeController();
-    $controller->constructClasses();
-    $controller->startupProcess();
-    $controller->Component->startup($controller);
-    $controller->Auth->startup($controller);
-    $admin = array('User' => array('username' => 'Admin',
-                                   'password' => 'passwordA'));
-$controller->Auth->login($admin);*/
-        echo 'Start Test';
+        echo $method.TEST_LB;
+        $this->controller = new MockHomeController();
     }
 
-    function endTest()
+    function endTest($method)
     {
-        echo '<hr />';
+        // defer logout to end of the test as some of the test need check flash
+        // message. After logging out, message is destoryed.
+        $this->controller->Auth->logout();
+        unset($this->controller);
+        ClassRegistry::flush();
     }
 
-    function testIndex() {
+    function testIndex()
+    {
         $result = $this->testAction('/home/index', array('return' => 'vars'));
-        var_dump($result);
-        $this->assertEqual($result['paramsForList']['data']['entries'][0]['Course']['course'], 'Math303');
-        $this->assertEqual($result['paramsForList']['data']['entries'][0]['Group']['group_num'], '1');
-        $this->assertEqual($result['paramsForList']['data']['entries'][0]['Group']['member_count'], '2');
-        $this->assertEqual($result['paramsForList']['data']['entries'][1]['Group']['group_num'], '2');
-        $this->assertEqual($result['paramsForList']['data']['entries'][1]['Group']['member_count'], '2');
-        $this->assertEqual($result['paramsForList']['data']['entries'][2]['Group']['group_num'], '3');
-        $this->assertEqual($result['paramsForList']['data']['entries'][2]['Group']['member_count'], '0');
+        $this->assertEqual(count($result['course_list']['A']), 2);
+        $this->assertEqual(count($result['course_list']['I']), 1);
+        $activeCourses = Set::sort($result['course_list']['A'], '{n}.Course.id', 'asc');
+        $inactiveCourses = $result['course_list']['I'];
+        $this->assertEqual(count($activeCourses[0]['Instructor']), 1);
+        $this->assertEqual(count($activeCourses[0]['Event']), 6);
+        $this->assertEqual(count($activeCourses[1]['Instructor']), 2);
+        $this->assertEqual(count($activeCourses[1]['Event']), 0);
+        $this->assertEqual(count($inactiveCourses[0]['Instructor']), 1);
+        $this->assertEqual(count($inactiveCourses[0]['Event']), 0);
     }
 
+    function testIndexInstructor()
+    {
+        $this->login = array(
+            'User' => array(
+                'username' => 'instructor1',
+                'password' => md5('ipeeripeer')
+            )
+        );
+        $result = $this->testAction('/home/index', array('return' => 'vars'));
+        $this->assertEqual(count($result['course_list']['A']), 1);
+        $this->assertFalse(isset($result['course_list']['I']));
+        $activeCourses = $result['course_list']['A'];
+        $this->assertEqual(count($activeCourses[0]['Instructor']), 1);
+        $this->assertEqual(count($activeCourses[0]['Event']), 6);
+    }
+
+    function testIndexStudent()
+    {
+        $this->login = array(
+            'User' => array(
+                'username' => '65498451',
+                'password' => md5('ipeeripeer')
+            )
+        );
+        $result = $this->testAction('/home/index', array('return' => 'vars'));
+        $this->assertEqual($result['userId'], 5);
+        $data = Set::sort($result['data'], '{n}.comingEvent.Event.id', 'asc');
+        $this->assertEqual(count($data), 6);
+        $this->assertEqual(Set::extract('/comingEvent/Event/id', $data), array(1,2,3,4,5));
+        $this->assertEqual(Set::extract('/eventSubmitted/Event/id', $data), array(6));
+    }
 }
