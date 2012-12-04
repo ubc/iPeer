@@ -109,6 +109,14 @@ class InstallController extends Controller
     {
         if (!is_writable(CONFIGS)) {
             $this->Session->setFlash(__('Cannot write to the configuration directory. Please change the permission on '.CONFIGS.' so that it is writable.', true));
+            return;
+        }
+
+        if (!file_exists(CONFIGS.'guard.php')) {
+            if (!copy(APP.DS.'plugins'.DS.'guard'.DS.'config'.DS.'guard.php', CONFIGS.'guard.php')) {
+                $this->Session->setFlash(__('Cannot copy the guard configuration (gurad.php) to the configuration directory.', true));
+                return;
+            }
         }
 
         if ($this->data) {

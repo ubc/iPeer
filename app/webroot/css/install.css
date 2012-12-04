@@ -78,6 +78,12 @@ div.install
 
 .install .text input, .install .password input, .install .textarea textarea
 {
-	width: 21em;
+    width: 21em;
 }
 
+.help
+{
+    font-size: 0.8em;
+    color: grey;
+    margin: 0.5em 0 0 0;
+}

@@ -1,15 +1,16 @@
 <?php
 // NOTE:
-// The detection logic should really be in the controller. But the code is 
+// The detection logic should really be in the controller. But the code is
 // pretty clean right now, so we'll defer that refactoring until needed.
 //
 // Need to be restyled so that it looks better. Deferred until default layout
 // is refactored.
 //
 
-function get_php_setting($val) {
-	$r =  (ini_get($val) == '1' ? 1 : 0);
-	return $r ? 'ON' : 'OFF';
+function get_php_setting($val)
+{
+    $r =  (ini_get($val) == '1' ? 1 : 0);
+    return $r ? 'ON' : 'OFF';
 }
 
 $no = '<b class="red">'.__('No', true).'</b>';
@@ -22,36 +23,35 @@ $mysql = $no;
 $configwritable = $no;
 $dbconfig = $no;
 $magicquotes = $yes;
+$guard_plugin = $no;
 
 // optional requirements init
 $sendmail = $no;
 $emailperm = $no;
 
 // mandatory requirements check
-if (version_compare(phpversion(), $REQPHPVER) >= 0)
-{
+if (version_compare(phpversion(), $REQPHPVER) >= 0) {
   $phpver = $yes;
 }
-if (function_exists('mysql_connect'))
-{
+if (function_exists('mysql_connect')) {
   $mysql = $yes;
 }
-if (is_writable(CONFIGS))
-{
+if (is_writable(CONFIGS)) {
   $configwritable = $yes;
 }
-if (is_writable(CONFIGS.'database.php'))
-{
+if (is_writable(CONFIGS.'database.php')) {
   $dbconfig = $yes;
 }
-if(get_magic_quotes_gpc())
-{ // magic quotes need to be off or json gets escaped, ref ticket #330
+if (get_magic_quotes_gpc()) {
+    // magic quotes need to be off or json gets escaped, ref ticket #330
     $magicquotes = $no;
+}
+if (file_exists(APP.DS.'plugins'.DS.'guard'.DS.'config'.DS.'guard.php') || file_exists(CONFIGS.'guard.php')) {
+    $guard_plugin = $yes;
 }
 
 // optional requirements check
-if (ini_get("sendmail_path"))
-{
+if (ini_get("sendmail_path")) {
   $sendmail = $yes;
 }
 $output;
@@ -81,7 +81,7 @@ $php_recommended_settings = array(
   ),
   array (
     'name' => 'Register Globals',
-    'directive' => 'register_globals', 
+    'directive' => 'register_globals',
     'recommend' => 'OFF'
   ),
   array (
@@ -138,18 +138,28 @@ foreach ($php_recommended_settings as &$setting)
     <td><?php __('magic_quotes_gpc is off ')?></td>
     <td><?php echo $magicquotes; ?></td>
   </tr>
+  <tr>
+    <td><?php __('Guard Plugin')?>
+        <div class='help'><?php __('If you cloned iPeer from git, you may need to run git submodule init and git submodule update.')?></div>
+    </td>
+    <td><?php echo $guard_plugin; ?></td>
+  </tr>
 </table>
 
 <h4>Optional</h4>
 
 <table>
   <tr>
-    <td width="70%"><?php __('Sendmail or Sendmail Wrapper <br />(Required if you want email functions.)')?></td>
+    <td width="70%"><?php __('Sendmail or Sendmail Wrapper')?>
+        <div class="help"><?php __('Required if you want email functions.')?></div>
+    </td>
     <td width="30%"><?php echo $sendmail ?></td>
   </tr>
   <tr>
-	  <td><?php __('Permissions for email scheduling. <br />If failed, remove Apache user from "/etc/at.deny" or "/var/at/at.deny"')?></td>
-	  <td><?php echo $emailperm; ?></td>
+      <td><?php __('Permissions for email scheduling.')?>
+        <div class="help"><?php __('If failed, remove Apache user from "/etc/at.deny" or "/var/at/at.deny"')?></div>
+      </td>
+      <td><?php echo $emailperm; ?></td>
   </tr>
 </table>
 
@@ -172,8 +182,8 @@ foreach ($php_recommended_settings as &$setting)
   ?>
 </table>
 <form action="<?php echo $html->url('install2') ?>" id="sysreqform">
-  <?php 
-  echo $form->submit('Next >>', array('id' => 'next')); 
+  <?php
+  echo $form->submit('Next >>', array('id' => 'next'));
   ?>
 </form>
 </div>

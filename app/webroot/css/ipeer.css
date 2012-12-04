@@ -108,9 +108,8 @@ p {
 {
     float: left;
     text-align: right;
-    margin: 0.5em 0;
     clear: left;
-    padding-right: 1em;
+    padding: 0.5em 1em 0 0;
     width: 13em;
 }
 

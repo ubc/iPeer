@@ -52,9 +52,6 @@ class InstallValidationStep3 extends AppModel
         'login' => array(
             'rule' => 'notEmpty',
         ),
-        'password' => array(
-            'rule' => 'notEmpty',
-        ),
         'database' => array(
             'rule' => 'notEmpty',
         ),
