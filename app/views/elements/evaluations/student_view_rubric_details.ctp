@@ -2,48 +2,41 @@
 $gradeReleased = isset($scoreRecords[$currentUser['id']])? $scoreRecords[$currentUser['id']]['grade_released']: 1;
 $commentReleased = isset($scoreRecords[$currentUser['id']])? $scoreRecords[$currentUser['id']]['comment_released']: 1;
 $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
-
 ?>
-<table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
-	<tr class="tableheader" align="center">
+<table class="standardtable">
+	<tr>
     <td width="100" valign="top"><?php __('Person Being Evaluated')?></td>
-    <?php
-      for ($i=1; $i<=$rubric['Rubric']["criteria"]; $i++) {
-    		echo "<td><strong><font color=" . $color[ $i % sizeof($color) ] . ">" . ($i) . ". "  . "</font></strong>";
-    		echo $rubricCriteria[0]['criteria'];
-    		echo "</td>";
-    	}
-    ?>
-  </tr>
- <?php
-if (!$gradeReleased && !$commentReleased) {
-  $cols = $rubric['Rubric']["criteria"]+1;
-  echo "<tr class=\"tablecell2\" align=\"center\"><td colspan=".$cols.">";
-  echo "<font color=\"red\">".__('Comments/Grades Not Released Yet.')."</font></td></td>";
-}else if ($gradeReleased || $commentReleased) {
+    <?php foreach ($rubricCriteria as $criteria) { ?>
+    	<td><?php echo $criteria['criteria']?></td>
+    <?php } ?>
+    </tr>
+<?php if (!$gradeReleased && !$commentReleased) {
+  $cols = $rubric['Rubric']["criteria"]+1; ?>
+  <tr id='details' align="center"><td colspan="<?php echo $cols ?>">
+  <font color="red"><?php __('Comments/Grades Not Released Yet.') ?></font></td></tr>
+<?php } else if ($gradeReleased || $commentReleased) {
   if (isset($evalResult[$userId])) {
-   //Retrieve the individual rubric detail
+    //Retrieve the individual rubric detail
    $memberResult = $evalResult[$userId];
    if (isset($scoreRecords)) {
      shuffle($memberResult);
    }
    foreach ($memberResult AS $row):
-     $memberRubric = $row['EvaluationRubric'];
-     echo "<tr class=\"tablecell2\">";
-     if ($currentUser['id']!=$row['EvaluationRubric']['creator_id']) {
-       echo "<td width='15%'>".$currentUser['full_name']."</td>";
-     } else {
-        $member = $membersAry[$memberRubric['evaluatee']];
-        echo "<td width='15%'>".$member['User']['full_name']."</td>";
-     }
+     $memberRubric = $row['EvaluationRubric']; ?>
+     <tr id='details'>
+     <?php if ($currentUser['id']!=$row['EvaluationRubric']['creator_id']) { ?>
+        <td width='15%'><?php echo $currentUser['full_name'] ?></td>
+     <?php } else { 
+        $member = $membersAry[$memberRubric['evaluatee']]; ?>
+        <td width='15%'><?php echo $member['User']['first_name'].' '.$member['User']['last_name'] ?></td>
+     <?php }
 
      $resultDetails = $memberRubric['details'];
-     foreach ($resultDetails AS $detail) : $rubDet = $detail['EvaluationRubricDetail'];
-        echo "<td valign=\"middle\">";
-        echo "<br />";
-        //Points Detail
-        echo "<strong>Points: </strong>";
-        if ($gradeReleased && isset($rubDet)) {
+     foreach ($resultDetails AS $detail) : $rubDet = $detail['EvaluationRubricDetail']; ?>
+        <td valign=\"middle\"><br />
+        <!-- Points Detail -->
+        <strong><?php echo __('Points', true) ?>: </strong>
+        <? if ($gradeReleased && isset($rubDet)) {
         		$lom = $rubDet["selected_lom"];
         	$empty = $rubric["Rubric"]["lom_max"];
         	for ($v = 0; $v < $lom; $v++) {
@@ -52,11 +45,11 @@ if (!$gradeReleased && !$commentReleased) {
         	}
         	for ($t=0; $t < $empty; $t++) {
         		echo $html->image('evaluations/circle_empty.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle_empty'));
-        	}
-        	echo "<br />";
-        } else {
-        	echo "n/a<br />";
-        }
+        	} ?>
+        	<br />
+        <?php } else { ?>
+        	n/a<br />
+        <?php } 
 
         //Grade Detail
         /*echo "<strong>Grade: </strong>";
@@ -65,33 +58,32 @@ if (!$gradeReleased && !$commentReleased) {
         } else {
         	echo "n/a<br />";
         }*/
-        //Comments
-        echo "<br/><strong>".__('Comment', true).": </strong>";
-        if ($commentReleased && isset($rubDet)) {
+        //Comments 
+        ?>
+        <br/><strong><?php echo __('Comment', true) ?>: </strong>
+        <?php if ($commentReleased && isset($rubDet)) {
         	echo $rubDet["criteria_comment"];
-        } else {
-        	echo "n/a<br />";
-        }
+        } else { ?>
+        	n/a<br />
+        <?php } ?>
 
-        echo "</td>";
-     endforeach;
-     //echo "<td>";
-     //echo "</td>";
-     echo "</tr>";
-     //General Comment
-     echo "<tr class=\"tablecell2\">";
-     echo "<td></td>";
-     $col = $rubric['Rubric']['criteria'] + 1;
-     echo "<td colspan=".$col.">";
-     echo "<strong>".__('General Comment').": </strong><br>";
-     if ($commentReleased) {
+        </td>
+     <?php endforeach; ?>
+     </tr>
+     <!-- General Comment -->
+     <tr id='details'>
+     <td></td> 
+     <?php $col = $rubric['Rubric']['criteria'] + 1; ?>
+     <td colspan="<?php echo $col ?>">
+     <strong><?php __('General Comment') ?>: </strong><br>
+     <?php if ($commentReleased) {
        echo $memberRubric['general_comment'];
-     }else {
-      	echo "n/a<br />";
-     }
-     echo "<br><br></td>";
-     echo "</tr>";
-         endforeach;
+     }else { ?>
+      	n/a<br />
+     <?php } ?>
+     <br><br></td>
+     </tr>
+    <?php endforeach;
     }
 }
  ?>

@@ -175,6 +175,10 @@ strong {
     text-align: center;
 }
 
+.standardtable #details td {
+    background-color: #F1F1F1;
+}
+
 /* css for timepicker */
 div.ui-datepicker { font-size: 0.85em; }
 .ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
@@ -1045,9 +1049,9 @@ i {
 }
 
 .panelheader{
-    border : 5px solid #24588C;
-    background-color : #24588C;
-    color : #A8B0C4;
+    border : 5px solid khaki;
+    background-color : khaki;
+    color : #666666;
 }
 
 .mdHover {
@@ -1061,15 +1065,15 @@ i {
     color : #FA7E04;
 }
 .mdSelected {
-    border : 5px solid #24588C;
-    background-color : #24588C;
-    color : #ffffff;
+    border : 5px solid khaki;
+    background-color : khaki;
+    color : #000000;
 }
 .panelContent {
-    border : 5px solid #F1F1F1;
+    border : 5px solid white;
     border-top-width    : 0px;
     border-bottom-width : 0px;
-    background-color: #F1F1F1;
+    background-color: white;
     font-weight:normal;
     font-size: 0.9em;
 }

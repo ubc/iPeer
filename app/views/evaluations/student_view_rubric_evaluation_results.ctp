@@ -1,3 +1,55 @@
+<h2><?php __('Evaluation Result Detail')?></h2>
+<!-- Event Details Table -->
+<table class="standardtable">
+<tr>
+    <th><?php __('Event Name')?></th>
+    <th><?php __('Evaluated By')?></th>
+    <th><?php __('Due Date')?></th>
+    <th><?php __('Self-Evaluation')?></th>
+</tr>
+<tr>
+    <td><?php echo $event['Event']['title'] ?></td>
+    <td><?php echo $event['group_name'] ?></td>
+    <td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($event['Event']['due_date']))) ?></td>
+    <td><?php echo ($event['Event']['self_eval']) ? 'Yes' : 'No' ?></td>
+</tr>
+</table>
+
+<table class="standardtable">
+<tr>
+    <th><?php __('Description')?></th>
+</tr>
+<tr>
+    <td><?php echo $event['Event']['description'] ?></td>
+</tr>
+</table>
+
+<h2><?php __('Summary')?></h2>
+<table class="standardtable">
+<tr>
+    <th><?php __('Rating')?></th>
+</tr>
+<tr>
+    <td>
+    <?php 
+    isset($scoreRecords[$currentUser['id']]['grade_released'])? $gradeReleaseStatus = $scoreRecords[$currentUser['id']]['grade_released'] : $gradeReleaseStatus = array();
+    if ($gradeReleaseStatus) {
+            $finalAvg = $memberScoreSummary[$currentUser['id']]['received_ave_score'] - $ratingPenalty;
+            ($ratingPenalty > 0) ? ($stringAddOn = ' - '.'('.'<font color=\'red\'>'.$ratingPenalty.'</font>'.
+                ')'.'<font color=\'red\'>*</font>'.' = '.number_format($finalAvg, 2)) : $stringAddOn = '';
+                
+            echo number_format($memberScoreSummary[$currentUser['id']]['received_ave_score'], 2).$stringAddOn;
+            $ratingPenalty > 0 ? $penaltyNote = '&nbsp &nbsp &nbsp &nbsp &nbsp ( )'.'<font color=\'red\'>*</font>'.' : '.$studentResult['penalty'].
+                '% late penalty.' : $penaltyNote = '';
+            echo $penaltyNote;
+        } else {
+            echo __('Not Released', true);
+        }
+    ?>
+    </td>
+</tr>
+</table>
+
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>
@@ -7,18 +59,6 @@
 <?php echo $html->script('ricopanelcontainer')?>
 <?php echo $html->script('ricoaccordion')?>
 <?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
-    <!-- Render Event Info table -->
-	  <?php
-	  if (isset($memberScoreSummary[$currentUser['id']])) {
-  	  $receviedAvePercent = $memberScoreSummary[$currentUser['id']]['received_ave_score'] / $rubric['Rubric']['total_marks'] * 100;
-  	  $releaseStatus = $scoreRecords[$currentUser['id']]['grade_released'];
-  	} else {
-  	  $receviedAvePercent = 0;
-  	}
-    $params = array('controller'=>'evaluations', 'event'=>$event, 'ratingPenalty' => $ratingPenalty, 'gradeReleaseStatus'=>isset($scoreRecords[$currentUser['id']]['grade_released'])?$scoreRecords[$currentUser['id']]['grade_released'] : array(), 
-        'aveScore'=>isset($memberScoreSummary[$currentUser['id']]['received_ave_score']) ? number_format($memberScoreSummary[$currentUser['id']]['received_ave_score'], 2) : 0, 'groupAve'=>null);
-    echo $this->element('evaluations/student_view_event_info', $params);
-    ?>
 <div id='rubric_result'>
 
 <?php
@@ -56,13 +96,13 @@ if (isset($scoreRecords[$currentUser['id']])) {
 		  <div id="panelResultsHeader" class="panelheader">
 		  	<?php echo __('Evaluation Results From Your Teammates. (Randomly Ordered)       ', true);
 		  	if ( !$gradeReleased && !$commentReleased) {
-          echo '<font color="red">'.__('Comments/Grades Not Released Yet.', true).'</font>';
-		  	}	else if ( !$gradeReleased) {
-		  	  echo '<font color="red">'.__('Grades Not Released Yet.', true).'</font>';
-        }	else if ( !$commentReleased) {
-		  	  echo '<font color="red">'.__('Comments Not Released Yet.', true).'</font>';
-        }
-?>
+                echo '<font color="red">'.__('Comments/Grades Not Released Yet.', true).'</font>';
+		  	} else if ( !$gradeReleased) {
+		  	    echo '<font color="red">'.__('Grades Not Released Yet.', true).'</font>';
+            } else if ( !$commentReleased) {
+		  	    echo '<font color="red">'.__('Comments Not Released Yet.', true).'</font>';
+            }
+            ?>
 		  </div>
 		  <div style="height: 200px;" id="panelResultsContent" class="panelContent">
   	  <?php
