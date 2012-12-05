@@ -1,3 +1,56 @@
+<h2><?php __('Evaluation Result Detail')?></h2>
+<!-- Event Details Table -->
+
+<table class="standardtable">
+<tr>
+    <th><?php __('Event Name')?></th>
+    <th><?php __('Evaluated By')?></th>
+    <th><?php __('Due Date')?></th>
+    <th><?php __('Self-Evaluation')?></th>
+</tr>
+<tr>
+    <td><?php echo $event['Event']['title'] ?></td>
+    <td><?php echo $event['group_name'] ?></td>
+    <td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($event['Event']['due_date']))) ?></td>
+    <td><?php echo ($event['Event']['self_eval']) ? 'Yes' : 'No' ?></td>
+</tr>
+</table>
+
+<table class="standardtable">
+<tr>
+    <th><?php __('Description')?></th>
+</tr>
+<tr>
+    <td><?php echo $event['Event']['description'] ?></td>
+</tr>
+</table>
+
+<h2><?php __('Summary')?></h2>
+<table class="standardtable">
+<tr>
+    <th><?php __('Rating')?></th>
+</tr>
+<tr>
+    <td>
+    <?php 
+    isset($scoreRecords[$currentUser['id']]['grade_released'])? $gradeReleaseStatus = $scoreRecords[$currentUser['id']]['grade_released'] : $gradeReleaseStatus = array();
+    if ($gradeReleaseStatus) {
+            $finalAvg = $memberScoreSummary[$currentUser['id']]['received_ave_score'] - number_format($avePenalty, 2);
+            (number_format($avePenalty, 2) > 0) ? ($stringAddOn = ' - '.'('.'<font color=\'red\'>'.number_format($avePenalty, 2).'</font>'.
+                ')'.'<font color=\'red\'>*</font>'.' = '.number_format($finalAvg, 2)) : $stringAddOn = '';
+                
+            echo number_format($memberScoreSummary[$currentUser['id']]['received_ave_score'], 2).$stringAddOn;
+            number_format($avePenalty, 2) > 0 ? $penaltyNote = '&nbsp &nbsp &nbsp &nbsp &nbsp ( )'.'<font color=\'red\'>*</font>'.' : '.$studentResult['penalty'].
+                '% late penalty.' : $penaltyNote = '';
+            echo $penaltyNote;
+        } else {
+            echo __('Not Released', true);
+        }
+    ?>
+    </td>
+</tr>
+</table>
+
 <table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td>
@@ -16,9 +69,6 @@
   	  $receviedAvePercent = 0;
   	  $releaseStatus = array();
   	}
-    $params = array('controller'=>'evaluations', 'event'=>$event, 'gradeReleaseStatus'=>$releaseStatus, 'ratingPenalty' => number_format($avePenalty, 2), 
-        'penalty' => $penalty, 'aveScore'=>isset($memberScoreSummary[$currentUser['id']]['received_total_score']) ? number_format($memberScoreSummary[$currentUser['id']]['received_total_score'], 2) : 0, 'groupAve'=>null);
-    echo $this->element('evaluations/student_view_event_info', $params);
     ?>
 <div id='mixeval_result'>
 
