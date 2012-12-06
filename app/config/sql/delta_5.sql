@@ -448,7 +448,7 @@ COLLATE = utf8_general_ci;
 
 INSERT INTO roles_users (role_id, user_id, created, modified) (SELECT 2, id, NOW(), NOW() FROM  `users` WHERE  `role` =  'A' AND id != 1);
 INSERT INTO roles_users (role_id, user_id, created, modified) (SELECT 3, id, NOW(), NOW() FROM  `users` WHERE  `role` =  'I');
-INSERT INTO roles_users (role_id, user_id, created, modified) (SELECT 4, id, NOW(), NOW() FROM  `users` WHERE  `role` =  'S');
+INSERT INTO roles_users (role_id, user_id, created, modified) (SELECT 5, id, NOW(), NOW() FROM  `users` WHERE  `role` =  'S');
 UPDATE `users` SET `created`=NOW() WHERE `created` = '0000-00-00 00:00:00';
 ALTER TABLE `users` CHARACTER SET = utf8 
 , CHANGE  `created`  `created` DATETIME NULL DEFAULT NULL
