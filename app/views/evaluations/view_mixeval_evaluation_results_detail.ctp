@@ -62,7 +62,7 @@ echo $html->script('ricoaccordion');
       		            $avgPerQuestion = 0;
         	            for ($j = 1; $j <= $mixeval['Mixeval']["lickert_question_max"]; $j++) {
                             if (!empty($scoreRecords[$member['User']['id']]['mixeval_question_ave'])) {
-                                $criteriaAveGrade = $scoreRecords[$member['User']['id']]['mixeval_question_ave'][$j-1];
+                                $criteriaAveGrade = $scoreRecords[$member['User']['id']]['mixeval_question_ave'][$j];
                             } else {
                                 $criteriaAveGrade = 0;
                             }

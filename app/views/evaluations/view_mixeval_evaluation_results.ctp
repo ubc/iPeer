@@ -57,7 +57,7 @@ foreach ($groupMembersNoTutors as $member) {
         <td><?php __("Group Average:");?></td>
         <td><?php echo ($allMembersCompleted ? number_format($aveScoreSum / count($groupMembers), 2) : '-')?></td>
     </tr>
-    <?php if ($allMembersCompleted) {?>
+    <?php if ($allMembersCompleted): ?>
     <tr class="tablecell2" align="center">
       <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
               <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
@@ -70,12 +70,12 @@ foreach ($groupMembersNoTutors as $member) {
     <?php if ($event['group_event_marked'] == "reviewed"): ?>
         <input class="reviewed" type="submit" name="mark_not_reviewed" value="<?php __('Mark Peer Evaluations as Not Reviewed')?>" />
     <?php else: ?>
-        <input class="reviewed" type="submit" name="mark_reviewed" value="<?php __('Mark Peer Evaluations as Reviewed')?>" />";
+        <input class="reviewed" type="submit" name="mark_reviewed" value="<?php __('Mark Peer Evaluations as Reviewed')?>" />
     <?php endif; ?>
-    </td>
-    </form>
-  </tr>
-<?php } ?>
+        </td>
+      </form>
+    </tr>
+    <?php endif; ?>
 </table>
 </div>
 
