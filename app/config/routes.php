@@ -96,8 +96,7 @@ if (file_exists(CONFIGS.'installed.txt')) {
   // the /* directive would just redirect every page to the index page
   // of install, including the install/install2/, etc. steps of install
   Router::connect('/install/:action/*', array('controller' => 'install'));
+  Router::connect('/upgrade', array('controller' => 'upgrade', 'action' => 'index'));
+  Router::connect('/upgrade/:action', array('controller' => 'upgrade', 'action' => 'index'));
   Router::connect('/*', array('controller' => 'install'));
 }
-
-
-?>

@@ -1596,7 +1596,6 @@ class EvaluationsController extends AppController
             if (isset($this->params['form']['evaluator_ids'])) {
                 $groupEventId = $this->params['form']['group_event_id'];
                 $evaluatorIds = $this->params['form']['evaluator_ids'];
-                $this->log($this->params);
                 $this->Evaluation->changeSimpleEvaluationCommentRelease($groupEventId, $evaluatorIds, $this->params);
             }
 

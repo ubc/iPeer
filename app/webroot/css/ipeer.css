@@ -1387,3 +1387,18 @@ table.event-view td {
 table.event-view table td {
     border: 0;
 }
+
+.text-button {
+    -webkit-box-shadow:rgba(0,0,0,0.2) 0 1px 0 0;
+    -moz-box-shadow:rgba(0,0,0,0.2) 0 1px 0 0;
+    box-shadow:rgba(0,0,0,0.2) 0 1px 0 0;
+    color:#333;
+    background-color: white;
+    border-radius:3px;
+    -moz-border-radius:3px;
+    -webkit-border-radius:3px;
+    border: 1px solid;
+    height:32px;
+    padding:4px 16px;
+    text-decoration:none !important;
+}

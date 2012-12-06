@@ -13,6 +13,18 @@ class SysParameter extends AppModel
     public $name = 'SysParameter';
     public $actsAs = array('Traceable');
 
+    public $validate = array (
+        'parameter_code' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Parameter code is required',
+        ),
+        'parameter_type' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Parameter code is required',
+            'on' => 'create',
+        )
+    );
+
     /**
      * findParameter
      *
@@ -44,15 +56,35 @@ class SysParameter extends AppModel
      * @access public
      * @return void
      */
-    function get($paramCode)
+    function get($paramCode, $default = null)
     {
-        $result = null;
+        $result = $default;
         $parameter = $this->findParameter($paramCode);
         if ($parameter != null) {
             $result = $parameter['SysParameter']['parameter_value'];
         }
 
         return $result;
+    }
+
+    /**
+     * set a value to database
+     *
+     * @param mixed $paramCode
+     * @param mixed $value
+     *
+     * @access public
+     * @return void
+     */
+    function setValue($paramCode, $value)
+    {
+        $obj = $this->findParameter($paramCode);
+        if ($obj) {
+            $obj['SysParameter']['parameter_value'] = $value;
+            return $this->save($obj);
+        }
+
+        return false;
     }
 
     /**
@@ -65,36 +97,24 @@ class SysParameter extends AppModel
     function beforeSave()
     {
         $this->data[$this->name]['modified'] = date('Y-m-d H:i:s');
-        // Ensure the name is not empty
-        if (empty($this->data['SysParameter']['id'])) {
-
-
-            $this->errorMessage = "Id is required";
-            return false;
-        }
-
-        if (!is_numeric($this->data['SysParameter']['id'])) {
-
-            $this->errorMessage = "Id must be a number";
-            return false;
-        }
-
-
-        if (empty($this->data['SysParameter']['parameter_code'])) {
-
-            $this->errorMessage = "Parameter code is required";
-            return false;
-        }
-        if (empty($this->data['SysParameter']['parameter_type'])) {
-            $this->errorMessage = "Parameter type is required";
-            return false;
-        }
-
-        Cache::write($this->data['SysParameter']['parameter_code'], $this->data['SysParameter'], 'configuration');
 
         return true;
     }
 
+    /**
+     * afterSave
+     *
+     * @param boolean $created
+     *
+     * @access public
+     * @return void
+     */
+    function afterSave($created)
+    {
+        Cache::write($this->data['SysParameter']['parameter_code'], $this->data['SysParameter'], 'configuration');
+
+        return true;
+    }
 
     /**
      * getDatabaseVersion
@@ -105,11 +125,17 @@ class SysParameter extends AppModel
      */
     public function getDatabaseVersion()
     {
-        $ret = $this->field('parameter_value', array('parameter_code' => 'database.version'));
-        if ($ret == false) {
-            throw new UnexpectedValueException(__('Could not retrieve database version from the database.', true));
-        }
-        return $ret;
+        return $this->field('parameter_value', array('parameter_code' => 'database.version'));
     }
 
+    /**
+     * reload force reload by clearing the cache
+     *
+     * @access public
+     * @return void
+     */
+    public function reload()
+    {
+        Cache::clear(false, 'configuration');
+    }
 }

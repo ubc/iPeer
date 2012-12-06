@@ -8,30 +8,43 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class UpgradeController extends AppController
+class UpgradeController extends Controller
 {
-    public $name = "Upgrade";
-    public $uses         = array();
-    public $components   = array('Output',
-        'framework',
-        'Session',
-        'Guard.Guard',
-        'DbPatcher'
-    );
+    public $name       = "Upgrade";
+    public $uses       = array();
+    public $components = array('Session', 'Upgrader');
+    public $layout = 'installer';
 
     /**
-     * __construct
+     * beforeFilter
      *
-     *
-     * @access protected
+     * @access public
      * @return void
      */
-    function __construct()
+    function beforeFilter()
     {
-        $this->set('title_for_layout', __('Upgrade Database', true));
-        parent::__construct();
-    }
+        Cache::clear(false, 'configuration');
+        $this->set('title_for_layout', __('Upgrade', true));
+        if (!class_exists('DATABASE_CONFIG')) {
+            // not a valid installation
+            $this->Session->setFlash(__('It seems you do not have a installation of iPeer. Please install it first!', true));
+            $this->redirect('/install');
+            return;
+        } elseif (!file_exists(CONFIGS.'installed.txt')) {
+            // 2.x upgrade
+            $sysp = ClassRegistry::init('SysParameter');
+            if (null == $sysp->get('system.version', null)) {
+                return;
+            }
+        }
 
+        // 3.x and above upgrade, enable permission
+        $permission = array_filter(array('controllers', ucwords($this->params['plugin']), ucwords($this->params['controller']), $this->params['action']));
+        if (!User::hasPermission(join('/', $permission))) {
+            $this->Session->setFlash('Error: You do not have permission to access the page.');
+            $this->redirect('/home');
+        }
+    }
 
     /**
      * index
@@ -42,13 +55,8 @@ class UpgradeController extends AppController
      */
     function index()
     {
-        if ($this->checkPermission()) {
-            $this->set('isadmin', false); // tell view user doesn't have access
-        } else {
-            $this->set('isadmin', true);
-        }
+        $this->set('is_upgradable', $this->Upgrader->isUpgradable());
     }
-
 
     /**
      * step2
@@ -59,33 +67,10 @@ class UpgradeController extends AppController
      */
     function step2()
     {
-        if ($this->checkPermission()) {
-            $this->set('isadmin', false);
-        } else {
-            $this->set('isadmin', true);
-            $this->set('upgradefailed', false); // tell view the upgrade worked fine
-            $dbv = $this->SysParameter->getDatabaseVersion();
-            $ret = $this->DbPatcher->patch($dbv);
-            if ($ret) {
-                $this->set('upgradefailed', $ret);
-            }
+        $result = $this->Upgrader->upgrade();
+        if ($result) {
+            $this->Session->destroy();
         }
-    }
-
-
-    /**
-     * checkPermission
-     *
-     *
-     * @access public
-     * @return void
-     */
-    function checkPermission()
-    {
-        if (User::hasPermission('controllers/upgrade')) {
-            $this->Session->setFlash(__('Sorry, you do not have access to this page. Only administrators can perform a database upgrade. If you are an administrator, please login and then go to this page to perform the upgrade.', true));
-            return true;
-        }
-        return false;
+        $this->set('upgrade_success', $result);
     }
 }

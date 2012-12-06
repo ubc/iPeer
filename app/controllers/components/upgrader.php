@@ -1,6 +1,6 @@
 <?php
 /**
- * DbPatcherComponent
+ * UpgraderComponent
  *
  * @uses Object
  * @package   CTLT.iPeer
@@ -8,161 +8,70 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class DbPatcherComponent extends Object
+class UpgraderComponent extends Object
 {
-    public $controller = true;
+    public $scripts = array();
 
     /**
-     * patch
-     *
-     * @param mixed $from_version from version
-     * @param bool  $dbConfig     db config
+     * __construct
      *
      * @access public
      * @return void
      */
-    public function patch($from_version, $dbConfig = null)
+    public function __construct()
     {
-        $ret = $this->connectDb($dbConfig);
-        if ($ret) {
-            // Unable to connect
-           return $ret;
-        }
-
-        // Apply the delta files
-        for ($i = $from_version+1; $i <= Configure::read('DATABASE_VERSION'); $i++) {
-            // Check that we can read the delta file
-            $file = CONFIGS.'sql/delta_'.$i.'.sql';
-            if (!is_readable($file)) {
-                mysql_close();
-                return "Cannot read delta file $file";
+        $scriptNames = glob(APP.DS.'libs'.DS.'upgrade_scripts/*.php');
+        sort($scriptNames);
+        foreach ($scriptNames as $script) {
+            if (basename($script) == 'upgrade_base.php') {
+                continue;
             }
-            $ret = $this->applyDelta($file);
-            if ($ret) {
-                mysql_close();
-                return 'DB Version '. $from_version . ' Failed to apply delta file: '.$file.'. Message = '.$ret;
-            }
+            require_once($script);
+            $name = Inflector::classify(basename($script, '.php'));
+            $this->scripts[] = new $name();
         }
-
-        // apply the other changes
-        $ret = $this->updateDatabaseVersion();
-        if ($ret) {
-            mysql_close();
-            return "Database upgrade successful, however, failed to increment database version counter, please do this manually: " . $ret;
-        }
-        mysql_close();
-
-        return false;
     }
 
+    public function startup($controller)
+    {
+        $this->controller = $controller;
+    }
 
     /**
-     * connectDb
+     * isUpgradable check if the current instance is upgradable
      *
-     * @param mixed $dbConfig
-     *
-     * @access private
+     * @access public
      * @return void
      */
-    private function connectDb($dbConfig)
+    public function isUpgradable()
     {
-        // Read the database configuration from database.php
-        $dbConfig = new DATABASE_CONFIG();
-        $dbConfig = $dbConfig->default;
-
-        if (null == $dbConfig) {
-            $db = new DATABASE_CONFIG();
-            $dbConfig = $db->default;
-        }
-        $mysql = mysql_connect($dbConfig['host'], $dbConfig['login'], $dbConfig['password']);
-        if (!$mysql) {
-            return 'Could not connect to database!';
-        }
-
-        //Open the database
-        $mysqldb = mysql_select_db($dbConfig['database']);
-        if (!$mysqldb) {
-            return 'Could not find database '.$dbConfig['database'].'!';
+        foreach ($this->scripts as $script) {
+            if ($script->isUpgradable()) {
+                return true;
+            }
         }
 
         return false;
     }
 
-
     /**
-     * applyDelta
+     * upgrade
      *
-     * @param mixed $file
-     *
-     * @access private
+     * @access public
      * @return void
      */
-    private function applyDelta($file)
+    public function upgrade()
     {
-        $fp = fopen($file, "r");
-        if (false === $fp) {
-            return "Could not open ".$file;
-        }
-        mysql_query('BEGIN');
-
-        $cmd = "";
-        $done = false;
-
-        while (!feof($fp)) {
-            $line = trim(fgets($fp, 1024));
-            $sl = strlen($line) - 1;
-
-            if ($sl < 0) {
-                continue;
-            }
-            if ("-" == $line{0} && "-" == $line{1}) {
-                continue;
-            }
-
-            if (";" == $line{$sl}) {
-                $done = true;
-                $line = substr($line, 0, $sl);
-            }
-
-            if ("" != $cmd) {
-                $cmd .= " ";
-            }
-            $cmd .= $line;
-
-            if ($done) {
-                $result = mysql_query($cmd);
-                if (!$result) {
-                    $err = mysql_error();
-                    mysql_query("ROLLBACK");
-                    return "Cannot run query from $file - $cmd - $err";
+        foreach ($this->scripts as $script) {
+            if ($script->isUpgradable()) {
+                if (!$script->upgrade()) {
+                    $this->controller->Session->setFlash(join(';', $script->errors));
+                    return false;
                 }
-                $cmd = "";
-                $done = false;
             }
         }
-        fclose($fp);
-        mysql_query("COMMIT");
-        return false;
+
+        return true;
     }
-
-
-    /**
-     * updateDatabaseVersion
-     *
-     * @access private
-     * @return void
-     */
-    private function updateDatabaseVersion()
-    {
-        // it should be safe to assume that we have a database.version entry
-        // since we're starting from version 3
-        $ret = mysql_query("update `sys_parameters` set `parameter_value` = ".
-            Configure::read('DATABASE_VERSION')." where `parameter_code` = 'database.version';");
-        if ($ret == false) {
-            return mysql_error();
-        }
-        return false;
-    }
-
 }
 

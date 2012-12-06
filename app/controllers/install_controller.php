@@ -18,10 +18,8 @@ class InstallController extends Controller
         'InstallValidationStep4'
     );
     public $components   = array(
-        'Output',
         'Session',
         'installHelper',
-        'DbPatcher'
     );
     public $helpers = array('Session', 'Html', 'Js');
     public $layout = 'installer';
@@ -73,9 +71,15 @@ class InstallController extends Controller
      */
     function install3()
     {
+        if ($this->data['InstallValidationStep3']['data_setup_option'] == 'C') {
+            $this->redirect(array('controller' => 'upgrade'));
+            return;
+        }
+
         if (!is_writable(CONFIGS.'database.php')) {
             $this->Session->setFlash(__('Cannot write to the database configuration file. Please change the permission on '.CONFIGS.'/database.php so that it is writable.', true));
         }
+
 
         if ($this->data) {
             // we have data submitted
@@ -151,7 +155,7 @@ class InstallController extends Controller
             // mark this instance as installed
             $f = fopen(CONFIGS.'installed.txt', 'w');
             if (!$f) {
-                $this->Session->setFlash(__('Installation failed, unable to write to '. CONFIGS .' dir'), true);
+                $this->Session->setFlash(__('Installation failed, unable to write to '. CONFIGS .' dir', true));
                 $this->redirect(array('action' => 'install4'));
                 return;
             }
