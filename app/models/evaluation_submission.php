@@ -14,11 +14,14 @@ class EvaluationSubmission extends AppModel
     public $actsAs = array('Traceable');
 
     public $belongsTo = array(
-        'Event' =>
-        array(
+        'Event' => array(
             'className' => 'Event',
             'foreignKey' => 'event_id'
-        )
+        ),
+        'GroupEvent' => array(
+            'className' => 'GroupEvent',
+            'foreignKey' => 'grp_event_id',
+        ),
     );
 
     /**
@@ -68,10 +71,10 @@ class EvaluationSubmission extends AppModel
     function numCountInGroupCompleted($groupEventId)
     {
         return $this->find(
-            'count', 
+            'count',
             array(
                 'conditions' => array(
-                    'EvaluationSubmission.submitted' => 1, 
+                    'EvaluationSubmission.submitted' => 1,
                     'EvaluationSubmission.grp_event_id' => $groupEventId
                 ),
             )
