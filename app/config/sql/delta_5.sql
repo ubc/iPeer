@@ -220,7 +220,7 @@ ALTER TABLE `mixevals` CHARACTER SET = utf8
 , CHANGE COLUMN `availability` `availability` VARCHAR(10) NOT NULL DEFAULT 'public'  ;
 UPDATE mixevals SET zero_mark=0 where zero_mark=2;
 
-# change mixeval question description question number to question_id
+-- change mixeval question description question number to question_id
 UPDATE mixevals_question_descs as qd, mixevals_questions as q set qd.question_num = q.id where qd.mixeval_id = q.mixeval_id AND qd.question_num = q.question_num;
 ALTER TABLE `mixevals_question_descs` CHARACTER SET = utf8 
 , DROP COLUMN `mixeval_id` 
@@ -345,10 +345,10 @@ ALTER TABLE `rubrics_criteria_comments` CHARACTER SET = utf8
 , ADD FOREIGN KEY ( `rubrics_loms_id` ) REFERENCES  `rubrics_loms` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 , ADD FOREIGN KEY ( `criteria_id` ) REFERENCES `rubrics_criterias` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT ;
 
-# change rubrics_criteria_comments to associate with rubrics_criterias by criteria id
+-- change rubrics_criteria_comments to associate with rubrics_criterias by criteria id
 UPDATE rubrics_criteria_comments as rcc set criteria_id = (SELECT id from rubrics_criterias as rc WHERE rc.rubric_id = rcc.rubric_id AND rc.criteria_num = rcc.criteria_num);
 
-# change Criteria comments lom_num to LOM ids
+-- change Criteria comments lom_num to LOM ids
 UPDATE rubrics_criteria_comments as rcc, rubrics_criterias as rc, rubrics as r, rubrics_loms as rl set rcc.lom_num=rl.id where rcc.criteria_id = rc.id AND rc.rubric_id = r.id  AND rl.rubric_id = r.id AND rl.lom_num = rcc.lom_num;
 
 ALTER TABLE `rubrics_criteria_comments` DROP COLUMN `lom_num` 
@@ -459,6 +459,8 @@ ALTER TABLE `users` CHARACTER SET = utf8
 
 DROP TABLE IF EXISTS `sys_functions` ;
 
+-- some house clean up
+DELETE FROM `group_events` WHERE `group_id` = 0;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
