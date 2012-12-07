@@ -35,7 +35,10 @@ class EvaluationSubmission extends AppModel
     function getEvalSubmissionsByEventId($eventId)
     {
         return $this->find('all', array(
-            'conditions' => array($this->alias.'.event_id' => $eventId),
+            'conditions' => array(
+                $this->alias.'.event_id' => $eventId,
+                $this->alias.'.submitted' => '1',
+            ),
             'contain' => false,
         ));
     }
@@ -52,7 +55,11 @@ class EvaluationSubmission extends AppModel
     function getEvalSubmissionByGrpEventIdSubmitter($grpEventId=null, $submitter=null)
     {
         return $this->find('first', array(
-            'conditions' => array($this->alias.'.grp_event_id' => $grpEventId, $this->alias.'.submitter_id' => $submitter)
+            'conditions' => array(
+                $this->alias.'.grp_event_id' => $grpEventId,
+                $this->alias.'.submitter_id' => $submitter,
+                $this->alias.'.submitted' => '1',
+            ),
         ));
     }
 
@@ -68,7 +75,11 @@ class EvaluationSubmission extends AppModel
     function getEvalSubmissionByEventIdSubmitter($eventId, $submitter)
     {
         return $this->find('first', array(
-            'conditions' => array($this->alias.'.event_id' => $eventId, 'submitter_id' => $submitter),
+            'conditions' => array(
+                $this->alias.'.event_id' => $eventId,
+                $this->alias.'.submitter_id' => $submitter,
+                $this->alias.'.submitted' => 1,
+            ),
             'contain' => false,
         ));
     }
@@ -87,8 +98,8 @@ class EvaluationSubmission extends AppModel
             'count',
             array(
                 'conditions' => array(
-                    'EvaluationSubmission.submitted' => 1,
-                    'EvaluationSubmission.grp_event_id' => $groupEventId
+                    $this->alias.'.submitted' => 1,
+                    $this->alias.'.grp_event_id' => $groupEventId
                 ),
             )
         );

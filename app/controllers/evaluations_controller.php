@@ -593,14 +593,7 @@ class EvaluationsController extends AppController
             }
 
             // students can't submit again
-            $submission = $this->EvaluationSubmission->find(
-                'all',
-                array(
-                    'conditions' => array(
-                        'event_id' => $eventId,
-                        'submitter_id' => $this->Auth->user('id'),
-                        'submitted' => '1'
-                )));
+            $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId, User::get('id'));
             if (!empty($submission)) {
                 $this->Session->setFlash(__('Error: Survey has already been submitted', true));
                 $this->redirect('/home/index');
