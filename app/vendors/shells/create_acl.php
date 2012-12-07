@@ -500,6 +500,7 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Rubrics');
         $this->Acl->allow($role, 'controllers/Simpleevaluations');
         $this->Acl->allow($role, 'controllers/Surveys');
+        $this->Acl->allow($role, 'controllers/Surveygroups');
         $this->Acl->allow($role, 'controllers/Users');
         $this->Acl->allow($role, 'controllers/Evaluations');
         $this->Acl->allow($role, 'controllers/guard/guard/logout');
@@ -532,6 +533,7 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Rubrics');
         $this->Acl->allow($role, 'controllers/Simpleevaluations');
         $this->Acl->allow($role, 'controllers/Surveys');
+        $this->Acl->allow($role, 'controllers/Surveygroups');
         $this->Acl->allow($role, 'controllers/Users');
         $this->Acl->allow($role, 'controllers/guard/guard/logout');
         $this->Acl->deny($role, 'functions');
