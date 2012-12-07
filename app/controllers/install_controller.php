@@ -163,7 +163,7 @@ class InstallController extends Controller
 
             // congratulate the user for a successful install
             $this->redirect(array('action' => 'install5'));
-        } else {
+        } /*else {
             // Try to patch the database if needed, note that this database patching
             // is only for small changes, not for large version changes
             $ret = $this->patchDB();
@@ -172,7 +172,7 @@ class InstallController extends Controller
                 $this->redirect(array('action' => 'install3'));
                 return;
             }
-        }
+        }*/
     }
 
     /**
