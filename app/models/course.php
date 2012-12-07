@@ -418,6 +418,33 @@ class Course extends AppModel
     }
 
     /**
+     * getCourseWithEnrolmentById
+     *
+     * @param mixed $courseId
+     *
+     * @access public
+     * @return void
+     */
+    function getCourseWithEnrolmentById($courseId)
+    {
+        $course = $this->find('first', array(
+            'conditions' => array('Course.id' => $courseId),
+            'contain' => array(
+                'Enrol' => array(
+                    'fields' => array('id', 'username', 'full_name', 'email', 'student_no')
+                )
+            )
+        ));
+
+        // some clean up
+        foreach ($course['Enrol'] as $key => $student) {
+            unset($course['Enrol'][$key]['UserEnrol']);
+        }
+
+        return $course;
+    }
+
+    /**
      * getCourseIdByGroup get the course by group id
      *
      * @param mixed $groupId

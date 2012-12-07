@@ -14,7 +14,6 @@ class UsersController extends AppController
 {
     public $name = 'Users';
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'FileUpload.FileUpload');
-    public $NeatString;
     public $uses = array('User', 'UserEnrol', 'Personalize', 'Course',
         'SysParameter', 'Role', 'Group', 'UserFaculty',
         'Department', 'CourseDepartment', 'OauthClient', 'OauthToken',
@@ -31,7 +30,6 @@ class UsersController extends AppController
      */
     function __construct()
     {
-        $this->NeatString = new NeatString;
         $this->set('title_for_layout', __('Users', true));
         parent::__construct();
     }
@@ -200,22 +198,16 @@ class UsersController extends AppController
      * code base produced only puzzlement. As we want to move off of prototype
      * and to jquery anyways, it was easier to just rewrite this part.
      *
-     * @param mixed $course - the course id to list users for
+     * @param mixed $courseId the course id to list users for
      *
      * @access public
      * @return void
      */
-    function goToClassList($course = null) {
-
-        if (!User::hasPermission('functions/user')) {
-            $this->Session->setFlash(
-                'Error: You do not have permission to view users.', true);
-            $this->redirect('/home');
-        }
-
+    function goToClassList($courseId)
+    {
         // check whether the course exists
-        $class = $this->Course->find('first', array('conditions' => array('Course.id' => $course)));
-        if (empty($class)) {
+        $course = $this->Course->getCourseWithEnrolmentById($courseId);
+        if (empty($course)) {
             $this->Session->setFlash(__('Error: That course does not exist', true));
             $this->redirect('/courses');
         }
@@ -229,36 +221,15 @@ class UsersController extends AppController
             $courses = User::getMyDepartmentsCourseList('list');
         }
 
-        if (!in_array($course, array_keys($courses)) && !User::hasPermission('functions/superadmin')) {
+        if (!in_array($courseId, array_keys($courses)) && !User::hasPermission('functions/superadmin')) {
             $this->Session->setFlash(__('Error: You do not have permission to view this class list', true));
             $this->redirect('/courses');
         }
 
-        $classStudents = array(); // holds all the students enrolled in this course
-        $classList = array(); // holds all users in this course for display in view
+        $this->set('classList', $course['Enrol']);
+        $this->set('courseId', $courseId);
 
-        // get the students
-        $classStudents = $this->User->find(
-            'all',
-            array(
-                'conditions' => array('Enrolment.id' => $course),
-            )
-        );
-
-        // put only the data needed for display into classList
-        foreach ($classStudents as $user) {
-            $tmp = array();
-            $tmp['id'] = $user['User']['id'];
-            $tmp['Role'] = 'Student';
-            $tmp['Username'] = $user['User']['username'];
-            $tmp['Full Name'] = $user['User']['full_name'];
-            if (User::hasPermission('functions/viewemailaddresses')) {
-                $tmp['Email'] = $user['User']['email'];
-            }
-            $classList[] = $tmp;
-        }
-        $this->set('classList', $classList);
-        $this->set('courseId', $course);
+        $this->set('title_for_layout', $course['Course']['full_name'] . ' > ' . __('Students', true));
     }
 
     /**
