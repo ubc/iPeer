@@ -83,7 +83,7 @@ $evalEvents = Set::extract($upcoming, '/Event[event_template_type_id!=3]/..');
     <td><?php echo Toolkit::formatDate($event['EvaluationSubmission']['date_submitted'])?></td>
 </tr>
 <?php endforeach; ?>
-<?php if (empty($evalEvents)):?>
+<?php if (empty($submitted)):?>
     <tr><td colspan="5" align="center"><b>No evaluations or survey submitted at this time</b></td></tr>
 <?php endif; ?>
     </table>
