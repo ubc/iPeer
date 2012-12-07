@@ -59,7 +59,11 @@ class OauthtokensController extends AppController {
             $this->OauthToken->create();
             if ($this->OauthToken->save($this->data)) {
                 $this->Session->setFlash(__('New OAuth token created!', true), 'good');
-                $this->redirect(array('action' => 'index'));
+                if (User::hasPermission('controllers/oauthtokens')) {
+                    $this->redirect(array('action' => 'index'));
+                } else {
+                    $this->redirect('/users/editProfile');
+                }
             } else {
                 $this->Session->setFlash(__('The OAuth token could not be saved. Please, try again.', true));
             }
@@ -131,7 +135,11 @@ class OauthtokensController extends AppController {
             $this->Session->setFlash(__('Invalid id for OAuth token', true));
         } else if ($this->OauthToken->delete($id)) {
             $this->Session->setFlash(__('OAuth token deleted.', true), 'good');
-            $this->redirect(array('action'=>'index'));
+            if(User::hasPermission('controllers/oauthtokens')) {
+                $this->redirect(array('action'=>'index'));
+            } else {
+                $this->redirect('/users/editProfile');
+            }
         }
         $this->Session->setFlash(__('OAuth token was not deleted.', true));
         $this->redirect(array('action' => 'index'));
