@@ -382,7 +382,7 @@ class EvaluationRubric extends AppModel
             array('fields' => $fields, 'conditions' => $conditions));
 
         $data = array();
-        foreach($list as $mark) {
+        foreach ($list as $mark) {
             if (!isset($data[$mark['EvaluationRubric']['evaluatee']])) {
                 $data[$mark['EvaluationRubric']['evaluatee']]['user_id'] = $mark['EvaluationRubric']['evaluatee'];
                 $data[$mark['EvaluationRubric']['evaluatee']]['score'] = $mark['EvaluationRubric']['score'];
@@ -393,10 +393,10 @@ class EvaluationRubric extends AppModel
             }
         }
 
-        $sub = $evalSub->find('all', array('conditions' => array('event_id' => $eventId)));
+        $sub = $evalSub->getEvalSubmissionsByEventId($eventId);
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId)));
 
-        foreach($sub as $stu) {
+        foreach ($sub as $stu) {
             if (isset($data[$stu['EvaluationSubmission']['submitter_id']])) {
                 $diff = strtotime($stu['EvaluationSubmission']['date_submitted']) - strtotime($event['Event']['due_date']);
                 $days = $diff/(60*60*24);
@@ -406,7 +406,7 @@ class EvaluationRubric extends AppModel
             }
         }
 
-        foreach($data as $demo) {
+        foreach ($data as $demo) {
             if (!isset($demo['penalty'])) {
                 $data[$demo['user_id']]['penalty'] = 0;
             }

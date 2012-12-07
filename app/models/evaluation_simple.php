@@ -528,7 +528,7 @@ class EvaluationSimple extends AppModel
             }
         }
 
-        $sub = $evalSub->find('all', array('conditions' => array('event_id' => $eventId)));
+        $sub = $evalSub->getEvalSubmissionsByEventId($eventId);
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId)));
         $template = $simp->find('first', array('conditions' => array('SimpleEvaluation.id' => $event['Event']['template_id'])));
         $max = $template['SimpleEvaluation']['point_per_member'];

@@ -202,9 +202,6 @@ class EvaluationMixeval extends AppModel
      */
     function getReceivedTotalScore($grpEventId=null, $evaluatee=null)
     {
-        //        return $this->find('grp_event_id=' . $grpEventId .
-        //             ' AND evaluatee=' . $evaluatee,
-        //             'AVG(score) AS received_total_score');
         return $this->find('first', array(
             'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
             'fields' => array('AVG(score) AS received_total_score')
@@ -224,7 +221,6 @@ class EvaluationMixeval extends AppModel
      */
     function getReceivedTotalEvaluatorCount($grpEventId, $evaluatee)
     {
-        //return $this->find('grp_event_id='.$grpEventId.' AND evaluatee='.$evaluatee, 'COUNT(*) AS ttl_count');
         return $this->find('count', array(
             'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee)
         ));
@@ -376,7 +372,7 @@ class EvaluationMixeval extends AppModel
             array('fields' => $fields, 'conditions' => $conditions));
 
         $data = array();
-        foreach($list as $mark) {
+        foreach ($list as $mark) {
             if (!isset($data[$mark['EvaluationMixeval']['evaluatee']])) {
                 $data[$mark['EvaluationMixeval']['evaluatee']]['user_id'] = $mark['EvaluationMixeval']['evaluatee'];
                 $data[$mark['EvaluationMixeval']['evaluatee']]['score'] = $mark['EvaluationMixeval']['score'];
@@ -387,10 +383,10 @@ class EvaluationMixeval extends AppModel
             }
         }
 
-        $sub = $evalSub->find('all', array('conditions' => array('event_id' => $eventId)));
+        $sub = $evalSub->getEvalSubmissionsByEventId($eventId);
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId)));
 
-        foreach($sub as $stu) {
+        foreach ($sub as $stu) {
             if (isset($data[$stu['EvaluationSubmission']['submitter_id']])) {
                 $diff = strtotime($stu['EvaluationSubmission']['date_submitted']) - strtotime($event['Event']['due_date']);
                 $days = $diff/(60*60*24);
@@ -400,7 +396,7 @@ class EvaluationMixeval extends AppModel
             }
         }
 
-        foreach($data as $demo) {
+        foreach ($data as $demo) {
             if (!isset($demo['penalty'])) {
                 $data[$demo['user_id']]['penalty'] = 0;
             }
