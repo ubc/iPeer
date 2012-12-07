@@ -410,11 +410,7 @@ class GroupsController extends AppController
                 'conditions' => array('group_id' => $group_id),
                 'fields' => array('GroupEvent.id')
             ));
-        $submissions = $this->EvaluationSubmission->find('count',
-            array(
-                'conditions' => array('grp_event_id' => $groupEvent)
-            ));
-
+        $submissions = $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent);
         $this->set('title_for_layout', $this->Course->getCourseName($this->data['Group']['course_id']).__(' > Groups > Edit', true));
 
         // gets all students not listed in the group for unfiltered box

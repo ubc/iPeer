@@ -565,12 +565,8 @@ class Event extends AppModel
             )
         ));
 
-        // find submission separately, doesn't work in on query
-        $submissions = $this->GroupEvent->EvaluationSubmission->find('all', array(
-            'conditions' => array('grp_event_id' => Set::extract('/GroupEvent/id', $evaluationEvents), 'submitter_id' => $userId),
-            'contain' => false,
-        ));
-
+        // find submission separately, doesn't work within above query
+        $submissions = $this->GroupEvent->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter(Set::extract('/GroupEvent/id', $evaluationEvents), $userId);
         foreach ($submissions as $submission) {
             foreach ($evaluationEvents as $key => $event) {
                 if ($submission['EvaluationSubmission']['grp_event_id'] == $event['GroupEvent']['id']) {

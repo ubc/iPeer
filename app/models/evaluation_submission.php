@@ -52,9 +52,14 @@ class EvaluationSubmission extends AppModel
      * @access public
      * @return void
      */
-    function getEvalSubmissionByGrpEventIdSubmitter($grpEventId=null, $submitter=null)
+    function getEvalSubmissionByGrpEventIdSubmitter($grpEventId, $submitter)
     {
-        return $this->find('first', array(
+        $findMethod = 'first';
+        // if grpEventId is array, there might be multple submissions matching
+        if (is_array($grpEventId)) {
+            $findMethod = 'all';
+        }
+        return $this->find($findMethod, array(
             'conditions' => array(
                 $this->alias.'.grp_event_id' => $grpEventId,
                 $this->alias.'.submitter_id' => $submitter,
