@@ -1137,7 +1137,7 @@ class UsersController extends AppController
     {
         $this->Session->write('ipeerSession.id', $userData['id']);
         $this->Session->write('ipeerSession.username', $userData['username']);
-        $this->Session->write('ipeerSession.fullname', $userData['full_name']);
+        $this->Session->write('ipeerSession.fullname', $userData['first_name'].' '.$userData['last_name']);
         $this->Session->write('ipeerSession.email', $userData['email']);
     }
 

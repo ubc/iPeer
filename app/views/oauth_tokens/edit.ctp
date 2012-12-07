@@ -1,14 +1,14 @@
 <div class="oauthTokens form">
 <?php 
-echo $this->Form->create('OauthToken');
-echo $this->Form->input('id');
-echo $this->Form->input('user_id');
-echo $this->Form->input('key');
-echo $this->Form->input('secret');
-echo $this->Form->input('expires');
-echo $this->Form->input('enabled', 
+echo $this->Form->create('Oauthtoken');
+echo $this->Form->input('OauthToken.id');
+echo $this->Form->input('OauthToken.user_id');
+echo $this->Form->input('OauthToken.key');
+echo $this->Form->input('OauthToken.secret');
+echo $this->Form->input('OauthToken.expires');
+echo $this->Form->input('OauthToken.enabled', 
     array('options' => array('0' => 'False', '1' => 'True')));
-echo $this->Form->input('comment');
+echo $this->Form->input('OauthToken.comment');
 echo $this->Form->end(__('Submit', true));
 ?>
 </div>
