@@ -1069,7 +1069,7 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    function viewEvaluationResults($eventId, $groupId, $displayFormat="")
+    function viewEvaluationResults($eventId, $groupId = null, $displayFormat="")
     {
         // Make sure the present user has permission
         if (!User::hasPermission('controllers/evaluations/viewevaluationresults')) {
@@ -1280,26 +1280,16 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    function studentViewEvaluationResult($param=null)
+    function studentViewEvaluationResult($eventId, $groupId = null)
     {
         $this->autoRender = false;
-        $tok = strtok($param, ';');
-        $eventId = $tok;
-        $groupId = strtok(';');
 
         // check to see if the ids are numeric
-        if (!is_numeric($eventId) || !is_numeric($groupId)) {
+        if (!is_numeric($eventId)) {
             $this->Session->setFlash(__('Error: Invalid Id', true));
             // may want to redirect to somewhere else
             $this->redirect('/home/index');
         }
-
-        $groupMember = $this->GroupsMembers->find('first', array(
-            'conditions' => array(
-                'group_id' => $groupId,
-                'user_id' => $this->Auth->user('id')
-            )
-        ));
 
         $event = $this->Event->find('first', array(
             'conditions' => array(
@@ -1308,6 +1298,19 @@ class EvaluationsController extends AppController
         ));
 
         if ('3' != $event['Event']['event_template_type_id']) {
+            if (!is_numeric($groupId)) {
+                $this->Session->setFlash(__('Error: Invalid Id', true));
+                // may want to redirect to somewhere else
+                $this->redirect('/home/index');
+            }
+
+            $groupMember = $this->GroupsMembers->find('first', array(
+                'conditions' => array(
+                    'group_id' => $groupId,
+                    'user_id' => User::get('id')
+                )
+            ));
+
             // check to see if user is part of the group and whether the event id is valid
             if (null == $groupMember || null == $event) {
                 $this->Session->setFlash(__('Error: Invalid Id', true));
@@ -1376,14 +1379,7 @@ class EvaluationsController extends AppController
 
             case 3: //View Survey Result
                 $answers = array();
-                $studentId = $groupId;
-
-                if ($studentId != $this->Auth->user('id')) {
-                    $this->Session->setFlash(__('Invalid Id', true));
-                    $this->redirect('/home');
-                }
-
-                $formattedResult = $this->Evaluation->formatSurveyEvaluationResult($event, $studentId);
+                $formattedResult = $this->Evaluation->formatSurveyEvaluationResult($event, User::get('id'));
 
                 foreach ($formattedResult['answers'] as $answer) {
                     $answers[$answer['SurveyInput']['question_id']][] = $answer;
