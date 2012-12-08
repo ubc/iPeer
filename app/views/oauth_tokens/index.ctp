@@ -46,11 +46,11 @@ function fnFormatDetails ( oTable, nTr )
     var sOut = '<div class="userActionPanel"><ul>';
 
     sOut += '<li>';
-    sOut += '<a href="<?php echo $this->base; ?>/oauth_tokens/edit/'+aData[0]+'">Edit</a>';
+    sOut += '<a href="<?php echo $this->base; ?>/oauthtokens/edit/'+aData[0]+'">Edit</a>';
     sOut += '</li>';
 
     sOut += '<li>';
-    sOut += '<a href="<?php echo $this->base; ?>/oauth_tokens/delete/'+aData[0]+'">Delete</a>';
+    sOut += '<a href="<?php echo $this->base; ?>/oauthtokens/delete/'+aData[0]+'">Delete</a>';
     sOut += '</li>';
 
     sOut += '</ul></div>';

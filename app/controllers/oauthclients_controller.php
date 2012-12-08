@@ -8,7 +8,7 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class OauthClientsController extends AppController {
+class OauthclientsController extends AppController {
 
     public $name = 'OauthClients';
     public $components = array('PasswordGenerator');
@@ -115,6 +115,7 @@ class OauthClientsController extends AppController {
             }
         } else if (empty($this->data)) {
             $this->data = $this->OauthClient->read(null, $id);
+            debug($this->data);
             if (empty($this->data)) {
                 $this->redirect('index');
             }

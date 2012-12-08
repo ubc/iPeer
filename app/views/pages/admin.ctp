@@ -28,7 +28,7 @@ if (User::hasPermission('functions/user/superadmin')) {
     echo "<li>";
         echo $this->Html->link(
             'OAuth Client Credentials',
-            array('controller' => 'oauth_clients')
+            array('controller' => 'oauthclients')
         );
     echo "</li>";
 }
@@ -37,7 +37,7 @@ if (User::hasPermission('functions/user/superadmin')) {
     echo "<li>";
         echo $this->Html->link(
             'OAuth Token Credentials',
-            array('controller' => 'oauth_tokens')
+            array('controller' => 'oauthtokens')
         );
     echo "</li>";
 }
