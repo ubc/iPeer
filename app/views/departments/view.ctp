@@ -9,33 +9,31 @@ Faculty: <?php echo $faculty;?>
     <thead>
         <tr>
 <?php
+$columns = array('id', 'course', 'title', 'student_count', 'record_status');
 if (!empty($courses)) {
-    $sample = $courses[0];
-    foreach ($sample as $key => $val) {
-        echo "<th>$key</th>";
+    foreach ($columns as $val) {
+        if ($val == 'email' && !User::hasPermission('functions/viewemailaddresses')) {
+            continue;
+        }
+        echo "<th>".Inflector::humanize($val)."</th>";
     }
 }
 ?>
         </tr>
     </thead>
     <tbody>
-
 <?php
 foreach ($courses as $course) {
-    $id = $course['id'];
     echo "<tr>";
-    foreach ($course as $val) {
-        echo "<td>";
-        echo $this->Html->link(
-            $val, 
-            array('action' => 'view', 'controller' => 'courses', $id)
-        );
-        echo "</td>";
+    foreach ($columns as $val) {
+        if ($val == 'email' && !User::hasPermission('functions/viewemailaddresses')) {
+            continue;
+        }
+        echo "<td>".$this->Html->link($course['Course'][$val], '/courses/view'.$course['Course']['id'])."</td>";
     }
     echo "</tr>";
 }
 ?>
-
     </tbody>
 </table>
 
@@ -45,10 +43,10 @@ jQuery(document).ready(function() {
     var oTable = jQuery('#table_id').dataTable( {
         "sPaginationType" : "full_numbers",
         "aoColumnDefs": [{
-            "bSearchable": false, 
-            "bVisible": false, 
-            "bSortable":false, 
-            "aTargets": [ 0 ] 
+            "bSearchable": false,
+            "bVisible": false,
+            "bSortable":false,
+            "aTargets": [ 0 ]
         }],
         "aaSorting" : [[1, 'asc']]
     });

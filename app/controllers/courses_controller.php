@@ -308,37 +308,12 @@ class CoursesController extends AppController
 
         if ($this->Course->delete($id)) {
             //Delete all corresponding data start here
-            $course = $this->Course->findById($id);
-
             //Instructors: Instructor record will remain in database, but the join table records will be deleted
-            $instructors = $course['UserCourse'];
-            if (!empty($instructors)) {
-                foreach ($instructors as $index -> $value) {
-                    $this->UserCourse-del($value['id']);
-                }
-            }
+            $this->Course->UserCourse->deleteAll(array('UserCourse.course_id' => $id));
 
-            //Students: Students who enrolled in other courses will not be deleted;
-            //          Else, Student records will be deleted
-            $students = $course['UserEnrol'];
-            if (!empty($students)) {
-                foreach ($students as $index -> $value) {
-                    $this->UserCourse-del($value['id']);
-
-                    //Check whether there is other enrolled courses existed
-                    $otherCourse = $this->UserCourse->getById($value['user_id']);
-                    if (empty($otherCourse)) {
-                        $this->User->del($value['user_id']);
-                    }
-                }
-            }
-
+            // same for students
+            $this->Course->UserEnrol->deleteAll(array('UserEnrol.course_id' => $id));
             //Events: TODO
-            $events = $course['Event'];
-            if (!empty($events)) {
-
-            }
-
             $this->Session->setFlash(__('The course was deleted successfully.', true), 'good');
         } else {
             $this->Session->setFlash('Cannot delete the course. Check errors below');

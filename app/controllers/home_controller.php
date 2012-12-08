@@ -42,7 +42,7 @@ class HomeController extends AppController
     {
         if (User::hasPermission('functions/coursemanager')) {
             //General Home Rendering for others
-            $course_list = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'all', array('contain' => array('Event', 'Instructor')));
+            $course_list = $this->Course->getAllAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'all', array('contain' => array('Event', 'Instructor')));
             $this->set('course_list', $this->_formatCourseList($course_list));
         } else {
             // student and tutor

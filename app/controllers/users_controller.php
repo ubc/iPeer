@@ -394,14 +394,15 @@ class UsersController extends AppController
      *
      * @return void
      * */
-    private function _initFormEnv() {
+    private function _initFormEnv()
+    {
         $user = $this->User->find(
             'first',
             array('conditions' => array('id' => $this->Auth->user('id')))
         );
         // get the courses that this user is allowed access to
-        $coursesOptions = array();
-        if (User::hasPermission('functions/user/superadmin')) {
+        $coursesOptions = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+        /*if (User::hasPermission('functions/user/superadmin')) {
             // superadmins should have access to all courses regardless
             $coursesOptions = $this->Course->find('list');
         } else if (User::hasPermission('functions/user/admin')) {
@@ -426,7 +427,7 @@ class UsersController extends AppController
             foreach ($courses as $course) {
                 $coursesOptions[$course['id']] = $course['full_name'];
             }
-        }
+        }*/
         $this->set('coursesOptions', $coursesOptions);
 
         $this->set('roleOptions', $this->AccessControl->getEditableRoles());
@@ -910,7 +911,7 @@ class UsersController extends AppController
     public function import($courseId = null)
     {
         if (!is_null($courseId)) {
-            $course = $this->Course->find('first', array('conditions' => array('id' => $courseId), 'recursive' => 0));
+            $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
             if (empty($course)) {
                 $this->Session->setFlash(__('Error: That course does not exist.', true));
                 $this->redirect('/courses');

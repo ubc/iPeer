@@ -478,19 +478,18 @@ class Course extends AppModel
         return $this->find('first', array('conditions' => array('Course.id' => $courseId)));
     }
 
-
     /**
-     * getAccessibleCourses get all course that the user has access to
+     * getCoursesByUserIdFilterPermission
      *
      * @param int    $userId     user id
      * @param mixed  $permission filter permission
      * @param string $type       find type
      * @param array  $options    find options
      *
-     * @access public
+     * @access protected
      * @return void
      */
-    function getAccessibleCourses($userId, $permission, $type = 'all', $options = array())
+    protected function getCoursesByUserIdFilterPermission($userId, $permission, $type = 'all', $options = array())
     {
         switch($permission) {
         case Course::FILTER_PERMISSION_SUPERADMIN:
@@ -516,6 +515,41 @@ class Course extends AppModel
         }
 
         return $courses;
+    }
+
+    /**
+     * getAccessibleCourses get all active course that the user has access to
+     *
+     * @param int    $userId     user id
+     * @param mixed  $permission filter permission
+     * @param string $type       find type
+     * @param array  $options    find options
+     *
+     * @access public
+     * @return void
+     */
+    function getAccessibleCourses($userId, $permission, $type = 'all', $options = array())
+    {
+        $default = array('conditions' => array('record_status' => 'A'));
+        $options = array_merge($default, $options);
+        return $this->getCoursesByUserIdFilterPermission($userId, $permission, $type, $options);
+    }
+
+    /**
+     * getAllAccessibleCourses get all course that the user has access to,
+     * including inactive ones
+     *
+     * @param int    $userId     user id
+     * @param mixed  $permission filter permission
+     * @param string $type       find type
+     * @param array  $options    find options
+     *
+     * @access public
+     * @return void
+     */
+    function getAllAccessibleCourses($userId, $permission, $type = 'all', $options = array())
+    {
+        return $this->getCoursesByUserIdFilterPermission($userId, $permission, $type, $options);
     }
 
     /**

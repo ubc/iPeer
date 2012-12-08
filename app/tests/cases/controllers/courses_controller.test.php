@@ -559,6 +559,10 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $courseModel = ClassRegistry::init('Course');
         $found = $courseModel->find('first', array( 'conditions' => array('id' => 1)));
         $this->assertFalse($found);
+        $instructors = $courseModel->UserCourse->find('all', array('conditions' => array('course_id' => 1)));
+        $this->assertFalse($instructors);
+        $students = $courseModel->UserEnrol->find('all', array('conditions' => array('course_id' => 1)));
+        $this->assertFalse($students);
 
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], 'The course was deleted successfully.');
