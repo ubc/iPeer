@@ -373,7 +373,8 @@ class EvaluationsController extends AppController
     /**
      * makeEvaluation proxy method for makeing different evaluations
      *
-     * @param mixed $param
+     * @param mixed $eventId  event id
+     * @param mixed $objectId object id
      * @access public
      * @return void
      */
@@ -399,7 +400,8 @@ class EvaluationsController extends AppController
     /**
      * makeSimpleEvaluation
      *
-     * @param bool $param
+     * @param mixed $eventId event id
+     * @param mixed $groupId group id
      *
      * @access public
      * @return void
@@ -521,7 +523,7 @@ class EvaluationsController extends AppController
     /**
      * makeSurveyEvaluation
      *
-     * @param bool $param
+     * @param mixed $eventId event id
      *
      * @access public
      * @return void
@@ -646,7 +648,8 @@ class EvaluationsController extends AppController
     /**
      * makeRubricEvaluation
      *
-     * @param string $param
+     * @param mixed $eventId event id
+     * @param mixed $groupId group id
      *
      * @access public
      * @return void
@@ -838,7 +841,8 @@ class EvaluationsController extends AppController
     /**
      * makeMixevalEvaluation
      *
-     * @param string $param
+     * @param mixed $eventId event id
+     * @param mixed $groupId group id
      *
      * @access public
      * @return void
