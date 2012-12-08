@@ -149,29 +149,10 @@ class CoursesController extends AppController
      */
     function view($id)
     {
-        // check whether the course exists
-        $course = $this->Course->find('first', array(
-            'fields' => array('id', 'course', 'title', 'record_status', 'homepage', 'creator', 'created', 'updater', 'modified'),
-            'conditions' => array('id' => $id), 'contain' => 'Instructor'));
-        if (empty($course)) {
-            $this->Session->setFlash(__('Error: That course does not exist.', true));
+        $course = $this->Course->getAccessibleCourseById($id, User::get('id'), User::getCourseFilterPermission(), array('Instructor'));
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
-        }
-
-        if (!User::hasPermission('functions/superadmin')) {
-            // check whether the user has access to the course
-            // instructors
-            if (!User::hasPermission('controllers/departments')) {
-                $courses = User::getMyCourseList();
-            // admins
-            } else {
-                $courses = User::getMyDepartmentsCourseList('list');
-            }
-
-            if (!in_array($id, array_keys($courses))) {
-                $this->Session->setFlash(__('Error: You do not have permission to view this course.', true));
-                $this->redirect('index');
-            }
         }
 
         $this->set('data', $course);
@@ -187,27 +168,10 @@ class CoursesController extends AppController
      */
     function home($id)
     {
-        // check whether the course exists
-        $course = $this->Course->find('first', array('conditions' => array('id' => $id), 'recursive' => 1));
-        if (empty($course)) {
-            $this->Session->setFlash(__('Error: That course does not exist.', true));
+        $course = $this->Course->getAccessibleCourseById($id, User::get('id'), User::getCourseFilterPermission(), array('Instructor', 'Tutor', 'Event', 'Group'));
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
-        }
-
-        if (!User::hasPermission('functions/superadmin')) {
-            // check whether the user has access to the course
-            // instructors
-            if (!User::hasPermission('controllers/departments')) {
-                $courses = User::getMyCourseList();
-            // admins
-            } else {
-                $courses = User::getMyDepartmentsCourseList('list');
-            }
-
-            if (!in_array($id, array_keys($courses))) {
-                $this->Session->setFlash(__('Error: You do not have permission to view this course.', true));
-                $this->redirect('index');
-            }
         }
 
         $this->set('data', $course);
@@ -295,14 +259,13 @@ class CoursesController extends AppController
     /**
      * edit
      *
-     * @param mixed $id
+     * @param int $courseId
      *
      * @access public
      * @return void
      */
-    public function edit($id)
+    public function edit($courseId)
     {
-        $this->set('title_for_layout', 'Edit Course');
         $this->_initFormEnv();
 
         if (!empty($this->data)) {
@@ -315,35 +278,14 @@ class CoursesController extends AppController
             }
         }
 
-        // Check whether the course exists
-        $course = $this->Course->find('first', array(
-            'conditions' => array('id' => $id),
-            'contain' => array('Instructor.id', 'Department.id')
-        ));
-
-        if (empty($course)) {
-            $this->Session->setFlash(__('Error: That course does not exist.', true));
+        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission(), array('Instructor'));
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
         }
 
-        // TODO: refactor
-        if (!User::hasPermission('functions/superadmin')) {
-            // check whether the user has access to the course
-            // instructors
-            if (!User::hasPermission('controllers/departments')) {
-                $courses = User::getMyCourseList();
-                // admins
-            } else {
-                $courses = User::getMyDepartmentsCourseList('list');
-            }
-
-            if (!in_array($id, array_keys($courses))) {
-                $this->Session->setFlash(__('Error: You do not have permission to edit this course.', true));
-                $this->redirect('index');
-            }
-        }
-
         $this->data = $course;
+        $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Edit Course', true)));
     }
 
 
@@ -357,29 +299,11 @@ class CoursesController extends AppController
      */
     function delete($id)
     {
-        // Check whether the course exists
-        $course = $this->Course->find('first', array('conditions' => array('id' => $id), 'recursive' => 1));
-        if (empty($course)) {
-            $this->Session->setFlash(__('Error: That course does not exist.', true));
+        $course = $this->Course->getAccessibleCourseById($id, User::get('id'), User::getCourseFilterPermission());
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
             return;
-        }
-
-        if (!User::hasPermission('functions/superadmin')) {
-            // check whether the user has access to the course
-            // instructors
-            if (!User::hasPermission('controllers/departments')) {
-                $courses = User::getMyCourseList();
-            // admins
-            } else {
-                $courses = User::getMyDepartmentsCourseList('list');
-            }
-
-            if (!in_array($id, array_keys($courses))) {
-                $this->Session->setFlash(__('Error: You do not have permission to delete this course', true));
-                $this->redirect('index');
-                return;
-            }
         }
 
         if ($this->Course->delete($id)) {
@@ -415,8 +339,7 @@ class CoursesController extends AppController
 
             }
 
-            $this->Session->setFlash(
-                __('The course was deleted successfully.', true), 'good');
+            $this->Session->setFlash(__('The course was deleted successfully.', true), 'good');
         } else {
             $this->Session->setFlash('Cannot delete the course. Check errors below');
         }

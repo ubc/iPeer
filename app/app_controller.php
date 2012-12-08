@@ -11,7 +11,7 @@ ini_set('auto_detect_line_endings', true);
 
 uses('sanitize');
 App::import('Lib', 'toolkit');
-App::import('Model', 'User');
+App::import('Lib', 'breadcrumb');
 
 /**
  * AppController the base controller
@@ -29,6 +29,7 @@ class AppController extends Controller
     public $helpers    = array('Session', 'Html', 'Js');
     public $access     = array ();
     public $actionList = array ();
+    public $breadcrumb;
 
     /**
      * if this request has session transfer data
@@ -82,6 +83,7 @@ class AppController extends Controller
             $this->_checkDatabaseVersion();
         }
 
+        $this->breadcrumb = Breadcrumb::create();
         parent::beforeFilter();
     }
 

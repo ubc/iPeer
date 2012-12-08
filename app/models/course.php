@@ -10,6 +10,10 @@
  */
 class Course extends AppModel
 {
+    const FILTER_PERMISSION_SUPERADMIN = 0;
+    const FILTER_PERMISSION_FACULTY = 1;
+    const FILTER_PERMISSION_OWNER = 2;
+
     public $name = 'Course';
     public $displayField = 'full_name';
 
@@ -263,7 +267,7 @@ class Course extends AppModel
      *
      * @return course data
      */
-    function getCourseByInstructor($instructorId, $type = 'all', $contain = array())
+    function getCourseByInstructor($instructorId, $type = 'all', $contain = array(), $conditions = array())
     {
         $contain = array_merge(array('Instructor'), $contain);
         if ($type == 'list') {
@@ -284,9 +288,19 @@ class Course extends AppModel
         );
 
         $courseIds = Set::extract('/Course/id', $courses);
-
+        if (array_key_exists('id', $conditions)) {
+            if (is_array($conditions['id'])) {
+                $conditions['id'] = array_intersect($conditions['id'], $courseIds);
+            } else {
+                if (!in_array($conditions['id'], $courseIds)) {
+                    return false;
+                }
+            }
+        } else {
+            $conditions['id'] = $courseIds;
+        }
         // find courses with instructor and other models specified in contain
-        $courses = $this->find('all', array('conditions' => array('id' => $courseIds), 'contain' => $contain));
+        $courses = $this->find($type, array('conditions' => $conditions, 'contain' => $contain));
 
         return $courses;
     }
@@ -352,42 +366,14 @@ class Course extends AppModel
         return $ret;
     }
 
-    /************** HELPER FUNCTION USED FOR UNIT TESTING PURPOSES   *****************/
-
-    /**
-     * createCoursesHelper
-     *
-     * @param bool $id     id
-     * @param bool $course course
-     * @param bool $title  title
-     *
-     * @access public
-     * @return void
-     */
-    function createCoursesHelper($id=null, $course=null, $title=null)
+    function getByDepartmentIds($departmentIds, $findType = "all", $options)
     {
-        $sql = "INSERT INTO courses VALUES ( '$id', '$course', '$title', NULL , 'off', NULL , 'A', '0', '0000-00-00 00:00:00', NULL , NULL , '0' ) ";
-        $this->query($sql);
-
-    }
-
-
-    /**
-     * createInactiveCoursesHelper
-     *
-     * @param bool $id     id
-     * @param bool $course course
-     * @param bool $title  title
-     *
-     * @access public
-     * @return void
-     */
-    function createInactiveCoursesHelper($id=null, $course=null, $title=null)
-    {
-
-        $sql = "INSERT INTO courses VALUES ( '$id', '$course', '$title', NULL , 'off', NULL , 'I', '0', '0000-00-00 00:00:00', NULL , NULL , '0' ) ";
-        $this->query($sql);
-
+        $options = array_merge(array('conditions' => array('Department.id' => $departmentIds)), $options);
+        if ($findType == 'list') {
+            $courses = $this->find('all', $options);
+            return Set::combine($courses, '{n}.'.$this->alias.'.id', '{n}.'.$this->alias.'.'.$this->displayField);
+        }
+        return $this->find($findType, $options);
     }
 
     /**
@@ -414,7 +400,26 @@ class Course extends AppModel
      */
     function getCourseById($courseId)
     {
-        return $this->find('first', array('conditions' => array('Course.id' => $courseId)));
+        return $this->find('first', array(
+            'conditions' => array('Course.id' => $courseId),
+            'contain' => false
+        ));
+    }
+
+    /**
+     * getCourseById
+     *
+     * @param mixed $courseId course id
+     *
+     * @access public
+     * @return void
+     */
+    function getCourseWithInstructorsById($courseId)
+    {
+        return $this->find('first', array(
+            'conditions' => array('Course.id' => $courseId),
+            'contain' => 'Instructor'
+        ));
     }
 
     /**
@@ -461,4 +466,37 @@ class Course extends AppModel
         return $this->find('first', array('conditions' => array('Course.id' => $courseId)));
     }
 
+
+    function getAccessibleCourses($userId, $permission, $type = 'all', $options = array())
+    {
+        switch($permission) {
+        case Course::FILTER_PERMISSION_SUPERADMIN:
+            $courses = $this->find($type, $options);
+            break;
+        case Course::FILTER_PERMISSION_FACULTY:
+            $department = Classregistry::init('Department');
+            $departments = $department->find('all', array(
+                'fields' => array('id'),
+                'contain' => array(
+                    'Faculty' => 'User.id = '.$userId
+                ),
+            ));
+            $departmentIds = Set::extract($departments, '/Department/id');
+            $courses = $this->getByDepartmentIds($departmentIds, $type, $options);
+            break;
+        case Course::FILTER_PERMISSION_OWNER:
+            $options = array_merge(array('contain' => array(), 'conditions' => array()), $options);
+            $courses = $this->getCourseByInstructor($userId, $type, $options['contain'], $options['conditions']);
+            break;
+        default:
+            return array();
+        }
+
+        return $courses;
+    }
+
+    function getAccessibleCourseById($courseId, $userId,  $permission, $contain = array())
+    {
+        return $this->getAccessibleCourses($userId, $permission, 'first', array('conditions' => array('id' => $courseId), 'contain' => $contain));
+    }
 }

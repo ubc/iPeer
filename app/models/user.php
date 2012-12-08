@@ -1009,6 +1009,24 @@ class User extends AppModel
     }
 
     /**
+     * getCourseFilterPermission return the permissions need by filtering the course
+     *
+     * @static
+     * @access public
+     * @return void
+     */
+    static function getCourseFilterPermission()
+    {
+        if (User::hasPermission('functions/superadmin')) {
+            return Course::FILTER_PERMISSION_SUPERADMIN;
+        } elseif (User::hasPermission('controllers/departments')) {
+            return Course::FILTER_PERMISSION_FACULTY;
+        } else {
+            return Course::FILTER_PERMISSION_OWNER;
+        }
+    }
+
+    /**
      * Custom validation rule makes a field required if another field is
      * enabled.
      *

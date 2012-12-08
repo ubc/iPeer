@@ -53,7 +53,11 @@
   <!-- TITLE BAR -->
   <h1 class='title'>
     <?php echo $html->image('layout/icon_ipeer_logo.gif',array('alt'=>'icon_ipeer_logo'))?>
-    <?php echo $title_for_layout;?>
+    <?php if (isset($breadcrumb)): ?>
+        <?php echo $breadcrumb->render($html); ?>
+    <?php else: ?>
+        <?php echo $title_for_layout;?>
+    <?php endif; ?>
   </h1>
   <!-- ERRORS -->
   <?php echo $this->Session->flash(); ?>

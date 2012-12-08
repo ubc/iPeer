@@ -40,14 +40,12 @@ class HomeController extends AppController
      */
     function index()
     {
-        //General Home Rendering for Admin
-        if (User::hasPermission('functions/superadmin')) {
-            $course_list = $this->Course->find('all', array('contain' => array('Instructor', 'Event')));
-        // admins
-        } else if (User::hasPermission('controllers/departments')) {
-            $course_list = User::getMyDepartmentsCourseList('all');
-        // students & tutors
-        } else if (User::hasPermission('functions/onlytakeeval')) {
+        if (User::hasPermission('functions/coursemanager')) {
+            //General Home Rendering for others
+            $course_list = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'all', array('contain' => array('Event', 'Instructor')));
+            $this->set('course_list', $this->_formatCourseList($course_list));
+        } else {
+            // student and tutor
             $events = $this->Event->getEventsByUserId(User::get('id'));
             $submitted = $upcoming = array();
             foreach ($events as $event) {
@@ -60,12 +58,7 @@ class HomeController extends AppController
             $this->set('submitted', $submitted);
             $this->set('upcoming', $upcoming);
             $this->render('studentIndex');
-            return;
-        // instructors
-        } else {
-            $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'), 'all', array('Event'));
         }
-        $this->set('course_list', $this->_formatCourseList($course_list));
     }
 
     /**

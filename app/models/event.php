@@ -105,6 +105,14 @@ class Event extends AppModel
             'dependent' => true,
             'foreignKey' => 'event_id'
         ),
+        'EvaluationSubmission' =>
+        array(
+            'className' => 'EvaluationSubmission',
+            'conditions' => '',
+            'order' => '',
+            'dependent' => true,
+            'foreignKey' => 'event_id'
+        ),
         'Penalty' =>
         array(
             'className' => 'Penalty',

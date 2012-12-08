@@ -12,12 +12,6 @@ class SurveyGroupsController extends AppController
 {
     public $uses =  array('Course', 'Survey', 'User', 'Question', 'SurveyQuestion', 'Response', 'Personalize', 'Event', 'EvaluationSubmission', 'UserEnrol', 'SurveyInput', 'SurveyGroupMember', 'SurveyGroupSet', 'SurveyGroup', 'Group', 'GroupsMembers', 'Event');
     public $name = 'SurveyGroups';
-    public $show;
-    public $sortBy;
-    public $direction;
-    public $page;
-    public $order;
-    public $Sanitize;
     public $helpers = array('Html', 'Ajax', 'Javascript');
     public $components = array('Output', 'userPersonalize', 'framework', 'XmlHandler', 'AjaxList');
 
@@ -29,15 +23,6 @@ class SurveyGroupsController extends AppController
      */
     function __construct()
     {
-        $this->Sanitize = new Sanitize;
-        $this->show = empty($_GET['show'])? 'null': $this->Sanitize->paranoid($_GET['show']);
-        if ($this->show == 'all') {
-            $this->show = 99999999;
-        }
-        $this->sortBy = empty($_GET['sort'])? 'created': $this->Sanitize->paranoid($_GET['sort']);
-        $this->direction = empty($_GET['direction'])? 'desc': $this->Sanitize->paranoid($_GET['direction']);
-        $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
-        $this->order = $this->sortBy.' '.strtoupper($this->direction);
         $this->set('title_for_layout', __('Survey Groups', true));
         parent::__construct();
     }
@@ -103,13 +88,16 @@ class SurveyGroupsController extends AppController
      * @access public
      * @return void
      */
-    function index()
+    function index($courseId)
     {
-        $this->set('course_id', $this->Session->read('ipeerSession.courseId'));
+        $course = $this->Course->getCourseById($courseId);
+        $this->set('course_id', $courseId);
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
+        $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))
+            ->push(__('Survey Groups', true)));
     }
 
 
@@ -136,105 +124,58 @@ class SurveyGroupsController extends AppController
      * @access public
      * @return void
      */
-    function viewresult($eventId=null)
+    function viewresult($courseId, $eventId=null)
     {
-        $class = array(); // holds all the students enrolled in the course
         $view = array(); // holds all the details for display in view
         $surveys = array(); // holds all the surveys' titles in the course
-        $survey = ""; // holds the event title
-        $survey_id = ""; // holds the id of the survey
         $event = array(); // holds the current survey
-        $courseId = ""; // hold the course id
 
+        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission(), array(
+            'Event' => 'event_template_type_id = 3',
+            'Enrol' => array(
+                'fields' => array('id', 'username', 'full_name', 'student_no', 'email'),
+                'Submission'
+            )
+        ));
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+            $this->redirect('/courses');
+        }
+
+        $eventIds = Set::extract($course['Event'], '/id');
         // if an event id is entered
         if ($eventId != null) {
-            $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId, 'Event.event_template_type_id' => 3)));
-        }
-        // event id not entered but a course id stored in Session
-        else if ('' != $this->Session->read('ipeerSession.courseId')) {
-            $courseId = $this->Session->read('ipeerSession.courseId');
-            $event = $this->Event->find('first', array('conditions' => array('Course.id' => $courseId, 'Event.event_template_type_id' => 3)));
-            $eventId = $event['Event']['id'];
-        // event id not entered and no course id stored in Session
+            if (!in_array($eventId, $eventIds)) {
+                $eventId = null;
+            }
         } else {
-            $userid = $this->Auth->user('id');
-            $user = $this->User->find('first', array('conditions' => array('User.id' => $userid)));
-            foreach ($user['Course'] as $course) {
-                $courses[] = $course['id'];
-            }
-            $event = $this->Event->find('first', array('conditions' => array('Course.id' => $courses, 'Event.event_template_type_id' => 3)));
-            $eventId = $event['Event']['id'];
+            $eventId = array_shift($eventIds);
         }
 
-        if (!empty($event)) {
-            $courseId = $event['Course']['id'];
-
-            if (!User::hasPermission('functions/superadmin')) {
-                // check whether the user has access to the course
-                // instructors
-                if (!User::hasPermission('controllers/departments')) {
-                    $courses = User::getMyCourseList();
-                // admins
-                } else {
-                    $courses = User::getMyDepartmentsCourseList('list');
-                }
-
-                if (!in_array($courseId, array_keys($courses))) {
-                    $this->Session->setFlash(__("Error: You do not have permission to view this event's results", true));
-                    $this->redirect('index');
-                }
-            }
-
-            $this->set('title_for_layout', $this->Course->getCourseName($courseId).__(' > View Survey Result', true));
-
-            $class = $this->User->find(
-                'all',
-                array(
-                    'conditions' => array('Enrolment.id' => $courseId)
-                )
-            );
-
-            //filtering for the data to be printed in the view
-            foreach ($class as $student) {
-                $temp = array();
-                $temp['ID'] = $student['User']['id'];
-                $temp['Full Name'] = $student['User']['full_name'];
-                $temp['Student No.'] = $student['User']['student_no'];
-                $temp['Date Submitted'] = 'Not Submitted';
-                foreach ($student['Submission'] as $submission) {
-                    if ($submission['event_id'] == $eventId) {
-                        $temp['Date Submitted'] = date('D, M j, Y g:i a', strtotime($submission['date_submitted']));
-                    }
-                }
-                if (empty($student['Submission'])) {
-                    $temp['Date Submitted'] = 'Not Submitted';
-                }
-
-                $temp['Event Id'] = $eventId;
-
-                $view[] = $temp;
-            }
-
-            $events = $this->Event->find('all', array('conditions' => array('Course.id' => $courseId, 'Event.event_template_type_id' => 3)));
-
-            // for populating the drop down menu to switch to different surveys in the course
-            foreach ($events as $key => $survey) {
-                $surveys[$key]['id'] = $survey['Event']['id'];
-                $surveys[$key]['title'] = $survey['Event']['title'];
-            }
-            $survey = $event['Event']['title'];
-            $survey_id = $event['Event']['template_id'];
-        } else {
-            $this->set('title_for_layout', __('View Survey Result', true));
-            $this->Session->setFlash(__('No surveys found', true));
+        if (null == $eventId) {
+            $this->Session->setFlash(__('Error: Invalid course ID or event ID.', true));
+            $this->redirect('index/'.$courseId);
         }
 
-        $this->set('view', $view);
+        //filtering for the data to be printed in the view
+        foreach ($course['Enrol'] as $key => $student) {
+            $course['Enrol'][$key]['submitted'] = 'Not Submitted';
+            foreach ($student['Submission'] as $submission) {
+                if ($submission['event_id'] == $eventId) {
+                    $course['Enrol'][$key]['submitted'] = $submission['date_submitted'];
+                    break;
+                }
+            }
+        }
+
+        // for populating the drop down menu to switch to different surveys in the course
+        $surveys = Set::combine($course['Event'], '{n}.id', '{n}.title');
+
+        $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('View Survey Result', true)));
+        $this->set('view', $course['Enrol']);
         $this->set('courseId', $courseId);
         $this->set('eventId', $eventId);
         $this->set('surveysList', $surveys);
-        $this->set('survey', $survey);
-        $this->set('survey_id', $survey_id);
     }
 
     /**
@@ -248,31 +189,14 @@ class SurveyGroupsController extends AppController
     function makegroups($course_id)
     {
 
-        $course = $this->Course->find('first', array('conditions' => array('id' => $course_id),
-            'contain' => array()));
-
-        if (empty($course)) {
-            $this->Session->setFlash(__('Error: That course does not exist.', true));
+        $course = $this->Course->getAccessibleCourseById($course_id, User::get('id'), User::getCourseFilterPermission());
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
         }
-
-        if (!User::hasPermission('functions/superadmin')) {
-            // check whether the user has access to the course
-            // instructors
-            if (!User::hasPermission('controllers/departments')) {
-                $courses = User::getMyCourseList();
-            // admins
-            } else {
-                $courses = User::getMyDepartmentsCourseList('list');
-            }
-
-            if (!in_array($course_id, array_keys($courses))) {
-                $this->Session->setFlash(__('Error: You do not have permission to make groups for this course', true));
-                $this->redirect('index');
-            }
-        }
         $courseName = $course['Course']['course'];
-        $this->set('title_for_layout', $courseName.__(' > Create Group Set', true));
+        $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))
+            ->push(__('Create Group Set', true)));
         $this->set('surveys', $this->Survey->find('list', array('conditions' => array('course_id' => $course_id))));
     }
 
@@ -470,20 +394,10 @@ class SurveyGroupsController extends AppController
 
         $groupSet = $this->SurveyGroupSet->find('first', array('conditions' => array('SurveyGroupSet.id' => $group_set_id)));
 
-        if (!User::hasPermission('functions/superadmin')) {
-            // check whether the user has access to the course
-            // instructors
-            if (!User::hasPermission('controllers/departments')) {
-                $courses = User::getMyCourseList();
-            // admins
-            } else {
-                $courses = User::getMyDepartmentsCourseList('list');
-            }
-
-            if (!in_array($groupSet['Survey']['course_id'], array_keys($courses))) {
-                $this->Session->setFlash(__('Error: You do not have permission to delete this survey group set', true));
-                $this->redirect('index');
-            }
+        $course = $this->Course->getAccessibleCourseById($groupSet['Survey']['course_id'], User::get('id'), User::getCourseFilterPermission());
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+            $this->redirect('index');
         }
 
         if ($this->SurveyGroupSet->delete($group_set_id)) {

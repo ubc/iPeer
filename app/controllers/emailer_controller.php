@@ -196,16 +196,11 @@ class EmailerController extends AppController
      * @return void
      */
     public function write($type=null, $id=null) {
-
-        if (!User::hasPermission('controllers/emailer')) {
-            $this->Session->setFlash(__('Error: You do not have permission to write emails.', true));
-            $this->redirect('/home');
-        }
-
         // class, group, user
         if ('C' == $type || 'G' == $type || null != $id) {
             if ('C' == $type) {
                 $group = $this->Course->find('first', array('conditions' => array('Course.id' => $id)));
+                $this->breadcrumb->push(array('course' => $group['Course']));
             } else if ('G' == $type) {
                 $group = $this->Group->find('first', array('conditions' => array('Group.id' => $id)));
             } else if (null != $id) {
@@ -219,14 +214,7 @@ class EmailerController extends AppController
             }
         }
 
-        // check whether the user has access to the course
-        // instructors
-        if (!User::hasPermission('controllers/departments')) {
-            $courseList = User::getMyCourseList();
-        // admins
-        } else {
-            $courseList = User::getMyDepartmentsCourseList('list');
-        }
+        $courseList = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
 
         //for checking if the user can email to class with $id
         if ('C' == $type && !User::hasPermission('functions/email/allcourses')) {
@@ -252,7 +240,7 @@ class EmailerController extends AppController
         }
 
 
-        $this->set('title_for_layout', 'Write Email');
+        $this->set('breadcrumb', $this->breadcrumb->push(__('Write Email', true)));
 
         if (!isset($this->data)) {
             //Get recipients' email address
@@ -308,11 +296,6 @@ class EmailerController extends AppController
      */
     function cancel ($id)
     {
-        if (!User::hasPermission('controllers/emailer')) {
-            $this->Session->setFlash(__('Error: You do not have permission to cancel email schedules', true));
-            $this->redirect('/home');
-        }
-
         // retrieving the requested email schedule
         $email = $this->EmailSchedule->find(
             'first',
@@ -341,10 +324,7 @@ class EmailerController extends AppController
                     array(
                         'conditions' => array('UserCourse.course_id' => $courseIds)
                 ));
-                $instructorIds = array();
-                foreach ($instructors as $instructor) {
-                    $instructorIds[] = $instructor['UserCourse']['user_id'];
-                }
+                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
                 // add the user's id
                 array_push($instructorIds, $this->Auth->user('id'));
             }

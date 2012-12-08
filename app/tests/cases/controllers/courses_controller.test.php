@@ -75,6 +75,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'modified' => '2006-06-20 14:14:45',
                 'creator' => 'Super Admin',
                 'updater' => null,
+                'student_count' => 13,
             ),
             array (
                 'id' => '2',
@@ -86,6 +87,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'modified' => '2006-06-20 14:39:31',
                 'creator' => 'Super Admin',
                 'updater' => null,
+                'student_count' => 15,
             ),
         ),
         'Instructor' => array(
@@ -284,10 +286,21 @@ class CoursesControllerTest extends ExtendedAuthTestCase
     {
         $result1 = $this->testAction('/courses/view/1', array('return' => 'vars'));
         $result2 = $this->testAction('/courses/view/2', array('return' => 'vars'));
-        $expect1 = array('data' => array('Course' => $this->fixtureView['Course'][0], 'Instructor' => array($this->fixtureView['Instructor'][0])));
-        $expect2 = array('data' => array('Course' => $this->fixtureView['Course'][1], 'Instructor' => array($this->fixtureView['Instructor'][1], $this->fixtureView['Instructor'][2])));
-        $this->assertEqual($result1, $expect1);
-        $this->assertEqual($result2, $expect2);
+
+        $result = $result1['data'];
+        $this->assertEqual($result['Course']['id'], 1);
+        $this->assertEqual($result['Course']['course'], $this->fixtureView['Course'][0]['course']);
+        $this->assertEqual($result['Course']['student_count'], $this->fixtureView['Course'][0]['student_count']);
+        $this->assertEqual(count($result['Instructor']), 1);
+        $this->assertEqual($result['Instructor'][0]['id'], $this->fixtureView['Instructor'][0]['id']);
+
+        $result = $result2['data'];
+        $this->assertEqual($result['Course']['id'], 2);
+        $this->assertEqual($result['Course']['course'], $this->fixtureView['Course'][1]['course']);
+        $this->assertEqual($result['Course']['student_count'], $this->fixtureView['Course'][1]['student_count']);
+        $this->assertEqual(count($result['Instructor']), 2);
+        $this->assertEqual($result['Instructor'][0]['id'], $this->fixtureView['Instructor'][1]['id']);
+        $this->assertEqual($result['Instructor'][1]['id'], $this->fixtureView['Instructor'][2]['id']);
     }
 
     function testViewInvalidId()
@@ -296,7 +309,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->controller->expectOnce('redirect', array('index'));
         $this->testAction('/courses/view/9999', array('return' => 'vars'));
         $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], 'Error: That course does not exist.');
+        $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
     }
 
     function testViewNotMyCourse()
@@ -311,7 +324,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->controller->expectOnce('redirect', array('index'));
         $this->testAction('/courses/view/1', array('return' => 'vars'));
         $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], 'Error: You do not have permission to view this course.');
+        $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
     }
 
     function testHome()
@@ -334,7 +347,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->controller->expectOnce('redirect', array('index'));
         $this->testAction('/courses/home/9999', array('return' => 'result'));
         $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], 'Error: That course does not exist.');
+        $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
     }
 
     function testHomeNotMyCourse()
@@ -349,7 +362,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->controller->expectOnce('redirect', array('index'));
         $this->testAction('/courses/home/1', array('return' => 'vars'));
         $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], 'Error: You do not have permission to view this course.');
+        $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
     }
 
     function testAdd()
@@ -429,13 +442,10 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->assertEqual(count($result['departments']), 3);
         $this->assertEqual($result['statusOptions'], array( 'A' => 'Active', 'I' => 'Inactive'));
         $this->assertEqual(count($result['instructors']), 3);
-        $this->assertEqual($result['title_for_layout'], 'Edit Course');
         $this->assertEqual($this->controller->data['Course']['course'], $this->fixtureView['Course'][0]['course']);
         $this->assertEqual($this->controller->data['Course']['course'], $this->fixtureView['Course'][0]['course']);
         $this->assertEqual(count($this->controller->data['Instructor']), 1);
         $this->assertEqual($this->controller->data['Instructor'][0]['id'], 2);
-        $this->assertEqual(count($this->controller->data['Department']), 1);
-        $this->assertEqual($this->controller->data['Department'][0]['id'], 1);
     }
 
     function testEditWithData()
@@ -475,7 +485,6 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->assertEqual(count($course['Instructor']), 1);
         $this->assertEqual($course['Instructor'][0]['id'], 2);
 
-        $this->assertEqual($result['title_for_layout'], 'Edit Course');
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], 'The course was updated successfully.');
     }
@@ -537,7 +546,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
             array('fixturize' => true, 'data' => $data, 'method' => 'post')
         );
         $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], 'Error: You do not have permission to edit this course.');
+        $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
     }
 
     function testDelete()
@@ -564,7 +573,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         );
 
         $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], 'Error: That course does not exist.');
+        $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
     }
 
     function testDeleteOthersCourse()
@@ -588,7 +597,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->assertTrue(array_key_exists('Course', $found));
 
         $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], 'Error: You do not have permission to delete this course');
+        $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
     }
 
     function testLogout()

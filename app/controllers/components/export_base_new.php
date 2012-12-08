@@ -34,7 +34,7 @@ class ExportBaseNewComponent extends Object
 
         $courseId = $this->Event->getCourseByEventId($eventId);
         $event = $this->Event->getEventById($eventId);
-        $course = $this->Course->getCourseById($courseId);
+        $course = $this->Course->getCourseWithInstructorsById($courseId);
 
         $grid = $this->ExportHelper2->buildExporterGrid(8, 8);
         $grid[0][0] = "********************************************";
@@ -101,7 +101,7 @@ class ExportBaseNewComponent extends Object
 
         $courseId = $this->Event->getCourseByEventId($eventId);
         $event = $this->Event->getEventById($eventId);
-        $course = $this->Course->getCourseById($courseId);
+        $course = $this->Course->getCourseWithInstructorsById($courseId);
         //$instructors = $this->UserCourse->getInstructors($courseId);
         $header = '';
 

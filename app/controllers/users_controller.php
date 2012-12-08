@@ -206,30 +206,18 @@ class UsersController extends AppController
     function goToClassList($courseId)
     {
         // check whether the course exists
+        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+            $this->redirect('index');
+        }
+
         $course = $this->Course->getCourseWithEnrolmentById($courseId);
-        if (empty($course)) {
-            $this->Session->setFlash(__('Error: That course does not exist', true));
-            $this->redirect('/courses');
-        }
-
-        // check whether the user has access to the course
-        // instructors
-        if (!User::hasPermission('controllers/departments')) {
-            $courses = User::getMyCourseList();
-        // admins
-        } else {
-            $courses = User::getMyDepartmentsCourseList('list');
-        }
-
-        if (!in_array($courseId, array_keys($courses)) && !User::hasPermission('functions/superadmin')) {
-            $this->Session->setFlash(__('Error: You do not have permission to view this class list', true));
-            $this->redirect('/courses');
-        }
 
         $this->set('classList', $course['Enrol']);
         $this->set('courseId', $courseId);
 
-        $this->set('title_for_layout', $course['Course']['full_name'] . ' > ' . __('Students', true));
+        $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Students', true)));
     }
 
     /**
@@ -306,75 +294,6 @@ class UsersController extends AppController
         }
 
         return false;
-    }
-
-
-    /**
-     * getSimpleEntrollmentLists
-     *
-     * @param mixed $id
-     *
-     * @access public
-     * @return void
-     */
-    function getSimpleEntrollmentLists($id)
-    {
-        $result = array();
-
-        if ($id) {
-            // This needs a custom query:
-            //   The getSimpleEntrollmentLists() can be called twice in one page rendering.
-            //    There's a problem with Cake PHP caching results (I could not turn this off)
-            //      $enrolled_courses = $this->UserEnrol->query(
-            //        "SELECT `course_id` from `user_enrols` WHERE user_id=$id",
-            //         /* No cache!! (undoc.) */ false );
-            $enrolled_courses = $this->UserEnrol->find('all', array(
-                'conditions' => array('UserEnrol.user_id' => $id),
-                'fields' => array('UserEnrol.course_id')
-            ));
-        } else {
-            // New Student = display a courses list.
-            $enrolled_courses = array();
-        }
-
-        // Get accessible courses
-        $coursesList = User::getMyCourseList();
-
-        // List the entrolled courses
-        $simpleEnrolledList = array();
-        foreach ($enrolled_courses as $value) {
-            if (!empty($coursesList[$value['UserEnrol']['course_id']])) {
-                array_push($simpleEnrolledList, $value['UserEnrol']['course_id']);
-            }
-        }
-
-        // List the available courses
-        $simpleCoursesList = array();
-        foreach ($coursesList as $key => $value) {
-            $simpleCoursesList[$key] = $value['course'];
-        }
-
-        // Pack up the data for the return
-        $result['simpleEnrolledList'] = $simpleEnrolledList;
-        $result['simpleCoursesList'] = $simpleCoursesList;
-
-        return $result;
-    }
-
-
-    /**
-     * _setUpCourseEnrollmentLists
-     *
-     * @param mixed $id - user id
-     *
-     * @access public
-     * @return void
-     */
-    function _setUpCourseEnrollmentLists($id)
-    {
-        $data = $this->getSimpleEntrollmentLists($id);
-        $this->set("simpleEnrolledList", $data['simpleEnrolledList']);
-        $this->set("simpleCoursesList", $data['simpleCoursesList']);
     }
 
     /**
@@ -572,9 +491,8 @@ class UsersController extends AppController
      * @access public
      * @return void
      */
-    public function add($courseId = null) {
-        $this->set('title_for_layout', 'Add User');
-
+    public function add($courseId = null)
+    {
         if (!User::hasPermission('functions/user')) {
             $this->Session->setFlash('Error: You do not have permission to add users', true);
             $this->redirect('/home');
@@ -633,38 +551,18 @@ class UsersController extends AppController
                 // Failed
                 $this->Session->setFlash("Error: Unable to create user.");
             }
-        // Permission checking
-        } else {
-            // Check whether the course exists
-            $course = $this->Course->find('first', array('conditions' => array('id' => $courseId), 'recursive' => 1));
-            if (!is_null($courseId)) {
-                if (empty($course)) {
-                    $this->Session->setFlash(__('Error: That course does not exist.', true));
-                    $this->redirect('/courses');
-                }
-
-                // check whether the user has access to the course
-                if (!User::hasPermission('functions/superadmin')) {
-                    // instructors
-                    if (!User::hasPermission('controllers/departments')) {
-                        $courses = User::getMyCourseList();
-                    // admins
-                    } else {
-                        $courses = User::getMyDepartmentsCourseList('list');
-                    }
-
-                    if (!in_array($courseId, array_keys($courses))) {
-                        $this->Session->setFlash(__('Error: You do not have permission to add users to this course', true));
-                        // no $courseId provided - assume user is a faculty admin or super admin
-                        if (is_null($courseId)) {
-                            $this->redirect('index');
-                        } else {
-                            $this->redirect('/courses');
-                        }
-                    }
-                }
-            }
         }
+
+        // Check whether the course exists
+        if (!is_null($courseId)) {
+            $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+            if (!$course) {
+                $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+                $this->redirect('/courses');
+            }
+            $this->breadcrumb->push(array('course' => $course['Course']));
+        }
+        $this->set('breadcrumb', $this->breadcrumb->push(__('Add User', true)));
     }
 
 
@@ -1011,34 +909,26 @@ class UsersController extends AppController
      */
     public function import($courseId = null)
     {
-        $this->set('title_for_layout',
-            __('Import Students From Text (.txt) or CSV File (.csv)', true));
+        if (!is_null($courseId)) {
+            $course = $this->Course->find('first', array('conditions' => array('id' => $courseId), 'recursive' => 0));
+            if (empty($course)) {
+                $this->Session->setFlash(__('Error: That course does not exist.', true));
+                $this->redirect('/courses');
+            }
+            $this->breadcrumb->push(array('course' => $course['Course']));
+        }
 
-        // users can only import to courses they have access to
-        if (User::hasPermission('functions/superadmin')) {
-            // superadmins have access to everything
-            $courseList = $this->Course->find('list');
-        }
-        else if (User::hasPermission('functions/user/admin')) {
-            // admins have access to their departments
-            $courseList = User::getMyDepartmentsCourseList('list');
-        }
-        else if (!User::hasPermission('functions/user/instructor')) {
-            // instructors have access to courses they're teaching
-            $courseList = User::getMyCourseList();
-        }
-        else {
-            // no permission to import user
-            $this->Session->setFlash("Access denied to import user.");
-            $this->redirect('/home');
-        }
-        $this->set('courses', $courseList);
+        $courses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+        $this->set('courses', $courses);
 
         // make sure we know the course we're importing users into
         if ($courseId == null && !empty($this->data)) {
             $courseId = $this->data['Course']['Course'];
         }
         $this->set('courseId', $courseId);
+
+        $this->set('breadcrumb', $this->breadcrumb->push(__('Import Students From Text (.txt) or CSV File (.csv)', true)));
+
 
         if (!empty($this->data)) {
             // check that file upload worked
