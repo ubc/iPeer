@@ -21,6 +21,7 @@ $status = isset($status) ? $status : '';
         <input type="button" style="width:100px;" onClick="itemMove($('all_groups'), $('selected_groups'))" value="<?php __('Assign')?> >>" <?php echo $status ?>/>
         <br><br>
         <input type="button" style="width:100px;" onClick="itemMove($('selected_groups'), $('all_groups'))" value="<< <?php __('Remove')?> " <?php echo $status ?> />
+        <br><br><?php !empty($status) ? __('There has been submissions in this group. Changing group members may cause data integrity issue.') : ''?>
     </td>
     <td align="center">
       <h3><?php echo isset($selectedName) ? $selectedName : ''?></h3>

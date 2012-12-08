@@ -69,6 +69,29 @@ class EvaluationSubmission extends AppModel
     }
 
     /**
+     * getEvalSubmissionByEventIdGroupIdSubmitter
+     *
+     * @param bool $eventId   event id
+     * @param bool $groupId   group id
+     * @param bool $submitter submitter
+     *
+     * @access public
+     * @return void
+     */
+    function getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, $submitter)
+    {
+        return $this->find('first', array(
+            'conditions' => array(
+                $this->alias.'.submitter_id' => $submitter,
+                $this->alias.'.submitted' => 1,
+                'GroupEvent.group_id' => $groupId,
+                'GroupEvent.event_id' => $eventId,
+            ),
+            'contain' => array('GroupEvent')
+        ));
+    }
+
+    /**
      * getEvalSubmissionByEventIdSubmitter
      *
      * @param bool $eventId   event id

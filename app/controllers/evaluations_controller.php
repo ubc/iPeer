@@ -411,32 +411,31 @@ class EvaluationsController extends AppController
         $this->autoRender = false;
 
         if (empty($this->params['data'])) {
-            $group = null;
+            $group = array();
             $group_events = $this->GroupEvent->getGroupEventByEventId($eventId);
-            $userId=$this->Auth->user('id');
+            $userId = User::get('id');
             foreach ($group_events as $events) {
                 if ($this->GroupsMembers->checkMembershipInGroup($events['GroupEvent']['group_id'], $userId) !== 0) {
-                    $group=$events['GroupEvent']['group_id'];
+                    $group[] = $events['GroupEvent']['group_id'];
                 }
             }
 
-            $templateId = $this->Event->getEventTemplateTypeId($eventId);;
+            $event = $this->Event->getEventById($eventId);
 
             // filter out users that don't have access to this eval, invalid ids, not simple eval
-            if (($group != $groupId || '1' != $templateId)) {
+            if ((!in_array($groupId, $group) || '1' != $event['Event']['event_template_type_id'])) {
                 $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/home/index');
             }
 
             // students can't submit again
-            $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId, User::get('id'));
+            $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
             if (!empty($submission)) {
                 $this->Session->setFlash(__('Error: Submissions had been made', true));
                 $this->redirect('/home/index');
             }
 
             // students can't submit outside of release date range
-            $event = $this->Event->getEventById($eventId);
             $now = time();
 
             if ($now < strtotime($event['Event']['release_date_begin']) ||
@@ -671,24 +670,24 @@ class EvaluationsController extends AppController
             $rubricId = $event['Event']['template_id'];
             $courseId = $event['Event']['course_id'];
 
-            $group = null;
+            $group = array();
             $group_events = $this->GroupEvent->getGroupEventByEventId($eventId);
-            $userId=$this->Auth->user('id');
+            $userId = User::get('id');
             foreach ($group_events as $events) {
                 if ($this->GroupsMembers->checkMembershipInGroup($events['GroupEvent']['group_id'], $userId) !== 0) {
-                    $group=$events['GroupEvent']['group_id'];
+                    $group[] = $events['GroupEvent']['group_id'];
                 }
             }
 
             // if group id provided does not match the group id the user belongs to or
             // template type is not rubric - they are redirected
-            if ($group != $groupId || '2' != $event['Event']['event_template_type_id']) {
+            if (!in_array($groupId, $group) || '2' != $event['Event']['event_template_type_id']) {
                 $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/home/index');
             }
 
             // students can't submit again
-            $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId, User::get('id'));
+            $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
             if (!empty($submission)) {
                 $this->Session->setFlash(__('Error: Submissions had been made', true));
                 $this->redirect('/home/index');
@@ -862,18 +861,18 @@ class EvaluationsController extends AppController
             $courseId = $this->Event->getCourseByEventId($eventId);
             $templateId = $this->Event->getEventTemplateTypeid($eventId);
 
-            $group = null;
+            $group = array();
             $group_events = $this->GroupEvent->getGroupEventByEventId($eventId);
-            $userId=$this->Auth->user('id');
+            $userId = User::get('id');
             foreach ($group_events as $events) {
                 if ($this->GroupsMembers->checkMembershipInGroup($events['GroupEvent']['group_id'], $userId) !== 0) {
-                    $group=$events['GroupEvent']['group_id'];
+                    $group[] = $events['GroupEvent']['group_id'];
                 }
             }
 
             // if group id provided does not match the group id the user belongs to or
             // template type is not mixeval - they are redirected
-            if ($group != $groupId || '4' != $templateId) {
+            if (!in_array($groupId, $group) || '4' != $templateId) {
                 $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/home/index');
             }
