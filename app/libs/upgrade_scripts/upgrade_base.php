@@ -50,6 +50,12 @@ class UpgradeBase
         trigger_error(__('You need to implemented down() function in the upgrade script.', true));
     }
 
+    /**
+     * upgrade
+     *
+     * @access public
+     * @return void
+     */
     public function upgrade() {
         if ($this->up()) {
             $sysparameter = ClassRegistry::init('SysParameter');
@@ -64,8 +70,9 @@ class UpgradeBase
     /**
      * patchDb
      *
-     * @param mixed $fromVersion from version
-     * @param bool  $dbConfig     db config
+     * @param int   $fromVersion from version
+     * @param int   $toVersion   to version
+     * @param array $dbConfig    database config
      *
      * @access public
      * @return void

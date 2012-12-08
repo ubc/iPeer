@@ -32,6 +32,14 @@ class UpgraderComponent extends Object
         }
     }
 
+    /**
+     * startup
+     *
+     * @param mixed $controller
+     *
+     * @access public
+     * @return void
+     */
     public function startup($controller)
     {
         $this->controller = $controller;

@@ -706,7 +706,6 @@ class V1Controller extends Controller {
         if ($user_id) {
             $conditions['evaluatee'] = $user_id;
         }
-        $params = array('fields' => $fields, 'conditions' => $conditions);
 
         if ($this->RequestHandler->isGet()) {
             $res = array();

@@ -85,6 +85,8 @@ class SurveyGroupsController extends AppController
     /**
      * index
      *
+     * @param int $courseId
+     *
      * @access public
      * @return void
      */
@@ -119,16 +121,15 @@ class SurveyGroupsController extends AppController
     /**
      * viewresult
      *
-     * @param mixed $eventId - Event id
+     * @param int $courseId
+     * @param int $eventId
      *
      * @access public
      * @return void
      */
     function viewresult($courseId, $eventId=null)
     {
-        $view = array(); // holds all the details for display in view
         $surveys = array(); // holds all the surveys' titles in the course
-        $event = array(); // holds the current survey
 
         $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission(), array(
             'Event' => 'event_template_type_id = 3',
@@ -194,7 +195,6 @@ class SurveyGroupsController extends AppController
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
         }
-        $courseName = $course['Course']['course'];
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))
             ->push(__('Create Group Set', true)));
         $this->set('surveys', $this->Survey->find('list', array('conditions' => array('course_id' => $course_id))));

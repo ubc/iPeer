@@ -11,6 +11,12 @@ require_once('upgrade_base.php');
  */
 class Upgrade300 extends UpgradeBase
 {
+    /**
+     * __construct
+     *
+     * @access public
+     * @return void
+     */
     public function __construct()
     {
         $this->fromVersions = array(null, '2.3.1');

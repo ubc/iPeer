@@ -264,15 +264,16 @@ class Course extends AppModel
      * @param mixed $instructorId instructor id
      * @param bool  $type         type
      * @param int   $contain      contained models
+     * @param array $conditions   conditions for find
      *
      * @return course data
      */
     function getCourseByInstructor($instructorId, $type = 'all', $contain = array(), $conditions = array())
     {
         $contain = array_merge(array('Instructor'), $contain);
-        if ($type == 'list') {
+        /*if ($type == 'list') {
             $fields = array('Course.full_name');
-        }
+        }*/
 
         // we need two queries to find the courses. becuase if we specifiy the instructor id condition
         // we can only get one instructor with the id we specified. If the course has more than one
@@ -343,8 +344,8 @@ class Course extends AppModel
     /**
      * Get course data by departments
      *
-     * @param unknown_type $departments
-     * @param mixed $findType
+     * @param array  $departments array of departments
+     * @param string $findType    find type
      *
      * @return course data
      */
@@ -366,7 +367,17 @@ class Course extends AppModel
         return $ret;
     }
 
-    function getByDepartmentIds($departmentIds, $findType = "all", $options)
+    /**
+     * getByDepartmentIds get course belongs to departments
+     *
+     * @param mixed  $departmentIds id or array of ids
+     * @param string $findType      find type
+     * @param mixed  $options       options for find
+     *
+     * @access public
+     * @return void
+     */
+    function getByDepartmentIds($departmentIds, $findType = "all", $options = array())
     {
         $options = array_merge(array('conditions' => array('Department.id' => $departmentIds)), $options);
         if ($findType == 'list') {
@@ -375,6 +386,7 @@ class Course extends AppModel
         }
         return $this->find($findType, $options);
     }
+    /* }}} */
 
     /**
      * getCourseList
@@ -467,6 +479,17 @@ class Course extends AppModel
     }
 
 
+    /**
+     * getAccessibleCourses get all course that the user has access to
+     *
+     * @param int    $userId     user id
+     * @param mixed  $permission filter permission
+     * @param string $type       find type
+     * @param array  $options    find options
+     *
+     * @access public
+     * @return void
+     */
     function getAccessibleCourses($userId, $permission, $type = 'all', $options = array())
     {
         switch($permission) {
@@ -495,6 +518,18 @@ class Course extends AppModel
         return $courses;
     }
 
+    /**
+     * getAccessibleCourseById get one course by course id, if user do not have
+     * access to the course, return false.
+     *
+     * @param int   $courseId   course id
+     * @param int   $userId     user id
+     * @param mixed $permission filter permission
+     * @param array $contain    contain relationship
+     *
+     * @access public
+     * @return void
+     */
     function getAccessibleCourseById($courseId, $userId,  $permission, $contain = array())
     {
         return $this->getAccessibleCourses($userId, $permission, 'first', array('conditions' => array('id' => $courseId), 'contain' => $contain));

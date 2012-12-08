@@ -358,6 +358,8 @@ class GroupsController extends AppController
     /**
      * import
      *
+     * @param int $courseId
+     *
      * @access public
      * @return void
      */

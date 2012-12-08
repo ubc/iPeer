@@ -1211,7 +1211,8 @@ class EvaluationsController extends AppController
     /**
      * studentViewEvaluationResult
      *
-     * @param bool $param
+     * @param int $eventId
+     * @param int $groupId
      *
      * @access public
      * @return void
@@ -1753,7 +1754,7 @@ class EvaluationsController extends AppController
     /**
      * viewSurveySummary
      *
-     * @param bool $surveyId
+     * @param int $eventId
      *
      * @access public
      * @return void
