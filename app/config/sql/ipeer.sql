@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS `acos` (
 -- Dumping data for table `acos`
 --
 
+INSERT INTO acos (id, parent_id, model, foreign_key, alias, lft, rght) VALUES
 (1, NULL, NULL, NULL, 'adminpage', 1, 2),
 (2, NULL, NULL, NULL, 'controllers', 3, 634),
 (3, 2, NULL, NULL, 'Pages', 4, 17),
@@ -438,6 +439,7 @@ CREATE TABLE IF NOT EXISTS `aros_acos` (
 -- Dumping data for table `aros_acos`
 --
 
+INSERT INTO `aros_acos` (`id`, `aro_id`, `aco_id`, `_create`, `_read`, `_update`, `_delete`) VALUES
 (1, 1, 2, '1', '1', '1', '1'),
 (2, 1, 318, '1', '1', '1', '1'),
 (3, 1, 51, '1', '1', '1', '1'),
