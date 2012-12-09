@@ -168,11 +168,6 @@ class EmailerController extends AppController
      */
     public function index()
     {
-        if (!User::hasPermission('controllers/emailer')) {
-            $this->Session->setFlash(__('Error: You do not have permission to use the emailer.', true));
-            $this->redirect('/home');
-        }
-
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
         // Set the display list
@@ -356,11 +351,6 @@ class EmailerController extends AppController
      */
     function view ($id)
     {
-        if (!User::hasPermission('controllers/emailer')) {
-            $this->Session->setFlash(__('Error: You do not have permission to view email schedules.', true));
-            $this->redirect('/home');
-        }
-
         // retrieving the requested email schedule
         $email = $this->EmailSchedule->find(
             'first',

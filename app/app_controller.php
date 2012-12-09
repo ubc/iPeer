@@ -25,7 +25,7 @@ class AppController extends Controller
     public $uses       = array('User', 'SysParameter', 'OauthToken');
     public $components = array('Session', 'Output',
         'userPersonalize', 'framework', 'Guard.Guard', 'Acl',
-        'AccessControl', 'Email');
+        'AccessControl', 'TemplateEmail');
     public $helpers    = array('Session', 'Html', 'Js');
     public $access     = array ();
     public $actionList = array ();
@@ -142,21 +142,15 @@ class AppController extends Controller
      */
     protected function _sendEmail($content, $subject, $from, $toAddress, $templateName = 'default', $ccAddress = array(), $bcc= array())
     {
+        $this->SysParameter->reload();
         $smtp['port'] = $this->SysParameter->get('email.port');
         $smtp['host'] = $this->SysParameter->get('email.host');
         $smtp['username'] = $this->SysParameter->get('email.username');
         $smtp['password'] = $this->SysParameter->get('email.password');
-
+        $smtp['timeout'] = 30;
         $this->Email->reset();
 
-        $this->Email->smtpOptions = array(
-            'port'=>$smtp['port']['parameter_value'],
-            'timeout'=>'30',
-            'host' => $smtp['host']['parameter_value'],
-            'username'=>$smtp['username']['parameter_value'],
-            'password'=>$smtp['password']['parameter_value'],
-        );
-
+        $this->Email->smtpOptions = $smtp;
         $this->Email->delivery = 'smtp';
         $this->Email->to = $toAddress;
         $this->Email->cc = $ccAddress;

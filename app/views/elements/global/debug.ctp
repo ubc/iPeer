@@ -19,29 +19,26 @@ if(!Configure::read('debug') == 0 &&
   <div style="text-align:center;">Version: <?php echo IPEER_VERSION?> - Branch: <?php echo $branch?> - Commit/Tag: <?php echo $commit;?></div>
   <table>
   <tr>
-    <td>User ID: <?php echo User::isLoggedIn() ? User::get('id') : "none" ?>
+    <td><a href="#user-data">User ID: <?php echo User::isLoggedIn() ? User::get('id') : "none" ?></a>
       <input type="button" onclick="jQuery('#user-data').toggle();" value="show/hide" />
     </td>
-    <td>Role: <?php echo count(User::getRoleArray()); ?>
+    <td><a href="#role-data">Role: <?php echo count(User::getRoleArray()); ?></a>
       <input type="button" onclick="jQuery('#role-data').toggle();" value="show/hide" />
     </td>
-    <td>Permission: <?php echo count(User::getPermissions()); ?>
+    <td><a href="#permission-data">Permission: <?php echo count(User::getPermissions()); ?></a>
       <input type="button" onclick="jQuery('#permission-data').toggle();" value="show/hide" />
     </td>
-    <td>Courses: <?php echo empty($coursesList) ? 0 : count($coursesList); ?>
-      <input type="button" onclick="jQuery('#coursesList-data').toggle();" value="show/hide" />
-    </td>
-    <td>Actions: <?php echo empty($action) ? 0 : count($action); ?>
+    <td><a href="#actions-data">Actions: <?php echo empty($action) ? 0 : count($action); ?></a>
       <input type="button" onclick="jQuery('#actions-data').toggle();" value="show/hide" />
     </td>
-    <td>Params: <?php echo empty($this->params) ? 0 : count($this->params); ?>
+    <td><a href="#params-data">Params: <?php echo empty($this->params) ? 0 : count($this->params); ?></a>
       <input type="button" onclick="jQuery('#params-data').toggle();" value="show/hide" />
     </td>
-    <td>SQL Log:
+    <td><a href="#SQL-data">SQL Log:</a>
       <input type="button" onclick="jQuery('#SQL-data').toggle();" value="show/hide" />
     </td>
-    <td>Allowed By:
-      <input type="button" onclick="jQuery('#allowedBy-data').toggle();" value="show/hide" />
+    <td><a href="#email-data">Email:</a>
+      <input type="button" onclick="jQuery('#email-data').toggle();" value="show/hide" />
     </td>
   </tr>
   </table>
@@ -83,20 +80,6 @@ if(!Configure::read('debug') == 0 &&
       print_r(__("(Empty)", true));
     } else {
       echo htmlspecialchars(print_r($perms, true));
-    }
-    ?>
-  </pre>
-
-  <h5>$coursesList variable</h5>
-  <pre style="background-color:#FFE9FF;" id="coursesList-data" >
-<?php
-    if (empty($courseList))
-    {
-      print_r(__("(Empty)", true));
-    }
-    else
-    {
-      echo htmlspecialchars(print_r($courseList, true));
     }
     ?>
   </pre>
@@ -152,18 +135,9 @@ if(!Configure::read('debug') == 0 &&
     ?>
   </div>
 
-  <h5>$allowedBy variable</h5>
-  <pre style="background-color: #E9FFFF;" id="allowedBy-data" >
-<?php
-    if (empty($allowedBy))
-    {
-      print_r(__("(Empty)", true));
-    }
-    else
-    {
-      echo htmlspecialchars(print_r($allowedBy, true));
-    }
-    ?>
+  <h5>$email variable</h5>
+  <pre style="background-color: #E9FFFF;" id="email-data" >
+  <?php echo $this->Session->flash('email'); ?>
   </pre>
 </div>
 <?php

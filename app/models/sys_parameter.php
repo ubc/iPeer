@@ -35,17 +35,10 @@ class SysParameter extends AppModel
      */
     function findParameter ($paramCode)
     {
-        // search in cache first
-        $result = Cache::read($paramCode, 'configuration');
-        if (null == $result ) {
-            $result = $this->find('first', array(
-                'conditions' => array('parameter_code' => $paramCode),
-                'fields' => array('id', 'parameter_code', 'parameter_value', 'parameter_type')
-            ));
-            Cache::write($paramCode, $result, 'configuration');
-        }
-
-        return $result;
+        return $this->find('first', array(
+            'conditions' => array('parameter_code' => $paramCode),
+            'fields' => array('id', 'parameter_code', 'parameter_value', 'parameter_type')
+        ));
     }
 
     /**
@@ -58,10 +51,16 @@ class SysParameter extends AppModel
      */
     function get($paramCode, $default = null)
     {
-        $result = $default;
-        $parameter = $this->findParameter($paramCode);
-        if ($parameter != null) {
-            $result = $parameter['SysParameter']['parameter_value'];
+        // search in cache first
+        $result = Cache::read($paramCode, 'configuration');
+        if (null == $result) {
+            $param = $this->findParameter($paramCode);
+            if ($param) {
+                $result = $param['SysParameter']['parameter_value'];
+                Cache::write($paramCode, $result, 'configuration');
+            } else {
+                $result = $default;
+            }
         }
 
         return $result;
@@ -125,7 +124,7 @@ class SysParameter extends AppModel
      */
     public function getDatabaseVersion()
     {
-        return $this->field('parameter_value', array('parameter_code' => 'database.version'));
+        return $this->get('database.version');
     }
 
     /**

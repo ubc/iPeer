@@ -25,10 +25,9 @@ class SysParameterTestCase extends CakeTestCase
     {
     }
 
-    //Run before EVERY test.
     function startTest($method)
     {
-        // extra setup stuff here
+        echo $method."\n";
     }
 
     function endTest($method)
@@ -37,7 +36,6 @@ class SysParameterTestCase extends CakeTestCase
 
     function testFindParameter ()
     {
-
         $result = $this->SysParameter->findParameter('display.logo_file');
         $this->assertEqual($result['SysParameter']['id'], 10);
         $this->assertEqual($result['SysParameter']['parameter_code'], 'display.logo_file');
@@ -48,5 +46,19 @@ class SysParameterTestCase extends CakeTestCase
 
         $result = $this->SysParameter->findParameter(null);
         $this->assertFalse($result);
+    }
+
+    function testGet()
+    {
+        $result = $this->SysParameter->get('display.logo_file');
+        $this->assertEqual($result, 'LayoutLogoDefault.gif');
+
+        // test cached version
+        $result = $this->SysParameter->get('display.logo_file');
+        $this->assertEqual($result, 'LayoutLogoDefault.gif');
+
+        // test default
+        $result = $this->SysParameter->get('non.existing.key', 'default');
+        $this->assertEqual($result, 'default');
     }
 }
