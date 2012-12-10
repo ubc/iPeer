@@ -1,8 +1,8 @@
 <?php
 /* OauthClients Test cases generated on: 2012-08-09 10:57:49 : 1344535069*/
-App::import('Controller', 'OauthClients');
+App::import('Controller', 'Oauthclients');
 
-class TestOauthClientsController extends OauthClientsController {
+class TestOauthClientsController extends OauthclientsController {
 	var $autoRender = false;
 
 	function redirect($url, $status = null, $exit = true) {

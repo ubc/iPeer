@@ -123,9 +123,9 @@
 </script>
 
 	<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
-    <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeEvaluation/'.$event['Event']['id'].'/'.$event['group_id']) ?>">
+    <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeEvaluation/'.$event['Event']['id'].'/'.$event['Group']['id']) ?>">
       <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
-      <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>"/>
+      <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>"/>
       <input type="hidden" name="course_id" value="<?php echo $courseId?>"/>
       <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $userId ?>"/>
       <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
@@ -139,13 +139,13 @@
     <td width="25%"><?php echo $fullName ?>
     </td>
     <td width="10%"><?php __('Evaluating')?>:</td>
-    <td width="25%"><?php echo $event['group_name'] ?></td>
+    <td width="25%"><?php echo $event['Group']['group_name'] ?></td>
   </tr>
   <tr class="tablecell2">
     <td><?php __('Event Name')?>:</td>
     <td><?php echo $event['Event']['title'] ?></td>
     <td><?php __('Due Date')?>:</td>
-    <td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($event['Event']['due_date']))) ?></td>
+    <td><?php echo Toolkit::formatDate($event['Event']['due_date']) ?></td>
   </tr>
   <tr class="tablecell2">
     <td><?php __('Description')?>:&nbsp;</td>

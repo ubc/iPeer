@@ -9,13 +9,13 @@
 
 	<?php
 	echo empty($data['Evaluation']['id']) ? null : $html->hidden('Evaluation.id'); ?>
-    <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeEvaluation') . '/'.$event['Event']['id'].'/'.$event['group_id']; ?>">
+    <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeEvaluation') . '/'.$event['Event']['id'].'/'.$event['Group']['id']; ?>">
       <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
-      <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>"/>
-      <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>"/>
+      <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>"/>
+      <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>"/>
       <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id'] ?>"/>
       <input type="hidden" name="mixeval_id" value="<?php echo $data['Mixeval']['id']?>"/>
-      <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $evaluator_id ;?>"/>
+      <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo User::get('id');?>"/>
       <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
       <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
 
@@ -24,10 +24,10 @@
     </tr>
   <tr class="tablecell2">
     <td width="10%"><?php __('Evaluator:')?></td>
-    <td width="25%"><?php echo $full_name ?>;
+    <td width="25%"><?php echo User::get('full_name')?>;
     </td>
     <td width="10%"><?php __('Evaluating:')?></td>
-	<td width="25%"><?php echo $event['group_name']; ?></td>
+	<td width="25%"><?php echo $event['Group']['group_name']; ?></td>
   </tr>
   <tr class="tablecell2">
     <td><?php __('Event Name:')?></td>
@@ -91,7 +91,7 @@
           $evaluationDetails = $user['Evaluation']['EvaluationDetail'];
           foreach ($evaluationDetails as $detailEval) {
             $detail = $detailEval['EvaluationMixevalDetail'];
-                     if ($view_data['Question'][$detail['question_number']]['MixevalsQuestion']['question_type'] != 'S' &&
+                     if ($viewData['Question'][$detail['question_number']]['MixevalsQuestion']['question_type'] != 'S' &&
                 empty($detail['question_comment'])) {
               $commentsNeeded = true;      // A criteria comment is missing
               //echo "Missing detail $detail[id] for user $user[id]<br />";
@@ -116,7 +116,7 @@
 
       <?php
       $params = array(  'controller'            => 'mixevals',
-                        'data'                  => $view_data,
+                        'data'                  => $viewData,
                         'scale_default'         => $data['Mixeval']['scale_max'],
                         'question_default'      => $data['Mixeval']['lickert_question_max'],
                         'prefill_question_max'  => $data['Mixeval']['prefill_question_max'],
@@ -155,11 +155,11 @@
   <tr class="tablecell2">
     <td colspan="4" align="center"><form name="submitForm" id="submitForm" method="POST" action="<?php echo $html->url('completeEvaluationMixeval') ?>">
   <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
-  <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>"/>
-  <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>"/>
+  <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>"/>
+  <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>"/>
   <input type="hidden" name="course_id" value="<?php echo $courseId ?>"/>
   <input type="hidden" name="mixeval_id" value="<?php echo $data['Mixeval']['id']?>"/>
-  <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $evaluator_id?>"/>
+  <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo User::get('id')?>"/>
   <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
 <center>
 <?php

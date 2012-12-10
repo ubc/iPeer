@@ -72,18 +72,20 @@ class AppController extends Controller
         // store user in the singleton for global access
         User::store($this->Auth->user());
 
+        $this->breadcrumb = Breadcrumb::create();
+
         if ($this->Auth->isAuthorized()) {
             // check if the user has permission to access the controller/action
             $permission = array_filter(array('controllers', ucwords($this->params['plugin']), ucwords($this->params['controller']), $this->params['action']));
             if (!User::hasPermission(join('/', $permission))) {
                 $this->Session->setFlash('Error: You do not have permission to access the page.');
                 $this->redirect('/home');
+                return;
             }
 
             $this->_checkDatabaseVersion();
         }
 
-        $this->breadcrumb = Breadcrumb::create();
         parent::beforeFilter();
     }
 

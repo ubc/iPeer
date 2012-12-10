@@ -463,7 +463,7 @@ class Event extends AppModel
 
 
     /**
-     * formatEventObj
+     * getEventByIdGroupId
      *
      * @param mixed $eventId event id
      * @param bool  $groupId group id
@@ -471,23 +471,21 @@ class Event extends AppModel
      * @access public
      * @return void
      */
-    function formatEventObj ($eventId, $groupId=null)
+    function getEventByIdGroupId($eventId, $groupId=null)
     {
         $this->recursive = 0;
         $conditions['Event.id'] = $eventId;
+        $contain = array();
         if ($groupId != null) {
             $conditions['Group.id'] = $groupId;
+            $contain[] = 'Group';
         }
 
-        $event = $this->find('first', array('conditions' => $conditions));
+        $event = $this->find('first', array(
+            'conditions' => $conditions,
+            'contain' => $contain,
+        ));
 
-        //This part can be removed after correcting array indexing on controller and view files
-        if ($groupId != null) {
-            $event['group_name'] = 'Group '.$event['Group']['group_num']." - ".$event['Group']['group_name'];
-            $event['group_id'] = $event['Group']['id'];
-            $event['group_event_id'] = $event['GroupEvent']['id'];
-            $event['group_event_marked'] = $event['GroupEvent']['marked'];
-        }
         return $event;
     }
 

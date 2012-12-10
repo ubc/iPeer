@@ -39,7 +39,8 @@ class RubricsLom extends AppModel
     function getLoms($rubricId=null, $lomId=null)
     {
         return $this->find('all', array(
-            'conditions' => array('RubricsLom.id' => $lomId, 'RubricsLom.rubric_id' => $rubricId)
+            'conditions' => array('RubricsLom.id' => $lomId, 'RubricsLom.rubric_id' => $rubricId),
+            'contain' => false,
         ));
     }
 }

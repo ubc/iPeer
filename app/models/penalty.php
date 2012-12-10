@@ -10,9 +10,8 @@
  */
 class Penalty extends AppModel
 {
-
     public $name = 'Penalty';
-    
+
     public $validate = array(
         'days_late' => array(
             'notEmpty' => array(
@@ -26,8 +25,9 @@ class Penalty extends AppModel
             )
         )
     );
-    
+
     public $belongsTo = array('Event');
+    public $actsAs = array('Containable');
 
     /**
      * getPenaltyById
@@ -53,7 +53,11 @@ class Penalty extends AppModel
      */
     function getPenaltyByEventId($eventId)
     {
-        $penalties = $this->find('all', array('conditions' => array('Penalty.event_id' => $eventId), 'order' => array('Penalty.days_late')));
+        $penalties = $this->find('all', array(
+            'conditions' => array('Penalty.event_id' => $eventId),
+            'order' => array('Penalty.days_late'),
+            'contain' => false,
+        ));
         // pop off the final deduction
         array_pop($penalties);
         return $penalties;
@@ -70,7 +74,11 @@ class Penalty extends AppModel
      */
     function getPenaltyFinal($eventId)
     {
-        $final = $this->find('all', array('conditions' => array('Penalty.event_id' => $eventId)));
+        $final = $this->find('all', array(
+            'conditions' => array('Penalty.event_id' => $eventId),
+            'order' => array('Penalty.days_late'),
+            'contain' => false,
+        ));
         return array_pop($final);
     }
 
@@ -85,8 +93,10 @@ class Penalty extends AppModel
      */
     function getPenaltyDays($eventId)
     {
-        $count = $this->find('count',
-            array('conditions'=>array('Penalty.event_id' => $eventId)));
+        $count = $this->find('count', array(
+            'conditions'=>array('Penalty.event_id' => $eventId),
+            'contain' => false,
+        ));
         if ($count > 0) {
             $count--;
         }

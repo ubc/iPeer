@@ -519,11 +519,12 @@ class EvaluationComponent extends Object
      * Rubric Evaluation functions
      *
      * @param mixed $event
+     * @param mixed $groupId
      *
      * @access public
      * @return void
      */
-    function loadRubricEvaluationDetail($event)
+    function loadRubricEvaluationDetail($event, $groupId)
     {
         $this->EvaluationRubric = new EvaluationRubric;
         $this->GroupsMembers = new GroupsMembers;
@@ -537,11 +538,11 @@ class EvaluationComponent extends Object
         $result = array();
         //Get Members for this evaluation
         $groupMembers = $this->GroupsMembers->getEventGroupMembersNoTutors(
-            $event['group_id'], $event['Event']['self_eval'], $evaluator);
+            $event['Group']['id'], $event['Event']['self_eval'], $evaluator);
         for ($i = 0; $i<count($groupMembers); $i++) {
             $targetEvaluatee = $groupMembers[$i]['User']['id'];
             $evaluation = $this->EvaluationRubric->getEvalRubricByGrpEventIdEvaluatorEvaluatee(
-                $event['group_event_id'], $evaluator, $targetEvaluatee);
+                $event['GroupEvent']['id'], $evaluator, $targetEvaluatee);
             if (!empty($evaluation)) {
                 $groupMembers[$i]['User']['Evaluation'] = $evaluation;
                 $groupMembers[$i]['User']['Evaluation']['EvaluationDetail'] =
@@ -559,7 +560,7 @@ class EvaluationComponent extends Object
         $result['rubric'] = $this->Rubric->read();
 
         // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
-        $numMembers=count($this->GroupsMembers->getEventGroupMembersNoTutors($event['group_id'], $event['Event']['self_eval'], $evaluator));
+        $numMembers = count($this->GroupsMembers->getEventGroupMembersNoTutors($groupId, $event['Event']['self_eval'], $evaluator));
         //$this->set('evaluateeCount', $numMembers);
         $result['evaluateeCount'] = $numMembers;
         return $result;
@@ -1107,11 +1108,11 @@ class EvaluationComponent extends Object
 
         //Get Members for this evaluation
         $groupMembers = $this->GroupsMembers->getEventGroupMembersNoTutors(
-            $event['group_id'], $event['Event']['self_eval'], $this->Auth->user('id'));
+            $event['Group']['id'], $event['Event']['self_eval'], $this->Auth->user('id'));
         for ($i = 0; $i<count($groupMembers); $i++) {
             $targetEvaluatee = $groupMembers[$i]['User']['id'];
             $evaluation = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee(
-                $event['group_event_id'], $evaluator, $targetEvaluatee);
+                $event['GroupEvent']['id'], $evaluator, $targetEvaluatee);
             if (!empty($evaluation)) {
                 $groupMembers[$i]['User']['Evaluation'] = $evaluation;
                 $groupMembers[$i]['User']['Evaluation']['EvaluationDetail'] =
@@ -1127,7 +1128,7 @@ class EvaluationComponent extends Object
         $result['mixeval'] = $this->Mixeval->read();
 
         // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
-        $numMembers=count($this->GroupsMembers->getEventGroupMembersNoTutors($event['group_id'],
+        $numMembers=count($this->GroupsMembers->getEventGroupMembersNoTutors($event['Group']['id'],
             $event['Event']['self_eval'], $evaluator));
         //$this->set('evaluateeCount', $numMembers);
         $result['evaluateeCount'] = $numMembers;
