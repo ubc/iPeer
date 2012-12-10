@@ -94,20 +94,20 @@ $php_recommended_settings = array(
     'directive' => 'session.auto_start',
     'recommend' => 'OFF'
   ),
+  array (
+    'name' => 'PHP LDAP Extension',
+    'recommend' => 'Yes',
+    'actual' => (function_exists('ldap_connect') ? 'Yes' : 'No'),
+    'description' => 'This has to be enabled if you are planning to use LDAP authenication.'
+  ),
 );
 
 // recommended requirements check
-foreach ($php_recommended_settings as &$setting)
+foreach ($php_recommended_settings as $key => $setting)
 {
-  $actual = get_php_setting($setting['directive']);
-  if ($actual == $setting['recommend'])
-  {
-    $setting['actual'] = "<b class='green'>".$actual."</b>";
-  }
-  else
-  {
-    $setting['actual'] = "<b class='red'>".$actual."</b>";
-  }
+    if (isset($setting['directive'])) {
+        $php_recommended_settings[$key]['actual'] = get_php_setting($setting['directive']);
+    }
 }
 
 ?>
@@ -170,16 +170,15 @@ foreach ($php_recommended_settings as &$setting)
     <th width="30%"><?php __('Recommended')?></th>
     <th width="30%"><?php __('Actual')?></th>
   </tr>
-  <?php
-  foreach ($php_recommended_settings as $setting)
-  {
-    echo "<tr>";
-    echo "<td>". $setting['name'] ."</td>";
-    echo "<td>". $setting['recommend'] ."</td>";
-    echo "<td>". $setting['actual'] ."</td>";
-    echo "</tr>";
-  }
-  ?>
+  <?php foreach ($php_recommended_settings as $setting):?>
+    <tr>
+    <td><?php echo $setting['name']?>
+        <div class="help"><?php echo isset($setting['description']) ? $setting['description'] : ''?></div>
+    </td>
+    <td><?php echo $setting['recommend']?></td>
+    <td><b class='<?php echo ($setting['actual'] == $setting['recommend'] ? 'green' : 'red')?>'><?php echo $setting['actual']?></font></td>
+    </tr>
+  <?php endforeach; ?>
 </table>
 <form action="<?php echo $html->url('install2') ?>" id="sysreqform">
   <?php
