@@ -894,7 +894,7 @@ class EvaluationsController extends AppController
             }
 
             // students can't submit again
-            $submission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($eventId, User::get('id'));
+            $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
             if (!empty($submission)) {
                 $this->Session->setFlash(__('Error: Submissions had been made', true));
                 $this->redirect('/home/index');
