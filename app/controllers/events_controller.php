@@ -46,7 +46,7 @@ class EventsController extends AppController
         foreach ($data as $i => $entry) {
             $releaseDate = strtotime($entry["Event"]["release_date_begin"]);
             $endDate = strtotime($entry["Event"]["release_date_end"]);
-            $timeNow = strtotime($entry[0]["now()"]);
+            $timeNow = time();
 
             if (!$releaseDate) {
                 $releaseDate = 0;
@@ -111,7 +111,7 @@ class EventsController extends AppController
             // Release window
             array("Event.release_date_begin", "", "",    "hidden"),
             array("Event.release_date_end",   "", "",    "hidden"),
-            array("now()",           "",          "",    "hidden"));
+        );
 
         // put all the joins together
         // shows all events of courses the user (not student) has access to

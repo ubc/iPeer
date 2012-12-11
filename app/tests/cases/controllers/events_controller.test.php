@@ -82,26 +82,29 @@ class EventsControllerTest extends ExtendedAuthTestCase {
     function testIndex() {
         $result = $this->testAction('/events/index', array('return' => 'vars'));
 
-        $this->assertEqual($result["paramsForList"]['data']['entries'][0]['Event']['Title'], 'Term 1 Evaluation');
-        $this->assertEqual($result["paramsForList"]['data']['entries'][0]['Event']['event_template_type_id'], 1);
-        $this->assertEqual($result["paramsForList"]['data']['entries'][0]['Course']['course'], 'MECH 328');
-        $this->assertEqual($result["paramsForList"]['data']['entries'][0]['!Custom']['isReleased'], 'Open Now');
+        $this->assertEqual(count($result["paramsForList"]['data']['entries']), 4);
+        $this->assertEqual(sort(Set::extract($result["paramsForList"]['data']['entries'], '/Event/id')), array(1,2,3,6));
+        $events = Set::sort($result["paramsForList"]['data']['entries'], '{n}.Event.id', 'asc');
+        $this->assertEqual($events[0]['Event']['Title'], 'Term 1 Evaluation');
+        $this->assertEqual($events[0]['Event']['event_template_type_id'], 1);
+        $this->assertEqual($events[0]['Course']['course'], 'MECH 328');
+        $this->assertEqual($events[0]['!Custom']['isReleased'], 'Open Now');
 
-        $this->assertEqual($result["paramsForList"]['data']['entries'][1]['Event']['Title'], 'Term Report Evaluation');
-        $this->assertEqual($result["paramsForList"]['data']['entries'][1]['Event']['event_template_type_id'], 2);
-        $this->assertEqual($result["paramsForList"]['data']['entries'][1]['Course']['course'], 'MECH 328');
-        $this->assertEqual($result["paramsForList"]['data']['entries'][1]['!Custom']['isReleased'], 'Open Now');
+        $this->assertEqual($events[1]['Event']['Title'], 'Term Report Evaluation');
+        $this->assertEqual($events[1]['Event']['event_template_type_id'], 2);
+        $this->assertEqual($events[1]['Course']['course'], 'MECH 328');
+        $this->assertEqual($events[1]['!Custom']['isReleased'], 'Open Now');
 
-        $this->assertEqual($result["paramsForList"]['data']['entries'][2]['Event']['Title'], 'Project Evaluation');
-        $this->assertEqual($result["paramsForList"]['data']['entries'][2]['Event']['event_template_type_id'], 4);
-        $this->assertEqual($result["paramsForList"]['data']['entries'][2]['Course']['course'], 'MECH 328');
-        $this->assertEqual($result["paramsForList"]['data']['entries'][2]['!Custom']['isReleased'], 'Open Now');
+        $this->assertEqual($events[2]['Event']['Title'], 'Project Evaluation');
+        $this->assertEqual($events[2]['Event']['event_template_type_id'], 4);
+        $this->assertEqual($events[2]['Course']['course'], 'MECH 328');
+        $this->assertEqual($events[2]['!Custom']['isReleased'], 'Open Now');
 
     }
 
     function testView() {
         $result = $this->testAction('/events/view/1', array('return' => 'vars'));
-        // var_dump($result);
+
         $this->assertEqual($result['event']['Event']['title'], 'Term 1 Evaluation');
         $this->assertEqual($result['event']['Event']['event_template_type_id'], 1);
         $this->assertEqual($result['event']['Group'][0]['group_name'], 'Reapers');
@@ -109,7 +112,7 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->assertEqual($result['event']['Group'][0]['Member'][0]['last_name'], 'Student');
 
         $result = $this->testAction('/events/view/2', array('return' => 'vars'));
-        // var_dump($result);
+
         $this->assertEqual($result['event']['Event']['title'], 'Term Report Evaluation');
         $this->assertEqual($result['event']['Event']['event_template_type_id'], 2);
         $this->assertEqual($result['event']['Group'][0]['group_name'], 'Reapers');
