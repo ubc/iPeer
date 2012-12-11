@@ -190,7 +190,7 @@ class GroupsController extends AppController
     function view($id)
     {
         // Check whether the group exists
-        $group = $this->Group->find('first', array('conditions' => array('Group.id' => $id), 'recursive' => 1));
+        $group = $this->Group->getGroupWithMembersById($id);
         if (empty($group)) {
             $this->Session->setFlash(__('Error: That group does not exist.', true));
             $this->redirect('/courses');
@@ -202,17 +202,7 @@ class GroupsController extends AppController
             $this->redirect('/courses');
         }
 
-        $this->data = $this->Group->read(null, $id);
-        $this->set('data', $this->data);
-        $this->set('course_id', $this->data['Group']['course_id']);
-        $this->set('readonly', true);
-        $this->set('members', $this->GroupsMembers->getMembers($id));
-        $members = $this->GroupsMembers->getMembers($id);
-        $this->User->recursive =0;
-        $group_data = $this->User->find('all', array('conditions' => array('id'=>$members),
-            'fields' => array('id', 'full_name', 'email')
-        ));
-        $this->set('group_data', $group_data);
+        $this->set('data', $group);
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))
             ->push(array('groups' => array('course_id' => $course['Course']['id'])))
             ->push(__('View', true)));
@@ -230,10 +220,7 @@ class GroupsController extends AppController
     function add ($course_id)
     {
         if (!empty($this->data)) {
-            //$this->params = $this->Group->prepData($this->params);
             if ($this->Group->save($this->data)) {
-                // add members into the groups_members table
-                //$this->GroupsMembers->insertMembers($this->Group->id, $this->params['data']['Group']);
                 $this->Session->setFlash(__('The group was added successfully.', true), 'good');
                 $this->redirect('index/'.$course_id);
             }
@@ -261,7 +248,6 @@ class GroupsController extends AppController
         $this->data['Group']['course_id'] = $course_id;
         // gets all the students in db for the unfiltered students list
         $this->set('user_data', $user_data);
-        $this->set('group_data', array());
         $this->set('course_id', $course_id);
         $this->set('group_num', $this->Group->getFirstAvailGroupNum(($course_id)));
     }
@@ -278,12 +264,9 @@ class GroupsController extends AppController
     function edit ($group_id = null)
     {
         if (!empty($this->data)) {
-            //$this->data['Group']['id'] = $group_id;
             if ($this->Group->save($this->data)) {
-                //$this->GroupsMembers->updateMembers($this->Group->id, $data2save['data']['Group']);
                 $this->Session->setFlash(__('The group was updated successfully.', true), 'good');
             } else {
-                // Error occurs:
                 $this->Session->setFlash(__('Error updating that group.', true));
             }
             $this->redirect('index/'.$this->data['Group']['course_id']);

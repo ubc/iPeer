@@ -23,6 +23,7 @@ class EventsController extends AppController
      */
     function __construct()
     {
+        $this->Sanitize = new Sanitize;
         $this->set('title_for_layout', __('Events', true));
         parent::__construct();
     }
@@ -309,6 +310,7 @@ class EventsController extends AppController
     }
 
     /**
+     * deprecated?
      * eventTemplatesList
      *
      * @param int $templateId
@@ -316,7 +318,7 @@ class EventsController extends AppController
      * @access public
      * @return void
      */
-    function eventTemplatesList($templateId = 1)
+    /*function eventTemplatesList($templateId = 1)
     {
         $currentUser = $this->User->getCurrentLoggedInUser();
         $this->layout = 'ajax';
@@ -344,7 +346,7 @@ class EventsController extends AppController
         $this->set('eventTemplates', $eventTemplates);
         $this->set('default', $default);
         $this->set('model', $model);
-    }
+    }*/
 
 
 
@@ -581,7 +583,7 @@ class EventsController extends AppController
         $id = $this->Sanitize->paranoid($groupId);
 
         $this->set('event_id', $id);
-        $this->set('assignedGroups', $this->getAssignedGroups($groupId));
+        $this->set('assignedGroups', $this->_getAssignedGroups($groupId));
     }
 
     /**
@@ -636,14 +638,14 @@ class EventsController extends AppController
 
 
     /**
-     * getAssignedGroups
+     * _getAssignedGroups
      *
      * @param bool $eventId
      *
      * @access public
      * @return void
      */
-    function getAssignedGroups($eventId=null)
+    function _getAssignedGroups($eventId=null)
     {
         $assignedGroupIDs = $this->GroupEvent->getGroupIDsByEventId($eventId);
         $assignedGroups = array();

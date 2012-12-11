@@ -164,9 +164,9 @@ class Mixeval extends EvaluationBase
         }
         return $mixeval;
     }
-    
+
     /**
-    * copy generate a copy of mixeval with specific ID. The generated copy 
+    * copy generate a copy of mixeval with specific ID. The generated copy
     * is cleaned up by removing all the IDs in it
     *
     * @param mixed $id source rubric ID
@@ -178,16 +178,16 @@ class Mixeval extends EvaluationBase
         $data = $this->find('first', array('conditions' => array('id' => $id),
             'contain' => array('Question.Description',
             )));
-        
+
         $data['Mixeval']['name'] = __('Copy of ', true).$data['Mixeval']['name'];
-        
+
         if (null != $data) {
             unset ($data['Mixeval']['id'],
                 $data['Mixeval']['creator_id'],
                 $data['Mixeval']['created'],
                 $data['Mixeval']['updater_id'],
                 $data['Mixeval']['modified']);
-            
+
             for ($i = 0; $i < count($data['Question']); $i++) {
                 unset ($data['Question'][$i]['id'],
                     $data['Question'][$i]['mixeval_id']);
@@ -199,7 +199,7 @@ class Mixeval extends EvaluationBase
                 }
             }
         }
-        
+
         return $data;
     }
 

@@ -19,7 +19,7 @@ Mock::generatePartial('CoursesController',
 /**
  * CoursesControllerTest Course controller test case
  *
- * @uses ExtendedTestCase
+ * @uses ExtendedAuthTestCase
  * @package Tests
  * @author  Pan Luo <pan.luo@ubc.ca>
  */
@@ -40,7 +40,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         'app.evaluation_rubric', 'app.evaluation_rubric_detail',
         'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
         'app.user_faculty', 'app.department', 'app.sys_parameter',
-        'app.oauth_token','fda'
+        'app.oauth_token',
     );
 
     //public $testMethods = array('testIndexNoPermission');
@@ -206,6 +206,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
      */
     public function startCase()
     {
+        echo "Start Course controller test.\n";
         $this->defaultLogin = array(
             'User' => array(
                 'username' => 'root',

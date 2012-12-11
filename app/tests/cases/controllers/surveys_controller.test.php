@@ -8,105 +8,128 @@
  * http://42pixels.com/blog/testing-controllers-the-slightly-less-hard-way
  */
 
-App::import('Controller', 'Survey');
+App::import('Controller', 'Surveys');
+App::import('Lib', 'ExtendedAuthTestCase');
 
-class SurveyControllerTest extends CakeTestCase {
-  var $fixtures = array('app.course', 'app.role', 'app.user', 'app.group',
-                        'app.roles_user', 'app.event', 'app.event_template_type', 'app.rubrics_lom',
-                        'app.group_event', 'app.evaluation_submission', 'app.rubrics_criteria_comment',
-                        'app.survey_group_set', 'app.survey_group', 'app.rubrics_criteria',
-                        'app.survey_group_member', 'app.question', 'app.rubric',
-                        'app.response', 'app.survey_question', 'app.user_course',
-                        'app.user_enrol', 'app.groups_member', 'app.survey',
-                        'app.personalize', 'app.sys_parameter',
-                       );
+// mock instead of needing to create a new controller for every test
+Mock::generatePartial('SurveysController',
+    'MockSurveysController',
+    array('isAuthorized', 'render', 'redirect', '_stop', 'header'));
 
-  function startCase() {
-    echo '<h1>Starting Test Case</h1>';
-  }
+class SurveyControllerTest extends ExtendedAuthTestCase {
+    public $controller = null;
 
-  function endCase() {
-     echo '<h1>Ending Test Case</h1>';
-  }
+    public $fixtures = array(
+        'app.course', 'app.role', 'app.user', 'app.group',
+        'app.roles_user', 'app.event', 'app.event_template_type',
+        'app.group_event', 'app.evaluation_submission',
+        'app.survey_group_set', 'app.survey_group',
+        'app.survey_group_member', 'app.question',
+        'app.response', 'app.survey_question', 'app.user_course',
+        'app.user_enrol', 'app.groups_member', 'app.survey',
+        'app.personalize', 'app.penalty', 'app.evaluation_simple',
+        'app.faculty', 'app.user_tutor', 'app.course_department',
+        'app.evaluation_rubric', 'app.evaluation_rubric_detail',
+        'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
+        'app.user_faculty', 'app.department', 'app.sys_parameter',
+        'app.oauth_token', 'app.rubric', 'app.rubrics_criteria',
+        'app.rubrics_criteria_comment', 'app.rubrics_lom',
+        'app.simple_evaluation', 'app.survey_input', 'app.mixevals_question',
+        'app.mixevals_question_desc', 'app.mixeval'
+    );
 
-  function startTest() {
-    $controller = new FakeController();
-    $controller->constructClasses();
-    $controller->startupProcess();
-    $controller->Component->startup($controller);
-    $controller->Auth->startup($controller);
-    $admin = array('User' => array('username' => 'Admin',
-                                   'password' => 'passwordA'));
-    $controller->Auth->login($admin);
-  }
+    function startCase() {
+        echo "Start Survey controller test.\n";
+        $this->defaultLogin = array(
+            'User' => array(
+                'username' => 'root',
+                'password' => md5('ipeeripeer')
+            )
+        );
+    }
 
-  function endTest() {
-    echo '<hr />';
-  }
+    function endCase() {
+    }
 
-  function testIndex() {
-    $result = $this->testAction('/surveys/index', array('connection' => 'test_suite', 'return' => 'vars'));
+    function startTest($method) {
+        echo $method.TEST_LB;
+        $this->controller = new MockSurveysController();
+    }
 
-    $this->assertEqual($result['paramsForList']['data']['entries'][0]['Survey']['name'], 'Math303 Survey');
-    $this->assertEqual($result['paramsForList']['data']['entries'][0]['Course']['course'], 'Math303');
-    $this->assertEqual($result['paramsForList']['data']['entries'][1]['Survey']['name'], 'Math304 Survey');
-    $this->assertEqual($result['paramsForList']['data']['entries'][1]['Course']['course'], 'Math303');
-    $this->assertEqual($result['paramsForList']['data']['entries'][2]['Survey']['name'], 'Empty Survey');
-    $this->assertEqual($result['paramsForList']['data']['entries'][2]['Course']['course'], 'Math303');
-  }
+    public function endTest($method)
+    {
+        // defer logout to end of the test as some of the test need check flash
+        // message. After logging out, message is destoryed.
+        if (isset($this->controller->Auth)) {
+            $this->controller->Auth->logout();
+        }
+        unset($this->controller);
+        ClassRegistry::flush();
+    }
 
-  function testView() {
-    $result = $this->testAction('/surveys/view/1', array('connection' => 'test_suite', 'return' => 'vars'));
-    $this->assertEqual($result['data']['Survey']['name'], 'Math303 Survey');
-    $this->assertEqual($result['data']['Survey']['due_date'], '2012-06-16 12:28:00');
-    $this->assertEqual($result['data']['Survey']['release_date_begin'], '2011-06-16 12:28:07');
-    $this->assertEqual($result['data']['Survey']['release_date_end'], '2013-06-16 12:28:07');
-    $this->assertEqual($result['data']['Course']['course'], 'Math303');
-    $this->assertEqual($result['data']['Course']['title'], 'Stochastic Process');
-  }
+    public function getController()
+    {
+        return $this->controller;
+    }
 
-  //TODO redirect
-  function testAdd() {
-  }
-  //TODO redirect
-  function testEdit() {
-//    $result = $this->testAction('/surveys/edit/1', array('connection' => 'test_suite', 'return' => 'contents'));
-//    var_dump($result);
-  }
+    function testIndex() {
+        $result = $this->testAction('/surveys/index', array('return' => 'vars'));
 
-  //TODO redirect
-  function testCopy() {
-  }
-  //TODO redirect
-  function testDelete() {
-  }
+        $this->assertEqual($result['paramsForList']['data']['entries'][0]['Survey']['name'], 'Team Creation Survey');
+        $this->assertEqual($result['paramsForList']['data']['entries'][0]['Course']['course'], 'MECH 328');
+        $this->assertEqual($result['paramsForList']['data']['entries'][1]['Survey']['name'], 'Survey, all Q types');
+        $this->assertEqual($result['paramsForList']['data']['entries'][1]['Course']['course'], 'MECH 328');
+    }
 
-  //TODO redirect
-  function testReleaseSurvey() {
-    $result = $this->testAction('surveys/questionsSummary/1', array('connection' => 'test_suite', 'return' => 'vars'));
-    $this->assertEqual($result['questions'][0]['Question']['prompt'], 'Did you learn a lot from this course ?');
-    $this->assertEqual($result['questions'][0]['Response'][0]['response'], 'YES FOR Q1');
-    $this->assertEqual($result['questions'][0]['Response'][1]['response'], 'NO FOR Q1');
-    $this->assertEqual($result['questions'][1]['Question']['prompt'], 'What was the hardest part ?');
-    $this->assertEqual($result['questions'][1]['Response'][0]['response'], 'NO FOR Q2');
-    $this->assertEqual($result['questions'][2]['Question']['prompt'], 'Did u like the prof ?');
-    $this->assertEqual($result['questions'][2]['Response'][0]['response'], 'YES FOR Q3');
+    function testView() {
+        $result = $this->testAction('/surveys/view/1', array('return' => 'vars'));
+        $this->assertEqual($result['data']['Survey']['name'], 'Team Creation Survey');
+        $this->assertEqual($result['data']['Survey']['due_date'], '2012-07-31 11:20:00');
+        $this->assertEqual($result['data']['Survey']['release_date_begin'], '2012-07-01 11:20:00');
+        $this->assertEqual($result['data']['Survey']['release_date_end'], '2013-12-31 11:20:00');
+        $this->assertEqual($result['data']['Course']['course'], 'MECH 328');
+        $this->assertEqual($result['data']['Course']['title'], 'Mechanical Engineering Design Project');
+    }
 
-  }
+    //TODO redirect
+    function testAdd() {
+    }
+    //TODO redirect
+    function testEdit() {
+        //    $result = $this->testAction('/surveys/edit/1', array('connection' => 'test_suite', 'return' => 'contents'));
+        //    var_dump($result);
+    }
 
-  //TODO redirect
-  function testMoveQuestion() {
-  }
+    //TODO redirect
+    function testCopy() {
+    }
+    //TODO redirect
+    function testDelete() {
+    }
 
-  //TODO redirect
-  function testAddQuestion() {
-    //$result = $this->testAction('surveys/addQuestion/1', array('connection' => 'test_suite', 'return' => 'vars'));
-   // var_dump($result);
-  }
+    //TODO redirect
+    function testReleaseSurvey() {
+        $result = $this->testAction('surveys/questionsSummary/1', array('return' => 'vars'));
+        $this->assertEqual($result['questions'][0]['Question']['prompt'], 'What was your GPA last term?');
+        $this->assertEqual($result['questions'][0]['Response'][0]['response'], '4+');
+        $this->assertEqual($result['questions'][0]['Response'][1]['response'], '3-4');
+        $this->assertEqual($result['questions'][1]['Question']['prompt'], 'Do you own a laptop?');
+        $this->assertEqual($result['questions'][1]['Response'][0]['response'], 'yes');
+    }
+
+    //TODO redirect
+    function testMoveQuestion() {
+    }
+
+    //TODO redirect
+    function testAddQuestion() {
+        //$result = $this->testAction('surveys/addQuestion/1', array('connection' => 'test_suite', 'return' => 'vars'));
+        // var_dump($result);
+    }
 
     function testEditQuestion() {
-    //$result = $this->testAction('surveys/editQuestion/1/1', array('connection' => 'test_suite', 'return' => 'vars'));
-   // var_dump($result);
-  }
+        //$result = $this->testAction('surveys/editQuestion/1/1', array('connection' => 'test_suite', 'return' => 'vars'));
+        // var_dump($result);
+    }
 
 }

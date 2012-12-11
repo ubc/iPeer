@@ -12,7 +12,7 @@ App::import('Controller', 'Evaluations');
 
 Mock::generatePartial(
     'EvaluationsController',
-    'MockController',
+    'MockEvaluationsController',
     array('isAuthorized', 'render', 'redirect', '_stop', 'header')
 );
 
@@ -46,6 +46,7 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
 
     function startCase()
     {
+        echo "Start Evaluation controller test.\n";
         $this->defaultLogin = array(
             'User' => array(
                 'username' => 'root',
@@ -61,7 +62,7 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
     function startTest($method)
     {
         echo $method.TEST_LB;
-        $this->controller = new MockController();
+        $this->controller = new MockEvaluationsController();
     }
 
     function endTest($method)

@@ -13,21 +13,6 @@ class AppModel extends Model
     protected $errorMessage = array();
 
     /**
-     * __construct constructor function
-     *
-     * @param bool $id    the id
-     * @param bool $table table
-     * @param bool $ds    ds
-     *
-     * @access protected
-     * @return void
-     */
-    function __construct($id = false, $table = null, $ds = null)
-    {
-        parent::__construct($id, $table, $ds);
-    }
-
-    /**
      * save override save function
      *
      * @param bool $data      data to be saved

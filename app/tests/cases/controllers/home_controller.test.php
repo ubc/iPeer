@@ -44,6 +44,7 @@ class HomeControllerTest extends ExtendedAuthTestCase
 
     function startCase()
     {
+        echo "Start Home controller test.\n";
         $this->defaultLogin = array(
             'User' => array(
                 'username' => 'root',

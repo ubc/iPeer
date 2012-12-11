@@ -12,13 +12,7 @@ class MixevalsController extends AppController
 {
     public $uses =  array('Event', 'Mixeval','MixevalsQuestion', 'MixevalsQuestionDesc', 'Personalize', 'UserCourse');
     public $name = 'Mixevals';
-    public $show;
-    public $sortBy;
-    public $direction;
-    public $page;
-    public $order;
     public $helpers = array('Html','Ajax','Javascript','Time');
-    public $Sanitize;
     public $components = array('AjaxList','Auth','Output', 'userPersonalize', 'framework');
 
 
@@ -30,15 +24,6 @@ class MixevalsController extends AppController
      */
     function __construct()
     {
-        $this->Sanitize = new Sanitize;
-        $this->show = empty($_REQUEST['show'])? 'null': $this->Sanitize->paranoid($_REQUEST['show']);
-        if ($this->show == 'all') {
-            $this->show = 99999999;
-        }
-        $this->sortBy = empty($_GET['sort'])? 'name': $_GET['sort'];
-        $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
-        $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
-        $this->order = $this->sortBy.' '.strtoupper($this->direction);
         $this->set('title_for_layout', __('Mixed Evaluations', true));
         $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
         parent::__construct();
@@ -46,14 +31,14 @@ class MixevalsController extends AppController
 
 
     /**
-     * postProcess
+     * _postProcess
      *
      * @param mixed $data
      *
      * @access public
      * @return void
      */
-    function postProcess($data)
+    function _postProcess($data)
     {
         // Creates the custom in use column
         if ($data) {
@@ -77,8 +62,6 @@ class MixevalsController extends AppController
      */
     function setUpAjaxList()
     {
-        $myID = $this->Auth->user('id');
-
         // Set up Columns
         $columns = array(
             array("Mixeval.id",            "",              "",  "hidden"),
@@ -93,21 +76,20 @@ class MixevalsController extends AppController
             array("Mixeval.created",      __("Creation Date", true),  "10em", "date"));
 
         // Just list all and my evaluations for selections
-        $userList = array($this->Auth->user('id') => "My Evaluations");
+        $userList = array(User::get('id') => "My Evaluations");
 
         // Join with Users
         $jointTableCreator =
             array("id"         => "Creator_id",
                 "localKey"   => "creator_id",
                 "description" => __("Evaluations to show:", true),
-                "default" => $myID,
+                "default" => User::get('id'),
                 "list" => $userList,
                 "joinTable"  => "users",
                 "joinModel"  => "Creator");
         // put all the joins together
         $joinTables = array($jointTableCreator);
 
-        $myID = $this->Auth->user('id');
         if (User::hasPermission('functions/superadmin')) {
             $extraFilters = "";
         } else {
@@ -128,7 +110,7 @@ class MixevalsController extends AppController
                 $extraFilters .= "creator_id = $id or ";
             }
             // allow instructors/admins to see their own simple eval templates
-            $extraFilters .= "creator_id = $myID or ";
+            $extraFilters .= "creator_id = ".User::get('id')." or ";
             // can see all public simple evaluation templates
             $extraFilters .= "availability = 'public')";
         }
@@ -137,7 +119,7 @@ class MixevalsController extends AppController
         $restrictions = "";
         // instructors
         $basicRestrictions = array(
-            $myID => true,
+            User::get('id') => true,
             "!default" => false);
         // super admins
         if (User::hasPermission('functions/superadmin')) {
@@ -166,7 +148,7 @@ class MixevalsController extends AppController
 
         // Set up the list itself
         $this->AjaxList->setUp($this->Mixeval, $columns, $actions,
-            "Mixeval.name", "Mixeval.name", $joinTables, $extraFilters, $recursive, "postProcess");
+            "Mixeval.name", "Mixeval.name", $joinTables, $extraFilters, $recursive, "_postProcess");
     }
 
     /**
@@ -177,18 +159,10 @@ class MixevalsController extends AppController
      */
     function index()
     {
-        if (!User::hasPermission('controllers/mixevals')) {
-            $this->Session->setFlash(__('Error: You do not have permission to access mixed evaluations', true));
-            $this->redirect('/home');
-        }
-
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
-        $Auth = $this->Auth;
-
-        $this->set('Auth', $Auth);
     }
 
     /**
@@ -217,16 +191,11 @@ class MixevalsController extends AppController
      */
     function view($id, $layout='')
     {
-        if (!User::hasPermission('controllers/mixevals')) {
-            $this->Session->setFlash(__('Error: You do not have permission to view mixed evaluations', true));
-            $this->redirect('/home');
-        }
-
         $eval = $this->Mixeval->find(
             'first',
             array(
                 'conditions' => array('id' => $id),
-                'contain' => array('Event' => 'EvaluationSubmission')
+                'contain' => 'Question.Description',
             )
         );
 
@@ -234,6 +203,7 @@ class MixevalsController extends AppController
         if (!is_numeric($id) || empty($eval)) {
             $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
+            return;
         }
 
         // check whether the user has access to the evaluation if the eval is not public
@@ -270,23 +240,7 @@ class MixevalsController extends AppController
             $this->layout = $layout;
         }
 
-        if (empty($this->data)) {
-            $this->data = $this->Mixeval->find('first', array('conditions' => array('id' => $id),
-                'contain' => array('Question.Description',
-            )));
-
-        }
-
-        $this->set('data', $this->data);
-        $Auth = $this->Auth;
-
-        $this->set('Auth', $Auth);
-        $this->Mixeval->id = $id;
-        $this->params['data'] = $this->Mixeval->read();
-
-        $this->Output->filter($this->params['data']);
-        $prepare_data = $this->Mixeval->compileViewData($this->params['data']);
-        $this->set('prepare', $prepare_data);
+        $this->set('data', $eval);
     }
 
     /**
@@ -641,57 +595,4 @@ class MixevalsController extends AppController
             }
         }
     }
-
-    /**
-     * previewMixeval
-     *
-     *
-     * @access public
-     * @return void
-     */
-    function previewMixeval()
-    {
-        //print_r(array_values($this->params));
-
-        $this->layout = 'ajax';
-        $this->render('preview');
-    }
-
-
-    /**
-     * renderRows
-     *
-     * @access public
-     * @return void
-     */
-    function renderRows()
-    {
-        $this->layout = 'ajax';
-        $this->render('row');
-    }
-
-
-    //	function printUserName($user_id)
-    //	{
-    //		$tmp = $this->Mixeval->query("SELECT username FROM users WHERE id=$user_id");
-    //		echo $tmp[0]['users']['username'];
-    //	}
-
-    /**
-     * update
-     *
-     * @param string $attributeCode  attribute code
-     * @param string $attributeValue attribute value
-     *
-     * @access public
-     * @return void
-     */
-    function update($attributeCode='',$attributeValue='')
-    {
-        if ($attributeCode != '' && $attributeValue != '') {
-            //check for empty params
-            $this->params['data'] = $this->Personalize->updateAttribute($this->Auth->user('id'), $attributeCode, $attributeValue);
-        }
-    }
-
 }

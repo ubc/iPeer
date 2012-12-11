@@ -9,50 +9,71 @@
  */
 
 App::import('Controller', 'Surveygroups');
+App::import('Lib', 'ExtendedAuthTestCase');
 
-class SurveygroupsControllerTest extends CakeTestCase {
-  var $fixtures = array('app.course', 'app.role', 'app.user', 'app.group',
-                        'app.roles_user', 'app.event', 'app.event_template_type', 'app.rubrics_lom',
-                        'app.group_event', 'app.evaluation_submission', 'app.rubrics_criteria_comment',
-                        'app.survey_group_set', 'app.survey_group', 'app.rubrics_criteria',
-                        'app.survey_group_member', 'app.question', 'app.rubric',
-                        'app.response', 'app.survey_question', 'app.user_course',
-                        'app.user_enrol', 'app.groups_member', 'app.survey',
-                        'app.personalize', 'app.sys_parameter','app.survey_input'
-                       );
+// mock instead of needing to create a new controller for every test
+Mock::generatePartial('SurveyGroupsController',
+    'MockSurveyGroupsController',
+    array('isAuthorized', 'render', 'redirect', '_stop', 'header'));
 
-  function startCase() {
-    echo '<h1>Starting Test Case</h1>';
-  }
+class SurveygroupsControllerTest extends ExtendedAuthTestCase {
+    public $controller = null;
 
-  function endCase() {
-     echo '<h1>Ending Test Case</h1>';
-  }
+    public $fixtures = array(
+        'app.course', 'app.role', 'app.user', 'app.group',
+        'app.roles_user', 'app.event', 'app.event_template_type',
+        'app.group_event', 'app.evaluation_submission',
+        'app.survey_group_set', 'app.survey_group',
+        'app.survey_group_member', 'app.question',
+        'app.response', 'app.survey_question', 'app.user_course',
+        'app.user_enrol', 'app.groups_member', 'app.survey',
+        'app.personalize', 'app.penalty', 'app.evaluation_simple',
+        'app.faculty', 'app.user_tutor', 'app.course_department',
+        'app.evaluation_rubric', 'app.evaluation_rubric_detail',
+        'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
+        'app.user_faculty', 'app.department', 'app.sys_parameter',
+        'app.oauth_token', 'app.rubric', 'app.rubrics_criteria',
+        'app.rubrics_criteria_comment', 'app.rubrics_lom',
+        'app.simple_evaluation', 'app.survey_input', 'app.mixevals_question',
+        'app.mixevals_question_desc', 'app.mixeval'
+    );
 
-  function startTest() {
-    $controller = new FakeController();
-    $controller->constructClasses();
-    $controller->startupProcess();
-    $controller->Component->startup($controller);
-    $controller->Auth->startup($controller);
-    $admin = array('User' => array('username' => 'Admin',
-                                   'password' => 'passwordA'));
-    $controller->Auth->login($admin);
-  }
+    function startCase() {
+        echo "Start SurveyGroup controller test.\n";
+        $this->defaultLogin = array(
+            'User' => array(
+                'username' => 'root',
+                'password' => md5('ipeeripeer')
+            )
+        );
+    }
 
-  function endTest() {
-    echo '<hr />';
-  }
+    function endCase() {
+    }
 
-  function testIndex() {
-    $result = $this->testAction('/surveygroups/index', array('connection' => 'test_suite', 'return' => 'contents'));
-    $this->assertEqual($result['paramsForList']['data']['entries'][0]['Course']['course'], 'Math303');
-    $this->assertEqual($result['paramsForList']['data']['entries'][0]['Group']['group_num'], '1');
-    $this->assertEqual($result['paramsForList']['data']['entries'][0]['Group']['member_count'], '2');
-    $this->assertEqual($result['paramsForList']['data']['entries'][1]['Group']['group_num'], '2');
-    $this->assertEqual($result['paramsForList']['data']['entries'][1]['Group']['member_count'], '2');
-    $this->assertEqual($result['paramsForList']['data']['entries'][2]['Group']['group_num'], '3');
-    $this->assertEqual($result['paramsForList']['data']['entries'][2]['Group']['member_count'], '0');
-  }
+    function startTest($method) {
+        echo $method.TEST_LB;
+        $this->controller = new MockSurveyGroupsController();
+    }
+
+    public function endTest($method)
+    {
+        // defer logout to end of the test as some of the test need check flash
+        // message. After logging out, message is destoryed.
+        if (isset($this->controller->Auth)) {
+            $this->controller->Auth->logout();
+        }
+        unset($this->controller);
+        ClassRegistry::flush();
+    }
+
+    public function getController()
+    {
+        return $this->controller;
+    }
+
+    function testIndex() {
+        $result = $this->testAction('/surveygroups/index/1', array('return' => 'contents'));
+    }
 
 }

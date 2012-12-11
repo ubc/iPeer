@@ -213,21 +213,15 @@
 
     <target name="test" description="Run unit tests" depends="init-test-db">
         <exec command="cake/console/cake testsuite app group model" passthru="true"/>
-        <exec command="cake/console/cake testsuite app case controllers/courses_controller" passthru="true"/>
-        <exec command="cake/console/cake testsuite app case controllers/home_controller" passthru="true"/>
-        <exec command="cake/console/cake testsuite app case controllers/evaluations_controller" passthru="true"/>
+        <exec command="cake/console/cake testsuite app group controller" passthru="true"/>
         <!-- v1_controller test must be last one as it will change the database --> 
-        <exec command="cake/console/cake testsuite app case controllers/v1_controller" passthru="true"/>
         <phingcall target="post-test"/>
     </target>
 
     <target name="test-ci" description="Run unit tests for continuous integration(output as xml)" depends="init-test-db">
         <exec command="cake/console/cake testreport app group model" passthru="true"/>
-        <exec command="cake/console/cake testreport app case controllers/courses_controller" passthru="true"/>
-        <exec command="cake/console/cake testreport app case controllers/home_controller" passthru="true"/>
-        <exec command="cake/console/cake testreport app case controllers/evaluations_controller" passthru="true"/>
+        <exec command="cake/console/cake testreport app group controller" passthru="true"/>
         <!-- v1_controller test must be last one as it will change the database --> 
-        <exec command="cake/console/cake testreport app case controllers/v1_controller" passthru="true"/>
         <phingcall target="post-test"/>
     </target>
 

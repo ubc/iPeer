@@ -363,4 +363,12 @@ class Group extends AppModel
             array_merge(array('conditions' => array($this->name.'.id' => $id,)), $params)
         );
     }
+
+    function getGroupWithMembersById($id)
+    {
+        return $this->find('first', array(
+            'conditions' => array($this->alias.'.id' => $id),
+            'contain' => 'Member',
+        ));
+    }
 }
