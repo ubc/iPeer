@@ -55,7 +55,7 @@ $evalEvents = Set::extract($upcoming, '/Event[event_template_type_id!=3]/..');
     </table>
 </div>
 
-<h3>Peer Evaluations/Surveys Submitted</h3>
+<h3>Peer Evaluations/Surveys Submitted or Overdue</h3>
 
 <div>
     <table class='standardtable'>
@@ -70,7 +70,7 @@ $evalEvents = Set::extract($upcoming, '/Event[event_template_type_id!=3]/..');
 <tr>
     <td>
     <?php if (((isset($event['Event']['is_result_released']) && $event['Event']['is_result_released']) ||
-            !isset($event['Event']['is_result_released'])) && User::hasPermission('functions/viewstudentresults')):?>
+            !isset($event['Event']['is_result_released'])) && User::hasPermission('functions/viewstudentresults') && isset($event['EvaluationSubmission']['date_submitted'])):?>
         <?php $id = $event['Event']['event_template_type_id'] == 3 ? '' : '/'.$event['Group']['id']?>
         <?php echo $html->link($event['Event']['title'], '/evaluations/studentViewEvaluationResult/'.$event['Event']['id'].$id)?>
     <?php else: ?>
@@ -80,7 +80,7 @@ $evalEvents = Set::extract($upcoming, '/Event[event_template_type_id!=3]/..');
     <td><?php echo isset($event['Group']['group_name']) ? $event['Group']['group_name'] : "--"?></td>
     <td><?php echo $event['Course']['course']?></td>
     <td><?php echo Toolkit::formatDate($event['Event']['due_date'])?></td>
-    <td><?php echo Toolkit::formatDate($event['EvaluationSubmission']['date_submitted'])?></td>
+    <td><?php echo isset($event['EvaluationSubmission']['date_submitted']) ? Toolkit::formatDate($event['EvaluationSubmission']['date_submitted']):'--'?></td>
 </tr>
 <?php endforeach; ?>
 <?php if (empty($submitted)):?>

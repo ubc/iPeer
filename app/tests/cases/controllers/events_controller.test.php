@@ -125,15 +125,16 @@ class EventsControllerTest extends ExtendedAuthTestCase {
 
     function testEdit() {
         $result = $this->testAction('/events/edit/1', array('return' => 'vars'));
-
+        $this->assertEqual($result['eventTemplateTypes'][1], 'SIMPLE');
+        $this->assertEqual($result['eventTemplateTypes'][2], 'RUBRIC');
+        $this->assertEqual($result['eventTemplateTypes'][4], 'MIX EVALUATION');
         $this->assertEqual($result['event']['Event']['title'], 'Term 1 Evaluation');
         $this->assertEqual($result['event']['Event']['event_template_type_id'], 1);
+        $this->assertEqual($result['event']['Course']['id'], 1);
+        $this->assertEqual(count($result['event']['Penalty']), 4);
+        $this->assertEqual(count($result['event']['Group']), 2);
         $this->assertEqual($result['event']['Group'][0]['group_name'], 'Reapers');
-        $this->assertEqual($result['event']['Group'][0]['Member'][0]['first_name'], 'Ed');
-        $this->assertEqual($result['event']['Group'][0]['Member'][0]['last_name'], 'Student');
-
-        //TODO test saving the data (redirect)
-
+        $this->assertEqual($result['event']['Group'][1]['group_name'], 'Lazy Engineers');
     }
 
     function testDelete() {

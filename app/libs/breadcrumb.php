@@ -31,6 +31,11 @@ class Breadcrumb
             'display_field' => 'name',
             'key' => 'course_id'
         ),
+        'event' => array(
+            'url' => '/events/index/',
+            'display_field' => 'title',
+            'key' => 'course_id'
+        ),
     );
 
     /**

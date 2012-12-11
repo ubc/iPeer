@@ -174,6 +174,10 @@ class Event extends AppModel
                     ($currentDate >= strtotime($event['Event']['result_release_date_begin']) &&
                     $currentDate < strtotime($event['Event']['result_release_date_end']));
             }
+            if (isset($event['Event']['release_date_end'])) {
+                $results[$key]['Event']['is_ended']  =
+                    ($currentDate > strtotime($event['Event']['release_date_end']));
+            }
         }
 
         return $results;
@@ -602,5 +606,25 @@ class Event extends AppModel
         }
 
         return array_merge($evaluationEvents, $surveyEvents);
+    }
+
+    public function getAccessibleEventById($eventId, $userId, $permission, $contain = array())
+    {
+        $event = $this->find('first', array(
+            'conditions' => array($this->alias.'.id' => $eventId),
+            'contain' => $contain,
+        ));
+
+        if (empty($event)) {
+            return false;
+        }
+
+        // check if the user has access to the course that event associated with
+        $course = $this->Course->getAccessibleCourseById($event[$this->alias]['course_id'], $userId, $permission);
+        if (empty($course)) {
+            return false;
+        }
+
+        return $event;
     }
 }

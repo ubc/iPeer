@@ -46,8 +46,8 @@ class EventTestCase extends CakeTestCase
         //Test a valid course number
         $course = $this->Event->getCourseEvent(1);
         $events = $this->toEventNameArray($course);
-        $this->assertEqual($events, array('Term 1 Evaluation', 
-            'Term Report Evaluation', 'Project Evaluation', 
+        $this->assertEqual($events, array('Term 1 Evaluation',
+            'Term Report Evaluation', 'Project Evaluation',
             'Team Creation Survey', 'Survey, all Q types',
             'simple evaluation 2'
         ));
@@ -77,7 +77,7 @@ class EventTestCase extends CakeTestCase
         $this->assertEqual($events['0'], 'Term 1 Evaluation');
         $this->assertEqual($events['1'], 'Term Report Evaluation');
         $this->assertEqual($events['2'], 'Project Evaluation');
-        
+
         //Test an invalid course number
         $course = $this->Event->GetCourseEvalEvent(999);
         $this->assertEqual($course, $empty);
@@ -243,6 +243,38 @@ class EventTestCase extends CakeTestCase
         $title = $this->Event->getEventTitleById(999);
         $this->assertEqual($title, $empty);
 
+    }
+
+    function testGetAccessibleEventById()
+    {
+        // superadmin
+        $event = $this->Event->getAccessibleEventById(1, 1, Course::FILTER_PERMISSION_SUPERADMIN);
+        $this->assertEqual(count($event), 1);
+        $event = $event['Event'];
+        $this->assertEqual($event['id'], 1);
+        $this->assertEqual($event['title'], 'Term 1 Evaluation');
+
+        // admins can access their faculty's event
+        $event = $this->Event->getAccessibleEventById(1, 34, Course::FILTER_PERMISSION_FACULTY);
+        $this->assertEqual(count($event), 1);
+        $event = $event['Event'];
+        $this->assertEqual($event['id'], 1);
+        $this->assertEqual($event['title'], 'Term 1 Evaluation');
+
+        // admins cannot access other faculty's event
+        $event = $this->Event->getAccessibleEventById(1, 38, Course::FILTER_PERMISSION_FACULTY);
+        $this->assertFalse($event);
+
+        // instructor can access their course's event
+        $event = $this->Event->getAccessibleEventById(1, 2, Course::FILTER_PERMISSION_OWNER);
+        $this->assertEqual(count($event), 1);
+        $event = $event['Event'];
+        $this->assertEqual($event['id'], 1);
+        $this->assertEqual($event['title'], 'Term 1 Evaluation');
+
+        // instructor cannot access other course's event
+        $event = $this->Event->getAccessibleEventById(1, 3, Course::FILTER_PERMISSION_FACULTY);
+        $this->assertFalse($event);
     }
 
 

@@ -420,59 +420,17 @@ class EventsController extends AppController
      * @access public
      * @return void
      */
-    function edit($id)
+    function edit($eventId)
     {
-        $courseId = $this->Event->getCourseByEventId($id);
-
-        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
-        if (!$course) {
-            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+        // Check whether the course exists
+        if (!($event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission(), array('Course', 'Group', 'Penalty')))) {
+            $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
             $this->redirect('index');
+        } else if ($event['Event']['event_template_type_id'] == '3') {
+            // can't edit survey event from this view
+            $this->redirect('/surveys/edit/'.$eventId);
         }
 
-        $event = $this->Event->find('first', array('conditions' => array('Event.id' => $id),
-            'contain' => array('Group.Member')));
-
-        $data = $this->Event->find('first', array('conditions' => array('id' => $id),
-            'contain' => array('Group')));
-        $penaltyData = $this->Penalty->find('all', array('conditions' => array('event_id' => $id)));
-        $penalties = array();
-        foreach ($penaltyData as $tmp) {
-            array_splice($tmp['Penalty'], 1, -2);
-            $penalties[] = $tmp['Penalty'];
-        }
-
-        // Sets up the already assigned groups
-        $assignedGroupIds = $this->GroupEvent->getGroupListByEventId($id);
-        $assignedGroups=array();
-        foreach ($assignedGroupIds as $groups) {
-            $groupId = $groups['GroupEvent']['group_id'];
-            $groupName = $this->Group->getGroupByGroupId($groupId, array('group_name'));
-            $assignedGroups[$groupId] = $groupName[0]['Group']['group_name'];
-        }
-
-        $this->set('groups', $this->Group->getGroupsByCourseId($courseId));
-        $this->set(
-            'mixevals',
-            $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'))
-        );
-        $this->set(
-            'simpleEvaluations',
-            $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'))
-        );
-        $this->set(
-            'rubrics',
-            $this->Rubric->getBelongingOrPublic($this->Auth->user('id'))
-        );
-
-        $this->set('event_id', $id);
-        $this->set('data', $data);
-        $this->set('event', $event);
-        $this->set('course', $course['Course']['full_name']);
-        $this->set('courses', $this->Course->getCourseList());
-        $this->set('title_for_layout', $this->Course->getCourseName($courseId).__(' > Events', true));
-        $this->set('eventTemplateTypes', $this->EventTemplateType->find('list', array('conditions' => array('NOT' => array('id' => 3)))));
-        $this->set('course_id', $courseId);
 
         if (!empty($this->data)) {
             // need to set the template_id based on the event_template_type_id
@@ -487,7 +445,14 @@ class EventsController extends AppController
                 $this->data['Event']['template_id'] =
                     $this->data['Event']['Mixeval'];
             }
-            $pTmp = array();
+
+            $penaltyData = $this->Penalty->find('all', array('conditions' => array('event_id' => $eventId), 'contain' => false));
+            $penalties = array();
+            foreach ($penaltyData as $tmp) {
+                array_splice($tmp['Penalty'], 1, -2);
+                $penalties[] = $tmp['Penalty'];
+            }
+
             isset($this->data['Penalty']) ? $formPenalty = $this->data['Penalty'] : $formPenalty = array();
             // check differences (table vs form data), delete what's missing in form data from db
             foreach ($penalties as $pTmp) {
@@ -497,22 +462,33 @@ class EventsController extends AppController
             }
             if ($this->Event->saveAll($this->data)) {
                 $this->Session->setFlash("Edit event successful!", 'good');
-                $this->redirect('index/'.$courseId);
+                $this->redirect('index/'.$event['Event']['course_id']);
             } else {
                 $this->Session->setFlash("Edit event failed.");
             }
         }
 
-        // Check whether the course exists
-        if (!($this->data = $this->Event->getEventByid($id))) {
-            $this->Session->setFlash(__('Error: That event does not exist', true));
-            $this->redirect('index');
-        // can't edit survey event from this view
-        } else if ($this->data['Event']['event_template_type_id'] == '3') {
-            $this->Session->setFlash(__('Error: Invalid Id', true));
-            $this->redirect('index');
-        }
+        // Sets up the already assigned groups
 
+        $this->set('groups', $this->Group->getGroupsByCourseId($event['Event']['course_id']));
+        $this->set(
+            'mixevals',
+            $this->Mixeval->getBelongingOrPublic(User::get('id'))
+        );
+        $this->set(
+            'simpleEvaluations',
+            $this->SimpleEvaluation->getBelongingOrPublic(User::get('id'))
+        );
+        $this->set(
+            'rubrics',
+            $this->Rubric->getBelongingOrPublic(User::get('id'))
+        );
+
+        $this->set('event', $event);
+        $this->set('eventTemplateTypes', $this->EventTemplateType->find('list', array('conditions' => array('NOT' => array('id' => 3)))));
+        $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $event['Course']))->push(array('event' => $event['Event']))->push(__('Edit', true)));
+
+        $this->data = $event;
     }
 
     /**

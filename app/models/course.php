@@ -379,14 +379,14 @@ class Course extends AppModel
      */
     function getByDepartmentIds($departmentIds, $findType = "all", $options = array())
     {
-        $options = array_merge(array('conditions' => array('Department.id' => $departmentIds)), $options);
+        $options['conditions']['Department.id'] = $departmentIds;
+        $options['contain'] = array_merge(array('Department'), $options['contain']);
         if ($findType == 'list') {
             $courses = $this->find('all', $options);
             return Set::combine($courses, '{n}.'.$this->alias.'.id', '{n}.'.$this->alias.'.'.$this->displayField);
         }
         return $this->find($findType, $options);
     }
-    /* }}} */
 
     /**
      * getCourseList
@@ -496,14 +496,7 @@ class Course extends AppModel
             $courses = $this->find($type, $options);
             break;
         case Course::FILTER_PERMISSION_FACULTY:
-            $department = Classregistry::init('Department');
-            $departments = $department->find('all', array(
-                'fields' => array('id'),
-                'contain' => array(
-                    'Faculty' => 'User.id = '.$userId
-                ),
-            ));
-            $departmentIds = Set::extract($departments, '/Department/id');
+            $departmentIds = $this->Department->getIdsByUserId($userId);
             $courses = $this->getByDepartmentIds($departmentIds, $type, $options);
             break;
         case Course::FILTER_PERMISSION_OWNER:
@@ -566,6 +559,6 @@ class Course extends AppModel
      */
     function getAccessibleCourseById($courseId, $userId,  $permission, $contain = array())
     {
-        return $this->getAccessibleCourses($userId, $permission, 'first', array('conditions' => array('id' => $courseId), 'contain' => $contain));
+        return $this->getAccessibleCourses($userId, $permission, 'first', array('conditions' => array($this->alias.'.id' => $courseId), 'contain' => $contain));
     }
 }

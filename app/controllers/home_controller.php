@@ -49,7 +49,7 @@ class HomeController extends AppController
             $events = $this->Event->getEventsByUserId(User::get('id'));
             $submitted = $upcoming = array();
             foreach ($events as $event) {
-                if (isset($event['EvaluationSubmission']['id'])) {
+                if (isset($event['EvaluationSubmission']['id'])||$event['Event']['is_ended']) {
                     $submitted[] = $event;
                 } else {
                     $upcoming[] = $event;

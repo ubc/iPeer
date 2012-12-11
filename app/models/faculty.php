@@ -13,6 +13,9 @@ class Faculty extends AppModel
             ),
         ),
     );
+
+    public $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable');
+
     public $hasAndBelongsToMany = array(
         'User' => array(
             'joinTable' => 'user_faculties'

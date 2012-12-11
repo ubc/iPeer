@@ -38,4 +38,19 @@ class Department extends AppModel {
         }
         return $departments;
     }
+
+    public function getIdsByUserId($userId)
+    {
+        $faculties = $this->Faculty->find('all', array(
+            'conditions' => array('User.id' => $userId),
+            'contain' => 'User',
+        ));
+        $departments = $this->find('all', array(
+            'conditions' => array('faculty_id' => Set::extract($faculties, '/Faculty/id')),
+            'fields' => array('id'),
+            'contain' => false,
+        ));
+
+        return Set::extract($departments, '/Department/id');
+    }
 }

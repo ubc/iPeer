@@ -1,12 +1,11 @@
 <div id='Events'>
 <?php
 $html->script("jquery-ui-timepicker-addon", array("inline"=>false));
-
-echo $this->Form->create('Event', array('action' => "edit/$event_id"));
+echo $this->Form->create('Event', array('action' => "edit/".$event['Event']['id']));
 echo '<input type="hidden" name="required" id="required" value="eventId" />';
 echo $this->Form->input('id');?>
-<label class=courseLabel><?php __('Course')?></label>
-<label class=course><?php echo $course ?></label>
+<label class="courseLabel"><?php __('Course')?></label>
+<label class="course"><?php echo $event['Course']['full_name'] ?></label>
 <?php echo $this->Form->input('title', array('label' => 'Event Title'));
 echo $this->Form->input('description', array('type' => 'textarea'));
 echo $this->Form->input('event_template_type_id');
@@ -17,19 +16,19 @@ echo $this->Form->input('Rubric',
 echo $this->Form->input('Mixeval',
     array('div' => array('id' => 'MixevalDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevM'))));
 echo $this->Form->input(
-    'self_eval', 
+    'self_eval',
     array(
         'legend' => 'Self-Evaluation',
-        'type' => 'radio', 
+        'type' => 'radio',
         'options' => array('1' => 'Enabled', '0' => 'Disabled'),
         'default' => '0'
     )
 );
 echo $this->Form->input(
-    'com_req', 
+    'com_req',
     array(
-        'legend' => 'Comments Required', 
-        'type' => 'radio', 
+        'legend' => 'Comments Required',
+        'type' => 'radio',
         'options' => array('1' => 'Enabled', '0' => 'Disabled'),
         'default' => '0'
     )
@@ -44,7 +43,7 @@ echo $this->Form->input('Group', array('label' => 'Group(s)'));
 // No nice way of inserting new penalty entries using CakePHP, doing it
 // manually.
 echo $this->Form->label(
-    'latep', 
+    'latep',
     'Late Penalties',
     array('class' => 'penaltyLabel')
 );
@@ -64,7 +63,7 @@ if (isset($this->data) && isset($this->data['Penalty'])) {
 $percent = range(0,100); // 0,100 since array index starts from 0, and we want
 unset($percent[0]); // the index to match the percentage value
 for ($i = -1; $i < $numPenalties; $i++) {
-    $inputs = 
+    $inputs =
         '<div class="penaltyInput" id="penaltyInput'.$i.'">' .
         '<input type="hidden" name="required" id="required" value="eventId" />'.
         $this->Form->input("Penalty.$i.id").
@@ -72,7 +71,7 @@ for ($i = -1; $i < $numPenalties; $i++) {
         $this->Form->text("Penalty.$i.days_late", array('default' => $i + 1)) .
         $this->Form->label('days', 'days', array('class' => 'penaltyInLabel')) .
         $this->Form->select(
-            "Penalty.$i.percent_penalty", 
+            "Penalty.$i.percent_penalty",
             $percent,
             null,
             array('empty' => false, 'default' => '1')
@@ -81,7 +80,7 @@ for ($i = -1; $i < $numPenalties; $i++) {
         '<a href="#" onclick="rmPenaltyInputs('.$i.'); return false;">X</a>' .
         "</div>";
     if ($i < 0) {
-        // save for use as a template in javascript, should work in Lin/Win/Mac 
+        // save for use as a template in javascript, should work in Lin/Win/Mac
         $penaltyInputs = str_replace(array("\n", "\r"), "", $inputs);
     }
     else {
@@ -90,7 +89,7 @@ for ($i = -1; $i < $numPenalties; $i++) {
 
 }
 echo "</div>";
-echo '<a class="addPenaltyButton" 
+echo '<a class="addPenaltyButton"
     href="#" onclick="addPenaltyInputs(); return false;">Add Penalty</a>';
 
 
@@ -130,7 +129,7 @@ function addPenaltyInputs() {
     // requires that the form name be indexed accordingly. Here, we replace
     // the default index 0 with whatever index the user is on at the moment.
     penaltyInputs = penaltyInputs.replace(/>0</g, '>' +(penaltyCount + 1)+ '<');
-    penaltyInputs = penaltyInputs.replace(/value="0"/g, 
+    penaltyInputs = penaltyInputs.replace(/value="0"/g,
         'value="' +(penaltyCount + 1)+ '"');
     penaltyInputs = penaltyInputs.replace(/-1/g, penaltyCount);
     jQuery(penaltyInputs).appendTo("#penaltyInputs");
