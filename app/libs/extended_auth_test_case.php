@@ -39,21 +39,6 @@ class ExtendedAuthTestCase extends ExtendedTestCase
         if (is_null($Controller)) {
             return parent::testAction($url, $params);
         }
-        $Controller->__construct();
-        $Controller->constructClasses();
-
-        $default = array(
-            'return' => 'result',
-            'fixturize' => false,
-            'data' => array(),
-            'method' => 'post',
-            'connection' => 'default'
-        );
-
-        if (is_string($params)) {
-            $params = array('return' => $params);
-        }
-        $params = array_merge($default, $params);
 
         // reset parameters
         ClassRegistry::flush();
@@ -68,8 +53,26 @@ class ExtendedAuthTestCase extends ExtendedTestCase
                 ClassRegistry::getObject(Inflector::camelize($key))->create(false);
             }
         }
+
+        $Controller->__construct();
+        $Controller->constructClasses();
+
         $Controller->Session->delete('Message');
         $Controller->activeUser = null;
+
+        $default = array(
+            'return' => 'result',
+            'fixturize' => false,
+            'data' => array(),
+            'method' => 'post',
+            'connection' => 'default'
+        );
+
+        if (is_string($params)) {
+            $params = array('return' => $params);
+        }
+        $params = array_merge($default, $params);
+
 
         $default = array(
             'data' => array(),
