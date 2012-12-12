@@ -362,7 +362,7 @@ class EvaluationSimple extends AppModel
         $studentResult['groupAve'] = null;
         $subtractAvgScore = 0;
         $eventId = $event['Event']['id'];
-        $results = $this->getResultsByEvaluatee($event['group_event_id'], $userId);
+        $results = $this->getResultsByEvaluatee($event['GroupEvent']['id'], $userId);
         if ($results != null) {
             //Get Grade Release: grade_release will be the same for all evaluatee records
             $gradeReleaseStatus = $results[0]['EvaluationSimple']['grade_release'];
@@ -566,6 +566,4 @@ class EvaluationSimple extends AppModel
 
         return $grades;
     }
-    /* }}} */
-
 }

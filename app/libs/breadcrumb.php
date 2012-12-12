@@ -36,6 +36,14 @@ class Breadcrumb
             'display_field' => 'title',
             'key' => 'course_id'
         ),
+        'event_student' => array(
+            'url' => '/home',
+            'display_field' => 'title',
+        ),
+        'home_student' => array(
+            'url' => '/home',
+            'display' => 'Home',
+        ),
     );
 
     /**
@@ -89,18 +97,25 @@ class Breadcrumb
 
         foreach ($this->breadcrumb as $data) {
             // primitive variables, display directly
-            if (!is_array($data)) {
+            if (!is_array($data) && !array_key_exists($data, $this->urlMapping)) {
                 $result[] = $data;
             } else {
+                if (!is_array($data)) {
+                    $data = array($data => null);
+                }
                 $display = $url = "";
                 $key = array_keys($data);
                 $key = $key[0];
                 if (isset($this->urlMapping[$key])) {
                     // we have a pre-defined mapping
-                    $display = isset($this->urlMapping[$key]['display_field']) ?
-                        $data[$key][$this->urlMapping[$key]['display_field']] : Inflector::humanize($key);
+                    if (isset($this->urlMapping[$key]['display'])) {
+                        $display = $this->urlMapping[$key]['display'];
+                    } else {
+                        $display = isset($this->urlMapping[$key]['display_field']) ?
+                            $data[$key][$this->urlMapping[$key]['display_field']] : Inflector::humanize($key);
+                    }
                     $url = (isset($this->urlMapping[$key]['url']) ? $this->urlMapping[$key]['url'] : "").
-                        (isset($data[$key][$this->urlMapping[$key]['key']]) ? $data[$key][$this->urlMapping[$key]['key']] : "");
+                        (isset($this->urlMapping[$key]['key']) && isset($data[$key][$this->urlMapping[$key]['key']]) ? $data[$key][$this->urlMapping[$key]['key']] : "");
                 } else {
                     // not defined in mapping, use custom parameters
                     $display = Inflector::humanize($key);

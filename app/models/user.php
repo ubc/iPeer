@@ -1021,8 +1021,10 @@ class User extends AppModel
             return Course::FILTER_PERMISSION_SUPERADMIN;
         } elseif (User::hasPermission('controllers/departments')) {
             return Course::FILTER_PERMISSION_FACULTY;
-        } else {
+        } elseif (User::hasPermission('functions/coursemanager')) {
             return Course::FILTER_PERMISSION_OWNER;
+        } else {
+            return Course::FILTER_PERMISSION_ENROLLED;
         }
     }
 

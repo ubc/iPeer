@@ -371,4 +371,37 @@ class Group extends AppModel
             'contain' => 'Member',
         ));
     }
+
+    function getGroupsByEventId($eventId, $contain = array())
+    {
+        return $this->find('all', array(
+            'conditions' => array('GroupEvent.event_id' => $eventId),
+            'contain' => $contain,
+        ));
+    }
+
+    function getGroupByGroupIdEventIdMemberId($groupId, $eventId, $memberId)
+    {
+        $group = $this->find('first', array(
+            'fields' => array('Group.*'),
+            'conditions' => array(
+                $this->alias.'.id' => $groupId,
+                'GroupEvent.event_id' => $eventId,
+                'Member.id' => $memberId,
+            ),
+        ));
+
+        // hack to find the GroupEvent
+        if (isset($group['GroupEvent'])) {
+            $correct = array();
+            foreach ($group['GroupEvent'] as $groupEvent) {
+                if ($groupEvent['group_id'] == $groupId && $groupEvent['event_id'] == $eventId) {
+                    $correct = $groupEvent;
+                }
+            }
+            $group['GroupEvent'] = $correct;
+        }
+
+        return $group;
+    }
 }

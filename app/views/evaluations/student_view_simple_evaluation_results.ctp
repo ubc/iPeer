@@ -9,7 +9,7 @@
 </tr>
 <tr>
     <td><?php echo $event['Event']['title'] ?></td>
-    <td><?php echo $event['group_name'] ?></td>
+    <td><?php echo $event['Group']['group_name'] ?></td>
     <td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($event['Event']['due_date']))) ?></td>
     <td><?php echo ($event['Event']['self_eval']) ? 'Yes' : 'No' ?></td>
 </tr>
@@ -36,7 +36,7 @@
             $finalAvg = $studentResult['aveScore'] - $studentResult['avePenalty'];
             ($studentResult['avePenalty'] > 0) ? ($stringAddOn = ' - '.'('.'<font color=\'red\'>'.$studentResult['avePenalty'].'</font>'.
                 ')'.'<font color=\'red\'>*</font>'.' = '.number_format($finalAvg, 2)) : $stringAddOn = '';
-                
+
             echo number_format($studentResult['aveScore'], 2).$stringAddOn;
             $studentResult['penalty'] > 0 ? $penaltyNote = '&nbsp &nbsp &nbsp &nbsp &nbsp ( )'.'<font color=\'red\'>*</font>'.' : '.$studentResult['penalty'].
                 '% late penalty.' : $penaltyNote = '';

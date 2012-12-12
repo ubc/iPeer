@@ -13,6 +13,7 @@ class Course extends AppModel
     const FILTER_PERMISSION_SUPERADMIN = 0;
     const FILTER_PERMISSION_FACULTY = 1;
     const FILTER_PERMISSION_OWNER = 2;
+    const FILTER_PERMISSION_ENROLLED = 3;
 
     public $name = 'Course';
     public $displayField = 'full_name';
@@ -319,6 +320,53 @@ class Course extends AppModel
     }
 
     /**
+     * Get course data by student id
+     *
+     * @param mixed $instructorId instructor id
+     * @param bool  $type         type
+     * @param int   $contain      contained models
+     * @param array $conditions   conditions for find
+     *
+     * @return course data
+     */
+    function getCourseByStudent($studentId, $type = 'all', $contain = array(), $conditions = array())
+    {
+        $contain = array_merge(array('Enrol'), $contain);
+        /*if ($type == 'list') {
+            $fields = array('Course.full_name');
+        }*/
+
+        // we need two queries to find the courses. becuase if we specifiy the student id condition
+        // we can only get one student with the id we specified. If the course has more than one
+        // student, we will fail to retrieve them.
+
+        // find course ids first
+        $courses = $this->find(
+            'all',
+            array(
+                'conditions' => array('Enrol.id' => $studentId),
+                'contain' => array('Enrol')
+            )
+        );
+
+        $courseIds = Set::extract('/Course/id', $courses);
+        if (array_key_exists('id', $conditions)) {
+            if (is_array($conditions['id'])) {
+                $conditions['id'] = array_intersect($conditions['id'], $courseIds);
+            } else {
+                if (!in_array($conditions['id'], $courseIds)) {
+                    return false;
+                }
+            }
+        } else {
+            $conditions['id'] = $courseIds;
+        }
+        // find courses with student and other models specified in contain
+        $courses = $this->find($type, array('conditions' => $conditions, 'contain' => $contain));
+
+        return $courses;
+    }
+    /**
      * enrolStudents enrol student to a course
      *
      * @param mixed $ids      id array of the students
@@ -502,6 +550,10 @@ class Course extends AppModel
         case Course::FILTER_PERMISSION_OWNER:
             $options = array_merge(array('contain' => array(), 'conditions' => array()), $options);
             $courses = $this->getCourseByInstructor($userId, $type, $options['contain'], $options['conditions']);
+            break;
+        case Course::FILTER_PERMISSION_ENROLLED:
+            $options = array_merge(array('contain' => array(), 'conditions' => array()), $options);
+            $courses = $this->getCourseByStudent($userId, $type, $options['contain'], $options['conditions']);
             break;
         default:
             return array();
