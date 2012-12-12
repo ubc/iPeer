@@ -120,7 +120,118 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->assertEqual($result['event']['Group'][0]['Member'][0]['last_name'], 'Student');
     }
 
-    function testAdd(){
+    function testAdd() {
+        $result = $this->testAction('/events/add/1', array('return' => 'vars'));
+
+        // make sure the correct course
+        $this->assertEqual($result['course_id'], 1);
+        // available evaluations
+        $this->assertEqual($result['rubrics'][1], 'Term Report Evaluation');
+        $this->assertEqual($result['simpleEvaluations'][1], 'Module 1 Project Evaluation');
+        $this->assertEqual($result['mixevals'][1], 'Default Mix Evalution');
+        // evauation types
+        $this->assertEqual(count($result['eventTemplateTypes']), 3);
+        // course list
+        ksort($result['courses']);
+        $this->assertEqual($result['courses'], array(
+            1 => 'MECH 328 - Mechanical Engineering Design Project',
+            2 => 'APSC 201 - Technical Communication',
+        ));
+        // group list
+        ksort($result['groups']);
+        $this->assertEqual($result['groups'], array(
+            1 => 'Reapers',
+            2 => 'Lazy Engineers',
+        ));
+    }
+
+    function testAddWithData() {
+        // test with instructor account
+        $this->login = array(
+            'User' => array(
+                'username' => 'instructor1',
+                'password' => md5('ipeeripeer')
+            )
+        );
+        $data = array(
+            'Event' => array(
+                'title' => 'new evaluation',
+                'description' => 'result released with submissiona',
+                'event_template_type_id' => 1,
+                'SimpleEvaluation' => 1,
+                'self_eval' => 0,
+                'com_req' => 0,
+                'due_date' => '2012-11-28 00:00:01',
+                'release_date_begin' => '2012-11-20 00:00:01',
+                'release_date_end' => '2012-11-29 00:00:01',
+                'result_release_date_begin' => '2012-11-30 00:00:01',
+                'result_release_date_end' => '2022-12-12 00:00:01',
+            ),
+            'Group' => array(
+                'Group' => array(1,2)
+            ),
+        );
+        $this->controller->expectOnce('redirect', array('index/1'));
+        $this->testAction(
+            '/events/add/1',
+            array('fixturize' => true, 'data' => $data, 'method' => 'post')
+        );
+        $model = ClassRegistry::init('Event');
+        $event = $model->find('first', array( 'conditions' => array('title' => 'new evaluation'), 'contain' => array('Group', 'GroupEvent', 'EvaluationSubmission')));
+        unset($data['Event']['SimpleEvaluation']);
+        $data['Event']['template_id'] = 1;
+        foreach ($data['Event'] as $key => $expected) {
+            $this->assertEqual($event['Event'][$key], $expected);
+        }
+        $this->assertEqual(count($event['Group']), 2);
+
+        // make sure the GroupEvents are added
+        $this->assertEqual(count($event['GroupEvent']), 2);
+
+        // make sure no submission
+        $this->assertEqual(count($event['EvaluationSubmission']), 0);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Add event successful!');
+    }
+
+    function testAddToOthersCourse() {
+        // test with instructor account
+        $this->login = array(
+            'User' => array(
+                'username' => 'instructor2',
+                'password' => md5('ipeeripeer')
+            )
+        );
+        $data = array(
+            'Event' => array(
+                'title' => 'new evaluation1',
+                'description' => 'result released with submissiona',
+                'event_template_type_id' => 1,
+                'SimpleEvaluation' => 1,
+                'self_eval' => 0,
+                'com_req' => 0,
+                'due_date' => '2012-11-28 00:00:01',
+                'release_date_begin' => '2012-11-20 00:00:01',
+                'release_date_end' => '2012-11-29 00:00:01',
+                'result_release_date_begin' => '2012-11-30 00:00:01',
+                'result_release_date_end' => '2022-12-12 00:00:01',
+            ),
+            'Group' => array(
+                'Group' => array(1,2)
+            ),
+        );
+        $this->controller->expectOnce('redirect', array('/home'));
+        $this->testAction(
+            '/events/add/1',
+            array('fixturize' => true, 'data' => $data, 'method' => 'post')
+        );
+        $model = ClassRegistry::init('Event');
+        $event = $model->find('first', array( 'conditions' => array('title' => 'new evaluation'), 'contain' => array('Group', 'GroupEvent', 'EvaluationSubmission')));
+        $this->assertFalse($event);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
     }
 
     function testEdit() {
@@ -227,7 +338,7 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $groupEvents = Set::sort($event['GroupEvent'], '{n}.id', 'asc');
         $this->assertEqual($groupEvents[0]['id'], 10);
 
-        // make sure the GroupEvent id is not shifted
+        // make sure the submission id is not shifted
         $submissions = Set::sort($event['EvaluationSubmission'], '{n}.id', 'asc');
         $this->assertEqual($submissions[0]['id'], 11);
 
@@ -236,9 +347,43 @@ class EventsControllerTest extends ExtendedAuthTestCase {
     }
 
     function testDelete() {
+        $this->controller->expectOnce('redirect', array('index/1'));
+        $this->testAction(
+            '/events/delete/1',
+            array('fixturize' => true, 'method' => 'get')
+        );
+
+        $model = ClassRegistry::init('Event');
+        $found = $model->find('first', array( 'conditions' => array('id' => 1), 'contain' => false));
+        $this->assertFalse($found);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'The event has been deleted successfully.');
     }
 
-    function testSearch() {
+    function testDeletOthers() {
+        // test with instructor account
+        $this->login = array(
+            'User' => array(
+                'username' => 'instructor2',
+                'password' => md5('ipeeripeer')
+            )
+        );
+
+        $this->controller->expectOnce('redirect', array('/home'));
+        $this->testAction(
+            '/events/delete/1',
+            array('fixturize' => true, 'method' => 'get')
+        );
+
+        $model = ClassRegistry::init('Event');
+        $found = $model->find('first', array( 'conditions' => array('id' => 1), 'contain' => false));
+
+        // stil there?
+        $this->assertEqual($found['Event']['id'], 1);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: That event does not exist or you dont have access to it');
     }
 
     function testViewGroups() {

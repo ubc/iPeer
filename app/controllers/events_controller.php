@@ -363,7 +363,8 @@ class EventsController extends AppController
         $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
-            $this->redirect('index');
+            $this->redirect('/home');
+            return;
         }
 
         // Init form variables needed for display
@@ -498,34 +499,34 @@ class EventsController extends AppController
     /**
      * delete
      *
-     * @param int $id
+     * @param int $eventId
      *
      * @access public
      * @return void
      */
-    function delete ($id)
+    function delete ($eventId)
     {
-        // Check whether the event exists
-        if (!($this->Event->getEventByid($id))) {
-            $this->Session->setFlash(__('Error: That event does not exist.', true));
-            $this->redirect('index');
+        // Check whether the course exists
+        if (!($event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission(), array('Course', 'Group', 'Penalty')))) {
+            $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+            $this->redirect('/home');
+            return;
         }
 
-        $courseId = $this->Event->getCourseByEventId($id);
-
-        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
-        if (!$course) {
-            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
-            $this->redirect('index');
-        }
-
+        // what's this????
         if (isset($this->params['form']['id'])) {
-            $id = intval(substr($this->params['form']['id'], 5));
+            $eventId = intval(substr($this->params['form']['id'], 5));
 
-        }   //end if
-        if ($this->Event->delete($id)) {
+        }
+
+        if ($this->Event->delete($eventId)) {
             $this->Session->setFlash(__('The event has been deleted successfully.', true), 'good');
-            $this->redirect('index');
+            $this->redirect('index/'.$event['Event']['course_id']);
+            return;
+        } else {
+            $this->Session->setFlash(__('Failed to delete the event', true));
+            $this->redirect('index/'.$event['Event']['course_id']);
+            return;
         }
     }
 
