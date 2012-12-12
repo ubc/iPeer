@@ -12,6 +12,7 @@ if(!Configure::read('debug') == 0 &&
     if (!$commit) {
         $commit = "Unknown";
     }
+    $hasUserModel = class_exists('User');
 ?>
 
 <div id='debugsection'>
@@ -19,13 +20,21 @@ if(!Configure::read('debug') == 0 &&
   <div style="text-align:center;">Version: <?php echo IPEER_VERSION?> - Branch: <?php echo $branch?> - Commit/Tag: <?php echo $commit;?></div>
   <table>
   <tr>
-    <td><a href="#user-data">User ID: <?php echo User::isLoggedIn() ? User::get('id') : "none" ?></a>
+    <td>
+        <a href="#user-data">User ID: 
+        <?php 
+            echo $hasUserModel && User::isLoggedIn() ? User::get('id') : "none";
+        ?>
+        </a>
       <input type="button" onclick="jQuery('#user-data').toggle();" value="show/hide" />
     </td>
-    <td><a href="#role-data">Role: <?php echo count(User::getRoleArray()); ?></a>
-      <input type="button" onclick="jQuery('#role-data').toggle();" value="show/hide" />
+    <td><a href="#role-data">
+        Role: <?php echo $hasUserModel ? count(User::getRoleArray()) : "no user"; ?>
+        </a>
+        <input type="button" onclick="jQuery('#role-data').toggle();" value="show/hide" />
     </td>
-    <td><a href="#permission-data">Permission: <?php echo count(User::getPermissions()); ?></a>
+    <td><a href="#permission-data">
+Permission: <?php echo $hasUserModel ? count(User::getPermissions()) : "no user"; ?></a>
       <input type="button" onclick="jQuery('#permission-data').toggle();" value="show/hide" />
     </td>
     <td><a href="#actions-data">Actions: <?php echo empty($action) ? 0 : count($action); ?></a>
@@ -48,7 +57,7 @@ if(!Configure::read('debug') == 0 &&
   <pre style="background-color:#E9FFFF;" id="user-data" >
 <?php
   // echo prevent the use of the short form conditional operator for some reason
-  if (User::isLoggedIn())
+  if ($hasUserModel && User::isLoggedIn())
   { // escape html so they're not interpreted by the browser
     echo htmlspecialchars(print_r(User::getInstance(), true));
   }
@@ -63,7 +72,7 @@ if(!Configure::read('debug') == 0 &&
   <pre style="background-color:#E9FFFF;" id="role-data" >
 <?php
   // echo prevent the use of the short form conditional operator for some reason
-  if (User::isLoggedIn()) {
+  if ($hasUserModel && User::isLoggedIn()) {
       // escape html so they're not interpreted by the browser
       echo htmlspecialchars(print_r(User::getRoleArray(), true));
   } else {
@@ -75,7 +84,7 @@ if(!Configure::read('debug') == 0 &&
   <h5>Permissions</h5>
   <pre style="background-color:#E9FFFF;display: none;" id="permission-data" >
 <?php
-    $perms = User::getPermissions();
+    $perms = $hasUserModel ? User::getPermissions() : array();
     if (empty($perms)) {
       print_r(__("(Empty)", true));
     } else {

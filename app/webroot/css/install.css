@@ -81,9 +81,9 @@ div.install
     width: 21em;
 }
 
-.help
+.install .help
 {
-    font-size: 0.8em;
-    color: grey;
+    font-size: 0.9em;
+    color: chocolate;
     margin: 0.5em 0 0 0;
 }

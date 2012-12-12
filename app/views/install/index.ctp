@@ -3,9 +3,6 @@
 // The detection logic should really be in the controller. But the code is
 // pretty clean right now, so we'll defer that refactoring until needed.
 //
-// Need to be restyled so that it looks better. Deferred until default layout
-// is refactored.
-//
 
 function get_php_setting($val)
 {
@@ -16,7 +13,7 @@ function get_php_setting($val)
 $no = '<b class="red">'.__('No', true).'</b>';
 $yes = '<b class="green">'.__('Yes', true).'</b>';
 
-// mandatory requirements init
+// Mandatory requirements init
 $phpver = $no;
 $REQPHPVER = '5.0';
 $mysql = $no;
@@ -25,11 +22,11 @@ $dbconfig = $no;
 $magicquotes = $yes;
 $guard_plugin = $no;
 
-// optional requirements init
+// Optional requirements init
 $sendmail = $no;
 $emailperm = $no;
 
-// mandatory requirements check
+// Mandatory requirements check
 if (version_compare(phpversion(), $REQPHPVER) >= 0) {
   $phpver = $yes;
 }
@@ -50,10 +47,11 @@ if (file_exists(APP.DS.'plugins'.DS.'guard'.DS.'config'.DS.'guard.php') || file_
     $guard_plugin = $yes;
 }
 
-// optional requirements check
-if (ini_get("sendmail_path")) {
+// Optional requirements check
+if (ini_get("sendmail_path")) { // send mail
   $sendmail = $yes;
 }
+// email scheduling
 $output;
 $return_var;
 exec("atq",$output,$return_var); //won't work on windows
@@ -61,8 +59,10 @@ if($return_var == 0)
 {
   $emailperm = $yes;
 }
+// ldap
+$ldap = function_exists('ldap_connect') ? $yes : $no;
 
-// recommended requirements init
+// Recommended requirements init
 $php_recommended_settings = array(
   array (
     'name' => 'Safe Mode',
@@ -94,15 +94,9 @@ $php_recommended_settings = array(
     'directive' => 'session.auto_start',
     'recommend' => 'OFF'
   ),
-  array (
-    'name' => 'PHP LDAP Extension',
-    'recommend' => 'Yes',
-    'actual' => (function_exists('ldap_connect') ? 'Yes' : 'No'),
-    'description' => 'This has to be enabled if you are planning to use LDAP authenication.'
-  ),
 );
 
-// recommended requirements check
+// Recommended requirements check
 foreach ($php_recommended_settings as $key => $setting)
 {
     if (isset($setting['directive'])) {
@@ -160,6 +154,12 @@ foreach ($php_recommended_settings as $key => $setting)
         <div class="help"><?php __('If failed, remove Apache user from "/etc/at.deny" or "/var/at/at.deny"')?></div>
       </td>
       <td><?php echo $emailperm; ?></td>
+  </tr>
+  <tr>
+      <td><?php __('PHP LDAP Extension.')?>
+        <div class="help"><?php __('Required if you are planning to use LDAP authentication.')?></div>
+      </td>
+      <td><?php echo $ldap; ?></td>
   </tr>
 </table>
 
