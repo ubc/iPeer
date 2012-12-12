@@ -9,8 +9,8 @@ echo $html->script('ricoaccordion');
 <?php echo $this->element('evaluations/view_event_info', array('controller'=>'evaluations', 'event'=>$event));?>
 
 <div class="event-summary">
-    <span class="instruction-icon"><?php __('Summary:')?> ( <?php echo $this->Html->link(__('Basic', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['group_id']."/Basic")?> |
-    <?php echo $html->link(__('Detail', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['group_id']."/Detail")?> )</span>
+    <span class="instruction-icon"><?php __('Summary:')?> ( <?php echo $this->Html->link(__('Basic', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['Group']['id']."/Basic")?> |
+    <?php echo $html->link(__('Detail', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['Group']['id']."/Detail")?> )</span>
     <font size = "1" face = "arial" color = "red" >*Numerics in red denotes late submission penalty.</font>
     <?php if (!$allMembersCompleted): ?>
         <div class="incompleted">
@@ -144,13 +144,13 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
     <tr class="tablecell2" align="center"><td colspan="<?php echo $rubric['Rubric']["criteria"] +2; ?>">
         <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
             <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
-            <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
-            <input type="hidden" name="course_id" value="<?php echo $courseId; ?>" />
-            <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" />
+            <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>" />
+            <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id']; ?>" />
+            <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>" />
             <input type="hidden" name="display_format" value="Detail" />
 
       	<?php
-            if ($event['group_event_marked'] == "reviewed") {
+            if ($event['GroupEvent']['marked'] == "reviewed") {
                 echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_not_reviewed\" value=\" ".__('Mark Peer Evaluations as Not Reviewed', true)."\" />";
             } else {
                 echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_reviewed\" value=\" ".__('Mark Peer Evaluations as Reviewed', true)."\" />";
@@ -286,16 +286,16 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
         //Grade Released
         if (isset($scoreRecords[$user['id']]['grade_released']) && $scoreRecords[$user['id']]['grade_released']) {?>
 
-            <input type="button" name="UnreleaseGrades" value="<?php __('Unrelease Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';0'; ?>'">
+            <input type="button" name="UnreleaseGrades" value="<?php __('Unrelease Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$user['id'].';'.$event['GroupEvent']['id'].';0'; ?>'">
         <?php } else {?>
-            <input type="button" name="ReleaseGrades" value="<?php __('Release Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';1'; ?>'">
+            <input type="button" name="ReleaseGrades" value="<?php __('Release Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$user['id'].';'.$event['GroupEvent']['id'].';1'; ?>'">
         <?php }
 
         //Comment Released
         if (isset($scoreRecords[$user['id']]['comment_released']) && $scoreRecords[$user['id']]['comment_released']) {?>
-            <input type="button" name="UnreleaseComments" value="<?php __('Unrelease Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';0'; ?>'">
+            <input type="button" name="UnreleaseComments" value="<?php __('Unrelease Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$user['id'].';'.$event['GroupEvent']['id'].';0'; ?>'">
         <?php } else { ?>
-            <input type="button" name="ReleaseComments" value="<?php __('Release Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';1'; ?>'">
+            <input type="button" name="ReleaseComments" value="<?php __('Release Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$user['id'].';'.$event['GroupEvent']['id'].';1'; ?>'">
         <?php } ?>
     </div>
     </div>

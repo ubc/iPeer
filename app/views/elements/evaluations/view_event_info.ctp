@@ -2,7 +2,7 @@
   <tr class="tableheader"><td colspan="4" align="center"><?php __('Evaluation Event Detail')?></td></tr>
   <tr>
     <td width="15%"><?php __('Group')?>:</td>
-    <td width="35%"><?php echo $event['group_name'] ?></td>
+    <td width="35%"><?php echo $event['Group']['group_name'] ?></td>
     <td width="15%"><?php __('Self-Evaluation')?>:</td>
     <td><?php echo ($event['Event']['self_eval']) ? 'Yes' : 'No'?></td>
   </tr>

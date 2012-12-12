@@ -168,7 +168,20 @@ class GroupTestCase extends CakeTestCase
         $this->assertEqual($group_num, 1);
     }
 
-    function testGetGroupByGroupIdMemberId()
+    function testGetGroupByGroupIdEventId()
+    {
+        // group is attached to event
+        $group = $this->Group->getGroupByGroupIdEventId(1, 1);
+        $this->assertFalse(empty($group));
+        $this->assertEqual($group['Group']['id'], 1);
+
+        // group is not attached to event
+        $group = $this->Group->getGroupByGroupIdEventId(2, 8);
+        $this->assertFalse($group);
+
+    }
+
+    function testGetGroupByGroupIdEventIdMemberId()
     {
         // student within group, and group is attached to event
         $group = $this->Group->getGroupByGroupIdEventIdMemberId(1, 1, 5);

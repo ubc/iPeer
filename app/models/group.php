@@ -380,15 +380,23 @@ class Group extends AppModel
         ));
     }
 
+    function getGroupByGroupIdEventId($groupId, $eventId)
+    {
+        return $this->getGroupByGroupIdEventIdMemberId($groupId, $eventId, null);
+    }
+
     function getGroupByGroupIdEventIdMemberId($groupId, $eventId, $memberId)
     {
+        $conditions = array(
+            $this->alias.'.id' => $groupId,
+            'GroupEvent.event_id' => $eventId,
+        );
+        if ($memberId != null) {
+            $conditions['Member.id'] = $memberId;
+        }
         $group = $this->find('first', array(
             'fields' => array('Group.*'),
-            'conditions' => array(
-                $this->alias.'.id' => $groupId,
-                'GroupEvent.event_id' => $eventId,
-                'Member.id' => $memberId,
-            ),
+            'conditions' => $conditions,
         ));
 
         // hack to find the GroupEvent

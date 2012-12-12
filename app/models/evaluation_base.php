@@ -149,7 +149,10 @@ class EvaluationBase extends AppModel
     {
         $this->Penalty = ClassRegistry::init('Penalty');
         $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
-        $userPenalty = array();
+        $memberIds = Set::extract($groupMembers, '/User/id');
+        $userPenalty = array_fill_keys($memberIds, 0);
+
+        // find the event
         $event = $this->Event->find(
             'first',
             array(
@@ -160,13 +163,11 @@ class EvaluationBase extends AppModel
 
         // not due yet. no penalty
         if ($event['Event']['due_in'] >= 0) {
-            return array();
+            return $userPenalty;
         }
 
         // storing the timestamp of the due date of the event
         $event_due = strtotime($event['Event']['due_date']);
-        $memberIds = Set::extract($groupMembers, '/User/id');
-        $userPenalty = array_fill_keys($memberIds, 0);
         // assign penalty to groupMember if they submitted late or never submitted by release_date_end
         $submissions = $this->EvaluationSubmission->find('all', array(
             'conditions' => array('submitter_id' => $memberIds, 'EvaluationSubmission.event_id' => $eventId),

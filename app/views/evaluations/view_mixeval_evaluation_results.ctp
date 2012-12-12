@@ -28,8 +28,8 @@ foreach ($groupMembersNoTutors as $member) {
 <?php echo $this->element('evaluations/view_event_info', array('controller'=>'evaluations', 'event'=>$event));?>
 
 <div class="event-summary">
-    <span class="instruction-icon"><?php __('Summary:')?> ( <?php echo $this->Html->link(__('Basic', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['group_id']."/Basic")?> |
-    <?php echo $html->link(__('Detail', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['group_id']."/Detail")?> )</span>
+    <span class="instruction-icon"><?php __('Summary:')?> ( <?php echo $this->Html->link(__('Basic', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['Group']['id']."/Basic")?> |
+    <?php echo $html->link(__('Detail', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['Group']['id']."/Detail")?> )</span>
     <font size = "1" face = "arial" color = "red" >*Numerics in red denotes late submission penalty.</font>
 	<?php if (!$allMembersCompleted): ?>
         <div class="incompleted">
@@ -61,9 +61,9 @@ foreach ($groupMembersNoTutors as $member) {
     <tr class="tablecell2" align="center">
       <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
               <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
-              <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
+              <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>" />
               <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id']?>" />
-              <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" />
+              <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>" />
               <input type="hidden" name="display_format" value="Basic" />
 
         <td colspan="<?php echo count($groupMembersNoTutors) +1; ?>">

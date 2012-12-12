@@ -9,7 +9,7 @@
 </tr>
 <tr>
     <td><?php echo $event['Event']['title'] ?></td>
-    <td><?php echo $event['group_name'] ?></td>
+    <td><?php echo $event['Group']['group_name'] ?></td>
     <td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($event['Event']['due_date']))) ?></td>
     <td><?php echo ($event['Event']['self_eval']) ? 'Yes' : 'No'?></td>
 </tr>
@@ -26,9 +26,9 @@
 </table>
 
 <h3><?php __('Summary')?>
- :(<?php echo $this->Html->link(__('Basic', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['group_id']."/Basic")?> |
-    <?php echo $html->link(__('Detail', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['group_id']."/Detail")?> )</h3>
-    
+ :(<?php echo $this->Html->link(__('Basic', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['Group']['id']."/Basic")?> |
+    <?php echo $html->link(__('Detail', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['Group']['id']."/Detail")?> )</h3>
+
 <!-- Users who haven't done the evaluation yet table -->
 <table class="standardtable">
 <?php
@@ -48,12 +48,12 @@ if (!$allMembersCompleted) {
 
 <!-- Show Evaluation Reuslts - Basic -->
  <h3><?php __('Evaluation Results')?></h3>
- 
-<table class='standardtable'> 
+
+<table class='standardtable'>
    <th><?php __('Student Name')?></th>
-   <th><?php __('Total') ?> 
+   <th><?php __('Total') ?>
        : (/<?php echo number_format($rubric['Rubric']['total_marks'], 2); ?>)</th>
-    
+
 <?php
 $aveScoreSum = 0;
 //This section will display the evaluatees' name
@@ -87,18 +87,18 @@ if ($groupMembersNoTutors) {
     <td><b>
     <?php echo number_format($aveScoreSum / count($groupMembersNoTutors), 2); ?>
     </b></td>
-    
-    
+
+
     <?php if ($allMembersCompleted) :?>
     <tr class="tablecell2" align="center">
       <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
               <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
-              <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
-              <input type="hidden" name="course_id" value="<?php echo $courseId; ?>" />
-              <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" />
+              <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>" />
+              <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id']; ?>" />
+              <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>" />
               <input type="hidden" name="display_format" value="<?php __('Basic')?>" />
 
-              <td colspan="<?php echo count($groupMembers) + 1; ?>">      
+              <td colspan="<?php echo count($groupMembers) + 1; ?>">
            <?php  if ($event['group_event_marked'] == "reviewed"): ?>
                  <input class="reviewed" type="submit" name="mark_not_reviewed" value="<?php __('Mark Peer Evaluations as Not Reviewed')?>" />
             <?php else: ?>
@@ -106,7 +106,7 @@ if ($groupMembersNoTutors) {
             </td>
             </form>
   </tr>
-  <?php endif; endif; ?>          
+  <?php endif; endif; ?>
 </table>
 
 
