@@ -370,13 +370,13 @@ class EvaluationSimple extends AppModel
                 //Grade is released; retrieve all grades
                 //Get total mark each member received
                 $receivedTotalScore = $this->getReceivedTotalScore(
-                    $event['group_event_id'], $userId);
+                    $event['GroupEvent']['id'], $userId);
                 $totalScore = $receivedTotalScore[0][0]['received_total_score'];
                 $numMemberSubmissions = $this->find('count', array(
                     'conditions' => array(
                         'EvaluationSimple.evaluatee' => $userId,
                         'EvaluationSimple.event_id' => $event['Event']['id'],
-                        'EvaluationSimple.grp_event_id' => $event['group_event_id'])));
+                        'EvaluationSimple.grp_event_id' => $event['GroupEvent']['id'])));
 
                 $event_info = $this->Event->find(
                     'first',
@@ -420,7 +420,7 @@ class EvaluationSimple extends AppModel
 
                 $tmp_total = 0;
                 $avg = $this->find('all', array(
-                    'conditions' => array('EvaluationSimple.grp_event_id' => $event['group_event_id']),
+                    'conditions' => array('EvaluationSimple.grp_event_id' => $event['GroupEvent']['id']),
                     'fields' => array('AVG(score) as avg', 'sum(score) as sum', 'evaluatee', 'grp_event_id'),
                     'group' => 'evaluatee'
                 ));

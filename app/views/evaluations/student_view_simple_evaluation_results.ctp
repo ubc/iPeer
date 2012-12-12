@@ -10,7 +10,7 @@
 <tr>
     <td><?php echo $event['Event']['title'] ?></td>
     <td><?php echo $event['Group']['group_name'] ?></td>
-    <td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($event['Event']['due_date']))) ?></td>
+    <td><?php echo Toolkit::formatDate($event['Event']['due_date']) ?></td>
     <td><?php echo ($event['Event']['self_eval']) ? 'Yes' : 'No' ?></td>
 </tr>
 </table>
@@ -60,7 +60,7 @@
 </table>
 <table class="standardtable">
     <tr>
-        <th><?php __('Comments&nbsp;(Randomly Ordered)')?></th>
+        <th><?php __('Comments')?> (<?php __('Randomly Ordered')?>)</th>
     </tr>
     <?php if (isset($studentResult['comments'])) {
         foreach ($studentResult['comments'] as $row) {
@@ -75,3 +75,6 @@
         <tr><td><?php echo __('Not Released.', true); ?> </td></tr>
     <?php } ?>
 </table>
+<div style="text-align: center;">
+<input type="button" name="Back" value="Back" onclick="javascript:(history.length > 1 ? history.back() : window.close());">
+</div>

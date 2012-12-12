@@ -1,8 +1,8 @@
 <?php
-    $gradeReleased = isset($scoreRecords[$currentUser['id']]['grade_released']) ?
-        $scoreRecords[$currentUser['id']]['grade_released'] : 1;
-    $commentReleased = isset($scoreRecords[$currentUser['id']]['comment_released']) ?
-        $scoreRecords[$currentUser['id']]['comment_released'] : 1;
+    $gradeReleased = isset($scoreRecords[User::get('id')]['grade_released']) ?
+        $scoreRecords[User::get('id')]['grade_released'] : 1;
+    $commentReleased = isset($scoreRecords[User::get('id')]['comment_released']) ?
+        $scoreRecords[User::get('id')]['comment_released'] : 1;
     $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
 
     $pos = 1;
@@ -46,7 +46,7 @@ if (!$gradeReleased && !$commentReleased) {
         } ?>
         <tr id='details'>
         <?php if (isset($scoreRecords)) { ?>
-        <td width='15%'><?php echo $currentUser['full_name'] ?></td>
+        <td width='15%'><?php echo User::get('full_name') ?></td>
     <?php } else { ?>
         <td width='15%'><?php echo $member['User']['first_name'].' '.$member['User']['last_name']?></td>
     <?php }
@@ -66,7 +66,7 @@ if (!$gradeReleased && !$commentReleased) {
 
         <!-- Points Detail -->
         <strong>Points: </strong>
-        <?php if ($gradeReleased && isset($mixevalDet)) { 
+        <?php if ($gradeReleased && isset($mixevalDet)) {
             $lom = $mixevalDet['grade'];
         	$empty = $mixeval["Question"][$i-1]["multiplier"];
         	for ($v = 0; $v < $lom; $v++) {
@@ -137,7 +137,7 @@ if (!$gradeReleased && !$commentReleased) {
 
      <tr id='details'>
      <?php if (isset($scoreRecords)) { ?>
-       <td width='15%'><?php echo $currentUser['full_name'] ?></td>
+       <td width='15%'><?php echo User::get('full_name') ?></td>
      <?php } else { ?>
        <td width='15%'><?php echo $member['User']['first_name'].' '.$member['User']['last_name']?></td>
      <?php }

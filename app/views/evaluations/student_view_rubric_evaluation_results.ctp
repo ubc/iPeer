@@ -9,7 +9,7 @@
 </tr>
 <tr>
     <td><?php echo $event['Event']['title'] ?></td>
-    <td><?php echo $event['group_name'] ?></td>
+    <td><?php echo $event['Group']['group_name'] ?></td>
     <td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($event['Event']['due_date']))) ?></td>
     <td><?php echo ($event['Event']['self_eval']) ? 'Yes' : 'No' ?></td>
 </tr>
@@ -31,14 +31,14 @@
 </tr>
 <tr>
     <td>
-    <?php 
-    isset($scoreRecords[$currentUser['id']]['grade_released'])? $gradeReleaseStatus = $scoreRecords[$currentUser['id']]['grade_released'] : $gradeReleaseStatus = array();
+    <?php
+    isset($scoreRecords[User::get('id')]['grade_released'])? $gradeReleaseStatus = $scoreRecords[User::get('id')]['grade_released'] : $gradeReleaseStatus = array();
     if ($gradeReleaseStatus) {
-            $finalAvg = $memberScoreSummary[$currentUser['id']]['received_ave_score'] - $ratingPenalty;
+            $finalAvg = $memberScoreSummary[User::get('id')]['received_ave_score'] - $ratingPenalty;
             ($ratingPenalty > 0) ? ($stringAddOn = ' - '.'('.'<font color=\'red\'>'.$ratingPenalty.'</font>'.
                 ')'.'<font color=\'red\'>*</font>'.' = '.number_format($finalAvg, 2)) : $stringAddOn = '';
-                
-            echo number_format($memberScoreSummary[$currentUser['id']]['received_ave_score'], 2).$stringAddOn;
+
+            echo number_format($memberScoreSummary[User::get('id')]['received_ave_score'], 2).$stringAddOn;
             $ratingPenalty > 0 ? $penaltyNote = '&nbsp &nbsp &nbsp &nbsp &nbsp ( )'.'<font color=\'red\'>*</font>'.' : '.$studentResult['penalty'].
                 '% late penalty.' : $penaltyNote = '';
             echo $penaltyNote;
@@ -65,10 +65,10 @@
 $numerical_index = 1;  //use numbers instead of words; get users to refer to the legend
 $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
 $membersAry = array();  //used to format result
-$groupAve = 0; 
-if (isset($scoreRecords[$currentUser['id']])) {
-    $gradeReleased = $scoreRecords[$currentUser['id']]['grade_released'];
-    $commentReleased = $scoreRecords[$currentUser['id']]['comment_released'];
+$groupAve = 0;
+if (isset($scoreRecords[User::get('id')])) {
+    $gradeReleased = $scoreRecords[User::get('id')]['grade_released'];
+    $commentReleased = $scoreRecords[User::get('id')]['comment_released'];
 } else {
     $gradeReleased = 0;
     $commentReleased = 0;
@@ -106,7 +106,7 @@ if (isset($scoreRecords[$currentUser['id']])) {
 		  </div>
 		  <div style="height: 200px;" id="panelResultsContent" class="panelContent">
   	  <?php
-    $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$evalResult, 'userId'=>$currentUser['id'], 'scoreRecords'=>$scoreRecords);
+    $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$evalResult, 'userId'=>User::get('id'), 'scoreRecords'=>$scoreRecords);
     echo $this->element('evaluations/student_view_rubric_details', $params);
     ?>
 
@@ -120,7 +120,7 @@ if (isset($scoreRecords[$currentUser['id']])) {
 		  <div style="height: 200px;" id="panelReviewsContent" class="panelContent">
 
   	  <?php
-    $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$reviewEvaluations, 'userId'=>$currentUser['id'], 'scoreRecords'=>$scoreRecords);
+    $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$reviewEvaluations, 'userId'=>User::get('id'), 'scoreRecords'=>$scoreRecords);
     echo $this->element('evaluations/student_view_rubric_details', $params);
     ?>
 		  </div>

@@ -798,8 +798,8 @@ class EvaluationComponent extends Object
 
         $this->User->id = $userId;
 
-        if ($event['group_event_id'] && $userId) {
-            $rubricResult = $this->EvaluationRubric->getResultsByEvaluator($event['group_event_id'], $userId);
+        if ($event['GroupEvent']['id'] && $userId) {
+            $rubricResult = $this->EvaluationRubric->getResultsByEvaluator($event['GroupEvent']['id'], $userId);
 
             $evalResult[$userId] = $rubricResult;
 
@@ -1365,8 +1365,8 @@ class EvaluationComponent extends Object
         $this->User = ClassRegistry::init('User');
         $evalResult = array();
         $this->User->id = $userId;
-        if ($event['group_event_id'] && $userId) {
-            $mixevalResult = $this->EvaluationMixeval->getResultsByEvaluator($event['group_event_id'], $userId);
+        if ($event['GroupEvent']['id'] && $userId) {
+            $mixevalResult = $this->EvaluationMixeval->getResultsByEvaluator($event['GroupEvent']['id'], $userId);
             $evalResult[$userId] = $mixevalResult;
 
             foreach ($mixevalResult as $row) {
@@ -1887,7 +1887,7 @@ class EvaluationComponent extends Object
         $aveScore = 0; $groupAve = 0;
         $studentResult = array();
 
-        $results = $this->EvaluationSimple->getResultsByEvaluatee($event['group_event_id'], $this->Auth->user('id'));
+        $results = $this->EvaluationSimple->getResultsByEvaluatee($event['GroupEvent']['id'], $this->Auth->user('id'));
         if ($results !=null) {
             //Get Grade Release: grade_release will be the same for all evaluatee records
             $gradeReleaseStatus = $results[0]['EvaluationSimple']['grade_release'];
@@ -1895,17 +1895,17 @@ class EvaluationComponent extends Object
                 //Grade is released; retrieve all grades
                 //Get total mark each member received
                 $receivedTotalScore = $this->EvaluationSimple->getReceivedTotalScore(
-                    $event['group_event_id'], $this->Auth->user('id'));
+                    $event['GroupEvent']['id'], $this->Auth->user('id'));
                 $totalScore = $receivedTotalScore[0]['received_total_score'];
                 $numMembers=$event['Event']['self_eval'] ?
-                    $this->GroupsMembers->find('count', 'group_id='.$event['group_id']) :
-                    $this->GroupsMembers->find('count', 'group_id='.$event['group_id']) - 1;
+                    $this->GroupsMembers->find('count', 'group_id='.$event['Group']['id']) :
+                    $this->GroupsMembers->find('count', 'group_id='.$event['Group']['id']) - 1;
                 $aveScore = $totalScore / $numMembers;
                 $studentResult['numMembers'] = $numMembers;
                 $studentResult['receivedNum'] = count($receivedTotalScore);
 
-                $groupTotal = $this->EvaluationSimple->getGroupResultsByGroupEventId($event['group_event_id']);
-                $groupTotalCount = $this->EvaluationSimple->getGroupResultsCountByGroupEventId($event['group_event_id']);
+                $groupTotal = $this->EvaluationSimple->getGroupResultsByGroupEventId($event['GroupEvent']['id']);
+                $groupTotalCount = $this->EvaluationSimple->getGroupResultsCountByGroupEventId($event['GroupEvent']['id']);
                 $groupAve = $groupTotal[0]['received_total_score'] / $groupTotalCount[0]['received_total_count'];
             }
             $studentResult['aveScore'] = $aveScore;
@@ -1915,7 +1915,7 @@ class EvaluationComponent extends Object
             $commentReleaseStatus = $results[0]['EvaluationSimple']['release_status'];
             if ($commentReleaseStatus) {
                 //Comment is released; retrieve all comments
-                $comments = $this->EvaluationSimple->getAllComments($event['group_event_id'], $this->Auth->user('id'));
+                $comments = $this->EvaluationSimple->getAllComments($event['GroupEvent']['id'], $this->Auth->user('id'));
                 if (shuffle($comments)) {
                     $studentResult['comments'] = $comments;
                 }

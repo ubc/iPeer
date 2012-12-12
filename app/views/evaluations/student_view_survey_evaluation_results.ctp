@@ -62,13 +62,12 @@ foreach ($questions as $ques) {
         $ques_num++;
     }
 }
-echo '<br>';
 
 function boldSelected($choices, $selected) {
     $options = array();
     $answers = array();
     $data = array();
-    
+
     // grabbing all the choices
     foreach ($choices as $choice) {
         $options[] = $choice['response'];
@@ -77,7 +76,7 @@ function boldSelected($choices, $selected) {
     foreach ($selected as $select) {
         $answers[] = $select['SurveyInput']['response_text'];
     }
-    
+
     foreach ($options as $option) {
         // option is chosen
         if (in_array($option, $answers)) {
@@ -87,8 +86,11 @@ function boldSelected($choices, $selected) {
             $data[] = $option;
         }
     }
-    
+
     return $data;
 }
 ?>
+<div style="text-align: center;">
+<input type="button" name="Back" value="Back" onclick="javascript:(history.length > 1 ? history.back() : window.close());">
+</div>
 </div>
