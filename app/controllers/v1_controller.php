@@ -133,6 +133,7 @@ class V1Controller extends Controller {
         // construct the key used for hmac calculation
         $clientSecret = $this->_getClientSecret($_REQUEST['oauth_consumer_key']);
         if (is_null($clientSecret)) {
+            $this->log('Got invalid client ["'.(isset($_REQUEST['oauth_consumer_key']) ? $_REQUEST['oauth_consumer_key'] : "").'"]!');
             $this->set('oauthError', "Invalid Client");
             $this->render('oauth_error');
             return false;
@@ -140,7 +141,7 @@ class V1Controller extends Controller {
         $clientSecret = rawurlencode($clientSecret);
         $tokenSecret = $this->OauthToken->getTokenSecret($_REQUEST['oauth_token']);
         if (is_null($tokenSecret)) {
-            $this->log('Got invalid token ["'.isset($_REQUEST['oauth_token']) ? $_REQUEST['oauth_token'] : "" .'"]!');
+            $this->log('Got invalid token ["'.(isset($_REQUEST['oauth_token']) ? $_REQUEST['oauth_token'] : "").'"]!');
             $this->set('oauthError', "Invalid Token");
             $this->render('oauth_error');
             return false;
@@ -155,6 +156,7 @@ class V1Controller extends Controller {
         // check to see if we got the signature we expected
         $actual = $_REQUEST['oauth_signature'];
         if ($expected != $actual) {
+            $this->log('Got invalid signature. expecting: '.$expected.', actual: '.$actual.'.');
             $this->set('oauthError', "Invalid Signature");
             $this->render('oauth_error');
             return false;
