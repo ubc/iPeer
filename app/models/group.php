@@ -375,8 +375,8 @@ class Group extends AppModel
     function getGroupsByEventId($eventId, $contain = array())
     {
         return $this->find('all', array(
-            'conditions' => array('GroupEvent.event_id' => $eventId),
-            'contain' => $contain,
+            'conditions' => array('Event.id' => $eventId),
+            'contain' => array_merge(array('Event'), $contain),
         ));
     }
 

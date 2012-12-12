@@ -11,7 +11,7 @@ class GroupEventTestCase extends CakeTestCase {
         'app.survey_group_member', 'app.question',
         'app.response', 'app.survey_question', 'app.user_course', 'app.evaluation_rubric', 'app.rubrics_criteria',
         'app.user_enrol', 'app.groups_member', 'app.survey', 'app.rubric', 'app.faculty', 'app.course_department',
-        'app.department', 'app.user_faculty', 'app.sys_parameter', 
+        'app.department', 'app.user_faculty', 'app.sys_parameter',
         'app.user_tutor', 'app.penalty', 'app.evaluation_simple'
     );
     public $GroupEvent = null;
@@ -28,6 +28,7 @@ class GroupEventTestCase extends CakeTestCase {
 
     function startTest($method)
     {
+        echo $method."\n";
     }
 
     function endTest($method)
@@ -36,15 +37,20 @@ class GroupEventTestCase extends CakeTestCase {
 
     function testUpdateGroups()
     {
-        $data = array();
-        $data['Member'] = array(3);
-
+        // add group 3 and remove group 1 and 2
+        $data = array(3);
         $this->GroupEvent->updateGroups(1, $data);
         $searched = $this->GroupEvent->find('all', array('conditions' => array('event_id' => 1)));
+        $this->assertEqual(count($searched), 1);
         $this->assertEqual($searched[0]['GroupEvent']['group_id'], 3);
         $this->assertEqual($searched[0]['GroupEvent']['event_id'], 1);
-        $this->assertEqual(sizeof($searched), 1);
 
+        // single group
+        $this->GroupEvent->updateGroups(1, 1);
+        $searched = $this->GroupEvent->find('all', array('conditions' => array('event_id' => 1)));
+        $this->assertEqual(count($searched), 1);
+
+        // invalid group
         $incorrectData = $this->GroupEvent->updateGroups(1, null);
         $this->assertFalse($incorrectData);
     }

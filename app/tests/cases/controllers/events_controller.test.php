@@ -137,6 +137,104 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->assertEqual($result['event']['Group'][1]['group_name'], 'Lazy Engineers');
     }
 
+    function testEditWithData() {
+        $data = array(
+            'Event' => array(
+                'id' => 8,
+                'title' => 'simple evaluation 4a',
+                'description' => 'result released with submissiona',
+                'event_template_type_id' => 1,
+                'SimpleEvaluation' => 1,
+                'self_eval' => 0,
+                'com_req' => 0,
+                'due_date' => '2012-11-28 00:00:01',
+                'release_date_begin' => '2012-11-20 00:00:01',
+                'release_date_end' => '2012-11-29 00:00:01',
+                'result_release_date_begin' => '2012-11-30 00:00:01',
+                'result_release_date_end' => '2022-12-12 00:00:01',
+            ),
+            'Group' => array(
+                'Group' => array(1,2)
+            ),
+        );
+        $this->controller->expectOnce('redirect', array('index/1'));
+        $this->testAction(
+            '/events/edit/8',
+            array('fixturize' => true, 'data' => $data, 'method' => 'post')
+        );
+        $model = ClassRegistry::init('Event');
+        $event = $model->find('first', array( 'conditions' => array('id' => $data['Event']['id']), 'contain' => array('Group', 'GroupEvent', 'EvaluationSubmission')));
+        unset($data['Event']['SimpleEvaluation']);
+        $data['Event']['template_id'] = 1;
+        foreach ($data['Event'] as $key => $expected) {
+            $this->assertEqual($event['Event'][$key], $expected);
+        }
+        $this->assertEqual(count($event['Group']), 2);
+
+        // make sure the GroupEvent id is not shifted
+        $groupEvents = Set::sort($event['GroupEvent'], '{n}.id', 'asc');
+        $this->assertEqual($groupEvents[0]['id'], 10);
+
+        // make sure the GroupEvent id is not shifted
+        $submissions = Set::sort($event['EvaluationSubmission'], '{n}.id', 'asc');
+        $this->assertEqual($submissions[0]['id'], 11);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Edit event successful!');
+    }
+
+    function testEditOthersEvent() {
+        // test with instructor account
+        $this->login = array(
+            'User' => array(
+                'username' => 'instructor2',
+                'password' => md5('ipeeripeer')
+            )
+        );
+
+        $data = array(
+            'Event' => array(
+                'id' => 8,
+                'title' => 'simple evaluation 4a',
+                'description' => 'result released with submissiona',
+                'event_template_type_id' => 1,
+                'SimpleEvaluation' => 1,
+                'self_eval' => 0,
+                'com_req' => 0,
+                'due_date' => '2012-11-28 00:00:01',
+                'release_date_begin' => '2012-11-20 00:00:01',
+                'release_date_end' => '2012-11-29 00:00:01',
+                'result_release_date_begin' => '2012-11-30 00:00:01',
+                'result_release_date_end' => '2022-12-12 00:00:01',
+            ),
+            'Group' => array(
+                'Group' => array(1,2)
+            ),
+        );
+        $this->controller->expectOnce('redirect', array('index'));
+        $this->testAction(
+            '/events/edit/8',
+            array('fixturize' => true, 'data' => $data, 'method' => 'post')
+        );
+        $model = ClassRegistry::init('Event');
+        $event = $model->find('first', array( 'conditions' => array('id' => $data['Event']['id']), 'contain' => array('Group', 'GroupEvent', 'EvaluationSubmission')));
+        // data should not be changed
+        $this->assertEqual($event['Event']['title'], 'simple evaluation 4');
+        $this->assertEqual(count($event['Group']), 1);
+
+        // make sure the GroupEvent id is not shifted
+        $this->assertEqual(count($event['GroupEvent']), 1);
+        $groupEvents = Set::sort($event['GroupEvent'], '{n}.id', 'asc');
+        $this->assertEqual($groupEvents[0]['id'], 10);
+
+        // make sure the GroupEvent id is not shifted
+        $submissions = Set::sort($event['EvaluationSubmission'], '{n}.id', 'asc');
+        $this->assertEqual($submissions[0]['id'], 11);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: That event does not exist or you dont have access to it');
+    }
+
     function testDelete() {
     }
 

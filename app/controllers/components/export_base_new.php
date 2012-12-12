@@ -282,7 +282,7 @@ class ExportBaseNewComponent extends Object
     {
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $csv  = '';
-        $groupEvents = $this->GroupEvent->getGrpEventByEventId($eventId);
+        $groupEvents = $this->GroupEvent->getGroupEventByEventId($eventId);
         foreach ($groupEvents as $ge) {
             $SimpleEvalResultTable =  $this->buildSimpleEvaluationScoreTableByGroup($params, $ge['GroupEvent']['id'], $eventId);
             $csv .= $SimpleEvalResultTable."\n";
@@ -441,7 +441,7 @@ class ExportBaseNewComponent extends Object
     function buildMixEvalScoreTableByEvent($params, $eventId)
     {
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
-        $groupEvents = $this->GroupEvent->getGrpEventByEventId($eventId);
+        $groupEvents = $this->GroupEvent->getGroupEventByEventId($eventId);
         $csv  = '';
         foreach ($groupEvents as $ge) {
             $mixEvalResultTable =  $this->buildMixedEvalScoreTableByGroupEvent($params, $ge['GroupEvent']['id'], $eventId);

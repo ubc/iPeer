@@ -426,9 +426,11 @@ class EventsController extends AppController
         if (!($event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission(), array('Course', 'Group', 'Penalty')))) {
             $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
             $this->redirect('index');
+            return;
         } else if ($event['Event']['event_template_type_id'] == '3') {
             // can't edit survey event from this view
             $this->redirect('/surveys/edit/'.$eventId);
+            return;
         }
 
 
@@ -463,6 +465,7 @@ class EventsController extends AppController
             if ($this->Event->saveAll($this->data)) {
                 $this->Session->setFlash("Edit event successful!", 'good');
                 $this->redirect('index/'.$event['Event']['course_id']);
+                return;
             } else {
                 $this->Session->setFlash("Edit event failed.");
             }

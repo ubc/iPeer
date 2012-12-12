@@ -183,6 +183,13 @@ class Event extends AppModel
         return $results;
     }
 
+    function beforeSave(array $options) {
+        if (isset($this->data['Group']['Group']) && isset($this->data[$this->alias]['id'])) {
+            $this->GroupEvent->updateGroups($this->data[$this->alias]['id'], $this->data['Group']['Group']);
+            unset($this->data['Group']);
+        }
+        return true;
+    }
     /**
      * prepData
      * parses the grous from the hidden field assigned

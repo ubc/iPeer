@@ -11,7 +11,7 @@
 class GroupEvent extends AppModel
 {
     public $name = 'GroupEvent';
-    public $actsAs = array('Traceable');
+    public $actsAs = array('Traceable', 'Containable');
 
     public $belongsTo= array(
         'Group' =>
@@ -67,47 +67,47 @@ class GroupEvent extends AppModel
 
     /**
      * Updates all the group events
-     * @param int   $id   Event id
-     * @param array $data new goups for the event
+     *
+     * @param int   $eventId   Event id
+     * @param array $newGroups new goups for the event
      *
      * @access public
-     * @return void
+     * @return boolean
      */
-    function updateGroups($id=null, $data=null)
+    function updateGroups($eventId, $newGroups)
     {
+        if (null == $newGroups) {
+            return false;
+        }
+
+        if (!is_array($newGroups)) {
+            $newGroups = array($newGroups);
+        }
         //get old groupid's
-        $tmp = $this->getGroupIDsByEventId($id);
-        $oldGroups = array();
-        $newGroups = array();
+        $tmp = $this->getGroupIDsByEventId($eventId);
+        $oldGroups = Set::extract($tmp, '/GroupEvent/group_id');
+        $mapping = Set::combine($tmp, '{n}.GroupEvent.group_id', '{n}.GroupEvent.id');
         $insertGroups = array();
         $deleteGroups = array();
-
-        for ($i = 0; $i < count($data['Member']); $i++) {
-            if (!empty($data['Member'])) {
-                array_push($newGroups, $data['Member'][$i]);
-            }
-        }
-        for ($i = 0; $i < count($tmp); $i++) {
-            array_push($oldGroups, $tmp[$i]['GroupEvent']['group_id']);
-        }
 
         //compare
         $insertGroups = array_diff($newGroups, $oldGroups);
         $deleteGroups = array_diff($oldGroups, $newGroups);
-        //insert/delete
+
+        //insert
         foreach ($insertGroups as $groupId) {
-            $tmp = array('event_id'=>$id, 'group_id'=>$groupId, 'marked'=>'not reviewed');
+            $tmp = array('event_id' => $eventId, 'group_id' => $groupId, 'marked'=>'not reviewed');
             $this->save($tmp);
             $this->id = null;
         }
+
+        // delete
         foreach ($deleteGroups as $groupId) {
-            $tmp = $this->find('first', array(
-                'conditions' => array('event_id'=>$id,'group_id'=>$groupId),
-                'fields' => array('GroupEvent.id')
-            ));
-            $this->delete($tmp['GroupEvent']['id']);
+            $this->delete($mapping[$groupId]);
             $this->id = null;
         }
+
+        return true;
     }
 
     /**
@@ -118,12 +118,16 @@ class GroupEvent extends AppModel
      * @return array of group ids associated with the event
      */
 
-    function getGroupIDsByEventId($eventId=null)
+    function getGroupIDsByEventId($eventId)
     {
         if (empty($eventId) || is_null($eventId)) {
             return;
         }
-        return $this->find('all', array('conditions'=>array('event_id'=>$eventId), 'fields' => 'group_id'));
+        return $this->find('all', array(
+            'conditions' => array('event_id'=>$eventId),
+            'fields' => array('id', 'group_id'),
+            'contain' => false,
+        ));
     }
 
     /**
@@ -134,7 +138,7 @@ class GroupEvent extends AppModel
      * @return array of grops associated with the event
      */
 
-    function getGroupsByEventId($eventId=null)
+    function getGroupsByEventId($eventId)
     {
         if (empty($eventId) || is_null($eventId)) {
             return;
@@ -439,19 +443,5 @@ class GroupEvent extends AppModel
     {
         return $this->find('first', array('conditions' => array('GroupEvent.id' => $grpEventid),
             'fields' => $fields));
-    }
-
-
-    /**
-     * getGrpEventByEventId
-     *
-     * @param int $eventId event id
-     *
-     * @access public
-     * @return void
-     */
-    function getGrpEventByEventId($eventId)
-    {
-        return $this->find('all', array('conditions' => array('event_id' => $eventId)));
     }
 }
