@@ -369,6 +369,8 @@ class EventsController extends AppController
         // Init form variables needed for display
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Add Event', true)));
         $this->set('groups', $this->Group->getGroupsByCourseId($courseId));
+        $courseList = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+        $this->set('courses', $courseList);
         $this->set(
             'eventTemplateTypes',
             $this->EventTemplateType->getEventTemplateTypeList(true)
@@ -409,7 +411,6 @@ class EventsController extends AppController
             }
             $this->redirect('index/'.$courseId);
         }
-
     }
 
     /**

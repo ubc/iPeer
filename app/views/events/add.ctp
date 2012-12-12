@@ -3,7 +3,7 @@
 $html->script("jquery-ui-timepicker-addon", array("inline"=>false));
 
 echo $this->Form->create('Event', array('action' => "add/$course_id"));
-echo $this->Form->input('course_id', array('default' => $course_id, 'disabled' => true));
+echo $this->Form->input('course_id', array('default' => $course_id));
 echo $this->Form->input('title', array('label' => 'Event Title'));
 echo $this->Form->input('description', array('type' => 'textarea'));
 echo $this->Form->input('event_template_type_id');
@@ -87,7 +87,6 @@ for ($i = -1; $i < $numPenalties; $i++) {
 echo "</div>";
 echo '<a class="addPenaltyButton"
     href="#" onclick="addPenaltyInputs(); return false;">Add Penalty</a>';
-
 
 echo $this->Form->submit();
 echo $this->Form->end();
