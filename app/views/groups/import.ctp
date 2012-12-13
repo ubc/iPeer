@@ -1,11 +1,10 @@
-<div class="content-container">
-	<table class="full-size">
-      <tr class="tableheader">
-        <td width="50%"><?php __('Instructions')?></td>
-        <td width="50%"><?php __('Import')?></td>
-      </tr>
-      <tr class="tablecell2">
-        <td>
+<table class='standardtable'>
+    <tr>
+        <th width="50%"><?php __('Instructions')?></th>
+        <th width="50%"><?php __('Import')?></th>
+    </tr>
+    <tr>
+        <td style="text-align: left;">
           <?php __('NOTE:')?>
           <ul class="instructions">
             <li><?php __('Please make sure the username column matches the username column in student import file.')?></li>
@@ -26,7 +25,7 @@
             29978051, 2, <?php __('Team B')?>
           </pre>
         </td>
-        <td valign="top"><br>
+        <td style="text-align: left;">
     <form name="importfrm" id="importfrm" method="POST" action="<?php echo $html->url('import') ?>" enctype="multipart/form-data" >
         <h3>1) <?php __('Please select a CSV file to import')?>:</h3>
         &nbsp;&nbsp;&nbsp;&nbsp;
@@ -41,7 +40,6 @@
         &nbsp;&nbsp;&nbsp;&nbsp;
         <input type="submit" value="<?php __('Import Group CSV')?> "/>
     </form>
-    <br></td>
-      </tr>
-    </table>
-</div>
+    </td>
+    </tr>
+</table>
