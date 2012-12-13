@@ -105,8 +105,76 @@ class GroupsControllerTest extends ExtendedAuthTestCase {
         $this->assertEqual(count($result['user_data']), 15);
         $this->assertEqual($result['user_data'][5], '65498451 Ed Student *');
         $this->assertEqual($result['user_data'][26], '19524032 Bill Student');
+    }
 
-        //TODO test saving, redirect
+    function testAddWithData() {
+        // test with instructor account
+        $this->login = array(
+            'User' => array(
+                'username' => 'instructor1',
+                'password' => md5('ipeeripeer')
+            )
+        );
+        $data = array(
+            'Group' => array(
+                'course_id' => 1,
+                'group_num' => 3,
+                'group_name' => 'Test1',
+                'record_status' => 'A',
+            ),
+            'Member' => array(26, 31, 32),
+        );
+
+        $this->controller->expectOnce('redirect', array('index/1'));
+        $this->testAction(
+            '/groups/add/1',
+            array('fixturize' => true, 'data' => $data, 'method' => 'post')
+        );
+
+        $model = ClassRegistry::init('Group');
+        $group = $model->find('first', array( 'conditions' => array('group_name' => 'Test1'), 'contain' => array('Member')));
+        foreach ($data['Group'] as $key => $expected) {
+            $this->assertEqual($group['Group'][$key], $expected);
+        }
+        $this->assertEqual(count($group['Member']), 3);
+        $memberIds = Set::extract($group['Member'], '/id');
+        sort($memberIds);
+        $this->assertEqual($memberIds, $data['Member']);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'The group was added successfully.');
+    }
+
+    function testAddWithDataToOthersCourse() {
+        // test with instructor account
+        $this->login = array(
+            'User' => array(
+                'username' => 'instructor2',
+                'password' => md5('ipeeripeer')
+            )
+        );
+        $data = array(
+            'Group' => array(
+                'course_id' => 1,
+                'group_num' => 3,
+                'group_name' => 'Test1',
+                'record_status' => 'A',
+            ),
+            'Member' => array(26, 31, 32),
+        );
+
+        $this->controller->expectOnce('redirect', array('/courses'));
+        $this->testAction(
+            '/groups/add/1',
+            array('fixturize' => true, 'data' => $data, 'method' => 'post')
+        );
+
+        $model = ClassRegistry::init('Group');
+        $group = $model->find('first', array( 'conditions' => array('group_name' => 'Test1'), 'contain' => array('Member')));
+        $this->assertFalse($group);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
     }
 
     function testEdit() {
@@ -120,10 +188,167 @@ class GroupsControllerTest extends ExtendedAuthTestCase {
         // group member should not be in user_data
         $this->assertFalse(isset($result['user_data'][5]));
         $this->assertEqual($result['user_data'][26], '19524032 Bill Student');
+    }
 
-        //TODO test saving, redirect
+    function testEditWithData() {
+        // test with instructor account
+        $this->login = array(
+            'User' => array(
+                'username' => 'instructor1',
+                'password' => md5('ipeeripeer')
+            )
+        );
+        $data = array(
+            'Group' => array(
+                'id' => 1,
+                'course_id' => 1,
+                'group_num' => 3,
+                'group_name' => 'Test1',
+                'record_status' => 'I',
+            ),
+            'Member' => array(26, 31, 32),
+        );
+
+        $this->controller->expectOnce('redirect', array('index/1'));
+        $this->testAction(
+            '/groups/edit/1',
+            array('fixturize' => true, 'data' => $data, 'method' => 'post')
+        );
+
+        $model = ClassRegistry::init('Group');
+        $group = $model->find('first', array( 'conditions' => array('id' => 1), 'contain' => array('Member')));
+        foreach ($data['Group'] as $key => $expected) {
+            $this->assertEqual($group['Group'][$key], $expected);
+        }
+        $this->assertEqual(count($group['Member']), 3);
+        $memberIds = Set::extract($group['Member'], '/id');
+        sort($memberIds);
+        $this->assertEqual($memberIds, $data['Member']);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'The group was updated successfully.');
+    }
+
+    function testEditInvalidGroupId() {
+        // test with instructor account
+        $this->login = array(
+            'User' => array(
+                'username' => 'instructor1',
+                'password' => md5('ipeeripeer')
+            )
+        );
+        $data = array(
+            'Group' => array(
+                'id' => 999,
+                'course_id' => 1,
+                'group_num' => 3,
+                'group_name' => 'Test1',
+                'record_status' => 'I',
+            ),
+            'Member' => array(26, 31, 32),
+        );
+
+        $this->controller->expectOnce('redirect', array('/courses'));
+        $this->testAction(
+            '/groups/edit/999',
+            array('fixturize' => true, 'data' => $data, 'method' => 'post')
+        );
+
+        $model = ClassRegistry::init('Group');
+        $group = $model->find('first', array( 'conditions' => array('id' => 999), 'contain' => array('Member')));
+        $this->assertFalse($group);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: That group does not exist.');
+    }
+
+    function testEditGroupInOthersCourse() {
+        // test with instructor account
+        $this->login = array(
+            'User' => array(
+                'username' => 'instructor2',
+                'password' => md5('ipeeripeer')
+            )
+        );
+        $data = array(
+            'Group' => array(
+                'id' => 1,
+                'course_id' => 1,
+                'group_num' => 3,
+                'group_name' => 'Test1',
+                'record_status' => 'I',
+            ),
+            'Member' => array(26, 31, 32),
+        );
+
+        $this->controller->expectOnce('redirect', array('/courses'));
+        $this->testAction(
+            '/groups/edit/1',
+            array('fixturize' => true, 'data' => $data, 'method' => 'post')
+        );
+
+        $model = ClassRegistry::init('Group');
+        $group = $model->find('first', array( 'conditions' => array('id' => 999), 'contain' => array('Member')));
+        $this->assertFalse($group);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
     }
 
     function testDelete() {
+        $this->controller->expectOnce('redirect', array('index/1'));
+        $this->testAction(
+            '/groups/delete/1',
+            array('fixturize' => true, 'method' => 'get')
+        );
+
+        $model = ClassRegistry::init('Group');
+        $found = $model->find('first', array( 'conditions' => array('id' => 1), 'contain' => false));
+        $this->assertFalse($found);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'The group was deleted successfully.');
+    }
+
+    function testDeleteInvalidGroup() {
+        $this->controller->expectOnce('redirect', array('/courses'));
+        $this->testAction(
+            '/groups/delete/999',
+            array('fixturize' => true, 'method' => 'get')
+        );
+
+        $model = ClassRegistry::init('Group');
+        $found = $model->find('first', array( 'conditions' => array('id' => 999), 'contain' => false));
+        $this->assertFalse($found);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: That group does not exist.');
+    }
+
+    function testDeleteOthersGroup() {
+        $this->login = array(
+            'User' => array(
+                'username' => 'instructor2',
+                'password' => md5('ipeeripeer')
+            )
+        );
+        $this->controller->expectOnce('redirect', array('/courses'));
+        $this->testAction(
+            '/groups/delete/1',
+            array('fixturize' => true, 'method' => 'get')
+        );
+
+        $model = ClassRegistry::init('Group');
+        $found = $model->find('first', array( 'conditions' => array('id' => 1), 'contain' => false));
+        $this->assertTrue($found);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
+    }
+
+    function testImport() {
+    }
+
+    function testExport() {
     }
 }

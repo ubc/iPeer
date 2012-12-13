@@ -20,8 +20,8 @@ switch($submenu) {
       array('name' => 'Create Groups (Import)',
         'link' => "/groups/import/$course_id"),
       array('name' => 'List Groups',
-        'link' => "/groups/goToClassList/$course_id"),
-      array('name' => 'Export Groups Information',
+        'link' => "/groups/index/$course_id"),
+      array('name' => 'Export Groups',
         'link' => "/groups/export/$course_id")
     );
     break;

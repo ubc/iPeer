@@ -28,25 +28,20 @@ $status = isset($status) ? $status : '';
       <h3><?php echo isset($selectedName) ? $selectedName : ''?></h3>
       <?php
         $options = array(
-              		 'style' => $listStyle,
-                     'div' => false,
-                     'label' => false,
-                     'before' => '',
-                     'after' => '',
-                     'separator' => '',
-                     'between' => '',
-                     'id' => 'selected_groups' );
-        if(isset($assigned))
+            'style' => $listStyle,
+            'div' => false,
+            'label' => false,
+            'before' => '',
+            'after' => '',
+            'separator' => '',
+            'between' => '',
+            'id' => 'selected_groups' );
+        if (isset($assigned)) {
           $options['options'] = $assigned;
+        }
 
         echo $this->Form->input('Member.Member', $options);
       ?>
-    </td>
-</tr>
-<tr class="note">
-    <td colspan="3">
-     <?php __('Note: Students already in one or more groups are marked')?><br>
-     <?php __('with * and are listed under those without groups')?>
     </td>
 </tr>
 </table>

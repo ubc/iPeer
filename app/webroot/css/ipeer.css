@@ -1407,6 +1407,16 @@ table.event-view table td {
     text-decoration:none !important;
 }
 
+table.group-list-chooser {
+    margin: auto;
+    border: none;
+}
+
+table.group-list-chooser td{
+    border: none;
+    background-color: none;
+}
+
 .group-list-chooser td.middle-column{
     width: 100px;
     vertical-align: middle;

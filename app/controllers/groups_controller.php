@@ -149,36 +149,6 @@ class GroupsController extends AppController
         $this->AjaxList->asyncGet();
     }
 
-
-    /**
-     * goToClassList
-     * Show a class list of groups
-     *
-     * @param mixed $course
-     *
-     * @access public
-     * @return void
-     */
-    function goToClassList($course)
-    {
-        if (is_numeric($course)) {
-            $courses = User::getMyCourseList();
-            if (!empty($courses[$course])) {
-                // We need to change the session state to point to this
-                // course:
-                // Initialize a basic non-funcional AjaxList
-                $this->AjaxList->quickSetUp();
-                // Clear the state first, we don't want any previous searches/selections.
-                $this->AjaxList->clearState();
-                // Set and update session state Variable
-                $joinFilterSelections->{"Group.course_id"} = $course;
-                $this->AjaxList->setStateVariable("joinFilterSelections", $joinFilterSelections);
-            }
-        }
-        // Redirect to list after state modifications (or in case of error)
-        $this->redirect("/groups/index/".$course);
-    }
-
     /**
      * view
      *
@@ -219,17 +189,19 @@ class GroupsController extends AppController
      */
     function add ($course_id)
     {
-        if (!empty($this->data)) {
-            if ($this->Group->save($this->data)) {
-                $this->Session->setFlash(__('The group was added successfully.', true), 'good');
-                $this->redirect('index/'.$course_id);
-            }
-        }
-
         $course = $this->Course->getAccessibleCourseById($course_id, User::get('id'), User::getCourseFilterPermission());
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('/courses');
+            return;
+        }
+
+        if (!empty($this->data)) {
+            if ($this->Group->save($this->data)) {
+                $this->Session->setFlash(__('The group was added successfully.', true), 'good');
+                $this->redirect('index/'.$course_id);
+                return;
+            }
         }
 
         $user_data1 = $this->User->getEnrolledStudentsForList($course_id);
@@ -269,12 +241,14 @@ class GroupsController extends AppController
         if (empty($group)) {
             $this->Session->setFlash(__('Error: That group does not exist.', true));
             $this->redirect('/courses');
+            return;
         }
 
         $course = $this->Course->getAccessibleCourseById($group['Group']['course_id'], User::get('id'), User::getCourseFilterPermission());
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('/courses');
+            return;
         }
 
         if (!empty($this->data)) {
@@ -284,6 +258,7 @@ class GroupsController extends AppController
                 $this->Session->setFlash(__('Error updating that group.', true));
             }
             $this->redirect('index/'.$this->data['Group']['course_id']);
+            return;
         }
 
         $this->data = $group;
@@ -311,32 +286,34 @@ class GroupsController extends AppController
     /**
      * delete
      *
-     * @param mixed $id
+     * @param mixed $groupId
      *
      * @access public
      * @return void
      */
-    function delete ($id = null)
+    function delete ($groupId = null)
     {
         // Check whether the course exists
-        $group = $this->Group->find('first', array('conditions' => array('Group.id' => $id), 'recursive' => 1));
+        $group = $this->Group->find('first', array('conditions' => array('id' => $groupId), 'contain' => false));
         if (empty($group)) {
             $this->Session->setFlash(__('Error: That group does not exist.', true));
             $this->redirect('/courses');
+            return;
         }
 
         $course = $this->Course->getAccessibleCourseById($group['Group']['course_id'], User::get('id'), User::getCourseFilterPermission());
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('/courses');
+            return;
         }
 
-        if ($this->Group->delete($id)) {
+        if ($this->Group->delete($groupId)) {
             $this->Session->setFlash(__('The group was deleted successfully.', true), 'good');
         } else {
             $this->Session->setFlash(__('Group delete failed.', true));
         }
-        $this->redirect('index/'.$this->Session->read('ipeerSession.courseId'));
+        $this->redirect('index/'.$course['Course']['id']);
     }
 
 
@@ -374,7 +351,7 @@ class GroupsController extends AppController
                 // Delete the uploaded file
                 unlink($uploadFile);
                 //Mass create groups
-                $this->addGroupByImport($lines, $courseId);
+                $this->_addGroupByImport($lines, $courseId);
                 // We should never get to this line :-)
             } else {
                 $this->set('errmsg', $validUploads);
@@ -399,7 +376,7 @@ class GroupsController extends AppController
 
 
     /**
-     * addGroupByImport
+     * _addGroupByImport
      * Takes an array of imported file lines, and creates groups from them
      *
      * @param mixed $lines    lines
@@ -408,7 +385,7 @@ class GroupsController extends AppController
      * @access public
      * @return void
      */
-    function addGroupByImport($lines, $courseId)
+    function _addGroupByImport($lines, $courseId)
     {
         // Check for parameters
         if (empty($lines) || empty($courseId)) {
@@ -728,23 +705,6 @@ class GroupsController extends AppController
             // format data
             $unassignedGroups = $this->Group->find('list', array('conditions'=> array('course_id'=>$courseId), 'fields'=>array('group_name')));
             $this->set('unassignedGroups', $unassignedGroups);
-        }
-    }
-
-    /**
-     * sendGroupEmail
-     *
-     * @param mixed $courseId
-     *
-     * @access public
-     * @return void
-     */
-    function sendGroupEmail ($courseId)
-    {
-        if (is_numeric($courseId)) {
-
-        } else {
-
         }
     }
 }
