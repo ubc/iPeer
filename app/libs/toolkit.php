@@ -76,10 +76,8 @@ class Toolkit
      */
     static function formatDate($timestamp)
     {
-        App::import('Model', 'SysParameter');
-        $sys_parameter = new SysParameter;
-        $data = $sys_parameter->findParameter('display.date_format');
-        $dateFormat = $data['SysParameter']['parameter_value'];
+        $sys_parameter = ClassRegistry::init('SysParameter');
+        $dateFormat = $sys_parameter->get('display.date_format');
 
         if (is_string($timestamp)) {
             return date($dateFormat, strtotime($timestamp));

@@ -1,63 +1,49 @@
 <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($event['Event']['id'])?'add':'edit') ?>">
 <?php echo empty($event['Event']['id']) ? null : $this->Form->hidden('id'); ?>
 
-<table class="full-size event-view">
-    <tr class="tableheader"><td colspan="2">Evaluation Event</td></tr>
-    <tr class="tablecell2">
-        <td width="20%" id="course_label"><?php __('Course:')?></td>
+<table class="standardtable">
+    <tr><th colspan="2">Evaluation Event</th></tr>
+    <tr>
+        <th><?php __('Course:')?></th>
         <td><?php echo $event['Course']['full_name']; ?>
         </td>
     </tr>
-    <tr class="tablecell2">
-        <td><?php __('Event Title:')?>&nbsp;</td>
+    <tr>
+        <th><?php __('Event Title:')?></th>
         <td><?php echo $event['Event']['title']; ?></td>
     </tr>
-    <tr class="tablecell2">
-        <td><?php __('Description:')?>&nbsp;</td>
+    <tr>
+        <th><?php __('Description:')?></th>
         <td><?php echo $event['Event']['description']; ?></td>
     </tr>
-    <tr class="tablecell2">
-        <td><?php __('Evaluation Format:')?>&nbsp;</td>
+    <tr>
+        <th valign="top"><?php __('Evaluation Format:')?></th>
         <td>
-            <table border="0" align="left" cellpadding="4" cellspacing="2">
-                <tr>
-                    <td width="50%" align="left" valign="top" >
-                        <?php
-                        foreach($eventTypes as $row):
-                            $eventTemplateType = $row['EventTemplateType'];
-                            if (!empty($event['Event']['event_template_type_id']) && $event['Event']['event_template_type_id'] == $eventTemplateType['id']) {
-                                echo $eventTemplateType['type_name'];
-                            }
-                        endforeach; ?>
-                        <br>
-                        <br>
-                        <div id='template_table'>
-                        <?php
-                        $params = array('controller'=>'events', 'eventTemplates'=>$eventTemplates, 'default'=>$default, 'model'=>$model, 'templateID'=>$event['Event']['template_id'], 'view'=>1);
-                        echo $this->element('events/ajax_event_template_list', $params);
-                        ?>
-                        </div>
-                    </td>
-                </tr>
-            </table>
+            <?php echo $event['EventTemplateType']['type_name'];?>
         </td>
     </tr>
-    <tr class="tablecell2">
-        <td><?php __('Allow Self-Evaluation?:')?></td>
+    <tr>
+        <th valign="top"><?php __('Evaluation:')?></th>
+        <td>
+            <?php echo $html->link($event[$modelName]['name'], '/'.strtolower(Inflector::pluralize($modelName)).'/view/'.$event[$modelName]['id']);?>
+        </td>
+    </tr>
+    <tr>
+        <th><?php __('Allow Self-Evaluation?:')?></th>
         <td>
             <?php echo $event['Event']['self_eval']==1? 'Enable' : 'Disable'; ?>
         </td>
     </tr>
-    <tr class="tablecell2">
-        <td><?php __('Require Student Comments?:')?> </td>
+    <tr>
+        <th><?php __('Require Student Comments?:')?></th>
         <td><?php echo $event['Event']['com_req']==1? 'Yes' : 'No'; ?></td>
     </tr>
-    <tr class="tablecell2">
-        <td><?php __('Due Date:')?>&nbsp;</td>
+    <tr>
+        <th><?php __('Due Date:')?>&nbsp;</th>
         <td><?php echo Toolkit::formatDate($event['Event']['due_date']) ?></td>
     </tr>
-    <tr class="tablecell2">
-        <td><?php __('Evaluation Release Date: <font color="red">*</font>')?></td>
+    <tr>
+        <th><?php __('Evaluation Release Date: <font color="red">*</font>')?></th>
         <td id="release_date_begin">
             <table width="100%">
                 <tr align="left">
@@ -75,8 +61,8 @@
             </table>
         </td>
     </tr>
-    <tr class="tablecell2">
-        <td><?php __('Result Release Date: <font color="red">*</font>')?></td>
+    <tr>
+        <th><?php __('Result Release Date: <font color="red">*</font>')?></th>
         <td id="result_release_date_begin">
             <table width="100%">
                 <tr align="left">
@@ -94,18 +80,18 @@
             </table>
         </td>
     </tr>
-    <tr class="tablecell2">
-        <td><?php __('Late Penalty:')?>&nbsp;</td>
+    <tr>
+        <th><?php __('Late Penalty:')?></th>
         <td>
             <?php
-            if (!empty($penalty)) {
-                foreach ($penalty as $tmp) {
-                    echo 'Deduct '.$tmp['Penalty']['percent_penalty'].'% if late by '.$tmp['Penalty']['days_late'].' day';
-                    if (1 != $tmp['Penalty']['days_late']) {
+            if (!empty($event['Penalty'])) {
+                foreach ($event['Penalty'] as $tmp) {
+                    echo 'Deduct '.$tmp['percent_penalty'].'% if late by '.$tmp['days_late'].' day';
+                    if (1 != $tmp['days_late']) {
                         echo 's';
                     }
                     echo '<br>';
-                    $dayslate_count = $tmp['Penalty']['days_late'];
+                    $dayslate_count = $tmp['days_late'];
                 }
             } else {
                 echo 'No late penalties currently set';
@@ -113,27 +99,19 @@
             ?>
         </td>
     </tr>
-    <tr class="tablecell2">
-        <td valign="top"><?php __('Groups Assignment:')?>&nbsp;</td>
+    <tr>
+        <th valign="top"><?php __('Groups Assignment:')?></th>
         <td>
         <?php
-            $params = array('controller'=>'events', 'data'=>$event['Group'], 'event_id' => $event_id, 'popup' => 'y');
+            $params = array('controller'=>'events', 'data'=>$event['Group'], 'event_id' => $event['Event']['id'], 'popup' => 'n');
             echo $this->element('events/event_groups_detail', $params);
         ?>
         </td>
     </tr>
 </table>
-<table width="95%"  border="0" cellspacing="2" cellpadding="4">
-    <tr>
-        <td width="45%">
-            <table width="403" border="0" cellspacing="0" cellpadding="4">
-                <tr>
-                    <td colspan="2"><?php echo $html->link(__('Edit this Event', true), '/events/edit/'.$event['Event']['id']); ?> |
-                    <?php echo $html->link(__('Back to Event Listing', true), '/events/index/'.$course_id); ?></td>
-                </tr>
-            </table>
-        </td>
-        <td></td>
-    </tr>
-</table>
+
+<div style="text-align: center;">
+    <?php echo $html->link(__('Edit this Event', true), '/events/edit/'.$event['Event']['id']); ?> |
+    <?php echo $html->link(__('Back to Event Listing', true), '/events/index/'.$event['Event']['course_id']); ?>
+</div>
 </form>

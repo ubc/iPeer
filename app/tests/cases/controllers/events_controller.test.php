@@ -105,11 +105,24 @@ class EventsControllerTest extends ExtendedAuthTestCase {
     function testView() {
         $result = $this->testAction('/events/view/1', array('return' => 'vars'));
 
+        $this->assertEqual($result['event']['Course']['full_name'], 'MECH 328 - Mechanical Engineering Design Project');
         $this->assertEqual($result['event']['Event']['title'], 'Term 1 Evaluation');
         $this->assertEqual($result['event']['Event']['event_template_type_id'], 1);
-        $this->assertEqual($result['event']['Group'][0]['group_name'], 'Reapers');
-        $this->assertEqual($result['event']['Group'][0]['Member'][0]['first_name'], 'Ed');
-        $this->assertEqual($result['event']['Group'][0]['Member'][0]['last_name'], 'Student');
+        $this->assertEqual(count($result['event']['Group']), 2);
+        $groups = Set::sort($result['event']['Group'], '{n}.id', 'asc');
+        $this->assertEqual($groups[0]['id'], 1);
+        $this->assertEqual($groups[0]['group_name'], 'Reapers');
+        $this->assertEqual(count($groups[0]['Member']), 4);
+        $this->assertEqual($groups[1]['id'], 2);
+        $this->assertEqual($groups[1]['group_name'], 'Lazy Engineers');
+        $this->assertEqual(count($groups[1]['Member']), 4);
+        $this->assertEqual($result['event']['SimpleEvaluation']['id'], 1);
+        $this->assertEqual($result['event']['SimpleEvaluation']['name'], 'Module 1 Project Evaluation');
+        $penalties = Set::sort($result['event']['Penalty'], '{n}.id', 'asc');
+        $this->assertEqual(Set::extract($penalties, '/id'), array(1,2,3,4));
+        $this->assertEqual(Set::extract($penalties, '/days_late'), array(1,2,3,4));
+        $this->assertEqual($result['event']['EventTemplateType']['id'], 1);
+        $this->assertEqual($result['event']['EventTemplateType']['type_name'], 'SIMPLE');
 
         $result = $this->testAction('/events/view/2', array('return' => 'vars'));
 
@@ -384,25 +397,5 @@ class EventsControllerTest extends ExtendedAuthTestCase {
 
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], 'Error: That event does not exist or you dont have access to it');
-    }
-
-    function testViewGroups() {
-        $result = $this->testAction('/events/viewGroups/1', array('return' => 'vars'));
-
-        $this->assertEqual($result['assignedGroups'][0]['group_num'], 1);
-        $this->assertEqual($result['assignedGroups'][0]['group_name'], 'Reapers');
-        $this->assertEqual($result['assignedGroups'][0]['member_count'], 4);
-        $this->assertEqual($result['assignedGroups'][0]['Member'][0]['full_name'], 'Ed Student');
-        $this->assertEqual($result['assignedGroups'][0]['Member'][1]['full_name'], 'Alex Student');
-
-        $this->assertEqual($result['assignedGroups'][1]['group_num'], 2);
-        $this->assertEqual($result['assignedGroups'][1]['group_name'], 'Lazy Engineers');
-        $this->assertEqual($result['assignedGroups'][1]['member_count'], 4);
-        $this->assertEqual($result['assignedGroups'][1]['Member'][0]['full_name'], 'Hui Student');
-        $this->assertEqual($result['assignedGroups'][1]['Member'][1]['full_name'], 'Bowinn Student');
-    }
-
-    function testEditGroups()
-    {
     }
 }
