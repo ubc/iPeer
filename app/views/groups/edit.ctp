@@ -1,6 +1,6 @@
 <?php echo $html->script('groups')?>
 <?php $readonly = isset($readonly) ? $readonly : false;?>
-<?php $status = ($submissions > 0 && !User::hasPermission('functions/superadmin')) ? 'disabled' : '';?>
+<?php $status = (isset($submissions) && $submissions > 0 && !User::hasPermission('functions/superadmin')) ? 'disabled' : '';?>
 
 <div class="content-container">
 <?php

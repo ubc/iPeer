@@ -250,6 +250,7 @@ class GroupsController extends AppController
         $this->set('user_data', $user_data);
         $this->set('course_id', $course_id);
         $this->set('group_num', $this->Group->getFirstAvailGroupNum(($course_id)));
+        $this->render('edit');
     }
 
 
