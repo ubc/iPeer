@@ -10,7 +10,7 @@ function getUpcomingTableArray($html, $events) {
             $tmp[] = $event['Group']['group_name'];
         }
         else {
-            $tmp[] = $html->link($event['Event']['title'], 
+            $tmp[] = $html->link($event['Event']['title'],
                 '/evaluations/makeEvaluation/'.$event['Event']['id']);
         }
         $tmp[] = $event['Course']['course'];
@@ -18,7 +18,7 @@ function getUpcomingTableArray($html, $events) {
 
         $due = $event['Event']['due_in'];
         if ($event['late']) {
-            $penalty = isset($event['percent_penalty']) ? 
+            $penalty = isset($event['percent_penalty']) ?
                 ', ' . $event['percent_penalty'] . '&#37; penalty' : '';
             $tmp[] = "<span class='red'>$due</span>$penalty";
         }
@@ -44,8 +44,8 @@ $surveyUpcoming = getUpcomingTableArray($html, $surveys['upcoming']);
        <th>Due Date</th>
        <th>Due In/<span class='red'>Late By</span></th>
     </tr>
-    <?php 
-    echo $html->tableCells($evalUpcoming); 
+    <?php
+    echo $html->tableCells($evalUpcoming);
     ?>
     <?php if (empty($evalUpcoming)):?>
     <tr><td colspan="5" align="center"><b> No peer evaluations due at this time </b></td></tr>
@@ -60,8 +60,8 @@ $surveyUpcoming = getUpcomingTableArray($html, $surveys['upcoming']);
        <th>Due Date</th>
        <th>Due In/<span class='red'>Late By</span></th>
     </tr>
-    <?php 
-    echo $html->tableCells($surveyUpcoming); 
+    <?php
+    echo $html->tableCells($surveyUpcoming);
     ?>
     <?php if (empty($surveyUpcoming)):?>
     <tr><td colspan="5" align="center"><b> No survey due at this time </b></td></tr>
@@ -72,20 +72,20 @@ $surveyUpcoming = getUpcomingTableArray($html, $surveys['upcoming']);
 function getSubmittedTableArray($html, $events) {
     $ret = array();
     foreach ($events as $event) {
-        if (!$event['Event']['is_released'] && 
+        if (!$event['Event']['is_released'] &&
             !$event['Event']['is_result_released']
         ){ // an event that has expired and is no longer relevant
             continue;
         }
         $tmp = array();
         if (isset($event['Event']['is_result_released'])) {
-            $tmp[] = $html->link($event['Event']['title'], 
+            $tmp[] = $html->link($event['Event']['title'],
                 '/evaluations/studentViewEvaluationResult/' .
                 $event['Event']['id'] . '/' . $event['Group']['id']);
             $tmp[] = $event['Event']['result_release_date_end'];
         }
         elseif ($event['Event']['event_template_type_id'] == 3) {
-            $tmp[] = $html->link($event['Event']['title'], 
+            $tmp[] = $html->link($event['Event']['title'],
                 '/evaluations/studentViewEvaluationResult/' .
                 $event['Event']['id']);
         }
@@ -122,7 +122,7 @@ $surveySubmitted = getSubmittedTableArray($html, $surveys['submitted']);
 <?php echo $html->tableCells($evalSubmitted); ?>
 <?php if (empty($evalSubmitted)):?>
     <tr>
-        <td colspan="5" align="center">No submitted evaluations available.</td>
+        <td colspan="6" align="center">No submitted evaluations available.</td>
     </tr>
 <?php endif; ?>
 </table>
