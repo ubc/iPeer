@@ -299,6 +299,10 @@ div.ui-datepicker { font-size: 0.85em; }
     color: green;
 }
 
+.orangered {
+    color: orangered;
+}
+
 h1.title {
     margin: 0.5em 0;
     font-weight: 600;

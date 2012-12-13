@@ -148,7 +148,7 @@ class Event extends AppModel
         $this->virtualFields['to_review_count'] = sprintf('SELECT count(*) as count FROM group_events as ge WHERE ge.event_id = %s.id AND marked LIKE "to review"', $this->alias);
         $this->virtualFields['student_count'] = sprintf('SELECT count(*) as count FROM group_events as vge RIGHT JOIN groups_members as vgm ON vge.group_id = vgm.group_id WHERE vge.event_id = %s.id', $this->alias);
         $this->virtualFields['completed_count'] = sprintf('SELECT count(*) as count FROM evaluation_submissions as ves WHERE ves.submitted = 1 AND ves.event_id = %s.id', $this->alias);
-        $this->virtualFields['due_in'] = 'DATEDIFF(due_date, NOW())';
+        $this->virtualFields['due_in'] = 'TIMESTAMPDIFF(SECOND,NOW(),due_date)';
     }
 
     /**
@@ -549,8 +549,9 @@ class Event extends AppModel
     }
 
     /**
-     * getEventsByUserId get events that associated with a specific user
-     *
+     * Get evaluations and surveys assigned to the given user. Also gets the
+     * evaluation submission entries made by this specific user.
+     * 
      * @param mixed $userId
      *
      * @access public
@@ -558,61 +559,43 @@ class Event extends AppModel
      */
     function getEventsByUserId($userId)
     {
+        // get the groups that this user is in
         $groups = $this->Group->find('all', array(
             'conditions' => array('Member.id' => $userId),
             'fields' => array('id'),
             'contain' => array('Member')));
         $groupIds = Set::extract('/Group/id', $groups);
 
-        // find evaluation events
+        // find evaluation events based on the groups this user is in
         $evaluationEvents = $this->find('all', array(
             'conditions' => array('Group.id' => $groupIds),
+            'order' => array('due_in ASC'),
             'contain' => array(
                 'Course',
                 'Group',
                 'Penalty' => array(
-                    'conditions' => array(
-                        'OR' => array(
-                            array('days_late' => 'Event.due_in'),
-                            array('days_late <' => 0)
-                        )
-                    ),
-                    'order' => array('days_late DESC')
+                    'order' => array('days_late ASC')
+                ),
+                'EvaluationSubmission' => array(
+                    'conditions' => array('submitter_id' => $userId),
                 )
             )
         ));
 
-        // find submission separately, doesn't work within above query
-        $submissions = $this->GroupEvent->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter(Set::extract('/GroupEvent/id', $evaluationEvents), $userId);
-        foreach ($submissions as $submission) {
-            foreach ($evaluationEvents as $key => $event) {
-                if ($submission['EvaluationSubmission']['grp_event_id'] == $event['GroupEvent']['id']) {
-                    $evaluationEvents[$key]['EvaluationSubmission'] = $submission['EvaluationSubmission'];
-                }
-            }
-        }
-
-        // find survey events
-        $this->bindModel(array(
-            'hasOne' => array(
-                'EvaluationSubmission' => array('conditions' => array('EvaluationSubmission.submitter_id' => $userId))
-        )));
+        // find survey events based on the groups this user is in
         $surveyEvents = $this->find('all', array(
             'conditions' => array('event_template_type_id' => '3'),
+            'order' => array('due_in ASC'),
             'contain' => array(
                 'Course',
-                'EvaluationSubmission',
+                'EvaluationSubmission' => array(
+                    'conditions' => array('submitter_id' => $userId),
+                ),
             )
         ));
 
-        // clean up the empty EvaluationSubmissions, Cake put them in even if they are empty
-        foreach ($surveyEvents as $key => $events) {
-            if (!isset($events['EvaluationSubmission']['id']) || empty($events['EvaluationSubmission']['id'])) {
-                unset($surveyEvents[$key]['EvaluationSubmission']);
-            }
-        }
-
-        return array_merge($evaluationEvents, $surveyEvents);
+        return array('Evaluations' => $evaluationEvents, 
+            'Surveys' => $surveyEvents);
     }
 
     public function getAccessibleEventById($eventId, $userId, $permission, $contain = array())
