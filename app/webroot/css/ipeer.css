@@ -131,7 +131,7 @@ p {
 .submit input {
     margin: 0 auto;
     margin-top: 1em;
-    width: 6em;
+    min-width: 6em;
     height: 2em;
     font-weight: 600;
     display: block;
@@ -1401,4 +1401,19 @@ table.event-view table td {
     height:32px;
     padding:4px 16px;
     text-decoration:none !important;
+}
+
+.group-list-chooser td.middle-column{
+    width: 100px;
+    vertical-align: middle;
+}
+
+.group-list-chooser td.middle-column input {
+    width: 100px;
+    margin-bottom: 3em;
+}
+
+.group-list-chooser tr.note {
+    text-align: center;
+    font-size: 0.9em;
 }

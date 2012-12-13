@@ -20,14 +20,14 @@ class GroupsController extends AppController
     public $components = array('AjaxList', 'ExportBaseNew', 'ExportCsv');
 
     /**
-     * postProcess
+     * _postProcess
      *
      * @param mixed $data
      *
      * @access public
      * @return void
      */
-    function postProcess($data)
+    function _postProcess($data)
     {
         // Creates the custom in use column
         if ($data) {
@@ -106,7 +106,7 @@ class GroupsController extends AppController
         );
 
         $this->AjaxList->setUp($this->Group, $columns, $actions, "Group.group_num", "Group.group_name",
-            $joinTables, $extraFilters, $recursive, "postProcess", null, null, null, $conditions);
+            $joinTables, $extraFilters, $recursive, "_postProcess", null, null, null, $conditions);
     }
 
     /**
@@ -263,6 +263,19 @@ class GroupsController extends AppController
      */
     function edit ($group_id = null)
     {
+        // Check whether the course exists
+        $group = $this->Group->find('first', array('conditions' => array('Group.id' => $group_id), 'recursive' => 1));
+        if (empty($group)) {
+            $this->Session->setFlash(__('Error: That group does not exist.', true));
+            $this->redirect('/courses');
+        }
+
+        $course = $this->Course->getAccessibleCourseById($group['Group']['course_id'], User::get('id'), User::getCourseFilterPermission());
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+            $this->redirect('/courses');
+        }
+
         if (!empty($this->data)) {
             if ($this->Group->save($this->data)) {
                 $this->Session->setFlash(__('The group was updated successfully.', true), 'good');
@@ -272,19 +285,7 @@ class GroupsController extends AppController
             $this->redirect('index/'.$this->data['Group']['course_id']);
         }
 
-        // Check whether the course exists
-        $this->data = $this->Group->find('first', array('conditions' => array('Group.id' => $group_id), 'recursive' => 1));
-        if (empty($this->data)) {
-            $this->Session->setFlash(__('Error: That group does not exist.', true));
-            $this->redirect('/courses');
-        }
-
-        $course = $this->Course->getAccessibleCourseById($this->data['Group']['course_id'], User::get('id'), User::getCourseFilterPermission());
-        if (!$course) {
-            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
-            $this->redirect('/courses');
-        }
-
+        $this->data = $group;
         $groupEvent = $this->GroupEvent->find('list',
             array(
                 'conditions' => array('group_id' => $group_id),
