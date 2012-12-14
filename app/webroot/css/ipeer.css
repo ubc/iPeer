@@ -178,6 +178,10 @@ strong {
     background-color: #F1F1F1;
 }
 
+.standardtable table td {
+    border: none;
+}
+
 /* css for timepicker */
 div.ui-datepicker { font-size: 0.85em; }
 .ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
@@ -1430,4 +1434,21 @@ table.group-list-chooser td{
 .group-list-chooser tr.note {
     text-align: center;
     font-size: 0.9em;
+}
+
+.survey-prompt {
+    margin: 1em 1em;
+}
+
+.survey-response {
+    margin: 1em 1em 3em 2em;
+}
+
+.survey-response textarea {
+    width: 50%;
+    height: 7em;
+}
+
+.survey-response input[type=text] {
+    width: 50%;
 }

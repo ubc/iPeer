@@ -1,8 +1,4 @@
-<table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
-  <tr>
-    <td>
 <script type="text/javascript" language="javascript">
-
   function updateCount(allPoints,commentsRequired) {
     <?php
       $ids = array();
@@ -78,128 +74,123 @@
 
 	function distribute() {
 <?php
-	echo "\n";
-	for ($z = 0; $z < count($groupMembers); $z++) {
-	  $user = $groupMembers[$z]['User'];
-	  $id = $user['id'];
-		echo "var v$z = parseInt($('score$id').innerHTML);";
-		echo "\n";
-	}
-	for ($z = 0; $z < count($groupMembers); $z++)
-	{
-	  $user = $groupMembers[$z]['User'];
-  	//TODO: if(!is_bool($groupMembers[$z]) && $groupMembers[$z]!==NULL){ //happens with groups of size1
-  		$id = $user['id']; // this is a  null object for some reason
-  		$string = "document.forms['evalForm'].elements['point$id'].value = Math.floor((v$z/(";
-  		echo "\n";
-  		for ($a = 0; $a < count($groupMembers); $a++) {
-  			$plus = ( $a == 0 ? "" : "+" );
-  			$string .= $plus . "v$a";
-  		}
+      echo "\n";
+      for ($z = 0; $z < count($groupMembers); $z++) {
+          $user = $groupMembers[$z]['User'];
+          $id = $user['id'];
+          echo "var v$z = parseInt($('score$id').innerHTML);";
+          echo "\n";
+      }
+      for ($z = 0; $z < count($groupMembers); $z++) {
+          $user = $groupMembers[$z]['User'];
+          //TODO: if(!is_bool($groupMembers[$z]) && $groupMembers[$z]!==NULL){ //happens with groups of size1
+          $id = $user['id']; // this is a  null object for some reason
+          $string = "document.forms['evalForm'].elements['point$id'].value = Math.floor((v$z/(";
+          echo "\n";
+          for ($a = 0; $a < count($groupMembers); $a++) {
+              $plus = ( $a == 0 ? "" : "+" );
+              $string .= $plus . "v$a";
+          }
 
-  		$total = $remaining;
-  		$string .= "))*$total);";
-  		echo $string;
-  		echo "\n";
-  		echo "var s$z = parseFloat(document.forms['evalForm'].elements['point$id'].value);";
-  	//}
-  }
-	echo "\n";
+          $total = $remaining;
+          $string .= "))*$total);";
+          echo $string;
+          echo "\n";
+          echo "var s$z = parseFloat(document.forms['evalForm'].elements['point$id'].value);";
+          //}
+      }
+      echo "\n";
 
-	$t_string = "$('total').innerHTML = Math.round(";
-		for ($b = 0; $b < count($groupMembers); $b++) {
-			$plus = ( $b == 0 ? "" : "+" );
-			$t_string .= $plus . "s$b";
-		}
+      $t_string = "$('total').innerHTML = Math.round(";
+      for ($b = 0; $b < count($groupMembers); $b++) {
+          $plus = ( $b == 0 ? "" : "+" );
+          $t_string .= $plus . "s$b";
+      }
 
-	$t_string .= ");";
-	echo $t_string;
-  $com_req = $event['Event']['com_req'];
-  echo "updateCount($remaining, $com_req);";
+      $t_string .= ");";
+      echo $t_string;
+      $com_req = $event['Event']['com_req'];
+      echo "updateCount($remaining, $com_req);";
 ?>
-  }<?php
+    }<?php
 ?>
-	//-->
+    //-->
 </script>
 
-	<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
-    <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeEvaluation/'.$event['Event']['id'].'/'.$event['Group']['id']) ?>">
-      <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
-      <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>"/>
-      <input type="hidden" name="course_id" value="<?php echo $courseId?>"/>
-      <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $userId ?>"/>
-      <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
+<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
+<form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeEvaluation/'.$event['Event']['id'].'/'.$event['Group']['id']) ?>">
+<input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
+<input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>"/>
+<input type="hidden" name="course_id" value="<?php echo $courseId?>"/>
+<input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo $userId ?>"/>
+<input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
 
-      <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
-  <tr class="tableheader">
-    <td colspan="4" align="center"><?php __('Evaluation Event Detail')?></td>
+<table class="standardtable">
+    <tr>
+        <th colspan="4"><?php __('Evaluation Event Detail')?></th>
     </tr>
-  <tr class="tablecell2">
-    <td width="10%"><?php __('Evaluator')?>:</td>
-    <td width="25%"><?php echo $fullName ?>
-    </td>
-    <td width="10%"><?php __('Evaluating')?>:</td>
-    <td width="25%"><?php echo $event['Group']['group_name'] ?></td>
-  </tr>
-  <tr class="tablecell2">
-    <td><?php __('Event Name')?>:</td>
-    <td><?php echo $event['Event']['title'] ?></td>
-    <td><?php __('Due Date')?>:</td>
-    <td><?php echo Toolkit::formatDate($event['Event']['due_date']) ?></td>
-  </tr>
-  <tr class="tablecell2">
-    <td><?php __('Description')?>:&nbsp;</td>
-    <td colspan="3"><?php echo $event['Event']['description'] ?></td>
-  </tr>
-  <tr>
-    <td colspan="3" align="center">&nbsp;</td>
+    <tr>
+        <td width="10%"><?php __('Evaluator')?>:</td>
+        <td width="25%"><?php echo $fullName ?></td>
+        <td width="10%"><?php __('Evaluating')?>:</td>
+        <td width="25%"><?php echo $event['Group']['group_name'] ?></td>
     </tr>
-</table>
-<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
-  <tr>
-    <td colspan="3"><?php echo $html->image('icons/instructions.gif',array('alt'=>'instructions'));?>
-      <b><?php __(' Instructions')?>:</b><br>
-      1. <?php __("Rate your peer's relative performance by using the slider. [Weight 1-10]")?><br>
-      2. <?php __('Click "Distribute" button to distribute points.')?><br>
-      3. <?php __('Allocate any remaining point.')?><br>
-      4. <?php __('Enter Comments')?> <?php echo  $event['Event']['com_req']? '<font color="red"> (Must) </font>' : '(Optional)' ;?> .<br>
-      5: <font color="red"><blink><?php __('NOTE:')?></blink></font> <?php __('"Submit Evaluation" button will only be enabled when all points, and comments (if required), are filled!')?>
-    </td>
-  </tr>
-</table>
+    <tr>
+        <td><?php __('Event Name')?>:</td>
+        <td><?php echo $event['Event']['title'] ?></td>
+        <td><?php __('Due Date')?>:</td>
+        <td><?php echo Toolkit::formatDate($event['Event']['due_date']) ?></td>
+    </tr>
+    <tr>
+        <td><?php __('Description')?>:&nbsp;</td>
+        <td colspan="3"><?php echo $event['Event']['description'] ?></td>
+    </tr>
+    <tr>
+        <td colspan="4" style="text-align: left;">
+            <span class="instruction-icon"><?php __(' Instructions')?>:</span>
+            <ul class="instructions">
+            <li><?php __("Rate your peer's relative performance by using the slider. [Weight 1-10]")?></li>
+            <li><?php __('Click "Distribute" button to distribute points.')?></li>
+            <li><?php __('Allocate any remaining point.')?></li>
+            <li><?php __('Enter Comments')?> <?php echo  $event['Event']['com_req']? '<font color="red"> (Must) </font>' : '(Optional)' ;?> .</li>
+            <li><font color="red"><blink><?php __('NOTE:')?></blink></font> <?php __('"Submit Evaluation" button will only be enabled when all points, and comments (if required), are filled!')?></li>
+            </ul>
 
-    <div style="text-align:left; margin-left:3em;"><a href="#" onClick="javascript:$('penalty').toggle();return false;">( <?php __('Show/Hide late penalty policy')?> )</a></div>
-    <div id ="penalty" style ="border:1px solid red; margin: 0.5em 0 0 3em; width: 450px; padding:0.5em; color:darkred; display:none">
+            <div style="text-align:left; margin-left:3em;"><a href="#" onClick="javascript:$('penalty').toggle();return false;">( <?php __('Show/Hide late penalty policy')?> )</a></div>
+            <div id ="penalty" style ="border:1px solid red; margin: 0.5em 0 0 3em; width: 450px; padding:0.5em; color:darkred; display:none">
 
-	<?php if(!empty($penalty)){
-        foreach($penalty as $day){
-            $mult = ($day['Penalty']['days_late']>1)?'s':'';
-            echo $day['Penalty']['days_late'].' day'.$mult.' late: '.$day['Penalty']['percent_penalty'].'% deduction. </br>';
-        }
-        echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';
-    } else {
-        echo 'No penalty is specified for this evaluation.';
+<?php if(!empty($penalty)){
+    foreach($penalty as $day){
+        $mult = ($day['Penalty']['days_late']>1)?'s':'';
+        echo $day['Penalty']['days_late'].' day'.$mult.' late: '.$day['Penalty']['percent_penalty'].'% deduction. </br>';
     }
+    echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';
+} else {
+    echo 'No penalty is specified for this evaluation.';
+}
 
-	?>
+?>
 
   </div>
+        </td>
+    </tr>
+</table>
+
 
     </br>
-<table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
-	<tr class="tableheader">
-		<td width="30%"><?php __('Member(s)')?></td>
-		<td width="20%"><?php __('Relative Weight')?></td>
-		<td width="15%"><?php __('Mark')?></td>
-		<td width="35%"><?php __('Comment')?>  <?php echo $event['Event']['com_req']? '<font color=red>*</font>' : __('(Optional)', true) ;?></td>
-	</tr>
-                   <?php $i = 0;
-    foreach($groupMembers as $row): $user = $row['User'];
-    ?>
-    <tr class="tablecell">
+<table class="standardtable">
+    <tr>
+        <th width="20%"><?php __('Member(s)')?></th>
+        <th width="20%"><?php __('Relative Weight')?></th>
+        <th width="15%"><?php __('Mark')?></th>
+        <th><?php __('Comment')?>  <?php echo $event['Event']['com_req']? '<font color=red>*</font>' : __('(Optional)', true) ;?></th>
+    </tr>
+<?php foreach ($groupMembers as $row): $user = $row['User'];?>
+    <tr>
         <td><?php echo $user['first_name'].' '.$user['last_name']?>
       <input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/></td>
-      <td width="110"><table><tr>
+      <td width="110">
+        <table><tr>
         <td width="5">Min.</td>
         <td width="110">
         <div id="track<?php echo $user['id']?>" style="width:120px;background-color:#aaa;height:10px;">
@@ -235,26 +226,19 @@
 
             onSlide(defaultValue);
     </script></td>
-	</tr>
-	<?php $i++;?>
-	<?php endforeach; ?>
-	<tr class="tablecell">
-		<td>
+    </tr>
+    <?php endforeach; ?>
+    <tr>
+        <td colspan="3" align="right" id="statusMsg"></td>
+        <td>
+          <?php __('Points Allocated/Total:')?>&nbsp;
+          <div id="total" style="padding-top: 5px;display: inline;">0</div> /
+          <div id="remaining" style="padding-top: 5px;display: inline;" ><?php echo $remaining?></div>&nbsp;
+          <input type="button" name="distr" id="distr_button" value="<?php __('Distribute')?>" onClick="distribute()"/>
+        </td>
+    </tr>
 
-  </td>
-		<td align="center"> <input type="button" name="distr" id="distr_button" value="<?php __('Distribute')?>" onClick="distribute()"/></td>
-		<td align="center">
-		  <table width="95%" border="0" align="center"><tr><td colspan="2"><?php __('Points Allocated/Total:')?></td></tr>
-      	 <tr>
-      	  <td align="right"><div id="total" style="padding-top: 5px;">0</div></td>
-      	  <td align="left"><div id="remaining" style="padding-top: 5px;" >&nbsp;/&nbsp;<?php echo $remaining?></div></td>
-      	 </tr>
-      	</table>
-    </td>
-		<td align="center" id="statusMsg"></td>
-	</tr>
-
-  <tr class="tablecell2">
+  <tr>
     <td colspan="4" align="center"><?php
       if (!isset($preview)) {
         echo $form->submit(__('Submit Evaluation', true), array('id' => 'submit0', 'disabled' => 'true', 'onClick' => "javascript:return confirm('".__('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?', true)."')", 'div'=>'submitSimple'));
@@ -262,8 +246,4 @@
       ?></td>
     </tr>
 </table>
-    </form>
-	</td>
-  </tr>
-</table>
-
+</form>
