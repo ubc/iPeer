@@ -26,6 +26,9 @@ class Breadcrumb
             'url' => '/groups/index/',
             'key' => 'course_id'
         ),
+        'surveys' => array(
+            'url' => '/surveys',
+        ),
         'survey' => array(
             'url' => '/surveys/index/',
             'display_field' => 'name',

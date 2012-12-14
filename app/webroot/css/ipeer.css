@@ -777,7 +777,7 @@ i {
 
 /* courses/edit */
 
-#CourseEditForm .text label, .select label {
+#CourseEditForm .text label, #CourseEditForm .select label {
     width: 13em;
 }
 
@@ -1436,12 +1436,14 @@ table.group-list-chooser td{
     font-size: 0.9em;
 }
 
+/* survey related */
 .survey-prompt {
     margin: 1em 1em;
 }
 
 .survey-response {
-    margin: 1em 1em 3em 2em;
+    padding: 1em 1em 2em 2em;
+    border-bottom: 1px solid gray;
 }
 
 .survey-response textarea {
@@ -1451,4 +1453,54 @@ table.group-list-chooser td{
 
 .survey-response input[type=text] {
     width: 50%;
+}
+
+div#answers {
+    margin-left: 14em;
+}
+
+div#answers input {
+    width: 60%;
+}
+
+.top-button {
+    background:url('/img/icons/top.gif') center left no-repeat;
+    padding: 0 0.5em 0 1.5em;
+    white-space:nowrap;
+}
+.up-button {
+    background:url('/img/icons/up.gif') center left no-repeat;
+    padding: 0 0.5em 0 1.5em;
+    white-space:nowrap;
+}
+
+.down-button {
+    background:url('/img/icons/down.gif') center left no-repeat;
+    padding: 0 0.5em 0 1.5em;
+    white-space:nowrap;
+}
+
+.bottom-button {
+    background:url('/img/icons/bottom.gif') center left no-repeat;
+    padding: 0 0.5em 0 1.5em;
+    white-space:nowrap;
+}
+
+/* public */
+.small-font {
+    font-size: 0.7em;
+}
+
+button a:link {
+    text-decoration: none;
+}
+
+div.help-text {
+    margin: 0.5em 0 1em 18em;
+    font-size: 0.8em;
+    color: gray;
+}
+
+form div.input {
+    margin: 0.5em 0 0 0;
 }

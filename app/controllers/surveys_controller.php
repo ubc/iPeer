@@ -429,6 +429,7 @@ class SurveysController extends AppController
 
         $this->set('template_id', $id);
         $this->set('courses', $courses);
+        $this->set('breadcrumb', $this->breadcrumb->push('surveys')->push(__('Copy', true)));
         $this->render('edit');
     }
 
@@ -477,67 +478,12 @@ class SurveysController extends AppController
         }
 
         if ($this->Survey->delete($id)) {
-      /*$groupSets = $this->SurveyGroupSet->find('all', 'survey_id='.$id);
-
-      foreach ($groupSets as $groupSet) {
-    $groupSetId = $groupSet['SurveyGroupSet']['id'];
-    $time = $groupSet['SurveyGroupSet']['date'];
-
-    $this->SurveyQuestion->deleteGroupSet($groupSetId);
-
-    //delete teammaker crums
-    if (!empty($time)) {
-      unlink('../uploads/'.$time.'.txt');
-      unlink('../uploads/'.$time.'.xml');
-      unlink('../uploads/'.$time.'.txt.scores');
-    }
-      }
-
-      //delete associating event
-      $events = $this->Event->find('all', 'event_template_type_id=3 AND template_id='.$id);
-      if (!empty($events)) {
-              foreach ($events as $event) {
-                $this->Event->del($event['Event']['id']);
-              }
-      }
-      //delete possible submissions
-      $inputs = $this->SurveyInput->find('all', 'survey_id='.$id);
-      foreach ($inputs as $input) {
-        $this->SurveyInputs->del($input['SurveyInput']['id']);
-      }*/
-
             $this->Session->setFlash(__('The survey was deleted successfully.', true), 'good');
         } else {
             $this->Session->setFlash(__('Survey delete failed.', true));
         }
         $this->redirect('index');
     }
-
-
-  // called to add/remove response field from add/edit question pages
-  /*function adddelquestion($question_id=null)
-  {
-    if(!empty($question_id))
-      $this->set('responses', $this->Response->find('all', $conditions='question_id='.$question_id));
-
-    $this->layout = 'ajax';
-  }*/
-
-  /**
-   * checkDuplicateName
-   *
-   *
-   * @access public
-   * @return void
-   */
-  function checkDuplicateName()
-  {
-      $course_id = $this->Session->read('ipeerSession.courseId');
-      $this->layout = 'ajax';
-      $this->set('course_id', $course_id);
-      $this->render('checkDuplicateName');
-  }
-
 
   /**
    * releaseSurvey
@@ -601,11 +547,6 @@ class SurveysController extends AppController
    */
     function questionsSummary($survey_id)
     {
-        if (!User::hasPermission('controllers/surveys')) {
-            $this->Session->setFlash('Error: You do not have permission to edit this survey\'s questions', true);
-            $this->redirect('/home');
-        }
-
         // retrieving the requested survey
         $eval = $this->Survey->find('first',
             array(
@@ -646,6 +587,8 @@ class SurveysController extends AppController
             //'contain' => array('Question', 'Response'),
             'order' => 'SurveyQuestion.number',
             'recursive' => 1));
+
+        $this->set('breadcrumb', $this->breadcrumb->push('surveys')->push(__('Edit Question', true)));
         $this->set('survey_id', $survey_id);
         $this->set('questions', $questions);
         $this->set('is_editable', true);
@@ -739,6 +682,7 @@ class SurveysController extends AppController
       $this->autorender = false;
       $this->set('templates', $this->Question->find('list', array('conditions' => array('master' => 'yes'))));
       $this->set('survey_id', $survey_id);
+      $this->set('breadcrumb', $this->breadcrumb->push('surveys')->push(Inflector::humanize(Inflector::underscore($this->action))));
   }
 
 
@@ -767,25 +711,7 @@ class SurveysController extends AppController
       $this->set('question_id', $question_id);
       $this->set('survey_id', $survey_id);
       $this->set('responses', $this->data['Response']);
-
+      $this->set('breadcrumb', $this->breadcrumb->push('surveys')->push(__('Edit Question', true)));
       $this->render('addQuestion');
   }
-
-
-  /**
-   * update
-   *
-   * @param string $attributeCode  attribute code
-   * @param string $attributeValue attribute value
-   *
-   * @access public
-   * @return void
-   */
-  function update($attributeCode='', $attributeValue='')
-  {
-      if ($attributeCode != '' && $attributeValue != '') {
-          $this->params['data'] = $this->Personalize->updateAttribute($this->Auth->user('id'), $attributeCode, $attributeValue);
-      }
-  }
-
 }
