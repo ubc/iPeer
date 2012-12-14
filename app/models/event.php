@@ -174,9 +174,18 @@ class Event extends AppModel
                     ($currentDate >= strtotime($event['Event']['result_release_date_begin']) &&
                     $currentDate < strtotime($event['Event']['result_release_date_end']));
             }
+            else {
+                // since surveys have no result release period
+                $results[$key]['Event']['is_result_released'] = false;
+            }
             if (isset($event['Event']['release_date_end'])) {
                 $results[$key]['Event']['is_ended']  =
                     ($currentDate > strtotime($event['Event']['release_date_end']));
+            }
+            // is_ended for surveys
+            if ($event['Event']['event_template_type_id'] == 3) {
+                $results[$key]['Event']['is_ended']  =
+                    ($currentDate > strtotime($event['Event']['due_date']));
             }
         }
 

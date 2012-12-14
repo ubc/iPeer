@@ -112,16 +112,40 @@ class HomeControllerTest extends ExtendedAuthTestCase
             )
         );
         $result = $this->testAction('/home/index', array('return' => 'vars'));
+
+        // summary statistics
+        $this->assertEqual($result['numOverdue'], 0);
+        $this->assertEqual($result['numDue'], 5);
+
+        // evaluations
         $upcoming = Set::sort($result['evals']['upcoming'], '{n}.Event.id', 
             'asc');
         $submitted = Set::sort($result['evals']['submitted'], '{n}.Event.id', 
             'asc');
-        $this->assertEqual(count($upcoming), 6);
-        $this->assertEqual(count($submitted), 1);
+        $expired = Set::sort($result['evals']['expired'], '{n}.Event.id', 
+            'asc');
+        $this->assertEqual(count($upcoming), 3);
+        $this->assertEqual(count($submitted), 2);
+        $this->assertEqual(count($expired), 2);
 
         $this->assertEqual(Set::extract('/Event/id', $upcoming), 
-            array(1,2,3,7,8,9));
+            array(1,2,3));
         $this->assertEqual(Set::extract('/Event/id', $submitted), 
-            array(6));
+            array(6,8));
+        $this->assertEqual(Set::extract('/Event/id', $expired), 
+            array(7,9));
+
+        // surveys
+        $upcoming = Set::sort($result['surveys']['upcoming'], '{n}.Event.id', 
+            'asc');
+        $submitted = Set::sort($result['surveys']['submitted'], '{n}.Event.id', 
+            'asc');
+        $this->assertEqual(count($upcoming), 2);
+        $this->assertEqual(count($submitted), 0);
+
+        $this->assertEqual(Set::extract('/Event/id', $upcoming), 
+            array(4,5));
+        $this->assertEqual(Set::extract('/Event/id', $submitted), 
+            array());
     }
 }

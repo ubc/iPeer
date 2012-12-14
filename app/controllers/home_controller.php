@@ -48,11 +48,6 @@ class HomeController extends AppController
         }
 
         // Student and tutor
-        
-        // TODO
-        // make sure that submitted surveys CAN be viewed
-        // make a summary section that tells students if there are any urgently
-        //  due assignments
         $events = $this->Event->getEventsByUserId(User::get('id'));
 
         // mark events as late if past due date
@@ -91,10 +86,24 @@ class HomeController extends AppController
             }
         }
 
+        // remove non-current events and split into upcoming/submitted/expired
         $evals = $this->_splitSubmittedEvents($events['Evaluations']);
         $surveys = $this->_splitSubmittedEvents($events['Surveys']);
+
+        // calculate summary statistics
+        $numOverdue = 0;
+        $numDue = 0;
+        $numDue = sizeof($evals['upcoming']) + sizeof($surveys['upcoming']);
+        // only evals can have overdue events right now
+        foreach ($evals['upcoming'] as $e) {
+            $e['late'] ? $numOverdue++ : '';
+        }
+
+
         $this->set('evals', $evals);
         $this->set('surveys', $surveys);
+        $this->set('numOverdue', $numOverdue);
+        $this->set('numDue', $numDue);
         $this->render('studentIndex');
     }
 
@@ -124,28 +133,63 @@ class HomeController extends AppController
     }
 
     /**
-     * Helper for index to split an array of survey  or 
-     * evaluation events into events that has submissions
-     * and events that don't have any submissions.
+     * Helper to filter events into 3 different categories and to
+     * discard inactive events. 
+     *
+     * The 3 categories are: Upcoming, Submitted, Expired
+     *
+     * - Upcoming are events that the user can still make submissions for.
+     * - Submitted are events that the user has already made a submission.
+     * - Expired are events that the user hasn't made and can no longer make 
+     * submissions, but they can still view results from their peers.
+     *
+     * An evaluation is considered inactive once past its result release
+     * period. A survey is considered inactive once past its release period.
      *
      * @param array $events - list of events info returned from the event model,
      *  each event MUST have an 'EvaluationSubmission' array or this won't work
      *
-     * @return Split the events array into 'upcoming' or 'submitted' categories
+     * @return Discard inactive events and then split the remaining events
+     * into upcoming, submitted, and expired.
      * */
     private function _splitSubmittedEvents($events) 
     {
-        $submitted = $upcoming = array();
+        $submitted = $upcoming = $expired = array();
         foreach ($events as $event) {
-            if (empty($event['EvaluationSubmission']) || 
-                $event['Event']['is_ended']
-            ){
+            if (empty($event['EvaluationSubmission']) &&
+                $event['Event']['is_released']
+            ) { // can only take surveys during the release period
                 $upcoming[] = $event;
-            } else {
+            }
+            else if (!empty($event['EvaluationSubmission']) &&
+                strtotime('NOW') < 
+                strtotime($event['Event']['result_release_date_end'])
+            ) { // has submission and can or will be able to view results soon
+                // note that we're not using is_released or is_result_released
+                // because of an edge case where if there is a period of time
+                // between the release and result release period, the evaluation
+                // will disappear from view
                 $submitted[] = $event;
             }
+            else if (!empty($event['EvaluationSubmission']) &&
+                $event['Event']['is_released']
+            ) {
+                // special case for surveys, which doesn't have
+                // result_release_date_end
+                $submitted[] = $event;
+            }
+            else if (empty($event['EvaluationSubmission']) &&
+                strtotime('NOW') < 
+                strtotime($event['Event']['result_release_date_end'])
+            ) { // student did not do the survey within the allowed time
+                // but we should still let them view results
+                $expired[] = $event;
+            }
         }
-        return array('upcoming' => $upcoming, 'submitted' => $submitted);
+        return array('upcoming' => $upcoming, 
+            'submitted' => $submitted,
+            'expired' => $expired
+        );
     }
 
     /**

@@ -392,6 +392,7 @@ i {
 }
 
 /* HOME */
+/* for admins and instructors */
 .course {
     margin-bottom: 1em;
     background-color: lightgoldenrodyellow;
@@ -461,6 +462,26 @@ i {
 
 #short_help li {
     padding-bottom: 0.5em;
+}
+
+/* student home */
+
+#StudentHome .eventSummary {
+    text-align: center;
+    padding: 0.3em;
+    margin-bottom: 0.1em;
+}
+
+#StudentHome .overdue {
+    background: lightcoral;
+}
+
+#StudentHome .pending {
+    background: lightsalmon;
+}
+
+#StudentHome .alldone {
+    background: lightgreen;
 }
 
 /* Emailtemplate Form settings */
