@@ -180,9 +180,6 @@ class CreateAclShell extends Shell
      */
     function __buildAcoControllers()
     {
-        if (!Configure::read('debug')) {
-            return $this->_stop();
-        }
         $log = array();
 
         $aco =& $this->Acl->Aco;
@@ -260,7 +257,7 @@ class CreateAclShell extends Shell
             }
         }
         if (count($log)>0) {
-            debug($log);
+            print_r($log);
         }
     }
 
@@ -415,7 +412,7 @@ class CreateAclShell extends Shell
                 $file = Inflector::camelize(substr($file, 0, strlen($file)-strlen('_controller.php')));
                 if (!preg_match('/^'. Inflector::humanize($pluginName). 'App/', $file)) {
                     if (!App::import('Controller', $pluginName.'.'.$file)) {
-                        debug(__('Error importing ', true).$file.__(' for plugin ', true).$pluginName);
+                        trigger_error(__('Error importing ', true).$file.__(' for plugin ', true).$pluginName);
                     } else {
                         /// Now prepend the Plugin name ...
                         // This is required to allow us to fetch the method names.
