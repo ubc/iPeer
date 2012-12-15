@@ -253,11 +253,6 @@ class MixevalsController extends AppController
      */
     function add($layout='')
     {
-        if (!User::hasPermission('controllers/mixevals')) {
-            $this->Session->setFlash(__('Error: You do not have permission to add mixed evaluations', true));
-            $this->redirect('/home');
-        }
-
         if ($layout != '') {
             $this->layout = $layout;
             $this->set('layout', $layout);
