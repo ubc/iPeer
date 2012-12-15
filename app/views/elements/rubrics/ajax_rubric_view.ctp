@@ -7,9 +7,9 @@ $zero_mark = $data['Rubric']['zero_mark'];
 isset($user)? $userId = $user['id'] : $userId = '';
 isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = null;
 ?>
-<table class="form-table">
+<table class="standardtable">
     <tr>
-        <th width=100 valign="top"><?php __('Rubric View')?></th>
+        <th width=150 valign="top"><?php __('Rubric View')?></th>
         <!-- // horizontal template type -->
         <?php if ( $rubric_type == "horizontal" ):?>
             <?php foreach($data['RubricsLom'] as $lom): ?>
@@ -22,19 +22,16 @@ isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = nu
     </tr>
 
     <?php foreach ($data['RubricsCriteria'] as $criteria): $i = $criteria['criteria_num']; ?>
-    <tr>
-        <td valign="top">
         <?php if (isset($evaluation)) :?>
             <input type="hidden" name="selected_lom_<?php echo $userId.'_'.$i?>" value="<?php echo $evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['selected_lom']?>">
         <?php else: ?>
             <input type="hidden" name="selected_lom_<?php echo $userId.'_'.$i?>" value="1" size="4" >
         <?php endif ?>
-
-        <table border="0" width="95%" cellpadding="2">
-            <tr><td><?php echo $i.': '.$criteria['criteria']?></td></tr>
-            <tr><td><i><?php echo $criteria['multiplier']?><?php __(' mark(s)')?></i></td></tr>
-        </table>
-        </td>
+    <tr>
+        <th style="text-align: left; padding: 0.5em;">
+            <?php echo $criteria['criteria']?><br /><br />
+            <i><?php echo $criteria['multiplier']?><?php __(' mark(s)')?></i>
+        </th>
 
         <?php foreach($data['RubricsLom'] as $lom): ?>
         <?php $mark_value = round( ($criteria['multiplier']/(count($data['RubricsLom']) - ('on' == $zero_mark ? 1 : 0))*($lom['lom_num'] - ('on' == $zero_mark ? 1 : 0))) , 2);?>

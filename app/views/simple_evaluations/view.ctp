@@ -34,13 +34,9 @@
 
 <br />
 
-<table class="standardtable">
-  <tr>
-    <th onclick="$('rpreview').toggle();">
-        <?php echo $html->image('layout/icon_ipeer_logo.gif',array('border'=>'0','alt'=>'icon_ipeer_logo'))?><?php __(' Simple Evaluation Preview')?>
-    </th>
-  </tr>
-</table>
+<h1 onclick="$('rpreview').toggle();" class="title">
+    <span class="ipeer-icon"><?php __(' Simple Evaluation Preview')?></span>
+</h1>
 
 <div id="rpreview" style="display: none;">
 <?php

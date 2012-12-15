@@ -597,38 +597,4 @@ class RubricsController extends AppController
         $this->redirect('index');
     }
 
-
-    /**
-     * setForm_RubricName
-     *
-     * @param mixed $name
-     *
-     * @access public
-     * @return void
-     */
-    function setForm_RubricName($name)
-    {
-        $this->data['Rubric']['name'] = $name;
-        //$this->log($this->data['Rubric']['name']);
-    }
-
-
-/*  function previewRubric()
-  {
-    $this->layout = 'ajax';
-        $this->render('preview');
-  }
-
-    function renderRows($row=null, $criteria_weight=null )
-    {
-        $this->layout = 'ajax';
-        $this->render('row');
-    }
-
-
-    function update($attributeCode='', $attributeValue='')
-{
-        if ($attributeCode != '' && $attributeValue != '') //check for empty params
-        $this->params['data'] = $this->Personalize->updateAttribute($this->Auth->user('id'), $attributeCode, $attributeValue);
-}*/
 }
