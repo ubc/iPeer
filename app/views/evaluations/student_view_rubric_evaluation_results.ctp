@@ -1,34 +1,9 @@
-<h2><?php __('Evaluation Result Detail')?></h2>
-<!-- Event Details Table -->
-<table class="standardtable">
-<tr>
-    <th><?php __('Event Name')?></th>
-    <th><?php __('Evaluated By')?></th>
-    <th><?php __('Due Date')?></th>
-    <th><?php __('Self-Evaluation')?></th>
-</tr>
-<tr>
-    <td><?php echo $event['Event']['title'] ?></td>
-    <td><?php echo $event['Group']['group_name'] ?></td>
-    <td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($event['Event']['due_date']))) ?></td>
-    <td><?php echo ($event['Event']['self_eval']) ? 'Yes' : 'No' ?></td>
-</tr>
-</table>
-
-<table class="standardtable">
-<tr>
-    <th><?php __('Description')?></th>
-</tr>
-<tr>
-    <td><?php echo $event['Event']['description'] ?></td>
-</tr>
-</table>
+<?php echo $this->element('evaluations/view_event_info', array('controller'=>'evaluations', 'event'=>$event));?>
 
 <h2><?php __('Summary')?></h2>
+
 <table class="standardtable">
-<tr>
-    <th><?php __('Rating')?></th>
-</tr>
+<tr><th><?php __('Rating')?></th></tr>
 <tr>
     <td>
     <?php
@@ -39,7 +14,7 @@
                 ')'.'<font color=\'red\'>*</font>'.' = '.number_format($finalAvg, 2)) : $stringAddOn = '';
 
             echo number_format($memberScoreSummary[User::get('id')]['received_ave_score'], 2).$stringAddOn;
-            $ratingPenalty > 0 ? $penaltyNote = '&nbsp &nbsp &nbsp &nbsp &nbsp ( )'.'<font color=\'red\'>*</font>'.' : '.$studentResult['penalty'].
+            $ratingPenalty > 0 ? $penaltyNote = '&nbsp &nbsp &nbsp &nbsp &nbsp ( )'.'<font color=\'red\'>*</font>'.' : '.$penalty.
                 '% late penalty.' : $penaltyNote = '';
             echo $penaltyNote;
         } else {
@@ -50,16 +25,12 @@
 </tr>
 </table>
 
-<table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
-  <tr>
-    <td>
 <?php echo $html->script('ricobase')?>
 <?php echo $html->script('ricoeffects')?>
 <?php echo $html->script('ricoanimation')?>
 <?php echo $html->script('ricopanelcontainer')?>
 <?php echo $html->script('ricoaccordion')?>
 <?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
-<div id='rubric_result'>
 
 <?php
 $numerical_index = 1;  //use numbers instead of words; get users to refer to the legend
@@ -87,60 +58,49 @@ if (isset($scoreRecords[User::get('id')])) {
 			                  ?>
 			        <br><br-->
 
-<table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
-	<tr>
-		<td>
 <div id="accordion">
     <!-- Panel of Evaluations Results -->
-		<div id="panelResults">
-		  <div id="panelResultsHeader" class="panelheader">
-		  	<?php echo __('Evaluation Results From Your Teammates. (Randomly Ordered)       ', true);
-		  	if ( !$gradeReleased && !$commentReleased) {
-                echo '<font color="red">'.__('Comments/Grades Not Released Yet.', true).'</font>';
-		  	} else if ( !$gradeReleased) {
-		  	    echo '<font color="red">'.__('Grades Not Released Yet.', true).'</font>';
+    <div id="panelResults">
+        <div id="panelResultsHeader" class="panelheader">
+            <?php echo __('Evaluation Results From Your Teammates. (Randomly Ordered)', true);?>
+            <font color="red">
+            <?php if ( !$gradeReleased && !$commentReleased) {
+                echo __('Comments/Grades Not Released Yet.', true);
+            } else if ( !$gradeReleased) {
+                echo __('Grades Not Released Yet.', true);
             } else if ( !$commentReleased) {
-		  	    echo '<font color="red">'.__('Comments Not Released Yet.', true).'</font>';
+                echo __('Comments Not Released Yet.', true);
             }
             ?>
-		  </div>
-		  <div style="height: 200px;" id="panelResultsContent" class="panelContent">
-  	  <?php
-    $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$evalResult, 'userId'=>User::get('id'), 'scoreRecords'=>$scoreRecords);
-    echo $this->element('evaluations/student_view_rubric_details', $params);
-    ?>
-
-		  </div>
-		</div>
+            </font>
+        </div>
+        <div style="height: 200px;" id="panelResultsContent" class="panelContent">
+            <?php
+            $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$evalResult, 'userId'=>User::get('id'), 'scoreRecords'=>$scoreRecords);
+            echo $this->element('evaluations/student_view_rubric_details', $params);
+            ?>
+        </div>
+    </div>
     <!-- Panel of Evaluations Reviews -->
-		<div id="panelReviews">
-		  <div id="panelReviewsHeader" class="panelheader">
-		  	<?php echo 'Review Evaluations From You.'?>
-		  </div>
-		  <div style="height: 200px;" id="panelReviewsContent" class="panelContent">
-
-  	  <?php
-    $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$reviewEvaluations, 'userId'=>User::get('id'), 'scoreRecords'=>$scoreRecords);
-    echo $this->element('evaluations/student_view_rubric_details', $params);
-    ?>
-		  </div>
-		</div>
+    <div id="panelReviews">
+        <div id="panelReviewsHeader" class="panelheader">
+            <?php echo 'Review Evaluations From You.'?>
+        </div>
+        <div style="height: 200px;" id="panelReviewsContent" class="panelContent">
+            <?php
+            $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$reviewEvaluations, 'userId'=>User::get('id'), 'scoreRecords'=>$scoreRecords, 'isReview' => true);
+            echo $this->element('evaluations/student_view_rubric_details', $params);
+            ?>
+        </div>
+    </div>
 </div>
-		</td>
-	</tr>
 
-</table>
-	<script type="text/javascript"> new Rico.Accordion( 'accordion',
-								{panelHeight:500,
-								 hoverClass: 'mdHover',
-								 selectedClass: 'mdSelected',
-								 clickedClass: 'mdClicked',
-								 unselectedClass: 'panelheader'});
+<script type="text/javascript">
+    new Rico.Accordion( 'accordion',
+            {panelHeight:500,
+            hoverClass: 'mdHover',
+            selectedClass: 'mdSelected',
+            clickedClass: 'mdClicked',
+            unselectedClass: 'panelheader'});
 
-	</script>
-
-
-	</td>
-  </tr>
-</table>
-</div>
+</script>

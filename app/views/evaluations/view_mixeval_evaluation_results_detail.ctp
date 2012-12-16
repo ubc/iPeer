@@ -18,22 +18,8 @@ echo $html->script('ricoaccordion');
 <div class="content-container">
 
 <?php echo $this->element('evaluations/view_event_info', array('controller'=>'evaluations', 'event'=>$event));?>
+<?php echo $this->element('evaluations/summary_info', array('controller'=>'evaluations', 'event'=>$event));?>
 
-<div class="event-summary">
-    <span class="instruction-icon"><?php __('Summary:')?> ( <?php echo $this->Html->link(__('Basic', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['Group']['id']."/Basic")?> |
-    <?php echo $html->link(__('Detail', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['Group']['id']."/Detail")?> )</span>
-    <font size = "1" face = "arial" color = "red" >*Numerics in red denotes late submission penalty.</font>
-    <?php if (!$allMembersCompleted): ?>
-        <div class="incompleted">
-          <?php __('These people have not yet submit their evaluations:')?>
-            <ul>
-                <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
-                    <li><?php echo $user['first_name']." ".$user['last_name'] . ($row['Role']['role_id']==4 ? ' (TA)' : ' (student)');?></li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
-    <?php endif; ?>
-</div>
 
 <!-- summary table -->
 <table width="100%" align="center" class="outer-table">
@@ -132,7 +118,7 @@ echo $html->script('ricoaccordion');
     <?php
     if ($groupMembersNoTutors) {
         foreach ($groupMembersNoTutors as $member) {
-            echo '<tr class="tablecell2" cellpadding="4" cellspacing="2" >';
+            echo '<tr cellpadding="4" cellspacing="2" >';
             $membersAry[$member['User']['id']]['member'] = $member;
             echo '<td width="25%" class="group-members">' . $member['User']['first_name']." ".$member['User']['last_name'] . '</td></tr>' . "\n";
         }
@@ -149,7 +135,7 @@ echo $html->script('ricoaccordion');
     ?>
 <!-- end of summary table -->
 <tr><td>  </td></tr>    <!-- adding space between the submit button and the table -->
-    <tr class="tablecell2" align="center"><td colspan="<?php echo ($mixeval['Mixeval']["lickert_question_max"] +2); ?>">
+    <tr align="center"><td colspan="<?php echo ($mixeval['Mixeval']["lickert_question_max"] +2); ?>">
         <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
             <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
             <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>" />
@@ -166,136 +152,136 @@ echo $html->script('ricoaccordion');
         </form></td>
     </tr>
 </table>
-<table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
-    <tr>
-        <td align="center">
-            <div id="accordion">
-	            <?php $i = 0;
-                foreach($groupMembersNoTutors as $row):
-                    $user = $row['User']; ?>
-                    <div id="panel<?php echo $user['id']?>">
-                    <div id="panel<?php echo $user['id']?>Header" class="panelheader">
-                    <?php echo 'Evaluatee: '.$user['first_name']." ".$user['last_name']?>
-                    </div>
-                    <div style="height: 200px;" id="panel1Content" class="panelContent">
-                    <br><b><?php
-                        $deduction = number_format($membersAry[$user['id']]['received_total_score'] * $penalties[$user['id']]/100, 2);
-                        $scaled = number_format($membersAry[$user['id']]['received_total_score'] * (1 - $penalties[$user['id']]/100), 2);
-                        $percent = number_format($scaled/$mixeval['Mixeval']['total_marks'] * 100);
-                        $ave_deduction = number_format($membersAry[$user['id']]['received_ave_score'] * $penalties[$user['id']]/100, 2);
-                        $ave_scaled = number_format($membersAry[$user['id']]['received_ave_score'] * (1 - $penalties[$user['id']]/100), 2);
-                        echo __("(Number of Evaluator(s): ",true).$membersAry[$user['id']]['received_count'].")<br/>";
-                        echo __("Final Total: ",true).number_format($membersAry[$user['id']]['received_total_score'], 2);
-                        $penalties[$user['id']] > 0 ? $penaltyAddOn = ' - '."<font color=\"red\">".$deduction."</font> = ".$scaled :
-                            $penaltyAddOn = '';
-                        echo $penaltyAddOn.' ('.$percent.'%)';
 
-                        if (isset($membersAry[$user['id']]['received_ave_score'])) {
-                            $memberAve = number_format($membersAry[$user['id']]['received_ave_score'], 2);
-                            $memberAvePercent = number_format($ave_scaled * 100);
-                        } else {
-                            $memberAve = '-';
-                            $memberAvePercent = '-';
-                        }
-                        $penalties[$user['id']] > 0 ? $ave_penaltyAddOn = ' - '."<font color=\"red\">".$ave_deduction."</font> = ".$ave_scaled :
-                            $ave_penaltyAddOn = '';
-                        $memberAverageAve = number_format($membersAry[$user['id']]['received_total_score'], 2);
-                        if ($memberAverageAve == $groupAve) {
-                            echo "&nbsp;&nbsp;<< ".__('Same Mark as Group Average', true)." >>";
-                        } else if ($memberAverageAve < $groupAve) {
-                            echo "&nbsp;&nbsp;<font color='#cc0033'><< ".__('Below Group Average', true)." >></font>";
-                        } else if ($memberAverageAve > $groupAve) {
-                            echo "&nbsp;&nbsp;<font color='#000099'><< ".__('Above Group Average', true)." >></font>";
-                        }
-                        ?> </b><br>
-                        <?php echo __("Average Percentage Per Question: ", true);
-                        echo $memberAve.$ave_penaltyAddOn;
-                        echo ' ('.$memberAvePercent .'%)';
+<h3><?php __('Evaluation Results')?></h3>
 
-                        $penalties[$user['id']] > 0 ? $penaltyNotice = '<br>'.__('NOTE: ', true).'<font color=\'red\'>'.$penalties[$user['id']].
-                            '%</font>'.__(' Late Penalty', true) : $penaltyNotice = '';
-                        echo $penaltyNotice;
-                        ?>
-			            <br><br>
-                <!-- Section One -->
-                <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
-                    <tr>
-                        <td colspan="<?php echo $mixeval['Mixeval']["lickert_question_max"] ?>"><b> <?php __('Section One:')?> </b></td>
-                    </tr>
-                    <tr class="tableheader" align="center">
-                        <td width="100" valign="top"><?php __('Evaluator')?></td>
-                        <?php
-                            for ($i=0; $i<$mixeval['Mixeval']["lickert_question_max"]; $i++) {
-                                echo "<td><strong><font color=" . $color[ ($i+1) % sizeof($color) ] . ">" . ($i+1) . ". "  . "</font></strong>";
-                                echo $mixevalQuestion[$i+1]['title'];
-                                echo "</td>";
+<div id="accordion">
+    <?php $i = 0;
+    foreach($groupMembersNoTutors as $row):
+        $user = $row['User']; ?>
+        <div id="panel<?php echo $user['id']?>">
+        <div id="panel<?php echo $user['id']?>Header" class="panelheader">
+        <?php echo 'Evaluatee: '.$user['first_name']." ".$user['last_name']?>
+        </div>
+        <div style="height: 200px;text-align: center;" id="panel1Content" class="panelContent">
+        <br><b><?php
+            $deduction = number_format($membersAry[$user['id']]['received_total_score'] * $penalties[$user['id']]/100, 2);
+            $scaled = number_format($membersAry[$user['id']]['received_total_score'] * (1 - $penalties[$user['id']]/100), 2);
+            $percent = number_format($scaled/$mixeval['Mixeval']['total_marks'] * 100);
+            $ave_deduction = number_format($membersAry[$user['id']]['received_ave_score'] * $penalties[$user['id']]/100, 2);
+            $ave_scaled = number_format($membersAry[$user['id']]['received_ave_score'] * (1 - $penalties[$user['id']]/100), 2);
+            echo __("(Number of Evaluator(s): ",true).$membersAry[$user['id']]['received_count'].")<br/>";
+            echo __("Final Total: ",true).number_format($membersAry[$user['id']]['received_total_score'], 2);
+            $penalties[$user['id']] > 0 ? $penaltyAddOn = ' - '."<font color=\"red\">".$deduction."</font> = ".$scaled :
+                $penaltyAddOn = '';
+            echo $penaltyAddOn.' ('.$percent.'%)';
+
+            if (isset($membersAry[$user['id']]['received_ave_score'])) {
+                $memberAve = number_format($membersAry[$user['id']]['received_ave_score'], 2);
+                $memberAvePercent = number_format($ave_scaled * 100);
+            } else {
+                $memberAve = '-';
+                $memberAvePercent = '-';
+            }
+            $penalties[$user['id']] > 0 ? $ave_penaltyAddOn = ' - '."<font color=\"red\">".$ave_deduction."</font> = ".$ave_scaled :
+                $ave_penaltyAddOn = '';
+            $memberAverageAve = number_format($membersAry[$user['id']]['received_total_score'], 2);
+            if ($memberAverageAve == $groupAve) {
+                echo "&nbsp;&nbsp;<< ".__('Same Mark as Group Average', true)." >>";
+            } else if ($memberAverageAve < $groupAve) {
+                echo "&nbsp;&nbsp;<font color='#cc0033'><< ".__('Below Group Average', true)." >></font>";
+            } else if ($memberAverageAve > $groupAve) {
+                echo "&nbsp;&nbsp;<font color='#000099'><< ".__('Above Group Average', true)." >></font>";
+            }
+            ?> </b><br>
+            <?php echo __("Average Percentage Per Question: ", true);
+            echo $memberAve.$ave_penaltyAddOn;
+            echo ' ('.$memberAvePercent .'%)';
+
+            $penalties[$user['id']] > 0 ? $penaltyNotice = '<br>'.__('NOTE: ', true).'<font color=\'red\'>'.$penalties[$user['id']].
+                '%</font>'.__(' Late Penalty', true) : $penaltyNotice = '';
+            echo $penaltyNotice;
+            ?>
+            <br><br>
+    <!-- Section One -->
+    <table class="standardtable">
+        <tr>
+            <td colspan="<?php echo $mixeval['Mixeval']["lickert_question_max"]+1 ?>"><b> <?php __('Section One:')?> </b></td>
+        </tr>
+        <tr align="center">
+            <th width="100" valign="top"><?php __('Evaluator')?></th>
+            <?php
+                for ($i=0; $i<$mixeval['Mixeval']["lickert_question_max"]; $i++) {
+                    echo "<th><strong><font color=" . $color[ ($i+1) % sizeof($color) ] . ">" . ($i+1) . ". "  . "</font></strong>";
+                    echo $mixevalQuestion[$i+1]['title'];
+                    echo "</th>";
+                }
+            ?>
+        </tr>
+        <?php
+        //Retrieve the individual mixeval detail
+        if (isset($evalResult[$user['id']])) {
+            $memberResult = $evalResult[$user['id']];
+                foreach ($memberResult AS $row): $memberMixeval = $row['EvaluationMixeval'];
+                    $evalutor = $withTutorsAry[$memberMixeval['evaluator']];
+                    echo "<tr class=\"tablecell2\">";
+                    echo "<td width='15%'>".$evalutor['member']['User']['first_name']." ".$evalutor['member']['User']['last_name']."</td>";
+                    $width = 85 / $mixeval['Mixeval']['lickert_question_max'];
+                    $resultDetails = $memberMixeval['details'];
+                    for ($j = 1; $j <= $mixeval['Mixeval']["lickert_question_max"]; $j++) {
+                        $rubDet = $resultDetails[$j-1]['EvaluationMixevalDetail'];
+                        echo '<td valign="middle" width="'.$width.'%">';
+                        //Point Description Detail
+                        if (isset($mixevalQuestion[$j-1]['Description'][$rubDet['selected_lom']-1]['descriptor'])) {
+                            echo $mixevalQuestion[$j-1]['Description'][$rubDet['selected_lom']-1]['descriptor'];
+                        }
+                        echo "<br />";
+
+                        //Points Detail
+                        echo "<strong>".__('Points:', true)."</strong>";
+                        if (isset($rubDet)) {
+                            $lom = $rubDet["grade"];
+                            $empty = $mixevalQuestion[$i-1]['multiplier'];
+                            for ($v = 0; $v < $lom; $v++) {
+                                echo $html->image('evaluations/circle.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle'));
+                                $empty--;
                             }
-                        ?>
-                    </tr>
-                    <?php
-                    //Retrieve the individual mixeval detail
-                    if (isset($evalResult[$user['id']])) {
-                        $memberResult = $evalResult[$user['id']];
-                            foreach ($memberResult AS $row): $memberMixeval = $row['EvaluationMixeval'];
-                                $evalutor = $withTutorsAry[$memberMixeval['evaluator']];
-                                echo "<tr class=\"tablecell2\">";
-                                echo "<td width='15%'>".$evalutor['member']['User']['first_name']." ".$evalutor['member']['User']['last_name']."</td>";
-                                $width = 85 / $mixeval['Mixeval']['lickert_question_max'];
-                                $resultDetails = $memberMixeval['details'];
-                                for ($j = 1; $j <= $mixeval['Mixeval']["lickert_question_max"]; $j++) {
-                                    $rubDet = $resultDetails[$j-1]['EvaluationMixevalDetail'];
-                                    echo '<td valign="middle" width="'.$width.'%">';
-                                    //Point Description Detail
-                                    if (isset($mixevalQuestion[$j-1]['Description'][$rubDet['selected_lom']-1]['descriptor'])) {
-                                        echo $mixevalQuestion[$j-1]['Description'][$rubDet['selected_lom']-1]['descriptor'];
-                                    }
-                                    echo "<br />";
+                            for ($t=0; $t < $empty; $t++) {
+                                echo $html->image('evaluations/circle_empty.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'cicle_empty'));
+                            }
+                            echo "<br />";
+                        } else {
+                            echo "n/a<br />";
+                        }
 
-                                    //Points Detail
-                                    echo "<strong>".__('Points:', true)."</strong>";
-                                    if (isset($rubDet)) {
-                                        $lom = $rubDet["grade"];
-                                        $empty = $mixevalQuestion[$i-1]['multiplier'];
-                                        for ($v = 0; $v < $lom; $v++) {
-                                            echo $html->image('evaluations/circle.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle'));
-                                            $empty--;
-                                        }
-                                        for ($t=0; $t < $empty; $t++) {
-                                            echo $html->image('evaluations/circle_empty.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'cicle_empty'));
-                                        }
-                                        echo "<br />";
-                                    } else {
-                                        echo "n/a<br />";
-                                    }
+                        //Grade Detail
+                        echo "<strong>".__('Grade', true).": </strong>";
+                        if (isset($rubDet)) {
+                            echo $rubDet["grade"] . " / " . $mixevalQuestion[$j]['multiplier'] . "<br />";
+                        } else {
+                            echo "n/a<br />";
+                        }
 
-                                    //Grade Detail
-                                    echo "<strong>".__('Grade', true).": </strong>";
-                                    if (isset($rubDet)) {
-                                        echo $rubDet["grade"] . " / " . $mixevalQuestion[$j]['multiplier'] . "<br />";
-                                    } else {
-                                        echo "n/a<br />";
-                                    }
+                        echo "<br /><br /></td>";
+                    }
+                echo "</tr>";
 
-                                    echo "<br /><br /></td>";
-                                }
-                            echo "</tr>";
-
-                        endforeach;
-                    } ?>
-            </table>
+            endforeach;
+        } ?>
+</table>
             <!-- Section Two -->
-            <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
+            <table class="standardtable">
                 <tr>
                     <td colspan="<?php echo $mixeval['Mixeval']["total_question"] ?>"><b> Section Two: </b></td>
                 </tr>
-                <tr class="tableheader" align="center">
-                    <td width="100" valign="top"><?php __('Evaluator')?></td>
+                <tr align="center">
+                    <th width="100" valign="top"><?php __('Evaluator')?></th>
                     <?php
                     for ($i=$numerical_index; $i<=$mixeval['Mixeval']["total_question"]; $i++) {
                         if (isset($mixevalQuestion[$i-1])) {
-                            echo "<td><strong><font color=" . $color[ $i % sizeof($color) ] . ">" . ($i) . ". "  . "</font></strong>";
+                            echo "<th><strong><font color=" . $color[ $i % sizeof($color) ] . ">" . ($i) . ". "  . "</font></strong>";
                             echo $mixevalQuestion[$i-1]['title'];
-                            echo "</td>";
+                            echo "</th>";
                         }
                     }
                     ?>
@@ -350,13 +336,14 @@ echo $html->script('ricoaccordion');
 
     <?php $i++;?>
 <?php endforeach; ?>
-</div></td></tr></table>
-	<script type="text/javascript"> new Rico.Accordion( 'accordion',
-								{panelHeight:500,
-								 hoverClass: 'mdHover',
-								 selectedClass: 'mdSelected',
-								 clickedClass: 'mdClicked',
-								 unselectedClass: 'panelheader'});
+</div>
 
-	</script>
+<script type="text/javascript"> new Rico.Accordion( 'accordion',
+            {panelHeight:500,
+            hoverClass: 'mdHover',
+            selectedClass: 'mdSelected',
+            clickedClass: 'mdClicked',
+            unselectedClass: 'panelheader'});
+
+</script>
 </div>

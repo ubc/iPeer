@@ -1,24 +1,25 @@
 <?php
-$gradeReleased = isset($scoreRecords[User::get('id')])? $scoreRecords[User::get('id')]['grade_released']: 1;
-$commentReleased = isset($scoreRecords[User::get('id')])? $scoreRecords[User::get('id')]['comment_released']: 1;
+$isReview = isset($isReview) && $isReview;
+$gradeReleased = $isReview || (isset($scoreRecords[User::get('id')])? $scoreRecords[User::get('id')]['grade_released']: 1);
+$commentReleased = $isReview || (isset($scoreRecords[User::get('id')])? $scoreRecords[User::get('id')]['comment_released']: 1);
 $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
 ?>
-<table class="standardtable">
+<table class="standardtable" style="margin-top: 1em;">
     <tr>
-    <td width="100" valign="top"><?php __('Person Being Evaluated')?></td>
-    <?php foreach ($rubricCriteria as $criteria): ?>
-        <td><?php echo $criteria['criteria']?></td>
-    <?php endforeach; ?>
+        <th width="100"><?php __('Person Being Evaluated')?></th>
+        <?php foreach ($rubricCriteria as $criteria): ?>
+        <th><?php echo $criteria['criteria']?></th>
+        <?php endforeach; ?>
     </tr>
-    <?php if (!$gradeReleased && !$commentReleased) {
-        $cols = $rubric['Rubric']["criteria"]+1; ?>
-    <tr id='details' align="center">
+    <?php if (!$gradeReleased && !$commentReleased):?>
+        <?php $cols = $rubric['Rubric']["criteria"]+1; ?>
+    <tr>
         <td colspan="<?php echo $cols ?>">
-            <font color="red"><?php __('Comments/Grades Not Released Yet.') ?></font>
+            <font color="red"><?php echo ($isReview ? '':__('Comments/Grades Not Released Yet.', true)) ?></font>
         </td>
     </tr>
-    <?php } else if ($gradeReleased || $commentReleased) {
-        if (isset($evalResult[$userId])) {
+    <?php else: ?>
+        <?php if (isset($evalResult[$userId])) {
         //Retrieve the individual rubric detail
             $memberResult = $evalResult[$userId];
             if (isset($scoreRecords)) {
@@ -26,15 +27,15 @@ $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","
             }
         foreach ($memberResult AS $row):
             $memberRubric = $row['EvaluationRubric']; ?>
-    <tr id='details'>
-        <?php if (User::get('id')!=$row['EvaluationRubric']['creator_id']) { ?>
+    <tr>
+        <?php if (User::get('id')!=$row['EvaluationRubric']['evaluator']) { ?>
             <td width='15%'><?php echo User::get('full_name') ?></td>
         <?php } else {
             $member = $membersAry[$memberRubric['evaluatee']]; ?>
-            <td width='15%'><?php echo $member['User']['first_name'].' '.$member['User']['last_name'] ?></td>
+            <td width='15%' rowspan="2"><?php echo $member['User']['first_name'].' '.$member['User']['last_name'] ?></td>
         <?php }
         $resultDetails = $memberRubric['details'];
-        foreach ($resultDetails AS $detail) : $rubDet = $detail['EvaluationRubricDetail']; ?>
+        foreach ($resultDetails as $detail) : $rubDet = $detail['EvaluationRubricDetail']; ?>
             <td valign="middle"><br />
                 <!-- Points Detail -->
                 <strong><?php echo __('Points', true) ?>: </strong>
@@ -65,8 +66,7 @@ $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","
         <?php endforeach; ?>
      </tr>
      <!-- General Comment -->
-     <tr id='details'>
-        <td></td>
+     <tr>
         <?php $col = $rubric['Rubric']['criteria'] + 1; ?>
         <td colspan="<?php echo $col ?>">
             <strong><?php __('General Comment') ?>: </strong><br>
@@ -75,6 +75,6 @@ $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","
      </tr>
     <?php endforeach;
         }
-}
- ?>
+?>
+<?php endif; ?>
 </table>

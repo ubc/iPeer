@@ -1,29 +1,10 @@
-<h2><?php __('Evaluation Result Detail')?></h2>
-<!-- Event Details Table -->
+<?php echo $html->script('ricobase')?>
+<?php echo $html->script('ricoeffects')?>
+<?php echo $html->script('ricoanimation')?>
+<?php echo $html->script('ricopanelcontainer')?>
+<?php echo $html->script('ricoaccordion')?>
 
-<table class="standardtable">
-<tr>
-    <th><?php __('Event Name')?></th>
-    <th><?php __('Evaluated By')?></th>
-    <th><?php __('Due Date')?></th>
-    <th><?php __('Self-Evaluation')?></th>
-</tr>
-<tr>
-    <td><?php echo $event['Event']['title'] ?></td>
-    <td><?php echo $event['Group']['group_name'] ?></td>
-    <td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($event['Event']['due_date']))) ?></td>
-    <td><?php echo ($event['Event']['self_eval']) ? 'Yes' : 'No' ?></td>
-</tr>
-</table>
-
-<table class="standardtable">
-<tr>
-    <th><?php __('Description')?></th>
-</tr>
-<tr>
-    <td><?php echo $event['Event']['description'] ?></td>
-</tr>
-</table>
+<?php echo $this->element('evaluations/view_event_info', array('controller'=>'evaluations', 'event'=>$event));?>
 
 <h2><?php __('Summary')?></h2>
 <table class="standardtable">
@@ -51,25 +32,17 @@
 </tr>
 </table>
 
-<table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
-  <tr>
-    <td>
-<?php echo $html->script('ricobase')?>
-<?php echo $html->script('ricoeffects')?>
-<?php echo $html->script('ricoanimation')?>
-<?php echo $html->script('ricopanelcontainer')?>
-<?php echo $html->script('ricoaccordion')?>
-	<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
-    <!-- Render Event Info table -->
-	  <?php
-	  if (isset($memberScoreSummary[User::get('id')])) {
-	    $receviedAvePercent = $memberScoreSummary[User::get('id')]['received_ave_score'] / $mixeval['Mixeval']['total_marks'] * 100;
-	    $releaseStatus = $scoreRecords[User::get('id')]['grade_released'];
-	  } else {
-  	  $receviedAvePercent = 0;
-  	  $releaseStatus = array();
-  	}
-    ?>
+<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
+<!-- Render Event Info table -->
+<?php
+    if (isset($memberScoreSummary[User::get('id')])) {
+        $receviedAvePercent = $memberScoreSummary[User::get('id')]['received_ave_score'] / $mixeval['Mixeval']['total_marks'] * 100;
+        $releaseStatus = $scoreRecords[User::get('id')]['grade_released'];
+    } else {
+        $receviedAvePercent = 0;
+        $releaseStatus = array();
+    }
+?>
 <div id='mixeval_result'>
 
 <?php
@@ -101,59 +74,47 @@ $commentReleased = !empty($scoreRecords[User::get('id')]['comment_released']) ?
 			                  ?>
 			        <br><br-->
 
-<table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
-	<tr>
-		<td>
 <div id="accordion">
     <!-- Panel of Evaluations Results -->
-		<div id="panelResults">
-		  <div id="panelResultsHeader" class="panelheader">
-		  	<?php echo __('Evaluation Results From Your Teammates. (Randomly Ordered)       ', true);
-		  	if ( !$gradeReleased && !$commentReleased) {
-          echo '<font color="red">'.__('Comments/Grades Not Released Yet.', true).'</font>';
-		  	}	else if ( !$gradeReleased) {
-		  	  echo '<font color="red">'.__('Grades Not Released Yet.', true).'</font>';
-        }	else if ( !$commentReleased) {
-		  	  echo '<font color="red">'.__('Comments Not Released Yet.', true).'</font>';
-        }
-?>
-		  </div>
-		  <div style="height: 200px;" id="panelResultsContent" class="panelContent">
-  	  <?php
-    $params = array('controller'=>'evaluations', 'mixeval'=>$mixeval, 'mixevalQuestion'=>$mixevalQuestion, 'membersAry'=>$groupMembers, 'evalResult'=>$evalResult, 'userId'=>User::get('id'), 'scoreRecords'=>$scoreRecords);
-    echo $this->element('evaluations/student_view_mixeval_details', $params);
-    ?>
-
-		  </div>
-		</div>
+    <div id="panelResults">
+        <div id="panelResultsHeader" class="panelheader">
+            <?php echo __('Evaluation Results From Your Teammates. (Randomly Ordered)', true);
+                if ( !$gradeReleased && !$commentReleased) {
+                echo '<font color="red">'.__('Comments/Grades Not Released Yet.', true).'</font>';
+                } else if ( !$gradeReleased) {
+                    echo '<font color="red">'.__('Grades Not Released Yet.', true).'</font>';
+                } else if ( !$commentReleased) {
+                    echo '<font color="red">'.__('Comments Not Released Yet.', true).'</font>';
+                }
+            ?>
+        </div>
+        <div style="height: 200px;text-align: center;" id="panelResultsContent" class="panelContent">
+            <?php
+            $params = array('controller'=>'evaluations', 'mixeval'=>$mixeval, 'mixevalQuestion'=>$mixevalQuestion, 'membersAry'=>$groupMembers, 'evalResult'=>$evalResult, 'userId'=>User::get('id'), 'scoreRecords'=>$scoreRecords);
+            echo $this->element('evaluations/student_view_mixeval_details', $params);
+            ?>
+        </div>
+    </div>
     <!-- Panel of Evaluations Reviews -->
-		<div id="panelReviews">
-		  <div id="panelReviewsHeader" class="panelheader">
-		  	<?php echo __('Review Evaluations From You.', true)?>
-		  </div>
-		  <div style="height: 200px;" id="panelReviewsContent" class="panelContent">
-
-  	  <?php
-    $params = array('controller'=>'evaluations', 'mixeval'=>$mixeval, 'mixevalQuestion'=>$mixevalQuestion, 'membersAry'=>$groupMembers, 'evalResult'=>$reviewEvaluations, 'userId'=>User::get('id'), 'scoreRecords'=>null);
-    echo $this->element('evaluations/student_view_mixeval_details', $params);
-    ?>
-		  </div>
-		</div>
+    <div id="panelReviews">
+        <div id="panelReviewsHeader" class="panelheader">
+            <?php echo __('Review Evaluations From You.', true)?>
+        </div>
+        <div style="height: 200px;" id="panelReviewsContent" class="panelContent">
+            <?php
+            $params = array('controller'=>'evaluations', 'mixeval'=>$mixeval, 'mixevalQuestion'=>$mixevalQuestion, 'membersAry'=>$groupMembers, 'evalResult'=>$reviewEvaluations, 'userId'=>User::get('id'), 'scoreRecords'=>null);
+            echo $this->element('evaluations/student_view_mixeval_details', $params);
+            ?>
+        </div>
+    </div>
 </div>
-		</td>
-	</tr>
-
-</table>
-	<script type="text/javascript"> new Rico.Accordion( 'accordion',
-								{panelHeight:500,
-								 hoverClass: 'mdHover',
-								 selectedClass: 'mdSelected',
-								 clickedClass: 'mdClicked',
-								 unselectedClass: 'panelheader'});
-
-	</script>
 </div>
 
-	</td>
-  </tr>
-</table>
+<script type="text/javascript"> new Rico.Accordion( 'accordion',
+        {panelHeight:500,
+            hoverClass: 'mdHover',
+            selectedClass: 'mdSelected',
+            clickedClass: 'mdClicked',
+            unselectedClass: 'panelheader'});
+
+</script>

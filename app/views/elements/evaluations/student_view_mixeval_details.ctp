@@ -1,36 +1,28 @@
 <?php
-    $gradeReleased = isset($scoreRecords[User::get('id')]['grade_released']) ?
-        $scoreRecords[User::get('id')]['grade_released'] : 1;
-    $commentReleased = isset($scoreRecords[User::get('id')]['comment_released']) ?
-        $scoreRecords[User::get('id')]['comment_released'] : 1;
-    $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
+$gradeReleased = isset($scoreRecords[User::get('id')]['grade_released']) ?
+$scoreRecords[User::get('id')]['grade_released'] : 1;
+$commentReleased = isset($scoreRecords[User::get('id')]['comment_released']) ?
+    $scoreRecords[User::get('id')]['comment_released'] : 1;
+$color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
 
-    $pos = 1;
+$pos = 1;
 ?>
-<br/><br/>
-<table class="standardtable">
-	<tr>
-    <td width="100" valign="top" colspan="<?php echo ($mixeval['Mixeval']["lickert_question_max"]+1)?>"><?php __('Section One')?>:</td>
+<table class="standardtable" style="margin-top: 2em;">
+    <tr><td width="100" colspan="<?php echo ($mixeval['Mixeval']["lickert_question_max"]+1)?>"><?php __('Section One')?>:</td></tr>
+    <tr>
+        <th width="100"><?php __('Person Being Evaluated')?></th>
+        <?php for ($i=1; $i<=$mixeval['Mixeval']["lickert_question_max"]; $i++):?>
+            <?php if (isset($mixevalQuestion[$i])): ?>
+                <th><?php echo $i.' '.$mixevalQuestion[$i]['title'] ?></th>
+                <?php $pos++; ?>
+            <?php endif; ?>
+        <?php endfor; ?>
     </tr>
-	<tr>
-    <td width="100" valign="top"><?php __('Person Being Evaluated')?></td>
-    <?php
-      for ($i=1; $i<=$mixeval['Mixeval']["lickert_question_max"]; $i++) {
-        if (isset($mixevalQuestion[$i])) { ?>
-      		<td>
-      		<?php echo $i.' '.$mixevalQuestion[$i]['title'] ?>
-      		</td>
-      		<?php $pos++;
-      	}
-    	}
-    ?>
-    </tr>
- <?php
-if (!$gradeReleased && !$commentReleased) {
+    <?php if (!$gradeReleased && !$commentReleased) {
     $cols = $mixeval['Mixeval']["lickert_question_max"]+1; ?>
     <tr><td colspan="<?php echo $cols ?>">
-    <font color="red"><?php __('Comments/Grades Not Released Yet.', true) ?></font></td></tr>
-<?php } else if ($gradeReleased || $commentReleased) {
+    <font color="red"><?php __('Comments/Grades Not Released Yet.') ?></font></td></tr>
+    <?php } else if ($gradeReleased || $commentReleased) {
     //Retrieve the individual mixeval detail
     if (isset($evalResult[$userId])) {
         $memberResult = $evalResult[$userId];
@@ -40,11 +32,11 @@ if (!$gradeReleased && !$commentReleased) {
         foreach ($memberResult AS $row): $memberMixeval = $row['EvaluationMixeval'];
 
         if ($scoreRecords == null) { // renders self evaluation
-     	    $member = $membersAry[$memberMixeval['evaluatee']];
+            $member = $membersAry[$memberMixeval['evaluatee']];
         } else { // renders evaluations from peers
             $member = $membersAry[$memberMixeval['evaluator']];
         } ?>
-        <tr id='details'>
+        <tr>
         <?php if (isset($scoreRecords)) { ?>
         <td width='15%'><?php echo User::get('full_name') ?></td>
     <?php } else { ?>
@@ -68,17 +60,17 @@ if (!$gradeReleased && !$commentReleased) {
         <strong>Points: </strong>
         <?php if ($gradeReleased && isset($mixevalDet)) {
             $lom = $mixevalDet['grade'];
-        	$empty = $mixeval["Question"][$i-1]["multiplier"];
-        	for ($v = 0; $v < $lom; $v++) {
-        		echo $html->image('evaluations/circle.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle'));
-        		$empty--;
-        	}
-        	for ($t=0; $t < $empty; $t++) {
-        		echo $html->image('evaluations/circle_empty.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle_empty'));
-        	} ?>
-        	<br />
+            $empty = $mixeval["Question"][$i-1]["multiplier"];
+            for ($v = 0; $v < $lom; $v++) {
+                echo $html->image('evaluations/circle.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle'));
+                $empty--;
+            }
+            for ($t=0; $t < $empty; $t++) {
+                echo $html->image('evaluations/circle_empty.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle_empty'));
+            } ?>
+            <br />
         <?php } else { ?>
-        	n/a<br />
+            n/a<br />
         <?php } ?>
 
         <!-- Grades Detail -->
@@ -98,28 +90,21 @@ if (!$gradeReleased && !$commentReleased) {
 }
  ?>
 </table>
-<br/><br/>
-<table class="standardtable">
-	<tr>
-    <td width="100" valign="top" colspan="<?php echo ($mixeval['Mixeval']["prefill_question_max"]+1)?>"><?php __('Section Two')?>:</td>
-    </tr>
-	<tr>
-    <td width="100" valign="top"><?php __('Person Being Evaluated')?></td>
-    <?php
-      for ($i=$pos; $i<=$mixeval['Mixeval']["total_question"]; $i++) {
-        if (isset($mixevalQuestion[$i-1])) { ?>
-      		<td>
-      		<?php echo $i.' '.$mixevalQuestion[$i-1]['title'] ?>
-      		</td>
-      	<?php }
-        }
-    ?>
+
+<table class="standardtable" style="margin-top: 2em;">
+    <tr><td width="100" colspan="<?php echo ($mixeval['Mixeval']["prefill_question_max"]+1)?>"><?php __('Section Two')?>:</td></tr>
+    <tr>
+    <th width="100"><?php __('Person Being Evaluated')?></th>
+    <?php for ($i=$pos; $i<=$mixeval['Mixeval']["total_question"]; $i++): ?>
+        <?php if (isset($mixevalQuestion[$i-1])): ?>
+            <th><?php echo $i.' '.$mixevalQuestion[$i-1]['title'] ?></th>
+        <?php endif; ?>
+    <?php endfor; ?>
     </tr>
 <?php
 if (!$gradeReleased && !$commentReleased) {
   $cols = $mixeval['Mixeval']["prefill_question_max"]+1; ?>
-  <tr><td colspan="<?php $cols ?>">
-  <font color="red"><?php __('Comments/Grades Not Released Yet.', true) ?></font></td></tr>
+  <tr><td colspan="<?php echo $cols ?>"><font color="red"><?php __('Comments/Grades Not Released Yet.') ?></font></td></tr>
 <?php }else if ($gradeReleased || $commentReleased) {
     if (isset($evalResult[$userId])) {
    //Retrieve the individual mixeval detail
@@ -135,7 +120,7 @@ if (!$gradeReleased && !$commentReleased) {
         $member = $membersAry[$memberMixeval['evaluator']];
      } ?>
 
-     <tr id='details'>
+     <tr>
      <?php if (isset($scoreRecords)) { ?>
        <td width='15%'><?php echo User::get('full_name') ?></td>
      <?php } else { ?>
@@ -147,17 +132,10 @@ if (!$gradeReleased && !$commentReleased) {
      for ($i=$pos; $i<=$mixeval['Mixeval']["total_question"]; $i++) {
         if (isset($memberMixeval['details'][$i-1])) {
           $mixevalDet = $memberMixeval['details'][$i-1]['EvaluationMixevalDetail']; ?>
-          <td valign="middle">
-
           <!-- Comments -->
-          <br/><strong><?php echo __('Comment', true)?>: </strong>
-          <?php if ($commentReleased && isset($mixevalDet)) {
-          	echo $mixevalDet["question_comment"];
-          } else { ?>
-          	n/a<br />
-          <?php } ?>
-          <br />
-
+          <td>
+            <strong><?php echo __('Comment', true)?>: </strong>
+            <?php echo ($commentReleased && isset($mixevalDet) ? $mixevalDet["question_comment"] : 'n/a');?>
           </td>
       <?php }
     } ?>

@@ -1,53 +1,8 @@
-<h3><?php __('Evaluation Event Detail')?></h3>
-<!-- Event Details Table -->
-<table class="standardtable">
-<tr>
-    <th><?php __('Event Name')?></th>
-    <th><?php __('Group')?></th>
-    <th><?php __('Due Date')?></th>
-    <th><?php __('Self-Evaluation')?></th>
-</tr>
-<tr>
-    <td><?php echo $event['Event']['title'] ?></td>
-    <td><?php echo $event['Group']['group_name'] ?></td>
-    <td><?php echo Toolkit::formatDate(date("Y-m-d H:i:s", strtotime($event['Event']['due_date']))) ?></td>
-    <td><?php echo ($event['Event']['self_eval']) ? 'Yes' : 'No'?></td>
-</tr>
-</table>
-
-<table class="standardtable">
-<tr>
-    <th><?php __('Description')?></th>
-</tr>
-
-<tr>
-    <td><?php echo $event['Event']['description'] ?></td>
-</tr>
-</table>
-
-<h3><?php __('Summary')?>
- :(<?php echo $this->Html->link(__('Basic', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['Group']['id']."/Basic")?> |
-    <?php echo $html->link(__('Detail', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['Group']['id']."/Detail")?> )</h3>
-
-<!-- Users who haven't done the evaluation yet table -->
-<table class="standardtable">
-<?php
-if (!$allMembersCompleted) {
-    echo $html -> tableHeaders(array(__('These people have not yet submitted their evaluations', true)), null, array('class' => 'red'));
-    $incompletedMembersArr = array();
-    $users = array();
-    foreach ($inCompletedMembers as $row) {
-        $user = $row['User'];
-        array_push($incompletedMembersArr, $user['first_name'] . " " . $user['last_name']);
-        $users[] = array($user['first_name'] . " " . $user['last_name'] . ($row['Role']['role_id'] == 4 ? ' (TA)' : ' (student)'));
-    }
-    echo $html -> tableCells($users);
-}
-?>
-</table>
+<?php echo $this->element('evaluations/view_event_info', array('controller'=>'evaluations', 'event'=>$event));?>
+<?php echo $this->element('evaluations/summary_info', array('controller'=>'evaluations', 'event'=>$event));?>
 
 <!-- Show Evaluation Reuslts - Basic -->
- <h3><?php __('Evaluation Results')?></h3>
+<h3><?php __('Evaluation Results')?></h3>
 
 <table class='standardtable'>
    <th><?php __('Student Name')?></th>

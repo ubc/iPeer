@@ -7,23 +7,9 @@ echo $html->script('ricoaccordion');
 <div class="content-container">
 <!-- Render Event Info table -->
 <?php echo $this->element('evaluations/view_event_info', array('controller'=>'evaluations', 'event'=>$event));?>
+<?php echo $this->element('evaluations/summary_info', array('controller'=>'evaluations', 'event'=>$event));?>
 
-<div class="event-summary">
-    <span class="instruction-icon"><?php __('Summary:')?> ( <?php echo $this->Html->link(__('Basic', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['Group']['id']."/Basic")?> |
-    <?php echo $html->link(__('Detail', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['Group']['id']."/Detail")?> )</span>
-    <font size = "1" face = "arial" color = "red" >*Numerics in red denotes late submission penalty.</font>
-    <?php if (!$allMembersCompleted): ?>
-        <div class="incompleted">
-          <?php __('These people have not yet submit their evaluations:')?>
-            <ul>
-                <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
-                    <li><?php echo $user['first_name']." ".$user['last_name'] . ($row['Role']['role_id']==4 ? ' (TA)' : ' (student)');?></li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
-    <?php endif; ?>
-</div>
-
+<h3><?php __('Evaluation Results')?></h3>
 <div id='rubric_result'>
 
 <?php
@@ -159,9 +145,7 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
         </form></td>
     </tr>
 </table>
-<table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
-    <tr>
-        <td align="center">
+
 <div id="accordion">
     <?php $i = 0;
     foreach($groupMembersNoTutors as $row):
@@ -170,7 +154,7 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
         <div id="panel<?php echo $user['id']?>Header" class="panelheader">
             <?php echo __('Evaluatee: ', true).$user['first_name']." ".$user['last_name']?>
         </div>
-        <div style="height: 200px;" id="panel1Content" class="panelContent">
+        <div style="height: 200px;text-align: center;" id="panel1Content" class="panelContent">
             <br><b><?php
                 $scaled = $membersAry[$user['id']]['received_ave_score'] * (1 - ($penalties[$user['id']] / 100));
                 $deduction = number_format($membersAry[$user['id']]['received_ave_score'] * ($penalties[$user['id']] / 100), 2);
@@ -207,16 +191,14 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
                 echo $penaltyNotice;
                 ?> </b>
             <br><br>
-        <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
-            <tr class="tableheader" align="center">
-                <td width="100" valign="top"><?php __('Evaluator')?></td>
-                <?php
-                for ($i=1; $i<=$rubric['Rubric']["criteria"]; $i++) {
-                    echo "<td><strong><font color=" . $color[ $i % sizeof($color) ] . ">" . ($i) . ". "  . "</font></strong>";
-                    echo $rubricCriteria[$i-1]['criteria'];
-                    echo "</td>";
-                }
-                ?>
+        <table class="standardtable">
+            <tr>
+                <th width="100" valign="top"><?php __('Evaluator')?></th>
+                <?php for ($i=1; $i<=$rubric['Rubric']["criteria"]; $i++): ?>
+                    <th><strong><font color="<?php echo $color[ $i % sizeof($color) ]?>">(<?php echo $i?>)</font></strong>
+                        <?php echo $rubricCriteria[$i-1]['criteria'];?>
+                    </th>
+                <?php endfor; ?>
             </tr>
             <?php
             //Retrieve the individual rubric detail
@@ -303,9 +285,6 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
     <?php $i++;?>
     <?php endforeach; ?>
 </div>
-    </td>
-    </tr>
-</table>
 
 <script type="text/javascript"> new Rico.Accordion( 'accordion',
                                     {panelHeight:500,

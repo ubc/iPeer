@@ -257,7 +257,7 @@ class EventsController extends AppController
         case 2:
             $modelName = 'Rubric';
             break;
-        case 3:
+        case 4:
             $modelName = 'Mixeval';
         }
 

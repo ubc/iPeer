@@ -26,27 +26,13 @@ foreach ($groupMembersNoTutors as $member) {
 
 <!-- Render Event Info table -->
 <?php echo $this->element('evaluations/view_event_info', array('controller'=>'evaluations', 'event'=>$event));?>
+<?php echo $this->element('evaluations/summary_info', array('controller'=>'evaluations', 'event'=>$event));?>
 
-<div class="event-summary">
-    <span class="instruction-icon"><?php __('Summary:')?> ( <?php echo $this->Html->link(__('Basic', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['Group']['id']."/Basic")?> |
-    <?php echo $html->link(__('Detail', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['Group']['id']."/Detail")?> )</span>
-    <font size = "1" face = "arial" color = "red" >*Numerics in red denotes late submission penalty.</font>
-	<?php if (!$allMembersCompleted): ?>
-        <div class="incompleted">
-	      <?php __('These people have not yet submit their evaluations:')?>
-            <ul>
-	            <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
-        	        <li><?php echo $user['first_name']." ".$user['last_name'] . ($row['Role']['role_id']==4 ? ' (TA)' : ' (student)');?></li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
-    <?php endif; ?>
-</div>
-
-<table class="eval-result full-size">
-    <tr class="tableheader">
-        <td valign="middle"><?php __('Student Name:')?></td>
-        <td> <?php __('Total:')?>( /<?php echo number_format($mixeval['Mixeval']['total_marks'], 2)?>)</td>
+<h3><?php __('Evaluation Results')?></h3>
+<table class="standardtable">
+    <tr>
+        <th valign="middle"><?php __('Student Name:')?></th>
+        <th> <?php __('Total:')?>( /<?php echo number_format($mixeval['Mixeval']['total_marks'], 2)?>)</th>
     </tr>
 
     <?php foreach($result as $name => $score):?>
@@ -58,7 +44,7 @@ foreach ($groupMembersNoTutors as $member) {
         <td><?php echo ($allMembersCompleted ? number_format($aveScoreSum / count($groupMembers), 2) : '-')?></td>
     </tr>
     <?php if ($allMembersCompleted): ?>
-    <tr class="tablecell2" align="center">
+    <tr align="center">
       <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
               <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
               <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>" />
