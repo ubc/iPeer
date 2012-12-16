@@ -334,10 +334,11 @@ class EventsController extends AppController
 
             if ($this->Event->saveAll($this->data)) {
                 $this->Session->setFlash("Add event successful!", 'good');
+                $this->redirect('index/'.$courseId);
+                return;
             } else {
                 $this->Session->setFlash("Add event failed.");
             }
-            $this->redirect('index/'.$courseId);
         }
     }
 
