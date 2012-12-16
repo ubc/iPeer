@@ -198,8 +198,8 @@ class AppController extends Controller
         if ($this->Auth->isAuthorized()) {
             User::getInstance($this->Auth->user());
             // after login stuff
-            $this->AccessControl->getPermissions();
             $this->User->loadRoles(User::get('id'));
+            $this->AccessControl->loadPermissions();
             //TODO logging!
         }
 

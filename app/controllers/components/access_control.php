@@ -255,30 +255,40 @@ class AccessControlComponent extends Object
      */
     function getPermissions()
     {
-        $perms = array();
-        if (!($perms = $this->Session->read('ipeerSession.Permissions'))) {
-            $this->permissionsArray = array();
-            $roles = $this->getRoles();
-            if (!empty($roles)) {
-                $roleIds = array_keys($roles);
-
-                //GET ACL PERMISSIONS
-                $acos = $this->Acl->Aco->find('threaded');
-                $group_aro = $this->Acl->Aro->find('threaded', array('conditions'=>array('Aro.foreign_key'=>$roleIds, 'Aro.model'=>'Role')));
-                $group_perms = Set::extract('{n}.Aco', $group_aro);
-                $gpAco = array();
-                foreach ($group_perms[0] as $value) {
-                    $gpAco[$value['id']] = $value;
-                }
-
-                $this->perms = $gpAco;
-                $this->_addPermissions($acos, 0);
-            }
-
-            $this->Session->write('ipeerSession.Permissions', $this->permissionsArray);
+        if (!($this->permissionArray = $this->Session->read('ipeerSession.Permissions'))) {
+            $this->loadPermissions();
         }
 
         return $this->permissionsArray;
+    }
+
+    /**
+     * loadPermissions load permissions from database and cache them in seesion
+     *
+     * @access public
+     * @return void
+     */
+    function loadPermissions()
+    {
+        $this->permissionsArray = array();
+        $roles = $this->getRoles();
+        if (!empty($roles)) {
+            $roleIds = array_keys($roles);
+
+            //GET ACL PERMISSIONS
+            $acos = $this->Acl->Aco->find('threaded');
+            $group_aro = $this->Acl->Aro->find('threaded', array('conditions'=>array('Aro.foreign_key'=>$roleIds, 'Aro.model'=>'Role')));
+            $group_perms = Set::extract('{n}.Aco', $group_aro);
+            $gpAco = array();
+            foreach ($group_perms[0] as $value) {
+                $gpAco[$value['id']] = $value;
+            }
+
+            $this->perms = $gpAco;
+            $this->_addPermissions($acos, 0);
+        }
+
+        $this->Session->write('ipeerSession.Permissions', $this->permissionsArray);
     }
 
 
