@@ -12,12 +12,6 @@ class SurveysController extends AppController
 {
     public $uses =  array('SurveyQuestion', 'Course', 'Survey', 'User', 'Question', 'Response', 'Personalize', 'Event', 'EvaluationSubmission', 'UserEnrol', 'SurveyInput', 'SurveyGroupMember', 'SurveyGroupSet', 'SurveyGroup');
     public $name = 'Surveys';
-    public $show;
-    public $sortBy;
-    public $direction;
-    public $page;
-    public $order;
-    public $Sanitize;
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time');
     public $components = array('AjaxList', 'Output', 'framework');
 
@@ -30,15 +24,6 @@ class SurveysController extends AppController
      */
     function __construct()
     {
-        $this->Sanitize = new Sanitize;
-        $this->show = empty($_REQUEST['show'])? 'null': $this->Sanitize->paranoid($_REQUEST['show']);
-        if ($this->show == 'all') {
-            $this->show = 99999999;
-        }
-        $this->sortBy = empty($_GET['sort'])? 'Survey.created': $_GET['sort'];
-        $this->direction = empty($_GET['direction'])? 'desc': $this->Sanitize->paranoid($_GET['direction']);
-        $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
-        $this->order = $this->sortBy.' '.strtoupper($this->direction);
         $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
         $this->set('title_for_layout', __('Surveys', true));
         parent::__construct();

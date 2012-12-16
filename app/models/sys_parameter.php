@@ -110,7 +110,13 @@ class SysParameter extends AppModel
      */
     function afterSave($created)
     {
-        Cache::write($this->data['SysParameter']['parameter_code'], $this->data['SysParameter'], 'configuration');
+        if (empty($this->data['SysParameter']['parameter_value'])) {
+            // cake cache doesn't allow storing empty value. so we have to remove
+            // the old value instead of overwrite
+            Cache::delete($this->data['SysParameter']['parameter_code'], 'configuration');
+        } else {
+            Cache::write($this->data['SysParameter']['parameter_code'], $this->data['SysParameter']['parameter_value'], 'configuration');
+        }
 
         return true;
     }

@@ -185,6 +185,8 @@ class AppController extends Controller
                 return false;
             }
         }
+        $this->set('loginHeader', $this->SysParameter->get('display.login.header'));
+        $this->set('loginFooter', $this->SysParameter->get('display.login.footer'));
     }
 
     /**

@@ -1530,3 +1530,13 @@ form div.input {
     padding: 0 0.5em 0 1.5em;
     white-space:nowrap;
 }
+
+.login-footer {
+    font-size: 0.8em;
+    margin: 0.5em 0 1em 0;
+}
+
+.login-footer a {
+    text-decoration: none;
+    color: black;
+}
