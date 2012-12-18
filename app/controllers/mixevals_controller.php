@@ -386,7 +386,7 @@ class MixevalsController extends AppController
 
         // check to see if submissions had been made - if yes - mixed evaluation can't be edited
         if (!empty($submissions)) {
-            $this->Session->setFlash(__('Submissions had been made. '.$eval['Mixeval']['name'].' cannot be edited. Please make a copy.', true));
+            $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $eval['Mixeval']['name']));
             $this->redirect('index');
         }
 
@@ -577,7 +577,7 @@ class MixevalsController extends AppController
             $message.= __("This evaluation is now in use, and can NOT be deleted.<br />", true);
             $message.= __("Please remove all the events assosiated with this evaluation first.", true);
             $message.= "</span>";
-            $this->Session->setFlash(__($message, true));
+            $this->Session->setFlash($message);
             $this->redirect('index');
             //	exit;
         } else {

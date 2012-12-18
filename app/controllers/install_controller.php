@@ -77,7 +77,7 @@ class InstallController extends Controller
         }
 
         if (!is_writable(CONFIGS.'database.php')) {
-            $this->Session->setFlash(__('Cannot write to the database configuration file. Please change the permission on '.CONFIGS.'/database.php so that it is writable.', true));
+            $this->Session->setFlash(sprintf(__('Cannot write to the database configuration file. Please change the permission on %s so that it is writable.', true), CONFIGS.'/database.php'));
         }
 
 
@@ -95,7 +95,7 @@ class InstallController extends Controller
             $ret = $this->configureDatabase();
             if ($ret) {
                 // Failed to configure database
-                $this->Session->setFlash(__('Database config failed - '.$ret, true));
+                $this->Session->setFlash(sprintf(__('Database config failed - %s', true), $ret));
                 return;
             }
 
@@ -112,7 +112,7 @@ class InstallController extends Controller
     function install4()
     {
         if (!is_writable(CONFIGS)) {
-            $this->Session->setFlash(__('Cannot write to the configuration directory. Please change the permission on '.CONFIGS.' so that it is writable.', true));
+            $this->Session->setFlash(sprintf(__('Cannot write to the configuration directory. Please change the permission on %s so that it is writable.', true), CONFIGS));
             return;
         }
 
@@ -155,7 +155,7 @@ class InstallController extends Controller
             // mark this instance as installed
             $f = fopen(CONFIGS.'installed.txt', 'w');
             if (!$f) {
-                $this->Session->setFlash(__('Installation failed, unable to write to '. CONFIGS .' dir', true));
+                $this->Session->setFlash(sprintf(__('Installation failed, unable to write to %s dir', true), CONFIGS));
                 $this->redirect(array('action' => 'install4'));
                 return;
             }

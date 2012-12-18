@@ -7,7 +7,7 @@
   <h4>Installation Notes</h4>
   <p>
     <span class='red'><?php __('Important!')?></span>
-    <?php __('For security reasons, please set the configuration directory ('.CONFIGS.') and database.php ('.CONFIGS.'database.php) back to read only.')?>
+    <?php printf(__('For security reasons, please set the configuration directory (%s) and database.php (%s) back to read only.'), CONFIGS, CONFIGS.'database.php')?>
   </p>
   <p>
   <?php __("If you opted to install with example data, you can login to the example user accounts with the password 'ipeeripeer'")?>

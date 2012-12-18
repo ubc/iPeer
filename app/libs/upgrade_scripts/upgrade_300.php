@@ -44,7 +44,7 @@ class Upgrade300 extends UpgradeBase
     public function up()
     {
         if (!is_writable(CONFIGS)) {
-            $this->errors[] = __('Cannot write to the configuration directory. Please change the permission on '.CONFIGS.' so that it is writable.', true);
+            $this->errors[] = sprintf(__('Cannot write to the configuration directory. Please change the permission on %s so that it is writable.', true), CONFIGS);
             return false;
         }
 
@@ -59,7 +59,7 @@ class Upgrade300 extends UpgradeBase
         $dbv = $sysparameter->getDatabaseVersion();
         $ret = $this->patchDb($dbv, $this->dbVersion);
         if ($ret) {
-            $this->errors[] = __('Database patching failed: '.$ret, true);
+            $this->errors[] = sprintf(__('Database patching failed: ', true), $ret);
             return false;
         }
         $sysparameter->reload();
@@ -67,7 +67,7 @@ class Upgrade300 extends UpgradeBase
         if (!file_exists(CONFIGS.'installed.txt')) {
             $f = fopen(CONFIGS.'installed.txt', 'w');
             if (!$f) {
-                $this->errors[] = __('Installation failed, unable to write to '. CONFIGS .' dir', true);
+                $this->errors[] = sprintf(__('Installation failed, unable to write to %s dir', true), CONFIGS);
                 return false;
             }
             fclose($f);
