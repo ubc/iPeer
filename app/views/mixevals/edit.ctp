@@ -25,7 +25,6 @@ else{
     $zero_mark = 'off';
 }*/
 ?>
-<?php echo $html->script('showhide')?>
 
 <?php echo $this->Form->create('Mixeval',
     array('id' => 'frm',

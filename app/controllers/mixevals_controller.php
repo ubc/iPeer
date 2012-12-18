@@ -240,7 +240,12 @@ class MixevalsController extends AppController
             $this->layout = $layout;
         }
 
+        $this->data = $eval;
         $this->set('data', $eval);
+        $this->set('readonly', true);
+        $this->set('evaluate', false);
+        $this->set('action', __('View Mixed Evaluation', true));
+        $this->render('edit');
     }
 
     /**
