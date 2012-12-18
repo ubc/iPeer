@@ -356,10 +356,6 @@ class EventsController extends AppController
             $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
             $this->redirect('index');
             return;
-        } else if ($event['Event']['event_template_type_id'] == '3') {
-            // can't edit survey event from this view
-            $this->redirect('/surveys/edit/'.$eventId);
-            return;
         }
 
         if (!empty($this->data)) {
@@ -371,6 +367,9 @@ class EventsController extends AppController
             } else if ($typeId == 2) {
                 $this->data['Event']['template_id'] =
                     $this->data['Event']['Rubric'];
+            } else if ($typeId == 3) {
+                $this->data['Event']['template_id'] =
+                    $this->data['Event']['Survey'];
             } else if ($typeId == 4) {
                 $this->data['Event']['template_id'] =
                     $this->data['Event']['Mixeval'];
@@ -400,23 +399,45 @@ class EventsController extends AppController
         }
 
         // Sets up the already assigned groups
-
         $this->set('groups', $this->Group->getGroupsByCourseId($event['Event']['course_id']));
+
+        // Populate the template selections
         $this->set(
             'mixevals',
-            $this->Mixeval->getBelongingOrPublic(User::get('id'))
+            $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'))
         );
         $this->set(
             'simpleEvaluations',
-            $this->SimpleEvaluation->getBelongingOrPublic(User::get('id'))
+            $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'))
+        );
+        $this->set(
+            'surveys',
+            $this->Survey->getBelongingOrPublic($this->Auth->user('id'))
         );
         $this->set(
             'rubrics',
-            $this->Rubric->getBelongingOrPublic(User::get('id'))
+            $this->Rubric->getBelongingOrPublic($this->Auth->user('id'))
         );
+        $this->set(
+            'eventTemplateTypes',
+            $this->EventTemplateType->getEventTemplateTypeList(true)
+        );
+        $this->set('simpleSelected', '');
+        $this->set('rubricSelected', '');
+        $this->set('surveySelected', '');
+        $this->set('mixevalSelected', '');
+        $typeId = $event['Event']['event_template_type_id'];
+        if ($typeId == 1) {
+            $this->set('simpleSelected', $event['Event']['template_id']);
+        } else if ($typeId == 2) {
+            $this->set('rubricSelected', $event['Event']['template_id']);
+        } else if ($typeId == 3) {
+            $this->set('surveySelected', $event['Event']['template_id']);
+        } else if ($typeId == 4) {
+            $this->set('mixevalSelected', $event['Event']['template_id']);
+        }
 
         $this->set('event', $event);
-        $this->set('eventTemplateTypes', $this->EventTemplateType->find('list', array('conditions' => array('NOT' => array('id' => 3)))));
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $event['Course']))->push(array('event' => $event['Event']))->push(__('Edit', true)));
 
         $this->data = $event;
