@@ -261,7 +261,7 @@ class SurveysController extends AppController
                 }
             }
             if (!empty($submissions)) {
-                $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $survey['Survey']['name']);
+                $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $survey['Survey']['name']));
                 $this->redirect('index');
             }
         }
