@@ -10,36 +10,12 @@
 
 <?php echo $this->Form->input('name', array('size'=>'50', 'class'=>'input',
     'readonly' => $readonly)) ?>
-<div id="surveyErr"></div>
 
 <?php if('add' == $this->action):?>
     <?php echo $this->Form->input('template_id', array('empty' => __('(No Template)', true)))?>
 <?php elseif('copy' == $this->action):?>
     <?php echo $this->Form->input('template_id', array('type' => 'hidden', 'value' => $template_id))?>
-<?php endif;
-
-echo $this->Form->input('course_id', array(
-    'label' => __('Assigned Course:', true).'<font color="red">*</font>'));
-echo $form->input('Survey.due_date', array(
-    'label'=> __('Due Date', true).':<font color="red">*</font>',
-    'type'=>'text',
-    'size'=>'40',
-    'class'=>'input',
-    ));
-
-echo $form->input('Survey.release_date_begin', array(
-    'label'=>__('Release From:<font color="red">*</font>', true),
-    'type'=>'text',
-    'size'=>'40',
-    'class'=>'input',
-    ));
-
-echo $form->input('Survey.release_date_end', array(
-    'label'=> __('Release Until:<font color="red">*</font>', true),
-    'type'=>'text',
-    'size'=>'40',
-    'class'=>'input',
-    )) ?>
+<?php endif;?>
 
     <div style="text-align: center">
         <input type="button" name="Back" value="<?php __('Back')?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">

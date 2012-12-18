@@ -1,9 +1,9 @@
-<?php 
+<?php
 // data processing for simple eval, create arrays to generate the entry tables
 $simpleevalheaders = array(
     __('Name', true),
-    __('In Use', true), 
-    __('Public', true),  
+    __('In Use', true),
+    __('Public', true),
     __('Base Point Per Member', true)
 );
 $simpleevalcells = array();
@@ -32,7 +32,7 @@ $rubricsheaders = array(
 );
 $rubricscells = array();
 foreach($rubricData as $data) {
-    $rubric = $data['Rubric']; 
+    $rubric = $data['Rubric'];
     $row = array();
     $row[] = $html->link($rubric['name'], '/rubrics/view/'.$rubric['id']);
     $row[] = $rubric['event_count'] > 0 ?
@@ -57,7 +57,7 @@ $mixevalheaders = array(
     __('Total Marks', true)
 );
 $mixevalcells = array();
-foreach ($mixevalData as $data) { 
+foreach ($mixevalData as $data) {
     $mixeval = $data['Mixeval'];
     $row = array();
     $row[] = $html->link($mixeval['name'], '/mixevals/view/'.$mixeval['id']);
@@ -77,9 +77,7 @@ foreach ($mixevalData as $data) {
 $surveyheaders = array(
     __('Name', true),
     __('In Use', true),
-    __('Course', true),
-    __('Due Date', true),
-    __('Released?', true)
+    __('Questions', true),
 );
 $surveycells = array();
 foreach($surveyData as $data) {
@@ -89,12 +87,7 @@ foreach($surveyData as $data) {
     $row[] = $survey['event_count'] > 0 ?
         $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
         $html->image('icons/red_x.gif', array('alt'=>'red_x'));
-    $row[] = $survey['course_id'] == '-1' ? 'N/A' : $data['Course']['course'];
-    $row[] = Toolkit::formatDate(date('Y-m-d H:i:s', 
-        strtotime($survey['due_date'])));
-    $row[] = date('Y-m-d H:i:s',time()) > $survey['release_date_begin'] ?
-        $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
-      	$html->image('icons/red_x.gif', array('alt'=>'red_x'));
+    $row[] = $survey['question_count'];
     $surveycells[] = $row;
 }
 
@@ -108,7 +101,7 @@ $templatecells = array();
 foreach($emailTemplates as $data) {
     $emailTemplate = $data['EmailTemplate'];
     $row = array();
-    $row[] = $html->link($emailTemplate['name'], 
+    $row[] = $html->link($emailTemplate['name'],
         '/emailtemplates/view/'.$emailTemplate['id']);
     $row[] = $emailTemplate['subject'];
     $row[] = $emailTemplate['description'];
@@ -123,7 +116,7 @@ echo $this->element('evaltools/tools_menu', array());
 <h2><?php __('Simple Evaluations')?></h2>
 <div class='evaltoolsadd'><?php echo $html->link(__('Add Simple Evaluation', true), '/simpleevaluations/add', array('class' => 'add-button')); ?></div>
 <table class='standardtable'>
-<?php 
+<?php
 echo $html->tableHeaders($simpleevalheaders);
 echo $html->tableCells($simpleevalcells);
 ?>

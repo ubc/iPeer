@@ -15,7 +15,9 @@
                     'removeQuestion/'.$survey_id.'/'.$question['id'],
                     array('escape' => false, 'class' => 'delete-button'),
                     __('Are you sure to delete question', true).' &ldquo;'.$question['prompt'].'&rdquo;?')?>
+                <?php endif; ?>
                 </div>
+                <?php if ($is_editable):?>
                 <div style="float: right">
                 <?php echo $this->Html->link(__('Top', true),
                     'moveQuestion/'.$survey_id.'/'.$question['id'].'/TOP',
@@ -30,8 +32,8 @@
                     'moveQuestion/'.$survey_id.'/'.$question['id'].'/BOTTOM',
                     array('escape' => false, 'class' => 'bottom-button small-font'))?>
                 </div>
-                <div style="clear: both;"></div>
                 <?php endif;?>
+                <div style="clear: both;"></div>
             </div>
             <div class="survey-response">
                 <!-- Multiple Choice Question-->

@@ -74,21 +74,16 @@ class SurveyControllerTest extends ExtendedAuthTestCase {
 
     function testIndex() {
         $result = $this->testAction('/surveys/index', array('return' => 'vars'));
-
-        $this->assertEqual($result['paramsForList']['data']['entries'][0]['Survey']['name'], 'Team Creation Survey');
-        $this->assertEqual($result['paramsForList']['data']['entries'][0]['Course']['course'], 'MECH 328');
-        $this->assertEqual($result['paramsForList']['data']['entries'][1]['Survey']['name'], 'Survey, all Q types');
-        $this->assertEqual($result['paramsForList']['data']['entries'][1]['Course']['course'], 'MECH 328');
+        $surveys = Set::sort($result['paramsForList']['data']['entries'], '{n}.Survey.id', 'asc');
+        $this->assertEqual($surveys[0]['Survey']['name'], 'Team Creation Survey');
+        $this->assertEqual($surveys[0]['Survey']['question_count'], 2);
+        $this->assertEqual($surveys[1]['Survey']['name'], 'Survey, all Q types');
+        $this->assertEqual($surveys[1]['Survey']['question_count'], 4);
     }
 
     function testView() {
         $result = $this->testAction('/surveys/view/1', array('return' => 'vars'));
         $this->assertEqual($result['data']['Survey']['name'], 'Team Creation Survey');
-        $this->assertEqual($result['data']['Survey']['due_date'], '2012-07-31 11:20:00');
-        $this->assertEqual($result['data']['Survey']['release_date_begin'], '2012-07-01 11:20:00');
-        $this->assertEqual($result['data']['Survey']['release_date_end'], '2013-12-31 11:20:00');
-        $this->assertEqual($result['data']['Course']['course'], 'MECH 328');
-        $this->assertEqual($result['data']['Course']['title'], 'Mechanical Engineering Design Project');
     }
 
     //TODO redirect
@@ -108,7 +103,7 @@ class SurveyControllerTest extends ExtendedAuthTestCase {
     }
 
     //TODO redirect
-    function testReleaseSurvey() {
+    function testQuestionSummary() {
         $result = $this->testAction('surveys/questionsSummary/1', array('return' => 'vars'));
         $this->assertEqual($result['questions'][0]['Question']['prompt'], 'What was your GPA last term?');
         $this->assertEqual($result['questions'][0]['Response'][0]['response'], '4+');
