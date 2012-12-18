@@ -82,7 +82,8 @@ class EventsControllerTest extends ExtendedAuthTestCase {
     function testIndex() {
         $result = $this->testAction('/events/index', array('return' => 'vars'));
 
-        $this->assertEqual(count($result["paramsForList"]['data']['entries']), 7);
+        $this->assertEqual(count($result["paramsForList"]['data']['entries']), 
+            9);
         $this->assertEqual(sort(Set::extract($result["paramsForList"]['data']['entries'], '/Event/id')), array(1,2,3,6));
         $events = Set::sort($result["paramsForList"]['data']['entries'], '{n}.Event.id', 'asc');
         $this->assertEqual($events[0]['Event']['Title'], 'Term 1 Evaluation');
@@ -143,7 +144,7 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->assertEqual($result['simpleEvaluations'][1], 'Module 1 Project Evaluation');
         $this->assertEqual($result['mixevals'][1], 'Default Mix Evalution');
         // evauation types
-        $this->assertEqual(count($result['eventTemplateTypes']), 3);
+        $this->assertEqual(count($result['eventTemplateTypes']), 4);
         // course list
         ksort($result['courses']);
         $this->assertEqual($result['courses'], array(
