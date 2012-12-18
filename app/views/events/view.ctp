@@ -4,46 +4,46 @@
 <table class="standardtable">
     <tr><th colspan="2">Evaluation Event</th></tr>
     <tr>
-        <th><?php __('Course:')?></th>
+        <th><?php __('Course')?></th>
         <td><?php echo $event['Course']['full_name']; ?>
         </td>
     </tr>
     <tr>
-        <th><?php __('Event Title:')?></th>
+        <th><?php __('Event Title')?></th>
         <td><?php echo $event['Event']['title']; ?></td>
     </tr>
     <tr>
-        <th><?php __('Description:')?></th>
+        <th><?php __('Description')?></th>
         <td><?php echo $event['Event']['description']; ?></td>
     </tr>
     <tr>
-        <th valign="top"><?php __('Evaluation Format:')?></th>
+        <th valign="top"><?php __('Evaluation Format')?></th>
         <td>
             <?php echo $event['EventTemplateType']['type_name'];?>
         </td>
     </tr>
     <tr>
-        <th valign="top"><?php __('Evaluation:')?></th>
+        <th valign="top"><?php __('Evaluation')?></th>
         <td>
             <?php echo $html->link($event[$modelName]['name'], '/'.strtolower(Inflector::pluralize($modelName)).'/view/'.$event[$modelName]['id']);?>
         </td>
     </tr>
     <tr>
-        <th><?php __('Allow Self-Evaluation?:')?></th>
+        <th><?php __('Allow Self-Evaluation?')?></th>
         <td>
             <?php echo $event['Event']['self_eval']==1? 'Enable' : 'Disable'; ?>
         </td>
     </tr>
     <tr>
-        <th><?php __('Require Student Comments?:')?></th>
+        <th><?php __('Require Student Comments?')?></th>
         <td><?php echo $event['Event']['com_req']==1? 'Yes' : 'No'; ?></td>
     </tr>
     <tr>
-        <th><?php __('Due Date:')?>&nbsp;</th>
+        <th><?php __('Due Date')?>&nbsp;</th>
         <td><?php echo Toolkit::formatDate($event['Event']['due_date']) ?></td>
     </tr>
     <tr>
-        <th><?php __('Evaluation Release Date: <font color="red">*</font>')?></th>
+        <th><?php __('Evaluation Release Date')?></th>
         <td id="release_date_begin">
             <table width="100%">
                 <tr align="left">
@@ -62,7 +62,7 @@
         </td>
     </tr>
     <tr>
-        <th><?php __('Result Release Date: <font color="red">*</font>')?></th>
+        <th><?php __('Result Release Date')?></th>
         <td id="result_release_date_begin">
             <table width="100%">
                 <tr align="left">
@@ -81,7 +81,7 @@
         </td>
     </tr>
     <tr>
-        <th><?php __('Late Penalty:')?></th>
+        <th><?php __('Late Penalty')?></th>
         <td>
             <?php
             if (!empty($event['Penalty'])) {
@@ -100,7 +100,7 @@
         </td>
     </tr>
     <tr>
-        <th valign="top"><?php __('Groups Assignment:')?></th>
+        <th valign="top"><?php __('Groups Assignment')?></th>
         <td>
         <?php
             $params = array('controller'=>'events', 'data'=>$event['Group'], 'event_id' => $event['Event']['id'], 'popup' => 'n');

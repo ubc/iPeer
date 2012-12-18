@@ -12,7 +12,7 @@ class EventsController extends AppController
 {
     public $name = 'Events';
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time');
-    public $uses = array('GroupEvent', 'User', 'Group', 'Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers', 'Penalty');
+    public $uses = array('GroupEvent', 'User', 'Group', 'Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers', 'Penalty', 'Survey');
     public $components = array("AjaxList", "Session");
 
     /**
@@ -100,7 +100,11 @@ class EventsController extends AppController
             array("Event.Title",          __("Title", true),       "auto", "action", "View Event"),
             array("!Custom.results",       __("View", true),       "4em", "action", "View Results"),
             array("Event.event_template_type_id", __("Type", true), "", "map",
-            array("1" => __("Simple", true), "2" => __("Rubric", true), "4" => __("Mixed", true))),
+            array(
+                "1" => __("Simple", true), 
+                "2" => __("Rubric", true), 
+                "3" => __("Survey", true), 
+                "4" => __("Mixed", true))),
             array("Event.due_date",       __("Due Date", true),    "10em", "date"),
             array("!Custom.isReleased",    __("Released ?", true), "8em", "string"),
             array("Event.self_eval",       __("Self Eval", true),   "6em", "map",
@@ -149,11 +153,6 @@ class EventsController extends AppController
             $extraFilters .= "1=0 ) ";
         }
 
-        // Leave the survey types out, always
-        $extraFilters .= !empty($extraFilters) ? "and " : "";
-        $extraFilters .= "Event.event_template_type_id<>3";
-
-
         // Set up actions
         $warning = __("Are you sure you want to delete this event permanently?", true);
         $actions = array(
@@ -180,7 +179,7 @@ class EventsController extends AppController
      * @access public
      * @return void
      */
-    function index($courseId = null, $message = '')
+    function index($courseId = null)
     {
         // check for permission to course ($courseId) only when $courseId is provided
         if (!is_null($courseId)) {
@@ -192,13 +191,11 @@ class EventsController extends AppController
             $this->breadcrumb->push(array('course' => $course['Course']));
         }
 
-        $this->set('message', $message);
-
         // We need to change the session state to point to this
         // course:
-        // Initialize a basic non-funcional AjaxList
+        // Initialize a basic non-functional AjaxList
         $this->AjaxList->quickSetUp();
-        // Clear the state first, we don't want any previous searches/selections.
+        // Clear the state first, we don't want any previous searches/selections
         $this->AjaxList->clearState();
         // Set and update session state Variable
         $joinFilterSelections->course_id = $courseId;
@@ -212,7 +209,6 @@ class EventsController extends AppController
         $this->set('courseId', $courseId);
         $this->set('breadcrumb', $this->breadcrumb->push(__('Events', true)));
     }
-
 
     /**
      * ajaxList
@@ -244,10 +240,6 @@ class EventsController extends AppController
             $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
             $this->redirect('index');
             return;
-        } else if ($event['Event']['event_template_type_id'] == '3') {
-            // can't view survey event from this view
-            $this->Session->setFlash(__('Invalid Id', true));
-            $this->redirect('index');
         }
 
         switch ($event['Event']['event_template_type_id']) {
@@ -256,6 +248,9 @@ class EventsController extends AppController
             break;
         case 2:
             $modelName = 'Rubric';
+            break;
+        case 3:
+            $modelName = 'Survey';
             break;
         case 4:
             $modelName = 'Mixeval';
@@ -310,6 +305,10 @@ class EventsController extends AppController
         $this->set(
             'simpleEvaluations',
             $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'))
+        );
+        $this->set(
+            'surveys',
+            $this->Survey->getBelongingOrPublic($this->Auth->user('id'))
         );
         $this->set(
             'rubrics',

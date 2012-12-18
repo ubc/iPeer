@@ -654,7 +654,7 @@ CREATE TABLE IF NOT EXISTS `event_template_types` (
 INSERT INTO `event_template_types` (`id`, `type_name`, `table_name`, `model_name`, `display_for_selection`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
 (1, 'SIMPLE', 'simple_evaluations', 'SimpleEvaluation', 1, 'A', 0, '0000-00-00 00:00:00', NULL, NULL),
 (2, 'RUBRIC', 'rubrics', 'Rubric', 1, 'A', 0, '0000-00-00 00:00:00', NULL, NULL),
-(3, 'SURVEY', 'surveys', '', 0, 'A', 0, '0000-00-00 00:00:00', NULL, NULL),
+(3, 'SURVEY', 'surveys', '', 1, 'A', 0, '0000-00-00 00:00:00', NULL, NULL),
 (4, 'MIX EVALUATION', 'mixevals', 'Mixeval', 1, 'A', 0, '2006-04-03 11:51:02', 0, '2006-04-06 15:31:48');
 
 -- --------------------------------------------------------
@@ -1470,6 +1470,7 @@ CREATE TABLE IF NOT EXISTS `surveys` (
   `course_id` int(11) NOT NULL DEFAULT '0',
   `user_id` int(11) NOT NULL DEFAULT '1',
   `name` varchar(255) NOT NULL,
+  `availability` varchar(10) NOT NULL DEFAULT 'public',
   `due_date` datetime DEFAULT NULL,
   `release_date_begin` datetime DEFAULT NULL,
   `release_date_end` datetime DEFAULT NULL,

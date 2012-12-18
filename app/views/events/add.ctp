@@ -11,6 +11,8 @@ echo $this->Form->input('SimpleEvaluation',
     array('div' => array('id' => 'SimpleEvalDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevS', 'target' => '_blank'))));
 echo $this->Form->input('Rubric',
     array('div' => array('id' => 'RubricDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevR', 'target' => '_blank'))));
+echo $this->Form->input('Survey',
+    array('div' => array('id' => 'SurveyDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevV', 'target' => '_blank'))));
 echo $this->Form->input('Mixeval',
     array('div' => array('id' => 'MixevalDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevM', 'target' => '_blank'))));
 echo $this->Form->input(
@@ -34,18 +36,21 @@ echo $this->Form->input(
 echo $this->Form->input('due_date', array('type' => 'text'));
 echo $this->Form->input('release_date_begin', array('label' => 'Evaluation Released From', 'type' => 'text'));
 echo $this->Form->input('release_date_end', array('label' => 'Until', 'type' => 'text'));
-echo $this->Form->input('result_release_date_begin', array('label' => 'Results Released From', 'type' => 'text', 'label' => 'Result Release Date'));
-echo $this->Form->input('result_release_date_end', array('label' => 'Until', 'type' => 'text'));
-echo $this->Form->input('Group', array('label' => 'Group(s)'));
+echo $this->Form->input('result_release_date_begin', 
+    array('label' => 'Results Released From', 'type' => 'text'));
+echo $this->Form->input('result_release_date_end', 
+    array('label' => 'Until', 'type' => 'text'));
+echo $this->Form->input('Group', 
+    array('div' => array('id' => 'GroupsDiv'), 'label' => 'Group(s)'));
 
 // No nice way of inserting new penalty entries using CakePHP, doing it
 // manually.
+echo "<div id='penaltyInputs'>";
 echo $this->Form->label(
     'latep',
     'Late Penalties',
     array('class' => 'penaltyLabel')
 );
-echo "<div id='penaltyInputs'>";
 // Keep track of the number of penalties entered. This is mostly for smart
 // 'resume' where the user encounters an error during form submit and we need
 // to preserve the data already entered. Initially, there should only be one
@@ -84,9 +89,9 @@ for ($i = -1; $i < $numPenalties; $i++) {
     }
 
 }
-echo "</div>";
 echo '<a class="addPenaltyButton"
     href="#" onclick="addPenaltyInputs(); return false;">Add Penalty</a>';
+echo "</div>";
 
 echo $this->Form->submit();
 echo $this->Form->end();
@@ -103,6 +108,7 @@ jQuery("#EventEventTemplateTypeId").change(toggleEventTemplate);
 // attach event handlers to deal with changes in event template selection
 jQuery("#EventSimpleEvaluation").change(updatePreview);
 jQuery("#EventRubric").change(updatePreview);
+jQuery("#EventSurvey").change(updatePreview);
 jQuery("#EventMixeval").change(updatePreview);
 // for redirecting to the add event view for the selected course
 changeCourseId();
@@ -147,19 +153,41 @@ function toggleEventTemplate() {
     if (eventType == '1') {
         jQuery("#SimpleEvalDiv").show();
         jQuery("#RubricDiv").hide();
+        jQuery("#SurveyDiv").hide();
         jQuery("#MixevalDiv").hide();
+        jQuery("div.radio").show();
+        jQuery("#penaltyInputs").show();
+        jQuery("#GroupsDiv").show();
         updatePreview();
     }
     else if (eventType == '2') {
         jQuery("#SimpleEvalDiv").hide();
         jQuery("#RubricDiv").show();
+        jQuery("#SurveyDiv").hide();
         jQuery("#MixevalDiv").hide();
+        jQuery("div.radio").show();
+        jQuery("#penaltyInputs").show();
+        jQuery("#GroupsDiv").show();
+        updatePreview();
+    }
+    else if (eventType == '3') {
+        jQuery("#SimpleEvalDiv").hide();
+        jQuery("#RubricDiv").hide();
+        jQuery("#SurveyDiv").show();
+        jQuery("#MixevalDiv").hide();
+        jQuery("div.radio").hide(); // no self eval and comments in surveys
+        jQuery("#penaltyInputs").hide(); // no penalty in surveys
+        jQuery("#GroupsDiv").hide(); // no groups in surveys
         updatePreview();
     }
     else if (eventType == '4') {
         jQuery("#SimpleEvalDiv").hide();
         jQuery("#RubricDiv").hide();
+        jQuery("#SurveyDiv").hide();
         jQuery("#MixevalDiv").show();
+        jQuery("div.radio").show();
+        jQuery("#penaltyInputs").show();
+        jQuery("#GroupsDiv").show();
         updatePreview();
     }
 }
@@ -186,6 +214,12 @@ function updatePreview() {
         var eventIdToPrev = jQuery("#EventRubric").val();
         url = "<?php echo $this->base; ?>/rubrics/view/";
         prevR.href = url + eventIdToPrev;
+    }
+    else if (eventType == '3') {
+        var eventIdToPrev = jQuery("#EventSurvey").val();
+        console.log("Id: " + eventIdToPrev);
+        url = "<?php echo $this->base; ?>/surveys/view/";
+        prevV.href = url + eventIdToPrev;
     }
     else if (eventType == '4') {
         var eventIdToPrev = jQuery("#EventMixeval").val();
