@@ -168,6 +168,10 @@ class CreateAclShell extends Shell
         $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'coursemanager'));
         $coursemanager = $this->Acl->Aco->save();
 
+        // functions/viewusername
+        // some users can't explicitly see username
+        $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'viewusername'));
+        $this->Acl->Aco->save();
     }
 
 
@@ -468,21 +472,7 @@ class CreateAclShell extends Shell
         $role->id = 1;  // superadmin
         $this->Acl->allow($role, 'controllers');
         $this->Acl->allow($role, 'functions');
-        $this->Acl->allow($role, 'controllers/Evaltools');
-        $this->Acl->allow($role, 'controllers/Simpleevaluations');
-        $this->Acl->allow($role, 'controllers/Rubrics');
-        $this->Acl->allow($role, 'controllers/Mixevals');
-        $this->Acl->allow($role, 'controllers/Surveys');
-        $this->Acl->allow($role, 'controllers/Surveygroups');
-        $this->Acl->allow($role, 'controllers/Emailer');
-        $this->Acl->allow($role, 'controllers/Emailtemplates');
-        $this->Acl->allow($role, 'controllers/Events');
-        $this->Acl->allow($role, 'controllers/Faculties');
-        $this->Acl->allow($role, 'controllers/Departments');
-        $this->Acl->allow($role, 'controllers/Groups');
         $this->Acl->allow($role, 'adminpage');
-        $this->Acl->allow($role, 'functions/viewemailaddresses');
-        $this->Acl->allow($role, 'functions/superadmin');
 
         $role->id = 2;  // admin
         $this->Acl->deny($role, 'controllers');
@@ -519,6 +509,7 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'functions/user/superadmin');
         $this->Acl->allow($role, 'adminpage');
         $this->Acl->allow($role, 'functions/viewemailaddresses');
+        $this->Acl->allow($role, 'functions/viewusername');
         $this->Acl->allow($role, 'functions/coursemanager');
         $this->Acl->deny($role, 'functions/superadmin');
 

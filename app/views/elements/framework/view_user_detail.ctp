@@ -1,7 +1,7 @@
 <table class="standardtable">
     <tr>
         <th><?php __('Username')?></th>
-        <td><?php echo $user['User']['username']; ?></td>
+        <td><?php echo User::hasPermission('functions/viewusername') ? $user['User']['username'] : 'N/A'; ?></td>
         <th> <?php __('Role')?></th>
         <td>
         <?php

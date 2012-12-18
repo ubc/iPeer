@@ -8,6 +8,9 @@ if (!empty($classList)) {
         if ($val == 'email' && !User::hasPermission('functions/viewemailaddresses')) {
             continue;
         }
+        if ($val == 'username' && !User::hasPermission('functions/viewusername')) {
+            continue;
+        }
         echo "<th>".Inflector::humanize($val)."</th>";
     }
 }
@@ -21,6 +24,9 @@ foreach ($classList as $person) {
     echo "<tr>";
     foreach ($columns as $val) {
         if ($val == 'email' && !User::hasPermission('functions/viewemailaddresses')) {
+            continue;
+        }
+        if ($val == 'username' && !User::hasPermission('functions/viewusername')) {
             continue;
         }
         echo "<td>".$person[$val]."</td>";
