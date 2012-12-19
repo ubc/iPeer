@@ -59,7 +59,7 @@ class Upgrade300 extends UpgradeBase
         $dbv = $sysparameter->getDatabaseVersion();
         $ret = $this->patchDb($dbv, $this->dbVersion);
         if ($ret) {
-            $this->errors[] = sprintf(__('Database patching failed: ', true), $ret);
+            $this->errors[] = sprintf(__('Database patching failed: %s', true), $ret);
             return false;
         }
         $sysparameter->reload();

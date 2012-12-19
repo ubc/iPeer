@@ -11,7 +11,7 @@
 class UpgradeController extends Controller
 {
     public $name       = "Upgrade";
-    public $uses       = array();
+    public $uses       = array('SysParameter');
     public $components = array('Session', 'Upgrader');
     public $layout = 'installer';
 
@@ -56,6 +56,8 @@ class UpgradeController extends Controller
     function index()
     {
         $this->set('is_upgradable', $this->Upgrader->isUpgradable());
+        $this->set('currentVersion', $this->SysParameter->get('system.version', '2.x'));
+        $this->set('currentDbVersion', $this->SysParameter->get('database.version', '4'));
     }
 
     /**
