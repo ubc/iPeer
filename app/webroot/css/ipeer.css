@@ -1000,8 +1000,18 @@ i {
     color: #111;
 }
 
+.evaltool-section-header h2{
+    float: left;
+}
+
 .evaltoolsadd {
-    margin-bottom: 0.5em;
+    float: right;
+    padding: 1.7em 0 0 0;
+}
+
+.evaltoolsadd a {
+    margin-right: 1em;
+    font-size: 0.9em;
 }
 
 /* TO BE REFACTORED LATER */

@@ -113,8 +113,10 @@ echo $this->element('evaltools/tools_menu', array());
 ?>
 
 <!-- Simple Eval Table -->
-<h2><?php __('Simple Evaluations')?></h2>
-<div class='evaltoolsadd'><?php echo $html->link(__('Add Simple Evaluation', true), '/simpleevaluations/add', array('class' => 'add-button')); ?></div>
+<div class="evaltool-section-header">
+    <h2><?php __('My Simple Evaluations')?></h2>
+    <div class='evaltoolsadd'><?php echo $html->link(__('Add Simple Evaluation', true), '/simpleevaluations/add', array('class' => 'add-button')); ?><?php echo $html->link(__('All Simple Evaluations', true), '/simpleevaluations'); ?></div>
+</div>
 <table class='standardtable'>
 <?php
 echo $html->tableHeaders($simpleevalheaders);
@@ -123,8 +125,10 @@ echo $html->tableCells($simpleevalcells);
 </table>
 
 <!-- Rubrics -->
-<h2><?php __('Rubrics')?></h2>
-<div class='evaltoolsadd'><?php echo $html->link(__('Add Rubric', true), '/rubrics/add', array('class' => 'add-button')); ?></div>
+<div class="evaltool-section-header">
+    <h2><?php __('My Rubrics Evaluations')?></h2>
+    <div class='evaltoolsadd'><?php echo $html->link(__('Add Rubric', true), '/rubrics/add', array('class' => 'add-button')); ?><?php echo $html->link(__('All Rubric Evaluations', true), '/rubrics')?></div>
+</div>
 <table class='standardtable'>
 <?php
 echo $html->tableHeaders($rubricsheaders);
@@ -133,8 +137,10 @@ echo $html->tableCells($rubricscells);
 </table>
 
 <!-- Mixed Evals -->
-<h2><?php __('Mixed Evaluations')?></h2>
-<div class='evaltoolsadd'><?php echo $html->link(__('Add Mixed Evaluation', true), '/mixevals/add', array('class' => 'add-button')); ?></div>
+<div class="evaltool-section-header">
+    <h2><?php __('My Mixed Evaluations')?></h2>
+    <div class='evaltoolsadd'><?php echo $html->link(__('Add Mixed Evaluation', true), '/mixevals/add', array('class' => 'add-button')); ?><?php echo $html->link(__('All Mixed Evaluations', true), '/mixevals')?></div>
+</div>
 <table class='standardtable'>
 <?php
 echo $html->tableHeaders($mixevalheaders);
@@ -143,8 +149,10 @@ echo $html->tableCells($mixevalcells);
 </table>
 
 <!-- Surveys -->
-<h2><?php __('Surveys (Team Maker)')?></h2>
-<div class='evaltoolsadd'><?php echo $html->link(__('Add Survey', true), '/surveys/add', array('class' => 'add-button')); ?></div>
+<div class="evaltool-section-header">
+    <h2><?php __('My Surveys')?></h2>
+    <div class='evaltoolsadd'><?php echo $html->link(__('Add Survey', true), '/surveys/add', array('class' => 'add-button')); ?><?php echo $html->link(__('All Surveys', true), '/surveys')?></div>
+</div>
 <table class='standardtable'>
 <?php
 echo $html->tableHeaders($surveyheaders);
@@ -153,8 +161,10 @@ echo $html->tableCells($surveycells);
 </table>
 
 <!-- Email Templates -->
-<h2><?php __('Email Templates')?></h2>
-<div class='evaltoolsadd'><?php echo $html->link(__('Add Email Template', true), '/emailtemplates/add', array('class' => 'add-button')); ?></div>
+<div class="evaltool-section-header">
+    <h2><?php __('My Email Templates')?></h2>
+    <div class='evaltoolsadd'><?php echo $html->link(__('Add Email Template', true), '/emailtemplates/add', array('class' => 'add-button')); ?><?php echo $html->link(__('All Email Templates', true), '/emailtemplates')?></div>
+</div>
 <table class='standardtable'>
 <?php
 echo $html->tableHeaders($templateheaders);
