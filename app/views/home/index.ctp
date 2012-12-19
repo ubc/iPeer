@@ -31,8 +31,7 @@ if (isset($course_list['A']))
       $eventReview = '';
       if ($event['to_review_count'] > 0)
       {
-        $eventReview = $event['to_review_count'] .
-           ' unreviewed group evaluations.';
+          $eventReview = '<br />('.sprintf(__('%d unreviewed group evaluations', true), $event['to_review_count']).')';
       }
       $eventRatio = $event['completed_count'] .' of '.
         $event['student_count'] . ' Students';

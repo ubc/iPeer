@@ -350,7 +350,7 @@ class ExportBaseNewComponent extends Object
                 array_push($row, $evaluatee['User']['student_no']);
             }
             if (!empty($params['include_student_name'])) {
-                array_push($row, $evaluator['full_name']);
+                array_push($row, $evaluator['first_name'].' '.$evaluator['last_name']);
             }
             if (!empty($params['include_student_id'])) {
                 array_push($row, $evaluator['student_no']);
