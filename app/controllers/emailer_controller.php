@@ -16,12 +16,6 @@ class EmailerController extends AppController
         'UserTutor');
     public $components = array('AjaxList', 'Session', 'RequestHandler', 'Email');
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Js' => array('Prototype'));
-    public $show;
-    public $sortBy;
-    public $direction;
-    public $page;
-    public $order;
-    public $Sanitize;
 
     /**
      * __construct
@@ -31,30 +25,8 @@ class EmailerController extends AppController
      */
     function __construct()
     {
-        $this->Sanitize = new Sanitize;
-        $this->show = empty($_GET['show'])? 'null':$this->Sanitize->paranoid($_GET['show']);
-        if ($this->show == 'all') {
-            $this->show = 99999999;
-        }
-        $this->sortBy = empty($_GET['sort'])? 'EmailSchedule.date': $_GET['sort'];
-        $this->direction = empty($_GET['direction'])? 'desc': $this->Sanitize->paranoid($_GET['direction']);
-        $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
-        $this->order = $this->sortBy . ' ' . strtoupper($this->direction);
         $this->pageTitle = 'Email';
-        $this->mergeStart = '{{{';
-        $this->mergeEnd = '}}}';
         parent::__construct();
-    }
-
-    /**
-     * Need this to allow the send page to be accessed by unloggedin users.
-     * The send page needs this free access in order to accomdate cron jobs
-     * which enable the scheduled email delivery feature.
-     * */
-    function beforeFilter() {
-        parent::beforeFilter();
-        // Need to be able to cron job send, so should allow unauthed access
-        $this->Auth->allow('send');
     }
 
     /**
@@ -547,81 +519,5 @@ class EmailerController extends AppController
                 $i++;
             }
         }
-    }
-
-    /**
-     * Do merge
-     *
-     * @param string $string  string with merge fields
-     * @param int    $start   start of merge field
-     * @param int    $end     end of merge field
-     * @param int    $user_id user id
-     *
-     * @return merged string
-     */
-    function doMerge($string, $start, $end, $user_id = null)
-    {
-        //Return array $matches that contains all tags
-        preg_match_all('/'.$start.'(.*?)'.$end.'/', $string, $matches, PREG_OFFSET_CAPTURE);
-        $patterns = array();
-        $replacements = array();
-        $patterns = $matches[0];
-        foreach ($matches[0] as $key => $match) {
-            $patterns[$key] = '/'.$match[0].'/';
-
-            $table = $this->EmailMerge->getFieldAndTableNameByValue($match[0]);
-            $table_name = $table['table_name'];
-            $field_name = $table['field_name'];
-            $this->$table_name->recursive = -1;
-            $value = $this->$table_name->find('first', array(
-                'conditions' => array($table_name.'.id' => $user_id),
-                'fields' => $field_name
-            ));
-
-            $replacements[$key] = $value[$table_name][$field_name];
-        }
-        return preg_replace($patterns, $replacements, $string);
-    }
-
-    /**
-     * Goes through scheduled emails that have not yet been sent,
-     * send them if they're due and mark them them as sent.
-     */
-    public function send() {
-        $this->layout = 'ajax';
-        $emails = $this->EmailSchedule->getEmailsToSend();
-
-        foreach ($emails as $e) {
-            $e = $e['EmailSchedule'];
-
-            $from_id = $e['from'];
-            $from = $this->getEmailAddress($from_id);
-            // TODO what to do if no from address?
-
-            $to_ids = explode(';', $e['to']);
-            foreach ($to_ids as $to_id) {
-                $to = $this->getEmailAddress($to_id);
-                $subject = $e['subject'];
-                $content = $this->doMerge($e['content'], $this->mergeStart, $this->mergeEnd, $to_id);
-                if ($this->_sendEmail($content, $subject, $from, $to)) {
-                    $tmp = array('id' => $e['id'], 'sent' => '1');
-                    $this->EmailSchedule->save($tmp);
-                } else {
-                    echo __("Failed", true);
-                }
-
-            }
-        }
-    }
-
-    /**
-     * Given a user id, get the email address associated with that id, if any.
-     *
-     * @param int $id - the user id
-     *
-     * @return The user's email address, if it exists, empty string if not
-     */
-    private function getEmailAddress($id) {
-        return $this->User->field('email', array('User.id' => $id));
     }
 }

@@ -790,6 +790,15 @@ class User extends AppModel
         return $this->UserTutor->delete($id);
     }
 
+    public function getEmails($id)
+    {
+        return $this->find('list', array(
+            'fields' => array('email'),
+            'conditions' => array('id' => $id),
+            'contain' => false,
+        ));
+    }
+
     /*********************************
      * Static functions
      * *******************************/

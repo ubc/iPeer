@@ -1,64 +1,52 @@
-<table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
+<table class="standardtable">
   <tr>
-    <td>
-        <table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
-          <tr class="tableheader">
-            <td colspan="3" align="center"><?php __('View Email')?></td>
-          </tr>
-          <tr class="tablecell2">
-            <td width="15%">To:&nbsp;</td>
-            <td><?php
-              $last_item = end($data['User']);
-              foreach($data['User'] as $user){
-                $user = $user['User'];
-                echo $html->link($user['full_name'], '/users/view/'.$user['id']);
-                if($user != $last_item['User'])
-                  echo ', ';
-              }
-            ?>
-            </td>
-            <td>&nbsp;</td>
-          </tr>
-          <tr class="tablecell2">
-            <td width="15%"><?php __('Subject')?>:&nbsp;</td>
-            <td><?php echo $data['EmailSchedule']['subject'];?>
-            </td>
-            <td>&nbsp;</td>
-          </tr>
-          <tr class="tablecell2">
-            <td width="15%"><?php __('Scheduled on')?>:&nbsp;</td>
-            <td><?php echo $data['EmailSchedule']['date'];?>
-            </td>
-            <td>&nbsp;</td>
-          </tr>
-          <tr class="tablecell2">
-            <td width="15%"><?php __('Sent?')?>:&nbsp;</td>
-            <td><?php echo $data['EmailSchedule']['sent'] == 1 ?
-                     $html->image('icons/green_check.gif',array('border'=>'0','alt'=>'green_check')) :
-                     $html->image('icons/red_x.gif',array('border'=>'0','alt'=>'red_x'));?>
-            </td>
-            <td>&nbsp;</td>
-          </tr>
-          <tr class="tablecell2">
-            <td width="15%"><?php __('Content')?>:&nbsp;</td>
-            <td><?php echo $form->textarea('Email.content', array(
-                  'id' => 'email_content',
-                  'value' => $data['EmailSchedule']['content'],
-                  'cols' => '60',
-                  'rows' => '15',
-                  'escape' => false,
-                  'readonly' => true
-                ));?>
-            </td>
-            <td>&nbsp;</td>
-          </tr>
-          <tr class="tablecell2">
-            <td width="15%"><?php __('Created:')?>&nbsp;</td>
-            <td><?php echo $data['EmailSchedule']['created'];?>
-            </td>
-            <td>&nbsp;</td>
-          </tr>
-        </table>
+    <th colspan="2"><?php __('View Email')?></th>
+  </tr>
+  <tr>
+    <td width="15%"><?php __('To')?></td>
+    <td style="text-align: left;"><?php
+      $last_item = end($data['User']);
+      foreach($data['User'] as $user){
+        $user = $user['User'];
+        echo $html->link($user['full_name'], '/users/view/'.$user['id']);
+        if($user != $last_item['User'])
+          echo ', ';
+      }
+    ?>
+    </td>
+  </tr>
+  <tr>
+    <td><?php __('Subject')?></td>
+    <td><?php echo $data['EmailSchedule']['subject'];?>
+    </td>
+  </tr>
+  <tr>
+    <td><?php __('Scheduled on')?></td>
+    <td><?php echo $data['EmailSchedule']['date'];?>
+    </td>
+  </tr>
+  <tr>
+    <td><?php __('Sent')?>?</td>
+    <td><?php echo $data['EmailSchedule']['sent'] == 1 ?
+             $html->image('icons/green_check.gif',array('border'=>'0','alt'=>'green_check')) :
+             $html->image('icons/red_x.gif',array('border'=>'0','alt'=>'red_x'));?>
+    </td>
+  </tr>
+  <tr>
+    <td><?php __('Content')?></td>
+    <td><?php echo $form->textarea('Email.content', array(
+          'id' => 'email_content',
+          'value' => $data['EmailSchedule']['content'],
+          'cols' => '60',
+          'rows' => '15',
+          'escape' => false,
+          'readonly' => true
+        ));?>
+    </td>
+  </tr>
+  <tr>
+    <td><?php __('Created')?></td>
+    <td><?php echo $data['EmailSchedule']['created'];?>
     </td>
   </tr>
 </table>
