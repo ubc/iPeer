@@ -20,7 +20,7 @@ class XmlHandlerComponent extends Object
      * @access public
      * @return void
      */
-    function makeTeamMakerXML($survey, $numGroups, $weight)
+    function makeTeamMakerXML($survey, $numGroups, $weight, $eventId)
     {
         if (phpversion() < 5) {
             $appendChildFunc = 'append_child';
@@ -71,7 +71,7 @@ class XmlHandlerComponent extends Object
                     $response->$setAttributeFunc('type', ($q['type'] == 'C' ? 'CAO':'MC'));
                     $student->$appendChildFunc($response);
 
-                    $responses = $this->SurveyInput->getAllSurveyInputBySurveyIdUserIdQuestionId($survey['Survey']['id'], $user['id'], $q['id']);
+                    $responses = $this->SurveyInput->getBySurveyIdUserIdQuestionId($eventId, $user['id'], $q['id']);
                     //print_r($responses);
                     if (count($responses) != 0) {
                         for ($j=0; $j < count($responses); $j++) {
@@ -119,204 +119,6 @@ class XmlHandlerComponent extends Object
             return $doc->saveXML();
         }
     }
-
-    /**
-     * makeTMXml4
-     *
-     * @param mixed $survey    survey
-     * @param mixed $numGroups number of groups
-     * @param mixed $weight    weight
-     *
-     * @access public
-     * @return void
-     */
-    /*function makeTMXml4($survey, $numGroups, $weight)
-    {
-        $this->SurveyInput = new SurveyInput;
-        $this->Response = new Response;
-        $this->User = new User;
-
-        $doc = domxml_new_doc('1.0');
-        //docroot
-        $team_input = $doc->create_element('team_input');
-        $team_input->set_attribute('num_groups', $numGroups);
-        $doc->append_child($team_input);
-        foreach ($survey['Question'] as $q) {
-            if (in_array($q['type'], array('M', 'C'))) {
-                //questions
-                $question = $doc->create_element('question');
-                $question->set_attribute('id', $q['id']);
-                $question->set_attribute('type', ($q['type'] == 'C' ? 'CAO':'MC'));
-                $question->set_attribute('title', $q['prompt']);
-                $team_input->append_child($question);
-
-                //weight
-                $element_weight = $doc->create_element('weight');
-                $element_weight->set_attribute('value', $q['id']);
-                $question->append_child($element_weight);
-            }
-        }
-        $courseId = $this->Session->read('ipeerSession.courseId');
-        $userData = $this->User->getEnrolledStudents($courseId);
-        //	print_r($userData);
-        foreach ($userData as $user) {
-            //students
-            $student = $doc->create_element('student');
-            $student->set_attribute('username', $user['User']['student_no']);
-            $team_input->append_child($student);
-
-            foreach ($survey['Question'] as $q) {
-                if (in_array($q['type'], array('M', 'C'))) {
-                    //response
-                    $response = $doc->create_element('response');
-                    $response->set_attribute('q_id', $q['id']);
-                    $response->set_attribute('type', ($q['type'] == 'C' ? 'CAO':'MC'));
-                    $student->append_child($response);
-
-                    $responses = $this->SurveyInput->getAllSurveyInputBySurveyIdUserIdQuestionId($survey['Survey']['id'], $user['User']['id'], $q['id']);
-                    //print_r($responses);
-                    if (count($responses) != 0) {
-                        for ($j=0; $j < count($responses); $j++) {
-                            $response_tmp = $responses[$j]['SurveyInput'];
-                            if ($response_tmp['response_text']==null && $response_tmp['response_id']==null) {
-                                //response/answer
-                                $value = $doc->create_element('value');
-                                $value->set_attribute('id', $response_tmp['id']);
-                                $value->set_attribute('answer', 0);
-                                $response->append_child($value);
-                            } elseif ($response_tmp['response_text']=='' || $response_tmp['response_text']==null) {
-                                //response/answer
-                                $value = $doc->create_element('value');
-                                $value->set_attribute('id', $response_tmp['id']);
-                                $value->set_attribute('answer', 1);
-                                $response->append_child($value);
-                            } else {
-                                $mcResponse = explode('_', $response_tmp['response_text']);
-                                if (isset($mcResponse[1])) {
-                                    $mcTmp = $this->Response->find('id='.$mcResponse[1]);
-                                    if ($mcTmp['Response']['response']==$mcResponse[0]) {
-                                        //response/answer
-                                        $value = $doc->create_element('value');
-                                        $value->set_attribute('id', $response_tmp['id']);
-                                        //$value->setAttribute('answer',1);
-                                        $response->append_child($value);
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        if ($type == 'MC') {
-                            $value = $doc->create_element('value');
-                            $value->set_attribute('id', '');
-                            $response->append_child($value);
-                        }
-                    }
-                }
-            }
-        }
-        return $doc->dump_mem(true);
-    }*/
-
-
-    /**
-     * makeTMXml5
-     *
-     * @param mixed $survey    survey
-     * @param mixed $numGroups number of groups
-     * @param mixed $weight    weight
-     *
-     * @access public
-     * @return void
-     */
-    /*function makeTMXml5($survey, $numGroups, $weight)
-    {
-        $this->SurveyInput = new SurveyInput;
-        $this->Response = new Response;
-        $this->User = new User;
-
-        $doc = new DOMDocument('1.0');
-        //docroot
-        $team_input = $doc->createElement('team_input');
-        $team_input->setAttribute('num_groups', $numGroups);
-        $doc->appendChild($team_input);
-        foreach ($survey['Question'] as $q) {
-            if (in_array($q['type'], array('M', 'C'))) {
-                //questions
-                $question = $doc->createElement('question');
-                $question->setAttribute('id', $q['id']);
-                $question->setAttribute('type', ($q['type'] == 'C' ? 'CAO':'MC'));
-                $question->setAttribute('title', $q['prompt']);
-                $team_input->appendChild($question);
-
-                //weight
-                $element_weight = $doc->createElement('weight');
-                $element_weight->setAttribute('value', $weight[$question_id]);
-                $question->appendChild($element_weight);
-            }
-        }
-        $courseId = $this->Session->read('ipeerSession.courseId');
-        $userData = $this->User->getEnrolledStudents($courseId);
-        //	print_r($userData);
-        foreach ($userData as $user) {
-            //students
-            $student = $doc->createElement('student');
-            $student->setAttribute('username', $user['User']['student_no']);
-            $team_input->appendChild($student);
-
-            for ($i=1; $i <= count($questions); $i++) {
-                if (in_array($questions[$i]['Question']['type'], array('M', 'C'))) {
-                    $question_id = $questions[$i]['Question']['id'];
-                    //response
-                    $type = $questions[$i]['Question']['type'] == 'C' ? 'CAO':'MC';
-                    $response = $doc->createElement('response');
-                    $response->setAttribute('q_id', $question_id);
-                    $response->setAttribute('type', $type);
-                    $student->appendChild($response);
-
-                    $responses = $this->SurveyInput->getAllSurveyInputBySurveyIdUserIdQuestionId($survey_id, $user['User']['id'], $question_id);
-                    //print_r($responses);
-                    if (count($responses) != 0) {
-                        for ($j=0; $j < count($responses); $j++) {
-                            $response_tmp = $responses[$j]['SurveyInput'];
-                            if ($response_tmp['response_text']==null && $response_tmp['response_id']==null) {
-                                //response/answer
-                                $value = $doc->createElement('value');
-                                $value->setAttribute('id', $response_tmp['id']);
-                                $value->setAttribute('answer', 0);
-                                $response->appendChild($value);
-                            } elseif ($response_tmp['response_text']=='' || $response_tmp['response_text']==null) {
-                                //response/answer
-                                $value = $doc->createElement('value');
-                                $value->setAttribute('id', $response_tmp['id']);
-                                $value->setAttribute('answer', 1);
-                                $response->appendChild($value);
-                            } else {
-                                $mcResponse = explode('_', $response_tmp['response_text']);
-                                if (isset($mcResponse[1])) {
-                                    $mcTmp = $this->Response->find('id='.$mcResponse[1]);
-                                    if ($mcTmp['Response']['response']==$mcResponse[0]) {
-                                        //response/answer
-                                        $value = $doc->createElement('value');
-                                        $value->setAttribute('id', $response_tmp['id']);
-                                        //$value->setAttribute('answer',1);
-                                        $response->appendChild($value);
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        if ($type == 'MC') {
-                            $value = $doc->createElement('value');
-                            $value->setAttribute('id', '');
-                            $response->appendChild($value);
-                        }
-                    }
-                }
-            }
-        }
-        return $doc->saveXML();
-    }*/
-
 
     /**
      * readTMXml

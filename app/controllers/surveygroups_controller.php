@@ -242,12 +242,13 @@ class SurveyGroupsController extends AppController
         $survey = $this->Survey->find('first', array('conditions' => array('Survey.id' => $survey_id),
             'recursive' => 2));
         foreach ($survey['Course']['Event'] as $data) {
-            if ($data['title'] == $survey['Survey']['name']) {
+            if ($data['event_template_type_id'] == 3 &&
+               $data['template_id'] == $survey['Survey']['id']) {
                 $event_id = $data['id'];
             }
         }
         //make xml for TeamMaker
-        $doc = $this->XmlHandler->makeTeamMakerXML($survey, $numGroups, $this->params['form']['weight']);
+        $doc = $this->XmlHandler->makeTeamMakerXML($survey, $numGroups, $this->params['form']['weight'], $event_id);
 
         //saves the 'in' file
         $time = (isset($time) ? $time: (String) time());
@@ -441,7 +442,7 @@ class SurveyGroupsController extends AppController
             foreach ($survey_group['Member'] as $surveyGroupMember) {
                 //if question selected, add responses to data
                 if ($question_id != null) {
-                    $surveyInput = $this->SurveyInput->getAllSurveyInputBySurveyIdUserIdQuestionId($group_set['Survey']['id'], $surveyGroupMember['id'], $question_id);
+                    $surveyInput = $this->SurveyInput->getBySurveyIdUserIdQuestionId($event_id, $surveyGroupMember['id'], $question_id);
 
                     for ($k=0; $k < count($surveyInput); $k++) {
                         $inputData = $surveyInput[$k]['SurveyInput'];
@@ -459,7 +460,7 @@ class SurveyGroupsController extends AppController
                     }
                 } else {
                     //links student to survey result if submitted
-                    $surveyInput = $this->SurveyInput->getAllSurveyInputBySurveyIdUserId($group_set['Survey']['id'], $surveyGroupMember['id']);
+                    $surveyInput = $this->SurveyInput->getBySurveyIdUserId($event_id, $surveyGroupMember['id']);
                     if (!empty($surveyInput)) {
                         $inputs[$surveyGroupMember['id']] = 'yes';
                     }

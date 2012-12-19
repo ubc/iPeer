@@ -951,7 +951,7 @@ CREATE TABLE IF NOT EXISTS `survey_groups` (
 DROP TABLE IF EXISTS `survey_inputs`;
 CREATE TABLE IF NOT EXISTS `survey_inputs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `survey_id` int(11) NOT NULL DEFAULT '0',
+  `event_id` int(11) NOT NULL DEFAULT '0',
   `user_id` int(11) NOT NULL DEFAULT '0',
   `question_id` int(11) NOT NULL DEFAULT '0',
   `sub_id` int(11) DEFAULT NULL,

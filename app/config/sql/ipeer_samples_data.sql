@@ -1404,7 +1404,7 @@ INSERT INTO `survey_groups` VALUES (7, 3, 3);
 DROP TABLE IF EXISTS `survey_inputs`;
 CREATE TABLE IF NOT EXISTS `survey_inputs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `survey_id` int(11) NOT NULL DEFAULT '0',
+  `event_id` int(11) NOT NULL DEFAULT '0',
   `user_id` int(11) NOT NULL DEFAULT '0',
   `question_id` int(11) NOT NULL DEFAULT '0',
   `sub_id` int(11) DEFAULT NULL,
@@ -1418,16 +1418,16 @@ CREATE TABLE IF NOT EXISTS `survey_inputs` (
 -- Dumping data for table `survey_inputs`
 --
 
-INSERT INTO survey_inputs (id, survey_id, user_id, question_id, sub_id, chkbx_id, response_text, response_id) VALUES
-(1, 1, 7, 1, NULL, NULL, '4+', 1),
-(2, 1, 7, 2, NULL, NULL, 'yes', 5),
-(3, 1, 31, 1, NULL, NULL, '3-4', 2),
-(4, 1, 31, 2, NULL, NULL, 'no', 6),
-(5, 2, 17, 3, NULL, NULL, 'B', 8),
-(6, 2, 17, 4, NULL, 0, 'choose me', 11),
-(7, 2, 17, 4, NULL, 1, 'no, me', 12),
-(8, 2, 17, 5, NULL, NULL, 'single line rah rah', 0),
-(9, 2, 17, 6, NULL, NULL, 'long answer what what', 0);
+INSERT INTO survey_inputs (id, event_id, user_id, question_id, sub_id, chkbx_id, response_text, response_id) VALUES
+(1, 4, 7, 1, NULL, NULL, '4+', 1),
+(2, 4, 7, 2, NULL, NULL, 'yes', 5),
+(3, 4, 31, 1, NULL, NULL, '3-4', 2),
+(4, 4, 31, 2, NULL, NULL, 'no', 6),
+(5, 5, 17, 3, NULL, NULL, 'B', 8),
+(6, 5, 17, 4, NULL, 0, 'choose me', 11),
+(7, 5, 17, 4, NULL, 1, 'no, me', 12),
+(8, 5, 17, 5, NULL, NULL, 'single line rah rah', 0),
+(9, 5, 17, 6, NULL, NULL, 'long answer what what', 0);
 
 -- --------------------------------------------------------
 

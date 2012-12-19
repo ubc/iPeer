@@ -36,7 +36,7 @@ class SurveyInputTestCase extends CakeTestCase
 
     function testGetAllSurveyInputBySurveyIdUserId()
     {
-        $result1 = $this->SurveyInput->getAllSurveyInputBySurveyIdUserId(1, 7);
+        $result1 = $this->SurveyInput->getBySurveyIdUserId(1, 7);
         $expect1 = array(
             '0' => array(
                 'SurveyInput' => array(
@@ -64,11 +64,11 @@ class SurveyInputTestCase extends CakeTestCase
         $this->assertEqual($result1, $expect1);
 
         // Test faulty inputs
-        $invalid1 = $this->SurveyInput->getAllSurveyInputBySurveyIdUserId(1, 21312);
+        $invalid1 = $this->SurveyInput->getBySurveyIdUserId(1, 21312);
         $this->assertTrue(empty($invalid1));
-        $invalid2 = $this->SurveyInput->getAllSurveyInputBySurveyIdUserId(23123, 1);
+        $invalid2 = $this->SurveyInput->getBySurveyIdUserId(23123, 1);
         $this->assertTrue(empty($invalid2));
-        $nullInput = $this->SurveyInput->getAllSurveyInputBySurveyIdUserId(null, null);
+        $nullInput = $this->SurveyInput->getBySurveyIdUserId(null, null);
         $this->assertTrue(empty($nullInput));
     }
 
@@ -76,7 +76,7 @@ class SurveyInputTestCase extends CakeTestCase
     {
 
         $result1 = 
-            $this->SurveyInput->getAllSurveyInputBySurveyIdUserIdQuestionId(1, 7, 1);
+            $this->SurveyInput->getBySurveyIdUserIdQuestionId(1, 7, 1);
         $expect1 = array(
             '0' => array(
                 'SurveyInput' => array(
@@ -92,7 +92,7 @@ class SurveyInputTestCase extends CakeTestCase
             );
         $this->assertEqual($result1, $expect1);
 
-        $result2 = $this->SurveyInput->getAllSurveyInputBySurveyIdUserIdQuestionId(1,7,2);
+        $result2 = $this->SurveyInput->getBySurveyIdUserIdQuestionId(1,7,2);
         $expect2 = array(
             '0' => array(
                 'SurveyInput' => array(
@@ -109,36 +109,11 @@ class SurveyInputTestCase extends CakeTestCase
         $this->assertEqual($result2, $expect2);
 
         // Test faulty inputs
-        $invalid1 = $this->SurveyInput->getAllSurveyInputBySurveyIdUserIdQuestionId(1, 21312, 1);
+        $invalid1 = $this->SurveyInput->getBySurveyIdUserIdQuestionId(1, 21312, 1);
         $this->assertTrue(empty($invalid1));
-        $invalid2 = $this->SurveyInput->getAllSurveyInputBySurveyIdUserIdQuestionId(23123, 1, 1);
+        $invalid2 = $this->SurveyInput->getBySurveyIdUserIdQuestionId(23123, 1, 1);
         $this->assertTrue(empty($invalid2));
-        $nullInput = $this->SurveyInput->getAllSurveyInputBySurveyIdUserIdQuestionId(null, null, null);
+        $nullInput = $this->SurveyInput->getBySurveyIdUserIdQuestionId(null, null, null);
         $this->assertTrue(empty($nullInput));
-    }
-
-    function testDelAllSurveyInputBySurveyIdUserIdQuestionId()
-    {
-        // Before delete tuple 1
-        $searchBefore1 = $this->SurveyInput->find('first', array('conditions' => array('survey_id' => 1, 'user_id' => 7, 'question_id' => 1)));
-        $this->assertTrue(!empty($searchBefore1));
-        // After delete
-        $this->SurveyInput->delAllSurveyInputBySurveyIdUserIdQuestionId(1, 7, 1);
-        $searchAfter1 = $this->SurveyInput->find('first', array('conditions' => array('survey_id' => 1, 'user_id' => 7, 'question_id' => 1)));
-        $this->assertTrue(empty($searchAfter1));
-
-        // Before delete tuple 2
-        $searchBefore2 = $this->SurveyInput->find('first', array('conditions' => array('survey_id' => 1, 'user_id' => 31, 'question_id' => 2)));
-        $this->assertTrue(!empty($searchBefore2));
-        // After delete
-        $this->SurveyInput->delAllSurveyInputBySurveyIdUserIdQuestionId(1,31,2);
-        $searchAfter1 = $this->SurveyInput->find('first', array('conditions' => array('survey_id' => 1, 'user_id' => 31, 'question_id' => 2)));
-        $this->assertTrue(empty($searchAfter2));
-    }
-
-    function testFindCountInSurveyGroup()
-    {
-        $count = $this->SurveyInput->findCountInSurveyGroup(1, 2, 5, 7);
-        $this->assertEqual($count, 1);
     }
 }

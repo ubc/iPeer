@@ -1778,83 +1778,6 @@ class EvaluationComponent extends Object
         } else {
             return false;
         }
-    /*
-    // if no submission exists, create one
-    //$surveyInput['SurveyInput']['event_id'] = $params['form']['event_id'];
-    // save evaluation submission
-    //$surveyInput['SurveyInput']['date_submitted'] = date('Y-m-d H:i:s');
-
-    //parse for question id and their response id/text
-    //then save
-    for ($i=1; $i < $params['form']['question_count']+1; $i++) {
-        $questionId = $params['form']['question_id'.$i];
-        if (isset($params['form']['answer_'.$i])) {
-            if (is_array($params['form']['answer_'.$i])) {
-                if (!$this->SurveyInput->delAllSurveyInputBySurveyIdUserIdQuestionId($surveyId, $userId, $questionId)) {
-                    die('delete failed');
-                }
-                //parse answers for 'any choice' type
-                for ($j=0; $j < count($params['form']['answer_'.$i]); $j++) {
-                    $surveyInput['SurveyInput']['user_id'] = $userId;
-                    $surveyInput['SurveyInput']['survey_id'] = $surveyId;
-                    $surveyInput['SurveyInput']['question_id'] = $questionId;
-
-                    $answer = explode("_", $params['form']['answer_'.$i][$j]);
-                    $surveyInput['SurveyInput']['response_id'] = $answer[1];
-                    if (!$this->SurveyInput->save($surveyInput)) {
-                        return false;
-                    }
-                    $this->SurveyInput->id = null;
-                }
-            } else {
-                //get existing 'answer' record
-                $surveyInput = $this->SurveyInput->getSurveyInputBySurveyIdUserIdQuestionId($surveyId, $userId, $questionId);
-
-                //if none exists fill in fields
-                if (empty($surveyInput)) {
-                    $surveyInput['SurveyInput']['user_id'] = $userId;
-                    $surveyInput['SurveyInput']['survey_id'] = $surveyId;
-                }
-                $surveyInput['SurveyInput']['question_id'] = $questionId;
-
-                //check for MC
-                $type = $this->Question->getTypeById($questionId);
-                if ($type == 'M') {
-                    $answer = explode("_", $params['form']['answer_'.$i]);
-                    $surveyInput['SurveyInput']['response_id'] = $answer[1];
-                } else {
-                    $surveyInput['SurveyInput']['response_text'] = $params['form']['answer_'.$i];
-                }
-                if (!$this->SurveyInput->save($surveyInput)) {
-                    return false;
-                }
-                $this->SurveyInput->id = null;
-            }
-        } else {
-            if (!$this->SurveyInput->delAllSurveyInputBySurveyIdUserIdQuestionId($surveyId, $userId, $questionId)) {
-            die('delete failed');
-            } else {
-                if (!$this->SurveyInput->delAllSurveyInputBySurveyIdUserIdQuestionId($surveyId, $userId, $questionId)) {
-                    die('delete failed');
-                }
-                //parse answers for 'any choice' type
-                $surveyInput['SurveyInput']['user_id'] = $userId;
-                $surveyInput['SurveyInput']['survey_id'] = $surveyId;
-                $surveyInput['SurveyInput']['question_id'] = $questionId;
-                if (!$this->SurveyInput->save($surveyInput)) {
-                    return false;
-                }
-                $this->SurveyInput->id = null;
-            }
-        }
-    }
-    if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
-        echo "this->EvaluationSubmission->save() returned false";
-        return false;
-    }
-    $this->EvaluationSubmission->id = null;
-    return true;
-     */
     }
 
 
@@ -1925,7 +1848,7 @@ class EvaluationComponent extends Object
      * @access public
      * @return void
      */
-    function formatSurveyEvaluationResult($event=null, $studentId=null)
+    function formatSurveyEvaluationResult($event, $studentId=null)
     {
         $this->Survey = ClassRegistry::init('Survey');
         $this->SurveyQuestion = ClassRegistry::init('SurveyQuestion');
@@ -1935,7 +1858,7 @@ class EvaluationComponent extends Object
 
         $result = array();
 
-        $survey_id = $this->Survey->getSurveyIdByCourseIdTitle($event['Event']['course_id'], $event['Event']['title']);
+        $survey_id = $event['Event']['template_id'];
         $result['survey_id'] = $survey_id;
 
         // Get all required data from each table for every question
@@ -1955,7 +1878,8 @@ class EvaluationComponent extends Object
                 }
             }
         }
-        $answers = $this->SurveyInput->getAllSurveyInputBySurveyIdUserId($survey_id, $studentId);
+        $answers = $this->SurveyInput->getByEventIdUserId(
+            $event['Event']['id'], $studentId);
 
         $result['answers'] = $answers;
         $result['questions'] = $questions;
@@ -1963,87 +1887,6 @@ class EvaluationComponent extends Object
 
         return $result;
     }
-
-
-    /**
-     * formatSurveyGroupEvaluationResult
-     *
-     * @param bool $surveyId      survey id
-     * @param bool $surveyGroupId survey group id
-     *
-     * @access public
-     * @return void
-     */
-    function formatSurveyGroupEvaluationResult($surveyId=null, $surveyGroupId=null)
-    {
-        $this->Survey = ClassRegistry::init('Survey');
-        $this->SurveyQuestion = ClassRegistry::init('SurveyQuestion');
-        $this->Question = ClassRegistry::init('Question');
-        $this->Response = ClassRegistry::init('Response');
-        $this->SurveyInput = ClassRegistry::init('SurveyInput');
-        $this->User = ClassRegistry::init('User');
-
-        // Get all required data from each table for every question
-        $surveyQuestion = new SurveyQuestion();
-        $tmp = $surveyQuestion->getQuestionsID($surveyId);
-        $tmp = $this->Question->fillQuestion($tmp);
-        $tmp = $this->Response->fillResponse($tmp);
-        $questions = null;
-
-        // Sort the resultant array by question number
-        $count = 1;
-        for ($i=0; $i<=count($tmp); $i++) {
-            for ($j=0; $j<count($tmp); $j++) {
-                if ($i == $tmp[$j]['Question']['number']) {
-                    $questions[$count]['Question'] = $tmp[$j]['Question'];
-                    $count++;
-                }
-            }
-        }
-
-        for ($i=1; $i < count($questions)+1; $i++) {
-            $questionType = $questions[$i]['Question']['type'];
-            $questionTypeAllowed = array('C', 'M');
-            $questionId = $questions[$i]['Question']['id'];
-
-            //count the choice responses
-            if (in_array($questionType, $questionTypeAllowed)) {
-                $totalResponsePerQuestion = 0;
-                for ($j=0; $j < count($questions[$i]['Question']['Responses']); $j++) {
-                    $responseId = $questions[$i]['Question']['Responses']['response_'.$j]['id'];
-                    $answerCount = $this->SurveyInput->findCountInSurveyGroup($surveyId, $questionId, $responseId, $surveyGroupId);
-                    //echo $surveyId.';'.$questionId.' '.$responseId.' '.$surveyGroupId;
-                    //print_r($answerCount); die;
-                    $questions[$i]['Question']['Responses']['response_'.$j]['count'] = $answerCount;
-                    $totalResponsePerQuestion += $answerCount;
-                }
-                $questions[$i]['Question']['total_response'] = $totalResponsePerQuestion;
-            } else {
-                $responses = $this->SurveyInput->findResponseInSurveyGroup($surveyId, $questionId, $surveyGroupId);
-                $questions[$i]['Question']['Responses'] = array();
-                //sort results by last name
-                $tmpUserResponse = array();
-                for ($j=0; $j < count($responses); $j++) {
-                    $responseText = $responses[$j]['SurveyInput']['response_text'];
-                    $userId = $responses[$j]['SurveyInput']['user_id'];
-                    $userName = $this->User->findById($userId);
-                    $userName = $userName['User']['full_name'];
-                    $tmpUserResponse[$userName]['response_text'] = $responseText;
-                }
-                ksort($tmpUserResponse);
-
-                $k=1;
-                foreach ($tmpUserResponse as $username => $response) {
-                    $questions[$i]['Question']['Responses']['response_'.$k]['response_text'] = $response['response_text'];
-                    $questions[$i]['Question']['Responses']['response_'.$k]['user_name'] = $username;
-                    $k++;
-                }
-            }
-        }
-
-        return $questions;
-    }
-
 
     /**
      * formatSurveyEvaluationSummary
