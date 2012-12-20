@@ -14,3 +14,4 @@ build/pdepend/
 cache.properties
 lint.cache
 tags
+.project

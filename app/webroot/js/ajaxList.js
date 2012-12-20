@@ -816,7 +816,7 @@ AjaxList.prototype.renderTableBody = function(tbody) {
 
             // A division is required to use overflow
             var div = new Element("div");
-            div.style.overflow="hidden";
+            //div.style.overflow="hidden";
 
             // Get the actual entry name
             var split = column[ID_COL].split(".", 2);
