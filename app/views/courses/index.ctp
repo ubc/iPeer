@@ -2,10 +2,10 @@
     <div class="button-row">
         <ul>
             <li>
-            <?php 
-            if ($addlink) {
-                echo $html->link( __('Add Course', true), 
-                    '/courses/add', array('class' => 'add-button')); 
+            <?php
+            if (User::hasPermission('controllers/Courses/add')) {
+                echo $html->link( __('Add Course', true),
+                    '/courses/add', array('class' => 'add-button'));
             }
             ?>
             </li>

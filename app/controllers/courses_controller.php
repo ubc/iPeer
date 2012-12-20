@@ -112,17 +112,10 @@ class CoursesController extends AppController
      */
     function index()
     {
-        // only create the addcourse link if user can add courses
-        $addlink = false;
-        if (User::hasPermission('controllers/Courses/add')) {
-            $addlink = true;
-        }
-
         // Set up the basic static ajax list variables
         $this->_setUpAjaxList();
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
-        $this->set('addlink', $addlink);
     }
 
     /**
@@ -268,20 +261,22 @@ class CoursesController extends AppController
     {
         $this->_initFormEnv();
 
+        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission(), array('Instructor'));
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+            $this->redirect('index');
+            return;
+        }
+
         if (!empty($this->data)) {
             $success = $this->Course->save($this->data);
             if ($success) {
                 $this->Session->setFlash(__('The course was updated successfully.', true), 'good');
                 $this->redirect('index');
+                return;
             } else if (!$success) {
                 $this->Session->setFlash(__('Error: Course edits could not be saved.', true));
             }
-        }
-
-        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission(), array('Instructor'));
-        if (!$course) {
-            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
-            $this->redirect('index');
         }
 
         $this->data = $course;

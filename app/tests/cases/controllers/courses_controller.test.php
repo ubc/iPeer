@@ -540,8 +540,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'Department' => array(3)
             ),
         );
-        $this->controller->expectAt(0, 'redirect', array('/home'));
-        $this->controller->expectAt(1, 'redirect', array('index'));
+        $this->controller->expectAt(0, 'redirect', array('index'));
         $result = $this->testAction(
             '/courses/edit/1',
             array('fixturize' => true, 'data' => $data, 'method' => 'post')

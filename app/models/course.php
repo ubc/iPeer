@@ -120,8 +120,11 @@ class Course extends AppModel
      * For some reason, HABTM fields can't be validated with $validate.
      * So this is a workaround, make sure courses have at least 1
      * department selected.
+     *
+     * Disable this for now as it is ok for a course doesn't have department
+     * Only super admin and instructors in the course have access to it
      * */
-    public function beforeValidate() {
+    /*public function beforeValidate() {
         if (array_key_exists('Department', $this->data) &&
             empty($this->data['Department']['Department'])) {
             // make sure this model fails when saving without department
@@ -130,7 +133,7 @@ class Course extends AppModel
             $this->Department->invalidate('Department',
                 'Please select a department.');
         }
-    }
+    }*/
 
     /**
      * __construct
