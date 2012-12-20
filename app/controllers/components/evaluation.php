@@ -1062,7 +1062,10 @@ class EvaluationComponent extends Object
             }
             $result['penalty'] = $scorePenalty['Penalty']['percent_penalty'];
         } else {
-            $groupMembers = $this->GroupsMembers->getEventGroupMembers($event['Group']['id'], $event['Event']['self_eval'], $userId);
+            $groupMembers = $this->User->getMembersByGroupId(
+                $event['Group']['id'],
+                ($event['Event']['self_eval'] ? null : $userId)
+            );
             $groupMembersNoTutors = $this->GroupsMembers->getEventGroupMembersNoTutors($event['Group']['id'], $event['Event']['self_eval'], $userId);
             $rubricResultDetail = $this->getRubricResultDetail($event, $groupMembers);
             $result['groupMembers'] = $groupMembers;
