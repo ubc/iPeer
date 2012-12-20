@@ -1274,9 +1274,15 @@ class EvaluationComponent extends Object
                 $userId = isset($user['User'])? $user['User']['id'] : $user['id'];
                 // no submissions
                 if (!in_array($userId, $submissions)) {
-                    $inCompletedMembers[$pos++]=$user;
+                    $inCompletedMembers[$pos++] = $user;
+                }
+
+                // filter out the people who are not student, they should not get result
+                if ($user['Role'][0]['name'] != 'student') {
                     continue;
                 }
+
+                // get the results for students
                 $mixevalResult = $this->EvaluationMixeval->getResultsByEvaluatee($groupEventId, $userId);
                 $evalResult[$userId] = $mixevalResult;
 
@@ -1285,15 +1291,6 @@ class EvaluationComponent extends Object
                 $memberScoreSummary[$userId]['received_total_score'] = array_sum(Set::extract($mixevalResult, '/EvaluationMixeval/score'));
                 $memberScoreSummary[$userId]['received_ave_score'] = ($memberScoreSummary[$userId]['received_count'] == 0 ?
                     0 : $memberScoreSummary[$userId]['received_total_score'] / $memberScoreSummary[$userId]['received_count']);
-
-                /*foreach ($mixevalResult as $row) {
-                    $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
-                    if ($evalMark!=null) {
-                        $rubriDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera($evalMark['id']);
-                        $evalResult[$userId][$userPOS++]['EvaluationMixeval']['details'] = $rubriDetail;
-                    }
-                }*/
-
             }
         }
 
@@ -1647,16 +1644,8 @@ class EvaluationComponent extends Object
         }
 
         //Get Detail information on Mixeval score
-        if ($displayFormat == 'Detail') {
-            $mixevalQuestion = $this->MixevalsQuestion->getQuestion($mixeval['Mixeval']['id']);
-            /*foreach ($mixevalQuestion as $row) {
-                $row['MixevalsQuestion']['Description'] = $row['Description'];
-                $question = $row['MixevalsQuestion'];
-                $result['mixevalQuestion'][$question['question_num']] = $question;
-            }*/
-            $result['mixevalQuestion'] = $mixevalQuestion;
-            //$result['mixevalQuestion'] = $mixevalQuestion;
-        }
+        $mixevalQuestion = $this->MixevalsQuestion->getQuestion($mixeval['Mixeval']['id']);
+        $result['mixevalQuestion'] = $mixevalQuestion;
         $gradeReleaseStatus = $this->EvaluationMixeval->getTeamReleaseStatus($event['GroupEvent']['id']);
 
         $result['inCompletedMembers'] = $mixevalResultDetail['inCompletedMembers'];

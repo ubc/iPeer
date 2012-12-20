@@ -1,28 +1,15 @@
 <?php
-$result = array();
-
-$aveScoreSum = 0;
-//This section will display the evaluatees' name
-//as display the average scores their peers gave them
-//for various criteria
-foreach ($groupMembersNoTutors as $member) {
-    $score = 0;
-    if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
-        $totalScore = $memberScoreSummary[$member['User']['id']]['received_ave_score'];
-        $penalty = number_format(($penalties[$member['User']['id']] / 100) * $totalScore, 2);
-        $finalTotalScore = $totalScore - $penalty;
-        $penalty > 0 ? $stringAddOn = ' - '."<font color=\"red\">".$penalty."</font> = ".number_format($finalTotalScore, 2) :
-            $stringAddOn = '';
-        $aveScoreSum += $finalTotalScore;
-        $score = number_format($totalScore, 2).$stringAddOn;
+$textQuestions = array();
+foreach ($mixevalQuestion as $question) {
+    if ($question['MixevalsQuestion']['question_type'] != 'S') {
+        $textQuestions[] = $question;
     } else {
-        $score = '-';
+        $numberQuestions[] = $question;
     }
-    $result[$member['User']['first_name']." ".$member['User']['last_name']] = $score;
 }
+$memberList = Set::combine($event, 'Member.{n}.id', 'Member.{n}.full_name');
+$table = $this->Evaluation->getSummaryTable($memberList, $scoreRecords, $numberQuestions, $mixeval, $penalties);
 ?>
-
-<div class="content-container">
 
 <!-- Render Event Info table -->
 <?php echo $this->element('evaluations/view_event_info', array('controller'=>'evaluations', 'event'=>$event));?>
@@ -35,32 +22,9 @@ foreach ($groupMembersNoTutors as $member) {
         <th> <?php __('Total:')?>( /<?php echo number_format($mixeval['Mixeval']['total_marks'], 2)?>)</th>
     </tr>
 
-    <?php foreach($result as $name => $score):?>
-    <tr><td><?php echo $name?></td><td><?php echo $score?></td></tr>
+    <?php foreach ($table as $row):?>
+    <tr><td><?php echo $row[0]?></td><td><?php echo end($row)?></td></tr>
     <?php endforeach; ?>
 
-    <tr class="tablesummary">
-        <td><?php __("Group Average:");?></td>
-        <td><?php echo (empty($inCompletedMembers) ? number_format($aveScoreSum / count($groupMembers), 2) : '-')?></td>
-    </tr>
-    <tr align="center">
-      <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
-              <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
-              <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>" />
-              <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id']?>" />
-              <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>" />
-              <input type="hidden" name="display_format" value="Basic" />
-
-        <td colspan="<?php echo count($groupMembersNoTutors) +1; ?>">
-    <?php if ($event['GroupEvent']['marked'] == "reviewed"): ?>
-        <input class="reviewed" type="submit" name="mark_not_reviewed" value="<?php __('Mark Peer Evaluations as Not Reviewed')?>" />
-    <?php else: ?>
-        <input class="reviewed" type="submit" name="mark_reviewed" value="<?php __('Mark Peer Evaluations as Reviewed')?>" />
-    <?php endif; ?>
-        </td>
-      </form>
-    </tr>
+    <tr><td colspan="2"><?php echo $this->Evaluation->getReviewButton($event, 'Basic')?></td></tr>
 </table>
-</div>
-
-</div>

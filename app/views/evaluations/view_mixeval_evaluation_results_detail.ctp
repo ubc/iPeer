@@ -1,7 +1,5 @@
 <?php
 $color = array("#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
-$groupAve = 0;
-$groupAverage = array_fill(1, $mixeval['Mixeval']['lickert_question_max'], 0);
 $averagePerQuestion = array();
 $numberQuestions = array();
 $textQuestions = array();
@@ -14,13 +12,8 @@ foreach ($mixevalQuestion as $question) {
 }
 $memberList = Set::combine($event, 'Member.{n}.id', 'Member.{n}.full_name');
 
-function array_avg($array) {
-    if (empty($array)) {
-        return 0;
-    }
-
-    return array_sum($array)/count($array);
-}
+$summaryTableData = $this->Evaluation->getSummaryTable($memberList, $scoreRecords, $numberQuestions, $mixeval, $penalties);
+$groupAvg = end(end($summaryTableData));
 
 echo $html->script('ricobase');
 echo $html->script('ricoeffects');
@@ -35,27 +28,15 @@ echo $html->script('ricoaccordion');
 <?php echo $this->element('evaluations/summary_info', array('controller'=>'evaluations', 'event'=>$event));?>
 
 <!-- summary table -->
-<form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
-    <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
-    <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>" />
-    <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id']?>" />
-    <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>" />
-    <input type="hidden" name="display_format" value="Detail" />
 <table class="standardtable">
     <?php echo $html->tableHeaders($this->Evaluation->getSummaryTableHeader($mixeval['Mixeval']['total_marks'], $mixevalQuestion));?>
-    <?php echo $html->tableCells($this->Evaluation->getSummaryTable($memberList, $scoreRecords, $numberQuestions, $mixeval, $penalties));?>
-    <tr align="center"><td colspan="<?php echo (count($numberQuestions) + 2); ?>">
-        <?php
-            if ($event['GroupEvent']['marked'] == "reviewed") {
-                echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_not_reviewed\" value=\" ".__('Mark Peer Evaluations as Not Reviewed', true)."\" />";
-            } else {
-                echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_reviewed\" value=\" ".__('Mark Peer Evaluations as Reviewed', true)."\" />";
-            }
-        ?>
+    <?php echo $html->tableCells($summaryTableData);?>
+    <tr align="center">
+        <td colspan="<?php echo (count($numberQuestions) + 2); ?>">
+            <?php echo $this->Evaluation->getReviewButton($event, 'Detail')?>
         </td>
     </tr>
 </table>
-</form>
 <!-- end of summary table -->
 
 <h3><?php __('Evaluation Results')?></h3>
@@ -73,7 +54,6 @@ echo $html->script('ricoaccordion');
             $percent = number_format($scaled/$mixeval['Mixeval']['total_marks'] * 100);
             $ave_deduction = number_format(array_avg($scores) * $penalties[$evaluteeId]/100, 2);
             $ave_scaled = number_format(array_avg($scores) * (1 - $penalties[$evaluteeId]/100), 2);
-            echo __("Number of Evaluator(s)", true).': '.count($scores)."<br/>";
             echo __("Final Total", true).': '.number_format(array_sum($scores), 2);
             $penalties[$evaluteeId] > 0 ? $penaltyAddOn = ' - '."<font color=\"red\">".$deduction."</font> = ".$scaled :
                 $penaltyAddOn = '';
@@ -89,11 +69,11 @@ echo $html->script('ricoaccordion');
             $penalties[$evaluteeId] > 0 ? $ave_penaltyAddOn = ' - '."<font color=\"red\">".$ave_deduction."</font> = ".$ave_scaled :
                 $ave_penaltyAddOn = '';
             $memberAverageAve = number_format(array_sum($scores), 2);
-            if ($memberAverageAve == $groupAve) {
+            if ($memberAverageAve == $groupAvg) {
                 echo "&nbsp;&nbsp;<< ".__('Same Mark as Group Average', true)." >>";
-            } else if ($memberAverageAve < $groupAve) {
+            } else if ($memberAverageAve < $groupAvg) {
                 echo "&nbsp;&nbsp;<font color='#cc0033'><< ".__('Below Group Average', true)." >></font>";
-            } else if ($memberAverageAve > $groupAve) {
+            } else if ($memberAverageAve > $groupAvg) {
                 echo "&nbsp;&nbsp;<font color='#000099'><< ".__('Above Group Average', true)." >></font>";
             }
             ?> </b><br>

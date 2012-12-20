@@ -1005,12 +1005,6 @@ class EvaluationsController extends AppController
 
             $formattedResult = $this->Evaluation->formatRubricEvaluationResult($event, $displayFormat);
             $this->set('rubric', $formattedResult['rubric']);
-            if (isset($formattedResult['groupMembers'])) {
-                $this->set('groupMembers', $formattedResult['groupMembers']);
-            }
-            if (isset($formattedResult['groupMembersNoTutors'])) {
-                $this->set('groupMembersNoTutors', $formattedResult['groupMembersNoTutors']);
-            }
             if (isset($formattedResult['reviewEvaluations'])) {
                 $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);
             }
@@ -1065,14 +1059,11 @@ class EvaluationsController extends AppController
             if (isset($formattedResult['reviewEvaluations'])) {
                 $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);
             }
-            if (isset($formattedResult['mixevalQuestion'])) {
-                $this->set('mixevalQuestion', $formattedResult['mixevalQuestion']);
-            }
+
+            $this->set('mixevalQuestion', $formattedResult['mixevalQuestion']);
             $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
             $this->set('scoreRecords', $formattedResult['scoreRecords']);
-            $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
             $this->set('evalResult', $formattedResult['evalResult']);
-            $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
 
             // Set Penalty
             $penalties = $this->Mixeval->formatPenaltyArray($formattedResult['groupMembersNoTutors'], $eventId, $groupId);
@@ -1275,6 +1266,7 @@ class EvaluationsController extends AppController
         $groupId =  $this->params['form']['group_id'];
         $groupEventId = $this->params['form']['group_event_id'];
         $reviewStatus = isset($this->params['form']['mark_reviewed'])? "mark_reviewed" : "mark_not_reviewed";
+        $display_format = $this->params['form']['display_format'];
 
         //Get the target event
         $this->Event->id = $eventId;
@@ -1308,7 +1300,7 @@ class EvaluationsController extends AppController
                 $this->GroupEvent->save($groupEvent);
             }
         }
-        $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId);
+        $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.'/'.$display_format);
     }
 
 
