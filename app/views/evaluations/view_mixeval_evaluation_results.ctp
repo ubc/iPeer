@@ -7,8 +7,8 @@ $aveScoreSum = 0;
 //for various criteria
 foreach ($groupMembersNoTutors as $member) {
     $score = 0;
-    if (isset($memberScoreSummary[$member['User']['id']]['received_total_score'])) {
-        $totalScore = $memberScoreSummary[$member['User']['id']]['received_total_score'];
+    if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
+        $totalScore = $memberScoreSummary[$member['User']['id']]['received_ave_score'];
         $penalty = number_format(($penalties[$member['User']['id']] / 100) * $totalScore, 2);
         $finalTotalScore = $totalScore - $penalty;
         $penalty > 0 ? $stringAddOn = ' - '."<font color=\"red\">".$penalty."</font> = ".number_format($finalTotalScore, 2) :
@@ -41,9 +41,8 @@ foreach ($groupMembersNoTutors as $member) {
 
     <tr class="tablesummary">
         <td><?php __("Group Average:");?></td>
-        <td><?php echo ($allMembersCompleted ? number_format($aveScoreSum / count($groupMembers), 2) : '-')?></td>
+        <td><?php echo (empty($inCompletedMembers) ? number_format($aveScoreSum / count($groupMembers), 2) : '-')?></td>
     </tr>
-    <?php if ($allMembersCompleted): ?>
     <tr align="center">
       <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
               <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
@@ -53,7 +52,7 @@ foreach ($groupMembersNoTutors as $member) {
               <input type="hidden" name="display_format" value="Basic" />
 
         <td colspan="<?php echo count($groupMembersNoTutors) +1; ?>">
-    <?php if ($event['group_event_marked'] == "reviewed"): ?>
+    <?php if ($event['GroupEvent']['marked'] == "reviewed"): ?>
         <input class="reviewed" type="submit" name="mark_not_reviewed" value="<?php __('Mark Peer Evaluations as Not Reviewed')?>" />
     <?php else: ?>
         <input class="reviewed" type="submit" name="mark_reviewed" value="<?php __('Mark Peer Evaluations as Reviewed')?>" />
@@ -61,7 +60,6 @@ foreach ($groupMembersNoTutors as $member) {
         </td>
       </form>
     </tr>
-    <?php endif; ?>
 </table>
 </div>
 

@@ -133,7 +133,6 @@ class EvaluationBase extends AppModel
     }
 
     /**
-     * TODO: should be moved to model
      * formatPenaltyArray return the array that student has penalty. key will
      * be the user id and value will be the penalty. The student without
      * penalty will be value 0.
@@ -173,7 +172,7 @@ class EvaluationBase extends AppModel
             'conditions' => array('submitter_id' => $memberIds, 'EvaluationSubmission.event_id' => $eventId),
             'contain' => array(
                 'GroupEvent' => array(
-                    'condition' => array('group_id' => $groupId, 'event_id' => $eventId),
+                    'conditions' => array('GroupEvent.group_id' => $groupId, 'GroupEvent.event_id' => $eventId),
                 ),
             )
         ));

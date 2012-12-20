@@ -389,25 +389,24 @@ class User extends AppModel
     /**
      * Get list of users in the group
      *
-     * @param int $group_id group id
+     * @param int   $groupId    group id
+     * @param mixed $excludeIds the member that are excluded from retrieving
      *
      * @access public
      * @return list of users
      * */
-    public function getUsersByGroupId($group_id) {
-        $ret = array();
-        $users = $this->find('all', array('conditions' => array('Group.id' => $group_id)));
-        foreach ($users as $user) {
-            $tmp = array();
-            $tmp['id'] = $user['User']['id'];
-            $tmp['role_id'] = $user['Role']['0']['id'];
-            $tmp['username'] = $user['User']['username'];
-            $tmp['last_name'] = $user['User']['last_name'];
-            $tmp['first_name'] = $user['User']['first_name'];
-            $ret[] = $tmp;
+    public function getMembersByGroupId($groupId, $excludeIds = null)
+    {
+        $conditions = array('Group.id' => $groupId);
+        if (!empty($excludeIds)) {
+            $conditions[$this->alias.'.id <>'] = $excludeIds;
         }
 
-        return $ret;
+        return $this->find('all', array(
+            'fields' => array($this->alias.'.*'),
+            'conditions' => $conditions,
+            'contain' => array('Group', 'Role'),
+        ));
     }
 
     /**

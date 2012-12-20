@@ -10,7 +10,7 @@
  */
 class EvaluationsController extends AppController
 {
-    public $helpers = array('Html', 'Ajax', 'Javascript', 'Time');
+    public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Evaluation');
     public $Sanitize;
 
     public $uses = array('SurveyQuestion', 'GroupEvent', 'EvaluationRubric', 'EvaluationRubricDetail',
@@ -960,15 +960,17 @@ class EvaluationsController extends AppController
 
             $this->Session->setFlash(__('Error: Invalid id or you do not have permission to access this event.', true));
             $this->redirect('/home/index');
+            return;
         }
 
         if ('3' != $event['Event']['event_template_type_id']) {
             // not survey, we need group
             if (!is_numeric($groupId) ||
-                !($group = $this->Group->getGroupByGroupIdEventId($groupId, $eventId))) {
+                !($group = $this->Group->getGroupWithMemberRoleByGroupIdEventId($groupId, $eventId))) {
 
                     $this->Session->setFlash(__('Error: Invalid group id.', true));
                     $this->redirect('/home/index');
+                    return;
                 }
             $event = array_merge($event, $group);
         }
@@ -1066,7 +1068,6 @@ class EvaluationsController extends AppController
             if (isset($formattedResult['mixevalQuestion'])) {
                 $this->set('mixevalQuestion', $formattedResult['mixevalQuestion']);
             }
-            $this->set('allMembersCompleted', $formattedResult['allMembersCompleted']);
             $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
             $this->set('scoreRecords', $formattedResult['scoreRecords']);
             $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
@@ -1376,6 +1377,13 @@ class EvaluationsController extends AppController
             $this->Session->setFlash('Error: You do not have permission to release comments', true);
             $this->redirect('/home');
         }
+
+        $tok = strtok($param, ';');
+        $eventId = $tok;
+        $groupId =  strtok(';');
+        $evaluateeId =  strtok(';');
+        $groupEventId = strtok(';');
+        $releaseStatus = strtok(';');
 
         $courseId = $this->Event->getCourseByEventId($eventId);
 
@@ -1969,22 +1977,5 @@ class EvaluationsController extends AppController
 
 
 
-    }
-
-
-    /**
-     * pre
-     *
-     * @param mixed $para
-     *
-     * @access public
-     * @return void
-     */
-    public function pre($para)
-    {
-        $this->autoRender=false;
-        $this->autoLayout=false;
-        $para = print_r($para, true);
-        echo "<pre>$para</pre>";
     }
 }

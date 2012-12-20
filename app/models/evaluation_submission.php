@@ -11,7 +11,7 @@
 class EvaluationSubmission extends AppModel
 {
     public $name = 'EvaluationSubmission';
-    public $actsAs = array('Traceable');
+    public $actsAs = array('Traceable', 'Containable');
 
     public $belongsTo = array(
         'Event' => array(
@@ -37,6 +37,25 @@ class EvaluationSubmission extends AppModel
         return $this->find('all', array(
             'conditions' => array(
                 $this->alias.'.event_id' => $eventId,
+                $this->alias.'.submitted' => '1',
+            ),
+            'contain' => false,
+        ));
+    }
+
+    /**
+     * getEvalSubmissionsByGroupEventId
+     *
+     * @param mixed $groupEventId
+     *
+     * @access public
+     * @return void
+     */
+    function getEvalSubmissionsByGroupEventId($groupEventId)
+    {
+        return $this->find('all', array(
+            'conditions' => array(
+                $this->alias.'.grp_event_id' => $groupEventId,
                 $this->alias.'.submitted' => '1',
             ),
             'contain' => false,

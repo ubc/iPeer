@@ -11,7 +11,7 @@
 class EvaluationMixeval extends AppModel
 {
     public $name = 'EvaluationMixeval';
-    public $actsAs = array('Traceable');
+    public $actsAs = array('Traceable', 'Containable');
 
     public $hasMany = array(
         'EvaluationMixevalDetail' =>
@@ -20,7 +20,7 @@ class EvaluationMixeval extends AppModel
             'conditions' => '',
             'order' => '',
             'dependent' => true,
-            'foreignKey' => 'id'
+            'foreignKey' => 'evaluation_mixeval_id'
         )
     );
 
@@ -81,10 +81,10 @@ class EvaluationMixeval extends AppModel
      */
     function getResultsByEvaluatee($grpEventId=null, $evaluatee=null)
     {
-        //return $this->find('all', 'grp_event_id='.$grpEventId.' AND evaluatee='.$evaluatee, null, 'evaluator ASC');
         return $this->find('all', array(
             'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
-            'order' => 'evaluator ASC'
+            'order' => 'evaluator ASC',
+            'contain' => 'EvaluationMixevalDetail',
         ));
     }
 
@@ -101,10 +101,26 @@ class EvaluationMixeval extends AppModel
      */
     function getResultsByEvaluator($grpEventId=null, $evaluator=null)
     {
-        //return $this->find('all', 'grp_event_id='.$grpEventId.' AND evaluator='.$evaluator, null, 'evaluatee ASC');
         return $this->find('all', array(
             'conditions' => array('grp_event_id' => $grpEventId, 'evaluator' => $evaluator),
             'order' => 'evaluatee ASC'
+        ));
+    }
+
+    /**
+     * getResultsWithDetailByGroupEvent
+     *
+     * @param mixed $groupEventId
+     *
+     * @access public
+     * @return void
+     */
+    function getResultsWithDetailByGroupEvent($groupEventId)
+    {
+        return $this->find('all', array(
+            'conditions' => array('grp_event_id' => $groupEventId),
+            'order' => 'evaluator ASC, evaluatee ASC',
+            'contain' => 'EvaluationMixevalDetail',
         ));
     }
 

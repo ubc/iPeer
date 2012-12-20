@@ -385,6 +385,36 @@ class Group extends AppModel
         return $this->getGroupByGroupIdEventIdMemberId($groupId, $eventId, null);
     }
 
+    function getGroupWithMemberRoleByGroupIdEventId($groupId, $eventId)
+    {
+        $group = $this->getGroupByGroupIdEventIdMemberId($groupId, $eventId, null);
+        $roles = $this->Member->Role->find('all', array(
+            'fields' => array('Role.*', 'User.id'),
+            'conditions' => array('User.id' => Set::extract($group['Member'], '/id')),
+        ));
+
+        foreach($roles as $role) {
+            foreach($group['Member'] as $key => $member) {
+                if ($role['User']['id'] == $member['id']) {
+                    $group['Member'][$key]['Role'] = $role['Role'];
+                }
+            }
+        }
+
+        return $group;
+    }
+
+    /**
+     * getGroupByGroupIdEventIdMemberId get the group by id. If the group is not in the event,
+     * return false
+     *
+     * @param mixed $groupId  group id
+     * @param mixed $eventId  event id
+     * @param mixed $memberId member id
+     *
+     * @access public
+     * @return void
+     */
     function getGroupByGroupIdEventIdMemberId($groupId, $eventId, $memberId)
     {
         $conditions = array(
