@@ -1067,7 +1067,7 @@ class EvaluationComponent extends Object
                 ($event['Event']['self_eval'] ? null : $userId)
             );
             $groupMembersNoTutors = $this->GroupsMembers->getEventGroupMembersNoTutors($event['Group']['id'], $event['Event']['self_eval'], $userId);
-            $rubricResultDetail = $this->getRubricResultDetail($event, $groupMembers);
+            $rubricResultDetail = $this->getRubricResultDetail($event, $groupMembersNoTutors);
             $result['groupMembers'] = $groupMembers;
             $result['groupMembersNoTutors'] = $groupMembersNoTutors;
         }

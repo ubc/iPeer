@@ -1005,6 +1005,17 @@ class EvaluationsController extends AppController
 
             $formattedResult = $this->Evaluation->formatRubricEvaluationResult($event, $displayFormat);
             $this->set('rubric', $formattedResult['rubric']);
+            if (isset($formattedResult['groupMembers'])) {
+                $this->set('groupMembers', $formattedResult['groupMembers']);
+            }
+            if (isset($formattedResult['groupMembersNoTutors'])) {
+                $this->set('groupMembersNoTutors', $formattedResult['groupMembersNoTutors']);
+                $members = array();
+                foreach ($formattedResult['groupMembersNoTutors'] as $user) {
+                    $members[$user['User']['id']] = $user['User']['first_name'].' '.$user['User']['last_name'];
+                }
+                $this->set('summaryMembers', $members);
+            }
             if (isset($formattedResult['reviewEvaluations'])) {
                 $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);
             }

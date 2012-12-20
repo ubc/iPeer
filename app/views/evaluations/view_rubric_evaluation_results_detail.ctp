@@ -9,6 +9,28 @@ echo $html->script('ricoaccordion');
 <?php echo $this->element('evaluations/view_event_info', array('controller'=>'evaluations', 'event'=>$event));?>
 <?php echo $this->element('evaluations/summary_info', array('controller'=>'evaluations', 'event'=>$event));?>
 
+<!-- summary table -->
+<form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
+    <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
+    <input type="hidden" name="group_id" value="<?php echo $event['Group']['id'] ?>" />
+    <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id']?>" />
+    <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>" />
+    <input type="hidden" name="display_format" value="Detail" />
+<table class="standardtable">
+    <?php echo $html->tableHeaders($this->Evaluation->getRubricSummaryTableHeader($rubric['Rubric']['total_marks'],$rubricCriteria));?>
+    <?php echo $html->tableCells($this->Evaluation->getRubricSummaryTable($summaryMembers, $scoreRecords, $memberScoreSummary, $penalties, $rubric['Rubric']['total_marks'])); ?>
+    <tr align="center"><td colspan="<?php echo $rubric['Rubric']['criteria']+2; ?>">
+        <?php
+            if ($event['GroupEvent']['marked'] == "reviewed") {
+                echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_not_reviewed\" value=\" ".__('Mark Peer Evaluations as Not Reviewed', true)."\" />";
+            } else {
+                echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_reviewed\" value=\" ".__('Mark Peer Evaluations as Reviewed', true)."\" />";
+            }
+        ?>
+    </td></tr>
+</table>
+</form>
+
 <h3><?php __('Evaluation Results')?></h3>
 <div id='rubric_result'>
 

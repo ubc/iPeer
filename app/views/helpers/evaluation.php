@@ -70,7 +70,56 @@ class EvaluationHelper extends AppHelper {
         }
         $tr[] = $totalCounter ? $totalScore/$totalCounter : __('N/A', true);
         $table[] = $tr;
-
+        
+        return $table;
+    }
+    
+    function getRubricSummaryTableHeader($total, $criteria) {      
+        $header = array(__('Evaluatee', true));
+        foreach ($criteria as $key => $criterion) {
+            $header[] = sprintf('<font color="%s">%d</font> (/%.1f)',
+                $this->color[$key % sizeof($this->color)], $key+1, $criterion['criteria_num']);
+        }
+        $header[] = __("Total", true) . ' (/' . number_format($total, 2) . ')';
+        
+        return $header;
+    }
+    
+    function getRubricSummaryTable($memberList, $scores, $scoreSummary, $penalties, $total) {
+        $average = array_pop($scores);
+        $totalAve = 0;
+        $numMembers = 0;
+        $table = array();
+        foreach($scores as $userId => $score) {
+            $user = array();
+            $user[] = $memberList[$userId];
+            foreach($score['rubric_criteria_ave'] as $key => $criterion) {
+                $user[] = isset($criterion) ? number_format($criterion,2) : 'N/A';
+            }
+            
+            if (!isset($scoreSummary[$userId]['received_ave_score'])) {
+                $user[] = sprintf('%.2 (%.2f%%)', 0, 0);
+                $totalAve += 0;
+            } else if ($penalties[$userId] > 0) {
+                $penalty = number_format($penalties[$userId]/100 * $scoreSummary[$userId]['received_ave_score'],2);
+                $diff = number_format($scoreSummary[$userId]['received_ave_score'] - $penalty,2);
+                $user[] = sprintf('%.2f - <font color="red">%.2f</font> = %.2f (%.2f%%)',
+                    number_format($scoreSummary[$userId]['received_ave_score'],2), $penalty, $diff, number_format($diff/$total*100,2));
+                $totalAve += $diff;
+            } else {
+                $user[] = sprintf('%.2f (%.2f%%)',$scoreSummary[$userId]['received_ave_score'],$scoreSummary[$userId]['received_ave_score']/$total*100);
+                $totalAve += $scoreSummary[$userId]['received_ave_score'];
+            }
+            $numMembers++;
+            $table[] = $user;
+        }
+        $user = array();
+        $user[] = __('Group Average', true);
+        foreach($average as $ave) {
+            $user[] = number_format($ave, 2);
+        }
+        $user[] = number_format($totalAve/$numMembers,2);
+        $table[] = $user;
         return $table;
     }
 
