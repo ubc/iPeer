@@ -68,7 +68,7 @@ class EvaluationHelper extends AppHelper {
                 $tr[] = __('N/A', true);
             }
         }
-        $tr[] = $totalCounter ? $totalScore/$totalCounter : __('N/A', true);
+        $tr[] = $totalCounter ? number_format($totalScore/$totalCounter,2) : __('N/A', true);
         $table[] = $tr;
         
         return $table;
