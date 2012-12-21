@@ -215,9 +215,14 @@ class CoursesController extends AppController
         $instructors = $this->User->getInstructors('all', array('User.username'));
         $instructorlist = array();
 
-        //Display instructor names as "lastname, firstname" and sorted by lastname
+        // need to display names to user, not ids
+        $this->set('instructorSelected', '');
         foreach ($instructors as $i) {
             $instructorlist[$i['User']['id']] = $i['User']['full_name'];
+            // we want to have ourself selected as default
+            if ($i['User']['id'] == $this->Auth->user('id')) {
+                $this->set('instructorSelected', $i['User']['id']);
+            }
         }
 
         $this->set('instructors', $instructorlist);
