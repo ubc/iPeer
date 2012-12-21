@@ -344,6 +344,15 @@ class V1ControllerTest extends CakeTestCase {
         $expectedCourse = array('id' => $id, 'course' => 'BLAH 789', 'title' => 'Title for Blah Course');
         $this->assertEqual($expectedCourse, $checkCourse);
 
+        // add a course without department (method: post)
+        $newCourse = array(
+            'Course' => array('id' => 0, 'course' => 'BLAH 790', 'title' => 'Title for Blah Course 790'),
+        );
+        $file = $this->_oauthReq($url, json_encode($newCourse), OAUTH_HTTP_METHOD_POST);
+        $checkCourse = json_decode($file, true);
+        $newCourse['Course']['id'] = $checkCourse['id'];
+        $this->assertEqual($newCourse['Course'], $checkCourse);
+
         // update a course with id (method: put) and compare results to expected
         $updateCourse = array('Course' => array('id' => $id, 'course' => 'BLAH 789', 'title' => 'Updated Title for Blah Course'));
         $file = $this->_oauthReq("$url/$id", json_encode($updateCourse), OAUTH_HTTP_METHOD_PUT);
