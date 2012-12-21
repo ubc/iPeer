@@ -13,7 +13,7 @@ class SurveyInput extends AppModel
     public $name = 'SurveyInput';
 
     /**
-     * getBySurveyIdUserId
+     * getByEventIdUserId
      *
      * @param mixed $surveyId survey id
      * @param mixed $userId   user id
@@ -37,7 +37,7 @@ class SurveyInput extends AppModel
 
 
     /**
-     * getBySurveyIdUserIdQuestionId
+     * getByEventIdUserIdQuestionId
      *
      * @param mixed $surveyId   survey id
      * @param mixed $userId     user id
@@ -46,7 +46,7 @@ class SurveyInput extends AppModel
      * @access public
      * @return void
      */
-    function getBySurveyIdUserIdQuestionId($eventId, $userId, $questionId)
+    function getByEventIdUserIdQuestionId($eventId, $userId, $questionId)
     {
         return $this->find(
             'all', 

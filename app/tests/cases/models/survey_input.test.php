@@ -34,14 +34,14 @@ class SurveyInputTestCase extends CakeTestCase
     {
     }
 
-    function testGetAllSurveyInputBySurveyIdUserId()
+    function testGetByEventIdUserId()
     {
-        $result1 = $this->SurveyInput->getBySurveyIdUserId(1, 7);
+        $result1 = $this->SurveyInput->getByEventIdUserId(4, 7);
         $expect1 = array(
             '0' => array(
                 'SurveyInput' => array(
                     'id' => 1,
-                    'survey_id' => 1,
+                    'event_id' => 4,
                     'user_id' => 7,
                     'question_id' => 1,
                     'sub_id' => null,
@@ -52,7 +52,7 @@ class SurveyInputTestCase extends CakeTestCase
             '1' => array(
                 'SurveyInput' => array(
                     'id' => 2,
-                    'survey_id' => 1,
+                    'event_id' => 4,
                     'user_id' => 7,
                     'question_id' => 2,
                     'sub_id' => null,
@@ -64,24 +64,24 @@ class SurveyInputTestCase extends CakeTestCase
         $this->assertEqual($result1, $expect1);
 
         // Test faulty inputs
-        $invalid1 = $this->SurveyInput->getBySurveyIdUserId(1, 21312);
+        $invalid1 = $this->SurveyInput->getByEventIdUserId(4, 21312);
         $this->assertTrue(empty($invalid1));
-        $invalid2 = $this->SurveyInput->getBySurveyIdUserId(23123, 1);
+        $invalid2 = $this->SurveyInput->getByEventIdUserId(23123, 4);
         $this->assertTrue(empty($invalid2));
-        $nullInput = $this->SurveyInput->getBySurveyIdUserId(null, null);
+        $nullInput = $this->SurveyInput->getByEventIdUserId(null, null);
         $this->assertTrue(empty($nullInput));
     }
 
-    function testGetAllSurveyInputBySurveyIdUserIdQuestionId()
+    function testEventIdUserIdQuestionId()
     {
 
         $result1 = 
-            $this->SurveyInput->getBySurveyIdUserIdQuestionId(1, 7, 1);
+            $this->SurveyInput->getByEventIdUserIdQuestionId(4, 7, 1);
         $expect1 = array(
             '0' => array(
                 'SurveyInput' => array(
                     'id' => 1,
-                    'survey_id' => 1,
+                    'event_id' => 4,
                     'user_id' => 7,
                     'question_id' => 1,
                     'sub_id' => null,
@@ -92,12 +92,12 @@ class SurveyInputTestCase extends CakeTestCase
             );
         $this->assertEqual($result1, $expect1);
 
-        $result2 = $this->SurveyInput->getBySurveyIdUserIdQuestionId(1,7,2);
+        $result2 = $this->SurveyInput->getByEventIdUserIdQuestionId(4,7,2);
         $expect2 = array(
             '0' => array(
                 'SurveyInput' => array(
                     'id' => 2,
-                    'survey_id' => 1,
+                    'event_id' => 4,
                     'user_id' => 7,
                     'question_id' => 2,
                     'sub_id' => null,
@@ -109,11 +109,11 @@ class SurveyInputTestCase extends CakeTestCase
         $this->assertEqual($result2, $expect2);
 
         // Test faulty inputs
-        $invalid1 = $this->SurveyInput->getBySurveyIdUserIdQuestionId(1, 21312, 1);
+        $invalid1 = $this->SurveyInput->getByEventIdUserIdQuestionId(1, 21312, 1);
         $this->assertTrue(empty($invalid1));
-        $invalid2 = $this->SurveyInput->getBySurveyIdUserIdQuestionId(23123, 1, 1);
+        $invalid2 = $this->SurveyInput->getByEventIdUserIdQuestionId(23123, 1, 1);
         $this->assertTrue(empty($invalid2));
-        $nullInput = $this->SurveyInput->getBySurveyIdUserIdQuestionId(null, null, null);
+        $nullInput = $this->SurveyInput->getByEventIdUserIdQuestionId(null, null, null);
         $this->assertTrue(empty($nullInput));
     }
 }

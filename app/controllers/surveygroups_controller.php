@@ -380,7 +380,7 @@ class SurveyGroupsController extends AppController
             foreach ($survey_group['Member'] as $surveyGroupMember) {
                 //if question selected, add responses to data
                 if ($question_id != null) {
-                    $surveyInput = $this->SurveyInput->getBySurveyIdUserIdQuestionId($event_id, $surveyGroupMember['id'], $question_id);
+                    $surveyInput = $this->SurveyInput->getByEventIdUserIdQuestionId($event_id, $surveyGroupMember['id'], $question_id);
 
                     for ($k=0; $k < count($surveyInput); $k++) {
                         $inputData = $surveyInput[$k]['SurveyInput'];
@@ -398,7 +398,7 @@ class SurveyGroupsController extends AppController
                     }
                 } else {
                     //links student to survey result if submitted
-                    $surveyInput = $this->SurveyInput->getBySurveyIdUserId($event_id, $surveyGroupMember['id']);
+                    $surveyInput = $this->SurveyInput->getByEventIdUserId($event_id, $surveyGroupMember['id']);
                     if (!empty($surveyInput)) {
                         $inputs[$surveyGroupMember['id']] = 'yes';
                     }

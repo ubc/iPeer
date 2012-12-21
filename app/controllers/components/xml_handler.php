@@ -71,7 +71,7 @@ class XmlHandlerComponent extends Object
                     $response->$setAttributeFunc('type', ($q['type'] == 'C' ? 'CAO':'MC'));
                     $student->$appendChildFunc($response);
 
-                    $responses = $this->SurveyInput->getBySurveyIdUserIdQuestionId($eventId, $user['id'], $q['id']);
+                    $responses = $this->SurveyInput->getByEventIdUserIdQuestionId($eventId, $user['id'], $q['id']);
                     //print_r($responses);
                     if (count($responses) != 0) {
                         for ($j=0; $j < count($responses); $j++) {
