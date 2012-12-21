@@ -22,7 +22,7 @@ foreach ($questions as $question) {
                 $percent = round($count / $totalResponses * 100) : 0;
             $cells[] = $response['response'];
             $cells[] = $count;
-            $cells[] = $percent;
+            $cells[] = $percent == 0 ? "-" : "$percent%";
             $cells[] = $html->image(
                 "evaluations/bar.php?per=" . $percent, array('alt'=>$percent));
             $tmp['cells'][] = $cells;
