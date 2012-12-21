@@ -49,7 +49,7 @@ echo $this->element('courses/submenu', $params);
 
 if (User::hasPermission('controllers/Surveys')) {
   $submenu = 'TeamMaker';
-  $submenuTitle = __('Surveys (Team Maker)', true);
+  $submenuTitle = __('Team Maker', true);
   $params = array('controller'=>'courses', 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$course_id);
   echo $this->element('courses/submenu', $params);
 }
