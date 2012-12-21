@@ -54,7 +54,7 @@ if ($groupMembersNoTutors) {
               <input type="hidden" name="display_format" value="<?php __('Basic')?>" />
 
               <td colspan="<?php echo count($groupMembers) + 1; ?>">
-           <?php  if ($event['group_event_marked'] == "reviewed"): ?>
+           <?php  if ($event['GroupEvent']['marked'] == "reviewed"): ?>
                  <input class="reviewed" type="submit" name="mark_not_reviewed" value="<?php __('Mark Peer Evaluations as Not Reviewed')?>" />
             <?php else: ?>
                   <input class="reviewed" type="submit" name="mark_reviewed" value="<?php __('Mark Peer Evaluations as Reviewed')?>" />
