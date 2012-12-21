@@ -189,6 +189,11 @@ class EvaluationsController extends AppController
             $this->redirect('index');
         }
 
+        // Survey Results are on a different page for now
+        if ($event['Event']['event_template_type_id'] == 3) {
+            $this->redirect("viewSurveySummary/$eventId");
+        }
+
         // Set up the basic static ajax list variables
         $this->setUpAjaxList($eventId);
 
@@ -1038,26 +1043,29 @@ class EvaluationsController extends AppController
                 $this->render('view_rubric_evaluation_results');
             }
             break;
-
         case 3: // View Survey
             $studentId = $groupId;
             $formattedResult = $this->Evaluation->formatSurveyEvaluationResult($event, $studentId);
-            $user = $this->User->find('first', array('conditions' => array('User.id' => $studentId)));
-            $username = $user['User']['username'];
-            $this->set('title_for_layout', $this->Course->getCourseName($courseId).' > '.$event['Event']['title'].' > '.$username. __("'s Results ", true));
+            $user = $this->User->find(
+                'first', 
+                array(
+                    'conditions' => array('User.id' => $studentId), 
+                    'contain' => false
+                )
+            );
 
             $answers = array();
 
             foreach ($formattedResult['answers'] as $answer) {
                 $answers[$answer['SurveyInput']['question_id']][] = $answer;
             }
-
+            
+            $this->set('name', $user['User']['full_name']);
             $this->set('answers', $answers);
             $this->set('questions', $formattedResult['questions']);
 
             $this->render('view_survey_results');
             break;
-
         case 4:  //View Mix Evaluation
             $formattedResult = $this->Evaluation->formatMixevalEvaluationResult($event, $displayFormat);
             $this->set('mixeval', $formattedResult['mixeval']);
@@ -1089,50 +1097,6 @@ class EvaluationsController extends AppController
             break;
         }
     }
-
-
-    /**
-     * viewSurveyGroupEvaluationResults
-     *
-     * @param bool $params
-     *
-     * @access public
-     * @return void
-     */
-    function viewSurveyGroupEvaluationResults($params=null)
-    {
-        $this->autoRender = false;
-
-        $surveyId = strtok($params, ';');
-        $surveyGroupId = strtok(';');
-
-        // check to see if the ids are numeric
-        if (!is_numeric($surveyId) || !is_numeric($surveyGroupId)) {
-            $this->Session->setFlash(__('Error: Invalid Id', true));
-            // may want to redirect to somewhere else
-            $this->redirect('/home/index');
-        }
-
-        $survey = $this->Survey->find('first', array(
-            'conditions' => array(
-                'Survey.id' => $surveyId
-            )
-        ));
-
-        $courseId = $survey['Survey']['course_id'];
-
-        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
-        if (!$course) {
-            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
-            $this->redirect('index');
-        }
-
-        $formattedResult = $this->Evaluation->formatSurveyGroupEvaluationResult($surveyId, $surveyGroupId);
-
-        $this->set('questions', $formattedResult);
-        $this->render('view_survey_summary');
-    }
-
 
     /**
      * studentViewEvaluationResult
@@ -1664,43 +1628,73 @@ class EvaluationsController extends AppController
      */
     function viewSurveySummary($eventId)
     {
+        // Check that $eventId is valid
         $event = $this->Event->find('first', array(
             'conditions' => array(
                 'id' => $eventId
             ),
             'contain' => false,
         ));
-
-        // check that $eventId is valid
         if (null == $event) {
             $this->Session->setFlash(__('Error: Invalid event Id', true));
             $this->redirect('index');
         }
 
+        // Check that $surveyId is valid
         $survey = $this->Survey->find('first', array(
             'conditions' => array(
                 'id' => $event['Event']['template_id']
             ),
             'contain' => false,
         ));
-
-        // check that $surveyId is valid
         if (null == $survey) {
             $this->Session->setFlash(__('Error: Invalid survey Id', true));
             $this->redirect('index');
         }
 
-        $course = $this->Course->getAccessibleCourseById($survey['Survey']['course_id'], User::get('id'), User::getCourseFilterPermission());
+        // Check that course is accessible by user
+        $course = $this->Course->getAccessibleCourseById(
+            $event['Event']['course_id'], User::get('id'), User::getCourseFilterPermission());
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
         }
 
-        $formattedResult = $this->Evaluation->formatSurveyEvaluationSummary($survey['Survey']['id']);
+        // Prepare data to pass to view
+        $formattedResult = $this->Evaluation->formatSurveyEvaluationSummary(
+            $survey['Survey']['id'], $eventId);
 
         $this->set('questions', $formattedResult);
-        $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))
-            ->push(array('survey' => $survey['Survey']))->push(__('Summary', true)));
+        $this->set('breadcrumb', 
+            $this->breadcrumb->push(array('course' => $course['Course']))
+            ->push(array('survey' => $survey['Survey']))
+            ->push(__('Summary', true)));
+
+        // Get enrolment data for the individual responses
+        $course = $this->Course->find(
+            'first',
+            array(
+                'conditions' => array('id' => $course['Course']['id']),
+                'contain' => array('Enrol')
+            )
+        );
+        $submissions = $this->SurveyInput->findAllByEventId($eventId);
+        // add submission status for each enroled user
+        foreach ($course['Enrol'] as $key => $student) {
+            $course['Enrol'][$key]['submitted'] = false;
+            foreach ($submissions as $submission) {
+                if ($student['id'] == $submission['SurveyInput']['user_id']) {
+                    $course['Enrol'][$key]['submitted'] = true;
+                    break;
+                }
+            }
+        }
+
+        // TODO check that survey submissions are still going through
+        // TODO check that all SurveyInput calls don't have survey_id hardcoded
+        // somewhere
+        $this->set('students', $course['Enrol']);
+        $this->set('eventId', $eventId);
     }
 
 

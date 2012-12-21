@@ -1896,7 +1896,7 @@ class EvaluationComponent extends Object
      * @access public
      * @return void
      */
-    function formatSurveyEvaluationSummary($surveyId=null)
+    function formatSurveyEvaluationSummary($surveyId, $eventId)
     {
         $this->Survey = ClassRegistry::init('Survey');
         //$this->SurveyQuestion = new SurveyQuestion;
@@ -1937,7 +1937,7 @@ class EvaluationComponent extends Object
                 $totalResponsePerQuestion = 0;
                 for ($j=0; $j < count($questions[$i]['Question']['Responses']); $j++) {
                     $responseId = $questions[$i]['Question']['Responses']['response_'.$j]['id'];
-                    $answerCount = $this->SurveyInput->find('count', array('conditions' => array('survey_id' => $surveyId,
+                    $answerCount = $this->SurveyInput->find('count', array('conditions' => array('event_id' => $eventId,
                         'question_id' => $questionId,
                         'response_id' => $responseId)));
                     $questions[$i]['Question']['Responses']['response_'.$j]['count'] = $answerCount;
@@ -1947,7 +1947,7 @@ class EvaluationComponent extends Object
             } else {
 
                 $responses = $this->SurveyInput->find('all', array(
-                    'conditions' => array('SurveyInput.survey_id' => $surveyId,
+                    'conditions' => array('SurveyInput.event_id' => $eventId,
                     'SurveyInput.question_id' => $questionId),
                     'fields' => array('response_text', 'user_id')
 

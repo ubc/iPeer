@@ -117,68 +117,6 @@ class SurveyGroupsController extends AppController
         $this->AjaxList->asyncGet();
     }
 
-
-    /**
-     * viewresult
-     *
-     * @param int $courseId
-     * @param int $eventId
-     *
-     * @access public
-     * @return void
-     */
-    function viewresult($courseId, $eventId=null)
-    {
-        $surveys = array(); // holds all the surveys' titles in the course
-
-        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission(), array(
-            'Event' => 'event_template_type_id = 3',
-            'Enrol' => array(
-                'fields' => array('id', 'username', 'full_name', 'student_no', 'email'),
-                'Submission'
-            )
-        ));
-        if (!$course) {
-            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
-            $this->redirect('/courses');
-        }
-
-        $eventIds = Set::extract($course['Event'], '/id');
-        // if an event id is entered
-        if ($eventId != null) {
-            if (!in_array($eventId, $eventIds)) {
-                $eventId = null;
-            }
-        } else {
-            $eventId = array_shift($eventIds);
-        }
-
-        if (null == $eventId) {
-            $this->Session->setFlash(__('Error: Invalid course ID or event ID.', true));
-            $this->redirect('index/'.$courseId);
-        }
-
-        //filtering for the data to be printed in the view
-        foreach ($course['Enrol'] as $key => $student) {
-            $course['Enrol'][$key]['submitted'] = 'Not Submitted';
-            foreach ($student['Submission'] as $submission) {
-                if ($submission['event_id'] == $eventId) {
-                    $course['Enrol'][$key]['submitted'] = $submission['date_submitted'];
-                    break;
-                }
-            }
-        }
-
-        // for populating the drop down menu to switch to different surveys in the course
-        $surveys = Set::combine($course['Event'], '{n}.id', '{n}.title');
-
-        $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('View Survey Result', true)));
-        $this->set('view', $course['Enrol']);
-        $this->set('courseId', $courseId);
-        $this->set('eventId', $eventId);
-        $this->set('surveysList', $surveys);
-    }
-
     /**
      * makegroups
      *

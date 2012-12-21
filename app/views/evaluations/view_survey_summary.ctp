@@ -1,30 +1,143 @@
-<table class="standardtable">
-    <tr><th><?php __('Team Maker Survey Summary')?></th></tr>
-    <tr>
-        <td>
-    <?php if( !empty($questions)):?>
-    <?php foreach ($questions as $question): $question = $question['Question'];?>
-        <div style="text-align: left;">Q<?php echo $question['number']?>: <?php echo $question['prompt']?></div>
-        <div>
-            <table border="0">
-            <?php if($question['type'] == 'M' || $question['type'] == 'C'): ?>
-                <?php if( !empty($question['Responses'])):?>
-                    <?php foreach ($question['Responses'] as $index => $value):?>
-                        <?php $percent = $question['total_response'] != 0 ? round(($value['count']/$question['total_response'])*100): 0;?>
-                        <tr><td width="250"><?php echo $value['response']?></td><td width="30"><?php echo $value['count']?></td><td> <?php echo $percent?>% </td><td><?php echo $html->image("evaluations/bar.php?per=".$percent,array('alt'=>$percent))?></td></tr>
-                    <?php endforeach;?>
-                <?php endif; ?>
-            <?php elseif( $question['type'] == 'S' || $question['type'] == 'L'): ?>
-                <?php if( !empty($question['Responses'])):?>
-                    <?php foreach ($question['Responses'] as $index => $value):?>
-                        <tr valign="top"><td width="250"><?php echo $value['user_name']?></td><td width="15"></td><td><i><?php echo $value['response_text']?></i><td></tr>
-                    <?php endforeach;?>
-                <?php endif; ?>
-            <?php endif; ?>
-            </table>
-        </div>
-    <?php endforeach; ?>
-    <?php endif; ?>
-        </td>
-    </tr>
+<?php
+// Survey Summary data
+$count = 1;
+$colspan = 4; // total number of columns for when we want only 1 cell
+$questionsTable = array();
+foreach ($questions as $question) {
+    $tmp = array();
+    $question = $question['Question'];
+    if (isset($question['total_response'])) {
+        // Processing a multiple choice response
+        // header
+        $totalResponses = $question['total_response'];
+        $tmp['header'][] = "$count. " . $question['prompt'] . ' (' . 
+            $totalResponses . ' '. __('responses', true) . ')';
+
+        // responses
+        foreach ($question['Responses'] as $response) {
+            $cells = array();
+            // processing a multiple choice question's response
+            $count = $response['count'];
+            $percent = $totalResponses > 0 ? 
+                $percent = round($count / $totalResponses * 100) : 0;
+            $cells[] = $response['response'];
+            $cells[] = $count;
+            $cells[] = $percent;
+            $cells[] = $html->image(
+                "evaluations/bar.php?per=" . $percent, array('alt'=>$percent));
+            $tmp['cells'][] = $cells;
+        }
+    }
+    else {
+        // Processing a single or multi-line text response
+        // header
+        $totalResponses = count($question['Responses']);
+        $tmp['header'][] = "$count. " . $question['prompt'] . ' (' . 
+            $totalResponses . ' '. __('responses', true) . ')';
+
+        // responses
+        $responders = "";
+        foreach ($question['Responses'] as $response) {
+            $responders .= $response['user_name']
+                . ', ';
+        }
+        $responders = trim($responders, ", ");
+        $cells = array();
+        $cells[] = __('Responders', true) . ":";
+        $cells[] = array($responders, array('colspan' => $colspan - 1));
+        $tmp['cells'][] = $cells;
+    }
+
+    $count++;
+    $questionsTable[] = $tmp;
+}
+
+// Individual Response data
+$headers = array('id', 'username', 'full_name', 'email', 'student_no', 'submitted');
+$displayHeaders = array();
+// display email only if the user has access to it
+foreach ($headers as $key => $header) {
+    if ($header == 'email' && 
+        !User::hasPermission('functions/viewemailaddresses')
+    ) {
+        unset($headers[$key]);
+        continue;
+    }
+    $displayHeaders[] = Inflector::humanize($header);
+}
+
+$displayCells = array();
+foreach ($students as $student) {
+    $tmp = array();
+    foreach ($headers as $header) {
+        if ($header == 'email' && 
+            !User::hasPermission('functions/viewemailaddresses')
+        ) {
+            continue;
+        }
+        // link to view user information
+        else if ($header == 'username') {
+            $tmp[] = $html->link(
+                $student[$header], 
+                '/users/view/'.$student['id'],
+                array('target' => '_blank')
+            );
+        }
+        // link to view this user's submission if available
+        else if ($header == 'submitted') {
+            $tmp[] = $student[$header] ? 
+                $html->link(__('Result', true), 
+                    "/evaluations/viewEvaluationResults/$eventId/" . 
+                    $student['id'],
+                    array('target' => '_blank')
+                ) :
+                __('Not Submitted', true);
+        }
+        else {
+            $tmp[] = $student[$header];
+        }
+    }
+    $displayCells[] = $tmp;
+}
+?>
+
+<h2>Survey Summary</h2>
+
+<table class='standardtable leftalignedtable'>
+<?php
+foreach ($questionsTable as $question) {
+    echo $html->tableHeaders($question['header'], null,
+        array('colspan' => $colspan));
+    echo $html->tableCells($question['cells']);
+}
+?>
 </table>
+
+<h2>Individual Responses</h2>
+
+<table id="individualResponses">
+    <thead>
+    <?php
+    echo $html->tableHeaders($displayHeaders);
+    ?>
+    </thead>
+    <tbody>
+    <?php
+    echo $html->tableCells($displayCells);
+    ?>
+    </tbody>
+</table>
+
+<script type="text/javascript">
+// enable all the nice sorting, search pagination, etc, hide the user id field
+jQuery(document).ready(function() {
+    var oTable= jQuery('#individualResponses').dataTable( {
+        "sPaginationType" : "full_numbers",
+        "aoColumnDefs" : [
+            {"bSearchable": false, "bVisible": false, "bSortable": false, "aTargets": [0] },
+        ],
+        "aaSorting" :[[1, 'asc']]
+    });
+});
+</script>
+
