@@ -58,6 +58,7 @@
     </tr>
   </table>
     <div class="oauth">
+    <?php if (User::hasPermission('controllers/Oauthclients')): ?>
     <!-- OAuth Client Credentials -->
     <hr align=left width=95%>
     <h3><?php __('OAuth Client Credentials')?>:</h3>
@@ -74,6 +75,8 @@
             <label id=comment><?php echo __('&nbsp;Comment: ').$client['OauthClient']['comment'];?></label>
         <?php } ?>
     <?php } ?>
+    <?php endif; ?>
+    <?php if (User::hasPermission('controllers/Oauthtokens')): ?>
     <!-- OAuth Token Credentials -->
     <hr align=left width=95%>
     <h3><?php __('OAuth Token Credentials')?>:</h3>
@@ -89,6 +92,7 @@
             <label id=comment><?php echo __('&nbsp;Comment: ').$token['OauthToken']['comment'];?></label>
         <?php } ?>
     <?php } ?>
+    <?php endif;?>
     </div>
     <br>
     <?php if ($viewPage==false): echo $this->Form->submit(__('Save', true));
