@@ -16,8 +16,7 @@ class EvaluationHelper extends AppHelper {
         $numberQuestions = Set::extract($questions, '/MixevalsQuestion[question_type=S]');
         $header = array(__('Evaluatee', true));
         foreach ($numberQuestions as $key => $question) {
-            $header[] = sprintf('<font color="%s">%d</font> (/%.1f)',
-                $this->color[$key % sizeof($this->color)], $key+1, $question['MixevalsQuestion']['multiplier']);
+            $header[] = sprintf('%d (/%.1f)', $key+1, $question['MixevalsQuestion']['multiplier']);
         }
         $header[] = __("Total", true) . ' (/' . number_format($totalMark, 2) . ')';
 
@@ -77,8 +76,7 @@ class EvaluationHelper extends AppHelper {
     function getRubricSummaryTableHeader($total, $criteria) {      
         $header = array(__('Evaluatee', true));
         foreach ($criteria as $key => $criterion) {
-            $header[] = sprintf('<font color="%s">%d</font> (/%.1f)',
-                $this->color[$key % sizeof($this->color)], $key+1, $criterion['criteria_num']);
+            $header[] = sprintf('%d (/%.1f)', $key+1, $criterion['multiplier']);
         }
         $header[] = __("Total", true) . ' (/' . number_format($total, 2) . ')';
         
@@ -127,8 +125,7 @@ class EvaluationHelper extends AppHelper {
     {
         $header = array(__('Evaluator', true));
         foreach($questions as $key => $question) {
-            $header[] = sprintf('<font color="%s">%d.</font>%s',
-                $this->color[$key % sizeof($this->color)], $key+1, $question['MixevalsQuestion']['title']);
+            $header[] = sprintf('%d.%s', $key+1, $question['MixevalsQuestion']['title']);
         }
 
         return $header;

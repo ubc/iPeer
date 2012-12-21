@@ -135,7 +135,7 @@ if ($groupMembers) {
             <tr>
                 <th width="100" valign="top"><?php __('Evaluator')?></th>
                 <?php for ($i=1; $i<=$rubric['Rubric']["criteria"]; $i++): ?>
-                    <th><strong><font color="<?php echo $color[ $i % sizeof($color) ]?>">(<?php echo $i?>)</font></strong>
+                    <th><strong>(<?php echo $i?>)</strong>
                         <?php echo $rubricCriteria[$i-1]['criteria'];?>
                     </th>
                 <?php endfor; ?>
