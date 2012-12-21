@@ -10,8 +10,12 @@
  */
 class ExportBaseNewComponent extends Object
 {
-
-    public $components = array('ExportHelper2');
+    public $eventType = array('1' => 'Simple Evaluation', '2' => 'Rubrics Evaluation', '4' => 'Mixed Evaluation');
+    public $components = array('ExportHelper2', 'Penalty');
+    public $responseModelName = null;
+    public $responseModel = null;
+    public $evaluationModelName = null;
+    public $evaluationModel = null;
 
     /**
      * generateHeader2
@@ -23,25 +27,15 @@ class ExportBaseNewComponent extends Object
      * @access public
      * @return void
      */
-    function generateHeader2($params, $eventId, $type)
+    function generateHeader2($params, $event, $type)
     {
-        $this->Course = ClassRegistry::init('Course');
-        $this->Event = ClassRegistry::init('Event');
-        $this->UserCourse = ClassRegistry::init('UserCourse');
-        $this->GroupEvent = ClassRegistry::init('GroupEvent');
-        $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
-        $eventType = array('1' => 'Simple Evaluation', '2' => 'Rubrics Evaluation', '4' => 'Mixed Evaluation');
-
-        $courseId = $this->Event->getCourseByEventId($eventId);
-        $event = $this->Event->getEventById($eventId);
-        $course = $this->Course->getCourseWithInstructorsById($courseId);
 
         $grid = $this->ExportHelper2->buildExporterGrid(8, 8);
         $grid[0][0] = "********************************************";
         $yIndex = 1;
 
         if (!empty($params['include_course'])) {
-            $grid[0][$yIndex] = "Course Name : ,,".$course['Course']['title'];
+            $grid[0][$yIndex] = "Course Name : ,,".$event['Course']['title'];
         }
         if (!empty($params['include_eval_event_names'])) {
             $yIndex++;
@@ -49,12 +43,12 @@ class ExportBaseNewComponent extends Object
         }
         if (!empty($params['include_eval_event_type'])) {
             $yIndex++;
-            $grid[0][$yIndex] = "Evaluation Type : ,,".$eventType[$event['Event']['event_template_type_id']];
+            $grid[0][$yIndex] = "Evaluation Type : ,,".$this->eventType[$event['Event']['event_template_type_id']];
         }
         if (!empty($params['include_instructors'])) {
             $yIndex++;
             $instructors = array();
-            foreach ($course['Instructor'] as $instructor) {
+            foreach ($event['Course']['Instructor'] as $instructor) {
                 array_push($instructors, $instructor['full_name']);
             }
             if (!empty($instructors)) {
@@ -83,49 +77,35 @@ class ExportBaseNewComponent extends Object
     /**
      * generateHeader
      *
-     * @param mixed $params  params
-     * @param mixed $eventId event id
+     * @param mixed $params params
+     * @param mixed $event  event
      *
      * @access public
      * @return void
      */
-    function generateHeader($params, $eventId)
+    function generateHeader($params, $event)
     {
-        $this->Course = ClassRegistry::init('Course');
-        $this->Event = ClassRegistry::init('Event');
-        $this->User = ClassRegistry::init('User');
-        $this->UserCourse = ClassRegistry::init('UserCourse');
-        $this->GroupEvent = ClassRegistry::init('GroupEvent');
-        $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
-        $eventType = array('1' => 'Simple Evaluation', '2' => 'Rubrics Evaluation', '4' => 'Mixed Evaluation');
-
-        $courseId = $this->Event->getCourseByEventId($eventId);
-        $event = $this->Event->getEventById($eventId);
-        $course = $this->Course->getCourseWithInstructorsById($courseId);
-        //$instructors = $this->UserCourse->getInstructors($courseId);
         $header = '';
 
         if (!empty($params['include_course']) || !empty($params['include_eval_event_names'])) {
             $header .= "********************************************\n";
             if (!empty($params['include_course'])) {
-                $header .= "Course Name : ,,".$course['Course']['title']."\n";
+                $header .= "Course Name : ,,".$event['Course']['title']."\n";
             }
             if (!empty($params['include_eval_event_names'])) {
                 $header .= "Event : ,,".$event['Event']['title']."\n";
             }
         }
         if (!empty($params['include_eval_event_type'])) {
-            $header .= "Evaluation Type : ,,".$eventType[$event['Event']['event_template_type_id']]."\n\n";
+            $header .= "Evaluation Type : ,,".$this->eventType[$event['Event']['event_template_type_id']]."\n\n";
         }
         if (!empty($params['include_date'])) {
             $header .= "Date : ,,".date("F j Y g:i a")."\n";
         }
         if (!empty($params['include_instructors'])) {
             $header .= "Instructors :,,";
-            foreach ($course['Instructor'] as $i) {
-                if ($this->User->getRoleId($i['id']) == 3) {
-                    $header .= $i['full_name'].",";
-                }
+            foreach ($event['Course']['Instructor'] as $i) {
+                $header .= $i['full_name'].",";
             }
         }
 
@@ -137,112 +117,75 @@ class ExportBaseNewComponent extends Object
     /**
      * buildSimpleEvaluationScoreTableByEvaluatee
      *
-     * @param mixed $params      params
-     * @param mixed $grpEventId  group event id
-     * @param mixed $evaluateeId evaluatee id
-     * @param mixed $eventId     event id
+     * @param mixed $params    params
+     * @param mixed $group     group with group event and member -> role
+     * @param mixed $evaluatee evaluatee
+     * @param mixed $event     event
      *
      * @access public
      * @return void
      */
-    function buildSimpleEvaluationScoreTableByEvaluatee($params, $grpEventId, $evaluateeId, $eventId)
+    function buildSimpleEvaluationScoreTableByEvaluatee($params, $group, $evaluatee, $event, $responses)
     {
-        $this->GroupEvent = ClassRegistry::init('GroupEvent');
-        $this->Group = ClassRegistry::init('Group');
-        $this->User = ClassRegistry::init('User');
-        $this->EvaluationSimple = ClassRegistry::init('EvaluationSimple');
-        $this->Penalty = ClassRegistry::init('Penalty');
-
-        $grpEvent = $this->GroupEvent->getGrpEvent($grpEventId);
-        $group = $this->Group->getGroupByGroupId($grpEvent['GroupEvent']['group_id']);
-        $event_info = $this->Event->find(
-            'first',
-            array(
-                'conditions' => array('Event.id' => $eventId),
-            )
-        );
-        // storing the timestamp of the due date/end date of the event
-        $event_due = strtotime($event_info['Event']['due_date']);
-        $event_end = strtotime($event_info['Event']['release_date_end']);
-
-        $groupMembers = $this->ExportHelper2->getGroupMemberHelper($grpEventId);
         // Build grid
         $xDimension = 10;
-        $yDimensions = count($groupMembers);
+        $yDimensions = count($group['Member']);
         $grid = $this->ExportHelper2->buildExporterGrid($xDimension, $yDimensions);
         $xPosition = 0;
         $yPosition = 0;
         // Fill in grid Results
-        $evaluatee = $this->User->findById($evaluateeId);
-        $yInc = 0; $index = 0;
-        foreach ($groupMembers as $evaluator) {
+        $yInc = 0;
+        foreach ($group['Member'] as $evaluator) {
             $row = array();
             if (!empty($params['include_group_names'])) {
-                array_push($row, $group[0]['Group']['group_name']);
+                array_push($row, $group['Group']['group_name']);
             }
             if (!empty($params['include_student_email'])) {
-                array_push($row, $evaluatee['User']['email']);
+                array_push($row, $evaluatee['email']);
             }
             if (!empty($params['include_student_name'])) {
-                array_push($row, $evaluatee['User']['full_name']);
+                array_push($row, $evaluatee['full_name']);
             }
             if (!empty($params['include_student_id'])) {
-                array_push($row, $evaluatee['User']['student_no']);
+                array_push($row, $evaluatee['student_no']);
             }
             if (!empty($params['include_student_name'])) {
-                array_push($row, $evaluator['first_name']." ".$evaluator['last_name']);
+                array_push($row, $evaluator['full_name']);
             }
             if (!empty($params['include_student_id'])) {
                 array_push($row, $evaluator['student_no']);
             }
-            $simpleEvalResults = $this->EvaluationSimple->getResultsByEvaluatee($grpEventId, $evaluatee['User']['id'], true);
-            // Save all the submissions; use to find evaluators who haven't submitted yet
-            $submissionStudentNo = array();
-            foreach ($simpleEvalResults as $results) {
-                array_push($submissionStudentNo, $results['User']['student_no']);
-            }
-            // Verify that the evaluator has indeed submitted an evaluator for the current evaluatee; ie the evluator exists in the array
-            if (!in_array($evaluator['student_no'], $submissionStudentNo)) {
+
+            // check if we have a reponse for this evaluator
+            if (!isset($responses[$evaluatee['id']]) || !array_key_exists($evaluator['id'], $responses[$evaluatee['id']])) {
                 $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition+$yInc, $row);
                 $yInc++;
                 continue;
             }
-            array_push($row, $simpleEvalResults[$index]['EvaluationSimple']['score']);
 
-            $penalty = null;
-            $event_sub = $this->Event->find(
-                'first',
-                array(
-                    'conditions' => array('Event.id' => $eventId),
-                    'contain' => array('EvaluationSubmission' => array(
-                        'conditions' => array('EvaluationSubmission.submitter_id' => $evaluateeId)
-                )))
+            $response = $responses[$evaluatee['id']][$evaluator['id']];
+            array_push($row, $response['EvaluationSimple']['score']);
+
+            $penalty = $this->Penalty->calculate(
+                $event['Event']['due_date'],
+                $event['Event']['release_date_end'],
+                $response['EvaluationSubmission']['date_submitted'],
+                $event['Penalty']
             );
-            // no submission - if now is after release date end then - gets final deduction
-            if (empty($event_sub['EvaluationSubmission'])) {
-                if (time() > $event_end) {
-                    $penalty = $this->Penalty->getPenaltyfinal($eventId);
-                }
-            // there is submission - may be on time or late
-            } else {
-                $late_diff = strtotime($event_sub['EvaluationSubmission'][0]['date_submitted']) - $event_due;
-                // late
-                if (0 < $late_diff) {
-                    $days_late = $late_diff/(24*60*60);
-                    $penalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId, $days_late);
-                }
-            }
-            if (!empty($penalty)) {
-                array_push($row, $penalty['Penalty']['percent_penalty']."%");
+
+            if (is_numeric($penalty)) {
+                array_push($row, $penalty."%");
+                $finalGrade = $response['EvaluationSimple']['score'] * (1 - ($penalty/100));
             } else {
                 array_push($row, "-");
+                $finalGrade = $response['EvaluationSimple']['score'];
             }
-            $finalGrade = $simpleEvalResults[$index]['EvaluationSimple']['score'] * (1 - ($penalty['Penalty']['percent_penalty']/100));
+
             array_push($row, $finalGrade);
             $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition + $yInc, $row);
-            $index++;
             $yInc++;
         }
+
         return $this->ExportHelper2->arrayDraw($grid);
     }
 
@@ -257,12 +200,18 @@ class ExportBaseNewComponent extends Object
      * @access public
      * @return void
      */
-    function buildSimpleEvaluationScoreTableByGroup($params, $grpEventId, $eventId)
+    function buildSimpleEvaluationScoreTableByGroup($params, $groupEvent, $event, $results)
     {
-        $groupMembers = $this->ExportHelper2->getGroupMemberWithoutTutorsHelper($grpEventId);
+        $this->Group = ClassRegistry::init('Group');
+        $group = $this->Group->getGroupWithMemberRoleByGroupIdEventId($groupEvent['group_id'], $event['Event']['id']);
         $csv = '';
-        foreach ($groupMembers as $evaluatee) {
-            $resultTable = $this->buildSimpleEvaluationScoreTableByEvaluatee($params, $grpEventId, $evaluatee, $eventId);
+        $responsesByEvaluatee = Set::combine($results, '{n}.EvaluationSimple.evaluator', '{n}', '{n}.EvaluationSimple.evaluatee');
+        foreach ($group['Member'] as $member) {
+            // skip the non student member, for now we assume all the evaluatees are students
+            if ($member['Role']['name'] != 'student') {
+                continue;
+            }
+            $resultTable = $this->buildSimpleEvaluationScoreTableByEvaluatee($params, $group, $member, $event, $responsesByEvaluatee);
             $csv .= $resultTable;
         }
         return $csv;
@@ -273,18 +222,19 @@ class ExportBaseNewComponent extends Object
      * buildSimpleEvaluationScoreTableByEvent
      *
      * @param mixed $params  params
-     * @param mixed $eventId event id
+     * @param mixed $event   event
      *
      * @access public
      * @return void
      */
-    function buildSimpleEvaluationScoreTableByEvent($params, $eventId)
+    function buildSimpleEvaluationScoreTableByEvent($params, $event, $results)
     {
-        $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $csv  = '';
-        $groupEvents = $this->GroupEvent->getGroupEventByEventId($eventId);
-        foreach ($groupEvents as $ge) {
-            $SimpleEvalResultTable =  $this->buildSimpleEvaluationScoreTableByGroup($params, $ge['GroupEvent']['id'], $eventId);
+        if (empty($event['GroupEvent'])) {
+            return $csv;
+        }
+        foreach ($event['GroupEvent'] as $ge) {
+            $SimpleEvalResultTable =  $this->buildSimpleEvaluationScoreTableByGroup($params, $ge, $event, $results[$ge['id']]);
             $csv .= $SimpleEvalResultTable."\n";
         }
         return $csv;
@@ -462,51 +412,31 @@ class ExportBaseNewComponent extends Object
      * @access public
      * @return void
      */
-    function buildRubricsScoreTableByEvaluatee($params, $grpEventId, $evaluateeId, $eventId)
+    function buildRubricsScoreTableByEvaluatee($params, $group, $evaluatee, $event, $responses)
     {
-        $this->GroupEvent = ClassRegistry::init('GroupEvent');
-        $this->Group = ClassRegistry::init('Group');
-        $this->User = ClassRegistry::init('User');
-        $this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
-        $this->Penalty = ClassRegistry::init('Penalty');
-
-        $grpEvent = $this->GroupEvent->getGrpEvent($grpEventId);
-        $group = $this->Group->getGroupByGroupId($grpEvent['GroupEvent']['group_id']);
-        $event_info = $this->Event->find(
-            'first',
-            array(
-                'conditions' => array('Event.id' => $eventId),
-            )
-        );
-        // storing the timestamp of the due date/end date of the event
-        $event_due = strtotime($event_info['Event']['due_date']);
-        $event_end = strtotime($event_info['Event']['release_date_end']);
-
-        $groupMembers = $this->ExportHelper2->getGroupMemberHelper($grpEventId);
-        $questions = $this->ExportHelper2->getEvaluationQuestions($grpEventId);
-
-        // Creat grid
-        $xDimension = 10 + count($questions);
-        $yDimensions = count($groupMembers);
-        $grid = $this->ExportHelper2->buildExporterGrid($xDimension, $yDimensions);
+        // Build grid
         $xPosition = 0;
         $yPosition = 0;
-        // Fill in grid with results
-        $evaluatee = $this->User->findById($evaluateeId);
+        // Fill in grid Results
         $yInc = 0;
-        foreach ($groupMembers as $evaluator) {
+
+        $xDimension = 10 + count($event['Question']);
+        $yDimensions = count($group['Member']);
+        $grid = $this->ExportHelper2->buildExporterGrid($xDimension, $yDimensions);
+
+        foreach ($group['Member'] as $evaluator) {
             $row = array();
             if (!empty($params['include_group_names'])) {
-                array_push($row, $group[0]['Group']['group_name']);
+                array_push($row, $group['Group']['group_name']);
             }
             if (!empty($params['include_student_email'])) {
-                array_push($row, $evaluatee['User']['email']);
+                array_push($row, $evaluatee['email']);
             }
             if (!empty($params['include_student_name'])) {
-                array_push($row, $evaluatee['User']['full_name']);
+                array_push($row, $evaluatee['full_name']);
             }
             if (!empty($params['include_student_id'])) {
-                array_push($row, $evaluatee['User']['student_no']);
+                array_push($row, $evaluatee['student_no']);
             }
             if (!empty($params['include_student_name'])) {
                 array_push($row, $evaluator['full_name']);
@@ -514,50 +444,36 @@ class ExportBaseNewComponent extends Object
             if (!empty($params['include_student_id'])) {
                 array_push($row, $evaluator['student_no']);
             }
-            $rubricsEvaluation = $this->EvaluationRubric->getEvalRubricByGrpEventIdEvaluatorEvaluatee($grpEventId, $evaluator['id'], $evaluateeId);
-            // check to see evaluator has sumbitted an evaluation
-            if (empty($rubricsEvaluation)) {
+
+            // check if we have a reponse for this evaluator
+            if (!isset($responses[$evaluatee['id']]) || !array_key_exists($evaluator['id'], $responses[$evaluatee['id']])) {
                 $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition+$yInc, $row);
                 $yInc++;
                 continue;
             }
-            $rubricsEvalResult = $rubricsEvaluation['EvaluationRubricDetail'];
-            foreach ($rubricsEvalResult as $result) {
+
+            $response = $responses[$evaluatee['id']][$evaluator['id']];
+            foreach ($response['EvaluationRubricDetail'] as $result) {
                 array_push($row, $result['grade']);
             }
-            array_push($row, $rubricsEvaluation['EvaluationRubric']['score']);
+            array_push($row, $response[$this->responseModelName]['score']);
 
-            $penalty = null;
-            $event_sub = $this->Event->find(
-                'first',
-                array(
-                    'conditions' => array('Event.id' => $eventId),
-                    'contain' => array('EvaluationSubmission' => array(
-                        'conditions' => array('EvaluationSubmission.submitter_id' => $evaluateeId)
-                )))
+            $penalty = $this->Penalty->calculate(
+                $event['Event']['due_date'],
+                $event['Event']['release_date_end'],
+                $response['EvaluationSubmission']['date_submitted'],
+                $event['Penalty']
             );
-            // no submission - if now is after release date end then - gets final deduction
-            if (empty($event_sub['EvaluationSubmission'])) {
-                if (time() > $event_end) {
-                    $penalty = $this->Penalty->getPenaltyfinal($eventId);
-                }
-            // there is submission - may be on time or late
+
+            if (is_numeric($penalty)) {
+                array_push($row, $penalty."%");
+                $finalGrade = $response[$this->responseModelName]['score'] * (1 - ($penalty/100));
             } else {
-                $late_diff = strtotime($event_sub['EvaluationSubmission'][0]['date_submitted']) - $event_due;
-                // late
-                if (0 < $late_diff) {
-                    $days_late = $late_diff/(24*60*60);
-                    $penalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId, $days_late);
-                }
+                array_push($row, "-");
+                $finalGrade = $response[$this->responseModelName]['score'];
             }
 
-            if (!empty($penalty)) {
-                array_push($row, $penalty['Penalty']['percent_penalty']."%");
-            } else {
-                array_push($row, "--");
-            }
-            $finalGrade = $rubricsEvaluation['EvaluationRubric']['score'] * (1 - ($penalty['Penalty']['percent_penalty']/100));
-            array_push($row, number_format($finalGrade, 2));
+            array_push($row, $finalGrade);
             $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition + $yInc, $row);
             $yInc++;
         }
@@ -575,12 +491,18 @@ class ExportBaseNewComponent extends Object
      * @access public
      * @return void
      */
-    function buildRubricsEvalTableByGroupEvent($params, $grpEventId, $eventId)
+    function buildRubricsEvalTableByGroupEvent($params, $groupEvent, $event, $results)
     {
-        $groupMembers = $this->ExportHelper2->getGroupMemberWithoutTutorsHelper($grpEventId);
+        $this->Group = ClassRegistry::init('Group');
+        $group = $this->Group->getGroupWithMemberRoleByGroupIdEventId($groupEvent['group_id'], $event['Event']['id']);
         $csv = '';
-        foreach ($groupMembers as $evaluatee) {
-            $resultTable =  $this->buildRubricsScoreTableByEvaluatee($params, $grpEventId, $evaluatee['id'], $eventId);
+        $responsesByEvaluatee = Set::combine($results, '{n}.'.$this->responseModelName.'.evaluator', '{n}', '{n}.'.$this->responseModelName.'.evaluatee');
+        foreach ($group['Member'] as $member) {
+            // skip the non student member, for now we assume all the evaluatees are students
+            if ($member['Role']['name'] != 'student') {
+                continue;
+            }
+            $resultTable = $this->buildRubricsScoreTableByEvaluatee($params, $group, $member, $event, $responsesByEvaluatee);
             $csv .= $resultTable;
         }
         return $csv;
@@ -591,18 +513,20 @@ class ExportBaseNewComponent extends Object
      * buildRubricsEvalTableByEventId
      *
      * @param mixed $params  params
-     * @param mixed $eventId event id
+     * @param mixed $event   event
+     * @param mixed $results results
      *
      * @access public
      * @return void
      */
-    function buildRubricsEvalTableByEventId($params, $eventId)
+    function buildRubricsEvalTableByEventId($params, $event, $results)
     {
-        $this->GroupEvent = ClassRegistry::init('GroupEvent');
-        $groupEvents = $this->GroupEvent->getGroupEventByEventId($eventId);
-        $csv = '';
-        foreach ($groupEvents as $ge) {
-            $resultTable = $this->buildRubricsEvalTableByGroupEvent($params, $ge['GroupEvent']['id'], $eventId);
+        $csv  = '';
+        if (empty($event['GroupEvent'])) {
+            return $csv;
+        }
+        foreach ($event['GroupEvent'] as $ge) {
+            $resultTable =  $this->buildRubricsEvalTableByGroupEvent($params, $ge, $event, $results[$ge['id']]);
             $csv .= $resultTable."\n";
         }
         return $csv;

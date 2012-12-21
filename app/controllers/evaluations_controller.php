@@ -231,19 +231,15 @@ class EvaluationsController extends AppController
      */
     function export($type, $id)
     {
-        // Make sure the present user has Permission
-        if (!User::hasPermission('functions/evaluation/export')) {
-            $this->Session->setFlash(__('Error: You do not have permission to export evaluation results', true));
-            $this->redirect('/home');
-        }
-
         // $type must be course or event
         if ('course' != $type && 'event' != $type) {
             $this->Session->setFlash('Error: Invalid export type', true);
             $this->redirect('/courses');
+            return;
         } else if (!is_numeric($id)) {
             $this->Session->setFlash(__('Error: Invalid id', true));
             $this->redirect('/courses');
+            return;
         }
 
         $this->set('type', $type);
@@ -290,21 +286,27 @@ class EvaluationsController extends AppController
         if (isset($this->params['form']) && !empty($this->params['form'])) {
             $this->autoRender = false;
 
+            if (!($event = $this->Event->getAccessibleEventById($this->params['form']['event_id'], User::get('id'), User::getCourseFilterPermission(), array('Course' => array('Instructor'), 'GroupEvent', 'EventTemplateType', 'Penalty' => array('order' => array('days_late ASC')))))) {
+                $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+                $this->redirect('index');
+                return;
+            }
+
             $fileName = isset($this->params['form']['file_name']) && !empty($this->params['form']['file_name']) ? $this->params['form']['file_name']:date('m.d.y');
             switch($this->params['form']['export_type']) {
             case "csv" :
-                $fileContent = $this->ExportCsv->createCsv($this->params['form'], $this->params['form']['event_id']);
+                $fileContent = $this->ExportCsv->createCsv($this->params['form'], $event);
                 break;
             case "excel" :
-                $fileContent = $this->ExportExcel->createExcel($this->params['form'], $this->params['form']['event_id']);
+                $fileContent = $this->ExportExcel->createExcel($this->params['form'], $event);
                 break;
             default :
                 throw new Exception("Invalid evaluation selection.");
             }
             header('Content-Type: application/csv');
             header('Content-Disposition: attachment; filename=' . $fileName . '.csv');
+            $this->log($this->User->getDataSource()->getLog(false, false), 'debug');
             echo $fileContent;
-            //	  }
         } else {
             // Set up data
             $this->set('file_name', date('m.d.y'));
@@ -316,6 +318,7 @@ class EvaluationsController extends AppController
      *
      * @param mixed $eventId  event id
      * @param mixed $objectId object id
+     *
      * @access public
      * @return void
      */

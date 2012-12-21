@@ -1,4 +1,6 @@
 <?php
+App::import('Model', 'EvaluationResponseBase');
+
 /**
  * EvaluationRubric
  *
@@ -8,10 +10,10 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class EvaluationRubric extends AppModel
+class EvaluationRubric extends EvaluationResponseBase
 {
     public $name = 'EvaluationRubric';
-    public $actsAs = array('Traceable');
+    public $useTable = null;
 
     public $hasMany = array(
         'EvaluationRubricDetail' =>

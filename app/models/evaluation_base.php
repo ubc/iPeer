@@ -11,6 +11,7 @@
  */
 class EvaluationBase extends AppModel
 {
+    public static $types = array(1 => 'SimpleEvaluation', 2 => 'Rubric', 4 => 'Mixeval');
     public $name = 'EvaluationBase';
     public $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Traceable');
     public $useTable = false;
@@ -197,6 +198,4 @@ class EvaluationBase extends AppModel
 
         return $userPenalty;
     }
-
-
 }

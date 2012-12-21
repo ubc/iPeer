@@ -40,6 +40,13 @@ class GroupEvent extends AppModel
             'dependent' => true,
             'foreignKey' => 'grp_event_id'
         ),
+        'EvaluationSimple' => array(
+            'className' => 'EvaluationSimple',
+            'conditions' => '',
+            'order' => '',
+            'dependent' => true,
+            'foreignKey' => 'grp_event_id'
+        ),
     );
 
 

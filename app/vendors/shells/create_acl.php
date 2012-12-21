@@ -125,9 +125,6 @@ class CreateAclShell extends Shell
         $eval = $this->Acl->Aco->save();
         $eval['Aco']['id'] = $this->Acl->Aco->id;
 
-        $this->Acl->Aco->create(array('parent_id' => $eval['Aco']['id'], 'model' => null, 'alias' => 'export'));
-        $this->Acl->Aco->save();
-
         // functions/email
         $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'email'));
         $email = $this->Acl->Aco->save();
