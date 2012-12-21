@@ -1,6 +1,6 @@
 <form name="frm" id="frm" method="POST" action="<?php echo $html->url('makeEvaluation/'.$eventId) ?>">
 <input type="hidden" name="event_id" value="<?php echo $eventId?>"/>
-<input type="hidden" name="survey_id" id="survey_id" value="<?php if (!empty($survey_id)) echo $survey_id; ?>" />
+<input type="hidden" name="event_id" id="event_id" value="<?php if (!empty($eventId)) echo $eventId; ?>" />
 <input type="hidden" name="course_id" value="<?php echo $courseId ?>"/>
 <input type="hidden" name="data[Evaluation][surveyee_id]" value="<?php echo User::get('id')?>"/>
 <input type="hidden" name="question_count" value="<?php echo count($questions)?>"/>

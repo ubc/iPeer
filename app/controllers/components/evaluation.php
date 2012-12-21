@@ -1676,14 +1676,12 @@ class EvaluationComponent extends Object
 
         $userId = $params['data']['Evaluation']['surveyee_id'];
         $eventId = $params['form']['event_id'];
-        $surveyId = $params['form']['survey_id'];
 
         //get existing record if there is one
         $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId, $userId);
         if (empty($evaluationSubmission)) {
             //if there is no existing record, fill in all fields
             $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $userId;
-            $evaluationSubmission['EvaluationSubmission']['survey_id'] = $surveyId;
             $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
             $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
             $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
@@ -1693,14 +1691,14 @@ class EvaluationComponent extends Object
         }
         $surveyInput=array();
         $surveyInput['SurveyInput']['user_id'] = $userId;
-        $surveyInput['SurveyInput']['survey_id'] = $surveyId;
+        $surveyInput['SurveyInput']['event_id'] = $eventId;
         $successfullySaved = true;
         $j = 0;
         for ($i=1; $i<=$params['form']['question_count']; $i++) {
             $this->SurveyInput = new SurveyInput;
             //Set survey and user id
             $surveyInput[$i+$j]['SurveyInput']['user_id'] = $userId;
-            $surveyInput[$i+$j]['SurveyInput']['survey_id'] = $surveyId;
+            $surveyInput[$i+$j]['SurveyInput']['event_id'] = $eventId;
             //Set question Id
             $questionId = $params['form']['question_id'.$i];
             $questionType = $this->Question->getTypeById($questionId);
@@ -1716,7 +1714,7 @@ class EvaluationComponent extends Object
                     $surveyInput[$i+$j]['SurveyInput']['chkbx_id']=$j;
                     $this->SurveyInput->recursive = 0;
                     $surveyInputId = $this->SurveyInput->find('first', array(
-                        'conditions' => array('SurveyInput.survey_id' => $surveyId,
+                        'conditions' => array('SurveyInput.event_id' => $eventId,
                             'SurveyInput.user_id' => $userId,
                             'SurveyInput.question_id' => $questionId,
                             'SurveyInput.chkbx_id' => $j),
@@ -1736,7 +1734,7 @@ class EvaluationComponent extends Object
                     $this->SurveyInput = new SurveyInput;
                     //Set survey and user id
                     $surveyInput[$i+$j]['SurveyInput']['user_id'] = $userId;
-                    $surveyInput[$i+$j]['SurveyInput']['survey_id'] = $surveyId;
+                    $surveyInput[$i+$j]['SurveyInput']['event_id'] = $eventId;
                     //Set question Id
                     $questionId = $params['form']['question_id'.$i];
                     $surveyInput[$i+$j]['SurveyInput']['question_id'] = $questionId;
@@ -1757,7 +1755,7 @@ class EvaluationComponent extends Object
             //Check SurveyInput existed
             $this->SurveyInput->recursive = 0;
             $surveyInputId = $this->SurveyInput->find('first', array(
-                    'conditions' => array('SurveyInput.survey_id' => $surveyId,
+                    'conditions' => array('SurveyInput.event_id' => $eventId,
                     'SurveyInput.user_id' => $userId,
                     'SurveyInput.question_id' => $questionId),
                 'fields' => array('SurveyInput.id')

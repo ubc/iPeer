@@ -1690,9 +1690,6 @@ class EvaluationsController extends AppController
             }
         }
 
-        // TODO check that survey submissions are still going through
-        // TODO check that all SurveyInput calls don't have survey_id hardcoded
-        // somewhere
         $this->set('students', $course['Enrol']);
         $this->set('eventId', $eventId);
     }
