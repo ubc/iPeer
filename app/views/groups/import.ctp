@@ -26,7 +26,7 @@
           </pre>
         </td>
         <td style="text-align: left;">
-    <form name="importfrm" id="importfrm" method="POST" action="<?php echo $html->url('import') ?>" enctype="multipart/form-data" >
+    <form name="importfrm" id="importfrm" method="POST" action="<?php echo $html->url('import/'.$courseId) ?>" enctype="multipart/form-data" >
         <h3>1) <?php __('Please select a CSV file to import')?>:</h3>
         &nbsp;&nbsp;&nbsp;&nbsp;
         <input type="file" name="file" value="<?php __('Browse')?>" /><br>

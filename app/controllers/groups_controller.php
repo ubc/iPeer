@@ -327,6 +327,13 @@ class GroupsController extends AppController
      */
     function import($courseId)
     {
+        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+            $this->redirect('index');
+        }
+        $this->breadcrumb->push(array('course' => $course['Course']));
+
         // Just render :-)
         if (!empty($this->params['form'])) {
             $courseId = $this->params['data']['course_id'];
@@ -358,14 +365,6 @@ class GroupsController extends AppController
             }
         }
 
-        if (!is_null($courseId)) {
-            $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
-            if (!$course) {
-                $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
-                $this->redirect('index');
-            }
-            $this->breadcrumb->push(array('course' => $course['Course']));
-        }
 
         $coursesList = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
 
@@ -392,33 +391,24 @@ class GroupsController extends AppController
             return array();
         }
 
-        // pre-process the lines in the file first
-        for ($i = 0; $i < count($lines); $i++) {
-            // Trim this line's white space
-            $lines[$i] = trim($lines[$i]);
-            // Clear all quotes - we rely on separators instead
-            $lines[$i] = str_replace('"', '', $lines[$i]);
-            // Replace tabs with commas - in case of different CSV formatting
-            $lines[$i] = str_replace("\t", "", $lines[$i]);
-            // Put a space between the commas, and their following column
-            $lines[$i] = str_replace(", ", ", ", $lines[$i]);
-        }
-
         // Remove duplicate lines
         $lines = array_unique($lines);
 
+        // pre-process the lines in the file first
+        for ($i = 0; $i < count($lines); $i++) {
+            // Trim this line's white space
+            $lines[$i] = str_getcsv(trim($lines[$i]));
+        }
 
         // Process the array into groups
         $users = array();
-        for ($i = 0; $i < count($lines); $i++) {
+        foreach ($lines as $split) {
             $entry = array();
-            $entry['line'] =  $lines[$i];
+            $entry['line'] =  join(', ', $split);
             // To start, mark all entries as invalid and
             $entry['status'] = "Unchecked Entry";
             $entry['valid'] = false;
             $entry['added'] = false;
-            // Split the line up by command
-            $split = @split(', ', $entry['line']);
             // If the count is not 3, there's probably a formatting error,
             //  so ignore this entry.
             if (count($split) < 3 ) {
@@ -427,45 +417,45 @@ class GroupsController extends AppController
             } else if (count($split) > 3 ) {
                 $entry['status'] = __("Too many columns in this line (", true) . count($split). "), " .
                     __(" expected 3.", true);
-            } else {
-                // assign the parts into their appropriate places
-                $entry['username'] = trim($split[IMPORT_GROUP_USERNAME]);
-                $entry['group_num'] = trim($split[IMPORT_GROUP_GROUP_NUMBER]);
-                $entry['group_name'] = trim($split[IMPORT_GROUP_GROUP_NAME]);
+            }
 
-                // Check the entries for empty spots
-                if (empty($entry['username'])) {
-                    $entry['status'] = __("Username column is empty.", true);
-                } else if (empty($entry['group_num'])) {
-                    $entry['status'] = __("Group Number column is empty.", true);
-                } else if (empty($entry['group_name'])) {
-                    $entry['status'] = __("Group Name column is empty.", true);
-                } else {
-                    $userData = $this->User->findByUsername($entry['username']);
-                    if (!is_array($userData)) {
-                        $entry['status'] = __("User ", true). $entry['username'].__(" is unknown. Please add this user first.", true);
-                    } else {
-                        $entry['id'] = $userData['User']['id'];
-                        $enrolled = false;
-                        foreach ($userData['Enrolment'] as $checkData) {
-                            if ($checkData['id'] == $courseId) {
-                                $enrolled = true;
-                            }
-                        }
-                        foreach ($userData['Tutor'] as $checkData) {
-                            if ($checkData['id'] == $courseId) {
-                                $enrolled = true;
-                            }
-                        }
-                        if (!$enrolled) {
-                            $entry['status'] = __("User ", true). $entry['username'].__(" is not enrolled in your selected course. ", true);
-                            $entry['status'] .= __("Please enrol them first.", true);
-                        } else {
-                            // So, the user exists, and is enrolled in the course - they pass validation
-                            $entry['status'] = __("Validated Entry", true);
-                            $entry['valid'] = true;
-                        }
+            // assign the parts into their appropriate places
+            $entry['username'] = trim($split[IMPORT_GROUP_USERNAME]);
+            $entry['group_num'] = trim($split[IMPORT_GROUP_GROUP_NUMBER]);
+            $entry['group_name'] = trim($split[IMPORT_GROUP_GROUP_NAME]);
+
+            // Check the entries for empty spots
+            if (empty($entry['username'])) {
+                $entry['status'] = __("Username column is empty.", true);
+            } else if (empty($entry['group_num'])) {
+                $entry['status'] = __("Group Number column is empty.", true);
+            } else if (empty($entry['group_name'])) {
+                $entry['status'] = __("Group Name column is empty.", true);
+            }
+
+            $userData = $this->User->findByUsername($entry['username']);
+            if (!is_array($userData)) {
+                $entry['status'] = __("User ", true). $entry['username'].__(" is unknown. Please add this user first.", true);
+            } else {
+                $entry['id'] = $userData['User']['id'];
+                $enrolled = false;
+                foreach ($userData['Enrolment'] as $checkData) {
+                    if ($checkData['id'] == $courseId) {
+                        $enrolled = true;
                     }
+                }
+                foreach ($userData['Tutor'] as $checkData) {
+                    if ($checkData['id'] == $courseId) {
+                        $enrolled = true;
+                    }
+                }
+                if (!$enrolled) {
+                    $entry['status'] = __("User ", true). $entry['username'].__(" is not enrolled in your selected course. ", true);
+                    $entry['status'] .= __("Please enrol them first.", true);
+                } else {
+                    // So, the user exists, and is enrolled in the course - they pass validation
+                    $entry['status'] = __("Validated Entry", true);
+                    $entry['valid'] = true;
                 }
             }
             // Add this checked entry into the list
