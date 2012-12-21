@@ -45,7 +45,7 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    function postProcess($data)
+    function _postProcess($data)
     {
         // Creates the custom in use column
         if ($data) {
@@ -146,7 +146,7 @@ class EvaluationsController extends AppController
 
         $this->AjaxList->setUp($this->GroupEvent, $columns, $actions,
             "Group.group_num", "Group.group_name",
-            array(), $extraFilters, $recursive, "postProcess");
+            array(), $extraFilters, $recursive, "_postProcess");
     }
 
 
@@ -187,6 +187,13 @@ class EvaluationsController extends AppController
 
             $this->Session->setFlash(__('Error: Invalid id or you do not have permission to access this event.', true));
             $this->redirect('index');
+            return;
+        }
+
+        // for surveys, redirect to survey result page
+        if (3 == $event['Event']['event_template_type_id']) {
+            $this->redirect('/surveygroups/viewresult/'.$event['Event']['course_id'].'/'.$eventId);
+            return;
         }
 
         // Survey Results are on a different page for now
