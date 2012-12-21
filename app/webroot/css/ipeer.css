@@ -181,6 +181,11 @@ strong {
     border: none;
 }
 
+.leftalignedtable th, .leftalignedtable td {
+    padding: 0.4em;
+    text-align: left;
+}
+
 /* css for timepicker */
 div.ui-datepicker { font-size: 0.85em; }
 .ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
@@ -911,8 +916,16 @@ i {
     margin-left: 7em;
 }
 
+#SurveyResults pre {
+    margin-left: 7em;
+}
+
 #SurveyResults h3 {
     margin-left: 3.5em;
+}
+
+#SurveyResults .noanswer {
+    font-style: italic;
 }
 
 /* ajax pagination */
