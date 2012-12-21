@@ -431,7 +431,11 @@ class Course extends AppModel
     function getByDepartmentIds($departmentIds, $findType = "all", $options = array())
     {
         $options['conditions']['Department.id'] = $departmentIds;
-        $options['contain'] = array_merge(array('Department'), $options['contain']);
+        if(isset($options['contain'])) { 
+        	$options['contain'] = array_merge(array('Department'), $options['contain']);
+        } else {
+        	$options['contain'] = array('Department');
+        }
         if ($findType == 'list') {
             $courses = $this->find('all', $options);
             return Set::combine($courses, '{n}.'.$this->alias.'.id', '{n}.'.$this->alias.'.'.$this->displayField);
