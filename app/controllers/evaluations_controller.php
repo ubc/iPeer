@@ -394,18 +394,14 @@ class EvaluationsController extends AppController
                 $this->redirect('/home/index');
                 return;
             }
+			
+			
 
-            // students can't submit again
+            // students can submit again
             $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
-            if (!empty($submission)) {
-                $this->Session->setFlash(__('Error: Submissions had been made', true));
-                $this->redirect('/home/index');
-                return;
-            }
-
-            // students can't submit outside of release date range
-            $now = time();
-
+			
+			$now = time();
+            // students can't submit outside of release date range            
             if ($now < strtotime($event['Event']['release_date_begin']) ||
                 $now > strtotime($event['Event']['release_date_end'])) {
                 $this->Session->setFlash(__('Error: Evaluation is unavailable', true));
@@ -517,13 +513,13 @@ class EvaluationsController extends AppController
                 return;
             }
 
-            // students can't submit again
+            // students can submit again
             $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId, User::get('id'));
-            if (!empty($submission)) {
-                $this->Session->setFlash(__('Error: Survey has already been submitted', true));
-                $this->redirect('/home/index');
-                return;
-            }
+//            if (!empty($submission)) {
+//                $this->Session->setFlash(__('Error: Survey has already been submitted', true));
+//                $this->redirect('/home/index');
+//                return;
+//            }
 
             // students can't submit outside of release date range
             $event = $this->Event->getEventById($eventId);
@@ -636,13 +632,13 @@ class EvaluationsController extends AppController
                 return;
             }
 
-            // students can't submit again
+            // students can submit again
             $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
-            if (!empty($submission)) {
-                $this->Session->setFlash(__('Error: Submissions had been made', true));
-                $this->redirect('/home/index');
-                return;
-            }
+//            if (!empty($submission)) {
+//                $this->Session->setFlash(__('Error: Submissions had been made', true));
+//                $this->redirect('/home/index');
+//                return;
+//            }
 
             // students can't submit outside of release date range
             $now = time();
