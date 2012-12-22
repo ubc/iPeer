@@ -351,12 +351,14 @@ class V1Controller extends Controller {
                     if ($ret) {
                         $statusCode = 'HTTP/1.1 201 Created';
                         $sUser[] = $decode[$key]['username'];
+                        $this->log('User created successful: '. $decode[$key]['username'], 'debug');
                     } else {
                         $temp = array();
                         $temp['username'] = $decode[$key]['username'];
                         $temp['first_name'] = $decode[$key]['first_name'];
                         $temp['last_name'] = $decode[$key]['last_name'];
                         $uUser[] = $temp;
+                        $this->log('User created failed: '. $decode[$key]['username'], 'debug');
                     }
                 }
                 $sbody = $this->User->find('all', array(
@@ -942,12 +944,15 @@ class V1Controller extends Controller {
                     $table = null;
                     if ($role == 'student') {
                         $ret = $this->User->addStudent($userId, $courseId);
+                        $this->log('Adding student '.$user['username'].' to course '.$courseId, 'debug');
                     }
                     else if ($role == 'instructor') {
                         $ret = $this->User->addInstructor($userId, $courseId);
+                        $this->log('Adding instructor'.$user['username'].' to course '.$courseId, 'debug');
                     }
                     else if ($role == 'tutor') {
                         $ret = $this->User->addTutor($userId, $courseId);
+                        $this->log('Adding tutor '.$user['username'].' to course '.$courseId, 'debug');
                     }
                     else {
                         $this->set('error', array('code' => 400, 'message' => 'Unsupported role for '.$user['username']));
