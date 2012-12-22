@@ -135,7 +135,6 @@ Class ExportCsvComponent extends ExportBaseNewComponent
      */
     function createCsv($params, $event)
     {
-        $contain = array(1 => false, 2 => array('EvaluationRubricDetail'), 4 => array('EvaluationMixevalDetail'));
         $csv = '';
         $eventHeader = $this->generateHeader($params, $event);
         $csv = $eventHeader."\n";
@@ -145,33 +144,15 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         $this->responseModel = ClassRegistry::init($this->responseModelName);
         $this->evaluationModelName = EvaluationBase::$types[$event['Event']['event_template_type_id']];
         $this->evaluationModel = ClassRegistry::init($this->evaluationModelName);
-        $results = $this->responseModel->getSubmittedResultsByGroupEvent($groupEventIds, $contain[$event['Event']['event_template_type_id']]);
+        $results = $this->responseModel->getSubmittedResultsByGroupEvent($groupEventIds, $this->detailModel[$event['Event']['event_template_type_id']]);
         $results = Set::combine($results, '{n}.'.$this->responseModelName.'.id', '{n}', '{n}.'.$this->responseModelName.'.grp_event_id');
         $evaluation = $this->evaluationModel->getEvaluation($event['Event']['template_id']);
         $event = array_merge($event, $evaluation);
 
         $subHeader = $this->createCsvSubHeader($params, $event['Question']);
         $csv .= $subHeader."\n\n";
+        $csv .= $this->buildEvaluationScoreTableByEvent($params, $event, $results);
 
-        switch($event['Event']['event_template_type_id']) {
-        case 1:
-            $resultTable = $this->buildSimpleEvaluationScoreTableByEvent($params, $event, $results);
-            $csv .= $resultTable;
-            break;
-
-        case 2:
-            $resultTable = $this->buildRubricsEvalTableByEventId($params, $event, $results);
-            $csv .= $resultTable;
-            break;
-
-        case 4:
-            foreach ($groupEvents as $ge) {
-                $resultTable = $this->buildMixedEvalScoreTableByGroupEvent($params, $ge['id'], $event['Event']['id']);
-                $csv .= $resultTable;
-            }
-            break;
-        default: throw new Exception("Invalid event_id");
-        }
         return $csv;
     }
 

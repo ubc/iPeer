@@ -18,10 +18,11 @@ class Mixeval extends EvaluationBase
     public $name = 'Mixeval';
     // use default table
     public $useTable = null;
+    public $actsAs = array('Containable', 'Traceable');
 
     public $hasMany = array(
-        'Event' =>
-        array('className'   => 'Event',
+        'Event' => array(
+            'className'   => 'Event',
             'conditions'  => array('Event.event_template_type_id' => self::TEMPLATE_TYPE_ID),
             'order'       => '',
             'foreignKey'  => 'template_id',
@@ -242,5 +243,12 @@ class Mixeval extends EvaluationBase
             $data = preg_replace($search, $replace, $data);
         }
         return $data;
+    }
+
+    public function getEvaluation($id)
+    {
+        $eval = $this->find('first', array('conditions' => array($this->alias.'.id' => $id), 'contain' => 'Question'));
+
+        return $eval;
     }
 }

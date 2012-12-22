@@ -1,4 +1,5 @@
 <?php
+App::import('Model', 'EvaluationResponseBase');
 /**
  * EvaluationMixeval
  *
@@ -8,10 +9,10 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class EvaluationMixeval extends AppModel
+class EvaluationMixeval extends EvaluationResponseBase
 {
     public $name = 'EvaluationMixeval';
-    public $actsAs = array('Traceable', 'Containable');
+    public $useTable = null;
 
     public $hasMany = array(
         'EvaluationMixevalDetail' =>

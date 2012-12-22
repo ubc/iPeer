@@ -4,7 +4,7 @@ App::import('Model', 'EvaluationResponseBase');
 /**
  * EvaluationRubric
  *
- * @uses AppModel
+ * @uses EvaluationResponseBase
  * @package   CTLT.iPeer
  * @author    Pan Luo <pan.luo@ubc.ca>
  * @copyright 2012 All rights reserved.
@@ -425,6 +425,4 @@ class EvaluationRubric extends EvaluationResponseBase
 
         return $grades;
     }
-    /* }}} */
-
 }
