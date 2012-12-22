@@ -161,15 +161,16 @@ class HomeController extends AppController
             ) { // can only take surveys during the release period
                 $upcoming[] = $event;
             }
-            else if (!empty($event['EvaluationSubmission'])) {
-            	if(strtotime('NOW') <  strtotime($event['Event']['result_release_date_end'])) {
-            		$upcoming[] = $event;
-            	}
-				else{
-	                $submitted[] = $event;
-				}	
+            else if (!empty($event['EvaluationSubmission']) &&
+                strtotime('NOW') < 
+                strtotime($event['Event']['result_release_date_end'])
+            ) { // has submission and can or will be able to view results soon
+                // note that we're not using is_released or is_result_released
+                // because of an edge case where if there is a period of time
+                // between the release and result release period, the evaluation
+                // will disappear from view
+                $submitted[] = $event;
             }
-            
             else if (!empty($event['EvaluationSubmission']) &&
                 $event['Event']['is_released']
             ) {
@@ -205,7 +206,7 @@ class HomeController extends AppController
 
         foreach ($course_list as $row) {
             for ($i = 0; $i < count($row['Event']); $i++) {
-   	             if ($row['Event'][$i]['event_template_type_id'] == 3) {
+                if ($row['Event'][$i]['event_template_type_id'] == 3) {
                     $row['Event'][$i]['student_count'] = $row['Course']['student_count'];
                 }
             }

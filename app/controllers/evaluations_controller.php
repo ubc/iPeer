@@ -816,13 +816,8 @@ class EvaluationsController extends AppController
                 return;
             }
 
-            // students can't submit again
+            // students can submit again
             $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
-            if (!empty($submission)) {
-                $this->Session->setFlash(__('Error: Submissions had been made', true));
-                $this->redirect('/home/index');
-                return;
-            }
 
             // students can't submit outside of release date range
             $event = $this->Event->getEventByIdGroupId($eventId, $groupId);

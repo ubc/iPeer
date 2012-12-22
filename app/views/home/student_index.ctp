@@ -56,7 +56,21 @@ function getNonUpcomingTableArray($html, $events) {
         else {
             // we're not in the result release period, notify user when they can
             // view the results
-            $tmp[] = $event['Event']['title'];
+            if ($event['Event']['is_released']) {
+                // can let students edit their submissions
+                if (isset($event['Group']['group_name'])) {
+                    $tmp[] = $html->link($event['Event']['title'],
+                        '/evaluations/makeEvaluation/'.$event['Event']['id'].
+                        '/'. $event['Group']['id']);
+                }
+                else {
+                    $tmp[] = $html->link($event['Event']['title'],
+                        '/evaluations/makeEvaluation/'.$event['Event']['id']);
+                }
+            }
+            else {
+                $tmp[] = $event['Event']['title'];
+            }
             $tmp[] = "<span class='orangered'>" .
                 $event['Event']['result_release_date_begin'] . "</span>";
         }
