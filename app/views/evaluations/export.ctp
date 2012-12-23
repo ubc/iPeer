@@ -50,24 +50,24 @@
       <th colspan="3">Body</th>
     </tr>
     <tr>
-      <td>Include Group Names:</td><td><input type="checkbox" name="include_group_names" checked /></td>
+      <td>Include Group Names:</td><td><input type="checkbox" name="include[group_names]" checked /></td>
     </tr>
     <tr>
-      <td>Include Student Name:&nbsp;<font color="Green">*</td><td><input type="checkbox" name="include_student_name" checked /></td>
+      <td>Include Student Name:&nbsp;<font color="Green">*</td><td><input type="checkbox" name="include[student_name]" checked /></td>
     </tr>
     <tr>
-      <td>Include Student Id:&nbsp;<font color="Green">*</td><td><input type="checkbox" name="include_student_id" checked /></td>
-    </tr>
-
-    <tr>
-        <td>Include Comments:&nbsp;<font color="orange">*</td><td><input class="csv" type="checkbox" name="include_comments" checked /></td>
-    </tr>
-    <tr>
-        <td>Include Grades:&nbsp;<font color="orange">*</td><td><input class="csv" type="checkbox" name="include_grade_tables" checked /></td>
+      <td>Include Student Id:&nbsp;<font color="Green">*</td><td><input type="checkbox" name="include[student_id]" checked /></td>
     </tr>
 
     <tr>
-      <td>Include Final Marks:</td><td><input type="checkbox" name="include_final_marks" checked /></td>
+        <td>Include Comments:&nbsp;<font color="orange">*</td><td><input class="csv" type="checkbox" name="include[comments]" checked /></td>
+    </tr>
+    <tr>
+        <td>Include Grades:&nbsp;<font color="orange">*</td><td><input class="csv" type="checkbox" name="include[grade_tables]" checked /></td>
+    </tr>
+
+    <tr>
+      <td>Include Final Marks:</td><td><input type="checkbox" name="include[final_marks]" checked /></td>
     </tr>
 
     <tr>

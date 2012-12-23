@@ -1906,7 +1906,7 @@ class EvaluationsController extends AppController
         $evaluation_rubric_general_data=array();
         foreach ($evaluation_rubric_id as $key => $value) {
             //field 7,8
-            $evaluation_rubric_general_data["$value"]=$this->EvaluationRubric->find("id=$value", array("evaluator", "evaluatee", "general_comment", "score"), "id asc", false);
+            $evaluation_rubric_general_data["$value"]=$this->EvaluationRubric->find("id=$value", array("evaluator", "evaluatee", "comment", "score"), "id asc", false);
         }
 
         //pre($evaluation_rubric_general_data);
@@ -1966,7 +1966,7 @@ class EvaluationsController extends AppController
                 //2) get student number from user_data
                 $student_number=$user_data[$evaluatee_id]['User']['student_no'];                //3) if current student is the evaluatee
                 if ($value['User']['student_no']==$student_number) {
-                    $general_comments=$general_comments.''.$array['EvaluationRubric']['general_comment'].';';
+                    $general_comments=$general_comments.''.$array['EvaluationRubric']['comment'].';';
                     //add up score
                     $score_total=$score_total+$array['EvaluationRubric']['score'];
                 }

@@ -83,22 +83,22 @@ Class ExportCsvComponent extends ExportBaseNewComponent
      */
     function creteCsvSubHeaderHelper($params, &$subHeader)
     {
-        if (!empty($params['include_group_names'])) {
+        if (!empty($params['include']['group_names'])) {
             $subHeader .= "Group Name, ";
         }
-        if (!empty($params['include_student_email'])) {
+        if (!empty($params['include']['student_email'])) {
             $subHeader .= "Email, ";
         }
-        if (!empty($params['include_student_name'])) {
+        if (!empty($params['include']['student_name'])) {
             $subHeader .= "Evaluatee, ";
         }
-        if (!empty($params['include_student_id'])) {
+        if (!empty($params['include']['student_id'])) {
             $subHeader .= "Evaluatee S#, ";
         }
-        if (!empty($params['include_student_name'])) {
+        if (!empty($params['include']['student_name'])) {
             $subHeader .= "Evaluator, ";
         }
-        if (!empty($params['include_student_id'])) {
+        if (!empty($params['include']['student_id'])) {
             $subHeader .= "Evaluator S#, ";
         }
     }
@@ -112,14 +112,32 @@ Class ExportCsvComponent extends ExportBaseNewComponent
      * @access public
      * @return void
      */
-    function createCsvSubHeader($params, $questions)
+    function createCsvSubHeader($params, $questions, $evalType)
     {
         $subHeader = '';
         $this->creteCsvSubHeaderHelper($params, $subHeader);
-        foreach ($questions as $key => $question) {
-            $subHeader .= "Q".($key+1)." ( /".$question['multiplier']."), ";
+
+        // comment header
+        if ($evalType != 4 && $params['include']['comments']) {
+            $subHeader .= 'Comment, ';
         }
-        $subHeader .= "Raw Score, Late Penalty, Final Score";
+
+        foreach ($questions as $key => $question) {
+            if (isset($question['question_type'])) {
+                if ((isset($params['include']['grade_tables']) && $question['question_type'] == 'S') ||
+                (isset($params['include']['comments']) && $question['question_type'] == 'T')) {
+                    $subHeader .= "Q".($key+1)." ( /".$question['multiplier']."), ";
+                }
+            } else {
+                $subHeader .= "Q".($key+1)." ( /".$question['multiplier']."), ";
+            }
+        }
+        $subHeader .= "Raw Score, Late Penalty";
+
+        if (isset($params['include']['final_marks'])) {
+            $subHeader .= ", Final Score";
+        }
+
         return $subHeader;
     }
 
@@ -149,7 +167,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         $evaluation = $this->evaluationModel->getEvaluation($event['Event']['template_id']);
         $event = array_merge($event, $evaluation);
 
-        $subHeader = $this->createCsvSubHeader($params, $event['Question']);
+        $subHeader = $this->createCsvSubHeader($params, $event['Question'], $event['Event']['event_template_type_id']);
         $csv .= $subHeader."\n\n";
         $csv .= $this->buildEvaluationScoreTableByEvent($params, $event, $results);
 

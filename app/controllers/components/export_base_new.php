@@ -184,28 +184,28 @@ class ExportBaseNewComponent extends Object
         // Fill in grid Results
         $yInc = 0;
 
-        $xDimension = 10 + count($event['Question']);
+        $xDimension = $this->calcDimensionX($params, $event);
         $yDimensions = count($group['Member']);
         $grid = $this->ExportHelper2->buildExporterGrid($xDimension, $yDimensions);
 
         foreach ($group['Member'] as $evaluator) {
             $row = array();
-            if (!empty($params['include_group_names'])) {
+            if (!empty($params['include']['group_names'])) {
                 array_push($row, $group['Group']['group_name']);
             }
-            if (!empty($params['include_student_email'])) {
+            if (!empty($params['include']['student_email'])) {
                 array_push($row, $evaluatee['email']);
             }
-            if (!empty($params['include_student_name'])) {
+            if (!empty($params['include']['student_name'])) {
                 array_push($row, $evaluatee['full_name']);
             }
-            if (!empty($params['include_student_id'])) {
+            if (!empty($params['include']['student_id'])) {
                 array_push($row, $evaluatee['student_no']);
             }
-            if (!empty($params['include_student_name'])) {
+            if (!empty($params['include']['student_name'])) {
                 array_push($row, $evaluator['full_name']);
             }
-            if (!empty($params['include_student_id'])) {
+            if (!empty($params['include']['student_id'])) {
                 array_push($row, $evaluator['student_no']);
             }
 
@@ -217,9 +217,23 @@ class ExportBaseNewComponent extends Object
             }
 
             $response = $responses[$evaluatee['id']][$evaluator['id']];
+
+            // comments for Rubric and Simple Evaluation
+            if ($event['Event']['event_template_type_id'] != 4 && isset($params['include']['comments'])) {
+                array_push($row, $response[$this->responseModelName]['comment']);
+            }
+
             if ($this->detailModel[$event['Event']['event_template_type_id']] && array_key_exists($this->detailModel[$event['Event']['event_template_type_id']], $response)) {
-                foreach ($response[$this->detailModel[$event['Event']['event_template_type_id']]] as $result) {
-                    array_push($row, $result['grade']);
+                foreach ($response[$this->detailModel[$event['Event']['event_template_type_id']]] as $key => $result) {
+                    if (isset($event['Question'][$key]['question_type'])) {
+                        if (isset($params['include']['grade_tables']) && $event['Question'][$key]['question_type'] == 'S') {
+                            array_push($row, $result['grade']);
+                        } elseif (isset($params['include']['comments']) && $event['Question'][$key]['question_type'] == 'T') {
+                            array_push($row, $result['question_comment']);
+                        }
+                    } else {
+                        array_push($row, $result['grade']);
+                    }
                 }
             }
             array_push($row, $response[$this->responseModelName]['score']);
@@ -239,12 +253,47 @@ class ExportBaseNewComponent extends Object
                 $finalGrade = $response[$this->responseModelName]['score'];
             }
 
-            array_push($row, $finalGrade);
+            if (isset($params['include']['final_marks'])) {
+                array_push($row, $finalGrade);
+            }
             $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition + $yInc, $row);
             $yInc++;
         }
 
         return $this->ExportHelper2->arrayDraw($grid);
+    }
+
+    public function calcDimensionX($params, $event) {
+        $total = 2 + count($params['include']);
+        if (4 == $event['Event']['event_template_type_id']) {
+            $commentQuestions = Set::extract($event, '/Question[question_type=T]');
+            if (isset($params['include']['grade_tables'])) {
+                // question number - 1 as one is counted as grade_tables in include
+                $total += count($event['Question']) - count($commentQuestions) - 1;
+            }
+            if (isset($params['include']['comments'])) {
+                // question number - 1 as one is counted as comments in include
+                $total += count($commentQuestions) - 1;
+            }
+        } elseif (2 == $event['Event']['event_template_type_id']) {
+            if (isset($params['include']['grade_tables'])) {
+                // question number - 1 as one is counted as grade_tables in include
+                $total += count($event['Question']) - 1;
+            }
+        } else {
+            if (isset($params['include']['grade_tables'])) {
+                $total--;
+            }
+        }
+
+        if (isset($params['include']['student_name'])) {
+            $total++;
+        }
+        if (isset($params['include']['student_id'])) {
+            $total++;
+        }
+
+        return $total;
     }
 
     /*
@@ -680,11 +729,11 @@ for ($inc=0; $inc<$count($groupMembers); $inc++) {
         // Insert evaluators' comment
         $eventType == 'S' ? ($evalResults = $this->EvaluationSimple->getResultsByEvaluatee($grpEventId, $evaluateeId, true)) &&
             ($evalType = 'EvaluationSimple') &&
-            ($commentType = 'eval_comment')
+            ($commentType = 'comment')
             :
             ($evalResults = $this->EvaluationRubric->getResultsByEvaluatee($grpEventId, $evaluateeId, true)) &&
             ($evalType = 'EvaluationRubric') &&
-            ($commentType = 'general_comment');
+            ($commentType = 'comment');
         $yRowPosition = 2;
         for ($i=0; $i<count($groupMembers); $i++) {
             $evaluator = $groupMembers[$i];

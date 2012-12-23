@@ -253,11 +253,11 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         // Insert evaluators' comment
         $eventType == 'S' ? ($evalResults = $this->EvaluationSimple->getResultsByEvaluatee($grpEventId, $evaluateeId, true)) &&
             ($evalType = 'EvaluationSimple') &&
-            ($commentType = 'eval_comment')
+            ($commentType = 'comment')
             :
             ($evalResults = $this->EvaluationRubric->getResultsByEvaluatee($grpEventId, $evaluateeId, true)) &&
             ($evalType = 'EvaluationRubric') &&
-            ($commentType = 'general_comment');
+            ($commentType = 'comment');
         $yRowPosition = 2;
         for ($i=0; $i<count($groupMembers); $i++) {
             $evaluator = $groupMembers[$i];

@@ -68,7 +68,7 @@ isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = nu
         <td colspan="<?php echo $LOM_num+1?>" align="right"><?php __('Total Marks')?>: <?php echo $data['Rubric']['total_marks']?></td>
         <?php else: ?>
         <td colspan="<?php echo $LOM_num+2?>" align="center" class="tableheader2"><?php __('General Comments')?><br>
-            <textarea cols="80" rows="2" name="<?php echo $userId?>gen_comment" ><?php echo (isset($evaluation) ? $evaluation['EvaluationRubric']['general_comment'] : '')?></textarea>
+            <textarea cols="80" rows="2" name="<?php echo $userId?>gen_comment" ><?php echo (isset($evaluation) ? $evaluation['EvaluationRubric']['comment'] : '')?></textarea>
         </td>
         <?php endif;?>
     </tr>

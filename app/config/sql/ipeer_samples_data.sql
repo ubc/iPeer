@@ -516,7 +516,7 @@ CREATE TABLE IF NOT EXISTS `evaluation_rubrics` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `evaluator` int(11) NOT NULL DEFAULT '0',
   `evaluatee` int(11) NOT NULL DEFAULT '0',
-  `general_comment` text,
+  `comment` text,
   `score` double(12,2) NOT NULL DEFAULT '0.00',
   `comment_release` int(1) NOT NULL DEFAULT '0',
   `grade_release` int(1) NOT NULL DEFAULT '0',
@@ -535,7 +535,7 @@ CREATE TABLE IF NOT EXISTS `evaluation_rubrics` (
 -- Dumping data for table `evaluation_rubrics`
 --
 
-INSERT INTO evaluation_rubrics (id, evaluator, evaluatee, general_comment, score, comment_release, grade_release, grp_event_id, event_id, record_status, creator_id, created, updater_id, modified, rubric_id) VALUES
+INSERT INTO evaluation_rubrics (id, evaluator, evaluatee, comment, score, comment_release, grade_release, grp_event_id, event_id, record_status, creator_id, created, updater_id, modified, rubric_id) VALUES
 (1, 31, 32, 'We work well together.', 15.00, 0, 0, 4, 2, 'A', 31, '2012-07-13 10:26:47', 31, '2012-07-13 10:26:47', 1),
 (2, 31, 33, 'He did a great job.', 14.00, 0, 0, 4, 2, 'A', 31, '2012-07-13 10:29:14', 31, '2012-07-13 10:29:15', 1),
 (3, 7, 5, 'Good group member.', 14.00, 0, 0, 3, 2, 'A', 7, '2012-07-13 10:30:29', 7, '2012-07-13 10:30:29', 1),
@@ -553,7 +553,7 @@ CREATE TABLE IF NOT EXISTS `evaluation_simples` (
   `evaluator` int(11) NOT NULL DEFAULT '0',
   `evaluatee` int(11) NOT NULL DEFAULT '0',
   `score` int(5) NOT NULL DEFAULT '0',
-  `eval_comment` text,
+  `comment` text,
   `release_status` int(1) NOT NULL DEFAULT '0',
   `grp_event_id` int(11) NOT NULL DEFAULT '0',
   `event_id` bigint(11) NOT NULL DEFAULT '0',
@@ -571,7 +571,7 @@ CREATE TABLE IF NOT EXISTS `evaluation_simples` (
 -- Dumping data for table `evaluation_simples`
 --
 
-INSERT INTO evaluation_simples (id, evaluator, evaluatee, score, eval_comment, release_status, grp_event_id, event_id, date_submitted, grade_release, record_status, creator_id, created, updater_id, modified) VALUES
+INSERT INTO evaluation_simples (id, evaluator, evaluatee, score, comment, release_status, grp_event_id, event_id, date_submitted, grade_release, record_status, creator_id, created, updater_id, modified) VALUES
 (1, 7, 5, 95, 'very hard working', 0, 1, 1, '2012-07-13 10:21:57', 0, 'A', 7, '2012-07-13 10:21:57', 7, '2012-07-13 10:21:57'),
 (2, 7, 6, 105, 'did a decent job', 0, 1, 1, '2012-07-13 10:21:57', 0, 'A', 7, '2012-07-13 10:21:57', 7, '2012-07-13 10:21:57'),
 (3, 31, 32, 125, 'very good job', 0, 2, 1, '2012-07-13 10:23:11', 0, 'A', 31, '2012-07-13 10:23:11', 31, '2012-07-13 10:23:11'),

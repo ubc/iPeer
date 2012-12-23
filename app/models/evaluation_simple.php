@@ -235,7 +235,7 @@ class EvaluationSimple extends EvaluationResponseBase
     {
         $temp = $this->find('all', array(
             'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluateeId),
-            'fields' => array('evaluatee AS evaluateeId', 'eval_comment', 'event_id', 'User.first_name AS evaluator_first_name', 'User.last_name AS evaluator_last_name', 'User.student_no AS evaluator_student_no'),
+            'fields' => array('evaluatee AS evaluateeId', 'comment', 'event_id', 'User.first_name AS evaluator_first_name', 'User.last_name AS evaluator_last_name', 'User.student_no AS evaluator_student_no'),
             'joins' => array(
                 array(
                     'table' => 'users',
@@ -263,7 +263,7 @@ class EvaluationSimple extends EvaluationResponseBase
     {
         $temp = $this->find('first', array(
             'conditions' => array('EvaluationSimple.id' => $id),
-            'fields' => array('evaluatee AS evaluateeId', 'eval_comment', 'event_id', 'User.first_name AS evaluator_first_name', 'User.last_name AS evaluator_last_name', 'User.student_no AS evaluator_student_no'),
+            'fields' => array('evaluatee AS evaluateeId', 'comment', 'event_id', 'User.first_name AS evaluator_first_name', 'User.last_name AS evaluator_last_name', 'User.student_no AS evaluator_student_no'),
             'joins' => array(
                 array(
                     'table' => 'users',

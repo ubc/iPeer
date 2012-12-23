@@ -70,7 +70,7 @@ $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","
         <?php $col = $rubric['Rubric']['criteria'] + 1; ?>
         <td colspan="<?php echo $col ?>">
             <strong><?php __('General Comment') ?>: </strong><br>
-            <?php echo ($commentReleased ? $memberRubric['general_comment'] : __('n/a', true))?><br><br>
+            <?php echo ($commentReleased ? $memberRubric['comment'] : __('n/a', true))?><br><br>
         </td>
      </tr>
     <?php endforeach;
