@@ -9,7 +9,7 @@
         <td>Export File Type:</td>
         <td>
             <select name="export_type" class="export_type">
-                <option value="excel">excel</option>
+                <!--<option value="excel">excel</option>-->
                 <option value="csv">csv</option>
             </select>
       </td>
