@@ -71,38 +71,6 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         return $row;
     }
 
-
-    /**
-     * creteCsvSubHeaderHelper
-     *
-     * @param mixed $params     params
-     * @param mixed &$subHeader sub header
-     *
-     * @access public
-     * @return void
-     */
-    function creteCsvSubHeaderHelper($params, &$subHeader)
-    {
-        if (!empty($params['include']['group_names'])) {
-            $subHeader .= "Group Name, ";
-        }
-        if (!empty($params['include']['student_email'])) {
-            $subHeader .= "Email, ";
-        }
-        if (!empty($params['include']['student_name'])) {
-            $subHeader .= "Evaluatee, ";
-        }
-        if (!empty($params['include']['student_id'])) {
-            $subHeader .= "Evaluatee S#, ";
-        }
-        if (!empty($params['include']['student_name'])) {
-            $subHeader .= "Evaluator, ";
-        }
-        if (!empty($params['include']['student_id'])) {
-            $subHeader .= "Evaluator S#, ";
-        }
-    }
-
     /**
      * createCsvSubHeader
      *
@@ -114,31 +82,6 @@ Class ExportCsvComponent extends ExportBaseNewComponent
      */
     function createCsvSubHeader($params, $questions, $evalType)
     {
-        $subHeader = '';
-        $this->creteCsvSubHeaderHelper($params, $subHeader);
-
-        // comment header
-        if ($evalType != 4 && $params['include']['comments']) {
-            $subHeader .= 'Comment, ';
-        }
-
-        foreach ($questions as $key => $question) {
-            if (isset($question['question_type'])) {
-                if ((isset($params['include']['grade_tables']) && $question['question_type'] == 'S') ||
-                (isset($params['include']['comments']) && $question['question_type'] == 'T')) {
-                    $subHeader .= "Q".($key+1)." ( /".$question['multiplier']."), ";
-                }
-            } else {
-                $subHeader .= "Q".($key+1)." ( /".$question['multiplier']."), ";
-            }
-        }
-        $subHeader .= "Raw Score, Late Penalty";
-
-        if (isset($params['include']['final_marks'])) {
-            $subHeader .= ", Final Score";
-        }
-
-        return $subHeader;
     }
 
 
@@ -154,8 +97,6 @@ Class ExportCsvComponent extends ExportBaseNewComponent
     function createCsv($params, $event)
     {
         $csv = '';
-        $eventHeader = $this->generateHeader($params, $event);
-        $csv = $eventHeader."\n";
         $groupEvents = $event['GroupEvent'];
         $groupEventIds = Set::extract($groupEvents, '/id');
         $this->responseModelName = EvaluationResponseBase::$types[$event['Event']['event_template_type_id']];
@@ -167,11 +108,79 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         $evaluation = $this->evaluationModel->getEvaluation($event['Event']['template_id']);
         $event = array_merge($event, $evaluation);
 
-        $subHeader = $this->createCsvSubHeader($params, $event['Question'], $event['Event']['event_template_type_id']);
-        $csv .= $subHeader."\n\n";
+        $header = $this->generateHeader($params, $event);
+
+        $csv .= $header."\n\n";
         $csv .= $this->buildEvaluationScoreTableByEvent($params, $event, $results);
 
         return $csv;
+    }
+
+    /**
+     * generateHeader
+     *
+     * @param mixed $params params
+     * @param mixed $event  event
+     *
+     * @access public
+     * @return void
+     */
+    function generateHeader($params, $event)
+    {
+        $header = array();
+
+        if (!empty($params['include']['course'])) {
+            $header[] = "Course Name";
+        }
+        if (!empty($params['include']['eval_event_names'])) {
+            $header[] = "Event";
+        }
+        if (!empty($params['include']['eval_event_type'])) {
+            $header[] = "Evaluation Type";
+        }
+
+        if (!empty($params['include']['group_names'])) {
+            $header[] = "Group Name";
+        }
+        if (!empty($params['include']['student_email'])) {
+            $header[] = "Email";
+        }
+        if (!empty($params['include']['student_name'])) {
+            $header[] = "Evaluatee";
+        }
+        if (!empty($params['include']['student_id'])) {
+            $header[] = "Evaluatee S#";
+        }
+        if (!empty($params['include']['student_name'])) {
+            $header[] = "Evaluator";
+        }
+        if (!empty($params['include']['student_id'])) {
+            $header[] = "Evaluator S#";
+        }
+
+        // comment header
+        if ($event['Event']['event_template_type_id'] != 4 && $params['include']['comments']) {
+            $header[] = 'Comment';
+        }
+
+        foreach ($event['Question'] as $key => $question) {
+            if (isset($question['question_type'])) {
+                if ((isset($params['include']['grade_tables']) && $question['question_type'] == 'S') ||
+                (isset($params['include']['comments']) && $question['question_type'] == 'T')) {
+                    $header[] = "Q".($key+1)." ( /".$question['multiplier']."), ";
+                }
+            } else {
+                $header[] = "Q".($key+1)." ( /".$question['multiplier']."), ";
+            }
+        }
+        $header[] = "Raw Score";
+        $header[] = "Late Penalty";
+
+        if (isset($params['include']['final_marks'])) {
+            $header[] = "Final Score";
+        }
+
+        return join(', ', $header);
     }
 
     /**

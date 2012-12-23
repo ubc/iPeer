@@ -76,45 +76,6 @@ class ExportBaseNewComponent extends Object
     }
 
     /**
-     * generateHeader
-     *
-     * @param mixed $params params
-     * @param mixed $event  event
-     *
-     * @access public
-     * @return void
-     */
-    function generateHeader($params, $event)
-    {
-        $header = '';
-
-        if (!empty($params['include_course']) || !empty($params['include_eval_event_names'])) {
-            $header .= "********************************************\n";
-            if (!empty($params['include_course'])) {
-                $header .= "Course Name : ,,".$event['Course']['title']."\n";
-            }
-            if (!empty($params['include_eval_event_names'])) {
-                $header .= "Event : ,,".$event['Event']['title']."\n";
-            }
-        }
-        if (!empty($params['include_eval_event_type'])) {
-            $header .= "Evaluation Type : ,,".$this->eventType[$event['Event']['event_template_type_id']]."\n\n";
-        }
-        if (!empty($params['include_date'])) {
-            $header .= "Date : ,,".date("F j Y g:i a")."\n";
-        }
-        if (!empty($params['include_instructors'])) {
-            $header .= "Instructors :,,";
-            foreach ($event['Course']['Instructor'] as $i) {
-                $header .= $i['full_name'].",";
-            }
-        }
-
-        $header .= "\n********************************************\n";
-        return $header;
-    }
-
-    /**
      * buildEvaluationScoreTableByGroup
      *
      * @param mixed $params     params
@@ -190,6 +151,15 @@ class ExportBaseNewComponent extends Object
 
         foreach ($group['Member'] as $evaluator) {
             $row = array();
+            if (!empty($params['include']['course'])) {
+                array_push($row, $event['Course']['course']);
+            }
+            if (!empty($params['include']['eval_event_names'])) {
+                array_push($row, $event['Event']['title']);
+            }
+            if (!empty($params['include']['eval_event_type'])) {
+                array_push($row, $this->eventType[$event['Event']['event_template_type_id']]);
+            }
             if (!empty($params['include']['group_names'])) {
                 array_push($row, $group['Group']['group_name']);
             }

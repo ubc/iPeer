@@ -18,10 +18,10 @@
         <td>Event Name:</td>
         <td>
             <select name="event_id" class= "event_id">
-            <?php if($fromEvent): ?>
+            <?php if ($fromEvent): ?>
             <option value="<?php echo $selectedEvent['Event']['id']?>"><?php echo $selectedEvent['Event']['title']?></option>
             <?php else: ?>
-                <?php foreach($events as $e): ?>
+                <?php foreach ($events as $e): ?>
                     <option value="<?php echo $e['Event']['id']?>"><?php echo $e["Event"]["title"]?></option>
                 <?php endforeach; ?>
             <?php endif; ?>
@@ -29,25 +29,25 @@
         </td>
     </tr>
     <tr>
-      <th colspan="2">Header</th>
+      <th colspan="2">Evaluation Info</th>
     </tr>
     <tr>
-      <td>Include Course Name:&nbsp;<font color="red">*</td><td><input type="checkbox" name="include_course" checked /></td>
+      <td>Include Course Name:&nbsp;<font color="red">*</td><td><input type="checkbox" name="include[course]" checked /></td>
     </tr>
     <tr>
-      <td>Include Event Name:&nbsp;<font color="red">*</td><td><input type="checkbox" name="include_eval_event_names" checked /></td>
+      <td>Include Event Name:&nbsp;<font color="red">*</td><td><input type="checkbox" name="include[eval_event_names]" checked /></td>
+    </tr>
+    <!--<tr>
+      <td>Include Date of Export:</td><td><input type="checkbox" name="include[date]" checked /></td>
     </tr>
     <tr>
-      <td>Include Date of Export:</td><td><input type="checkbox" name="include_date" checked /></td>
+      <td>Include Instructor Name:</td><td><input type="checkbox" name="include[instructors]" checked /></td>
+    </tr>-->
+    <tr>
+      <td>Include Evaluation Type:</td><td><input type="checkbox" name="include[eval_event_type]" checked /></td>
     </tr>
     <tr>
-      <td>Include Instructor Name:</td><td><input type="checkbox" name="include_instructors" checked /></td>
-    </tr>
-    <tr>
-      <td>Include Evaluation Type:</td><td><input type="checkbox" name="include_eval_event_type" checked /></td>
-    </tr>
-    <tr>
-      <th colspan="3">Body</th>
+      <th colspan="3">Group and Result</th>
     </tr>
     <tr>
       <td>Include Group Names:</td><td><input type="checkbox" name="include[group_names]" checked /></td>
