@@ -1220,7 +1220,7 @@ class EvaluationComponent extends Object
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
         $totalGrade = 0;
 
-        for ($i=0; $i < $mixeval['Mixeval']['total_question']; $i++) {
+        for ($i=1; $i <= $mixeval['Mixeval']['total_question']; $i++) {
             $evalMixevalDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera($evalMixevalId, $i);
 
             if (isset($evalMixevalDetail[$i])) {

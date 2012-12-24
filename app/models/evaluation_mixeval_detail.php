@@ -11,7 +11,7 @@
 class EvaluationMixevalDetail extends AppModel
 {
     public $name = 'EvaluationMixevalDetail';
-    public $actsAs = array('Traceable');
+    public $actsAs = array('Traceable', 'Containable');
 
     public $belongsTo = array('EvaluationMixeval' =>
         array(
@@ -64,9 +64,10 @@ class EvaluationMixevalDetail extends AppModel
         } else {
             $type = 'first';
         }
-        
+
         return $this->find($type, array(
-            'conditions' => $conditions, 'order'=>'question_number'
+            'conditions' => $conditions, 'order'=>'question_number',
+            'contain' => false,
         ));
     }
 }
