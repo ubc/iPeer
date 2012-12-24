@@ -223,8 +223,8 @@ class EvaluationsController extends AppController
     /**
      * export
      *
-     * @param mixed $type
-     * @param mixed $id
+     * @param mixed $type course or event
+     * @param mixed $id   course/event id
      *
      * @access public
      * @return void
@@ -300,12 +300,12 @@ class EvaluationsController extends AppController
                 $this->ExportCsv->createCsv($this->params['form'], $event);
                 break;
             case "excel" :
-                $fileContent = $this->ExportExcel->createExcel($this->params['form'], $event);
+                $this->ExportExcel->createExcel($this->params['form'], $event);
                 break;
             default :
                 throw new Exception("Invalid evaluation selection.");
             }
-            $this->log($this->User->getDataSource()->getLog(false, false), 'debug');
+            $this->log('Memory Usage for exporting event '.$event['Event']['title'].': '.memory_get_peak_usage(), 'debug');
         } else {
             // Set up data
             $this->set('file_name', date('m.d.y'));
