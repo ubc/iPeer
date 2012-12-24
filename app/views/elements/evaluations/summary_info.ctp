@@ -6,7 +6,7 @@
 <table class="standardtable">
 <?php
 if (!empty($inCompletedMembers)) {
-    echo $html -> tableHeaders(array(__('These people have not yet submitted their evaluations', true)), null, array('class' => 'red'));
+    echo $html->tableHeaders(array(__('These people have not yet submitted their evaluations', true)), null, array('class' => 'red'));
     $incompletedMembersArr = array();
     $users = array();
     foreach ($inCompletedMembers as $row) {
@@ -14,7 +14,7 @@ if (!empty($inCompletedMembers)) {
         array_push($incompletedMembersArr, $user['first_name'] . " " . $user['last_name']);
         $users[] = array($user['first_name'] . " " . $user['last_name'] . ($row['Role'][0]['id'] == 4 ? ' (TA)' : ' (student)'));
     }
-    echo $html -> tableCells($users);
+    echo $html->tableCells($users);
 }
 ?>
 </table>

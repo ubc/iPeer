@@ -4,7 +4,11 @@ function array_avg($arr) {
         return 0;
     }
 
-    return array_sum($arr) / count(array_filter($arr, 'is_numeric'));
+    if (!($count = count(array_filter($arr, 'is_numeric')))) {
+        return 0;
+    }
+
+    return array_sum($arr) / $count;
 }
 
 class EvaluationHelper extends AppHelper {
@@ -33,8 +37,8 @@ class EvaluationHelper extends AppHelper {
             $tr = array();
             $tr[] = $memberList[$evaluteeId];
             foreach ($numberQuestions as $question) {
-                $tr[] = isset($scores[$question['MixevalsQuestion']['question_num']-1]) ?
-                    $scores[$question['MixevalsQuestion']['question_num']-1] : __('N/A', true);
+                $tr[] = isset($scores[$question['MixevalsQuestion']['question_num']]) ?
+                    $scores[$question['MixevalsQuestion']['question_num']] : __('N/A', true);
             }
 
             // find out penalties for total column
@@ -60,7 +64,7 @@ class EvaluationHelper extends AppHelper {
         $tr = array(__('Group Average', true));
         foreach ($numberQuestions as $question) {
             if ($totalCounter) {
-                $avg = array_avg(Set::classicExtract($scoreRecords, '{n}.'.($question['MixevalsQuestion']['question_num']-1)));
+                $avg = array_avg(Set::classicExtract($scoreRecords, '{n}.'.($question['MixevalsQuestion']['question_num'])));
                 $tr[] = number_format($avg, 2);
             } else {
                 // no values in the table
@@ -69,20 +73,20 @@ class EvaluationHelper extends AppHelper {
         }
         $tr[] = $totalCounter ? number_format($totalScore/$totalCounter,2) : __('N/A', true);
         $table[] = $tr;
-        
+
         return $table;
     }
-    
-    function getRubricSummaryTableHeader($total, $criteria) {      
+
+    function getRubricSummaryTableHeader($total, $criteria) {
         $header = array(__('Evaluatee', true));
         foreach ($criteria as $key => $criterion) {
             $header[] = sprintf('%d (/%.1f)', $key+1, $criterion['multiplier']);
         }
         $header[] = __("Total", true) . ' (/' . number_format($total, 2) . ')';
-        
+
         return $header;
     }
-    
+
     function getRubricSummaryTable($memberList, $scores, $scoreSummary, $penalties, $total) {
         $average = array_pop($scores);
         $totalAve = 0;
@@ -94,7 +98,7 @@ class EvaluationHelper extends AppHelper {
             foreach($score['rubric_criteria_ave'] as $key => $criterion) {
                 $user[] = isset($criterion) ? number_format($criterion,2) : 'N/A';
             }
-            
+
             if (!isset($scoreSummary[$userId]['received_ave_score'])) {
                 $user[] = sprintf('%.2 (%.2f%%)', 0, 0);
                 $totalAve += 0;
@@ -153,7 +157,7 @@ class EvaluationHelper extends AppHelper {
             // change the details indexed by question_number
             $resultDetails = Set::combine($row['EvaluationMixevalDetail'], '{n}.question_number', '{n}');
             foreach ($questions as $question) {
-                $detail = $resultDetails[$question['MixevalsQuestion']['question_num']-1];
+                $detail = $resultDetails[$question['MixevalsQuestion']['question_num']];
                 $tr[] = $this->renderQuestionResult($question, $detail);
             }
             $table[] = $tr;
