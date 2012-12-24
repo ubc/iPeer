@@ -267,7 +267,7 @@ class GroupsController extends AppController
                 'conditions' => array('group_id' => $group_id),
                 'fields' => array('GroupEvent.id')
             ));
-        $submissions = $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent);
+        $submissions = empty($groupEvent) ? false : $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent);
 
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))
             ->push(array('groups' => array('course_id' => $course['Course']['id'])))
