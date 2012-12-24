@@ -274,6 +274,20 @@ class EventTestCase extends CakeTestCase
         $this->assertFalse($event);
     }
 
+    function testGetEventsByUserId()
+    {
+        $events = $this->Event->getEventsByUserId(5);
+        $evaluations = $events['Evaluations'];
+        $this->assertEqual(count($evaluations), 7);
+        $surveys = $events['Surveys'];
+        $this->assertEqual(count($surveys), 2);
+
+        $events = $this->Event->getEventsByUserId(27);
+        $evaluations = $events['Evaluations'];
+        $this->assertEqual(count($evaluations), 0);
+        $surveys = $events['Surveys'];
+        $this->assertEqual(count($surveys), 0);
+    }
 
     #####################################################################################################################################################
     ###############################################     HELPER FUNCTIONS     ############################################################################

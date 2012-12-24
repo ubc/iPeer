@@ -78,7 +78,7 @@ class HomeController extends AppController
             $event['percent_penalty'] = $pctPenalty;
         }
 
-        // format the 'due in' time interval for display 
+        // format the 'due in' time interval for display
         foreach ($events as &$types) {
             foreach ($types as &$event) {
                 $event['Event']['due_in'] = $this->_formatDueIn(
@@ -120,13 +120,13 @@ class HomeController extends AppController
         elseif ($seconds < 3600) {
             $minutes = (int) ($seconds / 60);
             $seconds = $seconds % 60;
-            $ret = $minutes . __(' minutes ', true) . $seconds 
+            $ret = $minutes . __(' minutes ', true) . $seconds
                 . __(' seconds', true);
         }
         else {
             $hours = (int) ($seconds / 3600);
             $minutes = (int) ($seconds % 3600 / 60);
-            $ret = $hours . __(' hours ', true) . $minutes . 
+            $ret = $hours . __(' hours ', true) . $minutes .
                 __(' minutes', true);
         }
         return $ret;
@@ -134,13 +134,13 @@ class HomeController extends AppController
 
     /**
      * Helper to filter events into 3 different categories and to
-     * discard inactive events. 
+     * discard inactive events.
      *
      * The 3 categories are: Upcoming, Submitted, Expired
      *
      * - Upcoming are events that the user can still make submissions for.
      * - Submitted are events that the user has already made a submission.
-     * - Expired are events that the user hasn't made and can no longer make 
+     * - Expired are events that the user hasn't made and can no longer make
      * submissions, but they can still view results from their peers.
      *
      * An evaluation is considered inactive once past its result release
@@ -152,7 +152,7 @@ class HomeController extends AppController
      * @return Discard inactive events and then split the remaining events
      * into upcoming, submitted, and expired.
      * */
-    private function _splitSubmittedEvents($events) 
+    private function _splitSubmittedEvents($events)
     {
         $submitted = $upcoming = $expired = array();
         foreach ($events as $event) {
@@ -162,7 +162,7 @@ class HomeController extends AppController
                 $upcoming[] = $event;
             }
             else if (!empty($event['EvaluationSubmission']) &&
-                strtotime('NOW') < 
+                strtotime('NOW') <
                 strtotime($event['Event']['result_release_date_end'])
             ) { // has submission and can or will be able to view results soon
                 // note that we're not using is_released or is_result_released
@@ -179,14 +179,14 @@ class HomeController extends AppController
                 $submitted[] = $event;
             }
             else if (empty($event['EvaluationSubmission']) &&
-                strtotime('NOW') < 
+                strtotime('NOW') <
                 strtotime($event['Event']['result_release_date_end'])
             ) { // student did not do the survey within the allowed time
                 // but we should still let them view results
                 $expired[] = $event;
             }
         }
-        return array('upcoming' => $upcoming, 
+        return array('upcoming' => $upcoming,
             'submitted' => $submitted,
             'expired' => $expired
         );

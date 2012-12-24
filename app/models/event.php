@@ -551,7 +551,7 @@ class Event extends AppModel
     /**
      * Get evaluations and surveys assigned to the given user. Also gets the
      * evaluation submission entries made by this specific user.
-     * 
+     *
      * @param mixed $userId
      *
      * @access public
@@ -582,9 +582,17 @@ class Event extends AppModel
             )
         ));
 
+        // to find the surveys, we need to find the courses that user is enrolled in
+        // can't use find('list') as we are query the conditions on HABTM
+        $courses = $this->Course->find('all', array(
+            'fields' => array('id'),
+            'conditions' => array('Enrol.id' => $userId),
+            'contain' => 'Enrol',
+        ));
+        $courseIds = Set::extract($courses, '/Course/id');
         // find survey events based on the groups this user is in
         $surveyEvents = $this->find('all', array(
-            'conditions' => array('event_template_type_id' => '3'),
+            'conditions' => array('event_template_type_id' => '3', 'course_id' => $courseIds),
             'order' => array('due_in ASC'),
             'contain' => array(
                 'Course',
@@ -594,7 +602,7 @@ class Event extends AppModel
             )
         ));
 
-        return array('Evaluations' => $evaluationEvents, 
+        return array('Evaluations' => $evaluationEvents,
             'Surveys' => $surveyEvents);
     }
 
