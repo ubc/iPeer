@@ -1,3 +1,12 @@
+iPeer 3.0.0
+More than 74 bug fixes or improvement from 3.0.0 Beta
+ * Better CSV export. More efficient and better format for processes
+ * Upgrade scripts allowing to upgrade from 2.x
+ * Better student home page
+ * Confirmation email after evaluation submitted
+ * New color theme
+ * And more
+
 iPeer 3.0.0 Beta
 New Features:
  * Improved Installation and Upgrade Wizard
