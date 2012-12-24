@@ -293,9 +293,11 @@ class EvaluationsController extends AppController
             }
 
             $fileName = isset($this->params['form']['file_name']) && !empty($this->params['form']['file_name']) ? $this->params['form']['file_name']:date('m.d.y');
+            header('Content-Type: application/csv');
+            header('Content-Disposition: attachment; filename=' . $fileName . '.csv');
             switch($this->params['form']['export_type']) {
             case "csv" :
-                $fileContent = $this->ExportCsv->createCsv($this->params['form'], $event);
+                $this->ExportCsv->createCsv($this->params['form'], $event);
                 break;
             case "excel" :
                 $fileContent = $this->ExportExcel->createExcel($this->params['form'], $event);
@@ -303,10 +305,7 @@ class EvaluationsController extends AppController
             default :
                 throw new Exception("Invalid evaluation selection.");
             }
-            header('Content-Type: application/csv');
-            header('Content-Disposition: attachment; filename=' . $fileName . '.csv');
             $this->log($this->User->getDataSource()->getLog(false, false), 'debug');
-            echo $fileContent;
         } else {
             // Set up data
             $this->set('file_name', date('m.d.y'));

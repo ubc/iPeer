@@ -153,12 +153,11 @@ class ExportHelper2Component extends Object
         $xLim = count($grid);
         $yLim = count($grid[0]);
         for ($y=0; $y<$yLim; $y++) {
-            for ($x=0; $x<$xLim; $x++) {
+            for ($x=0; $x<$xLim-1; $x++) {
                 $formatCSV .= $grid[$x][$y].",";
             }
             $formatCSV .= "\n";
         }
-
         return $formatCSV;
     }
 

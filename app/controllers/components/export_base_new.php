@@ -89,17 +89,17 @@ class ExportBaseNewComponent extends Object
     {
         $this->Group = ClassRegistry::init('Group');
         $group = $this->Group->getGroupWithMemberRoleByGroupIdEventId($groupEvent['group_id'], $event['Event']['id']);
-        $csv = '';
+        $grid = array();
         $responsesByEvaluatee = Set::combine($results, '{n}.'.$this->responseModelName.'.evaluator', '{n}', '{n}.'.$this->responseModelName.'.evaluatee');
         foreach ($group['Member'] as $member) {
             // skip the non student member, for now we assume all the evaluatees are students
             if ($member['Role']['name'] != 'student') {
                 continue;
             }
-
-            $csv .= $this->buildScoreTableByEvaluatee($params, $group, $member, $event, $responsesByEvaluatee);
+            $grid = array_merge($grid, $this->buildScoreTableByEvaluatee($params, $group, $member, $event, $responsesByEvaluatee));
         }
-        return $csv;
+
+        return $grid;
     }
 
 
@@ -114,15 +114,14 @@ class ExportBaseNewComponent extends Object
      */
     function buildEvaluationScoreTableByEvent($params, $event, $results)
     {
-        $csv  = '';
+        $grid = array();
         if (empty($event['GroupEvent'])) {
-            return $csv;
+            return $grid;
         }
         foreach ($event['GroupEvent'] as $ge) {
-            $resultTable =  $this->buildEvaluationScoreTableByGroup($params, $ge, $event, $results[$ge['id']]);
-            $csv .= $resultTable."\n";
+            $grid = array_merge($grid, $this->buildEvaluationScoreTableByGroup($params, $ge, $event, $results[$ge['id']]));
         }
-        return $csv;
+        return $grid;
     }
 
 
@@ -147,7 +146,7 @@ class ExportBaseNewComponent extends Object
 
         $xDimension = $this->calcDimensionX($params, $event);
         $yDimensions = count($group['Member']);
-        $grid = $this->ExportHelper2->buildExporterGrid($xDimension, $yDimensions);
+        $grid = array();
 
         foreach ($group['Member'] as $evaluator) {
             $row = array();
@@ -181,8 +180,7 @@ class ExportBaseNewComponent extends Object
 
             // check if we have a reponse for this evaluator
             if (!isset($responses[$evaluatee['id']]) || !array_key_exists($evaluator['id'], $responses[$evaluatee['id']])) {
-                $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition+$yInc, $row);
-                $yInc++;
+                array_push($row, array_fill(0, $xDimension - count($row), ''));
                 continue;
             }
 
@@ -226,11 +224,11 @@ class ExportBaseNewComponent extends Object
             if (isset($params['include']['final_marks'])) {
                 array_push($row, $finalGrade);
             }
-            $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition + $yInc, $row);
+            $grid[] = $row;
             $yInc++;
         }
 
-        return $this->ExportHelper2->arrayDraw($grid);
+        return $grid;
     }
 
     public function calcDimensionX($params, $event) {

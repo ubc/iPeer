@@ -96,7 +96,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
      */
     function createCsv($params, $event)
     {
-        $csv = '';
+        $grid = array();
         $groupEvents = $event['GroupEvent'];
         $groupEventIds = Set::extract($groupEvents, '/id');
         $this->responseModelName = EvaluationResponseBase::$types[$event['Event']['event_template_type_id']];
@@ -110,10 +110,9 @@ Class ExportCsvComponent extends ExportBaseNewComponent
 
         $header = $this->generateHeader($params, $event);
 
-        $csv .= $header."\n\n";
-        $csv .= $this->buildEvaluationScoreTableByEvent($params, $event, $results);
+        $grid = $this->buildEvaluationScoreTableByEvent($params, $event, $results);
 
-        return $csv;
+        $this->render($header, $grid);
     }
 
     /**
@@ -167,10 +166,10 @@ Class ExportCsvComponent extends ExportBaseNewComponent
             if (isset($question['question_type'])) {
                 if ((isset($params['include']['grade_tables']) && $question['question_type'] == 'S') ||
                 (isset($params['include']['comments']) && $question['question_type'] == 'T')) {
-                    $header[] = "Q".($key+1)." ( /".$question['multiplier']."), ";
+                    $header[] = "Q".($key+1)." ( /".$question['multiplier'].")";
                 }
             } else {
-                $header[] = "Q".($key+1)." ( /".$question['multiplier']."), ";
+                $header[] = "Q".($key+1)." ( /".$question['multiplier'].")";
             }
         }
         $header[] = "Raw Score";
@@ -180,7 +179,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
             $header[] = "Final Score";
         }
 
-        return join(', ', $header);
+        return $header;
     }
 
     /**
@@ -313,4 +312,23 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         }
     }
 
+    /**
+     * render
+     *
+     * @param mixed $header csv header
+     * @param mixed $grid   data grid
+     *
+     * @access public
+     * @return void
+     */
+    function render($header, $grid)
+    {
+        $target = array();
+        $resource = fopen('php://output', 'a');
+        fputcsv($resource, $header);
+        foreach ($grid as $row) {
+            fputcsv($resource, $row);
+        }
+        fclose($resource);
+    }
 }
