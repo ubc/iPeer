@@ -46,7 +46,7 @@ class EvaluationRubricTestCase extends CakeTestCase
         // Assert the queried data is correct
         $this->assertTrue(!empty($ret));
 
-        $this->assertEqual($ret['EvaluationRubric']['general_comment'], 'We work well together.');
+        $this->assertEqual($ret['EvaluationRubric']['comment'], 'We work well together.');
         $this->assertEqual($ret['EvaluationRubric']['score'], 15.00);
         $this->assertEqual($ret['EvaluationRubric']['event_id'], 2);
         // Test invalid inputs
@@ -66,7 +66,7 @@ class EvaluationRubricTestCase extends CakeTestCase
         $ret = $this->EvaluationRubric->getResultsByEvaluatee(4, 33);
         // Assert the queried data matches and is correctly ordered according to the fixture data
         $this->assertTrue(!empty($ret[0]));
-        $this->assertEqual($ret[0]['EvaluationRubric']['general_comment'], 'He did a great job.');
+        $this->assertEqual($ret[0]['EvaluationRubric']['comment'], 'He did a great job.');
         $this->assertEqual($ret[0]['EvaluationRubric']['score'], 14.00);
         // Test invalid inputs
         $invalidInputs = $this->EvaluationRubric->getResultsByEvaluatee(1, 999);
@@ -115,10 +115,10 @@ class EvaluationRubricTestCase extends CakeTestCase
 
         // Note that the returned comments are not sorted in any particular
         // order and must be tested in an order-agnostic way.
-        $actual = array($comment1, $comment2, $comment3, $comment4, 
+        $actual = array($comment1, $comment2, $comment3, $comment4,
             $comment5, $comment6);
         $expected = array('Yes', 'Yes', 'Absolutely', 'Definitely',
-            'attended all of our team meetings', 
+            'attended all of our team meetings',
             'very helpful in all parts of the project'
         );
 
@@ -150,7 +150,7 @@ class EvaluationRubricTestCase extends CakeTestCase
     function testGetAllComments()
     {
         $ret = $this->EvaluationRubric->getAllComments(3, 5);
-        $this->assertEqual($ret[0]['EvaluationRubric']['general_comment'], 'Good group member.');
+        $this->assertEqual($ret[0]['EvaluationRubric']['comment'], 'Good group member.');
     }
 
     function testGetReceivedTotalEvaluatorCount()

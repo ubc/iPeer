@@ -228,27 +228,23 @@ class EvaluationsController extends AppController
     /**
      * export
      *
-     * @param mixed $type
-     * @param mixed $id
+     * @param mixed $type course or event
+     * @param mixed $id   course/event id
      *
      * @access public
      * @return void
      */
     function export($type, $id)
     {
-        // Make sure the present user has Permission
-        if (!User::hasPermission('functions/evaluation/export')) {
-            $this->Session->setFlash(__('Error: You do not have permission to export evaluation results', true));
-            $this->redirect('/home');
-        }
-
         // $type must be course or event
         if ('course' != $type && 'event' != $type) {
             $this->Session->setFlash('Error: Invalid export type', true);
             $this->redirect('/courses');
+            return;
         } else if (!is_numeric($id)) {
             $this->Session->setFlash(__('Error: Invalid id', true));
             $this->redirect('/courses');
+            return;
         }
 
         $this->set('type', $type);
@@ -295,21 +291,26 @@ class EvaluationsController extends AppController
         if (isset($this->params['form']) && !empty($this->params['form'])) {
             $this->autoRender = false;
 
+            if (!($event = $this->Event->getAccessibleEventById($this->params['form']['event_id'], User::get('id'), User::getCourseFilterPermission(), array('Course' => array('Instructor'), 'GroupEvent', 'EventTemplateType', 'Penalty' => array('order' => array('days_late ASC')))))) {
+                $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+                $this->redirect('index');
+                return;
+            }
+
             $fileName = isset($this->params['form']['file_name']) && !empty($this->params['form']['file_name']) ? $this->params['form']['file_name']:date('m.d.y');
+            header('Content-Type: application/csv');
+            header('Content-Disposition: attachment; filename=' . $fileName . '.csv');
             switch($this->params['form']['export_type']) {
             case "csv" :
-                $fileContent = $this->ExportCsv->createCsv($this->params['form'], $this->params['form']['event_id']);
+                $this->ExportCsv->createCsv($this->params['form'], $event);
                 break;
             case "excel" :
-                $fileContent = $this->ExportExcel->createExcel($this->params['form'], $this->params['form']['event_id']);
+                $this->ExportExcel->createExcel($this->params['form'], $event);
                 break;
             default :
                 throw new Exception("Invalid evaluation selection.");
             }
-            header('Content-Type: application/csv');
-            header('Content-Disposition: attachment; filename=' . $fileName . '.csv');
-            echo $fileContent;
-            //	  }
+            $this->log('Memory Usage for exporting event '.$event['Event']['title'].': '.memory_get_peak_usage(), 'debug');
         } else {
             // Set up data
             $this->set('file_name', date('m.d.y'));
@@ -321,6 +322,7 @@ class EvaluationsController extends AppController
      *
      * @param mixed $eventId  event id
      * @param mixed $objectId object id
+     *
      * @access public
      * @return void
      */
@@ -394,14 +396,12 @@ class EvaluationsController extends AppController
                 $this->redirect('/home/index');
                 return;
             }
-			
-			
 
             // students can submit again
             $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
-			
-			$now = time();
-            // students can't submit outside of release date range            
+
+            $now = time();
+            // students can't submit outside of release date range
             if ($now < strtotime($event['Event']['release_date_begin']) ||
                 $now > strtotime($event['Event']['release_date_end'])) {
                 $this->Session->setFlash(__('Error: Evaluation is unavailable', true));
@@ -1045,9 +1045,9 @@ class EvaluationsController extends AppController
             $studentId = $groupId;
             $formattedResult = $this->Evaluation->formatSurveyEvaluationResult($event, $studentId);
             $user = $this->User->find(
-                'first', 
+                'first',
                 array(
-                    'conditions' => array('User.id' => $studentId), 
+                    'conditions' => array('User.id' => $studentId),
                     'contain' => false
                 )
             );
@@ -1057,7 +1057,7 @@ class EvaluationsController extends AppController
             foreach ($formattedResult['answers'] as $answer) {
                 $answers[$answer['SurveyInput']['question_id']][] = $answer;
             }
-            
+
             $this->set('name', $user['User']['full_name']);
             $this->set('answers', $answers);
             $this->set('questions', $formattedResult['questions']);
@@ -1663,7 +1663,7 @@ class EvaluationsController extends AppController
             $survey['Survey']['id'], $eventId);
 
         $this->set('questions', $formattedResult);
-        $this->set('breadcrumb', 
+        $this->set('breadcrumb',
             $this->breadcrumb->push(array('course' => $course['Course']))
             ->push(array('survey' => $survey['Survey']))
             ->push(__('Summary', true)));
@@ -1885,7 +1885,7 @@ class EvaluationsController extends AppController
         $evaluation_rubric_general_data=array();
         foreach ($evaluation_rubric_id as $key => $value) {
             //field 7,8
-            $evaluation_rubric_general_data["$value"]=$this->EvaluationRubric->find("id=$value", array("evaluator", "evaluatee", "general_comment", "score"), "id asc", false);
+            $evaluation_rubric_general_data["$value"]=$this->EvaluationRubric->find("id=$value", array("evaluator", "evaluatee", "comment", "score"), "id asc", false);
         }
 
         //pre($evaluation_rubric_general_data);
@@ -1945,7 +1945,7 @@ class EvaluationsController extends AppController
                 //2) get student number from user_data
                 $student_number=$user_data[$evaluatee_id]['User']['student_no'];                //3) if current student is the evaluatee
                 if ($value['User']['student_no']==$student_number) {
-                    $general_comments=$general_comments.''.$array['EvaluationRubric']['general_comment'].';';
+                    $general_comments=$general_comments.''.$array['EvaluationRubric']['comment'].';';
                     //add up score
                     $score_total=$score_total+$array['EvaluationRubric']['score'];
                 }

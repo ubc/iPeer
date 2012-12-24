@@ -308,7 +308,7 @@ foreach ($groupMembers as $row) {
         if (isset($evalMark)) {
             echo '<td>'.$evaluatee['full_name'].'</td>';
             echo '<td>';
-            echo (isset($evalMark['eval_comment']))? $evalMark['eval_comment'] : __('No Comments', true);
+            echo (isset($evalMark['comment']))? $evalMark['comment'] : __('No Comments', true);
             echo '</td>' ;
             if ($evalMark['release_status'] == 1) { // made explicit comparison with 1
                 echo '<td>' . '<input type="checkbox" name="release' .  $evalMark['evaluator']  . '[]" value="' . $evalMark['evaluatee'] . '" checked />';

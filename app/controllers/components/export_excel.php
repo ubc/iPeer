@@ -253,11 +253,11 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         // Insert evaluators' comment
         $eventType == 'S' ? ($evalResults = $this->EvaluationSimple->getResultsByEvaluatee($grpEventId, $evaluateeId, true)) &&
             ($evalType = 'EvaluationSimple') &&
-            ($commentType = 'eval_comment')
+            ($commentType = 'comment')
             :
             ($evalResults = $this->EvaluationRubric->getResultsByEvaluatee($grpEventId, $evaluateeId, true)) &&
             ($evalType = 'EvaluationRubric') &&
-            ($commentType = 'general_comment');
+            ($commentType = 'comment');
         $yRowPosition = 2;
         for ($i=0; $i<count($groupMembers); $i++) {
             $evaluator = $groupMembers[$i];
@@ -616,21 +616,20 @@ Class ExportExcelComponent extends ExportBaseNewComponent
      * @access public
      * @return void
      */
-    function createExcel($params, $eventId)
+    function createExcel($params, $event)
     {
         // Prepare header.
-        $header = $this->generateHeader2($params, $eventId, 'fsa');
+        $header = $this->generateHeader2($params, $event, 'fsa');
         $this->_drawToExcelSheetAtCoordinates($header, $this->cursor['x'], $this->cursor['y']);
         $this->_setFontSizeVertically(1, count($header[0])-1, 'A', 16);
         $this->cursor['y'] += (count($header[0]));
-        $groupEvents = $this->GroupEvent->getGroupEventByEventId($eventId);
-        $event = $this->Event->getEventById($eventId);
+        $groupEvents = $event['GroupEvent'];
         switch($event['Event']['event_template_type_id']){
-            // Simple Evaluation
         case 1 :
+            // Simple Evaluation
             for ($i=0; $i<count($groupEvents); $i++) {
-                $group = $this->Group->getGroupByGroupId($groupEvents[$i]['GroupEvent']['group_id']);
-                $grpEventId = $groupEvents[$i]['GroupEvent']['id'];
+                $group = $this->Group->getGroupByGroupId($groupEvents[$i]['group_id']);
+                $grpEventId = $groupEvents[$i]['id'];
                 $groupMembers = $this->GroupEvent->getGroupMembers($grpEventId);
                 $groupMembersNoTutors = $this->ExportHelper2->getGroupMemberWithoutTutorsHelper($grpEventId);
                 if (!empty($params['include_group_names'])) {

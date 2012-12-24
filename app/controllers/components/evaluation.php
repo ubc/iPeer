@@ -274,7 +274,7 @@ class EvaluationComponent extends Object
                 $evalMarkRecord['EvaluationSimple']['grade_release'] = 0;
             }
             $evalMarkRecord['EvaluationSimple']['score'] = $points[$pos];
-            $evalMarkRecord['EvaluationSimple']['eval_comment'] = $comments[$pos];
+            $evalMarkRecord['EvaluationSimple']['comment'] = $comments[$pos];
             $evalMarkRecord['EvaluationSimple']['date_submitted'] = date('Y-m-d H:i:s');
 
             if (!$this->EvaluationSimple->save($evalMarkRecord)) {
@@ -621,7 +621,7 @@ class EvaluationComponent extends Object
 
         }
 
-        $evalRubric['EvaluationRubric']['general_comment'] = $params['form'][$targetEvaluatee.'gen_comment'];
+        $evalRubric['EvaluationRubric']['comment'] = $params['form'][$targetEvaluatee.'gen_comment'];
         $score = $this->saveNGetEvalutionRubricDetail(
             $evalRubric['EvaluationRubric']['id'], $rubric, $targetEvaluatee, $params['form']);
         $evalRubric['EvaluationRubric']['score'] = $score;

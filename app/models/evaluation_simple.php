@@ -1,4 +1,5 @@
 <?php
+App::import('Model', 'EvaluationResponseBase');
 
 /**
  * EvaluationSimple
@@ -9,10 +10,10 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class EvaluationSimple extends AppModel
+class EvaluationSimple extends EvaluationResponseBase
 {
     public $name = 'EvaluationSimple';
-    public $actsAs = array('Traceable');
+    public $useTable = null;
 
     public $belongsTo = array(
         'Event' => array(
@@ -33,7 +34,6 @@ class EvaluationSimple extends AppModel
      */
     function getEvalMarkByGrpEventIdEvaluatorEvaluatee($grpEventId=null, $evaluator=null, $evaluatee=null)
     {
-        //return $this->find('grp_event_id='.$grpEventId.' AND evaluator='.$evaluator.' AND evaluatee='.$evaluatee);
         return $this->find('first', array(
             'conditions' => array('grp_event_id' => $grpEventId, 'evaluator' => $evaluator, 'evaluatee' => $evaluatee)
         ));
@@ -51,7 +51,6 @@ class EvaluationSimple extends AppModel
      */
     function getResultsByEvaluator($grpEventId=null, $evaluator=null)
     {
-        //return $this->find('all', 'grp_event_id='.$grpEventId.' AND evaluator='.$evaluator);
         return $this->find('all', array(
             'conditions' => array('grp_event_id' => $grpEventId, 'evaluator' => $evaluator)
         ));
@@ -236,7 +235,7 @@ class EvaluationSimple extends AppModel
     {
         $temp = $this->find('all', array(
             'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluateeId),
-            'fields' => array('evaluatee AS evaluateeId', 'eval_comment', 'event_id', 'User.first_name AS evaluator_first_name', 'User.last_name AS evaluator_last_name', 'User.student_no AS evaluator_student_no'),
+            'fields' => array('evaluatee AS evaluateeId', 'comment', 'event_id', 'User.first_name AS evaluator_first_name', 'User.last_name AS evaluator_last_name', 'User.student_no AS evaluator_student_no'),
             'joins' => array(
                 array(
                     'table' => 'users',
@@ -264,7 +263,7 @@ class EvaluationSimple extends AppModel
     {
         $temp = $this->find('first', array(
             'conditions' => array('EvaluationSimple.id' => $id),
-            'fields' => array('evaluatee AS evaluateeId', 'eval_comment', 'event_id', 'User.first_name AS evaluator_first_name', 'User.last_name AS evaluator_last_name', 'User.student_no AS evaluator_student_no'),
+            'fields' => array('evaluatee AS evaluateeId', 'comment', 'event_id', 'User.first_name AS evaluator_first_name', 'User.last_name AS evaluator_last_name', 'User.student_no AS evaluator_student_no'),
             'joins' => array(
                 array(
                     'table' => 'users',

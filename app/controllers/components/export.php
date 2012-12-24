@@ -200,7 +200,7 @@ class ExportComponent extends Object
                     $comments = $this->EvaluationSimple->getAllComments($groupEventId, $userId);
                     $data[$i]['students'][$j]['comments'] = '';
                     foreach ($comments as $comment) {
-                        $data[$i]['students'][$j]['comments'] .= $comment['EvaluationSimple']['eval_comment'].'; ';
+                        $data[$i]['students'][$j]['comments'] .= $comment['EvaluationSimple']['comment'].'; ';
                     }
                     $data[$i]['students'][$j]['score'] = '';
                     $score_tmp = $this->EvaluationSimple->getReceivedTotalScore($groupEventId, $userId);
@@ -230,7 +230,7 @@ class ExportComponent extends Object
                     $data[$i]['students'][$j]['comments'] = '';
                     $comments = $this->EvaluationRubric->getAllComments($groupEventId, $userId);
                     foreach ($comments as $comment) {
-                        $data[$i]['students'][$j]['comments'] .= $comment['EvaluationRubric']['general_comment'].'; ';
+                        $data[$i]['students'][$j]['comments'] .= $comment['EvaluationRubric']['comment'].'; ';
                     }
                     break;
                 case 4://mixeval
@@ -322,7 +322,7 @@ class ExportComponent extends Object
     {
         $content = '';
         //sloppy code... sorry...
-        $fields = array('group_status','group_names','student_first','student_last','student_id','student_id','criteria_marks','general_comments');
+        $fields = array('group_status','group_names','student_first','student_last','student_id','student_id','criteria_marks','comment');
         $hasContent=false;
         for ($i=0; $i<count($fields); $i++) {
             if (!empty($params['form']['include_'.$fields[$i]])) {

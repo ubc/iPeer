@@ -197,7 +197,7 @@ if ($groupMembers) {
             $col = $rubric['Rubric']['criteria'] + 1;
             echo "<td colspan=".$col.">";
             echo "<strong>".__('General Comment:', true)." </strong><br>";
-            echo $memberRubric['general_comment'];
+            echo $memberRubric['comment'];
             echo "<br><br></td>";
             echo "</tr>";
         endforeach;

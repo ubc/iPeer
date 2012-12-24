@@ -65,8 +65,8 @@
     <?php if (isset($studentResult['comments'])) {
         foreach ($studentResult['comments'] as $row) {
             $evalMarkSimple = $row['EvaluationSimple'];
-            if (!empty($evalMarkSimple['eval_comment'])) {
-                echo '<tr><td>'.$evalMarkSimple['eval_comment'].'</td></tr>';
+            if (!empty($evalMarkSimple['comment'])) {
+                echo '<tr><td>'.$evalMarkSimple['comment'].'</td></tr>';
             } else {
                 echo '<tr><td>n/a</td></tr>';
             }

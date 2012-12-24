@@ -462,6 +462,9 @@ ALTER TABLE `users` CHARACTER SET = utf8
 , ADD COLUMN `lti_id` INT(11) NULL DEFAULT NULL  AFTER `modified` 
 , ADD UNIQUE INDEX `lti_id` (`lti_id` ASC) ;
 
+ALTER TABLE  `evaluation_rubrics` CHANGE  `general_comment`  `comment` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+ALTER TABLE  `evaluation_simples` CHANGE  `eval_comment`  `comment` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+
 DROP TABLE IF EXISTS `sys_functions` ;
 
 -- some house clean up

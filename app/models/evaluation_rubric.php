@@ -1,17 +1,19 @@
 <?php
+App::import('Model', 'EvaluationResponseBase');
+
 /**
  * EvaluationRubric
  *
- * @uses AppModel
+ * @uses EvaluationResponseBase
  * @package   CTLT.iPeer
  * @author    Pan Luo <pan.luo@ubc.ca>
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class EvaluationRubric extends AppModel
+class EvaluationRubric extends EvaluationResponseBase
 {
     public $name = 'EvaluationRubric';
-    public $actsAs = array('Traceable');
+    public $useTable = null;
 
     public $hasMany = array(
         'EvaluationRubricDetail' =>
@@ -224,7 +226,7 @@ class EvaluationRubric extends AppModel
     {
         $temp = $this->find('all', array(
             'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
-            'fields' => array('general_comment', 'event_id', 'evaluatee AS evaluateeId', 'User.first_name AS evaluator_first_name', 'User.last_name AS evaluator_last_name', 'User.student_no AS evaluator_student_no'),
+            'fields' => array('comment', 'event_id', 'evaluatee AS evaluateeId', 'User.first_name AS evaluator_first_name', 'User.last_name AS evaluator_last_name', 'User.student_no AS evaluator_student_no'),
             'joins' => array(
                 array(
                     'table' => 'users',
@@ -423,6 +425,4 @@ class EvaluationRubric extends AppModel
 
         return $grades;
     }
-    /* }}} */
-
 }

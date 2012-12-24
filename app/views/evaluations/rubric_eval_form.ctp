@@ -134,7 +134,7 @@
                             $commentsNeeded = true;      // A criteria comment is missing
                             break;
                         }
-                if (empty($evaluation['general_comment'])) {
+                if (empty($evaluation['comment'])) {
                     $commentsNeeded = true;   // General comment missing
                 }
             }

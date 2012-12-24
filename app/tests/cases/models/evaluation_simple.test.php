@@ -173,7 +173,7 @@ class EvaluationSimpleTestCase extends CakeTestCase
     function testGetAllComments ()
     {
         $result = $this->EvaluationSimple->getAllComments(1, 5);
-        $this->assertEqual($result[0]['EvaluationSimple']['eval_comment'], 'very hard working');
+        $this->assertEqual($result[0]['EvaluationSimple']['comment'], 'very hard working');
     }
 
 
