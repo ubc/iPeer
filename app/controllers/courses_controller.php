@@ -205,6 +205,13 @@ class CoursesController extends AppController
                 $departments[$department['Department']['id']] =
                     $department['Department']['name'];
             }
+            // a hack for transition from 2.x
+            // exisintg instructors may not get assigned to any department,
+            // they have no way to assign course to department. So showing all
+            // deparments for those who don't get any deparment
+            if (empty($departments)) {
+                $departments = $this->Course->Department->find('list');
+            }
             $this->set('departments', $departments);
         }
         // set the list available statuses
