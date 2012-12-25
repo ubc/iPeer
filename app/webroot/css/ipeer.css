@@ -677,11 +677,16 @@ i {
 }
 
 #UserForm select {
-    width: 13em;
+    width: 15em;
     margin-top: 0.5em;
     margin-bottom: 0.3em;
     background: transparent;
     font-size: 1em;
+}
+
+#UserForm select#FacultyFaculty {
+    height: 10em;
+    width: 23em;
 }
 
 #UserForm .select .checkbox {
