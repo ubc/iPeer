@@ -18,7 +18,12 @@ class Faculty extends AppModel
 
     public $hasAndBelongsToMany = array(
         'User' => array(
-            'joinTable' => 'user_faculties'
+            'className'             => 'User',
+            'joinTable'             => 'user_faculties',
+            'foreignKey'            => 'faculty_id',
+            'associationForeignKey' => 'user_id',
+            'unique'                => true,
+            'dependent'             => true,
         ),
     );
 

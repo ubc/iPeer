@@ -64,7 +64,17 @@ class User extends AppModel
 
     public $hasAndBelongsToMany = array(
         'Faculty' => array(
-            'joinTable' => 'user_faculties'
+            'className'    => 'Faculty',
+            'joinTable'    => 'user_faculties',
+            'foreignKey'   => 'user_id',
+            'associationForeignKey'    =>  'faculty_id',
+            'conditions'   => '',
+            'order'        => '',
+            'limit'        => '',
+            'unique'       => true,
+            'finderQuery'  => '',
+            'deleteQuery'  => '',
+            'dependent'    => false,
         ),
         'Course' => array(
             'className'    => 'Course',

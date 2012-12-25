@@ -126,7 +126,7 @@ class AjaxListComponent extends Object
             $this->Session->write($this->sessionVariableName, $state);
         }
         // Return the session or constructed state
-        
+
         return $state;
     }
 
@@ -235,7 +235,7 @@ class AjaxListComponent extends Object
         // Add the main table
 
         // Add in the map filter conditions
-        
+
         if (!empty($state->mapFilterSelections)) {
             foreach ($state->mapFilterSelections as $column => $value) {
                 if (!empty($column) && null !== $value && "" != $value) {

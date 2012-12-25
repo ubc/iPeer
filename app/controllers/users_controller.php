@@ -109,16 +109,40 @@ class UsersController extends AppController
 
         $actionRestrictions = "";
 
+        $viewableRoles = $this->AccessControl->getViewableRoles();
         $joinTables =  array(
             array (
                 // GUI aspects
                 "id" => "Role.id",
                 "description" => __("Show role:", true),
                 // The choise and default values
-                "list" => $this->AccessControl->getViewableRoles(),
+                "list" => $viewableRoles,
                 "default" => 0,
-            )
+            ),
         );
+
+        $extraFilters = array();
+        // faculty admins, filter out the admins and instructors from other department/faculty
+        //  stupid cakephp doesn't support double habtm query. So using raw query
+        if (User::hasPermission('controllers/departments')) {
+            $conditions = array();
+            $faculties = $this->UserFaculty->find('all', array(
+                'conditions' => array('user_id' => User::get('id')),
+                'fields' => array('faculty_id'),
+            ));
+            $facultyIds = Set::extract($faculties, '/UserFaculty/faculty_id');
+            $query = "SELECT User.id FROM `users` AS `User` LEFT JOIN `user_faculties` AS `UserFaculty` ON (`UserFaculty`.`user_id` = `User`.`id`) LEFT JOIN `faculties` AS `Faculty` ON (`Faculty`.`id` = `UserFaculty`.`faculty_id`) INNER JOIN `roles_users` AS `RolesUser` ON (`RolesUser`.`user_id` = `User`.`id`) INNER JOIN `roles` AS `Role` ON (`Role`.`id` = `RolesUser`.`role_id`) WHERE ";
+            foreach ($viewableRoles as $id => $role) {
+                if ($role == 'admin' || $role == 'instructor') {
+                    $conditions[] = 'Role.id = '.$id.' AND Faculty.id IN ('.join(',',$facultyIds).')';
+                } else {
+                    $conditions[] = 'Role.id = '.$id;
+                }
+            }
+            $result = $this->User->query($query.join(' OR ', $conditions));
+            $userIds = Set::extract($result, '/User/id');
+            $extraFilters = array('User.id' => $userIds);
+        }
 
         // define right click menu actions
         $actions = array(
@@ -131,7 +155,7 @@ class UsersController extends AppController
         );
 
         $this->AjaxList->setUp($this->User, $columns, $actions,
-            "User.id", "User.username", $joinTables);
+            "User.id", "User.username", $joinTables, $extraFilters);
     }
 
 
