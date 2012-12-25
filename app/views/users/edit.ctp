@@ -19,7 +19,7 @@ echo $this->Form->input(
     'options' => $roleOptions,
   )
 );
-if (User::hasPermission('functions/user/admin')) {
+if (User::hasPermission('functions/user/admin', 'update')) {
     echo $this->Form->input('Faculty',
         array('label' => 'Faculty (admin only)'));
 }
