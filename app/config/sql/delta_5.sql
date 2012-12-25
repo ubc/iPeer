@@ -97,7 +97,6 @@ CREATE  TABLE IF NOT EXISTS `faculties` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_general_ci;
-INSERT INTO faculties VALUES (NULL, 'default', 1, NOW(), 1, NOW());
 
 CREATE  TABLE IF NOT EXISTS `departments` (
   `id` INT(11) NOT NULL AUTO_INCREMENT ,
@@ -117,7 +116,6 @@ CREATE  TABLE IF NOT EXISTS `departments` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_general_ci;
-INSERT INTO departments VALUES (NULL, 'default', 1, 1, NOW(), 1, NOW());
 
 CREATE  TABLE IF NOT EXISTS `email_merges` (
   `id` INT(11) NOT NULL AUTO_INCREMENT ,
@@ -427,7 +425,6 @@ CREATE  TABLE IF NOT EXISTS `user_faculties` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_general_ci;
-INSERT INTO `user_faculties` (user_id, faculty_id) (SELECT id, 1 FROM `users` WHERE role in ('A', 'I'));
 
 CREATE  TABLE IF NOT EXISTS `user_tutors` (
   `id` INT(11) NOT NULL AUTO_INCREMENT ,
