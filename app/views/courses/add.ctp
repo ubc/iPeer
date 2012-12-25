@@ -7,15 +7,13 @@ echo $this->Form->input('Instructor', array('selected' => $instructorSelected));
 echo $this->Form->input(
     'record_status',
     array(
-        'type' => 'select',  
+        'type' => 'select',
         'id' => 'status',
         'label' => 'Status',
         'options' => $statusOptions,
     )
 );
-echo $this->Form->input('Department');
+echo $this->Form->input('Department', array('label' => __($this->Vocabulary->translate('Department'), true)));
 echo $this->Form->input('homepage', array('after' => 'eg. http://mycoursehome.com'));
 echo $this->Form->submit('Save');
 echo $this->Form->end();
-
-?>

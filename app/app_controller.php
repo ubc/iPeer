@@ -26,7 +26,7 @@ class AppController extends Controller
     public $components = array('Session', 'Output',
         'userPersonalize', 'framework', 'Guard.Guard', 'Acl',
         'AccessControl', 'TemplateEmail');
-    public $helpers    = array('Session', 'Html', 'Js');
+    public $helpers    = array('Session', 'Html', 'Js', 'Vocabulary');
     public $access     = array ();
     public $actionList = array ();
     public $breadcrumb;

@@ -1,6 +1,6 @@
 <h2><?php echo $faculty; ?></h2>
 
-<h3><?php __('Departments');?></h3>
+<h3><?php __($this->Vocabulary->translate('Department'));?></h3>
 
 <table id="departments">
     <thead>
@@ -24,7 +24,7 @@ foreach ($departments as $department) {
     foreach ($department as $val) {
         echo "<td>";
         echo $this->Html->link(
-            $val, 
+            $val,
             array('action' => 'view', 'controller' => 'departments', $id)
         );
         echo "</td>";
@@ -58,7 +58,7 @@ foreach ($userfaculty as $user) {
     foreach ($user as $val) {
         echo "<td>";
         echo $this->Html->link(
-            $val, 
+            $val,
             array('action' => 'view', 'controller' => 'users', $id)
         );
         echo "</td>";
@@ -71,20 +71,20 @@ foreach ($userfaculty as $user) {
 <script type="text/javascript">
 jQuery(document).ready(function() {
     jQuery('#departments').dataTable({
-        "aoColumnDefs": [{ 
-            "bSearchable": false, 
-                "bVisible": false, 
-                "bSortable":false, 
-                "aTargets": [ 0 ] 
+        "aoColumnDefs": [{
+            "bSearchable": false,
+                "bVisible": false,
+                "bSortable":false,
+                "aTargets": [ 0 ]
         }],
         "aaSorting" : [[1, 'asc']]
     });
     jQuery('#userfaculty').dataTable({
-        "aoColumnDefs": [{ 
-            "bSearchable": false, 
-                "bVisible": false, 
-                "bSortable":false, 
-                "aTargets": [ 0 ] 
+        "aoColumnDefs": [{
+            "bSearchable": false,
+                "bVisible": false,
+                "bSortable":false,
+                "aTargets": [ 0 ]
         }],
         "aaSorting" : [[1, 'asc']]
     });
