@@ -34,7 +34,7 @@ foreach ($departments as $department) {
 ?>
 </table>
 
-<h3><?php __('Admins');?></h3>
+<h3><?php __('Admins/Instructors');?></h3>
 
 <table id="userfaculty">
     <thead>

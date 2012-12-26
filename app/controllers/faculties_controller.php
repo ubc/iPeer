@@ -25,7 +25,7 @@ class FacultiesController extends AppController {
         $ret = $this->Faculty->find('all');
         $faculties = array();
         foreach ($ret as $faculty) {
-            $tmp = array(); 
+            $tmp = array();
             $tmp['id'] = $faculty['Faculty']['id'];
             $tmp['Name'] = $faculty['Faculty']['name'];
             $faculties[] = $tmp;
@@ -38,7 +38,8 @@ class FacultiesController extends AppController {
      *
      * @param mixed $id - the id of the faculty to be displayed
      */
-    function view($id = null) {
+    function view($id)
+    {
         $this->set('title_for_layout', 'View Faculty');
 
         if (!$id) {
@@ -48,7 +49,7 @@ class FacultiesController extends AppController {
 
         // there's pretty much only one interesting field in faculty
         $this->set(
-            'faculty', 
+            'faculty',
             $this->Faculty->field('name', array('id' => $id))
         );
         // Get this faculty's departments
@@ -62,7 +63,7 @@ class FacultiesController extends AppController {
         }
         $this->set('departments', $departments);
         // Get this faculty's admins
-        // for now, we assume that only admins will have a 
+        // for now, we assume that only admins will have a
         // UserFaculty entry
         $ret = $this->UserFaculty->findAllByFacultyId($id);
         $userfaculty = array();
@@ -74,6 +75,7 @@ class FacultiesController extends AppController {
             $tmp['Username'] = $prof['User']['username'];
             $tmp['Full Name'] = $prof['User']['full_name'];
             $tmp['Email'] = $prof['User']['email'];
+            $tmp['Role'] = $prof['Role'][0]['name'];
             $userfaculty[] = $tmp;
         }
         $this->set('userfaculty', $userfaculty);
@@ -85,10 +87,10 @@ class FacultiesController extends AppController {
     function add() {
         $this->set('title_for_layout', 'Add Faculty');
         $this->RolesUser = Classregistry::init('RolesUser');
-        
+
         $superadmins = $this->RolesUser->find('all', array('conditions' => array('role_id' => 1)));
         $userfac = array();
-        
+
         if (!empty($this->data)) {
             $this->Faculty->create();
             if ($this->Faculty->save($this->data)) {

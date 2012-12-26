@@ -122,9 +122,11 @@ class UsersController extends AppController
         );
 
         $extraFilters = array();
-        // faculty admins, filter out the admins and instructors from other department/faculty
-        //  stupid cakephp doesn't support double habtm query. So using raw query
-        if (User::hasPermission('controllers/departments')) {
+        if (User::hasPermission('functions/superadmin')) {
+            $extraFilters = array();
+        } elseif (User::hasPermission('controllers/departments')) {
+            // faculty admins, filter out the admins and instructors from other department/faculty
+            // stupid cakephp doesn't support double habtm query. So using raw query
             $conditions = array();
             $faculties = $this->UserFaculty->find('all', array(
                 'conditions' => array('user_id' => User::get('id')),
@@ -134,7 +136,7 @@ class UsersController extends AppController
             $query = "SELECT User.id FROM `users` AS `User` LEFT JOIN `user_faculties` AS `UserFaculty` ON (`UserFaculty`.`user_id` = `User`.`id`) LEFT JOIN `faculties` AS `Faculty` ON (`Faculty`.`id` = `UserFaculty`.`faculty_id`) INNER JOIN `roles_users` AS `RolesUser` ON (`RolesUser`.`user_id` = `User`.`id`) INNER JOIN `roles` AS `Role` ON (`Role`.`id` = `RolesUser`.`role_id`) WHERE ";
             foreach ($viewableRoles as $id => $role) {
                 if ($role == 'admin' || $role == 'instructor') {
-                    $conditions[] = 'Role.id = '.$id.' AND Faculty.id IN ('.join(',',$facultyIds).')';
+                    $conditions[] = 'Role.id = '.$id.' AND Faculty.id IN ('.join(',', $facultyIds).')';
                 } else {
                     $conditions[] = 'Role.id = '.$id;
                 }
