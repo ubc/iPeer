@@ -1,25 +1,30 @@
-<div>
 <?php
 echo $this->Form->create('Course');
-echo $this->Form->input('id');
-echo $this->Form->input('course', array('after' => 'eg. APSC 201 001'));
-echo $this->Form->input('title', array('after' => 'eg. Technical Communication'));
-echo $this->Form->input('Instructor');
-echo $this->Form->input(
+echo $this->Form->input('course', array('after' => ''));?>
+<div class="help-text"><?php __('Course subjects and course numbers, e.g. APSC 201 001')?></div>
+
+<?php echo $this->Form->input('title');?>
+<div class="help-text"><?php __('Course title, e.g. Technical Communication')?></div>
+<?php echo $this->Form->input('Instructor', array('selected' => $instructorSelected));?>
+<div class="help-text"><?php __('Holding "ctrl" or "command" key to select multiple instructors.')?></div>
+
+<?php echo $this->Form->input(
     'record_status',
     array(
         'type' => 'select',
-        'label' => 'Status',
         'id' => 'status',
+        'label' => 'Status',
         'options' => $statusOptions,
     )
-);
-echo $this->Form->input('Department', array('label' => __($this->Vocabulary->translate('Department'), true)));
-echo $this->Form->input('homepage',
-    array('after' => 'eg. http://mycoursehome.com'));
-echo $this->Form->submit('Save');
-echo $this->Form->end();
+);?>
 
+<?php echo $this->Form->input('Department', array(
+    'label' => __($this->Vocabulary->translate('Department'), true),
+));
 ?>
-</div>
+<div class="help-text"><?php __('Selecting correct assoication will allow admin to help troubleshooting.')?></div>
+<?php echo $this->Form->input('homepage');?>
+<div class="help-text"><?php __('e.g. http://mycoursehome.com')?></div>
 
+<?php echo $this->Form->submit('Save');
+echo $this->Form->end();

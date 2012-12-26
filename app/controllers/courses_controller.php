@@ -234,6 +234,7 @@ class CoursesController extends AppController
     {
         $this->set('title_for_layout', 'Add Course');
         $this->_initFormEnv();
+        $this->set('instructorSelected', User::get('id'));
 
         if (!empty($this->data)) {
             if ($this->Course->save($this->data)) {
@@ -244,10 +245,12 @@ class CoursesController extends AppController
                 }
                 $this->Session->setFlash('Course created!', 'good');
                 $this->redirect('index');
+                return;
             } else {
                 $this->Session->setFlash('Add course failed.');
             }
         }
+        $this->render('edit');
     }
 
     /**
@@ -281,6 +284,7 @@ class CoursesController extends AppController
         }
 
         $this->data = $course;
+        $this->set('instructorSelected', Set::extract($course, '/Instructor/id'));
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Edit Course', true)));
     }
 

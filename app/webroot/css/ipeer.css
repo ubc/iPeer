@@ -779,58 +779,30 @@ i {
 
 /* Courses */
 
-/* courses/add */
+/* courses/add, courses/edit */
 
-#CourseAddForm .text label, #CourseAddForm .select label {
-    width: 13em;
-}
-
-#CourseAddForm .text input {
-    width: 21em;
-    text-align: left;
-}
-
-#CourseAddForm .select #status {
-    margin-top: 0.7em;
-    margin-bottom: 1em;
-}
-
-#CourseAddForm .input input{
-    margin-right: 10em;
-    position: relative;
-}
-
-#CourseAddForm .submit {
-    width: 10em;
-    margin: 1em auto;
-}
-
-/* courses/edit */
-
+#CourseAddForm .text label, #CourseAddForm .select label, 
 #CourseEditForm .text label, #CourseEditForm .select label {
     width: 13em;
 }
 
-#CourseEditForm .text input {
+#CourseAddForm .text input, #CourseEditForm .text input {
     width: 21em;
     text-align: left;
 }
 
-#CourseEditForm .select #status {
-    margin-top: 0.7em;
-    margin-bottom: 1em;
+#CourseAddForm .select #InstructorInstructor, #CourseEditForm .select #InstructorInstructor {
+    height: 10em;
+    width: 20em;
 }
 
-#CourseEditForm .select #instruct {
-    margin-top: 0.5em;
-}
-
-#CourseEditForm .input input{
+#CourseAddForm .input input, #CourseEditForm .input input{
     margin-right: 10em;
     position: relative;
+    width: 30em;
 }
 
-#CourseEditForm .submit {
+#CourseAddForm .submit, #CourseEditForm .submit {
     width: 10em;
     margin: 1em auto;
 }
