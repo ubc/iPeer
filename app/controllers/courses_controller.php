@@ -192,8 +192,7 @@ class CoursesController extends AppController
         if (User::hasPermission('functions/user/superadmin')) {
             // superadmin permission means you see all departments regardless
             $departments = $this->Course->Department->find('list');
-            $this->set('departments', $departments);
-
+            $instructorList = $this->User->getInstructors('list', array());
         } else {
             // need to limit the departments this user can see
             // get the user's faculties
@@ -212,27 +211,17 @@ class CoursesController extends AppController
             if (empty($departments)) {
                 $departments = $this->Course->Department->find('list');
             }
-            $this->set('departments', $departments);
+            $facultyIds = Set::extract($uf, '/UserFaculty/faculty_id');
+            $instructorList = $this->User->getInstructorListByFaculty($facultyIds);
         }
         // set the list available statuses
         $statusOptions = array( 'A' => 'Active', 'I' => 'Inactive');
         $this->set('statusOptions', $statusOptions);
 
+        $this->set('departments', $departments);
+
         // set the list of instructors
-        $instructors = $this->User->getInstructors('all', array('User.username'));
-        $instructorlist = array();
-
-        // need to display names to user, not ids
-        $this->set('instructorSelected', '');
-        foreach ($instructors as $i) {
-            $instructorlist[$i['User']['id']] = $i['User']['full_name'];
-            // we want to have ourself selected as default
-            if ($i['User']['id'] == $this->Auth->user('id')) {
-                $this->set('instructorSelected', $i['User']['id']);
-            }
-        }
-
-        $this->set('instructors', $instructorlist);
+        $this->set('instructors', $instructorList);
     }
 
     /**

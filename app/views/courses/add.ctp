@@ -5,7 +5,7 @@ echo $this->Form->input('course', array('after' => ''));?>
 
 <?php echo $this->Form->input('title');?>
 <div class="help-text"><?php __('Course title, e.g. Technical Communication')?></div>
-<?php echo $this->Form->input('Instructor', array('selected' => $instructorSelected));?>
+<?php echo $this->Form->input('Instructor', array('selected' => User::get('id')));?>
 <div class="help-text"><?php __('Holding "ctrl" or "command" key to select multiple instructors.')?></div>
 
 <?php echo $this->Form->input(

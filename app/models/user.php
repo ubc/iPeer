@@ -505,7 +505,7 @@ class User extends AppModel
      * @access public
      * @return list of instructors
      * */
-    function getInstructors($type, $params)
+    function getInstructors($type, $params = array())
     {
         $defaults = array('order' => $this->alias.'.last_name');
         $params = array_merge($defaults, $params);
@@ -532,6 +532,29 @@ class User extends AppModel
         }
 
         return $this->find($type, $params);
+    }
+
+    /**
+     * getInstructorListByFaculty
+     * get instructors within faculty
+     *
+     * @param mixed $facultyId
+     *
+     * @access public
+     * @return void
+     */
+    function getInstructorListByFaculty($facultyId)
+    {
+        $users = $this->find('all', array(
+            'conditions' => array('Role.id' => 3, 'Faculty.id' => $facultyId),
+            'fields' => array($this->alias.'.id', $this->displayField),
+            'contain' => array('Faculty', 'Role'),
+            'order' => $this->alias.'.last_name',
+        ));
+
+        $userList = Set::combine($users, '{n}.User.id', '{n}.User.'.$this->displayField);
+
+        return $userList;
     }
 
     /**
