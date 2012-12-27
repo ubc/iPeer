@@ -502,7 +502,6 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'functions/user/admin');
         $this->Acl->deny($role, 'functions/user/admin', 'delete');
         $this->Acl->deny($role, 'functions/user/superadmin');
-        $this->Acl->allow($role, 'adminpage');
         $this->Acl->allow($role, 'functions/viewemailaddresses');
         $this->Acl->allow($role, 'functions/viewusername');
         $this->Acl->allow($role, 'functions/coursemanager');
