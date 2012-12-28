@@ -199,6 +199,7 @@ ALTER TABLE `evaluation_submissions` CHARACTER SET = utf8 ;
 UPDATE `event_template_types` SET `created`=NOW(), `modified` = NOW() WHERE 1;
 ALTER TABLE  `event_template_types` CHANGE  `created`  `created` DATETIME NULL DEFAULT NULL, CHANGE  `modified`  `modified` DATETIME NULL DEFAULT NULL ;
 ALTER TABLE `event_template_types` CHARACTER SET = utf8 ;
+UPDATE `event_template_types` SET  `display_for_selection` =  '1' WHERE  `event_template_types`.`id` =3;
 
 ALTER TABLE  `events` CHANGE  `created`  `created` DATETIME NULL DEFAULT NULL, CHANGE  `modified`  `modified` DATETIME NULL DEFAULT NULL ;
 ALTER TABLE `events` CHARACTER SET = utf8 , ADD COLUMN `result_release_date_begin` DATETIME NULL DEFAULT NULL  AFTER `release_date_end` , ADD COLUMN `result_release_date_end` DATETIME NULL DEFAULT NULL  AFTER `result_release_date_begin` ;
@@ -370,11 +371,13 @@ ALTER TABLE `survey_group_sets` CHARACTER SET = utf8 ;
 ALTER TABLE `survey_groups` CHARACTER SET = utf8 ;
 
 ALTER TABLE `survey_inputs` CHARACTER SET = utf8 , ADD COLUMN `chkbx_id` INT(11) NULL DEFAULT NULL  AFTER `sub_id` ;
+ALTER TABLE `survey_inputs` CHANGE  `survey_id`  `event_id` INT( 11 ) NOT NULL DEFAULT  '0';
 
 ALTER TABLE `survey_questions` CHARACTER SET = utf8 , CHANGE COLUMN `number` `number` INT(11) NOT NULL DEFAULT '9999'  ;
 
-ALTER TABLE  `surveys` CHANGE  `created`  `created` DATETIME NULL DEFAULT NULL, CHANGE  `modified`  `modified` DATETIME NULL DEFAULT NULL ;
+ALTER TABLE `surveys` CHANGE  `created`  `created` DATETIME NULL DEFAULT NULL, CHANGE  `modified`  `modified` DATETIME NULL DEFAULT NULL ;
 ALTER TABLE `surveys` CHARACTER SET = utf8 , CHANGE COLUMN `name` `name` VARCHAR(255) NOT NULL  ;
+ALTER TABLE `surveys` ADD  `availability` VARCHAR( 10 ) NOT NULL DEFAULT  'public' AFTER  `name`;
 
 ALTER TABLE  `sys_parameters` CHARACTER SET = utf8,  CHANGE  `created`  `created` DATETIME NULL DEFAULT NULL, CHANGE  `modified`  `modified` DATETIME NULL DEFAULT NULL ;
 INSERT INTO `sys_parameters` VALUES (NULL, 'system.version', '3.0.0', 'S', 'System version', 'A', 1, NOW(), 1, NOW()),
