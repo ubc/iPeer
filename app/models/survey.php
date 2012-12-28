@@ -69,6 +69,15 @@ class Survey extends EvaluationBase
 
     public $contain = array('Question');
 
+    public $validate = array(
+        'name'  => array(
+            'unique' => array(
+                'rule' => 'isUnique',
+                'message' => 'Duplicate name found. Please select another.'
+            )
+        ),
+    );
+
     /**
      * __construct
      *
