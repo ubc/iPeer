@@ -1540,3 +1540,7 @@ form div.input {
     text-decoration: none;
     color: black;
 }
+
+#cwl-login td {
+    background-color: transparent;
+}
