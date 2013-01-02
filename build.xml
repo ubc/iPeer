@@ -251,7 +251,7 @@
         </reflexive>
     </target>
 
-    <target name="release" description="Prepare the release" depends="bump, packaging" />
+    <target name="release" description="Prepare the release" depends="packaging" />
 
     <target name="packaging" description="Packaging the release">
         <delete dir="${project.basedir}/dist"/>
@@ -282,6 +282,6 @@
         <filehash file="dist/${phing.project.name}-${version.number}.zip" hashtype="0" />
         <echo msg="${filehashvalue}" file="dist/${phing.project.name}-${version.number}.zip.md5" />
 
-        <copy file="readme.txt" todir="dist/" />
+        <copy file="readme.md" todir="dist/" />
     </target>
 </project>
