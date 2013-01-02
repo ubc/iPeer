@@ -60,6 +60,8 @@ if (file_exists(CONFIGS.'installed.txt')) {
     'action' => 'login'));
   Router::connect('/logout', array('plugin' => 'guard', 'controller' => 'guard',
     'action' => 'logout'));
+  Router::connect('/loginout/loginByCWL', array('plugin' => 'guard', 'controller' => 'guard',
+    'action' => 'logout'));
   // Connect url to groups api
   Router::connect('/:controller/courses/:course_id/groups/:group_id',
     array('action' => 'groups', 'group_id' => null),
