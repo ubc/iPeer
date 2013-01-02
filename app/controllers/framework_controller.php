@@ -15,9 +15,9 @@ class FrameworkController extends AppController
      *
      * @public $uses
      */
-    public $uses =  array('User', 'SysFunction', 'SysParameter', 'UserCourse', 'UserTutor', 'UserEnrol');
+    public $uses =  array('User', 'SysParameter', 'UserCourse', 'UserTutor', 'UserEnrol');
     public $Sanitize;
-    public $components = array('Output', 'sysContainer', 'userPersonalize', 'framework');
+    public $components = array('Output', 'userPersonalize', 'framework');
 
     /**
      * __construct
@@ -73,7 +73,7 @@ class FrameworkController extends AppController
             $this->Session->setFlash(__('Error: Invalid user ID.', true));
             $this->redirect($this->referer());
         }
-        
+
         $role = $this->User->getRoleName($id);
         if (!User::hasPermission('functions/user/'.$role)) {
             $this->Session->setFlash(__('Error: You do not have permission to view this user', true));
@@ -85,7 +85,7 @@ class FrameworkController extends AppController
             $courses = User::getMyCourseList();
             $models = array('UserCourse', 'UserTutor', 'UserEnrol');
             $accessibleUsers = array();
-            
+
             // generate a list of instructors, tutors, and students the user has access to
             foreach ($models as $model) {
                 $users = $this->$model->find('list', array(
@@ -94,7 +94,7 @@ class FrameworkController extends AppController
                 ));
                 $accessibleUsers = array_merge($accessibleUsers, $users);
             }
-            
+
             if (!in_array($id, $accessibleUsers)) {
                 $this->Session->setFlash(__('Error: You do not have permission to view this user', true));
                 $this->redirect($this->referer());
@@ -103,7 +103,7 @@ class FrameworkController extends AppController
 
         $this->set('title_for_layout', __('View User', true));
         $this->autoRender = false;
-        $this->set('data', $this->data);
+        $this->set('user', $this->data);
         $this->render("userinfo");
     }
 

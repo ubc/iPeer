@@ -40,6 +40,10 @@ class EmailTemplate extends AppModel
      */
     function getPermittedEmailTemplate($user_id, $type= 'all')
     {
+        if (empty($user_id)) {
+            return array();
+        }
+
         $this->recursive = -1;
         return $this->find($type, array(
             'conditions' => array('OR' => array(

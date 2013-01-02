@@ -14,9 +14,8 @@ class UsersController extends AppController
 {
     public $name = 'Users';
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'FileUpload.FileUpload');
-    public $NeatString;
     public $uses = array('User', 'UserEnrol', 'Personalize', 'Course',
-        'SysParameter', 'SysFunction', 'Role', 'Group', 'UserFaculty',
+        'SysParameter', 'Role', 'Group', 'UserFaculty',
         'Department', 'CourseDepartment', 'OauthClient', 'OauthToken',
         'UserCourse', 'UserTutor'
     );
@@ -31,7 +30,6 @@ class UsersController extends AppController
      */
     function __construct()
     {
-        $this->NeatString = new NeatString;
         $this->set('title_for_layout', __('Users', true));
         parent::__construct();
     }
@@ -111,16 +109,42 @@ class UsersController extends AppController
 
         $actionRestrictions = "";
 
+        $viewableRoles = $this->AccessControl->getViewableRoles();
         $joinTables =  array(
             array (
                 // GUI aspects
                 "id" => "Role.id",
                 "description" => __("Show role:", true),
                 // The choise and default values
-                "list" => $this->AccessControl->getViewableRoles(),
+                "list" => $viewableRoles,
                 "default" => 0,
-            )
+            ),
         );
+
+        $extraFilters = array();
+        if (User::hasPermission('functions/superadmin')) {
+            $extraFilters = array();
+        } elseif (User::hasPermission('controllers/departments')) {
+            // faculty admins, filter out the admins and instructors from other department/faculty
+            // stupid cakephp doesn't support double habtm query. So using raw query
+            $conditions = array();
+            $faculties = $this->UserFaculty->find('all', array(
+                'conditions' => array('user_id' => User::get('id')),
+                'fields' => array('faculty_id'),
+            ));
+            $facultyIds = Set::extract($faculties, '/UserFaculty/faculty_id');
+            $query = "SELECT User.id FROM `users` AS `User` LEFT JOIN `user_faculties` AS `UserFaculty` ON (`UserFaculty`.`user_id` = `User`.`id`) LEFT JOIN `faculties` AS `Faculty` ON (`Faculty`.`id` = `UserFaculty`.`faculty_id`) INNER JOIN `roles_users` AS `RolesUser` ON (`RolesUser`.`user_id` = `User`.`id`) INNER JOIN `roles` AS `Role` ON (`Role`.`id` = `RolesUser`.`role_id`) WHERE ";
+            foreach ($viewableRoles as $id => $role) {
+                if ($role == 'admin' || $role == 'instructor') {
+                    $conditions[] = 'Role.id = '.$id.' AND Faculty.id IN ('.join(',', $facultyIds).')';
+                } else {
+                    $conditions[] = 'Role.id = '.$id;
+                }
+            }
+            $result = $this->User->query($query.join(' OR ', $conditions));
+            $userIds = Set::extract($result, '/User/id');
+            $extraFilters = array('User.id' => $userIds);
+        }
 
         // define right click menu actions
         $actions = array(
@@ -133,7 +157,7 @@ class UsersController extends AppController
         );
 
         $this->AjaxList->setUp($this->User, $columns, $actions,
-            "User.id", "User.username", $joinTables);
+            "User.id", "User.username", $joinTables, $extraFilters);
     }
 
 
@@ -200,66 +224,26 @@ class UsersController extends AppController
      * code base produced only puzzlement. As we want to move off of prototype
      * and to jquery anyways, it was easier to just rewrite this part.
      *
-     * @param mixed $course - the course id to list users for
+     * @param mixed $courseId the course id to list users for
      *
      * @access public
      * @return void
      */
-    function goToClassList($course = null) {
-
-        if (!User::hasPermission('functions/user')) {
-            $this->Session->setFlash(
-                'Error: You do not have permission to view users.', true);
-            $this->redirect('/home');
-        }
-
+    function goToClassList($courseId)
+    {
         // check whether the course exists
-        $class = $this->Course->find('first', array('conditions' => array('Course.id' => $course)));
-        if (empty($class)) {
-            $this->Session->setFlash(__('Error: That course does not exist', true));
-            $this->redirect('/courses');
+        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+            $this->redirect('index');
         }
 
-        // check whether the user has access to the course
-        // instructors
-        if (!User::hasPermission('controllers/departments')) {
-            $courses = User::getMyCourseList();
-        // admins
-        } else {
-            $courses = User::getMyDepartmentsCourseList('list');
-        }
+        $course = $this->Course->getCourseWithEnrolmentById($courseId);
 
-        if (!in_array($course, array_keys($courses)) && !User::hasPermission('functions/superadmin')) {
-            $this->Session->setFlash(__('Error: You do not have permission to view this class list', true));
-            $this->redirect('/courses');
-        }
+        $this->set('classList', $course['Enrol']);
+        $this->set('courseId', $courseId);
 
-        $classStudents = array(); // holds all the students enrolled in this course
-        $classList = array(); // holds all users in this course for display in view
-
-        // get the students
-        $classStudents = $this->User->find(
-            'all',
-            array(
-                'conditions' => array('Enrolment.id' => $course),
-            )
-        );
-
-        // put only the data needed for display into classList
-        foreach ($classStudents as $user) {
-            $tmp = array();
-            $tmp['id'] = $user['User']['id'];
-            $tmp['Role'] = 'Student';
-            $tmp['Username'] = $user['User']['username'];
-            $tmp['Full Name'] = $user['User']['first_name'] .' '.
-                $user['User']['last_name'];
-            if (User::hasPermission('functions/viewemailaddresses')) {
-                $tmp['Email'] = $user['User']['email'];
-            }
-            $classList[] = $tmp;
-        }
-        $this->set('classList', $classList);
-        $this->set('courseId', $course);
+        $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Students', true)));
     }
 
     /**
@@ -336,75 +320,6 @@ class UsersController extends AppController
         }
 
         return false;
-    }
-
-
-    /**
-     * getSimpleEntrollmentLists
-     *
-     * @param mixed $id
-     *
-     * @access public
-     * @return void
-     */
-    function getSimpleEntrollmentLists($id)
-    {
-        $result = array();
-
-        if ($id) {
-            // This needs a custom query:
-            //   The getSimpleEntrollmentLists() can be called twice in one page rendering.
-            //    There's a problem with Cake PHP caching results (I could not turn this off)
-            //      $enrolled_courses = $this->UserEnrol->query(
-            //        "SELECT `course_id` from `user_enrols` WHERE user_id=$id",
-            //         /* No cache!! (undoc.) */ false );
-            $enrolled_courses = $this->UserEnrol->find('all', array(
-                'conditions' => array('UserEnrol.user_id' => $id),
-                'fields' => array('UserEnrol.course_id')
-            ));
-        } else {
-            // New Student = display a courses list.
-            $enrolled_courses = array();
-        }
-
-        // Get accessible courses
-        $coursesList = User::getMyCourseList();
-
-        // List the entrolled courses
-        $simpleEnrolledList = array();
-        foreach ($enrolled_courses as $value) {
-            if (!empty($coursesList[$value['UserEnrol']['course_id']])) {
-                array_push($simpleEnrolledList, $value['UserEnrol']['course_id']);
-            }
-        }
-
-        // List the available courses
-        $simpleCoursesList = array();
-        foreach ($coursesList as $key => $value) {
-            $simpleCoursesList[$key] = $value['course'];
-        }
-
-        // Pack up the data for the return
-        $result['simpleEnrolledList'] = $simpleEnrolledList;
-        $result['simpleCoursesList'] = $simpleCoursesList;
-
-        return $result;
-    }
-
-
-    /**
-     * _setUpCourseEnrollmentLists
-     *
-     * @param mixed $id - user id
-     *
-     * @access public
-     * @return void
-     */
-    function _setUpCourseEnrollmentLists($id)
-    {
-        $data = $this->getSimpleEntrollmentLists($id);
-        $this->set("simpleEnrolledList", $data['simpleEnrolledList']);
-        $this->set("simpleCoursesList", $data['simpleCoursesList']);
     }
 
     /**
@@ -505,14 +420,15 @@ class UsersController extends AppController
      *
      * @return void
      * */
-    private function _initFormEnv() {
+    private function _initFormEnv()
+    {
         $user = $this->User->find(
             'first',
             array('conditions' => array('id' => $this->Auth->user('id')))
         );
         // get the courses that this user is allowed access to
-        $coursesOptions = array();
-        if (User::hasPermission('functions/user/superadmin')) {
+        $coursesOptions = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+        /*if (User::hasPermission('functions/user/superadmin')) {
             // superadmins should have access to all courses regardless
             $coursesOptions = $this->Course->find('list');
         } else if (User::hasPermission('functions/user/admin')) {
@@ -537,7 +453,7 @@ class UsersController extends AppController
             foreach ($courses as $course) {
                 $coursesOptions[$course['id']] = $course['full_name'];
             }
-        }
+        }*/
         $this->set('coursesOptions', $coursesOptions);
 
         $this->set('roleOptions', $this->AccessControl->getEditableRoles());
@@ -602,9 +518,8 @@ class UsersController extends AppController
      * @access public
      * @return void
      */
-    public function add($courseId = null) {
-        $this->set('title_for_layout', 'Add User');
-
+    public function add($courseId = null)
+    {
         if (!User::hasPermission('functions/user')) {
             $this->Session->setFlash('Error: You do not have permission to add users', true);
             $this->redirect('/home');
@@ -663,38 +578,18 @@ class UsersController extends AppController
                 // Failed
                 $this->Session->setFlash("Error: Unable to create user.");
             }
-        // Permission checking
-        } else {
-            // Check whether the course exists
-            $course = $this->Course->find('first', array('conditions' => array('id' => $courseId), 'recursive' => 1));
-            if (!is_null($courseId)) {
-                if (empty($course)) {
-                    $this->Session->setFlash(__('Error: That course does not exist.', true));
-                    $this->redirect('/courses');
-                }
-
-                // check whether the user has access to the course
-                if (!User::hasPermission('functions/superadmin')) {
-                    // instructors
-                    if (!User::hasPermission('controllers/departments')) {
-                        $courses = User::getMyCourseList();
-                    // admins
-                    } else {
-                        $courses = User::getMyDepartmentsCourseList('list');
-                    }
-
-                    if (!in_array($courseId, array_keys($courses))) {
-                        $this->Session->setFlash(__('Error: You do not have permission to add users to this course', true));
-                        // no $courseId provided - assume user is a faculty admin or super admin
-                        if (is_null($courseId)) {
-                            $this->redirect('index');
-                        } else {
-                            $this->redirect('/courses');
-                        }
-                    }
-                }
-            }
         }
+
+        // Check whether the course exists
+        if (!is_null($courseId)) {
+            $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+            if (!$course) {
+                $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+                $this->redirect('/courses');
+            }
+            $this->breadcrumb->push(array('course' => $course['Course']));
+        }
+        $this->set('breadcrumb', $this->breadcrumb->push(__('Add User', true)));
     }
 
 
@@ -1010,7 +905,7 @@ class UsersController extends AppController
 
         //Save Data
         if ($this->User->save($user_data, true, array('password'))) {
-            $message = __("Password successfully reset. The new password is ".$tmp_password.".\n", true);
+            $message = sprintf(__("Password successfully reset. The new password is %s.\n", true), $tmp_password);
             $this->User->set('id', $user_id);
 
             // send email to user
@@ -1041,34 +936,26 @@ class UsersController extends AppController
      */
     public function import($courseId = null)
     {
-        $this->set('title_for_layout',
-            __('Import Students From Text (.txt) or CSV File (.csv)', true));
+        if (!is_null($courseId)) {
+            $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+            if (empty($course)) {
+                $this->Session->setFlash(__('Error: That course does not exist.', true));
+                $this->redirect('/courses');
+            }
+            $this->breadcrumb->push(array('course' => $course['Course']));
+        }
 
-        // users can only import to courses they have access to
-        if (User::hasPermission('functions/superadmin')) {
-            // superadmins have access to everything
-            $courseList = $this->Course->find('list');
-        }
-        else if (User::hasPermission('functions/user/admin')) {
-            // admins have access to their departments
-            $courseList = User::getMyDepartmentsCourseList('list');
-        }
-        else if (!User::hasPermission('functions/user/instructor')) {
-            // instructors have access to courses they're teaching
-            $courseList = User::getMyCourseList();
-        }
-        else {
-            // no permission to import user
-            $this->Session->setFlash("Access denied to import user.");
-            $this->redirect('/home');
-        }
-        $this->set('courses', $courseList);
+        $courses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+        $this->set('courses', $courses);
 
         // make sure we know the course we're importing users into
         if ($courseId == null && !empty($this->data)) {
             $courseId = $this->data['Course']['Course'];
         }
         $this->set('courseId', $courseId);
+
+        $this->set('breadcrumb', $this->breadcrumb->push(__('Import Students From Text (.txt) or CSV File (.csv)', true)));
+
 
         if (!empty($this->data)) {
             // check that file upload worked
@@ -1167,7 +1054,7 @@ class UsersController extends AppController
     {
         $this->Session->write('ipeerSession.id', $userData['id']);
         $this->Session->write('ipeerSession.username', $userData['username']);
-        $this->Session->write('ipeerSession.fullname', $userData['last_name'].' '.$userData['first_name']);
+        $this->Session->write('ipeerSession.fullname', $userData['first_name'].' '.$userData['last_name']);
         $this->Session->write('ipeerSession.email', $userData['email']);
     }
 
@@ -1194,7 +1081,7 @@ class UsersController extends AppController
         $from = $this->Auth->user('email');
         $to = $user['User']['email'];
         $username = $user['User']['username'];
-        $name = $user['User']['first_name'].' '.$user['User']['last_name'];
+        $name = $user['User']['full_name'];
 
         // this means only students will get a list of courses they're
         // enrolled in, since instructors are stored in another array

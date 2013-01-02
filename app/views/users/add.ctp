@@ -4,7 +4,7 @@ Usernames must be at least 6 characters long and contain only letters and number
 
 
 <div>
-<?php 
+<?php
 echo $this->Form->create('User', array('id' => 'UserForm', 'url' => '/'.$this->params['url']['url']));
 echo '<input type="hidden" name="required" id="required" value="username" />';
 echo $this->Form->input('username');
@@ -22,8 +22,8 @@ echo $this->Form->input(
     'options' => $roleOptions,
   )
 );
-if (User::hasPermission('functions/user/admin')) {
-    echo $this->Form->input('Faculty', 
+if (User::hasPermission('functions/user/admin', 'create')) {
+    echo $this->Form->input('Faculty',
         array('label' => 'Faculty (admin only)'));
 }
 echo $this->Form->input('title');
@@ -73,7 +73,7 @@ if (User::hasPermission('functions/user/admin')) {
 // instructor. Any other role, disable adding as a student.
 jQuery('#RoleRolesUserRoleId').change(function() {
     var str = jQuery('#RoleRolesUserRoleId option:selected').text();
-    if (str == 'admin') {
+    if (str == 'admin' || str == 'instructor') {
         jQuery('#FacultyFaculty').removeAttr('disabled');
     }
     else {

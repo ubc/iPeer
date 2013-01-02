@@ -35,7 +35,7 @@ class ExportHelper2Component extends Object
         }
         return $groupMembers;
     }
-    
+
     /**
      * getGroupMemberwithoutTutorsHelper
      *

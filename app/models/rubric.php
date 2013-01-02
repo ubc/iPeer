@@ -332,4 +332,15 @@ class Rubric extends EvaluationBase
         );
         return $ret;
     }
+
+    public function getEvaluation($id)
+    {
+        $eval = $this->find('first', array('conditions' => array($this->alias.'.id' => $id), 'contain' => 'RubricsCriteria'));
+        if ($eval) {
+            $eval['Question'] = $eval['RubricsCriteria'];
+            unset($eval['RubricsCriteria']);
+        }
+
+        return $eval;
+    }
 }

@@ -1,6 +1,6 @@
 <div class="content-container">
   <?php echo $this->element('evaltools/tools_menu', array());?>
-  <div class="list-add">
+  <div class="alignright">
     <?php echo $html->link(__('Add Mix Evaluation', true), '/mixevals/add', array('class' => 'add-button')); ?>
   </div>
 

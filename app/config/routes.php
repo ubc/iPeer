@@ -60,6 +60,8 @@ if (file_exists(CONFIGS.'installed.txt')) {
     'action' => 'login'));
   Router::connect('/logout', array('plugin' => 'guard', 'controller' => 'guard',
     'action' => 'logout'));
+  Router::connect('/loginout/loginByCWL', array('plugin' => 'guard', 'controller' => 'guard',
+    'action' => 'logout'));
   // Connect url to groups api
   Router::connect('/:controller/courses/:course_id/groups/:group_id',
     array('action' => 'groups', 'group_id' => null),
@@ -96,8 +98,7 @@ if (file_exists(CONFIGS.'installed.txt')) {
   // the /* directive would just redirect every page to the index page
   // of install, including the install/install2/, etc. steps of install
   Router::connect('/install/:action/*', array('controller' => 'install'));
+  Router::connect('/upgrade', array('controller' => 'upgrade', 'action' => 'index'));
+  Router::connect('/upgrade/:action', array('controller' => 'upgrade', 'action' => 'index'));
   Router::connect('/*', array('controller' => 'install'));
 }
-
-
-?>

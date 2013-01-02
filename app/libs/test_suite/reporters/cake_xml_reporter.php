@@ -41,7 +41,7 @@ class CakeXmlReporter extends XmlReporter
      *
      * @var array
      */
-    protected $params = array();
+    public $params = array();
 
     /**
      * Character set for the output of test reporting.

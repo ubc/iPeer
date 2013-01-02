@@ -6,7 +6,7 @@
 class DepartmentsController extends AppController {
 
     public $name = 'Departments';
-    public $uses = array('Department', 'Faculty', 'CourseDepartment', 
+    public $uses = array('Department', 'Faculty', 'CourseDepartment',
         'UserFaculty', 'Course');
 
     /**
@@ -31,15 +31,15 @@ class DepartmentsController extends AppController {
             $uf = $this->UserFaculty->findAllByUserId($this->Auth->user('id'));
             $ret = $this->Department->getByUserFaculties($uf);
         }
-        
+
         if (empty($ret)) {
             $this->Session->setFlash(__('You do not have access to any faculties', true));
             $this->redirect('/pages/admin');
         }
-        
+
         $departments = array();
         foreach ($ret as $department) {
-            $tmp = array(); 
+            $tmp = array();
             $tmp['id'] = $department['Department']['id'];
             $tmp['Name'] = $department['Department']['name'];
             $tmp['Faculty'] = $department['Faculty']['name'];
@@ -53,7 +53,7 @@ class DepartmentsController extends AppController {
      *
      * @param mixed $id - The department id to be viewed
      */
-    public function view($id = null) {
+    public function view($id) {
         $this->set('title_for_layout', 'View Department');
         if (!$id) {
             $this->Session->setFlash(__('Invalid department', true));
@@ -63,18 +63,7 @@ class DepartmentsController extends AppController {
         $this->set('department', $ret['Department']['name']);
         $this->set('faculty', $ret['Faculty']['name']);
 
-        $ret = $this->CourseDepartment->findAllByDepartmentId($id);
-        $courses = array();
-        foreach ($ret as $val) {
-            $course = $this->Course->findById(
-                $val['CourseDepartment']['course_id']);
-            $tmp = array();
-            $tmp['id'] = $course['Course']['id'];
-            $tmp['Course'] = $course['Course']['course'];
-            $tmp['Title'] = $course['Course']['title'];
-            $tmp['Students'] = $course['Course']['student_count'];
-            $courses[] = $tmp;
-        }
+        $courses = $this->Course->getAllAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'all', array('conditions' => array('Department.id' => $id), 'contain' => 'Department'));
         $this->set('courses', $courses);
     }
 
@@ -157,7 +146,7 @@ class DepartmentsController extends AppController {
             $uf = $this->UserFaculty->findAllByUserId($this->Auth->user('id'));
             $ret = $this->Department->getByUserFaculties($uf);
         }
-        
+
         foreach ($ret as $faculty) {
             $faculties[$faculty['Faculty']['id']] = $faculty['Faculty']['name'];
         }

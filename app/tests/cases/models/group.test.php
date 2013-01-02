@@ -77,11 +77,11 @@ class GroupTestCase extends CakeTestCase
         // Test group with some students in it
         $students = $this->Group->getStudentsNotInGroup(2);
         $this->assertEqual($students, array(
-            '26' => '19524032 Bill Student', 
+            '26' => '19524032 Bill Student',
             '21' => '22784037 Nicole Student',
             '17' => '37116036 Edna Student',
             '28' => '38058020 Michael Student',
-            '15' => '48877031 Jennifer Student', 
+            '15' => '48877031 Jennifer Student',
             '13' => '84188465 Damien Student',
             '19' => '90938044 Jonathan Student',
             '35' => ' Tutor 1 *',
@@ -152,19 +152,49 @@ class GroupTestCase extends CakeTestCase
         $groups = $this->Group->getGroupsByCourseId(999);
         $this->assertEqual($groups, $empty);
     }
-    
+
     function testGetFirstAvailGroupNum()
     {
         // Test valid course with groups
         $group_num = $this->Group->getFirstAvailGroupNum(1);
         $this->assertEqual($group_num, 3);
-        
+
         // Test valid course with no groups
         $group_num = $this->Group->getFirstAvailGroupNum(2);
         $this->assertEqual($group_num, 1);
-        
+
         // Test invalid course
         $group_num = $this->Group->getFirstAvailGroupNum(999);
         $this->assertEqual($group_num, 1);
+    }
+
+    function testGetGroupByGroupIdEventId()
+    {
+        // group is attached to event
+        $group = $this->Group->getGroupByGroupIdEventId(1, 1);
+        $this->assertFalse(empty($group));
+        $this->assertEqual($group['Group']['id'], 1);
+
+        // group is not attached to event
+        $group = $this->Group->getGroupByGroupIdEventId(2, 8);
+        $this->assertFalse($group);
+
+    }
+
+    function testGetGroupByGroupIdEventIdMemberId()
+    {
+        // student within group, and group is attached to event
+        $group = $this->Group->getGroupByGroupIdEventIdMemberId(1, 1, 5);
+        $this->assertFalse(empty($group));
+        $this->assertEqual($group['Group']['id'], 1);
+
+        // student not in the group
+        $group = $this->Group->getGroupByGroupIdEventIdMemberId(1, 1, 31);
+        $this->assertFalse($group);
+
+        // student in the group, but group is not attached to event
+        $group = $this->Group->getGroupByGroupIdEventIdMemberId(2, 8, 31);
+        $this->assertFalse($group);
+
     }
 }

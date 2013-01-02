@@ -58,11 +58,12 @@
     </tr>
   </table>
     <div class="oauth">
+    <?php if (User::hasPermission('controllers/Oauthclients')): ?>
     <!-- OAuth Client Credentials -->
     <hr align=left width=95%>
     <h3><?php __('OAuth Client Credentials')?>:</h3>
     <?php if (count($clients) == 0 || User::hasPermission('controllers/oauthclients')) { ?>
-        <?php echo $html->link(__('Add Client Credential', true), '/oauth_clients/add', array('id' => 'add', 'class' => 'add-button')); ?>
+        <?php echo $html->link(__('Add Client Credential', true), '/oauthclients/add', array('id' => 'add', 'class' => 'add-button')); ?>
     <?php } ?>
     <?php if (count($clients) > 0) { ?>
         <?php foreach ($clients as $key => $client) { ?>
@@ -70,14 +71,16 @@
             <label id=secret><?php echo __('Secret').': '.$client['OauthClient']['secret'];?></label>
             <?php echo $this->Form->select('OauthClient.'.$key.'.enabled', $enabled, $client['OauthClient']['enabled'], array('empty' => false)); ?>
             <?php echo $this->Form->input('OauthClient.'.$key.'.id', array('value' => $client['OauthClient']['id'])); ?>
-            <?php echo $html->link('X', '/oauth_clients/delete/'.$client['OauthClient']['id'], array('id' => 'delete')); ?></p>
+            <?php echo $html->link('X', '/oauthclients/delete/'.$client['OauthClient']['id'], array('id' => 'delete')); ?></p>
             <label id=comment><?php echo __('&nbsp;Comment: ').$client['OauthClient']['comment'];?></label>
         <?php } ?>
     <?php } ?>
+    <?php endif; ?>
+    <?php if (User::hasPermission('controllers/Oauthtokens')): ?>
     <!-- OAuth Token Credentials -->
     <hr align=left width=95%>
     <h3><?php __('OAuth Token Credentials')?>:</h3>
-    <?php echo $html->link(__('Add Token Credential', true), '/oauth_tokens/add', array('id' => 'add', 'class' => 'add-button')); ?>
+    <?php echo $html->link(__('Add Token Credential', true), '/oauthtokens/add', array('id' => 'add', 'class' => 'add-button')); ?>
     <?php if (count($tokens) > 0) { ?>
         <?php foreach ($tokens as $index => $token) { ?>
             <p><label id=key><?php echo __('Key').': '.$token['OauthToken']['key'];?></label>
@@ -85,10 +88,11 @@
             <?php echo __('Expires').': '.$token['OauthToken']['expires'];?>
             <?php echo $this->Form->select('OauthToken.'.$index.'.enabled', $enabled, $token['OauthToken']['enabled'], array('empty' => false)); ?>
             <?php echo $this->Form->input('OauthToken.'.$index.'.id', array('value' => $token['OauthToken']['id'])); ?>
-            <?php echo $html->link('X', '/oauth_tokens/delete/'.$token['OauthToken']['id'], array('id' => 'delete')); ?></p>
+            <?php echo $html->link('X', '/oauthtokens/delete/'.$token['OauthToken']['id'], array('id' => 'delete')); ?></p>
             <label id=comment><?php echo __('&nbsp;Comment: ').$token['OauthToken']['comment'];?></label>
         <?php } ?>
     <?php } ?>
+    <?php endif;?>
     </div>
     <br>
     <?php if ($viewPage==false): echo $this->Form->submit(__('Save', true));

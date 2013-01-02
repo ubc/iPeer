@@ -69,6 +69,31 @@ class Survey extends EvaluationBase
 
     public $contain = array('Question');
 
+    public $validate = array(
+        'name'  => array(
+            'unique' => array(
+                'rule' => 'isUnique',
+                'message' => 'Duplicate name found. Please select another.'
+            )
+        ),
+    );
+
+    /**
+     * __construct
+     *
+     * @param bool $id    id
+     * @param bool $table table
+     * @param bool $ds    data source
+     *
+     * @access protected
+     * @return void
+     */
+    function __construct($id = false, $table = null, $ds = null)
+    {
+        parent::__construct($id, $table, $ds);
+        $this->virtualFields['question_count'] = sprintf('SELECT count(*) as question_count FROM survey_questions as q WHERE q.survey_id = %s.id', $this->alias);
+    }
+
     /**
      * getSurveyIdByCourseIdTitle
      *

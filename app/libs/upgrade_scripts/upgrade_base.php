@@ -1,27 +1,83 @@
 <?php
 /**
- * DbPatcherComponent
+ * UpgradeBase
  *
- * @uses Object
  * @package   CTLT.iPeer
  * @author    Pan Luo <pan.luo@ubc.ca>
  * @copyright 2012 All rights reserved.
- * @license   MIT {@link http://www.opensource.org/licenses/MIT}
+ * @license   PHP Version 3.0 {@link http://www.php.net/license/3_0.txt}
+ * @version   Release: 3.0
  */
-class DbPatcherComponent extends Object
+class UpgradeBase
 {
-    public $controller = true;
-
+    public $errors = array();
+    public $currentVersion;
+    public $fromVersions;
+    public $toVersion;
+    public $dbVersion;
     /**
-     * patch
-     *
-     * @param mixed $from_version from version
-     * @param bool  $dbConfig     db config
+     * isUpgradable
      *
      * @access public
      * @return void
      */
-    public function patch($from_version, $dbConfig = null)
+    public function isUpgradable()
+    {
+        $sysparameter = ClassRegistry::init('SysParameter');
+        $this->currentVersion = $sysparameter->get('system.version');
+        return in_array($this->currentVersion, $this->fromVersions);
+    }
+
+    /**
+     * up the actually upgrade function
+     *
+     * @access public
+     * @return void
+     */
+    public function up()
+    {
+        trigger_error(__('You need to implemented up() function in the upgrade script.', true));
+    }
+
+    /**
+     * down the actually downgrade function
+     *
+     * @access public
+     * @return void
+     */
+    public function down()
+    {
+        trigger_error(__('You need to implemented down() function in the upgrade script.', true));
+    }
+
+    /**
+     * upgrade
+     *
+     * @access public
+     * @return void
+     */
+    public function upgrade() {
+        if ($this->up()) {
+            $sysparameter = ClassRegistry::init('SysParameter');
+            $sysparameter->setValue('system.version', $this->toVersion);
+        } else {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * patchDb
+     *
+     * @param int   $fromVersion from version
+     * @param int   $toVersion   to version
+     * @param array $dbConfig    database config
+     *
+     * @access public
+     * @return void
+     */
+    public function patchDb($fromVersion, $toVersion = null, $dbConfig = null)
     {
         $ret = $this->connectDb($dbConfig);
         if ($ret) {
@@ -29,8 +85,10 @@ class DbPatcherComponent extends Object
            return $ret;
         }
 
+        $toVersion = $toVersion == null ? Configure::read('DATABASE_VERSION') : $toVersion;
+
         // Apply the delta files
-        for ($i = $from_version+1; $i <= Configure::read('DATABASE_VERSION'); $i++) {
+        for ($i = $fromVersion+1; $i <= $toVersion; $i++) {
             // Check that we can read the delta file
             $file = CONFIGS.'sql/delta_'.$i.'.sql';
             if (!is_readable($file)) {
@@ -40,15 +98,8 @@ class DbPatcherComponent extends Object
             $ret = $this->applyDelta($file);
             if ($ret) {
                 mysql_close();
-                return 'DB Version '. $from_version . ' Failed to apply delta file: '.$file.'. Message = '.$ret;
+                return 'DB Version '. $fromVersion . ' Failed to apply delta file: '.$file.'. Message = '.$ret;
             }
-        }
-
-        // apply the other changes
-        $ret = $this->updateDatabaseVersion();
-        if ($ret) {
-            mysql_close();
-            return "Database upgrade successful, however, failed to increment database version counter, please do this manually: " . $ret;
         }
         mysql_close();
 
@@ -61,10 +112,10 @@ class DbPatcherComponent extends Object
      *
      * @param mixed $dbConfig
      *
-     * @access private
+     * @access protected
      * @return void
      */
-    private function connectDb($dbConfig)
+    protected function connectDb($dbConfig)
     {
         // Read the database configuration from database.php
         $dbConfig = new DATABASE_CONFIG();
@@ -94,10 +145,10 @@ class DbPatcherComponent extends Object
      *
      * @param mixed $file
      *
-     * @access private
+     * @access protected
      * @return void
      */
-    private function applyDelta($file)
+    protected function applyDelta($file)
     {
         $fp = fopen($file, "r");
         if (false === $fp) {
@@ -109,7 +160,7 @@ class DbPatcherComponent extends Object
         $done = false;
 
         while (!feof($fp)) {
-            $line = trim(fgets($fp, 1024));
+            $line = trim(fgets($fp));
             $sl = strlen($line) - 1;
 
             if ($sl < 0) {
@@ -141,28 +192,9 @@ class DbPatcherComponent extends Object
             }
         }
         fclose($fp);
+        // update database version
+        mysql_query('UPDATE `sys_parameters` SET `parameter_value` = '.$this->dbVersion.' Where `parameter_code` = "database.version";');
         mysql_query("COMMIT");
         return false;
     }
-
-
-    /**
-     * updateDatabaseVersion
-     *
-     * @access private
-     * @return void
-     */
-    private function updateDatabaseVersion()
-    {
-        // it should be safe to assume that we have a database.version entry
-        // since we're starting from version 3
-        $ret = mysql_query("update `sys_parameters` set `parameter_value` = ".
-            Configure::read('DATABASE_VERSION')." where `parameter_code` = 'database.version';");
-        if ($ret == false) {
-            return mysql_error();
-        }
-        return false;
-    }
-
 }
-

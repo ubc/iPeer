@@ -58,9 +58,9 @@ class CreateAclShell extends Shell
      */
     function createAcos()
     {
-        // could make it 'pages/admin' but unfortunately, there is a 
+        // could make it 'pages/admin' but unfortunately, there is a
         // pages controller brought in somewhere when generating the ACOs
-        // for the controller. 
+        // for the controller.
         $this->Acl->Aco->create(
             array('parent_id' => null, 'alias' => 'adminpage'));
         $this->Acl->Aco->save();
@@ -106,7 +106,7 @@ class CreateAclShell extends Shell
             $this->Acl->Aco->create(array('parent_id' => $pwd_reset['Aco']['id'], 'model' => null, 'alias' => $r['Role']['name']));
             $this->Acl->Aco->save();
         }
-        
+
         $this->Acl->Aco->create(array('parent_id' => $aco_user['Aco']['id'], 'model' => null, 'alias' => 'index'));
         $user_index = $this->Acl->Aco->save();
 
@@ -119,55 +119,56 @@ class CreateAclShell extends Shell
             $this->Acl->Aco->create(array('parent_id' => $role['Aco']['id'], 'model' => null, 'alias' => $r['Role']['name']));
             $this->Acl->Aco->save();
         }
-        
+
         // functions/evaluation
         $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'evaluation'));
         $eval = $this->Acl->Aco->save();
         $eval['Aco']['id'] = $this->Acl->Aco->id;
-        
-        $this->Acl->Aco->create(array('parent_id' => $eval['Aco']['id'], 'model' => null, 'alias' => 'export'));
-        $this->Acl->Aco->save();
 
         // functions/email
         $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'email'));
         $email = $this->Acl->Aco->save();
         $email['Aco']['id'] = $this->Acl->Aco->id;
-        
+
         $this->Acl->Aco->create(array('parent_id' => $email['Aco']['id'], 'model' => null, 'alias' => 'allUsers'));
         $this->Acl->Aco->save();
-        
+
         $this->Acl->Aco->create(array('parent_id' => $email['Aco']['id'], 'model' => null, 'alias' => 'allGroups'));
         $this->Acl->Aco->save();
-        
+
         $this->Acl->Aco->create(array('parent_id' => $email['Aco']['id'], 'model' => null, 'alias' => 'allCourses'));
         $this->Acl->Aco->save();
-        
+
         // functions/emailtemplate
         $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'emailtemplate'));
         $emailtemplate = $this->Acl->Aco->save();
         $emailtemplate['Aco']['id'] = $this->Acl->Aco->id;
-        
+
         // functions/viewstudentresults
         $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'viewstudentresults'));
         $viewstudentresults = $this->Acl->Aco->save();
         $viewstudentresults['Aco']['id'] = $this->Acl->Aco->id;
-        
+
         // functions/viewemailaddresses
         // some users can't explicitly see users' email addresses
         $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'viewemailaddresses'));
         $viewemailaddresses = $this->Acl->Aco->save();
         $viewemailaddresses['Aco']['id'] = $this->Acl->Aco->id;
-        
+
         // functions/superadmin
         // for functionalities only super admin can use
         $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'superadmin'));
         $superadmin = $this->Acl->Aco->save();
-        
-        // functions/onlytakeeval
-        // for roles that can only take evaluations
-        $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'onlytakeeval'));
-        $onlytakeeval = $this->Acl->Aco->save();
-        
+
+        // functions/coursemanager
+        // for roles that can view the course manager home page
+        $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'coursemanager'));
+        $coursemanager = $this->Acl->Aco->save();
+
+        // functions/viewusername
+        // some users can't explicitly see username
+        $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'viewusername'));
+        $this->Acl->Aco->save();
     }
 
 
@@ -180,9 +181,6 @@ class CreateAclShell extends Shell
      */
     function __buildAcoControllers()
     {
-        if (!Configure::read('debug')) {
-            return $this->_stop();
-        }
         $log = array();
 
         $aco =& $this->Acl->Aco;
@@ -260,7 +258,7 @@ class CreateAclShell extends Shell
             }
         }
         if (count($log)>0) {
-            debug($log);
+            print_r($log);
         }
     }
 
@@ -415,7 +413,7 @@ class CreateAclShell extends Shell
                 $file = Inflector::camelize(substr($file, 0, strlen($file)-strlen('_controller.php')));
                 if (!preg_match('/^'. Inflector::humanize($pluginName). 'App/', $file)) {
                     if (!App::import('Controller', $pluginName.'.'.$file)) {
-                        debug(__('Error importing ', true).$file.__(' for plugin ', true).$pluginName);
+                        trigger_error(__('Error importing ', true).$file.__(' for plugin ', true).$pluginName);
                     } else {
                         /// Now prepend the Plugin name ...
                         // This is required to allow us to fetch the method names.
@@ -467,24 +465,11 @@ class CreateAclShell extends Shell
     function createPermissions()
     {
         $role = $this->Role;
-        
+
         $role->id = 1;  // superadmin
         $this->Acl->allow($role, 'controllers');
         $this->Acl->allow($role, 'functions');
-        $this->Acl->allow($role, 'controllers/Evaltools');
-        $this->Acl->allow($role, 'controllers/Simpleevaluations');
-        $this->Acl->allow($role, 'controllers/Rubrics');
-        $this->Acl->allow($role, 'controllers/Mixevals');
-        $this->Acl->allow($role, 'controllers/Surveys');
-        $this->Acl->allow($role, 'controllers/Emailer');
-        $this->Acl->allow($role, 'controllers/Emailtemplates');
-        $this->Acl->allow($role, 'controllers/Events');
-        $this->Acl->allow($role, 'controllers/Faculties');
-        $this->Acl->allow($role, 'controllers/Departments');
-        $this->Acl->allow($role, 'controllers/Groups');
         $this->Acl->allow($role, 'adminpage');
-        $this->Acl->allow($role, 'functions/viewemailaddresses');
-        $this->Acl->allow($role, 'functions/superadmin');
 
         $role->id = 2;  // admin
         $this->Acl->deny($role, 'controllers');
@@ -494,44 +479,55 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Emailer');
         $this->Acl->allow($role, 'controllers/Emailtemplates');
         $this->Acl->allow($role, 'controllers/Evaltools');
+        $this->Acl->allow($role, 'controllers/Evaluations');
         $this->Acl->allow($role, 'controllers/Events');
         $this->Acl->allow($role, 'controllers/Groups');
         $this->Acl->allow($role, 'controllers/Mixevals');
         $this->Acl->allow($role, 'controllers/Rubrics');
         $this->Acl->allow($role, 'controllers/Simpleevaluations');
         $this->Acl->allow($role, 'controllers/Surveys');
+        $this->Acl->allow($role, 'controllers/Surveygroups');
         $this->Acl->allow($role, 'controllers/Users');
         $this->Acl->allow($role, 'controllers/Evaluations');
+        $this->Acl->allow($role, 'controllers/guard/guard/logout');
+        $this->Acl->allow($role, 'controllers/Oauthclients/add');
+        $this->Acl->allow($role, 'controllers/Oauthclients/delete');
+        $this->Acl->allow($role, 'controllers/Oauthtokens/add');
+        $this->Acl->allow($role, 'controllers/Oauthtokens/delete');
         $this->Acl->deny($role, 'functions');
         $this->Acl->allow($role, 'functions/emailtemplate');
         $this->Acl->allow($role, 'functions/evaluation');
         $this->Acl->allow($role, 'functions/email/allUsers');
         $this->Acl->allow($role, 'functions/user');
         $this->Acl->allow($role, 'functions/user/admin');
-        $this->Acl->deny($role, 'functions/user/admin', 'create');
-        $this->Acl->deny($role, 'functions/user/admin', 'update');
         $this->Acl->deny($role, 'functions/user/admin', 'delete');
         $this->Acl->deny($role, 'functions/user/superadmin');
-        $this->Acl->allow($role, 'adminpage');
         $this->Acl->allow($role, 'functions/viewemailaddresses');
+        $this->Acl->allow($role, 'functions/viewusername');
+        $this->Acl->allow($role, 'functions/coursemanager');
         $this->Acl->deny($role, 'functions/superadmin');
 
         $role->id = 3; // instructor
         $this->Acl->deny($role, 'controllers');
         $this->Acl->allow($role, 'controllers/Home');
         $this->Acl->allow($role, 'controllers/Courses');
-        $this->Acl->deny($role, 'controllers/Courses/add');
-        $this->Acl->deny($role, 'controllers/Courses/edit');
         $this->Acl->allow($role, 'controllers/Emailer');
         $this->Acl->allow($role, 'controllers/Emailtemplates');
         $this->Acl->allow($role, 'controllers/Evaltools');
+        $this->Acl->allow($role, 'controllers/Evaluations');
         $this->Acl->allow($role, 'controllers/Events');
         $this->Acl->allow($role, 'controllers/Groups');
         $this->Acl->allow($role, 'controllers/Mixevals');
         $this->Acl->allow($role, 'controllers/Rubrics');
         $this->Acl->allow($role, 'controllers/Simpleevaluations');
         $this->Acl->allow($role, 'controllers/Surveys');
+        $this->Acl->allow($role, 'controllers/Surveygroups');
         $this->Acl->allow($role, 'controllers/Users');
+        $this->Acl->allow($role, 'controllers/guard/guard/logout');
+        $this->Acl->allow($role, 'controllers/Oauthclients/add');
+        $this->Acl->allow($role, 'controllers/Oauthclients/delete');
+        $this->Acl->allow($role, 'controllers/Oauthtokens/add');
+        $this->Acl->allow($role, 'controllers/Oauthtokens/delete');
         $this->Acl->deny($role, 'functions');
         $this->Acl->allow($role, 'functions/evaluation');
         $this->Acl->deny($role, 'functions/evaluation', 'update');
@@ -546,8 +542,8 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'functions/user/index');
         $this->Acl->deny($role, 'functions/viewemailaddresses');
         $this->Acl->deny($role, 'functions/superadmin');
-        $this->Acl->deny($role, 'functions/onlytakeeval');
-        
+        $this->Acl->allow($role, 'functions/coursemanager');
+
         $role->id = 4; // tutor
         $this->Acl->deny($role, 'controllers');
         $this->Acl->allow($role, 'controllers/Home');
@@ -561,12 +557,18 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'controllers/Rubrics');
         $this->Acl->deny($role, 'controllers/Simpleevaluations');
         $this->Acl->deny($role, 'controllers/Surveys');
+        $this->Acl->deny($role, 'controllers/Surveygroups');
         $this->Acl->deny($role, 'controllers/Users');
+        $this->Acl->allow($role, 'controllers/guard/guard/logout');
+        $this->Acl->allow($role, 'controllers/Evaluations/makeEvaluation');
+        $this->Acl->allow($role, 'controllers/Evaluations/studentViewEvaluationResult');
+        $this->Acl->allow($role, 'controllers/Evaluations/completeEvaluationRubric');
+        $this->Acl->allow($role, 'controllers/Evaluations/completeEvaluationMixeval');
+        $this->Acl->allow($role, 'controllers/Users/editProfile');
         $this->Acl->deny($role, 'functions');
         $this->Acl->deny($role, 'functions/viewemailaddresses');
         $this->Acl->deny($role, 'functions/superadmin');
-        $this->Acl->allow($role, 'functions/onlytakeeval');
-        
+
         $role->id = 5; // student
         $this->Acl->deny($role, 'controllers');
         $this->Acl->allow($role, 'controllers/Home');
@@ -580,11 +582,21 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'controllers/Rubrics');
         $this->Acl->deny($role, 'controllers/Simpleevaluations');
         $this->Acl->deny($role, 'controllers/Surveys');
+        $this->Acl->deny($role, 'controllers/Surveygroups');
         $this->Acl->deny($role, 'controllers/Users');
+        $this->Acl->allow($role, 'controllers/guard/guard/logout');
+        $this->Acl->allow($role, 'controllers/Evaluations/makeEvaluation');
+        $this->Acl->allow($role, 'controllers/Evaluations/studentViewEvaluationResult');
+        $this->Acl->allow($role, 'controllers/Evaluations/completeEvaluationRubric');
+        $this->Acl->allow($role, 'controllers/Evaluations/completeEvaluationMixeval');
+        $this->Acl->allow($role, 'controllers/Users/editProfile');
+        $this->Acl->allow($role, 'controllers/Oauthclients/add');
+        $this->Acl->allow($role, 'controllers/Oauthclients/delete');
+        $this->Acl->allow($role, 'controllers/Oauthtokens/add');
+        $this->Acl->allow($role, 'controllers/Oauthtokens/delete');
         $this->Acl->deny($role, 'functions');
         $this->Acl->allow($role, 'functions/viewstudentresults');
         $this->Acl->deny($role, 'functions/viewemailaddresses');
         $this->Acl->deny($role, 'functions/superadmin');
-        $this->Acl->allow($role, 'functions/onlytakeeval');
     }
 }

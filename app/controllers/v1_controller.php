@@ -22,6 +22,14 @@ class V1Controller extends Controller {
     public $layout = "blank_layout";
 
     /**
+     * body the request body
+     *
+     * @var string
+     * @access private
+     */
+    private $body = "";
+
+    /**
      * oauth function for use in test?
      */
     public function oauth() {
@@ -82,7 +90,8 @@ class V1Controller extends Controller {
      *
      * @return bool - true if signatures match
      */
-    private function _checkSignature() {
+    private function _checkSignature()
+    {
         // Calculate the signature, note, going to assume that all incoming
         // parameters are already UTF-8 encoded since it'll be impossible
         // to convert encodings blindly
@@ -124,6 +133,7 @@ class V1Controller extends Controller {
         // construct the key used for hmac calculation
         $clientSecret = $this->_getClientSecret($_REQUEST['oauth_consumer_key']);
         if (is_null($clientSecret)) {
+            $this->log('Got invalid client ["'.(isset($_REQUEST['oauth_consumer_key']) ? $_REQUEST['oauth_consumer_key'] : "").'"]!');
             $this->set('oauthError', "Invalid Client");
             $this->render('oauth_error');
             return false;
@@ -131,6 +141,7 @@ class V1Controller extends Controller {
         $clientSecret = rawurlencode($clientSecret);
         $tokenSecret = $this->OauthToken->getTokenSecret($_REQUEST['oauth_token']);
         if (is_null($tokenSecret)) {
+            $this->log('Got invalid token ["'.(isset($_REQUEST['oauth_token']) ? $_REQUEST['oauth_token'] : "").'"]!');
             $this->set('oauthError', "Invalid Token");
             $this->render('oauth_error');
             return false;
@@ -145,6 +156,7 @@ class V1Controller extends Controller {
         // check to see if we got the signature we expected
         $actual = $_REQUEST['oauth_signature'];
         if ($expected != $actual) {
+            $this->log('Got invalid signature. expecting: '.$expected.', actual: '.$actual.'.');
             $this->set('oauthError', "Invalid Signature");
             $this->render('oauth_error');
             return false;
@@ -234,7 +246,12 @@ class V1Controller extends Controller {
      * @return void
      */
     public function beforeFilter() {
-        // return true;
+        // expecting a body except get request
+        if (!$this->RequestHandler->isGet()) {
+            $this->body = trim(file_get_contents('php://input'), true);
+        }
+        $this->log('Got API request '. print_r($_REQUEST, true)."\nBody: ".$this->body, 'debug');
+
         return $this->_checkRequiredParams() && $this->_checkSignature() &&
             $this->_checkNonce();
     }
@@ -296,7 +313,7 @@ class V1Controller extends Controller {
             $this->set('statusCode', $statusCode);
         // add
         } else if ($this->RequestHandler->isPost()) {
-            $input = trim(file_get_contents('php://input'), true);
+            $input = $this->body;
             $decode = json_decode($input, true);
             // adding one user
             if (isset($decode['username'])) {
@@ -334,12 +351,14 @@ class V1Controller extends Controller {
                     if ($ret) {
                         $statusCode = 'HTTP/1.1 201 Created';
                         $sUser[] = $decode[$key]['username'];
+                        $this->log('User created successful: '. $decode[$key]['username'], 'debug');
                     } else {
                         $temp = array();
                         $temp['username'] = $decode[$key]['username'];
                         $temp['first_name'] = $decode[$key]['first_name'];
                         $temp['last_name'] = $decode[$key]['last_name'];
                         $uUser[] = $temp;
+                        $this->log('User created failed: '. $decode[$key]['username'], 'debug');
                     }
                 }
                 $sbody = $this->User->find('all', array(
@@ -379,7 +398,7 @@ class V1Controller extends Controller {
             }
         // update
         } else if ($this->RequestHandler->isPut()) {
-            $edit = trim(file_get_contents('php://input'), true);
+            $edit = $this->body;
             $decode = json_decode($edit, true);
             // at the moment each user only has one role
             $role = array('Role' => array('RolesUser' => array('role_id' => $decode['role_id'])));
@@ -440,7 +459,7 @@ class V1Controller extends Controller {
             $this->set('courses', $classes);
             $this->set('statusCode', $statusCode);
         } else if ($this->RequestHandler->isPost()) {
-            $create = trim(file_get_contents('php://input'), true);
+            $create = $this->body;
             if (!$this->Course->save(json_decode($create, true))) {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
                 $this->set('courses', array('code' => 1, 'message' => 'course already exists.'));
@@ -451,7 +470,7 @@ class V1Controller extends Controller {
                 $this->set('courses', $course);
             }
         } else if ($this->RequestHandler->isPut()) {
-            $update = trim(file_get_contents('php://input'), true);
+            $update = $this->body;
             if (!$this->Course->save(json_decode($update, true))) {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
                 $this->set('courses', null);
@@ -525,7 +544,7 @@ class V1Controller extends Controller {
             $this->set('statusCode', $statusCode);
         // add
         } else if ($this->RequestHandler->isPost()) {
-            $add = trim(file_get_contents('php://input'), true);
+            $add = $this->body;
             $decode = array('Group' => json_decode($add, true));
             $decode['Group']['course_id'] = $this->params['course_id'];
 
@@ -549,7 +568,7 @@ class V1Controller extends Controller {
             }
         // update
         } else if ($this->RequestHandler->isPut()) {
-            $edit = trim(file_get_contents('php://input'), true);
+            $edit = $this->body;
             $decode = array('Group' => json_decode($edit, true));
             if ($this->Group->save($decode)) {
                 $temp = $this->Group->read($fields);
@@ -601,7 +620,7 @@ class V1Controller extends Controller {
             $status = 'HTTP/1.1 200 OK';
         } else if ($this->RequestHandler->isPost()) {
             // add the list of users to the given group
-            $ret = trim(file_get_contents('php://input'), true);
+            $ret = $this->body;
             $users = json_decode($ret, true);
             $status = 'HTTP/1.1 200 OK';
             foreach ($users as $user) {
@@ -645,9 +664,7 @@ class V1Controller extends Controller {
 
         if ($this->RequestHandler->isGet()) {
             if (!isset($this->params['event_id']) || empty($this->params['event_id'])) {
-                $list = $this->Event->find('all', array(
-                    'conditions' => array('course_id' => $course_id),
-                    'fields' => $fields));
+                $list = $this->Event->getEventFieldsByCourseId($course_id, $fields);
 
                 if (!empty($list)) {
                     foreach ($list as $data) {
@@ -656,10 +673,7 @@ class V1Controller extends Controller {
                 }
                 $statusCode = 'HTTP/1.1 200 OK';
             } else {
-                $list = $this->Event->find('first',
-                    array('fields' => $fields,
-                        'conditions' => array('Event.id' => $this->params['event_id']))
-                );
+                $list = $this->Event->getEventFieldsByEventId($this->params['event_id'], $fields);
 
                 if (!empty($list)) {
                     $results = $list['Event'];
@@ -696,7 +710,6 @@ class V1Controller extends Controller {
         if ($user_id) {
             $conditions['evaluatee'] = $user_id;
         }
-        $params = array('fields' => $fields, 'conditions' => $conditions);
 
         if ($this->RequestHandler->isGet()) {
             $res = array();
@@ -914,7 +927,7 @@ class V1Controller extends Controller {
         //
         else if ($this->RequestHandler->isPost()) {
             $this->set('statusCode', 'HTTP/1.1 200 OK');
-            $input = trim(file_get_contents('php://input'), true);
+            $input = $this->body;
             $users = json_decode($input, true);
 
             $students = $this->UserEnrol->find('list', array('conditions' => array('course_id' => $courseId), 'fields' => array('user_id')));
@@ -931,22 +944,25 @@ class V1Controller extends Controller {
                     $table = null;
                     if ($role == 'student') {
                         $ret = $this->User->addStudent($userId, $courseId);
+                        $this->log('Adding student '.$user['username'].' to course '.$courseId, 'debug');
                     }
                     else if ($role == 'instructor') {
                         $ret = $this->User->addInstructor($userId, $courseId);
+                        $this->log('Adding instructor'.$user['username'].' to course '.$courseId, 'debug');
                     }
                     else if ($role == 'tutor') {
                         $ret = $this->User->addTutor($userId, $courseId);
+                        $this->log('Adding tutor '.$user['username'].' to course '.$courseId, 'debug');
                     }
                     else {
-                        $this->set('statusCode',
-                            'HTTP/1.1 501 Unsupported role for '.$user['username']);
-                        break;
+                        $this->set('error', array('code' => 400, 'message' => 'Unsupported role for '.$user['username']));
+                        $this->render('error');
+                        return;
                     }
                     if (!$ret) {
-                        $this->set('statusCode',
-                            'HTTP/1.1 501 Fail to enrol ' . $user['username']);
-                        break;
+                        $this->set('error', array('code' => 401, 'message' => 'Fail to enrol ' . $user['username']));
+                        $this->render('error');
+                        return;
                     }
                 }
             }
@@ -955,7 +971,7 @@ class V1Controller extends Controller {
         }
         else if ($this->RequestHandler->isDelete()) {
             $this->set('statusCode', 'HTTP/1.1 200 OK');
-            $input = trim(file_get_contents('php://input'), true);
+            $input = $this->body;
             $users = json_decode($input, true);
             foreach ($users as $user) {
                 $userId = $this->User->field('id',
@@ -972,14 +988,14 @@ class V1Controller extends Controller {
                     $ret = $this->User->removeTutor($userId, $courseId);
                 }
                 else {
-                    $this->set('statusCode',
-                        'HTTP/1.1 501 Unsupported role for '.$user['username']);
-                    break;
+                    $this->set('error', array('code' => 400, 'message' => 'Unsupported role for '.$user['username']));
+                    $this->render('error');
+                    return;
                 }
                 if (!$ret) {
-                    $this->set('statusCode',
-                        'HTTP/1.1 501 Fail to drop ' . $user['username']);
-                    break;
+                    $this->set('error', array('code' => 401, 'message' => 'Fail to enrol ' . $user['username']));
+                    $this->render('error');
+                    return;
                 }
             }
             $this->set('enrolment', $users);

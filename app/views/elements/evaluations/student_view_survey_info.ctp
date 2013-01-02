@@ -1,4 +1,4 @@
-<form name="frm" id="frm" method="POST" action="<?php echo $html->url('makeSurveyEvaluation') ?>">
+<form name="frm" id="frm" method="POST" action="<?php echo $html->url('makeEvaluation/'.$event['Event']['id']) ?>">
 <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
 <input type="hidden" name="survey_id" id="survey_id" value="<?php if (!empty($survey_id)) echo $survey_id; ?>" />
 <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id']?>"/>

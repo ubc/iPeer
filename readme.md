@@ -1,4 +1,15 @@
+iPeer 3.0.0
+-----------------------------
+More than 74 bug fixes or improvements from 3.0.0 Beta
+ * Better CSV export. More efficient and better format for process
+ * Upgrade scripts allowing to upgrade from 2.x
+ * Better student home page
+ * Confirmation email after evaluation submitted
+ * New color theme
+ * And more
+
 iPeer 3.0.0 Beta
+-----------------------------
 New Features:
  * Improved Installation and Upgrade Wizard
  * The new Tutur Role and Faculty Admin Role
@@ -15,7 +26,7 @@ New Features:
  * And more
 
 iPeer 2.2
-
+-----------------------------
 Changelog from 2.1
 1) Students are now able to view released evaluation results (grades and comments)
      These results are anonymous, and randomly ordered.

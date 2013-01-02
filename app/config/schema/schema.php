@@ -1,4 +1,4 @@
-<?php 
+<?php
 /* App schema generated on: 2012-02-21 17:30:19 : 1329874219*/
 class AppSchema extends CakeSchema {
 	var $name = 'App';
@@ -77,7 +77,7 @@ class AppSchema extends CakeSchema {
 		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
 		'evaluator' => array('type' => 'integer', 'null' => false, 'default' => '0'),
 		'evaluatee' => array('type' => 'integer', 'null' => false, 'default' => '0'),
-		'general_comment' => array('type' => 'text', 'null' => true, 'default' => NULL, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+		'comment' => array('type' => 'text', 'null' => true, 'default' => NULL, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'score' => array('type' => 'float', 'null' => false, 'default' => '0.00', 'length' => '12,2'),
 		'comment_release' => array('type' => 'integer', 'null' => false, 'default' => '0', 'length' => 1),
 		'grade_release' => array('type' => 'integer', 'null' => false, 'default' => '0', 'length' => 1),
@@ -97,7 +97,7 @@ class AppSchema extends CakeSchema {
 		'evaluator' => array('type' => 'integer', 'null' => false, 'default' => '0'),
 		'evaluatee' => array('type' => 'integer', 'null' => false, 'default' => '0'),
 		'score' => array('type' => 'integer', 'null' => false, 'default' => '0', 'length' => 5),
-		'eval_comment' => array('type' => 'text', 'null' => true, 'default' => NULL, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+		'comment' => array('type' => 'text', 'null' => true, 'default' => NULL, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'release_status' => array('type' => 'integer', 'null' => false, 'default' => '0', 'length' => 1),
 		'grp_event_id' => array('type' => 'integer', 'null' => false, 'default' => '0'),
 		'event_id' => array('type' => 'integer', 'null' => false, 'default' => '0'),
@@ -369,22 +369,6 @@ class AppSchema extends CakeSchema {
 		'release_date_begin' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
 		'release_date_end' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
 		'released' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
-		'creator_id' => array('type' => 'integer', 'null' => false, 'default' => '0'),
-		'created' => array('type' => 'datetime', 'null' => false, 'default' => '0000-00-00 00:00:00'),
-		'updater_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
-		'modified' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
-		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),
-		'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'InnoDB')
-	);
-	var $sys_functions = array(
-		'id' => array('type' => 'integer', 'null' => false, 'default' => '0', 'key' => 'primary'),
-		'function_code' => array('type' => 'string', 'null' => false, 'length' => 80, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-		'function_name' => array('type' => 'string', 'null' => false, 'length' => 200, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-		'parent_id' => array('type' => 'integer', 'null' => false, 'default' => '0'),
-		'controller_name' => array('type' => 'string', 'null' => false, 'length' => 80, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-		'url_link' => array('type' => 'string', 'null' => false, 'length' => 80, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-		'permission_type' => array('type' => 'string', 'null' => false, 'default' => 'A', 'length' => 10, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-		'record_status' => array('type' => 'string', 'null' => false, 'default' => 'A', 'length' => 1, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'creator_id' => array('type' => 'integer', 'null' => false, 'default' => '0'),
 		'created' => array('type' => 'datetime', 'null' => false, 'default' => '0000-00-00 00:00:00'),
 		'updater_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),

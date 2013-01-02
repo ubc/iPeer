@@ -18,10 +18,8 @@ class InstallController extends Controller
         'InstallValidationStep4'
     );
     public $components   = array(
-        'Output',
         'Session',
         'installHelper',
-        'DbPatcher'
     );
     public $helpers = array('Session', 'Html', 'Js');
     public $layout = 'installer';
@@ -73,9 +71,15 @@ class InstallController extends Controller
      */
     function install3()
     {
-        if (!is_writable(CONFIGS.'database.php')) {
-            $this->Session->setFlash(__('Cannot write to the database configuration file. Please change the permission on '.CONFIGS.'/database.php so that it is writable.', true));
+        if ($this->data['InstallValidationStep3']['data_setup_option'] == 'C') {
+            $this->redirect(array('controller' => 'upgrade'));
+            return;
         }
+
+        if (!is_writable(CONFIGS.'database.php')) {
+            $this->Session->setFlash(sprintf(__('Cannot write to the database configuration file. Please change the permission on %s so that it is writable.', true), CONFIGS.'/database.php'));
+        }
+
 
         if ($this->data) {
             // we have data submitted
@@ -91,7 +95,7 @@ class InstallController extends Controller
             $ret = $this->configureDatabase();
             if ($ret) {
                 // Failed to configure database
-                $this->Session->setFlash(__('Database config failed - '.$ret, true));
+                $this->Session->setFlash(sprintf(__('Database config failed - %s', true), $ret));
                 return;
             }
 
@@ -108,7 +112,15 @@ class InstallController extends Controller
     function install4()
     {
         if (!is_writable(CONFIGS)) {
-            $this->Session->setFlash(__('Cannot write to the configuration directory. Please change the permission on '.CONFIGS.' so that it is writable.', true));
+            $this->Session->setFlash(sprintf(__('Cannot write to the configuration directory. Please change the permission on %s so that it is writable.', true), CONFIGS));
+            return;
+        }
+
+        if (!file_exists(CONFIGS.'guard.php')) {
+            if (!copy(APP.DS.'plugins'.DS.'guard'.DS.'config'.DS.'guard.php', CONFIGS.'guard.php')) {
+                $this->Session->setFlash(__('Cannot copy the guard configuration (gurad.php) to the configuration directory.', true));
+                return;
+            }
         }
 
         if ($this->data) {
@@ -143,7 +155,7 @@ class InstallController extends Controller
             // mark this instance as installed
             $f = fopen(CONFIGS.'installed.txt', 'w');
             if (!$f) {
-                $this->Session->setFlash(__('Installation failed, unable to write to '. CONFIGS .' dir'), true);
+                $this->Session->setFlash(sprintf(__('Installation failed, unable to write to %s dir', true), CONFIGS));
                 $this->redirect(array('action' => 'install4'));
                 return;
             }
@@ -151,7 +163,7 @@ class InstallController extends Controller
 
             // congratulate the user for a successful install
             $this->redirect(array('action' => 'install5'));
-        } else {
+        } /*else {
             // Try to patch the database if needed, note that this database patching
             // is only for small changes, not for large version changes
             $ret = $this->patchDB();
@@ -160,7 +172,7 @@ class InstallController extends Controller
                 $this->redirect(array('action' => 'install3'));
                 return;
             }
-        }
+        }*/
     }
 
     /**
@@ -271,8 +283,6 @@ class InstallController extends Controller
      */
     private function patchDB()
     {
-        // using the SysParameter model directly as bringing in sysContainer
-        // introduces seemingly random bugs due to its use of sessions
         $ret = $this->loadModel('SysParameter');
         if ($ret !== true) {
             // failed to load model

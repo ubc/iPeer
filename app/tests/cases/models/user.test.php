@@ -317,60 +317,80 @@ class UserTestCase extends CakeTestCase {
         $this->assertFalse($ret);
     }
 
-	function testGetCourseTutorsForList() {
+    function testGetMembersByGroupId() {
+        $users = $this->User->getMembersByGroupId(1);
+        $users = Set::sort($users, '{n}.User.id', 'asc');
+        $this->assertEqual(Set::extract($users, '/User/id'), array(5,6,7,35));
+
+        // test invalid group id
+        $users = $this->User->getMembersByGroupId(999);
+        $this->assertFalse($users);
+
+        // test excluding member
+        $users = $this->User->getMembersByGroupId(1, 6);
+        $users = Set::sort($users, '{n}.User.id', 'asc');
+        $this->assertEqual(Set::extract($users, '/User/id'), array(5,7,35));
+
+        // test excluding invalid member
+        $users = $this->User->getMembersByGroupId(1, 8);
+        $users = Set::sort($users, '{n}.User.id', 'asc');
+        $this->assertEqual(Set::extract($users, '/User/id'), array(5,6,7,35));
+    }
+
+    function testGetCourseTutorsForList() {
         // TODO
-	}
+    }
 
-	function testRegisterRole() {
+    function testRegisterRole() {
         // TODO
-	}
+    }
 
-	function testGetMyCourse() {
+    function testGetMyCourse() {
         // TODO
-	}
+    }
 
-	function testGetMyCourseList() {
+    function testGetMyCourseList() {
         // TODO
-	}
+    }
 
-	function testAddUserByArray() {
+    function testAddUserByArray() {
         // TODO
-	}
+    }
 
-	function testGetCurrentLoggedInUser() {
+    function testGetCurrentLoggedInUser() {
         // can't test, no session without a browser!
-	}
+    }
 
-	function testGetInstance() {
+    function testGetInstance() {
         // can't test, no session without a browser!
-	}
+    }
 
-	function testStore() {
+    function testStore() {
         // can't test, no session without a browser!
-	}
+    }
 
-	function testGet() {
+    function testGet() {
         // can't test, no session without a browser!
-	}
+    }
 
-	function testIsLoggedIn() {
+    function testIsLoggedIn() {
         // can't test, no session without a browser!
-	}
+    }
 
-	function testHasRole() {
+    function testHasRole() {
         // can't test, no session without a browser!
-	}
+    }
 
-	function testGetRoleArray() {
+    function testGetRoleArray() {
         // can't test, no session without a browser!
-	}
+    }
 
-	function testGetPermission() {
+    function testGetPermission() {
         // can't test, no session without a browser!
-	}
+    }
 
-	function testHasPermission() {
+    function testHasPermission() {
         // can't test, no session without a browser!
-	}
+    }
 
 }

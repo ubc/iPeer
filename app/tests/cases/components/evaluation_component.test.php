@@ -165,8 +165,8 @@ class EvaluationTestCase extends CakeTestCase
     function testSaveSimpleEvaluation()
     {
         // Assert data was not saved prior to running function
-        $search1 = $this->EvaluationSimple->find('first', array('conditions' => array('eval_comment' => 'Kevin Luk was smart')));
-        $search2 = $this->EvaluationSimple->find('first', array('conditions' => array('eval_comment' => 'Zion Au was also smart')));
+        $search1 = $this->EvaluationSimple->find('first', array('conditions' => array('comment' => 'Kevin Luk was smart')));
+        $search2 = $this->EvaluationSimple->find('first', array('conditions' => array('comment' => 'Zion Au was also smart')));
         $searchEvalSubmission = $this->EvaluationSubmission->find('all', array('conditions' => array('grp_event_id' => 999)));
         $this->assertFalse($search1);
         $this->assertFalse($search2);
@@ -177,18 +177,18 @@ class EvaluationTestCase extends CakeTestCase
         $params = $input[0];
         $groupEvent = $input[1];
         $result1 = $this->EvaluationComponentTest->saveSimpleEvaluation($params, $groupEvent, null);
-        $search1 = $this->EvaluationSimple->find('first', array('conditions' => array('eval_comment' => 'Kevin Luk was smart')));
-        $search2 = $this->EvaluationSimple->find('first', array('conditions' => array('eval_comment' => 'Zion Au was also smart')));
+        $search1 = $this->EvaluationSimple->find('first', array('conditions' => array('comment' => 'Kevin Luk was smart')));
+        $search2 = $this->EvaluationSimple->find('first', array('conditions' => array('comment' => 'Zion Au was also smart')));
         $searchEvalSubmission = $this->EvaluationSubmission->find('all', array('conditions' => array('grp_event_id' => 999)));
 
         // Run tests
         $this->assertTrue($search1);
         $this->assertTrue($search2);
         $this->assertTrue($searchEvalSubmission);
-        $this->assertEqual($search1['EvaluationSimple']['eval_comment'], 'Kevin Luk was smart');
+        $this->assertEqual($search1['EvaluationSimple']['comment'], 'Kevin Luk was smart');
         $this->assertEqual($search1['EvaluationSimple']['score'], 25);
         $this->assertEqual($search1['EvaluationSimple']['grp_event_id'], 999);
-        $this->assertEqual($search2['EvaluationSimple']['eval_comment'], 'Zion Au was also smart');
+        $this->assertEqual($search2['EvaluationSimple']['comment'], 'Zion Au was also smart');
         $this->assertEqual($search2['EvaluationSimple']['score'], 50);
         $this->assertEqual($search2['EvaluationSimple']['grp_event_id'], 999);
         $this->assertEqual($searchEvalSubmission[0]['EvaluationSubmission']['event_id'], 999);
@@ -242,7 +242,7 @@ class EvaluationTestCase extends CakeTestCase
         $this->assertEqual($result[3][0]['EvaluationRubric']['id'], 1);
         $this->assertEqual($result[3][0]['EvaluationRubric']['evaluator'], 3);
         $this->assertEqual($result[3][0]['EvaluationRubric']['evaluatee'], 4);
-        $this->assertEqual($result[3][0]['EvaluationRubric']['general_comment'], 'general comment1');
+        $this->assertEqual($result[3][0]['EvaluationRubric']['comment'], 'general comment1');
         $this->assertEqual($result[3][0]['EvaluationRubric']['score'], 15.00);
         $this->assertEqual($result[3][0]['EvaluationRubric']['details'][0]['EvaluationRubricDetail']['id'], 3);
         $this->assertEqual($result[3][0]['EvaluationRubric']['details'][0]['EvaluationRubricDetail']['evaluation_rubric_id'], 1);
@@ -365,9 +365,9 @@ class EvaluationTestCase extends CakeTestCase
     function testGetMixevalResultDetail()
     {
 
-        $event = array('group_event_id' => 1);
+        $groupEventId = 1;
         $groupMembers = array( 1=> array('id' => 1),2=> array ('id' =>2));
-        $eval = $this->EvaluationComponentTest->getMixevalResultDetail($event, $groupMembers);
+        $eval = $this->EvaluationComponentTest->getMixevalResultDetail($groupEventId, $groupMembers);
         $expected = array( "scoreRecords"=>
             array(1=> array ( "grade_released"=> "0", "comment_released"=> "0", "mixeval_question_ave"=> array()),
                 2=> array( 1 => "n/a", 2=> "n/a", "mixeval_question_ave"=> array()),

@@ -45,13 +45,15 @@ class EventTestCase extends CakeTestCase
 
         //Test a valid course number
         $course = $this->Event->getCourseEvent(1);
-        $events = $this->toEventNameArray($course);
-        $this->assertEqual($events, array('Term 1 Evaluation', 'Term Report Evaluation', 'Project Evaluation', 'Team Creation Survey', 'Survey, all Q types'));
         $this->assertEqual($course[0]['Event']['title'], 'Term 1 Evaluation');
         $this->assertEqual($course[1]['Event']['title'], 'Term Report Evaluation');
         $this->assertEqual($course[2]['Event']['title'], 'Project Evaluation');
         $this->assertEqual($course[3]['Event']['title'], 'Team Creation Survey');
         $this->assertEqual($course[4]['Event']['title'], 'Survey, all Q types');
+        $this->assertEqual($course[5]['Event']['title'], 'simple evaluation 2');
+        $this->assertEqual($course[6]['Event']['title'], 'simple evaluation 3');
+        $this->assertEqual($course[7]['Event']['title'], 'simple evaluation 4');
+        $this->assertEqual($course[8]['Event']['title'], 'simple evaluation 5');
 
         //Test an invalid course number
         $course = $this->Event->getCourseEvent(999);
@@ -72,7 +74,7 @@ class EventTestCase extends CakeTestCase
         $this->assertEqual($events['0'], 'Term 1 Evaluation');
         $this->assertEqual($events['1'], 'Term Report Evaluation');
         $this->assertEqual($events['2'], 'Project Evaluation');
-        
+
         //Test an invalid course number
         $course = $this->Event->GetCourseEvalEvent(999);
         $this->assertEqual($course, $empty);
@@ -87,7 +89,7 @@ class EventTestCase extends CakeTestCase
 
         //Test a valid course number
         $course = $this->Event->getCourseEventCount(1);
-        $this->assertEqual($course, 5);
+        $this->assertEqual($course, 9);
 
         //Test an invalid course number
         $course = $this->Event->getCourseEventCount(999);
@@ -240,6 +242,52 @@ class EventTestCase extends CakeTestCase
 
     }
 
+    function testGetAccessibleEventById()
+    {
+        // superadmin
+        $event = $this->Event->getAccessibleEventById(1, 1, Course::FILTER_PERMISSION_SUPERADMIN);
+        $this->assertEqual(count($event), 1);
+        $event = $event['Event'];
+        $this->assertEqual($event['id'], 1);
+        $this->assertEqual($event['title'], 'Term 1 Evaluation');
+
+        // admins can access their faculty's event
+        $event = $this->Event->getAccessibleEventById(1, 34, Course::FILTER_PERMISSION_FACULTY);
+        $this->assertEqual(count($event), 1);
+        $event = $event['Event'];
+        $this->assertEqual($event['id'], 1);
+        $this->assertEqual($event['title'], 'Term 1 Evaluation');
+
+        // admins cannot access other faculty's event
+        $event = $this->Event->getAccessibleEventById(1, 38, Course::FILTER_PERMISSION_FACULTY);
+        $this->assertFalse($event);
+
+        // instructor can access their course's event
+        $event = $this->Event->getAccessibleEventById(1, 2, Course::FILTER_PERMISSION_OWNER);
+        $this->assertEqual(count($event), 1);
+        $event = $event['Event'];
+        $this->assertEqual($event['id'], 1);
+        $this->assertEqual($event['title'], 'Term 1 Evaluation');
+
+        // instructor cannot access other course's event
+        $event = $this->Event->getAccessibleEventById(1, 3, Course::FILTER_PERMISSION_FACULTY);
+        $this->assertFalse($event);
+    }
+
+    function testGetEventsByUserId()
+    {
+        $events = $this->Event->getEventsByUserId(5);
+        $evaluations = $events['Evaluations'];
+        $this->assertEqual(count($evaluations), 7);
+        $surveys = $events['Surveys'];
+        $this->assertEqual(count($surveys), 2);
+
+        $events = $this->Event->getEventsByUserId(27);
+        $evaluations = $events['Evaluations'];
+        $this->assertEqual(count($evaluations), 0);
+        $surveys = $events['Surveys'];
+        $this->assertEqual(count($surveys), 0);
+    }
 
     #####################################################################################################################################################
     ###############################################     HELPER FUNCTIONS     ############################################################################

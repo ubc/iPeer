@@ -29,6 +29,7 @@ class EvaluationSubmissionTestCase extends CakeTestCase
 
     function startTest($method)
     {
+        echo $method."\n";
     }
 
     function endTest($method)
@@ -62,6 +63,22 @@ class EvaluationSubmissionTestCase extends CakeTestCase
         $result = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(null, 3);
         $this->assertFalse($result);
         $result = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(2, null);
+        $this->assertFalse($result);
+    }
+
+    function testGetEvalSubmissionByEventIdGroupSubmitter()
+    {
+        // valid params
+        $result = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter(6, 1, 5);
+        $this->assertEqual($result['EvaluationSubmission']['id'], 10);
+        $this->assertEqual($result['EvaluationSubmission']['event_id'], 6);
+        $this->assertEqual($result['EvaluationSubmission']['submitter_id'], 5);
+        $this->assertEqual($result['EvaluationSubmission']['grp_event_id'], 7);
+
+        // invalid params
+        $result = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter(null, null, 3);
+        $this->assertFalse($result);
+        $result = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter(2, null, null);
         $this->assertFalse($result);
     }
 

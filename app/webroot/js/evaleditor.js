@@ -1,5 +1,5 @@
 /********************************
- * Evalution Editor 
+ * Evalution Editor
  * Create evaluation form using javascript to enable rich interactive editor
  * By Compass
  *
@@ -17,7 +17,7 @@
  *                <?php echo json_encode($data['Question'])?>,
  *                {delete_question_url: "<?php echo $this->Html->url('deleteQuestion')?>/",
  *                 delete_descriptor_url: "<?php echo $this->Html->url('deleteDescriptor')?>/",
- *                }); 
+ *                });
  ********************************/
 
 var EvalEditor = Class.create({
@@ -33,16 +33,16 @@ var EvalEditor = Class.create({
     this.container = $(container);
     this.max_order = 0;
     this.descriptor_indexes = new Array();
-    
+
     // set the zero mark control
     if(this.options.zero_mark != "") {
       this.options.zero_mark = $('zero_mark');
       this.options.zero_mark.observe("change", this._onChangeZeroMark.bindAsEventListener(this));
     }
 
-    this.generate(questions); 
+    this.generate(questions);
   },
-  
+
   num_questions: function() {
     return this.container.select('.question').length;
   },
@@ -62,13 +62,13 @@ var EvalEditor = Class.create({
     Element.observe($(this.controls).down('#add-lickert-button'), 'click', function() {this.addQuestion({question_type: "S"})}.bind(this));
     Element.observe($(this.controls).down('#add-text-button'), 'click', function() {this.addQuestion({question_type: "T"})}.bind(this));
 
-    // add new elements to the container 
+    // add new elements to the container
     this.container.appendChild(this.section);
     this.container.appendChild(this.summary);
     this.container.appendChild(this.controls);
- 
+
     // add questions
- 
+
     if(questions) {
       for(var i = 0; i < questions.length; i++) {
     	this.addQuestion(Object.extend(questions[i], {index: i}));
@@ -85,13 +85,13 @@ var EvalEditor = Class.create({
     var options = Object.extend(defaults, arguments[0] || { });
 
     var question_body;
-   
+
     if(options.question_type == "S") {
       question_body = this._generateLickertQuestion(Object.extend(options, {index: this.max_order}));
     } else {
       question_body = this._generateTextQuestion(Object.extend(options, {index: this.max_order}));
     }
- 
+
     var questionElement = Builder.node("div", {className: "question", index: this.max_order}, [
       Builder.node("div", {className: "question-tab"}, [
         Builder.node("span", "Q"+(this.container.select('div.question-tab span').length+1))
@@ -119,7 +119,7 @@ var EvalEditor = Class.create({
         ])
       ])
     ]);
-   
+
     var elem = Builder.node("div", {"class": "remove-button"}, "X");
     $(elem).observe('click', this.onRemoveQuestion.bindAsEventListener(this));
 
@@ -129,9 +129,9 @@ var EvalEditor = Class.create({
     this.max_order++;
     this._calculateTotalMarks();
 
-    Sortable.create(this.section, { 
-      elements: this.section.select('div.question'), 
-      constraint:'vertical', 
+    Sortable.create(this.section, {
+      elements: this.section.select('div.question'),
+      constraint:'vertical',
       handles: this.section.select('div.question-tab'),
       onChange: this._updateOrder.bindAsEventListener(this),
     });
@@ -182,7 +182,7 @@ var EvalEditor = Class.create({
                                                     cols: 20,
                                                     rows: 3,
                                                     className:"question-descriptor"}, options.descriptor)),
-      Builder.node("div", {"class": "remove-descriptor-button text-button"}, "X"),
+      Builder.node("button", {"class": "remove-descriptor-button", "type": "button"}, "X"),
       "Mark:",
       Builder.node("input", {name: "marks",
                              readonly: "readonly",
@@ -223,8 +223,8 @@ var EvalEditor = Class.create({
     // generate question body
     var question_body = Builder.node("div", {className: "question-body"}, [
       Builder.node("div", {"class": "descriptor-title"}, [
-        "Descriptors: ", 
-        Builder.node("span", {className: "add-descriptor-button text-button"}, "[Add]")
+        "Descriptors: ",
+        Builder.node("button", {className: "add-descriptor-button", "type": "button"}, "Add")
       ]),
       Builder.node("div", {"class": "scale-weight"}, ["Scale Weight", multiplier]),
       descriptors
@@ -248,7 +248,7 @@ var EvalEditor = Class.create({
       response_type: "L",
       index: 0,
     };
-  
+
     var options = Object.extend(defaults, options || { });
 
     var question_body = Builder.node("div", {className: "question-body"} , Builder.node("table", [
@@ -310,7 +310,7 @@ var EvalEditor = Class.create({
 
     if(options.question_index == undefined) {
       options.question_index = $(container).up(3).readAttribute("index");
-    } 
+    }
 
     // initialize indexes if not defined
     if(this.descriptor_indexes[options.question_index] == undefined) {

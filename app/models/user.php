@@ -64,7 +64,17 @@ class User extends AppModel
 
     public $hasAndBelongsToMany = array(
         'Faculty' => array(
-            'joinTable' => 'user_faculties'
+            'className'    => 'Faculty',
+            'joinTable'    => 'user_faculties',
+            'foreignKey'   => 'user_id',
+            'associationForeignKey'    =>  'faculty_id',
+            'conditions'   => '',
+            'order'        => '',
+            'limit'        => '',
+            'unique'       => true,
+            'finderQuery'  => '',
+            'deleteQuery'  => '',
+            'dependent'    => false,
         ),
         'Course' => array(
             'className'    => 'Course',
@@ -136,12 +146,12 @@ class User extends AppModel
     public $validate = array(
         'username'  => array(
             'character' => array(
-                'rule' => 'alphaNumeric',
-                'message' => 'Usernames may only have letters and numbers.'
+                'rule' => '/^[a-z0-9_.-]{1,}$/i',
+                'message' => 'Usernames may only have letters, numbers, underscore and dot.'
             ),
             'minLength' => array(
                 'rule' => array('minLength', 1),
-                'message' => 'Usernames must be at least 6 characters.'
+                'message' => 'Usernames must be at least 1 characters.'
             ),
             'unique' => array(
                 'rule' => 'isUnique',
@@ -153,10 +163,6 @@ class User extends AppModel
             'allowEmpty' => true,
             'message'    => 'Invalid email format.'
         ),
-        'first_name' => array(
-            'rule' => 'notEmpty',
-            'message' => "First name cannot be empty, it is used as the display name."
-        ),
         'send_email_notification' => array(
             'rule' => array('requiredWith', 'email'),
             'message' => 'Email notification requires an email address.'
@@ -165,7 +171,7 @@ class User extends AppModel
 
 
     public $virtualFields = array(
-        'full_name' => 'CONCAT_WS(" ", first_name, last_name)',
+        'full_name' => 'IF(CONCAT(first_name, last_name)>"", CONCAT_WS(" ", first_name, last_name), username)',
         'student_no_with_full_name' => 'CONCAT_WS(" ", student_no,CONCAT_WS(" ", first_name, last_name))'
     );
 
@@ -393,25 +399,24 @@ class User extends AppModel
     /**
      * Get list of users in the group
      *
-     * @param int $group_id group id
+     * @param int   $groupId    group id
+     * @param mixed $excludeIds the member that are excluded from retrieving
      *
      * @access public
      * @return list of users
      * */
-    public function getUsersByGroupId($group_id) {
-        $ret = array();
-        $users = $this->find('all', array('conditions' => array('Group.id' => $group_id)));
-        foreach ($users as $user) {
-            $tmp = array();
-            $tmp['id'] = $user['User']['id'];
-            $tmp['role_id'] = $user['Role']['0']['id'];
-            $tmp['username'] = $user['User']['username'];
-            $tmp['last_name'] = $user['User']['last_name'];
-            $tmp['first_name'] = $user['User']['first_name'];
-            $ret[] = $tmp;
+    public function getMembersByGroupId($groupId, $excludeIds = null)
+    {
+        $conditions = array('Group.id' => $groupId);
+        if (!empty($excludeIds)) {
+            $conditions[$this->alias.'.id <>'] = $excludeIds;
         }
 
-        return $ret;
+        return $this->find('all', array(
+            'fields' => array($this->alias.'.*'),
+            'conditions' => $conditions,
+            'contain' => array('Group', 'Role'),
+        ));
     }
 
     /**
@@ -500,7 +505,7 @@ class User extends AppModel
      * @access public
      * @return list of instructors
      * */
-    function getInstructors($type, $params)
+    function getInstructors($type, $params = array())
     {
         $defaults = array('order' => $this->alias.'.last_name');
         $params = array_merge($defaults, $params);
@@ -527,6 +532,29 @@ class User extends AppModel
         }
 
         return $this->find($type, $params);
+    }
+
+    /**
+     * getInstructorListByFaculty
+     * get instructors within faculty
+     *
+     * @param mixed $facultyId
+     *
+     * @access public
+     * @return void
+     */
+    function getInstructorListByFaculty($facultyId)
+    {
+        $users = $this->find('all', array(
+            'conditions' => array('Role.id' => 3, 'Faculty.id' => $facultyId),
+            'fields' => array($this->alias.'.id', $this->displayField),
+            'contain' => array('Faculty', 'Role'),
+            'order' => $this->alias.'.last_name',
+        ));
+
+        $userList = Set::combine($users, '{n}.User.id', '{n}.User.'.$this->displayField);
+
+        return $userList;
     }
 
     /**
@@ -794,6 +822,15 @@ class User extends AppModel
         return $this->UserTutor->delete($id);
     }
 
+    public function getEmails($id)
+    {
+        return $this->find('list', array(
+            'fields' => array('email'),
+            'conditions' => array('id' => $id),
+            'contain' => false,
+        ));
+    }
+
     /*********************************
      * Static functions
      * *******************************/
@@ -1010,6 +1047,26 @@ class User extends AppModel
 
         // check action
         return in_array($action, $permission[$aco]);
+    }
+
+    /**
+     * getCourseFilterPermission return the permissions need by filtering the course
+     *
+     * @static
+     * @access public
+     * @return void
+     */
+    static function getCourseFilterPermission()
+    {
+        if (User::hasPermission('functions/superadmin')) {
+            return Course::FILTER_PERMISSION_SUPERADMIN;
+        } elseif (User::hasPermission('controllers/departments')) {
+            return Course::FILTER_PERMISSION_FACULTY;
+        } elseif (User::hasPermission('functions/coursemanager')) {
+            return Course::FILTER_PERMISSION_OWNER;
+        } else {
+            return Course::FILTER_PERMISSION_ENROLLED;
+        }
     }
 
     /**

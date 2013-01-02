@@ -1,4 +1,5 @@
 <?php
+App::import('Model', 'EvaluationResponseBase');
 /**
  * EvaluationMixeval
  *
@@ -8,10 +9,10 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class EvaluationMixeval extends AppModel
+class EvaluationMixeval extends EvaluationResponseBase
 {
     public $name = 'EvaluationMixeval';
-    public $actsAs = array('Traceable');
+    public $useTable = null;
 
     public $hasMany = array(
         'EvaluationMixevalDetail' =>
@@ -20,7 +21,7 @@ class EvaluationMixeval extends AppModel
             'conditions' => '',
             'order' => '',
             'dependent' => true,
-            'foreignKey' => 'id'
+            'foreignKey' => 'evaluation_mixeval_id'
         )
     );
 
@@ -81,10 +82,10 @@ class EvaluationMixeval extends AppModel
      */
     function getResultsByEvaluatee($grpEventId=null, $evaluatee=null)
     {
-        //return $this->find('all', 'grp_event_id='.$grpEventId.' AND evaluatee='.$evaluatee, null, 'evaluator ASC');
         return $this->find('all', array(
             'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
-            'order' => 'evaluator ASC'
+            'order' => 'evaluator ASC',
+            'contain' => 'EvaluationMixevalDetail',
         ));
     }
 
@@ -101,10 +102,26 @@ class EvaluationMixeval extends AppModel
      */
     function getResultsByEvaluator($grpEventId=null, $evaluator=null)
     {
-        //return $this->find('all', 'grp_event_id='.$grpEventId.' AND evaluator='.$evaluator, null, 'evaluatee ASC');
         return $this->find('all', array(
             'conditions' => array('grp_event_id' => $grpEventId, 'evaluator' => $evaluator),
             'order' => 'evaluatee ASC'
+        ));
+    }
+
+    /**
+     * getResultsWithDetailByGroupEvent
+     *
+     * @param mixed $groupEventId
+     *
+     * @access public
+     * @return void
+     */
+    function getResultsWithDetailByGroupEvent($groupEventId)
+    {
+        return $this->find('all', array(
+            'conditions' => array('grp_event_id' => $groupEventId),
+            'order' => 'evaluator ASC, evaluatee ASC',
+            'contain' => 'EvaluationMixevalDetail',
         ));
     }
 
@@ -202,9 +219,6 @@ class EvaluationMixeval extends AppModel
      */
     function getReceivedTotalScore($grpEventId=null, $evaluatee=null)
     {
-        //        return $this->find('grp_event_id=' . $grpEventId .
-        //             ' AND evaluatee=' . $evaluatee,
-        //             'AVG(score) AS received_total_score');
         return $this->find('first', array(
             'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
             'fields' => array('AVG(score) AS received_total_score')
@@ -224,7 +238,6 @@ class EvaluationMixeval extends AppModel
      */
     function getReceivedTotalEvaluatorCount($grpEventId, $evaluatee)
     {
-        //return $this->find('grp_event_id='.$grpEventId.' AND evaluatee='.$evaluatee, 'COUNT(*) AS ttl_count');
         return $this->find('count', array(
             'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee)
         ));
@@ -376,7 +389,7 @@ class EvaluationMixeval extends AppModel
             array('fields' => $fields, 'conditions' => $conditions));
 
         $data = array();
-        foreach($list as $mark) {
+        foreach ($list as $mark) {
             if (!isset($data[$mark['EvaluationMixeval']['evaluatee']])) {
                 $data[$mark['EvaluationMixeval']['evaluatee']]['user_id'] = $mark['EvaluationMixeval']['evaluatee'];
                 $data[$mark['EvaluationMixeval']['evaluatee']]['score'] = $mark['EvaluationMixeval']['score'];
@@ -387,10 +400,10 @@ class EvaluationMixeval extends AppModel
             }
         }
 
-        $sub = $evalSub->find('all', array('conditions' => array('event_id' => $eventId)));
+        $sub = $evalSub->getEvalSubmissionsByEventId($eventId);
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId)));
 
-        foreach($sub as $stu) {
+        foreach ($sub as $stu) {
             if (isset($data[$stu['EvaluationSubmission']['submitter_id']])) {
                 $diff = strtotime($stu['EvaluationSubmission']['date_submitted']) - strtotime($event['Event']['due_date']);
                 $days = $diff/(60*60*24);
@@ -400,7 +413,7 @@ class EvaluationMixeval extends AppModel
             }
         }
 
-        foreach($data as $demo) {
+        foreach ($data as $demo) {
             if (!isset($demo['penalty'])) {
                 $data[$demo['user_id']]['penalty'] = 0;
             }

@@ -16,7 +16,6 @@ time, mark, audio, video {
     border: 0;
     font-size: 100%;
     font: inherit;
-    vertical-align: baseline;
 }
 /* html5 display-role reset for older browsers */
 article, aside, details, figcaption, figure, 
@@ -47,11 +46,17 @@ table {
 
 /* GLOBAL */
 body {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-family: 'Lato', serif; /* provided by Google Web Fonts */
     background-image: url(bg.gif);
 }
 
+/* Open Sans to enable font-weight: 600 */
+h1,h2,h3,h4,h5,h6,th {
+    font-family: 'Open Sans', serif; /* provided by Google Web Fonts */
+}
+
 p {
+    padding-top: 1em;
     padding-bottom: 1em;
     overflow: auto;
 }
@@ -62,6 +67,10 @@ p {
 
 .floatright {
     float: right;
+}
+
+.alignright {
+    text-align: right;
 }
 
 .pagewidth {
@@ -94,13 +103,12 @@ p {
     width: 100%;
 }
 
-.text label, .password label, .textarea label, .select label, .datetime label, .date label, .radio legend, .penaltyLabel, .file label
+.text label, .password label, .textarea label, .select label, .checkbox label, .datetime label, .date label, .radio legend, .penaltyLabel, .file label
 {
     float: left;
     text-align: right;
-    margin: 0.5em 0;
     clear: left;
-    padding-right: 1em;
+    padding: 0 1em 0 0;
     width: 13em;
 }
 
@@ -122,9 +130,9 @@ p {
 .submit input {
     margin: 0 auto;
     margin-top: 1em;
-    width: 6em;
+    min-width: 6em;
     height: 2em;
-    font-weight: bold;
+    font-weight: 600;
     display: block;
 }
 
@@ -141,7 +149,41 @@ a:hover {
 }
 
 strong {
-    font-weight: bold;
+    font-weight: 600;
+}
+
+.standardtable {
+    width: 100%;
+}
+
+.standardtable th {
+    padding: 0.4em 0.1em;
+    background-color: khaki;
+    font-weight: 600;
+    font-size: 0.95em;
+    border-left: 2px solid white;
+    border-bottom: 2px solid white;
+}
+
+.standardtable td {
+    border-left: 2px solid white;
+    border-bottom: 2px solid white;
+    padding: 0.4em 0.1em;
+    background-color: lightgoldenrodyellow;
+    text-align: center;
+}
+
+.standardtable #details td {
+    background-color: #F1F1F1;
+}
+
+.standardtable table td {
+    border: none;
+}
+
+.leftalignedtable th, .leftalignedtable td {
+    padding: 0.4em;
+    text-align: left;
 }
 
 /* css for timepicker */
@@ -179,7 +221,7 @@ div.ui-datepicker { font-size: 0.85em; }
 #bannerLogoText {
     padding-top: 50px; 
     font-size: 1em; 
-    font-weight: bold; color: white;
+    font-weight: 600; color: white;
     text-shadow: 0 0 7px #222
 }
 
@@ -204,8 +246,7 @@ div.ui-datepicker { font-size: 0.85em; }
     border-right: 1px solid #ddd;
     border-top: 1px solid #ddd;
     color: white;
-    font-weight: bolder;
-    font-size: 0.85em;
+    font-weight: 600;
     text-align: center;
     padding: 0.5em;
     padding-left: 0.6em;
@@ -213,18 +254,18 @@ div.ui-datepicker { font-size: 0.85em; }
 }
 
 .navigation a:hover,a:active {
-    /*background-color: #ff9933;*/
-    background-color: #ff2;
-    color: #333;
+    background-color: yellow;
+    color: #111;
 }
 
 .navigation #current a {
-    color: #333;
-    background-color: #ed0;
+    color: #111;
+    background-color: gold;
 }
 
 .navigation .miniLinks {
-    font-size: 0.65em;
+    font-family: 'Open Sans', serif;
+    font-size: 0.8em;
     border: none;
     margin-right: 0.5em;
     padding: 0.5em 1em;
@@ -244,7 +285,7 @@ div.ui-datepicker { font-size: 0.85em; }
     margin-bottom: 1em;
     clear: left;
     padding: 0.7em;
-    font-weight: bold;
+    font-weight: 600;
     text-align: center;
 }
 
@@ -266,9 +307,13 @@ div.ui-datepicker { font-size: 0.85em; }
     color: green;
 }
 
+.orangered {
+    color: orangered;
+}
+
 h1.title {
     margin: 0.5em 0;
-    font-weight: bold;
+    font-weight: 600;
     background: #eee;
     border: 1px solid #ddd;
     padding: 0.3em 0.5em;
@@ -277,12 +322,16 @@ h1.title {
 h2 {
     margin: 1em 0;
     font-size: 1.3em;
-    font-weight: bold;
+    font-weight: 600;
 }
 
 h3 {
-    margin: 1em 0 0.5em 0;
-    font-weight: bold;
+    margin: 1em 0;
+    font-weight: 600;
+}
+
+h4 {
+    margin: 0.5em 0;
 }
 
 i {
@@ -306,7 +355,7 @@ i {
 #debugsection h5 {
     padding: 0.5em;
     font-size: 1em;
-    font-weight: bold;
+    font-weight: 600;
     background-color: #ccff99;
 }
 
@@ -322,15 +371,15 @@ i {
 .login {
     width: 20em;
     margin: 1em auto;
-    border: 1px solid #ccc;
+    border: 1px solid crimson;
 }
 
 .login h4 {
-    background-color: #f71; 
-    padding: 0.5em;
+    background-color: crimson; 
     color: white;
-    font-weight: bold;
-    font-size: 0.9em;
+    margin: 0;
+    padding: 0.5em;
+    font-weight: 600;
 }
 
 .login .text label, .login .password label {
@@ -347,24 +396,22 @@ i {
 }
 
 /* HOME */
+/* for admins and instructors */
 .course {
     margin-bottom: 1em;
-    background-color: #EAEAEA;
+    background-color: lightgoldenrodyellow;
 }
 
 .course h3 {
-    font-size: 0.9em;
-    font-weight: bold;
-    background-color: #4478AC;
-    padding: 0.5em 0.5em;
+    background-color: khaki;
+    padding: 0.5em;
 }
 
-.course h3 a:link, .course h3 a:visited {
-    color: white;
+.course a:link h3, .course a:visited h3 {
+    color: black;
 }
 
 .course h4 {
-    font-size: 0.9em;
     padding: 0.5em;
 }
 
@@ -380,13 +427,12 @@ i {
 .course table {
     margin: 0.5em;
     width: 100%;
-    font-size: 0.9em;
 }
 
 .course th {
     width: 33%;
     text-align: left;
-    font-weight: bold;
+    font-weight: 600;
     padding: 0.5em;
 }
 
@@ -403,7 +449,7 @@ i {
 }
 
 #short_help h5 {
-    font-weight: bold;
+    font-weight: 600;
     padding: 0.5em;
 }
 
@@ -420,6 +466,26 @@ i {
 
 #short_help li {
     padding-bottom: 0.5em;
+}
+
+/* student home */
+
+#StudentHome .eventSummary {
+    text-align: center;
+    padding: 0.3em;
+    margin-bottom: 0.1em;
+}
+
+#StudentHome .overdue {
+    background: lightcoral;
+}
+
+#StudentHome .pending {
+    background: lightsalmon;
+}
+
+#StudentHome .alldone {
+    background: lightgreen;
 }
 
 /* Emailtemplate Form settings */
@@ -553,28 +619,6 @@ i {
 
 /* COURSE */
 
-.course_summary {
-    border-spacing: 0;
-    width: 100%;
-    margin-top: 0.5em;
-    font-size: 0.9em;
-}
-
-.course_summary th {
-    background-color: #3E83B6;
-    color: white;
-    font-weight: bold;
-}
-
-.course_summary td {
-    background-color: #EAEAEA;
-    text-align: center;
-}
-
-.course_summary li {
-    padding: 0.2em 0; /* space out the instructors more */
-}
-
 .course_actions {
     margin-bottom: 0.5em;
 }
@@ -589,7 +633,7 @@ i {
 .course_submenu h3 {
     background-color: #EAEAEA;
     color: #0A2C64;
-    font-weight: bold;
+    font-weight: 600;
     padding: 0.5em;
 }
 
@@ -633,11 +677,16 @@ i {
 }
 
 #UserForm select {
-    width: 13em;
+    width: 15em;
     margin-top: 0.5em;
     margin-bottom: 0.3em;
     background: transparent;
     font-size: 1em;
+}
+
+#UserForm select#FacultyFaculty {
+    height: 10em;
+    width: 23em;
 }
 
 #UserForm .select .checkbox {
@@ -695,12 +744,13 @@ i {
 
 .userActionPanel {
     width: 100%;
-    background-color: #dfd;
+    background-color: wheat;
+    padding: 0.2em 0;
+    margin: 0;
 }
 .userActionPanel ul {
     text-align: center;
     width: 100%;
-    background-color: #dfd;
 }
 .userActionPanel li {
     padding: 0 1em;
@@ -729,58 +779,30 @@ i {
 
 /* Courses */
 
-/* courses/add */
+/* courses/add, courses/edit */
 
-#CourseAddForm .text label, #CourseAddForm .select label {
+#CourseAddForm .text label, #CourseAddForm .select label, 
+#CourseEditForm .text label, #CourseEditForm .select label {
     width: 13em;
 }
 
-#CourseAddForm .text input {
+#CourseAddForm .text input, #CourseEditForm .text input {
     width: 21em;
     text-align: left;
 }
 
-#CourseAddForm .select #status {
-    margin-top: 0.7em;
-    margin-bottom: 1em;
+#CourseAddForm .select #InstructorInstructor, #CourseEditForm .select #InstructorInstructor {
+    height: 10em;
+    width: 20em;
 }
 
-#CourseAddForm .input input{
+#CourseAddForm .input input, #CourseEditForm .input input{
     margin-right: 10em;
     position: relative;
+    width: 30em;
 }
 
-#CourseAddForm .submit {
-    width: 10em;
-    margin: 1em auto;
-}
-
-/* courses/edit */
-
-#CourseEditForm .text label, .select label {
-    width: 13em;
-}
-
-#CourseEditForm .text input {
-    width: 21em;
-    text-align: left;
-}
-
-#CourseEditForm .select #status {
-    margin-top: 0.7em;
-    margin-bottom: 1em;
-}
-
-#CourseEditForm .select #instruct {
-    margin-top: 0.5em;
-}
-
-#CourseEditForm .input input{
-    margin-right: 10em;
-    position: relative;
-}
-
-#CourseEditForm .submit {
+#CourseAddForm .submit, #CourseEditForm .submit {
     width: 10em;
     margin: 1em auto;
 }
@@ -871,26 +893,16 @@ i {
     margin-left: 7em;
 }
 
+#SurveyResults pre {
+    margin-left: 7em;
+}
+
 #SurveyResults h3 {
     margin-left: 3.5em;
 }
 
-/* dataTable */
-
-#table_id th {
-    font-family: Verdana, Arial, Helveica, sans-serif;
-    font-weight: bold;
-    color: white;
-    background-color: #4478AC;
-    font-size: 0.9em;
-    padding: 0.3em;
-}
-
-#table_id td {
-    color: black;
-    background-color: #EAEAEA;
-    line-height: 1.5;
-    font-size: 0.9em;
+#SurveyResults .noanswer {
+    font-style: italic;
 }
 
 /* ajax pagination */
@@ -939,158 +951,84 @@ i {
 #ajaxListDiv .total-result {
     text-align: center;  
     width: 33%; 
-    font-weight: bold; 
+    font-weight: 600; 
     font-size: 100%
 }
+
+/* EVALTOOLS */
+
+.evaltoolsnav {
+    margin-top: 1em;
+}
+
+.evaltoolsnav ul {
+    padding-bottom: 1em;
+}
+
+.evaltoolsnav li {
+    display: inline;
+    list-style: none;
+    border-left: 1px solid white;
+}
+
+.evaltoolsnav a {
+    color: white;
+    font-weight: 600;
+    font-size: 0.9em;
+    background-color: #0A2C64;
+    text-decoration: none;
+    padding: 0.5em;
+}
+
+.evaltoolsnav a:hover {
+    background-color: yellow;
+    color: #111;
+}
+
+.evaltoolsnav .current a {
+    background-color: gold;
+    color: #111;
+}
+
+.evaltool-section-header h2{
+    float: left;
+}
+
+.evaltoolsadd {
+    float: right;
+    padding: 1.7em 0 0 0;
+}
+
+.evaltoolsadd a {
+    margin-right: 1em;
+    font-size: 0.9em;
+}
+
 /* TO BE REFACTORED LATER */
 
 /* TEMPORARY */
-/* temporary padding to be used until refactoring finished */
 
-th {
-    vertical-align: middle;
-    padding: 0.3em;
-    font-size: 0.9em;
-}
-
-td {
-    overflow: hidden;
-    vertical-align: middle;
-    padding: 0.3em;
-}
-
-/* temp nav ul fix */
-#nav ul {
-    margin: 1em;
-}
-
-#nav li {
-    display: inline;
-    list-style: none;
-}
-
-#nav a {
-    font-size: 0.9em;
-    padding: 0.2em 0.5em;
-}
-
-#nav .current a {
-    background-color: #ed0;
-}
-
-/* BOX STYLE */
-.title2 {
-    margin:0;
-    padding:2px 5px;
-    background:#F4F4F4;
-    font:bold 1em/1 Arial, Helvetica, sans-serif;
-    color: #0A2C64;
-    border-top: 1px solid #CFCFCF;
-    border-bottom: 1px solid #CFCFCF;
-}
-.box h1 {
-    margin:0;
-    padding:5px 10px;
-    background:#E2E2E2;
-    font:bold 1.2em/1 Arial, Helvetica, sans-serif;
-    border-top: 1px solid #CFCFCF;
-    border-bottom: 1px solid #CFCFCF;
-}
-.box h2 {
-    margin:0;
-    padding:2px 5px;
-    background:#F4F4F4;
-    font:bold 1em/1 Arial, Helvetica, sans-serif;
-    color: #0A2C64;
-    border-top: 1px solid #CFCFCF;
-    border-bottom: 1px solid #CFCFCF;
-}
-
-.smallHeader {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: 10px;
-    font-weight: bold;
-    color: #FFF;
-}
-
-.subTable {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: 10px;
-    color: #333333;
-    border-top-width: 1px;
-    border-right-width: 1px;
-    border-bottom-width: 1px;
-    border-left-width: 1px;
-    border-top-style: none;
-    border-right-style: solid;
-    border-bottom-style: solid;
-    border-left-style: solid;
-    border-top-color: #e2e2e2;
-    border-right-color: #e2e2e2;
-    border-bottom-color: #e2e2e2;
-    border-left-color: #e2e2e2;
-    width: 240px;
-    float: left;
-    margin: 20px 0 20px 0;
-    position: relative;
-}
-
-div.subTable .table-header {
-    height: 2.2em;
-    background-image: url("../img/layout/header_back.gif");
-    text-align: center;
-    line-height: 2.2em;
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: 10px;
-    font-weight: bold;
-    color: #FFF;
-}
-
-div.subTable .table-content {
-    background-image: url("../img/layout/small_table_back.gif");
-    height: 115px;
-    padding-top: 20px;
-}
-
-div.table-content li {
-    list-style: none;
-    line-height: 20px;
-}
-
-div.table-content li img {
-    vertical-align: middle;
-}
-
-.tableback {
-    background-image: url(banner_back.gif);
-}
 .tableheader {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-weight: bold;
+    font-weight: 600;
     color: #FFFFFF;
     background-color: #4478AC;
-    font-size: 0.9em;
 }
 
-.tablesubheader {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-weight: bold;
+.tableheader td, .tableheader th {
+    padding: 0.3em;
+}
+
+.tablesubheader td {
+    padding: 0.3em;
+    font-weight: 600;
     color: #FFFFFF;
     background-color: #3E83B6;
 }
 
 .tablesummary {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-weight: bold;
+    font-weight: 600;
     color: #000000;
     background-color: #99cc99;
-}
-
-.tablesummary2 {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-weight: bold;
-    color: #000000;
-    background-color: #bce9bc;
 }
 
 .tableheader a:link, .tableheader a:visited {
@@ -1098,29 +1036,25 @@ div.table-content li img {
 }
 
 .tableheader2 {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-weight: bold;
+    font-weight: 600;
     color: #000;
     background-color: #C0C0C0;
 }
 
 .searchtable1 {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-weight: bold;
+    font-weight: 600;
     color: #000000;
     background-color: #cc9933;
 }
 
 .searchtable2 {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-weight: bold;
+    font-weight: 600;
     color: #000000;
     background-color: #cccc00;
 }
 
 .searchtable3 {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-weight: bold;
+    font-weight: 600;
     color: #000000;
     background-color: #99cc99;
 }
@@ -1128,40 +1062,25 @@ div.table-content li img {
 .tablecell {
     color: #000000;
     background-color: #EAEAEA;
-    line-height: 1.5; /* needed or bottom of letters like g will cut off */
-    font-size: 0.9em;
 }
+
+.tablecell td {
+    padding: 0.4em;
+}
+
 .tablecell:hover {
     background-color: #C7D0E7;
 }
 .tablecell2 {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
     color: #000000;
 }
-#detailside {
-    margin-left : 280px;
-    height : 420px;
-}
-#masterside {
-    float : left;
-    width : 275px;
-}
+
 .panelheader{
-    border : 5px solid #24588C;
-    background-color : #24588C;
-    color : #A8B0C4;
+    border : 5px solid khaki;
+    background-color : khaki;
+    color : #666666;
 }
 
-.masterHover {
-    border : 5px solid #C7D0E7;
-    background-color : #C7D0E7;
-    color : #FA7E04;
-}
-.panelTitle {
-    background-color : #24588C;
-    color : #A8B0C4;
-    border-color : #24588C;
-}
 .mdHover {
     border : 5px solid #C7D0E7;
     background-color : #C7D0E7;
@@ -1173,15 +1092,15 @@ div.table-content li img {
     color : #FA7E04;
 }
 .mdSelected {
-    border : 5px solid #24588C;
-    background-color : #24588C;
-    color : #ffffff;
+    border : 5px solid khaki;
+    background-color : khaki;
+    color : #000000;
 }
 .panelContent {
-    border : 5px solid #F1F1F1;
+    border : 5px solid white;
     border-top-width    : 0px;
     border-bottom-width : 0px;
-    background-color: #F1F1F1;
+    background-color: white;
     font-weight:normal;
     font-size: 0.9em;
 }
@@ -1191,16 +1110,11 @@ div.table-content li img {
 #accordion {
     border-bottom : 1px solid #24588C;
     margin-top : 6px;
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-weight:bold;
+    font-weight:600;
 }
 
 /* Home styles */
 
-
-#importfrm li {
-    margin:1em 0 3em 1em;
-}
 
 .button-row {
     margin: 0.5em 0 0.5em 0;
@@ -1211,7 +1125,7 @@ div.table-content li img {
     margin-bottom: 1em;
     padding: 0;
     list-style: none;
-    float: right;
+    text-align: right;
 }
 
 .button-row li {
@@ -1220,114 +1134,7 @@ div.table-content li img {
     padding: 0;
 }
 
-.list-title {
-    font-weight: bold;
-    margin: 1em 0 0.5em 1em;
-}
-
-.user-list-table {
-    width: 100%;
-    border-width: 0px;
-    border-spacing: 2px;
-    background-color: white;
-}
-
-.user-list-table tr {
-    background-color: #EAEAEA;
-}
-
-.user-list-table th {
-    background-color: #4478AC;
-    color: white;
-    padding: 4px;
-}
-
-.user-list-table td {
-    padding: 4px;
-}
-
 /* No clue what these does */
-#loading {
-    padding-left: 2px;
-    padding-top:2px;
-    position:absolute;
-    float:left;
-    display:none;
-}
-
-#adddelcourses select.course-selector {
-    width: 250px;
-    margin: 2px;
-}
-
-#content {
-    width: 100%;
-    height: auto;
-    background-color: white;
-    padding-bottom: 1em;
-}
-
-#login-form-div {
-    margin-left: auto;
-    margin-right: auto;
-    width: 500px;
-}
-
-.notice {
-    color: red;
-}
-
-#login-form-div div.table-content div {
-    width: 240px;
-    padding-left: 5px;
-    padding-bottom: 15px;
-    text-align: center;
-}
-
-#UserLoginByDefaultForm input {
-    width: 130px;
-}
-
-#UserLoginByDefaultForm label {
-    width: 60px;
-    display: block;
-    float: left;
-    height: 23px;
-    padding: 5px 0 5px 0;
-}
-
-input[readonly='readonly'] {
-    border: 0px;
-    background: transparent;
-}
-
-textarea[readonly='readonly'] {
-    border: 0px;
-    background: transparent;
-}
-
-.rubric-comment {
-    color: #000066;
-    font-weight: bold;
-}
-
-.rubric-mark {
-    color: #FF6600;
-}
-
-table.list-bottom {
-    width: 100%;
-    border-width: 0;
-    background-color: #E5E5E5;
-    border-collapse: collapse;
-    padding: 0;
-    margin: 0 0 2em 0;
-}
-
-table.list-bottom td {
-    border-width: 0;
-    padding: 0;
-}
 
 table.form-table {
     width: 100%;
@@ -1363,9 +1170,6 @@ table.content-table {
     margin: 0 auto 0 auto;
 }
 
-.list-add {
-    text-align: right;
-}
 
 .add-button {
     background:url('/img/icons/add.gif') center left no-repeat;
@@ -1519,8 +1323,7 @@ textarea.question-title-textarea, textarea.question-descriptor {
 
 .result-header-td {
     vertical-align: middle;
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-weight: bold;
+    font-weight: 600;
     color: #FFFFFF;
     background-color: #4478AC;
     font-size: 0.9em;
@@ -1611,4 +1414,133 @@ table.event-view td {
 
 table.event-view table td {
     border: 0;
+}
+
+.text-button {
+    -webkit-box-shadow:rgba(0,0,0,0.2) 0 1px 0 0;
+    -moz-box-shadow:rgba(0,0,0,0.2) 0 1px 0 0;
+    box-shadow:rgba(0,0,0,0.2) 0 1px 0 0;
+    color:#333;
+    background-color: white;
+    border-radius:3px;
+    -moz-border-radius:3px;
+    -webkit-border-radius:3px;
+    border: 1px solid;
+    height:32px;
+    padding:4px 16px;
+    text-decoration:none !important;
+}
+
+table.group-list-chooser {
+    margin: auto;
+    border: none;
+}
+
+table.group-list-chooser td{
+    border: none;
+    background-color: none;
+}
+
+.group-list-chooser td.middle-column{
+    width: 100px;
+    vertical-align: middle;
+}
+
+.group-list-chooser td.middle-column input {
+    width: 100px;
+    margin-bottom: 3em;
+}
+
+.group-list-chooser tr.note {
+    text-align: center;
+    font-size: 0.9em;
+}
+
+/* survey related */
+.survey-prompt {
+    margin: 1em 1em;
+}
+
+.survey-response {
+    padding: 1em 1em 2em 2em;
+    border-bottom: 1px solid gray;
+}
+
+.survey-response textarea {
+    width: 50%;
+    height: 7em;
+}
+
+.survey-response input[type=text] {
+    width: 50%;
+}
+
+div#answers {
+    margin-left: 14em;
+}
+
+div#answers input {
+    width: 60%;
+}
+
+.top-button {
+    background:url('/img/icons/top.gif') center left no-repeat;
+    padding: 0 0.5em 0 1.5em;
+    white-space:nowrap;
+}
+.up-button {
+    background:url('/img/icons/up.gif') center left no-repeat;
+    padding: 0 0.5em 0 1.5em;
+    white-space:nowrap;
+}
+
+.down-button {
+    background:url('/img/icons/down.gif') center left no-repeat;
+    padding: 0 0.5em 0 1.5em;
+    white-space:nowrap;
+}
+
+.bottom-button {
+    background:url('/img/icons/bottom.gif') center left no-repeat;
+    padding: 0 0.5em 0 1.5em;
+    white-space:nowrap;
+}
+
+/* public */
+.small-font {
+    font-size: 0.7em;
+}
+
+button a:link {
+    text-decoration: none;
+}
+
+div.help-text {
+    margin: 0.5em 0 1em 18em;
+    font-size: 0.8em;
+    color: gray;
+}
+
+form div.input {
+    margin: 0.5em 0 0 0;
+}
+
+.ipeer-icon {
+    background:url('/img/layout/icon_ipeer_logo.gif') center left no-repeat;
+    padding: 0 0.5em 0 1.5em;
+    white-space:nowrap;
+}
+
+.login-footer {
+    font-size: 0.8em;
+    margin: 0.5em 0 1em 0;
+}
+
+.login-footer a {
+    text-decoration: none;
+    color: black;
+}
+
+#cwl-login td {
+    background-color: transparent;
 }

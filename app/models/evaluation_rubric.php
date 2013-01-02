@@ -1,17 +1,19 @@
 <?php
+App::import('Model', 'EvaluationResponseBase');
+
 /**
  * EvaluationRubric
  *
- * @uses AppModel
+ * @uses EvaluationResponseBase
  * @package   CTLT.iPeer
  * @author    Pan Luo <pan.luo@ubc.ca>
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class EvaluationRubric extends AppModel
+class EvaluationRubric extends EvaluationResponseBase
 {
     public $name = 'EvaluationRubric';
-    public $actsAs = array('Traceable');
+    public $useTable = null;
 
     public $hasMany = array(
         'EvaluationRubricDetail' =>
@@ -224,7 +226,7 @@ class EvaluationRubric extends AppModel
     {
         $temp = $this->find('all', array(
             'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
-            'fields' => array('general_comment', 'event_id', 'evaluatee AS evaluateeId', 'User.first_name AS evaluator_first_name', 'User.last_name AS evaluator_last_name', 'User.student_no AS evaluator_student_no'),
+            'fields' => array('comment', 'event_id', 'evaluatee AS evaluateeId', 'User.first_name AS evaluator_first_name', 'User.last_name AS evaluator_last_name', 'User.student_no AS evaluator_student_no'),
             'joins' => array(
                 array(
                     'table' => 'users',
@@ -382,7 +384,7 @@ class EvaluationRubric extends AppModel
             array('fields' => $fields, 'conditions' => $conditions));
 
         $data = array();
-        foreach($list as $mark) {
+        foreach ($list as $mark) {
             if (!isset($data[$mark['EvaluationRubric']['evaluatee']])) {
                 $data[$mark['EvaluationRubric']['evaluatee']]['user_id'] = $mark['EvaluationRubric']['evaluatee'];
                 $data[$mark['EvaluationRubric']['evaluatee']]['score'] = $mark['EvaluationRubric']['score'];
@@ -393,10 +395,10 @@ class EvaluationRubric extends AppModel
             }
         }
 
-        $sub = $evalSub->find('all', array('conditions' => array('event_id' => $eventId)));
+        $sub = $evalSub->getEvalSubmissionsByEventId($eventId);
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId)));
 
-        foreach($sub as $stu) {
+        foreach ($sub as $stu) {
             if (isset($data[$stu['EvaluationSubmission']['submitter_id']])) {
                 $diff = strtotime($stu['EvaluationSubmission']['date_submitted']) - strtotime($event['Event']['due_date']);
                 $days = $diff/(60*60*24);
@@ -406,7 +408,7 @@ class EvaluationRubric extends AppModel
             }
         }
 
-        foreach($data as $demo) {
+        foreach ($data as $demo) {
             if (!isset($demo['penalty'])) {
                 $data[$demo['user_id']]['penalty'] = 0;
             }
@@ -423,6 +425,4 @@ class EvaluationRubric extends AppModel
 
         return $grades;
     }
-    /* }}} */
-
 }

@@ -121,7 +121,6 @@ class Group extends AppModel
             $max_num = $this->find('first', array(
                 'conditions' => array('course_id' => $this->data[$this->name]['course_id']),
                 'fields' => array('MAX(group_num) as max_num')));
-            Debugger::log(print_r($max_num, true));
             $this->data[$this->name]['group_num'] = $max_num[0]['max_num'] + 1;
         }
 
@@ -363,5 +362,84 @@ class Group extends AppModel
             'first',
             array_merge(array('conditions' => array($this->name.'.id' => $id,)), $params)
         );
+    }
+
+    function getGroupWithMembersById($id)
+    {
+        return $this->find('first', array(
+            'conditions' => array($this->alias.'.id' => $id),
+            'contain' => 'Member',
+        ));
+    }
+
+    function getGroupsByEventId($eventId, $contain = array())
+    {
+        return $this->find('all', array(
+            'conditions' => array('Event.id' => $eventId),
+            'contain' => array_merge(array('Event'), $contain),
+        ));
+    }
+
+    function getGroupByGroupIdEventId($groupId, $eventId)
+    {
+        return $this->getGroupByGroupIdEventIdMemberId($groupId, $eventId, null);
+    }
+
+    function getGroupWithMemberRoleByGroupIdEventId($groupId, $eventId)
+    {
+        $group = $this->getGroupByGroupIdEventIdMemberId($groupId, $eventId, null);
+        $roles = $this->Member->Role->find('all', array(
+            'fields' => array('Role.*', 'User.id'),
+            'conditions' => array('User.id' => Set::extract($group['Member'], '/id')),
+        ));
+
+        foreach($roles as $role) {
+            foreach($group['Member'] as $key => $member) {
+                if ($role['User']['id'] == $member['id']) {
+                    $group['Member'][$key]['Role'] = $role['Role'];
+                }
+            }
+        }
+
+        return $group;
+    }
+
+    /**
+     * getGroupByGroupIdEventIdMemberId get the group by id. If the group is not in the event,
+     * return false
+     *
+     * @param mixed $groupId  group id
+     * @param mixed $eventId  event id
+     * @param mixed $memberId member id
+     *
+     * @access public
+     * @return void
+     */
+    function getGroupByGroupIdEventIdMemberId($groupId, $eventId, $memberId)
+    {
+        $conditions = array(
+            $this->alias.'.id' => $groupId,
+            'GroupEvent.event_id' => $eventId,
+        );
+        if ($memberId != null) {
+            $conditions['Member.id'] = $memberId;
+        }
+        $group = $this->find('first', array(
+            'fields' => array('Group.*'),
+            'conditions' => $conditions,
+        ));
+
+        // hack to find the GroupEvent
+        if (isset($group['GroupEvent'])) {
+            $correct = array();
+            foreach ($group['GroupEvent'] as $groupEvent) {
+                if ($groupEvent['group_id'] == $groupId && $groupEvent['event_id'] == $eventId) {
+                    $correct = $groupEvent;
+                }
+            }
+            $group['GroupEvent'] = $correct;
+        }
+
+        return $group;
     }
 }

@@ -9,103 +9,107 @@
  */
 
 App::import('Controller', 'Sysparameters');
+App::import('Lib', 'ExtendedAuthTestCase');
 
-class SysparametersControllerTest extends CakeTestCase {
-  var $fixtures = array('app.course', 'app.role', 'app.user', 'app.group',
-                        'app.roles_user', 'app.event', 'app.event_template_type', 'app.rubrics_lom',
-                        'app.group_event', 'app.evaluation_submission', 'app.rubrics_criteria_comment',
-                        'app.survey_group_set', 'app.survey_group', 'app.rubrics_criteria',
-                        'app.survey_group_member', 'app.question', 'app.rubric',
-                        'app.response', 'app.survey_question', 'app.user_course',
-                        'app.user_enrol', 'app.groups_member', 'app.survey',
-                        'app.personalize', 'app.sys_parameter', 'app.sys_function',
-                       );
+// mock instead of needing to create a new controller for every test
+Mock::generatePartial('SysParametersController',
+    'MockSysParametersController',
+    array('isAuthorized', 'render', 'redirect', '_stop', 'header'));
 
-  function startCase() {
-    echo '<h1>Starting Test Case</h1>';
-  }
+class SysparametersControllerTest extends ExtendedAuthTestCase {
+    public $controller = null;
 
-  function endCase() {
-     echo '<h1>Ending Test Case</h1>';
-  }
+    public $fixtures = array(
+        'app.course', 'app.role', 'app.user', 'app.group',
+        'app.roles_user', 'app.event', 'app.event_template_type',
+        'app.group_event', 'app.evaluation_submission',
+        'app.survey_group_set', 'app.survey_group',
+        'app.survey_group_member', 'app.question',
+        'app.response', 'app.survey_question', 'app.user_course',
+        'app.user_enrol', 'app.groups_member', 'app.survey',
+        'app.personalize', 'app.penalty', 'app.evaluation_simple',
+        'app.faculty', 'app.user_tutor', 'app.course_department',
+        'app.evaluation_rubric', 'app.evaluation_rubric_detail',
+        'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
+        'app.user_faculty', 'app.department', 'app.sys_parameter',
+        'app.oauth_token', 'app.rubric', 'app.rubrics_criteria',
+        'app.rubrics_criteria_comment', 'app.rubrics_lom',
+        'app.simple_evaluation', 'app.survey_input', 'app.mixevals_question',
+        'app.mixevals_question_desc', 'app.mixeval'
+    );
 
-  function startTest() {
-    $controller = new FakeController();
-    $controller->constructClasses();
-    $controller->startupProcess();
-    $controller->Component->startup($controller);
-    $controller->Auth->startup($controller);
-    $admin = array('User' => array('username' => 'Admin',
-                                   'password' => 'passwordA'));
-    $controller->Auth->login($admin);
-  }
+    function startCase() {
+        echo "Start SysParameter controller test.\n";
+        $this->defaultLogin = array(
+            'User' => array(
+                'username' => 'root',
+                'password' => md5('ipeeripeer')
+            )
+        );
+    }
 
-  function endTest() {
-    echo '<hr />';
-  }
+    function endCase() {
+    }
 
-  function testIndex() {
-    $result = $this->testAction('/sysparameters/index', array('connection' => 'test_suite', 'return' => 'vars'));
-var_dump($result);
-    $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysFunction']['function_code'], 'code1');
-    $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysFunction']['function_name'], 'name1');
-    $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysFunction']['controller_name'], 'controller1');
-    $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysFunction']['url_link'], 'link1');
-    $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysFunction']['permission_type'], 'I');
-    $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysFunction']['record_status'], 'A');
+    function startTest($method) {
+        echo $method.TEST_LB;
+        $this->controller = new MockSysParametersController();
+    }
 
-    $this->assertEqual($result['paramsForList']['data']['entries'][1]['SysFunction']['function_code'], 'code2');
-    $this->assertEqual($result['paramsForList']['data']['entries'][1]['SysFunction']['function_name'], 'name2');
-    $this->assertEqual($result['paramsForList']['data']['entries'][1]['SysFunction']['controller_name'], 'controller2');
-    $this->assertEqual($result['paramsForList']['data']['entries'][1]['SysFunction']['url_link'], 'link2');
-    $this->assertEqual($result['paramsForList']['data']['entries'][1]['SysFunction']['permission_type'], 'I');
-    $this->assertEqual($result['paramsForList']['data']['entries'][1]['SysFunction']['record_status'], 'A');
+    public function endTest($method)
+    {
+        // defer logout to end of the test as some of the test need check flash
+        // message. After logging out, message is destoryed.
+        if (isset($this->controller->Auth)) {
+            $this->controller->Auth->logout();
+        }
+        unset($this->controller);
+        ClassRegistry::flush();
+    }
 
-    $this->assertEqual($result['paramsForList']['data']['entries'][2]['SysFunction']['function_code'], 'code3');
-    $this->assertEqual($result['paramsForList']['data']['entries'][2]['SysFunction']['function_name'], 'name3');
-    $this->assertEqual($result['paramsForList']['data']['entries'][2]['SysFunction']['controller_name'], 'controller3');
-    $this->assertEqual($result['paramsForList']['data']['entries'][2]['SysFunction']['url_link'], 'link3');
-    $this->assertEqual($result['paramsForList']['data']['entries'][2]['SysFunction']['permission_type'], 'A');
-    $this->assertEqual($result['paramsForList']['data']['entries'][2]['SysFunction']['record_status'], 'A');
+    public function getController()
+    {
+        return $this->controller;
+    }
 
-    $this->assertEqual($result['paramsForList']['data']['entries'][3]['SysFunction']['function_code'], 'code4');
-    $this->assertEqual($result['paramsForList']['data']['entries'][3]['SysFunction']['function_name'], 'name4');
-    $this->assertEqual($result['paramsForList']['data']['entries'][3]['SysFunction']['controller_name'], 'controller4');
-    $this->assertEqual($result['paramsForList']['data']['entries'][3]['SysFunction']['url_link'], 'link4');
-    $this->assertEqual($result['paramsForList']['data']['entries'][3]['SysFunction']['permission_type'], 'A');
-    $this->assertEqual($result['paramsForList']['data']['entries'][3]['SysFunction']['record_status'], 'A');
+    // This code may be copied from SysParameter, need to be changed
+    function testIndex() {
+        $result = $this->testAction('/sysparameters/index', array('return' => 'vars'));
 
-  }
+        $this->assertEqual(count($result['paramsForList']['data']['entries']), 15);
+        $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysParameter']['parameter_code'], 'system.soft_delete_enable');
+        $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysParameter']['parameter_value'], 'true');
+        $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysParameter']['parameter_type'], 'B');
+    }
 
 
-  function testView() {
-    $result = $this->testAction('/sysfunctions/view/1', array('connection' => 'test_suite', 'return' => 'vars'));
-//var_dump($result);
-    $this->assertEqual($result['data']['SysFunction']['function_code'], 'code1');
-    $this->assertEqual($result['data']['SysFunction']['function_name'], 'name1');
-    $this->assertEqual($result['data']['SysFunction']['controller_name'], 'controller1');
-    $this->assertEqual($result['data']['SysFunction']['url_link'], 'link1');
-    $this->assertEqual($result['data']['SysFunction']['permission_type'], 'I');
-    $this->assertEqual($result['data']['SysFunction']['record_status'], 'A');
-  }
+    function testView() {
+        $result = $this->testAction('/sysparameters/view/1', array('return' => 'vars'));
 
-  //TODO test saving
+        $this->assertEqual($result['data']['SysParameter']['parameter_code'], 'system.soft_delete_enable');
+        $this->assertEqual($result['data']['SysParameter']['parameter_value'], 'true');
+        $this->assertEqual($result['data']['SysParameter']['parameter_type'], 'B');
+        $this->assertEqual($result['data']['SysParameter']['record_status'], 'A');
+    }
+
+    //TODO test saving
     function testEdit() {
-    $result = $this->testAction('/sysfunctions/edit/1', array('connection' => 'test_suite', 'return' => 'vars'));
-//var_dump($result);
-    $this->assertEqual($result['data']['SysFunction']['function_code'], 'code1');
-    $this->assertEqual($result['data']['SysFunction']['function_name'], 'name1');
-    $this->assertEqual($result['data']['SysFunction']['controller_name'], 'controller1');
-    $this->assertEqual($result['data']['SysFunction']['url_link'], 'link1');
-    $this->assertEqual($result['data']['SysFunction']['permission_type'], 'I');
-    $this->assertEqual($result['data']['SysFunction']['record_status'], 'A');
+        $result = $this->testAction('/sysparameters/edit/1', array('return' => 'vars'));
+
+        $this->assertEqual($result['data']['SysParameter']['parameter_code'], 'system.soft_delete_enable');
+        $this->assertEqual($result['data']['SysParameter']['parameter_value'], 'true');
+        $this->assertEqual($result['data']['SysParameter']['parameter_type'], 'B');
+        $this->assertEqual($result['data']['SysParameter']['record_status'], 'A');
 
     }
 
-   //TODO test redirect
+    //TODO test redirect
     function testDelete() {
-//    $result = $this->testAction('/sysfunctions/delete/1', array('connection' => 'test_suite', 'return' => 'vars'));
-//var_dump($result);
-      }
+        $result = $this->testAction('/sysparameters/delete/1', array('return' => 'vars'));
+
+        $model = ClassRegistry::init('SysParameter');
+        $found = $model->find('first', array( 'conditions' => array('id' => 1)));
+        $this->assertFalse($found);
+    }
 
 }

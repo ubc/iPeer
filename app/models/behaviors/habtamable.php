@@ -109,18 +109,20 @@ class HabtamableBehavior extends ModelBehavior
     {
 
         $assoc = $Model->hasAndBelongsToMany[$model_name];
-        //$Model->unbindModel(array('hasAndBelongsToMany' => array($model_name)));
-        $Model->bindModel(array('hasOne' => array($assoc['with'] => array(
-            'foreignKey' => false,
-            'type' => $this->settings[$Model->alias]['joinType'],
-            'conditions' => array($assoc['with'] . '.' . $assoc['foreignKey'] . ' = ' .
-            $Model->alias . '.' . $Model->primaryKey)),
-        $model_name => array(
-            'foreignKey' => false,
-            'type' => $this->settings[$Model->alias]['joinType'],
-            'conditions' => array($model_name . '.' . $Model->{$model_name}->primaryKey . ' = ' .
-            $assoc['with'] . '.' . $assoc['associationForeignKey']
-        )))));
+        $Model->unbindModel(array('hasAndBelongsToMany' => array($model_name)));
+        $Model->bindModel(array(
+            'hasOne' => array(
+                $assoc['with'] => array(
+                    'foreignKey' => false,
+                    'type' => $this->settings[$Model->alias]['joinType'],
+                    'conditions' => array($assoc['with'] . '.' . $assoc['foreignKey'] . ' = ' .
+                    $Model->alias . '.' . $Model->primaryKey)),
+                $model_name => array(
+                    'foreignKey' => false,
+                    'type' => $this->settings[$Model->alias]['joinType'],
+                    'conditions' => array($model_name . '.' . $Model->{$model_name}->primaryKey . ' = ' .
+                    $assoc['with'] . '.' . $assoc['associationForeignKey']
+                )))));
     }
 
 

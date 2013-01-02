@@ -1,4 +1,4 @@
-<table width="100%"  border="0" align="center" cellpadding="4" cellspacing="2" bgcolor="#FFFFFF">
+<table width="100%"  border="0" align="center" cellpadding="4" cellspacing="2">
 <?php if (count($data) > 0):?>
     <tr>
 	    <th align="left" width="25%"><?php __('Group No.')?></th>
@@ -12,13 +12,11 @@
             <td><?php echo $group['group_name']; ?></td>
             <td>
                 <?php if (isset($group['Member'])): ?>
-                    <table>
+                    <ul>
                         <?php foreach($group['Member'] as $member): ?>
-                            <tr>
-                                <td><?php echo $this->element('users/user_info', array('data'=>$member));?></td>
-                            </tr>
+                            <li><?php echo $this->element('users/user_info', array('data'=>$member));?></li>
                         <?php endforeach; ?>
-                    </table>
+                    </ul>
                 <?php endif;?>
             </td>
         </tr>

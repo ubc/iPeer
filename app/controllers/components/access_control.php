@@ -1,7 +1,4 @@
 <?php
-App::import('Model', 'Role');
-App::import('Model', 'User');
-
 /**
  * AccessControlComponent
  *
@@ -54,7 +51,7 @@ class AccessControlComponent extends Object
     function initialize(&$controller, $settings=array())
     {
         $this->controller = $controller;
-        $this->User = new User;
+        $this->User = ClassRegistry::init('User');
     }
 
 
@@ -230,7 +227,7 @@ class AccessControlComponent extends Object
      */
     function getRoles()
     {
-        $role = new Role();
+        $role = ClassRegistry::init('Role');
         $roles = array();
         if (!($roles = $this->Session->read('ipeerSession.Roles'))) {
             $roles = $role->find(
@@ -258,9 +255,24 @@ class AccessControlComponent extends Object
      */
     function getPermissions()
     {
-        $perms = array();
-        if (!($perms = $this->Session->read('ipeerSession.Permissions'))) {
-            $roles = $this->getRoles();
+        if (!($this->permissionArray = $this->Session->read('ipeerSession.Permissions'))) {
+            $this->loadPermissions();
+        }
+
+        return $this->permissionsArray;
+    }
+
+    /**
+     * loadPermissions load permissions from database and cache them in seesion
+     *
+     * @access public
+     * @return void
+     */
+    function loadPermissions()
+    {
+        $this->permissionsArray = array();
+        $roles = $this->getRoles();
+        if (!empty($roles)) {
             $roleIds = array_keys($roles);
 
             //GET ACL PERMISSIONS
@@ -273,13 +285,10 @@ class AccessControlComponent extends Object
             }
 
             $this->perms = $gpAco;
-            $this->permissionsArray = array();
             $this->_addPermissions($acos, 0);
-
-            $this->Session->write('ipeerSession.Permissions', $this->permissionsArray);
         }
 
-        return $this->permissionsArray;
+        $this->Session->write('ipeerSession.Permissions', $this->permissionsArray);
     }
 
 

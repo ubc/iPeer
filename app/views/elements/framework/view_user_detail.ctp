@@ -1,59 +1,72 @@
-<table class="userViewTable">
-  <tr class="tablecell2">
-    <td width="17%" id="username_label"><?php __('Username')?>:</td>
-    <td width="33%" ><?php echo $data['User']['username']; ?></td>
-    <td width="17%" id="username_label"> <?php __('Role')?>:
-    <td width="33%" > <?php
-        $role = $data['Role']['0']['name'];
+<table class="standardtable">
+    <tr>
+        <th><?php __('Username')?></th>
+        <td><?php echo User::hasPermission('functions/viewusername') ? $user['User']['username'] : 'N/A'; ?></td>
+        <th> <?php __('Role')?></th>
+        <td>
+        <?php
+        $role = $user['Role']['0']['name'];
         echo ucfirst($role);
-        ?></td>
-  </tr>
-  <tr class="tablecell2">
-    <td id="last_name_label"><?php __('Last Name')?>:</td>
-    <td align="left" colspan="3"><?php echo $data['User']['last_name']; ?> </td>
-  </tr>
-  <tr class="tablecell2">
-    <td id="first_name_label"><?php __('First Name')?>:</td>
-    <td align="left" colspan="3"><?php echo $data['User']['first_name']; ?> </td>
-  </tr>
-  <?php if ($data['Role']['0']['name'] == 'student'): ?>
-  <tr class="tablecell2">
-    <td id="student_no_label"><?php __('Student No.')?>:</td>
-    <td align="left" colspan="3"><?php echo $data['User']['student_no']; ?> </td>
-  </tr>
-  <?php else: ?>
-  <tr class="tablecell2">
-    <td id="title_label"><?php __('Title')?>:</td>
-    <td align="left" colspan="3"><?php echo $data['User']['title']; ?> </td>
-  </tr>
-  <?php endif;?>
-  <tr class="tablecell2">
-    <td id="email_label"><?php __('Email')?>:</td>
-    <td align="left" colspan="3">
-      <a href="mailto:<?php if(!empty($data['User']['email'])) echo $data['User']['email']; ?>">
-      <?php echo $html->image('icons/email_icon.gif',array('border'=>'0','alt'=>'Email'));?></a>
-      <?php if (User::hasPermission('functions/viewemailaddress')) {
-        echo $data['User']['email'];
-      } ?>
-    </td>
-  </tr>
-  <tr class="tablecell2">
-    <td id="creator_label"><?php __('Creator')?>:</td>
-    <td align="left"><?php echo $data['User']['creator'];?></td>
-    <td id="updater_label"><?php __('Updater:')?></td>
-    <td align="left"><?php echo $data['User']['updater'];?></td>
-  </tr>
-  <tr class="tablecell2">
-    <td id="created_label"><?php __('Create Date')?>:</td>
-    <td align="left"><?php echo $data['User']['created']; ?></td>
-    <td id="updated_label"><?php __('Update Date')?>:</td>
-    <td align="left"><?php echo $data['User']['modified']; ?></td>
-  </tr>
-  <tr class="tablecell2">
-    <td colspan="4" align="center" class="whitebg">
-    <form name="frm" id="frm" method="post" action="#">
-      <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
-    </form>
-    </td>
-  </tr>
+        ?>
+        </td>
+    </tr>
+    <tr>
+        <th id="last_name_label"><?php __('Last Name')?></th>
+        <td><?php echo $user['User']['last_name']; ?></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <th><?php __('First Name')?></th>
+        <td><?php echo $user['User']['first_name']; ?> </td>
+        <td></td>
+        <td></td>
+    </tr>
+    <?php if ($user['Role']['0']['name'] == 'student'): ?>
+    <tr>
+        <th><?php __('Student No.')?></th>
+        <td><?php echo $user['User']['student_no']; ?> </td>
+        <td></td>
+        <td></td>
+    </tr>
+    <?php else: ?>
+    <tr>
+        <th><?php __('Title')?></th>
+        <td><?php echo $user['User']['title']; ?> </td>
+        <td></td>
+        <td></td>
+    </tr>
+    <?php endif;?>
+    <tr>
+        <th><?php __('Email')?></th>
+        <td>
+        <?php if(!empty($user['User']['email'])): ?>
+            <a href="mailto:<?php echo $user['User']['email']; ?>">
+            <?php echo $html->image('icons/email_icon.gif', array('border'=>'0','alt'=>'Email'));?>
+            <?php echo $user['User']['email']; ?>
+            </a>
+        <?php endif; ?>
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <th><?php __('Creator')?></th>
+        <td><?php echo $user['User']['creator'];?></td>
+        <th><?php __('Updater')?></th>
+        <td><?php echo $user['User']['updater'];?></td>
+    </tr>
+    <tr>
+        <th><?php __('Create Date')?></th>
+        <td><?php echo $user['User']['created']; ?></td>
+        <th><?php __('Update Date')?></th>
+        <td><?php echo $user['User']['modified']; ?></td>
+    </tr>
+    <tr>
+        <td colspan='4'>
+        <form name="frm" id="frm" method="post" action="#">
+        <input type="button" name="Back" value="Back" onClick="javascript:(history.length > 1 ? history.back() : window.close());">
+        </form>
+        </td>
+    </tr>
 </table>

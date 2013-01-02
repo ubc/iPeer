@@ -1,93 +1,37 @@
 <?php echo $html->script('groups')?>
 <?php $readonly = isset($readonly) ? $readonly : false;?>
+<?php $status = (isset($submissions) && $submissions > 0 && !User::hasPermission('functions/superadmin')) ? 'disabled' : '';?>
 
 <div class="content-container">
-  <?php echo $this->Form->create('Group',
-                                 array('id' => 'frm',
-                                       'url' => array('action' => $this->action.'/'.$course_id),
-                                       'inputDefaults' => array('div' => false,
-                                                                'before' => '<td width="200px">',
-                                                                'after' => '</td>',
-                                                                'between' => '</td><td>')))?>
-  <?php if(isset($group_id))
-            echo $this->Form->hidden('Group.id', array('value' => $group_id));
-
-        echo $this->Form->hidden('Group.course_id', array('value' => $course_id));
-  ?>
-  <table class="full-size">
-  <tr class="tableheader">
-    <td colspan="4" align="center"><?php echo ucfirst($this->action)?> <?php __('Group')?></td>
-  </tr>
-
-  <tr class="tablecell2">
-    <?php echo $this->Form->input('group_num', array('size'=>'50', 'class'=>'input',
-                                                  'readonly' => true, 'value' => $group_num, 'label' => __('Group Number:', true))) ?>
-  </tr>
-
-  <tr class="tablecell2">
-    <?php echo $this->Form->input('group_name', array('size'=>'50', 'class'=>'input', 'label' => __('Group Name:', true),
-                                                      'readonly' => $readonly)) ?>
-  </tr>
-
-  <tr class="tablecell2">
-    <td><?php __('Status')?>:</td>
-    <td><?php echo $this->Form->select('record_status', array('A' => __('Active', true), 'I' => __('Inactive', true)), null, array('empty' => false,
-                                                                                                               'disabled' => $readonly))?></td>
-  </tr>
-
-  <tr class="tablecell2">
-    <td><?php __('Members')?>:</td>
-    <td>
-    <?php if($readonly):?>
-      <?php if(!empty($members)):?>
-    <table width="100%" border="0" cellspacing="2" cellpadding="2">
-      <?php foreach($members as $id => $name):?>
-      <tr>
-        <td width="15"><?php echo $html->image('icons/email_icon.gif',array('border'=>'0','alt'=>'Email'))?></td>
-        <td><?php echo $this->Html->link($name, '/users/view/'.$id)?></td>
-      </tr>
-      <?php endforeach;?>
-    </table>
-      <?php else:?>
-        <?php __('No members in this group.')?>
-      <?php endif;?>
-    <?php else:?>
-    <?php
-    if ($submissions > 0 && !User::hasPermission('functions/superadmin')) {
-        $status = 'disabled';
-    } else {
-        $status = '';
-    }
-    ?>
+<?php
+echo $this->Form->create('Group',
+    array('id' => 'frm',
+    'url' => array('action' => $this->action.'/'.$course_id),
+));
+echo isset($group_id) ? $this->Form->hidden('Group.id', array('value' => $group_id)):'';
+echo $this->Form->hidden('Group.course_id', array('value' => $course_id));
+echo $this->Form->input('group_num', array('size'=>'50', 'class'=>'input',
+    'readonly' => true, 'value' => $group_num, 'label' => __('Group Number', true)));
+echo $this->Form->input('group_name', array('size'=>'50', 'class'=>'input', 'label' => __('Group Name', true),
+    'readonly' => $readonly));
+echo $this->Form->input('record_status', array(
+    'options' => array('A' => __('Active', true), 'I' => __('Inactive', true)),
+     'empty' => false, 'disabled' => $readonly, 'label' => __('Status', true))
+        )?>
+<div class="input select">
+<?php echo $this->Form->label('', __('Members', true))?>
+    <div style="margin-left: 14em; width: 28em; text-align:center">
     <?php echo $this->element("groups/group_list_chooser",
                 array('all' => $user_data, 'status' => $status,
                       'allName' =>  __("Filtered Students", true), 'selectedName' => __('Students in Group', true)));
     ?>
-    <?php endif;?>
-        <?php __('<font size=2>Note: Students already in one or more groups are marked<br>
-            &nbsp; &nbsp; &nbsp; &nbsp; with * and are listed under those without groups</font>')?>
-    </td>
-  </tr>
-
-  <?php if(!$readonly):?>
-  <tr class="tablecell2">
-    <td colspan="2" align="center"><?php echo $this->Form->submit(ucfirst($this->action).__(' Group', true), array('div' => false,
-                                                                                                         'onClick' => "processSubmit(document.getElementById('selected_groups'))")) ?>
-    </td>
-  </tr>
-  <?php endif;?>
-  </table>
-
-
-  <?php if($readonly):?>
-  <table width="95%"  border="0" cellspacing="2" cellpadding="4">
-  <tr>
-    <td>
-      <?php echo $this->Html->link(__('Edit this Group', true), '/groups/edit/'.$data['Group']['id']); ?> |
-      <?php echo $html->link(__('Back to Group Listing', true), '/groups/index/'.$data['Group']['course_id']); ?>
-    </td>
-  </tr>
-  </table>
-  <?php endif;?>
+     <font size="2em">
+     <?php __('Note: Students already in one or more groups are marked')?><br>
+     <?php __('with * and are listed under those without groups')?>
+     </font>
+     </div>
+</div>
+    <?php echo $this->Form->submit(ucfirst($this->action).__(' Group', true), array(
+        'onClick' => "processSubmit(document.getElementById('selected_groups'))")) ?>
 </div>
 <?php echo $this->Form->end();?>

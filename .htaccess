@@ -1,5 +1,10 @@
 <IfModule mod_rewrite.c>
    RewriteEngine on
+   #Options +FollowSymlinks
+   #RewriteCond %{REQUEST_URI} !/maintenance.html$
+   #RewriteCond %{REMOTE_HOST} !^128\.189\.126\.182
+   #RewriteRule $ /maintenance.html [R=302,L] 
+
    RewriteRule    ^$ app/webroot/    [L]
    RewriteRule    (.*) app/webroot/$1 [L]
 </IfModule>

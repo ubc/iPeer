@@ -44,13 +44,13 @@ class EvaluationMixevalDetailTestCase extends CakeTestCase {
     function testGetByEvalMixevalIdCritera()
     {
         // Run test on valid data
-        $mixEvalDetail1 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera(1, 3);
-        $mixEvalDetail2 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera(1, 4);
+        $mixEvalDetail1 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera(1, 4);
+        $mixEvalDetail2 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera(1, 5);
         $this->assertEqual($mixEvalDetail1['EvaluationMixevalDetail']['id'], 4);
-        $this->assertEqual($mixEvalDetail1['EvaluationMixevalDetail']['question_number'], 3);
+        $this->assertEqual($mixEvalDetail1['EvaluationMixevalDetail']['question_number'], 4);
         $this->assertEqual($mixEvalDetail1['EvaluationMixevalDetail']['question_comment'], 'work very efficiently');
         $this->assertEqual($mixEvalDetail2['EvaluationMixevalDetail']['id'], 5);
-        $this->assertEqual($mixEvalDetail2['EvaluationMixevalDetail']['question_number'], 4);
+        $this->assertEqual($mixEvalDetail2['EvaluationMixevalDetail']['question_number'], 5);
         $this->assertEqual($mixEvalDetail2['EvaluationMixevalDetail']['question_comment'], 'Contributed his part');
         // Run test on one valid input
         $mixEvalDetail3 = $invalid3 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera(1, null);

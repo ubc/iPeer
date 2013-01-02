@@ -1,198 +1,207 @@
+<div id='StudentHome'>
 <?php
-/*
-Table for coming Peer Evaluations
-*/
-echo "<h3>Peer Evaluations Due</h3>";
+function getUpcomingTableArray($html, $events) {
+    $ret = array();
+    foreach ($events as $event) {
+        $tmp = array();
+        if (isset($event['Group']['group_name'])) {
+            $tmp[] = $html->link($event['Event']['title'],
+                '/evaluations/makeEvaluation/'.$event['Event']['id'].'/'.
+                $event['Group']['id']);
+            $tmp[] = $event['Group']['group_name'];
+        }
+        else {
+            $tmp[] = $html->link($event['Event']['title'],
+                '/evaluations/makeEvaluation/'.$event['Event']['id']);
+        }
+        $tmp[] = $event['Course']['course'];
+        $tmp[] = Toolkit::formatDate($event['Event']['due_date']);
 
-echo"<div> 
-        <table style='width:100%'> 
-		  <tr class='tableheader'>
-			<th width='30%'>Event</th>
-            <th width='10%'>Group</th>
-			<th width='20%'>Course</th>
-			<th width='20%'>Due Date</th>
-			<th width='20%'>Due In/Late By (red)</th>
-		  </tr>";
-		  
-$i = 0;
-$currentDate = strtotime('NOW');
+        $due = $event['Event']['due_in'];
+        if ($event['late']) {
+            $penalty = isset($event['percent_penalty']) ?
+                ', ' . $event['percent_penalty'] . '&#37; penalty' : '';
+            $tmp[] = "<span class='red'>$due</span>$penalty";
+        }
+        else {
+            $tmp[] = $due;
+        }
 
-foreach($data as $row) {
-    isset($row['comingEvent'])? $comingUpEvent = $row['comingEvent']: $comingUpEvent = null;
-
- 
-if(!empty($row['comingEvent']['Event']['release_date_end'])) { 
-    $releaseEndDate = strtotime( $row['comingEvent']['Event']['release_date_end']);
-}
-	
-if (isset($comingUpEvent['Event']['id']) && $currentDate <= $releaseEndDate && !isset($row['eventSubmitted'])){
-    echo "<tr class='tablecell'>";
-	
-if ($comingUpEvent['Event']['event_template_type_id'] == 1) {
-    echo "<td> <a href ='" .$this->webroot.$this->theme. "evaluations/makeSimpleEvaluation/" 
-    .$comingUpEvent['Event']['id'] . ";".  $comingUpEvent['Event']['group_id'] . "'>"
-	.$comingUpEvent['Event']['title']."</a></td>"; 
-} 
-			
-if ($comingUpEvent['Event']['event_template_type_id'] == 2) {
-	echo "<td> <a href ='" .$this->webroot.$this->theme. "evaluations/makeRubricEvaluation/" 
-	.$comingUpEvent['Event']['id'] . ";". $comingUpEvent['Event']['group_id'] . "'>"
-	.$comingUpEvent['Event']['title']."</a></td>"; 
-}
-			
-if ($comingUpEvent['Event']['event_template_type_id'] == 3) {
-	echo"<td> <a href ='" .$this->webroot.$this->theme. "evaluations/makeSurveyEvaluation/" 
-    .$comingUpEvent['Event']['id'] . "'>"
-	.$comingUpEvent['Event']['title']."</a></td>"; 
-}
-			
-if ($comingUpEvent['Event']['event_template_type_id'] == 4) {
-	echo "<td> <a href ='" .$this->webroot.$this->theme. "evaluations/makeMixevalEvaluation/" 
-	.$comingUpEvent['Event']['id'] . ";".  $comingUpEvent['Event']['group_id'] . "'>"
-    .$comingUpEvent['Event']['title']."</a></td>"; 
+        $ret[] = $tmp;
+    }
+    return $ret;
 }
 
-//Display group name and course name for the Event			
-echo "<td>".$comingUpEvent['Event']['group_name']."</td>";
-echo "<td>" .$comingUpEvent['Event']['course']. "</td>";
-	  
+$evalUpcoming = getUpcomingTableArray($html, $evals['upcoming']);
+$surveyUpcoming = getUpcomingTableArray($html, $surveys['upcoming']);
 
-//Display due date for the coming event	  
-echo "<td>" ;
-$dueDate=$row['comingEvent']['Event']['due_date'];
-$timeStamp = strtotime($dueDate);
-echo date('F j, y g:i a', $timeStamp); 
-echo "</td>";	  
-	  
-echo "<td>";	
-if ($comingUpEvent['Event']['is_late']) {
-//If the event is late, display in RED 
-	echo "<font color=\"red\"><b>" . $comingUpEvent['Event']["days_to_due"] . "</b>".__(' day(s)', true)."!  ";
-	
-	if (isset($comingUpEvent['Event']['penalty'])){
-	    echo ($comingUpEvent['Event']['penalty'].'% penalty');
-	}
-	
-	echo "</font>";
-			  } 
-    else {
-		 echo "<b>".$comingUpEvent['Event']['days_to_due']."</b>".__(' day(s)', true);
-			  	
-				if ($comingUpEvent['Event']['days_to_due'] <= 2) {
-    				print "<b>!</b>";
-    			}
-			  
-		 }
-			  
-	echo "</td>";
-	echo "</tr>";
-	$i++;
-}
+function getNonUpcomingTableArray($html, $events) {
+    $ret = array();
+    foreach ($events as $event) {
+        $tmp = array();
+        if (isset($event['Event']['is_result_released']) &&
+            $event['Event']['is_result_released']
+        ) { // we're in the result release period, so link to the results
+            $tmp[] = $html->link($event['Event']['title'], 
+                '/evaluations/studentViewEvaluationResult/' .
+                $event['Event']['id'] . '/' . $event['Group']['id']);
+            $tmp[] = $event['Event']['result_release_date_end'];
+        }
+        else if ($event['Event']['event_template_type_id'] == 3) {
+            // this is a survey, no release period, so link to the results
+            $tmp[] = $html->link($event['Event']['title'], 
+                '/evaluations/studentViewEvaluationResult/' .
+                $event['Event']['id']);
+        }
+        else {
+            // we're not in the result release period, notify user when they can
+            // view the results
+            if ($event['Event']['is_released']) {
+                // can let students edit their submissions
+                if (isset($event['Group']['group_name'])) {
+                    $tmp[] = $html->link($event['Event']['title'],
+                        '/evaluations/makeEvaluation/'.$event['Event']['id'].
+                        '/'. $event['Group']['id']);
+                }
+                else {
+                    $tmp[] = $html->link($event['Event']['title'],
+                        '/evaluations/makeEvaluation/'.$event['Event']['id']);
+                }
+            }
+            else {
+                $tmp[] = $event['Event']['title'];
+            }
+            $tmp[] = "<span class='orangered'>" .
+                $event['Event']['result_release_date_begin'] . "</span>";
+        }
+        if (isset($event['Group']['group_name'])) {
+            // NOTE: surveys don't have group names
+            $tmp[] = $event['Group']['group_name'];
+        }
+        $tmp[] = $event['Course']['course'];
+        $tmp[] = Toolkit::formatDate($event['Event']['due_date']);
+        if (!empty($event['EvaluationSubmission'])) {
+            // expired events have no submissions
+            $tmp[] = $event['EvaluationSubmission'][0]['date_submitted'];
+        }
+        $ret[] = $tmp;
+    }
+    return $ret;
 }
 
-//Display no peer evaluations due
-if($i == 0) {
-    echo "<tr><td colspan='5' align='center'><b> No peer evaluations due at this time </b></td></tr>";
-}
+$evalSubmitted = getNonUpcomingTableArray($html, $evals['submitted']);
+$surveySubmitted = getNonUpcomingTableArray($html, $surveys['submitted']);
+$evalExpired = getNonUpcomingTableArray($html, $evals['expired']);
+// note that we have this section for completeness, but currently,
+// surveys are removed once past the due date, so unless the student
+// made a submission, it won't show up
+$surveyExpired = getNonUpcomingTableArray($html, $surveys['expired']);
 
-	echo "</table>";
-	echo "</div>";
-	
-/*
-Table for submitted peer evaluations 
-*/
-echo "<h3>Peer Evaluations Submitted</h3>";
-	
-echo"<div> 
-    <table style='width:100%'> 
-        <tr class='tableheader'>
-		    <th width='30%'>Event</th>
-            <th width='10%'>Group</th>
-			<th width='20%'>Course</th>
-			<th width='20%'>Due Date</th>
-			<th width='20%'>Date Submitted</th>
-		</tr>";
-	  
-$i = 0;
-	
-foreach($data as $row){
-	if (isset($row['eventSubmitted']))  
-	    $eventSubmitted = $row['eventSubmitted'];
-    else
-	    $eventSubmitted =null;
-	
-//Display if event is submitted, before result release end date and not survey
-if (isset($eventSubmitted['Event']['id'])&&(($currentDate<strtotime($eventSubmitted['Event']['result_release_date_end'])&&$eventSubmitted['Event']['event_template_type_id'] != 3)|| ($currentDate<strtotime($eventSubmitted['Event']['release_date_end'])&&$eventSubmitted['Event']['event_template_type_id'] == 3))) {
-
-    //Condition to check; if after result release begin date, display link to result view page: else just display event title.
-    $isResultReleased = ($currentDate >= strtotime($eventSubmitted['Event']['result_release_date_begin']) &&
-    $currentDate < strtotime($eventSubmitted['Event']['result_release_date_end']));
-	
-	echo "<tr class='tablecell'>";
-			
-    if ($eventSubmitted['Event']['event_template_type_id'] == 1){ 
-        if ($isResultReleased && User::hasPermission('functions/viewstudentresults')){
-            echo "<td><a href='". $this->webroot.$this->theme . "evaluations/studentViewEvaluationResult/".
-            $eventSubmitted['Event']['id']. ";".$eventSubmitted['Event']['group_id']. "'>" .
-            $eventSubmitted['Event']['title'] ."</a></td>";
-	    }
-	    else
-       	    echo "<td>".$eventSubmitted['Event']['title']."</td>";
-	}
-	   
-	   
-	if ($eventSubmitted['Event']['event_template_type_id'] == 2) {
-	    if ($isResultReleased && User::hasPermission('functions/viewstudentresults')) {
-            echo "<td><a href='". $this->webroot.$this->theme . "evaluations/studentViewEvaluationResult/"
-		    .$eventSubmitted['Event']['id']. ";" . $eventSubmitted['Event']['group_id']. "'>".
-		    $eventSubmitted['Event']['title'] . "</a></td>";  
-		}
-	    else
-	        echo "<td>".$eventSubmitted['Event']['title']."</td>";
-	}
-	 
-	if ($eventSubmitted['Event']['event_template_type_id'] == 3) {
-	    echo "<td><a href='". $this->webroot.$this->theme."evaluations/studentViewEvaluationResult/"
-	    .$eventSubmitted['Event']['id']. ";".$userId . "'>" . $eventSubmitted['Event']['title'] . "</a></td>";
-	}
-	 
-	if ($eventSubmitted['Event']['event_template_type_id'] == 4) {
-	    if ($isResultReleased && User::hasPermission('functions/viewstudentresults')) {
-        echo "<td><a href='". $this->webroot.$this->theme . "evaluations/studentViewEvaluationResult/"
-		.$eventSubmitted['Event']['id'].";". $eventSubmitted['Event']['group_id']."'>".
-		$eventSubmitted['Event']['title'] . "</a></td>";  
-		}
-	 else
-	    echo "<td>".$eventSubmitted['Event']['title']."</td>";
-	 } 
-	 
-	echo "</td>";
-	 
-	//Display the group name and the course name
-	echo "<td>".$eventSubmitted['Event']['group_name']."</td>";
-	echo "<td>".$eventSubmitted['Event']['course']."</td>" ;
-	 
-	//Display the due date
-	echo "<td>";
-	$due_date = $eventSubmitted['Event']['due_date'];
-	$timeStamp = strtotime($due_date);
-	echo date('F j, y g:i a', $timeStamp) . "</td>";
-	 
-	//Display the submitted date
-	$submit_date = $eventSubmitted['Event']['date_submitted'];
-	$timeStamp = strtotime($submit_date);
-	echo "<td>". date('F j, y g:i a', $timeStamp) . "</td>";
-	 
-	echo "</tr>";
-	 
-	$i++;
+if ($numOverdue) {
+    echo "<div class='eventSummary overdue'>$numOverdue Overdue Events</div>";
 }
+if ($numDue) {
+    echo "<div class='eventSummary pending'>$numDue Pending Events Total</div>";
 }
-	 
-if ($i == 0) {
-	echo  "<tr><td colspan='5' align='center'><b><br>'No peer Evaluations submitted.'</b></td></tr>";
+else {
+    echo "<div class='eventSummary alldone'>No Events Pending</div>";
 }
-	
-	echo "</table></div>";
-			
 ?>
+
+
+<h2>Peer Evaluations</h2>
+<h3>Due</h3>
+<table class='standardtable'>
+    <tr>
+       <th>Event</th>
+       <th>Group</th>
+       <th>Course</th>
+       <th>Due Date</th>
+       <th>Due In/<span class='red'>Late By</span></th>
+    </tr>
+    <?php 
+    echo $html->tableCells($evalUpcoming); 
+    ?>
+    <?php if (empty($evalUpcoming)):?>
+    <tr><td colspan="5" align="center"><b> No peer evaluations due at this time </b></td></tr>
+    <?php endif; ?>
+</table>
+
+<h3>Submitted</h3>
+<table class='standardtable'>
+    <tr>
+        <th>Event</th>
+        <th>Viewable <span class='orangered'>Start</span>/End</th>
+        <th>Group</th>
+        <th>Course</th>
+        <th>Due Date</th>
+        <th>Date Submitted</th>
+    </tr>
+<?php echo $html->tableCells($evalSubmitted); ?>
+<?php if (empty($evalSubmitted)):?>
+    <tr>
+        <td colspan="6" align="center">No submitted evaluations available.</td>
+    </tr>
+<?php endif; ?>
+</table>
+
+<?php if (!empty($evalExpired)):?>
+<h3>Expired With No Submission</h3>
+<table class='standardtable'>
+    <tr>
+        <th>Event</th>
+        <th>Viewable <span class='orangered'>Start</span>/End</th>
+        <th>Group</th>
+        <th>Course</th>
+        <th>Due Date</th>
+    </tr>
+<?php echo $html->tableCells($evalExpired); ?>
+</table>
+<?php endif; ?>
+
+<h2>Surveys</h2>
+<h3>Due</h3>
+<table class='standardtable'>
+    <tr>
+       <th>Event</th>
+       <th>Course</th>
+       <th>Due Date</th>
+       <th>Due In/<span class='red'>Late By</span></th>
+    </tr>
+    <?php 
+    echo $html->tableCells($surveyUpcoming); 
+    ?>
+    <?php if (empty($surveyUpcoming)):?>
+    <tr><td colspan="4" align="center"><b> No survey due at this time </b></td></tr>
+    <?php endif; ?>
+</table>
+
+<h3>Submitted</h3>
+<table class='standardtable'>
+    <tr>
+        <th>Event</th>
+        <th>Course</th>
+        <th>Due Date</th>
+        <th>Date Submitted</th>
+    </tr>
+<?php echo $html->tableCells($surveySubmitted); ?>
+<?php if (empty($surveySubmitted)):?>
+    <tr>
+        <td colspan="4" align="center">No submitted surveys available.</td>
+    </tr>
+<?php endif; ?>
+</table>
+
+<?php if (!empty($surveyExpired)):?>
+<h3>Expired With No Submission</h3>
+<table class='standardtable'>
+    <tr>
+        <th>Event</th>
+        <th>Course</th>
+        <th>Due Date</th>
+    </tr>
+<?php echo $html->tableCells($surveyExpired); ?>
+</table>
+<?php endif; ?>
+
+</div>

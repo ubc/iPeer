@@ -10,6 +10,9 @@
  */
 class EmailMerge extends AppModel
 {
+    const MERGE_START = '{{{';
+    const MERGE_END   = '}}}';
+
     public $name = 'EmailMerge';
 
     public $actsAs = array();
@@ -42,4 +45,20 @@ class EmailMerge extends AppModel
         return $table['EmailMerge'];
     }
 
+    /**
+     * getAllMergesWithKey
+     *
+     * @access public
+     * @return void
+     */
+    function getAllMergesWithKey()
+    {
+        $return = array();
+        $merges = $this->find('all', array('fields' => array('key', 'value', 'table_name', 'field_name')));
+        foreach ($merges as $merge) {
+            $return[$merge['EmailMerge']['value']] = $merge['EmailMerge'];
+        }
+
+        return $return;
+    }
 }

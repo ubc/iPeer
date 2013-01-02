@@ -13,6 +13,18 @@ class SysParameter extends AppModel
     public $name = 'SysParameter';
     public $actsAs = array('Traceable');
 
+    public $validate = array (
+        'parameter_code' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Parameter code is required',
+        ),
+        'parameter_type' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Parameter code is required',
+            'on' => 'create',
+        )
+    );
+
     /**
      * findParameter
      *
@@ -21,7 +33,7 @@ class SysParameter extends AppModel
      * @access public
      * @return void
      */
-    function findParameter ($paramCode='')
+    function findParameter ($paramCode)
     {
         return $this->find('first', array(
             'conditions' => array('parameter_code' => $paramCode),
@@ -29,6 +41,50 @@ class SysParameter extends AppModel
         ));
     }
 
+    /**
+     * get the value of a parameter
+     *
+     * @param string $paramCode
+     *
+     * @access public
+     * @return void
+     */
+    function get($paramCode, $default = null)
+    {
+        // search in cache first
+        $result = Cache::read($paramCode, 'configuration');
+        if (null == $result) {
+            $param = $this->findParameter($paramCode);
+            if ($param) {
+                $result = $param['SysParameter']['parameter_value'];
+                Cache::write($paramCode, $result, 'configuration');
+            } else {
+                $result = $default;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * set a value to database
+     *
+     * @param mixed $paramCode
+     * @param mixed $value
+     *
+     * @access public
+     * @return void
+     */
+    function setValue($paramCode, $value)
+    {
+        $obj = $this->findParameter($paramCode);
+        if ($obj) {
+            $obj['SysParameter']['parameter_value'] = $value;
+            return $this->save($obj);
+        }
+
+        return false;
+    }
 
     /**
      * beforeSave
@@ -40,34 +96,30 @@ class SysParameter extends AppModel
     function beforeSave()
     {
         $this->data[$this->name]['modified'] = date('Y-m-d H:i:s');
-        // Ensure the name is not empty
-        if (empty($this->data['SysParameter']['id'])) {
-
-
-            $this->errorMessage = "Id is required";
-            return false;
-        }
-
-        if (!is_numeric($this->data['SysParameter']['id'])) {
-
-            $this->errorMessage = "Id must be a number";
-            return false;
-        }
-
-
-        if (empty($this->data['SysParameter']['parameter_code'])) {
-
-            $this->errorMessage = "Parameter code is required";
-            return false;
-        }
-        if (empty($this->data['SysParameter']['parameter_type'])) {
-            $this->errorMessage = "Parameter type is required";
-            return false;
-        }
 
         return true;
     }
 
+    /**
+     * afterSave
+     *
+     * @param boolean $created
+     *
+     * @access public
+     * @return void
+     */
+    function afterSave($created)
+    {
+        if (empty($this->data['SysParameter']['parameter_value'])) {
+            // cake cache doesn't allow storing empty value. so we have to remove
+            // the old value instead of overwrite
+            Cache::delete($this->data['SysParameter']['parameter_code'], 'configuration');
+        } else {
+            Cache::write($this->data['SysParameter']['parameter_code'], $this->data['SysParameter']['parameter_value'], 'configuration');
+        }
+
+        return true;
+    }
 
     /**
      * getDatabaseVersion
@@ -78,11 +130,17 @@ class SysParameter extends AppModel
      */
     public function getDatabaseVersion()
     {
-        $ret = $this->field('parameter_value', array('parameter_code' => 'database.version'));
-        if ($ret == false) {
-            throw new UnexpectedValueException(__('Could not retrieve database version from the database.', true));
-        }
-        return $ret;
+        return $this->get('database.version');
     }
 
+    /**
+     * reload force reload by clearing the cache
+     *
+     * @access public
+     * @return void
+     */
+    public function reload()
+    {
+        Cache::clear(false, 'configuration');
+    }
 }

@@ -7,23 +7,31 @@ echo $html->script('ricoaccordion');
 <div class="content-container">
 <!-- Render Event Info table -->
 <?php echo $this->element('evaluations/view_event_info', array('controller'=>'evaluations', 'event'=>$event));?>
+<?php echo $this->element('evaluations/summary_info', array('controller'=>'evaluations', 'event'=>$event));?>
 
-<div class="event-summary">
-    <span class="instruction-icon"><?php __('Summary:')?> ( <?php echo $this->Html->link(__('Basic', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['group_id']."/Basic")?> |
-    <?php echo $html->link(__('Detail', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['group_id']."/Detail")?> )</span>
-    <font size = "1" face = "arial" color = "red" >*Numerics in red denotes late submission penalty.</font>
-    <?php if (!$allMembersCompleted): ?>
-        <div class="incompleted">
-          <?php __('These people have not yet submit their evaluations:')?>
-            <ul>
-                <?php foreach($inCompletedMembers as $row): $user = $row['User']; ?>
-                    <li><?php echo $user['first_name'].' '.$user['last_name'] . ($row['Role']['role_id']==4 ? ' (TA)' : ' (student)');?></li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
-    <?php endif; ?>
-</div>
+<!-- summary table -->
+<form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
+    <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
+    <input type="hidden" name="group_id" value="<?php echo $event['Group']['id'] ?>" />
+    <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id']?>" />
+    <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>" />
+    <input type="hidden" name="display_format" value="Detail" />
+<table class="standardtable">
+    <?php echo $html->tableHeaders($this->Evaluation->getRubricSummaryTableHeader($rubric['Rubric']['total_marks'],$rubricCriteria));?>
+    <?php echo $html->tableCells($this->Evaluation->getRubricSummaryTable($summaryMembers, $scoreRecords, $memberScoreSummary, $penalties, $rubric['Rubric']['total_marks'])); ?>
+    <tr align="center"><td colspan="<?php echo $rubric['Rubric']['criteria']+2; ?>">
+        <?php
+            if ($event['GroupEvent']['marked'] == "reviewed") {
+                echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_not_reviewed\" value=\" ".__('Mark Peer Evaluations as Not Reviewed', true)."\" />";
+            } else {
+                echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_reviewed\" value=\" ".__('Mark Peer Evaluations as Reviewed', true)."\" />";
+            }
+        ?>
+    </td></tr>
+</table>
+</form>
 
+<h3><?php __('Evaluation Results')?></h3>
 <div id='rubric_result'>
 
 <?php
@@ -34,143 +42,59 @@ $membersAry = array();  //used to format result (students)
 $withTutorsAry = array(); //used to format result (students,tutors)
 $groupAve = 0;
 $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
+$aveScoreSum = 0;
 ?>
 <!-- summary table -->
-<?php echo '<table width="100%" border="0" align="center" cellpadding="4" cellspacing="2" class="outer-table">'; ?>
-    <tr>
-        <td width="25%" valign="middle" class="result-header-td"><?php __('Student Name:')?></td>
-		<?php echo '<td width="75%" rowspan="'.$rowspan.'" class="inner-table-cell"><div class="scrollbar"><table class="inner-table"><tr class="result-header-td">';
-            for ($i = 1; $i <= $rubric['Rubric']["criteria"]; $i++) {
-                echo "<td width='200' class='inner-table-cell'>";
-                echo '<strong><font color="' . $color[ $i % sizeof($color) ] . '">' . $numerical_index . ". </font></strong>";
-                echo "(" .$rubricCriteria[$i-1]['multiplier']. ")";
-                echo "</td>";
-                $numerical_index++;
+<?php
+if ($groupMembersNoTutors) {
+    foreach ($groupMembersNoTutors as $member) {
+        $membersAry[$member['User']['id']] = $member;
+        if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
+            $avgScore = $memberScoreSummary[$member['User']['id']]['received_ave_score'];
+            $penalty = number_format(($penalties[$member['User']['id']] / 100) * $avgScore, 2);
+            $penalty_percent = $penalties[$member['User']['id']] / 100;
+            $questionIndex = 0;
+            foreach ($scoreRecords[$member['User']['id']]['rubric_criteria_ave'] AS $criteriaAveIndex => $criteriaAveGrade) {
+                $scaledQuestionGrade = $criteriaAveGrade * (1 - $penalty_percent);
+                $groupAverage[$criteriaAveIndex] += $scaledQuestionGrade;
+                $deduction = $criteriaAveGrade * $penalty_percent;
+                $questionIndex++;
             }
-
-        echo '<td width="250" class="inner-table-cell">'.__("Total:( /", true).number_format($rubric['Rubric']['total_marks'], 2).')' ?></td>
-    </tr>
-    <?php
-    $aveScoreSum = 0;
-    //This section will display the evaluatees' name
-    //as display the average scores their peers gave them
-    //for various criteria
-    $questionSum = array_fill(0, $rubric['Rubric']['criteria'], 0);
-    if ($groupMembersNoTutors) {
-        foreach ($groupMembersNoTutors as $member) {
-            $membersAry[$member['User']['id']] = $member;
-            echo '<tr class="result-cell">';
-            if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
-                $avgScore = $memberScoreSummary[$member['User']['id']]['received_ave_score'];
-                $penalty = number_format(($penalties[$member['User']['id']] / 100) * $avgScore, 2);
-                $penalty_percent = $penalties[$member['User']['id']] / 100;
-                $questionIndex = 0;
-                foreach ($scoreRecords[$member['User']['id']]['rubric_criteria_ave'] AS $criteriaAveIndex => $criteriaAveGrade) {
-                    $scaledQuestionGrade = $criteriaAveGrade * (1 - $penalty_percent);
-                    $groupAverage[$criteriaAveIndex] += $scaledQuestionGrade;
-                    $deduction = $criteriaAveGrade * $penalty_percent;
-                    $questionSum[$questionIndex] += $scaledQuestionGrade;
-                    $questionIndex++;
-                    $penalty > 0 ? $stringAddOn = ' - '."<font color=\"red\">".number_format($deduction, 2).
-                        "</font> = ".number_format($scaledQuestionGrade, 2).'</td>' :
-                        $stringAddOn = '';
-                    echo '<td class="result-cell">' . number_format($criteriaAveGrade, 2).$stringAddOn;
-                }
-            } else {
-                for ($i = 1; $i <= $rubric['Rubric']["criteria"]; $i++) {
-                    echo "<td class='result-cell'>-</td>";
-                }
-            }
-		// for calculating average percentage per question (ratio)
+        }
+        // for calculating average percentage per question (ratio)
         $ratio = 0;
         for ($i = 0; $i < $rubric['Rubric']["criteria"]; $i++) {
             if (!empty($scoreRecords[$member['User']['id']]['rubric_criteria_ave']))
                 $ratio += $scoreRecords[$member['User']['id']]['rubric_criteria_ave'][$i+1] / $rubricCriteria[$i]['multiplier'];
         }
         $avgPerQues[$member['User']['id']] = $ratio /  $rubric['Rubric']['criteria'];
-        //totals section
-        echo '<td class="total-cell">';
         if (isset($memberScoreSummary[$member['User']['id']]['received_ave_score'])) {
             $finalAvgScore = $avgScore - $penalty;
-            $penalty > 0 ? $stringAddOn = ' - '."<font color=\"red\">".$penalty."</font> = ".number_format($finalAvgScore, 2) :
-                $stringAddOn = '';
             $aveScoreSum += $finalAvgScore;
-            echo number_format($avgScore, 2).$stringAddOn;
             $receviedAvePercent = $finalAvgScore / $rubric['Rubric']['total_marks'] * 100;
-            echo ' ('.number_format($receviedAvePercent) . '%)';
             $membersAry[$member['User']['id']]['received_ave_score'] = $memberScoreSummary[$member['User']['id']]['received_ave_score'];
             $membersAry[$member['User']['id']]['received_ave_score_%'] = $receviedAvePercent;
-        } else {
-            echo '-';
-        }
-        echo "</td>";
-        echo "</tr>";
-        //end scores
-        }
-
-        //averages
-        echo '<tr class="tablesummary">';
-        $questionIndex = 0;
-        foreach ($groupAverage AS $sum) {
-            echo '<td class="total-cell">' . number_format($sum / count($groupMembersNoTutors), 2). "</td>";
-        }
-        echo "<td><b>";
-        $groupAve = number_format($aveScoreSum / count($groupMembersNoTutors), 2);
-        echo $groupAve;
-        echo ' ('.number_format($groupAve / $rubric['Rubric']['total_marks'] * 100) . '%)';
-
-        echo "</b></td>";
-    } ?>
-    </tr></table></td></tr>
-    <?php
-    if ($groupMembers) {
-        foreach ($groupMembers as $member) {
-            $withTutorsAry[$member['User']['id']]['first_name'] = $member['User']['first_name'];
-            $withTutorsAry[$member['User']['id']]['last_name'] = $member['User']['last_name'];
         }
     }
-    if ($groupMembersNoTutors) {
-        foreach ($groupMembersNoTutors as $member) {
-            echo '<tr class="tablecell2" cellpadding="4" cellspacing="2" >';
-            $membersAry[$member['User']['id']]['member'] = $member;
-            echo '<td width="25%" class="group-members">' . $member['User']['first_name'] . ' ' . $member['User']['last_name'] . '</td></tr>' . "\n";
-        }
+    $groupAve = number_format($aveScoreSum / count($groupMembersNoTutors), 2);
+} ?>
+<?php
+if ($groupMembers) {
+    foreach ($groupMembers as $member) {
+        $withTutorsAry[$member['User']['id']]['first_name'] = $member['User']['first_name'];
+        $withTutorsAry[$member['User']['id']]['last_name'] = $member['User']['last_name'];
     }
-    echo '<tr class="tablesummary"><td class="group-members"><b>';
-    echo __("Group Average: ", true);
-    echo "</b></td></tr><tr><td> </td></tr>";
-    ?>
-    <tr><td>  </td></tr>
-    <tr class="tablecell2" align="center"><td colspan="<?php echo $rubric['Rubric']["criteria"] +2; ?>">
-        <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
-            <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
-            <input type="hidden" name="group_id" value="<?php echo $event['group_id']?>" />
-            <input type="hidden" name="course_id" value="<?php echo $courseId; ?>" />
-            <input type="hidden" name="group_event_id" value="<?php echo $event['group_event_id']?>" />
-            <input type="hidden" name="display_format" value="Detail" />
+}?>
 
-      	<?php
-            if ($event['group_event_marked'] == "reviewed") {
-                echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_not_reviewed\" value=\" ".__('Mark Peer Evaluations as Not Reviewed', true)."\" />";
-            } else {
-                echo "<input class=\"reviewed\" type=\"submit\" name=\"mark_reviewed\" value=\" ".__('Mark Peer Evaluations as Reviewed', true)."\" />";
-            }
-        ?>
-        </form></td>
-    </tr>
-</table>
-<table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
-    <tr>
-        <td align="center">
 <div id="accordion">
     <?php $i = 0;
     foreach($groupMembersNoTutors as $row):
         $user = $row['User']; ?>
         <div id="panel<?php echo $user['id']?>">
         <div id="panel<?php echo $user['id']?>Header" class="panelheader">
-            <?php echo __('Evaluatee: ', true).$user['last_name'].' '.$user['first_name']?>
+            <?php echo __('Evaluatee: ', true).$user['first_name']." ".$user['last_name']?>
         </div>
-        <div style="height: 200px;" id="panel1Content" class="panelContent">
+        <div style="height: 200px;text-align: center;" id="panel1Content" class="panelContent">
             <br><b><?php
                 $scaled = $membersAry[$user['id']]['received_ave_score'] * (1 - ($penalties[$user['id']] / 100));
                 $deduction = number_format($membersAry[$user['id']]['received_ave_score'] * ($penalties[$user['id']] / 100), 2);
@@ -207,16 +131,14 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
                 echo $penaltyNotice;
                 ?> </b>
             <br><br>
-        <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
-            <tr class="tableheader" align="center">
-                <td width="100" valign="top"><?php __('Evaluator')?></td>
-                <?php
-                for ($i=1; $i<=$rubric['Rubric']["criteria"]; $i++) {
-                    echo "<td><strong><font color=" . $color[ $i % sizeof($color) ] . ">" . ($i) . ". "  . "</font></strong>";
-                    echo $rubricCriteria[$i-1]['criteria'];
-                    echo "</td>";
-                }
-                ?>
+        <table class="standardtable">
+            <tr>
+                <th width="100" valign="top"><?php __('Evaluator')?></th>
+                <?php for ($i=1; $i<=$rubric['Rubric']["criteria"]; $i++): ?>
+                    <th><strong>(<?php echo $i?>)</strong>
+                        <?php echo $rubricCriteria[$i-1]['criteria'];?>
+                    </th>
+                <?php endfor; ?>
             </tr>
             <?php
             //Retrieve the individual rubric detail
@@ -227,7 +149,7 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
                 foreach ($memberResult AS $row): $memberRubric = $row['EvaluationRubric'];
                     $evalutor = $withTutorsAry[$memberRubric['evaluator']];
                     echo "<tr class=\"tablecell2\">";
-                    echo "<td width='15%'>".$evalutor['last_name'].' '.$evalutor['first_name']."</td>";
+                    echo "<td width='15%'>".$evalutor['first_name']." ".$evalutor['last_name'] ."</td>";
 
                     $resultDetails = $memberRubric['details'];
                     foreach ($resultDetails AS $detail) : $rubDet = $detail['EvaluationRubricDetail'];
@@ -275,7 +197,7 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
             $col = $rubric['Rubric']['criteria'] + 1;
             echo "<td colspan=".$col.">";
             echo "<strong>".__('General Comment:', true)." </strong><br>";
-            echo $memberRubric['general_comment'];
+            echo $memberRubric['comment'];
             echo "<br><br></td>";
             echo "</tr>";
         endforeach;
@@ -286,16 +208,16 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
         //Grade Released
         if (isset($scoreRecords[$user['id']]['grade_released']) && $scoreRecords[$user['id']]['grade_released']) {?>
 
-            <input type="button" name="UnreleaseGrades" value="<?php __('Unrelease Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';0'; ?>'">
+            <input type="button" name="UnreleaseGrades" value="<?php __('Unrelease Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$user['id'].';'.$event['GroupEvent']['id'].';0'; ?>'">
         <?php } else {?>
-            <input type="button" name="ReleaseGrades" value="<?php __('Release Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';1'; ?>'">
+            <input type="button" name="ReleaseGrades" value="<?php __('Release Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$user['id'].';'.$event['GroupEvent']['id'].';1'; ?>'">
         <?php }
 
         //Comment Released
         if (isset($scoreRecords[$user['id']]['comment_released']) && $scoreRecords[$user['id']]['comment_released']) {?>
-            <input type="button" name="UnreleaseComments" value="<?php __('Unrelease Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';0'; ?>'">
+            <input type="button" name="UnreleaseComments" value="<?php __('Unrelease Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$user['id'].';'.$event['GroupEvent']['id'].';0'; ?>'">
         <?php } else { ?>
-            <input type="button" name="ReleaseComments" value="<?php __('Release Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['group_id'].';'.$user['id'].';'.$event['group_event_id'].';1'; ?>'">
+            <input type="button" name="ReleaseComments" value="<?php __('Release Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$user['id'].';'.$event['GroupEvent']['id'].';1'; ?>'">
         <?php } ?>
     </div>
     </div>
@@ -303,9 +225,6 @@ $groupAverage = array_fill(1, $rubric['Rubric']['criteria'], 0);
     <?php $i++;?>
     <?php endforeach; ?>
 </div>
-    </td>
-    </tr>
-</table>
 
 <script type="text/javascript"> new Rico.Accordion( 'accordion',
                                     {panelHeight:500,

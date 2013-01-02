@@ -10,6 +10,11 @@
  */
 class Course extends AppModel
 {
+    const FILTER_PERMISSION_SUPERADMIN = 0;
+    const FILTER_PERMISSION_FACULTY = 1;
+    const FILTER_PERMISSION_OWNER = 2;
+    const FILTER_PERMISSION_ENROLLED = 3;
+
     public $name = 'Course';
     public $displayField = 'full_name';
 
@@ -115,8 +120,11 @@ class Course extends AppModel
      * For some reason, HABTM fields can't be validated with $validate.
      * So this is a workaround, make sure courses have at least 1
      * department selected.
+     *
+     * Disable this for now as it is ok for a course doesn't have department
+     * Only super admin and instructors in the course have access to it
      * */
-    public function beforeValidate() {
+    /*public function beforeValidate() {
         if (array_key_exists('Department', $this->data) &&
             empty($this->data['Department']['Department'])) {
             // make sure this model fails when saving without department
@@ -125,7 +133,7 @@ class Course extends AppModel
             $this->Department->invalidate('Department',
                 'Please select a department.');
         }
-    }
+    }*/
 
     /**
      * __construct
@@ -259,25 +267,47 @@ class Course extends AppModel
      *
      * @param mixed $instructorId instructor id
      * @param bool  $type         type
-     * @param int   $recursive    recursive search
+     * @param int   $contain      contained models
+     * @param array $conditions   conditions for find
      *
      * @return course data
      */
-    function getCourseByInstructor($instructorId, $type = 'all', $recursive = 1)
+    function getCourseByInstructor($instructorId, $type = 'all', $contain = array(), $conditions = array())
     {
-        $fields = array('Course.*');
-        if ($type == 'list') {
+        $contain = array_merge(array('Instructor'), $contain);
+        /*if ($type == 'list') {
             $fields = array('Course.full_name');
-            $recursive = 0;
-        }
-        return $this->find(
-            $type,
+        }*/
+
+        // we need two queries to find the courses. becuase if we specifiy the instructor id condition
+        // we can only get one instructor with the id we specified. If the course has more than one
+        // instructor, we will fail to retrieve them.
+
+        // find course ids first
+        $courses = $this->find(
+            'all',
             array(
                 'conditions' => array('Instructor.id' => $instructorId),
-                'fields' => $fields,
-                'recursive' => $recursive
+                'contain' => array('Instructor')
             )
         );
+
+        $courseIds = Set::extract('/Course/id', $courses);
+        if (array_key_exists('id', $conditions)) {
+            if (is_array($conditions['id'])) {
+                $conditions['id'] = array_intersect($conditions['id'], $courseIds);
+            } else {
+                if (!in_array($conditions['id'], $courseIds)) {
+                    return false;
+                }
+            }
+        } else {
+            $conditions['id'] = $courseIds;
+        }
+        // find courses with instructor and other models specified in contain
+        $courses = $this->find($type, array('conditions' => $conditions, 'contain' => $contain));
+
+        return $courses;
     }
 
     /**
@@ -292,6 +322,53 @@ class Course extends AppModel
         return $this->getCourseByInstructor($instructorId, 'list');
     }
 
+    /**
+     * Get course data by student id
+     *
+     * @param mixed $instructorId instructor id
+     * @param bool  $type         type
+     * @param int   $contain      contained models
+     * @param array $conditions   conditions for find
+     *
+     * @return course data
+     */
+    function getCourseByStudent($studentId, $type = 'all', $contain = array(), $conditions = array())
+    {
+        $contain = array_merge(array('Enrol'), $contain);
+        /*if ($type == 'list') {
+            $fields = array('Course.full_name');
+        }*/
+
+        // we need two queries to find the courses. becuase if we specifiy the student id condition
+        // we can only get one student with the id we specified. If the course has more than one
+        // student, we will fail to retrieve them.
+
+        // find course ids first
+        $courses = $this->find(
+            'all',
+            array(
+                'conditions' => array('Enrol.id' => $studentId),
+                'contain' => array('Enrol')
+            )
+        );
+
+        $courseIds = Set::extract('/Course/id', $courses);
+        if (array_key_exists('id', $conditions)) {
+            if (is_array($conditions['id'])) {
+                $conditions['id'] = array_intersect($conditions['id'], $courseIds);
+            } else {
+                if (!in_array($conditions['id'], $courseIds)) {
+                    return false;
+                }
+            }
+        } else {
+            $conditions['id'] = $courseIds;
+        }
+        // find courses with student and other models specified in contain
+        $courses = $this->find($type, array('conditions' => $conditions, 'contain' => $contain));
+
+        return $courses;
+    }
     /**
      * enrolStudents enrol student to a course
      *
@@ -318,8 +395,8 @@ class Course extends AppModel
     /**
      * Get course data by departments
      *
-     * @param unknown_type $departments
-     * @param mixed $findType
+     * @param array  $departments array of departments
+     * @param string $findType    find type
      *
      * @return course data
      */
@@ -341,42 +418,29 @@ class Course extends AppModel
         return $ret;
     }
 
-    /************** HELPER FUNCTION USED FOR UNIT TESTING PURPOSES   *****************/
-
     /**
-     * createCoursesHelper
+     * getByDepartmentIds get course belongs to departments
      *
-     * @param bool $id     id
-     * @param bool $course course
-     * @param bool $title  title
+     * @param mixed  $departmentIds id or array of ids
+     * @param string $findType      find type
+     * @param mixed  $options       options for find
      *
      * @access public
      * @return void
      */
-    function createCoursesHelper($id=null, $course=null, $title=null)
+    function getByDepartmentIds($departmentIds, $findType = "all", $options = array())
     {
-        $sql = "INSERT INTO courses VALUES ( '$id', '$course', '$title', NULL , 'off', NULL , 'A', '0', '0000-00-00 00:00:00', NULL , NULL , '0' ) ";
-        $this->query($sql);
-
-    }
-
-
-    /**
-     * createInactiveCoursesHelper
-     *
-     * @param bool $id     id
-     * @param bool $course course
-     * @param bool $title  title
-     *
-     * @access public
-     * @return void
-     */
-    function createInactiveCoursesHelper($id=null, $course=null, $title=null)
-    {
-
-        $sql = "INSERT INTO courses VALUES ( '$id', '$course', '$title', NULL , 'off', NULL , 'I', '0', '0000-00-00 00:00:00', NULL , NULL , '0' ) ";
-        $this->query($sql);
-
+        $options['conditions']['Department.id'] = $departmentIds;
+        if(isset($options['contain'])) { 
+        	$options['contain'] = array_merge(array('Department'), $options['contain']);
+        } else {
+        	$options['contain'] = array('Department');
+        }
+        if ($findType == 'list') {
+            $courses = $this->find('all', $options);
+            return Set::combine($courses, '{n}.'.$this->alias.'.id', '{n}.'.$this->alias.'.'.$this->displayField);
+        }
+        return $this->find($findType, $options);
     }
 
     /**
@@ -403,7 +467,53 @@ class Course extends AppModel
      */
     function getCourseById($courseId)
     {
-        return $this->find('first', array('conditions' => array('Course.id' => $courseId)));
+        return $this->find('first', array(
+            'conditions' => array('Course.id' => $courseId),
+            'contain' => false
+        ));
+    }
+
+    /**
+     * getCourseById
+     *
+     * @param mixed $courseId course id
+     *
+     * @access public
+     * @return void
+     */
+    function getCourseWithInstructorsById($courseId)
+    {
+        return $this->find('first', array(
+            'conditions' => array('Course.id' => $courseId),
+            'contain' => 'Instructor'
+        ));
+    }
+
+    /**
+     * getCourseWithEnrolmentById
+     *
+     * @param mixed $courseId
+     *
+     * @access public
+     * @return void
+     */
+    function getCourseWithEnrolmentById($courseId)
+    {
+        $course = $this->find('first', array(
+            'conditions' => array('Course.id' => $courseId),
+            'contain' => array(
+                'Enrol' => array(
+                    'fields' => array('id', 'username', 'full_name', 'email', 'student_no')
+                )
+            )
+        ));
+
+        // some clean up
+        foreach ($course['Enrol'] as $key => $student) {
+            unset($course['Enrol'][$key]['UserEnrol']);
+        }
+
+        return $course;
     }
 
     /**
@@ -423,4 +533,91 @@ class Course extends AppModel
         return $this->find('first', array('conditions' => array('Course.id' => $courseId)));
     }
 
+    /**
+     * getCoursesByUserIdFilterPermission
+     *
+     * @param int    $userId     user id
+     * @param mixed  $permission filter permission
+     * @param string $type       find type
+     * @param array  $options    find options
+     *
+     * @access protected
+     * @return void
+     */
+    protected function getCoursesByUserIdFilterPermission($userId, $permission, $type = 'all', $options = array())
+    {
+        switch($permission) {
+        case Course::FILTER_PERMISSION_SUPERADMIN:
+            $courses = $this->find($type, $options);
+            break;
+        case Course::FILTER_PERMISSION_FACULTY:
+            $departmentIds = $this->Department->getIdsByUserId($userId);
+            $courses = $this->getByDepartmentIds($departmentIds, $type, $options);
+            break;
+        case Course::FILTER_PERMISSION_OWNER:
+            $options = array_merge(array('contain' => array(), 'conditions' => array()), $options);
+            $courses = $this->getCourseByInstructor($userId, $type, $options['contain'], $options['conditions']);
+            break;
+        case Course::FILTER_PERMISSION_ENROLLED:
+            $options = array_merge(array('contain' => array(), 'conditions' => array()), $options);
+            $courses = $this->getCourseByStudent($userId, $type, $options['contain'], $options['conditions']);
+            break;
+        default:
+            return array();
+        }
+
+        return $courses;
+    }
+
+    /**
+     * getAccessibleCourses get all active course that the user has access to
+     *
+     * @param int    $userId     user id
+     * @param mixed  $permission filter permission
+     * @param string $type       find type
+     * @param array  $options    find options
+     *
+     * @access public
+     * @return void
+     */
+    function getAccessibleCourses($userId, $permission, $type = 'all', $options = array())
+    {
+        $default = array('conditions' => array('record_status' => 'A'));
+        $options = array_merge($default, $options);
+        return $this->getCoursesByUserIdFilterPermission($userId, $permission, $type, $options);
+    }
+
+    /**
+     * getAllAccessibleCourses get all course that the user has access to,
+     * including inactive ones
+     *
+     * @param int    $userId     user id
+     * @param mixed  $permission filter permission
+     * @param string $type       find type
+     * @param array  $options    find options
+     *
+     * @access public
+     * @return void
+     */
+    function getAllAccessibleCourses($userId, $permission, $type = 'all', $options = array())
+    {
+        return $this->getCoursesByUserIdFilterPermission($userId, $permission, $type, $options);
+    }
+
+    /**
+     * getAccessibleCourseById get one course by course id, if user do not have
+     * access to the course, return false.
+     *
+     * @param int   $courseId   course id
+     * @param int   $userId     user id
+     * @param mixed $permission filter permission
+     * @param array $contain    contain relationship
+     *
+     * @access public
+     * @return void
+     */
+    function getAccessibleCourseById($courseId, $userId,  $permission, $contain = array())
+    {
+        return $this->getAccessibleCourses($userId, $permission, 'first', array('conditions' => array($this->alias.'.id' => $courseId), 'contain' => $contain));
+    }
 }

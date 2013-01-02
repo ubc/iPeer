@@ -161,7 +161,7 @@ class GroupsMembers extends AppModel
             $conditions['GroupsMembers.user_id !='] = $userId;
         }
 
-        return $this->find('all', array(
+        $groupMembers = $this->find('all', array(
             'conditions' => $conditions,
             'fields' => array('User.*', 'Role.*'),
             'joins' => array(
@@ -179,6 +179,14 @@ class GroupsMembers extends AppModel
                 ),
             ),
         ));
+        
+        foreach($groupMembers as $key => $member) {
+            $role = $groupMembers[$key]['Role'];
+            unset($groupMembers[$key]['Role']);
+            $groupMembers[$key]['Role']['0'] = $role;
+        }
+
+        return $groupMembers;
     }
 
 

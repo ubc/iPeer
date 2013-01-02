@@ -1,46 +1,87 @@
 <?php
 /* OauthTokens Test cases generated on: 2012-08-09 10:58:06 : 1344535086*/
-App::import('Controller', 'OauthTokens');
+App::import('Controller', 'Oauthtokens');
+App::import('Lib', 'ExtendedAuthTestCase');
 
-class TestOauthTokensController extends OauthTokensController {
-	var $autoRender = false;
+// mock instead of needing to create a new controller for every test
+Mock::generatePartial('OauthtokensController',
+    'MockOauthtokensController',
+    array('isAuthorized', 'render', 'redirect', '_stop', 'header'));
 
-	function redirect($url, $status = null, $exit = true) {
-		$this->redirectUrl = $url;
-	}
-}
+class OauthTokensControllerTestCase extends ExtendedAuthTestCase {
+    public $controller = null;
 
-class OauthTokensControllerTestCase extends CakeTestCase {
-	var $fixtures = array('app.oauth_token', 'app.user', 'app.evaluation_submission', 'app.event', 'app.event_template_type', 'app.course', 'app.group', 'app.group_event', 'app.groups_member', 'app.survey', 'app.survey_group_set', 'app.survey_group', 'app.survey_group_member', 'app.question', 'app.response', 'app.survey_question', 'app.user_course', 'app.user_tutor', 'app.user_enrol', 'app.department', 'app.faculty', 'app.course_department', 'app.penalty', 'app.user_faculty', 'app.role', 'app.roles_user', 'app.sys_parameter');
+    public $fixtures = array(
+        'app.course', 'app.role', 'app.user', 'app.group',
+        'app.roles_user', 'app.event', 'app.event_template_type',
+        'app.group_event', 'app.evaluation_submission',
+        'app.survey_group_set', 'app.survey_group',
+        'app.survey_group_member', 'app.question',
+        'app.response', 'app.survey_question', 'app.user_course',
+        'app.user_enrol', 'app.groups_member', 'app.survey',
+        'app.personalize', 'app.penalty', 'app.evaluation_simple',
+        'app.faculty', 'app.user_tutor', 'app.course_department',
+        'app.evaluation_rubric', 'app.evaluation_rubric_detail',
+        'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
+        'app.user_faculty', 'app.department', 'app.sys_parameter',
+        'app.oauth_token', 'app.rubric', 'app.rubrics_criteria',
+        'app.rubrics_criteria_comment', 'app.rubrics_lom',
+        'app.simple_evaluation', 'app.survey_input', 'app.mixevals_question',
+        'app.mixevals_question_desc', 'app.mixeval'
+    );
 
-	function startTest() {
-		$this->OauthTokens =& new TestOauthTokensController();
-		$this->OauthTokens->constructClasses();
-	}
+    function startCase() {
+        echo "Start OAuth Token controller test.\n";
+        $this->defaultLogin = array(
+            'User' => array(
+                'username' => 'root',
+                'password' => md5('ipeeripeer')
+            )
+        );
+    }
 
-	function endTest() {
-		unset($this->OauthTokens);
-		ClassRegistry::flush();
-	}
+    function endCase() {
+    }
 
-	function testIndex() {
+    function startTest($method) {
+        echo $method.TEST_LB;
+        $this->controller = new MockOauthtokensController();
+    }
 
-	}
+    public function endTest($method)
+    {
+        // defer logout to end of the test as some of the test need check flash
+        // message. After logging out, message is destoryed.
+        if (isset($this->controller->Auth)) {
+            $this->controller->Auth->logout();
+        }
+        unset($this->controller);
+        ClassRegistry::flush();
+    }
 
-	function testView() {
+    public function getController()
+    {
+        return $this->controller;
+    }
 
-	}
+    function testIndex() {
 
-	function testAdd() {
+    }
 
-	}
+    function testView() {
 
-	function testEdit() {
+    }
 
-	}
+    function testAdd() {
 
-	function testDelete() {
+    }
 
-	}
+    function testEdit() {
+
+    }
+
+    function testDelete() {
+
+    }
 
 }

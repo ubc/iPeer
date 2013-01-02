@@ -89,7 +89,7 @@ class ExportComponent extends Object
             $header .= !empty($params['export_date']) ? $params['export_date']."\n":'';
             foreach ($params['instructors'] as $instructor) {
                 $instructor = $instructor['User'];
-                $header .= $instructor['first_name'].' '.$instructor['last_name']."\n";
+                $header .= $instructor['full_name']."\n";
             }
             $header .= '************************************************************************'."\n";
             return  $header;
@@ -190,6 +190,7 @@ class ExportComponent extends Object
                 $userId = $groupMember;
                 $student = $this->User->findById($userId);
                 $data[$i]['students'][$j]['student_id'] = $student['User']['student_no'];
+                $data[$i]['students'][$j]['full_name'] = $student['User']['full_name'];
                 $data[$i]['students'][$j]['first_name'] = $student['User']['first_name'];
                 $data[$i]['students'][$j]['last_name'] = $student['User']['last_name'];
                 $data[$i]['students'][$j]['email'] = $student['User']['email'];
@@ -199,7 +200,7 @@ class ExportComponent extends Object
                     $comments = $this->EvaluationSimple->getAllComments($groupEventId, $userId);
                     $data[$i]['students'][$j]['comments'] = '';
                     foreach ($comments as $comment) {
-                        $data[$i]['students'][$j]['comments'] .= $comment['EvaluationSimple']['eval_comment'].'; ';
+                        $data[$i]['students'][$j]['comments'] .= $comment['EvaluationSimple']['comment'].'; ';
                     }
                     $data[$i]['students'][$j]['score'] = '';
                     $score_tmp = $this->EvaluationSimple->getReceivedTotalScore($groupEventId, $userId);
@@ -229,7 +230,7 @@ class ExportComponent extends Object
                     $data[$i]['students'][$j]['comments'] = '';
                     $comments = $this->EvaluationRubric->getAllComments($groupEventId, $userId);
                     foreach ($comments as $comment) {
-                        $data[$i]['students'][$j]['comments'] .= $comment['EvaluationRubric']['general_comment'].'; ';
+                        $data[$i]['students'][$j]['comments'] .= $comment['EvaluationRubric']['comment'].'; ';
                     }
                     break;
                 case 4://mixeval
@@ -244,7 +245,7 @@ class ExportComponent extends Object
                     //then we sample index 0 of the userResults array to just get the number of numeric questions. Then we can make column headers for each question (1,2,3...)
                     global $mixedEvalNumeric;
                     $nameArray = $this->User->findById($userId);
-                    $name=$nameArray['User']['first_name'] . ' ' . $nameArray['User']['last_name'];
+                    $name = $nameArray['User']['full_name'];
                     $mixedEvalNumeric .= "\n".$name . "," . $data[$i]['group_name'] . "\n";
                     $tempEvaluatee = '';
                     $counter = 0;
@@ -273,9 +274,9 @@ class ExportComponent extends Object
                         if (!empty($results)) {
                             //Set some variables that hold the USER data for the evaluator and evaluatee, then set the names for convenience
                             $evaluatorArray = $this->User->find('all', array('conditions' => array('User.id' => $results[0]['EvaluationMixeval']['evaluator'])));
-                            $evaluatorName = $evaluatorArray[0]['User']['first_name'] . ' ' . $evaluatorArray[0]['User']['last_name'];
+                            $evaluatorName = $evaluatorArray[0]['User']['full_name'];
                             $evaluateeArray = $this->User->find('all', array('conditions' => array('User.id' => $results[0]['EvaluationMixeval']['evaluatee'])));
-                            $evaluateeName = $evaluateeArray[0]['User']['first_name'] . ' ' . $evaluateeArray[0]['User']['last_name'];
+                            $evaluateeName = $evaluateeArray[0]['User']['full_name'];
 
                             //The $userResults variable is a long list of entries for EVERY evaluatee. If the evaluator changes, it means we are on a new 'survey' created by a different person.
                             //Then we want to add a new line to our numeric data variable.
@@ -321,7 +322,7 @@ class ExportComponent extends Object
     {
         $content = '';
         //sloppy code... sorry...
-        $fields = array('group_status','group_names','student_first','student_last','student_id','student_id','criteria_marks','general_comments');
+        $fields = array('group_status','group_names','student_first','student_last','student_id','student_id','criteria_marks','comment');
         $hasContent=false;
         for ($i=0; $i<count($fields); $i++) {
             if (!empty($params['form']['include_'.$fields[$i]])) {

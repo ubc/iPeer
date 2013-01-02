@@ -10,7 +10,9 @@
   // CSS files
   echo $html->css('datepicker');
   echo $html->css('jquery.dataTables');
-  echo $html->css('http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/jquery-ui.css');
+  echo $html->css('https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/jquery-ui.css');
+  echo $html->css('https://fonts.googleapis.com/css?family=Lato:400,400italic,700');
+  echo $html->css('https://fonts.googleapis.com/css?family=Open+Sans:400,600,700');
   echo $html->css('ipeer');
 
   // Scripts
@@ -51,7 +53,11 @@
   <!-- TITLE BAR -->
   <h1 class='title'>
     <?php echo $html->image('layout/icon_ipeer_logo.gif',array('alt'=>'icon_ipeer_logo'))?>
-    <?php echo $title_for_layout;?>
+    <?php if (isset($breadcrumb)): ?>
+        <?php echo $breadcrumb->render($html); ?>
+    <?php else: ?>
+        <?php echo $title_for_layout;?>
+    <?php endif; ?>
   </h1>
   <!-- ERRORS -->
   <?php echo $this->Session->flash(); ?>

@@ -28,7 +28,7 @@ class SimpleEvaluation extends EvaluationBase
             'finderSql'   => ''
         ),
     );
-    
+
     public $validate = array(
         'availability' => array(
             'rule' => 'notEmpty',
@@ -36,4 +36,13 @@ class SimpleEvaluation extends EvaluationBase
         )
     );
 
+    public function getEvaluation($id)
+    {
+        $eval = $this->find('first', array('conditions' => array($this->alias.'.id' => $id), 'contain' => false));
+        if ($eval) {
+            $eval['Question'] = array();
+        }
+
+        return $eval;
+    }
 }

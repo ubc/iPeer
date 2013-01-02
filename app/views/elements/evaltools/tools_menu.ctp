@@ -7,69 +7,37 @@
  * @param $name              name
  */
 function generateLink ($view, $url, $name) {
+    $current = $view->params['controller'] == $url ? "class='current'" : "";
     $url = $view->webroot . $view->theme . $url;
-    $current = $view->params['controller'] ? "id='current'" : "";
     echo "<li $current><a href='$url'>$name</a></li>";
 }
 ?>
 
-<div id="nav">
+<div class="evaltoolsnav">
     <ul>
         <!-- Sub menu for Evaluation Event Tools -->
-        <?php if (User::hasPermission('controllers/evaltools')) { 
-            generateLink(
-                $this,
-                'evaltools',
-                'All My Tools'
-            );
-            echo "|";
-        }?>
-        <?php if (User::hasPermission('controllers/simpleevaluations')) {
-            generateLink(
-                $this,
-                'simpleevaluations',
-                'Simple Evaluations'
-            );
-            echo "|";
-        }?>
-        <?php if (User::hasPermission('controllers/rubrics')) {
-            generateLink(
-                $this,
-                'rubrics',
-                'Rubrics'
-            );
-            echo "|";
-        }?>
-        <?php if (User::hasPermission('controllers/mixevals')) {
-            generateLink(
-                $this,
-                'mixevals',
-                'Mixed Evaluations'
-            );
-            echo "|";
-        }?>
-        <?php if (User::hasPermission('controllers/surveys')) {
-            generateLink(
-                $this,
-                'surveys',
-                'Surveys'
-            );
-            echo "|";
-        }?>
-        <?php if (User::hasPermission('controllers/emailer')) {
-            generateLink(
-                $this,
-                'emailer',
-                'Emailer'
-            );
-            echo "|";
-        }?>
-        <?php if (User::hasPermission('controllers/emailtemplates')) {
-            generateLink(
-                $this,
-                'emailtemplates',
-                'Email Templates'
-            );
-        }?>
+<?php 
+if (User::hasPermission('controllers/evaltools')) { 
+    generateLink($this, 'evaltools', 'All My Tools');
+}
+if (User::hasPermission('controllers/simpleevaluations')) {
+    generateLink($this, 'simpleevaluations', 'Simple Evaluations');
+}
+if (User::hasPermission('controllers/rubrics')) {
+    generateLink($this, 'rubrics', 'Rubrics');
+}
+if (User::hasPermission('controllers/mixevals')) {
+    generateLink($this, 'mixevals', 'Mixed Evaluations');
+}
+if (User::hasPermission('controllers/surveys')) {
+    generateLink($this, 'surveys', 'Surveys');
+}
+if (User::hasPermission('controllers/emailer')) {
+    generateLink($this, 'emailer', 'Emailer');
+}
+if (User::hasPermission('controllers/emailtemplates')) {
+    generateLink($this, 'emailtemplates', 'Email Templates');
+}
+?>
     </ul>
 </div>

@@ -3,8 +3,8 @@
 $status = isset($status) ? $status : '';
 ?>
 
-<table><tr align="center">
-    <td align="center">
+<table class="group-list-chooser"><tr align="center">
+    <td>
       <h3><?php echo isset($allName) ? $allName : ''?></h3>
       <?php echo $this->Form->input('source', array('options' => $all,
                                                     'multiple' => true,
@@ -17,27 +17,31 @@ $status = isset($status) ? $status : '';
                                                     'id' => 'all_groups',
                                                     'style' => $listStyle));?>
     </td>
-    <td width="100" align="center">
-        <input type="button" style="width:100px;" onClick="itemMove($('all_groups'), $('selected_groups'))" value="<?php __('Assign')?> >>" <?php echo $status ?>/>
-        <br><br>
-        <input type="button" style="width:100px;" onClick="itemMove($('selected_groups'), $('all_groups'))" value="<< <?php __('Remove')?> " <?php echo $status ?> />
+
+    <td class='middle-column'>
+        <input type="button" onClick="itemMove($('all_groups'), $('selected_groups'))" value="<?php __('Assign')?> >>" <?php echo $status ?>/>
+        <input type="button" onClick="itemMove($('selected_groups'), $('all_groups'))" value="<< <?php __('Remove')?> " <?php echo $status ?> />
+        <div><?php !empty($status) ? __('There has been submissions in this group. Changing group members may cause data integrity issue.') : ''?></div>
     </td>
-    <td align="center">
+
+    <td>
       <h3><?php echo isset($selectedName) ? $selectedName : ''?></h3>
       <?php
         $options = array(
-              		 'style' => $listStyle,
-                     'div' => false,
-                     'label' => false,
-                     'before' => '',
-                     'after' => '',
-                     'separator' => '',
-                     'between' => '',
-                     'id' => 'selected_groups' );
-        if(isset($assigned))
+            'style' => $listStyle,
+            'div' => false,
+            'label' => false,
+            'before' => '',
+            'after' => '',
+            'separator' => '',
+            'between' => '',
+            'id' => 'selected_groups' );
+        if (isset($assigned)) {
           $options['options'] = $assigned;
+        }
 
         echo $this->Form->input('Member.Member', $options);
       ?>
     </td>
-</tr></table>
+</tr>
+</table>

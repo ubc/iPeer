@@ -1,3 +1,4 @@
+<h2><?php echo $name; ?></h2>
 <div id='SurveyResults'>
 <?php
 $ques_num = 1;
@@ -43,21 +44,25 @@ foreach ($questions as $ques) {
     } else if ($ques['Question']['type'] == 'S') {
         echo '<h3>'.$ques_num.') '.$ques['Question']['prompt'].'</h3>';
         // response is given
-        if (isset($answers[$ques['Question']['id']])) {
-            echo '<p><i>'.$answers[$ques['Question']['id']]['0']['SurveyInput']['response_text'].'</i></p>';
+        if (isset($answers[$ques['Question']['id']]) &&
+            !empty($answers[$ques['Question']['id']]['0']['SurveyInput']['response_text'])
+        ) {
+            echo '<p>'.$answers[$ques['Question']['id']]['0']['SurveyInput']['response_text'].'</p>';
         // no response
         } else {
-            echo '<p>NO RESPONSE</p>';
+            echo '<p class="noanswer">-- No Answer --</p>';
         }
         $ques_num++;
     } else if ($ques['Question']['type'] == 'L') {
         echo '<h3>'.$ques_num.') '.$ques['Question']['prompt'].'</h3>';
         // response is given
-        if (isset($answers[$ques['Question']['id']])) {
-            echo '<p><i>'.$answers[$ques['Question']['id']]['0']['SurveyInput']['response_text'].'</i></p>';
+        if (isset($answers[$ques['Question']['id']]) && 
+            !empty($answers[$ques['Question']['id']]['0']['SurveyInput']['response_text'])
+        ) {
+            echo '<pre>'.$answers[$ques['Question']['id']]['0']['SurveyInput']['response_text'].'</pre>';
         // no response
         } else {
-            echo '<p>NO RESPONSE</p>';
+            echo '<p class="noanswer">-- No Answer --</p>';
         }
         $ques_num++;
     }

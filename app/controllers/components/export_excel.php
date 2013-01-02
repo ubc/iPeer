@@ -42,7 +42,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
         $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
         $this->User = ClassRegistry::init('User');
-        $this->Penalty = ClassRegistry::init('Penalty'); 
+        $this->Penalty = ClassRegistry::init('Penalty');
     }
 
     /**
@@ -172,11 +172,10 @@ Class ExportExcelComponent extends ExportBaseNewComponent
             // Insert Evaluatee Average Mark; if neccessary.
             $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, $yPosition, $resultRowArray);
             if (!empty($params['include_final_marks'])) {
-                //$submissionCount = $this->EvaluationSubmission->countSubmissions($grpEventId);
                 if ($submitterCount > 0) {
                     $aveScore = $totalScore/$submitterCount;
                     $grid[$xPosition + count($groupMembers) + 1][$yPosition] = number_format($aveScore, 2);
-                    $submission = $this->EvaluationSubmission->find('first', array('conditions' => array('EvaluationSubmission.grp_event_id' => $grpEventId, 'EvaluationSubmission.submitter_id' => $evaluatee['id'])));
+                    $submission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($grpEventId, $evaluatee['id']);
                     $due_date = strtotime($submission['Event']['due_date']);
                     $event_end = strtotime($submission['Event']['release_date_end']);
                     $sub_date = strtotime($submission['EvaluationSubmission']['date_submitted']);
@@ -200,7 +199,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                     $penaltyPercent  = $penalty['Penalty']['percent_penalty'];
                     $penaltyPercent > 0 ?  $perPenalty =  '-'.$penaltyPercent.'%' : $perPenalty = '--';
                     $final = number_format($aveScore * (1 - $penaltyPercent / 100), 2);
-                    
+
                     $grid[$xPosition + count($groupMembers) + 2][$yPosition] = $perPenalty;
                     $grid[$xPosition + count($groupMembers) + 3][$yPosition] = $final;
                 }
@@ -254,11 +253,11 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         // Insert evaluators' comment
         $eventType == 'S' ? ($evalResults = $this->EvaluationSimple->getResultsByEvaluatee($grpEventId, $evaluateeId, true)) &&
             ($evalType = 'EvaluationSimple') &&
-            ($commentType = 'eval_comment')
+            ($commentType = 'comment')
             :
             ($evalResults = $this->EvaluationRubric->getResultsByEvaluatee($grpEventId, $evaluateeId, true)) &&
             ($evalType = 'EvaluationRubric') &&
-            ($commentType = 'general_comment');
+            ($commentType = 'comment');
         $yRowPosition = 2;
         for ($i=0; $i<count($groupMembers); $i++) {
             $evaluator = $groupMembers[$i];
@@ -345,7 +344,6 @@ Class ExportExcelComponent extends ExportBaseNewComponent
                 $totalScore += $result;
             }
             array_push($row, ' ');
-            // $sumbissionCount = $this->EvaluationSubmission->countSubmissions($grpEventId);
             $submissionCount > 0 ? $questionAvg = $totalScore/$submissionCount :
                 $questionAvg = 0;
             array_push($row, number_format($questionAvg, 2));
@@ -359,7 +357,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         if (!empty($params['include_final_marks'])) {
             $grid[$xPosition + count($groupMembers) + 3][$yPosition + 2] = "Final Mark";
             $grid[$xPosition + count($groupMembers) + 4][$yPosition + 2] = number_format($finalMark, 2);
-            $submission = $this->EvaluationSubmission->find('first', array('conditions' => array('EvaluationSubmission.grp_event_id' => $grpEventId, 'EvaluationSubmission.submitter_id' => $evaluatee)));
+            $submission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($grpEventId, $evaluatee);
             $due_date = strtotime($submission['Event']['due_date']);
             $event_end = strtotime($submission['Event']['release_date_end']);
             $sub_date = strtotime($submission['EvaluationSubmission']['date_submitted']);
@@ -383,7 +381,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
             $penaltyPercent  = $penalty['Penalty']['percent_penalty'];
             $penaltyPercent > 0 ?  $perPenalty =  '-'.$penaltyPercent.'%' : $perPenalty = '--';
             $final = number_format($finalMark * (1 - $penaltyPercent / 100), 2);
-            
+
             $grid[$xPosition + count($groupMembers) + 3][$yPosition + 3] = "Penalty";
             $grid[$xPosition + count($groupMembers) + 4][$yPosition + 3] = $perPenalty;
             $grid[$xPosition + count($groupMembers) + 3][$yPosition + 4] = "Final Mark";
@@ -472,7 +470,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         if (!empty($params['include_final_marks'])) {
             $grid[$xPosition][$yPosition + count($questions)] = "Raw Total";
             $grid[$xPosition + 1][$yPosition + count($questions)] = $finalMark;
-            $submission = $this->EvaluationSubmission->find('first', array('conditions' => array('EvaluationSubmission.grp_event_id' => $grpEventId, 'EvaluationSubmission.submitter_id' => $evaluatee)));
+            $submission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($grpEventId, $evaluatee);
             $due_date = strtotime($submission['Event']['due_date']);
             $event_end = strtotime($submission['Event']['release_date_end']);
             $sub_date = strtotime($submission['EvaluationSubmission']['date_submitted']);
@@ -496,7 +494,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
             $penaltyPercent  = $penalty['Penalty']['percent_penalty'];
             $penaltyPercent > 0 ?  $perPenalty =  '-'.$penaltyPercent.'%' : $perPenalty = '--';
             $final = number_format($finalMark * (1 - $penaltyPercent / 100), 2);
-            
+
             $grid[$xPosition][$yPosition + count($questions) + 1] = "Penalty";
             $grid[$xPosition + 1][$yPosition + count($questions) + 1] = $perPenalty;
             $grid[$xPosition][$yPosition + count($questions) + 2] = "Final Mark";
@@ -539,7 +537,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         $grid = $this->ExportHelper2->buildExporterGrid($gridDimensionX, $gridDimensionY);
         // Fill in the questions
         $questionNum = 1; $questionYPos = 2; $xPosition = 2;
-        
+
         foreach ($questions as $q) {
             $this->ExportHelper2->repeatDrawByCoordinateVertical($grid, $xPosition, $questionYPos, $sectionSpacing, $groupCount,
                 "Question ".$questionNum.": ".$q['MixevalsQuestion']['title']);
@@ -618,21 +616,20 @@ Class ExportExcelComponent extends ExportBaseNewComponent
      * @access public
      * @return void
      */
-    function createExcel($params, $eventId)
+    function createExcel($params, $event)
     {
         // Prepare header.
-        $header = $this->generateHeader2($params, $eventId, 'fsa');
+        $header = $this->generateHeader2($params, $event, 'fsa');
         $this->_drawToExcelSheetAtCoordinates($header, $this->cursor['x'], $this->cursor['y']);
         $this->_setFontSizeVertically(1, count($header[0])-1, 'A', 16);
         $this->cursor['y'] += (count($header[0]));
-        $groupEvents = $this->GroupEvent->getGroupEventByEventId($eventId);
-        $event = $this->Event->getEventById($eventId);
+        $groupEvents = $event['GroupEvent'];
         switch($event['Event']['event_template_type_id']){
-            // Simple Evaluation
         case 1 :
+            // Simple Evaluation
             for ($i=0; $i<count($groupEvents); $i++) {
-                $group = $this->Group->getGroupByGroupId($groupEvents[$i]['GroupEvent']['group_id']);
-                $grpEventId = $groupEvents[$i]['GroupEvent']['id'];
+                $group = $this->Group->getGroupByGroupId($groupEvents[$i]['group_id']);
+                $grpEventId = $groupEvents[$i]['id'];
                 $groupMembers = $this->GroupEvent->getGroupMembers($grpEventId);
                 $groupMembersNoTutors = $this->ExportHelper2->getGroupMemberWithoutTutorsHelper($grpEventId);
                 if (!empty($params['include_group_names'])) {

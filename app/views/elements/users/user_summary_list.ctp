@@ -16,7 +16,7 @@ if (isset($data['id'])) {
 }
 ?>
 
-<table class="user-list-table">
+<table class='standardtable'>
     <tr>
     <?php 
     foreach($columns as $k => $v) {

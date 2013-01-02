@@ -19,11 +19,6 @@ class HomeController extends AppController
         'User', 'UserCourse', 'Event', 'EvaluationSubmission',
         'Course', 'Role', 'UserEnrol', 'Rubric', 'Penalty');
 
-    public $page;
-    public $Sanitize;
-    public $functionCode = 'HOME';
-    public $components = array( 'Auth', 'Acl', 'Output');
-
     /**
      * __construct
      *
@@ -32,7 +27,6 @@ class HomeController extends AppController
      */
     function __construct()
     {
-        $this->Sanitize = new Sanitize;
         $this->set('title_for_layout', __('Home', true));
         parent::__construct();
     }
@@ -46,234 +40,157 @@ class HomeController extends AppController
      */
     function index()
     {
-        //General Home Rendering for Admin
-        if (User::hasPermission('functions/superadmin')) {
-            $course_list = $this->Course->find('all');
+        if (User::hasPermission('functions/coursemanager')) {
+            // Admins and profs
+            $course_list = $this->Course->getAllAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'all', array('contain' => array('Event', 'Instructor')));
             $this->set('course_list', $this->_formatCourseList($course_list));
-        // admins
-        } else if (User::hasPermission('controllers/departments')) {
-            $course_list = User::getMyDepartmentsCourseList('all');
-            $this->set('course_list', $this->_formatCourseList($course_list));
-        // students & tutors
-        } else if (User::hasPermission('functions/onlytakeeval')) {
-            $this->redirect('studentIndex');
-        // instructors
-        } else {
-            $course_list = $this->Course->getCourseByInstructor($this->Auth->user('id'));
-            $this->set('course_list', $this->_formatCourseList($course_list));
+            return;
         }
-    }
-    
-    /**
-     * studentIndex
-     *
-     *
-     * @access public
-     * @return void
-     */
-     function studentIndex() {
-        $this->set('data', $this->_preparePeerEvals());
-        $this->set('userId', $this->Auth->user('id'));
-     }
 
+        // Student and tutor
+        $events = $this->Event->getEventsByUserId(User::get('id'));
 
-    /**
-     * preparePeerEvals
-     *
-     *
-     * @access public
-     * @return void
-     */
-    function _preparePeerEvals()
-    {
-        $curUserId = $this->Auth->user('id');
-        $eventAry = array();
-        $pos = 0;
-        $user = $this->User->findById($this->Auth->user('id'));
-        $roleId = $user['Role'][0]['id'];
-        if ($roleId == 5) {
-            //Get enrolled courses
-            $enrol = $user['Enrolment'];
-            foreach ($enrol as $enrolledCourse) {
-                $courseId = $enrolledCourse['UserEnrol']['course_id'];
-                //$courseDetail = $this->Course->find('id='.$courseId);
-                //Get Events for this course that are due
-                $evals = $this->Event->find(
-                    'all', 
-                    array(
-                        'conditions' => array(
-                            'release_date_begin < NOW()', 
-                            'NOW() <= result_release_date_end', 
-                            'course_id' => $courseId,
-                            'NOT' => array('event_template_type_id' => 3)
-                )));
-                $surveys = $this->Event->find(
-                    'all', 
-                    array(
-                        'conditions' => array(
-                            'course_id' => $courseId,
-                            'event_template_type_id' => 3
-                )));
-                $events = array_merge($evals, $surveys);
-                foreach ($events as $row) {
-                    $event = $row['Event'];
-                    switch ($event['event_template_type_id']) {
-                    case 3:
-                        //Survey
-                        $survey = $this->_getSurveyEvaluation($courseId, $event, $curUserId);
-                        if ($survey!=null) {
-                            $eventAry[$pos] = $survey;
-                            $pos++;
-                        }
-                        break;
-                    default:
-                        //Simple, Rubric and Mixed Evaluation
-                        $evaluation = $this->_getEvaluation($curUserId, $event);
-                        if ($evaluation!=null) {
-                            $eventAry[$pos] = $evaluation;
-                            $pos++;
-                        }
-                        break;
-                    }
+        // mark events as late if past due date
+        foreach ($events as &$type) {
+            foreach ($type as &$event) {
+                if ($event['Event']['due_in'] > 0) {
+                    $event['late'] = false;
+                    continue;
+                }
+                $event['late'] = true;
+            }
+        }
+
+        // determine the proper penalty to be applied to a late eval
+        foreach ($events['Evaluations'] as &$event) {
+            if (!$event['late'] || empty($event['Penalty'])) {
+                continue;
+            }
+            // convert seconds to days
+            $daysLate = abs($event['Event']['due_in']) / 86400;
+            $pctPenalty = 0;
+            foreach ($event['Penalty'] as $penalty) {
+                $pctPenalty = $penalty['percent_penalty'];
+                if ($penalty['days_late'] > $daysLate) {
+                    break;
                 }
             }
-        } else if ($roleId == 4) {
-            //Get assigned courses
-            $courses = $user['Tutor'];
-            foreach ($courses as $assignedCourse) {
-                $courseId = $assignedCourse['id'];
-                $events = $this->Event->find('all', array('conditions' => array('release_date_begin < NOW()', 'NOW() <= result_release_date_end', 'course_id' => $courseId)));
-                foreach ($events as $row) {
-                    $event = $row['Event'];
-                    switch ($event['event_template_type_id']) {
-                    case 3:
-                        //Survey
-                        $survey = $this->_getSurveyEvaluation($courseId, $event, $curUserId);
-                        if ($survey!=null) {
-                            $eventAry[$pos] = $survey;
-                            $pos++;
-                        }
-                        break;
-                    default:
-                        //Simple, Rubric and Mixed Evaluation
-                        $evaluation = $this->_getEvaluation($curUserId, $event);
-                        if ($evaluation!=null) {
-                            $eventAry[$pos] = $evaluation;
-                            $pos++;
-                        }
-                        break;
-                    }
-                }
+            $event['percent_penalty'] = $pctPenalty;
+        }
+
+        // format the 'due in' time interval for display
+        foreach ($events as &$types) {
+            foreach ($types as &$event) {
+                $event['Event']['due_in'] = $this->_formatDueIn(
+                    abs($event['Event']['due_in']));
             }
         }
-        return $eventAry;
-    }
 
+        // remove non-current events and split into upcoming/submitted/expired
+        $evals = $this->_splitSubmittedEvents($events['Evaluations']);
+        $surveys = $this->_splitSubmittedEvents($events['Surveys']);
+
+        // calculate summary statistics
+        $numOverdue = 0;
+        $numDue = 0;
+        $numDue = sizeof($evals['upcoming']) + sizeof($surveys['upcoming']);
+        // only evals can have overdue events right now
+        foreach ($evals['upcoming'] as $e) {
+            $e['late'] ? $numOverdue++ : '';
+        }
+
+
+        $this->set('evals', $evals);
+        $this->set('surveys', $surveys);
+        $this->set('numOverdue', $numOverdue);
+        $this->set('numDue', $numDue);
+        $this->render('studentIndex');
+    }
 
     /**
-     * _getEvaluation
-     *
-     * @param mixed $userId user id
-     * @param bool  $event  event
-     *
-     * @access public
-     * @return void
-     */
-    function _getEvaluation($userId, $event=null)
+     * Take the due interval, which is in seconds, and format
+     * it something that's easier for users to read.
+     * */
+    private function _formatDueIn($seconds)
     {
-        $result = null;
-        $groupsEvents = $this->GroupEvent->getGroupEventByUserId($userId, $event['id']);
-        foreach ($groupsEvents as $row) {
-            $groupEvent = $row['GroupEvent'];
-            $group = $this->Group->findGroupByid($groupEvent['group_id']);
-
-            // get corresponding evaluation submission that is not submitted
-            $isSubmitted = false;
-            $eventSubmit = $this->EvaluationSubmission->find('first', array( 'conditions'=>array( 'grp_event_id'=>$groupEvent['id'], 'submitter_id'=>$userId)));
-            if ($eventSubmit['EvaluationSubmission']['submitted']) {
-                $isSubmitted = true;
-            }
-            // get due date of event in days or number of days late
-            $diff = $this->framework->getTimeDifference($event['due_date'], $this->framework->getTime());
-            $isLate = ($diff < 0);
-            $dueIn = abs(floor($diff));
-            // if eval submission is not submitted or doesn't exist, output
-            if (!$isSubmitted) {
-                $result['comingEvent']['Event'] = $event;
-                $result['comingEvent']['Event']['is_late'] = $isLate;
-                $result['comingEvent']['Event']['days_to_due'] = $dueIn;
-                $result['comingEvent']['Event']['group_id'] = $groupEvent['group_id'];
-                $result['comingEvent']['Event']['group_name'] = $group['Group']['group_name'];
-                $result['comingEvent']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
-
-                if ($isLate) {
-                    $penalty = $this->Penalty->find('first', array(
-                        'conditions' => array('event_id' => $event['id'], 'OR' => array(
-                            array('days_late' => $dueIn), array('days_late <' => 0))),
-                        'order' => array('days_late DESC')));
-                    $result['comingEvent']['Event']['penalty'] = $penalty['Penalty']['percent_penalty'];
-                }
-
-            } else {
-                $result['eventSubmitted']['Event'] = $event;
-                $result['eventSubmitted']['Event']['is_late'] = $isLate;
-                $result['eventSubmitted']['Event']['date_submitted'] = $eventSubmit['EvaluationSubmission']['date_submitted'];
-                $result['eventSubmitted']['Event']['group_id'] = $groupEvent['group_id'];
-                $result['eventSubmitted']['Event']['group_name'] = $group['Group']['group_name'];
-                $result['eventSubmitted']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
-            }
+        $ret = "";
+        if ($seconds > 86400) {
+            $ret = round($seconds / 86400, 1) . __(' days', true);
         }
-        return $result;
+        elseif ($seconds < 3600) {
+            $minutes = (int) ($seconds / 60);
+            $seconds = $seconds % 60;
+            $ret = $minutes . __(' minutes ', true) . $seconds
+                . __(' seconds', true);
+        }
+        else {
+            $hours = (int) ($seconds / 3600);
+            $minutes = (int) ($seconds % 3600 / 60);
+            $ret = $hours . __(' hours ', true) . $minutes .
+                __(' minutes', true);
+        }
+        return $ret;
     }
-
 
     /**
-     * _getSurveyEvaluation
+     * Helper to filter events into 3 different categories and to
+     * discard inactive events.
      *
-     * @param mixed $courseId course id
-     * @param bool  $event    event
-     * @param bool  $userId   user id
+     * The 3 categories are: Upcoming, Submitted, Expired
      *
-     * @access public
-     * @return void
-     */
-    function _getSurveyEvaluation($courseId, $event = null, $userId=null)
+     * - Upcoming are events that the user can still make submissions for.
+     * - Submitted are events that the user has already made a submission.
+     * - Expired are events that the user hasn't made and can no longer make
+     * submissions, but they can still view results from their peers.
+     *
+     * An evaluation is considered inactive once past its result release
+     * period. A survey is considered inactive once past its release period.
+     *
+     * @param array $events - list of events info returned from the event model,
+     *  each event MUST have an 'EvaluationSubmission' array or this won't work
+     *
+     * @return Discard inactive events and then split the remaining events
+     * into upcoming, submitted, and expired.
+     * */
+    private function _splitSubmittedEvents($events)
     {
-        $result = null;
-        $surveyEvents = $this->Event->getActiveSurveyEvents($courseId);
-
-        foreach ($surveyEvents as $row) {
-            // get corresponding evaluation submission that is not submitted
-            $isSubmitted = false;
-            $eventSubmit = $this->EvaluationSubmission->find('event_id='.$event['id'].' AND submitter_id='.$userId);
-
-            if ($eventSubmit['EvaluationSubmission']['submitted']) {
-                $isSubmitted = true;
+        $submitted = $upcoming = $expired = array();
+        foreach ($events as $event) {
+            if (empty($event['EvaluationSubmission']) &&
+                $event['Event']['is_released']
+            ) { // can only take surveys during the release period
+                $upcoming[] = $event;
             }
-
-            // get due date of event in days or number of days late
-            $diff = $this->framework->getTimeDifference($event['due_date'], $this->framework->getTime());
-            $isLate = ($diff < 0);
-            $dueIn = abs(floor($diff));
-
-            // if eval submission is not submitted or doesn't exist, output
-            if (!$isSubmitted) {
-                $result['comingEvent']['Event'] = $event;
-                $result['comingEvent']['Event']['is_late'] = $isLate;
-                $result['comingEvent']['Event']['days_to_due'] = $dueIn;
-                $result['comingEvent']['Event']['group_name'] = '-';
-                $result['comingEvent']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
-            } else {
-                $result['eventSubmitted']['Event'] = $event;
-                $result['comingEvent']['Event']['is_late'] = $isLate;
-                $result['eventSubmitted']['Event']['date_submitted'] = $eventSubmit['EvaluationSubmission']['date_submitted'];
-                $result['eventSubmitted']['Event']['group_name'] = '-';
-                $result['eventSubmitted']['Event']['course'] = $this->sysContainer->getCourseName($event['course_id'], $this->User->USER_TYPE_STUDENT);
+            else if (!empty($event['EvaluationSubmission']) &&
+                strtotime('NOW') <
+                strtotime($event['Event']['result_release_date_end'])
+            ) { // has submission and can or will be able to view results soon
+                // note that we're not using is_released or is_result_released
+                // because of an edge case where if there is a period of time
+                // between the release and result release period, the evaluation
+                // will disappear from view
+                $submitted[] = $event;
+            }
+            else if (!empty($event['EvaluationSubmission']) &&
+                $event['Event']['is_released']
+            ) {
+                // special case for surveys, which doesn't have
+                // result_release_date_end
+                $submitted[] = $event;
+            }
+            else if (empty($event['EvaluationSubmission']) &&
+                strtotime('NOW') <
+                strtotime($event['Event']['result_release_date_end'])
+            ) { // student did not do the survey within the allowed time
+                // but we should still let them view results
+                $expired[] = $event;
             }
         }
-        return $result;
+        return array('upcoming' => $upcoming,
+            'submitted' => $submitted,
+            'expired' => $expired
+        );
     }
-
 
     /**
      * _formatCourseList

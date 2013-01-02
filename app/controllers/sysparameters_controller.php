@@ -84,15 +84,8 @@ class SysParametersController extends AppController
      * @access public
      * @return void
      */
-    function index($message='')
+    function index()
     {
-        // Make sure the present user has permission
-        if (!User::hasPermission('controllers/sysparameters')) {
-            $this->Session->setFlash('You do not have permission to view system parameters', true);
-            $this->redirect('/home');
-        }
-        // Set the top message
-        $this->set('message', $message);
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
         // Set the display list
@@ -140,16 +133,11 @@ class SysParametersController extends AppController
      */
     function add()
     {
-        if (empty($this->data)) {
-            $this->render();
+        if ($this->SysParameter->save($this->params['data'])) {
+            $this->Session->setFlash(__('The record is saved successfully', true), 'good');
+            $this->redirect('index');
         } else {
-            if ($this->SysParameter->save($this->params['data'])) {
-                $message = __('The record is saved successfully', true);
-                $this->redirect('sysparameters/index/'.$message);
-            } else {
-                $this->set('data', $this->data);
-                $this->render('edit');
-            }
+            $this->Session->setFlash(__('Failed to save the record', true));
         }
     }
 
@@ -161,21 +149,19 @@ class SysParametersController extends AppController
      * @access public
      * @return void
      */
-    function edit($id=null)
+    function edit($id)
     {
         if (empty($this->data)) {
             $this->SysParameter->id = $id;
             $this->data = $this->SysParameter->read();
             $this->set('data', $this->data);
-            $this->render();
         } else {
             if ($this->SysParameter->save($this->data)) {
-                $this->Session->setFlash(__('The record is edited successfully.', true));
+                $this->Session->setFlash(__('The record is edited successfully.', true), 'good');
                 $this->redirect('index');
             } else {
                 $this->Session->setFlash($this->SysParameter->errorMessage, true);
                 $this->set('data', $this->data);
-                $this->render();
             }
         }
     }

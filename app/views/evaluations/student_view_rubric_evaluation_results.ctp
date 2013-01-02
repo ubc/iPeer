@@ -1,34 +1,45 @@
-<table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
-  <tr>
+<?php echo $this->element('evaluations/view_event_info', array('controller'=>'evaluations', 'event'=>$event));?>
+
+<h2><?php __('Summary')?></h2>
+
+<table class="standardtable">
+<tr><th><?php __('Rating')?></th></tr>
+<tr>
     <td>
+    <?php
+    isset($scoreRecords[User::get('id')]['grade_released'])? $gradeReleaseStatus = $scoreRecords[User::get('id')]['grade_released'] : $gradeReleaseStatus = array();
+    if ($gradeReleaseStatus) {
+            $finalAvg = $memberScoreSummary[User::get('id')]['received_ave_score'] - $ratingPenalty;
+            ($ratingPenalty > 0) ? ($stringAddOn = ' - '.'('.'<font color=\'red\'>'.$ratingPenalty.'</font>'.
+                ')'.'<font color=\'red\'>*</font>'.' = '.number_format($finalAvg, 2)) : $stringAddOn = '';
+
+            echo number_format($memberScoreSummary[User::get('id')]['received_ave_score'], 2).$stringAddOn;
+            $ratingPenalty > 0 ? $penaltyNote = '&nbsp &nbsp &nbsp &nbsp &nbsp ( )'.'<font color=\'red\'>*</font>'.' : '.$penalty.
+                '% late penalty.' : $penaltyNote = '';
+            echo $penaltyNote;
+        } else {
+            echo __('Not Released', true);
+        }
+    ?>
+    </td>
+</tr>
+</table>
+
 <?php echo $html->script('ricobase')?>
 <?php echo $html->script('ricoeffects')?>
 <?php echo $html->script('ricoanimation')?>
 <?php echo $html->script('ricopanelcontainer')?>
 <?php echo $html->script('ricoaccordion')?>
 <?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
-    <!-- Render Event Info table -->
-	  <?php
-	  if (isset($memberScoreSummary[$currentUser['id']])) {
-  	  $receviedAvePercent = $memberScoreSummary[$currentUser['id']]['received_ave_score'] / $rubric['Rubric']['total_marks'] * 100;
-  	  $releaseStatus = $scoreRecords[$currentUser['id']]['grade_released'];
-  	} else {
-  	  $receviedAvePercent = 0;
-  	}
-    $params = array('controller'=>'evaluations', 'event'=>$event, 'ratingPenalty' => $ratingPenalty, 'gradeReleaseStatus'=>isset($scoreRecords[$currentUser['id']]['grade_released'])?$scoreRecords[$currentUser['id']]['grade_released'] : array(), 
-        'aveScore'=>isset($memberScoreSummary[$currentUser['id']]['received_ave_score']) ? number_format($memberScoreSummary[$currentUser['id']]['received_ave_score'], 2) : 0, 'groupAve'=>null);
-    echo $this->element('evaluations/student_view_event_info', $params);
-    ?>
-<div id='rubric_result'>
 
 <?php
 $numerical_index = 1;  //use numbers instead of words; get users to refer to the legend
 $color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
 $membersAry = array();  //used to format result
-$groupAve = 0; 
-if (isset($scoreRecords[$currentUser['id']])) {
-    $gradeReleased = $scoreRecords[$currentUser['id']]['grade_released'];
-    $commentReleased = $scoreRecords[$currentUser['id']]['comment_released'];
+$groupAve = 0;
+if (isset($scoreRecords[User::get('id')])) {
+    $gradeReleased = $scoreRecords[User::get('id')]['grade_released'];
+    $commentReleased = $scoreRecords[User::get('id')]['comment_released'];
 } else {
     $gradeReleased = 0;
     $commentReleased = 0;
@@ -47,60 +58,49 @@ if (isset($scoreRecords[$currentUser['id']])) {
 			                  ?>
 			        <br><br-->
 
-<table width="100%" border="0" align="center" cellpadding="4" cellspacing="2">
-	<tr>
-		<td>
 <div id="accordion">
     <!-- Panel of Evaluations Results -->
-		<div id="panelResults">
-		  <div id="panelResultsHeader" class="panelheader">
-		  	<?php echo __('Evaluation Results From Your Teammates. (Randomly Ordered)       ', true);
-		  	if ( !$gradeReleased && !$commentReleased) {
-          echo '<font color="red">'.__('Comments/Grades Not Released Yet.', true).'</font>';
-		  	}	else if ( !$gradeReleased) {
-		  	  echo '<font color="red">'.__('Grades Not Released Yet.', true).'</font>';
-        }	else if ( !$commentReleased) {
-		  	  echo '<font color="red">'.__('Comments Not Released Yet.', true).'</font>';
-        }
-?>
-		  </div>
-		  <div style="height: 200px;" id="panelResultsContent" class="panelContent">
-  	  <?php
-    $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$evalResult, 'userId'=>$currentUser['id'], 'scoreRecords'=>$scoreRecords);
-    echo $this->element('evaluations/student_view_rubric_details', $params);
-    ?>
-
-		  </div>
-		</div>
+    <div id="panelResults">
+        <div id="panelResultsHeader" class="panelheader">
+            <?php echo __('Evaluation Results From Your Teammates. (Randomly Ordered)', true);?>
+            <font color="red">
+            <?php if ( !$gradeReleased && !$commentReleased) {
+                echo __('Comments/Grades Not Released Yet.', true);
+            } else if ( !$gradeReleased) {
+                echo __('Grades Not Released Yet.', true);
+            } else if ( !$commentReleased) {
+                echo __('Comments Not Released Yet.', true);
+            }
+            ?>
+            </font>
+        </div>
+        <div style="height: 200px;" id="panelResultsContent" class="panelContent">
+            <?php
+            $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$evalResult, 'userId'=>User::get('id'), 'scoreRecords'=>$scoreRecords);
+            echo $this->element('evaluations/student_view_rubric_details', $params);
+            ?>
+        </div>
+    </div>
     <!-- Panel of Evaluations Reviews -->
-		<div id="panelReviews">
-		  <div id="panelReviewsHeader" class="panelheader">
-		  	<?php echo 'Review Evaluations From You.'?>
-		  </div>
-		  <div style="height: 200px;" id="panelReviewsContent" class="panelContent">
-
-  	  <?php
-    $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$reviewEvaluations, 'userId'=>$currentUser['id'], 'scoreRecords'=>$scoreRecords);
-    echo $this->element('evaluations/student_view_rubric_details', $params);
-    ?>
-		  </div>
-		</div>
+    <div id="panelReviews">
+        <div id="panelReviewsHeader" class="panelheader">
+            <?php echo 'Review Evaluations From You.'?>
+        </div>
+        <div style="height: 200px;" id="panelReviewsContent" class="panelContent">
+            <?php
+            $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$reviewEvaluations, 'userId'=>User::get('id'), 'scoreRecords'=>$scoreRecords, 'isReview' => true);
+            echo $this->element('evaluations/student_view_rubric_details', $params);
+            ?>
+        </div>
+    </div>
 </div>
-		</td>
-	</tr>
 
-</table>
-	<script type="text/javascript"> new Rico.Accordion( 'accordion',
-								{panelHeight:500,
-								 hoverClass: 'mdHover',
-								 selectedClass: 'mdSelected',
-								 clickedClass: 'mdClicked',
-								 unselectedClass: 'panelheader'});
+<script type="text/javascript">
+    new Rico.Accordion( 'accordion',
+            {panelHeight:500,
+            hoverClass: 'mdHover',
+            selectedClass: 'mdSelected',
+            clickedClass: 'mdClicked',
+            unselectedClass: 'panelheader'});
 
-	</script>
-
-
-	</td>
-  </tr>
-</table>
-</div>
+</script>

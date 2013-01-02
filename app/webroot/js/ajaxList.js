@@ -180,6 +180,7 @@ function AjaxList (parameterArray, whereToDisplay) {
     this.table = new Element("table");
     this.table.width = "100%";
     this.table.cellPadding = "4";
+	this.table.setAttribute('class', 'standardtable');
     this.header = new Element ("div");
     this.footer = new Element("div");
 
@@ -747,7 +748,7 @@ AjaxList.prototype.renderFooter = function(div) {
 // Renders the table headers, with column names
 AjaxList.prototype.renderTableHeaders = function (tbody) {
     // Create Headers
-    var headerRow = new Element("tr", { "class":"tableheader","style":"text-align:center"});
+    var headerRow = new Element("tr", { "style":"text-align:center"});
 
     for (i = 0; i < this.columns.length; i++) {
         var column = this.columns[i];
@@ -800,7 +801,7 @@ AjaxList.prototype.renderTableBody = function(tbody) {
 
     // Render each entry
     for (j = 0; j < this.data.length; j++) {
-        var tr = new Element("tr",{ "class"  :"tablecell", "style" : "cursor: pointer;"});
+        var tr = new Element("tr",{ "style" : "cursor: pointer;"});
         var entry = this.data[j];
         for (i = 0; i < this.columns.length; i++) {
             var column = this.columns[i];
@@ -815,7 +816,7 @@ AjaxList.prototype.renderTableBody = function(tbody) {
 
             // A division is required to use overflow
             var div = new Element("div");
-            div.style.overflow="hidden";
+            //div.style.overflow="hidden";
 
             // Get the actual entry name
             var split = column[ID_COL].split(".", 2);

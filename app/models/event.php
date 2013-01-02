@@ -148,8 +148,48 @@ class Event extends AppModel
         $this->virtualFields['to_review_count'] = sprintf('SELECT count(*) as count FROM group_events as ge WHERE ge.event_id = %s.id AND marked LIKE "to review"', $this->alias);
         $this->virtualFields['student_count'] = sprintf('SELECT count(*) as count FROM group_events as vge RIGHT JOIN groups_members as vgm ON vge.group_id = vgm.group_id WHERE vge.event_id = %s.id', $this->alias);
         $this->virtualFields['completed_count'] = sprintf('SELECT count(*) as count FROM evaluation_submissions as ves WHERE ves.submitted = 1 AND ves.event_id = %s.id', $this->alias);
+        $this->virtualFields['due_in'] = 'TIMESTAMPDIFF(SECOND,NOW(),due_date)';
     }
 
+    /**
+     * afterFind
+     *
+     * @param array $results
+     * @param mixed $primary
+     *
+     * @access public
+     * @return void
+     */
+    function afterFind(array $results, $primary)
+    {
+        $currentDate = strtotime('NOW');
+        foreach ($results as $key => $event) {
+            if (isset($event['Event']['release_date_begin'])) {
+                $results[$key]['Event']['is_released']  =
+                    ($currentDate >= strtotime($event['Event']['release_date_begin']) &&
+                    $currentDate < strtotime($event['Event']['release_date_end']));
+            }
+            if (isset($event['Event']['result_release_date_begin'])) {
+                $results[$key]['Event']['is_result_released']  =
+                    ($currentDate >= strtotime($event['Event']['result_release_date_begin']) &&
+                    $currentDate < strtotime($event['Event']['result_release_date_end']));
+            }
+            if (isset($event['Event']['release_date_end'])) {
+                $results[$key]['Event']['is_ended']  =
+                    ($currentDate > strtotime($event['Event']['release_date_end']));
+            }
+        }
+
+        return $results;
+    }
+
+    function beforeSave(array $options) {
+        if (isset($this->data['Group']['Group']) && isset($this->data[$this->alias]['id'])) {
+            $this->GroupEvent->updateGroups($this->data[$this->alias]['id'], $this->data['Group']['Group']);
+            unset($this->data['Group']);
+        }
+        return true;
+    }
     /**
      * prepData
      * parses the grous from the hidden field assigned
@@ -434,7 +474,7 @@ class Event extends AppModel
 
 
     /**
-     * formatEventObj
+     * getEventByIdGroupId
      *
      * @param mixed $eventId event id
      * @param bool  $groupId group id
@@ -442,23 +482,21 @@ class Event extends AppModel
      * @access public
      * @return void
      */
-    function formatEventObj ($eventId, $groupId=null)
+    function getEventByIdGroupId($eventId, $groupId=null)
     {
         $this->recursive = 0;
         $conditions['Event.id'] = $eventId;
+        $contain = array();
         if ($groupId != null) {
             $conditions['Group.id'] = $groupId;
+            $contain[] = 'Group';
         }
 
-        $event = $this->find('first', array('conditions' => $conditions));
+        $event = $this->find('first', array(
+            'conditions' => $conditions,
+            'contain' => $contain,
+        ));
 
-        //This part can be removed after correcting array indexing on controller and view files
-        if ($groupId != null) {
-            $event['group_name'] = 'Group '.$event['Group']['group_num']." - ".$event['Group']['group_name'];
-            $event['group_id'] = $event['Group']['id'];
-            $event['group_event_id'] = $event['GroupEvent']['id'];
-            $event['group_event_marked'] = $event['GroupEvent']['marked'];
-        }
         return $event;
     }
 
@@ -478,5 +516,113 @@ class Event extends AppModel
             'fields' => array('Event.title')
         ));
         return $event['Event']['title'];
+    }
+
+    /**
+     * Get fields of all events by course id
+     *
+     * @param mixed $courseId course id
+     * @param mixed $fields fields
+     *
+     * @return events
+     */
+    function getEventFieldsByCourseId($courseId, $fields)
+    {
+        return $this->find('all', array(
+            'conditions' => array('course_id' => $courseId),
+            'fields' => $fields));
+    }
+
+    /**
+     * Get fields of all event by event id
+     *
+     * @param mixed $eventId event id
+     * @param mixed $fields fields
+     *
+     * @return events
+     */
+    function getEventFieldsByEventId($eventId, $fields)
+    {
+        return $this->find('first', array(
+            'conditions' => array('Event.id' => $eventId),
+            'fields' => $fields));
+    }
+
+    /**
+     * Get evaluations and surveys assigned to the given user. Also gets the
+     * evaluation submission entries made by this specific user.
+     *
+     * @param mixed $userId
+     *
+     * @access public
+     * @return array array of events with related models, e.g. course, group, submission
+     */
+    function getEventsByUserId($userId)
+    {
+        // get the groups that this user is in
+        $groups = $this->Group->find('all', array(
+            'conditions' => array('Member.id' => $userId),
+            'fields' => array('id'),
+            'contain' => array('Member')));
+        $groupIds = Set::extract('/Group/id', $groups);
+
+        // find evaluation events based on the groups this user is in
+        $evaluationEvents = $this->find('all', array(
+            'conditions' => array('Group.id' => $groupIds),
+            'order' => array('due_in ASC'),
+            'contain' => array(
+                'Course',
+                'Group',
+                'Penalty' => array(
+                    'order' => array('days_late ASC')
+                ),
+                'EvaluationSubmission' => array(
+                    'conditions' => array('submitter_id' => $userId),
+                )
+            )
+        ));
+
+        // to find the surveys, we need to find the courses that user is enrolled in
+        // can't use find('list') as we are query the conditions on HABTM
+        $courses = $this->Course->find('all', array(
+            'fields' => array('id'),
+            'conditions' => array('Enrol.id' => $userId),
+            'contain' => 'Enrol',
+        ));
+        $courseIds = Set::extract($courses, '/Course/id');
+        // find survey events based on the groups this user is in
+        $surveyEvents = $this->find('all', array(
+            'conditions' => array('event_template_type_id' => '3', 'course_id' => $courseIds),
+            'order' => array('due_in ASC'),
+            'contain' => array(
+                'Course',
+                'EvaluationSubmission' => array(
+                    'conditions' => array('submitter_id' => $userId),
+                ),
+            )
+        ));
+
+        return array('Evaluations' => $evaluationEvents,
+            'Surveys' => $surveyEvents);
+    }
+
+    public function getAccessibleEventById($eventId, $userId, $permission, $contain = array())
+    {
+        $event = $this->find('first', array(
+            'conditions' => array($this->alias.'.id' => $eventId),
+            'contain' => $contain,
+        ));
+
+        if (empty($event)) {
+            return false;
+        }
+
+        // check if the user has access to the course that event associated with
+        $course = $this->Course->getAccessibleCourseById($event[$this->alias]['course_id'], $userId, $permission);
+        if (empty($course)) {
+            return false;
+        }
+
+        return $event;
     }
 }

@@ -45,10 +45,6 @@ class EvaltoolsController extends AppController
      */
     function index($evaltool = null)
     {
-        if (!User::hasPermission('controllers/evaltools')) {
-            $this->Session->setFlash(__('You do not have permission to view evaluation tools.', true));
-            $this->redirect('/home');
-        }
         //Disable the autorender, base the role to render the custom home
         $this->autoRender = false;
 
@@ -97,7 +93,7 @@ class EvaltoolsController extends AppController
         $this->set('mixevalData', $mixevalData);
 
         $surveyData = $this->Survey->find('all', array('conditions' => array('Survey.creator_id' => $this->Auth->user('id')),
-            'contain' => array('Course')));
+            'contain' => false));
         $this->set('surveyData', $surveyData);
 
         $emailTemplates = $this->EmailTemplate->getMyEmailTemplate($this->Auth->user('id'));

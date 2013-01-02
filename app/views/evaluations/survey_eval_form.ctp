@@ -1,76 +1,39 @@
-<table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
-  <tr>
-    <td>
-      <form name="frm" id="frm" method="POST" action="<?php echo $html->url('makeSurveyEvaluation') ?>">
-      <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
-      <input type="hidden" name="survey_id" id="survey_id" value="<?php if (!empty($survey_id)) echo $survey_id; ?>" />      
-      <input type="hidden" name="course_id" value="<?php echo $courseId ?>"/>
-      <input type="hidden" name="data[Evaluation][surveyee_id]" value="<?php echo $id ?>"/>
-      <input type="hidden" name="question_count" value="<?php echo count($questions)?>"/>
-        <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
-          <tr class="tableheader">
-            <td align="center"><?php __('Team Maker Survey')?></td>
-          </tr>
-          <tr class="tablecell2">
-            <td>
-			<?php
-			if(!empty($questions)):
-			$i = 1;
-			foreach ($questions as $row): $question = $row['Question'];
-				echo "<br><table align=\"center\" width=\"95%\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\">
-						<tr class=\"tablecell\">
-						<td width=\"50\"><b><font size=\"2\">Q: ".$i."</font></b><br>";
-				echo "</td></tr>";
-				$i ++;
-				// Multiple Choice Question
-				if( $question['type'] == 'M'){
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\">".$question['prompt']."</td></tr>";
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\">";
-					echo "<input type=\"hidden\" name=\"question_id".$question['number']."\" value=\"".$question['id']."\"/>";
-					if( !empty($question['Responses'])){
-						foreach ($question['Responses'] as $index => $value):
-							echo "<input type=\"radio\" name=\"answer_".$question['id']."\" value=\"".$value['id']."\" > ".$value['response']."<br>";
-						endforeach;
-					}
-					echo "</td></tr>";
-				}
-				// Choose Any... Question
-				elseif( $question['type'] == 'C'){
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\">".$question['prompt']."</td></tr>";
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\">";
-					echo "<input type=\"hidden\" name=\"question_id".$question['number']."\" value=\"".$question['id']."\"/>";
+<form name="frm" id="frm" method="POST" action="<?php echo $html->url('makeEvaluation/'.$eventId) ?>">
+<input type="hidden" name="event_id" value="<?php echo $eventId?>"/>
+<input type="hidden" name="event_id" id="event_id" value="<?php if (!empty($eventId)) echo $eventId; ?>" />
+<input type="hidden" name="course_id" value="<?php echo $courseId ?>"/>
+<input type="hidden" name="data[Evaluation][surveyee_id]" value="<?php echo User::get('id')?>"/>
+<input type="hidden" name="question_count" value="<?php echo count($questions)?>"/>
+<table class="standardtable">
+    <tr><th><?php __('Team Maker Survey')?></th></tr>
+    <tr>
+        <td style="text-align: left;">
+        <?php if(!empty($questions)):?>
+            <?php foreach ($questions as $key => $row): $question = $row['Question'];?>
+                <input type="hidden" name="question_id<?php echo $question['number']?>" value="<?php echo $question['id']?>"/>
+                <div class="survey-prompt">Q<?php echo $key+1?>: <?php echo $question['prompt']?></div>
 
-					if( !empty($question['Responses'])){
-						foreach ($question['Responses'] as $index => $value):
-							echo "<input type=\"checkbox\" name=\"answer_".$question['id']."[]\" value=\"".$value['id']."\" > ".$value['response']."<br>";
-						endforeach;
-					}
-					echo "</td></tr>";
-				}
-				// Short Answer Question
-				elseif( $question['type'] == 'S'){
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\">".$question['prompt']."</td></tr>";
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\"><input type=\"text\" name=\"answer_".$question['id']."\" style='width:55%;'></td></tr>";
-					echo "<input type=\"hidden\" name=\"question_id".$question['number']."\" value=\"".$question['id']."\"/>";
-				}
-				// Long Answer Question
-				elseif( $question['type'] == 'L'){
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\">".$question['prompt']."</td></tr>";
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\"><textarea name=\"answer_".$question['id']."\"  style='width:55%;' rows=\"3\"></textarea></td></tr>";
-					echo "<input type=\"hidden\" name=\"question_id".$question['number']."\" value=\"".$question['id']."\"/>";
-				}
-
-				echo "</table>";
-			endforeach;
-			endif;
-			?>
-			</td>
-          </tr>
-          <tr class="tablecell2">
-            <td><div align="center"><?php echo $form->submit(__('Submit', true)) ?>
-			</div></td>
-          </tr>
-      </table>
-    </form></td>
-  </tr>
+                <div class="survey-response">
+                <?php if( $question['type'] == 'M'):// Multiple Choice Question?>
+                    <?php foreach ($question['Responses'] as $index => $value):?>
+                        <input type="radio" name="answer_<?php echo $question['id']?>" value="<?php echo $value['id']?>"><?php echo $value['response']?><br>
+                    <?php endforeach; ?>
+                <?php elseif( $question['type'] == 'C'):// Choose Any... Question?>
+                    <?php foreach ($question['Responses'] as $index => $value): ?>
+                        <input type="checkbox" name="answer_<?php echo $question['id']?>[]" value="<?php echo $value['id']?>"><?php echo $value['response']?><br>
+                    <?php endforeach;?>
+                <?php elseif( $question['type'] == 'S'):// Short Answer Question?>
+                    <input type="text" name="answer_<?php echo $question['id']?>">
+                <?php elseif( $question['type'] == 'L'):// Long Answer Question?>
+                    <textarea name="answer_<?php echo $question['id']?>"></textarea>
+                <?php endif; ?>
+                </div>
+            <?php endforeach;?>
+        <?php endif;?>
+        </td>
+    </tr>
+    <tr>
+      <td><div align="center"><?php echo $form->submit(__('Submit', true)) ?></div></td>
+    </tr>
 </table>
+    </form>

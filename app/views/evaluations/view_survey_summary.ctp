@@ -1,80 +1,143 @@
+<?php
+// Survey Summary data
+$count = 1;
+$colspan = 4; // total number of columns for when we want only 1 cell
+$questionsTable = array();
+foreach ($questions as $question) {
+    $tmp = array();
+    $question = $question['Question'];
+    if (isset($question['total_response'])) {
+        // Processing a multiple choice response
+        // header
+        $totalResponses = $question['total_response'];
+        $tmp['header'][] = "$count. " . $question['prompt'] . ' (' . 
+            $totalResponses . ' '. __('responses', true) . ')';
 
-<table width="100%"  border="0" cellpadding="8" cellspacing="0" bgcolor="#FFFFFF">
-  <tr>
-    <td>
-        <table width="95%" border="0" align="center" cellpadding="4" cellspacing="2">
-          <tr class="tableheader">
-            <td align="center"><?php __('Team Maker Survey Summary')?></td>
-          </tr>
-          <tr class="tablecell2">
-            <td>
-			<?php
-			if( !empty($questions)):
-			for ($i=1; $i <= count($questions); $i++): $question = $questions[$i]['Question'];
-				echo "<br><table align=\"center\" width=\"95%\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\">
-						<tr class=\"tablecell\">
-						<td width=\"50\" colspan=\"8\"><b><font size=\"2\">Q: ".$question['number'].") &nbsp; ".$question['prompt']."</font></b>";
-				echo "</td></tr>";
+        // responses
+        foreach ($question['Responses'] as $response) {
+            $cells = array();
+            // processing a multiple choice question's response
+            $count = $response['count'];
+            $percent = $totalResponses > 0 ? 
+                $percent = round($count / $totalResponses * 100) : 0;
+            $cells[] = $response['response'];
+            $cells[] = $count;
+            $cells[] = $percent == 0 ? "-" : "$percent%";
+            $cells[] = $html->image(
+                "evaluations/bar.php?per=" . $percent, array('alt'=>$percent));
+            $tmp['cells'][] = $cells;
+        }
+    }
+    else {
+        // Processing a single or multi-line text response
+        // header
+        $totalResponses = count($question['Responses']);
+        $tmp['header'][] = "$count. " . $question['prompt'] . ' (' . 
+            $totalResponses . ' '. __('responses', true) . ')';
 
-				// Multiple Choice Question
-				if( $question['type'] == 'M'){
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\">";
-          echo '<table border="0">';
-					if( !empty($question['Responses'])){
-						foreach ($question['Responses'] as $index => $value):
-						  $percent = $question['total_response'] != 0 ? round(($value['count']/$question['total_response'])*100): 0;
-							echo "<tr><td width=\"250\">".$value['response']." </td><td width=\"30\"> ".$value['count']." </td><td> ".$percent."% </td><td> ".$html->image("evaluations/bar.php?per=".$percent,array('alt'=>$percent))."</td></tr>";
-						endforeach;
-					}
+        // responses
+        $responders = "";
+        foreach ($question['Responses'] as $response) {
+            $responders .= $response['user_name']
+                . ', ';
+        }
+        $responders = trim($responders, ", ");
+        $cells = array();
+        $cells[] = __('Responders', true) . ":";
+        $cells[] = array($responders, array('colspan' => $colspan - 1));
+        $tmp['cells'][] = $cells;
+    }
 
-					echo "</table></td></tr>";
-				}
-				// Choose Any... Question
-				elseif( $question['type'] == 'C'){
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\">";
-          echo '<table border="0">';
-					if( !empty($question['Responses'])){
-						foreach ($question['Responses'] as $index => $value):
-						  $percent = $question['total_response'] != 0 ? round(($value['count']/$question['total_response'])*100): 0;
-							echo "<tr><td width=\"250\">".$value['response']."</td><td width=\"30\"> ".$value['count']." </td><td> ".$percent."% </td><td> ".$html->image("evaluations/bar.php?per=".$percent,array('alt'=>$percent))."</td></tr>";
-						endforeach;
-					}
+    $count++;
+    $questionsTable[] = $tmp;
+}
 
-					echo "</table></td></tr>";
-				}
-				// Short Answer Question
-				elseif( $question['type'] == 'S'){
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\">";
-					echo '<table>';
-					if( !empty($question['Responses'])){
-						foreach ($question['Responses'] as $index => $value):
-							echo "<tr valign=\"top\"><td width=\"250\">".$value['user_name']."</td><td width=\"15\"></td><td><i>".$value['response_text']."</i><td></tr>";
-						endforeach;
-					}
+// Individual Response data
+$headers = array('id', 'username', 'full_name', 'email', 'student_no', 'submitted');
+$displayHeaders = array();
+// display email only if the user has access to it
+foreach ($headers as $key => $header) {
+    if ($header == 'email' && 
+        !User::hasPermission('functions/viewemailaddresses')
+    ) {
+        unset($headers[$key]);
+        continue;
+    }
+    $displayHeaders[] = Inflector::humanize($header);
+}
 
-					echo "</table></td></tr>";
-				}
-				// Long Answer Question
-				elseif( $question['type'] == 'L'){
-					echo "<tr class=\"tablecell2\"><td colspan=\"8\">";
-					echo '<table border="0">';
-					if( !empty($question['Responses'])){
-						foreach ($question['Responses'] as $index => $value):
-							echo "<tr valign=\"top\"><td width=\"250\">".$value['user_name']."</td><td width=\"15\"></td><td><i>".$value['response_text']."</i><td></tr>";
-						endforeach;
-					}
+$displayCells = array();
+foreach ($students as $student) {
+    $tmp = array();
+    foreach ($headers as $header) {
+        if ($header == 'email' && 
+            !User::hasPermission('functions/viewemailaddresses')
+        ) {
+            continue;
+        }
+        // link to view user information
+        else if ($header == 'username') {
+            $tmp[] = $html->link(
+                $student[$header], 
+                '/users/view/'.$student['id'],
+                array('target' => '_blank')
+            );
+        }
+        // link to view this user's submission if available
+        else if ($header == 'submitted') {
+            $tmp[] = $student[$header] ? 
+                $html->link(__('Result', true), 
+                    "/evaluations/viewEvaluationResults/$eventId/" . 
+                    $student['id'],
+                    array('target' => '_blank')
+                ) :
+                __('Not Submitted', true);
+        }
+        else {
+            $tmp[] = $student[$header];
+        }
+    }
+    $displayCells[] = $tmp;
+}
+?>
 
-					echo "</table></td></tr>";
-				}
+<h2>Survey Summary</h2>
 
-				echo "</table>";
-			endfor;
-			endif;
-			?>
-
-			</td>
-          </tr>
-      </table>
-    </td>
-  </tr>
+<table class='standardtable leftalignedtable'>
+<?php
+foreach ($questionsTable as $question) {
+    echo $html->tableHeaders($question['header'], null,
+        array('colspan' => $colspan));
+    echo $html->tableCells($question['cells']);
+}
+?>
 </table>
+
+<h2>Individual Responses</h2>
+
+<table id="individualResponses">
+    <thead>
+    <?php
+    echo $html->tableHeaders($displayHeaders);
+    ?>
+    </thead>
+    <tbody>
+    <?php
+    echo $html->tableCells($displayCells);
+    ?>
+    </tbody>
+</table>
+
+<script type="text/javascript">
+// enable all the nice sorting, search pagination, etc, hide the user id field
+jQuery(document).ready(function() {
+    var oTable= jQuery('#individualResponses').dataTable( {
+        "sPaginationType" : "full_numbers",
+        "aoColumnDefs" : [
+            {"bSearchable": false, "bVisible": false, "bSortable": false, "aTargets": [0] },
+        ],
+        "aaSorting" :[[1, 'asc']]
+    });
+});
+</script>
+

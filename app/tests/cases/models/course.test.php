@@ -48,7 +48,7 @@ class CourseTestCase extends CakeTestCase {
 
         $this->assertEqual($course[0]['Course']['course'], "MECH 328");
         $this->assertEqual(
-            $course[0]['Course']['title'], 
+            $course[0]['Course']['title'],
             "Mechanical Engineering Design Project"
         );
 
@@ -56,7 +56,7 @@ class CourseTestCase extends CakeTestCase {
         $instructor = $this->Course->getCourseByInstructor(312321);
         $this->assertEqual($instructor, $empty);
 
-        
+
         // Testing null inputs
         $instructor = $this->Course->getCourseByInstructor(null);
         $this->assertEqual($instructor, $empty);
@@ -176,7 +176,7 @@ class CourseTestCase extends CakeTestCase {
         $this->Course->deleteInstructor(null, 1);
         $this->Course->deleteInstructor(1, null);
         $course = $this->Course->getCourseByInstructor(1);
-        $this->assertTrue(in_array('MECH 328', 
+        $this->assertTrue(in_array('MECH 328',
             Set::Extract('/Course/course', $course)));
     }
 
@@ -228,7 +228,7 @@ class CourseTestCase extends CakeTestCase {
  */
 
     }
-    
+
     function testGetByDepartments()
     {
         $this->UserFaculty = Classregistry::init('UserFaculty');
@@ -241,17 +241,28 @@ class CourseTestCase extends CakeTestCase {
             "3" => "CPSC 101 - Connecting with Computer Science"
         );
         $empty = null;
-        
+
         // super admin: user id 1, should see all courses
         $uf = $this->UserFaculty->findAllByUserId(1);
         $dep = $this->Department->getByUserFaculties($uf);
         $course = $this->Course->getByDepartments($dep, 'list');
         $this->assertEqual($course, $expected);
-        
+
         // if no departments in array, should return nothing
         $course = $this->Course->getByDepartments(array(), 'all');
         $this->assertEqual($course, $empty);
-        
+
     }
 
+    function testGetByDepartmentIds()
+    {
+    }
+
+    function testGetAccessibleCourses()
+    {
+    }
+
+    function testGetAccessibleCourseById()
+    {
+    }
 }

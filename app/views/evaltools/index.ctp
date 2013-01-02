@@ -1,267 +1,173 @@
-<div class="content-container">
+<?php
+// data processing for simple eval, create arrays to generate the entry tables
+$simpleevalheaders = array(
+    __('Name', true),
+    __('In Use', true),
+    __('Public', true),
+    __('Base Point Per Member', true)
+);
+$simpleevalcells = array();
+foreach($simpleEvalData as $data) {
+    $eval = $data['SimpleEvaluation'];
+    $row = array();
+    $row[] = $html->link($eval['name'], '/simpleevaluations/view/'.$eval['id']);
+    $row[] = $eval['event_count'] > 0 ?
+        $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
+        $html->image('icons/red_x.gif', array('alt'=>'red_x'));
+    $row[] = $eval['availability'] == "public" ?
+        $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
+        $html->image('icons/red_x.gif', array('alt'=>'red_x'));
+    $row[] = $eval['point_per_member'];
+    $simpleevalcells[] = $row;
+}
 
-<?php echo $this->element('evaltools/tools_menu', array());?>
+// data processing for rubrics, create arrays to generate the entry tables
+$rubricsheaders = array(
+    __('Name', true),
+    __('In Use', true),
+    __('Public', true),
+    __('LOM', true),
+    __('Criteria', true),
+    __('Total Marks', true)
+);
+$rubricscells = array();
+foreach($rubricData as $data) {
+    $rubric = $data['Rubric'];
+    $row = array();
+    $row[] = $html->link($rubric['name'], '/rubrics/view/'.$rubric['id']);
+    $row[] = $rubric['event_count'] > 0 ?
+        $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
+        $html->image('icons/red_x.gif', array('alt'=>'red_x'));
+    $row[] = $rubric['availability'] == "public" ?
+        $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
+        $html->image('icons/red_x.gif',array('alt'=>'red_x'));
+    $row[] = $rubric['lom_max'];
+    $row[] = $rubric['criteria'];
+    $row[] = $rubric['total_marks'];
+    $rubricscells[] = $row;
+}
 
-<!--form id="searchForm" action="">
-<table width="95%" border="0" cellspacing="0" cellpadding="2">
-  <tr>
-    <td width="10" height="32"><?php echo $html->image('magnify.png', array('alt'=>__('Magnify Icon', true)));?></td>
-    <td width="35"> <b>Search:</b> </td>
-    <td width="35"><select name="select" id="select2">
-      <option value="name" >Name</option>
-      <option value="description" >Description</option>
-      <option value="point_per_member" >Base Point Per Member</option>
-    </select></td>
-    <td width="35"><input type="text" name="livesearch2" id="livesearch" size="30"></td>
-    <td width="80%" align="right">&nbsp;</td>
-  </tr>
-</table>
-</form-->
-	<table class="list-table">
-	  <tr class="tableheader">
-	    <td colspan="7"><?php __('Simple Evaluations')?></td>
-	  </tr>
-	  <tr class="panelContent">
-	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
-	      <tr class="panelContent">
-	        <td colspan="5" align="right"><?php echo $html->link(__('Add Simple Evaluation', true), '/simpleevaluations/add', array('class' => 'add-button')); ?></td>
-	      </tr>
-    	  <tr class="panelContent">
-    	    <th colspan="2" width="60%"><?php __('Name')?></th>
-    	    <th width="50"><?php __('In Use')?></th>
-    	    <th><?php __('Public')?></th>
-    	    <th><?php __('Base Point Per Member')?></th>
-    	  </tr>
-      	<?php $i = '0';?>
-    	  <?php foreach($simpleEvalData as $row): $eval = $row['SimpleEvaluation']; ?>
-    	  <tr class="tablecell">
-    	    <td width="1%" bgcolor="#FFB66F">&nbsp;</td>
-    		  <td align="left">
-    	      <a href="<?php echo $this->webroot.$this->theme.'simpleevaluations/view/'.$eval['id']?>"><?php echo $eval['name']?></a>
-    	    </td>
-    		  <td align="center">
-        	<?php echo $eval['event_count'] > 0 ?
-                     $html->image('icons/green_check.gif',array('border'=>'0','alt'=>'green_check')) :
-                     $html->image('icons/red_x.gif',array('border'=>'0','alt'=>'red_x'));?>
-          </td>
-            <td align="center"><?php
-        	if( $eval['availability'] == "public" )
-        		echo $html->image('icons/green_check.gif',array('border'=>'0','alt'=>'green_check'));
-        	else
-        		echo $html->image('icons/red_x.gif',array('border'=>'0','alt'=>'red_x'));
-        	?></td>
-    	    <td align="center">
-    	      <?php echo $eval['point_per_member'] ?>
-    	    </td>
-    	  </tr>
-    	  <?php $i++;?>
-    	  <?php endforeach; ?>
-        <?php if ($i == 0) :?>
-      	<tr class="tablecell" align="center">
-      	    <td colspan="5"><?php __('Record Not Found')?></td>
-        </tr>
-        <?php endif;?>
-    	  </table>
-	  </td>
-	  </tr>
-	  <tr class="tableheader">
-	    <td colspan="7"><?php __('Rubrics')?></td>
-	  </tr>
-	  <tr class="panelContent">
-	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
-	      <tr class="panelContent">
-	        <td colspan="8" align="right">
-          <?php echo $html->link(__('Add Rubric', true), '/rubrics/add', array('class' => 'add-button')); ?>
-            </td>
-	      </tr>
-    	  <tr class="panelContent">
-    	    <th colspan="2" width="60%"><?php __('Name')?></th>
-    	    <th width="50"><?php __('In Use')?></th>
-    	    <th><?php __('Public')?></th>
-    	    <th><?php __('LOM')?></th>
-    	    <th><?php __('Criteria')?></th>
-    	    <th><?php __('Total Marks')?></th>
-    	  </tr>
-      	<?php $i = '0';?>
-    	  <?php foreach($rubricData as $row): $rubric = $row['Rubric']; ?>
-    	  <tr class="tablecell">
-    	    <td width="1%" bgcolor="#FFB66F">&nbsp;</td>
-    		  <td align="left"><?php echo $html->link($rubric['name'], '/rubrics/view/'.$rubric['id']) ?></td>
-          <td align="center">
-        	<?php echo $rubric['event_count'] > 0 ?
-                     $html->image('icons/green_check.gif',array('border'=>'0','alt'=>'green_check')) :
-                     $html->image('icons/red_x.gif',array('border'=>'0','alt'=>'red_x'));?>
-          </td>
-          <td align="center"><?php
-        	if( $rubric['availability'] == "public" )
-        		echo $html->image('icons/green_check.gif',array('border'=>'0','alt'=>'green_check'));
-        	else
-        		echo $html->image('icons/red_x.gif',array('border'=>'0','alt'=>'red_x'));
-        	?></td>
-          <td align="center"><?php echo $rubric['lom_max'] ?></td>
-          <td align="center"><?php echo $rubric['criteria'] ?></td>
-          <td align="center"><?php echo $rubric['total_marks'] ?></td>
-    	  </tr>
-    	  <?php $i++;?>
-    	  <?php endforeach; ?>
-        <?php if ($i == 0) :?>
-      	<tr class="tablecell" align="center">
-      	    <td colspan="7"><?php __('Record Not Found')?></td>
-        </tr>
-        <?php endif;?>
-    	  </table>
-	  </td>
-	  </tr>
-	  <tr class="tableheader">
-	    <td colspan="7"><?php __('Mixed Evaluations')?></td>
-	  </tr>
-	  <tr class="panelContent">
-	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
-	      <tr class="panelContent">
-	        <td colspan="8" align="right">
-          <?php echo $html->link(__('Add Mixed Evaluation', true), '/mixevals/add', array('class' => 'add-button')); ?>
-            </td>
-	      </tr>
-    	  <tr class="panelContent">
-    	    <th colspan="2" width="60%"><?php __('Name')?></th>
-    	    <th width="50"><?php __('In Use')?></th>
-    	    <th><?php __('Public')?></th>
-    	    <th><?php __('Lickert Scale Questions')?></th>
-    	    <th><?php __('Prefill Questions')?></th>
-    	    <th><?php __('Total Marks')?></th>
-    	  </tr>
-        <?php $i = '0';?>
-        <?php
-        foreach ($mixevalData as $row): $mixeval = $row['Mixeval']; ?>
-        <tr class="tablecell">
-          <td width="1%" bgcolor="#FFB66F">&nbsp;</td>
-          <td align="left">
-          <?php echo $html->link($mixeval['name'], '/mixevals/view/'.$mixeval['id']) ?>
-          </td>
-          <td align="center">
-        	<?php echo $mixeval['event_count'] > 0 ?
-                     $html->image('icons/green_check.gif',array('border'=>'0','alt'=>'green_check')) :
-                     $html->image('icons/red_x.gif',array('border'=>'0','alt'=>'red_x'));?>
-          </td>
-          <td align="center">
-        	<?php
+// data processing for mix evals, create arrays to generate the entry tables
+$mixevalheaders = array(
+    __('Name', true),
+    __('In Use', true),
+    __('Public', true),
+    __('Lickert Scale Questions', true),
+    __('Prefill Questions', true),
+    __('Total Marks', true)
+);
+$mixevalcells = array();
+foreach ($mixevalData as $data) {
+    $mixeval = $data['Mixeval'];
+    $row = array();
+    $row[] = $html->link($mixeval['name'], '/mixevals/view/'.$mixeval['id']);
+    $row[] = $mixeval['event_count'] > 0 ?
+        $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
+        $html->image('icons/red_x.gif', array('alt'=>'red_x'));
+    $row[] = $mixeval['availability'] == "public" ?
+        $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
+        $html->image('icons/red_x.gif', array('alt'=>'red_x'));
+    $row[] = $mixeval['lickert_question_max'];
+    $row[] = $mixeval['prefill_question_max'];
+    $row[] = $mixeval['total_marks'];
+    $mixevalcells[] = $row;
+}
 
-        	if( $mixeval['availability'] == "public" )
-        		echo $html->image('icons/green_check.gif',array('border'=>'0','alt'=>'green_check'));
-        	else
-        		echo $html->image('icons/red_x.gif',array('border'=>'0','alt'=>'red_x'));
-        	?>
-          </td>
-          <td align="center">
-        	<?php echo $mixeval['lickert_question_max'] ?>
-          </td>
-          <td align="center">
-        	<?php echo $mixeval['prefill_question_max'] ?>
-          </td>
-          <td align="center">
-        	<?php echo $mixeval['total_marks'] ?>
-          </td>
-        </tr>
-        <?php $i++;?>
-        <?php endforeach; ?>
-        <?php if ($i == 0) :?>
-      	<tr class="tablecell" align="center">
-      	    <td colspan="8"><?php __('Record Not Found')?></td>
-        </tr>
-        <?php endif;?>
-    	  </table>
-	  </td>
-	  </tr>
-<?php if (!empty($access['SURVEY'])):?>
-	  <tr class="tableheader">
-	    <td colspan="7"><?php __('Surveys (Team Maker)')?></td>
-	  </tr>
-	  <tr class="panelContent">
-	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
-	      <tr class="panelContent">
-	        <td colspan="6" align="right">
-          <?php if (!empty($access['SURVEY_RECORD'])):?>
-          <?php echo $html->link(__('Add Survey', true), '/surveys/add', array('class' => 'add-button')); ?>
-          <?php endif;?>
-          </td>
-	      </tr>
-    	  <tr class="panelContent">
-    	    <th colspan="2" width="42%"><?php __('Name')?></th>
-    	    <th width="45"><?php __('In Use')?></th>
-    	    <th><?php __('Course')?></th>
-    	    <th width="170"><?php __('Due Date')?></th>
-          <th><?php __('Released?')?></th>
-    	  </tr>
-        <?php if(!empty($surveyData)):?>
-    	  <?php foreach($surveyData as $row): $survey = $row['Survey'];?>
-    	  <tr class="tablecell">
-    	    <td width="1%" bgcolor="#FFB66F">&nbsp;</td>
-    		  <td align="left"><?php echo $html->link($survey['name'], '/surveys/questionssummary/'.$survey['id']) ?></td>
-          <td align="center">
-        	<?php echo $survey['event_count'] > 0 ?
-                     $html->image('icons/green_check.gif',array('border'=>'0','alt'=>'green_check')) :
-                     $html->image('icons/red_x.gif',array('border'=>'0','alt'=>'red_x'));?>
-          </td>
-    		  <td align="center"><?php echo $survey['course_id'] == '-1' ? 'N/A':$row['Course']['course']?></td>
-          <td align="center">
-            <?php
-              if (!empty($survey['due_date'])) echo Toolkit::formatDate(date('Y-m-d H:i:s', strtotime($survey['due_date'])));
-          ?></td>
-          <td align="center">
-      		<?php
-                if(date('Y-m-d H:i:s',time()) > $survey['release_date_begin'])
-      			echo $html->image('icons/green_check.gif',array('border'=>'0','alt'=>'green_check'));
-      		else
-      			echo $html->image('icons/red_x.gif',array('border'=>'0','alt'=>'red_x'));
-      	 ?></td>
-    	  </tr>
-    	  <?php endforeach; ?>
-        <?php else:?>
-      	<tr class="tablecell" align="center">
-      	    <td colspan="6"><?php __('Record Not Found')?></td>
-        </tr>
-        <?php endif;?>
-    	  </table>
-	  </td>
-	  </tr>
-<?php endif; ?>
-<?php if (!empty($access['EMAIL_TEMPLATE'])):?>
-	  <tr class="tableheader">
-	    <td colspan="7"><?php __('Email Templates')?></td>
-	  </tr>
-	  <tr class="panelContent">
-	    <td colspan="7"><table width="100%" bgcolor="#FFFFFF">
-	      <tr class="panelContent">
-	        <td colspan="6" align="right">
-          <?php echo $html->link(__('Add Email Template', true), '/emailtemplates/add', array('class' => 'add-button')); ?>
+// data processing for surveys
+$surveyheaders = array(
+    __('Name', true),
+    __('In Use', true),
+    __('Questions', true),
+);
+$surveycells = array();
+foreach($surveyData as $data) {
+    $survey = $data['Survey'];
+    $row = array();
+    $row[] = $html->link($survey['name'], '/surveys/questionssummary/'.$survey['id']);
+    $row[] = $survey['event_count'] > 0 ?
+        $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
+        $html->image('icons/red_x.gif', array('alt'=>'red_x'));
+    $row[] = $survey['question_count'];
+    $surveycells[] = $row;
+}
 
-          </td>
-	      </tr>
-    	  <tr class="panelContent">
-            <th colspan="2" width="20"><?php __('Name')?></th>
-             <th width="20%"><?php __('Subject')?></th>
-    	    <th width="60%"><?php __('Description')?></th>
+// data processing for email templates
+$templateheaders = array(
+    __('Name', true),
+    __('Subject', true),
+    __('Description', true)
+);
+$templatecells = array();
+foreach($emailTemplates as $data) {
+    $emailTemplate = $data['EmailTemplate'];
+    $row = array();
+    $row[] = $html->link($emailTemplate['name'],
+        '/emailtemplates/view/'.$emailTemplate['id']);
+    $row[] = $emailTemplate['subject'];
+    $row[] = $emailTemplate['description'];
+    $templatecells[] = $row;
+}
 
-    	  </tr>
-        <?php if(!empty($emailTemplates)):?>
-    	  <?php foreach($emailTemplates as $row): $emailTemplate = $row['EmailTemplate'];?>
-    	  <tr class="tablecell">
-    	    <td width="1%" bgcolor="#FFB66F">&nbsp;</td>
-            <td align="left"><?php echo $html->link($emailTemplate['name'], '/emailtemplates/view/'.$emailTemplate['id']) ?></td>
-            <td align="left"><?php echo $emailTemplate['subject'];?></td>
-            <td align="center"><?php echo $emailTemplate['description'];?></td>
-    	  </tr>
-    	  <?php endforeach; ?>
-        <?php else:?>
-      	<tr class="tablecell" align="center">
-      	    <td colspan="6"><?php __('Record Not Found')?></td>
-        </tr>
-        <?php endif;?>
-    	  </table>
-	  </td>
-	  </tr>
-<?php endif; ?>
+// evaltools navigation
+echo $this->element('evaltools/tools_menu', array());
+?>
 
-  </table>
-
+<!-- Simple Eval Table -->
+<div class="evaltool-section-header">
+    <h2><?php __('My Simple Evaluations')?></h2>
+    <div class='evaltoolsadd'><?php echo $html->link(__('Add Simple Evaluation', true), '/simpleevaluations/add', array('class' => 'add-button')); ?><?php echo $html->link(__('All Simple Evaluations', true), '/simpleevaluations'); ?></div>
 </div>
+<table class='standardtable'>
+<?php
+echo $html->tableHeaders($simpleevalheaders);
+echo $html->tableCells($simpleevalcells);
+?>
+</table>
+
+<!-- Rubrics -->
+<div class="evaltool-section-header">
+    <h2><?php __('My Rubrics Evaluations')?></h2>
+    <div class='evaltoolsadd'><?php echo $html->link(__('Add Rubric', true), '/rubrics/add', array('class' => 'add-button')); ?><?php echo $html->link(__('All Rubric Evaluations', true), '/rubrics')?></div>
+</div>
+<table class='standardtable'>
+<?php
+echo $html->tableHeaders($rubricsheaders);
+echo $html->tableCells($rubricscells);
+?>
+</table>
+
+<!-- Mixed Evals -->
+<div class="evaltool-section-header">
+    <h2><?php __('My Mixed Evaluations')?></h2>
+    <div class='evaltoolsadd'><?php echo $html->link(__('Add Mixed Evaluation', true), '/mixevals/add', array('class' => 'add-button')); ?><?php echo $html->link(__('All Mixed Evaluations', true), '/mixevals')?></div>
+</div>
+<table class='standardtable'>
+<?php
+echo $html->tableHeaders($mixevalheaders);
+echo $html->tableCells($mixevalcells);
+?>
+</table>
+
+<!-- Surveys -->
+<div class="evaltool-section-header">
+    <h2><?php __('My Surveys')?></h2>
+    <div class='evaltoolsadd'><?php echo $html->link(__('Add Survey', true), '/surveys/add', array('class' => 'add-button')); ?><?php echo $html->link(__('All Surveys', true), '/surveys')?></div>
+</div>
+<table class='standardtable'>
+<?php
+echo $html->tableHeaders($surveyheaders);
+echo $html->tableCells($surveycells);
+?>
+</table>
+
+<!-- Email Templates -->
+<div class="evaltool-section-header">
+    <h2><?php __('My Email Templates')?></h2>
+    <div class='evaltoolsadd'><?php echo $html->link(__('Add Email Template', true), '/emailtemplates/add', array('class' => 'add-button')); ?><?php echo $html->link(__('All Email Templates', true), '/emailtemplates')?></div>
+</div>
+<table class='standardtable'>
+<?php
+echo $html->tableHeaders($templateheaders);
+echo $html->tableCells($templatecells);
+?>
+</table>

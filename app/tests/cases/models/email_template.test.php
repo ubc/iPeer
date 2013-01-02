@@ -38,13 +38,16 @@ class EmailTemplateTestCase extends CakeTestCase
     function testGetMyEmailTemplate()
     {
         //Test on valid input w/ find all
-        $expected[0]['EmailTemplate'] = array('id' => 1, 'name' => 'Email template example','description' => 'This is an email template example', 'subject' => 'Email Template', 'content' => 'Hello, {{{USERNAME}}}', 'availability' => '1', 'creator_id' => '1', 'created' => '0000-00-00 00:00:00', 'updater_id' => null, 'updated' => null, 'creator' => 'Super Admin', 'updater' => null);
         $templates = $this->EmailTemplate->getMyEmailTemplate('1', 'all');
-        $this->assertEqual($templates, $expected);
+        $this->assertEqual(count($templates), 2);
+        $this->assertEqual($templates[0]['EmailTemplate']['id'], 1);
+        $this->assertEqual($templates[1]['EmailTemplate']['id'], 2);
+        $this->assertEqual($templates[0]['EmailTemplate']['name'], 'Submission Confirmation');
+        $this->assertEqual($templates[1]['EmailTemplate']['name'], 'Email template example');
 
         //Test on valid input w/ find list
         $templates = $this->EmailTemplate->getMyEmailTemplate('1', 'list');
-        $this->assertEqual($templates, array('1' => 'Email template example'));
+        $this->assertEqual($templates, array('1' => 'Submission Confirmation', '2' => 'Email template example'));
 
         //Test on null input
         $templates = $this->EmailTemplate->getMyEmailTemplate(null);
@@ -54,30 +57,35 @@ class EmailTemplateTestCase extends CakeTestCase
     function testGetPermittedEmailTemplate()
     {
         //Test on valid input w/ find all
-        $expected = array();
-        $expected[0]['EmailTemplate'] = array('id' => 1, 'name' => 'Email template example','description' => 'This is an email template example', 'subject' => 'Email Template', 'content' => 'Hello, {{{USERNAME}}}', 'availability' => '1', 'creator_id' => '1', 'created' => '0000-00-00 00:00:00', 'updater_id' => null, 'updated' => null, 'creator' => 'Super Admin', 'updater' => null);
-        $expected[1]['EmailTemplate'] = array('id' => 2, 'name' => 'Email template example2','description' => 'email template ex2', 'subject' => 'Email Template2', 'content' => 'Hello, {{{FIRSTNAME}}}', 'availability' => '1', 'creator_id' => '2', 'created' => '0000-00-00 00:00:00', 'updater_id' => null, 'updated' => null, 'creator' => 'Instructor 1', 'updater' => null);
-        $expected[2]['EmailTemplate'] = array('id' => 3, 'name' => 'Email template example3','description' => 'email temp example3', 'subject' => 'Email Template3', 'content' => 'Hello,', 'availability' => '1', 'creator_id' => '3', 'created' => '0000-00-00 00:00:00', 'updater_id' => null, 'updated' => null, 'creator' => 'Instructor 2', 'updater' => null);
         $templates = $this->EmailTemplate->getPermittedEmailTemplate('1', 'all');
-        $this->assertEqual($templates, $expected);
+        $this->assertEqual(count($templates), 4);
+        $this->assertEqual($templates[0]['EmailTemplate']['id'], 1);
+        $this->assertEqual($templates[1]['EmailTemplate']['id'], 2);
+        $this->assertEqual($templates[2]['EmailTemplate']['id'], 3);
+        $this->assertEqual($templates[3]['EmailTemplate']['id'], 4);
+        $this->assertEqual($templates[0]['EmailTemplate']['name'], 'Submission Confirmation');
+        $this->assertEqual($templates[1]['EmailTemplate']['name'], 'Email template example');
+        $this->assertEqual($templates[2]['EmailTemplate']['name'], 'Email template example2');
+        $this->assertEqual($templates[3]['EmailTemplate']['name'], 'Email template example3');
 
         //Test on valid input w/ find list
         $templates = $this->EmailTemplate->getPermittedEmailTemplate('1', 'list');
-        $this->assertEqual($templates, array('1' => 'Email template example', '2' => 'Email template example2', '3' => 'Email template example3'));
+        $this->assertEqual($templates, array(
+            '1' => 'Submission Confirmation',
+            '2' => 'Email template example',
+            '3' => 'Email template example2',
+            '4' => 'Email template example3')
+        );
 
         //Test on null input
-        $expected = array();
-        $expected[0]['EmailTemplate'] = array('id' => 1, 'name' => 'Email template example','description' => 'This is an email template example', 'subject' => 'Email Template', 'content' => 'Hello, {{{USERNAME}}}', 'availability' => '1', 'creator_id' => '1', 'created' => '0000-00-00 00:00:00', 'updater_id' => null, 'updated' => null, 'creator' => 'Super Admin', 'updater' => null);
-        $expected[1]['EmailTemplate'] = array('id' => 2, 'name' => 'Email template example2','description' => 'email template ex2', 'subject' => 'Email Template2', 'content' => 'Hello, {{{FIRSTNAME}}}', 'availability' => '1', 'creator_id' => '2', 'created' => '0000-00-00 00:00:00', 'updater_id' => null, 'updated' => null, 'creator' => 'Instructor 1', 'updater' => null);
-        $expected[2]['EmailTemplate'] = array('id' => 3, 'name' => 'Email template example3','description' => 'email temp example3', 'subject' => 'Email Template3', 'content' => 'Hello,', 'availability' => '1', 'creator_id' => '3', 'created' => '0000-00-00 00:00:00', 'updater_id' => null, 'updated' => null, 'creator' => 'Instructor 2', 'updater' => null);
         $templates = $this->EmailTemplate->getPermittedEmailTemplate(null);
-        $this->assertEqual($templates, $expected);
+        $this->assertEqual($templates, array());
     }
 
     function testGetCreatorId()
     {
         //Test on valid input
-        $creator_id = $this->EmailTemplate->getCreatorId('2');
+        $creator_id = $this->EmailTemplate->getCreatorId('3');
         $this->assertEqual($creator_id, '2');
 
         //Test on invalid input
