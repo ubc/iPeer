@@ -1125,15 +1125,19 @@ class EvaluationComponent extends Object
         //$this->set('groupMembers', $groupMembers);
         $result['groupMembers'] = $groupMembers;
 
-        //Get the target mixeval
-        $this->Mixeval->id = $event['Event']['template_id'];
-        //$this->set('mixeval', $this->Mixeval->read());
-        $result['mixeval'] = $this->Mixeval->read();
+        $result['mixeval'] = $this->Mixeval->find('first', array(
+            'conditions' => array('id' => $event['Event']['template_id']),
+            'contain' => array('Question' => 'Description'),
+        ));
+
+        // index by question number
+        if (!empty($result['mixeval']['Question'])) {
+            $result['mixeval']['Question'] = Set::combine($result['mixeval']['Question'], '{n}.question_num', '{n}');
+        }
 
         // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
-        $numMembers=count($this->GroupsMembers->getEventGroupMembersNoTutors($event['Group']['id'],
+        $numMembers = count($this->GroupsMembers->getEventGroupMembersNoTutors($event['Group']['id'],
             $event['Event']['self_eval'], $evaluator));
-        //$this->set('evaluateeCount', $numMembers);
         $result['evaluateeCount'] = $numMembers;
 
         return $result;

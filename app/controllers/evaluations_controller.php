@@ -845,7 +845,6 @@ class EvaluationsController extends AppController
             $this->set('courseId', $courseId);
             $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
             $mixEvalDetail = $this->Evaluation->loadMixEvaluationDetail($event);
-            $this->set('viewData', $this->Mixeval->compileViewDataShort($mixEvalDetail['mixeval'], $this));
             $this->set('data', $mixEvalDetail['mixeval']);
             $this->set('groupMembers', $mixEvalDetail['groupMembers']);
             $this->set('evaluateeCount', $mixEvalDetail['evaluateeCount']);
