@@ -12,7 +12,7 @@ class MixevalTestCase extends CakeTestCase
         'app.survey_group_set', 'app.survey_group',
         'app.survey_group_member', 'app.question',
         'app.response', 'app.survey_question', 'app.user_course',
-        'app.user_enrol', 'app.groups_member', 'app.mixeval', 
+        'app.user_enrol', 'app.groups_member', 'app.mixeval',
         'app.mixevals_question', 'app.mixevals_question_desc', 'app.faculty',
         'app.user_faculty', 'app.department', 'app.course_department',
         'app.sys_parameter', 'app.user_tutor', 'app.penalty',
@@ -60,27 +60,6 @@ class MixevalTestCase extends CakeTestCase
         $this->assertFalse(isset($input['questions']));
         $this->assertNotNull($result['questions']);
         $this->assertEqual(count($result['questions']), 6);
-    }
-
-    function testCompileViewDataShort()
-    {
-
-        // Set up test input with some fake questions
-        $input = array('Mixeval' => array('id' => 1),
-            'Question' => array('Q1' => 1, 'Q2' => 2));
-        // Set up test data
-        $result = $this->Mixeval->compileViewDataShort($input);
-        // Assert that a new Question array is merged with real fixture questions
-        $this->assertEqual($result['Question'][0]['MixevalsQuestion']['id'], 1);
-        $this->assertEqual($result['Question'][1]['MixevalsQuestion']['id'], 2);
-        $this->assertEqual($result['Question'][2]['MixevalsQuestion']['id'], 3);
-
-
-        // Set up alternate input without Question index
-        $altInput = array('Mixeval' => array('id' => 2));
-        $result = $this->Mixeval->compileViewDataShort($altInput);
-        // Assert no addition array entry was merged into result
-        $this->assertEqual($altInput, $result);
     }
 
     function setUpTestInput()
