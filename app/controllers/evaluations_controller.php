@@ -397,9 +397,6 @@ class EvaluationsController extends AppController
                 return;
             }
 
-            // students can submit again
-            $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
-
             $now = time();
             // students can't submit outside of release date range
             if ($now < strtotime($event['Event']['release_date_begin']) ||
@@ -407,6 +404,17 @@ class EvaluationsController extends AppController
                 $this->Session->setFlash(__('Error: Evaluation is unavailable', true));
                 $this->redirect('/home/index');
                 return;
+            }
+
+            // students can submit again
+            $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
+            if (!empty($submission)) {
+                // load the submitted values
+                $evaluation =  $this->EvaluationSimple->getSubmittedResultsByGroupIdEventIdAndEvaluator($groupId, $eventId, User::get('id'));
+                foreach ($evaluation as $eval) {
+                    $this->data['Evaluation']['point'.$eval['EvaluationSimple']['evaluatee']] = $eval['EvaluationSimple']['score'];
+                    $this->data['Evaluation']['comment_'.$eval['EvaluationSimple']['evaluatee']] = $eval['EvaluationSimple']['comment'];
+                }
             }
 
             //Get the target event
@@ -439,7 +447,10 @@ class EvaluationsController extends AppController
 
             // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
             $numMembers = count($groupMembers);
-            $simpleEvaluation = $this->SimpleEvaluation->find('id='.$event['Event']['template_id']);
+            $simpleEvaluation = $this->SimpleEvaluation->find('first', array(
+                'conditions' => array('id' => $event['Event']['template_id']),
+                'contain' => false,
+            ));
             $remaining = $simpleEvaluation['SimpleEvaluation']['point_per_member'] * $numMembers;
             //          if ($in['points']) $out['points']=$in['points']; //saves previous points
             //$points_to_ratio = $numMembers==0 ? 0 : 1 / ($simpleEvaluation['SimpleEvaluation']['point_per_member'] * $numMembers);
@@ -631,14 +642,6 @@ class EvaluationsController extends AppController
                 $this->redirect('/home/index');
                 return;
             }
-
-            // students can submit again
-            $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
-//            if (!empty($submission)) {
-//                $this->Session->setFlash(__('Error: Submissions had been made', true));
-//                $this->redirect('/home/index');
-//                return;
-//            }
 
             // students can't submit outside of release date range
             $now = time();
