@@ -10,9 +10,9 @@
   // CSS files
   echo $html->css('datepicker');
   echo $html->css('jquery.dataTables');
-  echo $html->css('http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/jquery-ui.css');
-  echo $html->css('http://fonts.googleapis.com/css?family=Lato:400,400italic,700');
-  echo $html->css('http://fonts.googleapis.com/css?family=Open+Sans:400,600,700');
+  echo $html->css('https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/jquery-ui.css');
+  echo $html->css('https://fonts.googleapis.com/css?family=Lato:400,400italic,700');
+  echo $html->css('https://fonts.googleapis.com/css?family=Open+Sans:400,600,700');
   echo $html->css('ipeer');
 
   // Scripts
