@@ -136,14 +136,13 @@ $details = Set::combine($evaluation['EvaluationDetail'], '{n}.EvaluationMixevalD
             </td></tr>
             <?php if ($evaluate) :?>
             <tr><td colspan="2" style="text-align: left; padding-left: 2em;">
-                  <?php if (isset($mixevalQuestion['MixevalsQuestion']['response_type']) && $mixevalQuestion['MixevalsQuestion']['response_type']=='L') {?>
-                     <?php $text = isset($details[$mixevalQuestion['MixevalsQuestion']['question_num']]['question_comment']) ?
+                  <?php $text = isset($details[$mixevalQuestion['MixevalsQuestion']['question_num']]['question_comment']) ?
                         $details[$mixevalQuestion['MixevalsQuestion']['question_num']]['question_comment']:'';?>
+                  <?php if (isset($mixevalQuestion['MixevalsQuestion']['response_type']) && $mixevalQuestion['MixevalsQuestion']['response_type']=='L') {?>
                      <textarea name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['MixevalsQuestion']['question_num']?>" cols="80" rows="10"><?php echo $text?></textarea>
                      <br /><?php __('Maximum 65535 characters.')?>
                   <?php } else { ?>
-                     <input type="text" name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['MixevalsQuestion']['question_num']?>" size="92" value="<?php
-                      echo htmlentities($details[$mixevalQuestion['MixevalsQuestion']['question_num']]['question_comment'])?>">
+                     <input type="text" name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['MixevalsQuestion']['question_num']?>" size="92" value="<?php echo $text?>">
                   <?php }?>
             </td></tr>
             <?php else: ?>
