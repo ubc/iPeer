@@ -190,12 +190,6 @@ class EvaluationsController extends AppController
             return;
         }
 
-        // for surveys, redirect to survey result page
-        if (3 == $event['Event']['event_template_type_id']) {
-            $this->redirect('/surveygroups/viewresult/'.$event['Event']['course_id'].'/'.$eventId);
-            return;
-        }
-
         // Survey Results are on a different page for now
         if ($event['Event']['event_template_type_id'] == 3) {
             $this->redirect("viewSurveySummary/$eventId");
