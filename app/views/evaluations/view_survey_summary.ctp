@@ -5,7 +5,6 @@ $colspan = 4; // total number of columns for when we want only 1 cell
 $questionsTable = array();
 foreach ($questions as $question) {
     $tmp = array();
-    $question = $question['Question'];
     if (isset($question['total_response'])) {
         // Processing a multiple choice response
         // header
@@ -14,7 +13,7 @@ foreach ($questions as $question) {
             $totalResponses . ' '. __('responses', true) . ')';
 
         // responses
-        foreach ($question['Responses'] as $response) {
+        foreach ($question['Response'] as $response) {
             $cells = array();
             // processing a multiple choice question's response
             $count = $response['count'];
@@ -27,17 +26,16 @@ foreach ($questions as $question) {
                 "evaluations/bar.php?per=" . $percent, array('alt'=>$percent));
             $tmp['cells'][] = $cells;
         }
-    }
-    else {
+    } else {
         // Processing a single or multi-line text response
         // header
-        $totalResponses = count($question['Responses']);
+        $totalResponses = count($question['Response']);
         $tmp['header'][] = "$questionIndex. " . $question['prompt'] . ' (' .
             $totalResponses . ' '. __('responses', true) . ')';
 
         // responses
         $responders = "";
-        foreach ($question['Responses'] as $response) {
+        foreach ($question['Response'] as $response) {
             $responders .= $response['user_name']
                 . ', ';
         }

@@ -1897,51 +1897,30 @@ class EvaluationComponent extends Object
     function formatSurveyEvaluationSummary($surveyId, $eventId)
     {
         $this->Survey = ClassRegistry::init('Survey');
-        //$this->SurveyQuestion = new SurveyQuestion;
-        $this->SurveyQuestion = ClassRegistry::init('SurveyQuestion');
-        $this->Question = ClassRegistry::init('Question');
-        $this->Response = ClassRegistry::init('Response');
         $this->SurveyInput = ClassRegistry::init('SurveyInput');
         $this->User = ClassRegistry::init('User');
 
-        $survey_id = $surveyId;
-
         // Get all required data from each table for every question
-        $surveyQuestion = new SurveyQuestion();
-        $tmp = $surveyQuestion->getQuestionsID($survey_id);
-        $tmp = $this->Question->fillQuestion($tmp);
-        $tmp = $this->Response->fillResponse($tmp);
+        $survey = $this->Survey->getSurveyWithQuestionsById($surveyId);
+        $questions = $survey['Question'];
 
-        $questions = null;
-
-        // Sort the resultant array by question number
-        $count = 1;
-        for ($i=0; $i<=count($tmp); $i++) {
-            for ($j=0; $j<count($tmp); $j++) {
-                if ($i == $tmp[$j]['Question']['number']) {
-                    $questions[$count]['Question'] = $tmp[$j]['Question'];
-                    $count++;
-                }
-            }
-        }
-
-        for ($i=1; $i < count($questions)+1; $i++) {
-            $questionType = $questions[$i]['Question']['type'];
+        foreach ($questions as $i => $question) {
+            $questionType = $question['type'];
             $questionTypeAllowed = array('C', 'M');
-            $questionId = $questions[$i]['Question']['id'];
+            $questionId = $question['id'];
 
             //count the choice responses
             if (in_array($questionType, $questionTypeAllowed)) {
                 $totalResponsePerQuestion = 0;
-                for ($j=0; $j < count($questions[$i]['Question']['Responses']); $j++) {
-                    $responseId = $questions[$i]['Question']['Responses']['response_'.$j]['id'];
+                for ($j=0; $j < count($question['Response']); $j++) {
+                    $responseId = $question['Response'][$j]['id'];
                     $answerCount = $this->SurveyInput->find('count', array('conditions' => array('event_id' => $eventId,
                         'question_id' => $questionId,
                         'response_id' => $responseId)));
-                    $questions[$i]['Question']['Responses']['response_'.$j]['count'] = $answerCount;
+                    $questions[$i]['Response'][$j]['count'] = $answerCount;
                     $totalResponsePerQuestion += $answerCount;
                 }
-                $questions[$i]['Question']['total_response'] = $totalResponsePerQuestion;
+                $questions[$i]['total_response'] = $totalResponsePerQuestion;
             } else {
 
                 $responses = $this->SurveyInput->find('all', array(
@@ -1950,7 +1929,7 @@ class EvaluationComponent extends Object
                     'fields' => array('response_text', 'user_id')
 
                 ));
-                $questions[$i]['Question']['Responses'] = array();
+                $questions[$i]['Responses'] = array();
                 //sort results by last name
                 $tmpUserResponse = array();
 
@@ -1964,8 +1943,8 @@ class EvaluationComponent extends Object
                 ksort($tmpUserResponse);
                 $k=1;
                 foreach ($tmpUserResponse as $username => $response) {
-                    $questions[$i]['Question']['Responses']['response_'.$k]['response_text'] = $response['response_text'];
-                    $questions[$i]['Question']['Responses']['response_'.$k]['user_name'] = $username;
+                    $questions[$i]['Response'][$k]['response_text'] = $response['response_text'];
+                    $questions[$i]['Response'][$k]['user_name'] = $username;
                     $k++;
                 }
             }
