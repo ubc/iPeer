@@ -173,8 +173,8 @@ class SurveysController extends AppController
      */
     function view($id)
     {
-        $survey = $this->Survey->find(
-            'first',
+        // retrieving the requested survey
+        $survey = $this->Survey->find('first',
             array(
                 'conditions' => array('id' => $id),
                 'contain' => false
@@ -188,7 +188,29 @@ class SurveysController extends AppController
             return;
         }
 
-        $this->set('data', $survey);
+        // Get all required data from each table for every question
+        $questions = $this->Question->find('all', array(
+            'conditions' => array('Survey.id' => $id),
+            'order' => 'SurveyQuestion.number',
+            'recursive' => 1)
+        );
+
+        // Convert the response array into a flat options array for
+        // the form input helper
+        foreach ($questions as &$q) {
+            if (isset($q['Response'])) {
+                $options = array();
+                foreach ($q['Response'] as $resp) {
+                    $options[$resp['id']] = $resp['response'];
+                }
+                $q['ResponseOptions'] = $options;
+            }
+        }
+
+        $this->set('breadcrumb', $this->breadcrumb->push('surveys')->
+            push(__('View', true))->push($survey['Survey']['name']));
+        $this->set('survey', $survey);
+        $this->set('questions', $questions);
     }
 
 
