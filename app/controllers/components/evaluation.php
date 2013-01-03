@@ -682,11 +682,12 @@ class EvaluationComponent extends Object
      *
      * @param mixed $event        event
      * @param mixed $groupMembers group members
+     * @param mixed $rubric       rubric with criteria
      *
      * @access public
      * @return void
      */
-    function getRubricResultDetail($event, $groupMembers)
+    function getRubricResultDetail($event, $groupMembers, $rubric)
     {
         $pos = 0;
         $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
@@ -765,7 +766,7 @@ class EvaluationComponent extends Object
                 }
             }
         }
-        $rubricResultDetail['scoreRecords'] =  $this->formatRubricEvaluationResultsMatrix($groupMembers, $evalResult);
+        $rubricResultDetail['scoreRecords'] =  $this->formatRubricEvaluationResultsMatrix($groupMembers, $evalResult, $rubric);
         $rubricResultDetail['allMembersCompleted'] = $allMembersCompleted;
         $rubricResultDetail['inCompletedMembers'] = $inCompletedMembers;
         $rubricResultDetail['memberScoreSummary'] = $memberScoreSummary;
@@ -820,11 +821,12 @@ class EvaluationComponent extends Object
      *
      * @param mixed $groupMembers group members
      * @param mixed $evalResult   evel result
+     * @param mixed $rubric       rubric with critieria
      *
      * @access public
      * @return void
      */
-    function formatRubricEvaluationResultsMatrix($groupMembers, $evalResult)
+    function formatRubricEvaluationResultsMatrix($groupMembers, $evalResult, $rubric)
     {
         //
         // results matrix format:
@@ -867,22 +869,22 @@ class EvaluationComponent extends Object
                         //$matrix[$index][$evalMark['evaluatee']] = 'n/a';
                     }
                 }
-            } else {
-                foreach ($groupMembers as $user) {
-                    if (isset($user['User'])) {
-                        $user = $user['User'];
+                //Get Ave Criteria Grade
+                foreach ($rubricCriteria as $criIndex => $criGrade) {
+                    if (!isset($groupCriteriaAve[$criIndex])) {
+                        $groupCriteriaAve[$criIndex] = 0;
                     }
-                    $matrix[$index][$user['id']] = 'n/a';
+                    $ave = $criGrade / $detailPOS;
+                    $rubricCriteria[$criIndex] = $ave;
+                    $groupCriteriaAve[$criIndex]+= $ave;
                 }
-            }
-            //Get Ave Criteria Grade
-            foreach ($rubricCriteria as $criIndex => $criGrade) {
-                if (!isset($groupCriteriaAve[$criIndex])) {
-                    $groupCriteriaAve[$criIndex] = 0;
+            } else {
+                // no result for this person
+                $matrix[$index]['grade_released'] = 0;
+                $matrix[$index]['comment_released'] = 0;
+                foreach ($rubric['RubricsCriteria'] as $criteria) {
+                    $rubricCriteria[$criteria['criteria_num']] = 'N/A';
                 }
-                $ave = $criGrade / $detailPOS;
-                $rubricCriteria[$criIndex] = $ave;
-                $groupCriteriaAve[$criIndex]+= $ave;
             }
             $matrix[$index]['rubric_criteria_ave'] = $rubricCriteria;
         }
@@ -1007,12 +1009,11 @@ class EvaluationComponent extends Object
             $this->User->id = $this->Auth->user('id');
             $this->User->recursive = -1;
             $user = $this->User->read();
-            $rubricResultDetail = $this->getRubricResultDetail($event, $user);
             $groupMembers = $this->GroupsMembers->getEventGroupMembers(
                 $event['Group']['id'], $event['Event']['self_eval'], $userId);
             $groupMembersNoTutors = $this->GroupsMembers->getEventGroupMembersNoTutors(
                 $event['Group']['id'], $event['Event']['self_eval'], $userId);
-            $rubricResultDetail = $this->getRubricResultDetail($event, $user);
+            $rubricResultDetail = $this->getRubricResultDetail($event, $user, $rubric);
             $membersAry = array();
             $membersAryNoTutors = array();
             foreach ($groupMembers as $member) {
@@ -1067,16 +1068,11 @@ class EvaluationComponent extends Object
                 ($event['Event']['self_eval'] ? null : $userId)
             );
             $groupMembersNoTutors = $this->GroupsMembers->getEventGroupMembersNoTutors($event['Group']['id'], $event['Event']['self_eval'], $userId);
-            $rubricResultDetail = $this->getRubricResultDetail($event, $groupMembersNoTutors);
+            $rubricResultDetail = $this->getRubricResultDetail($event, $groupMembersNoTutors, $rubric);
             $result['groupMembers'] = $groupMembers;
             $result['groupMembersNoTutors'] = $groupMembersNoTutors;
         }
 
-        //Get Detail information on Rubric score
-        if ($displayFormat == 'Detail') {
-            $rubricCriteria = $this->RubricsCriteria->getCriteria($rubric['Rubric']['id']);
-            $result['rubricCriteria'] = $rubricCriteria;
-        }
         $gradeReleaseStatus = $this->EvaluationRubric->getTeamReleaseStatus($event['GroupEvent']['id']);
         $result['allMembersCompleted'] = $rubricResultDetail['allMembersCompleted'];
         $result['inCompletedMembers'] = $rubricResultDetail['inCompletedMembers'];

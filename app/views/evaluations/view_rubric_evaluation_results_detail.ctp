@@ -17,7 +17,7 @@ echo $html->script('ricoaccordion');
     <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>" />
     <input type="hidden" name="display_format" value="Detail" />
 <table class="standardtable">
-    <?php echo $html->tableHeaders($this->Evaluation->getRubricSummaryTableHeader($rubric['Rubric']['total_marks'],$rubricCriteria));?>
+    <?php echo $html->tableHeaders($this->Evaluation->getRubricSummaryTableHeader($rubric['Rubric']['total_marks'], $rubricCriteria));?>
     <?php echo $html->tableCells($this->Evaluation->getRubricSummaryTable($summaryMembers, $scoreRecords, $memberScoreSummary, $penalties, $rubric['Rubric']['total_marks'])); ?>
     <tr align="center"><td colspan="<?php echo $rubric['Rubric']['criteria']+2; ?>">
         <?php
