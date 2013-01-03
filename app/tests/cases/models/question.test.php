@@ -38,26 +38,6 @@ class QuestionTestCase extends CakeTestCase
     {
     }
 
-    function testFillQuestion()
-    {
-        $data = $this->SurveyQuestion->find('all', array('conditions'=> array('survey_id' => 1),
-            'fields' => array('number', 'question_id', 'id'),
-            'order' => 'number'));
-        $ret = $this->Question->fillQuestion($data);
-        // Compare the result with fixture data
-        $firstQuestion = $ret[0]['Question'];
-        $this->assertEqual($firstQuestion['prompt'], 'What was your GPA last term?');
-        $this->assertEqual($firstQuestion['id'], 1);
-        $this->assertEqual($firstQuestion['number'], 1);
-        $secondQuestion = $ret[1]['Question'];
-        $this->assertEqual($secondQuestion['prompt'], 'Do you own a laptop?');
-        $this->assertEqual($secondQuestion['id'], 2);
-        $this->assertEqual($secondQuestion['number'], 2);
-        // Check that Survey Question has been unset
-        $this->assertFalse(isset($firstQuestion['SurveyQuestion']));
-        $this->assertFalse(isset($secondQuestion['SurveyQuestion']));
-    }
-
     function testGetTypeById()
     {
         // Set up test data

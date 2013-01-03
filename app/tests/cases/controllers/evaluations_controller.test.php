@@ -160,15 +160,14 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
             )
         );
 
-        // rubric evaluation
         $result = $this->testAction('/evaluations/makeEvaluation/4', array('return' => 'vars'));
         $this->assertEqual($result['eventId'], 4);
         $this->assertEqual($result['courseId'], 1);
-        $this->assertEqual(count($result['questions']), 2);
-        $this->assertEqual($result['questions'][0]['Question']['prompt'], 'What was your GPA last term?');
-        $this->assertEqual($result['questions'][1]['Question']['prompt'], 'Do you own a laptop?');
-        $this->assertEqual(count($result['questions'][0]['Question']['Responses']), 4);
-        $this->assertEqual(count($result['questions'][1]['Question']['Responses']), 2);
+        $this->assertEqual(count($result['survey']['Question']), 2);
+        $this->assertEqual($result['survey']['Question'][0]['prompt'], 'What was your GPA last term?');
+        $this->assertEqual($result['survey']['Question'][1]['prompt'], 'Do you own a laptop?');
+        $this->assertEqual(count($result['survey']['Question'][0]['Response']), 4);
+        $this->assertEqual(count($result['survey']['Question'][1]['Response']), 2);
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], '');
     }
