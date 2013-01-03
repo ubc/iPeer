@@ -1676,6 +1676,7 @@ class EvaluationComponent extends Object
     {
         $this->Response = ClassRegistry::init('Response');
         $this->Question = ClassRegistry::init('Question');
+        $this->SurveyQuestion = ClassRegistry::init('SurveyQuestion');
         $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
 
         $userId = $params['data']['Evaluation']['surveyee_id'];
@@ -1698,15 +1699,24 @@ class EvaluationComponent extends Object
         $surveyInput['SurveyInput']['event_id'] = $eventId;
         $successfullySaved = true;
         $j = 0;
-        for ($i=1; $i<=$params['form']['question_count']; $i++) {
+        $surveyQuestion = new SurveyQuestion();
+        $questions = $surveyQuestion->getQuestionsByEventId($eventId);
+
+        //for ($i=1; $i<=$params['form']['question_count']; $i++) {
+        foreach ($questions as $i => $question) {
             $this->SurveyInput = new SurveyInput;
             //Set survey and user id
             $surveyInput[$i+$j]['SurveyInput']['user_id'] = $userId;
             $surveyInput[$i+$j]['SurveyInput']['event_id'] = $eventId;
             //Set question Id
-            $questionId = $params['form']['question_id'.$i];
+            $questionId = $question['SurveyQuestion']['question_id'];
             $questionType = $this->Question->getTypeById($questionId);
             $surveyInput[$i+$j]['SurveyInput']['question_id'] = $questionId;
+
+            // not answers entered
+            if (!isset($params['form']['answer_'.$questionId])) {
+                continue;
+            }
             //Set answers
             $answer = $params['form']['answer_'.$questionId];
             if ('C' == $questionType) {
@@ -1732,15 +1742,15 @@ class EvaluationComponent extends Object
                         $successfullySaved=false;
                     }
                     $j++;
-                    if ($j == count($answer)) {
+                    /*if ($j == count($answer)) {
                         $i++;
-                    }
+                    }*/
                     $this->SurveyInput = new SurveyInput;
                     //Set survey and user id
                     $surveyInput[$i+$j]['SurveyInput']['user_id'] = $userId;
                     $surveyInput[$i+$j]['SurveyInput']['event_id'] = $eventId;
                     //Set question Id
-                    $questionId = $params['form']['question_id'.$i];
+                    $questionId = $params['form']['question_id'.$question['SurveyQuestion']['number']];
                     $surveyInput[$i+$j]['SurveyInput']['question_id'] = $questionId;
                     //Set answers
                     $answer = $params['form']['answer_'.$questionId];

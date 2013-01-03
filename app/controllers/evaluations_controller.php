@@ -545,22 +545,15 @@ class EvaluationsController extends AppController
             $this->set('survey_id', $survey_id);
 
             // Get all required data from each table for every question
-            $surveyQuestion = new SurveyQuestion();
-            $tmp = $surveyQuestion->getQuestionsID($survey_id);
-            $tmp = $this->Question->fillQuestion($tmp);
-            $tmp = $this->Response->fillResponse($tmp);
-            $result = array();
-            // Sort the resultant array by question number
-            for ($i=0; $i<=count($tmp); $i++) {
-                for ($j=0; $j<count($tmp); $j++) {
-                    if ($i == $tmp[$j]['Question']['number']) {
-                        $result[]['Question'] = $tmp[$j]['Question'];
-                    }
-                }
-            }
+            $survey = $this->Survey->find('first', array(
+                'conditions' => array('id' => $survey_id),
+                'contain' => array('Question' => array('order' => 'SurveyQuestion.number ASC', 'Response'))
+            ));
+
+            $this->set('event', $event);
             $this->set('courseId', $courseId);
             $this->set('eventId', $event['Event']['id']);
-            $this->set('questions', $result);
+            $this->set('survey', $survey);
             $this->render('survey_eval_form');
 
         } else {
