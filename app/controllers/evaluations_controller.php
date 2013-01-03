@@ -545,10 +545,7 @@ class EvaluationsController extends AppController
             $this->set('survey_id', $survey_id);
 
             // Get all required data from each table for every question
-            $survey = $this->Survey->find('first', array(
-                'conditions' => array('id' => $survey_id),
-                'contain' => array('Question' => array('order' => 'SurveyQuestion.number ASC', 'Response'))
-            ));
+            $survey = $this->Survey->getSurveyWithQuestionsById($survey_id);
 
             $this->set('event', $event);
             $this->set('courseId', $courseId);

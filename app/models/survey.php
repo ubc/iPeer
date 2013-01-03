@@ -113,4 +113,19 @@ class Survey extends EvaluationBase
         return $tmp['Survey']['id'];
     }
 
+    /**
+     * getSurveyWithQuestionsById
+     *
+     * @param mixed $surveyId
+     *
+     * @access public
+     * @return survey with questions and responses
+     */
+    public function getSurveyWithQuestionsById($surveyId)
+    {
+        return $this->find('first', array(
+            'conditions' => array('id' => $surveyId),
+            'contain' => array('Question' => array('order' => 'SurveyQuestion.number ASC', 'Response'))
+        ));
+    }
 }

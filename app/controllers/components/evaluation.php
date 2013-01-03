@@ -1874,27 +1874,12 @@ class EvaluationComponent extends Object
         $result['survey_id'] = $survey_id;
 
         // Get all required data from each table for every question
-        $surveyQuestion = new SurveyQuestion();
-        $tmp = $surveyQuestion->getQuestionsID($survey_id);
-        $tmp = $this->Question->fillQuestion($tmp);
-        $tmp = $this->Response->fillResponse($tmp);
-        $questions = null;
-
-        // Sort the resultant array by question number
-        $count = 1;
-        for ($i = 0; $i <= count($tmp); $i++) {
-            for ($j=0; $j<count($tmp); $j++) {
-                if ($i == $tmp[$j]['Question']['number']) {
-                    $questions[$count]['Question'] = $tmp[$j]['Question'];
-                    $count++;
-                }
-            }
-        }
+        $survey = $this->Survey->getSurveyWithQuestionsById($survey_id);
         $answers = $this->SurveyInput->getByEventIdUserId(
             $event['Event']['id'], $studentId);
 
         $result['answers'] = $answers;
-        $result['questions'] = $questions;
+        $result['questions'] = $survey['Question'];
         $result['event'] = $event;
 
         return $result;
@@ -1903,7 +1888,8 @@ class EvaluationComponent extends Object
     /**
      * formatSurveyEvaluationSummary
      *
-     * @param bool $surveyId
+     * @param bool $surveyId survey id
+     * @param bool $eventId  event  id
      *
      * @access public
      * @return void
