@@ -136,6 +136,10 @@ p {
     display: block;
 }
 
+.checkbox label { /* checkboxes look weird with left floating labels */
+    float: none;
+}
+
 a:link, a:visited {
     text-decoration: none;
 }
@@ -662,10 +666,6 @@ i {
     margin-top: 0.5em;
 }
 
-#UserForm .checkbox label {
-    float: none;
-}
-
 #UserForm .checkbox {
     vertical-align: middle;
     margin-top: 0.5em;
@@ -1002,6 +1002,32 @@ i {
 .evaltoolsadd a {
     margin-right: 1em;
     font-size: 0.9em;
+}
+
+/* SURVEYS */
+
+.surveyquestions .prompt {
+    margin: 2em 1em 1em 1em;
+}
+
+.surveyquestions  .checkbox input, .surveyquestions input[type="radio"]  {
+    margin: 0.5em;
+    margin-left: 3em;
+}
+
+.surveyquestions .checkbox label {
+    padding: 0 0 0 0.5em;
+}
+
+.surveyquestions input[type="text"] {
+    width: 40em;
+    margin-left: 3em;
+}
+
+.surveyquestions textarea {
+    width: 40em;
+    height: 10em;
+    margin-left: 3em;
 }
 
 /* TO BE REFACTORED LATER */
