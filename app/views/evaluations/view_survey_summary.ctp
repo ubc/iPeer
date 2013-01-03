@@ -1,6 +1,6 @@
 <?php
 // Survey Summary data
-$count = 1;
+$questionIndex = 1;
 $colspan = 4; // total number of columns for when we want only 1 cell
 $questionsTable = array();
 foreach ($questions as $question) {
@@ -10,7 +10,7 @@ foreach ($questions as $question) {
         // Processing a multiple choice response
         // header
         $totalResponses = $question['total_response'];
-        $tmp['header'][] = "$count. " . $question['prompt'] . ' (' . 
+        $tmp['header'][] = "$questionIndex. " . $question['prompt'] . ' (' .
             $totalResponses . ' '. __('responses', true) . ')';
 
         // responses
@@ -18,7 +18,7 @@ foreach ($questions as $question) {
             $cells = array();
             // processing a multiple choice question's response
             $count = $response['count'];
-            $percent = $totalResponses > 0 ? 
+            $percent = $totalResponses > 0 ?
                 $percent = round($count / $totalResponses * 100) : 0;
             $cells[] = $response['response'];
             $cells[] = $count;
@@ -32,7 +32,7 @@ foreach ($questions as $question) {
         // Processing a single or multi-line text response
         // header
         $totalResponses = count($question['Responses']);
-        $tmp['header'][] = "$count. " . $question['prompt'] . ' (' . 
+        $tmp['header'][] = "$questionIndex. " . $question['prompt'] . ' (' .
             $totalResponses . ' '. __('responses', true) . ')';
 
         // responses
@@ -48,7 +48,7 @@ foreach ($questions as $question) {
         $tmp['cells'][] = $cells;
     }
 
-    $count++;
+    $questionIndex++;
     $questionsTable[] = $tmp;
 }
 
@@ -57,7 +57,7 @@ $headers = array('id', 'username', 'full_name', 'email', 'student_no', 'submitte
 $displayHeaders = array();
 // display email only if the user has access to it
 foreach ($headers as $key => $header) {
-    if ($header == 'email' && 
+    if ($header == 'email' &&
         !User::hasPermission('functions/viewemailaddresses')
     ) {
         unset($headers[$key]);
@@ -70,7 +70,7 @@ $displayCells = array();
 foreach ($students as $student) {
     $tmp = array();
     foreach ($headers as $header) {
-        if ($header == 'email' && 
+        if ($header == 'email' &&
             !User::hasPermission('functions/viewemailaddresses')
         ) {
             continue;
@@ -78,16 +78,16 @@ foreach ($students as $student) {
         // link to view user information
         else if ($header == 'username') {
             $tmp[] = $html->link(
-                $student[$header], 
+                $student[$header],
                 '/users/view/'.$student['id'],
                 array('target' => '_blank')
             );
         }
         // link to view this user's submission if available
         else if ($header == 'submitted') {
-            $tmp[] = $student[$header] ? 
-                $html->link(__('Result', true), 
-                    "/evaluations/viewEvaluationResults/$eventId/" . 
+            $tmp[] = $student[$header] ?
+                $html->link(__('Result', true),
+                    "/evaluations/viewEvaluationResults/$eventId/" .
                     $student['id'],
                     array('target' => '_blank')
                 ) :
