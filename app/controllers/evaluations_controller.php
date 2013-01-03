@@ -190,12 +190,6 @@ class EvaluationsController extends AppController
             return;
         }
 
-        // for surveys, redirect to survey result page
-        if (3 == $event['Event']['event_template_type_id']) {
-            $this->redirect('/surveygroups/viewresult/'.$event['Event']['course_id'].'/'.$eventId);
-            return;
-        }
-
         // Survey Results are on a different page for now
         if ($event['Event']['event_template_type_id'] == 3) {
             $this->redirect("viewSurveySummary/$eventId");
@@ -397,9 +391,6 @@ class EvaluationsController extends AppController
                 return;
             }
 
-            // students can submit again
-            $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
-
             $now = time();
             // students can't submit outside of release date range
             if ($now < strtotime($event['Event']['release_date_begin']) ||
@@ -407,6 +398,17 @@ class EvaluationsController extends AppController
                 $this->Session->setFlash(__('Error: Evaluation is unavailable', true));
                 $this->redirect('/home/index');
                 return;
+            }
+
+            // students can submit again
+            $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
+            if (!empty($submission)) {
+                // load the submitted values
+                $evaluation =  $this->EvaluationSimple->getSubmittedResultsByGroupIdEventIdAndEvaluator($groupId, $eventId, User::get('id'));
+                foreach ($evaluation as $eval) {
+                    $this->data['Evaluation']['point'.$eval['EvaluationSimple']['evaluatee']] = $eval['EvaluationSimple']['score'];
+                    $this->data['Evaluation']['comment_'.$eval['EvaluationSimple']['evaluatee']] = $eval['EvaluationSimple']['comment'];
+                }
             }
 
             //Get the target event
@@ -439,7 +441,10 @@ class EvaluationsController extends AppController
 
             // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
             $numMembers = count($groupMembers);
-            $simpleEvaluation = $this->SimpleEvaluation->find('id='.$event['Event']['template_id']);
+            $simpleEvaluation = $this->SimpleEvaluation->find('first', array(
+                'conditions' => array('id' => $event['Event']['template_id']),
+                'contain' => false,
+            ));
             $remaining = $simpleEvaluation['SimpleEvaluation']['point_per_member'] * $numMembers;
             //          if ($in['points']) $out['points']=$in['points']; //saves previous points
             //$points_to_ratio = $numMembers==0 ? 0 : 1 / ($simpleEvaluation['SimpleEvaluation']['point_per_member'] * $numMembers);
@@ -540,22 +545,12 @@ class EvaluationsController extends AppController
             $this->set('survey_id', $survey_id);
 
             // Get all required data from each table for every question
-            $surveyQuestion = new SurveyQuestion();
-            $tmp = $surveyQuestion->getQuestionsID($survey_id);
-            $tmp = $this->Question->fillQuestion($tmp);
-            $tmp = $this->Response->fillResponse($tmp);
-            $result = array();
-            // Sort the resultant array by question number
-            for ($i=0; $i<=count($tmp); $i++) {
-                for ($j=0; $j<count($tmp); $j++) {
-                    if ($i == $tmp[$j]['Question']['number']) {
-                        $result[]['Question'] = $tmp[$j]['Question'];
-                    }
-                }
-            }
+            $survey = $this->Survey->getSurveyWithQuestionsById($survey_id);
+
+            $this->set('event', $event);
             $this->set('courseId', $courseId);
             $this->set('eventId', $event['Event']['id']);
-            $this->set('questions', $result);
+            $this->set('survey', $survey);
             $this->render('survey_eval_form');
 
         } else {
@@ -631,14 +626,6 @@ class EvaluationsController extends AppController
                 $this->redirect('/home/index');
                 return;
             }
-
-            // students can submit again
-            $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
-//            if (!empty($submission)) {
-//                $this->Session->setFlash(__('Error: Submissions had been made', true));
-//                $this->redirect('/home/index');
-//                return;
-//            }
 
             // students can't submit outside of release date range
             $now = time();
@@ -842,7 +829,6 @@ class EvaluationsController extends AppController
             $this->set('courseId', $courseId);
             $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
             $mixEvalDetail = $this->Evaluation->loadMixEvaluationDetail($event);
-            $this->set('viewData', $this->Mixeval->compileViewDataShort($mixEvalDetail['mixeval'], $this));
             $this->set('data', $mixEvalDetail['mixeval']);
             $this->set('groupMembers', $mixEvalDetail['groupMembers']);
             $this->set('evaluateeCount', $mixEvalDetail['evaluateeCount']);

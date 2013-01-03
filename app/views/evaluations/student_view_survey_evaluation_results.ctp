@@ -2,11 +2,11 @@
 <?php
 $ques_num = 1;
 foreach ($questions as $ques) {
-    if ($ques['Question']['type'] == 'M') {
-        echo '<h3>'.$ques_num.') '.$ques['Question']['prompt'].'</h3>';
+    if ($ques['type'] == 'M') {
+        echo '<h3>'.$ques_num.') '.$ques['prompt'].'</h3>';
         // a response is given
-        if (isset($answers[$ques['Question']['id']])) {
-            $responses = boldSelected($ques['Question']['Responses'], $answers[$ques['Question']['id']]);
+        if (isset($answers[$ques['id']])) {
+            $responses = boldSelected($ques['Response'], $answers[$ques['id']]);
             echo '<ol>';
             foreach ($responses as $response) {
                 echo '<li>'.$response.'</li>';
@@ -15,17 +15,17 @@ foreach ($questions as $ques) {
         // no response
         } else {
             echo '<ol>';
-            foreach ($ques['Question']['Responses'] as $response) {
+            foreach ($ques['Response'] as $response) {
                 echo '<li>'.$response['response'].'</li>';
             }
             echo '</ol>';
         }
         $ques_num++;
-    } else if ($ques['Question']['type'] == 'C') {
-        echo '<h3>'.$ques_num.') '.$ques['Question']['prompt'].'</h3>';
+    } else if ($ques['type'] == 'C') {
+        echo '<h3>'.$ques_num.') '.$ques['prompt'].'</h3>';
         // response is given
-        if (isset($answers[$ques['Question']['id']])) {
-            $responses = boldSelected($ques['Question']['Responses'], $answers[$ques['Question']['id']]);
+        if (isset($answers[$ques['id']])) {
+            $responses = boldSelected($ques['Response'], $answers[$ques['id']]);
             echo '<ul>';
             foreach ($responses as $response) {
                 echo '<li>'.$response.'</li>';
@@ -34,27 +34,27 @@ foreach ($questions as $ques) {
         // no response
         } else {
             echo '<ul>';
-            foreach ($ques['Question']['Responses'] as $response) {
+            foreach ($ques['Response'] as $response) {
                 echo '<li>'.$response['response'].'</li>';
             }
             echo '</ul>';
         }
         $ques_num++;
-    } else if ($ques['Question']['type'] == 'S') {
-        echo '<h3>'.$ques_num.') '.$ques['Question']['prompt'].'</h3>';
+    } else if ($ques['type'] == 'S') {
+        echo '<h3>'.$ques_num.') '.$ques['prompt'].'</h3>';
         // response is given
-        if (isset($answers[$ques['Question']['id']])) {
-            echo '<p><i>'.$answers[$ques['Question']['id']]['0']['SurveyInput']['response_text'].'</i></p>';
+        if (isset($answers[$ques['id']])) {
+            echo '<p><i>'.$answers[$ques['id']]['0']['SurveyInput']['response_text'].'</i></p>';
         // no response
         } else {
             echo '<p>NO RESPONSE</p>';
         }
         $ques_num++;
-    } else if ($ques['Question']['type'] == 'L') {
-        echo '<h3>'.$ques_num.') '.$ques['Question']['prompt'].'</h3>';
+    } else if ($ques['type'] == 'L') {
+        echo '<h3>'.$ques_num.') '.$ques['prompt'].'</h3>';
         // response is given
-        if (isset($answers[$ques['Question']['id']])) {
-            echo '<p><i>'.$answers[$ques['Question']['id']]['0']['SurveyInput']['response_text'].'</i></p>';
+        if (isset($answers[$ques['id']])) {
+            echo '<p><i>'.$answers[$ques['id']]['0']['SurveyInput']['response_text'].'</i></p>';
         // no response
         } else {
             echo '<p>NO RESPONSE</p>';

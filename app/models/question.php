@@ -81,5 +81,4 @@ class Question extends AppModel
         ));
         return $type['Question']['type'];
     }
-
 }

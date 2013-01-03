@@ -216,5 +216,17 @@ class SurveyQuestion extends AppModel
         return $tmp[0][0]['max(number)'];
     }
 
+    function getQuestionsByEventId($eventId)
+    {
+        $this->Event = ClassRegistry::init('Event');
+        $event = $this->Event->find('first', array(
+            'conditions' => array('id' => $eventId),
+            'contain' => false,
+            'fields' => array('template_id'),
+        ));
 
+        return $this->find('all', array(
+            'conditions' => array('survey_id' => $event['Event']['template_id']),
+        ));
+    }
 }
