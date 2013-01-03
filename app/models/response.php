@@ -13,31 +13,6 @@ class Response extends AppModel
     public $name = 'Response';
     public $belongsTo = array('Question');
 
-    /**
-     * fillResponse
-     * prepares the data public with all the response info from the form for display
-     *
-     * @param mixed $data
-     *
-     * @access public
-     * @return void
-     */
-    function fillResponse($data)
-    {
-        for ($i=0; $i<count($data); $i++) {
-            $tmp = $this->find('all', array('conditions' => array('question_id' => $data[$i]['Question']['id']),
-                'fields' => array('response', 'id')));
-            $count = count($tmp);
-            for ($j=0; $j<$count; $j++) {
-                if (!empty($tmp)) {
-                    $data[$i]['Question']['Responses']['response_'.$j]['response'] = $tmp[$j]['Response']['response'];
-                    $data[$i]['Question']['Responses']['response_'.$j]['id'] = $tmp[$j]['Response']['id'];
-                }
-            }
-        }
-        return $data;
-    }
-
 
     /**
      * getResponseByQuestionId
