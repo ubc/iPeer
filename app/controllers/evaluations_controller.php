@@ -1329,21 +1329,6 @@ class EvaluationsController extends AppController
             $this->redirect('/home');
         }
 
-        $tok = strtok($param, ';');
-        $eventId = $tok;
-        $groupId =  strtok(';');
-        $evaluateeId =  strtok(';');
-        $groupEventId = strtok(';');
-        $releaseStatus = strtok(';');
-
-        $courseId = $this->Event->getCourseByEventId($eventId);
-
-        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
-        if (!$course) {
-            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
-            $this->redirect('index');
-        }
-
         $this->autoRender = false;
         if ($param !=null) {
             $tok = strtok($param, ';');
@@ -1352,9 +1337,12 @@ class EvaluationsController extends AppController
             $eventId = $this->params['form']['event_id'];
         }
 
-        $this->Event->id = $eventId;
-        $event = $this->Event->read();
-
+        // Check whether the event exists or user has permission to access it
+        if (!($event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission(), array()))) {
+            $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+            $this->redirect('index');
+            return;
+        }
 
         switch ($event['Event']['event_template_type_id']) {
         case "1":
