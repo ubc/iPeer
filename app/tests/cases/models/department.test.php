@@ -44,6 +44,7 @@ class DepartmentTestCase extends CakeTestCase {
 
         // instructor
         $result = $this->Department->getIdsByUserId(2);
-        $this->assertFalse($result);
+        sort($result);
+        $this->assertEqual($result, array(1,2));
     }
 }

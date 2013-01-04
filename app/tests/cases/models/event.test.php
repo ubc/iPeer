@@ -270,7 +270,7 @@ class EventTestCase extends CakeTestCase
         $this->assertEqual($event['title'], 'Term 1 Evaluation');
 
         // instructor cannot access other course's event
-        $event = $this->Event->getAccessibleEventById(1, 3, Course::FILTER_PERMISSION_FACULTY);
+        $event = $this->Event->getAccessibleEventById(1, 3, Course::FILTER_PERMISSION_OWNER);
         $this->assertFalse($event);
     }
 
