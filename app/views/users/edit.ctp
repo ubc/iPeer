@@ -63,7 +63,7 @@ if (User::hasPermission('functions/user/admin')) {
 // instructor. Any other role, disable adding as a student.
 jQuery('#RoleRolesUserRoleId').change(function() {
     var str = jQuery('#RoleRolesUserRoleId option:selected').text();
-    if (str == 'admin') {
+    if (str == 'admin' || str == 'instructor') {
         jQuery('#FacultyFaculty').removeAttr('disabled');
     }
     else {
