@@ -24,7 +24,7 @@ echo $this->Form->input(
 );
 if (User::hasPermission('functions/user/admin', 'create')) {
     echo $this->Form->input('Faculty',
-        array('label' => 'Faculty (admin only)'));
+        array('label' => 'Faculty<br>(instructor/admin only)'));
 }
 echo $this->Form->input('title');
 echo $this->Form->input('student_no', array('label' => 'Student Number'));
