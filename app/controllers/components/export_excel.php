@@ -610,8 +610,8 @@ Class ExportExcelComponent extends ExportBaseNewComponent
     /**
      * createExcel
      *
-     * @param mixed $params  params
-     * @param mixed $eventId event id
+     * @param mixed $params params
+     * @param mixed $event  event
      *
      * @access public
      * @return void

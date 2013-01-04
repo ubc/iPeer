@@ -346,6 +346,12 @@ class EvaluationsController extends AppController
         }
     }
 
+    /**
+     * sendConfirmationEmail
+     *
+     * @access public
+     * @return void
+     */ 
     function _sendConfirmationEmail()
     {
         $this->SysParameter->reload();
@@ -960,7 +966,7 @@ class EvaluationsController extends AppController
                     $this->Session->setFlash(__('Error: Invalid group id.', true));
                     $this->redirect('/home/index');
                     return;
-                }
+            }
             $event = array_merge($event, $group);
         }
 
@@ -1112,7 +1118,7 @@ class EvaluationsController extends AppController
 
                     $this->Session->setFlash(__('Error: Invalid group id or you are not in this group.', true));
                     $this->redirect('/home/index');
-                }
+            }
 
             if (!$event['Event']['is_result_released']) {
                 $this->Session->setFlash(__('Error: The results are not released.', true));

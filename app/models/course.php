@@ -325,10 +325,10 @@ class Course extends AppModel
     /**
      * Get course data by student id
      *
-     * @param mixed $instructorId instructor id
-     * @param bool  $type         type
-     * @param int   $contain      contained models
-     * @param array $conditions   conditions for find
+     * @param mixed $studentId  student id
+     * @param bool  $type       type
+     * @param int   $contain    contained models
+     * @param array $conditions conditions for find
      *
      * @return course data
      */
@@ -432,9 +432,9 @@ class Course extends AppModel
     {
         $options['conditions']['Department.id'] = $departmentIds;
         if(isset($options['contain'])) { 
-        	$options['contain'] = array_merge(array('Department'), $options['contain']);
+            $options['contain'] = array_merge(array('Department'), $options['contain']);
         } else {
-        	$options['contain'] = array('Department');
+            $options['contain'] = array('Department');
         }
         if ($findType == 'list') {
             $courses = $this->find('all', $options);

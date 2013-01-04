@@ -15,8 +15,8 @@ class SurveyInput extends AppModel
     /**
      * getByEventIdUserId
      *
-     * @param mixed $surveyId survey id
-     * @param mixed $userId   user id
+     * @param mixed $eventId event id
+     * @param mixed $userId  user id
      *
      * @access public
      * @return void
@@ -39,7 +39,7 @@ class SurveyInput extends AppModel
     /**
      * getByEventIdUserIdQuestionId
      *
-     * @param mixed $surveyId   survey id
+     * @param mixed $eventId    event id
      * @param mixed $userId     user id
      * @param mixed $questionId question id
      *

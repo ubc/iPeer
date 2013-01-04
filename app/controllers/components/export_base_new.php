@@ -22,7 +22,7 @@ class ExportBaseNewComponent extends Object
      * generateHeader2
      *
      * @param mixed $params  params
-     * @param mixed $eventId event id
+     * @param mixed $event   event
      * @param mixed $type    type
      *
      * @access public
@@ -79,8 +79,9 @@ class ExportBaseNewComponent extends Object
      * buildEvaluationScoreTableByGroup
      *
      * @param mixed $params     params
-     * @param mixed $grpEventId group event id
-     * @param mixed $eventId    event id
+     * @param mixed $groupEvent group event
+     * @param mixed $event      event
+     * @param mixed $results    results
      *
      * @access public
      * @return void
@@ -108,6 +109,7 @@ class ExportBaseNewComponent extends Object
      *
      * @param mixed $params  params
      * @param mixed $event   event
+     * @param mixed $results results
      *
      * @access public
      * @return void
@@ -129,9 +131,10 @@ class ExportBaseNewComponent extends Object
      * buildMixedEvalScoreTableByEvaluatee
      *
      * @param mixed $params      params
-     * @param mixed $grpEventId  group event id
-     * @param mixed $evaluateeId evalutee id
-     * @param mixed $eventId     event id
+     * @param mixed $group       group
+     * @param mixed $evaluatee   evaluatee
+     * @param mixed $event       event
+     * @param mixed $responses   responses
      *
      * @access public
      * @return void
@@ -231,6 +234,15 @@ class ExportBaseNewComponent extends Object
         return $grid;
     }
 
+    /**
+     * calcDimensionX
+     *
+     * @param mixed $params params
+     * @param mixed $event  event
+     *
+     * @access public
+     * @return void
+     */
     public function calcDimensionX($params, $event) {
         $total = 2 + count($params['include']);
         if (4 == $event['Event']['event_template_type_id']) {

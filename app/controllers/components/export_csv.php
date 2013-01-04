@@ -76,6 +76,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
      *
      * @param mixed $params    params
      * @param mixed $questions questions
+     * @param mixed $evalType  evaluation type
      *
      * @access public
      * @return void
@@ -88,8 +89,8 @@ Class ExportCsvComponent extends ExportBaseNewComponent
     /**
      * createCsv
      *
-     * @param mixed $params  params
-     * @param mixed $eventId event id
+     * @param mixed $params params
+     * @param mixed $event  event
      *
      * @access public
      * @return void

@@ -1250,7 +1250,7 @@ class EvaluationComponent extends Object
     /**
      * getMixevalResultDetail
      *
-     * @param mixed $event        event
+     * @param mixed $groupEventId group event id
      * @param mixed $groupMembers group members
      *
      * @access public
@@ -1428,7 +1428,7 @@ class EvaluationComponent extends Object
      * results matrix format:
      * Matrix[evaluatee_id][question_index] = score
      *
-     * @param mixed $evalResult evaluation result
+     * @param mixed $evalResults evaluation result
      *
      * @access public
      * @return array

@@ -183,6 +183,14 @@ class Event extends AppModel
         return $results;
     }
 
+    /**
+     * beforeSave
+     *
+     * @param $options options
+     *
+     * @access public
+     * @return void
+     */
     function beforeSave(array $options) {
         if (isset($this->data['Group']['Group']) && isset($this->data[$this->alias]['id'])) {
             $this->GroupEvent->updateGroups($this->data[$this->alias]['id'], $this->data['Group']['Group']);
@@ -606,6 +614,17 @@ class Event extends AppModel
             'Surveys' => $surveyEvents);
     }
 
+    /**
+     * getAccessibleEventById
+     *
+     * @param $eventId    event id
+     * @param $userId     user id
+     * @param $permission permission
+     * @param $contain    contain
+     *
+     * @access public
+     * @return void
+     */
     public function getAccessibleEventById($eventId, $userId, $permission, $contain = array())
     {
         $event = $this->find('first', array(

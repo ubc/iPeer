@@ -16,6 +16,7 @@ class XmlHandlerComponent extends Object
      * @param mixed $survey    survey
      * @param mixed $numGroups number of groups
      * @param mixed $weight    weight
+     * @param mixed $eventId   event id
      *
      * @access public
      * @return void

@@ -364,6 +364,14 @@ class Group extends AppModel
         );
     }
 
+    /**
+     * getGroupWithMembersById
+     *
+     * @param $id id
+     * 
+     * @access public
+     * @return void
+     */
     function getGroupWithMembersById($id)
     {
         return $this->find('first', array(
@@ -372,6 +380,15 @@ class Group extends AppModel
         ));
     }
 
+    /**
+     * getGroupsByEventId
+     *
+     * @param $eventId event id
+     * @param $contain contain
+     * 
+     * @access public
+     * @return void
+     */
     function getGroupsByEventId($eventId, $contain = array())
     {
         return $this->find('all', array(
@@ -380,11 +397,29 @@ class Group extends AppModel
         ));
     }
 
+    /**
+     * getGroupByGroupIdEventId
+     *
+     * @param $groupId group id
+     * @param $eventId event id
+     * 
+     * @access public
+     * @return void
+     */
     function getGroupByGroupIdEventId($groupId, $eventId)
     {
         return $this->getGroupByGroupIdEventIdMemberId($groupId, $eventId, null);
     }
 
+    /**
+     * getGroupWithMemberRoleByGroupIdEventId
+     *
+     * @param $groupId group id
+     * @param $eventId event id
+     * 
+     * @access public
+     * @return void
+     */
     function getGroupWithMemberRoleByGroupIdEventId($groupId, $eventId)
     {
         $group = $this->getGroupByGroupIdEventIdMemberId($groupId, $eventId, null);
