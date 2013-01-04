@@ -104,7 +104,7 @@ class V1ControllerTest extends CakeTestCase {
             if (!($server = getenv('SERVER_TEST'))) {
                 $server = 'http://localhost:2000';
             }
-            return $server."/$path";
+            return $server.$path;
         }
         return $url;
     }
