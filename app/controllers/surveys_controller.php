@@ -472,8 +472,6 @@ class SurveysController extends AppController
    */
   function removeQuestion($survey_id, $question_id)
   {
-      $this->autoRender = false;
-
       // move question to bottom of survey list so deletion can be done
       // without affecting the number order
       $this->SurveyQuestion->moveQuestion($survey_id, $question_id, 'BOTTOM');
@@ -481,7 +479,9 @@ class SurveysController extends AppController
       // remove the question from the survey association as well as all other
       // references to the question in the responses and questions tables
       $this->Survey->habtmDelete('Question', $survey_id, $question_id);
-      //$this->Question->editCleanUp($question_id);
+      // for some reason, habtmDelete does not remove the question's entry
+      // in the Question model, so doing it here as a quick fix
+      $this->Question->delete($question_id);
 
       $this->Session->setFlash(__('The question was removed successfully.', true), 'good');
 
@@ -505,8 +505,14 @@ class SurveysController extends AppController
           $this->data = $this->Question->find('first', array('conditions' => array('id' => $this->data['Question']['template_id'])));
           $this->set('responses', $this->data['Response']);
       } elseif (!empty($this->params['data']['Question'])) {
-          //$maxQuestionNum = $this->SurveyQuestion->getMaxSurveyQuestionNumber($this->data['Survey']['id']);
-          //$this->data['number'] = $maxQuestionNum+1;
+          // Strip ID from responses or the original master question will
+          // lose its responses. We want a copy, not the original.
+          if (isset($this->data['Response'])) {
+              foreach($this->data['Response'] as &$response) {
+                  unset($response['id']);
+              }
+          }
+
           if ($this->Question->saveAll($this->data)) {
               $this->Session->setFlash(__('The question was added successfully.', true), 'good');
               // Need to run reorderQuestions once in order to correctly set the question position numbers
@@ -516,13 +522,12 @@ class SurveysController extends AppController
               //$this->questionsSummary($this->params['form']['survey_id'], null, null);
           } else {
               $this->set('responses', $this->data['Response']);
-              $this->render('editQuestion');
+              $this->Session->setFlash(_('Failed to save question.'));
           }
       } else {
           $this->set('responses', array());
       }
 
-      $this->autorender = false;
       $this->set('templates', $this->Question->find('list', array('conditions' => array('master' => 'yes'))));
       $this->set('survey_id', $survey_id);
       $this->set('breadcrumb', $this->breadcrumb->push('surveys')->push(Inflector::humanize(Inflector::underscore($this->action))));
