@@ -6,7 +6,7 @@
 <?php
 echo $this->Form->create('Group',
     array('id' => 'frm',
-    'url' => array('action' => $this->action.'/'.$course_id),
+    'url' => array('action' => $this->action.'/'.$group_id),
 ));
 echo isset($group_id) ? $this->Form->hidden('Group.id', array('value' => $group_id)):'';
 echo $this->Form->hidden('Group.course_id', array('value' => $course_id));
