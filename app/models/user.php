@@ -176,13 +176,13 @@ class User extends AppModel
     );
     
     /* validate the faculty field for user form
-    if user is a super admin, faculty admin, or instructor,
+    if user is a faculty admin, or instructor,
     faculty field must not be empty
     */
     public function beforeValidate() {
         if (array_key_exists('Faculty', $this->data) &&
             empty($this->data['Faculty']['Faculty']) && 
-            in_array($this->data['Role']['RolesUser']['role_id'],array(1,2,3))) {
+            in_array($this->data['Role']['RolesUser']['role_id'],array(2,3))) {
             // make sure this model fails when saving without department
             $this->invalidate('Faculty');
             // make the error message appear in the right place
