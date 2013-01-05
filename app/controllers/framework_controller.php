@@ -52,6 +52,7 @@ class FrameworkController extends AppController
     }
 
 
+    // Deprecated. It's the same as users/view.
     /**
      * userInfoDisplay
      *
@@ -60,7 +61,7 @@ class FrameworkController extends AppController
      * @access public
      * @return void
      */
-    function userInfoDisplay($id)
+    /*function userInfoDisplay($id)
     {
         $this->AccessControl->check('functions/user', 'read');
 
@@ -105,7 +106,7 @@ class FrameworkController extends AppController
         $this->autoRender = false;
         $this->set('user', $this->data);
         $this->render("userinfo");
-    }
+    }*/
 
 
     /**
