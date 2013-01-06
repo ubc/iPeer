@@ -1700,7 +1700,7 @@ class EvaluationComponent extends Object
         foreach ($questions as $i => $question) {
             $this->SurveyInput = new SurveyInput;
             $questionId = $question['SurveyQuestion']['question_id'];
-            $questionType = $this->Question->field('type', 
+            $questionType = $this->Question->field('type',
                 array('id' => $questionId));
             // First, remove all prior responses, this deals with the edge
             // case where the user decides to change a previously answered
@@ -1720,7 +1720,7 @@ class EvaluationComponent extends Object
                 foreach ($answer as $respId) {
                     $tmp = array();
                     // First get data on the choice the user picked
-                    $choice = $this->Response->find('first', 
+                    $choice = $this->Response->find('first',
                         array('conditions' => array('Response.id' => $respId)));
                     // Tailor a data entry for SurveyInput's saveAll function
                     $tmp['response_text'] = $choice['Response']['response'];
@@ -1736,7 +1736,7 @@ class EvaluationComponent extends Object
             }
             else if ('M' == $questionType) {
                 // We are saving a multiple choice question, only 1 answer
-                $choice = $this->Response->find('first', 
+                $choice = $this->Response->find('first',
                     array('conditions' => array('Response.id' => $answer)));
                 $tmp = array();
                 $tmp['response_text'] = $choice['Response']['response'];
@@ -1869,11 +1869,12 @@ class EvaluationComponent extends Object
      *
      * @param bool $surveyId survey id
      * @param bool $eventId  event  id
+     * @param bool $userIds  the user ids to search with
      *
      * @access public
      * @return void
      */
-    function formatSurveyEvaluationSummary($surveyId, $eventId)
+    function formatSurveyEvaluationSummary($surveyId, $eventId, $userIds = array())
     {
         $this->Survey = ClassRegistry::init('Survey');
         $this->SurveyInput = ClassRegistry::init('SurveyInput');
@@ -1882,6 +1883,11 @@ class EvaluationComponent extends Object
         // Get all required data from each table for every question
         $survey = $this->Survey->getSurveyWithQuestionsById($surveyId);
         $questions = $survey['Question'];
+        $conditions = array('event_id' => $eventId);
+        if (!empty($userIds)) {
+            // use userIds to exclude drop students
+            $conditions['user_id'] = $userIds;
+        }
 
         foreach ($questions as $i => $question) {
             $questionType = $question['type'];
@@ -1892,10 +1898,12 @@ class EvaluationComponent extends Object
             if (in_array($questionType, $questionTypeAllowed)) {
                 $totalResponsePerQuestion = 0;
                 for ($j=0; $j < count($question['Response']); $j++) {
-                    $responseId = $question['Response'][$j]['id'];
-                    $answerCount = $this->SurveyInput->find('count', array('conditions' => array('event_id' => $eventId,
-                        'question_id' => $questionId,
-                        'response_id' => $responseId)));
+                    $answerCount = $this->SurveyInput->find('count', array(
+                        'conditions' => array_merge($conditions, array(
+                            'question_id' => $questionId,
+                            'response_id' => $question['Response'][$j]['id'],
+                        ))
+                    ));
                     $questions[$i]['Response'][$j]['count'] = $answerCount;
                     $totalResponsePerQuestion += $answerCount;
                 }
@@ -1903,10 +1911,10 @@ class EvaluationComponent extends Object
             } else {
 
                 $responses = $this->SurveyInput->find('all', array(
-                    'conditions' => array('SurveyInput.event_id' => $eventId,
-                    'SurveyInput.question_id' => $questionId),
-                    'fields' => array('response_text', 'user_id')
-
+                    'fields' => array('response_text', 'user_id'),
+                    'conditions' => array_merge($conditions, array(
+                        'question_id' => $questionId,
+                    )),
                 ));
                 $questions[$i]['Responses'] = array();
                 //sort results by last name
