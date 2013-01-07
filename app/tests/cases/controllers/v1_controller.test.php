@@ -664,7 +664,7 @@ class V1ControllerTest extends CakeTestCase {
             )
         );
 
-        $url = $this->_getURL('v1/users/65498451/events');
+        $url = $this->_getURL('/v1/users/65498451/events');
         $actualEvents = $this->_oauthReq("$url");
         $this->assertEqual($expectedEvents, json_decode($actualEvents, true));
 
