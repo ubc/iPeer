@@ -1,3 +1,4 @@
+<div class='groupsimport'>
 <table class='standardtable'>
     <tr>
         <th width="50%"><?php __('Instructions')?></th>
@@ -13,16 +14,19 @@
           </ul>
           <br />
           <?php __('Format')?>:
-          <pre style='background-color: white; border:1px solid black; padding:5px; margin:5px'>
-            <?php __('Username, Group#, and Group Name')?>
+          <pre class='csvexample'>
+<?php __('Username, Group#, and Group Name')?>
           </pre>
 
           <?php __('Example')?>:
-          <pre style='background-color: white; border:1px solid black; padding:5px; margin:5px'>
-            29978037, 1, <?php __('Team A')?><br>
-            29978063, 1, <?php __('Team A')?><br>
-            29978043, 2, <?php __('Team B')?><br>
-            29978051, 2, <?php __('Team B')?>
+          <pre class='csvexample'>
+29978037, 1, <?php __('Team A')?>
+
+29978063, 1, <?php __('Team A')?>
+
+29978043, 2, <?php __('Team B')?>
+
+29978051, 2, <?php __('Team B')?>
           </pre>
         </td>
         <td style="text-align: left;">
@@ -43,3 +47,4 @@
     </td>
     </tr>
 </table>
+</div>

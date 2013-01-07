@@ -1006,6 +1006,7 @@ i {
 
 /* SURVEYS */
 
+/* surveys/view */
 .surveyquestions .prompt {
     margin: 2em 1em 1em 1em;
 }
@@ -1028,6 +1029,17 @@ i {
     width: 40em;
     height: 10em;
     margin-left: 3em;
+}
+
+/* GROUPS */
+
+/* groups/import */
+
+.groupsimport .csvexample {
+    border: 1px solid black;
+    background: white;
+    padding: 1em;
+    margin: 1em;
 }
 
 /* TO BE REFACTORED LATER */
