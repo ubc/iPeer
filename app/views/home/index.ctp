@@ -24,10 +24,7 @@ if (isset($course_list['A']))
     foreach ($course['Event'] as $event)
     {
       $eventTitle = $this->Html->link(
-        $event['title'],
-        ($event['event_template_type_id'] == 3) ?
-        '/surveygroups/viewresult/'.$event['id'] :
-        '/evaluations/view/'.$event['id']);
+          $event['title'], '/evaluations/view/'.$event['id']);
       $eventReview = '';
       if ($event['to_review_count'] > 0)
       {
