@@ -600,15 +600,7 @@ class V1Controller extends Controller {
 
         if ($this->RequestHandler->isGet()) {
             // retrieve a list of users in the given group
-            $userIds = $this->GroupsMembers->find('list',
-                array(
-                    'conditions' => array('group_id' => $groupId),
-                    'fields' => array('user_id')
-                )
-            );
-            $users = $this->User->find('all',
-                array('conditions' => array('User.id' => $userIds)));
-
+            $users = $this->User->getMembersByGroupId($groupId);
             foreach ($users as $user) {
                 $tmp = array();
                 $tmp['id'] = $user['User']['id'];
