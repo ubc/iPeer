@@ -207,7 +207,12 @@ class SurveyGroupsController extends AppController
         $cmdline = $this->__getTeamMaker().' '.$file_path.'.xml '.$file_path.'.txt';// > ../tmp/tm_log.txt";
         set_time_limit(1200);
         if ($make) {
-            exec($cmdline);
+            exec($cmdline, $out, $ret);
+            if ($ret) {
+                $this->Session->setFlash("Unable to execute TeamMaker.");
+                $this->redirect($this->referer());
+                return;
+            }
         }
 
         //parse results and display
