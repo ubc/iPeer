@@ -10,7 +10,8 @@ class V1ControllerTest extends CakeTestCase {
         'app.user_enrol', 'app.groups_member', 'app.survey',
         'app.faculty', 'app.department', 'app.course_department',
         'app.user_faculty', 'app.user_tutor', 'app.sys_parameter',
-        'app.penalty', 'app.oauth_client', 'app.oauth_token'
+        'app.penalty', 'app.oauth_client', 'app.oauth_token',
+        'app.survey_input',
     );
 
     public function startCase() {
@@ -616,38 +617,54 @@ class V1ControllerTest extends CakeTestCase {
 
     function testUsersEvents()
     {
-        $url = $this->_getURL('/v1/users/65498451/events');
         $expectedEvents = array(
             array(
                 'title' => 'Term 1 Evaluation',
                 'course_id' => '1',
                 'event_template_type_id' => '1',
                 'due_date' => '2013-07-02 16:34:43',
-                'id' => '1'
+                'id' => '1',
+                'release_date_begin' => "2011-06-16 16:34:49",
+                'release_date_end' => "2023-07-22 16:34:53",
+                'is_released' => true,
+                'is_ended' => false,
             ),
             array(
                 'title' => 'Term Report Evaluation',
                 'course_id' => '1',
                 'event_template_type_id' => '2',
                 'due_date' => '2013-06-08 08:59:29',
-                'id' => '2'
+                'id' => '2',
+                'release_date_begin' => "2011-06-06 08:59:35",
+                'release_date_end' => "2023-07-02 08:59:41",
+                'is_released' => true,
+                'is_ended' => false,
             ),
             array(
                 'title' => 'Project Evaluation',
                 'course_id' => '1',
                 'event_template_type_id' => '4',
                 'due_date' => '2013-07-02 09:00:28',
-                'id' => '3'
+                'id' => '3',
+                'release_date_begin' => "2011-06-07 09:00:35",
+                'release_date_end' => "2023-07-09 09:00:39",
+                'is_released' => true,
+                'is_ended' => false,
             ),
             array(
                 'title' => 'simple evaluation 2',
                 'course_id' => '1',
                 'event_template_type_id' => '1',
                 'due_date' => '2012-11-28 00:00:00',
-                'id' => '6'
+                'id' => '6',
+                'release_date_begin' => "2012-11-20 00:00:00",
+                'release_date_end' => "2022-11-29 00:00:00",
+                'is_released' => true,
+                'is_ended' => false,
             )
         );
 
+        $url = $this->_getURL('v1/users/65498451/events');
         $actualEvents = $this->_oauthReq("$url");
         $this->assertEqual($expectedEvents, json_decode($actualEvents, true));
 

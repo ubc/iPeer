@@ -12,7 +12,7 @@ class MixevalsQuestionTestCase extends CakeTestCase
         'app.survey_group_member', 'app.question',
         'app.response', 'app.survey_question', 'app.user_course',
         'app.user_enrol', 'app.groups_member', 'app.mixeval', 'app.mixevals_question',
-        'app.mixevals_question_desc'
+        'app.mixevals_question_desc', 'app.survey_input',
     );
     public $MixevalsQuestion = null;
 
@@ -67,11 +67,11 @@ class MixevalsQuestionTestCase extends CakeTestCase
         $this->assertEqual($result[0]['MixevalsQuestion']['id'], 1);
         $this->assertEqual($result[1]['MixevalsQuestion']['id'], 2);
         $this->assertEqual($result[2]['MixevalsQuestion']['id'], 3);
-        $this->assertEqual($result[0]['MixevalsQuestion']['title'], 
+        $this->assertEqual($result[0]['MixevalsQuestion']['title'],
             'Participated in Team Meetings');
-        $this->assertEqual($result[1]['MixevalsQuestion']['title'], 
+        $this->assertEqual($result[1]['MixevalsQuestion']['title'],
             'Was Helpful and co-operative');
-        $this->assertEqual($result[2]['MixevalsQuestion']['title'], 
+        $this->assertEqual($result[2]['MixevalsQuestion']['title'],
             'Submitted work on time');
     }
 

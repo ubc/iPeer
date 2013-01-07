@@ -14,9 +14,9 @@ class RubricsCriteriaTestCase extends CakeTestCase
         'app.response', 'app.survey_question', 'app.user_course',
         'app.user_enrol', 'app.groups_member', 'app.rubric', 'app.rubrics_lom',
         'app.rubrics_criteria', 'app.rubrics_criteria_comment',
-        'app.faculty', 'app.user_faculty', 'app.department', 
+        'app.faculty', 'app.user_faculty', 'app.department',
         'app.course_department', 'app.sys_parameter', 'app.user_tutor',
-        'app.penalty', 'app.evaluation_simple'
+        'app.penalty', 'app.evaluation_simple', 'app.survey_input',
     );
     public $RubricsCriteria = null;
 
@@ -45,11 +45,11 @@ class RubricsCriteriaTestCase extends CakeTestCase
         // Compare result to fixture data
         $this->assertTrue(!empty($criteria1));
         $this->assertNotNull($criteria1);
-        $this->assertEqual($criteria1[0]['RubricsCriteria']['criteria'], 
+        $this->assertEqual($criteria1[0]['RubricsCriteria']['criteria'],
             'Participated in Team Meetings');
-        $this->assertEqual($criteria1[1]['RubricsCriteria']['criteria'], 
+        $this->assertEqual($criteria1[1]['RubricsCriteria']['criteria'],
             'Was Helpful and Co-operative');
-        $this->assertEqual($criteria1[2]['RubricsCriteria']['criteria'], 
+        $this->assertEqual($criteria1[2]['RubricsCriteria']['criteria'],
             'Submitted Work on Time');
 
     }

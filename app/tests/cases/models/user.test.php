@@ -3,7 +3,16 @@
 App::import('Model', 'User');
 
 class UserTestCase extends CakeTestCase {
-    var $fixtures = array('app.user', 'app.evaluation_submission', 'app.event', 'app.event_template_type', 'app.course', 'app.group', 'app.group_event', 'app.groups_member', 'app.survey', 'app.survey_group_set', 'app.survey_group', 'app.survey_group_member', 'app.question', 'app.response', 'app.survey_question', 'app.user_course', 'app.user_tutor', 'app.user_enrol', 'app.department', 'app.faculty', 'app.course_department', 'app.user_faculty', 'app.role', 'app.roles_user', 'app.penalty', 'app.evaluation_simple');
+    var $fixtures = array(
+        'app.user', 'app.evaluation_submission', 'app.event',
+        'app.event_template_type', 'app.course', 'app.group',
+        'app.group_event', 'app.groups_member', 'app.survey',
+        'app.survey_group_set', 'app.survey_group', 'app.survey_group_member',
+        'app.question', 'app.response', 'app.survey_question', 'app.user_course',
+        'app.user_tutor', 'app.user_enrol', 'app.department', 'app.faculty',
+        'app.course_department', 'app.user_faculty', 'app.role', 'app.roles_user',
+        'app.penalty', 'app.evaluation_simple', 'app.survey_input',
+    );
 
     function startCase()
     {
@@ -335,6 +344,180 @@ class UserTestCase extends CakeTestCase {
         $users = $this->User->getMembersByGroupId(1, 8);
         $users = Set::sort($users, '{n}.User.id', 'asc');
         $this->assertEqual(Set::extract($users, '/User/id'), array(5,6,7,35));
+    }
+
+    /**
+     * testSaveAllWithFailedResult
+     *
+     * Testing cakephp saveall bug. When the failed entry
+     * is the last one in the array, cakephp fails to save the rest.
+     *
+     * @access public
+     * @return void
+     */
+    function testSaveAllWithFailedResult() {
+        $data = array(
+            array(
+                'User' => array(
+                    'id' => 0,
+                    'username' => 'notonlist1',
+                    'email' => 'noonlist1@example.com',
+                    'first_name' => 'Not',
+                    'last_name' => 'Onlist1',
+                    'student_no' => '',
+                ),
+                'Role' => array('RoleUser' => array('role_id' => 3)),
+            ),
+            array(
+                'User' => array(
+                    'id' => 0,
+                    'username' => '65498451',
+                    'email' => 'onlist1@example.com',
+                    'first_name' => 'On',
+                    'last_name' => 'list1',
+                    'student_no' => '',
+                ),
+                'Role' => array('RoleUser' => array('role_id' => 5)),
+            ),
+            array(
+                'User' => array(
+                    'id' => 0,
+                    'username' => 'notonlist2',
+                    'email' => 'noonlist2@example.com',
+                    'first_name' => 'Not',
+                    'last_name' => 'Onlist2',
+                    'student_no' => '',
+                ),
+                'Role' => array('RoleUser' => array('role_id' => 5)),
+            ),
+        );
+
+        $result = $this->User->saveAll($data, array('atomic' => false));
+        $this->assertTrue($result[0]);
+        $this->assertTrue($result[2]);
+        $this->assertFalse($result[1]);
+        $this->assertEqual($this->User->validationErrors, array(1 => array(
+            'username' => 'Duplicate Username found. Please select another.'
+        )));
+
+        $usernames = Set::extract($data, '/User/username');
+        $sbody = $this->User->find('all', array(
+            'conditions' => array('username' => $usernames),
+            'fields' => array('User.id', 'username', 'last_name', 'first_name'),
+            'contain' => false,
+        ));
+
+        $this->assertEqual(count($sbody), 3);
+    }
+
+    function testSaveAllWithLastOneFailed() {
+        $data = array(
+            array(
+                'User' => array(
+                    'id' => 0,
+                    'username' => 'notonlist1',
+                    'email' => 'noonlist1@example.com',
+                    'first_name' => 'Not',
+                    'last_name' => 'Onlist1',
+                    'student_no' => '',
+                ),
+                'Role' => array('RoleUser' => array('role_id' => 3)),
+            ),
+            array(
+                'User' => array(
+                    'id' => 0,
+                    'username' => 'notonlist2',
+                    'email' => 'noonlist2@example.com',
+                    'first_name' => 'Not',
+                    'last_name' => 'Onlist2',
+                    'student_no' => '',
+                ),
+                'Role' => array('RoleUser' => array('role_id' => 5)),
+            ),
+            array(
+                'User' => array(
+                    'id' => 0,
+                    'username' => '65498451',
+                    'email' => 'onlist1@example.com',
+                    'first_name' => 'On',
+                    'last_name' => 'list1',
+                    'student_no' => '',
+                ),
+                'Role' => array('RoleUser' => array('role_id' => 5)),
+            ),
+        );
+
+        $result = $this->User->saveAll($data, array('atomic' => false));
+        $this->assertTrue($result[0]);
+        $this->assertTrue($result[1]);
+        $this->assertFalse($result[2]);
+        $this->assertEqual($this->User->validationErrors, array(2 => array(
+            'username' => 'Duplicate Username found. Please select another.'
+        )));
+
+        $usernames = Set::extract($data, '/User/username');
+        $sbody = $this->User->find('all', array(
+            'conditions' => array('username' => $usernames),
+            'fields' => array('User.id', 'username', 'last_name', 'first_name'),
+            'contain' => false,
+        ));
+
+        $this->assertEqual(count($sbody), 3);
+    }
+
+    function testSaveAllWithValidationFailed() {
+        $data = array(
+            array(
+                'User' => array(
+                    'id' => 0,
+                    'username' => 'notonlist1',
+                    'email' => 'noonlist1@example.com',
+                    'first_name' => 'Not',
+                    'last_name' => 'Onlist1',
+                    'student_no' => '',
+                ),
+                'Role' => array('RoleUser' => array('role_id' => 3)),
+            ),
+            array(
+                'User' => array(
+                    'id' => 0,
+                    'username' => 'notonlist2',
+                    'email' => 'noonlist2@example.com',
+                    'first_name' => 'Not',
+                    'last_name' => 'Onlist2',
+                    'student_no' => '',
+                ),
+                'Role' => array('RoleUser' => array('role_id' => 5)),
+            ),
+            array(
+                'User' => array(
+                    'id' => 0,
+                    'username' => '#####',
+                    'email' => 'onlist1@example.com',
+                    'first_name' => 'On',
+                    'last_name' => 'list1',
+                    'student_no' => '',
+                ),
+                'Role' => array('RoleUser' => array('role_id' => 5)),
+            ),
+        );
+
+        $result = $this->User->saveAll($data, array('atomic' => false));
+        $this->assertTrue($result[0]);
+        $this->assertTrue($result[1]);
+        $this->assertFalse($result[2]);
+        $this->assertEqual($this->User->validationErrors, array(2 => array(
+            'username' => 'Usernames may only have letters, numbers, underscore and dot.'
+        )));
+
+        $usernames = Set::extract($data, '/User/username');
+        $sbody = $this->User->find('all', array(
+            'conditions' => array('username' => $usernames),
+            'fields' => array('User.id', 'username', 'last_name', 'first_name'),
+            'contain' => false,
+        ));
+
+        $this->assertEqual(count($sbody), 2);
     }
 
     function testGetCourseTutorsForList() {
