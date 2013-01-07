@@ -136,10 +136,6 @@ p {
     display: block;
 }
 
-.checkbox label { /* checkboxes look weird with left floating labels */
-    float: none;
-}
-
 a:link, a:visited {
     text-decoration: none;
 }
@@ -1028,6 +1024,10 @@ i {
     width: 40em;
     height: 10em;
     margin-left: 3em;
+}
+
+.surveyquestions .checkbox label { /* checkboxes look weird with left floating labels */
+    float: none;
 }
 
 /* TO BE REFACTORED LATER */
