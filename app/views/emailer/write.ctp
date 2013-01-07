@@ -11,7 +11,7 @@
                         echo $html->link($recipients['name'], $recipients['link']);
                     }
                 ?></p>
-                <div id="add-div"></div>
+                <div id="add-div"></div><?php natcasesort($recipients_rest);?>
                 <?php echo $this->Form->select('recipients', $recipients_rest);
                     echo $this->Js->link(__('Add Additional Recipient', true),
                         array('action' => 'addRecipient'),
