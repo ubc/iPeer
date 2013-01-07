@@ -326,6 +326,9 @@ class EventsController extends AppController
             } else if ($typeId == 2) {
                 $this->data['Event']['template_id'] =
                     $this->data['Event']['Rubric'];
+            } else if ($typeId == 3) {
+                $this->data['Event']['template_id'] =
+                    $this->data['Event']['Survey'];
             } else if ($typeId == 4) {
                 $this->data['Event']['template_id'] =
                     $this->data['Event']['Mixeval'];
