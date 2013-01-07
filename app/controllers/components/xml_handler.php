@@ -75,13 +75,11 @@ class XmlHandlerComponent extends Object
                 if (!empty($responses)) {
                     foreach ($responses as $resp) {
                         $response_tmp = $resp['SurveyInput'];
-                        if ($response_tmp['response_id'] != null) {
-                            //response/answer
-                            $value = $doc->$createElementFunc('value');
-                            $value->$setAttributeFunc('id', $response_tmp['response_id']);
-                            #$value->$setAttributeFunc('answer', 1);
-                            $response->$appendChildFunc($value);
-                        }
+                        //response/answer
+                        $value = $doc->$createElementFunc('value');
+                        $value->$setAttributeFunc('id', $response_tmp['response_id'] == null ? '':$response_tmp['response_id'] == null);
+                        #$value->$setAttributeFunc('answer', 1);
+                        $response->$appendChildFunc($value);
                     }
                 } else {
                     if ('M' == $q['type']) {
