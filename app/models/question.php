@@ -56,4 +56,46 @@ class Question extends AppModel
         ));
         return $type['Question']['type'];
     }
+
+    /**
+     * getQuestionsForMakingGroupBySurveyId
+     * get all the questions that are available for makeing groups
+     * E.g. select/checkbox questions
+     * The result of questions are ordered
+     *
+     * @param mixed $surveyId survey id
+     *
+     * @access public
+     * @return array of the questions
+     */
+    function getQuestionsForMakingGroupBySurveyId($surveyId)
+    {
+        $questions = $this->find('all', array(
+            'fields' => array($this->alias.'.*'),
+            'conditions' => array(
+                'type' => array('C', 'M'),
+                'Survey.id' => $surveyId,
+            ),
+            'order' => 'number ASC',
+            'contain' => 'Survey',
+        ));
+
+        return Set::classicExtract($questions, '{n}.Question');
+    }
+
+    /**
+     * getQuestionsListBySurveyId
+     * return the list of questions for select
+     *
+     * @param mixed $surveyId survey id
+     *
+     * @access public
+     * @return void
+     */
+    function getQuestionsListBySurveyId($surveyId)
+    {
+        $questions = $this->getQuestionsForMakingGroupBySurveyId($surveyId);
+
+        return Set::combine($questions, '{n}.id', '{n}.prompt');
+    }
 }

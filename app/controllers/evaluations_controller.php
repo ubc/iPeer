@@ -1632,15 +1632,17 @@ class EvaluationsController extends AppController
 
         // Check that course is accessible by user
         $course = $this->Course->getAccessibleCourseById(
-            $event['Event']['course_id'], User::get('id'), User::getCourseFilterPermission());
+            $event['Event']['course_id'], User::get('id'), User::getCourseFilterPermission(), array('Enrol'));
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
         }
 
-        // Prepare data to pass to view
+        // Prepare data to pass to view, get current enrolled student Ids first
+        // so that we can exclude the dropped students
+        $studentIds = Set::extract($course['Enrol'], '/id');
         $formattedResult = $this->Evaluation->formatSurveyEvaluationSummary(
-            $survey['Survey']['id'], $eventId);
+            $survey['Survey']['id'], $eventId, $studentIds);
 
         $this->set('questions', $formattedResult);
         $this->set('breadcrumb',
@@ -1648,14 +1650,6 @@ class EvaluationsController extends AppController
             ->push(array('survey' => $survey['Survey']))
             ->push(__('Summary', true)));
 
-        // Get enrolment data for the individual responses
-        $course = $this->Course->find(
-            'first',
-            array(
-                'conditions' => array('id' => $course['Course']['id']),
-                'contain' => array('Enrol')
-            )
-        );
         $submissions = $this->SurveyInput->findAllByEventId($eventId);
         // add submission status for each enroled user
         foreach ($course['Enrol'] as $key => $student) {

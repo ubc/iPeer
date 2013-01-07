@@ -12,7 +12,7 @@ class MixevalsQuestionDescTestCase extends CakeTestCase
         'app.survey_group_member', 'app.question',
         'app.response', 'app.survey_question', 'app.user_course',
         'app.user_enrol', 'app.groups_member', 'app.mixeval', 'app.mixevals_question',
-        'app.mixevals_question_desc'
+        'app.mixevals_question_desc', 'app.survey_input',
     );
     public $MixevalsQuestionDesc = null;
 
@@ -61,10 +61,10 @@ class MixevalsQuestionDescTestCase extends CakeTestCase
         // Data comes from fixture tables
         $result = $this->MixevalsQuestionDesc->getQuestionDescriptor(1);
         $this->assertEqual($result[0]['MixevalsQuestionDesc']['id'], 1);
-        $this->assertEqual($result[0]['MixevalsQuestionDesc']['descriptor'], 
+        $this->assertEqual($result[0]['MixevalsQuestionDesc']['descriptor'],
             'Lowest');
         $this->assertEqual($result[2]['MixevalsQuestionDesc']['id'], 3);
-        $this->assertEqual($result[2]['MixevalsQuestionDesc']['descriptor'], 
+        $this->assertEqual($result[2]['MixevalsQuestionDesc']['descriptor'],
             'Middle');
     }
 
@@ -72,7 +72,7 @@ class MixevalsQuestionDescTestCase extends CakeTestCase
     {
         $tmp = array(
             '0' => array(
-                'id' => 1, 
+                'id' => 1,
                 'question_type' => 'S',
                 'question_num' => 1,
                 'title' => 'Participated in Team Meetings',

@@ -12,7 +12,7 @@ class CourseTestCase extends CakeTestCase {
         'app.user_enrol', 'app.groups_member', 'app.survey',
         'app.user_faculty', 'app.faculty', 'app.department',
         'app.course_department', 'app.user_tutor', 'app.penalty',
-        'app.evaluation_simple'
+        'app.evaluation_simple', 'app.survey_input',
     );
     public $Course = null;
 

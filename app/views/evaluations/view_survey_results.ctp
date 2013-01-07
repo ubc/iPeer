@@ -69,17 +69,20 @@ foreach ($questions as $ques) {
 }
 
 function boldSelected($choices, $selected) {
-    $options = array();
     $answers = array();
     $data = array();
-
     // grabbing all the choices
-    foreach ($choices as $choice) {
-        $options[] = $choice['response'];
-    }
+    $options = Set::combine($choices, '{n}.id', '{n}.response');
+
     // grabbing all the chosen values
     foreach ($selected as $select) {
-        $answers[] = $select['SurveyInput']['response_text'];
+        if (null != $select['SurveyInput']['response_text']) {
+            // if response text is available
+            $answers[] = $select['SurveyInput']['response_text'];
+        } else {
+            // otherwise use response id
+            $answers[] = $options[$select['SurveyInput']['response_id']];
+        }
     }
 
     foreach ($options as $option) {

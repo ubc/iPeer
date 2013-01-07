@@ -13,7 +13,14 @@ class SurveyGroupSet extends AppModel
     public $name = 'SurveyGroupSet';
     public $belongsTo = array(
         'Survey' => array(
+            // deprecated assocation!
             'className'    => 'Survey',
+            'condition'    => '',
+            'order'        => '',
+            'foreignKey'   => 'survey_id'
+        ),
+        'Event' => array(
+            'className'    => 'Event',
             'condition'    => '',
             'order'        => '',
             'foreignKey'   => 'survey_id'
@@ -86,15 +93,20 @@ class SurveyGroupSet extends AppModel
                 $groupNum = 1;
                 foreach ($data['SurveyGroup'] as $survey_group) {
                     $survey_group['SurveyGroup']['group_set_id'] = $this->id;
+                    $survey_group['SurveyGroup']['group_number'] = $groupNum;
                     if (isset($survey_group['SurveyGroupMember'])) {
-                        foreach ($survey_group['SurveyGroupMember'] as $key => $m) {
+                        foreach ($survey_group['SurveyGroupMember'] as $key => $member) {
                             $survey_group['Member'][$key]['SurveyGroupMember']['group_set_id'] = $this->id;
-                            $survey_group['Member'][$key]['SurveyGroupMember']['user_id'] = $m['user_id'];
+                            $survey_group['Member'][$key]['SurveyGroupMember']['user_id'] = $member;
                             $survey_group['Member'][$key]['SurveyGroupMember']['group_id'] = $groupNum;
                         }
+                        unset($survey_group['SurveyGroupMember']);
                     }
-                    $result = $SurveyGroup->save($survey_group, array('validate' => $validate,
-                        'atomic' => false));
+
+                    if (!$result = $SurveyGroup->saveAll($survey_group, array('validate' => $validate,
+                        'atomic' => false))) {
+                        break;
+                    }
                     $groupNum++;
                 }
             }
@@ -121,19 +133,26 @@ class SurveyGroupSet extends AppModel
      */
     function release($group_set_id)
     {
-        $group_set = $this->find('first', array('conditions' => array('SurveyGroupSet.id' => $group_set_id),
-            'contain' => array('Survey', 'SurveyGroup' => array('Member.id')),
+        $group_set = $this->find('first', array(
+            'conditions' => array('SurveyGroupSet.id' => $group_set_id),
+            'contain' => array('SurveyGroup' => array('Member')),
         ));
         if (empty($group_set) || $group_set['SurveyGroupSet']['released']) {
             return false;
         }
+
+        $event = $this->Event->find('first', array(
+            'conditions' => array('id' => $group_set['SurveyGroupSet']['survey_id']),
+            'contain' => false,
+        ));
+        $courseId = $event['Event']['course_id'];
 
         $Group = ClassRegistry::init('Group');
         $result = true;
         $groups = array();
 
         //get last group number if exists
-        $max_group_num = $Group->getLastGroupNumByCourseId($group_set['Survey']['course_id']);
+        $max_group_num = $Group->getLastGroupNumByCourseId($courseId);
 
         // begin transaction for saving the records
         $dataSource = $this->getDataSource();
@@ -143,7 +162,7 @@ class SurveyGroupSet extends AppModel
             $groupNum = $surveyGroup['group_number'];
             $group['Group']['group_num'] = $groupNum + $max_group_num;
             $group['Group']['group_name'] = $group_set['SurveyGroupSet']['set_description'].' Team #'.$surveyGroup['group_number'];
-            $group['Group']['course_id'] = $group_set['Survey']['course_id'];
+            $group['Group']['course_id'] = $courseId;
 
             //add group members
             foreach ($surveyGroup['Member'] as $surveyGroupMember) {

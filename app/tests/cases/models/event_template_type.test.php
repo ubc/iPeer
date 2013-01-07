@@ -13,7 +13,7 @@ class EventTemplateTypeTestCase extends CakeTestCase {
         'app.user_enrol', 'app.groups_member', 'app.survey',
         'app.faculty', 'app.user_faculty', 'app.user_tutor',
         'app.department', 'app.course_department', 'app.penalty',
-        'app.evaluation_simple'
+        'app.evaluation_simple', 'app.survey_input',
     );
     public $EventTemplateType = null;
 
@@ -45,7 +45,7 @@ class EventTemplateTypeTestCase extends CakeTestCase {
         $this->assertEqual($result[2], 'RUBRIC');
         $this->assertEqual($result[3], 'SURVEY');
         $this->assertEqual($result[4], 'MIX EVALUATION');
-        
+
         // Test for returning ONLY display_for_selection==1 templates
         $result = $this->EventTemplateType->getEventTemplateTypeList(true);
         $this->assertTrue(!empty($result));

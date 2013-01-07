@@ -43,27 +43,27 @@ class V1Controller extends Controller {
     private function _checkRequiredParams() {
         if (!isset($_REQUEST['oauth_consumer_key'])) {
             $this->set('oauthError', "Parameter Absent: oauth_consumer_key");
-            $this->render('oauth_error');
+            $this->output = $this->render('oauth_error');
             return false;
         }
         if (!isset($_REQUEST['oauth_token'])) {
             $this->set('oauthError', "Parameter Absent: oauth_token");
-            $this->render('oauth_error');
+            $this->output = $this->render('oauth_error');
             return false;
         }
         if (!isset($_REQUEST['oauth_signature_method'])) {
             $this->set('oauthError', "Parameter Absent: oauth_signature_method");
-            $this->render('oauth_error');
+            $this->output = $this->render('oauth_error');
             return false;
         }
         if (!isset($_REQUEST['oauth_timestamp'])) {
             $this->set('oauthError', "Parameter Absent: oauth_timestamp");
-            $this->render('oauth_error');
+            $this->output = $this->render('oauth_error');
             return false;
         }
         if (!isset($_REQUEST['oauth_nonce'])) {
             $this->set('oauthError', "Parameter Absent: oauth_nonce");
-            $this->render('oauth_error');
+            $this->output = $this->render('oauth_error');
             return false;
         }
         // oauth_version is optional, but must be set to 1.0
@@ -72,13 +72,13 @@ class V1Controller extends Controller {
         ) {
             $this->set('oauthError',
                 "Parameter Rejected: oauth_version 1.0 only");
-            $this->render('oauth_error');
+            $this->output = $this->render('oauth_error');
             return false;
         }
         if ($_REQUEST['oauth_signature_method'] != "HMAC-SHA1") {
             $this->set('oauthError',
                 "Parameter Rejected: Only HMAC-SHA1 signatures supported.");
-            $this->render('oauth_error');
+            $this->output = $this->render('oauth_error');
             return false;
         }
         return true;
@@ -135,7 +135,7 @@ class V1Controller extends Controller {
         if (is_null($clientSecret)) {
             $this->log('Got invalid client ["'.(isset($_REQUEST['oauth_consumer_key']) ? $_REQUEST['oauth_consumer_key'] : "").'"]!');
             $this->set('oauthError', "Invalid Client");
-            $this->render('oauth_error');
+            $this->output = $this->render('oauth_error');
             return false;
         }
         $clientSecret = rawurlencode($clientSecret);
@@ -143,7 +143,7 @@ class V1Controller extends Controller {
         if (is_null($tokenSecret)) {
             $this->log('Got invalid token ["'.(isset($_REQUEST['oauth_token']) ? $_REQUEST['oauth_token'] : "").'"]!');
             $this->set('oauthError', "Invalid Token");
-            $this->render('oauth_error');
+            $this->output = $this->render('oauth_error');
             return false;
         }
         $tokenSecret = rawurlencode($tokenSecret);
@@ -158,7 +158,7 @@ class V1Controller extends Controller {
         if ($expected != $actual) {
             $this->log('Got invalid signature. expecting: '.$expected.', actual: '.$actual.'.');
             $this->set('oauthError', "Invalid Signature");
-            $this->render('oauth_error');
+            $this->output = $this->render('oauth_error');
             return false;
         }
         return true;
@@ -185,7 +185,7 @@ class V1Controller extends Controller {
         if ($diff > $validTimeWindow) {
             // more than 15 minutes of difference between the two times
             $this->set('oauthError', "Timestamp Refused");
-            $this->render('oauth_error');
+            $this->output = $this->render('oauth_error');
             return false;
         }
 
@@ -203,7 +203,7 @@ class V1Controller extends Controller {
         if ($ret) {
             // we've seen this nonce already
             $this->set('oauthError', "Nonce Used");
-            $this->render('oauth_error');
+            $this->output = $this->render('oauth_error');
             return false;
         } else {
             // store nonce we haven't encountered before
@@ -252,8 +252,10 @@ class V1Controller extends Controller {
         }
         $this->log('Got API request '. print_r($_REQUEST, true)."\nBody: ".$this->body, 'debug');
 
-        return $this->_checkRequiredParams() && $this->_checkSignature() &&
-            $this->_checkNonce();
+        if (!($this->_checkRequiredParams() && $this->_checkSignature() && $this->_checkNonce())) {
+            echo $this->output;
+            $this->_stop();
+        }
     }
 
     /**
@@ -876,7 +878,7 @@ class V1Controller extends Controller {
                 // after release begin date and before end date
             $evts = $this->Event->find('all', array(
                 'conditions' => $eventConditions,
-                'fields' => array('title', 'course_id', 'event_template_type_id', 'due_date', 'id')
+                'fields' => array('title', 'course_id', 'event_template_type_id', 'due_date', 'release_date_begin', 'release_date_end', 'id')
             ));
 
             $events = array();
