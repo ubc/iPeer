@@ -77,7 +77,7 @@ class XmlHandlerComponent extends Object
                         $response_tmp = $resp['SurveyInput'];
                         //response/answer
                         $value = $doc->$createElementFunc('value');
-                        $value->$setAttributeFunc('id', $response_tmp['response_id'] == null ? '':$response_tmp['response_id'] == null);
+                        $value->$setAttributeFunc('id', $response_tmp['response_id'] == null ? '':$response_tmp['response_id']);
                         #$value->$setAttributeFunc('answer', 1);
                         $response->$appendChildFunc($value);
                     }
