@@ -11,7 +11,8 @@ class GroupsMembersTestCase extends CakeTestCase
         'app.survey_group_set', 'app.survey_group',
         'app.survey_group_member', 'app.question',
         'app.response', 'app.survey_question', 'app.user_course',
-        'app.user_enrol', 'app.groups_member', 'app.survey'
+        'app.user_enrol', 'app.groups_member', 'app.survey',
+        'app.survey_input',
     );
     public $GroupsMembers = null;
 
@@ -116,7 +117,7 @@ class GroupsMembersTestCase extends CakeTestCase
         $members = $this->GroupsMembers->getEventGroupMembers(999, false, 3);
         $this->assertEqual(Set::extract('/User/username', $members), null);
     }
-    
+
 
     function testGetEventGroupMembersNoTutors ()
     {

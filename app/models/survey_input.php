@@ -11,28 +11,28 @@
 class SurveyInput extends AppModel
 {
     public $name = 'SurveyInput';
+    public $belongsTo = array('User');
+    public $actsAs = array('Containable');
 
     /**
      * getByEventIdUserId
      *
-     * @param mixed $surveyId survey id
-     * @param mixed $userId   user id
+     * @param mixed $eventId event id
+     * @param mixed $userId  user id
      *
      * @access public
      * @return void
      */
     function getByEventIdUserId($eventId, $userId)
     {
-        return $this->find(
-            'all', 
-            array(
-                'conditions' => array(
-                    'event_id' => $eventId,
-                    'user_id' => $userId
-                ),
-                'order' => 'question_id'
-            )
-        );
+        return $this->find('all', array(
+            'conditions' => array(
+                'event_id' => $eventId,
+                'user_id' => $userId
+            ),
+            'order' => 'question_id ASC',
+            'contain' => false,
+        ));
     }
 
 
@@ -48,42 +48,13 @@ class SurveyInput extends AppModel
      */
     function getByEventIdUserIdQuestionId($eventId, $userId, $questionId)
     {
-        return $this->find(
-            'all', 
-            array(
-                'conditions' => array(
-                    'event_id' => $eventId,
-                    'user_id' => $userId,
-                    'question_id' => $questionId
-                )
-            )
-        );
+        return $this->find('all', array(
+            'conditions' => array(
+                'event_id' => $eventId,
+                'user_id' => $userId,
+                'question_id' => $questionId
+            ),
+            'contain' => false,
+        ));
     }
-
-    /**
-     * beforeSave
-     *
-     *
-     * @access public
-     * @return void
-     */
-    function beforeSave()
-    {
-        //check for duplicate submission
-        return true;
-    }
-
-
-    /**
-     * checkDuplicate
-     *
-     *
-     * @access public
-     * @return void
-     */
-    function checkDuplicate()
-    {
-        //check duplicate
-    }
-
 }

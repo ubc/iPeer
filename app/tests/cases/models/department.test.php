@@ -14,7 +14,7 @@ class DepartmentTestCase extends CakeTestCase {
         'app.user_enrol', 'app.groups_member', 'app.survey',
         'app.faculty', 'app.user_faculty', 'app.department',
         'app.course_department', 'app.sys_parameter', 'app.user_tutor',
-        'app.penalty', 'app.evaluation_simple'
+        'app.penalty', 'app.evaluation_simple', 'app.survey_input',
     );
 
     function startTest() {

@@ -50,13 +50,14 @@ class Survey extends EvaluationBase
             'counterQuery'  => ''),
     );
 
-    public $hasAndBelongsToMany = array('Question' =>
-        array('className'    =>  'Question',
+    public $hasAndBelongsToMany = array(
+        'Question' => array(
+            'className'    =>  'Question',
             'joinTable'    =>  'survey_questions',
             'foreignKey'   =>  'survey_id',
             'associationForeignKey'    =>  'question_id',
             'conditions'   =>  '',
-            'order'        =>  '',
+            'order'        =>  'number',
             'limit'        => '',
             'unique'       => true,
             'finderQuery'  => '',
