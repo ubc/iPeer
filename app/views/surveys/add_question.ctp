@@ -46,9 +46,6 @@
             <?php echo $html->link( __('Add Answer', true), '#', array('class' => 'add-button', 'id' => 'add-button')); ?>
         </div>
 </div>
-<div class="help-text">
-    <?php __(' Do not include an option for "I choose not to answer this question." It will be inserted automatically.')?>
-</div>
 </div>
 
 <div align="center">
@@ -77,7 +74,9 @@ $("QuestionType").observe('change', function(event) {
 });
 
 function removeAnswer(element) {
-  $(element).up().remove();
+  $(element).previous(0).remove(); // remove the text field
+  $(element).next('br').remove();
+  $(element).remove();  // remove the Remove link
 
   // reorder the names
   var fields = $$('input[class=answers]');
