@@ -181,7 +181,7 @@ if (!empty($penalty)) {
         }
     }
     if (!$mustCompleteUsers && !$commentsNeeded) {
-        echo $form->submit(__('Submit to Complete the Evaluation', true), array('onClick' => "javascript:return confirm('".__('Once you submit the input, you can still make the change until the event closed.', true)."')", 'div'=>'submitMixeval'));
+        echo $form->submit(__('Submit to Complete the Evaluation', true), array('div'=>'submitMixeval'));
     } else {
         echo $form->submit(__('Submit to Complete the Evaluation', true), array('disabled'=>'true', 'div'=>'submitMixeval')); echo "<br />";
         echo $mustCompleteUsers ? "<div style='color: red'>".__("Please complete the questions for all group members, pressing 'Save This Section' button for each one.", true)."</div>" : "";

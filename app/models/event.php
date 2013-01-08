@@ -191,6 +191,8 @@ class Event extends AppModel
             $this->_backupValidate = $this->validate;
             unset($this->validate['result_release_date_begin']);
             unset($this->validate['result_release_date_end']);
+            unset($this->validate['com_req']);
+            unset($this->validate['self_eval']);
         }
 
         return true;
@@ -213,7 +215,7 @@ class Event extends AppModel
         return true;
     }
 
-    function afterSave(boolean $created) {
+    function afterSave($created) {
         // restore the validate if it is been changed
         if (null != $this->_backupValidate) {
             $this->validate = $this->_backupValidate;

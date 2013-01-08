@@ -110,6 +110,7 @@
       $t_string .= ");";
       echo $t_string;
       $com_req = $event['Event']['com_req'];
+      echo "updateCount($remaining, $com_req);";
 ?>
     }<?php
 ?>
@@ -240,7 +241,7 @@
   <tr>
     <td colspan="4" align="center"><?php
       if (!isset($preview)) {
-        echo $form->submit(__('Submit Evaluation', true), array('id' => 'submit0', 'disabled' => 'true', 'onClick' => "javascript:return confirm('".__('Once you submit the input, you can still make the change until the event closed.', true)."')", 'div'=>'submitSimple'));
+        echo $form->submit(__('Submit Evaluation', true), array('id' => 'submit0', 'disabled' => 'true', 'div'=>'submitSimple'));
       }
       ?></td>
     </tr>

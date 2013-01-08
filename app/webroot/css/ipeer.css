@@ -1044,6 +1044,9 @@ i {
     background: white;
     padding: 1em;
     margin: 1em;
+
+.surveyquestions .checkbox label { /* checkboxes look weird with left floating labels */
+    float: none;
 }
 
 /* TO BE REFACTORED LATER */
