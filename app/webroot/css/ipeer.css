@@ -736,6 +736,10 @@ i {
     margin-left: 14em;
 }
 
+#UserForm .checkbox label {
+    float: none;
+}
+
 /* users/goToClassList/ */
 
 .userActionPanel {
