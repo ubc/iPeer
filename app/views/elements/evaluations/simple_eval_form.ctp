@@ -110,7 +110,6 @@
       $t_string .= ");";
       echo $t_string;
       $com_req = $event['Event']['com_req'];
-      echo "updateCount($remaining, $com_req);";
 ?>
     }<?php
 ?>
@@ -201,7 +200,7 @@
       <td width="5">Max.</td>
       </tr></table>
                 </td>
-                 <td><input type="text" name="points[]" id="point<?php echo $user['id']?>" value="<?php echo empty($this->data['Evaluation']['point'.$user['id']])? '' : $this->data['Evaluation']['point'.$user['id']] ?>" size="5" onchange="updateCount(<?php echo $remaining?>,<?php echo $event['Event']['com_req']?>);">
+                 <td><input type="text" name="points[]" id="point<?php echo $user['id']?>" value="<?php echo empty($this->data['Evaluation']['point'.$user['id']])? '0' : $this->data['Evaluation']['point'.$user['id']] ?>" size="5" onchange="updateCount(<?php echo $remaining?>,<?php echo $event['Event']['com_req']?>);">
     </td>
                  <td><input type="text" name="comments[]" id="comment<?php echo $user['id']?>" value="<?php echo empty($this->data['Evaluation']['comment_'.$user['id']])? '' : $this->data['Evaluation']['comment_'.$user['id']] ?>" size="50" onchange="updateCount(<?php echo $remaining?>,<?php echo $event['Event']['com_req']?>);">
       <script type="text/javascript" language="javascript">
@@ -247,3 +246,7 @@
     </tr>
 </table>
 </form>
+
+<script type='text/javascript'>
+      updateCount(<?php echo $remaining ?>, <?php echo $com_req ?>);
+</script>
