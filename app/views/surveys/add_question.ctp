@@ -40,7 +40,7 @@
             'value' => $r['response'], 'id' => false, 'label' => false, 'div' => false,
             ));?>
           <?php echo isset($r['id']) ? $this->Form->input('Response.'.$k.'.id', array('type' => 'hidden', 'value' => $r['id'])) : '';?>
-          <?php echo $html->link( __('Remove', true), '#', array('class' => 'delete-button', 'onclick' => 'removeAnswer(this);')); ?>
+          <?php echo $html->link( __('Remove', true), '#', array('class' => 'delete-button', 'onclick' => 'removePrevAnswer(this);')); ?>
           </div>
           <?php endforeach;?>
             <?php echo $html->link( __('Add Answer', true), '#', array('class' => 'add-button', 'id' => 'add-button')); ?>
@@ -83,6 +83,21 @@ function removeAnswer(element) {
 
   for(var i=0; i<fields.length; i++) {
     fields[i].name='data[Response]['+i+'][response]';
+  }
+}
+
+function removePrevAnswer(element) {
+  $(element).previous('input').remove(); // removes the hidden field
+  $(element).previous('.answers').remove(); //removes the text field
+  $(element).up('div').remove(); // removes the div tag
+  $(element).remove();  // removes the Remove link
+
+  // reorder the names
+  var fields = $$('input[class=answers]');
+
+  for(var i=0; i<fields.length; i++) {
+    fields[i].name='data[Response]['+i+'][response]';   //text field
+    fields[i].next().name='data[Response]['+i+'][id]';  //hidden field
   }
 }
 
