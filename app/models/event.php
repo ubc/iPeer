@@ -16,6 +16,7 @@ class Event extends AppModel
     public $RUBRIC_EVAL_HEIGHT = array('2'=>'200', '3'=>'250');
     const DATETIMEREGEX = '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/';
 
+    public $_backupValidate = null;
     public $validate = array(
         'title' => array(
             'notEmpty' => array(
@@ -183,12 +184,33 @@ class Event extends AppModel
         return $results;
     }
 
+    function beforeValidate(array $options)
+    {
+        if ($this->data['Event']['event_template_type_id'] == 3) {
+            // remove the result release validation
+            $this->_backupValidate = $this->validate;
+            unset($this->validate['result_release_date_begin']);
+            unset($this->validate['result_release_date_end']);
+        }
+
+        return true;
+    }
+
     function beforeSave(array $options) {
         if (isset($this->data['Group']['Group']) && isset($this->data[$this->alias]['id'])) {
             $this->GroupEvent->updateGroups($this->data[$this->alias]['id'], $this->data['Group']['Group']);
             unset($this->data['Group']);
         }
+
         return true;
+    }
+
+    function afterSave(boolean $created) {
+        // restore the validate if it is been changed
+        if (null != $this->_backupValidate) {
+            $this->validate = $this->_backupValidate;
+            $this->_backupValidate = null;
+        }
     }
     /**
      * prepData

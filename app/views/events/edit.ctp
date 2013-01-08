@@ -2,7 +2,7 @@
 
 <?php
 $html->script("jquery-ui-timepicker-addon", array("inline"=>false));
-echo $this->Form->create('Event', array('action' => "edit/".$event['Event']['id']));
+echo $this->Form->create('Event', array('action' => "edit"));
 echo '<input type="hidden" name="required" id="required" value="eventId" />';
 echo $this->Form->input('id');
 ?>
@@ -15,7 +15,7 @@ echo $this->Form->input('event_template_type_id');
 
 echo $this->Form->input('SimpleEvaluation',
     array(
-        'div' => array('id' => 'SimpleEvalDiv'), 
+        'div' => array('id' => 'SimpleEvalDiv'),
         'label' => $html->link(
             'Preview', '', array('id' => 'prevS', 'target' => '_blank')),
         'selected' => $simpleSelected
@@ -23,7 +23,7 @@ echo $this->Form->input('SimpleEvaluation',
 );
 echo $this->Form->input('Rubric',
     array(
-        'div' => array('id' => 'RubricDiv'), 
+        'div' => array('id' => 'RubricDiv'),
         'label' => $html->link(
             'Preview', '', array('id' => 'prevR', 'target' => '_blank')),
         'selected'=> $rubricSelected
@@ -31,7 +31,7 @@ echo $this->Form->input('Rubric',
 );
 echo $this->Form->input('Survey',
     array(
-        'div' => array('id' => 'SurveyDiv'), 
+        'div' => array('id' => 'SurveyDiv'),
         'label' => $html->link(
             'Preview', '', array('id' => 'prevV', 'target' => '_blank')),
         'selected' => $surveySelected
@@ -39,7 +39,7 @@ echo $this->Form->input('Survey',
 );
 echo $this->Form->input('Mixeval',
     array(
-        'div' => array('id' => 'MixevalDiv'), 
+        'div' => array('id' => 'MixevalDiv'),
         'label' => $html->link(
             'Preview', '', array('id' => 'prevM', 'target' => '_blank')),
         'selected' => $mixevalSelected
@@ -67,11 +67,11 @@ echo $this->Form->input(
 echo $this->Form->input('due_date', array('type' => 'text'));
 echo $this->Form->input('release_date_begin', array('label' => 'Evaluation Released From', 'type' => 'text'));
 echo $this->Form->input('release_date_end', array('label' => 'Until', 'type' => 'text'));
-echo $this->Form->input('result_release_date_begin', 
-    array('label' => 'Results Released From', 'type' => 'text'));
-echo $this->Form->input('result_release_date_end', 
-    array('label' => 'Until', 'type' => 'text'));
-echo $this->Form->input('Group', 
+echo $this->Form->input('result_release_date_begin',
+    array('div' => array('id' => 'ResultReleaseBeginDiv'), 'label' => 'Results Released From', 'type' => 'text'));
+echo $this->Form->input('result_release_date_end',
+    array('div' => array('id' => 'ResultReleaseEndDiv'), 'label' => 'Until', 'type' => 'text'));
+echo $this->Form->input('Group',
     array('div' => array('id' => 'GroupsDiv'), 'label' => 'Group(s)'));
 
 // No nice way of inserting new penalty entries using CakePHP, doing it
@@ -206,6 +206,8 @@ function toggleEventTemplate() {
         jQuery("#MixevalDiv").hide();
         jQuery("div.radio").hide(); // no self eval and comments in surveys
         jQuery("#penaltyInputs").hide(); // no penalty in surveys
+        jQuery("#ResultReleaseBeginDiv").hide(); // no result release for survey
+        jQuery("#ResultReleaseEndDiv").hide(); // no result release for survey
         jQuery("#GroupsDiv").hide(); // no groups in surveys
         updatePreview();
     }
