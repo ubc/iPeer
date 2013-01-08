@@ -609,7 +609,7 @@ i {
 
 #bannerSmall {
     background-image: url(small_header_back.gif);
-    background-repeat: repeat=x;
+    background-repeat: repeat-x;
 }
 
 #bannerSmall img {
@@ -923,7 +923,6 @@ i {
 	padding: 2px 5px;
 	/*margin: 0 3px;*/
 	cursor: pointer;
-	*cursor: hand;
 	color: #333 !important;
 	background-color: #DDD;
 }
@@ -936,7 +935,6 @@ i {
 	padding: 2px 5px;
 	/*margin: 0 3px;*/
 	cursor: pointer;
-	*cursor: hand;
 	color: #333 !important;
     background-color: #99B3FF;
 }
@@ -1026,6 +1024,7 @@ i {
 
 .surveyquestions .checkbox label {
     padding: 0 0 0 0.5em;
+    float: none;
 }
 
 .surveyquestions input[type="text"] {
@@ -1052,9 +1051,6 @@ i {
     background: white;
     padding: 1em;
     margin: 1em;
-
-.surveyquestions .checkbox label { /* checkboxes look weird with left floating labels */
-    float: none;
 }
 
 /* TO BE REFACTORED LATER */
@@ -1491,7 +1487,6 @@ table.group-list-chooser {
 
 table.group-list-chooser td{
     border: none;
-    background-color: none;
 }
 
 .group-list-chooser td.middle-column{
