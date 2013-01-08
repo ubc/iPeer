@@ -652,13 +652,24 @@ class V1ControllerTest extends CakeTestCase {
                 'is_ended' => false,
             ),
             array(
-                'title' => 'simple evaluation 2',
+                'title' => 'Team Creation Survey',
                 'course_id' => '1',
-                'event_template_type_id' => '1',
-                'due_date' => '2012-11-28 00:00:00',
-                'id' => '6',
-                'release_date_begin' => "2012-11-20 00:00:00",
-                'release_date_end' => "2022-11-29 00:00:00",
+                'event_template_type_id' => '3',
+                'due_date' => '2013-07-31 11:20:00',
+                'id' => '4',
+                'release_date_begin' => "2012-07-01 11:20:00",
+                'release_date_end' => "2013-12-31 11:20:00",
+                'is_released' => true,
+                'is_ended' => false,
+            ),
+            array(
+                'title' => 'Survey, all Q types',
+                'course_id' => '1',
+                'event_template_type_id' => '3',
+                'due_date' => '2013-07-31 11:20:00',
+                'id' => '5',
+                'release_date_begin' => "2012-07-01 11:20:00",
+                'release_date_end' => "2013-12-31 11:20:00",
                 'is_released' => true,
                 'is_ended' => false,
             )
@@ -666,11 +677,13 @@ class V1ControllerTest extends CakeTestCase {
 
         $url = $this->_getURL('v1/users/65498451/events');
         $actualEvents = $this->_oauthReq("$url");
-        $this->assertEqual($expectedEvents, json_decode($actualEvents, true));
+        $events = Set::sort(json_decode($actualEvents, true), '{n}.id', 'asc');
+        $this->assertequal($expectedEvents, $events);
 
         $url = $this->_getURL('v1/courses/1/users/65498451/events');
         $courseUserEvents = $this->_oauthReq("$url");
-        $this->assertEqual($expectedEvents, json_decode($courseUserEvents, true));
+        $events = Set::sort(json_decode($courseUserEvents, true), '{n}.id', 'asc');
+        $this->assertequal($expectedEvents, $events);
     }
 
     function testEnrolments() {

@@ -609,6 +609,32 @@ class Event extends AppModel
             'Surveys' => $surveyEvents);
     }
 
+    /**
+     * getPendingEventsByUserId
+     * get all the events that are open and user haven't submitted for user with id = userId
+     *
+     * @param mixed $userId user id
+     * @param mixed $fields the fields to retreive
+     *
+     * @access public
+     * @return void
+     */
+    public function getPendingEventsByUserId($userId, $fields = null)
+    {
+        $pendingEvents = array();
+        $events = $this->getEventsByUserId($userId, $fields);
+        $events = array_merge($events['Evaluations'], $events['Surveys']);
+        foreach ($events as $event) {
+            if ($event['Event']['is_released'] &&
+                ((isset($event['EvaluationSubmission'][0]) && $event['EvaluationSubmission'][0]['submitted'] == 0) ||
+                empty($event['EvaluationSubmission']))) {
+                $pendingEvents[] = $event['Event'];
+            }
+        }
+
+        return $pendingEvents;
+    }
+
     public function getAccessibleEventById($eventId, $userId, $permission, $contain = array())
     {
         $event = $this->find('first', array(

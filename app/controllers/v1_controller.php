@@ -847,9 +847,7 @@ class V1Controller extends Controller {
             $user_id = $user['User']['id'];
 
             $fields = array('title', 'course_id', 'event_template_type_id', 'due_date', 'release_date_begin', 'release_date_end', 'id');
-            $events = $this->Event->getEventsByUserId($user_id, $fields);
-            $events = array_merge($events['Evaluations'], $events['Surveys']);
-            $events = Set::classicExtract($events, '{n}.Event');
+            $events = $this->Event->getPendingEventsByUserId($user_id, $fields);
 
             $this->set('statusCode', 'HTTP/1.1 200 OK');
             $this->set('events', $events);

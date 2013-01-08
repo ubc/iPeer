@@ -289,6 +289,18 @@ class EventTestCase extends CakeTestCase
         $this->assertEqual(count($surveys), 0);
     }
 
+    function testGetPendingEventsByUserId()
+    {
+        $events = $this->Event->getPendingEventsByUserId(5);
+        $ids = Set::extract($events, '/id');
+        sort($ids);
+        $this->assertEqual(count($events), 5);
+        $this->assertEqual($ids, array(1,2,3,4,5));
+
+        $events = $this->Event->getPendingEventsByUserId(27);
+        $this->assertEqual(count($events), 0);
+    }
+
     #####################################################################################################################################################
     ###############################################     HELPER FUNCTIONS     ############################################################################
     #####################################################################################################################################################
