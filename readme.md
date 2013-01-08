@@ -1,3 +1,20 @@
+iPeer 3.0.1
+-----------------------------
+This is a maintenance release. It is recommended to upgrade to this version as it fixes a few critical bugs.
+ * Fix old survey event can't be edited
+ * Fix penalty display when only 1 penalty present.
+ * Remove result release date from event form for surveys
+ * Fix it couldn't add question in survey in IE and Firefox
+ * Fix a teammaker xml issue when student survey response id is NULL
+ * Fix Survey result link on instructor/admin home.
+ * Fix old survey result do not show on viewEvaluationResult
+ * Exclude dropped student from survey result summary
+ * Fix survey save for "Choose any of" questions
+ * Fix unable to add text answers to surveys
+ * Fix master question losing responses & deletion
+ * Fix previous submissions not loading
+ * Fix Survey Question - Add/Remove Answer not working
+
 iPeer 3.0.0
 -----------------------------
 More than 74 bug fixes or improvements from 3.0.0 Beta
