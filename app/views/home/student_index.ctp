@@ -131,7 +131,7 @@ else {
 <table class='standardtable'>
     <tr>
         <th>Event</th>
-        <th>Viewable <span class='orangered'>Start</span>/End</th>
+        <th>Result <span class='orangered'>Available</span>/End</th>
         <th>Group</th>
         <th>Course</th>
         <th>Due Date</th>
@@ -150,7 +150,7 @@ else {
 <table class='standardtable'>
     <tr>
         <th>Event</th>
-        <th>Viewable <span class='orangered'>Start</span>/End</th>
+        <th>Result <span class='orangered'>Available</span>/End</th>
         <th>Group</th>
         <th>Course</th>
         <th>Due Date</th>
