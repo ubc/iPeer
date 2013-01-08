@@ -14,7 +14,7 @@ class EventTestCase extends CakeTestCase
         'app.user_enrol', 'app.groups_member', 'app.survey',
         'app.faculty', 'app.user_faculty', 'app.department',
         'app.course_department', 'app.sys_parameter', 'app.user_tutor',
-        'app.penalty', 'app.evaluation_simple'
+        'app.penalty', 'app.evaluation_simple', 'app.survey_input',
     );
     public $Course = null;
 
@@ -270,7 +270,7 @@ class EventTestCase extends CakeTestCase
         $this->assertEqual($event['title'], 'Term 1 Evaluation');
 
         // instructor cannot access other course's event
-        $event = $this->Event->getAccessibleEventById(1, 3, Course::FILTER_PERMISSION_FACULTY);
+        $event = $this->Event->getAccessibleEventById(1, 3, Course::FILTER_PERMISSION_OWNER);
         $this->assertFalse($event);
     }
 

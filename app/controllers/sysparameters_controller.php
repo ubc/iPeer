@@ -79,8 +79,6 @@ class SysParametersController extends AppController
     /**
      * index
      *
-     * @param string $message
-     *
      * @access public
      * @return void
      */

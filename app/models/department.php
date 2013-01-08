@@ -39,6 +39,14 @@ class Department extends AppModel {
         return $departments;
     }
 
+    /**
+     * getIdsByUserId
+     * 
+     * @param $userId user id
+     *
+     * @access public
+     * @return void
+     */
     public function getIdsByUserId($userId)
     {
         $faculties = $this->Faculty->find('all', array(

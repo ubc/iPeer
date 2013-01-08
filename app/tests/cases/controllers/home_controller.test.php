@@ -34,7 +34,8 @@ class HomeControllerTest extends ExtendedAuthTestCase
         'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
         'app.user_faculty', 'app.department', 'app.sys_parameter',
         'app.oauth_token', 'app.rubric', 'app.rubrics_criteria',
-        'app.rubrics_criteria_comment', 'rubrics_lom'
+        'app.rubrics_criteria_comment', 'rubrics_lom',
+        'app.survey_input',
     );
 
     public function getController()
@@ -118,34 +119,34 @@ class HomeControllerTest extends ExtendedAuthTestCase
         $this->assertEqual($result['numDue'], 5);
 
         // evaluations
-        $upcoming = Set::sort($result['evals']['upcoming'], '{n}.Event.id', 
+        $upcoming = Set::sort($result['evals']['upcoming'], '{n}.Event.id',
             'asc');
-        $submitted = Set::sort($result['evals']['submitted'], '{n}.Event.id', 
+        $submitted = Set::sort($result['evals']['submitted'], '{n}.Event.id',
             'asc');
-        $expired = Set::sort($result['evals']['expired'], '{n}.Event.id', 
+        $expired = Set::sort($result['evals']['expired'], '{n}.Event.id',
             'asc');
         $this->assertEqual(count($upcoming), 3);
         $this->assertEqual(count($submitted), 2);
         $this->assertEqual(count($expired), 2);
 
-        $this->assertEqual(Set::extract('/Event/id', $upcoming), 
+        $this->assertEqual(Set::extract('/Event/id', $upcoming),
             array(1,2,3));
-        $this->assertEqual(Set::extract('/Event/id', $submitted), 
+        $this->assertEqual(Set::extract('/Event/id', $submitted),
             array(6,8));
-        $this->assertEqual(Set::extract('/Event/id', $expired), 
+        $this->assertEqual(Set::extract('/Event/id', $expired),
             array(7,9));
 
         // surveys
-        $upcoming = Set::sort($result['surveys']['upcoming'], '{n}.Event.id', 
+        $upcoming = Set::sort($result['surveys']['upcoming'], '{n}.Event.id',
             'asc');
-        $submitted = Set::sort($result['surveys']['submitted'], '{n}.Event.id', 
+        $submitted = Set::sort($result['surveys']['submitted'], '{n}.Event.id',
             'asc');
         $this->assertEqual(count($upcoming), 2);
         $this->assertEqual(count($submitted), 0);
 
-        $this->assertEqual(Set::extract('/Event/id', $upcoming), 
+        $this->assertEqual(Set::extract('/Event/id', $upcoming),
             array(4,5));
-        $this->assertEqual(Set::extract('/Event/id', $submitted), 
+        $this->assertEqual(Set::extract('/Event/id', $submitted),
             array());
     }
 }

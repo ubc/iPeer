@@ -507,8 +507,10 @@ class SurveysController extends AppController
       } elseif (!empty($this->params['data']['Question'])) {
           // Strip ID from responses or the original master question will
           // lose its responses. We want a copy, not the original.
-          foreach($this->data['Response'] as &$response) {
-              unset($response['id']);
+          if (isset($this->data['Response'])) {
+              foreach($this->data['Response'] as &$response) {
+                  unset($response['id']);
+              }
           }
 
           if ($this->Question->saveAll($this->data)) {
@@ -520,7 +522,7 @@ class SurveysController extends AppController
               //$this->questionsSummary($this->params['form']['survey_id'], null, null);
           } else {
               $this->set('responses', $this->data['Response']);
-              $this->render('editQuestion');
+              $this->Session->setFlash(_('Failed to save question.'));
           }
       } else {
           $this->set('responses', array());

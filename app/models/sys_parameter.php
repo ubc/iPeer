@@ -45,6 +45,7 @@ class SysParameter extends AppModel
      * get the value of a parameter
      *
      * @param string $paramCode
+     * @param mixed $default
      *
      * @access public
      * @return void

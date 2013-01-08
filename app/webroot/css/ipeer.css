@@ -136,10 +136,6 @@ p {
     display: block;
 }
 
-.checkbox label { /* checkboxes look weird with left floating labels */
-    float: none;
-}
-
 a:link, a:visited {
     text-decoration: none;
 }
@@ -740,6 +736,10 @@ i {
     margin-left: 14em;
 }
 
+#UserForm .checkbox label {
+    float: none;
+}
+
 /* users/goToClassList/ */
 
 .userActionPanel {
@@ -1028,6 +1028,10 @@ i {
     width: 40em;
     height: 10em;
     margin-left: 3em;
+}
+
+.surveyquestions .checkbox label { /* checkboxes look weird with left floating labels */
+    float: none;
 }
 
 /* TO BE REFACTORED LATER */
@@ -1569,4 +1573,48 @@ form div.input {
 
 #cwl-login td {
     background-color: transparent;
+}
+
+td.weight1 {
+    background-color: #00ff00;
+}
+
+td.weight2 {
+    background-color: #30ff30;
+}
+
+td.weight3 {
+    background-color: #60ff60;
+}
+
+td.weight4 {
+    background-color: #90ff90;
+}
+
+td.weight5 {
+    background-color: #c0ffc0;
+}
+
+td.weight6 {
+    background-color: #ffffff;
+}
+
+td.weight7 {
+    background-color: #ffcfcf;
+}
+
+td.weight8 {
+    background-color: #ff9f9f;
+}
+
+td.weight9 {
+    background-color: #ff6f6f;
+}
+
+td.weight10 {
+    background-color: #ff3f3f;
+}
+
+td.weight11 {
+    background-color: #ff0f0f;
 }

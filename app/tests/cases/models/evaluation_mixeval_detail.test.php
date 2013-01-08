@@ -12,7 +12,8 @@ class EvaluationMixevalDetailTestCase extends CakeTestCase {
         'app.user_enrol', 'app.groups_member', 'app.survey',
         'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
         'app.faculty', 'app.user_faculty', 'app.user_tutor', 'app.department',
-        'app.course_department', 'app.penalty', 'app.evaluation_simple'
+        'app.course_department', 'app.penalty',
+        'app.evaluation_simple', 'app.survey_input',
     );
     public $Course = null;
 

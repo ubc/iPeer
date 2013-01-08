@@ -96,7 +96,7 @@ class FacultiesController extends AppController {
             if ($this->Faculty->save($this->data)) {
                 $facultyId = $this->Faculty->getLastInsertID();
                 foreach ($superadmins as $sa) {
-                    $userfac = array_merge($userfac, array('user_id' => $sa['RolesUser']['user_id'], 'faculty_id' => $facultyId));
+                    $userfac[] = array('user_id' => $sa['RolesUser']['user_id'], 'faculty_id' => $facultyId);
                 }
                 $this->UserFaculty->saveAll($userfac);
                 $this->Session->setFlash(

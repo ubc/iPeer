@@ -10,7 +10,8 @@ class V1ControllerTest extends CakeTestCase {
         'app.user_enrol', 'app.groups_member', 'app.survey',
         'app.faculty', 'app.department', 'app.course_department',
         'app.user_faculty', 'app.user_tutor', 'app.sys_parameter',
-        'app.penalty', 'app.oauth_client', 'app.oauth_token'
+        'app.penalty', 'app.oauth_client', 'app.oauth_token',
+        'app.survey_input',
     );
 
     public function startCase() {
@@ -104,13 +105,13 @@ class V1ControllerTest extends CakeTestCase {
             if (!($server = getenv('SERVER_TEST'))) {
                 $server = 'http://localhost:2000';
             }
-            return $server."/$path";
+            return $server.$path;
         }
         return $url;
     }
 
     public function testCheckRequiredParams() {
-        $url = $this->_getURL('v1/oauth');
+        $url = $this->_getURL('/v1/oauth');
         // Test required parameters checking
         // missing oauth_consumer_key
         $params = "oauth_signature_method=HMAC-SHA1&oauth_nonce=7&oauth_timestamp=1&oauth_version=1.0&oauth_token=1&oauth_signature=4";
@@ -157,7 +158,7 @@ class V1ControllerTest extends CakeTestCase {
     }
 
     public function testCheckSignature() {
-        $url = $this->_getURL('v1/oauth');
+        $url = $this->_getURL('/v1/oauth');
 
         // No errors thrown
         $this->assertEqual('', $this->_oauthReq($url));
@@ -194,7 +195,7 @@ class V1ControllerTest extends CakeTestCase {
     }
 
     public function testCheckNonce() {
-        $url = $this->_getURL('v1/oauth');
+        $url = $this->_getURL('/v1/oauth');
         // invalid timestamp
         $oauth = $this->_oauthReq($url, null, null, null, 1344974674);
         $this->assertEqual(
@@ -211,7 +212,7 @@ class V1ControllerTest extends CakeTestCase {
 
     public function testUsers()
     {
-        $url = $this->_getURL('v1/users');
+        $url = $this->_getURL('/v1/users');
         // GET - all users
         $users = $this->_fixtures['app.user']->records;
         $expected = array();
@@ -304,7 +305,7 @@ class V1ControllerTest extends CakeTestCase {
 
     public function testCourses()
     {
-        $url = $this->_getURL('v1/courses');
+        $url = $this->_getURL('/v1/courses');
         $courses = $this->_fixtures['app.course']->records;
         $expectedList = array();
 
@@ -370,7 +371,7 @@ class V1ControllerTest extends CakeTestCase {
     }
 
     public function testGroups() {
-        $url = $this->_getURL('v1/courses');
+        $url = $this->_getURL('/v1/courses');
         // GET - list of groups in course
         $expected = array();
         $groups = $this->_fixtures['app.group']->records;
@@ -440,7 +441,7 @@ class V1ControllerTest extends CakeTestCase {
 
     public function testGroupMembers()
     {
-        $url = $this->_getURL('v1/groups/1/users');
+        $url = $this->_getURL('/v1/groups/1/users');
 
         // HTTP GET, get a list of group members
         $expectedGroup = array(
@@ -476,7 +477,7 @@ class V1ControllerTest extends CakeTestCase {
 
     public function testEvents()
     {
-        $url = $this->_getURL('v1/courses');
+        $url = $this->_getURL('/v1/courses');
         $events = $this->_fixtures['app.event']->records;
 
         $expectedEvents = array();
@@ -505,7 +506,7 @@ class V1ControllerTest extends CakeTestCase {
 
     public function testGrades()
     {
-        $url = $this->_getURL('v1/events');
+        $url = $this->_getURL('/v1/events');
 
         // prep expected results
         $events = $this->_fixtures['app.event']->records;
@@ -582,7 +583,7 @@ class V1ControllerTest extends CakeTestCase {
 
 
     public function testDepartments() {
-        $url = $this->_getURL('v1/departments');
+        $url = $this->_getURL('/v1/departments');
 
         $expectedDepartments = array(
             array('id' => '1', 'name' => 'MECH'),
@@ -599,7 +600,7 @@ class V1ControllerTest extends CakeTestCase {
     }
 
     public function testCourseDepartments() {
-        $url = $this->_getURL('v1/courses/1/departments');
+        $url = $this->_getURL('/v1/courses/1/departments');
 
         // POST - Add a course to a department
         $file = $this->_oauthReq("$url/2", '', OAUTH_HTTP_METHOD_POST);
@@ -616,49 +617,65 @@ class V1ControllerTest extends CakeTestCase {
 
     function testUsersEvents()
     {
-        $url = $this->_getURL('v1/users/65498451/events');
         $expectedEvents = array(
             array(
                 'title' => 'Term 1 Evaluation',
                 'course_id' => '1',
                 'event_template_type_id' => '1',
                 'due_date' => '2013-07-02 16:34:43',
-                'id' => '1'
+                'id' => '1',
+                'release_date_begin' => "2011-06-16 16:34:49",
+                'release_date_end' => "2023-07-22 16:34:53",
+                'is_released' => true,
+                'is_ended' => false,
             ),
             array(
                 'title' => 'Term Report Evaluation',
                 'course_id' => '1',
                 'event_template_type_id' => '2',
                 'due_date' => '2013-06-08 08:59:29',
-                'id' => '2'
+                'id' => '2',
+                'release_date_begin' => "2011-06-06 08:59:35",
+                'release_date_end' => "2023-07-02 08:59:41",
+                'is_released' => true,
+                'is_ended' => false,
             ),
             array(
                 'title' => 'Project Evaluation',
                 'course_id' => '1',
                 'event_template_type_id' => '4',
                 'due_date' => '2013-07-02 09:00:28',
-                'id' => '3'
+                'id' => '3',
+                'release_date_begin' => "2011-06-07 09:00:35",
+                'release_date_end' => "2023-07-09 09:00:39",
+                'is_released' => true,
+                'is_ended' => false,
             ),
             array(
                 'title' => 'simple evaluation 2',
                 'course_id' => '1',
                 'event_template_type_id' => '1',
                 'due_date' => '2012-11-28 00:00:00',
-                'id' => '6'
+                'id' => '6',
+                'release_date_begin' => "2012-11-20 00:00:00",
+                'release_date_end' => "2022-11-29 00:00:00",
+                'is_released' => true,
+                'is_ended' => false,
             )
         );
 
+        $url = $this->_getURL('/v1/users/65498451/events');
         $actualEvents = $this->_oauthReq("$url");
         $this->assertEqual($expectedEvents, json_decode($actualEvents, true));
 
-        $url = $this->_getURL('v1/courses/1/users/65498451/events');
+        $url = $this->_getURL('/v1/courses/1/users/65498451/events');
         $courseUserEvents = $this->_oauthReq("$url");
         $this->assertEqual($expectedEvents, json_decode($courseUserEvents, true));
     }
 
     function testEnrolments() {
         // Get the ids of students enrolled in course id 3
-        $url = $this->_getURL('v1/courses/3/users');
+        $url = $this->_getURL('/v1/courses/3/users');
         $actual = $this->_oauthReq("$url");
         $expected = array(
             array('id' => '8', 'role_id' => '5', 'username' => '16585158'),

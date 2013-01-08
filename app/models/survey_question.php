@@ -216,6 +216,14 @@ class SurveyQuestion extends AppModel
         return $tmp[0][0]['max(number)'];
     }
 
+    /**
+     * getQuestionsByEventId
+     *
+     * @param $eventId event id
+     * 
+     * @access public
+     * @return void
+     */
     function getQuestionsByEventId($eventId)
     {
         $this->Event = ClassRegistry::init('Event');

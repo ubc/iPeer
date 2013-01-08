@@ -290,13 +290,16 @@ echo '</td>';
 foreach ($groupMembers as $row) {
     $user = $row['User'];
     echo '<h3>Evaluator: '.$user['full_name'].'</h3>';
-    $headers = array(__('Evaluatee', true), __('Comment', true),
-        __('Released', true));
+    $headers = array(
+        __('Evaluatee', true),
+        __('Comment', true),
+        __('Released', true)
+    );
     echo "<table class='standardtable'>";
     echo $html->tableHeaders($headers);
     $comments = array();
     $i = 0;
-    foreach($evalResult[$user['id']] AS $row ) {
+    foreach ($evalResult[$user['id']] as $row) {
         // We need to skip self-evaluation results
         if (($groupMembersNoTutors[$i]['User']['id']==$user['id']) && (!$event['Event']['self_eval'])) {
             $i++;
@@ -306,15 +309,13 @@ foreach ($groupMembers as $row) {
         $evalMark = isset($row['EvaluationSimple'])? $row['EvaluationSimple']: null;
         echo '<tr>';
         if (isset($evalMark)) {
-            echo '<td>'.$evaluatee['full_name'].'</td>';
+            echo '<td width="15%">'.$evaluatee['full_name'].'</td>';
             echo '<td>';
             echo (isset($evalMark['comment']))? $evalMark['comment'] : __('No Comments', true);
             echo '</td>' ;
-            if ($evalMark['release_status'] == 1) { // made explicit comparison with 1
-                echo '<td>' . '<input type="checkbox" name="release' .  $evalMark['evaluator']  . '[]" value="' . $evalMark['evaluatee'] . '" checked />';
-            } else {
-                echo '<td>' . '<input type="checkbox" name="release' .  $evalMark['evaluator']  . '[]" value="' . $evalMark['evaluatee'] . '" />';
-            }
+            $checked = $evalMark['release_status'] == 1 ? 'checked' : '';
+            // made explicit comparison with 1
+            echo '<td width="5%">' . '<input type="checkbox" name="release' .  $evalMark['evaluator']  . '[]" value="' . $evalMark['evaluatee'] . '" '.$checked.'/>';
             echo '<input type="hidden" name="evaluator_ids[]" value="' .  $evalMark['evaluator']  . '" /></td>';
         } else {
             echo '<td colspan="4">'.__('n/a', true).'</td>';
@@ -327,7 +328,6 @@ foreach ($groupMembers as $row) {
 <p style="text-align: center;">
 <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
 <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>" />
-<input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id']?>" />
 <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>" />
 <input type="submit" name="submit" value="<?php __('Save Changes')?>" />
 <input type="submit" name="submit" value="<?php __('Release All')?>" />

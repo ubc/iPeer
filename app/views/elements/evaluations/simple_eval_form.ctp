@@ -29,7 +29,7 @@
       echo "    submitButton.disabled = false;";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments != 0) {";
-      echo "    $('statusMsg').innerHTML = '".__('All points are allocated.<br />There are still ', true)."<font color=red>' + emptyComments + '</font> ".__('comments to be filled.', true)." ';";
+      echo "    $('statusMsg').innerHTML = '".__('All points are allocated.<br />There are still ', true)."<font color=red>' + emptyComments + '</font> ".__(' comments to be filled.', true)." ';";
       echo "    submitButton.disabled = true;";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments == 0) {";

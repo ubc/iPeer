@@ -21,7 +21,7 @@ echo $this->Form->input(
 );
 if (User::hasPermission('functions/user/admin', 'update')) {
     echo $this->Form->input('Faculty',
-        array('label' => 'Faculty (admin only)'));
+        array('label' => 'Faculty<br>(instructor/admin only)'));
 }
 echo $this->Form->input('title');
 echo $this->Form->input('student_no', array('label' => 'Student Number'));
@@ -63,7 +63,7 @@ if (User::hasPermission('functions/user/admin')) {
 // instructor. Any other role, disable adding as a student.
 jQuery('#RoleRolesUserRoleId').change(function() {
     var str = jQuery('#RoleRolesUserRoleId option:selected').text();
-    if (str == 'admin') {
+    if (str == 'admin' || str == 'instructor') {
         jQuery('#FacultyFaculty').removeAttr('disabled');
     }
     else {

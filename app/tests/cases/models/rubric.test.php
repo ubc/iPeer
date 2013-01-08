@@ -16,7 +16,7 @@ class RubricTestCase extends CakeTestCase
         'app.rubrics_criteria', 'app.rubrics_criteria_comment',
         'app.faculty', 'app.user_faculty', 'app.department',
         'app.course_department', 'app.sys_parameter', 'app.user_tutor',
-        'app.penalty', 'app.evaluation_simple'
+        'app.penalty', 'app.evaluation_simple', 'app.survey_input',
     );
     public $Rubric = null;
 
@@ -89,7 +89,7 @@ class RubricTestCase extends CakeTestCase
         $copyRubric = $this->Rubric->copy(1);
 
         // Assert the Rubric name is copied
-        $this->assertEqual($copyRubric['Rubric']['name'], 
+        $this->assertEqual($copyRubric['Rubric']['name'],
             'Copy of Term Report Evaluation');
         // Assert that the Rubric and all of its associated id's are delete
         $this->assertTrue(!isset($copyRubric['Rubric']['id']));

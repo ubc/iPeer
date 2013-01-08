@@ -12,7 +12,7 @@ class CourseTestCase extends CakeTestCase {
         'app.user_enrol', 'app.groups_member', 'app.survey',
         'app.user_faculty', 'app.faculty', 'app.department',
         'app.course_department', 'app.user_tutor', 'app.penalty',
-        'app.evaluation_simple'
+        'app.evaluation_simple', 'app.survey_input',
     );
     public $Course = null;
 
@@ -243,8 +243,11 @@ class CourseTestCase extends CakeTestCase {
         $empty = null;
 
         // super admin: user id 1, should see all courses
-        $uf = $this->UserFaculty->findAllByUserId(1);
-        $dep = $this->Department->getByUserFaculties($uf);
+        $dep = array(
+            array('Department' => array('id' => 1)),
+            array('Department' => array('id' => 2)),
+            array('Department' => array('id' => 3)),
+        );
         $course = $this->Course->getByDepartments($dep, 'list');
         $this->assertEqual($course, $expected);
 

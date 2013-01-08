@@ -17,7 +17,7 @@ class UsersController extends AppController
     public $uses = array('User', 'UserEnrol', 'Personalize', 'Course',
         'SysParameter', 'Role', 'Group', 'UserFaculty',
         'Department', 'CourseDepartment', 'OauthClient', 'OauthToken',
-        'UserCourse', 'UserTutor'
+        'UserCourse', 'UserTutor', 'Faculty', 'UserFaculty'
     );
     public $components = array('Session', 'AjaxList', 'RequestHandler',
         'Email', 'FileUpload.FileUpload', 'PasswordGenerator');
@@ -551,6 +551,16 @@ class UsersController extends AppController
 
             // Now we actually attempt to save the data
             if ($ret = $this->User->save($this->data)) {
+                // if the user added is a super admin
+                if ($ret['Role']['RolesUser']['role_id'] == '1') {
+                    $userId = $this->User->getLastInsertID();
+                    $faculties = $this->Faculty->find('list', array('fields' => array('Faculty.id')));
+                    $userfac = array();
+                    foreach ($faculties as $faculty) {
+                        $userfac[] = array('user_id' => $userId, 'faculty_id' => $faculty);
+                    }
+                    $this->UserFaculty->saveAll($userfac);
+                }
                 // Success!
                 $message = "User successfully created!
                     <br>Password: <b>$password</b><br>";

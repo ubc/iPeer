@@ -36,6 +36,14 @@ class SimpleEvaluation extends EvaluationBase
         )
     );
 
+    /**
+     * getEvaluation
+     *
+     * @param $id id
+     * 
+     * @access public
+     * @return void
+     */
     public function getEvaluation($id)
     {
         $eval = $this->find('first', array('conditions' => array($this->alias.'.id' => $id), 'contain' => false));

@@ -174,7 +174,6 @@ class EventsController extends AppController
      * index
      *
      * @param mixed $courseId
-     * @param string $message
      *
      * @access public
      * @return void
@@ -229,7 +228,7 @@ class EventsController extends AppController
     /**
      * view
      *
-     * @param mixed $id
+     * @param mixed $eventid
      *
      * @access public
      * @return void
@@ -344,7 +343,7 @@ class EventsController extends AppController
     /**
      * edit
      *
-     * @param mixed $id
+     * @param mixed $eventid
      *
      * @access public
      * @return void
