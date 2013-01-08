@@ -552,12 +552,13 @@ class Event extends AppModel
      * Get evaluations and surveys assigned to the given user. Also gets the
      * evaluation submission entries made by this specific user.
      *
-     * @param mixed $userId
+     * @param mixed $userId user id
+     * @param mixed $fields the fields to retreive
      *
      * @access public
      * @return array array of events with related models, e.g. course, group, submission
      */
-    function getEventsByUserId($userId)
+    function getEventsByUserId($userId, $fields = null)
     {
         // get the groups that this user is in
         $groups = $this->Group->find('all', array(
@@ -568,6 +569,7 @@ class Event extends AppModel
 
         // find evaluation events based on the groups this user is in
         $evaluationEvents = $this->find('all', array(
+            'fields' => $fields,
             'conditions' => array('Group.id' => $groupIds),
             'order' => array('due_in ASC'),
             'contain' => array(
@@ -592,6 +594,7 @@ class Event extends AppModel
         $courseIds = Set::extract($courses, '/Course/id');
         // find survey events based on the groups this user is in
         $surveyEvents = $this->find('all', array(
+            'fields' => $fields,
             'conditions' => array('event_template_type_id' => '3', 'course_id' => $courseIds),
             'order' => array('due_in ASC'),
             'contain' => array(
