@@ -522,7 +522,7 @@ class Event extends AppModel
      * Get fields of all events by course id
      *
      * @param mixed $courseId course id
-     * @param mixed $fields fields
+     * @param mixed $fields  fields
      *
      * @return events
      */
@@ -537,7 +537,7 @@ class Event extends AppModel
      * Get fields of all event by event id
      *
      * @param mixed $eventId event id
-     * @param mixed $fields fields
+     * @param mixed $fields  fields
      *
      * @return events
      */
@@ -560,29 +560,55 @@ class Event extends AppModel
      */
     function getEventsByUserId($userId, $fields = null)
     {
+        $evaluationFields = $surveyFields = $fields;
+        if ($evaluationFields != null) {
+            $evaluationFields[] = 'GroupEvent.*';
+        }
         // get the groups that this user is in
         $groups = $this->Group->find('all', array(
+            'fields' => 'id',
             'conditions' => array('Member.id' => $userId),
-            'fields' => array('id'),
-            'contain' => array('Member')));
-        $groupIds = Set::extract('/Group/id', $groups);
+            'contain' => array('Member', 'GroupEvent.id')));
+        $groupEventIds = Set::extract('/GroupEvent/id', $groups);
 
         // find evaluation events based on the groups this user is in
         $evaluationEvents = $this->find('all', array(
-            'fields' => $fields,
-            'conditions' => array('Group.id' => $groupIds),
+            'fields' => $evaluationFields,
+            'conditions' => array('GroupEvent.id' => $groupEventIds),
             'order' => array('due_in ASC'),
             'contain' => array(
                 'Course',
                 'Group',
+                'GroupEvent',
                 'Penalty' => array(
                     'order' => array('days_late ASC')
                 ),
                 'EvaluationSubmission' => array(
-                    'conditions' => array('submitter_id' => $userId),
+                    'conditions' => array(
+                        'submitter_id' => $userId,
+                        'submitted' => 1,
+                    ),
                 )
             )
         ));
+
+        // as there should be only one submission for each event+group+user,
+        // we need to find out the correct submission by grp_event_id, then overwrite
+        // the EvaluationSubmission array in the result
+        foreach ($evaluationEvents as &$event) {
+            $hasSubmission = false;
+            foreach ($event['EvaluationSubmission'] as $submission) {
+                if ($submission['grp_event_id'] == $event['GroupEvent']['id']) {
+                    $hasSubmission = true;
+                    $event['EvaluationSubmission'] = $submission;
+                    break;
+                }
+            }
+            if (!$hasSubmission) {
+                // no submission matched, set EvaluationSubmission to emtpy
+                $event['EvaluationSubmission'] = array();
+            }
+        }
 
         // to find the surveys, we need to find the courses that user is enrolled in
         // can't use find('list') as we are query the conditions on HABTM
@@ -592,18 +618,29 @@ class Event extends AppModel
             'contain' => 'Enrol',
         ));
         $courseIds = Set::extract($courses, '/Course/id');
+
         // find survey events based on the groups this user is in
         $surveyEvents = $this->find('all', array(
-            'fields' => $fields,
+            'fields' => $surveyFields,
             'conditions' => array('event_template_type_id' => '3', 'course_id' => $courseIds),
             'order' => array('due_in ASC'),
             'contain' => array(
                 'Course',
                 'EvaluationSubmission' => array(
-                    'conditions' => array('submitter_id' => $userId),
+                    'conditions' => array(
+                        'submitter_id' => $userId,
+                        'submitted' => 1,
+                    ),
                 ),
             )
         ));
+
+        // some clean up for submission
+        foreach ($surveyEvents as &$event) {
+            if (isset($event['EvaluationSubmission'][0])) {
+                $event['EvaluationSubmission'] = $event['EvaluationSubmission'][0];
+            }
+        }
 
         return array('Evaluations' => $evaluationEvents,
             'Surveys' => $surveyEvents);
@@ -625,9 +662,7 @@ class Event extends AppModel
         $events = $this->getEventsByUserId($userId, $fields);
         $events = array_merge($events['Evaluations'], $events['Surveys']);
         foreach ($events as $event) {
-            if ($event['Event']['is_released'] &&
-                ((isset($event['EvaluationSubmission'][0]) && $event['EvaluationSubmission'][0]['submitted'] == 0) ||
-                empty($event['EvaluationSubmission']))) {
+            if ($event['Event']['is_released'] && empty($event['EvaluationSubmission'])) {
                 $pendingEvents[] = $event['Event'];
             }
         }
@@ -635,6 +670,17 @@ class Event extends AppModel
         return $pendingEvents;
     }
 
+    /**
+     * getAccessibleEventById
+     *
+     * @param mixed $eventId    event id
+     * @param mixed $userId     user id
+     * @param mixed $permission permission
+     * @param array $contain    contain
+     *
+     * @access public
+     * @return void
+     */
     public function getAccessibleEventById($eventId, $userId, $permission, $contain = array())
     {
         $event = $this->find('first', array(
