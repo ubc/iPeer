@@ -64,8 +64,10 @@
     </tr>
     <tr>
         <td>
-            <?php if ($is_editable) echo '<button>'.$this->Html->link(__('Add Questions', true), 'addQuestion/'.$survey_id).'</button>'?>
-            <button><?php echo $this->Html->link(__('Finish', true), 'index')?></button>
+            <?php if ($is_editable): ?>
+                <button onclick="window.location='<?php echo $this->Html->url('addQuestion/'.$survey_id)?>';"><?php __('Add Questions')?></button>
+            <?php endif; ?>
+            <button onclick="window.location='<?php echo $this->Html->url('index')?>';"><?php __('Finish')?></button>
         </td>
     </tr>
 </table>

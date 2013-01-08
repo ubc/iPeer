@@ -276,17 +276,53 @@ class EventTestCase extends CakeTestCase
 
     function testGetEventsByUserId()
     {
+        // normal student
         $events = $this->Event->getEventsByUserId(5);
         $evaluations = $events['Evaluations'];
         $this->assertEqual(count($evaluations), 7);
         $surveys = $events['Surveys'];
         $this->assertEqual(count($surveys), 2);
 
+        // studnet with no events
         $events = $this->Event->getEventsByUserId(27);
         $evaluations = $events['Evaluations'];
         $this->assertEqual(count($evaluations), 0);
         $surveys = $events['Surveys'];
         $this->assertEqual(count($surveys), 0);
+
+        // normal student with fields
+        $events = $this->Event->getEventsByUserId(5, array('id', 'title'));
+        $evaluations = $events['Evaluations'];
+        $this->assertEqual(count($evaluations), 7);
+        $surveys = $events['Surveys'];
+        $this->assertEqual(count($surveys), 2);
+
+        // student within two groups in the same event
+        $events = $this->Event->getEventsByUserId(7);
+        $evaluations = $events['Evaluations'];
+        $this->assertEqual(count($evaluations), 11);
+        $surveys = $events['Surveys'];
+        $this->assertEqual(count($surveys), 2);
+    }
+
+    function testGetPendingEventsByUserId()
+    {
+        $events = $this->Event->getPendingEventsByUserId(5);
+        $ids = Set::extract($events, '/id');
+        sort($ids);
+        $this->assertEqual(count($events), 5);
+        $this->assertEqual($ids, array(1,2,3,4,5));
+
+        $events = $this->Event->getPendingEventsByUserId(27);
+        $this->assertEqual(count($events), 0);
+
+        // student within two groups in the same event
+        $events = $this->Event->getPendingEventsByUserId(7);
+        $ids = Set::extract($events, '/id');
+        sort($ids);
+        $this->assertEqual(count($events), 6);
+        // event 6 has two occurrences as user in two groups
+        $this->assertEqual($ids, array(1,2,3,5,6,6));
     }
 
     #####################################################################################################################################################

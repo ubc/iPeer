@@ -146,7 +146,7 @@ class GroupsMembersTestCase extends CakeTestCase
         $this->assertTrue($inGroup);
 
         //Test student not in existing group
-        $inGroup = $this->GroupsMembers->checkMembershipInGroup(2, 7);
+        $inGroup = $this->GroupsMembers->checkMembershipInGroup(2, 5);
         $this->assertFalse($inGroup);
 
         //Test invalid student in existing group

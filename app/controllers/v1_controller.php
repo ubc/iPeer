@@ -600,15 +600,7 @@ class V1Controller extends Controller {
 
         if ($this->RequestHandler->isGet()) {
             // retrieve a list of users in the given group
-            $userIds = $this->GroupsMembers->find('list',
-                array(
-                    'conditions' => array('group_id' => $groupId),
-                    'fields' => array('user_id')
-                )
-            );
-            $users = $this->User->find('all',
-                array('conditions' => array('User.id' => $userIds)));
-
+            $users = $this->User->getMembersByGroupId($groupId);
             foreach ($users as $user) {
                 $tmp = array();
                 $tmp['id'] = $user['User']['id'];
@@ -846,45 +838,17 @@ class V1Controller extends Controller {
     /**
      * retrieving events a user has access to (eg. student)
     **/
-    public function userEvents() {
+    public function userEvents()
+    {
         $username = $this->params['username'];
 
         if ($this->RequestHandler->isGet()) {
             $user = $this->User->find('first', array('conditions' => array('User.username' => $username)));
             $user_id = $user['User']['id'];
 
-            // find all groups the user is associated with - groupMembers
-            $groups = $this->GroupsMembers->find('list', array(
-                'conditions' => array('user_id' => $user_id),
-                'fields' => array('group_id')
-            ));
+            $fields = array('title', 'course_id', 'event_template_type_id', 'due_date', 'release_date_begin', 'release_date_end', 'id');
+            $events = $this->Event->getPendingEventsByUserId($user_id, $fields);
 
-            // find all groupEvents relating to the above groups - groupEvents
-            $eventIds = $this->GroupEvent->find('list', array(
-                'conditions' => array('group_id' => $groups),
-                'fields' => array('event_id')
-            ));
-
-            $eventConditions = array(
-                        'Event.id' => $eventIds,
-                        'release_date_begin <=' => date('Y-m-d H-i-s', time()),
-                        'release_date_end >=' => date('Y-m-d H-i-s', time()));
-
-            if (isset($this->params['course_id'])) {
-                $eventConditions = $eventConditions + array('course_id' => $this->params['course_id']);
-            }
-
-            // from groupEvents - pickout all events and generate list of valid events - Events
-                // after release begin date and before end date
-            $evts = $this->Event->find('all', array(
-                'conditions' => $eventConditions,
-                'fields' => array('title', 'course_id', 'event_template_type_id', 'due_date', 'release_date_begin', 'release_date_end', 'id')
-            ));
-
-            $events = array();
-            foreach ($evts as $evt) {
-                $events[] = $evt['Event'];
-            }
             $this->set('statusCode', 'HTTP/1.1 200 OK');
             $this->set('events', $events);
         } else {

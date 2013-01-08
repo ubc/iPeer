@@ -1006,6 +1006,7 @@ i {
 
 /* SURVEYS */
 
+/* surveys/view */
 .surveyquestions .prompt {
     margin: 2em 1em 1em 1em;
 }
@@ -1032,6 +1033,17 @@ i {
 
 .surveyquestions .checkbox label { /* checkboxes look weird with left floating labels */
     float: none;
+}
+
+/* GROUPS */
+
+/* groups/import */
+
+.groupsimport .csvexample {
+    border: 1px solid black;
+    background: white;
+    padding: 1em;
+    margin: 1em;
 }
 
 /* TO BE REFACTORED LATER */

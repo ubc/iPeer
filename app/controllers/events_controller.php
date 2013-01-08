@@ -101,9 +101,9 @@ class EventsController extends AppController
             array("!Custom.results",       __("View", true),       "4em", "action", "View Results"),
             array("Event.event_template_type_id", __("Type", true), "", "map",
             array(
-                "1" => __("Simple", true), 
-                "2" => __("Rubric", true), 
-                "3" => __("Survey", true), 
+                "1" => __("Simple", true),
+                "2" => __("Rubric", true),
+                "3" => __("Survey", true),
                 "4" => __("Mixed", true))),
             array("Event.due_date",       __("Due Date", true),    "10em", "date"),
             array("!Custom.isReleased",    __("Released ?", true), "8em", "string"),
@@ -325,6 +325,9 @@ class EventsController extends AppController
             } else if ($typeId == 2) {
                 $this->data['Event']['template_id'] =
                     $this->data['Event']['Rubric'];
+            } else if ($typeId == 3) {
+                $this->data['Event']['template_id'] =
+                    $this->data['Event']['Survey'];
             } else if ($typeId == 4) {
                 $this->data['Event']['template_id'] =
                     $this->data['Event']['Mixeval'];

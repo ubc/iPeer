@@ -792,7 +792,7 @@ INSERT INTO `groups_members` VALUES (4, 1, 35);
 INSERT INTO `groups_members` VALUES (5, 2, 31);
 INSERT INTO `groups_members` VALUES (6, 2, 32);
 INSERT INTO `groups_members` VALUES (7, 2, 33);
-INSERT INTO `groups_members` VALUES (8, 2, 36);
+INSERT INTO `groups_members` VALUES (8, 2, 7);
 
 -- --------------------------------------------------------
 

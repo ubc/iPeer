@@ -546,6 +546,19 @@ class SurveysController extends AppController
   function editQuestion( $question_id, $survey_id )
   {
       if (!empty($this->data)) {
+          // filter - remove the removed answers from the database
+          $responses = $this->Response->find('list', array('conditions' => array('question_id' => $question_id)));
+          $newResponses = array();
+          foreach ($this->data['Response'] as $new) {
+            if (isset($new['id'])) {
+                $newResponses[] = $new['id'];
+            }
+          }
+          foreach ($responses as $resp) {
+            if (!in_array($resp, $newResponses)) {
+                $this->Response->delete($resp);
+            }
+          }
           if ($this->Question->saveAll($this->data)) {
               $this->Session->setFlash(__('The question was updated successfully.', true), 'good');
               $this->redirect('questionsSummary/'.$survey_id);
