@@ -207,7 +207,7 @@ class Event extends AppModel
         return true;
     }
 
-    function afterSave(boolean $created) {
+    function afterSave($created) {
         // restore the validate if it is been changed
         if (null != $this->_backupValidate) {
             $this->validate = $this->_backupValidate;

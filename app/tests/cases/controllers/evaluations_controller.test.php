@@ -91,8 +91,8 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
         $this->assertEqual(count($result['groupMembers']), 2);
         $this->assertEqual($result['fullName'], 'Ed Student');
         $this->assertEqual($result['userId'], 5);
-        $this->assertEqual(count($result['penalty']), 3);
-        $this->assertEqual(Set::extract($result['penalty'], '/Penalty/id'), array(1,2,3));
+        $this->assertEqual(count($result['penalty']), 4);
+        $this->assertEqual(Set::extract($result['penalty'], '/Penalty/id'), array(1,2,3,4));
         $this->assertEqual($result['penaltyDays'], 3);
         $this->assertEqual($result['penaltyFinal']['Penalty']['id'], 4);
         $this->assertEqual($result['event']['Event']['id'], 1);
@@ -116,8 +116,8 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
         $this->assertEqual($result['evaluateeCount'], 2);
         $this->assertEqual(count($result['groupMembers']), 2);
         $this->assertEqual($result['viewData']['id'], 1);
-        $this->assertEqual(count($result['penalty']), 3);
-        $this->assertEqual(Set::extract($result['penalty'], '/Penalty/id'), array(5,6,7));
+        $this->assertEqual(count($result['penalty']), 4);
+        $this->assertEqual(Set::extract($result['penalty'], '/Penalty/id'), array(5,6,7,8));
         $this->assertEqual($result['penaltyDays'], 3);
         $this->assertEqual($result['penaltyFinal']['Penalty']['id'], 8);
         $this->assertEqual($result['event']['Event']['id'], 2);
