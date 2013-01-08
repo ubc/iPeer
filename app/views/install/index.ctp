@@ -21,6 +21,7 @@ $configwritable = $no;
 $dbconfig = $no;
 $magicquotes = $yes;
 $guard_plugin = $no;
+$gdext = $no;
 
 // Optional requirements init
 $sendmail = $no;
@@ -29,6 +30,9 @@ $emailperm = $no;
 // Mandatory requirements check
 if (version_compare(phpversion(), $REQPHPVER) >= 0) {
   $phpver = $yes;
+}
+if (extension_loaded('gd') && function_exists('gd_info')) {
+    $gdext = $yes;
 }
 if (function_exists('mysql_connect')) {
   $mysql = $yes;
@@ -115,6 +119,10 @@ foreach ($php_recommended_settings as $key => $setting)
   <tr>
     <td width="70%"><?php __('PHP version')?> &gt;= <?php echo $REQPHPVER;?></td>
     <td width="30%"><?php echo $phpver; ?></td>
+  </tr>
+  <tr>
+    <td><?php __('PHP GD extension')?></td>
+    <td><?php echo $gdext; ?></td>
   </tr>
   <tr>
     <td><?php __('MySQL support')?></td>
