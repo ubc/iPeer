@@ -14,6 +14,7 @@ class SurveyInputTestCase extends CakeTestCase
         'app.rubrics_criteria', 'app.rubrics_criteria_comment',
         'app.survey_input', 'app.survey', 'app.faculty', 'app.user_faculty',
         'app.department', 'app.course_department', 'app.evaluation_simple',
+        'app.user_tutor', 'app.penalty'
     );
     public $SurveyInput = null;
 
