@@ -42,7 +42,6 @@ else{
     'type' => 'radio',
     'options' => array('public'=>__('Public', true),'private'=>__('Private', true)),
     'label' => __('Availability', true),
-    'default' => 'public',
     'disabled' => $readonly));?>
 <div class="help-text"><?php __('Public Allows Mixed Evaluation Sharing Amongst Instructors')?></div>
 
