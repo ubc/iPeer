@@ -4,8 +4,6 @@ App::import('Model', 'UserCourse');
 class UserCourseTestCase extends CakeTestCase
 {
     public $name = 'UserEnrol';
-    public $fixtures = array(
-    );
     public $UserCourse = null;
 
     function startCase()
