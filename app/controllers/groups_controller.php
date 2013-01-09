@@ -125,7 +125,10 @@ class GroupsController extends AppController
             $this->redirect('index');
         }
 
+        ($course['Course']['record_status'] == 'A') ? $active = true : $active = false;
+
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Groups', true)));
+        $this->set('active', $active);
         $this->set('course_id', $courseId);
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();

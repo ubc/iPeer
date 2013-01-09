@@ -99,7 +99,10 @@ class SurveyGroupsController extends AppController
             $this->redirect('index');
         }
 
+        ($course['Course']['record_status'] == 'A') ? $active = true : $active = false;
+
         $this->set('course_id', $courseId);
+        $this->set('active', $active);
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
         // Set the display list

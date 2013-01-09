@@ -1,3 +1,4 @@
+<?php if ($active) { ?>
 <div class="button-row">
 <ul>
   <li>
@@ -5,6 +6,7 @@
   </li>
 </ul>
 </div>
+<?php } ?>
 <div>
 <?php echo $this->element("list/ajaxList", array ("paramsForList" =>$paramsForList)); ?>
 </div>

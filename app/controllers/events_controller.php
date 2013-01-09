@@ -189,7 +189,9 @@ class EventsController extends AppController
             }
             $this->breadcrumb->push(array('course' => $course['Course']));
         }
-
+        
+        ($course['Course']['record_status'] == 'A') ? $active = true : $active = false;
+        
         // We need to change the session state to point to this
         // course:
         // Initialize a basic non-functional AjaxList
@@ -205,6 +207,7 @@ class EventsController extends AppController
         $this->setUpAjaxList($courseId);
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
+        $this->set('active', $active);
         $this->set('courseId', $courseId);
         $this->set('breadcrumb', $this->breadcrumb->push(__('Events', true)));
     }

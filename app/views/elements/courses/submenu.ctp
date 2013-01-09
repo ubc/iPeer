@@ -21,18 +21,18 @@ switch($submenu) {
     }
     break;
   case "Group":
-    array_push(
-        $items,
-        array('name' => 'Create Groups (Manual)', 'link' => "/groups/add/$course_id"),
-        array('name' => 'Create Groups (Import)', 'link' => "/groups/import/$course_id")
-    );
     if ($active) {
         array_push(
             $items,
-            array('name' => 'List Groups', 'link' => "/groups/index/$course_id"),
-            array('name' => 'Export Groups', 'link' => "/groups/export/$course_id")
+            array('name' => 'Create Groups (Manual)', 'link' => "/groups/add/$course_id"),
+            array('name' => 'Create Groups (Import)', 'link' => "/groups/import/$course_id")
         );
     }
+    array_push(
+        $items,
+        array('name' => 'List Groups', 'link' => "/groups/index/$course_id"),
+        array('name' => 'Export Groups', 'link' => "/groups/export/$course_id")
+    );
     break;
   case "EvalEvents":
     if ($active) {
