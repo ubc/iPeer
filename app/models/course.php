@@ -305,7 +305,14 @@ class Course extends AppModel
             $conditions['id'] = $courseIds;
         }
         // find courses with instructor and other models specified in contain
-        $courses = $this->find($type, array('conditions' => $conditions, 'contain' => $contain));
+        $courses = $this->find(
+            $type, 
+            array(
+                'conditions' => $conditions, 
+                'contain' => $contain,
+                'order' => 'Course.course' # sort courses alphabetically
+            )
+        );
 
         return $courses;
     }
@@ -430,6 +437,9 @@ class Course extends AppModel
      */
     function getByDepartmentIds($departmentIds, $findType = "all", $options = array())
     {
+        $options['group'] = 'Course.id'; # prevent dups when a course is in
+                                        # multiple faculties
+        $options['order'] = 'Course.course'; # sort courses alphabetically
         $options['conditions']['Department.id'] = $departmentIds;
         if(isset($options['contain'])) { 
             $options['contain'] = array_merge(array('Department'), $options['contain']);
@@ -548,6 +558,7 @@ class Course extends AppModel
     {
         switch($permission) {
         case Course::FILTER_PERMISSION_SUPERADMIN:
+            $options['order'] = 'Course.course'; # sort courses alphabetically
             $courses = $this->find($type, $options);
             break;
         case Course::FILTER_PERMISSION_FACULTY:

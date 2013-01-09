@@ -76,14 +76,21 @@ class HomeControllerTest extends ExtendedAuthTestCase
     function testIndex()
     {
         $result = $this->testAction('/home/index', array('return' => 'vars'));
+        // test that courses are in alphabetical order
+        $this->assertEqual(
+            $result['course_list']['A'][0]['Course']['course'], 'APSC 201');
+        $this->assertEqual(
+            $result['course_list']['A'][1]['Course']['course'], 'MECH 328');
+        // test that there are no duplicate courses listed
         $this->assertEqual(count($result['course_list']['A']), 2);
         $this->assertEqual(count($result['course_list']['I']), 1);
-        $activeCourses = Set::sort($result['course_list']['A'], '{n}.Course.id', 'asc');
+        // test that course information is correct
+        $activeCourses = $result['course_list']['A'];
         $inactiveCourses = $result['course_list']['I'];
-        $this->assertEqual(count($activeCourses[0]['Instructor']), 1);
-        $this->assertEqual(count($activeCourses[0]['Event']), 9);
-        $this->assertEqual(count($activeCourses[1]['Instructor']), 2);
-        $this->assertEqual(count($activeCourses[1]['Event']), 0);
+        $this->assertEqual(count($activeCourses[0]['Instructor']), 2);
+        $this->assertEqual(count($activeCourses[0]['Event']), 0);
+        $this->assertEqual(count($activeCourses[1]['Instructor']), 1);
+        $this->assertEqual(count($activeCourses[1]['Event']), 9);
         $this->assertEqual(count($inactiveCourses[0]['Instructor']), 1);
         $this->assertEqual(count($inactiveCourses[0]['Event']), 0);
     }
@@ -102,6 +109,42 @@ class HomeControllerTest extends ExtendedAuthTestCase
         $activeCourses = $result['course_list']['A'];
         $this->assertEqual(count($activeCourses[0]['Instructor']), 1);
         $this->assertEqual(count($activeCourses[0]['Event']), 9);
+
+        // make sure the inactive courses are listed correctly
+        $this->login = array(
+            'User' => array(
+                'username' => 'instructor3',
+                'password' => md5('ipeeripeer')
+            )
+        );
+        $result = $this->testAction('/home/index', array('return' => 'vars'));
+        $this->assertEqual(count($result['course_list']['A']), 1);
+        $this->assertEqual(count($result['course_list']['I']), 1);
+        $inactiveCourses = $result['course_list']['I'];
+        $this->assertEqual(count($inactiveCourses[0]['Instructor']), 1);
+    }
+
+    function testIndexFacultyAdmin()
+    {
+        $this->login = array(
+            'User' => array(
+                'username' => 'admin1',
+                'password' => md5('ipeeripeer')
+            )
+        );
+        // test that courses are in alphabetical order
+        $result = $this->testAction('/home/index', array('return' => 'vars'));
+        $this->assertEqual(
+            $result['course_list']['A'][0]['Course']['course'], 'APSC 201');
+        $this->assertEqual(
+            $result['course_list']['A'][1]['Course']['course'], 'MECH 328');
+        // test that there are no duplicate courses listed
+        $this->assertEqual(count($result['course_list']['A']), 2);
+        $this->assertEqual(count($result['course_list']['I']), 1);
+        // test that course information is correct for MECH 328
+        $activeCourses = $result['course_list']['A'];
+        $this->assertEqual(count($activeCourses[1]['Instructor']), 1);
+        $this->assertEqual(count($activeCourses[1]['Event']), 9);
     }
 
     function testIndexStudent()

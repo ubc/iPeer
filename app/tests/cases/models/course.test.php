@@ -92,7 +92,7 @@ class CourseTestCase extends CakeTestCase {
         $this->Course->addInstructor(2, 2);
         //Run tests
         $courseTaught = $this->Course->getCourseByInstructor(2);// assume tested
-        $this->assertEqual($courseTaught[1]['Course']['course'], 'APSC 201');
+        $this->assertEqual($courseTaught[1]['Course']['course'], 'MECH 328');
 
         /*
          * Test adding a valid instructor to an invalid course;
