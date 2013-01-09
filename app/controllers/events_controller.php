@@ -186,11 +186,11 @@ class EventsController extends AppController
             if (!$course) {
                 $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
                 $this->redirect('index');
+                return;
             }
             $this->breadcrumb->push(array('course' => $course['Course']));
+            $this->set('course', $course);
         }
-        
-        ($course['Course']['record_status'] == 'A') ? $active = true : $active = false;
         
         // We need to change the session state to point to this
         // course:
@@ -207,8 +207,6 @@ class EventsController extends AppController
         $this->setUpAjaxList($courseId);
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
-        $this->set('active', $active);
-        $this->set('courseId', $courseId);
         $this->set('breadcrumb', $this->breadcrumb->push(__('Events', true)));
     }
 

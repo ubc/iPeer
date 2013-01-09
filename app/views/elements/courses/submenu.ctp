@@ -1,8 +1,9 @@
 <?php
+$status = $data['Course']['record_status'];
 $items = array();
 switch($submenu) {
   case "Student":
-    if ($active) {
+    if ($status == 'A') {
         array_push(
             $items,
             array('name' => 'Add Student', 'link' => "/users/add/$course_id"),
@@ -13,7 +14,7 @@ switch($submenu) {
         $items,
         array('name' => 'List Students', 'link' => "/users/goToClassList/$course_id")
     );
-    if ($active) {
+    if ($status == 'A') {
         array_push(
             $items,
             array('name' => 'Email to All Students',  'link' => "/emailer/write/C/$course_id")
@@ -21,7 +22,7 @@ switch($submenu) {
     }
     break;
   case "Group":
-    if ($active) {
+    if ($status == 'A') {
         array_push(
             $items,
             array('name' => 'Create Groups (Manual)', 'link' => "/groups/add/$course_id"),
@@ -35,7 +36,7 @@ switch($submenu) {
     );
     break;
   case "EvalEvents":
-    if ($active) {
+    if ($status == 'A') {
         array_push(
             $items,
             array('name' => 'Add Event', 'link' => "/events/add/$course_id")
@@ -48,7 +49,7 @@ switch($submenu) {
     );
     break;
   case "TeamMaker":
-    if ($active) {
+    if ($status == 'A') {
         array_push(
             $items,
             array('name' => 'Create Groups (Auto)', 'link' => "/surveygroups/makegroups/$course_id")

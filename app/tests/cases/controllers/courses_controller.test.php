@@ -332,13 +332,13 @@ class CoursesControllerTest extends ExtendedAuthTestCase
     {
         $result = $this->testAction('/courses/home/1', array('return' => 'vars'));
 
-        $this->assertEqual($result['studentCount'], 13);
-        $this->assertEqual($result['course_id'], $this->fixtureView['Course'][0]['id']);
+        $this->assertEqual($result['data']['Course']['student_count'], 13);
+        $this->assertEqual($result['data']['Course']['id'], $this->fixtureView['Course'][0]['id']);
         $this->assertEqual($result['data']['Course']['id'], $this->fixtureView['Course'][0]['id']);
         $this->assertEqual($result['data']['Course']['course'], $this->fixtureView['Course'][0]['course']);
         $this->assertEqual($result['data']['Course']['title'], $this->fixtureView['Course'][0]['title']);
-        $this->assertEqual($result['groupCount'], 2);
-        $this->assertEqual($result['eventCount'], 9);
+        $this->assertEqual(count($result['data']['Group']), 2);
+        $this->assertEqual(count($result['data']['Event']), 9);
         $this->assertEqual($result['title_for_layout'], $this->fixtureView['Course'][0]['course'].' - '.$this->fixtureView['Course'][0]['title']);
     }
 

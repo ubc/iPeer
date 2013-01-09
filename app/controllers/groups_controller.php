@@ -123,13 +123,11 @@ class GroupsController extends AppController
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
+            return;
         }
 
-        ($course['Course']['record_status'] == 'A') ? $active = true : $active = false;
-
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Groups', true)));
-        $this->set('active', $active);
-        $this->set('course_id', $courseId);
+        $this->set('course', $course);
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
         // Set the display list

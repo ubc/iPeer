@@ -1,5 +1,8 @@
 <div id='CourseHome'>
-<?php if (!$active) {
+<?php $studentCount = $data['Course']['student_count']; 
+$groupCount = count($data['Group']);
+$eventCount = count($data['Event']);
+if ($data['Course']['record_status'] == 'I') {
     echo "<div class='invalid'>Invalid Course</div><br>";
 } ?>
 <table class='standardtable'>
@@ -37,24 +40,24 @@
 <?php
 $submenu = 'Student';
 $submenuTitle = __('Students', true);
-$params = array('submenu'=>$submenu, 'submenuTitle'=>$submenuTitle);
+$params = array('submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$data['Course']['id']);
 echo $this->element('courses/submenu', $params);
 
 
 $submenu = 'Group';
 $submenuTitle = __('Groups', true);
-$params = array('controller'=>'courses', 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'courseId'=>$course_id);
+$params = array('controller'=>'courses', 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$data['Course']['id']);
 echo $this->element('courses/submenu', $params);
 
 $submenu = 'EvalEvents';
 $submenuTitle = __('Evaluation Events', true);
-$params = array('controller'=>'courses', 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'courseId'=>$course_id);
+$params = array('controller'=>'courses', 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$data['Course']['id']);
 echo $this->element('courses/submenu', $params);
 
 if (User::hasPermission('controllers/Surveys')) {
   $submenu = 'TeamMaker';
   $submenuTitle = __('Team Maker', true);
-  $params = array('controller'=>'courses', 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$course_id);
+  $params = array('controller'=>'courses', 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$data['Course']['id']);
   echo $this->element('courses/submenu', $params);
 }
 

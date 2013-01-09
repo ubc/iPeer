@@ -146,6 +146,7 @@ class CoursesController extends AppController
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
+            return;
         }
 
         $this->set('data', $course);
@@ -165,18 +166,10 @@ class CoursesController extends AppController
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
+            return;
         }
 
-        ($course['Course']['record_status'] == 'A') ? $active = true : $active = false;
-
         $this->set('data', $course);
-        $this->set('active', $active);
-        $this->set('course_id', $id);
-
-        $this->set('studentCount', $course['Course']['student_count']);
-        $this->set('groupCount', count($course['Group']));
-        $this->set('eventCount', count($course['Event']));
-
         $this->set('title_for_layout', $course['Course']['full_name']);
 
         //Setup the courseId to session

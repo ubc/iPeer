@@ -75,14 +75,7 @@ class GroupsControllerTest extends ExtendedAuthTestCase {
     function testIndex() {
         $result = $this->testAction('/groups/index/1', array('return' => 'vars'));
 
-        $this->assertEqual($result['course_id'], 1);
-        /*$this->assertEqual($result['paramsForList']['data']['entries'][0]['Course']['course'], 'Math303');
-        $this->assertEqual($result['paramsForList']['data']['entries'][0]['Group']['group_num'], '1');
-        $this->assertEqual($result['paramsForList']['data']['entries'][0]['Group']['member_count'], '2');
-        $this->assertEqual($result['paramsForList']['data']['entries'][1]['Group']['group_num'], '2');
-        $this->assertEqual($result['paramsForList']['data']['entries'][1]['Group']['member_count'], '2');
-        $this->assertEqual($result['paramsForList']['data']['entries'][2]['Group']['group_num'], '3');
-        $this->assertEqual($result['paramsForList']['data']['entries'][2]['Group']['member_count'], '0');*/
+        $this->assertEqual($result['course']['Course']['course'], 'MECH 328');
     }
 
     function testView() {
