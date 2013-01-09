@@ -649,6 +649,14 @@ i {
     background-position: 0.5em;
 }
 
+#CourseHome .invalid {
+    text-align: center;
+    padding: 0.3em;
+    margin-bottom: 0.1em;
+    font-weight: bold;
+    background-color: salmon;
+}
+
 /* USERS */
 
 /* users/add users/edit */

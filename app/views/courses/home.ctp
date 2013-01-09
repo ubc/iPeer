@@ -1,3 +1,7 @@
+<div id='CourseHome'>
+<?php if (!$active) {
+    echo "<div class='invalid'>Invalid Course</div><br>";
+} ?>
 <table class='standardtable'>
   <tr>
     <th>Instructors</th>
@@ -55,4 +59,5 @@ if (User::hasPermission('controllers/Surveys')) {
 }
 
 ?>
+</div>
 </div>

@@ -167,7 +167,10 @@ class CoursesController extends AppController
             $this->redirect('index');
         }
 
+        ($course['Course']['record_status'] == 'A') ? $active = true : $active = false;
+
         $this->set('data', $course);
+        $this->set('active', $active);
         $this->set('course_id', $id);
 
         $this->set('studentCount', $course['Course']['student_count']);
