@@ -275,7 +275,8 @@ CREATE TABLE `course_departments` (
 INSERT INTO `course_departments` (`id`, `course_id`, `department_id`) VALUES
 (1, 2, 2),
 (2, 1, 1),
-(3, 3, 3);
+(3, 3, 3),
+(4, 3, 2);
 
 -- --------------------------------------------------------
 
