@@ -81,8 +81,14 @@ class EmailtemplatesController extends AppController
             $extraFilters = "";
         } else {
             $creators = array();
-            // grab course ids of the courses admin has access to
-            $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+            // grab course ids of the courses admin/instructor has access to
+            $courseIds = array();
+            if (User::hasPermission('functions/user/admin')) {
+                $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+            } else {
+                $courseIds = $this->UserCourse->find('list', array('conditions' => array('user_id' => $myID),
+                    'fields' => array('course_id')));
+            }
             // grab all instructors that have access to the courses above
             $instructors = $this->UserCourse->find(
                 'all',
