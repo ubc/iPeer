@@ -14,27 +14,27 @@ $details = Set::combine($evaluation['EvaluationDetail'], '{n}.EvaluationMixevalD
     </tr>
     <?php foreach ($questions as $mixevalQuestion) {
     //Get and set Mixeval Question
-    if ($mixevalQuestion !=null && $mixevalQuestion['MixevalsQuestion']["question_type"]=="S") {
+    if ($mixevalQuestion !=null && $mixevalQuestion["question_type"]=="S") {
         $questionDescriptors = $mixevalQuestion['Description'];
     }
-    if ($mixevalQuestion['MixevalsQuestion']["question_type"]=="S") {
+    if ($mixevalQuestion["question_type"]=="S") {
 
         echo '<tr><td style="text-align: left; padding-left: 1em;">';
         if (isset($evaluate)) {
-            echo '<input type="hidden" name="selected_lom_'.$userId.'_'.$mixevalQuestion['MixevalsQuestion']['question_num'].'"';
-            echo 'value="'.(isset($details[$mixevalQuestion['MixevalsQuestion']['question_num']]['selected_lom']) ?
-                $details[$mixevalQuestion['MixevalsQuestion']['question_num']]['selected_lom'] :
+            echo '<input type="hidden" name="selected_lom_'.$userId.'_'.$mixevalQuestion['question_num'].'"';
+            echo 'value="'.(isset($details[$mixevalQuestion['question_num']]['selected_lom']) ?
+                $details[$mixevalQuestion['question_num']]['selected_lom'] :
                 '1') . '">';
         } else {
-            echo '<input type="hidden" name="selected_lom_'.$userId.'_'.$mixevalQuestion['MixevalsQuestion']['question_num'].'" value="1" size="4" >';
+            echo '<input type="hidden" name="selected_lom_'.$userId.'_'.$mixevalQuestion['question_num'].'" value="1" size="4" >';
         }
 
-        echo $pos. ': &nbsp &nbsp '. $mixevalQuestion['MixevalsQuestion']['title'];
+        echo $pos. ': &nbsp &nbsp '. $mixevalQuestion['title'];
         echo '</td></tr>';
-        echo $form->hidden('Mixeval.question_type'.$mixevalQuestion['MixevalsQuestion']['question_num'], array('value'=>'S'));
+        echo $form->hidden('Mixeval.question_type'.$mixevalQuestion['question_num'], array('value'=>'S'));
 
         //for loop to display the criteria comment cells for each LOM
-        isset($mixevalQuestion['MixevalsQuestion']['multiplier']) ? $multiplier = $mixevalQuestion['MixevalsQuestion']['multiplier'] : $multiplier = 1;
+        isset($mixevalQuestion['multiplier']) ? $multiplier = $mixevalQuestion['multiplier'] : $multiplier = 1;
         echo '<tr align="left"><td >';
         echo '<div style="margin: 1em">';
         for ($j=1; $j<=count($mixevalQuestion['Description']); $j++) {
@@ -50,11 +50,11 @@ $details = Set::combine($evaluation['EvaluationDetail'], '{n}.EvaluationMixevalD
             echo $mixevalQuestion['Description'][$j-1]['descriptor'].'&nbsp;';
             echo "</td></tr>";
             echo '<tr><td align="center">';
-            echo '<input name="'.$userId.'criteria_points_'.$mixevalQuestion['MixevalsQuestion']['question_num'].'" type="radio" value="'.$mark_value.'"';
-            echo 'onclick="document.evalForm.selected_lom_'.$userId.'_'.$mixevalQuestion['MixevalsQuestion']['question_num'].".value=".$j.'" ';
+            echo '<input name="'.$userId.'criteria_points_'.$mixevalQuestion['question_num'].'" type="radio" value="'.$mark_value.'"';
+            echo 'onclick="document.evalForm.selected_lom_'.$userId.'_'.$mixevalQuestion['question_num'].".value=".$j.'" ';
             if (isset($evaluation)) {
-                if (isset($details[$mixevalQuestion['MixevalsQuestion']['question_num']]['selected_lom']) &&
-                    $details[$mixevalQuestion['MixevalsQuestion']['question_num']]['selected_lom'] == $j) {
+                if (isset($details[$mixevalQuestion['question_num']]['selected_lom']) &&
+                    $details[$mixevalQuestion['question_num']]['selected_lom'] == $j) {
                         echo " checked ";
                     }
             } else {
@@ -94,7 +94,7 @@ $details = Set::combine($evaluation['EvaluationDetail'], '{n}.EvaluationMixevalD
         <th align="left"><?php __('Section Two')?>: &nbsp;<?php __('Comments (No Weight on this Section)')?></th>
     </tr>
     <?php foreach ($questions as $mixevalQuestion) {
-        if ($mixevalQuestion['MixevalsQuestion']["question_type"] == "S") {
+        if ($mixevalQuestion["question_type"] == "S") {
             continue;
         }
     ?>
@@ -103,13 +103,13 @@ $details = Set::combine($evaluation['EvaluationDetail'], '{n}.EvaluationMixevalD
           <table border="0" width="95%" cellpadding="2">
             <tr><td width="5%"><?php echo $pos?>:</td>
                 <td width="95%" style="text-align: left;"> Question Prompt:
-                  <?php echo  $mixevalQuestion['MixevalsQuestion']['title'];
+                  <?php echo  $mixevalQuestion['title'];
                    if ($evaluate) {
-                      if (isset($mixevalQuestion['MixevalsQuestion']['required']) && $mixevalQuestion['MixevalsQuestion']['required']==1) {
+                      if (isset($mixevalQuestion['required']) && $mixevalQuestion['required']==1) {
                         echo '<font color="red"> * </font>';
                       }
                    } ?> <br>
-                  <?php echo $form->hidden('Mixeval.question_type'.$mixevalQuestion['MixevalsQuestion']['question_num'], array('value'=>'T')); ?>
+                  <?php echo $form->hidden('Mixeval.question_type'.$mixevalQuestion['question_num'], array('value'=>'T')); ?>
                 </td>
               </tr>
               <?php if (!$evaluate) { ?>
@@ -117,7 +117,7 @@ $details = Set::combine($evaluation['EvaluationDetail'], '{n}.EvaluationMixevalD
                 <td/>
                 <td><?php __('Mandatory?')?>:
                   <?php $checkRequired = __('YES', true);
-                   if (isset($mixevalQuestion['MixevalsQuestion']['required']) && $mixevalQuestion['MixevalsQuestion']['required']==0) {
+                   if (isset($mixevalQuestion['required']) && $mixevalQuestion['required']==0) {
                      $checkRequired = __('NO', true);
                    }
                    echo $checkRequired;
@@ -132,18 +132,17 @@ $details = Set::combine($evaluation['EvaluationDetail'], '{n}.EvaluationMixevalD
         <td cellpadding="2">
           <table border="0" width="95%" cellpadding="2">
              <tr><td colspan="2">
-                  <?php echo $mixevalQuestion['MixevalsQuestion']['instructions'] ?>
+                  <?php echo $mixevalQuestion['instructions'] ?>
             </td></tr>
             <?php if ($evaluate) :?>
             <tr><td colspan="2" style="text-align: left; padding-left: 2em;">
-                  <?php if (isset($mixevalQuestion['MixevalsQuestion']['response_type']) && $mixevalQuestion['MixevalsQuestion']['response_type']=='L') {?>
-                     <?php $text = isset($details[$mixevalQuestion['MixevalsQuestion']['question_num']]['question_comment']) ?
-                        $details[$mixevalQuestion['MixevalsQuestion']['question_num']]['question_comment']:'';?>
-                     <textarea name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['MixevalsQuestion']['question_num']?>" cols="80" rows="10"><?php echo $text?></textarea>
+                  <?php $text = isset($details[$mixevalQuestion['question_num']]['question_comment']) ?
+                        $details[$mixevalQuestion['question_num']]['question_comment']:'';?>
+                  <?php if (isset($mixevalQuestion['response_type']) && $mixevalQuestion['response_type']=='L') {?>
+                     <textarea name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['question_num']?>" cols="80" rows="10"><?php echo $text?></textarea>
                      <br /><?php __('Maximum 65535 characters.')?>
                   <?php } else { ?>
-                     <input type="text" name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['MixevalsQuestion']['question_num']?>" size="92" value="<?php
-                      echo htmlentities($details[$mixevalQuestion['MixevalsQuestion']['question_num']]['question_comment'])?>">
+                     <input type="text" name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['question_num']?>" size="92" value="<?php echo $text?>">
                   <?php }?>
             </td></tr>
             <?php else: ?>
@@ -151,7 +150,7 @@ $details = Set::combine($evaluation['EvaluationDetail'], '{n}.EvaluationMixevalD
                 <td width="85%" align="left">
                   <?php
                    $responseType = 'Single Text Input';
-                   if (isset($mixevalQuestion['MixevalsQuestion']['response_type']) && $mixevalQuestion['MixevalsQuestion']['response_type']=='L') {
+                   if (isset($mixevalQuestion['response_type']) && $mixevalQuestion['response_type']=='L') {
                        $responseType = __('Long Answer Text Input', true);
                    }
                    echo $responseType;?>

@@ -58,8 +58,6 @@ class Penalty extends AppModel
             'order' => array('Penalty.days_late'),
             'contain' => false,
         ));
-        // pop off the final deduction
-        array_pop($penalties);
         return $penalties;
     }
 

@@ -77,13 +77,11 @@ if (!empty($penalty)) {
           $evaluationDetails = $user['Evaluation']['EvaluationDetail'];
           foreach ($evaluationDetails as $detailEval) {
             $detail = $detailEval['EvaluationMixevalDetail'];
-                     if ($viewData['Question'][$detail['question_number']]['MixevalsQuestion']['question_type'] != 'S' &&
+            if ($data['Question'][$detail['question_number']]['question_type'] != 'S' &&
                 empty($detail['question_comment'])) {
-              $commentsNeeded = true;      // A criteria comment is missing
-              //echo "Missing detail $detail[id] for user $user[id]<br />";
-              break;
-            } else {
-              //echo "OK detail $detail[id] ($detail[question_comment]) for user $user[id]<br />";
+                $commentsNeeded = true;      // A criteria comment is missing
+                //echo "Missing detail $detail[id] for user $user[id]<br />";
+                break;
             }
           }
           $partial = '';
@@ -92,15 +90,15 @@ if (!empty($penalty)) {
           }
         ?>
 
-		  	  <font color="#66FF33"> ( <?php echo $partial?><?php __('Entered')?> )</font>
-		  	<?php else:?>
-		  	  <font color="#FF6666"> - <?php __('Incomplete')?> </font>
-		  	<?php endif;?>
-		  </div>
-		  <div id="panel1Content" class="panelContent">
+              <font color="#66FF33"> ( <?php echo $partial?><?php __('Entered')?> )</font>
+            <?php else:?>
+              <font color="#FF6666"> - <?php __('Incomplete')?> </font>
+            <?php endif;?>
+          </div>
+          <div id="panel1Content" class="panelContent">
       <?php
       $params = array(  'controller'            => 'mixevals',
-                        'data'                  => $viewData,
+                        'data'                  => $data,
                         'scale_default'         => $data['Mixeval']['scale_max'],
                         'question_default'      => $data['Mixeval']['lickert_question_max'],
                         'prefill_question_max'  => $data['Mixeval']['prefill_question_max'],
@@ -183,7 +181,7 @@ if (!empty($penalty)) {
         }
     }
     if (!$mustCompleteUsers && !$commentsNeeded) {
-        echo $form->submit(__('Submit to Complete the Evaluation', true), array('onClick' => "javascript:return confirm('".__('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?', true)."')", 'div'=>'submitMixeval'));
+        echo $form->submit(__('Submit to Complete the Evaluation', true), array('div'=>'submitMixeval'));
     } else {
         echo $form->submit(__('Submit to Complete the Evaluation', true), array('disabled'=>'true', 'div'=>'submitMixeval')); echo "<br />";
         echo $mustCompleteUsers ? "<div style='color: red'>".__("Please complete the questions for all group members, pressing 'Save This Section' button for each one.", true)."</div>" : "";

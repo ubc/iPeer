@@ -1,11 +1,12 @@
 <?php
 echo $this->Form->create('Course');
+echo $this->Form->input('id');
 echo $this->Form->input('course', array('after' => ''));?>
 <div class="help-text"><?php __('Course subjects and course numbers, e.g. APSC 201 001')?></div>
 
 <?php echo $this->Form->input('title');?>
 <div class="help-text"><?php __('Course title, e.g. Technical Communication')?></div>
-<?php echo $this->Form->input('Instructor', array('selected' => $instructorSelected));?>
+<?php echo $this->Form->input('Instructor');?>
 <div class="help-text"><?php __('Holding "ctrl" or "command" key to select multiple instructors.')?></div>
 
 <?php echo $this->Form->input(

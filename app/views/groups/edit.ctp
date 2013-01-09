@@ -1,12 +1,13 @@
 <?php echo $html->script('groups')?>
 <?php $readonly = isset($readonly) ? $readonly : false;?>
 <?php $status = (isset($submissions) && $submissions > 0 && !User::hasPermission('functions/superadmin')) ? 'disabled' : '';?>
+<?php $id = $this->action == 'add' ? $course_id : $group_id; ?>
 
 <div class="content-container">
 <?php
 echo $this->Form->create('Group',
     array('id' => 'frm',
-    'url' => array('action' => $this->action.'/'.$course_id),
+    'url' => array('action' => $this->action.'/'.$id),
 ));
 echo isset($group_id) ? $this->Form->hidden('Group.id', array('value' => $group_id)):'';
 echo $this->Form->hidden('Group.course_id', array('value' => $course_id));

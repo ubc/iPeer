@@ -13,7 +13,7 @@ class GroupTestCase extends CakeTestCase
         'app.user_enrol', 'app.groups_member', 'app.survey',
         'app.user_faculty', 'app.faculty', 'app.department',
         'app.course_department', 'app.sys_parameter', 'app.user_tutor',
-        'app.penalty', 'app.evaluation_simple'
+        'app.penalty', 'app.evaluation_simple', 'app.survey_input',
     );
     public $Group = null;
 
@@ -77,6 +77,7 @@ class GroupTestCase extends CakeTestCase
         // Test group with some students in it
         $students = $this->Group->getStudentsNotInGroup(2);
         $this->assertEqual($students, array(
+            '36' => 'Tutor 2',
             '26' => '19524032 Bill Student',
             '21' => '22784037 Nicole Student',
             '17' => '37116036 Edna Student',
@@ -87,7 +88,6 @@ class GroupTestCase extends CakeTestCase
             '35' => ' Tutor 1 *',
             '6' => '65468188 Alex Student *',
             '5' => '65498451 Ed Student *',
-            '7' => '98985481 Matt Student *'
         ));
 
         // Test invalid group
@@ -108,10 +108,10 @@ class GroupTestCase extends CakeTestCase
         $students = Set::extract('/Member/student_no_with_full_name', $students);
         sort($students);
         $this->assertEqual($students, array(
-            ' Tutor 2',
             '10186039 Hui Student',
             '19803030 Bowinn Student',
-            '51516498 Joe Student'
+            '51516498 Joe Student',
+            '98985481 Matt Student',
         ));
 
         // Test invalid group

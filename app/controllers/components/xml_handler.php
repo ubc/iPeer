@@ -13,14 +13,15 @@ class XmlHandlerComponent extends Object
     /**
      * makeTeamMakerXML
      *
-     * @param mixed $survey    survey
+     * @param mixed $questions questions for make groups
+     * @param mixed $responses user responses
      * @param mixed $numGroups number of groups
      * @param mixed $weight    weight
      *
      * @access public
      * @return void
      */
-    function makeTeamMakerXML($survey, $numGroups, $weight, $eventId)
+    function makeTeamMakerXML($questions, $responses, $numGroups, $weight)
     {
         if (phpversion() < 5) {
             $appendChildFunc = 'append_child';
@@ -41,73 +42,50 @@ class XmlHandlerComponent extends Object
         $team_input = $doc->$createElementFunc('team_input');
         $team_input->$setAttributeFunc('num_groups', $numGroups);
         $doc->$appendChildFunc($team_input);
-        foreach ($survey['Question'] as $q) {
-            if (in_array($q['type'], array('M', 'C'))) {
-                //questions
-                $question = $doc->$createElementFunc('question');
-                $question->$setAttributeFunc('id', $q['id']);
-                $question->$setAttributeFunc('type', ($q['type'] == 'C' ? 'CAO':'MC'));
-                $question->$setAttributeFunc('title', $q['prompt']);
-                $team_input->$appendChildFunc($question);
+        foreach ($questions as $q) {
+            //questions
+            $question = $doc->$createElementFunc('question');
+            $question->$setAttributeFunc('id', $q['id']);
+            $question->$setAttributeFunc('type', ($q['type'] == 'C' ? 'CAO':'MC'));
+            $question->$setAttributeFunc('title', $q['prompt']);
+            $team_input->$appendChildFunc($question);
 
-                //weight
-                $element_weight = $doc->$createElementFunc('weight');
-                $element_weight->$setAttributeFunc('value', $weight[$q['id']]);
-                $question->$appendChildFunc($element_weight);
-            }
+            //weight
+            $element_weight = $doc->$createElementFunc('weight');
+            $element_weight->$setAttributeFunc('value', $weight[$q['id']]);
+            $question->$appendChildFunc($element_weight);
         }
-        $userData = $survey['Course']['Enrol'];
-        foreach ($userData as $user) {
+
+        foreach ($responses as $user) {
             //students
             $student = $doc->$createElementFunc('student');
-            $student->$setAttributeFunc('username', $user['student_no']);
+            $student->$setAttributeFunc('username', $user['User']['id']);
             $team_input->$appendChildFunc($student);
 
-            foreach ($survey['Question'] as $q) {
-                if (in_array($q['type'], array('M', 'C'))) {
-                    //response
-                    $response = $doc->$createElementFunc('response');
-                    $response->$setAttributeFunc('q_id', $q['id']);
-                    $response->$setAttributeFunc('type', ($q['type'] == 'C' ? 'CAO':'MC'));
-                    $student->$appendChildFunc($response);
+            foreach ($questions as $q) {
+                //response
+                $response = $doc->$createElementFunc('response');
+                $response->$setAttributeFunc('q_id', $q['id']);
+                $response->$setAttributeFunc('type', ($q['type'] == 'C' ? 'CAO':'MC'));
+                $student->$appendChildFunc($response);
 
-                    $responses = $this->SurveyInput->getByEventIdUserIdQuestionId($eventId, $user['id'], $q['id']);
-                    //print_r($responses);
-                    if (count($responses) != 0) {
-                        for ($j=0; $j < count($responses); $j++) {
-                            $response_tmp = $responses[$j]['SurveyInput'];
-                            if ($response_tmp['response_text']==null && $response_tmp['response_id']==null) {
-                                //response/answer
-                                $value = $doc->$createElementFunc('value');
-                                $value->$setAttributeFunc('id', $response_tmp['id']);
-                                $value->$setAttributeFunc('answer',0);
-                                $response->$appendChildFunc($value);
-                            } elseif ($response_tmp['response_text']=='' || $response_tmp['response_text']==null) {
-                                //response/answer
-                                $value = $doc->$createElementFunc('value');
-                                $value->$setAttributeFunc('id', $response_tmp['id']);
-                                $value->$setAttributeFunc('answer',1);
-                                $response->$appendChildFunc($value);
-                            } else {
-                                //$mcResponse = explode('_', $response_tmp['response_text']);debug($mcResponse);
-                                //if (isset($mcResponse[0])) {
-                                //    $mcTmp = $this->Response->read(null, $mcResponse[1]);
-                                //    if ($mcTmp['Response']['response']==$mcResponse[0]) {
-                                        //response/answer
-                                        $value = $doc->$createElementFunc('value');
-                                        $value->$setAttributeFunc('id', $response_tmp['id']);
-                                        //$value->setAttribute('answer',1);
-                                        $response->$appendChildFunc($value);
-                                //    }
-                                //}
-                            }
-                        }
-                    } else {
-                        if ('M' == $q['type']) {
-                            $value = $doc->$createElementFunc('value');
-                            $value->$setAttributeFunc('id', '');
-                            $response->$appendChildFunc($value);
-                        }
+                // TODO: handle CAO (checkbox questions. See the example xml in teammaker
+                // source directory
+                $responses = Set::extract($user, '/SurveyInput[question_id='.$q['id'].']');
+                if (!empty($responses)) {
+                    foreach ($responses as $resp) {
+                        $response_tmp = $resp['SurveyInput'];
+                        //response/answer
+                        $value = $doc->$createElementFunc('value');
+                        $value->$setAttributeFunc('id', $response_tmp['response_id'] == null ? '':$response_tmp['response_id']);
+                        #$value->$setAttributeFunc('answer', 1);
+                        $response->$appendChildFunc($value);
+                    }
+                } else {
+                    if ('M' == $q['type']) {
+                        $value = $doc->$createElementFunc('value');
+                        $value->$setAttributeFunc('id', '');
+                        $response->$appendChildFunc($value);
                     }
                 }
             }

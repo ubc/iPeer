@@ -3,11 +3,11 @@
 <?php
 $ques_num = 1;
 foreach ($questions as $ques) {
-    if ($ques['Question']['type'] == 'M') {
-        echo '<h3>'.$ques_num.') '.$ques['Question']['prompt'].'</h3>';
+    if ($ques['type'] == 'M') {
+        echo '<h3>'.$ques_num.') '.$ques['prompt'].'</h3>';
         // a response is given
-        if (isset($answers[$ques['Question']['id']])) {
-            $responses = boldSelected($ques['Question']['Responses'], $answers[$ques['Question']['id']]);
+        if (isset($answers[$ques['id']])) {
+            $responses = boldSelected($ques['Response'], $answers[$ques['id']]);
             echo '<ol>';
             foreach ($responses as $response) {
                 echo '<li>'.$response.'</li>';
@@ -16,17 +16,17 @@ foreach ($questions as $ques) {
         // no response
         } else {
             echo '<ol>';
-            foreach ($ques['Question']['Responses'] as $response) {
+            foreach ($ques['Response'] as $response) {
                 echo '<li>'.$response['response'].'</li>';
             }
             echo '</ol>';
         }
         $ques_num++;
-    } else if ($ques['Question']['type'] == 'C') {
-        echo '<h3>'.$ques_num.') '.$ques['Question']['prompt'].'</h3>';
+    } else if ($ques['type'] == 'C') {
+        echo '<h3>'.$ques_num.') '.$ques['prompt'].'</h3>';
         // response is given
-        if (isset($answers[$ques['Question']['id']])) {
-            $responses = boldSelected($ques['Question']['Responses'], $answers[$ques['Question']['id']]);
+        if (isset($answers[$ques['id']])) {
+            $responses = boldSelected($ques['Response'], $answers[$ques['id']]);
             echo '<ul>';
             foreach ($responses as $response) {
                 echo '<li>'.$response.'</li>';
@@ -35,31 +35,31 @@ foreach ($questions as $ques) {
         // no response
         } else {
             echo '<ul>';
-            foreach ($ques['Question']['Responses'] as $response) {
+            foreach ($ques['Response'] as $response) {
                 echo '<li>'.$response['response'].'</li>';
             }
             echo '</ul>';
         }
         $ques_num++;
-    } else if ($ques['Question']['type'] == 'S') {
-        echo '<h3>'.$ques_num.') '.$ques['Question']['prompt'].'</h3>';
+    } else if ($ques['type'] == 'S') {
+        echo '<h3>'.$ques_num.') '.$ques['prompt'].'</h3>';
         // response is given
-        if (isset($answers[$ques['Question']['id']]) &&
-            !empty($answers[$ques['Question']['id']]['0']['SurveyInput']['response_text'])
+        if (isset($answers[$ques['id']]) &&
+            !empty($answers[$ques['id']]['0']['SurveyInput']['response_text'])
         ) {
-            echo '<p>'.$answers[$ques['Question']['id']]['0']['SurveyInput']['response_text'].'</p>';
+            echo '<p>'.$answers[$ques['id']]['0']['SurveyInput']['response_text'].'</p>';
         // no response
         } else {
             echo '<p class="noanswer">-- No Answer --</p>';
         }
         $ques_num++;
-    } else if ($ques['Question']['type'] == 'L') {
-        echo '<h3>'.$ques_num.') '.$ques['Question']['prompt'].'</h3>';
+    } else if ($ques['type'] == 'L') {
+        echo '<h3>'.$ques_num.') '.$ques['prompt'].'</h3>';
         // response is given
-        if (isset($answers[$ques['Question']['id']]) && 
-            !empty($answers[$ques['Question']['id']]['0']['SurveyInput']['response_text'])
+        if (isset($answers[$ques['id']]) &&
+            !empty($answers[$ques['id']]['0']['SurveyInput']['response_text'])
         ) {
-            echo '<pre>'.$answers[$ques['Question']['id']]['0']['SurveyInput']['response_text'].'</pre>';
+            echo '<pre>'.$answers[$ques['id']]['0']['SurveyInput']['response_text'].'</pre>';
         // no response
         } else {
             echo '<p class="noanswer">-- No Answer --</p>';
@@ -69,19 +69,22 @@ foreach ($questions as $ques) {
 }
 
 function boldSelected($choices, $selected) {
-    $options = array();
     $answers = array();
     $data = array();
-    
     // grabbing all the choices
-    foreach ($choices as $choice) {
-        $options[] = $choice['response'];
-    }
+    $options = Set::combine($choices, '{n}.id', '{n}.response');
+
     // grabbing all the chosen values
     foreach ($selected as $select) {
-        $answers[] = $select['SurveyInput']['response_text'];
+        if (null != $select['SurveyInput']['response_text']) {
+            // if response text is available
+            $answers[] = $select['SurveyInput']['response_text'];
+        } else {
+            // otherwise use response id
+            $answers[] = $options[$select['SurveyInput']['response_id']];
+        }
     }
-    
+
     foreach ($options as $option) {
         // option is chosen
         if (in_array($option, $answers)) {
@@ -91,7 +94,7 @@ function boldSelected($choices, $selected) {
             $data[] = $option;
         }
     }
-    
+
     return $data;
 }
 ?>

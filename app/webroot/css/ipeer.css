@@ -609,7 +609,7 @@ i {
 
 #bannerSmall {
     background-image: url(small_header_back.gif);
-    background-repeat: repeat=x;
+    background-repeat: repeat-x;
 }
 
 #bannerSmall img {
@@ -660,10 +660,6 @@ i {
 #UserForm .select label {
     width: 13em;
     margin-top: 0.5em;
-}
-
-#UserForm .checkbox label {
-    float: none;
 }
 
 #UserForm .checkbox {
@@ -915,7 +911,6 @@ i {
 	padding: 2px 5px;
 	/*margin: 0 3px;*/
 	cursor: pointer;
-	*cursor: hand;
 	color: #333 !important;
 	background-color: #DDD;
 }
@@ -928,7 +923,6 @@ i {
 	padding: 2px 5px;
 	/*margin: 0 3px;*/
 	cursor: pointer;
-	*cursor: hand;
 	color: #333 !important;
     background-color: #99B3FF;
 }
@@ -1002,6 +996,45 @@ i {
 .evaltoolsadd a {
     margin-right: 1em;
     font-size: 0.9em;
+}
+
+/* SURVEYS */
+
+/* surveys/view */
+.surveyquestions .prompt {
+    margin: 2em 1em 1em 1em;
+}
+
+.surveyquestions  .checkbox input, .surveyquestions input[type="radio"]  {
+    margin: 0.5em;
+    margin-left: 3em;
+}
+
+.surveyquestions .checkbox label {
+    padding: 0 0 0 0.5em;
+    float: none;
+}
+
+.surveyquestions input[type="text"] {
+    width: 40em;
+    margin-left: 3em;
+}
+
+.surveyquestions textarea {
+    width: 40em;
+    height: 10em;
+    margin-left: 3em;
+}
+
+/* GROUPS */
+
+/* groups/import */
+
+.groupsimport .csvexample {
+    border: 1px solid black;
+    background: white;
+    padding: 1em;
+    margin: 1em;
 }
 
 /* TO BE REFACTORED LATER */
@@ -1438,7 +1471,6 @@ table.group-list-chooser {
 
 table.group-list-chooser td{
     border: none;
-    background-color: none;
 }
 
 .group-list-chooser td.middle-column{
@@ -1543,4 +1575,48 @@ form div.input {
 
 #cwl-login td {
     background-color: transparent;
+}
+
+td.weight1 {
+    background-color: #00ff00;
+}
+
+td.weight2 {
+    background-color: #30ff30;
+}
+
+td.weight3 {
+    background-color: #60ff60;
+}
+
+td.weight4 {
+    background-color: #90ff90;
+}
+
+td.weight5 {
+    background-color: #c0ffc0;
+}
+
+td.weight6 {
+    background-color: #ffffff;
+}
+
+td.weight7 {
+    background-color: #ffcfcf;
+}
+
+td.weight8 {
+    background-color: #ff9f9f;
+}
+
+td.weight9 {
+    background-color: #ff6f6f;
+}
+
+td.weight10 {
+    background-color: #ff3f3f;
+}
+
+td.weight11 {
+    background-color: #ff0f0f;
 }

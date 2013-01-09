@@ -560,7 +560,7 @@ class EvaluationTestCase extends CakeTestCase
     {
 
         $survey = $this->EvaluationComponentTest->formatSurveyEvaluationSummary(1);
-        $expected = $this->setUpSurveTestData();
+        $expected = $this->setUpSurveyTestData();
 
         $this->assertEqual($expected, $survey);
         $survey = $this->EvaluationComponentTest->formatSurveyEvaluationSummary(999);
@@ -598,7 +598,7 @@ class EvaluationTestCase extends CakeTestCase
         return $return;
     }
 
-    function setUpSurveTestData()
+    function setUpSurveyTestData()
     {
 
         $expected = array(

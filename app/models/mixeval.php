@@ -146,27 +146,6 @@ class Mixeval extends EvaluationBase
 
 
     /**
-     * compileViewDataShort
-     *
-     * @param bool $mixeval
-     *
-     * @access public
-     * @return void
-     */
-    function compileViewDataShort($mixeval = null)
-    {
-        $this->MixevalsQuestion = ClassRegistry::init('MixevalsQuestion');
-        $this->MixevalsQuestionDesc = ClassRegistry::init('MixevalsQuestionDesc');
-
-        $mixeval_id = $mixeval['Mixeval']['id'];
-        $mixEvalDetail = $this->MixevalsQuestion->getQuestion($mixeval_id);
-        if (!empty($mixeval['Question'])) {
-            $mixeval['Question'] = $mixEvalDetail;
-        }
-        return $mixeval;
-    }
-
-    /**
     * copy generate a copy of mixeval with specific ID. The generated copy
     * is cleaned up by removing all the IDs in it
     *

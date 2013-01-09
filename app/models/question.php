@@ -36,31 +36,6 @@ class Question extends AppModel
 
     public $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable');
 
-
-    /**
-     * sets the data variable up with proper formating in the array for display
-     *
-     * @param array $data : $data obtained as return value from
-     * 					  SurveyQuestion::getQuestionsID($survey_id);
-     *
-     * @access public
-     * @return void
-     */
-    function fillQuestion($data)
-    {
-        for ($i=0; $i<count($data); $i++) {
-            $data[$i]['Question'] = $this->find('all', array('conditions' => array('id' => $data[$i]['SurveyQuestion']['question_id']),
-                'fields' => array('prompt', 'type')));
-            $data[$i]['Question'] = $data[$i]['Question'][0]['Question'];
-            $data[$i]['Question']['number'] = $data[$i]['SurveyQuestion']['number'];
-            $data[$i]['Question']['id'] = $data[$i]['SurveyQuestion']['question_id'];
-            $data[$i]['Question']['sq_id'] = $data[$i]['SurveyQuestion']['id'];
-            unset($data[$i]['SurveyQuestion']);
-        }
-        return $data;
-    }
-
-
     /**
      * getTypeById
      *
@@ -82,4 +57,45 @@ class Question extends AppModel
         return $type['Question']['type'];
     }
 
+    /**
+     * getQuestionsForMakingGroupBySurveyId
+     * get all the questions that are available for makeing groups
+     * E.g. select/checkbox questions
+     * The result of questions are ordered
+     *
+     * @param mixed $surveyId survey id
+     *
+     * @access public
+     * @return array of the questions
+     */
+    function getQuestionsForMakingGroupBySurveyId($surveyId)
+    {
+        $questions = $this->find('all', array(
+            'fields' => array($this->alias.'.*'),
+            'conditions' => array(
+                'type' => array('C', 'M'),
+                'Survey.id' => $surveyId,
+            ),
+            'order' => 'number ASC',
+            'contain' => 'Survey',
+        ));
+
+        return Set::classicExtract($questions, '{n}.Question');
+    }
+
+    /**
+     * getQuestionsListBySurveyId
+     * return the list of questions for select
+     *
+     * @param mixed $surveyId survey id
+     *
+     * @access public
+     * @return void
+     */
+    function getQuestionsListBySurveyId($surveyId)
+    {
+        $questions = $this->getQuestionsForMakingGroupBySurveyId($surveyId);
+
+        return Set::combine($questions, '{n}.id', '{n}.prompt');
+    }
 }

@@ -83,7 +83,7 @@ class SurveyControllerTest extends ExtendedAuthTestCase {
 
     function testView() {
         $result = $this->testAction('/surveys/view/1', array('return' => 'vars'));
-        $this->assertEqual($result['data']['Survey']['name'], 'Team Creation Survey');
+        $this->assertEqual($result['survey']['Survey']['name'], 'Team Creation Survey');
     }
 
     //TODO redirect

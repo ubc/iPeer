@@ -55,4 +55,34 @@ class EvaluationResponseBase extends AppModel
 
         return $responses;
     }
+
+    /**
+     * getSubmittedResultsByGroupIdEventIdAndEvaluator
+     *
+     * @param mixed $groupId   group id
+     * @param mixed $eventId   event id
+     * @param mixed $evaluator evaluator id
+     * @param mixed $contain   contain array
+     *
+     * @access public
+     * @return void
+     */
+    public function getSubmittedResultsByGroupIdEventIdAndEvaluator($groupId, $eventId, $evaluator, $contain = false)
+    {
+        // get the group event id first
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
+        $groupEvent = $this->GroupEvent->find('first', array(
+            'conditions' => array('group_id' => $groupId, 'event_id' => $eventId),
+            'fields' => array('id'),
+            'contain' => false,
+        ));
+        if (empty($groupEvent)) {
+            return false;
+        }
+
+        return $this->find('all', array(
+            'conditions' => array('grp_event_id' => $groupEvent['GroupEvent']['id'], 'evaluator' => $evaluator),
+            'contain' => $contain,
+        ));
+    }
 }

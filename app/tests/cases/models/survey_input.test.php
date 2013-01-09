@@ -12,7 +12,8 @@ class SurveyInputTestCase extends CakeTestCase
         'app.response', 'app.survey_question', 'app.user_course',
         'app.user_enrol', 'app.groups_member', 'app.rubric', 'app.rubrics_lom',
         'app.rubrics_criteria', 'app.rubrics_criteria_comment',
-        'app.survey_input', 'app.survey'
+        'app.survey_input', 'app.survey', 'app.faculty', 'app.user_faculty',
+        'app.department', 'app.course_department', 'app.evaluation_simple',
     );
     public $SurveyInput = null;
 
@@ -75,7 +76,7 @@ class SurveyInputTestCase extends CakeTestCase
     function testEventIdUserIdQuestionId()
     {
 
-        $result1 = 
+        $result1 =
             $this->SurveyInput->getByEventIdUserIdQuestionId(4, 7, 1);
         $expect1 = array(
             '0' => array(

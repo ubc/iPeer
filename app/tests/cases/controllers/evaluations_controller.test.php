@@ -91,8 +91,8 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
         $this->assertEqual(count($result['groupMembers']), 2);
         $this->assertEqual($result['fullName'], 'Ed Student');
         $this->assertEqual($result['userId'], 5);
-        $this->assertEqual(count($result['penalty']), 3);
-        $this->assertEqual(Set::extract($result['penalty'], '/Penalty/id'), array(1,2,3));
+        $this->assertEqual(count($result['penalty']), 4);
+        $this->assertEqual(Set::extract($result['penalty'], '/Penalty/id'), array(1,2,3,4));
         $this->assertEqual($result['penaltyDays'], 3);
         $this->assertEqual($result['penaltyFinal']['Penalty']['id'], 4);
         $this->assertEqual($result['event']['Event']['id'], 1);
@@ -116,8 +116,8 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
         $this->assertEqual($result['evaluateeCount'], 2);
         $this->assertEqual(count($result['groupMembers']), 2);
         $this->assertEqual($result['viewData']['id'], 1);
-        $this->assertEqual(count($result['penalty']), 3);
-        $this->assertEqual(Set::extract($result['penalty'], '/Penalty/id'), array(5,6,7));
+        $this->assertEqual(count($result['penalty']), 4);
+        $this->assertEqual(Set::extract($result['penalty'], '/Penalty/id'), array(5,6,7,8));
         $this->assertEqual($result['penaltyDays'], 3);
         $this->assertEqual($result['penaltyFinal']['Penalty']['id'], 8);
         $this->assertEqual($result['event']['Event']['id'], 2);
@@ -140,7 +140,7 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
         $result = $this->testAction('/evaluations/makeEvaluation/3/1', array('return' => 'vars'));
         $this->assertEqual($result['evaluateeCount'], 2);
         $this->assertEqual(count($result['groupMembers']), 2);
-        $this->assertEqual($result['viewData']['Mixeval']['id'], 1);
+        $this->assertEqual($result['data']['Mixeval']['id'], 1);
         $this->assertEqual(count($result['penalty']), 0);
         $this->assertEqual(Set::extract($result['penalty'], '/Penalty/id'), array());
         $this->assertEqual($result['penaltyDays'], 0);
@@ -160,15 +160,14 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
             )
         );
 
-        // rubric evaluation
         $result = $this->testAction('/evaluations/makeEvaluation/4', array('return' => 'vars'));
         $this->assertEqual($result['eventId'], 4);
         $this->assertEqual($result['courseId'], 1);
-        $this->assertEqual(count($result['questions']), 2);
-        $this->assertEqual($result['questions'][0]['Question']['prompt'], 'What was your GPA last term?');
-        $this->assertEqual($result['questions'][1]['Question']['prompt'], 'Do you own a laptop?');
-        $this->assertEqual(count($result['questions'][0]['Question']['Responses']), 4);
-        $this->assertEqual(count($result['questions'][1]['Question']['Responses']), 2);
+        $this->assertEqual(count($result['survey']['Question']), 2);
+        $this->assertEqual($result['survey']['Question'][0]['prompt'], 'What was your GPA last term?');
+        $this->assertEqual($result['survey']['Question'][1]['prompt'], 'Do you own a laptop?');
+        $this->assertEqual(count($result['survey']['Question'][0]['Response']), 4);
+        $this->assertEqual(count($result['survey']['Question'][1]['Response']), 2);
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], '');
     }

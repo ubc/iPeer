@@ -265,7 +265,7 @@ class CoursesController extends AppController
     {
         $this->_initFormEnv();
 
-        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission(), array('Instructor'));
+        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission(), array('Instructor', 'Department'));
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
@@ -284,7 +284,6 @@ class CoursesController extends AppController
         }
 
         $this->data = $course;
-        $this->set('instructorSelected', Set::extract($course, '/Instructor/id'));
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Edit Course', true)));
     }
 

@@ -117,8 +117,8 @@
     //-->
 </script>
 
-<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
 <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeEvaluation/'.$event['Event']['id'].'/'.$event['Group']['id']) ?>">
+<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
 <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
 <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>"/>
 <input type="hidden" name="course_id" value="<?php echo $courseId?>"/>
@@ -201,9 +201,9 @@
       <td width="5">Max.</td>
       </tr></table>
                 </td>
-                 <td><input type="text" name="points[]" id="point<?php echo $user['id']?>" value="<?php echo empty($params['data']['Evaluation']['point'.$user['id']])? '' : $params['data']['Evaluation']['point'.$user['id']] ?>" size="5" onchange="updateCount(<?php echo $remaining?>,<?php echo $event['Event']['com_req']?>);">
+                 <td><input type="text" name="points[]" id="point<?php echo $user['id']?>" value="<?php echo empty($this->data['Evaluation']['point'.$user['id']])? '0' : $this->data['Evaluation']['point'.$user['id']] ?>" size="5" onchange="updateCount(<?php echo $remaining?>,<?php echo $event['Event']['com_req']?>);">
     </td>
-                 <td><input type="text" name="comments[]" id="comment<?php echo $user['id']?>" value="<?php echo empty($params['data']['Evaluation']['comment_'.$user['id']])? '' : $params['data']['Evaluation']['comment_'.$user['id']] ?>" size="50" onchange="updateCount(<?php echo $remaining?>,<?php echo $event['Event']['com_req']?>);">
+                 <td><input type="text" name="comments[]" id="comment<?php echo $user['id']?>" value="<?php echo empty($this->data['Evaluation']['comment_'.$user['id']])? '' : $this->data['Evaluation']['comment_'.$user['id']] ?>" size="50" onchange="updateCount(<?php echo $remaining?>,<?php echo $event['Event']['com_req']?>);">
       <script type="text/javascript" language="javascript">
 
             function onSlide(v){
@@ -241,9 +241,13 @@
   <tr>
     <td colspan="4" align="center"><?php
       if (!isset($preview)) {
-        echo $form->submit(__('Submit Evaluation', true), array('id' => 'submit0', 'disabled' => 'true', 'onClick' => "javascript:return confirm('".__('Once you submit the input, you cannot change them. Please review your input before submitting. Are you sure you want to submit?', true)."')", 'div'=>'submitSimple'));
+        echo $form->submit(__('Submit Evaluation', true), array('id' => 'submit0', 'disabled' => 'true', 'div'=>'submitSimple'));
       }
       ?></td>
     </tr>
 </table>
 </form>
+
+<script type='text/javascript'>
+      updateCount(<?php echo $remaining ?>, <?php echo $com_req ?>);
+</script>

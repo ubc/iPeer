@@ -42,14 +42,14 @@ function getNonUpcomingTableArray($html, $events) {
         if (isset($event['Event']['is_result_released']) &&
             $event['Event']['is_result_released']
         ) { // we're in the result release period, so link to the results
-            $tmp[] = $html->link($event['Event']['title'], 
+            $tmp[] = $html->link($event['Event']['title'],
                 '/evaluations/studentViewEvaluationResult/' .
                 $event['Event']['id'] . '/' . $event['Group']['id']);
             $tmp[] = $event['Event']['result_release_date_end'];
         }
         else if ($event['Event']['event_template_type_id'] == 3) {
             // this is a survey, no release period, so link to the results
-            $tmp[] = $html->link($event['Event']['title'], 
+            $tmp[] = $html->link($event['Event']['title'],
                 '/evaluations/studentViewEvaluationResult/' .
                 $event['Event']['id']);
         }
@@ -82,7 +82,7 @@ function getNonUpcomingTableArray($html, $events) {
         $tmp[] = Toolkit::formatDate($event['Event']['due_date']);
         if (!empty($event['EvaluationSubmission'])) {
             // expired events have no submissions
-            $tmp[] = $event['EvaluationSubmission'][0]['date_submitted'];
+            $tmp[] = $event['EvaluationSubmission']['date_submitted'];
         }
         $ret[] = $tmp;
     }
@@ -119,8 +119,8 @@ else {
        <th>Due Date</th>
        <th>Due In/<span class='red'>Late By</span></th>
     </tr>
-    <?php 
-    echo $html->tableCells($evalUpcoming); 
+    <?php
+    echo $html->tableCells($evalUpcoming);
     ?>
     <?php if (empty($evalUpcoming)):?>
     <tr><td colspan="5" align="center"><b> No peer evaluations due at this time </b></td></tr>
@@ -131,7 +131,7 @@ else {
 <table class='standardtable'>
     <tr>
         <th>Event</th>
-        <th>Viewable <span class='orangered'>Start</span>/End</th>
+        <th>Result <span class='orangered'>Available</span>/End</th>
         <th>Group</th>
         <th>Course</th>
         <th>Due Date</th>
@@ -150,7 +150,7 @@ else {
 <table class='standardtable'>
     <tr>
         <th>Event</th>
-        <th>Viewable <span class='orangered'>Start</span>/End</th>
+        <th>Result <span class='orangered'>Available</span>/End</th>
         <th>Group</th>
         <th>Course</th>
         <th>Due Date</th>
@@ -168,8 +168,8 @@ else {
        <th>Due Date</th>
        <th>Due In/<span class='red'>Late By</span></th>
     </tr>
-    <?php 
-    echo $html->tableCells($surveyUpcoming); 
+    <?php
+    echo $html->tableCells($surveyUpcoming);
     ?>
     <?php if (empty($surveyUpcoming)):?>
     <tr><td colspan="4" align="center"><b> No survey due at this time </b></td></tr>

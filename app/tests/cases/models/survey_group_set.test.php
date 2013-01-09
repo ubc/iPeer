@@ -13,9 +13,9 @@ class SurveyGroupSetTestCase extends CakeTestCase
         'app.response', 'app.survey_question', 'app.user_course',
         'app.user_enrol', 'app.groups_member', 'app.rubric', 'app.rubrics_lom',
         'app.rubrics_criteria', 'app.rubrics_criteria_comment',
-        'app.faculty', 'app.user_faculty', 'app.department', 
+        'app.faculty', 'app.user_faculty', 'app.department',
         'app.course_department', 'app.sys_parameter', 'app.user_tutor',
-        'app.penalty', 'app.evaluation_simple'
+        'app.penalty', 'app.evaluation_simple', 'app.survey_input',
     );
     public $SurveyGroupSet = null;
 
@@ -49,8 +49,8 @@ class SurveyGroupSetTestCase extends CakeTestCase
         $this->SurveyGroupSet->save($input);
 
         // Assert that data has been saved in database
-        $searchedAll = $this->SurveyGroupSet->find('first', array('conditions' => array('SurveyGroupSet.id' => 50)));
-        $searchedSurveyGroup = $this->SurveyGroup->find('first', array('conditions' => array('group_set_id' => 50)));
+        $searchedAll = $this->SurveyGroupSet->find('first', array('conditions' => array('SurveyGroupSet.id' => 50), 'contain' => false));
+        $searchedSurveyGroup = $this->SurveyGroup->find('first', array('conditions' => array('group_set_id' => 50), 'contain' => false));
         $searchedSurveyGroupMember1 = $this->SurveyGroupMember->find('first', array('conditions' => array('group_set_id' => 50, 'user_id' => 10)));
         $searchedSurveyGroupMember2 = $this->SurveyGroupMember->find('first', array('conditions' => array('group_set_id' => 50, 'user_id' => 11)));
         $this->assertTrue(!empty($searchedAll));
@@ -80,14 +80,14 @@ class SurveyGroupSetTestCase extends CakeTestCase
         // Release surveyGroup in the fixture
         $this->SurveyGroupSet->release(3);
         // Assert that surveyGroup is released
-        $released = $this->SurveyGroupSet->find('first', array('conditions' => array('SurveyGroupSet.id' => 3)));
+        $released = $this->SurveyGroupSet->find('first', array('conditions' => array('SurveyGroupSet.id' => 3), 'contain' => false));
         $this->assertEqual($released['SurveyGroupSet']['released'], 1);
 
         // Assert that an associated group has been added, as specified by the function
-        $groupName = 'test groupset Team #1'; 
+        $groupName = 'test groupset Team #1';
         $addedGroup = $this->Group->find(
-            'first', 
-            array('conditions' => 
+            'first',
+            array('conditions' =>
                 array('group_name' => $groupName)
             )
         );
@@ -109,17 +109,7 @@ class SurveyGroupSetTestCase extends CakeTestCase
             ),
             'SurveyGroup' => array(
                 '0' => array(
-                    'SurveyGroup' => array(
-                        'group_number' => 1
-                    ),
-                    'SurveyGroupMember' => array(
-                        '0' => array(
-                            'user_id' => 10
-                        ),
-                        '1' => array(
-                            'user_id' => 11
-                        )
-                    )
+                    'SurveyGroupMember' => array(10, 11)
                 )
             )
         );

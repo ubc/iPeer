@@ -50,13 +50,14 @@ class Survey extends EvaluationBase
             'counterQuery'  => ''),
     );
 
-    public $hasAndBelongsToMany = array('Question' =>
-        array('className'    =>  'Question',
+    public $hasAndBelongsToMany = array(
+        'Question' => array(
+            'className'    =>  'Question',
             'joinTable'    =>  'survey_questions',
             'foreignKey'   =>  'survey_id',
             'associationForeignKey'    =>  'question_id',
             'conditions'   =>  '',
-            'order'        =>  '',
+            'order'        =>  'number',
             'limit'        => '',
             'unique'       => true,
             'finderQuery'  => '',
@@ -113,4 +114,19 @@ class Survey extends EvaluationBase
         return $tmp['Survey']['id'];
     }
 
+    /**
+     * getSurveyWithQuestionsById
+     *
+     * @param mixed $surveyId
+     *
+     * @access public
+     * @return survey with questions and responses
+     */
+    public function getSurveyWithQuestionsById($surveyId)
+    {
+        return $this->find('first', array(
+            'conditions' => array('id' => $surveyId),
+            'contain' => array('Question' => array('order' => 'SurveyQuestion.number ASC', 'Response'))
+        ));
+    }
 }

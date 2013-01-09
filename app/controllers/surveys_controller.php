@@ -173,8 +173,8 @@ class SurveysController extends AppController
      */
     function view($id)
     {
-        $survey = $this->Survey->find(
-            'first',
+        // retrieving the requested survey
+        $survey = $this->Survey->find('first',
             array(
                 'conditions' => array('id' => $id),
                 'contain' => false
@@ -188,7 +188,29 @@ class SurveysController extends AppController
             return;
         }
 
-        $this->set('data', $survey);
+        // Get all required data from each table for every question
+        $questions = $this->Question->find('all', array(
+            'conditions' => array('Survey.id' => $id),
+            'order' => 'SurveyQuestion.number',
+            'recursive' => 1)
+        );
+
+        // Convert the response array into a flat options array for
+        // the form input helper
+        foreach ($questions as &$q) {
+            if (isset($q['Response'])) {
+                $options = array();
+                foreach ($q['Response'] as $resp) {
+                    $options[$resp['id']] = $resp['response'];
+                }
+                $q['ResponseOptions'] = $options;
+            }
+        }
+
+        $this->set('breadcrumb', $this->breadcrumb->push('surveys')->
+            push(__('View', true))->push($survey['Survey']['name']));
+        $this->set('survey', $survey);
+        $this->set('questions', $questions);
     }
 
 
@@ -450,8 +472,6 @@ class SurveysController extends AppController
    */
   function removeQuestion($survey_id, $question_id)
   {
-      $this->autoRender = false;
-
       // move question to bottom of survey list so deletion can be done
       // without affecting the number order
       $this->SurveyQuestion->moveQuestion($survey_id, $question_id, 'BOTTOM');
@@ -459,7 +479,9 @@ class SurveysController extends AppController
       // remove the question from the survey association as well as all other
       // references to the question in the responses and questions tables
       $this->Survey->habtmDelete('Question', $survey_id, $question_id);
-      //$this->Question->editCleanUp($question_id);
+      // for some reason, habtmDelete does not remove the question's entry
+      // in the Question model, so doing it here as a quick fix
+      $this->Question->delete($question_id);
 
       $this->Session->setFlash(__('The question was removed successfully.', true), 'good');
 
@@ -483,8 +505,14 @@ class SurveysController extends AppController
           $this->data = $this->Question->find('first', array('conditions' => array('id' => $this->data['Question']['template_id'])));
           $this->set('responses', $this->data['Response']);
       } elseif (!empty($this->params['data']['Question'])) {
-          //$maxQuestionNum = $this->SurveyQuestion->getMaxSurveyQuestionNumber($this->data['Survey']['id']);
-          //$this->data['number'] = $maxQuestionNum+1;
+          // Strip ID from responses or the original master question will
+          // lose its responses. We want a copy, not the original.
+          if (isset($this->data['Response'])) {
+              foreach($this->data['Response'] as &$response) {
+                  unset($response['id']);
+              }
+          }
+
           if ($this->Question->saveAll($this->data)) {
               $this->Session->setFlash(__('The question was added successfully.', true), 'good');
               // Need to run reorderQuestions once in order to correctly set the question position numbers
@@ -494,13 +522,12 @@ class SurveysController extends AppController
               //$this->questionsSummary($this->params['form']['survey_id'], null, null);
           } else {
               $this->set('responses', $this->data['Response']);
-              $this->render('editQuestion');
+              $this->Session->setFlash(_('Failed to save question.'));
           }
       } else {
           $this->set('responses', array());
       }
 
-      $this->autorender = false;
       $this->set('templates', $this->Question->find('list', array('conditions' => array('master' => 'yes'))));
       $this->set('survey_id', $survey_id);
       $this->set('breadcrumb', $this->breadcrumb->push('surveys')->push(Inflector::humanize(Inflector::underscore($this->action))));
@@ -519,6 +546,19 @@ class SurveysController extends AppController
   function editQuestion( $question_id, $survey_id )
   {
       if (!empty($this->data)) {
+          // filter - remove the removed answers from the database
+          $responses = $this->Response->find('list', array('conditions' => array('question_id' => $question_id)));
+          $newResponses = array();
+          foreach ($this->data['Response'] as $new) {
+            if (isset($new['id'])) {
+                $newResponses[] = $new['id'];
+            }
+          }
+          foreach ($responses as $resp) {
+            if (!in_array($resp, $newResponses)) {
+                $this->Response->delete($resp);
+            }
+          }
           if ($this->Question->saveAll($this->data)) {
               $this->Session->setFlash(__('The question was updated successfully.', true), 'good');
               $this->redirect('questionsSummary/'.$survey_id);

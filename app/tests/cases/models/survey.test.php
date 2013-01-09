@@ -16,7 +16,7 @@ class SurveyTestCase extends CakeTestCase
         'app.rubrics_criteria', 'app.rubrics_criteria_comment',
         'app.faculty', 'app.user_faculty', 'app.department',
         'app.course_department', 'app.sys_parameter', 'app.user_tutor',
-        'app.penalty', 'app.evaluation_simple'
+        'app.penalty', 'app.evaluation_simple', 'app.survey_input',
     );
     public $Survey = null;
 
@@ -36,7 +36,7 @@ class SurveyTestCase extends CakeTestCase
 
     function testGetSurveyIdByCourseIdTitle() {
         // grab test data
-        $ret = $this->Survey->getSurveyIdByCourseIdTitle(1, 
+        $ret = $this->Survey->getSurveyIdByCourseIdTitle(1,
             'Team Creation Survey');
 
         // Assert on valid data

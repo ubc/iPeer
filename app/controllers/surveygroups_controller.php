@@ -61,12 +61,13 @@ class SurveyGroupsController extends AppController
         // Set up Columns
         $columns = array(
             array("SurveyGroupSet.id",            "",            "",      "hidden"),
-            array("Survey.name",      __("Survey", true),         "auto",  "string",   ""),
+            array("Event.title",      __("Event", true),         "auto",  "string",   ""),
+            array("SurveyGroupSet.set_description",        __("Group Set Name", true),      "13em",  "string", ""),
             array("SurveyGroupSet.group_count",        __("Number of Groups", true),      "13em",  "number", ""),
             array("SurveyGroupSet.released",         __("Released?", true),       "9em", "string", ""),
         );
 
-        $extraFilters = array("Survey.course_id" => $course_id);
+        $extraFilters = array("Event.course_id" => $course_id);
 
         // Set up actions
         $warning = __("Are you sure you want to delete this group set permanently?", true);
@@ -92,7 +93,12 @@ class SurveyGroupsController extends AppController
      */
     function index($courseId)
     {
-        $course = $this->Course->getCourseById($courseId);
+        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+            $this->redirect('index');
+        }
+
         $this->set('course_id', $courseId);
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
@@ -135,7 +141,7 @@ class SurveyGroupsController extends AppController
         }
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))
             ->push(__('Create Group Set', true)));
-        $this->set('surveys', $this->Survey->find('list', array('conditions' => array('course_id' => $course_id))));
+        $this->set('events', $this->Event->find('list', array('conditions' => array('course_id' => $course_id, 'event_template_type_id' => 3))));
     }
 
 
@@ -149,15 +155,20 @@ class SurveyGroupsController extends AppController
     {
         $this->layout = false;
 
-        if (empty($this->data['survey_select'])) {
+        if (empty($this->data['event_select'])) {
             $this->autoRender = false;
             return '';
         }
 
-        $survey = $this->Survey->read(null, $this->data['survey_select']);
-        $this->set('group_list', $this->__makeGroupList($survey['Course']['student_count']));
+        $event = $this->Event->find('first', array(
+            'conditions' => array('Event.id' => $this->data['event_select']),
+            'contain' => 'Course',
+        ));
+        $questions = $this->Question->getQuestionsForMakingGroupBySurveyId($event['Event']['template_id']);
 
-        $this->set('data', $survey);
+        $this->set('group_list', $this->__makeGroupList($event['Course']['student_count']));
+        $this->set('event', $event);
+        $this->set('questions', $questions);
     }
 
 
@@ -172,21 +183,19 @@ class SurveyGroupsController extends AppController
      */
     function maketmgroups($time=null, $make=true)
     {
-      /*$time = 1290644146;
-      $make = false;*/
+        // for debug
+        //$time = 1357520601;
+        //$make = false;
         $this->set('title_for_layout', __('Survey Groups > Teams Summary', true));
         $numGroups = $this->data['group_config'];
-        $survey_id = $this->data['survey_id'];
-        $survey = $this->Survey->find('first', array('conditions' => array('Survey.id' => $survey_id),
-            'recursive' => 2));
-        foreach ($survey['Course']['Event'] as $data) {
-            if ($data['event_template_type_id'] == 3 &&
-               $data['template_id'] == $survey['Survey']['id']) {
-                $event_id = $data['id'];
-            }
-        }
+        $event_id = $this->data['event_id'];
+        $event = $this->Event->find('first', array('conditions' => array('Event.id' => $event_id),
+            'contain' => false));
+
         //make xml for TeamMaker
-        $doc = $this->XmlHandler->makeTeamMakerXML($survey, $numGroups, $this->params['form']['weight'], $event_id);
+        $questions = $this->Question->getQuestionsForMakingGroupBySurveyId($event['Event']['template_id']);
+        $responses = $this->User->getWithSurveyResponsesByEvent($event);
+        $doc = $this->XmlHandler->makeTeamMakerXML($questions, $responses, $numGroups, $this->params['form']['weight'], $event_id);
 
         //saves the 'in' file
         $time = (isset($time) ? $time: (String) time());
@@ -198,7 +207,12 @@ class SurveyGroupsController extends AppController
         $cmdline = $this->__getTeamMaker().' '.$file_path.'.xml '.$file_path.'.txt';// > ../tmp/tm_log.txt";
         set_time_limit(1200);
         if ($make) {
-            exec($cmdline);
+            exec($cmdline, $out, $ret);
+            if ($ret) {
+                $this->Session->setFlash("Unable to execute TeamMaker.");
+                $this->redirect($this->referer());
+                return;
+            }
         }
 
         //parse results and display
@@ -206,35 +220,23 @@ class SurveyGroupsController extends AppController
         $teams = array();
 
         //format the team recordset
-        for ($i=0; $i < count($teams_tmp); $i++) {
-            $team = $teams_tmp[$i];
+        $students = Set::combine($responses, '{n}.User.id', '{n}.User');
+        foreach ($teams_tmp as $team) {
             $members = explode(' ', $team);
-            for ($j=0; $j < count($members); $j++) {
-                $member = $members[$j];
-                $member = trim($member);
-                $member_id =
-                    $this->User->field('id', array('student_no' => $member));
-                $teams[$i]['member_'.$j]['student_no'] = $member;
-                $teams[$i]['member_'.$j]['id'] = $member_id;
+            $teamArray = array();
+            foreach ($members as $member) {
+                $teamArray[] = $students[trim($member)];
             }
-        }
-
-        // count how many MC or Checkbox questions are in survey
-        $sq_count = 0;
-        foreach ($survey['Question'] as $tmp) {
-            if ($tmp['type'] == 'M' || $tmp['type'] == 'C') {
-                $sq_count++;
-            }
+            $teams[] = $teamArray;
         }
 
         $this->__cleanXmlFile($file_path.'.txt.scores');
 
-        $scores = $this->XmlHandler->readTMXml($sq_count, $file_path.'.txt.scores');
+        $scores = $this->XmlHandler->readTMXml(count($questions), $file_path.'.txt.scores');
         $this->set('scores', $scores);
         $this->set('teams', $teams);
 
         $this->set('filename', $time);
-        $this->set('survey_id', $survey_id);
         $this->set('event_id', $event_id);
     }
 
@@ -250,14 +252,21 @@ class SurveyGroupsController extends AppController
         $this->autoRender = false;
         $time = $this->data['filename'];
         $setDescription = $this->data['team_set_name'];
-        $surveyId = $this->data['survey_id'];
+        $eventId = $this->data['event_id'];
+
+        if (!($event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission()))) {
+            $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+            $this->redirect('/home');
+            return;
+        }
+
         //get teams
         $teams_tmp = file(TMP.$time.'.txt');
 
         //save group sets
         $numGroups = count($teams_tmp);
         $surveyGroupSet = array();
-        $surveyGroupSet['SurveyGroupSet']['survey_id'] = $surveyId;
+        $surveyGroupSet['SurveyGroupSet']['survey_id'] = $eventId;
         $surveyGroupSet['SurveyGroupSet']['set_description'] = $setDescription;
         $surveyGroupSet['SurveyGroupSet']['num_groups'] = $numGroups;
         $surveyGroupSet['SurveyGroupSet']['date'] = $time;
@@ -266,21 +275,8 @@ class SurveyGroupsController extends AppController
             //save groups
             $team = $teams_tmp[$i];
 
-            $group = array();
-            $group['group_number'] = $i+1;
-
             $members = explode(' ', trim($team));
-            $group_members = array();
-            foreach ($members as $member) {
-                //save group members
-                $member_id =
-                    $this->User->field('id', array('student_no' => $member));
-                $surveyGroupMember = array();
-                $surveyGroupMember['user_id'] = $member_id;
-                $group_members[] = $surveyGroupMember;
-            }
-            $surveyGroupSet['SurveyGroup'][]['SurveyGroup'] = $group;
-            $surveyGroupSet['SurveyGroup'][$i]['SurveyGroupMember'] = $group_members;
+            $surveyGroupSet['SurveyGroup'][$i]['SurveyGroupMember'] = $members;
         }
 
         // use overwritten save method to save all
@@ -289,7 +285,8 @@ class SurveyGroupsController extends AppController
         } else {
             $this->Session->setFlash(__('The group set saving failed.', true));
         }
-        $this->redirect('index');
+
+        $this->redirect('index/'.$event['Event']['course_id']);
     }
 
 
@@ -303,18 +300,24 @@ class SurveyGroupsController extends AppController
      */
     function release($group_set_id)
     {
-        // Check for a valid parameter
-        if (!is_numeric($group_set_id)) {
-            $this->Session->setFlash(__('Group Set must be a numeric id', true));
-            $this->redirect('index');
+        //get group set
+        $group_set = $this->SurveyGroupSet->find('first', array(
+            'conditions' => array('SurveyGroupSet.id' => $group_set_id),
+            'contain' => array('SurveyGroup' => array('Member')),
+        ));
+        $event_id = $group_set['SurveyGroupSet']['survey_id'];
+        if (!($event = $this->Event->getAccessibleEventById($event_id, User::get('id'), User::getCourseFilterPermission()))) {
+            $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+            $this->redirect('/home');
+            return;
         }
 
         if ($this->SurveyGroupSet->release($group_set_id)) {
-            $this->Session->setFlash(__('The group set was released successfully.', true));
+            $this->Session->setFlash(__('The group set was released successfully.', true), 'good');
         } else {
             $this->Session->setFlash(__('Releasing group set failed.', true));
         }
-        $this->redirect('index');
+        $this->redirect('index/'.$event['Event']['course_id']);
     }
 
 
@@ -331,20 +334,24 @@ class SurveyGroupsController extends AppController
     {
         $this->autoRender = false;
 
-        $groupSet = $this->SurveyGroupSet->find('first', array('conditions' => array('SurveyGroupSet.id' => $group_set_id)));
-
-        $course = $this->Course->getAccessibleCourseById($groupSet['Survey']['course_id'], User::get('id'), User::getCourseFilterPermission());
-        if (!$course) {
-            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
-            $this->redirect('index');
+        //get group set
+        $group_set = $this->SurveyGroupSet->find('first', array(
+            'conditions' => array('SurveyGroupSet.id' => $group_set_id),
+            'contain' => array('SurveyGroup' => array('Member')),
+        ));
+        $event_id = $group_set['SurveyGroupSet']['survey_id'];
+        if (!($event = $this->Event->getAccessibleEventById($event_id, User::get('id'), User::getCourseFilterPermission()))) {
+            $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+            $this->redirect('/home');
+            return;
         }
 
         if ($this->SurveyGroupSet->delete($group_set_id)) {
-            $this->Session->setFlash(__('The group set was deleted successfully.', true));
+            $this->Session->setFlash(__('The group set was deleted successfully.', true), 'good');
         } else {
             $this->Session->setFlash(__('Failed to delete group set.', true));
         }
-        $this->redirect('index');
+        $this->redirect('index/'.$event['Event']['course_id']);
     }
 
 
@@ -359,21 +366,22 @@ class SurveyGroupsController extends AppController
      */
     function edit($group_set_id, $question_id = null)
     {
-        $this->set('title_for_layout', $this->Course->getCourseName($this->Session->read('ipeerSession.courseId')).__(' > Edit Groupset', true));
         //get group set
-        $group_set = $this->SurveyGroupSet->find('first', array('conditions' => array('SurveyGroupSet.id' => $group_set_id),
-            'recursive' => 2));
+        $group_set = $this->SurveyGroupSet->find('first', array(
+            'conditions' => array('SurveyGroupSet.id' => $group_set_id),
+            'contain' => array('SurveyGroup' => array('Member')),
+        ));
+        $event_id = $group_set['SurveyGroupSet']['survey_id'];
+        if (!($event = $this->Event->getAccessibleEventById($event_id, User::get('id'), User::getCourseFilterPermission()))) {
+            $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+            $this->redirect('/home');
+            return;
+        }
+
+        // load scores
         $time = $group_set['SurveyGroupSet']['date'];
         $scoreFilePathAndName = TMP.$time.'.txt.scores';
         $this->__cleanXmlFile($scoreFilePathAndName);
-
-        $survey = $this->Survey->find('first', array('conditions' => array('Survey.id' => $group_set['Survey']['id']),
-            'recursive' => 2));
-        foreach ($survey['Course']['Event'] as $data) {
-            if ($data['title'] == $group_set['Survey']['name']) {
-                $event_id = $data['id'];
-            }
-        }
 
         $inputs = array();
         foreach ($group_set['SurveyGroup'] as $survey_group) {
@@ -411,17 +419,13 @@ class SurveyGroupsController extends AppController
             $this->set('responses', $responses);
         }
 
-        $questions = array();
-        foreach ($group_set['Survey']['Question'] as $q) {
-            $questions[$q['id']] = $q['prompt'];
-        }
-
-        $score = $this->XmlHandler->readTMXml(count($group_set['Survey']['Question']), $scoreFilePathAndName);
+        $questions = $this->Question->getQuestionsListBySurveyId($event['Event']['template_id']);
+        $score = $this->XmlHandler->readTMXml(count($questions), $scoreFilePathAndName);
 
         //set data
         $this->set('score', $score);
         $this->set('selected_question', $question_id);
-        $this->set('survey_id', $group_set['Survey']['id']);
+        $this->set('survey_id', $event['Event']['template_id']);
         $this->set('questions', $questions);
         $this->set('inputs', $inputs);
         $this->set('data', $group_set);
@@ -440,50 +444,34 @@ class SurveyGroupsController extends AppController
     {
         $this->autoRender = false;
 
+        //get group set
+        $group_set = $this->SurveyGroupSet->find('first', array(
+            'conditions' => array('SurveyGroupSet.id' => $this->data['group_set_id']),
+            'contain' => array('SurveyGroup' => array('Member')),
+        ));
+        $event_id = $group_set['SurveyGroupSet']['survey_id'];
+        if (!($event = $this->Event->getAccessibleEventById($event_id, User::get('id'), User::getCourseFilterPermission()))) {
+            $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+            $this->redirect('/home');
+            return;
+        }
+
         foreach ($this->data['move'] as $value) {
             if (empty($value)) {
                 continue;
             }
             $data = explode('_', $value);
-            if (!$this->SurveyGroupMember->updateAll(array('group_id' => $data[2]),
-                array('user_id' => $data[0],
-                'group_id' => $data[1]))) {
-                    $this->Session->setFlash(__('Group set change failed.', true));
-                    $this->redirect('index');
+            if (!$this->SurveyGroupMember->updateAll(
+                array('group_id' => $data[2]),
+                array('user_id' => $data[0], 'group_id' => $data[1]))) {
+
+                $this->Session->setFlash(__('Group set change failed.', true));
+                $this->redirect('index/'.$event['Event']['course_id']);
             }
         }
 
-        //group code end
-    /*$time = $group_set['SurveyGroupSet']['date'];
-    $out = file_get_contents($xmlFilePathAndName);
-    $out = @ereg_replace("</team_input>", '', $out);
-    $out = @ereg_replace("(<fixed>).+(</fixed>)", '', $out);
-    $out .= "<fixed>";
-    foreach ($this->data['move'] as $move) {
-      if(empty($move)) continue;
-      $move = explode('_', $move);
-      as $i => $surveyGroup) {
-      foreach ($surveyGroup['Member'] as $j => $member) {
-        $out .= '<member name="'.$member['student_no'].'"/>'."\n";
-      }
-    }
-      $out .= "</fixed>\n";
-    $out .= "</team_input>";
-    file_put_contents($xmlFilePathAndName, $out);
-
-    //execute TeamMaker saves the 'in' file
-    if (file_exists(COMPONENTS.'TeamMaker')) {
-      $team_maker = 'TeamMaker';
-    } else {//windows
-      $team_maker = 'TeamMaker.exe';
-    }
-    $cmdline .= COMPONENTS.$team_maker.' '.$xmlFilePathAndName.' '.TMP.$time.'.txt > '.TMP.'tm_log.txt';
-
-    set_time_limit(1200);
-    exec($cmdline);*/
-
-        $this->Session->setFlash(__('Group set changed successfully.', true));
-        $this->redirect('index');
+        $this->Session->setFlash(__('Group set changed successfully.', true), 'good');
+        $this->redirect('index/'.$event['Event']['course_id']);
     }
 
     /**

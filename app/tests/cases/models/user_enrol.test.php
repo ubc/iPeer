@@ -14,7 +14,7 @@ class UserEnrolTestCase extends CakeTestCase
         'app.user_enrol', 'app.groups_member', 'app.survey', 'app.faculty',
         'app.user_faculty', 'app.department', 'app.course_department',
         'app.sys_parameter', 'app.user_tutor', 'app.penalty',
-        'app.evaluation_simple'
+        'app.evaluation_simple', 'app.survey_input',
     );
     public $Course = null;
 
@@ -40,19 +40,19 @@ class UserEnrolTestCase extends CakeTestCase
     function testInsertCourses()
     {
         //Test insert valid student into valid courses
-        $user = $this->User->UserEnrol->field('id', 
+        $user = $this->User->UserEnrol->field('id',
             array('user_id' => 26, 'course_id' => 2));
         $this->assertFalse($user);
-        $user = $this->User->UserEnrol->field('id', 
+        $user = $this->User->UserEnrol->field('id',
             array('user_id' => 26, 'course_id' => 3));
         $this->assertFalse($user);
 
         $this->UserEnrol->insertCourses(26, array(2,3));
 
-        $user = $this->User->UserEnrol->field('id', 
+        $user = $this->User->UserEnrol->field('id',
             array('user_id' => 26, 'course_id' => 2));
         $this->assertTrue($user);
-        $user = $this->User->UserEnrol->field('id', 
+        $user = $this->User->UserEnrol->field('id',
             array('user_id' => 26, 'course_id' => 3));
         $this->assertTrue($user);
     }
