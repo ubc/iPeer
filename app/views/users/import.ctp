@@ -29,6 +29,9 @@ echo $this->Form->create(null, array('type' => 'file'));
 echo $this->Form->input('file', array('type' => 'file', 'name' => 'file'));
 echo $this->Form->input('Course', 
     array('multiple' => false, 'default' => $courseId));
+echo $this->Form->input('update_class',
+    array('type'=>'checkbox'));
+?><div class="help-text"><?php __('Select, if you would like to remove students not in your new list.')?></div><?php
 echo $this->Form->submit(__('Import', true));
 echo $this->Form->end();
 ?>

@@ -817,10 +817,18 @@ class UsersController extends AppController
             $this->cakeError('error404');
         }
 
-        if ($this->User->delete($id)) {
-            $this->Session->setFlash(__('Record is successfully deleted!', true), 'good');
+        if (is_null($courseId)) {
+            if ($this->User->delete($id)) {
+                $this->Session->setFlash(__('Record is successfully deleted!', true), 'good');
+            } else {
+                $this->Session->setFlash(__('Error: Delete failed!', true));
+            }
         } else {
-            $this->Session->setFlash(__('Error: Delete failed!', true));
+            if ($this->User->removeStudent($id, $courseId)) {
+                $this->Session->setFlash(__('Student is successfully unenrolled!', true), 'good');
+            } else {
+                $this->Session->setFlash(__('Error: Unenrol failed!', true));
+            }
         }
 
         $this->redirect($this->referer());
@@ -977,6 +985,7 @@ class UsersController extends AppController
             }
 
             $data = Toolkit::parseCSV($uploadFile);
+            $usernames = array();
             // generation password for users who weren't given one
             foreach ($data as &$user) {
                 if (empty($user[User::IMPORT_PASSWORD])) {
@@ -984,6 +993,11 @@ class UsersController extends AppController
                 } else {
                     $user[User::GENERATED_PASSWORD] = '';
                 }
+                $usernames[] = $user[User::IMPORT_USERNAME];
+            }
+            
+            if ($this->data['User']['update_class']) {
+                $this->User->removeOldStudents($usernames, $courseId);
             }
 
             // add the users to the database

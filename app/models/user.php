@@ -864,6 +864,25 @@ class User extends AppModel
             ),
         ));
     }
+    
+    /**
+     * removeOldStudents
+     * 
+     * @param mixed $newList  new list of students
+     * @param mixed $courseId course id
+     *
+     * @access public
+     * @return void
+     */
+    public function removeOldStudents($newList, $courseId) {
+        //match usernames
+        $oldList = $this->getEnrolledStudents($courseId);
+        foreach ($oldList as $student) {
+            if (!in_array($student['User']['username'], $newList)) {
+                $this->removeStudent($student['User']['id'], $courseId);
+            }
+        }
+    }
 
     /*********************************
      * Static functions
