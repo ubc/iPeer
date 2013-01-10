@@ -1133,7 +1133,8 @@ class EvaluationsController extends AppController
         if ('3' != $event['Event']['event_template_type_id']) {
             // not survey, we need group
             if (!is_numeric($groupId) ||
-                !($group = $this->Group->getGroupByGroupIdEventIdMemberId($groupId, $eventId, User::get('id')))) {
+                //!($group = $this->Group->getGroupByGroupIdEventIdMemberId($groupId, $eventId, User::get('id')))) {
+                !($group = $this->Group->getGroupWithMemberRoleByGroupIdEventId($groupId, $eventId))) {
 
                     $this->Session->setFlash(__('Error: Invalid group id or you are not in this group.', true));
                     $this->redirect('/home/index');
@@ -1216,7 +1217,6 @@ class EvaluationsController extends AppController
             if (isset($formattedResult['mixevalQuestion'])) {
                 $this->set('mixevalQuestion', $formattedResult['mixevalQuestion']);
             }
-            $this->set('allMembersCompleted', $formattedResult['allMembersCompleted']);
             $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
             $this->set('scoreRecords', $formattedResult['scoreRecords']);
             $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
