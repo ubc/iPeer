@@ -882,7 +882,10 @@ class UsersController extends AppController
         }
 
         // Read the user
-        $user_data = $this->User->findById($user_id, array('contain' => false));
+        $user_data = $this->User->find('first', array(
+            'conditions' => array('id' => $user_id),
+            'contain' => false
+        ));
 
         if (empty($user_data)) {
             $this->Session->setFlash(__('User Not Found!', true));
@@ -922,20 +925,20 @@ class UsersController extends AppController
         $user_data['User']['id'] =  $user_id;
 
         //Save Data
-        if ($this->User->save($user_data, false, array('password'))) {
-            $message = sprintf(__("Password successfully reset. The new password is %s.\n", true), $tmp_password);
+        if ($this->User->save($user_data, true, array('password'))) {
+            $message = sprintf(__("Password successfully reset. The new password is %s.", true).'<br />', $tmp_password);
             $this->User->set('id', $user_id);
 
             // send email to user
             $this->set('user_data', $user_data);
-            if ($this->_sendEmail('', 'Reset Password', $this->Auth->user('email'), $user_data['User']['email'], 'resetPassword')) {
-                //if ($this->_sendEmail( $to, $from, $subject, $email_msg )) {
-                $message .= __("Email has been sent. ", true);
-            } else {
-                if (!isset($user_data['User']['email']) || strlen($user_data['User']['email']) < 1) {
-                    $message .= __('No destination email address. ', true);
+            if (!empty($user_data['User']['email'])) {
+                if ($this->_sendEmail('', 'Reset Password', null, $user_data['User']['email'], 'resetPassword')) {
+                    $message .= __("Email has been sent. ", true);
+                } else {
+                    $message .= __("Email was <u>not</u> sent to the user. ", true) . $this->Email->smtpError;
                 }
-                $message .= __("Email was <u>not</u> sent to the user. ", true) . $this->Email->smtpError;
+            } else {
+                $message .= __('No email has been sent. User does not have email address.', true);
             }
             $this->Session->setFlash($message, 'good');
             $this->redirect($this->referer());
@@ -995,7 +998,7 @@ class UsersController extends AppController
                 }
                 $usernames[] = $user[User::IMPORT_USERNAME];
             }
-            
+
             if ($this->data['User']['update_class']) {
                 $this->User->removeOldStudents($usernames, $courseId);
             }

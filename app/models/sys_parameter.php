@@ -44,11 +44,11 @@ class SysParameter extends AppModel
     /**
      * get the value of a parameter
      *
-     * @param string $paramCode
-     * @param mixed $default
+     * @param string $paramCode param code
+     * @param string $default   default value if no paramCode
      *
      * @access public
-     * @return void
+     * @return string the value for paramCode. If no such paramCode, return null or $default (if specified)
      */
     function get($paramCode, $default = null)
     {
