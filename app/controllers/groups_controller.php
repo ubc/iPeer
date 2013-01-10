@@ -165,12 +165,14 @@ class GroupsController extends AppController
         if (empty($group)) {
             $this->Session->setFlash(__('Error: That group does not exist.', true));
             $this->redirect('/courses');
+            return;
         }
 
         $course = $this->Course->getAccessibleCourseById($group['Group']['course_id'], User::get('id'), User::getCourseFilterPermission());
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('/courses');
+            return;
         }
 
         $this->set('data', $group);
@@ -332,6 +334,7 @@ class GroupsController extends AppController
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
+            return;
         }
         $this->breadcrumb->push(array('course' => $course['Course']));
 
@@ -640,6 +643,7 @@ class GroupsController extends AppController
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('/courses');
+            return;
         }
 
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Export Groups', true)));
@@ -649,11 +653,13 @@ class GroupsController extends AppController
             if (empty($this->params['form']['file_name'])) {
                 $this->Session->setFlash("Please enter a valid filename.");
                 $this->redirect('');
+                return;
             }
             // check that at least one group has been selected
             if (empty($this->data['Member']['Member'])) {
                 $this->Session->setFlash("Please select at least one group to export.");
                 $this->redirect('');
+                return;
             }
             $this->autoRender = false;
             $fileContent = '';
@@ -682,6 +688,7 @@ class GroupsController extends AppController
               && empty($this->params['form']['include_student_name']) && empty($this->params['form']['include_student_email'])) {
                 $this->Session->setFlash("Please select at least one field to export.");
                 $this->redirect('');
+                return;
             }
 
             $fileContent .= "\n";

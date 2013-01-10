@@ -180,6 +180,7 @@ class EventsController extends AppController
      */
     function index($courseId = null)
     {
+        $course = array('Course' => array('id' => $courseId));
         // check for permission to course ($courseId) only when $courseId is provided
         if (!is_null($courseId)) {
             $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
@@ -189,9 +190,8 @@ class EventsController extends AppController
                 return;
             }
             $this->breadcrumb->push(array('course' => $course['Course']));
-            $this->set('course', $course);
         }
-        
+
         // We need to change the session state to point to this
         // course:
         // Initialize a basic non-functional AjaxList
@@ -206,6 +206,7 @@ class EventsController extends AppController
         $this->Session->write('eventsControllerCourseId', $courseId);
         $this->setUpAjaxList($courseId);
         // Set the display list
+        $this->set('course', $course);
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
         $this->set('breadcrumb', $this->breadcrumb->push(__('Events', true)));
     }

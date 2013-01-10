@@ -35,6 +35,7 @@ class DepartmentsController extends AppController {
         if (empty($ret)) {
             $this->Session->setFlash(__('You do not have access to any faculties', true));
             $this->redirect('/pages/admin');
+            return;
         }
 
         $departments = array();
@@ -58,6 +59,7 @@ class DepartmentsController extends AppController {
         if (!$id) {
             $this->Session->setFlash(__('Invalid department', true));
             $this->redirect(array('action' => 'index'));
+            return;
         }
         $ret = $this->Department->read(null, $id);
         $this->set('department', $ret['Department']['name']);
@@ -99,6 +101,7 @@ class DepartmentsController extends AppController {
         if (!$id && empty($this->data)) {
             $this->Session->setFlash(__('Invalid department', true));
             $this->redirect(array('action' => 'index'));
+            return;
         }
         if (!empty($this->data)) {
             if ($this->Department->save($this->data)) {
@@ -123,10 +126,12 @@ class DepartmentsController extends AppController {
         if (!$id) {
             $this->Session->setFlash(__('Invalid id for department', true));
             $this->redirect(array('action'=>'index'));
+            return;
         }
         if ($this->Department->delete($id)) {
             $this->Session->setFlash(__('Department deleted', true), 'good');
             $this->redirect(array('action'=>'index'));
+            return;
         }
         $this->Session->setFlash(__('Department was not deleted', true));
         $this->redirect(array('action' => 'index'));
