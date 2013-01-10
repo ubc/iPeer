@@ -168,7 +168,7 @@ class User extends AppModel
         if (array_key_exists('Faculty', $this->data) &&
             empty($this->data['Faculty']['Faculty']) && 
             in_array($this->data['Role']['RolesUser']['role_id'], array(2,3))) {
-            // make sure this model fails when saving without department
+            // make sure this model fails when saving without faculty
             $this->invalidate('Faculty');
             // make the error message appear in the right place
             $this->Faculty->invalidate('Faculty',

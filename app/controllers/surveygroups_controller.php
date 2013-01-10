@@ -42,7 +42,7 @@ class SurveyGroupsController extends AppController
         }
 
         foreach ($data as $key => $entry) {
-            $data[$key]['SurveyGroupSet']['released'] = $entry['SurveyGroupSet']['released'] == 0 ? 'No' : 'Yes';
+            $data[$key]['!Custom']['isReleased'] = $entry['SurveyGroupSet']['released'] == 0 ? 'No' : 'Yes';
         }
         return $data;
     }
@@ -64,7 +64,8 @@ class SurveyGroupsController extends AppController
             array("Event.title",      __("Event", true),         "auto",  "string",   ""),
             array("SurveyGroupSet.set_description",        __("Group Set Name", true),      "13em",  "string", ""),
             array("SurveyGroupSet.group_count",        __("Number of Groups", true),      "13em",  "number", ""),
-            array("SurveyGroupSet.released",         __("Released?", true),       "9em", "string", ""),
+            array("!Custom.isReleased",         __("Released?", true),       "9em", "string"),
+            array("SurveyGroupSet.released", "", "", "hidden"),
         );
 
         $extraFilters = array("Event.course_id" => $course_id);
@@ -99,7 +100,7 @@ class SurveyGroupsController extends AppController
             $this->redirect('index');
             return;
         }
-
+        
         $this->set('course', $course);
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();

@@ -914,7 +914,7 @@ class UsersController extends AppController
         $user_data['User']['id'] =  $user_id;
 
         //Save Data
-        if ($this->User->save($user_data, true, array('password'))) {
+        if ($this->User->save($user_data, false, array('password'))) {
             $message = sprintf(__("Password successfully reset. The new password is %s.\n", true), $tmp_password);
             $this->User->set('id', $user_id);
 
@@ -1091,7 +1091,7 @@ class UsersController extends AppController
         $from = $this->Auth->user('email');
         $to = $user['User']['email'];
         $username = $user['User']['username'];
-        $name = $user['User']['full_name'];
+        $name = $user['User']['first_name'].' '.$user['User']['last_name'];
 
         // this means only students will get a list of courses they're
         // enrolled in, since instructors are stored in another array
