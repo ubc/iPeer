@@ -1250,18 +1250,17 @@ class EvaluationComponent extends Object
     /**
      * getMixevalResultDetail
      *
-     * @param mixed $event        event
+     * @param mixed $groupEventId group event id
      * @param mixed $groupMembers group members
      *
      * @access public
      * @return void
      */
-    function getMixevalResultDetail ($groupEventId, $groupMembers)
+    function getMixevalResultDetail($groupEventId, $groupMembers)
     {
         $pos = 0;
         $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
-        $this->EvaluationMixevalDetail   = ClassRegistry::init('EvaluationMixevalDetail');
         $mixevalResultDetail = array();
         $memberScoreSummary = array();
         $inCompletedMembers = array();
@@ -1573,11 +1572,11 @@ class EvaluationComponent extends Object
         //Get Members for this evaluation
         if ($studentView) {
 
-            $this->User->id = $this->Auth->user('id');
-
-            $this->User->recursive = -1;
-            $user = $this->User->read();
-            $mixevalResultDetail = $this->getMixevalResultDetail($event['GroupEvent']['id'], $user);
+            $user = $this->User->find('first', array(
+                'conditions' => array('id' => User::get('id')),
+                'contain' => array('Role'),
+            ));
+            $mixevalResultDetail = $this->getMixevalResultDetail($event['GroupEvent']['id'], array($user));
             $groupMembers = $this->GroupsMembers->getEventGroupMembers(
                 $event['Group']['id'], $event['Event']['self_eval'], $currentUser['id']);
             $groupMembersNoTutors = $this->GroupsMembers->getEventGroupMembersNoTutors(

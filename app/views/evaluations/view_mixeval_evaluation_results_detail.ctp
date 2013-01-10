@@ -92,7 +92,7 @@ echo $html->script('ricoaccordion');
                 <tr>
                     <td colspan="<?php echo count($numberQuestions)+1?>"><b> <?php __('Section One:')?> </b></td>
                 </tr>
-                <?php echo $this->Html->tableHeaders($this->Evaluation->getResultTableHeader($numberQuestions)) ?>
+                <?php echo $this->Html->tableHeaders($this->Evaluation->getResultTableHeader($numberQuestions, __('Evaluator', true))) ?>
                 <?php echo $this->Html->tableCells($this->Evaluation->getMixevalResultTable($evalResult[$evaluteeId], $memberList, $numberQuestions)) ?>
             </table>
             <br />
@@ -100,9 +100,9 @@ echo $html->script('ricoaccordion');
             <!-- Section Two -->
             <table class="standardtable">
                 <tr>
-                    <td colspan="<?php echo $mixeval['Mixeval']["total_question"] ?>"><b> Section Two: </b></td>
+                    <td colspan="<?php echo count($textQuestions)+1?>"><b><?php __('Section Two')?>:</b></td>
                 </tr>
-                <?php echo $this->Html->tableHeaders($this->Evaluation->getResultTableHeader($textQuestions)) ?>
+                <?php echo $this->Html->tableHeaders($this->Evaluation->getResultTableHeader($textQuestions, __('Evaluator', true))) ?>
                 <?php echo $this->Html->tableCells($this->Evaluation->getMixevalResultTable($evalResult[$evaluteeId], $memberList, $textQuestions)) ?>
             </table>
 

@@ -149,9 +149,18 @@ class EvaluationHelper extends AppHelper
         return $table;
     }
 
-    function getResultTableHeader($questions)
+    /**
+     * getResultTableHeader
+     *
+     * @param mixed $questions   questions
+     * @param mixed $firstColumn first column text
+     *
+     * @access public
+     * @return void
+     */
+    function getResultTableHeader($questions, $firstColumn)
     {
-        $header = array(__('Evaluator', true));
+        $header = array($firstColumn);
         foreach ($questions as $key => $question) {
             $header[] = sprintf('%d.%s', $key+1, $question['MixevalsQuestion']['title']);
         }
@@ -166,22 +175,38 @@ class EvaluationHelper extends AppHelper
      * @param mixed $memberResult member result
      * @param mixed $memberList   member list
      * @param mixed $questions    questions
+     * @param mixed $type         type of the table, possible values 'evaluator', 'evaluatee', any other string
+     *                            when it is another string, the string will be shown on the first column. Otherwise,
+     *                            the evaluator/evaluatee name will show on the first column
      *
      * @access public
      * @return void
      */
-    function getMixevalResultTable($memberResult, $memberList, $questions)
+    function getMixevalResultTable($memberResult, $memberList, $questions, $type = 'evaluator')
     {
         $table = array();
 
+        // randomize the result
+        if ($type != 'evaluator' && $type != 'evaluatee') {
+            shuffle($memberResult);
+        }
+
         foreach ($memberResult as $row) {
             $memberMixeval = $row['EvaluationMixeval'];
-            $tr = array($memberList[$memberMixeval['evaluator']]);
+            $tr = array(isset($memberMixeval[$type]) ? $memberList[$memberMixeval[$type]] : $type);
             // change the details indexed by question_number
             $resultDetails = Set::combine($row['EvaluationMixevalDetail'], '{n}.question_number', '{n}');
             foreach ($questions as $question) {
                 $detail = $resultDetails[$question['MixevalsQuestion']['question_num']];
-                $tr[] = $this->renderQuestionResult($question, $detail);
+                // check if the result is released
+                if (($type == 'evaluator' || $type == 'evaluatee') ||
+                    (($memberMixeval['grade_release'] && $question['MixevalsQuestion']['question_type'] == 'S') ||
+                    ($memberMixeval['comment_release'] && $question['MixevalsQuestion']['question_type'] == 'T'))) {
+
+                    $tr[] = $this->renderQuestionResult($question, $detail);
+                } else {
+                    $tr[] = 'n/a';
+                }
             }
             $table[] = $tr;
         }
