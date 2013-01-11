@@ -624,12 +624,18 @@ class UsersController extends AppController
 
         // save the data which involves:
         if ($this->data) {
+            //debug($this->data);
+            //return;
             // create the enrolment entry depending on if instructor or student
             // and also convert it into a CakePHP dark magic friendly format
-            $enrolments = $this->_convertCourseEnrolment(
-                $this->data['Courses']['id'],
-                $this->data['Role']['RolesUser']['role_id']
-            );
+            if (!empty($this->data['Courses']['id'])) {
+                $enrolments = $this->_convertCourseEnrolment(
+                    $this->data['Courses']['id'],
+                    $this->data['Role']['RolesUser']['role_id']
+                );
+            } else {
+                $enrolments = array('Enrolment' => array());
+            }
             $this->data = array_merge($this->data, $enrolments);
 
             // Now we actually attempt to save the data

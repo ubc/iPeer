@@ -169,14 +169,20 @@ class User extends AppModel
      * faculty field must not be empty
      */
     public function beforeValidate() {
-        if (array_key_exists('Faculty', $this->data) &&
-            empty($this->data['Faculty']['Faculty']) && 
-            in_array($this->data['Role']['RolesUser']['role_id'], array(2,3))) {
-            // make sure this model fails when saving without faculty
-            $this->invalidate('Faculty');
-            // make the error message appear in the right place
-            $this->Faculty->invalidate('Faculty',
-                'Please select a faculty.');
+        /* array structure is different between add & edit and reset password &
+        adding superadmin during installation */
+        if (array_key_exists('Faculty', $this->data) && array_key_exists('Role', $this->data)) {
+            (isset($this->data['Faculty']['Faculty'])) ? $faculty = $this->data['Faculty']['Faculty'] :
+                $faculty = $this->data['Faculty'];
+            (isset($this->data['Role']['RolesUser']['role_id'])) ? $role = $this->data['Role']['RolesUser']['role_id'] :
+                $role = $this->data['Role']['0']['RolesUser']['role_id'];
+            if (empty($faculty) && in_array($role, array(2,3))) {
+                // make sure this model fails when saving without faculty
+                $this->invalidate('Faculty');
+                // make the error message appear in the right place
+                $this->Faculty->invalidate('Faculty',
+                    'Please select a faculty.');
+            }
         }
     }
 
