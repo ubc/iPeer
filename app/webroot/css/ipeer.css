@@ -1046,11 +1046,10 @@ i {
 
 /* groups/import */
 
-.groupsimport .csvexample {
-    border: 1px solid black;
-    background: white;
-    padding: 1em;
-    margin: 1em;
+#groupsimport ul li {
+    list-style-type: circle;
+    list-style-position: inside;
+    margin: 0.5em;
 }
 
 /* SIMPLE EVAL */

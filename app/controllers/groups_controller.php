@@ -328,19 +328,21 @@ class GroupsController extends AppController
      * @access public
      * @return void
      */
-    function import($courseId)
+    function import($courseId = null)
     {
         $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
-        if (!$course) {
-            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
-            $this->redirect('index');
-            return;
+        if (!is_null($courseId)) {
+            if (!$course) {
+                $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+                $this->redirect('index');
+                return;
+            }
         }
         $this->breadcrumb->push(array('course' => $course['Course']));
 
         // Just render :-)
         if (!empty($this->params['form'])) {
-            $courseId = $this->params['data']['course_id'];
+            $courseId = $this->params['data']['Group']['Course'];
             $this->params['data']['Group']['course_id'] = $courseId;
             $filename = $this->params['form']['file']['name'];
             $tmpFile = $this->params['form']['file']['tmp_name'];
@@ -373,7 +375,7 @@ class GroupsController extends AppController
         $coursesList = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
 
         $this->set('breadcrumb', $this->breadcrumb->push(__('Import Groups From Text (.txt) or CSV File (.csv)', true)));
-        $this->set("coursesList", $coursesList);
+        $this->set("courses", $coursesList);
         $this->set("courseId", $courseId);
     }
 
