@@ -749,7 +749,6 @@ class EvaluationsController extends AppController
         }
 
         if ($status) {
-            $this->_sendConfirmationEmail();
             $this->Session->setFlash(__('Your Evaluation was submitted successfully.', true), 'good');
             $this->redirect('/home/index/', true);
             return;
@@ -921,7 +920,6 @@ class EvaluationsController extends AppController
         }
 
         if ($status) {
-            $this->_sendConfirmationEmail();
             $this->Session->setFlash(__('Your Evaluation was submitted successfully.', true), 'good');
             $this->redirect('/home/index/', true);
             return;
