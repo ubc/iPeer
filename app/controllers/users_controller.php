@@ -1089,7 +1089,7 @@ class UsersController extends AppController
         $from = $this->Auth->user('email');
         $to = $user['User']['email'];
         $username = $user['User']['username'];
-        $name = $user['User']['full_name'];
+        $name = $user['User']['first_name'].' '.$user['User']['last_name'];
 
         // this means only students will get a list of courses they're
         // enrolled in, since instructors are stored in another array
