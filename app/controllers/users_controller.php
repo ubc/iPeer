@@ -46,10 +46,11 @@ class UsersController extends AppController
 
         $allowTypes = array(
             'text/plain', 'text/csv', 'application/csv',
-            'application/csv.ms-excel', 'application/octet-stream');
+            'application/csv.ms-excel', 'application/octet-stream',
+            'text/comma-separated-values', 'text/anytext');
         $this->FileUpload->allowedTypes(array(
-            'txt' => $allowTypes,
-            'csv' => $allowTypes,
+            'txt' => null,
+            'csv' => null,
         ));
         $this->FileUpload->uploadDir('../tmp');
         $this->FileUpload->fileModel(null);
