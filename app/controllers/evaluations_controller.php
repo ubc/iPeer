@@ -348,7 +348,6 @@ class EvaluationsController extends AppController
 
     function _sendConfirmationEmail()
     {
-        $this->SysParameter->reload();
         $email = User::get('email');
         if (empty($email)) {
             return;
