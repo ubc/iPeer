@@ -352,26 +352,6 @@ class EvaluationsController extends AppController
     }
 
     /**
-     * sendConfirmationEmail
-     *
-     * @access public
-     * @return void
-     */ 
-    function _sendConfirmationEmail()
-    {
-        $this->SysParameter->reload();
-        $email = User::get('email');
-        if (empty($email)) {
-            return;
-        }
-
-        if (!$this->TemplateEmail->send(array(User::get('id') => $email), 'Submission Confirmation')) {
-            $this->log('Sending email to '.$email.' failed.'. $this->Email->smtpError);
-            $this->Session->setFlash('Sending confirmation email failed!');
-        }
-    }
-
-    /**
      * makeSimpleEvaluation
      *
      * @param mixed $event   event object
@@ -487,7 +467,6 @@ class EvaluationsController extends AppController
             $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
 
             if ($this->Evaluation->saveSimpleEvaluation($this->params, $groupEvent, $evaluationSubmission)) {
-                $this->_sendConfirmationEmail();
                 $this->Session->setFlash(__('Your Evaluation was submitted successfully.', true), 'good');
                 $this->redirect('/home/index/', true);
             } else {
