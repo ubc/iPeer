@@ -13,7 +13,10 @@ class SurveyGroupMemberTestCase extends CakeTestCase
         'app.response', 'app.survey_question', 'app.user_course',
         'app.user_enrol', 'app.groups_member', 'app.rubric', 'app.rubrics_lom',
         'app.rubrics_criteria', 'app.rubrics_criteria_comment',
-        'app.survey_group_member'
+        'app.survey_group_member', 'app.oauth_token', 'app.sys_parameter',
+        'app.evaluation_simple', 'app.survey_input', 'app.faculty',
+        'app.user_faculty', 'app.user_tutor', 'app.department',
+        'app.course_department', 'app.penalty'
     );
     public $SurveyGroupMember = null;
 

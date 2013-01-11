@@ -11,6 +11,21 @@
 class SurveyGroupMember extends AppModel
 {
     public $name = 'SurveyGroupMember';
+    
+    public $belongsTo = array(
+        'User' => array(
+            'className'    => 'User',
+            'condition'    => '',
+            'order'        => '',
+            'foreignKey'   => 'user_id'
+        ),
+        'SurveyGroupSet' => array(
+            'className'    => 'SurveyGroupSet',
+            'condition'    => '',
+            'order'        => '',
+            'foreignKey'   => 'group_set_id'
+        ),
+    );
 
     /**
      * getIdsByGroupSetId

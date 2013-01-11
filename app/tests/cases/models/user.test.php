@@ -539,6 +539,10 @@ class UserTestCase extends CakeTestCase {
     function testAddUserByArray() {
         // TODO
     }
+    
+    function testremoveOldStudents() {
+        // TODO
+    }
 
     function testGetCurrentLoggedInUser() {
         // can't test, no session without a browser!
