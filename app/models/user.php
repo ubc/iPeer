@@ -767,6 +767,10 @@ class User extends AppModel
         foreach ($members as $member) {
             $this->SurveyGroupMember->delete($member['SurveyGroupMember']['id']);
         }
+        $members = $this->Group->find('all', array('conditions' => array('Member.id' => $user_id, 'course_id' => $course_id)));
+        foreach ($members as $member) {
+            $this->GroupsMember->delete($member['GroupsMember']['id']);
+        }
         return $this->UserEnrol->delete($id);
     }
 
