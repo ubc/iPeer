@@ -210,23 +210,23 @@ function updatePreview() {
     if (eventType == '1') {
         var eventIdToPrev = jQuery("#EventSimpleEvaluation").val();
         url = "<?php echo $this->base; ?>/simpleevaluations/view/";
-        prevS.href = url + eventIdToPrev;
+        jQuery("#prevS").attr("href", url + eventIdToPrev);
     }
     else if (eventType == '2') {
         var eventIdToPrev = jQuery("#EventRubric").val();
         url = "<?php echo $this->base; ?>/rubrics/view/";
-        prevR.href = url + eventIdToPrev;
+        jQuery("#prevR").attr("href", url + eventIdToPrev);
     }
     else if (eventType == '3') {
         var eventIdToPrev = jQuery("#EventSurvey").val();
         console.log("Id: " + eventIdToPrev);
         url = "<?php echo $this->base; ?>/surveys/view/";
-        prevV.href = url + eventIdToPrev;
+        jQuery("#prevV").attr("href", url + eventIdToPrev);
     }
     else if (eventType == '4') {
         var eventIdToPrev = jQuery("#EventMixeval").val();
         url = "<?php echo $this->base; ?>/mixevals/view/";
-        prevM.href = url + eventIdToPrev;
+        jQuery("#prevM").attr("href", url + eventIdToPrev);
     }
 }
 </script>
