@@ -252,7 +252,11 @@ class V1Controller extends Controller {
         }
         $this->log('Got API request '. print_r($_REQUEST, true)."\nBody: ".$this->body, 'debug');
 
-        if (!($this->_checkRequiredParams() && $this->_checkSignature() && $this->_checkNonce())) {
+        // use oauth=0 paramter in url to bypass oauth checking
+        if (!(Configure::read('debug') != 0 && isset($_REQUEST['oauth'])) &&
+            !($this->_checkRequiredParams() && $this->_checkSignature() && $this->_checkNonce())) {
+
+            $this->log('Parameter checking failed: '.$this->output);
             echo $this->output;
             $this->_stop();
         }
@@ -311,7 +315,7 @@ class V1Controller extends Controller {
                     $data = null;
                 }
             }
-            $this->set('user', $data);
+            $this->set('result', $data);
             $this->set('statusCode', $statusCode);
         // add
         } else if ($this->RequestHandler->isPost()) {
@@ -388,15 +392,15 @@ class V1Controller extends Controller {
                 $body = null;
             }
             $this->set('statusCode', $statusCode);
-            $this->set('user', $body);
+            $this->set('result', $body);
         // delete
         } else if ($this->RequestHandler->isDelete()) {
             if ($this->User->delete($id)) {
                 $this->set('statusCode', 'HTTP/1.1 204 No Content');
-                $this->set('user', null);
+                $this->set('result', null);
             } else {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
-                $this->set('user', null);
+                $this->set('result', null);
             }
         // update
         } else if ($this->RequestHandler->isPut()) {
@@ -413,15 +417,16 @@ class V1Controller extends Controller {
                 $role = $this->RolesUser->find('first', array('conditions' => array('user_id' => $user['User']['id']), 'fields' => 'role_id'));
                 $combine = $user['User'] + array('role_id' => $role['RolesUser']['role_id']);
                 $this->set('statusCode', 'HTTP/1.1 200 OK');
-                $this->set('user', $combine);
+                $this->set('result', $combine);
             } else {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
-                $this->set('user', null);
+                $this->set('result', null);
             }
         } else {
             $this->set('statusCode', 'HTTP/1.1 400 Bad Request');
-            $this->set('user', null);
+            $this->set('result', null);
         }
+        $this->render('json');
     }
 
     /**
@@ -458,42 +463,43 @@ class V1Controller extends Controller {
                     $statusCode = 'HTTP/1.1 404 Not Found';
                 }
             }
-            $this->set('courses', $classes);
+            $this->set('result', $classes);
             $this->set('statusCode', $statusCode);
         } else if ($this->RequestHandler->isPost()) {
             $create = $this->body;
             if (!$this->Course->save(json_decode($create, true))) {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
-                $this->set('courses', array('code' => 1, 'message' => 'course already exists.'));
+                $this->set('result', array('code' => 1, 'message' => 'course already exists.'));
             } else {
                 $temp = $this->Course->read(array('id','course','title'));
                 $course = $temp['Course'];
                 $this->set('statusCode', 'HTTP/1.1 201 Created');
-                $this->set('courses', $course);
+                $this->set('result', $course);
             }
         } else if ($this->RequestHandler->isPut()) {
             $update = $this->body;
             if (!$this->Course->save(json_decode($update, true))) {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
-                $this->set('courses', null);
+                $this->set('result', null);
             } else {
                 $temp = $this->Course->read(array('id','course','title'));
                 $course = $temp['Course'];
                 $this->set('statusCode', 'HTTP/1.1 200 OK');
-                $this->set('courses', $course);
+                $this->set('result', $course);
             }
         } else if ($this->RequestHandler->isDelete()) {
             if (!$this->Course->delete($id)) {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
-                $this->set('courses', null);
+                $this->set('result', null);
             } else {
                 $this->set('statusCode', 'HTTP/1.1 204 No Content');
-                $this->set('courses', null);
+                $this->set('result', null);
             }
         } else {
             $this->set('statusCode', 'HTTP/1.1 400 Bad Request');
-            $this->set('courses', null);
+            $this->set('result', null);
         }
+        $this->render('json');
     }
 
     /**
@@ -542,7 +548,7 @@ class V1Controller extends Controller {
                     $statusCode = 'HTTP/1.1 404 Not Found';
                 }
             }
-            $this->set('group', $data);
+            $this->set('result', $data);
             $this->set('statusCode', $statusCode);
         // add
         } else if ($this->RequestHandler->isPost()) {
@@ -554,19 +560,19 @@ class V1Controller extends Controller {
                 $tempGroup = $this->Group->read($fields);
                 $group = $tempGroup['Group'];
                 $this->set('statusCode', 'HTTP/1.1 201 Created');
-                $this->set('group', $group);
+                $this->set('result', $group);
             } else {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
-                $this->set('group', null);
+                $this->set('result', null);
             }
         // delete
         } else if ($this->RequestHandler->isDelete()) {
             if ($this->Group->delete($this->params['group_id'])) {
                 $this->set('statusCode', 'HTTP/1.1 204 No Content');
-                $this->set('group', null);
+                $this->set('result', null);
             } else {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
-                $this->set('group', null);
+                $this->set('result', null);
             }
         // update
         } else if ($this->RequestHandler->isPut()) {
@@ -576,16 +582,17 @@ class V1Controller extends Controller {
                 $temp = $this->Group->read($fields);
                 $group = $temp['Group'];
                 $this->set('statusCode', 'HTTP/1.1 200 OK');
-                $this->set('group', $group);
+                $this->set('result', $group);
             } else {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
-                $this->set('group', null);
+                $this->set('result', null);
             }
         } else {
             $this->set('statusCode', 'HTTP/1.1 400 Bad Request');
-            $this->set('group', null);
+            $this->set('result', null);
         }
 
+        $this->render('json');
     }
 
     /**
@@ -645,7 +652,8 @@ class V1Controller extends Controller {
         }
 
         $this->set('statusCode', $status);
-        $this->set('groupMembers', $groupMembers);
+        $this->set('result', $groupMembers);
+        $this->render('json');
     }
 
     /**
@@ -675,11 +683,12 @@ class V1Controller extends Controller {
                 $statusCode = 'HTTP/1.1 200 OK';
             }
             $this->set('statusCode', $statusCode);
-            $this->set('events', $results);
+            $this->set('result', $results);
         } else {
             $this->set('statusCode', 'HTTP/1.1 400 Bad Request');
-            $this->set('events', null);
+            $this->set('result', null);
         }
+        $this->render('json');
     }
 
     /**
@@ -743,8 +752,9 @@ class V1Controller extends Controller {
             }
         }
 
-        $this->set('grades', $results);
+        $this->set('result', $results);
         $this->set('statusCode', $statusCode);
+        $this->render('json');
     }
 
     /**
@@ -790,12 +800,14 @@ class V1Controller extends Controller {
                     $statusCode = 'HTTP/1.1 404 Not Found';
                 }
             }
-            $this->set('departments', $departments);
+            $this->set('result', $departments);
             $this->set('statusCode', $statusCode);
         } else {
-            $this->set('departments', null);
+            $this->set('result', null);
             $this->set('statusCode', 'HTTP/1.0 400 Bad Request');
         }
+
+        $this->render('json');
     }
 
     /**
@@ -819,20 +831,22 @@ class V1Controller extends Controller {
                 $this->set('departments', json_encode($departments));
             } else {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
-                $this->set('departments', null);
+                $this->set('result', null);
             }
         } else if ($this->RequestHandler->isDelete()) {
             if ($this->Course->habtmDelete('Department', $course_id, $department_id)) {
                 $this->set('statusCode', 'HTTP:/1.1 204 No Content');
-                $this->set('departments', null);
+                $this->set('result', null);
             } else {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
-                $this->set('departments', null);
+                $this->set('result', null);
             }
         } else {
             $this->set('statusCode', 'HTTP/1.0 400 Bad Request');
-            $this->set('departments', null);
+            $this->set('result', null);
         }
+
+        $this->render('json');
     }
 
     /**
@@ -850,13 +864,13 @@ class V1Controller extends Controller {
             $events = $this->Event->getPendingEventsByUserId($user_id, $fields);
 
             $this->set('statusCode', 'HTTP/1.1 200 OK');
-            $this->set('events', $events);
+            $this->set('result', $events);
         } else {
             $this->set('statusCode', 'HTTP/1.1 400 Bad Request');
-            $this->set('events', null);
+            $this->set('result', null);
         }
 
-        $this->render('events');
+        $this->render('json');
     }
 
     /**
@@ -864,7 +878,7 @@ class V1Controller extends Controller {
      */
     public function enrolment() {
         $this->set('statusCode', 'HTTP/1.1 400 Unrecognizable Request');
-        $this->set('enrolment', null);
+        $this->set('result', null);
         $courseId = $this->params['course_id'];
 
         // Get request, just return a list of users
@@ -884,14 +898,12 @@ class V1Controller extends Controller {
                 $users[] = $user;
             }
             $this->set('statusCode', 'HTTP/1.1 200 OK');
-            $this->set('enrolment', $users);
-            return;
-        }
+            $this->set('result', $users);
+        } else if ($this->RequestHandler->isPost()) {
         // Post request, add user to course
         // if user already in course, count as successful
         // if user failed save, stop execution and return an error
         //
-        else if ($this->RequestHandler->isPost()) {
             $this->set('statusCode', 'HTTP/1.1 200 OK');
             $input = $this->body;
             $users = json_decode($input, true);
@@ -903,7 +915,7 @@ class V1Controller extends Controller {
             $inClass = $this->User->find('list', array('conditions' => array('User.id' => $members), 'fields' => array('User.username')));
 
             foreach ($users as $user) {
-                if(!in_array($user['username'], $inClass)) {
+                if (!in_array($user['username'], $inClass)) {
                     $userId = $this->User->field('id',
                         array('username' => $user['username']));
                     $role = $this->Role->getRoleName($user['role_id']);
@@ -911,16 +923,13 @@ class V1Controller extends Controller {
                     if ($role == 'student') {
                         $ret = $this->User->addStudent($userId, $courseId);
                         $this->log('Adding student '.$user['username'].' to course '.$courseId, 'debug');
-                    }
-                    else if ($role == 'instructor') {
+                    } else if ($role == 'instructor') {
                         $ret = $this->User->addInstructor($userId, $courseId);
                         $this->log('Adding instructor'.$user['username'].' to course '.$courseId, 'debug');
-                    }
-                    else if ($role == 'tutor') {
+                    } else if ($role == 'tutor') {
                         $ret = $this->User->addTutor($userId, $courseId);
                         $this->log('Adding tutor '.$user['username'].' to course '.$courseId, 'debug');
-                    }
-                    else {
+                    } else {
                         $this->set('error', array('code' => 400, 'message' => 'Unsupported role for '.$user['username']));
                         $this->render('error');
                         return;
@@ -932,10 +941,8 @@ class V1Controller extends Controller {
                     }
                 }
             }
-            $this->set('enrolment', $users);
-            return;
-        }
-        else if ($this->RequestHandler->isDelete()) {
+            $this->set('result', $users);
+        } else if ($this->RequestHandler->isDelete()) {
             $this->set('statusCode', 'HTTP/1.1 200 OK');
             $input = $this->body;
             $users = json_decode($input, true);
@@ -946,14 +953,11 @@ class V1Controller extends Controller {
                 $table = null;
                 if ($role == 'student') {
                     $ret = $this->User->removeStudent($userId, $courseId);
-                }
-                else if ($role == 'instructor') {
+                } else if ($role == 'instructor') {
                     $ret = $this->User->removeInstructor($userId, $courseId);
-                }
-                else if ($role == 'tutor') {
+                } else if ($role == 'tutor') {
                     $ret = $this->User->removeTutor($userId, $courseId);
-                }
-                else {
+                } else {
                     $this->set('error', array('code' => 400, 'message' => 'Unsupported role for '.$user['username']));
                     $this->render('error');
                     return;
@@ -964,8 +968,8 @@ class V1Controller extends Controller {
                     return;
                 }
             }
-            $this->set('enrolment', $users);
-            return;
+            $this->set('result', $users);
         }
+        $this->render('json');
     }
 }
