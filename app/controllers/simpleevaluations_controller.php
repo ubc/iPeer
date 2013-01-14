@@ -302,9 +302,7 @@ class SimpleevaluationsController extends AppController
             $this->Session->setFlash(__('Error: You do not have permission to add simple evaluations.', true));
             $this->redirect('/home');
         }
-        if ($layout != '') {
-            $this->layout = $layout;
-        }
+
         $this->set('title_for_layout', __('Simple Evaluations > Add Template', true));
         if (!empty($this->data)) {
             if ($this->__processForm()) {

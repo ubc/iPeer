@@ -33,8 +33,20 @@ class SimpleEvaluation extends EvaluationBase
         'availability' => array(
             'rule' => 'notEmpty',
             'message' => 'Please select an availability option'
-        )
+        ),
+        'name' => array(
+            'rule' => 'isUnique',
+            'message' => 'Duplicate name found. Please change the name.'
+        ),
+        'point_per_member' => array(
+            'valid' => array(
+                'rule' => array('comparison', '>', 0),
+                'message' => 'Please enter a positive integer.'
+            ),
+        ),
     );
+
+
 
     /**
      * getEvaluation
