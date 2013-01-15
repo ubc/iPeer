@@ -38,6 +38,23 @@ class Mixeval extends EvaluationBase
             'order'     => array('question_num' => 'ASC', 'id' => 'ASC'),
         ),
     );
+    
+    public $validate = array(
+        'name' => array(
+            'unique' => array(
+                'rule' => 'isUnique',
+                'message' => 'Duplicate name found. Please change the name.'
+            ),
+            'required' => array(
+                'rule' => 'notEmpty',
+                'message' => 'Please give the evaluation template a name.'
+            ),
+        ),
+        'availability' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Please select an availability option.'
+        ),
+    );
 
     /**
      * __construct

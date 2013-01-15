@@ -11,7 +11,6 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 <?php echo $this->Form->input('template', array('type' => 'hidden', 'value' => 'horizontal'))?>
 
 <?php echo $this->Form->input('name', array('id' => 'name', 'size'=>'30',
-    'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.',
     'readonly' => $readonly, 'label' => __('Name', true)));?>
 
 <?php echo $this->Form->input('lom_max', array('id' => 'LOM', 'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.',

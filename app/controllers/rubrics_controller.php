@@ -314,6 +314,13 @@ class RubricsController extends AppController
                 if ($this->__processForm()) {
                     $this->Session->setFlash(__('The rubric was added successfully.', true), 'good');
                     $this->redirect('index');
+                } else {
+                    $this->set('data', $this->data);
+                    $this->Session->setFlash(__("The evaluation was not added successfully.", true));
+                    $error = $this->Rubric->getErrorMessage();
+                    if (!is_array($error)) {
+                        $this->Session->setFlash($error);
+                    }
                 }
             }
         } else {
@@ -429,6 +436,13 @@ class RubricsController extends AppController
                 if ($this->__processForm()) {
                     $this->Session->setFlash(__('The rubric evaluation was updated successfully', true), 'good');
                     $this->redirect('index');
+                } else { 
+                    $this->set('data', $this->data);
+                    $this->Session->setFlash(__("The evaluation was not updated successfully.", true));
+                    $error = $this->Rubric->getErrorMessage();
+                    if (!is_array($error)) {
+                        $this->Session->setFlash($error);
+                    }
                 }
             }
         }
@@ -453,8 +467,6 @@ class RubricsController extends AppController
             if ($this->Rubric->saveAllWithCriteriaComment($this->data)) {
                 $this->data['Rubric']['id'] = $this->Rubric->id;
                 return true;
-            } else {
-                $this->Session->setFlash($this->Rubric->errorMessage, 'error');
             }
         }
         return false;

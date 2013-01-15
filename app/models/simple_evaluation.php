@@ -32,11 +32,17 @@ class SimpleEvaluation extends EvaluationBase
     public $validate = array(
         'availability' => array(
             'rule' => 'notEmpty',
-            'message' => 'Please select an availability option'
+            'message' => 'Please select an availability option.'
         ),
         'name' => array(
-            'rule' => 'isUnique',
-            'message' => 'Duplicate name found. Please change the name.'
+            'unique' => array(
+                'rule' => 'isUnique',
+                'message' => 'Duplicate name found. Please change the name.'
+            ),
+            'required' => array(
+                'rule' => 'notEmpty',
+                'message' => 'Please give the evaluation template a name.'
+            )
         ),
         'point_per_member' => array(
             'valid' => array(

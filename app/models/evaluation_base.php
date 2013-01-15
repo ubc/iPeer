@@ -47,8 +47,8 @@ class EvaluationBase extends AppModel
     {
         // Ensure the name is not empty
         if (empty($this->data[$this->name]['name'])) {
-            $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
-            return false;
+           $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
+           return false;
         }
 
         // Remove any signle quotes in the name, so that custom SQL queries are not confused.
@@ -70,7 +70,7 @@ class EvaluationBase extends AppModel
         }
 
         if (empty($this->data['Question'])&&($this->name =='Mixeval')) {
-            $this->errorMessage = "Please add at least one question for this " . $this->name . ".";
+            $this->errorMessage = "Please add at least one question for this mixed evaluation.";
             return false;
         }
         return parent::beforeSave();

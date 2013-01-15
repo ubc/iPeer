@@ -286,7 +286,11 @@ class MixevalsController extends AppController
                 $this->redirect('index');
             } else {
                 $this->set('data', $this->data);
-                $this->Session->setFlash($this->Mixeval->getErrorMessage());
+                $this->Session->setFlash(__("The evaluation was not added successfully.", true));
+                $error = $this->Mixeval->getErrorMessage();
+                if (!is_array($error)) {
+                    $this->Session->setFlash($error);
+                }
             }
         }
         $this->set('data', $this->data);
@@ -411,10 +415,13 @@ class MixevalsController extends AppController
                 $this->MixevalsQuestionDesc->insertQuestionDescriptor($this->data['Question'], $question_ids);
                 $this->Session->setFlash(__('The Mixed Evaluation was edited successfully.', true), 'good');
                 $this->redirect('index');
-
             } else {
                 $this->set('data', $this->data);
-                $this->set('errmsg', $this->Mixeval->errorMessage);
+                $this->Session->setFlash(__("The evaluation was not added successfully.", true));
+                $error = $this->Mixeval->getErrorMessage();
+                if (!is_array($error)) {
+                    $this->Session->setFlash($error);
+                }
             }
         }
         $this->set('data', $this->data);
@@ -438,8 +445,6 @@ class MixevalsController extends AppController
             if ($this->Mixeval->saveAllWithDescription($this->data)) {
                 $this->data['Mixeval']['id'] = $this->Mixeval->id;
                 return true;
-            } else {
-                $this->Session->setFlash($this->Mixeval->errorMessage, 'error');
             }
         }
         return false;

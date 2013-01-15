@@ -2,41 +2,14 @@
 $readonly = isset($readonly) ? $readonly : false;
 $evaluate = isset($evaluate) ? $evaluate : false;
 $url = $this->action == 'copy' ? 'add' : $this->action;
-
-/*	if(!empty($data)){
-    $mixeval_name = $data['Mixeval']['name'];
-    $scale_default = $data['Mixeval']['scale_max'];
-    $prefill_question_max = $data['Mixeval']['prefill_question_max'];
-    $question_default = $data['Mixeval']['lickert_question_max'];
-    $mixeval_avail = $data['Mixeval']['availability'];
-    $total_mark = isset($data['Mixeval']['total_marks']) ? $data['Mixeval']['total_marks'] : "";
-    if(!empty($data['Mixeval']['zero_mark']))
-        $zero_mark = $data['Mixeval']['zero_mark'];
-    else
-        $zero_mark='off';
-}
-else{
-    $mixeval_name = '';
-    $scale_default = 5;
-    $question_default = 3;
-    $prefill_question_max = 3;
-    $mixeval_avail = 'public';
-    $total_mark = 5;
-    $zero_mark = 'off';
-}*/
 ?>
 
-<?php echo $this->Form->create('Mixeval',
-    array('id' => 'frm',
-    'url' => array('action' => $url),
-))?>
+<?php echo $this->Form->create('Mixeval', array('url' => array('action' => $url)))?>
 <?php echo $this->Form->input('id', array('type' => 'hidden'))?>
 <input type="hidden" name="required" id="required" value="mixeval_name" />
 
 <?php echo $this->Form->input('name', array('id' => 'name', 'size'=>'30',
-    'class'=>'validate required TEXT_FORMAT mixeval_name_msg Invalid_Text._At_Least_One_Word_Is_Required.',
     'label' => __('Name', true), 'readonly' => $readonly));?>
-<div id="mixeval_name_msg" class="error">&nbsp;</div>
 
 <?php echo $this->Form->input('availability', array('id' => 'availability',
     'type' => 'radio',
