@@ -48,7 +48,7 @@ class EvaluationHelper extends AppHelper
             $tr[] = $memberList[$evaluteeId];
             foreach ($numberQuestions as $question) {
                 $tr[] = isset($scores[$question['MixevalsQuestion']['question_num']]) ?
-                    $scores[$question['MixevalsQuestion']['question_num']] : __('N/A', true);
+                    number_format($scores[$question['MixevalsQuestion']['question_num']], 2) : __('N/A', true);
             }
 
             // find out penalties for total column

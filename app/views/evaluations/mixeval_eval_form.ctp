@@ -86,11 +86,11 @@ if (!empty($penalty)) {
           }
           $partial = '';
           if($commentsNeeded) {
-            $partial = '<font color="red">'.__('Partially', true).'</font>';
+            $partial = '<font color="red">'.__('Partially', true).' </font>';
           }
         ?>
 
-              <font color="#66FF33"> ( <?php echo $partial?><?php __('Entered')?> )</font>
+              <font color="#259500"> ( <?php echo $partial?><?php __('Entered')?> )</font>
             <?php else:?>
               <font color="#FF6666"> - <?php __('Incomplete')?> </font>
             <?php endif;?>
@@ -114,11 +114,11 @@ if (!empty($penalty)) {
         <tr>
           <td align="center"><?php
             if (isset($user['Evaluation'])) {
-              echo $form->submit(__('Edit This Section (Click this button to save now or you may lose your input)', true), array('name'=>$user['id'], 'div'=>'editSection'));
+              echo $form->submit(__('Edit This Section', true), array('name'=>$user['id'], 'div'=>'editSection'));
             } else {
-              echo $form->submit(__('Save This Section (Click this button to save now or you may lose your input)', true), array('name'=>$user['id'], 'div'=>'editSection'));
+              echo $form->submit(__('Save This Section', true), array('name'=>$user['id'], 'div'=>'editSection'));
             }
-
+            echo "<br />".__('Make sure you save this section before moving on to the other ones!', true)." <br /><br />";
             ?></td>
         </tr>
       </table>

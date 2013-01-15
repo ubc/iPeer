@@ -82,8 +82,11 @@ class EvaluationMixeval extends EvaluationResponseBase
      */
     function getResultsByEvaluatee($grpEventId=null, $evaluatee=null)
     {
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
+        $members = Set::extract($this->GroupEvent->getGroupMembers($grpEventId), '/GroupsMembers/user_id');
+        
         return $this->find('all', array(
-            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
+            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee, 'evaluator' => $members),
             'order' => 'evaluator ASC',
             'contain' => 'EvaluationMixevalDetail',
         ));
