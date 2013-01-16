@@ -155,7 +155,11 @@ class User extends AppModel
         'send_email_notification' => array(
             'rule' => array('requiredWith', 'email'),
             'message' => 'Email notification requires an email address.'
-        )
+        ),
+        'tmp_password' => array(
+            'rule' => '/^[a-z0-9_.-]{1,}$/i',
+            'message' => 'Passwords may only have letters, numbers, underscore and dot.'
+        ),
     );
 
 
