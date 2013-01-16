@@ -329,20 +329,10 @@ class GroupsController extends AppController
      */
     function import($courseId = null)
     {
-<<<<<<< HEAD
-        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
-        if (!is_null($courseId)) {
-            if (!$course) {
-                $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
-                $this->redirect('index');
-                return;
-            }
-=======
         if (empty($courseId) || !$course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission())) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('/courses');
             return;
->>>>>>> hotfix
         }
         $this->breadcrumb->push(array('course' => $course['Course']));
 
