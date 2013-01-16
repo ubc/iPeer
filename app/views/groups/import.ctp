@@ -22,7 +22,7 @@
 <h2><?php __('Import')?></h2>
 
 <?php
-echo $this->Form->create(null, array('type' => 'file'));
+echo $this->Form->create(null, array('type' => 'file', 'url' => 'import/'.$courseId));
 echo $this->Form->input('file', array('type' => 'file', 'name' => 'file'));
 echo $this->Form->input('Course',
     array('multiple'=>false, 'default' =>$courseId));
