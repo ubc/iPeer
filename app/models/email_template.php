@@ -13,6 +13,13 @@ class EmailTemplate extends AppModel
     public $name = 'EmailTemplate';
 
     public $actsAs = array('Traceable');
+    
+    public $validate = array(
+        'availability' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Please select an availability option.'
+        ),
+    );
 
     /**
      * Get my email templates

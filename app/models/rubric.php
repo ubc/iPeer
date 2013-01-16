@@ -58,6 +58,14 @@ class Rubric extends EvaluationBase
                 'message' => 'Please give the evaluation template a name.'
             )
         ),
+        'lom_max' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Please select a Level of Mastery.'
+        ),
+        'criteria' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Please select the number of Criteria.'
+        ),
     );
 
     /**

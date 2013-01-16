@@ -75,7 +75,11 @@ class Survey extends EvaluationBase
             'unique' => array(
                 'rule' => 'isUnique',
                 'message' => 'Duplicate name found. Please select another.'
-            )
+            ),
+            'required' => array(
+                'rule' => 'notEmpty',
+                'message' => 'Please fill in the name of the survey template.'
+            ),
         ),
     );
 

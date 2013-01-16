@@ -8,7 +8,8 @@ class Department extends AppModel {
     public $validate = array(
         'name' => array(
             'notempty' => array(
-                'rule' => array('notempty'),
+                'rule' => 'notempty',
+                'message' => 'Please fill in the name of the Department.'
             ),
         ),
         'faculty_id' => array(

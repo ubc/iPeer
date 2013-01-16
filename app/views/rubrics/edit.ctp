@@ -13,7 +13,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 <?php echo $this->Form->input('name', array('id' => 'name', 'size'=>'30',
     'readonly' => $readonly, 'label' => __('Name', true)));?>
 
-<?php echo $this->Form->input('lom_max', array('id' => 'LOM', 'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.',
+<?php echo $this->Form->input('lom_max', array('id' => 'LOM',
     'options' => array_combine(range(2,10), range(2,10)),
     'default' => 5,
     'label' => __('Level of Mastery:', true),
@@ -21,7 +21,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
     'disabled' => $readonly));?>
 <div class="help-text"><?php __('aka LOM, Evaluation Range (Max 10)')?></div>
 
-<?php echo $this->Form->input('criteria', array('id' => 'criteria', 'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.',
+<?php echo $this->Form->input('criteria', array('id' => 'criteria',
     'options' => array_combine(range(1,25), range(1,25)),
     'default' => 3,
     'label' => __('Number of Criteria:', true),

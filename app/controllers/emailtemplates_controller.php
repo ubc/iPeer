@@ -202,10 +202,10 @@ class EmailtemplatesController extends AppController
             //Save Data
             if ($this->EmailTemplate->save($this->params['data'])) {
                 $this->Session->setFlash(__('Save Successful!', true), 'good');
+                $this->redirect('index');
             } else {
                 $this->Session->setFlash(__('Save failed.', true));
             }
-            $this->redirect('index');
         }
     }
 
