@@ -1,116 +1,92 @@
-<?php if(!isset($responses)) {
-    $responses = array();
+<div class='SurveyAddQuestion'>
+<?php
+echo $this->Form->create('Question', 
+    array('url' => '/'.$this->params['url']['url']));
+echo $form->input('template_id', 
+    array(
+        'empty' => _('(Select Question to Load)'),
+        'options' => $templates,
+        'after' => $form->submit(_('Load'), 
+            array('div' => false, 'name' => 'load'))
+    )
+);
+echo $html->div('help-text', _('Load a master question as your template.'));
+echo $form->input('Question.master', 
+    array('options' => array('no' => 'No', 'yes' => 'Yes')));
+echo $html->div('help-text', 
+    _('Whether this question can be used as a template for new questions.'));
+echo $form->input('Question.prompt');
+echo $form->input('Question.type', 
+    array(
+        'options' => array(
+            'M' => _('Multiple Choice (Single Answer)'),
+            'C' => _('Choose Any Of... (Multiple Answers)'),
+            'S' => _('Single Line Text Input'),
+            'L' => _('Long Answer Text Input')
+        )
+    )
+);
+
+// Response section, has to be custom due to no cakephp automagic for doing this
+// Most of the complication is due to the need to implement form restoration
+// on submit error. 
+function makeResp($i, $val, $html, $form) {
+    // make the response text box
+    $input = $form->text("Response.$i.response") . $html->link('X', '#', 
+                array('onclick' => "rmResponseInput($i); return false;"));
+    if (isset($val['id'])) { # for editing form, need to know response id
+        $input .= $form->hidden("Response.$i.id");
+    }
+    $ret = $html->div('input text', $input, array('id' => "responseInput$i"));
+    return $ret;
 }
-?>
-<?php echo $this->Form->create('Question',
-    array('id' => 'frm',
-    'url' => '/surveys/'.$this->action.'/'.(isset($question_id)?$question_id.'/':'').$survey_id,
-))?>
-<?php echo isset($question_id) ? $this->Form->input('id', array('type' => 'hidden', 'value' => $question_id)) :
-                                 $this->Form->input('Survey.id', array('type' => 'hidden', 'value' => $survey_id))?>
-<?php echo $this->Form->input('template_id', array(
-    'label' => __('Load Existing Question', true),
-    'empty' => __('(Select Question to Load Its Details)', true),
-    'after' => $this->Form->submit('Load Question', array('name'=>'loadq','div' => false)
-)))?>
-<div class="help-text"><?php __('Select from the list to load an existing question as your question template.')?></div>
-
-<?php echo $this->Form->input('prompt', array('size'=>'50','class'=>'input',
-    'label' => __('Question', true).' <font color="red">*</font>')) ?>
-<div class="help-text"><?php __('E.g. What grade do you expect to earn in this class?')?></div>
-
-<?php echo $this->Form->input('master', array('label' => __('Master Question?', true),
-    'type' => 'select',
-    'options' => array('no' => __('No', true), 'yes' => __('Yes', true))))?>
-<div class="help-text"><?php __('Master question can be used as a template of a new question. ')?></div>
-
-<?php echo $this->Form->input('type', array('label' => __('Question Type:', true).' <font color="red">*</font>',
-    'options' => array(
-        'M' => __('Multiple Choice (Single Answer)', true),
-        'C' => __('Choose Any Of... (Multiple Answers)', true),
-        'S' => __('Single Line Text Input', true),
-        'L' => __('Long Answer Text Input', true))))?>
-<div id="possible-answers">
-<div class="input select">
-    <?php echo $this->Form->label('response', __('Possible Question Answers', true).'<font color="red">*</font>')?>
-    <div id="answers">
-        <?php foreach($responses as $k => $r):?>
-          <div><?php echo $this->Form->input('Response.'.$k.'.response', array(
-            'size'=>'25','class'=>'answers', 'type' => 'text',
-            'value' => $r['response'], 'id' => false, 'label' => false, 'div' => false,
-            ));?>
-          <?php echo isset($r['id']) ? $this->Form->input('Response.'.$k.'.id', array('type' => 'hidden', 'value' => $r['id'])) : '';?>
-          <?php echo $html->link( __('Remove', true), '#', array('class' => 'delete-button', 'onclick' => 'removePrevAnswer(this);')); ?>
-          </div>
-          <?php endforeach;?>
-            <?php echo $html->link( __('Add Answer', true), '#', array('class' => 'add-button', 'id' => 'add-button')); ?>
-        </div>
-</div>
-</div>
-
-<div align="center">
-    <input type="button" name="Back" value="<?php __('Back')?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
-    <?php echo $this->Form->submit(Inflector::humanize(Inflector::underscore($this->action)), array('div' => false))?>
-</div>
-<?php echo $this->Form->end()?>
-
-
-<script>
-$("add-button").observe('click', function(event){
-  var index = $$('input[class=answers]').length;
-
-  // add element
-  this.insert({before: '<?php echo $this->Form->input('Response.\'+index+\'.response',
-      array('size'=>'25','class'=>'answers',
-      'type' => 'text',
-      'id' => false,
-      'label' => false,
-      'div' => false
-  ));?> <?php echo $html->link( __('Remove', true), '#', array('class' => 'delete-button', 'onclick' => 'removeAnswer(this);')); ?><br/>'});
-});
-
-$("QuestionType").observe('change', function(event) {
-    updatePossibleAnswersStatus();
-});
-
-function removeAnswer(element) {
-  $(element).previous(0).remove(); // remove the text field
-  $(element).next('br').remove();
-  $(element).remove();  // remove the Remove link
-
-  // reorder the names
-  var fields = $$('input[class=answers]');
-
-  for(var i=0; i<fields.length; i++) {
-    fields[i].name='data[Response]['+i+'][response]';
-  }
-}
-
-function removePrevAnswer(element) {
-  $(element).previous('input').remove(); // removes the hidden field
-  $(element).previous('.answers').remove(); //removes the text field
-  $(element).up('div').remove(); // removes the div tag
-  $(element).remove();  // removes the Remove link
-
-  // reorder the names
-  var fields = $$('input[class=answers]');
-
-  for(var i=0; i<fields.length; i++) {
-    fields[i].name='data[Response]['+i+'][response]';   //text field
-    fields[i].next().name='data[Response]['+i+'][id]';  //hidden field
-  }
-}
-
-function updatePossibleAnswersStatus() {
-    switch($('QuestionType').getValue()) {
-    case 'M':
-    case 'C':
-        $('possible-answers').show();
-        break;
-    case 'S':
-    case 'L':
-        $('possible-answers').hide();
+$numResponses = 0; 
+$responseTemplate = makeResp(-1, array(), $html, $form);
+$existingResponses = $form->label('Responses') . $html->link('Add Response',
+    '#', array('onclick' => "addResponseInput(); return false;"));
+// restore previously submitted responses, if any
+if (isset($this->data) && isset($this->data['Response'])) {
+    foreach($this->data['Response'] as $key => $val) { 
+        $existingResponses .= makeResp($key, $val, $html, $form);
+        $numResponses = $key + 1;
     }
 }
-updatePossibleAnswersStatus();
+// actual response section
+echo $html->div('input text', $existingResponses, array('id' => 'responseInput'));
+
+// Submit buttons
+echo $html->div('center',
+    $form->submit(_('Save Question'), array('div' => false)) .
+    $form->submit(_('Cancel'), array('div' => false, 'name' => 'cancel'))
+);
+echo $form->end();
+?>
+</div>
+
+<script type="text/javascript">
+jQuery("#QuestionType").change(toggleResponse);
+
+// Adding/Removing responses
+var numResponses = <?php echo $numResponses; ?>;
+function addResponseInput() {
+    var template = '<?php echo $responseTemplate; ?>';
+    template = template.replace(/-1/g, numResponses);
+    jQuery(template).appendTo("#responseInput");
+    numResponses++;
+}
+
+function rmResponseInput(num) {
+    jQuery("#responseInput" + num).remove();
+}
+
+// Show/Hide response section
+function toggleResponse() {
+    var type = jQuery("#QuestionType").val();
+    if (type == 'M' || type == 'C') {
+        jQuery('#responseInput').show();
+    }
+    else {
+        jQuery('#responseInput').hide();
+    }
+}
 </script>

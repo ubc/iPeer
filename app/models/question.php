@@ -36,6 +36,24 @@ class Question extends AppModel
 
     public $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable');
 
+    public $validate = array(
+        'prompt' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Please enter a prompt.',
+            'required' => true
+        ),
+        'type' => array(
+            'rule' => array('inList', array('M', 'C', 'S', 'L')),
+            'message' => 'Please select a valid type.',
+            'required' => true
+        ),
+        'master' => array(
+            'rule' => array('inList', array('yes', 'no')),
+            'message' => 'Please select yes or no for master.',
+            'required' => true
+        )
+    );
+
     /**
      * getTypeById
      *

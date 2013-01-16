@@ -110,6 +110,7 @@ p {
     clear: left;
     padding: 0 1em 0 0;
     width: 13em;
+    margin-top: 0.4em;
 }
 
 .text input, .password input, .textarea textarea, .select select, 
@@ -660,16 +661,6 @@ i {
 /* USERS */
 
 /* users/add users/edit */
-#UserForm .text label {
-    width: 13em;
-    margin-top: 0.3em;
-}
-
-#UserForm .select label {
-    width: 13em;
-    margin-top: 0.5em;
-}
-
 #UserForm .checkbox {
     vertical-align: middle;
     margin-top: 0.5em;
@@ -788,16 +779,6 @@ i {
 /* Courses */
 
 /* courses/add, courses/edit */
-
-#CourseAddForm .text label, #CourseAddForm .select label, 
-#CourseEditForm .text label, #CourseEditForm .select label {
-    width: 13em;
-}
-
-#CourseAddForm .text input, #CourseEditForm .text input {
-    width: 21em;
-    text-align: left;
-}
 
 #CourseAddForm .select #InstructorInstructor, #CourseEditForm .select #InstructorInstructor {
     height: 10em;
@@ -1040,6 +1021,42 @@ i {
 
 .surveyquestions .checkbox label { /* checkboxes look weird with left floating labels */
     float: none;
+}
+
+/* surveys/addQuestion */
+.SurveyAddQuestion #QuestionPrompt {
+    width: 35em;
+}
+
+.SurveyAddQuestion .center {
+    width: 30em;
+    display: block;
+    margin: 1em auto;
+}
+
+.SurveyAddQuestion input[type="submit"] {
+    padding: 0.3em 0.5em;
+}
+
+.SurveyAddQuestion .center input {
+    margin-right: 1em;
+}
+
+.SurveyAddQuestion div#responseInput {
+    margin-bottom: 1.5em;
+}
+
+.SurveyAddQuestion #responseInput a {
+    padding: 0.5em;
+    display: inline-block;
+}
+
+.SurveyAddQuestion #responseInput .input {
+    margin-left: 14em;
+}
+
+.SurveyAddQuestion #responseInput .input input {
+    width: 15em;
 }
 
 /* GROUPS */

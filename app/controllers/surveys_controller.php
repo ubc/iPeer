@@ -499,12 +499,19 @@ class SurveysController extends AppController
    */
   function addQuestion($survey_id)
   {
-      //check to see if user has clicked load question
-      if (!empty($this->params['form']['loadq'])) {
+      if (isset($this->params['form']['cancel'])) {
+          $this->redirect('questionsSummary/'.$survey_id);
+          return;
+      }
+      if (isset($this->params['form']['load'])) {
           // load values from selected question into temp array
-          $this->data = $this->Question->find('first', array('conditions' => array('id' => $this->data['Question']['template_id'])));
-          $this->set('responses', $this->data['Response']);
-      } elseif (!empty($this->params['data']['Question'])) {
+          $this->data = $this->Question->find(
+              'first', 
+              array('conditions' => 
+              array('id' => $this->data['Question']['template_id'])));
+      } 
+      else if (!empty($this->data)) {
+          $this->data['Survey']['id'] = $survey_id;
           // Strip ID from responses or the original master question will
           // lose its responses. We want a copy, not the original.
           if (isset($this->data['Response'])) {
@@ -521,15 +528,10 @@ class SurveysController extends AppController
               $this->redirect('questionsSummary/'.$survey_id);
               //$this->questionsSummary($this->params['form']['survey_id'], null, null);
           } else {
-              $this->set('responses', $this->data['Response']);
               $this->Session->setFlash(_('Failed to save question.'));
           }
-      } else {
-          $this->set('responses', array());
       }
-
       $this->set('templates', $this->Question->find('list', array('conditions' => array('master' => 'yes'))));
-      $this->set('survey_id', $survey_id);
       $this->set('breadcrumb', $this->breadcrumb->push('surveys')->push(Inflector::humanize(Inflector::underscore($this->action))));
   }
 
@@ -545,7 +547,19 @@ class SurveysController extends AppController
    */
   function editQuestion( $question_id, $survey_id )
   {
-      if (!empty($this->data)) {
+      if (isset($this->params['form']['cancel'])) {
+          $this->redirect('questionsSummary/'.$survey_id);
+          return;
+      }
+      if (isset($this->params['form']['load'])) {
+          // load values from selected question into temp array
+          $this->data = $this->Question->find(
+              'first', 
+              array('conditions' => 
+              array('id' => $this->data['Question']['template_id'])));
+      } 
+      else if (!empty($this->data)) {
+          $this->data['Question']['id'] = $question_id;
           // filter - remove the removed answers from the database
           $responses = $this->Response->find('list', array('conditions' => array('question_id' => $question_id)));
           $newResponses = array();
@@ -569,9 +583,7 @@ class SurveysController extends AppController
           $this->data = $this->Question->find('first', array('conditions' => array('id' => $question_id)));
       }
 
-      $this->set('question_id', $question_id);
-      $this->set('survey_id', $survey_id);
-      $this->set('responses', $this->data['Response']);
+      $this->set('templates', $this->Question->find('list', array('conditions' => array('master' => 'yes'))));
       $this->set('breadcrumb', $this->breadcrumb->push('surveys')->push(__('Edit Question', true)));
       $this->render('addQuestion');
   }
