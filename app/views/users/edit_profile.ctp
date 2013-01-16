@@ -14,7 +14,7 @@ echo $this->Form->input('title', array('size'=>'50', 'label' => __('Title', true
 <hr align=left width=100%><h3><?php __('Change Password')?>:</h3></td>
 <?php
 echo $this->Form->input('old_password', array('type'=>'password', 'size'=>'50', 'label'=>__('Old Password', true), 'disabled'=>$viewPage));
-echo $this->Form->input('tmp_password', array('type'=>'password', 'size'=>'50', 'label'=>__('New Password', true), 'disabled'=>$viewPage));
+echo $this->Form->input('temp_password', array('type'=>'password', 'size'=>'50', 'label'=>__('New Password', true), 'disabled'=>$viewPage));
 echo $this->Form->input('confirm_password', array('type'=>'password', 'size'=>'50', 'label'=>__('Confirm New Password', true), 'disabled'=>$viewPage));
 ?>
 

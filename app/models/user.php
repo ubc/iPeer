@@ -156,9 +156,9 @@ class User extends AppModel
             'rule' => array('requiredWith', 'email'),
             'message' => 'Email notification requires an email address.'
         ),
-        'tmp_password' => array(
-            'rule' => '/^[a-z0-9_.-]{1,}$/i',
-            'message' => 'Passwords may only have letters, numbers, underscore and dot.'
+        'temp_password' => array(
+            'rule' => array('minLength', 6),
+            'message' => 'Passwords must have a minimum of 6 characters.'
         ),
     );
 

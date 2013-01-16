@@ -725,10 +725,10 @@ class UsersController extends AppController
         if (!empty($this->data)) {
             $this->data['User']['id'] = $id;
 
-            if (!empty($this->data['User']['tmp_password'])) {
+            if (!empty($this->data['User']['temp_password'])) {
                 if (md5($this->data['User']['old_password']==$this->Auth->user('password'))) {
-                    if ($this->data['User']['tmp_password']==$this->data['User']['confirm_password']) {
-                        $this->data['User']['password'] = md5($this->data['User']['tmp_password']);
+                    if ($this->data['User']['temp_password']==$this->data['User']['confirm_password']) {
+                        $this->data['User']['password'] = md5($this->data['User']['temp_password']);
                     } else {
                         $this->Session->setFlash(__("New passwords do not match", true));
                         $this->redirect('editProfile/'.$id);
@@ -738,7 +738,7 @@ class UsersController extends AppController
                     $this->redirect('editProfile/'.$id);
                 }
             } else {
-                unset($this->data['User']['tmp_password']);
+                unset($this->data['User']['temp_password']);
             }
 
             if ($this->__processForm()) {
