@@ -41,13 +41,20 @@ class TemplateEmailComponent extends EmailComponent
      */
     public function initParameters()
     {
-        $smtp['port'] = $this->SysParameter->get('email.port');
-        $smtp['host'] = $this->SysParameter->get('email.host');
-        $smtp['username'] = $this->SysParameter->get('email.username');
-        $smtp['password'] = $this->SysParameter->get('email.password');
-        $smtp['timeout'] = 30;
-        $this->smtpOptions = $smtp;
-        $this->delivery = 'smtp';
+        $this->Email->reset();
+
+        $smtpHost = $this->SysParameter->get('email.host');
+        if (!empty($smtpHost)) {
+            $smtp['port'] = $this->SysParameter->get('email.port');
+            $smtp['host'] = $this->SysParameter->get('email.host');
+            $smtp['username'] = $this->SysParameter->get('email.username');
+            $smtp['password'] = $this->SysParameter->get('email.password');
+            $smtp['timeout'] = 30;
+            $this->delivery = 'smtp';
+            $this->smtpOptions = $smtp;
+        } else {
+            $this->delivery = 'mail';
+        }
     }
 
     /**
@@ -146,7 +153,6 @@ class TemplateEmailComponent extends EmailComponent
         $patterns = array();
         $replacements = array();
 
-        var_dump($merges);
         foreach ($users as $user) {
             foreach ($matches[0] as $key => $match) {
                 $patterns[$key] = '/'.$match[0].'/';

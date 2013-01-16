@@ -44,9 +44,14 @@ class UsersController extends AppController
     {
         parent::beforeFilter();
 
+        $allowTypes = array(
+            'text/plain', 'text/csv', 'application/csv',
+            'application/csv.ms-excel', 'application/octet-stream',
+            'text/comma-separated-values', 'text/anytext');
         $this->FileUpload->allowedTypes(array(
-            'txt' => array('text/plain'),
-            'csv' => array('text/csv', 'application/csv')));
+            'txt' => null,
+            'csv' => null,
+        ));
         $this->FileUpload->uploadDir('../tmp');
         $this->FileUpload->fileModel(null);
         $this->FileUpload->attr('required', true);

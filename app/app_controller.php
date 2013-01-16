@@ -69,6 +69,17 @@ class AppController extends Controller
         // set default language for now
         Configure::write('Config.language', 'eng');
 
+        // if we have a session transfered to us
+        if ($this->_hasSessionTransferData()) {
+            if ($this->_authenticateWithSessionTransferData()) {
+                if (method_exists($this, '_afterLogin')) {
+                    $this->_afterLogin(false);
+                }
+            } else {
+                $this->Session->setFlash($this->Auth->loginError, $this->Auth->flashElement, array(), 'auth');
+            }
+        }
+
         // store user in the singleton for global access
         User::store($this->Auth->user());
 
@@ -172,25 +183,14 @@ class AppController extends Controller
     }
 
     /**
-     * beforeLogin callback, called every time in auth compoment
+     * beforeLogin callback, called every time in auth compoment if user is not
+     * logged in yet
      *
      * @access public
      * @return void
      */
     public function _beforeLogin()
     {
-        // if we have a session transfered to us
-        if ($this->_hasSessionTransferData()) {
-            if ($this->_authenticateWithSessionTransferData()) {
-                if (method_exists($this, '_afterLogin')) {
-                    $this->_afterLogin();
-                }
-                return true;
-            } else {
-                $this->Session->setFlash($this->Auth->loginError, $this->Auth->flashElement, array(), 'auth');
-                return false;
-            }
-        }
         $this->set('loginHeader', $this->SysParameter->get('display.login.header'));
         $this->set('loginFooter', $this->SysParameter->get('display.login.footer'));
     }
@@ -198,10 +198,12 @@ class AppController extends Controller
     /**
      * afterLogin callback, called when logging in successfully
      *
+     * @param bool $isRedirect whether redirecting
+     *
      * @access public
      * @return void
      */
-    public function _afterLogin()
+    public function _afterLogin($isRedirect = true)
     {
         if ($this->Auth->isAuthorized()) {
             User::getInstance($this->Auth->user());
@@ -211,11 +213,16 @@ class AppController extends Controller
             //TODO logging!
         }
 
+        if (!$isRedirect) {
+            return;
+        }
+
         $redirect = $this->Auth->redirect();
         if (isset($this->params['url']['redirect'])) {
             $redirect = $this->params['url']['redirect'];
         }
 
+        $this->log('redirecting to '.$redirect, 'debug');
         $this->redirect($redirect);
     }
 
@@ -257,16 +264,25 @@ class AppController extends Controller
      */
     function _authenticateWithSessionTransferData()
     {
+        // valid signature first
         $message = $this->sessionTransferData['username'].$this->sessionTransferData['timestamp'].$this->sessionTransferData['token'];
         $secret = $this->OauthToken->getTokenSecret($this->sessionTransferData['token']);
         $signature = base64_encode(hash_hmac('sha1', $message, $secret, true));
-        if ($signature == $this->sessionTransferData['signature']) {
-            $user = $this->User->findByUsername($this->sessionTransferData['username']);
-            $this->Session->write($this->Auth->sessionKey, $user['User']);
-            return true;
+        if ($signature != $this->sessionTransferData['signature']) {
+            $this->log('Invalid signature! Expect '.$signature.', Got '.$this->sessionTransferData['signature']);
+
+            return false;
         }
 
-        $this->log('Invalid signature! Expect '.$signature.', Got '.$this->sessionTransferData['signature']);
-        return false;
+        // find the userId by username and use it to login
+        $userId = $this->User->field('id', array('username' => $this->sessionTransferData['username']));
+        if (!$this->Auth->login($userId)) {
+            $this->log('Invalid username '.$this->sessionTransferData['username'].' from session transfer.', 'debug');
+            return false;
+        }
+
+        $this->log('User '.$this->sessionTransferData['username'].' is logged in with session transfer.', 'debug');
+
+        return true;
     }
 }
