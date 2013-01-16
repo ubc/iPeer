@@ -148,7 +148,12 @@ class Event extends AppModel
         $this->virtualFields['response_count'] = sprintf('SELECT count(*) as count FROM evaluation_submissions as sub WHERE sub.event_id = %s.id', $this->alias);
         $this->virtualFields['to_review_count'] = sprintf('SELECT count(*) as count FROM group_events as ge WHERE ge.event_id = %s.id AND marked LIKE "to review"', $this->alias);
         $this->virtualFields['student_count'] = sprintf('SELECT count(*) as count FROM group_events as vge RIGHT JOIN groups_members as vgm ON vge.group_id = vgm.group_id WHERE vge.event_id = %s.id', $this->alias);
-        $this->virtualFields['completed_count'] = sprintf('SELECT count(*) as count FROM evaluation_submissions as ves WHERE ves.submitted = 1 AND ves.event_id = %s.id', $this->alias);
+        $this->virtualFields['completed_count'] = sprintf(
+                'SELECT count(*) as count 
+                FROM evaluation_submissions as ves INNER JOIN group_events as ges 
+                ON ges.id = ves.grp_event_id JOIN groups_members as gms 
+                ON gms.user_id = ves.submitter_id 
+                WHERE ves.submitted = 1 AND ves.event_id = %s.id', $this->alias);
         $this->virtualFields['due_in'] = 'TIMESTAMPDIFF(SECOND,NOW(),due_date)';
     }
 

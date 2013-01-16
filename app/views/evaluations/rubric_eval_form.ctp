@@ -70,14 +70,16 @@
                 <div id="panel<?php echo $user['id']?>Header" class="panelheader">
                 <?php echo $user['first_name'].' '.$user['last_name'];?>
                 <?php if (isset($row['User']['Evaluation'])): ?>
-                    <font color="red"> ( Saved )</font>
+                    <font color="#259500"> ( Saved )</font>
                 <?php else: ?>
                     <blink><font color="#FF6666"> - </font></blink><?php __('(click to expand)')?>
                 <?php endif; ?>
                 </div>
                 <div style="height: 200px;" id="panel1Content" class="panelContent">
-                    <br><?php __('Important! Comments are required in this evaluation.')?><br>
-
+                    <?php if ($event['Event']['com_req']) { ?>
+                    <br><?php __('Important! Comments are required in this evaluation.')?>
+                    <?php } ?>
+                    <br>
                     <?php
                     $params = array('controller'=>'rubrics', $viewData , 'evaluate'=>1, 'user'=>$user);
                     echo $this->element('rubrics/ajax_rubric_view', $params);
