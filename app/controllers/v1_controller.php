@@ -828,7 +828,7 @@ class V1Controller extends Controller {
                     array('conditions' => array('course_id' => $course_id, 'department_id' => $department_id)));
                 $departments = $departments['CourseDepartment'];
                 unset($departments['id']);
-                $this->set('departments', json_encode($departments));
+                $this->set('result', json_encode($departments));
             } else {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
                 $this->set('result', null);

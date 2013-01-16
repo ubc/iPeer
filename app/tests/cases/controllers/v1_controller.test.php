@@ -610,7 +610,7 @@ class V1ControllerTest extends CakeTestCase {
 
         // DELETE - Delete a course from a department
         $file = $this->_oauthReq("$url/2", '', OAUTH_HTTP_METHOD_DELETE);
-        $this->assertEqual(json_decode($file), '');
+        $this->assertEqual(json_decode($file), array());
 
         // add test to see if course exist using departments
     }
