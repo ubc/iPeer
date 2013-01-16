@@ -710,7 +710,8 @@ class UsersController extends AppController
             $this->data['User']['id'] = $id;
 
             if (!empty($this->data['User']['tmp_password'])) {
-                if (md5($this->data['User']['old_password']==$this->Auth->user('password'))) {
+                $user = $this->User->findUserByidWithFields($id, array('password'));
+                if (md5($this->data['User']['old_password'])==$user['password']) {
                     if ($this->data['User']['tmp_password']==$this->data['User']['confirm_password']) {
                         $this->data['User']['password'] = md5($this->data['User']['tmp_password']);
                     } else {
