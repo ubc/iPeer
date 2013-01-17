@@ -79,18 +79,17 @@ if (isset($course_list['I']))
 <div id="short_help" <?php echo ($course_list == 0) ? '':'style="display:none"'?>>
 <h5><?php __('To use iPeer you have to add a course.')?></h5>
   <ol>
-    <li><?php __('Please <i>add a course</i> from the yellow "Courses" tab above')?>
+    <li><?php __('Please <i>add a course</i> from the "Courses" tab above')?>
     </li>
 
-    <li><?php __('Then <i>register students</i> into that course from that course\'s summary display. This display will be available (once the course is created) by clicking on the course\'s name from most menus.')?>
+    <li><?php __('Then <i>register students</i> into that course from that course\'s home page. This display will be available (once the course is created) by clicking on the course\'s name from most menus.')?>
     </li>
 
     <li><?php __('Put your students into <i>groups</i> manually, (or, if you have the students complete a survey, iPeer can do it for you, using TeamMaker).')?>
     </li>
 
     <li>
-      <?php __('To create evaluations, check out the orange wizard link the top right hand corner "iPeer Tutorial Wizard".')?>
-          <?php __('It has detailed video clips on how to create evaluations.')?>
+      <?php __('To create evaluations, check out the ')?><a href="http://ipeer.ctlt.ubc.ca/trac/wiki/UserDocV3" target="_blank">User Documentations</a>.
     </li>
   </ol>
 </div>

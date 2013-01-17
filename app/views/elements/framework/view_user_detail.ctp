@@ -41,9 +41,13 @@
         <th><?php __('Email')?></th>
         <td>
         <?php if(!empty($user['User']['email'])): ?>
-            <a href="mailto:<?php echo $user['User']['email']; ?>">
-            <?php echo $html->image('icons/email_icon.gif', array('border'=>'0','alt'=>'Email'));?>
-            <?php echo $user['User']['email']; ?>
+            <?php if (User::hasPermission('functions/viewemailaddresses')) { ?>
+                <a href="mailto:<?php echo $user['User']['email']; ?>">
+                <?php echo $html->image('icons/email_icon.gif', array('border'=>'0','alt'=>'Email'));?>
+                <?php echo $user['User']['email']; ?>
+            <?php } else {
+                echo 'N/A';
+            } ?>
             </a>
         <?php endif; ?>
         </td>
