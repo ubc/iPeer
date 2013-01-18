@@ -269,7 +269,7 @@ class CourseTestCase extends CakeTestCase {
     {
     }
     
-    function testGetuserListByCourse(()
+    function testGetuserListByCourse()
     {
     }
 }
