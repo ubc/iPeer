@@ -18,6 +18,7 @@ class UserTestCase extends CakeTestCase {
     {
         echo "Start User model test.\n";
         $this->User =& ClassRegistry::init('User');
+        $this->UserEnrol =& ClassRegistry::init('UserEnrol');
     }
 
     function endCase()
@@ -542,6 +543,22 @@ class UserTestCase extends CakeTestCase {
     
     function testremoveOldStudents() {
         // TODO
+    }
+    
+    function testGetEnrolledCourses() {
+        //Test valid student enrolled in 2 courses
+        $courses = $this->User->getEnrolledCourses(7);
+        $this->assertEqual($courses, array(1,2));
+        
+        //Test valid user not enrolled in courses
+        $this->User->removeStudent(20,2);
+        $courses = $this->User->getEnrolledCourses(20);
+        $this->assertEqual($courses, null);
+        $this->User->addStudent(20, 2);
+        
+        //Test invalid user
+        $courses = $this->User->getEnrolledCourses(999);
+        $this->assertEqual($courses, null);
     }
 
     function testGetCurrentLoggedInUser() {

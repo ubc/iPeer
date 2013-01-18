@@ -331,12 +331,12 @@ class User extends AppModel
     }
 
     /**
-     * Get student enrolled in a course
+     * Get instructors enrolled in a course
      *
      * @param int $course_id course id
      *
      * @access public
-     * @return students enrolled in a course
+     * @return instructors enrolled in a course
      * */
     function getInstructorsByCourse($course_id)
     {
@@ -917,6 +917,22 @@ class User extends AppModel
                 $this->removeStudent($student['User']['id'], $courseId);
             }
         }
+    }
+    
+    /**
+     * Get courses a user is enrolled in
+     *
+     * @param mixed $userId user id
+     *
+     * @return list of course ids
+     */
+    function getEnrolledCourses($userId='')
+    {
+        $user = $this->find('first', array(
+            'conditions' => array('User.id' => $userId), 
+            'contain' => array('Enrolment')
+        ));
+        return Set::extract($user, '/Enrolment/id');
     }
 
     /*********************************

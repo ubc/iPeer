@@ -44,19 +44,6 @@ class UserEnrol extends AppModel
         }
     }
 
-
-    /**
-     * Get courses a user is enrolled in
-     *
-     * @param unknown_type $userId user id
-     *
-     * @return list of course ids
-     */
-    function getEnrolledCourses($userId='')
-    {
-        return $this->find('all', array('conditions'=>array('user_id'=>$userId), 'fields'=>array('course_id')));
-    }
-
     /**
      * Get list of users enrolled in a course
      *

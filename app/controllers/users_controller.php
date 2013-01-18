@@ -620,6 +620,8 @@ class UsersController extends AppController
     public function edit($userId = null, $courseId = null) {
         $this->set('title_for_layout', 'Edit User');
 
+        $enrolCourses = $this->User->getEnrolledCourses($userId);
+
         $role = $this->User->getRoleName($userId);
 
         if (!User::hasPermission('functions/user')) {
@@ -629,8 +631,14 @@ class UsersController extends AppController
 
         // save the data which involves:
         if ($this->data) {
-            //debug($this->data);
-            //return;
+            // unenrol student from course, group, surveygroup
+            // only students will go in because only they have records in Enrolment
+            foreach ($enrolCourses as $course) {
+                if (!in_array($course, $this->data['Courses']['id'])) {
+                    $this->User->removeStudent($userId, $course);
+                }
+            }
+        
             // create the enrolment entry depending on if instructor or student
             // and also convert it into a CakePHP dark magic friendly format
             if (!empty($this->data['Courses']['id'])) {

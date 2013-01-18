@@ -62,7 +62,7 @@ function fnFormatDetails ( oTable, nTr )
     sOut += '</li>';
 
     sOut += '<li>';
-    sOut += '<a href="<?php echo $this->base; ?>/users/delete/'+aData[0]+'/<?php echo $courseId?>">Delete</a>';
+    sOut += '<a href="<?php echo $this->base; ?>/users/delete/'+aData[0]+'/<?php echo $courseId?>">Drop</a>';
     sOut += '</li>';
 
     sOut += '</ul></div>';
