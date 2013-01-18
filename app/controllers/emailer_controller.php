@@ -456,7 +456,7 @@ class EmailerController extends AppController
         case 'C': //Email addresses for all in Course
             $users = $this->User->find($s_type, array(
                 //'fields' => array('email'),
-                'conditions' => array('User.id' => $this->UserEnrol->getUserListByCourse($id))
+                'conditions' => array('User.id' => $this->Course->getUserListbyCourse($id))
             ));
             $course = $this->Course->find('first', array(
                 'fields' => array('id', 'course'),

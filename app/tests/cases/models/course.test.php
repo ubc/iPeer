@@ -268,4 +268,8 @@ class CourseTestCase extends CakeTestCase {
     function testGetAccessibleCourseById()
     {
     }
+    
+    function testGetuserListByCourse(()
+    {
+    }
 }

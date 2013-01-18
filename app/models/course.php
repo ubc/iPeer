@@ -484,7 +484,7 @@ class Course extends AppModel
     }
 
     /**
-     * getCourseById
+     * getCourseWithInstructorsById
      *
      * @param mixed $courseId course id
      *
@@ -631,4 +631,20 @@ class Course extends AppModel
     {
         return $this->getAccessibleCourses($userId, $permission, 'first', array('conditions' => array($this->alias.'.id' => $courseId), 'contain' => $contain));
     }
+    
+    /**
+     * Get list of users enrolled in a course
+     *
+     * @param mixed $course_id
+     *
+     * @return list of user ids
+     */
+    function getUserListbyCourse($course_id) {
+        $users = $this->find('first', array(
+            'conditions' => array('Course.id' => $course_id),
+            'contain' => array('Enrol')
+        ));
+        return Set::extract($users, '/Enrol/id');
+    }
+     
 }

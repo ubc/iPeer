@@ -18,7 +18,6 @@ class UserTestCase extends CakeTestCase {
     {
         echo "Start User model test.\n";
         $this->User =& ClassRegistry::init('User');
-        $this->UserEnrol =& ClassRegistry::init('UserEnrol');
     }
 
     function endCase()
