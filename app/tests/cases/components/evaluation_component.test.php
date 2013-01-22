@@ -113,43 +113,6 @@ class EvaluationTestCase extends CakeTestCase
         $this->assertEqual($result, $expect);
     }
 
-    function testFormatSimpleEvaluationResultsMatrix()
-    {
-        // Set up test data
-        $evalResult = array();
-        $evalResult[0]['EvaluationSimple']['EvaluationSimple']['grade_release'] = 0;
-        $evalResult[0]['EvaluationSimple']['EvaluationSimple']['evaluatee'] = 'Kevin Luk';
-        $evalResult[0]['EvaluationSimple']['EvaluationSimple']['score'] = 25;
-        $evalResult[1]['EvaluationSimple']['EvaluationSimple']['grade_release'] = 0;
-        $evalResult[1]['EvaluationSimple']['EvaluationSimple']['evaluatee'] = 'Zion Au';
-        $evalResult[1]['EvaluationSimple']['EvaluationSimple']['score'] = 50;
-        $groupMembers = array();
-        $groupMembers[0]['User']['id'] = 1;
-        $groupMembers[1]['User']['id'] = 2;
-        // Run test
-        $result = $this->EvaluationComponentTest->formatSimpleEvaluationResultsMatrix($groupMembers, $evalResult);
-        $expect = array('0' => array('Kevin Luk' => 25),
-            '1' => array('Zion Au' => 50));
-        $this->assertEqual($result, $expect);
-
-        // Run tests for 'N/A' return value
-        $evalResultDuplicate1 = $evalResult;
-        unset($evalResultDuplicate1[0]['EvaluationSimple']['EvaluationSimple']);
-        unset($evalResultDuplicate1[1]['EvaluationSimple']['EvaluationSimple']);
-        $result = $this->EvaluationComponentTest->formatSimpleEvaluationResultsMatrix($groupMembers, $evalResultDuplicate1);
-        $expect = array('0' => array('' => 'n/a'),
-            '1' => array('' => 'n/a'));
-        $this->assertEqual($result, $expect);
-
-        $evalResultDuplicate2 = $evalResult;
-        unset($evalResultDuplicate1[0]['EvaluationSimple']);
-        unset($evalResultDuplicate1[1]['EvaluationSimple']);
-        $result = $this->EvaluationComponentTest->formatSimpleEvaluationResultsMatrix($groupMembers, $evalResultDuplicate1);
-        $expect = array(array('1' => 'n/a', '2' => 'n/a'),
-            array('1' => 'n/a', '2' => 'n/a'));
-        $this->assertEqual($result, $expect);
-    }
-
     function testFilterString()
     {
         $testString = "HELLO THIS IS A TEST";

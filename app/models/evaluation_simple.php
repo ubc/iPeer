@@ -52,7 +52,8 @@ class EvaluationSimple extends EvaluationResponseBase
     function getResultsByEvaluator($grpEventId=null, $evaluator=null)
     {
         return $this->find('all', array(
-            'conditions' => array('grp_event_id' => $grpEventId, 'evaluator' => $evaluator)
+            'conditions' => array('grp_event_id' => $grpEventId, 'evaluator' => $evaluator),
+            'contain' => false
         ));
     }
 
