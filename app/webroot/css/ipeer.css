@@ -781,16 +781,6 @@ i {
     width: 25em;
 }
 
-/* users/editProfile */
-
-#EditProfile .text label, .password label {
-    text-align: left;
-}
-
-#EditProfile .text label, .input {
-    margin-top: 0.3em;
-}
-
 /* Courses */
 
 /* courses/add, courses/edit */
