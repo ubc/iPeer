@@ -84,6 +84,11 @@ class SurveyControllerTest extends ExtendedAuthTestCase {
     function testView() {
         $result = $this->testAction('/surveys/view/1', array('return' => 'vars'));
         $this->assertEqual($result['survey']['Survey']['name'], 'Team Creation Survey');
+        $this->assertEqual($result['questions'][0]['Question']['prompt'], 'What was your GPA last term?');
+        $this->assertEqual($result['questions'][0]['Response'][0]['response'], '4+');
+        $this->assertEqual($result['questions'][0]['Response'][1]['response'], '3-4');
+        $this->assertEqual($result['questions'][1]['Question']['prompt'], 'Do you own a laptop?');
+        $this->assertEqual($result['questions'][1]['Response'][0]['response'], 'yes');
     }
 
     //TODO redirect
@@ -104,12 +109,6 @@ class SurveyControllerTest extends ExtendedAuthTestCase {
 
     //TODO redirect
     function testQuestionSummary() {
-        $result = $this->testAction('surveys/questionsSummary/1', array('return' => 'vars'));
-        $this->assertEqual($result['questions'][0]['Question']['prompt'], 'What was your GPA last term?');
-        $this->assertEqual($result['questions'][0]['Response'][0]['response'], '4+');
-        $this->assertEqual($result['questions'][0]['Response'][1]['response'], '3-4');
-        $this->assertEqual($result['questions'][1]['Question']['prompt'], 'Do you own a laptop?');
-        $this->assertEqual($result['questions'][1]['Response'][0]['response'], 'yes');
     }
 
     //TODO redirect

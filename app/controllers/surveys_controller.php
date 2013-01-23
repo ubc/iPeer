@@ -575,6 +575,14 @@ class SurveysController extends AppController
       $this->render('addQuestion');
   }
 
+  /**
+   * Retrives the questions and responses for a given survey.
+   * This Helper function rewrites the question responses into a format
+   * that's more friendly to cakephp's form helper.
+   *
+   * @param int surveyId The id of the survey you want the questions from.
+   * @return The questions and responses of the survey.
+   * */
   private function _formatQuestions($surveyId) 
   {
         // Get all required data from each table for every question
