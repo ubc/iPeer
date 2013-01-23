@@ -1258,23 +1258,13 @@ class EvaluationComponent extends Object
      */
     function getMixevalResultDetail($groupEventId, $groupMembers)
     {
-        $pos = 0;
-        $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
         $mixevalResultDetail = array();
         $memberScoreSummary = array();
-        $inCompletedMembers = array();
         $evalResult = array();
-
-        if ($groupEventId && $groupMembers) {
-            $submissions = $this->EvaluationSubmission->getEvalSubmissionsByGroupEventId($groupEventId);
-            $submissions = Set::extract($submissions, '/EvaluationSubmission/submitter_id');
+        if ($groupEventId && $groupMembers) {                        
             foreach ($groupMembers as $user) {
                 $userId = isset($user['User'])? $user['User']['id'] : $user['id'];
-                // no submissions
-                if (!in_array($userId, $submissions)) {
-                    $inCompletedMembers[$pos++] = $user;
-                }
 
                 // filter out the people who are not student, they should not get result
                 if ($user['Role'][0]['name'] != 'student') {
@@ -1294,7 +1284,6 @@ class EvaluationComponent extends Object
         }
 
         $mixevalResultDetail['scoreRecords'] =  $this->formatMixevalEvaluationResultsMatrix($evalResult);
-        $mixevalResultDetail['inCompletedMembers'] = $inCompletedMembers;
         $mixevalResultDetail['memberScoreSummary'] = $memberScoreSummary;
         $mixevalResultDetail['evalResult'] = $evalResult;
 
@@ -1560,11 +1549,6 @@ class EvaluationComponent extends Object
         $groupMembersNoTutors = array();
         $result = array();
 
-        $mixeval = $this->Mixeval->find('first', array(
-            'conditions' => array('id' => $event['Event']['template_id']),
-            'contain' => false,
-        ));
-        $result['mixeval'] = $mixeval;
         $eventId = $event['Event']['id'];
 
         $currentUser = $this->User->getCurrentLoggedInUser();
@@ -1635,22 +1619,13 @@ class EvaluationComponent extends Object
                 $event['Group']['id'],
                 ($event['Event']['self_eval'] ? null : $this->Auth->user('id'))
             );
-            $groupMembersNoTutors = $this->GroupsMembers->getEventGroupMembersNoTutors(
-                $event['Group']['id'], $event['Event']['self_eval'], $this->Auth->user('id'));
             $mixevalResultDetail = $this->getMixevalResultDetail($event['GroupEvent']['id'], $groupMembers);
-            $result['groupMembers'] = $groupMembers;
-            $result['groupMembersNoTutors'] = $groupMembersNoTutors;
         }
 
         //Get Detail information on Mixeval score
         $mixevalQuestion = $this->MixevalsQuestion->getQuestion($mixeval['Mixeval']['id']);
-        $result['mixevalQuestion'] = $mixevalQuestion;
         $gradeReleaseStatus = $this->EvaluationMixeval->getTeamReleaseStatus($event['GroupEvent']['id']);
 
-        $result['inCompletedMembers'] = $mixevalResultDetail['inCompletedMembers'];
-        $result['scoreRecords'] = $mixevalResultDetail['scoreRecords'];
-        $result['memberScoreSummary'] = $mixevalResultDetail['memberScoreSummary'];
-        $result['evalResult'] = $mixevalResultDetail['evalResult'];
         $result['gradeReleaseStatus'] = $gradeReleaseStatus;
 
         return $result;

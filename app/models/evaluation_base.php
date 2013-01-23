@@ -149,7 +149,8 @@ class EvaluationBase extends AppModel
     {
         $this->Penalty = ClassRegistry::init('Penalty');
         $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
-        $memberIds = Set::extract($groupMembers, '/User/id');
+
+        $memberIds = array_keys($groupMembers);
         $userPenalty = array_fill_keys($memberIds, 0);
 
         // find the event

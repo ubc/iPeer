@@ -52,14 +52,11 @@ class EvaluationSubmission extends AppModel
      * @return void
      */
     function getEvalSubmissionsByGroupEventId($groupEventId)
-    {
-        $members = Set::extract($this->GroupEvent->getGroupMembers($groupEventId), '/GroupsMembers/user_id');
-        
+    {     
         return $this->find('all', array(
             'conditions' => array(
                 $this->alias.'.grp_event_id' => $groupEventId,
                 $this->alias.'.submitted' => '1',
-                $this->alias.'.submitter_id' => $members,
             ),
             'contain' => false,
         ));
@@ -192,4 +189,5 @@ class EvaluationSubmission extends AppModel
     {
         return $this->find('count', array('conditions' => array('grp_event_id' => $grpEventId,)));
     }
+
 }

@@ -167,4 +167,9 @@ class EvaluationMixevalTestCase extends CakeTestCase
         $this->assertEqual($searched[1]['EvaluationMixeval']['grade_release'], 0);
         $this->assertEqual($searched[2]['EvaluationMixeval']['grade_release'], 0);
     }
+    
+    function testGetResultsByEvaluateesAndEvaluators()
+    {
+        // TODO
+    }
 }

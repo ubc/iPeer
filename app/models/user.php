@@ -934,6 +934,21 @@ class User extends AppModel
         ));
         return Set::extract($user, '/Enrolment/id');
     }
+    
+    /**
+     * Get first and last names of user(s)
+     *
+     * @param mixed $userId user id
+     *
+     * @return list of usernames
+     */
+    function getFullNames($userId)
+    {
+        return $this->find('list', array(
+            'conditions' => array('User.id' => $userId),
+            'fields' => array('User.full_name')
+        ));
+    }
 
     /*********************************
      * Static functions

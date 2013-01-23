@@ -82,13 +82,29 @@ class EvaluationMixeval extends EvaluationResponseBase
      */
     function getResultsByEvaluatee($grpEventId=null, $evaluatee=null)
     {
-        $this->GroupEvent = ClassRegistry::init('GroupEvent');
-        $members = Set::extract($this->GroupEvent->getGroupMembers($grpEventId), '/GroupsMembers/user_id');
-        
         return $this->find('all', array(
-            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee, 'evaluator' => $members),
+            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
             'order' => 'evaluator ASC',
             'contain' => 'EvaluationMixevalDetail',
+        ));
+    }
+    
+    /**
+     * getResultsByEvaluateesAndEvaluators
+     * gets Mixeval evaluation result for a specific assignment and evaluator
+     *
+     * @param mixed $grpEventId group event id
+     * @param mixed $members    members
+     * @access public
+     * @return void
+     */
+    function getResultsByEvaluateesOrEvaluators($grpEventId=null, $members=null)
+    {
+        return $this->find('all', array(
+            'conditions' => array('grp_event_id' => $grpEventId, "OR"=>array('evaluatee' => $members, 'evaluator' => $members)),
+            'order' => 'evaluator ASC',
+            'contain' => 'EvaluationMixevalDetail',
+            'group' => array('EvaluationMixeval.evaluator','EvaluationMixeval.evaluatee'),
         ));
     }
 
@@ -433,4 +449,5 @@ class EvaluationMixeval extends EvaluationResponseBase
 
         return $grades;
      }
+
 }

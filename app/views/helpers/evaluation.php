@@ -27,6 +27,7 @@ class EvaluationHelper extends AppHelper
 
     function getSummaryTableHeader($totalMark, $questions)
     {
+        $questions = array('MixevalsQuestion' => $questions);
         $numberQuestions = Set::extract($questions, '/MixevalsQuestion[question_type=S]');
         $header = array(__('Evaluatee', true));
         foreach ($numberQuestions as $key => $question) {
@@ -37,7 +38,7 @@ class EvaluationHelper extends AppHelper
         return $header;
     }
 
-    function getSummaryTable($memberList, $scoreRecords, $numberQuestions, $mixeval, $penalties)
+    function getSummaryTable($memberList, $scoreRecords, $numberQuestions, $mixeval, $penalties, $notInGroup)
     {
         $totalScore = 0;
         $totalCounter = 0;
@@ -45,10 +46,11 @@ class EvaluationHelper extends AppHelper
 
         foreach ($scoreRecords as $evaluteeId => $scores) {
             $tr = array();
-            $tr[] = $memberList[$evaluteeId];
+            (in_array($evaluteeId, $notInGroup)) ? $class=array('class'=>'blue') : $class=array();
+            $tr[] = array($memberList[$evaluteeId], $class);
             foreach ($numberQuestions as $question) {
-                $tr[] = isset($scores[$question['MixevalsQuestion']['question_num']]) ?
-                    number_format($scores[$question['MixevalsQuestion']['question_num']], 2) : __('N/A', true);
+                $tr[] = isset($scores[$question['question_num']]) ?
+                    number_format($scores[$question['question_num']], 2) : __('N/A', true);
             }
 
             // find out penalties for total column
@@ -67,14 +69,14 @@ class EvaluationHelper extends AppHelper
                 $totalScore += $total-$penalty;
                 $totalCounter ++;
             }
-            $table[] = $tr;
+            $table[$evaluteeId] = $tr;
         }
 
         // group average row
         $tr = array(__('Group Average', true));
         foreach ($numberQuestions as $question) {
             if ($totalCounter) {
-                $avg = array_avg(Set::classicExtract($scoreRecords, '{n}.'.($question['MixevalsQuestion']['question_num'])));
+                $avg = array_avg(Set::classicExtract($scoreRecords, '{n}.'.($question['question_num'])));
                 $tr[] = number_format($avg, 2);
             } else {
                 // no values in the table
@@ -162,7 +164,7 @@ class EvaluationHelper extends AppHelper
     {
         $header = array($firstColumn);
         foreach ($questions as $key => $question) {
-            $header[] = sprintf('%d.%s', $key+1, $question['MixevalsQuestion']['title']);
+            $header[] = sprintf('%d.%s', $key+1, $question['title']);
         }
 
         return $header;
@@ -182,7 +184,7 @@ class EvaluationHelper extends AppHelper
      * @access public
      * @return void
      */
-    function getMixevalResultTable($memberResult, $memberList, $questions, $type = 'evaluator')
+    function getMixevalResultTable($memberResult, $memberList, $questions, $notInGroup, $type = 'evaluator')
     {
         $table = array();
 
@@ -193,11 +195,12 @@ class EvaluationHelper extends AppHelper
 
         foreach ($memberResult as $row) {
             $memberMixeval = $row['EvaluationMixeval'];
-            $tr = array(isset($memberMixeval[$type]) ? $memberList[$memberMixeval[$type]] : $type);
+            (in_array($memberMixeval[$type], $notInGroup)) ? $class=array('class' => 'blue') : $class=array();
+            $tr = array(isset($memberMixeval[$type]) ? array($memberList[$memberMixeval[$type]],$class) : array($type,$class));
             // change the details indexed by question_number
             $resultDetails = Set::combine($row['EvaluationMixevalDetail'], '{n}.question_number', '{n}');
             foreach ($questions as $question) {
-                $detail = $resultDetails[$question['MixevalsQuestion']['question_num']];
+                $detail = $resultDetails[$question['question_num']];
                 // check if the result is released
                 if (($type == 'evaluator' || $type == 'evaluatee') ||
                     (($memberMixeval['grade_release'] && $question['MixevalsQuestion']['question_type'] == 'S') ||
@@ -218,7 +221,7 @@ class EvaluationHelper extends AppHelper
     {
         $result = '';
 
-        switch($question['MixevalsQuestion']['question_type']) {
+        switch($question['question_type']) {
         case 'S':
             //Point Description Detail
             $result = $question['Description'][$detail['selected_lom']-1]['descriptor'];
@@ -226,12 +229,12 @@ class EvaluationHelper extends AppHelper
 
             //Points Detail
             $result .= "<strong>".__('Points', true).": </strong>";
-            $result .= isset($detail) ? $this->getPoints($detail["grade"], $question['MixevalsQuestion']['multiplier']) : __('N/A', true);
+            $result .= isset($detail) ? $this->getPoints($detail["grade"], $question['multiplier']) : __('N/A', true);
             $result .= "<br />";
 
             //Grade Detail
             $result .= "<strong>".__('Grade', true).": </strong>";
-            $result .= isset($detail) ? $detail["grade"] . " / " . $question['MixevalsQuestion']['multiplier'] : __('N/A', true);
+            $result .= isset($detail) ? $detail["grade"] . " / " . $question['multiplier'] : __('N/A', true);
             $result .= "<br />";
             break;
         case 'T':

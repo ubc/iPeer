@@ -559,6 +559,10 @@ class UserTestCase extends CakeTestCase {
         $courses = $this->User->getEnrolledCourses(999);
         $this->assertEqual($courses, null);
     }
+    
+    function testgetFullNames() {
+        // TODO
+    }
 
     function testGetCurrentLoggedInUser() {
         // can't test, no session without a browser!

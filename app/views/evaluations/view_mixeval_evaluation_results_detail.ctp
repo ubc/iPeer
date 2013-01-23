@@ -1,18 +1,17 @@
 <?php
-$color = array("#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
 $averagePerQuestion = array();
 $numberQuestions = array();
 $textQuestions = array();
-foreach ($mixevalQuestion as $question) {
-    if ($question['MixevalsQuestion']['question_type'] != 'S') {
+
+foreach ($mixeval['Question'] as $question) {
+    if ($question['question_type'] != 'S') {
         $textQuestions[] = $question;
     } else {
         $numberQuestions[] = $question;
     }
 }
-$memberList = Set::combine($event, 'Member.{n}.id', 'Member.{n}.full_name');
 
-$summaryTableData = $this->Evaluation->getSummaryTable($memberList, $scoreRecords, $numberQuestions, $mixeval, $penalties);
+$summaryTableData = $this->Evaluation->getSummaryTable($memberList, $mixevalDetails, $numberQuestions, $mixeval, $penalty, $notInGroup);
 $groupAvg = end(end($summaryTableData));
 
 echo $html->script('ricobase');
@@ -25,12 +24,41 @@ echo $html->script('ricoaccordion');
 <div class="content-container">
 
 <?php echo $this->element('evaluations/view_event_info', array('controller'=>'evaluations', 'event'=>$event));?>
-<?php echo $this->element('evaluations/summary_info', array('controller'=>'evaluations', 'event'=>$event));?>
 
+<h3><?php __('Summary')?>
+  (<?php echo $this->Html->link(__('Basic', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['Group']['id']."/Basic")?> |
+    <?php echo $html->link(__('Detail', true), "/evaluations/viewEvaluationResults/".$event['Event']['id']."/".$event['Group']['id']."/Detail")?> )</h3>
+
+<table class="standardtable">
+<?php if (!empty($inCompleteMembers)) {
+    echo $this->Html->tableHeaders(array(__('Have not submitted their evaluations', true)), null, array('class' => 'red'));
+    $incompletedMembersArr = array();
+    $users = array();
+    foreach ($inCompletedMembers as $row) {
+        $user = $row['User'];
+        array_push($incompletedMembersArr, $user['first_name'] . " " . $user['last_name']);
+        $users[] = array($user['first_name'] . " " . $user['last_name'] . ($row['Role'][0]['id'] == 4 ? ' (TA)' : ' (student)'));
+    }
+    echo $this->Html->tableCells($users);
+} ?>
+</table>
+<table class="standardtable">
+<?php
+if (!empty($notInGroup)) {
+    echo $this->Html->tableHeaders(array(__('Left the group, but had submitted or were evaluated', true)), null, array('class' => 'blue'));
+    $users = array();
+    foreach ($notInGroup as $row) {
+        $users[] = $memberList[$row];
+    }
+    echo $this->Html->tableCells($users);
+}
+?>
+</table>
+<br>
 <!-- summary table -->
 <table class="standardtable">
-    <?php echo $html->tableHeaders($this->Evaluation->getSummaryTableHeader($mixeval['Mixeval']['total_marks'], $mixevalQuestion));?>
-    <?php echo $html->tableCells($summaryTableData);?>
+    <?php echo $html->tableHeaders($this->Evaluation->getSummaryTableHeader($mixeval['Mixeval']['total_marks'], $mixeval['Question']));?>
+    <?php echo $html->tableCells(array_values($summaryTableData));?>
     <tr align="center">
         <td colspan="<?php echo (count($numberQuestions) + 2); ?>">
             <?php echo $this->Evaluation->getReviewButton($event, 'Detail')?>
@@ -42,20 +70,20 @@ echo $html->script('ricoaccordion');
 <h3><?php __('Evaluation Results')?></h3>
 
 <div id="accordion">
-    <?php foreach ($scoreRecords as $evaluteeId => $scores):?>
+    <?php foreach ($mixevalDetails as $evaluteeId => $scores):?>
         <div id="panel<?php echo $evaluteeId?>">
             <div id="panel<?php echo $evaluteeId?>Header" class="panelheader">
                 <?php echo __('Evaluatee', true).': '.$memberList[$evaluteeId]?>
             </div>
             <div style="height: 200px;text-align: center;" id="panel1Content" class="panelContent">
             <br><b><?php
-            $deduction = number_format(array_sum($scores) * $penalties[$evaluteeId]/100, 2);
-            $scaled = number_format(array_sum($scores) * (1 - $penalties[$evaluteeId]/100), 2);
+            $deduction = number_format(array_sum($scores) * $penalty[$evaluteeId]/100, 2);
+            $scaled = number_format(array_sum($scores) * (1 - $penalty[$evaluteeId]/100), 2);
             $percent = number_format($scaled/$mixeval['Mixeval']['total_marks'] * 100);
-            $ave_deduction = number_format(array_avg($scores) * $penalties[$evaluteeId]/100, 2);
-            $ave_scaled = number_format(array_avg($scores) * (1 - $penalties[$evaluteeId]/100), 2);
+            $ave_deduction = number_format(array_avg($scores) * $penalty[$evaluteeId]/100, 2);
+            $ave_scaled = number_format(array_avg($scores) * (1 - $penalty[$evaluteeId]/100), 2);
             echo __("Final Total", true).': '.number_format(array_sum($scores), 2);
-            $penalties[$evaluteeId] > 0 ? $penaltyAddOn = ' - '."<font color=\"red\">".$deduction."</font> = ".$scaled :
+            $penalty[$evaluteeId] > 0 ? $penaltyAddOn = ' - '."<font color=\"red\">".$deduction."</font> = ".$scaled :
                 $penaltyAddOn = '';
             echo $penaltyAddOn.' ('.$percent.'%)';
 
@@ -66,7 +94,7 @@ echo $html->script('ricoaccordion');
                 $memberAve = '-';
                 $memberAvePercent = '-';
             }
-            $penalties[$evaluteeId] > 0 ? $ave_penaltyAddOn = ' - '."<font color=\"red\">".$ave_deduction."</font> = ".$ave_scaled :
+            $penalty[$evaluteeId] > 0 ? $ave_penaltyAddOn = ' - '."<font color=\"red\">".$ave_deduction."</font> = ".$ave_scaled :
                 $ave_penaltyAddOn = '';
             $memberAverageAve = number_format(array_sum($scores), 2);
             if ($memberAverageAve == $groupAvg) {
@@ -81,7 +109,7 @@ echo $html->script('ricoaccordion');
             echo $memberAve.$ave_penaltyAddOn;
             echo ' ('.$memberAvePercent .'%)';
 
-            $penalties[$evaluteeId] > 0 ? $penaltyNotice = '<br>'.__('NOTE: ', true).'<font color=\'red\'>'.$penalties[$evaluteeId].
+            $penalty[$evaluteeId] > 0 ? $penaltyNotice = '<br>'.__('NOTE: ', true).'<font color=\'red\'>'.$penalties[$evaluteeId].
                 '%</font>'.__(' Late Penalty', true) : $penaltyNotice = '';
             echo $penaltyNotice;
             ?>
@@ -93,7 +121,7 @@ echo $html->script('ricoaccordion');
                     <td colspan="<?php echo count($numberQuestions)+1?>"><b> <?php __('Section One:')?> </b></td>
                 </tr>
                 <?php echo $this->Html->tableHeaders($this->Evaluation->getResultTableHeader($numberQuestions, __('Evaluator', true))) ?>
-                <?php echo $this->Html->tableCells($this->Evaluation->getMixevalResultTable($evalResult[$evaluteeId], $memberList, $numberQuestions)) ?>
+                <?php echo $this->Html->tableCells($this->Evaluation->getMixevalResultTable($evalResult[$evaluteeId], $memberList, $numberQuestions, $notInGroup)) ?>
             </table>
             <br />
 
@@ -103,7 +131,7 @@ echo $html->script('ricoaccordion');
                     <td colspan="<?php echo count($textQuestions)+1?>"><b><?php __('Section Two')?>:</b></td>
                 </tr>
                 <?php echo $this->Html->tableHeaders($this->Evaluation->getResultTableHeader($textQuestions, __('Evaluator', true))) ?>
-                <?php echo $this->Html->tableCells($this->Evaluation->getMixevalResultTable($evalResult[$evaluteeId], $memberList, $textQuestions)) ?>
+                <?php echo $this->Html->tableCells($this->Evaluation->getMixevalResultTable($evalResult[$evaluteeId], $memberList, $textQuestions, $notInGroup)) ?>
             </table>
 
             <br />
