@@ -1064,6 +1064,32 @@ i {
     width: 15em;
 }
 
+/* surveys/questionssummary */
+
+.surveyquestions .MoveQuestion {
+    display: inline;
+    float: right;
+}
+
+.surveyquestions .Operators {
+    margin: 1em;
+    font-size: 0.9em;
+}
+
+.surveyquestions .Operators a {
+    padding-left: 20px;
+    padding-right: 1em;
+}
+
+.surveyquestions .center {
+    width: 12em;
+}
+
+.surveyquestions .center button {
+    padding: 0.3em 0.5em;
+    margin-right: 0.5em;
+}
+
 /* GROUPS */
 
 /* groups/import */
@@ -1576,22 +1602,11 @@ div#answers input {
 }
 
 /* public */
-.small-font {
-    font-size: 0.7em;
-}
-
-button a:link {
-    text-decoration: none;
-}
 
 div.help-text {
     margin: 0.5em 0 1em 18em;
     font-size: 0.8em;
     color: gray;
-}
-
-form div.input {
-    margin: 0.5em 0 0 0;
 }
 
 .ipeer-icon {
@@ -1600,60 +1615,7 @@ form div.input {
     white-space:nowrap;
 }
 
-.login-footer {
-    font-size: 0.8em;
-    margin: 0.5em 0 1em 0;
-}
-
-.login-footer a {
-    text-decoration: none;
-    color: black;
-}
-
 #cwl-login td {
     background-color: transparent;
 }
 
-td.weight1 {
-    background-color: #00ff00;
-}
-
-td.weight2 {
-    background-color: #30ff30;
-}
-
-td.weight3 {
-    background-color: #60ff60;
-}
-
-td.weight4 {
-    background-color: #90ff90;
-}
-
-td.weight5 {
-    background-color: #c0ffc0;
-}
-
-td.weight6 {
-    background-color: #ffffff;
-}
-
-td.weight7 {
-    background-color: #ffcfcf;
-}
-
-td.weight8 {
-    background-color: #ff9f9f;
-}
-
-td.weight9 {
-    background-color: #ff6f6f;
-}
-
-td.weight10 {
-    background-color: #ff3f3f;
-}
-
-td.weight11 {
-    background-color: #ff0f0f;
-}
