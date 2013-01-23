@@ -46,7 +46,7 @@ class EvaluationHelper extends AppHelper
 
         foreach ($scoreRecords as $evaluteeId => $scores) {
             $tr = array();
-            (in_array($evaluteeId, $notInGroup)) ? $class=array('class'=>'blue') : $class=array();
+            (in_array($evaluteeId, Set::extract($notInGroup,'/User/id'))) ? $class=array('class'=>'blue') : $class=array();
             $tr[] = array($memberList[$evaluteeId], $class);
             foreach ($numberQuestions as $question) {
                 $tr[] = isset($scores[$question['question_num']]) ?
@@ -73,7 +73,7 @@ class EvaluationHelper extends AppHelper
         }
 
         // group average row
-        $tr = array(__('Group Average', true));
+        $tr = array(array(__('Group Average', true), array()));
         foreach ($numberQuestions as $question) {
             if ($totalCounter) {
                 $avg = array_avg(Set::classicExtract($scoreRecords, '{n}.'.($question['question_num'])));
@@ -195,7 +195,7 @@ class EvaluationHelper extends AppHelper
 
         foreach ($memberResult as $row) {
             $memberMixeval = $row['EvaluationMixeval'];
-            (in_array($memberMixeval[$type], $notInGroup)) ? $class=array('class' => 'blue') : $class=array();
+            (in_array($memberMixeval[$type], Set::extract($notInGroup, '/User/id'))) ? $class=array('class' => 'blue') : $class=array();
             $tr = array(isset($memberMixeval[$type]) ? array($memberList[$memberMixeval[$type]],$class) : array($type,$class));
             // change the details indexed by question_number
             $resultDetails = Set::combine($row['EvaluationMixevalDetail'], '{n}.question_number', '{n}');

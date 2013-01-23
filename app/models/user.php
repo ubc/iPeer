@@ -936,6 +936,7 @@ class User extends AppModel
     }
     
     /**
+     * getFullNames
      * Get first and last names of user(s)
      *
      * @param mixed $userId user id
@@ -947,6 +948,23 @@ class User extends AppModel
         return $this->find('list', array(
             'conditions' => array('User.id' => $userId),
             'fields' => array('User.full_name')
+        ));
+    }
+    
+    /**
+     * getUsers
+     *
+     * @param mixed $userIds user ids
+     * @param mixed $models  models
+     * @param mixed $fields  fields
+     *
+     * @return users
+     */
+    function getUsers($userIds, $models=array(), $fields=array()) {
+        return $this->find('all', array(
+            'conditions' => array('User.id' => $userIds),
+            'contain' => $models,
+            'fields' => $fields,
         ));
     }
 

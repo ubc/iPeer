@@ -563,6 +563,10 @@ class UserTestCase extends CakeTestCase {
     function testgetFullNames() {
         // TODO
     }
+    
+    function testgetUsers() {
+        // TODO
+    }
 
     function testGetCurrentLoggedInUser() {
         // can't test, no session without a browser!

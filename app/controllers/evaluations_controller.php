@@ -1052,16 +1052,15 @@ class EvaluationsController extends AppController
             $mixevalDetails = $this->EvaluationMixeval->getResultsByEvaluateesOrEvaluators($groupEventId, Set::extract($sub, '/EvaluationSubmission/submitter_id'));
             $memberList = array_unique(array_merge(Set::extract($mixevalDetails, '/EvaluationMixeval/evaluator'),
                         Set::extract($mixevalDetails, '/EvaluationMixeval/evaluatee')));
-            $fullNames = $this->User->find('list', array(
-                    'conditions' => array('User.id' => $memberList),
-                    'fields' => 'User.full_name'
-            ));
-            $members = $this->User->find('all', array('conditions' => array('User.id' => $memberList)));
+            $memberList = array_unique(array_merge($memberList, $inCompleteMembers));
+            $fullNames = $this->User->getFullNames($memberList);
             $details = $this->Evaluation->getMixevalResultDetail($groupEventId, $members);
             $mixeval = $this->Mixeval->find('first', array(
                 'conditions' => array('Mixeval.id' => $event['Event']['template_id']),
                 'contain' => array('Question' => array('Description'))
             ));
+            $inCompleteMembers = $this->User->getUsers($inCompleteMembers, array('Role'), array('User.full_name'));
+            $notInGroup = $this->User->getUsers($notInGroup, array('Role'), array('User.id', 'User.full_name'));
             $this->set('mixeval', $mixeval);
             $this->set('memberList', $fullNames);
             $this->set('mixevalDetails', $details['scoreRecords']);
