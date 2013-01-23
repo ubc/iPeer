@@ -75,7 +75,7 @@ class SurveysController extends AppController
         $columns = array(
             array("Survey.id",          __("ID", true),         "4em",   "hidden"),
             array("Survey.name",        __("Name", true),        "auto",  "action", "Edit Survey"),
-            array("Survey.question_count", __("Questions", true),        "6em",  "action", "View Questions"),
+            array("Survey.question_count", __("Questions", true),        "6em",  "action", "Edit Questions"),
             array("!Custom.inUse",      __("In Use", true),      "4em",   "number"),
             array("Survey.creator_id",   "", "", "hidden"),
             array("Survey.creator",  __("Created By", true),    "8em", "action", "View Creator"),
@@ -107,7 +107,7 @@ class SurveysController extends AppController
         $actions = array(
             array(__("View Survey", true), "", "", "", "view", "Survey.id"),
             array(__("Edit Survey", true), "", "", "", "edit", "Survey.id"),
-            array(__("View Questions", true), "", "", "", "questionsSummary", "Survey.id"),
+            array(__("Edit Questions", true), "", "", "", "questionsSummary", "Survey.id"),
             array(__("Copy Survey", true), "", "", "", "copy", "Survey.id"),
             array(__("Delete Survey", true), $warning, "", "", "delete", "Survey.id"),
             array(__("View Creator", true), "",    "", "users", "view", "Survey.creator_id"));
@@ -188,24 +188,7 @@ class SurveysController extends AppController
             return;
         }
 
-        // Get all required data from each table for every question
-        $questions = $this->Question->find('all', array(
-            'conditions' => array('Survey.id' => $id),
-            'order' => 'SurveyQuestion.number',
-            'recursive' => 1)
-        );
-
-        // Convert the response array into a flat options array for
-        // the form input helper
-        foreach ($questions as &$q) {
-            if (isset($q['Response'])) {
-                $options = array();
-                foreach ($q['Response'] as $resp) {
-                    $options[$resp['id']] = $resp['response'];
-                }
-                $q['ResponseOptions'] = $options;
-            }
-        }
+        $questions = $this->_formatQuestions($id);
 
         $this->set('breadcrumb', $this->breadcrumb->push('surveys')->
             push(__('View', true))->push($survey['Survey']['name']));
@@ -283,7 +266,7 @@ class SurveysController extends AppController
                 }
             }
             if (!empty($submissions)) {
-                $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $survey['Survey']['name']));
+                $this->Session->setFlash(sprintf(__('Submissions have been made. %s cannot be edited. Please make a copy.', true), $survey['Survey']['name']));
                 $this->redirect('index');
             }
         }
@@ -424,17 +407,21 @@ class SurveysController extends AppController
             }
         }
 
-        // Get all required data from each table for every question
-        $questions = $this->Question->find('all', array(
-            'conditions' => array('Survey.id' => $survey_id),
-            //'contain' => array('Question', 'Response'),
-            'order' => 'SurveyQuestion.number',
-            'recursive' => 1));
+        if ($hasSubmission) {
+            $this->Session->setFlash(sprintf(__('Submissions have been made. %s cannot be edited. Please make a copy.', true), $survey['Survey']['name']));
+            $this->redirect('index');
+            return;
+        }
 
-        $this->set('breadcrumb', $this->breadcrumb->push('surveys')->push(__('View Questions', true)));
+        // Get all required data from each table for every question
+        $questions = $this->_formatQuestions($survey_id);
+
+        $this->set('breadcrumb', 
+            $this->breadcrumb->push('surveys')->
+                push(array('survey' => $survey['Survey']))->
+                push(__('Edit Questions', true)));
         $this->set('survey_id', $survey_id);
         $this->set('questions', $questions);
-        $this->set('is_editable', !$hasSubmission);
         $this->render('questionssummary');
     }
 
@@ -587,4 +574,28 @@ class SurveysController extends AppController
       $this->set('breadcrumb', $this->breadcrumb->push('surveys')->push(__('Edit Question', true)));
       $this->render('addQuestion');
   }
+
+  private function _formatQuestions($surveyId) 
+  {
+        // Get all required data from each table for every question
+        $questions = $this->Question->find('all', array(
+            'conditions' => array('Survey.id' => $surveyId),
+            'order' => 'SurveyQuestion.number',
+            'recursive' => 1)
+        );
+
+        // Convert the response array into a flat options array for
+        // the form input helper
+        foreach ($questions as &$q) {
+            if (isset($q['Response'])) {
+                $options = array();
+                foreach ($q['Response'] as $resp) {
+                    $options[$resp['id']] = $resp['response'];
+                }
+                $q['ResponseOptions'] = $options;
+            }
+        }
+
+        return $questions;
+    }
 }

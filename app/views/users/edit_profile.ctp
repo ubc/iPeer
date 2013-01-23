@@ -1,3 +1,4 @@
+<h2>User Information</h2>
 <?php 
 echo $this->Form->create('User', array('id' => 'EditProfile', 'url' => array('action' => $this->action)));
 echo $this->Form->input('username', array('id' => 'username', 'size'=>'50', 'readonly' => true, 'label' => __('Username', true)));
@@ -11,7 +12,7 @@ echo $this->Form->input('student_no', array('size'=>'50', 'label' => __('Student
 // title
 echo $this->Form->input('title', array('size'=>'50', 'label' => __('Title', true)));
 } ?>
-<hr align=left width=100%><h3><?php __('Change Password')?>:</h3></td>
+<h2><?php __('Change Password')?></h2>
 <?php
 echo $this->Form->input('old_password', array('type'=>'password', 'size'=>'50', 'label'=>__('Old Password', true), 'disabled'=>$viewPage));
 echo $this->Form->input('temp_password', array('type'=>'password', 'size'=>'50', 'label'=>__('New Password', true), 'disabled'=>$viewPage));
@@ -20,8 +21,8 @@ echo $this->Form->input('confirm_password', array('type'=>'password', 'size'=>'5
 
 <div class="oauth">
 <?php if (User::hasPermission('controllers/Oauthclients')): ?>
+<h2>OAuths</h2>
 <!-- OAuth Client Credentials -->
-<hr align=left width=95%>
 <h3><?php __('OAuth Client Credentials')?>:</h3>
 <?php if (count($clients) == 0 || User::hasPermission('controllers/oauthclients')) { ?>
     <?php echo $html->link(__('Add Client Credential', true), '/oauthclients/add', array('id' => 'add', 'class' => 'add-button')); ?>
@@ -39,7 +40,6 @@ echo $this->Form->input('confirm_password', array('type'=>'password', 'size'=>'5
 <?php endif; ?>
 <?php if (User::hasPermission('controllers/Oauthtokens')): ?>
 <!-- OAuth Token Credentials -->
-<hr align=left width=95%>
 <h3><?php __('OAuth Token Credentials')?>:</h3>
 <?php echo $html->link(__('Add Token Credential', true), '/oauthtokens/add', array('id' => 'add', 'class' => 'add-button')); ?>
 <?php if (count($tokens) > 0) { ?>

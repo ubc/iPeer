@@ -979,17 +979,8 @@ class EvaluationsController extends AppController
         {
         case 1:  //View Simple Evaluation Result
             $formattedResult = $this->Evaluation->formatSimpleEvaluationResult($event);
-            $this->set('scoreRecords', $formattedResult['scoreRecords']);
-            $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
-            $this->set('evalResult', $formattedResult['evalResult']);
-            $this->set('groupMembers', $formattedResult['groupMembers']);
-            $this->set('groupMembersNoTutors', $formattedResult['groupMembersNoTutors']);
-            $this->set('allMembersCompleted', $formattedResult['allMembersCompleted']);
-            $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
-            $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
-            // Set penalty
-            $penalties = $this->SimpleEvaluation->formatPenaltyArray($formattedResult['groupMembersNoTutors'], $eventId, $groupId);
-            $this->set('penalties', $penalties);
+            $this->set('event', $event);
+            $this->set('results', $formattedResult);
             $this->render('view_simple_evaluation_results');
             break;
 
