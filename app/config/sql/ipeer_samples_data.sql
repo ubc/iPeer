@@ -1407,8 +1407,6 @@ CREATE TABLE IF NOT EXISTS `survey_inputs` (
   `event_id` int(11) NOT NULL DEFAULT '0',
   `user_id` int(11) NOT NULL DEFAULT '0',
   `question_id` int(11) NOT NULL DEFAULT '0',
-  `sub_id` int(11) DEFAULT NULL,
-  `chkbx_id` int(11) DEFAULT NULL,
   `response_text` text,
   `response_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -1418,16 +1416,16 @@ CREATE TABLE IF NOT EXISTS `survey_inputs` (
 -- Dumping data for table `survey_inputs`
 --
 
-INSERT INTO survey_inputs (id, event_id, user_id, question_id, sub_id, chkbx_id, response_text, response_id) VALUES
-(1, 4, 7, 1, NULL, NULL, '4+', 1),
-(2, 4, 7, 2, NULL, NULL, 'yes', 5),
-(3, 4, 31, 1, NULL, NULL, '3-4', 2),
-(4, 4, 31, 2, NULL, NULL, 'no', 6),
-(5, 5, 17, 3, NULL, NULL, 'B', 8),
-(6, 5, 17, 4, NULL, 0, 'choose me', 11),
-(7, 5, 17, 4, NULL, 1, 'no, me', 12),
-(8, 5, 17, 5, NULL, NULL, 'single line rah rah', 0),
-(9, 5, 17, 6, NULL, NULL, 'long answer what what', 0);
+INSERT INTO survey_inputs (id, event_id, user_id, question_id, response_text, response_id) VALUES
+(1, 4, 7, 1, '4+', 1),
+(2, 4, 7, 2, 'yes', 5),
+(3, 4, 31, 1, '3-4', 2),
+(4, 4, 31, 2, 'no', 6),
+(5, 5, 17, 3, 'B', 8),
+(6, 5, 17, 4, 'choose me', 11),
+(7, 5, 17, 4, 'no, me', 12),
+(8, 5, 17, 5, 'single line rah rah', 0),
+(9, 5, 17, 6, 'long answer what what', 0);
 
 -- --------------------------------------------------------
 

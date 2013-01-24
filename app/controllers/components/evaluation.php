@@ -1475,118 +1475,112 @@ class EvaluationComponent extends Object
         $this->GroupEvent->save($groupEvent);
     }
 
+
     /**
-     * saveSurveyEvaluation
-     * Survey Evaluation functions
+     * formatMixevalEvaluationResult
      *
-     * @param bool $params
+     * @param bool   $event         event
+     * @param string $displayFormat display format
+     * @param int    $studentView   student view
      *
      * @access public
      * @return void
      */
-    function saveSurveyEvaluation($params=null)
+    function formatMixevalEvaluationResult($event, $displayFormat='', $studentView=0)
     {
-        $this->Response = ClassRegistry::init('Response');
-        $this->Question = ClassRegistry::init('Question');
-        $this->SurveyQuestion = ClassRegistry::init('SurveyQuestion');
-        $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
+        $this->Mixeval = ClassRegistry::init('Mixeval');
+        $this->User = ClassRegistry::init('User');
+        $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
+        $this->MixevalsQuestion = ClassRegistry::init('MixevalsQuestion');
+        $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
+        $this->Event = ClassRegistry::init('Event');
+        $this->Penalty = ClassRegistry::init('Penalty');
 
-        $userId = $params['data']['Evaluation']['surveyee_id'];
-        $eventId = $params['form']['event_id'];
+        $groupMembers = array();
+        $groupMembersNoTutors = array();
+        $result = array();
 
-        //get existing record if there is one
-        $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId, $userId);
-        if (empty($evaluationSubmission)) {
-            //if there is no existing record, fill in all fields
-            $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $userId;
-            $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
-            $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
-            $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
-        } else {
-            //if existing record, just update the time submitted
-            $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
-        }
-        $surveyInput = array();
-        $surveyInput['SurveyInput']['user_id'] = $userId;
-        $surveyInput['SurveyInput']['event_id'] = $eventId;
-        $successfullySaved = true;
-        $surveyQuestion = new SurveyQuestion();
-        $questions = $surveyQuestion->getQuestionsByEventId($eventId);
+        $eventId = $event['Event']['id'];
 
-        foreach ($questions as $i => $question) {
-            $this->SurveyInput = new SurveyInput;
-            $questionId = $question['SurveyQuestion']['question_id'];
-            $questionType = $this->Question->field('type',
-                array('id' => $questionId));
-            // First, remove all prior responses, this deals with the edge
-            // case where the user decides to change a previously answered
-            // question to blank
-            $this->SurveyInput->deleteAll(
+        $currentUser = $this->User->getCurrentLoggedInUser();
+
+        //Get Members for this evaluation
+        if ($studentView) {
+
+            $user = $this->User->find('first', array(
+                'conditions' => array('id' => User::get('id')),
+                'contain' => array('Role'),
+            ));
+            $mixevalResultDetail = $this->getMixevalResultDetail($event['GroupEvent']['id'], array($user));
+            $groupMembers = $this->GroupsMembers->getEventGroupMembers(
+                $event['Group']['id'], $event['Event']['self_eval'], $currentUser['id']);
+            $groupMembersNoTutors = $this->GroupsMembers->getEventGroupMembersNoTutors(
+                $event['Group']['id'], $event['Event']['self_eval'], $currentUser['id']);
+            $membersAry = array();
+            $membersAryNoTutors = array();
+            foreach ($groupMembers as $member) {
+                $membersAry[$member['User']['id']] = $member;
+            }
+            foreach ($groupMembersNoTutors as $member) {
+                $membersAryNoTutors[$member['User']['id']] = $member;
+            }
+            $result['groupMembers'] = $membersAry;
+            $result['groupMembersNoTutors'] = $membersAryNoTutors;
+
+            $reviewEvaluations = $this->getStudentViewMixevalResultDetailReview(
+                $event, $this->Auth->user('id'));
+            $result['reviewEvaluations'] = $reviewEvaluations;
+            $event_info = $this->Event->find(
+                'first',
                 array(
-                    'user_id' => $userId,
-                    'question_id' => $questionId
+                    'conditions' => array('Event.id' => $eventId),
                 )
             );
-            //Set answer
-            $answer = $params['form']['answer_'.$questionId];
-            if ('C' == $questionType) {
-                // We are saving a "Choose any of", which means multiple answers
-                // Save the new responses
-                $surveyInputs = array();
-                foreach ($answer as $respId) {
-                    $tmp = array();
-                    // First get data on the choice the user picked
-                    $choice = $this->Response->find('first',
-                        array('conditions' => array('Response.id' => $respId)));
-                    // Tailor a data entry for SurveyInput's saveAll function
-                    $tmp['response_text'] = $choice['Response']['response'];
-                    $tmp['response_id'] = $respId;
-                    $tmp['question_id'] = $questionId;
-                    $tmp['user_id'] = $userId;
-                    $tmp['event_id'] = $eventId;
-                    $surveyInputs[]['SurveyInput'] = $tmp;
+
+            // storing the timestamp of the due date/end date of the event
+            $event_due = strtotime($event_info['Event']['due_date']);
+            $event_end = strtotime($event_info['Event']['release_date_end']);
+            // assign penalty to user if they submitted late or never submitted by release_date_end
+            $scorePenalty = null;
+            $event_sub = $this->Event->find(
+                'first',
+                array(
+                    'conditions' => array('Event.id' => $eventId),
+                    'contain' => array('EvaluationSubmission' => array(
+                        'conditions' => array('EvaluationSubmission.submitter_id' => $this->Auth->user('id'))
+                )))
+            );
+            // no submission - if now is after release date end then - gets final deduction
+            if (empty($event_sub['EvaluationSubmission'])) {
+                if (time() > $event_end) {
+                    $scorePenalty = $this->Penalty->getPenaltyFinal($eventId);
                 }
-                if (!$this->SurveyInput->saveAll($surveyInputs)) {
-                    $successfullySaved = false;
-                }
-            }
-            else if ('M' == $questionType) {
-                // We are saving a multiple choice question, only 1 answer
-                $choice = $this->Response->find('first',
-                    array('conditions' => array('Response.id' => $answer)));
-                $tmp = array();
-                $tmp['response_text'] = $choice['Response']['response'];
-                $tmp['response_id'] = $answer;
-                $tmp['question_id'] = $questionId;
-                $tmp['user_id'] = $userId;
-                $tmp['event_id'] = $eventId;
-                $surveyInputs = array('SurveyInput' => $tmp);
-                if (!$this->SurveyInput->save($surveyInputs)) {
-                    $successfullySaved = false;
-                }
+            // there is submission - may be on time or late
             } else {
-                // Saving a short or long answer question.
-                $tmp = array();
-                $tmp['response_text'] = $answer;
-                $tmp['question_id'] = $questionId;
-                $tmp['user_id'] = $userId;
-                $tmp['event_id'] = $eventId;
-                $surveyInputs = array('SurveyInput' => $tmp);
-                if (!$this->SurveyInput->save($surveyInputs)) {
-                    $successfullySaved = false;
+                $late_diff = strtotime($event_sub['EvaluationSubmission'][0]['date_submitted']) - $event_due;
+                // late
+                if (0 < $late_diff) {
+                    $days_late = $late_diff/(24*60*60);
+                    $scorePenalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId, $days_late);
                 }
             }
-        }
-
-        //Indicate that evaluation has been submitted
-        if ($successfullySaved) {
-            $this->EvaluationSubmission->save($evaluationSubmission);
-            return true;
+            $result['penalty'] = $scorePenalty['Penalty']['percent_penalty'];
         } else {
-            return false;
+            $groupMembers = $this->User->getMembersByGroupId(
+                $event['Group']['id'],
+                ($event['Event']['self_eval'] ? null : $this->Auth->user('id'))
+            );
+            $mixevalResultDetail = $this->getMixevalResultDetail($event['GroupEvent']['id'], $groupMembers);
         }
-    }
 
+        //Get Detail information on Mixeval score
+        $mixevalQuestion = $this->MixevalsQuestion->getQuestion($mixeval['Mixeval']['id']);
+        $gradeReleaseStatus = $this->EvaluationMixeval->getTeamReleaseStatus($event['GroupEvent']['id']);
+
+        $result['gradeReleaseStatus'] = $gradeReleaseStatus;
+
+        return $result;
+    }
 
     /**
      * formatStudentViewOfSurveyEvaluationResult

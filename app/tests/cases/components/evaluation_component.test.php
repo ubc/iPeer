@@ -415,23 +415,11 @@ class EvaluationTestCase extends CakeTestCase
 
     }
 
-    function testSaveSurveyEvaluation()
+    function testFormatMixevalEvaluationResult()
     {
 
-        $params = array();
-        $params['data']['Evaluation']['surveyee_id'] = 1;
-        $params['form']['event_id'] = 1;
-        $params['form']['survey_id'] = 17;
-        $params['form']['question_count'] = 1;
-        $params['form']['question_id1'] = 1;
-        $params['form']['answer_1'] = 'answer 1';
-
-        $this->EvaluationComponentTest->saveSurveyEvaluation($params);
-
-
-
-        $survey =  $this->SurveyInput->find('all', array('conditions' => array('survey_id' => 17)));
-        //  var_dump($survey);
+        // $result = $this->EvaluationComponentTest->formatMixevalEvaluationResult(1, 1, 1);
+        // var_dump($result);
 
     }
 

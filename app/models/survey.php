@@ -133,4 +133,38 @@ class Survey extends EvaluationBase
             'contain' => array('Question' => array('order' => 'SurveyQuestion.number ASC', 'Response'))
         ));
     }
+
+    /**
+     * Get the questions and responses for a given survey. This method will
+     * format the responses into a format that's easier for cakephp's form
+     * helper to use.
+     *
+     * @param int $surveyId - The id of the survey to get questions for
+     *
+     * @return An array of the questions, responses, and response options
+     */
+    public function getQuestions($surveyId)
+    {
+        // Get all required data from each table for every question
+        $questions = $this->Question->find('all', 
+            array(
+                'conditions' => array('Survey.id' => $surveyId),
+                'order' => 'SurveyQuestion.number'
+            )
+        );
+
+        // Convert the response array into a flat options array for
+        // the form input helper
+        foreach ($questions as &$q) {
+            if (isset($q['Response'])) {
+                $options = array();
+                foreach ($q['Response'] as $resp) {
+                    $options[$resp['id']] = $resp['response'];
+                }
+                $q['ResponseOptions'] = $options;
+            }
+        }
+
+        return $questions;
+    }
 }

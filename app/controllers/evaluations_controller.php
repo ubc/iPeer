@@ -13,13 +13,16 @@ class EvaluationsController extends AppController
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Evaluation');
     public $Sanitize;
 
-    public $uses = array('SurveyQuestion', 'GroupEvent', 'EvaluationRubric', 'EvaluationRubricDetail',
+    public $uses = array('SurveyQuestion', 'GroupEvent', 'EvaluationRubric', 
+        'EvaluationRubricDetail',
         'EvaluationSubmission', 'Event', 'EvaluationSimple',
-        'SimpleEvaluation', 'Rubric', 'Group', 'User',
+        'SimpleEvaluation', 'Rubric', 'Group', 'User', 'UserEnrol',
         'GroupsMembers', 'RubricsLom', 'RubricsCriteria',
         'RubricsCriteriaComment', 'Personalize', 'Penalty',
-        'Question', 'Response', 'Survey', 'SurveyInput', 'Course', 'MixevalsQuestion',
-        'EvaluationMixeval', 'EvaluationMixevalDetail', 'Mixeval', 'MixevalsQuestionDesc');
+        'Question', 'Response', 'Survey', 'SurveyInput', 'Course', 
+        'MixevalsQuestion',
+        'EvaluationMixeval', 'EvaluationMixevalDetail', 'Mixeval', 
+        'MixevalsQuestionDesc');
     public $components = array('ExportBaseNew', 'Auth', 'AjaxList', 'Output',
         'userPersonalize', 'framework',
         'Evaluation', 'Export', 'ExportCsv', 'ExportExcel');
@@ -480,100 +483,115 @@ class EvaluationsController extends AppController
     }
 
     /**
-     * makeSurveyEvaluation
+     * This is where students go to take surveys. Loads and passes data to
+     * the view for displaying the survey questions and then process the
+     * form submit when the student is done.
      *
-     * @param mixed $event event
+     * NOTE: If save fails, the student has to re-enter all data, there is
+     * no persistence available unlike other forms. This is due to how we
+     * redirect to evaluation/makeEvaluation on failure.
+     *
+     * @param mixed $event event - The survey event that we're processing.
      *
      * @access public
      * @return void
      */
     function _makeSurveyEvaluation ($event)
     {
-        $this->autoRender = false;
+        //TODO Move validation to parent, since it's shared among all
+        $surveyId = $event['Event']['template_id'];
         $eventId = $event['Event']['id'];
-
-        if (empty($this->params['data'])) {
-            $courseId = $event['Event']['course_id'];
-            $course = $this->Course->find('first', array(
-                'conditions' => array(
-                    'Course.id' => $courseId,
-                    'Enrol.id' => $this->Auth->user('id')
-                )
-            ));
-
-            // user is not an instructor of course or event is not a survey
-            if (null == $course) {
-                $this->Session->setFlash(__('Error: Invalid Id', true));
+        $userId = $this->Auth->user('id');
+        $courseId = $event['Event']['course_id'];
+        // Make sure user is a student in this course
+        $ret = $this->UserEnrol->field('id', 
+            array('course_id' => $courseId, 'user_id' => $userId ));
+        if (!$ret) {
+                $this->Session->setFlash(_('Error: Invalid Id'));
                 $this->redirect('/home/index');
                 return;
+        }
+        // Students can't submit outside of release date range
+        $now = time();
+        if ($now < strtotime($event['Event']['release_date_begin']) ||
+            $now > strtotime($event['Event']['release_date_end'])) {
+            $this->Session->setFlash(_('Error: Survey is unavailable'));
+            $this->redirect('/home/index');
+            return;
+        }
+        // TODO Can't submit surveys twice due to no data persistence in forms
+        // i.e.: We don't load previously submitted data into the survey form
+        $sub = $this->EvaluationSubmission->
+            getEvalSubmissionByEventIdSubmitter($eventId, $userId);
+        if (!empty($sub)) {
+            $this->Session->setFlash(
+                _('Error: Survey has already been submitted'));
+            $this->redirect('/home/index');
+            return;
+        }
+
+        // Process form submit
+        if (!empty($this->data)) {
+            // We need an evaluation submission entry
+            $sub['EvaluationSubmission']['submitter_id'] = $userId;
+            $sub['EvaluationSubmission']['submitted'] = 1;
+            $sub['EvaluationSubmission']['date_submitted'] = 
+                date('Y-m-d H:i:s');
+            $sub['EvaluationSubmission']['event_id'] = $eventId;
+            // Cakephp doesn't know how to deal with the checkboxes response for
+            // "Choose any of..." questions, so have to manually correct data
+            // to create a separate SurveyInput entry for each selected chkbox
+            $chkboxResps = array();
+            foreach ($this->data['SurveyInput'] as $key => &$input) {
+                if (!isset($input['response_id'])) continue;
+                if (is_array($input['response_id'])) {
+                    // the "Choose any of..." questions that has chkboxes
+                    foreach ($input['response_id'] as $respId) {
+                        $tmp = array();
+                        $tmp['event_id'] = $input['event_id'];
+                        $tmp['user_id'] = $input['user_id'];
+                        $tmp['question_id'] = $input['question_id'];
+                        $tmp['response_id'] = $respId;
+                        $tmp['response_text'] = $this->Response->field(
+                            'response', array('id' => $respId));
+                        $chkboxResps[] = $tmp;
+                    }
+                    unset($this->data['SurveyInput'][$key]);
+                }
+                else {
+                    // "Multiple choice" question, just fill in response text
+                    $input['response_text'] = $this->Response->field(
+                        'response', array('id' => $input['response_id']));
+                }
             }
-
-            // students can submit again
-            $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId, User::get('id'));
-//            if (!empty($submission)) {
-//                $this->Session->setFlash(__('Error: Survey has already been submitted', true));
-//                $this->redirect('/home/index');
-//                return;
-//            }
-
-            // students can't submit outside of release date range
-            $event = $this->Event->getEventById($eventId);
-            $now = time();
-
-            if ($now < strtotime($event['Event']['release_date_begin']) ||
-                $now > strtotime($event['Event']['release_date_end'])) {
-                $this->Session->setFlash(__('Error: Survey is unavailable', true));
-                $this->redirect('/home/index');
-                return;
-            }
-
-            //Setup the courseId to session
-            $courseId = $event['Event']['course_id'];
-            $survey_id = $event['Event']['template_id'];
-
-            $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S').__(' > Survey', true));
-            $this->set('survey_id', $survey_id);
-
-            // Get all required data from each table for every question
-            $survey = $this->Survey->getSurveyWithQuestionsById($survey_id);
-
-            $this->set('event', $event);
-            $this->set('courseId', $courseId);
-            $this->set('eventId', $event['Event']['id']);
-            $this->set('survey', $survey);
-            $this->render('survey_eval_form');
-
-        } else {
-            $courseId = $this->params['form']['course_id'];
-            $eventId = $this->params['form']['event_id'];
-            if (!$this->validSurveyEvalComplete($this->params)) {
-                $this->set('errmsg', 'validSurveyEvalCompleten failure.');
-                //$this->redirect('/evaluations/makeEvaluation/'.$eventId);
-            }
-            if ($this->Evaluation->saveSurveyEvaluation($this->params)) {
-                $this->Session->setFlash(__('Your survey was submitted successfully', true), 'good');
+            $this->data['SurveyInput'] = array_merge($this->data['SurveyInput'],
+                $chkboxResps);
+            // Try to save SurveyInput first and then the EvaluationSubmission
+            // since SurveyInput fails safe (we'll just have some extra entries)
+            if ($this->SurveyInput->saveAll($this->data['SurveyInput']) &&
+                $this->EvaluationSubmission->save($sub)
+            ) {
+                $this->Session->setFlash(
+                    _('Your survey was submitted successfully!'), 'good');
                 $this->redirect('/home/index/');
                 return;
             } else {
-                $this->Session->setFlash(__('Your survey was not submitted successfully', true));
+                $this->Session->setFlash(
+                    _('Survey save failed, please try again.'));
                 $this->redirect('evaluations/makeEvaluation/'.$eventId);
                 return;
             }
         }
-    }
 
+        // Display questions
+        $this->set('title_for_layout', 
+            $this->Course->getCourseName($courseId, 'S').__(' > Survey', true));
 
-    /**
-     * validSurveyEvalComplete
-     *
-     * @param bool $param
-     *
-     * @access public
-     * @return void
-     */
-    function validSurveyEvalComplete($param = null)
-    {
-        return true;
+        // Get all required data from each table for every question
+        $this->set('questions', $this->Survey->getQuestions($surveyId));
+        $this->set('userId', $userId);
+        $this->set('eventId', $event['Event']['id']);
+        $this->render('survey_eval_form');
     }
 
     /**
@@ -1181,7 +1199,8 @@ class EvaluationsController extends AppController
             $this->set('survey_id', $formattedResult['survey_id']);
             $this->set('answers', $answers);
             $this->set('questions', $formattedResult['questions']);
-            $this->render('student_view_survey_evaluation_results');
+            $this->set('name', $this->Auth->user('full_name'));
+            $this->render('view_survey_results');
             break;
 
         case 4: //View Mix Evaluation Result

@@ -188,7 +188,7 @@ class SurveysController extends AppController
             return;
         }
 
-        $questions = $this->_formatQuestions($id);
+        $questions = $this->Survey->getQuestions($id);
 
         $this->set('breadcrumb', $this->breadcrumb->push('surveys')->
             push(__('View', true))->push($survey['Survey']['name']));
@@ -414,7 +414,7 @@ class SurveysController extends AppController
         }
 
         // Get all required data from each table for every question
-        $questions = $this->_formatQuestions($survey_id);
+        $questions = $this->Survey->getQuestions($survey_id);
 
         $this->set('breadcrumb', 
             $this->breadcrumb->push('surveys')->
@@ -575,35 +575,4 @@ class SurveysController extends AppController
       $this->render('addQuestion');
   }
 
-  /**
-   * Retrives the questions and responses for a given survey.
-   * This Helper function rewrites the question responses into a format
-   * that's more friendly to cakephp's form helper.
-   *
-   * @param int surveyId The id of the survey you want the questions from.
-   * @return The questions and responses of the survey.
-   * */
-  private function _formatQuestions($surveyId) 
-  {
-        // Get all required data from each table for every question
-        $questions = $this->Question->find('all', array(
-            'conditions' => array('Survey.id' => $surveyId),
-            'order' => 'SurveyQuestion.number',
-            'recursive' => 1)
-        );
-
-        // Convert the response array into a flat options array for
-        // the form input helper
-        foreach ($questions as &$q) {
-            if (isset($q['Response'])) {
-                $options = array();
-                foreach ($q['Response'] as $resp) {
-                    $options[$resp['id']] = $resp['response'];
-                }
-                $q['ResponseOptions'] = $options;
-            }
-        }
-
-        return $questions;
-    }
 }

@@ -46,8 +46,6 @@ class SurveyInputTestCase extends CakeTestCase
                     'event_id' => 4,
                     'user_id' => 7,
                     'question_id' => 1,
-                    'sub_id' => null,
-                    'chkbx_id' => null,
                     'response_text' => '4+',
                     'response_id' => 1)
             ),
@@ -57,8 +55,6 @@ class SurveyInputTestCase extends CakeTestCase
                     'event_id' => 4,
                     'user_id' => 7,
                     'question_id' => 2,
-                    'sub_id' => null,
-                    'chkbx_id' => null,
                     'response_text' => 'yes',
                     'response_id' => 5)
             )
@@ -86,8 +82,6 @@ class SurveyInputTestCase extends CakeTestCase
                     'event_id' => 4,
                     'user_id' => 7,
                     'question_id' => 1,
-                    'sub_id' => null,
-                    'chkbx_id' => null,
                     'response_text' => '4+',
                     'response_id' => 1)
                 )
@@ -102,8 +96,6 @@ class SurveyInputTestCase extends CakeTestCase
                     'event_id' => 4,
                     'user_id' => 7,
                     'question_id' => 2,
-                    'sub_id' => null,
-                    'chkbx_id' => null,
                     'response_text' => 'yes',
                     'response_id' => 5)
                 )
