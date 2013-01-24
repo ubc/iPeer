@@ -1051,7 +1051,7 @@ class EvaluationsController extends AppController
             $notInGroup = array_diff(Set::extract($sub, '/EvaluationSubmission/submitter_id'), Set::extract($groupMembers, '/GroupsMembers/user_id'));
             $mixevalDetails = $this->EvaluationMixeval->getResultsByEvaluateesOrEvaluators($groupEventId, Set::extract($sub, '/EvaluationSubmission/submitter_id'));
             $memberList = array_unique(array_merge(Set::extract($mixevalDetails, '/EvaluationMixeval/evaluator'),
-                        Set::extract($mixevalDetails, '/EvaluationMixeval/evaluatee')));
+                Set::extract($mixevalDetails, '/EvaluationMixeval/evaluatee')));
             $memberList = array_unique(array_merge($memberList, $inCompleteMembers));
             $fullNames = $this->User->getFullNames($memberList);
             $members = $this->User->find('all', array('conditions' => array('User.id' => $memberList)));

@@ -861,7 +861,7 @@ class User extends AppModel
     /**
      * getEmails
      *
-     * @param $id id
+     * @param mixed $id id
      * 
      * @access public
      * @return void

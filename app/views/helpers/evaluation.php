@@ -177,6 +177,7 @@ class EvaluationHelper extends AppHelper
      * @param mixed $memberResult member result
      * @param mixed $memberList   member list
      * @param mixed $questions    questions
+     * @param mixed $notInGroup   list of students no longer in the group
      * @param mixed $type         type of the table, possible values 'evaluator', 'evaluatee', any other string
      *                            when it is another string, the string will be shown on the first column. Otherwise,
      *                            the evaluator/evaluatee name will show on the first column

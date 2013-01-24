@@ -95,6 +95,7 @@ class EvaluationMixeval extends EvaluationResponseBase
      *
      * @param mixed $grpEventId group event id
      * @param mixed $members    members
+     *
      * @access public
      * @return void
      */

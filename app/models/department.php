@@ -43,7 +43,7 @@ class Department extends AppModel {
     /**
      * getIdsByUserId
      * 
-     * @param $userId user id
+     * @param mixed $userId user id
      *
      * @access public
      * @return void

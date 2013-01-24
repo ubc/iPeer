@@ -57,7 +57,7 @@ class SimpleEvaluation extends EvaluationBase
     /**
      * getEvaluation
      *
-     * @param $id id
+     * @param mixed $id id
      * 
      * @access public
      * @return void

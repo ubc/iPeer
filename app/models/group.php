@@ -367,7 +367,7 @@ class Group extends AppModel
     /**
      * getGroupWithMembersById
      *
-     * @param $id id
+     * @param mixed $id id
      * 
      * @access public
      * @return void
@@ -383,8 +383,8 @@ class Group extends AppModel
     /**
      * getGroupsByEventId
      *
-     * @param $eventId event id
-     * @param $contain contain
+     * @param mixed $eventId event id
+     * @param mixed $contain contain
      * 
      * @access public
      * @return void
@@ -400,8 +400,8 @@ class Group extends AppModel
     /**
      * getGroupByGroupIdEventId
      *
-     * @param $groupId group id
-     * @param $eventId event id
+     * @param mixed $groupId group id
+     * @param mixed $eventId event id
      * 
      * @access public
      * @return void
@@ -414,8 +414,8 @@ class Group extends AppModel
     /**
      * getGroupWithMemberRoleByGroupIdEventId
      *
-     * @param $groupId group id
-     * @param $eventId event id
+     * @param mixed $groupId group id
+     * @param mixed $eventId event id
      * 
      * @access public
      * @return void

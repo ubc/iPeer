@@ -480,7 +480,7 @@ class MixevalsController extends AppController
             $this->redirect('index');
         }
 
-        if (!User::hasPermission('functions/superadmin')) {
+        if ($eval['Mixeval']['availability'] != 'public' && !User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
                 $instructorIds = array($this->Auth->user('id'));

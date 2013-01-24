@@ -21,9 +21,9 @@ class ExportBaseNewComponent extends Object
     /**
      * generateHeader2
      *
-     * @param mixed $params  params
-     * @param mixed $event   event
-     * @param mixed $type    type
+     * @param mixed $params params
+     * @param mixed $event  event
+     * @param mixed $type   type
      *
      * @access public
      * @return void
@@ -130,11 +130,11 @@ class ExportBaseNewComponent extends Object
     /**
      * buildMixedEvalScoreTableByEvaluatee
      *
-     * @param mixed $params      params
-     * @param mixed $group       group
-     * @param mixed $evaluatee   evaluatee
-     * @param mixed $event       event
-     * @param mixed $responses   responses
+     * @param mixed $params    params
+     * @param mixed $group     group
+     * @param mixed $evaluatee evaluatee
+     * @param mixed $event     event
+     * @param mixed $responses responses
      *
      * @access public
      * @return void
