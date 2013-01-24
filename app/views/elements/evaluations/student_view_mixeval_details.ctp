@@ -1,15 +1,13 @@
 <?php
 $numberQuestions = array();
 $textQuestions = array();
-foreach ($mixevalQuestion as $question) {
-    if ($question['MixevalsQuestion']['question_type'] != 'S') {
+foreach ($mixeval['Question'] as $question) {
+    if ($question['question_type'] != 'S') {
         $textQuestions[] = $question;
     } else {
         $numberQuestions[] = $question;
     }
 }
-
-$memberList = Set::combine($event, 'Member.{n}.id', 'Member.{n}.full_name');
 
 $showGrades = array_sum(Set::extract($evalResult, '/EvaluationMixeval/grade_release')) ||
     $tableType == 'evaluator' || $tableType == 'evaluatee';
@@ -22,7 +20,7 @@ $showComments = array_sum(Set::extract($evalResult, '/EvaluationMixeval/comment_
         <td colspan="<?php echo count($numberQuestions)+1?>"><b> <?php __('Section One:')?> </b></td>
     </tr>
     <?php echo $this->Html->tableHeaders($this->Evaluation->getResultTableHeader($numberQuestions, __('Person Being Evaluated', true))) ?>
-    <?php echo $showGrades ? $this->Html->tableCells($this->Evaluation->getMixevalResultTable($evalResult, $memberList, $numberQuestions, $tableType)) : '' ?>
+    <?php echo $showGrades ? $this->Html->tableCells($this->Evaluation->getMixevalResultTable($evalResult, $memberList, $numberQuestions, array(), $tableType)) : '' ?>
 </table>
 <?php if (!$showGrades): ?>
 <div style="text-align: center;color: red;">Grades Not Released Yet.</div>
@@ -34,7 +32,7 @@ $showComments = array_sum(Set::extract($evalResult, '/EvaluationMixeval/comment_
         <td colspan="<?php echo count($textQuestions)+1?>"><b><?php __('Section Two')?>:</b></td>
     </tr>
     <?php echo $this->Html->tableHeaders($this->Evaluation->getResultTableHeader($textQuestions, __('Person Being Evaluated', true))) ?>
-    <?php echo $showComments ? $this->Html->tableCells($this->Evaluation->getMixevalResultTable($evalResult, $memberList, $textQuestions, $tableType)) : '' ?>
+    <?php echo $showComments ? $this->Html->tableCells($this->Evaluation->getMixevalResultTable($evalResult, $memberList, $textQuestions, array(), $tableType)) : '' ?>
 </table>
 <?php if (!$showComments): ?>
 <div style="text-align: center;color: red;">Comments Not Released Yet.</div>

@@ -737,4 +737,22 @@ class Event extends AppModel
 
         return $event;
     }
+    
+    /**
+     * getEventSubmission
+     *
+     * @param $eventId event id
+     * @param $userId  user id
+     *
+     * @access public
+     * @return void
+     */
+    public function getEventSubmission($eventId, $userId)
+    {
+        return $this->find('first', array(
+            'conditions' => array('Event.id' => $eventId),
+            'contain' => array('EvaluationSubmission' => array(
+                'conditions' => array('EvaluationSubmission.submitter_id' => $userId)
+        ))));
+    }
 }

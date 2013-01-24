@@ -126,4 +126,38 @@ class Penalty extends AppModel
             return $this->getPenaltyFinal($eventId);
         }
     }
+    
+    /**
+     * getPenaltyPercent
+     *
+     * @param mixed $event_sub event submission
+     *
+     * @access public
+     * @return void
+     */
+    function getPenaltyPercent($event_sub)
+    {
+        // storing the timestamp of the due date/end date of the event
+        $event_due = strtotime($event_sub['Event']['due_date']);
+        $event_end = strtotime($event_sub['Event']['release_date_end']);
+        
+        // assign penalty to user if they submitted late or never submitted by release_date_end
+        $scorePenalty = null;
+        // no submission - if now is after the release date end then - gets final deduction
+        if (empty($event_sub['EvaluationSubmission'])) {
+            if (time() > $event_end) {
+                $scorePenalty = $this->Penalty->getPenaltyFinal($eventId);
+            } 
+        // there is submission - may be on time or late
+        } else {
+            $late_diff = strtotime($event_sub['EvaluationSubmission'][0]['date_submitted']) - $event_due;
+            // late
+            if (0 < $late_diff) {
+                $days_late = $late_diff/(24*60*60);
+                $scorePenalty = $this->getPenaltyByEventandDaysLate($event_sub['Event']['id'], $days_late);
+                
+            }
+        }
+        return $scorePenalty['Penalty']['percent_penalty'];
+    }
 }

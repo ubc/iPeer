@@ -324,6 +324,11 @@ class EventTestCase extends CakeTestCase
         // event 6 has two occurrences as user in two groups
         $this->assertEqual($ids, array(1,2,3,5,6,6));
     }
+    
+    function testGetEventSubmission()
+    {
+        //TODO
+    }
 
     #####################################################################################################################################################
     ###############################################     HELPER FUNCTIONS     ############################################################################

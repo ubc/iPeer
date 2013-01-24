@@ -81,6 +81,7 @@ if (!empty($notInGroup)) {
             $percent = number_format($scaled/$mixeval['Mixeval']['total_marks'] * 100);
             $ave_deduction = number_format(array_avg($scores) * $penalty[$evaluteeId]/100, 2);
             $ave_scaled = number_format(array_avg($scores) * (1 - $penalty[$evaluteeId]/100), 2);
+            $ave_marks = number_format(array_avg($scores), 2);
             echo __("Final Total", true).': '.number_format(array_sum($scores), 2);
             $penalty[$evaluteeId] > 0 ? $penaltyAddOn = ' - '."<font color=\"red\">".$deduction."</font> = ".$scaled :
                 $penaltyAddOn = '';
@@ -95,7 +96,7 @@ if (!empty($notInGroup)) {
             }
             $penalty[$evaluteeId] > 0 ? $ave_penaltyAddOn = ' - '."<font color=\"red\">".$ave_deduction."</font> = ".$ave_scaled :
                 $ave_penaltyAddOn = '';
-            $memberAverageAve = number_format(array_sum($scores), 2);
+            $memberAverageAve = number_format(array_sum($scores), 2) * (100-$penalty[$evaluteeId])/100;
             if ($memberAverageAve == $groupAvg) {
                 echo "&nbsp;&nbsp;<< ".__('Same Mark as Group Average', true)." >>";
             } else if ($memberAverageAve < $groupAvg) {
@@ -104,11 +105,11 @@ if (!empty($notInGroup)) {
                 echo "&nbsp;&nbsp;<font color='#000099'><< ".__('Above Group Average', true)." >></font>";
             }
             ?> </b><br>
-            <?php echo __("Average Percentage Per Question: ", true);
-            echo $memberAve.$ave_penaltyAddOn;
-            echo ' ('.$memberAvePercent .'%)';
+            <?php //echo __("Average Percentage Per Question: ", true);
+            //echo $ave_marks.$ave_penaltyAddOn;
+            //echo ' ('.$memberAvePercent .'%)';
 
-            $penalty[$evaluteeId] > 0 ? $penaltyNotice = '<br>'.__('NOTE: ', true).'<font color=\'red\'>'.$penalties[$evaluteeId].
+            $penalty[$evaluteeId] > 0 ? $penaltyNotice = __('NOTE: ', true).'<font color=\'red\'>'.$penalty[$evaluteeId].
                 '%</font>'.__(' Late Penalty', true) : $penaltyNotice = '';
             echo $penaltyNotice;
             ?>

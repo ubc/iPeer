@@ -187,15 +187,20 @@ class EvaluationHelper extends AppHelper
     function getMixevalResultTable($memberResult, $memberList, $questions, $notInGroup, $type = 'evaluator')
     {
         $table = array();
+        $blue = array('class' => 'blue');
+        $class = array();
 
         // randomize the result
         if ($type != 'evaluator' && $type != 'evaluatee') {
             shuffle($memberResult);
+            $blue = array();
         }
 
         foreach ($memberResult as $row) {
             $memberMixeval = $row['EvaluationMixeval'];
-            (in_array($memberMixeval[$type], Set::extract($notInGroup, '/User/id'))) ? $class=array('class' => 'blue') : $class=array();
+            if (!empty($notInGroup)) {
+                (in_array($memberMixeval[$type], Set::extract($notInGroup, '/User/id'))) ? $class=$blue : $class=array();
+            }
             $tr = array(isset($memberMixeval[$type]) ? array($memberList[$memberMixeval[$type]],$class) : array($type,$class));
             // change the details indexed by question_number
             $resultDetails = Set::combine($row['EvaluationMixevalDetail'], '{n}.question_number', '{n}');
@@ -203,8 +208,8 @@ class EvaluationHelper extends AppHelper
                 $detail = $resultDetails[$question['question_num']];
                 // check if the result is released
                 if (($type == 'evaluator' || $type == 'evaluatee') ||
-                    (($memberMixeval['grade_release'] && $question['MixevalsQuestion']['question_type'] == 'S') ||
-                    ($memberMixeval['comment_release'] && $question['MixevalsQuestion']['question_type'] == 'T'))) {
+                    (($memberMixeval['grade_release'] && $question['question_type'] == 'S') ||
+                    ($memberMixeval['comment_release'] && $question['question_type'] == 'T'))) {
 
                     $tr[] = $this->renderQuestionResult($question, $detail);
                 } else {

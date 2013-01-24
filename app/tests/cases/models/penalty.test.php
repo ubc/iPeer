@@ -163,4 +163,9 @@ class PenaltyTestCase extends CakeTestCase
         $ret = $this->Penalty->getPenaltyByEventAndDaysLate(999, 5);
         $this->assertEqual($ret, null);
     }
+    
+    function testGetPenaltyPercent()
+    {
+        //TODO
+    }
 }

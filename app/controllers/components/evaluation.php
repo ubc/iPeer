@@ -1263,7 +1263,6 @@ class EvaluationComponent extends Object
         if ($event['GroupEvent']['id'] && $userId) {
             $mixevalResult = $this->EvaluationMixeval->getResultsByEvaluator($event['GroupEvent']['id'], $userId);
             $evalResult[$userId] = $mixevalResult;
-
             foreach ($mixevalResult as $row) {
                 $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
                 if ($evalMark!=null) {
@@ -1475,115 +1474,6 @@ class EvaluationComponent extends Object
 
         $this->GroupEvent->save($groupEvent);
     }
-
-
-    /**
-     * formatMixevalEvaluationResult
-     *
-     * @param bool   $event         event
-     * @param string $displayFormat display format
-     * @param int    $studentView   student view
-     *
-     * @access public
-     * @return void
-     */
-    function formatMixevalEvaluationResult($event, $displayFormat='', $studentView=0)
-    {
-        $this->Mixeval = ClassRegistry::init('Mixeval');
-        $this->User = ClassRegistry::init('User');
-        $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
-        $this->MixevalsQuestion = ClassRegistry::init('MixevalsQuestion');
-        $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
-        $this->Event = ClassRegistry::init('Event');
-        $this->Penalty = ClassRegistry::init('Penalty');
-
-        $groupMembers = array();
-        $groupMembersNoTutors = array();
-        $result = array();
-
-        $eventId = $event['Event']['id'];
-
-        $currentUser = $this->User->getCurrentLoggedInUser();
-
-        //Get Members for this evaluation
-        if ($studentView) {
-
-            $user = $this->User->find('first', array(
-                'conditions' => array('id' => User::get('id')),
-                'contain' => array('Role'),
-            ));
-            $mixevalResultDetail = $this->getMixevalResultDetail($event['GroupEvent']['id'], array($user));
-            $groupMembers = $this->GroupsMembers->getEventGroupMembers(
-                $event['Group']['id'], $event['Event']['self_eval'], $currentUser['id']);
-            $groupMembersNoTutors = $this->GroupsMembers->getEventGroupMembersNoTutors(
-                $event['Group']['id'], $event['Event']['self_eval'], $currentUser['id']);
-            $membersAry = array();
-            $membersAryNoTutors = array();
-            foreach ($groupMembers as $member) {
-                $membersAry[$member['User']['id']] = $member;
-            }
-            foreach ($groupMembersNoTutors as $member) {
-                $membersAryNoTutors[$member['User']['id']] = $member;
-            }
-            $result['groupMembers'] = $membersAry;
-            $result['groupMembersNoTutors'] = $membersAryNoTutors;
-
-            $reviewEvaluations = $this->getStudentViewMixevalResultDetailReview(
-                $event, $this->Auth->user('id'));
-            $result['reviewEvaluations'] = $reviewEvaluations;
-            $event_info = $this->Event->find(
-                'first',
-                array(
-                    'conditions' => array('Event.id' => $eventId),
-                )
-            );
-
-            // storing the timestamp of the due date/end date of the event
-            $event_due = strtotime($event_info['Event']['due_date']);
-            $event_end = strtotime($event_info['Event']['release_date_end']);
-            // assign penalty to user if they submitted late or never submitted by release_date_end
-            $scorePenalty = null;
-            $event_sub = $this->Event->find(
-                'first',
-                array(
-                    'conditions' => array('Event.id' => $eventId),
-                    'contain' => array('EvaluationSubmission' => array(
-                        'conditions' => array('EvaluationSubmission.submitter_id' => $this->Auth->user('id'))
-                )))
-            );
-            // no submission - if now is after release date end then - gets final deduction
-            if (empty($event_sub['EvaluationSubmission'])) {
-                if (time() > $event_end) {
-                    $scorePenalty = $this->Penalty->getPenaltyFinal($eventId);
-                }
-            // there is submission - may be on time or late
-            } else {
-                $late_diff = strtotime($event_sub['EvaluationSubmission'][0]['date_submitted']) - $event_due;
-                // late
-                if (0 < $late_diff) {
-                    $days_late = $late_diff/(24*60*60);
-                    $scorePenalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId, $days_late);
-                }
-            }
-            $result['penalty'] = $scorePenalty['Penalty']['percent_penalty'];
-        } else {
-            $groupMembers = $this->User->getMembersByGroupId(
-                $event['Group']['id'],
-                ($event['Event']['self_eval'] ? null : $this->Auth->user('id'))
-            );
-            $mixevalResultDetail = $this->getMixevalResultDetail($event['GroupEvent']['id'], $groupMembers);
-        }
-
-        //Get Detail information on Mixeval score
-        $mixevalQuestion = $this->MixevalsQuestion->getQuestion($mixeval['Mixeval']['id']);
-        $gradeReleaseStatus = $this->EvaluationMixeval->getTeamReleaseStatus($event['GroupEvent']['id']);
-
-        $result['gradeReleaseStatus'] = $gradeReleaseStatus;
-
-        return $result;
-    }
-
-
 
     /**
      * saveSurveyEvaluation

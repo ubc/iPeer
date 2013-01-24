@@ -154,13 +154,7 @@ class EvaluationBase extends AppModel
         $userPenalty = array_fill_keys($memberIds, 0);
 
         // find the event
-        $event = $this->Event->find(
-            'first',
-            array(
-                'conditions' => array('Event.id' => $eventId),
-                'contain' => false,
-            )
-        );
+        $event = $this->Event->findById($eventId);
 
         // not due yet. no penalty
         if ($event['Event']['due_in'] >= 0) {

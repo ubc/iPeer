@@ -21,19 +21,20 @@ $commentReleased = array_sum(Set::extract($evalResult[User::get('id')], '/Evalua
     <?php
     if ($gradeReleased) {
         if (isset($memberScoreSummary[User::get('id')])) {
-            $receviedAvePercent = number_format($memberScoreSummary[User::get('id')]['received_ave_score']/$mixeval['Mixeval']['total_marks'] * 100);
+            $receivedAvePercent = number_format($memberScoreSummary[User::get('id')]['received_ave_score']/$mixeval['Mixeval']['total_marks'] * 100);
+            $receivedAvePercent = $receivedAvePercent * (100 - $penalty)/100;
         } else {
-            $receviedAvePercent = 0;
+            $receivedAvePercent = 0;
         }
         $finalAvg = $memberScoreSummary[User::get('id')]['received_ave_score'] - number_format($avePenalty, 2);
         (number_format($avePenalty, 2) > 0) ? ($stringAddOn = ' - '.'('.'<font color=\'red\'>'.number_format($avePenalty, 2).'</font>'.
             ')'.'<font color=\'red\'>*</font>'.' = '.number_format($finalAvg, 2)) : $stringAddOn = '';
 
         echo number_format($memberScoreSummary[User::get('id')]['received_ave_score'], 2).$stringAddOn;
-        number_format($avePenalty, 2) > 0 ? $penaltyNote = '&nbsp &nbsp &nbsp &nbsp &nbsp ( )'.'<font color=\'red\'>*</font>'.' : '.$studentResult['penalty'].
-            '% late penalty.' : $penaltyNote = '';
+        number_format($avePenalty, 2) > 0 ? $penaltyNote = '&nbsp &nbsp &nbsp &nbsp &nbsp ( )'.'<font color=\'red\'>*</font>'.' : '.$penalty.
+            '% late penalty. ' : $penaltyNote = '';
         echo $penaltyNote;
-        echo ' ('.$receviedAvePercent.'%)';
+        echo ' ('.number_format($receivedAvePercent).'%)';
     } else {
         echo __('Not Released', true);
     }
@@ -61,7 +62,7 @@ $commentReleased = array_sum(Set::extract($evalResult[User::get('id')], '/Evalua
         </div>
         <div style="height: 200px;text-align: center;" id="panelResultsContent" class="panelContent">
             <?php
-            $params = array('controller'=>'evaluations', 'mixevalQuestion'=>$mixevalQuestion, 'evalResult'=>$evalResult[User::get('id')], 'tableType'=>User::get('full_name'));
+            $params = array('controller'=>'evaluations', 'mixeval'=>$mixeval, 'evalResult'=>$evalResult[User::get('id')], 'tableType'=>User::get('full_name'));
             echo $this->element('evaluations/student_view_mixeval_details', $params);
             ?>
         </div>
@@ -74,7 +75,7 @@ $commentReleased = array_sum(Set::extract($evalResult[User::get('id')], '/Evalua
         </div>
         <div style="height: 200px;" id="panelReviewsContent" class="panelContent">
             <?php
-            $params = array('controller'=>'evaluations', 'mixevalQuestion'=>$mixevalQuestion, 'evalResult'=>$reviewEvaluations[User::get('id')], 'tableType'=>'evaluatee');
+            $params = array('controller'=>'evaluations', 'mixevalQuestion'=>$mixeval, 'evalResult'=>$reviewEvaluations[User::get('id')], 'tableType'=>'evaluatee');
             echo $this->element('evaluations/student_view_mixeval_details', $params);
             ?>
         </div>

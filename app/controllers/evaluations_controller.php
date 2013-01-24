@@ -965,7 +965,7 @@ class EvaluationsController extends AppController
             $event = array_merge($event, $group);
         }
 
-        $groupEventId = $this->GroupEvent->getGroupEventByEventIdAndGroupId($eventId, $groupId);
+        $groupEventId = $event['GroupEvent']['id'];
 
         $this->autoRender = false;
 
@@ -1054,6 +1054,7 @@ class EvaluationsController extends AppController
                         Set::extract($mixevalDetails, '/EvaluationMixeval/evaluatee')));
             $memberList = array_unique(array_merge($memberList, $inCompleteMembers));
             $fullNames = $this->User->getFullNames($memberList);
+            $members = $this->User->find('all', array('conditions' => array('User.id' => $memberList)));
             $details = $this->Evaluation->getMixevalResultDetail($groupEventId, $members);
             $mixeval = $this->Mixeval->find('first', array(
                 'conditions' => array('Mixeval.id' => $event['Event']['template_id']),
@@ -1061,6 +1062,8 @@ class EvaluationsController extends AppController
             ));
             $inCompleteMembers = $this->User->getUsers($inCompleteMembers, array('Role'), array('User.full_name'));
             $notInGroup = $this->User->getUsers($notInGroup, array('Role'), array('User.id', 'User.full_name'));
+            $gradeReleaseStatus = $this->EvaluationMixeval->getTeamReleaseStatus($groupEventId);
+            
             $this->set('mixeval', $mixeval);
             $this->set('memberList', $fullNames);
             $this->set('mixevalDetails', $details['scoreRecords']);
@@ -1069,6 +1072,7 @@ class EvaluationsController extends AppController
             $this->set('penalty', $this->Mixeval->formatPenaltyArray($fullNames, $eventId, $groupId));
             $this->set('inCompleteMembers', $inCompleteMembers);
             $this->set('notInGroup', $notInGroup);
+            $this->set('gradeReleaseStatus', $gradeReleaseStatus);
             
             if ($displayFormat == 'Detail') {
                 $this->render('view_mixeval_evaluation_results_detail');
@@ -1130,6 +1134,7 @@ class EvaluationsController extends AppController
             ->push(__('View My Results', true)));
 
         $userId = User::get('id');
+        $groupEventId = $event['GroupEvent']['id'];
 
         switch ($event['Event']['event_template_type_id'])
         {
@@ -1180,24 +1185,31 @@ class EvaluationsController extends AppController
             break;
 
         case 4: //View Mix Evaluation Result
-            $formattedResult = $this->Evaluation->formatMixevalEvaluationResult($event, 'Detail', 1);
-            $this->set('mixeval', $formattedResult['mixeval']);
-            if (isset($formattedResult['groupMembers'])) {
-                $this->set('groupMembers', $formattedResult['groupMembers']);
-            }
-            if (isset($formattedResult['reviewEvaluations'])) {
-                $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);
-            }
-            if (isset($formattedResult['mixevalQuestion'])) {
-                $this->set('mixevalQuestion', $formattedResult['mixevalQuestion']);
-            }
-            $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
-            $this->set('scoreRecords', $formattedResult['scoreRecords']);
-            $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
-            $this->set('evalResult', $formattedResult['evalResult']);
-            $this->set('penalty', $formattedResult['penalty']);
+            $mixeval = $this->Mixeval->find('first', array(
+                'conditions' => array('Mixeval.id' => $event['Event']['template_id']),
+                'contain' => array('Question' => array('Description'))
+            ));         
+            
+            $user = $this->User->findById($userId);            
+            $details = $this->Evaluation->getMixevalResultDetail($groupEventId, array($user));
+            $sub = $this->EvaluationSubmission->findAllByGrpEventId($groupEventId);
+            $mixevalDetails = $this->EvaluationMixeval->getResultsByEvaluateesOrEvaluators($groupEventId, Set::extract($sub, '/EvaluationSubmission/submitter_id'));
+            $memberList = array_unique(array_merge(Set::extract($mixevalDetails, '/EvaluationMixeval/evaluator'),
+                        Set::extract($mixevalDetails, '/EvaluationMixeval/evaluatee')));
+            $fullNames = $this->User->getFullNames($memberList);
+            $eventSub = $this->Event->getEventSubmission($eventId, $userId);
+            $penalty = $this->Penalty->getPenaltyPercent($eventSub);
+            $gradeReleaseStatus = $this->EvaluationMixeval->getTeamReleaseStatus($groupEventId);
+            $reviewEvaluations = $this->Evaluation->getStudentViewMixevalResultDetailReview($event, $userId);
+            $avePenalty = $details['memberScoreSummary'][$userId]['received_total_score'] * ($penalty / 100);
 
-            $avePenalty = $formattedResult['memberScoreSummary'][$userId]['received_total_score'] * ($formattedResult['penalty'] / 100);
+            $this->set('mixeval', $mixeval);
+            $this->set('evalResult', $details['evalResult']);
+            $this->set('memberScoreSummary', $details['memberScoreSummary']);
+            $this->set('memberList', $fullNames);
+            $this->set('reviewEvaluations', $reviewEvaluations);
+            $this->set('gradeReleaseStatus', $gradeReleaseStatus);
+            $this->set('penalty', $penalty);
             $this->set('avePenalty', $avePenalty);
 
             $this->render('student_view_mixeval_evaluation_results');
