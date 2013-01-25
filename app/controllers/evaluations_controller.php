@@ -983,9 +983,8 @@ class EvaluationsController extends AppController
                     return;
             }
             $event = array_merge($event, $group);
+            $groupEventId = $event['GroupEvent']['id'];
         }
-
-        $groupEventId = $event['GroupEvent']['id'];
 
         $this->autoRender = false;
 
@@ -1145,6 +1144,7 @@ class EvaluationsController extends AppController
                 return;
             }
             $event = array_merge($event, $group);
+            $groupEventId = $event['GroupEvent']['id'];
         }
 
         // set up page variables
@@ -1154,7 +1154,6 @@ class EvaluationsController extends AppController
             ->push(__('View My Results', true)));
 
         $userId = User::get('id');
-        $groupEventId = $event['GroupEvent']['id'];
 
         switch ($event['Event']['event_template_type_id'])
         {

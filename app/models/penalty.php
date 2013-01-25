@@ -146,7 +146,7 @@ class Penalty extends AppModel
         // no submission - if now is after the release date end then - gets final deduction
         if (empty($event_sub['EvaluationSubmission'])) {
             if (time() > $event_end) {
-                $scorePenalty = $this->Penalty->getPenaltyFinal($eventId);
+                $scorePenalty = $this->getPenaltyFinal($event_sub['Event']['id']);
             } 
         // there is submission - may be on time or late
         } else {

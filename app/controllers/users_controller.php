@@ -433,6 +433,7 @@ class UsersController extends AppController
         );
         // get the courses that this user is allowed access to
         $coursesOptions = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+        asort($coursesOptions);
         /*if (User::hasPermission('functions/user/superadmin')) {
             // superadmins should have access to all courses regardless
             $coursesOptions = $this->Course->find('list');
