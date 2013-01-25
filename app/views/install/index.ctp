@@ -67,6 +67,18 @@ if($return_var == 0)
 $ldap = function_exists('ldap_connect') ? $yes : $no;
 
 // Recommended requirements init
+
+// make sure that the php memory limit is at least 64 mb
+$limit = ini_get('memory_limit');
+$unit = substr($limit, -1);
+// convert to bytes 
+if ($limit == -1) $limit = 9999999999999; # no memory limit
+else if (strcasecmp($unit, 'k') == 0) $limit *= 1024;
+else if (strcasecmp($unit, 'm')) $limit *= 1024 * 1024;
+else if (strcasecmp($unit, 'g')) $limit *= 1024 * 1024 * 1024;
+$memlimit = $no;
+if ($limit >= 64 * 1024 * 1024) $memlimit = $yes;
+
 $php_recommended_settings = array(
   array (
     'name' => 'Safe Mode',
@@ -172,6 +184,15 @@ foreach ($php_recommended_settings as $key => $setting)
 </table>
 
 <h4>Recommended</h4>
+<table>
+    <tr>
+        <td width="70%">
+        <?php __('PHP memory limit at least 64 MB') ?>
+        <div class="help"><?php __('Some operations, such as export, requires more memory when dealing with large courses.')?></div>
+        </td>
+        <td width="30%"><?php echo $memlimit ?></td>
+    </tr>
+</table>
 <table>
   <tr>
     <th width="40%"><?php __('PHP Directive')?></th>
