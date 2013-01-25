@@ -1374,7 +1374,7 @@ table.content-table {
 }
 
 textarea.question-title-textarea, textarea.question-descriptor {
-    width: 100%;
+    width: 90%;
     height: 4em; 
 }
 

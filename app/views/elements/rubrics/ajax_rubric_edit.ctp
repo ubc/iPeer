@@ -8,7 +8,7 @@ $zero_mark = $data['Rubric']['zero_mark'];
 $default_options = array('type' => 'text',
                          'cols' => 20,
                          'rows' => 3,
-                         'style' => 'width: 90%;',
+                         'style' => 'width: 83%;',
                          'label' => false,
                          'before' => '',
                          'after' => '',
