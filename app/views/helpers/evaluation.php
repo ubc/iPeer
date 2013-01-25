@@ -11,7 +11,6 @@
 class EvaluationHelper extends AppHelper
 {
     public $helpers = array('Html');
-    public $color = array("#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
 
     /**
      * array_avg 

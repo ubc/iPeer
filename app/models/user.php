@@ -1102,6 +1102,20 @@ class User extends AppModel
 
         return $ret;
     }
+    /**
+     * getAccessibleCourses
+     *
+     * @access public
+     * @return list of course ids
+     */
+    function getAccessibleCourses()
+    {
+        if (User::hasPermission('functions/user/admin')) {
+            return array_keys(User::getMyDepartmentsCourseList('list'));
+        } else {
+            return array_keys(User::getMyCourseList());
+        }
+    }
 
     /**
      * hasRole test if the user has a specific role

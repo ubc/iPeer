@@ -12,7 +12,8 @@ class EmailtemplatesController extends AppController
 {
     public $name = 'EmailTemplates';
     public $uses = array('GroupsMembers', 'UserEnrol', 'User', 'EmailTemplate',
-        'EmailMerge', 'EmailSchedule', 'Personalize', 'SysParameter', 'UserCourse');
+        'EmailMerge', 'EmailSchedule', 'Personalize', 'SysParameter', 'UserCourse',
+        'Course');
     public $components = array('AjaxList', 'Session', 'RequestHandler', 'Email');
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Js' => array('Prototype'));
     public $show;
@@ -82,19 +83,9 @@ class EmailtemplatesController extends AppController
         } else {
             $creators = array();
             // grab course ids of the courses admin/instructor has access to
-            $courseIds = array();
-            if (User::hasPermission('functions/user/admin')) {
-                $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
-            } else {
-                $courseIds = $this->UserCourse->find('list', array('conditions' => array('user_id' => $myID),
-                    'fields' => array('course_id')));
-            }
+            $courseIds = User::getAccessibleCourses();
             // grab all instructors that have access to the courses above
-            $instructors = $this->UserCourse->find(
-                'all',
-                array(
-                    'conditions' => array('UserCourse.course_id' => $courseIds)
-            ));
+            $instructors = $this->UserCourse->findAllByCourseId($courseIds);
             $extraFilters = "(";
             // only admins will go through this loop
             foreach ($instructors as $instructor) {

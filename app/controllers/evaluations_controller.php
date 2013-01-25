@@ -543,8 +543,9 @@ class EvaluationsController extends AppController
             // to create a separate SurveyInput entry for each selected chkbox
             $chkboxResps = array();
             foreach ($this->data['SurveyInput'] as $key => &$input) {
-                if (!isset($input['response_id'])) 
+                if (!isset($input['response_id'])) {
                     continue;
+                }
                 if (is_array($input['response_id'])) {
                     // the "Choose any of..." questions that has chkboxes
                     foreach ($input['response_id'] as $respId) {
