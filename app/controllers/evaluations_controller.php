@@ -543,7 +543,8 @@ class EvaluationsController extends AppController
             // to create a separate SurveyInput entry for each selected chkbox
             $chkboxResps = array();
             foreach ($this->data['SurveyInput'] as $key => &$input) {
-                if (!isset($input['response_id'])) continue;
+                if (!isset($input['response_id'])) 
+                    continue;
                 if (is_array($input['response_id'])) {
                     // the "Choose any of..." questions that has chkboxes
                     foreach ($input['response_id'] as $respId) {
@@ -1214,7 +1215,7 @@ class EvaluationsController extends AppController
             $sub = $this->EvaluationSubmission->findAllByGrpEventId($groupEventId);
             $mixevalDetails = $this->EvaluationMixeval->getResultsByEvaluateesOrEvaluators($groupEventId, Set::extract($sub, '/EvaluationSubmission/submitter_id'));
             $memberList = array_unique(array_merge(Set::extract($mixevalDetails, '/EvaluationMixeval/evaluator'),
-                        Set::extract($mixevalDetails, '/EvaluationMixeval/evaluatee')));
+                Set::extract($mixevalDetails, '/EvaluationMixeval/evaluatee')));
             $fullNames = $this->User->getFullNames($memberList);
             $eventSub = $this->Event->getEventSubmission($eventId, $userId);
             $penalty = $this->Penalty->getPenaltyPercent($eventSub);

@@ -219,7 +219,7 @@ class SurveyQuestion extends AppModel
     /**
      * getQuestionsByEventId
      *
-     * @param $eventId event id
+     * @param mixed $eventId event id
      * 
      * @access public
      * @return void

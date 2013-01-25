@@ -17,7 +17,6 @@ class XmlHandlerComponent extends Object
      * @param mixed $responses user responses
      * @param mixed $numGroups number of groups
      * @param mixed $weight    weight
-     * @param mixed $eventId   event id
      *
      * @access public
      * @return void
@@ -79,7 +78,7 @@ class XmlHandlerComponent extends Object
                         //response/answer
                         $value = $doc->$createElementFunc('value');
                         $value->$setAttributeFunc('id', $response_tmp['response_id'] == null ? '':$response_tmp['response_id']);
-                        #$value->$setAttributeFunc('answer', 1);
+                        //$value->$setAttributeFunc('answer', 1);
                         $response->$appendChildFunc($value);
                     }
                 } else {

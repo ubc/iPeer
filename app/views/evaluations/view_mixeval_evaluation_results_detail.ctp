@@ -79,9 +79,9 @@ if (!empty($notInGroup)) {
             $deduction = number_format(array_sum($scores) * $penalty[$evaluteeId]/100, 2);
             $scaled = number_format(array_sum($scores) * (1 - $penalty[$evaluteeId]/100), 2);
             $percent = number_format($scaled/$mixeval['Mixeval']['total_marks'] * 100);
-            $ave_deduction = number_format(array_avg($scores) * $penalty[$evaluteeId]/100, 2);
-            $ave_scaled = number_format(array_avg($scores) * (1 - $penalty[$evaluteeId]/100), 2);
-            $ave_marks = number_format(array_avg($scores), 2);
+            $ave_deduction = number_format($this->Evaluation->array_avg($scores) * $penalty[$evaluteeId]/100, 2);
+            $ave_scaled = number_format($this->Evaluation->array_avg($scores) * (1 - $penalty[$evaluteeId]/100), 2);
+            $ave_marks = number_format($this->Evaluation->array_avg($scores), 2);
             echo __("Final Total", true).': '.number_format(array_sum($scores), 2);
             $penalty[$evaluteeId] > 0 ? $penaltyAddOn = ' - '."<font color=\"red\">".$deduction."</font> = ".$scaled :
                 $penaltyAddOn = '';

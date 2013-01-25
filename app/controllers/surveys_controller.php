@@ -418,8 +418,8 @@ class SurveysController extends AppController
 
         $this->set('breadcrumb', 
             $this->breadcrumb->push('surveys')->
-                push(array('survey' => $survey['Survey']))->
-                push(__('Edit Questions', true)));
+            push(array('survey' => $survey['Survey']))->
+            push(__('Edit Questions', true)));
         $this->set('survey_id', $survey_id);
         $this->set('questions', $questions);
         $this->render('questionssummary');

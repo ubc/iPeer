@@ -1,30 +1,49 @@
 <?php
 /**
- * array_avg calculate the average of the numbers in an array
+ * EvaluationHelper
  *
- * @param mixed $arr
- *
- * @access public
- * @return the average of the array
+ * @uses AppHelper
+ * @package   CTLT.iPeer
+ * @author    Pan Luo <pan.luo@ubc.ca>
+ * @copyright 2012 All rights reserved.
+ * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-function array_avg($arr)
-{
-    if (empty($arr)) {
-        return 0;
-    }
-
-    if (!($count = count(array_filter($arr, 'is_numeric')))) {
-        return 0;
-    }
-
-    return array_sum($arr) / $count;
-}
-
 class EvaluationHelper extends AppHelper
 {
     public $helpers = array('Html');
     public $color = array("#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
 
+    /**
+     * array_avg 
+     * calculate the average of the numbers in an array
+     *
+     * @param mixed $arr
+     *
+     * @access public
+     * @return the average of the array
+     */
+    function array_avg($arr)
+    {
+        if (empty($arr)) {
+            return 0;
+        }
+    
+        if (!($count = count(array_filter($arr, 'is_numeric')))) {
+            return 0;
+        }
+    
+        return array_sum($arr) / $count;
+    }
+
+    /**
+     * getSummaryTableHeader
+     *
+     * @param mixed $totalMark
+     * @param mixed $questions
+     *
+     * @access public
+     * @return array of table headers
+     */
     function getSummaryTableHeader($totalMark, $questions)
     {
         $questions = array('MixevalsQuestion' => $questions);
@@ -38,6 +57,19 @@ class EvaluationHelper extends AppHelper
         return $header;
     }
 
+    /**
+     * getSummaryTable
+     *
+     * @param mixed $memberList
+     * @param mixed $scoreRecords
+     * @param mixed $numberQuestions
+     * @param mixed $mixeval
+     * @param mixed $penalties
+     * @param mixed $notInGroup
+     *
+     * @access public
+     * @return array for generating summary table
+     */
     function getSummaryTable($memberList, $scoreRecords, $numberQuestions, $mixeval, $penalties, $notInGroup)
     {
         $totalScore = 0;
@@ -46,7 +78,7 @@ class EvaluationHelper extends AppHelper
 
         foreach ($scoreRecords as $evaluteeId => $scores) {
             $tr = array();
-            (in_array($evaluteeId, Set::extract($notInGroup,'/User/id'))) ? $class=array('class'=>'blue') : $class=array();
+            (in_array($evaluteeId, Set::extract($notInGroup, '/User/id'))) ? $class=array('class'=>'blue') : $class=array();
             $tr[] = array($memberList[$evaluteeId], $class);
             foreach ($numberQuestions as $question) {
                 $tr[] = isset($scores[$question['question_num']]) ?
@@ -76,7 +108,7 @@ class EvaluationHelper extends AppHelper
         $tr = array(array(__('Group Average', true), array()));
         foreach ($numberQuestions as $question) {
             if ($totalCounter) {
-                $avg = array_avg(Set::classicExtract($scoreRecords, '{n}.'.($question['question_num'])));
+                $avg = $this->array_avg(Set::classicExtract($scoreRecords, '{n}.'.($question['question_num'])));
                 $tr[] = number_format($avg, 2);
             } else {
                 // no values in the table
@@ -89,6 +121,15 @@ class EvaluationHelper extends AppHelper
         return $table;
     }
 
+    /**
+     * getRubricSummaryTableHeader
+     *
+     * @param mixed $total
+     * @param mixed $criteria
+     *
+     * @access public
+     * @return array for generating table header
+     */
     function getRubricSummaryTableHeader($total, $criteria) {
         $header = array(__('Evaluatee', true));
         foreach ($criteria as $key => $criterion) {
@@ -223,6 +264,15 @@ class EvaluationHelper extends AppHelper
         return $table;
     }
 
+    /**
+     * renderQuestionResult
+     *
+     * @param mixed $question
+     * @param mixed $detail
+     *
+     * @access public
+     * @return array for rendering the results for mixeval questions
+     */
     function renderQuestionResult($question, $detail)
     {
         $result = '';
@@ -252,6 +302,15 @@ class EvaluationHelper extends AppHelper
         return $result;
     }
 
+    /**
+     * getPoints
+     *
+     * @param mixed $point
+     * @param mixed $total
+     *
+     * @access public
+     * @return circles to depict LOM results
+     */
     function getPoints($point, $total)
     {
         // suppose we want to show 5 balls
@@ -265,6 +324,15 @@ class EvaluationHelper extends AppHelper
                 round(($total - $point)/$valuePerBall));
     }
 
+    /**
+     * getReviewButton
+     *
+     * @param mixed $event
+     * @param mixed $displayFormat
+     *
+     * @access public
+     * @return review button for evaluation results
+     */
     function getReviewButton($event, $displayFormat)
     {
         $button = '<form name="evalForm" id="evalForm" method="POST" action="'.$this->Html->url('markEventReviewed').'">'.

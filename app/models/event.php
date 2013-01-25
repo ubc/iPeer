@@ -752,8 +752,8 @@ class Event extends AppModel
     /**
      * getEventSubmission
      *
-     * @param $eventId event id
-     * @param $userId  user id
+     * @param mixed $eventId event id
+     * @param mixed $userId  user id
      *
      * @access public
      * @return void
