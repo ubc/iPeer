@@ -1254,7 +1254,6 @@ class EvaluationComponent extends Object
     function getStudentViewMixevalResultDetailReview ($event, $userId)
     {
         $userPOS = 0;
-        $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
         $this->EvaluationMixevalDetail   = ClassRegistry::init('EvaluationMixevalDetail');
         $this->User = ClassRegistry::init('User');

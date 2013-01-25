@@ -142,16 +142,12 @@ class EvaluationSubmission extends AppModel
     function numCountInGroupCompleted($groupEventId)
     {
         $members = Set::extract($this->GroupEvent->getGroupMembers($groupEventId), '/GroupsMembers/user_id');
-        return $this->find(
-            'count',
-            array(
-                'conditions' => array(
-                    $this->alias.'.submitted' => 1,
-                    $this->alias.'.grp_event_id' => $groupEventId,
-                    $this->alias.'.submitter_id' => $members,
-                ),
-            )
-        );
+        return $this->find('count', array(
+            'conditions' => array(
+                $this->alias.'.submitted' => 1,
+                $this->alias.'.grp_event_id' => $groupEventId,
+                $this->alias.'.submitter_id' => $members,
+        )));
     }
 
     /**
