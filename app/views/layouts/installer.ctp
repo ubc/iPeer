@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
     <meta http-equiv="Content-Language" content="en" />
-    <!--link rel="shortcut icon" href="favicon.ico" type="image/x-icon"-->
+    <link rel="shortcut icon" href="img/favicon.png" type="image/png" />
     <?php
     // CSS files
     echo $html->css('http://fonts.googleapis.com/css?family=Lato:400,400italic,700');
