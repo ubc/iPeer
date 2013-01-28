@@ -77,7 +77,7 @@ jQuery(document).ready(function() {
     var oTable = jQuery('#table_id').dataTable( {
       "sPaginationType" : "full_numbers",
       "aoColumnDefs": [
-        { "bSearchable": false, "bVisible": false, "bSortable":false, "aTargets": [ 0 ] },
+        { "bSearchable": false, "bVisible": false, "bSortable":false, "aTargets": [ 0 ] }
         ],
         "aaSorting" : [[1, 'asc']]
     });
