@@ -3,6 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title>iPeer - <?php echo $title_for_layout;?></title>
+    <!-- Force IE back to standards mode when it ignores the doctype -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
     <meta http-equiv="Content-Language" content="en" />
     <!--link rel="shortcut icon" href="favicon.ico" type="image/x-icon"-->
