@@ -338,27 +338,6 @@ class Rubric extends EvaluationBase
     }
 
     /**
-     * getSelectionList
-     *
-     * @param mixed $userid
-     *
-     * @access public
-     * @return returns related selection list
-     */
-    public function getSelectionList($userid) {
-        $ret = $this->find(
-            'list',
-            array(
-                'conditions' => array(
-                    'Rubric.availability' => 'public',
-                    'Rubric.creator_id' => $userid
-                )
-            )
-        );
-        return $ret;
-    }
-
-    /**
      * getEvaluation
      *
      * @param mixed $id id

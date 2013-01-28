@@ -77,7 +77,7 @@ class SurveysController extends AppController
         // Set up Columns
         $columns = array(
             array("Survey.id",          __("ID", true),         "4em",   "hidden"),
-            array("Survey.name",        __("Name", true),        "auto",  "action", "Edit Survey"),
+            array("Survey.name",        __("Name", true),        "auto",  "action", "View Survey"),
             array("!Custom.inUse",      __("In Use", true),      "4em",   "number"),
             array("Survey.availability", __("Availability", true), "6em", "string"),
             array("Survey.question_count", __("Questions", true),        "6em",  "action", "Edit Questions"),
@@ -380,15 +380,11 @@ class SurveysController extends AppController
 
         // check to see if submissions had been made - if yes - survey can't be edited
         if (isset($survey['Event'])) {
-            $submissions = array();
             foreach ($survey['Event'] as $event) {
                 if (!empty($event['EvaluationSubmission'])) {
-                    $submissions[] = $event['EvaluationSubmission'];
+                    $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $survey['Survey']['name']));
+                    $this->redirect('index');
                 }
-            }
-            if (!empty($submissions)) {
-                $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $survey['Survey']['name']));
-                $this->redirect('index');
             }
         }
 

@@ -355,8 +355,6 @@ class SimpleevaluationsController extends AppController
                 'contain' => array('Event' => 'EvaluationSubmission')
             )
         );
-        // for storing submissions - for checking if there are any submissions
-        $submissions = array();
 
         // check to see if $id is valid - numeric & is a simple evaluation
         if (!is_numeric($id) || empty($eval)) {
@@ -393,16 +391,12 @@ class SimpleevaluationsController extends AppController
             }
         }
 
+        // check to see if submissions had been made - if yes - simple evaluation can't be edited
         foreach ($eval['Event'] as $event) {
             if (!empty($event['EvaluationSubmission'])) {
-                $submissions[] = $event['EvaluationSubmission'];
+                $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $eval['SimpleEvaluation']['name']));
+                $this->redirect('index');
             }
-        }
-
-        // check to see if submissions had been made - if yes - simple evaluation can't be edited
-        if (!empty($submissions)) {
-            $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $eval['SimpleEvaluation']['name']));
-            $this->redirect('index');
         }
 
         $this->data['SimpleEvaluation']['id'] = $id;

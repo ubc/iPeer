@@ -55,21 +55,6 @@ class EmailScheduleTestCase extends CakeTestCase
         $this->assertEqual($emails, $expected);
     }
 
-    function testGetCreatorId()
-    {
-        //Test on valid input
-        $creator_id = $this->EmailSchedule->getCreatorId('1');
-        $this->assertEqual($creator_id, '1');
-
-        //Test on invalid input
-        $creator_id = $this->EmailSchedule->getCreatorId('10');
-        $this->assertEqual($creator_id, null);
-
-        //null input
-        $creator_id = $this->EmailSchedule->getCreatorId(null);
-        $this->assertEqual($creator_id, null);
-    }
-
     function testGetSent()
     {
         //Test on valid input

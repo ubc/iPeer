@@ -110,7 +110,6 @@ class Survey extends EvaluationBase
      */
     function getSurveyIdByCourseIdTitle($courseId=null, $title=null)
     {
-        //$tmp = $this->find('course_id='.$courseId.' AND name=\''.$title.'\'', 'id');
         $tmp = $this->find('first', array(
             'conditions' => array('course_id' => $courseId, 'name' => $title),
             'fields' => array('id')

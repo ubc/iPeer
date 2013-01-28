@@ -84,7 +84,7 @@ $surveycells = array();
 foreach($surveyData as $data) {
     $survey = $data['Survey'];
     $row = array();
-    $row[] = $html->link($survey['name'], '/surveys/questionssummary/'.$survey['id']);
+    $row[] = $html->link($survey['name'], '/surveys/view/'.$survey['id']);
     $row[] = $survey['event_count'] > 0 ?
         $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
         $html->image('icons/red_x.gif', array('alt'=>'red_x'));

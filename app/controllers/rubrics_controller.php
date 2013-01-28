@@ -374,8 +374,6 @@ class RubricsController extends AppController
                 'contain' => array('Event' => 'EvaluationSubmission')
             )
         );
-        // for storing submissions - for checking if there are any submissions
-        $submissions = array();
 
         // check to see if $id is valid - numeric & is a rubric
         if (!is_numeric($id) || empty($eval)) {
@@ -413,14 +411,9 @@ class RubricsController extends AppController
 
         foreach ($eval['Event'] as $event) {
             if (!empty($event['EvaluationSubmission'])) {
-                $submissions[] = $event['EvaluationSubmission'];
+                $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $eval['Rubric']['name']));
+                $this->redirect('index');
             }
-        }
-
-        // check to see if submissions had been made - if yes - rubric can't be edited
-        if (!empty($submissions)) {
-            $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $eval['Rubric']['name']));
-            $this->redirect('index');
         }
 
         if (empty($this->data)) {

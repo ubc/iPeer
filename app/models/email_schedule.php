@@ -28,22 +28,6 @@ class EmailSchedule extends AppModel
     }
 
     /**
-     * Get creator's id
-     *
-     * @param int $id id
-     *
-     * @return Creator id
-     */
-    function getCreatorId($id)
-    {
-        $tmp = $this->find('first', array(
-            'conditions' => array('EmailSchedule.id' => $id),
-            'fields' => array('EmailSchedule.creator_id')
-        ));
-        return $tmp['EmailSchedule']['creator_id'];
-    }
-
-    /**
      * Get whether email is sent or not
      *
      * @param int $id id
