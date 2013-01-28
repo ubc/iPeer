@@ -77,6 +77,7 @@ foreach ($mixevalData as $data) {
 $surveyheaders = array(
     __('Name', true),
     __('In Use', true),
+    __('Public', true),
     __('Questions', true),
 );
 $surveycells = array();
@@ -85,6 +86,9 @@ foreach($surveyData as $data) {
     $row = array();
     $row[] = $html->link($survey['name'], '/surveys/questionssummary/'.$survey['id']);
     $row[] = $survey['event_count'] > 0 ?
+        $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
+        $html->image('icons/red_x.gif', array('alt'=>'red_x'));
+    $row[] = $survey['availability'] == "public" ?
         $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
         $html->image('icons/red_x.gif', array('alt'=>'red_x'));
     $row[] = $survey['question_count'];

@@ -10,7 +10,10 @@
  */
 class SurveysController extends AppController
 {
-    public $uses =  array('SurveyQuestion', 'Course', 'Survey', 'User', 'Question', 'Response', 'Personalize', 'Event', 'EvaluationSubmission', 'UserEnrol', 'SurveyInput', 'SurveyGroupMember', 'SurveyGroupSet', 'SurveyGroup');
+    public $uses =  array('SurveyQuestion', 'Course', 'Survey', 'User', 'Question', 
+        'Response', 'Personalize', 'Event', 'EvaluationSubmission', 'UserEnrol', 
+        'SurveyInput', 'SurveyGroupMember', 'SurveyGroupSet', 'SurveyGroup',
+        'UserCourse');
     public $name = 'Surveys';
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time');
     public $components = array('AjaxList', 'Output', 'framework');
@@ -75,8 +78,9 @@ class SurveysController extends AppController
         $columns = array(
             array("Survey.id",          __("ID", true),         "4em",   "hidden"),
             array("Survey.name",        __("Name", true),        "auto",  "action", "Edit Survey"),
-            array("Survey.question_count", __("Questions", true),        "6em",  "action", "Edit Questions"),
             array("!Custom.inUse",      __("In Use", true),      "4em",   "number"),
+            array("Survey.availability", __("Availability", true), "6em", "string"),
+            array("Survey.question_count", __("Questions", true),        "6em",  "action", "Edit Questions"),
             array("Survey.creator_id",   "", "", "hidden"),
             array("Survey.creator",  __("Created By", true),    "8em", "action", "View Creator"),
             array("Survey.created",     __("Creation Date", true), "10em", "date"));
@@ -98,18 +102,46 @@ class SurveysController extends AppController
         if (User::hasPermission('functions/superadmin')) {
             $extraFilters = "";
         } else {
-            // For instructors: only list their own course events (surveys)
-            $extraFilters = $conditions;
+            // grab course ids of the courses admin/instructor has access to
+            $creators = array();
+            $courseIds = User::getAccessibleCourses();
+            // grab all instructors that have access to the courses above
+            $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+            $extraFilters = "(";
+            foreach ($instructors as $instructor) {
+                $id = $instructor['UserCourse']['user_id'];
+                $creators[] = $id;
+                $extraFilters .= "Survey.creator_id = $id or ";
+            }
+            $extraFilters .= "Survey.creator_id = $myID or availability = 'public')";
         }
+        
+        $restrictions = "";
+        
+        $basicRestrictions = array(
+            $myID => true,
+            "!default" => false);
+        // super admins
+        if (User::hasPermission('functions/superadmin')) {
+            $basicRestrictions = "";
+        // faculty admins
+        } else if (User::hasPermission('controllers/departments')) {
+            foreach ($creators as $creator) {
+                $basicRestrictions = $basicRestrictions + array($creator => true);
+            }
+        }
+        
+        empty($basicRestrictions) ? $restrictions = $basicRestrictions :
+            $restrictions['Survey.creator_id'] = $basicRestrictions;
 
         // Set up actions
         $warning = __("Are you sure you want to delete this survey permanently?", true);
         $actions = array(
             array(__("View Survey", true), "", "", "", "view", "Survey.id"),
-            array(__("Edit Survey", true), "", "", "", "edit", "Survey.id"),
-            array(__("Edit Questions", true), "", "", "", "questionsSummary", "Survey.id"),
+            array(__("Edit Survey", true), "", $restrictions, "", "edit", "Survey.id"),
+            array(__("Edit Questions", true), "", $restrictions, "", "questionsSummary", "Survey.id"),
             array(__("Copy Survey", true), "", "", "", "copy", "Survey.id"),
-            array(__("Delete Survey", true), $warning, "", "", "delete", "Survey.id"),
+            array(__("Delete Survey", true), $warning, $restrictions, "", "delete", "Survey.id"),
             array(__("View Creator", true), "",    "", "users", "view", "Survey.creator_id"));
 
         // No recursion in results (at all!)
@@ -138,7 +170,7 @@ class SurveysController extends AppController
             $course = $this->Course->getCourseById($course_id);
             $this->breadcrumb->push(array('course' => $course['Course']));
         }
-        $this->setUpAjaxList($conditions);
+        $this->setUpAjaxList();
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
         $this->set('course_id', $course_id);
