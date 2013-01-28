@@ -206,12 +206,7 @@ class SurveysController extends AppController
     function view($id)
     {
         // retrieving the requested survey
-        $survey = $this->Survey->find('first',
-            array(
-                'conditions' => array('id' => $id),
-                'contain' => false
-            )
-        );
+        $survey = $this->Survey->findById($id);
 
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($id) || empty($survey)) {
@@ -274,32 +269,24 @@ class SurveysController extends AppController
     function edit($id)
     {
         // retrieving the requested survey
-        $survey = $this->Survey->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id),
-                'contain' => array('Event' => 'EvaluationSubmission')
-            )
-        );
-        // for storing submissions - for checking if there are any submissions
-        $submissions = array();
+        $survey = $this->Survey->find('first', array(
+            'conditions' => array('id' => $id),
+            'contain' => array('Event' => 'EvaluationSubmission')
+        ));
 
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($id) || empty($survey)) {
             $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
+            return;
         }
 
         // check to see if submissions had been made - if yes - survey can't be edited
-        if (isset($survey['Event'])) {
-            foreach ($survey['Event'] as $event) {
-                if (!empty($event['EvaluationSubmission'])) {
-                    $submissions[] = $event['EvaluationSubmission'];
-                }
-            }
-            if (!empty($submissions)) {
+        foreach ($survey['Event'] as $event) {
+            if (!empty($event['EvaluationSubmission'])) {
                 $this->Session->setFlash(sprintf(__('Submissions have been made. %s cannot be edited. Please make a copy.', true), $survey['Survey']['name']));
                 $this->redirect('index');
+                return;
             }
         }
 
@@ -327,13 +314,7 @@ class SurveysController extends AppController
      */
     function copy($id)
     {
-        $survey = $this->Survey->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id),
-                'contain' => false,
-            )
-        );
+        $survey = $this->Survey->findById($id);
 
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($id) || empty($survey)) {
@@ -364,13 +345,10 @@ class SurveysController extends AppController
     function delete($id)
     {
         // retrieving the requested survey
-        $survey = $this->Survey->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id),
-                'contain' => array('Event' => 'EvaluationSubmission')
-            )
-        );
+        $survey = $this->Survey->find('first', array(
+            'conditions' => array('id' => $id),
+            'contain' => array('Event' => 'EvaluationSubmission')
+        ));
 
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($id) || empty($survey)) {
@@ -379,12 +357,10 @@ class SurveysController extends AppController
         }
 
         // check to see if submissions had been made - if yes - survey can't be edited
-        if (isset($survey['Event'])) {
-            foreach ($survey['Event'] as $event) {
-                if (!empty($event['EvaluationSubmission'])) {
-                    $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $survey['Survey']['name']));
-                    $this->redirect('index');
-                }
+        foreach ($survey['Event'] as $event) {
+            if (!empty($event['EvaluationSubmission'])) {
+                $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $survey['Survey']['name']));
+                $this->redirect('index');
             }
         }
 
@@ -410,12 +386,10 @@ class SurveysController extends AppController
     function questionsSummary($survey_id)
     {
         // retrieving the requested survey
-        $survey = $this->Survey->find('first',
-            array(
-                'conditions' => array('id' => $survey_id),
-                'contain' => array('Event' => 'EvaluationSubmission')
-            )
-        );
+        $survey = $this->Survey->find('first', array(
+            'conditions' => array('id' => $survey_id),
+            'contain' => array('Event' => 'EvaluationSubmission')
+        ));
 
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($survey_id) || empty($survey)) {
@@ -424,21 +398,13 @@ class SurveysController extends AppController
             return;
         }
 
-        // for storing submissions - for checking if there are any submissions
-        $hasSubmission = false;
         // check to see if submissions had been made - if yes - survey can't be edited
-        if (isset($survey['Event'])) {
-            foreach ($survey['Event'] as $event) {
-                if (!empty($event['EvaluationSubmission'])) {
-                    $hasSubmission = true;
-                }
+        foreach ($survey['Event'] as $event) {
+            if (!empty($event['EvaluationSubmission'])) {
+                $this->Session->setFlash(sprintf(__('Submissions have been made. %s cannot be edited. Please make a copy.', true), $survey['Survey']['name']));
+                $this->redirect('index');
+                return;
             }
-        }
-
-        if ($hasSubmission) {
-            $this->Session->setFlash(sprintf(__('Submissions have been made. %s cannot be edited. Please make a copy.', true), $survey['Survey']['name']));
-            $this->redirect('index');
-            return;
         }
 
         // Get all required data from each table for every question
@@ -520,10 +486,8 @@ class SurveysController extends AppController
       }
       if (isset($this->params['form']['load'])) {
           // load values from selected question into temp array
-          $this->data = $this->Question->find(
-              'first', 
-              array('conditions' => 
-              array('id' => $this->data['Question']['template_id'])));
+          $this->data = $this->Question->find('first', array(
+            'conditions' => array('id' => $this->data['Question']['template_id'])));
       } 
       else if (!empty($this->data)) {
           $this->data['Survey']['id'] = $survey_id;
@@ -541,7 +505,7 @@ class SurveysController extends AppController
               $surveyQuestionId = $this->SurveyQuestion->find('first', array('conditions' => array('survey_id' => $survey_id), 'fields' => array('MIN(number) as minQuestionId')));
               $this->SurveyQuestion->reorderQuestions($survey_id, $surveyQuestionId['0']['minQuestionId'], 'TOP');
               $this->redirect('questionsSummary/'.$survey_id);
-              //$this->questionsSummary($this->params['form']['survey_id'], null, null);
+              return;
           } else {
               $this->Session->setFlash(_('Failed to save question.'));
           }
@@ -568,10 +532,8 @@ class SurveysController extends AppController
       }
       if (isset($this->params['form']['load'])) {
           // load values from selected question into temp array
-          $this->data = $this->Question->find(
-              'first', 
-              array('conditions' => 
-              array('id' => $this->data['Question']['template_id'])));
+          $this->data = $this->Question->find('first', array(
+            'conditions' => array('id' => $this->data['Question']['template_id'])));
       } 
       else if (!empty($this->data)) {
           $this->data['Question']['id'] = $question_id;
@@ -595,7 +557,7 @@ class SurveysController extends AppController
               $this->Session->setFlash(__('Error in saving question.', true));
           }
       } else {
-          $this->data = $this->Question->find('first', array('conditions' => array('id' => $question_id)));
+          $this->data = $this->Question->findById($question_id);
       }
 
       $this->set('templates', $this->Question->find('list', array('conditions' => array('master' => 'yes'))));

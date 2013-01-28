@@ -156,11 +156,6 @@ class EmailtemplatesController extends AppController
      */
     function index()
     {
-        if (!User::hasPermission('controllers/emailtemplates')) {
-            $this->Session->setFlash(__('Error: You do not have permission to access email templates.', true));
-            $this->redirect('/home');
-        }
-
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
         // Set the display list
@@ -177,11 +172,6 @@ class EmailtemplatesController extends AppController
      */
     function add()
     {
-        if (!User::hasPermission('controllers/emailtemplates')) {
-            $this->Session->setFlash(__('Error: You do not have permission to add email templates.', true));
-            $this->redirect('index');
-        }
-
         $this->set('title_for_layout', __('Add Email Template', true));
         // Set up user info
         $currentUser = $this->User->getCurrentLoggedInUser();
@@ -212,10 +202,6 @@ class EmailtemplatesController extends AppController
      */
     function edit ($id = null)
     {
-        if (!User::hasPermission('controllers/emailtemplates/edit')) {
-            $this->Session->setFlash(__('Error: You do not have permission to edit email templates.', true));
-            $this->redirect('index');
-        }
         if ($this->data) {
             //Save Data
             if ($this->EmailTemplate->save($this->data)) {
@@ -228,13 +214,14 @@ class EmailtemplatesController extends AppController
         }
 
         // retrieving the requested email template
-        $template = $this->EmailTemplate->find('first', array('conditions' => array('id' => $id)));
+        $template = $this->EmailTemplate->findById($id);
 
         $this->set('title_for_layout', __('Edit Email Template', true));
         // check to see if $id is valid - is an email template
         if (empty($template)) {
             $this->Session->setFlash(__('Error:Invalid ID.', true));
             $this->redirect('index');
+            return;
         }
 
         if (!User::hasPermission('functions/superadmin')) {
@@ -246,15 +233,8 @@ class EmailtemplatesController extends AppController
                 // course ids
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
                 // instructors
-                $instructors = $this->UserCourse->find(
-                    'all',
-                    array(
-                        'conditions' => array('UserCourse.course_id' => $courseIds)
-                ));
-                $instructorIds = array();
-                foreach ($instructors as $instructor) {
-                    $instructorIds[] = $instructor['UserCourse']['user_id'];
-                }
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
                 // add the user's id
                 array_push($instructorIds, $this->Auth->user('id'));
             }
@@ -281,23 +261,14 @@ class EmailtemplatesController extends AppController
      */
     function delete ($id)
     {
-        if (!User::hasPermission('controllers/emailtemplates')) {
-            $this->Session->setFlash(__('Error: You do not have permission to delete email templates.', true));
-            $this->redirect('/home');
-        }
-
         // retrieving the requested email template
-        $template = $this->EmailTemplate->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id),
-            )
-        );
+        $template = $this->EmailTemplate->findById($id);
 
         // check to see if $id is valid - numeric & is a email template
         if (empty($template)) {
             $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
+            return;
         }
 
         if (!User::hasPermission('functions/superadmin')) {
@@ -309,15 +280,8 @@ class EmailtemplatesController extends AppController
                 // course ids
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
                 // instructors
-                $instructors = $this->UserCourse->find(
-                    'all',
-                    array(
-                        'conditions' => array('UserCourse.course_id' => $courseIds)
-                ));
-                $instructorIds = array();
-                foreach ($instructors as $instructor) {
-                    $instructorIds[] = $instructor['UserCourse']['user_id'];
-                }
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
                 // add the user's id
                 array_push($instructorIds, $this->Auth->user('id'));
             }
@@ -326,6 +290,7 @@ class EmailtemplatesController extends AppController
             if (!(in_array($template['EmailTemplate']['creator_id'], $instructorIds))) {
                 $this->Session->setFlash(__('Error: You do not have permission to delete this email template', true));
                 $this->redirect('index');
+                return;
             }
         }
 
@@ -343,20 +308,16 @@ class EmailtemplatesController extends AppController
      */
     function view($id)
     {
-        if (!User::hasPermission('controllers/emailtemplates')) {
-            $this->Session->setFlash(__('Error: You do not have permission to view email templates.', true));
-            $this->redirect('/home');
-        }
-
         $this->set('title_for_layout', __('View Email Template', true));   //title for view
 
         // retrieving the requested email template
-        $template = $this->EmailTemplate->find('first', array('conditions' => array('id' => $id)));
+        $template = $this->EmailTemplate->findById($id);
 
         // check to see if $id is valid - numeric & is a email template
         if (!is_numeric($id) || empty($template)) {
             $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
+            return;
         }
 
         // check for permissions if the email template is not public
@@ -369,15 +330,8 @@ class EmailtemplatesController extends AppController
                 // course ids
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
                 // instructors
-                $instructors = $this->UserCourse->find(
-                    'all',
-                    array(
-                        'conditions' => array('UserCourse.course_id' => $courseIds)
-                ));
-                $instructorIds = array();
-                foreach ($instructors as $instructor) {
-                    $instructorIds[] = $instructor['UserCourse']['user_id'];
-                }
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
                 // add the user's id
                 array_push($instructorIds, $this->Auth->user('id'));
             }
@@ -389,7 +343,7 @@ class EmailtemplatesController extends AppController
             }
         }
 
-        $this->data = $this->EmailTemplate->find('first', array('conditions' => array('EmailTemplate.id' => $id)));
+        $this->data = $this->EmailTemplate->findById($id);
         $this->set('readonly', true);
     }
 
@@ -400,9 +354,7 @@ class EmailtemplatesController extends AppController
     function displayTemplateContent($templateId = null)
     {
         $this->layout = 'ajax';
-        $template = $this->EmailTemplate->find('first', array(
-            'conditions' => array('EmailTemplate.id' => $templateId)
-        ));
+        $template = $this->EmailTemplate->findById($templateId);
         $this->set('template', $template);
     }
 
@@ -418,9 +370,7 @@ class EmailtemplatesController extends AppController
     function displayTemplateSubject($templateId = null)
     {
         $this->layout = 'ajax';
-        $template = $this->EmailTemplate->find('first', array(
-            'conditions' => array('EmailTemplate.id' => $templateId)
-        ));
+        $template = $this->EmailTemplate->findById($templateId);
         $this->set('template', $template);
     }
 

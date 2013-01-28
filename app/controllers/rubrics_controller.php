@@ -118,15 +118,12 @@ class RubricsController extends AppController
             if (User::hasPermission('functions/user/admin')) {
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
             } else {
-                $courseIds = $this->UserCourse->find('list', array('conditions' => array('user_id' => $myID),
-                    'fields' => array('course_id')));
+                $courseIds = Set::extract($this->UserCourse->findAllByUserId($myID),'/UserCourse/course_id');    
             }
+            
             // grab all instructors that have access to the courses above
-            $instructors = $this->UserCourse->find(
-                'all',
-                array(
-                    'conditions' => array('UserCourse.course_id' => $courseIds)
-            ));
+            $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+
             $extraFilters = "(";
             // only admins will go through this loop
             foreach ($instructors as $instructor) {
@@ -186,11 +183,6 @@ class RubricsController extends AppController
      */
     function index()
     {
-        if (!User::hasPermission('controllers/rubrics')) {
-            $this->Session->setFlash(__('Error: You do not have permission to access rubrics', true));
-            $this->redirect('/home');
-        }
-
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
         // Set the display list
@@ -216,30 +208,22 @@ class RubricsController extends AppController
      * view
      *
      * @param int    $id     id
-     * @param string $layout layout
      *
      * @access public
      * @return void
      */
-    function view($id, $layout='')
+    function view($id)
     {
-        if (!User::hasPermission('controllers/rubrics')) {
-            $this->Session->setFlash(__('Error: You do not have permission to view rubrics', true));
-            $this->redirect('/home');
-        }
-
-        $eval = $this->Rubric->find(
-            'first',
-            array(
-                'conditions' => array('Rubric.id' => $id),
-                'contain' => array('Event' => 'EvaluationSubmission')
-            )
-        );
+        $eval = $this->Rubric->find('first', array(
+            'conditions' => array('Rubric.id' => $id),
+            'contain' => array('Event' => 'EvaluationSubmission')
+        ));
 
         // check to see if $id is valid - numeric & is a rubric
         if (!is_numeric($id) || empty($eval)) {
             $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
+            return;
         }
 
         // check whether the user has access to the evaluation if the rubric is not public
@@ -252,15 +236,8 @@ class RubricsController extends AppController
                 // course ids
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
                 // instructors
-                $instructors = $this->UserCourse->find(
-                    'all',
-                    array(
-                        'conditions' => array('UserCourse.course_id' => $courseIds)
-                ));
-                $instructorIds = array();
-                foreach ($instructors as $instructor) {
-                    $instructorIds[] = $instructor['UserCourse']['user_id'];
-                }
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
                 // add the user's id
                 array_push($instructorIds, $this->Auth->user('id'));
             }
@@ -269,6 +246,7 @@ class RubricsController extends AppController
             if (!(in_array($eval['Rubric']['creator_id'], $instructorIds))) {
                 $this->Session->setFlash(__('Error: You do not have permission to view this rubric', true));
                 $this->redirect('index');
+                return;
             }
         }
 
@@ -295,17 +273,8 @@ class RubricsController extends AppController
      * @access public
      * @return void
      */
-    function add($layout='')
+    function add()
     {
-        if (!User::hasPermission('controllers/rubrics')) {
-            $this->Session->setFlash(__('Error: You do not have permission to add rubrics', true));
-            $this->redirect('/home');
-        }
-
-        if ($layout != '') {
-            $this->layout = $layout;
-        }
-
         if (!empty($this->data)) {
             $this->set('action', __('Add Rubric (Step 2)', true));
             $this->set('data', $this->data);
@@ -314,6 +283,7 @@ class RubricsController extends AppController
                 if ($this->__processForm()) {
                     $this->Session->setFlash(__('The rubric was added successfully.', true), 'good');
                     $this->redirect('index');
+                    return;
                 } else {
                     $this->set('data', $this->data);
                     $this->Session->setFlash(__("The evaluation was not added successfully.", true));
@@ -327,28 +297,6 @@ class RubricsController extends AppController
             $this->set('action', __('Add Rubric', true));
         }
         $this->render('edit');
-/*
-          $this->params['data']['Rubric']['total_marks'] = $this->params['form']['total_marks'];
-
-          if ($this->Rubric->save($this->params['data'])) {
-            //prepare the data from the form fields in array
-            $this->params['data']['Rubric'] = $this->Rubric->prepData($this->params, $this->Auth->user('id'));
-
-            //insert all the rubric data into other associated tables
-            $this->RubricsLom->insertLOM($this->Rubric->id, $this->params['data']['Rubric']);
-            $this->RubricsCriteria->insertCriteria($this->Rubric->id, $this->params['data']['Rubric']);
-            $this->RubricsCriteriaComment->insertCriteriaComm($this->Rubric->id, $this->params['data']['Rubric']);
-
-            $this->Session->setFlash('The rubric was added successfully.');
-            $this->redirect('/rubrics/index');
-          } else {
-            $this->set('data', $this->params['data']);
-            $this->set('errmsg', $this->Rubric->errorMessage);
-            $this->render('add');
-          }
-        }
-
-}*/
     }
 
     /**
@@ -361,24 +309,17 @@ class RubricsController extends AppController
      */
     function edit($id)
     {
-        if (!User::hasPermission('controllers/rubrics')) {
-            $this->Session->setFlash(__('Error: You do not have permission to edit rubrics', true));
-            $this->redirect('/home');
-        }
-
         // retrieving the requested rubric
-        $eval = $this->Rubric->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id),
-                'contain' => array('Event' => 'EvaluationSubmission')
-            )
-        );
+        $eval = $this->Rubric->find('first', array(
+            'conditions' => array('id' => $id),
+            'contain' => array('Event' => 'EvaluationSubmission')
+        ));
 
         // check to see if $id is valid - numeric & is a rubric
         if (!is_numeric($id) || empty($eval)) {
             $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
+            return;
         }
 
         if (!User::hasPermission('functions/superadmin')) {
@@ -390,15 +331,8 @@ class RubricsController extends AppController
                 // course ids
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
                 // instructors
-                $instructors = $this->UserCourse->find(
-                    'all',
-                    array(
-                        'conditions' => array('UserCourse.course_id' => $courseIds)
-                ));
-                $instructorIds = array();
-                foreach ($instructors as $instructor) {
-                    $instructorIds[] = $instructor['UserCourse']['user_id'];
-                }
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
                 // add the user's id
                 array_push($instructorIds, $this->Auth->user('id'));
             }
@@ -406,6 +340,7 @@ class RubricsController extends AppController
             if (!(in_array($eval['Rubric']['creator_id'], $instructorIds))) {
                 $this->Session->setFlash(__('Error: You do not have permission to edit this rubric', true));
                 $this->redirect('index');
+                return;
             }
         }
 
@@ -413,6 +348,7 @@ class RubricsController extends AppController
             if (!empty($event['EvaluationSubmission'])) {
                 $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $eval['Rubric']['name']));
                 $this->redirect('index');
+                return;
             }
         }
 
@@ -429,6 +365,7 @@ class RubricsController extends AppController
                 if ($this->__processForm()) {
                     $this->Session->setFlash(__('The rubric evaluation was updated successfully', true), 'good');
                     $this->redirect('index');
+                    return;
                 } else { 
                     $this->set('data', $this->data);
                     $this->Session->setFlash(__("The evaluation was not updated successfully.", true));
@@ -440,7 +377,6 @@ class RubricsController extends AppController
             }
         }
         $this->set('action', __('Edit Rubric', true));
-        $this->render('edit');
     }
 
 
@@ -476,23 +412,16 @@ class RubricsController extends AppController
      */
     function copy($id)
     {
-        if (!User::hasPermission('controllers/rubrics')) {
-            $this->Session->setFlash(__('Error: You do not have permission to copy rubrics.', true));
-            $this->redirect('/home');
-        }
-
-        $eval = $this->Rubric->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id),
-                'contain' => array('Event' => 'EvaluationSubmission')
-            )
-        );
+        $eval = $this->Rubric->find('first',array(
+            'conditions' => array('id' => $id),
+            'contain' => array('Event' => 'EvaluationSubmission')
+        ));
 
         // check to see if $id is valid - numeric & is a rubric
         if (!is_numeric($id) || empty($eval)) {
             $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
+            return;
         }
 
         // can be copied if rubric is public
@@ -505,15 +434,8 @@ class RubricsController extends AppController
                 // course ids
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
                 // instructors
-                $instructors = $this->UserCourse->find(
-                    'all',
-                    array(
-                        'conditions' => array('UserCourse.course_id' => $courseIds)
-                ));
-                $instructorIds = array();
-                foreach ($instructors as $instructor) {
-                    $instructorIds[] = $instructor['UserCourse']['user_id'];
-                }
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
                 // add the user's id
                 array_push($instructorIds, $this->Auth->user('id'));
             }
@@ -522,6 +444,7 @@ class RubricsController extends AppController
             if (!(in_array($eval['Rubric']['creator_id'], $instructorIds))) {
                 $this->Session->setFlash(__('Error: You do not have permission to copy this rubric', true));
                 $this->redirect('index');
+                return;
             }
         }
 
@@ -542,24 +465,17 @@ class RubricsController extends AppController
      */
     function delete($id)
     {
-        if (!User::hasPermission('controllers/rubrics')) {
-            $this->Session->setFlash(__('Error: You do not have permission to delete rubrics', true));
-            $this->redirect('/home');
-        }
-
         // retrieving the requested rubric
-        $eval = $this->Rubric->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id),
-                'contain' => array('Event' => 'EvaluationSubmission')
-            )
-        );
+        $eval = $this->Rubric->find('first', array(
+            'conditions' => array('id' => $id),
+            'contain' => array('Event' => 'EvaluationSubmission')
+        ));
 
         // check to see if $id is valid - numeric & is a rubric
         if (!is_numeric($id) || empty($eval)) {
             $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
+            return;
         }
 
         if (!User::hasPermission('functions/superadmin')) {
@@ -571,15 +487,8 @@ class RubricsController extends AppController
                 // course ids
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
                 // instructors
-                $instructors = $this->UserCourse->find(
-                    'all',
-                    array(
-                        'conditions' => array('UserCourse.course_id' => $courseIds)
-                ));
-                $instructorIds = array();
-                foreach ($instructors as $instructor) {
-                    $instructorIds[] = $instructor['UserCourse']['user_id'];
-                }
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
                 // add the user's id
                 array_push($instructorIds, $this->Auth->user('id'));
             }
@@ -588,6 +497,7 @@ class RubricsController extends AppController
             if (!(in_array($eval['Rubric']['creator_id'], $instructorIds))) {
                 $this->Session->setFlash(__('Error: You do not have permission to delete this rubric', true));
                 $this->redirect('index');
+                return;
             }
         }
 
@@ -597,11 +507,6 @@ class RubricsController extends AppController
                 'error');
         } else {
             if ($this->Rubric->delete($id, true)) {
-        /*$this->RubricsLom->deleteLOM($id);
-          $this->RubricsCriteria->deleteCriterias($id);
-          $this->RubricsCriteriaComment->deleteCriteriaComments($id);
-        //$this->set('data', $this->Rubric->find('all',null, null, 'id'));
-        $this->index();*/
                 $this->Session->setFlash(__('The rubric was deleted successfully.', true), 'good');
             }
         }

@@ -99,15 +99,11 @@ class MixevalsController extends AppController
             if (User::hasPermission('functions/user/admin')) {
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
             } else {
-                $courseIds = $this->UserCourse->find('list', array('conditions' => array('user_id' => User::get('id')),
-                    'fields' => array('course_id')));
+                $courseIds = Set::extract($this->UserCourse->findAllByUserId($myID),'/UserCourse/course_id');
             }
             // grab all instructors that have access to the courses above
-            $instructors = $this->UserCourse->find(
-                'all',
-                array(
-                    'conditions' => array('UserCourse.course_id' => $courseIds)
-            ));
+            $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+
             $extraFilters = "(";
             // only admins will go through this loop
             foreach ($instructors as $instructor) {
@@ -190,12 +186,11 @@ class MixevalsController extends AppController
      * view
      *
      * @param string $id     id
-     * @param string $layout layout
      *
      * @access public
      * @return void
      */
-    function view($id, $layout='')
+    function view($id)
     {
         $eval = $this->Mixeval->find('first', array(
             'conditions' => array('id' => $id),
@@ -233,10 +228,6 @@ class MixevalsController extends AppController
             }
         }
 
-        if ($layout != '') {
-            $this->layout = $layout;
-        }
-
         $this->data = $eval;
         $this->set('data', $eval);
         $this->set('readonly', true);
@@ -248,18 +239,11 @@ class MixevalsController extends AppController
     /**
      * add
      *
-     * @param string $layout
-     *
      * @access public
      * @return void
      */
-    function add($layout='')
+    function add()
     {
-        if ($layout != '') {
-            $this->layout = $layout;
-            $this->set('layout', $layout);
-        }
-
         if (empty($this->data)) {
             $this->data['Mixeval']= array();
             $this->data['Question'] = array();
@@ -330,12 +314,6 @@ class MixevalsController extends AppController
      */
     function edit($id)
     {
-        if (!User::hasPermission('controllers/mixevals')) {
-            $this->Session->setFlash(__('Error: You do not have permission to edit mixed evaluations', true));
-            $this->redirect('/home');
-            return;
-        }
-
         // retrieving the requested mixed evaluation
         $eval = $this->Mixeval->find('first', array(
             'conditions' => array('id' => $id),
@@ -350,13 +328,11 @@ class MixevalsController extends AppController
         }
         
         // check to see if submissions had been made - if yes - mixeval can't be edited
-        if (isset($eval['Event'])) {
-            foreach ($eval['Event'] as $event) {
-                if (!empty($event['EvaluationSubmission'])) {
-                    $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $eval['Mixeval']['name']));
-                    $this->redirect('index');
-                    return;
-                }
+        foreach ($eval['Event'] as $event) {
+            if (!empty($event['EvaluationSubmission'])) {
+                $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $eval['Mixeval']['name']));
+                $this->redirect('index');
+                return;
             }
         }
         
@@ -444,12 +420,6 @@ class MixevalsController extends AppController
      */
     function copy($id=null)
     {
-        if (!User::hasPermission('controllers/mixevals')) {
-            $this->Session->setFlash(__('Error: You do not have permission to copy mixed evaluations', true));
-            $this->redirect('/home');
-            return;
-        }
-
         $eval = $this->Mixeval->find('first', array(
             'conditions' => array('id' => $id),
             'contain' => array('Event' => 'EvaluationSubmission')
@@ -558,17 +528,13 @@ class MixevalsController extends AppController
             $message.= "</span>";
             $this->Session->setFlash($message);
             $this->redirect('index');
-            return;
             //	exit;
         } else {
             if ($this->Mixeval->delete($id)) {
                 $this->Session->setFlash(__('The Mixed Evaluation was removed successfully.', true), 'good');
                 $this->redirect('index');
-                return;
-
             } else {
                 $this->Session->setFlash($this->Mixeval->errorMessage, 'error');
-
             }
         }
     }
