@@ -213,7 +213,7 @@ class EmailtemplatesController extends AppController
      * @access public
      * @return void
      */
-    function edit ($id)
+    function edit ($id = null)
     {
         if (!User::hasPermission('controllers/emailtemplates/edit')) {
             $this->Session->setFlash(__('Error: You do not have permission to edit email templates.', true));

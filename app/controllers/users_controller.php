@@ -44,9 +44,14 @@ class UsersController extends AppController
     {
         parent::beforeFilter();
 
+        $allowTypes = array(
+            'text/plain', 'text/csv', 'application/csv',
+            'application/csv.ms-excel', 'application/octet-stream',
+            'text/comma-separated-values', 'text/anytext');
         $this->FileUpload->allowedTypes(array(
-            'txt' => array('text/plain'),
-            'csv' => array('text/csv', 'application/csv')));
+            'txt' => null,
+            'csv' => null,
+        ));
         $this->FileUpload->uploadDir('../tmp');
         $this->FileUpload->fileModel(null);
         $this->FileUpload->attr('required', true);
@@ -705,7 +710,8 @@ class UsersController extends AppController
             $this->data['User']['id'] = $id;
 
             if (!empty($this->data['User']['tmp_password'])) {
-                if (md5($this->data['User']['old_password']==$this->Auth->user('password'))) {
+                $user = $this->User->findUserByidWithFields($id, array('password'));
+                if (md5($this->data['User']['old_password'])==$user['password']) {
                     if ($this->data['User']['tmp_password']==$this->data['User']['confirm_password']) {
                         $this->data['User']['password'] = md5($this->data['User']['tmp_password']);
                     } else {
@@ -864,7 +870,10 @@ class UsersController extends AppController
         }
 
         // Read the user
-        $user_data = $this->User->findById($user_id, array('contain' => false));
+        $user_data = $this->User->find('first', array(
+            'conditions' => array('id' => $user_id),
+            'contain' => false
+        ));
 
         if (empty($user_data)) {
             $this->Session->setFlash(__('User Not Found!', true));
@@ -905,19 +914,19 @@ class UsersController extends AppController
 
         //Save Data
         if ($this->User->save($user_data, true, array('password'))) {
-            $message = sprintf(__("Password successfully reset. The new password is %s.\n", true), $tmp_password);
+            $message = sprintf(__("Password successfully reset. The new password is %s.", true).'<br />', $tmp_password);
             $this->User->set('id', $user_id);
 
             // send email to user
             $this->set('user_data', $user_data);
-            if ($this->_sendEmail('', 'Reset Password', $this->Auth->user('email'), $user_data['User']['email'], 'resetPassword')) {
-                //if ($this->_sendEmail( $to, $from, $subject, $email_msg )) {
-                $message .= __("Email has been sent. ", true);
-            } else {
-                if (!isset($user_data['User']['email']) || strlen($user_data['User']['email']) < 1) {
-                    $message .= __('No destination email address. ', true);
+            if (!empty($user_data['User']['email'])) {
+                if ($this->_sendEmail('', 'Reset Password', null, $user_data['User']['email'], 'resetPassword')) {
+                    $message .= __("Email has been sent. ", true);
+                } else {
+                    $message .= __("Email was <u>not</u> sent to the user. ", true) . $this->Email->smtpError;
                 }
-                $message .= __("Email was <u>not</u> sent to the user. ", true) . $this->Email->smtpError;
+            } else {
+                $message .= __('No email has been sent. User does not have email address.', true);
             }
             $this->Session->setFlash($message, 'good');
             $this->redirect($this->referer());
@@ -1081,7 +1090,7 @@ class UsersController extends AppController
         $from = $this->Auth->user('email');
         $to = $user['User']['email'];
         $username = $user['User']['username'];
-        $name = $user['User']['full_name'];
+        $name = $user['User']['first_name'].' '.$user['User']['last_name'];
 
         // this means only students will get a list of courses they're
         // enrolled in, since instructors are stored in another array

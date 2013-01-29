@@ -23,10 +23,11 @@
             'name' => 'merge',
             'options' => $mergeList,
             'empty' => __('-- Select Merge Field --', true),
-            'label' => 'Insert Merge Field'
+            'label' => 'Insert Merge Field',
+            'onChange' => '$("email_content").value = $F("email_content") + $F("merge");',
         )
     );
-    echo $this->Form->input('EmailTemplate.content');
+    echo $this->Form->input('EmailTemplate.content', array('id' => 'email_content'));
     echo $this->Form->submit();
     echo $this->Form->end();
 ?>

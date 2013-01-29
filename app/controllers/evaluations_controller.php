@@ -348,16 +348,15 @@ class EvaluationsController extends AppController
 
     function _sendConfirmationEmail()
     {
-        $this->SysParameter->reload();
         $email = User::get('email');
         if (empty($email)) {
             return;
         }
 
-        if (!$this->TemplateEmail->send(array(User::get('id') => $email), 'Submission Confirmation')) {
-            $this->log('Sending email to '.$email.' failed.'. $this->Email->smtpError);
+        /*if (!$this->TemplateEmail->send(array(User::get('id') => $email), 'Submission Confirmation')) {
+            $this->log('Sending email to '.$email.' failed.'. $this->TemplateEmail->smtpError);
             $this->Session->setFlash('Sending confirmation email failed!');
-        }
+        }*/
     }
 
     /**
@@ -1103,20 +1102,24 @@ class EvaluationsController extends AppController
 
             $this->Session->setFlash(__('Error: Invalid id or you do not have permission to access this event.', true));
             $this->redirect('/home/index');
+            return;
         }
 
         if ('3' != $event['Event']['event_template_type_id']) {
             // not survey, we need group
             if (!is_numeric($groupId) ||
-                !($group = $this->Group->getGroupByGroupIdEventIdMemberId($groupId, $eventId, User::get('id')))) {
+                //!($group = $this->Group->getGroupByGroupIdEventIdMemberId($groupId, $eventId, User::get('id')))) {
+                !($group = $this->Group->getGroupWithMemberRoleByGroupIdEventId($groupId, $eventId))) {
 
                     $this->Session->setFlash(__('Error: Invalid group id or you are not in this group.', true));
                     $this->redirect('/home/index');
-                }
+                    return;
+            }
 
             if (!$event['Event']['is_result_released']) {
                 $this->Session->setFlash(__('Error: The results are not released.', true));
                 $this->redirect('/home/index');
+                return;
             }
             $event = array_merge($event, $group);
         }
@@ -1189,7 +1192,6 @@ class EvaluationsController extends AppController
             if (isset($formattedResult['mixevalQuestion'])) {
                 $this->set('mixevalQuestion', $formattedResult['mixevalQuestion']);
             }
-            $this->set('allMembersCompleted', $formattedResult['allMembersCompleted']);
             $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
             $this->set('scoreRecords', $formattedResult['scoreRecords']);
             $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);

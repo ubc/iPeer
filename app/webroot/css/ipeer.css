@@ -134,6 +134,7 @@ p {
     height: 2em;
     font-weight: 600;
     display: block;
+    width: 8em;
 }
 
 a:link, a:visited {
@@ -734,6 +735,10 @@ i {
 
 #UserForm .buttons {
     margin-left: 14em;
+}
+
+#UserForm .checkbox label {
+    float: none;
 }
 
 /* users/goToClassList/ */
