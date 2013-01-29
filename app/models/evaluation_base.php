@@ -193,4 +193,19 @@ class EvaluationBase extends AppModel
 
         return $userPenalty;
     }
+    
+    /**
+     * get Event and Submission of Eval
+     *
+     * @param mixed $evalId eval id
+     *
+     * @access public
+     * @return void
+     */
+    function getEventSub($evalId) {
+        return $this->find('first', array(
+            'conditions' => array('id' => $evalId),
+            'contain' => array('Event' => 'EvaluationSubmission')
+        ));
+    }
 }

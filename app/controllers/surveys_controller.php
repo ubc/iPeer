@@ -269,10 +269,7 @@ class SurveysController extends AppController
     function edit($id)
     {
         // retrieving the requested survey
-        $survey = $this->Survey->find('first', array(
-            'conditions' => array('id' => $id),
-            'contain' => array('Event' => 'EvaluationSubmission')
-        ));
+        $survey = $this->Survey->getEventSub($id);
 
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($id) || empty($survey)) {
@@ -345,10 +342,7 @@ class SurveysController extends AppController
     function delete($id)
     {
         // retrieving the requested survey
-        $survey = $this->Survey->find('first', array(
-            'conditions' => array('id' => $id),
-            'contain' => array('Event' => 'EvaluationSubmission')
-        ));
+        $survey = $this->Survey->getEventSub($id);
 
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($id) || empty($survey)) {
@@ -386,10 +380,7 @@ class SurveysController extends AppController
     function questionsSummary($survey_id)
     {
         // retrieving the requested survey
-        $survey = $this->Survey->find('first', array(
-            'conditions' => array('id' => $survey_id),
-            'contain' => array('Event' => 'EvaluationSubmission')
-        ));
+        $survey = $this->Survey->getEventSub($survey_id);
 
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($survey_id) || empty($survey)) {

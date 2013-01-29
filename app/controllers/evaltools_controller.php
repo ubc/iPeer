@@ -38,8 +38,6 @@ class EvaltoolsController extends AppController
     /**
      * index
      *
-     * @param bool $evaltool
-     *
      * @access public
      * @return void
      */

@@ -99,7 +99,7 @@ class MixevalsController extends AppController
             if (User::hasPermission('functions/user/admin')) {
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
             } else {
-                $courseIds = Set::extract($this->UserCourse->findAllByUserId($myID),'/UserCourse/course_id');
+                $courseIds = Set::extract($this->UserCourse->findAllByUserId($myID), '/UserCourse/course_id');
             }
             // grab all instructors that have access to the courses above
             $instructors = $this->UserCourse->findAllByCourseId($courseIds);
@@ -185,7 +185,7 @@ class MixevalsController extends AppController
     /**
      * view
      *
-     * @param string $id     id
+     * @param mixed $id id
      *
      * @access public
      * @return void
@@ -315,10 +315,7 @@ class MixevalsController extends AppController
     function edit($id)
     {
         // retrieving the requested mixed evaluation
-        $eval = $this->Mixeval->find('first', array(
-            'conditions' => array('id' => $id),
-            'contain' => array('Event' => 'EvaluationSubmission')
-        ));
+        $eval = $this->Mixeval->getEventSub($id);
 
         // check to see if $id is valid - numeric & is a mixed evaluation
         if (!is_numeric($id) || empty($eval)) {
@@ -420,10 +417,7 @@ class MixevalsController extends AppController
      */
     function copy($id=null)
     {
-        $eval = $this->Mixeval->find('first', array(
-            'conditions' => array('id' => $id),
-            'contain' => array('Event' => 'EvaluationSubmission')
-        ));
+        $eval = $this->Mixeval->getEventSub($id);
 
         // check to see if $id is valid - numeric & is a mixed evaluation
         if (!is_numeric($id) || empty($eval)) {
@@ -478,13 +472,8 @@ class MixevalsController extends AppController
             return;
         }
 
-        // for checking the user's role
-        //$user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
         // retrieving the requested mixed evaluation
-        $eval = $this->Mixeval->find('first', array(
-            'conditions' => array('id' => $id),
-            'contain' => array('Event' => 'EvaluationSubmission')
-        ));
+        $eval = $this->Mixeval->getEventSub($id);
 
         // check to see if $id is valid - numeric & is a mixed evaluation
         if (!is_numeric($id) || empty($eval)) {

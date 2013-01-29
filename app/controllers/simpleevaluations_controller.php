@@ -118,12 +118,7 @@ class SimpleevaluationsController extends AppController
         } else {
             $creators = array();
             // grab course ids of the courses admin/instructor has access to
-            $courseIds = array();
-            if (User::hasPermission('functions/user/admin')) {
-                $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
-            } else {
-                $courseIds = Set::extract($this->UserCourse->findAllByUserId($myID),'/UserCourse/course_id');    
-            }
+            $courseIds = User::getAccessibleCourses();
 
             // grab all instructors that have access to the courses above
             $instructors = $this->UserCourse->findAllByCourseId($courseIds);
@@ -209,17 +204,14 @@ class SimpleevaluationsController extends AppController
     /**
      * view
      *
-     * @param mixed  $id     id
+     * @param mixed $id id
      *
      * @access public
      * @return void
      */
     function view($id = null)
     {
-        $eval = $this->SimpleEvaluation->find('first', array(
-            'conditions' => array('id' => $id),
-            'contain' => array('Event' => 'EvaluationSubmission')
-        ));
+        $eval = $this->SimpleEvaluation->getEventSub($id);
 
         // check to see if $id is valid - numeric & is a simple evaluation
         if (!is_numeric($id) || empty($eval)) {
@@ -312,10 +304,7 @@ class SimpleevaluationsController extends AppController
     function edit($id = null)
     {
         // retrieving the requested simple evaluation
-        $eval = $this->SimpleEvaluation->find('first', array(
-            'conditions' => array('id' => $id),
-            'contain' => array('Event' => 'EvaluationSubmission')
-        ));
+        $eval = $this->SimpleEvaluation->getEventSub($id);
 
         // check to see if $id is valid - numeric & is a simple evaluation
         if (!is_numeric($id) || empty($eval)) {
@@ -381,10 +370,7 @@ class SimpleevaluationsController extends AppController
      */
     function copy($id = null)
     {
-        $eval = $this->SimpleEvaluation->find('first', array(
-            'conditions' => array('id' => $id),
-            'contain' => array('Event' => 'EvaluationSubmission')
-        ));
+        $eval = $this->SimpleEvaluation->getEventSub($id);
 
         // check to see if $id is valid - numeric & is a simple evaluation
         if (!is_numeric($id) || empty($eval)) {
@@ -437,10 +423,7 @@ class SimpleevaluationsController extends AppController
     function delete($id = null)
     {
         // retrieving the requested simple evaluation
-        $eval = $this->SimpleEvaluation->find('first', array(
-            'conditions' => array('id' => $id),
-            'contain' => array('Event' => 'EvaluationSubmission')
-        ));
+        $eval = $this->SimpleEvaluation->getEventSub($id);
 
         // check to see if $id is valid - numeric & is a simple evaluation
         if (!is_numeric($id) || empty($eval)) {

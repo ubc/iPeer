@@ -1452,7 +1452,6 @@ class EvaluationsController extends AppController
             break;
         }
 
-
         //Update all groupEvent's comment release Status based on submission
         $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId);
         foreach ($groupEventList as $groupEvent) {
@@ -1519,7 +1518,6 @@ class EvaluationsController extends AppController
         default:
             break;
         }
-
 
         //Update all groupEvent's grade release Status based on submission
         $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId);

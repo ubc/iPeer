@@ -114,13 +114,7 @@ class RubricsController extends AppController
         } else {
             $creators = array();
             // grab course ids of the courses admin/instructor has access to
-            $courseIds = array();
-            if (User::hasPermission('functions/user/admin')) {
-                $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
-            } else {
-                $courseIds = Set::extract($this->UserCourse->findAllByUserId($myID),'/UserCourse/course_id');    
-            }
-            
+            $courseIds = User::getAccessibleCourses();
             // grab all instructors that have access to the courses above
             $instructors = $this->UserCourse->findAllByCourseId($courseIds);
 
@@ -207,17 +201,14 @@ class RubricsController extends AppController
     /**
      * view
      *
-     * @param int    $id     id
+     * @param mixed $id id
      *
      * @access public
      * @return void
      */
     function view($id)
     {
-        $eval = $this->Rubric->find('first', array(
-            'conditions' => array('Rubric.id' => $id),
-            'contain' => array('Event' => 'EvaluationSubmission')
-        ));
+        $eval = $this->Rubric->getEventSub($id);
 
         // check to see if $id is valid - numeric & is a rubric
         if (!is_numeric($id) || empty($eval)) {
@@ -250,10 +241,6 @@ class RubricsController extends AppController
             }
         }
 
-        if ($layout != '') {
-            $this->layout = $layout;
-        }
-
         $this->data = $this->Rubric->find('first', array('conditions' => array('id' => $id),
             'contain' => array('RubricsCriteria.RubricsCriteriaComment',
             'RubricsLom')));
@@ -267,8 +254,6 @@ class RubricsController extends AppController
 
     /**
      * add
-     *
-     * @param string $layout
      *
      * @access public
      * @return void
@@ -310,10 +295,7 @@ class RubricsController extends AppController
     function edit($id)
     {
         // retrieving the requested rubric
-        $eval = $this->Rubric->find('first', array(
-            'conditions' => array('id' => $id),
-            'contain' => array('Event' => 'EvaluationSubmission')
-        ));
+        $eval = $this->Rubric->getEventSub($id);
 
         // check to see if $id is valid - numeric & is a rubric
         if (!is_numeric($id) || empty($eval)) {
@@ -412,10 +394,7 @@ class RubricsController extends AppController
      */
     function copy($id)
     {
-        $eval = $this->Rubric->find('first',array(
-            'conditions' => array('id' => $id),
-            'contain' => array('Event' => 'EvaluationSubmission')
-        ));
+        $eval = $this->Rubric->getEventSub($id);
 
         // check to see if $id is valid - numeric & is a rubric
         if (!is_numeric($id) || empty($eval)) {
@@ -466,10 +445,7 @@ class RubricsController extends AppController
     function delete($id)
     {
         // retrieving the requested rubric
-        $eval = $this->Rubric->find('first', array(
-            'conditions' => array('id' => $id),
-            'contain' => array('Event' => 'EvaluationSubmission')
-        ));
+        $eval = $this->Rubric->getEventSub($id);
 
         // check to see if $id is valid - numeric & is a rubric
         if (!is_numeric($id) || empty($eval)) {
