@@ -599,18 +599,18 @@ class V1ControllerTest extends CakeTestCase {
         $this->assertEqual(json_decode($courses, true), $expectedCourses);
     }
 
-    public function testCourseDepartments() {
+    public function testCourseDepartments()
+    {
         $url = $this->_getURL('v1/courses/1/departments');
 
         // POST - Add a course to a department
         $file = $this->_oauthReq("$url/2", '', OAUTH_HTTP_METHOD_POST);
-        $cd = json_decode($file, true);
         $expected = array('course_id' => '1', 'department_id' => '2');
-        $this->assertEqual(json_decode($cd, true), $expected);
+        $this->assertEqual(json_decode($file, true), $expected);
 
         // DELETE - Delete a course from a department
         $file = $this->_oauthReq("$url/2", '', OAUTH_HTTP_METHOD_DELETE);
-        $this->assertEqual(json_decode($file), '');
+        $this->assertEqual(json_decode($file), array());
 
         // add test to see if course exist using departments
     }
