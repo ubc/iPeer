@@ -1,9 +1,9 @@
 <?php
-App::import('Model', 'MixevalsQuestion');
+App::import('Model', 'MixevalQuestion');
 
-class MixevalsQuestionTestCase extends CakeTestCase
+class MixevalQuestionTestCase extends CakeTestCase
 {
-    public $name = 'MixevalsQuestion';
+    public $name = 'MixevalQuestion';
     public $fixtures = array(
         'app.course', 'app.role', 'app.user', 'app.group',
         'app.roles_user', 'app.event', 'app.event_template_type',
@@ -11,15 +11,15 @@ class MixevalsQuestionTestCase extends CakeTestCase
         'app.survey_group_set', 'app.survey_group',
         'app.survey_group_member', 'app.question',
         'app.response', 'app.survey_question', 'app.user_course',
-        'app.user_enrol', 'app.groups_member', 'app.mixeval', 'app.mixevals_question',
-        'app.mixevals_question_desc', 'app.survey_input',
+        'app.user_enrol', 'app.groups_member', 'app.mixeval', 'app.mixeval_question',
+        'app.mixeval_question_desc', 'app.survey_input',
     );
-    public $MixevalsQuestion = null;
+    public $MixevalQuestion = null;
 
     function startCase()
     {
-        echo "Start MixevalsQuestion model test.\n";
-        $this->MixevalsQuestion = ClassRegistry::init('MixevalsQuestion');
+        echo "Start MixevalQuestion model test.\n";
+        $this->MixevalQuestion = ClassRegistry::init('MixevalQuestion');
     }
 
     function endCase()
@@ -34,9 +34,9 @@ class MixevalsQuestionTestCase extends CakeTestCase
     {
     }
 
-    function testMixevalsQuestionInstance()
+    function testMixevalQuestionInstance()
     {
-        $this->assertTrue(is_a($this->MixevalsQuestion, 'MixevalsQuestion'));
+        $this->assertTrue(is_a($this->MixevalQuestion, 'MixevalQuestion'));
     }
 
     function testInsertQuestion()
@@ -44,18 +44,18 @@ class MixevalsQuestionTestCase extends CakeTestCase
         // set up test input
         $input = $this->setUpInserQuestionTestData();
         // set up test data
-        $result = $this->MixevalsQuestion->insertQuestion(55, $input);
+        $result = $this->MixevalQuestion->insertQuestion(55, $input);
         // Assert the data was saved in database
-        $searched = $this->MixevalsQuestion->find('all', array('conditions' => array('mixeval_id' => 55)));
-        $this->assertEqual($searched[0]['MixevalsQuestion']['mixeval_id'], 55);
-        $this->assertEqual($searched[1]['MixevalsQuestion']['mixeval_id'], 55);
-        $this->assertEqual($searched[0]['MixevalsQuestion']['title'], 'Licket Q1');
-        $this->assertEqual($searched[1]['MixevalsQuestion']['title'], 'Comment Q2');
+        $searched = $this->MixevalQuestion->find('all', array('conditions' => array('mixeval_id' => 55)));
+        $this->assertEqual($searched[0]['MixevalQuestion']['mixeval_id'], 55);
+        $this->assertEqual($searched[1]['MixevalQuestion']['mixeval_id'], 55);
+        $this->assertEqual($searched[0]['MixevalQuestion']['title'], 'Licket Q1');
+        $this->assertEqual($searched[1]['MixevalQuestion']['title'], 'Comment Q2');
 
         // Test for incorrect inputs
-        $incorrectResult1 = $this->MixevalsQuestion->insertQuestion(null, $input);
-        $incorrectResult2 = $this->MixevalsQuestion->insertQuestion(55, null);
-        $incorrectResult3 = $this->MixevalsQuestion->insertQuestion(null, null);
+        $incorrectResult1 = $this->MixevalQuestion->insertQuestion(null, $input);
+        $incorrectResult2 = $this->MixevalQuestion->insertQuestion(55, null);
+        $incorrectResult3 = $this->MixevalQuestion->insertQuestion(null, null);
         $this->assertFalse($incorrectResult1);
         $this->assertFalse($incorrectResult2);
         $this->assertFalse($incorrectResult3);
@@ -63,15 +63,15 @@ class MixevalsQuestionTestCase extends CakeTestCase
 
     function testGetQuestion()
     {
-        $result = $this->MixevalsQuestion->getQuestion(1);
-        $this->assertEqual($result[0]['MixevalsQuestion']['id'], 1);
-        $this->assertEqual($result[1]['MixevalsQuestion']['id'], 2);
-        $this->assertEqual($result[2]['MixevalsQuestion']['id'], 3);
-        $this->assertEqual($result[0]['MixevalsQuestion']['title'],
+        $result = $this->MixevalQuestion->getQuestion(1);
+        $this->assertEqual($result[0]['MixevalQuestion']['id'], 1);
+        $this->assertEqual($result[1]['MixevalQuestion']['id'], 2);
+        $this->assertEqual($result[2]['MixevalQuestion']['id'], 3);
+        $this->assertEqual($result[0]['MixevalQuestion']['title'],
             'Participated in Team Meetings');
-        $this->assertEqual($result[1]['MixevalsQuestion']['title'],
+        $this->assertEqual($result[1]['MixevalQuestion']['title'],
             'Was Helpful and co-operative');
-        $this->assertEqual($result[2]['MixevalsQuestion']['title'],
+        $this->assertEqual($result[2]['MixevalQuestion']['title'],
             'Submitted work on time');
     }
 

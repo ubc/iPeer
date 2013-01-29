@@ -34,8 +34,8 @@ class SysparametersControllerTest extends ExtendedAuthTestCase {
         'app.user_faculty', 'app.department', 'app.sys_parameter',
         'app.oauth_token', 'app.rubric', 'app.rubrics_criteria',
         'app.rubrics_criteria_comment', 'app.rubrics_lom',
-        'app.simple_evaluation', 'app.survey_input', 'app.mixevals_question',
-        'app.mixevals_question_desc', 'app.mixeval', 'app.survey_input',
+        'app.simple_evaluation', 'app.survey_input', 'app.mixeval_question',
+        'app.mixeval_question_desc', 'app.mixeval', 'app.survey_input',
     );
 
     function startCase() {

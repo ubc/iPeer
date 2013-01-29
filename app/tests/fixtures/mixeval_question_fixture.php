@@ -1,6 +1,6 @@
 <?php
 /**
- * MixevalsQuestionFixture
+ * MixevalQuestionFixture
  *
  * @uses CakeTestFixture
  * @package   CTLT.iPeer
@@ -8,10 +8,10 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class MixevalsQuestionFixture extends CakeTestFixture
+class MixevalQuestionFixture extends CakeTestFixture
 {
-    public $name = 'MixevalsQuestion';
+    public $name = 'MixevalQuestion';
 
-    public $import = array('model' => 'MixevalsQuestion', 'records' => true);
+    public $import = array('model' => 'MixevalQuestion', 'records' => true);
 
 }

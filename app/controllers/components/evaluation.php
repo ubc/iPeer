@@ -1245,7 +1245,7 @@ class EvaluationComponent extends Object
         $this->Mixeval = ClassRegistry::init('Mixeval');
         $this->User = ClassRegistry::init('User');
         $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
-        $this->MixevalsQuestion = ClassRegistry::init('MixevalsQuestion');
+        $this->MixevalQuestion = ClassRegistry::init('MixevalQuestion');
         $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
         $this->Event = ClassRegistry::init('Event');
         $this->Penalty = ClassRegistry::init('Penalty');
@@ -1328,7 +1328,7 @@ class EvaluationComponent extends Object
         }
 
         //Get Detail information on Mixeval score
-        $mixevalQuestion = $this->MixevalsQuestion->getQuestion($mixeval['Mixeval']['id']);
+        $mixevalQuestion = $this->MixevalQuestion->getQuestion($mixeval['Mixeval']['id']);
         $gradeReleaseStatus = $this->EvaluationMixeval->getTeamReleaseStatus($event['GroupEvent']['id']);
 
         $result['gradeReleaseStatus'] = $gradeReleaseStatus;

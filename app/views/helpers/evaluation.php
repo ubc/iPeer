@@ -45,11 +45,11 @@ class EvaluationHelper extends AppHelper
      */
     function getSummaryTableHeader($totalMark, $questions)
     {
-        $questions = array('MixevalsQuestion' => $questions);
-        $numberQuestions = Set::extract($questions, '/MixevalsQuestion[question_type=S]');
+        $questions = array('MixevalQuestion' => $questions);
+        $numberQuestions = Set::extract($questions, '/MixevalQuestion[question_type=S]');
         $header = array(__('Evaluatee', true));
         foreach ($numberQuestions as $key => $question) {
-            $header[] = sprintf('%d (/%.1f)', $key+1, $question['MixevalsQuestion']['multiplier']);
+            $header[] = sprintf('%d (/%.1f)', $key+1, $question['MixevalQuestion']['multiplier']);
         }
         $header[] = __("Total", true) . ' (/' . number_format($totalMark, 2) . ')';
 

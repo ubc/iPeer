@@ -1,9 +1,9 @@
 <?php
-App::import('Model', 'MixevalsQuestionDesc');
+App::import('Model', 'MixevalQuestionDesc');
 
-class MixevalsQuestionDescTestCase extends CakeTestCase
+class MixevalQuestionDescTestCase extends CakeTestCase
 {
-    public $name = 'MixevalsQuestionDesc';
+    public $name = 'MixevalQuestionDesc';
     public $fixtures = array(
         'app.course', 'app.role', 'app.user', 'app.group',
         'app.roles_user', 'app.event', 'app.event_template_type',
@@ -11,16 +11,16 @@ class MixevalsQuestionDescTestCase extends CakeTestCase
         'app.survey_group_set', 'app.survey_group',
         'app.survey_group_member', 'app.question',
         'app.response', 'app.survey_question', 'app.user_course',
-        'app.user_enrol', 'app.groups_member', 'app.mixeval', 'app.mixevals_question',
-        'app.mixevals_question_desc', 'app.survey_input',
+        'app.user_enrol', 'app.groups_member', 'app.mixeval', 'app.mixeval_question',
+        'app.mixeval_question_desc', 'app.survey_input',
     );
-    public $MixevalsQuestionDesc = null;
+    public $MixevalQuestionDesc = null;
 
     function startCase()
     {
-        echo "Start MixevalsQuestionDesc model test.\n";
-        $this->MixevalsQuestionDesc = ClassRegistry::init('MixevalsQuestionDesc');
-        $this->MixevalsQuestion = ClassRegistry::init('MixevalsQuestion');
+        echo "Start MixevalQuestionDesc model test.\n";
+        $this->MixevalQuestionDesc = ClassRegistry::init('MixevalQuestionDesc');
+        $this->MixevalQuestion = ClassRegistry::init('MixevalQuestion');
     }
 
     function endCase()
@@ -37,34 +37,34 @@ class MixevalsQuestionDescTestCase extends CakeTestCase
     {
     }
 
-    function testMixevalsQuestionDescInstance()
+    function testMixevalQuestionDescInstance()
     {
-        $this->assertTrue(is_a($this->MixevalsQuestionDesc, 'MixevalsQuestionDesc'));
+        $this->assertTrue(is_a($this->MixevalQuestionDesc, 'MixevalQuestionDesc'));
     }
 
     function testInsertQuestionDescriptor()
     {
         // Set up test inputs
-        $question_ids = $this->MixevalsQuestion->find('all', array('conditions' => array('mixeval_id'=> 1), 'fields' => array('MixevalsQuestion.id, question_num')));
+        $question_ids = $this->MixevalQuestion->find('all', array('conditions' => array('mixeval_id'=> 1), 'fields' => array('MixevalQuestion.id, question_num')));
         $data = $this->setUpTestData();
         // Set up test
-        $this->MixevalsQuestionDesc->insertQuestionDescriptor($data, $question_ids);
-        // Assert Question Descriptors have been successfully added to MixevalsQuestionDesc
-        $searched1 = $this->MixevalsQuestionDesc->find('all', array('conditions' => array('descriptor' => 'ONLY ENTRY 1')));
-        $searched2 = $this->MixevalsQuestionDesc->find('all', array('conditions' => array('descriptor' => 'ONLY ENTRY 2')));
-        $this->assertEqual($searched1[0]['MixevalsQuestionDesc']['descriptor'], 'ONLY ENTRY 1');
-        $this->assertEqual($searched2[0]['MixevalsQuestionDesc']['descriptor'], 'ONLY ENTRY 2');
+        $this->MixevalQuestionDesc->insertQuestionDescriptor($data, $question_ids);
+        // Assert Question Descriptors have been successfully added to MixevalQuestionDesc
+        $searched1 = $this->MixevalQuestionDesc->find('all', array('conditions' => array('descriptor' => 'ONLY ENTRY 1')));
+        $searched2 = $this->MixevalQuestionDesc->find('all', array('conditions' => array('descriptor' => 'ONLY ENTRY 2')));
+        $this->assertEqual($searched1[0]['MixevalQuestionDesc']['descriptor'], 'ONLY ENTRY 1');
+        $this->assertEqual($searched2[0]['MixevalQuestionDesc']['descriptor'], 'ONLY ENTRY 2');
     }
 
     function testGetQuestionDescriptor()
     {
         // Data comes from fixture tables
-        $result = $this->MixevalsQuestionDesc->getQuestionDescriptor(1);
-        $this->assertEqual($result[0]['MixevalsQuestionDesc']['id'], 1);
-        $this->assertEqual($result[0]['MixevalsQuestionDesc']['descriptor'],
+        $result = $this->MixevalQuestionDesc->getQuestionDescriptor(1);
+        $this->assertEqual($result[0]['MixevalQuestionDesc']['id'], 1);
+        $this->assertEqual($result[0]['MixevalQuestionDesc']['descriptor'],
             'Lowest');
-        $this->assertEqual($result[2]['MixevalsQuestionDesc']['id'], 3);
-        $this->assertEqual($result[2]['MixevalsQuestionDesc']['descriptor'],
+        $this->assertEqual($result[2]['MixevalQuestionDesc']['id'], 3);
+        $this->assertEqual($result[2]['MixevalQuestionDesc']['descriptor'],
             'Middle');
     }
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * MixevalsQuestion
+ * MixevalQuestion
  *
  * @uses AppModel
  * @package   CTLT.iPeer
@@ -8,12 +8,12 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class MixevalsQuestion extends AppModel
+class MixevalQuestion extends AppModel
 {
-    public $name = 'MixevalsQuestion';
+    public $name = 'MixevalQuestion';
     public $hasMany = array(
         'Description' =>
-        array('className'   => 'MixevalsQuestionDesc',
+        array('className'   => 'MixevalQuestionDesc',
             'order'       => '',
             'foreignKey'  => 'question_id',
             'dependent'   => true,

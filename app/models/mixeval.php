@@ -1,7 +1,7 @@
 <?php
 App::import('Model', 'EvaluationBase');
-App::import('Model', 'MixevalsQuestion');
-App::import('Model', 'MixevalsQuestionDesc');
+App::import('Model', 'MixevalQuestion');
+App::import('Model', 'MixevalQuestionDesc');
 
 /**
  * Mixeval
@@ -31,7 +31,7 @@ class Mixeval extends EvaluationBase
             'finderSql'   => ''
         ),
         'Question' =>
-        array('className' => 'MixevalsQuestion',
+        array('className' => 'MixevalQuestion',
             'foreignKey' => 'mixeval_id',
             'dependent' => true,
             'exclusive' => true,
@@ -69,10 +69,10 @@ class Mixeval extends EvaluationBase
     function __construct($id = false, $table = null, $ds = null)
     {
         parent::__construct($id, $table, $ds);
-        $this->virtualFields['lickert_question_max'] = sprintf('SELECT count(*) as lickert_question_max FROM mixevals_questions as q WHERE q.mixeval_id = %s.id AND q.question_type LIKE "S"', $this->alias);
-        $this->virtualFields['prefill_question_max'] = sprintf('SELECT count(*) as prefill_question_max FROM mixevals_questions as q WHERE q.mixeval_id = %s.id AND q.question_type LIKE "T"', $this->alias);
-        $this->virtualFields['total_question'] = sprintf('SELECT count(*) as total_question FROM mixevals_questions as q WHERE q.mixeval_id = %s.id', $this->alias);
-        $this->virtualFields['total_marks'] = sprintf('SELECT sum(multiplier) as sum FROM mixevals_questions as q WHERE q.mixeval_id = %s.id', $this->alias);
+        $this->virtualFields['lickert_question_max'] = sprintf('SELECT count(*) as lickert_question_max FROM mixeval_questions as q WHERE q.mixeval_id = %s.id AND q.question_type LIKE "S"', $this->alias);
+        $this->virtualFields['prefill_question_max'] = sprintf('SELECT count(*) as prefill_question_max FROM mixeval_questions as q WHERE q.mixeval_id = %s.id AND q.question_type LIKE "T"', $this->alias);
+        $this->virtualFields['total_question'] = sprintf('SELECT count(*) as total_question FROM mixeval_questions as q WHERE q.mixeval_id = %s.id', $this->alias);
+        $this->virtualFields['total_marks'] = sprintf('SELECT sum(multiplier) as sum FROM mixeval_questions as q WHERE q.mixeval_id = %s.id', $this->alias);
     }
 
     /**
@@ -105,7 +105,7 @@ class Mixeval extends EvaluationBase
       isset($tmp['form']['criteria_weight_'.$i])? $question['multiplier'] = $tmp['form']['criteria_weight_'.$i] : $question['multiplier'] = 0;
       $question['scale_level'] = $tmp['data']['Mixeval']['scale_max'];
       isset($tmp['data']['Mixeval']['response_type'.$i])? $question['response_type'] = $tmp['data']['Mixeval']['response_type'.$i] : $question['response_type'] = null;
-      $questions[$i]['MixevalsQuestion'] = $question;
+      $questions[$i]['MixevalQuestion'] = $question;
 
       //Format lickert descriptors
       if ($question['question_type'] == 'S') {
@@ -117,7 +117,7 @@ class Mixeval extends EvaluationBase
          $descriptor = isset($tmp['data']['Mixeval']['criteria_comment_'.$question['question_num'].'_'.$j]) ?
                              $tmp['data']['Mixeval']['criteria_comment_'.$question['question_num'].'_'.$j] : "";
          $desc['descriptor'] = $descriptor;
-         $questions[$i]['MixevalsQuestion']['descriptor'][$j] = $desc;
+         $questions[$i]['MixevalQuestion']['descriptor'][$j] = $desc;
         }
 
       }
@@ -137,21 +137,21 @@ class Mixeval extends EvaluationBase
      */
     function compileViewData($mixeval=null)
     {
-        $this->MixevalsQuestion = ClassRegistry::init('MixevalsQuestion');
-        $this->MixevalsQuestionDesc = ClassRegistry::init('MixevalsQuestionDesc');
+        $this->MixevalQuestion = ClassRegistry::init('MixevalQuestion');
+        $this->MixevalQuestionDesc = ClassRegistry::init('MixevalQuestionDesc');
 
         $mixeval_id = $mixeval['Mixeval']['id'];
-        $mixEvalDetail = $this->MixevalsQuestion->getQuestion($mixeval_id);
+        $mixEvalDetail = $this->MixevalQuestion->getQuestion($mixeval_id);
         $tmp = array();
 
         if (!empty($mixEvalDetail)) {
             foreach ($mixEvalDetail as $row) {
-                $evalQuestion = $row['MixevalsQuestion'];
+                $evalQuestion = $row['MixevalQuestion'];
                 $this->filter($evalQuestion);
                 $tmp['questions'][$evalQuestion['question_num']] = $evalQuestion;
                 if ($evalQuestion['question_type'] == 'S') {
                     //Retrieve the lickert descriptor
-                    $descriptors = $this->MixevalsQuestionDesc->getQuestionDescriptor($row['MixevalsQuestion']['id']);
+                    $descriptors = $this->MixevalQuestionDesc->getQuestionDescriptor($row['MixevalQuestion']['id']);
                     $tmp['questions'][$evalQuestion['question_num']]['descriptors'] = $descriptors;
                 }
             }

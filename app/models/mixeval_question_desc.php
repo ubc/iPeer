@@ -1,6 +1,6 @@
 <?php
 /**
- * MixevalsQuestionDesc
+ * MixevalQuestionDesc
  *
  * @uses AppModel
  * @package   CTLT.iPeer
@@ -8,13 +8,13 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class MixevalsQuestionDesc extends AppModel
+class MixevalQuestionDesc extends AppModel
 {
-    public $name = 'MixevalsQuestionDesc';
+    public $name = 'MixevalQuestionDesc';
 
     public $belongsTo = array(
-        'MixevalsQuestion' => array(
-            'className' => 'MixevalsQuestion',
+        'MixevalQuestion' => array(
+            'className' => 'MixevalQuestion',
             'foreignKey' => 'question_id'
         )
     );
@@ -34,8 +34,8 @@ class MixevalsQuestionDesc extends AppModel
             if (isset($row['Description'])) {
                 $descriptors =  $row['Description'];
                 foreach ($question_ids as $question_id) {
-                    if ($question_id['MixevalsQuestion']['question_num'] == $row['question_num']) {
-                        $q_id = $question_id['MixevalsQuestion']['id'];
+                    if ($question_id['MixevalQuestion']['question_num'] == $row['question_num']) {
+                        $q_id = $question_id['MixevalQuestion']['id'];
                     }
                 }
 
@@ -88,10 +88,10 @@ class MixevalsQuestionDesc extends AppModel
 return $data;*/
     /*return $this->find('all', array(
             'conditions' => array('mixeval_id' => $mixevalId, 'question_num' => $questionNum),
-            'order' => 'MixevalsQuestionDesc.id ASC'
+            'order' => 'MixevalQuestionDesc.id ASC'
     ));*/
         return $this->find('all', array('conditions' => array('question_id' => $questionId),
-            'order' => 'MixevalsQuestionDesc.id ASC'));
+            'order' => 'MixevalQuestionDesc.id ASC'));
     }
 
 

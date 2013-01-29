@@ -19,10 +19,10 @@ class EvaluationsController extends AppController
         'SimpleEvaluation', 'Rubric', 'Group', 'User', 'UserEnrol',
         'GroupsMembers', 'RubricsLom', 'RubricsCriteria',
         'RubricsCriteriaComment', 'Personalize', 'Penalty',
-        'Question', 'Response', 'Survey', 'SurveyInput', 'Course',
-        'MixevalsQuestion',
-        'EvaluationMixeval', 'EvaluationMixevalDetail', 'Mixeval',
-        'MixevalsQuestionDesc');
+        'Question', 'Response', 'Survey', 'SurveyInput', 'Course', 
+        'MixevalQuestion',
+        'EvaluationMixeval', 'EvaluationMixevalDetail', 'Mixeval', 
+        'MixevalQuestionDesc');
     public $components = array('ExportBaseNew', 'Auth', 'AjaxList', 'Output',
         'userPersonalize', 'framework',
         'Evaluation', 'Export', 'ExportCsv', 'ExportExcel');

@@ -10,7 +10,7 @@
  */
 class MixevalsController extends AppController
 {
-    public $uses =  array('Event', 'Mixeval','MixevalsQuestion', 'MixevalsQuestionDesc', 'Personalize', 'UserCourse');
+    public $uses =  array('Event', 'Mixeval','MixevalQuestion', 'MixevalQuestionDesc', 'Personalize', 'UserCourse');
     public $name = 'Mixevals';
     public $helpers = array('Html','Ajax','Javascript','Time');
     public $components = array('AjaxList','Auth','Output', 'userPersonalize', 'framework');
@@ -253,10 +253,10 @@ class MixevalsController extends AppController
             $data = $this->data;
 
             if ($this->Mixeval->save($data)) {
-                $this->MixevalsQuestion->insertQuestion($this->Mixeval->id, $this->data['Question']);
+                $this->MixevalQuestion->insertQuestion($this->Mixeval->id, $this->data['Question']);
                 $id = $this->Mixeval->id;
-                $question_ids= $this->MixevalsQuestion->find('all', array('conditions' => array('mixeval_id'=> $id), 'fields' => array('MixevalsQuestion.id, question_num')));
-                $this->MixevalsQuestionDesc->insertQuestionDescriptor($this->data['Question'], $question_ids);
+                $question_ids= $this->MixevalQuestion->find('all', array('conditions' => array('mixeval_id'=> $id), 'fields' => array('MixevalQuestion.id, question_num')));
+                $this->MixevalQuestionDesc->insertQuestionDescriptor($this->data['Question'], $question_ids);
                 $this->Session->setFlash(__('The Mixed Evaluation was added successfully.', true), 'good');
                 $this->redirect('index');
                 return;
@@ -285,7 +285,7 @@ class MixevalsController extends AppController
     function deleteQuestion($question_id)
     {
         $this->autoRender = false;
-        $this->MixevalsQuestion->deleteAll(array('id' => $question_id), true);
+        $this->MixevalQuestion->deleteAll(array('id' => $question_id), true);
     }
 
 
@@ -300,7 +300,7 @@ class MixevalsController extends AppController
     function deleteDescriptor($descriptor_id)
     {
         $this->autoRender = false;
-        $this->MixevalsQuestionDesc->delete(array('id' => $descriptor_id));
+        $this->MixevalQuestionDesc->delete(array('id' => $descriptor_id));
     }
 
 
@@ -365,10 +365,10 @@ class MixevalsController extends AppController
             $data = $this->data;
 
             if ($this->Mixeval->save($data)) {
-                $this->MixevalsQuestion->insertQuestion($this->Mixeval->id, $this->data['Question']);
+                $this->MixevalQuestion->insertQuestion($this->Mixeval->id, $this->data['Question']);
                 $id = $this->Mixeval->id;
-                $question_ids= $this->MixevalsQuestion->find('all', array('conditions' => array('mixeval_id'=> $id), 'fields'=>'id, question_num'));
-                $this->MixevalsQuestionDesc->insertQuestionDescriptor($this->data['Question'], $question_ids);
+                $question_ids= $this->MixevalQuestion->find('all', array('conditions' => array('mixeval_id'=> $id), 'fields'=>'id, question_num'));
+                $this->MixevalQuestionDesc->insertQuestionDescriptor($this->data['Question'], $question_ids);
                 $this->Session->setFlash(__('The Mixed Evaluation was edited successfully.', true), 'good');
                 $this->redirect('index');
                 return;

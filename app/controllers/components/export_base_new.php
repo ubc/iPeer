@@ -281,12 +281,12 @@ class ExportBaseNewComponent extends Object
      function buildMixEvalCommentTableByEvaluatee($params, $grpEventId, $evaluateeId)
      {
          $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
-         $this->MixevalsQuestion = ClassRegistry::init('MixevalsQuestion');
+         $this->MixevalQuestion = ClassRegistry::init('MixevalQuestion');
          $this->GroupEvent = ClassRegistry::init('GroupEvent');
          $this->Event = ClassRegistry::init('Event');
 
          $groupMembers = $this->ExportHelper2->getGroupMemberHelper($grpEventId);
-         $questions = $this->MixevalsQuestion->getQuestion($evaluation['Event']['template_id'], 'T');
+         $questions = $this->MixevalQuestion->getQuestion($evaluation['Event']['template_id'], 'T');
          // Create grid
          $gridYDim = count($questions)*(count($groupMembers) + 1);
          $gridXDim = 8;
@@ -297,13 +297,13 @@ class ExportBaseNewComponent extends Object
          $qSpacing = count($groupMembers) + 1;
          $qIndexing = 0;
          foreach ($question as $q) {
-             $grid[$xPosition + 2][$yPosition + $qIndexing + 2] = "Question ".$qCount.":".$q['MixevalsQuestion']['title'];
+             $grid[$xPosition + 2][$yPosition + $qIndexing + 2] = "Question ".$qCount.":".$q['MixevalQuestion']['title'];
              $qIndexing += $qSpacing;
 }
 // Save question_comment's quesion num; only way to identify question comments via question num
 $validQuestionNum = array();
 foreach ($questions as $q) {
-    array_push($validQuestionNum, $q['MixevalsQuestion']['question_num']);
+    array_push($validQuestionNum, $q['MixevalQuestion']['question_num']);
 }
 // Setup evaluator's info
 $grpMembersBlock = $this->ExportHelper2->createGroupMemberArrayBlock($groupMembers, $params);
@@ -327,7 +327,7 @@ for ($inc=0; $inc<$count($groupMembers); $inc++) {
     function buildMixEvalQuestionCommentTable($params ,$grpEventId)
     {
         $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
-        $this->MixevalsQuestion = ClassRegistry::init('MixevalsQuestion');
+        $this->MixevalQuestion = ClassRegistry::init('MixevalQuestion');
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $this->Event = ClassRegistry::init('Event');
 
@@ -335,10 +335,10 @@ for ($inc=0; $inc<$count($groupMembers); $inc++) {
         $groupCount = count($groupMembers);
         $grpEvent = $this->GroupEvent->getGrpEvent($grpEventId);
         $evaluation = $this->Event->getEventById($grpEvent['GroupEvent']['event_id']);
-        $questions = $this->MixevalsQuestion->getQuestion($evaluation['Event']['template_id'], 'T');
+        $questions = $this->MixevalQuestion->getQuestion($evaluation['Event']['template_id'], 'T');
         $validQuestionNum = array();
         foreach ($questions as $q) {
-            array_push($validQuestionNum, $q['MixevalsQuestion']['question_num']);
+            array_push($validQuestionNum, $q['MixevalQuestion']['question_num']);
         }
         $qCount = count($questions);
         // Create grid
@@ -351,7 +351,7 @@ for ($inc=0; $inc<$count($groupMembers); $inc++) {
         $submissionCount = $this->EvaluationSubmission->countSubmissions($grpEventId);
         foreach ($questions as $q) {
             $this->ExportHelper2->repeatDrawByCoordinateVertical($grid, $xPosition, $questionYPos, $sectionSpacing, $groupCount,
-                "Question ".$questionNum.": ".$q['MixevalsQuestion']['title']);
+                "Question ".$questionNum.": ".$q['MixevalQuestion']['title']);
             $questionNum++;
             $questionYPos += $submissionCount + 1;
         }
@@ -532,10 +532,10 @@ for ($inc=0; $inc<$count($groupMembers); $inc++) {
         foreach ($questions as $q) {
             $totalScore = 0;
             $row = array();
-            array_push($row, $q['MixevalsQuestion']['title'].' (/'.$q['MixevalsQuestion']['multiplier'].')'.',');
+            array_push($row, $q['MixevalQuestion']['title'].' (/'.$q['MixevalQuestion']['multiplier'].')'.',');
             foreach ($groupMembers as $evaluator) {
                 $evalResult = $this->EvaluationMixeval->getResultDetailByQuestion($grpEventId, $evaluatee['id'],
-                    $evaluator['id'], $q['MixevalsQuestion']['question_num']-1);
+                    $evaluator['id'], $q['MixevalQuestion']['question_num']-1);
                 array_push($row, $evalResult['EvaluationMixevalDetail']['grade']);
                 $totalScore += $evalResult['EvaluationMixevalDetail']['grade'];
             }

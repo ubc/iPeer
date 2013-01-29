@@ -1284,11 +1284,11 @@ INSERT INTO `mixevals` (`id`, `name`, `zero_mark`, `total_question`, `lickert_qu
 -- --------------------------------------------------------
 
 --
--- Table structure for table `mixevals_question_descs`
+-- Table structure for table `mixeval_question_descs`
 --
 
-DROP TABLE IF EXISTS `mixevals_question_descs`;
-CREATE TABLE IF NOT EXISTS `mixevals_question_descs` (
+DROP TABLE IF EXISTS `mixeval_question_descs`;
+CREATE TABLE IF NOT EXISTS `mixeval_question_descs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `question_id` int(11) NOT NULL DEFAULT '0',
   `scale_level` int(11) NOT NULL DEFAULT '0',
@@ -1298,10 +1298,10 @@ CREATE TABLE IF NOT EXISTS `mixevals_question_descs` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
 
 --
--- Dumping data for table `mixevals_question_descs`
+-- Dumping data for table `mixeval_question_descs`
 --
 
-INSERT INTO `mixevals_question_descs` (`id`, `question_id`, `scale_level`, `descriptor`) VALUES
+INSERT INTO `mixeval_question_descs` (`id`, `question_id`, `scale_level`, `descriptor`) VALUES
 (1, 1, 1, 'Lowest'),
 (2, 1, 2, NULL),
 (3, 1, 3, 'Middle'),
@@ -1321,11 +1321,11 @@ INSERT INTO `mixevals_question_descs` (`id`, `question_id`, `scale_level`, `desc
 -- --------------------------------------------------------
 
 --
--- Table structure for table `mixevals_questions`
+-- Table structure for table `mixeval_questions`
 --
 
-DROP TABLE IF EXISTS `mixevals_questions`;
-CREATE TABLE IF NOT EXISTS `mixevals_questions` (
+DROP TABLE IF EXISTS `mixeval_questions`;
+CREATE TABLE IF NOT EXISTS `mixeval_questions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `mixeval_id` int(11) NOT NULL DEFAULT '0',
   `question_num` int(11) NOT NULL DEFAULT '0',
@@ -1340,10 +1340,10 @@ CREATE TABLE IF NOT EXISTS `mixevals_questions` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
 
 --
--- Dumping data for table `mixevals_questions`
+-- Dumping data for table `mixeval_questions`
 --
 
-INSERT INTO `mixevals_questions` (`id`, `mixeval_id`, `question_num`, `title`, `instructions`, `question_type`, `required`, `multiplier`, `scale_level`, `response_type`) VALUES
+INSERT INTO `mixeval_questions` (`id`, `mixeval_id`, `question_num`, `title`, `instructions`, `question_type`, `required`, `multiplier`, `scale_level`, `response_type`) VALUES
 (1, 1, 1, 'Participated in Team Meetings', NULL, 'S', 1, 1, 5, NULL),
 (2, 1, 2, 'Was Helpful and co-operative', NULL, 'S', 1, 1, 5, NULL),
 (3, 1, 3, 'Submitted work on time', NULL, 'S', 1, 1, 5, NULL),
