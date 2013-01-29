@@ -353,10 +353,10 @@ class EvaluationsController extends AppController
             return;
         }
 
-        if (!$this->TemplateEmail->send(array(User::get('id') => $email), 'Submission Confirmation')) {
+        /*if (!$this->TemplateEmail->send(array(User::get('id') => $email), 'Submission Confirmation')) {
             $this->log('Sending email to '.$email.' failed.'. $this->TemplateEmail->smtpError);
             $this->Session->setFlash('Sending confirmation email failed!');
-        }
+        }*/
     }
 
     /**
