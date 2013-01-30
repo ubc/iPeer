@@ -714,6 +714,7 @@ i {
 }
 
 #UserForm .select .checkbox label {
+    float: none;
     width: 30em;
     text-align: left;
 }
@@ -758,10 +759,6 @@ i {
 
 #UserForm .buttons {
     margin-left: 14em;
-}
-
-#UserForm .checkbox label {
-    float: none;
 }
 
 /* users/goToClassList/ */
@@ -1462,10 +1459,6 @@ textarea.question-title-textarea, textarea.question-descriptor {
     float: right;
 }
 
-.text-button {
-    cursor: pointer;
-}
-
 #summary {
     text-align: right;
     background-color: #EAEAEA;
@@ -1486,76 +1479,6 @@ textarea.question-title-textarea, textarea.question-descriptor {
     text-align: center;
 }
 
-.result-header-td {
-    vertical-align: middle;
-    font-weight: 600;
-    color: #FFFFFF;
-    background-color: #4478AC;
-    font-size: 0.9em;
-    height: 40px;
-    padding: 0em;
-}
-
-.inner-table-cell {
-    padding: 0em;
-}
-
-.group-members {
-    height: 40px;
-}
-
-.total-cell {
-    height: 40px;
-    width: 250px;
-}
-
-.result-cell {
-    height: 40px;
-    width: 200px;
-    padding: 0em;
-}
-
-.inner-table {
-    width: 100%;
-    margin-top: 0em;
-    table-layout: fixed;
-}
-
-.outer-table {
-    table-layout: fixed;
-}
-
-.scrollbar {
-    overflow-x: auto;
-    overflow-y: hidden;
-}
-
-table.full-size {
-    width: 100%;
-    border: 0px;
-    font-size: 0.9em;
-    text-align: left;
-    margin-bottom: 2em;
-}
-
-table.event-detail {
-}
-
-.event-summary div.incompleted {
-    color: red;
-    margin: 1em 0 1em 1em;
-    font-size: 0.9em;
-}
-
-.event-summary div.incompleted ul {
-    margin: 20px;
-}
-
-.event-summary div.incompleted li {
-    list-style-type: square; 
-    padding: 0.2em;
-}
-
 ul.instructions {
     margin: 1em 0 1em 2em;
 }
@@ -1563,37 +1486,6 @@ ul.instructions {
 ul.instructions li {
     list-style-type: square; 
     padding: 0.2em;
-}
-
-table.event-view {
-    border-collapse:collapse;
-}
-
-table.event-view tr.tablecell2 {
-    background-color: #EAEAEA;
-}
-
-table.event-view td {
-    border: 1px solid white;
-}
-
-table.event-view table td {
-    border: 0;
-}
-
-.text-button {
-    -webkit-box-shadow:rgba(0,0,0,0.2) 0 1px 0 0;
-    -moz-box-shadow:rgba(0,0,0,0.2) 0 1px 0 0;
-    box-shadow:rgba(0,0,0,0.2) 0 1px 0 0;
-    color:#333;
-    background-color: white;
-    border-radius:3px;
-    -moz-border-radius:3px;
-    -webkit-border-radius:3px;
-    border: 1px solid;
-    height:32px;
-    padding:4px 16px;
-    text-decoration:none !important;
 }
 
 table.group-list-chooser {
@@ -1618,24 +1510,6 @@ table.group-list-chooser td{
 .group-list-chooser tr.note {
     text-align: center;
     font-size: 0.9em;
-}
-
-/* survey related */
-.survey-prompt {
-    margin: 1em 1em;
-}
-
-.survey-response {
-    padding: 1em 1em 2em 2em;
-}
-
-.survey-response textarea {
-    width: 50%;
-    height: 7em;
-}
-
-.survey-response input[type=text] {
-    width: 50%;
 }
 
 /* public */
