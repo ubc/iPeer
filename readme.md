@@ -1,3 +1,23 @@
+iPeer 3.0.2
+----------------------------
+This is a maintenance release. It is recommended to upgrade to this version as it fixes a few critical bugs.
+* Disable submission confirmation email
+* Fix some bugs & outdated instructions
+* Fix change password for editProfile
+* Fix some bugs for email templates
+* Fix warnings caused by empty courseId in group controller
+* Fix user can't login with session transfer if there is an old session
+* Unify the views in v1 controller
+* Fix preview button on add event page in IE and FF
+* Allow fall back to mail in template email
+* Fix incorrect logging when sending submission email failed.
+* Fix missing names in the email after creating user
+* Disable the type checking for upload csv file for now
+* Fix #471, add extra file type to allow upload for user import
+* Fix that email failed to send when stmp parameters are not set
+* Fix #464. The student view of mixeval result was not showing correctly.
+* Update guard to allow login in with PUID as username in cwl module
+
 iPeer 3.0.1
 -----------------------------
 This is a maintenance release. It is recommended to upgrade to this version as it fixes a few critical bugs.

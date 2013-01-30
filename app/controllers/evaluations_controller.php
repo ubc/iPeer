@@ -13,15 +13,15 @@ class EvaluationsController extends AppController
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Evaluation');
     public $Sanitize;
 
-    public $uses = array('SurveyQuestion', 'GroupEvent', 'EvaluationRubric', 
+    public $uses = array('SurveyQuestion', 'GroupEvent', 'EvaluationRubric',
         'EvaluationRubricDetail',
         'EvaluationSubmission', 'Event', 'EvaluationSimple',
         'SimpleEvaluation', 'Rubric', 'Group', 'User', 'UserEnrol',
         'GroupsMembers', 'RubricsLom', 'RubricsCriteria',
         'RubricsCriteriaComment', 'Personalize', 'Penalty',
-        'Question', 'Response', 'Survey', 'SurveyInput', 'Course', 
+        'Question', 'Response', 'Survey', 'SurveyInput', 'Course',
         'MixevalsQuestion',
-        'EvaluationMixeval', 'EvaluationMixevalDetail', 'Mixeval', 
+        'EvaluationMixeval', 'EvaluationMixevalDetail', 'Mixeval',
         'MixevalsQuestionDesc');
     public $components = array('ExportBaseNew', 'Auth', 'AjaxList', 'Output',
         'userPersonalize', 'framework',
@@ -354,6 +354,19 @@ class EvaluationsController extends AppController
         }
     }
 
+    function _sendConfirmationEmail()
+    {
+        $email = User::get('email');
+        if (empty($email)) {
+            return;
+        }
+
+        /*if (!$this->TemplateEmail->send(array(User::get('id') => $email), 'Submission Confirmation')) {
+            $this->log('Sending email to '.$email.' failed.'. $this->TemplateEmail->smtpError);
+            $this->Session->setFlash('Sending confirmation email failed!');
+        }*/
+    }
+
     /**
      * makeSimpleEvaluation
      *
@@ -504,7 +517,7 @@ class EvaluationsController extends AppController
         $userId = $this->Auth->user('id');
         $courseId = $event['Event']['course_id'];
         // Make sure user is a student in this course
-        $ret = $this->UserEnrol->field('id', 
+        $ret = $this->UserEnrol->field('id',
             array('course_id' => $courseId, 'user_id' => $userId ));
         if (!$ret) {
                 $this->Session->setFlash(_('Error: Invalid Id'));
@@ -535,7 +548,7 @@ class EvaluationsController extends AppController
             // We need an evaluation submission entry
             $sub['EvaluationSubmission']['submitter_id'] = $userId;
             $sub['EvaluationSubmission']['submitted'] = 1;
-            $sub['EvaluationSubmission']['date_submitted'] = 
+            $sub['EvaluationSubmission']['date_submitted'] =
                 date('Y-m-d H:i:s');
             $sub['EvaluationSubmission']['event_id'] = $eventId;
             // Cakephp doesn't know how to deal with the checkboxes response for
@@ -586,7 +599,7 @@ class EvaluationsController extends AppController
         }
 
         // Display questions
-        $this->set('title_for_layout', 
+        $this->set('title_for_layout',
             $this->Course->getCourseName($courseId, 'S').__(' > Survey', true));
 
         // Get all required data from each table for every question
@@ -1082,7 +1095,7 @@ class EvaluationsController extends AppController
             $inCompleteMembers = $this->User->getUsers($inCompleteMembers, array('Role'), array('User.full_name'));
             $notInGroup = $this->User->getUsers($notInGroup, array('Role'), array('User.id', 'User.full_name'));
             $gradeReleaseStatus = $this->EvaluationMixeval->getTeamReleaseStatus($groupEventId);
-            
+
             $this->set('mixeval', $mixeval);
             $this->set('memberList', $fullNames);
             $this->set('mixevalDetails', $details['scoreRecords']);
@@ -1092,7 +1105,7 @@ class EvaluationsController extends AppController
             $this->set('inCompleteMembers', $inCompleteMembers);
             $this->set('notInGroup', $notInGroup);
             $this->set('gradeReleaseStatus', $gradeReleaseStatus);
-            
+
             if ($displayFormat == 'Detail') {
                 $this->render('view_mixeval_evaluation_results_detail');
 
@@ -1208,9 +1221,9 @@ class EvaluationsController extends AppController
             $mixeval = $this->Mixeval->find('first', array(
                 'conditions' => array('Mixeval.id' => $event['Event']['template_id']),
                 'contain' => array('Question' => array('Description'))
-            ));         
-            
-            $user = $this->User->findById($userId);            
+            ));
+
+            $user = $this->User->findById($userId);
             $details = $this->Evaluation->getMixevalResultDetail($groupEventId, array($user));
             $sub = $this->EvaluationSubmission->findAllByGrpEventId($groupEventId);
             $mixevalDetails = $this->EvaluationMixeval->getResultsByEvaluateesOrEvaluators($groupEventId, Set::extract($sub, '/EvaluationSubmission/submitter_id'));

@@ -505,7 +505,8 @@ class V1Controller extends Controller {
     /**
      * Get a list of groups in iPeer.
      **/
-    public function groups() {
+    public function groups()
+    {
         $fields = array('id', 'group_num', 'group_name', 'course_id', 'member_count');
         // view
         if ($this->RequestHandler->isGet()) {
@@ -598,7 +599,8 @@ class V1Controller extends Controller {
     /**
      * get, add, and delete group members from a group
     **/
-    public function groupMembers() {
+    public function groupMembers()
+    {
         $status = 'HTTP/1.1 400 Bad Request';
         $groupMembers = array();
 
@@ -659,7 +661,8 @@ class V1Controller extends Controller {
     /**
      * Get a list of events in iPeer.
      **/
-    public function events() {
+    public function events()
+    {
         $course_id = $this->params['course_id'];
         $results = array();
         $fields = array('title', 'course_id', 'event_template_type_id', 'due_date');
@@ -721,13 +724,11 @@ class V1Controller extends Controller {
                 $res = $this->EvaluationSimple->simpleEvalScore($event_id,
                     $fields, $conditions);
                 $key = "EvaluationSimple";
-            }
-            else if ($type == 2) {
+            } else if ($type == 2) {
                 $res = $this->EvaluationRubric->rubricEvalScore($event_id,
                     $fields, $conditions);
                 $key = "EvaluationRubric";
-            }
-            else if ($type == 4) {
+            } else if ($type == 4) {
                 $res = $this->EvaluationMixeval->mixedEvalScore($event_id,
                     $fields, $conditions);
                 $key = "EvaluationMixeval";
@@ -828,22 +829,22 @@ class V1Controller extends Controller {
                     array('conditions' => array('course_id' => $course_id, 'department_id' => $department_id)));
                 $departments = $departments['CourseDepartment'];
                 unset($departments['id']);
-                $this->set('result', json_encode($departments));
+                $this->set('result', $departments);
             } else {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
-                $this->set('result', null);
+                $this->set('result', array());
             }
         } else if ($this->RequestHandler->isDelete()) {
             if ($this->Course->habtmDelete('Department', $course_id, $department_id)) {
                 $this->set('statusCode', 'HTTP:/1.1 204 No Content');
-                $this->set('result', null);
+                $this->set('result', array());
             } else {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
-                $this->set('result', null);
+                $this->set('result', array());
             }
         } else {
             $this->set('statusCode', 'HTTP/1.0 400 Bad Request');
-            $this->set('result', null);
+            $this->set('result', array());
         }
 
         $this->render('json');

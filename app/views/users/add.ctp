@@ -1,5 +1,5 @@
 <p>
-Usernames must be at least 6 characters long and contain only letters and numbers. A password will be automatically generated and shown after you click "Save".
+A password will be automatically generated and shown after you click "Save".
 </p>
 
 

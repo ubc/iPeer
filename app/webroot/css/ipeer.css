@@ -134,7 +134,7 @@ input[type="text"], input[type="file"], input[type="password"], textarea, select
     height: 2em;
     font-weight: 600;
     display: block;
-    width: 5em;
+    width: 8em;
 }
 
 a:link, a:visited {

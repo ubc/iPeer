@@ -639,7 +639,7 @@ class UsersController extends AppController
                     $this->User->removeStudent($userId, $course);
                 }
             }
-        
+
             // create the enrolment entry depending on if instructor or student
             // and also convert it into a CakePHP dark magic friendly format
             if (!empty($this->data['Courses']['id'])) {
@@ -734,10 +734,11 @@ class UsersController extends AppController
         if (!empty($this->data)) {
             $this->data['User']['id'] = $id;
 
-            if (!empty($this->data['User']['temp_password'])) {
-                if (md5($this->data['User']['old_password']==$this->Auth->user('password'))) {
-                    if ($this->data['User']['temp_password']==$this->data['User']['confirm_password']) {
-                        $this->data['User']['password'] = md5($this->data['User']['temp_password']);
+            if (!empty($this->data['User']['tmp_password'])) {
+                $user = $this->User->findUserByidWithFields($id, array('password'));
+                if (md5($this->data['User']['old_password'])==$user['password']) {
+                    if ($this->data['User']['tmp_password']==$this->data['User']['confirm_password']) {
+                        $this->data['User']['password'] = md5($this->data['User']['tmp_password']);
                     } else {
                         $this->Session->setFlash(__("New passwords do not match", true));
                         $this->redirect('editProfile/'.$id);
