@@ -142,16 +142,16 @@ class EvaluationHelper extends AppHelper
     /**
      * getRubricSummaryTable
      *
-     * @param mixed $memberList   list of members as id => name
-     * @param mixed $scores       scores
-     * @param mixed $scoreSummary score summary
-     * @param mixed $penalties    penalties
-     * @param mixed $total        total
+     * @param mixed $memberList list of members as id => name
+     * @param mixed $notInGroup users not in group
+     * @param mixed $scores     scores
+     * @param mixed $penalties  penalties
+     * @param mixed $total      total
      *
      * @access public
      * @return array for generate summary table
      */
-    function getRubricSummaryTable($memberList, $scores, $scoreSummary, $penalties, $total)
+    function getRubricSummaryTable($memberList, $notInGroup, $scores, $penalties, $total)
     {
         $average = array_pop($scores);
         $totalAve = 0;
@@ -159,23 +159,24 @@ class EvaluationHelper extends AppHelper
         $table = array();
         foreach ($scores as $userId => $score) {
             $user = array();
-            $user[] = $memberList[$userId];
-            foreach ($score['rubric_criteria_ave'] as $criterion) {
+            in_array($userId, $notInGroup) ? $class=array('class' => 'blue') : $class=array();
+            $user[] = array($memberList[$userId], $class);
+            foreach ($score['grades'] as $criterion) {
                 $user[] = is_numeric($criterion) ? number_format($criterion, 2) : 'N/A';
             }
 
-            if (!isset($scoreSummary[$userId]['received_ave_score'])) {
+            if (!isset($scores[$userId]['total'])) {
                 $user[] = sprintf('%.2 (%.2f%%)', 0, 0);
                 $totalAve += 0;
             } else if ($penalties[$userId] > 0) {
-                $penalty = number_format($penalties[$userId]/100 * $scoreSummary[$userId]['received_ave_score'], 2);
-                $diff = number_format($scoreSummary[$userId]['received_ave_score'] - $penalty, 2);
+                $penalty = number_format($penalties[$userId]/100 * $scores[$userId]['total'], 2);
+                $diff = number_format($scores[$userId]['total'] - $penalty, 2);
                 $user[] = sprintf('%.2f - <font color="red">%.2f</font> = %.2f (%.2f%%)',
-                    number_format($scoreSummary[$userId]['received_ave_score'], 2), $penalty, $diff, number_format($diff/$total*100, 2));
+                    number_format($scores[$userId]['total'], 2), $penalty, $diff, number_format($diff/$total*100, 2));
                 $totalAve += $diff;
             } else {
-                $user[] = sprintf('%.2f (%.2f%%)', $scoreSummary[$userId]['received_ave_score'], $scoreSummary[$userId]['received_ave_score']/$total*100);
-                $totalAve += $scoreSummary[$userId]['received_ave_score'];
+                $user[] = sprintf('%.2f (%.2f%%)', $scores[$userId]['total'], number_format($scores[$userId]['total']/$total*100,2));
+                $totalAve += $scores[$userId]['total'];
             }
             $numMembers++;
             $table[] = $user;
@@ -189,6 +190,23 @@ class EvaluationHelper extends AppHelper
         $table[] = $user;
 
         return $table;
+    }
+    
+    /**
+     * getIndividualRubricHeader
+     *
+     * @param mixed $criteria
+     *
+     * @access public
+     * @return void
+     */
+    function getIndividualRubricHeader($criteria)
+    {
+        $header = array(__('Evaluator', true));
+        foreach ($criteria as $criterion) {
+            $header[$criterion['criteria_num']] = '('.$criterion['criteria_num'].') '.$criterion['criteria'];
+        }
+        return $header;
     }
 
     /**

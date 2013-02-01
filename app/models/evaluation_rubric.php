@@ -67,9 +67,8 @@ class EvaluationRubric extends EvaluationResponseBase
     {
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $includeEvaluator ? $user = 'User.*' : $user = '';
-        $members = Set::extract($this->GroupEvent->getGroupMembers($grpEventId), '/GroupsMembers/user_id');
         return $this->find('all', array(
-            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee, 'evaluator' => $members),
+            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
             'joins' => array(
                 array(
                     'table' => 'users',

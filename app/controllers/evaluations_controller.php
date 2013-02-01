@@ -1017,35 +1017,28 @@ class EvaluationsController extends AppController
             break;
 
         case 2: //View Rubric Evaluation
+            $sub = $this->EvaluationSubmission->findAllByGrpEventId($groupEventId);
+            $groupMembers = $this->GroupEvent->getGroupMembers($groupEventId);
+            $inCompleteMembers = array_diff(Set::extract($groupMembers, '/GroupsMembers/user_id'), Set::extract($sub, '/EvaluationSubmission/submitter_id'));
+            $notInGroup = array_diff(Set::extract($sub, '/EvaluationSubmission/submitter_id'), Set::extract($groupMembers, '/GroupsMembers/user_id'));
+            $inCompleteMembers = $this->User->getUsers($inCompleteMembers, array('Role'), array('User.full_name'));
+            $notInGroup = $this->User->getUsers($notInGroup, array('Role'), array('User.id', 'User.full_name'));
+            $rubricDetails = $this->EvaluationRubric->findAllByGrpEventId($groupEventId);
+            $memberList = array_unique(array_merge(Set::extract($rubricDetails, '/EvaluationRubric/evaluator'),
+                Set::extract($rubricDetails, '/EvaluationRubric/evaluatee')));
+            $fullNames = $this->User->getFullNames($memberList);
+            $members = $this->User->findAllById($memberList);
+            $rubric = $this->Rubric->findById($event['Event']['template_id']);
+            $scoreRecords = $this->Evaluation->formatRubricEvaluationResultsMatrix($rubricDetails, $rubric);
 
-            $formattedResult = $this->Evaluation->formatRubricEvaluationResult($event, $displayFormat);
-            $this->set('rubric', $formattedResult['rubric']);
-            if (isset($formattedResult['groupMembers'])) {
-                $this->set('groupMembers', $formattedResult['groupMembers']);
-            }
-            if (isset($formattedResult['groupMembersNoTutors'])) {
-                $this->set('groupMembersNoTutors', $formattedResult['groupMembersNoTutors']);
-                $members = array();
-                foreach ($formattedResult['groupMembersNoTutors'] as $user) {
-                    $members[$user['User']['id']] = $user['User']['first_name'].' '.$user['User']['last_name'];
-                }
-                $this->set('summaryMembers', $members);
-            }
-            if (isset($formattedResult['reviewEvaluations'])) {
-                $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);
-            }
-            if (isset($formattedResult['rubric']['RubricsCriteria'])) {
-                $this->set('rubricCriteria', $formattedResult['rubric']['RubricsCriteria']);
-            }
-            $this->set('allMembersCompleted', $formattedResult['allMembersCompleted']);
-            $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
-            $this->set('scoreRecords', $formattedResult['scoreRecords']);
-            $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
-            $this->set('evalResult', $formattedResult['evalResult']);
-            $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
-            // set penalty data
-            $formattedPenalty = $this->Rubric->formatPenaltyArray($formattedResult['groupMembersNoTutors'], $eventId, $groupId);
-            $this->set('penalties', $formattedPenalty);
+            $this->set('rubric', $rubric);
+            $this->set('inCompleteMembers', $inCompleteMembers);
+            $this->set('notInGroup', $notInGroup);
+            $this->set('members', $members);
+            $this->set('memberList', $fullNames);
+            $this->set('penalties', $this->Rubric->formatPenaltyArray($fullNames, $eventId, $groupId));
+            $this->set('scoreRecords', $scoreRecords);
+            
 
             if ($displayFormat == 'Detail') {
                 $this->render('view_rubric_evaluation_results_detail');
@@ -1086,7 +1079,7 @@ class EvaluationsController extends AppController
                 Set::extract($mixevalDetails, '/EvaluationMixeval/evaluatee')));
             $memberList = array_unique(array_merge($memberList, $inCompleteMembers));
             $fullNames = $this->User->getFullNames($memberList);
-            $members = $this->User->find('all', array('conditions' => array('User.id' => $memberList)));
+            $members = $this->User->findAllById($memberList);
             $details = $this->Evaluation->getMixevalResultDetail($groupEventId, $members);
             $mixeval = $this->Mixeval->find('first', array(
                 'conditions' => array('Mixeval.id' => $event['Event']['template_id']),
@@ -1177,31 +1170,32 @@ class EvaluationsController extends AppController
             break;
 
         case 2: //View Rubric Evaluation Result
-            $formattedResult = $this->Evaluation->formatRubricEvaluationResult($event, 'Detail', 1, User::get('id'));
-            $this->set('rubric', $formattedResult['rubric']);
-            if (isset($formattedResult['groupMembers'])) {
-                $this->set('groupMembers', $formattedResult['groupMembers']);
-            }
-            if (isset($formattedResult['reviewEvaluations'])) {
-                $this->set('reviewEvaluations', $formattedResult['reviewEvaluations']);
-            }
-            if (isset($formattedResult['rubric']['RubricsCriteria'])) {
-                $this->set('rubricCriteria', $formattedResult['rubric']['RubricsCriteria']);
-            }
-            $this->set('allMembersCompleted', $formattedResult['allMembersCompleted']);
-            $this->set('inCompletedMembers', $formattedResult['inCompletedMembers']);
-            $this->set('scoreRecords', $formattedResult['scoreRecords']);
-            $this->set('memberScoreSummary', $formattedResult['memberScoreSummary']);
-            $this->set('evalResult', $formattedResult['evalResult']);
-            $this->set('gradeReleaseStatus', $formattedResult['gradeReleaseStatus']);
-            $this->set('penalty', $formattedResult['penalty']);
-
-            $ratingPenalty = $formattedResult['memberScoreSummary'][$userId]['received_ave_score'] * ($formattedResult['penalty'] / 100);
-            $this->set('ratingPenalty', $ratingPenalty);
+            $rubric = $this->Rubric->findById($event['Event']['template_id']);
+            $evaluatorDetails = $this->EvaluationRubric->find('all', array(
+                'conditions' => array('grp_event_id' => $groupEventId, 'evaluator' => $userId)
+            ));
+            $evaluateeDetails = $this->EvaluationRubric->find('all', array(
+                'conditions' => array('grp_event_id' => $groupEventId, 'evaluatee' => $userId)
+            ));
+            $userIds = array_unique(array_merge(
+                Set::extract($evaluatorDetails, '/EvaluationRubric/evaluatee'), array($userId)));
+            $fullNames = $this->User->getFullNames($userIds);
+            $sub = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $userId);
+            $penalty = $this->Penalty->getPenaltyPercent($sub);
+            $status = array(
+                'comment' => array_product(Set::extract($evaluateeDetails, '/EvaluationRubric/comment_release')),
+                'grade' => array_product(Set::extract($evaluateeDetails, '/EvaluationRubric/grade_release'))
+            );
+            
+            $this->set('rubric', $rubric);
+            $this->set('membersList', $fullNames);
+            $this->set('evaluatorDetails', $evaluatorDetails);
+            $this->set('evaluateeDetails', $evaluateeDetails);
+            $this->set('status', $status);
+            $this->set('penalty', $penalty);
 
             $this->render('student_view_rubric_evaluation_results');
             break;
-
         case 3: //View Survey Result
             $answers = array();
             $formattedResult = $this->Evaluation->formatSurveyEvaluationResult($event, User::get('id'));

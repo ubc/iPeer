@@ -281,7 +281,7 @@ class Rubric extends EvaluationBase
     /**
      * getRubricById
      *
-     * @param Integer $id : Rubric id
+     * @param mixed $id rubric id
      *
      * @access public
      * @return returns Rubric and all of its associated models

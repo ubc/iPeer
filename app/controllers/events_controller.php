@@ -12,7 +12,8 @@ class EventsController extends AppController
 {
     public $name = 'Events';
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time');
-    public $uses = array('GroupEvent', 'User', 'Group', 'Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers', 'Penalty', 'Survey');
+    public $uses = array('GroupEvent', 'User', 'Group', 'Course', 'Event', 'EventTemplateType', 
+        'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers', 'Penalty', 'Survey');
     public $components = array("AjaxList", "Session");
 
     /**
@@ -258,8 +259,7 @@ class EventsController extends AppController
         }
 
         // find the related evaluation
-        $model = ClassRegistry::init($modelName);
-        $evaluation = $model->find('first', array(
+        $evaluation = $this->$modelName->find('first', array(
             'conditions' => array('id' => $event['Event']['template_id']),
             'contain' => false
         ));

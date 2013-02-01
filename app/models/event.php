@@ -313,7 +313,6 @@ class Event extends AppModel
      */
     function getCourseEventCount($courseId=null)
     {
-        //return $this->find('course_id='.$courseId, 'COUNT(*) as total');
         return $this->find('count', array(
             'conditions' => array('course_id' => $courseId)
         ));
@@ -343,7 +342,6 @@ class Event extends AppModel
      */
     function getActiveSurveyEvents($courseId = null)
     {
-        //return $this->find('all', 'course_id='.$courseId.' AND event_template_type_id=3');
         return $this->find('all', array(
             'conditions' => array('course_id' => $courseId, 'event_template_type_id' => '3', 'Event.record_status !='=>'I')
         ));

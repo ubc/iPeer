@@ -150,7 +150,9 @@ class Penalty extends AppModel
             } 
         // there is submission - may be on time or late
         } else {
-            $late_diff = strtotime($event_sub['EvaluationSubmission'][0]['date_submitted']) - $event_due;
+            $dateSub = isset($event_sub['EvaluationSubmission'][0]['date_submitted']) ? $event_sub['EvaluationSubmission'][0]['date_submitted'] :
+                $event_sub['EvaluationSubmission']['date_submitted'];
+            $late_diff = strtotime($dateSub) - $event_due;
             // late
             if (0 < $late_diff) {
                 $days_late = $late_diff/(24*60*60);
