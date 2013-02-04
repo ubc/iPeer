@@ -1321,6 +1321,27 @@ INSERT INTO `mixeval_question_descs` (`id`, `question_id`, `scale_level`, `descr
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `mixeval_question_types`
+--
+
+DROP TABLE IF EXISTS `mixeval_question_types`;
+CREATE TABLE IF NOT EXISTS `mixeval_question_types` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `type` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
+
+--
+-- Dumping data for table `mixeval_question_types`
+--
+
+INSERT INTO `mixeval_question_types` (`id`, `type`) VALUES
+(1, 'Likert'),
+(2, 'Comment');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `mixeval_questions`
 --
 
@@ -1331,25 +1352,27 @@ CREATE TABLE IF NOT EXISTS `mixeval_questions` (
   `question_num` int(11) NOT NULL DEFAULT '0',
   `title` text,
   `instructions` text,
-  `question_type` char(1) DEFAULT NULL,
+  `mixeval_question_type_id` int(11) DEFAULT NULL,
   `required` tinyint(1) NOT NULL DEFAULT '1',
   `multiplier` int(11) NOT NULL DEFAULT '0',
   `scale_level` int(11) NOT NULL DEFAULT '0',
   `response_type` char(1) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`mixeval_question_type_id`) REFERENCES `mixeval_question_types` 
+	(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
 
 --
 -- Dumping data for table `mixeval_questions`
 --
 
-INSERT INTO `mixeval_questions` (`id`, `mixeval_id`, `question_num`, `title`, `instructions`, `question_type`, `required`, `multiplier`, `scale_level`, `response_type`) VALUES
-(1, 1, 1, 'Participated in Team Meetings', NULL, 'S', 1, 1, 5, NULL),
-(2, 1, 2, 'Was Helpful and co-operative', NULL, 'S', 1, 1, 5, NULL),
-(3, 1, 3, 'Submitted work on time', NULL, 'S', 1, 1, 5, NULL),
-(4, 1, 4, 'Produced efficient work?', NULL, 'T', 1, 0, 5, 'S'),
-(5, 1, 5, 'Contributed?', NULL, 'T', 1, 0, 5, 'L'),
-(6, 1, 6, 'Easy to work with?', NULL, 'T', 0, 0, 5, 'S');
+INSERT INTO `mixeval_questions` (`id`, `mixeval_id`, `question_num`, `title`, `instructions`, `mixeval_question_type_id`, `required`, `multiplier`, `scale_level`, `response_type`) VALUES
+(1, 1, 1, 'Participated in Team Meetings', "Please rate performance.", 1, 1, 1, 5, NULL),
+(2, 1, 2, 'Was Helpful and co-operative', NULL, 1, 1, 1, 5, NULL),
+(3, 1, 3, 'Submitted work on time', NULL, 1, 1, 1, 5, NULL),
+(4, 1, 4, 'Produced efficient work?', "Please give a paragraph answer.", 2, 1, 0, 5, 'S'),
+(5, 1, 5, 'Contributed?', NULL, 2, 1, 0, 5, 'L'),
+(6, 1, 6, 'Easy to work with?', NULL, 2, 0, 0, 5, 'S');
 
 -- --------------------------------------------------------
 

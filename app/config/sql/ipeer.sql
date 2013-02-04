@@ -1075,6 +1075,27 @@ INSERT INTO `mixeval_question_descs` (`id`, `question_id`, `scale_level`, `descr
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `mixeval_question_types`
+--
+
+DROP TABLE IF EXISTS `mixeval_question_types`;
+CREATE TABLE IF NOT EXISTS `mixeval_question_types` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `type` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
+
+--
+-- Dumping data for table `mixeval_question_types`
+--
+
+INSERT INTO `mixeval_question_types` (`id`, `type`) VALUES
+(1, 'Likert'),
+(2, 'Comment');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `mixeval_questions`
 --
 
@@ -1085,12 +1106,14 @@ CREATE TABLE IF NOT EXISTS `mixeval_questions` (
   `question_num` int(11) NOT NULL DEFAULT '0',
   `title` text,
   `instructions` text,
-  `question_type` char(1) DEFAULT NULL,
+  `mixeval_question_type_id` int(11) DEFAULT NULL,
   `required` tinyint(1) NOT NULL DEFAULT '1',
   `multiplier` int(11) NOT NULL DEFAULT '0',
   `scale_level` int(11) NOT NULL DEFAULT '0',
   `response_type` char(1) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`mixeval_question_type_id`) REFERENCES `mixeval_question_types` 
+	(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
 
 
