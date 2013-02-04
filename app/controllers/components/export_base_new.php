@@ -196,10 +196,10 @@ class ExportBaseNewComponent extends Object
 
             if ($this->detailModel[$event['Event']['event_template_type_id']] && array_key_exists($this->detailModel[$event['Event']['event_template_type_id']], $response)) {
                 foreach ($response[$this->detailModel[$event['Event']['event_template_type_id']]] as $key => $result) {
-                    if (isset($event['Question'][$key]['question_type'])) {
-                        if (isset($params['include']['grade_tables']) && $event['Question'][$key]['question_type'] == 'S') {
+                    if (isset($event['Question'][$key]['mixeval_question_type_id'])) {
+                        if (isset($params['include']['grade_tables']) && $event['Question'][$key]['mixeval_question_type_id'] == '1') {
                             array_push($row, $result['grade']);
-                        } elseif (isset($params['include']['comments']) && $event['Question'][$key]['question_type'] == 'T') {
+                        } elseif (isset($params['include']['comments']) && $event['Question'][$key]['mixeval_question_type_id'] == '2') {
                             array_push($row, $result['question_comment']);
                         }
                     } else {
@@ -246,7 +246,7 @@ class ExportBaseNewComponent extends Object
     public function calcDimensionX($params, $event) {
         $total = 2 + count($params['include']);
         if (4 == $event['Event']['event_template_type_id']) {
-            $commentQuestions = Set::extract($event, '/Question[question_type=T]');
+            $commentQuestions = Set::extract($event, '/Question[mixeval_question_type_id=2]');
             if (isset($params['include']['grade_tables'])) {
                 // question number - 1 as one is counted as grade_tables in include
                 $total += count($event['Question']) - count($commentQuestions) - 1;
@@ -335,7 +335,7 @@ for ($inc=0; $inc<$count($groupMembers); $inc++) {
         $groupCount = count($groupMembers);
         $grpEvent = $this->GroupEvent->getGrpEvent($grpEventId);
         $evaluation = $this->Event->getEventById($grpEvent['GroupEvent']['event_id']);
-        $questions = $this->MixevalQuestion->getQuestion($evaluation['Event']['template_id'], 'T');
+        $questions = $this->MixevalQuestion->getQuestion($evaluation['Event']['template_id'], '2');
         $validQuestionNum = array();
         foreach ($questions as $q) {
             array_push($validQuestionNum, $q['MixevalQuestion']['question_num']);

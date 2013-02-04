@@ -59,8 +59,8 @@ var EvalEditor = Class.create({
     ]);
 
     // hook up the observers
-    Element.observe($(this.controls).down('#add-lickert-button'), 'click', function() {this.addQuestion({question_type: "S"})}.bind(this));
-    Element.observe($(this.controls).down('#add-text-button'), 'click', function() {this.addQuestion({question_type: "T"})}.bind(this));
+    Element.observe($(this.controls).down('#add-lickert-button'), 'click', function() {this.addQuestion({mixeval_question_type_id: "1"})}.bind(this));
+    Element.observe($(this.controls).down('#add-text-button'), 'click', function() {this.addQuestion({mixeval_question_type_id: "2"})}.bind(this));
 
     // add new elements to the container
     this.container.appendChild(this.section);
@@ -78,7 +78,7 @@ var EvalEditor = Class.create({
 
   addQuestion: function() {
     var defaults = {
-      question_type: "T",
+      mixeval_question_type_id: "2",
       title: "",
       id: "",
     };
@@ -86,7 +86,7 @@ var EvalEditor = Class.create({
 
     var question_body;
 
-    if(options.question_type == "S") {
+    if(options.mixeval_question_type_id == "1") {
       question_body = this._generateLickertQuestion(Object.extend(options, {index: this.max_order}));
     } else {
       question_body = this._generateTextQuestion(Object.extend(options, {index: this.max_order}));
@@ -102,8 +102,8 @@ var EvalEditor = Class.create({
                      className: "question-id",
                      value: options.id}),
         Builder.node("input", {type: "hidden",
-                     name: "data[Question]["+this.max_order+"][question_type]",
-                     value: options.question_type}),
+                     name: "data[Question]["+this.max_order+"][mixeval_question_type_id]",
+                     value: options.mixeval_question_type_id}),
         Builder.node("input", {type: "hidden",
                      name: "data[Question]["+this.max_order+"][question_num]",
                      order: "true",

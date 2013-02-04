@@ -131,7 +131,7 @@
                     $evaluation = $user['Evaluation']['EvaluationRubric'];
                     $evaluationDetails = $user['Evaluation']['EvaluationRubricDetail'];
                     foreach ($evaluationDetails as $detail)
-                        if ($data['questions'][$detail['question_number']]['question_type'] !='S' &&   // if the questing in not a selection one.
+                        if ($data['questions'][$detail['question_number']]['mixeval_question_type_id'] !='1' &&   // if the questing in not a selection one.
                             empty($detail['criteria_comment'])) {
                             $commentsNeeded = true;      // A criteria comment is missing
                             break;

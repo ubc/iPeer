@@ -11,6 +11,9 @@
 class MixevalQuestion extends AppModel
 {
     public $name = 'MixevalQuestion';
+
+    public $belongsTo = array('MixevalQuestionType');
+
     public $hasMany = array(
         'Description' =>
         array('className'   => 'MixevalQuestionDesc',
@@ -81,7 +84,7 @@ class MixevalQuestion extends AppModel
     function getQuestion($mixEvalId=null, $questionType=null)
     {
         if (isset($questionType)) {
-            $condition = array('mixeval_id' => $mixEvalId, 'question_type' => $questionType);
+            $condition = array('mixeval_id' => $mixEvalId, 'mixeval_question_type_id' => $questionType);
         } else {
             $condition = array('mixeval_id' => $mixEvalId);
         }

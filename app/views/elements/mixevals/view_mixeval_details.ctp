@@ -14,10 +14,10 @@ $details = Set::combine($evaluation['EvaluationDetail'], '{n}.EvaluationMixevalD
     </tr>
     <?php foreach ($questions as $mixevalQuestion) {
     //Get and set Mixeval Question
-    if ($mixevalQuestion !=null && $mixevalQuestion["question_type"]=="S") {
+    if ($mixevalQuestion !=null && $mixevalQuestion["mixeval_question_type_id"]=="1") {
         $questionDescriptors = $mixevalQuestion['Description'];
     }
-    if ($mixevalQuestion["question_type"]=="S") {
+    if ($mixevalQuestion["mixeval_question_type_id"]=="1") {
 
         echo '<tr><td style="text-align: left; padding-left: 1em;">';
         if (isset($evaluate)) {
@@ -31,7 +31,7 @@ $details = Set::combine($evaluation['EvaluationDetail'], '{n}.EvaluationMixevalD
 
         echo $pos. ': &nbsp &nbsp '. $mixevalQuestion['title'];
         echo '</td></tr>';
-        echo $form->hidden('Mixeval.question_type'.$mixevalQuestion['question_num'], array('value'=>'S'));
+        echo $form->hidden('Mixeval.mixeval_question_type_id'.$mixevalQuestion['question_num'], array('value'=>'1'));
 
         //for loop to display the criteria comment cells for each LOM
         isset($mixevalQuestion['multiplier']) ? $multiplier = $mixevalQuestion['multiplier'] : $multiplier = 1;
@@ -94,7 +94,7 @@ $details = Set::combine($evaluation['EvaluationDetail'], '{n}.EvaluationMixevalD
         <th align="left"><?php __('Section Two')?>: &nbsp;<?php __('Comments (No Weight on this Section)')?></th>
     </tr>
     <?php foreach ($questions as $mixevalQuestion) {
-        if ($mixevalQuestion["question_type"] == "S") {
+        if ($mixevalQuestion["mixeval_question_type_id"] == "1") {
             continue;
         }
     ?>
@@ -109,7 +109,7 @@ $details = Set::combine($evaluation['EvaluationDetail'], '{n}.EvaluationMixevalD
                         echo '<font color="red"> * </font>';
                       }
                    } ?> <br>
-                  <?php echo $form->hidden('Mixeval.question_type'.$mixevalQuestion['question_num'], array('value'=>'T')); ?>
+                  <?php echo $form->hidden('Mixeval.mixeval_question_type_id'.$mixevalQuestion['question_num'], array('value'=>'2')); ?>
                 </td>
               </tr>
               <?php if (!$evaluate) { ?>

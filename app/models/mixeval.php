@@ -69,63 +69,9 @@ class Mixeval extends EvaluationBase
     function __construct($id = false, $table = null, $ds = null)
     {
         parent::__construct($id, $table, $ds);
-        $this->virtualFields['lickert_question_max'] = sprintf('SELECT count(*) as lickert_question_max FROM mixeval_questions as q WHERE q.mixeval_id = %s.id AND q.question_type LIKE "S"', $this->alias);
-        $this->virtualFields['prefill_question_max'] = sprintf('SELECT count(*) as prefill_question_max FROM mixeval_questions as q WHERE q.mixeval_id = %s.id AND q.question_type LIKE "T"', $this->alias);
         $this->virtualFields['total_question'] = sprintf('SELECT count(*) as total_question FROM mixeval_questions as q WHERE q.mixeval_id = %s.id', $this->alias);
         $this->virtualFields['total_marks'] = sprintf('SELECT sum(multiplier) as sum FROM mixeval_questions as q WHERE q.mixeval_id = %s.id', $this->alias);
     }
-
-    /**
-     * saveAllWithDescription save the mixed evaluation with all questions
-     * including the descriptions in lickert questions
-     *
-     * @param array $data the array of data to be saved
-     *
-     * @access public
-     * @return boolean
-     */
-    /*function saveAllWithDescription($data)
-    {
-    }*/
-
-    //sets the current userid and merges the form values into the data array
-    /*function prepData($tmp=null, $userid)
-{
-
-//		$tmp = array_merge($tmp['data']['Mixeval'], $tmp['form']);
-    $ttlQuestionNo = $tmp['data']['Mixeval']['total_question'];
-    $questions = array();
-    for ($i = 1; $i < $ttlQuestionNo; $i++) {
-      //Format questions for mixed eval
-      $question['question_num'] = $i;
-      $question['title'] = $tmp['data']['Mixeval']['title'.$i];
-      isset($tmp['data']['Mixeval']['text_instruction'.$i])? $question['instructions'] = $tmp['data']['Mixeval']['text_instruction'.$i] : $question['instructions'] = null;
-      $question['question_type'] = $tmp['data']['Mixeval']['question_type'.$i];
-      isset($tmp['data']['Mixeval']['text_require'.$i])? $question['required'] = $tmp['data']['Mixeval']['text_require'.$i] : $question['required'] = 0;
-      isset($tmp['form']['criteria_weight_'.$i])? $question['multiplier'] = $tmp['form']['criteria_weight_'.$i] : $question['multiplier'] = 0;
-      $question['scale_level'] = $tmp['data']['Mixeval']['scale_max'];
-      isset($tmp['data']['Mixeval']['response_type'.$i])? $question['response_type'] = $tmp['data']['Mixeval']['response_type'.$i] : $question['response_type'] = null;
-      $questions[$i]['MixevalQuestion'] = $question;
-
-      //Format lickert descriptors
-      if ($question['question_type'] == 'S') {
-        for ($j = 1; $j <= $question['scale_level']; $j++) {
-         $desc['question_num'] = $question['question_num'];
-         $desc['scale_level'] = $j;
-
-        // Make sure empty strings cause no php errors.
-         $descriptor = isset($tmp['data']['Mixeval']['criteria_comment_'.$question['question_num'].'_'.$j]) ?
-                             $tmp['data']['Mixeval']['criteria_comment_'.$question['question_num'].'_'.$j] : "";
-         $desc['descriptor'] = $descriptor;
-         $questions[$i]['MixevalQuestion']['descriptor'][$j] = $desc;
-        }
-
-      }
-
-    }
-
-        return $questions;
-    }*/
 
     /**
      * compileViewData
@@ -149,7 +95,7 @@ class Mixeval extends EvaluationBase
                 $evalQuestion = $row['MixevalQuestion'];
                 $this->filter($evalQuestion);
                 $tmp['questions'][$evalQuestion['question_num']] = $evalQuestion;
-                if ($evalQuestion['question_type'] == 'S') {
+                if ($evalQuestion['mixeval_question_type_id'] == '1') {
                     //Retrieve the lickert descriptor
                     $descriptors = $this->MixevalQuestionDesc->getQuestionDescriptor($row['MixevalQuestion']['id']);
                     $tmp['questions'][$evalQuestion['question_num']]['descriptors'] = $descriptors;
@@ -188,7 +134,7 @@ class Mixeval extends EvaluationBase
             for ($i = 0; $i < count($data['Question']); $i++) {
                 unset ($data['Question'][$i]['id'],
                     $data['Question'][$i]['mixeval_id']);
-                if ('S' == $data['Question'][$i]['question_type']) {
+                if ('1' == $data['Question'][$i]['mixeval_question_type_id']) {
                     for ($j = 0; $j < count($data['Question'][$i]['Description']); $j++) {
                         unset($data['Question'][$i]['Description'][$j]['id'],
                             $data['Question'][$i]['Description'][$j]['question_id']);

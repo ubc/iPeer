@@ -280,7 +280,7 @@ class ExportHelper2Component extends Object
         // $EventType = 2(Rubric) or 4(Mix Eval)
         $evaluationType == 2 ? ($questions = $this->RubricsCriteria->getCriteria($evaluationId)) &&
             ($evalType = 'RubricsCriteria') :
-            ($questions = $this->MixevalQuestion->getQuestion($evaluationId, 'S')) &&
+            ($questions = $this->MixevalQuestion->getQuestion($evaluationId, '1')) &&
             ($evalType = 'MixevalQuestion');
         //Store the $evaluationType
         $questions[0][$evalType]['evaluation_type'] = $evaluationType;

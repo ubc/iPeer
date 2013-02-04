@@ -62,7 +62,7 @@ class EvaluationBase extends AppModel
         //check if questions are entered
         if (!empty($this->data['Question'])&&$this->name =='Mixeval') {
             foreach ($this->data['Question'] as $row) {
-                if ($row['question_type']== 'S' &&(empty($row['Description'] ) || (count($row['Description'])) < 2)) {
+                if ($row['mixeval_question_type_id']== '1' &&(empty($row['Description'] ) || (count($row['Description'])) < 2)) {
                     $this->errorMessage = "Please add at least two descriptors for each of the Lickert questions.";
                     return false;
                 }

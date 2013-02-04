@@ -73,7 +73,7 @@ class MixevalQuestionDescTestCase extends CakeTestCase
         $tmp = array(
             '0' => array(
                 'id' => 1,
-                'question_type' => 'S',
+                'mixeval_question_type_id' => '1',
                 'question_num' => 1,
                 'title' => 'Participated in Team Meetings',
                 'multiplier' => 1,

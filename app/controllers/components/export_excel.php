@@ -524,7 +524,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         $groupCount = count($groupMembersNoTutors);
         $grpEvent = $this->GroupEvent->getGrpEvent($grpEventId);
         $evaluation = $this->Event->getEventById($grpEvent['GroupEvent']['event_id']);
-        $questions = $this->MixevalQuestion->getQuestion($evaluation['Event']['template_id'], 'T');
+        $questions = $this->MixevalQuestion->getQuestion($evaluation['Event']['template_id'], '2');
         $validQuestionNum = array();
         foreach ($questions as $q) {
             array_push($validQuestionNum, $q['MixevalQuestion']['question_num']-1);

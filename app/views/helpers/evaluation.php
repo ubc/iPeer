@@ -46,7 +46,7 @@ class EvaluationHelper extends AppHelper
     function getSummaryTableHeader($totalMark, $questions)
     {
         $questions = array('MixevalQuestion' => $questions);
-        $numberQuestions = Set::extract($questions, '/MixevalQuestion[question_type=S]');
+        $numberQuestions = Set::extract($questions, '/MixevalQuestion[mixeval_question_type_id=1]');
         $header = array(__('Evaluatee', true));
         foreach ($numberQuestions as $key => $question) {
             $header[] = sprintf('%d (/%.1f)', $key+1, $question['MixevalQuestion']['multiplier']);
@@ -267,8 +267,8 @@ class EvaluationHelper extends AppHelper
                 $detail = $resultDetails[$question['question_num']];
                 // check if the result is released
                 if (($type == 'evaluator' || $type == 'evaluatee') ||
-                    (($memberMixeval['grade_release'] && $question['question_type'] == 'S') ||
-                    ($memberMixeval['comment_release'] && $question['question_type'] == 'T'))) {
+                    (($memberMixeval['grade_release'] && $question['mixeval_question_type_id'] == '1') ||
+                    ($memberMixeval['comment_release'] && $question['mixeval_question_type_id'] == '2'))) {
 
                     $tr[] = $this->renderQuestionResult($question, $detail);
                 } else {
@@ -294,8 +294,8 @@ class EvaluationHelper extends AppHelper
     {
         $result = '';
 
-        switch($question['question_type']) {
-        case 'S':
+        switch($question['mixeval_question_type_id']) {
+        case '1':
             //Point Description Detail
             $result = $question['Description'][$detail['selected_lom']-1]['descriptor'];
             $result .= "<br />";
@@ -310,7 +310,7 @@ class EvaluationHelper extends AppHelper
             $result .= isset($detail) ? $detail["grade"] . " / " . $question['multiplier'] : __('N/A', true);
             $result .= "<br />";
             break;
-        case 'T':
+        case '2':
             $result = "<strong>".__('Comment', true).": </strong>";
             $result .= isset($detail) ? $detail["question_comment"] : __('N/A', true);
             break;

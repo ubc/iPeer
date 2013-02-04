@@ -107,6 +107,6 @@ return $data;*/
     {
         return $this->find('all', array('conditions' => array(
             'mixeval_id' => $mixEvalId,
-            'question_type' => 'T')));
+            'mixeval_question_type_id' => '2')));
     }
 }

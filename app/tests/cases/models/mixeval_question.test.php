@@ -80,7 +80,7 @@ class MixevalQuestionTestCase extends CakeTestCase
         $tmp = array(
             '0' => array(
                 'id' => '',
-                'question_type' => 'S',
+                'mixeval_question_type_id' => '1',
                 'question_num' => 0,
                 'title' => 'Licket Q1',
                 'multiplier' => 15,
@@ -97,7 +97,7 @@ class MixevalQuestionTestCase extends CakeTestCase
             ),
             '1' => array(
                 'id' => '',
-                'question_type' => 'T',
+                'mixeval_question_type_id' => '2',
                 'question_num' => 1,
                 'title' => 'Comment Q2',
                 'instructions' => 'Comment',

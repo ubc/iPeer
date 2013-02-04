@@ -77,7 +77,7 @@ if (!empty($penalty)) {
           $evaluationDetails = $user['Evaluation']['EvaluationDetail'];
           foreach ($evaluationDetails as $detailEval) {
             $detail = $detailEval['EvaluationMixevalDetail'];
-            if ($data['Question'][$detail['question_number']]['question_type'] != 'S' &&
+            if ($data['Question'][$detail['question_number']]['mixeval_question_type_id'] != '1' &&
                 empty($detail['question_comment'])) {
                 $commentsNeeded = true;      // A criteria comment is missing
                 //echo "Missing detail $detail[id] for user $user[id]<br />";
@@ -167,7 +167,7 @@ if (!empty($penalty)) {
                     $evaluationDetails = $user['Evaluation']['EvaluationDetail'];
                     foreach ($evaluationDetails as $detailEval) {
                         $detail = $detailEval['EvaluationMixevalDetail'];
-                        if ($params['data']['questions'][$detail['question_number']]['question_type'] != 'S' &&
+                        if ($params['data']['questions'][$detail['question_number']]['mixeval_question_type_id'] != '1' &&
                             '' === $detail['question_comment']) {
                             $commentsNeeded = true;      // A criteria comment is missing
                             //echo "Missing detail $detail[id] for user $user[id]<br />";

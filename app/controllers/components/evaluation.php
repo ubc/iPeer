@@ -936,14 +936,14 @@ class EvaluationComponent extends Object
             $evalMixevalDetail['EvaluationMixevalDetail']['evaluation_mixeval_id'] = $evalMixevalId;
             $evalMixevalDetail['EvaluationMixevalDetail']['question_number'] = $i;
 
-            if ($form['data']['Mixeval']['question_type'.$i] == 'S') {
+            if ($form['data']['Mixeval']['mixeval_question_type_id'.$i] == '1') {
                 // get total possible grade for the question number ($i)
                 $selectedLom = $form['form']['selected_lom_'.$targetEvaluatee.'_'.$i];
                 $grade = $form['form'][$targetEvaluatee.'criteria_points_'.$i];
                 $evalMixevalDetail['EvaluationMixevalDetail']['selected_lom'] = $selectedLom;
                 $evalMixevalDetail['EvaluationMixevalDetail']['grade'] = $grade;
                 $totalGrade += $grade;
-            } else if ($form['data']['Mixeval']['question_type'.$i] == 'T') {
+            } else if ($form['data']['Mixeval']['mixeval_question_type_id'.$i] == '2') {
                 $evalMixevalDetail['EvaluationMixevalDetail']['question_comment'] = $form['form']["response_text_".$targetEvaluatee."_".$i];
             }
             $this->EvaluationMixevalDetail->save($evalMixevalDetail);
