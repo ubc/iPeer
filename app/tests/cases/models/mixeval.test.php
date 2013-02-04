@@ -16,7 +16,8 @@ class MixevalTestCase extends CakeTestCase
         'app.mixeval_question', 'app.mixeval_question_desc', 'app.faculty',
         'app.user_faculty', 'app.department', 'app.course_department',
         'app.sys_parameter', 'app.user_tutor', 'app.penalty',
-        'app.evaluation_simple', 'app.survey_input',
+        'app.evaluation_simple', 'app.survey_input', 
+        'app.mixeval_question_type'
     );
     public $Mixeval = null;
 

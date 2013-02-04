@@ -7,12 +7,15 @@ class MixevalQuestionTestCase extends CakeTestCase
     public $fixtures = array(
         'app.course', 'app.role', 'app.user', 'app.group',
         'app.roles_user', 'app.event', 'app.event_template_type',
-        'app.group_event', 'app.evaluation_submission',
-        'app.survey_group_set', 'app.survey_group',
-        'app.survey_group_member', 'app.question',
+        'app.group_event', 'app.evaluation_submission', 'app.oauth_token',
+        'app.survey_group_set', 'app.survey_group', 'app.sys_parameter',
+        'app.survey_group_member', 'app.question', 'app.evaluation_simple',
         'app.response', 'app.survey_question', 'app.user_course',
-        'app.user_enrol', 'app.groups_member', 'app.mixeval', 'app.mixeval_question',
-        'app.mixeval_question_desc', 'app.survey_input',
+        'app.user_enrol', 'app.groups_member', 'app.mixeval', 
+        'app.mixeval_question', 'app.mixeval_question_desc', 'app.survey_input',
+        'app.survey', 'app.faculty', 'app.user_faculty', 'app.user_tutor',
+        'app.department', 'app.course_department', 'app.penalty',
+        'app.mixeval_question_type'
     );
     public $MixevalQuestion = null;
 
