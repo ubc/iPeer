@@ -50,12 +50,18 @@ echo $this->Form->submit(
 ?></div><?php
 echo $this->Form->end();
 
+if(!is_null($courseId)) {
+    $url = 'checkDuplicateName/'.$courseId;
+} else {
+    $url = 'checkDuplicateName/';
+}
+
 // dynamically check username availability
 echo $ajax->observeField(
   'UserUsername',
   array(
     'update'=>'usernameErr',
-    'url'=>'checkDuplicateName/',
+    'url'=>$url,
     'frequency'=>1,
     'loading'=>"Element.show('loading');",
     'complete'=>"Element.hide('loading');stripe();"

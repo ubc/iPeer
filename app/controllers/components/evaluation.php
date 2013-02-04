@@ -672,7 +672,6 @@ class EvaluationComponent extends Object
     /**
      * formatRubricEvaluationResultsMatrix
      *
-     * @param mixed $groupMembers group members
      * @param mixed $evalResult   evel result
      * @param mixed $rubric       rubric with critieria
      *

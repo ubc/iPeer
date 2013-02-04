@@ -533,6 +533,7 @@ class UsersController extends AppController
 
         // set up the course and role variables to fill the form elements
         $this->_initAddFormEnv($courseId);
+        $this->set('courseId', $courseId);
 
         // save the data which involves:
         if ($this->data) {
@@ -608,6 +609,43 @@ class UsersController extends AppController
         $this->set('breadcrumb', $this->breadcrumb->push(__('Add User', true)));
     }
 
+    /**
+     * Enrol individual students via Users add
+     *
+     * @param mixed $username username
+     * @param mixed $courseId course id
+     *
+     * @access public
+     * @return void
+     */
+    public function enrol($username, $courseId)
+    {
+        $roleId = $this->User->getRoleId($this->Auth->user('id'));
+        $user = $this->User->getByUsername($username);
+        $userRole = $user['Role']['0']['RolesUser']['role_id'];
+        
+        if ($userRole <= $roleId || !in_array($userRole, array(4,5))) {
+            $this->Session->setFlash(__('Error: You do not have permission to enrol this user.', true));
+            $this->redirect('/courses/home/'.$courseId);
+            return;
+        }
+        
+        // enrol students
+        if ($userRole == 5) {
+            $save = $this->User->addStudent($user['User']['id'], $courseId);
+        // enrol tutors
+        } else {
+            $save = $this->User->addTutor($user['User']['id'], $courseId);
+        }
+        
+        if (!empty($save)) {
+            $this->Session->setFlash(__('Student is successfully enrolled.', true), 'good');
+        } else {
+            $this->Session->setFlash(__('Error: Unable to enrol student.', true));
+        }
+        $this->redirect('/courses/home/'.$courseId);
+    }
+     
 
     /**
      * Given a user id, edit the information for that user
@@ -858,20 +896,28 @@ class UsersController extends AppController
     /**
      * checkDuplicateName
      *
+     * @param $courseId course id
+     *
      * @access public
      * @return void
      */
-    function checkDuplicateName()
+    function checkDuplicateName($courseId = null)
     {
         if (!$this->RequestHandler->isAjax()) {
             $this->cakeError('error404');
         }
         $this->layout = 'ajax';
         $this->autoRender = false;
+        
+        $message = __('Username "', true).$this->data['User']['username'].__('" already exists.', true);
+        if (!is_null($courseId)) {
+            $message = $message.'<br> To enrol, click '.
+                '<a href="/users/enrol/'.$this->data['User']['username'].'/'.$courseId.'"> here</a>';
+        }
 
         $sFound = $this->User->getByUsername($this->data['User']['username']);
 
-        return ($sFound) ? __('Username "', true).$this->data['User']['username'].__('" already exists.', true) : '';
+        return ($sFound) ? $message : '';
     }
 
 

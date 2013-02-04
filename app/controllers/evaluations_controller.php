@@ -354,6 +354,12 @@ class EvaluationsController extends AppController
         }
     }
 
+    /**
+     * sendConfirmationEmail
+     *
+     * @access public
+     * @return void
+     */
     function _sendConfirmationEmail()
     {
         $email = User::get('email');
