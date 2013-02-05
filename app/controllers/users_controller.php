@@ -896,7 +896,7 @@ class UsersController extends AppController
     /**
      * checkDuplicateName
      *
-     * @param $courseId course id
+     * @param mixed $courseId course id
      *
      * @access public
      * @return void

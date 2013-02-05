@@ -175,7 +175,7 @@ class EvaluationHelper extends AppHelper
                     number_format($scores[$userId]['total'], 2), $penalty, $diff, number_format($diff/$total*100, 2));
                 $totalAve += $diff;
             } else {
-                $user[] = sprintf('%.2f (%.2f%%)', $scores[$userId]['total'], number_format($scores[$userId]['total']/$total*100,2));
+                $user[] = sprintf('%.2f (%.2f%%)', $scores[$userId]['total'], number_format($scores[$userId]['total']/$total*100, 2));
                 $totalAve += $scores[$userId]['total'];
             }
             $numMembers++;

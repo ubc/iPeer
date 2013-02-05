@@ -145,7 +145,7 @@ class Course extends AppModel
         }
     }*/
     
-    /*
+    /**
      * include http to the beginning of the url if it is not already there
      *
      * @access public

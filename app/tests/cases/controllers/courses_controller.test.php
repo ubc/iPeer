@@ -48,17 +48,17 @@ class CoursesControllerTest extends ExtendedAuthTestCase
     private $fixtureIndex = array(
         array(
             'Course' => array(
-                'id' => 1, 'homepage' => 'http://www.mech.ubc.ca', 'course' => 'MECH 328', 'title' => 'Mechanical Engineering Design Project',
+                'id' => 1, 'course' => 'MECH 328', 'title' => 'Mechanical Engineering Design Project',
                 'creator_id' => 1, 'record_status' => 'A', 'creator' => 'Super Admin'),
         ),
         array(
             'Course' => array(
-                'id' => 2, 'homepage' => 'http://www.apsc.ubc.ca', 'course' => 'APSC 201', 'title' => 'Technical Communication',
+                'id' => 2, 'course' => 'APSC 201', 'title' => 'Technical Communication',
                 'creator_id' => 1, 'record_status' => 'A', 'creator' => 'Super Admin'),
         ),
         array(
             'Course' => array(
-                'id' => 3, 'homepage' => 'http://www.ugrad.cs.ubc.ca/~cs101/', 'course' => 'CPSC 101', 'title' => 'Connecting with Computer Science',
+                'id' => 3, 'course' => 'CPSC 101', 'title' => 'Connecting with Computer Science',
                 'creator_id' => 0, 'record_status' => 'I', 'creator' => null),
         ),
     );
@@ -265,6 +265,8 @@ class CoursesControllerTest extends ExtendedAuthTestCase
             $this->fixtureIndex[2],
             $this->fixtureIndex[0],
         );
+        debug($expected);
+        debug($result['paramsForList']['data']['entries']);
         $this->assertTrue($result['paramsForList']['data']['entries'] == $expected);
     }
 
