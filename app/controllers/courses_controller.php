@@ -39,7 +39,6 @@ class CoursesController extends AppController
         // Set up Columns
         $columns = array(
             array("Course.id",            "",            "",      "hidden"),
-            array("Course.homepage",      __("Web", true),         "4em",  "link",   "home.gif"),
             array("Course.course",        __("Course", true),      "15em",  "action", "Course Home"),
             array("Course.title",         __("Title", true),       "auto", "action", "Course Home"),
             array("Course.creator_id",           "",            "",     "hidden"),

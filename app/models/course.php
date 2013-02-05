@@ -113,6 +113,16 @@ class Course extends AppModel
                 'rule' => 'notEmpty',
                 'message' => 'The course name is required.'
             )
+        ),
+        'homepage' => array(
+            'http' => array(
+                'rule' => 'includeHttp'
+            ),
+            'url' => array(
+                'rule' => 'url',
+                'allowEmpty' => true,
+                'message' => 'The homepage is not a valid URL.'
+            )
         )
     );
 
@@ -134,6 +144,21 @@ class Course extends AppModel
                 'Please select a department.');
         }
     }*/
+    
+    /*
+     * include http to the beginning of the url if it is not already there
+     *
+     * @access public
+     * @return void
+     */
+    function includeHttp($check)
+    {
+        $prefix = substr($check['homepage'], 0, 4);
+        if ($prefix != 'http' && !empty($check['homepage'])) {
+            $this->data['Course']['homepage'] = 'http://'.$this->data['Course']['homepage'];
+        }
+        return true;
+    }
 
     /**
      * __construct

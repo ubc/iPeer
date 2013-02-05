@@ -7,6 +7,7 @@ if ($data['Course']['record_status'] == 'I') {
 } ?>
 <table class='standardtable'>
   <tr>
+    <th>Web</th>
     <th>Instructors</th>
     <th>Tutors</th>
     <th>Class Size</th>
@@ -14,6 +15,12 @@ if ($data['Course']['record_status'] == 'I') {
     <th>Evaluation Events</th>
   </tr>
   <tr>
+    <td>
+        <?php
+        echo (!empty($data['Course']['homepage'])) ? "<a href=".$data['Course']['homepage'].">
+            <img src='/img/icons/home.gif' border='0'></a>" : "None";
+        ?>
+    </td>
     <td>
       <?php
       echo $this->element(
