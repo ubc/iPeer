@@ -837,6 +837,10 @@ i {
 
 /* events/edit */
 
+#Events .help-text {
+    margin-left: 24em;
+}
+
 #Events #titleWarning {
     margin-left: 19em;
 }

@@ -73,8 +73,10 @@ echo $this->Form->input('result_release_date_begin',
 echo $this->Form->input('result_release_date_end',
     array('div' => array('id' => 'ResultReleaseEndDiv'), 'label' => 'Until', 'type' => 'text'));
 echo $this->Form->input('Group',
-    array('div' => array('id' => 'GroupsDiv'), 'label' => 'Group(s)'));
+    array('div' => array('id' => 'GroupsDiv'), 'label' => 'Group(s)')); ?>
+<div class='help-text'><?php __('Holding "ctrl" or "command" key to select multiple groups.') ?></div>
 
+<?php
 // No nice way of inserting new penalty entries using CakePHP, doing it
 // manually.
 echo "<div id='penaltyInputs'>";
