@@ -837,6 +837,10 @@ i {
 
 /* events/edit */
 
+#Events #titleWarning {
+    margin-left: 19em;
+}
+
 #Events fieldset, #Events .submit {
     clear: both;
 }

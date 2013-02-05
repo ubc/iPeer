@@ -5,6 +5,7 @@ $html->script("jquery-ui-timepicker-addon", array("inline"=>false));
 echo $this->Form->create('Event', array('action' => "add/$course_id"));
 echo $this->Form->input('course_id', array('default' => $course_id));
 echo $this->Form->input('title', array('label' => 'Event Title'));
+echo "<div id='titleWarning' class='red'></div>";
 echo $this->Form->input('description', array('type' => 'textarea'));
 echo $this->Form->input('event_template_type_id');
 echo $this->Form->input('SimpleEvaluation',
@@ -95,6 +96,17 @@ echo "</div>";
 
 echo $this->Form->submit();
 echo $this->Form->end();
+
+echo $ajax->observeField(
+    'EventTitle',
+    array(
+        'update'=>'titleWarning',
+        'url'=>'checkDuplicateName/'.$course_id,
+        'frequency'=>1,
+        'loading'=>"Element.show('loading');",
+        'complete'=>"Element.hide('loading');stripe();"
+    )
+);
 ?>
 </div>
 

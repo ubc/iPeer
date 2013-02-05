@@ -19,15 +19,9 @@ class Event extends AppModel
     public $_backupValidate = null;
     public $validate = array(
         'title' => array(
-            'notEmpty' => array(
-                'rule' => 'notEmpty',
-                'message' => 'Title is required.',
-                'allowEmpty' => false
-            ),
-            'isUnique' => array(
-                'rule' => 'isUnique',
-                'message' => 'Duplicate title found.'
-            )
+            'rule' => 'notEmpty',
+            'message' => 'Title is required.',
+            'allowEmpty' => false
         ),
         'course_id' => array(
             'rule' => 'notEmpty',

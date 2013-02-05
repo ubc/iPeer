@@ -10,6 +10,7 @@ echo $this->Form->input('id');
 <label class="courseLabel"><?php __('Course')?></label>
 <label class="course"><?php echo $event['Course']['full_name'] ?></label>
 <?php echo $this->Form->input('title', array('label' => 'Event Title'));
+echo "<div id='titleWarning' class='red'></div>";
 echo $this->Form->input('description', array('type' => 'textarea'));
 echo $this->Form->input('event_template_type_id');
 
@@ -128,6 +129,17 @@ echo "</div>";
 
 echo $this->Form->submit();
 echo $this->Form->end();
+
+echo $ajax->observeField(
+    'EventTitle',
+    array(
+        'update'=>'titleWarning',
+        'url'=>'checkDuplicateName/'.$event['Course']['id'].'/'.$event['Event']['id'],
+        'frequency'=>1,
+        'loading'=>"Element.show('loading');",
+        'complete'=>"Element.hide('loading');stripe();"
+    )
+);
 ?>
 </div>
 

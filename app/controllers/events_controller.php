@@ -14,7 +14,7 @@ class EventsController extends AppController
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time');
     public $uses = array('GroupEvent', 'User', 'Group', 'Course', 'Event', 'EventTemplateType', 
         'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers', 'Penalty', 'Survey');
-    public $components = array("AjaxList", "Session");
+    public $components = array("AjaxList", "Session", "RequestHandler");
 
     /**
      * __construct
@@ -479,5 +479,32 @@ class EventsController extends AppController
             $this->redirect('index/'.$event['Event']['course_id']);
             return;
         }
+    }
+    
+    /**
+     * checkDuplicateName
+     *
+     * @param mixed $courseId course id
+     * @param mixed $eventId  event id
+     *
+     * @access public
+     * @return void
+     */
+    function checkDuplicateName($courseId, $eventId=null)
+    {
+        if (!$this->RequestHandler->isAjax()) {
+            $this->cakeError('error404');
+        }
+        $this->layout = 'ajax';
+        $this->autoRender = false;
+        
+        $conditions = array('Event.title' => $this->data['Event']['title'], 'Event.course_id' => $courseId);
+        if (!is_null($eventId)) {
+            $conditions = $conditions + array('not' => array('Event.id' => $eventId));
+        }
+        
+        $sFound = $this->Event->find('all', array('conditions' => $conditions));
+ 
+        return ($sFound) ? __('Event title "', true).$this->data['Event']['title'].__('" already exists in this course.', true) : '';
     }
 }

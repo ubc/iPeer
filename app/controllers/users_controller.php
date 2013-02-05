@@ -623,9 +623,14 @@ class UsersController extends AppController
         $roleId = $this->User->getRoleId($this->Auth->user('id'));
         $user = $this->User->getByUsername($username);
         $userRole = $user['Role']['0']['RolesUser']['role_id'];
+        $enrolled = Set::extract('/Tutor/id', $user) + Set::extract('/Enrolment/id', $user);
         
         if ($userRole <= $roleId || !in_array($userRole, array(4,5))) {
             $this->Session->setFlash(__('Error: You do not have permission to enrol this user.', true));
+            $this->redirect('/courses/home/'.$courseId);
+            return;
+        } else if (in_array($courseId, $enrolled)) {
+            $this->Session->setFlash(__('Error: The student is already enrolled.', true));
             $this->redirect('/courses/home/'.$courseId);
             return;
         }

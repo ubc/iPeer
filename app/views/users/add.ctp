@@ -50,10 +50,9 @@ echo $this->Form->submit(
 ?></div><?php
 echo $this->Form->end();
 
+$url = 'checkDuplicateName/';
 if(!is_null($courseId)) {
-    $url = 'checkDuplicateName/'.$courseId;
-} else {
-    $url = 'checkDuplicateName/';
+    $url = $url.$courseId;
 }
 
 // dynamically check username availability
