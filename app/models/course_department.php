@@ -11,4 +11,28 @@
 class CourseDepartment extends AppModel
 {
     public $name = 'CourseDepartment';
+    
+    /**
+     * put course in departments
+     *
+     * @param mixed $courseId      course id
+     * @param mixed $departmentIds department id
+     *
+     * @access public
+     * @return void
+     */
+    function insertCourses($courseId, $departmentIds)
+    {
+        if (!is_array($departmentIds) || empty($departmentIds) || $courseId <= 0) {
+            return;
+        }
+        
+        foreach (array_unique($departmentIds) as $id) {
+            $temp = array();
+            $temp['CourseDepartment']['course_id'] = $courseId;
+            $temp['CourseDepartment']['department_id'] = $id;
+            $this->save($temp);
+            $this->id = null;
+        }
+    }
 }

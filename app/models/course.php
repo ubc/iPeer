@@ -91,7 +91,8 @@ class Course extends AppModel
             'dependent'    => false,
         ),
         'Department' => array(
-            'joinTable' => 'course_departments'
+            'with' => 'CourseDepartment',
+            'joinTable' => 'course_departments',
         ),
     );
 

@@ -12,7 +12,8 @@ class CoursesController extends AppController
 {
     public $name = 'Courses';
     public $uses =  array('GroupEvent', 'Course', 'Personalize', 'UserCourse',
-        'UserEnrol', 'Group', 'Event', 'User', 'UserFaculty', 'Department');
+        'UserEnrol', 'Group', 'Event', 'User', 'UserFaculty', 'Department',
+        'CourseDepartment');
     public $helpers = array('Html', 'Ajax', 'excel', 'Javascript', 'Time', 'Js' => array('Prototype'));
     public $components = array('ExportBaseNew', 'AjaxList', 'ExportCsv', 'ExportExcel');
 
@@ -237,6 +238,14 @@ class CoursesController extends AppController
                 if (!User::hasPermission('controllers/departments')) {
                     $this->Course->addInstructor($this->Course->id,
                         $this->Auth->user('id'));
+                }
+                // assign departments to the course if none were selected
+                // based on the faculties the instructor(s)' are in
+                if (empty($this->data['Department']['Department'])) {
+                    $instructors = $this->UserCourse->findAllByCourseId($this->Course->id);
+                    $faculty = $this->UserFaculty->findAllByUserId(Set::extract('/UserCourse/user_id', $instructors));
+                    $department = $this->Department->findAllByFacultyId(Set::extract('/UserFaculty/faculty_id', $faculty));
+                    $this->CourseDepartment->insertCourses($this->Course->id, Set::extract('/Department/id', $department));
                 }
                 $this->Session->setFlash('Course created!', 'good');
                 $this->redirect('index');
