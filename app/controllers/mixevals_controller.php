@@ -197,14 +197,19 @@ class MixevalsController extends AppController
             'contain' => 'Question.Description',
         ));
 
-        // check to see if $id is valid - numeric & is a mixed evaluation
-        if (!is_numeric($id) || empty($eval)) {
-            $this->Session->setFlash(__('Error: Invalid ID.', true));
+        // check to see if $id is a valid mixed evaluation
+        if (empty($eval)) {
+            $this->Session->setFlash(_('Error: Invalid Mixeval ID.'));
             $this->redirect('index');
             return;
         }
 
-        // check whether the user has access to the evaluation if the eval is not public
+        // Make sure the user has access if the eval is not public,
+        // - a user has access if they're superadmin.
+        // - if they're an instructor, they have access to evals made by 
+        // themselves and by instructors who teach the saame courses.
+        // - if they're a faculty admin, they have access to all evals made by
+        // instructors in their faculty. 
         if ($eval['Mixeval']['availability'] != 'public' && !User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
@@ -227,13 +232,12 @@ class MixevalsController extends AppController
                 return;
             }
         }
+        $questions = $this->MixevalQuestion->findAllByMixevalId($id);
+        $mixeval = $this->Mixeval->find('first',
+            array('conditions' => array('id' => $id), 'contain' => false));
 
-        $this->data = $eval;
-        $this->set('data', $eval);
-        $this->set('readonly', true);
-        $this->set('evaluate', false);
-        $this->set('action', __('View Mixed Evaluation', true));
-        $this->render('edit');
+        $this->set('mixeval', $mixeval['Mixeval']);
+        $this->set('questions', $questions);
     }
 
     /**

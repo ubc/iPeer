@@ -73,17 +73,17 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
     }
 
     function testView() {
-        $result = $this->testAction('/mixevals/view/1', array('return' => 'vars'));
-        $result = $result['data'];
+        $result = $this->testAction('/mixevals/view/1', 
+            array('return' => 'vars'));
 
-        $this->assertEqual($result['Mixeval']['id'], 1);
-        $this->assertEqual(count($result['Question']), 6);
-        $this->assertEqual(count($result['Question'][0]['Description']), 5);
-        $this->assertEqual(count($result['Question'][1]['Description']), 5);
-        $this->assertEqual(count($result['Question'][2]['Description']), 5);
-        $this->assertEqual(count($result['Question'][3]['Description']), 0);
-        $this->assertEqual(count($result['Question'][4]['Description']), 0);
-        $this->assertEqual(count($result['Question'][5]['Description']), 0);
+        $this->assertEqual($result['mixeval']['id'], 1);
+        $this->assertEqual(count($result['questions']), 6);
+        $this->assertEqual(count($result['questions'][0]['Description']), 5);
+        $this->assertEqual(count($result['questions'][1]['Description']), 5);
+        $this->assertEqual(count($result['questions'][2]['Description']), 5);
+        $this->assertEqual(count($result['questions'][3]['Description']), 0);
+        $this->assertEqual(count($result['questions'][4]['Description']), 0);
+        $this->assertEqual(count($result['questions'][5]['Description']), 0);
     }
 
     function testAdd() {

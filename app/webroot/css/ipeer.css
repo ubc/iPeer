@@ -1155,6 +1155,62 @@ i {
 
 #groupsimport .checkbox input {
     margin-top: 0.85em;
+/* MIXEVALS */
+
+/* mixevals/view */
+
+.MixevalView dt {
+    width: 13em;
+    padding-bottom: 0.5em;
+    text-align: right;
+    float: left;
+}
+
+.MixevalView dd {
+    padding-bottom: 0.5em;
+    display: block;
+    margin-left: 14em;
+}
+
+.MixevalView .help {
+    color: chocolate;
+}
+
+.MixevalView span.help {
+    font-size: 0.9em;
+}
+
+.MixevalView p.help {
+    padding-top: 0;
+}
+
+div.MixevalQuestion {
+    margin-left: 1em;
+}
+
+.MixevalQuestion table {
+    width: 100%;
+}
+
+.MixevalQuestion td {
+    text-align: center;
+    padding-bottom: 0.5em;
+}
+
+.MixevalQuestion input[type="text"], .MixevalQuestion textarea {
+    width: 80%;
+    margin: 0 auto;
+    display: block;
+}
+
+.MixevalQuestion textarea {
+    height: 8em;
+}
+
+.MixevalView .marks {
+    text-align: right;
+    padding-right: 1em;
+    padding-top: 1em;
 }
 
 /* TO BE REFACTORED LATER */
@@ -1514,7 +1570,7 @@ table.group-list-chooser td{
 
 /* public */
 
-div.help-text {
+form div.help-text {
     margin: 0.5em 0 1em 18em;
     font-size: 0.8em;
     color: gray;
