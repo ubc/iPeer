@@ -62,7 +62,6 @@ class Group extends AppModel
         ),
     );
     public $validate = array(
-        'group_num' => 'notEmpty',
         'group_name' => array('rule' => 'notEmpty', 'message' => 'Please insert group name')
         );
 
