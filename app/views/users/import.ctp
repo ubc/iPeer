@@ -31,7 +31,7 @@ echo $this->Form->input('Course',
     array('multiple' => false, 'default' => $courseId));
 echo $this->Form->input('update_class',
     array('type'=>'checkbox'));
-?><div class="help-text"><?php __('Select, if you would like to remove students not in your new list.')?></div><?php
+?><div class="help-text"><?php __('Remove old students and add new students.')?></div><?php
 echo $this->Form->submit(__('Import', true));
 echo $this->Form->end();
 ?>

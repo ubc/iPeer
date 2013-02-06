@@ -780,6 +780,10 @@ i {
     width: 25em;
 }
 
+#UserImport .checkbox input {
+    margin-top: 0.85em;
+}
+
 /* Courses */
 
 /* courses/add, courses/edit */
@@ -1128,6 +1132,10 @@ i {
     list-style-type: circle;
     list-style-position: inside;
     margin: 0.5em;
+}
+
+#groupsimport .checkbox input {
+    margin-top: 0.85em;
 }
 
 /* TO BE REFACTORED LATER */

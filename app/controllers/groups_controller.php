@@ -387,7 +387,8 @@ class GroupsController extends AppController
      * @return void
      */
     function _addGroupByImport($lines, $courseId)
-    {
+    {   
+        // MT - February 5, 2013
         // Check for parameters
         if (empty($lines) || empty($courseId)) {
             return array();
@@ -402,6 +403,7 @@ class GroupsController extends AppController
             $lines[$i] = str_getcsv(trim($lines[$i]));
         }
 
+        //debug($lines);
         // Process the array into groups
         $users = array();
         foreach ($lines as $split) {
@@ -413,6 +415,7 @@ class GroupsController extends AppController
             $entry['added'] = false;
             // If the count is not 3, there's probably a formatting error,
             //  so ignore this entry.
+            // MT - change count to minimum 2 (< 2) - expected 2 or 3
             if (count($split) < 3 ) {
                 $entry['status'] = __("Too few columns in this line (", true) . count($split). "), " .
                     __(" expected 3.", true);
@@ -422,11 +425,13 @@ class GroupsController extends AppController
             }
 
             // assign the parts into their appropriate places
+            // MT - switch the order of group_num and group_name
             $entry['username'] = trim($split[IMPORT_GROUP_USERNAME]);
             $entry['group_num'] = trim($split[IMPORT_GROUP_GROUP_NUMBER]);
             $entry['group_name'] = trim($split[IMPORT_GROUP_GROUP_NAME]);
 
             // Check the entries for empty spots
+            // MT - remove check for group_num
             if (empty($entry['username'])) {
                 $entry['status'] = __("Username column is empty.", true);
             } else if (empty($entry['group_num'])) {
@@ -441,6 +446,7 @@ class GroupsController extends AppController
             } else {
                 $entry['id'] = $userData['User']['id'];
                 $enrolled = false;
+                // MT - do Set::extract and in_array - a lot cleaner
                 foreach ($userData['Enrolment'] as $checkData) {
                     if ($checkData['id'] == $courseId) {
                         $enrolled = true;
@@ -470,6 +476,8 @@ class GroupsController extends AppController
             if ($entry['valid']) {
                 // Check to see if this group is already in the group array.
                 $newGroup = true;
+                // MT - Set::extract and in_array - cleaner
+                // check for group_name only
                 foreach ($groups as $group) {
                     if ($group['name'] == $entry['group_name'] &&
                         $group['number'] == $entry['group_num']) {
@@ -478,6 +486,8 @@ class GroupsController extends AppController
                     }
                 }
                 // If we have a new group, record it.
+                // MT - check whether $entry['group_num'] exists
+                // if not - generate a valid group_num
                 if ($newGroup) {
                     $group = array();
                     $group['number'] = $entry['group_num'];
@@ -506,6 +516,7 @@ class GroupsController extends AppController
             } else {
                 // DOESN'T WORK FOR SOME REASON...
                 // Create the group's database array for storage
+                // MT - I think it works now - comment was made 2 years ago
                 $groupData = array();
                 $groupData['Group'] = array();
                 $groupData['Group']['id'] = null;
@@ -531,6 +542,7 @@ class GroupsController extends AppController
             // For all valid users
             if ($user['valid']) {
                 // Find the group we'd like to add this person to
+                // MT - only group_name??
                 $groupId = false;
                 foreach ($groups as $group) {
                     if ($group['number'] == $user['group_num'] &&
@@ -541,6 +553,7 @@ class GroupsController extends AppController
                 if (is_numeric($groupId)) {
                     $groupAry = $this->Group->findGroupByid($groupId);
                     $alreadyAdded = false;
+                    // MT - Set::extract & in_array - cleaner
                     foreach ($groupAry['Member'] as $checkMember) {
                         if ($user['id'] == $checkMember['id']) {
                             $alreadyAdded = true;
@@ -575,6 +588,9 @@ class GroupsController extends AppController
         }
 
         // Set up the data for the view
+        // MT - can this possibly be done another way
+        // Set::extract with condition + php count
+        // while saving each record
         $results = array();
         $results['users_added'] = 0;
         $results['users_skipped'] = 0;
