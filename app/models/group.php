@@ -217,18 +217,18 @@ class Group extends AppModel
     }
 
     /**
-     * findGroupByGroupNumber Get group id by group number
+     * findGroupByGroupName Get group by group name
      *
      * @param mixed $course_id
-     * @param mixed $group_num
+     * @param mixed $group_name
      *
      * @access public
      *
      * @return array of the group
      */
-    function findGroupByGroupNumber($course_id, $group_num)
+    function findGroupByGroupName($course_id, $group_name)
     {
-        return $this->find('first', array('conditions' => array('group_num' => $group_num, 'course_id' => $course_id)));
+        return $this->find('first', array('conditions' => array('group_name' => $group_name, 'course_id' => $course_id)));
     }
 
     /**

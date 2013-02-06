@@ -1,7 +1,7 @@
 <?php
 define('IMPORT_GROUP_USERNAME', 0);
-define('IMPORT_GROUP_GROUP_NUMBER', 1);
-define('IMPORT_GROUP_GROUP_NAME', 2);
+define('IMPORT_GROUP_GROUP_NAME', 1);
+define('IMPORT_GROUP_GROUP_NUMBER', 2);
 
 /**
  * GroupsController
@@ -342,15 +342,17 @@ class GroupsController extends AppController
             $this->params['data']['Group']['course_id'] = $courseId;
             $filename = $this->params['form']['file']['name'];
             $tmpFile = $this->params['form']['file']['tmp_name'];
+            $update = ($this->params['data']['Group']['update_groups']) ? 
+                true : false;
 
             $uploadDir = "../tmp/";
-            //$uploadFile = APP.$uploadDir['parameter_value'] . $filename;
             $uploadFile = $uploadDir.$filename;
 
-            //check for blank filename
+            //check that a file is attached
             if (trim($filename) == "") {
-                $this->set('errmsg', __('File required.', true));
-                $this->set('user_data', $this->User->getEnrolledStudents($courseId));
+                $this->Session->setFlash(__('Please select a file to upload.', true));
+                $this->redirect('import/'.$courseId);
+                return;
             }
             //Return true if valid, else error msg
             $validUploads = $this->framework->validateUploadFile($tmpFile, $filename, $uploadFile);
@@ -360,10 +362,11 @@ class GroupsController extends AppController
                 // Delete the uploaded file
                 unlink($uploadFile);
                 //Mass create groups
-                $this->_addGroupByImport($lines, $courseId);
-                // We should never get to this line :-)
+                $this->_addGroupByImport($lines, $courseId, $update);
             } else {
-                $this->set('errmsg', $validUploads);
+                $this->Session->setFlash(__('Error: File was not successfully processed.', true));
+                $this->redirect('import/'.$courseId);
+                return;
             }
         }
 
@@ -382,11 +385,12 @@ class GroupsController extends AppController
      *
      * @param mixed $lines    lines
      * @param mixed $courseId course id
+     * @param mixed $update   update
      *
      * @access public
      * @return void
      */
-    function _addGroupByImport($lines, $courseId)
+    function _addGroupByImport($lines, $courseId, $update)
     {   
         // MT - February 5, 2013
         // Check for parameters
@@ -396,14 +400,13 @@ class GroupsController extends AppController
 
         // Remove duplicate lines
         $lines = array_unique($lines);
-
+        
         // pre-process the lines in the file first
-        for ($i = 0; $i < count($lines); $i++) {
+        foreach ($lines as $key=>$line) {
             // Trim this line's white space
-            $lines[$i] = str_getcsv(trim($lines[$i]));
+            $lines[$key] = str_getcsv(trim($lines[$key]));
         }
 
-        //debug($lines);
         // Process the array into groups
         $users = array();
         foreach ($lines as $split) {
@@ -413,49 +416,44 @@ class GroupsController extends AppController
             $entry['status'] = "Unchecked Entry";
             $entry['valid'] = false;
             $entry['added'] = false;
-            // If the count is not 3, there's probably a formatting error,
+            // If the count is not 2 or 3, there's probably a formatting error,
             //  so ignore this entry.
-            // MT - change count to minimum 2 (< 2) - expected 2 or 3
-            if (count($split) < 3 ) {
+            if (count($split) < 2 ) {
                 $entry['status'] = __("Too few columns in this line (", true) . count($split). "), " .
-                    __(" expected 3.", true);
+                    __(" expected minimum 2.", true);
             } else if (count($split) > 3 ) {
                 $entry['status'] = __("Too many columns in this line (", true) . count($split). "), " .
-                    __(" expected 3.", true);
+                    __(" expected maximum 3.", true);
             }
 
             // assign the parts into their appropriate places
             // MT - switch the order of group_num and group_name
             $entry['username'] = trim($split[IMPORT_GROUP_USERNAME]);
-            $entry['group_num'] = trim($split[IMPORT_GROUP_GROUP_NUMBER]);
             $entry['group_name'] = trim($split[IMPORT_GROUP_GROUP_NAME]);
+            if (count($split) > 2) {
+                $entry['group_num'] = trim($split[IMPORT_GROUP_GROUP_NUMBER]);
+            }
 
             // Check the entries for empty spots
             // MT - remove check for group_num
             if (empty($entry['username'])) {
                 $entry['status'] = __("Username column is empty.", true);
-            } else if (empty($entry['group_num'])) {
-                $entry['status'] = __("Group Number column is empty.", true);
             } else if (empty($entry['group_name'])) {
                 $entry['status'] = __("Group Name column is empty.", true);
             }
 
             $userData = $this->User->findByUsername($entry['username']);
+
             if (!is_array($userData)) {
                 $entry['status'] = __("User ", true). $entry['username'].__(" is unknown. Please add this user first.", true);
             } else {
                 $entry['id'] = $userData['User']['id'];
                 $enrolled = false;
                 // MT - do Set::extract and in_array - a lot cleaner
-                foreach ($userData['Enrolment'] as $checkData) {
-                    if ($checkData['id'] == $courseId) {
-                        $enrolled = true;
-                    }
-                }
-                foreach ($userData['Tutor'] as $checkData) {
-                    if ($checkData['id'] == $courseId) {
-                        $enrolled = true;
-                    }
+                $courses = array_merge(Set::extract('/Enrolment/id', $userData),
+                    Set::extract('/Tutor/id', $userData));
+                if (in_array($courseId, array_unique($courses))) {
+                    $enrolled = true;
                 }
                 if (!$enrolled) {
                     $entry['status'] = __("User ", true). $entry['username'].__(" is not enrolled in your selected course. ", true);
@@ -472,47 +470,48 @@ class GroupsController extends AppController
 
         // Now, generate a list of groups to create
         $groups = array();
+        $groupNames = array();
+        $groupMembers = array();
+        $groupNum = $this->Group->getFirstAvailGroupNum($courseId);
         foreach ($users as $key => $entry) {
             if ($entry['valid']) {
                 // Check to see if this group is already in the group array.
                 $newGroup = true;
-                // MT - Set::extract and in_array - cleaner
+                // MT - in_array
                 // check for group_name only
-                foreach ($groups as $group) {
-                    if ($group['name'] == $entry['group_name'] &&
-                        $group['number'] == $entry['group_num']) {
-                            $newGroup = false;
-                            break;
-                    }
-                }
+                $newGroup = (in_array($entry['group_name'], $groupNames)) ? false : true;
+                
                 // If we have a new group, record it.
                 // MT - check whether $entry['group_num'] exists
                 // if not - generate a valid group_num
                 if ($newGroup) {
                     $group = array();
-                    $group['number'] = $entry['group_num'];
+                    $group['number'] = (isset($entry['group_num'])) ? $entry['group_num'] : $groupNum;
                     $group['name'] = $entry['group_name'];
+                    $groupNames[] = $entry['group_name'];
                     $group['id'] = false;
                     $group['created'] = false;
                     $group['present'] = false;
                     $group['reason'] = __("Unchecked groups", true);
                     array_push($groups, $group);
+                    $groupNum++;
                 }
+                $groupMembers[$entry['group_name']]['User'][$key] = $entry;
             } else {
                 continue;
             }
         }
 
         // Check the groups' existance, and create them if they're missing.
-        // Here I assume that the above code will not add a group without users.
         foreach ($groups as $key => $group) {
             $groupAry = array();
-            $groupAry = $this->Group->findGroupByGroupNumber($courseId, $group['number']);
+            $groupAry = $this->Group->findGroupByGroupName($courseId, $group['name']);
             $groupId = $groupAry['Group']['id'];
             if (is_numeric($groupId)) {
                 $groups[$key]['present'] = true;
                 $groups[$key]['id'] = $groupId;
                 $groups[$key]['reason'] = __("The group already exists. Students will be added to it.", true);
+                $groupMembers[$group['name']]['Group']['id'] = $groupId;
             } else {
                 // DOESN'T WORK FOR SOME REASON...
                 // Create the group's database array for storage
@@ -531,6 +530,7 @@ class GroupsController extends AppController
                     $groups[$key]['created'] = true;
                     $groups[$key]['id'] = $this->Group->id;
                     $groups[$key]['reason'] = __("This is a new group; it was created successfully.", true);
+                    $groupMembers[$group['name']]['Group']['id'] = $this->Group->id;
                 } else {
                     $groups[$key]['reason'] = __("The group could not be created in the database!", true);
                 }
@@ -538,52 +538,38 @@ class GroupsController extends AppController
         }
 
         // Then, add the users to the created groups
-        foreach ($users as $key => $user) {
-            // For all valid users
-            if ($user['valid']) {
-                // Find the group we'd like to add this person to
-                // MT - only group_name??
-                $groupId = false;
-                foreach ($groups as $group) {
-                    if ($group['number'] == $user['group_num'] &&
-                        $group['name'] == $user['group_name']) {
-                            $groupId = $group['id'];
+        // MT - include update option
+        foreach ($groupMembers as $groupName => $group) {
+            $groupId = $group['Group']['id'];
+            $oldMembers = $this->GroupsMembers->findAllByGroupId($groupId);
+            $newMembers = Set::extract('/User/id', $group);
+            // remove old group members
+            if ($update) {
+                foreach ($oldMembers as $old) {
+                    if (!in_array($old['GroupsMembers']['user_id'], $newMembers)) {
+                        $this->GroupsMembers->delete($old['GroupsMembers']['id']);
                     }
                 }
-                if (is_numeric($groupId)) {
-                    $groupAry = $this->Group->findGroupByid($groupId);
-                    $alreadyAdded = false;
-                    // MT - Set::extract & in_array - cleaner
-                    foreach ($groupAry['Member'] as $checkMember) {
-                        if ($user['id'] == $checkMember['id']) {
-                            $alreadyAdded = true;
-                        }
-                    }
-                    if ($alreadyAdded) {
-                        // User Already in group
-                        $users[$key]['status'] = __("User ", true). $user['username']. __(" is already in group ", true);
-                        $users[$key]['status'].= "$user[group_num] - $user[group_name]";
-                    } else {
-                        $groupMemberData = array();
-                        $groupMemberData['id']= null;
-                        $groupMemberData['user_id'] = $user['id'];
-                        $groupMemberData['group_id'] = $groupId;
-                        if ($this->GroupsMembers->save($groupMemberData)) {
-                            $users[$key]['status'] = __("User added successfully to group ", true);
-                            $users[$key]['status'].= "$user[group_num] - $user[group_name]";
-                            $users[$key]['added'] = true;
-                        } else {
-                            $users[$key]['status'] = __("User ", true). $user['username'].__(" could not be added to group ", true);
-                            $users[$key]['status'].= "$user[group_num] - $user[group_name]";
-                            $users[$key]['status'].= __("- the entry could not be created in the database.", true);
-                        }
-                    }
+            }
+            
+            foreach($group['User'] as $key=>$user) {
+                if (in_array($user['id'], Set::extract('/GroupsMembers/user_id', $oldMembers))) {
+                    $users[$key]['status'] = __("User ", true).$user['username'];
+                    $users[$key]['status'] .= __("is already in group ", true).$groupName;
                 } else {
-                    // A group should have either existed, or was just created.
-                    $users[$key]['status'] = __("Can't find the group for user", true). $user['username'];
-                    $users[$key]['status'] = __("This should never occur!", true);
+                    $groupMemberData = array();
+                    $groupMemberData['id'] = null;
+                    $groupMemberData['user_id'] = $user['id'];
+                    $groupMemberData['group_id'] = $groupId;
+                    if ($this->GroupsMembers->save($groupMemberData)) {
+                        $users[$key]['status'] = __("User added successfully to group ", true).$groupName;
+                        $users[$key]['added'] = true;
+                    } else {
+                        $users[$key]['status'] = __("User ", true).$user['username'];
+                        $users[$key]['status'] .= __(" could not be added to group ", true). $groupName;
+                        $users[$key]['status'] .= __("- the entry could not be created in the database.", true);
+                    }
                 }
-
             }
         }
 
