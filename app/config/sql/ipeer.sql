@@ -1091,7 +1091,8 @@ CREATE TABLE IF NOT EXISTS `mixeval_question_types` (
 
 INSERT INTO `mixeval_question_types` (`id`, `type`) VALUES
 (1, 'Likert'),
-(2, 'Comment');
+(2, 'Paragraph'),
+(3, 'Sentence');
 
 -- --------------------------------------------------------
 
@@ -1110,7 +1111,6 @@ CREATE TABLE IF NOT EXISTS `mixeval_questions` (
   `required` tinyint(1) NOT NULL DEFAULT '1',
   `multiplier` int(11) NOT NULL DEFAULT '0',
   `scale_level` int(11) NOT NULL DEFAULT '0',
-  `response_type` char(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`mixeval_question_type_id`) REFERENCES `mixeval_question_types` 
 	(`id`) ON DELETE CASCADE

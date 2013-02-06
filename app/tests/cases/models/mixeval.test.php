@@ -123,7 +123,6 @@ class MixevalTestCase extends CakeTestCase
                     'required' => 1,
                     'multiplier' => 1,
                     'scale_level' => 0,
-                    'response_type' => null
                 ),
 
                 '1' => array(
@@ -136,7 +135,6 @@ class MixevalTestCase extends CakeTestCase
                     'required' => 1,
                     'multiplier' => 0,
                     'scale_level' => 0,
-                    'response_type' => 'L'
                 ),
 
                 '2' => array(
@@ -149,7 +147,6 @@ class MixevalTestCase extends CakeTestCase
                     'required' => 1,
                     'multiplier' => 0,
                     'scale_level' => 0,
-                    'response_type' => 'L'
                 )
             )
         );

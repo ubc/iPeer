@@ -104,7 +104,6 @@ class MixevalQuestionTestCase extends CakeTestCase
                 'question_num' => 1,
                 'title' => 'Comment Q2',
                 'instructions' => 'Comment',
-                'response_type' => 'L'
             )
         );
         return $tmp;

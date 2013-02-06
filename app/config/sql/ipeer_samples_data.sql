@@ -1337,7 +1337,8 @@ CREATE TABLE IF NOT EXISTS `mixeval_question_types` (
 
 INSERT INTO `mixeval_question_types` (`id`, `type`) VALUES
 (1, 'Likert'),
-(2, 'Comment');
+(2, 'Paragraph'),
+(3, 'Sentence');
 
 -- --------------------------------------------------------
 
@@ -1356,7 +1357,6 @@ CREATE TABLE IF NOT EXISTS `mixeval_questions` (
   `required` tinyint(1) NOT NULL DEFAULT '1',
   `multiplier` int(11) NOT NULL DEFAULT '0',
   `scale_level` int(11) NOT NULL DEFAULT '0',
-  `response_type` char(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`mixeval_question_type_id`) REFERENCES `mixeval_question_types` 
 	(`id`) ON DELETE CASCADE
@@ -1366,13 +1366,13 @@ CREATE TABLE IF NOT EXISTS `mixeval_questions` (
 -- Dumping data for table `mixeval_questions`
 --
 
-INSERT INTO `mixeval_questions` (`id`, `mixeval_id`, `question_num`, `title`, `instructions`, `mixeval_question_type_id`, `required`, `multiplier`, `scale_level`, `response_type`) VALUES
-(1, 1, 1, 'Participated in Team Meetings', "Please rate performance.", 1, 1, 1, 5, NULL),
-(2, 1, 2, 'Was Helpful and co-operative', NULL, 1, 1, 1, 5, NULL),
-(3, 1, 3, 'Submitted work on time', NULL, 1, 1, 1, 5, NULL),
-(4, 1, 4, 'Produced efficient work?', "Please give a paragraph answer.", 2, 1, 0, 5, 'S'),
-(5, 1, 5, 'Contributed?', NULL, 2, 1, 0, 5, 'L'),
-(6, 1, 6, 'Easy to work with?', NULL, 2, 0, 0, 5, 'S');
+INSERT INTO `mixeval_questions` (`id`, `mixeval_id`, `question_num`, `title`, `instructions`, `mixeval_question_type_id`, `required`, `multiplier`, `scale_level`) VALUES
+(1, 1, 1, 'Participated in Team Meetings', "Please rate performance.", 1, 1, 1, 5),
+(2, 1, 2, 'Was Helpful and co-operative', NULL, 1, 1, 1, 5),
+(3, 1, 3, 'Submitted work on time', NULL, 1, 1, 1, 5),
+(4, 1, 4, 'Produced efficient work?', NULL, 3, 1, 0, 5),
+(5, 1, 5, 'Contributed?', "Please give a paragraph answer.", 2, 1, 0, 5),
+(6, 1, 6, 'Easy to work with?', NULL, 3, 0, 0, 5);
 
 -- --------------------------------------------------------
 
