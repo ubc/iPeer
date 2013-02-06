@@ -392,7 +392,6 @@ class GroupsController extends AppController
      */
     function _addGroupByImport($lines, $courseId, $update)
     {   
-        // MT - February 5, 2013
         // Check for parameters
         if (empty($lines) || empty($courseId)) {
             return array();
@@ -402,7 +401,7 @@ class GroupsController extends AppController
         $lines = array_unique($lines);
         
         // pre-process the lines in the file first
-        foreach ($lines as $key=>$line) {
+        foreach ($lines as $key => $line) {
             // Trim this line's white space
             $lines[$key] = str_getcsv(trim($lines[$key]));
         }
@@ -412,7 +411,7 @@ class GroupsController extends AppController
         foreach ($lines as $split) {
             $entry = array();
             $entry['line'] =  join(', ', $split);
-            // To start, mark all entries as invalid and
+            // To start, mark all entries as invalid
             $entry['status'] = "Unchecked Entry";
             $entry['valid'] = false;
             $entry['added'] = false;
@@ -427,15 +426,13 @@ class GroupsController extends AppController
             }
 
             // assign the parts into their appropriate places
-            // MT - switch the order of group_num and group_name
             $entry['username'] = trim($split[IMPORT_GROUP_USERNAME]);
             $entry['group_name'] = trim($split[IMPORT_GROUP_GROUP_NAME]);
             if (count($split) > 2) {
                 $entry['group_num'] = trim($split[IMPORT_GROUP_GROUP_NUMBER]);
             }
 
-            // Check the entries for empty spots
-            // MT - remove check for group_num
+            // Check the entries for empty usernames or group_names fields
             if (empty($entry['username'])) {
                 $entry['status'] = __("Username column is empty.", true);
             } else if (empty($entry['group_name'])) {
@@ -448,14 +445,9 @@ class GroupsController extends AppController
                 $entry['status'] = __("User ", true). $entry['username'].__(" is unknown. Please add this user first.", true);
             } else {
                 $entry['id'] = $userData['User']['id'];
-                $enrolled = false;
-                // MT - do Set::extract and in_array - a lot cleaner
                 $courses = array_merge(Set::extract('/Enrolment/id', $userData),
                     Set::extract('/Tutor/id', $userData));
-                if (in_array($courseId, array_unique($courses))) {
-                    $enrolled = true;
-                }
-                if (!$enrolled) {
+                if (!in_array($courseId, array_unique($courses))) {
                     $entry['status'] = __("User ", true). $entry['username'].__(" is not enrolled in your selected course. ", true);
                     $entry['status'] .= __("Please enrol them first.", true);
                 } else {
@@ -475,16 +467,8 @@ class GroupsController extends AppController
         $groupNum = $this->Group->getFirstAvailGroupNum($courseId);
         foreach ($users as $key => $entry) {
             if ($entry['valid']) {
-                // Check to see if this group is already in the group array.
-                $newGroup = true;
-                // MT - in_array
-                // check for group_name only
-                $newGroup = (in_array($entry['group_name'], $groupNames)) ? false : true;
-                
                 // If we have a new group, record it.
-                // MT - check whether $entry['group_num'] exists
-                // if not - generate a valid group_num
-                if ($newGroup) {
+                if (!in_array($entry['group_name'], $groupNames)) {
                     $group = array();
                     $group['number'] = (isset($entry['group_num'])) ? $entry['group_num'] : $groupNum;
                     $group['name'] = $entry['group_name'];
@@ -513,10 +497,7 @@ class GroupsController extends AppController
                 $groups[$key]['reason'] = __("The group already exists. Students will be added to it.", true);
                 $groupMembers[$group['name']]['Group']['id'] = $groupId;
             } else {
-                // DOESN'T WORK FOR SOME REASON...
                 // Create the group's database array for storage
-                // MT - I think it works now - comment was made 2 years ago
-                $groupData = array();
                 $groupData['Group'] = array();
                 $groupData['Group']['id'] = null;
                 $groupData['Group']['group_num'] = $group['number'];
@@ -538,7 +519,6 @@ class GroupsController extends AppController
         }
 
         // Then, add the users to the created groups
-        // MT - include update option
         foreach ($groupMembers as $groupName => $group) {
             $groupId = $group['Group']['id'];
             $oldMembers = $this->GroupsMembers->findAllByGroupId($groupId);
@@ -552,7 +532,7 @@ class GroupsController extends AppController
                 }
             }
             
-            foreach($group['User'] as $key=>$user) {
+            foreach($group['User'] as $key => $user) {
                 if (in_array($user['id'], Set::extract('/GroupsMembers/user_id', $oldMembers))) {
                     $users[$key]['status'] = __("User ", true).$user['username'];
                     $users[$key]['status'] .= __("is already in group ", true).$groupName;
@@ -574,9 +554,6 @@ class GroupsController extends AppController
         }
 
         // Set up the data for the view
-        // MT - can this possibly be done another way
-        // Set::extract with condition + php count
-        // while saving each record
         $results = array();
         $results['users_added'] = 0;
         $results['users_skipped'] = 0;
