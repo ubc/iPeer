@@ -12,8 +12,7 @@ echo "<div id='usernameErr' class='red'></div>";
 echo $this->Form->input('first_name');
 echo $this->Form->input('last_name');
 echo $this->Form->input('email');
-echo $this->Form->input('send_email_notification',
-  array('type'=>'checkbox', 'div' => 'email'));
+echo $this->Form->input('send_email_notification', array('type'=>'checkbox'));
 echo $this->Form->input(
   'Role.RolesUser.role_id',
   array(

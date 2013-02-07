@@ -124,7 +124,12 @@ input[type="text"], input[type="file"], input[type="password"], textarea, select
 
 .radio input
 {
-    margin: 0.5em 0.5em 0.5em 1em;
+    margin: 0.7em 0.5em 0.5em 1em;
+}
+
+.checkbox input
+{
+    margin-top: 0.7em;
 }
 
 .submit input {
@@ -686,12 +691,6 @@ i {
 /* USERS */
 
 /* users/add users/edit */
-#UserForm .checkbox {
-    vertical-align: middle;
-    margin-top: 0.5em;
-    margin-left: 3em;
-}
-
 #UserForm #usernameErr {
     margin-left: 14em;
 }
@@ -732,6 +731,10 @@ i {
     float: none;
 }
 
+#UserForm .checkbox {
+    vertical-align: middle;
+}
+
 #UserForm .submit input{
     width: 12em;
     margin: 2em;
@@ -740,21 +743,6 @@ i {
 #UserForm .submit {
     clear: both;
     display: inline-block;
-}
-
-#UserForm .email.required {
-    clear: both;
-    margin-left: 14em;
-    margin-bottom: 0.5em;
-    margin-top: 0.5em;
-}
-
-#UserForm .email.required label {
-    margin-left: 0.5em;
-}
-
-#UserForm .input.select {
-    margin-bottom: 1em;
 }
 
 #UserForm .buttons {
