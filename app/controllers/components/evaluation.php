@@ -285,18 +285,18 @@ class EvaluationComponent extends Object
         }
 
         // if no submission exists, create one
-        $grpEvent = $groupEvent['GroupEvent']['id'];
-        $event = $groupEvent['GroupEvent']['event_id'];
-        $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $grpEvent;
-        $evaluationSubmission['EvaluationSubmission']['event_id'] = $event;
-        $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
-        // save evaluation submission
-        $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
-        $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
-        if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
-            return false;
+        $sub = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($grpEvent, $evaluator);
+        if (empty($sub)) {       
+            $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $grpEvent;
+            $evaluationSubmission['EvaluationSubmission']['event_id'] = $event;
+            $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
+            // save evaluation submission
+            $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
+            $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
+            if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
+                return false;
+            }
         }
-
         //checks if all members in the group have submitted
         //the number of submission equals the number of members
         //means that this group is ready to review
@@ -1685,10 +1685,8 @@ class EvaluationComponent extends Object
             $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
             $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
             $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
-        } else {
-            //if existing record, just update the time submitted
-            $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
-        }
+        } 
+        
         $surveyInput = array();
         $surveyInput['SurveyInput']['user_id'] = $userId;
         $surveyInput['SurveyInput']['event_id'] = $eventId;

@@ -668,6 +668,7 @@ class EvaluationsController extends AppController
             $groupId = $this->params['form']['group_id'];
 
             $courseId = $this->params['form']['course_id'];
+
             if (!$this->validRubricEvalComplete($this->params['form'])) {
                 $this->Session->setFlash(__('validRubricEvalCompleten failure', true));
                 $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
@@ -726,15 +727,17 @@ class EvaluationsController extends AppController
         // if no submission exists, create one
         //Get the target event submission
         $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
-        $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
-        $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
-        $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
-        $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
-        // save evaluation submission
-        $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
-        $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
-        if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
-            $status = false;
+        if (empty($evaluationSubmission)) {
+            $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
+            $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
+            $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
+            $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
+            // save evaluation submission
+            $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
+            $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
+            if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
+                $status = false;
+            }
         }
 
 
@@ -893,16 +896,17 @@ class EvaluationsController extends AppController
         // if no submission exists, create one
         //Get the target event submission
         $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
-        $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
-
-        $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
-        $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
-        $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
-        // save evaluation submission
-        $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
-        $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
-        if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
-            $status = false;
+        if (empty($evaluationSubmission)) {
+            $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
+            $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
+            $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
+            $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
+            // save evaluation submission
+            $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
+            $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
+            if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
+                $status = false;
+            }
         }
 
         //checks if all members in the group have submitted
