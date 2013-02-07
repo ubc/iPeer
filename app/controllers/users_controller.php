@@ -434,32 +434,6 @@ class UsersController extends AppController
         // get the courses that this user is allowed access to
         $coursesOptions = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
         asort($coursesOptions);
-        /*if (User::hasPermission('functions/user/superadmin')) {
-            // superadmins should have access to all courses regardless
-            $coursesOptions = $this->Course->find('list');
-        } else if (User::hasPermission('functions/user/admin')) {
-            // admins should have access only in their faculty
-            // get user's faculties
-            $uf = $this->UserFaculty->findAllByUserId($this->Auth->user('id'));
-            // based on the faculties, get the user's departments
-            $ret = $this->Department->getByUserFaculties($uf);
-            // based on the departments, get the user's allowed courses
-            foreach ($ret as $department) {
-                $courses = $this->CourseDepartment->findAllByDepartmentId(
-                    $department['Department']['id']);
-                foreach ($courses as $course) {
-                    $cid = $course['CourseDepartment']['course_id'];
-                    $coursesOptions[$cid] =
-                        $this->Course->field('full_name', array('id' => $cid));
-                }
-            }
-        } else if (User::hasPermission('functions/user/instructor')) {
-            // instructors can only access courses they teach
-            $courses = $user['Course'];
-            foreach ($courses as $course) {
-                $coursesOptions[$course['id']] = $course['full_name'];
-            }
-        }*/
         $this->set('coursesOptions', $coursesOptions);
 
         $this->set('roleOptions', $this->AccessControl->getEditableRoles());
