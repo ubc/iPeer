@@ -31,21 +31,31 @@ $totalMarks = 0;
 foreach ($questions as $q) {
     $qtype = $q['MixevalQuestionType']['type'];
     $qnum = $q['MixevalQuestion']['question_num'];
-    $qtitle = $q['MixevalQuestion']['title'];
+    // construct the instructions paragraph if needed
     $qinstruct = $q['MixevalQuestion']['instructions'];
+    $qinstruct = $qinstruct ? $html->para('help green', $qinstruct) : '';
+    // construct the required marker if needed
+    $qrequired = "";
+    if ($q['MixevalQuestion']['required']) {
+        $qrequired = $html->tag('span', '*', 
+            array('class' => 'required orangered floatright'));
+    }
+    // construct the question prompt header
+    $qtitle = $q['MixevalQuestion']['title'];
+    $qtitle = $html->tag('h3', "$qnum. $qtitle $qrequired");
+
+    // construct the question for display depending on the question type
     if ($qtype == 'Paragraph') {
         $out = $html->div('MixevalQuestion',
-            $html->tag('h3', "$qnum. $qtitle") .
-            // empty string cause para omits end p tag if given null $qinstruct
-            ($qinstruct ? $html->para('help', $qinstruct) : '') . 
+            $qtitle .
+            $qinstruct . 
             $form->textarea($qnum)
         );
     }
     else if ($qtype == 'Sentence') {
         $out = $html->div('MixevalQuestion',
-            $html->tag('h3', "$qnum. $qtitle") .
-            // empty string cause para omits end p tag if given null $qinstruct
-            ($qinstruct ? $html->para('help', $qinstruct) : '') . 
+            $qtitle .
+            $qinstruct . 
             $form->text($qnum)
         );
     }
@@ -67,8 +77,8 @@ foreach ($questions as $q) {
             $opt = "<input type='radio' name='$qnum' />";
         }
         $out = $html->div('MixevalQuestion',
-            $html->tag('h3', "$qnum. $qtitle") .
-            ($qinstruct ? $html->para('help', $qinstruct) : '') . 
+            $qtitle .
+            $qinstruct . 
             $html->tag('table',
                 $html->tableCells($descs) . 
                 $html->tableCells($options) .
@@ -79,8 +89,10 @@ foreach ($questions as $q) {
     echo $out;
 }
 
-echo $html->tag('h4', _('Total Marks') . ": $totalMarks", 
-    array('class' => 'marks'));
+// reconstruct the marker since the one used in $qtitle had class floatright
+$required = $html->tag('span', '*', array('class' => 'required orangered'));
+echo $html->para('note', $required . ' ' . _('Indicates response required.'));
+echo $html->para('marks', _('Total Marks') . ": $totalMarks");
 
 ?>
 </div>
