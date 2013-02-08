@@ -109,7 +109,7 @@ if (!empty($notInGroup)) {
                 $penalties[$user['id']] > 0 ? $penaltyAddOn = ' - '."<font color=\"red\">".$memberAvgScoreDeduction."</font> = ".$memberAvgScoreScaled :
                     $penaltyAddOn = '';
                 echo $penaltyAddOn.' ('.$memberAvgScorePercent.'%)<br>';*/
-                $penalties[$user['id']] > 0 ? $penaltyNotice = 'NOTE: <font color=\'red\'>'.$penalties[$user['id']].'% </font>Late Penalty<br>' :
+                (isset($penalties[$user['id']]) && $penalties[$user['id']] > 0) ? $penaltyNotice = 'NOTE: <font color=\'red\'>'.$penalties[$user['id']].'% </font>Late Penalty<br>' :
                     $penaltyNotice = '<br>';
                 echo $penaltyNotice;
                 ?>
@@ -174,6 +174,13 @@ if (!empty($notInGroup)) {
         <?php } else { ?>
             <input type="button" name="ReleaseComments" value="<?php __('Release Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$userId.';'.$event['GroupEvent']['id'].';1'; ?>'">
         <?php } ?>
+        
+        <!-- /Auto Release Message-->
+        <?php if ($event['Event']['auto_release']) {
+            echo "<div id='autoRelease_msg' class='green'>";
+            echo "<br>".__("Auto Release is ON, you do not need to manually release the grades and comments", true);
+            echo "</div>";
+        } ?>
     </div>
     </div>
 

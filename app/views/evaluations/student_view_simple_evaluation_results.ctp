@@ -32,7 +32,7 @@
 </tr>
 <tr>
     <td>
-        <?php if ($studentResult['gradeReleaseStatus']) {
+        <?php if ($studentResult['gradeReleaseStatus'] || $event['Event']['auto_release']) {
             $finalAvg = $studentResult['aveScore'] - $studentResult['avePenalty'];
             ($studentResult['avePenalty'] > 0) ? ($stringAddOn = ' - '.'('.'<font color=\'red\'>'.$studentResult['avePenalty'].'</font>'.
                 ')'.'<font color=\'red\'>*</font>'.' = '.number_format($finalAvg, 2)) : $stringAddOn = '';
@@ -48,7 +48,7 @@
     </td>
     <td>
         <?php
-            if ($studentResult['gradeReleaseStatus']) {
+            if ($studentResult['gradeReleaseStatus'] || $event['Event']['auto_release']) {
                 isset($studentResult['groupAve'])? $groupAve = $studentResult['groupAve']: $groupAve = 0;
                 echo number_format($groupAve, 2);
             } else {
@@ -71,6 +71,8 @@
                 echo '<tr><td>n/a</td></tr>';
             }
         }
+    } else if ($event['Event']['auto_release']) {
+        echo '<tr><td>n/a</td></tr>';
     } else { ?>
         <tr><td><?php echo __('Not Released.', true); ?> </td></tr>
     <?php } ?>

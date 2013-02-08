@@ -928,6 +928,7 @@ CREATE TABLE IF NOT EXISTS `events` (
   `template_id` int(11) NOT NULL DEFAULT '2',
   `self_eval` varchar(11) NOT NULL DEFAULT '',
   `com_req` int(11) NOT NULL DEFAULT '0',
+  `auto_release` int(11) NOT NULL DEFAULT '0',
   `due_date` datetime DEFAULT NULL,
   `release_date_begin` datetime DEFAULT NULL,
   `release_date_end` datetime DEFAULT NULL,

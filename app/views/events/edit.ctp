@@ -65,6 +65,15 @@ echo $this->Form->input(
         'default' => '0'
     )
 );
+echo $this->Form->input(
+    'auto_release',
+    array(
+        'legend' => 'Auto-Release Results',
+        'type' => 'radio',
+        'options' => array('1' => 'Enabled', '0' => 'Disabled'),
+        'default' => '0'
+    )
+);
 echo $this->Form->input('due_date', array('type' => 'text'));
 echo $this->Form->input('release_date_begin', array('label' => 'Evaluation Released From', 'type' => 'text'));
 echo $this->Form->input('release_date_end', array('label' => 'Until', 'type' => 'text'));

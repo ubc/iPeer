@@ -877,8 +877,9 @@ i {
     background-color: white;
 }
 
-#Events label {
+#Events .radio legend {
     margin-top: 0.25em;
+    margin-bottom: 0.5em;
 }
 
 
@@ -1454,6 +1455,11 @@ textarea.question-title-textarea, textarea.question-descriptor {
 }
 
 /* evaluation result tables */
+
+#autoRelease_msg {
+    font-weight: bold;
+    text-align: center;
+}
 
 .result-header-td {
     vertical-align: middle;

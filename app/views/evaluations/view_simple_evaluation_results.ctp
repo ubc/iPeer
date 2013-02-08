@@ -66,6 +66,13 @@ if (!empty($results['Dropped'])) {
 </table>
 
 <h3><?php __('Evaluation Results')?></h3>
+<?php 
+if ($event['Event']['auto_release']) {
+    echo "<div id='autoRelease_msg' class='green'>";
+    echo __("Auto Release is ON, you do not need to manually release the grades and comments", true); 
+    echo "</div><br>";
+}
+?>
 <!-- Point Distribution Table -->
 <table class='standardtable'>
 <tr>
@@ -259,10 +266,13 @@ foreach ($results['All'] as $evaluatee) {
 <!-- Comment Section -->
 
 <h2><?php __('Comment Sections')?></h2>
-<h4><?php __('Instructions'); ?></h4>
-<ul>
+<h3><?php __('Instructions'); ?></h3>
+<ul class="instructions">
 <li><?php __('Check the "Released" checkbox and click "Save Changes" to release individual comments , or')?></li>
 <li><?php __('Click "Release All" or "Unrelease All" buttons to release or unrelease all comments.')?></li>
+<?php if ($event['Event']['auto_release']) {
+    echo "<li class='green'>".__("Auto Release is ON, you do not need to manually release the grades and comments", true)."</li>";
+} ?>
 </ul>
 
 <form name="evalForm2" id="evalForm2" method="POST" action="<?php echo $html->url('markCommentRelease') ?>">

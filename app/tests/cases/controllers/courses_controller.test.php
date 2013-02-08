@@ -265,8 +265,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
             $this->fixtureIndex[2],
             $this->fixtureIndex[0],
         );
-        debug($expected);
-        debug($result['paramsForList']['data']['entries']);
+
         $this->assertTrue($result['paramsForList']['data']['entries'] == $expected);
     }
 

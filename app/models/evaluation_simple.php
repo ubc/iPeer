@@ -481,7 +481,7 @@ class EvaluationSimple extends EvaluationResponseBase
             $releasedComments = array();
             //Get Comment Release: release_status may not be the same for all evaluators
             foreach ($results as $comment) {
-                if ($comment['EvaluationSimple']['release_status']) {
+                if ($comment['EvaluationSimple']['release_status'] || $event['Event']['auto_release']) {
                     //comment is released
                     $releasedComments[] = $this->getComment($comment['EvaluationSimple']['id']);
                 }

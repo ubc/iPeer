@@ -7,8 +7,14 @@
 <tr>
     <td>
     <?php
-    $gradeReleaseStatus = isset($status['grade'])? $status['grade'] : 0;
-    if ($gradeReleaseStatus) {
+    if (isset($status)) {
+        $gradeReleased = $status['autoRelease'] || $status['grade'];
+        $commentReleased = $status['autoRelease'] || $status['comment'];
+    } else {
+        $gradeReleased = 0;
+        $commentReleased = 0;
+    }
+    if ($gradeReleased) {
         $ave = number_format(array_sum(Set::extract($evaluateeDetails, '/EvaluationRubric/score')) / count($evaluateeDetails), 2);
         $deduction = number_format($ave * $penalty / 100, 2);
         $finalAvg = number_format($ave * (100 - $penalty) / 100, 2);
@@ -34,15 +40,6 @@
 <?php echo $html->script('ricoaccordion')?>
 <?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
 
-<?php
-if (isset($status)) {
-    $gradeReleased = $status['grade'];
-    $commentReleased = $status['comment'];
-} else {
-    $gradeReleased = 0;
-    $commentReleased = 0;
-}
-?>
 <div id="accordion">
     <!-- Panel of Evaluations Results -->
     <div id="panelResults">
@@ -61,7 +58,7 @@ if (isset($status)) {
         </div>
         <div style="height: 200px;" id="panelResultsContent" class="panelContent">
             <?php
-            $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'membersList'=>$membersList, 'details'=>$evaluateeDetails, 'penalty'=> $penalty, 'status'=>$status);
+            $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'membersList'=>$membersList, 'details'=>$evaluateeDetails, 'penalty'=> $penalty, 'release'=>$status);
             echo $this->element('evaluations/student_view_rubric_details', $params);
             ?>
         </div>

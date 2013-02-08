@@ -1157,6 +1157,7 @@ class EvaluationsController extends AppController
             }
             $event = array_merge($event, $group);
             $groupEventId = $event['GroupEvent']['id'];
+            $autoRelease = $event['Event']['auto_release'];
         }
 
         // set up page variables
@@ -1190,7 +1191,8 @@ class EvaluationsController extends AppController
             $penalty = $this->Penalty->getPenaltyPercent($sub);
             $status = array(
                 'comment' => array_product(Set::extract($evaluateeDetails, '/EvaluationRubric/comment_release')),
-                'grade' => array_product(Set::extract($evaluateeDetails, '/EvaluationRubric/grade_release'))
+                'grade' => array_product(Set::extract($evaluateeDetails, '/EvaluationRubric/grade_release')),
+                'autoRelease' => $autoRelease
             );
             
             $this->set('rubric', $rubric);
@@ -1199,6 +1201,7 @@ class EvaluationsController extends AppController
             $this->set('evaluateeDetails', $evaluateeDetails);
             $this->set('status', $status);
             $this->set('penalty', $penalty);
+            $this->set('status', $status);
 
             $this->render('student_view_rubric_evaluation_results');
             break;
@@ -1272,7 +1275,6 @@ class EvaluationsController extends AppController
         $groupId =  $this->params['form']['group_id'];
         $groupEventId = $this->params['form']['group_event_id'];
         $reviewStatus = isset($this->params['form']['mark_reviewed'])? "mark_reviewed" : "mark_not_reviewed";
-        $display_format = $this->params['form']['display_format'];
 
         //Get the target event
         $this->Event->id = $eventId;
@@ -1306,7 +1308,7 @@ class EvaluationsController extends AppController
                 $this->GroupEvent->save($groupEvent);
             }
         }
-        $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.'/'.$display_format);
+        $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId);
     }
 
 

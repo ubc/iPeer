@@ -39,6 +39,12 @@
         <td><?php echo $event['Event']['com_req']==1? 'Yes' : 'No'; ?></td>
     </tr>
     <tr>
+        <th><?php __('Auto-Release Results?')?></th>
+        <td>
+            <?php echo $event['Event']['auto_release']==1? 'Enable' : 'Disable'; ?>
+        </td>
+    </tr>
+    <tr>
         <th><?php __('Due Date')?>&nbsp;</th>
         <td><?php echo Toolkit::formatDate($event['Event']['due_date']) ?></td>
     </tr>

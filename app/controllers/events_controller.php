@@ -47,6 +47,9 @@ class EventsController extends AppController
         foreach ($data as $i => $entry) {
             $releaseDate = strtotime($entry["Event"]["release_date_begin"]);
             $endDate = strtotime($entry["Event"]["release_date_end"]);
+            $resultStart = strtotime($entry['Event']['result_release_date_begin']);
+            $resultEnd = strtotime($entry['Event']['result_release_date_end']);
+            
             $timeNow = time();
 
             if (!$releaseDate) {
@@ -70,6 +73,18 @@ class EventsController extends AppController
 
             // Set the view results column
             $entry['!Custom']['results'] = __("Results", true);
+            
+            if ($entry['Event']['event_template_type_id'] == 3) {
+                $entry['!Custom']['resultReleased'] = 'N/A';
+            } else if ($timeNow < $resultStart) {
+                $entry['!Custom']['resultReleased'] = 'Not Yet';
+            } else if ($timeNow >= $resultEnd) {
+                $entry['!Custom']['resultReleased'] = 'Closed';
+            } else if ($entry['Event']['auto_release']){
+                $entry['!Custom']['resultReleased'] = 'Auto';
+            } else {
+                $entry['!Custom']['resultReleased'] = 'Manual';
+            }
 
             // Write the entry back
             $data[$i] = $entry;
@@ -108,14 +123,14 @@ class EventsController extends AppController
                 "4" => __("Mixed", true))),
             array("Event.due_date",       __("Due Date", true),    "10em", "date"),
             array("!Custom.isReleased",    __("Released ?", true), "8em", "string"),
-            array("Event.self_eval",       __("Self Eval", true),   "6em", "map",
-            array("0" => __("Disabled", true), "1" => __("Enabled", true))),
-            array("Event.com_req",        __("Comment", true),      "6em", "map",
-            array("0" => __("Optional", true), "1" => __("Required", true))),
+            array("!Custom.resultReleased",       __("Result Released", true),   "6em", "string"),
 
             // Release window
             array("Event.release_date_begin", "", "",    "hidden"),
             array("Event.release_date_end",   "", "",    "hidden"),
+            array("Event.result_release_date_begin", "", "", "hidden"),
+            array("Event.result_release_date_end", "", "", "hidden"),
+            array("Event.auto_release", "", "", "hidden"),
         );
 
         // put all the joins together

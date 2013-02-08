@@ -1,6 +1,6 @@
 <?php
-$gradeReleased = (isset($status)? $status['grade']: 1);
-$commentReleased = (isset($status)? $status['comment']: 1);
+$gradeReleased = $status['autoRelease'] || (isset($release)? $release['grade']: 1);
+$commentReleased = $status['autoRelease'] || (isset($release)? $release['comment']: 1);
 ?>
 <table class="standardtable" style="margin-top: 1em;">
     <tr>
@@ -12,7 +12,7 @@ $commentReleased = (isset($status)? $status['comment']: 1);
     <?php if (!$gradeReleased && !$commentReleased) {
         $cols = $rubric['Rubric']["criteria"]+1; ?>
         <tr><td colspan="<?php echo $cols ?>">
-            <font color="red"><?php echo ($isReview ? '':__(' Comments/Grades Not Released Yet.', true)) ?></font>
+            <font color="red"><?php echo __(' Comments/Grades Not Released Yet.', true) ?></font>
         </td></tr>
     <?php } else { 
         if (!empty($details)) {
