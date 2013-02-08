@@ -835,7 +835,7 @@ AjaxList.prototype.renderTableBody = function(tbody) {
                     div.update(contents);
                 } else if (column[TYPE_COL] == "action") {
                     // If this is an "action" type entry, we need to create a link for it
-                    if (contents.length > 161) {
+                    if (contents && contents.length > 161) {
                         contents = contents.substring(0, 159).concat(' ...');
                     }
                     var link = new Element("a").update(contents);
@@ -866,7 +866,7 @@ AjaxList.prototype.renderTableBody = function(tbody) {
                     // Normal Text create and add
                     // if the string is too long, it is very inconvenient for
                     // users to scroll through to see all the entries
-                    if (contents.length >161) {
+                    if (contents && contents.length >161) {
                         contents = contents.substring(0, 159).concat(' ...');
                     }
                     div.update(contents);
