@@ -343,18 +343,10 @@ class CoursesController extends AppController
         
         if (!empty($this->data)) {
             $data = $this->data['Course'];
-            
-            // validation - array filter returns all fields that have a selection
-            // if the number of selections is not 5 then a field must not be filled
-            $filter = array_filter($data);
-            if (count($filter) != 5) {
-                $this->Session->setFlash(__('All fields are required.', true));
-                $this->redirect('move/'.$courseId);
-                return;
-            }
+            $move = $data['action'];
+
             $destSub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(
                 $data['destSurveys'], $data['submitters']);
-
             if (!empty($destSub)) {
                 $this->Session->setFlash(__('The student has already submitted to the destination survey', true));
                 $this->redirect('move/'.$courseId);
@@ -365,18 +357,51 @@ class CoursesController extends AppController
                 $data['sourceSurveys'], $data['submitters']);
             $inputs = $this->SurveyInput->getByEventIdUserId(
                 $data['sourceSurveys'], $data['submitters']);
-
-            $sub['EvaluationSubmission']['id'] = null;
+            
+            // if choose to copy set id to null
+            if (!$move) {
+                $sub['EvaluationSubmission']['id'] = null;
+            }
             $sub['EvaluationSubmission']['event_id'] = $data['destSurveys'];
             $sInputs = array();
             foreach ($inputs as $input) {
                 $tmp = $input['SurveyInput'];
-                $tmp['id'] = null;
+                if (!$move) {
+                    $tmp['id'] = null;
+                }
                 $tmp['event_id'] = $data['destSurveys'];
                 $sInputs[] = $tmp;
             }
-            $this->EvaluationSubmission->save($sub);
-            $this->SurveyInput->saveAll($sInputs);
+            $action = ($move) ? 'moved' : 'copied';
+            $this->User->id = $data['submitters'];
+            $student = $this->User->field('full_name');
+            $this->Course->id = $data['destCourses'];
+            $to = $this->Course->field('full_name');
+            
+            if ($this->EvaluationSubmission->save($sub) && $this->SurveyInput->saveAll($sInputs)) {
+                $msg = $student.' was successfully '.$action.' to '.$to.'.';
+            } else {
+                $this->Session->setFlash(__($student.' was not successfully '.$action.' to '.$from.'.', true));
+                $this->redirect('move/'.$courseId);
+                return;
+            }
+            
+            // if student is not enrolled in destination course - enrol them
+            $enrol = $this->Course->getAccessibleCourseById($data['destCourses'], $data['submitters'], Course::FILTER_PERMISSION_ENROLLED);
+            if (!$enrol) {
+                if (!$this->User->addStudent($data['submitters'], $data['destCourses'])) {
+                    $msg .= ' '.$student.' was unsuccessfully enrolled to '.$to.'.';
+                }
+            }
+
+            if ($move) {
+                $this->Course->id = $data['sourceCourses'];
+                $from = $this->Course->field('full_name');
+                if (!$this->User->removeStudent($data['submitters'], $data['sourceCourses'])) {
+                    $msg .= ' '.$student.' was unsuccessfully unenrolled from '.$from.'.';
+                }
+            }
+            $this->Session->setFlash(__($msg, true), 'good');
         }
         // clear data when user is redirected back to this page
         $this->data = null;
@@ -425,11 +450,9 @@ class CoursesController extends AppController
             case 'submitters':
                 $event = $this->Event->findById($this->data['Course']['sourceSurveys']);
                 $destCourses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
-                $enrolCourses = $this->Course->getAccessibleCourses($this->data['Course']['submitters'], Course::FILTER_PERMISSION_ENROLLED, 'list');
-                $courses = array_intersect(array_keys($destCourses), array_keys($enrolCourses)); //courses common between user and student
                 $destEvents = $this->Event->find('all', array(
                     'conditions' => array(
-                        'Event.course_id' => $courses,
+                        'Event.course_id' => array_keys($destCourses),
                         'Event.event_template_type_id' => 3,
                         'Event.template_id' => $event['Event']['template_id']
                     )
