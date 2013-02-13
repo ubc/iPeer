@@ -343,25 +343,29 @@ class CoursesController extends AppController
         
         if (!empty($this->data)) {
             $data = $this->data['Course'];
-            // check data
-            // validation - all fields not empty
-            // check no submissions have been made in destination course's survey
-            // if yes - error
-            // move find and data processing to their respective models
-            $sub = $this->EvaluationSubmission->find('first', array(
-                'conditions' => array(
-                    'event_id' => $data['sourceSurveys'],
-                    'submitter_id' => $data['submitters']
-                ),
-                'recursive' => -1
-            ));
-            $inputs = $this->SurveyInput->find('all', array(
-                'conditions' => array(
-                    'event_id' => $data['sourceSurveys'],
-                    'user_id' => $data['submitters']
-                ),
-                'recursive' => -1
-            ));
+            
+            // validation - array filter returns all fields that have a selection
+            // if the number of selections is not 5 then a field must not be filled
+            $filter = array_filter($data);
+            if (count($filter) != 5) {
+                $this->Session->setFlash(__('All fields are required.', true));
+                $this->redirect('move/'.$courseId);
+                return;
+            }
+            $destSub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(
+                $data['destSurveys'], $data['submitters']);
+
+            if (!empty($destSub)) {
+                $this->Session->setFlash(__('The student has already submitted to the destination survey', true));
+                $this->redirect('move/'.$courseId);
+                return;
+            }
+            // making copies of the submission and survey inputs
+            $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(
+                $data['sourceSurveys'], $data['submitters']);
+            $inputs = $this->SurveyInput->getByEventIdUserId(
+                $data['sourceSurveys'], $data['submitters']);
+
             $sub['EvaluationSubmission']['id'] = null;
             $sub['EvaluationSubmission']['event_id'] = $data['destSurveys'];
             $sInputs = array();
@@ -374,16 +378,11 @@ class CoursesController extends AppController
             $this->EvaluationSubmission->save($sub);
             $this->SurveyInput->saveAll($sInputs);
         }
-        
+        // clear data when user is redirected back to this page
         $this->data = null;
         
         $sourceCourses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
-        $sourceEvents = $this->Event->find('all', array(
-            'conditions' => array(
-                'Event.course_id' => array_keys($sourceCourses),
-                'Event.event_template_type_id' => 3
-            )
-        ));
+        $sourceEvents = $this->Event->getActiveSurveyEvents(array_keys($sourceCourses));
         $courseIds = array_unique(Set::extract('/Event/course_id', $sourceEvents));
         $sourceCourses = $this->Course->find('list', array('conditions' => array('Course.id' => $courseIds)));
         asort($sourceCourses);
