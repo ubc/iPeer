@@ -1,3 +1,10 @@
+iPeer 3.0.3
+----------------------------
+This is a maintenance release. It is recommended to upgrade to this version as it fixes a one critical bug.
+* Fix incorrect question number in mixeval
+* Using student first submission timestamp as late penalty criteria
+* Fix mixeval descriptor overflow issue
+
 iPeer 3.0.2
 ----------------------------
 This is a maintenance release. It is recommended to upgrade to this version as it fixes a few critical bugs.

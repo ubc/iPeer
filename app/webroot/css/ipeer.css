@@ -1403,6 +1403,10 @@ textarea.question-title-textarea, textarea.question-descriptor {
     width: 97%;
 }
 
+.question-descriptor {
+    overflow: auto;
+}
+
 .descriptor-title {
     margin: 0.5em 0;
     width: 150px;

@@ -220,18 +220,18 @@ class EvaluationComponent extends Object
         }
 
         // if no submission exists, create one
-        $grpEvent = $groupEvent['GroupEvent']['id'];
-        $event = $groupEvent['GroupEvent']['event_id'];
-        $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $grpEvent;
-        $evaluationSubmission['EvaluationSubmission']['event_id'] = $event;
-        $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
-        // save evaluation submission
-        $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
-        $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
-        if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
-            return false;
+        $sub = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($grpEvent, $evaluator);
+        if (empty($sub)) {
+            $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $grpEvent;
+            $evaluationSubmission['EvaluationSubmission']['event_id'] = $event;
+            $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
+            // save evaluation submission
+            $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
+            $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
+            if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
+                return false;
+            }
         }
-
         //checks if all members in the group have submitted
         //the number of submission equals the number of members
         //means that this group is ready to review
@@ -415,16 +415,16 @@ class EvaluationComponent extends Object
             $ret['Submissions'][$submitter] = $tmp;
         }
         // Get user info for all users who have submitted a submission or
-        // been evaluated in a submission. Such users is not guaranteed to 
-        // still be in the group or the course when you view the results 
+        // been evaluated in a submission. Such users is not guaranteed to
+        // still be in the group or the course when you view the results
         // (e.g.: they might have dropped the course) but still needs to be
         // displayed.
         $groupIds = $this->GroupsMembers->find(
-            'list', 
+            'list',
             array(
                 'conditions' => array('group_id' => $groupId),
                 // indexed by user_id instead of id
-                'fields' => array('user_id', 'user_id') 
+                'fields' => array('user_id', 'user_id')
             )
         );
         $droppedUsers = array_diff($submitterIds, $groupIds);
@@ -432,16 +432,16 @@ class EvaluationComponent extends Object
         // all users currently in the group or have submitted/been evaluated
         $ret['All'] = $groupIds + $droppedUsers;
         // users currently in the group but who haven't made a submission
-        $ret['Incomplete'] = array_diff($ret['All'], $droppedUsers, 
+        $ret['Incomplete'] = array_diff($ret['All'], $droppedUsers,
             $submitterIds);
         // users who are currently in the group
-        $ret['GroupMembers'] = $groupIds; 
+        $ret['GroupMembers'] = $groupIds;
         // users no longer in the group but still relevant
         $ret['Dropped'] = $droppedUsers;
 
         // grab user info from user ids
         foreach ($ret['All'] as $userid) {
-            $userinfo = $this->User->find('first', 
+            $userinfo = $this->User->find('first',
                 array(
                     'conditions' => array('id' => $userid),
                     'contain' => array('Role')
@@ -454,7 +454,7 @@ class EvaluationComponent extends Object
         $ret['Penalties'] = $this->SimpleEvaluation->formatPenaltyArray(
             $ret['All'], $eventId, $groupId);
         foreach ($ret['TotalGrades'] as $userid => $grade) {
-            $ret['FinalGrades'][$userid] = $grade - 
+            $ret['FinalGrades'][$userid] = $grade -
                 ($grade * ($ret['Penalties'][$userid] / 100));
         }
 
@@ -704,7 +704,7 @@ class EvaluationComponent extends Object
             }
             $summary[$userId]['individual'][$evaluator]['general_comment'] = $result['EvaluationRubric']['comment'];
         }
-        
+
         foreach ($summary as $id => $score) {
             $summary[$id]['total'] = $score['total']['score'] / $score['evaluator_count'];
             foreach ($score['grades'] as $num => $grade) {
@@ -969,7 +969,7 @@ class EvaluationComponent extends Object
         $mixevalResultDetail = array();
         $memberScoreSummary = array();
         $evalResult = array();
-        if ($groupEventId && $groupMembers) {                        
+        if ($groupEventId && $groupMembers) {
             foreach ($groupMembers as $user) {
                 $userId = isset($user['User'])? $user['User']['id'] : $user['id'];
 
