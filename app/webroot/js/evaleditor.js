@@ -31,7 +31,7 @@ var EvalEditor = Class.create({
     this.options = Object.extend(defaults, arguments[2] || { });
 
     this.container = $(container);
-    this.max_order = 0;
+    this.max_order = 1;
     this.descriptor_indexes = new Array();
 
     // set the zero mark control
