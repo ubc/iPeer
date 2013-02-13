@@ -181,6 +181,7 @@ function toggleEventTemplate() {
         jQuery("div.radio").show();
         jQuery("#penaltyInputs").show();
         jQuery("#GroupsDiv").show();
+        jQuery("div.help-text").show();
         updatePreview();
     }
     else if (eventType == '2') {
@@ -191,6 +192,7 @@ function toggleEventTemplate() {
         jQuery("div.radio").show();
         jQuery("#penaltyInputs").show();
         jQuery("#GroupsDiv").show();
+        jQuery("div.help-text").show();
         updatePreview();
     }
     else if (eventType == '3') {
@@ -203,6 +205,7 @@ function toggleEventTemplate() {
         jQuery("#ResultReleaseBeginDiv").hide(); // no result release for survey
         jQuery("#ResultReleaseEndDiv").hide(); // no result release for survey
         jQuery("#GroupsDiv").hide(); // no groups in surveys
+        jQuery("div.help-text").hide(); // no groups in surveys
         updatePreview();
     }
     else if (eventType == '4') {
@@ -213,6 +216,7 @@ function toggleEventTemplate() {
         jQuery("div.radio").show();
         jQuery("#penaltyInputs").show();
         jQuery("#GroupsDiv").show();
+        jQuery("div.help-text").show();
         updatePreview();
     }
 }
