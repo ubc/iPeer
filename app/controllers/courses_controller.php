@@ -13,9 +13,9 @@ class CoursesController extends AppController
     public $name = 'Courses';
     public $uses =  array('GroupEvent', 'Course', 'Personalize', 'UserCourse',
         'UserEnrol', 'Group', 'Event', 'User', 'UserFaculty', 'Department',
-        'CourseDepartment');
+        'CourseDepartment', 'EvaluationSubmission', 'SurveyInput');
     public $helpers = array('Html', 'Ajax', 'excel', 'Javascript', 'Time', 'Js' => array('Prototype'));
-    public $components = array('ExportBaseNew', 'AjaxList', 'ExportCsv', 'ExportExcel');
+    public $components = array('ExportBaseNew', 'AjaxList', 'ExportCsv', 'ExportExcel', 'RequestHandler');
 
     /**
      * __construct
@@ -322,6 +322,143 @@ class CoursesController extends AppController
             $this->Session->setFlash('Cannot delete the course. Check errors below');
         }
         $this->redirect('index');
+    }
+    
+    /**
+     * move
+     *
+     * @param mixed $courseId
+     *
+     * @access public
+     * @return void
+     */
+    function move($courseId=null)
+    {
+        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission(), array('Instructor', 'Department'));
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+            $this->redirect('index');
+            return;
+        }
+        
+        if (!empty($this->data)) {
+            $data = $this->data['Course'];
+            // check data
+            // validation - all fields not empty
+            // check no submissions have been made in destination course's survey
+            // if yes - error
+            // move find and data processing to their respective models
+            $sub = $this->EvaluationSubmission->find('first', array(
+                'conditions' => array(
+                    'event_id' => $data['sourceSurveys'],
+                    'submitter_id' => $data['submitters']
+                ),
+                'recursive' => -1
+            ));
+            $inputs = $this->SurveyInput->find('all', array(
+                'conditions' => array(
+                    'event_id' => $data['sourceSurveys'],
+                    'user_id' => $data['submitters']
+                ),
+                'recursive' => -1
+            ));
+            $sub['EvaluationSubmission']['id'] = null;
+            $sub['EvaluationSubmission']['event_id'] = $data['destSurveys'];
+            $sInputs = array();
+            foreach ($inputs as $input) {
+                $tmp = $input['SurveyInput'];
+                $tmp['id'] = null;
+                $tmp['event_id'] = $data['destSurveys'];
+                $sInputs[] = $tmp;
+            }
+            $this->EvaluationSubmission->save($sub);
+            $this->SurveyInput->saveAll($sInputs);
+        }
+        
+        $this->data = null;
+        
+        $sourceCourses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+        $sourceEvents = $this->Event->find('all', array(
+            'conditions' => array(
+                'Event.course_id' => array_keys($sourceCourses),
+                'Event.event_template_type_id' => 3
+            )
+        ));
+        $courseIds = array_unique(Set::extract('/Event/course_id', $sourceEvents));
+        $sourceCourses = $this->Course->find('list', array('conditions' => array('Course.id' => $courseIds)));
+        asort($sourceCourses);
+
+        $this->set('sourceCourses', $sourceCourses);
+        $this->set('sourceSurveys', array());
+        $this->set('submitters', array());
+        $this->set('destCourses', array());
+        $this->set('destSurveys', array());
+        $this->set('courseId', $courseId);
+        $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Move Students', true)));
+    }
+    
+    function ajax_options($field) 
+    {
+        if (!$this->RequestHandler->isAjax()) {
+            $this->cakeError('error404');
+        }
+        $this->layout = 'ajax';
+        $this->autoRender = false;
+
+        switch($field) {
+            case 'sCourses':
+                $options = $this->Event->find('list', array(
+                        'conditions' => array(
+                            'Event.course_id' => $this->data['Course']['sourceCourses'],
+                            'Event.event_template_type_id' => 3
+                        )
+                ));            
+                $empty = 'survey';
+                break;
+            case 'sSurveys':
+                $sub = $this->EvaluationSubmission->findAllByEventId($this->data['Course']['sourceSurveys']);
+                $options = $this->User->find('list', array(
+                    'conditions' => array('User.id' => Set::extract('/EvaluationSubmission/submitter_id', $sub)),
+                    'fields' => array('User.full_name')
+                ));
+                $empty = 'student';
+                break;
+            case 'submitters':
+                $event = $this->Event->findById($this->data['Course']['sourceSurveys']);
+                $destCourses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+                $enrolCourses = $this->Course->getAccessibleCourses($this->data['Course']['submitters'], Course::FILTER_PERMISSION_ENROLLED, 'list');
+                $courses = array_intersect(array_keys($destCourses), array_keys($enrolCourses)); //courses common between user and student
+                $destEvents = $this->Event->find('all', array(
+                    'conditions' => array(
+                        'Event.course_id' => $courses,
+                        'Event.event_template_type_id' => 3,
+                        'Event.template_id' => $event['Event']['template_id']
+                    )
+                ));
+
+                $options = $this->Course->find('list', array(
+                    'conditions' => array('Course.id' => array_unique(Set::extract('/Event/course_id', $destEvents)),
+                )));
+                unset($options[$this->data['Course']['sourceCourses']]); //remove source course
+                $empty = 'course';
+                break;
+            case 'dCourses':
+                $event = $this->Event->findById($this->data['Course']['sourceSurveys']);
+                $options = $this->Event->find('list', array(
+                    'conditions' => array(
+                        'Event.event_template_type_id' => 3,
+                        'Event.template_id' => $event['Event']['template_id'],
+                        'Event.course_id' => $this->data['Course']['destCourses']
+                )));
+                $empty = 'survey';
+                break;
+        }
+
+        asort($options);
+        $this->set('options', $options);
+        $this->set('empty', $empty);
+        $this->render('/elements/courses/ajax_move_options', 'ajax');
+        
     }
 
     /**
