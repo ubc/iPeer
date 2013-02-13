@@ -662,6 +662,12 @@ i {
     background-color: salmon;
 }
 
+/* courses/move */
+
+#UserMove select {
+    width: 30em;
+}
+
 /* USERS */
 
 /* users/add users/edit */
