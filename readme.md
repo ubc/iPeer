@@ -1,4 +1,4 @@
-iPeer 3.0.2
+iPeer 3.0.3
 ----------------------------
 This is a maintenance release. It is recommended to upgrade to this version as it fixes a one critical bug.
 * Fix incorrect question number in mixeval
