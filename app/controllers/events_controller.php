@@ -168,6 +168,10 @@ class EventsController extends AppController
             }
             $extraFilters .= "1=0 ) ";
         }
+        
+        // Surveys cannot be exported
+        $restrictions['Event.event_template_type_id'] = array(1 => true, 2 => true,
+            4 => true, "!default" => false);
 
         // Set up actions
         $warning = __("Are you sure you want to delete this event permanently?", true);
@@ -176,7 +180,7 @@ class EventsController extends AppController
             array("View Event", "", "", "", "view", "Event.id"),
             array("Edit Event", "", "", "", "edit", "Event.id"),
             array("View Course", "", "", "courses", "view", "Course.id"),
-            array("Export Results", "", "", "evaluations", "export/event", "Event.id"),
+            array("Export Results", "", $restrictions, "evaluations", "export/event", "Event.id"),
             array("Delete Event", $warning, "", "", "delete", "Event.id"));
 
         $recursive = 0;

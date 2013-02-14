@@ -469,7 +469,9 @@ class Course extends AppModel
         $options['group'] = 'Course.id'; // prevent dups when a course is in
                                         // multiple faculties
         $options['order'] = 'Course.course'; // sort courses alphabetically
-        $options['conditions']['Department.id'] = $departmentIds;
+        if ($findType != 'first') {
+            $options['conditions']['Department.id'] = $departmentIds;
+        }
         if(isset($options['contain'])) { 
             $options['contain'] = array_merge(array('Department'), $options['contain']);
         } else {

@@ -1659,25 +1659,21 @@ class EvaluationsController extends AppController
     function viewSurveySummary($eventId)
     {
         // Check that $eventId is valid
-        $event = $this->Event->find('first', array(
-            'conditions' => array(
-                'id' => $eventId
-            ),
-            'contain' => false,
-        ));
+        $event = $this->Event->findById($eventId);
         if (null == $event) {
             $this->Session->setFlash(__('Error: Invalid event Id', true));
             $this->redirect('index');
             return;
         }
 
+        if ($event['Course']['student_count'] < 1) {
+            $this->Session->setFlash(__('Error: There are no students in the class', true));
+            $this->redirect('index');
+            return; 
+        }
+
         // Check that $surveyId is valid
-        $survey = $this->Survey->find('first', array(
-            'conditions' => array(
-                'id' => $event['Event']['template_id']
-            ),
-            'contain' => false,
-        ));
+        $survey = $this->Survey->findById($event['Event']['template_id']);
         if (null == $survey) {
             $this->Session->setFlash(__('Error: Invalid survey Id', true));
             $this->redirect('index');
