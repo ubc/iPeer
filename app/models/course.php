@@ -481,7 +481,15 @@ class Course extends AppModel
             $courses = $this->find('all', $options);
             return Set::combine($courses, '{n}.'.$this->alias.'.id', '{n}.'.$this->alias.'.'.$this->displayField);
         }
-        return $this->find($findType, $options);
+        
+        $course = $this->find($findType, $options);
+        $xDept = array_intersect(Set::extract('/Department/id', $course), $departmentIds);
+        
+        if (!empty($xDept)) {
+            return $course;
+        } else {
+            return array();
+        }
     }
 
     /**
