@@ -330,16 +330,39 @@ class Event extends AppModel
     /**
      * Get active survey events by course id
      *
-     * @param int $courseId course id
+     * @param mixed $courseId course id
+     * @param mixed $type     type
      *
      * @return array of survey events
      */
-    function getActiveSurveyEvents($courseId = null)
+    function getActiveSurveyEvents($courseId = null, $type='all')
     {
-        return $this->find('all', array(
+        return $this->find($type, array(
             'conditions' => array('course_id' => $courseId, 'event_template_type_id' => '3', 'Event.record_status !='=>'I')
         ));
     }
+    
+    /**
+     * getSurveyByCourseIdTemplateId
+     *
+     * @param mixed $courseIds  course ids
+     * @param mixed $templateId template id
+     * @param mixed $type       type
+     *
+     * @access public
+     * @return void
+     */
+    function getSurveyByCourseIdTemplateId($courseIds, $templateId, $type='list')
+    {
+        return $this->find($type, array(
+            'conditions' => array(
+                'Event.event_template_type_id' => 3,
+                'Event.template_id' => $templateId,
+                'Event.course_id' => $courseIds
+            )
+        ));
+    }
+    
 
 
     /**

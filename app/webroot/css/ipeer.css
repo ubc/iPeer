@@ -668,6 +668,12 @@ i {
     width: 30em;
 }
 
+#UserMove ul li {
+    list-style-type: circle;
+    list-style-position: inside;
+    margin: 0.5em;
+}
+
 /* USERS */
 
 /* users/add users/edit */
