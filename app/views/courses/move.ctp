@@ -3,6 +3,8 @@
 <ul>
     <li><?php __('All fields are mandatory.') ?></li>
     <li><?php __('When all fields have been filled, the Submit button will become available.') ?></li>
+    <li><?php __('Only students who have submitted their surveys will appear in the list.') ?></li>
+    <li><?php __('For moving multiple students, go to import (currently unavailable).') ?></li>
 </ul>
 <h2><?php __('Move or Copy Student') ?></h2>
 <?php
@@ -50,6 +52,7 @@ $this->Js->get('#CourseDestCourses')->event('change',
 <script type="text/javascript">
 
 jQuery().ready(function() {
+    // creating empty options for select fields below the field that was changed
     jQuery('#CourseSourceCourses').change(function() {
         jQuery('#CourseSubmitters').find('option').remove().end()
             .append('<option value="">-- Pick a student --</option>');
@@ -68,6 +71,7 @@ jQuery().ready(function() {
         jQuery('#CourseDestSurveys').find('option').remove().end()
             .append('<option value="">-- Pick a survey --</option>');
     });
+    // enables the submit button when all select fields are filled
     jQuery("select").change(function() {
         var empty = false;
         jQuery("select").each(function() {
