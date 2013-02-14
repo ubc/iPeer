@@ -485,14 +485,15 @@ class Course extends AppModel
     /**
      * getCourseList
      *
+     * @param $courseIds course id
+     *
      * @access public
      * @return void
      */
-    function getCourseList()
+    function getCourseList($courseIds)
     {
-        $this->displayField = 'course';
         return $this->find('list', array(
-            'conditions' => array()
+            'conditions' => array('Course.id' => $courseIds)
         ));
     }
 

@@ -420,7 +420,15 @@ class CoursesController extends AppController
         $this->set('courseId', $courseId);
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Move Students', true)));
     }
-    
+
+    /**
+     * ajax_options
+     *
+     * @param $field field
+     *
+     * @access public
+     * @return void
+     */   
     function ajax_options($field) 
     {
         if (!$this->RequestHandler->isAjax()) {
@@ -431,47 +439,27 @@ class CoursesController extends AppController
 
         switch($field) {
             case 'sCourses':
-                $options = $this->Event->find('list', array(
-                        'conditions' => array(
-                            'Event.course_id' => $this->data['Course']['sourceCourses'],
-                            'Event.event_template_type_id' => 3
-                        )
-                ));            
+                $options = $this->Event->getActiveSurveyEvents($this->data['Course']['sourceCourses'], 'list');
                 $empty = 'survey';
                 break;
             case 'sSurveys':
                 $sub = $this->EvaluationSubmission->findAllByEventId($this->data['Course']['sourceSurveys']);
-                $options = $this->User->find('list', array(
-                    'conditions' => array('User.id' => Set::extract('/EvaluationSubmission/submitter_id', $sub)),
-                    'fields' => array('User.full_name')
-                ));
+                $options = $this->User->getFullNames(Set::extract('/EvaluationSubmission/submitter_id', $sub));
                 $empty = 'student';
                 break;
             case 'submitters':
                 $event = $this->Event->findById($this->data['Course']['sourceSurveys']);
                 $destCourses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
-                $destEvents = $this->Event->find('all', array(
-                    'conditions' => array(
-                        'Event.course_id' => array_keys($destCourses),
-                        'Event.event_template_type_id' => 3,
-                        'Event.template_id' => $event['Event']['template_id']
-                    )
-                ));
-
-                $options = $this->Course->find('list', array(
-                    'conditions' => array('Course.id' => array_unique(Set::extract('/Event/course_id', $destEvents)),
-                )));
+                $destEvents = $this->Event->getSurveyByCourseIdTemplateId(array_keys($destCourses),
+                    $event['Event']['template_id'], 'all');
+                $options = $this->Course->getCourseList(array_unique(Set::extract('/Event/course_id', $destEvents)));
                 unset($options[$this->data['Course']['sourceCourses']]); //remove source course
                 $empty = 'course';
                 break;
             case 'dCourses':
                 $event = $this->Event->findById($this->data['Course']['sourceSurveys']);
-                $options = $this->Event->find('list', array(
-                    'conditions' => array(
-                        'Event.event_template_type_id' => 3,
-                        'Event.template_id' => $event['Event']['template_id'],
-                        'Event.course_id' => $this->data['Course']['destCourses']
-                )));
+                $options = $this->Event->getSurveyByCourseIdTemplateId(
+                    $this->data['Course']['destCourses'], $event['Event']['template_id']);
                 $empty = 'survey';
                 break;
         }

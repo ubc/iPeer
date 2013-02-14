@@ -114,6 +114,7 @@ class EventTestCase extends CakeTestCase
 
     function testGetActiveSurveyEvents()
     {
+        //TODO - test for second parameter
         $empty = null;
         $this->Event = & ClassRegistry::init('Event');
 
