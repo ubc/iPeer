@@ -142,6 +142,11 @@ input[type="text"], input[type="file"], input[type="password"], textarea, select
     width: 8em;
 }
 
+/* Make buttons a bit easier to press */
+button {
+    padding: 0.3em 0.5em;
+}
+
 a:link, a:visited {
     text-decoration: none;
 }
@@ -152,6 +157,15 @@ a:hover {
 
 .center {
     margin: 0 auto;
+}
+
+/* Make semi-centered button clusters, mainly for Save and Cancel buttons */
+.center {
+    width: 12em; /* width chosen to be near the middle of most forms */
+}
+
+.center button {
+    margin-right: 0.5em;
 }
 
 strong {
@@ -1099,15 +1113,6 @@ i {
     padding-right: 1em;
 }
 
-.surveyquestions .center {
-    width: 12em;
-}
-
-.surveyquestions .center button {
-    padding: 0.3em 0.5em;
-    margin-right: 0.5em;
-}
-
 .surveyquestions .top-button {
     background:url('/img/icons/top.gif') center left no-repeat;
     padding: 0 0.5em 0 1.5em;
@@ -1221,6 +1226,48 @@ div.MixevalQuestion {
 
 .MixevalQuestion textarea {
     height: 8em;
+}
+
+/* mixevals/add */
+
+.MixevalAdd #questions div a.removeQ, .MixevalAdd #questions div a.upQ,
+.MixevalAdd #questions div a.downQ {
+    padding: 0.5em;
+    margin: 0;
+}
+
+.MixevalAdd #questions div a.downQ {
+    margin-right: 1em;
+}
+
+.MixevalAdd #questions div a.removeQ:hover {
+    color: white;
+    text-decoration: none;
+}
+
+.MixevalAdd #questions div a.removeQ:hover, .MixevalAdd #questions div.remove {
+    background-color: crimson;
+}
+
+.MixevalAdd #questions div a.upQ:hover {
+    background-color: orangered;
+    color: white;
+    text-decoration: none;
+}
+
+.MixevalAdd #questions div a.downQ:hover {
+    background-color: dodgerblue;
+    color: white;
+    text-decoration: none;
+}
+
+div.MixevalMakeQuestion {
+    padding: 0.5em 0;
+}
+
+.MixevalAdd input[type='text'], .MixevalMakeQuestion
+input[type='text'], .MixevalMakeQuestion textarea {
+    width: 30em;
 }
 
 /* TO BE REFACTORED LATER */

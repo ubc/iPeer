@@ -10,7 +10,9 @@
  */
 class MixevalsController extends AppController
 {
-    public $uses =  array('Event', 'Mixeval','MixevalQuestion', 'MixevalQuestionDesc', 'Personalize', 'UserCourse');
+    public $uses =  array('Event', 'Mixeval','MixevalQuestion', 
+        'MixevalQuestionDesc', 'Personalize', 'UserCourse', 
+        'MixevalQuestionType');
     public $name = 'Mixevals';
     public $helpers = array('Html','Ajax','Javascript','Time');
     public $components = array('AjaxList','Auth','Output', 'userPersonalize', 'framework');
@@ -248,12 +250,24 @@ class MixevalsController extends AppController
      */
     function add()
     {
+        $mixeval_question_types = $this->MixevalQuestionType->find('list');
+        $this->set('mixevalQuestionTypes', $mixeval_question_types);
         if (empty($this->data)) {
+            // old
             $this->data['Mixeval']= array();
             $this->data['Question'] = array();
             $this->set('data', $this->data);
-
         } else {
+            // reorder the questions so that they match the numbering that
+            // the user wanted
+            $orderedQs = array();
+            if (isset($this->data['MixevalQuestion'])) {
+                foreach ($this->data['MixevalQuestion'] as $q) {
+                   $orderedQs[$q['question_num']] = $q; 
+                }
+                $this->data['MixevalQuestion'] = $orderedQs;
+            }
+            // old
             $data = $this->data;
 
             if ($this->Mixeval->save($data)) {
@@ -275,7 +289,7 @@ class MixevalsController extends AppController
         }
         $this->set('data', $this->data);
         $this->set('action', __('Add Mixed Evaluation', true));
-        $this->render('edit');
+        //$this->render('edit');
     }
 
     /**
