@@ -12,13 +12,10 @@ App::import('Model', 'MixevalQuestionDesc');
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class Mixeval extends EvaluationBase
+class Mixeval extends AppModel
 {
     const TEMPLATE_TYPE_ID = 4;
     public $name = 'Mixeval';
-    // use default table
-    public $useTable = null;
-    public $actsAs = array('Containable', 'Traceable');
 
     public $hasMany = array(
         'Event' => array(
@@ -30,11 +27,11 @@ class Mixeval extends EvaluationBase
             'exclusive'   => false,
             'finderSql'   => ''
         ),
-        'Question' =>
+        'MixevalQuestion' =>
         array('className' => 'MixevalQuestion',
             'foreignKey' => 'mixeval_id',
             'dependent' => true,
-            'exclusive' => true,
+            //'exclusive' => true,
             'order'     => array('question_num' => 'ASC', 'id' => 'ASC'),
         ),
     );
@@ -43,11 +40,11 @@ class Mixeval extends EvaluationBase
         'name' => array(
             'unique' => array(
                 'rule' => 'isUnique',
-                'message' => 'Duplicate name found. Please change the name.'
+                'message' => 'Another evaluation already exists with this name.'
             ),
             'required' => array(
                 'rule' => 'notEmpty',
-                'message' => 'Please give the evaluation template a name.'
+                'message' => 'Please enter an evaluation name.'
             ),
         ),
         'availability' => array(

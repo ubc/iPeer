@@ -15,7 +15,7 @@ class EvaltoolsController extends AppController
      *
      * @public $uses
      */
-    public $uses =  array('SimpleEvaluation', 'Rubric', 'Mixeval', 'Survey', 'EmailTemplate');
+    public $uses =  array('SimpleEvaluation', 'Rubric', 'Mixeval', 'Survey', 'EmailTemplate', 'Event');
     public $page;
     public $Sanitize;
     public $functionCode = 'EVAL_TOOL';
@@ -50,6 +50,13 @@ class EvaltoolsController extends AppController
         $this->set('rubricData', $rubricData);
 
         $mixevalData = $this->Mixeval->findAllByCreatorId($this->Auth->user('id'));
+        foreach ($mixevalData as &$mixeval) {
+            $mixeval['Mixeval']['event_count'] = $this->Event->find('count',
+                array('conditions' => 
+                    array('event_template_type_id' => $mixeval['Mixeval']['id'])
+                )
+            );
+        }
         $this->set('mixevalData', $mixevalData);
 
         $surveyData = $this->Survey->findAllByCreatorId($this->Auth->user('id'));

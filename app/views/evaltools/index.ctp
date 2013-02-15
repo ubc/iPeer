@@ -52,8 +52,6 @@ $mixevalheaders = array(
     __('Name', true),
     __('In Use', true),
     __('Public', true),
-    __('Lickert Scale Questions', true),
-    __('Prefill Questions', true),
     __('Total Marks', true)
 );
 $mixevalcells = array();
@@ -67,8 +65,6 @@ foreach ($mixevalData as $data) {
     $row[] = $mixeval['availability'] == "public" ?
         $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
         $html->image('icons/red_x.gif', array('alt'=>'red_x'));
-    $row[] = $mixeval['lickert_question_max'];
-    $row[] = $mixeval['prefill_question_max'];
     $row[] = $mixeval['total_marks'];
     $mixevalcells[] = $row;
 }
