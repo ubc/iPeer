@@ -1262,10 +1262,6 @@ CREATE TABLE IF NOT EXISTS `mixevals` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(80) NOT NULL DEFAULT '',
   `zero_mark` tinyint(1) NOT NULL DEFAULT '0',
-  `total_question` int(11) NOT NULL DEFAULT '0',
-  `lickert_question_max` int(11) NOT NULL DEFAULT '0',
-  `scale_max` int(11) NOT NULL DEFAULT '0',
-  `prefill_question_max` int(11) DEFAULT NULL,
   `availability` varchar(10) NOT NULL DEFAULT 'public',
   `creator_id` int(11) NOT NULL DEFAULT '0',
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -1278,8 +1274,8 @@ CREATE TABLE IF NOT EXISTS `mixevals` (
 -- Dumping data for table `mixevals`
 --
 
-INSERT INTO `mixevals` (`id`, `name`, `zero_mark`, `total_question`, `lickert_question_max`, `scale_max`, `prefill_question_max`, `availability`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
-(1, 'Default Mix Evalution', 0, 7, 3, 5, 3, 'public', 1, '2006-09-12 13:34:30', 1, '2006-09-12 13:47:57');
+INSERT INTO `mixevals` (`id`, `name`, `zero_mark`, `availability`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
+(1, 'Default Mix Evaluation', 0, 'public', 1, '2006-09-12 13:34:30', 1, '2006-09-12 13:47:57');
 
 -- --------------------------------------------------------
 

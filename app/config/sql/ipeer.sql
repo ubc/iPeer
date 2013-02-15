@@ -1016,10 +1016,6 @@ CREATE TABLE IF NOT EXISTS `mixevals` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(80) NOT NULL DEFAULT '',
   `zero_mark` tinyint(1) NOT NULL DEFAULT '0',
-  `total_question` int(11) NOT NULL DEFAULT '0',
-  `lickert_question_max` int(11) NOT NULL DEFAULT '0',
-  `scale_max` int(11) NOT NULL DEFAULT '0',
-  `prefill_question_max` int(11) DEFAULT NULL,
   `availability` varchar(10) NOT NULL DEFAULT 'public',
   `creator_id` int(11) NOT NULL DEFAULT '0',
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -1027,13 +1023,6 @@ CREATE TABLE IF NOT EXISTS `mixevals` (
   `modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
-
---
--- Dumping data for table `mixevals`
---
-
-INSERT INTO `mixevals` (`id`, `name`, `zero_mark`, `total_question`, `lickert_question_max`, `scale_max`, `prefill_question_max`, `availability`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
-(1, 'Default Mix Evalution', 0, 7, 3, 5, 3, 'public', 1, '2006-09-12 13:34:30', 1, '2006-09-12 13:47:57');
 
 -- --------------------------------------------------------
 
@@ -1050,27 +1039,6 @@ CREATE TABLE IF NOT EXISTS `mixeval_question_descs` (
   PRIMARY KEY (`id`),
   KEY `question_num` (`question_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
-
---
--- Dumping data for table `mixeval_question_descs`
---
-
-INSERT INTO `mixeval_question_descs` (`id`, `question_id`, `scale_level`, `descriptor`) VALUES
-(1, 1, 1, 'Lowest'),
-(2, 1, 2, NULL),
-(3, 1, 3, 'Middle'),
-(4, 1, 4, NULL),
-(5, 1, 5, 'Highest'),
-(6, 2, 1, 'Lowest'),
-(7, 2, 2, NULL),
-(8, 2, 3, 'Middle'),
-(9, 2, 4, NULL),
-(10, 2, 5, 'Highest'),
-(11, 3, 1, 'Lowest'),
-(12, 3, 2, NULL),
-(13, 3, 3, 'Middle'),
-(14, 3, 4, NULL),
-(15, 3, 5, 'Highest');
 
 -- --------------------------------------------------------
 
