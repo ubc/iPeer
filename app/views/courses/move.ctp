@@ -4,11 +4,10 @@
     <li><?php __('All fields are mandatory.') ?></li>
     <li><?php __('When all fields have been filled, the Submit button will become available.') ?></li>
     <li><?php __('Only students who have submitted their surveys will appear in the list.') ?></li>
-    <li><?php __('For moving multiple students, go to import (currently unavailable).') ?></li>
 </ul>
 <h2><?php __('Move or Copy Student') ?></h2>
 <?php
-echo $this->Form->create('Course', array('action' => 'move/'.$courseId));
+echo $this->Form->create('Course');
 echo $this->Form->input('sourceCourses', array('label' => 'Source Course', 'empty' => '-- Pick a course --'));
 echo $this->Form->input('sourceSurveys', array('label' => 'Source Survey', 'empty' => '-- Pick a survey --'));
 echo $this->Form->input('submitters', array('label' => 'Student', 'empty' => '-- Pick a student --'));

@@ -662,16 +662,25 @@ i {
     background-color: salmon;
 }
 
-/* courses/move */
+/* courses/move courses/import */
 
-#UserMove select {
+#UserMove select, #CourseImport select {
     width: 30em;
 }
 
-#UserMove ul li {
+#UserMove ul li, #CourseImport ul li{
     list-style-type: circle;
     list-style-position: inside;
     margin: 0.5em;
+}
+
+#CourseImport #example {
+    background-color: white;
+    border:1px solid black;
+    padding: 0.5em;
+    margin-left: 1em;
+    display: inline-block;
+    line-height: 150%;
 }
 
 /* USERS */

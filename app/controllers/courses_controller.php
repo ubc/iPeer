@@ -327,20 +327,11 @@ class CoursesController extends AppController
     /**
      * move
      *
-     * @param mixed $courseId
-     *
      * @access public
      * @return void
      */
-    function move($courseId=null)
-    {
-        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission(), array('Instructor', 'Department'));
-        if (!$course) {
-            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
-            $this->redirect('index');
-            return;
-        }
-        
+    function move()
+    {       
         if (!empty($this->data)) {
             $data = $this->data['Course'];
             $move = $data['action'];
@@ -349,7 +340,7 @@ class CoursesController extends AppController
                 $data['destSurveys'], $data['submitters']);
             if (!empty($destSub)) {
                 $this->Session->setFlash(__('The student has already submitted to the destination survey', true));
-                $this->redirect('move/'.$courseId);
+                $this->redirect('move');
                 return;
             }
             // making copies of the submission and survey inputs
@@ -382,7 +373,7 @@ class CoursesController extends AppController
                 $msg = $student.' was successfully '.$action.' to '.$to.'.';
             } else {
                 $this->Session->setFlash(__($student.' was not successfully '.$action.' to '.$from.'.', true));
-                $this->redirect('move/'.$courseId);
+                $this->redirect('move');
                 return;
             }
             
@@ -409,7 +400,7 @@ class CoursesController extends AppController
         $sourceCourses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
         $sourceEvents = $this->Event->getActiveSurveyEvents(array_keys($sourceCourses));
         $courseIds = array_unique(Set::extract('/Event/course_id', $sourceEvents));
-        $sourceCourses = $this->Course->find('list', array('conditions' => array('Course.id' => $courseIds)));
+        $sourceCourses = $this->Course->getCourseList($courseIds);
         asort($sourceCourses);
 
         $this->set('sourceCourses', $sourceCourses);
@@ -417,14 +408,13 @@ class CoursesController extends AppController
         $this->set('submitters', array());
         $this->set('destCourses', array());
         $this->set('destSurveys', array());
-        $this->set('courseId', $courseId);
-        $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Move Students', true)));
+        $this->set('title_for_layout', 'Move Students');
     }
 
     /**
      * ajax_options
      *
-     * @param $field field
+     * @param mixed $field field
      *
      * @access public
      * @return void
@@ -462,6 +452,17 @@ class CoursesController extends AppController
                     $this->data['Course']['destCourses'], $event['Event']['template_id']);
                 $empty = 'survey';
                 break;
+            case 'importDestCourses':
+                $options = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+                unset($options[$this->data['Course']['sourceCourses']]); // remove source course
+                $empty = 'course';
+                break;
+            case 'importDestSurveys':
+                $event = $this->Event->findById($this->data['Course']['sourceSurveys']);
+                $options = $this->Event->getSurveyByCourseIdTemplateId(
+                    $this->data['Course']['destCourses'], $event['Event']['template_id']);
+                $empty = 'survey';
+                break;
         }
 
         asort($options);
@@ -470,6 +471,28 @@ class CoursesController extends AppController
         $this->render('/elements/courses/ajax_move_options', 'ajax');
         
     }
+    
+    /**
+     * import
+     *
+     * @access public
+     * @return void
+     */
+    function import()
+    {
+        $destCourses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+        $sourceEvents = $this->Event->getActiveSurveyEvents(array_keys($destCourses));
+        $courseIds = array_unique(Set::extract('/Event/course_id', $sourceEvents));
+        $sourceCourses = $this->Course->getCourseList($courseIds);
+        asort($sourceCourses);
+        $courseChoice = array('Create New Course', 'Select Created Course');
+        $this->set('sourceCourses', $sourceCourses);
+        $this->set('sourceSurveys', array());
+        $this->set('destCourses', $destCourses);
+        $this->set('destSurveys', array());
+        $this->set('title_for_layout', 'Move Group of Students');
+    }
+     
 
     /**
      * addInstructor
