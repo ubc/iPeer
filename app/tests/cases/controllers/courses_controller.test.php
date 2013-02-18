@@ -568,6 +568,11 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], 'The course was deleted successfully.');
     }
+    
+    /*function testMove()
+    {
+        //TODO
+    }*/
 
     function testDeleteNonExistingCourse()
     {
@@ -614,11 +619,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->assertFalse(array_key_exists('Auth', $_SESSION));
         $this->assertFalse(array_key_exists('ipeerSession', $_SESSION));
     }
-    
-    function testMove()
-    {
-        //TODO
-    }
+
 /*    function testAddInstructor() {
         $this->Course = ClassRegistry::init('Course');
         $data = array('instructor_id'=> 2, 'course_id' => 1);
