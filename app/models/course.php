@@ -15,8 +15,7 @@ class Course extends AppModel
     const FILTER_PERMISSION_OWNER = 2;
     const FILTER_PERMISSION_ENROLLED = 3;
     
-    const IMPORT_IDENTIFIER_STUDENTNO = 0;
-    const IMPORT_IDENTIFIER_USERNAME = 1;
+    const IDENTIFIER = 0;
 
     public $name = 'Course';
     public $displayField = 'full_name';
