@@ -604,12 +604,10 @@ class CoursesController extends AppController
             }
             $this->set('errors', $error);
             $this->set('success', $success);
+            $this->set('courseId', $data['destCourses']);
             $this->set('identifier', __(ucwords($fieldText), true));
             $this->FileUpload->removeFile($uploadFile);
             $this->render('import_summary');
-            //$this->Session->setFlash(__('Done', true), 'good');
-            //$this->redirect('index');
-            //return;
         }
         
         $destCourses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');

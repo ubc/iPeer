@@ -45,7 +45,9 @@ switch($submenu) {
     array_push(
         $items,
         array('name' => 'List Evaluation Events', 'link' => "/events/index/$course_id"),
-        array('name' => 'Export Evaluation Results', 'link' => "/evaluations/export/course/$course_id")
+        array('name' => 'Export Evaluation Results', 'link' => "/evaluations/export/course/$course_id"),
+        array('name' => 'Move Students', 'link' => '/courses/move'),
+        array('name' => 'Move Group of Students', 'link' => '/courses/import')
     );
     break;
   case "TeamMaker":

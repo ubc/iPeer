@@ -5,3 +5,9 @@
 
 <h3><?php echo __('User(s) successfully transferred:', true)?></h3>
 <?php echo $this->element('courses/import_summary_list', array('data'=>$success, 'identifier' => $identifier, 'note' => __('Note', true))); ?>
+
+<p>
+<?php 
+echo $html->link(__('Back to Course', true), "/courses/home/$courseId");
+?>
+</p>
