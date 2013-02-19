@@ -15,7 +15,7 @@ class MixevalQuestion extends AppModel
     public $belongsTo = array('MixevalQuestionType');
 
     public $hasMany = array(
-        'Description' =>
+        'MixevalQuestionDesc' =>
         array('className'   => 'MixevalQuestionDesc',
             'order'       => '',
             'foreignKey'  => 'question_id',

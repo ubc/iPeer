@@ -8,17 +8,20 @@
 /* Each question type can have unique options for the user to configure, this 
  * section creates the html template needed for each question type. 
  */
-
-// -- Sentence Answer Question --
-function makeQ($qType, $html, $form, $i, $qTypes)
+function makeQ($view, $qType, $i, $qTypes)
 {
-    $qFields = "";
+    $html = $view->Html;
+    $form = $view->Form;
+
+    // TODO PERSISTENCE FOR mixeval question desc
     $qTypeId = 0;
     $qHeader = "";
+    $qFields = "";
     switch ($qType) {
     case 'Likert':
         $qHeader = _('Likert Answer Question');
         $qTypeId = array_search($qType, $qTypes);
+        $qFields = likertFields($view, $i);
         break;
     case 'Paragraph':
         $qHeader = _('Paragraph Answer Question');
@@ -32,21 +35,21 @@ function makeQ($qType, $html, $form, $i, $qTypes)
        return ""; // unrecognized question type
     }
 
-    $removeLink = $html->link('X', '#', 
+    $removeLink = $html->link('x', '#', 
         array(
             'class' => 'removeQ', 
             'onclick' => "removeQ($i); return false;",
             'escape' => false
         )
     );
-    $upLink = $html->link('ᐱ', '#', 
+    $upLink = $html->link('▲', '#', 
         array(
             'class' => 'upQ', 
             'onclick' => "upQ($i); return false;",
             'escape' => false
         )
     );
-    $downLink = $html->link('ᐯ', '#', 
+    $downLink = $html->link('▼', '#', 
         array(
             'class' => 'downQ', 
             'onclick' => "downQ($i); return false;",
@@ -56,8 +59,7 @@ function makeQ($qType, $html, $form, $i, $qTypes)
     $controls = "$removeLink $upLink $downLink";
     // give an ID to the question number for easy renumbering later on
     $qNum = $html->tag('span', "$i. ", array('id' => "questionNum$i"));
-    $ret = $html->div(
-        'MixevalMakeQuestion',
+    $ret = $html->div('MixevalMakeQuestion',
         $html->tag('h3', "$controls $qNum $qHeader") .
         $form->input("MixevalQuestion.$i.title", 
             array("type" => "text", "label" => "Question")) .
@@ -65,10 +67,61 @@ function makeQ($qType, $html, $form, $i, $qTypes)
         $form->input("MixevalQuestion.$i.required") .
         $form->hidden("MixevalQuestion.$i.mixeval_question_type_id",
             array('value' => $qTypeId)) .
-        $form->hidden("MixevalQuestion.$i.question_num", array('value' => $i)),
-            array('id' => "question$i")
+        $form->hidden("MixevalQuestion.$i.question_num", array('value' => $i)) .
+        $qFields
+        ,
+        array('id' => "question$i")
     );
 
+    return $ret;
+}
+
+// Helper for creating a template for likert questions
+function likertFields($view, $i) {
+    $html = $view->Html;
+    $form = $view->Form;
+
+    $descs = '';
+    if (isset($view->data['MixevalQuestionDesc'])) {
+        foreach ($view->data['MixevalQuestionDesc'] as $key => $d) {
+            if ($d['question_id'] == $i) {
+                // note that $key is indexed from 0 while we want the more
+                // user friendly indexed from 1, hence the +1
+                $descs .= makeDesc($view, $i, $key);
+            }
+        }
+    }
+
+    $ret = $form->input("MixevalQuestion.$i.multiplier", 
+        array('label' => 'Marks'));
+    $ret .= $html->div("help-text", 
+        _('This mark will be scaled according to the response. E.g.: If there are 5 scale levels and this is set at 1, the lowest scale will be worth 0.2 marks, the second lowest 0.4 marks, and so on with the highest scale being worth the full 1 mark.'));
+    $ret .= $html->div('',
+        $form->label(null, 'Scale', array('class' => 'defLabel')) .
+        $form->button("Add", array('type' => 'button', 
+            'onclick' => "addDesc($i);")) .
+        $html->div('DescsDiv', $descs, array('id' => "DescsDiv$i"))
+    );
+    return $ret;
+}
+
+// Create a template for question descriptors
+function makeDesc($view, $qNum, $descNum) {
+    $html = $view->Html;
+    $form = $view->Form;
+
+    $ret = $html->div('MixevalQuestionDesc',
+        $form->text("MixevalQuestionDesc.$descNum.descriptor") .
+        $form->hidden("MixevalQuestionDesc.$descNum.question_id", 
+            array('value' => $qNum, 'class' => "MixevalQuestionDesc$qNum")) .
+        $html->link('x', '#', 
+            array(
+                'class' => 'removeQ', 
+                'onclick' => "removeDesc($qNum, $descNum); return false;"
+            )
+        ),
+        array('id' => "question{$qNum}desc$descNum")
+    );
     return $ret;
 }
 
@@ -84,7 +137,7 @@ if (isset($this->data) && isset($this->data['MixevalQuestion'])) {
     $prevQs = $this->data['MixevalQuestion'];
     foreach ($prevQs as $q) {
         $qType = $qTypes[$q['mixeval_question_type_id']];
-        $reloadedQ .= makeQ($qType, $html, $form, $numQ, $qTypes);
+        $reloadedQ .= makeQ($this, $qType, $numQ, $qTypes);
         $numQArray .= "$numQ,";
         $numQ++;
     }
@@ -93,17 +146,31 @@ if (isset($this->data) && isset($this->data['MixevalQuestion'])) {
         $numQArray = substr($numQArray, 0, -1);
     }
 }
+// initialize the javascript counter that tracks descriptors
+$numDesc = 1;
+if (isset($this->data['MixevalQuestionDesc'])) {
+    $numDesc = count($this->data['MixevalQuestionDesc']) + 1;
+}
 
 // Finally, we create the div that will hold all these questions
 echo $html->div('', $reloadedQ, array('id' => 'questions'));
 ?>
 
 <script type="text/javascript">
-var numQ = <?php echo $numQ; ?>;
+// tracking variables that tells us what ID to give to the next question or desc
+var numQ = <?php echo $numQ; ?>; // the total number of questions + 1
+// the total number of descriptors + 1
+var numDesc = <?php echo $numDesc; ?>; 
+// keeps track of currently valid user ids, cause users can remove questions
 var questionIds = new Array(<?php echo $numQArray; ?>);
-var likertQ = '<?php echo makeQ('Likert', $html, $form, -1, $qTypes); ?>';
-var sentenceQ = '<?php echo makeQ('Sentence', $html, $form, -1, $qTypes); ?>';
-var paragraphQ = '<?php echo makeQ('Paragraph', $html, $form, -1, $qTypes); ?>';
+// templates for each question type, the negative numbers will be replaced
+// with an appropriate ID (from the tracking variables)
+// -1 is for numQ, -2 is for numDesc
+var likertQ = '<?php echo makeQ($this, 'Likert', -1, $qTypes); ?>';
+var sentenceQ = '<?php echo makeQ($this, 'Sentence', -1, $qTypes); ?>';
+var paragraphQ = '<?php echo makeQ($this, 'Paragraph', -1, $qTypes); ?>';
+var desc = '<?php echo makeDesc($this, -1, -2); ?>';
+
 
 // Add a question
 function insertQ() {
@@ -111,6 +178,7 @@ function insertQ() {
     var q = "";
     switch (type) {
     case "Likert":
+        q = likertQ;
         break;
     case "Paragraph":
         q = paragraphQ;
@@ -180,7 +248,25 @@ function reorderQ() {
         var staticId = questionIds[i];
         jQuery("#questionNum" + staticId).text(i + 1 + '. ');
         jQuery("#MixevalQuestion" + staticId + "QuestionNum").val(i + 1);
+        console.log(".MixevalQuestionDesc" + staticId);
+        jQuery(".MixevalQuestionDesc" + staticId).val(i + 1);
     }
+}
+
+// Add a question descriptor, this is used to configure things like scale 
+// levels in likert questions
+function addDesc(numQ) {
+    var insert = desc.replace(/-1/g, numQ);
+    insert = insert.replace(/-2/g, numDesc);
+    jQuery(insert).hide().appendTo('#DescsDiv' + numQ).fadeIn(350);
+    numDesc++;
+}
+
+// Remove a question descriptor
+function removeDesc(qNum, numDesc) {
+    var target = jQuery('#question' + qNum + 'desc' + numDesc);
+    target.addClass('remove');
+    target.hide('blind', 350, function() { target.remove(); });
 }
 
 </script>

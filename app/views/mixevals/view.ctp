@@ -62,12 +62,12 @@ foreach ($questions as $q) {
     else if ($qtype == 'Likert') {
         $highestMark = $q['MixevalQuestion']['multiplier'];
         $totalMarks += $highestMark;
-        $scale = count($q['Description']);
+        $scale = count($q['MixevalQuestionDesc']);
         $options = array();
         $descs = array();
         $marks = array();
         $markLbl = "Mark: ";
-        foreach ($q['Description'] as $desc) {
+        foreach ($q['MixevalQuestionDesc'] as $desc) {
             $options[] = $desc['id'];
             $descs[] = $desc['descriptor'];
             $marks[] = $markLbl. $highestMark * ($desc['scale_level'] / $scale);

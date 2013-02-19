@@ -103,7 +103,7 @@ p {
     width: 100%;
 }
 
-.text label, .password label, .textarea label, .select label, .checkbox label, .datetime label, .date label, .radio legend, .penaltyLabel, .file label
+.text label, .password label, .textarea label, .select label, .checkbox label, .datetime label, .date label, .radio legend, .penaltyLabel, .file label, .defLabel
 {
     float: left;
     text-align: right;
@@ -351,6 +351,7 @@ h2 {
 
 h3 {
     margin: 1em 0;
+    font-size: 1.1em;
     font-weight: 600;
 }
 
@@ -1234,12 +1235,22 @@ div.MixevalQuestion {
 
 .MixevalAdd #questions div a.removeQ, .MixevalAdd #questions div a.upQ,
 .MixevalAdd #questions div a.downQ {
-    padding: 0.5em;
+    font-size: 1.2em;
+    padding: 0.3em;
     margin: 0;
+}
+
+.MixevalAdd #questions div a.removeQ {
+    color: crimson;
+}
+
+.MixevalAdd #questions div a.upQ {
+    color: orangered;
 }
 
 .MixevalAdd #questions div a.downQ {
     margin-right: 1em;
+    color: dodgerblue;
 }
 
 .MixevalAdd #questions div a.removeQ:hover {
@@ -1270,6 +1281,19 @@ div.MixevalMakeQuestion {
 .MixevalAdd input[type='text'], .MixevalMakeQuestion
 input[type='text'], .MixevalMakeQuestion textarea {
     width: 30em;
+}
+
+.MixevalMakeQuestion div.DescsDiv input[type="text"] {
+    width: 10em;
+}
+
+.DescsDiv {
+    margin-top: 0.2em;
+    margin-left: 14em;
+}
+
+.MixevalQuestionDesc {
+    padding-bottom: 0.1em;
 }
 
 /* TO BE REFACTORED LATER */
@@ -1632,6 +1656,7 @@ table.group-list-chooser td{
 form div.help-text {
     margin: 0.5em 0 1em 18em;
     font-size: 0.8em;
+    width: 35em;
     color: gray;
 }
 

@@ -16,6 +16,7 @@ class Mixeval extends AppModel
 {
     const TEMPLATE_TYPE_ID = 4;
     public $name = 'Mixeval';
+    public $actsAs = array('Traceable');
 
     public $hasMany = array(
         'Event' => array(
@@ -27,11 +28,10 @@ class Mixeval extends AppModel
             'exclusive'   => false,
             'finderSql'   => ''
         ),
-        'MixevalQuestion' =>
-        array('className' => 'MixevalQuestion',
+        'MixevalQuestion' => array(
+            'className' => 'MixevalQuestion',
             'foreignKey' => 'mixeval_id',
             'dependent' => true,
-            //'exclusive' => true,
             'order'     => array('question_num' => 'ASC', 'id' => 'ASC'),
         ),
     );

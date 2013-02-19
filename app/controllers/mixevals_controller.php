@@ -45,6 +45,12 @@ class MixevalsController extends AppController
         // Creates the custom in use column
         if ($data) {
             foreach ($data as $key => $entry) {
+                $entry['Mixeval']['event_count'] = $this->Event->find('count', 
+                    array('conditions' => array(
+                        'event_template_type_id' => $entry['Mixeval']['id'])
+                    )
+                );
+
                 // is it in use?
                 $inUse = (0 != $entry['Mixeval']['event_count']);
 
@@ -72,7 +78,6 @@ class MixevalsController extends AppController
             array("Mixeval.availability",  __("Availability", true), "6em",  "string"),
             array("Mixeval.total_question",  __("Questions", true),    "4em", "number"),
             array("Mixeval.total_marks",  __("Total Marks", true),    "4em", "number"),
-            array("Mixeval.event_count",   "",       "",        "hidden"),
             array("Mixeval.creator_id",           "",               "",    "hidden"),
             array("Mixeval.creator",     __("Creator", true),        "8em", "action", "View Creator"),
             array("Mixeval.created",      __("Creation Date", true),  "10em", "date"));
@@ -252,44 +257,141 @@ class MixevalsController extends AppController
     {
         $mixeval_question_types = $this->MixevalQuestionType->find('list');
         $this->set('mixevalQuestionTypes', $mixeval_question_types);
-        if (empty($this->data)) {
-            // old
-            $this->data['Mixeval']= array();
-            $this->data['Question'] = array();
-            $this->set('data', $this->data);
-        } else {
-            // reorder the questions so that they match the numbering that
-            // the user wanted
-            $orderedQs = array();
+        if (!empty($this->data)) {
+            // Since users can move questions around, we have two different
+            // question orderings that needs to be dealth with: The order
+            // in which the questions were inserted and the order in which
+            // the user wants to questions to be.
+            
+            // Reorder the questions so that they match the numbering that
+            // the user wanted, also create a mapping from the insertion
+            // order to the user order.
+            $userOrder = array();
             if (isset($this->data['MixevalQuestion'])) {
-                foreach ($this->data['MixevalQuestion'] as $q) {
+                $orderedQs = array();
+                foreach ($this->data['MixevalQuestion'] as $key => $q) {
                    $orderedQs[$q['question_num']] = $q; 
+                   $userOrder[$key] = $q['question_num'];
                 }
                 $this->data['MixevalQuestion'] = $orderedQs;
             }
-            // old
-            $data = $this->data;
 
-            if ($this->Mixeval->save($data)) {
-                $this->MixevalQuestion->insertQuestion($this->Mixeval->id, $this->data['Question']);
-                $id = $this->Mixeval->id;
-                $question_ids= $this->MixevalQuestion->find('all', array('conditions' => array('mixeval_id'=> $id), 'fields' => array('MixevalQuestion.id, question_num')));
-                $this->MixevalQuestionDesc->insertQuestionDescriptor($this->data['Question'], $question_ids);
-                $this->Session->setFlash(__('The Mixed Evaluation was added successfully.', true), 'good');
-                $this->redirect('index');
-                return;
-            } else {
-                $this->set('data', $this->data);
-                $this->Session->setFlash(__("The evaluation was not added successfully.", true));
-                $error = $this->Mixeval->getErrorMessage();
-                if (!is_array($error)) {
-                    $this->Session->setFlash($error);
+            // also give a scale_level to each question desc. Note that this
+            // implemention depends on the order of the question desc always
+            // being sequential. E.g. If Q1 has descs # 3, 8, 5534, 23323, then
+            // we assume that the lowest desc # (3 in this case) is the lowest
+            // scale (1) and 23323 is the desc for the highest scale (4 in this
+            // case) 
+            if (isset($this->data['MixevalQuestionDesc'])) {
+                // we also want to make sure that the descriptors have a 
+                // monotonically increasing index to make our life easier when
+                // restoring form state in the view. Also needs to be indexed
+                // from 1 and not 0, so we'll put in a fake 0 element and remove
+                // it later. 
+                $orderedDescs = array(0 => 'blah');
+                // map question num to scale, this keeps track of how many
+                // descriptors for each question we've seen so far (and hence,
+                // the scale level)
+                $descScale = array(); 
+                foreach ($this->data['MixevalQuestionDesc'] as $desc) {
+                    $qNum = $desc['question_id']; // this is the insertion order
+                    // change to user order
+                    $desc['question_id'] = $userOrder[$qNum];
+                    // assign the appropriate scale
+                    if (!isset($descScale[$qNum])) {
+                        $descScale[$qNum] = 1;
+                    }
+                    else {
+                        $descScale[$qNum]++;
+                    }
+                    $desc['scale_level'] = $descScale[$qNum];
+
+                    $orderedDescs[] = $desc;
+                }
+                unset($orderedDescs[0]);
+                $this->data['MixevalQuestionDesc'] = $orderedDescs;
+            }
+
+            $this->_transactionalSave();
+        }
+    }
+
+    /* Helper method to split out all the complication involved in saving
+     * mixeval data.
+     *
+     * Can't figure out how to get cakephp to nicely save 
+     * MixevalQuestionDesc with just a Mixeval->save call, so it'll have to be 
+     * split up into a multi-model save transaction. Note that since CakePHP 
+     * doesn't have nested transaction support, we're going to avoid saveAll as 
+     * it issues another transaction by default. This should be simpler than 
+     * having to properly deal with the return statuses in a non-transactional 
+     * saveAll call. 
+     */
+    public function _transactionalSave() {
+        $continue = true;
+        $this->Mixeval->begin();
+
+        $ret = $this->Mixeval->save($this->data); 
+        if (!$ret) {
+            $this->Session->setFlash(
+                _('Unable to save the mixed evaluation.'));
+            $continue = false;
+        }
+
+        // Have to save each question individually due to previously noted 
+        // problem with saveAll and transactions.
+        if ($continue) {
+            $questions = array('MixevalQuestion' => 
+                $this->data['MixevalQuestion']);
+            foreach ($questions['MixevalQuestion'] as $q) {
+                $q['mixeval_id'] = $this->Mixeval->id;
+                $saveQ = array('MixevalQuestion' => $q);
+                $this->MixevalQuestion->create();
+                if (!$this->MixevalQuestion->save($saveQ)) {
+                    $this->Session->setFlash(
+                        _("Unable to save this mixed eval's questions."));
+                    $continue = false;
+                    break;
                 }
             }
         }
-        $this->set('data', $this->data);
-        $this->set('action', __('Add Mixed Evaluation', true));
-        //$this->render('edit');
+
+        // Save the MixevalQuestionDesc
+        // Have to remap question_id to the correct question
+        if ($continue && isset($this->data['MixevalQuestionDesc'])) {
+            // first, need to map question number to question id
+            $questions = $this->MixevalQuestion->findAllByMixevalId(
+                $this->Mixeval->id);
+            $qNumToId = array(); 
+            foreach ($questions as $q) {
+                $q = $q['MixevalQuestion'];
+                $qNumToId[$q['question_num']] = $q['id'];
+            }
+            // try to save each question desc
+            foreach ($this->data['MixevalQuestionDesc'] as $d) {
+                $d['question_id'] = $qNumToId[$d['question_id']];
+                $saveDesc = array('MixevalQuestionDesc' => $d);
+                $this->MixevalQuestionDesc->create();
+                if (!$this->MixevalQuestionDesc->save($saveDesc)) {
+                    $this->Session->setFlash(
+                        _('Unable to save the mixed eval question descs.'));
+                    $continue = false;
+                    break;
+                }
+            }
+        }
+
+        // commit the transaction if everything looks good
+        if ($continue) {
+            $this->Mixeval->commit();
+            $this->Session->setFlash(
+                _('The mixed evaluation was added successfully.'), 'good');
+            $this->redirect('index');
+            return;
+        }
+        else {
+            $this->Mixeval->rollback();
+        }
     }
 
     /**
