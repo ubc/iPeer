@@ -820,9 +820,18 @@ i {
     width: 30em;
 }
 
-#CourseAddForm .submit, #CourseEditForm .submit {
-    width: 10em;
-    margin: 1em auto;
+#CourseEditForm .center {
+    text-align: center;
+}
+
+#CourseEditForm #instructors .text input {
+    width: 20em;
+    margin-bottom: 0.75em;
+    margin-right: 1em;
+}
+
+#CourseEditForm #instructors a {
+    padding: 0.5em;
 }
 
 /* PAGES/ADMIN */

@@ -258,6 +258,10 @@ class CoursesController extends AppController
         $this->set('instructorSelected', User::get('id'));
 
         if (!empty($this->data)) {
+            // reformat the Instructor array if exists
+            $newInstructors = (!isset($this->data['Instructor'])) ? array() :
+                Set::extract('/id', $this->data['Instructor']);
+            $this->data['Instructor'] = array('Instructor' => $newInstructors);
             if ($this->Course->save($this->data)) {
                 // add current user to the new course if the user is not an admin
                 if (!User::hasPermission('controllers/departments')) {
@@ -302,6 +306,17 @@ class CoursesController extends AppController
         }
 
         if (!empty($this->data)) {
+            // reformat the Instructor array if exists
+            $newInstructors = (!isset($this->data['Instructor'])) ? array() : 
+                Set::extract('/id', $this->data['Instructor']);
+            // delete instructors from the course if they are not in the new list
+            $instructors = $this->UserCourse->findAllByCourseId($courseId);
+            foreach ($instructors as $instructor) {
+                if (!in_array($instructor['UserCourse']['user_id'], $newInstructors)) {
+                    $this->UserCourse->delete($instructor['UserCourse']['id']);
+                }
+            }
+            $this->data['Instructor'] = array('Instructor' => $newInstructors);
             $success = $this->Course->save($this->data);
             if ($success) {
                 $this->Session->setFlash(__('The course was updated successfully.', true), 'good');
@@ -615,7 +630,6 @@ class CoursesController extends AppController
         $courseIds = array_unique(Set::extract('/Event/course_id', $sourceEvents));
         $sourceCourses = $this->Course->getCourseList($courseIds);
         asort($sourceCourses);
-        $courseChoice = array('Create New Course', 'Select Created Course');
         $this->set('sourceCourses', $sourceCourses);
         $this->set('sourceSurveys', array());
         $this->set('destCourses', $destCourses);

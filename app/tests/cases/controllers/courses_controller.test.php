@@ -461,12 +461,13 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'homepage' => 'http://www.ubc.ca'
             ),
             'Instructor' => array(
-                'Instructor' => array(2)
+                array('id' => 2)
             ),
             'Department' => array(
                 'Department' => array(3)
             ),
         );
+
         $this->controller->expectOnce('redirect', array('index'));
         $result = $this->testAction(
             '/courses/edit/1',
