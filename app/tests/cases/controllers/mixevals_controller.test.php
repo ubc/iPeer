@@ -68,7 +68,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
 
         $this->assertEqual(count($result['paramsForList']['data']['entries']), 1);
         $this->assertEqual($result['paramsForList']['data']['entries'][0]['Mixeval']['id'], 1);
-        $this->assertEqual($result['paramsForList']['data']['entries'][0]['Mixeval']['name'], 'Default Mix Evalution');
+        $this->assertEqual($result['paramsForList']['data']['entries'][0]['Mixeval']['name'], 'Default Mix Evaluation');
         $this->assertEqual($result['paramsForList']['data']['count'], 1);
     }
 
@@ -78,15 +78,21 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
 
         $this->assertEqual($result['mixeval']['id'], 1);
         $this->assertEqual(count($result['questions']), 6);
-        $this->assertEqual(count($result['questions'][0]['Description']), 5);
-        $this->assertEqual(count($result['questions'][1]['Description']), 5);
-        $this->assertEqual(count($result['questions'][2]['Description']), 5);
-        $this->assertEqual(count($result['questions'][3]['Description']), 0);
-        $this->assertEqual(count($result['questions'][4]['Description']), 0);
-        $this->assertEqual(count($result['questions'][5]['Description']), 0);
+        $this->assertEqual(count($result['questions'][0]['MixevalQuestionDesc']), 5);
+        $this->assertEqual(count($result['questions'][1]['MixevalQuestionDesc']), 5);
+        $this->assertEqual(count($result['questions'][2]['MixevalQuestionDesc']), 5);
+        $this->assertEqual(count($result['questions'][3]['MixevalQuestionDesc']), 0);
+        $this->assertEqual(count($result['questions'][4]['MixevalQuestionDesc']), 0);
+        $this->assertEqual(count($result['questions'][5]['MixevalQuestionDesc']), 0);
     }
 
     function testAdd() {
+        // can we test submits?
+        // need to add validation for questions so that you can't
+        // submit a string for the 'marks' field
+        // question reordering must match what users want
+        // question descriptors need to be scaled properly
+        // question descriptors need to have a monotonically increasing index
     }
 
     function testDeleteQuestion() {

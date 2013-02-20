@@ -198,4 +198,29 @@ class Mixeval extends AppModel
 
         return $eval;
     }
+
+    /**
+     * getBelongingOrPublic
+     * Returns the evaluations made by this user, and any other public ones.
+     *
+     * Note duplicate in evaluation_base. Unfortunately, evaluation_base
+     * causes other problems for some reason, so can't inherit from it, just
+     * copy and pasting the code here for now.
+     *
+     * @param mixed $user_id
+     *
+     * @access public
+     * @return void
+     */
+    function getBelongingOrPublic($user_id)
+    {
+        if (!is_numeric($user_id)) {
+            return false;
+        }
+
+        $conditions = array('creator_id' => $user_id);
+        $conditions = array('OR' => array_merge(array('availability' => 'public'), $conditions));
+        return $this->find('list', array('conditions' => $conditions, 'fields' => array('name')));
+    }
+
 }

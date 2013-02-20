@@ -283,11 +283,11 @@ class MixevalsController extends AppController
             // scale (1) and 23323 is the desc for the highest scale (4 in this
             // case) 
             if (isset($this->data['MixevalQuestionDesc'])) {
-                // we also want to make sure that the descriptors have a 
-                // monotonically increasing index to make our life easier when
-                // restoring form state in the view. Also needs to be indexed
-                // from 1 and not 0, so we'll put in a fake 0 element and remove
-                // it later. 
+                // we also want to make sure that the descriptors have an index
+                // that monotonically increases by 1 each entry to make our 
+                // life easier when restoring form state in the view. Also 
+                // needs to be indexed from 1 and not 0, so we'll put in a fake 
+                // 0 element and remove it later. 
                 $orderedDescs = array(0 => 'blah');
                 // map question num to scale, this keeps track of how many
                 // descriptors for each question we've seen so far (and hence,

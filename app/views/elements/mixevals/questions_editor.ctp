@@ -166,6 +166,8 @@ var questionIds = new Array(<?php echo $numQArray; ?>);
 // templates for each question type, the negative numbers will be replaced
 // with an appropriate ID (from the tracking variables)
 // -1 is for numQ, -2 is for numDesc
+// Note that we're using negative numbers because of problems with quote
+// escaping in strings with cakephp generated onclick attributes.
 var likertQ = '<?php echo makeQ($this, 'Likert', -1, $qTypes); ?>';
 var sentenceQ = '<?php echo makeQ($this, 'Sentence', -1, $qTypes); ?>';
 var paragraphQ = '<?php echo makeQ($this, 'Paragraph', -1, $qTypes); ?>';
