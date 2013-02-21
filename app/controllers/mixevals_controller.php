@@ -106,7 +106,10 @@ class MixevalsController extends AppController
             if (User::hasPermission('functions/user/admin')) {
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
             } else {
-                $courseIds = Set::extract($this->UserCourse->findAllByUserId($myID), '/UserCourse/course_id');
+                $courseIds = Set::extract(
+                    $this->UserCourse->findAllByUserId(User::get('id')), 
+                    '/UserCourse/course_id'
+                );
             }
             // grab all instructors that have access to the courses above
             $instructors = $this->UserCourse->findAllByCourseId($courseIds);
