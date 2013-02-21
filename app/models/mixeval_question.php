@@ -25,6 +25,13 @@ class MixevalQuestion extends AppModel
         ),
     );
 
+    public $validate = array(
+        'multiplier' => array(
+            'rule' => 'numeric',
+            'message' => 'Please enter a number for marks.'
+        )
+    );
+
     /**
      * Saves Mix evaluation questions to database
      *
@@ -47,16 +54,6 @@ class MixevalQuestion extends AppModel
         }
     }
 
-
-  /*FUNCTION NOT BEING USED
-    called by mixevals controller during an edit of an
-  existing mixeval question(s)*/
-  /*function updateQuestion($id, $data)
-{
-    $this->deleteQuestions($id);
-    $this->insertQuestion($id, $data);
-  }*/
-
     /**
      * deleteQuestions called by the delete function in the controller
      *
@@ -70,7 +67,6 @@ class MixevalQuestion extends AppModel
         //  	$this->query('DELETE FROM mixevals_questions WHERE mixeval_id='.$id);
         $this->delete($id);
     }
-
 
     /**
      * Get corresponding mix evaluation question corresponding to some mix evaluation
