@@ -1,11 +1,11 @@
 <div id='UserMove'>
-<h2><?php __('Instructions')?></h2>
+<h2><?php echo __('Instructions', true)?></h2>
 <ul>
-    <li><?php __('All fields are mandatory.') ?></li>
-    <li><?php __('When all fields have been filled, the Submit button will become available.') ?></li>
-    <li><?php __('Only students who have submitted their surveys will appear in the list.') ?></li>
+    <li><?php echo __('All fields are mandatory.', true) ?></li>
+    <li><?php echo __('When all fields have been filled, the Submit button will become available.', true) ?></li>
+    <li><?php echo __('Only students who have submitted their surveys will appear in the list.', true) ?></li>
 </ul>
-<h2><?php __('Move or Copy Student') ?></h2>
+<h2><?php echo __('Move or Copy Student', true); ?></h2>
 <?php
 echo $this->Form->create('Course');
 echo $this->Form->input('sourceCourses', array('label' => 'Source Course', 'empty' => '-- Pick a course --'));
@@ -20,32 +20,6 @@ echo $this->Form->input('action', array(
     'default' => '1'
 ));
 echo $this->Form->end(array('label' => 'Submit', 'id' => 'submit', 'disabled' => 'disabled'));
-
-//populate source surveys
-$this->Js->get('#CourseSourceCourses')->event('change',
-    $this->Js->request(
-        array('controller'=>'courses', 'action'=>'ajax_options/sCourses'),
-        array('update' => '#CourseSourceSurveys', 'dataExpression' => true, 'async' => true,
-        'data' => $js->serializeForm(array('isForm'=>false, 'inline'=>true)))
-));
-$this->Js->get('#CourseSourceSurveys')->event('change', 
-    $this->Js->request(
-        array('controller'=>'courses', 'action'=>'ajax_options/sSurveys'),
-        array('update' => '#CourseSubmitters', 'dataExpression' => true, 'async' => true,
-        'data' => $js->serializeForm(array('isForm'=>false, 'inline'=>true)))
-));
-$this->Js->get('#CourseSubmitters')->event('change',
-    $this->Js->request(
-        array('controller'=>'courses', 'action'=>'ajax_options/submitters'),
-        array('update' => '#CourseDestCourses', 'dataExpression' => true, 'async' => true,
-        'data' => $js->serializeForm(array('isForm'=>false, 'inline'=>true)))
-));
-$this->Js->get('#CourseDestCourses')->event('change',
-    $this->Js->request(
-        array('controller'=>'courses', 'action'=>'ajax_options/dCourses'),
-        array('update' => '#CourseDestSurveys', 'dataExpression' => true, 'async' => true,
-        'data' => $js->serializeForm(array('isForm'=>false, 'inline'=>true)))
-));
 ?>
 
 </div>
@@ -53,7 +27,13 @@ $this->Js->get('#CourseDestCourses')->event('change',
 
 jQuery().ready(function() {
     // creating empty options for select fields below the field that was changed
+    // updating the next field with available options
     jQuery('#CourseSourceCourses').change(function() {
+        var id = jQuery('#CourseSourceCourses option:selected').val();
+        jQuery.getJSON('/courses/ajax_options', {field: 'sCourses', courseId: id},
+            function(surveys) {
+                populate(surveys, '#CourseSourceSurveys', 'survey');
+        });
         jQuery('#CourseSubmitters').find('option').remove().end()
             .append('<option value="">-- Pick a student --</option>');
         jQuery('#CourseDestCourses').find('option').remove().end()
@@ -62,15 +42,43 @@ jQuery().ready(function() {
             .append('<option value="">-- Pick a survey --</option>');
     });
     jQuery('#CourseSourceSurveys').change(function() {
+        var id = jQuery('#CourseSourceSurveys option:selected').val();
+        jQuery.getJSON('/courses/ajax_options', {field: 'sSurveys', surveyId: id},
+            function(students) {
+                populate(students, '#CourseSubmitters', 'student');
+        });
         jQuery('#CourseDestCourses').find('option').remove().end()
             .append('<option value="">-- Pick a course --</option>');
         jQuery('#CourseDestSurveys').find('option').remove().end()
             .append('<option value="">-- Pick a survey --</option>');
     });
     jQuery('#CourseSubmitters').change(function() {
+        var sId = jQuery('#CourseSourceSurveys option:selected').val();
+        var cId = jQuery('#CourseSourceCourses option:selected').val();
+        jQuery.getJSON('/courses/ajax_options', {field: 'submitters', surveyId: sId, courseId: cId},
+            function(courses) {
+                populate(courses, '#CourseDestCourses', 'course');
+        });
         jQuery('#CourseDestSurveys').find('option').remove().end()
             .append('<option value="">-- Pick a survey --</option>');
     });
+    jQuery('#CourseDestCourses').change(function() {
+        var sId = jQuery('#CourseSourceSurveys option:selected').val();
+        var cId = jQuery('#CourseDestCourses option:selected').val();
+        jQuery.getJSON('/courses/ajax_options', {field: 'dCourses', surveyId: sId, courseId: cId},
+            function(surveys) {
+                populate(surveys, '#CourseDestSurveys', 'survey'); 
+        });
+    });
+    
+    // generate the options for the select fields
+    function populate(selections, update, empty) {
+        var options = '<option value>-- Pick a ' + empty + ' --</option>';
+        jQuery.each(selections, function(index, value) {
+            options += '<option value="' + index + '">' + value + '</option>';
+        });
+        jQuery(update).html(options);
+    }
 
     // enables the submit button when all select fields are filled
     jQuery("select").change(function() {

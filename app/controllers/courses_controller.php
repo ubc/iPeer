@@ -449,68 +449,55 @@ class CoursesController extends AppController
         $this->set('submitters', array());
         $this->set('destCourses', array());
         $this->set('destSurveys', array());
-        $this->set('title_for_layout', 'Move Students');
+        $this->set('title_for_layout', __('Move Students', true));
     }
 
     /**
      * ajax_options
      *
-     * @param mixed $field field
-     *
      * @access public
      * @return void
      */   
-    function ajax_options($field) 
+    function ajax_options() 
     {
         if (!$this->RequestHandler->isAjax()) {
             $this->cakeError('error404');
         }
-        $this->layout = 'ajax';
-        $this->autoRender = false;
 
-        switch($field) {
+        switch($_GET['field']) {
             case 'sCourses':
-                $options = $this->Event->getActiveSurveyEvents($this->data['Course']['sourceCourses'], 'list');
+                $options = $this->Event->getActiveSurveyEvents($_GET['courseId'], 'list');
                 $empty = 'survey';
                 break;
             case 'sSurveys':
-                $sub = $this->EvaluationSubmission->findAllByEventId($this->data['Course']['sourceSurveys']);
+                $sub = $this->EvaluationSubmission->findAllByEventId($_GET['surveyId']);
                 $options = $this->User->getFullNames(Set::extract('/EvaluationSubmission/submitter_id', $sub));
                 $empty = 'student';
                 break;
             case 'submitters':
-                $event = $this->Event->findById($this->data['Course']['sourceSurveys']);
+                $event = $this->Event->findById($_GET['surveyId']);
                 $destCourses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
                 $destEvents = $this->Event->getSurveyByCourseIdTemplateId(array_keys($destCourses),
                     $event['Event']['template_id'], 'all');
                 $options = $this->Course->getCourseList(array_unique(Set::extract('/Event/course_id', $destEvents)));
-                unset($options[$this->data['Course']['sourceCourses']]); //remove source course
+                unset($options[$_GET['courseId']]); //remove source course
                 $empty = 'course';
                 break;
             case 'dCourses':
-                $event = $this->Event->findById($this->data['Course']['sourceSurveys']);
+                $event = $this->Event->findById($_GET['surveyId']);
                 $options = $this->Event->getSurveyByCourseIdTemplateId(
-                    $this->data['Course']['destCourses'], $event['Event']['template_id']);
+                    $_GET['courseId'], $event['Event']['template_id']);
                 $empty = 'survey';
                 break;
             case 'importDestCourses':
                 $options = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
-                unset($options[$this->data['Course']['sourceCourses']]); // remove source course
+                unset($options[$_GET['courseId']]); // remove source course
                 $empty = 'course';
-                break;
-            case 'importDestSurveys':
-                $event = $this->Event->findById($this->data['Course']['sourceSurveys']);
-                $options = $this->Event->getSurveyByCourseIdTemplateId(
-                    $this->data['Course']['destCourses'], $event['Event']['template_id']);
-                $empty = 'survey';
                 break;
         }
 
         asort($options);
         $this->set('options', $options);
-        $this->set('empty', $empty);
-        $this->render('/elements/courses/ajax_move_options', 'ajax');
-        
     }
     
     /**
@@ -521,7 +508,7 @@ class CoursesController extends AppController
      */
     function import()
     {
-        $this->set('title_for_layout', 'Move Group of Students');
+        $this->set('title_for_layout', __('Move Group of Students', true));
 
         if (!empty($this->data)) {
             // check that file upload worked

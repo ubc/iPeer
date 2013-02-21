@@ -1,11 +1,11 @@
 <div id='CourseImport'>
-<h2><?php __('Instructions')?></h2>
+<h2><?php echo __('Instructions', true)?></h2>
 <ul>
-    <li><?php __('All fields are mandatory.') ?></li>
-    <li><?php __('When all fields are filled, the Submit button will become available.') ?></li>
-    <li><?php __('You can choose to import into a duplicate of the source survey or choose an existing survey.') ?></li>
+    <li><?php echo __('All fields are mandatory.', true) ?></li>
+    <li><?php echo __('When all fields are filled, the Submit button will become available.', true) ?></li>
+    <li><?php echo __('You can choose to import into a duplicate of the source survey or choose an existing survey.', true) ?></li>
 </ul>
-<h3><?php __('Examples:')?></h3>
+<h3><?php echo __('Examples:', true)?></h3>
 <pre id='example'>
 studentno1
 studentno2
@@ -18,7 +18,7 @@ username2
 username3
 username4
 </pre>
-<h2><?php __('Move or Copy Group of Students') ?></h2>
+<h2><?php echo __('Move or Copy Group of Students', true) ?></h2>
 <?php
 echo $this->Form->create('Course', array('type' => 'file'));
 echo $this->Form->input('file', array('type' => 'file', 'name' => 'file'));
@@ -47,26 +47,6 @@ echo $this->Form->input('action', array(
     'default' => '1'
 ));
 echo $this->Form->end(array('label' => 'Submit', 'id' => 'submit', 'disabled' => 'disabled'));
-
-$this->Js->get('#CourseSourceCourses')->event('change',
-    $this->Js->request(
-        array('controller' => 'courses', 'action'=>'ajax_options/sCourses'),
-        array('update' => '#CourseSourceSurveys', 'dataExpression' => true, 'async' => true,
-        'data' => $js->serializeForm(array('isForm' => false, 'inline' => true)))
-));
-$this->Js->get('#CourseSourceCourses')->event('change',
-    $this->Js->request(
-        array('controller' => 'courses', 'action'=>'ajax_options/importDestCourses'),
-        array('update' => '#CourseDestCourses', 'dataExpression' => true, 'async' => true,
-        'data' => $js->serializeForm(array('isForm' => false, 'inline' => true)))
-));
-$this->Js->get('#CourseDestCourses')->event('change',
-    $this->Js->request(
-        array('controller' => 'courses', 'action'=>'ajax_options/importDestSurveys'),
-        array('update' => '#CourseDestSurveys', 'dataExpression' => true, 'async' => true,
-        'data' => $js->serializeForm(array('isForm' => false, 'inline' => true)))
-));
-
 ?>
 </div>
 <script type="text/javascript">
@@ -98,11 +78,40 @@ jQuery().ready(function() {
             jQuery("#submit").removeAttr("disabled");
         }
     });
+    
+    // updating the next field with available options
     jQuery('#CourseSourceCourses').change(function() {
+        var id = jQuery('#CourseSourceCourses option:selected').val();
         jQuery('#CourseDestSurveys').find('option').remove().end()
             .append('<option value="">-- Pick a survey --</option>');
+        jQuery.getJSON('/courses/ajax_options', {field: 'sCourses', courseId: id},
+            function(surveys) {
+                populate(surveys, '#CourseSourceSurveys', 'survey');
+        });
+        jQuery.getJSON('/courses/ajax_options', {field: 'importDestCourses',courseId: id},
+            function(courses) {
+                populate(courses, '#CourseDestCourses', 'course');
+        });
+    });
+    
+    jQuery('#CourseDestCourses').change(function() {
+        var sId = jQuery('#CourseSourceSurveys option:selected').val();
+        var cId = jQuery('#CourseDestCourses option:selected').val();
+        jQuery.getJSON('/courses/ajax_options', {field: 'dCourses', surveyId: sId, courseId: cId},
+            function(surveys) {
+                populate(surveys, '#CourseDestSurveys', 'survey');
+        });
     });
 });
+
+// generate the options for the select fields
+function populate(selections, update, empty) {
+    var options = '<option value>-- Pick a ' + empty + ' --</option>';
+    jQuery.each(selections, function(index, value) {
+        options += '<option value="' + index + '">' + value + '</option>';
+    });
+    jQuery(update).html(options);
+}
 
 function toggleDestSurveys() {
     var choice = jQuery('input[type="radio"][name="data[Course][surveyChoices]"]:checked').val();
