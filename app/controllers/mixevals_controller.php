@@ -206,7 +206,7 @@ class MixevalsController extends AppController
 
         // check to see if $id is a valid mixed evaluation
         if (empty($eval)) {
-            $this->Session->setFlash(_('Error: Invalid Mixeval ID.'));
+            $this->Session->setFlash(_t('Error: Invalid Mixeval ID.'));
             $this->redirect('index');
             return;
         }
@@ -328,14 +328,26 @@ class MixevalsController extends AppController
      * saveAll call. 
      */
     public function _transactionalSave() {
+        // First, we have to validate the forms. The automagic validation errors
+        // won't show up with the multiple save calls we're going to be using.
+        // Note that this will validate Mixeval and MixevalQuestions, but not
+        // MixevalQuestionDesc.
+        if (!$this->Mixeval->saveAll($this->data, array('validate' => 'only'))){
+            $this->Session->setFlash(
+                _t('Unable to save, data validation failed.'));
+            return;
+        }
+        
         $continue = true;
         $this->Mixeval->begin();
 
-        $ret = $this->Mixeval->save($this->data); 
-        if (!$ret) {
-            $this->Session->setFlash(
-                _('Unable to save the mixed evaluation.'));
-            $continue = false;
+        if ($continue) {
+            $ret = $this->Mixeval->save($this->data); 
+            if (!$ret) {
+                $this->Session->setFlash(
+                    _t('Unable to save the mixed evaluation.'));
+                $continue = false;
+            }
         }
 
         // Have to save each question individually due to previously noted 
@@ -349,7 +361,7 @@ class MixevalsController extends AppController
                 $this->MixevalQuestion->create();
                 if (!$this->MixevalQuestion->save($saveQ)) {
                     $this->Session->setFlash(
-                        _("Unable to save this mixed eval's questions."));
+                        _t("Unable to save this mixed eval's questions."));
                     $continue = false;
                     break;
                 }
@@ -374,7 +386,7 @@ class MixevalsController extends AppController
                 $this->MixevalQuestionDesc->create();
                 if (!$this->MixevalQuestionDesc->save($saveDesc)) {
                     $this->Session->setFlash(
-                        _('Unable to save the mixed eval question descs.'));
+                        _t('Unable to save the mixed eval question descs.'));
                     $continue = false;
                     break;
                 }
@@ -385,7 +397,7 @@ class MixevalsController extends AppController
         if ($continue) {
             $this->Mixeval->commit();
             $this->Session->setFlash(
-                _('The mixed evaluation was added successfully.'), 'good');
+                _t('The mixed evaluation was added successfully.'), 'good');
             $this->redirect('index');
             return;
         }
