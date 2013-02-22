@@ -7,13 +7,16 @@
     <dd><?php echo ucfirst($mixeval['availability']); ?></dd>
     <dd>
         <span class='help'>
-        <?php __('Public Allows Mixed Evaluation Sharing Amongst Instructors')?>        </span>
+        <?php
+        __('Public lets you share this mixed evaluation with other instructors.');
+        ?>
+        </span>
     </dd>
     <dt>Zero Mark</dt>
     <dd><?php echo $mixeval['zero_mark'] ? 'On' : 'Off';?></dd>
     <dd>
         <span class='help'>
-        <?php __('If Enabled, No Marks Given for Level of Scale of 1')?>
+        <?php __('Start marks from zero for all Likert questions.')?>
         </span>
     </dd>
     <dt>Creator</dt>
@@ -67,10 +70,18 @@ foreach ($questions as $q) {
         $descs = array();
         $marks = array();
         $markLbl = "Mark: ";
+        // for zero marks, we need to shift the scale so that marks start at 0
+        $subIf0 = 0;
+        if ($mixeval['zero_mark']) {
+            $subIf0 = 1;
+            $scale -= $subIf0;
+        }
         foreach ($q['MixevalQuestionDesc'] as $desc) {
             $options[] = $desc['id'];
             $descs[] = $desc['descriptor'];
-            $marks[] = $markLbl. $highestMark * ($desc['scale_level'] / $scale);
+            $desc['scale_level'] -= $subIf0;
+            $mark = $highestMark * ($desc['scale_level'] / $scale);
+            $marks[] = $markLbl. round($mark, 2);// max 2 decimal places
             $markLbl = "";
         }
         foreach ($options as &$opt) {
@@ -89,10 +100,10 @@ foreach ($questions as $q) {
     echo $out;
 }
 
-// reconstruct the marker since the one used in $qtitle had class floatright
+// reconstruct the req marker since the one used in $qtitle had class floatright
 $required = $html->tag('span', '*', array('class' => 'required orangered'));
-echo $html->para('note', $required . ' ' . _('Indicates response required.'));
-echo $html->para('marks', _('Total Marks') . ": $totalMarks");
+echo $html->para('note', $required . ' ' . _t('Indicates response required.'));
+echo $html->para('marks', _t('Total Marks') . ": $totalMarks");
 
 ?>
 </div>

@@ -1222,6 +1222,7 @@ div.MixevalQuestion {
 }
 
 .MixevalQuestion table {
+    table-layout: fixed;
     width: 100%;
 }
 
