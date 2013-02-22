@@ -220,10 +220,10 @@ class EvaluationComponent extends Object
         }
 
         // if no submission exists, create one
-        $sub = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($grpEvent, $evaluator);
+        $sub = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'], $evaluator);
         if (empty($sub)) {
-            $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $grpEvent;
-            $evaluationSubmission['EvaluationSubmission']['event_id'] = $event;
+            $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEvent['GroupEvent']['id'];
+            $evaluationSubmission['EvaluationSubmission']['event_id'] = $groupEvent['GroupEvent']['event_id'];
             $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
             // save evaluation submission
             $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
@@ -1336,6 +1336,122 @@ class EvaluationComponent extends Object
         return $result;
     }
 
+<<<<<<< HEAD
+=======
+
+
+    /**
+     * saveSurveyEvaluation
+     * Survey Evaluation functions
+     *
+     * @param bool $params
+     *
+     * @access public
+     * @return void
+     */
+    function saveSurveyEvaluation($params=null)
+    {
+        $this->Response = ClassRegistry::init('Response');
+        $this->Question = ClassRegistry::init('Question');
+        $this->SurveyQuestion = ClassRegistry::init('SurveyQuestion');
+        $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
+
+        $userId = $params['data']['Evaluation']['surveyee_id'];
+        $eventId = $params['form']['event_id'];
+
+        //get existing record if there is one
+        $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId, $userId);
+        if (empty($evaluationSubmission)) {
+            //if there is no existing record, fill in all fields
+            $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $userId;
+            $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
+            $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
+            $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
+        }
+
+        $surveyInput = array();
+        $surveyInput['SurveyInput']['user_id'] = $userId;
+        $surveyInput['SurveyInput']['event_id'] = $eventId;
+        $successfullySaved = true;
+        $surveyQuestion = new SurveyQuestion();
+        $questions = $surveyQuestion->getQuestionsByEventId($eventId);
+
+        foreach ($questions as $i => $question) {
+            $this->SurveyInput = new SurveyInput;
+            $questionId = $question['SurveyQuestion']['question_id'];
+            $questionType = $this->Question->field('type',
+                array('id' => $questionId));
+            // First, remove all prior responses, this deals with the edge
+            // case where the user decides to change a previously answered
+            // question to blank
+            $this->SurveyInput->deleteAll(
+                array(
+                    'user_id' => $userId,
+                    'question_id' => $questionId
+                )
+            );
+            //Set answer
+            $answer = $params['form']['answer_'.$questionId];
+            if ('C' == $questionType) {
+                // We are saving a "Choose any of", which means multiple answers
+                // Save the new responses
+                $surveyInputs = array();
+                foreach ($answer as $respId) {
+                    $tmp = array();
+                    // First get data on the choice the user picked
+                    $choice = $this->Response->find('first',
+                        array('conditions' => array('Response.id' => $respId)));
+                    // Tailor a data entry for SurveyInput's saveAll function
+                    $tmp['response_text'] = $choice['Response']['response'];
+                    $tmp['response_id'] = $respId;
+                    $tmp['question_id'] = $questionId;
+                    $tmp['user_id'] = $userId;
+                    $tmp['event_id'] = $eventId;
+                    $surveyInputs[]['SurveyInput'] = $tmp;
+                }
+                if (!$this->SurveyInput->saveAll($surveyInputs)) {
+                    $successfullySaved = false;
+                }
+            }
+            else if ('M' == $questionType) {
+                // We are saving a multiple choice question, only 1 answer
+                $choice = $this->Response->find('first',
+                    array('conditions' => array('Response.id' => $answer)));
+                $tmp = array();
+                $tmp['response_text'] = $choice['Response']['response'];
+                $tmp['response_id'] = $answer;
+                $tmp['question_id'] = $questionId;
+                $tmp['user_id'] = $userId;
+                $tmp['event_id'] = $eventId;
+                $surveyInputs = array('SurveyInput' => $tmp);
+                if (!$this->SurveyInput->save($surveyInputs)) {
+                    $successfullySaved = false;
+                }
+            } else {
+                // Saving a short or long answer question.
+                $tmp = array();
+                $tmp['response_text'] = $answer;
+                $tmp['question_id'] = $questionId;
+                $tmp['user_id'] = $userId;
+                $tmp['event_id'] = $eventId;
+                $surveyInputs = array('SurveyInput' => $tmp);
+                if (!$this->SurveyInput->save($surveyInputs)) {
+                    $successfullySaved = false;
+                }
+            }
+        }
+
+        //Indicate that evaluation has been submitted
+        if ($successfullySaved) {
+            $this->EvaluationSubmission->save($evaluationSubmission);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+>>>>>>> hotfix-487
     /**
      * formatStudentViewOfSurveyEvaluationResult
      *
