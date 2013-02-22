@@ -24,9 +24,15 @@ echo $form->input(
 );
 echo $html->div("help-text", 
     _t('Public lets you share this mixed evaluation with other instructors.'));
-echo $this->Form->input('zero_mark');
+echo $form->input('zero_mark');
 echo $html->div("help-text", 
     _t('Start marks from zero for all Likert questions.'));
+
+// If we're editing a previously saved mixeval, will need to have an id for
+// the mixeval.
+if (isset($this->data['Mixeval']['id'])) {
+    echo $form->hidden('id');
+}
 
 // Question section
 echo $html->tag('h3', _t('Questions'));
@@ -38,9 +44,8 @@ echo $this->element('mixevals/questions_editor',
 
 // Submit
 echo $html->div('center', 
-    $form->button(_t('Back'), array('onclick' => 
-        "javascript:(history.length > 1) ? history.back() : window.close();'")).
-    $form->button(_t('Save'))
+    $form->button(_t('Save')) .
+    $form->button(_t('Cancel'), array('name' => 'cancel'))
 );
 
 echo $this->Form->end();
