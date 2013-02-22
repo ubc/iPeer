@@ -17,7 +17,9 @@ class UsersController extends AppController
     public $uses = array('User', 'UserEnrol', 'Personalize', 'Course',
         'SysParameter', 'Role', 'Group', 'UserFaculty',
         'Department', 'CourseDepartment', 'OauthClient', 'OauthToken',
-        'UserCourse', 'UserTutor', 'Faculty', 'UserFaculty'
+        'UserCourse', 'UserTutor', 'Faculty', 'UserFaculty', 'EmailTemplate', 'EvaluationMixevalDetail',
+        'EvaluationRubricDetail', 'EventTemplateType', 'Event', 'Faculty', 'GroupEvent',
+        'Mixeval', 'Rubric', 'SimpleEvaluation', 'SysParameter', 'Survey'
     );
     public $components = array('Session', 'AjaxList', 'RequestHandler',
         'Email', 'FileUpload.FileUpload', 'PasswordGenerator');
@@ -1096,6 +1098,12 @@ class UsersController extends AppController
             $primaryRole = $this->User->getRoleId($primaryAccount);
             $secondaryRole = $this->User->getRoleId($secondaryAccount);
             
+            // secondary account cannot be currently logged in user
+            if (User::get('id') == $secondaryAccount) {
+                $this->Session->setFlash(__('Error: The secondary account is the currently logged in user.', true));
+                return;
+            }
+            
             if ($primaryRole != $secondaryRole) {
                 $this->Session->setFlash(__('Error: The users do not have the same role.', true));
                 return;
@@ -1103,6 +1111,22 @@ class UsersController extends AppController
             
             if ($primaryAccount == $secondaryAccount) {
                 $this->Session->setFlash(__('Error: No merger needed. The primary and secondary accounts are the same.', true));
+                return;
+            }
+            
+            //update transactions
+            // MT - February 22, 2013
+            $updated = true;
+            $this->User->begin();
+            // tables that only need creator_id and updater_id updated
+            $updated = $this->_updateCreatorUpdaterId($updated, $primaryAccount, $secondaryAccount);
+            
+            if ($updated) {
+                $this->Session->setFlash(__('Success', true), 'good');
+                $this->User->commit();
+            } else {
+                $this->Session->setFlash(__('Failure', true));
+                $this->User->rollback();
             }
         }
     }
@@ -1265,6 +1289,52 @@ class UsersController extends AppController
         }
         return "<div class='red'>User created but unable to send email
             notification: ". $this->Email->smtpError ."</div>";
+    }
+    
+    /**
+     * _updateCreatorUpdaterId
+     *
+     * @param mixed $updated   updated
+     * @param mixed $primary   primary account
+     * @param mixed $secondary secondary account
+     *
+     * @access private
+     * @return void
+     */
+    private function _updateCreatorUpdaterId($updated, $primary, $secondary)
+    {
+        $updated = $updated && $this->Course->query('UPDATE courses SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+        $updated = $updated && $this->Course->query('UPDATE courses SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        $updated = $updated && $this->Department->query('UPDATE departments SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+        $updated = $updated && $this->Department->query('UPDATE departments SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');            
+        $updated = $updated && $this->EmailTemplate->query('UPDATE email_templates SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+        $updated = $updated && $this->EmailTemplate->query('UPDATE email_templates SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        $updated = $updated && $this->EvaluationMixevalDetail->query('UPDATE evaluation_mixeval_details SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+        $updated = $updated && $this->EvaluationMixevalDetail->query('UPDATE evaluation_mixeval_details SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        $updated = $updated && $this->EvaluationRubricDetail->query('UPDATE evaluation_rubric_details SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+        $updated = $updated && $this->EvaluationRubricDetail->query('UPDATE evaluation_rubric_details SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        $updated = $updated && $this->Event->query('UPDATE events SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+        $updated = $updated && $this->Event->query('UPDATE events SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        $updated = $updated && $this->EventTemplateType->query('UPDATE event_template_types SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+        $updated = $updated && $this->EventTemplateType->query('UPDATE event_template_types SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        $updated = $updated && $this->Faculty->query('UPDATE faculties SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+        $updated = $updated && $this->Faculty->query('UPDATE faculties SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        $updated = $updated && $this->Group->query('UPDATE groups SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+        $updated = $updated && $this->Group->query('UPDATE groups SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        $updated = $updated && $this->GroupEvent->query('UPDATE group_events SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+        $updated = $updated && $this->GroupEvent->query('UPDATE group_events SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        $updated = $updated && $this->Mixeval->query('UPDATE mixevals SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+        $updated = $updated && $this->Mixeval->query('UPDATE mixevals SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        $updated = $updated && $this->Rubric->query('UPDATE rubrics SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+        $updated = $updated && $this->Rubric->query('UPDATE rubrics SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        $updated = $updated && $this->SimpleEvaluation->query('UPDATE simple_evaluations SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+        $updated = $updated && $this->SimpleEvaluation->query('UPDATE simple_evaluations SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        $updated = $updated && $this->SysParameter->query('UPDATE sys_parameters SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+        $updated = $updated && $this->SysParameter->query('UPDATE sys_parameters SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        $updated = $updated && $this->Survey->query('UPDATE surveys SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+        $updated = $updated && $this->Survey->query('UPDATE surveys SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+
+        return $updated;
     }
 
 }
