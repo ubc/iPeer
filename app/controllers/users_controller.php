@@ -1073,6 +1073,89 @@ class UsersController extends AppController
             $this->render('userSummary');
         }
     }
+    
+    /**
+     * merge
+     *
+     * @access public
+     * @return void
+     */
+    function merge() {
+        $searchValue = array(
+            'full_name' => __('Full Name', true),
+            'username' => __('Username', true),
+            'student_no' => __('Student No.', true)
+        );
+        $this->set('title_for_layout', __('Merge Users', true));
+        $this->set('searchValue', $searchValue);
+        $this->set('secondaryAccounts', array());
+        $this->set('primaryAccounts', array());
+        if($this->data) {
+            $primaryAccount = $this->data['User']['primaryAccount'];
+            $secondaryAccount = $this->data['User']['secondaryAccount'];
+            $primaryRole = $this->User->getRoleId($primaryAccount);
+            $secondaryRole = $this->User->getRoleId($secondaryAccount);
+            
+            if ($primaryRole != $secondaryRole) {
+                $this->Session->setFlash(__('Error: The users do not have the same role.', true));
+                return;
+            }
+            
+            if ($primaryAccount == $secondaryAccount) {
+                $this->Session->setFlash(__('Error: No merger needed. The primary and secondary accounts are the same.', true));
+            }
+        }
+    }
+    
+    /**
+     * ajax_merge_options
+     *
+     * @access public
+     * @return void
+     */
+    function ajax_merge() {
+        if (!$this->RequestHandler->isAjax()) {
+            $this->cakeError('error404');
+        }
+        
+        $options = array();
+        switch($_GET['action']) {
+            case 'account':
+                if ($_GET['value'] == '') {
+                    $options = array();
+                } else {
+                    $options = $this->User->find('all', array(
+                        'conditions' => array(
+                            'User.'.$_GET['field'].' LIKE' => "%".$_GET['value']."%",
+                            'Role.id' => array_keys($this->AccessControl->getViewableRoles())
+                    )));
+                    $options = Set::combine($options, '{n}.User.id', '{n}.User.'.$_GET['field']);
+                }
+                break;
+            case 'data':
+                $user = $this->User->findById($_GET['userId']);
+                // initialize user's data with blank fields
+                $options = array('Username', 'LastName', 'FirstName', 'Role', 'Title', 'Email',
+                    'Creator', 'CreateDate', 'Updater', 'UpdateDate');
+                $options = array_combine($options, array_fill(0, 10, ''));
+                if (isset($user)) {
+                    $options['Username'] = $user['User']['username'];
+                    $options['LastName'] = $user['User']['last_name'];
+                    $options['FirstName'] = $user['User']['first_name'];
+                    $options['Role'] = ucwords($this->Role->getRoleName($user['Role']['0']['id']));
+                    $options['Title'] = $user['User']['title'];
+                    $options['Email'] = $user['User']['email'];
+                    $options['Creator'] = $user['User']['creator'];
+                    $options['CreateDate'] = $user['User']['created'];
+                    $options['Updater'] = $user['User']['updater'];
+                    $options['UpdateDate'] = $user['User']['modified'];
+                }
+        }
+        
+        
+        asort($options);
+        $this->set('options', $options);
+    }
 
     /**
      * update

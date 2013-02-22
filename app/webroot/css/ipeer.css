@@ -805,6 +805,55 @@ i {
     margin-top: 0.85em;
 }
 
+/* users/merge */
+
+#UserMergeForm ul li {
+    list-style-type: circle;
+    list-style-position: inside;
+    margin: 0.5em;
+}
+
+#UserMergeForm h3, #UserMergeForm h3 {
+    text-align: center;
+}
+
+#UserMergeForm div#form {
+    overflow: hidden;
+}
+
+#UserMergeForm label{
+    width: auto;
+}
+
+#UserMergeForm div.input.select {
+    margin-top: 2em;
+}
+
+#UserMergeForm .account {
+    width: 30em;
+}
+
+#UserMergeForm div#secondary, #UserMergeForm div#primary{
+    float: right;
+    width: 50%;
+}
+
+#UserMergeForm .search, #UserMergeForm .searchValue {
+    display: inline;
+}
+
+#UserMergeForm .searchValue {
+    width: 25em;
+}
+
+#UserMergeForm #primaryData, #UserMergeForm #secondaryData {
+    padding: 1em;
+}
+
+#UserMergeForm td {
+    width: 50%
+}
+
 /* Courses */
 
 /* courses/add, courses/edit */
