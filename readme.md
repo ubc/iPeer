@@ -1,3 +1,8 @@
+iPeer 3.0.4
+---------------------------
+This is a maintenance release. It is recommended to upgrade to this version as it fixes a one critical bug.
+* Fix submissions for simple evaluation are not stored correctly
+
 iPeer 3.0.3
 ----------------------------
 This is a maintenance release. It is recommended to upgrade to this version as it fixes a one critical bug.
