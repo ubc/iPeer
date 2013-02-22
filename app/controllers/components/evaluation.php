@@ -1336,10 +1336,6 @@ class EvaluationComponent extends Object
         return $result;
     }
 
-<<<<<<< HEAD
-=======
-
-
     /**
      * saveSurveyEvaluation
      * Survey Evaluation functions
