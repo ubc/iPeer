@@ -19,6 +19,8 @@ class MixevalQuestionDesc extends AppModel
         )
     );
 
+    var $actsAs = array('Containable');
+
     /**
      * Saves Mix evaluation question descriptions to database
      *
@@ -50,30 +52,6 @@ class MixevalQuestionDesc extends AppModel
         }
     }
 
-
-    // called by mixevals controller during an edit of an
-    // existing mixeval question comment(s)
-  /* FUNCTION NOT BEING USED
-  function updateQuestionDescriptor($id=null, $data)
-{
-    $this->delete($id);
-    $this->insertQuestionDescriptor($id, $data);
-  }*/
-
-    //  // called by the delete function in the controller
-    //  function deleteQuestionDescriptors( $id )
-    //            {
-    //
-    //
-    //
-    //  	$this->query('DELETE
-    //  				  FROM mixevals_question_descs
-    //  				  WHERE question_id IN
-    //  				  	(SELECT id
-    //  				  	FROM mixevals_questions
-    //  				  	WHERE id='.$id.')');
-    //  }
-
     /**
      * getQuestionDescriptor function to return the question's descriptor
      *
@@ -84,16 +62,9 @@ class MixevalQuestionDesc extends AppModel
      */
     function getQuestionDescriptor($questionId)
     {
-/*		$data = $this->find('all','mixeval_id='.$mixevalId.' AND question_num='.$questionNum, null, 'scale_level ASC');
-return $data;*/
-    /*return $this->find('all', array(
-            'conditions' => array('mixeval_id' => $mixevalId, 'question_num' => $questionNum),
-            'order' => 'MixevalQuestionDesc.id ASC'
-    ));*/
         return $this->find('all', array('conditions' => array('question_id' => $questionId),
             'order' => 'MixevalQuestionDesc.id ASC'));
     }
-
 
     /**
      * getCommentQuestionsByMixEvalId Gets the mixeval comment type questions.

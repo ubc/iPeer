@@ -12,7 +12,7 @@ class MixevalsController extends AppController
 {
     public $uses =  array('Event', 'Mixeval','MixevalQuestion', 
         'MixevalQuestionDesc', 'Personalize', 'UserCourse', 
-        'MixevalQuestionType');
+        'MixevalQuestionType', 'EvaluationSubmission');
     public $name = 'Mixevals';
     public $helpers = array('Html','Ajax','Javascript','Time');
     public $components = array('AjaxList','Auth','Output', 'userPersonalize', 'framework');
@@ -258,61 +258,71 @@ class MixevalsController extends AppController
      */
     function add()
     {
+        // Check that the user has permission to access this page
+        if (!User::hasPermission('controllers/Mixevals')) {
+            $this->Session->setFlash(_t('Error: You do not have permission to edit this evaluation'));
+            $this->redirect('index');
+            return;
+        }
+
+        // Load data for the view
         $mixeval_question_types = $this->MixevalQuestionType->find('list');
         $this->set('mixevalQuestionTypes', $mixeval_question_types);
+
+        // Process form submit
         if (!empty($this->data)) {
-            // Since users can move questions around, we have two different
-            // question orderings that needs to be dealth with: The order
-            // in which the questions were inserted and the order in which
-            // the user wants to questions to be.
-            
-            // Reorder the questions so that they match the numbering that
-            // the user wanted, also create a mapping from the insertion
-            // order to the user order.
-            $userOrder = array();
+            // Reorder the questions so that they're contiguous starting from 0.
+            // This is necessary because the question indexes can be missing
+            // questions due to users moving them around, and form persistence
+            // on save failure requires 0 indexed contiguous arrays.
+            // What's helpful is that question_num has been kept contiguous by
+            // javascript, unfortunately, it's indexed from 1 instead of 0 for
+            // user friendliness.
+            $newOrder = array(); // maps old index to new index, this is for
+                                // fixing the QuestionDesc indexes, which
+                                // is still referring to the old index
             if (isset($this->data['MixevalQuestion'])) {
-                $orderedQs = array();
-                foreach ($this->data['MixevalQuestion'] as $key => $q) {
-                   $orderedQs[$q['question_num']] = $q; 
-                   $userOrder[$key] = $q['question_num'];
+                $contiguousQs = array();
+                foreach ($this->data['MixevalQuestion'] as $oldIndex => $q) {
+                    $newIndex = $q['question_num'] - 1;
+                    $contiguousQs[$newIndex] = $q; 
+                    $newOrder[$oldIndex] = $newIndex;
                 }
-                $this->data['MixevalQuestion'] = $orderedQs;
+                $this->data['MixevalQuestion'] = $contiguousQs;
             }
 
-            // also give a scale_level to each question desc. Note that this
-            // implemention depends on the order of the question desc always
-            // being sequential. E.g. If Q1 has descs # 3, 8, 5534, 23323, then
-            // we assume that the lowest desc # (3 in this case) is the lowest
-            // scale (1) and 23323 is the desc for the highest scale (4 in this
-            // case) 
+            // Question desc has the same problem with needing to be contiguous.
+            // We also need to edit the question desc data: 
+            // - Update question_index to the new question indexes.
+            // - Determine each desc's scale level.
+            //
+            // Determining each desc's scale level depends on the order of the 
+            // question desc always being sequential. E.g. If Q1 has descs # 3, 
+            // 8, 5534, 23323, then we assume that the lowest desc # (3 in this 
+            // case) is the lowest scale (1) and 23323 is the desc for the 
+            // highest scale (4 in this case) 
             if (isset($this->data['MixevalQuestionDesc'])) {
-                // we also want to make sure that the descriptors have an index
-                // that monotonically increases by 1 each entry to make our 
-                // life easier when restoring form state in the view. Also 
-                // needs to be indexed from 1 and not 0, so we'll put in a fake 
-                // 0 element and remove it later. 
-                $orderedDescs = array(0 => 'blah');
-                // map question num to scale, this keeps track of how many
+                $contiguousDescs = array();
+                // map old question index to scale, this keeps track of how many
                 // descriptors for each question we've seen so far (and hence,
                 // the scale level)
                 $descScale = array(); 
                 foreach ($this->data['MixevalQuestionDesc'] as $desc) {
-                    $qNum = $desc['question_id']; // this is the insertion order
-                    // change to user order
-                    $desc['question_id'] = $userOrder[$qNum];
+                    $oldIndex = $desc['question_index'];
+                    // fix the index
+                    $desc['question_index'] = $newOrder[$oldIndex];
                     // assign the appropriate scale
-                    if (!isset($descScale[$qNum])) {
-                        $descScale[$qNum] = 1;
+                    if (!isset($descScale[$oldIndex])) {
+                        $descScale[$oldIndex] = 1;
                     }
                     else {
-                        $descScale[$qNum]++;
+                        $descScale[$oldIndex]++;
                     }
-                    $desc['scale_level'] = $descScale[$qNum];
-
-                    $orderedDescs[] = $desc;
+                    $desc['scale_level'] = $descScale[$oldIndex];
+                    // make contiguous
+                    $contiguousDescs[] = $desc;
                 }
-                unset($orderedDescs[0]);
-                $this->data['MixevalQuestionDesc'] = $orderedDescs;
+                $this->data['MixevalQuestionDesc'] = $contiguousDescs;
             }
 
             $this->_transactionalSave();
@@ -372,19 +382,19 @@ class MixevalsController extends AppController
         }
 
         // Save the MixevalQuestionDesc
-        // Have to remap question_id to the correct question
+        // Have to give a question_id to each question desc
         if ($continue && isset($this->data['MixevalQuestionDesc'])) {
             // first, need to map question number to question id
             $questions = $this->MixevalQuestion->findAllByMixevalId(
                 $this->Mixeval->id);
-            $qNumToId = array(); 
+            $qIndexToId = array(); 
             foreach ($questions as $q) {
                 $q = $q['MixevalQuestion'];
-                $qNumToId[$q['question_num']] = $q['id'];
+                $qIndexToId[$q['question_num'] - 1] = $q['id'];
             }
             // try to save each question desc
             foreach ($this->data['MixevalQuestionDesc'] as $d) {
-                $d['question_id'] = $qNumToId[$d['question_id']];
+                $d['question_id'] = $qIndexToId[$d['question_index']];
                 $saveDesc = array('MixevalQuestionDesc' => $d);
                 $this->MixevalQuestionDesc->create();
                 if (!$this->MixevalQuestionDesc->save($saveDesc)) {

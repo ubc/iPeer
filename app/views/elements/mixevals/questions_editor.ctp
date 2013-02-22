@@ -3,6 +3,10 @@
  * primary complexity here is that there's a lot of fragile state to keep track 
  * of due to the need to keep the questions numbered sequentially as a user 
  * adds and removes questions.
+ *
+ * The key idea here is that a question's question_num field keeps track of
+ * the order that the user wants the questions in while the question's array
+ * index does NOT change while in the view.
  */
 
 /* Each question type can have unique options for the user to configure, this 
@@ -13,22 +17,21 @@ function makeQ($view, $qType, $i, $qTypes)
     $html = $view->Html;
     $form = $view->Form;
 
-    // TODO PERSISTENCE FOR mixeval question desc
     $qTypeId = 0;
     $qHeader = "";
     $qFields = "";
     switch ($qType) {
     case 'Likert':
-        $qHeader = _('Likert Answer Question');
+        $qHeader = _t('Likert Answer Question');
         $qTypeId = array_search($qType, $qTypes);
         $qFields = likertFields($view, $i);
         break;
     case 'Paragraph':
-        $qHeader = _('Paragraph Answer Question');
+        $qHeader = _t('Paragraph Answer Question');
         $qTypeId = array_search($qType, $qTypes);
         break;
     case 'Sentence':
-        $qHeader = _('Sentence Answer Question');
+        $qHeader = _t('Sentence Answer Question');
         $qTypeId = array_search($qType, $qTypes);
         break;
     default:
@@ -58,7 +61,7 @@ function makeQ($view, $qType, $i, $qTypes)
     );
     $controls = "$removeLink $upLink $downLink";
     // give an ID to the question number for easy renumbering later on
-    $qNum = $html->tag('span', "$i. ", array('id' => "questionNum$i"));
+    $qNum = $html->tag('span', $i + 1 . ". ", array('id' => "questionIndex$i"));
     $ret = $html->div('MixevalMakeQuestion',
         $html->tag('h3', "$controls $qNum $qHeader") .
         $form->input("MixevalQuestion.$i.title", 
@@ -67,7 +70,8 @@ function makeQ($view, $qType, $i, $qTypes)
         $form->input("MixevalQuestion.$i.required") .
         $form->hidden("MixevalQuestion.$i.mixeval_question_type_id",
             array('value' => $qTypeId)) .
-        $form->hidden("MixevalQuestion.$i.question_num", array('value' => $i)) .
+        $form->hidden("MixevalQuestion.$i.question_num", 
+            array('value' => $i + 1)) .
         $qFields
         ,
         array('id' => "question$i")
@@ -84,7 +88,7 @@ function likertFields($view, $i) {
     $descs = '';
     if (isset($view->data['MixevalQuestionDesc'])) {
         foreach ($view->data['MixevalQuestionDesc'] as $key => $d) {
-            if ($d['question_id'] == $i) {
+            if ($d['question_index'] == $i) {
                 // note that $key is indexed from 0 while we want the more
                 // user friendly indexed from 1, hence the +1
                 $descs .= makeDesc($view, $i, $key);
@@ -95,7 +99,7 @@ function likertFields($view, $i) {
     $ret = $form->input("MixevalQuestion.$i.multiplier", 
         array('label' => 'Marks'));
     $ret .= $html->div("help-text", 
-        _('This mark will be scaled according to the response. E.g.: If there are 5 scale levels and this is set at 1, the lowest scale will be worth 0.2 marks, the second lowest 0.4 marks, and so on with the highest scale being worth the full 1 mark.'));
+        _t('This mark will be scaled according to the response. E.g.: If there are 5 scale levels and this is set at 1, the lowest scale will be worth 0.2 marks, the second lowest 0.4 marks, and so on with the highest scale being worth the full 1 mark.'));
     $ret .= $html->div('',
         $form->label(null, 'Scale', array('class' => 'defLabel')) .
         $form->button("Add", array('type' => 'button', 
@@ -112,7 +116,7 @@ function makeDesc($view, $qNum, $descNum) {
 
     $ret = $html->div('MixevalQuestionDesc',
         $form->text("MixevalQuestionDesc.$descNum.descriptor") .
-        $form->hidden("MixevalQuestionDesc.$descNum.question_id", 
+        $form->hidden("MixevalQuestionDesc.$descNum.question_index", 
             array('value' => $qNum, 'class' => "MixevalQuestionDesc$qNum")) .
         $html->link('x', '#', 
             array(
@@ -130,7 +134,7 @@ function makeDesc($view, $qNum, $descNum) {
  * from a failed submit, we need to reload all the questions they've already 
  * configured, so they don't have to enter them all over again. 
  */
-$numQ = 1; // for initializing the javascript counter that track questions
+$numQ = 0; // for initializing the javascript counter that track questions
 $numQArray = ""; // for initializing the javascript array that tracks questions
 $reloadedQ = "";
 if (isset($this->data) && isset($this->data['MixevalQuestion'])) {
@@ -147,9 +151,9 @@ if (isset($this->data) && isset($this->data['MixevalQuestion'])) {
     }
 }
 // initialize the javascript counter that tracks descriptors
-$numDesc = 1;
+$numDesc = 0;
 if (isset($this->data['MixevalQuestionDesc'])) {
-    $numDesc = count($this->data['MixevalQuestionDesc']) + 1;
+    $numDesc = count($this->data['MixevalQuestionDesc']);
 }
 
 // Finally, we create the div that will hold all these questions
@@ -158,8 +162,8 @@ echo $html->div('', $reloadedQ, array('id' => 'questions'));
 
 <script type="text/javascript">
 // tracking variables that tells us what ID to give to the next question or desc
-var numQ = <?php echo $numQ; ?>; // the total number of questions + 1
-// the total number of descriptors + 1
+var numQ = <?php echo $numQ; ?>; // the total number of questions
+// the total number of descriptors
 var numDesc = <?php echo $numDesc; ?>; 
 // keeps track of currently valid user ids, cause users can remove questions
 var questionIds = new Array(<?php echo $numQArray; ?>);
@@ -248,7 +252,7 @@ function downQ(qNum) {
 function reorderQ() {
     for (var i = 0; i < questionIds.length; i++) {
         var staticId = questionIds[i];
-        jQuery("#questionNum" + staticId).text(i + 1 + '. ');
+        jQuery("#questionIndex" + staticId).text(i + 1 + '. ');
         jQuery("#MixevalQuestion" + staticId + "QuestionNum").val(i + 1);
         console.log(".MixevalQuestionDesc" + staticId);
         jQuery(".MixevalQuestionDesc" + staticId).val(i + 1);

@@ -130,15 +130,15 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
             "MixevalQuestionDesc" => array(
                 "1" => array(
                     "descriptor" => 'Likert Scale 1',
-                    "question_id" => 1
+                    "question_index" => 1
                 ),
                 "2" => array(
                     "descriptor" => 'Likert Scale 2',
-                    "question_id" => 1
+                    "question_index" => 1
                 ),
                 "3" => array(
                     "descriptor" => 'Likert Scale 3',
-                    "question_id" => 1
+                    "question_index" => 1
                 ),
             ),
         );
@@ -238,22 +238,19 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
             "MixevalQuestionDesc" => array(
                 "2" => array(
                     "descriptor" => 'Likert Q1 Scale 1',
-                    // the question_id here is expected to be question index 
-                    // when submitted from the form, which for Question 1 is 4 
-                    // in this case
-                    "question_id" => 4 
+                    "question_index" => 4 
                 ),
                 "4" => array(
                     "descriptor" => 'Likert Q1 Scale 2',
-                    "question_id" => 4
+                    "question_index" => 4
                 ),
                 "1" => array(
                     "descriptor" => 'Likert Q2 Scale 1',
-                    "question_id" => 2
+                    "question_index" => 2
                 ),
                 "6" => array(
                     "descriptor" => 'Likert Q2 Scale 2',
-                    "question_id" => 2
+                    "question_index" => 2
                 ),
             ),
         );
