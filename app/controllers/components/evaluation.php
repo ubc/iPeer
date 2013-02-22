@@ -285,10 +285,10 @@ class EvaluationComponent extends Object
         }
 
         // if no submission exists, create one
-        $sub = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($grpEvent, $evaluator);
-        if (empty($sub)) {       
-            $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $grpEvent;
-            $evaluationSubmission['EvaluationSubmission']['event_id'] = $event;
+        $sub = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'], $evaluator);
+        if (empty($sub)) {
+            $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEvent['GroupEvent']['id'];
+            $evaluationSubmission['EvaluationSubmission']['event_id'] = $groupEvent['GroupEvent']['event_id'];
             $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
             // save evaluation submission
             $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
@@ -1685,8 +1685,8 @@ class EvaluationComponent extends Object
             $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
             $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
             $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
-        } 
-        
+        }
+
         $surveyInput = array();
         $surveyInput['SurveyInput']['user_id'] = $userId;
         $surveyInput['SurveyInput']['event_id'] = $eventId;
