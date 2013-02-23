@@ -379,6 +379,43 @@ class MixevalsController extends AppController
         $continue = true;
         $this->Mixeval->begin();
 
+        // Only try deleting stuff if we're editing
+        if (isset($this->data['Mixeval']['id'])) {
+            // Delete removed questions
+            $existingQs = $this->MixevalQuestion->findAllByMixevalId(
+                $this->data['Mixeval']['id']);
+
+            function getExistingQId($x) { return $x['MixevalQuestion']['id']; }
+            $existingQIds = array_map('getExistingQId', $existingQs);
+
+            function getId($x) { return isset($x['id']) ? $x['id'] : null; }
+            $submittedQIds = array_map('getId', 
+                $this->data['MixevalQuestion']);
+
+            $deletedQIds = array_diff($existingQIds, $submittedQIds);
+
+            foreach ($deletedQIds as $id) {
+                $this->MixevalQuestion->delete($id);
+            }
+
+            // Delete removed question descs
+            function getExistingDescId($x) 
+                { return array_map('getId', $x['MixevalQuestionDesc']); }
+            $existingQDescIds = array_map('getExistingDescId', $existingQs);
+            $existingQDescIds = array_reduce($existingQDescIds, 
+                'array_merge', array());
+
+            $submittedQDescIds = array_map('getId', 
+                $this->data['MixevalQuestionDesc']);
+
+            $deletedDescIds = array_diff($existingQDescIds, $submittedQDescIds);
+
+            foreach ($deletedDescIds as $id) {
+                $this->MixevalQuestionDesc->delete($id);
+            }
+        }
+
+        // Save the Mixeval info
         if ($continue) {
             $ret = $this->Mixeval->save($this->data); 
             if (!$ret) {
@@ -436,6 +473,8 @@ class MixevalsController extends AppController
             $this->Mixeval->commit();
             $this->Session->setFlash(
                 _t('The mixed evaluation was saved successfully.'), 'good');
+            // TODO Maybe redirect to view evaluation instead?
+            // And put an Edit button in the view evaluation too
             $this->redirect('index');
             return;
         }
@@ -456,11 +495,12 @@ class MixevalsController extends AppController
     {
         // Check that the user has permission to access this page
         if (!User::hasPermission('functions/superadmin')) {
-            // instructor
+            // check people who are not superadmins
             if (!User::hasPermission('controllers/departments')) {
+            // instructor
                 $instructorIds = array($this->Auth->user('id'));
-            // admins
             } else {
+            // admins
                 // course ids
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
                 // instructors
@@ -479,7 +519,7 @@ class MixevalsController extends AppController
         }
 
         // Check that there's actually a mixeval with the given ID
-        if (!is_numeric($id) && 
+        if (!is_numeric($id) || 
             !$this->Mixeval->field('id', array('id' => $id))
         ){
             $this->Session->setFlash(_t('Error: Invalid ID.'));
@@ -511,54 +551,56 @@ class MixevalsController extends AppController
             }
         }
 
-        if (empty($this->data)) {
-            // Load existing data
-            $this->data = $this->Mixeval->find(
-                'first', 
-                array(
-                    'conditions' => array('id' => $id),
-                    'contain' => array('MixevalQuestion.MixevalQuestionDesc')
-                )
-            );
-            $qIds = $this->MixevalQuestion->find(
-                'list',
-                array(
-                    'conditions' => array('mixeval_id' => $id),
-                    'fields' => array('id')
-                )
-            );
-            $descs = $this->MixevalQuestionDesc->find(
-                'all',
-                array(
-                    'conditions' => array('question_id' => $qIds),
-                    'contain' => false,
-                )
-            );
-            // Find all returns data in a different format than form submit, and
-            // since the question editor expects data in form submit format, we
-            // need to change the $descs data to the expected format.
-            //
-            // Also need to add a question_index to each question descriptor.
-
-            // get a mapping of question id to question index.
-            $qIdToIndex = array();
-            foreach ($this->data['MixevalQuestion'] as $index => $q) {
-                $qIdToIndex[$q['id']] = $index;
-            }
-            $tmpDescs = array();
-            foreach ($descs as $d) {
-                $d = $d['MixevalQuestionDesc'];
-                $d['question_index'] = $qIdToIndex[$d['question_id']];
-                $tmpDescs[] = $d;
-            }
-            $this->data['MixevalQuestionDesc'] = $tmpDescs;
-        } else {
-            // Save changes
+        // Save changes if there are any
+        if (!empty($this->data)) {
             $this->_dataSavePrep();
             $this->_transactionalSave();
         }
 
-        // Load data for the view
+        // Load existing mix evaluation data for the view
+        // Needs to be here since we need to reload the data after a save, or 
+        // the js question tracking will get confused due to the differing
+        // question indexes.
+        $this->data = $this->Mixeval->find(
+            'first', 
+            array(
+                'conditions' => array('id' => $id),
+                'contain' => array('MixevalQuestion.MixevalQuestionDesc')
+            )
+        );
+        $qIds = $this->MixevalQuestion->find(
+            'list',
+            array(
+                'conditions' => array('mixeval_id' => $id),
+                'fields' => array('id')
+            )
+        );
+        $descs = $this->MixevalQuestionDesc->find(
+            'all',
+            array(
+                'conditions' => array('question_id' => $qIds),
+                'contain' => false,
+            )
+        );
+        // find all returns data in a different format than form submit, and
+        // since the question editor expects data in form submit format, we
+        // need to change the $descs data to the expected format.
+        
+        // also need to add a question_index to each question descriptor, we do
+        // this with a mapping of question id to question index.
+        $qIdToIndex = array();
+        foreach ($this->data['MixevalQuestion'] as $index => $q) {
+            $qIdToIndex[$q['id']] = $index;
+        }
+        $tmpDescs = array();
+        foreach ($descs as $d) {
+            $d = $d['MixevalQuestionDesc'];
+            $d['question_index'] = $qIdToIndex[$d['question_id']];
+            $tmpDescs[] = $d;
+        }
+        $this->data['MixevalQuestionDesc'] = $tmpDescs;
+
+        // Load other stuff for the view
         $mixeval_question_types = $this->MixevalQuestionType->find('list');
         $this->set('mixevalQuestionTypes', $mixeval_question_types);
         $this->set('breadcrumb', 
