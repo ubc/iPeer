@@ -38,6 +38,7 @@ function makeQ($view, $qType, $i, $qTypes)
        return ""; // unrecognized question type
     }
 
+    // Build the remove, move up, move down controls
     $removeLink = $html->link('x', '#', 
         array(
             'class' => 'removeQ', 
@@ -60,10 +61,18 @@ function makeQ($view, $qType, $i, $qTypes)
         )
     );
     $controls = "$removeLink $upLink $downLink";
+    // If we're editing a previously saved question, will need to have an id for
+    // the question.
+    $hiddenIdField = "";
+    if (isset($view->data['MixevalQuestion'][$i]['id'])) {
+        $hiddenIdField = $form->hidden("MixevalQuestion.$i.id");
+    }
+    
     // give an ID to the question number for easy renumbering later on
     $qNum = $html->tag('span', $i + 1 . ". ", array('id' => "questionIndex$i"));
     $ret = $html->div('MixevalMakeQuestion',
         $html->tag('h3', "$controls $qNum $qHeader") .
+        $hiddenIdField .
         $form->input("MixevalQuestion.$i.title", 
             array("type" => "text", "label" => "Question")) .
         $form->input("MixevalQuestion.$i.instructions") .
@@ -114,7 +123,15 @@ function makeDesc($view, $qNum, $descNum) {
     $html = $view->Html;
     $form = $view->Form;
 
+    // If we're editing a previously saved question, will need to have an id for
+    // the question desc
+    $hiddenIdField = "";
+    if (isset($view->data['MixevalQuestionDesc'][$descNum]['id'])) {
+        $hiddenIdField = $form->hidden("MixevalQuestionDesc.$descNum.id");
+    }
+
     $ret = $html->div('MixevalQuestionDesc',
+        $hiddenIdField . 
         $form->text("MixevalQuestionDesc.$descNum.descriptor") .
         $form->hidden("MixevalQuestionDesc.$descNum.question_index", 
             array('value' => $qNum, 'class' => "MixevalQuestionDesc$qNum")) .

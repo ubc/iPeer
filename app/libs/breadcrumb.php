@@ -26,6 +26,10 @@ class Breadcrumb
             'url' => '/groups/index/',
             'key' => 'course_id'
         ),
+        'mixevals' => array(
+            'display' => 'Mixed Evaluations',
+            'url' => '/mixevals',
+        ),
         'surveys' => array(
             'url' => '/surveys',
         ),
