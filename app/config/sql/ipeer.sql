@@ -546,6 +546,7 @@ INSERT INTO aros_acos (id, aro_id, aco_id, _create, _read, _update, _delete) VAL
 (114, 5, 317, '1', '1', '1', '1'),
 (115, 5, 318, '-1', '-1', '-1', '-1'),
 (116, 5, 319, '-1', '-1', '-1', '-1');
+
 -- --------------------------------------------------------
 
 --
@@ -1024,21 +1025,6 @@ CREATE TABLE IF NOT EXISTS `mixevals` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `mixeval_question_descs`
---
-
-DROP TABLE IF EXISTS `mixeval_question_descs`;
-CREATE TABLE IF NOT EXISTS `mixeval_question_descs` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `question_id` int(11) NOT NULL DEFAULT '0',
-  `scale_level` int(11) NOT NULL DEFAULT '0',
-  `descriptor` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `question_num` (`question_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
 
 -- --------------------------------------------------------
 
@@ -1081,9 +1067,27 @@ CREATE TABLE IF NOT EXISTS `mixeval_questions` (
   `scale_level` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   FOREIGN KEY (`mixeval_question_type_id`) REFERENCES `mixeval_question_types` 
+	(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`mixeval_id`) REFERENCES `mixevals` 
 	(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `mixeval_question_descs`
+--
+
+DROP TABLE IF EXISTS `mixeval_question_descs`;
+CREATE TABLE IF NOT EXISTS `mixeval_question_descs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `question_id` int(11) NOT NULL DEFAULT '0',
+  `scale_level` int(11) NOT NULL DEFAULT '0',
+  `descriptor` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`question_id`) REFERENCES `mixeval_questions` 
+	(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
 
 -- --------------------------------------------------------
 

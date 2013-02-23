@@ -1280,43 +1280,6 @@ INSERT INTO `mixevals` (`id`, `name`, `zero_mark`, `availability`, `creator_id`,
 -- --------------------------------------------------------
 
 --
--- Table structure for table `mixeval_question_descs`
---
-
-DROP TABLE IF EXISTS `mixeval_question_descs`;
-CREATE TABLE IF NOT EXISTS `mixeval_question_descs` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `question_id` int(11) NOT NULL DEFAULT '0',
-  `scale_level` int(11) NOT NULL DEFAULT '0',
-  `descriptor` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `question_num` (`question_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
-
---
--- Dumping data for table `mixeval_question_descs`
---
-
-INSERT INTO `mixeval_question_descs` (`id`, `question_id`, `scale_level`, `descriptor`) VALUES
-(1, 1, 1, 'Lowest'),
-(2, 1, 2, NULL),
-(3, 1, 3, 'Middle'),
-(4, 1, 4, NULL),
-(5, 1, 5, 'Highest'),
-(6, 2, 1, 'Lowest'),
-(7, 2, 2, NULL),
-(8, 2, 3, 'Middle'),
-(9, 2, 4, NULL),
-(10, 2, 5, 'Highest'),
-(11, 3, 1, 'Lowest'),
-(12, 3, 2, NULL),
-(13, 3, 3, 'Middle'),
-(14, 3, 4, NULL),
-(15, 3, 5, 'Highest');
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `mixeval_question_types`
 --
 
@@ -1355,6 +1318,8 @@ CREATE TABLE IF NOT EXISTS `mixeval_questions` (
   `scale_level` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   FOREIGN KEY (`mixeval_question_type_id`) REFERENCES `mixeval_question_types` 
+	(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`mixeval_id`) REFERENCES `mixevals` 
 	(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
 
@@ -1369,6 +1334,44 @@ INSERT INTO `mixeval_questions` (`id`, `mixeval_id`, `question_num`, `title`, `i
 (4, 1, 4, 'Produced efficient work?', NULL, 3, 1, 0, 5),
 (5, 1, 5, 'Contributed?', "Please give a paragraph answer.", 2, 1, 0, 5),
 (6, 1, 6, 'Easy to work with?', NULL, 3, 0, 0, 5);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `mixeval_question_descs`
+--
+
+DROP TABLE IF EXISTS `mixeval_question_descs`;
+CREATE TABLE IF NOT EXISTS `mixeval_question_descs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `question_id` int(11) NOT NULL DEFAULT '0',
+  `scale_level` int(11) NOT NULL DEFAULT '0',
+  `descriptor` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`question_id`) REFERENCES `mixeval_questions` 
+	(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
+
+--
+-- Dumping data for table `mixeval_question_descs`
+--
+
+INSERT INTO `mixeval_question_descs` (`id`, `question_id`, `scale_level`, `descriptor`) VALUES
+(1, 1, 1, 'Lowest'),
+(2, 1, 2, NULL),
+(3, 1, 3, 'Middle'),
+(4, 1, 4, NULL),
+(5, 1, 5, 'Highest'),
+(6, 2, 1, 'Lowest'),
+(7, 2, 2, NULL),
+(8, 2, 3, 'Middle'),
+(9, 2, 4, NULL),
+(10, 2, 5, 'Highest'),
+(11, 3, 1, 'Lowest'),
+(12, 3, 2, NULL),
+(13, 3, 3, 'Middle'),
+(14, 3, 4, NULL),
+(15, 3, 5, 'Highest');
 
 -- --------------------------------------------------------
 
