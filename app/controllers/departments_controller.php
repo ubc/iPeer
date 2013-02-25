@@ -30,12 +30,12 @@ class DepartmentsController extends AppController {
         } else {
             $uf = $this->UserFaculty->findAllByUserId($this->Auth->user('id'));
             $ret = $this->Department->getByUserFaculties($uf);
+            if (empty($ret)) {
+                $this->Session->setFlash(__('You do not have access to any faculties', true));
+                $this->redirect('/pages/admin');
+            }
         }
 
-        if (empty($ret)) {
-            $this->Session->setFlash(__('You do not have access to any faculties', true));
-            $this->redirect('/pages/admin');
-        }
 
         $departments = array();
         foreach ($ret as $department) {
