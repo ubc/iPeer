@@ -128,7 +128,7 @@ class V1Controller extends Controller {
         } else if ($this->RequestHandler->isDelete()) {
             $reqType = "DELETE";
         }
-        $params = "$reqType&" . rawurlencode(Router::url($this->here, true))
+        $params = "$reqType&" . rawurlencode(Router::url(null, true))
             . "&" . rawurlencode($params);
         // construct the key used for hmac calculation
         $clientSecret = $this->_getClientSecret($_REQUEST['oauth_consumer_key']);
