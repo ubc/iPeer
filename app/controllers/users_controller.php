@@ -19,7 +19,8 @@ class UsersController extends AppController
         'Department', 'CourseDepartment', 'OauthClient', 'OauthToken',
         'UserCourse', 'UserTutor', 'Faculty', 'UserFaculty', 'EmailTemplate', 'EvaluationMixevalDetail',
         'EvaluationRubricDetail', 'EventTemplateType', 'Event', 'Faculty', 'GroupEvent',
-        'Mixeval', 'Rubric', 'SimpleEvaluation', 'SysParameter', 'Survey'
+        'Mixeval', 'Rubric', 'SimpleEvaluation', 'SysParameter', 'Survey', 'EvaluationMixeval',
+        'EvaluationSimple', 'EvaluationRubric', 'GroupsMembers', 'SurveyGroupMember', 'SurveyInput'
     );
     public $components = array('Session', 'AjaxList', 'RequestHandler',
         'Email', 'FileUpload.FileUpload', 'PasswordGenerator');
@@ -1082,7 +1083,8 @@ class UsersController extends AppController
      * @access public
      * @return void
      */
-    function merge() {
+    function merge() 
+    {
         $searchValue = array(
             'full_name' => __('Full Name', true),
             'username' => __('Username', true),
@@ -1119,7 +1121,10 @@ class UsersController extends AppController
             $updated = true;
             $this->User->begin();
             // tables that only need creator_id and updater_id updated
-            $updated = $this->_updateCreatorUpdaterId($updated, $primaryAccount, $secondaryAccount);
+            $updated = $updated && $this->_updateCreatorUpdaterId($updated, $primaryAccount, $secondaryAccount);
+            $updated = $updated && $this->_updateUserCourse($updated, $primaryAccount, $secondaryAccount);
+            $updated = $updated && $this->_updateEvaluations($updated, $primaryAccount, $secondaryAccount);
+            $updated = $updated && $this->_updateUserId($updated, $primaryAccount, $secondaryAccount);
             
             if ($updated) {
                 $this->Session->setFlash(__('Success', true), 'good');
@@ -1303,38 +1308,143 @@ class UsersController extends AppController
      */
     private function _updateCreatorUpdaterId($updated, $primary, $secondary)
     {
-        $updated = $updated && $this->Course->query('UPDATE courses SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-        $updated = $updated && $this->Course->query('UPDATE courses SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
-        $updated = $updated && $this->Department->query('UPDATE departments SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-        $updated = $updated && $this->Department->query('UPDATE departments SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');            
-        $updated = $updated && $this->EmailTemplate->query('UPDATE email_templates SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-        $updated = $updated && $this->EmailTemplate->query('UPDATE email_templates SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
-        $updated = $updated && $this->EvaluationMixevalDetail->query('UPDATE evaluation_mixeval_details SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-        $updated = $updated && $this->EvaluationMixevalDetail->query('UPDATE evaluation_mixeval_details SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
-        $updated = $updated && $this->EvaluationRubricDetail->query('UPDATE evaluation_rubric_details SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-        $updated = $updated && $this->EvaluationRubricDetail->query('UPDATE evaluation_rubric_details SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
-        $updated = $updated && $this->Event->query('UPDATE events SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-        $updated = $updated && $this->Event->query('UPDATE events SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
-        $updated = $updated && $this->EventTemplateType->query('UPDATE event_template_types SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-        $updated = $updated && $this->EventTemplateType->query('UPDATE event_template_types SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        $models = array('Course', 'Department', 'EmailTemplate', 'EvaluationMixevalDetail',
+            'EvaluationRubricDetail', 'Event', 'EventTemplateType', 'Group',
+            'GroupEvent', 'Mixeval', 'Rubric', 'SimpleEvaluation', 'SysParameter', 'Survey');
+        foreach ($models as $model) {
+            $name = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $model)).'s';
+            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        }
         $updated = $updated && $this->Faculty->query('UPDATE faculties SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
         $updated = $updated && $this->Faculty->query('UPDATE faculties SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
-        $updated = $updated && $this->Group->query('UPDATE groups SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-        $updated = $updated && $this->Group->query('UPDATE groups SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
-        $updated = $updated && $this->GroupEvent->query('UPDATE group_events SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-        $updated = $updated && $this->GroupEvent->query('UPDATE group_events SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
-        $updated = $updated && $this->Mixeval->query('UPDATE mixevals SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-        $updated = $updated && $this->Mixeval->query('UPDATE mixevals SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
-        $updated = $updated && $this->Rubric->query('UPDATE rubrics SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-        $updated = $updated && $this->Rubric->query('UPDATE rubrics SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
-        $updated = $updated && $this->SimpleEvaluation->query('UPDATE simple_evaluations SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-        $updated = $updated && $this->SimpleEvaluation->query('UPDATE simple_evaluations SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
-        $updated = $updated && $this->SysParameter->query('UPDATE sys_parameters SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-        $updated = $updated && $this->SysParameter->query('UPDATE sys_parameters SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
-        $updated = $updated && $this->Survey->query('UPDATE surveys SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-        $updated = $updated && $this->Survey->query('UPDATE surveys SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
 
         return $updated;
     }
 
+    /**
+     * _updateUserCourse
+     *
+     * @param mixed $updated   updated
+     * @param mixed $primary   primary account
+     * @param mixed $secondary secondary account
+     *
+     * @access private
+     * @return void
+     */
+    private function _updateUserCourse($updated, $primary, $secondary)
+    {
+        $functionNames = array(
+            'UserTutor' => 'removeTutor', 
+            'UserEnrol' => 'unenrolStudent', 
+            'UserCourse' => 'removeInstructor'
+        );
+        $models = array_keys($functionNames);
+        foreach ($models as $model) {
+            $primaryTutor = Set::extract('/'.$model.'/course_id', $this->$model->findAllByUserId($primary));
+            $secondaryTutor = Set::extract('/'.$model.'/course_id', $this->$model->findAllByUserId($secondary));
+            $conflict = array_intersect($primaryTutor, $secondaryTutor);
+            $updatated = $updated && $this->User->$functionNames[$model]($secondary, $conflict);
+            $conflict = implode(',', $conflict);
+            $name = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $model)).'s';
+            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+            $change = 'UPDATE '.$name.' SET user_id='.$primary.' WHERE user_id='.$secondary;
+            $change .= ($conflict) ? ' AND course_id !=('.$conflict.');' : ';';
+            $updated = $updated && $this->$model->query($change);
+        }
+
+        return $updated;
+    }
+    
+    /**
+     * _updateEvaluations
+     *
+     * @param mixed $updated   updated
+     * @param mixed $primary   primary account
+     * @param mixed $secondary secondary account
+     *
+     * @access private
+     * @return void
+     */
+    private function _updateEvaluations($updated, $primary, $secondary)
+    {
+        $models = array('EvaluationSimple', 'EvaluationMixeval', 'EvaluationRubric');
+        foreach ($models as $model) {
+            $primaryEval = Set::extract('/'.$model.'/grp_event_id', $this->$model->findAllByEvaluator($primary));
+            $secondaryEval = Set::extract('/'.$model.'/grp_event_id', $this->$model->findAllByEvaluator($secondary));
+            $conflict = array_intersect($primaryEval, $secondaryEval);
+            $updated = $updated && $this->$model->removeAll($secondary, $conflict);
+            $conflict = implode(',', $conflict);
+            $name = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $model)).'s';
+            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET evaluatee='.$primary.' WHERE evaluatee='.$secondary.';');
+            $change = 'UPDATE '.$name.' SET evaluator='.$primary.' WHERE evaluator='.$secondary;
+            $change .= ($conflict) ? ' AND grp_event_id !=('.$conflict.');' : ';';
+            $updated = $updated && $this->$model->query($change);
+        }
+        
+        return $updated;
+    }
+    
+    /**
+     * _updateUserId
+     *
+     * @param mixed $updated   updated
+     * @param mixed $primary   primary account
+     * @param mixed $secondary secondary account
+     *
+     * @access private
+     * @return void
+     */
+    private function _updateUserId($updated, $primary, $secondary)
+    {
+        //groups_members - group_id
+        $primaryUser = Set::extract('/GroupsMembers/group_id', $this->GroupsMembers->findAllByUserId($primary));
+        $secondaryUser = Set::extract('/GroupsMembers/group_id', $this->GroupsMembers->findAllByUserId($secondary));
+        $conflict = array_intersect($primaryUser, $secondaryUser);
+        $updated = $updated && $this->GroupsMembers->removeAll($secondary, $conflict);
+        $conflict = implode(',', $conflict);
+        $change = 'UPDATE groups_members SET user_id='.$primary.' WHERE user_id='.$secondary;
+        $change .= ($conflict) ? ' AND group_id NOT IN ('.$conflict.');' : ';';
+        $updated = $updated && $this->GroupsMembers->query($change);
+        
+        //oauth_clients - don't need to check
+        $updated = $updated && $this->OauthClient->query('UPDATE oauth_clients SET user_id='.$primary.' WHERE user_id='.$secondary.';');
+        //oauth_tokens - don't need to check
+        $updated = $updated && $this->OauthToken->query('UPDATE oauth_tokens SET user_id='.$primary.' WHERE user_id='.$secondary.';');
+        
+        //survey_group_members - group_set_id
+        $primaryUser = Set::extract('/SurveyGroupMember/group_set_id', $this->SurveyGroupMember->findAllByUserId($primary));
+        $secondaryUser = Set::extract('/SurveyGroupMember/group_set_id', $this->SurveyGroupMember->findAllByUserId($secondary));
+        $conflict = array_intersect($primaryUser, $secondaryUser);
+        $updated = $updated && $this->SurveyGroupMember->removeAll($secondary, $conflict);
+        $conflict = implode(',', $conflict);
+        $change = 'UPDATE survey_group_members SET user_id='.$primary.' WHERE user_id='.$secondary;
+        $change .= ($conflict) ? ' AND group_set_id NOT IN ('.$conflict.');' : ';';
+        $updated = $updated && $this->SurveyGroupMember->query($change);
+
+        //survey_inputs - event_id
+        $primaryUser = Set::extract('/SurveyInput/event_id', $this->SurveyInput->findAllByUserId($primary));
+        $secondaryUser = Set::extract('/SurveyInput/event_id', $this->SurveyInput->findAllByUserId($secondary));
+        $conflict = array_intersect($primaryUser, $secondaryUser);
+        $updated = $updated && $this->SurveyInput->removeAll($secondary, $conflict);
+        $conflict = implode(',', $conflict);
+        $change = 'UPDATE survey_inputs SET user_id='.$primary.' WHERE user_id='.$secondary;
+        $change .= ($conflict) ? ' AND event_id NOT IN ('.$conflict.');' : ';';
+        $updated = $updated && $this->SurveyInput->query($change);
+        
+        //user_faculties - faculty_id
+        $primaryUser = Set::extract('/UserFaculty/faculty_id', $this->UserFaculty->findAllByUserId($primary));
+        $secondaryUser = Set::extract('/UserFaculty/faculty_id', $this->UserFaculty->findAllByUserId($secondary));
+        $conflict = array_intersect($primaryUser, $secondaryUser);
+        $updated = $updated && $this->UserFaculty->deleteAll(array('user_id' => $secondaryUser, 'faculty_id' => $conflict));
+        $conflict = implode(',', $conflict);
+        $change = 'UPDATE user_faculties SET user_id='.$primary.' WHERE user_id='.$secondary;
+        $change .= ($conflict) ? ' AND faculty_id NOT IN ('.$conflict.');' : ';';
+        $updated = $updated && $this->UserFaculty->query($change);
+        
+        return $updated;
+    }
 }

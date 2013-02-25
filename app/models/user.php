@@ -783,6 +783,22 @@ class User extends AppModel
         }
         return $this->UserEnrol->delete($id);
     }
+    
+    /**
+     * unenrolStudent
+     *
+     * @param mixed $userId   user id
+     * @param mixed $courseId course id
+     *
+     * @access public
+     * @return void
+     */
+    function unenrolStudent($userId, $courseId)
+    {
+        $id = $this->UserEnrol->field('id',
+            array('user_id' => $userId, 'course_id' => $courseId));
+        return $this->UserEnrol->delete($id);
+    }
 
     /**
      * Add instructor to course
