@@ -19,6 +19,8 @@
 
 <script type="text/javascript">
 disableButton();
+disableSelection('#UserPrimaryAccount');
+disableSelection('#UserSecondaryAccount');
 jQuery().ready(function() {
     jQuery('#UserPrimarySearchValue').keydown(function(e) {
         if (e.keyCode == 13) {
@@ -58,6 +60,7 @@ function populate(selections, update, empty) {
         options += '<option value="' + index + '">' + value + '</option>';
     });
     jQuery(update).html(options);
+    disableSelection(update);
 }
 
 function disableButton() {
@@ -77,8 +80,13 @@ function disableButton() {
 function primarySearch() {
     var field = jQuery('#UserPrimarySearch option:selected').val();
     var value = jQuery('#UserPrimarySearchValue').val();
+    //var start = new Date().getTime();
+    jQuery('#UserPrimaryAccount').attr('disabled', 'disabled');
     jQuery.getJSON('/users/ajax_merge', {action: 'account', field: field, value: value},
         function(users) {
+            /*var end = new Date().getTime();
+            var length = end - start;
+            console.log(length);*/
             populate(users, '#UserPrimaryAccount', 'primary');
     });
     jQuery.getJSON('/users/ajax_merge', {action: 'data', userId: ''},
@@ -94,6 +102,7 @@ function primarySearch() {
 function secondarySearch() {
     var field = jQuery('#UserSecondarySearch option:selected').val();
     var value = jQuery('#UserSecondarySearchValue').val();
+    jQuery('#UserSecondaryAccount').attr('disabled', 'disabled');
     jQuery.getJSON('/users/ajax_merge', {action: 'account', field: field, value: value},
         function(users) {
             populate(users, '#UserSecondaryAccount', 'secondary');
@@ -105,6 +114,15 @@ function secondarySearch() {
             });
     });
     jQuery('#merge').attr('disabled', 'disabled');
+}
+
+function disableSelection(account) {
+    var length = jQuery(account + ' option').length;
+    if (length > 1) {
+        jQuery(account).removeAttr('disabled');
+    } else {
+        jQuery(account).attr('disabled', 'disabled');
+    }
 }
 
 </script>

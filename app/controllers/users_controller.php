@@ -20,7 +20,8 @@ class UsersController extends AppController
         'UserCourse', 'UserTutor', 'Faculty', 'UserFaculty', 'EmailTemplate', 'EvaluationMixevalDetail',
         'EvaluationRubricDetail', 'EventTemplateType', 'Event', 'Faculty', 'GroupEvent',
         'Mixeval', 'Rubric', 'SimpleEvaluation', 'SysParameter', 'Survey', 'EvaluationMixeval',
-        'EvaluationSimple', 'EvaluationRubric', 'GroupsMembers', 'SurveyGroupMember', 'SurveyInput'
+        'EvaluationSimple', 'EvaluationRubric', 'GroupsMembers', 'SurveyGroupMember', 'SurveyInput',
+        'EvaluationSubmission', 'EmailSchedule', 'RolesUser'
     );
     public $components = array('Session', 'AjaxList', 'RequestHandler',
         'Email', 'FileUpload.FileUpload', 'PasswordGenerator');
@@ -1122,9 +1123,15 @@ class UsersController extends AppController
             $this->User->begin();
             // tables that only need creator_id and updater_id updated
             $updated = $updated && $this->_updateCreatorUpdaterId($updated, $primaryAccount, $secondaryAccount);
+            // user_course, user_enrol, user_tutor
             $updated = $updated && $this->_updateUserCourse($updated, $primaryAccount, $secondaryAccount);
+            // the three evaluation types eg. evaluation_simple
             $updated = $updated && $this->_updateEvaluations($updated, $primaryAccount, $secondaryAccount);
+            // tables that only need their user_id field updated
             $updated = $updated && $this->_updateUserId($updated, $primaryAccount, $secondaryAccount);
+            // evaluation_submissions && email_schedules
+            $updated = $updated && $this->_updateTablesWithUserId($updated, $primaryAccount, $secondaryAccount);
+            $updated = $updated && $this->User->delete($secondaryAccount); // delete secondaryAccount
             
             if ($updated) {
                 $this->Session->setFlash(__('Success', true), 'good');
@@ -1146,7 +1153,6 @@ class UsersController extends AppController
         if (!$this->RequestHandler->isAjax()) {
             $this->cakeError('error404');
         }
-        
         $options = array();
         switch($_GET['action']) {
             case 'account':
@@ -1155,8 +1161,8 @@ class UsersController extends AppController
                 } else {
                     $options = $this->User->find('all', array(
                         'conditions' => array(
+                            'Role.id' => array_keys($this->AccessControl->getViewableRoles()),
                             'User.'.$_GET['field'].' LIKE' => "%".$_GET['value']."%",
-                            'Role.id' => array_keys($this->AccessControl->getViewableRoles())
                     )));
                     $options = Set::combine($options, '{n}.User.id', '{n}.User.'.$_GET['field']);
                 }
@@ -1350,7 +1356,7 @@ class UsersController extends AppController
             $updated = $updated && $this->$model->query('UPDATE '.$name.' SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
             $updated = $updated && $this->$model->query('UPDATE '.$name.' SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
             $change = 'UPDATE '.$name.' SET user_id='.$primary.' WHERE user_id='.$secondary;
-            $change .= ($conflict) ? ' AND course_id !=('.$conflict.');' : ';';
+            $change .= ($conflict) ? ' AND course_id NOT IN ('.$conflict.');' : ';';
             $updated = $updated && $this->$model->query($change);
         }
 
@@ -1382,7 +1388,7 @@ class UsersController extends AppController
             $updated = $updated && $this->$model->query('UPDATE '.$name.' SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
             $updated = $updated && $this->$model->query('UPDATE '.$name.' SET evaluatee='.$primary.' WHERE evaluatee='.$secondary.';');
             $change = 'UPDATE '.$name.' SET evaluator='.$primary.' WHERE evaluator='.$secondary;
-            $change .= ($conflict) ? ' AND grp_event_id !=('.$conflict.');' : ';';
+            $change .= ($conflict) ? ' AND grp_event_id NOT IN ('.$conflict.');' : ';';
             $updated = $updated && $this->$model->query($change);
         }
         
@@ -1427,6 +1433,63 @@ class UsersController extends AppController
         //oauth_tokens
         $updated = $updated && $this->OauthToken->query('UPDATE oauth_tokens SET user_id='.$primary.' WHERE user_id='.$secondary.';');
         
+        return $updated;
+    }
+    
+    /**
+     * _updateTablesWithUserId
+     *
+     * @param mixed $updated   updated
+     * @param mixed $primary   primary account
+     * @param mixed $secondary secondary account
+     *
+     * @access private
+     * @return void
+     */
+    private function _updateTablesWithUserId($updated, $primary, $secondary)
+    {
+        //evaluation_submissions
+        //update creator_id and updater_id
+        $updated = $updated && $this->EvaluationSubmission->query('UPDATE evaluation_submissions SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+        $updated = $updated && $this->EvaluationSubmission->query('UPDATE evaluation_submissions SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        $primaryEval = $this->EvaluationSubmission->getGrpEventIdEvalSub($primary);
+        $primarySurvey = $this->EvaluationSubmission->getEventIdSurveySub($primary);
+        $secondaryEval = $this->EvaluationSubmission->getGrpEventIdEvalSub($secondary);
+        $secondarySurvey = $this->EvaluationSubmission->getEventIdSurveySub($secondary);
+        
+        $evalConflict = array_intersect($primaryEval, $secondaryEval);  //grp_evnt_id
+        $surveyConflict = array_intersect($primarySurvey, $secondarySurvey); //event_id
+        //delete conflicted evaluation submissions by grp_event_id
+        $updated = $updated && $this->EvaluationSubmission->deleteAll(
+            array('EvaluationSubmission.submitter_id' => $secondary, 'EvaluationSubmission.grp_event_id' => $evalConflict));
+        //delete conflicted survey submissions by event_id
+        $updated = $updated && $this->EvaluationSubmission->deleteAll(
+            array('EvaluationSubmission.submitter_id' => $secondary, 'EvaluationSubmission.event_id' => $surveyConflict));
+        $evalConflict = implode(',', $evalConflict);
+        $surveyConflict = implode(',', $surveyConflict);
+        
+        $change = 'UPDATE evaluation_submissions SET submitter_id='.$primary.' WHERE submitter_id='.$secondary;
+        $change .= ($evalConflict || $surveyConflict) ? ' AND (' : ';';
+        //append grp_event_id if any evaluation submissions are conflicted
+        $change .= ($evalConflict) ? 'grp_event_id NOT IN ('.$evalConflict.')' : '';
+        $change .= ($evalConflict && $surveyConflict) ? ' OR ' : '';
+        //append event_id if any survey submissions are conflicted
+        $change .= ($surveyConflict) ? 'event_id NOT IN ('.$surveyConflict.')' : '';
+        $change .= ($evalConflict || $surveyConflict) ? ');' : '';
+        $updated = $updated && $this->EvaluationSubmission->query($change);
+        
+        //email_schedules
+        $updated = $updated && $this->EmailSchedule->query("UPDATE email_schedules SET creator_id=".$primary." WHERE creator_id=".$secondary.";");
+        $updated = $updated && $this->EmailSchedule->query("UPDATE email_schedules SET `from`=".$primary." WHERE `from`=".$secondary.";");
+        // middle of the string eg. ;17;
+        $updated = $updated && $this->EmailSchedule->query('UPDATE email_schedules SET `to`=REPLACE(`to`, ";'.$secondary.';", ";'.$primary.';");');
+        // end of the string eg. ;17
+        $updated = $updated && $this->EmailSchedule->query('UPDATE email_schedules SET `to`=REPLACE(`to`, ";'.$secondary.'", ";'.$primary.'");');
+        // beginning of the string eg. 17;
+        $updated = $updated && $this->EmailSchedule->query('UPDATE email_schedules SET `to`=REPLACE(`to`, "'.$secondary.';", "'.$primary.';");');
+        // the whole string eg. 17
+        $updated = $updated && $this->EmailSchedule->query('UPDATE email_schedules SET `to`=REPLACE(`to`, "'.$secondary.'", "'.$primary.'");');
+
         return $updated;
     }
 }
