@@ -1374,7 +1374,8 @@ class UsersController extends AppController
             $primaryEval = Set::extract('/'.$model.'/grp_event_id', $this->$model->findAllByEvaluator($primary));
             $secondaryEval = Set::extract('/'.$model.'/grp_event_id', $this->$model->findAllByEvaluator($secondary));
             $conflict = array_intersect($primaryEval, $secondaryEval);
-            $updated = $updated && $this->$model->removeAll($secondary, $conflict);
+            $updated = $updated && $this->$model->deleteAll(
+                array('evaluator' => $secondary, 'grp_event_id' => $conflict));
             $conflict = implode(',', $conflict);
             $name = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $model)).'s';
             $updated = $updated && $this->$model->query('UPDATE '.$name.' SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
@@ -1400,50 +1401,31 @@ class UsersController extends AppController
      */
     private function _updateUserId($updated, $primary, $secondary)
     {
-        //groups_members - group_id
-        $primaryUser = Set::extract('/GroupsMembers/group_id', $this->GroupsMembers->findAllByUserId($primary));
-        $secondaryUser = Set::extract('/GroupsMembers/group_id', $this->GroupsMembers->findAllByUserId($secondary));
-        $conflict = array_intersect($primaryUser, $secondaryUser);
-        $updated = $updated && $this->GroupsMembers->removeAll($secondary, $conflict);
-        $conflict = implode(',', $conflict);
-        $change = 'UPDATE groups_members SET user_id='.$primary.' WHERE user_id='.$secondary;
-        $change .= ($conflict) ? ' AND group_id NOT IN ('.$conflict.');' : ';';
-        $updated = $updated && $this->GroupsMembers->query($change);
+        $models = array(
+            array('GroupsMembers', 'groups_members', 'group_id'),
+            array('SurveyGroupMember', 'survey_group_members', 'group_set_id'),
+            array('SurveyInput', 'survey_inputs', 'event_id'),
+            array('UserFaculty', 'user_faculties', 'faculty_id')
+        );
         
-        //oauth_clients - don't need to check
+        foreach ($models as $model) {
+            $primaryUser = $this->$model[User::MERGE_MODEL]->findAllByUserId($primary);
+            $primaryUser = Set::extract('/'.$model[User::MERGE_MODEL].'/'.$model[User::MERGE_FIELD], $primaryUser);
+            $secondaryUser = $this->$model[User::MERGE_MODEL]->findAllByUserId($secondary);
+            $secondaryUser = Set::extract('/'.$model[User::MERGE_MODEL].'/'.$model[User::MERGE_FIELD], $secondaryUser);
+            $conflict = array_intersect($primaryUser, $secondaryUser);
+            $updated = $updated && $this->$model[User::MERGE_MODEL]->deleteAll(
+                array('user_id' => $secondaryUser, $model[User::MERGE_FIELD] => $conflict));
+            $conflict = implode(',', $conflict);
+            $change = 'UPDATE '.$model[User::MERGE_TABLE].' SET user_id='.$primary.' WHERE user_id='.$secondary;
+            $change .= ($conflict) ? ' AND '.$model[User::MERGE_FIELD].' NOT IN ('.$conflict.');' : ';';
+            $updated = $updated && $this->$model[User::MERGE_MODEL]->query($change);
+        }
+        
+        //oauth_clients
         $updated = $updated && $this->OauthClient->query('UPDATE oauth_clients SET user_id='.$primary.' WHERE user_id='.$secondary.';');
-        //oauth_tokens - don't need to check
+        //oauth_tokens
         $updated = $updated && $this->OauthToken->query('UPDATE oauth_tokens SET user_id='.$primary.' WHERE user_id='.$secondary.';');
-        
-        //survey_group_members - group_set_id
-        $primaryUser = Set::extract('/SurveyGroupMember/group_set_id', $this->SurveyGroupMember->findAllByUserId($primary));
-        $secondaryUser = Set::extract('/SurveyGroupMember/group_set_id', $this->SurveyGroupMember->findAllByUserId($secondary));
-        $conflict = array_intersect($primaryUser, $secondaryUser);
-        $updated = $updated && $this->SurveyGroupMember->removeAll($secondary, $conflict);
-        $conflict = implode(',', $conflict);
-        $change = 'UPDATE survey_group_members SET user_id='.$primary.' WHERE user_id='.$secondary;
-        $change .= ($conflict) ? ' AND group_set_id NOT IN ('.$conflict.');' : ';';
-        $updated = $updated && $this->SurveyGroupMember->query($change);
-
-        //survey_inputs - event_id
-        $primaryUser = Set::extract('/SurveyInput/event_id', $this->SurveyInput->findAllByUserId($primary));
-        $secondaryUser = Set::extract('/SurveyInput/event_id', $this->SurveyInput->findAllByUserId($secondary));
-        $conflict = array_intersect($primaryUser, $secondaryUser);
-        $updated = $updated && $this->SurveyInput->removeAll($secondary, $conflict);
-        $conflict = implode(',', $conflict);
-        $change = 'UPDATE survey_inputs SET user_id='.$primary.' WHERE user_id='.$secondary;
-        $change .= ($conflict) ? ' AND event_id NOT IN ('.$conflict.');' : ';';
-        $updated = $updated && $this->SurveyInput->query($change);
-        
-        //user_faculties - faculty_id
-        $primaryUser = Set::extract('/UserFaculty/faculty_id', $this->UserFaculty->findAllByUserId($primary));
-        $secondaryUser = Set::extract('/UserFaculty/faculty_id', $this->UserFaculty->findAllByUserId($secondary));
-        $conflict = array_intersect($primaryUser, $secondaryUser);
-        $updated = $updated && $this->UserFaculty->deleteAll(array('user_id' => $secondaryUser, 'faculty_id' => $conflict));
-        $conflict = implode(',', $conflict);
-        $change = 'UPDATE user_faculties SET user_id='.$primary.' WHERE user_id='.$secondary;
-        $change .= ($conflict) ? ' AND faculty_id NOT IN ('.$conflict.');' : ';';
-        $updated = $updated && $this->UserFaculty->query($change);
         
         return $updated;
     }

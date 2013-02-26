@@ -43,18 +43,4 @@ class SurveyGroupMember extends AppModel
             'fields' => array('SurveyGroupMember.id')
         ));
     }
-    
-    /**
-     * removeAll
-     *
-     * @param mixed $userId     user id
-     * @param mixed $groupSetId group set id
-     *
-     * @access public
-     * @return void
-     */
-    function removeAll($userId, $groupSetId)
-    {
-        return $this->deleteAll(array('user_id' => $userId, 'group_set_id' => $groupSetId));
-    }
 }

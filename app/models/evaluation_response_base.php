@@ -85,23 +85,4 @@ class EvaluationResponseBase extends AppModel
             'contain' => $contain,
         ));
     }
-    
-    
-    /**
-     * removeAll
-     *
-     * @param mixed $secondary    secondary account
-     * @param mixed $grp_event_id group event id
-     *
-     * @access public
-     * @return void
-     */
-    function removeAll($evaluator, $grpEventId) {
-        /*$ids = $this->find('all', array(
-            'conditions' => array('evaluator' => $evaluator, 'grp_event_id' => $grpEventId)
-        ));
-        $ids = Set::extract('/'.$this->name.'/id', $ids);
-        return $this->deleteAll(array($this->name.'.id' => $ids));*/
-        return $this->deleteAll(array('evaluator' => $evaluator, 'grp_event_id' => $grpEventId));
-    }
 }

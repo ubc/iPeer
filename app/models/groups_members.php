@@ -221,18 +221,4 @@ class GroupsMembers extends AppModel
             'group' => 'user_id'
         ));
     }
-    
-    /**
-     * removeAll
-     *
-     * @param mixed $userId  user id
-     * @param mixed $groupId group id
-     *
-     * @access public
-     * @return void
-     */
-    function removeAll($userId, $groupId)
-    {
-        return $this->deleteAll(array('user_id' => $userId, 'group_id' => $groupId));
-    }
 }

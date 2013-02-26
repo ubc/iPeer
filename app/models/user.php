@@ -32,6 +32,10 @@ class User extends AppModel
     const IMPORT_EMAIL = '4';
     const IMPORT_PASSWORD = '5';
     const GENERATED_PASSWORD = '6';
+    
+    const MERGE_MODEL = '0';
+    const MERGE_TABLE = '1';
+    const MERGE_FIELD = '2';
 
     public $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Traceable');
 

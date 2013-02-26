@@ -57,18 +57,4 @@ class SurveyInput extends AppModel
             'contain' => false,
         ));
     }
-    
-    /**
-     * removeAll
-     *
-     * @param mixed $userId  user id
-     * @param mixed $eventId event id
-     *
-     * @access public
-     * @return void
-     */
-    function removeAll($userId, $eventId)
-    {
-        return $this->deleteAll(array('user_id' => $userId, 'event_id' => $eventId));
-    }
 }
