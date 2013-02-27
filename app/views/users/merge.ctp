@@ -62,7 +62,6 @@ function populate(selections, update, empty) {
     if (selections.length === 0) {
         options = '<option value>-- No users found --</option>';
     }
-    //alert(selections);
     jQuery.each(selections, function(index, value) {
         options += '<option value="' + index + '">' + value + '</option>';
     });
