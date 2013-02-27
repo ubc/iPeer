@@ -1543,6 +1543,13 @@ table.content-table {
     font-size: 0.9em;
 }
 
+.merge-button {
+    background:url('/img/icons/merge.png') center left no-repeat;
+    padding: 0 0 0 20px;
+    white-space:nowrap;
+    font-size: 0.9em;
+}
+
 .export-excel-button {
     background:url('/img/icons/export_excel.gif') center left no-repeat;
     padding: 0 0 0 20px;

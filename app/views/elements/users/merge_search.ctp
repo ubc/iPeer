@@ -8,7 +8,7 @@
     <?php echo $this->Form->input('User.'.$account.'SearchValue', 
         array('label' => false, 'class' => 'searchValue', 'div' => false)); ?>
     <?php echo $this->Form->input('User.'.$account.'Account',
-        array('label' => __('User', true), 'empty' => __('-- Pick the '.$account.' account --', true), 'class' => 'account')); ?>
+        array('label' => __('User', true), 'empty' => __('-- Search for the '.$account.' account --', true), 'class' => 'account')); ?>
     
     <div id='<?php echo $account ?>Data'>
     <table class='standardtable'>

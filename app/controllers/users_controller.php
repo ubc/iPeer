@@ -221,6 +221,7 @@ class UsersController extends AppController
 
         $this->set('can_add_user', User::hasPermission('functions/user', 'create'));
         $this->set('can_import_user', User::hasPermission('functions/user/import'));
+        $this->set('can_merge_users', User::hasPermission('controllers/users/merge'));
     }
 
     /**
@@ -1118,7 +1119,6 @@ class UsersController extends AppController
             }
             
             //update transactions
-            // MT - February 22, 2013
             $updated = true;
             $this->User->begin();
             // tables that only need creator_id and updater_id updated
@@ -1134,10 +1134,10 @@ class UsersController extends AppController
             $updated = $updated && $this->User->delete($secondaryAccount); // delete secondaryAccount
             
             if ($updated) {
-                $this->Session->setFlash(__('Success', true), 'good');
+                $this->Session->setFlash(__('The two accounts have successfully merged.', true), 'good');
                 $this->User->commit();
             } else {
-                $this->Session->setFlash(__('Failure', true));
+                $this->Session->setFlash(__('Error: The two accounts could not be merged.', true));
                 $this->User->rollback();
             }
         }

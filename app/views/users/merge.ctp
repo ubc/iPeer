@@ -22,13 +22,16 @@ disableButton();
 disableSelection('#UserPrimaryAccount');
 disableSelection('#UserSecondaryAccount');
 jQuery().ready(function() {
+    var searching = '<option value>Searching ...</option>';
     jQuery('#UserPrimarySearchValue').keydown(function(e) {
         if (e.keyCode == 13) {
+            jQuery('#UserPrimaryAccount').html(searching);
             primarySearch();
         }
     });
     jQuery('#UserSecondarySearchValue').keydown(function(e) {
         if (e.keyCode == 13) {
+            jQuery('#UserSecondaryAccount').html(searching);
             secondarySearch();
         }
     });
@@ -56,6 +59,10 @@ jQuery().ready(function() {
 // generate the options for the users fields
 function populate(selections, update, empty) {
     var options = '<option value>-- Pick the ' + empty + ' account --</option>';
+    if (selections.length === 0) {
+        options = '<option value>-- No users found --</option>';
+    }
+    //alert(selections);
     jQuery.each(selections, function(index, value) {
         options += '<option value="' + index + '">' + value + '</option>';
     });
@@ -80,13 +87,9 @@ function disableButton() {
 function primarySearch() {
     var field = jQuery('#UserPrimarySearch option:selected').val();
     var value = jQuery('#UserPrimarySearchValue').val();
-    //var start = new Date().getTime();
     jQuery('#UserPrimaryAccount').attr('disabled', 'disabled');
     jQuery.getJSON('/users/ajax_merge', {action: 'account', field: field, value: value},
         function(users) {
-            /*var end = new Date().getTime();
-            var length = end - start;
-            console.log(length);*/
             populate(users, '#UserPrimaryAccount', 'primary');
     });
     jQuery.getJSON('/users/ajax_merge', {action: 'data', userId: ''},
