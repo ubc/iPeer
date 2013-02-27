@@ -385,10 +385,18 @@ class MixevalsController extends AppController
             $existingQs = $this->MixevalQuestion->findAllByMixevalId(
                 $this->data['Mixeval']['id']);
 
-            function getExistingQId($x) { return $x['MixevalQuestion']['id']; }
+            // Declare all the functions used by array_map. Note that
+            // we check if the function_exists only because the test cases
+            // keep complaining about these functions being redeclared, wtf php.
+            if (!function_exists('getExistingQId')) {
+                function getExistingQId($x) 
+                    { return $x['MixevalQuestion']['id']; }
+                function getId($x) { return isset($x['id']) ? $x['id'] : null; }
+                function getExistingDescId($x) 
+                    { return array_map('getId', $x['MixevalQuestionDesc']); }
+            }
             $existingQIds = array_map('getExistingQId', $existingQs);
 
-            function getId($x) { return isset($x['id']) ? $x['id'] : null; }
             $submittedQIds = array_map('getId', 
                 $this->data['MixevalQuestion']);
 
@@ -399,8 +407,6 @@ class MixevalsController extends AppController
             }
 
             // Delete removed question descs
-            function getExistingDescId($x) 
-                { return array_map('getId', $x['MixevalQuestionDesc']); }
             $existingQDescIds = array_map('getExistingDescId', $existingQs);
             $existingQDescIds = array_reduce($existingQDescIds, 
                 'array_merge', array());
