@@ -242,7 +242,7 @@ class V1ControllerTest extends CakeTestCase {
         $expectedPerson = array(
             'id' => '17',
             'role_id' => '5',
-            'username' => '37116036',
+            'username' => 'redshirt0013',
             'last_name' => 'Student',
             'first_name' => 'Edna'
         );
@@ -445,9 +445,9 @@ class V1ControllerTest extends CakeTestCase {
 
         // HTTP GET, get a list of group members
         $expectedGroup = array(
-            array('id' => '5', 'role_id' => '5', 'username' => '65498451', 'last_name' => 'Student', 'first_name' => 'Ed'),
-            array('id' => '6', 'role_id' => '5', 'username' => '65468188', 'last_name' => 'Student', 'first_name' => 'Alex'),
-            array('id' => '7', 'role_id' => '5', 'username' => '98985481', 'last_name' => 'Student', 'first_name' => 'Matt'),
+            array('id' => '5', 'role_id' => '5', 'username' => 'redshirt0001', 'last_name' => 'Student', 'first_name' => 'Ed'),
+            array('id' => '6', 'role_id' => '5', 'username' => 'redshirt0002', 'last_name' => 'Student', 'first_name' => 'Alex'),
+            array('id' => '7', 'role_id' => '5', 'username' => 'redshirt0003', 'last_name' => 'Student', 'first_name' => 'Matt'),
             array('id' => '35', 'role_id' => '4', 'username' => 'tutor1', 'last_name' => '1', 'first_name' => 'Tutor')
         );
 
@@ -456,19 +456,19 @@ class V1ControllerTest extends CakeTestCase {
 
         // HTTP POST, try to assign students to a group
         $toBeAdded = array(
-            array('username' => '16585158'),
-            array('username' => '81121651'),
-            array('username' => '87800283'));
+            array('username' => 'redshirt0004'),
+            array('username' => 'redshirt0005'),
+            array('username' => 'redshirt0006'));
         $addedMembers = $this->_oauthReq("$url", json_encode($toBeAdded), OAUTH_HTTP_METHOD_POST);
 
         $this->assertEqual(json_decode($addedMembers, true), $toBeAdded);
 
         // HTTP DELETE, try to remove students from a group
-        $ret = $this->_oauthReq("$url/16585158",null,OAUTH_HTTP_METHOD_DELETE);
+        $ret = $this->_oauthReq("$url/redshirt0004",null,OAUTH_HTTP_METHOD_DELETE);
         $this->assertEqual(json_decode($ret, true), array());
-        $ret = $this->_oauthReq("$url/81121651",null,OAUTH_HTTP_METHOD_DELETE);
+        $ret = $this->_oauthReq("$url/redshirt0005",null,OAUTH_HTTP_METHOD_DELETE);
         $this->assertEqual(json_decode($ret, true), array());
-        $ret = $this->_oauthReq("$url/87800283",null,OAUTH_HTTP_METHOD_DELETE);
+        $ret = $this->_oauthReq("$url/redshirt0006",null,OAUTH_HTTP_METHOD_DELETE);
         $this->assertEqual(json_decode($ret, true), array());
         // confirm that the group is back to what it was before
         $ret = $this->_oauthReq("$url");
@@ -562,22 +562,22 @@ class V1ControllerTest extends CakeTestCase {
 
         // test get specific student's grades for an event of a course (test multiple types)
         // evaluation simple
-        $studentGrade = $this->_oauthReq("$url/1/grades/51516498");
+        $studentGrade = $this->_oauthReq("$url/1/grades/redshirt0029");
         $studentGrade = json_decode($studentGrade, true);
         $expectedGrade = array("evaluatee" => "33", "score" => "75",
-            'username' => '51516498');
+            'username' => 'redshirt0029');
         $this->assertEqual($expectedGrade, $studentGrade);
         // evaluation rubric
-        $studentGrade = $this->_oauthReq("$url/2/grades/65498451");
+        $studentGrade = $this->_oauthReq("$url/2/grades/redshirt0001");
         $studentGrade = json_decode($studentGrade, true);
         $expectedGrade = array("evaluatee" => "5", "score" => "14",
-            'username' => '65498451');
+            'username' => 'redshirt0001');
         $this->assertEqual($expectedGrade, $studentGrade);
         // evaluation mixeval
-        $studentGrade = $this->_oauthReq("$url/3/grades/65468188");
+        $studentGrade = $this->_oauthReq("$url/3/grades/redshirt0002");
         $studentGrade = json_decode($studentGrade, true);
         $expectedGrade = array("evaluatee" => "6", "score" => "2.4",
-            'username' => '65468188');
+            'username' => 'redshirt0002');
         $this->assertEqual($expectedGrade, $studentGrade);
     }
 
@@ -675,12 +675,12 @@ class V1ControllerTest extends CakeTestCase {
             )
         );
 
-        $url = $this->_getURL('v1/users/65498451/events');
+        $url = $this->_getURL('v1/users/redshirt0001/events');
         $actualEvents = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($actualEvents, true), '{n}.id', 'asc');
         $this->assertequal($expectedEvents, $events);
 
-        $url = $this->_getURL('v1/courses/1/users/65498451/events');
+        $url = $this->_getURL('v1/courses/1/users/redshirt0001/events');
         $courseUserEvents = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($courseUserEvents, true), '{n}.id', 'asc');
         $this->assertequal($expectedEvents, $events);
@@ -691,15 +691,15 @@ class V1ControllerTest extends CakeTestCase {
         $url = $this->_getURL('v1/courses/3/users');
         $actual = $this->_oauthReq("$url");
         $expected = array(
-            array('id' => '8', 'role_id' => '5', 'username' => '16585158'),
-            array('id' => '33', 'role_id' => '5', 'username' => '51516498'),
+            array('id' => '8', 'role_id' => '5', 'username' => 'redshirt0004'),
+            array('id' => '33', 'role_id' => '5', 'username' => 'redshirt0029'),
             array('id' => '4', 'role_id' => '3', 'username' => 'instructor3'),
             array('id' => '37', 'role_id' => '4', 'username' => 'tutor3'),
         );
         $this->assertEqual($expected, json_decode($actual, true));
 
         // Add a student to a course
-        $expected = array(array('username' => '81121651', 'role_id' => 5));
+        $expected = array(array('username' => 'redshirt0005', 'role_id' => 5));
         $actual = $this->_oauthReq(
             $url, json_encode($expected), OAUTH_HTTP_METHOD_POST);
         $this->assertEqual($expected, json_decode($actual, true));
@@ -734,7 +734,7 @@ class V1ControllerTest extends CakeTestCase {
         $this->assertEqual($expected, json_decode($actual, true));
 
         // Remove a student from a course
-        $expected = array(array('username' => '81121651', 'role_id' => 5));
+        $expected = array(array('username' => 'redshirt0005', 'role_id' => 5));
         $actual = $this->_oauthReq(
             $url, json_encode($expected), OAUTH_HTTP_METHOD_DELETE);
         $this->assertEqual($expected, json_decode($actual, true));
