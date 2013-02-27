@@ -704,10 +704,27 @@ class V1ControllerTest extends CakeTestCase {
             $url, json_encode($expected), OAUTH_HTTP_METHOD_POST);
         $this->assertEqual($expected, json_decode($actual, true));
 
+        // Add a duplicate student to a course
+        $expected = array();
+        $actual = $this->_oauthReq(
+            $url, json_encode($expected), OAUTH_HTTP_METHOD_POST);
+        $this->assertEqual($expected, json_decode($actual, true));
+
         // Add an instructor to a course
         $expected = array(array('username' => 'instructor2', 'role_id' => 3));
         $actual = $this->_oauthReq(
             $url, json_encode($expected), OAUTH_HTTP_METHOD_POST);
+        $this->assertEqual($expected, json_decode($actual, true));
+
+        // Add an instructor with duplicate usernames to a course
+        $expected = array(
+            array('username' => 'instructor1', 'role_id' => 3),
+        );
+        $actual = $this->_oauthReq(
+            $url, json_encode(array(
+                array('username' => 'instructor1', 'role_id' => 3),
+                array('username' => 'INStructor1', 'role_id' => 3)
+            )), OAUTH_HTTP_METHOD_POST);
         $this->assertEqual($expected, json_decode($actual, true));
 
         // Add a tutor to a course
