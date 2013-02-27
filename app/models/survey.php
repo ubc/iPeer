@@ -16,13 +16,6 @@ class Survey extends EvaluationBase
     public $useTable = null;
     const TEMPLATE_TYPE_ID = 3;
 
-    public $belongsTo = array('Course' =>
-        array('className'  =>  'Course',
-            'conditions' =>  '',
-            'order'      =>  '',
-            'foreignKey' =>  'course_id'),
-    );
-
     public $hasMany = array('SurveyGroupSet' =>
         array('className'    =>  'SurveyGroupSet',
             'conditions'    => '',
@@ -97,24 +90,6 @@ class Survey extends EvaluationBase
     {
         parent::__construct($id, $table, $ds);
         $this->virtualFields['question_count'] = sprintf('SELECT count(*) as question_count FROM survey_questions as q WHERE q.survey_id = %s.id', $this->alias);
-    }
-
-    /**
-     * getSurveyIdByCourseIdTitle
-     *
-     * @param bool $courseId course id
-     * @param bool $title    title
-     *
-     * @access public
-     * @return void
-     */
-    function getSurveyIdByCourseIdTitle($courseId=null, $title=null)
-    {
-        $tmp = $this->find('first', array(
-            'conditions' => array('course_id' => $courseId, 'name' => $title),
-            'fields' => array('id')
-        ));
-        return $tmp['Survey']['id'];
     }
 
     /**

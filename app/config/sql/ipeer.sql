@@ -567,7 +567,6 @@ CREATE TABLE `courses` (
   `created` datetime NOT NULL default '0000-00-00 00:00:00',
   `updater_id` int(11) default NULL,
   `modified` datetime default NULL,
-  `instructor_id` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `course` (`course`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -705,7 +704,7 @@ CREATE TABLE IF NOT EXISTS `email_schedules` (
   `content` text NOT NULL,
   `date` datetime NOT NULL,
   `from` varchar(80) NOT NULL,
-  `to` varchar(600) NOT NULL,
+  `to` text NOT NULL,
   `course_id` int(11) DEFAULT NULL,
   `event_id` int(11) DEFAULT NULL,
   `grp_id` int(11) DEFAULT NULL,
@@ -1436,8 +1435,6 @@ CREATE TABLE IF NOT EXISTS `survey_questions` (
 DROP TABLE IF EXISTS `surveys`;
 CREATE TABLE IF NOT EXISTS `surveys` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `course_id` int(11) NOT NULL DEFAULT '0',
-  `user_id` int(11) NOT NULL DEFAULT '1',
   `name` varchar(255) NOT NULL,
   `availability` varchar(10) NOT NULL DEFAULT 'public',
   `due_date` datetime DEFAULT NULL,

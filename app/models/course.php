@@ -40,15 +40,6 @@ class Course extends AppModel
             'dependent'   => true,
             'exclusive'   => false,
             'finderSql'   => ''
-        ),
-        'Survey' => array(
-            'className'   => 'Survey',
-            'conditions'  => '',
-            'order'       => '',
-            'foreignKey'  => 'course_id',
-            'dependent'   => true,
-            'exclusive'   => false,
-            'finderSql'   => ''
         )
     );
 

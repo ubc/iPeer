@@ -567,7 +567,6 @@ CREATE TABLE `courses` (
   `created` datetime NOT NULL default '0000-00-00 00:00:00',
   `updater_id` int(11) default NULL,
   `modified` datetime default NULL,
-  `instructor_id` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `course` (`course`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -576,9 +575,9 @@ CREATE TABLE `courses` (
 -- Dumping data for table `courses`
 --
 
-INSERT INTO `courses` VALUES (1, 'MECH 328', 'Mechanical Engineering Design Project', 'http://www.mech.ubc.ca', 'off', NULL, 'A', 1, '2006-06-20 14:14:45', NULL, '2006-06-20 14:14:45', 0);
-INSERT INTO `courses` VALUES (2, 'APSC 201', 'Technical Communication', 'http://www.apsc.ubc.ca', 'off', NULL, 'A', 1, '2006-06-20 14:15:38', NULL, '2006-06-20 14:39:31', 0);
-INSERT INTO `courses` VALUES (3, 'CPSC 101', 'Connecting with Computer Science', 'http://www.ugrad.cs.ubc.ca/~cs101/', 'off', NULL, 'I', 0, '2006-06-20 00:00:00', NULL, NULL, 0);
+INSERT INTO `courses` VALUES (1, 'MECH 328', 'Mechanical Engineering Design Project', 'http://www.mech.ubc.ca', 'off', NULL, 'A', 1, '2006-06-20 14:14:45', NULL, '2006-06-20 14:14:45');
+INSERT INTO `courses` VALUES (2, 'APSC 201', 'Technical Communication', 'http://www.apsc.ubc.ca', 'off', NULL, 'A', 1, '2006-06-20 14:15:38', NULL, '2006-06-20 14:39:31');
+INSERT INTO `courses` VALUES (3, 'CPSC 101', 'Connecting with Computer Science', 'http://www.ugrad.cs.ubc.ca/~cs101/', 'off', NULL, 'I', 0, '2006-06-20 00:00:00', NULL, NULL);
 -- --------------------------------------------------------
 
 --
@@ -775,7 +774,7 @@ CREATE TABLE IF NOT EXISTS `email_schedules` (
   `content` text NOT NULL,
   `date` datetime NOT NULL,
   `from` varchar(80) NOT NULL,
-  `to` varchar(600) NOT NULL,
+  `to` text NOT NULL,
   `course_id` int(11) DEFAULT NULL,
   `event_id` int(11) DEFAULT NULL,
   `grp_id` int(11) DEFAULT NULL,
@@ -1944,8 +1943,6 @@ INSERT INTO survey_questions (id, survey_id, number, question_id) VALUES
 DROP TABLE IF EXISTS `surveys`;
 CREATE TABLE IF NOT EXISTS `surveys` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `course_id` int(11) NOT NULL DEFAULT '0',
-  `user_id` int(11) NOT NULL DEFAULT '1',
   `name` varchar(255) NOT NULL,
   `availability` varchar(10) NOT NULL DEFAULT 'public',
   `due_date` datetime DEFAULT NULL,
@@ -1963,9 +1960,9 @@ CREATE TABLE IF NOT EXISTS `surveys` (
 -- Dumping data for table `surveys`
 --
 
-INSERT INTO surveys (id, course_id, user_id, name, due_date, release_date_begin, release_date_end, released, creator_id, created, updater_id, modified) VALUES
-(1, 1, 1, 'Team Creation Survey', '2012-07-31 11:20:00', '2012-07-01 11:20:00', '2013-12-31 11:20:00', 0, 2, '2012-07-13 11:18:56', 2, '2012-07-13 11:18:56'),
-(2, 1, 1, 'Survey, all Q types', '2012-07-31 11:20:00', '2012-07-01 11:20:00', '2013-12-31 11:20:00', 0, 1, '2012-07-13 11:18:56', 1, '2012-07-13 11:18:56');
+INSERT INTO surveys (id, name, due_date, release_date_begin, release_date_end, released, creator_id, created, updater_id, modified) VALUES
+(1, 'Team Creation Survey', '2012-07-31 11:20:00', '2012-07-01 11:20:00', '2013-12-31 11:20:00', 0, 2, '2012-07-13 11:18:56', 2, '2012-07-13 11:18:56'),
+(2, 'Survey, all Q types', '2012-07-31 11:20:00', '2012-07-01 11:20:00', '2013-12-31 11:20:00', 0, 1, '2012-07-13 11:18:56', 1, '2012-07-13 11:18:56');
 -- --------------------------------------------------------
 
 --

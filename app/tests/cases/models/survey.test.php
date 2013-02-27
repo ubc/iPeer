@@ -33,23 +33,4 @@ class SurveyTestCase extends CakeTestCase
 
     function endTest($method) {
     }
-
-    function testGetSurveyIdByCourseIdTitle() {
-        // grab test data
-        $ret = $this->Survey->getSurveyIdByCourseIdTitle(1,
-            'Team Creation Survey');
-
-        // Assert on valid data
-        $this->assertEqual($ret, 1);
-
-        // Test on faulty inputs
-        $faultyInputs1 = $this->Survey->getSurveyIdByCourseIdTitle(1, 'Faulty');
-        $faultyInputs2 = $this->Survey->getSurveyIdByCourseIdTitle(999, 'Math303 Survey');
-        $faultyInputs3 = $this->Survey->getSurveyIdByCourseIdTitle(999, null);
-        $faultyInputs4 = $this->Survey->getSurveyIdByCourseIdTitle(null, null);
-        $this->assertNull($faultyInputs1);
-        $this->assertNull($faultyInputs2);
-        $this->assertNull($faultyInputs3);
-        $this->assertNull($faultyInputs4);
-    }
 }
