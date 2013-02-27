@@ -274,7 +274,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         // test with student account
         $this->login = array(
             'User' => array(
-                'username' => '65498451',
+                'username' => 'redshirt0001',
                 'password' => md5('ipeeripeer')
             )
         );
