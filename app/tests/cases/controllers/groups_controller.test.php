@@ -103,8 +103,8 @@ class GroupsControllerTest extends ExtendedAuthTestCase {
         $this->assertEqual($result['group_num'], 3);
         $this->assertEqual($result['course_id'], 1);
         $this->assertEqual(count($result['user_data']), 15);
-        $this->assertEqual($result['user_data'][5], 'redshirt0001 Ed Student *');
-        $this->assertEqual($result['user_data'][26], 'redshirt0022 Bill Student');
+        $this->assertEqual($result['user_data'][5], '65498451 Ed Student *');
+        $this->assertEqual($result['user_data'][26], '19524032 Bill Student');
     }
 
     function testAddWithData() {
@@ -182,12 +182,12 @@ class GroupsControllerTest extends ExtendedAuthTestCase {
 
         $this->assertEqual($result['group_num'], 1);
         $this->assertEqual(count($result['members']), 4);
-        $this->assertEqual($result['members'][5], 'redshirt0001 Ed Student');
+        $this->assertEqual($result['members'][5], '65498451 Ed Student');
 
         $this->assertEqual(count($result['user_data']), 11);
         // group member should not be in user_data
         $this->assertFalse(isset($result['user_data'][5]));
-        $this->assertEqual($result['user_data'][26], 'redshirt0022 Bill Student');
+        $this->assertEqual($result['user_data'][26], '19524032 Bill Student');
     }
 
     function testEditWithData() {

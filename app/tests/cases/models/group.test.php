@@ -78,16 +78,16 @@ class GroupTestCase extends CakeTestCase
         $students = $this->Group->getStudentsNotInGroup(2);
         $this->assertEqual($students, array(
             '36' => 'Tutor 2',
-            '26' => 'redshirt0022 Bill Student',
-            '21' => 'redshirt0017 Nicole Student',
-            '17' => 'redshirt0013 Edna Student',
-            '28' => 'redshirt0024 Michael Student',
-            '15' => 'redshirt0011 Jennifer Student',
-            '13' => 'redshirt0009 Damien Student',
-            '19' => 'redshirt0015 Jonathan Student',
+            '26' => '19524032 Bill Student',
+            '21' => '22784037 Nicole Student',
+            '17' => '37116036 Edna Student',
+            '28' => '38058020 Michael Student',
+            '15' => '48877031 Jennifer Student',
+            '13' => '84188465 Damien Student',
+            '19' => '90938044 Jonathan Student',
             '35' => ' Tutor 1 *',
-            '6' => 'redshirt0002 Alex Student *',
-            '5' => 'redshirt0001 Ed Student *',
+            '6' => '65468188 Alex Student *',
+            '5' => '65498451 Ed Student *',
         ));
 
         // Test invalid group
@@ -108,10 +108,10 @@ class GroupTestCase extends CakeTestCase
         $students = Set::extract('/Member/student_no_with_full_name', $students);
         sort($students);
         $this->assertEqual($students, array(
-            'redshirt0027 Hui Student',
-            'redshirt0028 Bowinn Student',
-            'redshirt0029 Joe Student',
-            'redshirt0003 Matt Student',
+            '10186039 Hui Student',
+            '19803030 Bowinn Student',
+            '51516498 Joe Student',
+            '98985481 Matt Student',
         ));
 
         // Test invalid group
