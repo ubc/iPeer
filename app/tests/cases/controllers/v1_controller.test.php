@@ -309,7 +309,7 @@ class V1ControllerTest extends CakeTestCase {
         $courses = $this->_fixtures['app.course']->records;
         $expectedList = array();
 
-        $enrol = array('13', '15', '2');
+        $enrol = array('13', '15', '2', '0');
 
         foreach ($courses as $key => $course) {
             $tmp = array();
@@ -685,6 +685,7 @@ class V1ControllerTest extends CakeTestCase {
         $events = Set::sort(json_decode($courseUserEvents, true), '{n}.id', 'asc');
         $this->assertequal($expectedEvents, $events);
     }
+     
 
     function testEnrolments() {
         // Get the ids of students enrolled in course id 3

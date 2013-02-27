@@ -383,14 +383,16 @@ class User extends AppModel
     function getEnrolledStudentsForList($course_id)
     {
         $this->displayField = 'student_no_with_full_name';
-        return $this->find('list', array(
-            'conditions' => array('UserEnrol.course_id' => $course_id),
-            'joins' => array(array('table' => 'user_enrols',
-                'alias' => 'UserEnrol',
-                'type'  => 'LEFT',
-                'conditions' => array('User.id = UserEnrol.user_id'))
-            ),
-            'order' => 'User.student_no'));
+        return $this->find(
+            'list', 
+            array(
+                'conditions' => array(
+                    'Enrolment.id' => $course_id,
+                ),
+                'recursive' => 1,
+                'order' => 'User.student_no'
+            )
+        );
     }
 
     /**

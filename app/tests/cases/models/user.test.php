@@ -80,19 +80,19 @@ class UserTestCase extends CakeTestCase {
             array_push($actual, $student['User']['username']);
         }
         $expect = array(
-            redshirt0027,
-            redshirt0022,
-            redshirt0028,
-            redshirt0017,
-            redshirt0013,
-            redshirt0024,
-            redshirt0011,
-            redshirt0029,
-            redshirt0002,
-            redshirt0001,
-            redshirt0009,
-            redshirt0015,
-            redshirt0003
+            'redshirt0027',
+            'redshirt0022',
+            'redshirt0028',
+            'redshirt0017',
+            'redshirt0013',
+            'redshirt0024',
+            'redshirt0011',
+            'redshirt0029',
+            'redshirt0002',
+            'redshirt0001',
+            'redshirt0009',
+            'redshirt0015',
+            'redshirt0003'
         );
         $this->assertTrue(count(array_diff($actual, $expect)) == 0);
 
@@ -106,19 +106,19 @@ class UserTestCase extends CakeTestCase {
         //Set up test data
         $ret = $this->User->getEnrolledStudentsForList(1);
         $expected = array(
-            '31' => 'redshirt0027 Hui Student',
-            '26' => 'redshirt0022 Bill Student',
-            '32' => 'redshirt0028 Bowinn Student',
-            '21' => 'redshirt0017 Nicole Student',
-            '17' => 'redshirt0013 Edna Student',
-            '28' => 'redshirt0024 Michael Student',
-            '15' => 'redshirt0011 Jennifer Student',
-            '33' => 'redshirt0029 Joe Student',
-            '6' => 'redshirt0002 Alex Student',
-            '5' => 'redshirt0001 Ed Student',
-            '13' => 'redshirt0009 Damien Student',
-            '19' => 'redshirt0015 Jonathan Student',
-            '7' => 'redshirt0003 Matt Student'
+            '31' => '10186039 Hui Student',
+            '26' => '19524032 Bill Student',
+            '32' => '19803030 Bowinn Student',
+            '21' => '22784037 Nicole Student',
+            '17' => '37116036 Edna Student',
+            '28' => '38058020 Michael Student',
+            '15' => '48877031 Jennifer Student',
+            '33' => '51516498 Joe Student',
+            '6' => '65468188 Alex Student',
+            '5' => '65498451 Ed Student',
+            '13' => '84188465 Damien Student',
+            '19' => '90938044 Jonathan Student',
+            '7' => '98985481 Matt Student'
         );
         $this->assertTrue(count(array_diff_assoc($ret, $expected)) == 0);
 	}
@@ -268,15 +268,15 @@ class UserTestCase extends CakeTestCase {
 
         //Test remove instructor from wrong course
         $ret = $this->User->removeInstructor(4, 1);
-        $this->assertFalse($user); // operation should fail
+        $this->assertFalse($ret); // operation should fail
 
         //Test remove invalid instructor from  course
         $ret = $this->User->removeInstructor(999, 2);
-        $this->assertFalse($user); // operation should fail
+        $this->assertFalse($ret); // operation should fail
 
         //Test remove valid instructor from invalid course
         $ret = $this->User->removeInstructor(4, 999);
-        $this->assertFalse($user); // operation should fail
+        $this->assertFalse($ret); // operation should fail
 
         //Test remove invalid instructor from invalid course
         $ret = $this->User->removeInstructor(999, 999);
