@@ -516,6 +516,7 @@ class UsersController extends AppController
 
         // save the data which involves:
         if ($this->data) {
+            $this->data['User'] = array_map('trim', $this->data['User']);
             $submit = $this->data['Form']['save'];
             unset($this->data['Form']);
             // create the enrolment entry depending on if instructor or student
@@ -654,6 +655,7 @@ class UsersController extends AppController
 
         // save the data which involves:
         if ($this->data) {
+            $this->data['User'] = array_map('trim', $this->data['User']);
             // unenrol student from course, group, surveygroup
             // only students will go in because only they have records in Enrolment
             foreach ($enrolCourses as $course) {

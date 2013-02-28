@@ -446,7 +446,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->assertEqual(count($result['instructors']), 3);
         $this->assertEqual($this->controller->data['Course']['course'], $this->fixtureView['Course'][0]['course']);
         $this->assertEqual($this->controller->data['Course']['course'], $this->fixtureView['Course'][0]['course']);
-        $this->assertEqual(count($this->controller->data['Instructor']), 1);
+        $this->assertEqual(count($this->controller->data['Instructor']['Instructor']), 1);
         $this->assertEqual($this->controller->data['Instructor'][0]['id'], 2);
     }
 
@@ -461,7 +461,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'homepage' => 'http://www.ubc.ca'
             ),
             'Instructor' => array(
-                array('id' => 2)
+                'Instructor' => array(2)
             ),
             'Department' => array(
                 'Department' => array(3)
