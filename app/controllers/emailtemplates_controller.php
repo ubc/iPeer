@@ -181,6 +181,7 @@ class EmailtemplatesController extends AppController
 
         } else {
             //Save Data
+            $this->data['EmailTemplate'] = array_map('trim', $this->data['EmailTemplate']);
             if ($this->EmailTemplate->save($this->params['data'])) {
                 $this->Session->setFlash(__('Save Successful!', true), 'good');
                 $this->redirect('index');
@@ -204,6 +205,7 @@ class EmailtemplatesController extends AppController
     {
         if ($this->data) {
             //Save Data
+            $this->data['EmailTemplate'] = array_map('trim', $this->data['EmailTemplate']);
             if ($this->EmailTemplate->save($this->data)) {
                 $this->Session->setFlash(__('Save Successful', true), 'good');
                 $this->redirect('index');

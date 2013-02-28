@@ -249,6 +249,7 @@ class EmailerController extends AppController
             }
 
             //Push an email into email_schedules table
+            $data = $this->_multiMap($data);
             $this->EmailSchedule->saveAll($data);
 
             $this->Session->setFlash(__('The Email was saved successfully', true), 'good');
@@ -519,5 +520,23 @@ class EmailerController extends AppController
                 $i++;
             }
         }
+    }
+    
+    /**
+     * _multiMap
+     *
+     * @param mixed $data data
+     *
+     * @access private
+     * @return void
+     */
+    function _multiMap($data)
+    {
+    	$ret = array();
+    	foreach($data as $key => $value)
+    	{
+    		$ret[$key] = is_array($value) ? $this->_multiMap($value) : trim($value);
+    	}
+    	return $ret;
     }
 }

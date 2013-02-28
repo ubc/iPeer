@@ -372,6 +372,7 @@ class RubricsController extends AppController
     {
         if (!empty($this->data)) {
             $this->Output->filter($this->data);//always filter
+            $this->data = $this->_multiMap($this->data);
             //Save Data
 
             //$this->log($this->data);
@@ -487,6 +488,24 @@ class RubricsController extends AppController
             }
         }
         $this->redirect('index');
+    }
+    
+    /**
+     * _multiMap
+     *
+     * @param mixed $data data
+     *
+     * @access private
+     * @return void
+     */
+    function _multiMap($data)
+    {
+    	$ret = array();
+    	foreach($data as $key => $value)
+    	{
+    		$ret[$key] = is_array($value) ? $this->_multiMap($value) : trim($value);
+    	}
+    	return $ret;
     }
 
 }

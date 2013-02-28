@@ -353,7 +353,7 @@ class EventsController extends AppController
                 $this->data['Event']['template_id'] =
                     $this->data['Event']['Mixeval'];
             }
-
+            $this->data = $this->_multiMap($this->data);
             if ($this->Event->saveAll($this->data)) {
                 $this->Session->setFlash("Add event successful!", 'good');
                 $this->redirect('index/'.$courseId);
@@ -412,6 +412,7 @@ class EventsController extends AppController
                     $this->Penalty->delete($pTmp['id']);
                 }
             }
+            $this->data = $this->_multiMap($this->data);
             if ($this->Event->saveAll($this->data)) {
                 $this->Session->setFlash("Edit event successful!", 'good');
                 $this->redirect('index/'.$event['Event']['course_id']);
@@ -525,5 +526,23 @@ class EventsController extends AppController
         $sFound = $this->Event->find('all', array('conditions' => $conditions));
  
         return ($sFound) ? __('Event title "', true).$this->data['Event']['title'].__('" already exists in this course.', true) : '';
+    }
+    
+    /**
+     * _multiMap
+     *
+     * @param mixed $data data
+     *
+     * @access private
+     * @return void
+     */
+    function _multiMap($data)
+    {
+    	$ret = array();
+    	foreach($data as $key => $value)
+    	{
+    		$ret[$key] = is_array($value) ? $this->_multiMap($value) : trim($value);
+    	}
+    	return $ret;
     }
 }

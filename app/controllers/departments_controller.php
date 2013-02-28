@@ -76,6 +76,7 @@ class DepartmentsController extends AppController {
 
         if (!empty($this->data)) {
             $this->Department->create();
+            $this->data['Department']['name'] = trim($this->data['Department']['name']);
             if ($this->Department->save($this->data)) {
                 $this->Session->setFlash(
                     __('The department has been saved', true), 'good');
@@ -102,6 +103,7 @@ class DepartmentsController extends AppController {
             return;
         }
         if (!empty($this->data)) {
+            $this->data['Department']['name'] = trim($this->data['Department']['name']);
             if ($this->Department->save($this->data)) {
                 $this->Session->setFlash(
                     __('The department has been saved', true), 'good');
