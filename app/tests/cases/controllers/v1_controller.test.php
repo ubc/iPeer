@@ -99,11 +99,18 @@ class V1ControllerTest extends CakeTestCase {
      **/
     private function _getURL($path) {
         $url = Router::url($path, true);
+        // check if we're running the tests from the command line, if so,
+        // we have to manually construct a proper URL
         if (substr($url,0,4) != "http") {
             // read the server from environment var first
             // so that this can be configured from outside
             if (!($server = getenv('SERVER_TEST'))) {
                 $server = 'http://localhost:2000';
+            }
+            // since the Router isn't handling relative URLs for us, make sure
+            // to convert the path to an absolute URL
+            if (substr($path,0,1) != '/') {
+                $path = "/$path";
             }
             return $server.$path;
         }
@@ -675,12 +682,12 @@ class V1ControllerTest extends CakeTestCase {
             )
         );
 
-        $url = $this->_getURL('v1/users/redshirt0001/events');
+        $url = $this->_getURL('/v1/users/redshirt0001/events');
         $actualEvents = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($actualEvents, true), '{n}.id', 'asc');
         $this->assertequal($expectedEvents, $events);
 
-        $url = $this->_getURL('v1/courses/1/users/redshirt0001/events');
+        $url = $this->_getURL('/v1/courses/1/users/redshirt0001/events');
         $courseUserEvents = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($courseUserEvents, true), '{n}.id', 'asc');
         $this->assertequal($expectedEvents, $events);
