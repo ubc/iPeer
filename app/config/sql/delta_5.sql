@@ -370,6 +370,7 @@ ALTER TABLE `survey_group_sets` CHARACTER SET = utf8 ;
 
 ALTER TABLE `survey_groups` CHARACTER SET = utf8 ;
 
+ALTER TABLE `survey_inputs` CHARACTER SET = utf8 , ADD COLUMN `chkbx_id` INT(11) NULL DEFAULT NULL  AFTER `sub_id` ;
 ALTER TABLE `survey_inputs` CHANGE  `survey_id`  `event_id` INT( 11 ) NOT NULL DEFAULT  '0';
 
 ALTER TABLE `survey_questions` CHARACTER SET = utf8 , CHANGE COLUMN `number` `number` INT(11) NOT NULL DEFAULT '9999'  ;
