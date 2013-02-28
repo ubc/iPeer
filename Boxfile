@@ -1,23 +1,23 @@
 web1:
-    name: ipeer
-    document_root: app/webroot
-    shared_writable_dirs:
-        - app/tmp/cache
-        - app/tmp/logs
-        - app/tmp/sessions
-        - app/tmp/tests
-        - app/tmp
-        - app/config
-    php_extensions:
-        - mcrypt
-        - apc
-        - pdo_mysql
-        - mysqli
-        - mbstring
-        - gd
-    after_build:
-        - "mv pagoda/database.php app/Config/database.php"
-        - "mv pagoda/core.php app/Config/core.php"
+  name: ipeer
+  document_root: app/webroot
+  shared_writable_dirs:
+    - app/tmp/cache
+    - app/tmp/logs
+    - app/tmp/sessions
+    - app/tmp/tests
+    - app/tmp
+    - app/config
+  php_extensions:
+    - mcrypt
+    - apc
+    - pdo_mysql
+    - mysqli
+    - mbstring
+    - gd
+  after_build:
+    - "mv pagoda/database.php app/Config/database.php"
+    - "mv pagoda/core.php app/Config/core.php"
 db1:
-    name: db
-    type: mysql
+  name: ipeerdb
+  type: mysql
