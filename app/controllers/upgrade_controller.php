@@ -30,7 +30,7 @@ class UpgradeController extends Controller
             $this->Session->setFlash(__('It seems you do not have a installation of iPeer. Please install it first!', true));
             $this->redirect('/install');
             return;
-        } elseif (!file_exists(CONFIGS.'installed.txt')) {
+        } elseif (!file_exists(TMP.'installed.txt')) {
             // 2.x upgrade
             $sysp = ClassRegistry::init('SysParameter');
             if (null == $sysp->get('system.version', null)) {

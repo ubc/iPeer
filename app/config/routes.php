@@ -28,10 +28,10 @@
  * is directed to the installation page. Setup normal router otherwise.
  *
  * iPeer is considered to be installed if the text file installed.txt
- * is located in the CONFIGS directory.
+ * is located in the TMP directory.
  * */
 
-if (file_exists(CONFIGS.'installed.txt')) {
+if (file_exists(TMP.'installed.txt')) {
   // Disable access to the installer by redirecting all attempts to access
   // the installer to the index page. Except for install5, which is needed
   // to tell the user that an install was successful.
