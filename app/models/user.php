@@ -999,30 +999,30 @@ class User extends AppModel
 	 *
 	 * @return group members
 	 */
-	function getEventGroupMembersNoTutors ($groupId, $selfEval, $userId)
-	{
-		$conditions['Group.id'] = $groupId;
-		// TODO needs to be changed to use constant instead for role id
-		$conditions['Role.id'] = $this->USER_TYPE_STUDENT;
-		if (!$selfEval) {
-			$conditions['User.id !='] = $userId;
-		}
-		
-		$members = $this->find('all', array(
-			'conditions' => $conditions,
-			'contain' => array('Role', 'Group')
-		));
-		
-		$groupMembers = array();
-		foreach($members as $member) {
-			$tmp = array();
-			$tmp['User'] = $member['User'];
-			$tmp['Role']['0'] = $member['Role'];
-			$groupMembers[] = $tmp;
-		}
-		
-		return $groupMembers;
-	}
+    function getEventGroupMembersNoTutors ($groupId, $selfEval, $userId)
+    {
+        $conditions['Group.id'] = $groupId;
+        // TODO needs to be changed to use constant instead for role id
+        $conditions['Role.id'] = $this->USER_TYPE_STUDENT;
+        if (!$selfEval) {
+            $conditions['User.id !='] = $userId;
+        }
+        
+        $members = $this->find('all', array(
+            'conditions' => $conditions,
+            'contain' => array('Role', 'Group')
+        ));
+        
+        $groupMembers = array();
+        foreach($members as $member) {
+            $tmp = array();
+            $tmp['User'] = $member['User'];
+            $tmp['Role']['0'] = $member['Role'];
+            $groupMembers[] = $tmp;
+        }
+
+        return $groupMembers;
+    }
 
     /*********************************
      * Static functions

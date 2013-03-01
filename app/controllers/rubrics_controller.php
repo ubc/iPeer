@@ -500,12 +500,11 @@ class RubricsController extends AppController
      */
     function _multiMap($data)
     {
-    	$ret = array();
-    	foreach($data as $key => $value)
-    	{
-    		$ret[$key] = is_array($value) ? $this->_multiMap($value) : trim($value);
-    	}
-    	return $ret;
+        $ret = array();
+        foreach($data as $key => $value) {
+            $ret[$key] = is_array($value) ? $this->_multiMap($value) : trim($value);
+        }
+        return $ret;
     }
 
 }

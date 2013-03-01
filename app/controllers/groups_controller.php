@@ -199,7 +199,7 @@ class GroupsController extends AppController
         }
 
         if (!empty($this->data)) {
-        	$this->data['Group']['group_name'] = trim($this->data['Group']['group_name']);
+            $this->data['Group']['group_name'] = trim($this->data['Group']['group_name']);
             if ($this->Group->save($this->data)) {
                 $this->Session->setFlash(__('The group was added successfully.', true), 'good');
                 $this->redirect('index/'.$course_id);
@@ -255,7 +255,7 @@ class GroupsController extends AppController
         }
 
         if (!empty($this->data)) {
-        	$this->data['Group']['group_name'] = trim($this->data['Group']['group_name']);
+            $this->data['Group']['group_name'] = trim($this->data['Group']['group_name']);
             if ($this->Group->save($this->data)) {
                 $this->Session->setFlash(__('The group was updated successfully.', true), 'good');
             } else {

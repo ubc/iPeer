@@ -197,7 +197,7 @@ class EvaluationSubmission extends AppModel
     function getGrpEventIdEvalSub($userId)
     {
         return $this->find('list', array(
-            'conditions' => array('EvaluationSubmission.submitter_id' => $userId, 'EvaluationSubmission.grp_event_id !=' => NULL),
+            'conditions' => array('EvaluationSubmission.submitter_id' => $userId, 'EvaluationSubmission.grp_event_id !=' => null),
             'fields' => array('EvaluationSubmission.grp_event_id')
         ));
     }
@@ -213,7 +213,7 @@ class EvaluationSubmission extends AppModel
     function getEventIdSurveySub($userId)
     {
         return $this->find('list', array(
-            'conditions' => array('EvaluationSubmission.submitter_id' => $userId, 'EvaluationSubmission.grp_event_id' => NULL),
+            'conditions' => array('EvaluationSubmission.submitter_id' => $userId, 'EvaluationSubmission.grp_event_id' => null),
             'fields' => array('EvaluationSubmission.event_id')
         ));
     }
