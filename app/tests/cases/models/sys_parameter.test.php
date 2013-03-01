@@ -36,10 +36,9 @@ class SysParameterTestCase extends CakeTestCase
 
     function testFindParameter ()
     {
-        $result = $this->SysParameter->findParameter('display.logo_file');
-        $this->assertEqual($result['SysParameter']['id'], 10);
-        $this->assertEqual($result['SysParameter']['parameter_code'], 'display.logo_file');
-        $this->assertEqual($result['SysParameter']['parameter_value'], 'LayoutLogoDefault.gif');
+        $result = $this->SysParameter->findParameter('system.super_admin');
+        $this->assertEqual($result['SysParameter']['parameter_code'], 'system.super_admin');
+        $this->assertEqual($result['SysParameter']['parameter_value'], 'root');
 
         $result = $this->SysParameter->findParameter('invalid');
         $this->assertFalse($result);
@@ -50,12 +49,12 @@ class SysParameterTestCase extends CakeTestCase
 
     function testGet()
     {
-        $result = $this->SysParameter->get('display.logo_file');
-        $this->assertEqual($result, 'LayoutLogoDefault.gif');
+        $result = $this->SysParameter->get('system.super_admin');
+        $this->assertEqual($result, 'root');
 
         // test cached version
-        $result = $this->SysParameter->get('display.logo_file');
-        $this->assertEqual($result, 'LayoutLogoDefault.gif');
+        $result = $this->SysParameter->get('system.super_admin');
+        $this->assertEqual($result, 'root');
 
         // test default
         $result = $this->SysParameter->get('non.existing.key', 'default');

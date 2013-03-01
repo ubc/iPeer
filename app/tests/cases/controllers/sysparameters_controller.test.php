@@ -75,20 +75,18 @@ class SysparametersControllerTest extends ExtendedAuthTestCase {
     // This code may be copied from SysParameter, need to be changed
     function testIndex() {
         $result = $this->testAction('/sysparameters/index', array('return' => 'vars'));
-
-        $this->assertEqual(count($result['paramsForList']['data']['entries']), 15);
-        $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysParameter']['parameter_code'], 'system.soft_delete_enable');
-        $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysParameter']['parameter_value'], 'true');
-        $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysParameter']['parameter_type'], 'B');
+        $this->assertEqual(count($result['paramsForList']['data']['entries']), 12);
+        $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysParameter']['parameter_code'], 'system.super_admin');
+        $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysParameter']['parameter_value'], 'root');
+        $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysParameter']['parameter_type'], 'S');
     }
 
 
     function testView() {
         $result = $this->testAction('/sysparameters/view/1', array('return' => 'vars'));
-
-        $this->assertEqual($result['data']['SysParameter']['parameter_code'], 'system.soft_delete_enable');
-        $this->assertEqual($result['data']['SysParameter']['parameter_value'], 'true');
-        $this->assertEqual($result['data']['SysParameter']['parameter_type'], 'B');
+        $this->assertEqual($result['data']['SysParameter']['parameter_code'], 'system.super_admin');
+        $this->assertEqual($result['data']['SysParameter']['parameter_value'], 'root');
+        $this->assertEqual($result['data']['SysParameter']['parameter_type'], 'S');
         $this->assertEqual($result['data']['SysParameter']['record_status'], 'A');
     }
 
@@ -96,9 +94,9 @@ class SysparametersControllerTest extends ExtendedAuthTestCase {
     function testEdit() {
         $result = $this->testAction('/sysparameters/edit/1', array('return' => 'vars'));
 
-        $this->assertEqual($result['data']['SysParameter']['parameter_code'], 'system.soft_delete_enable');
-        $this->assertEqual($result['data']['SysParameter']['parameter_value'], 'true');
-        $this->assertEqual($result['data']['SysParameter']['parameter_type'], 'B');
+        $this->assertEqual($result['data']['SysParameter']['parameter_code'], 'system.super_admin');
+        $this->assertEqual($result['data']['SysParameter']['parameter_value'], 'root');
+        $this->assertEqual($result['data']['SysParameter']['parameter_type'], 'S');
         $this->assertEqual($result['data']['SysParameter']['record_status'], 'A');
 
     }
