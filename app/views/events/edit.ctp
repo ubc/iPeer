@@ -74,6 +74,17 @@ echo $this->Form->input(
         'default' => '0'
     )
 );
+echo $this->Form->input(
+    'results',
+    array(
+        'legend' => 'Student Result Mode',
+        'type' => 'radio',
+        'options' => array('1' => 'Detailed', '0'=> 'Basic'),
+        'default' => '0'
+    )
+); ?>
+<div class='help-text'><?php echo _t('Basic view only show averages of questions') ?></div>
+<?php
 echo $this->Form->input('due_date', array('type' => 'text'));
 echo $this->Form->input('release_date_begin', array('label' => 'Evaluation Released From', 'type' => 'text'));
 echo $this->Form->input('release_date_end', array('label' => 'Until', 'type' => 'text'));

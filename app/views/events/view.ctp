@@ -45,6 +45,12 @@
         </td>
     </tr>
     <tr>
+        <th><?php __('Student Result Mode')?></th>
+        <td>
+            <?php echo $event['Event']['results']==1? 'Detailed' : 'Basic'; ?>
+        </td>
+    </tr>
+    <tr>
         <th><?php __('Due Date')?>&nbsp;</th>
         <td><?php echo Toolkit::formatDate($event['Event']['due_date']) ?></td>
     </tr>
