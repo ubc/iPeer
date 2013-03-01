@@ -43,8 +43,8 @@ class InstallController extends Controller
      * */
     function index()
     {
-        if (file_exists(CONFIGS.'installed.txt')) {
-            $this->Session->setFlash(__('WARNING: It looks like you already have a instance running. Reinstalling will remove all your current data. Remove app/config/installed.txt to proceed.', true));
+        if (file_exists(TMP.'installed.txt')) {
+            $this->Session->setFlash(__('WARNING: It looks like you already have a instance running. Reinstalling will remove all your current data. Remove '.TMP.'/installed.txt to proceed.', true));
         }
     }
 
@@ -153,7 +153,7 @@ class InstallController extends Controller
             );
             $this->installHelper->updateSystemParameters($sysparams);
             // mark this instance as installed
-            $f = fopen(CONFIGS.'installed.txt', 'w');
+            $f = fopen(TMP.'installed.txt', 'w');
             if (!$f) {
                 $this->Session->setFlash(sprintf(__('Installation failed, unable to write to %s dir', true), CONFIGS));
                 $this->redirect(array('action' => 'install4'));

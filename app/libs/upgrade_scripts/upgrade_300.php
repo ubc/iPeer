@@ -64,8 +64,8 @@ class Upgrade300 extends UpgradeBase
         }
         $sysparameter->reload();
 
-        if (!file_exists(CONFIGS.'installed.txt')) {
-            $f = fopen(CONFIGS.'installed.txt', 'w');
+        if (!file_exists(TMP.'installed.txt')) {
+            $f = fopen(TMP.'installed.txt', 'w');
             if (!$f) {
                 $this->errors[] = sprintf(__('Installation failed, unable to write to %s dir', true), CONFIGS);
                 return false;
