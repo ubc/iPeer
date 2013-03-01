@@ -49,11 +49,11 @@
  *
  */
 
-if(file_exists(dirname(__FILE__).'/bootstrap.local.php')) { 
+if(file_exists(dirname(__FILE__).'/bootstrap.local.php')) {
   include('bootstrap.local.php');
 }
 
-/** 
+/**
  * Create an empty database.php file if one isn't found.
  *
  * This lets us remove database.php from version control. This was a bit of
@@ -64,4 +64,8 @@ if(file_exists(dirname(__FILE__).'/bootstrap.local.php')) {
 if (!file_exists(CONFIGS.'database.php')) {
   $fd = fopen(CONFIGS.'database.php', 'x');
   fclose($fd);
+}
+
+if (defined(DB_PREDEFINED)) {
+    define('DB_PREDEFINED', false);
 }

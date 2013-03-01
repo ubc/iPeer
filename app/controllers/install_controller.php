@@ -241,11 +241,6 @@ class InstallController extends Controller
         // Workaround for Windows portability
         $endl = (substr(PHP_OS, 0, 3)=='WIN')? "\r\n" : "\n";
 
-        //create and write file
-        $confile = fopen(CONFIGS.'database.php', 'wb');
-        if (!$confile) {
-            return false;
-        }
         $dbConfig = array();
         //Setup the database config parameters
         $dbConfig['host'] = $this->data['InstallValidationStep3']['host'];
@@ -253,21 +248,30 @@ class InstallController extends Controller
         $dbConfig['password'] = $this->data['InstallValidationStep3']['password'];
         $dbConfig['database'] = $this->data['InstallValidationStep3']['database'];
 
-        //Write Config file
-        fwrite($confile, "<?php" . $endl);
-        fwrite($confile, "class DATABASE_CONFIG
-        {".$endl);
-        fwrite($confile, "public \$default = array(".$endl);
-        fwrite($confile, "    'driver' => 'mysql', ". $endl);
-        fwrite($confile, "    'connect' => 'mysql_pconnect', ".$endl);
-        foreach ($dbConfig as $k => $v) {
-            fwrite($confile, "    '".$k."'   => '".$v."', ".$endl);
+        if (!DB_PREDEFINED) {
+            //create and write file
+            $confile = fopen(CONFIGS.'database.php', 'wb');
+            if (!$confile) {
+                return false;
+            }
+
+            //Write Config file
+            fwrite($confile, "<?php" . $endl);
+            fwrite($confile, "class DATABASE_CONFIG
+            {".$endl);
+            fwrite($confile, "public \$default = array(".$endl);
+            fwrite($confile, "    'driver' => 'mysql', ". $endl);
+            fwrite($confile, "    'connect' => 'mysql_pconnect', ".$endl);
+            foreach ($dbConfig as $k => $v) {
+                fwrite($confile, "    '".$k."'   => '".$v."', ".$endl);
+            }
+            fwrite($confile, "    'prefix'   => ''" . $endl);
+            fwrite($confile, "  );" . $endl . "}".$endl);
+            fwrite($confile, "?>" . $endl);
+            fflush($confile);
+            fclose($confile);
         }
-        fwrite($confile, "    'prefix'   => ''" . $endl);
-        fwrite($confile, "  );" . $endl . "}".$endl);
-        fwrite($confile, "?>" . $endl);
-        fflush($confile);
-        fclose($confile);
+
         return $dbConfig;
     }
 
