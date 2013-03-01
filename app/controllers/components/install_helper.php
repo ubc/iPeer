@@ -52,7 +52,6 @@ class InstallHelperComponent
     function dbSource($dbConfig)
     {
         // Connect to the server
-        var_dump($dbConfig);
         $mysql = mysql_connect($dbConfig['host'],
             $dbConfig['login'],
             $dbConfig['password']);
