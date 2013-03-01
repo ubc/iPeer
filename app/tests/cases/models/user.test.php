@@ -560,6 +560,25 @@ class UserTestCase extends CakeTestCase {
         $this->assertEqual($courses, null);
     }
     
+    function testGetEventGroupMembersNoTutors ()
+    {
+        //Test group, selfeval
+        $members = $this->User->getEventGroupMembersNoTutors(1, true, 5);
+        $this->assertEqual(Set::extract('/User/username', $members), array('redshirt0001', 'redshirt0002', 'redshirt0003'));
+
+        //Test group, no selfeval, valid used id
+        $members = $this->User->getEventGroupMembersNoTutors(1, false, 6);
+        $this->assertEqual(Set::extract('/User/username', $members), array('redshirt0001', 'redshirt0003'));
+
+        //Test group, no selfeval, invalid used id
+        $members = $this->User->getEventGroupMembersNoTutors(1, false, 999);
+        $this->assertEqual(Set::extract('/User/username', $members), array('redshirt0001', 'redshirt0002', 'redshirt0003'));
+
+        //Test invalid group
+        $members = $this->User->getEventGroupMembersNoTutors(999, false, 3);
+        $this->assertEqual(Set::extract('/User/username', $members), null);
+    }
+    
     function testgetFullNames() {
         // TODO
     }

@@ -449,7 +449,7 @@ class EvaluationsController extends AppController
 
 
             //Get Members for this evaluation
-            $groupMembers = $this->GroupsMembers->getEventGroupMembersNoTutors($groupId, $event['Event']['self_eval'], $userId);
+            $groupMembers = $this->User->getEventGroupMembersNoTutors($groupId, $event['Event']['self_eval'], $userId);
             $this->set('groupMembers', $groupMembers);
 
             // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
