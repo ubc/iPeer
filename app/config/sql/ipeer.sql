@@ -994,6 +994,7 @@ CREATE TABLE IF NOT EXISTS `groups_members` (
   `group_id` int(11) NOT NULL DEFAULT '0',
   `user_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `group_user` (`group_id`,`user_id`),
   KEY `group_id` (`group_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 

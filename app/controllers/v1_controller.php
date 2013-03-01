@@ -630,15 +630,20 @@ class V1Controller extends Controller {
                 $userId = $this->User->field('id',
                     array('username' => $user['username']));
                 $tmp = array('group_id' => $groupId, 'user_id' => $userId);
-                // try to add this user to group
-                $this->GroupsMembers->create();
-                if ($this->GroupsMembers->save($tmp)) {
-                    $userId = $this->GroupsMembers->read('user_id');
-                    $this->GroupsMembers->id = null;
+                $inGroup = $this->GroupsMembers->field('id', $tmp);
+                if ($inGroup) {
                     $groupMembers[] = $user;
-                } else {
-                    $status = 'HTTP/1.1 500 Internal Server Error';
-                    break;
+                } else if (!empty($userId)) {
+                    // try to add this user to group
+                    $this->GroupsMembers->create();
+                    if ($this->GroupsMembers->save($tmp)) {
+                        $userId = $this->GroupsMembers->read('user_id');
+                        $this->GroupsMembers->id = null;
+                        $groupMembers[] = $user;
+                    } else {
+                        $status = 'HTTP/1.1 500 Internal Server Error';
+                        break;
+                    }
                 }
             }
         } else if ($this->RequestHandler->isDelete()) {
