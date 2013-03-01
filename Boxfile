@@ -8,11 +8,11 @@ web1:
     - app/tmp/tests
     - app/tmp
   php_extensions:
+    - gd
     - mcrypt
     - apc
     - mysql
     - mbstring
-    - gd
   after_build:
     - "mv app/config/database.pagoda.php app/config/database.php"
     - "mv plugins/guard/config/guard.php app/config/guard.php"
