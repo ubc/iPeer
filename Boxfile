@@ -7,7 +7,6 @@ web1:
     - app/tmp/sessions
     - app/tmp/tests
     - app/tmp
-    - app/config
   php_extensions:
     - mcrypt
     - apc
