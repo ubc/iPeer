@@ -11,7 +11,7 @@ web1:
     - mcrypt
     - apc
     - pdo_mysql
-    - mysqli
+    - mysql
     - mbstring
     - gd
   after_build:
