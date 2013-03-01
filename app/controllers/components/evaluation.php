@@ -808,6 +808,7 @@ class EvaluationComponent extends Object
         $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
         $this->EvaluationMixevalDetail = ClassRegistry::init('EvaluationMixevalDetail');
         $this->Mixeval = ClassRegistry::init('Mixeval');
+        $this->User = ClassRegistry::init('User');
 
         $result = array();
         $evaluator = $this->Auth->user('id');

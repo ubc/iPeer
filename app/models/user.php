@@ -999,7 +999,7 @@ class User extends AppModel
 	 *
 	 * @return group members
 	 */
-    function getEventGroupMembersNoTutors ($groupId, $selfEval, $userId)
+    function getEventGroupMembersNoTutors($groupId, $selfEval, $userId)
     {
         $conditions['Group.id'] = $groupId;
         // TODO needs to be changed to use constant instead for role id

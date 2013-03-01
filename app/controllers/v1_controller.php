@@ -631,8 +631,10 @@ class V1Controller extends Controller {
                     array('username' => $user['username']));
                 $tmp = array('group_id' => $groupId, 'user_id' => $userId);
                 $inGroup = $this->GroupsMembers->field('id', $tmp);
+                // user already in the group
                 if ($inGroup) {
                     $groupMembers[] = $user;
+                // only try to add the user if the user exists
                 } else if (!empty($userId)) {
                     // try to add this user to group
                     $this->GroupsMembers->create();
