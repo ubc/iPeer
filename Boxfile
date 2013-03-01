@@ -15,6 +15,7 @@ web1:
     - gd
   after_build:
     - "mv app/config/database.pagoda.php app/config/database.php"
+    - "mv plugins/guard/config/guard.php app/config/guard.php"
 db1:
   name: ipeerdb
   type: mysql

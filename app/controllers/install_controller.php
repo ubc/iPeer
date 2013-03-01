@@ -111,8 +111,8 @@ class InstallController extends Controller
      * */
     function install4()
     {
-        if (!is_writable(CONFIGS)) {
-            $this->Session->setFlash(sprintf(__('Cannot write to the configuration directory. Please change the permission on %s so that it is writable.', true), CONFIGS));
+        if (!is_writable(TMP)) {
+            $this->Session->setFlash(sprintf(__('Cannot write to the configuration directory. Please change the permission on %s so that it is writable.', true), TMP));
             return;
         }
 
