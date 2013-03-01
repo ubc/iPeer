@@ -280,7 +280,7 @@ class EventsController extends AppController
         // find the related evaluation
         $evaluation = $this->$modelName->find('first', array(
             'conditions' => array('id' => $event['Event']['template_id']),
-            'contain' => false
+            'recursive' => -1
         ));
 
         //merge into event

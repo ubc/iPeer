@@ -1,6 +1,6 @@
 <?php
 $numberQuesetions = array();
-foreach ($mixeval['Question'] as $question) {
+foreach ($mixeval['MixevalQuestion'] as $question) {
     if ($question['mixeval_question_type_id'] == '1') {
         $numberQuestions[] = $question;
     }

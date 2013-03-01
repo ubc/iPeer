@@ -3,7 +3,7 @@ $averagePerQuestion = array();
 $numberQuestions = array();
 $textQuestions = array();
 
-foreach ($mixeval['Question'] as $question) {
+foreach ($mixeval['MixevalQuestion'] as $question) {
     if ($question['mixeval_question_type_id'] != '1') {
         $textQuestions[] = $question;
     } else {
@@ -56,7 +56,7 @@ if (!empty($notInGroup)) {
 <br>
 <!-- summary table -->
 <table class="standardtable">
-    <?php echo $html->tableHeaders($this->Evaluation->getSummaryTableHeader($mixeval['Mixeval']['total_marks'], $mixeval['Question']));?>
+    <?php echo $html->tableHeaders($this->Evaluation->getSummaryTableHeader($mixeval['Mixeval']['total_marks'], $mixeval['MixevalQuestion']));?>
     <?php echo $html->tableCells(array_values($summaryTableData));?>
     <tr align="center">
         <td colspan="<?php echo (count($numberQuestions) + 2); ?>">

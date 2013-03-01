@@ -1093,7 +1093,7 @@ class EvaluationsController extends AppController
             $details = $this->Evaluation->getMixevalResultDetail($groupEventId, $members);
             $mixeval = $this->Mixeval->find('first', array(
                 'conditions' => array('Mixeval.id' => $event['Event']['template_id']),
-                'contain' => array('Question' => array('Description'))
+                'recursive' => 2
             ));
             $inCompleteMembers = $this->User->getUsers($inCompleteMembers, array('Role'), array('User.full_name'));
             $notInGroup = $this->User->getUsers($notInGroup, array('Role'), array('User.id', 'User.full_name'));

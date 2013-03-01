@@ -297,7 +297,7 @@ class EvaluationHelper extends AppHelper
         switch($question['mixeval_question_type_id']) {
         case '1':
             //Point Description Detail
-            $result = $question['Description'][$detail['selected_lom']-1]['descriptor'];
+            $result = $question['MixevalQuestionDesc'][$detail['selected_lom']-1]['descriptor'];
             $result .= "<br />";
 
             //Points Detail

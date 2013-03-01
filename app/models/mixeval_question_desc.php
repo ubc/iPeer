@@ -19,7 +19,7 @@ class MixevalQuestionDesc extends AppModel
         )
     );
 
-    var $actsAs = array('Containable');
+    public $actsAs = array('Containable');
 
     /**
      * Saves Mix evaluation question descriptions to database
