@@ -76,7 +76,7 @@ class InstallController extends Controller
             return;
         }
 
-        if (!is_writable(CONFIGS.'database.php')) {
+        if (!DB_PREDEFINED && !is_writable(CONFIGS.'database.php')) {
             $this->Session->setFlash(sprintf(__('Cannot write to the database configuration file. Please change the permission on %s so that it is writable.', true), CONFIGS.'/database.php'));
         }
 
