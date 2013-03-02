@@ -33,6 +33,7 @@
 </tr>
 </table>
 
+<?php if ($event['Event']['results']) { ?>
 <?php echo $html->script('ricobase')?>
 <?php echo $html->script('ricoeffects')?>
 <?php echo $html->script('ricoanimation')?>
@@ -86,3 +87,26 @@
             unselectedClass: 'panelheader'});
 
 </script>
+<?php } else {
+    $grades = array();
+    foreach ($evaluateeDetails as $details) {
+        foreach ($details['EvaluationRubricDetail'] as $grade) {
+            $grades[$grade['criteria_number']][] = $grade['grade'];
+        }
+    }
+    foreach ($grades as $num => $marks) {
+        $grades[$num] = $this->Evaluation->array_avg($marks);
+    }
+    echo "<br><table class='standardtable'>";
+    echo "<tr>";
+    echo "<th width=50%>"._t('Criteria')."</th>";
+    echo "<th width=50%>"._t('Grade')."</th>";
+    echo "</tr>";
+    foreach ($rubric['RubricsCriteria'] as $ques) {
+        echo "<tr>";
+        echo "<td width=50%>".$ques['criteria']."</th>";
+        echo "<td width=50%>".number_format($grades[$ques['criteria_num']], 2)."</td>";
+        echo "</tr>";
+    }
+    echo "</table>";
+} ?>
