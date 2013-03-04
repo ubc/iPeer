@@ -867,10 +867,17 @@ class EvaluationsController extends AppController
             $courseId = $event['Event']['course_id'];
             $this->set('courseId', $courseId);
             $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
+            // do we need this
             $mixEvalDetail = $this->Evaluation->loadMixEvaluationDetail($event);
             $this->set('data', $mixEvalDetail['mixeval']);
             $this->set('groupMembers', $mixEvalDetail['groupMembers']);
             $this->set('evaluateeCount', $mixEvalDetail['evaluateeCount']);
+            // MT
+            $questions = $this->MixevalQuestion->findAllByMixevalId($event['Event']['template_id']);
+            $mixeval = $this->Mixeval->find('first', array(
+                'conditions' => array('id' => $event['Event']['template_id']), 'contain' => false));
+            $this->set('questions', $questions);
+            $this->set('mixeval', $mixeval);
 
             $this->render('mixeval_eval_form');
         } else {

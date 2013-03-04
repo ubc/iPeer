@@ -1226,29 +1226,30 @@ i {
     margin-left: 14em;
 }
 
-.MixevalView span.help {
+.MixevalView span.help, .MixevalForm span.help {
     color: chocolate;
     font-size: 0.9em;
 }
 
 /* Need to change the font to match how they look in headings (the required
  * mark are in h3 tags in the question prompts) */
-.MixevalView span.required {
+.MixevalView span.required, .MixevalForm span.required {
     font-weight: bold;
     font-family: 'Open Sans', serif;
 }
 
-.MixevalView span.required, .MixevalQuestion span.required {
+.MixevalView span.required, .MixevalQuestion span.required,
+.MixevalForm span.required {
     font-size: 1.5em;
 }
 
-.MixevalView p.note {
+.MixevalView p.note, .MixevalForm p.note {
     display: inline-block;
     margin-left: 1em;
     margin-top: 1em;
 }
 
-.MixevalView p.marks {
+.MixevalView p.marks, .MixevalForm p.marks {
     float: right;
     text-align: right;
     margin-top: 1em;

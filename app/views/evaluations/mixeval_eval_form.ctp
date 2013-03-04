@@ -37,6 +37,7 @@
             <span class="instruction-icon"><?php __(' Instructions')?>:</span>
             <ul class="instructions">
             <li><?php __("Click your peer's name to rate his/her performance.")?></li>
+            <!-- required fields *'ed -->
             <li><?php __('Enter Comments')?> <?php echo $event['Event']['com_req']? '<font color="red">'.__('(Must)', true). '</font>' : __('(Optional)', true) ;?>.</li>
             <li><?php __('Press "Save This Section" or "Edit This Section" once to save the evaluation on individual peer.')?></li>
             <li><?php __('Press "Submit to Complete the Evaluation" to submit your evaluation to all peers.')?> </li>
@@ -61,7 +62,7 @@ if (!empty($penalty)) {
     </tr>
 </table>
 
-<table class="standardtable">
+<table>
     <tr>
         <td>
         <div id="accordion">
@@ -69,18 +70,18 @@ if (!empty($penalty)) {
         <input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/>
             <div id="panel<?php echo $user['id']?>">
                 <div id="panel<?php echo $user['id']?>Header" class="panelheader">
-                    <?php echo $user['first_name'].' '.$user['last_name']?>
+                    <?php echo $user['full_name']?>
                     <?php if (isset($user['Evaluation'])):?>
                     <?php
           // check if the evaluation comment is empty
+          // MT check whether required fields are filled
           $commentsNeeded = false;
           $evaluationDetails = $user['Evaluation']['EvaluationDetail'];
           foreach ($evaluationDetails as $detailEval) {
             $detail = $detailEval['EvaluationMixevalDetail'];
-            if ($data['Question'][$detail['question_number']]['mixeval_question_type_id'] != '1' &&
-                empty($detail['question_comment'])) {
-                $commentsNeeded = true;      // A criteria comment is missing
-                //echo "Missing detail $detail[id] for user $user[id]<br />";
+            $type = $data['MixevalQuestion'][$detail['question_number']-1]['MixevalQuestionType'];
+            if ($type['type'] != 'Likert' && empty($detail['question_comment'])) {
+                $commentsNeeded = true;
                 break;
             }
           }
@@ -99,12 +100,10 @@ if (!empty($penalty)) {
       <?php
       $params = array(  'controller'            => 'mixevals',
                         'data'                  => $data,
-                        'scale_default'         => $data['Mixeval']['scale_max'],
-                        'question_default'      => $data['Mixeval']['lickert_question_max'],
-                        'prefill_question_max'  => $data['Mixeval']['prefill_question_max'],
                         'zero_mark'             => $data['Mixeval']['zero_mark'],
                         'total_mark'            => $data['Mixeval']['total_marks'],
-                        'evaluate'              => 1,
+                        'questions'             => $questions,
+                        'mixeval'               => $mixeval,
                         'user'                  => $user);
 
 

@@ -33,8 +33,9 @@ echo $this->Form->input(
         'options' => array('1' => 'Enabled', '0' => 'Disabled'),
         'default' => '0'
     )
-);
-echo $this->Form->input(
+); ?>
+<div class='help-text'><?php __("Doesn't apply to Mix Evaluation. Required questions are set in the template.") ?></div>
+<?php echo $this->Form->input(
     'auto_release',
     array(
         'legend' => 'Auto-Release Results',

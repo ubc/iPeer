@@ -831,7 +831,7 @@ class EvaluationComponent extends Object
 
         $result['mixeval'] = $this->Mixeval->find('first', array(
             'conditions' => array('id' => $event['Event']['template_id']),
-            'contain' => array('Question' => 'Description'),
+            'recursive' => 2
         ));
 
         // index by question number
