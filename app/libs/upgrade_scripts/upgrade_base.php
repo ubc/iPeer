@@ -60,6 +60,10 @@ class UpgradeBase
         if ($this->up()) {
             $sysparameter = ClassRegistry::init('SysParameter');
             $sysparameter->setValue('system.version', $this->toVersion);
+            // note that upgrade_300 will run this but it won't do anything
+            // because there's no pre-existing database.version entry, 
+            // upgrade_310 should properly add this back
+            $sysparameter->setValue('database.version', $this->dbVersion);
         } else {
             return false;
         }

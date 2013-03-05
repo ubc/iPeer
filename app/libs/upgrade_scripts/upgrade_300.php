@@ -55,6 +55,10 @@ class Upgrade300 extends UpgradeBase
             }
         }
 
+        // when upgrading from v2, will run through all the delta_*.sql files
+        // up to $this->dbVersion because the database version wasn't stored in
+        // the database, so PHP get a null value back, which is then treated
+        // as if we're starting from version 0 
         $sysparameter = ClassRegistry::init('SysParameter');
         $dbv = $sysparameter->getDatabaseVersion();
         $ret = $this->patchDb($dbv, $this->dbVersion);

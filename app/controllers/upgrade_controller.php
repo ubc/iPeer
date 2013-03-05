@@ -39,6 +39,10 @@ class UpgradeController extends Controller
         }
 
         // 3.x and above upgrade, enable permission
+        // Workaround to avoid loading the User model with an iPeer2 database. 
+        // If we tried loading iPeer3's User model with an iPeer2 database, 
+        // we'll get missing table errors.
+        App::import('Model', 'User');
         $permission = array_filter(array('controllers', ucwords($this->params['plugin']), ucwords($this->params['controller']), $this->params['action']));
         if (!User::hasPermission(join('/', $permission))) {
             $this->Session->setFlash('Error: You do not have permission to access the page.');
