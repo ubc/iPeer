@@ -46,7 +46,7 @@ class EvaluationMixevalDetail extends AppModel
      * @access public
      * @return void
      */
-    function getByEvalMixevalIdCritera($MixevalId=null, $questionNum=null)
+    function getByEvalMixevalIdCriteria($MixevalId=null, $questionNum=null)
     {
         //	  $sql = 'evaluation_mixeval_id='.$MixevalId;
         //	  if ($questionNum != null) {
