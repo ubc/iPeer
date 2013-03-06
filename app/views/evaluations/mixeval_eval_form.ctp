@@ -1,6 +1,4 @@
 <?php echo empty($mixeval['Evaluation']['id']) ? null : $html->hidden('Evaluation.id'); ?>
-<form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeEvaluation') . '/'.$event['Event']['id'].'/'.$event['Group']['id']; ?>">
-
 <table class="standardtable">
     <tr><th colspan="4" align="center"><?php __('Evaluation Event Detail')?></th></tr>
     <tr>
@@ -79,54 +77,4 @@ if (!empty($penalty)) {
         </td>
     </tr>
 </table>
-</form>
-
-<center>
-<?php
-  /*$count = 0;
-  foreach($groupMembers as $row) {
-    $user = $row['User'];
-    if (isset($user['Evaluation'])) {
-      $count++;
-    }
-  }
-    $mustCompleteUsers = ($count != $evaluateeCount);
-
-    $requiredNeeded = false;
-    // Check if any comment fields were left empty.
-    if ($event['Event']['com_req']) {
-        foreach($groupMembers as $row) {
-            $user = $row['User'];
-
-            if (empty($user['Evaluation'])) {
-                $requiredNeeded = true;      // Not evaluated? Then we need comments for sure
-                //echo "(Please complete evaluation for student $user[full_name])<br />";
-            } else {
-                if (isset($params['data']['questions'])) {
-                    $evaluationDetails = $user['Evaluation']['EvaluationDetail'];
-                    foreach ($evaluationDetails as $detailEval) {
-                        $detail = $detailEval['EvaluationMixevalDetail'];
-                        if ($params['data']['questions'][$detail['question_number']]['mixeval_question_type_id'] != '1' &&
-                            '' === $detail['question_comment']) {
-                            $requiredNeeded = true;      // A criteria comment is missing
-                            //echo "Missing detail $detail[id] for user $user[id]<br />";
-                            break;
-                        } else {
-                            //echo "OK detail $detail[id] ($detail[question_comment]) for user $user[id]<br />";
-                        }
-                    }
-                }
-            }
-        }
-    }
-    if (!$mustCompleteUsers && !$requiredNeeded) {
-        echo $form->submit(__('Submit to Complete the Evaluation', true), array('div'=>'submitMixeval'));
-    } else {
-        echo $form->submit(__('Submit to Complete the Evaluation', true), array('disabled'=>'true', 'div'=>'submitMixeval')); echo "<br />";
-        echo $mustCompleteUsers ? "<div style='color: red'>".__("Please complete the questions for all group members, pressing 'Save This Section' button for each one.", true)."</div>" : "";
-        echo $requiredNeeded ? "<div style='color: red'>".__("Please Enter all the comments for all the group members before submitting.", true)."</div>" : "";
-    }
-*/
-?>
-</center>
 

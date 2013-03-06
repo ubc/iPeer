@@ -310,7 +310,7 @@ class EvaluationTestCase extends CakeTestCase
 
     }
 
-    function testSaveNGetEvalutionMixevalDetail()
+    function testSaveNGetEvaluationMixevalDetail()
     {
 
         $evalMixevalId = 1;
@@ -318,9 +318,9 @@ class EvaluationTestCase extends CakeTestCase
         $targetEvaluatee = 2;
         $form = array('data'=> array('Mixeval' => array('mixeval_question_type_id0' => '1', 'mixeval_question_type_id1' => '2')),
             'form' => array('selected_lom_2_0' => 1, '2criteria_points_0' => 30, 'response_text_2_1' => 'text'));
-        $grade = $this->EvaluationComponentTest->saveNGetEvalutionMixevalDetail ($evalMixevalId, $mixeval, $targetEvaluatee, $form);
+        $grade = $this->EvaluationComponentTest->saveNGetEvaluationMixevalDetail ($evalMixevalId, $mixeval, $targetEvaluatee, $form);
         $this->assertEqual($grade, 30);
-        $grade = $this->EvaluationComponentTest->saveNGetEvalutionMixevalDetail (null, null, null, null);
+        $grade = $this->EvaluationComponentTest->saveNGetEvaluationMixevalDetail (null, null, null, null);
         $this->assertFalse($grade);
 
     }

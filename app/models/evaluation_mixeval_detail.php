@@ -38,7 +38,7 @@ class EvaluationMixevalDetail extends AppModel
 
 
     /**
-     * getByEvalMixevalIdCritera
+     * getByEvalMixevalIdCriteria
      *
      * @param bool $MixevalId   mixeval id
      * @param bool $questionNum question number

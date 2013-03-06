@@ -1,10 +1,7 @@
 <div class='MixevalForm'>
 <?php
-// MT
 $evaluation = isset($user['Evaluation']) ? $user['Evaluation'] : null;
 $details = Set::combine($evaluation['EvaluationMixevalDetail'], '{n}.question_number', '{n}');
-//echo $this->Form->create('EvaluationMixeval', array(
-//    'url' => $html->url('makeEvaluation') . '/'.$event['Event']['id'].'/'.$event['Group']['id']));
 echo "<input type='hidden' name=data[$user[id]][Evaluation][evaluatee_id] value='$user[id]'/>";
 echo "<input type='hidden' name=data[$user[id]][Evaluation][evaluator_id] value='".User::get('id')."'/>";
 echo "<input type='hidden' name=data[$user[id]][Evaluation][event_id] value='".$event['Event']['id']."'/>";

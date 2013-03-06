@@ -138,9 +138,9 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
 
         // rubric evaluation
         $result = $this->testAction('/evaluations/makeEvaluation/3/1', array('return' => 'vars'));
-        $this->assertEqual($result['evaluateeCount'], 2);
         $this->assertEqual(count($result['groupMembers']), 2);
-        $this->assertEqual($result['data']['Mixeval']['id'], 1);
+        $this->assertEqual(count($result['groupMembers']), 2);
+        $this->assertEqual($result['mixeval']['Mixeval']['id'], 1);
         $this->assertEqual(count($result['penalty']), 0);
         $this->assertEqual(Set::extract($result['penalty'], '/Penalty/id'), array());
         $this->assertEqual($result['penaltyDays'], 0);

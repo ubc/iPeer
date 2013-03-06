@@ -42,11 +42,11 @@ class EvaluationMixevalDetailTestCase extends CakeTestCase {
         $this->assertTrue(is_a($this->EvaluationMixevalDetail, 'EvaluationMixevalDetail'));
     }
 
-    function testGetByEvalMixevalIdCritera()
+    function testGetByEvalMixevalIdCriteria()
     {
         // Run test on valid data
-        $mixEvalDetail1 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera(1, 4);
-        $mixEvalDetail2 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera(1, 5);
+        $mixEvalDetail1 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCriteria(1, 4);
+        $mixEvalDetail2 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCriteria(1, 5);
         $this->assertEqual($mixEvalDetail1['EvaluationMixevalDetail']['id'], 4);
         $this->assertEqual($mixEvalDetail1['EvaluationMixevalDetail']['question_number'], 4);
         $this->assertEqual($mixEvalDetail1['EvaluationMixevalDetail']['question_comment'], 'work very efficiently');
@@ -54,16 +54,16 @@ class EvaluationMixevalDetailTestCase extends CakeTestCase {
         $this->assertEqual($mixEvalDetail2['EvaluationMixevalDetail']['question_number'], 5);
         $this->assertEqual($mixEvalDetail2['EvaluationMixevalDetail']['question_comment'], 'Contributed his part');
         // Run test on one valid input
-        $mixEvalDetail3 = $invalid3 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera(1, null);
+        $mixEvalDetail3 = $invalid3 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCriteria(1, null);
         $this->assertTrue(!empty($mixEvalDetail3));
         $this->assertEqual($mixEvalDetail3[0]['EvaluationMixevalDetail']['id'], 1);
         $this->assertEqual($mixEvalDetail3[1]['EvaluationMixevalDetail']['id'], 2);
         $this->assertEqual($mixEvalDetail3[0]['EvaluationMixevalDetail']['question_comment'], null);
         $this->assertEqual($mixEvalDetail3[1]['EvaluationMixevalDetail']['question_comment'], null);
         // Run tests on invalid data
-        $invalid1 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera(232, 1);
-        $invalid2 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera(1, 1232);
-        $invalid3 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera(null, 1);
+        $invalid1 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCriteria(232, 1);
+        $invalid2 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCriteria(1, 1232);
+        $invalid3 = $this->EvaluationMixevalDetail->getByEvalMixevalIdCriteria(null, 1);
         $this->assertTrue(empty($invalid1));
         $this->assertTrue(empty($invalid2));
         $this->assertTrue(empty($invalid3));

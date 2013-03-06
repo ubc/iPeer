@@ -482,8 +482,8 @@ class EvaluationComponent extends Object
         $this->GroupsMembers = new GroupsMembers;
         $this->EvaluationRubricDetail = new EvaluationRubricDetail;
         $this->Rubric = new Rubric;
-        $this->User=  new User;
-
+        $this->User = ClassRegistry::init('User');
+        
         $Session = new SessionComponent();
         $user = $Session->read('Auth.User');//User or Admin or
         $evaluator = $user['id'];
@@ -512,7 +512,7 @@ class EvaluationComponent extends Object
         $result['rubric'] = $this->Rubric->read();
 
         // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
-        $numMembers = count($this->User->getEventGroupMembersNoTutors($groupId, $event['Event']['self_eval'], $evaluator));
+        $numMembers = count($groupMembers);
         //$this->set('evaluateeCount', $numMembers);
         $result['evaluateeCount'] = $numMembers;
         return $result;
@@ -804,11 +804,9 @@ class EvaluationComponent extends Object
      */
     function loadMixEvaluationDetail ($event)
     {
-        // MT
         $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
         $this->User = ClassRegistry::init('User');
 
-        $result = array();
         $evaluator = $this->Auth->user('id');
 
         //Get Members for this evaluation
@@ -822,10 +820,7 @@ class EvaluationComponent extends Object
                 $groupMembers[$key]['User']['Evaluation'] = $evaluation;
             }
         }
-        $result['groupMembers'] = $groupMembers;
-        $result['evaluateeCount'] = count($groupMembers);
-
-        return $result;
+        return $groupMembers;
     }
 
 
@@ -839,7 +834,6 @@ class EvaluationComponent extends Object
      */
     function saveMixevalEvaluation($params=null)
     {
-        // MT
         $this->Event = ClassRegistry::init('Event');
         $this->Mixeval = ClassRegistry::init('Mixeval');
         $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
@@ -858,11 +852,6 @@ class EvaluationComponent extends Object
         $this->Mixeval->id = $event['Event']['template_id'];
         $mixeval = $this->Mixeval->read();
 
-        // Save evaluation data
-        // total grade for evaluatee from evaluator
-        //$total = Set::extract('/grade', $params['data']['EvaluationMixeval']);
-        //$total = array_sum($total);
-
         $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee(
             $groupEventId, $evaluator, $evaluatee);
         if (empty($evalMixeval)) {
@@ -875,7 +864,7 @@ class EvaluationComponent extends Object
             $this->EvaluationMixeval->save($evalMixeval);
             $evalMixeval = $this->EvaluationMixeval->read();
         }
-        $score = $this->saveNGetEvalutionMixevalDetail(
+        $score = $this->saveNGetEvaluationMixevalDetail(
             $evalMixeval['EvaluationMixeval']['id'], $mixeval, $params);
         $evalMixeval['EvaluationMixeval']['score'] = $score;
         if (!$this->EvaluationMixeval->save($evalMixeval)) {
@@ -886,7 +875,7 @@ class EvaluationComponent extends Object
 
 
     /**
-     * saveNGetEvalutionMixevalDetail
+     * saveNGetEvaluationMixevalDetail
      *
      * @param mixed $evalMixevalId   mixeval id
      * @param mixed $mixeval         mixeval
@@ -895,10 +884,8 @@ class EvaluationComponent extends Object
      * @access public
      * @return void
      */
-    function saveNGetEvalutionMixevalDetail($evalMixevalId, $mixeval, $form)
+    function saveNGetEvaluationMixevalDetail($evalMixevalId, $mixeval, $form)
     {
-        // MT
-        // change the function name to be spelled correctly
         $this->EvaluationMixevalDetail = ClassRegistry::init('EvaluationMixevalDetail');
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
         $totalGrade = 0;

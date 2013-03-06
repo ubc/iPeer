@@ -842,9 +842,6 @@ class EvaluationsController extends AppController
                 return;
             }
 
-            // students can submit again
-            $submission = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
-
             // students can't submit outside of release date range
             $event = $this->Event->getEventByIdGroupId($eventId, $groupId);
             $now = time();
@@ -864,15 +861,9 @@ class EvaluationsController extends AppController
             $this->set('penalty', $penalty);
             $this->set('event', $event);
             //Setup the courseId to session
-            $courseId = $event['Event']['course_id'];
-            $this->set('courseId', $courseId);
+            $this->set('courseId', $event['Event']['course_id']);
             $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
-            // do we need this
-            $mixEvalDetail = $this->Evaluation->loadMixEvaluationDetail($event);
-            //$this->set('data', $mixEvalDetail['mixeval']);
-            $this->set('groupMembers', $mixEvalDetail['groupMembers']);
-            $this->set('evaluateeCount', $mixEvalDetail['evaluateeCount']);
-            // MT
+            $this->set('groupMembers', $this->Evaluation->loadMixEvaluationDetail($event));
             $questions = $this->MixevalQuestion->findAllByMixevalId($event['Event']['template_id']);
             $mixeval = $this->Mixeval->find('first', array(
                 'conditions' => array('id' => $event['Event']['template_id']), 'contain' => false, 'recursive' => 2));
@@ -965,67 +956,6 @@ class EvaluationsController extends AppController
     {
         $status = true;
         return $status;
-    }
-
-
-    /**
-     * completeEvaluationMixeval
-     *
-     *
-     * @access public
-     * @return void
-     */
-    function completeEvaluationMixeval ()
-    {
-        $status = true;
-
-        $eventId = $this->params['form']['event_id'];
-        $groupId = $this->params['form']['group_id'];
-        $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
-        $evaluateeCount = $this->params['form']['evaluateeCount'];
-
-        $groupEventId = $this->params['form']['group_event_id'];
-        //Get the target group event
-        $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
-        $this->GroupEvent->id = $groupEvent['GroupEvent']['group_id'];
-
-        // if no submission exists, create one
-        //Get the target event submission
-        $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
-        if (empty($evaluationSubmission)) {
-            $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
-            $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
-            $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
-            $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
-            // save evaluation submission
-            $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
-            $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
-            if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
-                $status = false;
-            }
-        }
-
-        //checks if all members in the group have submitted
-        //the number of submission equals the number of members
-        //means that this group is ready to review
-        $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupEventId);
-        $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
-        //Check to see if all members are completed this evaluation
-        if ($numOfCompletedCount == $evaluateeCount ) {
-            $groupEvent['GroupEvent']['marked'] = 'to review';
-            if (!$this->GroupEvent->save($groupEvent)) {
-                $status = false;
-            }
-        }
-
-        if ($status) {
-            $this->Session->setFlash(__('Your Evaluation was submitted successfully.', true), 'good');
-            $this->redirect('/home/index/', true);
-            return;
-        } else {
-            $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
-            return;
-        }
     }
 
 
