@@ -550,9 +550,9 @@ CREATE TABLE `courses` (
   `password` varchar(25) default NULL,
   `record_status` varchar(1) NOT NULL default 'A',
   `creator_id` int(11) NOT NULL default '0',
-  `created` datetime NOT NULL default '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) default NULL,
-  `modified` datetime default NULL,
+  `modified` datetime,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `course` (`course`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -581,14 +581,14 @@ CREATE TABLE IF NOT EXISTS `users` (
   `title` varchar(80) DEFAULT '',
 -- The maximum length for an email address is 254 chars by RFC3696 errata
   `email` varchar(254) DEFAULT '',
-  `last_login` datetime DEFAULT NULL,
-  `last_logout` datetime DEFAULT NULL,
+  `last_login` datetime,
+  `last_logout` datetime,
   `last_accessed` varchar(10) DEFAULT NULL,
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   `lti_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
@@ -650,9 +650,9 @@ CREATE TABLE IF NOT EXISTS `faculties` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(80) NOT NULL,
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE (`name`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -662,8 +662,8 @@ CREATE TABLE IF NOT EXISTS `faculties` (
 --
 
 INSERT INTO `faculties` (`id`, `name`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
-(1, 'Applied Science', 0, '0000-00-00 00:00:00', NULL, '2012-05-23 11:29:58'),
-(2, 'Science', 0, '0000-00-00 00:00:00', NULL, '2012-05-23 11:30:05');
+(1, 'Applied Science', 0, NOW(), NULL, '2012-05-23 11:29:58'),
+(2, 'Science', 0, NOW(), NULL, '2012-05-23 11:30:05');
 
 -- --------------------------------------------------------
 
@@ -677,9 +677,9 @@ CREATE TABLE IF NOT EXISTS `departments` (
   `name` varchar(80) NOT NULL,
   `faculty_id` int NOT NULL,
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   FOREIGN KEY (`faculty_id`) REFERENCES `faculties` (`id`) ON DELETE CASCADE,
   PRIMARY KEY (`id`),
   UNIQUE (`name`)
@@ -690,9 +690,9 @@ CREATE TABLE IF NOT EXISTS `departments` (
 --
 
 INSERT INTO `departments` (`id`, `name`, `faculty_id`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
-(1, 'MECH', 1, 0, '0000-00-00 00:00:00', NULL, '2012-05-23 11:30:41'),
-(2, 'APSC', 1, 0, '0000-00-00 00:00:00', NULL, '2012-05-23 11:30:57'),
-(3, 'CPSC', 2, 0, '0000-00-00 00:00:00', NULL, '2012-05-23 11:31:07');
+(1, 'MECH', 1, 0, NOW(), NULL, '2012-05-23 11:30:41'),
+(2, 'APSC', 1, 0, NOW(), NULL, '2012-05-23 11:30:57'),
+(3, 'CPSC', 2, 0, NOW(), NULL, '2012-05-23 11:31:07');
 
 -- --------------------------------------------------------
 
@@ -733,8 +733,8 @@ CREATE TABLE IF NOT EXISTS `email_merges` (
   `value` varchar(80) NOT NULL,
   `table_name` varchar(80) NOT NULL,
   `field_name` varchar(80) NOT NULL,
-  `created` datetime NOT NULL,
-  `modified` datetime NOT NULL,
+  `created` datetime,
+  `modified` datetime,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
@@ -743,10 +743,10 @@ CREATE TABLE IF NOT EXISTS `email_merges` (
 --
 
 INSERT INTO `email_merges` (`id`, `key`, `value`, `table_name`, `field_name`, `created`, `modified`) VALUES
-(1, 'Username', '{{{USERNAME}}}', 'User', 'username', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
-(2, 'First Name', '{{{FIRSTNAME}}}', 'User', 'first_name', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
-(3, 'Last Name', '{{{LASTNAME}}}', 'User', 'last_name', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
-(4, 'Email Address', '{{{Email}}}', 'User', 'email', '0000-00-00 00:00:00', '0000-00-00 00:00:00');
+(1, 'Username', '{{{USERNAME}}}', 'User', 'username', NOW(), NOW()),
+(2, 'First Name', '{{{FIRSTNAME}}}', 'User', 'first_name', NOW(), NOW()),
+(3, 'Last Name', '{{{LASTNAME}}}', 'User', 'last_name', NOW(), NOW()),
+(4, 'Email Address', '{{{Email}}}', 'User', 'email', NOW(), NOW());
 
 -- --------------------------------------------------------
 
@@ -759,7 +759,7 @@ CREATE TABLE IF NOT EXISTS `email_schedules` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `subject` varchar(80) NOT NULL,
   `content` text NOT NULL,
-  `date` datetime NOT NULL,
+  `date` datetime,
   `from` varchar(80) NOT NULL,
   `to` text NOT NULL,
   `course_id` int(11) DEFAULT NULL,
@@ -767,7 +767,7 @@ CREATE TABLE IF NOT EXISTS `email_schedules` (
   `grp_id` int(11) DEFAULT NULL,
   `sent` tinyint(1) NOT NULL DEFAULT '0',
   `creator_id` int(11) NOT NULL,
-  `created` datetime NOT NULL,
+  `created` datetime,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
 
@@ -795,11 +795,11 @@ CREATE TABLE IF NOT EXISTS `email_templates` (
   `content` text NOT NULL,
   `availability` tinyint(4) NOT NULL,
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `updated` datetime DEFAULT NULL,
+  `updated` datetime,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=13 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `email_templates`
@@ -807,9 +807,9 @@ CREATE TABLE IF NOT EXISTS `email_templates` (
 
 INSERT INTO `email_templates` (`id`, `name`, `description`, `subject`, `content`, `availability`, `creator_id`, `created`, `updater_id`, `updated`) VALUES
 (1, 'Submission Confirmation', 'template for submission confirmation', 'iPeer: Evaluation Submission Confirmation', 'Hi {{{FIRSTNAME}}}, \nYour evaluation has been submitted successfully. Thank you for your feedback!\n\n iPeer',1, 1, NOW(), NULL, NULL),
-(2, 'Email template example', 'This is an email template example', 'Email Template', 'Hello, {{{USERNAME}}}',1, 1, '0000-00-00', NULL, NULL),
-(3, 'Email template example2', 'email template ex2', 'Email Template2', 'Hello, {{{FIRSTNAME}}}',1, 2, '0000-00-00', NULL, NULL),
-(4, 'Email template example3', 'email temp example3', 'Email Template3', 'Hello,',1, 3, '0000-00-00', NULL, NULL);
+(2, 'Email template example', 'This is an email template example', 'Email Template', 'Hello, {{{USERNAME}}}',1, 1, NOW(), NULL, NULL),
+(3, 'Email template example2', 'email template ex2', 'Email Template2', 'Hello, {{{FIRSTNAME}}}',1, 2, NOW(), NULL, NULL),
+(4, 'Email template example3', 'email temp example3', 'Email Template3', 'Hello,',1, 3, NOW(), NULL, NULL);
 
 
 -- --------------------------------------------------------
@@ -828,9 +828,9 @@ CREATE TABLE IF NOT EXISTS `evaluation_mixeval_details` (
   `grade` double(12,2) NOT NULL DEFAULT '0.00',
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE KEY `evaluation_mixeval_id` (`evaluation_mixeval_id`,`question_number`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -889,9 +889,9 @@ CREATE TABLE IF NOT EXISTS `evaluation_mixevals` (
   `event_id` int(11) NOT NULL DEFAULT '0',
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -922,9 +922,9 @@ CREATE TABLE IF NOT EXISTS `evaluation_rubric_details` (
   `grade` double(12,2) NOT NULL DEFAULT '0.00',
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE KEY `evaluation_rubric_id` (`evaluation_rubric_id`,`criteria_number`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -966,9 +966,9 @@ CREATE TABLE IF NOT EXISTS `evaluation_rubrics` (
   `event_id` int(11) NOT NULL DEFAULT '0',
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   `rubric_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -999,13 +999,13 @@ CREATE TABLE IF NOT EXISTS `evaluation_simples` (
   `release_status` int(1) NOT NULL DEFAULT '0',
   `grp_event_id` int(11) NOT NULL DEFAULT '0',
   `event_id` bigint(11) NOT NULL DEFAULT '0',
-  `date_submitted` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `date_submitted` datetime,
   `grade_release` int(1) DEFAULT NULL,
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -1038,12 +1038,12 @@ CREATE TABLE IF NOT EXISTS `evaluation_submissions` (
   `grp_event_id` int(11) DEFAULT NULL,
   `submitter_id` int(11) NOT NULL DEFAULT '0',
   `submitted` tinyint(1) NOT NULL DEFAULT '0',
-  `date_submitted` datetime DEFAULT NULL,
+  `date_submitted` datetime,
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE KEY `grp_event_id` (`grp_event_id`,`submitter_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -1081,9 +1081,9 @@ CREATE TABLE IF NOT EXISTS `event_template_types` (
   `display_for_selection` tinyint(1) NOT NULL DEFAULT '1',
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE KEY `type_name` (`type_name`),
   UNIQUE KEY `table_name` (`table_name`)
@@ -1094,9 +1094,9 @@ CREATE TABLE IF NOT EXISTS `event_template_types` (
 --
 
 INSERT INTO `event_template_types` (`id`, `type_name`, `table_name`, `model_name`, `display_for_selection`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
-(1, 'SIMPLE', 'simple_evaluations', 'SimpleEvaluation', 1, 'A', 0, '0000-00-00 00:00:00', NULL, NULL),
-(2, 'RUBRIC', 'rubrics', 'Rubric', 1, 'A', 0, '0000-00-00 00:00:00', NULL, NULL),
-(3, 'SURVEY', 'surveys', '', 1, 'A', 0, '0000-00-00 00:00:00', NULL, NULL),
+(1, 'SIMPLE', 'simple_evaluations', 'SimpleEvaluation', 1, 'A', 0, NOW(), NULL, NULL),
+(2, 'RUBRIC', 'rubrics', 'Rubric', 1, 'A', 0, NOW(), NULL, NULL),
+(3, 'SURVEY', 'surveys', '', 1, 'A', 0, NOW(), NULL, NULL),
 (4, 'MIX EVALUATION', 'mixevals', 'Mixeval', 1, 'A', 0, '2006-04-03 11:51:02', 0, '2006-04-06 15:31:48');
 
 -- --------------------------------------------------------
@@ -1116,16 +1116,16 @@ CREATE TABLE IF NOT EXISTS `events` (
   `self_eval` varchar(11) NOT NULL DEFAULT '',
   `com_req` int(11) NOT NULL DEFAULT '0',
   `auto_release` int(11) NOT NULL DEFAULT '0',
-  `due_date` datetime DEFAULT NULL,
-  `release_date_begin` datetime DEFAULT NULL,
-  `release_date_end` datetime DEFAULT NULL,
-  `result_release_date_begin` datetime DEFAULT NULL,
-  `result_release_date_end` datetime DEFAULT NULL,
+  `due_date` datetime,
+  `release_date_begin` datetime,
+  `release_date_end` datetime,
+  `result_release_date_begin` datetime,
+  `result_release_date_end` datetime,
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -1161,9 +1161,9 @@ CREATE TABLE IF NOT EXISTS `group_events` (
   `comment_release_status` varchar(20) NOT NULL DEFAULT 'None',
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE KEY `group_id` (`event_id`,`group_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -1178,11 +1178,11 @@ INSERT INTO `group_events` VALUES (3, 1, 2, 'not reviewed', NULL, 'None', 'None'
 INSERT INTO `group_events` VALUES (4, 2, 2, 'not reviewed', NULL, 'None', 'None', 'A', 0, '2006-06-21 08:52:20', NULL, '2006-06-21 08:52:20');
 INSERT INTO `group_events` VALUES (5, 1, 3, 'not reviewed', NULL, 'None', 'None', 'A', 0, '2006-06-21 08:53:23', NULL, '2006-06-21 08:53:23');
 INSERT INTO `group_events` VALUES (6, 2, 3, 'not reviewed', NULL, 'None', 'None', 'A', 0, '2006-06-21 08:53:23', NULL, '2006-06-21 08:53:23');
-INSERT INTO `group_events` VALUES (7, 1, 6, 'not reviewed', NULL, 'None', 'None', 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
-INSERT INTO `group_events` VALUES (8, 2, 6, 'not reviewed', NULL, 'None', 'None', 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
-INSERT INTO `group_events` VALUES (9, 1, 7, 'not reviewed', NULL, 'None', 'None', 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
-INSERT INTO `group_events` VALUES (10, 1, 8, 'not reviewed', NULL, 'None', 'None', 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
-INSERT INTO `group_events` VALUES (11, 1, 9, 'not reviewed', NULL, 'None', 'None', 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
+INSERT INTO `group_events` VALUES (7, 1, 6, 'not reviewed', NULL, 'None', 'None', 'A', 0, NOW(), NULL, NULL);
+INSERT INTO `group_events` VALUES (8, 2, 6, 'not reviewed', NULL, 'None', 'None', 'A', 0, NOW(), NULL, NULL);
+INSERT INTO `group_events` VALUES (9, 1, 7, 'not reviewed', NULL, 'None', 'None', 'A', 0, NOW(), NULL, NULL);
+INSERT INTO `group_events` VALUES (10, 1, 8, 'not reviewed', NULL, 'None', 'None', 'A', 0, NOW(), NULL, NULL);
+INSERT INTO `group_events` VALUES (11, 1, 9, 'not reviewed', NULL, 'None', 'None', 'A', 0, NOW(), NULL, NULL);
 -- --------------------------------------------------------
 
 --
@@ -1197,9 +1197,9 @@ CREATE TABLE IF NOT EXISTS `groups` (
   `course_id` int(11) DEFAULT NULL,
   `record_status` varchar(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -1252,9 +1252,9 @@ CREATE TABLE IF NOT EXISTS `mixevals` (
   `zero_mark` tinyint(1) NOT NULL DEFAULT '0',
   `availability` varchar(10) NOT NULL DEFAULT 'public',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
@@ -1471,8 +1471,8 @@ CREATE TABLE IF NOT EXISTS `personalizes` (
   `user_id` int(11) NOT NULL DEFAULT '0',
   `attribute_code` varchar(80) DEFAULT NULL,
   `attribute_value` varchar(80) DEFAULT NULL,
-  `created` datetime DEFAULT NULL,
-  `updated` datetime DEFAULT NULL,
+  `created` datetime,
+  `updated` datetime,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`,`attribute_code`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
@@ -1566,8 +1566,8 @@ DROP TABLE IF EXISTS `roles`;
 CREATE TABLE IF NOT EXISTS `roles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
-  `created` datetime NOT NULL,
-  `modified` datetime NOT NULL,
+  `created` datetime,
+  `modified` datetime,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
@@ -1593,8 +1593,8 @@ CREATE TABLE IF NOT EXISTS `roles_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `role_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `created` datetime NOT NULL,
-  `modified` datetime NOT NULL,
+  `created` datetime,
+  `modified` datetime,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -1658,9 +1658,9 @@ CREATE TABLE IF NOT EXISTS `rubrics` (
   `availability` varchar(10) NOT NULL DEFAULT 'public',
   `template` varchar(20) NOT NULL DEFAULT 'horizontal',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -1771,10 +1771,11 @@ CREATE TABLE IF NOT EXISTS `simple_evaluations` (
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `availability` varchar(10) NOT NULL DEFAULT 'public',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `modified` datetime,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
@@ -1933,14 +1934,14 @@ CREATE TABLE IF NOT EXISTS `surveys` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `availability` varchar(10) NOT NULL DEFAULT 'public',
-  `due_date` datetime DEFAULT NULL,
-  `release_date_begin` datetime DEFAULT NULL,
-  `release_date_end` datetime DEFAULT NULL,
+  `due_date` datetime,
+  `release_date_begin` datetime,
+  `release_date_end` datetime,
   `released` tinyint(1) NOT NULL DEFAULT '0',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -1966,9 +1967,9 @@ CREATE TABLE IF NOT EXISTS `sys_parameters` (
   `description` varchar(255) DEFAULT NULL,
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE KEY `parameter_code` (`parameter_code`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
@@ -2005,9 +2006,9 @@ CREATE TABLE IF NOT EXISTS `user_courses` (
   `access_right` varchar(1) NOT NULL DEFAULT 'O',
   `record_status` varchar(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE no_duplicates (`course_id`,`user_id`),
   FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
@@ -2036,9 +2037,9 @@ CREATE TABLE IF NOT EXISTS `user_enrols` (
   `user_id` int(11) NOT NULL DEFAULT '0',
   `record_status` varchar(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE no_duplicates (`course_id`,`user_id`),
   FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
@@ -2122,9 +2123,9 @@ CREATE TABLE IF NOT EXISTS `user_tutors` (
   `user_id` int(11) NOT NULL DEFAULT '0',
   `course_id` int(11) NOT NULL DEFAULT '0',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE no_duplicates (`course_id`,`user_id`),
   FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
@@ -2136,9 +2137,9 @@ CREATE TABLE IF NOT EXISTS `user_tutors` (
 --
 
 INSERT INTO user_tutors (id, user_id, course_id, creator_id, created, updater_id, modified) VALUES
-(1, 35, 1, 0, '0000-00-00 00:00:00', NULL, '2012-07-13 09:45:57'),
-(2, 36, 1, 0, '0000-00-00 00:00:00', NULL, '2012-07-13 09:48:16'),
-(3, 37, 2, 0, '0000-00-00 00:00:00', NULL, '2012-07-13 09:48:24'),
-(4, 37, 3, 0, '0000-00-00 00:00:00', NULL, '2012-07-13 09:48:24');
+(1, 35, 1, 0, NOW(), NULL, NOW()),
+(2, 36, 1, 0, NOW(), NULL, NOW()),
+(3, 37, 2, 0, NOW(), NULL, NOW()),
+(4, 37, 3, 0, NOW(), NULL, NOW());
 
 SET foreign_key_checks = 1;
