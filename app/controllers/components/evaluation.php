@@ -845,12 +845,12 @@ class EvaluationComponent extends Object
         $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
 
         // assuming all are in the same order and same size
-        $evaluator = $params['data']['Evaluation']['evaluator_id'];
-        $evaluatee = $params['data']['Evaluation']['evaluatee_id'];
-        $groupEventId = $params['data']['Evaluation']['group_event_id'];
+        $evaluator = $params['Evaluation']['evaluator_id'];
+        $evaluatee = $params['Evaluation']['evaluatee_id'];
+        $groupEventId = $params['Evaluation']['group_event_id'];
 
         //Get the target event
-        $eventId = $params['data']['Evaluation']['event_id'];
+        $eventId = $params['Evaluation']['event_id'];
         $this->Event->id = $eventId;
         $event = $this->Event->read();
 
@@ -865,25 +865,22 @@ class EvaluationComponent extends Object
 
         $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee(
             $groupEventId, $evaluator, $evaluatee);
-
         if (empty($evalMixeval)) {
             //Save the master Evalution Mixeval record if empty
+            $this->EvaluationMixeval->id = null;
             $evalMixeval['EvaluationMixeval']['evaluator'] = $evaluator;
             $evalMixeval['EvaluationMixeval']['evaluatee'] = $evaluatee;
             $evalMixeval['EvaluationMixeval']['grp_event_id'] = $groupEventId;
             $evalMixeval['EvaluationMixeval']['event_id'] = $eventId;
             $this->EvaluationMixeval->save($evalMixeval);
-            //$evalMixeval['EvaluationMixeval']['id']= $this->EvaluationMixeval->id;
             $evalMixeval = $this->EvaluationMixeval->read();
         }
         $score = $this->saveNGetEvalutionMixevalDetail(
             $evalMixeval['EvaluationMixeval']['id'], $mixeval, $params);
-
         $evalMixeval['EvaluationMixeval']['score'] = $score;
         if (!$this->EvaluationMixeval->save($evalMixeval)) {
             return false;
         }
-
         return true;
     }
 
@@ -905,7 +902,7 @@ class EvaluationComponent extends Object
         $this->EvaluationMixevalDetail = ClassRegistry::init('EvaluationMixevalDetail');
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
         $totalGrade = 0;
-        $data = $form['data']['EvaluationMixeval'];
+        $data = $form['EvaluationMixeval'];
         
         foreach($mixeval['MixevalQuestion'] as $ques) {
             $num = $ques['question_num'];
@@ -917,10 +914,19 @@ class EvaluationComponent extends Object
             $evalMixevalDetail['EvaluationMixevalDetail']['question_number'] = $num;
             
             if ($ques['mixeval_question_type_id'] == '1') {
+                if (empty($data[$num]['selected_lom'])) {
+                    continue;
+                }
                 $evalMixevalDetail['EvaluationMixevalDetail']['selected_lom'] = $data[$num]['selected_lom'];
                 $evalMixevalDetail['EvaluationMixevalDetail']['grade'] = $data[$num]['grade'];
                 $totalGrade += $data[$num]['grade'];
             } else {
+                if (empty($data[$num]['question_comment']) && !empty($evalMixevalDetail)) {
+                    $test = $this->EvaluationMixevalDetail->delete($this->EvaluationMixevalDetail->id);
+                    continue;
+                } else if (empty($data[$num]['question_comment'])) {
+                    continue;
+                }
                 $evalMixevalDetail['EvaluationMixevalDetail']['question_comment'] = $data[$num]['question_comment'];
             }
             $this->EvaluationMixevalDetail->save($evalMixevalDetail);

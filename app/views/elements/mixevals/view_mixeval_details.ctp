@@ -1,14 +1,15 @@
 <div class='MixevalForm'>
 <?php
+// MT
 $evaluation = isset($user['Evaluation']) ? $user['Evaluation'] : null;
 $details = Set::combine($evaluation['EvaluationMixevalDetail'], '{n}.question_number', '{n}');
-echo $this->Form->create('EvaluationMixeval', array(
-    'url' => $html->url('makeEvaluation') . '/'.$event['Event']['id'].'/'.$event['Group']['id']));
-echo "<input type='hidden' name=data[Evaluation][evaluatee_id] value='$user[id]'/>";
-echo "<input type='hidden' name=data[Evaluation][evaluator_id] value='".User::get('id')."'/>";
-echo "<input type='hidden' name=data[Evaluation][event_id] value='".$event['Event']['id']."'/>";
-echo "<input type='hidden' name=data[Evaluation][group_event_id] value='".$event['GroupEvent']['id']."'/>";
-echo "<input type='hidden' name=data[Evaluation][group_id] value='".$event['Group']['id']."'/>";
+//echo $this->Form->create('EvaluationMixeval', array(
+//    'url' => $html->url('makeEvaluation') . '/'.$event['Event']['id'].'/'.$event['Group']['id']));
+echo "<input type='hidden' name=data[$user[id]][Evaluation][evaluatee_id] value='$user[id]'/>";
+echo "<input type='hidden' name=data[$user[id]][Evaluation][evaluator_id] value='".User::get('id')."'/>";
+echo "<input type='hidden' name=data[$user[id]][Evaluation][event_id] value='".$event['Event']['id']."'/>";
+echo "<input type='hidden' name=data[$user[id]][Evaluation][group_event_id] value='".$event['GroupEvent']['id']."'/>";
+echo "<input type='hidden' name=data[$user[id]][Evaluation][group_id] value='".$event['Group']['id']."'/>";
 foreach ($questions as $ques) {
     $type = $ques['MixevalQuestionType']['type'];
     $num = $ques['MixevalQuestion']['question_num'];
@@ -25,15 +26,17 @@ foreach ($questions as $ques) {
             $title .
             $instruct .
             $form->textarea('EvaluationMixeval.'.$num.'.question_comment',
-                array('default' => $value))
+                array('default' => $value, 
+                    'name' => 'data['.$user['id'].'][EvaluationMixeval]['.$num.'][question_comment]'))
         );
     } else if ($type == 'Sentence') {
         $value = (isset($details[$num])) ? $details[$num]['question_comment'] : '';
         $output = $html->div('MixevalQuestion',
             $title .
             $instruct .
-            $form->input('EvaluationMixeval.'.$num.'.question_comment',
-                array('label' => false, 'default' => $value))
+            $form->input($user['id'].'.EvaluationMixeval.'.$num.'.question_comment',
+                array('label' => false, 'default' => $value, 'type' => 'text',
+                    'name' => 'data['.$user['id'].'][EvaluationMixeval]['.$num.'][question_comment]'))
         );
     } else if ($type == 'Likert') {
         $highestMark = $ques['MixevalQuestion']['multiplier'];
@@ -55,13 +58,14 @@ foreach ($questions as $ques) {
             if (isset($details[$num])) {
                 $checked = ($details[$num]['selected_lom'] == $desc['scale_level']) ? 'checked' : '';
             }
-            $option = "<input type='radio' name=data[EvaluationMixeval][$num][grade] value='$mark' $checked ";
-            $option .= "onclick=document.getElementById('selected_lom".$num."').value=$desc[scale_level] />";
+            $option = "<input type='radio' name=data[$user[id]][EvaluationMixeval][$num][grade] value='$mark' $checked ";
+            $option .= "onclick=document.getElementById('selected_lom".$num."_".$user['id']."').value=$desc[scale_level] />";
             $options[] = $option;
             $marks[] = $markLabel. round($mark, 2);
             $markLabel = '';
         }
-        $selected = "<input type='hidden' id='selected_lom".$num."' name=data[EvaluationMixeval][$num][selected_lom] value=''/>";
+        $lom = (isset($details[$num])) ? $details[$num]['selected_lom'] : '';
+        $selected = "<input type='hidden' id='selected_lom".$num."_".$user['id']."' name=data[$user[id]][EvaluationMixeval][$num][selected_lom] value='".$lom."' />";
         $output = $html->div('MixevalQuestion',
             $title .
             $instruct .
@@ -75,9 +79,11 @@ foreach ($questions as $ques) {
     }
     echo $output;
 }
-$required  = $html->tag('span', '*', array('class' => 'required orangered'));
-echo $html->para('note', $required . ' ' . _t('Indicates response required.'));
-echo $html->div('center', $form->submit(__('Save', true), array('div' => false)));
-echo $form->end();
+//$required = $html->tag('span', '*', array('class' => 'required orangered'));
+//$save = isset($user['Evaluation']) ? 'Edit This Section' : 'Save This Section';
+//echo $html->para('note', $required . ' ' . _t('Indicates response required.'));
+//echo $html->div('center', $form->submit(__($save, true), array('div' => 'editSection')));
+//echo '<br><center>'._t('Make sure you save this section before moving on to the other ones!').'</center><br><br>';
+//echo $form->end();
 ?>
 </div>

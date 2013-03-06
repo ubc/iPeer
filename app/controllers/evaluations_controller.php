@@ -881,24 +881,74 @@ class EvaluationsController extends AppController
 
             $this->render('mixeval_eval_form');
         } else {
-            $eventId = $this->data['Evaluation']['event_id'];
-            $groupId = $this->data['Evaluation']['group_id'];
-            if (!$this->validMixevalEvalComplete($this->params['form'])) {
-                $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
-                return;
+            $data = $this->data['data'];
+            unset($this->data['data']);
+            $mixeval = $this->Mixeval->findById($data['template_id']);
+            $groupEventId = $data['grp_event_id'];
+            $evaluator = $data['submitter_id'];
+            $members = $data['members'];
+            $required = true;
+            $failures = array();
+            foreach ($this->data as $userId => $eval) {
+                $eventId = $eval['Evaluation']['event_id'];
+                $groupId = $eval['Evaluation']['group_id'];
+                $evaluatee = $eval['Evaluation']['evaluatee_id'];
+                if (!$this->validMixevalEvalComplete($this->params['form'])) {
+                    $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
+                    return;
+                }
+                if (!$this->Evaluation->saveMixevalEvaluation($eval)) {
+                    $failures[] = $userId;
+                }
+                $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee(
+                    $groupEventId, $evaluator, $evaluatee);
+                $evaluation = !empty($evalMixeval['EvaluationMixevalDetail']) ? $evalMixeval['EvaluationMixevalDetail'] : null;
+                $details = Set::combine($evaluation, '{n}.question_number', '{n}');
+                foreach ($mixeval['MixevalQuestion'] as $ques) {
+                    if ($ques['required'] && !isset($details[$ques['question_num']])) {
+                        $required = false;
+                    }
+                }
             }
-            if ($this->Evaluation->saveMixevalEvaluation($this->params)) {
-                $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
-                return;
+            // success
+            if (empty($failures)) {
+                if ($required) {
+                    $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
+                    if (empty($evaluationSubmission)) {
+                        $this->EvaluationSubmission->id = null;
+                        $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
+                        $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
+                        $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
+                        $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
+                        $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
+                        if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
+                            $this->Session->setFlash(_t('Error: Unable to submit the evaluation. Please try again.'));               
+                        }
+                    }
+
+                    //checks if all members in the group have submitted the number of 
+                    //submission equals the number of members means that this group is ready to review
+                    $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupEventId);
+                    //Check to see if all members are completed this evaluation
+                    if ($memberCompletedNo == $members) {
+                        $this->GroupEvent->id = $groupEventId;
+                        $groupEvent['GroupEvent']['marked'] = 'to review';
+                        if (!$this->GroupEvent->save($groupEvent)) {
+                            $this->Session->setFlash(_t('Error'));               
+                        } else {
+                            $this->Session->setFlash(_t('Successful'), 'good');
+                        }
+                    }
+                } else {
+                    $this->Session->setFlash(_t('Your answers have been saved. Please answer all the required questions before it can be considered submitted.'));
+                }
+            } else {
+                $failures = $this->User->getFullNames($failures);
+                $failures = join(' and ', array_filter(array_merge(array(join(
+                    ', ', array_slice($failures, 0, -1))), array_slice($failures, -1))));
+                $this->Session->setFlash(_t('Error: It was unsuccessful to save evaluation(s) for ').$failures);
             }
-            //Found error
-            else {
-                //Validate the error why the Event->save() method returned false
-                $this->validateErrors($this->Event);
-                $this->set('errmsg', __('Save Evaluation failure.', true));
-                $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
-                return;
-            }//end if
+            $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
         }
     }
 

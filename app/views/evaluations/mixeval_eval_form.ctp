@@ -1,9 +1,3 @@
-<?php echo $html->script('ricobase')?>
-<?php echo $html->script('ricoeffects')?>
-<?php echo $html->script('ricoanimation')?>
-<?php echo $html->script('ricopanelcontainer')?>
-<?php echo $html->script('ricoaccordion')?>
-
 <?php echo empty($mixeval['Evaluation']['id']) ? null : $html->hidden('Evaluation.id'); ?>
 <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeEvaluation') . '/'.$event['Event']['id'].'/'.$event['Group']['id']; ?>">
 
@@ -58,74 +52,38 @@ if (!empty($penalty)) {
 <table>
     <tr>
         <td>
-        <div id="accordion">
+        <?php echo $this->Form->create('EvaluationMixeval', array(
+            'url' => $html->url('makeEvaluation') . '/'.$event['Event']['id'].'/'.$event['Group']['id'])); ?>
+        <?php echo "<input type='hidden' name=data[data][submitter_id] value='".User::get('id')."'/>"; ?>
+        <?php echo "<input type='hidden' name=data[data][event_id] value='".$event['Event']['id']."'/>"; ?>
+        <?php echo "<input type='hidden' name=data[data][template_id] value='".$event['Event']['template_id']."'/>"; ?>
+        <?php echo "<input type='hidden' name=data[data][grp_event_id] value='".$event['GroupEvent']['id']."'/>"; ?>
+        <?php echo "<input type='hidden' name=data[data][members] value='".count($groupMembers)."'/>"; ?>
         <?php foreach($groupMembers as $row): $user = $row['User']; ?>
-        <!-- MT move to view_mixeval_details -->
-        <div id="panel<?php echo $user['id']?>">
-            <!-- MT redo section -->
-            <div id="panel<?php echo $user['id']?>Header" class="panelheader">
-                <?php echo $user['full_name']?>
-                <?php if (isset($user['Evaluation'])):?>
-                <?php
-                  // check if the evaluation comment is empty
-                  // MT check whether required fields are filled
-                  $requiredNeeded = false;
-                  $evaluationDetails = $user['Evaluation']['EvaluationMixevalDetail'];
-                  foreach ($evaluationDetails as $detailEval) {
-                    $detail = $detailEval;
-                    //debug($mixeval['MixevalQuestion']);
-                    $type = $mixeval['MixevalQuestion'][$detail['question_number']-1]['MixevalQuestionType'];
-                    if ($type['type'] != 'Likert' && empty($detail['question_comment'])) {
-                        $requiredNeeded = true;
-                        break;
-                    }
-                  }
-                  $partial = '';
-                  if($requiredNeeded) {
-                    $partial = '<font color="red">'.__('Partially', true).' </font>';
-                  }
-                ?>
-                  <font color="#259500"> ( <?php echo $partial?><?php __('Entered')?> )</font>
-                <?php else:?>
-                  <font color="#FF6666"> - <?php __('Incomplete')?> </font>
-                <?php endif;?>
-            </div>
-            <!-- MT end section-->
-            <div id="panel1Content" class="panelContent">
-              <?php
-              $params = array(  'controller'            => 'mixevals',
-                                'zero_mark'             => $mixeval['Mixeval']['zero_mark'],
-                                'total_mark'            => $mixeval['Mixeval']['total_marks'],
-                                'questions'             => $questions,
-                                'mixeval'               => $mixeval,
-                                'event'                 => $event,
-                                'user'                  => $user);
+            <center><h2><?php echo $user['full_name']?></h2></center>
+            <?php
+            $params = array(  'controller'            => 'mixevals',
+                            'zero_mark'             => $mixeval['Mixeval']['zero_mark'],
+                            'total_mark'            => $mixeval['Mixeval']['total_marks'],
+                            'questions'             => $questions,
+                            'mixeval'               => $mixeval,
+                            'event'                 => $event,
+                            'user'                  => $user);
 
 
-              echo $this->element('mixevals/view_mixeval_details', $params);
-              ?>
-            </div>
-        </div>
+            echo $this->element('mixevals/view_mixeval_details', $params);
+            ?><br>
         <?php endforeach; ?>
-        </div>
+        <center><?php echo $form->submit(__('Submit the Evaluation', true), array('div' => 'editSection')); ?></center>
+        <?php echo $form->end(); ?>
         </td>
     </tr>
 </table>
 </form>
 
-<table class="standardtable">
-  <tr>
-    <td colspan="4" align="center"><form name="submitForm" id="submitForm" method="POST" action="<?php echo $html->url('completeEvaluationMixeval') ?>">
-  <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
-  <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>"/>
-  <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>"/>
-  <input type="hidden" name="course_id" value="<?php echo $courseId ?>"/>
-  <input type="hidden" name="mixeval_id" value="<?php echo $mixeval['Mixeval']['id']?>"/>
-  <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo User::get('id')?>"/>
-  <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
 <center>
 <?php
-  $count = 0;
+  /*$count = 0;
   foreach($groupMembers as $row) {
     $user = $row['User'];
     if (isset($user['Evaluation'])) {
@@ -168,17 +126,7 @@ if (!empty($penalty)) {
         echo $mustCompleteUsers ? "<div style='color: red'>".__("Please complete the questions for all group members, pressing 'Save This Section' button for each one.", true)."</div>" : "";
         echo $requiredNeeded ? "<div style='color: red'>".__("Please Enter all the comments for all the group members before submitting.", true)."</div>" : "";
     }
-
+*/
 ?>
 </center>
-</tr>
-</table>
 
-    <script type="text/javascript">
-    new Rico.Accordion( 'accordion',
-  {hoverClass: 'mdHover',
-  selectedClass: 'mdSelected',
-  clickedClass: 'mdClicked',
-  unselectedClass: 'panelheader'});
-
-    </script>
