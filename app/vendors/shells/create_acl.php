@@ -564,7 +564,6 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Evaluations/makeEvaluation');
         $this->Acl->allow($role, 'controllers/Evaluations/studentViewEvaluationResult');
         $this->Acl->allow($role, 'controllers/Evaluations/completeEvaluationRubric');
-        $this->Acl->allow($role, 'controllers/Evaluations/completeEvaluationMixeval');
         $this->Acl->allow($role, 'controllers/Users/editProfile');
         $this->Acl->deny($role, 'functions');
         $this->Acl->deny($role, 'functions/viewemailaddresses');
@@ -589,7 +588,6 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Evaluations/makeEvaluation');
         $this->Acl->allow($role, 'controllers/Evaluations/studentViewEvaluationResult');
         $this->Acl->allow($role, 'controllers/Evaluations/completeEvaluationRubric');
-        $this->Acl->allow($role, 'controllers/Evaluations/completeEvaluationMixeval');
         $this->Acl->allow($role, 'controllers/Users/editProfile');
         $this->Acl->allow($role, 'controllers/Oauthclients/add');
         $this->Acl->allow($role, 'controllers/Oauthclients/delete');
