@@ -223,7 +223,7 @@ class Mixeval extends AppModel
         return $this->find('list', array('conditions' => $conditions, 'fields' => array('name')));
     }
     
-	/**
+    /**
      * formatPenaltyArray return the array that student has penalty. key will
      * be the user id and value will be the penalty. The student without
      * penalty will be value 0.

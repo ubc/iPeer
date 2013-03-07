@@ -46,9 +46,7 @@
             <?php
             $params = array(  'controller'            => 'mixevals',
                             'zero_mark'             => $mixeval['Mixeval']['zero_mark'],
-                            'total_mark'            => $mixeval['Mixeval']['total_marks'],
                             'questions'             => $questions,
-                            'mixeval'               => $mixeval,
                             'event'                 => $event,
                             'user'                  => $user);
 
