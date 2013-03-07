@@ -326,6 +326,7 @@ class EventsControllerTest extends ExtendedAuthTestCase {
                 'SimpleEvaluation' => 1,
                 'self_eval' => 0,
                 'com_req' => 0,
+                'enable_details' => 1,
                 'due_date' => '2012-11-28 00:00:01',
                 'release_date_begin' => '2012-11-20 00:00:01',
                 'release_date_end' => '2012-11-29 00:00:01',
