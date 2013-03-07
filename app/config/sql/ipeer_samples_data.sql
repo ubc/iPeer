@@ -1964,7 +1964,7 @@ INSERT INTO surveys (id, name, due_date, release_date_begin, release_date_end, r
 DROP TABLE IF EXISTS `sys_parameters`;
 CREATE TABLE IF NOT EXISTS `sys_parameters` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `parameter_code` varchar(80) NOT NULL DEFAULT '',
+  `parameter_code` varchar(80) NOT NULL,
   `parameter_value` text,
   `parameter_type` char(1) NOT NULL DEFAULT '',
   `description` varchar(255) DEFAULT NULL,
