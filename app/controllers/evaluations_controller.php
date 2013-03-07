@@ -853,6 +853,8 @@ class EvaluationsController extends AppController
                 return;
             }
 
+            $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId, User::get('id'));
+
             $penalty = $this->Penalty->getPenaltyByEventId($eventId);
             $penaltyDays = $this->Penalty->getPenaltyDays($eventId);
             $penaltyFinal = $this->Penalty->getPenaltyFinal($eventId);
@@ -860,6 +862,7 @@ class EvaluationsController extends AppController
             $this->set('penaltyDays', $penaltyDays);
             $this->set('penalty', $penalty);
             $this->set('event', $event);
+            $this->set('sub', $sub);
             //Setup the courseId to session
             $this->set('courseId', $event['Event']['course_id']);
             $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));

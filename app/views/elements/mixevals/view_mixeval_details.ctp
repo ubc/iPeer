@@ -16,6 +16,7 @@ foreach ($questions as $ques) {
         $html->tag('span', '*', array('class' => 'required orangered floatright'));
     $title = $ques['MixevalQuestion']['title'];
     $title = $html->tag('h3', "$num. $title $required");
+    $class = $ques['MixevalQuestion']['required'] ? 'must' : '';
     
     if ($type == 'Paragraph') {
         $value = (isset($details[$num])) ? $details[$num]['question_comment'] : '';
@@ -23,7 +24,7 @@ foreach ($questions as $ques) {
             $title .
             $instruct .
             $form->textarea('EvaluationMixeval.'.$num.'.question_comment',
-                array('default' => $value, 
+                array('default' => $value, 'class' => $class,
                     'name' => 'data['.$user['id'].'][EvaluationMixeval]['.$num.'][question_comment]'))
         );
     } else if ($type == 'Sentence') {
@@ -32,7 +33,7 @@ foreach ($questions as $ques) {
             $title .
             $instruct .
             $form->input($user['id'].'.EvaluationMixeval.'.$num.'.question_comment',
-                array('label' => false, 'default' => $value, 'type' => 'text',
+                array('label' => false, 'default' => $value, 'type' => 'text', 'class' => $class,
                     'name' => 'data['.$user['id'].'][EvaluationMixeval]['.$num.'][question_comment]'))
         );
     } else if ($type == 'Likert') {
@@ -56,10 +57,12 @@ foreach ($questions as $ques) {
                 $checked = ($details[$num]['selected_lom'] == $desc['scale_level']) ? 'checked' : '';
             }
             $option = "<input type='radio' name=data[$user[id]][EvaluationMixeval][$num][grade] value='$mark' $checked ";
-            $option .= "onclick=document.getElementById('selected_lom".$num."_".$user['id']."').value=$desc[scale_level] />";
+            $option .= "onclick=document.getElementById('selected_lom".$num."_".$user['id']."').value=$desc[scale_level] ";
+            $option .= "class='".$class."' />";
             $options[] = $option;
             $marks[] = $markLabel. round($mark, 2);
             $markLabel = '';
+            $class = '';
         }
         $lom = (isset($details[$num])) ? $details[$num]['selected_lom'] : '';
         $selected = "<input type='hidden' id='selected_lom".$num."_".$user['id']."' name=data[$user[id]][EvaluationMixeval][$num][selected_lom] value='".$lom."' />";

@@ -72,9 +72,42 @@ if (!empty($penalty)) {
             echo $this->element('mixevals/view_mixeval_details', $params);
             ?><br>
         <?php endforeach; ?>
-        <center><?php echo $form->submit(__('Submit the Evaluation', true), array('div' => 'editSection')); ?></center>
+        <center><?php echo $form->submit(__('Submit the Evaluation', true), array('div' => 'editSection', 'id' => 'submit')); ?></center>
         <?php echo $form->end(); ?>
         </td>
     </tr>
 </table>
+
+<?php if (!empty($sub)) { ?>
+<script type="text/javascript">
+jQuery("#submit").click(function() {
+    if (!validate()) {
+        alert('Please fill in all required questions before resubmitting the evaluation.');
+        return false;
+    }
+});
+
+function validate() {
+    var empty = false;
+    jQuery(".must").each(function() {
+        var type = jQuery(this).attr('type');
+        if (type == 'radio') {
+            var name = jQuery(this).attr('name');
+            if (!jQuery("input[name='" + name + "']:checked").val()) {
+                empty = true;
+            }
+        } else {
+            if(jQuery(this).val() == '') {
+                empty = true;
+            }
+        }
+    });
+    if (empty) {
+        return false;
+    } else {
+        return true;
+    }
+}
+</script>
+<?php } ?>
 
