@@ -1,51 +1,35 @@
-<?php echo empty($mixeval['Evaluation']['id']) ? null : $html->hidden('Evaluation.id'); ?>
-<table class="standardtable">
-    <tr><th colspan="4" align="center"><?php __('Evaluation Event Detail')?></th></tr>
-    <tr>
-        <td width="10%"><?php __('Evaluator:')?></td>
-        <td width="25%"><?php echo User::get('full_name')?></td>
-        <td width="10%"><?php __('Evaluating:')?></td>
-	    <td width="25%"><?php echo $event['Group']['group_name']; ?></td>
-    </tr>
-    <tr>
-        <td><?php __('Event Name:')?></td>
-        <td><?php echo $event['Event']['title'] ?></td>
-        <td><?php __('Due Date:')?></td>
-        <td><?php if (isset($event['Event']['due_date'])) echo Toolkit::formatDate($event['Event']['due_date']) ?></td>
-    </tr>
-    <tr>
-        <td><?php __('Description:')?></td>
-        <td colspan="3"><?php echo $event['Event']['description'] ?></td>
-    </tr>
-    <tr>
-        <td colspan="4" style="text-align: left;">
-            <span class="instruction-icon"><?php __(' Instructions')?>:</span>
-            <ul class="instructions">
-            <li><?php __("Click your peer's name to rate his/her performance.")?></li>
-            <!-- MT required fields *'ed -->
-            <li><?php __('Enter Comments')?> <?php echo $event['Event']['com_req']? '<font color="red">'.__('(Must)', true). '</font>' : __('(Optional)', true) ;?>.</li>
-            <li><?php __('Press "Save This Section" or "Edit This Section" once to save the evaluation on individual peer.')?></li>
-            <li><?php __('Press "Submit to Complete the Evaluation" to submit your evaluation to all peers.')?> </li>
-            </ul>
-
-    <div style="text-align:left; margin-left:3em;"><a href="#" onClick="javascript:$('penalty').toggle();return false;">( <?php __('Show/Hide late penalty policy')?> )</a></div>
-    <div id ="penalty" style ="border:1px solid red; margin-left: 3em; margin-top:0.5em; width: 450px; padding:0.5em; color:darkred; display:none">
-
-<?php
-if (!empty($penalty)) {
-    foreach ($penalty as $day) {
-        $mult = ($day['Penalty']['days_late']>1)?'s':'';
-        echo $day['Penalty']['days_late'].' day'.$mult.' late: '.$day['Penalty']['percent_penalty'].'% deduction. </br>';
-    }
-    echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';
-} else {
-    echo 'No penalty is specified for this evaluation.';
-}
-?>
-  </div>
-        </td>
-    </tr>
-</table>
+<div class='MixevalForm'>
+<center><h2><?php echo $event['Event']['title'].' - '.$event['Group']['group_name']?></h2></center>
+<h2><?php echo _t('Notes') ?></h2>
+<ul>
+    <?php $due = date('l, F j, Y g:i a', strtotime($event['Event']['due_date']))?>
+    <li><?php echo _t('The evaluation is due on ').$due.'.' ?></li>
+    <li><?php echo _t('To resubmit a evaluation, all required questions must be answered.') ?></li>
+    <li><?php echo $html->tag('span', '*', array('class' => 'required orangered'))._t(' marks required questions.')?></li>
+    <?php if (!empty($event['Event']['description'])) { ?>
+    <li><a href="#" onClick="javascript:$('description').toggle(); return false;">
+        <?php echo _t('Show/Hide Evaluation Description')?></a>
+        <div id='description' style="display:none">
+            <?php echo __($event['Event']['description'], true) ?>
+        </div>
+    </li>
+    <?php } ?>
+    <li><a href="#" onClick="javascript:$('penalty').toggle(); return false;">
+        <?php echo _t('Show/Hide Late Penalty Policy') ?></a>
+        <div id='penalty' style="display:none">
+            <?php if (!empty($penalty)) {
+                foreach ($penalty as $day) {
+                    $mult = ($day['Penalty']['days_late']>1) ? 's' : '';
+                    echo $day['Penalty']['days_late'].' day'.$mult.' late: '.
+                        $day['Penalty']['percent_penalty'].'% deduction. </br>';
+                }
+                echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';
+            } else {
+                echo _t('No penalty is specified for this evaluation.');
+            } ?>
+        </div>
+    </li>
+</ul>
 
 <table>
     <tr>
@@ -110,4 +94,4 @@ function validate() {
 }
 </script>
 <?php } ?>
-
+</div>

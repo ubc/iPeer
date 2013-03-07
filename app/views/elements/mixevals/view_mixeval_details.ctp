@@ -1,4 +1,3 @@
-<div class='MixevalForm'>
 <?php
 $evaluation = isset($user['Evaluation']) ? $user['Evaluation'] : null;
 $details = Set::combine($evaluation['EvaluationMixevalDetail'], '{n}.question_number', '{n}');
@@ -79,11 +78,4 @@ foreach ($questions as $ques) {
     }
     echo $output;
 }
-//$required = $html->tag('span', '*', array('class' => 'required orangered'));
-//$save = isset($user['Evaluation']) ? 'Edit This Section' : 'Save This Section';
-//echo $html->para('note', $required . ' ' . _t('Indicates response required.'));
-//echo $html->div('center', $form->submit(__($save, true), array('div' => 'editSection')));
-//echo '<br><center>'._t('Make sure you save this section before moving on to the other ones!').'</center><br><br>';
-//echo $form->end();
 ?>
-</div>
