@@ -28,7 +28,7 @@
 <table class="standardtable">
 <tr>
     <th width=50%><?php __('Rating')?></th>
-    <?php if ($event['Event']['results']) { ?>
+    <?php if ($event['Event']['enable_details']) { ?>
         <th width=50%><?php __('Group Average')?></th>
     <?php } ?>
 </tr>
@@ -48,7 +48,7 @@
         }
         ?>
     </td>
-    <?php if ($event['Event']['results']) { ?>
+    <?php if ($event['Event']['enable_details']) { ?>
     <td>
         <?php
             if ($studentResult['gradeReleaseStatus'] || $event['Event']['auto_release']) {
@@ -62,7 +62,7 @@
     <?php } ?>
 </tr>
 </table>
-<?php if ($event['Event']['results']) { ?>
+<?php if ($event['Event']['enable_details']) { ?>
 <table class="standardtable">
     <tr>
         <th><?php __('Comments')?> (<?php __('Randomly Ordered')?>)</th>

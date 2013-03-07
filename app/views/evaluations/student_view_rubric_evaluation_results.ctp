@@ -33,7 +33,7 @@
 </tr>
 </table>
 
-<?php if ($event['Event']['results']) { ?>
+<?php if ($event['Event']['enable_details']) { ?>
 <?php echo $html->script('ricobase')?>
 <?php echo $html->script('ricoeffects')?>
 <?php echo $html->script('ricoanimation')?>

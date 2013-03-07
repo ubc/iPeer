@@ -47,7 +47,7 @@
     <tr>
         <th><?php __('Student Result Mode')?></th>
         <td>
-            <?php echo $event['Event']['results']==1? 'Detailed' : 'Basic'; ?>
+            <?php echo $event['Event']['enable_details']==1? 'Detailed' : 'Basic'; ?>
         </td>
     </tr>
     <tr>

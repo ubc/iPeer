@@ -45,12 +45,12 @@ echo $this->Form->input(
     )
 );
 echo $this->Form->input(
-    'results',
+    'enable_details',
     array(
         'legend' => 'Student Result Mode',
         'type' => 'radio',
-        'options' => array('1' => 'Detailed', '0'=> 'Basic'),
-        'default' => '0'
+        'options' => array('0'=> 'Basic', '1' => 'Detailed'),
+        'default' => '1'
     )
 ); ?>
 <div class='help-text'><?php echo _t('Basic view only show averages of questions') ?></div>

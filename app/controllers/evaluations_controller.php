@@ -930,7 +930,8 @@ class EvaluationsController extends AppController
                         if (!$this->GroupEvent->save($groupEvent)) {
                             $this->Session->setFlash(_t('Error'));               
                         } else {
-                            $this->Session->setFlash(_t('Successful'), 'good');
+                            $this->Session->setFlash(_t('Your Evaluation was submitted successfully.'), 'good');
+                            $this->redirect('/home');
                         }
                     }
                 } else {

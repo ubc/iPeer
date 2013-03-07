@@ -921,7 +921,7 @@ CREATE TABLE IF NOT EXISTS `events` (
   `self_eval` varchar(11) NOT NULL DEFAULT '0',
   `com_req` int(11) NOT NULL DEFAULT '0',
   `auto_release` int(11) NOT NULL DEFAULT '0',
-  `results` int(11) NOT NULL DEFAULT '0',
+  `enable_details` int(11) NOT NULL DEFAULT '1',
   `due_date` datetime,
   `release_date_begin` datetime,
   `release_date_end` datetime,
