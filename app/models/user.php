@@ -1007,7 +1007,7 @@ class User extends AppModel
         if (!$selfEval) {
             $conditions['User.id !='] = $userId;
         }
-        
+
         $members = $this->find('all', array(
             'conditions' => $conditions,
             'contain' => array('Role', 'Group')
