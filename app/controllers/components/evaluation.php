@@ -990,8 +990,8 @@ class EvaluationComponent extends Object
             foreach ($mixevalResult as $row) {
                 $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
                 if ($evalMark!=null) {
-                    $rubriDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera($evalMark['id']);
-                    $evalResult[$userId][$userPOS++]['EvaluationMixeval']['details'] = $rubriDetail;
+                    $mixevalDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCriteria($evalMark['id']);
+                    $evalResult[$userId][$userPOS++]['EvaluationMixeval']['details'] = $mixevalDetail;
                 }
             }
         }

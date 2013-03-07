@@ -1,19 +1,15 @@
 <div class='MixevalForm'>
 <center><h2><?php echo $event['Event']['title'].' - '.$event['Group']['group_name']?></h2></center>
+<?php if (!empty($event['Event']['description'])) { ?>
+<h2><?php echo _t('Description') ?></h2>
+<div id='description'><?php echo _t($event['Event']['description']) ?></div>
+<?php } ?>
 <h2><?php echo _t('Notes') ?></h2>
 <ul>
     <?php $due = date('l, F j, Y g:i a', strtotime($event['Event']['due_date']))?>
     <li><?php echo _t('The evaluation is due on ').$due.'.' ?></li>
     <li><?php echo _t('To resubmit a evaluation, all required questions must be answered.') ?></li>
     <li><?php echo $html->tag('span', '*', array('class' => 'required orangered'))._t(' marks required questions.')?></li>
-    <?php if (!empty($event['Event']['description'])) { ?>
-    <li><a href="#" onClick="javascript:$('description').toggle(); return false;">
-        <?php echo _t('Show/Hide Evaluation Description')?></a>
-        <div id='description' style="display:none">
-            <?php echo __($event['Event']['description'], true) ?>
-        </div>
-    </li>
-    <?php } ?>
     <li><a href="#" onClick="javascript:$('penalty').toggle(); return false;">
         <?php echo _t('Show/Hide Late Penalty Policy') ?></a>
         <div id='penalty' style="display:none">

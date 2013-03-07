@@ -387,7 +387,7 @@ class EvaluationMixeval extends EvaluationResponseBase
     {
         $mixEval = $this->find('first', array('conditions' => array('evaluator' => $evluatorId, 'evaluatee' => $evaluateeId,
             'grp_event_id' => $groupEventId)));
-        $evalDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera($mixEval['EvaluationMixeval']['id'], $questionNum);
+        $evalDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCriteria($mixEval['EvaluationMixeval']['id'], $questionNum);
         return $evalDetail;
     }
 
