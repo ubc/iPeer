@@ -29,11 +29,14 @@
 <h2>Questions</h2> 
 <?php
 $totalMarks = array_sum(Set::extract('/MixevalQuestion/multiplier', $questions));
+$id = array('id' => 0);
+$event = array('Event' => $id, 'GroupEvent' => $id, 'Group' => $id);
   
 $params = array('controller'            => 'mixevals',
                 'zero_mark'             => $mixeval['zero_mark'],
                 'questions'             => $questions,
-                'user'                  => array('id' => 0));
+                'user'                  => $id,
+                'event'                 => $event);
 
 echo $this->element('mixevals/view_mixeval_details', $params);
 
