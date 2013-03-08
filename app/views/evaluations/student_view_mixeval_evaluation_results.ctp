@@ -51,7 +51,7 @@ foreach ($evalResult[User::get('id')] as $eval) {
 }
 
 $params = array('controller'=>'evaluations', 'questions'=>$questions, 'zero_mark'=>$zero_mark,
-    'gradeReleased'=>$gradeReleased, 'commentReleased'=>$commentReleased);
+    'gradeReleased'=>$gradeReleased, 'commentReleased'=>$commentReleased, 'details'=>$event['Event']['enable_details']);
 echo $this->element('evaluations/mixeval_details', $params);
 ?>
 </div>
