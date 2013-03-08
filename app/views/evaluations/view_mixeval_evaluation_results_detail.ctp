@@ -47,6 +47,7 @@ if (!empty($notInGroup)) {
         $users[] = array($user['full_name'] . ($row['Role'][0]['id'] == 4 ? ' (TA)' : ' (student)'));
     }
     echo $this->Html->tableCells($users);
+    $notInGroup = Set::extract('/User/id', $notInGroup);
 }
 ?>
 </table>
@@ -125,7 +126,7 @@ if (!empty($notInGroup)) {
 
             $params = array('controller'=>'evaluations', 'questions'=>$questions, 'zero_mark'=>$zero_mark,
                 'gradeReleased'=>1, 'commentReleased'=>1, 'details'=>1, 'evaluatee'=>$evaluteeId, 
-                'names'=>$memberList);
+                'names'=>$memberList, 'notInGroup'=>$notInGroup);
             echo $this->element('evaluations/mixeval_details', $params);
             ?>
             </div>

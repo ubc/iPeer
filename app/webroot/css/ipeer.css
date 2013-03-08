@@ -1228,7 +1228,7 @@ i {
     margin-left: 5em;
 }
 
-#mixeval_result .name {
+#mixeval_result .name, #mixeval_result .blue {
     margin-right: 1em;
     display: inline-block;
     width: 10em;

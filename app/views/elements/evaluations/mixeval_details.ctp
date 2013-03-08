@@ -27,7 +27,11 @@ if ($details) {
                     echo '<li>'._t('Comments Not Released Yet').'</li>';
                     break;
                 }
-                $name = isset($names) ? '<label class="name">'.$names[$sub['evaluator']].':</label>' : '';
+                $name = '';
+                if (isset($names)) {
+                    $class = in_array($sub['evaluator'], $notInGroup) ? 'blue' : 'name';
+                    $name = '<label class='.$class.'>'.$names[$sub['evaluator']].':</label>';
+                }
                 if ($type == '1') {
                     $step = $multiplier / ($scale - $zero_mark);
                     $start = $zero_mark ? 0 : $step;
