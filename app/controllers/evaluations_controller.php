@@ -854,6 +854,7 @@ class EvaluationsController extends AppController
             }
 
             $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId, User::get('id'));
+            $members = $this->GroupsMembers->findAllByGroupId($groupId);
 
             $penalty = $this->Penalty->getPenaltyByEventId($eventId);
             $penaltyDays = $this->Penalty->getPenaltyDays($eventId);
@@ -863,6 +864,7 @@ class EvaluationsController extends AppController
             $this->set('penalty', $penalty);
             $this->set('event', $event);
             $this->set('sub', $sub);
+            $this->set('members', count($members));
             //Setup the courseId to session
             $this->set('courseId', $event['Event']['course_id']);
             $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
@@ -933,6 +935,9 @@ class EvaluationsController extends AppController
                             $this->Session->setFlash(_t('Your Evaluation was submitted successfully.'), 'good');
                             $this->redirect('/home');
                         }
+                    } else {
+                        $this->Session->setFlash(_t('Your Evaluation was submitted successfully.'), 'good');
+                        $this->redirect('/home');
                     }
                 } else {
                     $this->Session->setFlash(_t('Your answers have been saved. Please answer all the required questions before it can be considered submitted.'));

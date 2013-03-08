@@ -36,7 +36,7 @@
         <?php echo "<input type='hidden' name=data[data][event_id] value='".$event['Event']['id']."'/>"; ?>
         <?php echo "<input type='hidden' name=data[data][template_id] value='".$event['Event']['template_id']."'/>"; ?>
         <?php echo "<input type='hidden' name=data[data][grp_event_id] value='".$event['GroupEvent']['id']."'/>"; ?>
-        <?php echo "<input type='hidden' name=data[data][members] value='".count($groupMembers)."'/>"; ?>
+        <?php echo "<input type='hidden' name=data[data][members] value='".$members."'/>"; ?>
         <?php foreach($groupMembers as $row): $user = $row['User']; ?>
             <center><h2><?php echo $user['full_name']?></h2></center>
             <?php
