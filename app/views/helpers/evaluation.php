@@ -264,11 +264,17 @@ class EvaluationHelper extends AppHelper
             // change the details indexed by question_number
             $resultDetails = Set::combine($row['EvaluationMixevalDetail'], '{n}.question_number', '{n}');
             foreach ($questions as $question) {
+                // for unanswered not required questions
+                if (!isset($resultDetails[$question['question_num']])) {
+                    $tr[] = 'n/a';
+                    continue;
+                }            
+
                 $detail = $resultDetails[$question['question_num']];
                 // check if the result is released
                 if (($type == 'evaluator' || $type == 'evaluatee') ||
                     (($memberMixeval['grade_release'] && $question['mixeval_question_type_id'] == '1') ||
-                    ($memberMixeval['comment_release'] && $question['mixeval_question_type_id'] == '2'))) {
+                    ($memberMixeval['comment_release'] && in_array($question['mixeval_question_type_id'], array('2', '3'))))) {
 
                     $tr[] = $this->renderQuestionResult($question, $detail);
                 } else {
@@ -311,6 +317,10 @@ class EvaluationHelper extends AppHelper
             $result .= "<br />";
             break;
         case '2':
+            $result = "<strong>".__('Comment', true).": </strong>";
+            $result .= isset($detail) ? $detail["question_comment"] : __('N/A', true);
+            break;
+        case '3':
             $result = "<strong>".__('Comment', true).": </strong>";
             $result .= isset($detail) ? $detail["question_comment"] : __('N/A', true);
             break;

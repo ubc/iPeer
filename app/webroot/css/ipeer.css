@@ -1211,6 +1211,23 @@ i {
 
 /* MIXEVALS */
 
+/* mixevals results */
+
+#mixeval_result ul li {
+    list-style-type: square;
+    list-style-position: inside;
+    margin: 0.5em;
+    margin-left: 2.5em;
+}
+
+#mixeval_result h3, #mixeval_result .desc {
+    margin-left: 1em;
+}
+
+#mixeval_result .grade {
+    margin-left: 5em;
+}
+
 /* mixevals/view */
 
 .MixevalView dt {

@@ -1217,7 +1217,7 @@ class EvaluationsController extends AppController
         case 4: //View Mix Evaluation Result
             $mixeval = $this->Mixeval->find('first', array(
                 'conditions' => array('Mixeval.id' => $event['Event']['template_id']),
-                'contain' => array('Question' => array('Description'))
+                'recursive' => 2
             ));
 
             $user = $this->User->findById($userId);
