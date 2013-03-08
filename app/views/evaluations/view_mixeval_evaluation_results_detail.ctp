@@ -1,12 +1,9 @@
 <?php
 $averagePerQuestion = array();
 $numberQuestions = array();
-$textQuestions = array();
 
 foreach ($mixeval['MixevalQuestion'] as $question) {
-    if ($question['mixeval_question_type_id'] != '1') {
-        $textQuestions[] = $question;
-    } else {
+    if ($question['mixeval_question_type_id'] == '1') {
         $numberQuestions[] = $question;
     }
 }
@@ -113,28 +110,26 @@ if (!empty($notInGroup)) {
                 '%</font>'.__(' Late Penalty', true) : $penaltyNotice = '';
             echo $penaltyNotice;
             ?>
-            <br><br>
 
-            <!-- Section One -->
-            <table class="standardtable">
-                <tr>
-                    <td colspan="<?php echo count($numberQuestions)+1?>"><b> <?php __('Section One:')?> </b></td>
-                </tr>
-                <?php echo $this->Html->tableHeaders($this->Evaluation->getResultTableHeader($numberQuestions, __('Evaluator', true))) ?>
-                <?php echo $this->Html->tableCells($this->Evaluation->getMixevalResultTable($evalResult[$evaluteeId], $memberList, $numberQuestions, $notInGroup)) ?>
-            </table>
-            <br />
+            <div id='mixeval_result'>
+            <?php
+            $questions = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}');
+            $zero_mark = $mixeval['Mixeval']['zero_mark'];
+            foreach ($evalResult[$evaluteeId] as $eval) {
+                $evaluator = $eval['EvaluationMixeval']['evaluator'];
+                foreach ($eval['EvaluationMixevalDetail'] as $detail) {
+                    $detail['evaluator'] = $evaluator;
+                    $questions[$detail['question_number']]['Submissions'][] = $detail;
+                }
+            }
 
-            <!-- Section Two -->
-            <table class="standardtable">
-                <tr>
-                    <td colspan="<?php echo count($textQuestions)+1?>"><b><?php __('Section Two')?>:</b></td>
-                </tr>
-                <?php echo $this->Html->tableHeaders($this->Evaluation->getResultTableHeader($textQuestions, __('Evaluator', true))) ?>
-                <?php echo $this->Html->tableCells($this->Evaluation->getMixevalResultTable($evalResult[$evaluteeId], $memberList, $textQuestions, $notInGroup)) ?>
-            </table>
+            $params = array('controller'=>'evaluations', 'questions'=>$questions, 'zero_mark'=>$zero_mark,
+                'gradeReleased'=>1, 'commentReleased'=>1, 'details'=>1, 'evaluatee'=>$evaluteeId, 
+                'names'=>$memberList);
+            echo $this->element('evaluations/mixeval_details', $params);
+            ?>
+            </div>
 
-            <br />
             <?php
             //Grade Released
             if (isset($evalResult[$evaluteeId][0]['EvaluationMixeval']['grade_release']) && $evalResult[$evaluteeId][0]['EvaluationMixeval']['grade_release']) {?>
@@ -149,6 +144,7 @@ if (!empty($notInGroup)) {
             <?php } else {?>
                 <input type="button" name="ReleaseComments" value="<?php __('Release Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$evaluteeId.';'.$event['GroupEvent']['id'].';1'; ?>'">
             <?php } ?>
+
         </div>
     </div>
 <?php endforeach; ?>

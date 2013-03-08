@@ -27,7 +27,7 @@ if ($details) {
                     echo '<li>'._t('Comments Not Released Yet').'</li>';
                     break;
                 }
-        
+                $name = isset($names) ? '<label class="name">'.$names[$sub['evaluator']].':</label>' : '';
                 if ($type == '1') {
                     $step = $multiplier / ($scale - $zero_mark);
                     $start = $zero_mark ? 0 : $step;
@@ -36,16 +36,16 @@ if ($details) {
                     $grade .= $sub['grade'].' / '.$multiplier.'</label>';
                     $grade .= (empty($descriptors[$sub['selected_lom']])) ? '' :
                         '<label class="desc">('.$descriptors[$sub['selected_lom']].')</label>';
-                    echo $form->input('ques_'.$qnum.'_'.$num, array(
+                    echo $form->input('ques_'.$qnum.'_'.$num.'_'.$evaluatee, array(
                         'type' => 'radio',
                         'options' => $options,
                         'disabled' => true,
                         'default' => $sub['selected_lom'] - 1,
-                        'before' => '<li>',
+                        'before' => '<li>'.$name,
                         'after' => $grade.'</li>'
                     ));
                 } else {
-                    echo '<li>'.$sub['question_comment'].'</li>';
+                    echo '<li>'.$name.$sub['question_comment'].'</li>';
                 }
             }
             echo '</ul>';

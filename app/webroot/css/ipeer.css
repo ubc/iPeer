@@ -1228,6 +1228,17 @@ i {
     margin-left: 5em;
 }
 
+#mixeval_result .name {
+    margin-right: 1em;
+    display: inline-block;
+    width: 10em;
+    font-weight: bold;
+}
+
+#mixeval_result {
+    text-align: left;
+}
+
 /* mixevals/view */
 
 .MixevalView dt {
