@@ -15,7 +15,7 @@ if ($details) {
         echo $html->tag('h3', "$qnum. $ques[title]");
         $type = $ques['mixeval_question_type_id'];
         $multiplier = $ques['multiplier'];
-        $scale = $ques['scale_level'];
+        $scale = count($ques['MixevalQuestionDesc']);
         $descriptors = Set::combine($ques['MixevalQuestionDesc'], '{n}.scale_level', '{n}.descriptor');
         if (isset($ques['Submissions'])) {
             echo '<ul>';
@@ -35,7 +35,8 @@ if ($details) {
                 if ($type == '1') {
                     $step = $multiplier / ($scale - $zero_mark);
                     $start = $zero_mark ? 0 : $step;
-                    $options = range($start, $multiplier, $step);
+                    $options = array_map('number_format',range($start, $multiplier, $step),
+                        array_fill(0, $scale, 2));
                     $grade = '<label class="grade">'._t('Grade: ');
                     $grade .= $sub['grade'].' / '.$multiplier.'</label>';
                     $grade .= (empty($descriptors[$sub['selected_lom']])) ? '' :

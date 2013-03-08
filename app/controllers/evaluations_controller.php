@@ -1085,7 +1085,8 @@ class EvaluationsController extends AppController
             $memberList = array_unique(array_merge($memberList, $inCompleteMembers));
             $fullNames = $this->User->getFullNames($memberList);
             $members = $this->User->findAllById($memberList);
-            $details = $this->Evaluation->getMixevalResultDetail($groupEventId, $members);
+            $sub = Set::extract('/EvaluationSubmission/submitter_id', $sub);
+            $details = $this->Evaluation->getMixevalResultDetail($groupEventId, $members, $sub);
             $mixeval = $this->Mixeval->find('first', array(
                 'conditions' => array('Mixeval.id' => $event['Event']['template_id']),
                 'recursive' => 2
@@ -1226,24 +1227,21 @@ class EvaluationsController extends AppController
             ));
 
             $user = $this->User->findById($userId);
-            $details = $this->Evaluation->getMixevalResultDetail($groupEventId, array($user));
             $sub = $this->EvaluationSubmission->findAllByGrpEventId($groupEventId);
+            $sub = Set::extract('/EvaluationSubmission/submitter_id', $sub);
+            $details = $this->Evaluation->getMixevalResultDetail($groupEventId, array($user), $sub);
             $mixevalDetails = $this->EvaluationMixeval->getResultsByEvaluateesOrEvaluators($groupEventId, Set::extract($sub, '/EvaluationSubmission/submitter_id'));
             $memberList = array_unique(array_merge(Set::extract($mixevalDetails, '/EvaluationMixeval/evaluator'),
                 Set::extract($mixevalDetails, '/EvaluationMixeval/evaluatee')));
             $fullNames = $this->User->getFullNames($memberList);
             $eventSub = $this->Event->getEventSubmission($eventId, $userId);
             $penalty = $this->Penalty->getPenaltyPercent($eventSub);
-            $gradeReleaseStatus = $this->EvaluationMixeval->getTeamReleaseStatus($groupEventId);
-            $reviewEvaluations = $this->Evaluation->getStudentViewMixevalResultDetailReview($event, $userId);
             $avePenalty = $details['memberScoreSummary'][$userId]['received_total_score'] * ($penalty / 100);
 
             $this->set('mixeval', $mixeval);
             $this->set('evalResult', $details['evalResult']);
             $this->set('memberScoreSummary', $details['memberScoreSummary']);
             $this->set('memberList', $fullNames);
-            $this->set('reviewEvaluations', $reviewEvaluations);
-            $this->set('gradeReleaseStatus', $gradeReleaseStatus);
             $this->set('penalty', $penalty);
             $this->set('avePenalty', $avePenalty);
 

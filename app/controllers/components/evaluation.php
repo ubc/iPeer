@@ -929,11 +929,12 @@ class EvaluationComponent extends Object
      *
      * @param mixed $groupEventId group event id
      * @param mixed $groupMembers group members
+     * @param mixed $include      members that have submitted
      *
      * @access public
      * @return void
      */
-    function getMixevalResultDetail($groupEventId, $groupMembers)
+    function getMixevalResultDetail($groupEventId, $groupMembers, $include)
     {
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
         $mixevalResultDetail = array();
@@ -949,7 +950,7 @@ class EvaluationComponent extends Object
                 }
 
                 // get the results for students
-                $mixevalResult = $this->EvaluationMixeval->getResultsByEvaluatee($groupEventId, $userId);
+                $mixevalResult = $this->EvaluationMixeval->getResultsByEvaluatee($groupEventId, $userId, $include);
                 $evalResult[$userId] = $mixevalResult;
 
                 //Get total mark each member received
@@ -1235,7 +1236,6 @@ class EvaluationComponent extends Object
                 'conditions' => array('id' => User::get('id')),
                 'contain' => array('Role'),
             ));
-            $mixevalResultDetail = $this->getMixevalResultDetail($event['GroupEvent']['id'], array($user));
             $groupMembers = $this->GroupsMembers->getEventGroupMembers(
                 $event['Group']['id'], $event['Event']['self_eval'], $currentUser['id']);
             $groupMembersNoTutors = $this->User->getEventGroupMembersNoTutors(
@@ -1294,7 +1294,6 @@ class EvaluationComponent extends Object
                 $event['Group']['id'],
                 ($event['Event']['self_eval'] ? null : $this->Auth->user('id'))
             );
-            $mixevalResultDetail = $this->getMixevalResultDetail($event['GroupEvent']['id'], $groupMembers);
         }
 
         //Get Detail information on Mixeval score

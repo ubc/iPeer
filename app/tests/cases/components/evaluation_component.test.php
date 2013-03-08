@@ -304,7 +304,7 @@ class EvaluationTestCase extends CakeTestCase
 
         $groupEventId = 1;
         $groupMembers = array( 1=> array('id' => 1),2=> array ('id' =>2));
-        $eval = $this->EvaluationComponentTest->getMixevalResultDetail($groupEventId, $groupMembers);
+        $eval = $this->EvaluationComponentTest->getMixevalResultDetail($groupEventId, $groupMembers, array(1, 2));
         $expected = array( "scoreRecords"=>
             array(1=> array ( "grade_released"=> "0", "comment_released"=> "0", "mixeval_question_ave"=> array()),
                 2=> array( 1 => "n/a", 2=> "n/a", "mixeval_question_ave"=> array()),
