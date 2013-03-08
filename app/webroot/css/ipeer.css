@@ -1275,6 +1275,10 @@ i {
     font-family: 'Open Sans', serif; /* for visual distinctiveness */
 }
 
+.MixevalForm table {
+    width: 100%;
+}
+
 .MixevalForm ul li {
     list-style-type: circle;
     list-style-position: inside;
