@@ -19,7 +19,8 @@ class EvaluationTestCase extends CakeTestCase
         'app.user_enrol', 'app.groups_member', 'app.survey', 'app.mixeval', 'app.mixevals_question', 'app.mixevals_question_desc',
         'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
         'app.evaluation_simple', 'app.faculty', 'app.user_faculty',
-        'app.department', 'app.course_department'
+        'app.department', 'app.course_department', 'app.oauth_token', 'app.sys_parameter',
+        'app.user_tutor'
     );
 
     function startCase()
@@ -166,33 +167,6 @@ class EvaluationTestCase extends CakeTestCase
 
     function saveNGetEvalutionRubricDetail()
     {
-
-    }
-
-
-
-    function testGetRubricResultDetail()
-    {
-
-        $event = array('group_event_id' => 1);
-        $groupMembers = array(array('id' => 4));
-        $result = $this->EvaluationComponentTest->getRubricResultDetail($event, $groupMembers);
-
-        $this->assertEqual($result['scoreRecords'][4]['grade_released'], 0);
-        $this->assertEqual($result['scoreRecords'][4]['comment_released'], 0);
-        $this->assertEqual($result['scoreRecords'][4]['rubric_criteria_ave'][1], 10);
-        $this->assertEqual($result['memberScoreSummary'][4]['received_total_score'], 15.00);
-        $this->assertEqual($result['memberScoreSummary'][4]['received_ave_score'], 15);
-        $this->assertEqual($result['evalResult'][4][0]['EvaluationRubric']['id'], 1);
-        $this->assertEqual($result['evalResult'][4][0]['EvaluationRubric']['evaluator'], 3);
-        $this->assertEqual($result['evalResult'][4][0]['EvaluationRubric']['evaluatee'], 4);
-
-        $result = $this->EvaluationComponentTest->getRubricResultDetail(null, $groupMembers);
-        $this->assertFalse($result);
-        $result = $this->EvaluationComponentTest->getRubricResultDetail($event, null);
-        $this->assertFalse($result);
-        $result = $this->EvaluationComponentTest->getRubricResultDetail(null, null);
-        $this->assertFalse($result);
 
     }
 
