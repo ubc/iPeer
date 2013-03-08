@@ -32,6 +32,17 @@ class Upgrade300 extends UpgradeBase
      */
     public function isUpgradable()
     {
+        $sysparameter = ClassRegistry::init('SysParameter');
+        $dbv = $sysparameter->get('database.version');
+        $sysv = $sysparameter->get('system.version');
+
+        // If system.version doesn't exist, but we get a database version of 4, 
+        // then that means we're upgrading from a prior iPeer v3 installation 
+        // and don't need to run this upgrader.
+        if (empty($sysv) && $dbv == 4) {
+            return false;
+        }
+
         return parent::isUpgradable();
     }
 

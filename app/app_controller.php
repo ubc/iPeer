@@ -217,6 +217,7 @@ class AppController extends Controller
             // after login stuff
             $this->User->loadRoles(User::get('id'));
             $this->AccessControl->loadPermissions();
+            $this->SysParameter->reload();
             //TODO logging!
         }
 

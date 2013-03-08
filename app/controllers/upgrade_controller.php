@@ -59,9 +59,21 @@ class UpgradeController extends Controller
      */
     function index()
     {
+        $sysv = $this->SysParameter->get('system.version');
+        $dbv = $this->SysParameter->get('database.version');
+        // workaround for a mistake in a sql templates in v3.0.x where
+        // we forgot to add the system.version entry into sys_parameters
+        if (empty($sysv) && $dbv == 4) 
+        { // upgrading from iPeer v3.0
+            $sysv = '3.0.x';
+            $dbv = 5;
+        }
+        else {
+            $sysv = $this->SysParameter->get('system.version', '2.x');
+        }
         $this->set('is_upgradable', $this->Upgrader->isUpgradable());
-        $this->set('currentVersion', $this->SysParameter->get('system.version', '2.x'));
-        $this->set('currentDbVersion', $this->SysParameter->get('database.version', '4'));
+        $this->set('currentVersion', $sysv);
+        $this->set('currentDbVersion', $dbv);
     }
 
     /**
