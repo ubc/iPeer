@@ -1141,9 +1141,13 @@ class EvaluationComponent extends Object
     {
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
+        $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
+        
+        $sub = $this->EvaluationSubmission->findAllByGrpEventId($groupEventId);
+        $sub = Set::extract('/EvaluationSubmission/submitter_id', $sub);
 
         //changing grade release for each EvaluationMixeval
-        $evaluationMixeval = $this->EvaluationMixeval->getResultsByEvaluatee($groupEventId, $evaluateeId);
+        $evaluationMixeval = $this->EvaluationMixeval->getResultsByEvaluatee($groupEventId, $evaluateeId, $sub);
         foreach ($evaluationMixeval as $row) {
             $evalMixeval = $row['EvaluationMixeval'];
             if (isset($evalMixeval)) {
@@ -1176,12 +1180,16 @@ class EvaluationComponent extends Object
     {
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
+        $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
 
         $this->GroupEvent->id = $groupEventId;
         $groupEvent = $this->GroupEvent->read();
+        
+        $sub = $this->EvaluationSubmission->findAllByGrpEventId($groupEventId);
+        $sub = Set::extract('/EvaluationSubmission/submitter_id', $sub);
 
         //changing comment release for each EvaluationMixeval
-        $evaluationMixeval = $this->EvaluationMixeval->getResultsByEvaluatee($groupEventId, $evaluateeId);
+        $evaluationMixeval = $this->EvaluationMixeval->getResultsByEvaluatee($groupEventId, $evaluateeId, $sub);
         foreach ($evaluationMixeval as $row) {
             $evalMixeval = $row['EvaluationMixeval'];
             if (isset($evalMixeval)) {
