@@ -1230,10 +1230,6 @@ class EvaluationsController extends AppController
             $sub = $this->EvaluationSubmission->findAllByGrpEventId($groupEventId);
             $sub = Set::extract('/EvaluationSubmission/submitter_id', $sub);
             $details = $this->Evaluation->getMixevalResultDetail($groupEventId, array($user), $sub);
-            $mixevalDetails = $this->EvaluationMixeval->getResultsByEvaluateesOrEvaluators($groupEventId, Set::extract($sub, '/EvaluationSubmission/submitter_id'));
-            $memberList = array_unique(array_merge(Set::extract($mixevalDetails, '/EvaluationMixeval/evaluator'),
-                Set::extract($mixevalDetails, '/EvaluationMixeval/evaluatee')));
-            $fullNames = $this->User->getFullNames($memberList);
             $eventSub = $this->Event->getEventSubmission($eventId, $userId);
             $penalty = $this->Penalty->getPenaltyPercent($eventSub);
             $avePenalty = $details['memberScoreSummary'][$userId]['received_total_score'] * ($penalty / 100);
@@ -1241,7 +1237,6 @@ class EvaluationsController extends AppController
             $this->set('mixeval', $mixeval);
             $this->set('evalResult', $details['evalResult']);
             $this->set('memberScoreSummary', $details['memberScoreSummary']);
-            $this->set('memberList', $fullNames);
             $this->set('penalty', $penalty);
             $this->set('avePenalty', $avePenalty);
 

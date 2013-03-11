@@ -355,23 +355,6 @@ class EvaluationTestCase extends CakeTestCase
         $this->assertFalse($eval);
     }
 
-    function testFormatMixevalEvaluationResultsMatrix()
-    {
-
-        $evalResult = array( array( array('EvaluationMixeval' =>
-            array('grade_release' => 1, 'comment_release' => 1, 'evaluatee' => 1, 'details' => array(
-                array ('EvaluationMixevalDetail' => array('question_number' => 1, 'grade' => 50)))))));
-        $groupMembers = array('Group'=> array (1=> array('id' => 1),2=> array ('id' =>2)));
-
-        $expected = array( 0 => array('mixeval_question_ave' => array(1=>50)),'group_question_ave' => array(1=>50));
-        $matrix = $this->EvaluationComponentTest->formatMixevalEvaluationResultsMatrix($groupMembers, $evalResult);
-        $this->assertEqual($expected, $matrix);
-
-        $matrix = $this->EvaluationComponentTest->formatMixevalEvaluationResultsMatrix(null, null);
-        $this->assertFalse($matrix);
-
-    }
-
 
     function testChangeMixevalEvaluationGradeRelease()
     {

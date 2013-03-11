@@ -685,8 +685,8 @@ class EvaluationComponent extends Object
         foreach ($evalResult as $result) {
             $userId = $result['EvaluationRubric']['evaluatee'];
             $evaluator = $result['EvaluationRubric']['evaluator'];
-            $summary[$userId]['gradeRelease'] = $result['EvaluationRubric']['grade_release'];
-            $summary[$userId]['commentRelease'] = $result['EvaluationRubric']['comment_release'];
+            $summary[$userId]['gradeRelease'][] = $result['EvaluationRubric']['grade_release'];
+            $summary[$userId]['commentRelease'][] = $result['EvaluationRubric']['comment_release'];
             $summary[$userId]['total']['score'] = (isset($summary[$userId]['total']['score'])) ?
                 $summary[$userId]['total']['score'] + $result['EvaluationRubric']['score'] : $result['EvaluationRubric']['score'];
             $summary[$userId]['evaluator_count'] = (isset($summary[$userId]['evaluator_count'])) ?
@@ -706,6 +706,8 @@ class EvaluationComponent extends Object
         }
 
         foreach ($summary as $id => $score) {
+            $summary[$id]['gradeRelease'] = array_product($summary[$id]['gradeRelease']);
+            $summary[$id]['commentRelease'] = array_product($summary[$id]['commentRelease']);
             $summary[$id]['total'] = $score['total']['score'] / $score['evaluator_count'];
             foreach ($score['grades'] as $num => $grade) {
                 $summary[$id]['grades'][$num] = $grade['grade']/$grade['evaluator_count'];
@@ -716,7 +718,7 @@ class EvaluationComponent extends Object
             $grades = Set::extract($summary, '/grades/'.$num);
             $group['grades'][$num] = array_sum($grades) / count($grades);
         }
-
+        
         return $summary + $group;
     }
 
@@ -961,7 +963,6 @@ class EvaluationComponent extends Object
             }
         }
 
-        $mixevalResultDetail['scoreRecords'] =  $this->formatMixevalEvaluationResultsMatrix($evalResult);
         $mixevalResultDetail['memberScoreSummary'] = $memberScoreSummary;
         $mixevalResultDetail['evalResult'] = $evalResult;
 
@@ -998,134 +999,7 @@ class EvaluationComponent extends Object
         }
         return $evalResult;
     }
-
-
-    /**
-     * formatMixevalEvaluationResultsMatrix
-     * results matrix format:
-     * Matrix[evaluatee_id][evaluator_id] = score
-     *
-     * @param mixed $groupMembers group member
-     * @param mixed $evalResult   evaluation result
-     *
-     * @access public
-     * @return array
-     */
-    /*function formatMixevalEvaluationResultsMatrix($groupMembers, $evalResult)
-    {
-        $matrix = array();
-        $groupQuestionAve = array();
-        if (empty($evalResult)) {
-            return false;
-        }
-        foreach ($evalResult as $index => $value) {
-            $evalMarkArray = $value;
-            $mixevalQuestion = array();
-
-            if ($evalMarkArray != null) {
-                $grade_release = 1;
-                $detailPOS = 0;
-
-                foreach ($evalMarkArray as $row) {
-                    $evalMark = isset($row['EvaluationMixeval'])? $row['EvaluationMixeval']: null;
-                    if ($evalMark!=null) {
-                        //print_r($evalMark);
-                        $grade_release = $evalMark['grade_release'];
-                        $comment_release = $evalMark['comment_release'];
-                        //$ave_score= $receivedTotalScore / count($evalMarkArray);
-                        //$matrix[$index][$evalMark['evaluator']] = $evalMark['score'];
-                        //$matrix[$index]['received_ave_score'] =$ave_score;
-                        if ($index == $evalMark['evaluatee']) {
-                            $matrix[$index]['grade_released'] =$grade_release;
-                            $matrix[$index]['comment_released'] =$comment_release;
-                        }
-                        //Format the mixeval question
-                        foreach ($evalMark['details'] as $detail) {
-                            $mixevalResult = $detail['EvaluationMixevalDetail'];
-                            if (!isset($mixevalQuestion[$mixevalResult['question_number']])) {
-                                $mixevalQuestion[$mixevalResult['question_number']] = 0;
-                            }
-                            $mixevalQuestion[$mixevalResult['question_number']] += $mixevalResult['grade'];
-                        }
-                        $detailPOS ++ ;
-                    } else {
-                        //$matrix[$index][$evalMark['evaluatee']] = 'n/a';
-                    }
-                }
-            } else {
-                foreach ($groupMembers as $user) {
-                    if (isset($user['User'])) {
-                        $user = $user['User'];
-                    }
-                    if (!empty($user)) {
-                        // The array's format varries. Sometime a sub-array [0] is present
-                        $id = !empty($user['id']) ? $user['id'] : $user['User']['id'];
-                        $matrix[$index][$id] = 'n/a';
-                    }
-                }
-            }
-            //Get Ave Question Grade
-            foreach ($mixevalQuestion as $criIndex => $criGrade) {
-                if (!isset($groupQuestionAve[$criIndex])) {
-                    $groupQuestionAve[$criIndex] = 0;
-                }
-                $ave = $criGrade / $detailPOS;
-                $mixevalQuestion[$criIndex] = $ave;
-                $groupQuestionAve[$criIndex]+= $ave;
-            }
-            $matrix[$index]['mixeval_question_ave'] = $mixevalQuestion;
-        }
-
-        //Get Group Ave Question Grade
-        foreach ($groupQuestionAve as $groupIndex => $groupGrade) {
-            $ave = $groupGrade / count($evalResult);
-            $groupQuestionAve[$groupIndex] = $ave;
-        }
-        $matrix['group_question_ave'] = $groupQuestionAve;
-
-        var_dump($matrix);
-        return $matrix;
-    }*/
-
-    /**
-     * formatMixevalEvaluationResultsMatrix
-     * results matrix format:
-     * Matrix[evaluatee_id][question_index] = score
-     *
-     * @param mixed $evalResults evaluation result
-     *
-     * @access public
-     * @return array
-     */
-    function formatMixevalEvaluationResultsMatrix($evalResults)
-    {
-        $matrix = array();
-        foreach ($evalResults as $userId => $evals) {
-            $counter = array();
-            $matrix[$userId] = array();
-            foreach ($evals as $eval) {
-                foreach ($eval['EvaluationMixevalDetail'] as $detail) {
-                    // skip the comment question
-                    if ($detail['question_comment'] !== null) {
-                        continue;
-                    }
-                    $counter[$detail['question_number']] = isset($counter[$detail['question_number']]) ?
-                        $counter[$detail['question_number']] : 0;
-                    $matrix[$userId][$detail['question_number']] = isset($matrix[$userId][$detail['question_number']]) ?
-                        $matrix[$userId][$detail['question_number']] : 0;
-                    $matrix[$userId][$detail['question_number']] += $detail['grade'];
-                    // need a counter for each question, in case different number of evalutions
-                    // for each question (optional questoin)
-                    $counter[$detail['question_number']]++;
-                }
-            }
-            foreach ($counter as $questionNumber => $count) {
-                $matrix[$userId][$questionNumber] = $matrix[$userId][$questionNumber]/$count;
-            }
-        }
-
-        return $matrix;
-    }
+    
 
     /**
      * changeMixevalEvaluationGradeRelease
