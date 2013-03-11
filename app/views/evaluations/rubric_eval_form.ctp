@@ -13,6 +13,20 @@
 <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo User::get('id')?>"/>
 <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
 
+<script type="text/javascript">
+var save = null;
+var sub = null;
+function setSub(){
+	sub = 1;
+}
+
+function alertSave(){
+	save = 1;
+	var elem = document.getElementsByClassName('as'); 
+	jQuery(elem).fadeIn('300');
+}
+</script>
+
 <table class="standardtable">
     <tr><th colspan="4" align="center"><?php __('Evaluation Event Detail')?></th></tr>
     <tr>
@@ -87,9 +101,10 @@
                     <table align="center" width=100% >
                     <tr>
                         <td align="center">
-                        <?php echo $form->submit('Save This Section', array('name'=>$user['id'], 'div'=>'saveThisSection'));
+                        <?php echo $form->submit('Save This Section', array('name'=>$user['id'], 'div'=>'saveThisSection','onClick'=>'alertSave()'));
                         echo "<br />".__('Make sure you save this section before moving on to the other ones!', true)." <br /><br />";
-                        ?></td>
+                        ?>
+                         <div class="as" style="display:none;">Please click on "Submit to Complete the Evaluation" before exiting</div><br /></td>
                     </tr>
                     </table>
                 </div>
@@ -151,9 +166,9 @@
     }
 
   if (!$mustCompleteUsers && !$commentsNeeded) {
-    echo $form->submit(__('Submit to Complete the Evaluation', true), array('div'=>'submitComplete'));
+    echo $form->submit(__('Submit to Complete the Evaluation', true), array('div'=>'submitComplete','onClick'=>'setSub()'));
   } else {
-    echo $form->submit(__('Submit to Complete the Evaluation', true), array('disabled'=>'true','div'=>'submitComplete')); echo "<br />";
+    echo $form->submit(__('Submit to Complete the Evaluation', true), array('disabled'=>'true','div'=>'submitComplete','onClick'=>'setSub()')); echo "<br />";
     echo $mustCompleteUsers ? "<div style='color: red'>".__("Please complete the questions for all group members, pressing 'Save This Section' button for each one.</div>", true) : "";
     echo $commentsNeeded ? "<div style='color: red'>".__('Please Enter all the comments for all the group members before submitting.</div>', true) : "";
   }
@@ -170,5 +185,10 @@
       clickedClass: 'mdClicked',
       unselectedClass: 'panelheader',
       onShowTab: 'panel6' });
+      
+jQuery(window).on("beforeunload",function() {
+	if(sub !=1 && save !=1)
+   		return 'Please click on the "Submit to Complete the Evaluation" button before exiting.' ;
+});
 
   </script>

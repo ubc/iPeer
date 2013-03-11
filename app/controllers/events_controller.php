@@ -13,8 +13,9 @@ class EventsController extends AppController
     public $name = 'Events';
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time');
     public $uses = array('GroupEvent', 'User', 'Group', 'Course', 'Event', 'EventTemplateType', 
-        'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers', 'Penalty', 'Survey');
-    public $components = array("AjaxList", "Session", "RequestHandler");
+        'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers', 'Penalty', 'Survey','EmailSchedule',
+        'EvaluationSubmission');
+    public $components = array("AjaxList", "Session", "RequestHandler","Email");
 
     /**
      * __construct
@@ -49,7 +50,6 @@ class EventsController extends AppController
             $endDate = strtotime($entry["Event"]["release_date_end"]);
             $resultStart = strtotime($entry['Event']['result_release_date_begin']);
             $resultEnd = strtotime($entry['Event']['result_release_date_end']);
-            
             $timeNow = time();
 
             if (!$releaseDate) {
@@ -353,16 +353,85 @@ class EventsController extends AppController
                 $this->data['Event']['template_id'] =
                     $this->data['Event']['Mixeval'];
             }
-            $this->data = $this->_multiMap($this->data);
+            $this->data = $this->_multiMap($this->data);			
+			
             if ($this->Event->saveAll($this->data)) {
                 $this->Session->setFlash("Add event successful!", 'good');
-                $this->redirect('index/'.$courseId);
+			//Call the setSchedule function to Schedule reminder emails
+			$emailfreq = $this->data['Event']['email_schedule'];
+			
+			if($emailfreq != 0) {
+				$this->setSchedule($emailfreq,$courseId,$this->Event->id,$this->data);
+			}
+              //$this->redirect('index/'.$courseId);
                 return;
             } else {
                 $this->Session->setFlash("Add event failed.");
             }
         }
     }
+
+
+	/**
+	 * 
+	 * setSchedule
+	 * 
+	 * @param int $emailfreq
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	 
+	 function setSchedule($emailfreq,$courseid,$eventid,$date){
+	 	//Get the startdate, duedate and frequency of emails
+		$start_date = $date['Event']['release_date_begin'];
+		$duedate = $date['Event']['due_date'];
+		$emailfreq = '+'.$emailfreq.' day';
+	
+		//Get the groups by the eventID
+		$groups = $this->Group->getGroupsByEventId($eventid,array());
+		$eventtitle = $this->Event->getEventTitleById($eventid);
+		$coursename = $this->Course->getCourseById($courseid);
+		$coursename = $coursename['Course']['course'];
+	    
+		//Get the assigned groupids and their resepctive members for the event
+		foreach ($groups as $group) {
+			$groupids[] = $group['Group']['id'];	
+		}
+		
+		$members[] = $this->GroupsMembers->getUserListInGroups($groupids);
+		$to = array();
+		$to[0] = 'save_reminder'; 
+		
+	    foreach($members[0] as $m){
+			array_push($to,$m);
+		}
+	    $to = implode(';', $to);	
+		
+		//Prepare the data for pushing to the email_schedules database table
+	    $data = array();
+	    
+	    $data['course_id']= $courseid;
+	    $data['event_id'] = $eventid;
+		$data['from'] = $this->Auth->user('id');	
+				
+		$data['subject'] = 'Please Submit your Ipeer Evaluation for '.$coursename.' - '.$eventtitle;
+		$data['content'] = 'You have not yet submitted your Ipeer Evaluation for '.$coursename.' - '.$eventtitle.
+			                   '. Please login to Ipeer and click on the submit button to Submit your Ipeer Eval';
+	
+		$data['to'] = $to;
+            
+			while (strtotime($start_date) <= strtotime($duedate)) {
+				$data['date'] = $start_date;
+				$start_date = strtotime ($emailfreq,strtotime($start_date)) ;
+				$start_date = date ( 'Y-m-j H:i:s' , $start_date );
+			 $data = $this->_multiMap($data);
+       		 $this->EmailSchedule->saveAll($data);
+			} 
+            
+			return;
+	   }			
+		
 
     /**
      * edit
