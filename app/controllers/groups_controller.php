@@ -1,5 +1,5 @@
 <?php
-define('IMPORT_GROUP_USERNAME', 0);
+define('IMPORT_GROUP_IDENTIFIER', 0);
 define('IMPORT_GROUP_GROUP_NAME', 1);
 define('IMPORT_GROUP_GROUP_NUMBER', 2);
 
@@ -346,6 +346,7 @@ class GroupsController extends AppController
             $tmpFile = $this->params['form']['file']['tmp_name'];
             $update = ($this->params['data']['Group']['update_groups']) ? 
                 true : false;
+            $identifier = $this->params['data']['Group']['identifiers'];
 
             $uploadDir = "../tmp/";
             $uploadFile = $uploadDir.$filename;
@@ -364,7 +365,7 @@ class GroupsController extends AppController
                 // Delete the uploaded file
                 unlink($uploadFile);
                 //Mass create groups
-                $this->_addGroupByImport($lines, $courseId, $update);
+                $this->_addGroupByImport($lines, $courseId, $update, $identifier);
             } else {
                 $this->Session->setFlash(__('Error: File was not successfully processed.', true));
                 $this->redirect('import/'.$courseId);
@@ -385,14 +386,15 @@ class GroupsController extends AppController
      * _addGroupByImport
      * Takes an array of imported file lines, and creates groups from them
      *
-     * @param mixed $lines    lines
-     * @param mixed $courseId course id
-     * @param mixed $update   update
+     * @param mixed $lines      lines
+     * @param mixed $courseId   course id
+     * @param mixed $update     update
+     * @param mixed $identifier identifier
      *
      * @access public
      * @return void
      */
-    function _addGroupByImport($lines, $courseId, $update)
+    function _addGroupByImport($lines, $courseId, $update, $identifier)
     {   
         // Check for parameters
         if (empty($lines) || empty($courseId)) {
@@ -428,29 +430,30 @@ class GroupsController extends AppController
             }
 
             // assign the parts into their appropriate places
-            $entry['username'] = trim($split[IMPORT_GROUP_USERNAME]);
+            $entry['identifier'] = trim($split[IMPORT_GROUP_IDENTIFIER]);
             $entry['group_name'] = trim($split[IMPORT_GROUP_GROUP_NAME]);
             if (count($split) > 2) {
                 $entry['group_num'] = trim($split[IMPORT_GROUP_GROUP_NUMBER]);
             }
 
-            // Check the entries for empty usernames or group_names fields
-            if (empty($entry['username'])) {
-                $entry['status'] = __("Username column is empty.", true);
+            // Check the entries for empty usernames/student no's or group_names fields
+            if (empty($entry['identifier'])) {
+                $entry['status'] = __("Username/Student No column is empty.", true);
             } else if (empty($entry['group_name'])) {
                 $entry['status'] = __("Group Name column is empty.", true);
             }
 
-            $userData = $this->User->findByUsername($entry['username']);
+            $userData = ($identifier == 'username') ? $this->User->findByUsername($entry['identifier']) :
+                $this->User->findByStudentNo($entry['identifier']);
 
             if (!is_array($userData)) {
-                $entry['status'] = __("User ", true). $entry['username'].__(" is unknown. Please add this user first.", true);
+                $entry['status'] = __("User ", true). $entry['identifier'].__(" is unknown. Please add this user first.", true);
             } else {
                 $entry['id'] = $userData['User']['id'];
                 $courses = array_merge(Set::extract('/Enrolment/id', $userData),
                     Set::extract('/Tutor/id', $userData));
                 if (!in_array($courseId, array_unique($courses))) {
-                    $entry['status'] = __("User ", true). $entry['username'].__(" is not enrolled in your selected course. ", true);
+                    $entry['status'] = __("User ", true). $entry['identifier'].__(" is not enrolled in your selected course. ", true);
                     $entry['status'] .= __("Please enrol them first.", true);
                 } else {
                     // So, the user exists, and is enrolled in the course - they pass validation
@@ -536,8 +539,8 @@ class GroupsController extends AppController
             
             foreach($group['User'] as $key => $user) {
                 if (in_array($user['id'], Set::extract('/GroupsMembers/user_id', $oldMembers))) {
-                    $users[$key]['status'] = __("User ", true).$user['username'];
-                    $users[$key]['status'] .= __("is already in group ", true).$groupName;
+                    $users[$key]['status'] = __("User ", true).$user['identifier'];
+                    $users[$key]['status'] .= __(" is already in group ", true).$groupName;
                 } else {
                     $groupMemberData = array();
                     $groupMemberData['id'] = null;
@@ -547,7 +550,7 @@ class GroupsController extends AppController
                         $users[$key]['status'] = __("User added successfully to group ", true).$groupName;
                         $users[$key]['added'] = true;
                     } else {
-                        $users[$key]['status'] = __("User ", true).$user['username'];
+                        $users[$key]['status'] = __("User ", true).$user['identifier'];
                         $users[$key]['status'] .= __(" could not be added to group ", true). $groupName;
                         $users[$key]['status'] .= __("- the entry could not be created in the database.", true);
                     }
