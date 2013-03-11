@@ -12,7 +12,9 @@ $header = _t('Questions').$addOn;
 echo $html->tag('h2', $header);
 if ($details) {
     foreach ($questions as $qnum => $ques) {
-        echo $html->tag('h3', "$qnum. $ques[title]");
+        $required = (!$ques['required']) ? '' :
+            $html->tag('span', '*', array('class' => 'required orangered'));
+        echo $html->tag('h3', "$qnum. $ques[title] $required");
         $type = $ques['mixeval_question_type_id'];
         $multiplier = $ques['multiplier'];
         $scale = count($ques['MixevalQuestionDesc']);
@@ -62,6 +64,9 @@ if ($details) {
 } else {
     foreach ($questions as $qnum => $ques) {
         if ($ques['mixeval_question_type_id'] == '1') {
+            $required = (!$ques['required']) ? '' :
+                $html->tag('span', '*', array('class' => 'required orangered'));
+            echo $html->tag('h3', "$qnum. $ques[title] $required");
             echo $html->tag('h3', "$qnum. $ques[title]");
             if (isset($ques['Submissions'])) {
                 echo '<ul>';

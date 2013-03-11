@@ -8,7 +8,7 @@
 <h2><?php echo __('Merge Accounts', true); ?></h2>
 <div id='form'>
 <?php echo $this->Form->create('User', 
-    array('onsubmit' => 'return confirm("Do you really want to merge the two users? The merger cannot be undone.");')); ?>
+    array('onsubmit' => 'return confirm("Are you sure you want to merge the two users? The merger cannot be undone.");')); ?>
 <!-- secondary account -->
 <?php echo $this->element('users/merge_search', array('account' => 'secondary', 'searchValue' => $searchValue)); ?>
 <!-- primary account -->

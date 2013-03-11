@@ -132,15 +132,19 @@ if (!empty($notInGroup)) {
             </div>
 
             <?php
+            $gradeReleased = (!isset($evalResult[$evaluteeId][0]['EvaluationMixeval']['grade_release'])) ? false : 
+                array_product(Set::extract('/EvaluationMixeval/grade_release', $evalResult[$evaluteeId]));
+            $commentReleased = (!isset($evalResult[$evaluteeId][0]['EvaluationMixeval']['comment_release'])) ? false : 
+                array_product(Set::extract('/EvaluationMixeval/comment_release', $evalResult[$evaluteeId]));
             //Grade Released
-            if (isset($evalResult[$evaluteeId][0]['EvaluationMixeval']['grade_release']) && $evalResult[$evaluteeId][0]['EvaluationMixeval']['grade_release']) {?>
+            if ($gradeReleased) {?>
                 <input type="button" name="UnreleaseGrades" value="<?php __('Unrelease Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$evaluteeId.';'.$event['GroupEvent']['id'].';0'; ?>'">
             <?php } else {?>
                 <input type="button" name="ReleaseGrades" value="<?php __('Release Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$evaluteeId.';'.$event['GroupEvent']['id'].';1'; ?>'">
             <?php }
 
             //Comment Released
-            if (isset($evalResult[$evaluteeId][0]['EvaluationMixeval']['comment_release']) && $evalResult[$evaluteeId][0]['EvaluationMixeval']['comment_release']) {?>
+            if ($commentReleased) {?>
                 <input type="button" name="UnreleaseComments" value="<?php __('Unrelease Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$evaluteeId.';'.$event['GroupEvent']['id'].';0'; ?>'">
             <?php } else {?>
                 <input type="button" name="ReleaseComments" value="<?php __('Release Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$evaluteeId.';'.$event['GroupEvent']['id'].';1'; ?>'">
