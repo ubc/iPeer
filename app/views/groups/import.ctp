@@ -5,13 +5,13 @@
     <li><?php __('Please make sure to remove the header in CSV file.')?></li>
     <li><?php __('All fields are mandatory, except Group#.')?></li>
     <li><?php __('All group names must be unique within the class.')?></li>
-    <li><?php __('Only use one student identifier (Username or Student No) in the CSV file.')?></li>
+    <li><?php __('The student identifiers that can be used are usernames or student numbers.')?></li>
     <li><?php __('If the Group# column is missing, the system will generate a Group#.')?></li>
 </ul>
 
 <h3><?php __('Formatting:')?></h3>
     <pre style='background-color: white; border:1px solid black; padding:5px; margin:5px'>
-    <?php __('Username (or Student No), Group Name, <i>Group#(optional)</i>')?>
+    <?php __('Student Identifier, Group Name, <i>Group#(optional)</i>')?>
     </pre>
 
 <h3><?php __('Examples:')?></h3>
@@ -31,13 +31,14 @@ echo $this->Form->input('identifiers', array(
     'type' => 'radio',
     'options' => array('student_no' => 'Student No.', 'username' => 'Username'),
     'legend' => __('Student Identifier', true),
-    'default' => 'student_no'
+    'default' => 'username'
 ));
+?><div class="help-text"><?php echo _t('The student identifier used in the CSV file.')?></div><?php
 echo $this->Form->input('Course',
-    array('multiple'=>false, 'default' =>$courseId));
+    array('multiple'=>false, 'default' => $courseId));
 echo $this->Form->input('update_groups',
     array('type'=>'checkbox'));;
-?><div class="help-text"><?php __('Update group members for existing groups.')?></div><?php
+?><div class="help-text"><?php echo _t('Update group members for existing groups.')?></div><?php
 echo $this->Form->submit(__('Import', true));
 echo $this->Form->end();
 ?>

@@ -448,6 +448,7 @@ class GroupsController extends AppController
 
             if (!is_array($userData)) {
                 $entry['status'] = __("User ", true). $entry['identifier'].__(" is unknown. Please add this user first.", true);
+                $entry['status'] .= __(' Did you choose the wrong student identifier?', true);
             } else {
                 $entry['id'] = $userData['User']['id'];
                 $courses = array_merge(Set::extract('/Enrolment/id', $userData),
