@@ -106,45 +106,6 @@ class Mixeval extends AppModel
 
 
     /**
-    * copy generate a copy of mixeval with specific ID. The generated copy
-    * is cleaned up by removing all the IDs in it
-    *
-    * @param mixed $id source rubric ID
-    *
-    * @access public
-    * @return array copy of mixeval
-    */
-    function copy($id) {
-        $data = $this->find('first', array('conditions' => array('id' => $id),
-            'contain' => array('Question.Description',
-            )));
-
-        $data['Mixeval']['name'] = __('Copy of ', true).$data['Mixeval']['name'];
-
-        if (null != $data) {
-            unset ($data['Mixeval']['id'],
-                $data['Mixeval']['creator_id'],
-                $data['Mixeval']['created'],
-                $data['Mixeval']['updater_id'],
-                $data['Mixeval']['modified']);
-
-            for ($i = 0; $i < count($data['Question']); $i++) {
-                unset ($data['Question'][$i]['id'],
-                    $data['Question'][$i]['mixeval_id']);
-                if ('1' == $data['Question'][$i]['mixeval_question_type_id']) {
-                    for ($j = 0; $j < count($data['Question'][$i]['Description']); $j++) {
-                        unset($data['Question'][$i]['Description'][$j]['id'],
-                            $data['Question'][$i]['Description'][$j]['question_id']);
-                    }
-                }
-            }
-        }
-
-        return $data;
-    }
-
-
-    /**
      * filter Filter function from Output Component
      *
      * @param mixed &$data

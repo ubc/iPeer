@@ -627,7 +627,10 @@ class MixevalsController extends AppController
      */
     function copy($id=null)
     {
-        $eval = $this->Mixeval->getEventSub($id);
+        $eval = $this->Mixeval->find('first', array(
+            'conditions' => array('id' => $id),
+            'contain' => array('Event' => 'EvaluationSubmission')
+        ));
 
         // check to see if $id is valid - numeric & is a mixed evaluation
         if (!is_numeric($id) || empty($eval)) {
@@ -658,11 +661,46 @@ class MixevalsController extends AppController
                 return;
             }
         }
-
-        $this->data = $this->Mixeval->copy($id);
-        $this->set('data', $this->data);
-        $this->set('action', __('Copy Mixed Evaluation', true));
-        $this->render('edit');
+        
+        $mixeval = $this->Mixeval->find('first', array(
+            'conditions' => array('id' => $id),
+            'recursive' => 2
+        ));
+        $saved = true;
+        $this->Mixeval->begin();
+        unset($mixeval['Mixeval']['id']);
+        $mixeval['Mixeval']['name'] = __('Copy of ', true).$mixeval['Mixeval']['name'];
+        $saved = $saved && $this->Mixeval->save($mixeval['Mixeval']);
+        $id = $this->Mixeval->id;
+        if ($saved) {
+            foreach ($mixeval['MixevalQuestion'] as $ques) {
+                $desc = array();
+                unset($ques['id'], $ques['MixevalQuestionType']);
+                $ques['mixeval_id'] = $id;
+                if ($ques['mixeval_question_type_id'] == 1) {
+                    $desc = $ques['MixevalQuestionDesc'];
+                    unset($ques['MixevalQuestionDesc']);
+                }
+                $this->MixevalQuestion->id = null;
+                $saved = $saved && $this->MixevalQuestion->save($ques);
+                $qId = $this->MixevalQuestion->id;
+                foreach ($desc as $d) {
+                    unset($d['id']);
+                    $d['question_id'] = $qId;
+                    $this->MixevalQuestionDesc->id = null;
+                    $saved = $saved && $this->MixevalQuestionDesc->save($d);
+                }
+            }
+        }
+        
+        if ($saved) {
+            $this->Mixeval->commit();
+            $this->redirect('edit/'.$id);
+        } else {
+            $this->Mixeval->rollback();
+            $this->Session->setFlash(__('Error: There was an error copying the template. Please try again.', true));
+            $this->redirect('index');
+        }
     }
 
 
