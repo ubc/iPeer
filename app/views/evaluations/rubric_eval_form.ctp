@@ -17,13 +17,13 @@
 var save = null;
 var sub = null;
 function setSub(){
-	sub = 1;
+    sub = 1;
 }
 
 function alertSave(){
-	save = 1;
-	var elem = document.getElementsByClassName('as'); 
-	jQuery(elem).fadeIn('300');
+    save = 1;
+    var elem = document.getElementsByClassName('as'); 
+    jQuery(elem).fadeIn('300');
 }
 </script>
 
@@ -187,8 +187,8 @@ function alertSave(){
       onShowTab: 'panel6' });
       
 jQuery(window).on("beforeunload",function() {
-	if(sub !=1 && save !=1)
-   		return 'Please click on the "Submit to Complete the Evaluation" button before exiting.' ;
+    if(sub !=1 && save !=1)
+        return 'Please click on the "Submit to Complete the Evaluation" button before exiting.' ;
 });
 
   </script>
