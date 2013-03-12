@@ -70,13 +70,16 @@ function makeQ($view, $qType, $i, $qTypes)
     
     // give an ID to the question number for easy renumbering later on
     $qNum = $html->tag('span', $i + 1 . ". ", array('id' => "questionIndex$i"));
+    $requiredTxt = ($qType != 'Likert') ? '' :
+        $html->div("help-text", _t('Unrequired Likert questions are not counted toward the total rating.'));
     $ret = $html->div('MixevalMakeQuestion',
         $html->tag('h3', "$controls $qNum $qHeader") .
         $hiddenIdField .
         $form->input("MixevalQuestion.$i.title", 
             array("type" => "text", "label" => "Question")) .
         $form->input("MixevalQuestion.$i.instructions") .
-        $form->input("MixevalQuestion.$i.required") .
+        $form->input("MixevalQuestion.$i.required", array('checked' => true)) .
+        $requiredTxt .
         $form->hidden("MixevalQuestion.$i.mixeval_question_type_id",
             array('value' => $qTypeId)) .
         $form->hidden("MixevalQuestion.$i.question_num", 
