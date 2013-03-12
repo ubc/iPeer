@@ -940,7 +940,6 @@ class EvaluationComponent extends Object
     {
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
         $mixevalResultDetail = array();
-        $memberScoreSummary = array();
         $evalResult = array();
         if ($groupEventId && $groupMembers) {
             foreach ($groupMembers as $user) {
@@ -952,19 +951,11 @@ class EvaluationComponent extends Object
                 }
 
                 // get the results for students
-                $mixevalResult = $this->EvaluationMixeval->getResultsByEvaluatee($groupEventId, $userId, $include);
-                $evalResult[$userId] = $mixevalResult;
-
-                //Get total mark each member received
-                $memberScoreSummary[$userId]['received_count'] = count($mixevalResult);
-                $memberScoreSummary[$userId]['received_total_score'] = array_sum(Set::extract($mixevalResult, '/EvaluationMixeval/score'));
-                $memberScoreSummary[$userId]['received_ave_score'] = ($memberScoreSummary[$userId]['received_count'] == 0 ?
-                    0 : $memberScoreSummary[$userId]['received_total_score'] / $memberScoreSummary[$userId]['received_count']);
+                $evalResult[$userId] = $this->EvaluationMixeval->getResultsByEvaluatee($groupEventId, $userId, $include);
             }
         }
 
         $mixevalResultDetail['scoreRecords'] =  $this->formatMixevalEvaluationResultsMatrix($evalResult);
-        $mixevalResultDetail['memberScoreSummary'] = $memberScoreSummary;
         $mixevalResultDetail['evalResult'] = $evalResult;
 
         return $mixevalResultDetail;

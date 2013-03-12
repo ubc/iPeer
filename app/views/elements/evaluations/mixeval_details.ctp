@@ -67,7 +67,6 @@ if ($details) {
             $required = (!$ques['required']) ? '' :
                 $html->tag('span', '*', array('class' => 'required orangered'));
             echo $html->tag('h3', "$qnum. $ques[title] $required");
-            echo $html->tag('h3', "$qnum. $ques[title]");
             if (isset($ques['Submissions'])) {
                 echo '<ul>';
                 if (!$gradeReleased) {

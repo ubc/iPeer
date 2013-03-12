@@ -1099,7 +1099,6 @@ class EvaluationsController extends AppController
             $this->set('mixeval', $mixeval);
             $this->set('memberList', $fullNames);
             $this->set('mixevalDetails', $details['scoreRecords']);
-            $this->set('memberScoreSummary', $details['memberScoreSummary']);
             $this->set('evalResult', $details['evalResult']);
             $this->set('penalty', $this->Mixeval->formatPenaltyArray($fullNames, $eventId, $groupId));
             $this->set('inCompleteMembers', $inCompleteMembers);
@@ -1234,11 +1233,13 @@ class EvaluationsController extends AppController
             $details = $this->Evaluation->getMixevalResultDetail($groupEventId, array($user), $sub);
             $eventSub = $this->Event->getEventSubmission($eventId, $userId);
             $penalty = $this->Penalty->getPenaltyPercent($eventSub);
-            $avePenalty = $details['memberScoreSummary'][$userId]['received_total_score'] * ($penalty / 100);
+            $required = array_filter(Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.required'));
+            $score[$userId]['received_ave_score'] = array_sum(array_intersect_key($details['scoreRecords'][$userId], $required));
+            $avePenalty = $score[$userId]['received_ave_score'] * ($penalty / 100);
 
             $this->set('mixeval', $mixeval);
             $this->set('evalResult', $details['evalResult']);
-            $this->set('memberScoreSummary', $details['memberScoreSummary']);
+            $this->set('memberScoreSummary', $score);
             $this->set('penalty', $penalty);
             $this->set('avePenalty', $avePenalty);
 
