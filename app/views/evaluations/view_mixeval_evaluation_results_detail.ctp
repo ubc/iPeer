@@ -74,6 +74,7 @@ if (!empty($notInGroup)) {
             </div>
             <div style="height: 200px;text-align: center;" id="panel1Content" class="panelContent">
             <br><b><?php
+            $scores = array_intersect_key($scores, $required);
             $deduction = number_format(array_sum($scores) * $penalty[$evaluteeId]/100, 2);
             $scaled = number_format(array_sum($scores) * (1 - $penalty[$evaluteeId]/100), 2);
             $percent = number_format($scaled/$mixeval['Mixeval']['total_marks'] * 100);

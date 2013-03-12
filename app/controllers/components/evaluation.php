@@ -963,10 +963,51 @@ class EvaluationComponent extends Object
             }
         }
 
+        $mixevalResultDetail['scoreRecords'] =  $this->formatMixevalEvaluationResultsMatrix($evalResult);
         $mixevalResultDetail['memberScoreSummary'] = $memberScoreSummary;
         $mixevalResultDetail['evalResult'] = $evalResult;
 
         return $mixevalResultDetail;
+    }
+    
+    /**
+     * formatMixevalEvaluationResultsMatrix
+     * results matrix format:
+     * Matrix[evaluatee_id][question_index] = score
+     *
+     * @param mixed $evalResults evaluation result
+     *
+     * @access public
+     * @return array
+     */
+    function formatMixevalEvaluationResultsMatrix($evalResults)
+    {
+        $matrix = array();
+        foreach ($evalResults as $userId => $evals) {
+            $counter = array();
+            $matrix[$userId] = array();
+            foreach ($evals as $eval) {
+                foreach ($eval['EvaluationMixevalDetail'] as $detail) {
+                    // skip the comment question
+                    if ($detail['question_comment'] !== null) {
+                        continue;
+                    }
+                    $counter[$detail['question_number']] = isset($counter[$detail['question_number']]) ?
+                        $counter[$detail['question_number']] : 0;
+                    $matrix[$userId][$detail['question_number']] = isset($matrix[$userId][$detail['question_number']]) ?
+                        $matrix[$userId][$detail['question_number']] : 0;
+                    $matrix[$userId][$detail['question_number']] += $detail['grade'];
+                    // need a counter for each question, in case different number of evalutions
+                    // for each question (optional questoin)
+                    $counter[$detail['question_number']]++;
+                }
+            }
+            foreach ($counter as $questionNumber => $count) {
+                $matrix[$userId][$questionNumber] = $matrix[$userId][$questionNumber]/$count;
+            }
+        }
+
+        return $matrix;
     }
 
     /**

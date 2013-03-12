@@ -1094,6 +1094,7 @@ class EvaluationsController extends AppController
             $inCompleteMembers = $this->User->getUsers($inCompleteMembers, array('Role'), array('User.full_name'));
             $notInGroup = $this->User->getUsers($notInGroup, array('Role'), array('User.id', 'User.full_name'));
             $gradeReleaseStatus = $this->EvaluationMixeval->getTeamReleaseStatus($groupEventId);
+            $required = array_filter(Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.required'));
 
             $this->set('mixeval', $mixeval);
             $this->set('memberList', $fullNames);
@@ -1103,6 +1104,7 @@ class EvaluationsController extends AppController
             $this->set('penalty', $this->Mixeval->formatPenaltyArray($fullNames, $eventId, $groupId));
             $this->set('inCompleteMembers', $inCompleteMembers);
             $this->set('notInGroup', $notInGroup);
+            $this->set('required', $required);
             $this->set('gradeReleaseStatus', $gradeReleaseStatus);
 
             if ($displayFormat == 'Detail') {

@@ -28,7 +28,8 @@
 </dl>
 <h2>Questions</h2> 
 <?php
-$totalMarks = array_sum(Set::extract('/MixevalQuestion/multiplier', $questions));
+$requiredLikert = Set::extract('/MixevalQuestion[required=1]', $questions);
+$totalMarks = array_sum(Set::extract('/MixevalQuestion/multiplier', $requiredLikert));
 $id = array('id' => 0);
 $event = array('Event' => $id, 'GroupEvent' => $id, 'Group' => $id);
   

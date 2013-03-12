@@ -354,6 +354,11 @@ class EvaluationTestCase extends CakeTestCase
         $eval = $eval = $this->EvaluationComponentTest->getStudentViewMixevalResultDetailReview(1, null);
         $this->assertFalse($eval);
     }
+    
+    function testFormatMixevalEvaluationResultsMatrix()
+    {
+    
+    }
 
 
     function testChangeMixevalEvaluationGradeRelease()
