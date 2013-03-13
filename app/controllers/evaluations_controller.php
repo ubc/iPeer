@@ -1028,7 +1028,11 @@ class EvaluationsController extends AppController
             $notInGroup = array_diff(Set::extract($sub, '/EvaluationSubmission/submitter_id'), Set::extract($groupMembers, '/GroupsMembers/user_id'));
             $inCompleteMembers = $this->User->getUsers($inCompleteMembers, array('Role'), array('User.full_name'));
             $notInGroup = $this->User->getUsers($notInGroup, array('Role'), array('User.id', 'User.full_name'));
-            $rubricDetails = $this->EvaluationRubric->findAllByGrpEventId($groupEventId);
+            $submitted = $this->EvaluationSubmission->findAllByGrpEventId($groupEventId);
+            $submitted = Set::extract('/EvaluationSubmission/submitter_id', $submitted);
+            $rubricDetails = $this->EvaluationRubric->find('all', array(
+                'conditions' => array('grp_event_id' => $groupEventId, 'evaluator' => $submitted)
+            ));
             $memberList = array_unique(array_merge(Set::extract($rubricDetails, '/EvaluationRubric/evaluator'),
                 Set::extract($rubricDetails, '/EvaluationRubric/evaluatee')));
             $fullNames = $this->User->getFullNames($memberList);
@@ -1179,11 +1183,13 @@ class EvaluationsController extends AppController
 
         case 2: //View Rubric Evaluation Result
             $rubric = $this->Rubric->findById($event['Event']['template_id']);
+            $submitted = $this->EvaluationSubmission->findAllByGrpEventId($groupEventId);
+            $submitted = Set::extract('/EvaluationSubmission/submitter_id', $submitted);
             $evaluatorDetails = $this->EvaluationRubric->find('all', array(
                 'conditions' => array('grp_event_id' => $groupEventId, 'evaluator' => $userId)
             ));
             $evaluateeDetails = $this->EvaluationRubric->find('all', array(
-                'conditions' => array('grp_event_id' => $groupEventId, 'evaluatee' => $userId)
+                'conditions' => array('grp_event_id' => $groupEventId, 'evaluatee' => $userId, 'evaluator' => $submitted)
             ));
             $userIds = array_unique(array_merge(
                 Set::extract($evaluatorDetails, '/EvaluationRubric/evaluatee'), array($userId)));
