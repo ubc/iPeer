@@ -13,7 +13,7 @@ require_once (CORE_PATH.'cake/libs/controller/controller.php');
  */
 class SendEmailsShell extends Shell
 {
-    public $uses = array('User', 'EmailSchedule', 'SysParameter', 'EmailMerge','Event');
+    public $uses = array('User', 'EmailSchedule', 'SysParameter', 'EmailMerge','Event','Group','GroupMembers');
     const EMAIL_TASK_LOCK = 'tmp/email_task_lock';
     /**
      * main
@@ -96,8 +96,23 @@ class SendEmailsShell extends Shell
     * @param $email_id : id for the current email schedule id
     * @param $date : The date of the reminder with id = $email_id
     * 
-    */ private function reminderFilter($event_id,$to,$email_id,$date){
+    */ private function reminderFilter($event_id,$to,$email_id,$date){        
     if(isset($event_id) && $to[0]=='save_reminder') {
+            
+        //Get the updated groups
+        $groups = $this-> Group->getGroupsByEventId($event_id, array());
+        foreach ($groups as $group) {
+            $groupids[] = $group['Group']['id' ];
+         }
+        $members[] = $this->GroupsMembers->getUserListInGroups($groupids);
+        $to_new = array();
+        $to_new[0] = 'save_reminder';
+
+        foreach($members[0] as $m){
+            array_push($to_new,$m);
+        }
+        
+        
         //If the date on the reminder is past the due date, delete the corresponding reminder from the table
         $event =$this->Event->getEventById($event_id);
         if( strtotime($event['Event']['due_date']) < strtotime($date)){
@@ -109,14 +124,14 @@ class SendEmailsShell extends Shell
         else{ //Modify the to list and save the updated to[] list data in the database
             $to_list = array();
             $submissions = $this->EvaluationSubmission->getEvalSubmissionsByEventId($event_id);
-            for($i=1;$i < count($to);$i++){
+            for($i=1;$i < count($to_new);$i++){
                 foreach($submissions as $s){
-                    if($to[$i] == $s['EvaluationSubmission']['submitter_id']){
-                        array_push($to_list,$to[$i]);
+                    if($to_new[$i] == $s['EvaluationSubmission']['submitter_id']){
+                        array_push($to_list,$to_new[$i]);
                     }
                 }
             }
-            $to_list = array_values(array_diff($to, $to_list));
+            $to_list = array_values(array_diff($to_new, $to_list));
             array_shift($to_list);
             $to_list = implode(';', $to_list);
 
