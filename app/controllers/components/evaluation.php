@@ -187,13 +187,15 @@ class EvaluationComponent extends Object
         $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $this->Penalty = ClassRegistry::init('Penalty');
+        $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
 
         // assuming all are in the same order and same size
         $evaluatees = $params['form']['memberIDs'];
         $points = $params['form']['points'];
         $comments = $params['form']['comments'];
         $evaluator = $params['data']['Evaluation']['evaluator_id'];
-        $evaluateeCount = $params['form']['evaluateeCount'];
+        $evaluators = $this->GroupsMembers->findAllByGroupId($params['form']['group_id']);
+        $evaluators = Set::extract('/GroupsMembers/user_id', $evaluators);
 
         // create Evaluations for each evaluator-evaluatee pair
         $pos = 0;
@@ -235,12 +237,12 @@ class EvaluationComponent extends Object
         //checks if all members in the group have submitted
         //the number of submission equals the number of members
         //means that this group is ready to review
-        $memberCompletedNo =
-            $this->EvaluationSubmission->numCountInGroupCompleted(
-                $groupEvent['GroupEvent']['id']);
-        $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
+        $memberCompletedNo = $this->EvaluationSubmission->find('count', array(
+            'conditions' => array('grp_event_id' => $groupEvent['GroupEvent']['id'], 'submitter_id' => $evaluators)
+        ));
         //Check to see if all members are completed this evaluation
-        if ($numOfCompletedCount == $evaluateeCount) {
+        $evaluators = count($evaluators);
+        if ($memberCompletedNo == $evaluators) {
             $groupEvent['GroupEvent']['marked'] = 'to review';
             if (!$this->GroupEvent->save($groupEvent)) {
                 return false;

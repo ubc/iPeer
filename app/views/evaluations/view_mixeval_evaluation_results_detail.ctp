@@ -150,7 +150,11 @@ if (!empty($notInGroup)) {
             <?php } else {?>
                 <input type="button" name="ReleaseComments" value="<?php __('Release Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$evaluteeId.';'.$event['GroupEvent']['id'].';1'; ?>'">
             <?php } ?>
-
+            <?php if ($event['Event']['auto_release']) {
+                echo "<div id='autoRelease_msg' class='green'>";
+                echo "<br>".__("Auto Release is ON, you do not need to manually release the grades and comments", true);
+                echo "</div>";
+            } ?>        
         </div>
     </div>
 <?php endforeach; ?>

@@ -752,7 +752,8 @@ class EvaluationsController extends AppController
         $eventId = $this->params['form']['event_id'];
         $groupId = $this->params['form']['group_id'];
         $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
-        $evaluateeCount = $this->params['form']['evaluateeCount'];
+        $evaluators = $this->GroupsMembers->findAllByGroupId($groupId);
+        $evaluators = Set::extract('/GroupsMembers/user_id', $evaluators);
 
         $groupEventId = $this->params['form']['group_event_id'];
         //Get the target group event
@@ -780,10 +781,12 @@ class EvaluationsController extends AppController
         //checks if all members in the group have submitted
         //the number of submission equals the number of members
         //means that this group is ready to review
-        $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupEventId);
-        $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
+        $memberCompletedNo = $this->EvaluationSubmission->find('count', array(
+            'conditions' => array('grp_event_id' => $groupEventId, 'submitter_id' => $evaluators)
+        ));
+        $evaluators = count($evaluators);
         //Check to see if all members are completed this evaluation
-        if ($numOfCompletedCount == $evaluateeCount ) {
+        if ($memberCompletedNo == $evaluators) {
             $groupEvent['GroupEvent']['marked'] = 'to review';
             if (!$this->GroupEvent->save($groupEvent)) {
                 $status = false;
@@ -882,7 +885,6 @@ class EvaluationsController extends AppController
             $mixeval = $this->Mixeval->findById($data['template_id']);
             $groupEventId = $data['grp_event_id'];
             $evaluator = $data['submitter_id'];
-            $members = $data['members'];
             $required = true;
             $failures = array();
             foreach ($this->data as $userId => $eval) {
@@ -924,9 +926,14 @@ class EvaluationsController extends AppController
 
                     //checks if all members in the group have submitted the number of 
                     //submission equals the number of members means that this group is ready to review
-                    $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupEventId);
+                    $evaluators = $this->GroupsMembers->findAllByGroupId($groupId);
+                    $evaluators = Set::extract('/GroupsMembers/user_id', $evaluators);
+                    $memberCompletedNo = $this->EvaluationSubmission->find('count', array(
+                        'conditions' => array('grp_event_id' => $groupEventId, 'submitter_id' => $evaluators)
+                    ));
+                    $evaluators = count($evaluators);
                     //Check to see if all members are completed this evaluation
-                    if ($memberCompletedNo == $members) {
+                    if ($memberCompletedNo == $evaluators) {
                         $this->GroupEvent->id = $groupEventId;
                         $groupEvent['GroupEvent']['marked'] = 'to review';
                         if (!$this->GroupEvent->save($groupEvent)) {
