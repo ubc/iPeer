@@ -199,8 +199,10 @@ class ExportBaseNewComponent extends Object
                     if (isset($event['Question'][$key]['mixeval_question_type_id'])) {
                         if (isset($params['include']['grade_tables']) && $event['Question'][$key]['mixeval_question_type_id'] == '1') {
                             array_push($row, $result['grade']);
-                        } elseif (isset($params['include']['comments']) && $event['Question'][$key]['mixeval_question_type_id'] == '2') {
+                        } elseif (isset($params['include']['comments']) && in_array($event['Question'][$key]['mixeval_question_type_id'], array(2, 3))) {
                             array_push($row, $result['question_comment']);
+                        } else {
+                            array_push($row, 'N/A');
                         }
                     } else {
                         array_push($row, $result['grade']);

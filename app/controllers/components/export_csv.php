@@ -107,6 +107,11 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         $results = $this->responseModel->getSubmittedResultsByGroupEvent($groupEventIds, $this->detailModel[$event['Event']['event_template_type_id']]);
         $results = Set::combine($results, '{n}.'.$this->responseModelName.'.id', '{n}', '{n}.'.$this->responseModelName.'.grp_event_id');
         $evaluation = $this->evaluationModel->getEvaluation($event['Event']['template_id']);
+        unset($evaluation['Event']);
+        if (isset($evaluation['MixevalQuestion'])) {
+            $evaluation['Question'] = $evaluation['MixevalQuestion'];
+            unset($evaluation['MixevalQuestion']);
+        }
         $event = array_merge($event, $evaluation);
 
         $header = $this->generateHeader($params, $event);
@@ -165,9 +170,11 @@ Class ExportCsvComponent extends ExportBaseNewComponent
 
         foreach ($event['Question'] as $key => $question) {
             if (isset($question['mixeval_question_type_id'])) {
-                if ((isset($params['include']['grade_tables']) && $question['mixeval_question_type_id'] == '1') ||
-                (isset($params['include']['comments']) && $question['mixeval_question_type_id'] == '2')) {
+                if ((isset($params['include']['grade_tables']) && $question['mixeval_question_type_id'] == '1')) {
                     $header[] = "Q".($key+1)." ( /".$question['multiplier'].")";
+                } else if (isset($params['include']['comments']) && 
+                    in_array($question['mixeval_question_type_id'], array(2, 3))){
+                    $header[] = "Q".($key+1);
                 }
             } else {
                 $header[] = "Q".($key+1)." ( /".$question['multiplier'].")";
