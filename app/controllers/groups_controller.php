@@ -405,10 +405,7 @@ class GroupsController extends AppController
         $lines = array_unique($lines);
         
         // pre-process the lines in the file first
-        foreach ($lines as $key => $line) {
-            // Trim this line's white space
-            $lines[$key] = str_getcsv(trim($lines[$key]));
-        }
+        $lines = array_map("str_getcsv", array_map("trim", $lines));
 
         // Process the array into groups
         $users = array();

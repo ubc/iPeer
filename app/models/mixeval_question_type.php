@@ -1,8 +1,17 @@
 <?php
+/**
+ * MixevalQuestionType Model
+ *
+ * @uses AppModel
+ * @package   CTLT.iPeer
+ * @author    Pan Luo <pan.luo@ubc.ca>
+ * @copyright 2013 All rights reserved.
+ * @license   MIT {@link http://www.opensource.org/licenses/MIT}
+ */
 class MixevalQuestionType extends AppModel {
-    var $name = 'MixevalQuestionType';
-    var $displayField = 'type';
-    var $validate = array(
+    public $name = 'MixevalQuestionType';
+    public $displayField = 'type';
+    public $validate = array(
         'type' => array(
             'notempty' => array(
                 'rule' => array('notempty'),
@@ -16,7 +25,7 @@ class MixevalQuestionType extends AppModel {
     );
     //The Associations below have been created with all possible keys, those that are not needed can be removed
 
-    var $hasMany = array(
+    public $hasMany = array(
         'MixevalQuestion' => array(
             'className' => 'MixevalQuestion',
             'foreignKey' => 'mixeval_question_type_id',

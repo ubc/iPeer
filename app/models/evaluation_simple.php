@@ -527,7 +527,7 @@ class EvaluationSimple extends EvaluationResponseBase
         $sub = $evalSub->getEvalSubmissionsByEventId($eventId);
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId)));
         $template = $simp->find('first', array('conditions' => array('SimpleEvaluation.id' => $event['Event']['template_id'])));
-        $max = $template['SimpleEvaluation']['point_per_member'];
+        //$max = $template['SimpleEvaluation']['point_per_member'];
 
         foreach($sub as $stu) {
             if (isset($data[$stu['EvaluationSubmission']['submitter_id']])) {

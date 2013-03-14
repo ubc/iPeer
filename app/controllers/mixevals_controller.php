@@ -359,6 +359,9 @@ class MixevalsController extends AppController
      * it issues another transaction by default. This should be simpler than 
      * having to properly deal with the return statuses in a non-transactional 
      * saveAll call. 
+     *
+     * @access public
+     * @return void
      */
     public function _transactionalSave() {
         // Don't actually do a save if user pressed cancelled button

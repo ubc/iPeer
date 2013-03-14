@@ -71,9 +71,6 @@ class SurveysController extends AppController
     {
         $myID = $this->Auth->user('id');
 
-        // Get the course data
-        $courses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
-
         // Set up Columns
         $columns = array(
             array("Survey.id",          __("ID", true),         "4em",   "hidden"),

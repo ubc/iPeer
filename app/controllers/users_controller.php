@@ -432,10 +432,6 @@ class UsersController extends AppController
      * */
     private function _initFormEnv()
     {
-        $user = $this->User->find(
-            'first',
-            array('conditions' => array('id' => $this->Auth->user('id')))
-        );
         // get the courses that this user is allowed access to
         $coursesOptions = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
         asort($coursesOptions);
@@ -1352,7 +1348,7 @@ class UsersController extends AppController
             $primaryTutor = Set::extract('/'.$model.'/course_id', $this->$model->findAllByUserId($primary));
             $secondaryTutor = Set::extract('/'.$model.'/course_id', $this->$model->findAllByUserId($secondary));
             $conflict = array_intersect($primaryTutor, $secondaryTutor);
-            $updatated = $updated && $this->User->$functionNames[$model]($secondary, $conflict);
+            $updated = $updated && $this->User->$functionNames[$model]($secondary, $conflict);
             $conflict = implode(',', $conflict);
             $name = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $model)).'s';
             $updated = $updated && $this->$model->query('UPDATE '.$name.' SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');

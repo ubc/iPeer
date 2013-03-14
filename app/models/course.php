@@ -552,9 +552,10 @@ class Course extends AppModel
         ));
 
         // some clean up
-        foreach ($course['Enrol'] as $key => $student) {
-            unset($course['Enrol'][$key]['UserEnrol']);
+        foreach ($course['Enrol'] as &$student) {
+            unset($student['UserEnrol']);
         }
+        unset($student);
 
         return $course;
     }
