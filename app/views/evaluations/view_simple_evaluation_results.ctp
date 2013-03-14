@@ -36,7 +36,7 @@ if (!empty($results['Incomplete'])) {
     );
     $users = array();
     foreach($results['Incomplete'] as $userid) {
-        $user = $results['All'][$userid];
+        $user = $results['evaluators'][$userid];
         $users[] = array($user['User']['full_name'] .
             ($user['Role'][0]['id']==4 ? ' (TA)' : ' (student)'));
     }
@@ -56,7 +56,7 @@ if (!empty($results['Dropped'])) {
     );
     $users = array();
     foreach($results['Dropped'] as $userid) {
-        $user = $results['All'][$userid];
+        $user = $results['evaluators'][$userid];
         $users[] = array($user['User']['full_name'] .
             ($user['Role'][0]['id']==4 ? ' (TA)' : ' (student)'));
     }
@@ -77,13 +77,13 @@ if ($event['Event']['auto_release']) {
 <table class='standardtable'>
 <tr>
     <th rowspan="2"><?php __('Evaluator')?></th>
-    <th colspan='<?php echo count($results['All']);?>'>
+    <th colspan='<?php echo count($results['evaluatees']);?>'>
     <?php __('Members Evaluated')?>
     </th>
 </tr>
 <tr>
     <?php
-    foreach ($results['All'] as $member) {
+    foreach ($results['evaluatees'] as $member) {
         $class = "";
         if (in_array($member['User']['id'], $results['Dropped'])) {
             $class = "class='blue'";
@@ -99,7 +99,7 @@ if ($event['Event']['auto_release']) {
 // data processing for scores
 
 // first the individual scores
-foreach ($results['All'] as $evaluatorId => $evaluator) {
+foreach ($results['evaluators'] as $evaluatorId => $evaluator) {
     $class = "";
     if (in_array($evaluatorId, $results['Dropped'])) {
         $class = "class='blue'";
@@ -109,7 +109,7 @@ foreach ($results['All'] as $evaluatorId => $evaluator) {
     }
     echo '<tr>';
     echo "<th $class>" . $evaluator['User']['full_name'] . '</th>';
-    foreach ($results['All'] as $evaluatee) {
+    foreach ($results['evaluatees'] as $evaluatee) {
         $evaluateeId = $evaluatee['User']['id'];
         $score = '-';
         // get the score that the evaluator gave to the evaluatee
@@ -125,14 +125,14 @@ foreach ($results['All'] as $evaluatorId => $evaluator) {
 ?>
 
 <tr>
-    <td colspan='<?php echo count($results['All']) + 1;?>'></td>
+    <td colspan='<?php echo count($results['evaluatees']) + 1;?>'></td>
 </tr>
 
 <tr>
     <th><?php __('Total'); ?></th>
 <?php
 // then the total for each user
-foreach ($results['All'] as $evaluatee) {
+foreach ($results['evaluatees'] as $evaluatee) {
     $evaluateeId = $evaluatee['User']['id'];
     $totalGrade = '-';
     if (isset($results['TotalGrades'][$evaluateeId])) {
@@ -147,7 +147,7 @@ foreach ($results['All'] as $evaluatee) {
     <th><?php __('Penalty'); ?> </th>
 <?php
 // the penalty for each user
-foreach ($results['All'] as $evaluatee) {
+foreach ($results['evaluatees'] as $evaluatee) {
     $evaluateeId = $evaluatee['User']['id'];
     $disp = '-';
     if (isset($results['TotalGrades'][$evaluateeId])) {
@@ -168,7 +168,7 @@ foreach ($results['All'] as $evaluatee) {
     <th><?php __('Final Mark'); ?></th>
 <?php
 // the final mark for each user
-foreach ($results['All'] as $evaluatee) {
+foreach ($results['evaluatees'] as $evaluatee) {
     $evaluateeId = $evaluatee['User']['id'];
     $finalGrade = '-';
     if (isset($results['FinalGrades'][$evaluateeId])) {
@@ -183,7 +183,7 @@ foreach ($results['All'] as $evaluatee) {
     <th><?php __('# of Evaluator(s)')?></th>
 <?php
 // the number of evaluators for each user
-foreach ($results['All'] as $evaluatee) {
+foreach ($results['evaluatees'] as $evaluatee) {
     $evaluateeId = $evaluatee['User']['id'];
     $numEvaluators = '-';
     if (isset($results['NumEvaluators'][$evaluateeId])) {
@@ -198,7 +198,7 @@ foreach ($results['All'] as $evaluatee) {
     <th><?php __('Average Received')?></th>
 <?php
 // the average for each user
-foreach ($results['All'] as $evaluatee) {
+foreach ($results['evaluatees'] as $evaluatee) {
     $evaluateeId = $evaluatee['User']['id'];
     $avgScore = '-';
     if (isset($results['NumEvaluators'][$evaluateeId])) {
@@ -216,7 +216,7 @@ foreach ($results['All'] as $evaluatee) {
     <td><?php __('Grade Release')?></td>
 <?php
 // controls to initiate grade release
-foreach ($results['All'] as $evaluatee) {
+foreach ($results['evaluatees'] as $evaluatee) {
     $evaluateeId = $evaluatee['User']['id'];
     $button = $form->button(_('N/A'), array('disabled' => 'disabled'));
     if (array_key_exists($evaluateeId, $results['ReleaseStatus'])) {
@@ -243,7 +243,7 @@ foreach ($results['All'] as $evaluatee) {
 </tr>
 
 <tr>
-	<td colspan="<?php echo count($results['All']) + 1; ?>">
+	<td colspan="<?php echo count($results['evaluatees']) + 1; ?>">
     <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
     <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
     <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>" />
@@ -283,7 +283,7 @@ foreach ($results['Submissions'] as $evaluatorId => $evaluator) {
     if (in_array($evaluatorId, $results['Dropped'])) {
         $class = "class='blue'";
     }
-    $evaluatorInfo = $results['All'][$evaluatorId]['User'];
+    $evaluatorInfo = $results['evaluators'][$evaluatorId]['User'];
     echo "<h3 $class>Evaluator: ".$evaluatorInfo['full_name'].'</h3>';
     $headers = array(_('Evaluatee'), _('Comment'), _('Released'));
     echo "<table class='standardtable'>";
@@ -297,7 +297,7 @@ foreach ($results['Submissions'] as $evaluatorId => $evaluator) {
         else if (in_array($evaluateeId, $results['Incomplete'])) {
             $class = "red";
         }
-        $evaluateeInfo = $results['All'][$evaluateeId]['User'];
+        $evaluateeInfo = $results['evaluators'][$evaluateeId]['User'];
         $tmp = array();
         $tmp[] = array($evaluateeInfo['full_name'], 
             array('width' => '15%', 'class' => $class));

@@ -430,9 +430,9 @@ class EvaluationComponent extends Object
         $droppedUsers = array_diff($submitterIds, $groupIds);
         $droppedUsers += array_diff($evaluateeIds, $groupIds);
         // all users currently in the group or have submitted/been evaluated
-        $ret['All'] = $groupIds + $droppedUsers;
+        $ret['evaluators'] = $groupIds + $droppedUsers;
         // users currently in the group but who haven't made a submission
-        $ret['Incomplete'] = array_diff($ret['All'], $droppedUsers,
+        $ret['Incomplete'] = array_diff($ret['evaluators'], $droppedUsers,
             $submitterIds);
         // users who are currently in the group
         $ret['GroupMembers'] = $groupIds;
@@ -440,19 +440,21 @@ class EvaluationComponent extends Object
         $ret['Dropped'] = $droppedUsers;
 
         // grab user info from user ids
-        foreach ($ret['All'] as $userid) {
+        foreach ($ret['evaluators'] as $userid) {
             $userinfo = $this->User->find('first',
                 array(
-                    'conditions' => array('id' => $userid),
+                    'conditions' => array('User.id' => $userid),
                     'contain' => array('Role')
                 )
             );
-            $ret['All'][$userid] = $userinfo;
+            $ret['evaluators'][$userid] = $userinfo;
         }
+        $ret['evaluatees'] = Set::extract('/Role[id='.$this->User->USER_TYPE_TA.']/RolesUser/user_id', $ret['evaluators']);
+        $ret['evaluatees'] = array_diff_key($ret['evaluators'], array_flip($ret['evaluatees']));
 
         // calculate penalty
         $ret['Penalties'] = $this->SimpleEvaluation->formatPenaltyArray(
-            $ret['All'], $eventId, $groupId);
+            $ret['evaluatees'], $eventId, $groupId);
         foreach ($ret['TotalGrades'] as $userid => $grade) {
             $ret['FinalGrades'][$userid] = $grade -
                 ($grade * ($ret['Penalties'][$userid] / 100));
@@ -908,7 +910,9 @@ class EvaluationComponent extends Object
                 }
                 $evalMixevalDetail['EvaluationMixevalDetail']['selected_lom'] = $data[$num]['selected_lom'];
                 $evalMixevalDetail['EvaluationMixevalDetail']['grade'] = $data[$num]['grade'];
-                $totalGrade += $data[$num]['grade'];
+                if ($ques['required']) {
+                    $totalGrade += $data[$num]['grade'];
+                }
             } else {
                 if (empty($data[$num]['question_comment']) && !empty($evalMixevalDetail)) {
                     $test = $this->EvaluationMixevalDetail->delete($this->EvaluationMixevalDetail->id);
