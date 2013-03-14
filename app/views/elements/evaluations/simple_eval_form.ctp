@@ -154,6 +154,8 @@
             <li><?php __('Allocate any remaining point.')?></li>
             <li><?php __('Enter Comments')?> <?php echo  $event['Event']['com_req']? '<font color="red"> (Must) </font>' : '(Optional)' ;?> .</li>
             <li><font color="red"><?php __('NOTE:')?></font> <?php __('"Submit Evaluation" button will only be enabled when all points, and comments (if required), are filled!')?></li>
+            <?php $releaseEnd = date('l, F j, Y g:i a', strtotime($event['Event']['release_date_end'])); ?>
+            <li><?php echo _t('The evaluation can be repeatedly submitted until ').$releaseEnd.'.'?></li>
             </ul>
 
             <div style="text-align:left; margin-left:3em;"><a href="#" onClick="javascript:$('penalty').toggle();return false;">( <?php __('Show/Hide late penalty policy')?> )</a></div>

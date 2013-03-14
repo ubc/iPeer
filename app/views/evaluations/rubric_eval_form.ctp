@@ -54,6 +54,8 @@ function alertSave(){
             <li><?php __('Press "Save This Section" or "Edit This Section" once to save the evaluation on individual peer.')?></li>
             <li><?php __('Press "Submit to Complete the Evaluation" to submit your evlauation to all peers.')?> </li>
             <li><?php __('<i>NOTE:</i> You can click the "Submit to Complete the Evaluation" button only <font color ="#FF6666">AFTER</font> all evaluations are completed.')?></li>
+            <?php $releaseEnd = date('l, F j, Y g:i a', strtotime($event['Event']['release_date_end'])); ?>
+            <li><?php echo _t('The evaluation can be repeatedly submitted until ').$releaseEnd.'.'?></li>
             </ul>
 
             <div style="text-align:left; margin-left:3em;"><a href="#" onClick="javascript:$('penalty').toggle();return false;">( <?php __('Show/Hide late penalty policy')?> )</a></div>
