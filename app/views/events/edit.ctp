@@ -93,6 +93,18 @@ echo $this->Form->input('result_release_date_begin',
     array('div' => array('id' => 'ResultReleaseBeginDiv'), 'label' => 'Results Released From', 'type' => 'text'));
 echo $this->Form->input('result_release_date_end',
     array('div' => array('id' => 'ResultReleaseEndDiv'), 'label' => 'Until', 'type' => 'text'));
+  
+echo $this->Form->input(
+    'email_schedule',
+    array(
+        'legend' => 'Email Reminder Frequency ',
+        'type' => 'radio',
+        'options' => array('0'=> 'Disable', '1' => '1 Day', '2'=>'2 Days','3'=>'3 Days','4'=>'4 Days','5'=>'5 Days','6'=>'6 Days'
+         ,'7'=>'7 Days'),
+         'default' => "$email_schedule"
+    )
+); 
+
 echo $this->Form->input('Group',
     array('div' => array('id' => 'GroupsDiv'), 'label' => 'Group(s)')); ?>
 <div class='help-text'><?php __('Holding "ctrl" or "command" key to select multiple groups.') ?></div>

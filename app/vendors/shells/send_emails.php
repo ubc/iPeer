@@ -96,22 +96,9 @@ class SendEmailsShell extends Shell
     * @param $email_id : id for the current email schedule id
     * @param $date : The date of the reminder with id = $email_id
     * 
-    */ private function reminderFilter($event_id,$to,$email_id,$date){        
+    */ 
+    private function reminderFilter($event_id,$to,$email_id,$date){        
     if(isset($event_id) && $to[0]=='save_reminder') {
-            
-        //Get the updated groups
-        $groups = $this-> Group->getGroupsByEventId($event_id, array());
-        foreach ($groups as $group) {
-            $groupids[] = $group['Group']['id' ];
-         }
-        $members[] = $this->GroupsMembers->getUserListInGroups($groupids);
-        $to_new = array();
-        $to_new[0] = 'save_reminder';
-
-        foreach($members[0] as $m){
-            array_push($to_new,$m);
-        }
-        
         
         //If the date on the reminder is past the due date, delete the corresponding reminder from the table
         $event =$this->Event->getEventById($event_id);
@@ -121,29 +108,28 @@ class SendEmailsShell extends Shell
             $to_list_empty = array();
             return $to_list_empty;
         }
-        else{ //Modify the to list and save the updated to[] list data in the database
-            $to_list = array();
+        else{ 
+            $submitter_list = array();
             $submissions = $this->EvaluationSubmission->getEvalSubmissionsByEventId($event_id);
-            for($i=1;$i < count($to_new);$i++){
-                foreach($submissions as $s){
-                    if($to_new[$i] == $s['EvaluationSubmission']['submitter_id']){
-                        array_push($to_list,$to_new[$i]);
-                    }
-                }
+      
+            foreach($submissions as $s){
+                array_push($submitter_list,$s['EvaluationSubmission']['submitter_id']);
             }
-            $to_list = array_values(array_diff($to_new, $to_list));
-            array_shift($to_list);
-            $to_list = implode(';', $to_list);
+                
+            
+            $new_to_list = array_values(array_diff($to, $submitter_list));
+            array_shift($new_to_list);
+            $new_to_list = implode(';', $new_to_list);
 
             //Save the new array in the Database table email_schedules
-            $data = array('id' => $email_id,'to'=>$to_list);
+            $data = array('id' => $email_id,'to'=>$new_to_list);
             $this->EmailSchedule->save($data);
-            $to_list = explode(';', $to_list);
+            $to_list = explode(';', $new_to_list);
 
-            return $to_list;
+            return $new_to_list;
         }
     }
-    else //Database entry does not correspond to reminders so, return list as is.
+    else //Database entry does not correspond to reminders and so, return list as is.
         return $to;
     }
 
