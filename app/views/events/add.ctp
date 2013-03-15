@@ -203,6 +203,8 @@ function toggleEventTemplate() {
         jQuery("#MixevalDiv").hide();
         jQuery("div.radio").show();
         jQuery("#penaltyInputs").show();
+        jQuery("#ResultReleaseBeginDiv").show(); // no result release for survey
+        jQuery("#ResultReleaseEndDiv").show(); // no result release for survey
         jQuery("#GroupsDiv").show();
         jQuery("div.help-text").show();
         updatePreview();
@@ -214,6 +216,8 @@ function toggleEventTemplate() {
         jQuery("#MixevalDiv").hide();
         jQuery("div.radio").show();
         jQuery("#penaltyInputs").show();
+        jQuery("#ResultReleaseBeginDiv").show(); // no result release for survey
+        jQuery("#ResultReleaseEndDiv").show(); // no result release for survey
         jQuery("#GroupsDiv").show();
         jQuery("div.help-text").show();
         updatePreview();
@@ -238,6 +242,8 @@ function toggleEventTemplate() {
         jQuery("#MixevalDiv").show();
         jQuery("div.radio").show();
         jQuery("#penaltyInputs").show();
+        jQuery("#ResultReleaseBeginDiv").show(); // no result release for survey
+        jQuery("#ResultReleaseEndDiv").show(); // no result release for survey
         jQuery("#GroupsDiv").show();
         jQuery("div.help-text").show();
         updatePreview();
