@@ -1409,6 +1409,12 @@ input[type='text'], .MixevalMakeQuestion textarea {
     padding-bottom: 0.1em;
 }
 
+/* permissions editor */
+/* access/edit */
+#perm_editor label {
+    width: auto;
+}
+
 /* TO BE REFACTORED LATER */
 
 /* TEMPORARY */
