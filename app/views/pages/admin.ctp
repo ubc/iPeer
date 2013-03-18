@@ -51,6 +51,16 @@ if (User::hasPermission('controllers/sysparameters')) {
     );
     echo '</li>';
 }
+
+// Permissions Editor
+if (User::hasPermission('controllers/accesses/view')) {
+    echo '<li>';
+    echo $this->Html->link(
+        'Permissions Editor',
+        array('controller' => 'accesses', 'action' => 'view')
+    );
+    echo '</li>';
+}
 ?>
 </ul>
 </div>

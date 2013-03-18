@@ -30,6 +30,10 @@ class Access extends AppModel
     public function loadPermissions($acos, $group_aro)
     {
         $this->permissions = array();
+        
+        if (empty($group_aro)) {
+            return $this->permissions;
+        }
 
         //GET ACL PERMISSIONS
         $group_perms = Set::extract('{n}.Aco', $group_aro);
@@ -94,17 +98,6 @@ class Access extends AppModel
         }
         
         return;
-    }
-    
-    function generateAlias($acoId)
-    {
-        $aco = $this->Acl->Aco->findById($acoId);
-        $alias = $test['Aco']['alias'];
-        while (isset($aco['Aco']['parent_id'])) {
-            $aco = $this->Acl->Aco->findById($aco['Aco']['parent_id']);
-            $alias = $aco['Aco']['alias'].'/'.$alias;
-        }
-        return $alias;
     }
 }
 ?>

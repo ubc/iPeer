@@ -42,7 +42,7 @@ function fnFormatDetails (oTable, nTr)
 {
     var aData = oTable.fnGetData(nTr);
     var roleId = "<?php echo $roleId ?>";
-    var types = new Array("Create", "Update", "Update", "Delete");
+    var types = new Array("Create", "Read", "Update", "Delete");
     var actions = new Array();
     for (var i=2;i<6;i++) {
         if (aData[i] == 'Allow') {

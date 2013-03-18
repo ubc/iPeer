@@ -15,11 +15,16 @@ class AccessesController extends AppController {
     // need comments
     public function view($roleId=1)
     {
+        $roles = $this->Role->find('list');
+        if (!in_array($roleId, array_keys($roles))) {
+            $this->Session->setFlash(_t('Error: Invalid Id.'));
+            $this->redirect('view'); 
+        }
+    
         $acos = $this->Acl->Aco->find('threaded');
         $group_aro = $this->Acl->Aro->find('threaded', array('conditions'=>array('Aro.foreign_key'=>$roleId, 'Aro.model'=>'Role')));
         $permissions = $this->Access->loadPermissions($acos, $group_aro);
-        $roles = $this->Role->find('list');
-
+        
         $this->set('roles', $roles);
         $this->set('roleId', $roleId);
         $this->set('permissions', $permissions);
@@ -66,7 +71,8 @@ class AccessesController extends AppController {
                 $alias = strtolower($aco['Aco']['alias'].'/'.$alias);
             }
             $acos = $this->Acl->Aco->find('threaded');
-            $group_aro = $this->Acl->Aro->find('threaded', array('conditions'=>array('Aro.foreign_key'=>$aroId, 'Aro.model'=>'Role')));
+            $group_aro = $this->Acl->Aro->find('threaded', array(
+                'conditions'=>array('Aro.foreign_key'=>$aroId, 'Aro.model'=>'Role')));
             $permissions = $this->Access->loadPermissions($acos, $group_aro);
             $permissions = $permissions[$alias];
             $permission['aro_id'] = $aroId;
