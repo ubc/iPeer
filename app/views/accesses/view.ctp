@@ -55,23 +55,32 @@ function fnFormatDetails (oTable, nTr)
     var sOut = '<div class="userActionPanel"><ul>';
     
     sOut += '<li>';
-    sOut += '<a href="<?php echo $this->base; ?>/accesses/edit/allow/'+aData[0]+'/'+roleId+'">Allow All</a>';
+    sOut += '<a href="<?php echo $this->base; ?>/accesses/edit/allow/'+aData[0]+'/'+roleId+'"';
+    sOut += 'onclick="return changeConfirmed(&quot;'+aData[1]+'&quot;)">Allow All</a>';
     sOut += '</li>';
     
     sOut += '<li>';
-    sOut += '<a href="<?php echo $this->base; ?>/accesses/edit/deny/'+aData[0]+'/'+roleId+'">Deny All</a>';
+    sOut += '<a href="<?php echo $this->base; ?>/accesses/edit/deny/'+aData[0]+'/'+roleId+'"';
+    sOut += 'onclick="return changeConfirmed(&quot;'+aData[1]+'&quot;)">Deny All</a>';
     sOut += '</li>';
     
     for (var i=0; i<4; i++) {
         sOut += '<li>';
         sOut += '<a href="<?php echo $this->base; ?>/accesses/edit/';
-        sOut += actions[i].toLowerCase()+'/'+aData[0]+'/'+roleId+'/'+types[i].toLowerCase()+'">'+actions[i]+' '+types[i]+'</a>';
+        sOut += actions[i].toLowerCase()+'/'+aData[0]+'/'+roleId+'/'+types[i].toLowerCase()+'"';
+        sOut += 'onclick="return changeConfirmed(&quot;'+aData[1]+'&quot;)">'+actions[i]+' '+types[i]+'</a>';
         sOut += '</li>';
     }
     
     sOut += '</ul></div>';
     
     return sOut;
+}
+
+function changeConfirmed(access)
+{
+    var confirmed = confirm("Are you sure you want to change the access to "+access+"?");
+    return confirmed;
 }
 
 jQuery(document).ready(function() {
