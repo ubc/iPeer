@@ -52,8 +52,6 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
             echo $this->Form->submit(__('Next', true), array('Name'=>'preview', 'div' => false));
             break;
           case 'View Rubric':
-            echo $this->Form->button(__('Edit Rubric', true), array('type' => 'button',
-                                                                    'onClick' => 'javascript:location.href=\''.$this->Html->url('edit/'.$data['Rubric']['id'], true).'\';'));
             break;
           default:
             echo $this->Form->submit(__('Preview (Update Format)', true), array('Name'=>'preview', 'div' => false));

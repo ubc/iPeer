@@ -12,7 +12,14 @@ class AccessesController extends AppController {
     public $name = 'Accesses';
     public $uses = array('Access', 'Role');
     
-    // need comments
+    /**
+     * view
+     *
+     * @param mixed $roleId role id
+     *
+     * @access public
+     * @return void
+     */
     public function view($roleId=1)
     {
         $roles = $this->Role->find('list');
@@ -31,6 +38,17 @@ class AccessesController extends AppController {
         $this->set('title_for_layout', 'Permissions Editor > '.$roles[$roleId]);
     }
     
+    /**
+     * edit
+     *
+     * @param mixed $access allow or deny
+     * @param mixed $acoId  aco id
+     * @param mixed $aroId  role id
+     * @param mixed $action action
+     *
+     * @access public
+     * @return void
+     */
     public function edit($access, $acoId, $aroId, $action='all')
     {
         $permission = $this->Access->find('first', array(
@@ -97,5 +115,4 @@ class AccessesController extends AppController {
         }
         $this->redirect('view/'.$aroId);
     }
- }
-?>
+}
