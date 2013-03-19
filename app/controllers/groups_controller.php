@@ -15,7 +15,8 @@ define('IMPORT_GROUP_GROUP_NUMBER', 2);
 class GroupsController extends AppController
 {
     public $name = 'Groups';
-    public $uses =  array('Group', 'GroupsMembers', 'User', 'Personalize', 'GroupEvent', 'Course', 'EvaluationSubmission');
+    public $uses =  array('Group', 'GroupsMembers', 'User', 'Personalize', 'GroupEvent', 'Course', 'EvaluationSubmission',
+        'UserEnrol', 'UserTutor');
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time');
     public $components = array('AjaxList', 'ExportBaseNew', 'ExportCsv');
 
@@ -406,206 +407,84 @@ class GroupsController extends AppController
         
         // pre-process the lines in the file first
         $lines = array_map("str_getcsv", array_map("trim", $lines));
-
-        // Process the array into groups
-        $users = array();
-        foreach ($lines as $split) {
-            $entry = array();
-            $entry['line'] =  join(', ', $split);
-            // To start, mark all entries as invalid
-            $entry['status'] = "Unchecked Entry";
-            $entry['valid'] = false;
-            $entry['added'] = false;
-            // If the count is not 2 or 3, there's probably a formatting error,
-            //  so ignore this entry.
-            if (count($split) < 2 ) {
-                $entry['status'] = __("Too few columns in this line (", true) . count($split). "), " .
-                    __(" expected minimum 2.", true);
-            } else if (count($split) > 3 ) {
-                $entry['status'] = __("Too many columns in this line (", true) . count($split). "), " .
-                    __(" expected maximum 3.", true);
-            }
-
-            // assign the parts into their appropriate places
-            $entry['identifier'] = trim($split[IMPORT_GROUP_IDENTIFIER]);
-            $entry['group_name'] = trim($split[IMPORT_GROUP_GROUP_NAME]);
-            if (count($split) > 2) {
-                $entry['group_num'] = trim($split[IMPORT_GROUP_GROUP_NUMBER]);
-            }
-
-            // Check the entries for empty usernames/student no's or group_names fields
-            if (empty($entry['identifier'])) {
-                $entry['status'] = __("Username/Student No column is empty.", true);
-            } else if (empty($entry['group_name'])) {
-                $entry['status'] = __("Group Name column is empty.", true);
-            }
-
-            $userData = ($identifier == 'username') ? $this->User->findByUsername($entry['identifier']) :
-                $this->User->findByStudentNo($entry['identifier']);
-
-            if (!is_array($userData)) {
-                $entry['status'] = __("User ", true). $entry['identifier'].__(" is unknown. Please add this user first.", true);
-                $entry['status'] .= __(' Did you choose the wrong student identifier?', true);
+        $filter = 'return (count(array_filter($user)) != 2);';
+        $invalid = array_filter($lines, create_function('$user', $filter));
+        $valid = array_diff_key($lines, $invalid); 
+        $users = Set::combine($valid, '{n}.'.IMPORT_GROUP_IDENTIFIER, '', '{n}.'.IMPORT_GROUP_GROUP_NAME);
+        $names = array_unique(Set::extract($valid, '{n}.'.IMPORT_GROUP_GROUP_NAME));
+        
+        $groupSuccess = array();
+        $groupFailure = array();
+        foreach ($names as $name) {
+            $inGroup = $this->Group->field('id', array('group_name' => $name, 'course_id' => $courseId));
+            if($inGroup) {
+                $groupSuccess[$name] = $inGroup;
             } else {
-                $entry['id'] = $userData['User']['id'];
-                $courses = array_merge(Set::extract('/Enrolment/id', $userData),
-                    Set::extract('/Tutor/id', $userData));
-                if (!in_array($courseId, array_unique($courses))) {
-                    $entry['status'] = __("User ", true). $entry['identifier'].__(" is not enrolled in your selected course. ", true);
-                    $entry['status'] .= __("Please enrol them first.", true);
+                $groupNum = $this->Group->getFirstAvailGroupNum($courseId);
+                $tmp = array('Group' => array('group_num' => $groupNum, 'group_name' => $name, 
+                    'course_id' => $courseId, 'creator_id' => $this->Auth->user('id')));
+                $this->Group->id = null;
+                if ($this->Group->save($tmp)) {
+                    $groupSuccess[$name] = $this->Group->id;
                 } else {
-                    // So, the user exists, and is enrolled in the course - they pass validation
-                    $entry['status'] = __("Validated Entry", true);
-                    $entry['valid'] = true;
+                    $groupFailure[] = $name;
                 }
             }
-            // Add this checked entry into the list
-            array_push($users, $entry);
         }
-
-        // Now, generate a list of groups to create
-        $groups = array();
-        $groupNames = array();
-        $groupMembers = array();
-        $groupNum = $this->Group->getFirstAvailGroupNum($courseId);
-        foreach ($users as $key => $entry) {
-            if ($entry['valid']) {
-                // If we have a new group, record it.
-                if (!in_array($entry['group_name'], $groupNames)) {
-                    $group = array();
-                    $group['number'] = (isset($entry['group_num'])) ? $entry['group_num'] : $groupNum;
-                    $group['name'] = $entry['group_name'];
-                    $groupNames[] = $entry['group_name'];
-                    $group['id'] = false;
-                    $group['created'] = false;
-                    $group['present'] = false;
-                    $group['reason'] = __("Unchecked groups", true);
-                    array_push($groups, $group);
-                    $groupNum++;
-                }
-                $groupMembers[$entry['group_name']]['User'][$key] = $entry;
-            } else {
+        
+        $memSuccess = array();
+        $memFailure = array();
+        $tutors = $this->UserTutor->find('list', array(
+            'conditions' => array('course_id' => $courseId), 'fields' => 'user_id'));
+        $students = $this->UserEnrol->find('list', array(
+            'conditions' => array('course_id' => $courseId), 'fields' => 'user_id'));
+        $enrolled = $tutors + $students;
+        foreach ($users as $groupName => $members) {
+            if (!isset($groupSuccess[$groupName])) {
                 continue;
             }
-        }
-
-        // Check the groups' existance, and create them if they're missing.
-        foreach ($groups as $key => $group) {
-            $groupAry = array();
-            $groupAry = $this->Group->findGroupByGroupName($courseId, $group['name']);
-            $groupId = $groupAry['Group']['id'];
-            if (is_numeric($groupId)) {
-                $groups[$key]['present'] = true;
-                $groups[$key]['id'] = $groupId;
-                $groups[$key]['reason'] = __("The group already exists. Students will be added to it.", true);
-                $groupMembers[$group['name']]['Group']['id'] = $groupId;
-            } else {
-                // Create the group's database array for storage
-                $groupData['Group'] = array();
-                $groupData['Group']['id'] = null;
-                $groupData['Group']['group_num'] = $group['number'];
-                $groupData['Group']['group_name'] = $group['name'];
-                $groupData['Group']['creator_id'] = $this->Auth->user('id');
-                $groupData['Group']['course_id'] = $courseId;
-
-                // Save the group to the database
-                if ($this->Group->save($groupData)) {
-                    $groups[$key]['present'] = true;
-                    $groups[$key]['created'] = true;
-                    $groups[$key]['id'] = $this->Group->id;
-                    $groups[$key]['reason'] = __("This is a new group; it was created successfully.", true);
-                    $groupMembers[$group['name']]['Group']['id'] = $this->Group->id;
-                } else {
-                    $groups[$key]['reason'] = __("The group could not be created in the database!", true);
-                }
-            }
-        }
-
-        // Then, add the users to the created groups
-        foreach ($groupMembers as $groupName => $group) {
-            $groupId = $group['Group']['id'];
-            $oldMembers = $this->GroupsMembers->findAllByGroupId($groupId);
-            $newMembers = Set::extract('/User/id', $group);
-            // remove old group members
+            $identifiers = array_keys($members);
+            $members = $this->User->find('list', array(
+                'conditions' => array('User.'.$identifier => $identifiers),
+                'fields' => array('User.'.$identifier)
+            ));
+            $notExist = array_diff($identifiers, $members);
+            
+            $groupId = $groupSuccess[$groupName];
+            $old = $this->GroupsMembers->find('list', array(
+                'conditions' => array('group_id' => $groupId), 'fields' => 'user_id'));
+            
             if ($update) {
-                foreach ($oldMembers as $old) {
-                    if (!in_array($old['GroupsMembers']['user_id'], $newMembers)) {
-                        $this->GroupsMembers->delete($old['GroupsMembers']['id']);
-                    }
-                }
+                $diff = array_diff($old, array_keys($members));
+                $this->GroupsMembers->deleteAll(array('user_id' => $diff));
             }
             
-            foreach($group['User'] as $key => $user) {
-                if (in_array($user['id'], Set::extract('/GroupsMembers/user_id', $oldMembers))) {
-                    $users[$key]['status'] = __("User ", true).$user['identifier'];
-                    $users[$key]['status'] .= __(" is already in group ", true).$groupName;
+            foreach ($members as $userId => $name) {
+                if (in_array($userId, $notExist)) {
+                    $memFailure[$groupName][] = $members[$userId];
+                    continue;
+                } else if (in_array($userId, $old)) {
+                    $memSuccess[$groupName][] = $members[$userId];
+                    continue;
+                } else if (!in_array($userId, $enrolled)) {
+                    $memFailure[$groupName][] = $members[$userId];
+                    continue;
+                }
+                $tmp = array('GroupsMembers' => array('user_id' => $userId, 'group_id' => $groupId));
+                $this->GroupsMembers->id = null;
+                if ($this->GroupsMembers->save($tmp)) {
+                    $memSuccess[$groupName][] = $members[$userId];
                 } else {
-                    $groupMemberData = array();
-                    $groupMemberData['id'] = null;
-                    $groupMemberData['user_id'] = $user['id'];
-                    $groupMemberData['group_id'] = $groupId;
-                    if ($this->GroupsMembers->save($groupMemberData)) {
-                        $users[$key]['status'] = __("User added successfully to group ", true).$groupName;
-                        $users[$key]['added'] = true;
-                    } else {
-                        $users[$key]['status'] = __("User ", true).$user['identifier'];
-                        $users[$key]['status'] .= __(" could not be added to group ", true). $groupName;
-                        $users[$key]['status'] .= __("- the entry could not be created in the database.", true);
-                    }
+                    $memFailure[$groupName][] = $members[$userId];
                 }
             }
         }
-
-        // Set up the data for the view
-        $results = array();
-        $results['users_added'] = 0;
-        $results['users_skipped'] = 0;
-        $results['users_error'] = 0;
-
-        $results['groups_added'] = 0;
-        $results['groups_skipped'] = 0;
-        $results['groups_error'] = 0;
-
-        // Add up statistics of import
-        foreach ($users as $key => $user) {
-
-            // Look up extra user info:
-            if (!empty($user['id'])) {
-                $users[$key]['data'] = $this->User->findById($user['id']);
-            } else {
-                $users[$key]['data'] = false;
-            }
-
-            // Add the user to statistics
-            if ($user['valid']) {
-                if ($user['added']) {
-                    $results['users_added']++;
-                } else {
-                    $results['users_skipped']++;
-                }
-            } else {
-                $results['users_error']++;
-            }
-
-        }
-
-        foreach ($groups as $key => $group) {
-            if ($group['present']) {
-                if ($group['created']) {
-                    $results['groups_added']++;
-                } else {
-                    $results['groups_skipped']++;
-                }
-            } else {
-                $results['groups_error']++;
-            }
-        }
-
-        $results['groups'] = $groups;
-        $results['users'] = $users;
-
-        $this->set("results", $results);
-        $this->set("courseId", $courseId);
+        $this->set('groupSuccess', array_keys($groupSuccess));
+        $this->set('groupFailure', $groupFailure);
+        $this->set('memSuccess', $memSuccess);
+        $this->set('memFailure', $memFailure);
+        $this->set('invalid', $invalid);
+        $this->set('courseId', $courseId);
         $this->render('import_results');
     }
 
