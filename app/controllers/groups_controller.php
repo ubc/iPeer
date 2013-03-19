@@ -1,7 +1,6 @@
 <?php
 define('IMPORT_GROUP_IDENTIFIER', 0);
 define('IMPORT_GROUP_GROUP_NAME', 1);
-define('IMPORT_GROUP_GROUP_NUMBER', 2);
 
 /**
  * GroupsController
@@ -440,15 +439,20 @@ class GroupsController extends AppController
             'conditions' => array('course_id' => $courseId), 'fields' => 'user_id'));
         $enrolled = $tutors + $students;
         foreach ($users as $groupName => $members) {
-            if (!isset($groupSuccess[$groupName])) {
-                continue;
-            }
             $identifiers = array_keys($members);
             $members = $this->User->find('list', array(
                 'conditions' => array('User.'.$identifier => $identifiers),
                 'fields' => array('User.'.$identifier)
             ));
             $notExist = array_diff($identifiers, $members);
+            
+            if (!isset($groupSuccess[$groupName])) {
+                $stu = array_keys($members);
+                foreach ($stu as $userId) {
+                    $memFailure[$groupName][] = $members[$userId];
+                }
+                continue;
+            }
             
             $groupId = $groupSuccess[$groupName];
             $old = $this->GroupsMembers->find('list', array(
@@ -459,7 +463,8 @@ class GroupsController extends AppController
                 $this->GroupsMembers->deleteAll(array('user_id' => $diff));
             }
             
-            foreach ($members as $userId => $name) {
+            $stu = array_keys($members);
+            foreach ($stu as $userId) {
                 if (in_array($userId, $notExist)) {
                     $memFailure[$groupName][] = $members[$userId];
                     continue;
@@ -485,6 +490,7 @@ class GroupsController extends AppController
         $this->set('memFailure', $memFailure);
         $this->set('invalid', $invalid);
         $this->set('courseId', $courseId);
+        $this->set('breadcrumb', $this->breadcrumb->push(__('Import Groups Results', true)));
         $this->render('import_results');
     }
 

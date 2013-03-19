@@ -1,12 +1,13 @@
-<center style="font-size:150%"><?php __('The group CSV file was processed.')?></center><br />
-<center><?php __('Click OK to return
-to the list of groups, or look below for the results of the import.')?>
-<br /> <br />
-<input type="button" name="Okay" value="OK" onClick="window.location='<?php echo $this->webroot . "groups/index/". $courseId ?>'";>
+<div id='groupsimport'>
+<div id='title'><?php __('The group CSV file was processed.')?></div><br>
+<div id='button_text'><?php __('Click OK to return to the list of groups, or look below 
+for the results of the import.')?></div><br><center>
+<input type="button" id='back' value="OK" onClick="window.location='<?php echo $this->webroot . "groups/index/". $courseId ?>'";>
 </center>
 <?php
 if (!empty($invalid)) {
     echo '<h2>'._t('Invalid Entries').'</h2>';
+    echo '<ul><li>'._t('There are more or less than 2 columns.').'</li></ul>';
     echo '<table class="standardtable"><tr><th>'._t('Entry').'</th></tr>';
     foreach ($invalid as $entry) {
         echo '<tr><td>'.implode(', ', $entry).' ('.count($entry).' columns)</td></tr>';
@@ -42,7 +43,13 @@ if (!empty($memSuccess)) {
     echo '</table>';
 }
 if (!empty($memFailure)) {
-    echo '<h2>'._t('Students Not Placed.').'</h2>';
+    echo '<h2>'._t('Students Not Placed').'</h2>';
+    echo '<h3>'._t('Possible Reasons:').'</h3>';
+    echo '<ul>';
+    echo '<li>'._t('The student identifier does not exist in the system. Please add them first.').'</li>';
+    echo '<li>'._t('The student is not enrolled in the course. Please enrol them first.').'</li>';
+    echo '<li>'._t('The group was unable to be created or does not exist.').'</li>';
+    echo '</ul>';
     echo '<table class="standardtable"><tr><th>'._t('Student').'</th>';
     echo '<th>'._t('Group').'</th></tr>';
     foreach ($memFailure as $groupName => $group) {
@@ -54,3 +61,4 @@ if (!empty($memFailure)) {
     echo '</table>';
 }
 ?>
+</div>

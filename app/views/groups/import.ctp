@@ -3,23 +3,22 @@
 <ul>
     <li><?php __('Please make sure the column matches the username column in student import file.')?></li>
     <li><?php __('Please make sure to remove the header in CSV file.')?></li>
-    <li><?php __('All fields are mandatory, except Group#.')?></li>
+    <li><?php __('All fields are mandatory. The system will generate the group numbers.')?></li>
     <li><?php __('All group names must be unique within the class.')?></li>
     <li><?php __('The student identifiers that can be used are usernames or student numbers.')?></li>
-    <li><?php __('If the Group# column is missing, the system will generate a Group#.')?></li>
 </ul>
 
 <h3><?php __('Formatting:')?></h3>
-    <pre style='background-color: white; border:1px solid black; padding:5px; margin:5px'>
-    <?php __('Student Identifier, Group Name, <i>Group#(optional)</i>')?>
+    <pre id='example'>
+    <?php __('Student Identifier, Group Name')?>
     </pre>
 
 <h3><?php __('Examples:')?></h3>
-    <pre style='background-color: white; border:1px solid black; padding:5px; margin:5px'>
-        29978037, <?php __('Team A')?>, 1<br>
-        29978063, <?php __('Team A')?>, 1<br>
-        29978043, <?php __('Team B')?>, 2<br>
-        29978051, <?php __('Team B')?>, 2
+    <pre id='example'>
+        29978037, <?php __('Team A')?><br>
+        29978063, <?php __('Team A')?><br>
+        29978043, <?php __('Team B')?><br>
+        29978051, <?php __('Team B')?>
     </pre>
     
 <h2><?php __('Import')?></h2>

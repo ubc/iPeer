@@ -1209,6 +1209,23 @@ i {
     margin-top: 0.85em;
 }
 
+#groupsimport #example {
+    background-color: white;
+    border:1px solid black;
+    padding: 0.5em;
+    margin-left: 1em;
+    display: inline-block;
+    line-height: 100%;
+}
+
+#groupsimport #title {
+    font-size: 150%;
+}
+
+#groupsimport #title, #groupsimport #button_text {
+    text-align: center;
+}
+
 /* MIXEVALS */
 
 /* mixevals results */
