@@ -527,40 +527,52 @@ class GroupsController extends AppController
                 return;
             }
             $this->autoRender = false;
-            $fileContent = '';
+            $fileContent = array();
             $groups = $this->data['Member']['Member'];
-            if (!empty($this->params['form']['include_group_numbers'])) {
-                $fileContent .= "Group Number, ";
+            $GroupColumns = array(
+                'Group.group_num' => array('form' => 'include_group_numbers', 'title' => _t('Group Number')),
+                'Group.group_name' => array('form' => 'include_group_names', 'title' => _t('Group Name')),
+            );
+            // took out emails
+            $UserColumns = array(
+                'Member.username' => array('form' => 'include_usernames', 'title' => _t('Username')),
+                'Member.student_no' => array('form' => 'include_student_id', 'title' => _t('Student No')),
+                'Member.first_name' => array('form' => 'include_student_name', 'title' => _t('First Name')),
+                'Member.last_name' => array('form' => 'include_student_name', 'title' => _t('Last Name')),
+            );
+            $titles = array();
+            $gFields = array();
+            $uFields = array();
+            $grp = false;
+            foreach ($GroupColumns as $key => $field) {
+                if (isset($this->params['form'][$field['form']])) {
+                    $grp = true;
+                    $titles[] = $field['title'];
+                    $gFields[] = $key;
+                }
             }
-            if (!empty($this->params['form']['include_group_names'])) {
-                $fileContent .= "Group Name, ";
+            foreach ($UserColumns as $key => $field) {
+                if (isset($this->params['form'][$field['form']])) {
+                    $titles[] = $field['title'];
+                    $uFields[] = $key;
+                }
             }
-            if (!empty($this->params['form']['include_usernames'])) {
-                $fileContent .= "Username, ";
-            }
-            if (!empty($this->params['form']['include_student_id'])) {
-                $fileContent .= "Student #, ";
-            }
-            if (!empty($this->params['form']['include_student_name'])) {
-                $fileContent .= "First Name, Last Name";
-            }
-            //if (!empty($this->params['form']['include_student_email'])) {
-            //    $fileContent .= "Email Address";
-            //}
+            $fileContent[] = implode(',', $titles);
             // check that at least one export field has been selected
-            if (empty($this->params['form']['include_group_numbers']) && empty($this->params['form']['include_group_names'])
-              && empty($this->params['form']['include_usernames']) && empty($this->params['form']['include_student_id'])
-              && empty($this->params['form']['include_student_name']) && empty($this->params['form']['include_student_email'])) {
+            $fields = $this->params['form'];
+            unset($fields['file_name']);
+            $fields = array_filter($fields);
+            if (empty($fields)) {
                 $this->Session->setFlash("Please select at least one field to export.");
                 $this->redirect('');
                 return;
             }
 
-            $fileContent .= "\n";
-
             foreach ($groups as $groupId) {
-                $fileContent .= $this->ExportCsv->buildGroupExportCsvByGroup($this->params['form'], $groupId);
+                $group = $this->ExportCsv->buildGroupExportCsvByGroup($gFields, $uFields, $groupId);
+                $fileContent = array_merge($fileContent, $group);
             }
+            $fileContent = implode("\n", $fileContent);
             header('Content-Type: application/csv');
             header('Content-Disposition: attachment; filename=' .$this->params['form']['file_name']. '.csv');
             echo $fileContent;
