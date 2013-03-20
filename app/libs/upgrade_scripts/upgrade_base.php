@@ -121,8 +121,6 @@ class UpgradeBase
     /**
      * connectDb
      *
-     * @param mixed $dbConfig
-     *
      * @access protected
      * @return void
      */

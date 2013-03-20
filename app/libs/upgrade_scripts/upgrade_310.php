@@ -1,6 +1,15 @@
 <?php
 require_once('upgrade_base.php');
-
+/**
+ * Upgrade310
+ *
+ * @uses UpgradeBase
+ * @package   CTLT.iPeer
+ * @author    Pan Luo <pan.luo@ubc.ca>
+ * @copyright 2012 All rights reserved.
+ * @license   PHP Version 3.0 {@link http://www.php.net/license/3_0.txt}
+ * @version   Release: 3.0
+ */
 class Upgrade310 extends UpgradeBase
 {
     /**

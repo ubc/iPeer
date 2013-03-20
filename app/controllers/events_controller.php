@@ -418,7 +418,7 @@ class EventsController extends AppController
         }
 
         return;
-    }
+     }
 
      /**
      * getGroupMembers
@@ -565,10 +565,10 @@ class EventsController extends AppController
     /**
      * checkIfChanged
      *
-     * @param int $eventid
-     * @param int $data for the event being modified
-     * @param int $orig_email_frequency - the original email frequency
-     * @param int $orig_group_members - the members in the group before it was modified
+     * @param mixed $event
+     * @param mixed $data               for the event being modified
+     * @param int $email_frequency      the original email frequency
+     * @param mixed $orig_group_members the members in the group before it was modified
      *
      * @access public
      * @return bool -  return 1 if the data has been modified else returns 0
@@ -623,8 +623,8 @@ class EventsController extends AppController
     /**
      * modifySchedule
      *
-     * @param int eventId
-     * @param array() data containing the data for the corresponding event
+     * @param int eventid
+     * @param mixed data  containing the data for the corresponding event
      *
      * @access public
      * @return void

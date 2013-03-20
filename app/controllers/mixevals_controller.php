@@ -392,11 +392,42 @@ class MixevalsController extends AppController
             // we check if the function_exists only because the test cases
             // keep complaining about these functions being redeclared, wtf php.
             if (!function_exists('getExistingQId')) {
+                /**
+                 * getExistingQId
+                 *
+                 * @param mixed $x
+                 *
+                 * @access public
+                 * @return void
+                 */
                 function getExistingQId($x) 
-                    { return $x['MixevalQuestion']['id']; }
-                function getId($x) { return isset($x['id']) ? $x['id'] : null; }
+                {
+                    return $x['MixevalQuestion']['id'];
+                }
+                /**
+                 * getId
+                 *
+                 * @param mixed $x
+                 *
+                 * @access public
+                 * @return void
+                 */
+                function getId($x) 
+                {
+                    return isset($x['id']) ? $x['id'] : null; 
+                }
+                /**
+                 * getExistingDescId
+                 *
+                 * @param mixed $x
+                 *
+                 * @access public
+                 * @return void
+                 */
                 function getExistingDescId($x) 
-                    { return array_map('getId', $x['MixevalQuestionDesc']); }
+                { 
+                    return array_map('getId', $x['MixevalQuestionDesc']); 
+                }
             }
             $existingQIds = array_map('getExistingQId', $existingQs);
 
