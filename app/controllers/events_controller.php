@@ -353,12 +353,12 @@ class EventsController extends AppController
                 $this->data['Event']['template_id'] =
                     $this->data['Event']['Mixeval'];
             }
-            $this->data = $this->_multiMap($this->data);			
-			
+            $this->data = $this->_multiMap($this->data);
+
             if ($this->Event->saveAll($this->data)) {
                 $this->Session->setFlash("Add event successful!", 'good');
-			    //Call the setSchedule function to Schedule reminder emails			
-			    $this->setSchedule($this->Event->id,$this->data);
+                //Call the setSchedule function to Schedule reminder emails			
+                $this->setSchedule($this->Event->id, $this->data);
                 $this->redirect('index/'.$courseId);
                 return;
             } else {
@@ -368,18 +368,17 @@ class EventsController extends AppController
     }
 
 
-	/**
-	 * 
-	 * setSchedule
-	 * 
-     * @param $eventid - id of the event for which the reminders are being set
-     * @param $eventdata -  passing $this->data which contains the information for the event
-	 * 
-	 * @access public
-	 * @return void
-	 */
-	 function setSchedule($eventid,$eventdata)
-	 {
+    /**
+     * setSchedule
+     * 
+     * @param mixed $eventid - id of the event for which the reminders are being set
+     * @param mixed $eventdata -  passing $this->data which contains the information for the event
+     * 
+     * @access public
+     * @return void
+     */
+     function setSchedule($eventid, $eventdata)
+     {
         $emailfreq = $eventdata['Event']['email_schedule'];
         if($emailfreq == 0){   //Return if email reminders are disable. There is no need to put the data in the table
             return;                
@@ -408,12 +407,12 @@ class EventsController extends AppController
         $data['subject'] = 'Please Submit your Ipeer Evaluation for '.$coursename.' - '.$eventtitle;
         $data['content'] = 'You have not yet submitted your Ipeer Evaluation for '.$coursename.' - '.$eventtitle.
         '. Please login to Ipeer and click on the submit button to Submit your Ipeer Eval';
-        $data['to' ] = $to;
+        $data['to'] = $to;
 
         while (strtotime($start_date) <= strtotime($duedate)) {
             $data['date'] = $start_date;
-            $start_date = strtotime ($emailfreq,strtotime($start_date)) ;
-            $start_date = date ( 'Y-m-j H:i:s' , $start_date );
+            $start_date = strtotime($emailfreq, strtotime($start_date));
+            $start_date = date('Y-m-j H:i:s', $start_date);
             $data = $this->_multiMap($data);
             $this->EmailSchedule->saveAll($data);
         }
@@ -429,8 +428,8 @@ class EventsController extends AppController
      * @access public
      * @return $eventid - the event id of the concerning event
      */
-     function getGroupMembers($eventid){
-         //Get the groups by the eventID
+    function getGroupMembers($eventid){
+        //Get the groups by the eventID
         $groups = $this -> Group -> getGroupsByEventId($eventid, array());
         if(empty($groups)){
             return null;
@@ -438,7 +437,7 @@ class EventsController extends AppController
         $groupids = array();
         //Get the assigned groupids and their resepctive members for the event
         foreach ($groups as $group) {
-            array_push($groupids,$group['Group']['id' ]);
+            array_push($groupids, $group['Group']['id']);
         }
 
         $members[] = $this->GroupsMembers->getUserListInGroups($groupids);
@@ -446,12 +445,12 @@ class EventsController extends AppController
         $to[0] = 'save_reminder';
 
         foreach($members[0] as $m){
-            array_push($to,$m);
+            array_push($to, $m);
         }
         $to = implode(';', $to);
         
         return $to;
-     }
+    }
 
     /**
      * edit
@@ -471,7 +470,7 @@ class EventsController extends AppController
         }
         
         $orig_email_frequency = $this->calculateFrequency($eventId);
-        $this->set('email_schedule',$orig_email_frequency);
+        $this->set('email_schedule', $orig_email_frequency);
         $event = $this->Event->getEventById($eventId);
         $orig_group_members = $this->getGroupMembers($eventId);
 
@@ -510,7 +509,7 @@ class EventsController extends AppController
             $this->data = $this->_multiMap($this->data);
             if ($this->Event->saveAll($this->data)) {
                 $this->Session->setFlash("Edit event successful!", 'good');
-                $this->checkIfChanged($event,$this->data,$orig_email_frequency,$orig_group_members) ? $this->modifySchedule($eventId,$this->data) : 0; 
+                $this->checkIfChanged($event, $this->data, $orig_email_frequency, $orig_group_members) ? $this->modifySchedule($eventId, $this->data) : 0; 
                 $this->redirect('index/'.$event['Event']['course_id']);
                 return;
             } else {
@@ -563,8 +562,9 @@ class EventsController extends AppController
         $this->data = $event;
     }
 
-    /*
+    /**
      * checkIfChanged
+     *
      * @param int $eventid
      * @param int $data for the event being modified
      * @param int $orig_email_frequency - the original email frequency
@@ -572,8 +572,8 @@ class EventsController extends AppController
      *
      * @access public
      * @return bool -  return 1 if the data has been modified else returns 0
-     * */
-    function checkIfChanged($event,$data,$email_frequency,$orig_group_members){
+     **/
+    function checkIfChanged($event, $data, $email_frequency, $orig_group_members){
         $orig_release_date_begin = $event['Event']['release_date_begin'];
         $orig_due_date = $event['Event']['due_date'];
         $new_release_date_begin = $data['Event']['release_date_begin'];
@@ -593,46 +593,48 @@ class EventsController extends AppController
         
     }
     
-    /*
+    /**
      * calculateFrequency
+     *
      * @param int $eventId
      *
      * @access public
      * @return int - email_frequency
-     * */
-     function calculateFrequency($eventId)
-     {
-         $count = $this->EmailSchedule->find('count', array('conditions' => array('event_id' => $eventId)));
-         if($count == 0) {
-             $email_frequency = 0;
-         }
-         else {
+     **/
+    function calculateFrequency($eventId)
+    {
+        $count = $this->EmailSchedule->find('count', array('conditions' => array('event_id' => $eventId)));
+        if($count == 0) {
+            $email_frequency = 0;
+        }
+        else {
             $event = $this->Event->getEventById($eventId);
             $release_date_begin = strtotime($event['Event']['release_date_begin']);
             $due_date = strtotime($event['Event']['due_date']); 
             $difference = abs($release_date_begin - $due_date); //Will return difference in seconds
             //Convert difference to days  
             $days = ($difference/(60*60*24));
-      
+
             $email_frequency = ceil($days/$count); //Might need to change floor to ceiling or something else 
-         }
-         return $email_frequency;
+        }
+        return $email_frequency;
     }
 
-    /*
+    /**
      * modifySchedule
+     *
      * @param int eventId
      * @param array() data containing the data for the corresponding event
      *
      * @access public
      * @return void
-     * */
-     function modifySchedule($eventid,$data){
-         $this->EmailSchedule->deleteAll(array('event_id' => $eventid),false);
-         $event = $this->Event->getEventById($eventid);        
-         $this->setSchedule($eventid, $data);
-         return;
-     }
+     **/
+    function modifySchedule($eventid, $data){
+        $this->EmailSchedule->deleteAll(array('event_id' => $eventid), false);
+        $event = $this->Event->getEventById($eventid);        
+        $this->setSchedule($eventid, $data);
+        return;
+    }
 
     /**
      * delete
