@@ -128,7 +128,7 @@ class V1Controller extends Controller {
         } else if ($this->RequestHandler->isDelete()) {
             $reqType = "DELETE";
         }
-        $params = "$reqType&" . rawurlencode(Router::url($this->here, true))
+        $params = "$reqType&" . rawurlencode(Router::url(null, true))
             . "&" . rawurlencode($params);
         // construct the key used for hmac calculation
         $clientSecret = $this->_getClientSecret($_REQUEST['oauth_consumer_key']);
@@ -914,9 +914,12 @@ class V1Controller extends Controller {
             $instructors = $this->UserCourse->find('list', array('conditions' => array('course_id' => $courseId), 'fields' => array('user_id')));
             $members = $students + $tutors + $instructors;
             $inClass = $this->User->find('list', array('conditions' => array('User.id' => $members), 'fields' => array('User.username')));
+            $result = array();
 
             foreach ($users as $user) {
-                if (!in_array($user['username'], $inClass)) {
+                // check if the user is already in the course using case
+                // insensitive username
+                if (count(preg_grep("/^".$user['username']."$/i", $inClass)) == 0) {
                     $userId = $this->User->field('id',
                         array('username' => $user['username']));
                     $role = $this->Role->getRoleName($user['role_id']);
@@ -926,7 +929,7 @@ class V1Controller extends Controller {
                         $this->log('Adding student '.$user['username'].' to course '.$courseId, 'debug');
                     } else if ($role == 'instructor') {
                         $ret = $this->User->addInstructor($userId, $courseId);
-                        $this->log('Adding instructor'.$user['username'].' to course '.$courseId, 'debug');
+                        $this->log('Adding instructor '.$user['username'].' to course '.$courseId, 'debug');
                     } else if ($role == 'tutor') {
                         $ret = $this->User->addTutor($userId, $courseId);
                         $this->log('Adding tutor '.$user['username'].' to course '.$courseId, 'debug');
@@ -940,9 +943,15 @@ class V1Controller extends Controller {
                         $this->render('error');
                         return;
                     }
+
+                    // add the new user to our checklist to prevent duplication
+                    // in the request
+                    $inClass[] = $user['username'];
+
+                    $result[] = $user;
                 }
             }
-            $this->set('result', $users);
+            $this->set('result', $result);
         } else if ($this->RequestHandler->isDelete()) {
             $this->set('statusCode', 'HTTP/1.1 200 OK');
             $input = $this->body;

@@ -36,7 +36,7 @@ class OauthclientsController extends AppController {
             $tmp['Comment'] = $cred['OauthClient']['comment'];
             $clientCreds[] = $tmp;
         }
-        $this->set('clientCreds', $clientCreds); 
+        $this->set('clientCreds', $clientCreds);
     }
 
     /**
@@ -65,15 +65,15 @@ class OauthclientsController extends AppController {
             // fill key and secret with securely generated random values
             // if no existing data found
             $this->data['OauthClient']['user_id'] = $this->Auth->user('id');
-            $this->data['OauthClient']['key'] = 
+            $this->data['OauthClient']['key'] =
                 $this->PasswordGenerator->generate(8);
-            $this->data['OauthClient']['secret'] = 
+            $this->data['OauthClient']['secret'] =
                 $this->PasswordGenerator->generate();
         }
         if (!User::hasPermission('controllers/oauthclients')) {
             $this->set('hideUser', true);
             $clients = $this->OauthClient->find(
-                'count', 
+                'count',
                 array(
                     'conditions' => array('OauthClient.user_id' => $this->Auth->user('id'))
                 )
@@ -115,7 +115,6 @@ class OauthclientsController extends AppController {
             }
         } else if (empty($this->data)) {
             $this->data = $this->OauthClient->read(null, $id);
-            debug($this->data);
             if (empty($this->data)) {
                 $this->redirect('index');
             }
