@@ -1,3 +1,11 @@
+iPeer 3.0.5
+---------------------------
+This is a maintenance release. It fixes a few bugs related to the building block API and web interface.
+* Fixed events add/edit toggle
+* Fixed #491 Adding class member failed when duplicate username in request
+* Fixed #490 Denied access to admin/department page
+* Fixed #489 Invalid signature error when installed on subdirectory
+
 iPeer 3.0.4
 ---------------------------
 This is a maintenance release. It is recommended to upgrade to this version as it fixes a one critical bug.
