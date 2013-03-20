@@ -142,6 +142,13 @@ class SurveyGroupsController extends AppController
             $this->redirect('index');
             return;
         }
+        
+        // checks that the dom extension and DOMDocument class exists which are needed for TeamMaker
+        if (!(extension_loaded('dom') && class_exists('DOMDocument'))) {
+            $this->Session->setFlash(_t('DOMDocument could not be found. Please contact your
+                system administrator to use TeamMaker.'));
+        }
+        
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))
             ->push(__('Create Group Set', true)));
         $this->set('events', $this->Event->find('list', array('conditions' => array('course_id' => $course_id, 'event_template_type_id' => 3))));

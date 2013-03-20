@@ -66,6 +66,9 @@ if($return_var == 0)
 // ldap
 $ldap = function_exists('ldap_connect') ? $yes : $no;
 
+// DOMDocment
+$domdoc = (extension_loaded('dom') && class_exists('DOMDocument')) ? $yes : $no;
+
 // Recommended requirements init
 
 // make sure that the php memory limit is at least 64 mb
@@ -181,6 +184,11 @@ foreach ($php_recommended_settings as $key => $setting)
       </td>
       <td><?php echo $ldap; ?></td>
   </tr>
+  <tr>
+    <td><?php __('PHP DOMDocument.') ?>
+        <div class="help"><?php __('Required if you are planning to use TeamMaker.')?></div>
+    </td>
+    <td><?php echo $domdoc; ?></td>
 </table>
 
 <h4>Recommended</h4>
