@@ -13,6 +13,7 @@ web1:
     - apc
     - mysql
     - mbstring
+  php_display_errors: "0"
   after_build:
     - "mv app/config/database.pagoda.php app/config/database.php"
     - "mv app/plugins/guard/config/guard.php app/config/guard.php"
