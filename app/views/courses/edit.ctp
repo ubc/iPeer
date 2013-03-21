@@ -12,7 +12,7 @@ function makeInstructor($i, $userId, $fullName, $html, $form) {
     $name = "'$fullName'";
     $input = $form->label(' ') . $form->text("Instructor.$i.full_name", array('default' => $fullName, 'disabled' => true)) . 
         $html->link('X', '#', array('onclick' => "rmInstructor($i, $name, $userId); return false;"));
-    $input .= $form->hidden("Instructor.$i.id", array('default' => $userId));
+    $input .= $form->hidden("Instructor.Instructor.$i", array('value' => $userId));
     $ret = $html->div('input text', $input, array('id' => "instructorsList$i"));
     return $ret;
 }
@@ -24,10 +24,10 @@ $prof = $form->input('instructors', array(
     'after' => $html->link(__('Add Instructor', true),'#', array('onclick' => 'addInstructor(); return false;')),
     'empty' => '-- Select an instructor --'));
 if (isset($this->data) && isset($this->data['Instructor'])) {
-    foreach($this->data['Instructor'] as $key => $val) {
-        $prof .= makeInstructor($key, $val['id'], $val['full_name'], $html, $form);
+    foreach($this->data['Instructor']['Instructor'] as $key => $id) {
+        $prof .= makeInstructor($key, $id, $instructors[$id], $html, $form);
         $numInstructors = $key + 1;
-        $selected[] = $val['id'];
+        $selected[] = $id;
     }
 }
 echo $html->div('input text', $prof, array('id' => 'instructors'));

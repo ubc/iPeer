@@ -145,52 +145,6 @@ class GroupsMembers extends AppModel
     }
     
     /**
-     * Get members in a group in event (not including tutors)
-     *
-     * @param int  $groupId  Group Id
-     * @param bool $selfEval Check whether Self Evaluation is allowed or not
-     * @param int  $userId   User Id
-     *
-     * @return <type> Group members
-     */
-    function getEventGroupMembersNoTutors ($groupId, $selfEval, $userId)
-    {
-        $conditions['GroupsMembers.group_id'] = $groupId;
-        $conditions['Role.role_id'] = 5;        // only students (eg. not tutors);
-        if (!$selfEval) {
-            $conditions['GroupsMembers.user_id !='] = $userId;
-        }
-
-        $groupMembers = $this->find('all', array(
-            'conditions' => $conditions,
-            'fields' => array('User.*', 'Role.*'),
-            'joins' => array(
-                array(
-                    'table' => 'users',
-                    'alias' => 'User',
-                    'type' => 'LEFT',
-                    'conditions' => array('User.id = GroupsMembers.user_id')
-                ),
-                array(
-                    'table' => 'roles_users',
-                    'alias'  => 'Role',
-                    'type' => 'LEFT',
-                    'conditions' => array('Role.user_id = GroupsMembers.user_id')
-                ),
-            ),
-        ));
-        
-        foreach($groupMembers as $key => $member) {
-            $role = $groupMembers[$key]['Role'];
-            unset($groupMembers[$key]['Role']);
-            $groupMembers[$key]['Role']['0'] = $role;
-        }
-
-        return $groupMembers;
-    }
-
-
-    /**
      * Check if user is in a group
      *
      * @param int $groupId Group Id

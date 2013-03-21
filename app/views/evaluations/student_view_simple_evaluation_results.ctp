@@ -28,7 +28,9 @@
 <table class="standardtable">
 <tr>
     <th width=50%><?php __('Rating')?></th>
-    <th width=50%><?php __('Group Average')?></th>
+    <?php if ($event['Event']['enable_details']) { ?>
+        <th width=50%><?php __('Group Average')?></th>
+    <?php } ?>
 </tr>
 <tr>
     <td>
@@ -46,6 +48,7 @@
         }
         ?>
     </td>
+    <?php if ($event['Event']['enable_details']) { ?>
     <td>
         <?php
             if ($studentResult['gradeReleaseStatus'] || $event['Event']['auto_release']) {
@@ -56,8 +59,10 @@
             }
         ?>
     </td>
+    <?php } ?>
 </tr>
 </table>
+<?php if ($event['Event']['enable_details']) { ?>
 <table class="standardtable">
     <tr>
         <th><?php __('Comments')?> (<?php __('Randomly Ordered')?>)</th>
@@ -77,6 +82,7 @@
         <tr><td><?php echo __('Not Released.', true); ?> </td></tr>
     <?php } ?>
 </table>
+<?php } ?>
 <div style="text-align: center;">
 <input type="button" name="Back" value="Back" onclick="javascript:(history.length > 1 ? history.back() : window.close());">
 </div>

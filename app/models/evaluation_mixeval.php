@@ -76,14 +76,15 @@ class EvaluationMixeval extends EvaluationResponseBase
      *
      * @param bool $grpEventId group event id
      * @param bool $evaluatee  evaluatee
+     * @param mixed $include   evaluators that have submitted
      *
      * @access public
      * @return void
      */
-    function getResultsByEvaluatee($grpEventId=null, $evaluatee=null)
+    function getResultsByEvaluatee($grpEventId, $evaluatee, $include)
     {
         return $this->find('all', array(
-            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
+            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee, 'evaluator' => $include),
             'order' => 'evaluator ASC',
             'contain' => 'EvaluationMixevalDetail',
         ));
@@ -387,7 +388,7 @@ class EvaluationMixeval extends EvaluationResponseBase
     {
         $mixEval = $this->find('first', array('conditions' => array('evaluator' => $evluatorId, 'evaluatee' => $evaluateeId,
             'grp_event_id' => $groupEventId)));
-        $evalDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera($mixEval['EvaluationMixeval']['id'], $questionNum);
+        $evalDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCriteria($mixEval['EvaluationMixeval']['id'], $questionNum);
         return $evalDetail;
     }
 

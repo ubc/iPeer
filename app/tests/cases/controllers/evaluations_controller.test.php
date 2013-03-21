@@ -78,7 +78,7 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
     {
         $this->login = array(
             'User' => array(
-                'username' => '65498451',
+                'username' => 'redshirt0001',
                 'password' => md5('ipeeripeer')
             )
         );
@@ -106,7 +106,7 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
     {
         $this->login = array(
             'User' => array(
-                'username' => '65498451',
+                'username' => 'redshirt0001',
                 'password' => md5('ipeeripeer')
             )
         );
@@ -131,16 +131,16 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
     {
         $this->login = array(
             'User' => array(
-                'username' => '65498451',
+                'username' => 'redshirt0001',
                 'password' => md5('ipeeripeer')
             )
         );
 
         // rubric evaluation
         $result = $this->testAction('/evaluations/makeEvaluation/3/1', array('return' => 'vars'));
-        $this->assertEqual($result['evaluateeCount'], 2);
         $this->assertEqual(count($result['groupMembers']), 2);
-        $this->assertEqual($result['data']['Mixeval']['id'], 1);
+        $this->assertEqual(count($result['groupMembers']), 2);
+        $this->assertEqual($result['mixeval']['Mixeval']['id'], 1);
         $this->assertEqual(count($result['penalty']), 0);
         $this->assertEqual(Set::extract($result['penalty'], '/Penalty/id'), array());
         $this->assertEqual($result['penaltyDays'], 0);
@@ -155,7 +155,7 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
     {
         $this->login = array(
             'User' => array(
-                'username' => '65498451',
+                'username' => 'redshirt0001',
                 'password' => md5('ipeeripeer')
             )
         );

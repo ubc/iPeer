@@ -71,9 +71,6 @@ class SurveysController extends AppController
     {
         $myID = $this->Auth->user('id');
 
-        // Get the course data
-        $courses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
-
         // Set up Columns
         $columns = array(
             array("Survey.id",          __("ID", true),         "4em",   "hidden"),
@@ -234,6 +231,7 @@ class SurveysController extends AppController
     function add()
     {
         if (!empty($this->data)) {
+            $this->data['Survey']['name'] = trim($this->data['Survey']['name']);
             if ($result = $this->Survey->save($this->data)) {
                 $this->data = $result;
                 $this->data['Survey']['id'] = $this->Survey->id;
@@ -288,6 +286,7 @@ class SurveysController extends AppController
         }
 
         if (!empty($this->data)) {
+            $this->data['Survey']['name'] = trim($this->data['Survey']['name']);
             if ($this->Survey->save($this->data)) {
                 $this->Session->setFlash(__('The Survey was edited successfully.', true), 'good');
                 $this->redirect('index');

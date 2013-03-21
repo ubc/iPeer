@@ -62,12 +62,18 @@ function fnFormatDetails ( oTable, nTr )
     sOut += '</li>';
 
     sOut += '<li>';
-    sOut += '<a href="<?php echo $this->base; ?>/users/delete/'+aData[0]+'/<?php echo $courseId?>">Drop</a>';
+    sOut += '<a href="<?php echo $this->base; ?>/users/delete/'+aData[0]+'/<?php echo $courseId?>" onclick="return dropConfirmed(&quot;'+aData[2]+'&quot;)">Drop</a>';
     sOut += '</li>';
 
     sOut += '</ul></div>';
 
     return sOut;
+}
+
+function dropConfirmed(name)
+{
+    var confirmed = confirm("Are you sure you want to drop " + name + " from the course?");
+    return confirmed;
 }
 
 jQuery(document).ready(function() {

@@ -370,6 +370,7 @@ ALTER TABLE `survey_group_sets` CHARACTER SET = utf8 ;
 
 ALTER TABLE `survey_groups` CHARACTER SET = utf8 ;
 
+ALTER TABLE `survey_inputs` CHARACTER SET = utf8 , ADD COLUMN `chkbx_id` INT(11) NULL DEFAULT NULL  AFTER `sub_id` ;
 ALTER TABLE `survey_inputs` CHANGE  `survey_id`  `event_id` INT( 11 ) NOT NULL DEFAULT  '0';
 
 ALTER TABLE `survey_questions` CHARACTER SET = utf8 , CHANGE COLUMN `number` `number` INT(11) NOT NULL DEFAULT '9999'  ;
@@ -378,7 +379,6 @@ ALTER TABLE `surveys` CHANGE  `created`  `created` DATETIME NULL DEFAULT NULL, C
 ALTER TABLE `surveys` CHARACTER SET = utf8 , CHANGE COLUMN `name` `name` VARCHAR(255) NOT NULL  ;
 ALTER TABLE `surveys` ADD  `availability` VARCHAR( 10 ) NOT NULL DEFAULT  'public' AFTER  `name`;
 
-ALTER TABLE  `sys_parameters` CHARACTER SET = utf8,  CHANGE  `created`  `created` DATETIME NULL DEFAULT NULL, CHANGE  `modified`  `modified` DATETIME NULL DEFAULT NULL ;
 INSERT INTO `sys_parameters` VALUES (NULL, 'system.version', '3.0.0', 'S', 'System version', 'A', 1, NOW(), 1, NOW()),
 (NULL, 'display.login.header', '', 'S', 'Login Info Header', 'A', 0, NOW(), 0, NOW()),
 (NULL, 'display.login.footer', '', 'S', 'Login Info Footer', 'A', 0, NOW(), 0, NOW()),

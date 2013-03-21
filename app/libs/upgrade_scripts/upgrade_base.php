@@ -60,6 +60,10 @@ class UpgradeBase
         if ($this->up()) {
             $sysparameter = ClassRegistry::init('SysParameter');
             $sysparameter->setValue('system.version', $this->toVersion);
+            // note that upgrade_300 will run this but it won't do anything
+            // because there's no pre-existing database.version entry, 
+            // upgrade_310 should properly add this back
+            $sysparameter->setValue('database.version', $this->dbVersion);
         } else {
             return false;
         }
@@ -72,14 +76,16 @@ class UpgradeBase
      *
      * @param int   $fromVersion from version
      * @param int   $toVersion   to version
-     * @param array $dbConfig    database config
+     * @param array $additionalDeltas additional delta files to be applied after
+     *              the major patches. 
      *
      * @access public
      * @return void
      */
-    public function patchDb($fromVersion, $toVersion = null, $dbConfig = null)
+    public function patchDb($fromVersion, $toVersion = null, 
+        $additionalDeltas = array())
     {
-        $ret = $this->connectDb($dbConfig);
+        $ret = $this->connectDb();
         if ($ret) {
             // Unable to connect
            return $ret;
@@ -87,10 +93,15 @@ class UpgradeBase
 
         $toVersion = $toVersion == null ? Configure::read('DATABASE_VERSION') : $toVersion;
 
+        $deltaFiles = array();
+        for ($i = $fromVersion + 1; $i <= $toVersion; $i++) {
+            array_push($deltaFiles, CONFIGS.'sql/delta_'.$i.'.sql');
+        }
+        $deltaFiles = array_merge($deltaFiles, $additionalDeltas);
+
         // Apply the delta files
-        for ($i = $fromVersion+1; $i <= $toVersion; $i++) {
+        foreach ($deltaFiles as $file) {
             // Check that we can read the delta file
-            $file = CONFIGS.'sql/delta_'.$i.'.sql';
             if (!is_readable($file)) {
                 mysql_close();
                 return "Cannot read delta file $file";
@@ -98,7 +109,7 @@ class UpgradeBase
             $ret = $this->applyDelta($file);
             if ($ret) {
                 mysql_close();
-                return 'DB Version '. $fromVersion . ' Failed to apply delta file: '.$file.'. Message = '.$ret;
+                return 'Failed to apply delta file: '.$file.'. Message = '.$ret;
             }
         }
         mysql_close();
@@ -110,21 +121,15 @@ class UpgradeBase
     /**
      * connectDb
      *
-     * @param mixed $dbConfig
-     *
      * @access protected
      * @return void
      */
-    protected function connectDb($dbConfig)
+    protected function connectDb()
     {
         // Read the database configuration from database.php
         $dbConfig = new DATABASE_CONFIG();
         $dbConfig = $dbConfig->default;
 
-        if (null == $dbConfig) {
-            $db = new DATABASE_CONFIG();
-            $dbConfig = $db->default;
-        }
         $mysql = mysql_connect($dbConfig['host'], $dbConfig['login'], $dbConfig['password']);
         if (!$mysql) {
             return 'Could not connect to database!';

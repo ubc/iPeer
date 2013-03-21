@@ -185,5 +185,36 @@ class EvaluationSubmission extends AppModel
     {
         return $this->find('count', array('conditions' => array('grp_event_id' => $grpEventId,)));
     }
-
+    
+    /**
+     * getGrpEventIdEvalSub
+     *
+     * @param mixed $userId
+     *
+     * @access public
+     * @return void
+     */
+    function getGrpEventIdEvalSub($userId)
+    {
+        return $this->find('list', array(
+            'conditions' => array('EvaluationSubmission.submitter_id' => $userId, 'EvaluationSubmission.grp_event_id !=' => null),
+            'fields' => array('EvaluationSubmission.grp_event_id')
+        ));
+    }
+    
+    /**
+     * getEventIdSurveySub
+     *
+     * @param mixed $userId
+     *
+     * @access public
+     * @return void
+     */
+    function getEventIdSurveySub($userId)
+    {
+        return $this->find('list', array(
+            'conditions' => array('EvaluationSubmission.submitter_id' => $userId, 'EvaluationSubmission.grp_event_id' => null),
+            'fields' => array('EvaluationSubmission.event_id')
+        ));
+    }
 }

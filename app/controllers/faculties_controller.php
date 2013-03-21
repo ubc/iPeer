@@ -93,6 +93,7 @@ class FacultiesController extends AppController {
 
         if (!empty($this->data)) {
             $this->Faculty->create();
+            $this->data['Faculty']['name'] = trim($this->data['Faculty']['name']);
             if ($this->Faculty->save($this->data)) {
                 $facultyId = $this->Faculty->getLastInsertID();
                 foreach ($superadmins as $sa) {
@@ -119,6 +120,7 @@ class FacultiesController extends AppController {
             $this->redirect(array('action' => 'index'));
         }
         if (!empty($this->data)) {
+            $this->data['Faculty']['name'] = trim($this->data['Faculty']['name']);
             if ($this->Faculty->save($this->data)) {
                 $this->Session->setFlash(__('Faculty saved.', true), 'good');
                 $this->redirect(array('action' => 'index'));

@@ -64,8 +64,9 @@ echo $this->Form->input(
         'options' => array('1' => 'Enabled', '0' => 'Disabled'),
         'default' => '0'
     )
-);
-echo $this->Form->input(
+); ?>
+<div class='help-text'><?php __("Doesn't apply to Mix Evaluation. Required questions are set in the template.") ?></div>
+<?php echo $this->Form->input(
     'auto_release',
     array(
         'legend' => 'Auto-Release Results',
@@ -74,6 +75,17 @@ echo $this->Form->input(
         'default' => '0'
     )
 );
+echo $this->Form->input(
+    'enable_details',
+    array(
+        'legend' => 'Student Result Mode',
+        'type' => 'radio',
+        'options' => array('0'=> 'Basic', '1' => 'Detailed'),
+        'default' => '1'
+    )
+); ?>
+<div class='help-text'><?php echo _t('Basic view only show averages of questions') ?></div>
+<?php
 echo $this->Form->input('due_date', array('type' => 'text'));
 echo $this->Form->input('release_date_begin', array('label' => 'Evaluation Released From', 'type' => 'text'));
 echo $this->Form->input('release_date_end', array('label' => 'Until', 'type' => 'text'));
@@ -81,6 +93,18 @@ echo $this->Form->input('result_release_date_begin',
     array('div' => array('id' => 'ResultReleaseBeginDiv'), 'label' => 'Results Released From', 'type' => 'text'));
 echo $this->Form->input('result_release_date_end',
     array('div' => array('id' => 'ResultReleaseEndDiv'), 'label' => 'Until', 'type' => 'text'));
+  
+echo $this->Form->input(
+    'email_schedule',
+    array(
+        'legend' => 'Email Reminder Frequency ',
+        'type' => 'radio',
+        'options' => array('0'=> 'Disable', '1' => '1 Day', '2'=>'2 Days','3'=>'3 Days','4'=>'4 Days','5'=>'5 Days','6'=>'6 Days'
+         ,'7'=>'7 Days'),
+         'default' => "$email_schedule"
+    )
+); 
+
 echo $this->Form->input('Group',
     array('div' => array('id' => 'GroupsDiv'), 'label' => 'Group(s)')); ?>
 <div class='help-text'><?php __('Holding "ctrl" or "command" key to select multiple groups.') ?></div>
@@ -209,6 +233,8 @@ function toggleEventTemplate() {
         jQuery("#MixevalDiv").hide();
         jQuery("div.radio").show();
         jQuery("#penaltyInputs").show();
+        jQuery("#ResultReleaseBeginDiv").show(); // no result release for survey
+        jQuery("#ResultReleaseEndDiv").show(); // no result release for survey
         jQuery("#GroupsDiv").show();
         jQuery("div.help-text").show();
         updatePreview();
@@ -220,6 +246,8 @@ function toggleEventTemplate() {
         jQuery("#MixevalDiv").hide();
         jQuery("div.radio").show();
         jQuery("#penaltyInputs").show();
+        jQuery("#ResultReleaseBeginDiv").show(); // no result release for survey
+        jQuery("#ResultReleaseEndDiv").show(); // no result release for survey
         jQuery("#GroupsDiv").show();
         jQuery("div.help-text").show();
         updatePreview();
@@ -244,6 +272,8 @@ function toggleEventTemplate() {
         jQuery("#MixevalDiv").show();
         jQuery("div.radio").show();
         jQuery("#penaltyInputs").show();
+        jQuery("#ResultReleaseBeginDiv").show(); // no result release for survey
+        jQuery("#ResultReleaseEndDiv").show(); // no result release for survey
         jQuery("#GroupsDiv").show();
         jQuery("div.help-text").show();
         updatePreview();

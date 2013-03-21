@@ -1,173 +1,81 @@
-<!-- elements::ajax_rubric_preview start -->
 <?php
-$questions = isset($data['Question'])? $data['Question'] : array();
-isset($user)? $userId = $user['id'] : $userId = '';
-isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = null;
-$pos = 1;
-//for loop to display the criteria rows
-$details = Set::combine($evaluation['EvaluationDetail'], '{n}.EvaluationMixevalDetail.question_number', '{n}.EvaluationMixevalDetail');
+$evaluation = isset($user['Evaluation']) ? $user['Evaluation'] : null;
+$details = Set::combine($evaluation['EvaluationMixevalDetail'], '{n}.question_number', '{n}');
+echo "<input type='hidden' name=data[$user[id]][Evaluation][evaluatee_id] value='$user[id]'/>";
+echo "<input type='hidden' name=data[$user[id]][Evaluation][evaluator_id] value='".User::get('id')."'/>";
+echo "<input type='hidden' name=data[$user[id]][Evaluation][event_id] value='".$event['Event']['id']."'/>";
+echo "<input type='hidden' name=data[$user[id]][Evaluation][group_event_id] value='".$event['GroupEvent']['id']."'/>";
+echo "<input type='hidden' name=data[$user[id]][Evaluation][group_id] value='".$event['Group']['id']."'/>";
+foreach ($questions as $ques) {
+    $type = $ques['MixevalQuestionType']['type'];
+    $num = $ques['MixevalQuestion']['question_num'];
+    $instruct = $ques['MixevalQuestion']['instructions'];
+    $instruct = $instruct ? $html->para('help green', $instruct) : '';
+    $required = (!$ques['MixevalQuestion']['required']) ? '' :
+        $html->tag('span', '*', array('class' => 'required orangered floatright'));
+    $title = $ques['MixevalQuestion']['title'];
+    $title = $html->tag('h3', "$num. $title $required");
+    $class = $ques['MixevalQuestion']['required'] ? 'must' : '';
+    
+    if ($type == 'Paragraph') {
+        $value = (isset($details[$num])) ? $details[$num]['question_comment'] : '';
+        $output = $html->div('MixevalQuestion',
+            $title .
+            $instruct .
+            $form->textarea('EvaluationMixeval.'.$num.'.question_comment',
+                array('default' => $value, 'class' => $class,
+                    'name' => 'data['.$user['id'].'][EvaluationMixeval]['.$num.'][question_comment]'))
+        );
+    } else if ($type == 'Sentence') {
+        $value = (isset($details[$num])) ? $details[$num]['question_comment'] : '';
+        $output = $html->div('MixevalQuestion',
+            $title .
+            $instruct .
+            $form->input($user['id'].'.EvaluationMixeval.'.$num.'.question_comment',
+                array('label' => false, 'default' => $value, 'type' => 'text', 'class' => $class,
+                    'name' => 'data['.$user['id'].'][EvaluationMixeval]['.$num.'][question_comment]'))
+        );
+    } else if ($type == 'Likert') {
+        $highestMark = $ques['MixevalQuestion']['multiplier'];
+        $scale = count($ques['MixevalQuestionDesc']);
+        $options = array();
+        $descs = array();
+        $marks = array();
+        $markLabel = "Mark: ";
+        $subIf0 = 0;
+        if ($zero_mark) {
+            $subIf0 = 1;
+            $scale -= $subIf0;
+        }
+        foreach ($ques['MixevalQuestionDesc'] as $desc) {
+            $descs[] = $desc['descriptor'];
+            $desc['scale_level'] -= $subIf0;
+            $mark = $highestMark * ($desc['scale_level'] / $scale);
+            $checked = '';
+            if (isset($details[$num])) {
+                $checked = ($details[$num]['selected_lom'] == $desc['scale_level']) ? 'checked' : '';
+            }
+            $option = "<input type='radio' name=data[$user[id]][EvaluationMixeval][$num][grade] value='$mark' $checked ";
+            $option .= "onclick=document.getElementById('selected_lom".$num."_".$user['id']."').value=$desc[scale_level] ";
+            $option .= "class='".$class."' />";
+            $options[] = $option;
+            $marks[] = $markLabel. round($mark, 2);
+            $markLabel = '';
+            $class = '';
+        }
+        $lom = (isset($details[$num])) ? $details[$num]['selected_lom'] : '';
+        $selected = "<input type='hidden' id='selected_lom".$num."_".$user['id']."' name=data[$user[id]][EvaluationMixeval][$num][selected_lom] value='".$lom."' />";
+        $output = $html->div('MixevalQuestion',
+            $title .
+            $instruct .
+            $html->tag('table',
+                $html->tableCells($descs) .
+                $html->tableCells($options) .
+                $html->tableCells($marks)
+            )
+        );
+        $output = $output.$selected;
+    }
+    echo $output;
+}
 ?>
-<table class="standardtable" style="margin: 1em 0;">
-    <tr align="center">
-        <th align="left"><?php __('Section One: Lickert Scales')?></th>
-        <?php echo !$evaluate ? '<td width="10%">'.__('Scale Weight', true).'</td>':''?>
-    </tr>
-    <?php foreach ($questions as $mixevalQuestion) {
-    //Get and set Mixeval Question
-    if ($mixevalQuestion !=null && $mixevalQuestion["mixeval_question_type_id"]=="1") {
-        $questionDescriptors = $mixevalQuestion['Description'];
-    }
-    if ($mixevalQuestion["mixeval_question_type_id"]=="1") {
-
-        echo '<tr><td style="text-align: left; padding-left: 1em;">';
-        if (isset($evaluate)) {
-            echo '<input type="hidden" name="selected_lom_'.$userId.'_'.$mixevalQuestion['question_num'].'"';
-            echo 'value="'.(isset($details[$mixevalQuestion['question_num']]['selected_lom']) ?
-                $details[$mixevalQuestion['question_num']]['selected_lom'] :
-                '1') . '">';
-        } else {
-            echo '<input type="hidden" name="selected_lom_'.$userId.'_'.$mixevalQuestion['question_num'].'" value="1" size="4" >';
-        }
-
-        echo $pos. ': &nbsp &nbsp '. $mixevalQuestion['title'];
-        echo '</td></tr>';
-        echo $form->hidden('Mixeval.mixeval_question_type_id'.$mixevalQuestion['question_num'], array('value'=>'1'));
-
-        //for loop to display the criteria comment cells for each LOM
-        isset($mixevalQuestion['multiplier']) ? $multiplier = $mixevalQuestion['multiplier'] : $multiplier = 1;
-        echo '<tr align="left"><td >';
-        echo '<div style="margin: 1em">';
-        for ($j=1; $j<=count($mixevalQuestion['Description']); $j++) {
-            //isset($mixevalQuestion['multiplier']) ? $multiplier = $mixevalQuestion['multiplier'] : $multiplier = 1;
-
-            if ( $zero_mark == "on" ) {
-                $mark_value = round(($multiplier/(count($mixevalQuestion['Description'])-1)*($j-1)), 2);
-            } else {
-                $mark_value = round(($multiplier/count($mixevalQuestion['Description'])*$j), 2);
-            }
-
-            echo '<table border="0" width="20%" align="center" style ="display: inline-table;"><tr><td align="center" >';
-            echo $mixevalQuestion['Description'][$j-1]['descriptor'].'&nbsp;';
-            echo "</td></tr>";
-            echo '<tr><td align="center">';
-            echo '<input name="'.$userId.'criteria_points_'.$mixevalQuestion['question_num'].'" type="radio" value="'.$mark_value.'"';
-            echo 'onclick="document.evalForm.selected_lom_'.$userId.'_'.$mixevalQuestion['question_num'].".value=".$j.'" ';
-            if (isset($evaluation)) {
-                if (isset($details[$mixevalQuestion['question_num']]['selected_lom']) &&
-                    $details[$mixevalQuestion['question_num']]['selected_lom'] == $j) {
-                        echo " checked ";
-                    }
-            } else {
-                if ($j==1) {
-                    echo " checked ";
-                }
-            }
-            echo "/></td></tr>";
-            if (!$evaluate) {
-                echo '<tr><td align="center" width="20%">Mark: '.$mark_value.'</td></tr>';
-            }
-            echo "</table>";
-            //     echo '</div>';
-        }
-        echo '<tr><td>';
-        if (!$evaluate) {
-            echo '<td>'.$multiplier.'</td>';
-        }
-
-        echo "</tr>";
-        $pos++;
-    }
-    }
-    if (!$evaluate) {
-      echo '<tr>';
-      echo '<td colspan="'.(count($question['Description'])+1).'" align="right">Total Marks: </td>';
-      echo '<td align="center">'.$total_mark.'</td>';
-      echo '</tr>';
-    }
-    ?>
-  <tr>
-    <td colspan="3" align="center">&nbsp;</td>
-    </tr>
-  </table>
-<table class="standardtable" style="margin: 1em 0;">
-    <tr>
-        <th align="left"><?php __('Section Two')?>: &nbsp;<?php __('Comments (No Weight on this Section)')?></th>
-    </tr>
-    <?php foreach ($questions as $mixevalQuestion) {
-        if ($mixevalQuestion["mixeval_question_type_id"] == "1") {
-            continue;
-        }
-    ?>
-      <tr align="center">
-        <td valign="top" colspan="<?php echo $scale_default?>">
-          <table border="0" width="95%" cellpadding="2">
-            <tr><td width="5%"><?php echo $pos?>:</td>
-                <td width="95%" style="text-align: left;"> Question Prompt:
-                  <?php echo  $mixevalQuestion['title'];
-                   if ($evaluate) {
-                      if (isset($mixevalQuestion['required']) && $mixevalQuestion['required']==1) {
-                        echo '<font color="red"> * </font>';
-                      }
-                   } ?> <br>
-                  <?php echo $form->hidden('Mixeval.mixeval_question_type_id'.$mixevalQuestion['question_num'], array('value'=>'2')); ?>
-                </td>
-              </tr>
-              <?php if (!$evaluate) { ?>
-              <tr>
-                <td/>
-                <td><?php __('Mandatory?')?>:
-                  <?php $checkRequired = __('YES', true);
-                   if (isset($mixevalQuestion['required']) && $mixevalQuestion['required']==0) {
-                     $checkRequired = __('NO', true);
-                   }
-                   echo $checkRequired;
-                   ?>
-                </td>
-            </tr>
-          <?php }?>
-          </table>
-       </td>
-      </tr>
-      <tr align="center">
-        <td cellpadding="2">
-          <table border="0" width="95%" cellpadding="2">
-             <tr><td colspan="2">
-                  <?php echo $mixevalQuestion['instructions'] ?>
-            </td></tr>
-            <?php if ($evaluate) :?>
-            <tr><td colspan="2" style="text-align: left; padding-left: 2em;">
-                  <?php $text = isset($details[$mixevalQuestion['question_num']]['question_comment']) ?
-                        $details[$mixevalQuestion['question_num']]['question_comment']:'';?>
-                  <?php if (isset($mixevalQuestion['response_type']) && $mixevalQuestion['response_type']=='L') {?>
-                     <textarea name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['question_num']?>" cols="80" rows="10"><?php echo $text?></textarea>
-                     <br /><?php __('Maximum 65535 characters.')?>
-                  <?php } else { ?>
-                     <input type="text" name="response_text_<?php echo $userId?>_<?php echo $mixevalQuestion['question_num']?>" size="92" value="<?php echo $text?>">
-                  <?php }?>
-            </td></tr>
-            <?php else: ?>
-            <tr><td width="15%"><?php __('Respond Type?')?>: </td>
-                <td width="85%" align="left">
-                  <?php
-                   $responseType = 'Single Text Input';
-                   if (isset($mixevalQuestion['response_type']) && $mixevalQuestion['response_type']=='L') {
-                       $responseType = __('Long Answer Text Input', true);
-                   }
-                   echo $responseType;?>
-                </td></tr>
-            <?php endif; ?>
-       </table></td>
-      </tr>
-<?php     $pos++;
-    }
-    ?>
-  <tr>
-    <td colspan="3" align="center">
-<?php echo $form->hidden('Mixeval.total_question', array('value'=>($pos-1)));?>
-<?php if (!$evaluate) :?>
-    <input type="button" name="Back" value="<?php __('Back')?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
-<?php endif; ?>
-  </td>
-  </tr>
-  </table>
-<!-- elements::ajax_rubric_preview end -->

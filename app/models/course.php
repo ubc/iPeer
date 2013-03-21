@@ -40,15 +40,6 @@ class Course extends AppModel
             'dependent'   => true,
             'exclusive'   => false,
             'finderSql'   => ''
-        ),
-        'Survey' => array(
-            'className'   => 'Survey',
-            'conditions'  => '',
-            'order'       => '',
-            'foreignKey'  => 'course_id',
-            'dependent'   => true,
-            'exclusive'   => false,
-            'finderSql'   => ''
         )
     );
 
@@ -561,9 +552,10 @@ class Course extends AppModel
         ));
 
         // some clean up
-        foreach ($course['Enrol'] as $key => $student) {
-            unset($course['Enrol'][$key]['UserEnrol']);
+        foreach ($course['Enrol'] as &$student) {
+            unset($student['UserEnrol']);
         }
+        unset($student);
 
         return $course;
     }

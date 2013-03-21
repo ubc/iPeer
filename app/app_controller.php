@@ -13,9 +13,17 @@ uses('sanitize');
 App::import('Lib', 'toolkit');
 App::import('Lib', 'breadcrumb');
 
-// because CakePHP 1.3's internationalization __() call is stupid and wants
-// you to pass an extra parameter for no reason to get a string, use this
-// instead.
+/**
+ * _t
+ * because CakePHP 1.3's internationalization __() call is stupid and wants
+ * you to pass an extra parameter for no reason to get a string, use this
+ * instead.
+ *
+ * @param mixed $str
+ *
+ * @access public
+ * @return void
+ */
 function _t($str) {
     return __($str, true);
 }
@@ -217,6 +225,7 @@ class AppController extends Controller
             // after login stuff
             $this->User->loadRoles(User::get('id'));
             $this->AccessControl->loadPermissions();
+            $this->SysParameter->reload();
             //TODO logging!
         }
 

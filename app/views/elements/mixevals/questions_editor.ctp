@@ -12,7 +12,7 @@
 /* Each question type can have unique options for the user to configure, this 
  * section creates the html template needed for each question type. 
  */
-function makeQ($view, $qType, $i, $qTypes)
+function makeQ($view, $qType, $i, $qTypes, $required=true)
 {
     $html = $view->Html;
     $form = $view->Form;
@@ -70,13 +70,16 @@ function makeQ($view, $qType, $i, $qTypes)
     
     // give an ID to the question number for easy renumbering later on
     $qNum = $html->tag('span', $i + 1 . ". ", array('id' => "questionIndex$i"));
+    $requiredTxt = ($qType != 'Likert') ? '' :
+        $html->div("help-text", _t('Unrequired Likert questions are not counted toward the total rating.'));
     $ret = $html->div('MixevalMakeQuestion',
         $html->tag('h3', "$controls $qNum $qHeader") .
         $hiddenIdField .
         $form->input("MixevalQuestion.$i.title", 
             array("type" => "text", "label" => "Question")) .
         $form->input("MixevalQuestion.$i.instructions") .
-        $form->input("MixevalQuestion.$i.required") .
+        $form->input("MixevalQuestion.$i.required", array('checked' => $required)) .
+        $requiredTxt .
         $form->hidden("MixevalQuestion.$i.mixeval_question_type_id",
             array('value' => $qTypeId)) .
         $form->hidden("MixevalQuestion.$i.question_num", 
@@ -157,8 +160,9 @@ $reloadedQ = "";
 if (isset($this->data) && isset($this->data['MixevalQuestion'])) {
     $prevQs = $this->data['MixevalQuestion'];
     foreach ($prevQs as $q) {
+        $required = $q['required'] ? true : false;
         $qType = $qTypes[$q['mixeval_question_type_id']];
-        $reloadedQ .= makeQ($this, $qType, $numQ, $qTypes);
+        $reloadedQ .= makeQ($this, $qType, $numQ, $qTypes, $required);
         $numQArray .= "$numQ,";
         $numQ++;
     }
@@ -215,6 +219,9 @@ function insertQ() {
     q = q.replace(/-1/g, numQ);
     jQuery(q).hide().appendTo('#questions').fadeIn(600);
     questionIds.push(numQ);
+    if (questionIds.length == 1 && questionIds[0] != 0) {
+        questionIds.unshift(0);
+    }
     numQ++;
     reorderQ();
 }

@@ -258,10 +258,7 @@ class CoursesController extends AppController
         $this->set('instructorSelected', User::get('id'));
 
         if (!empty($this->data)) {
-            // reformat the Instructor array if exists
-            $newInstructors = (!isset($this->data['Instructor'])) ? array() :
-                Set::extract('/id', $this->data['Instructor']);
-            $this->data['Instructor'] = array('Instructor' => $newInstructors);
+            $this->data['Course'] = array_map('trim', $this->data['Course']);
             if ($this->Course->save($this->data)) {
                 // add current user to the new course if the user is not an admin
                 if (!User::hasPermission('controllers/departments')) {
@@ -306,9 +303,9 @@ class CoursesController extends AppController
         }
 
         if (!empty($this->data)) {
-            // reformat the Instructor array if exists
+            $this->data['Course'] = array_map('trim', $this->data['Course']);
             $newInstructors = (!isset($this->data['Instructor'])) ? array() : 
-                Set::extract('/id', $this->data['Instructor']);
+                $this->data['Instructor']['Instructor'];
             // delete instructors from the course if they are not in the new list
             $instructors = $this->UserCourse->findAllByCourseId($courseId);
             foreach ($instructors as $instructor) {
@@ -316,7 +313,6 @@ class CoursesController extends AppController
                     $this->UserCourse->delete($instructor['UserCourse']['id']);
                 }
             }
-            $this->data['Instructor'] = array('Instructor' => $newInstructors);
             $success = $this->Course->save($this->data);
             if ($success) {
                 $this->Session->setFlash(__('The course was updated successfully.', true), 'good');
@@ -326,7 +322,9 @@ class CoursesController extends AppController
                 $this->Session->setFlash(__('Error: Course edits could not be saved.', true));
             }
         }
-
+        
+        $course['Instructor']['Instructor'] = Set::extract('/Instructor/id', $course);
+        
         $this->data = $course;
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Edit Course', true)));
     }

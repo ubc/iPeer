@@ -47,9 +47,10 @@ class EvaluationHelper extends AppHelper
     {
         $questions = array('MixevalQuestion' => $questions);
         $numberQuestions = Set::extract($questions, '/MixevalQuestion[mixeval_question_type_id=1]');
+        $numberQuestions = Set::extract($numberQuestions, '/MixevalQuestion[required=1]');
         $header = array(__('Evaluatee', true));
-        foreach ($numberQuestions as $key => $question) {
-            $header[] = sprintf('%d (/%.1f)', $key+1, $question['MixevalQuestion']['multiplier']);
+        foreach ($numberQuestions as $question) {
+            $header[] = sprintf('%d (/%.1f)', $question['MixevalQuestion']['question_num'], $question['MixevalQuestion']['multiplier']);
         }
         $header[] = __("Total", true) . ' (/' . number_format($totalMark, 2) . ')';
 
@@ -75,11 +76,18 @@ class EvaluationHelper extends AppHelper
         $totalCounter = 0;
         $table = array();
 
+        $required = Set::combine($numberQuestions, '{n}.question_num', '{n}.required');
+        $required = array_keys(array_filter($required));
+
         foreach ($scoreRecords as $evaluteeId => $scores) {
             $tr = array();
             (in_array($evaluteeId, Set::extract($notInGroup, '/User/id'))) ? $class=array('class'=>'blue') : $class=array();
             $tr[] = array($memberList[$evaluteeId], $class);
             foreach ($numberQuestions as $question) {
+                if (!in_array($question['question_num'], $required)) {
+                    unset($scores[$question['question_num']]);
+                    continue;
+                }
                 $tr[] = isset($scores[$question['question_num']]) ?
                     number_format($scores[$question['question_num']], 2) : __('N/A', true);
             }
@@ -106,6 +114,9 @@ class EvaluationHelper extends AppHelper
         // group average row
         $tr = array(array(__('Group Average', true), array()));
         foreach ($numberQuestions as $question) {
+            if (!in_array($question['question_num'], $required)) {
+                continue;
+            }
             if ($totalCounter) {
                 $avg = $this->array_avg(Set::classicExtract($scoreRecords, '{n}.'.($question['question_num'])));
                 $tr[] = number_format($avg, 2);
@@ -207,138 +218,6 @@ class EvaluationHelper extends AppHelper
             $header[$criterion['criteria_num']] = '('.$criterion['criteria_num'].') '.$criterion['criteria'];
         }
         return $header;
-    }
-
-    /**
-     * getResultTableHeader
-     *
-     * @param mixed $questions   questions
-     * @param mixed $firstColumn first column text
-     *
-     * @access public
-     * @return void
-     */
-    function getResultTableHeader($questions, $firstColumn)
-    {
-        $header = array($firstColumn);
-        foreach ($questions as $key => $question) {
-            $header[] = sprintf('%d.%s', $key+1, $question['title']);
-        }
-
-        return $header;
-    }
-
-    /**
-     * getMixevalResultTable
-     * Returning the data array for mixeval result table
-     *
-     * @param mixed $memberResult member result
-     * @param mixed $memberList   member list
-     * @param mixed $questions    questions
-     * @param mixed $notInGroup   list of students no longer in the group
-     * @param mixed $type         type of the table, possible values 'evaluator', 'evaluatee', any other string
-     *                            when it is another string, the string will be shown on the first column. Otherwise,
-     *                            the evaluator/evaluatee name will show on the first column
-     *
-     * @access public
-     * @return void
-     */
-    function getMixevalResultTable($memberResult, $memberList, $questions, $notInGroup, $type = 'evaluator')
-    {
-        $table = array();
-        $blue = array('class' => 'blue');
-        $class = array();
-
-        // randomize the result
-        if ($type != 'evaluator' && $type != 'evaluatee') {
-            shuffle($memberResult);
-            $blue = array();
-        }
-
-        foreach ($memberResult as $row) {
-            $memberMixeval = $row['EvaluationMixeval'];
-            if (!empty($notInGroup)) {
-                (in_array($memberMixeval[$type], Set::extract($notInGroup, '/User/id'))) ? $class=$blue : $class=array();
-            }
-            $tr = array(isset($memberMixeval[$type]) ? array($memberList[$memberMixeval[$type]],$class) : array($type,$class));
-            // change the details indexed by question_number
-            $resultDetails = Set::combine($row['EvaluationMixevalDetail'], '{n}.question_number', '{n}');
-            foreach ($questions as $question) {
-                $detail = $resultDetails[$question['question_num']];
-                // check if the result is released
-                if (($type == 'evaluator' || $type == 'evaluatee') ||
-                    (($memberMixeval['grade_release'] && $question['mixeval_question_type_id'] == '1') ||
-                    ($memberMixeval['comment_release'] && $question['mixeval_question_type_id'] == '2'))) {
-
-                    $tr[] = $this->renderQuestionResult($question, $detail);
-                } else {
-                    $tr[] = 'n/a';
-                }
-            }
-            $table[] = $tr;
-        }
-
-        return $table;
-    }
-
-    /**
-     * renderQuestionResult
-     *
-     * @param mixed $question
-     * @param mixed $detail
-     *
-     * @access public
-     * @return array for rendering the results for mixeval questions
-     */
-    function renderQuestionResult($question, $detail)
-    {
-        $result = '';
-
-        switch($question['mixeval_question_type_id']) {
-        case '1':
-            //Point Description Detail
-            $result = $question['Description'][$detail['selected_lom']-1]['descriptor'];
-            $result .= "<br />";
-
-            //Points Detail
-            $result .= "<strong>".__('Points', true).": </strong>";
-            $result .= isset($detail) ? $this->getPoints($detail["grade"], $question['multiplier']) : __('N/A', true);
-            $result .= "<br />";
-
-            //Grade Detail
-            $result .= "<strong>".__('Grade', true).": </strong>";
-            $result .= isset($detail) ? $detail["grade"] . " / " . $question['multiplier'] : __('N/A', true);
-            $result .= "<br />";
-            break;
-        case '2':
-            $result = "<strong>".__('Comment', true).": </strong>";
-            $result .= isset($detail) ? $detail["question_comment"] : __('N/A', true);
-            break;
-        }
-
-        return $result;
-    }
-
-    /**
-     * getPoints
-     *
-     * @param mixed $point
-     * @param mixed $total
-     *
-     * @access public
-     * @return circles to depict LOM results
-     */
-    function getPoints($point, $total)
-    {
-        // suppose we want to show 5 balls
-        $valuePerBall = $total / 5;
-        return
-            str_repeat(
-                $this->Html->image('evaluations/circle.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle')),
-                round($point / $valuePerBall)).
-            str_repeat(
-                $this->Html->image('evaluations/circle_empty.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'cicle_empty')),
-                round(($total - $point)/$valuePerBall));
     }
 
     /**

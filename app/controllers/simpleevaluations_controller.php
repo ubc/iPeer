@@ -282,7 +282,7 @@ class SimpleevaluationsController extends AppController
     {
         if (!empty($this->data)) {
             $this->Output->filter($this->data);//always filter
-
+            $this->data['SimpleEvaluation'] = array_map('trim', $this->data['SimpleEvaluation']);
             //Save Data
             if ($this->SimpleEvaluation->save($this->data)) {
                 $this->data['SimpleEvaluation']['id'] = $this->SimpleEvaluation->id;

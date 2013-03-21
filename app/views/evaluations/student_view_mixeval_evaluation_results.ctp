@@ -1,13 +1,9 @@
 <?php
-$gradeReleased = array_sum(Set::extract($evalResult[User::get('id')], '/EvaluationMixeval/grade_release'));
-$commentReleased = array_sum(Set::extract($evalResult[User::get('id')], '/EvaluationMixeval/comment_release'));
+$gradeReleased = array_product(Set::extract($evalResult[User::get('id')], '/EvaluationMixeval/grade_release')) ||
+    $event['Event']['auto_release'];
+$commentReleased = array_product(Set::extract($evalResult[User::get('id')], '/EvaluationMixeval/comment_release')) ||
+    $event['Event']['auto_release'];
 ?>
-<?php echo $html->script('ricobase')?>
-<?php echo $html->script('ricoeffects')?>
-<?php echo $html->script('ricoanimation')?>
-<?php echo $html->script('ricopanelcontainer')?>
-<?php echo $html->script('ricoaccordion')?>
-
 <!-- Render Event Info table -->
 <?php echo $this->element('evaluations/view_event_info', array('controller'=>'evaluations', 'event'=>$event));?>
 
@@ -43,51 +39,19 @@ $commentReleased = array_sum(Set::extract($evalResult[User::get('id')], '/Evalua
 </tr>
 </table>
 
-<?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
 <div id='mixeval_result'>
+<?php
+$questions = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}');
+shuffle($evalResult[User::get('id')]);
+$zero_mark = $mixeval['Mixeval']['zero_mark'];
+foreach ($evalResult[User::get('id')] as $eval) {
+    foreach ($eval['EvaluationMixevalDetail'] as $detail) {
+        $questions[$detail['question_number']]['Submissions'][] = $detail;
+    }
+}
 
-<div id="accordion">
-    <!-- Panel of Evaluations Results -->
-    <div id="panelResults">
-        <div id="panelResultsHeader" class="panelheader">
-            <?php echo __('Evaluation Results From Your Teammates. (Randomly Ordered) ', true);
-                if ( !$gradeReleased && !$commentReleased) {
-                    echo '<font color="red">'.__('Comments/Grades Not Released Yet.', true).'</font>';
-                } else if ( !$gradeReleased) {
-                    echo '<font color="red">'.__('Grades Not Released Yet.', true).'</font>';
-                } else if ( !$commentReleased) {
-                    echo '<font color="red">'.__('Comments Not Released Yet.', true).'</font>';
-                }
-            ?>
-        </div>
-        <div style="height: 200px;text-align: center;" id="panelResultsContent" class="panelContent">
-            <?php
-            $params = array('controller'=>'evaluations', 'mixeval'=>$mixeval, 'evalResult'=>$evalResult[User::get('id')], 'tableType'=>User::get('full_name'));
-            echo $this->element('evaluations/student_view_mixeval_details', $params);
-            ?>
-        </div>
-    </div>
-
-    <!-- Panel of Evaluations Reviews -->
-    <div id="panelReviews">
-        <div id="panelReviewsHeader" class="panelheader">
-            <?php echo __('Review Evaluations From You.', true)?>
-        </div>
-        <div style="height: 200px;" id="panelReviewsContent" class="panelContent">
-            <?php
-            $params = array('controller'=>'evaluations', 'mixevalQuestion'=>$mixeval, 'evalResult'=>$reviewEvaluations[User::get('id')], 'tableType'=>'evaluatee');
-            echo $this->element('evaluations/student_view_mixeval_details', $params);
-            ?>
-        </div>
-    </div>
+$params = array('controller'=>'evaluations', 'questions'=>$questions, 'zero_mark'=>$zero_mark, 'evaluatee' => User::get('id'),
+    'gradeReleased'=>$gradeReleased, 'commentReleased'=>$commentReleased, 'details'=>$event['Event']['enable_details']);
+echo $this->element('evaluations/mixeval_details', $params);
+?>
 </div>
-</div>
-
-<script type="text/javascript"> new Rico.Accordion( 'accordion',
-        {panelHeight:500,
-            hoverClass: 'mdHover',
-            selectedClass: 'mdSelected',
-            clickedClass: 'mdClicked',
-            unselectedClass: 'panelheader'});
-
-</script>

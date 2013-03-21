@@ -51,8 +51,8 @@ class UserTestCase extends CakeTestCase {
 
         //Test on valid student input
         //Run tests
-        $studentName = $this->User->getByUsername('65498451');
-        $this->assertEqual($studentName['User']['username'], "65498451");
+        $studentName = $this->User->getByUsername('redshirt0001');
+        $this->assertEqual($studentName['User']['username'], "redshirt0001");
 
         //Test on valid instructor input
         $instructorName = $this->User->getByUserName('instructor1');
@@ -80,19 +80,19 @@ class UserTestCase extends CakeTestCase {
             array_push($actual, $student['User']['username']);
         }
         $expect = array(
-            10186039,
-            19524032,
-            19803030,
-            22784037,
-            37116036,
-            38058020,
-            48877031,
-            51516498,
-            65468188,
-            65498451,
-            84188465,
-            90938044,
-            98985481
+            'redshirt0027',
+            'redshirt0022',
+            'redshirt0028',
+            'redshirt0017',
+            'redshirt0013',
+            'redshirt0024',
+            'redshirt0011',
+            'redshirt0029',
+            'redshirt0002',
+            'redshirt0001',
+            'redshirt0009',
+            'redshirt0015',
+            'redshirt0003'
         );
         $this->assertTrue(count(array_diff($actual, $expect)) == 0);
 
@@ -268,15 +268,15 @@ class UserTestCase extends CakeTestCase {
 
         //Test remove instructor from wrong course
         $ret = $this->User->removeInstructor(4, 1);
-        $this->assertFalse($user); // operation should fail
+        $this->assertFalse($ret); // operation should fail
 
         //Test remove invalid instructor from  course
         $ret = $this->User->removeInstructor(999, 2);
-        $this->assertFalse($user); // operation should fail
+        $this->assertFalse($ret); // operation should fail
 
         //Test remove valid instructor from invalid course
         $ret = $this->User->removeInstructor(4, 999);
-        $this->assertFalse($user); // operation should fail
+        $this->assertFalse($ret); // operation should fail
 
         //Test remove invalid instructor from invalid course
         $ret = $this->User->removeInstructor(999, 999);
@@ -371,7 +371,7 @@ class UserTestCase extends CakeTestCase {
             array(
                 'User' => array(
                     'id' => 0,
-                    'username' => '65498451',
+                    'username' => 'redshirt0001',
                     'email' => 'onlist1@example.com',
                     'first_name' => 'On',
                     'last_name' => 'list1',
@@ -437,7 +437,7 @@ class UserTestCase extends CakeTestCase {
             array(
                 'User' => array(
                     'id' => 0,
-                    'username' => '65498451',
+                    'username' => 'redshirt0001',
                     'email' => 'onlist1@example.com',
                     'first_name' => 'On',
                     'last_name' => 'list1',
@@ -558,6 +558,25 @@ class UserTestCase extends CakeTestCase {
         //Test invalid user
         $courses = $this->User->getEnrolledCourses(999);
         $this->assertEqual($courses, null);
+    }
+    
+    function testGetEventGroupMembersNoTutors ()
+    {
+        //Test group, selfeval
+        $members = $this->User->getEventGroupMembersNoTutors(1, true, 5);
+        $this->assertEqual(Set::extract('/User/username', $members), array('redshirt0001', 'redshirt0002', 'redshirt0003'));
+
+        //Test group, no selfeval, valid used id
+        $members = $this->User->getEventGroupMembersNoTutors(1, false, 6);
+        $this->assertEqual(Set::extract('/User/username', $members), array('redshirt0001', 'redshirt0003'));
+
+        //Test group, no selfeval, invalid used id
+        $members = $this->User->getEventGroupMembersNoTutors(1, false, 999);
+        $this->assertEqual(Set::extract('/User/username', $members), array('redshirt0001', 'redshirt0002', 'redshirt0003'));
+
+        //Test invalid group
+        $members = $this->User->getEventGroupMembersNoTutors(999, false, 3);
+        $this->assertEqual(Set::extract('/User/username', $members), null);
     }
     
     function testgetFullNames() {

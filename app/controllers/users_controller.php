@@ -17,7 +17,11 @@ class UsersController extends AppController
     public $uses = array('User', 'UserEnrol', 'Personalize', 'Course',
         'SysParameter', 'Role', 'Group', 'UserFaculty',
         'Department', 'CourseDepartment', 'OauthClient', 'OauthToken',
-        'UserCourse', 'UserTutor', 'Faculty', 'UserFaculty'
+        'UserCourse', 'UserTutor', 'Faculty', 'UserFaculty', 'EmailTemplate', 'EvaluationMixevalDetail',
+        'EvaluationRubricDetail', 'EventTemplateType', 'Event', 'Faculty', 'GroupEvent',
+        'Mixeval', 'Rubric', 'SimpleEvaluation', 'SysParameter', 'Survey', 'EvaluationMixeval',
+        'EvaluationSimple', 'EvaluationRubric', 'GroupsMembers', 'SurveyGroupMember', 'SurveyInput',
+        'EvaluationSubmission', 'EmailSchedule', 'RolesUser'
     );
     public $components = array('Session', 'AjaxList', 'RequestHandler',
         'Email', 'FileUpload.FileUpload', 'PasswordGenerator');
@@ -217,6 +221,7 @@ class UsersController extends AppController
 
         $this->set('can_add_user', User::hasPermission('functions/user', 'create'));
         $this->set('can_import_user', User::hasPermission('functions/user/import'));
+        $this->set('can_merge_users', User::hasPermission('controllers/users/merge'));
     }
 
     /**
@@ -427,10 +432,6 @@ class UsersController extends AppController
      * */
     private function _initFormEnv()
     {
-        $user = $this->User->find(
-            'first',
-            array('conditions' => array('id' => $this->Auth->user('id')))
-        );
         // get the courses that this user is allowed access to
         $coursesOptions = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
         asort($coursesOptions);
@@ -511,6 +512,7 @@ class UsersController extends AppController
 
         // save the data which involves:
         if ($this->data) {
+            $this->data['User'] = array_map('trim', $this->data['User']);
             $submit = $this->data['Form']['save'];
             unset($this->data['Form']);
             // create the enrolment entry depending on if instructor or student
@@ -649,6 +651,7 @@ class UsersController extends AppController
 
         // save the data which involves:
         if ($this->data) {
+            $this->data['User'] = array_map('trim', $this->data['User']);
             // unenrol student from course, group, surveygroup
             // only students will go in because only they have records in Enrolment
             foreach ($enrolCourses as $course) {
@@ -1073,6 +1076,119 @@ class UsersController extends AppController
             $this->render('userSummary');
         }
     }
+    
+    /**
+     * merge
+     *
+     * @access public
+     * @return void
+     */
+    function merge() 
+    {
+        $searchValue = array(
+            'full_name' => __('Full Name', true),
+            'username' => __('Username', true),
+            'student_no' => __('Student No.', true)
+        );
+        $this->set('title_for_layout', __('Merge Users', true));
+        $this->set('searchValue', $searchValue);
+        $this->set('secondaryAccounts', array());
+        $this->set('primaryAccounts', array());
+        if($this->data) {
+            $primaryAccount = $this->data['User']['primaryAccount'];
+            $secondaryAccount = $this->data['User']['secondaryAccount'];
+            $primaryRole = $this->User->getRoleId($primaryAccount);
+            $secondaryRole = $this->User->getRoleId($secondaryAccount);
+            
+            // secondary account cannot be currently logged in user
+            if (User::get('id') == $secondaryAccount) {
+                $this->Session->setFlash(__('Error: The secondary account is the currently logged in user.', true));
+                return;
+            }
+            
+            if ($primaryRole != $secondaryRole) {
+                $this->Session->setFlash(__('Error: The users do not have the same role.', true));
+                return;
+            }
+            
+            if ($primaryAccount == $secondaryAccount) {
+                $this->Session->setFlash(__('Error: No merger needed. The primary and secondary accounts are the same.', true));
+                return;
+            }
+            
+            //update transactions
+            $updated = true;
+            $this->User->begin();
+            // tables that only need creator_id and updater_id updated
+            $updated = $updated && $this->_updateCreatorUpdaterId($updated, $primaryAccount, $secondaryAccount);
+            // user_course, user_enrol, user_tutor
+            $updated = $updated && $this->_updateUserCourse($updated, $primaryAccount, $secondaryAccount);
+            // the three evaluation types eg. evaluation_simple
+            $updated = $updated && $this->_updateEvaluations($updated, $primaryAccount, $secondaryAccount);
+            // tables that only need their user_id field updated
+            $updated = $updated && $this->_updateUserId($updated, $primaryAccount, $secondaryAccount);
+            // evaluation_submissions && email_schedules
+            $updated = $updated && $this->_updateTablesWithUserId($updated, $primaryAccount, $secondaryAccount);
+            $updated = $updated && $this->User->delete($secondaryAccount); // delete secondaryAccount
+            
+            if ($updated) {
+                $this->Session->setFlash(__('The two accounts have successfully merged.', true), 'good');
+                $this->User->commit();
+            } else {
+                $this->Session->setFlash(__('Error: The two accounts could not be merged.', true));
+                $this->User->rollback();
+            }
+        }
+    }
+    
+    /**
+     * ajax_merge_options
+     *
+     * @access public
+     * @return void
+     */
+    function ajax_merge() {
+        if (!$this->RequestHandler->isAjax()) {
+            $this->cakeError('error404');
+        }
+        $options = array();
+        switch($_GET['action']) {
+            case 'account':
+                if ($_GET['value'] == '') {
+                    $options = array();
+                } else {
+                    $options = $this->User->find('all', array(
+                        'conditions' => array(
+                            'Role.id' => array_keys($this->AccessControl->getViewableRoles()),
+                            'User.'.$_GET['field'].' LIKE' => "%".$_GET['value']."%",
+                    )));
+                    $options = Set::combine($options, '{n}.User.id', '{n}.User.'.$_GET['field']);
+                }
+                break;
+            case 'data':
+                $user = $this->User->findById($_GET['userId']);
+                // initialize user's data with blank fields
+                $options = array('Username', 'LastName', 'FirstName', 'Role', 'Title', 'Email',
+                    'Creator', 'CreateDate', 'Updater', 'UpdateDate');
+                $options = array_combine($options, array_fill(0, 10, ''));
+                if (isset($user)) {
+                    $options['Username'] = $user['User']['username'];
+                    $options['LastName'] = $user['User']['last_name'];
+                    $options['FirstName'] = $user['User']['first_name'];
+                    $options['Role'] = ucwords($this->Role->getRoleName($user['Role']['0']['id']));
+                    $options['Title'] = $user['User']['title'];
+                    $options['Email'] = $user['User']['email'];
+                    $options['Creator'] = $user['User']['creator'];
+                    $options['CreateDate'] = $user['User']['created'];
+                    $options['Updater'] = $user['User']['updater'];
+                    $options['UpdateDate'] = $user['User']['modified'];
+                }
+        }
+        
+        
+        asort($options);
+        $this->set('options', $options);
+    }
 
     /**
      * update
@@ -1183,5 +1299,195 @@ class UsersController extends AppController
         return "<div class='red'>User created but unable to send email
             notification: ". $this->Email->smtpError ."</div>";
     }
+    
+    /**
+     * _updateCreatorUpdaterId
+     *
+     * @param mixed $updated   updated
+     * @param mixed $primary   primary account
+     * @param mixed $secondary secondary account
+     *
+     * @access private
+     * @return void
+     */
+    private function _updateCreatorUpdaterId($updated, $primary, $secondary)
+    {
+        $models = array('Course', 'Department', 'EmailTemplate', 'EvaluationMixevalDetail',
+            'EvaluationRubricDetail', 'Event', 'EventTemplateType', 'Group',
+            'GroupEvent', 'Mixeval', 'Rubric', 'SimpleEvaluation', 'SysParameter', 'Survey');
+        foreach ($models as $model) {
+            $name = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $model)).'s';
+            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        }
+        $updated = $updated && $this->Faculty->query('UPDATE faculties SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+        $updated = $updated && $this->Faculty->query('UPDATE faculties SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
 
+        return $updated;
+    }
+
+    /**
+     * _updateUserCourse
+     *
+     * @param mixed $updated   updated
+     * @param mixed $primary   primary account
+     * @param mixed $secondary secondary account
+     *
+     * @access private
+     * @return void
+     */
+    private function _updateUserCourse($updated, $primary, $secondary)
+    {
+        $functionNames = array(
+            'UserTutor' => 'removeTutor', 
+            'UserEnrol' => 'unenrolStudent', 
+            'UserCourse' => 'removeInstructor'
+        );
+        $models = array_keys($functionNames);
+        foreach ($models as $model) {
+            $primaryTutor = Set::extract('/'.$model.'/course_id', $this->$model->findAllByUserId($primary));
+            $secondaryTutor = Set::extract('/'.$model.'/course_id', $this->$model->findAllByUserId($secondary));
+            $conflict = array_intersect($primaryTutor, $secondaryTutor);
+            $updated = $updated && $this->User->$functionNames[$model]($secondary, $conflict);
+            $conflict = implode(',', $conflict);
+            $name = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $model)).'s';
+            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+            $change = 'UPDATE '.$name.' SET user_id='.$primary.' WHERE user_id='.$secondary;
+            $change .= ($conflict) ? ' AND course_id NOT IN ('.$conflict.');' : ';';
+            $updated = $updated && $this->$model->query($change);
+        }
+
+        return $updated;
+    }
+    
+    /**
+     * _updateEvaluations
+     *
+     * @param mixed $updated   updated
+     * @param mixed $primary   primary account
+     * @param mixed $secondary secondary account
+     *
+     * @access private
+     * @return void
+     */
+    private function _updateEvaluations($updated, $primary, $secondary)
+    {
+        $models = array('EvaluationSimple', 'EvaluationMixeval', 'EvaluationRubric');
+        foreach ($models as $model) {
+            $primaryEval = Set::extract('/'.$model.'/grp_event_id', $this->$model->findAllByEvaluator($primary));
+            $secondaryEval = Set::extract('/'.$model.'/grp_event_id', $this->$model->findAllByEvaluator($secondary));
+            $conflict = array_intersect($primaryEval, $secondaryEval);
+            $updated = $updated && $this->$model->deleteAll(
+                array('evaluator' => $secondary, 'grp_event_id' => $conflict));
+            $conflict = implode(',', $conflict);
+            $name = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $model)).'s';
+            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET evaluatee='.$primary.' WHERE evaluatee='.$secondary.';');
+            $change = 'UPDATE '.$name.' SET evaluator='.$primary.' WHERE evaluator='.$secondary;
+            $change .= ($conflict) ? ' AND grp_event_id NOT IN ('.$conflict.');' : ';';
+            $updated = $updated && $this->$model->query($change);
+        }
+        
+        return $updated;
+    }
+    
+    /**
+     * _updateUserId
+     *
+     * @param mixed $updated   updated
+     * @param mixed $primary   primary account
+     * @param mixed $secondary secondary account
+     *
+     * @access private
+     * @return void
+     */
+    private function _updateUserId($updated, $primary, $secondary)
+    {
+        $models = array(
+            array('GroupsMembers', 'groups_members', 'group_id'),
+            array('SurveyGroupMember', 'survey_group_members', 'group_set_id'),
+            array('SurveyInput', 'survey_inputs', 'event_id'),
+            array('UserFaculty', 'user_faculties', 'faculty_id')
+        );
+        
+        foreach ($models as $model) {
+            $primaryUser = $this->$model[User::MERGE_MODEL]->findAllByUserId($primary);
+            $primaryUser = Set::extract('/'.$model[User::MERGE_MODEL].'/'.$model[User::MERGE_FIELD], $primaryUser);
+            $secondaryUser = $this->$model[User::MERGE_MODEL]->findAllByUserId($secondary);
+            $secondaryUser = Set::extract('/'.$model[User::MERGE_MODEL].'/'.$model[User::MERGE_FIELD], $secondaryUser);
+            $conflict = array_intersect($primaryUser, $secondaryUser);
+            $updated = $updated && $this->$model[User::MERGE_MODEL]->deleteAll(
+                array('user_id' => $secondaryUser, $model[User::MERGE_FIELD] => $conflict));
+            $conflict = implode(',', $conflict);
+            $change = 'UPDATE '.$model[User::MERGE_TABLE].' SET user_id='.$primary.' WHERE user_id='.$secondary;
+            $change .= ($conflict) ? ' AND '.$model[User::MERGE_FIELD].' NOT IN ('.$conflict.');' : ';';
+            $updated = $updated && $this->$model[User::MERGE_MODEL]->query($change);
+        }
+        
+        //oauth_clients
+        $updated = $updated && $this->OauthClient->query('UPDATE oauth_clients SET user_id='.$primary.' WHERE user_id='.$secondary.';');
+        //oauth_tokens
+        $updated = $updated && $this->OauthToken->query('UPDATE oauth_tokens SET user_id='.$primary.' WHERE user_id='.$secondary.';');
+        
+        return $updated;
+    }
+    
+    /**
+     * _updateTablesWithUserId
+     *
+     * @param mixed $updated   updated
+     * @param mixed $primary   primary account
+     * @param mixed $secondary secondary account
+     *
+     * @access private
+     * @return void
+     */
+    private function _updateTablesWithUserId($updated, $primary, $secondary)
+    {
+        //evaluation_submissions
+        //update creator_id and updater_id
+        $updated = $updated && $this->EvaluationSubmission->query('UPDATE evaluation_submissions SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
+        $updated = $updated && $this->EvaluationSubmission->query('UPDATE evaluation_submissions SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        $primaryEval = $this->EvaluationSubmission->getGrpEventIdEvalSub($primary);
+        $primarySurvey = $this->EvaluationSubmission->getEventIdSurveySub($primary);
+        $secondaryEval = $this->EvaluationSubmission->getGrpEventIdEvalSub($secondary);
+        $secondarySurvey = $this->EvaluationSubmission->getEventIdSurveySub($secondary);
+        
+        $evalConflict = array_intersect($primaryEval, $secondaryEval);  //grp_evnt_id
+        $surveyConflict = array_intersect($primarySurvey, $secondarySurvey); //event_id
+        //delete conflicted evaluation submissions by grp_event_id
+        $updated = $updated && $this->EvaluationSubmission->deleteAll(
+            array('EvaluationSubmission.submitter_id' => $secondary, 'EvaluationSubmission.grp_event_id' => $evalConflict));
+        //delete conflicted survey submissions by event_id
+        $updated = $updated && $this->EvaluationSubmission->deleteAll(
+            array('EvaluationSubmission.submitter_id' => $secondary, 'EvaluationSubmission.event_id' => $surveyConflict));
+        $evalConflict = implode(',', $evalConflict);
+        $surveyConflict = implode(',', $surveyConflict);
+        
+        $change = 'UPDATE evaluation_submissions SET submitter_id='.$primary.' WHERE submitter_id='.$secondary;
+        $change .= ($evalConflict || $surveyConflict) ? ' AND (' : ';';
+        //append grp_event_id if any evaluation submissions are conflicted
+        $change .= ($evalConflict) ? 'grp_event_id NOT IN ('.$evalConflict.')' : '';
+        $change .= ($evalConflict && $surveyConflict) ? ' OR ' : '';
+        //append event_id if any survey submissions are conflicted
+        $change .= ($surveyConflict) ? 'event_id NOT IN ('.$surveyConflict.')' : '';
+        $change .= ($evalConflict || $surveyConflict) ? ');' : '';
+        $updated = $updated && $this->EvaluationSubmission->query($change);
+        
+        //email_schedules
+        $updated = $updated && $this->EmailSchedule->query("UPDATE email_schedules SET creator_id=".$primary." WHERE creator_id=".$secondary.";");
+        $updated = $updated && $this->EmailSchedule->query("UPDATE email_schedules SET `from`=".$primary." WHERE `from`=".$secondary.";");
+        // middle of the string eg. ;17;
+        $updated = $updated && $this->EmailSchedule->query('UPDATE email_schedules SET `to`=REPLACE(`to`, ";'.$secondary.';", ";'.$primary.';");');
+        // end of the string eg. ;17
+        $updated = $updated && $this->EmailSchedule->query('UPDATE email_schedules SET `to`=REPLACE(`to`, ";'.$secondary.'", ";'.$primary.'");');
+        // beginning of the string eg. 17;
+        $updated = $updated && $this->EmailSchedule->query('UPDATE email_schedules SET `to`=REPLACE(`to`, "'.$secondary.';", "'.$primary.';");');
+        // the whole string eg. 17
+        $updated = $updated && $this->EmailSchedule->query('UPDATE email_schedules SET `to`=REPLACE(`to`, "'.$secondary.'", "'.$primary.'");');
+
+        return $updated;
+    }
 }

@@ -48,18 +48,33 @@ class CoursesControllerTest extends ExtendedAuthTestCase
     private $fixtureIndex = array(
         array(
             'Course' => array(
-                'id' => 1, 'course' => 'MECH 328', 'title' => 'Mechanical Engineering Design Project',
-                'creator_id' => 1, 'record_status' => 'A', 'creator' => 'Super Admin'),
+                'id' => 1,
+                'course' => 'MECH 328',
+                'title' => 'Mechanical Engineering Design Project',
+                'creator_id' => 1,
+                'record_status' => 'A',
+                'creator' => 'Super Admin'
+            ),
         ),
         array(
             'Course' => array(
-                'id' => 2, 'course' => 'APSC 201', 'title' => 'Technical Communication',
-                'creator_id' => 1, 'record_status' => 'A', 'creator' => 'Super Admin'),
+                'id' => 2,
+                'course' => 'APSC 201',
+                'title' => 'Technical Communication',
+                'creator_id' => 1,
+                'record_status' => 'A',
+                'creator' => 'Super Admin'
+            ),
         ),
         array(
             'Course' => array(
-                'id' => 3, 'course' => 'CPSC 101', 'title' => 'Connecting with Computer Science',
-                'creator_id' => 0, 'record_status' => 'I', 'creator' => null),
+                'id' => 3,
+                'course' => 'CPSC 101',
+                'title' => 'Connecting with Computer Science',
+                'creator_id' => 1,
+                'record_status' => 'I',
+                'creator' => 'Super Admin'
+            ),
         ),
     );
 
@@ -265,8 +280,8 @@ class CoursesControllerTest extends ExtendedAuthTestCase
             $this->fixtureIndex[2],
             $this->fixtureIndex[0],
         );
-
-        $this->assertTrue($result['paramsForList']['data']['entries'] == $expected);
+        $this->assertEqual($result['paramsForList']['data']['entries'], 
+            $expected);
     }
 
     function testIndexNoPermission()
@@ -274,7 +289,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         // test with student account
         $this->login = array(
             'User' => array(
-                'username' => '65498451',
+                'username' => 'redshirt0001',
                 'password' => md5('ipeeripeer')
             )
         );
@@ -446,7 +461,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->assertEqual(count($result['instructors']), 3);
         $this->assertEqual($this->controller->data['Course']['course'], $this->fixtureView['Course'][0]['course']);
         $this->assertEqual($this->controller->data['Course']['course'], $this->fixtureView['Course'][0]['course']);
-        $this->assertEqual(count($this->controller->data['Instructor']), 1);
+        $this->assertEqual(count($this->controller->data['Instructor']['Instructor']), 1);
         $this->assertEqual($this->controller->data['Instructor'][0]['id'], 2);
     }
 
@@ -461,7 +476,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'homepage' => 'http://www.ubc.ca'
             ),
             'Instructor' => array(
-                array('id' => 2)
+                'Instructor' => array(2)
             ),
             'Department' => array(
                 'Department' => array(3)

@@ -32,6 +32,10 @@ class User extends AppModel
     const IMPORT_EMAIL = '4';
     const IMPORT_PASSWORD = '5';
     const GENERATED_PASSWORD = '6';
+    
+    const MERGE_MODEL = '0';
+    const MERGE_TABLE = '1';
+    const MERGE_FIELD = '2';
 
     public $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Traceable');
 
@@ -379,14 +383,16 @@ class User extends AppModel
     function getEnrolledStudentsForList($course_id)
     {
         $this->displayField = 'student_no_with_full_name';
-        return $this->find('list', array(
-            'conditions' => array('UserEnrol.course_id' => $course_id),
-            'joins' => array(array('table' => 'user_enrols',
-                'alias' => 'UserEnrol',
-                'type'  => 'LEFT',
-                'conditions' => array('User.id = UserEnrol.user_id'))
-            ),
-            'order' => 'User.student_no'));
+        return $this->find(
+            'list', 
+            array(
+                'conditions' => array(
+                    'Enrolment.id' => $course_id,
+                ),
+                'recursive' => 1,
+                'order' => 'User.student_no'
+            )
+        );
     }
 
     /**
@@ -783,6 +789,22 @@ class User extends AppModel
         }
         return $this->UserEnrol->delete($id);
     }
+    
+    /**
+     * unenrolStudent
+     *
+     * @param mixed $userId   user id
+     * @param mixed $courseId course id
+     *
+     * @access public
+     * @return void
+     */
+    function unenrolStudent($userId, $courseId)
+    {
+        $id = $this->UserEnrol->field('id',
+            array('user_id' => $userId, 'course_id' => $courseId));
+        return $this->UserEnrol->delete($id);
+    }
 
     /**
      * Add instructor to course
@@ -966,6 +988,40 @@ class User extends AppModel
             'contain' => $models,
             'fields' => $fields,
         ));
+    }
+    
+    /**
+     * Get members in a group in event (not including tutors)
+	 *
+	 * @param mixed $groupId group id
+	 * @param bool $selfEval check whether self evaluation is allowed or not
+	 * @param mixed $userId  user id
+	 *
+	 * @return group members
+	 */
+    function getEventGroupMembersNoTutors($groupId, $selfEval, $userId)
+    {
+        $conditions['Group.id'] = $groupId;
+        // TODO needs to be changed to use constant instead for role id
+        $conditions['Role.id'] = $this->USER_TYPE_STUDENT;
+        if (!$selfEval) {
+            $conditions['User.id !='] = $userId;
+        }
+
+        $members = $this->find('all', array(
+            'conditions' => $conditions,
+            'contain' => array('Role', 'Group')
+        ));
+        
+        $groupMembers = array();
+        foreach($members as $member) {
+            $tmp = array();
+            $tmp['User'] = $member['User'];
+            $tmp['Role']['0'] = $member['Role'];
+            $groupMembers[] = $tmp;
+        }
+
+        return $groupMembers;
     }
 
     /*********************************

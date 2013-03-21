@@ -13,63 +13,39 @@ Class ExportCsvComponent extends ExportBaseNewComponent
     /**
      * buildGroupExportCsvByGroup
      *
-     * @param mixed $params  params
+     * @param mixed $grp     group fields
+     * @param mixed $user    user fields
      * @param mixed $groupId group id
      *
      * @access public
      * @return void
      */
-    function buildGroupExportCsvByGroup($params, $groupId)
+    function buildGroupExportCsvByGroup($grp, $user, $groupId)
     {
-        $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
-        $groupMemberId = $this->GroupsMembers->getMembers($groupId);
-        $CSV = '';
-        foreach ($groupMemberId as $userId) {
-            $CSV .= $this->_buildGroupExportCsvByUser($userId, $params, $groupId)."\n";
-        }
-
-        return $CSV;
-    }
-
-
-    /**
-     * _buildGroupExportCsvByUser
-     *
-     * @param mixed $userId  user id
-     * @param mixed $params  params
-     * @param mixed $groupId group id
-     *
-     * @access protected
-     * @return void
-     */
-    function _buildGroupExportCsvByUser($userId, $params, $groupId)
-    {
-        $this->User = ClassRegistry::init('User');
         $this->Group = ClassRegistry::init('Group');
-        $row = '';
-        $user = $this->User->findById($userId);
-        $group = $this->Group->getGroupByGroupId($groupId);
-        if (!empty($params['include_group_numbers'])) {
-            $row .= $group['0']['Group']['group_num'].", ";
+      
+        $group = $this->Group->find('first', array(
+            'conditions' => array('Group.id' => $groupId),
+            'fields' => $grp,
+            'contain' => array('Member' => array('fields' => $user)),
+        ));
+        $usr = (empty($user)) ? true : false;
+        unset($group['Group']['id']);
+        $export = array();
+        foreach ($group['Member'] as $member) {
+            unset($member['GroupsMember']);
+            if ($usr) {
+                $member = array();
+            }
+            if ($grp) {
+                $member = $group['Group'] + $member;
+            }
+            $export[] = implode(',', $member);
         }
-        if (!empty($params['include_group_names'])) {
-            $row .= $group['0']['Group']['group_name'].", ";
-        }
-        if (!empty($params['include_usernames'])) {
-            $row .= $user['User']['username'].", ";
-        }
-        if (!empty($params['include_student_id'])) {
-            $row .= $user['User']['student_no'].", ";
-        }
-        if (!empty($params['include_student_name'])) {
-            $row .= $user['User']['first_name'].", ";
-            $row .= $user['User']['last_name'].", ";
-        }
-        //if (!empty($params['include_student_email'])) {
-        //    $row .= $user['User']['email'];
-        //}
-        return $row;
+
+        return $export;
     }
+
 
     /**
      * createCsvSubHeader
@@ -107,6 +83,11 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         $results = $this->responseModel->getSubmittedResultsByGroupEvent($groupEventIds, $this->detailModel[$event['Event']['event_template_type_id']]);
         $results = Set::combine($results, '{n}.'.$this->responseModelName.'.id', '{n}', '{n}.'.$this->responseModelName.'.grp_event_id');
         $evaluation = $this->evaluationModel->getEvaluation($event['Event']['template_id']);
+        unset($evaluation['Event']);
+        if (isset($evaluation['MixevalQuestion'])) {
+            $evaluation['Question'] = $evaluation['MixevalQuestion'];
+            unset($evaluation['MixevalQuestion']);
+        }
         $event = array_merge($event, $evaluation);
 
         $header = $this->generateHeader($params, $event);
@@ -165,9 +146,11 @@ Class ExportCsvComponent extends ExportBaseNewComponent
 
         foreach ($event['Question'] as $key => $question) {
             if (isset($question['mixeval_question_type_id'])) {
-                if ((isset($params['include']['grade_tables']) && $question['mixeval_question_type_id'] == '1') ||
-                (isset($params['include']['comments']) && $question['mixeval_question_type_id'] == '2')) {
+                if ((isset($params['include']['grade_tables']) && $question['mixeval_question_type_id'] == '1')) {
                     $header[] = "Q".($key+1)." ( /".$question['multiplier'].")";
+                } else if (isset($params['include']['comments']) && 
+                    in_array($question['mixeval_question_type_id'], array(2, 3))){
+                    $header[] = "Q".($key+1);
                 }
             } else {
                 $header[] = "Q".($key+1)." ( /".$question['multiplier'].")";

@@ -30,12 +30,10 @@ class DepartmentsController extends AppController {
         } else {
             $uf = $this->UserFaculty->findAllByUserId($this->Auth->user('id'));
             $ret = $this->Department->getByUserFaculties($uf);
-        }
-
-        if (empty($ret)) {
-            $this->Session->setFlash(__('You do not have access to any faculties', true));
-            $this->redirect('/pages/admin');
-            return;
+            if (empty($ret)) {
+                $this->Session->setFlash(__('You do not have access to any faculties', true));
+                $this->redirect('/pages/admin');
+            }
         }
 
         $departments = array();
@@ -78,6 +76,7 @@ class DepartmentsController extends AppController {
 
         if (!empty($this->data)) {
             $this->Department->create();
+            $this->data['Department']['name'] = trim($this->data['Department']['name']);
             if ($this->Department->save($this->data)) {
                 $this->Session->setFlash(
                     __('The department has been saved', true), 'good');
@@ -104,6 +103,7 @@ class DepartmentsController extends AppController {
             return;
         }
         if (!empty($this->data)) {
+            $this->data['Department']['name'] = trim($this->data['Department']['name']);
             if ($this->Department->save($this->data)) {
                 $this->Session->setFlash(
                     __('The department has been saved', true), 'good');

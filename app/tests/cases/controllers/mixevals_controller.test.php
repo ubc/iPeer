@@ -20,19 +20,19 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
     public $controller = null;
 
     public $fixtures = array(
-        'app.course', 'app.role', 'app.user', 'app.group', 'app.roles_user', 
-        'app.event', 'app.event_template_type', 'app.group_event', 
-        'app.evaluation_submission', 'app.survey_group_set', 
-        'app.survey_group', 'app.survey_group_member', 'app.question', 
-        'app.response', 'app.survey_question', 'app.user_course', 
-        'app.user_enrol', 'app.groups_member', 'app.survey', 'app.personalize', 
-        'app.penalty', 'app.evaluation_simple', 'app.faculty', 
-        'app.user_tutor', 'app.course_department', 'app.evaluation_rubric', 
-        'app.evaluation_rubric_detail', 'app.evaluation_mixeval', 
-        'app.evaluation_mixeval_detail', 'app.user_faculty', 'app.department', 
-        'app.sys_parameter', 'app.oauth_token', 'app.rubric', 
-        'app.rubrics_criteria', 'app.rubrics_criteria_comment', 
-        'app.rubrics_lom', 'app.simple_evaluation', 'app.survey_input', 
+        'app.course', 'app.role', 'app.user', 'app.group', 'app.roles_user',
+        'app.event', 'app.event_template_type', 'app.group_event',
+        'app.evaluation_submission', 'app.survey_group_set',
+        'app.survey_group', 'app.survey_group_member', 'app.question',
+        'app.response', 'app.survey_question', 'app.user_course',
+        'app.user_enrol', 'app.groups_member', 'app.survey', 'app.personalize',
+        'app.penalty', 'app.evaluation_simple', 'app.faculty',
+        'app.user_tutor', 'app.course_department', 'app.evaluation_rubric',
+        'app.evaluation_rubric_detail', 'app.evaluation_mixeval',
+        'app.evaluation_mixeval_detail', 'app.user_faculty', 'app.department',
+        'app.sys_parameter', 'app.oauth_token', 'app.rubric',
+        'app.rubrics_criteria', 'app.rubrics_criteria_comment',
+        'app.rubrics_lom', 'app.simple_evaluation', 'app.survey_input',
         'app.mixeval_question', 'app.mixeval_question_desc', 'app.mixeval',
         'app.mixeval_question_type'
     );
@@ -48,7 +48,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         // init fixtures so we can use them
         $this->Mixeval =& ClassRegistry::init('Mixeval');
         $this->MixevalQuestion =& ClassRegistry::init('MixevalQuestion');
-        $this->MixevalQuestionType =& 
+        $this->MixevalQuestionType =&
             ClassRegistry::init('MixevalQuestionType');
 
         // shared data
@@ -126,7 +126,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
     }
 
     public function testView() {
-        $result = $this->testAction('/mixevals/view/1', 
+        $result = $this->testAction('/mixevals/view/1',
             array('return' => 'vars'));
 
         $this->assertEqual($result['mixeval']['id'], 1);
@@ -140,7 +140,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
     }
 
     public function testAdd() {
-        $result = $this->testAction('/mixevals/add', 
+        $result = $this->testAction('/mixevals/add',
             array('return' => 'vars'));
         // make sure the list of question types is set
         $this->assertTrue(isset($result['mixevalQuestionTypes']));
@@ -150,7 +150,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         // Test a regular save with 1 of each question type
         $data = $this->testMixevalData;
         $result = $this->testAction(
-            '/mixevals/add', 
+            '/mixevals/add',
             array(
                 'method' => 'post',
                 'data' => $data,
@@ -163,8 +163,8 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         // Make sure that the data entered into the database is what we expected
         $this->_verifyMixeval($data, $mixeval);
 
-        // Test that questions/descriptors can be indexed in random order but 
-        // the save will make sure that the questions will end up being 
+        // Test that questions/descriptors can be indexed in random order but
+        // the save will make sure that the questions will end up being
         // numbered and scaled correctly.
         // - question reordering must match what users want
         // - question descriptors need to be scaled properly
@@ -196,7 +196,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
             "MixevalQuestionDesc" => array(
                 "2" => array(
                     "descriptor" => 'Likert Q1 Scale 1',
-                    "question_index" => 4 
+                    "question_index" => 4
                 ),
                 "4" => array(
                     "descriptor" => 'Likert Q1 Scale 2',
@@ -213,7 +213,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
             ),
         );
         $result = $this->testAction(
-            '/mixevals/add', 
+            '/mixevals/add',
             array(
                 'method' => 'post',
                 'data' => $data,
@@ -233,7 +233,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         // Add a mixeval so we have one to edit
         $expected = $this->testMixevalData;
         $result = $this->testAction(
-            '/mixevals/add', 
+            '/mixevals/add',
             array(
                 'method' => 'post',
                 'data' => $expected,
@@ -248,7 +248,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
 
         // Try accessing the edit page for the mixeval we just added
         echo "testEdit: Loading existing data, ";
-        $result = $this->testAction("/mixevals/edit/$mixevalId", 
+        $result = $this->testAction("/mixevals/edit/$mixevalId",
             array('return' => 'vars'));
         // make sure the list of question types is set
         $this->assertTrue(isset($result['mixevalQuestionTypes']));
@@ -257,14 +257,14 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
 
         // Check that edit is correctly loading existing data.
         $actual = $this->controller->data;
-        // Need to verify the 3 components of controller data: Mixeval, 
+        // Need to verify the 3 components of controller data: Mixeval,
         // MixevalQuestion, MixevalQuestionDesc.
         $this->_verifyMixeval($expected, $actual); // verify Mixeval part
         // Because _verifyMixeval uses the the Mixeval part of its
         // $actual param to call up MixevalQuestion and MixevalQuestionDesc
         // from database, it ignores the MixevalQuestion and MixevalQuestionDesc
         // that $actual may have. So as a lazy workaround, we give $actual to
-        // _verifyMixeval() twice, making it check the MixevalQuestion and 
+        // _verifyMixeval() twice, making it check the MixevalQuestion and
         // MixevalQuestionDesc in $actual against the database.
         $this->_verifyMixeval($actual, $actual); // verify Question and Desc
 
@@ -297,7 +297,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         array_push($expected['MixevalQuestionDesc'],
             array(
                 "descriptor" => 'Likert Q1 Scale 1',
-                "question_index" => 3 
+                "question_index" => 3
             )
         );
         array_push($expected['MixevalQuestionDesc'],
@@ -320,7 +320,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         );
         // Try to save these new questions
         $result = $this->testAction(
-            "/mixevals/edit/$mixevalId", 
+            "/mixevals/edit/$mixevalId",
             array(
                 'method' => 'post',
                 'data' => $expected,
@@ -328,7 +328,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
             )
         );
         // Try accessing the edit page for the mixeval we just saved
-        $result = $this->testAction("/mixevals/edit/$mixevalId", 
+        $result = $this->testAction("/mixevals/edit/$mixevalId",
             array('return' => 'vars'));
         // Check that the altered data was correctly saved and loaded
         $actual = $this->controller->data;
@@ -346,7 +346,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         unset($expected['MixevalQuestionDesc'][4]); // the likert's desc 2
         // Try to save these changes
         $result = $this->testAction(
-            "/mixevals/edit/$mixevalId", 
+            "/mixevals/edit/$mixevalId",
             array(
                 'method' => 'post',
                 'data' => $expected,
@@ -354,7 +354,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
             )
         );
         // Try accessing the edit page for the mixeval we just saved
-        $result = $this->testAction("/mixevals/edit/$mixevalId", 
+        $result = $this->testAction("/mixevals/edit/$mixevalId",
             array('return' => 'vars'));
         // Check that the altered data was correctly saved and loaded
         $actual = $this->controller->data;
@@ -370,7 +370,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         unset($expected['MixevalQuestionDesc'][3]);
         // Try to save these changes
         $result = $this->testAction(
-            "/mixevals/edit/$mixevalId", 
+            "/mixevals/edit/$mixevalId",
             array(
                 'method' => 'post',
                 'data' => $expected,
@@ -378,7 +378,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
             )
         );
         // Try accessing the edit page for the mixeval we just saved
-        $result = $this->testAction("/mixevals/edit/$mixevalId", 
+        $result = $this->testAction("/mixevals/edit/$mixevalId",
             array('return' => 'vars'));
         // Check that the altered data was correctly saved and loaded
         $actual = $this->controller->data;
@@ -406,18 +406,18 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         $expected['MixevalQuestionDesc'][2]['question_index'] = 3;
         // also move the question desc indexes around a bit, but keep in mind
         // that each question's scale level is determined sequentially
-        $expected['MixevalQuestionDesc'][4] = 
+        $expected['MixevalQuestionDesc'][4] =
             $expected['MixevalQuestionDesc'][0];
-        $expected['MixevalQuestionDesc'][5] = 
+        $expected['MixevalQuestionDesc'][5] =
             $expected['MixevalQuestionDesc'][2];
-        $expected['MixevalQuestionDesc'][6] = 
+        $expected['MixevalQuestionDesc'][6] =
             $expected['MixevalQuestionDesc'][1];
         unset($expected['MixevalQuestionDesc'][0]);
         unset($expected['MixevalQuestionDesc'][1]);
         unset($expected['MixevalQuestionDesc'][2]);
         // Try to save these changes
         $result = $this->testAction(
-            "/mixevals/edit/$mixevalId", 
+            "/mixevals/edit/$mixevalId",
             array(
                 'method' => 'post',
                 'data' => $expected,
@@ -435,7 +435,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         $expected['MixevalQuestionDesc'][4]['question_index'] = 2;
         $expected['MixevalQuestionDesc'][6]['question_index'] = 2;
         $expected['MixevalQuestionDesc'][5]['question_index'] = 1;
-        $expected['MixevalQuestionDesc'][0] = 
+        $expected['MixevalQuestionDesc'][0] =
             $expected['MixevalQuestionDesc'][4];
         $expected['MixevalQuestionDesc'][1] =
             $expected['MixevalQuestionDesc'][6];
@@ -445,13 +445,13 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         unset($expected['MixevalQuestionDesc'][5]);
         unset($expected['MixevalQuestionDesc'][6]);
         // Try accessing the edit page for the mixeval we just saved
-        $result = $this->testAction("/mixevals/edit/$mixevalId", 
+        $result = $this->testAction("/mixevals/edit/$mixevalId",
             array('return' => 'vars'));
         // Check that the altered data was correctly saved and loaded
         $actual = $this->controller->data;
         $this->_verifyMixeval($expected, $actual); // verify Mixeval part
         $this->_verifyMixeval($actual, $actual); // verify Question and Desc
-        echo "<br>\n";
+        echo "<br />\n";
     }
 
     /**
@@ -463,16 +463,16 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
      * one place.
      * @param array $actual - This is the data that comes out of the database
      * from a model's find method. Note that we only expect Mixeval fields
-     * here, MixevalQuestion and MixevalQuestionDesc are obtained in another 
+     * here, MixevalQuestion and MixevalQuestionDesc are obtained in another
      * query based on the actual Mixeval's id.
      */
     private function _verifyMixeval($expected, $actual) {
         // Check that the mixeval entry is correct
-        $this->assertEqual($expected['Mixeval']['name'], 
+        $this->assertEqual($expected['Mixeval']['name'],
             $actual['Mixeval']['name']);
-        $this->assertEqual($expected['Mixeval']['availability'], 
+        $this->assertEqual($expected['Mixeval']['availability'],
             $actual['Mixeval']['availability']);
-        $this->assertEqual($expected['Mixeval']['zero_mark'], 
+        $this->assertEqual($expected['Mixeval']['zero_mark'],
             $actual['Mixeval']['zero_mark']);
 
         // Check that the question entries are correct
@@ -487,22 +487,22 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         foreach ($expected['MixevalQuestion'] as $expectedQ) {
             $this->assertTrue(isset($actualQs[$i]));
             $actualQ = $actualQs[$i];
-            $this->assertEqual($expectedQ['title'], 
+            $this->assertEqual($expectedQ['title'],
                 $actualQ['MixevalQuestion']['title']);
-            $this->assertEqual($expectedQ['instructions'], 
+            $this->assertEqual($expectedQ['instructions'],
                 $actualQ['MixevalQuestion']['instructions']);
-            $this->assertEqual($expectedQ['required'], 
+            $this->assertEqual($expectedQ['required'],
                 $actualQ['MixevalQuestion']['required']);
-            $this->assertEqual($expectedQ['mixeval_question_type_id'], 
+            $this->assertEqual($expectedQ['mixeval_question_type_id'],
                 $actualQ['MixevalQuestion']['mixeval_question_type_id']);
-            $this->assertEqual($expectedQ['question_num'], 
+            $this->assertEqual($expectedQ['question_num'],
                 $actualQ['MixevalQuestion']['question_num']);
             if (isset($expectedQ['multiplier'])) {
-                $this->assertEqual($expectedQ['multiplier'], 
+                $this->assertEqual($expectedQ['multiplier'],
                     $actualQ['MixevalQuestion']['multiplier']);
             }
             else {
-                $this->assertEqual(0, 
+                $this->assertEqual(0,
                     $actualQ['MixevalQuestion']['multiplier']);
             }
             $i++;
@@ -516,7 +516,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         $expectedDescs = array();
         foreach ($expected['MixevalQuestionDesc'] as $expectedD) {
             $expectedQIndex = $expectedD['question_index'];
-            $expectedQNum = 
+            $expectedQNum =
                 $expected['MixevalQuestion'][$expectedQIndex]['question_num'];
             if (!isset($expectedDescs[$expectedQNum])) {
                 $expectedDescs[$expectedQNum] = array();
@@ -545,9 +545,9 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
             $i = 0;
             foreach ($expectedQDescs as $expectedD) {
                 $actualD = $actualQDescs[$i];
-                $this->assertEqual($expectedD['descriptor'], 
+                $this->assertEqual($expectedD['descriptor'],
                     $actualD['descriptor']);
-                $this->assertEqual($expectedD['scale_level'], 
+                $this->assertEqual($expectedD['scale_level'],
                     $actualD['scale_level']);
                 $i++;
             }

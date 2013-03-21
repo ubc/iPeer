@@ -67,7 +67,7 @@ class Mixeval extends AppModel
     {
         parent::__construct($id, $table, $ds);
         $this->virtualFields['total_question'] = sprintf('SELECT count(*) as total_question FROM mixeval_questions as q WHERE q.mixeval_id = %s.id', $this->alias);
-        $this->virtualFields['total_marks'] = sprintf('SELECT sum(multiplier) as sum FROM mixeval_questions as q WHERE q.mixeval_id = %s.id', $this->alias);
+        $this->virtualFields['total_marks'] = sprintf('SELECT IFNULL(SUM(multiplier),0) as sum FROM mixeval_questions as q WHERE q.mixeval_id = %s.id AND q.required = 1', $this->alias);
     }
 
     /**
@@ -102,45 +102,6 @@ class Mixeval extends AppModel
         $mixEvalDetail = array_merge($mixeval, $tmp);
 
         return $mixEvalDetail;
-    }
-
-
-    /**
-    * copy generate a copy of mixeval with specific ID. The generated copy
-    * is cleaned up by removing all the IDs in it
-    *
-    * @param mixed $id source rubric ID
-    *
-    * @access public
-    * @return array copy of mixeval
-    */
-    function copy($id) {
-        $data = $this->find('first', array('conditions' => array('id' => $id),
-            'contain' => array('Question.Description',
-            )));
-
-        $data['Mixeval']['name'] = __('Copy of ', true).$data['Mixeval']['name'];
-
-        if (null != $data) {
-            unset ($data['Mixeval']['id'],
-                $data['Mixeval']['creator_id'],
-                $data['Mixeval']['created'],
-                $data['Mixeval']['updater_id'],
-                $data['Mixeval']['modified']);
-
-            for ($i = 0; $i < count($data['Question']); $i++) {
-                unset ($data['Question'][$i]['id'],
-                    $data['Question'][$i]['mixeval_id']);
-                if ('1' == $data['Question'][$i]['mixeval_question_type_id']) {
-                    for ($j = 0; $j < count($data['Question'][$i]['Description']); $j++) {
-                        unset($data['Question'][$i]['Description'][$j]['id'],
-                            $data['Question'][$i]['Description'][$j]['question_id']);
-                    }
-                }
-            }
-        }
-
-        return $data;
     }
 
 
@@ -221,6 +182,67 @@ class Mixeval extends AppModel
         $conditions = array('creator_id' => $user_id);
         $conditions = array('OR' => array_merge(array('availability' => 'public'), $conditions));
         return $this->find('list', array('conditions' => $conditions, 'fields' => array('name')));
+    }
+    
+    /**
+     * formatPenaltyArray return the array that student has penalty. key will
+     * be the user id and value will be the penalty. The student without
+     * penalty will be value 0.
+     *
+     * @param mixed $groupMembers group members
+     * @param mixed $eventId      event id
+     * @param mixed $groupId      group id
+     *
+     * @access public
+     * @return void
+     */
+    function formatPenaltyArray($groupMembers, $eventId, $groupId)
+    {
+        $this->Penalty = ClassRegistry::init('Penalty');
+        $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
+
+        $memberIds = array_keys($groupMembers);
+        $userPenalty = array_fill_keys($memberIds, 0);
+
+        // find the event
+        $event = $this->Event->findById($eventId);
+
+        // not due yet. no penalty
+        if ($event['Event']['due_in'] >= 0) {
+            return $userPenalty;
+        }
+
+        // storing the timestamp of the due date of the event
+        $event_due = strtotime($event['Event']['due_date']);
+        // assign penalty to groupMember if they submitted late or never submitted by release_date_end
+        $submissions = $this->EvaluationSubmission->find('all', array(
+            'conditions' => array('submitter_id' => $memberIds, 'EvaluationSubmission.event_id' => $eventId),
+            'contain' => array(
+                'GroupEvent' => array(
+                    'conditions' => array('GroupEvent.group_id' => $groupId, 'GroupEvent.event_id' => $eventId),
+                ),
+            )
+        ));
+
+        foreach ($submissions as $submission) {
+            // there is submission - may be on time or late
+            $late_diff = strtotime($submission['EvaluationSubmission']['date_submitted']) - $event_due;
+            // late
+            if (0 < $late_diff) {
+                $days_late = $late_diff/(24*60*60);
+                $penalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId, $days_late);
+                $userPenalty[$submission['EvaluationSubmission']['submitter_id']] = $penalty['Penalty']['percent_penalty'];
+            }
+        }
+
+        // no submission - if now is after release date end then - gets final deduction
+        $penalty = $this->Penalty->getPenaltyFinal($eventId);
+        $noSubmissions = array_intersect($memberIds, Set::extract($submissions, '/EvluationSubmission/submitter_id'));
+        foreach ($noSubmissions as $userId) {
+            $userPenalty[$userId] = $penalty['Penalty']['percent_penalty'];
+        }
+
+        return $userPenalty;
     }
 
 }
