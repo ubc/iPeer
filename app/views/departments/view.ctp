@@ -29,7 +29,7 @@ foreach ($courses as $course) {
         if ($val == 'email' && !User::hasPermission('functions/viewemailaddresses')) {
             continue;
         }
-        echo "<td>".$this->Html->link($course['Course'][$val], '/courses/view'.$course['Course']['id'])."</td>";
+        echo "<td>".$this->Html->link($course['Course'][$val], '/courses/view/'.$course['Course']['id'])."</td>";
     }
     echo "</tr>";
 }

@@ -14,11 +14,6 @@ class DepartmentsController extends AppController {
      * */
     public function beforeFilter() {
         parent::beforeFilter();
-        if (!User::hasPermission('controllers/Departments')) {
-            $this->Session->setFlash(__('Permission to access departments '.
-                'not found.', true));
-            $this->redirect('/home');
-        }
     }
 
     /**
