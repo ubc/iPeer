@@ -389,16 +389,14 @@ class EvaluationsController extends AppController
 
         if (empty($this->params['data'])) {
             $group = array();
-            $group_events = $this->GroupEvent->getGroupEventByEventId($eventId);
             $userId = User::get('id');
-            foreach ($group_events as $events) {
-                if ($this->GroupsMembers->checkMembershipInGroup($events['GroupEvent']['group_id'], $userId) !== 0) {
-                    $group[] = $events['GroupEvent']['group_id'];
-                }
-            }
+            $grpMem = $this->GroupsMembers->find('first', array(
+                'conditions' => array('GroupsMembers.user_id' => $userId, 
+                    'GroupsMembers.group_id' => $groupId)
+            ));
 
             // filter out users that don't have access to this eval, invalid ids
-            if (!in_array($groupId, $group)) {
+            if (empty($grpMem)) {
                 $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/home/index');
                 return;

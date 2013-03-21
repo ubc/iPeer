@@ -2,19 +2,10 @@
 <tr>
     <th><?php __('Group Number'); ?></th>
     <th><?php __('Group Name'); ?></th>
-    <th><?php __('Status'); ?></th>
 </tr>
 <tr>
     <td><?php echo $data['Group']['group_num']; ?></td>
     <td><?php echo $data['Group']['group_name']; ?></td>
-    <td>
-    <?php
-    if( $data['Group']['record_status'] == "A" )
-        echo __("Active", true);
-    else
-        echo __("Inactive", true);
-    ?>
-    </td>
 </tr>
 </table>
 

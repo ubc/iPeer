@@ -623,13 +623,13 @@ class EventsController extends AppController
     /**
      * modifySchedule
      *
-     * @param mixed $eventid 
      * @param mixed $data    containing the data for the corresponding event
+     * @param mixed $eventid 
      *
      * @access public
      * @return void
      **/
-    function modifySchedule($eventid, $data){
+    function modifySchedule($data, $eventid){
         $this->EmailSchedule->deleteAll(array('event_id' => $eventid), false);
         $event = $this->Event->getEventById($eventid);        
         $this->setSchedule($eventid, $data);

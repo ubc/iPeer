@@ -15,10 +15,7 @@ echo $this->Form->input('group_num', array('size'=>'50', 'class'=>'input',
     'readonly' => true, 'value' => $group_num, 'label' => __('Group Number', true)));
 echo $this->Form->input('group_name', array('size'=>'50', 'class'=>'input', 'label' => __('Group Name', true),
     'readonly' => $readonly));
-echo $this->Form->input('record_status', array(
-    'options' => array('A' => __('Active', true), 'I' => __('Inactive', true)),
-     'empty' => false, 'disabled' => $readonly, 'label' => __('Status', true))
-        )?>
+?>
 <div class="input select">
 <?php echo $this->Form->label('', __('Members', true))?>
     <div style="margin-left: 14em; width: 28em; text-align:center">
