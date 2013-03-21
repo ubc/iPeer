@@ -924,7 +924,7 @@ i {
     margin-left: 24em;
 }
 
-#Events #titleWarning {
+#Events #titleWarning, #Events .selectAll {
     margin-left: 19em;
 }
 

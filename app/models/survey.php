@@ -74,6 +74,10 @@ class Survey extends EvaluationBase
                 'message' => 'Please fill in the name of the survey template.'
             ),
         ),
+        'availability' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Please select an availability option.'
+        )
     );
 
     /**

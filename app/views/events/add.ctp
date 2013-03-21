@@ -75,6 +75,10 @@ echo $this->Form->input(
 ); 
 echo $this->Form->input('Group',
     array('div' => array('id' => 'GroupsDiv'), 'label' => 'Group(s)')); ?>
+<div class='selectAll'>
+<?php echo $this->Form->button('Select All', array('type' => 'button', 'id' => 'selectAll'));
+echo $this->Form->button('Unselect All', array('type' => 'button', 'id' => 'unselectAll'));?>
+</div>
 <div class='help-text'><?php __('Holding "ctrl" or "command" key to select multiple groups.') ?></div>
 
 <?php
@@ -160,6 +164,14 @@ jQuery("#EventMixeval").change(updatePreview);
 changeCourseId();
 // attach event handlers to deal with changes in course selection
 jQuery("#EventCourseId").change(changeCourseId);
+// select all groups
+jQuery("#selectAll").click(function() {
+    jQuery("#GroupGroup option").prop('selected', true);
+});
+// unselect all groups
+jQuery("#unselectAll").click(function() {
+    jQuery("#GroupGroup option").prop('selected', false);
+});
 // keep track of the number of penalties entered.
 var penaltyCount = <?php echo $numPenalties; ?>;
 
