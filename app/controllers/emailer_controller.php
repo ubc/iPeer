@@ -166,12 +166,12 @@ class EmailerController extends AppController
         // class, group, user
         if ('C' == $type || 'G' == $type || null != $id) {
             if ('C' == $type) {
-                $group = $this->Course->find('first', array('conditions' => array('Course.id' => $id)));
+                $group = $this->Course->findById($id);
                 $this->breadcrumb->push(array('course' => $group['Course']));
             } else if ('G' == $type) {
-                $group = $this->Group->find('first', array('conditions' => array('Group.id' => $id)));
+                $group = $this->Group->findById($id);
             } else if (null != $id) {
-                $group = $this->User->find('first', array('conditions' => array('User.id' => $id)));
+                $group = $this->User->findById($id);
             }
 
             // check for valid id
@@ -192,14 +192,7 @@ class EmailerController extends AppController
         // for checking if the user can email to group with $id
         } else if ('G' == $type && !User::hasPermission('functions/email/allgroups')) {
             // check if they have access to group with $id
-            $group = $this->Group->find(
-                'first',
-                array(
-                    'conditions' => array(
-                        'Group.id' => $id
-                    )
-                )
-            );
+            $group = $this->Group->findById($id);
             if (!in_array($group['Course']['id'], array_keys($courseList))) {
                 $this->Session->setFlash(__('Error: You do not have permission to write emails to this group', true));
                 $this->redirect('index');
@@ -217,10 +210,8 @@ class EmailerController extends AppController
             $this->Session->write('email_recipients', $recipients['Users']);
             //Users who are not in recipients of the email
             $this->set('recipients_rest', $this->User->find('list', array(
-                'conditions'=>array('NOT' => array('User.id' => array_flip($this->getRecipient($type, $id, 'list')))))));
-            $this->set('from', $this->Auth->user('email'));
+                'conditions'=>array('NOT' => array('User.id' => Set::extract('/User/id', $recipients['Users']))))));
             $this->set('templatesList', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id'), 'list'));
-            $this->set('templates', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id')));
             $this->set('mergeList', $this->EmailMerge->getMergeList());
         } else {
             $recipients = $this->Session->read('email_recipients');
@@ -455,38 +446,28 @@ class EmailerController extends AppController
             $users = array();
             break;
         case 'C': //Email addresses for all in Course
-            $users = $this->User->find($s_type, array(
-                //'fields' => array('email'),
-                'conditions' => array('User.id' => $this->Course->getUserListbyCourse($id))
+            $users = $this->UserEnrol->find($s_type, array(
+                'conditions' => array('UserEnrol.course_id' => $id),
+                'contain' => array('User')
             ));
-            $course = $this->Course->find('first', array(
-                'fields' => array('id', 'course'),
-                'conditions' => array('Course.id' => $id)
-            ));
+            $users = Set::extract('/User', $users);
+            $course = $this->Course->findById($id);
             $display['name'] = __('All students in course: ', true).$course['Course']['course'];
             $display['link'] = '/users/goToClassList/'.$course['Course']['id'];
             break;
         case 'G': //Email addresses for all in group
             $users = $this->User->find($s_type, array(
-                //'fields' => array('email'),
                 'conditions' => array('User.id' => $this->GroupsMembers->getMembers($id))
             ));
-            $group = $this->Group->find('first', array(
-                'fields' => array('id', 'group_name'),
-                'conditions' => array('Group.id' => $id)
-            ));
+            $group = $this->Group->findById($id);
             $display['name'] = __('All students in  group: ', true).$group['Group']['group_name'];
             $display['link'] = '/groups/view/'.$group['Group']['id'];
             break;
         default: //Email address for a user
             $users = $this->User->find($s_type, array(
-                //'fields' => array('email'),
                 'conditions' => array('User.id' => $id)
             ));
-            $user = $this->User->find('first', array(
-                //'fields' => array('email'),
-                'conditions' => array('User.id' => $id)
-            ));
+            $user = $this->User->findById($id);
             $display['name'] = $user['User']['full_name'];
             $display['link'] = '/users/view/'.$user['User']['id'];
 

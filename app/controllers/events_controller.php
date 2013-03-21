@@ -371,8 +371,8 @@ class EventsController extends AppController
     /**
      * setSchedule
      * 
-     * @param mixed $eventid - id of the event for which the reminders are being set
-     * @param mixed $eventdata -  passing $this->data which contains the information for the event
+     * @param mixed $eventid   id of the event for which the reminders are being set
+     * @param mixed $eventdata passing $this->data which contains the information for the event
      * 
      * @access public
      * @return void
@@ -623,8 +623,8 @@ class EventsController extends AppController
     /**
      * modifySchedule
      *
-     * @param int eventid
-     * @param mixed data  containing the data for the corresponding event
+     * @param mixed $eventid 
+     * @param mixed $data    containing the data for the corresponding event
      *
      * @access public
      * @return void
