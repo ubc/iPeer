@@ -388,7 +388,6 @@ class EvaluationsController extends AppController
         $eventId = $event['Event']['id'];
 
         if (empty($this->params['data'])) {
-            $group = array();
             $userId = User::get('id');
             $grpMem = $this->GroupsMembers->find('first', array(
                 'conditions' => array('GroupsMembers.user_id' => $userId, 

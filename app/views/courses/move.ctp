@@ -19,11 +19,13 @@ echo $this->Form->input('action', array(
     'options' => array('1' => 'Move', '0' => 'Copy'),
     'default' => '1'
 ));
-echo $this->Form->end(array('label' => 'Submit', 'id' => 'submit', 'disabled' => 'disabled'));
+echo $this->Form->end(array('label' => 'Submit', 'id' => 'submit'));
 ?>
 
 </div>
 <script type="text/javascript">
+
+jQuery("#submit").attr("disabled", "disabled");
 
 jQuery().ready(function() {
     // creating empty options for select fields below the field that was changed

@@ -46,11 +46,12 @@ echo $this->Form->input('action', array(
     'legend' => __('Move or Copy?', true),
     'default' => '1'
 ));
-echo $this->Form->end(array('label' => 'Submit', 'id' => 'submit', 'disabled' => 'disabled'));
+echo $this->Form->end(array('label' => 'Submit', 'id' => 'submit'));
 ?>
 </div>
 <script type="text/javascript">
 
+jQuery("#submit").attr("disabled", "disabled");
 toggleDestSurveys();
 jQuery().ready(function() {
     // for changes in the user's choice for destination survey
