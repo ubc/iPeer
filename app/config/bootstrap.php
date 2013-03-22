@@ -49,7 +49,7 @@
  *
  */
 
-if(file_exists(dirname(__FILE__).'/bootstrap.local.php')) {
+if (file_exists(dirname(__FILE__).'/bootstrap.local.php')) {
   include('bootstrap.local.php');
 }
 
@@ -66,6 +66,6 @@ if (!file_exists(CONFIGS.'database.php')) {
   fclose($fd);
 }
 
-if (defined(DB_PREDEFINED)) {
+if (!defined('DB_PREDEFINED')) {
     define('DB_PREDEFINED', false);
 }
