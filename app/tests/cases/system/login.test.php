@@ -1,6 +1,6 @@
 <?php
 require_once('PHPWebDriver/WebDriver.php');
-require_once('PHPWebDriver/WebDriverBy.php');
+require_once('PHPWebDriver/WebDriver.php');
 require_once('PHPWebDriver/WebDriverWait.php');
 require_once('PageFactory.php');
 
@@ -14,7 +14,7 @@ class LoginTestCase extends CakeTestCase
 
     public function startCase()
     {
-        $wd_host = 'http://137.82.12.98:4444/wd/hub';
+        $wd_host = 'http://localhost::4444/wd/hub';
         $this->web_driver = new PHPWebDriver_WebDriver($wd_host);
         //$this->session = $this->web_driver->session('ie', array('version' => '8'));
         $this->session = $this->web_driver->session('firefox');
