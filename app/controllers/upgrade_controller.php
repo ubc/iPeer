@@ -30,7 +30,7 @@ class UpgradeController extends Controller
             $this->Session->setFlash(__('It seems you do not have a installation of iPeer. Please install it first!', true));
             $this->redirect('/install');
             return;
-        } elseif (!file_exists(TMP.'installed.txt')) {
+        } elseif (IS_INSTALLED) {
             // 2.x upgrade
             $sysp = ClassRegistry::init('SysParameter');
             if (null == $sysp->get('system.version', null)) {
@@ -39,8 +39,8 @@ class UpgradeController extends Controller
         }
 
         // 3.x and above upgrade, enable permission
-        // Workaround to avoid loading the User model with an iPeer2 database. 
-        // If we tried loading iPeer3's User model with an iPeer2 database, 
+        // Workaround to avoid loading the User model with an iPeer2 database.
+        // If we tried loading iPeer3's User model with an iPeer2 database,
         // we'll get missing table errors.
         App::import('Model', 'User');
         $permission = array_filter(array('controllers', ucwords($this->params['plugin']), ucwords($this->params['controller']), $this->params['action']));
@@ -63,7 +63,7 @@ class UpgradeController extends Controller
         $dbv = $this->SysParameter->get('database.version');
         // workaround for a mistake in a sql templates in v3.0.x where
         // we forgot to add the system.version entry into sys_parameters
-        if (empty($sysv) && $dbv == 4) 
+        if (empty($sysv) && $dbv == 4)
         { // upgrading from iPeer v3.0
             $sysv = '3.0.x';
             $dbv = 5;

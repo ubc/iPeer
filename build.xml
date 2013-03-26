@@ -47,7 +47,7 @@
         <mkdir dir="${project.basedir}/build/pdepend"/>
         <!-- Needed to enable the API controller tests -->
         <!-- make ipeer seem to be installed -->
-        <touch file="${project.basedir}/app/config/installed.txt" />
+        <touch file="${project.basedir}/app/tmp/installed.txt" />
         <!-- let Apache write to cache -->
         <exec command="chmod -R 777 ${project.basedir}/app/tmp"/>
     </target>

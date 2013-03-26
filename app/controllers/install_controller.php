@@ -43,7 +43,7 @@ class InstallController extends Controller
      * */
     function index()
     {
-        if (file_exists(TMP.'installed.txt')) {
+        if (IS_INSTALLED) {
             $this->Session->setFlash(__('WARNING: It looks like you already have a instance running. Reinstalling will remove all your current data. Remove '.TMP.'/installed.txt to proceed.', true));
         }
     }

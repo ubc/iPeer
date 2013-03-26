@@ -53,6 +53,19 @@ if (file_exists(dirname(__FILE__).'/bootstrap.local.php')) {
   include('bootstrap.local.php');
 }
 
+// because the installed.txt file has been moved from CONFIG to TMP
+// we need the following to move the file if the install.txt is still in the old
+// place
+if (!file_exists(dirname(__FILE__).'/../tmp/installed.txt') && file_exists(dirname(__FILE__).'/installed.txt')) {
+    copy(dirname(__FILE__).'/installed.txt', dirname(__FILE__).'/../tmp/installed.txt');
+    // in case we can't remove the old file, we will leave it there
+    @unlink(dirname(__FILE__).'/installed.txt');
+} else if (!file_exists(dirname(__FILE__).'/../tmp/installed.txt') && !file_exists(dirname(__FILE__).'/installed.txt')) {
+    define('IS_INSTALLED', 0);
+} else {
+    define('IS_INSTALLED', 1);
+}
+
 /**
  * Create an empty database.php file if one isn't found.
  *

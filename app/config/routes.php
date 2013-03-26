@@ -31,7 +31,7 @@
  * is located in the TMP directory.
  * */
 
-if (file_exists(TMP.'installed.txt')) {
+if (IS_INSTALLED) {
   // Disable access to the installer by redirecting all attempts to access
   // the installer to the index page. Except for install5, which is needed
   // to tell the user that an install was successful.
