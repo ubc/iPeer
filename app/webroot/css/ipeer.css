@@ -851,7 +851,11 @@ i {
 }
 
 #UserMergeForm td {
-    width: 50%
+    width: 50%;
+}
+
+#UserMergeForm div.submit {
+    clear: both;
 }
 
 /* Courses */
