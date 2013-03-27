@@ -1348,7 +1348,9 @@ class UsersController extends AppController
             $primaryTutor = Set::extract('/'.$model.'/course_id', $this->$model->findAllByUserId($primary));
             $secondaryTutor = Set::extract('/'.$model.'/course_id', $this->$model->findAllByUserId($secondary));
             $conflict = array_intersect($primaryTutor, $secondaryTutor);
-            $updated = $updated && $this->User->$functionNames[$model]($secondary, $conflict);
+            if ($conflict) {
+                $updated = $updated && $this->User->$functionNames[$model]($secondary, $conflict);
+            }
             $conflict = implode(',', $conflict);
             $name = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $model)).'s';
             $updated = $updated && $this->$model->query('UPDATE '.$name.' SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
@@ -1378,8 +1380,10 @@ class UsersController extends AppController
             $primaryEval = Set::extract('/'.$model.'/grp_event_id', $this->$model->findAllByEvaluator($primary));
             $secondaryEval = Set::extract('/'.$model.'/grp_event_id', $this->$model->findAllByEvaluator($secondary));
             $conflict = array_intersect($primaryEval, $secondaryEval);
-            $updated = $updated && $this->$model->deleteAll(
-                array('evaluator' => $secondary, 'grp_event_id' => $conflict));
+            if ($conflict) {
+                $updated = $updated && $this->$model->deleteAll(
+                    array('evaluator' => $secondary, 'grp_event_id' => $conflict));
+            }
             $conflict = implode(',', $conflict);
             $name = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $model)).'s';
             $updated = $updated && $this->$model->query('UPDATE '.$name.' SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
@@ -1418,8 +1422,10 @@ class UsersController extends AppController
             $secondaryUser = $this->$model[User::MERGE_MODEL]->findAllByUserId($secondary);
             $secondaryUser = Set::extract('/'.$model[User::MERGE_MODEL].'/'.$model[User::MERGE_FIELD], $secondaryUser);
             $conflict = array_intersect($primaryUser, $secondaryUser);
-            $updated = $updated && $this->$model[User::MERGE_MODEL]->deleteAll(
-                array('user_id' => $secondaryUser, $model[User::MERGE_FIELD] => $conflict));
+            if ($conflict) {
+                $updated = $updated && $this->$model[User::MERGE_MODEL]->deleteAll(
+                    array('user_id' => $secondaryUser, $model[User::MERGE_FIELD] => $conflict));
+            }
             $conflict = implode(',', $conflict);
             $change = 'UPDATE '.$model[User::MERGE_TABLE].' SET user_id='.$primary.' WHERE user_id='.$secondary;
             $change .= ($conflict) ? ' AND '.$model[User::MERGE_FIELD].' NOT IN ('.$conflict.');' : ';';
@@ -1458,11 +1464,15 @@ class UsersController extends AppController
         $evalConflict = array_intersect($primaryEval, $secondaryEval);  //grp_evnt_id
         $surveyConflict = array_intersect($primarySurvey, $secondarySurvey); //event_id
         //delete conflicted evaluation submissions by grp_event_id
-        $updated = $updated && $this->EvaluationSubmission->deleteAll(
-            array('EvaluationSubmission.submitter_id' => $secondary, 'EvaluationSubmission.grp_event_id' => $evalConflict));
+        if ($evalConflict) {
+            $updated = $updated && $this->EvaluationSubmission->deleteAll(
+                array('EvaluationSubmission.submitter_id' => $secondary, 'EvaluationSubmission.grp_event_id' => $evalConflict));
+        }
         //delete conflicted survey submissions by event_id
-        $updated = $updated && $this->EvaluationSubmission->deleteAll(
-            array('EvaluationSubmission.submitter_id' => $secondary, 'EvaluationSubmission.event_id' => $surveyConflict));
+        if ($surveyConflict) {
+            $updated = $updated && $this->EvaluationSubmission->deleteAll(
+                array('EvaluationSubmission.submitter_id' => $secondary, 'EvaluationSubmission.event_id' => $surveyConflict));
+        }
         $evalConflict = implode(',', $evalConflict);
         $surveyConflict = implode(',', $surveyConflict);
         
