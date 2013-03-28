@@ -54,13 +54,13 @@ class AddMixEvalTestCase extends CakeTestCase
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalZeroMark')->click();
         
         // likert question
-        $this->addLikert($this->session);
+        $this->addLikert();
         
         // sentence question
-        $this->addSentence($this->session);
+        $this->addSentence();
         
         // paragraph question
-        $this->addParagraph($this->session);
+        $this->addParagraph();
         
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="submit"]')->click();
         $session = $this->session;
@@ -76,74 +76,75 @@ class AddMixEvalTestCase extends CakeTestCase
         $this->assertEqual($msg, 'The mixed evaluation was saved successfully.');
         
         // delete the template
-        $this->deleteTemplate($this->session);
+        $this->deleteTemplate();
         $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'The Mixed Evaluation was removed successfully.');
     }
     
-    public function addLikert($session) 
+    public function addLikert() 
     {
-        $session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="button"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="button"]')->click();
         
-        $question = $session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion0Title');
+        $question = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion0Title');
         $question->sendKeys('In your opinion, how is their work ethics?');
         
-        $instructions = $session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion0Instructions');
+        $instructions = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion0Instructions');
         $instructions->sendKeys('Please be honest.');
         
-        $marks = $session->element(PHPWebDriver_WebDriverBy::ID, "MixevalQuestion0Multiplier");
+        $marks = $this->session->element(PHPWebDriver_WebDriverBy::ID, "MixevalQuestion0Multiplier");
         $marks->sendKeys('8');
         
-        $add = $session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="addDesc(0);"]');
+        $add = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="addDesc(0);"]');
         for ($i=0; $i<5; $i++) {
             $add->click();
         }
-        $w = new PHPWebDriver_WebDriverWait($session);
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
         $w->until(
             function($session) {
                 return (count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="DescsDiv0"] div')) - 4);
             }
         );
         for ($i=0; $i<5; $i++) {
-            $desc = $session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestionDesc'.$i.'Descriptor');
+            $desc = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestionDesc'.$i.'Descriptor');
             $mark = $i * 2;
             $desc->sendKeys($mark.' marks');
         }
     }
     
-    public function addSentence($session)
+    public function addSentence()
     {
-        $session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionType"] option[value="3"]')->click();
-        $session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ();"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionType"] option[value="3"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ();"]')->click();
         
-        $question = $session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion1Title');
+        $question = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion1Title');
         $question->sendKeys('Which part of the project was their greatest contribution?');
         
-        $instructions = $session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion1Instructions');
+        $instructions = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion1Instructions');
         $instructions->sendKeys('Choose one of the following: Research, Report, Presentation.');
         
-        $session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion1Required')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion1Required')->click();
     }
     
-    public function addParagraph($session)
+    public function addParagraph()
     {
-        $session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionType"] option[value="2"]')->click();
-        $session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ();"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionType"] option[value="2"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ();"]')->click();
         
-        $question = $session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion2Title');
+        $question = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion2Title');
         $question->sendKeys('What have they done well? How can they improve?');
         
-        $instructions = $session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion2Instructions');
+        $instructions = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion2Instructions');
         $instructions->sendKeys('Please give constructive comments.');
     }
     
-    public function deleteTemplate($session)
+    public function deleteTemplate()
     {
-        $session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation')->click();
         $title = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'Mixed Evaluations > View > Final Project Evaluation');
         
-        $templateId = end(explode('/', $session->url()));
-        $session->open($this->url.'mixevals/delete/'.$templateId);
+        $templateId = end(explode('/', $this->session->url()));
+        $this->session->open($this->url.'mixevals/delete/'.$templateId);
     }
 }
