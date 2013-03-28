@@ -8,8 +8,6 @@ class AddCourseTestCase extends CakeTestCase
 {
     protected $web_driver;
     protected $session;
-    protected $ini;
-    protected $browser;
     protected $url = "http://ipeerdev.ctlt.ubc.ca/";
     
     public function startCase()
