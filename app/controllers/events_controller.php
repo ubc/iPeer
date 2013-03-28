@@ -624,7 +624,7 @@ class EventsController extends AppController
      * modifySchedule
      *
      * @param mixed $data    containing the data for the corresponding event
-     * @param mixed $eventid
+     * @param mixed $eventid event id
      *
      * @access public
      * @return void
