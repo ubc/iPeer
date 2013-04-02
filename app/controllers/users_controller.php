@@ -56,9 +56,10 @@ class UsersController extends AppController
             'txt' => null,
             'csv' => null,
         ));
-        $this->FileUpload->uploadDir('../tmp');
+        $this->FileUpload->uploadDir(TMP);
         $this->FileUpload->fileModel(null);
         $this->FileUpload->attr('required', true);
+        $this->FileUpload->attr('forceWebroot', false);
     }
 
     /**
@@ -600,7 +601,7 @@ class UsersController extends AppController
         $user = $this->User->getByUsername($username);
         $userRole = $user['Role']['0']['RolesUser']['role_id'];
         $enrolled = Set::extract('/Tutor/id', $user) + Set::extract('/Enrolment/id', $user);
-        
+
         if ($userRole <= $roleId || !in_array($userRole, array(4,5))) {
             $this->Session->setFlash(__('Error: You do not have permission to enrol this user.', true));
             $this->redirect('/courses/home/'.$courseId);
@@ -610,7 +611,7 @@ class UsersController extends AppController
             $this->redirect('/courses/home/'.$courseId);
             return;
         }
-        
+
         // enrol students
         if ($userRole == 5) {
             $save = $this->User->addStudent($user['User']['id'], $courseId);
@@ -618,7 +619,7 @@ class UsersController extends AppController
         } else {
             $save = $this->User->addTutor($user['User']['id'], $courseId);
         }
-        
+
         if (!empty($save)) {
             $this->Session->setFlash(__('Student is successfully enrolled.', true), 'good');
         } else {
@@ -626,7 +627,7 @@ class UsersController extends AppController
         }
         $this->redirect('/courses/home/'.$courseId);
     }
-     
+
 
     /**
      * Given a user id, edit the information for that user
@@ -890,7 +891,7 @@ class UsersController extends AppController
         }
         $this->layout = 'ajax';
         $this->autoRender = false;
-        
+
         $message = __('Username "', true).$this->data['User']['username'].__('" already exists.', true);
         if (!is_null($courseId)) {
             $message = $message.'<br> To enrol, click '.
@@ -1076,14 +1077,14 @@ class UsersController extends AppController
             $this->render('userSummary');
         }
     }
-    
+
     /**
      * merge
      *
      * @access public
      * @return void
      */
-    function merge() 
+    function merge()
     {
         $searchValue = array(
             'full_name' => __('Full Name', true),
@@ -1099,23 +1100,23 @@ class UsersController extends AppController
             $secondaryAccount = $this->data['User']['secondaryAccount'];
             $primaryRole = $this->User->getRoleId($primaryAccount);
             $secondaryRole = $this->User->getRoleId($secondaryAccount);
-            
+
             // secondary account cannot be currently logged in user
             if (User::get('id') == $secondaryAccount) {
                 $this->Session->setFlash(__('Error: The secondary account is the currently logged in user.', true));
                 return;
             }
-            
+
             if ($primaryRole != $secondaryRole) {
                 $this->Session->setFlash(__('Error: The users do not have the same role.', true));
                 return;
             }
-            
+
             if ($primaryAccount == $secondaryAccount) {
                 $this->Session->setFlash(__('Error: No merger needed. The primary and secondary accounts are the same.', true));
                 return;
             }
-            
+
             //update transactions
             $updated = true;
             $this->User->begin();
@@ -1130,7 +1131,7 @@ class UsersController extends AppController
             // evaluation_submissions && email_schedules
             $updated = $updated && $this->_updateTablesWithUserId($updated, $primaryAccount, $secondaryAccount);
             $updated = $updated && $this->User->delete($secondaryAccount); // delete secondaryAccount
-            
+
             if ($updated) {
                 $this->Session->setFlash(__('The two accounts have successfully merged.', true), 'good');
                 $this->User->commit();
@@ -1140,7 +1141,7 @@ class UsersController extends AppController
             }
         }
     }
-    
+
     /**
      * ajax_merge_options
      *
@@ -1184,8 +1185,8 @@ class UsersController extends AppController
                     $options['UpdateDate'] = $user['User']['modified'];
                 }
         }
-        
-        
+
+
         asort($options);
         $this->set('options', $options);
     }
@@ -1299,7 +1300,7 @@ class UsersController extends AppController
         return "<div class='red'>User created but unable to send email
             notification: ". $this->Email->smtpError ."</div>";
     }
-    
+
     /**
      * _updateCreatorUpdaterId
      *
@@ -1339,8 +1340,8 @@ class UsersController extends AppController
     private function _updateUserCourse($updated, $primary, $secondary)
     {
         $functionNames = array(
-            'UserTutor' => 'removeTutor', 
-            'UserEnrol' => 'unenrolStudent', 
+            'UserTutor' => 'removeTutor',
+            'UserEnrol' => 'unenrolStudent',
             'UserCourse' => 'removeInstructor'
         );
         $models = array_keys($functionNames);
@@ -1362,7 +1363,7 @@ class UsersController extends AppController
 
         return $updated;
     }
-    
+
     /**
      * _updateEvaluations
      *
@@ -1393,10 +1394,10 @@ class UsersController extends AppController
             $change .= ($conflict) ? ' AND grp_event_id NOT IN ('.$conflict.');' : ';';
             $updated = $updated && $this->$model->query($change);
         }
-        
+
         return $updated;
     }
-    
+
     /**
      * _updateUserId
      *
@@ -1415,7 +1416,7 @@ class UsersController extends AppController
             array('SurveyInput', 'survey_inputs', 'event_id'),
             array('UserFaculty', 'user_faculties', 'faculty_id')
         );
-        
+
         foreach ($models as $model) {
             $primaryUser = $this->$model[User::MERGE_MODEL]->findAllByUserId($primary);
             $primaryUser = Set::extract('/'.$model[User::MERGE_MODEL].'/'.$model[User::MERGE_FIELD], $primaryUser);
@@ -1431,15 +1432,15 @@ class UsersController extends AppController
             $change .= ($conflict) ? ' AND '.$model[User::MERGE_FIELD].' NOT IN ('.$conflict.');' : ';';
             $updated = $updated && $this->$model[User::MERGE_MODEL]->query($change);
         }
-        
+
         //oauth_clients
         $updated = $updated && $this->OauthClient->query('UPDATE oauth_clients SET user_id='.$primary.' WHERE user_id='.$secondary.';');
         //oauth_tokens
         $updated = $updated && $this->OauthToken->query('UPDATE oauth_tokens SET user_id='.$primary.' WHERE user_id='.$secondary.';');
-        
+
         return $updated;
     }
-    
+
     /**
      * _updateTablesWithUserId
      *
@@ -1460,7 +1461,7 @@ class UsersController extends AppController
         $primarySurvey = $this->EvaluationSubmission->getEventIdSurveySub($primary);
         $secondaryEval = $this->EvaluationSubmission->getGrpEventIdEvalSub($secondary);
         $secondarySurvey = $this->EvaluationSubmission->getEventIdSurveySub($secondary);
-        
+
         $evalConflict = array_intersect($primaryEval, $secondaryEval);  //grp_evnt_id
         $surveyConflict = array_intersect($primarySurvey, $secondarySurvey); //event_id
         //delete conflicted evaluation submissions by grp_event_id
@@ -1475,7 +1476,7 @@ class UsersController extends AppController
         }
         $evalConflict = implode(',', $evalConflict);
         $surveyConflict = implode(',', $surveyConflict);
-        
+
         $change = 'UPDATE evaluation_submissions SET submitter_id='.$primary.' WHERE submitter_id='.$secondary;
         $change .= ($evalConflict || $surveyConflict) ? ' AND (' : ';';
         //append grp_event_id if any evaluation submissions are conflicted
@@ -1485,7 +1486,7 @@ class UsersController extends AppController
         $change .= ($surveyConflict) ? 'event_id NOT IN ('.$surveyConflict.')' : '';
         $change .= ($evalConflict || $surveyConflict) ? ');' : '';
         $updated = $updated && $this->EvaluationSubmission->query($change);
-        
+
         //email_schedules
         $updated = $updated && $this->EmailSchedule->query("UPDATE email_schedules SET creator_id=".$primary." WHERE creator_id=".$secondary.";");
         $updated = $updated && $this->EmailSchedule->query("UPDATE email_schedules SET `from`=".$primary." WHERE `from`=".$secondary.";");
