@@ -40,7 +40,13 @@ class GroupsController extends AppController
         // Return the processed data back
         return $data;
     }
-    
+
+    /**
+     * beforeFilter
+     *
+     * @access public
+     * @return void
+     */
     function beforeFilter()
     {
         parent::beforeFilter();
