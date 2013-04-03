@@ -32,7 +32,7 @@ class UserTestCase extends CakeTestCase {
     {
     }
 
-	function testFindUserByidWithField() {
+    function testFindUserByidWithField() {
         // no field restrictions, should be a flat array of
         // only data from the user field, no associations
         $ret = $this->User->findUserByidWithFields(4);
@@ -44,9 +44,9 @@ class UserTestCase extends CakeTestCase {
         $this->assertEqual(count($ret['User']), 2);
         $this->assertEqual($ret['User']['username'], 'instructor3');
         $this->assertEqual($ret['User']['id'], 4);
-	}
+    }
 
-	function testGetByUsername() {
+    function testGetByUsername() {
         $empty=null;
 
         //Test on valid student input
@@ -70,9 +70,9 @@ class UserTestCase extends CakeTestCase {
         //null input
         $nullInput = $this->User->getByUserName(null);
         $this->assertEqual($nullInput['username'], $empty);
-	}
+    }
 
-	function testGetEnrolledStudent() {
+    function testGetEnrolledStudent() {
         //Run tests
         $enrolledStudentList = $this->User->getEnrolledStudents(1);
         $actual = array();
@@ -80,57 +80,61 @@ class UserTestCase extends CakeTestCase {
             array_push($actual, $student['User']['username']);
         }
         $expect = array(
-            redshirt0027,
-            redshirt0022,
-            redshirt0028,
-            redshirt0017,
-            redshirt0013,
-            redshirt0024,
-            redshirt0011,
-            redshirt0029,
-            redshirt0002,
-            redshirt0001,
-            redshirt0009,
-            redshirt0015,
-            redshirt0003
+            'redshirt0027',
+            'redshirt0022',
+            'redshirt0028',
+            'redshirt0017',
+            'redshirt0013',
+            'redshirt0024',
+            'redshirt0011',
+            'redshirt0029',
+            'redshirt0002',
+            'redshirt0001',
+            'redshirt0009',
+            'redshirt0015',
+            'redshirt0003',
         );
         $this->assertTrue(count(array_diff($actual, $expect)) == 0);
 
         //Test an invalid corse, course_id==231321 (invalid)
         $invalidCourse = $this->User->getEnrolledStudents(231321);
         $this->assertEqual($invalidCourse, null);
-	}
+    }
 
-	function testGetEnrolledStudentsForList() {
+    function testGetEnrolledStudentsForList()
+    {
         //Test on a valid course with some student enrollment
-        //Set up test data
         $ret = $this->User->getEnrolledStudentsForList(1);
+        // should return an array with ids as key and student number + firstname +
+        // last name as value
         $expected = array(
-            '31' => 'redshirt0027 Hui Student',
-            '26' => 'redshirt0022 Bill Student',
-            '32' => 'redshirt0028 Bowinn Student',
-            '21' => 'redshirt0017 Nicole Student',
-            '17' => 'redshirt0013 Edna Student',
-            '28' => 'redshirt0024 Michael Student',
-            '15' => 'redshirt0011 Jennifer Student',
-            '33' => 'redshirt0029 Joe Student',
-            '6' => 'redshirt0002 Alex Student',
-            '5' => 'redshirt0001 Ed Student',
-            '13' => 'redshirt0009 Damien Student',
-            '19' => 'redshirt0015 Jonathan Student',
-            '7' => 'redshirt0003 Matt Student'
+            '31' => '10186039 Hui Student',
+            '26' => '19524032 Bill Student',
+            '32' => '19803030 Bowinn Student',
+            '21' => '22784037 Nicole Student',
+            '17' => '37116036 Edna Student',
+            '28' => '38058020 Michael Student',
+            '15' => '48877031 Jennifer Student',
+            '33' => '51516498 Joe Student',
+            '6' => '65468188 Alex Student',
+            '5' => '65498451 Ed Student',
+            '13' => '84188465 Damien Student',
+            '19' => '90938044 Jonathan Student',
+            '7' => '98985481 Matt Student'
         );
         $this->assertTrue(count(array_diff_assoc($ret, $expected)) == 0);
-	}
+    }
 
-	function testHashPassword() {
+    function testHashPassword()
+    {
         $input = array('User' => array('password' => 'frogleg'));
         $ret = $this->User->hashPasswords($input);
         $this->assertEqual($ret['User']['password'],
             '6f40a1a25eec7d325310dea310949005');
-	}
+    }
 
-	function testGetRoleName() {
+    function testGetRoleName()
+    {
         //user_id==1 : role(superadmin)
         $superAdminRole=$this->User->getRoleName(1);
         $this->assertEqual($superAdminRole, 'superadmin');
@@ -150,9 +154,9 @@ class UserTestCase extends CakeTestCase {
         //user_id==9999 : role(unassigned)
         $unassignedRole = $this->User->getRoleName(9999);
         $this->assertEqual($unassignedRole, null);
-	}
+    }
 
-	function testGetRoleId() {
+    function testGetRoleId() {
         //user_id==1 : role(superadmin)
         $superAdminRole = $this->User->getRoleId(1);
         $this->assertEqual($superAdminRole, '1');
@@ -172,30 +176,30 @@ class UserTestCase extends CakeTestCase {
         //user_id==9999 : role(unassigned)
         $unassignedRole = $this->User->getRoleId(9999);
         $this->assertEqual($unassignedRole, null);
-	}
+    }
 
-	function testGetRole() {
+    function testGetRole() {
         // NOTE: that we don't officially support multiple roles for
         // one user yet, so that's not tested.
 
         // test single user's role
         $ret = $this->User->getRoles(1);
         $this->assertEqual($ret[1], 'superadmin');
-	}
+    }
 
-	function testGetInstructor() {
+    function testGetInstructor() {
         $actual = $this->User->GetInstructors('all', array());
         $actual = Set::extract('/User/id', $actual);
         $expected = array('0' => 4, '1' => 2, '2' => 3);
         $this->assertTrue(count(array_diff_assoc($actual, $expected) == 0));
-	}
+    }
 
-	function testLoadRole() {
+    function testLoadRole() {
         $ret = $this->User->loadRoles(1);
         $this->assertEqual($ret['1'], 'superadmin');
         $ret = $this->User->loadRoles(2);
         $this->assertEqual($ret['3'], 'instructor');
-	}
+    }
 
     /*
      * Test adding a student to a course.
