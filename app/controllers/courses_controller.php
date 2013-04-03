@@ -49,9 +49,10 @@ class CoursesController extends AppController
             'txt' => null,
             'csv' => null,
         ));
-        $this->FileUpload->uploadDir('../tmp');
+        $this->FileUpload->uploadDir(TMP);
         $this->FileUpload->fileModel(null);
         $this->FileUpload->attr('required', true);
+        $this->FileUpload->attr('forceWebroot', false);
     }
 
     /**

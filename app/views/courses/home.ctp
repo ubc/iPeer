@@ -17,7 +17,7 @@ if ($data['Course']['record_status'] == 'I') {
   <tr>
     <td>
         <?php
-        echo (!empty($data['Course']['homepage'])) ? "<a href=".$data['Course']['homepage'].">
+        echo (!empty($data['Course']['homepage'])) ? "<a href=".$data['Course']['homepage']." target='_blank'>
             <img src='/img/icons/home.gif' border='0'></a>" : "None";
         ?>
     </td>

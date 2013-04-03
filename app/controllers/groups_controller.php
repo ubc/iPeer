@@ -16,8 +16,8 @@ class GroupsController extends AppController
     public $name = 'Groups';
     public $uses =  array('Group', 'GroupsMembers', 'User', 'Personalize', 'GroupEvent', 'Course', 'EvaluationSubmission',
         'UserEnrol', 'UserTutor');
-    public $helpers = array('Html', 'Ajax', 'Javascript', 'Time');
-    public $components = array('AjaxList', 'ExportBaseNew', 'ExportCsv');
+    public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'FileUpload.FileUpload');
+    public $components = array('AjaxList', 'ExportBaseNew', 'ExportCsv', 'FileUpload.FileUpload');
 
     /**
      * _postProcess
@@ -39,6 +39,24 @@ class GroupsController extends AppController
         }
         // Return the processed data back
         return $data;
+    }
+    
+    function beforeFilter()
+    {
+        parent::beforeFilter();
+        
+        $allowTypes = array(
+            'text/plain', 'text/csv', 'application/csv',
+            'application/csv.ms-excel', 'application/octet-stream',
+            'text/comma-separated-values', 'text/anytext');
+        $this->FileUpload->allowedTypes(array(
+            'txt' => null,
+            'csv' => null,
+        ));
+        $this->FileUpload->uploadDir(TMP);
+        $this->FileUpload->fileModel(null);
+        $this->FileUpload->attr('required', true);
+        $this->FileUpload->attr('forceWebroot', false);
     }
 
     // =-=-=-=-=-== New list routines =-=-=-=-=-===-=-
@@ -348,26 +366,23 @@ class GroupsController extends AppController
                 true : false;
             $identifier = $this->params['data']['Group']['identifiers'];
 
-            $uploadDir = "../tmp/";
-            $uploadFile = $uploadDir.$filename;
-
             //check that a file is attached
             if (trim($filename) == "") {
                 $this->Session->setFlash(__('Please select a file to upload.', true));
                 $this->redirect('import/'.$courseId);
                 return;
             }
-            //Return true if valid, else error msg
-            $validUploads = $this->framework->validateUploadFile($tmpFile, $filename, $uploadFile);
-            if ($validUploads === true) {
+
+            if ($this->FileUpload->success) {
+                $uploadFile = $this->FileUpload->uploadDir.DS.$this->FileUpload->finalFile;
                 // Get file into an array.
-                $lines = file($uploadFile, FILE_SKIP_EMPTY_LINES);
-                // Delete the uploaded file
-                unlink($uploadFile);
+                $lines = Toolkit::parseCSV($uploadFile);
                 //Mass create groups
                 $this->_addGroupByImport($lines, $courseId, $update, $identifier);
+                // Delete the uploaded file
+                $this->FileUpload->removeFile($uploadFile);
             } else {
-                $this->Session->setFlash(__('Error: File was not successfully processed.', true));
+                $this->Session->setFlash($this->FileUpload->showErrors());
                 $this->redirect('import/'.$courseId);
                 return;
             }
@@ -401,11 +416,10 @@ class GroupsController extends AppController
             return array();
         }
 
-        // Remove duplicate lines
-        $lines = array_unique($lines);
+        // Remove duplicate entries
+        $lines = array_map("unserialize", array_unique(array_map("serialize", $lines)));
         
         // pre-process the lines in the file first
-        $lines = array_map("str_getcsv", array_map("trim", $lines));
         $filter = 'return (count(array_filter($user)) != 2);';
         $invalid = array_filter($lines, create_function('$user', $filter));
         $valid = array_diff_key($lines, $invalid); 
