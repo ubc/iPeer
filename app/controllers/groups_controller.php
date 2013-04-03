@@ -367,7 +367,6 @@ class GroupsController extends AppController
             $courseId = $this->params['data']['Group']['Course'];
             $this->params['data']['Group']['course_id'] = $courseId;
             $filename = $this->params['form']['file']['name'];
-            $tmpFile = $this->params['form']['file']['tmp_name'];
             $update = ($this->params['data']['Group']['update_groups']) ? 
                 true : false;
             $identifier = $this->params['data']['Group']['identifiers'];

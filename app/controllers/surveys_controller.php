@@ -62,12 +62,10 @@ class SurveysController extends AppController
     /**
      * setUpAjaxList
      *
-     * @param bool $conditions
-     *
      * @access public
      * @return void
      */
-    function setUpAjaxList($conditions = array())
+    function setUpAjaxList()
     {
         $myID = $this->Auth->user('id');
 
