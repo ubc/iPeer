@@ -11,6 +11,7 @@
             <select name="export_type" class="export_type">
                 <!--<option value="excel">excel</option>-->
                 <option value="csv">csv</option>
+                <option value="pdf">pdf</option>
             </select>
       </td>
     </tr>

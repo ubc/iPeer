@@ -25,7 +25,7 @@ class EvaluationsController extends AppController
         'MixevalQuestionDesc');
     public $components = array('ExportBaseNew', 'Auth', 'AjaxList', 'Output',
         'userPersonalize', 'framework',
-        'Evaluation', 'Export', 'ExportCsv', 'ExportExcel');
+        'Evaluation', 'Export', 'ExportCsv', 'ExportExcel','ExportPdf');
 
     /**
      * __construct
@@ -300,11 +300,15 @@ class EvaluationsController extends AppController
             }
 
             $fileName = isset($this->params['form']['file_name']) && !empty($this->params['form']['file_name']) ? $this->params['form']['file_name']:date('m.d.y');
-            header('Content-Type: application/csv');
-            header('Content-Disposition: attachment; filename=' . $fileName . '.csv');
+           
             switch($this->params['form']['export_type']) {
             case "csv" :
+                header('Content-Type: application/csv');
+                header('Content-Disposition: attachment; filename=' . $fileName . '.csv');
                 $this->ExportCsv->createCsv($this->params['form'], $event);
+                break;
+            case "pdf":
+                $this->ExportPdf->createPdf($this->params['form'], $event);
                 break;
             case "excel" :
                 $this->ExportExcel->createExcel($this->params['form'], $event);
