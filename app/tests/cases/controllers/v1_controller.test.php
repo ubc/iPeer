@@ -9,7 +9,7 @@ class V1ControllerTest extends CakeTestCase {
         'app.response', 'app.survey_question', 'app.user_course',
         'app.user_enrol', 'app.groups_member', 'app.survey',
         'app.faculty', 'app.department', 'app.course_department',
-        'app.user_faculty', 'app.user_tutor', 'app.sys_parameter',
+        'app.user_faculty', 'app.user_tutor',
         'app.penalty', 'app.oauth_client', 'app.oauth_token',
         'app.survey_input',
     );
@@ -284,6 +284,13 @@ class V1ControllerTest extends CakeTestCase {
         $importUserId = $expectedUsers['1']['id'];
 
         $this->assertEqual($users, $expectedUsers);
+
+        // POST - special characters in the user data
+        $users = "[{\"id\":0,\"username\":\"student1111\",\"email\":\"\\tbademail@example.com\",\"role_id\":5,\"first_name\":\"Yu\",\"last_name\":\"Lee\",\"student_no\":\"67777777\"}]";
+        $file = $this->_oauthReq($url, $users, OAUTH_HTTP_METHOD_POST);
+        $users = json_decode($file, true);
+        // check if the user is correctly inserted
+        $this->assertEqual($users[0]['username'], 'student1111');
 
         // PUT - update user
         $updatedPerson = array('id' => $userId, 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane', 'role_id' => 4);

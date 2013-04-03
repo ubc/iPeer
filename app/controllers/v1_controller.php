@@ -11,7 +11,8 @@
 class V1Controller extends Controller {
 
     public $name = 'V1';
-    public $uses = array('User', 'RolesUser',
+    public $uses = array(
+        'User', 'RolesUser',
         'Group', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric',
         'EvaluationMixeval', 'OauthClient', 'OauthNonce', 'OauthToken',
         'GroupsMembers', 'GroupEvent', 'Department', 'Role', 'CourseDepartment',
@@ -325,6 +326,8 @@ class V1Controller extends Controller {
             if (isset($decode['username'])) {
                 $role = array('Role' => array('RolesUser' => array('role_id' => $decode['role_id'])));
                 unset($decode['role_id']);
+                // do some clean up before we insert the values
+                array_walk($decode, create_function('&$val', '$val = trim($val);'));
                 $user = array('User' => $decode);
                 $user = $user + $role;
 
@@ -346,6 +349,9 @@ class V1Controller extends Controller {
                 foreach ($decode as $person) {
                     $pRole = array('Role' => array('RolesUser' => array('role_id' => $person['role_id'])));
                     unset($person['role_id']);
+                    // do some clean up before we insert the values
+                    array_walk($person, create_function('&$val', '$val = trim($val);'));
+                    $this->log(print_r($person, true), 'debug');
                     $pUser = array('User' => $person);
                     $data[] = $pUser + $pRole;
                 }
