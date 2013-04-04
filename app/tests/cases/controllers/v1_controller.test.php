@@ -466,9 +466,20 @@ class V1ControllerTest extends CakeTestCase {
             array('username' => 'redshirt0004'),
             array('username' => 'redshirt0005'),
             array('username' => 'redshirt0006'));
-        $addedMembers = $this->_oauthReq("$url", json_encode($toBeAdded), OAUTH_HTTP_METHOD_POST);
+        $addedMembers = $this->_oauthReq($url, json_encode($toBeAdded), OAUTH_HTTP_METHOD_POST);
 
         $this->assertEqual(json_decode($addedMembers, true), $toBeAdded);
+
+        // test adding non existing user to a group
+        $toBeAdded = array(
+            array('username' => 'nonexistinguser'),
+        );
+        $addedMembers = $this->_oauthReq($url, json_encode($toBeAdded), OAUTH_HTTP_METHOD_POST);
+
+        $this->assertEqual(json_decode($addedMembers, true), array());
+        // make user nothing is added
+        $actualGroup = $this->_oauthReq("$url");
+        $this->assertEqual(count(json_decode($actualGroup, true)), 7);
 
         // HTTP DELETE, try to remove students from a group
         $ret = $this->_oauthReq("$url/redshirt0004",null,OAUTH_HTTP_METHOD_DELETE);

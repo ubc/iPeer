@@ -634,6 +634,10 @@ class V1Controller extends Controller {
             foreach ($users as $user) {
                 $userId = $this->User->field('id',
                     array('username' => $user['username']));
+                // skip the non-existing users
+                if (!$userId) {
+                    continue;
+                }
                 $tmp = array('group_id' => $groupId, 'user_id' => $userId);
                 // try to add this user to group
                 $this->GroupsMembers->create();
