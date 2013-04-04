@@ -114,7 +114,7 @@ class EmailerController extends AppController
 
         // Set up the list itself
         $this->AjaxList->setUp($this->EmailSchedule, $columns, $actions,
-            "EmailSchedule.date", "EmailSchedule.id", $joinTables, $extraFilters);
+            "EmailSchedule.date", "EmailSchedule.subject", $joinTables, $extraFilters);
     }
 
     /**
