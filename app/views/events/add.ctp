@@ -70,7 +70,8 @@ echo $this->Form->input(
         'type' => 'radio',
         'options' => array('0'=> 'Disable', '1' => '1 Day', '2'=>'2 Days','3'=>'3 Days','4'=>'4 Days','5'=>'5 Days','6'=>'6 Days'
          ,'7'=>'7 Days'),
-        'default' => '0'
+        'default' => '0',
+        'div' => array('id' => 'emailSchedule')
     )
 ); 
 echo $this->Form->input('Group',
@@ -264,6 +265,7 @@ function toggleEventTemplate() {
         jQuery("div.selectAll").show();
         updatePreview();
     }
+    jQuery('#emailSchedule').show(); // show email reminder frequency at all times
 }
 
 // redirects user to a new events add view based on the course selected

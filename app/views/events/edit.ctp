@@ -101,7 +101,8 @@ echo $this->Form->input(
         'type' => 'radio',
         'options' => array('0'=> 'Disable', '1' => '1 Day', '2'=>'2 Days','3'=>'3 Days','4'=>'4 Days','5'=>'5 Days','6'=>'6 Days'
          ,'7'=>'7 Days'),
-         'default' => "$email_schedule"
+         'default' => "$email_schedule",
+         'div' => array('id' => 'emailSchedule')
     )
 ); 
 
@@ -294,6 +295,7 @@ function toggleEventTemplate() {
         jQuery("div.selectAll").show();
         updatePreview();
     }
+    jQuery('#emailSchedule').show(); // shows email reminder frequency at all times
 }
 
 // update event id for the preview link
