@@ -251,7 +251,7 @@ class V1Controller extends Controller {
         if (!$this->RequestHandler->isGet()) {
             $this->body = trim(file_get_contents('php://input'), true);
         }
-        $this->log('Got API request '. print_r($_REQUEST, true)."\nBody: ".$this->body, 'debug');
+        $this->log('Got API request: '. $this->getRequestInfo($_REQUEST, $this->body), 'api');
 
         // use oauth=0 paramter in url to bypass oauth checking
         if (!(Configure::read('debug') != 0 && isset($_REQUEST['oauth'])) &&
@@ -351,7 +351,6 @@ class V1Controller extends Controller {
                     unset($person['role_id']);
                     // do some clean up before we insert the values
                     array_walk($person, create_function('&$val', '$val = trim($val);'));
-                    $this->log(print_r($person, true), 'debug');
                     $pUser = array('User' => $person);
                     $data[] = $pUser + $pRole;
                 }
@@ -363,14 +362,14 @@ class V1Controller extends Controller {
                     if ($ret) {
                         $statusCode = 'HTTP/1.1 201 Created';
                         $sUser[] = $decode[$key]['username'];
-                        $this->log('User created successful: '. $decode[$key]['username'], 'debug');
+                        $this->log('User created successful: '. $decode[$key]['username'], 'api');
                     } else {
                         $temp = array();
                         $temp['username'] = $decode[$key]['username'];
                         $temp['first_name'] = $decode[$key]['first_name'];
                         $temp['last_name'] = $decode[$key]['last_name'];
                         $uUser[] = $temp;
-                        $this->log('User created failed: '. $decode[$key]['username'], 'debug');
+                        $this->log('User created failed: '. $decode[$key]['username'], 'api');
                     }
                 }
                 $sbody = $this->User->find('all', array(
@@ -932,13 +931,13 @@ class V1Controller extends Controller {
                     $table = null;
                     if ($role == 'student') {
                         $ret = $this->User->addStudent($userId, $courseId);
-                        $this->log('Adding student '.$user['username'].' to course '.$courseId, 'debug');
+                        $this->log('Adding student '.$user['username'].' to course '.$courseId, 'api');
                     } else if ($role == 'instructor') {
                         $ret = $this->User->addInstructor($userId, $courseId);
-                        $this->log('Adding instructor '.$user['username'].' to course '.$courseId, 'debug');
+                        $this->log('Adding instructor '.$user['username'].' to course '.$courseId, 'api');
                     } else if ($role == 'tutor') {
                         $ret = $this->User->addTutor($userId, $courseId);
-                        $this->log('Adding tutor '.$user['username'].' to course '.$courseId, 'debug');
+                        $this->log('Adding tutor '.$user['username'].' to course '.$courseId, 'api');
                     } else {
                         $this->set('error', array('code' => 400, 'message' => 'Unsupported role for '.$user['username']));
                         $this->render('error');
@@ -987,5 +986,21 @@ class V1Controller extends Controller {
             $this->set('result', $users);
         }
         $this->render('json');
+    }
+
+    protected function getRequestInfo($request, $body)
+    {
+        $ret = '';
+        $ret .= $_SERVER['REQUEST_METHOD'] . ' ' . $request['url']. "\n";
+        $ret .= "Params: \n";
+        foreach ($request as $key => $value) {
+            if ($key == 'url') {
+                continue;
+            }
+            $ret .= "    ".$key.": ".$value."\n";
+        }
+        $ret .= "Body: ".$body;
+
+        return $ret;
     }
 }
