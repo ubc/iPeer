@@ -58,7 +58,7 @@ function fnFormatDetails ( oTable, nTr )
     sOut += '</li>';
 
     sOut += '<li>';
-    sOut += '<a href="<?php echo $this->base; ?>/users/resetPassword/'+aData[0]+'/<?php echo $courseId?>">Reset Password</a>';
+    sOut += '<a href="<?php echo $this->base; ?>/users/resetPassword/'+aData[0]+'/<?php echo $courseId?>" onclick="return resetConfirmed()">Reset Password</a>';
     sOut += '</li>';
 
     sOut += '<li>';
@@ -73,6 +73,12 @@ function fnFormatDetails ( oTable, nTr )
 function dropConfirmed(name)
 {
     var confirmed = confirm("Are you sure you want to drop " + name + " from the course?");
+    return confirmed;
+}
+
+function resetConfirmed()
+{
+    var confirmed = confirm("Resets student's password. Are you sure?");
     return confirmed;
 }
 

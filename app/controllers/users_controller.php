@@ -774,11 +774,10 @@ class UsersController extends AppController
 
             if ($this->__processForm()) {
                 $this->__setSessionData($this->data['User']);
-                $this->Session->setFlash((__("Your Profile Has Been Updated Successfully.", true)."<br /><br />" .
-                    "<a href='../../home/'>".__('Go to your iPeer Home page.', true)."</a><br />"), 'good');
+                $this->Session->setFlash((__("Your Profile Has Been Updated Successfully.", true)), 'good');
             }
         }
-        if ($this->User->getRoleName($id) == "student") {
+        if (in_array($this->User->getRoleName($id), array("student", "tutor"))) {
             $isStudent = true;
         } else {
             $isStudent = false;

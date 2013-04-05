@@ -44,7 +44,7 @@
       echo "    $('statusMsg').innerHTML = '".__('Too many points, need to unallocate', true)." <font color=red>' + diff + '</font> ".__('points.')." ';";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments != 0) {";
-      echo "    $('statusMsg').innerHTML = '".__('Too many points, need to unallocate', true)." <font color=red>' + diff + '</font> ".__('points.<br />There are still', true)." <font color=red>' + emptyComments + '</font> ".__('comments to be filled.', true)." ';";
+      echo "    $('statusMsg').innerHTML = '".__('Too many points, need to unallocate', true)." <font color=red>' + diff + '</font> ".__('points.<br />There are still', true)." <font color=red>' + emptyComments + '</font> ".__(' comments to be filled.', true)." ';";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments == 0) {";
       echo "    $('statusMsg').innerHTML = '".__('Too many points, need to unallocate', true)." <font color=red>' + diff + '</font ".__('points.<br />All comments are filled.', true)." ';";
@@ -58,7 +58,7 @@
       echo "    $('statusMsg').innerHTML = '".__('Please allocate', true)." <font color=green>' + diff + '</font> ".__('more points.', true)."';";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments != 0) {";
-      echo "    $('statusMsg').innerHTML = '".__('Please allocate', true)." <font color=green>' + diff + '</font>".__(' more points.<br />There are still', true)." <font color=red>' + emptyComments+ '</font>".__('comments to be filled.', true)."';";
+      echo "    $('statusMsg').innerHTML = '".__('Please allocate', true)." <font color=green>' + diff + '</font>".__(' more points.<br />There are still', true)." <font color=red>' + emptyComments+ '</font>".__(' comments to be filled.', true)."';";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments == 0) {";
       echo "    $('statusMsg').innerHTML = '".__('Please allocate', true)." <font color=green>' + diff + '</font>".__(' more points.<br />All comments are filled.', true)."';";
