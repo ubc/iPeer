@@ -994,6 +994,15 @@ i {
     font-style: italic;
 }
 
+/* SysParameters */
+#sysParam .text label, #sysParam .select label {
+    width: 18em;
+}
+
+#sysParam .text input {
+    width: 20em;
+}
+
 /* ajax pagination */
 
 .ajax_paginate {
