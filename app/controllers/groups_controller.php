@@ -456,7 +456,7 @@ class GroupsController extends AppController
             'conditions' => array('course_id' => $courseId), 'fields' => 'user_id'));
         $students = $this->UserEnrol->find('list', array(
             'conditions' => array('course_id' => $courseId), 'fields' => 'user_id'));
-        $enrolled = $tutors + $students;
+        $enrolled = array_merge($tutors, $students);
         foreach ($users as $groupName => $members) {
             $identifiers = array_keys($members);
             $members = $this->User->find('list', array(

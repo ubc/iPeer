@@ -58,6 +58,7 @@ class EmailtemplatesController extends AppController
         $columns = array(
             array("EmailTemplate.id",   "",       "",        "hidden"),
             array("EmailTemplate.name", __("Name", true),   "12em",    "action",   "View Email Template"),
+            array("EmailTemplate.availability", __("Availability", true), "6em", "map", array("1" => __("public", true), "0" => __("private", true))),
             array("EmailTemplate.subject", __("Subject", true),   "12em",    "string"),
             array("EmailTemplate.description", __("Description", true), "auto",  "string"),
             array("EmailTemplate.creator_id",           "",            "",     "hidden"),
@@ -70,7 +71,7 @@ class EmailtemplatesController extends AppController
         $jointTableCreator =
             array("id"         => "Creator_id",
                 "localKey"   => "creator_id",
-                "description" => __("Email Template to show:", true),
+                "description" => __("Email Templates to show:", true),
                 "default" => $myID,
                 "list" => $userList,
                 "joinTable"  => "users",

@@ -351,11 +351,16 @@ AjaxList.prototype.renderSelectionMaps = function (div) {
             }
             // Get the proper plural
             var text = column[DESC_COL];
-            text += (text.length > 1 && text.charAt(text.length - 1) == 's') ? "es" : "s";
+            //starting to create weird words (eg. Availabilitys)
+            //text += (text.length > 1 && text.charAt(text.length - 1) == 's') ? "es" : "s";
 
             div.appendChild(document.createTextNode(" " + text));
             atLeastOneMapAdded = true;
         }
+    }
+    if (atLeastOneMapAdded) {
+        // adding a period to separate the maps with the next section
+        div.appendChild(document.createTextNode(". "));
     }
     return atLeastOneMapAdded;
 }

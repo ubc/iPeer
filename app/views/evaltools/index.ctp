@@ -94,6 +94,7 @@ foreach($surveyData as $data) {
 // data processing for email templates
 $templateheaders = array(
     __('Name', true),
+    __('Public', true),
     __('Subject', true),
     __('Description', true)
 );
@@ -103,6 +104,9 @@ foreach($emailTemplates as $data) {
     $row = array();
     $row[] = $html->link($emailTemplate['name'],
         '/emailtemplates/view/'.$emailTemplate['id']);
+    $row[] = $emailTemplate['availability'] == "1" ?
+        $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
+        $html->image('icons/red_x.gif', array('alt'=>'red_x'));
     $row[] = $emailTemplate['subject'];
     $row[] = $emailTemplate['description'];
     $templatecells[] = $row;
