@@ -252,11 +252,12 @@ ALTER TABLE mixevals DROP lickert_question_max;
 ALTER TABLE mixevals DROP scale_max;
 ALTER TABLE mixevals DROP prefill_question_max;
 
+DROP TABLE IF EXISTS `mixeval_question_types`;
 CREATE TABLE IF NOT EXISTS `mixeval_question_types` (
 	`id` int(11) NOT NULL AUTO_INCREMENT,
 	`type` varchar(255) NOT NULL DEFAULT '',
 	PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 INSERT INTO `mixeval_question_types` (`id`, `type`) VALUES
 (1, 'Likert'),

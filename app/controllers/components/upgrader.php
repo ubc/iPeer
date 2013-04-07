@@ -11,6 +11,8 @@
 class UpgraderComponent extends Object
 {
     public $scripts = array();
+    public $errors = array();
+    protected $controller = null;
 
     /**
      * __construct
@@ -73,7 +75,12 @@ class UpgraderComponent extends Object
         foreach ($this->scripts as $script) {
             if ($script->isUpgradable()) {
                 if (!$script->upgrade()) {
-                    $this->controller->Session->setFlash(join(';', $script->errors));
+                    if ($this->controller != null) {
+                        $this->controller->Session->setFlash(join(';', $script->errors));
+                    } else {
+                        // if no controller (may be called from CLI)
+                        $this->errors = array_merge($this->errors, $script->errors);
+                    }
                     return false;
                 }
             }
