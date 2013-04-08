@@ -225,6 +225,10 @@
         <phingcall target="post-test"/>
     </target>
 
+    <target name="upgrade" description="Upgrade iPeer">
+        <exec command="cake/console/cake upgrade" passthru="true"/>
+    </target>
+
     <target name="phpcb"
         description="Aggregate tool output with PHP_CodeBrowser">
         <exec executable="phpcb">
