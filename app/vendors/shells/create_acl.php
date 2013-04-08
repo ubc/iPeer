@@ -495,10 +495,6 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Users');
         $this->Acl->allow($role, 'controllers/Evaluations');
         $this->Acl->allow($role, 'controllers/guard/guard/logout');
-        $this->Acl->allow($role, 'controllers/Oauthclients/add');
-        $this->Acl->allow($role, 'controllers/Oauthclients/delete');
-        $this->Acl->allow($role, 'controllers/Oauthtokens/add');
-        $this->Acl->allow($role, 'controllers/Oauthtokens/delete');
         $this->Acl->deny($role, 'functions');
         $this->Acl->allow($role, 'functions/emailtemplate');
         $this->Acl->allow($role, 'functions/evaluation');
