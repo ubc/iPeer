@@ -119,8 +119,10 @@ class SysParametersController extends AppController
      */
     function view($id)
     {
-        $this->SysParameter->id = $id;
-        $this->set('data', $this->SysParameter->read());
+        $this->data = $this->SysParameter->findById($id);
+        $types = array('S'=>__('String', true),'I'=>__('Integer', true), 'B'=>__('Boolean', true));
+        $this->set('types', $types);
+        $this->set('title_for_layout', 'View Sys Parameters');
     }
 
     /**
