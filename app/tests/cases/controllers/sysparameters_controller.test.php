@@ -84,10 +84,10 @@ class SysparametersControllerTest extends ExtendedAuthTestCase {
 
     function testView() {
         $result = $this->testAction('/sysparameters/view/1', array('return' => 'vars'));
-        $this->assertEqual($result['data']['SysParameter']['parameter_code'], 'system.super_admin');
-        $this->assertEqual($result['data']['SysParameter']['parameter_value'], 'root');
-        $this->assertEqual($result['data']['SysParameter']['parameter_type'], 'S');
-        $this->assertEqual($result['data']['SysParameter']['record_status'], 'A');
+        $this->assertEqual($this->controller->data['SysParameter']['parameter_code'], 'system.super_admin');
+        $this->assertEqual($this->controller->data['SysParameter']['parameter_value'], 'root');
+        $this->assertEqual($this->controller->data['SysParameter']['parameter_type'], 'S');
+        $this->assertEqual($this->controller->data['SysParameter']['record_status'], 'A');
     }
 
     //TODO test saving
