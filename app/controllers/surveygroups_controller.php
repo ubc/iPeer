@@ -61,7 +61,7 @@ class SurveyGroupsController extends AppController
         // Set up Columns
         $columns = array(
             array("SurveyGroupSet.id",            "",            "",      "hidden"),
-            array("Event.title",      __("Event", true),         "auto",  "string",   ""),
+            array("Event.title",      __("Event", true),         "auto",  "action",   "View/Edit Group Set"),
             array("SurveyGroupSet.set_description",        __("Group Set Name", true),      "13em",  "string", ""),
             array("SurveyGroupSet.group_count",        __("Number of Groups", true),      "13em",  "number", ""),
             array("!Custom.isReleased",         __("Released?", true),       "9em", "string"),
@@ -81,7 +81,7 @@ class SurveyGroupsController extends AppController
         $recursive = 0;
 
         $this->AjaxList->setUp($this->SurveyGroupSet, $columns, $actions,
-            "SurveyGroupSet.id", "SurveyGroupSet.id", array(), $extraFilters, $recursive, 'postProcess');
+            "SurveyGroupSet.id", "Event.title", array(), $extraFilters, $recursive, 'postProcess');
     }
 
     /**

@@ -27,7 +27,7 @@ class oauthTokenTestCase extends CakeTestCase
     public function endCase()
     {
         $this->session->deleteAllCookies();
-        //$this->session->close();
+        $this->session->close();
     }
     
     public function testAddOauthToken()
