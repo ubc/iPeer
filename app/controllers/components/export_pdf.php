@@ -89,6 +89,10 @@ Class ExportPdfComponent extends ExportBaseNewComponent
            //Write the Rubric Scores Table And The Evaluation Results
            $rtbl = $this->_writeRubricResultsTbl($event,$grp_event_id,$grp_id); 
            $spdf->writeHTML($rtbl,true, false, true, false, '');
+           
+           $spdf->writeHTML('<h3>Evaluation Results</h3>',true, false, true, false, '');
+           $eResultsTbl = $this->_writeRubricEvalResults($event,$grp_event_id,$grp_id); 
+           $spdf->writeHTML($eResultsTbl,true, false, true, false, '');
 
            $spdf->lastPage();
            $spdf->addPage();
@@ -114,8 +118,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
          $this->RubricsCriteria= ClassRegistry::init('RubricsCriteria');
          $this->EvaluationRubricDetail= ClassRegistry::init('EvaluationRubricDetail');
          $rubric = $this->EvaluationRubric->
-         find('first', array(
-            'conditions' => array('EvaluationRubric.grp_event_id' => $grp_event_id, 'EvaluationRubric.event_id' => $event['Event']['id'])));
+         find('first', array('conditions' => array('EvaluationRubric.grp_event_id' => $grp_event_id, 'EvaluationRubric.event_id' => $event['Event']['id'])));
          $rubric_id = $rubric['EvaluationRubric']['rubric_id'];
          $rubric_criteria_array = $this->RubricsCriteria->getCriteria($rubric_id);
          
@@ -137,22 +140,22 @@ Class ExportPdfComponent extends ExportBaseNewComponent
          $evaluatee_names = $this->_getMemberNames($evaluatees); 
          $evaluator_names = $this->_getMemberNames($evaluators);
 
-        //Write Scores For Each Evaluatee
-        $groupAvgArray = array();
-        $evaluatorCount = 0;
-        for($i=0;$i<sizeof($evaluatees);$i++){
-            //Get the Score Given to the Evaluatee (By Criteria)
-            $rubricScores = $this->EvaluationRubric->getCriteriaResults($grp_event_id,$evaluatees[$i]);
-            if(!empty($rubricScores)){
-                $evaluatorCount++;
-                $rSTBL = $rSTBL.'<tr>';
-                //Write The Evaluatee Name
-                $rSTBL = $rSTBL.'<td>'.$evaluatee_names[$i].'</td>';
-                //Write The Scores
-                foreach($rubricScores as $criteria_id => $score){
-                    (!isset($groupAvgArray[$criteria_id]))? $groupAvgArray[$criteria_id] = 0 : $groupAvgArray[$criteria_id];
-                    $groupAvgArray[$criteria_id] = ($groupAvgArray[$criteria_id] + $score)/($evaluatorCount);
-                    $rSTBL = $rSTBL.'<td>'.$score.'</td>';
+         //Write Scores For Each Evaluatee
+         $groupAvgArray = array();
+         $evaluatorCount = 0;
+         for($i=0;$i<sizeof($evaluatees);$i++){
+             //Get the Score Given to the Evaluatee (By Criteria)
+             $rubricScores = $this->EvaluationRubric->getCriteriaResults($grp_event_id,$evaluatees[$i]);
+             if(!empty($rubricScores)){
+                 $evaluatorCount++;
+                 $rSTBL = $rSTBL.'<tr>';
+                 //Write The Evaluatee Name
+                 $rSTBL = $rSTBL.'<td>'.$evaluatee_names[$i].'</td>';
+                 //Write The Scores
+                 foreach($rubricScores as $criteria_id => $score){
+                     (!isset($groupAvgArray[$criteria_id]))? $groupAvgArray[$criteria_id] = 0 : $groupAvgArray[$criteria_id];
+                     $groupAvgArray[$criteria_id] = ($groupAvgArray[$criteria_id] + $score)/($evaluatorCount);
+                     $rSTBL = $rSTBL.'<td>'.$score.'</td>';
                 }
                 //Write The Total
                 $totalScore = $this->EvaluationRubric->getReceivedTotalScore($grp_event_id, $evaluatees[$i]);
@@ -174,45 +177,98 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             if($criteria == 'total_score') break;
             $rSTBL = $rSTBL.'<td>'.$grpAvg.'</td>';
         }
-          $rSTBL = $rSTBL.'<td>'.$groupAvgArray['total_score'].'</td>';
-          $rSTBL = $rSTBL.'</tr></table>';
-          
-        //Write Evaluation Results
-        $rSTBL = $rSTBL . '<h3>Evaluation Results</h3>';     
+        $rSTBL = $rSTBL.'<td>'.$groupAvgArray['total_score'].'</td>';
+        $rSTBL = $rSTBL.'</tr></table>';
+        return $rSTBL;
+    }        
+    
+    /*
+     * function _writeRubricEvalResults
+     * 
+     * @param mixed $event
+     * @param Group Event ID $grp_event_id
+     * @param Group Id $grp_id
+     * */        
+    function _writeRubricEvalResults($event,$grp_event_id,$grp_id){
+        $this->EvaluationRubric= ClassRegistry::init('EvaluationRubric');
+        $this->RubricsCriteria= ClassRegistry::init('RubricsCriteria');
+        $this->EvaluationRubricDetail= ClassRegistry::init('EvaluationRubricDetail');
+        $rubric = $this->EvaluationRubric->find('first', array('conditions' => array('EvaluationRubric.grp_event_id' => $grp_event_id, 'EvaluationRubric.event_id' => $event['Event']['id'])));
+        $rubric_id = $rubric['EvaluationRubric']['rubric_id'];
+        $rubric_criteria_array = $this->RubricsCriteria->getCriteria($rubric_id);
+        $evaluators = $this->_getMembers($grp_event_id);
+        $evaluatees = $this->_filterTutors($grp_id);
+        $evaluatee_names = $this->_getMemberNames($evaluatees); 
+        $evaluator_names = $this->_getMemberNames($evaluators);
+        
+        //Get the Total
+         $total = 0;
+         foreach($rubric_criteria_array as $rubric_criteria){
+             //Get the Rubric Criteria number and the multiplier and write it to the table header
+             $multiplier = $rubric_criteria['RubricsCriteria']['multiplier'];
+             $total = $total + $multiplier;
+         }
+        
+         //Scores For Each Evaluatee
+         $groupAvgArray = array();
+         $evaluatorCount = 0;
+         for($i=0;$i<sizeof($evaluatees);$i++){
+             //Get the Score Given to the Evaluatee (By Criteria)
+             $rubricScores = $this->EvaluationRubric->getCriteriaResults($grp_event_id,$evaluatees[$i]);
+             if(!empty($rubricScores)){
+                 $evaluatorCount++;
+                 //Write The Scores
+                 foreach($rubricScores as $criteria_id => $score){
+                     (!isset($groupAvgArray[$criteria_id]))? $groupAvgArray[$criteria_id] = 0 : $groupAvgArray[$criteria_id];
+                     $groupAvgArray[$criteria_id] = ($groupAvgArray[$criteria_id] + $score)/($evaluatorCount);
+                }
+                //Write The Total
+                $totalScore = $this->EvaluationRubric->getReceivedTotalScore($grp_event_id, $evaluatees[$i]);
+                $totalScore = $totalScore['0']['0']['received_total_score'];
+                (!isset($groupAvgArray['total_score']))? $groupAvgArray['total_score'] = 0 : $groupAvgArray['total_score'];
+                $groupAvgArray['total_score'] = ($groupAvgArray['total_score'] + $totalScore)/($evaluatorCount);
+            }
+            else{
+                    continue;
+                }   
+        }
+        
+        $rSTBL = '';
+        
         for($j=0;$j<sizeof($evaluatees);$j++){
             //Get Results By Evaluatee and Check if the array is empty
-           $resultsArrayByEvaluatee = $this->EvaluationRubric->getResultsByEvaluatee($grp_event_id, $evaluatees[$j],false);
-          // debug($resultsArrayByEvaluatee);
-           if(empty($resultsArrayByEvaluatee)) {
+            $resultsArrayByEvaluatee = $this->EvaluationRubric->getResultsByEvaluatee($grp_event_id, $evaluatees[$j],false);
+            if(empty($resultsArrayByEvaluatee)) {
                continue;
-           }
-           else{
-               //debug($rubric_criteria_array);
-               $num_evaluators = $this->EvaluationRubric->getReceivedTotalEvaluatorCount($grp_event_id, $evaluatees[$j]);
-               $totalScore = $this->EvaluationRubric->getReceivedTotalScore($grp_event_id, $evaluatees[$j]);
-               $totalScore = $totalScore['0']['0']['received_total_score'];
-               if($totalScore==$groupAvgArray['total_score']) $totalComment = '= Group Average';
-               if($totalScore > $groupAvgArray['total_score']) $totalComment = 'Above Group Average';
-               if($totalScore < $groupAvgArray['total_score']) $totalComment = 'Below Group Average';
-               $rSTBL = $rSTBL.'<p><b>Evaluatee : '.$evaluatee_names[$j].'</b><br>';
-               $rSTBL = $rSTBL.'Number of Evaluators : '.$num_evaluators.'<br>';
-               $rSTBL = $rSTBL. 'Final Total : '.$totalScore.' ('.number_format(($totalScore * 100/$total),2).'%)<br>';
-               $rSTBL = $rSTBL. 'Comment : '.$totalComment.'</p>';
-               
-               //Write the Table Header
-               $rSTBL = $rSTBL.'<table border="1" align="center"><tr><th><b>Evaluator</b></th>';
-               $criteria_count = 0;
-               $criteria_comments = array();
-               foreach($rubric_criteria_array as $rubric_criteria){
+            }
+            else {
+                $num_evaluators = $this->EvaluationRubric->getReceivedTotalEvaluatorCount($grp_event_id, $evaluatees[$j]);
+                $totalScore = $this->EvaluationRubric->getReceivedTotalScore($grp_event_id, $evaluatees[$j]);
+                $totalScore = $totalScore['0']['0']['received_total_score'];
+                
+                if($totalScore==$groupAvgArray['total_score']) $totalComment = '= Group Average';
+                if($totalScore > $groupAvgArray['total_score']) $totalComment = 'Above Group Average';
+                if($totalScore < $groupAvgArray['total_score']) $totalComment = 'Below Group Average';
+                $rSTBL = $rSTBL.'<p><b>Evaluatee : '.$evaluatee_names[$j].'</b><br>';
+                $rSTBL = $rSTBL.'Number of Evaluators : '.$num_evaluators.'<br>';
+                $rSTBL = $rSTBL. 'Final Total : '.$totalScore.' ('.number_format(($totalScore * 100/$total),2).'%)<br>';
+                $rSTBL = $rSTBL. 'Comment : '.$totalComment.'</p>';
+                
+                //Write the Table Header
+                $rSTBL = $rSTBL. '<table border="1" align="center"><tr><th><b>Evaluator</b></th>';
+                $criteria_count = 0;
+                $criteria_comments = array();
+                foreach($rubric_criteria_array as $rubric_criteria){
                     //Get the Rubric Criteria number and the multiplier and write it to the table header
                     $criteria_num = $rubric_criteria['RubricsCriteria']['criteria_num'];
                     $criteria_comments[$criteria_num] = '--';
                     $criteria_desc = $rubric_criteria['RubricsCriteria']['criteria'];
                     $criteria_count = $criteria_count++;
                     $rSTBL = $rSTBL.'<th><b>('.$criteria_num.') '.$criteria_desc.'</b></th>';
-               }
-               $rSTBL = $rSTBL.'</tr>';
-               foreach ($resultsArrayByEvaluatee as $result) {
+                }
+                $rSTBL = $rSTBL.'</tr>';
+                
+                  foreach ($resultsArrayByEvaluatee as $result) {
                     $eval_rubric_id = $result['EvaluationRubric']['id'];
                     $rSTBL = $rSTBL.'<tr><td>'.$result['EvaluationRubric']['updater'].'</td>';
                     foreach($criteria_comments as $criteria_id => $criteria_comment){
@@ -222,15 +278,17 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                         $grade = $EvalRubricDtl['EvaluationRubricDetail']['grade'];
                         $rSTBL = $rSTBL.'<td>'.$comment.'<br><b>Grade given : </b>'.$grade.'</td>';
                     }
+                    
                     $rSTBL = $rSTBL.'</tr>';
                     //debug($resultsArrayByEvaluatee);
                     $rSTBL = $rSTBL.'<tr><td colspan="'.$criteria_count.'"><b>General Comment :</b> '.$resultsArrayByEvaluatee['0']['EvaluationRubric']['comment'].'</td></tr>';
                 }
-               $rSTBL = $rSTBL.'</table>';
-           }
-        }
-         return $rSTBL;      
-     }
+            }
+            $rSTBL = $rSTBL.'</table>';
+        } 
+        return $rSTBL;       
+    }      
+
      
      /**
       * _createSimpleResultsPdf
