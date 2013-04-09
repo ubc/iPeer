@@ -1,1 +1,0 @@
-<p><?php __('Edit')?> "<b>C:\wwwroot\cake\app\views\users\delete.thtml</b>" <?php __('to change this message.')?></p>

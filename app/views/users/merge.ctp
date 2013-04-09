@@ -2,7 +2,7 @@
 <h2><?php echo __('Instructions', true);?></h2>
 <ul>
     <li><?php echo __('Search for the primary account on the left by name, username, or student number.', true); ?></li>
-    <li><?php echo __('Search for the secondardy account on the right by name, username, or student number.', true); ?></li>
+    <li><?php echo __('Search for the secondary account on the right by name, username, or student number.', true); ?></li>
     <li><?php echo __('WARNING: The merger of two accounts cannot be undone.', true); ?></li>
 </ul>
 <h2><?php echo __('Merge Accounts', true); ?></h2>

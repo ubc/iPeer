@@ -1,1 +1,0 @@
-<p><?php __('Edit')?>' "<b>C:\wwwroot\ipeer2\app\views\simpleevaluations\delete.tpl.php</b>"<?php __(' to change this message')?>.</p>
