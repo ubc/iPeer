@@ -80,6 +80,7 @@ class OauthtokensController extends AppController {
             $this->set('hideUser', true);
         }
         $users = $this->OauthToken->User->find('list');
+        asort($users);
         $this->set(compact('users'));
     }
 
@@ -115,6 +116,7 @@ class OauthtokensController extends AppController {
             }
         }
         $users = $this->OauthToken->User->find('list');
+        asort($users);
         $this->set(compact('users'));
     }
 
