@@ -1003,6 +1003,27 @@ i {
     width: 20em;
 }
 
+/* Evaluations Export */
+
+#exportEval .text label, #exportEval .select label,
+#exportEval .checkbox label {
+    width: 18em;
+}
+
+#exportEval .text input {
+    width: 20em;
+}
+
+#exportEval ul li {
+    list-style-type: circle;
+    list-style-position: inside;
+    margin: 0.5em;
+}
+
+#exportEval div.help-text {
+    margin-left: 24em;
+}
+
 /* ajax pagination */
 
 .ajax_paginate {
