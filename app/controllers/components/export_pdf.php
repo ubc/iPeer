@@ -67,7 +67,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
               $grp_id = $groupevent['group_id'];
             
               //Call writeEvalDetails
-              $evalDetails = $this->_writeEvalDetails($event,$grp_id);      
+              $evalDetails = $this->_writeEvalDetails($event,$grp_id,$params);      
               $mpdf->writeHTML($evalDetails, true, false, true, false, '');
             
               //Write Summary 
@@ -312,7 +312,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
               $grp_id = $groupevent['group_id'];
             
               //Call writeEvalDetails
-              $evalDetails = $this->_writeEvalDetails($event,$grp_id);      
+              $evalDetails = $this->_writeEvalDetails($event,$grp_id,$params);      
               $spdf->writeHTML($evalDetails, true, false, true, false, '');
             
               //Write Summary 
@@ -553,8 +553,17 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $fileName = $fileName . '.pdf';
         $spdf -> AddPage();
        
+        $coursename ='';
+        $eventname ='';
         //Write header text
-        $headertext = '<h2>Evaluation Event Detail for '. $event['Course']['course'].' - '.$event['Event']['title'].'</h2>';
+        //debug($params);
+        if(isset($params['include']['course'])){
+            $coursename = ' : '.$event['Course']['course'];
+        }
+        if(isset($params['include']['eval_event_names'])){
+            $eventname = ' - '.$event['Event']['title'];
+        }
+        $headertext = '<h2>Evaluation Event Detail'.$coursename.$eventname.'</h2>';
         $spdf->writeHTML($headertext, true, FALSE, true, FALSE, '');
  
         $this->Group = ClassRegistry::init('Group');
@@ -565,7 +574,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             $grp_id = $groupevent['group_id'];
             
             //Call writeEvalDetails
-            $evalDetails = $this->_writeEvalDetails($event,$grp_id);      
+            $evalDetails = $this->_writeEvalDetails($event,$grp_id,$params);      
             $spdf->writeHTML($evalDetails, true, false, true, false, '');
             
             //Write Summary 
@@ -604,7 +613,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         if(ob_get_contents()){
            ob_clean();
         }
-        return $spdf -> Output($fileName,'D');
+        return $spdf -> Output($fileName,'I');
 
     }
     
@@ -791,14 +800,20 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * 
      * @param mixed $event
      * @param Group Id $group_id
-     * 
+     * @param mixed $params
      * @return html string
      */
-    function _writeEvalDetails($event,$grp_id){
+    function _writeEvalDetails($event,$grp_id,$params){
+        //debug($params);
+        $groupname = '-';
+        $evaleventtype = '-';
+        $eventTemplateType = '-';
         $this->Group = ClassRegistry::init('Group');
         $group = $this->Group->getGroupByGroupId($grp_id);
         //Write Group name
-        $groupname = $group['0']['Group']['group_name'];
+        if(isset($params['include']['group_names'])){
+            $groupname = $group['0']['Group']['group_name'];
+        }
         $group = '<p>Group : '.$groupname.'<br>';
         //Write if self-eval is 'yes' or 'no'
         $selfeval = null;
@@ -807,7 +822,9 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         //Write Event Name
         $eventname = $event['Event']['title'];
         $eventname = 'Event Name : '.$eventname.'<br>';
-        $eventTemplateType = ucfirst(strtolower($event['EventTemplateType']['type_name']));
+        if(isset($params['include']['eval_event_type'])){
+            $eventTemplateType = ucfirst(strtolower($event['EventTemplateType']['type_name']));
+        }
         $eventTemplateType = 'Evaluation Type : '.$eventTemplateType.'<br>';
         //Write duedate and description
         $duedate = $event['Event']['due_date'];      
