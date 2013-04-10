@@ -98,12 +98,12 @@ Class ExportPdfComponent extends ExportBaseNewComponent
               $mpdf->addPage();
               $page_count++;
           }
-          $mpdf->deletePage($page_count+1);
-
+          $mpdf->deletePage($mpdf->getNumPages());
+          
           if(ob_get_contents()){
               ob_clean();
           }
-          return $mpdf -> Output($fileName,'I');     
+          return $mpdf -> Output($fileName,'D');     
       }
 
     /*
@@ -160,45 +160,47 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                  if($receivedAverageScore < $totalGroupAverage) $scoreComment = ' -- Below Average --';         
                  if($receivedAverageScore == $totalGroupAverage) $scoreComment = ' -- Average --';
              }
-             $mEvalResults = $mEvalResults.'<b>Evaluatee: </b>'.$evaluatee_names[$i].'<br>';
-             $mEvalResults = $mEvalResults.'Final Total: '.$receivedAverageScore.$scoreComment.'<br>';   
+             $mEvalResults = $mEvalResults.'<br><u><b>Evaluatee: </b>'.$evaluatee_names[$i].'</u><br>';
+             $receivedAverageScore=='N/A'? $break = '<br>' : $break = '<br><br>';
+             $mEvalResults = $mEvalResults.'Final Total: '.$receivedAverageScore.$scoreComment.$break;   
              
              //Write down the Questions and the responses given by each evaluator
-             $mEvalResults = $mEvalResults.'<b>Questions</b><br>';
              foreach($mixevalQuestions as $question){
                  //For each question write down the question_num and the title
                  $question_num = $question['MixevalQuestion']['question_num'];
                  $title = $question['MixevalQuestion']['title'];
-                 $mEvalResults = $mEvalResults.$question_num.'. '.$title;
-                 
+                                
                  //For each question, write down the response of the evaluator in a single bullet point
                 // debug($this->EvaluationMixeval->getResultsDetailByEvaluatee($grp_event_id, $evaluatees[$i], false));
-                $mEvalResults = $mEvalResults.'<ul style="list-style-type:square">';
+                $question_text = $question_num.'.'.$title;
+                $questionWrittenBool = 0;
+                   
                 for($j=0;$j<sizeof($evaluators);$j++){
                     $result = $this->EvaluationMixeval->getResultDetailByQuestion($grp_event_id, $evaluatees[$i], $evaluators[$j], $question_num);
+                    //debug($result);
                     if(empty($result)){
                         continue;
                     }
-                    $mEvalResults = $mEvalResults.'<li><b>'.$evaluator_names[$j].' : </b>';
-                   // debug($evaluatee_names[$i]);
-                    
-                    if($result['EvaluationMixevalDetail']['grade']==0.00){
-                        $mEvalResults = $mEvalResults.'Comment : '.$result['EvaluationMixevalDetail']['question_comment'];
-                        $mEvalResults = $mEvalResults. '</li>';
-                    }
                     else{
-                        $mEvalResults = $mEvalResults.'Grade : '.$result['EvaluationMixevalDetail']['grade'];
-                        $mEvalResults = $mEvalResults. '</li>';
-                    }
-                   // debug($result); 
-                    //If the evaluator has infact submitted an evaluation for the given evaluatee, put it down
+                        if($questionWrittenBool==0){ //Checks if the question has already been written
+                            $mEvalResults = $mEvalResults.$question_text.'<br>'; 
+                            $questionWrittenBool = 1; //The question has now been written so set Boolean to 1
+                        }
+                        $mEvalResults = $mEvalResults.'<b>&#160;&#160;&#160;&#160;&#160;&#160;'.$evaluator_names[$j].' : </b>';
                     
-                }
-                $mEvalResults = $mEvalResults.'</ul>';
-                
+                        if($result['EvaluationMixevalDetail']['grade']==0.00){
+                            $mEvalResults = $mEvalResults.'Comment : '.$result['EvaluationMixevalDetail']['question_comment'];
+                        }
+                        else{
+                            $mEvalResults = $mEvalResults.'Grade : '.$result['EvaluationMixevalDetail']['grade'];
+                        }    
+                        $mEvalResults = $mEvalResults.'<br>';      
+                    }
+                }                     
              }
          }
-         return ($mEvalResults.'</p>');
+         $mEvalResults = $mEvalResults.'</p>';
+         return $mEvalResults;
      }
  
     /*
@@ -304,7 +306,6 @@ Class ExportPdfComponent extends ExportBaseNewComponent
           $spdf->writeHTML($headertext, true, FALSE, true, FALSE, '');
          
           $this->Group = ClassRegistry::init('Group');
-          $page_count = 0;
           foreach($event['GroupEvent'] as $groupevent){
               //Get the groupevent id and the group id for each group in the evaluation
               $grp_event_id = $groupevent['id'];
@@ -340,9 +341,9 @@ Class ExportPdfComponent extends ExportBaseNewComponent
 
               $spdf->lastPage();
               $spdf->addPage();
-              $page_count++;
+             // $page_count++;
           }
-          $spdf->deletePage($page_count+1);
+          $spdf->deletePage($spdf->getNumPages());
 
           if(ob_get_contents()){
               ob_clean();
@@ -598,7 +599,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
          $spdf->addPage();
          $page_count++;
         }
-        $spdf->deletePage($page_count+1);
+        $spdf->deletePage($spdf->getNumPages());
 
         if(ob_get_contents()){
            ob_clean();
