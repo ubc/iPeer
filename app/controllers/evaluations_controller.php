@@ -247,7 +247,7 @@ class EvaluationsController extends AppController
         }
 
         $this->set('type', $type);
-        $fileTypes = array('detailed' => 'csv (Detailed)', 'pdf' => 'pdf');
+        $fileTypes = array('csv' => 'csv', 'pdf' => 'pdf');
         $this->set('fileTypes', $fileTypes);
 
         if ('course' == $type) {
@@ -304,7 +304,7 @@ class EvaluationsController extends AppController
             $fileName = isset($this->params['form']['file_name']) && !empty($this->params['form']['file_name']) ? $this->params['form']['file_name']:date('m.d.y');
            
             switch($this->params['form']['export_type']) {
-            case "detailed" :
+            case "csv" :
                 header('Content-Type: application/csv');
                 header('Content-Disposition: attachment; filename=' . $fileName . '.csv');
                 $this->ExportCsv->createCsv($this->params['form'], $event);

@@ -291,7 +291,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      /**
       * _createRubricResultsPdf
       * 
-      * @param mixed params
+      * @param mixed $params
       * @param mixed $event
       * 
       * @return void 
@@ -476,7 +476,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                  foreach($rubricScores as $criteria_id => $score){
                      (!isset($groupAvgArray[$criteria_id]))? $groupAvgArray[$criteria_id] = 0 : $groupAvgArray[$criteria_id];
                      $groupAvgArray[$criteria_id] = ($groupAvgArray[$criteria_id] + $score)/($evaluatorCount);
-                }
+                 }
                 //Write The Total
                 $totalScore = $this->EvaluationRubric->getReceivedTotalScore($grp_event_id, $evaluatees[$i]);
                 $totalScore = $totalScore['0']['0']['received_total_score'];

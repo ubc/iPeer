@@ -2,7 +2,7 @@
 <h2><?php echo __('Instructions', true) ?></h2>
 <ul>
     <li><?php echo __("Give the export file a name, which is default to today's date.", true)?></li>
-    <li><?php echo __("Choose one of the three export formats.", true)?></li>
+    <li><?php echo __("Choose one of the two export formats.", true)?></li>
     <li><?php echo __("Please check at least one from each similarly coloured group.", true)?></li>
 </ul>
 <h2><?php echo __('Export', true) ?></h2>
@@ -16,7 +16,6 @@ echo $this->Form->input('export_type', array(
     'name' => 'export_type', 'options' => $fileTypes,
     'label' => __('Export File Type', true)
 ));
-echo "<div class='help-text' id='fileTypeHelp'></div>";
 $evaluations = ($fromEvent) ? array($selectedEvent['Event']['id'] => $selectedEvent['Event']['title']) :
     Set::combine($events, '{n}.Event.id', '{n}.Event.title');
 echo $this->Form->input('event_id', array(
@@ -80,23 +79,16 @@ echo $this->Form->end();
 ?>
 </div>
 <script type="text/javascript">
-exportTypeHelp();
-function exportTypeHelp() {
+exportTypeToggle();
+function exportTypeToggle() {
     var selected = jQuery("#ExportEvalExportType option:selected").val();
     jQuery('.error-message').hide();
     switch(selected) {
-        case 'detailed':
-            jQuery('#fileTypeHelp').html('Contains the detailed scores and comments.');
-            jQuery("div#student_id").show();
-            jQuery("div#student_name").show();
-            break;
-        case 'summary':
-            jQuery('#fileTypeHelp').html('Only contains the total mark and average mark.');
+        case 'csv':
             jQuery("div#student_id").show();
             jQuery("div#student_name").show();
             break;
         case 'pdf':
-            jQuery('#fileTypeHelp').html('Formatted similarly to the evaluation results page.');
             jQuery("div#student_id").hide();
             jQuery("div#student_name").hide();
             break;
@@ -131,7 +123,7 @@ function checkSubmit() {
 
 jQuery().ready(function() {
     jQuery('#ExportEvalExportType').change(function(){
-        exportTypeHelp();
+        exportTypeToggle();
     });
 });
 </script>
