@@ -110,8 +110,8 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * _writeMixEvalResults
      * 
      * @param mixed $event
-     * @param Group Event ID $grp_event_id
-     * @param Group ID $grp_id
+     * @param mixed $grp_event_id
+     * @param mixed $grp_id
      * 
      * @return HTML Table containing the results
      */
@@ -211,8 +211,8 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * _writeMixResultsTbl
      * 
      * @param mixed $event
-     * @param Group Event ID $grp_event_id
-     * @param Group ID $grp_id
+     * @param mixed $grp_event_id
+     * @param mixed $grp_id
      * 
      * @return HTML Table containing the results
      */
@@ -291,7 +291,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      /**
       * _createRubricResultsPdf
       * 
-      * @param form params - $params
+      * @param mixed params
       * @param mixed $event
       * 
       * @return void 
@@ -359,8 +359,11 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * function _writeRubricResultsTbl
      * 
      * @param mixed $event
-     * @param Group Event ID $grp_event_id
-     * @param Group Id $grp_id
+     * @param mixed $grp_event_id
+     * @param mixed $grp_id
+     *
+     * @access public
+     * @return void
      */
      function _writeRubricResultsTbl($event,$grp_event_id,$grp_id){
          $this->EvaluationRubric= ClassRegistry::init('EvaluationRubric');
@@ -416,7 +419,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
              } else {
                 continue;
              }   
-        }
+         }
        
        //Write Down The Group Average  
         $rSTBL = $rSTBL.'<tr><td><b>Group Average</b></td>';
@@ -425,18 +428,21 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                 break;
             }
             $rSTBL = $rSTBL.'<td>'.$grpAvg.'</td>';
-         }
+        }
         $rSTBL = $rSTBL.'<td>'.$groupAvgArray['total_score'].'</td>';
         $rSTBL = $rSTBL.'</tr></table>';
         return $rSTBL;
-    }        
+     }        
     
     /**
      * function _writeRubricEvalResults
      * 
      * @param mixed $event
-     * @param Group Event ID $grp_event_id
-     * @param Group Id $grp_id
+     * @param mixed $grp_event_id
+     * @param mixed $grp_id
+     *
+     * @access private
+     * @return void
      */        
     function _writeRubricEvalResults($event,$grp_event_id,$grp_id){
         $this->EvaluationRubric= ClassRegistry::init('EvaluationRubric');
@@ -456,7 +462,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
              //Get the Rubric Criteria number and the multiplier and write it to the table header
              $multiplier = $rubric_criteria['RubricsCriteria']['multiplier'];
              $total = $total + $multiplier;
-          }
+         }
         
          //Scores For Each Evaluatee
          $groupAvgArray = array();
@@ -479,7 +485,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
              } else {
                 continue;
              }   
-        }
+         }
         
         $rSTBL = '';
         
@@ -628,7 +634,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * _writeComments 
      * 
      * @param mixed $event
-     * @param GroupEventId $grp_event_id
+     * @param mixed $grp_event_id
      * 
      * @return HTML string consisting of comments
      */
@@ -660,8 +666,8 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * _writeScoresTbl
      * 
      * @param mixed $event
-     * @param GroupEventId $grp_event_id
-     * @param GroupId $grp_id
+     * @param mixed $grp_event_id
+     * @param mixed $grp_id
      * 
      * @return HTML string for ScoresTable
      */
@@ -767,7 +773,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * _getPenaltyArray
      * 
      * @param mixed $event
-     * @param array() - $evaluatees 
+     * @param mixed $evaluatees 
      * 
      * @return array() - an associative array consisting of the penalties for the evaluatees or '-' if no penalty
      */
@@ -789,7 +795,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
     /**
      * _filterTutors
      * 
-     * @param GroupId $grp_id
+     * @param mixed $grp_id
      * 
      * @return array() consisting of groupmembers no tutors
      */
@@ -807,8 +813,10 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * _writeEvalDetails
      * 
      * @param mixed $event
-     * @param Group Id $group_id
+     * @param mixed $grp_id
      * @param mixed $params
+     *
+     * @access private
      * @return html string
      */
     function _writeEvalDetails($event,$grp_id,$params){
@@ -846,9 +854,9 @@ Class ExportPdfComponent extends ExportBaseNewComponent
     /**
      * _getScoreGiven
      * 
-     * @param Evaluator Id - $evaluator
-     * @param Evaluatee Id - $evaluatee
-     * @param GroupEventId - $grpEventId
+     * @param mixed $evaluator
+     * @param mixed $evaluatee
+     * @param mixed $grpEventId
      * 
      * @return Integer - Score Given by evaluator to evaluatee or '-' if no score given 
      */
@@ -896,7 +904,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
     /**
      * _getMemberNames 
      * 
-     * @param array() $members
+     * @param mixed $members
      * 
      * @return array() consisting of member's names 
      */
@@ -919,7 +927,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
     
     /**
      * _getMembers 
-     * @param GroupEventId $grp_event_Id
+     * @param mixed $grp_event_Id
      * 
      * @return array() consisting of member's belonging to the group
      */
