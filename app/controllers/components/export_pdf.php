@@ -24,28 +24,28 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      {
          switch($event['Event']['event_template_type_id']){
              case 1:
-                 $this->_createSimpleResultsPdf($params,$event);
+                 $this->_createSimpleResultsPdf($params, $event);
                  break;
              case 2:
-                 $this->_createRubricResultsPdf($params,$event);
+                 $this->_createRubricResultsPdf($params, $event);
                  break;
             // case 3: We do not need export for Surveys
             //     $this->_createSurveyResultsPdf($params,$event);
             //     break;
              case 4:
-                 $this->_createMixResultsPdf($params,$event);
+                 $this->_createMixResultsPdf($params, $event);
                  break;
          }
      }  
      
-     /*
+     /**
       *_createMixResultsPdf
       * 
       * @param mixed $params
       * @param mixed $event 
       * 
       * @return void
-      * */
+      */
       function _createMixResultsPdf($params,$event){
           App::import('Vendor', 'xtcpdf');
           $mpdf = new XTCPDF();
@@ -57,7 +57,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
           
           //Write header text
           $headertext = '<h2>Evaluation Event Detail for '. $event['Course']['course'].' - '.$event['Event']['title'].'</h2>';
-          $mpdf->writeHTML($headertext, true, FALSE, true, FALSE, '');
+          $mpdf->writeHTML($headertext, true, false, true, false, '');
          
           $this->Group = ClassRegistry::init('Group');
           $page_count = 0;
@@ -67,7 +67,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
               $grp_id = $groupevent['group_id'];
             
               //Call writeEvalDetails
-              $evalDetails = $this->_writeEvalDetails($event,$grp_id,$params);      
+              $evalDetails = $this->_writeEvalDetails($event, $grp_id, $params);      
               $mpdf->writeHTML($evalDetails, true, false, true, false, '');
             
               //Write Summary 
@@ -75,11 +75,11 @@ Class ExportPdfComponent extends ExportBaseNewComponent
               $mpdf->writeHTML('<h3>Summary</h3>', true, false, true, false, '');
             
               //Get Membersid's and Membernames who have not submitted their evaluations
-              $inComplete = $this->_getIncompleteMembers($event['Event']['id'],$grp_id);
+              $inComplete = $this->_getIncompleteMembers($event['Event']['id'], $grp_id);
               $inComplete = $this->_getMemberNames($inComplete);
-              $mpdf->writeHTML('<p><b>Members who have not submitted their evaluations</b></p>',true, false, true, false, '');
+              $mpdf->writeHTML('<p><b>Members who have not submitted their evaluations</b></p>', true, false, true, false, '');
               foreach ($inComplete as $name){
-                  $mpdf->writeHTML($name,true, false, true, false, '');
+                  $mpdf->writeHTML($name, true, false, true, false, '');
               }
               $mpdf->writeHTML('<br>', true, false, true, false, '');
             
@@ -87,12 +87,12 @@ Class ExportPdfComponent extends ExportBaseNewComponent
               $event['Event']['self_eval'] == '0'? $selfeval = 'No' : $selfeval = 'Yes';
           
               //Write the Rubric Scores Table And The Evaluation Results
-              $rtbl = $this->_writeMixResultsTbl($event,$grp_event_id,$grp_id); 
-              $mpdf->writeHTML($rtbl,true, false, true, false, '');
+              $rtbl = $this->_writeMixResultsTbl($event, $grp_event_id, $grp_id); 
+              $mpdf->writeHTML($rtbl, true, false, true, false, '');
            
-              $mpdf->writeHTML('<h3>Evaluation Results</h3>',true, false, true, false, '');    
-              $mEvalResults = $this->_writeMixEvalResults($event,$grp_event_id,$grp_id);  
-              $mpdf->writeHTML($mEvalResults,true, false, true, false, '');                   
+              $mpdf->writeHTML('<h3>Evaluation Results</h3>', true, false, true, false, '');    
+              $mEvalResults = $this->_writeMixEvalResults($event, $grp_event_id, $grp_id);  
+              $mpdf->writeHTML($mEvalResults, true, false, true, false, '');                   
 
               $mpdf->lastPage();
               $mpdf->addPage();
@@ -103,10 +103,10 @@ Class ExportPdfComponent extends ExportBaseNewComponent
           if(ob_get_contents()){
               ob_clean();
           }
-          return $mpdf -> Output($fileName,'D');     
+          return $mpdf -> Output($fileName, 'D');     
       }
 
-    /*
+    /**
      * _writeMixEvalResults
      * 
      * @param mixed $event
@@ -114,7 +114,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * @param Group ID $grp_id
      * 
      * @return HTML Table containing the results
-     * */
+     */
      function _writeMixEvalResults($event,$grp_event_id,$grp_id){
          $evaluators = $this->_getMembers($grp_event_id);
          $evaluatees = $this->_filterTutors($grp_id);
@@ -131,7 +131,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
          //Get the final group average
          $totalGroupAverage = 0;
          $count = 0;
-         for($i=0;$i<sizeof($evaluatees);$i++){
+         for($i=0; $i<sizeof($evaluatees); $i++){
              $aver = $this->EvaluationMixeval->getReceivedAvgScore($grp_event_id, $evaluatees[$i]);
              $receivedAverageScore = $this->EvaluationMixeval->getReceivedAvgScore($grp_event_id, $evaluatees[$i]);
              $receivedAverageScore = $receivedAverageScore[0][0]['received_avg_score'];             
@@ -143,7 +143,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
          }
          $totalGroupAverage = $totalGroupAverage/$count;
          
-         for($i=0;$i<sizeof($evaluatees);$i++){
+         for($i=0; $i<sizeof($evaluatees); $i++){
              $aver = $this->EvaluationMixeval->getReceivedAvgScore($grp_event_id, $evaluatees[$i]);
              $receivedAverageScore = $this->EvaluationMixeval->getReceivedAvgScore($grp_event_id, $evaluatees[$i]);
              $receivedAverageScore = $receivedAverageScore[0][0]['received_avg_score'];
@@ -155,10 +155,14 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                  $receivedAverageScore = 'N/A';
              }
              else{
-                 $receivedAverageScore = number_format($receivedAverageScore,2);
-                 if($receivedAverageScore > $totalGroupAverage) $scoreComment = ' -- Above Average --';
-                 if($receivedAverageScore < $totalGroupAverage) $scoreComment = ' -- Below Average --';         
-                 if($receivedAverageScore == $totalGroupAverage) $scoreComment = ' -- Average --';
+                $receivedAverageScore = number_format($receivedAverageScore, 2);
+                if($receivedAverageScore > $totalGroupAverage) {
+                    $scoreComment = ' -- Above Average --';
+                } else if($receivedAverageScore < $totalGroupAverage) {
+                    $scoreComment = ' -- Below Average --';
+                } else {
+                    $scoreComment = ' -- Average --';
+                }
              }
              $mEvalResults = $mEvalResults.'<br><u><b>Evaluatee: </b>'.$evaluatee_names[$i].'</u><br>';
              $receivedAverageScore=='N/A'? $break = '<br>' : $break = '<br><br>';
@@ -175,7 +179,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                 $question_text = $question_num.'.'.$title;
                 $questionWrittenBool = 0;
                    
-                for($j=0;$j<sizeof($evaluators);$j++){
+                for($j=0; $j<sizeof($evaluators); $j++){
                     $result = $this->EvaluationMixeval->getResultDetailByQuestion($grp_event_id, $evaluatees[$i], $evaluators[$j], $question_num);
                     //debug($result);
                     if(empty($result)){
@@ -203,7 +207,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
          return $mEvalResults;
      }
  
-    /*
+    /**
      * _writeMixResultsTbl
      * 
      * @param mixed $event
@@ -211,7 +215,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * @param Group ID $grp_id
      * 
      * @return HTML Table containing the results
-     * */
+     */
      function _writeMixResultsTbl($event,$grp_event_id,$grp_id){
          $evaluators = $this->_getMembers($grp_event_id);
          $evaluatees = $this->_filterTutors($grp_id);
@@ -237,19 +241,19 @@ Class ExportPdfComponent extends ExportBaseNewComponent
              $question_num = $question['MixevalQuestion']['question_num'];
              $multiplier = $question['MixevalQuestion']['multiplier'];
              $lickertQuestions[$question_num]=0;
-             $mRTBL = $mRTBL.'<th>'.$question_num.' (/'.number_format($multiplier,2).')</th>';
+             $mRTBL = $mRTBL.'<th>'.$question_num.' (/'.number_format($multiplier, 2).')</th>';
              $total = $total+$multiplier;                         
          }
-         $mRTBL = $mRTBL.'<th>Total (/'.number_format($total,2).')</th>';
+         $mRTBL = $mRTBL.'<th>Total (/'.number_format($total, 2).')</th>';
          $mRTBL = $mRTBL.'</tr>';
          //Table Header End
          
-         for($i=0;$i<sizeof($evaluatees);$i++){
+         for($i=0; $i<sizeof($evaluatees); $i++){
              $total_grade=0;
              $mRTBL = $mRTBL.'<tr><td>'.$evaluatee_names[$i].'</td>';
              $evalMixevalDetail = $this->EvaluationMixeval->getResultsDetailByEvaluatee($grp_event_id, $evaluatees[$i], false);  
              if(empty($evalMixevalDetail)){
-                 for($j=0;$j<sizeof($lickertQuestions);$j++){
+                 for($j=0; $j<sizeof($lickertQuestions); $j++){
                      $mRTBL = $mRTBL.'<td> N/A </td>';
                  }
                  $mRTBL=$mRTBL.'<td> N/A </td>';
@@ -258,7 +262,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
              else{
                  $evalMixevalDetail = $evalMixevalDetail['0']['EvaluationMixevalDetail'];
                  //Get the scores for the lickert type questions and put them in the table
-                 foreach($lickertQuestions as $questionNum=>$value){
+                 foreach($lickertQuestions as $questionNum => $value){
                      $grade = $evalMixevalDetail[$questionNum-1]['grade']; //$questionNum-1 is necessary since array numbering starts from 0 not 1
                      $lickertQuestions[$questionNum] = $lickertQuestions[$questionNum] + $grade;
                      $total_grade = $total_grade + $grade;  
@@ -282,9 +286,9 @@ Class ExportPdfComponent extends ExportBaseNewComponent
          $mRTBL = $mRTBL.'</table>';
          
          return $mRTBL;
-}
+     }
       
-     /*
+     /**
       * _createRubricResultsPdf
       * 
       * @param form params - $params
@@ -303,7 +307,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
           
           //Write header text
           $headertext = '<h2>Evaluation Event Detail for '. $event['Course']['course'].' - '.$event['Event']['title'].'</h2>';
-          $spdf->writeHTML($headertext, true, FALSE, true, FALSE, '');
+          $spdf->writeHTML($headertext, true, false, true, false, '');
          
           $this->Group = ClassRegistry::init('Group');
           foreach($event['GroupEvent'] as $groupevent){
@@ -312,7 +316,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
               $grp_id = $groupevent['group_id'];
             
               //Call writeEvalDetails
-              $evalDetails = $this->_writeEvalDetails($event,$grp_id,$params);      
+              $evalDetails = $this->_writeEvalDetails($event, $grp_id, $params);      
               $spdf->writeHTML($evalDetails, true, false, true, false, '');
             
               //Write Summary 
@@ -320,11 +324,11 @@ Class ExportPdfComponent extends ExportBaseNewComponent
               $spdf->writeHTML('<h3>Summary</h3>', true, false, true, false, '');
             
               //Get Membersid's and Membernames who have not submitted their evaluations
-              $inComplete = $this->_getIncompleteMembers($event['Event']['id'],$grp_id);
+              $inComplete = $this->_getIncompleteMembers($event['Event']['id'], $grp_id);
               $inComplete = $this->_getMemberNames($inComplete);
-              $spdf->writeHTML('<p><b>Members who have not submitted their evaluations</b></p>',true, false, true, false, '');
+              $spdf->writeHTML('<p><b>Members who have not submitted their evaluations</b></p>', true, false, true, false, '');
               foreach ($inComplete as $name){
-                  $spdf->writeHTML($name,true, false, true, false, '');
+                  $spdf->writeHTML($name, true, false, true, false, '');
               }
               $spdf->writeHTML('<br>', true, false, true, false, '');
             
@@ -332,12 +336,12 @@ Class ExportPdfComponent extends ExportBaseNewComponent
               $event['Event']['self_eval'] == '0'? $selfeval = 'No' : $selfeval = 'Yes';
           
               //Write the Rubric Scores Table And The Evaluation Results
-              $rtbl = $this->_writeRubricResultsTbl($event,$grp_event_id,$grp_id); 
-              $spdf->writeHTML($rtbl,true, false, true, false, '');
+              $rtbl = $this->_writeRubricResultsTbl($event, $grp_event_id, $grp_id); 
+              $spdf->writeHTML($rtbl, true, false, true, false, '');
            
-              $spdf->writeHTML('<h3>Evaluation Results</h3>',true, false, true, false, '');
-              $eResultsTbl = $this->_writeRubricEvalResults($event,$grp_event_id,$grp_id); 
-              $spdf->writeHTML($eResultsTbl,true, false, true, false, '');
+              $spdf->writeHTML('<h3>Evaluation Results</h3>', true, false, true, false, '');
+              $eResultsTbl = $this->_writeRubricEvalResults($event, $grp_event_id, $grp_id); 
+              $spdf->writeHTML($eResultsTbl, true, false, true, false, '');
 
               $spdf->lastPage();
               $spdf->addPage();
@@ -348,16 +352,16 @@ Class ExportPdfComponent extends ExportBaseNewComponent
           if(ob_get_contents()){
               ob_clean();
           }
-          return $spdf -> Output($fileName,'D');     
+          return $spdf -> Output($fileName, 'D');     
       }    
 
-    /*
+    /**
      * function _writeRubricResultsTbl
      * 
      * @param mixed $event
      * @param Group Event ID $grp_event_id
      * @param Group Id $grp_id
-     * */
+     */
      function _writeRubricResultsTbl($event,$grp_event_id,$grp_id){
          $this->EvaluationRubric= ClassRegistry::init('EvaluationRubric');
          $this->RubricsCriteria= ClassRegistry::init('RubricsCriteria');
@@ -375,9 +379,9 @@ Class ExportPdfComponent extends ExportBaseNewComponent
              $criteria_num = $rubric_criteria['RubricsCriteria']['criteria_num'];
              $multiplier = $rubric_criteria['RubricsCriteria']['multiplier'];
              $total = $total + $multiplier;
-             $rSTBL = $rSTBL.'<th>'.$criteria_num.' (/'.number_format($multiplier,1).' )</th>';
+             $rSTBL = $rSTBL.'<th>'.$criteria_num.' (/'.number_format($multiplier, 1).' )</th>';
          }
-         $rSTBL = $rSTBL.'<th>Total (/'.number_format($total,2).')</th>';
+         $rSTBL = $rSTBL.'<th>Total (/'.number_format($total, 2).')</th>';
          $rSTBL = $rSTBL.'</tr>';
          
          $evaluators = $this->_getMembers($grp_event_id);
@@ -388,9 +392,9 @@ Class ExportPdfComponent extends ExportBaseNewComponent
          //Write Scores For Each Evaluatee
          $groupAvgArray = array();
          $evaluatorCount = 0;
-         for($i=0;$i<sizeof($evaluatees);$i++){
+         for($i=0; $i<sizeof($evaluatees); $i++){
              //Get the Score Given to the Evaluatee (By Criteria)
-             $rubricScores = $this->EvaluationRubric->getCriteriaResults($grp_event_id,$evaluatees[$i]);
+             $rubricScores = $this->EvaluationRubric->getCriteriaResults($grp_event_id, $evaluatees[$i]);
              if(!empty($rubricScores)){
                  $evaluatorCount++;
                  $rSTBL = $rSTBL.'<tr>';
@@ -401,39 +405,39 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                      (!isset($groupAvgArray[$criteria_id]))? $groupAvgArray[$criteria_id] = 0 : $groupAvgArray[$criteria_id];
                      $groupAvgArray[$criteria_id] = ($groupAvgArray[$criteria_id] + $score)/($evaluatorCount);
                      $rSTBL = $rSTBL.'<td>'.$score.'</td>';
-                }
+                 }
                 //Write The Total
                 $totalScore = $this->EvaluationRubric->getReceivedTotalScore($grp_event_id, $evaluatees[$i]);
                 $totalScore = $totalScore['0']['0']['received_total_score'];
                 (!isset($groupAvgArray['total_score']))? $groupAvgArray['total_score'] = 0 : $groupAvgArray['total_score'];
                 $groupAvgArray['total_score'] = ($groupAvgArray['total_score'] + $totalScore)/($evaluatorCount);
-                $rSTBL = $rSTBL.'<td>'.$totalScore.'('.number_format(($totalScore * 100/$total),2).'%)</td>';
+                $rSTBL = $rSTBL.'<td>'.$totalScore.'('.number_format(($totalScore * 100/$total), 2).'%)</td>';
                 $rSTBL = $rSTBL.'</tr>';
-            }
-            else 
-                {
-                    continue;
-                }   
+             } else {
+                continue;
+             }   
         }
        
        //Write Down The Group Average  
         $rSTBL = $rSTBL.'<tr><td><b>Group Average</b></td>';
         foreach ($groupAvgArray as $criteria => $grpAvg) {
-            if($criteria == 'total_score') break;
+            if($criteria == 'total_score') {
+                break;
+            }
             $rSTBL = $rSTBL.'<td>'.$grpAvg.'</td>';
-        }
+         }
         $rSTBL = $rSTBL.'<td>'.$groupAvgArray['total_score'].'</td>';
         $rSTBL = $rSTBL.'</tr></table>';
         return $rSTBL;
     }        
     
-    /*
+    /**
      * function _writeRubricEvalResults
      * 
      * @param mixed $event
      * @param Group Event ID $grp_event_id
      * @param Group Id $grp_id
-     * */        
+     */        
     function _writeRubricEvalResults($event,$grp_event_id,$grp_id){
         $this->EvaluationRubric= ClassRegistry::init('EvaluationRubric');
         $this->RubricsCriteria= ClassRegistry::init('RubricsCriteria');
@@ -452,14 +456,14 @@ Class ExportPdfComponent extends ExportBaseNewComponent
              //Get the Rubric Criteria number and the multiplier and write it to the table header
              $multiplier = $rubric_criteria['RubricsCriteria']['multiplier'];
              $total = $total + $multiplier;
-         }
+          }
         
          //Scores For Each Evaluatee
          $groupAvgArray = array();
          $evaluatorCount = 0;
-         for($i=0;$i<sizeof($evaluatees);$i++){
+         for($i=0; $i<sizeof($evaluatees); $i++){
              //Get the Score Given to the Evaluatee (By Criteria)
-             $rubricScores = $this->EvaluationRubric->getCriteriaResults($grp_event_id,$evaluatees[$i]);
+             $rubricScores = $this->EvaluationRubric->getCriteriaResults($grp_event_id, $evaluatees[$i]);
              if(!empty($rubricScores)){
                  $evaluatorCount++;
                  //Write The Scores
@@ -472,17 +476,16 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                 $totalScore = $totalScore['0']['0']['received_total_score'];
                 (!isset($groupAvgArray['total_score']))? $groupAvgArray['total_score'] = 0 : $groupAvgArray['total_score'];
                 $groupAvgArray['total_score'] = ($groupAvgArray['total_score'] + $totalScore)/($evaluatorCount);
-            }
-            else{
-                    continue;
-                }   
+             } else {
+                continue;
+             }   
         }
         
         $rSTBL = '';
         
-        for($j=0;$j<sizeof($evaluatees);$j++){
+        for($j=0; $j<sizeof($evaluatees); $j++){
             //Get Results By Evaluatee and Check if the array is empty
-            $resultsArrayByEvaluatee = $this->EvaluationRubric->getResultsByEvaluatee($grp_event_id, $evaluatees[$j],false);
+            $resultsArrayByEvaluatee = $this->EvaluationRubric->getResultsByEvaluatee($grp_event_id, $evaluatees[$j], false);
             if(empty($resultsArrayByEvaluatee)) {
                continue;
             }
@@ -491,12 +494,16 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                 $totalScore = $this->EvaluationRubric->getReceivedTotalScore($grp_event_id, $evaluatees[$j]);
                 $totalScore = $totalScore['0']['0']['received_total_score'];
                 
-                if($totalScore==$groupAvgArray['total_score']) $totalComment = '= Group Average';
-                if($totalScore > $groupAvgArray['total_score']) $totalComment = 'Above Group Average';
-                if($totalScore < $groupAvgArray['total_score']) $totalComment = 'Below Group Average';
+                if($totalScore==$groupAvgArray['total_score']) {
+                    $totalComment = '= Group Average';
+                } else if($totalScore > $groupAvgArray['total_score']) {
+                    $totalComment = 'Above Group Average';
+                } else {
+                    $totalComment = 'Below Group Average';
+                }
                 $rSTBL = $rSTBL.'<p><b>Evaluatee : '.$evaluatee_names[$j].'</b><br>';
                 $rSTBL = $rSTBL.'Number of Evaluators : '.$num_evaluators.'<br>';
-                $rSTBL = $rSTBL. 'Final Total : '.$totalScore.' ('.number_format(($totalScore * 100/$total),2).'%)<br>';
+                $rSTBL = $rSTBL. 'Final Total : '.$totalScore.' ('.number_format(($totalScore * 100/$total), 2).'%)<br>';
                 $rSTBL = $rSTBL. 'Comment : '.$totalComment.'</p>';
                 
                 //Write the Table Header
@@ -527,7 +534,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                     $rSTBL = $rSTBL.'</tr>';
                     //debug($resultsArrayByEvaluatee);
                     $rSTBL = $rSTBL.'<tr><td colspan="'.$criteria_count.'"><b>General Comment :</b> '.$resultsArrayByEvaluatee['0']['EvaluationRubric']['comment'].'</td></tr>';
-                }
+                  }
             }
             $rSTBL = $rSTBL.'</table>';
         } 
@@ -564,7 +571,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             $eventname = ' - '.$event['Event']['title'];
         }
         $headertext = '<h2>Evaluation Event Detail'.$coursename.$eventname.'</h2>';
-        $spdf->writeHTML($headertext, true, FALSE, true, FALSE, '');
+        $spdf->writeHTML($headertext, true, false, true, false, '');
  
         $this->Group = ClassRegistry::init('Group');
         $page_count = 0;
@@ -574,7 +581,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             $grp_id = $groupevent['group_id'];
             
             //Call writeEvalDetails
-            $evalDetails = $this->_writeEvalDetails($event,$grp_id,$params);      
+            $evalDetails = $this->_writeEvalDetails($event, $grp_id, $params);      
             $spdf->writeHTML($evalDetails, true, false, true, false, '');
             
             //Write Summary 
@@ -582,11 +589,11 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             $spdf->writeHTML('<h3>Summary</h3>', true, false, true, false, '');
             
             //Get Membersid's and Membernames who have not submitted their evaluations
-            $inComplete = $this->_getIncompleteMembers($event['Event']['id'],$grp_id);
+            $inComplete = $this->_getIncompleteMembers($event['Event']['id'], $grp_id);
             $inComplete = $this->_getMemberNames($inComplete);
-            $spdf->writeHTML('<p><b>Members who have not submitted their evaluations</b></p>',true, false, true, false, '');
+            $spdf->writeHTML('<p><b>Members who have not submitted their evaluations</b></p>', true, false, true, false, '');
             foreach ($inComplete as $name){
-                $spdf->writeHTML($name,true, false, true, false, '');
+                $spdf->writeHTML($name, true, false, true, false, '');
             }
             $spdf->writeHTML('<br>', true, false, true, false, '');
             
@@ -594,14 +601,14 @@ Class ExportPdfComponent extends ExportBaseNewComponent
            $event['Event']['self_eval'] == '0'? $selfeval = 'No' : $selfeval = 'Yes';
            
            //Write the scores table
-           $spdf->writeHTML('<h3>Evaluation Results</h3>',true, false, true, false, '');
-           $stbl = $this->_writeScoresTbl($event,$grp_event_id,$grp_id); 
+           $spdf->writeHTML('<h3>Evaluation Results</h3>', true, false, true, false, '');
+           $stbl = $this->_writeScoresTbl($event, $grp_event_id, $grp_id); 
            $spdf->writeHTML($stbl, true, false, true, false, '');
            
            //Write the comments if they are there
            $comments_text = '<h3>Comments</h3>';
            $spdf->writeHTML($comments_text, true, false, true, false, '');
-           $comments = $this->_writeComments($event,$grp_event_id);
+           $comments = $this->_writeComments($event, $grp_event_id);
            $spdf->writeHTML($comments, true, false, true, false, '');
 
          $spdf->lastPage();
@@ -613,28 +620,28 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         if(ob_get_contents()){
            ob_clean();
         }
-        return $spdf -> Output($fileName,'I');
+        return $spdf -> Output($fileName, 'I');
 
     }
     
-    /*
+    /**
      * _writeComments 
      * 
      * @param mixed $event
      * @param GroupEventId $grp_event_id
      * 
      * @return HTML string consisting of comments
-     * */
+     */
     function _writeComments($event,$grp_event_id){
-       $evaluators = $this->_getMembers($event['Event']['id'],$grp_event_id);
+       $evaluators = $this->_getMembers($event['Event']['id'], $grp_event_id);
        $evaluatees = $this->_filterTutors($grp_event_id);
        $evaluatee_names = $this->_getMemberNames($evaluatees); 
        $evaluator_names = $this->_getMemberNames($evaluators);
        
        $comments_html = '';
        //Write the comments if they exist
-       for($i=0;$i<sizeof($evaluators);$i++){       
-            for($j=0;$j<sizeof($evaluatees);$j++){
+       for($i=0; $i<sizeof($evaluators); $i++){       
+            for($j=0; $j<sizeof($evaluatees); $j++){
                 $commentgiven = $this->_getScoreGiven($evaluators[$i], $evaluatees[$j], $grp_event_id);
                 if($commentgiven[1]=='-'){
                     continue;
@@ -644,12 +651,12 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                     $comments_html=$comments_html.'Evaluatee : '.$evaluatee_names[$j].'<br>'.
                                    'Comment : '.$commentgiven[1].'<br><br>';
                 }
-                }
-        }
+            }
+       }
        return $comments_html;
     }
     
-    /*
+    /**
      * _writeScoresTbl
      * 
      * @param mixed $event
@@ -657,7 +664,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * @param GroupId $grp_id
      * 
      * @return HTML string for ScoresTable
-     * */
+     */
     function _writeScoresTbl($event,$grp_event_id,$grp_id){
        $evaluators = $this->_getMembers($grp_event_id);
        $evaluatees = $this->_filterTutors($grp_id);
@@ -673,7 +680,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                 </tr>';
         $tbl = $tbl.'<tr>';
         //Write the members that have been evaluated
-        for($i=0;$i<sizeof($evaluatee_names);$i++){
+        for($i=0; $i<sizeof($evaluatee_names); $i++){
             $tbl = $tbl.'<th>'.$evaluatee_names[$i].'</th>';
         }
         $tbl = $tbl.'</tr>';
@@ -681,9 +688,9 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $evaluator_count = array();
         
         //Write Scores
-        for($i=0;$i<sizeof($evaluators);$i++){
+        for($i=0; $i<sizeof($evaluators); $i++){
             $tbl = $tbl.'<tr><td>'.$evaluator_names[$i].'</td>'; //Write Evalator Name
-            for($j=0;$j<sizeof($evaluatees);$j++){
+            for($j=0; $j<sizeof($evaluatees); $j++){
                 $scoregiven = $this->_getScoreGiven($evaluators[$i], $evaluatees[$j], $grp_event_id);
                 $tbl=$tbl.'<td>'.$scoregiven[0].'</td>';
             }
@@ -695,9 +702,9 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $tbl = $tbl . '<tr><td><b>Totals</b></td>';
         
         //Write Totals
-        for($i=0;$i<sizeof($evaluatees);$i++){
+        for($i=0; $i<sizeof($evaluatees); $i++){
             $evaluator_count[$evaluatees[$i]] = 0;
-            for($j=0;$j<sizeof($evaluators);$j++){
+            for($j=0; $j<sizeof($evaluators); $j++){
                 $scoregiven = $this->_getScoreGiven($evaluators[$j], $evaluatees[$i], $grp_event_id);
                 $scoregiven[0] == '-'? $total : $total=$total+$scoregiven[0];
                 $scoregiven[0]=='-'? $evaluator_count[$evaluatees[$i]] : $evaluator_count[$evaluatees[$i]] = $evaluator_count[$evaluatees[$i]]+1;
@@ -710,16 +717,16 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $tbl = $tbl.'</tr>';
         
         //Write Penalties
-        $penalty_array = $this->_getPenaltyArray($event,$evaluatees);
+        $penalty_array = $this->_getPenaltyArray($event, $evaluatees);
          $tbl = $tbl . '<tr><td>Penalty</td>';
-         for($i=0;$i<sizeof($evaluatees);$i++){
+         for($i=0; $i<sizeof($evaluatees); $i++){
              $tbl = $tbl.'<td>'.$penalty_array[$evaluatees[$i]].'</td>';
          }
         $tbl = $tbl.'</tr>';      
         
         //Write Final Mark  
         $tbl = $tbl . '<tr><td><b>Final Mark</b></td>';
-         for($i=0;$i<sizeof($evaluatees);$i++){
+         for($i=0; $i<sizeof($evaluatees); $i++){
              if($penalty_array[$evaluatees[$i]] == '-'){
                  $tbl = $tbl.'<td>'.$totals_array[$evaluatees[$i]].'</td>';
              }
@@ -732,43 +739,43 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         
         //Write Evaluator Count
         $tbl = $tbl . '<tr><td># Evaluators</td>';
-         for($i=0;$i<sizeof($evaluatees);$i++){
+         for($i=0; $i<sizeof($evaluatees); $i++){
              if($evaluator_count[$evaluatees[$i]] == 0){
                  $tbl = $tbl.'<td> - </td>';
              }
              else{
                  $tbl = $tbl.'<td>'.$evaluator_count[$evaluatees[$i]].'</td>';
              }     
-        }
+         }
         $tbl = $tbl.'</tr>';  
         
         //Write Average Received
         $tbl = $tbl . '<tr><td><b>Average Received</b></td>';
-         for($i=0;$i<sizeof($evaluatees);$i++){
+         for($i=0; $i<sizeof($evaluatees); $i++){
              if($evaluator_count[$evaluatees[$i]] == 0){
                  $tbl = $tbl.'<td>'.$totals_array[$evaluatees[$i]].'</td>';
              }
              else{
                  $tbl = $tbl.'<td>'.($totals_array[$evaluatees[$i]]/$evaluator_count[$evaluatees[$i]]).'</td>';
              }     
-        }
+         }
         $tbl = $tbl.'</tr>';  
         return ($tbl.'</table>');
     }
     
-    /*
+    /**
      * _getPenaltyArray
      * 
      * @param mixed $event
      * @param array() - $evaluatees 
      * 
      * @return array() - an associative array consisting of the penalties for the evaluatees or '-' if no penalty
-     * */
+     */
     function _getPenaltyArray($event,$evaluatees){
         $this->Penalty= ClassRegistry::init('Penalty');
         $this->EvaluationSubmission= ClassRegistry::init('EvaluationSubmission');
         $penalty_array = array();
-        for($i=0;$i<sizeof($evaluatees);$i++){
+        for($i=0; $i<sizeof($evaluatees); $i++){
             $evalsub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($event['Event']['id'], $evaluatees[$i]);
             $days_late = $this->EvaluationSubmission->daysLate($event['Event']['id'], $evalsub['EvaluationSubmission']['date_submitted']);
             $penalty = $this->Penalty->getPenaltyByEventAndDaysLate($event['Event']['id'], $days_late);
@@ -779,23 +786,24 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         return $penalty_array;
     }
     
-    /*_filterTutors
+    /**
+     * _filterTutors
      * 
      * @param GroupId $grp_id
      * 
      * @return array() consisting of groupmembers no tutors
-     * */
+     */
     function _filterTutors($grp_id){
         $this->User = ClassRegistry::init('User');
-        $grpMembersNoTutors = $this->User->getEventGroupMembersNoTutors($grp_id, TRUE, null);
+        $grpMembersNoTutors = $this->User->getEventGroupMembersNoTutors($grp_id, true, null);
         $evaluatees = array();
         foreach($grpMembersNoTutors as $members){
-            array_push($evaluatees,$members['User']['id']);
+            array_push($evaluatees, $members['User']['id']);
         }
         return $evaluatees;
     }
     
-    /*
+    /**
      * _writeEvalDetails
      * 
      * @param mixed $event
@@ -835,7 +843,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         return ($group.$selfeval.$eventname.$eventTemplateType.$duedate.$description);             
     }
     
-    /*
+    /**
      * _getScoreGiven
      * 
      * @param Evaluator Id - $evaluator
@@ -843,75 +851,73 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * @param GroupEventId - $grpEventId
      * 
      * @return Integer - Score Given by evaluator to evaluatee or '-' if no score given 
-     * */
+     */
     function _getScoreGiven($evaluator,$evaluatee,$grpEventId){
          $this->EvaluationSimple = ClassRegistry::init('EvaluationSimple');
          $results = $this->EvaluationSimple->getEvalMarkByGrpEventIdEvaluatorEvaluatee($grpEventId, $evaluator, $evaluatee);
          $scores = array();
          isset($results['EvaluationSimple']['score'])? $mark = $results['EvaluationSimple']['score'] : $mark= '-';
-         array_push($scores,$mark);
+         array_push($scores, $mark);
          isset($results['EvaluationSimple']['comment'])? $comment = $results['EvaluationSimple']['comment'] : $comment= '-';
-         array_push($scores,$comment);
+         array_push($scores, $comment);
          return $scores;
     }
 
-    /*
+    /**
      * _getIncompleteMembers 
      * 
      * @param EventId $eventId
      * @param GroupId $groupId
      * 
      * @return array() consisting of members who have not completed the evaluation
-     */
-    
+     */    
     function _getIncompleteMembers($eventId,$groupId){
         //Get the evaluation submissions for the given $eventId
         //Do an array_diff on members in $groupId
         $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
         $this->Group = ClassRegistry::init('Group');
         
-        $members = $this->Group->getMembersByGroupId($groupId,'all');
+        $members = $this->Group->getMembersByGroupId($groupId, 'all');
         $memberslist = array();
         foreach($members as $m){
-            array_push($memberslist,$m['Member']['id']);
+            array_push($memberslist, $m['Member']['id']);
         }
         $submitter_list = array();
         $submissions = $this->EvaluationSubmission->getEvalSubmissionsByEventId($eventId);
       
         foreach($submissions as $s){
-           array_push($submitter_list,$s['EvaluationSubmission']['submitter_id']);
-         }
+           array_push($submitter_list, $s['EvaluationSubmission']['submitter_id']);
+        }
         $inComplete = array_values(array_diff($memberslist, $submitter_list));
         
         return $inComplete;
     }
     
-     /*
+    /**
      * _getMemberNames 
      * 
      * @param array() $members
      * 
      * @return array() consisting of member's names 
      */
-    
     function _getMemberNames($members){
         $nameslist = array();
          $this->User = ClassRegistry::init('User');
-        for($i = 0;$i < sizeof($members);$i++){
-            array_push($nameslist,$this->User->getFullNames($members[$i]));
+        for($i = 0; $i < sizeof($members); $i++){
+            array_push($nameslist, $this->User->getFullNames($members[$i]));
         }
         
         $names = array();
         foreach($nameslist as $name){
             foreach($name as $n){
-                array_push($names,$n);
+                array_push($names, $n);
             }
      
         }
         return $names; 
     }
     
-    /*
+    /**
      * _getMembers 
      * @param GroupEventId $grp_event_Id
      * 
@@ -923,10 +929,9 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $members = $this->GroupEvent->getGroupMembers($grp_event_Id);
         $memberslist = array();
         foreach($members as $m){
-            array_push($memberslist,$m['GroupsMembers']['user_id']);
+            array_push($memberslist, $m['GroupsMembers']['user_id']);
         }
         return $memberslist;       
     }
     
 }
-?>
