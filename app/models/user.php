@@ -1172,6 +1172,33 @@ class User extends AppModel
             return array_keys(User::getMyCourseList());
         }
     }
+    
+    /**
+     * getDroppedStudentsWithRole
+     *
+     * @param mixed $model
+     * @param mixed $results
+     * @param mixed $group
+     *
+     * @access public
+     * @return array of dropped students
+     */
+    function getDroppedStudentsWithRole($model, $results, $group)
+    {
+        $evaluators = Set::extract('/'.$model.'/evaluator', $results);
+        $evaluatees = Set::extract('/'.$model.'/evaluatee', $results);
+        $groupMembers = Set::extract('/id', $group['Member']);
+        $dropped = array_diff(array_unique(array_merge($evaluators, $evaluatees)), $groupMembers);
+        $dropped = $this->find('all', array(
+            'conditions' => array('User.id' => $dropped, 'Role.name' => 'student'),
+            'contain' => array('Role', 'Group'),
+        ));
+        foreach ($dropped as $key => $drop){
+            $dropped[$key] = $dropped[$key] + $drop['User'];
+        }
+        
+        return $dropped;
+    }
 
     /**
      * hasRole test if the user has a specific role

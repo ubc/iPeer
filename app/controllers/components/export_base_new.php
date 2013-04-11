@@ -89,9 +89,14 @@ class ExportBaseNewComponent extends Object
     function buildEvaluationScoreTableByGroup($params, $groupEvent, $event, $results)
     {
         $this->Group = ClassRegistry::init('Group');
+        $this->User = ClassRegistry::init('User');
+
         $group = $this->Group->getGroupWithMemberRoleByGroupIdEventId($groupEvent['group_id'], $event['Event']['id']);
+        $dropped = $this->User->getDroppedStudentsWithRole($this->responseModelName, $results, $group);
+        
         $grid = array();
         $responsesByEvaluatee = Set::combine($results, '{n}.'.$this->responseModelName.'.evaluator', '{n}', '{n}.'.$this->responseModelName.'.evaluatee');
+        $group['Member'] = array_merge($group['Member'], $dropped);
         foreach ($group['Member'] as $member) {
             // skip the non student member, for now we assume all the evaluatees are students
             if ($member['Role']['name'] != 'student') {
@@ -169,13 +174,15 @@ class ExportBaseNewComponent extends Object
                 array_push($row, $evaluatee['email']);
             }
             if (!empty($params['include']['student_name'])) {
-                array_push($row, $evaluatee['full_name']);
+                $dropped = isset($evaluatee['GroupsMember']) ? '' : '*';
+                array_push($row, $dropped.$evaluatee['full_name']);
             }
             if (!empty($params['include']['student_id'])) {
                 array_push($row, $evaluatee['student_no']);
             }
             if (!empty($params['include']['student_name'])) {
-                array_push($row, $evaluator['full_name']);
+                $dropped = isset($evaluator['GroupsMember']) ? '' : '*';
+                array_push($row, $dropped.$evaluator['full_name']);
             }
             if (!empty($params['include']['student_id'])) {
                 array_push($row, $evaluator['student_no']);
