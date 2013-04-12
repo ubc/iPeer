@@ -187,7 +187,7 @@ var numQ = <?php echo $numQ; ?>; // the total number of questions
 // the total number of descriptors
 var numDesc = <?php echo $numDesc; ?>; 
 // keeps track of currently valid user ids, cause users can remove questions
-var questionIds = new Array(<?php echo $numQArray; ?>);
+var questionIds = [<?php echo $numQArray; ?>];
 // templates for each question type, the negative numbers will be replaced
 // with an appropriate ID (from the tracking variables)
 // -1 is for numQ, -2 is for numDesc
@@ -219,9 +219,6 @@ function insertQ() {
     q = q.replace(/-1/g, numQ);
     jQuery(q).hide().appendTo('#questions').fadeIn(600);
     questionIds.push(numQ);
-    if (questionIds.length == 1 && questionIds[0] != 0) {
-        questionIds.unshift(0);
-    }
     numQ++;
     reorderQ();
 }

@@ -37,7 +37,15 @@ class AddGroupTestCase extends CakeTestCase
         $title = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'APSC 201 - Technical Communication > Add Group');
         
-        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'GroupGroupName')->sendKeys('Amazing Group');
+        $groupNum = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'GroupGroupNum');
+        $this->assertEqual($groupNum->attribute('value'), 1);
+        $this->assertTrue($groupNum->attribute('readonly'));
+        
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::CLASS_NAME, 'error-message')->text();
+        $this->assertEqual($msg, 'Please insert group name');
+        
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'GroupGroupName')->sendKeys(' Amazing Group ');
         
         // adding Geoff Student
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="all_groups"] option[value="30"]')->click();
@@ -78,6 +86,8 @@ class AddGroupTestCase extends CakeTestCase
         $this->assertEqual($title, 'APSC 201 - Technical Communication > Groups > View');
         $this->groupId = end(explode('/', $this->session->url()));
         
+        $this->checkViewLinks();
+        
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Edit this Group')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'GroupGroupName')->sendKeys(' Two');
         
@@ -116,5 +126,28 @@ class AddGroupTestCase extends CakeTestCase
         
         $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'The group was deleted successfully.');
+    }
+    
+    public function checkViewLinks()
+    {
+        $emails = $this->session->elements(PHPWebDriver_WebDriverBy::PARTIAL_LINK_TEXT, 'Email');
+        $this->assertTrue(strpos($emails[0]->attribute('href'), 'emailer/write/U/18'));
+        $this->assertTrue(strpos($emails[1]->attribute('href'), 'emailer/write/U/23'));
+        $this->assertTrue(strpos($emails[2]->attribute('href'), 'emailer/write/U/27'));
+        $this->assertTrue(strpos($emails[3]->attribute('href'), 'emailer/write/U/30'));
+        $this->assertTrue(strpos($emails[4]->attribute('href'), 'emailer/write/G/'.$this->groupId));
+        
+        $back = $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Back to Group Listing');
+        $this->assertTrue(strpos($back->attribute('href'), 'groups/index/2'));
+        
+        
+        $view = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[href="/users/view/18"]');
+        $this->assertTrue(!empty($view));
+        $view = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[href="/users/view/23"]');
+        $this->assertTrue(!empty($view));
+        $view = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[href="/users/view/27"]');
+        $this->assertTrue(!empty($view));
+        $view = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[href="/users/view/30"]');
+        $this->assertTrue(!empty($view));
     }
 }

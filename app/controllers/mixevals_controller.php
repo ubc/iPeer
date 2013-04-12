@@ -795,7 +795,7 @@ class MixevalsController extends AppController
 
         if ($inUse) {
             $message = __("This evaluation is now in use, and can NOT be deleted.<br />", true);
-            $message.= __("Please remove all the events assosiated with this evaluation first.", true);
+            $message.= __("Please remove all the events associated with this evaluation first.", true);
             $this->Session->setFlash($message);
             $this->redirect('index');
             //	exit;
