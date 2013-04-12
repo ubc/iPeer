@@ -476,6 +476,7 @@ class EventsController extends AppController
 
 
         if (!empty($this->data)) {
+            //debug($this->data);
             // need to set the template_id based on the event_template_type_id
             $typeId = $this->data['Event']['event_template_type_id'];
             if ($typeId == 1) {
@@ -490,6 +491,11 @@ class EventsController extends AppController
             } else if ($typeId == 4) {
                 $this->data['Event']['template_id'] =
                     $this->data['Event']['Mixeval'];
+            }
+            
+            // if all groups unselected - delete groupEvents
+            if (empty($this->data['Group']['Group'])) {
+                $this->GroupEvent->deleteAll(array('GroupEvent.event_id' => $eventId));
             }
 
             $penaltyData = $this->Penalty->find('all', array('conditions' => array('event_id' => $eventId), 'contain' => false));
