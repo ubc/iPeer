@@ -4,6 +4,7 @@
     <li><?php echo __("Give the export file a name, which is default to today's date.", true)?></li>
     <li><?php echo __("Choose one of the two export formats.", true)?></li>
     <li><?php echo __("Please check at least one from each similarly coloured group.", true)?></li>
+    <li><?php echo __("Dropped Students that have evaluated or have been evaluated are marked with an asterisk (*)", true)?></li>
 </ul>
 <h2><?php echo __('Export', true) ?></h2>
 <?php
