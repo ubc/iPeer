@@ -119,9 +119,9 @@ class AddMixEvalTestCase extends CakeTestCase
         
         $this->session->open($this->url.'mixevals/index');        
         // delete the template
-        /*$this->deleteTemplate();
+        $this->deleteTemplate();
         $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
-        $this->assertEqual($msg, 'The Mixed Evaluation was removed successfully.');*/
+        $this->assertEqual($msg, 'The Mixed Evaluation was removed successfully.');
     }
     
     public function addLikert() 
