@@ -529,10 +529,12 @@ class SurveysController extends AppController
           // filter - remove the removed answers from the database
           $responses = $this->Response->find('list', array('conditions' => array('question_id' => $question_id)));
           $newResponses = array();
-          foreach ($this->data['Response'] as $new) {
-            if (isset($new['id'])) {
-                $newResponses[] = $new['id'];
-            }
+          if (isset($this->data['Response'])) {
+              foreach ($this->data['Response'] as $new) {
+                if (isset($new['id'])) {
+                    $newResponses[] = $new['id'];
+                }
+              }
           }
           foreach ($responses as $resp) {
             if (!in_array($resp, $newResponses)) {

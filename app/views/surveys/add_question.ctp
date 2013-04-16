@@ -64,6 +64,7 @@ echo $form->end();
 </div>
 
 <script type="text/javascript">
+toggleResponse();
 jQuery("#QuestionType").change(toggleResponse);
 
 // Adding/Removing responses
