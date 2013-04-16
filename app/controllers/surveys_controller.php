@@ -267,6 +267,27 @@ class SurveysController extends AppController
     {
         // retrieving the requested survey
         $survey = $this->Survey->getEventSub($id);
+        if (!User::hasPermission('functions/superadmin')) {
+            // instructor
+            if (!User::hasPermission('controllers/departments')) {
+                $instructorIds = array($this->Auth->user('id'));
+            // admins
+            } else {
+                // course ids
+                $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+                // instructors
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
+                // add the user's id
+                array_push($instructorIds, $this->Auth->user('id'));
+            }
+            // creator's id be in the array of accessible user ids
+            if (!(in_array($survey['Survey']['creator_id'], $instructorIds))) {
+                $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
+                $this->redirect('index');
+                return;
+            }
+        }
 
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($id) || empty($survey)) {
@@ -341,6 +362,27 @@ class SurveysController extends AppController
     {
         // retrieving the requested survey
         $survey = $this->Survey->getEventSub($id);
+        if (!User::hasPermission('functions/superadmin')) {
+            // instructor
+            if (!User::hasPermission('controllers/departments')) {
+                $instructorIds = array($this->Auth->user('id'));
+            // admins
+            } else {
+                // course ids
+                $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+                // instructors
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
+                // add the user's id
+                array_push($instructorIds, $this->Auth->user('id'));
+            }
+            // creator's id be in the array of accessible user ids
+            if (!(in_array($survey['Survey']['creator_id'], $instructorIds))) {
+                $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
+                $this->redirect('index');
+                return;
+            }
+        }
 
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($id) || empty($survey)) {
@@ -379,6 +421,27 @@ class SurveysController extends AppController
     {
         // retrieving the requested survey
         $survey = $this->Survey->getEventSub($survey_id);
+        if (!User::hasPermission('functions/superadmin')) {
+            // instructor
+            if (!User::hasPermission('controllers/departments')) {
+                $instructorIds = array($this->Auth->user('id'));
+            // admins
+            } else {
+               // course ids
+               $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+               // instructors
+               $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+               $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
+               // add the user's id
+               array_push($instructorIds, $this->Auth->user('id'));
+            }
+            // creator's id be in the array of accessible user ids
+            if (!(in_array($survey['Survey']['creator_id'], $instructorIds))) {
+               $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
+               $this->redirect('index');
+               return;
+            }
+        }
 
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($survey_id) || empty($survey)) {
@@ -469,6 +532,29 @@ class SurveysController extends AppController
    */
   function addQuestion($survey_id)
   {
+      // retrieving the requested survey
+      $survey = $this->Survey->getEventSub($survey_id);
+      if (!User::hasPermission('functions/superadmin')) {
+          // instructor
+          if (!User::hasPermission('controllers/departments')) {
+              $instructorIds = array($this->Auth->user('id'));
+          // admins
+          } else {
+             // course ids
+             $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+             // instructors
+             $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+             $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
+             // add the user's id
+             array_push($instructorIds, $this->Auth->user('id'));
+          }
+          // creator's id be in the array of accessible user ids
+          if (!(in_array($survey['Survey']['creator_id'], $instructorIds))) {
+             $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
+             $this->redirect('index');
+             return;
+          }
+      }
       if (isset($this->params['form']['cancel'])) {
           $this->redirect('questionsSummary/'.$survey_id);
           return;
@@ -515,6 +601,29 @@ class SurveysController extends AppController
    */
   function editQuestion( $question_id, $survey_id )
   {
+      // retrieving the requested survey
+      $survey = $this->Survey->getEventSub($survey_id);
+      if (!User::hasPermission('functions/superadmin')) {
+          // instructor
+          if (!User::hasPermission('controllers/departments')) {
+              $instructorIds = array($this->Auth->user('id'));
+          // admins
+          } else {
+             // course ids
+             $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+             // instructors
+             $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+             $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
+             // add the user's id
+             array_push($instructorIds, $this->Auth->user('id'));
+          }
+          // creator's id be in the array of accessible user ids
+          if (!(in_array($survey['Survey']['creator_id'], $instructorIds))) {
+             $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
+             $this->redirect('index');
+             return;
+          }
+      }
       if (isset($this->params['form']['cancel'])) {
           $this->redirect('questionsSummary/'.$survey_id);
           return;
