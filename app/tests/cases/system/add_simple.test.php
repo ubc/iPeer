@@ -1,18 +1,13 @@
 <?php
-require_once('PHPWebDriver/WebDriver.php');
-require_once('PHPWebDriver/WebDriverBy.php');
-require_once('PHPWebDriver/WebDriverWait.php');
-require_once('PageFactory.php');
+require_once('system_base.php');
 
-class addSimple extends CakeTestCase
+class addSimpleTestCase extends SystemBaseTestCase
 {
-    protected $web_driver;
-    protected $session;
-    protected $url = 'http://ipeerdev.ctlt.ubc.ca/';
     protected $simpleId = 0;
     
     public function startCase()
     {
+        $this->getUrl();
         $wd_host = 'http://localhost:4444/wd/hub';
         $this->web_driver = new PHPWebDriver_WebDriver($wd_host);
         $this->session = $this->web_driver->session('firefox');
@@ -191,21 +186,5 @@ class addSimple extends CakeTestCase
         );
         $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'The evaluation was deleted successfully.');
-    }
-    
-    private function waitForLogout($username)
-    {
-        $this->session->open('http://ipeerdev.ctlt.ubc.ca/');
-        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Logout')->click();
-        $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
-        $w->until(
-            function($session) {
-                $title = $session->title();
-                return ($title == 'iPeer - Guard');
-            }
-        );
-        $login = PageFactory::initElements($this->session, 'Login');
-        $home = $login->login($username, 'ipeeripeer');
     }
 }

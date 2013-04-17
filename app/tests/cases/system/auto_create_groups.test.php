@@ -1,18 +1,13 @@
 <?php
-require_once('PHPWebDriver/WebDriver.php');
-require_once('PHPWebDriver/WebDriverBy.php');
-require_once('PHPWebDriver/WebDriverWait.php');
-require_once('PageFactory.php');
+require_once('system_base.php');
 
-class autoCreateGroups extends CakeTestCase
+class autoCreateGroupsTestCase extends SystemBaseTestCase
 {
-    protected $web_driver;
-    protected $session;
-    protected $url = 'http://ipeerdev.ctlt.ubc.ca/';
     protected $surveyGroupId = 0;
 
     public function startCase()
     {
+        $this->getUrl();
         $wd_host = 'http://localhost:4444/wd/hub';
         $this->web_driver = new PHPWebDriver_WebDriver($wd_host);
         $this->session = $this->web_driver->session('firefox');
@@ -61,7 +56,7 @@ class autoCreateGroups extends CakeTestCase
     {
         $title = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'Survey Groups > Teams Summary');
-        $numGroups = count($this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "tr")) - 1;
+        $numGroups = count($this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "tr td[width='100']"));
         $this->assertEqual($numGroups, 6);
         $students = count($this->session->elements(PHPWebDriver_WebDriverBy::PARTIAL_LINK_TEXT, "Student"));
         $this->assertEqual($students, 13);

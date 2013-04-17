@@ -378,7 +378,7 @@ class SurveysController extends AppController
             }
             // creator's id be in the array of accessible user ids
             if (!(in_array($survey['Survey']['creator_id'], $instructorIds))) {
-                $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
+                $this->Session->setFlash(__('Error: You do not have permission to delete this survey', true));
                 $this->redirect('index');
                 return;
             }

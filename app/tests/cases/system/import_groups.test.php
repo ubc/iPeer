@@ -1,17 +1,11 @@
 <?php
-require_once('PHPWebDriver/WebDriver.php');
-require_once('PHPWebDriver/WebDriverBy.php');
-require_once('PHPWebDriver/WebDriverWait.php');
-require_once('PageFactory.php');
+require_once('system_base.php');
 
-class ImportGroupsTestCase extends CakeTestCase
-{
-    protected $web_driver;
-    protected $session;
-    protected $url = 'http://ipeerdev.ctlt.ubc.ca/';
-    
+class ImportGroupsTestCase extends SystemBaseTestCase
+{    
     public function startCase()
     {
+        $this->getUrl();
         $wd_host = 'http://localhost:4444/wd/hub';
         $this->web_driver = new PHPWebDriver_WebDriver($wd_host);
         $this->session = $this->web_driver->session('firefox');
@@ -33,7 +27,7 @@ class ImportGroupsTestCase extends CakeTestCase
     {
         $this->session->open($this->url.'groups/import/2');
         $file = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'GroupFile');
-        $file->sendKeys('../tests/cases/system/importGroup.csv');
+        $file->sendKeys(dirname(__FILE__).'/importGroup.csv');
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $session = $this->session;

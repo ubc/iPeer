@@ -1,17 +1,11 @@
 <?php
-require_once('PHPWebDriver/WebDriver.php');
-require_once('PHPWebDriver/WebDriverBy.php');
-require_once('PHPWebDriver/WebDriverWait.php');
-require_once('PageFactory.php');
+require_once('system_base.php');
 
-class ImportUsersTestCase extends CakeTestCase
-{
-    protected $web_driver;
-    protected $session;
-    protected $url = 'http://ipeerdev.ctlt.ubc.ca/';
-    
+class ImportUsersTestCase extends SystemBaseTestCase
+{    
     public function startCase()
     {
+        $this->getUrl();
         $wd_host = 'http://localhost:4444/wd/hub';
         $this->web_driver = new PHPWebDriver_WebDriver($wd_host);
         $this->session = $this->web_driver->session('firefox');
@@ -36,7 +30,7 @@ class ImportUsersTestCase extends CakeTestCase
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Import Students')->click();
         
         $file = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserFile');
-        $file->sendKeys('../tests/cases/system/newClass_APSC201.csv');
+        $file->sendKeys(dirname(__FILE__).'/newClass_APSC201.csv');
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         
         // check class list - should have 16 students
@@ -72,7 +66,7 @@ class ImportUsersTestCase extends CakeTestCase
     {
         $this->session->open($this->url.'users/import/2');
         $file = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserFile');
-        $file->sendKeys('../tests/cases/system/oldClass_APSC201.csv');
+        $file->sendKeys(dirname(__FILE__).'/oldClass_APSC201.csv');
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserUpdateClass')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
 

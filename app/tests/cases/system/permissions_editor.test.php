@@ -1,17 +1,11 @@
 <?php
-require_once('PHPWebDriver/WebDriver.php');
-require_once('PHPWebDriver/WebDriverBy.php');
-require_once('PHPWebDriver/WebDriverWait.php');
-require_once('PageFactory.php');
+require_once('system_base.php');
 
-class PermissionsEditorTestCase extends cakeTestCase
-{
-    protected $web_driver;
-    protected $session;
-    protected $url = 'http://ipeerdev.ctlt.ubc.ca/';
-    
+class PermissionsEditorTestCase extends SystemBaseTestCase
+{    
     public function startCase()
     {
+        $this->getUrl();
         $wd_host = 'http://localhost:4444/wd/hub';
         $this->web_driver = new PHPWebDriver_WebDriver($wd_host);
         $this->session = $this->web_driver->session('firefox');
@@ -58,25 +52,18 @@ class PermissionsEditorTestCase extends cakeTestCase
     
     public function testAccess()
     {
-        $this->waitForLogout();
-        $this->assertEqual($this->session->url(), 'http://ipeerdev.ctlt.ubc.ca/login');
-
-        $login = PageFactory::initElements($this->session, 'Login');
-        $home = $login->login('instructor1', 'ipeeripeer');
+        $this->waitForLogout('instructor1');
         
-        $this->session->open('http://ipeerdev.ctlt.ubc.ca/accesses/view/5');
+        $this->session->open($this->url.'accesses/view/5');
         $title = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'Permissions Editor > student');
         
-        $this->waitForLogout();
+        $this->waitForLogout('root');
     }
     
     public function testDenyAccess()
     {
-        $login = PageFactory::initElements($this->session, 'Login');
-        $home = $login->login('root', 'ipeeripeer');
-
-        $this->session->open('http://ipeerdev.ctlt.ubc.ca/accesses/view/3');
+        $this->session->open($this->url.'accesses/view/3');
         $title = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'Permissions Editor > instructor');
 
@@ -119,21 +106,5 @@ class PermissionsEditorTestCase extends cakeTestCase
         );
         $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'Permissions have been updated');
-    }
-    
-    public function waitForLogout()
-    {
-        //set the url back to homepage before logging out
-        //so that when we login again, we're at the home page.
-        $this->session->open('http://ipeerdev.ctlt.ubc.ca/');
-        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Logout')->click();
-        $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
-        $w->until(
-            function($session) {
-                $title = $session->title();
-                return ($title == 'iPeer - Guard');
-            }
-        );
     }
 }

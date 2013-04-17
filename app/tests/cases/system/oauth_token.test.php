@@ -1,18 +1,13 @@
 <?php
-require_once('PHPWebDriver/WebDriver.php');
-require_once('PHPWebDriver/WebDriverBy.php');
-require_once('PHPWebDriver/WebDriverWait.php');
-require_once('PageFactory.php');
+require_once('system_base.php');
 
-class oauthClientTestCase extends CakeTestCase
+class oauthTokenTestCase extends SystemBaseTestCase
 {
-    protected $web_driver;
-    protected $session;
-    protected $url = 'http://ipeerdev.ctlt.ubc.ca/';
-    protected $clientId = 0;
+    protected $tokenId = 0;
     
     public function startCase()
     {
+        $this->getUrl();
         $wd_host = 'http://localhost:4444/wd/hub';
         $this->web_driver = new PHPWebDriver_WebDriver($wd_host);
         $this->session = $this->web_driver->session('firefox');
@@ -30,25 +25,26 @@ class oauthClientTestCase extends CakeTestCase
         $this->session->close();
     }
     
-    public function testAddOauthClient()
+    public function testAddOauthToken()
     {
         $this->session->open($this->url.'pages/admin');
-        $title = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
+        $title = $this->session->element(PHPWebDRiver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'Admin');
         
-        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'OAuth Client Credentials')->click();
-        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Add Client')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'OAuth Token Credentials')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Add Token')->click();
         $title = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
-        $this->assertEqual($title, 'Create New OAuth Client Credential');
-        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'OauthClientComment')->sendKeys('For Testing');
+        $this->assertEqual($title, 'Create New OAuth Token Credential');
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="OauthTokenExpiresYear"] option[value="2018"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'OauthTokenComment')->sendKeys('For Testing');
         
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
-        $this->assertEqual($msg, 'A new OAuth client has been created');
-        $this->assertEqual($this->session->url(), $this->url.'oauthclients');  
+        $this->assertEqual($msg, 'New OAuth token created!');
+        $this->assertEqual($this->session->url(), $this->url.'oauthtokens');  
     }
     
-    public function testEditOauthClient()
+    public function testEditOauthToken()
     {
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[aria-controls="table_id"]')->sendKeys('For Testing');
         $w = new PHPWebDriver_WebDriverWait($this->session);
@@ -62,19 +58,20 @@ class oauthClientTestCase extends CakeTestCase
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'td[class="  sorting_1"]')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Edit')->click();
         
-        $this->clientId = end(explode('/', $this->session->url()));
-        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'OauthClientComment')->sendKeys('Has been edited'); 
+        $this->tokenId = end(explode('/', $this->session->url()));
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="OauthTokenExpiresYear"] option[value="2023"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'OauthTokenComment')->sendKeys('Has been edited'); 
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
 
         $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
-        $this->assertEqual($msg, 'The OAuth client has been saved');
-        $this->assertEqual($this->session->url(), $this->url.'oauthclients');  
+        $this->assertEqual($msg, 'OAuth token saved successfully!');
+        $this->assertEqual($this->session->url(), $this->url.'oauthtokens');  
     }
     
     public function testEditProfile()
     {
         $this->session->open($this->url.'users/editProfile');
-        $id = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="'.$this->clientId.'"]')->attribute('id');
+        $id = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="'.$this->tokenId.'"]')->attribute('id');
         $selectId = str_replace('Id','Enabled',$id);
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="'.$selectId.'"] option[value="0"]')->click();
     
@@ -87,8 +84,8 @@ class oauthClientTestCase extends CakeTestCase
     
     public function testDelete()
     {
-        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[href="/oauthclients/delete/'.$this->clientId.'"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[href="/oauthtokens/delete/'.$this->tokenId.'"]')->click();
         $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
-        $this->assertEqual($msg, 'OAuth client deleted');
+        $this->assertEqual($msg, 'OAuth token deleted.');  
     }
 }

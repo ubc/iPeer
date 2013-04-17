@@ -1,18 +1,13 @@
 <?php
-require_once('PHPWebDriver/WebDriver.php');
-require_once('PHPWebDriver/WebDriverBy.php');
-require_once('PHPWebDriver/WebDriverWait.php');
-require_once('PageFactory.php');
+require_once('system_base.php');
 
-class addRubric extends CakeTestCase
+class addRubricTestCase extends SystemBaseTestCase
 {
-    protected $web_driver;
-    protected $session;
-    protected $url = 'http://ipeerdev.ctlt.ubc.ca/';
     protected $rubricId = 0;
     
     public function startCase()
     {
+        $this->getUrl();
         $wd_host = 'http://localhost:4444/wd/hub';
         $this->web_driver = new PHPWebDriver_WebDriver($wd_host);
         $this->session = $this->web_driver->session('firefox');
@@ -210,9 +205,7 @@ class addRubric extends CakeTestCase
         $eval = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation');
         $this->assertTrue(!empty($eval));
         
-        $this->waitForLogout();
-        $login = PageFactory::initElements($this->session, 'Login');
-        $home = $login->login('instructor1', 'ipeeripeer');
+        $this->waitForLogout('instructor1');
         $this->session->open($this->url.'rubrics/index');
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation')->click();
         $url = $this->session->url();
@@ -351,9 +344,7 @@ class addRubric extends CakeTestCase
         $this->session->open(str_replace('view', 'delete', $this->session->url()));
         $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'The rubric was deleted successfully.');
-        $this->waitForLogout();
-        $login = PageFactory::initElements($this->session, 'Login');
-        $home = $login->login('root', 'ipeeripeer');
+        $this->waitForLogout('root');
     }
     
     public function testDeleteRubric()
@@ -368,19 +359,5 @@ class addRubric extends CakeTestCase
         );
         $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'The rubric was deleted successfully.');
-    }
-
-    private function waitForLogout()
-    {
-        $this->session->open($this->url);
-        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Logout')->click();
-        $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
-        $w->until(
-            function($session) {
-                $title = $session->title();
-                return ($title == 'iPeer - Guard');
-            }
-        );
     }
 }

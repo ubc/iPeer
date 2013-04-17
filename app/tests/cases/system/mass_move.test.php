@@ -1,17 +1,11 @@
 <?php
-require_once('PHPWebDriver/WebDriver.php');
-require_once('PHPWebDriver/WebDriverBy.php');
-require_once('PHPWebDriver/WebDriverWait.php');
-require_once('PageFactory.php');
+require_once('system_base.php');
 
-class massMoveTestCase extends CakeTestCase
-{
-    protected $web_driver;
-    protected $session;
-    protected $url = 'http://ipeerdev.ctlt.ubc.ca/';
-    
+class massMoveTestCase extends SystemBaseTestCase
+{    
     public function startCase()
     {
+        $this->getUrl();
         $wd_host = 'http://localhost:4444/wd/hub';
         $this->web_driver = new PHPWebDriver_WebDriver($wd_host);
         $this->session = $this->web_driver->session('firefox');
@@ -34,7 +28,7 @@ class massMoveTestCase extends CakeTestCase
         $courseId = $this->addTestCourse();
         $this->session->open($this->url.'courses/import');
         $file = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'CourseFile');
-        $file->sendKeys('../tests/cases/system/massMove.csv');
+        $file->sendKeys(dirname(__FILE__).'/massMove.csv');
         
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'CourseIdentifiersUsername')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 

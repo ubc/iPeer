@@ -1,17 +1,11 @@
 <?php
-require_once('PHPWebDriver/WebDriver.php');
-require_once('PHPWebDriver/WebDriverBy.php');
-require_once('PHPWebDriver/WebDriverWait.php');
-require_once('PageFactory.php');
+require_once('system_base.php');
 
-class AddCourseTestCase extends CakeTestCase
+class AddCourseTestCase extends SystemBaseTestCase
 {
-    protected $web_driver;
-    protected $session;
-    protected $url = "http://ipeerdev.ctlt.ubc.ca/";
-    
     public function startCase()
     {
+        $this->getUrl();
         $wd_host = 'http://localhost:4444/wd/hub';
         $this->web_driver = new PHPWebDriver_WebDriver($wd_host);
         $this->session = $this->web_driver->session('firefox');
@@ -83,9 +77,7 @@ class AddCourseTestCase extends CakeTestCase
     
     public function testDefaultValues()
     {
-        $this->waitForLogout();
-        $login = PageFactory::initElements($this->session, 'Login');
-        $home = $login->login('instructor1', 'ipeeripeer');
+        $this->waitForLogout('instructor1');
         
         $this->session->open($this->url.'courses/add');
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'CourseCourse')->sendKeys('CPSC 101 101');
@@ -282,19 +274,5 @@ class AddCourseTestCase extends CakeTestCase
         
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'List Survey Group Sets')->click();
         $this->assertEqual($this->url.'surveygroups/index/1', $this->session->url());
-    }
-    
-    private function waitForLogout()
-    {
-        $this->session->open('http://ipeerdev.ctlt.ubc.ca/');
-        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Logout')->click();
-        $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
-        $w->until(
-            function($session) {
-                $title = $session->title();
-                return ($title == 'iPeer - Guard');
-            }
-        );
     }
 }
