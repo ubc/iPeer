@@ -37,7 +37,8 @@ $params = array('controller'            => 'mixevals',
                 'zero_mark'             => $mixeval['zero_mark'],
                 'questions'             => $questions,
                 'user'                  => $id,
-                'event'                 => $event);
+                'event'                 => $event,
+                'evaluatee_count'       => 1);
 
 echo $this->element('mixevals/view_mixeval_details', $params);
 

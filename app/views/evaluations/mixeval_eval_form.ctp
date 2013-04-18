@@ -42,7 +42,7 @@
         <?php foreach($groupMembers as $row): $user = $row['User']; ?>
             <center><h2><?php echo $user['full_name']?></h2></center>
             <?php
-            ($mixeval['Event']['0']['self_eval']=='1')? $evaluatee_count = count($groupMembers) : $evaluatee_count = count($groupMembers) - 1;
+            $evaluatee_count = count($groupMembers);
             $total_marksTbl= $mixeval['Mixeval']['total_marks']*$evaluatee_count;
             $params = array(  'controller'            => 'mixevals',
                             'zero_mark'             => $mixeval['Mixeval']['zero_mark'],
@@ -51,7 +51,6 @@
                             'user'                  => $user,
                             'evaluatee_count'       => $evaluatee_count
                             );
-
             echo $this->element('mixevals/view_mixeval_details', $params);
             ?><br>
         <?php endforeach; ?>
@@ -65,7 +64,7 @@
 <script type="text/javascript">
 jQuery("#submit").click(function() {
    if(!validateTotal()){
-      var alertText = 'Please make sure that the Total of the grades you selected, equals ' + <?php echo $total_marksTbl; ?> + ' and then resubmit';
+      var alertText = 'Please make sure that the Total of the grades you selected equals ' + <?php echo $total_marksTbl; ?> + ' and then resubmit.';
       alert(alertText);
       return false;
     }
@@ -104,24 +103,16 @@ function validateTotal(){
     var total = 0;
     var tbl_Exists = false;
     jQuery(".must").each(function() {
-        var id = jQuery(this).attr('id');
-        if(id == 'EvaluationMixevalDropdown'){
+        if(jQuery(this).attr('id') == 'EvaluationMixevalDropdown'){
             tbl_Exists = true;
-            total = parseInt(total,10) + parseInt(jQuery("option:selected",this).val(),10);
+            total = total + jQuery("option:selected",this).val();
         }
     });
     var total_marksTbl = <?php echo $total_marksTbl ?>;
-    var total_message;
     var total_bool = total != total_marksTbl;
-    if(tbl_Exists){
-        if(total_bool){
-            return false;
-        }
-        else{
-            return true;
-        }  
-    }
-    else {
+    if(tbl_Exists && total_bool){
+        return false;
+    } else {
         return true;
     }
 }

@@ -262,7 +262,8 @@ CREATE TABLE IF NOT EXISTS `mixeval_question_types` (
 INSERT INTO `mixeval_question_types` (`id`, `type`) VALUES
 (1, 'Likert'),
 (2, 'Paragraph'),
-(3, 'Sentence');
+(3, 'Sentence'),
+(4, 'ScoreDropdown');
 
 ALTER TABLE mixevals_questions RENAME mixeval_questions;
 ALTER TABLE mixeval_questions ADD mixeval_question_type_id int(11) NOT NULL;

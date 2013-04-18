@@ -51,11 +51,9 @@ if ($details) {
                         'before' => '<li>'.$name,
                         'after' => $grade.'</li>'
                     ));
-                }
-                else if($type == '4'){
+                } else if ($type == '4') {
                     echo '<li>'.$name.$sub['grade'].'</li>';
-                }
-             else {
+                } else {
                     echo '<li>'.$name.$sub['question_comment'].'</li>';
                 }
             }

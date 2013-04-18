@@ -911,7 +911,7 @@ class EvaluationComponent extends Object
                 if (empty($data[$num]['selected_lom']) && $ques['mixeval_question_type_id'] != '4' ) {
                     continue;
                 }
-                if($ques['mixeval_question_type_id'] == '1'){
+                if ($ques['mixeval_question_type_id'] == '1') {
                     $evalMixevalDetail['EvaluationMixevalDetail']['selected_lom'] = $data[$num]['selected_lom'];   
                 }
                 $evalMixevalDetail['EvaluationMixevalDetail']['grade'] = $data[$num]['grade'];
@@ -931,7 +931,6 @@ class EvaluationComponent extends Object
             $this->EvaluationMixevalDetail->save($evalMixevalDetail);
             $this->EvaluationMixevalDetail->id=null;
         }
-        //debug($evalMixevalDetail);
         return $totalGrade;
     }
 

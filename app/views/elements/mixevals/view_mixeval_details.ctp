@@ -75,24 +75,20 @@ foreach ($questions as $ques) {
             )
         );
         $output = $output.$selected;
-    }
-      else if ($type == 'ScoreDropdown'){
-            $basePoints = $ques['MixevalQuestion']['multiplier'];
-            $increment = $basePoints/10;
-            $total = $evaluatee_count;
-            $value = (isset($details[$num])) ? $details[$num]['grade'] : 0;
-            $incrementArray = array();
-            for($i=0;$i<=$basePoints*$evaluatee_count;$i++){
-                $incrementArray[$i] = $i;
-            }    
-            $output = $html->div('MixevalQuestion',
-                 $title .
-                 $instruct .
-                $form->input('dropdown',
-                     array('label' => false, 'default' => $value,'options' => $incrementArray, 'class' => $class,
-                    'name' => 'data['.$user['id'].'][EvaluationMixeval]['.$num.'][grade]'))
+    } else if ($type == 'ScoreDropdown') {
+        $basePoints = $ques['MixevalQuestion']['multiplier'];
+        $increment = $basePoints/10;
+        $total = $evaluatee_count;
+        $value = (isset($details[$num])) ? $details[$num]['grade'] : 0;
+        $max = $basePoints * $evaluatee_count;
+        $output = $html->div('MixevalQuestion',
+             $title .
+             $instruct .
+            $form->input('dropdown',
+                 array('label' => false, 'default' => $value,'options' => range(0, $max), 'class' => $class,
+                'name' => 'data['.$user['id'].'][EvaluationMixeval]['.$num.'][grade]'))
         );   
-        }
+    }
     
     echo $output;
 }

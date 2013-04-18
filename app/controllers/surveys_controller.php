@@ -231,7 +231,7 @@ class SurveysController extends AppController
     {
         if (!empty($this->data)) {
             $this->data['Survey']['name'] = trim($this->data['Survey']['name']);
-            if ($result = $this->Survey->save($this->data)) {
+            if ($this->Survey->save($this->data)) {
                 // check to see if a template has been selected
                 if (!empty($this->data['Survey']['template_id'])) {
                     $questions = $this->SurveyQuestion->findAllBySurveyId($this->data['Survey']['template_id']);
@@ -265,13 +265,10 @@ class SurveysController extends AppController
     {
         // retrieving the requested survey
         $survey = $this->Survey->getEventSub($id);
-        if (!User::hasPermission('functions/superadmin')) {
-            // creator's id be in the array of accessible user ids
-            if (!($this->surveyAccess($survey))) {
-                $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
-                $this->redirect('index');
-                return;
-            }
+        if (!($this->surveyAccess($survey))) {
+            $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
+            $this->redirect('index');
+            return;
         }
 
         // check to see if $id is valid - numeric & is a survey
@@ -347,13 +344,10 @@ class SurveysController extends AppController
     {
         // retrieving the requested survey
         $survey = $this->Survey->getEventSub($id);
-        if (!User::hasPermission('functions/superadmin')) {
-            // creator's id be in the array of accessible user ids
-            if (!($this->surveyAccess($survey))) {
-                $this->Session->setFlash(__('Error: You do not have permission to delete this survey', true));
-                $this->redirect('index');
-                return;
-            }
+        if (!($this->surveyAccess($survey))) {
+            $this->Session->setFlash(__('Error: You do not have permission to delete this survey', true));
+            $this->redirect('index');
+            return;
         }
 
         // check to see if $id is valid - numeric & is a survey
@@ -393,13 +387,10 @@ class SurveysController extends AppController
     {
         // retrieving the requested survey
         $survey = $this->Survey->getEventSub($survey_id);
-        if (!User::hasPermission('functions/superadmin')) {
-            // creator's id be in the array of accessible user ids
-            if (!($this->surveyAccess($survey))) {
-               $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
-               $this->redirect('index');
-               return;
-            }
+        if (!($this->surveyAccess($survey))) {
+           $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
+           $this->redirect('index');
+           return;
         }
 
         // check to see if $id is valid - numeric & is a survey
@@ -493,13 +484,10 @@ class SurveysController extends AppController
   {
       // retrieving the requested survey
       $survey = $this->Survey->getEventSub($survey_id);
-      if (!User::hasPermission('functions/superadmin')) {
-          // creator's id be in the array of accessible user ids
-          if (!($this->surveyAccess($survey))) {
-             $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
-             $this->redirect('index');
-             return;
-          }
+      if (!($this->surveyAccess($survey))) {
+         $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
+         $this->redirect('index');
+         return;
       }
       if (isset($this->params['form']['cancel'])) {
           $this->redirect('questionsSummary/'.$survey_id);
@@ -549,13 +537,10 @@ class SurveysController extends AppController
   {
       // retrieving the requested survey
       $survey = $this->Survey->getEventSub($survey_id);
-      if (!User::hasPermission('functions/superadmin')) {
-          // creator's id be in the array of accessible user ids
-          if (!($this->surveyAccess($survey))) {
-             $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
-             $this->redirect('index');
-             return;
-          }
+      if (!($this->surveyAccess($survey))) {
+         $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
+         $this->redirect('index');
+         return;
       }
       if (isset($this->params['form']['cancel'])) {
           $this->redirect('questionsSummary/'.$survey_id);
@@ -622,6 +607,6 @@ class SurveysController extends AppController
           // add the user's id
           array_push($instructorIds, $this->Auth->user('id'));
       }
-      return in_array($survey['Survey']['creator_id'], $instructorIds);
+      return (in_array($survey['Survey']['creator_id'], $instructorIds) || User::hasPermission('functions/superadmin'));
   }
 }

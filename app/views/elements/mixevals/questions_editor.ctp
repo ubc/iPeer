@@ -20,8 +20,6 @@ function makeQ($view, $qType, $i, $qTypes, $required=true)
     $qTypeId = 0;
     $qHeader = "";
     $qFields = "";
-    debug($qType);
-    debug($qTypes);
     switch ($qType) {
     case 'Likert':
         $qHeader = _t('Likert Answer Question');
@@ -103,17 +101,6 @@ function makeQ($view, $qType, $i, $qTypes, $required=true)
 function scoredropdownFields($view, $i) {
     $html = $view->Html;
     $form = $view->Form;
-
-    $descs = '';
-    if (isset($view->data['MixevalQuestionDesc'])) {
-        foreach ($view->data['MixevalQuestionDesc'] as $key => $d) {
-            if ($d['question_index'] == $i) {
-                // note that $key is indexed from 0 while we want the more
-                // user friendly indexed from 1, hence the +1
-                $descs .= makeDesc($view, $i, $key);
-            }
-        }
-    }
 
     $ret = $form->input("MixevalQuestion.$i.multiplier", 
         array('label' => 'Marks (Base Points per Member)'));

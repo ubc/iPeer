@@ -1300,7 +1300,8 @@ CREATE TABLE IF NOT EXISTS `mixeval_question_types` (
 INSERT INTO `mixeval_question_types` (`id`, `type`) VALUES
 (1, 'Likert'),
 (2, 'Paragraph'),
-(3, 'Sentence');
+(3, 'Sentence'),
+(4, 'ScoreDropdown');
 
 -- --------------------------------------------------------
 
