@@ -232,14 +232,12 @@ class SurveysController extends AppController
         if (!empty($this->data)) {
             $this->data['Survey']['name'] = trim($this->data['Survey']['name']);
             if ($result = $this->Survey->save($this->data)) {
-                $this->data = $result;
-                $this->data['Survey']['id'] = $this->Survey->id;
-
                 // check to see if a template has been selected
-                if (!empty($this->data['Survey']['template_id'] )) {
-                    $this->SurveyQuestion->copyQuestions($this->data['Survey']['template_id'], $this->Survey->id);
+                if (!empty($this->data['Survey']['template_id'])) {
+                    $questions = $this->SurveyQuestion->findAllBySurveyId($this->data['Survey']['template_id']);
+                    $quesNo = $this->Question->copyQuestions($questions, $this->Survey->id);
+                    $this->SurveyQuestion->assignNumber($quesNo, $this->Survey->id);
                 }
-
                 $this->Session->setFlash(__('Survey is saved!', true), 'good');
                 $this->redirect('index');
                 return;
@@ -299,7 +297,7 @@ class SurveysController extends AppController
                 $this->redirect('index');
                 return;
             } else {
-                $this->Session->setFlash($this->Survey->errorMessage);
+                $this->Session->setFlash(__('Error: The Survey was not saved successfully.', true));
             }
         } else {
             $this->data = $survey;
@@ -511,6 +509,7 @@ class SurveysController extends AppController
           // load values from selected question into temp array
           $this->data = $this->Question->find('first', array(
             'conditions' => array('id' => $this->data['Question']['template_id'])));
+          $this->data['Question']['master'] = 'no';
       } 
       else if (!empty($this->data)) {
           $this->data['Survey']['id'] = $survey_id;
@@ -521,7 +520,6 @@ class SurveysController extends AppController
                   unset($response['id']);
               }
           }
-
           if ($this->Question->saveAll($this->data)) {
               $this->Session->setFlash(__('The question was added successfully.', true), 'good');
               // Need to run reorderQuestions once in order to correctly set the question position numbers
@@ -567,6 +565,7 @@ class SurveysController extends AppController
           // load values from selected question into temp array
           $this->data = $this->Question->find('first', array(
             'conditions' => array('id' => $this->data['Question']['template_id'])));
+          $this->data['Question']['master'] = 'no';
       } 
       else if (!empty($this->data)) {
           $this->data['Question']['id'] = $question_id;

@@ -69,7 +69,13 @@ class addSurveyTestCase extends SystemBaseTestCase
         $this->session->open($this->url.'surveys/copy/'.$surveyId);
         $this->copySurvey();
         
-        // delete survey template
+        // delete survey template & their questions
+        $this->session->open($this->url.'surveys/questionsSummary/'.$surveyId);
+        $this->deleteQues();
+        $this->deleteQues();
+        $this->deleteQues();
+        $this->deleteQues();
+        $this->deleteQues();
         $this->session->open($this->url.'surveys/delete/'.$surveyId);
         $w->until(
             function($session) {
@@ -112,6 +118,7 @@ class addSurveyTestCase extends SystemBaseTestCase
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="submit"]')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'QuestionPrompt')->sendKeys('Which operating systems have you used before?');
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="QuestionType"] option[value="C"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="QuestionMaster"] option[value="yes"]')->click();
         
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Add Response')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'Response0Response')->sendKeys('Windows');
@@ -140,6 +147,8 @@ class addSurveyTestCase extends SystemBaseTestCase
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="submit"]')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'QuestionPrompt')->sendKeys('What is your favourite course this term?');
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="QuestionType"] option[value="S"]')->click();
+        $masterQ = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="QuestionTemplateId"] option');
+        $this->assertEqual(count($masterQ), 2);
  
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Save Question"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
@@ -187,7 +196,7 @@ class addSurveyTestCase extends SystemBaseTestCase
     }
 
     public function editQuestions()
-    {      
+    {
         // edit m/c
         $edits = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Edit');
         $this->session->open($edits[0]->attribute('href'));
@@ -265,6 +274,40 @@ class addSurveyTestCase extends SystemBaseTestCase
         $this->assertEqual($prompts[1]->text(), '2. Tell me a little bit about yourself.');
         $this->assertEqual($prompts[2]->text(), '3. Which OS will you be programming in?');
         $this->assertEqual($prompts[3]->text(), '4. What year are you in?');
+        
+        // load master question
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="submit"]')->click();
+        $templates = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="QuestionTemplateId"] option');
+        $templates[1]->click(); // choose first question
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Load"]')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                $prompt = $session->element(PHPWebDriver_WebDriverBy::ID, 'QuestionPrompt')->attribute('value');
+                return ($prompt == 'Which OS will you be programming in?');
+            }
+        );
+        $master = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="QuestionMaster"] option[value="no"]');
+        $this->assertTrue($master->attribute('selected'));
+        $desc = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="responseInput"] div[class="input text"]');
+        $this->assertEqual(count($desc), 3);
+        $first = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'Response0Response')->attribute('value');
+        $this->assertEqual($first, 'Windows');
+        $snd = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'Response1Response')->attribute('value');
+        $this->assertEqual($snd, 'Mac OS X');
+        $third = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'Response2Response')->attribute('value');
+        $this->assertEqual($third, 'Linux');
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Save Question"]')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
+        $this->assertEqual($msg, 'The question was added successfully.');
     }
     
     public function copySurvey()
@@ -278,7 +321,7 @@ class addSurveyTestCase extends SystemBaseTestCase
         $session = $this->session;
         $w->until(
             function($session) {
-                    return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
             }
         );
         $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
@@ -297,10 +340,13 @@ class addSurveyTestCase extends SystemBaseTestCase
         
         // 3 checkboxes
         $check = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[class="checkbox"] label');
-        $this->assertEqual(count($check), 3);
+        $this->assertEqual(count($check), 6);
         $this->assertEqual($check[0]->text(), 'Windows');
         $this->assertEqual($check[1]->text(), 'Mac OS X');
         $this->assertEqual($check[2]->text(), 'Linux');
+        $this->assertEqual($check[3]->text(), 'Windows');
+        $this->assertEqual($check[4]->text(), 'Mac OS X');
+        $this->assertEqual($check[5]->text(), 'Linux');
         
         // 4 radio buttons
         $radio = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[class="input radio"] label');
@@ -311,7 +357,13 @@ class addSurveyTestCase extends SystemBaseTestCase
         $this->assertEqual($radio[3]->text(), '4th +');
         
         // delete
-        $this->session->open(str_replace('view', 'delete', $this->session->url()));
+        $this->session->open(str_replace('view', 'questionsSummary', $this->session->url()));
+        $this->deleteQues();
+        $this->deleteQues();
+        $this->deleteQues();
+        $this->deleteQues();
+        $this->deleteQues();
+        $this->session->open(str_replace('questionsSummary', 'delete', $this->session->url()));
         $w->until(
             function($session) {
                     return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -375,5 +427,20 @@ class addSurveyTestCase extends SystemBaseTestCase
         $this->assertTrue(empty($mySurvey));
         
         $this->waitForLogout('root');
+    }
+    
+    public function deleteQues()
+    {
+        $delete = $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Delete')->click();
+        $this->session->accept_alert();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
+        $this->assertEqual($msg, 'The question was removed successfully.');
     }
 }

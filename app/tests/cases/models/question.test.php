@@ -53,5 +53,9 @@ class QuestionTestCase extends CakeTestCase
         $this->assertNull($faultyId);
         $this->assertNull($nullId);
     }
+    
+    function testCopyQuestions()
+    {
+    }
 
 }

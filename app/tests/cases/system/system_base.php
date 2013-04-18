@@ -37,4 +37,12 @@ class SystemBaseTestCase extends CakeTestCase
         $login = PageFactory::initElements($this->session, 'Login');
         $home = $login->login($username, 'ipeeripeer');
     }
+    
+    public function startTest($method) {
+        echo 'Starting method ' . $method . "\n";
+    }
+
+    public function endTest($method) {
+        echo 'Ending method ' . $method . "\n";
+    }
 }

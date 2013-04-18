@@ -116,4 +116,38 @@ class Question extends AppModel
 
         return Set::combine($questions, '{n}.id', '{n}.prompt');
     }
+    
+    /**
+     * copyQuestions
+     * copies the questions and responses to a new survey
+     *
+     * @param mixed $quesIds
+     * @param mixed $surveyId
+     *
+     * @access public
+     * @return void
+     */
+    function copyQuestions($quesIds, $surveyId)
+    {
+        $ids = Set::extract('/SurveyQuestion/question_id', $quesIds);
+        $order = Set::combine($quesIds, '{n}.SurveyQuestion.question_id', '{n}.SurveyQuestion.number');
+        $questions = $this->findAllById($ids);
+        foreach ($questions as $ques) {
+            $quesId = $ques['Question']['id'];
+            //$quesNo['SurveyQuestion']['number'] = $order[$ques['Question']['id']];
+            unset($ques['Survey'], $ques['Question']['id']);
+            $ques['Question']['master'] = 'no';
+            foreach ($ques['Response'] as &$resp) {
+                unset($resp['id'], $resp['question_id']);
+            }
+            unset($resp);
+            if (empty($ques['Response'])) {
+                unset($ques['Response']);
+            }
+            $ques['Survey']['id'] = $surveyId;
+            $this->saveAll($ques);
+            $quesNo[$this->getInsertId()] = $order[$quesId];
+        }
+        return $quesNo;
+    }
 }
