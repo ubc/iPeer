@@ -1,7 +1,7 @@
 <?php
 $numberQuesetions = array();
 foreach ($mixeval['MixevalQuestion'] as $question) {
-    if ($question['mixeval_question_type_id'] == '1') {
+    if ($question['mixeval_question_type_id'] == '1' || $question['mixeval_question_type_id'] == '4') {
         $numberQuestions[] = $question;
     }
 }

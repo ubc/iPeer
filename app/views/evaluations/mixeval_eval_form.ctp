@@ -33,7 +33,7 @@
     <tr>
         <td>
         <?php echo $this->Form->create('EvaluationMixeval', array(
-            'url' => $html->url('makeEvaluation') . '/'.$event['Event']['id'].'/'.$event['Group']['id'])); ?>
+            'url' => $html->url('makeEvaluation') . '/'.$event['Event']['id'].'/'.$event['Group']['id']));?>
         <?php echo "<input type='hidden' name=data[data][submitter_id] value='".User::get('id')."'/>"; ?>
         <?php echo "<input type='hidden' name=data[data][event_id] value='".$event['Event']['id']."'/>"; ?>
         <?php echo "<input type='hidden' name=data[data][template_id] value='".$event['Event']['template_id']."'/>"; ?>
@@ -42,12 +42,15 @@
         <?php foreach($groupMembers as $row): $user = $row['User']; ?>
             <center><h2><?php echo $user['full_name']?></h2></center>
             <?php
+            ($mixeval['Event']['0']['self_eval']=='1')? $evaluatee_count = count($groupMembers) : $evaluatee_count = count($groupMembers) - 1;
+            $total_marksTbl= $mixeval['Mixeval']['total_marks']*$evaluatee_count;
             $params = array(  'controller'            => 'mixevals',
                             'zero_mark'             => $mixeval['Mixeval']['zero_mark'],
                             'questions'             => $questions,
                             'event'                 => $event,
-                            'user'                  => $user);
-
+                            'user'                  => $user,
+                            'evaluatee_count'       => $evaluatee_count
+                            );
 
             echo $this->element('mixevals/view_mixeval_details', $params);
             ?><br>
@@ -61,16 +64,23 @@
 <?php if (!empty($sub)) { ?>
 <script type="text/javascript">
 jQuery("#submit").click(function() {
+   if(!validateTotal()){
+      var alertText = 'Please make sure that the Total of the grades you selected, equals ' + <?php echo $total_marksTbl; ?> + ' and then resubmit';
+      alert(alertText);
+      return false;
+    }
     if (!validate()) {
         alert('Please fill in all required questions before resubmitting the evaluation.');
         return false;
     }
+    
 });
 
 function validate() {
     var empty = false;
     jQuery(".must").each(function() {
         var type = jQuery(this).attr('type');
+        var name = jQuery(this).attr('name');
         if (type == 'radio') {
             var name = jQuery(this).attr('name');
             if (!jQuery("input[name='" + name + "']:checked").val()) {
@@ -82,9 +92,36 @@ function validate() {
             }
         }
     });
+
     if (empty) {
         return false;
     } else {
+        return true;
+    }
+}
+
+function validateTotal(){
+    var total = 0;
+    var tbl_Exists = false;
+    jQuery(".must").each(function() {
+        var id = jQuery(this).attr('id');
+        if(id == 'EvaluationMixevalDropdown'){
+            tbl_Exists = true;
+            total = parseInt(total,10) + parseInt(jQuery("option:selected",this).val(),10);
+        }
+    });
+    var total_marksTbl = <?php echo $total_marksTbl ?>;
+    var total_message;
+    var total_bool = total != total_marksTbl;
+    if(tbl_Exists){
+        if(total_bool){
+            return false;
+        }
+        else{
+            return true;
+        }  
+    }
+    else {
         return true;
     }
 }

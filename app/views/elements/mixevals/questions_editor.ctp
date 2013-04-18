@@ -20,6 +20,8 @@ function makeQ($view, $qType, $i, $qTypes, $required=true)
     $qTypeId = 0;
     $qHeader = "";
     $qFields = "";
+    debug($qType);
+    debug($qTypes);
     switch ($qType) {
     case 'Likert':
         $qHeader = _t('Likert Answer Question');
@@ -33,6 +35,11 @@ function makeQ($view, $qType, $i, $qTypes, $required=true)
     case 'Sentence':
         $qHeader = _t('Sentence Answer Question');
         $qTypeId = array_search($qType, $qTypes);
+        break;
+    case 'ScoreDropdown':
+        $qHeader = _t('Score Dropdown Answer Question');
+        $qTypeId = array_search($qType, $qTypes);
+        $qFields = scoredropdownFields($view, $i);
         break;
     default:
        return ""; // unrecognized question type
@@ -89,6 +96,29 @@ function makeQ($view, $qType, $i, $qTypes, $required=true)
         array('id' => "question$i")
     );
 
+    return $ret;
+}
+
+// Helper for creating a template for score dropdown questions
+function scoredropdownFields($view, $i) {
+    $html = $view->Html;
+    $form = $view->Form;
+
+    $descs = '';
+    if (isset($view->data['MixevalQuestionDesc'])) {
+        foreach ($view->data['MixevalQuestionDesc'] as $key => $d) {
+            if ($d['question_index'] == $i) {
+                // note that $key is indexed from 0 while we want the more
+                // user friendly indexed from 1, hence the +1
+                $descs .= makeDesc($view, $i, $key);
+            }
+        }
+    }
+
+    $ret = $form->input("MixevalQuestion.$i.multiplier", 
+        array('label' => 'Marks (Base Points per Member)'));
+    $ret .= $html->div("help-text", 
+        _t('The increments on the drop-down will be based on the marks chosen <br> E.g for 10 base points per member, the drop-down will go from 1 to (10 x #GroupMembers) in increments of 1 <br>For 100 base points per member, drop-down will move in increments of 10'));
     return $ret;
 }
 
@@ -196,6 +226,7 @@ var questionIds = [<?php echo $numQArray; ?>];
 var likertQ = '<?php echo makeQ($this, 'Likert', -1, $qTypes); ?>';
 var sentenceQ = '<?php echo makeQ($this, 'Sentence', -1, $qTypes); ?>';
 var paragraphQ = '<?php echo makeQ($this, 'Paragraph', -1, $qTypes); ?>';
+var scoredropdownQ = '<?php echo makeQ($this, 'ScoreDropdown', -1, $qTypes); ?>';
 var desc = '<?php echo makeDesc($this, -1, -2); ?>';
 
 
@@ -212,6 +243,9 @@ function insertQ() {
         break;
     case "Sentence":
         q = sentenceQ;
+        break;
+    case "ScoreDropdown":
+        q = scoredropdownQ;
         break;
     default:
         return "";

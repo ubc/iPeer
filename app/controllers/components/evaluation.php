@@ -870,6 +870,7 @@ class EvaluationComponent extends Object
             $this->EvaluationMixeval->save($evalMixeval);
             $evalMixeval = $this->EvaluationMixeval->read();
         }
+        
         $score = $this->saveNGetEvaluationMixevalDetail(
             $evalMixeval['EvaluationMixeval']['id'], $mixeval, $params);
         $evalMixeval['EvaluationMixeval']['score'] = $score;
@@ -905,12 +906,14 @@ class EvaluationComponent extends Object
             }
             $evalMixevalDetail['EvaluationMixevalDetail']['evaluation_mixeval_id'] = $evalMixevalId;
             $evalMixevalDetail['EvaluationMixevalDetail']['question_number'] = $num;
-            
-            if ($ques['mixeval_question_type_id'] == '1') {
-                if (empty($data[$num]['selected_lom'])) {
+      
+            if (in_array($ques['mixeval_question_type_id'], array('1','4'))) {
+                if (empty($data[$num]['selected_lom']) && $ques['mixeval_question_type_id'] != '4' ) {
                     continue;
                 }
-                $evalMixevalDetail['EvaluationMixevalDetail']['selected_lom'] = $data[$num]['selected_lom'];
+                if($ques['mixeval_question_type_id'] == '1'){
+                    $evalMixevalDetail['EvaluationMixevalDetail']['selected_lom'] = $data[$num]['selected_lom'];   
+                }
                 $evalMixevalDetail['EvaluationMixevalDetail']['grade'] = $data[$num]['grade'];
                 if ($ques['required']) {
                     $totalGrade += $data[$num]['grade'];
@@ -924,10 +927,11 @@ class EvaluationComponent extends Object
                 }
                 $evalMixevalDetail['EvaluationMixevalDetail']['question_comment'] = $data[$num]['question_comment'];
             }
+         
             $this->EvaluationMixevalDetail->save($evalMixevalDetail);
             $this->EvaluationMixevalDetail->id=null;
         }
-
+        //debug($evalMixevalDetail);
         return $totalGrade;
     }
 
