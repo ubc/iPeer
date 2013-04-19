@@ -76,7 +76,7 @@ foreach ($questions as $ques) {
         );
         $output = $output.$selected;
     } else if ($type == 'ScoreDropdown') {
-        $basePoints = $ques['MixevalQuestion']['multiplier'];
+        $basePoints = $ques['MixevalQuestion']['multiplier']; //Base Points is set as a Constant to 10 for since it is supposed to be used for TBL-Default
         $increment = $basePoints/10;
         $total = $evaluatee_count;
         $value = (isset($details[$num])) ? $details[$num]['grade'] : 0;

@@ -889,7 +889,8 @@ class EvaluationsController extends AppController
             $groupEventId = $data['grp_event_id'];
             $evaluator = $data['submitter_id'];
             $required = true;
-            $failures = array();
+            $failures = array();            
+
             foreach ($this->data as $userId => $eval) {
                 $eventId = $eval['Evaluation']['event_id'];
                 $groupId = $eval['Evaluation']['group_id'];

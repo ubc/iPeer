@@ -101,11 +101,10 @@ function makeQ($view, $qType, $i, $qTypes, $required=true)
 function scoredropdownFields($view, $i) {
     $html = $view->Html;
     $form = $view->Form;
-
-    $ret = $form->input("MixevalQuestion.$i.multiplier", 
-        array('label' => 'Marks (Base Points per Member)'));
-    $ret .= $html->div("help-text", 
-        _t('The increments on the drop-down will be based on the marks chosen <br> E.g for 10 base points per member, the drop-down will go from 1 to (10 x #GroupMembers) in increments of 1 <br>For 100 base points per member, drop-down will move in increments of 10'));
+    $ret = $form->hidden("MixevalQuestion.$i.multiplier",
+            array('value' => 10));
+    $ret = $ret.$html->div("help-text", 
+        _t('The increments on the drop-down will be based on 10 base points per member, the drop-down will go from 1 to (10 x No. of GroupMembers) in increments of 1 <br>'));
     return $ret;
 }
 

@@ -64,7 +64,7 @@
 <script type="text/javascript">
 jQuery("#submit").click(function() {
    if(!validateTotal()){
-      var alertText = 'Please make sure that the Total of the grades you selected equals ' + <?php echo $total_marksTbl; ?> + ' and then resubmit.';
+      var alertText = 'Please make sure that the total of the grades in the drop-downs equals ' + <?php echo $total_marksTbl; ?> + ' and then press "Submit" again.';
       alert(alertText);
       return false;
     }
