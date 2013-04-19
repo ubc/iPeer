@@ -862,12 +862,11 @@ i {
 
 /* courses/add, courses/edit */
 
-#CourseAddForm .select #InstructorInstructor, #CourseEditForm .select #InstructorInstructor {
-    height: 10em;
+#CourseEditForm .select #CourseInstructors, #CourseEditForm .select #CourseTutors {
     width: 20em;
 }
 
-#CourseAddForm .input input, #CourseEditForm .input input{
+#CourseEditForm .input input{
     margin-right: 10em;
     position: relative;
     width: 30em;
@@ -877,13 +876,13 @@ i {
     text-align: center;
 }
 
-#CourseEditForm #instructors .text input {
+#CourseEditForm #instructors .text input, #CourseEditForm #tutors .text input {
     width: 20em;
     margin-bottom: 0.75em;
     margin-right: 1em;
 }
 
-#CourseEditForm #instructors a {
+#CourseEditForm #instructors a, #CourseEditForm #tutors a {
     padding: 0.5em;
 }
 

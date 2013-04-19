@@ -13,7 +13,7 @@ class CoursesController extends AppController
     public $name = 'Courses';
     public $uses =  array('GroupEvent', 'Course', 'Personalize', 'UserCourse',
         'UserEnrol', 'Group', 'Event', 'User', 'UserFaculty', 'Department',
-        'CourseDepartment', 'EvaluationSubmission', 'SurveyInput');
+        'CourseDepartment', 'EvaluationSubmission', 'SurveyInput', 'UserTutor');
     public $helpers = array('Html', 'Ajax', 'excel', 'Javascript', 'Time',
         'Js' => array('Prototype'), 'FileUpload.FileUpload');
     public $components = array('ExportBaseNew', 'AjaxList', 'ExportCsv', 'ExportExcel',
@@ -242,8 +242,10 @@ class CoursesController extends AppController
 
         $this->set('departments', $departments);
 
-        // set the list of instructors
+        // set the list of instructors/tutors
+        $tutorList = $this->User->getTutors();
         $this->set('instructors', $instructorList);
+        $this->set('tutors', $tutorList);
     }
 
     /**
@@ -323,8 +325,10 @@ class CoursesController extends AppController
                 $this->Session->setFlash(__('Error: Course edits could not be saved.', true));
             }
         }
-        
+
         $course['Instructor']['Instructor'] = Set::extract('/Instructor/id', $course);
+        $tutors = $this->UserTutor->findAllByCourseId($courseId);
+        $course['Tutor']['Tutor'] = Set::extract('/UserTutor/user_id', $tutors);
         
         $this->data = $course;
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Edit Course', true)));

@@ -7,6 +7,7 @@ echo $html->div('help-text', __('Course subjects and course numbers, e.g. APSC 2
 echo $form->input('Course.title');
 echo $html->div('help-text', __('Course title, e.g. Technical Communication', true));
 
+// instructors field
 function makeInstructor($i, $userId, $fullName, $html, $form) {
     // make instructor text box
     $name = "'$fullName'";
@@ -31,6 +32,32 @@ if (isset($this->data) && isset($this->data['Instructor'])) {
     }
 }
 echo $html->div('input text', $prof, array('id' => 'instructors'));
+
+// tutors field
+function makeTutor($i, $userId, $fullName, $html, $form) {
+    // make tutor text box
+    $name = "'$fullName'";
+    $input = $form->label(' ') . $form->text("Tutor.$i.full_name", array('default' => $fullName, 'disabled' => true)) .
+        $html->link('X', '#', array('onclick' => "rmTutor($i, $name, $userId); return false;"));
+    $input .= $form->hidden("Tutor.Tutor.$i", array('value' => $userId));
+    $ret = $html->div('input text', $input, array('id' => "tutorsList$i"));
+    return $ret;
+}
+
+$numTutors = 0;
+$tutorSelected = array();
+$tutorTemplate = makeTutor(-1, -2, -3, $html, $form);
+$tutor = $form->input('tutors', array(
+    'after' => $html->link(__('Add Tutor', true), '#', array('onclick' => 'addTutor(); return false;')),
+    'empty' => '-- Select a tutor --'));
+if (isset($this->data) && isset($this->data['Tutor'])) {
+    foreach($this->data['Tutor']['Tutor'] as $key => $id) {
+        $tutor .= makeTutor($key, $id, $tutors[$id], $html, $form);
+        $numTutors = $key + 1;
+        $tutorSelected[] = $id;
+    }
+}
+echo $html->div('input text', $tutor, array('id' => 'tutors'));
 
 echo $form->input(
     'Course.record_status',
@@ -60,6 +87,10 @@ var selected = <?php echo json_encode($selected); ?>;
 jQuery.each(selected, function(key, value) {
     jQuery('#CourseInstructors option[value='+value+']').remove();
 });
+var selected = <?php echo json_encode($tutorSelected); ?>;
+jQuery.each(selected, function(key, value) {
+    jQuery('#CourseTutors option[value='+value+']').remove();
+});
 
 var numInstructors = <?php echo $numInstructors; ?>;
 function addInstructor() {
@@ -83,6 +114,33 @@ function rmInstructor(num, fullName, userId) {
     jQuery("#instructorsList" + num).remove();
     // add instructor back to drop down
     jQuery('#CourseInstructors').append(jQuery('<option>', {
+        value: userId,
+        text: fullName
+    }));
+}
+
+var numTutors = <?php echo $numTutors; ?>;
+function addTutor() {
+    // grab selected tutor
+    var userId = jQuery('#CourseTutors').val();
+    // not to add empty value
+    if (userId != '') {
+        var full_name = jQuery('#CourseTutors option:selected').text();
+        var template = '<?php echo $tutorTemplate; ?>';
+        template = template.replace(/-1/g, numTutors);
+        template = template.replace(/-2/g, userId);
+        template = template.replace(/-3/g, full_name);
+        jQuery(template).appendTo('#tutors');
+        // remove tutor from drop down
+        jQuery('#CourseTutors option[value='+userId+']').remove();
+        numTutors++;
+    }
+}
+
+function rmTutor(num, fullName, userId) {
+    jQuery("#tutorsList" + num).remove();
+    // add tutor back to drop down
+    jQuery('#CourseTutors').append(jQuery('<option>', {
         value: userId,
         text: fullName
     }));

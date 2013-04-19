@@ -422,6 +422,9 @@ class UsersController extends AppController
         foreach ($user['Enrolment'] as $course) {
             $coursesId[] = $course['id'];
         }
+        foreach ($user['Tutor'] as $course) {
+            $coursesId[] = $course['id'];
+        }
         $this->set('coursesSelected', $coursesId);
     }
 

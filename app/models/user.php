@@ -554,6 +554,19 @@ class User extends AppModel
 
         return $this->find($type, $params);
     }
+    
+    /**
+     * Get list of tutors
+     *
+     * @access public
+     * @return void
+     */
+    function getTutors()
+    {
+        $tutorList = $this->find('all', array(
+            'conditions' => array('Role.id' => $this->USER_TYPE_TA)));
+        return Set::combine($tutorList, '{n}.User.id', '{n}.User.'.$this->displayField);
+    }
 
     /**
      * getInstructorListByFaculty
@@ -567,7 +580,7 @@ class User extends AppModel
     function getInstructorListByFaculty($facultyId)
     {
         $users = $this->find('all', array(
-            'conditions' => array('Role.id' => 3, 'Faculty.id' => $facultyId),
+            'conditions' => array('Role.id' => $this->USER_TYPE_INSTRUCTOR, 'Faculty.id' => $facultyId),
             'fields' => array($this->alias.'.id', $this->displayField),
             'contain' => array('Faculty', 'Role'),
             'order' => $this->alias.'.last_name',
