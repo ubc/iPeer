@@ -1059,7 +1059,7 @@ class UsersController extends AppController
             $result = $this->User->addUserByArray($data, true);
 
             if (!$result) {
-                $this->Session->setFlash("Unable to import users. Do they already exist?");
+                $this->Session->setFlash("Error: Unable to import users.");
                 return;
             }
 

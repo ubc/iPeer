@@ -484,10 +484,7 @@ class GroupsController extends AppController
             
             $stu = array_keys($members);
             foreach ($stu as $userId) {
-                if (in_array($userId, $notExist)) {
-                    $memFailure[$groupName][] = $members[$userId];
-                    continue;
-                } else if (in_array($userId, $old)) {
+                if (in_array($userId, $old)) {
                     $memSuccess[$groupName][] = $members[$userId];
                     continue;
                 } else if (!in_array($userId, $enrolled)) {
@@ -501,6 +498,9 @@ class GroupsController extends AppController
                 } else {
                     $memFailure[$groupName][] = $members[$userId];
                 }
+            }
+            foreach ($notExist as $user) {
+                $memFailure[$groupName][] = $user;
             }
         }
         $this->set('groupSuccess', array_keys($groupSuccess));
