@@ -621,9 +621,9 @@ class UsersController extends AppController
         }
 
         if (!empty($save)) {
-            $this->Session->setFlash(__('Student is successfully enrolled.', true), 'good');
+            $this->Session->setFlash(__('User is successfully enrolled.', true), 'good');
         } else {
-            $this->Session->setFlash(__('Error: Unable to enrol student.', true));
+            $this->Session->setFlash(__('Error: Unable to enrol the user.', true));
         }
         $this->redirect('/courses/home/'.$courseId);
     }

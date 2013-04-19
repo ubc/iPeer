@@ -25,6 +25,13 @@ class autoCreateGroupsTestCase extends SystemBaseTestCase
         $this->session->close();
     }
     
+    public function testErrorChecking()
+    {
+        $this->session->open($this->url.'surveygroups/makegroups/2');
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::TAG_NAME, 'h3')->text();
+        $this->assertEqual($msg, 'No survey event found for this course!');
+    }
+    
     public function testStepOne()
     {
         $this->session->open($this->url.'courses/home/1');
@@ -43,6 +50,8 @@ class autoCreateGroupsTestCase extends SystemBaseTestCase
             }
         );
         
+        $surveyComp = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="frm"]/table/tbody/tr[2]/td')->text();
+        $this->assertEqual($surveyComp, '13 students were specified for this survey, 2 students responded');
         // choose group configuration - chose to have 6 groups
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="group_config"] option[value="6"]')->click();
         // weights for each survey question

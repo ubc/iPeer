@@ -135,4 +135,183 @@ class MergeUsersTestCase extends SystemBaseTestCase
         $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'Record is successfully deleted!');   
     }
+    
+    public function testUnMatchingRoles()
+    {
+        $this->session->open($this->url.'users/merge');
+        $return = new PHPWebDriver_WebDriverKeys('ReturnKey');
+        
+        $primary = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserPrimarySearchValue');
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimarySearch"] option[value="username"]')->click();
+        $primary->sendKeys('root');
+        $primary->sendKeys($return->key);
+
+        $secondary = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserSecondarySearchValue');
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserSecondarySearch"] option[value="student_no"]')->click();
+        $secondary->sendKeys('65498451');
+        $secondary->sendKeys($return->key);
+
+        // wait for primary account search results
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimaryAccount"] option')) - 1;
+            }
+        );
+        $primaryUser = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimaryAccount"] option');
+        $this->assertEqual($primaryUser[0]->text(), '-- Pick the primary account --');
+        $this->assertEqual($primaryUser[1]->text(), 'root');
+        $primaryUser[1]->click();
+        
+        // wait for secondary account search results
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserSecondaryAccount"] option')) - 1;
+            }
+        );
+        $secondaryUser = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserSecondaryAccount"] option');
+        $this->assertEqual($secondaryUser[0]->text(), '-- Pick the secondary account --');
+        $this->assertEqual($secondaryUser[1]->text(), '65498451');
+        $secondaryUser[1]->click();
+
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $this->session->accept_alert();
+        
+        // wait for merger to finish
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::ID, "flashMessage"));
+            }
+        );
+        
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::ID, "flashMessage")->text();
+        $this->assertEqual($msg, 'Error: The users do not have the same role.');     
+    }
+    
+    public function testNoUsersFound()
+    {
+        $primary = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserPrimarySearchValue');
+        $primary->clear();
+        $primary->sendKeys('redshirt9999');
+        $return = new PHPWebDriver_WebDriverKeys('ReturnKey');
+        $primary->sendKeys($return->key);
+        
+        // wait for primary account search results
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                $option = $session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimaryAccount"] option');
+                return ($option->text() == '-- No users found --');
+            }
+        );
+    }
+    
+    public function testMergeLoggedInUser()
+    {
+        $this->waitForLogout('admin1');
+        $this->session->open($this->url.'users/merge');
+        $return = new PHPWebDriver_WebDriverKeys('ReturnKey');
+        
+        $primary = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserPrimarySearchValue');
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimarySearch"] option[value="username"]')->click();
+        $primary->sendKeys('admin');
+        $primary->sendkeys($return->key);
+        
+        $secondary = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserSecondarySearchValue');
+        $secondary->sendKeys('admin');
+        $secondary->sendKeys($return->key);
+        
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimaryAccount"] option')) - 1;  
+            }
+        );
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserSecondaryAccount"] option')) - 1;  
+            }
+        );
+        
+        $primaryUser = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimaryAccount"] option');
+        $this->assertEqual($primaryUser[0]->text(), '-- Pick the primary account --');
+        $this->assertEqual($primaryUser[1]->text(), 'admin1');
+        $this->assertEqual($primaryUser[2]->text(), 'admin2');
+        
+        $secondaryUser = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserSecondaryAccount"] option');
+        $this->assertEqual($secondaryUser[0]->text(), '-- Pick the secondary account --');
+        $this->assertEqual($secondaryUser[1]->text(), 'admin1');
+        $this->assertEqual($secondaryUser[2]->text(), 'admin2');
+        
+        $primaryUser[2]->click();
+        $secondaryUser[1]->click();
+        
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $this->session->accept_alert();
+        
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::ID, 'flashMessage'));  
+            }
+        );
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'flashMessage');
+        $this->assertEqual($msg->text(), 'Error: The secondary account is the currently logged in user.');
+    }
+    
+    public function testMergeSameUsers()
+    {
+        $return = new PHPWebDriver_WebDriverKeys('ReturnKey');
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserPrimarySearchValue')->sendKeys($return->key);
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserSecondarySearchValue')->sendKeys($return->key);
+        
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimaryAccount"] option')) - 1;  
+            }
+        );
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserSecondaryAccount"] option')) - 1;  
+            }
+        );
+        
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimaryAccount"] option[value="38"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserSecondaryAccount"] option[value="38"]')->click();
+        
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $this->session->accept_alert();
+        
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::ID, 'flashMessage'));  
+            }
+        );
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'flashMessage');
+        $this->assertEqual($msg->text(), 'Error: No merger needed. The primary and secondary accounts are the same.');
+    }
+    
+    public function testAccessibleRoles()
+    {
+        $primary = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserPrimarySearchValue');
+        $primary->clear();
+        $primary->sendKeys('root');
+        $return = new PHPWebDriver_WebDriverKeys('ReturnKey');
+        $primary->sendKeys($return->key);
+        
+        // wait for primary account search results
+        // will not find root (super admin) because it is not an accessible role for admins
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                $option = $session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimaryAccount"] option');
+                return ($option->text() == '-- No users found --');
+            }
+        );
+    }
 }
