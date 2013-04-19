@@ -105,7 +105,7 @@ function validateTotal(){
     jQuery(".must").each(function() {
         if(jQuery(this).attr('id') == 'EvaluationMixevalDropdown'){
             tbl_Exists = true;
-            total = total + jQuery("option:selected",this).val();
+            total = parseInt(total,10) + parseInt(jQuery("option:selected",this).val(),10);
         }
     });
     var total_marksTbl = <?php echo $total_marksTbl ?>;
