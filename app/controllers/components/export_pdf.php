@@ -86,7 +86,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
               //Get if self evaluation is 'yes' or 'no'
               $event['Event']['self_eval'] == '0'? $selfeval = 'No' : $selfeval = 'Yes';
           
-              //Write the Rubric Scores Table And The Evaluation Results
+              //Write the Mixeval Scores Table And The Evaluation Results
               $rtbl = $this->_writeMixResultsTbl($event, $grp_event_id, $grp_id); 
               $mpdf->writeHTML($rtbl, true, false, true, false, '');
            
@@ -132,7 +132,6 @@ Class ExportPdfComponent extends ExportBaseNewComponent
          $totalGroupAverage = 0;
          $count = 0;
          for($i=0; $i<sizeof($evaluatees); $i++){
-             $aver = $this->EvaluationMixeval->getReceivedAvgScore($grp_event_id, $evaluatees[$i]);
              $receivedAverageScore = $this->EvaluationMixeval->getReceivedAvgScore($grp_event_id, $evaluatees[$i]);
              $receivedAverageScore = $receivedAverageScore[0][0]['received_avg_score'];             
              if(!isset($receivedAverageScore)){
@@ -141,7 +140,8 @@ Class ExportPdfComponent extends ExportBaseNewComponent
              $count++;    
              $totalGroupAverage = ($totalGroupAverage + $receivedAverageScore);
          }
-         $totalGroupAverage = $totalGroupAverage/$count;
+        
+         $totalGroupAverage = $count > 0 ? $totalGroupAverage/$count : null;
          
          for($i=0; $i<sizeof($evaluatees); $i++){
              $aver = $this->EvaluationMixeval->getReceivedAvgScore($grp_event_id, $evaluatees[$i]);
@@ -191,8 +191,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                             $questionWrittenBool = 1; //The question has now been written so set Boolean to 1
                         }
                         $mEvalResults = $mEvalResults.'<b>&#160;&#160;&#160;&#160;&#160;&#160;'.$evaluator_names[$j].' : </b>';
-                    
-                        if($result['EvaluationMixevalDetail']['grade']==0.00){
+                        if($result['EvaluationMixevalDetail']['grade'] == 0.00){
                             $mEvalResults = $mEvalResults.'Comment : '.$result['EvaluationMixevalDetail']['question_comment'];
                         }
                         else{
@@ -232,59 +231,102 @@ Class ExportPdfComponent extends ExportBaseNewComponent
          $total = 0;
          $lickertQuestions = array();
          $lickertQuestionsCount=0;
+         $scoreDropdownQuestions = array();
+         $scoreDropdownCount = 0;
          $finalCumulativeTotal=0;
          foreach($mixevalQuestions as $question){
              //Check if the Question has a multiplier (it should be a likert MixEvalQuestionType.id=1)
-             if($question['MixevalQuestionType']['id']!=1){
+             if($question['MixevalQuestionType']['id']!=1 && $question['MixevalQuestionType']['id']!=4){
                  continue;
              }
              $question_num = $question['MixevalQuestion']['question_num'];
              $multiplier = $question['MixevalQuestion']['multiplier'];
-             $lickertQuestions[$question_num]=0;
+             if($question['MixevalQuestionType']['id']==1){
+                 $lickertQuestions[$question_num]=0;
+             } 
+             else{
+                 $scoreDropdownQuestions[$question_num]=0;
+             }
              $mRTBL = $mRTBL.'<th>'.$question_num.' (/'.number_format($multiplier, 2).')</th>';
-             $total = $total+$multiplier;                         
+             $total = $total + $multiplier;                         
          }
          $mRTBL = $mRTBL.'<th>Total (/'.number_format($total, 2).')</th>';
          $mRTBL = $mRTBL.'</tr>';
          //Table Header End
          
+         //debug($scoreDropdownQuestions);
+         //debug($lickertQuestions);
+      
          for($i=0; $i<sizeof($evaluatees); $i++){
              $total_grade=0;
              $mRTBL = $mRTBL.'<tr><td>'.$evaluatee_names[$i].'</td>';
              $evalMixevalDetail = $this->EvaluationMixeval->getResultsDetailByEvaluatee($grp_event_id, $evaluatees[$i], false);  
              if(empty($evalMixevalDetail)){
-                 for($j=0; $j<sizeof($lickertQuestions); $j++){
-                     $mRTBL = $mRTBL.'<td> N/A </td>';
+                 if(count($lickertQuestions) <= 0){
+                    for($j=0; $j<sizeof($scoreDropdownQuestions); $j++){
+                        $mRTBL = $mRTBL.'<td> N/A </td>';
+                    }
                  }
+                 else{
+                     for($j=0; $j<sizeof($lickertQuestions); $j++){
+                        $mRTBL = $mRTBL.'<td> N/A </td>';
+                    }
+                 }
+
                  $mRTBL=$mRTBL.'<td> N/A </td>';
                  $mRTBL=$mRTBL.'</tr>';
              }
              else{
+                 //debug($evalMixevalDetail);
                  $evalMixevalDetail = $evalMixevalDetail['0']['EvaluationMixevalDetail'];
                  //Get the scores for the lickert type questions and put them in the table
-                 foreach($lickertQuestions as $questionNum => $value){
-                     $grade = $evalMixevalDetail[$questionNum-1]['grade']; //$questionNum-1 is necessary since array numbering starts from 0 not 1
-                     $lickertQuestions[$questionNum] = $lickertQuestions[$questionNum] + $grade;
-                     $total_grade = $total_grade + $grade;  
-                     $finalCumulativeTotal = $finalCumulativeTotal + $grade;                  
-                     $mRTBL = $mRTBL.'<td>'.$grade.'</td>';
-                 }
-                 $lickertQuestionsCount= $lickertQuestionsCount + 1;
+                 if(count($lickertQuestions) > 0){
+                     foreach($lickertQuestions as $questionNum => $value){
+                         $grade = $evalMixevalDetail[$questionNum-1]['grade']; //$questionNum-1 is necessary since array numbering starts from 0 not 1
+                         $lickertQuestions[$questionNum] = $lickertQuestions[$questionNum] + $grade;
+                         $total_grade = $total_grade + $grade;  
+                         $finalCumulativeTotal = $finalCumulativeTotal + $grade;                  
+                         $mRTBL = $mRTBL.'<td>'.$grade.'</td>';
+                    }
+                 $lickertQuestionsCount = $lickertQuestionsCount + 1;
                  $mRTBL=$mRTBL.'<td>'.$total_grade.'</td>';
-                 $mRTBL=$mRTBL.'</tr>';
+                 $mRTBL=$mRTBL.'</tr>';                    
+                 }
+                 
+                 if(count($scoreDropdownQuestions) > 0){
+                     foreach($scoreDropdownQuestions as $questionNum => $value){
+                         $grade = $evalMixevalDetail[$questionNum-1]['grade']; //$questionNum-1 is necessary since array numbering starts from 0 not 1
+                         $scoreDropdownQuestions[$questionNum] = $scoreDropdownQuestions[$questionNum] + $grade;
+                         $total_grade = $total_grade + $grade;  
+                         $finalCumulativeTotal = $finalCumulativeTotal + $grade;                  
+                         $mRTBL = $mRTBL.'<td>'.$grade.'</td>';
+                    }
+                 $scoreDropdownCount= $scoreDropdownCount + 1;
+                 $mRTBL=$mRTBL.'<td>'.$total_grade.'</td>';
+                 $mRTBL=$mRTBL.'</tr>';                    
+                 }
              }
              
          }
 
          $mRTBL = $mRTBL.'<tr><td><b>Group Average</b></td>';
          //Write the Group Average
-         foreach($lickertQuestions as $question){
-             $mRTBL = $mRTBL.'<td>'.$question/$lickertQuestionsCount.'</td>';
+         if($lickertQuestionsCount > 0){
+             foreach($lickertQuestions as $question){
+                $mRTBL = $mRTBL.'<td>'.$question/$lickertQuestionsCount.'</td>';
+            }
+            $mRTBL = $mRTBL.'<td>'.$finalCumulativeTotal/$lickertQuestionsCount.'</td>';
          }
-         $mRTBL = $mRTBL.'<td>'.$finalCumulativeTotal/$lickertQuestionsCount.'</td>';
+            
+         if($scoreDropdownCount > 0){
+             foreach($scoreDropdownQuestions as $question){
+                $mRTBL = $mRTBL.'<td>'.$question/$scoreDropdownCount.'</td>';
+            }
+            $mRTBL = $mRTBL.'<td>'.$finalCumulativeTotal/$scoreDropdownCount.'</td>';
+         }
          $mRTBL = $mRTBL.'</tr>';              
          $mRTBL = $mRTBL.'</table>';
-         
+         //debug($mRTBL);
          return $mRTBL;
      }
       
