@@ -79,6 +79,13 @@ class MergeUsersTestCase extends SystemBaseTestCase
         $this->assertEqual($heading, 'Merge Users');
 
         $return = new PHPWebDriver_WebDriverKeys('ReturnKey');
+        
+        $merge = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'merge');
+        $this->assertTrue($merge->attribute('disabled'));
+        $prmy = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserPrimaryAccount');
+        $this->assertTrue($prmy->attribute('disabled'));
+        $sndy = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserSecondaryAccount');
+        $this->assertTrue($sndy->attribute('disabled'));
 
         $primary = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserPrimarySearchValue');
         $primary->sendKeys('Bob B');
@@ -206,6 +213,9 @@ class MergeUsersTestCase extends SystemBaseTestCase
                 return ($option->text() == '-- No users found --');
             }
         );
+        
+        $prmy = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserPrimaryAccount');
+        $this->assertTrue($prmy->attribute('disabled'));
     }
     
     public function testMergeLoggedInUser()
@@ -313,5 +323,8 @@ class MergeUsersTestCase extends SystemBaseTestCase
                 return ($option->text() == '-- No users found --');
             }
         );
+        
+        $prmy = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserPrimaryAccount');
+        $this->assertTrue($prmy->attribute('disabled'));
     }
 }
