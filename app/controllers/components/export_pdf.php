@@ -87,11 +87,13 @@ Class ExportPdfComponent extends ExportBaseNewComponent
               $event['Event']['self_eval'] == '0'? $selfeval = 'No' : $selfeval = 'Yes';
           
               //Write the Mixeval Scores Table And The Evaluation Results
-              $rtbl = $this->_writeMixResultsTbl($event, $grp_event_id, $grp_id); 
-              $mpdf->writeHTML($rtbl, true, false, true, false, '');
+              if($params['include']['grade_tables'] == '1'){
+                  $rtbl = $this->_writeMixResultsTbl($event, $grp_event_id, $grp_id); 
+                  $mpdf->writeHTML($rtbl, true, false, true, false, '');
+              }            
            
               $mpdf->writeHTML('<h3>Evaluation Results</h3>', true, false, true, false, '');    
-              $mEvalResults = $this->_writeMixEvalResults($event, $grp_event_id, $grp_id);  
+              $mEvalResults = $this->_writeMixEvalResults($event, $grp_event_id, $grp_id,$params);  
               $mpdf->writeHTML($mEvalResults, true, false, true, false, '');                   
 
               $mpdf->lastPage();
@@ -103,7 +105,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
           if(ob_get_contents()){
               ob_clean();
           }
-          return $mpdf -> Output($fileName, 'D');     
+          return $mpdf -> Output($fileName, 'I');     
       }
 
     /**
@@ -112,10 +114,12 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * @param mixed $event
      * @param mixed $grp_event_id
      * @param mixed $grp_id
+     * @param mixed $params
      * 
      * @return HTML Table containing the results
      */
-     function _writeMixEvalResults($event,$grp_event_id,$grp_id){
+     function _writeMixEvalResults($event,$grp_event_id,$grp_id,$params){
+         //debug($params);
          $evaluators = $this->_getMembers($grp_event_id);
          $evaluatees = $this->_filterTutors($grp_id);
          $evaluatee_names = $this->_getMemberNames($evaluatees); 
@@ -165,8 +169,11 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                 }
              }
              $mEvalResults = $mEvalResults.'<br><u><b>Evaluatee: </b>'.$evaluatee_names[$i].'</u><br>';
-             $receivedAverageScore=='N/A'? $break = '<br>' : $break = '<br><br>';
-             $mEvalResults = $mEvalResults.'Final Total: '.$receivedAverageScore.$scoreComment.$break;   
+             $break = '<br>';
+             if($params['include']['final_marks'] == '1'){
+                 $mEvalResults = $mEvalResults.'Final Total: '.$receivedAverageScore.$scoreComment.$break;   
+             }
+ 
              
              //Write down the Questions and the responses given by each evaluator
              foreach($mixevalQuestions as $question){
@@ -181,7 +188,6 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                    
                 for($j=0; $j<sizeof($evaluators); $j++){
                     $result = $this->EvaluationMixeval->getResultDetailByQuestion($grp_event_id, $evaluatees[$i], $evaluators[$j], $question_num);
-                    //debug($result);
                     if(empty($result)){
                         continue;
                     }
@@ -190,12 +196,19 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                             $mEvalResults = $mEvalResults.$question_text.'<br>'; 
                             $questionWrittenBool = 1; //The question has now been written so set Boolean to 1
                         }
+                        $grade = $comment = ' --';
                         $mEvalResults = $mEvalResults.'<b>&#160;&#160;&#160;&#160;&#160;&#160;'.$evaluator_names[$j].' : </b>';
-                        if($result['EvaluationMixevalDetail']['grade'] == 0.00){
-                            $mEvalResults = $mEvalResults.'Comment : '.$result['EvaluationMixevalDetail']['question_comment'];
+                        if($question['MixevalQuestionType']['id'] != '1' && $question['MixevalQuestionType']['id'] != '4'){
+                            if($params['include']['comments'] == '1'){
+                                $comment = 'Comment : '.$result['EvaluationMixevalDetail']['question_comment'];
+                            }
+                            $mEvalResults = $mEvalResults.$comment;
                         }
                         else{
-                            $mEvalResults = $mEvalResults.'Grade : '.$result['EvaluationMixevalDetail']['grade'];
+                            if($params['include']['grade_tables'] == '1'){
+                                $grade = 'Grade : '.$result['EvaluationMixevalDetail']['grade'];
+                            }
+                            $mEvalResults = $mEvalResults. $grade;
                         }    
                         $mEvalResults = $mEvalResults.'<br>';      
                     }
@@ -225,6 +238,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
          
          $mixEvalId = $event['Event']['template_id'];
          $mixevalQuestions = $this->MixevalQuestion->getQuestion($mixEvalId, null);
+         //debug($mixevalQuestions);
          
          //Write the Table Header
          $mRTBL = '<table border="1" align="center"><tr><th><b>Evaluatee</b></th>';
@@ -254,33 +268,48 @@ Class ExportPdfComponent extends ExportBaseNewComponent
          $mRTBL = $mRTBL.'</tr>';
          //Table Header End
          
-         //debug($scoreDropdownQuestions);
-         //debug($lickertQuestions);
-      
+          //Since a question cannot be BOTH lickert and scoreDropdown at the same time, an array_merge on the 2 arrays should work fine.
+          $combinedLickertScoreDD = $lickertQuestions + $scoreDropdownQuestions;
          for($i=0; $i<sizeof($evaluatees); $i++){
              $total_grade=0;
              $mRTBL = $mRTBL.'<tr><td>'.$evaluatee_names[$i].'</td>';
              $evalMixevalDetail = $this->EvaluationMixeval->getResultsDetailByEvaluatee($grp_event_id, $evaluatees[$i], false);  
+             //debug($evalMixevalDetail);
              if(empty($evalMixevalDetail)){
-                 if(count($lickertQuestions) <= 0){
+                 if(count($combinedLickertScoreDD) <= 0){
+                     $mRTBL = $mRTBL. '<td> N/A </td>'; //If there are no lickert or score dropdown questions, the total is N/A
+                 }
+                 else if(count($lickertQuestions) <= 0 && count($scoreDropdownQuestions) > 0){  //If there are no lickert questions and the count of score dropdown is greater than 0 that means all the questions are of the type score dropdown  
                     for($j=0; $j<sizeof($scoreDropdownQuestions); $j++){
                         $mRTBL = $mRTBL.'<td> N/A </td>';
                     }
+                    $mRTBL=$mRTBL.'<td> N/A </td>'; //Additional N/A for total column
                  }
-                 else{
-                     for($j=0; $j<sizeof($lickertQuestions); $j++){
+                 else if(count($scoreDropdownQuestions) <= 0 && count($lickertQuestions) > 0){ //Opposite of the statement/condition above
+                     for($j=0; $j<sizeof($lickertQuestions); $j++){ 
                         $mRTBL = $mRTBL.'<td> N/A </td>';
                     }
+                     $mRTBL=$mRTBL.'<td> N/A </td>'; //Additional N/A for total column
                  }
-
-                 $mRTBL=$mRTBL.'<td> N/A </td>';
+                 else{
+                     for($j=0;$j< count($combinedLickertScoreDD);$j++){ //If lickertQuestions and scoreDropdown questions are both greater than 0, that means the number of rows = #lickert + #scoreDropdown
+                        $mRTBL=$mRTBL.'<td> N/A </td>';
+                     }
+                      $mRTBL=$mRTBL.'<td> N/A </td>'; //Additional N/A for total column
+                 }    
                  $mRTBL=$mRTBL.'</tr>';
              }
-             else{
+             else{ //The evaluation detail does exist. Need to handle the same cases as above
                  //debug($evalMixevalDetail);
                  $evalMixevalDetail = $evalMixevalDetail['0']['EvaluationMixevalDetail'];
-                 //Get the scores for the lickert type questions and put them in the table
-                 if(count($lickertQuestions) > 0){
+                 //Get the scores for the lickert or scoreDropdown or both type questions and put them in the table
+                 
+                 //If the count of BOTH lickert type and score dropdown type <= 0, the case is the same as the one handled above, which is as follows
+                 if(count($combinedLickertScoreDD) <= 0){
+                     $mRTBL = $mRTBL. '<td> N/A </td>'; //If there are no lickert or score dropdown questions, the total is N/A
+                 }
+                 
+                 else if(count($scoreDropdownQuestions) <= 0 && count($lickertQuestions) > 0){ //If there are no score dropdown questions, and the count(lickertQuestions) > 0, that means all the questions are lickert
                      foreach($lickertQuestions as $questionNum => $value){
                          $grade = $evalMixevalDetail[$questionNum-1]['grade']; //$questionNum-1 is necessary since array numbering starts from 0 not 1
                          $lickertQuestions[$questionNum] = $lickertQuestions[$questionNum] + $grade;
@@ -293,7 +322,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                  $mRTBL=$mRTBL.'</tr>';                    
                  }
                  
-                 if(count($scoreDropdownQuestions) > 0){
+                 else if(count($scoreDropdownQuestions) > 0 && count($lickertQuestions) <= 0){ //Opposite of the above condition
                      foreach($scoreDropdownQuestions as $questionNum => $value){
                          $grade = $evalMixevalDetail[$questionNum-1]['grade']; //$questionNum-1 is necessary since array numbering starts from 0 not 1
                          $scoreDropdownQuestions[$questionNum] = $scoreDropdownQuestions[$questionNum] + $grade;
@@ -305,24 +334,47 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                  $mRTBL=$mRTBL.'<td>'.$total_grade.'</td>';
                  $mRTBL=$mRTBL.'</tr>';                    
                  }
+                 
+                else{ //BOTH count(lickertQuestions) AND count(scoreDropdownQuestions) > 0, so we need to consider them both
+                    foreach($combinedLickertScoreDD as $questionNum => $value){
+                         $grade = $evalMixevalDetail[$questionNum-1]['grade']; //$questionNum-1 is necessary since array numbering starts from 0 not 1
+                         $combinedLickertScoreDD[$questionNum] = $combinedLickertScoreDD[$questionNum] + $grade;
+                         $total_grade = $total_grade + $grade;  
+                         $finalCumulativeTotal = $finalCumulativeTotal + $grade;                  
+                         $mRTBL = $mRTBL.'<td>'.$grade.'</td>';
+                    }
+                 $mRTBL=$mRTBL.'<td>'.$total_grade.'</td>';
+                 $mRTBL=$mRTBL.'</tr>';                      
+                }
              }
              
          }
-
+    
          $mRTBL = $mRTBL.'<tr><td><b>Group Average</b></td>';
+         $evaluateeCount = number_format(count($evaluatees),2);
          //Write the Group Average
-         if($lickertQuestionsCount > 0){
+         if($lickertQuestionsCount > 0 && $scoreDropdownCount <= 0){
              foreach($lickertQuestions as $question){
-                $mRTBL = $mRTBL.'<td>'.$question/$lickertQuestionsCount.'</td>';
+                $mRTBL = $mRTBL.'<td>'.$question/$evaluateeCount.'</td>';
             }
-            $mRTBL = $mRTBL.'<td>'.$finalCumulativeTotal/$lickertQuestionsCount.'</td>';
+            $mRTBL = $mRTBL.'<td>'.$finalCumulativeTotal/$evaluateeCount.'</td>';
          }
             
-         if($scoreDropdownCount > 0){
+         else if($scoreDropdownCount > 0 && $lickertQuestionsCount <= 0){
              foreach($scoreDropdownQuestions as $question){
-                $mRTBL = $mRTBL.'<td>'.$question/$scoreDropdownCount.'</td>';
+                $mRTBL = $mRTBL.'<td>'.$question/$evaluateeCount.'</td>';
             }
-            $mRTBL = $mRTBL.'<td>'.$finalCumulativeTotal/$scoreDropdownCount.'</td>';
+            $mRTBL = $mRTBL.'<td>'.$finalCumulativeTotal/$evaluateeCount.'</td>';
+         }
+         
+         else if($combinedLickertScoreDD <= 0){
+             $mRTBL = $mRTBL.'<td> N/A </td>';
+         }
+         else { //BOTH are > 0
+            foreach($combinedLickertScoreDD as $question){
+                 $mRTBL = $mRTBL.'<td>'.number_format($question/$evaluateeCount,2).'</td>';
+            }
+             $mRTBL = $mRTBL.'<td>'.number_format($finalCumulativeTotal/$evaluateeCount,2).'</td>';
          }
          $mRTBL = $mRTBL.'</tr>';              
          $mRTBL = $mRTBL.'</table>';
@@ -341,7 +393,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
       function _createRubricResultsPdf($params,$event){
           App::import('Vendor', 'xtcpdf');
           $spdf = new XTCPDF();
-        
+          //debug($params);
           //Construct the Filename and extension
           $fileName = isset($params['file_name']) && !empty($params['file_name']) ? $params['file_name']:date('m.d.y');
           $fileName = $fileName . '.pdf';
@@ -378,23 +430,24 @@ Class ExportPdfComponent extends ExportBaseNewComponent
               $event['Event']['self_eval'] == '0'? $selfeval = 'No' : $selfeval = 'Yes';
           
               //Write the Rubric Scores Table And The Evaluation Results
-              $rtbl = $this->_writeRubricResultsTbl($event, $grp_event_id, $grp_id); 
-              $spdf->writeHTML($rtbl, true, false, true, false, '');
-           
+              if($params['include']['grade_tables'] == '1'){
+                 $rtbl = $this->_writeRubricResultsTbl($event, $grp_event_id, $grp_id); 
+                 $spdf->writeHTML($rtbl, true, false, true, false, '');
+              } 
+                        
               $spdf->writeHTML('<h3>Evaluation Results</h3>', true, false, true, false, '');
-              $eResultsTbl = $this->_writeRubricEvalResults($event, $grp_event_id, $grp_id); 
+              $eResultsTbl = $this->_writeRubricEvalResults($event, $grp_event_id, $grp_id,$params); 
               $spdf->writeHTML($eResultsTbl, true, false, true, false, '');
 
               $spdf->lastPage();
               $spdf->addPage();
-             // $page_count++;
           }
           $spdf->deletePage($spdf->getNumPages());
 
           if(ob_get_contents()){
               ob_clean();
           }
-          return $spdf -> Output($fileName, 'D');     
+          return $spdf -> Output($fileName, 'I');     
       }    
 
     /**
@@ -482,11 +535,13 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * @param mixed $event
      * @param mixed $grp_event_id
      * @param mixed $grp_id
+     * @param mixed $params
      *
      * @access private
      * @return void
      */        
-    function _writeRubricEvalResults($event,$grp_event_id,$grp_id){
+    function _writeRubricEvalResults($event,$grp_event_id,$grp_id,$params){
+        //debug($params);
         $this->EvaluationRubric= ClassRegistry::init('EvaluationRubric');
         $this->RubricsCriteria= ClassRegistry::init('RubricsCriteria');
         $this->EvaluationRubricDetail= ClassRegistry::init('EvaluationRubricDetail');
@@ -551,7 +606,9 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                 }
                 $rSTBL = $rSTBL.'<p><b>Evaluatee : '.$evaluatee_names[$j].'</b><br>';
                 $rSTBL = $rSTBL.'Number of Evaluators : '.$num_evaluators.'<br>';
-                $rSTBL = $rSTBL. 'Final Total : '.$totalScore.' ('.number_format(($totalScore * 100/$total), 2).'%)<br>';
+                if($params['include']['final_marks'] == '1'){
+                     $rSTBL = $rSTBL. 'Final Total : '.$totalScore.' ('.number_format(($totalScore * 100/$total), 2).'%)<br>';
+                }
                 $rSTBL = $rSTBL. 'Comment : '.$totalComment.'</p>';
                 
                 //Write the Table Header
@@ -574,14 +631,21 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                     foreach($criteria_comments as $criteria_id => $criteria_comment){
                         $EvalRubricDtl = $this->EvaluationRubricDetail->getByEvalRubricIdCritera($eval_rubric_id, $criteria_id);
                         //debug($EvalRubricDtl);
-                        $comment = $EvalRubricDtl['EvaluationRubricDetail']['criteria_comment'];
-                        $grade = $EvalRubricDtl['EvaluationRubricDetail']['grade'];
+                        $grade = $comment = '--';
+                        if($params['include']['comments'] == 1) {
+                            $comment = $EvalRubricDtl['EvaluationRubricDetail']['criteria_comment'];
+                        }
+                        if($params['include']['grade_tables'] == 1){
+                            $grade = $EvalRubricDtl['EvaluationRubricDetail']['grade'];
+                        }
                         $rSTBL = $rSTBL.'<td>'.$comment.'<br><b>Grade given : </b>'.$grade.'</td>';
                     }
                     
                     $rSTBL = $rSTBL.'</tr>';
                     //debug($resultsArrayByEvaluatee);
-                    $rSTBL = $rSTBL.'<tr><td colspan="'.$criteria_count.'"><b>General Comment :</b> '.$resultsArrayByEvaluatee['0']['EvaluationRubric']['comment'].'</td></tr>';
+                    if($params['include']['comments'] == '1') {
+                        $rSTBL = $rSTBL.'<tr><td colspan="'.$criteria_count.'"><b>General Comment :</b> '.$resultsArrayByEvaluatee['0']['EvaluationRubric']['comment'].'</td></tr>';
+                    }            
                   }
             }
             $rSTBL = $rSTBL.'</table>';
@@ -611,11 +675,11 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $coursename ='';
         $eventname ='';
         //Write header text
-        //debug($params);
-        if(isset($params['include']['course'])){
+       // debug($params);
+        if($params['include']['course'] == '1'){
             $coursename = ' : '.$event['Course']['course'];
         }
-        if(isset($params['include']['eval_event_names'])){
+        if($params['include']['eval_event_names'] == '1'){
             $eventname = ' - '.$event['Event']['title'];
         }
         $headertext = '<h2>Evaluation Event Detail'.$coursename.$eventname.'</h2>';
@@ -649,15 +713,19 @@ Class ExportPdfComponent extends ExportBaseNewComponent
            $event['Event']['self_eval'] == '0'? $selfeval = 'No' : $selfeval = 'Yes';
            
            //Write the scores table
-           $spdf->writeHTML('<h3>Evaluation Results</h3>', true, false, true, false, '');
-           $stbl = $this->_writeScoresTbl($event, $grp_event_id, $grp_id); 
-           $spdf->writeHTML($stbl, true, false, true, false, '');
-           
-           //Write the comments if they are there
-           $comments_text = '<h3>Comments</h3>';
-           $spdf->writeHTML($comments_text, true, false, true, false, '');
-           $comments = $this->_writeComments($event, $grp_event_id);
-           $spdf->writeHTML($comments, true, false, true, false, '');
+           if($params['include']['grade_tables'] == '1'){
+               $spdf->writeHTML('<h3>Evaluation Results</h3>', true, false, true, false, '');
+               $stbl = $this->_writeScoresTbl($event, $grp_event_id, $grp_id,$params); 
+               $spdf->writeHTML($stbl, true, false, true, false, '');
+           }
+                     
+           //Write the comments if they are there and if the params ask for them
+           if($params['include']['comments'] == '1'){
+               $comments_text = '<h3>Comments</h3>';
+               $spdf->writeHTML($comments_text, true, false, true, false, '');
+               $comments = $this->_writeComments($event, $grp_event_id);
+               $spdf->writeHTML($comments, true, false, true, false, '');
+           }      
 
          $spdf->lastPage();
          $spdf->addPage();
@@ -710,10 +778,11 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * @param mixed $event
      * @param mixed $grp_event_id
      * @param mixed $grp_id
+     * @param mixed $params 
      * 
      * @return HTML string for ScoresTable
      */
-    function _writeScoresTbl($event,$grp_event_id,$grp_id){
+    function _writeScoresTbl($event,$grp_event_id,$grp_id,$params){
        $evaluators = $this->_getMembers($grp_event_id);
        $evaluatees = $this->_filterTutors($grp_id);
        $evaluatee_names = $this->_getMemberNames($evaluatees); 
@@ -772,18 +841,20 @@ Class ExportPdfComponent extends ExportBaseNewComponent
          }
         $tbl = $tbl.'</tr>';      
         
-        //Write Final Mark  
-        $tbl = $tbl . '<tr><td><b>Final Mark</b></td>';
-         for($i=0; $i<sizeof($evaluatees); $i++){
-             if($penalty_array[$evaluatees[$i]] == '-'){
-                 $tbl = $tbl.'<td>'.$totals_array[$evaluatees[$i]].'</td>';
-             }
-             else{
-                 $final_mark = (100 - $penalty_array[$evaluatees[$i]]) * $totals_array[$evaluatees[$i]];
-                 $tbl = $tbl.'<td>'.$final_mark.'</td>';
-             }     
-         }
-        $tbl = $tbl.'</tr>';  
+        //Write Final Mark if the params ask for it
+        if($params['include']['final_marks'] == '1'){
+            $tbl = $tbl . '<tr><td><b>Final Mark</b></td>';
+            for($i=0; $i<sizeof($evaluatees); $i++){
+                if($penalty_array[$evaluatees[$i]] == '-'){
+                    $tbl = $tbl.'<td>'.$totals_array[$evaluatees[$i]].'</td>';
+            }
+            else{
+                $final_mark = (100 - $penalty_array[$evaluatees[$i]]) * $totals_array[$evaluatees[$i]];
+                $tbl = $tbl.'<td>'.$final_mark.'</td>';
+                }     
+            }
+         $tbl = $tbl.'</tr>';  
+        }      
         
         //Write Evaluator Count
         $tbl = $tbl . '<tr><td># Evaluators</td>';
@@ -869,7 +940,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $this->Group = ClassRegistry::init('Group');
         $group = $this->Group->getGroupByGroupId($grp_id);
         //Write Group name
-        if(isset($params['include']['group_names'])){
+        if($params['include']['group_names'] == '1'){
             $groupname = $group['0']['Group']['group_name'];
         }
         $group = '<p>Group : '.$groupname.'<br>';
@@ -880,7 +951,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         //Write Event Name
         $eventname = $event['Event']['title'];
         $eventname = 'Event Name : '.$eventname.'<br>';
-        if(isset($params['include']['eval_event_type'])){
+        if($params['include']['eval_event_type'] == '1'){
             $eventTemplateType = ucfirst(strtolower($event['EventTemplateType']['type_name']));
         }
         $eventTemplateType = 'Evaluation Type : '.$eventTemplateType.'<br>';

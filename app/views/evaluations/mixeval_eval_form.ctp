@@ -39,11 +39,12 @@
         <?php echo "<input type='hidden' name=data[data][template_id] value='".$event['Event']['template_id']."'/>"; ?>
         <?php echo "<input type='hidden' name=data[data][grp_event_id] value='".$event['GroupEvent']['id']."'/>"; ?>
         <?php echo "<input type='hidden' name=data[data][members] value='".$members."'/>"; ?>
+        <?php  $evaluatee_count = count($groupMembers);
+               $total_marksTbl= 10*$evaluatee_count; //10 is encoded as a constant for TBL evaluation types in order to avoid adding marks for Likert              
+        ?>       
         <?php foreach($groupMembers as $row): $user = $row['User']; ?>
             <center><h2><?php echo $user['full_name']?></h2></center>
             <?php
-            $evaluatee_count = count($groupMembers);
-            $total_marksTbl= $mixeval['Mixeval']['total_marks']*$evaluatee_count;
             $params = array(  'controller'            => 'mixevals',
                             'zero_mark'             => $mixeval['Mixeval']['zero_mark'],
                             'questions'             => $questions,
@@ -60,13 +61,45 @@
     </tr>
 </table>
 
-<?php if (!empty($sub)) { ?>
+<?php if(empty($sub)) { ?>
 <script type="text/javascript">
-jQuery("#submit").click(function() {
+   jQuery('#submit').click(function() {
    if(!validateTotal()){
       var alertText = 'Please make sure that the total of the grades in the drop-downs equals ' + <?php echo $total_marksTbl; ?> + ' and then press "Submit" again.';
       alert(alertText);
       return false;
+    }
+    });
+</script>
+<?php } ?>
+
+<script type="text/javascript">    
+  function validateTotal(){
+    var total = 0;
+    var tbl_Exists = false;
+    jQuery(".must").each(function() {
+        if(jQuery(this).attr('id') == 'EvaluationMixevalDropdown'){
+            tbl_Exists = true;
+            total = parseInt(total,10) + parseInt(jQuery("option:selected",this).val(),10);
+        }
+    });
+    var total_marksTbl = <?php echo $total_marksTbl ?>;
+    var total_bool = total != total_marksTbl;
+    if(tbl_Exists && total_bool){
+        return false;
+    } else {
+        return true;
+    }
+}     
+</script>
+
+<?php if (!empty($sub)) { ?>
+<script type="text/javascript">
+jQuery("#submit").click(function() {
+    if(!validateTotal()){
+        var alertText = 'Please make sure that the total of the grades in the drop-downs equals ' + <?php echo $total_marksTbl; ?> + ' and then press "Submit" again.';
+        alert(alertText);
+        return false;
     }
     if (!validate()) {
         alert('Please fill in all required questions before resubmitting the evaluation.');
@@ -99,23 +132,6 @@ function validate() {
     }
 }
 
-function validateTotal(){
-    var total = 0;
-    var tbl_Exists = false;
-    jQuery(".must").each(function() {
-        if(jQuery(this).attr('id') == 'EvaluationMixevalDropdown'){
-            tbl_Exists = true;
-            total = parseInt(total,10) + parseInt(jQuery("option:selected",this).val(),10);
-        }
-    });
-    var total_marksTbl = <?php echo $total_marksTbl ?>;
-    var total_bool = total != total_marksTbl;
-    if(tbl_Exists && total_bool){
-        return false;
-    } else {
-        return true;
-    }
-}
 </script>
 <?php } ?>
 </div>
