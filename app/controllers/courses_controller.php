@@ -547,13 +547,20 @@ class CoursesController extends AppController
             
             $error = array();
             $success = array();
+            $users = ($field == 'student_no') ? $this->User->findAllByStudentNo($identifiers) :
+                $this->User->findAllByUsername($identifiers);
+            $invalid = array_diff($identifiers, Set::extract('/User/'.$field, $users));
+            foreach ($invalid as $inv) {
+                $error[$inv] = __('No student with '.$fieldText.' '.$inv.' exists.', true);
+            }
+            $enrolled = $this->UserEnrol->findAllByCourseId($data['sourceCourses']);
+            $enrolled = Set::extract('/UserEnrol/user_id', $enrolled);
             // enrol student
-            foreach ($identifiers as $identifier) {
-                // check that student exists
-                $user = ($field == 'student_no') ? $this->User->findByStudentNo($identifier) :
-                    $this->User->findByUsername($identifier);
-                if (!$user) {
-                    $error[$identifier] = __('No student with '.$fieldText.' '.$identifier.' exists.', true);
+            foreach ($users as $user) {
+                $identifier = $user['User'][$field];
+                // check that student is enrolled
+                if (!in_array($user['User']['id'], $enrolled)) {
+                    $error[$identifier] = __('No student with '.$fieldText.' '.$identifier.' is enrolled.', true);
                     continue;
                 }
                 // enrol student to destination course if not already enrolled
@@ -602,7 +609,8 @@ class CoursesController extends AppController
                 if (!isset($error[$identifier]) && !isset($success[$identifier])) {
                     $success[$identifier] = __('Success', true);
                     if (!empty($destSub)) {
-                        $success[$identifier] .= __(', but the student has already submitted to the destination survey, therefore the survey submission from the source survey was not transferred.', true);
+                        $success[$identifier] .= __(', but the student has already submitted to the 
+                            destination survey, therefore the survey submission from the source survey was not transferred.', true);
                     }
                 }
             
