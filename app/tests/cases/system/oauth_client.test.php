@@ -86,4 +86,35 @@ class oauthClientTestCase extends SystemBaseTestCase
         $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'OAuth client deleted');
     }
+    
+    public function testAddOauthClientOtherUser()
+    {
+        $this->session->open($this->url.'oauthclients/add');
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="OauthClientUserId"] option[value="4"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit"]')->click();
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
+        $this->assertEqual($msg, 'A new OAuth client has been created');
+        
+        $this->waitForLogout('instructor3');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Instructor 3')->click();
+        // instructors will not be able to see the Oauth section of their profile
+        $oauth = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Add Client Credential');
+        $this->assertTrue(empty($oauth));
+        
+        $this->waitForLogout('root');
+        $this->session->open($this->url.'oauthclients');
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[aria-controls="table_id"]')->sendKeys('instructor3');
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                $count = count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'tr[class="odd"]'));
+                return ($count == 1);
+            }
+        );
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'td[class="  sorting_1"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Delete')->click();
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
+        $this->assertEqual($msg, 'OAuth client deleted');
+    }
 }
