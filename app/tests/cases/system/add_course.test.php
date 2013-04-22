@@ -43,6 +43,11 @@ class AddCourseTestCase extends SystemBaseTestCase
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Add Instructor')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="CourseInstructors"] option[value="4"]')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Add Instructor')->click();
+        
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="CourseTutors"] option[value="35"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Add Tutor')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="CourseTutors"] option[value="37"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Add Tutor')->click();
 
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="DepartmentDepartment"] option[value="2"]')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="DepartmentDepartment"] option[value="3"]')->click();
@@ -68,6 +73,11 @@ class AddCourseTestCase extends SystemBaseTestCase
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Add Instructor')->click();
         $instructor = $this->session->elements(PHPWebDriver_WebDriverBy::ID, 'Instructor0FullName');
         $this->assertTrue(empty($instructor));
+        
+        // did not select a tutor - no tutors should be added
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Add Tutor')->click();
+        $tutor = $this->session->elements(PHPWebDriver_WebDriverBy::ID, 'Tutor0FullName');
+        $this->assertTrue(empty($tutor));
         
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'CourseCourse')->sendKeys('APSC 201');
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
@@ -95,6 +105,9 @@ class AddCourseTestCase extends SystemBaseTestCase
         $instructor = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'Instructor0FullName')->attribute("value");
         $this->assertEqual($instructor, 'Instructor 1');
         
+        $tutor = $this->session->elements(PHPWebDriver_WebDriverBy::ID, 'Tutor0FullName');
+        $this->assertTrue(empty($tutor));
+        
         // departments - MECH/APSC selected
         $departments = $this->session->elements(PHPWebDRiver_WebDriverBy::CSS_SELECTOR,
             'select[id="DepartmentDepartment"] option[selected="selected"]');
@@ -113,6 +126,17 @@ class AddCourseTestCase extends SystemBaseTestCase
         $courseId = end(explode('/', $this->session->url()));
         $this->session->open($this->url.'courses/edit/'.$courseId);
         
+        $remove = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'X');
+        // remove Instructor 3
+        $remove[1]->click();
+        $instructor3 = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="CourseInstructors"] option[value="4"]');
+        $this->assertTrue(!empty($instructor3));
+        
+        // remove Tutor 1
+        $remove[2]->click();
+        $tutor1 = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="CourseTutors"] option[value="35"]');
+        $this->assertTrue(!empty($tutor1));
+        
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="status"] option[value="I"]')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
 
@@ -124,6 +148,17 @@ class AddCourseTestCase extends SystemBaseTestCase
         $this->assertEqual($msg, 'Error: You do not have permission to view this user');
 
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'EECE 474 101')->click();
+        
+        // check the instructor and tutor list is updated
+        $instructor1 = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Instructor 1');
+        $this->assertTrue(!empty($instructor1));
+        $instructor3 = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Instructor 3');
+        $this->assertTrue(empty($instructor3));
+        $tutor1 = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Tutor 1');
+        $this->assertTrue(empty($tutor1));
+        $tutor3 = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Tutor 3');
+        $this->assertTrue(!empty($tutor3));
+        
         // Students
         $link = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Add Student');
         $this->assertTrue(empty($link));
