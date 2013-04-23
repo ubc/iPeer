@@ -3,7 +3,7 @@ $averagePerQuestion = array();
 $numberQuestions = array();
 
 foreach ($mixeval['MixevalQuestion'] as $question) {
-    if ($question['mixeval_question_type_id'] == '1') {
+    if ($question['mixeval_question_type_id'] == '1' || $question['mixeval_question_type_id'] == '4') {
         $numberQuestions[] = $question;
     }
 }
@@ -16,6 +16,7 @@ echo $html->script('ricoeffects');
 echo $html->script('ricoanimation');
 echo $html->script('ricopanelcontainer');
 echo $html->script('ricoaccordion');
+
 ?>
 
 <div class="content-container">

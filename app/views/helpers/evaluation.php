@@ -47,9 +47,14 @@ class EvaluationHelper extends AppHelper
     {
         $questions = array('MixevalQuestion' => $questions);
         $numberQuestions = Set::extract($questions, '/MixevalQuestion[mixeval_question_type_id=1]');
+        $numberQuestionsDD = Set::extract($questions, '/MixevalQuestion[mixeval_question_type_id=4]');
         $numberQuestions = Set::extract($numberQuestions, '/MixevalQuestion[required=1]');
+        $numberQuestionsDD = Set::extract($numberQuestionsDD, '/MixevalQuestion[required=1]');
         $header = array(__('Evaluatee', true));
         foreach ($numberQuestions as $question) {
+            $header[] = sprintf('%d (/%.1f)', $question['MixevalQuestion']['question_num'], $question['MixevalQuestion']['multiplier']);
+        }
+        foreach ($numberQuestionsDD as $question) {
             $header[] = sprintf('%d (/%.1f)', $question['MixevalQuestion']['question_num'], $question['MixevalQuestion']['multiplier']);
         }
         $header[] = __("Total", true) . ' (/' . number_format($totalMark, 2) . ')';
