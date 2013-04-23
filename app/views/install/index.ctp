@@ -91,7 +91,7 @@ $php_recommended_settings = array(
   array (
     'name' => 'Display Errors',
     'directive' => 'display_errors',
-    'recommend' => 'ON'
+    'recommend' => 'OFF'
   ),
   array (
     'name' => 'File Uploads',
