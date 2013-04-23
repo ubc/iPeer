@@ -87,7 +87,7 @@ class AddCourseTestCase extends SystemBaseTestCase
     
     public function testDefaultValues()
     {
-        $this->waitForLogout('instructor1');
+        $this->waitForLogoutLogin('instructor1');
         
         $this->session->open($this->url.'courses/add');
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'CourseCourse')->sendKeys('CPSC 101 101');

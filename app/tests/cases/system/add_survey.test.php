@@ -393,7 +393,7 @@ class addSurveyTestCase extends SystemBaseTestCase
         $mySurvey = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Group Making Survey');
         $this->assertTrue(!empty($mySurvey));
         
-        $this->waitForLogout('instructor1');
+        $this->waitForLogoutLogin('instructor1');
         $this->session->open($this->url.'surveys');
         // public survey (in use)
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Team Creation Survey')->click();
@@ -426,7 +426,7 @@ class addSurveyTestCase extends SystemBaseTestCase
         $mySurvey = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Group Making Survey');
         $this->assertTrue(empty($mySurvey));
         
-        $this->waitForLogout('root');
+        $this->waitForLogoutLogin('root');
     }
     
     public function deleteQues()

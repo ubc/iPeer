@@ -220,7 +220,7 @@ class MergeUsersTestCase extends SystemBaseTestCase
     
     public function testMergeLoggedInUser()
     {
-        $this->waitForLogout('admin1');
+        $this->waitForLogoutLogin('admin1');
         $this->session->open($this->url.'users/merge');
         $return = new PHPWebDriver_WebDriverKeys('ReturnKey');
         

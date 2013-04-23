@@ -81,7 +81,7 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         $eval = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation');
         $this->assertTrue(!empty($eval));
         
-        $this->waitForLogout('instructor1');
+        $this->waitForLogoutLogin('instructor1');
         $this->session->open($this->url.'mixevals/index');
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation')->click();
         $url = $this->session->url();
@@ -97,7 +97,7 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         $this->session->open(str_replace('view', 'copy', $url));
         // copying public template
         $this->copyTemplate();
-        $this->waitForLogout('root');
+        $this->waitForLogoutLogin('root');
         
         $this->session->open($url);
         // view the template

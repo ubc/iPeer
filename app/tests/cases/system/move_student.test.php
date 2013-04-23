@@ -279,14 +279,14 @@ class MoveStudentTestCase extends SystemBaseTestCase
         $this->enrolStudent('redshirt0005', '1');
         $this->enrolStudent('redshirt0006', '1');
         
-        $this->waitForLogout('redshirt0004');
+        $this->waitForLogoutLogin('redshirt0004');
         $this->fillInSurvey('1', '5', 'Team Creation Survey');
-        $this->waitForLogout('redshirt0005');
+        $this->waitForLogoutLogin('redshirt0005');
         $this->fillInSurvey('1', '6', 'Team Creation Survey');
-        $this->waitForLogout('redshirt0006');
+        $this->waitForLogoutLogin('redshirt0006');
         $this->fillInSurvey('2', '5', 'Team Creation Survey');
         
-        $this->waitForLogout('root');
+        $this->waitForLogoutLogin('root');
         $this->session->open($this->url.'courses/add');
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'CourseCourse')->sendKeys('EECE 375 101');
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'CourseTitle')->sendKeys('Project Course');
@@ -317,9 +317,9 @@ class MoveStudentTestCase extends SystemBaseTestCase
         $this->enrolStudent('redshirt0005', $this->courseId);
         $this->enrolStudent('redshirt0006', $this->courseId);
         
-        $this->waitForLogout('redshirt0005');
+        $this->waitForLogoutLogin('redshirt0005');
         $this->fillInSurvey('1', '5', 'Test Survey');
-        $this->waitForLogout('root');
+        $this->waitForLogoutLogin('root');
     }
     
     public function fillInSurvey($first, $snd, $survey)

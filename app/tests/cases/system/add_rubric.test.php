@@ -205,7 +205,7 @@ class addRubricTestCase extends SystemBaseTestCase
         $eval = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation');
         $this->assertTrue(!empty($eval));
         
-        $this->waitForLogout('instructor1');
+        $this->waitForLogoutLogin('instructor1');
         $this->session->open($this->url.'rubrics/index');
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation')->click();
         $url = $this->session->url();
@@ -344,7 +344,7 @@ class addRubricTestCase extends SystemBaseTestCase
         $this->session->open(str_replace('view', 'delete', $this->session->url()));
         $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'The rubric was deleted successfully.');
-        $this->waitForLogout('root');
+        $this->waitForLogoutLogin('root');
     }
     
     public function testDeleteRubric()

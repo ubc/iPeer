@@ -30,7 +30,7 @@ class ImportUsersTestCase extends SystemBaseTestCase
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Import Students')->click();
         
         $file = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserFile');
-        $file->sendKeys(dirname(__FILE__).'/newClass_APSC201.csv');        
+        $file->sendKeys(dirname(__FILE__).'/files/newClass_APSC201.csv');        
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $session = $this->session;
@@ -74,7 +74,7 @@ class ImportUsersTestCase extends SystemBaseTestCase
     {
         $this->session->open($this->url.'users/import/2');
         $file = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserFile');
-        $file->sendKeys(dirname(__FILE__).'/oldClass_APSC201.csv');
+        $file->sendKeys(dirname(__FILE__).'/files/oldClass_APSC201.csv');
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserUpdateClass')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
 

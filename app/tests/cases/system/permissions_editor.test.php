@@ -43,7 +43,7 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
         $this->assertEqual($title, 'Permissions Editor > instructor');
         
         // search for functions/user/index
-        $this->findPermissions();
+        $this->findPermissions('controllers/accesses/view');
         
         // allow access
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow All')->click();
@@ -52,13 +52,13 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
     
     public function testAccess()
     {
-        $this->waitForLogout('instructor1');
+        $this->waitForLogoutLogin('instructor1');
         
         $this->session->open($this->url.'accesses/view/5');
         $title = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'Permissions Editor > student');
         
-        $this->waitForLogout('root');
+        $this->waitForLogoutLogin('root');
     }
     
     public function testDenyAccess()
@@ -68,18 +68,105 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
         $this->assertEqual($title, 'Permissions Editor > instructor');
 
         // search for functions/user/index
-        $this->findPermissions();
+        $this->findPermissions('controllers/accesses/view');
         
         // deny access
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny All')->click();
         $this->updatePermissions();
     }
     
-    public function findPermissions()
+    public function testDenyIndividualActions()
+    {
+        $this->session->open($this->url.'accesses/view/3');
+        
+        // deny create
+        $this->findPermissions('controllers/mixevals/index');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Create')->click();
+        $this->updatePermissions();
+        // deny read
+        $this->findPermissions('controllers/mixevals/index');
+        $deny = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Create');
+        $allow = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow Create');
+        $this->assertTrue(empty($deny));
+        $this->assertTrue(!empty($allow));
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Read')->click();
+        $this->updatePermissions();
+        // deny update
+        $this->findPermissions('controllers/mixevals/index');
+        $deny = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Read');
+        $allow = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow Read');
+        $this->assertTrue(empty($deny));
+        $this->assertTrue(!empty($allow));
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Update')->click();
+        $this->updatePermissions();
+        // deny delete
+        $this->findPermissions('controllers/mixevals/index');
+        $deny = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Update');
+        $allow = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow Update');
+        $this->assertTrue(empty($deny));
+        $this->assertTrue(!empty($allow));
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Delete')->click();
+        $this->updatePermissions();
+        
+        $this->waitForLogoutLogin('instructor1');
+        $this->session->open($this->url.'evaltools');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Mixed Evaluations')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::ID, 'flashMessage'));
+            }
+        );
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'flashMessage');
+        $this->assertEqual($msg->text(), 'Error: You do not have permission to access the page.');
+        $this->waitForLogoutLogin('root');
+    }
+    
+    public function testAllowIndividualActions()
+    {
+        $this->session->open($this->url.'accesses/view/3');
+        
+        // allow create
+        $this->findPermissions('controllers/mixevals/index');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow Create')->click();
+        $this->updatePermissions();
+        // allow read
+        $this->findPermissions('controllers/mixevals/index');
+        $deny = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Create');
+        $allow = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow Create');
+        $this->assertTrue(!empty($deny));
+        $this->assertTrue(empty($allow));
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow Read')->click();
+        $this->updatePermissions();
+        // allow update
+        $this->findPermissions('controllers/mixevals/index');
+        $deny = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Read');
+        $allow = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow Read');
+        $this->assertTrue(!empty($deny));
+        $this->assertTrue(empty($allow));
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow Update')->click();
+        $this->updatePermissions();
+        // allow delete
+        $this->findPermissions('controllers/mixevals/index');
+        $deny = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Update');
+        $allow = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow Update');
+        $this->assertTrue(!empty($deny));
+        $this->assertTrue(empty($allow));
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow Delete')->click();
+        $this->updatePermissions();
+        
+        $this->waitForLogoutLogin('instructor1');
+        $this->session->open($this->url.'evaltools');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Mixed Evaluations')->click();
+        $this->assertEqual($this->session->url(), $this->url.'mixevals');
+    }
+    
+    public function findPermissions($permission)
     {
         // search for the permission to access users/index
         $search = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[aria-controls="table_id"]');
-        $search->sendKeys('controllers/accesses/view');
+        $search->sendKeys($permission);
         
         // open the table row for options
         $w = new PHPWebDriver_WebDriverWait($this->session);

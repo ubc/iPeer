@@ -27,7 +27,7 @@ class ImportGroupsTestCase extends SystemBaseTestCase
     {
         $this->session->open($this->url.'groups/import/2');
         $file = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'GroupFile');
-        $file->sendKeys(dirname(__FILE__).'/importGroup.csv');
+        $file->sendKeys(dirname(__FILE__).'/files/importGroup.csv');
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $session = $this->session;
@@ -62,12 +62,12 @@ class ImportGroupsTestCase extends SystemBaseTestCase
     
     public function testImportInvalidUsers()
     {
-        $this->waitForLogout('instructor1');
+        $this->waitForLogoutLogin('instructor1');
         $this->session->open($this->url.'courses/home/1');
         $this->session->open($this->url.'groups/import/1');
         $file = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'GroupFile');
         // tests nonexistant users, unenrolled students/tutors, import user of a different role (eg. instructor)
-        $file->sendKeys(dirname(__FILE__).'/invalidGroupMembers.csv');
+        $file->sendKeys(dirname(__FILE__).'/files/invalidGroupMembers.csv');
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $session = $this->session;
@@ -115,7 +115,7 @@ class ImportGroupsTestCase extends SystemBaseTestCase
         $this->session->open($this->url.'groups/import/1');
         $file = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'GroupFile');
         // students identified with student numbers
-        $file->sendKeys(dirname(__FILE__).'/groupsStudentNo.csv');
+        $file->sendKeys(dirname(__FILE__).'/files/groupsStudentNo.csv');
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'GroupIdentifiersStudentNo')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);

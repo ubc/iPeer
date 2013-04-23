@@ -105,7 +105,7 @@ class addSimpleTestCase extends SystemBaseTestCase
         $flash = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'flashMessage')->text();
         $this->assertEqual($flash, 'Submissions had been made. Module 1 Project Evaluation cannot be edited. Please make a copy.');
 
-        $this->waitForLogout('instructor1');
+        $this->waitForLogoutLogin('instructor1');
         $this->session->open($this->url.'evaltools');
         $creator = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Project Eval Part One');
         $this->assertTrue(empty($creator));
@@ -118,7 +118,7 @@ class addSimpleTestCase extends SystemBaseTestCase
         $flash = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'flashMessage')->text();
         $this->assertEqual($flash, 'Error: You do not have permission to edit this evaluation');
 
-        $this->waitForLogout('root');
+        $this->waitForLogoutLogin('root');
     }
     
     public function testCopy()

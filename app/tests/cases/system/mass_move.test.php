@@ -36,7 +36,7 @@ class massMoveTestCase extends SystemBaseTestCase
         $this->assertTrue($submit->attribute('disabled'));
         
         $file = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'CourseFile');
-        $file->sendKeys(dirname(__FILE__).'/massMove.csv');
+        $file->sendKeys(dirname(__FILE__).'/files/massMove.csv');
         
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'CourseIdentifiersUsername')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 
@@ -113,7 +113,7 @@ class massMoveTestCase extends SystemBaseTestCase
         );
         
         //fill in survey for one student
-        $this->waitForLogout('redshirt0001');
+        $this->waitForLogoutLogin('redshirt0001');
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Test Survey')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'SurveyInput0ResponseId2')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'SurveyInput1ResponseId5')->click();
@@ -123,11 +123,11 @@ class massMoveTestCase extends SystemBaseTestCase
                 return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
             }
         );
-        $this->waitForLogout('root');
+        $this->waitForLogoutLogin('root');
         
         $this->session->open($this->url.'courses/import');
         $file = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'CourseFile');
-        $file->sendKeys(dirname(__FILE__).'/massMoveStudentNo.csv');
+        $file->sendKeys(dirname(__FILE__).'/files/massMoveStudentNo.csv');
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="CourseSourceCourses"] option[value="'.$this->courseId.'"]')->click();
         $w->until(
             function($session) {

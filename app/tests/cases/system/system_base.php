@@ -22,7 +22,7 @@ class SystemBaseTestCase extends CakeTestCase
         $this->url = $server;
     }
     
-    public function waitForLogout($username)
+    public function waitForLogoutLogin($username)
     {
         $this->session->open($this->url);
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Logout')->click();

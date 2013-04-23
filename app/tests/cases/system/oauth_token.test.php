@@ -97,13 +97,13 @@ class oauthTokenTestCase extends SystemBaseTestCase
         $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'New OAuth token created!');
         
-        $this->waitForLogout('instructor3');
+        $this->waitForLogoutLogin('instructor3');
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Instructor 3')->click();
         // instructors will not be able to see the Oauth section of their profile
         $oauth = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Add Token Credential');
         $this->assertTrue(empty($oauth));
         
-        $this->waitForLogout('root');
+        $this->waitForLogoutLogin('root');
         $this->session->open($this->url.'oauthtokens');
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[aria-controls="table_id"]')->sendKeys('instructor3');
         $w = new PHPWebDriver_WebDriverWait($this->session);
