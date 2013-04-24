@@ -34,7 +34,7 @@
 </tr>
 <tr>
     <td>
-        <?php if ($studentResult['gradeReleaseStatus'] || $event['Event']['auto_release']) {
+        <?php if ($gradeReleased) {
             $finalAvg = $studentResult['aveScore'] - $studentResult['avePenalty'];
             ($studentResult['avePenalty'] > 0) ? ($stringAddOn = ' - '.'('.'<font color=\'red\'>'.$studentResult['avePenalty'].'</font>'.
                 ')'.'<font color=\'red\'>*</font>'.' = '.number_format($finalAvg, 2)) : $stringAddOn = '';
@@ -51,7 +51,7 @@
     <?php if ($event['Event']['enable_details']) { ?>
     <td>
         <?php
-            if ($studentResult['gradeReleaseStatus'] || $event['Event']['auto_release']) {
+            if ($gradeReleased) {
                 isset($studentResult['groupAve'])? $groupAve = $studentResult['groupAve']: $groupAve = 0;
                 echo number_format($groupAve, 2);
             } else {
@@ -62,7 +62,7 @@
     <?php } ?>
 </tr>
 </table>
-<?php if ($event['Event']['enable_details']) { ?>
+<?php if ($event['Event']['enable_details'] && $commentReleased) { ?>
 <table class="standardtable">
     <tr>
         <th><?php __('Comments')?> (<?php __('Randomly Ordered')?>)</th>

@@ -204,7 +204,8 @@ foreach ($results['evaluatees'] as $evaluatee) {
     if (isset($results['NumEvaluators'][$evaluateeId])) {
         $totalGrade = (float) $results['TotalGrades'][$evaluateeId];
         $numEvaluators = $results['NumEvaluators'][$evaluateeId];
-        $avgScore = $totalGrade / $numEvaluators;
+        $penalty = (1 - $results['Penalties'][$evaluateeId] / 100);
+        $avgScore = $totalGrade * $penalty / $numEvaluators;
         $avgScore = number_format($avgScore, 2);
     }
     echo "<td>$avgScore</td>";

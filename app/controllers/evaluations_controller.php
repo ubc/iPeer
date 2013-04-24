@@ -1189,6 +1189,8 @@ class EvaluationsController extends AppController
         case 1: //View Simple Evaluation Result
             $studentResult = $this->EvaluationSimple->formatStudentViewOfSimpleEvaluationResult($event, $userId);
             $this->set('studentResult', $studentResult);
+            $this->set('gradeReleased', $studentResult['gradeReleased']);
+            $this->set('commentReleased', $studentResult['commentReleased']);
             $this->render('student_view_simple_evaluation_results');
             break;
 
