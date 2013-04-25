@@ -124,6 +124,14 @@ class Event extends AppModel
             'dependent' => true,
             'foreignKey' => 'event_id'
         ),
+        'EvaluationRubric' =>
+        array(
+            'className' => 'EvaluationRubric',
+            'conditions' => '',
+            'order' => '',
+            'dependent' => true,
+            'foreignKey' => 'event_id'
+        ),
     );
 
     /**

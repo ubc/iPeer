@@ -70,6 +70,10 @@ if (!empty($notInGroup)) {
     <?php
     $groupAve = 0;
     array_pop($scoreRecords);
+    foreach ($scoreRecords as $userId => $row) {
+        $scaled[$userId] = $row['total'] * (1 - ($penalties[$userId] / 100));
+    }
+    $groupAve = array_sum($scaled) / count($scaled);
     foreach($scoreRecords as $userId => $row) {?>
         <div id="panel<?php echo $userId?>">
         <div id="panel<?php echo $userId?>Header" class="panelheader">
@@ -77,13 +81,12 @@ if (!empty($notInGroup)) {
         </div>
         <div style="height: 200px;text-align: center;" id="panel1Content" class="panelContent">
             <br><?php
-                $scaled = $row['total'] * (1 - ($penalties[$userId] / 100));
                 $deduction = number_format($row['total'] * ($penalties[$userId] / 100), 2);
-                $percent = number_format($scaled/$rubric['Rubric']['total_marks']*100);
+                $percent = number_format($scaled[$userId]/$rubric['Rubric']['total_marks']*100);
 
                 echo __(" (Number of Evaluator(s): ",true).$row['evaluator_count'].")<br/>";
                 echo __("Final Total: ",true).number_format($row['total'],2);
-                $penalties[$userId] > 0 ? $penaltyAddOn = ' - '."<font color=\"red\">".$deduction."</font> = ".number_format($scaled, 2) :
+                $penalties[$userId] > 0 ? $penaltyAddOn = ' - '."<font color=\"red\">".$deduction."</font> = ".number_format($scaled[$userId], 2) :
                     $penaltyAddOn = '';
                 echo $penaltyAddOn.' ('.$percent.'%)';
                 // temporarily removed avgscorepercent
@@ -96,11 +99,11 @@ if (!empty($notInGroup)) {
                     $memberAvgScore = '-';
                     $memberAvgScorePercent = '-';
                 }*/
-                if ($scaled == $groupAve) {
+                if ($scaled[$userId] == $groupAve) {
                     echo "&nbsp;&nbsp;((".__("Same Mark as Group Average", true)." ))<br>";
-                } else if ($scaled < $groupAve) {
+                } else if ($scaled[$userId] < $groupAve) {
                     echo "&nbsp;&nbsp;<font color='#cc0033'><< ".__('Below Group Average', true)." >></font><br>";
-                } else if ($scaled > $groupAve) {
+                } else if ($scaled[$userId] > $groupAve) {
                     echo "&nbsp;&nbsp;<font color='#000099'><< ".__('Above Group Average', true)." >></font><br>";
                 }
                 // temporarily removed avgscorepercent

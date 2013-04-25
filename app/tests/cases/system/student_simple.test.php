@@ -35,8 +35,6 @@ class studentSimple extends SystemBaseTestCase
 
         //set due date and release date end to next month so that the event is opened.
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->click();
-        /*$this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
-        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '1')->click();*/
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateBegin')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
@@ -176,9 +174,9 @@ class studentSimple extends SystemBaseTestCase
         // edit event's result release date begin to test student view of the results
         $this->session->open($this->url.'events/edit/'.$this->eventId);
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->click();
-        $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ui-datepicker-div"]/div[3]/button[1]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ui-datepicker-div"]/div[3]/button[1]')->click(); // today
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateBegin')->click();
-        $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ui-datepicker-div"]/div[3]/button[1]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ui-datepicker-div"]/div[3]/button[1]')->click(); // today
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $session = $this->session;     
@@ -326,6 +324,10 @@ class studentSimple extends SystemBaseTestCase
         $this->assertEqual($com5, 'Does his fair share of work');
         $this->assertEqual($com6, 'Knows what he is doing');
         $this->assertEqual($com7, 'Does his work efficiently');
+        
+        // colour coding for Tutor in comments section
+        $tutor = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="evalForm2"]/h3[3]');
+        $this->assertEqual($tutor->attribute('class'), 'blue');
     }
     
     public function testStudentViewResults()
@@ -345,10 +347,47 @@ class studentSimple extends SystemBaseTestCase
         $this->assertEqual($comments[2], 'Very responsible.');    
     }
     
-    public function testDeleteEvent()
+    public function testNoDetails()
+    {
+        $this->waitForLogoutLogin('root');
+        $this->session->open($this->url.'events/edit/'.$this->eventId);
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventEnableDetails0')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit"]')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;     
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        $this->waitForLogoutLogin('redshirt0002');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Simple Evaluation')->click();
+        $rating = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td')->text();
+        $this->assertEqual($rating, '110.00 - (11)* = 99.00          ( )* : 10% late penalty.');
+        $groupAve = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[2]');
+        $this->assertTrue(empty($groupAve));
+        $comments = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]');
+        $this->assertTrue(empty($comments));
+    }
+    
+    public function testTutorInInstructorView()
     {
         $this->waitForLogoutLogin('root');
         $this->assignToGroup();
+        // tutor's panel - does not exist
+        $this->session->open($this->url.'evaluations/viewEvaluationResults/'.$this->eventId.'/1/Detail');
+        // summary table
+        $tutor = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[5]/tbody/tr[2]/th[4]');
+        $this->assertTrue(empty($tutor));
+        // no class for Tutor - since they are reassigned to the group
+        $tutor = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[5]/tbody/tr[6]/th');
+        $this->assertFalse($tutor->attribute('class'));
+        $tutor = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="evalForm2"]/h3[3]');
+        $this->assertFalse($tutor->attribute('class'));
+    }
+    
+    public function testDeleteEvent()
+    {
         $this->session->open($this->url.'events/delete/'.$this->eventId);
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $session = $this->session;

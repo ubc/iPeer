@@ -1208,7 +1208,7 @@ class EvaluationsController extends AppController
                 Set::extract($evaluatorDetails, '/EvaluationRubric/evaluatee'), array($userId)));
             $fullNames = $this->User->getFullNames($userIds);
             $sub = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $userId);
-            $penalty = $this->Penalty->getPenaltyPercent($sub);
+            $penalty = empty($sub) ? $this->Penalty->getPenaltyPercent($event) : $this->Penalty->getPenaltyPercent($sub);
             $status = array(
                 'comment' => array_product(Set::extract($evaluateeDetails, '/EvaluationRubric/comment_release')),
                 'grade' => array_product(Set::extract($evaluateeDetails, '/EvaluationRubric/grade_release')),

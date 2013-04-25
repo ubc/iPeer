@@ -66,7 +66,7 @@ echo $this->Html->tableCells($scores);
 <!-- Display Average Scores -->
 <tr class="tablesummary">
 <td><b><?php echo __("Group Average: ", true) ?></b></td>
-<td><b><?php echo (count($members) > 0) ? number_format($aveScoreSum / count($members), 2) : 0; ?></b></td>
+<td><b><?php echo (count($scoreRecords) > 0) ? number_format($aveScoreSum / count($scoreRecords), 2) : 0; ?></b></td>
 
 <tr><td colspan="2"><?php echo $this->Evaluation->getReviewButton($event, 'Basic')?></td></tr>
 </table>
