@@ -132,6 +132,21 @@ class Event extends AppModel
             'dependent' => true,
             'foreignKey' => 'event_id'
         ),
+        'SurveyInput' =>
+        array(
+            'className' => 'SurveyInput',
+            'conditions' => '',
+            'order' => '',
+            'dependent' => true,
+            'foreignKey' => 'event_id'
+        ),
+        'EvaluationMixeval' =>
+        array(
+            'conditions' => '',
+            'order' => '',
+            'dependent' => true,
+            'foreignKey' => 'event_id'
+        ),
     );
 
     /**

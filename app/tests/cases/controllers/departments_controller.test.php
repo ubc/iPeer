@@ -4,8 +4,8 @@ App::import('Controller', 'Departments');
 App::import('Lib', 'ExtendedAuthTestCase');
 
 // mock instead of needing to create a new controller for every test
-Mock::generatePartial('EventsController',
-    'MockEventsController',
+Mock::generatePartial('DepartmentsController',
+    'MockDepartmentsController',
     array('isAuthorized', 'render', 'redirect', '_stop', 'header'));
 
 class TestDepartmentsController extends DepartmentsController {
@@ -52,7 +52,7 @@ class DepartmentsControllerTestCase extends ExtendedAuthTestCase {
 
     function startTest($method) {
         echo $method.TEST_LB;
-        $this->controller = new MockEventsController();
+        $this->controller = new MockDepartmentsController();
     }
 
     public function endTest($method)

@@ -11,7 +11,9 @@ class UserTestCase extends CakeTestCase {
         'app.question', 'app.response', 'app.survey_question', 'app.user_course',
         'app.user_tutor', 'app.user_enrol', 'app.department', 'app.faculty',
         'app.course_department', 'app.user_faculty', 'app.role', 'app.roles_user',
-        'app.penalty', 'app.evaluation_simple', 'app.survey_input',
+        'app.penalty', 'app.evaluation_simple', 'app.survey_input', 'app.oauth_token',
+        'app.evaluation_rubric', 'app.evaluation_rubric_detail', 'app.evaluation_mixeval',
+        'app.evaluation_mixeval_detail'
     );
 
     function startCase()

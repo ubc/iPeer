@@ -13,6 +13,8 @@ class GroupEventTestCase extends CakeTestCase {
         'app.user_enrol', 'app.groups_member', 'app.survey', 'app.rubric', 'app.faculty', 'app.course_department',
         'app.department', 'app.user_faculty', 'app.sys_parameter',
         'app.user_tutor', 'app.penalty', 'app.evaluation_simple', 'app.survey_input',
+        'app.oauth_token', 'app.evaluation_rubric', 'app.evaluation_rubric_detail',
+        'app.evaluation_mixeval', 'app.evaluation_mixeval_detail'
     );
     public $GroupEvent = null;
 

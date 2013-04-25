@@ -16,7 +16,9 @@ class SurveyGroupMemberTestCase extends CakeTestCase
         'app.survey_group_member', 'app.oauth_token', 'app.sys_parameter',
         'app.evaluation_simple', 'app.survey_input', 'app.faculty',
         'app.user_faculty', 'app.user_tutor', 'app.department',
-        'app.course_department', 'app.penalty'
+        'app.course_department', 'app.penalty', 'app.evaluation_rubric',
+        'app.evaluation_rubric_detail', 'app.evaluation_mixeval',
+        'app.evaluation_mixeval_detail'
     );
     public $SurveyGroupMember = null;
 

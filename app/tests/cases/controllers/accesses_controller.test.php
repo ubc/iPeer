@@ -25,7 +25,8 @@ class AccessesControllerTest extends ExtendedAuthTestCase
         'app.survey', 'app.question', 'app.response', 'app.survey_question',
         'app.survey_group', 'app.faculty', 'app.user_faculty', 'app.role', 'app.roles_user',
         'app.user_course', 'app.user_tutor', 'app.user_enrol','app.groups_member',
-        'app.department', 'app.course_department', 'app.penalty'
+        'app.department', 'app.course_department', 'app.penalty', 'app.evaluation_rubric',
+        'app.evaluation_rubric_detail', 'app.evaluation_mixeval', 'app.evaluation_mixeval_detail'
     );
     
     /**

@@ -11,7 +11,7 @@ class V1ControllerTest extends CakeTestCase {
         'app.faculty', 'app.department', 'app.course_department',
         'app.user_faculty', 'app.user_tutor', 'app.sys_parameter',
         'app.penalty', 'app.oauth_client', 'app.oauth_token',
-        'app.survey_input',
+        'app.survey_input', 'app.evaluation_rubric_detail', 'app.evaluation_mixeval_detail'
     );
 
     public function startCase() {
