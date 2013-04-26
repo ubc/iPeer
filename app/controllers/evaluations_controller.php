@@ -1708,7 +1708,7 @@ class EvaluationsController extends AppController
         $this->set('questions', $formattedResult);
         $this->set('breadcrumb',
             $this->breadcrumb->push(array('course' => $course['Course']))
-            ->push(array('survey' => $survey['Survey']))
+            ->push(array('event' => $event['Event']))
             ->push(__('Summary', true)));
 
         $submissions = $this->SurveyInput->findAllByEventId($eventId);
